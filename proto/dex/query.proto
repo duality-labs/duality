@@ -5,6 +5,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "dex/params.proto";
+import "dex/share.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -15,7 +16,17 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/NicholasDotSol/duality/dex/params";
   }
-  // this line is used by starport scaffolding # 2
+  // Queries a Share by index.
+	rpc Share(QueryGetShareRequest) returns (QueryGetShareResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/share/{owner}/{token0}/{token1}/{price}/{fee}";
+	}
+
+	// Queries a list of Share items.
+	rpc ShareAll(QueryAllShareRequest) returns (QueryAllShareResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/share";
+	}
+
+// this line is used by starport scaffolding # 2
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -25,6 +36,28 @@ message QueryParamsRequest {}
 message QueryParamsResponse {
   // params holds all the parameters of this module.
   Params params = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryGetShareRequest {
+	  string owner = 1;
+  string token0 = 2;
+  string token1 = 3;
+  string price = 4;
+  uint64 fee = 5;
+
+}
+
+message QueryGetShareResponse {
+	Share share = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllShareRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllShareResponse {
+	repeated Share share = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // this line is used by starport scaffolding # 3
