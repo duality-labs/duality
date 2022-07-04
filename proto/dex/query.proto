@@ -6,6 +6,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "dex/params.proto";
 import "dex/share.proto";
+import "dex/tick.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -24,6 +25,16 @@ service Query {
 	// Queries a list of Share items.
 	rpc ShareAll(QueryAllShareRequest) returns (QueryAllShareResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/share";
+	}
+
+// Queries a Tick by index.
+	rpc Tick(QueryGetTickRequest) returns (QueryGetTickResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick/{token0}/{token1}/{price}/{fee}";
+	}
+
+	// Queries a list of Tick items.
+	rpc TickAll(QueryAllTickRequest) returns (QueryAllTickResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -57,6 +68,27 @@ message QueryAllShareRequest {
 
 message QueryAllShareResponse {
 	repeated Share share = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetTickRequest {
+	  string token0 = 1;
+  string token1 = 2;
+  string price = 3;
+  uint64 fee = 4;
+
+}
+
+message QueryGetTickResponse {
+	Tick tick = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllTickRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllTickResponse {
+	repeated Tick tick = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

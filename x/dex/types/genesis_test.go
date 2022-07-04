@@ -38,6 +38,20 @@ func TestGenesisState_Validate(t *testing.T) {
 						Fee:    1,
 					},
 				},
+				TickList: []types.Tick{
+					{
+						Token0: "0",
+						Token1: "0",
+						Price:  "0",
+						Fee:    0,
+					},
+					{
+						Token0: "1",
+						Token1: "1",
+						Price:  "1",
+						Fee:    1,
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -55,6 +69,26 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 					{
 						Owner:  "0",
+						Token0: "0",
+						Token1: "0",
+						Price:  "0",
+						Fee:    0,
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated tick",
+			genState: &types.GenesisState{
+				TickList: []types.Tick{
+					{
+						Token0: "0",
+						Token1: "0",
+						Price:  "0",
+						Fee:    0,
+					},
+					{
 						Token0: "0",
 						Token1: "0",
 						Price:  "0",

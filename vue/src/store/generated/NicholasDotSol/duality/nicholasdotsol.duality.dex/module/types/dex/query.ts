@@ -7,6 +7,7 @@ import {
   PageRequest,
   PageResponse,
 } from "../cosmos/base/query/v1beta1/pagination";
+import { Tick } from "../dex/tick";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -37,6 +38,26 @@ export interface QueryAllShareRequest {
 
 export interface QueryAllShareResponse {
   share: Share[];
+  pagination: PageResponse | undefined;
+}
+
+export interface QueryGetTickRequest {
+  token0: string;
+  token1: string;
+  price: string;
+  fee: number;
+}
+
+export interface QueryGetTickResponse {
+  tick: Tick | undefined;
+}
+
+export interface QueryAllTickRequest {
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryAllTickResponse {
+  tick: Tick[];
   pagination: PageResponse | undefined;
 }
 
@@ -481,6 +502,328 @@ export const QueryAllShareResponse = {
   },
 };
 
+const baseQueryGetTickRequest: object = {
+  token0: "",
+  token1: "",
+  price: "",
+  fee: 0,
+};
+
+export const QueryGetTickRequest = {
+  encode(
+    message: QueryGetTickRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.token0 !== "") {
+      writer.uint32(10).string(message.token0);
+    }
+    if (message.token1 !== "") {
+      writer.uint32(18).string(message.token1);
+    }
+    if (message.price !== "") {
+      writer.uint32(26).string(message.price);
+    }
+    if (message.fee !== 0) {
+      writer.uint32(32).uint64(message.fee);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryGetTickRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGetTickRequest } as QueryGetTickRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.token0 = reader.string();
+          break;
+        case 2:
+          message.token1 = reader.string();
+          break;
+        case 3:
+          message.price = reader.string();
+          break;
+        case 4:
+          message.fee = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetTickRequest {
+    const message = { ...baseQueryGetTickRequest } as QueryGetTickRequest;
+    if (object.token0 !== undefined && object.token0 !== null) {
+      message.token0 = String(object.token0);
+    } else {
+      message.token0 = "";
+    }
+    if (object.token1 !== undefined && object.token1 !== null) {
+      message.token1 = String(object.token1);
+    } else {
+      message.token1 = "";
+    }
+    if (object.price !== undefined && object.price !== null) {
+      message.price = String(object.price);
+    } else {
+      message.price = "";
+    }
+    if (object.fee !== undefined && object.fee !== null) {
+      message.fee = Number(object.fee);
+    } else {
+      message.fee = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetTickRequest): unknown {
+    const obj: any = {};
+    message.token0 !== undefined && (obj.token0 = message.token0);
+    message.token1 !== undefined && (obj.token1 = message.token1);
+    message.price !== undefined && (obj.price = message.price);
+    message.fee !== undefined && (obj.fee = message.fee);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryGetTickRequest>): QueryGetTickRequest {
+    const message = { ...baseQueryGetTickRequest } as QueryGetTickRequest;
+    if (object.token0 !== undefined && object.token0 !== null) {
+      message.token0 = object.token0;
+    } else {
+      message.token0 = "";
+    }
+    if (object.token1 !== undefined && object.token1 !== null) {
+      message.token1 = object.token1;
+    } else {
+      message.token1 = "";
+    }
+    if (object.price !== undefined && object.price !== null) {
+      message.price = object.price;
+    } else {
+      message.price = "";
+    }
+    if (object.fee !== undefined && object.fee !== null) {
+      message.fee = object.fee;
+    } else {
+      message.fee = 0;
+    }
+    return message;
+  },
+};
+
+const baseQueryGetTickResponse: object = {};
+
+export const QueryGetTickResponse = {
+  encode(
+    message: QueryGetTickResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.tick !== undefined) {
+      Tick.encode(message.tick, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryGetTickResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGetTickResponse } as QueryGetTickResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tick = Tick.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetTickResponse {
+    const message = { ...baseQueryGetTickResponse } as QueryGetTickResponse;
+    if (object.tick !== undefined && object.tick !== null) {
+      message.tick = Tick.fromJSON(object.tick);
+    } else {
+      message.tick = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetTickResponse): unknown {
+    const obj: any = {};
+    message.tick !== undefined &&
+      (obj.tick = message.tick ? Tick.toJSON(message.tick) : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryGetTickResponse>): QueryGetTickResponse {
+    const message = { ...baseQueryGetTickResponse } as QueryGetTickResponse;
+    if (object.tick !== undefined && object.tick !== null) {
+      message.tick = Tick.fromPartial(object.tick);
+    } else {
+      message.tick = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllTickRequest: object = {};
+
+export const QueryAllTickRequest = {
+  encode(
+    message: QueryAllTickRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryAllTickRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryAllTickRequest } as QueryAllTickRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllTickRequest {
+    const message = { ...baseQueryAllTickRequest } as QueryAllTickRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllTickRequest): unknown {
+    const obj: any = {};
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageRequest.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryAllTickRequest>): QueryAllTickRequest {
+    const message = { ...baseQueryAllTickRequest } as QueryAllTickRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllTickResponse: object = {};
+
+export const QueryAllTickResponse = {
+  encode(
+    message: QueryAllTickResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    for (const v of message.tick) {
+      Tick.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(
+        message.pagination,
+        writer.uint32(18).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryAllTickResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryAllTickResponse } as QueryAllTickResponse;
+    message.tick = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.tick.push(Tick.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllTickResponse {
+    const message = { ...baseQueryAllTickResponse } as QueryAllTickResponse;
+    message.tick = [];
+    if (object.tick !== undefined && object.tick !== null) {
+      for (const e of object.tick) {
+        message.tick.push(Tick.fromJSON(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllTickResponse): unknown {
+    const obj: any = {};
+    if (message.tick) {
+      obj.tick = message.tick.map((e) => (e ? Tick.toJSON(e) : undefined));
+    } else {
+      obj.tick = [];
+    }
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageResponse.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryAllTickResponse>): QueryAllTickResponse {
+    const message = { ...baseQueryAllTickResponse } as QueryAllTickResponse;
+    message.tick = [];
+    if (object.tick !== undefined && object.tick !== null) {
+      for (const e of object.tick) {
+        message.tick.push(Tick.fromPartial(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -489,6 +832,10 @@ export interface Query {
   Share(request: QueryGetShareRequest): Promise<QueryGetShareResponse>;
   /** Queries a list of Share items. */
   ShareAll(request: QueryAllShareRequest): Promise<QueryAllShareResponse>;
+  /** Queries a Tick by index. */
+  Tick(request: QueryGetTickRequest): Promise<QueryGetTickResponse>;
+  /** Queries a list of Tick items. */
+  TickAll(request: QueryAllTickRequest): Promise<QueryAllTickResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -527,6 +874,30 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QueryAllShareResponse.decode(new Reader(data))
+    );
+  }
+
+  Tick(request: QueryGetTickRequest): Promise<QueryGetTickResponse> {
+    const data = QueryGetTickRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "Tick",
+      data
+    );
+    return promise.then((data) =>
+      QueryGetTickResponse.decode(new Reader(data))
+    );
+  }
+
+  TickAll(request: QueryAllTickRequest): Promise<QueryAllTickResponse> {
+    const data = QueryAllTickRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "TickAll",
+      data
+    );
+    return promise.then((data) =>
+      QueryAllTickResponse.decode(new Reader(data))
     );
   }
 }

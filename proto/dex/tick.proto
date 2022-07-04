@@ -1,0 +1,16 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+
+message Tick {
+  string token0 = 1; 
+  string token1 = 2; 
+  string price = 3; 
+  uint64 fee = 4; 
+  uint64 reserves0 = 5; 
+  uint64 reserves1 = 6; 
+  uint64 totalShares = 7; 
+  
+}
+

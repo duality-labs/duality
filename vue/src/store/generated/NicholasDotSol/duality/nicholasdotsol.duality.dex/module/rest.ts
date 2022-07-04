@@ -29,8 +29,27 @@ export interface DexQueryAllShareResponse {
   pagination?: V1Beta1PageResponse;
 }
 
+export interface DexQueryAllTickResponse {
+  tick?: DexTick[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
 export interface DexQueryGetShareResponse {
   share?: DexShare;
+}
+
+export interface DexQueryGetTickResponse {
+  tick?: DexTick;
 }
 
 /**
@@ -52,6 +71,24 @@ export interface DexShare {
 
   /** @format uint64 */
   shareAmount?: string;
+}
+
+export interface DexTick {
+  token0?: string;
+  token1?: string;
+  price?: string;
+
+  /** @format uint64 */
+  fee?: string;
+
+  /** @format uint64 */
+  reserves0?: string;
+
+  /** @format uint64 */
+  reserves1?: string;
+
+  /** @format uint64 */
+  totalShares?: string;
 }
 
 export interface ProtobufAny {
@@ -384,6 +421,48 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   ) =>
     this.request<DexQueryGetShareResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/share/${owner}/${token0}/${token1}/${price}/${fee}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryTickAll
+   * @summary Queries a list of Tick items.
+   * @request GET:/NicholasDotSol/duality/dex/tick
+   */
+  queryTickAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<DexQueryAllTickResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/tick`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryTick
+   * @summary Queries a Tick by index.
+   * @request GET:/NicholasDotSol/duality/dex/tick/{token0}/{token1}/{price}/{fee}
+   */
+  queryTick = (token0: string, token1: string, price: string, fee: string, params: RequestParams = {}) =>
+    this.request<DexQueryGetTickResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/tick/${token0}/${token1}/${price}/${fee}`,
       method: "GET",
       format: "json",
       ...params,
