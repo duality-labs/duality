@@ -8,5 +8,6 @@ import (
 
 // x/dex module sentinel errors
 var (
-	ErrSample = sdkerrors.Register(ModuleName, 1100, "sample error")
+	ErrNoSpendableCoins = sdkerrors.Register(ModuleName, 1100, "No Spendable Coins found: %s")
+	ErrNotEnoughCoins   = sdkerrors.Register(ModuleName, 1101, "Not enough Spendable Coins found: %s")
 )
