@@ -9,6 +9,8 @@
  * ---------------------------------------------------------------
  */
 
+export type DexMsgSingleDepositResponse = object;
+
 /**
  * Params defines the parameters for the module.
  */

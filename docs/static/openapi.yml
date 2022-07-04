@@ -51952,6 +51952,8 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
+  nicholasdotsol.duality.dex.MsgSingleDepositResponse:
+    type: object
   nicholasdotsol.duality.dex.Params:
     type: object
     description: Params defines the parameters for the module.
