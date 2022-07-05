@@ -17,10 +17,10 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	receiverAddr, err := sdk.AccAddressFromBech32(msg.Receiver)
-	if err != nil {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
-	}
+	// receiverAddr, err := sdk.AccAddressFromBech32(msg.Receiver)
+	// if err != nil {
+	// 	return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+	// }
 
 	// AccountsToken0Balance := k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token0)
 
@@ -133,17 +133,17 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 
 	//Token 0
 	coin0 := sdk.NewInt64Coin(token0[0], int64(trueAmounts0))
-	
-	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, "dex", coin0); err != nil {
+	//Token 1
+	coin1 := sdk.NewInt64Coin(token1[0], int64(trueAmounts1))
+	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, "dex", sdk.Coins{coin0, coin1}); err != nil {
 		return nil, err
 	}
 
-	//Token 1
-	coin1 := sdk.NewInt64Coin(token1[0], int64(trueAmounts1))
 	
-	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, "dex", coin1); err != nil {
-		return nil, err
-	}
+	
+	// if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, "dex", sdk.Coins{coin1}); err != nil {
+	// 	return nil, err
+	// }
 	
 	
 	// amt := AccountsToken0Balance.Amount
