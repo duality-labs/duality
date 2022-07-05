@@ -22,7 +22,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
-	AccountsToken0Balance := k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token0)
+	// AccountsToken0Balance := k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token0)
 
 	token0 := []string{msg.Token0}
 	token1 := []string{msg.Token1}
