@@ -8,6 +8,7 @@ option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 // Msg defines the Msg service.
 service Msg {
       rpc SingleDeposit(MsgSingleDeposit) returns (MsgSingleDepositResponse);
+  rpc SingleWithdraw(MsgSingleWithdraw) returns (MsgSingleWithdrawResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -23,6 +24,19 @@ message MsgSingleDeposit {
 }
 
 message MsgSingleDepositResponse {
+}
+
+message MsgSingleWithdraw {
+  string creator = 1;
+  string token0 = 2;
+  string token1 = 3;
+  string price = 4;
+  uint64 fee = 5;
+  string sharesRemoving = 6;
+  string receiver = 7;
+}
+
+message MsgSingleWithdrawResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message

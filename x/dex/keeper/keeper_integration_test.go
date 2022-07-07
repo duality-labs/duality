@@ -1,8 +1,8 @@
 package keeper_test
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 
 	"github.com/NicholasDotSol/duality/x/dex/keeper"
 	"github.com/NicholasDotSol/duality/x/dex/types"
@@ -68,7 +68,6 @@ func (suite *IntegrationTestSuite) SetupTest() {
 	suite.queryClient = queryClient
 }
 
-
 func makeBalance(address string, denom string, balance int64) banktypes.Balance {
 	return banktypes.Balance{
 		Address: address,
@@ -88,7 +87,7 @@ func getBankGenesis() *banktypes.GenesisState {
 		makeBalance(carol, "A", balCarol),
 
 		makeBalance(alice, "B", balAlice),
-		makeBalance(bob, "B",balBob),
+		makeBalance(bob, "B", balBob),
 		makeBalance(carol, "B", balCarol),
 	}
 	fmt.Println(coins)
@@ -99,11 +98,11 @@ func getBankGenesis() *banktypes.GenesisState {
 		coins,
 		sdk.Coins{
 			sdk.Coin{
-				Denom: "A",
+				Denom:  "A",
 				Amount: sdk.NewInt(balAlice + balBob + balCarol),
 			},
 			sdk.Coin{
-				Denom: "B",
+				Denom:  "B",
 				Amount: sdk.NewInt(balAlice + balBob + balCarol),
 			},
 		},

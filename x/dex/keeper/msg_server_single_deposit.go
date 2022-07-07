@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"context"
-	"fmt"
+	//"fmt"
 	"strconv"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
@@ -23,16 +23,17 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
-	
+	_ = receiverAddr
+
 	AccountsToken0Balance := k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token0)
-	
-	if (AccountsToken0Balance.Amount.LT( sdk.NewIntFromUint64(msg.Amounts0))) {
-		return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", receiverAddr)
+
+	if AccountsToken0Balance.Amount.LT(sdk.NewIntFromUint64(msg.Amounts0)) {
+		return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
 	AccountsToken1Balance := k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token1)
-	if (AccountsToken1Balance.Amount.LT( sdk.NewIntFromUint64(msg.Amounts1))) {
-		return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s does not have enough  of token 1", receiverAddr)
+	if AccountsToken1Balance.Amount.LT(sdk.NewIntFromUint64(msg.Amounts1)) {
+		return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s does not have enough  of token 1", callerAddr)
 	}
 
 	token0 := []string{msg.Token0}
@@ -89,28 +90,28 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 
 	price, err := strconv.ParseFloat(msg.Price, 64)
 	if err != nil {
-		return nil, error
+		return nil, err
 	}
 
 	if tickOld.Reserves0 > 0 {
-		trueAmounts0 = k.min( uint(msg.Amounts1), uint((uint(tickOld.Reserves1) * uint(msg.Amounts0)) / uint(tickOld.Reserves0)))
+		trueAmounts0 = k.min(uint(msg.Amounts1), uint((uint(tickOld.Reserves1)*uint(msg.Amounts0))/uint(tickOld.Reserves0)))
 	}
 
 	if tickOld.Reserves1 > 0 {
-		trueAmounts0 = k.min( uint(msg.Amounts0), uint((uint(tickOld.Reserves0) * uint(msg.Amounts1)) / uint(tickOld.Reserves1)))
+		trueAmounts0 = k.min(uint(msg.Amounts0), uint((uint(tickOld.Reserves0)*uint(msg.Amounts1))/uint(tickOld.Reserves1)))
 	}
 
 	if trueAmounts0 == uint(msg.Amounts0) && trueAmounts1 != uint(msg.Amounts1) {
-		trueAmounts1 = uint(msg.Amounts1) + (((uint(msg.Amounts1) - trueAmounts1) * uint(msg.Fee) ) / uint(10000 - msg.Fee)) 
+		trueAmounts1 = uint(msg.Amounts1) + (((uint(msg.Amounts1) - trueAmounts1) * uint(msg.Fee)) / uint(10000-msg.Fee))
 	} else if trueAmounts1 == uint(msg.Amounts1) && trueAmounts0 != uint(msg.Amounts0) {
-		trueAmounts0 = uint(msg.Amounts0) + (((uint(msg.Amounts0) - trueAmounts0) * uint(msg.Fee) ) / uint(10000 - msg.Fee)) 
+		trueAmounts0 = uint(msg.Amounts0) + (((uint(msg.Amounts0) - trueAmounts0) * uint(msg.Fee)) / uint(10000-msg.Fee))
 	}
 
 	if tickOld.TotalShares == 0 {
-		SharesMinted = uint(float64(msg.Amounts0) + float64(msg.Amounts1)  *price)
+		SharesMinted = uint(float64(msg.Amounts0) + float64(msg.Amounts1)*price)
 	} else {
-		SharesMinted = 
-            uint(float64(tickOld.TotalShares) * ((float64(msg.Amounts0) + float64(msg.Amounts1) *price) / (float64(tickOld.Reserves0)  + float64(tickOld.Reserves1) *price)))
+		SharesMinted =
+			uint(float64(tickOld.TotalShares) * ((float64(msg.Amounts0) + float64(msg.Amounts1)*price) / (float64(tickOld.Reserves0) + float64(tickOld.Reserves1)*price)))
 	}
 
 	tickNew := types.Tick{
@@ -143,26 +144,21 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	)
 
 	//Token 0
-	coin0 := sdk.NewInt64Coin(token0[0], int64(trueAmounts0))
-	//Token 1
-	coin1 := sdk.NewInt64Coin(token1[0], int64(trueAmounts1))
-	fmt.Println(coin0)
-	fmt.Println(coin1)
-	fmt.Println(types.ModuleName)
-	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0, coin1}); err != nil {
-		return nil, err
+	if trueAmounts0 > 0 {
+		coin0 := sdk.NewInt64Coin(token0[0], int64(trueAmounts0))
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
+			return nil, err
+		}
 	}
-
 	
+	//Token 1
+	if trueAmounts1 > 0 {
+		coin1 := sdk.NewInt64Coin(token1[0], int64(trueAmounts1))
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
+			return nil, err
+		}
+	}
 	
-	// if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, "dex", sdk.Coins{coin1}); err != nil {
-	// 	return nil, err
-	// }
-	
-	
-	
-
 
 	return &types.MsgSingleDepositResponse{}, nil
 }
-
