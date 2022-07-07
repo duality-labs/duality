@@ -17,12 +17,21 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	// receiverAddr, err := sdk.AccAddressFromBech32(msg.Receiver)
-	// if err != nil {
-	// 	return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
-	// }
+	receiverAddr, err := sdk.AccAddressFromBech32(msg.Receiver)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+	}
 
-	// AccountsToken0Balance := k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token0)
+	
+	AccountsToken0Balance := k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token0)
+	if !(AccountsToken0Balance.Amount.LT( sdk.NewIntFromUint64(msg.Amounts0))) {
+		return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address does not have enough %s of token 0", receiverAddr)
+	}
+
+	AccountsToken1Balance := k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token1)
+	if !(AccountsToken1Balance.Amount.LT( sdk.NewIntFromUint64(msg.Amounts1))) {
+		return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address does not have enough %s of token 1", receiverAddr)
+	}
 
 	token0 := []string{msg.Token0}
 	token1 := []string{msg.Token1}
@@ -135,7 +144,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	coin0 := sdk.NewInt64Coin(token0[0], int64(trueAmounts0))
 	//Token 1
 	coin1 := sdk.NewInt64Coin(token1[0], int64(trueAmounts1))
-	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, "dex", sdk.Coins{coin0, coin1}); err != nil {
+	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0, coin1}); err != nil {
 		return nil, err
 	}
 
@@ -146,10 +155,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	// }
 	
 	
-	// amt := AccountsToken0Balance.Amount
-	// if !(AccountsToken0Balance.LT(msg.Amounts0)) {
-	// 	return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address does not have enough %s of token 0", receiverAddr)
-	// }
+	
 
 
 	return &types.MsgSingleDepositResponse{}, nil
