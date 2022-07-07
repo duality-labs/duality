@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
@@ -24,13 +25,14 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 
 	
 	AccountsToken0Balance := k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token0)
-	if !(AccountsToken0Balance.Amount.LT( sdk.NewIntFromUint64(msg.Amounts0))) {
-		return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address does not have enough %s of token 0", receiverAddr)
+	
+	if (AccountsToken0Balance.Amount.LT( sdk.NewIntFromUint64(msg.Amounts0))) {
+		return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", receiverAddr)
 	}
 
 	AccountsToken1Balance := k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token1)
-	if !(AccountsToken1Balance.Amount.LT( sdk.NewIntFromUint64(msg.Amounts1))) {
-		return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address does not have enough %s of token 1", receiverAddr)
+	if (AccountsToken1Balance.Amount.LT( sdk.NewIntFromUint64(msg.Amounts1))) {
+		return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s does not have enough  of token 1", receiverAddr)
 	}
 
 	token0 := []string{msg.Token0}
@@ -82,8 +84,8 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	}
 
 	var SharesMinted uint
-	var trueAmounts0 uint
-	var trueAmounts1 uint
+	var trueAmounts0 uint = uint(msg.Amounts0)
+	var trueAmounts1 uint = uint(msg.Amounts1)
 
 	price, err := strconv.ParseFloat(msg.Price, 64)
 	if err != nil {
@@ -144,6 +146,9 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	coin0 := sdk.NewInt64Coin(token0[0], int64(trueAmounts0))
 	//Token 1
 	coin1 := sdk.NewInt64Coin(token1[0], int64(trueAmounts1))
+	fmt.Println(coin0)
+	fmt.Println(coin1)
+	fmt.Println(types.ModuleName)
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0, coin1}); err != nil {
 		return nil, err
 	}

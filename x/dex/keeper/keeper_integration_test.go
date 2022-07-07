@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"testing"
+	"fmt"
 
 	"github.com/NicholasDotSol/duality/x/dex/keeper"
 	"github.com/NicholasDotSol/duality/x/dex/types"
@@ -67,12 +68,13 @@ func (suite *IntegrationTestSuite) SetupTest() {
 	suite.queryClient = queryClient
 }
 
-func makeBalance(address string, balance int64) banktypes.Balance {
+
+func makeBalance(address string, denom string, balance int64) banktypes.Balance {
 	return banktypes.Balance{
 		Address: address,
 		Coins: sdk.Coins{
 			sdk.Coin{
-				Denom:  sdk.DefaultBondDenom,
+				Denom:  denom,
 				Amount: sdk.NewInt(balance),
 			},
 		},
@@ -81,16 +83,30 @@ func makeBalance(address string, balance int64) banktypes.Balance {
 
 func getBankGenesis() *banktypes.GenesisState {
 	coins := []banktypes.Balance{
-		makeBalance(alice, balAlice),
-		makeBalance(bob, balBob),
-		makeBalance(carol, balCarol),
+		makeBalance(alice, "A", balAlice),
+		makeBalance(bob, "A", balBob),
+		makeBalance(carol, "A", balCarol),
+
+		makeBalance(alice, "B", balAlice),
+		makeBalance(bob, "B",balBob),
+		makeBalance(carol, "B", balCarol),
 	}
+	fmt.Println(coins)
 	//supply := banktypes.NewSupply(coins[0].Coins.Add(coins[1].Coins...).Add(coins[2].Coins...))
 
 	state := banktypes.NewGenesisState(
 		banktypes.DefaultParams(),
 		coins,
-		coins[0].Coins.Add(coins[1].Coins...).Add(coins[2].Coins...),
+		sdk.Coins{
+			sdk.Coin{
+				Denom: "A",
+				Amount: sdk.NewInt(balAlice + balBob + balCarol),
+			},
+			sdk.Coin{
+				Denom: "B",
+				Amount: sdk.NewInt(balAlice + balBob + balCarol),
+			},
+		},
 		[]banktypes.Metadata{})
 
 	return state

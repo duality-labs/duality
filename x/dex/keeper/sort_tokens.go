@@ -11,7 +11,7 @@ import (
 
 func (k Keeper) sortTokens(ctx sdk.Context, tokens0 []string, tokens1 []string) ([]string, []string, error) {
 
-	if len(tokens0) == len(tokens1) {
+	if len(tokens0) != len(tokens1) {
 		return nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenListSize, "Invalid Array: Array Tokens0 size does not equal Array Tokens1" )
 	}
 	newTokens0 := make([]string, len(tokens0))
