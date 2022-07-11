@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"fmt"
+	//"fmt"
 
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
