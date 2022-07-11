@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 	//"fmt"
 	"strconv"
 
@@ -159,6 +160,24 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		}
 	}
 	
+	var event = sdk.NewEvent(sdk.EventTypeMessage,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "duality"),
+		sdk.NewAttribute(sdk.AttributeKeyAction, types.DepositEventKey),
+		sdk.NewAttribute(types.DepositEventCreator, msg.Creator),
+		sdk.NewAttribute(types.DepositEventToken0, msg.Token0),
+		sdk.NewAttribute(types.DepositEventToken1, msg.Token1),
+		sdk.NewAttribute(types.DepositEventPrice, msg.Price),
+		sdk.NewAttribute(types.DepositEventFee, strconv.FormatUint(uint64(msg.Fee), 10) ),
+		sdk.NewAttribute(types.DepositEventOldReserves0, strconv.FormatUint(uint64(tickOld.Reserves0), 10)),
+		sdk.NewAttribute(types.DepositEventOldReserves1, strconv.FormatUint(uint64(tickOld.Reserves1), 10)),
+		sdk.NewAttribute(types.DepositEventNewReserves0, strconv.FormatUint(uint64(tickNew.Reserves0), 10)),
+		sdk.NewAttribute(types.DepositEventNewReserves1, strconv.FormatUint(uint64(tickNew.Reserves1), 10)),
+		sdk.NewAttribute(types.DepositEventReceiver, msg.Receiver),
+		sdk.NewAttribute(types.DepositEventSharesMinted, strconv.FormatUint(uint64(SharesMinted), 10)),
 
-	return &types.MsgSingleDepositResponse{}, nil
+	)
+	ctx.EventManager().EmitEvent(event)
+
+
+	return &types.MsgSingleDepositResponse{ strconv.FormatUint(uint64(SharesMinted), 10) }, nil
 }

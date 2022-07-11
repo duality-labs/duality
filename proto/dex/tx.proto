@@ -24,6 +24,7 @@ message MsgSingleDeposit {
 }
 
 message MsgSingleDepositResponse {
+  string sharesMinted = 1;
 }
 
 message MsgSingleWithdraw {
@@ -37,6 +38,8 @@ message MsgSingleWithdraw {
 }
 
 message MsgSingleWithdrawResponse {
+  string amounts0 = 1;
+  string amounts1 = 2;
 }
 
 // this line is used by starport scaffolding # proto/tx/message

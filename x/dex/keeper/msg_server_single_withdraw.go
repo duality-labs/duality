@@ -56,7 +56,7 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		return nil, err
 	}
 
-	if shareOld.ShareAmount <= sharesRemoving {
+	if sharesRemoving > shareOld.ShareAmount  {
 		return nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, " Not enough shares are owned by:  %s", msg.Receiver)
 	}
 
@@ -113,5 +113,25 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		}
 	}
 
-	return &types.MsgSingleWithdrawResponse{}, nil
+	var event = sdk.NewEvent(sdk.EventTypeMessage,
+		sdk.NewAttribute(sdk.AttributeKeyModule, "duality"),
+		sdk.NewAttribute(sdk.AttributeKeyAction, types.WithdrawEventKey),
+		sdk.NewAttribute(types.WithdrawEventCreator, msg.Creator),
+		sdk.NewAttribute(types.WithdrawEventToken0, msg.Token0),
+		sdk.NewAttribute(types.WithdrawEventToken1, msg.Token1),
+		sdk.NewAttribute(types.WithdrawEventPrice, msg.Price),
+		sdk.NewAttribute(types.WithdrawEventFee, strconv.FormatUint(uint64(msg.Fee), 10) ),
+		sdk.NewAttribute(types.WithdrawEventOldReserves0, strconv.FormatUint(uint64(tickOld.Reserves0), 10)),
+		sdk.NewAttribute(types.WithdrawEventOldReserves1, strconv.FormatUint(uint64(tickOld.Reserves1), 10)),
+		sdk.NewAttribute(types.WithdrawEventNewReserves0, strconv.FormatUint(uint64(tickNew.Reserves0), 10)),
+		sdk.NewAttribute(types.WithdrawEventNewReserves1, strconv.FormatUint(uint64(tickNew.Reserves1), 10)),
+		sdk.NewAttribute(types.WithdrawEventReceiver, msg.Receiver),
+		sdk.NewAttribute(types.WithdrawEventAmounts0, strconv.FormatUint(uint64(amount0Withdraw), 10)),
+		sdk.NewAttribute(types.WithdrawEventAmounts0, strconv.FormatUint(uint64(amount1Withdraw), 10)),
+
+	)
+
+	ctx.EventManager().EmitEvent(event)
+
+	return &types.MsgSingleWithdrawResponse{strconv.FormatUint(uint64(amount0Withdraw), 10), strconv.FormatUint(uint64(amount1Withdraw), 10)}, nil
 }
