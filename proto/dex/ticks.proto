@@ -1,0 +1,14 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+import "dex/pool.proto"; 
+
+message Ticks {
+  string token0 = 1; 
+  string token1 = 2; 
+  Pool poolsZeroToOne = 3; 
+  Pool poolsOneToZero = 4; 
+  
+}
+

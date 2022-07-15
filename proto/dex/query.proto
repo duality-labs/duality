@@ -5,7 +5,9 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "dex/params.proto";
+import "dex/ticks.proto";
 // this line is used by starport scaffolding # 1
+import "dex/pool.proto";
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 
@@ -15,7 +17,17 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/NicholasDotSol/duality/dex/params";
   }
-  // this line is used by starport scaffolding # 2
+  // Queries a Ticks by index.
+	rpc Ticks(QueryGetTicksRequest) returns (QueryGetTicksResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/ticks/{token0}/{token1}";
+	}
+
+	// Queries a list of Ticks items.
+	rpc TicksAll(QueryAllTicksRequest) returns (QueryAllTicksResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/ticks";
+	}
+
+// this line is used by starport scaffolding # 2
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -25,6 +37,25 @@ message QueryParamsRequest {}
 message QueryParamsResponse {
   // params holds all the parameters of this module.
   Params params = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryGetTicksRequest {
+	  string token0 = 1;
+  string token1 = 2;
+
+}
+
+message QueryGetTicksResponse {
+	Ticks ticks = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllTicksRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllTicksResponse {
+	repeated Ticks ticks = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // this line is used by starport scaffolding # 3
