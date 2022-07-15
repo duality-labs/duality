@@ -1,0 +1,14 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+
+message Pool {
+  
+  string reserveA = 1; 
+  string reserveB = 2; 
+  string price = 3; 
+  string fee = 4; 
+  string totalShares = 5; 
+  int32 index = 6; 
+}
