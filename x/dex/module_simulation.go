@@ -28,6 +28,10 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgSingleDeposit int = 100
 
+	opWeightMsgSingleWithdraw = "op_weight_msg_single_withdraw"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgSingleWithdraw int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -71,6 +75,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgSingleDeposit,
 		dexsimulation.SimulateMsgSingleDeposit(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgSingleWithdraw int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgSingleWithdraw, &weightMsgSingleWithdraw, nil,
+		func(_ *rand.Rand) {
+			weightMsgSingleWithdraw = defaultWeightMsgSingleWithdraw
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgSingleWithdraw,
+		dexsimulation.SimulateMsgSingleWithdraw(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation

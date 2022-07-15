@@ -11,6 +11,8 @@
 
 export type DexMsgSingleDepositResponse = object;
 
+export type DexMsgSingleWithdrawResponse = object;
+
 /**
  * Params defines the parameters for the module.
  */

@@ -30054,37 +30054,41 @@ paths:
                     token1:
                       type: string
                     poolsZeroToOne:
-                      type: object
-                      properties:
-                        reserveA:
-                          type: string
-                        reserveB:
-                          type: string
-                        price:
-                          type: string
-                        fee:
-                          type: string
-                        totalShares:
-                          type: string
-                        index:
-                          type: integer
-                          format: int32
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          reserveA:
+                            type: string
+                          reserveB:
+                            type: string
+                          price:
+                            type: string
+                          fee:
+                            type: string
+                          totalShares:
+                            type: string
+                          index:
+                            type: integer
+                            format: int32
                     poolsOneToZero:
-                      type: object
-                      properties:
-                        reserveA:
-                          type: string
-                        reserveB:
-                          type: string
-                        price:
-                          type: string
-                        fee:
-                          type: string
-                        totalShares:
-                          type: string
-                        index:
-                          type: integer
-                          format: int32
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          reserveA:
+                            type: string
+                          reserveB:
+                            type: string
+                          price:
+                            type: string
+                          fee:
+                            type: string
+                          totalShares:
+                            type: string
+                          index:
+                            type: integer
+                            format: int32
               pagination:
                 type: object
                 properties:
@@ -30207,37 +30211,41 @@ paths:
                   token1:
                     type: string
                   poolsZeroToOne:
-                    type: object
-                    properties:
-                      reserveA:
-                        type: string
-                      reserveB:
-                        type: string
-                      price:
-                        type: string
-                      fee:
-                        type: string
-                      totalShares:
-                        type: string
-                      index:
-                        type: integer
-                        format: int32
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        reserveA:
+                          type: string
+                        reserveB:
+                          type: string
+                        price:
+                          type: string
+                        fee:
+                          type: string
+                        totalShares:
+                          type: string
+                        index:
+                          type: integer
+                          format: int32
                   poolsOneToZero:
-                    type: object
-                    properties:
-                      reserveA:
-                        type: string
-                      reserveB:
-                        type: string
-                      price:
-                        type: string
-                      fee:
-                        type: string
-                      totalShares:
-                        type: string
-                      index:
-                        type: integer
-                        format: int32
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        reserveA:
+                          type: string
+                        reserveB:
+                          type: string
+                        price:
+                          type: string
+                        fee:
+                          type: string
+                        totalShares:
+                          type: string
+                        index:
+                          type: integer
+                          format: int32
         default:
           description: An unexpected error response.
           schema:
@@ -51974,6 +51982,10 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
+  nicholasdotsol.duality.dex.MsgSingleDepositResponse:
+    type: object
+  nicholasdotsol.duality.dex.MsgSingleWithdrawResponse:
+    type: object
   nicholasdotsol.duality.dex.Params:
     type: object
     description: Params defines the parameters for the module.
@@ -52051,37 +52063,41 @@ definitions:
             token1:
               type: string
             poolsZeroToOne:
-              type: object
-              properties:
-                reserveA:
-                  type: string
-                reserveB:
-                  type: string
-                price:
-                  type: string
-                fee:
-                  type: string
-                totalShares:
-                  type: string
-                index:
-                  type: integer
-                  format: int32
+              type: array
+              items:
+                type: object
+                properties:
+                  reserveA:
+                    type: string
+                  reserveB:
+                    type: string
+                  price:
+                    type: string
+                  fee:
+                    type: string
+                  totalShares:
+                    type: string
+                  index:
+                    type: integer
+                    format: int32
             poolsOneToZero:
-              type: object
-              properties:
-                reserveA:
-                  type: string
-                reserveB:
-                  type: string
-                price:
-                  type: string
-                fee:
-                  type: string
-                totalShares:
-                  type: string
-                index:
-                  type: integer
-                  format: int32
+              type: array
+              items:
+                type: object
+                properties:
+                  reserveA:
+                    type: string
+                  reserveB:
+                    type: string
+                  price:
+                    type: string
+                  fee:
+                    type: string
+                  totalShares:
+                    type: string
+                  index:
+                    type: integer
+                    format: int32
       pagination:
         type: object
         properties:
@@ -52136,37 +52152,41 @@ definitions:
           token1:
             type: string
           poolsZeroToOne:
-            type: object
-            properties:
-              reserveA:
-                type: string
-              reserveB:
-                type: string
-              price:
-                type: string
-              fee:
-                type: string
-              totalShares:
-                type: string
-              index:
-                type: integer
-                format: int32
+            type: array
+            items:
+              type: object
+              properties:
+                reserveA:
+                  type: string
+                reserveB:
+                  type: string
+                price:
+                  type: string
+                fee:
+                  type: string
+                totalShares:
+                  type: string
+                index:
+                  type: integer
+                  format: int32
           poolsOneToZero:
-            type: object
-            properties:
-              reserveA:
-                type: string
-              reserveB:
-                type: string
-              price:
-                type: string
-              fee:
-                type: string
-              totalShares:
-                type: string
-              index:
-                type: integer
-                format: int32
+            type: array
+            items:
+              type: object
+              properties:
+                reserveA:
+                  type: string
+                reserveB:
+                  type: string
+                price:
+                  type: string
+                fee:
+                  type: string
+                totalShares:
+                  type: string
+                index:
+                  type: integer
+                  format: int32
   nicholasdotsol.duality.dex.QueryParamsResponse:
     type: object
     properties:
@@ -52197,37 +52217,41 @@ definitions:
       token1:
         type: string
       poolsZeroToOne:
-        type: object
-        properties:
-          reserveA:
-            type: string
-          reserveB:
-            type: string
-          price:
-            type: string
-          fee:
-            type: string
-          totalShares:
-            type: string
-          index:
-            type: integer
-            format: int32
+        type: array
+        items:
+          type: object
+          properties:
+            reserveA:
+              type: string
+            reserveB:
+              type: string
+            price:
+              type: string
+            fee:
+              type: string
+            totalShares:
+              type: string
+            index:
+              type: integer
+              format: int32
       poolsOneToZero:
-        type: object
-        properties:
-          reserveA:
-            type: string
-          reserveB:
-            type: string
-          price:
-            type: string
-          fee:
-            type: string
-          totalShares:
-            type: string
-          index:
-            type: integer
-            format: int32
+        type: array
+        items:
+          type: object
+          properties:
+            reserveA:
+              type: string
+            reserveB:
+              type: string
+            price:
+              type: string
+            fee:
+              type: string
+            totalShares:
+              type: string
+            index:
+              type: integer
+              format: int32
   tendermint.spn.claim.ClaimRecord:
     type: object
     properties:
