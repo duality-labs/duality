@@ -23,10 +23,10 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type Ticks struct {
-	Token0         string `protobuf:"bytes,1,opt,name=token0,proto3" json:"token0,omitempty"`
-	Token1         string `protobuf:"bytes,2,opt,name=token1,proto3" json:"token1,omitempty"`
-	PoolsZeroToOne *Pool  `protobuf:"bytes,3,opt,name=poolsZeroToOne,proto3" json:"poolsZeroToOne,omitempty"`
-	PoolsOneToZero *Pool  `protobuf:"bytes,4,opt,name=poolsOneToZero,proto3" json:"poolsOneToZero,omitempty"`
+	Token0         string  `protobuf:"bytes,1,opt,name=token0,proto3" json:"token0,omitempty"`
+	Token1         string  `protobuf:"bytes,2,opt,name=token1,proto3" json:"token1,omitempty"`
+	PoolsZeroToOne []*Pool `protobuf:"bytes,3,rep,name=poolsZeroToOne,proto3" json:"poolsZeroToOne,omitempty"`
+	PoolsOneToZero []*Pool `protobuf:"bytes,4,rep,name=poolsOneToZero,proto3" json:"poolsOneToZero,omitempty"`
 }
 
 func (m *Ticks) Reset()         { *m = Ticks{} }
@@ -76,14 +76,14 @@ func (m *Ticks) GetToken1() string {
 	return ""
 }
 
-func (m *Ticks) GetPoolsZeroToOne() *Pool {
+func (m *Ticks) GetPoolsZeroToOne() []*Pool {
 	if m != nil {
 		return m.PoolsZeroToOne
 	}
 	return nil
 }
 
-func (m *Ticks) GetPoolsOneToZero() *Pool {
+func (m *Ticks) GetPoolsOneToZero() []*Pool {
 	if m != nil {
 		return m.PoolsOneToZero
 	}
@@ -105,14 +105,14 @@ var fileDescriptor_f2fc2226c4509899 = []byte{
 	0xa8, 0x55, 0x3a, 0xcd, 0xc8, 0xc5, 0x1a, 0x02, 0xd2, 0x2b, 0x24, 0xc6, 0xc5, 0x56, 0x92, 0x9f,
 	0x9d, 0x9a, 0x67, 0x20, 0xc1, 0xa8, 0xc0, 0xa8, 0xc1, 0x19, 0x04, 0xe5, 0xc1, 0xc5, 0x0d, 0x25,
 	0x98, 0x90, 0xc4, 0x0d, 0x85, 0x3c, 0xb8, 0xf8, 0x40, 0xe6, 0x14, 0x47, 0xa5, 0x16, 0xe5, 0x87,
-	0xe4, 0xfb, 0xe7, 0xa5, 0x4a, 0x30, 0x2b, 0x30, 0x6a, 0x70, 0x1b, 0x29, 0xe8, 0xe1, 0xb6, 0x5e,
+	0xe4, 0xfb, 0xe7, 0xa5, 0x4a, 0x30, 0x2b, 0x30, 0x6b, 0x70, 0x1b, 0x29, 0xe8, 0xe1, 0xb6, 0x5e,
 	0x2f, 0x20, 0x3f, 0x3f, 0x27, 0x08, 0x4d, 0x1f, 0xdc, 0x24, 0xff, 0xbc, 0xd4, 0x90, 0x7c, 0x90,
 	0xb0, 0x04, 0x0b, 0x49, 0x26, 0xc1, 0xf5, 0x39, 0xb9, 0x9f, 0x78, 0x24, 0xc7, 0x78, 0xe1, 0x91,
 	0x1c, 0xe3, 0x83, 0x47, 0x72, 0x8c, 0x13, 0x1e, 0xcb, 0x31, 0x5c, 0x78, 0x2c, 0xc7, 0x70, 0xe3,
 	0xb1, 0x1c, 0x43, 0x94, 0x6e, 0x7a, 0x66, 0x49, 0x46, 0x69, 0x92, 0x5e, 0x72, 0x7e, 0xae, 0xbe,
 	0x1f, 0xd4, 0x54, 0x97, 0xfc, 0x92, 0xe0, 0xfc, 0x1c, 0x7d, 0xa8, 0xa9, 0xfa, 0x15, 0xfa, 0xe0,
 	0x80, 0xac, 0x2c, 0x48, 0x2d, 0x4e, 0x62, 0x03, 0x87, 0x8e, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff,
-	0x42, 0xce, 0xaa, 0xf4, 0x5c, 0x01, 0x00, 0x00,
+	0xb1, 0x9c, 0xa9, 0x0b, 0x5c, 0x01, 0x00, 0x00,
 }
 
 func (m *Ticks) Marshal() (dAtA []byte, err error) {
@@ -135,29 +135,33 @@ func (m *Ticks) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.PoolsOneToZero != nil {
-		{
-			size, err := m.PoolsOneToZero.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
+	if len(m.PoolsOneToZero) > 0 {
+		for iNdEx := len(m.PoolsOneToZero) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.PoolsOneToZero[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTicks(dAtA, i, uint64(size))
 			}
-			i -= size
-			i = encodeVarintTicks(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0x22
 		}
-		i--
-		dAtA[i] = 0x22
 	}
-	if m.PoolsZeroToOne != nil {
-		{
-			size, err := m.PoolsZeroToOne.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
+	if len(m.PoolsZeroToOne) > 0 {
+		for iNdEx := len(m.PoolsZeroToOne) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.PoolsZeroToOne[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTicks(dAtA, i, uint64(size))
 			}
-			i -= size
-			i = encodeVarintTicks(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0x1a
 		}
-		i--
-		dAtA[i] = 0x1a
 	}
 	if len(m.Token1) > 0 {
 		i -= len(m.Token1)
@@ -201,13 +205,17 @@ func (m *Ticks) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTicks(uint64(l))
 	}
-	if m.PoolsZeroToOne != nil {
-		l = m.PoolsZeroToOne.Size()
-		n += 1 + l + sovTicks(uint64(l))
+	if len(m.PoolsZeroToOne) > 0 {
+		for _, e := range m.PoolsZeroToOne {
+			l = e.Size()
+			n += 1 + l + sovTicks(uint64(l))
+		}
 	}
-	if m.PoolsOneToZero != nil {
-		l = m.PoolsOneToZero.Size()
-		n += 1 + l + sovTicks(uint64(l))
+	if len(m.PoolsOneToZero) > 0 {
+		for _, e := range m.PoolsOneToZero {
+			l = e.Size()
+			n += 1 + l + sovTicks(uint64(l))
+		}
 	}
 	return n
 }
@@ -340,10 +348,8 @@ func (m *Ticks) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.PoolsZeroToOne == nil {
-				m.PoolsZeroToOne = &Pool{}
-			}
-			if err := m.PoolsZeroToOne.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.PoolsZeroToOne = append(m.PoolsZeroToOne, &Pool{})
+			if err := m.PoolsZeroToOne[len(m.PoolsZeroToOne)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -376,10 +382,8 @@ func (m *Ticks) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.PoolsOneToZero == nil {
-				m.PoolsOneToZero = &Pool{}
-			}
-			if err := m.PoolsOneToZero.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.PoolsOneToZero = append(m.PoolsOneToZero, &Pool{})
+			if err := m.PoolsOneToZero[len(m.PoolsOneToZero)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

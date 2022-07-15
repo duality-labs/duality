@@ -7,8 +7,8 @@ import "dex/pool.proto";
 message Ticks {
   string token0 = 1; 
   string token1 = 2; 
-  Pool poolsZeroToOne = 3; 
-  Pool poolsOneToZero = 4; 
+  repeated Pool poolsZeroToOne = 3; 
+  repeated Pool poolsOneToZero = 4; 
   
 }
 
