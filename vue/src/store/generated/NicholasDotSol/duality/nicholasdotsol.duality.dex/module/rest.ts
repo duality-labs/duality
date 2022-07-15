@@ -9,6 +9,8 @@
  * ---------------------------------------------------------------
  */
 
+export type DexMsgSingleDepositResponse = object;
+
 /**
  * Params defines the parameters for the module.
  */
@@ -83,8 +85,8 @@ export interface DexShare {
 export interface DexTicks {
   token0?: string;
   token1?: string;
-  poolsZeroToOne?: DexPool;
-  poolsOneToZero?: DexPool;
+  poolsZeroToOne?: DexPool[];
+  poolsOneToZero?: DexPool[];
 }
 
 export interface ProtobufAny {

@@ -9,7 +9,11 @@ import (
 	grpc1 "github.com/gogo/protobuf/grpc"
 	proto "github.com/gogo/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
+	io "io"
 	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -23,19 +27,170 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+type MsgSingleDeposit struct {
+	Creator  string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Token0   string `protobuf:"bytes,2,opt,name=token0,proto3" json:"token0,omitempty"`
+	Token1   string `protobuf:"bytes,3,opt,name=token1,proto3" json:"token1,omitempty"`
+	Price    string `protobuf:"bytes,4,opt,name=price,proto3" json:"price,omitempty"`
+	Fee      string `protobuf:"bytes,5,opt,name=fee,proto3" json:"fee,omitempty"`
+	Amounts0 string `protobuf:"bytes,6,opt,name=amounts0,proto3" json:"amounts0,omitempty"`
+	Amounts1 string `protobuf:"bytes,7,opt,name=amounts1,proto3" json:"amounts1,omitempty"`
+	Receiver string `protobuf:"bytes,8,opt,name=receiver,proto3" json:"receiver,omitempty"`
+}
+
+func (m *MsgSingleDeposit) Reset()         { *m = MsgSingleDeposit{} }
+func (m *MsgSingleDeposit) String() string { return proto.CompactTextString(m) }
+func (*MsgSingleDeposit) ProtoMessage()    {}
+func (*MsgSingleDeposit) Descriptor() ([]byte, []int) {
+	return fileDescriptor_463701e671e5a5e0, []int{0}
+}
+func (m *MsgSingleDeposit) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSingleDeposit) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSingleDeposit.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSingleDeposit) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSingleDeposit.Merge(m, src)
+}
+func (m *MsgSingleDeposit) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSingleDeposit) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSingleDeposit.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSingleDeposit proto.InternalMessageInfo
+
+func (m *MsgSingleDeposit) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgSingleDeposit) GetToken0() string {
+	if m != nil {
+		return m.Token0
+	}
+	return ""
+}
+
+func (m *MsgSingleDeposit) GetToken1() string {
+	if m != nil {
+		return m.Token1
+	}
+	return ""
+}
+
+func (m *MsgSingleDeposit) GetPrice() string {
+	if m != nil {
+		return m.Price
+	}
+	return ""
+}
+
+func (m *MsgSingleDeposit) GetFee() string {
+	if m != nil {
+		return m.Fee
+	}
+	return ""
+}
+
+func (m *MsgSingleDeposit) GetAmounts0() string {
+	if m != nil {
+		return m.Amounts0
+	}
+	return ""
+}
+
+func (m *MsgSingleDeposit) GetAmounts1() string {
+	if m != nil {
+		return m.Amounts1
+	}
+	return ""
+}
+
+func (m *MsgSingleDeposit) GetReceiver() string {
+	if m != nil {
+		return m.Receiver
+	}
+	return ""
+}
+
+type MsgSingleDepositResponse struct {
+}
+
+func (m *MsgSingleDepositResponse) Reset()         { *m = MsgSingleDepositResponse{} }
+func (m *MsgSingleDepositResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSingleDepositResponse) ProtoMessage()    {}
+func (*MsgSingleDepositResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_463701e671e5a5e0, []int{1}
+}
+func (m *MsgSingleDepositResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSingleDepositResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSingleDepositResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSingleDepositResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSingleDepositResponse.Merge(m, src)
+}
+func (m *MsgSingleDepositResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSingleDepositResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSingleDepositResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSingleDepositResponse proto.InternalMessageInfo
+
+func init() {
+	proto.RegisterType((*MsgSingleDeposit)(nil), "nicholasdotsol.duality.dex.MsgSingleDeposit")
+	proto.RegisterType((*MsgSingleDepositResponse)(nil), "nicholasdotsol.duality.dex.MsgSingleDepositResponse")
+}
+
 func init() { proto.RegisterFile("dex/tx.proto", fileDescriptor_463701e671e5a5e0) }
 
 var fileDescriptor_463701e671e5a5e0 = []byte{
-	// 140 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x49, 0x49, 0xad, 0xd0,
-	0x2f, 0xa9, 0xd0, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x92, 0xca, 0xcb, 0x4c, 0xce, 0xc8, 0xcf,
-	0x49, 0x2c, 0x4e, 0xc9, 0x2f, 0x29, 0xce, 0xcf, 0xd1, 0x4b, 0x29, 0x4d, 0xcc, 0xc9, 0x2c, 0xa9,
-	0xd4, 0x4b, 0x49, 0xad, 0x30, 0x62, 0xe5, 0x62, 0xf6, 0x2d, 0x4e, 0x77, 0x72, 0x3f, 0xf1, 0x48,
-	0x8e, 0xf1, 0xc2, 0x23, 0x39, 0xc6, 0x07, 0x8f, 0xe4, 0x18, 0x27, 0x3c, 0x96, 0x63, 0xb8, 0xf0,
-	0x58, 0x8e, 0xe1, 0xc6, 0x63, 0x39, 0x86, 0x28, 0xdd, 0xf4, 0xcc, 0x92, 0x8c, 0xd2, 0x24, 0xbd,
-	0xe4, 0xfc, 0x5c, 0x7d, 0x3f, 0xa8, 0x39, 0x2e, 0xf9, 0x25, 0xc1, 0xf9, 0x39, 0xfa, 0x50, 0x73,
-	0xf4, 0x2b, 0xf4, 0xc1, 0xd6, 0x55, 0x16, 0xa4, 0x16, 0x27, 0xb1, 0x81, 0xad, 0x34, 0x06, 0x04,
-	0x00, 0x00, 0xff, 0xff, 0xe7, 0x79, 0xaf, 0x6c, 0x82, 0x00, 0x00, 0x00,
+	// 301 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x91, 0x4f, 0x4f, 0xc2, 0x30,
+	0x18, 0xc6, 0xa9, 0xc8, 0x1f, 0x1b, 0x4d, 0x48, 0x63, 0x4c, 0xb3, 0x43, 0x63, 0x38, 0x79, 0xd0,
+	0x8e, 0xa9, 0x9f, 0xc0, 0x90, 0x78, 0xc2, 0x03, 0xdc, 0xbc, 0x8d, 0xed, 0x75, 0x34, 0x8e, 0xbd,
+	0x4b, 0x5b, 0xcc, 0xf0, 0x53, 0xf8, 0xb1, 0x3c, 0x72, 0xe4, 0x68, 0xe0, 0x8b, 0x18, 0xca, 0x46,
+	0x80, 0xc4, 0x83, 0xb7, 0x3e, 0xbf, 0x5f, 0xf3, 0x34, 0x6f, 0x5f, 0x7a, 0x1e, 0x43, 0xe1, 0xdb,
+	0x42, 0xe6, 0x1a, 0x2d, 0x32, 0x2f, 0x53, 0xd1, 0x04, 0xd3, 0xd0, 0xc4, 0x68, 0x0d, 0xa6, 0x32,
+	0x9e, 0x85, 0xa9, 0xb2, 0x73, 0x19, 0x43, 0xd1, 0x5d, 0x12, 0xda, 0x19, 0x98, 0x64, 0xa4, 0xb2,
+	0x24, 0x85, 0x3e, 0xe4, 0x68, 0x94, 0x65, 0x9c, 0xb6, 0x22, 0x0d, 0xa1, 0x45, 0xcd, 0xc9, 0x35,
+	0xb9, 0x39, 0x1b, 0x56, 0x91, 0x5d, 0xd1, 0xa6, 0xc5, 0x77, 0xc8, 0x7a, 0xfc, 0xc4, 0x89, 0x32,
+	0xed, 0x78, 0xc0, 0xeb, 0x7b, 0x3c, 0x60, 0x97, 0xb4, 0x91, 0x6b, 0x15, 0x01, 0x3f, 0x75, 0x78,
+	0x1b, 0x58, 0x87, 0xd6, 0xdf, 0x00, 0x78, 0xc3, 0xb1, 0xcd, 0x91, 0x79, 0xb4, 0x1d, 0x4e, 0x71,
+	0x96, 0x59, 0xd3, 0xe3, 0x4d, 0x87, 0x77, 0x79, 0xcf, 0x05, 0xbc, 0x75, 0xe0, 0x82, 0x8d, 0xd3,
+	0x10, 0x81, 0xfa, 0x00, 0xcd, 0xdb, 0x5b, 0x57, 0xe5, 0xae, 0x47, 0xf9, 0xf1, 0x64, 0x43, 0x30,
+	0x39, 0x66, 0x06, 0xee, 0x3f, 0x69, 0x7d, 0x60, 0x12, 0x66, 0xe8, 0xc5, 0xe1, 0xe4, 0xb7, 0xf2,
+	0xef, 0xbf, 0x92, 0xc7, 0x6d, 0xde, 0xe3, 0x7f, 0x6e, 0x57, 0x6f, 0x3f, 0x3d, 0x7f, 0xaf, 0x04,
+	0x59, 0xac, 0x04, 0xf9, 0x59, 0x09, 0xf2, 0xb5, 0x16, 0xb5, 0xc5, 0x5a, 0xd4, 0x96, 0x6b, 0x51,
+	0x7b, 0xbd, 0x4b, 0x94, 0x9d, 0xcc, 0xc6, 0x32, 0xc2, 0xa9, 0xff, 0x52, 0x36, 0xf7, 0xd1, 0x8e,
+	0x30, 0xf5, 0xcb, 0x66, 0xbf, 0xf0, 0xdd, 0x6a, 0xe7, 0x39, 0x98, 0x71, 0xd3, 0xad, 0xf7, 0xe1,
+	0x37, 0x00, 0x00, 0xff, 0xff, 0xf3, 0xdd, 0xc6, 0x1c, 0xee, 0x01, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -50,6 +205,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
+	SingleDeposit(ctx context.Context, in *MsgSingleDeposit, opts ...grpc.CallOption) (*MsgSingleDepositResponse, error)
 }
 
 type msgClient struct {
@@ -60,22 +216,669 @@ func NewMsgClient(cc grpc1.ClientConn) MsgClient {
 	return &msgClient{cc}
 }
 
+func (c *msgClient) SingleDeposit(ctx context.Context, in *MsgSingleDeposit, opts ...grpc.CallOption) (*MsgSingleDepositResponse, error) {
+	out := new(MsgSingleDepositResponse)
+	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Msg/SingleDeposit", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
+	SingleDeposit(context.Context, *MsgSingleDeposit) (*MsgSingleDepositResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
 type UnimplementedMsgServer struct {
 }
 
+func (*UnimplementedMsgServer) SingleDeposit(ctx context.Context, req *MsgSingleDeposit) (*MsgSingleDepositResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SingleDeposit not implemented")
+}
+
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
 	s.RegisterService(&_Msg_serviceDesc, srv)
+}
+
+func _Msg_SingleDeposit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSingleDeposit)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).SingleDeposit(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/nicholasdotsol.duality.dex.Msg/SingleDeposit",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).SingleDeposit(ctx, req.(*MsgSingleDeposit))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "nicholasdotsol.duality.dex.Msg",
 	HandlerType: (*MsgServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams:     []grpc.StreamDesc{},
-	Metadata:    "dex/tx.proto",
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "SingleDeposit",
+			Handler:    _Msg_SingleDeposit_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "dex/tx.proto",
 }
+
+func (m *MsgSingleDeposit) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSingleDeposit) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSingleDeposit) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Receiver) > 0 {
+		i -= len(m.Receiver)
+		copy(dAtA[i:], m.Receiver)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Receiver)))
+		i--
+		dAtA[i] = 0x42
+	}
+	if len(m.Amounts1) > 0 {
+		i -= len(m.Amounts1)
+		copy(dAtA[i:], m.Amounts1)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Amounts1)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.Amounts0) > 0 {
+		i -= len(m.Amounts0)
+		copy(dAtA[i:], m.Amounts0)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Amounts0)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.Fee) > 0 {
+		i -= len(m.Fee)
+		copy(dAtA[i:], m.Fee)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Fee)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.Price) > 0 {
+		i -= len(m.Price)
+		copy(dAtA[i:], m.Price)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Price)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.Token1) > 0 {
+		i -= len(m.Token1)
+		copy(dAtA[i:], m.Token1)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Token1)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Token0) > 0 {
+		i -= len(m.Token0)
+		copy(dAtA[i:], m.Token0)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Token0)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSingleDepositResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSingleDepositResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSingleDepositResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
+	offset -= sovTx(v)
+	base := offset
+	for v >= 1<<7 {
+		dAtA[offset] = uint8(v&0x7f | 0x80)
+		v >>= 7
+		offset++
+	}
+	dAtA[offset] = uint8(v)
+	return base
+}
+func (m *MsgSingleDeposit) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Token0)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Token1)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Price)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Fee)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Amounts0)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Amounts1)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Receiver)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgSingleDepositResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func sovTx(x uint64) (n int) {
+	return (math_bits.Len64(x|1) + 6) / 7
+}
+func sozTx(x uint64) (n int) {
+	return sovTx(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *MsgSingleDeposit) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSingleDeposit: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSingleDeposit: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Token0", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Token0 = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Token1", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Token1 = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Price", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Price = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Fee", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Fee = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amounts0", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Amounts0 = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amounts1", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Amounts1 = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Receiver", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Receiver = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSingleDepositResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSingleDepositResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSingleDepositResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func skipTx(dAtA []byte) (n int, err error) {
+	l := len(dAtA)
+	iNdEx := 0
+	depth := 0
+	for iNdEx < l {
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return 0, ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return 0, io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		wireType := int(wire & 0x7)
+		switch wireType {
+		case 0:
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return 0, ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return 0, io.ErrUnexpectedEOF
+				}
+				iNdEx++
+				if dAtA[iNdEx-1] < 0x80 {
+					break
+				}
+			}
+		case 1:
+			iNdEx += 8
+		case 2:
+			var length int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return 0, ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return 0, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				length |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if length < 0 {
+				return 0, ErrInvalidLengthTx
+			}
+			iNdEx += length
+		case 3:
+			depth++
+		case 4:
+			if depth == 0 {
+				return 0, ErrUnexpectedEndOfGroupTx
+			}
+			depth--
+		case 5:
+			iNdEx += 4
+		default:
+			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
+		}
+		if iNdEx < 0 {
+			return 0, ErrInvalidLengthTx
+		}
+		if depth == 0 {
+			return iNdEx, nil
+		}
+	}
+	return 0, io.ErrUnexpectedEOF
+}
+
+var (
+	ErrInvalidLengthTx        = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowTx          = fmt.Errorf("proto: integer overflow")
+	ErrUnexpectedEndOfGroupTx = fmt.Errorf("proto: unexpected end of group")
+)

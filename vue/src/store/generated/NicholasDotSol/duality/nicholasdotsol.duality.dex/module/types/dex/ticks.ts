@@ -7,8 +7,8 @@ export const protobufPackage = "nicholasdotsol.duality.dex";
 export interface Ticks {
   token0: string;
   token1: string;
-  poolsZeroToOne: Pool | undefined;
-  poolsOneToZero: Pool | undefined;
+  poolsZeroToOne: Pool[];
+  poolsOneToZero: Pool[];
 }
 
 const baseTicks: object = { token0: "", token1: "" };
@@ -21,11 +21,11 @@ export const Ticks = {
     if (message.token1 !== "") {
       writer.uint32(18).string(message.token1);
     }
-    if (message.poolsZeroToOne !== undefined) {
-      Pool.encode(message.poolsZeroToOne, writer.uint32(26).fork()).ldelim();
+    for (const v of message.poolsZeroToOne) {
+      Pool.encode(v!, writer.uint32(26).fork()).ldelim();
     }
-    if (message.poolsOneToZero !== undefined) {
-      Pool.encode(message.poolsOneToZero, writer.uint32(34).fork()).ldelim();
+    for (const v of message.poolsOneToZero) {
+      Pool.encode(v!, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -34,6 +34,8 @@ export const Ticks = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseTicks } as Ticks;
+    message.poolsZeroToOne = [];
+    message.poolsOneToZero = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -44,10 +46,10 @@ export const Ticks = {
           message.token1 = reader.string();
           break;
         case 3:
-          message.poolsZeroToOne = Pool.decode(reader, reader.uint32());
+          message.poolsZeroToOne.push(Pool.decode(reader, reader.uint32()));
           break;
         case 4:
-          message.poolsOneToZero = Pool.decode(reader, reader.uint32());
+          message.poolsOneToZero.push(Pool.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -59,6 +61,8 @@ export const Ticks = {
 
   fromJSON(object: any): Ticks {
     const message = { ...baseTicks } as Ticks;
+    message.poolsZeroToOne = [];
+    message.poolsOneToZero = [];
     if (object.token0 !== undefined && object.token0 !== null) {
       message.token0 = String(object.token0);
     } else {
@@ -70,14 +74,14 @@ export const Ticks = {
       message.token1 = "";
     }
     if (object.poolsZeroToOne !== undefined && object.poolsZeroToOne !== null) {
-      message.poolsZeroToOne = Pool.fromJSON(object.poolsZeroToOne);
-    } else {
-      message.poolsZeroToOne = undefined;
+      for (const e of object.poolsZeroToOne) {
+        message.poolsZeroToOne.push(Pool.fromJSON(e));
+      }
     }
     if (object.poolsOneToZero !== undefined && object.poolsOneToZero !== null) {
-      message.poolsOneToZero = Pool.fromJSON(object.poolsOneToZero);
-    } else {
-      message.poolsOneToZero = undefined;
+      for (const e of object.poolsOneToZero) {
+        message.poolsOneToZero.push(Pool.fromJSON(e));
+      }
     }
     return message;
   },
@@ -86,19 +90,27 @@ export const Ticks = {
     const obj: any = {};
     message.token0 !== undefined && (obj.token0 = message.token0);
     message.token1 !== undefined && (obj.token1 = message.token1);
-    message.poolsZeroToOne !== undefined &&
-      (obj.poolsZeroToOne = message.poolsZeroToOne
-        ? Pool.toJSON(message.poolsZeroToOne)
-        : undefined);
-    message.poolsOneToZero !== undefined &&
-      (obj.poolsOneToZero = message.poolsOneToZero
-        ? Pool.toJSON(message.poolsOneToZero)
-        : undefined);
+    if (message.poolsZeroToOne) {
+      obj.poolsZeroToOne = message.poolsZeroToOne.map((e) =>
+        e ? Pool.toJSON(e) : undefined
+      );
+    } else {
+      obj.poolsZeroToOne = [];
+    }
+    if (message.poolsOneToZero) {
+      obj.poolsOneToZero = message.poolsOneToZero.map((e) =>
+        e ? Pool.toJSON(e) : undefined
+      );
+    } else {
+      obj.poolsOneToZero = [];
+    }
     return obj;
   },
 
   fromPartial(object: DeepPartial<Ticks>): Ticks {
     const message = { ...baseTicks } as Ticks;
+    message.poolsZeroToOne = [];
+    message.poolsOneToZero = [];
     if (object.token0 !== undefined && object.token0 !== null) {
       message.token0 = object.token0;
     } else {
@@ -110,14 +122,14 @@ export const Ticks = {
       message.token1 = "";
     }
     if (object.poolsZeroToOne !== undefined && object.poolsZeroToOne !== null) {
-      message.poolsZeroToOne = Pool.fromPartial(object.poolsZeroToOne);
-    } else {
-      message.poolsZeroToOne = undefined;
+      for (const e of object.poolsZeroToOne) {
+        message.poolsZeroToOne.push(Pool.fromPartial(e));
+      }
     }
     if (object.poolsOneToZero !== undefined && object.poolsOneToZero !== null) {
-      message.poolsOneToZero = Pool.fromPartial(object.poolsOneToZero);
-    } else {
-      message.poolsOneToZero = undefined;
+      for (const e of object.poolsOneToZero) {
+        message.poolsOneToZero.push(Pool.fromPartial(e));
+      }
     }
     return message;
   },
