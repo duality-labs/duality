@@ -11,6 +11,7 @@ const DefaultIndex uint64 = 1
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		TicksList: []Ticks{},
+		ShareList: []Share{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -28,6 +29,16 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("duplicated index for ticks")
 		}
 		ticksIndexMap[index] = struct{}{}
+	}
+	// Check for duplicated index in share
+	shareIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.ShareList {
+		index := string(ShareKey(elem.Owner, elem.Token0, elem.Token1, elem.Price, elem.Fee))
+		if _, ok := shareIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for share")
+		}
+		shareIndexMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 

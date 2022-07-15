@@ -32,6 +32,22 @@ func TestGenesisState_Validate(t *testing.T) {
 						Token1: "1",
 					},
 				},
+				ShareList: []types.Share{
+					{
+						Owner:  "0",
+						Token0: "0",
+						Token1: "0",
+						Price:  "0",
+						Fee:    "0",
+					},
+					{
+						Owner:  "1",
+						Token0: "1",
+						Token1: "1",
+						Price:  "1",
+						Fee:    "1",
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -47,6 +63,28 @@ func TestGenesisState_Validate(t *testing.T) {
 					{
 						Token0: "0",
 						Token1: "0",
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated share",
+			genState: &types.GenesisState{
+				ShareList: []types.Share{
+					{
+						Owner:  "0",
+						Token0: "0",
+						Token1: "0",
+						Price:  "0",
+						Fee:    "0",
+					},
+					{
+						Owner:  "0",
+						Token0: "0",
+						Token1: "0",
+						Price:  "0",
+						Fee:    "0",
 					},
 				},
 			},

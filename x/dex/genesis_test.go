@@ -24,6 +24,22 @@ func TestGenesis(t *testing.T) {
 				Token1: "1",
 			},
 		},
+		ShareList: []types.Share{
+			{
+				Owner:  "0",
+				Token0: "0",
+				Token1: "0",
+				Price:  "0",
+				Fee:    "0",
+			},
+			{
+				Owner:  "1",
+				Token0: "1",
+				Token1: "1",
+				Price:  "1",
+				Fee:    "1",
+			},
+		},
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
@@ -36,5 +52,6 @@ func TestGenesis(t *testing.T) {
 	nullify.Fill(got)
 
 	require.ElementsMatch(t, genesisState.TicksList, got.TicksList)
+	require.ElementsMatch(t, genesisState.ShareList, got.ShareList)
 	// this line is used by starport scaffolding # genesis/test/assert
 }
