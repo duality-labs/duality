@@ -133,3 +133,14 @@ func down(pools *([]*types.Pool), i0, n int32) bool {
 	}
 	return i > i0
 }
+
+
+func (k Keeper) getPool(pools *([]*types.Pool), Fee, Price string) (types.Pool, bool) {
+
+	for _, s := range *pools {
+		if s.Fee == Fee && s.Price == Price {
+			return s, true
+		}
+	}
+	return nil, false
+}

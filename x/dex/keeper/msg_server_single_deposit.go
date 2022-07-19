@@ -26,14 +26,25 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 
 	_ = receiverAddr
 
-	AccountsToken0Balance := k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token0)
+	AccountsToken0Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token0).Amount)
+	
 
-	if AccountsToken0Balance.Amount.LT(sdk.NewIntFromUint64(msg.Amounts0)) {
+	amount0, err := sdk.NewDecFromStr(msg.Amounts0)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
+	}
+
+	amount1, err := sdk.NewDecFromStr(msg.Amounts1)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
+	}
+
+	if AccountsToken0Balance.LT(amount0) {
 		return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
-	AccountsToken1Balance := k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token1)
-	if AccountsToken1Balance.Amount.LT(sdk.NewIntFromUint64(msg.Amounts1)) {
+	AccountsToken1Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token1).Amount)
+	if AccountsToken1Balance.LT(amount1) {
 		return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s does not have enough  of token 1", callerAddr)
 	}
 
@@ -61,33 +72,46 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 			Token1:      token1[0],
 			Price:       msg.Price,
 			Fee:         msg.Fee,
-			ShareAmount: 0,
+			ShareAmount: "0",
 		}
 	}
 
-	tickOld, tickFound := k.GetTick(
+	tickOld, tickFound := k.GetTicks(
 		ctx,
 		token0[0],
 		token1[0],
-		msg.Price,
-		msg.Fee,
 	)
 
-	if !tickFound {
-		tickOld = types.Tick{
-			Token0:      token0[0],
-			Token1:      token1[0],
-			Price:       msg.Price,
-			Fee:         msg.Fee,
-			Reserves0:   0,
-			Reserves1:   0,
-			TotalShares: 0,
-		}
+	ZeroToOneOld := types.Pool {
+		ReserveA: "0",
+		ReserveB: "0",
+		Fee: msg.Fee,
+		Price: msg.Price,
+		TotalShares: "0",
+		Index: 0,
+	}
+	ZeroToOneFound := false
+
+	OnetoZeroOld := types.Pool {
+		ReserveA: "0",
+		ReserveB: "0",
+		Fee: msg.Fee,
+		Price: msg.Price,
+		TotalShares: "0",
+		Index: 0,
+	}
+	OneToZeroFound := false
+
+	if tickFound {
+		OnetoZeroOld, OneToZeroFound = k.getPool(&tickOld.PoolsOneToZero, msg.Fee, msg.Price)
+		ZeroToOneOld, ZeroToOneFound = k.getPool(&tickOld.PoolsZeroToOne, msg.Fee, msg.Price)
+		
 	}
 
-	var SharesMinted uint
-	var trueAmounts0 uint = uint(msg.Amounts0)
-	var trueAmounts1 uint = uint(msg.Amounts1)
+
+	var SharesMinted sdk.Int
+	var trueAmounts0 = amount0
+	var trueAmounts1 = amount1
 
 	price, err := strconv.ParseFloat(msg.Price, 64)
 	if err != nil {
@@ -167,9 +191,9 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		sdk.NewAttribute(types.DepositEventToken0, msg.Token0),
 		sdk.NewAttribute(types.DepositEventToken1, msg.Token1),
 		sdk.NewAttribute(types.DepositEventPrice, msg.Price),
-		sdk.NewAttribute(types.DepositEventFee, strconv.FormatUint(uint64(msg.Fee), 10) ),
-		sdk.NewAttribute(types.DepositEventOldReserves0, strconv.FormatUint(uint64(tickOld.Reserves0), 10)),
-		sdk.NewAttribute(types.DepositEventOldReserves1, strconv.FormatUint(uint64(tickOld.Reserves1), 10)),
+		sdk.NewAttribute(types.DepositEventFee, msg.Fee ),
+		sdk.NewAttribute(types.DepositEventOldReserves0, tickOld.Reserves0),
+		sdk.NewAttribute(types.DepositEventOldReserves1, tickOld.Reserves1),
 		sdk.NewAttribute(types.DepositEventNewReserves0, strconv.FormatUint(uint64(tickNew.Reserves0), 10)),
 		sdk.NewAttribute(types.DepositEventNewReserves1, strconv.FormatUint(uint64(tickNew.Reserves1), 10)),
 		sdk.NewAttribute(types.DepositEventReceiver, msg.Receiver),
