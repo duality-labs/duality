@@ -22,15 +22,15 @@ func createNTicks(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Ticks {
 		items[i].Token1 = strconv.Itoa(i)
 		items[i].PoolsOneToZero = []*types.Pool{
 			&types.Pool{
-				ReserveA:    "100",
-				ReserveB:    "100",
+				Reserve0:    "100",
+				Reserve1:    "100",
 				Fee:         "3",
 				Price:       "2",
 				TotalShares: "200",
 			},
 			&types.Pool{
-				ReserveA:    "100",
-				ReserveB:    "100",
+				Reserve0:    "100",
+				Reserve1:    "100",
 				Fee:         "5",
 				Price:       "2",
 				TotalShares: "200",
@@ -38,15 +38,15 @@ func createNTicks(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Ticks {
 		}
 		items[i].PoolsZeroToOne = []*types.Pool{
 			&types.Pool{
-				ReserveA:    "100",
-				ReserveB:    "100",
+				Reserve0:    "100",
+				Reserve1:    "100",
 				Fee:         "3",
 				Price:       "2",
 				TotalShares: "200",
 			},
 			&types.Pool{
-				ReserveA:    "100",
-				ReserveB:    "100",
+				Reserve0:    "100",
+				Reserve1:    "100",
 				Fee:         "5",
 				Price:       "2",
 				TotalShares: "200",
@@ -104,16 +104,16 @@ func TestInit(t *testing.T) {
 
 	pools := []*types.Pool{
 		&types.Pool{
-			ReserveA:    "100",
-			ReserveB:    "100",
+			Reserve0:    "100",
+			Reserve1:    "100",
 			Fee:         ".5",
 			Price:       "2",
 			TotalShares: "200",
 			Index:       0,
 		},
 		&types.Pool{
-			ReserveA:    "100",
-			ReserveB:    "100",
+			Reserve0:    "100",
+			Reserve1:    "100",
 			Fee:         ".2",
 			Price:       "2",
 			TotalShares: "200",
@@ -125,8 +125,8 @@ func TestInit(t *testing.T) {
 	fmt.Println(pools)
 
 	newPool := &types.Pool{
-		ReserveA:    "100",
-		ReserveB:    "100",
+		Reserve0:    "100",
+		Reserve1:    "100",
 		Fee:         ".2",
 		Price:       "3",
 		TotalShares: "200",
@@ -156,16 +156,16 @@ func TestInit(t *testing.T) {
 	fmt.Println("Popped Pool", removedPool)
 
 	newPool2 := &types.Pool{
-		ReserveA:    "100",
-		ReserveB:    "100",
+		Reserve0:    "100",
+		Reserve1:    "100",
 		Fee:         ".2",
 		Price:       "4",
 		TotalShares: "200",
 		Index:       0,
 	}
 	newPool3 := &types.Pool{
-		ReserveA:    "100",
-		ReserveB:    "100",
+		Reserve0:    "100",
+		Reserve1:    "100",
 		Fee:         ".5",
 		Price:       "3",
 		TotalShares: "200",

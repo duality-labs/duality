@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"github.com/NicholasDotSol/duality/x/dex/types"
-	"strconv"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	//"fmt"
 )
 
@@ -16,16 +16,7 @@ func Swap(pools []*types.Pool, i, j int32) {
 
 func Less(pools []*types.Pool, i, j int32) bool {
 
-	priceI, error := strconv.ParseFloat(pools[i].Price, 64)
-
-	feeI, error := strconv.ParseFloat(pools[i].Fee, 64)
-
-	priceJ, error := strconv.ParseFloat(pools[j].Price, 64)
-
-	feeJ, error := strconv.ParseFloat(pools[j].Fee, 64)
-
-	_ = error
-	return (priceI * (1 - feeI)) > (priceJ * (1 - feeJ))
+	return  (pools[i].Price.Mul(pools[i].Fee)).Quo(10000).LT( (pools[j].Price.Mul(pools[j].Fee)).Quo(10000)) 
 
 }
 
@@ -46,9 +37,9 @@ func Pop(pools *([]*types.Pool)) types.Pool {
 }
 
 // update modifies the priority and value of an Item in the queue.
-func (k Keeper) Update(pools *([]*types.Pool), pool *types.Pool, reserveA string, reserveB string, fee string, totalShares string, price string) {
-	pool.ReserveA = reserveA
-	pool.ReserveB = reserveB
+func (k Keeper) Update(pools *([]*types.Pool), pool *types.Pool, reserve0 , reserve1 , fee, totalShares , price sdk.Dec) {
+	pool.Reserve0 = reserve0
+	pool.Reserve1 = reserve1
 	pool.Fee = fee
 	pool.Price = price
 	pool.TotalShares = totalShares
@@ -135,12 +126,12 @@ func down(pools *([]*types.Pool), i0, n int32) bool {
 }
 
 
-func (k Keeper) getPool(pools *([]*types.Pool), Fee, Price string) (types.Pool, bool) {
+func (k Keeper) getPool(pools *([]*types.Pool), Fee, Price sdk.Dec) (types.Pool, bool) {
 
 	for _, s := range *pools {
 		if s.Fee == Fee && s.Price == Price {
-			return s, true
+			return *s, true
 		}
 	}
-	return nil, false
+	return types.Pool{}, false
 }

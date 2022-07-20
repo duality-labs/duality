@@ -1,14 +1,40 @@
 syntax = "proto3";
 package nicholasdotsol.duality.dex;
 
+import "gogoproto/gogo.proto";
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 
 message Pool {
   
-  string reserveA = 1; 
-  string reserveB = 2; 
-  string price = 3; 
-  string fee = 4; 
-  string totalShares = 5; 
-  int32 index = 6; 
+  string reserve0 = 1  [
+      (gogoproto.moretags)   = "yaml:\"reserve0\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "reserve0"
+  ];
+  string reserve1 = 2  [
+      (gogoproto.moretags)   = "yaml:\"reserve1\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "reserve1"
+  ]; 
+  string price = 3  [
+      (gogoproto.moretags)   = "yaml:\"price\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "price"
+  ]; 
+  string fee = 4  [
+      (gogoproto.moretags)   = "yaml:\"fee\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "fee"
+  ];
+  string totalShares = 5  [
+      (gogoproto.moretags)   = "yaml:\"totalShares\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "totalShares"
+  ];
+  int32 index = 6;
 }

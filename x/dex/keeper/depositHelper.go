@@ -1,46 +1,60 @@
 package keeper
 
 import (
-	//"fmt"
-
-	"strconv"
-
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+func (k Keeper) depositHelperAdd(pool *types.Pool, amount0, amount1 sdk.Dec, Fee, Price string) (sdk.Dec, sdk.Dec, sdk.Dec, error) {
 
-func (k Keeper) depositHelperSub(pool *types.Pool, amount0, amount1 sdk.Int, Fee, Price string ) (sdk.Dec, sdk.Dec, sdk.Int, error){
+	var trueAmounts0 sdk.Dec
+	var trueAmounts1 sdk.Dec
 
-	fee, err := sdk.NewDecFromStr(Fee)
-	if err != nil {
-		return sdk.ZeroDec(), sdk.ZeroDec(), sdk.NewInt(0), err
+
+	if pool.Reserve0.GT(sdk.ZeroDec()) {
+		trueAmounts1 = k.min(amount1, (pool.Reserve1.Mul(amount0)).Quo(pool.Reserve0))
 	}
 
-	price, err := sdk.NewDecFromStr(Price)
-	if err != nil {
-		return sdk.ZeroDec(), sdk.ZeroDec(), sdk.NewInt(0), err
+	if pool.Reserve1.GT(sdk.ZeroDec()) {
+		trueAmounts0 = k.min(amount0, (pool.Reserve0.Mul(amount1)).Quo(pool.Reserve1))
 	}
 
-	if pool.Reserves0 > 0 {
-		trueAmounts0 = k.min(uint(msg.Amounts1), uint((uint(tickOld.Reserves1)*uint(msg.Amounts0))/uint(tickOld.Reserves0)))
+	if trueAmounts0 == amount0 && trueAmounts1 != amount1 {
+		trueAmounts1 = amount1.Add(((amount1.Sub(trueAmounts1)).Mul(pool.Fee)).Quo(sdk.NewDec(10000).Sub(pool.Fee)))
+	} else if trueAmounts1 == amount1 && trueAmounts0 != amount0 {
+		trueAmounts0 = amount0.Add(((amount0.Add(trueAmounts0)).Mul(pool.Fee)).Quo(sdk.NewDec(10000).Sub(pool.Fee)))
 	}
 
-	if tickOld.Reserves1 > 0 {
-		trueAmounts0 = k.min(uint(msg.Amounts0), uint((uint(tickOld.Reserves0)*uint(msg.Amounts1))/uint(tickOld.Reserves1)))
+	// ((TotalShares * (Amt0 + Amt1 * Price)) / Reserve0 + Reserve1 * Price
+	SharesMinted := (pool.TotalShares.Mul(amount0.Add(amount1.Mul(pool.Price)))).Quo(pool.Reserve0.Add(pool.Reserve1.Mul(pool.Price)))
+
+	return trueAmounts0, trueAmounts1, SharesMinted, nil
+
+}
+
+func (k Keeper) depositHelperSub(pool *types.Pool, amount0, amount1 sdk.Dec, Fee, Price string) (sdk.Dec, sdk.Dec, sdk.Dec, error) {
+
+	var trueAmounts0 sdk.Dec
+	var trueAmounts1 sdk.Dec
+
+
+	if pool.Reserve0.GT(sdk.ZeroDec()) {
+		trueAmounts1 = k.min(amount1, (pool.Reserve1.Mul(amount0)).Quo(pool.Reserve0))
 	}
 
-	if trueAmounts0 == uint(msg.Amounts0) && trueAmounts1 != uint(msg.Amounts1) {
-		trueAmounts1 = uint(msg.Amounts1) + (((uint(msg.Amounts1) - trueAmounts1) * uint(msg.Fee)) / uint(10000-msg.Fee))
-	} else if trueAmounts1 == uint(msg.Amounts1) && trueAmounts0 != uint(msg.Amounts0) {
-		trueAmounts0 = uint(msg.Amounts0) + (((uint(msg.Amounts0) - trueAmounts0) * uint(msg.Fee)) / uint(10000-msg.Fee))
+	if pool.Reserve1.GT(sdk.ZeroDec()) {
+		trueAmounts0 = k.min(amount0, (pool.Reserve0.Mul(amount1)).Quo(pool.Reserve1))
 	}
 
-	if tickOld.TotalShares == 0 {
-		SharesMinted = uint(float64(msg.Amounts0) + float64(msg.Amounts1)*price)
-	} else {
-		SharesMinted =
-			uint(float64(tickOld.TotalShares) * ((float64(msg.Amounts0) + float64(msg.Amounts1)*price) / (float64(tickOld.Reserves0) + float64(tickOld.Reserves1)*price)))
+	if trueAmounts0 == amount0 && trueAmounts1 != amount1 {
+		trueAmounts1 = amount1.Sub(((amount1.Sub(trueAmounts1)).Mul(pool.Fee)).Quo(sdk.NewDec(10000).Sub(pool.Fee)))
+	} else if trueAmounts1 == amount1 && trueAmounts0 != amount0 {
+		trueAmounts0 = amount0.Sub(((amount0.Add(trueAmounts0)).Mul(pool.Fee)).Quo(sdk.NewDec(10000).Sub(pool.Fee)))
 	}
+
+	// ((TotalShares * (Amt0 + Amt1 * Price)) / Reserve0 + Reserve1 * Price
+	SharesMinted := (pool.TotalShares.Mul(trueAmounts0.Add(trueAmounts1.Mul(pool.Price)))).Quo(pool.Reserve0.Add(pool.Reserve1.Mul(pool.Price)))
+
+	return trueAmounts0, trueAmounts1, SharesMinted, nil
+
 }

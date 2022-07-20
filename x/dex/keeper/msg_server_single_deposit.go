@@ -50,7 +50,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 
 	token0 := []string{msg.Token0}
 	token1 := []string{msg.Token1}
-	token0, token1, error := k.sortTokens(ctx, token0, token1)
+	token0, token1, error := k.sortTokens(ctx, token0, token1, amount0, amount1)
 
 	if error != nil {
 		return nil, error
@@ -82,62 +82,85 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		token1[0],
 	)
 
-	ZeroToOneOld := types.Pool {
-		ReserveA: "0",
-		ReserveB: "0",
-		Fee: msg.Fee,
-		Price: msg.Price,
-		TotalShares: "0",
-		Index: 0,
-	}
+	var OneToZeroOld types.Pool
+	var ZeroToOneOld types.Pool
+	OneToZeroFound := false
 	ZeroToOneFound := false
 
-	OnetoZeroOld := types.Pool {
-		ReserveA: "0",
-		ReserveB: "0",
-		Fee: msg.Fee,
-		Price: msg.Price,
-		TotalShares: "0",
-		Index: 0,
-	}
-	OneToZeroFound := false
-
-	if tickFound {
-		OnetoZeroOld, OneToZeroFound = k.getPool(&tickOld.PoolsOneToZero, msg.Fee, msg.Price)
-		ZeroToOneOld, ZeroToOneFound = k.getPool(&tickOld.PoolsZeroToOne, msg.Fee, msg.Price)
-		
-	}
-
-
-	var SharesMinted sdk.Int
+	var SharesMinted sdk.Dec
 	var trueAmounts0 = amount0
 	var trueAmounts1 = amount1
 
-	price, err := strconv.ParseFloat(msg.Price, 64)
-	if err != nil {
-		return nil, err
-	}
+	if tickFound {
+		OnetoZeroOld, OneToZeroFound := k.getPool(&tickOld.PoolsOneToZero, msg.Fee, msg.Price)
+		ZeroToOneOld, ZeroToOneFound := k.getPool(&tickOld.PoolsZeroToOne, msg.Fee, msg.Price)
 
-	if tickOld.Reserves0 > 0 {
-		trueAmounts0 = k.min(uint(msg.Amounts1), uint((uint(tickOld.Reserves1)*uint(msg.Amounts0))/uint(tickOld.Reserves0)))
-	}
+		if OneToZeroFound{
+			trueAmounts0, trueAmounts1, SharesMinted, err := k.depositHelperSub(&OnetoZeroOld, amount0, amount1, msg.Fee, msg.Price)
 
-	if tickOld.Reserves1 > 0 {
-		trueAmounts0 = k.min(uint(msg.Amounts0), uint((uint(tickOld.Reserves0)*uint(msg.Amounts1))/uint(tickOld.Reserves1)))
-	}
+			if err != nil {
+				return nil, err
+			}
+		} else if ZeroToOneFound{
+			trueAmounts0, trueAmounts1, SharesMinted, err := k.depositHelperAdd(&OnetoZeroOld, amount0, amount1, msg.Fee, msg.Price)
 
-	if trueAmounts0 == uint(msg.Amounts0) && trueAmounts1 != uint(msg.Amounts1) {
-		trueAmounts1 = uint(msg.Amounts1) + (((uint(msg.Amounts1) - trueAmounts1) * uint(msg.Fee)) / uint(10000-msg.Fee))
-	} else if trueAmounts1 == uint(msg.Amounts1) && trueAmounts0 != uint(msg.Amounts0) {
-		trueAmounts0 = uint(msg.Amounts0) + (((uint(msg.Amounts0) - trueAmounts0) * uint(msg.Fee)) / uint(10000-msg.Fee))
-	}
+			if err != nil {
+				return nil, err
+			}
+		}
 
-	if tickOld.TotalShares == 0 {
-		SharesMinted = uint(float64(msg.Amounts0) + float64(msg.Amounts1)*price)
+		if !OneToZeroFound && ZeroToOneFound {
+
+			OnetoZeroOld = types.Pool {
+				Reserve0: "0",
+				Reserve1: "0",
+				Fee: msg.Fee,
+				Price: msg.Price,
+				TotalShares: "0",
+				Index: 0,} 
+
+			trueAmounts0, trueAmounts1, SharesMinted, err := k.depositHelperAdd(&OnetoZeroOld , amount0, amount1, msg.Fee, msg.Price)
+		}
+
 	} else {
-		SharesMinted =
-			uint(float64(tickOld.TotalShares) * ((float64(msg.Amounts0) + float64(msg.Amounts1)*price) / (float64(tickOld.Reserves0) + float64(tickOld.Reserves1)*price)))
+
+		price, err := sdk.NewDecFromStr(msg.Price)
+		if err != nil {
+			return nil, err
+		}
+
+		SharesMinted = amount0.Add(amount1.Mul(price))
 	}
+
+	var NewPool types.Pool
+	if OneToZeroFound {
+		NewPool = types.Pool {
+			Reserve0: One,
+		}
+	} else if ZeroToOneFound {
+
+	} else {
+		NewPool = types.Pool {
+			
+		}
+	}
+	
+	//Token 0
+	if trueAmounts0.GT(sdk.ZeroDec()) {
+		coin0 := sdk.NewCoin(token0[0], sdk.NewIntFromBigInt(trueAmounts0.BigInt()) )
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
+			return nil, err
+		}
+	}
+	
+	//Token 1
+	if trueAmounts1.GT(sdk.ZeroDec()) {
+		coin1 := sdk.NewCoin(token1[0], sdk.NewIntFromBigInt(trueAmounts1.BigInt()) )
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
+			return nil, err
+		}
+	}
+
 
 	tickNew := types.Tick{
 		Token0:      token0[0],
@@ -158,31 +181,31 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		ShareAmount: shareOld.ShareAmount + uint64(SharesMinted),
 	}
 
+	
+	
+
+	// SharesMinted, TotalAmounts0, TotalAmounts1
+
+	//GetTicks -> ticks.ZeroToOne ticks.OneToZero (OUR PQS) actually []Pool
+	//k.Update(&tickOld.ZeroToOne, OneToZeroOld (Our Pool we are revising), token0[0], token1[0], msg.Price, msg.Fee, newResrve0, newReserve1, totalShares)
+	//k.Update(&ticksOld.OneToZero)
+
+	k.SetTicks(
+		ctx,
+		//token0
+		//token1
+		//&tickOld.ZeroToOne
+		//&tickOld.OneToZero
+	)
+
+
 	k.SetShare(
 		ctx,
 		shareNew,
 	)
 
-	k.SetTick(
-		ctx,
-		tickNew,
-	)
 
-	//Token 0
-	if trueAmounts0 > 0 {
-		coin0 := sdk.NewInt64Coin(token0[0], int64(trueAmounts0))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
-			return nil, err
-		}
-	}
-	
-	//Token 1
-	if trueAmounts1 > 0 {
-		coin1 := sdk.NewInt64Coin(token1[0], int64(trueAmounts1))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
-			return nil, err
-		}
-	}
+
 	
 	var event = sdk.NewEvent(sdk.EventTypeMessage,
 		sdk.NewAttribute(sdk.AttributeKeyModule, "duality"),
@@ -197,11 +220,11 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		sdk.NewAttribute(types.DepositEventNewReserves0, strconv.FormatUint(uint64(tickNew.Reserves0), 10)),
 		sdk.NewAttribute(types.DepositEventNewReserves1, strconv.FormatUint(uint64(tickNew.Reserves1), 10)),
 		sdk.NewAttribute(types.DepositEventReceiver, msg.Receiver),
-		sdk.NewAttribute(types.DepositEventSharesMinted, strconv.FormatUint(uint64(SharesMinted), 10)),
+		sdk.NewAttribute(types.DepositEventSharesMinted,SharesMinted.String()),
 
 	)
 	ctx.EventManager().EmitEvent(event)
 
 
-	return &types.MsgSingleDepositResponse{ strconv.FormatUint(uint64(SharesMinted), 10) }, nil
+	return &types.MsgSingleDepositResponse{ SharesMinted.String() }, nil
 }
