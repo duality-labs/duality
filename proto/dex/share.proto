@@ -1,6 +1,8 @@
 syntax = "proto3";
 package nicholasdotsol.duality.dex;
 
+import "gogoproto/gogo.proto";
+
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 
 message Share {
@@ -9,7 +11,12 @@ message Share {
   string token1 = 3; 
   string price = 4; 
   string fee = 5; 
-  string shareAmount = 6; 
+  string shareAmount = 6 [
+      (gogoproto.moretags)   = "yaml:\"totalShares\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "totalShares"
+  ];
   
 }
 

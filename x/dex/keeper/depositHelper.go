@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) depositHelperAdd(pool *types.Pool, amount0, amount1 sdk.Dec, Fee, Price string) (sdk.Dec, sdk.Dec, sdk.Dec, error) {
+func (k Keeper) depositHelperAdd(pool *types.Pool, amount0, amount1 sdk.Dec) (sdk.Dec, sdk.Dec, sdk.Dec, error) {
 
 	var trueAmounts0 sdk.Dec
 	var trueAmounts1 sdk.Dec
@@ -32,7 +32,7 @@ func (k Keeper) depositHelperAdd(pool *types.Pool, amount0, amount1 sdk.Dec, Fee
 
 }
 
-func (k Keeper) depositHelperSub(pool *types.Pool, amount0, amount1 sdk.Dec, Fee, Price string) (sdk.Dec, sdk.Dec, sdk.Dec, error) {
+func (k Keeper) depositHelperSub(pool *types.Pool, amount0, amount1 sdk.Dec) (sdk.Dec, sdk.Dec, sdk.Dec, error) {
 
 	var trueAmounts0 sdk.Dec
 	var trueAmounts1 sdk.Dec

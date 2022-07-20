@@ -4,8 +4,6 @@ import (
 	"context"
 	//"fmt"
 
-	"strconv"
-
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -50,7 +48,12 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 
 	token0 := []string{msg.Token0}
 	token1 := []string{msg.Token1}
-	token0, token1, error := k.sortTokens(ctx, token0, token1, amount0, amount1)
+	amounts0 := []sdk.Dec{amount0}
+	amounts1 := []sdk.Dec{amount1}
+
+	token0, token1, amounts0, amounts1, error := k.sortTokensDeposit(ctx, token0, token1, amounts0, amounts1)
+	amount0 = amounts0[0]
+	amount1 = amounts1[0]
 
 	if error != nil {
 		return nil, error
@@ -72,7 +75,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 			Token1:      token1[0],
 			Price:       msg.Price,
 			Fee:         msg.Fee,
-			ShareAmount: "0",
+			ShareAmount: sdk.ZeroDec(),
 		}
 	}
 
@@ -81,6 +84,18 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		token0[0],
 		token1[0],
 	)
+
+	price, err := sdk.NewDecFromStr(msg.Price) 
+
+	if err != nil {
+		return nil, err
+	}
+
+	fee, err := sdk.NewDecFromStr(msg.Fee) 
+
+	if err != nil {
+		return nil, err
+	}
 
 	var OneToZeroOld types.Pool
 	var ZeroToOneOld types.Pool
@@ -92,17 +107,17 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	var trueAmounts1 = amount1
 
 	if tickFound {
-		OnetoZeroOld, OneToZeroFound := k.getPool(&tickOld.PoolsOneToZero, msg.Fee, msg.Price)
-		ZeroToOneOld, ZeroToOneFound := k.getPool(&tickOld.PoolsZeroToOne, msg.Fee, msg.Price)
+		OneToZeroOld, OneToZeroFound = k.getPool(&tickOld.PoolsOneToZero, fee, price)
+		ZeroToOneOld, ZeroToOneFound = k.getPool(&tickOld.PoolsZeroToOne, fee, price)
 
 		if OneToZeroFound{
-			trueAmounts0, trueAmounts1, SharesMinted, err := k.depositHelperSub(&OnetoZeroOld, amount0, amount1, msg.Fee, msg.Price)
+			trueAmounts0, trueAmounts1, SharesMinted, err = k.depositHelperSub(&OneToZeroOld, amount0, amount1)
 
 			if err != nil {
 				return nil, err
 			}
 		} else if ZeroToOneFound{
-			trueAmounts0, trueAmounts1, SharesMinted, err := k.depositHelperAdd(&OnetoZeroOld, amount0, amount1, msg.Fee, msg.Price)
+			trueAmounts0, trueAmounts1, SharesMinted, err = k.depositHelperAdd(&ZeroToOneOld, amount0, amount1)
 
 			if err != nil {
 				return nil, err
@@ -111,37 +126,51 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 
 		if !OneToZeroFound && ZeroToOneFound {
 
-			OnetoZeroOld = types.Pool {
-				Reserve0: "0",
-				Reserve1: "0",
-				Fee: msg.Fee,
-				Price: msg.Price,
-				TotalShares: "0",
+			OneToZeroOld = types.Pool {
+				Reserve0: sdk.ZeroDec(),
+				Reserve1: sdk.ZeroDec(),
+				Fee: fee,
+				Price: price,
+				TotalShares: sdk.ZeroDec(),
 				Index: 0,} 
 
-			trueAmounts0, trueAmounts1, SharesMinted, err := k.depositHelperAdd(&OnetoZeroOld , amount0, amount1, msg.Fee, msg.Price)
+			trueAmounts0, trueAmounts1, SharesMinted, err = k.depositHelperAdd(&OneToZeroOld , amount0, amount1)
 		}
 
 	} else {
-
-		price, err := sdk.NewDecFromStr(msg.Price)
-		if err != nil {
-			return nil, err
-		}
 
 		SharesMinted = amount0.Add(amount1.Mul(price))
 	}
 
 	var NewPool types.Pool
+
 	if OneToZeroFound {
 		NewPool = types.Pool {
-			Reserve0: One,
+			Reserve0: OneToZeroOld.Reserve0.Add(trueAmounts0),
+			Reserve1: OneToZeroOld.Reserve1.Add(trueAmounts1),
+			Fee: fee,
+			Price: price,
+			TotalShares: OneToZeroOld.TotalShares.Add(SharesMinted),
+			Index: 0,
 		}
 	} else if ZeroToOneFound {
+		NewPool = types.Pool {
+			Reserve0: ZeroToOneOld.Reserve0.Add(trueAmounts0),
+			Reserve1: ZeroToOneOld.Reserve1.Add(trueAmounts1),
+			Fee: fee,
+			Price: price,
+			TotalShares: ZeroToOneOld.TotalShares.Add(SharesMinted),
+			Index: 0,
+		}
 
 	} else {
 		NewPool = types.Pool {
-			
+			Reserve0: trueAmounts0,
+			Reserve1: trueAmounts1,
+			Fee: fee,
+			Price: price,
+			TotalShares: SharesMinted,
+			Index: 0,
 		}
 	}
 	
@@ -161,15 +190,24 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		}
 	}
 
+	if NewPool.Reserve0.GT(sdk.ZeroDec())  && ZeroToOneFound {
+		k.Update(&tickOld.PoolsZeroToOne, &ZeroToOneOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
+	} else if NewPool.Reserve0.GT(sdk.ZeroDec())  && !ZeroToOneFound {
+		k.Push(&tickOld.PoolsZeroToOne,&NewPool)
+	}
 
-	tickNew := types.Tick{
+	if NewPool.Reserve1.GT(sdk.ZeroDec()) && OneToZeroFound {
+		k.Update(&tickOld.PoolsOneToZero, &OneToZeroOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
+	} else if NewPool.Reserve1.GT(sdk.ZeroDec())  && !OneToZeroFound {
+		k.Push(&tickOld.PoolsOneToZero,&NewPool)
+	}
+
+	
+	tickNew := types.Ticks{
 		Token0:      token0[0],
-		Token1:      token1[0],
-		Price:       msg.Price,
-		Fee:         msg.Fee,
-		Reserves0:   tickOld.Reserves0 + uint64(trueAmounts0),
-		Reserves1:   tickOld.Reserves1 + uint64(trueAmounts1),
-		TotalShares: tickOld.TotalShares + uint64(SharesMinted),
+		Token1: token1[0],
+		PoolsZeroToOne: tickOld.PoolsZeroToOne,
+		PoolsOneToZero: tickOld.PoolsOneToZero,
 	}
 
 	shareNew := types.Share{
@@ -178,24 +216,12 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		Token1:      token1[0],
 		Price:       msg.Price,
 		Fee:         msg.Fee,
-		ShareAmount: shareOld.ShareAmount + uint64(SharesMinted),
+		ShareAmount: shareOld.ShareAmount.Add(SharesMinted),
 	}
-
-	
-	
-
-	// SharesMinted, TotalAmounts0, TotalAmounts1
-
-	//GetTicks -> ticks.ZeroToOne ticks.OneToZero (OUR PQS) actually []Pool
-	//k.Update(&tickOld.ZeroToOne, OneToZeroOld (Our Pool we are revising), token0[0], token1[0], msg.Price, msg.Fee, newResrve0, newReserve1, totalShares)
-	//k.Update(&ticksOld.OneToZero)
 
 	k.SetTicks(
 		ctx,
-		//token0
-		//token1
-		//&tickOld.ZeroToOne
-		//&tickOld.OneToZero
+		tickNew,
 	)
 
 
@@ -211,20 +237,17 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		sdk.NewAttribute(sdk.AttributeKeyModule, "duality"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, types.DepositEventKey),
 		sdk.NewAttribute(types.DepositEventCreator, msg.Creator),
-		sdk.NewAttribute(types.DepositEventToken0, msg.Token0),
-		sdk.NewAttribute(types.DepositEventToken1, msg.Token1),
+		sdk.NewAttribute(types.DepositEventToken0, token0[0]),
+		sdk.NewAttribute(types.DepositEventToken1, token1[0]),
 		sdk.NewAttribute(types.DepositEventPrice, msg.Price),
 		sdk.NewAttribute(types.DepositEventFee, msg.Fee ),
-		sdk.NewAttribute(types.DepositEventOldReserves0, tickOld.Reserves0),
-		sdk.NewAttribute(types.DepositEventOldReserves1, tickOld.Reserves1),
-		sdk.NewAttribute(types.DepositEventNewReserves0, strconv.FormatUint(uint64(tickNew.Reserves0), 10)),
-		sdk.NewAttribute(types.DepositEventNewReserves1, strconv.FormatUint(uint64(tickNew.Reserves1), 10)),
+		sdk.NewAttribute(types.DepositEventNewReserves0, NewPool.Reserve0.String()),
+		sdk.NewAttribute(types.DepositEventNewReserves1, NewPool.Reserve1.String()),
 		sdk.NewAttribute(types.DepositEventReceiver, msg.Receiver),
 		sdk.NewAttribute(types.DepositEventSharesMinted,SharesMinted.String()),
 
 	)
 	ctx.EventManager().EmitEvent(event)
-
 
 	return &types.MsgSingleDepositResponse{ SharesMinted.String() }, nil
 }
