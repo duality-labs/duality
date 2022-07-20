@@ -191,15 +191,15 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	}
 
 	if NewPool.Reserve0.GT(sdk.ZeroDec())  && ZeroToOneFound {
-		k.Update(&tickOld.PoolsZeroToOne, &ZeroToOneOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
+		k.Update0to1(&tickOld.PoolsZeroToOne, &ZeroToOneOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 	} else if NewPool.Reserve0.GT(sdk.ZeroDec())  && !ZeroToOneFound {
-		k.Push(&tickOld.PoolsZeroToOne,&NewPool)
+		k.Push0to1(&tickOld.PoolsZeroToOne,&NewPool)
 	}
 
 	if NewPool.Reserve1.GT(sdk.ZeroDec()) && OneToZeroFound {
-		k.Update(&tickOld.PoolsOneToZero, &OneToZeroOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
+		k.Update1to0(&tickOld.PoolsOneToZero, &OneToZeroOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 	} else if NewPool.Reserve1.GT(sdk.ZeroDec())  && !OneToZeroFound {
-		k.Push(&tickOld.PoolsOneToZero,&NewPool)
+		k.Push1to0(&tickOld.PoolsOneToZero,&NewPool)
 	}
 
 	

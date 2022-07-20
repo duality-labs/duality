@@ -107,16 +107,16 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 	}
 
 	if NewPool.Reserve0 == sdk.ZeroDec() && ZeroToOneFound {
-		k.Remove(&tickOld.PoolsZeroToOne, ZeroToOneOld.Index)
+		k.Remove0to1(&tickOld.PoolsZeroToOne, ZeroToOneOld.Index)
 
 	} else if NewPool.Reserve0 != sdk.ZeroDec() && ZeroToOneFound {
-		k.Update(&tickOld.PoolsZeroToOne, &ZeroToOneOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
+		k.Update0to1(&tickOld.PoolsZeroToOne, &ZeroToOneOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 	}
 
 	if NewPool.Reserve1 == sdk.ZeroDec() && OneToZeroFound {
-		k.Remove(&tickOld.PoolsOneToZero, OneToZeroOld.Index)
+		k.Remove1to0(&tickOld.PoolsOneToZero, OneToZeroOld.Index)
 	}  else if NewPool.Reserve0 != sdk.ZeroDec() && ZeroToOneFound {
-		k.Update(&tickOld.PoolsOneToZero, &OneToZeroOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
+		k.Update0to1(&tickOld.PoolsOneToZero, &OneToZeroOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 	}
 
 	shareNew := types.Share{

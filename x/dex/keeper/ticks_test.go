@@ -22,34 +22,34 @@ func createNTicks(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Ticks {
 		items[i].Token1 = strconv.Itoa(i)
 		items[i].PoolsOneToZero = []*types.Pool{
 			&types.Pool{
-				Reserve0:    "100",
-				Reserve1:    "100",
-				Fee:         "3",
-				Price:       "2",
-				TotalShares: "200",
+				Reserve0:    sdk.NewDec(100),
+				Reserve1:    sdk.NewDec(100),
+				Fee: sdk.NewDecWithPrec(3, 1),
+				Price:       sdk.NewDec(2),
+				TotalShares: sdk.NewDec(200),
 			},
 			&types.Pool{
-				Reserve0:    "100",
-				Reserve1:    "100",
-				Fee:         "5",
-				Price:       "2",
-				TotalShares: "200",
+				Reserve0:    sdk.NewDec(100),
+				Reserve1:    sdk.NewDec(100),
+				Fee: sdk.NewDecWithPrec(5, 1),
+				Price:       sdk.NewDec(2),
+				TotalShares: sdk.NewDec(200),
 			},
 		}
 		items[i].PoolsZeroToOne = []*types.Pool{
 			&types.Pool{
-				Reserve0:    "100",
-				Reserve1:    "100",
-				Fee:         "3",
-				Price:       "2",
-				TotalShares: "200",
+				Reserve0:    sdk.NewDec(100),
+				Reserve1:    sdk.NewDec(100),
+				Fee: sdk.NewDecWithPrec(3, 1),
+				Price:       sdk.NewDec(2),
+				TotalShares: sdk.NewDec(200),
 			},
 			&types.Pool{
-				Reserve0:    "100",
-				Reserve1:    "100",
-				Fee:         "5",
-				Price:       "2",
-				TotalShares: "200",
+				Reserve0:    sdk.NewDec(100),
+				Reserve1:    sdk.NewDec(100),
+				Fee: sdk.NewDecWithPrec(5, 1),
+				Price:       sdk.NewDec(2),
+				TotalShares: sdk.NewDec(200),
 			},
 		}
 		keeper.SetTicks(ctx, items[i])
@@ -104,90 +104,90 @@ func TestInit(t *testing.T) {
 
 	pools := []*types.Pool{
 		&types.Pool{
-			Reserve0:    "100",
-			Reserve1:    "100",
-			Fee:         ".5",
-			Price:       "2",
-			TotalShares: "200",
+			Reserve0:    sdk.NewDec(100),
+			Reserve1:    sdk.NewDec(100),
+			Fee: sdk.NewDecWithPrec(3, 1),
+			Price:       sdk.NewDec(2),
+			TotalShares: sdk.NewDec(200),
 			Index:       0,
 		},
 		&types.Pool{
-			Reserve0:    "100",
-			Reserve1:    "100",
-			Fee:         ".2",
-			Price:       "2",
-			TotalShares: "200",
+			Reserve0:    sdk.NewDec(100),
+			Reserve1:    sdk.NewDec(100),
+			Fee: sdk.NewDecWithPrec(3, 1),
+			Price:       sdk.NewDec(2),
+			TotalShares: sdk.NewDec(200),
 			Index:       0,
 		},
 	}
 	fmt.Println(pools)
-	keeper.Init(&pools)
+	keeper.Init1to0(&pools)
 	fmt.Println(pools)
 
 	newPool := &types.Pool{
-		Reserve0:    "100",
-		Reserve1:    "100",
-		Fee:         ".2",
-		Price:       "3",
-		TotalShares: "200",
+		Reserve0:    sdk.NewDec(100),
+		Reserve1:    sdk.NewDec(100),
+		Fee: sdk.NewDecWithPrec(2, 1),
+		Price:       sdk.NewDec(2),
+		TotalShares: sdk.NewDec(200),
 		Index:       0,
 	}
 
-	keeper.Push(&pools, newPool)
+	keeper.Push1to0(&pools, newPool)
 	fmt.Println(pools)
 
-	removedPool := keeper.Pop(&pools)
+	removedPool := keeper.Pop1to0(&pools)
 	fmt.Println(pools)
 	fmt.Println("Popped Pool", removedPool)
-	removedPool = keeper.Remove(&pools, 0)
+	removedPool = keeper.Remove1to0(&pools, 0)
 	fmt.Println("Post Remove: ", pools)
 	fmt.Println(removedPool)
-	keeper.Push(&pools, newPool)
-	keeper.Push(&pools, newPool)
+	keeper.Push1to0(&pools, newPool)
+	keeper.Push1to0(&pools, newPool)
 	fmt.Println("HEAD", pools[1].Index)
 	fmt.Println("Post Pushes:", pools)
-	keeper.Update(&pools, pools[1], "100", "100", ".3", "200", "4")
+	keeper.Update1to0(&pools, pools[1], sdk.NewDec(100), sdk.NewDec(100), sdk.NewDecWithPrec(3, 1), sdk.NewDec(200), sdk.NewDec(4))
 	fmt.Println("Post Update: ", pools)
-	removedPool = keeper.Pop(&pools)
+	removedPool = keeper.Pop1to0(&pools)
 	fmt.Println(pools)
 	fmt.Println("Popped Pool", removedPool)
-	removedPool = keeper.Pop(&pools)
+	removedPool = keeper.Pop1to0(&pools)
 	fmt.Println(pools)
 	fmt.Println("Popped Pool", removedPool)
 
 	newPool2 := &types.Pool{
-		Reserve0:    "100",
-		Reserve1:    "100",
-		Fee:         ".2",
-		Price:       "4",
-		TotalShares: "200",
+		Reserve0:    sdk.NewDec(100),
+		Reserve1:    sdk.NewDec(100),
+		Fee: sdk.NewDecWithPrec(2, 1),
+		Price:       sdk.NewDec(4),
+		TotalShares: sdk.NewDec(200),
 		Index:       0,
 	}
 	newPool3 := &types.Pool{
-		Reserve0:    "100",
-		Reserve1:    "100",
-		Fee:         ".5",
-		Price:       "3",
-		TotalShares: "200",
+		Reserve0:    sdk.NewDec(100),
+		Reserve1:    sdk.NewDec(100),
+		Fee: sdk.NewDecWithPrec(5, 1),
+		Price:       sdk.NewDec(3),
+		TotalShares: sdk.NewDec(200),
 		Index:       0,
 	}
 	fmt.Println("New Pushes")
 	fmt.Println("")
-	keeper.Push(&pools, newPool)
-	keeper.Push(&pools, newPool2)
-	keeper.Push(&pools, newPool3)
-	keeper.Push(&pools, newPool2)
+	keeper.Push1to0(&pools, newPool)
+	keeper.Push1to0(&pools, newPool2)
+	keeper.Push1to0(&pools, newPool3)
+	keeper.Push1to0(&pools, newPool2)
 	fmt.Println(pools)
-	removedPool = keeper.Pop(&pools)
-	fmt.Println(pools)
-	fmt.Println("Popped Pool", removedPool)
-	removedPool = keeper.Pop(&pools)
+	removedPool = keeper.Pop1to0(&pools)
 	fmt.Println(pools)
 	fmt.Println("Popped Pool", removedPool)
-	removedPool = keeper.Pop(&pools)
+	removedPool = keeper.Pop1to0(&pools)
 	fmt.Println(pools)
 	fmt.Println("Popped Pool", removedPool)
-	removedPool = keeper.Pop(&pools)
+	removedPool = keeper.Pop1to0(&pools)
+	fmt.Println(pools)
+	fmt.Println("Popped Pool", removedPool)
+	removedPool = keeper.Pop1to0(&pools)
 	fmt.Println(pools)
 	fmt.Println("Popped Pool", removedPool)
 
@@ -206,7 +206,7 @@ func TestInit(t *testing.T) {
 
 	fmt.Println(tick)
 	fmt.Println(tick.PoolsZeroToOne)
-	removedPool = keeper.Pop(&tick.PoolsZeroToOne)
+	removedPool = keeper.Pop1to0(&tick.PoolsZeroToOne)
 	fmt.Println(&tick.PoolsZeroToOne)
 	fmt.Println("Popped Pool", removedPool)
 
