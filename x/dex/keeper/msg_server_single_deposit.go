@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	//"math/big"
 	//"fmt"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
@@ -79,12 +80,14 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		}
 	}
 
+	//fmt.Println("All ticks contracts:", k.GetAllTicks(ctx))
 	tickOld, tickFound := k.GetTicks(
 		ctx,
 		token0[0],
 		token1[0],
 	)
 
+	
 	price, err := sdk.NewDecFromStr(msg.Price) 
 
 	if err != nil {
@@ -105,40 +108,47 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	var SharesMinted sdk.Dec
 	var trueAmounts0 = amount0
 	var trueAmounts1 = amount1
-
+	
 	if tickFound {
+
+		
+		
+		
 		OneToZeroOld, OneToZeroFound = k.getPool(&tickOld.PoolsOneToZero, fee, price)
 		ZeroToOneOld, ZeroToOneFound = k.getPool(&tickOld.PoolsZeroToOne, fee, price)
 
 		if OneToZeroFound{
-			trueAmounts0, trueAmounts1, SharesMinted, err = k.depositHelperSub(&OneToZeroOld, amount0, amount1)
-
+			trueAmounts0, trueAmounts1, SharesMinted, err = k.depositHelperAdd(&OneToZeroOld, amount0, amount1)
+			
 			if err != nil {
 				return nil, err
 			}
 		} else if ZeroToOneFound{
 			trueAmounts0, trueAmounts1, SharesMinted, err = k.depositHelperAdd(&ZeroToOneOld, amount0, amount1)
-
+			
 			if err != nil {
 				return nil, err
 			}
-		}
 
-		if !OneToZeroFound && ZeroToOneFound {
+		} else if !OneToZeroFound && !ZeroToOneFound {
 
-			OneToZeroOld = types.Pool {
-				Reserve0: sdk.ZeroDec(),
-				Reserve1: sdk.ZeroDec(),
-				Fee: fee,
-				Price: price,
-				TotalShares: sdk.ZeroDec(),
-				Index: 0,} 
+			SharesMinted = amount0.Add(amount1.Mul(price))
+			// OneToZeroOld = types.Pool {
+			// 	Reserve0: sdk.ZeroDec(),
+			// 	Reserve1: sdk.ZeroDec(),
+			// 	Fee: fee,
+			// 	Price: price,
+			// 	TotalShares: sdk.ZeroDec(),
+			// 	Index: 0,} 
 
-			trueAmounts0, trueAmounts1, SharesMinted, err = k.depositHelperAdd(&OneToZeroOld , amount0, amount1)
+			// trueAmounts0, trueAmounts1, SharesMinted, err = k.depositHelperAdd(&OneToZeroOld , amount0, amount1)
+
+			// if err != nil {
+			// 	return nil, err
+			// }
 		}
 
 	} else {
-
 		SharesMinted = amount0.Add(amount1.Mul(price))
 	}
 
@@ -174,6 +184,9 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		}
 	}
 	
+
+	
+	
 	//Token 0
 	if trueAmounts0.GT(sdk.ZeroDec()) {
 		coin0 := sdk.NewCoin(token0[0], sdk.NewIntFromBigInt(trueAmounts0.BigInt()) )
@@ -190,13 +203,16 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		}
 	}
 
-	if NewPool.Reserve0.GT(sdk.ZeroDec())  && ZeroToOneFound {
+
+	if  ZeroToOneFound {
 		k.Update0to1(&tickOld.PoolsZeroToOne, &ZeroToOneOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
+
 	} else if NewPool.Reserve0.GT(sdk.ZeroDec())  && !ZeroToOneFound {
 		k.Push0to1(&tickOld.PoolsZeroToOne,&NewPool)
 	}
 
-	if NewPool.Reserve1.GT(sdk.ZeroDec()) && OneToZeroFound {
+	
+	if OneToZeroFound {
 		k.Update1to0(&tickOld.PoolsOneToZero, &OneToZeroOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 	} else if NewPool.Reserve1.GT(sdk.ZeroDec())  && !OneToZeroFound {
 		k.Push1to0(&tickOld.PoolsOneToZero,&NewPool)
@@ -204,12 +220,15 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 
 	
 	tickNew := types.Ticks{
-		Token0:      token0[0],
+		Token0: token0[0],
 		Token1: token1[0],
 		PoolsZeroToOne: tickOld.PoolsZeroToOne,
 		PoolsOneToZero: tickOld.PoolsOneToZero,
 	}
 
+	
+	
+	
 	shareNew := types.Share{
 		Owner:       msg.Creator,
 		Token0:      token0[0],
@@ -219,19 +238,16 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		ShareAmount: shareOld.ShareAmount.Add(SharesMinted),
 	}
 
+	
 	k.SetTicks(
 		ctx,
 		tickNew,
 	)
 
-
 	k.SetShare(
 		ctx,
 		shareNew,
 	)
-
-
-
 	
 	var event = sdk.NewEvent(sdk.EventTypeMessage,
 		sdk.NewAttribute(sdk.AttributeKeyModule, "duality"),

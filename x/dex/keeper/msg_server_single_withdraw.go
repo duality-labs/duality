@@ -25,6 +25,7 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		return nil, error
 	}
 
+	
 	tickOld, tickFound := k.GetTicks(
 		ctx,
 		token0[0],
@@ -106,17 +107,17 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		Index: 0,
 	}
 
-	if NewPool.Reserve0 == sdk.ZeroDec() && ZeroToOneFound {
+	if NewPool.Reserve0.Equal(sdk.ZeroDec()) && ZeroToOneFound {
 		k.Remove0to1(&tickOld.PoolsZeroToOne, ZeroToOneOld.Index)
 
-	} else if NewPool.Reserve0 != sdk.ZeroDec() && ZeroToOneFound {
+	} else if NewPool.Reserve0.Neg().Equal(sdk.ZeroDec()) && ZeroToOneFound {
 		k.Update0to1(&tickOld.PoolsZeroToOne, &ZeroToOneOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 	}
 
-	if NewPool.Reserve1 == sdk.ZeroDec() && OneToZeroFound {
+	if NewPool.Reserve1.Equal(sdk.ZeroDec()) && OneToZeroFound {
 		k.Remove1to0(&tickOld.PoolsOneToZero, OneToZeroOld.Index)
-	}  else if NewPool.Reserve0 != sdk.ZeroDec() && ZeroToOneFound {
-		k.Update0to1(&tickOld.PoolsOneToZero, &OneToZeroOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
+	}  else if NewPool.Reserve1.Neg().Equal(sdk.ZeroDec()) && OneToZeroFound {
+		k.Update1to0(&tickOld.PoolsOneToZero, &OneToZeroOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 	}
 
 	shareNew := types.Share{
@@ -125,7 +126,7 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		Token1:      token1[0],
 		Price:       msg.Price,
 		Fee:         msg.Fee,
-		ShareAmount: totalShares.Sub(sharesRemoving),
+		ShareAmount: shareOld.ShareAmount.Sub(sharesRemoving),
 	}
 
 	tickNew := types.Ticks{
@@ -135,6 +136,7 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		PoolsOneToZero: tickOld.PoolsOneToZero,
 	}
 
+	
 	k.SetShare(
 		ctx,
 		shareNew,
@@ -181,5 +183,5 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 
 	ctx.EventManager().EmitEvent(event)
 
-	return &types.MsgSingleWithdrawResponse{amount0Withdraw.String(), amount1Withdraw.String()}, nil
+	return &types.MsgSingleWithdrawResponse{ amount0Withdraw.String(), amount1Withdraw.String()}, nil
 }

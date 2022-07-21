@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"strconv"
 	"testing"
-
+	//"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/stretchr/testify/require"
@@ -22,6 +22,7 @@ func TestShareQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
 	msgs := createNShare(keeper, ctx, 2)
+
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetShareRequest
@@ -37,6 +38,7 @@ func TestShareQuerySingle(t *testing.T) {
 				Price:  msgs[0].Price,
 				Fee:    msgs[0].Fee,
 			},
+			
 			response: &types.QueryGetShareResponse{Share: msgs[0]},
 		},
 		{
@@ -67,6 +69,7 @@ func TestShareQuerySingle(t *testing.T) {
 		},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
+
 			response, err := keeper.Share(wctx, tc.request)
 			if tc.err != nil {
 				require.ErrorIs(t, err, tc.err)

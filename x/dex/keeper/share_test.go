@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	//"fmt"
 	"strconv"
 	"testing"
 
@@ -22,9 +23,10 @@ func createNShare(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Share {
 		items[i].Token0 = strconv.Itoa(i)
 		items[i].Token1 = strconv.Itoa(i)
 		items[i].Price = strconv.Itoa(i)
-		items[i].Fee = strconv.Itoa(i)
-
+		items[i].Fee = strconv.Itoa(i) 
+		items[i].ShareAmount = sdk.ZeroDec()
 		keeper.SetShare(ctx, items[i])
+
 	}
 	return items
 }
@@ -32,6 +34,7 @@ func createNShare(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Share {
 func TestShareGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNShare(keeper, ctx, 10)
+
 	for _, item := range items {
 		rst, found := keeper.GetShare(ctx,
 			item.Owner,
