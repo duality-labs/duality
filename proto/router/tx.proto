@@ -3,6 +3,7 @@ package nicholasdotsol.duality.router;
 
 // this line is used by starport scaffolding # proto/tx/import
 
+import "gogoproto/gogo.proto";
 option go_package = "github.com/NicholasDotSol/duality/x/router/types";
 
 // Msg defines the Msg service.
@@ -15,8 +16,18 @@ message MsgSwap {
   string creator = 1;
   string tokenIn = 2;
   string tokenOut = 3;
-  string amountIn = 4;
-  string minOut = 5;
+  string amountIn = 4 [
+      (gogoproto.moretags)   = "yaml:\"amountIn\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "amountIn"
+  ];
+  string minOut = 5 [
+      (gogoproto.moretags)   = "yaml:\"minOut\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "minOut"
+  ];
 }
 
 message MsgSwapResponse {
