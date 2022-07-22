@@ -13,6 +13,8 @@ export interface ProtobufAny {
   "@type"?: string;
 }
 
+export type RouterMsgSwapResponse = object;
+
 /**
  * Params defines the parameters for the module.
  */

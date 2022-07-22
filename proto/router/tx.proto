@@ -7,7 +7,19 @@ option go_package = "github.com/NicholasDotSol/duality/x/router/types";
 
 // Msg defines the Msg service.
 service Msg {
-    // this line is used by starport scaffolding # proto/tx/rpc
+      rpc Swap(MsgSwap) returns (MsgSwapResponse);
+// this line is used by starport scaffolding # proto/tx/rpc
+}
+
+message MsgSwap {
+  string creator = 1;
+  string tokenIn = 2;
+  string tokenOut = 3;
+  string amountIn = 4;
+  string minOut = 5;
+}
+
+message MsgSwapResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message

@@ -52296,6 +52296,8 @@ definitions:
             index:
               type: integer
               format: int32
+  nicholasdotsol.duality.router.MsgSwapResponse:
+    type: object
   nicholasdotsol.duality.router.Params:
     type: object
     description: Params defines the parameters for the module.
