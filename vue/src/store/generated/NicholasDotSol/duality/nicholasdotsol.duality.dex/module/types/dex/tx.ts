@@ -14,7 +14,9 @@ export interface MsgSingleDeposit {
   receiver: string;
 }
 
-export interface MsgSingleDepositResponse {}
+export interface MsgSingleDepositResponse {
+  sharesMinted: string;
+}
 
 export interface MsgSingleWithdraw {
   creator: string;
@@ -26,7 +28,10 @@ export interface MsgSingleWithdraw {
   receiver: string;
 }
 
-export interface MsgSingleWithdrawResponse {}
+export interface MsgSingleWithdrawResponse {
+  amounts0: string;
+  amounts1: string;
+}
 
 const baseMsgSingleDeposit: object = {
   creator: "",
@@ -211,13 +216,16 @@ export const MsgSingleDeposit = {
   },
 };
 
-const baseMsgSingleDepositResponse: object = {};
+const baseMsgSingleDepositResponse: object = { sharesMinted: "" };
 
 export const MsgSingleDepositResponse = {
   encode(
-    _: MsgSingleDepositResponse,
+    message: MsgSingleDepositResponse,
     writer: Writer = Writer.create()
   ): Writer {
+    if (message.sharesMinted !== "") {
+      writer.uint32(10).string(message.sharesMinted);
+    }
     return writer;
   },
 
@@ -233,6 +241,9 @@ export const MsgSingleDepositResponse = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          message.sharesMinted = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -241,24 +252,36 @@ export const MsgSingleDepositResponse = {
     return message;
   },
 
-  fromJSON(_: any): MsgSingleDepositResponse {
+  fromJSON(object: any): MsgSingleDepositResponse {
     const message = {
       ...baseMsgSingleDepositResponse,
     } as MsgSingleDepositResponse;
+    if (object.sharesMinted !== undefined && object.sharesMinted !== null) {
+      message.sharesMinted = String(object.sharesMinted);
+    } else {
+      message.sharesMinted = "";
+    }
     return message;
   },
 
-  toJSON(_: MsgSingleDepositResponse): unknown {
+  toJSON(message: MsgSingleDepositResponse): unknown {
     const obj: any = {};
+    message.sharesMinted !== undefined &&
+      (obj.sharesMinted = message.sharesMinted);
     return obj;
   },
 
   fromPartial(
-    _: DeepPartial<MsgSingleDepositResponse>
+    object: DeepPartial<MsgSingleDepositResponse>
   ): MsgSingleDepositResponse {
     const message = {
       ...baseMsgSingleDepositResponse,
     } as MsgSingleDepositResponse;
+    if (object.sharesMinted !== undefined && object.sharesMinted !== null) {
+      message.sharesMinted = object.sharesMinted;
+    } else {
+      message.sharesMinted = "";
+    }
     return message;
   },
 };
@@ -429,13 +452,19 @@ export const MsgSingleWithdraw = {
   },
 };
 
-const baseMsgSingleWithdrawResponse: object = {};
+const baseMsgSingleWithdrawResponse: object = { amounts0: "", amounts1: "" };
 
 export const MsgSingleWithdrawResponse = {
   encode(
-    _: MsgSingleWithdrawResponse,
+    message: MsgSingleWithdrawResponse,
     writer: Writer = Writer.create()
   ): Writer {
+    if (message.amounts0 !== "") {
+      writer.uint32(10).string(message.amounts0);
+    }
+    if (message.amounts1 !== "") {
+      writer.uint32(18).string(message.amounts1);
+    }
     return writer;
   },
 
@@ -451,6 +480,12 @@ export const MsgSingleWithdrawResponse = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          message.amounts0 = reader.string();
+          break;
+        case 2:
+          message.amounts1 = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -459,24 +494,46 @@ export const MsgSingleWithdrawResponse = {
     return message;
   },
 
-  fromJSON(_: any): MsgSingleWithdrawResponse {
+  fromJSON(object: any): MsgSingleWithdrawResponse {
     const message = {
       ...baseMsgSingleWithdrawResponse,
     } as MsgSingleWithdrawResponse;
+    if (object.amounts0 !== undefined && object.amounts0 !== null) {
+      message.amounts0 = String(object.amounts0);
+    } else {
+      message.amounts0 = "";
+    }
+    if (object.amounts1 !== undefined && object.amounts1 !== null) {
+      message.amounts1 = String(object.amounts1);
+    } else {
+      message.amounts1 = "";
+    }
     return message;
   },
 
-  toJSON(_: MsgSingleWithdrawResponse): unknown {
+  toJSON(message: MsgSingleWithdrawResponse): unknown {
     const obj: any = {};
+    message.amounts0 !== undefined && (obj.amounts0 = message.amounts0);
+    message.amounts1 !== undefined && (obj.amounts1 = message.amounts1);
     return obj;
   },
 
   fromPartial(
-    _: DeepPartial<MsgSingleWithdrawResponse>
+    object: DeepPartial<MsgSingleWithdrawResponse>
   ): MsgSingleWithdrawResponse {
     const message = {
       ...baseMsgSingleWithdrawResponse,
     } as MsgSingleWithdrawResponse;
+    if (object.amounts0 !== undefined && object.amounts0 !== null) {
+      message.amounts0 = object.amounts0;
+    } else {
+      message.amounts0 = "";
+    }
+    if (object.amounts1 !== undefined && object.amounts1 !== null) {
+      message.amounts1 = object.amounts1;
+    } else {
+      message.amounts1 = "";
+    }
     return message;
   },
 };

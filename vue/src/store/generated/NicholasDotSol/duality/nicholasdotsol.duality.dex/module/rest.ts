@@ -9,9 +9,14 @@
  * ---------------------------------------------------------------
  */
 
-export type DexMsgSingleDepositResponse = object;
+export interface DexMsgSingleDepositResponse {
+  sharesMinted?: string;
+}
 
-export type DexMsgSingleWithdrawResponse = object;
+export interface DexMsgSingleWithdrawResponse {
+  amounts0?: string;
+  amounts1?: string;
+}
 
 /**
  * Params defines the parameters for the module.
@@ -19,8 +24,8 @@ export type DexMsgSingleWithdrawResponse = object;
 export type DexParams = object;
 
 export interface DexPool {
-  reserveA?: string;
-  reserveB?: string;
+  reserve0?: string;
+  reserve1?: string;
   price?: string;
   fee?: string;
   totalShares?: string;

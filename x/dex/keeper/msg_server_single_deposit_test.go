@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -18,14 +17,12 @@ func newBCoin(amt sdk.Int) sdk.Coin {
 	return sdk.NewCoin("TokenB", amt)
 }
 
-
 func convInt(amt string) sdk.Int {
 	IntAmt, err := sdk.NewIntFromString(amt)
 
 	_ = err
 	return IntAmt
 }
-
 
 func (suite *IntegrationTestSuite) TestHasBalance() {
 	app, ctx := suite.app, suite.ctx
@@ -55,7 +52,7 @@ func (suite *IntegrationTestSuite) TestSingleDeposit() {
 	accBob := app.AccountKeeper.NewAccountWithAddress(ctx, bob)
 	app.AccountKeeper.SetAccount(ctx, accBob)
 
-	balanceAlice := sdk.NewCoins(newACoin( convInt("100000000000000000000")), newBCoin(convInt("500000000000000000000")))
+	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("500000000000000000000")))
 	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
 
 	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
@@ -78,9 +75,9 @@ func (suite *IntegrationTestSuite) TestSingleDeposit() {
 		Amounts1: "100",
 		Receiver: alice.String(),
 	})
-	
+
 	suite.Require().Nil(err)
-	
+
 	_ = createResponse
 	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))

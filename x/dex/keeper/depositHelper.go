@@ -12,7 +12,6 @@ func (k Keeper) depositHelperAdd(pool *types.Pool, amount0, amount1 sdk.Dec) (sd
 	var trueAmounts0 sdk.Dec
 	var trueAmounts1 sdk.Dec
 
-
 	if pool.Reserve0.GT(sdk.ZeroDec()) {
 		trueAmounts1 = k.min(amount1, (pool.Reserve1.Mul(amount0)).Quo(pool.Reserve0))
 	}
@@ -38,7 +37,6 @@ func (k Keeper) depositHelperSub(pool *types.Pool, amount0, amount1 sdk.Dec) (sd
 
 	var trueAmounts0 sdk.Dec
 	var trueAmounts1 sdk.Dec
-
 
 	if pool.Reserve0.GT(sdk.ZeroDec()) {
 		trueAmounts1 = k.min(amount1, (pool.Reserve1.Mul(amount0)).Quo(pool.Reserve0))

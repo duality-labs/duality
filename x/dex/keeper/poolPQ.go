@@ -24,7 +24,7 @@ func Swap1to0(pools []*types.Pool, i, j int32) {
 
 func Less1to0(pools []*types.Pool, i, j int32) bool {
 
-	return  (pools[i].Price.Mul(pools[i].Fee)).Quo(sdk.NewDec(10000)).LT( (pools[j].Price.Mul(pools[j].Fee)).Quo(sdk.NewDec(10000)))  
+	return (pools[i].Price.Mul(pools[i].Fee)).Quo(sdk.NewDec(10000)).LT((pools[j].Price.Mul(pools[j].Fee)).Quo(sdk.NewDec(10000)))
 
 }
 
@@ -32,7 +32,7 @@ func Push1to0(pools *([]*types.Pool), newPool types.Pool) {
 	n := int32(len(*pools))
 	newPool.Index = n
 	*pools = append(*pools, &newPool)
-	
+
 }
 
 func Pop1to0(pools *([]*types.Pool)) types.Pool {
@@ -46,7 +46,7 @@ func Pop1to0(pools *([]*types.Pool)) types.Pool {
 }
 
 // update modifies the priority and value of an Item in the queue.
-func (k Keeper) Update1to0(pools *([]*types.Pool), pool *types.Pool, reserve0 , reserve1 , fee, totalShares , price sdk.Dec) {
+func (k Keeper) Update1to0(pools *([]*types.Pool), pool *types.Pool, reserve0, reserve1, fee, totalShares, price sdk.Dec) {
 	pool.Reserve0 = reserve0
 	pool.Reserve1 = reserve1
 	pool.Fee = fee
@@ -149,8 +149,7 @@ func Swap0to1(pools []*types.Pool, i, j int32) {
 
 func Less0to1(pools []*types.Pool, i, j int32) bool {
 
-	
-	return  (pools[i].Fee).Quo( pools[i].Price.Mul(sdk.NewDec(10000))).LT( (pools[j].Fee).Quo(pools[i].Price.Mul(sdk.NewDec(10000)))) 
+	return (pools[i].Fee).Quo(pools[i].Price.Mul(sdk.NewDec(10000))).LT((pools[j].Fee).Quo(pools[i].Price.Mul(sdk.NewDec(10000))))
 
 }
 
@@ -171,7 +170,7 @@ func Pop0to1(pools *([]*types.Pool)) types.Pool {
 }
 
 // update modifies the priority and value of an Item in the queue.
-func (k Keeper) Update0to1(pools *([]*types.Pool), pool *types.Pool, reserve0 , reserve1 , fee, totalShares , price sdk.Dec) {
+func (k Keeper) Update0to1(pools *([]*types.Pool), pool *types.Pool, reserve0, reserve1, fee, totalShares, price sdk.Dec) {
 	pool.Reserve0 = reserve0
 	pool.Reserve1 = reserve1
 	pool.Fee = fee
@@ -266,9 +265,8 @@ func down0to1(pools *([]*types.Pool), i0, n int32) bool {
 
 func (k Keeper) getPool(pools *([]*types.Pool), Fee, Price sdk.Dec) (types.Pool, bool) {
 
-	
 	for _, s := range *pools {
-		
+
 		if s.Fee.Equal(Fee) && s.Price.Equal(Price) {
 			return *s, true
 		}

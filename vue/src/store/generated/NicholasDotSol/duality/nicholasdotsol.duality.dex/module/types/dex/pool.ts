@@ -4,8 +4,8 @@ import { Writer, Reader } from "protobufjs/minimal";
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
 export interface Pool {
-  reserveA: string;
-  reserveB: string;
+  reserve0: string;
+  reserve1: string;
   price: string;
   fee: string;
   totalShares: string;
@@ -13,8 +13,8 @@ export interface Pool {
 }
 
 const basePool: object = {
-  reserveA: "",
-  reserveB: "",
+  reserve0: "",
+  reserve1: "",
   price: "",
   fee: "",
   totalShares: "",
@@ -23,11 +23,11 @@ const basePool: object = {
 
 export const Pool = {
   encode(message: Pool, writer: Writer = Writer.create()): Writer {
-    if (message.reserveA !== "") {
-      writer.uint32(10).string(message.reserveA);
+    if (message.reserve0 !== "") {
+      writer.uint32(10).string(message.reserve0);
     }
-    if (message.reserveB !== "") {
-      writer.uint32(18).string(message.reserveB);
+    if (message.reserve1 !== "") {
+      writer.uint32(18).string(message.reserve1);
     }
     if (message.price !== "") {
       writer.uint32(26).string(message.price);
@@ -52,10 +52,10 @@ export const Pool = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.reserveA = reader.string();
+          message.reserve0 = reader.string();
           break;
         case 2:
-          message.reserveB = reader.string();
+          message.reserve1 = reader.string();
           break;
         case 3:
           message.price = reader.string();
@@ -79,15 +79,15 @@ export const Pool = {
 
   fromJSON(object: any): Pool {
     const message = { ...basePool } as Pool;
-    if (object.reserveA !== undefined && object.reserveA !== null) {
-      message.reserveA = String(object.reserveA);
+    if (object.reserve0 !== undefined && object.reserve0 !== null) {
+      message.reserve0 = String(object.reserve0);
     } else {
-      message.reserveA = "";
+      message.reserve0 = "";
     }
-    if (object.reserveB !== undefined && object.reserveB !== null) {
-      message.reserveB = String(object.reserveB);
+    if (object.reserve1 !== undefined && object.reserve1 !== null) {
+      message.reserve1 = String(object.reserve1);
     } else {
-      message.reserveB = "";
+      message.reserve1 = "";
     }
     if (object.price !== undefined && object.price !== null) {
       message.price = String(object.price);
@@ -114,8 +114,8 @@ export const Pool = {
 
   toJSON(message: Pool): unknown {
     const obj: any = {};
-    message.reserveA !== undefined && (obj.reserveA = message.reserveA);
-    message.reserveB !== undefined && (obj.reserveB = message.reserveB);
+    message.reserve0 !== undefined && (obj.reserve0 = message.reserve0);
+    message.reserve1 !== undefined && (obj.reserve1 = message.reserve1);
     message.price !== undefined && (obj.price = message.price);
     message.fee !== undefined && (obj.fee = message.fee);
     message.totalShares !== undefined &&
@@ -126,15 +126,15 @@ export const Pool = {
 
   fromPartial(object: DeepPartial<Pool>): Pool {
     const message = { ...basePool } as Pool;
-    if (object.reserveA !== undefined && object.reserveA !== null) {
-      message.reserveA = object.reserveA;
+    if (object.reserve0 !== undefined && object.reserve0 !== null) {
+      message.reserve0 = object.reserve0;
     } else {
-      message.reserveA = "";
+      message.reserve0 = "";
     }
-    if (object.reserveB !== undefined && object.reserveB !== null) {
-      message.reserveB = object.reserveB;
+    if (object.reserve1 !== undefined && object.reserve1 !== null) {
+      message.reserve1 = object.reserve1;
     } else {
-      message.reserveB = "";
+      message.reserve1 = "";
     }
     if (object.price !== undefined && object.price !== null) {
       message.price = object.price;

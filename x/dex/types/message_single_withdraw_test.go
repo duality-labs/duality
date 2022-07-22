@@ -3,9 +3,9 @@ package types
 import (
 	"testing"
 
+	"github.com/NicholasDotSol/duality/testutil/sample"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
-	"github.com/NicholasDotSol/duality/testutil/sample"
 )
 
 func TestMsgSingleWithdraw_ValidateBasic(t *testing.T) {

@@ -25,7 +25,6 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		return nil, error
 	}
 
-	
 	tickOld, tickFound := k.GetTicks(
 		ctx,
 		token0[0],
@@ -35,13 +34,13 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 	if !tickFound {
 		return nil, sdkerrors.Wrapf(types.ErrValidTickNotFound, "Valid tick not found")
 	}
-	price, err := sdk.NewDecFromStr(msg.Price) 
+	price, err := sdk.NewDecFromStr(msg.Price)
 
 	if err != nil {
 		return nil, err
 	}
 
-	fee, err := sdk.NewDecFromStr(msg.Fee) 
+	fee, err := sdk.NewDecFromStr(msg.Fee)
 
 	if err != nil {
 		return nil, err
@@ -81,30 +80,28 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		return nil, sdkerrors.Wrapf(types.ErrValidShareNotFound, "Valid share not found")
 	}
 
-
 	sharesRemoving, err := sdk.NewDecFromStr(msg.SharesRemoving)
 	if err != nil {
 		return nil, err
 	}
 
-	if sharesRemoving.GT(shareOld.ShareAmount)  {
+	if sharesRemoving.GT(shareOld.ShareAmount) {
 		return nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, " Not enough shares are owned by:  %s", msg.Receiver)
 	}
 
-
 	//uint128 amount0Withdraw = uint128(_input.sharesRemoving * tick.reserves0 / tick.totalShares);
-    //uint128 amount1Withdraw = uint128(_input.sharesRemoving * tick.reserves1 / tick.totalShares);
+	//uint128 amount1Withdraw = uint128(_input.sharesRemoving * tick.reserves1 / tick.totalShares);
 
 	amount0Withdraw := (sharesRemoving.Mul(reserve0)).Quo(totalShares)
 	amount1Withdraw := (sharesRemoving.Mul(reserve1)).Quo(totalShares)
 
-	NewPool := types.Pool {
-		Price: price,
-		Fee: fee,
-		Reserve0: reserve0.Sub(amount0Withdraw),
-		Reserve1: reserve1.Sub(amount1Withdraw),
+	NewPool := types.Pool{
+		Price:       price,
+		Fee:         fee,
+		Reserve0:    reserve0.Sub(amount0Withdraw),
+		Reserve1:    reserve1.Sub(amount1Withdraw),
 		TotalShares: totalShares.Sub(sharesRemoving),
-		Index: 0,
+		Index:       0,
 	}
 
 	if NewPool.Reserve0.Equal(sdk.ZeroDec()) && ZeroToOneFound {
@@ -116,7 +113,7 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 
 	if NewPool.Reserve1.Equal(sdk.ZeroDec()) && OneToZeroFound {
 		k.Remove1to0(&tickOld.PoolsOneToZero, OneToZeroOld.Index)
-	}  else if NewPool.Reserve1.Neg().Equal(sdk.ZeroDec()) && OneToZeroFound {
+	} else if NewPool.Reserve1.Neg().Equal(sdk.ZeroDec()) && OneToZeroFound {
 		k.Update1to0(&tickOld.PoolsOneToZero, &OneToZeroOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 	}
 
@@ -130,13 +127,12 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 	}
 
 	tickNew := types.Ticks{
-		Token0: token0[0],
-		Token1: token1[0],
+		Token0:         token0[0],
+		Token1:         token1[0],
 		PoolsZeroToOne: tickOld.PoolsZeroToOne,
 		PoolsOneToZero: tickOld.PoolsOneToZero,
 	}
 
-	
 	k.SetShare(
 		ctx,
 		shareNew,
@@ -149,7 +145,7 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 
 	//Token 0
 	if amount0Withdraw.GT(sdk.ZeroDec()) {
-		coin0 := sdk.NewCoin(token0[0], sdk.NewIntFromBigInt(amount0Withdraw.BigInt()) )
+		coin0 := sdk.NewCoin(token0[0], sdk.NewIntFromBigInt(amount0Withdraw.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coin0}); err != nil {
 			return nil, err
 		}
@@ -170,7 +166,7 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		sdk.NewAttribute(types.WithdrawEventToken0, msg.Token0),
 		sdk.NewAttribute(types.WithdrawEventToken1, msg.Token1),
 		sdk.NewAttribute(types.WithdrawEventPrice, msg.Price),
-		sdk.NewAttribute(types.WithdrawEventFee, msg.Fee ),
+		sdk.NewAttribute(types.WithdrawEventFee, msg.Fee),
 		sdk.NewAttribute(types.WithdrawEventOldReserves0, reserve0.String()),
 		sdk.NewAttribute(types.WithdrawEventOldReserves1, reserve1.String()),
 		sdk.NewAttribute(types.WithdrawEventNewReserves0, NewPool.Reserve0.String()),
@@ -178,10 +174,9 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		sdk.NewAttribute(types.WithdrawEventReceiver, msg.Receiver),
 		sdk.NewAttribute(types.WithdrawEventAmounts0, amount0Withdraw.String()),
 		sdk.NewAttribute(types.WithdrawEventAmounts0, amount1Withdraw.String()),
-
 	)
 
 	ctx.EventManager().EmitEvent(event)
 
-	return &types.MsgSingleWithdrawResponse{ amount0Withdraw.String(), amount1Withdraw.String()}, nil
+	return &types.MsgSingleWithdrawResponse{amount0Withdraw.String(), amount1Withdraw.String()}, nil
 }

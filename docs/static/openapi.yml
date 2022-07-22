@@ -30058,9 +30058,9 @@ paths:
                       items:
                         type: object
                         properties:
-                          reserveA:
+                          reserve0:
                             type: string
-                          reserveB:
+                          reserve1:
                             type: string
                           price:
                             type: string
@@ -30076,9 +30076,9 @@ paths:
                       items:
                         type: object
                         properties:
-                          reserveA:
+                          reserve0:
                             type: string
-                          reserveB:
+                          reserve1:
                             type: string
                           price:
                             type: string
@@ -30215,9 +30215,9 @@ paths:
                     items:
                       type: object
                       properties:
-                        reserveA:
+                        reserve0:
                           type: string
-                        reserveB:
+                        reserve1:
                           type: string
                         price:
                           type: string
@@ -30233,9 +30233,9 @@ paths:
                     items:
                       type: object
                       properties:
-                        reserveA:
+                        reserve0:
                           type: string
-                        reserveB:
+                        reserve1:
                           type: string
                         price:
                           type: string
@@ -30273,6 +30273,42 @@ paths:
           in: path
           required: true
           type: string
+      tags:
+        - Query
+  /NicholasDotSol/duality/router/params:
+    get:
+      summary: Parameters queries the parameters of the module.
+      operationId: NicholasdotsolDualityRouterParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params holds all the parameters of this module.
+                type: object
+            description: >-
+              QueryParamsResponse is response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
       tags:
         - Query
   /tendermint/spn/claim/airdrop_supply:
@@ -51984,17 +52020,25 @@ definitions:
       the connection handshake.
   nicholasdotsol.duality.dex.MsgSingleDepositResponse:
     type: object
+    properties:
+      sharesMinted:
+        type: string
   nicholasdotsol.duality.dex.MsgSingleWithdrawResponse:
     type: object
+    properties:
+      amounts0:
+        type: string
+      amounts1:
+        type: string
   nicholasdotsol.duality.dex.Params:
     type: object
     description: Params defines the parameters for the module.
   nicholasdotsol.duality.dex.Pool:
     type: object
     properties:
-      reserveA:
+      reserve0:
         type: string
-      reserveB:
+      reserve1:
         type: string
       price:
         type: string
@@ -52067,9 +52111,9 @@ definitions:
               items:
                 type: object
                 properties:
-                  reserveA:
+                  reserve0:
                     type: string
-                  reserveB:
+                  reserve1:
                     type: string
                   price:
                     type: string
@@ -52085,9 +52129,9 @@ definitions:
               items:
                 type: object
                 properties:
-                  reserveA:
+                  reserve0:
                     type: string
-                  reserveB:
+                  reserve1:
                     type: string
                   price:
                     type: string
@@ -52156,9 +52200,9 @@ definitions:
             items:
               type: object
               properties:
-                reserveA:
+                reserve0:
                   type: string
-                reserveB:
+                reserve1:
                   type: string
                 price:
                   type: string
@@ -52174,9 +52218,9 @@ definitions:
             items:
               type: object
               properties:
-                reserveA:
+                reserve0:
                   type: string
-                reserveB:
+                reserve1:
                   type: string
                 price:
                   type: string
@@ -52221,9 +52265,9 @@ definitions:
         items:
           type: object
           properties:
-            reserveA:
+            reserve0:
               type: string
-            reserveB:
+            reserve1:
               type: string
             price:
               type: string
@@ -52239,9 +52283,9 @@ definitions:
         items:
           type: object
           properties:
-            reserveA:
+            reserve0:
               type: string
-            reserveB:
+            reserve1:
               type: string
             price:
               type: string
@@ -52252,6 +52296,16 @@ definitions:
             index:
               type: integer
               format: int32
+  nicholasdotsol.duality.router.Params:
+    type: object
+    description: Params defines the parameters for the module.
+  nicholasdotsol.duality.router.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params holds all the parameters of this module.
+        type: object
+    description: QueryParamsResponse is response type for the Query/Params RPC method.
   tendermint.spn.claim.ClaimRecord:
     type: object
     properties:

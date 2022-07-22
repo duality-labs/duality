@@ -38,7 +38,7 @@ func TestShareQuerySingle(t *testing.T) {
 				Price:  msgs[0].Price,
 				Fee:    msgs[0].Fee,
 			},
-			
+
 			response: &types.QueryGetShareResponse{Share: msgs[0]},
 		},
 		{

@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -38,7 +37,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdraw() {
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
 
 	goCtx := sdk.WrapSDKContext(ctx)
-	
+
 	createResponse, err := suite.msgServer.SingleDeposit(goCtx, &types.MsgSingleDeposit{
 		Creator:  alice.String(),
 		Token0:   "TokenA",
@@ -49,10 +48,10 @@ func (suite *IntegrationTestSuite) TestSingleWithdraw() {
 		Amounts1: "100",
 		Receiver: alice.String(),
 	})
-	
+
 	suite.Require().Nil(err)
 	_ = createResponse
-	
+
 	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("400000000000000000000"))))
@@ -70,7 +69,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdraw() {
 		Amounts1: "0",
 		Receiver: bob.String(),
 	})
-	
+
 	_ = createResponse2
 	suite.Require().Nil(err)
 	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000"))))
@@ -81,18 +80,17 @@ func (suite *IntegrationTestSuite) TestSingleWithdraw() {
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("100000000000000000000"))))
 
 	withdrawResponse, err := suite.msgServer.SingleWithdraw(goCtx, &types.MsgSingleWithdraw{
-		Creator:  bob.String(),
-		Token0:   "TokenA",
-		Token1:   "TokenB",
-		Price:    "1.0",
-		Fee:      "300",
+		Creator:        bob.String(),
+		Token0:         "TokenA",
+		Token1:         "TokenB",
+		Price:          "1.0",
+		Fee:            "300",
 		SharesRemoving: "50",
-		Receiver: bob.String(),
-
+		Receiver:       bob.String(),
 	})
-	
+
 	_ = withdrawResponse
-	
+
 	suite.Require().Nil(err)
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("75000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("75000000000000000000"))))
@@ -102,19 +100,15 @@ func (suite *IntegrationTestSuite) TestSingleWithdraw() {
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("225000000000000000000"))))
 
 	withdrawResponse2, err := suite.msgServer.SingleWithdraw(goCtx, &types.MsgSingleWithdraw{
-		Creator:  bob.String(),
-		Token0:   "TokenA",
-		Token1:   "TokenB",
-		Price:    "1.0",
-		Fee:      "300",
+		Creator:        bob.String(),
+		Token0:         "TokenA",
+		Token1:         "TokenB",
+		Price:          "1.0",
+		Fee:            "300",
 		SharesRemoving: "50",
-		Receiver: bob.String(),
-
+		Receiver:       bob.String(),
 	})
 	suite.Require().Error(err)
 	_ = withdrawResponse2
-
-
-
 
 }

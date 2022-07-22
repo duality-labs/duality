@@ -24,14 +24,14 @@ func createNTicks(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Ticks {
 			&types.Pool{
 				Reserve0:    sdk.NewDec(100),
 				Reserve1:    sdk.NewDec(100),
-				Fee: sdk.NewDecWithPrec(3, 1),
+				Fee:         sdk.NewDecWithPrec(3, 1),
 				Price:       sdk.NewDec(2),
 				TotalShares: sdk.NewDec(200),
 			},
 			&types.Pool{
 				Reserve0:    sdk.NewDec(100),
 				Reserve1:    sdk.NewDec(100),
-				Fee: sdk.NewDecWithPrec(5, 1),
+				Fee:         sdk.NewDecWithPrec(5, 1),
 				Price:       sdk.NewDec(2),
 				TotalShares: sdk.NewDec(200),
 			},
@@ -40,14 +40,14 @@ func createNTicks(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Ticks {
 			&types.Pool{
 				Reserve0:    sdk.NewDec(100),
 				Reserve1:    sdk.NewDec(100),
-				Fee: sdk.NewDecWithPrec(3, 1),
+				Fee:         sdk.NewDecWithPrec(3, 1),
 				Price:       sdk.NewDec(2),
 				TotalShares: sdk.NewDec(200),
 			},
 			&types.Pool{
 				Reserve0:    sdk.NewDec(100),
 				Reserve1:    sdk.NewDec(100),
-				Fee: sdk.NewDecWithPrec(5, 1),
+				Fee:         sdk.NewDecWithPrec(5, 1),
 				Price:       sdk.NewDec(2),
 				TotalShares: sdk.NewDec(200),
 			},
@@ -132,7 +132,6 @@ func TestTicksGetAll(t *testing.T) {
 // 		TotalShares: sdk.NewDec(200),
 // 		Index:       0,
 // 	}
-
 
 // 	keeper.Push1to0(&pools, newPool)
 // 	fmt.Println("(1) Push New Pool:", pools)
