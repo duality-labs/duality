@@ -51,7 +51,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	amounts0 := []sdk.Dec{amount0}
 	amounts1 := []sdk.Dec{amount1}
 
-	token0, token1, amounts0, amounts1, error := k.sortTokensDeposit(ctx, token0, token1, amounts0, amounts1)
+	token0, token1, amounts0, amounts1, error := k.SortTokensDeposit(ctx, token0, token1, amounts0, amounts1)
 	amount0 = amounts0[0]
 	amount1 = amounts1[0]
 

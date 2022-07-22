@@ -19,7 +19,7 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 
 	token0 := []string{msg.Token0}
 	token1 := []string{msg.Token1}
-	token0, token1, error := k.sortTokens(ctx, token0, token1)
+	token0, token1, error := k.SortTokens(ctx, token0, token1)
 
 	if error != nil {
 		return nil, error

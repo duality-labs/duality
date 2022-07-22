@@ -9,7 +9,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k Keeper) sortTokens(ctx sdk.Context, tokens0 []string, tokens1 []string) ([]string, []string, error) {
+func (k Keeper) SortTokens(ctx sdk.Context, tokens0 []string, tokens1 []string) ([]string, []string, error) {
 
 	if len(tokens0) != len(tokens1) {
 		return nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenListSize, "Invalid Array: Array Tokens0 size does not equal Array Tokens1")
@@ -33,7 +33,7 @@ func (k Keeper) sortTokens(ctx sdk.Context, tokens0 []string, tokens1 []string) 
 	return newTokens0, newTokens1, nil
 }
 
-func (k Keeper) sortTokensDeposit(ctx sdk.Context, tokens0 []string, tokens1 []string, amounts0 []sdk.Dec, amounts1 []sdk.Dec) ([]string, []string, []sdk.Dec, []sdk.Dec, error) {
+func (k Keeper) SortTokensDeposit(ctx sdk.Context, tokens0 []string, tokens1 []string, amounts0 []sdk.Dec, amounts1 []sdk.Dec) ([]string, []string, []sdk.Dec, []sdk.Dec, error) {
 
 	if len(tokens0) != len(tokens1) {
 		return nil, nil, nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenListSize, "Invalid Array: Array Tokens0 size does not equal Array Tokens1")
