@@ -7,17 +7,17 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) depositHelperAdd(pool *types.Pool, amount0, amount1 sdk.Dec) (sdk.Dec, sdk.Dec, sdk.Dec, error) {
+func (k Keeper) DepositHelperAdd(pool *types.Pool, amount0, amount1 sdk.Dec) (sdk.Dec, sdk.Dec, sdk.Dec, error) {
 
 	var trueAmounts0 sdk.Dec
 	var trueAmounts1 sdk.Dec
 
 	if pool.Reserve0.GT(sdk.ZeroDec()) {
-		trueAmounts1 = k.min(amount1, (pool.Reserve1.Mul(amount0)).Quo(pool.Reserve0))
+		trueAmounts1 = k.Min(amount1, (pool.Reserve1.Mul(amount0)).Quo(pool.Reserve0))
 	}
 
 	if pool.Reserve1.GT(sdk.ZeroDec()) {
-		trueAmounts0 = k.min(amount0, (pool.Reserve0.Mul(amount1)).Quo(pool.Reserve1))
+		trueAmounts0 = k.Min(amount0, (pool.Reserve0.Mul(amount1)).Quo(pool.Reserve1))
 	}
 
 	if trueAmounts0 == amount0 && trueAmounts1 != amount1 {
@@ -33,17 +33,17 @@ func (k Keeper) depositHelperAdd(pool *types.Pool, amount0, amount1 sdk.Dec) (sd
 
 }
 
-func (k Keeper) depositHelperSub(pool *types.Pool, amount0, amount1 sdk.Dec) (sdk.Dec, sdk.Dec, sdk.Dec, error) {
+func (k Keeper) DepositHelperSub(pool *types.Pool, amount0, amount1 sdk.Dec) (sdk.Dec, sdk.Dec, sdk.Dec, error) {
 
 	var trueAmounts0 sdk.Dec
 	var trueAmounts1 sdk.Dec
 
 	if pool.Reserve0.GT(sdk.ZeroDec()) {
-		trueAmounts1 = k.min(amount1, (pool.Reserve1.Mul(amount0)).Quo(pool.Reserve0))
+		trueAmounts1 = k.Min(amount1, (pool.Reserve1.Mul(amount0)).Quo(pool.Reserve0))
 	}
 
 	if pool.Reserve1.GT(sdk.ZeroDec()) {
-		trueAmounts0 = k.min(amount0, (pool.Reserve0.Mul(amount1)).Quo(pool.Reserve1))
+		trueAmounts0 = k.Min(amount0, (pool.Reserve0.Mul(amount1)).Quo(pool.Reserve1))
 	}
 
 	if trueAmounts0 == amount0 && trueAmounts1 != amount1 {

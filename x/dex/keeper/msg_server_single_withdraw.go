@@ -46,8 +46,8 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		return nil, err
 	}
 
-	OneToZeroOld, OneToZeroFound := k.getPool(&tickOld.PoolsOneToZero, fee, price)
-	ZeroToOneOld, ZeroToOneFound := k.getPool(&tickOld.PoolsZeroToOne, fee, price)
+	OneToZeroOld, OneToZeroFound := k.GetPool(&tickOld.PoolsOneToZero, fee, price)
+	ZeroToOneOld, ZeroToOneFound := k.GetPool(&tickOld.PoolsZeroToOne, fee, price)
 
 	if !OneToZeroFound && !ZeroToOneFound {
 		return nil, sdkerrors.Wrapf(types.ErrValidTickNotFound, "Valid Pool not found")

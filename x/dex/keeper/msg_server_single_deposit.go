@@ -109,17 +109,17 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 
 	if tickFound {
 
-		OneToZeroOld, OneToZeroFound = k.getPool(&tickOld.PoolsOneToZero, fee, price)
-		ZeroToOneOld, ZeroToOneFound = k.getPool(&tickOld.PoolsZeroToOne, fee, price)
+		OneToZeroOld, OneToZeroFound = k.GetPool(&tickOld.PoolsOneToZero, fee, price)
+		ZeroToOneOld, ZeroToOneFound = k.GetPool(&tickOld.PoolsZeroToOne, fee, price)
 
 		if OneToZeroFound {
-			trueAmounts0, trueAmounts1, SharesMinted, err = k.depositHelperAdd(&OneToZeroOld, amount0, amount1)
+			trueAmounts0, trueAmounts1, SharesMinted, err = k.DepositHelperAdd(&OneToZeroOld, amount0, amount1)
 
 			if err != nil {
 				return nil, err
 			}
 		} else if ZeroToOneFound {
-			trueAmounts0, trueAmounts1, SharesMinted, err = k.depositHelperAdd(&ZeroToOneOld, amount0, amount1)
+			trueAmounts0, trueAmounts1, SharesMinted, err = k.DepositHelperAdd(&ZeroToOneOld, amount0, amount1)
 
 			if err != nil {
 				return nil, err

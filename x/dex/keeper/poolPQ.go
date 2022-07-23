@@ -263,7 +263,7 @@ func down0to1(pools *([]*types.Pool), i0, n int32) bool {
 // Other Helper Functions
 ////////////////////////////////////////////////////////
 
-func (k Keeper) getPool(pools *([]*types.Pool), Fee, Price sdk.Dec) (types.Pool, bool) {
+func (k Keeper) GetPool(pools *([]*types.Pool), Fee, Price sdk.Dec) (types.Pool, bool) {
 
 	for _, s := range *pools {
 
