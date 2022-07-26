@@ -17,9 +17,8 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
-	token0 := []string{msg.Token0}
-	token1 := []string{msg.Token1}
-	token0, token1, error := k.SortTokens(ctx, token0, token1)
+	
+	token0, token1, error := k.SortTokens(ctx, msg.Token0, msg.Token1)
 
 	if error != nil {
 		return nil, error
@@ -27,8 +26,8 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 
 	tickOld, tickFound := k.GetTicks(
 		ctx,
-		token0[0],
-		token1[0],
+		token0,
+		token1,
 	)
 
 	if !tickFound {
@@ -70,8 +69,8 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 	shareOld, shareFound := k.GetShare(
 		ctx,
 		msg.Receiver,
-		token0[0],
-		token1[0],
+		token0,
+		token1,
 		msg.Price,
 		msg.Fee,
 	)
@@ -104,14 +103,14 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		Index:       0,
 	}
 
-	if NewPool.Reserve0.Equal(sdk.ZeroDec()) && ZeroToOneFound {
+	if NewPool.Reserve1.Equal(sdk.ZeroDec()) && ZeroToOneFound {
 		k.Remove0to1(&tickOld.PoolsZeroToOne, ZeroToOneOld.Index)
 
 	} else if NewPool.Reserve0.Neg().Equal(sdk.ZeroDec()) && ZeroToOneFound {
 		k.Update0to1(&tickOld.PoolsZeroToOne, &ZeroToOneOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 	}
 
-	if NewPool.Reserve1.Equal(sdk.ZeroDec()) && OneToZeroFound {
+	if NewPool.Reserve0.Equal(sdk.ZeroDec()) && OneToZeroFound {
 		k.Remove1to0(&tickOld.PoolsOneToZero, OneToZeroOld.Index)
 	} else if NewPool.Reserve1.Neg().Equal(sdk.ZeroDec()) && OneToZeroFound {
 		k.Update1to0(&tickOld.PoolsOneToZero, &OneToZeroOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
@@ -119,16 +118,16 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 
 	shareNew := types.Share{
 		Owner:       msg.Creator,
-		Token0:      token0[0],
-		Token1:      token1[0],
+		Token0:      token0,
+		Token1:      token1,
 		Price:       msg.Price,
 		Fee:         msg.Fee,
 		ShareAmount: shareOld.ShareAmount.Sub(sharesRemoving),
 	}
 
 	tickNew := types.Ticks{
-		Token0:         token0[0],
-		Token1:         token1[0],
+		Token0:         token0,
+		Token1:         token1,
 		PoolsZeroToOne: tickOld.PoolsZeroToOne,
 		PoolsOneToZero: tickOld.PoolsOneToZero,
 	}
@@ -145,7 +144,7 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 
 	//Token 0
 	if amount0Withdraw.GT(sdk.ZeroDec()) {
-		coin0 := sdk.NewCoin(token0[0], sdk.NewIntFromBigInt(amount0Withdraw.BigInt()))
+		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount0Withdraw.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coin0}); err != nil {
 			return nil, err
 		}
@@ -153,7 +152,7 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 
 	//Token 1
 	if amount1Withdraw.GT(sdk.ZeroDec()) {
-		coin1 := sdk.NewCoin(token1[0], sdk.NewIntFromBigInt(amount1Withdraw.BigInt()))
+		coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount1Withdraw.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coin1}); err != nil {
 			return nil, err
 		}

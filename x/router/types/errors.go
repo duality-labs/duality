@@ -8,5 +8,6 @@ import (
 
 // x/router module sentinel errors
 var (
-	ErrSample = sdkerrors.Register(ModuleName, 1100, "sample error")
+	ErrValidPathNotFound    = sdkerrors.Register(ModuleName, 1100, "Valid Path not found")
+	ErrNotEnoughCoins       = sdkerrors.Register(ModuleName, 1101, "Not enough Spendable Coins found: %s")
 )

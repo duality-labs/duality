@@ -25,7 +25,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 
 	_ = receiverAddr
 
-	AccountsToken0Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token0).Amount)
+	
 
 	amount0, err := sdk.NewDecFromStr(msg.Amounts0)
 	if err != nil {
@@ -37,6 +37,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
+	AccountsToken0Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token0).Amount)
 	if AccountsToken0Balance.LT(amount0) {
 		return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
@@ -46,12 +47,11 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s does not have enough  of token 1", callerAddr)
 	}
 
-	token0 := []string{msg.Token0}
-	token1 := []string{msg.Token1}
+	
 	amounts0 := []sdk.Dec{amount0}
 	amounts1 := []sdk.Dec{amount1}
 
-	token0, token1, amounts0, amounts1, error := k.SortTokensDeposit(ctx, token0, token1, amounts0, amounts1)
+	token0, token1, amounts0, amounts1, error := k.SortTokensDeposit(ctx, msg.Token0, msg.Token1, amounts0, amounts1)
 	amount0 = amounts0[0]
 	amount1 = amounts1[0]
 
@@ -62,8 +62,8 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	shareOld, shareFound := k.GetShare(
 		ctx,
 		msg.Receiver,
-		token0[0],
-		token1[0],
+		token0,
+		token1,
 		msg.Price,
 		msg.Fee,
 	)
@@ -71,8 +71,8 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	if !shareFound {
 		shareOld = types.Share{
 			Owner:       msg.Receiver,
-			Token0:      token0[0],
-			Token1:      token1[0],
+			Token0:      token0,
+			Token1:      token1,
 			Price:       msg.Price,
 			Fee:         msg.Fee,
 			ShareAmount: sdk.ZeroDec(),
@@ -82,8 +82,8 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	//fmt.Println("All ticks contracts:", k.GetAllTicks(ctx))
 	tickOld, tickFound := k.GetTicks(
 		ctx,
-		token0[0],
-		token1[0],
+		token0,
+		token1,
 	)
 
 	price, err := sdk.NewDecFromStr(msg.Price)
@@ -181,7 +181,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 
 	//Token 0
 	if trueAmounts0.GT(sdk.ZeroDec()) {
-		coin0 := sdk.NewCoin(token0[0], sdk.NewIntFromBigInt(trueAmounts0.BigInt()))
+		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(trueAmounts0.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
 			return nil, err
 		}
@@ -189,7 +189,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 
 	//Token 1
 	if trueAmounts1.GT(sdk.ZeroDec()) {
-		coin1 := sdk.NewCoin(token1[0], sdk.NewIntFromBigInt(trueAmounts1.BigInt()))
+		coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(trueAmounts1.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
 			return nil, err
 		}
@@ -198,27 +198,29 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	if ZeroToOneFound {
 		k.Update0to1(&tickOld.PoolsZeroToOne, &ZeroToOneOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 
-	} else if NewPool.Reserve0.GT(sdk.ZeroDec()) && !ZeroToOneFound {
+	} else if NewPool.Reserve1.GT(sdk.ZeroDec()) && !ZeroToOneFound {
+		
 		k.Push0to1(&tickOld.PoolsZeroToOne, &NewPool)
 	}
 
 	if OneToZeroFound {
 		k.Update1to0(&tickOld.PoolsOneToZero, &OneToZeroOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
-	} else if NewPool.Reserve1.GT(sdk.ZeroDec()) && !OneToZeroFound {
+	} else if NewPool.Reserve0.GT(sdk.ZeroDec()) && !OneToZeroFound {
+		
 		k.Push1to0(&tickOld.PoolsOneToZero, &NewPool)
 	}
 
 	tickNew := types.Ticks{
-		Token0:         token0[0],
-		Token1:         token1[0],
+		Token0:         token0,
+		Token1:         token1,
 		PoolsZeroToOne: tickOld.PoolsZeroToOne,
 		PoolsOneToZero: tickOld.PoolsOneToZero,
 	}
 
 	shareNew := types.Share{
 		Owner:       msg.Creator,
-		Token0:      token0[0],
-		Token1:      token1[0],
+		Token0:      token0,
+		Token1:      token1,
 		Price:       msg.Price,
 		Fee:         msg.Fee,
 		ShareAmount: shareOld.ShareAmount.Add(SharesMinted),
@@ -238,8 +240,8 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		sdk.NewAttribute(sdk.AttributeKeyModule, "duality"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, types.DepositEventKey),
 		sdk.NewAttribute(types.DepositEventCreator, msg.Creator),
-		sdk.NewAttribute(types.DepositEventToken0, token0[0]),
-		sdk.NewAttribute(types.DepositEventToken1, token1[0]),
+		sdk.NewAttribute(types.DepositEventToken0, token0),
+		sdk.NewAttribute(types.DepositEventToken1, token1),
 		sdk.NewAttribute(types.DepositEventPrice, msg.Price),
 		sdk.NewAttribute(types.DepositEventFee, msg.Fee),
 		sdk.NewAttribute(types.DepositEventNewReserves0, NewPool.Reserve0.String()),

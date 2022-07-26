@@ -174,6 +174,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		dexmoduletypes.ModuleName:      {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+		routermoduletypes.ModuleName:      {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -439,6 +440,7 @@ func NewApp(
 		app.GetSubspace(routermoduletypes.ModuleName),
 
 		app.DexKeeper,
+		app.BankKeeper,
 	)
 	routerModule := routermodule.NewAppModule(appCodec, app.RouterKeeper, app.AccountKeeper, app.BankKeeper)
 
