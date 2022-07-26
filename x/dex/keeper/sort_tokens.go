@@ -1,52 +1,45 @@
 package keeper
 
 import (
-	//"sort"
-	"strconv"
+	"crypto/sha256"
+	"bytes"
 	//"strings"
-
+	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	//sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (k Keeper) SortTokens(ctx sdk.Context, token0 string, token1 string) (string, string, error) {
 
-	token0Int, err := strconv.ParseInt(token0, 10, 64)
+	token0Hash := sha256.Sum256([]byte(token0))
+	token1Hash := sha256.Sum256([]byte(token1))
 
-	if err != nil {
-		return "", "", err
-	}
+	comparisonInt :=  bytes.Compare(token0Hash[:], token1Hash[:])
 
-	token1Int, err := strconv.ParseInt(token1, 10, 64)
-
-	if err != nil {
-		return "", "", err
-	}
-
-	if token0Int < token1Int {
+	if comparisonInt == -1 {
 		return token0, token1, nil
+	} else if comparisonInt == 0 {
+		return "", "",  sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+	} else {
+		return token1, token0, nil
 	}
-	return token1, token0, nil
+	
 
 }
 
 func (k Keeper) SortTokensDeposit(ctx sdk.Context, token0 string, token1 string, amounts0 []sdk.Dec, amounts1 []sdk.Dec) (string, string, []sdk.Dec, []sdk.Dec, error) {
 
-	token0Int, err := strconv.ParseInt(token0, 10, 64)
+	token0Hash := sha256.Sum256([]byte(token0))
+	token1Hash := sha256.Sum256([]byte(token1))
 
-	if err != nil {
-		return "", "", nil, nil, err
-	}
+	comparisonInt :=  bytes.Compare(token0Hash[:], token1Hash[:])
 
-	token1Int, err := strconv.ParseInt(token1, 10, 64)
-
-	if err != nil {
-		return "", "", nil, nil, err
-	}
-
-	if token0Int < token1Int {
+	if comparisonInt == -1 {
 		return token0, token1, amounts0, amounts1, nil
+	} else if comparisonInt == 0 {
+		return "", "", nil, nil,  sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+	} else {
+		return token1, token0, amounts1, amounts0, nil
 	}
-	return token1, token0, amounts1, amounts0, nil
 
 }

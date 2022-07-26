@@ -106,13 +106,13 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 	if NewPool.Reserve1.Equal(sdk.ZeroDec()) && ZeroToOneFound {
 		k.Remove0to1(&tickOld.PoolsZeroToOne, ZeroToOneOld.Index)
 
-	} else if NewPool.Reserve0.Neg().Equal(sdk.ZeroDec()) && ZeroToOneFound {
+	} else if !(NewPool.Reserve0.Equal(sdk.ZeroDec() )) && ZeroToOneFound {
 		k.Update0to1(&tickOld.PoolsZeroToOne, &ZeroToOneOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 	}
 
 	if NewPool.Reserve0.Equal(sdk.ZeroDec()) && OneToZeroFound {
 		k.Remove1to0(&tickOld.PoolsOneToZero, OneToZeroOld.Index)
-	} else if NewPool.Reserve1.Neg().Equal(sdk.ZeroDec()) && OneToZeroFound {
+	} else if !(NewPool.Reserve1.Equal(sdk.ZeroDec())) && OneToZeroFound {
 		k.Update1to0(&tickOld.PoolsOneToZero, &OneToZeroOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 	}
 

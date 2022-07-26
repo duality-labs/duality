@@ -2,11 +2,12 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 	//"sort"
 	//"fmt"
 
-	"github.com/NicholasDotSol/duality/x/router/types"
 	dextypes "github.com/NicholasDotSol/duality/x/dex/types"
+	"github.com/NicholasDotSol/duality/x/router/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -94,10 +95,13 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	}
 	TotalAmountOut := sdk.ZeroDec()
 
+	
 	if token0 == msg.TokenIn {
 		if len(oldTick.PoolsZeroToOne) != 0 {
-			for (remainingAmount.Neg().Equal(sdk.ZeroDec()) || len(oldTick.PoolsZeroToOne) ==0 ) {
+			
+			for ( !(remainingAmount.Equal(sdk.ZeroDec())) && len(oldTick.PoolsZeroToOne) !=0 ) {
 				if (remainingAmount.LT(oldTick.PoolsZeroToOne[0].Reserve1)) {
+					
 					AmountOut := remainingAmount.Sub( remainingAmount.Mul(oldTick.PoolsZeroToOne[0].Fee.Quo(oldTick.PoolsZeroToOne[0].Price.Mul(sdk.NewDec(10000))))  )
 					NewReserve1 := oldTick.PoolsZeroToOne[0].Reserve1.Sub(AmountOut)
 					
@@ -191,8 +195,9 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		}
 
 	} else {
+		fmt.Println("Do I go here?")
 		if len(oldTick.PoolsOneToZero) != 0 {
-			for (remainingAmount.Neg().Equal(sdk.ZeroDec()) || len(oldTick.PoolsOneToZero) ==0 ) {
+			for (!(remainingAmount.Equal(sdk.ZeroDec())) || len(oldTick.PoolsOneToZero) ==0 ) {
 				if (remainingAmount.LT(oldTick.PoolsZeroToOne[0].Reserve0)) {
 					AmountOut := remainingAmount.Sub( remainingAmount.Mul(oldTick.PoolsOneToZero[0].Fee.Quo(oldTick.PoolsOneToZero[0].Price.Mul(sdk.NewDec(10000))))  )
 					NewReserve0 := oldTick.PoolsOneToZero[0].Reserve0.Sub(AmountOut)
@@ -287,6 +292,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 	}
 
+	fmt.Println(TotalAmountOut)
 	minOut, err := sdk.NewDecFromStr(msg.MinOut)
 	if err != nil {
 		return nil, err
@@ -297,17 +303,17 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		return nil, err
 	}
 
-
+	
 	if amountIn.GT(sdk.ZeroDec()) {
 		coinIn := sdk.NewCoin(msg.TokenIn, sdk.NewIntFromBigInt(amountIn.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, dextypes.ModuleName, sdk.Coins{coinIn}); err != nil {
 			return nil, err
 		}
 	}
 
 	if TotalAmountOut.GT(sdk.ZeroDec()) {
 		coinOut := sdk.NewCoin(msg.TokenOut, sdk.NewIntFromBigInt(TotalAmountOut.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, dextypes.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
 			return nil, err
 		}
 	}

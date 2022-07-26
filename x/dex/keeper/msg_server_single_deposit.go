@@ -2,6 +2,8 @@ package keeper
 
 import (
 	"context"
+	"fmt"
+	//"fmt"
 	//"math/big"
 	//"fmt"
 
@@ -47,17 +49,17 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s does not have enough  of token 1", callerAddr)
 	}
 
-	
-	amounts0 := []sdk.Dec{amount0}
-	amounts1 := []sdk.Dec{amount1}
 
-	token0, token1, amounts0, amounts1, error := k.SortTokensDeposit(ctx, msg.Token0, msg.Token1, amounts0, amounts1)
+	token0, token1, amounts0, amounts1, error := k.SortTokensDeposit(ctx, msg.Token0, msg.Token1, []sdk.Dec{amount0}, []sdk.Dec{amount1})
+
+	
 	amount0 = amounts0[0]
 	amount1 = amounts1[0]
-
+	
 	if error != nil {
 		return nil, error
 	}
+	
 
 	shareOld, shareFound := k.GetShare(
 		ctx,
@@ -107,6 +109,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	var trueAmounts0 = amount0
 	var trueAmounts1 = amount1
 
+	
 	if tickFound {
 
 		OneToZeroOld, OneToZeroFound = k.GetPool(&tickOld.PoolsOneToZero, fee, price)
@@ -195,6 +198,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		}
 	}
 
+	fmt.Println("here?")
 	if ZeroToOneFound {
 		k.Update0to1(&tickOld.PoolsZeroToOne, &ZeroToOneOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 
@@ -204,9 +208,9 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	}
 
 	if OneToZeroFound {
+		
 		k.Update1to0(&tickOld.PoolsOneToZero, &OneToZeroOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 	} else if NewPool.Reserve0.GT(sdk.ZeroDec()) && !OneToZeroFound {
-		
 		k.Push1to0(&tickOld.PoolsOneToZero, &NewPool)
 	}
 

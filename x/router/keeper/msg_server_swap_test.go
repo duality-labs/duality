@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -61,17 +63,20 @@ func (suite *IntegrationTestSuite) TestSwap() {
 	_ = createResponse
 	suite.Require().Nil(err)
 
+	fmt.Println("Zero to One", app.DexKeeper.GetAllTicks(ctx)[0].PoolsZeroToOne)
+	fmt.Println("One To Zero", app.DexKeeper.GetAllTicks(ctx)[0].PoolsOneToZero)
 	createResponse2, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator: alice.String(),
 		TokenIn: "TokenB",
 		TokenOut: "TokenA",
-		AmountIn: "3",
-		MinOut: "1",
+		AmountIn: "25",
+		MinOut: "5",
 	})
 
 	_ = createResponse2
 	suite.Require().Nil(err)
 
+	fmt.Println(app.DexKeeper.GetAllTicks(ctx))
 
 
 }
