@@ -43,7 +43,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	oldTick, tickFound := k.dexKeeper.GetTicks(ctx, token0, token1)
 
 	if !tickFound {
-		return nil, err
+		return nil, sdkerrors.Wrapf(types.ErrValidTickNotFound, "Valid tick not found")
 	}
 
 	// Token A Token B
@@ -95,7 +95,6 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	}
 	TotalAmountOut := sdk.ZeroDec()
 
-	
 	if token0 == msg.TokenIn {
 		if len(oldTick.PoolsZeroToOne) != 0 {
 			RequiredToDeplete := oldTick.PoolsZeroToOne[0].Reserve1.Add(oldTick.PoolsZeroToOne[0].Reserve1.Mul(oldTick.PoolsZeroToOne[0].Fee.Quo(oldTick.PoolsZeroToOne[0].Price.Mul(sdk.NewDec(10000))))) // RequiredToDeplete = ReserveB + ReserveB * (fee / (Pricec * 10000))
@@ -177,8 +176,6 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 						oldTick.PoolsOneToZero,
 					}
 
-					
-					
 					k.dexKeeper.SetTicks(
 						ctx,
 						NewTick,
@@ -186,7 +183,6 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 					TotalAmountOut = TotalAmountOut.Add(AmountOut)
 					remainingAmount = remainingAmount.Sub(AmountOut)				
-
 
 				}
 			}
@@ -196,7 +192,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		}
 
 	} else {
-		
+
 		if len(oldTick.PoolsOneToZero) != 0 {
 			RequiredToDeplete := oldTick.PoolsOneToZero[0].Reserve0.Add(oldTick.PoolsOneToZero[0].Reserve0.Mul(oldTick.PoolsOneToZero[0].Price.Mul(oldTick.PoolsOneToZero[0].Fee).Quo(sdk.NewDec(10000)))) 
 			for (!(remainingAmount.Equal(sdk.ZeroDec())) || len(oldTick.PoolsOneToZero) ==0 ) {
@@ -245,9 +241,6 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 				} else {
 					
 					AmountOut := oldTick.PoolsOneToZero[0].Reserve0.Sub( oldTick.PoolsOneToZero[0].Reserve0.Mul(oldTick.PoolsOneToZero[0].Fee.Mul(oldTick.PoolsOneToZero[0].Price).Quo(sdk.NewDec(10000)))  )
-					
-
-					
 
 					oldZeroToOnePool, ZeroToOnePoolFound := k.dexKeeper.GetPool(&oldTick.PoolsZeroToOne, oldTick.PoolsOneToZero[0].Fee, oldTick.PoolsOneToZero[0].Price )
 
@@ -304,7 +297,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 	if TotalAmountOut.LT(minOut) {
 		//TODO Custom ERROR Type here
-		return nil, err
+		return nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Total Amount is less than specified minimum amount out: %s", minOut.String())
 	}
 
 	
@@ -321,22 +314,6 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 			return nil, err
 		}
 	}
-	// A B C D
-
-	// A B
-	// TokenIN: A
-	// TokenOut: B
-	//sort(tokenIN, tokenOut)
-	//TokenIN = token0
-	// TokenOut == token1
-
-	// Mapping(token0, token1) -> PoolZeroToOne, PoolsOneToZero
-
-	// TokenIN: B
-	// TOkenOut: A
-	//TokenOut == token0
-	//TokenIN == token1
-	// Mapping(token0, token1) -> PoolZeroToOne, PoolsOneToZero
 
 	_ = ctx
 

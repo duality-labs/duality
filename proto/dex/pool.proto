@@ -4,6 +4,15 @@ package nicholasdotsol.duality.dex;
 import "gogoproto/gogo.proto";
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 
+
+/// @Notice Pool: Information related to a token pair representing a CSMM
+/// Reserve0: sdk.Dec (fixed pointed integer) representation of the Pool's reserve of token 0
+/// Reserve1: sdk.Dec (fixed pointed integer) representation of the Pool's reserve of token 1
+/// Price: sdk.Dec (fixed pointed integer) representation of the Price of Token0 with respect to token1
+/// Fee: sdk.Dec representation of a fee amount where 10000 is equal to 100% fee, (ie 300 equal to 3%)
+/// TotalShares: Total liquidity shares for the token pair at the specified fee/price pool
+/// Index: Internal index used in the heap-based priority queue
+
 message Pool {
   
   string reserve0 = 1  [

@@ -2,15 +2,13 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 	//"fmt"
-	//"math/big"
-	//"fmt"
-
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
+
+
 
 func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDeposit) (*types.MsgSingleDepositResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -198,7 +196,6 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		}
 	}
 
-	fmt.Println("here?")
 	if ZeroToOneFound {
 		k.Update0to1(&tickOld.PoolsZeroToOne, &ZeroToOneOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 

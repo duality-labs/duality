@@ -10,4 +10,6 @@ import (
 var (
 	ErrValidPathNotFound    = sdkerrors.Register(ModuleName, 1100, "Valid Path not found")
 	ErrNotEnoughCoins       = sdkerrors.Register(ModuleName, 1101, "Not enough Spendable Coins found: %s")
+	ErrValidTickNotFound    = sdkerrors.Register(ModuleName, 1102, "Valid tick not found")
+	
 )

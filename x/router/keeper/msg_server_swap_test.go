@@ -95,3 +95,63 @@ func (suite *IntegrationTestSuite) TestSwap() {
 
 
 }
+
+
+func (suite *IntegrationTestSuite) TestSwapNoAvailablePools() {
+	app, ctx := suite.app, suite.ctx
+	alice := sdk.AccAddress([]byte("alice"))
+	bob := sdk.AccAddress([]byte("bob"))
+
+	accAlice := app.AccountKeeper.NewAccountWithAddress(ctx, alice)
+	app.AccountKeeper.SetAccount(ctx, accAlice)
+	accBob := app.AccountKeeper.NewAccountWithAddress(ctx, bob)
+	app.AccountKeeper.SetAccount(ctx, accBob)
+
+	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("500000000000000000000")))
+	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
+
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+
+	goCtx := sdk.WrapSDKContext(ctx)
+	fmt.Println("Swap Failing Tests: ")
+	fmt.Println(app.DexKeeper.GetAllTicks(ctx))
+	createResponse, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
+		Creator: alice.String(),
+		TokenIn: "TokenA",
+		TokenOut: "TokenB",
+		AmountIn: "25",
+		MinOut: "5",
+	})
+	suite.Require().Error(err)
+
+	_ = createResponse
+	createResponse2, err :=  suite.msgServerDex.SingleDeposit(goCtx, &dextypes.MsgSingleDeposit{
+		Creator:  alice.String(),
+		Token0:   "TokenA",
+		Token1:   "TokenB",
+		Price:    "1.0",
+		Fee:      "300",
+		Amounts0: "50",
+		Amounts1: "0",
+		Receiver: alice.String(),
+	})
+	_ = createResponse2
+	suite.Require().Nil(err)
+
+	
+	fmt.Println(app.DexKeeper.GetAllTicks(ctx))
+	createResponse3, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
+		Creator: alice.String(),
+		TokenIn: "TokenA",
+		TokenOut: "TokenB",
+		AmountIn: "25",
+		MinOut: "5",
+	})
+
+	_ = createResponse3
+	suite.Require().Error(err)
+
+}
+
+

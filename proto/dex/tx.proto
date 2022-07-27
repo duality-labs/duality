@@ -12,6 +12,17 @@ service Msg {
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
+/// Note: MsgSingleDeposit is the message for depositing liquidity into a single Pool (ie a specfied price/fee for a given token pair)
+/// Creator: Message sender address
+/// Token0: address of the first token 
+/// Token1: address of the second token
+/// Price: specified price of a token pair to specify liquidity into
+//  Fee: specified fee of a token pair to specify liquidity into
+// Amount0: Amount of token0 to deposit
+// Amount1: Amount of token1 to deposit
+// receiver: Receiving address of liquidity shares from deposit
+
+
 message MsgSingleDeposit {
   string creator = 1;
   string token0 = 2;
@@ -26,6 +37,15 @@ message MsgSingleDeposit {
 message MsgSingleDepositResponse {
   string sharesMinted = 1;
 }
+
+/// Note: MsgSingleWithdraw is the message for removing liquidity into a single Pool (ie a specfied price/fee for a given token pair) from liquidity shares.
+/// Creator: Message sender address
+/// Token0: address of the first token 
+/// Token1: address of the second token
+/// Price: specified price of a token pair to withdrawl liquidity out of
+/// Fee: specified fee of a token pair to withdrawl liquidity out of
+/// sharesRemoving: Number of liquidity shares being removed
+/// receiver: Receiving address of amounts0 and amounts1 being withdrawn
 
 message MsgSingleWithdraw {
   string creator = 1;

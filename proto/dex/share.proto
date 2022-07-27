@@ -5,6 +5,15 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 
+/// @Note liquidity share information for a specific address
+/// Shares is a mapping from key values: owner, token0, token1, price fee => to values: shareAmount 
+/// creator: owner address
+/// token0: address for first token in the token pair
+/// token1: address for second token in the token pair
+/// Price: string representation of a decimal point number
+/// Fee: string representation of a decimal point number
+/// shareAmount: sdk.Dec (fixed point integer) specifying the number of shares the owner own's of the specfied pairs (tokens, price, and fee) liquidity shares.
+
 message Share {
   string owner = 1; 
   string token0 = 2; 
