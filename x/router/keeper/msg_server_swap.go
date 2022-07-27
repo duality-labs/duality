@@ -98,9 +98,9 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	
 	if token0 == msg.TokenIn {
 		if len(oldTick.PoolsZeroToOne) != 0 {
-			
+			RequiredToDeplete := oldTick.PoolsZeroToOne[0].Reserve1.Add(oldTick.PoolsZeroToOne[0].Reserve1.Mul(oldTick.PoolsZeroToOne[0].Fee.Quo(oldTick.PoolsZeroToOne[0].Price.Mul(sdk.NewDec(10000))))) // RequiredToDeplete = ReserveB + ReserveB * (fee / (Pricec * 10000))
 			for ( !(remainingAmount.Equal(sdk.ZeroDec())) && len(oldTick.PoolsZeroToOne) !=0 ) {
-				if (remainingAmount.LT(oldTick.PoolsZeroToOne[0].Reserve1)) {
+				if (remainingAmount.LT(RequiredToDeplete)) {
 					
 					AmountOut := remainingAmount.Sub( remainingAmount.Mul(oldTick.PoolsZeroToOne[0].Fee.Quo(oldTick.PoolsZeroToOne[0].Price.Mul(sdk.NewDec(10000))))  )
 					NewReserve1 := oldTick.PoolsZeroToOne[0].Reserve1.Sub(AmountOut)
@@ -113,7 +113,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 					if OneToZeroPoolFound {
 						k.dexKeeper.Update1to0(&oldTick.PoolsOneToZero, &oldOneToZeroPool,
-							oldTick.PoolsZeroToOne[0].Reserve0.Add(remainingAmount), NewReserve1, oldTick.PoolsZeroToOne[0].Fee, oldTick.PoolsZeroToOne[0].TotalShares, oldTick.PoolsZeroToOne[0].Price)
+							oldTick.PoolsZeroToOne[0].Reserve0, NewReserve1, oldTick.PoolsZeroToOne[0].Fee, oldTick.PoolsZeroToOne[0].TotalShares, oldTick.PoolsZeroToOne[0].Price)
 					
 					} else {
 						NewPool := dextypes.Pool{
@@ -168,6 +168,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 						k.dexKeeper.Push1to0(&oldTick.PoolsOneToZero, &NewPool)
 					}
+					k.dexKeeper.Pop0to1(&oldTick.PoolsZeroToOne)
 
 					NewTick := dextypes.Ticks {
 						token0,
@@ -176,8 +177,8 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 						oldTick.PoolsOneToZero,
 					}
 
-					k.dexKeeper.Pop0to1(&oldTick.PoolsZeroToOne)
-
+					
+					
 					k.dexKeeper.SetTicks(
 						ctx,
 						NewTick,
@@ -195,11 +196,12 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		}
 
 	} else {
-		fmt.Println("Do I go here?")
+		
 		if len(oldTick.PoolsOneToZero) != 0 {
+			RequiredToDeplete := oldTick.PoolsOneToZero[0].Reserve0.Add(oldTick.PoolsOneToZero[0].Reserve0.Mul(oldTick.PoolsOneToZero[0].Price.Mul(oldTick.PoolsOneToZero[0].Fee).Quo(sdk.NewDec(10000)))) 
 			for (!(remainingAmount.Equal(sdk.ZeroDec())) || len(oldTick.PoolsOneToZero) ==0 ) {
-				if (remainingAmount.LT(oldTick.PoolsZeroToOne[0].Reserve0)) {
-					AmountOut := remainingAmount.Sub( remainingAmount.Mul(oldTick.PoolsOneToZero[0].Fee.Quo(oldTick.PoolsOneToZero[0].Price.Mul(sdk.NewDec(10000))))  )
+				if (remainingAmount.LT(RequiredToDeplete)) {
+					AmountOut := remainingAmount.Sub( remainingAmount.Mul(oldTick.PoolsOneToZero[0].Fee.Mul(oldTick.PoolsOneToZero[0].Price).Quo(sdk.NewDec(10000)))  )
 					NewReserve0 := oldTick.PoolsOneToZero[0].Reserve0.Sub(AmountOut)
 					
 					
@@ -210,7 +212,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 					if ZeroToOnePoolFound {
 						k.dexKeeper.Update0to1(&oldTick.PoolsOneToZero, &oldZeroToOnePool, NewReserve0,
-							oldTick.PoolsOneToZero[0].Reserve1.Add(remainingAmount),  oldTick.PoolsOneToZero[0].Fee, oldTick.PoolsOneToZero[0].TotalShares, oldTick.PoolsOneToZero[0].Price)
+							oldTick.PoolsOneToZero[0].Reserve1,  oldTick.PoolsOneToZero[0].Fee, oldTick.PoolsOneToZero[0].TotalShares, oldTick.PoolsOneToZero[0].Price)
 					
 					} else {
 						NewPool := dextypes.Pool{
@@ -221,7 +223,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 							TotalShares:  oldTick.PoolsOneToZero[0].TotalShares ,
 							Index: 0,
 						}
-
+						
 						k.dexKeeper.Push1to0(&oldTick.PoolsZeroToOne, &NewPool)
 					}
 
@@ -242,7 +244,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 					
 				} else {
 					
-					AmountOut := oldTick.PoolsOneToZero[0].Reserve0.Sub( oldTick.PoolsOneToZero[0].Reserve0.Mul(oldTick.PoolsOneToZero[0].Fee.Quo(oldTick.PoolsOneToZero[0].Price.Mul(sdk.NewDec(10000))))  )
+					AmountOut := oldTick.PoolsOneToZero[0].Reserve0.Sub( oldTick.PoolsOneToZero[0].Reserve0.Mul(oldTick.PoolsOneToZero[0].Fee.Mul(oldTick.PoolsOneToZero[0].Price).Quo(sdk.NewDec(10000)))  )
 					
 
 					
@@ -266,6 +268,8 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 						k.dexKeeper.Push1to0(&oldTick.PoolsZeroToOne, &NewPool)
 					}
 
+					k.dexKeeper.Pop0to1(&oldTick.PoolsZeroToOne)
+
 					NewTick := dextypes.Ticks {
 						token0,
 						token1,
@@ -273,7 +277,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 						oldTick.PoolsOneToZero,
 					}
 
-					k.dexKeeper.Pop0to1(&oldTick.PoolsZeroToOne)
+					
 
 					k.dexKeeper.SetTicks(
 						ctx,

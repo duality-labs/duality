@@ -65,15 +65,30 @@ func (suite *IntegrationTestSuite) TestSwap() {
 
 	fmt.Println("Zero to One", app.DexKeeper.GetAllTicks(ctx)[0].PoolsZeroToOne)
 	fmt.Println("One To Zero", app.DexKeeper.GetAllTicks(ctx)[0].PoolsOneToZero)
+	fmt.Println(app.DexKeeper.GetAllTicks(ctx))
 	createResponse2, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
+		Creator: alice.String(),
+		TokenIn: "TokenB",
+		TokenOut: "TokenA",
+		AmountIn: "26.75",
+		MinOut: "5",
+	})
+
+	_ = createResponse2
+	suite.Require().Nil(err)
+
+	fmt.Println(app.DexKeeper.GetAllTicks(ctx))
+
+
+	createResponse3, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator: alice.String(),
 		TokenIn: "TokenB",
 		TokenOut: "TokenA",
 		AmountIn: "25",
 		MinOut: "5",
 	})
+	_ = createResponse3
 
-	_ = createResponse2
 	suite.Require().Nil(err)
 
 	fmt.Println(app.DexKeeper.GetAllTicks(ctx))
