@@ -15,7 +15,7 @@ import (
 func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSwapResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	//k.dexKeeper.GetAllTicks(ctx)
+
 
 	
 	token0, token1, err := k.dexKeeper.SortTokens(ctx, msg.TokenIn, msg.TokenOut)
@@ -45,50 +45,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	if !tickFound {
 		return nil, sdkerrors.Wrapf(types.ErrValidTickNotFound, "Valid tick not found")
 	}
-
-	// Token A Token B
-	// PoolZeroToOne [ {ReserveA : 100, ReserveB: 100, Fee = .2} ,  {ReserveA : 50, ReserveB: 0, Fee=.8}]
-	//PoolOneToZero  [{ReserveA : 100, ReserveB: 100, Fee= .2} ]
-
-	// Swap AtoB
-	// TokenIN: A
-	// TokenOut: B
-	// AmountIN: 75
-	// minAmount: 50
-	// RemainingAmount = AmountIN
-	// Head of PQ
-	// while (remaingAmount != 0) 
-
-	// RequiredToDeplete = ReserveB + ReserveB * (fee / (Pricec * 10000))
-
-	//  if RemainingAmount < RequiredToDeplete
-		
-		// AmountOut =  RemainingAmount - RemainingAmount * (fee /  (Price * 10000))
-		// NewReserveB = ReserveB - AmountOut
-		
-		// NewReserveA = ReserveA +  RemainingAmount
-		// TotalAmountOut += AmountOut
-		// Update0to1
-		// RemainingAmount = 0 
-		// Update1to0 
-
-	// else RemainigAmount >= RequiredToDeplete
-		// PQ.POP()
-
-		// NewReserveB = 0
-		// AmountOut =  ReserveB - ReserveB * Fee / (Price * 10000)
-		// NewReserveA = ReserveA + AmountOut
-		// TotalAmountOut += AmountOut
-		// RemainingAmount = RemainingAmount -= AmountOut
-		// Update1to0
-
-	//if TotalAmountOut < minOut
-		// return nil, error
 	
-	// Transfer totalAmountIN
-	// transfer TotalAmountOUt
-	
-
 	remainingAmount, err := sdk.NewDecFromStr(msg.AmountIn)
 	if err != nil {
 		return nil, err
