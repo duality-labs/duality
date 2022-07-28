@@ -9,7 +9,7 @@ import (
 )
 
 
-// Specifications of types.Msg.SingleDeposit can be found in ../proto/tx.proto
+// Specifications of types.Msg.SingleDeposit can be found in ../proto/dex/tx.proto
 
 func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDeposit) (*types.MsgSingleDepositResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)

@@ -152,6 +152,17 @@ func (suite *IntegrationTestSuite) TestSwapNoAvailablePools() {
 	_ = createResponse3
 	suite.Require().Error(err)
 
+	createResponse4, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
+		Creator: alice.String(),
+		TokenIn: "TokenB",
+		TokenOut: "TokenA",
+		AmountIn: "25",
+		MinOut: "30",
+	})
+
+	_ = createResponse4
+	suite.Require().Error(err)
+
 }
 
 

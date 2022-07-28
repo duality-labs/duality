@@ -9,7 +9,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// Specifications of types.Msg.SingleWithdraw can be found in ../proto/tx.proto
+// Specifications of types.Msg.SingleWithdraw can be found in ../proto/dex/tx.proto
 func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWithdraw) (*types.MsgSingleWithdrawResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
