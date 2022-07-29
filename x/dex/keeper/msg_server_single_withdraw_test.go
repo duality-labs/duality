@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -111,4 +113,135 @@ func (suite *IntegrationTestSuite) TestSingleWithdraw() {
 	suite.Require().Error(err)
 	_ = withdrawResponse2
 
+}
+
+func (suite *IntegrationTestSuite) TestSingleWithdrawFailure() {
+	app, ctx := suite.app, suite.ctx
+	//holderAcc := authtypes.NewEmptyModuleAccount("holder")
+	alice := sdk.AccAddress([]byte("alice"))
+	bob := sdk.AccAddress([]byte("bob"))
+
+	accAlice := app.AccountKeeper.NewAccountWithAddress(ctx, alice)
+	app.AccountKeeper.SetAccount(ctx, accAlice)
+	accBob := app.AccountKeeper.NewAccountWithAddress(ctx, bob)
+	app.AccountKeeper.SetAccount(ctx, accBob)
+
+	//100 & 500
+	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("500000000000000000000")))
+	//100 & 200
+	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
+
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+
+	goCtx := sdk.WrapSDKContext(ctx)
+
+	withdrawResponse, err := suite.msgServer.SingleWithdraw(goCtx, &types.MsgSingleWithdraw{
+		Creator:        bob.String(),
+		Token0:         "TokenA",
+		Token1:         "TokenB",
+		Price:          "1.0",
+		Fee:            "300",
+		SharesRemoving: "50",
+		Receiver:       bob.String(),
+	})
+
+	suite.Require().Error(err)
+
+	_ = withdrawResponse
+
+	createResponse2, err := suite.msgServer.SingleDeposit(goCtx, &types.MsgSingleDeposit{
+		Creator:  bob.String(),
+		Token0:   "TokenA",
+		Token1:   "TokenB",
+		Price:    "1.0",
+		Fee:      "300",
+		Amounts0: "50",
+		Amounts1: "0",
+		Receiver: bob.String(),
+	})
+
+	_ = createResponse2
+	suite.Require().Nil(err)
+
+	withdrawResponse2, err := suite.msgServer.SingleWithdraw(goCtx, &types.MsgSingleWithdraw{
+		Creator:        bob.String(),
+		Token0:         "TokenA",
+		Token1:         "TokenB",
+		Price:          "1.0",
+		Fee:            "300",
+		SharesRemoving: "50",
+		Receiver:       bob.String(),
+	})
+	suite.Require().Nil(err)
+	_ = withdrawResponse2
+
+	withdrawResponse3, err := suite.msgServer.SingleWithdraw(goCtx, &types.MsgSingleWithdraw{
+		Creator:        bob.String(),
+		Token0:         "TokenA",
+		Token1:         "TokenB",
+		Price:          "1.0",
+		Fee:            "300",
+		SharesRemoving: "50",
+		Receiver:       bob.String(),
+	})
+
+	suite.Require().Error(err)
+	_ = withdrawResponse3
+}
+
+func (suite *IntegrationTestSuite) TestWithdraw2() {
+
+	app, ctx := suite.app, suite.ctx
+	//holderAcc := authtypes.NewEmptyModuleAccount("holder")
+	alice := sdk.AccAddress([]byte("alice"))
+	bob := sdk.AccAddress([]byte("bob"))
+
+	accAlice := app.AccountKeeper.NewAccountWithAddress(ctx, alice)
+	app.AccountKeeper.SetAccount(ctx, accAlice)
+	accBob := app.AccountKeeper.NewAccountWithAddress(ctx, bob)
+	app.AccountKeeper.SetAccount(ctx, accBob)
+
+	//100 & 500
+	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("500000000000000000000")))
+	//100 & 200
+	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
+
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+
+	goCtx := sdk.WrapSDKContext(ctx)
+
+	createResponse1, err := suite.msgServer.SingleDeposit(goCtx, &types.MsgSingleDeposit{
+		Creator:  bob.String(),
+		Token0:   "TokenA",
+		Token1:   "TokenB",
+		Price:    "1.0",
+		Fee:      "300",
+		Amounts0: "50",
+		Amounts1: "0",
+		Receiver: bob.String(),
+	})
+	fmt.Println(createResponse1)
+	_ = createResponse1
+	suite.Require().Nil(err)
+
+	fmt.Println("Create Response 2: Withdraw")
+	createResponse2, err := suite.msgServer.SingleDeposit(goCtx, &types.MsgSingleDeposit{
+		Creator:  alice.String(),
+		Token0:   "TokenA",
+		Token1:   "TokenB",
+		Price:    "1.0",
+		Fee:      "300",
+		Amounts0: "0",
+		Amounts1: "50",
+		Receiver: alice.String(),
+	})
+
+	_ = createResponse2
+	suite.Require().Nil(err)
+
+	
+
+	
 }

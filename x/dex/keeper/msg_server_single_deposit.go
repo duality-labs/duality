@@ -3,11 +3,11 @@ package keeper
 import (
 	"context"
 	//"fmt"
+	//"fmt"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
-
 
 // Specifications of types.Msg.SingleDeposit can be found in ../proto/dex/tx.proto
 
@@ -74,6 +74,8 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	// Sorts token0, token1 for uniformity for use in internal mappings, if sorting is needed amounts0, amounts1 are switched as well.
 	token0, token1, amounts0, amounts1, error := k.SortTokensDeposit(ctx, msg.Token0, msg.Token1, []sdk.Dec{amount0}, []sdk.Dec{amount1})
 
+
+
 	// Error handling for SortTokensDeposit
 	if error != nil {
 		return nil, error
@@ -82,6 +84,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	// In the case of a single deposit we have amounts0, amounts1 will be arrays of length 1.
 	amount0 = amounts0[0]
 	amount1 = amounts1[0]
+	
 	
 	// Determines if previous shares exists for a address at a specified token pair, price, fee.
 	shareOld, shareFound := k.GetShare(
@@ -154,12 +157,14 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 				return nil, err
 			}
 		} else if ZeroToOneFound {
+
 			trueAmounts0, trueAmounts1, SharesMinted, err = k.DepositHelperAdd(&ZeroToOneOld, amount0, amount1)
 
 			if err != nil {
 				return nil, err
 			}
 
+			
 			// Neither pool has been found but  the tick has been previously initialized, caluclate sharesAmounts, and trueAmounts as if it
 			// is newly being initialized.
 		} else if !OneToZeroFound && !ZeroToOneFound {
@@ -187,6 +192,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 			Index:       0,
 		}
 	} else if ZeroToOneFound {
+
 		NewPool = types.Pool{
 			Reserve0:    ZeroToOneOld.Reserve0.Add(trueAmounts0),
 			Reserve1:    ZeroToOneOld.Reserve1.Add(trueAmounts1),
