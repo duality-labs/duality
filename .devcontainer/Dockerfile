@@ -19,8 +19,8 @@ RUN apt-get install -y \
 ARG NODE_VERSION="v16.14.2"
 RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && nvm install $NODE_VERSION" 2>&1
 
-# [Choice] Ignite CLI version
-ARG IGNITE_CLI_VERSION="v0.22.1"
+# [Choice] Ignite CLI version (align this with go.mod "github.com/ignite-hq/cli" version)
+ARG IGNITE_CLI_VERSION="v0.22.0"
 RUN curl "https://get.ignite.com/cli@$IGNITE_CLI_VERSION!" | bash
 
 # see docs for exposed ports:
