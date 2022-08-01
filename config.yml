@@ -14,3 +14,12 @@ client:
 faucet:
   name: bob
   coins: ["5token", "100000stake"]
+init:
+  # see /root/.duality/config/config.toml
+  config:
+    consensus:
+      # slow down block creation
+      # why? the default 1 block per second is quite fast even for development purposes
+      # it may be cause some CPU stress and can quickly expand a Docker container and the OS Docker.raw file
+      # this used space can be reclaimed by removing the Docker container and recreating it (starting a new chain)
+      timeout_commit: 7s # default 1s
