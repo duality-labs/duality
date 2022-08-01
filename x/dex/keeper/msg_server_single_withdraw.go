@@ -189,24 +189,18 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		}
 	}
 
-	var event = sdk.NewEvent(sdk.EventTypeMessage,
-		sdk.NewAttribute(sdk.AttributeKeyModule, "duality"),
-		sdk.NewAttribute(sdk.AttributeKeyAction, types.WithdrawEventKey),
-		sdk.NewAttribute(types.WithdrawEventCreator, msg.Creator),
-		sdk.NewAttribute(types.WithdrawEventToken0, msg.Token0),
-		sdk.NewAttribute(types.WithdrawEventToken1, msg.Token1),
-		sdk.NewAttribute(types.WithdrawEventPrice, msg.Price),
-		sdk.NewAttribute(types.WithdrawEventFee, msg.Fee),
-		sdk.NewAttribute(types.WithdrawEventOldReserves0, reserve0.String()),
-		sdk.NewAttribute(types.WithdrawEventOldReserves1, reserve1.String()),
-		sdk.NewAttribute(types.WithdrawEventNewReserves0, NewPool.Reserve0.String()),
-		sdk.NewAttribute(types.WithdrawEventNewReserves1, NewPool.Reserve1.String()),
-		sdk.NewAttribute(types.WithdrawEventReceiver, msg.Receiver),
-		sdk.NewAttribute(types.WithdrawEventAmounts0, amount0Withdraw.String()),
-		sdk.NewAttribute(types.WithdrawEventAmounts0, amount1Withdraw.String()),
-	)
 
-	ctx.EventManager().EmitEvent(event)
+	newReserve0 := NewPool.Reserve0
+	newReserve1 := NewPool.Reserve1
+	ctx.EventManager().EmitEvent(types.CreateWithdrawEvent(msg.Creator,
+		token0, token1, price.String(), fee.String(),
+		
+		newReserve0.Add(amount0Withdraw).String(), newReserve1.Add(amount1Withdraw).String(),
+		newReserve0.String(), newReserve1.String(),
+		sdk.NewAttribute(types.WithdrawEventAmounts0, amount0Withdraw.String()),
+		sdk.NewAttribute(types.WithdrawEventAmounts1, amount1Withdraw.String()),
+
+	))
 
 	return &types.MsgSingleWithdrawResponse{amount0Withdraw.String(), amount1Withdraw.String()}, nil
 }

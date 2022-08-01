@@ -279,20 +279,17 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		shareNew,
 	)
 
-	var event = sdk.NewEvent(sdk.EventTypeMessage,
-		sdk.NewAttribute(sdk.AttributeKeyModule, "duality"),
-		sdk.NewAttribute(sdk.AttributeKeyAction, types.DepositEventKey),
-		sdk.NewAttribute(types.DepositEventCreator, msg.Creator),
-		sdk.NewAttribute(types.DepositEventToken0, token0),
-		sdk.NewAttribute(types.DepositEventToken1, token1),
-		sdk.NewAttribute(types.DepositEventPrice, msg.Price),
-		sdk.NewAttribute(types.DepositEventFee, msg.Fee),
-		sdk.NewAttribute(types.DepositEventNewReserves0, NewPool.Reserve0.String()),
-		sdk.NewAttribute(types.DepositEventNewReserves1, NewPool.Reserve1.String()),
-		sdk.NewAttribute(types.DepositEventReceiver, msg.Receiver),
+
+	newReserve0 := NewPool.Reserve0
+	newReserve1 := NewPool.Reserve1
+
+	ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator,
+		token0, token1, price.String(), fee.String(),
+		newReserve0.Sub(trueAmounts0).String(), newReserve1.Sub(trueAmounts1).String(),
+		newReserve0.String(), newReserve1.String(),
 		sdk.NewAttribute(types.DepositEventSharesMinted, SharesMinted.String()),
-	)
-	ctx.EventManager().EmitEvent(event)
+	))
+
 
 	return &types.MsgSingleDepositResponse{SharesMinted.String()}, nil
 }

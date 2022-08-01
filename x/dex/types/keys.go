@@ -46,8 +46,8 @@ const (
 	WithdrawEventNewReserves0 = "NewReserves0"
 	WithdrawEventNewReserves1 = "NewReserves1"
 	WithdrawEventReceiver     = "Receiver"
-	WithdrawEventAmounts0     = "Shares0"
-	WithdrawEventAmounts1     = "Shares1"
+	WithdrawEventAmounts0     = "Amount0"
+	WithdrawEventAmounts1     = "Amount1"
 )
 
 func KeyPrefix(p string) []byte {
