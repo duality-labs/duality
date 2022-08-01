@@ -13,6 +13,11 @@
 	},
 	"runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
 
+	// store chain state in a volume to persist across editor sessions
+	// this also allows the OS to better manage the space taken by these constantly updating files
+	// if handled inside the Docker container, the docker container size will constantly grow
+	"mounts": [ "source=duality-state,target=/root" ],
+
 	// Configure tool-specific properties.
 	"customizations": {
 		// Configure properties specific to VS Code.
