@@ -358,6 +358,9 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		}
 	}
 
+	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, token0, token1, msg.AmountIn, TotalAmountOut.String()))
+
+	
 	_ = ctx
 
 	return &types.MsgSwapResponse{}, nil

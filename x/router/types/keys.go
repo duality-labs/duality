@@ -17,6 +17,18 @@ const (
 	MemStoreKey = "mem_router"
 )
 
+
+// Swap Event Attributes
+const (
+	SwapEventKey       = "NewSwap"
+	SwapEventCreator   = "Creator"
+	SwapEventTokenIn    = "TokenIn"
+	SwapEventTokenOut    = "TokenOut"
+	SwapEventMinOut = "MinOut"
+	SwapEventAmountIn  = "AmountIn"
+	SwapEventAmountOut = "AmountOut"
+)
+
 func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
