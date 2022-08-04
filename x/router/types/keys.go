@@ -25,8 +25,12 @@ const (
 	SwapEventTokenIn    = "TokenIn"
 	SwapEventTokenOut    = "TokenOut"
 	SwapEventMinOut = "MinOut"
+	SwapEventPriceSwap = "PriceOfSwap"
+	SwapEventFeeSwap = "FeeOfSwap"
 	SwapEventAmountIn  = "AmountIn"
 	SwapEventAmountOut = "AmountOut"
+	SwapEventNewPoolReserve0 = "NewReserve0"
+	SwapEventNewPoolReserve1 = "NewReserve1"
 )
 
 func KeyPrefix(p string) []byte {

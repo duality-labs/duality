@@ -74,42 +74,47 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		// Check to make sure the token pair has liquid pools
 		if len(oldTick.PoolsZeroToOne) != 0 {
 
-			// Calculate the amount of Reserve1 available given our virtual price
-			RequiredToDeplete := oldTick.PoolsZeroToOne[0].Reserve1.Add(oldTick.PoolsZeroToOne[0].Reserve1.Mul(oldTick.PoolsZeroToOne[0].Fee.Quo(oldTick.PoolsZeroToOne[0].Price.Mul(sdk.NewDec(10000))))) // RequiredToDeplete = ReserveB + ReserveB * (fee / (Pricec * 10000))
+			
 			
 			// While Loop, that loops until either:
 			// 	1. remainingAmount is zero, the sender has provided all of tokenIn desired 
 			//  2. All pools for that token pair have been emptied
 			for ( !(remainingAmount.Equal(sdk.ZeroDec())) && len(oldTick.PoolsZeroToOne) !=0 ) {
 
+				// Calculate the amount of Reserve1 available given our virtual price
+			RequiredToDeplete := oldTick.PoolsZeroToOne[0].Reserve1.Add(oldTick.PoolsZeroToOne[0].Reserve1.Mul(oldTick.PoolsZeroToOne[0].Fee.Quo(oldTick.PoolsZeroToOne[0].Price.Mul(sdk.NewDec(10000))))) // RequiredToDeplete = ReserveB + ReserveB * (fee / (Pricec * 10000))
+			price := oldTick.PoolsZeroToOne[0].Price
+			fee := oldTick.PoolsZeroToOne[0].Fee
+
 				// All remaining amount of tokenIn can be depleted at this pool
 				if (remainingAmount.LT(RequiredToDeplete)) {
 					
+					
 					// Calculates the amount out at specified pool given, relevant pool price and fee
-					AmountOut := remainingAmount.Sub( remainingAmount.Mul(oldTick.PoolsZeroToOne[0].Fee.Quo(oldTick.PoolsZeroToOne[0].Price.Mul(sdk.NewDec(10000))))  )
+					AmountOut := remainingAmount.Sub( remainingAmount.Mul(fee.Quo(price.Mul(sdk.NewDec(10000))))  )
 					// Calculates new Reserve1 to be Old Reserve1 - AmountOut
 					NewReserve1 := oldTick.PoolsZeroToOne[0].Reserve1.Sub(AmountOut)
 					
 					// Update ZeroToOne Priority queue with changes to Reserve0, Reserve1,
 					k.dexKeeper.Update0to1(&oldTick.PoolsZeroToOne, oldTick.PoolsZeroToOne[0],  
-						oldTick.PoolsZeroToOne[0].Reserve0.Add(remainingAmount), NewReserve1, oldTick.PoolsZeroToOne[0].Fee, oldTick.PoolsZeroToOne[0].TotalShares, oldTick.PoolsZeroToOne[0].Price)
+						oldTick.PoolsZeroToOne[0].Reserve0.Add(remainingAmount), NewReserve1, fee, oldTick.PoolsZeroToOne[0].TotalShares, price)
 					
 					// Determine if the pool exists in alternate direction priority queue
-					oldOneToZeroPool, OneToZeroPoolFound := k.dexKeeper.GetPool(&oldTick.PoolsOneToZero, oldTick.PoolsZeroToOne[0].Fee, oldTick.PoolsZeroToOne[0].Price )
+					oldOneToZeroPool, OneToZeroPoolFound := k.dexKeeper.GetPool(&oldTick.PoolsOneToZero, fee, price )
 
 					// If the pool in alternate direction priority queue exists, we update changes to it as well
 					// Note: As we have already added remainingAmount to reserve0 above, we only need to pass in reserve0 at this stage
 					if OneToZeroPoolFound {
 						k.dexKeeper.Update1to0(&oldTick.PoolsOneToZero, &oldOneToZeroPool,
-							oldTick.PoolsZeroToOne[0].Reserve0, NewReserve1, oldTick.PoolsZeroToOne[0].Fee, oldTick.PoolsZeroToOne[0].TotalShares, oldTick.PoolsZeroToOne[0].Price)
+							oldTick.PoolsZeroToOne[0].Reserve0, NewReserve1, fee, oldTick.PoolsZeroToOne[0].TotalShares, price)
 					
 					// If pool does not exists, create a newPool and push it to the PoolsOneToZero priority queue
 					} else {
 						NewPool := dextypes.Pool{
 							Reserve0: remainingAmount,
 							Reserve1: NewReserve1,
-							Price: oldTick.PoolsZeroToOne[0].Price,
-							Fee: oldTick.PoolsZeroToOne[0].Fee,
+							Price: price,
+							Fee: fee,
 							TotalShares:  oldTick.PoolsZeroToOne[0].TotalShares ,
 							Index: 0,
 						}
@@ -117,6 +122,9 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 						k.dexKeeper.Push1to0(&oldTick.PoolsOneToZero, &NewPool)
 					}
 
+					oldOneToZeroPool, OneToZeroPoolFound = k.dexKeeper.GetPool(&oldTick.PoolsOneToZero, fee, price )
+
+					ctx.EventManager().EmitEvent(types.CreatePoolSwapEvent(token0, token1, remainingAmount.String(), AmountOut.String(), oldOneToZeroPool.Reserve0.String(), oldOneToZeroPool.Reserve1.String(), price.String(), fee.String()))
 					// Initializes new tick object
 					NewTick := dextypes.Ticks {
 						token0,
@@ -135,30 +143,32 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 					TotalAmountOut = TotalAmountOut.Add(AmountOut)
 				
 					remainingAmount = sdk.ZeroDec()
+
+
 					
 				 // If remainingAmount is not less than the amount required to deplete, we calculate the maximal amount we can take from this pool, and then pop the pool from our priority queue
 				 // Note by conditionalizing based of the requiredToDeplete price we are able to remove exactly reserve1 from the pool (the maximal amount), allowing us to then pop it without any loss
 				 } else {
-					
+
 					// Calculates the amount out at specified pool given, relevant pool price and fee
-					AmountOut := oldTick.PoolsZeroToOne[0].Reserve1.Sub( oldTick.PoolsZeroToOne[0].Reserve1.Mul(oldTick.PoolsZeroToOne[0].Fee.Quo(oldTick.PoolsZeroToOne[0].Price.Mul(sdk.NewDec(10000))))  )
+					AmountOut := oldTick.PoolsZeroToOne[0].Reserve1.Sub( oldTick.PoolsZeroToOne[0].Reserve1.Mul(fee.Quo(price.Mul(sdk.NewDec(10000))))  )
 
 					// Returns whether the pool exists, and if so the pool in the alternate direction priority queue
-					oldOneToZeroPool, OneToZeroPoolFound := k.dexKeeper.GetPool(&oldTick.PoolsOneToZero, oldTick.PoolsZeroToOne[0].Fee, oldTick.PoolsZeroToOne[0].Price )
+					oldOneToZeroPool, OneToZeroPoolFound := k.dexKeeper.GetPool(&oldTick.PoolsOneToZero, fee, price )
 
 					// If the pool in the alternate direction exists we update it with our changes: adding reserves1 amount of token0 to reserves0 and setting reserves1 to zero
 					// Note we must pop the pool after OneToZero to avoid null pointer errors
 					if OneToZeroPoolFound {
 						k.dexKeeper.Update1to0(&oldTick.PoolsOneToZero, &oldOneToZeroPool,
-							oldTick.PoolsZeroToOne[0].Reserve0.Add(oldTick.PoolsZeroToOne[0].Reserve1), sdk.ZeroDec(), oldTick.PoolsZeroToOne[0].Fee, oldTick.PoolsZeroToOne[0].TotalShares, oldTick.PoolsZeroToOne[0].Price)
+							oldTick.PoolsZeroToOne[0].Reserve0.Add(oldTick.PoolsZeroToOne[0].Reserve1), sdk.ZeroDec(), fee, oldTick.PoolsZeroToOne[0].TotalShares, price)
 					
 					// If the pool in the alternate direction does not exists, we create a new pool object based off our changes and push it to the priority queue
 					} else {
 						NewPool := dextypes.Pool{
 							Reserve0: oldTick.PoolsZeroToOne[0].Reserve1,
 							Reserve1: sdk.ZeroDec(),
-							Price: oldTick.PoolsZeroToOne[0].Price,
-							Fee: oldTick.PoolsZeroToOne[0].Fee,
+							Price: price,
+							Fee: fee,
 							TotalShares:  oldTick.PoolsZeroToOne[0].TotalShares ,
 							Index: 0,
 						}
@@ -168,6 +178,9 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 					// Pop ZeroToOne pool
 					k.dexKeeper.Pop0to1(&oldTick.PoolsZeroToOne)
+
+					oldOneToZeroPool, OneToZeroPoolFound = k.dexKeeper.GetPool(&oldTick.PoolsOneToZero, fee, price )
+					ctx.EventManager().EmitEvent(types.CreatePoolSwapEvent(token0, token1, RequiredToDeplete.String(), AmountOut.String(), oldOneToZeroPool.Reserve0.String(), oldOneToZeroPool.Reserve1.String(), price.String(), fee.String()))
 
 					//Intializes a NewTick object to set in the memory
 					NewTick := dextypes.Ticks {
@@ -185,7 +198,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 					// Append and Subtract AmountOut from TotalAmountOut and remainingAmount respectively 
 					TotalAmountOut = TotalAmountOut.Add(AmountOut)
-					remainingAmount = remainingAmount.Sub(AmountOut)				
+					remainingAmount = remainingAmount.Sub(RequiredToDeplete)				
 
 				}
 			}
@@ -201,43 +214,48 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 		// Check to make sure the token pair has liquid pools
 		if len(oldTick.PoolsOneToZero) != 0 {
-			// Calculate the amount of Reserve0 available given our virtual price
-			RequiredToDeplete := oldTick.PoolsOneToZero[0].Reserve0.Add(oldTick.PoolsOneToZero[0].Reserve0.Mul(oldTick.PoolsOneToZero[0].Price.Mul(oldTick.PoolsOneToZero[0].Fee).Quo(sdk.NewDec(10000)))) 
+			
 			
 			// While Loop, that loops until either:
 			// 	1. remainingAmount is zero, the sender has provided all of tokenIn desired 
 			//  2. All pools for that token pair have been emptied
 			for (!(remainingAmount.Equal(sdk.ZeroDec())) || len(oldTick.PoolsOneToZero) ==0 ) {
 				
+				// Calculate the amount of Reserve0 available given our virtual price
+			RequiredToDeplete := oldTick.PoolsOneToZero[0].Reserve0.Add(oldTick.PoolsOneToZero[0].Reserve0.Mul(oldTick.PoolsOneToZero[0].Price.Mul(oldTick.PoolsOneToZero[0].Fee).Quo(sdk.NewDec(10000)))) 
+			price := oldTick.PoolsOneToZero[0].Price
+			fee := oldTick.PoolsOneToZero[0].Fee
+
 				// All remaining amount of tokenIn can be depleted at this pool
 				if (remainingAmount.LT(RequiredToDeplete)) {
 					
+					
 					// Calculates the amount out at specified pool given relevant pool price and fee
-					AmountOut := remainingAmount.Sub( remainingAmount.Mul(oldTick.PoolsOneToZero[0].Fee.Mul(oldTick.PoolsOneToZero[0].Price).Quo(sdk.NewDec(10000)))  )
+					AmountOut := remainingAmount.Sub( remainingAmount.Mul(fee.Mul(price).Quo(sdk.NewDec(10000)))  )
 					
 					// Calculates new Reserve0 to be Old Reserve0 - AmountOut
 					NewReserve0 := oldTick.PoolsOneToZero[0].Reserve0.Sub(AmountOut)
 					
 					// Update OneToZero Priority queue with changes to Reserve0, Reserve1,
 					k.dexKeeper.Update1to0(&oldTick.PoolsOneToZero, oldTick.PoolsOneToZero[0],  NewReserve0,
-						oldTick.PoolsOneToZero[0].Reserve1.Add(remainingAmount), oldTick.PoolsOneToZero[0].Fee, oldTick.PoolsOneToZero[0].TotalShares, oldTick.PoolsOneToZero[0].Price)
+						oldTick.PoolsOneToZero[0].Reserve1.Add(remainingAmount), fee, oldTick.PoolsOneToZero[0].TotalShares, price)
 					
 					// Determine if the pool exists in alternate direction priority queue
-					oldZeroToOnePool, ZeroToOnePoolFound := k.dexKeeper.GetPool(&oldTick.PoolsZeroToOne, oldTick.PoolsOneToZero[0].Fee, oldTick.PoolsOneToZero[0].Price )
+					oldZeroToOnePool, ZeroToOnePoolFound := k.dexKeeper.GetPool(&oldTick.PoolsZeroToOne, fee, price )
 
 					// If the pool in alternate direction priority queue exists, we update changes to it as well
 					// Note: As we have already added remainingAmount to reserve1 above, we only need to pass in reserve0 at this stage
 					if ZeroToOnePoolFound {
 						k.dexKeeper.Update0to1(&oldTick.PoolsOneToZero, &oldZeroToOnePool, NewReserve0,
-							oldTick.PoolsOneToZero[0].Reserve1,  oldTick.PoolsOneToZero[0].Fee, oldTick.PoolsOneToZero[0].TotalShares, oldTick.PoolsOneToZero[0].Price)
+							oldTick.PoolsOneToZero[0].Reserve1,  fee, oldTick.PoolsOneToZero[0].TotalShares, price)
 					
 					// If pool does not exists, create a newPool and push it to the PoolsZeroToOne priority queue
 					} else {
 						NewPool := dextypes.Pool{
 							Reserve0: NewReserve0,
 							Reserve1: remainingAmount ,
-							Price: oldTick.PoolsOneToZero[0].Price,
-							Fee: oldTick.PoolsOneToZero[0].Fee,
+							Price: price,
+							Fee: fee,
 							TotalShares:  oldTick.PoolsOneToZero[0].TotalShares ,
 							Index: 0,
 						}
@@ -245,6 +263,9 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 						k.dexKeeper.Push1to0(&oldTick.PoolsZeroToOne, &NewPool)
 					}
 
+					oldZeroToOnePool, ZeroToOnePoolFound = k.dexKeeper.GetPool(&oldTick.PoolsZeroToOne, fee, price )
+					//Note: token1 is the In Token, token 0 is the out token in this case
+					ctx.EventManager().EmitEvent(types.CreatePoolSwapEvent(token1, token0, remainingAmount.String(), AmountOut.String(), oldZeroToOnePool.Reserve0.String(), oldZeroToOnePool.Reserve1.String(), price.String(), fee.String() ))
 					// Initializes new tick object
 					NewTick := dextypes.Ticks {
 						token0,
@@ -269,25 +290,25 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 				} else {
 					
 					// Calculates the amount out at specified pool for the relevant pool price and fee
-					AmountOut := oldTick.PoolsOneToZero[0].Reserve0.Sub( oldTick.PoolsOneToZero[0].Reserve0.Mul(oldTick.PoolsOneToZero[0].Fee.Mul(oldTick.PoolsOneToZero[0].Price).Quo(sdk.NewDec(10000)))  )
+					AmountOut := oldTick.PoolsOneToZero[0].Reserve0.Sub( oldTick.PoolsOneToZero[0].Reserve0.Mul(fee.Mul(price).Quo(sdk.NewDec(10000)))  )
 
 					// Returns whether the pool exists, and if so the pool in the alternate direction priority queue
-					oldZeroToOnePool, ZeroToOnePoolFound := k.dexKeeper.GetPool(&oldTick.PoolsZeroToOne, oldTick.PoolsOneToZero[0].Fee, oldTick.PoolsOneToZero[0].Price )
+					oldZeroToOnePool, ZeroToOnePoolFound := k.dexKeeper.GetPool(&oldTick.PoolsZeroToOne, fee, price )
 
 
 					// If the pool in the alternate direction exists we update it with our changes: adding reserves1 amount of token0 to reserves0 and setting reserves1 to zero
 					// Note we must pop the pool after OneToZero to avoid null pointer errors
 					if ZeroToOnePoolFound {
 						k.dexKeeper.Update1to0(&oldTick.PoolsOneToZero, &oldZeroToOnePool, sdk.ZeroDec(),
-							oldTick.PoolsOneToZero[0].Reserve1.Add(oldTick.PoolsOneToZero[0].Reserve0),  oldTick.PoolsOneToZero[0].Fee, oldTick.PoolsOneToZero[0].TotalShares, oldTick.PoolsOneToZero[0].Price)
+							oldTick.PoolsOneToZero[0].Reserve1.Add(oldTick.PoolsOneToZero[0].Reserve0),  fee, oldTick.PoolsOneToZero[0].TotalShares, price)
 					
 							// If the pool in the alternate direction does not exists, we create a new pool object based off our changes and push it to the priority queue
 					} else {
 						NewPool := dextypes.Pool{
 							Reserve0: sdk.ZeroDec(),
 							Reserve1: oldTick.PoolsOneToZero[0].Reserve0,
-							Price: oldTick.PoolsOneToZero[0].Price,
-							Fee: oldTick.PoolsOneToZero[0].Fee,
+							Price: price,
+							Fee: fee,
 							TotalShares:  oldTick.PoolsOneToZero[0].TotalShares ,
 							Index: 0,
 						}
@@ -298,7 +319,9 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 					// Pop ZeroToOne pool
 					k.dexKeeper.Pop0to1(&oldTick.PoolsOneToZero)
 
-
+					oldZeroToOnePool, ZeroToOnePoolFound = k.dexKeeper.GetPool(&oldTick.PoolsZeroToOne, fee, price )
+					//Note: token1 is the In Token, token 0 is the out token in this case
+					ctx.EventManager().EmitEvent(types.CreatePoolSwapEvent(token1, token0, RequiredToDeplete.String(), AmountOut.String(), oldZeroToOnePool.Reserve0.String(), oldZeroToOnePool.Reserve1.String(),  price.String(), fee.String() ))
 					//Intializes a NewTick object to set in the memory
 					NewTick := dextypes.Ticks {
 						token0,
@@ -315,7 +338,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 					// Appends Amount out to the totalAmount of tokenOut 
 					TotalAmountOut = TotalAmountOut.Add(AmountOut)
-					remainingAmount = remainingAmount.Sub(AmountOut)				
+					remainingAmount = remainingAmount.Sub(RequiredToDeplete)				
 
 
 				}
