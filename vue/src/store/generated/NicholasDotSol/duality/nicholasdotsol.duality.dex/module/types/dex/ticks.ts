@@ -4,6 +4,10 @@ import { Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
+/**
+ * Proto Specification of the tick mapping from key: token0, token1 => to values: poolsZeroToOne, poolsZeroToOne (Pool Arrays).
+ * Pool specifics can be found within ./pool.proto
+ */
 export interface Ticks {
   token0: string;
   token1: string;

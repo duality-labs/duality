@@ -22,6 +22,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// Proto Specification of the tick mapping from key: token0, token1 => to values: poolsZeroToOne, poolsZeroToOne (Pool Arrays).
+// Pool specifics can be found within ./pool.proto
 type Ticks struct {
 	Token0         string  `protobuf:"bytes,1,opt,name=token0,proto3" json:"token0,omitempty"`
 	Token1         string  `protobuf:"bytes,2,opt,name=token1,proto3" json:"token1,omitempty"`

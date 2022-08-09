@@ -17356,6 +17356,9 @@ paths:
                         }
       parameters:
         - name: body
+          description: |-
+            SimulateRequest is the request type for the Service.Simulate
+            RPC method.
           in: body
           required: true
           schema:
@@ -18155,6 +18158,11 @@ paths:
                         }
       parameters:
         - name: body
+          description: >-
+            BroadcastTxRequest is the request type for the
+            Service.BroadcastTxRequest
+
+            RPC method.
           in: body
           required: true
           schema:
@@ -29956,16 +29964,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/share/{owner}/{token0}/{token1}/{price}/{fee}':
@@ -30089,6 +30087,12 @@ paths:
                           index:
                             type: integer
                             format: int32
+                  title: >-
+                    Proto Specification of the tick mapping from key: token0,
+                    token1 => to values: poolsZeroToOne, poolsZeroToOne (Pool
+                    Arrays). 
+
+                    Pool specifics can be found within ./pool.proto
               pagination:
                 type: object
                 properties:
@@ -30181,16 +30185,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/ticks/{token0}/{token1}':
@@ -30246,6 +30240,12 @@ paths:
                         index:
                           type: integer
                           format: int32
+                title: >-
+                  Proto Specification of the tick mapping from key: token0,
+                  token1 => to values: poolsZeroToOne, poolsZeroToOne (Pool
+                  Arrays). 
+
+                  Pool specifics can be found within ./pool.proto
         default:
           description: An unexpected error response.
           schema:
@@ -52142,6 +52142,11 @@ definitions:
                   index:
                     type: integer
                     format: int32
+          title: >-
+            Proto Specification of the tick mapping from key: token0, token1 =>
+            to values: poolsZeroToOne, poolsZeroToOne (Pool Arrays). 
+
+            Pool specifics can be found within ./pool.proto
       pagination:
         type: object
         properties:
@@ -52231,6 +52236,11 @@ definitions:
                 index:
                   type: integer
                   format: int32
+        title: >-
+          Proto Specification of the tick mapping from key: token0, token1 => to
+          values: poolsZeroToOne, poolsZeroToOne (Pool Arrays). 
+
+          Pool specifics can be found within ./pool.proto
   nicholasdotsol.duality.dex.QueryParamsResponse:
     type: object
     properties:
@@ -52296,6 +52306,11 @@ definitions:
             index:
               type: integer
               format: int32
+    title: >-
+      Proto Specification of the tick mapping from key: token0, token1 => to
+      values: poolsZeroToOne, poolsZeroToOne (Pool Arrays). 
+
+      Pool specifics can be found within ./pool.proto
   nicholasdotsol.duality.router.MsgSwapResponse:
     type: object
   nicholasdotsol.duality.router.Params:

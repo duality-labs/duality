@@ -3,6 +3,14 @@ import { Reader, Writer } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.router";
 
+/**
+ * / Note: MsgSwap is the message for swap one asset for another through all available pools
+ * / Creator: Message sender address
+ * / TokenIn: address of the token being added to the pool
+ * / TokenOut: address of the token being subtracted from the pool
+ * / AmountIn: Amount of tokenIn to be added to the pool
+ * / minOut: minimum amount of tokenOut required for the swap to succeed
+ */
 export interface MsgSwap {
   creator: string;
   tokenIn: string;
