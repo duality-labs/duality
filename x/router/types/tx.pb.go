@@ -28,12 +28,12 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// / Note: MsgSwap is the message for swap one asset for another through all available pools
-// / Creator: Message sender address
-// / TokenIn: address of the token being added to the pool
-// / TokenOut: address of the token being subtracted from the pool
-// / AmountIn: Amount of tokenIn to be added to the pool
-// / minOut: minimum amount of tokenOut required for the swap to succeed
+/// Note: MsgSwap is the message for swap one asset for another through all available pools
+/// Creator: Message sender address
+/// TokenIn: address of the token being added to the pool
+/// TokenOut: address of the token being subtracted from the pool
+/// AmountIn: Amount of tokenIn to be added to the pool
+/// minOut: minimum amount of tokenOut required for the swap to succeed
 type MsgSwap struct {
 	Creator  string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	TokenIn  string `protobuf:"bytes,2,opt,name=tokenIn,proto3" json:"tokenIn,omitempty"`
