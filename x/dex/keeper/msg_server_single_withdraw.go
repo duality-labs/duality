@@ -20,8 +20,16 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
+	// Converts msg.Price (string) to sdk.Dec
+	price, err := sdk.NewDecFromStr(msg.Price)
+
+	// Error handling for sdk.Dec
+	if err != nil {
+		return nil, err
+	}
+
 	// Sorts token0, token1 for uniformity for use in internal mappings
-	token0, token1, error := k.SortTokens(ctx, msg.Token0, msg.Token1)
+	token0, token1, price, error := k.SortTokens(ctx, msg.Token0, msg.Token1, price)
 
 	// Error handling for sort
 	if error != nil {
@@ -38,14 +46,6 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 	// Error handling if no pair exists
 	if !tickFound {
 		return nil, sdkerrors.Wrapf(types.ErrValidTickNotFound, "Valid tick not found")
-	}
-
-	// Converts msg.Price (string) to sdk.Dec
-	price, err := sdk.NewDecFromStr(msg.Price)
-
-	// Error handling for sdk.Dec
-	if err != nil {
-		return nil, err
 	}
 
 	// Converts msg.Fee (string) to sdk.Dec
@@ -112,7 +112,6 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		return nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, " Not enough shares are owned by:  %s", msg.Receiver)
 	}
 
-
 	// Calculates amount0, amount1 to withdraw
 	amount0Withdraw := (sharesRemoving.Mul(reserve0)).Quo(totalShares)
 	amount1Withdraw := (sharesRemoving.Mul(reserve1)).Quo(totalShares)
@@ -127,20 +126,20 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		Index:       0,
 	}
 
-	// If the Pool previously existed and now no longer has any tokens of Reserve1, remove the pool from the priority queue 
+	// If the Pool previously existed and now no longer has any tokens of Reserve1, remove the pool from the priority queue
 	if NewPool.Reserve1.Equal(sdk.ZeroDec()) && ZeroToOneFound {
 		k.Remove0to1(&tickOld.PoolsZeroToOne, ZeroToOneOld.Index)
 
-	// If the Pool previously existed and still has some number of tokens of reserve0, update the pool in the priority queue
-	} else if !(NewPool.Reserve0.Equal(sdk.ZeroDec() )) && ZeroToOneFound {
+		// If the Pool previously existed and still has some number of tokens of reserve0, update the pool in the priority queue
+	} else if !(NewPool.Reserve0.Equal(sdk.ZeroDec())) && ZeroToOneFound {
 		k.Update0to1(&tickOld.PoolsZeroToOne, &ZeroToOneOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 	}
 
-	// If the Pool previously existed and now no longer has any tokens of Reserve0, remove the pool from the priority queue 
+	// If the Pool previously existed and now no longer has any tokens of Reserve0, remove the pool from the priority queue
 	if NewPool.Reserve0.Equal(sdk.ZeroDec()) && OneToZeroFound {
 		k.Remove1to0(&tickOld.PoolsOneToZero, OneToZeroOld.Index)
 
-	// If the Pool previously existed and still has some number of tokens of reserve0, update the pool in the priority queue
+		// If the Pool previously existed and still has some number of tokens of reserve0, update the pool in the priority queue
 	} else if !(NewPool.Reserve1.Equal(sdk.ZeroDec())) && OneToZeroFound {
 		k.Update1to0(&tickOld.PoolsOneToZero, &OneToZeroOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 	}
@@ -189,17 +188,15 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, msg *types.MsgSingleWit
 		}
 	}
 
-
 	newReserve0 := NewPool.Reserve0
 	newReserve1 := NewPool.Reserve1
 	ctx.EventManager().EmitEvent(types.CreateWithdrawEvent(msg.Creator,
 		token0, token1, price.String(), fee.String(),
-		
+
 		newReserve0.Add(amount0Withdraw).String(), newReserve1.Add(amount1Withdraw).String(),
 		newReserve0.String(), newReserve1.String(),
 		sdk.NewAttribute(types.WithdrawEventAmounts0, amount0Withdraw.String()),
 		sdk.NewAttribute(types.WithdrawEventAmounts1, amount1Withdraw.String()),
-
 	))
 
 	return &types.MsgSingleWithdrawResponse{amount0Withdraw.String(), amount1Withdraw.String()}, nil

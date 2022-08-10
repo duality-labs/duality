@@ -14,7 +14,6 @@ import (
 func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDeposit) (*types.MsgSingleDepositResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	
 	// Converts input address (string) to sdk.AccAddress
 	callerAddr, err := sdk.AccAddressFromBech32(msg.Creator)
 	// Error checking for the calling address
@@ -29,12 +28,11 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
-	/* Note: while we want to intially check the validity of the sdk.AccAddress receiver address, 
+	/* Note: while we want to intially check the validity of the sdk.AccAddress receiver address,
 	the string version: msg.Receiver is used in our send call
 	*/
 	_ = receiverAddr
 
-	
 	//Coverts msg.Amounts0 (string) to sdk.Dec
 	// Note: msg.Amounts0 should be specified as a decimal as input (ie "1.45")
 	amount0, err := sdk.NewDecFromStr(msg.Amounts0)
@@ -50,12 +48,20 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
+	// Converts msg.Price (string) to a sdk.Dec
+	price, err := sdk.NewDecFromStr(msg.Price)
+
+	// Error handling for valid sdk.Dec
+	if err != nil {
+		return nil, err
+	}
+
 	/* GetBalance is an external (x/bank) module function called to check the token balanced for a specified address
-	  GetBalance returns a sdk.Coin: (string denom sdk.Int amount)
+	GetBalance returns a sdk.Coin: (string denom sdk.Int amount)
 
-	  Note: sdk.Int is not the same as native Int but is a override of big/int
+	Note: sdk.Int is not the same as native Int but is a override of big/int
 
-	  AccountsToken0Balance is the sdk.Dec representation of the return sdk.Coin's amount of token 0.
+	AccountsToken0Balance is the sdk.Dec representation of the return sdk.Coin's amount of token 0.
 	*/
 
 	AccountsToken0Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, msg.Token0).Amount)
@@ -72,9 +78,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	}
 
 	// Sorts token0, token1 for uniformity for use in internal mappings, if sorting is needed amounts0, amounts1 are switched as well.
-	token0, token1, amounts0, amounts1, error := k.SortTokensDeposit(ctx, msg.Token0, msg.Token1, []sdk.Dec{amount0}, []sdk.Dec{amount1})
-
-
+	token0, token1, amounts0, amounts1, price, error := k.SortTokensDeposit(ctx, msg.Token0, msg.Token1, []sdk.Dec{amount0}, []sdk.Dec{amount1}, price)
 
 	// Error handling for SortTokensDeposit
 	if error != nil {
@@ -84,8 +88,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	// In the case of a single deposit we have amounts0, amounts1 will be arrays of length 1.
 	amount0 = amounts0[0]
 	amount1 = amounts1[0]
-	
-	
+
 	// Determines if previous shares exists for a address at a specified token pair, price, fee.
 	shareOld, shareFound := k.GetShare(
 		ctx,
@@ -116,14 +119,6 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		token1,
 	)
 
-	// Converts msg.Price (string) to a sdk.Dec
-	price, err := sdk.NewDecFromStr(msg.Price)
-
-	// Error handling for valid sdk.Dec
-	if err != nil {
-		return nil, err
-	}
-
 	// Converts msg.Fee (string) to a sdk.Dec
 	fee, err := sdk.NewDecFromStr(msg.Fee)
 
@@ -142,7 +137,6 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	var trueAmounts0 = amount0
 	var trueAmounts1 = amount1
 
-	
 	if tickFound {
 
 		// Check to see which pool's previously exist
@@ -164,16 +158,15 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 				return nil, err
 			}
 
-			
 			// Neither pool has been found but  the tick has been previously initialized, caluclate sharesAmounts, and trueAmounts as if it
 			// is newly being initialized.
 		} else if !OneToZeroFound && !ZeroToOneFound {
 
 			SharesMinted = amount0.Add(amount1.Mul(price))
-		
+
 		}
-	
-		// No token pair was found, specified pool is initialized. 
+
+		// No token pair was found, specified pool is initialized.
 	} else {
 		SharesMinted = amount0.Add(amount1.Mul(price))
 	}
@@ -202,7 +195,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 			Index:       0,
 		}
 
-	// If no pool is found, we initialize a New Pool based off of our calculations above
+		// If no pool is found, we initialize a New Pool based off of our calculations above
 	} else {
 		NewPool = types.Pool{
 			Reserve0:    trueAmounts0,
@@ -234,18 +227,18 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 	if ZeroToOneFound {
 		k.Update0to1(&tickOld.PoolsZeroToOne, &ZeroToOneOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 
-	// Pushes a NewPool to the priority queue given that reserves1 is now greater than 0, and that this pool did not previously exists in the priority queue
+		// Pushes a NewPool to the priority queue given that reserves1 is now greater than 0, and that this pool did not previously exists in the priority queue
 	} else if NewPool.Reserve1.GT(sdk.ZeroDec()) && !ZeroToOneFound {
-		
+
 		k.Push0to1(&tickOld.PoolsZeroToOne, &NewPool)
 	}
 
 	// If the OneToZero pool exists we update the priority queue based off of updates of NewPool to the previous state
 	if OneToZeroFound {
-		
+
 		k.Update1to0(&tickOld.PoolsOneToZero, &OneToZeroOld, NewPool.Reserve0, NewPool.Reserve1, NewPool.Fee, NewPool.TotalShares, NewPool.Price)
 
-	// Pushes a NewPool to the priority queue given that reserves0 is now greater than 0, and that this pool did not previously exists in the priority queue
+		// Pushes a NewPool to the priority queue given that reserves0 is now greater than 0, and that this pool did not previously exists in the priority queue
 	} else if NewPool.Reserve0.GT(sdk.ZeroDec()) && !OneToZeroFound {
 		k.Push1to0(&tickOld.PoolsOneToZero, &NewPool)
 	}
@@ -279,7 +272,6 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		shareNew,
 	)
 
-
 	newReserve0 := NewPool.Reserve0
 	newReserve1 := NewPool.Reserve1
 
@@ -289,7 +281,6 @@ func (k msgServer) SingleDeposit(goCtx context.Context, msg *types.MsgSingleDepo
 		newReserve0.String(), newReserve1.String(),
 		sdk.NewAttribute(types.DepositEventSharesMinted, SharesMinted.String()),
 	))
-
 
 	return &types.MsgSingleDepositResponse{SharesMinted.String()}, nil
 }
