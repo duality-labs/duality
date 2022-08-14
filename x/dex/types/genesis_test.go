@@ -54,6 +54,27 @@ func TestGenesisState_Validate(t *testing.T) {
 						OrderType: "1",
 					},
 				},
+				VirtualPriceTickListList: []types.VirtualPriceTickList{
+					{
+						VPrice:    "0",
+						Direction: "0",
+						OrderType: "0",
+					},
+					{
+						VPrice:    "1",
+						Direction: "1",
+						OrderType: "1",
+					},
+				},
+				BitArrList: []types.BitArr{
+					{
+						Id: 0,
+					},
+					{
+						Id: 1,
+					},
+				},
+				BitArrCount: 2,
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -127,6 +148,50 @@ func TestGenesisState_Validate(t *testing.T) {
 						OrderType: "0",
 					},
 				},
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated virtualPriceTickList",
+			genState: &types.GenesisState{
+				VirtualPriceTickListList: []types.VirtualPriceTickList{
+					{
+						VPrice:    "0",
+						Direction: "0",
+						OrderType: "0",
+					},
+					{
+						VPrice:    "0",
+						Direction: "0",
+						OrderType: "0",
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated bitArr",
+			genState: &types.GenesisState{
+				BitArrList: []types.BitArr{
+					{
+						Id: 0,
+					},
+					{
+						Id: 0,
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "invalid bitArr count",
+			genState: &types.GenesisState{
+				BitArrList: []types.BitArr{
+					{
+						Id: 1,
+					},
+				},
+				BitArrCount: 0,
 			},
 			valid: false,
 		},

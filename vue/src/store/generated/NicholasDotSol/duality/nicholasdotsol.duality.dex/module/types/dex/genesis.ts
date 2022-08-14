@@ -5,6 +5,8 @@ import { Params } from "../dex/params";
 import { Nodes } from "../dex/nodes";
 import { VirtualPriceTickQueue } from "../dex/virtual_price_tick_queue";
 import { Ticks } from "../dex/ticks";
+import { VirtualPriceTickList } from "../dex/virtual_price_tick_list";
+import { BitArr } from "../dex/bit_arr";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -15,13 +17,17 @@ export interface GenesisState {
   nodesCount: number;
   virtualPriceTickQueueList: VirtualPriceTickQueue[];
   virtualPriceTickQueueCount: number;
-  /** this line is used by starport scaffolding # genesis/proto/state */
   ticksList: Ticks[];
+  virtualPriceTickListList: VirtualPriceTickList[];
+  bitArrList: BitArr[];
+  /** this line is used by starport scaffolding # genesis/proto/state */
+  bitArrCount: number;
 }
 
 const baseGenesisState: object = {
   nodesCount: 0,
   virtualPriceTickQueueCount: 0,
+  bitArrCount: 0,
 };
 
 export const GenesisState = {
@@ -44,6 +50,15 @@ export const GenesisState = {
     for (const v of message.ticksList) {
       Ticks.encode(v!, writer.uint32(50).fork()).ldelim();
     }
+    for (const v of message.virtualPriceTickListList) {
+      VirtualPriceTickList.encode(v!, writer.uint32(58).fork()).ldelim();
+    }
+    for (const v of message.bitArrList) {
+      BitArr.encode(v!, writer.uint32(66).fork()).ldelim();
+    }
+    if (message.bitArrCount !== 0) {
+      writer.uint32(72).uint64(message.bitArrCount);
+    }
     return writer;
   },
 
@@ -54,6 +69,8 @@ export const GenesisState = {
     message.nodesList = [];
     message.virtualPriceTickQueueList = [];
     message.ticksList = [];
+    message.virtualPriceTickListList = [];
+    message.bitArrList = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -79,6 +96,17 @@ export const GenesisState = {
         case 6:
           message.ticksList.push(Ticks.decode(reader, reader.uint32()));
           break;
+        case 7:
+          message.virtualPriceTickListList.push(
+            VirtualPriceTickList.decode(reader, reader.uint32())
+          );
+          break;
+        case 8:
+          message.bitArrList.push(BitArr.decode(reader, reader.uint32()));
+          break;
+        case 9:
+          message.bitArrCount = longToNumber(reader.uint64() as Long);
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -92,6 +120,8 @@ export const GenesisState = {
     message.nodesList = [];
     message.virtualPriceTickQueueList = [];
     message.ticksList = [];
+    message.virtualPriceTickListList = [];
+    message.bitArrList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromJSON(object.params);
     } else {
@@ -132,6 +162,24 @@ export const GenesisState = {
         message.ticksList.push(Ticks.fromJSON(e));
       }
     }
+    if (
+      object.virtualPriceTickListList !== undefined &&
+      object.virtualPriceTickListList !== null
+    ) {
+      for (const e of object.virtualPriceTickListList) {
+        message.virtualPriceTickListList.push(VirtualPriceTickList.fromJSON(e));
+      }
+    }
+    if (object.bitArrList !== undefined && object.bitArrList !== null) {
+      for (const e of object.bitArrList) {
+        message.bitArrList.push(BitArr.fromJSON(e));
+      }
+    }
+    if (object.bitArrCount !== undefined && object.bitArrCount !== null) {
+      message.bitArrCount = Number(object.bitArrCount);
+    } else {
+      message.bitArrCount = 0;
+    }
     return message;
   },
 
@@ -163,6 +211,22 @@ export const GenesisState = {
     } else {
       obj.ticksList = [];
     }
+    if (message.virtualPriceTickListList) {
+      obj.virtualPriceTickListList = message.virtualPriceTickListList.map((e) =>
+        e ? VirtualPriceTickList.toJSON(e) : undefined
+      );
+    } else {
+      obj.virtualPriceTickListList = [];
+    }
+    if (message.bitArrList) {
+      obj.bitArrList = message.bitArrList.map((e) =>
+        e ? BitArr.toJSON(e) : undefined
+      );
+    } else {
+      obj.bitArrList = [];
+    }
+    message.bitArrCount !== undefined &&
+      (obj.bitArrCount = message.bitArrCount);
     return obj;
   },
 
@@ -171,6 +235,8 @@ export const GenesisState = {
     message.nodesList = [];
     message.virtualPriceTickQueueList = [];
     message.ticksList = [];
+    message.virtualPriceTickListList = [];
+    message.bitArrList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromPartial(object.params);
     } else {
@@ -208,6 +274,26 @@ export const GenesisState = {
       for (const e of object.ticksList) {
         message.ticksList.push(Ticks.fromPartial(e));
       }
+    }
+    if (
+      object.virtualPriceTickListList !== undefined &&
+      object.virtualPriceTickListList !== null
+    ) {
+      for (const e of object.virtualPriceTickListList) {
+        message.virtualPriceTickListList.push(
+          VirtualPriceTickList.fromPartial(e)
+        );
+      }
+    }
+    if (object.bitArrList !== undefined && object.bitArrList !== null) {
+      for (const e of object.bitArrList) {
+        message.bitArrList.push(BitArr.fromPartial(e));
+      }
+    }
+    if (object.bitArrCount !== undefined && object.bitArrCount !== null) {
+      message.bitArrCount = object.bitArrCount;
+    } else {
+      message.bitArrCount = 0;
     }
     return message;
   },

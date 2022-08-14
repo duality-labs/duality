@@ -9,6 +9,12 @@
  * ---------------------------------------------------------------
  */
 
+export interface DexBitArr {
+  /** @format uint64 */
+  id?: string;
+  bit?: string;
+}
+
 export interface DexNode {
   token?: string;
   outgoingEdges?: string[];
@@ -20,10 +26,31 @@ export interface DexNodes {
   node?: DexNode;
 }
 
+export interface DexOrderParams {
+  orderRule?: string;
+  orderType?: string;
+  orderShares?: string;
+}
+
 /**
  * Params defines the parameters for the module.
  */
 export type DexParams = object;
+
+export interface DexQueryAllBitArrResponse {
+  BitArr?: DexBitArr[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
 
 export interface DexQueryAllNodesResponse {
   Nodes?: DexNodes[];
@@ -55,6 +82,21 @@ export interface DexQueryAllTicksResponse {
   pagination?: V1Beta1PageResponse;
 }
 
+export interface DexQueryAllVirtualPriceTickListResponse {
+  virtualPriceTickList?: DexVirtualPriceTickList[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
 export interface DexQueryAllVirtualPriceTickQueueResponse {
   VirtualPriceTickQueue?: DexVirtualPriceTickQueue[];
 
@@ -70,12 +112,20 @@ export interface DexQueryAllVirtualPriceTickQueueResponse {
   pagination?: V1Beta1PageResponse;
 }
 
+export interface DexQueryGetBitArrResponse {
+  BitArr?: DexBitArr;
+}
+
 export interface DexQueryGetNodesResponse {
   Nodes?: DexNodes;
 }
 
 export interface DexQueryGetTicksResponse {
   ticks?: DexTicks;
+}
+
+export interface DexQueryGetVirtualPriceTickListResponse {
+  virtualPriceTickList?: DexVirtualPriceTickList;
 }
 
 export interface DexQueryGetVirtualPriceTickQueueResponse {
@@ -100,7 +150,14 @@ export interface DexTicks {
   pairPrice?: string;
   pairFee?: string;
   totalShares?: string;
-  orderparams?: string;
+  orderparams?: DexOrderParams[];
+}
+
+export interface DexVirtualPriceTickList {
+  vPrice?: string;
+  direction?: string;
+  orderType?: string;
+  virtualTicks?: string;
 }
 
 export interface DexVirtualPriceTickQueue {
@@ -159,13 +216,6 @@ export interface V1Beta1PageRequest {
    * is set.
    */
   count_total?: boolean;
-
-  /**
-   * reverse is set to true if results are to be returned in the descending order.
-   *
-   * Since: cosmos-sdk 0.43
-   */
-  reverse?: boolean;
 }
 
 /**
@@ -377,10 +427,51 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title dex/genesis.proto
+ * @title dex/bit_arr.proto
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryBitArrAll
+   * @summary Queries a list of BitArr items.
+   * @request GET:/NicholasDotSol/duality/dex/bit_arr
+   */
+  queryBitArrAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<DexQueryAllBitArrResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/bit_arr`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryBitArr
+   * @summary Queries a BitArr by id.
+   * @request GET:/NicholasDotSol/duality/dex/bit_arr/{id}
+   */
+  queryBitArr = (id: string, params: RequestParams = {}) =>
+    this.request<DexQueryGetBitArrResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/bit_arr/${id}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
   /**
    * No description
    *
@@ -395,7 +486,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -453,7 +543,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -485,6 +574,47 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
+   * @name QueryVirtualPriceTickListAll
+   * @summary Queries a list of VirtualPriceTickList items.
+   * @request GET:/NicholasDotSol/duality/dex/virtual_price_tick_list
+   */
+  queryVirtualPriceTickListAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<DexQueryAllVirtualPriceTickListResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/virtual_price_tick_list`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryVirtualPriceTickList
+   * @summary Queries a VirtualPriceTickList by index.
+   * @request GET:/NicholasDotSol/duality/dex/virtual_price_tick_list/{vPrice}/{direction}/{orderType}
+   */
+  queryVirtualPriceTickList = (vPrice: string, direction: string, orderType: string, params: RequestParams = {}) =>
+    this.request<DexQueryGetVirtualPriceTickListResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/virtual_price_tick_list/${vPrice}/${direction}/${orderType}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
    * @name QueryVirtualPriceTickQueueAll
    * @summary Queries a list of VirtualPriceTickQueue items.
    * @request GET:/NicholasDotSol/duality/dex/virtual_price_tick_queue
@@ -495,7 +625,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>

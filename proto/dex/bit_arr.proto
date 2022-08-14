@@ -1,0 +1,10 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+
+message BitArr {
+  uint64 id = 1;
+  bytes bit = 2; 
+  
+}

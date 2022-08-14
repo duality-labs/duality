@@ -8,6 +8,8 @@ import "dex/params.proto";
 import "dex/nodes.proto";
 import "dex/virtual_price_tick_queue.proto";
 import "dex/ticks.proto";
+import "dex/virtual_price_tick_list.proto";
+import "dex/bit_arr.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -46,6 +48,26 @@ service Query {
 	// Queries a list of Ticks items.
 	rpc TicksAll(QueryAllTicksRequest) returns (QueryAllTicksResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/ticks";
+	}
+
+// Queries a VirtualPriceTickList by index.
+	rpc VirtualPriceTickList(QueryGetVirtualPriceTickListRequest) returns (QueryGetVirtualPriceTickListResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/virtual_price_tick_list/{vPrice}/{direction}/{orderType}";
+	}
+
+	// Queries a list of VirtualPriceTickList items.
+	rpc VirtualPriceTickListAll(QueryAllVirtualPriceTickListRequest) returns (QueryAllVirtualPriceTickListResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/virtual_price_tick_list";
+	}
+
+// Queries a BitArr by id.
+	rpc BitArr(QueryGetBitArrRequest) returns (QueryGetBitArrResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/bit_arr/{id}";
+	}
+
+	// Queries a list of BitArr items.
+	rpc BitArrAll(QueryAllBitArrRequest) returns (QueryAllBitArrResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/bit_arr";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -112,6 +134,43 @@ message QueryAllTicksRequest {
 
 message QueryAllTicksResponse {
 	repeated Ticks ticks = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetVirtualPriceTickListRequest {
+	  string vPrice = 1;
+  string direction = 2;
+  string orderType = 3;
+
+}
+
+message QueryGetVirtualPriceTickListResponse {
+	VirtualPriceTickList virtualPriceTickList = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllVirtualPriceTickListRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllVirtualPriceTickListResponse {
+	repeated VirtualPriceTickList virtualPriceTickList = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetBitArrRequest {
+	uint64 id = 1;
+}
+
+message QueryGetBitArrResponse {
+	BitArr BitArr = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllBitArrRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllBitArrResponse {
+	repeated BitArr BitArr = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

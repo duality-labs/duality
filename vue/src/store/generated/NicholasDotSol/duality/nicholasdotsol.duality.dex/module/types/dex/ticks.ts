@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { OrderParams } from "../dex/order_params";
 import { Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
@@ -13,7 +14,7 @@ export interface Ticks {
   pairPrice: string;
   pairFee: string;
   totalShares: string;
-  orderparams: string;
+  orderparams: OrderParams[];
 }
 
 const baseTicks: object = {
@@ -26,7 +27,6 @@ const baseTicks: object = {
   pairPrice: "",
   pairFee: "",
   totalShares: "",
-  orderparams: "",
 };
 
 export const Ticks = {
@@ -58,8 +58,8 @@ export const Ticks = {
     if (message.totalShares !== "") {
       writer.uint32(74).string(message.totalShares);
     }
-    if (message.orderparams !== "") {
-      writer.uint32(82).string(message.orderparams);
+    for (const v of message.orderparams) {
+      OrderParams.encode(v!, writer.uint32(82).fork()).ldelim();
     }
     return writer;
   },
@@ -68,6 +68,7 @@ export const Ticks = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseTicks } as Ticks;
+    message.orderparams = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -99,7 +100,7 @@ export const Ticks = {
           message.totalShares = reader.string();
           break;
         case 10:
-          message.orderparams = reader.string();
+          message.orderparams.push(OrderParams.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -111,6 +112,7 @@ export const Ticks = {
 
   fromJSON(object: any): Ticks {
     const message = { ...baseTicks } as Ticks;
+    message.orderparams = [];
     if (object.price !== undefined && object.price !== null) {
       message.price = String(object.price);
     } else {
@@ -157,9 +159,9 @@ export const Ticks = {
       message.totalShares = "";
     }
     if (object.orderparams !== undefined && object.orderparams !== null) {
-      message.orderparams = String(object.orderparams);
-    } else {
-      message.orderparams = "";
+      for (const e of object.orderparams) {
+        message.orderparams.push(OrderParams.fromJSON(e));
+      }
     }
     return message;
   },
@@ -176,13 +178,19 @@ export const Ticks = {
     message.pairFee !== undefined && (obj.pairFee = message.pairFee);
     message.totalShares !== undefined &&
       (obj.totalShares = message.totalShares);
-    message.orderparams !== undefined &&
-      (obj.orderparams = message.orderparams);
+    if (message.orderparams) {
+      obj.orderparams = message.orderparams.map((e) =>
+        e ? OrderParams.toJSON(e) : undefined
+      );
+    } else {
+      obj.orderparams = [];
+    }
     return obj;
   },
 
   fromPartial(object: DeepPartial<Ticks>): Ticks {
     const message = { ...baseTicks } as Ticks;
+    message.orderparams = [];
     if (object.price !== undefined && object.price !== null) {
       message.price = object.price;
     } else {
@@ -229,9 +237,9 @@ export const Ticks = {
       message.totalShares = "";
     }
     if (object.orderparams !== undefined && object.orderparams !== null) {
-      message.orderparams = object.orderparams;
-    } else {
-      message.orderparams = "";
+      for (const e of object.orderparams) {
+        message.orderparams.push(OrderParams.fromPartial(e));
+      }
     }
     return message;
   },

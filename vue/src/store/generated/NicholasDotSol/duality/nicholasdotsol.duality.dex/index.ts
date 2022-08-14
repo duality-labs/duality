@@ -1,14 +1,16 @@
 import { txClient, queryClient, MissingWalletError , registry} from './module'
 
+import { BitArr } from "./module/types/dex/bit_arr"
 import { Node } from "./module/types/dex/node"
 import { Nodes } from "./module/types/dex/nodes"
 import { OrderParams } from "./module/types/dex/order_params"
 import { Params } from "./module/types/dex/params"
 import { Ticks } from "./module/types/dex/ticks"
+import { VirtualPriceTickList } from "./module/types/dex/virtual_price_tick_list"
 import { VirtualPriceTickQueue } from "./module/types/dex/virtual_price_tick_queue"
 
 
-export { Node, Nodes, OrderParams, Params, Ticks, VirtualPriceTickQueue };
+export { BitArr, Node, Nodes, OrderParams, Params, Ticks, VirtualPriceTickList, VirtualPriceTickQueue };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -53,13 +55,19 @@ const getDefaultState = () => {
 				VirtualPriceTickQueueAll: {},
 				Ticks: {},
 				TicksAll: {},
+				VirtualPriceTickList: {},
+				VirtualPriceTickListAll: {},
+				BitArr: {},
+				BitArrAll: {},
 				
 				_Structure: {
+						BitArr: getStructure(BitArr.fromPartial({})),
 						Node: getStructure(Node.fromPartial({})),
 						Nodes: getStructure(Nodes.fromPartial({})),
 						OrderParams: getStructure(OrderParams.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						Ticks: getStructure(Ticks.fromPartial({})),
+						VirtualPriceTickList: getStructure(VirtualPriceTickList.fromPartial({})),
 						VirtualPriceTickQueue: getStructure(VirtualPriceTickQueue.fromPartial({})),
 						
 		},
@@ -130,6 +138,30 @@ export default {
 						(<any> params).query=null
 					}
 			return state.TicksAll[JSON.stringify(params)] ?? {}
+		},
+				getVirtualPriceTickList: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.VirtualPriceTickList[JSON.stringify(params)] ?? {}
+		},
+				getVirtualPriceTickListAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.VirtualPriceTickListAll[JSON.stringify(params)] ?? {}
+		},
+				getBitArr: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.BitArr[JSON.stringify(params)] ?? {}
+		},
+				getBitArrAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.BitArrAll[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -326,6 +358,102 @@ export default {
 				return getters['getTicksAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:QueryTicksAll API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryVirtualPriceTickList({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryVirtualPriceTickList( key.vPrice,  key.direction,  key.orderType)).data
+				
+					
+				commit('QUERY', { query: 'VirtualPriceTickList', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryVirtualPriceTickList', payload: { options: { all }, params: {...key},query }})
+				return getters['getVirtualPriceTickList']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryVirtualPriceTickList API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryVirtualPriceTickListAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryVirtualPriceTickListAll(query)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await queryClient.queryVirtualPriceTickListAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'VirtualPriceTickListAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryVirtualPriceTickListAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getVirtualPriceTickListAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryVirtualPriceTickListAll API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryBitArr({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryBitArr( key.id)).data
+				
+					
+				commit('QUERY', { query: 'BitArr', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryBitArr', payload: { options: { all }, params: {...key},query }})
+				return getters['getBitArr']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryBitArr API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryBitArrAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryBitArrAll(query)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await queryClient.queryBitArrAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'BitArrAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryBitArrAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getBitArrAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryBitArrAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

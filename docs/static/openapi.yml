@@ -29809,6 +29809,164 @@ paths:
           format: uint64
       tags:
         - Query
+  /NicholasDotSol/duality/dex/bit_arr:
+    get:
+      summary: Queries a list of BitArr items.
+      operationId: NicholasdotsolDualityDexBitArrAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              BitArr:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uint64
+                    bit:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/NicholasDotSol/duality/dex/bit_arr/{id}':
+    get:
+      summary: Queries a BitArr by id.
+      operationId: NicholasdotsolDualityDexBitArr
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              BitArr:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uint64
+                  bit:
+                    type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
   /NicholasDotSol/duality/dex/nodes:
     get:
       summary: Queries a list of Nodes items.
@@ -29925,16 +30083,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -30061,6 +30209,211 @@ paths:
                     totalShares:
                       type: string
                     orderparams:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          orderRule:
+                            type: string
+                          orderType:
+                            type: string
+                          orderShares:
+                            type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/NicholasDotSol/duality/dex/ticks/{price}/{fee}/{direction}/{orderType}':
+    get:
+      summary: Queries a Ticks by index.
+      operationId: NicholasdotsolDualityDexTicks
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              ticks:
+                type: object
+                properties:
+                  price:
+                    type: string
+                  fee:
+                    type: string
+                  direction:
+                    type: string
+                  orderType:
+                    type: string
+                  reserve:
+                    type: string
+                  token:
+                    type: string
+                  pairPrice:
+                    type: string
+                  pairFee:
+                    type: string
+                  totalShares:
+                    type: string
+                  orderparams:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        orderRule:
+                          type: string
+                        orderType:
+                          type: string
+                        orderShares:
+                          type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: price
+          in: path
+          required: true
+          type: string
+        - name: fee
+          in: path
+          required: true
+          type: string
+        - name: direction
+          in: path
+          required: true
+          type: string
+        - name: orderType
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/virtual_price_tick_list:
+    get:
+      summary: Queries a list of VirtualPriceTickList items.
+      operationId: NicholasdotsolDualityDexVirtualPriceTickListAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              virtualPriceTickList:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    vPrice:
+                      type: string
+                    direction:
+                      type: string
+                    orderType:
+                      type: string
+                    virtualTicks:
                       type: string
               pagination:
                 type: object
@@ -30154,50 +30507,28 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/ticks/{price}/{fee}/{direction}/{orderType}':
+  '/NicholasDotSol/duality/dex/virtual_price_tick_list/{vPrice}/{direction}/{orderType}':
     get:
-      summary: Queries a Ticks by index.
-      operationId: NicholasdotsolDualityDexTicks
+      summary: Queries a VirtualPriceTickList by index.
+      operationId: NicholasdotsolDualityDexVirtualPriceTickList
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              ticks:
+              virtualPriceTickList:
                 type: object
                 properties:
-                  price:
-                    type: string
-                  fee:
+                  vPrice:
                     type: string
                   direction:
                     type: string
                   orderType:
                     type: string
-                  reserve:
-                    type: string
-                  token:
-                    type: string
-                  pairPrice:
-                    type: string
-                  pairFee:
-                    type: string
-                  totalShares:
-                    type: string
-                  orderparams:
+                  virtualTicks:
                     type: string
         default:
           description: An unexpected error response.
@@ -30218,11 +30549,7 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
-        - name: price
-          in: path
-          required: true
-          type: string
-        - name: fee
+        - name: vPrice
           in: path
           required: true
           type: string
@@ -30349,16 +30676,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -52119,6 +52436,14 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
+  nicholasdotsol.duality.dex.BitArr:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+      bit:
+        type: string
   nicholasdotsol.duality.dex.Node:
     type: object
     properties:
@@ -52143,9 +52468,56 @@ definitions:
             type: array
             items:
               type: string
+  nicholasdotsol.duality.dex.OrderParams:
+    type: object
+    properties:
+      orderRule:
+        type: string
+      orderType:
+        type: string
+      orderShares:
+        type: string
   nicholasdotsol.duality.dex.Params:
     type: object
     description: Params defines the parameters for the module.
+  nicholasdotsol.duality.dex.QueryAllBitArrResponse:
+    type: object
+    properties:
+      BitArr:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uint64
+            bit:
+              type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
   nicholasdotsol.duality.dex.QueryAllNodesResponse:
     type: object
     properties:
@@ -52218,6 +52590,56 @@ definitions:
             totalShares:
               type: string
             orderparams:
+              type: array
+              items:
+                type: object
+                properties:
+                  orderRule:
+                    type: string
+                  orderType:
+                    type: string
+                  orderShares:
+                    type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  nicholasdotsol.duality.dex.QueryAllVirtualPriceTickListResponse:
+    type: object
+    properties:
+      virtualPriceTickList:
+        type: array
+        items:
+          type: object
+          properties:
+            vPrice:
+              type: string
+            direction:
+              type: string
+            orderType:
+              type: string
+            virtualTicks:
               type: string
       pagination:
         type: object
@@ -52286,6 +52708,17 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
+  nicholasdotsol.duality.dex.QueryGetBitArrResponse:
+    type: object
+    properties:
+      BitArr:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+          bit:
+            type: string
   nicholasdotsol.duality.dex.QueryGetNodesResponse:
     type: object
     properties:
@@ -52329,6 +52762,29 @@ definitions:
           totalShares:
             type: string
           orderparams:
+            type: array
+            items:
+              type: object
+              properties:
+                orderRule:
+                  type: string
+                orderType:
+                  type: string
+                orderShares:
+                  type: string
+  nicholasdotsol.duality.dex.QueryGetVirtualPriceTickListResponse:
+    type: object
+    properties:
+      virtualPriceTickList:
+        type: object
+        properties:
+          vPrice:
+            type: string
+          direction:
+            type: string
+          orderType:
+            type: string
+          virtualTicks:
             type: string
   nicholasdotsol.duality.dex.QueryGetVirtualPriceTickQueueResponse:
     type: object
@@ -52374,6 +52830,26 @@ definitions:
       totalShares:
         type: string
       orderparams:
+        type: array
+        items:
+          type: object
+          properties:
+            orderRule:
+              type: string
+            orderType:
+              type: string
+            orderShares:
+              type: string
+  nicholasdotsol.duality.dex.VirtualPriceTickList:
+    type: object
+    properties:
+      vPrice:
+        type: string
+      direction:
+        type: string
+      orderType:
+        type: string
+      virtualTicks:
         type: string
   nicholasdotsol.duality.dex.VirtualPriceTickQueue:
     type: object

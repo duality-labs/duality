@@ -30,3 +30,8 @@ const (
 	VirtualPriceTickQueueKey      = "VirtualPriceTickQueue-value-"
 	VirtualPriceTickQueueCountKey = "VirtualPriceTickQueue-count-"
 )
+
+const (
+	BitArrKey      = "BitArr-value-"
+	BitArrCountKey = "BitArr-count-"
+)

@@ -46,6 +46,27 @@ func TestGenesis(t *testing.T) {
 				OrderType: "1",
 			},
 		},
+		VirtualPriceTickListList: []types.VirtualPriceTickList{
+			{
+				VPrice:    "0",
+				Direction: "0",
+				OrderType: "0",
+			},
+			{
+				VPrice:    "1",
+				Direction: "1",
+				OrderType: "1",
+			},
+		},
+		BitArrList: []types.BitArr{
+			{
+				Id: 0,
+			},
+			{
+				Id: 1,
+			},
+		},
+		BitArrCount: 2,
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
@@ -62,5 +83,8 @@ func TestGenesis(t *testing.T) {
 	require.ElementsMatch(t, genesisState.VirtualPriceTickQueueList, got.VirtualPriceTickQueueList)
 	require.Equal(t, genesisState.VirtualPriceTickQueueCount, got.VirtualPriceTickQueueCount)
 	require.ElementsMatch(t, genesisState.TicksList, got.TicksList)
+	require.ElementsMatch(t, genesisState.VirtualPriceTickListList, got.VirtualPriceTickListList)
+	require.ElementsMatch(t, genesisState.BitArrList, got.BitArrList)
+	require.Equal(t, genesisState.BitArrCount, got.BitArrCount)
 	// this line is used by starport scaffolding # genesis/test/assert
 }
