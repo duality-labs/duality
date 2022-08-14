@@ -2,11 +2,12 @@ import { txClient, queryClient, MissingWalletError , registry} from './module'
 
 import { Node } from "./module/types/dex/node"
 import { Nodes } from "./module/types/dex/nodes"
+import { OrderParams } from "./module/types/dex/order_params"
 import { Params } from "./module/types/dex/params"
 import { VirtualPriceTickQueue } from "./module/types/dex/virtual_price_tick_queue"
 
 
-export { Node, Nodes, Params, VirtualPriceTickQueue };
+export { Node, Nodes, OrderParams, Params, VirtualPriceTickQueue };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -53,6 +54,7 @@ const getDefaultState = () => {
 				_Structure: {
 						Node: getStructure(Node.fromPartial({})),
 						Nodes: getStructure(Nodes.fromPartial({})),
+						OrderParams: getStructure(OrderParams.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						VirtualPriceTickQueue: getStructure(VirtualPriceTickQueue.fromPartial({})),
 						
