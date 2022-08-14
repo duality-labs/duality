@@ -52824,7 +52824,11 @@ definitions:
         format: byte
   nicholasdotsol.duality.dex.MsgAddLiquidityResponse:
     type: object
+  nicholasdotsol.duality.dex.MsgCreatePairResponse:
+    type: object
   nicholasdotsol.duality.dex.MsgRemoveLiquidityResponse:
+    type: object
+  nicholasdotsol.duality.dex.MsgSwapResponse:
     type: object
   nicholasdotsol.duality.dex.Node:
     type: object

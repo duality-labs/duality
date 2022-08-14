@@ -9,6 +9,8 @@ option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 service Msg {
       rpc AddLiquidity(MsgAddLiquidity) returns (MsgAddLiquidityResponse);
   rpc RemoveLiquidity(MsgRemoveLiquidity) returns (MsgRemoveLiquidityResponse);
+  rpc CreatePair(MsgCreatePair) returns (MsgCreatePairResponse);
+  rpc Swap(MsgSwap) returns (MsgSwapResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -38,6 +40,26 @@ message MsgRemoveLiquidity {
 }
 
 message MsgRemoveLiquidityResponse {
+}
+
+message MsgCreatePair {
+  string creator = 1;
+  string tokenA = 2;
+  string tokenB = 3;
+}
+
+message MsgCreatePairResponse {
+}
+
+message MsgSwap {
+  string creator = 1;
+  string tokenIn = 2;
+  string tokenOut = 3;
+  string amountIn = 4;
+  string minOut = 5;
+}
+
+message MsgSwapResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message

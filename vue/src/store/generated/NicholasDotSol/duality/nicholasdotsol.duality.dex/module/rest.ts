@@ -19,7 +19,11 @@ export interface DexBitArr {
 
 export type DexMsgAddLiquidityResponse = object;
 
+export type DexMsgCreatePairResponse = object;
+
 export type DexMsgRemoveLiquidityResponse = object;
+
+export type DexMsgSwapResponse = object;
 
 export interface DexNode {
   token?: string;
