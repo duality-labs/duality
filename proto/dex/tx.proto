@@ -8,6 +8,7 @@ option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 // Msg defines the Msg service.
 service Msg {
       rpc AddLiquidity(MsgAddLiquidity) returns (MsgAddLiquidityResponse);
+  rpc RemoveLiquidity(MsgRemoveLiquidity) returns (MsgRemoveLiquidityResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -23,6 +24,20 @@ message MsgAddLiquidity {
 }
 
 message MsgAddLiquidityResponse {
+}
+
+message MsgRemoveLiquidity {
+  string creator = 1;
+  string tokenA = 2;
+  string tokenB = 3;
+  string tokenDirection = 4;
+  string shares = 5;
+  string price = 6;
+  string fee = 7;
+  string orderType = 8;
+}
+
+message MsgRemoveLiquidityResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message
