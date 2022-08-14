@@ -4,13 +4,14 @@ import { BitArr } from "./module/types/dex/bit_arr"
 import { Node } from "./module/types/dex/node"
 import { Nodes } from "./module/types/dex/nodes"
 import { OrderParams } from "./module/types/dex/order_params"
+import { Pairs } from "./module/types/dex/pairs"
 import { Params } from "./module/types/dex/params"
 import { Ticks } from "./module/types/dex/ticks"
 import { VirtualPriceTickList } from "./module/types/dex/virtual_price_tick_list"
 import { VirtualPriceTickQueue } from "./module/types/dex/virtual_price_tick_queue"
 
 
-export { BitArr, Node, Nodes, OrderParams, Params, Ticks, VirtualPriceTickList, VirtualPriceTickQueue };
+export { BitArr, Node, Nodes, OrderParams, Pairs, Params, Ticks, VirtualPriceTickList, VirtualPriceTickQueue };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -59,12 +60,15 @@ const getDefaultState = () => {
 				VirtualPriceTickListAll: {},
 				BitArr: {},
 				BitArrAll: {},
+				Pairs: {},
+				PairsAll: {},
 				
 				_Structure: {
 						BitArr: getStructure(BitArr.fromPartial({})),
 						Node: getStructure(Node.fromPartial({})),
 						Nodes: getStructure(Nodes.fromPartial({})),
 						OrderParams: getStructure(OrderParams.fromPartial({})),
+						Pairs: getStructure(Pairs.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						Ticks: getStructure(Ticks.fromPartial({})),
 						VirtualPriceTickList: getStructure(VirtualPriceTickList.fromPartial({})),
@@ -162,6 +166,18 @@ export default {
 						(<any> params).query=null
 					}
 			return state.BitArrAll[JSON.stringify(params)] ?? {}
+		},
+				getPairs: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.Pairs[JSON.stringify(params)] ?? {}
+		},
+				getPairsAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.PairsAll[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -454,6 +470,54 @@ export default {
 				return getters['getBitArrAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:QueryBitArrAll API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryPairs({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryPairs( key.token0,  key.token1)).data
+				
+					
+				commit('QUERY', { query: 'Pairs', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryPairs', payload: { options: { all }, params: {...key},query }})
+				return getters['getPairs']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryPairs API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryPairsAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryPairsAll(query)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await queryClient.queryPairsAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'PairsAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryPairsAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getPairsAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryPairsAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

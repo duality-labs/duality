@@ -10,6 +10,7 @@ import "dex/virtual_price_tick_queue.proto";
 import "dex/ticks.proto";
 import "dex/virtual_price_tick_list.proto";
 import "dex/bit_arr.proto";
+import "dex/pairs.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -68,6 +69,16 @@ service Query {
 	// Queries a list of BitArr items.
 	rpc BitArrAll(QueryAllBitArrRequest) returns (QueryAllBitArrResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/bit_arr";
+	}
+
+// Queries a Pairs by index.
+	rpc Pairs(QueryGetPairsRequest) returns (QueryGetPairsResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/pairs/{token0}/{token1}";
+	}
+
+	// Queries a list of Pairs items.
+	rpc PairsAll(QueryAllPairsRequest) returns (QueryAllPairsResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/pairs";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -171,6 +182,25 @@ message QueryAllBitArrRequest {
 
 message QueryAllBitArrResponse {
 	repeated BitArr BitArr = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetPairsRequest {
+	  string token0 = 1;
+  string token1 = 2;
+
+}
+
+message QueryGetPairsResponse {
+	Pairs pairs = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllPairsRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllPairsResponse {
+	repeated Pairs pairs = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

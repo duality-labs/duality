@@ -6,18 +6,18 @@ export const protobufPackage = "nicholasdotsol.duality.dex";
 
 export interface BitArr {
   id: number;
-  bit: string;
+  bit: Uint8Array;
 }
 
-const baseBitArr: object = { id: 0, bit: "" };
+const baseBitArr: object = { id: 0 };
 
 export const BitArr = {
   encode(message: BitArr, writer: Writer = Writer.create()): Writer {
     if (message.id !== 0) {
       writer.uint32(8).uint64(message.id);
     }
-    if (message.bit !== "") {
-      writer.uint32(18).string(message.bit);
+    if (message.bit.length !== 0) {
+      writer.uint32(18).bytes(message.bit);
     }
     return writer;
   },
@@ -33,7 +33,7 @@ export const BitArr = {
           message.id = longToNumber(reader.uint64() as Long);
           break;
         case 2:
-          message.bit = reader.string();
+          message.bit = reader.bytes();
           break;
         default:
           reader.skipType(tag & 7);
@@ -51,9 +51,7 @@ export const BitArr = {
       message.id = 0;
     }
     if (object.bit !== undefined && object.bit !== null) {
-      message.bit = String(object.bit);
-    } else {
-      message.bit = "";
+      message.bit = bytesFromBase64(object.bit);
     }
     return message;
   },
@@ -61,7 +59,10 @@ export const BitArr = {
   toJSON(message: BitArr): unknown {
     const obj: any = {};
     message.id !== undefined && (obj.id = message.id);
-    message.bit !== undefined && (obj.bit = message.bit);
+    message.bit !== undefined &&
+      (obj.bit = base64FromBytes(
+        message.bit !== undefined ? message.bit : new Uint8Array()
+      ));
     return obj;
   },
 
@@ -75,7 +76,7 @@ export const BitArr = {
     if (object.bit !== undefined && object.bit !== null) {
       message.bit = object.bit;
     } else {
-      message.bit = "";
+      message.bit = new Uint8Array();
     }
     return message;
   },
@@ -90,6 +91,29 @@ var globalThis: any = (() => {
   if (typeof global !== "undefined") return global;
   throw "Unable to locate global object";
 })();
+
+const atob: (b64: string) => string =
+  globalThis.atob ||
+  ((b64) => globalThis.Buffer.from(b64, "base64").toString("binary"));
+function bytesFromBase64(b64: string): Uint8Array {
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; ++i) {
+    arr[i] = bin.charCodeAt(i);
+  }
+  return arr;
+}
+
+const btoa: (bin: string) => string =
+  globalThis.btoa ||
+  ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
+function base64FromBytes(arr: Uint8Array): string {
+  const bin: string[] = [];
+  for (let i = 0; i < arr.byteLength; ++i) {
+    bin.push(String.fromCharCode(arr[i]));
+  }
+  return btoa(bin.join(""));
+}
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 export type DeepPartial<T> = T extends Builtin

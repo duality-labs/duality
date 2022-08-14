@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { VirtualPriceTickQueue } from "../dex/virtual_price_tick_queue";
 import { Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
@@ -7,14 +8,13 @@ export interface VirtualPriceTickList {
   vPrice: string;
   direction: string;
   orderType: string;
-  virtualTicks: string;
+  virtualTicks: VirtualPriceTickQueue | undefined;
 }
 
 const baseVirtualPriceTickList: object = {
   vPrice: "",
   direction: "",
   orderType: "",
-  virtualTicks: "",
 };
 
 export const VirtualPriceTickList = {
@@ -31,8 +31,11 @@ export const VirtualPriceTickList = {
     if (message.orderType !== "") {
       writer.uint32(26).string(message.orderType);
     }
-    if (message.virtualTicks !== "") {
-      writer.uint32(34).string(message.virtualTicks);
+    if (message.virtualTicks !== undefined) {
+      VirtualPriceTickQueue.encode(
+        message.virtualTicks,
+        writer.uint32(34).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -54,7 +57,10 @@ export const VirtualPriceTickList = {
           message.orderType = reader.string();
           break;
         case 4:
-          message.virtualTicks = reader.string();
+          message.virtualTicks = VirtualPriceTickQueue.decode(
+            reader,
+            reader.uint32()
+          );
           break;
         default:
           reader.skipType(tag & 7);
@@ -82,9 +88,11 @@ export const VirtualPriceTickList = {
       message.orderType = "";
     }
     if (object.virtualTicks !== undefined && object.virtualTicks !== null) {
-      message.virtualTicks = String(object.virtualTicks);
+      message.virtualTicks = VirtualPriceTickQueue.fromJSON(
+        object.virtualTicks
+      );
     } else {
-      message.virtualTicks = "";
+      message.virtualTicks = undefined;
     }
     return message;
   },
@@ -95,7 +103,9 @@ export const VirtualPriceTickList = {
     message.direction !== undefined && (obj.direction = message.direction);
     message.orderType !== undefined && (obj.orderType = message.orderType);
     message.virtualTicks !== undefined &&
-      (obj.virtualTicks = message.virtualTicks);
+      (obj.virtualTicks = message.virtualTicks
+        ? VirtualPriceTickQueue.toJSON(message.virtualTicks)
+        : undefined);
     return obj;
   },
 
@@ -117,9 +127,11 @@ export const VirtualPriceTickList = {
       message.orderType = "";
     }
     if (object.virtualTicks !== undefined && object.virtualTicks !== null) {
-      message.virtualTicks = object.virtualTicks;
+      message.virtualTicks = VirtualPriceTickQueue.fromPartial(
+        object.virtualTicks
+      );
     } else {
-      message.virtualTicks = "";
+      message.virtualTicks = undefined;
     }
     return message;
   },

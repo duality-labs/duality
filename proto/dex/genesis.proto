@@ -8,6 +8,7 @@ import "dex/virtual_price_tick_queue.proto";
 import "dex/ticks.proto";
 import "dex/virtual_price_tick_list.proto";
 import "dex/bit_arr.proto";
+import "dex/pairs.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -23,5 +24,6 @@ message GenesisState {
   repeated VirtualPriceTickList virtualPriceTickListList = 7 [(gogoproto.nullable) = false];
   repeated BitArr bitArrList = 8 [(gogoproto.nullable) = false];
   uint64 bitArrCount = 9;
+  repeated Pairs pairsList = 10 [(gogoproto.nullable) = false];
   // this line is used by starport scaffolding # genesis/proto/state
 }

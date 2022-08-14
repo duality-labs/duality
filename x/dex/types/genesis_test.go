@@ -75,6 +75,16 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 				BitArrCount: 2,
+				PairsList: []types.Pairs{
+					{
+						Token0: "0",
+						Token1: "0",
+					},
+					{
+						Token0: "1",
+						Token1: "1",
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -192,6 +202,22 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 				BitArrCount: 0,
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated pairs",
+			genState: &types.GenesisState{
+				PairsList: []types.Pairs{
+					{
+						Token0: "0",
+						Token1: "0",
+					},
+					{
+						Token0: "0",
+						Token1: "0",
+					},
+				},
 			},
 			valid: false,
 		},

@@ -1,0 +1,19 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+import "dex/bit_arr.proto"; 
+import "dex/ticks.proto"; 
+import "dex/virtual_price_tick_list.proto"; 
+
+message Pairs {
+  string token0 = 1; 
+  string token1 = 2; 
+  uint64 tickSpacing = 3; 
+  uint64 currentIndex = 4; 
+  BitArr bitArray = 5; 
+  Ticks tickmap = 6; 
+  VirtualPriceTickList virtualPricemap = 7; 
+  
+}
+

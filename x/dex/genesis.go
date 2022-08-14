@@ -38,6 +38,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 
 	// Set bitArr count
 	k.SetBitArrCount(ctx, genState.BitArrCount)
+	// Set all the pairs
+	for _, elem := range genState.PairsList {
+		k.SetPairs(ctx, elem)
+	}
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
 }
@@ -55,6 +59,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.VirtualPriceTickListList = k.GetAllVirtualPriceTickList(ctx)
 	genesis.BitArrList = k.GetAllBitArr(ctx)
 	genesis.BitArrCount = k.GetBitArrCount(ctx)
+	genesis.PairsList = k.GetAllPairs(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis

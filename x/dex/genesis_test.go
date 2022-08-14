@@ -67,6 +67,16 @@ func TestGenesis(t *testing.T) {
 			},
 		},
 		BitArrCount: 2,
+		PairsList: []types.Pairs{
+			{
+				Token0: "0",
+				Token1: "0",
+			},
+			{
+				Token0: "1",
+				Token1: "1",
+			},
+		},
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
@@ -86,5 +96,6 @@ func TestGenesis(t *testing.T) {
 	require.ElementsMatch(t, genesisState.VirtualPriceTickListList, got.VirtualPriceTickListList)
 	require.ElementsMatch(t, genesisState.BitArrList, got.BitArrList)
 	require.Equal(t, genesisState.BitArrCount, got.BitArrCount)
+	require.ElementsMatch(t, genesisState.PairsList, got.PairsList)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

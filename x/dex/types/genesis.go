@@ -15,6 +15,7 @@ func DefaultGenesis() *GenesisState {
 		TicksList:                 []Ticks{},
 		VirtualPriceTickListList:  []VirtualPriceTickList{},
 		BitArrList:                []BitArr{},
+		PairsList:                 []Pairs{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -78,6 +79,16 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("bitArr id should be lower or equal than the last id")
 		}
 		bitArrIdMap[elem.Id] = true
+	}
+	// Check for duplicated index in pairs
+	pairsIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.PairsList {
+		index := string(PairsKey(elem.Token0, elem.Token1))
+		if _, ok := pairsIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for pairs")
+		}
+		pairsIndexMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 
