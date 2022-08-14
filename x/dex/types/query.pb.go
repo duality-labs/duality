@@ -6,7 +6,7 @@ package types
 import (
 	context "context"
 	fmt "fmt"
-	_ "github.com/cosmos/cosmos-sdk/types/query"
+	query "github.com/cosmos/cosmos-sdk/types/query"
 	_ "github.com/gogo/protobuf/gogoproto"
 	grpc1 "github.com/gogo/protobuf/grpc"
 	proto "github.com/gogo/protobuf/proto"
@@ -113,35 +113,433 @@ func (m *QueryParamsResponse) GetParams() Params {
 	return Params{}
 }
 
+type QueryGetNodesRequest struct {
+	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (m *QueryGetNodesRequest) Reset()         { *m = QueryGetNodesRequest{} }
+func (m *QueryGetNodesRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryGetNodesRequest) ProtoMessage()    {}
+func (*QueryGetNodesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d8e98105e6e08a59, []int{2}
+}
+func (m *QueryGetNodesRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryGetNodesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryGetNodesRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryGetNodesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetNodesRequest.Merge(m, src)
+}
+func (m *QueryGetNodesRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryGetNodesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetNodesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryGetNodesRequest proto.InternalMessageInfo
+
+func (m *QueryGetNodesRequest) GetId() uint64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+type QueryGetNodesResponse struct {
+	Nodes Nodes `protobuf:"bytes,1,opt,name=Nodes,proto3" json:"Nodes"`
+}
+
+func (m *QueryGetNodesResponse) Reset()         { *m = QueryGetNodesResponse{} }
+func (m *QueryGetNodesResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryGetNodesResponse) ProtoMessage()    {}
+func (*QueryGetNodesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d8e98105e6e08a59, []int{3}
+}
+func (m *QueryGetNodesResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryGetNodesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryGetNodesResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryGetNodesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetNodesResponse.Merge(m, src)
+}
+func (m *QueryGetNodesResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryGetNodesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetNodesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryGetNodesResponse proto.InternalMessageInfo
+
+func (m *QueryGetNodesResponse) GetNodes() Nodes {
+	if m != nil {
+		return m.Nodes
+	}
+	return Nodes{}
+}
+
+type QueryAllNodesRequest struct {
+	Pagination *query.PageRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
+}
+
+func (m *QueryAllNodesRequest) Reset()         { *m = QueryAllNodesRequest{} }
+func (m *QueryAllNodesRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryAllNodesRequest) ProtoMessage()    {}
+func (*QueryAllNodesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d8e98105e6e08a59, []int{4}
+}
+func (m *QueryAllNodesRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryAllNodesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryAllNodesRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryAllNodesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryAllNodesRequest.Merge(m, src)
+}
+func (m *QueryAllNodesRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryAllNodesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryAllNodesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryAllNodesRequest proto.InternalMessageInfo
+
+func (m *QueryAllNodesRequest) GetPagination() *query.PageRequest {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
+type QueryAllNodesResponse struct {
+	Nodes      []Nodes             `protobuf:"bytes,1,rep,name=Nodes,proto3" json:"Nodes"`
+	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+}
+
+func (m *QueryAllNodesResponse) Reset()         { *m = QueryAllNodesResponse{} }
+func (m *QueryAllNodesResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryAllNodesResponse) ProtoMessage()    {}
+func (*QueryAllNodesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d8e98105e6e08a59, []int{5}
+}
+func (m *QueryAllNodesResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryAllNodesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryAllNodesResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryAllNodesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryAllNodesResponse.Merge(m, src)
+}
+func (m *QueryAllNodesResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryAllNodesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryAllNodesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryAllNodesResponse proto.InternalMessageInfo
+
+func (m *QueryAllNodesResponse) GetNodes() []Nodes {
+	if m != nil {
+		return m.Nodes
+	}
+	return nil
+}
+
+func (m *QueryAllNodesResponse) GetPagination() *query.PageResponse {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
+type QueryGetVirtualPriceTickQueueRequest struct {
+	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (m *QueryGetVirtualPriceTickQueueRequest) Reset()         { *m = QueryGetVirtualPriceTickQueueRequest{} }
+func (m *QueryGetVirtualPriceTickQueueRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryGetVirtualPriceTickQueueRequest) ProtoMessage()    {}
+func (*QueryGetVirtualPriceTickQueueRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d8e98105e6e08a59, []int{6}
+}
+func (m *QueryGetVirtualPriceTickQueueRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryGetVirtualPriceTickQueueRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryGetVirtualPriceTickQueueRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryGetVirtualPriceTickQueueRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetVirtualPriceTickQueueRequest.Merge(m, src)
+}
+func (m *QueryGetVirtualPriceTickQueueRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryGetVirtualPriceTickQueueRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetVirtualPriceTickQueueRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryGetVirtualPriceTickQueueRequest proto.InternalMessageInfo
+
+func (m *QueryGetVirtualPriceTickQueueRequest) GetId() uint64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+type QueryGetVirtualPriceTickQueueResponse struct {
+	VirtualPriceTickQueue VirtualPriceTickQueue `protobuf:"bytes,1,opt,name=VirtualPriceTickQueue,proto3" json:"VirtualPriceTickQueue"`
+}
+
+func (m *QueryGetVirtualPriceTickQueueResponse) Reset()         { *m = QueryGetVirtualPriceTickQueueResponse{} }
+func (m *QueryGetVirtualPriceTickQueueResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryGetVirtualPriceTickQueueResponse) ProtoMessage()    {}
+func (*QueryGetVirtualPriceTickQueueResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d8e98105e6e08a59, []int{7}
+}
+func (m *QueryGetVirtualPriceTickQueueResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryGetVirtualPriceTickQueueResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryGetVirtualPriceTickQueueResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryGetVirtualPriceTickQueueResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetVirtualPriceTickQueueResponse.Merge(m, src)
+}
+func (m *QueryGetVirtualPriceTickQueueResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryGetVirtualPriceTickQueueResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetVirtualPriceTickQueueResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryGetVirtualPriceTickQueueResponse proto.InternalMessageInfo
+
+func (m *QueryGetVirtualPriceTickQueueResponse) GetVirtualPriceTickQueue() VirtualPriceTickQueue {
+	if m != nil {
+		return m.VirtualPriceTickQueue
+	}
+	return VirtualPriceTickQueue{}
+}
+
+type QueryAllVirtualPriceTickQueueRequest struct {
+	Pagination *query.PageRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
+}
+
+func (m *QueryAllVirtualPriceTickQueueRequest) Reset()         { *m = QueryAllVirtualPriceTickQueueRequest{} }
+func (m *QueryAllVirtualPriceTickQueueRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryAllVirtualPriceTickQueueRequest) ProtoMessage()    {}
+func (*QueryAllVirtualPriceTickQueueRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d8e98105e6e08a59, []int{8}
+}
+func (m *QueryAllVirtualPriceTickQueueRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryAllVirtualPriceTickQueueRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryAllVirtualPriceTickQueueRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryAllVirtualPriceTickQueueRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryAllVirtualPriceTickQueueRequest.Merge(m, src)
+}
+func (m *QueryAllVirtualPriceTickQueueRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryAllVirtualPriceTickQueueRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryAllVirtualPriceTickQueueRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryAllVirtualPriceTickQueueRequest proto.InternalMessageInfo
+
+func (m *QueryAllVirtualPriceTickQueueRequest) GetPagination() *query.PageRequest {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
+type QueryAllVirtualPriceTickQueueResponse struct {
+	VirtualPriceTickQueue []VirtualPriceTickQueue `protobuf:"bytes,1,rep,name=VirtualPriceTickQueue,proto3" json:"VirtualPriceTickQueue"`
+	Pagination            *query.PageResponse     `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+}
+
+func (m *QueryAllVirtualPriceTickQueueResponse) Reset()         { *m = QueryAllVirtualPriceTickQueueResponse{} }
+func (m *QueryAllVirtualPriceTickQueueResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryAllVirtualPriceTickQueueResponse) ProtoMessage()    {}
+func (*QueryAllVirtualPriceTickQueueResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d8e98105e6e08a59, []int{9}
+}
+func (m *QueryAllVirtualPriceTickQueueResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryAllVirtualPriceTickQueueResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryAllVirtualPriceTickQueueResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryAllVirtualPriceTickQueueResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryAllVirtualPriceTickQueueResponse.Merge(m, src)
+}
+func (m *QueryAllVirtualPriceTickQueueResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryAllVirtualPriceTickQueueResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryAllVirtualPriceTickQueueResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryAllVirtualPriceTickQueueResponse proto.InternalMessageInfo
+
+func (m *QueryAllVirtualPriceTickQueueResponse) GetVirtualPriceTickQueue() []VirtualPriceTickQueue {
+	if m != nil {
+		return m.VirtualPriceTickQueue
+	}
+	return nil
+}
+
+func (m *QueryAllVirtualPriceTickQueueResponse) GetPagination() *query.PageResponse {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*QueryParamsRequest)(nil), "nicholasdotsol.duality.dex.QueryParamsRequest")
 	proto.RegisterType((*QueryParamsResponse)(nil), "nicholasdotsol.duality.dex.QueryParamsResponse")
+	proto.RegisterType((*QueryGetNodesRequest)(nil), "nicholasdotsol.duality.dex.QueryGetNodesRequest")
+	proto.RegisterType((*QueryGetNodesResponse)(nil), "nicholasdotsol.duality.dex.QueryGetNodesResponse")
+	proto.RegisterType((*QueryAllNodesRequest)(nil), "nicholasdotsol.duality.dex.QueryAllNodesRequest")
+	proto.RegisterType((*QueryAllNodesResponse)(nil), "nicholasdotsol.duality.dex.QueryAllNodesResponse")
+	proto.RegisterType((*QueryGetVirtualPriceTickQueueRequest)(nil), "nicholasdotsol.duality.dex.QueryGetVirtualPriceTickQueueRequest")
+	proto.RegisterType((*QueryGetVirtualPriceTickQueueResponse)(nil), "nicholasdotsol.duality.dex.QueryGetVirtualPriceTickQueueResponse")
+	proto.RegisterType((*QueryAllVirtualPriceTickQueueRequest)(nil), "nicholasdotsol.duality.dex.QueryAllVirtualPriceTickQueueRequest")
+	proto.RegisterType((*QueryAllVirtualPriceTickQueueResponse)(nil), "nicholasdotsol.duality.dex.QueryAllVirtualPriceTickQueueResponse")
 }
 
 func init() { proto.RegisterFile("dex/query.proto", fileDescriptor_d8e98105e6e08a59) }
 
 var fileDescriptor_d8e98105e6e08a59 = []byte{
-	// 314 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x90, 0x31, 0x4b, 0x33, 0x31,
-	0x18, 0xc7, 0x2f, 0x2f, 0xaf, 0x1d, 0xce, 0x41, 0x89, 0x1d, 0xe4, 0x90, 0x28, 0x87, 0x83, 0x14,
-	0x4c, 0x68, 0xfd, 0x02, 0x52, 0x04, 0x37, 0xd1, 0x3a, 0x08, 0x6e, 0xb9, 0x5e, 0x48, 0x03, 0xd7,
-	0x3c, 0x69, 0x93, 0x93, 0x76, 0xf5, 0x13, 0x08, 0xe2, 0xec, 0xd7, 0xe9, 0x58, 0x70, 0x71, 0x12,
-	0x69, 0xfd, 0x20, 0xd2, 0x24, 0x20, 0x22, 0x15, 0xb7, 0xf0, 0xe4, 0xf7, 0xfb, 0xe7, 0x9f, 0x27,
-	0xdd, 0x2a, 0xc5, 0x84, 0x8d, 0x6a, 0x31, 0x9e, 0x52, 0x33, 0x06, 0x07, 0x38, 0xd3, 0xaa, 0x3f,
-	0x80, 0x8a, 0xdb, 0x12, 0x9c, 0x85, 0x8a, 0x96, 0x35, 0xaf, 0x94, 0x9b, 0xd2, 0x52, 0x4c, 0xb2,
-	0xa6, 0x04, 0x09, 0x1e, 0x63, 0xab, 0x53, 0x30, 0xb2, 0x3d, 0x09, 0x20, 0x2b, 0xc1, 0xb8, 0x51,
-	0x8c, 0x6b, 0x0d, 0x8e, 0x3b, 0x05, 0xda, 0xc6, 0xdb, 0x56, 0x1f, 0xec, 0x10, 0x2c, 0x2b, 0xb8,
-	0x15, 0xe1, 0x21, 0x76, 0xd7, 0x2e, 0x84, 0xe3, 0x6d, 0x66, 0xb8, 0x54, 0xda, 0xc3, 0x91, 0xdd,
-	0x5e, 0x95, 0x31, 0x7c, 0xcc, 0x87, 0xd1, 0xce, 0x9b, 0x29, 0xbe, 0x5a, 0x39, 0x97, 0x7e, 0xd8,
-	0x13, 0xa3, 0x5a, 0x58, 0x97, 0xdf, 0xa4, 0x3b, 0xdf, 0xa6, 0xd6, 0x80, 0xb6, 0x02, 0x9f, 0xa6,
-	0x8d, 0x20, 0xef, 0xa2, 0x03, 0x74, 0xb4, 0xd9, 0xc9, 0xe9, 0xfa, 0xbf, 0xd0, 0xe0, 0x76, 0xff,
-	0xcf, 0xde, 0xf6, 0x93, 0x5e, 0xf4, 0x3a, 0xcf, 0x28, 0xdd, 0xf0, 0xc9, 0xf8, 0x09, 0xa5, 0x8d,
-	0x80, 0x60, 0xfa, 0x5b, 0xcc, 0xcf, 0x76, 0x19, 0xfb, 0x33, 0x1f, 0x7a, 0xe7, 0xad, 0xfb, 0x97,
-	0x8f, 0xc7, 0x7f, 0x87, 0x38, 0x67, 0x17, 0x51, 0x3c, 0x03, 0x77, 0x0d, 0x15, 0x8b, 0x22, 0xfb,
-	0x5a, 0x4b, 0xf7, 0x7c, 0xb6, 0x20, 0x68, 0xbe, 0x20, 0xe8, 0x7d, 0x41, 0xd0, 0xc3, 0x92, 0x24,
-	0xf3, 0x25, 0x49, 0x5e, 0x97, 0x24, 0xb9, 0x3d, 0x96, 0xca, 0x0d, 0xea, 0x82, 0xf6, 0x61, 0xb8,
-	0x2e, 0x67, 0xe2, 0x93, 0xdc, 0xd4, 0x08, 0x5b, 0x34, 0xfc, 0x82, 0x4f, 0x3e, 0x03, 0x00, 0x00,
-	0xff, 0xff, 0x0f, 0xd3, 0xba, 0xc9, 0x01, 0x02, 0x00, 0x00,
+	// 659 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x96, 0x5f, 0x6b, 0x13, 0x4d,
+	0x14, 0xc6, 0x33, 0xe9, 0x9f, 0xf7, 0x65, 0x04, 0x95, 0xb1, 0x85, 0x12, 0x24, 0xda, 0xb1, 0xd6,
+	0x5a, 0x70, 0xc6, 0x54, 0x29, 0x88, 0x0a, 0x4d, 0x11, 0x7b, 0x57, 0xda, 0x28, 0x15, 0xbc, 0xb0,
+	0x4c, 0x76, 0x87, 0xed, 0xd0, 0xc9, 0xce, 0x36, 0x3b, 0x5b, 0x5a, 0xc4, 0x1b, 0x3f, 0x81, 0x20,
+	0x7a, 0x21, 0x8a, 0x5f, 0xa7, 0x97, 0x05, 0x6f, 0xbc, 0xd1, 0x4a, 0xeb, 0x07, 0x91, 0x9d, 0x99,
+	0x50, 0x93, 0x66, 0x77, 0x53, 0xdb, 0xbb, 0x30, 0x39, 0xcf, 0x39, 0xbf, 0xf3, 0x9c, 0x99, 0x93,
+	0xc0, 0x4b, 0x3e, 0xdf, 0xa1, 0x5b, 0x09, 0x6f, 0xef, 0x92, 0xa8, 0xad, 0xb4, 0x42, 0x95, 0x50,
+	0x78, 0x1b, 0x4a, 0xb2, 0xd8, 0x57, 0x3a, 0x56, 0x92, 0xf8, 0x09, 0x93, 0x42, 0xef, 0x12, 0x9f,
+	0xef, 0x54, 0xc6, 0x02, 0x15, 0x28, 0x13, 0x46, 0xd3, 0x4f, 0x56, 0x51, 0xb9, 0x1a, 0x28, 0x15,
+	0x48, 0x4e, 0x59, 0x24, 0x28, 0x0b, 0x43, 0xa5, 0x99, 0x16, 0x2a, 0x8c, 0xdd, 0xb7, 0xb3, 0x9e,
+	0x8a, 0x5b, 0x2a, 0xa6, 0x4d, 0x16, 0x73, 0x5b, 0x88, 0x6e, 0xd7, 0x9a, 0x5c, 0xb3, 0x1a, 0x8d,
+	0x58, 0x20, 0x42, 0x13, 0xec, 0x62, 0x2f, 0xa7, 0x30, 0x11, 0x6b, 0xb3, 0x56, 0x47, 0x6d, 0xf0,
+	0x42, 0xe5, 0xf3, 0xce, 0x01, 0x4e, 0x0f, 0xb6, 0x45, 0x5b, 0x27, 0x4c, 0xae, 0x47, 0x6d, 0xe1,
+	0xf1, 0x75, 0x2d, 0xbc, 0xcd, 0xf5, 0xad, 0x84, 0x27, 0xdc, 0xc6, 0xe0, 0x31, 0x88, 0x56, 0xd3,
+	0x42, 0x2b, 0x26, 0x53, 0x83, 0x6f, 0x25, 0x3c, 0xd6, 0xf8, 0x05, 0xbc, 0xd2, 0x75, 0x1a, 0x47,
+	0x2a, 0x8c, 0x39, 0x5a, 0x80, 0xa3, 0xb6, 0xe2, 0x04, 0xb8, 0x0e, 0x66, 0x2e, 0xcc, 0x61, 0x92,
+	0x6d, 0x00, 0xb1, 0xda, 0xc5, 0xe1, 0xbd, 0x9f, 0xd7, 0x4a, 0x0d, 0xa7, 0xc3, 0xd3, 0x70, 0xcc,
+	0x24, 0x5e, 0xe2, 0x7a, 0x39, 0x25, 0x75, 0x05, 0xd1, 0x45, 0x58, 0x16, 0xbe, 0xc9, 0x3a, 0xdc,
+	0x28, 0x0b, 0x1f, 0xaf, 0xc1, 0xf1, 0x9e, 0x38, 0x87, 0xf0, 0x18, 0x8e, 0x98, 0x03, 0x47, 0x30,
+	0x99, 0x47, 0x60, 0x02, 0x1d, 0x80, 0x55, 0xe1, 0x57, 0xae, 0x7e, 0x5d, 0xca, 0xae, 0xfa, 0x4f,
+	0x21, 0x3c, 0x76, 0xd8, 0xe5, 0x9e, 0x26, 0x76, 0x1c, 0x24, 0x1d, 0x07, 0xb1, 0x73, 0x77, 0xe3,
+	0x20, 0x2b, 0x2c, 0xe0, 0x4e, 0xdb, 0xf8, 0x4b, 0x89, 0xbf, 0x02, 0x07, 0x7e, 0x5c, 0xe0, 0x24,
+	0xf8, 0xd0, 0xe9, 0xc1, 0xd1, 0x52, 0x17, 0x60, 0xd9, 0x00, 0xde, 0x2a, 0x04, 0xb4, 0xb5, 0xbb,
+	0x08, 0xe7, 0xe1, 0x54, 0xc7, 0xd9, 0x35, 0x7b, 0x35, 0x56, 0xd2, 0x9b, 0xf1, 0x5c, 0x78, 0x9b,
+	0xab, 0xe9, 0xbd, 0xc8, 0x9a, 0xc8, 0x47, 0x00, 0x6f, 0x16, 0x08, 0x5d, 0xa7, 0x2d, 0x38, 0xde,
+	0x37, 0xc0, 0xd9, 0x5a, 0xcb, 0xeb, 0xbc, 0xaf, 0xd0, 0x39, 0xd1, 0x3f, 0x2b, 0x0e, 0x5d, 0x43,
+	0x75, 0x29, 0x73, 0x1b, 0x3a, 0xaf, 0x11, 0x1f, 0x74, 0x8c, 0xc8, 0x2e, 0x58, 0x6c, 0xc4, 0xd0,
+	0xf9, 0x1b, 0x71, 0x6e, 0x57, 0x64, 0xee, 0xcb, 0x7f, 0x70, 0xc4, 0x74, 0x88, 0x3e, 0x00, 0x38,
+	0x6a, 0xdf, 0x31, 0x22, 0x79, 0xb4, 0x27, 0x57, 0x48, 0x85, 0x0e, 0x1c, 0x6f, 0x09, 0xf0, 0xec,
+	0xdb, 0x6f, 0xbf, 0xdf, 0x97, 0xa7, 0x10, 0xa6, 0xcb, 0x4e, 0xf8, 0x44, 0xe9, 0x67, 0x4a, 0x52,
+	0x27, 0xa4, 0xc7, 0x0b, 0x0f, 0x7d, 0x06, 0xee, 0x35, 0xa1, 0xbb, 0x85, 0x65, 0x7a, 0x56, 0x4d,
+	0xa5, 0x76, 0x0a, 0x85, 0x43, 0x23, 0x06, 0x6d, 0x06, 0x4d, 0xe7, 0xa1, 0x99, 0xcd, 0x4b, 0x5f,
+	0x0b, 0xff, 0x0d, 0xfa, 0x04, 0xe0, 0xff, 0x26, 0x43, 0x5d, 0xca, 0x01, 0x08, 0x7b, 0x96, 0xd1,
+	0x00, 0x84, 0xbd, 0xdb, 0x05, 0xdf, 0x36, 0x84, 0x37, 0xd0, 0x64, 0x21, 0x21, 0x3a, 0x00, 0x19,
+	0xd7, 0x12, 0x2d, 0x0c, 0xe2, 0x4c, 0xde, 0x1b, 0xab, 0xd4, 0xcf, 0x90, 0xc1, 0x75, 0x52, 0x37,
+	0x9d, 0x3c, 0x44, 0x0f, 0xf2, 0x3a, 0xc9, 0xfa, 0x51, 0xb3, 0xf6, 0xff, 0x00, 0x70, 0xa2, 0x6f,
+	0x91, 0x74, 0x1c, 0x0b, 0x83, 0x98, 0x7b, 0xc6, 0x26, 0x8b, 0x36, 0x03, 0x7e, 0x64, 0x9a, 0x9c,
+	0x47, 0xf7, 0xff, 0xa5, 0xc9, 0xc5, 0xa5, 0xbd, 0xc3, 0x2a, 0xd8, 0x3f, 0xac, 0x82, 0x5f, 0x87,
+	0x55, 0xf0, 0xee, 0xa8, 0x5a, 0xda, 0x3f, 0xaa, 0x96, 0xbe, 0x1f, 0x55, 0x4b, 0x2f, 0xef, 0x04,
+	0x42, 0x6f, 0x24, 0x4d, 0xe2, 0xa9, 0x56, 0x56, 0xe6, 0x1d, 0x93, 0x5b, 0xef, 0x46, 0x3c, 0x6e,
+	0x8e, 0x9a, 0xff, 0x00, 0xf7, 0xfe, 0x04, 0x00, 0x00, 0xff, 0xff, 0xa7, 0xc1, 0x2c, 0x7b, 0xd9,
+	0x08, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -158,6 +556,14 @@ const _ = grpc.SupportPackageIsVersion4
 type QueryClient interface {
 	// Parameters queries the parameters of the module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
+	// Queries a Nodes by id.
+	Nodes(ctx context.Context, in *QueryGetNodesRequest, opts ...grpc.CallOption) (*QueryGetNodesResponse, error)
+	// Queries a list of Nodes items.
+	NodesAll(ctx context.Context, in *QueryAllNodesRequest, opts ...grpc.CallOption) (*QueryAllNodesResponse, error)
+	// Queries a VirtualPriceTickQueue by id.
+	VirtualPriceTickQueue(ctx context.Context, in *QueryGetVirtualPriceTickQueueRequest, opts ...grpc.CallOption) (*QueryGetVirtualPriceTickQueueResponse, error)
+	// Queries a list of VirtualPriceTickQueue items.
+	VirtualPriceTickQueueAll(ctx context.Context, in *QueryAllVirtualPriceTickQueueRequest, opts ...grpc.CallOption) (*QueryAllVirtualPriceTickQueueResponse, error)
 }
 
 type queryClient struct {
@@ -177,10 +583,54 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 	return out, nil
 }
 
+func (c *queryClient) Nodes(ctx context.Context, in *QueryGetNodesRequest, opts ...grpc.CallOption) (*QueryGetNodesResponse, error) {
+	out := new(QueryGetNodesResponse)
+	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Query/Nodes", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) NodesAll(ctx context.Context, in *QueryAllNodesRequest, opts ...grpc.CallOption) (*QueryAllNodesResponse, error) {
+	out := new(QueryAllNodesResponse)
+	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Query/NodesAll", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) VirtualPriceTickQueue(ctx context.Context, in *QueryGetVirtualPriceTickQueueRequest, opts ...grpc.CallOption) (*QueryGetVirtualPriceTickQueueResponse, error) {
+	out := new(QueryGetVirtualPriceTickQueueResponse)
+	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Query/VirtualPriceTickQueue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) VirtualPriceTickQueueAll(ctx context.Context, in *QueryAllVirtualPriceTickQueueRequest, opts ...grpc.CallOption) (*QueryAllVirtualPriceTickQueueResponse, error) {
+	out := new(QueryAllVirtualPriceTickQueueResponse)
+	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Query/VirtualPriceTickQueueAll", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
+	// Queries a Nodes by id.
+	Nodes(context.Context, *QueryGetNodesRequest) (*QueryGetNodesResponse, error)
+	// Queries a list of Nodes items.
+	NodesAll(context.Context, *QueryAllNodesRequest) (*QueryAllNodesResponse, error)
+	// Queries a VirtualPriceTickQueue by id.
+	VirtualPriceTickQueue(context.Context, *QueryGetVirtualPriceTickQueueRequest) (*QueryGetVirtualPriceTickQueueResponse, error)
+	// Queries a list of VirtualPriceTickQueue items.
+	VirtualPriceTickQueueAll(context.Context, *QueryAllVirtualPriceTickQueueRequest) (*QueryAllVirtualPriceTickQueueResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -189,6 +639,18 @@ type UnimplementedQueryServer struct {
 
 func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryParamsRequest) (*QueryParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
+}
+func (*UnimplementedQueryServer) Nodes(ctx context.Context, req *QueryGetNodesRequest) (*QueryGetNodesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Nodes not implemented")
+}
+func (*UnimplementedQueryServer) NodesAll(ctx context.Context, req *QueryAllNodesRequest) (*QueryAllNodesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NodesAll not implemented")
+}
+func (*UnimplementedQueryServer) VirtualPriceTickQueue(ctx context.Context, req *QueryGetVirtualPriceTickQueueRequest) (*QueryGetVirtualPriceTickQueueResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VirtualPriceTickQueue not implemented")
+}
+func (*UnimplementedQueryServer) VirtualPriceTickQueueAll(ctx context.Context, req *QueryAllVirtualPriceTickQueueRequest) (*QueryAllVirtualPriceTickQueueResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VirtualPriceTickQueueAll not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -213,6 +675,78 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_Nodes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGetNodesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).Nodes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/nicholasdotsol.duality.dex.Query/Nodes",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).Nodes(ctx, req.(*QueryGetNodesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_NodesAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryAllNodesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).NodesAll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/nicholasdotsol.duality.dex.Query/NodesAll",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).NodesAll(ctx, req.(*QueryAllNodesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_VirtualPriceTickQueue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGetVirtualPriceTickQueueRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).VirtualPriceTickQueue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/nicholasdotsol.duality.dex.Query/VirtualPriceTickQueue",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).VirtualPriceTickQueue(ctx, req.(*QueryGetVirtualPriceTickQueueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_VirtualPriceTickQueueAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryAllVirtualPriceTickQueueRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).VirtualPriceTickQueueAll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/nicholasdotsol.duality.dex.Query/VirtualPriceTickQueueAll",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).VirtualPriceTickQueueAll(ctx, req.(*QueryAllVirtualPriceTickQueueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "nicholasdotsol.duality.dex.Query",
 	HandlerType: (*QueryServer)(nil),
@@ -220,6 +754,22 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Params",
 			Handler:    _Query_Params_Handler,
+		},
+		{
+			MethodName: "Nodes",
+			Handler:    _Query_Nodes_Handler,
+		},
+		{
+			MethodName: "NodesAll",
+			Handler:    _Query_NodesAll_Handler,
+		},
+		{
+			MethodName: "VirtualPriceTickQueue",
+			Handler:    _Query_VirtualPriceTickQueue_Handler,
+		},
+		{
+			MethodName: "VirtualPriceTickQueueAll",
+			Handler:    _Query_VirtualPriceTickQueueAll_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -282,6 +832,296 @@ func (m *QueryParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *QueryGetNodesRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryGetNodesRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryGetNodesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Id != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.Id))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryGetNodesResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryGetNodesResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryGetNodesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.Nodes.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintQuery(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryAllNodesRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryAllNodesRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryAllNodesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryAllNodesResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryAllNodesResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryAllNodesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Nodes) > 0 {
+		for iNdEx := len(m.Nodes) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Nodes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintQuery(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryGetVirtualPriceTickQueueRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryGetVirtualPriceTickQueueRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryGetVirtualPriceTickQueueRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Id != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.Id))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryGetVirtualPriceTickQueueResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryGetVirtualPriceTickQueueResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryGetVirtualPriceTickQueueResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size, err := m.VirtualPriceTickQueue.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintQuery(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryAllVirtualPriceTickQueueRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryAllVirtualPriceTickQueueRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryAllVirtualPriceTickQueueRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryAllVirtualPriceTickQueueResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryAllVirtualPriceTickQueueResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryAllVirtualPriceTickQueueResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.VirtualPriceTickQueue) > 0 {
+		for iNdEx := len(m.VirtualPriceTickQueue) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.VirtualPriceTickQueue[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintQuery(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	offset -= sovQuery(v)
 	base := offset
@@ -310,6 +1150,116 @@ func (m *QueryParamsResponse) Size() (n int) {
 	_ = l
 	l = m.Params.Size()
 	n += 1 + l + sovQuery(uint64(l))
+	return n
+}
+
+func (m *QueryGetNodesRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Id != 0 {
+		n += 1 + sovQuery(uint64(m.Id))
+	}
+	return n
+}
+
+func (m *QueryGetNodesResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.Nodes.Size()
+	n += 1 + l + sovQuery(uint64(l))
+	return n
+}
+
+func (m *QueryAllNodesRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryAllNodesResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Nodes) > 0 {
+		for _, e := range m.Nodes {
+			l = e.Size()
+			n += 1 + l + sovQuery(uint64(l))
+		}
+	}
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryGetVirtualPriceTickQueueRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Id != 0 {
+		n += 1 + sovQuery(uint64(m.Id))
+	}
+	return n
+}
+
+func (m *QueryGetVirtualPriceTickQueueResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.VirtualPriceTickQueue.Size()
+	n += 1 + l + sovQuery(uint64(l))
+	return n
+}
+
+func (m *QueryAllVirtualPriceTickQueueRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryAllVirtualPriceTickQueueResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.VirtualPriceTickQueue) > 0 {
+		for _, e := range m.VirtualPriceTickQueue {
+			l = e.Size()
+			n += 1 + l + sovQuery(uint64(l))
+		}
+	}
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
 	return n
 }
 
@@ -428,6 +1378,722 @@ func (m *QueryParamsResponse) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if err := m.Params.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryGetNodesRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryGetNodesRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryGetNodesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			m.Id = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Id |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryGetNodesResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryGetNodesResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryGetNodesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Nodes", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Nodes.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryAllNodesRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryAllNodesRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryAllNodesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageRequest{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryAllNodesResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryAllNodesResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryAllNodesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Nodes", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Nodes = append(m.Nodes, Nodes{})
+			if err := m.Nodes[len(m.Nodes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageResponse{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryGetVirtualPriceTickQueueRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryGetVirtualPriceTickQueueRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryGetVirtualPriceTickQueueRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			m.Id = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Id |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryGetVirtualPriceTickQueueResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryGetVirtualPriceTickQueueResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryGetVirtualPriceTickQueueResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field VirtualPriceTickQueue", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.VirtualPriceTickQueue.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryAllVirtualPriceTickQueueRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryAllVirtualPriceTickQueueRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryAllVirtualPriceTickQueueRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageRequest{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryAllVirtualPriceTickQueueResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryAllVirtualPriceTickQueueResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryAllVirtualPriceTickQueueResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field VirtualPriceTickQueue", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.VirtualPriceTickQueue = append(m.VirtualPriceTickQueue, VirtualPriceTickQueue{})
+			if err := m.VirtualPriceTickQueue[len(m.VirtualPriceTickQueue)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageResponse{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

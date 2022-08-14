@@ -20,3 +20,13 @@ const (
 func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
+
+const (
+	NodesKey      = "Nodes-value-"
+	NodesCountKey = "Nodes-count-"
+)
+
+const (
+	VirtualPriceTickQueueKey      = "VirtualPriceTickQueue-value-"
+	VirtualPriceTickQueueCountKey = "VirtualPriceTickQueue-count-"
+)

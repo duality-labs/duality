@@ -5,6 +5,8 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "dex/params.proto";
+import "dex/nodes.proto";
+import "dex/virtual_price_tick_queue.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -15,7 +17,27 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/NicholasDotSol/duality/dex/params";
   }
-  // this line is used by starport scaffolding # 2
+  // Queries a Nodes by id.
+	rpc Nodes(QueryGetNodesRequest) returns (QueryGetNodesResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/nodes/{id}";
+	}
+
+	// Queries a list of Nodes items.
+	rpc NodesAll(QueryAllNodesRequest) returns (QueryAllNodesResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/nodes";
+	}
+
+// Queries a VirtualPriceTickQueue by id.
+	rpc VirtualPriceTickQueue(QueryGetVirtualPriceTickQueueRequest) returns (QueryGetVirtualPriceTickQueueResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/virtual_price_tick_queue/{id}";
+	}
+
+	// Queries a list of VirtualPriceTickQueue items.
+	rpc VirtualPriceTickQueueAll(QueryAllVirtualPriceTickQueueRequest) returns (QueryAllVirtualPriceTickQueueResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/virtual_price_tick_queue";
+	}
+
+// this line is used by starport scaffolding # 2
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -25,6 +47,40 @@ message QueryParamsRequest {}
 message QueryParamsResponse {
   // params holds all the parameters of this module.
   Params params = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryGetNodesRequest {
+	uint64 id = 1;
+}
+
+message QueryGetNodesResponse {
+	Nodes Nodes = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllNodesRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllNodesResponse {
+	repeated Nodes Nodes = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetVirtualPriceTickQueueRequest {
+	uint64 id = 1;
+}
+
+message QueryGetVirtualPriceTickQueueResponse {
+	VirtualPriceTickQueue VirtualPriceTickQueue = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllVirtualPriceTickQueueRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllVirtualPriceTickQueueResponse {
+	repeated VirtualPriceTickQueue VirtualPriceTickQueue = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // this line is used by starport scaffolding # 3

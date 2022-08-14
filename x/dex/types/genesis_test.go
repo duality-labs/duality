@@ -19,12 +19,82 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid:    true,
 		},
 		{
-			desc:     "valid genesis state",
+			desc: "valid genesis state",
 			genState: &types.GenesisState{
 
+				NodesList: []types.Nodes{
+					{
+						Id: 0,
+					},
+					{
+						Id: 1,
+					},
+				},
+				NodesCount: 2,
+				VirtualPriceTickQueueList: []types.VirtualPriceTickQueue{
+					{
+						Id: 0,
+					},
+					{
+						Id: 1,
+					},
+				},
+				VirtualPriceTickQueueCount: 2,
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
+		},
+		{
+			desc: "duplicated nodes",
+			genState: &types.GenesisState{
+				NodesList: []types.Nodes{
+					{
+						Id: 0,
+					},
+					{
+						Id: 0,
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "invalid nodes count",
+			genState: &types.GenesisState{
+				NodesList: []types.Nodes{
+					{
+						Id: 1,
+					},
+				},
+				NodesCount: 0,
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated virtualPriceTickQueue",
+			genState: &types.GenesisState{
+				VirtualPriceTickQueueList: []types.VirtualPriceTickQueue{
+					{
+						Id: 0,
+					},
+					{
+						Id: 0,
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "invalid virtualPriceTickQueue count",
+			genState: &types.GenesisState{
+				VirtualPriceTickQueueList: []types.VirtualPriceTickQueue{
+					{
+						Id: 1,
+					},
+				},
+				VirtualPriceTickQueueCount: 0,
+			},
+			valid: false,
 		},
 		// this line is used by starport scaffolding # types/genesis/testcase
 	} {
