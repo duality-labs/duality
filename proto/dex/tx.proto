@@ -23,6 +23,7 @@ message MsgAddLiquidity {
   string price = 6;
   string fee = 7;
   string orderType = 8;
+  string receiver = 9;
 }
 
 message MsgAddLiquidityResponse {
@@ -37,6 +38,7 @@ message MsgRemoveLiquidity {
   string price = 6;
   string fee = 7;
   string orderType = 8;
+  string receiver = 9;
 }
 
 message MsgRemoveLiquidityResponse {
