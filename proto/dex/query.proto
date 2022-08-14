@@ -7,6 +7,7 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 import "dex/params.proto";
 import "dex/nodes.proto";
 import "dex/virtual_price_tick_queue.proto";
+import "dex/ticks.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -35,6 +36,16 @@ service Query {
 	// Queries a list of VirtualPriceTickQueue items.
 	rpc VirtualPriceTickQueueAll(QueryAllVirtualPriceTickQueueRequest) returns (QueryAllVirtualPriceTickQueueResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/virtual_price_tick_queue";
+	}
+
+// Queries a Ticks by index.
+	rpc Ticks(QueryGetTicksRequest) returns (QueryGetTicksResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/ticks/{price}/{fee}/{direction}/{orderType}";
+	}
+
+	// Queries a list of Ticks items.
+	rpc TicksAll(QueryAllTicksRequest) returns (QueryAllTicksResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/ticks";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -80,6 +91,27 @@ message QueryAllVirtualPriceTickQueueRequest {
 
 message QueryAllVirtualPriceTickQueueResponse {
 	repeated VirtualPriceTickQueue VirtualPriceTickQueue = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetTicksRequest {
+	  string price = 1;
+  string fee = 2;
+  string direction = 3;
+  string orderType = 4;
+
+}
+
+message QueryGetTicksResponse {
+	Ticks ticks = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllTicksRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllTicksResponse {
+	repeated Ticks ticks = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

@@ -8,6 +8,7 @@ import {
   PageResponse,
 } from "../cosmos/base/query/v1beta1/pagination";
 import { VirtualPriceTickQueue } from "../dex/virtual_price_tick_queue";
+import { Ticks } from "../dex/ticks";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -51,6 +52,26 @@ export interface QueryAllVirtualPriceTickQueueRequest {
 
 export interface QueryAllVirtualPriceTickQueueResponse {
   VirtualPriceTickQueue: VirtualPriceTickQueue[];
+  pagination: PageResponse | undefined;
+}
+
+export interface QueryGetTicksRequest {
+  price: string;
+  fee: string;
+  direction: string;
+  orderType: string;
+}
+
+export interface QueryGetTicksResponse {
+  ticks: Ticks | undefined;
+}
+
+export interface QueryAllTicksRequest {
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryAllTicksResponse {
+  ticks: Ticks[];
   pagination: PageResponse | undefined;
 }
 
@@ -761,6 +782,332 @@ export const QueryAllVirtualPriceTickQueueResponse = {
   },
 };
 
+const baseQueryGetTicksRequest: object = {
+  price: "",
+  fee: "",
+  direction: "",
+  orderType: "",
+};
+
+export const QueryGetTicksRequest = {
+  encode(
+    message: QueryGetTicksRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.price !== "") {
+      writer.uint32(10).string(message.price);
+    }
+    if (message.fee !== "") {
+      writer.uint32(18).string(message.fee);
+    }
+    if (message.direction !== "") {
+      writer.uint32(26).string(message.direction);
+    }
+    if (message.orderType !== "") {
+      writer.uint32(34).string(message.orderType);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryGetTicksRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGetTicksRequest } as QueryGetTicksRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.price = reader.string();
+          break;
+        case 2:
+          message.fee = reader.string();
+          break;
+        case 3:
+          message.direction = reader.string();
+          break;
+        case 4:
+          message.orderType = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetTicksRequest {
+    const message = { ...baseQueryGetTicksRequest } as QueryGetTicksRequest;
+    if (object.price !== undefined && object.price !== null) {
+      message.price = String(object.price);
+    } else {
+      message.price = "";
+    }
+    if (object.fee !== undefined && object.fee !== null) {
+      message.fee = String(object.fee);
+    } else {
+      message.fee = "";
+    }
+    if (object.direction !== undefined && object.direction !== null) {
+      message.direction = String(object.direction);
+    } else {
+      message.direction = "";
+    }
+    if (object.orderType !== undefined && object.orderType !== null) {
+      message.orderType = String(object.orderType);
+    } else {
+      message.orderType = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetTicksRequest): unknown {
+    const obj: any = {};
+    message.price !== undefined && (obj.price = message.price);
+    message.fee !== undefined && (obj.fee = message.fee);
+    message.direction !== undefined && (obj.direction = message.direction);
+    message.orderType !== undefined && (obj.orderType = message.orderType);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryGetTicksRequest>): QueryGetTicksRequest {
+    const message = { ...baseQueryGetTicksRequest } as QueryGetTicksRequest;
+    if (object.price !== undefined && object.price !== null) {
+      message.price = object.price;
+    } else {
+      message.price = "";
+    }
+    if (object.fee !== undefined && object.fee !== null) {
+      message.fee = object.fee;
+    } else {
+      message.fee = "";
+    }
+    if (object.direction !== undefined && object.direction !== null) {
+      message.direction = object.direction;
+    } else {
+      message.direction = "";
+    }
+    if (object.orderType !== undefined && object.orderType !== null) {
+      message.orderType = object.orderType;
+    } else {
+      message.orderType = "";
+    }
+    return message;
+  },
+};
+
+const baseQueryGetTicksResponse: object = {};
+
+export const QueryGetTicksResponse = {
+  encode(
+    message: QueryGetTicksResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.ticks !== undefined) {
+      Ticks.encode(message.ticks, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryGetTicksResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGetTicksResponse } as QueryGetTicksResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.ticks = Ticks.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetTicksResponse {
+    const message = { ...baseQueryGetTicksResponse } as QueryGetTicksResponse;
+    if (object.ticks !== undefined && object.ticks !== null) {
+      message.ticks = Ticks.fromJSON(object.ticks);
+    } else {
+      message.ticks = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetTicksResponse): unknown {
+    const obj: any = {};
+    message.ticks !== undefined &&
+      (obj.ticks = message.ticks ? Ticks.toJSON(message.ticks) : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetTicksResponse>
+  ): QueryGetTicksResponse {
+    const message = { ...baseQueryGetTicksResponse } as QueryGetTicksResponse;
+    if (object.ticks !== undefined && object.ticks !== null) {
+      message.ticks = Ticks.fromPartial(object.ticks);
+    } else {
+      message.ticks = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllTicksRequest: object = {};
+
+export const QueryAllTicksRequest = {
+  encode(
+    message: QueryAllTicksRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryAllTicksRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryAllTicksRequest } as QueryAllTicksRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllTicksRequest {
+    const message = { ...baseQueryAllTicksRequest } as QueryAllTicksRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllTicksRequest): unknown {
+    const obj: any = {};
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageRequest.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryAllTicksRequest>): QueryAllTicksRequest {
+    const message = { ...baseQueryAllTicksRequest } as QueryAllTicksRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllTicksResponse: object = {};
+
+export const QueryAllTicksResponse = {
+  encode(
+    message: QueryAllTicksResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    for (const v of message.ticks) {
+      Ticks.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(
+        message.pagination,
+        writer.uint32(18).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryAllTicksResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryAllTicksResponse } as QueryAllTicksResponse;
+    message.ticks = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.ticks.push(Ticks.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllTicksResponse {
+    const message = { ...baseQueryAllTicksResponse } as QueryAllTicksResponse;
+    message.ticks = [];
+    if (object.ticks !== undefined && object.ticks !== null) {
+      for (const e of object.ticks) {
+        message.ticks.push(Ticks.fromJSON(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllTicksResponse): unknown {
+    const obj: any = {};
+    if (message.ticks) {
+      obj.ticks = message.ticks.map((e) => (e ? Ticks.toJSON(e) : undefined));
+    } else {
+      obj.ticks = [];
+    }
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageResponse.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryAllTicksResponse>
+  ): QueryAllTicksResponse {
+    const message = { ...baseQueryAllTicksResponse } as QueryAllTicksResponse;
+    message.ticks = [];
+    if (object.ticks !== undefined && object.ticks !== null) {
+      for (const e of object.ticks) {
+        message.ticks.push(Ticks.fromPartial(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -777,6 +1124,10 @@ export interface Query {
   VirtualPriceTickQueueAll(
     request: QueryAllVirtualPriceTickQueueRequest
   ): Promise<QueryAllVirtualPriceTickQueueResponse>;
+  /** Queries a Ticks by index. */
+  Ticks(request: QueryGetTicksRequest): Promise<QueryGetTicksResponse>;
+  /** Queries a list of Ticks items. */
+  TicksAll(request: QueryAllTicksRequest): Promise<QueryAllTicksResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -843,6 +1194,30 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QueryAllVirtualPriceTickQueueResponse.decode(new Reader(data))
+    );
+  }
+
+  Ticks(request: QueryGetTicksRequest): Promise<QueryGetTicksResponse> {
+    const data = QueryGetTicksRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "Ticks",
+      data
+    );
+    return promise.then((data) =>
+      QueryGetTicksResponse.decode(new Reader(data))
+    );
+  }
+
+  TicksAll(request: QueryAllTicksRequest): Promise<QueryAllTicksResponse> {
+    const data = QueryAllTicksRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "TicksAll",
+      data
+    );
+    return promise.then((data) =>
+      QueryAllTicksResponse.decode(new Reader(data))
     );
   }
 }

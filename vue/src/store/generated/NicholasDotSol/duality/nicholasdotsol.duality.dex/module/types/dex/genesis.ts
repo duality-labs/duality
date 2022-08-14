@@ -4,6 +4,7 @@ import { util, configure, Writer, Reader } from "protobufjs/minimal";
 import { Params } from "../dex/params";
 import { Nodes } from "../dex/nodes";
 import { VirtualPriceTickQueue } from "../dex/virtual_price_tick_queue";
+import { Ticks } from "../dex/ticks";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -13,8 +14,9 @@ export interface GenesisState {
   nodesList: Nodes[];
   nodesCount: number;
   virtualPriceTickQueueList: VirtualPriceTickQueue[];
-  /** this line is used by starport scaffolding # genesis/proto/state */
   virtualPriceTickQueueCount: number;
+  /** this line is used by starport scaffolding # genesis/proto/state */
+  ticksList: Ticks[];
 }
 
 const baseGenesisState: object = {
@@ -39,6 +41,9 @@ export const GenesisState = {
     if (message.virtualPriceTickQueueCount !== 0) {
       writer.uint32(40).uint64(message.virtualPriceTickQueueCount);
     }
+    for (const v of message.ticksList) {
+      Ticks.encode(v!, writer.uint32(50).fork()).ldelim();
+    }
     return writer;
   },
 
@@ -48,6 +53,7 @@ export const GenesisState = {
     const message = { ...baseGenesisState } as GenesisState;
     message.nodesList = [];
     message.virtualPriceTickQueueList = [];
+    message.ticksList = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -70,6 +76,9 @@ export const GenesisState = {
             reader.uint64() as Long
           );
           break;
+        case 6:
+          message.ticksList.push(Ticks.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -82,6 +91,7 @@ export const GenesisState = {
     const message = { ...baseGenesisState } as GenesisState;
     message.nodesList = [];
     message.virtualPriceTickQueueList = [];
+    message.ticksList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromJSON(object.params);
     } else {
@@ -117,6 +127,11 @@ export const GenesisState = {
     } else {
       message.virtualPriceTickQueueCount = 0;
     }
+    if (object.ticksList !== undefined && object.ticksList !== null) {
+      for (const e of object.ticksList) {
+        message.ticksList.push(Ticks.fromJSON(e));
+      }
+    }
     return message;
   },
 
@@ -141,6 +156,13 @@ export const GenesisState = {
     }
     message.virtualPriceTickQueueCount !== undefined &&
       (obj.virtualPriceTickQueueCount = message.virtualPriceTickQueueCount);
+    if (message.ticksList) {
+      obj.ticksList = message.ticksList.map((e) =>
+        e ? Ticks.toJSON(e) : undefined
+      );
+    } else {
+      obj.ticksList = [];
+    }
     return obj;
   },
 
@@ -148,6 +170,7 @@ export const GenesisState = {
     const message = { ...baseGenesisState } as GenesisState;
     message.nodesList = [];
     message.virtualPriceTickQueueList = [];
+    message.ticksList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromPartial(object.params);
     } else {
@@ -180,6 +203,11 @@ export const GenesisState = {
       message.virtualPriceTickQueueCount = object.virtualPriceTickQueueCount;
     } else {
       message.virtualPriceTickQueueCount = 0;
+    }
+    if (object.ticksList !== undefined && object.ticksList !== null) {
+      for (const e of object.ticksList) {
+        message.ticksList.push(Ticks.fromPartial(e));
+      }
     }
     return message;
   },

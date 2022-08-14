@@ -12,6 +12,7 @@ func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		NodesList:                 []Nodes{},
 		VirtualPriceTickQueueList: []VirtualPriceTickQueue{},
+		TicksList:                 []Ticks{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -43,6 +44,16 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("virtualPriceTickQueue id should be lower or equal than the last id")
 		}
 		virtualPriceTickQueueIdMap[elem.Id] = true
+	}
+	// Check for duplicated index in ticks
+	ticksIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.TicksList {
+		index := string(TicksKey(elem.Price, elem.Fee, elem.Direction, elem.OrderType))
+		if _, ok := ticksIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for ticks")
+		}
+		ticksIndexMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 

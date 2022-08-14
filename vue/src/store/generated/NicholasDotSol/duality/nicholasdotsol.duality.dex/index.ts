@@ -4,10 +4,11 @@ import { Node } from "./module/types/dex/node"
 import { Nodes } from "./module/types/dex/nodes"
 import { OrderParams } from "./module/types/dex/order_params"
 import { Params } from "./module/types/dex/params"
+import { Ticks } from "./module/types/dex/ticks"
 import { VirtualPriceTickQueue } from "./module/types/dex/virtual_price_tick_queue"
 
 
-export { Node, Nodes, OrderParams, Params, VirtualPriceTickQueue };
+export { Node, Nodes, OrderParams, Params, Ticks, VirtualPriceTickQueue };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -50,12 +51,15 @@ const getDefaultState = () => {
 				NodesAll: {},
 				VirtualPriceTickQueue: {},
 				VirtualPriceTickQueueAll: {},
+				Ticks: {},
+				TicksAll: {},
 				
 				_Structure: {
 						Node: getStructure(Node.fromPartial({})),
 						Nodes: getStructure(Nodes.fromPartial({})),
 						OrderParams: getStructure(OrderParams.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
+						Ticks: getStructure(Ticks.fromPartial({})),
 						VirtualPriceTickQueue: getStructure(VirtualPriceTickQueue.fromPartial({})),
 						
 		},
@@ -114,6 +118,18 @@ export default {
 						(<any> params).query=null
 					}
 			return state.VirtualPriceTickQueueAll[JSON.stringify(params)] ?? {}
+		},
+				getTicks: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.Ticks[JSON.stringify(params)] ?? {}
+		},
+				getTicksAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.TicksAll[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -262,6 +278,54 @@ export default {
 				return getters['getVirtualPriceTickQueueAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:QueryVirtualPriceTickQueueAll API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryTicks({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryTicks( key.price,  key.fee,  key.direction,  key.orderType)).data
+				
+					
+				commit('QUERY', { query: 'Ticks', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTicks', payload: { options: { all }, params: {...key},query }})
+				return getters['getTicks']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryTicks API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryTicksAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryTicksAll(query)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await queryClient.queryTicksAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'TicksAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTicksAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getTicksAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryTicksAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

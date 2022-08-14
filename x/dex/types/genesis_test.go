@@ -40,6 +40,20 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 				VirtualPriceTickQueueCount: 2,
+				TicksList: []types.Ticks{
+					{
+						Price:     "0",
+						Fee:       "0",
+						Direction: "0",
+						OrderType: "0",
+					},
+					{
+						Price:     "1",
+						Fee:       "1",
+						Direction: "1",
+						OrderType: "1",
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -93,6 +107,26 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 				VirtualPriceTickQueueCount: 0,
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated ticks",
+			genState: &types.GenesisState{
+				TicksList: []types.Ticks{
+					{
+						Price:     "0",
+						Fee:       "0",
+						Direction: "0",
+						OrderType: "0",
+					},
+					{
+						Price:     "0",
+						Fee:       "0",
+						Direction: "0",
+						OrderType: "0",
+					},
+				},
 			},
 			valid: false,
 		},

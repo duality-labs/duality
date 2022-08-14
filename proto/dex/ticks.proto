@@ -1,0 +1,20 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+import "dex/order_params.proto"; 
+
+message Ticks {
+  string price = 1; 
+  string fee = 2; 
+  string direction = 3; 
+  string orderType = 4; 
+  string reserve = 5; 
+  string token = 6; 
+  string pairPrice = 7; 
+  string pairFee = 8; 
+  string totalShares = 9; 
+  repeated OrderParams orderparams = 10; 
+  
+}
+
