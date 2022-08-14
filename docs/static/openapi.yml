@@ -30162,14 +30162,72 @@ paths:
                       type: string
                     tickSpacing:
                       type: string
+                      format: uint64
                     currentIndex:
                       type: string
+                      format: uint64
                     bitArray:
-                      type: string
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uint64
+                        bit:
+                          type: string
+                          format: byte
                     tickmap:
-                      type: string
+                      type: object
+                      properties:
+                        price:
+                          type: string
+                        fee:
+                          type: string
+                        direction:
+                          type: string
+                        orderType:
+                          type: string
+                        reserve:
+                          type: string
+                        token:
+                          type: string
+                        pairPrice:
+                          type: string
+                        pairFee:
+                          type: string
+                        totalShares:
+                          type: string
+                        orderparams:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              orderRule:
+                                type: string
+                              orderType:
+                                type: string
+                              orderShares:
+                                type: string
                     virtualPricemap:
-                      type: string
+                      type: object
+                      properties:
+                        vPrice:
+                          type: string
+                        direction:
+                          type: string
+                        orderType:
+                          type: string
+                        virtualTicks:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              format: uint64
+                            price:
+                              type: string
+                            fee:
+                              type: string
+                            orderType:
+                              type: string
               pagination:
                 type: object
                 properties:
@@ -30283,14 +30341,72 @@ paths:
                     type: string
                   tickSpacing:
                     type: string
+                    format: uint64
                   currentIndex:
                     type: string
+                    format: uint64
                   bitArray:
-                    type: string
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uint64
+                      bit:
+                        type: string
+                        format: byte
                   tickmap:
-                    type: string
+                    type: object
+                    properties:
+                      price:
+                        type: string
+                      fee:
+                        type: string
+                      direction:
+                        type: string
+                      orderType:
+                        type: string
+                      reserve:
+                        type: string
+                      token:
+                        type: string
+                      pairPrice:
+                        type: string
+                      pairFee:
+                        type: string
+                      totalShares:
+                        type: string
+                      orderparams:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            orderRule:
+                              type: string
+                            orderType:
+                              type: string
+                            orderShares:
+                              type: string
                   virtualPricemap:
-                    type: string
+                    type: object
+                    properties:
+                      vPrice:
+                        type: string
+                      direction:
+                        type: string
+                      orderType:
+                        type: string
+                      virtualTicks:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            format: uint64
+                          price:
+                            type: string
+                          fee:
+                            type: string
+                          orderType:
+                            type: string
         default:
           description: An unexpected error response.
           schema:
@@ -52646,6 +52762,8 @@ definitions:
       bit:
         type: string
         format: byte
+  nicholasdotsol.duality.dex.MsgAddLiquidityResponse:
+    type: object
   nicholasdotsol.duality.dex.Node:
     type: object
     properties:
@@ -52688,14 +52806,72 @@ definitions:
         type: string
       tickSpacing:
         type: string
+        format: uint64
       currentIndex:
         type: string
+        format: uint64
       bitArray:
-        type: string
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+          bit:
+            type: string
+            format: byte
       tickmap:
-        type: string
+        type: object
+        properties:
+          price:
+            type: string
+          fee:
+            type: string
+          direction:
+            type: string
+          orderType:
+            type: string
+          reserve:
+            type: string
+          token:
+            type: string
+          pairPrice:
+            type: string
+          pairFee:
+            type: string
+          totalShares:
+            type: string
+          orderparams:
+            type: array
+            items:
+              type: object
+              properties:
+                orderRule:
+                  type: string
+                orderType:
+                  type: string
+                orderShares:
+                  type: string
       virtualPricemap:
-        type: string
+        type: object
+        properties:
+          vPrice:
+            type: string
+          direction:
+            type: string
+          orderType:
+            type: string
+          virtualTicks:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uint64
+              price:
+                type: string
+              fee:
+                type: string
+              orderType:
+                type: string
   nicholasdotsol.duality.dex.Params:
     type: object
     description: Params defines the parameters for the module.
@@ -52797,14 +52973,72 @@ definitions:
               type: string
             tickSpacing:
               type: string
+              format: uint64
             currentIndex:
               type: string
+              format: uint64
             bitArray:
-              type: string
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uint64
+                bit:
+                  type: string
+                  format: byte
             tickmap:
-              type: string
+              type: object
+              properties:
+                price:
+                  type: string
+                fee:
+                  type: string
+                direction:
+                  type: string
+                orderType:
+                  type: string
+                reserve:
+                  type: string
+                token:
+                  type: string
+                pairPrice:
+                  type: string
+                pairFee:
+                  type: string
+                totalShares:
+                  type: string
+                orderparams:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      orderRule:
+                        type: string
+                      orderType:
+                        type: string
+                      orderShares:
+                        type: string
             virtualPricemap:
-              type: string
+              type: object
+              properties:
+                vPrice:
+                  type: string
+                direction:
+                  type: string
+                orderType:
+                  type: string
+                virtualTicks:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uint64
+                    price:
+                      type: string
+                    fee:
+                      type: string
+                    orderType:
+                      type: string
       pagination:
         type: object
         properties:
@@ -53027,14 +53261,72 @@ definitions:
             type: string
           tickSpacing:
             type: string
+            format: uint64
           currentIndex:
             type: string
+            format: uint64
           bitArray:
-            type: string
+            type: object
+            properties:
+              id:
+                type: string
+                format: uint64
+              bit:
+                type: string
+                format: byte
           tickmap:
-            type: string
+            type: object
+            properties:
+              price:
+                type: string
+              fee:
+                type: string
+              direction:
+                type: string
+              orderType:
+                type: string
+              reserve:
+                type: string
+              token:
+                type: string
+              pairPrice:
+                type: string
+              pairFee:
+                type: string
+              totalShares:
+                type: string
+              orderparams:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    orderRule:
+                      type: string
+                    orderType:
+                      type: string
+                    orderShares:
+                      type: string
           virtualPricemap:
-            type: string
+            type: object
+            properties:
+              vPrice:
+                type: string
+              direction:
+                type: string
+              orderType:
+                type: string
+              virtualTicks:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uint64
+                  price:
+                    type: string
+                  fee:
+                    type: string
+                  orderType:
+                    type: string
   nicholasdotsol.duality.dex.QueryGetTicksResponse:
     type: object
     properties:

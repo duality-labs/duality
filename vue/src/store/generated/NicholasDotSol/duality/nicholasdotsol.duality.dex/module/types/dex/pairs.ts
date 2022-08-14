@@ -1,26 +1,27 @@
 /* eslint-disable */
-import { Writer, Reader } from "protobufjs/minimal";
+import * as Long from "long";
+import { util, configure, Writer, Reader } from "protobufjs/minimal";
+import { BitArr } from "../dex/bit_arr";
+import { Ticks } from "../dex/ticks";
+import { VirtualPriceTickList } from "../dex/virtual_price_tick_list";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
 export interface Pairs {
   token0: string;
   token1: string;
-  tickSpacing: string;
-  currentIndex: string;
-  bitArray: string;
-  tickmap: string;
-  virtualPricemap: string;
+  tickSpacing: number;
+  currentIndex: number;
+  bitArray: BitArr | undefined;
+  tickmap: Ticks | undefined;
+  virtualPricemap: VirtualPriceTickList | undefined;
 }
 
 const basePairs: object = {
   token0: "",
   token1: "",
-  tickSpacing: "",
-  currentIndex: "",
-  bitArray: "",
-  tickmap: "",
-  virtualPricemap: "",
+  tickSpacing: 0,
+  currentIndex: 0,
 };
 
 export const Pairs = {
@@ -31,20 +32,23 @@ export const Pairs = {
     if (message.token1 !== "") {
       writer.uint32(18).string(message.token1);
     }
-    if (message.tickSpacing !== "") {
-      writer.uint32(26).string(message.tickSpacing);
+    if (message.tickSpacing !== 0) {
+      writer.uint32(24).uint64(message.tickSpacing);
     }
-    if (message.currentIndex !== "") {
-      writer.uint32(34).string(message.currentIndex);
+    if (message.currentIndex !== 0) {
+      writer.uint32(32).uint64(message.currentIndex);
     }
-    if (message.bitArray !== "") {
-      writer.uint32(42).string(message.bitArray);
+    if (message.bitArray !== undefined) {
+      BitArr.encode(message.bitArray, writer.uint32(42).fork()).ldelim();
     }
-    if (message.tickmap !== "") {
-      writer.uint32(50).string(message.tickmap);
+    if (message.tickmap !== undefined) {
+      Ticks.encode(message.tickmap, writer.uint32(50).fork()).ldelim();
     }
-    if (message.virtualPricemap !== "") {
-      writer.uint32(58).string(message.virtualPricemap);
+    if (message.virtualPricemap !== undefined) {
+      VirtualPriceTickList.encode(
+        message.virtualPricemap,
+        writer.uint32(58).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -63,19 +67,22 @@ export const Pairs = {
           message.token1 = reader.string();
           break;
         case 3:
-          message.tickSpacing = reader.string();
+          message.tickSpacing = longToNumber(reader.uint64() as Long);
           break;
         case 4:
-          message.currentIndex = reader.string();
+          message.currentIndex = longToNumber(reader.uint64() as Long);
           break;
         case 5:
-          message.bitArray = reader.string();
+          message.bitArray = BitArr.decode(reader, reader.uint32());
           break;
         case 6:
-          message.tickmap = reader.string();
+          message.tickmap = Ticks.decode(reader, reader.uint32());
           break;
         case 7:
-          message.virtualPricemap = reader.string();
+          message.virtualPricemap = VirtualPriceTickList.decode(
+            reader,
+            reader.uint32()
+          );
           break;
         default:
           reader.skipType(tag & 7);
@@ -98,32 +105,34 @@ export const Pairs = {
       message.token1 = "";
     }
     if (object.tickSpacing !== undefined && object.tickSpacing !== null) {
-      message.tickSpacing = String(object.tickSpacing);
+      message.tickSpacing = Number(object.tickSpacing);
     } else {
-      message.tickSpacing = "";
+      message.tickSpacing = 0;
     }
     if (object.currentIndex !== undefined && object.currentIndex !== null) {
-      message.currentIndex = String(object.currentIndex);
+      message.currentIndex = Number(object.currentIndex);
     } else {
-      message.currentIndex = "";
+      message.currentIndex = 0;
     }
     if (object.bitArray !== undefined && object.bitArray !== null) {
-      message.bitArray = String(object.bitArray);
+      message.bitArray = BitArr.fromJSON(object.bitArray);
     } else {
-      message.bitArray = "";
+      message.bitArray = undefined;
     }
     if (object.tickmap !== undefined && object.tickmap !== null) {
-      message.tickmap = String(object.tickmap);
+      message.tickmap = Ticks.fromJSON(object.tickmap);
     } else {
-      message.tickmap = "";
+      message.tickmap = undefined;
     }
     if (
       object.virtualPricemap !== undefined &&
       object.virtualPricemap !== null
     ) {
-      message.virtualPricemap = String(object.virtualPricemap);
+      message.virtualPricemap = VirtualPriceTickList.fromJSON(
+        object.virtualPricemap
+      );
     } else {
-      message.virtualPricemap = "";
+      message.virtualPricemap = undefined;
     }
     return message;
   },
@@ -136,10 +145,18 @@ export const Pairs = {
       (obj.tickSpacing = message.tickSpacing);
     message.currentIndex !== undefined &&
       (obj.currentIndex = message.currentIndex);
-    message.bitArray !== undefined && (obj.bitArray = message.bitArray);
-    message.tickmap !== undefined && (obj.tickmap = message.tickmap);
+    message.bitArray !== undefined &&
+      (obj.bitArray = message.bitArray
+        ? BitArr.toJSON(message.bitArray)
+        : undefined);
+    message.tickmap !== undefined &&
+      (obj.tickmap = message.tickmap
+        ? Ticks.toJSON(message.tickmap)
+        : undefined);
     message.virtualPricemap !== undefined &&
-      (obj.virtualPricemap = message.virtualPricemap);
+      (obj.virtualPricemap = message.virtualPricemap
+        ? VirtualPriceTickList.toJSON(message.virtualPricemap)
+        : undefined);
     return obj;
   },
 
@@ -158,34 +175,46 @@ export const Pairs = {
     if (object.tickSpacing !== undefined && object.tickSpacing !== null) {
       message.tickSpacing = object.tickSpacing;
     } else {
-      message.tickSpacing = "";
+      message.tickSpacing = 0;
     }
     if (object.currentIndex !== undefined && object.currentIndex !== null) {
       message.currentIndex = object.currentIndex;
     } else {
-      message.currentIndex = "";
+      message.currentIndex = 0;
     }
     if (object.bitArray !== undefined && object.bitArray !== null) {
-      message.bitArray = object.bitArray;
+      message.bitArray = BitArr.fromPartial(object.bitArray);
     } else {
-      message.bitArray = "";
+      message.bitArray = undefined;
     }
     if (object.tickmap !== undefined && object.tickmap !== null) {
-      message.tickmap = object.tickmap;
+      message.tickmap = Ticks.fromPartial(object.tickmap);
     } else {
-      message.tickmap = "";
+      message.tickmap = undefined;
     }
     if (
       object.virtualPricemap !== undefined &&
       object.virtualPricemap !== null
     ) {
-      message.virtualPricemap = object.virtualPricemap;
+      message.virtualPricemap = VirtualPriceTickList.fromPartial(
+        object.virtualPricemap
+      );
     } else {
-      message.virtualPricemap = "";
+      message.virtualPricemap = undefined;
     }
     return message;
   },
 };
+
+declare var self: any | undefined;
+declare var window: any | undefined;
+var globalThis: any = (() => {
+  if (typeof globalThis !== "undefined") return globalThis;
+  if (typeof self !== "undefined") return self;
+  if (typeof window !== "undefined") return window;
+  if (typeof global !== "undefined") return global;
+  throw "Unable to locate global object";
+})();
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 export type DeepPartial<T> = T extends Builtin
@@ -197,3 +226,15 @@ export type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+function longToNumber(long: Long): number {
+  if (long.gt(Number.MAX_SAFE_INTEGER)) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  return long.toNumber();
+}
+
+if (util.Long !== Long) {
+  util.Long = Long as any;
+  configure();
+}
