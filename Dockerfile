@@ -27,13 +27,8 @@ COPY go.mod ./go.mod
 COPY go.sum ./go.sum
 RUN go mod download
 
-# Copy work files (but not Dockerfile: to avoid invalidating caches while developing)
-COPY app ./app
-COPY cmd ./cmd
-COPY proto ./proto
-COPY testutil ./testutil
-COPY x ./x
-COPY config.yml ./config.yml
+# Copy rest of files
+COPY . .
 
 # see docs for exposed ports:
 #   https://docs.ignite.com/kb/config.html#host
