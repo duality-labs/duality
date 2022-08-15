@@ -1,9 +1,6 @@
-vue/node_modules
-vue/dist
-release/
-.idea/
-.vscode/
-.DS_Store
+Dockerfile
+docker-compose.yml
+docker-compose.setup.yml
 
 # Allow testnet space to be in this directory without affecting Docker builds
 .testnets/
