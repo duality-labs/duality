@@ -2,19 +2,39 @@ syntax = "proto3";
 package nicholasdotsol.duality.dex;
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+import "gogoproto/gogo.proto";
 import "dex/order_params.proto"; 
 
 message Ticks {
-  string price = 1; 
-  string fee = 2; 
+  string price = 1;
+  string fee = 2;
   string direction = 3; 
   string orderType = 4; 
-  string reserve = 5; 
-  string token = 6; 
-  string pairPrice = 7; 
-  string pairFee = 8; 
-  string totalShares = 9; 
-  repeated OrderParams orderparams = 10; 
+  string reserve = 5 [
+      (gogoproto.moretags)   = "yaml:\"reserve\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "reserve"
+  ]; 
+  string pairPrice = 6 [
+      (gogoproto.moretags)   = "yaml:\"pairprice\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "pairprice"
+  ]; 
+  string pairFee = 7 [
+      (gogoproto.moretags)   = "yaml:\"pairfee\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "pairfee"
+  ];
+  string totalShares = 8 [
+      (gogoproto.moretags)   = "yaml:\"totalShares\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "totalShares"
+  ];
+  repeated OrderParams orderparams = 9; 
   
 }
 

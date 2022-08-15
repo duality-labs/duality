@@ -3,9 +3,10 @@ package nicholasdotsol.duality.dex;
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 import "dex/virtual_price_tick_queue.proto"; 
+import "gogoproto/gogo.proto";
 
 message VirtualPriceTickList {
-  string vPrice = 1; 
+  string vPrice = 1;
   string direction = 2; 
   string orderType = 3; 
   VirtualPriceTickQueue virtualTicks = 4; 

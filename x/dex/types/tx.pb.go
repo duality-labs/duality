@@ -28,14 +28,15 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type MsgAddLiquidity struct {
-	Creator        string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	TokenA         string `protobuf:"bytes,2,opt,name=tokenA,proto3" json:"tokenA,omitempty"`
-	TokenB         string `protobuf:"bytes,3,opt,name=tokenB,proto3" json:"tokenB,omitempty"`
-	TokenDirection string `protobuf:"bytes,4,opt,name=tokenDirection,proto3" json:"tokenDirection,omitempty"`
-	Amount         string `protobuf:"bytes,5,opt,name=amount,proto3" json:"amount,omitempty"`
-	Price          string `protobuf:"bytes,6,opt,name=price,proto3" json:"price,omitempty"`
-	Fee            string `protobuf:"bytes,7,opt,name=fee,proto3" json:"fee,omitempty"`
-	OrderType      string `protobuf:"bytes,8,opt,name=orderType,proto3" json:"orderType,omitempty"`
+	Creator        string   `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	TokenA         string   `protobuf:"bytes,2,opt,name=tokenA,proto3" json:"tokenA,omitempty"`
+	TokenB         string   `protobuf:"bytes,3,opt,name=tokenB,proto3" json:"tokenB,omitempty"`
+	TokenDirection []string `protobuf:"bytes,4,rep,name=tokenDirection,proto3" json:"tokenDirection,omitempty"`
+	Amount         []string `protobuf:"bytes,5,rep,name=amount,proto3" json:"amount,omitempty"`
+	Price          []string `protobuf:"bytes,6,rep,name=price,proto3" json:"price,omitempty"`
+	Fee            []string `protobuf:"bytes,7,rep,name=fee,proto3" json:"fee,omitempty"`
+	OrderType      []string `protobuf:"bytes,8,rep,name=orderType,proto3" json:"orderType,omitempty"`
+	Receiver       string   `protobuf:"bytes,9,opt,name=receiver,proto3" json:"receiver,omitempty"`
 }
 
 func (m *MsgAddLiquidity) Reset()         { *m = MsgAddLiquidity{} }
@@ -92,37 +93,44 @@ func (m *MsgAddLiquidity) GetTokenB() string {
 	return ""
 }
 
-func (m *MsgAddLiquidity) GetTokenDirection() string {
+func (m *MsgAddLiquidity) GetTokenDirection() []string {
 	if m != nil {
 		return m.TokenDirection
 	}
-	return ""
+	return nil
 }
 
-func (m *MsgAddLiquidity) GetAmount() string {
+func (m *MsgAddLiquidity) GetAmount() []string {
 	if m != nil {
 		return m.Amount
 	}
-	return ""
+	return nil
 }
 
-func (m *MsgAddLiquidity) GetPrice() string {
+func (m *MsgAddLiquidity) GetPrice() []string {
 	if m != nil {
 		return m.Price
 	}
-	return ""
+	return nil
 }
 
-func (m *MsgAddLiquidity) GetFee() string {
+func (m *MsgAddLiquidity) GetFee() []string {
 	if m != nil {
 		return m.Fee
 	}
-	return ""
+	return nil
 }
 
-func (m *MsgAddLiquidity) GetOrderType() string {
+func (m *MsgAddLiquidity) GetOrderType() []string {
 	if m != nil {
 		return m.OrderType
+	}
+	return nil
+}
+
+func (m *MsgAddLiquidity) GetReceiver() string {
+	if m != nil {
+		return m.Receiver
 	}
 	return ""
 }
@@ -164,14 +172,15 @@ func (m *MsgAddLiquidityResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgAddLiquidityResponse proto.InternalMessageInfo
 
 type MsgRemoveLiquidity struct {
-	Creator        string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	TokenA         string `protobuf:"bytes,2,opt,name=tokenA,proto3" json:"tokenA,omitempty"`
-	TokenB         string `protobuf:"bytes,3,opt,name=tokenB,proto3" json:"tokenB,omitempty"`
-	TokenDirection string `protobuf:"bytes,4,opt,name=tokenDirection,proto3" json:"tokenDirection,omitempty"`
-	Shares         string `protobuf:"bytes,5,opt,name=shares,proto3" json:"shares,omitempty"`
-	Price          string `protobuf:"bytes,6,opt,name=price,proto3" json:"price,omitempty"`
-	Fee            string `protobuf:"bytes,7,opt,name=fee,proto3" json:"fee,omitempty"`
-	OrderType      string `protobuf:"bytes,8,opt,name=orderType,proto3" json:"orderType,omitempty"`
+	Creator        string   `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	TokenA         string   `protobuf:"bytes,2,opt,name=tokenA,proto3" json:"tokenA,omitempty"`
+	TokenB         string   `protobuf:"bytes,3,opt,name=tokenB,proto3" json:"tokenB,omitempty"`
+	TokenDirection []string `protobuf:"bytes,4,rep,name=tokenDirection,proto3" json:"tokenDirection,omitempty"`
+	Shares         []string `protobuf:"bytes,5,rep,name=shares,proto3" json:"shares,omitempty"`
+	Price          []string `protobuf:"bytes,6,rep,name=price,proto3" json:"price,omitempty"`
+	Fee            []string `protobuf:"bytes,7,rep,name=fee,proto3" json:"fee,omitempty"`
+	OrderType      []string `protobuf:"bytes,8,rep,name=orderType,proto3" json:"orderType,omitempty"`
+	Receiver       string   `protobuf:"bytes,9,opt,name=receiver,proto3" json:"receiver,omitempty"`
 }
 
 func (m *MsgRemoveLiquidity) Reset()         { *m = MsgRemoveLiquidity{} }
@@ -228,37 +237,44 @@ func (m *MsgRemoveLiquidity) GetTokenB() string {
 	return ""
 }
 
-func (m *MsgRemoveLiquidity) GetTokenDirection() string {
+func (m *MsgRemoveLiquidity) GetTokenDirection() []string {
 	if m != nil {
 		return m.TokenDirection
 	}
-	return ""
+	return nil
 }
 
-func (m *MsgRemoveLiquidity) GetShares() string {
+func (m *MsgRemoveLiquidity) GetShares() []string {
 	if m != nil {
 		return m.Shares
 	}
-	return ""
+	return nil
 }
 
-func (m *MsgRemoveLiquidity) GetPrice() string {
+func (m *MsgRemoveLiquidity) GetPrice() []string {
 	if m != nil {
 		return m.Price
 	}
-	return ""
+	return nil
 }
 
-func (m *MsgRemoveLiquidity) GetFee() string {
+func (m *MsgRemoveLiquidity) GetFee() []string {
 	if m != nil {
 		return m.Fee
 	}
-	return ""
+	return nil
 }
 
-func (m *MsgRemoveLiquidity) GetOrderType() string {
+func (m *MsgRemoveLiquidity) GetOrderType() []string {
 	if m != nil {
 		return m.OrderType
+	}
+	return nil
+}
+
+func (m *MsgRemoveLiquidity) GetReceiver() string {
+	if m != nil {
+		return m.Receiver
 	}
 	return ""
 }
@@ -521,38 +537,39 @@ func init() {
 func init() { proto.RegisterFile("dex/tx.proto", fileDescriptor_463701e671e5a5e0) }
 
 var fileDescriptor_463701e671e5a5e0 = []byte{
-	// 488 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x54, 0x5d, 0x6b, 0xd4, 0x40,
-	0x14, 0xdd, 0xb8, 0xed, 0x6e, 0x7b, 0xa9, 0x56, 0x07, 0xb5, 0x63, 0x28, 0x41, 0x22, 0x88, 0x52,
-	0x4c, 0xd0, 0x82, 0xef, 0x5d, 0x0b, 0x52, 0x30, 0x2a, 0x5b, 0x1f, 0xd4, 0xb7, 0x34, 0x73, 0xcd,
-	0x8e, 0xee, 0x66, 0xe2, 0xcc, 0x44, 0x37, 0x3f, 0x42, 0xf0, 0xe7, 0xf8, 0x13, 0x7c, 0xec, 0xa3,
-	0x8f, 0xba, 0xeb, 0x0f, 0x91, 0x4c, 0x3e, 0xda, 0x46, 0x74, 0x5b, 0x28, 0xf4, 0x6d, 0xce, 0x99,
-	0x33, 0xe7, 0xcc, 0xbd, 0xb9, 0x13, 0x58, 0x63, 0x38, 0xf5, 0xf5, 0xd4, 0x4b, 0xa5, 0xd0, 0x82,
-	0xd8, 0x09, 0x8f, 0x46, 0x62, 0x1c, 0x2a, 0x26, 0xb4, 0x12, 0x63, 0x8f, 0x65, 0xe1, 0x98, 0xeb,
-	0xdc, 0x63, 0x38, 0x75, 0x7f, 0x59, 0xb0, 0x1e, 0xa8, 0x78, 0x87, 0xb1, 0x67, 0xfc, 0x63, 0xc6,
-	0x19, 0xd7, 0x39, 0xa1, 0xd0, 0x8f, 0x24, 0x86, 0x5a, 0x48, 0x6a, 0xdd, 0xb6, 0xee, 0xad, 0x0e,
-	0x6b, 0x48, 0x6e, 0x42, 0x4f, 0x8b, 0x0f, 0x98, 0xec, 0xd0, 0x4b, 0x66, 0xa3, 0x42, 0x0d, 0x3f,
-	0xa0, 0xdd, 0x63, 0xfc, 0x80, 0xdc, 0x85, 0x2b, 0x66, 0xb5, 0xcb, 0x25, 0x46, 0x9a, 0x8b, 0x84,
-	0x2e, 0x99, 0xfd, 0x16, 0x5b, 0x9c, 0x0f, 0x27, 0x22, 0x4b, 0x34, 0x5d, 0x2e, 0xcf, 0x97, 0x88,
-	0x5c, 0x87, 0xe5, 0x54, 0xf2, 0x08, 0x69, 0xcf, 0xd0, 0x25, 0x20, 0x57, 0xa1, 0xfb, 0x0e, 0x91,
-	0xf6, 0x0d, 0x57, 0x2c, 0xc9, 0x26, 0xac, 0x0a, 0xc9, 0x50, 0xbe, 0xca, 0x53, 0xa4, 0x2b, 0x86,
-	0x3f, 0x22, 0xdc, 0x5b, 0xb0, 0xd1, 0x2a, 0x71, 0x88, 0x2a, 0x15, 0x89, 0x42, 0xf7, 0xb7, 0x05,
-	0x24, 0x50, 0xf1, 0x10, 0x27, 0xe2, 0x13, 0x5e, 0x70, 0x07, 0xd4, 0x28, 0x94, 0xa8, 0xea, 0x0e,
-	0x94, 0xe8, 0x9c, 0x3a, 0xb0, 0x09, 0xf6, 0xdf, 0x55, 0x36, 0x4d, 0x78, 0x03, 0x97, 0x03, 0x15,
-	0x3f, 0x29, 0x2a, 0xc4, 0x97, 0x21, 0x97, 0xe7, 0x57, 0xbe, 0xbb, 0x01, 0x37, 0x4e, 0x58, 0x37,
-	0x99, 0x5f, 0x2c, 0xe8, 0x07, 0x2a, 0xde, 0xff, 0x1c, 0xa6, 0xff, 0x89, 0xa3, 0xd0, 0x37, 0x46,
-	0x7b, 0x49, 0x95, 0x57, 0x43, 0x62, 0xc3, 0x8a, 0x59, 0xbe, 0xc8, 0x74, 0x15, 0xd9, 0xe0, 0x62,
-	0xaf, 0x9c, 0x9f, 0xbd, 0xba, 0xdb, 0x0d, 0x2e, 0x2e, 0x3a, 0xe1, 0xe6, 0x54, 0xd5, 0xe7, 0x12,
-	0xb9, 0xd7, 0xcc, 0x33, 0x28, 0xae, 0x53, 0x5f, 0xf1, 0xd1, 0xb7, 0x2e, 0x74, 0x03, 0x15, 0x93,
-	0x14, 0xd6, 0x4e, 0x3c, 0x8f, 0x2d, 0xef, 0xdf, 0xef, 0xc9, 0x6b, 0x0d, 0x9a, 0xbd, 0x7d, 0x06,
-	0x71, 0x9d, 0x4c, 0x72, 0x58, 0x6f, 0x4f, 0xa4, 0xb7, 0xc0, 0xa7, 0xa5, 0xb7, 0x1f, 0x9f, 0x4d,
-	0xdf, 0x44, 0xbf, 0x07, 0x38, 0x36, 0x08, 0xf7, 0x17, 0xb8, 0x1c, 0x49, 0xed, 0x87, 0xa7, 0x96,
-	0x36, 0x59, 0xaf, 0x61, 0xc9, 0x7c, 0xff, 0x3b, 0x0b, 0x8e, 0x16, 0x22, 0x7b, 0xeb, 0x14, 0xa2,
-	0xda, 0x79, 0xf0, 0xf4, 0xfb, 0xcc, 0xb1, 0x0e, 0x67, 0x8e, 0xf5, 0x73, 0xe6, 0x58, 0x5f, 0xe7,
-	0x4e, 0xe7, 0x70, 0xee, 0x74, 0x7e, 0xcc, 0x9d, 0xce, 0xdb, 0x07, 0x31, 0xd7, 0xa3, 0xec, 0xc0,
-	0x8b, 0xc4, 0xc4, 0x7f, 0x5e, 0x19, 0xee, 0x0a, 0xbd, 0x2f, 0xc6, 0x7e, 0x65, 0xe8, 0x4f, 0x7d,
-	0xf3, 0xf7, 0xcc, 0x53, 0x54, 0x07, 0x3d, 0xf3, 0x07, 0xdd, 0xfe, 0x13, 0x00, 0x00, 0xff, 0xff,
-	0x00, 0xa8, 0xcf, 0xf5, 0x51, 0x05, 0x00, 0x00,
+	// 509 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x54, 0xdd, 0x6a, 0xd4, 0x40,
+	0x14, 0xde, 0x74, 0xbb, 0xbb, 0xdd, 0x43, 0xb5, 0x3a, 0xa8, 0x1d, 0x43, 0x09, 0x25, 0x82, 0x54,
+	0x8a, 0x09, 0x5a, 0xf0, 0xbe, 0x6b, 0x41, 0x0a, 0x46, 0x65, 0xeb, 0x85, 0x7a, 0x97, 0x26, 0xc7,
+	0xec, 0xe8, 0x6e, 0x26, 0xce, 0x4c, 0xea, 0xe6, 0xce, 0x17, 0x10, 0x7c, 0x1c, 0x1f, 0xc1, 0xcb,
+	0x5e, 0x7a, 0x29, 0xbb, 0xcf, 0x21, 0x48, 0x26, 0x3f, 0x6d, 0x23, 0xba, 0x2d, 0x88, 0xbd, 0x9b,
+	0xef, 0x9c, 0x6f, 0xbe, 0xef, 0xcc, 0x99, 0x33, 0x03, 0xab, 0x21, 0x4e, 0x5d, 0x35, 0x75, 0x12,
+	0xc1, 0x15, 0x27, 0x66, 0xcc, 0x82, 0x11, 0x1f, 0xfb, 0x32, 0xe4, 0x4a, 0xf2, 0xb1, 0x13, 0xa6,
+	0xfe, 0x98, 0xa9, 0xcc, 0x09, 0x71, 0x6a, 0xff, 0x34, 0x60, 0xcd, 0x93, 0xd1, 0x6e, 0x18, 0x3e,
+	0x65, 0x1f, 0x52, 0x16, 0x32, 0x95, 0x11, 0x0a, 0xbd, 0x40, 0xa0, 0xaf, 0xb8, 0xa0, 0xc6, 0xa6,
+	0xb1, 0xd5, 0x1f, 0x56, 0x90, 0xdc, 0x82, 0xae, 0xe2, 0xef, 0x31, 0xde, 0xa5, 0x4b, 0x3a, 0x51,
+	0xa2, 0x3a, 0x3e, 0xa0, 0xed, 0x53, 0xf1, 0x01, 0xb9, 0x0b, 0x57, 0xf5, 0x6a, 0x8f, 0x09, 0x0c,
+	0x14, 0xe3, 0x31, 0x5d, 0xde, 0x6c, 0x6f, 0xf5, 0x87, 0x8d, 0x68, 0xbe, 0xdf, 0x9f, 0xf0, 0x34,
+	0x56, 0xb4, 0xa3, 0xf3, 0x25, 0x22, 0x37, 0xa0, 0x93, 0x08, 0x16, 0x20, 0xed, 0xea, 0x70, 0x01,
+	0xc8, 0x35, 0x68, 0xbf, 0x45, 0xa4, 0x3d, 0x1d, 0xcb, 0x97, 0x64, 0x03, 0xfa, 0x5c, 0x84, 0x28,
+	0x5e, 0x66, 0x09, 0xd2, 0x15, 0x1d, 0x3f, 0x09, 0x10, 0x13, 0x56, 0x04, 0x06, 0xc8, 0x8e, 0x50,
+	0xd0, 0xbe, 0xae, 0xaf, 0xc6, 0xf6, 0x6d, 0x58, 0x6f, 0x1c, 0x7f, 0x88, 0x32, 0xe1, 0xb1, 0x44,
+	0xfb, 0xd3, 0x12, 0x10, 0x4f, 0x46, 0x43, 0x9c, 0xf0, 0x23, 0xbc, 0xe4, 0xee, 0xc8, 0x91, 0x2f,
+	0x50, 0x56, 0xdd, 0x29, 0xd0, 0x7f, 0xe8, 0xce, 0x06, 0x98, 0xbf, 0x77, 0xa0, 0x6e, 0xd0, 0x6b,
+	0xb8, 0xe2, 0xc9, 0xe8, 0x71, 0x7e, 0x7a, 0x7c, 0xe1, 0x33, 0xf1, 0xef, 0x5a, 0x63, 0xaf, 0xc3,
+	0xcd, 0x33, 0xd2, 0xb5, 0xe7, 0x67, 0x03, 0x7a, 0x9e, 0x8c, 0x0e, 0x3e, 0xfa, 0xc9, 0x5f, 0xec,
+	0x28, 0xf4, 0xb4, 0xd0, 0x7e, 0x5c, 0xfa, 0x55, 0x30, 0x3f, 0xad, 0x5e, 0x3e, 0x4f, 0x55, 0x69,
+	0x59, 0xe3, 0x3c, 0x57, 0xcc, 0xdd, 0x7e, 0x7e, 0x13, 0x3a, 0x57, 0xe1, 0xbc, 0xd0, 0x09, 0xd3,
+	0xbb, 0x3a, 0x45, 0xa1, 0x05, 0xb2, 0xaf, 0xeb, 0xe7, 0x93, 0x97, 0x53, 0x95, 0xf8, 0xf0, 0x6b,
+	0x1b, 0xda, 0x9e, 0x8c, 0x48, 0x02, 0xab, 0x67, 0x9e, 0xd5, 0xb6, 0xf3, 0xe7, 0x77, 0xe8, 0x34,
+	0x86, 0xd0, 0xdc, 0xb9, 0x00, 0xb9, 0x72, 0x26, 0x19, 0xac, 0x35, 0xa7, 0xd5, 0x59, 0xa0, 0xd3,
+	0xe0, 0x9b, 0x8f, 0x2e, 0xc6, 0xaf, 0xad, 0xdf, 0x01, 0x9c, 0x1a, 0x84, 0x7b, 0x0b, 0x54, 0x4e,
+	0xa8, 0xe6, 0x83, 0x73, 0x53, 0x6b, 0xaf, 0x57, 0xb0, 0xac, 0xef, 0xff, 0xce, 0x82, 0xad, 0x39,
+	0xc9, 0xdc, 0x3e, 0x07, 0xa9, 0x52, 0x1e, 0x3c, 0xf9, 0x36, 0xb3, 0x8c, 0xe3, 0x99, 0x65, 0xfc,
+	0x98, 0x59, 0xc6, 0x97, 0xb9, 0xd5, 0x3a, 0x9e, 0x5b, 0xad, 0xef, 0x73, 0xab, 0xf5, 0xe6, 0x7e,
+	0xc4, 0xd4, 0x28, 0x3d, 0x74, 0x02, 0x3e, 0x71, 0x9f, 0x95, 0x82, 0x7b, 0x5c, 0x1d, 0xf0, 0xb1,
+	0x5b, 0x0a, 0xba, 0x53, 0x57, 0xff, 0xba, 0x59, 0x82, 0xf2, 0xb0, 0xab, 0x7f, 0xde, 0x9d, 0x5f,
+	0x01, 0x00, 0x00, 0xff, 0xff, 0xbd, 0xf8, 0xc6, 0x18, 0x89, 0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -763,40 +780,57 @@ func (m *MsgAddLiquidity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.OrderType) > 0 {
-		i -= len(m.OrderType)
-		copy(dAtA[i:], m.OrderType)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.OrderType)))
+	if len(m.Receiver) > 0 {
+		i -= len(m.Receiver)
+		copy(dAtA[i:], m.Receiver)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Receiver)))
 		i--
-		dAtA[i] = 0x42
+		dAtA[i] = 0x4a
+	}
+	if len(m.OrderType) > 0 {
+		for iNdEx := len(m.OrderType) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.OrderType[iNdEx])
+			copy(dAtA[i:], m.OrderType[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.OrderType[iNdEx])))
+			i--
+			dAtA[i] = 0x42
+		}
 	}
 	if len(m.Fee) > 0 {
-		i -= len(m.Fee)
-		copy(dAtA[i:], m.Fee)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Fee)))
-		i--
-		dAtA[i] = 0x3a
+		for iNdEx := len(m.Fee) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Fee[iNdEx])
+			copy(dAtA[i:], m.Fee[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.Fee[iNdEx])))
+			i--
+			dAtA[i] = 0x3a
+		}
 	}
 	if len(m.Price) > 0 {
-		i -= len(m.Price)
-		copy(dAtA[i:], m.Price)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Price)))
-		i--
-		dAtA[i] = 0x32
+		for iNdEx := len(m.Price) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Price[iNdEx])
+			copy(dAtA[i:], m.Price[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.Price[iNdEx])))
+			i--
+			dAtA[i] = 0x32
+		}
 	}
 	if len(m.Amount) > 0 {
-		i -= len(m.Amount)
-		copy(dAtA[i:], m.Amount)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Amount)))
-		i--
-		dAtA[i] = 0x2a
+		for iNdEx := len(m.Amount) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Amount[iNdEx])
+			copy(dAtA[i:], m.Amount[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.Amount[iNdEx])))
+			i--
+			dAtA[i] = 0x2a
+		}
 	}
 	if len(m.TokenDirection) > 0 {
-		i -= len(m.TokenDirection)
-		copy(dAtA[i:], m.TokenDirection)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.TokenDirection)))
-		i--
-		dAtA[i] = 0x22
+		for iNdEx := len(m.TokenDirection) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.TokenDirection[iNdEx])
+			copy(dAtA[i:], m.TokenDirection[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.TokenDirection[iNdEx])))
+			i--
+			dAtA[i] = 0x22
+		}
 	}
 	if len(m.TokenB) > 0 {
 		i -= len(m.TokenB)
@@ -865,40 +899,57 @@ func (m *MsgRemoveLiquidity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.OrderType) > 0 {
-		i -= len(m.OrderType)
-		copy(dAtA[i:], m.OrderType)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.OrderType)))
+	if len(m.Receiver) > 0 {
+		i -= len(m.Receiver)
+		copy(dAtA[i:], m.Receiver)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Receiver)))
 		i--
-		dAtA[i] = 0x42
+		dAtA[i] = 0x4a
+	}
+	if len(m.OrderType) > 0 {
+		for iNdEx := len(m.OrderType) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.OrderType[iNdEx])
+			copy(dAtA[i:], m.OrderType[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.OrderType[iNdEx])))
+			i--
+			dAtA[i] = 0x42
+		}
 	}
 	if len(m.Fee) > 0 {
-		i -= len(m.Fee)
-		copy(dAtA[i:], m.Fee)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Fee)))
-		i--
-		dAtA[i] = 0x3a
+		for iNdEx := len(m.Fee) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Fee[iNdEx])
+			copy(dAtA[i:], m.Fee[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.Fee[iNdEx])))
+			i--
+			dAtA[i] = 0x3a
+		}
 	}
 	if len(m.Price) > 0 {
-		i -= len(m.Price)
-		copy(dAtA[i:], m.Price)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Price)))
-		i--
-		dAtA[i] = 0x32
+		for iNdEx := len(m.Price) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Price[iNdEx])
+			copy(dAtA[i:], m.Price[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.Price[iNdEx])))
+			i--
+			dAtA[i] = 0x32
+		}
 	}
 	if len(m.Shares) > 0 {
-		i -= len(m.Shares)
-		copy(dAtA[i:], m.Shares)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Shares)))
-		i--
-		dAtA[i] = 0x2a
+		for iNdEx := len(m.Shares) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Shares[iNdEx])
+			copy(dAtA[i:], m.Shares[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.Shares[iNdEx])))
+			i--
+			dAtA[i] = 0x2a
+		}
 	}
 	if len(m.TokenDirection) > 0 {
-		i -= len(m.TokenDirection)
-		copy(dAtA[i:], m.TokenDirection)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.TokenDirection)))
-		i--
-		dAtA[i] = 0x22
+		for iNdEx := len(m.TokenDirection) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.TokenDirection[iNdEx])
+			copy(dAtA[i:], m.TokenDirection[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.TokenDirection[iNdEx])))
+			i--
+			dAtA[i] = 0x22
+		}
 	}
 	if len(m.TokenB) > 0 {
 		i -= len(m.TokenB)
@@ -1124,23 +1175,37 @@ func (m *MsgAddLiquidity) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.TokenDirection)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
+	if len(m.TokenDirection) > 0 {
+		for _, s := range m.TokenDirection {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
 	}
-	l = len(m.Amount)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
+	if len(m.Amount) > 0 {
+		for _, s := range m.Amount {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
 	}
-	l = len(m.Price)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
+	if len(m.Price) > 0 {
+		for _, s := range m.Price {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
 	}
-	l = len(m.Fee)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
+	if len(m.Fee) > 0 {
+		for _, s := range m.Fee {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
 	}
-	l = len(m.OrderType)
+	if len(m.OrderType) > 0 {
+		for _, s := range m.OrderType {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	l = len(m.Receiver)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -1174,23 +1239,37 @@ func (m *MsgRemoveLiquidity) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.TokenDirection)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
+	if len(m.TokenDirection) > 0 {
+		for _, s := range m.TokenDirection {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
 	}
-	l = len(m.Shares)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
+	if len(m.Shares) > 0 {
+		for _, s := range m.Shares {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
 	}
-	l = len(m.Price)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
+	if len(m.Price) > 0 {
+		for _, s := range m.Price {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
 	}
-	l = len(m.Fee)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
+	if len(m.Fee) > 0 {
+		for _, s := range m.Fee {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
 	}
-	l = len(m.OrderType)
+	if len(m.OrderType) > 0 {
+		for _, s := range m.OrderType {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	l = len(m.Receiver)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -1435,7 +1514,7 @@ func (m *MsgAddLiquidity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TokenDirection = string(dAtA[iNdEx:postIndex])
+			m.TokenDirection = append(m.TokenDirection, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
@@ -1467,7 +1546,7 @@ func (m *MsgAddLiquidity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Amount = string(dAtA[iNdEx:postIndex])
+			m.Amount = append(m.Amount, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
@@ -1499,7 +1578,7 @@ func (m *MsgAddLiquidity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Price = string(dAtA[iNdEx:postIndex])
+			m.Price = append(m.Price, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
@@ -1531,7 +1610,7 @@ func (m *MsgAddLiquidity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Fee = string(dAtA[iNdEx:postIndex])
+			m.Fee = append(m.Fee, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
@@ -1563,7 +1642,39 @@ func (m *MsgAddLiquidity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.OrderType = string(dAtA[iNdEx:postIndex])
+			m.OrderType = append(m.OrderType, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Receiver", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Receiver = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1791,7 +1902,7 @@ func (m *MsgRemoveLiquidity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TokenDirection = string(dAtA[iNdEx:postIndex])
+			m.TokenDirection = append(m.TokenDirection, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
@@ -1823,7 +1934,7 @@ func (m *MsgRemoveLiquidity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Shares = string(dAtA[iNdEx:postIndex])
+			m.Shares = append(m.Shares, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
@@ -1855,7 +1966,7 @@ func (m *MsgRemoveLiquidity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Price = string(dAtA[iNdEx:postIndex])
+			m.Price = append(m.Price, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
@@ -1887,7 +1998,7 @@ func (m *MsgRemoveLiquidity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Fee = string(dAtA[iNdEx:postIndex])
+			m.Fee = append(m.Fee, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
@@ -1919,7 +2030,39 @@ func (m *MsgRemoveLiquidity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.OrderType = string(dAtA[iNdEx:postIndex])
+			m.OrderType = append(m.OrderType, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Receiver", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Receiver = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
