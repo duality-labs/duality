@@ -31,6 +31,9 @@ COPY testutil ./testutil
 COPY x ./x
 COPY config.yml ./config.yml
 
+# compile dualityd
+RUN ignite chain build
+
 # see docs for exposed ports:
 #   https://docs.ignite.com/kb/config.html#host
 EXPOSE 26657
