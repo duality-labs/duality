@@ -26,6 +26,9 @@ RUN go mod download
 # Copy rest of files
 COPY . .
 
+# compile dualityd
+RUN ignite chain build
+
 # see docs for exposed ports:
 #   https://docs.ignite.com/kb/config.html#host
 EXPOSE 26657
