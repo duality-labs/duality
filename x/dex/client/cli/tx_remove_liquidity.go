@@ -25,6 +25,7 @@ func CmdRemoveLiquidity() *cobra.Command {
 			argPrice := args[4]
 			argFee := args[5]
 			argOrderType := args[6]
+			argReceiver := args[7]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -40,6 +41,7 @@ func CmdRemoveLiquidity() *cobra.Command {
 				argPrice,
 				argFee,
 				argOrderType,
+				argReceiver,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
