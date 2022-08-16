@@ -26,8 +26,10 @@ RUN go mod download
 # Copy work files (but not Dockerfile: to avoid invalidating caches while developing)
 COPY app ./app
 COPY cmd ./cmd
+COPY docs ./docs
 COPY proto ./proto
 COPY testutil ./testutil
+COPY vue ./vue
 COPY x ./x
 COPY config.yml ./config.yml
 
