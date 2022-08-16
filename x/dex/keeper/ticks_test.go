@@ -22,6 +22,10 @@ func createNTicks(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Ticks {
 		items[i].Fee = strconv.Itoa(i)
 		items[i].Direction = strconv.Itoa(i)
 		items[i].OrderType = strconv.Itoa(i)
+		items[i].Reserve = sdk.ZeroDec()
+		items[i].PairFee = sdk.ZeroDec()
+		items[i].PairPrice = sdk.ZeroDec()
+		items[i].TotalShares = sdk.ZeroDec()
 
 		keeper.SetTicks(ctx, items[i])
 	}

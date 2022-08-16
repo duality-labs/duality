@@ -14,7 +14,10 @@ import (
 func createNVirtualPriceTickQueue(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.VirtualPriceTickQueue {
 	items := make([]types.VirtualPriceTickQueue, n)
 	for i := range items {
+		items[i].Fee = sdk.ZeroDec()
+		items[i].Price = sdk.ZeroDec()
 		items[i].Id = keeper.AppendVirtualPriceTickQueue(ctx, items[i])
+
 	}
 	return items
 }

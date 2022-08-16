@@ -10,7 +10,6 @@ export interface Ticks {
   direction: string;
   orderType: string;
   reserve: string;
-  token: string;
   pairPrice: string;
   pairFee: string;
   totalShares: string;
@@ -23,7 +22,6 @@ const baseTicks: object = {
   direction: "",
   orderType: "",
   reserve: "",
-  token: "",
   pairPrice: "",
   pairFee: "",
   totalShares: "",
@@ -46,20 +44,17 @@ export const Ticks = {
     if (message.reserve !== "") {
       writer.uint32(42).string(message.reserve);
     }
-    if (message.token !== "") {
-      writer.uint32(50).string(message.token);
-    }
     if (message.pairPrice !== "") {
-      writer.uint32(58).string(message.pairPrice);
+      writer.uint32(50).string(message.pairPrice);
     }
     if (message.pairFee !== "") {
-      writer.uint32(66).string(message.pairFee);
+      writer.uint32(58).string(message.pairFee);
     }
     if (message.totalShares !== "") {
-      writer.uint32(74).string(message.totalShares);
+      writer.uint32(66).string(message.totalShares);
     }
     for (const v of message.orderparams) {
-      OrderParams.encode(v!, writer.uint32(82).fork()).ldelim();
+      OrderParams.encode(v!, writer.uint32(74).fork()).ldelim();
     }
     return writer;
   },
@@ -88,18 +83,15 @@ export const Ticks = {
           message.reserve = reader.string();
           break;
         case 6:
-          message.token = reader.string();
-          break;
-        case 7:
           message.pairPrice = reader.string();
           break;
-        case 8:
+        case 7:
           message.pairFee = reader.string();
           break;
-        case 9:
+        case 8:
           message.totalShares = reader.string();
           break;
-        case 10:
+        case 9:
           message.orderparams.push(OrderParams.decode(reader, reader.uint32()));
           break;
         default:
@@ -138,11 +130,6 @@ export const Ticks = {
     } else {
       message.reserve = "";
     }
-    if (object.token !== undefined && object.token !== null) {
-      message.token = String(object.token);
-    } else {
-      message.token = "";
-    }
     if (object.pairPrice !== undefined && object.pairPrice !== null) {
       message.pairPrice = String(object.pairPrice);
     } else {
@@ -173,7 +160,6 @@ export const Ticks = {
     message.direction !== undefined && (obj.direction = message.direction);
     message.orderType !== undefined && (obj.orderType = message.orderType);
     message.reserve !== undefined && (obj.reserve = message.reserve);
-    message.token !== undefined && (obj.token = message.token);
     message.pairPrice !== undefined && (obj.pairPrice = message.pairPrice);
     message.pairFee !== undefined && (obj.pairFee = message.pairFee);
     message.totalShares !== undefined &&
@@ -215,11 +201,6 @@ export const Ticks = {
       message.reserve = object.reserve;
     } else {
       message.reserve = "";
-    }
-    if (object.token !== undefined && object.token !== null) {
-      message.token = object.token;
-    } else {
-      message.token = "";
     }
     if (object.pairPrice !== undefined && object.pairPrice !== null) {
       message.pairPrice = object.pairPrice;

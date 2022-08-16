@@ -18,6 +18,7 @@ var _ = strconv.IntSize
 func createNPairs(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Pairs {
 	items := make([]types.Pairs, n)
 	for i := range items {
+
 		items[i].Token0 = strconv.Itoa(i)
 		items[i].Token1 = strconv.Itoa(i)
 

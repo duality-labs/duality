@@ -12,6 +12,7 @@ export interface MsgAddLiquidity {
   price: string;
   fee: string;
   orderType: string;
+  receiver: string;
 }
 
 export interface MsgAddLiquidityResponse {}
@@ -25,6 +26,7 @@ export interface MsgRemoveLiquidity {
   price: string;
   fee: string;
   orderType: string;
+  receiver: string;
 }
 
 export interface MsgRemoveLiquidityResponse {}
@@ -56,6 +58,7 @@ const baseMsgAddLiquidity: object = {
   price: "",
   fee: "",
   orderType: "",
+  receiver: "",
 };
 
 export const MsgAddLiquidity = {
@@ -83,6 +86,9 @@ export const MsgAddLiquidity = {
     }
     if (message.orderType !== "") {
       writer.uint32(66).string(message.orderType);
+    }
+    if (message.receiver !== "") {
+      writer.uint32(74).string(message.receiver);
     }
     return writer;
   },
@@ -117,6 +123,9 @@ export const MsgAddLiquidity = {
           break;
         case 8:
           message.orderType = reader.string();
+          break;
+        case 9:
+          message.receiver = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -168,6 +177,11 @@ export const MsgAddLiquidity = {
     } else {
       message.orderType = "";
     }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = String(object.receiver);
+    } else {
+      message.receiver = "";
+    }
     return message;
   },
 
@@ -182,6 +196,7 @@ export const MsgAddLiquidity = {
     message.price !== undefined && (obj.price = message.price);
     message.fee !== undefined && (obj.fee = message.fee);
     message.orderType !== undefined && (obj.orderType = message.orderType);
+    message.receiver !== undefined && (obj.receiver = message.receiver);
     return obj;
   },
 
@@ -226,6 +241,11 @@ export const MsgAddLiquidity = {
       message.orderType = object.orderType;
     } else {
       message.orderType = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = object.receiver;
+    } else {
+      message.receiver = "";
     }
     return message;
   },
@@ -286,6 +306,7 @@ const baseMsgRemoveLiquidity: object = {
   price: "",
   fee: "",
   orderType: "",
+  receiver: "",
 };
 
 export const MsgRemoveLiquidity = {
@@ -316,6 +337,9 @@ export const MsgRemoveLiquidity = {
     }
     if (message.orderType !== "") {
       writer.uint32(66).string(message.orderType);
+    }
+    if (message.receiver !== "") {
+      writer.uint32(74).string(message.receiver);
     }
     return writer;
   },
@@ -350,6 +374,9 @@ export const MsgRemoveLiquidity = {
           break;
         case 8:
           message.orderType = reader.string();
+          break;
+        case 9:
+          message.receiver = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -401,6 +428,11 @@ export const MsgRemoveLiquidity = {
     } else {
       message.orderType = "";
     }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = String(object.receiver);
+    } else {
+      message.receiver = "";
+    }
     return message;
   },
 
@@ -415,6 +447,7 @@ export const MsgRemoveLiquidity = {
     message.price !== undefined && (obj.price = message.price);
     message.fee !== undefined && (obj.fee = message.fee);
     message.orderType !== undefined && (obj.orderType = message.orderType);
+    message.receiver !== undefined && (obj.receiver = message.receiver);
     return obj;
   },
 
@@ -459,6 +492,11 @@ export const MsgRemoveLiquidity = {
       message.orderType = object.orderType;
     } else {
       message.orderType = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = object.receiver;
+    } else {
+      message.receiver = "";
     }
     return message;
   },

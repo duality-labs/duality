@@ -30208,8 +30208,6 @@ paths:
                           type: string
                         reserve:
                           type: string
-                        token:
-                          type: string
                         pairPrice:
                           type: string
                         pairFee:
@@ -30397,8 +30395,6 @@ paths:
                         type: string
                       reserve:
                         type: string
-                      token:
-                        type: string
                       pairPrice:
                         type: string
                       pairFee:
@@ -30526,8 +30522,6 @@ paths:
                     orderType:
                       type: string
                     reserve:
-                      type: string
-                    token:
                       type: string
                     pairPrice:
                       type: string
@@ -30672,8 +30666,6 @@ paths:
                   orderType:
                     type: string
                   reserve:
-                    type: string
-                  token:
                     type: string
                   pairPrice:
                     type: string
@@ -52898,8 +52890,6 @@ definitions:
             type: string
           reserve:
             type: string
-          token:
-            type: string
           pairPrice:
             type: string
           pairFee:
@@ -53065,8 +53055,6 @@ definitions:
                   type: string
                 reserve:
                   type: string
-                token:
-                  type: string
                 pairPrice:
                   type: string
                 pairFee:
@@ -53147,8 +53135,6 @@ definitions:
             orderType:
               type: string
             reserve:
-              type: string
-            token:
               type: string
             pairPrice:
               type: string
@@ -53353,8 +53339,6 @@ definitions:
                 type: string
               reserve:
                 type: string
-              token:
-                type: string
               pairPrice:
                 type: string
               pairFee:
@@ -53408,8 +53392,6 @@ definitions:
           orderType:
             type: string
           reserve:
-            type: string
-          token:
             type: string
           pairPrice:
             type: string
@@ -53486,8 +53468,6 @@ definitions:
       orderType:
         type: string
       reserve:
-        type: string
-      token:
         type: string
       pairPrice:
         type: string

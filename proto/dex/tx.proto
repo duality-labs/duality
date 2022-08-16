@@ -18,11 +18,11 @@ message MsgAddLiquidity {
   string creator = 1;
   string tokenA = 2;
   string tokenB = 3;
-  repeated string tokenDirection = 4;
-  repeated string amount = 5;
-  repeated string price = 6;
-  repeated string fee = 7;
-  repeated string orderType = 8;
+  string tokenDirection = 4;
+  string amount = 5;
+  string price = 6;
+  string fee = 7;
+  string orderType = 8;
   string receiver = 9;
 }
 
@@ -33,11 +33,11 @@ message MsgRemoveLiquidity {
   string creator = 1;
   string tokenA = 2;
   string tokenB = 3;
-  repeated string tokenDirection = 4;
-  repeated string shares = 5;
-  repeated string price = 6;
-  repeated string fee = 7;
-  repeated string orderType = 8;
+  string tokenDirection = 4;
+  string shares = 5;
+  string price = 6;
+  string fee = 7;
+  string orderType = 8;
   string receiver = 9;
 }
 

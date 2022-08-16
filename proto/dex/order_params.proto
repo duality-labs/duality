@@ -7,7 +7,7 @@ option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 message OrderParams {
   
   string orderRule = 1; 
-  uint64 orderType = 2; 
+  string orderType = 2; 
   string orderShares = 3 [
       (gogoproto.moretags)   = "yaml:\"orderShares\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
