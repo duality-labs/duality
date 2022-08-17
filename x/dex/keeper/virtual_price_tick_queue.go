@@ -8,6 +8,21 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+func (k Keeper) enqueue(ctx sdk.Context, queue *([]types.VirtualPriceTickQueue), newQueueItem types.VirtualPriceTickQueue) *([]types.VirtualPriceTickQueue) {
+
+	*queue = append(*(queue), newQueueItem)
+	return queue
+}
+
+func (k Keeper) dequeue(ctx sdk.Context, queue *([]types.VirtualPriceTickQueue)) (types.VirtualPriceTickQueue, *([]types.VirtualPriceTickQueue)) {
+	if len(*queue) == 0 {
+		return types.VirtualPriceTickQueue{0, sdk.ZeroDec(), sdk.ZeroDec(), ""}, nil
+	}
+	element := (*queue)[0]
+	*queue = (*queue)[1:]
+	return element, queue
+}
+
 // GetVirtualPriceTickQueueCount get the total number of virtualPriceTickQueue
 func (k Keeper) GetVirtualPriceTickQueueCount(ctx sdk.Context) uint64 {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte{})

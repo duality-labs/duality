@@ -37,6 +37,9 @@ func (k msgServer) AddLiquidityVerification(goCtx context.Context, msg *types.Ms
 		return "", "", nil, nil, sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
+	if msg.TokenDirection != msg.TokenA && msg.TokenB != msg.TokenDirection {
+		return "", "", nil, nil, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Token Direction must be the same as either Token A or Token B")
+	}
 	//var decAmounts []sdk.Dec
 	// for i := 0; i < len(msg.Amount); i++ {
 
