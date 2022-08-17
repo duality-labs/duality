@@ -7,3 +7,4 @@ release/
 
 # Allow testnet space to be in this directory without affecting Docker builds
 .testnets/
+.state/
