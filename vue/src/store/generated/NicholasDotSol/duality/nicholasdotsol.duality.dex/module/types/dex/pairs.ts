@@ -3,7 +3,7 @@ import * as Long from "long";
 import { util, configure, Writer, Reader } from "protobufjs/minimal";
 import { BitArr } from "../dex/bit_arr";
 import { Ticks } from "../dex/ticks";
-import { VirtualPriceTickList } from "../dex/virtual_price_tick_list";
+import { VirtualPriceQueue } from "../dex/virtual_price_queue";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -14,7 +14,7 @@ export interface Pairs {
   currentIndex: number;
   bitArray: BitArr | undefined;
   tickmap: Ticks | undefined;
-  virtualPricemap: VirtualPriceTickList | undefined;
+  virtualPriceMap: VirtualPriceQueue | undefined;
 }
 
 const basePairs: object = {
@@ -44,9 +44,9 @@ export const Pairs = {
     if (message.tickmap !== undefined) {
       Ticks.encode(message.tickmap, writer.uint32(50).fork()).ldelim();
     }
-    if (message.virtualPricemap !== undefined) {
-      VirtualPriceTickList.encode(
-        message.virtualPricemap,
+    if (message.virtualPriceMap !== undefined) {
+      VirtualPriceQueue.encode(
+        message.virtualPriceMap,
         writer.uint32(58).fork()
       ).ldelim();
     }
@@ -79,7 +79,7 @@ export const Pairs = {
           message.tickmap = Ticks.decode(reader, reader.uint32());
           break;
         case 7:
-          message.virtualPricemap = VirtualPriceTickList.decode(
+          message.virtualPriceMap = VirtualPriceQueue.decode(
             reader,
             reader.uint32()
           );
@@ -125,14 +125,14 @@ export const Pairs = {
       message.tickmap = undefined;
     }
     if (
-      object.virtualPricemap !== undefined &&
-      object.virtualPricemap !== null
+      object.virtualPriceMap !== undefined &&
+      object.virtualPriceMap !== null
     ) {
-      message.virtualPricemap = VirtualPriceTickList.fromJSON(
-        object.virtualPricemap
+      message.virtualPriceMap = VirtualPriceQueue.fromJSON(
+        object.virtualPriceMap
       );
     } else {
-      message.virtualPricemap = undefined;
+      message.virtualPriceMap = undefined;
     }
     return message;
   },
@@ -153,9 +153,9 @@ export const Pairs = {
       (obj.tickmap = message.tickmap
         ? Ticks.toJSON(message.tickmap)
         : undefined);
-    message.virtualPricemap !== undefined &&
-      (obj.virtualPricemap = message.virtualPricemap
-        ? VirtualPriceTickList.toJSON(message.virtualPricemap)
+    message.virtualPriceMap !== undefined &&
+      (obj.virtualPriceMap = message.virtualPriceMap
+        ? VirtualPriceQueue.toJSON(message.virtualPriceMap)
         : undefined);
     return obj;
   },
@@ -193,14 +193,14 @@ export const Pairs = {
       message.tickmap = undefined;
     }
     if (
-      object.virtualPricemap !== undefined &&
-      object.virtualPricemap !== null
+      object.virtualPriceMap !== undefined &&
+      object.virtualPriceMap !== null
     ) {
-      message.virtualPricemap = VirtualPriceTickList.fromPartial(
-        object.virtualPricemap
+      message.virtualPriceMap = VirtualPriceQueue.fromPartial(
+        object.virtualPriceMap
       );
     } else {
-      message.virtualPricemap = undefined;
+      message.virtualPriceMap = undefined;
     }
     return message;
   },

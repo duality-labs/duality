@@ -31,15 +31,6 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 				NodesCount: 2,
-				VirtualPriceTickQueueList: []types.VirtualPriceTickQueue{
-					{
-						Id: 0,
-					},
-					{
-						Id: 1,
-					},
-				},
-				VirtualPriceTickQueueCount: 2,
 				TicksList: []types.Ticks{
 					{
 						Price:     "0",
@@ -54,18 +45,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						OrderType: "1",
 					},
 				},
-				VirtualPriceTickListList: []types.VirtualPriceTickList{
-					{
-						VPrice:    "0",
-						Direction: "0",
-						OrderType: "0",
-					},
-					{
-						VPrice:    "1",
-						Direction: "1",
-						OrderType: "1",
-					},
-				},
+
 				BitArrList: []types.BitArr{
 					{
 						Id: 0,
@@ -83,6 +63,18 @@ func TestGenesisState_Validate(t *testing.T) {
 					{
 						Token0: "1",
 						Token1: "1",
+					},
+				},
+				VirtualPriceQueueList: []types.VirtualPriceQueue{
+					{
+						VPrice:    "0",
+						Direction: "0",
+						OrderType: "0",
+					},
+					{
+						VPrice:    "1",
+						Direction: "1",
+						OrderType: "1",
 					},
 				},
 				// this line is used by starport scaffolding # types/genesis/validField
@@ -115,32 +107,7 @@ func TestGenesisState_Validate(t *testing.T) {
 			},
 			valid: false,
 		},
-		{
-			desc: "duplicated virtualPriceTickQueue",
-			genState: &types.GenesisState{
-				VirtualPriceTickQueueList: []types.VirtualPriceTickQueue{
-					{
-						Id: 0,
-					},
-					{
-						Id: 0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "invalid virtualPriceTickQueue count",
-			genState: &types.GenesisState{
-				VirtualPriceTickQueueList: []types.VirtualPriceTickQueue{
-					{
-						Id: 1,
-					},
-				},
-				VirtualPriceTickQueueCount: 0,
-			},
-			valid: false,
-		},
+
 		{
 			desc: "duplicated ticks",
 			genState: &types.GenesisState{
@@ -161,24 +128,7 @@ func TestGenesisState_Validate(t *testing.T) {
 			},
 			valid: false,
 		},
-		{
-			desc: "duplicated virtualPriceTickList",
-			genState: &types.GenesisState{
-				VirtualPriceTickListList: []types.VirtualPriceTickList{
-					{
-						VPrice:    "0",
-						Direction: "0",
-						OrderType: "0",
-					},
-					{
-						VPrice:    "0",
-						Direction: "0",
-						OrderType: "0",
-					},
-				},
-			},
-			valid: false,
-		},
+
 		{
 			desc: "duplicated bitArr",
 			genState: &types.GenesisState{
@@ -216,6 +166,24 @@ func TestGenesisState_Validate(t *testing.T) {
 					{
 						Token0: "0",
 						Token1: "0",
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated virtualPriceQueue",
+			genState: &types.GenesisState{
+				VirtualPriceQueueList: []types.VirtualPriceQueue{
+					{
+						VPrice:    "0",
+						Direction: "0",
+						OrderType: "0",
+					},
+					{
+						VPrice:    "0",
+						Direction: "0",
+						OrderType: "0",
 					},
 				},
 			},

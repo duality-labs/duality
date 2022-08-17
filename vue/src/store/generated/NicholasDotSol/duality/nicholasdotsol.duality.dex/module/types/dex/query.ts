@@ -7,11 +7,10 @@ import {
   PageRequest,
   PageResponse,
 } from "../cosmos/base/query/v1beta1/pagination";
-import { VirtualPriceTickQueue } from "../dex/virtual_price_tick_queue";
 import { Ticks } from "../dex/ticks";
-import { VirtualPriceTickList } from "../dex/virtual_price_tick_list";
 import { BitArr } from "../dex/bit_arr";
 import { Pairs } from "../dex/pairs";
+import { VirtualPriceQueue } from "../dex/virtual_price_queue";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -41,23 +40,6 @@ export interface QueryAllNodesResponse {
   pagination: PageResponse | undefined;
 }
 
-export interface QueryGetVirtualPriceTickQueueRequest {
-  id: number;
-}
-
-export interface QueryGetVirtualPriceTickQueueResponse {
-  VirtualPriceTickQueue: VirtualPriceTickQueue | undefined;
-}
-
-export interface QueryAllVirtualPriceTickQueueRequest {
-  pagination: PageRequest | undefined;
-}
-
-export interface QueryAllVirtualPriceTickQueueResponse {
-  VirtualPriceTickQueue: VirtualPriceTickQueue[];
-  pagination: PageResponse | undefined;
-}
-
 export interface QueryGetTicksRequest {
   price: string;
   fee: string;
@@ -75,25 +57,6 @@ export interface QueryAllTicksRequest {
 
 export interface QueryAllTicksResponse {
   ticks: Ticks[];
-  pagination: PageResponse | undefined;
-}
-
-export interface QueryGetVirtualPriceTickListRequest {
-  vPrice: string;
-  direction: string;
-  orderType: string;
-}
-
-export interface QueryGetVirtualPriceTickListResponse {
-  virtualPriceTickList: VirtualPriceTickList | undefined;
-}
-
-export interface QueryAllVirtualPriceTickListRequest {
-  pagination: PageRequest | undefined;
-}
-
-export interface QueryAllVirtualPriceTickListResponse {
-  virtualPriceTickList: VirtualPriceTickList[];
   pagination: PageResponse | undefined;
 }
 
@@ -129,6 +92,25 @@ export interface QueryAllPairsRequest {
 
 export interface QueryAllPairsResponse {
   pairs: Pairs[];
+  pagination: PageResponse | undefined;
+}
+
+export interface QueryGetVirtualPriceQueueRequest {
+  vPrice: string;
+  direction: string;
+  orderType: string;
+}
+
+export interface QueryGetVirtualPriceQueueResponse {
+  virtualPriceQueue: VirtualPriceQueue | undefined;
+}
+
+export interface QueryAllVirtualPriceQueueRequest {
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryAllVirtualPriceQueueResponse {
+  virtualPriceQueue: VirtualPriceQueue[];
   pagination: PageResponse | undefined;
 }
 
@@ -499,346 +481,6 @@ export const QueryAllNodesResponse = {
   },
 };
 
-const baseQueryGetVirtualPriceTickQueueRequest: object = { id: 0 };
-
-export const QueryGetVirtualPriceTickQueueRequest = {
-  encode(
-    message: QueryGetVirtualPriceTickQueueRequest,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.id !== 0) {
-      writer.uint32(8).uint64(message.id);
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryGetVirtualPriceTickQueueRequest {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryGetVirtualPriceTickQueueRequest,
-    } as QueryGetVirtualPriceTickQueueRequest;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.id = longToNumber(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryGetVirtualPriceTickQueueRequest {
-    const message = {
-      ...baseQueryGetVirtualPriceTickQueueRequest,
-    } as QueryGetVirtualPriceTickQueueRequest;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = Number(object.id);
-    } else {
-      message.id = 0;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryGetVirtualPriceTickQueueRequest): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryGetVirtualPriceTickQueueRequest>
-  ): QueryGetVirtualPriceTickQueueRequest {
-    const message = {
-      ...baseQueryGetVirtualPriceTickQueueRequest,
-    } as QueryGetVirtualPriceTickQueueRequest;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id;
-    } else {
-      message.id = 0;
-    }
-    return message;
-  },
-};
-
-const baseQueryGetVirtualPriceTickQueueResponse: object = {};
-
-export const QueryGetVirtualPriceTickQueueResponse = {
-  encode(
-    message: QueryGetVirtualPriceTickQueueResponse,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.VirtualPriceTickQueue !== undefined) {
-      VirtualPriceTickQueue.encode(
-        message.VirtualPriceTickQueue,
-        writer.uint32(10).fork()
-      ).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryGetVirtualPriceTickQueueResponse {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryGetVirtualPriceTickQueueResponse,
-    } as QueryGetVirtualPriceTickQueueResponse;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.VirtualPriceTickQueue = VirtualPriceTickQueue.decode(
-            reader,
-            reader.uint32()
-          );
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryGetVirtualPriceTickQueueResponse {
-    const message = {
-      ...baseQueryGetVirtualPriceTickQueueResponse,
-    } as QueryGetVirtualPriceTickQueueResponse;
-    if (
-      object.VirtualPriceTickQueue !== undefined &&
-      object.VirtualPriceTickQueue !== null
-    ) {
-      message.VirtualPriceTickQueue = VirtualPriceTickQueue.fromJSON(
-        object.VirtualPriceTickQueue
-      );
-    } else {
-      message.VirtualPriceTickQueue = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryGetVirtualPriceTickQueueResponse): unknown {
-    const obj: any = {};
-    message.VirtualPriceTickQueue !== undefined &&
-      (obj.VirtualPriceTickQueue = message.VirtualPriceTickQueue
-        ? VirtualPriceTickQueue.toJSON(message.VirtualPriceTickQueue)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryGetVirtualPriceTickQueueResponse>
-  ): QueryGetVirtualPriceTickQueueResponse {
-    const message = {
-      ...baseQueryGetVirtualPriceTickQueueResponse,
-    } as QueryGetVirtualPriceTickQueueResponse;
-    if (
-      object.VirtualPriceTickQueue !== undefined &&
-      object.VirtualPriceTickQueue !== null
-    ) {
-      message.VirtualPriceTickQueue = VirtualPriceTickQueue.fromPartial(
-        object.VirtualPriceTickQueue
-      );
-    } else {
-      message.VirtualPriceTickQueue = undefined;
-    }
-    return message;
-  },
-};
-
-const baseQueryAllVirtualPriceTickQueueRequest: object = {};
-
-export const QueryAllVirtualPriceTickQueueRequest = {
-  encode(
-    message: QueryAllVirtualPriceTickQueueRequest,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.pagination !== undefined) {
-      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryAllVirtualPriceTickQueueRequest {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryAllVirtualPriceTickQueueRequest,
-    } as QueryAllVirtualPriceTickQueueRequest;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.pagination = PageRequest.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryAllVirtualPriceTickQueueRequest {
-    const message = {
-      ...baseQueryAllVirtualPriceTickQueueRequest,
-    } as QueryAllVirtualPriceTickQueueRequest;
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromJSON(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryAllVirtualPriceTickQueueRequest): unknown {
-    const obj: any = {};
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination
-        ? PageRequest.toJSON(message.pagination)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryAllVirtualPriceTickQueueRequest>
-  ): QueryAllVirtualPriceTickQueueRequest {
-    const message = {
-      ...baseQueryAllVirtualPriceTickQueueRequest,
-    } as QueryAllVirtualPriceTickQueueRequest;
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromPartial(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-};
-
-const baseQueryAllVirtualPriceTickQueueResponse: object = {};
-
-export const QueryAllVirtualPriceTickQueueResponse = {
-  encode(
-    message: QueryAllVirtualPriceTickQueueResponse,
-    writer: Writer = Writer.create()
-  ): Writer {
-    for (const v of message.VirtualPriceTickQueue) {
-      VirtualPriceTickQueue.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.pagination !== undefined) {
-      PageResponse.encode(
-        message.pagination,
-        writer.uint32(18).fork()
-      ).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryAllVirtualPriceTickQueueResponse {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryAllVirtualPriceTickQueueResponse,
-    } as QueryAllVirtualPriceTickQueueResponse;
-    message.VirtualPriceTickQueue = [];
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.VirtualPriceTickQueue.push(
-            VirtualPriceTickQueue.decode(reader, reader.uint32())
-          );
-          break;
-        case 2:
-          message.pagination = PageResponse.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryAllVirtualPriceTickQueueResponse {
-    const message = {
-      ...baseQueryAllVirtualPriceTickQueueResponse,
-    } as QueryAllVirtualPriceTickQueueResponse;
-    message.VirtualPriceTickQueue = [];
-    if (
-      object.VirtualPriceTickQueue !== undefined &&
-      object.VirtualPriceTickQueue !== null
-    ) {
-      for (const e of object.VirtualPriceTickQueue) {
-        message.VirtualPriceTickQueue.push(VirtualPriceTickQueue.fromJSON(e));
-      }
-    }
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromJSON(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryAllVirtualPriceTickQueueResponse): unknown {
-    const obj: any = {};
-    if (message.VirtualPriceTickQueue) {
-      obj.VirtualPriceTickQueue = message.VirtualPriceTickQueue.map((e) =>
-        e ? VirtualPriceTickQueue.toJSON(e) : undefined
-      );
-    } else {
-      obj.VirtualPriceTickQueue = [];
-    }
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination
-        ? PageResponse.toJSON(message.pagination)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryAllVirtualPriceTickQueueResponse>
-  ): QueryAllVirtualPriceTickQueueResponse {
-    const message = {
-      ...baseQueryAllVirtualPriceTickQueueResponse,
-    } as QueryAllVirtualPriceTickQueueResponse;
-    message.VirtualPriceTickQueue = [];
-    if (
-      object.VirtualPriceTickQueue !== undefined &&
-      object.VirtualPriceTickQueue !== null
-    ) {
-      for (const e of object.VirtualPriceTickQueue) {
-        message.VirtualPriceTickQueue.push(
-          VirtualPriceTickQueue.fromPartial(e)
-        );
-      }
-    }
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromPartial(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-};
-
 const baseQueryGetTicksRequest: object = {
   price: "",
   fee: "",
@@ -1154,382 +796,6 @@ export const QueryAllTicksResponse = {
     if (object.ticks !== undefined && object.ticks !== null) {
       for (const e of object.ticks) {
         message.ticks.push(Ticks.fromPartial(e));
-      }
-    }
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromPartial(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-};
-
-const baseQueryGetVirtualPriceTickListRequest: object = {
-  vPrice: "",
-  direction: "",
-  orderType: "",
-};
-
-export const QueryGetVirtualPriceTickListRequest = {
-  encode(
-    message: QueryGetVirtualPriceTickListRequest,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.vPrice !== "") {
-      writer.uint32(10).string(message.vPrice);
-    }
-    if (message.direction !== "") {
-      writer.uint32(18).string(message.direction);
-    }
-    if (message.orderType !== "") {
-      writer.uint32(26).string(message.orderType);
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryGetVirtualPriceTickListRequest {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryGetVirtualPriceTickListRequest,
-    } as QueryGetVirtualPriceTickListRequest;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.vPrice = reader.string();
-          break;
-        case 2:
-          message.direction = reader.string();
-          break;
-        case 3:
-          message.orderType = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryGetVirtualPriceTickListRequest {
-    const message = {
-      ...baseQueryGetVirtualPriceTickListRequest,
-    } as QueryGetVirtualPriceTickListRequest;
-    if (object.vPrice !== undefined && object.vPrice !== null) {
-      message.vPrice = String(object.vPrice);
-    } else {
-      message.vPrice = "";
-    }
-    if (object.direction !== undefined && object.direction !== null) {
-      message.direction = String(object.direction);
-    } else {
-      message.direction = "";
-    }
-    if (object.orderType !== undefined && object.orderType !== null) {
-      message.orderType = String(object.orderType);
-    } else {
-      message.orderType = "";
-    }
-    return message;
-  },
-
-  toJSON(message: QueryGetVirtualPriceTickListRequest): unknown {
-    const obj: any = {};
-    message.vPrice !== undefined && (obj.vPrice = message.vPrice);
-    message.direction !== undefined && (obj.direction = message.direction);
-    message.orderType !== undefined && (obj.orderType = message.orderType);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryGetVirtualPriceTickListRequest>
-  ): QueryGetVirtualPriceTickListRequest {
-    const message = {
-      ...baseQueryGetVirtualPriceTickListRequest,
-    } as QueryGetVirtualPriceTickListRequest;
-    if (object.vPrice !== undefined && object.vPrice !== null) {
-      message.vPrice = object.vPrice;
-    } else {
-      message.vPrice = "";
-    }
-    if (object.direction !== undefined && object.direction !== null) {
-      message.direction = object.direction;
-    } else {
-      message.direction = "";
-    }
-    if (object.orderType !== undefined && object.orderType !== null) {
-      message.orderType = object.orderType;
-    } else {
-      message.orderType = "";
-    }
-    return message;
-  },
-};
-
-const baseQueryGetVirtualPriceTickListResponse: object = {};
-
-export const QueryGetVirtualPriceTickListResponse = {
-  encode(
-    message: QueryGetVirtualPriceTickListResponse,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.virtualPriceTickList !== undefined) {
-      VirtualPriceTickList.encode(
-        message.virtualPriceTickList,
-        writer.uint32(10).fork()
-      ).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryGetVirtualPriceTickListResponse {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryGetVirtualPriceTickListResponse,
-    } as QueryGetVirtualPriceTickListResponse;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.virtualPriceTickList = VirtualPriceTickList.decode(
-            reader,
-            reader.uint32()
-          );
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryGetVirtualPriceTickListResponse {
-    const message = {
-      ...baseQueryGetVirtualPriceTickListResponse,
-    } as QueryGetVirtualPriceTickListResponse;
-    if (
-      object.virtualPriceTickList !== undefined &&
-      object.virtualPriceTickList !== null
-    ) {
-      message.virtualPriceTickList = VirtualPriceTickList.fromJSON(
-        object.virtualPriceTickList
-      );
-    } else {
-      message.virtualPriceTickList = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryGetVirtualPriceTickListResponse): unknown {
-    const obj: any = {};
-    message.virtualPriceTickList !== undefined &&
-      (obj.virtualPriceTickList = message.virtualPriceTickList
-        ? VirtualPriceTickList.toJSON(message.virtualPriceTickList)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryGetVirtualPriceTickListResponse>
-  ): QueryGetVirtualPriceTickListResponse {
-    const message = {
-      ...baseQueryGetVirtualPriceTickListResponse,
-    } as QueryGetVirtualPriceTickListResponse;
-    if (
-      object.virtualPriceTickList !== undefined &&
-      object.virtualPriceTickList !== null
-    ) {
-      message.virtualPriceTickList = VirtualPriceTickList.fromPartial(
-        object.virtualPriceTickList
-      );
-    } else {
-      message.virtualPriceTickList = undefined;
-    }
-    return message;
-  },
-};
-
-const baseQueryAllVirtualPriceTickListRequest: object = {};
-
-export const QueryAllVirtualPriceTickListRequest = {
-  encode(
-    message: QueryAllVirtualPriceTickListRequest,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.pagination !== undefined) {
-      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryAllVirtualPriceTickListRequest {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryAllVirtualPriceTickListRequest,
-    } as QueryAllVirtualPriceTickListRequest;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.pagination = PageRequest.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryAllVirtualPriceTickListRequest {
-    const message = {
-      ...baseQueryAllVirtualPriceTickListRequest,
-    } as QueryAllVirtualPriceTickListRequest;
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromJSON(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryAllVirtualPriceTickListRequest): unknown {
-    const obj: any = {};
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination
-        ? PageRequest.toJSON(message.pagination)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryAllVirtualPriceTickListRequest>
-  ): QueryAllVirtualPriceTickListRequest {
-    const message = {
-      ...baseQueryAllVirtualPriceTickListRequest,
-    } as QueryAllVirtualPriceTickListRequest;
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromPartial(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-};
-
-const baseQueryAllVirtualPriceTickListResponse: object = {};
-
-export const QueryAllVirtualPriceTickListResponse = {
-  encode(
-    message: QueryAllVirtualPriceTickListResponse,
-    writer: Writer = Writer.create()
-  ): Writer {
-    for (const v of message.virtualPriceTickList) {
-      VirtualPriceTickList.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.pagination !== undefined) {
-      PageResponse.encode(
-        message.pagination,
-        writer.uint32(18).fork()
-      ).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryAllVirtualPriceTickListResponse {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryAllVirtualPriceTickListResponse,
-    } as QueryAllVirtualPriceTickListResponse;
-    message.virtualPriceTickList = [];
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.virtualPriceTickList.push(
-            VirtualPriceTickList.decode(reader, reader.uint32())
-          );
-          break;
-        case 2:
-          message.pagination = PageResponse.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryAllVirtualPriceTickListResponse {
-    const message = {
-      ...baseQueryAllVirtualPriceTickListResponse,
-    } as QueryAllVirtualPriceTickListResponse;
-    message.virtualPriceTickList = [];
-    if (
-      object.virtualPriceTickList !== undefined &&
-      object.virtualPriceTickList !== null
-    ) {
-      for (const e of object.virtualPriceTickList) {
-        message.virtualPriceTickList.push(VirtualPriceTickList.fromJSON(e));
-      }
-    }
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromJSON(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryAllVirtualPriceTickListResponse): unknown {
-    const obj: any = {};
-    if (message.virtualPriceTickList) {
-      obj.virtualPriceTickList = message.virtualPriceTickList.map((e) =>
-        e ? VirtualPriceTickList.toJSON(e) : undefined
-      );
-    } else {
-      obj.virtualPriceTickList = [];
-    }
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination
-        ? PageResponse.toJSON(message.pagination)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryAllVirtualPriceTickListResponse>
-  ): QueryAllVirtualPriceTickListResponse {
-    const message = {
-      ...baseQueryAllVirtualPriceTickListResponse,
-    } as QueryAllVirtualPriceTickListResponse;
-    message.virtualPriceTickList = [];
-    if (
-      object.virtualPriceTickList !== undefined &&
-      object.virtualPriceTickList !== null
-    ) {
-      for (const e of object.virtualPriceTickList) {
-        message.virtualPriceTickList.push(VirtualPriceTickList.fromPartial(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -2104,6 +1370,382 @@ export const QueryAllPairsResponse = {
   },
 };
 
+const baseQueryGetVirtualPriceQueueRequest: object = {
+  vPrice: "",
+  direction: "",
+  orderType: "",
+};
+
+export const QueryGetVirtualPriceQueueRequest = {
+  encode(
+    message: QueryGetVirtualPriceQueueRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.vPrice !== "") {
+      writer.uint32(10).string(message.vPrice);
+    }
+    if (message.direction !== "") {
+      writer.uint32(18).string(message.direction);
+    }
+    if (message.orderType !== "") {
+      writer.uint32(26).string(message.orderType);
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryGetVirtualPriceQueueRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryGetVirtualPriceQueueRequest,
+    } as QueryGetVirtualPriceQueueRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.vPrice = reader.string();
+          break;
+        case 2:
+          message.direction = reader.string();
+          break;
+        case 3:
+          message.orderType = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetVirtualPriceQueueRequest {
+    const message = {
+      ...baseQueryGetVirtualPriceQueueRequest,
+    } as QueryGetVirtualPriceQueueRequest;
+    if (object.vPrice !== undefined && object.vPrice !== null) {
+      message.vPrice = String(object.vPrice);
+    } else {
+      message.vPrice = "";
+    }
+    if (object.direction !== undefined && object.direction !== null) {
+      message.direction = String(object.direction);
+    } else {
+      message.direction = "";
+    }
+    if (object.orderType !== undefined && object.orderType !== null) {
+      message.orderType = String(object.orderType);
+    } else {
+      message.orderType = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetVirtualPriceQueueRequest): unknown {
+    const obj: any = {};
+    message.vPrice !== undefined && (obj.vPrice = message.vPrice);
+    message.direction !== undefined && (obj.direction = message.direction);
+    message.orderType !== undefined && (obj.orderType = message.orderType);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetVirtualPriceQueueRequest>
+  ): QueryGetVirtualPriceQueueRequest {
+    const message = {
+      ...baseQueryGetVirtualPriceQueueRequest,
+    } as QueryGetVirtualPriceQueueRequest;
+    if (object.vPrice !== undefined && object.vPrice !== null) {
+      message.vPrice = object.vPrice;
+    } else {
+      message.vPrice = "";
+    }
+    if (object.direction !== undefined && object.direction !== null) {
+      message.direction = object.direction;
+    } else {
+      message.direction = "";
+    }
+    if (object.orderType !== undefined && object.orderType !== null) {
+      message.orderType = object.orderType;
+    } else {
+      message.orderType = "";
+    }
+    return message;
+  },
+};
+
+const baseQueryGetVirtualPriceQueueResponse: object = {};
+
+export const QueryGetVirtualPriceQueueResponse = {
+  encode(
+    message: QueryGetVirtualPriceQueueResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.virtualPriceQueue !== undefined) {
+      VirtualPriceQueue.encode(
+        message.virtualPriceQueue,
+        writer.uint32(10).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryGetVirtualPriceQueueResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryGetVirtualPriceQueueResponse,
+    } as QueryGetVirtualPriceQueueResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.virtualPriceQueue = VirtualPriceQueue.decode(
+            reader,
+            reader.uint32()
+          );
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetVirtualPriceQueueResponse {
+    const message = {
+      ...baseQueryGetVirtualPriceQueueResponse,
+    } as QueryGetVirtualPriceQueueResponse;
+    if (
+      object.virtualPriceQueue !== undefined &&
+      object.virtualPriceQueue !== null
+    ) {
+      message.virtualPriceQueue = VirtualPriceQueue.fromJSON(
+        object.virtualPriceQueue
+      );
+    } else {
+      message.virtualPriceQueue = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetVirtualPriceQueueResponse): unknown {
+    const obj: any = {};
+    message.virtualPriceQueue !== undefined &&
+      (obj.virtualPriceQueue = message.virtualPriceQueue
+        ? VirtualPriceQueue.toJSON(message.virtualPriceQueue)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetVirtualPriceQueueResponse>
+  ): QueryGetVirtualPriceQueueResponse {
+    const message = {
+      ...baseQueryGetVirtualPriceQueueResponse,
+    } as QueryGetVirtualPriceQueueResponse;
+    if (
+      object.virtualPriceQueue !== undefined &&
+      object.virtualPriceQueue !== null
+    ) {
+      message.virtualPriceQueue = VirtualPriceQueue.fromPartial(
+        object.virtualPriceQueue
+      );
+    } else {
+      message.virtualPriceQueue = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllVirtualPriceQueueRequest: object = {};
+
+export const QueryAllVirtualPriceQueueRequest = {
+  encode(
+    message: QueryAllVirtualPriceQueueRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryAllVirtualPriceQueueRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryAllVirtualPriceQueueRequest,
+    } as QueryAllVirtualPriceQueueRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllVirtualPriceQueueRequest {
+    const message = {
+      ...baseQueryAllVirtualPriceQueueRequest,
+    } as QueryAllVirtualPriceQueueRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllVirtualPriceQueueRequest): unknown {
+    const obj: any = {};
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageRequest.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryAllVirtualPriceQueueRequest>
+  ): QueryAllVirtualPriceQueueRequest {
+    const message = {
+      ...baseQueryAllVirtualPriceQueueRequest,
+    } as QueryAllVirtualPriceQueueRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllVirtualPriceQueueResponse: object = {};
+
+export const QueryAllVirtualPriceQueueResponse = {
+  encode(
+    message: QueryAllVirtualPriceQueueResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    for (const v of message.virtualPriceQueue) {
+      VirtualPriceQueue.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(
+        message.pagination,
+        writer.uint32(18).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryAllVirtualPriceQueueResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryAllVirtualPriceQueueResponse,
+    } as QueryAllVirtualPriceQueueResponse;
+    message.virtualPriceQueue = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.virtualPriceQueue.push(
+            VirtualPriceQueue.decode(reader, reader.uint32())
+          );
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllVirtualPriceQueueResponse {
+    const message = {
+      ...baseQueryAllVirtualPriceQueueResponse,
+    } as QueryAllVirtualPriceQueueResponse;
+    message.virtualPriceQueue = [];
+    if (
+      object.virtualPriceQueue !== undefined &&
+      object.virtualPriceQueue !== null
+    ) {
+      for (const e of object.virtualPriceQueue) {
+        message.virtualPriceQueue.push(VirtualPriceQueue.fromJSON(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllVirtualPriceQueueResponse): unknown {
+    const obj: any = {};
+    if (message.virtualPriceQueue) {
+      obj.virtualPriceQueue = message.virtualPriceQueue.map((e) =>
+        e ? VirtualPriceQueue.toJSON(e) : undefined
+      );
+    } else {
+      obj.virtualPriceQueue = [];
+    }
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageResponse.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryAllVirtualPriceQueueResponse>
+  ): QueryAllVirtualPriceQueueResponse {
+    const message = {
+      ...baseQueryAllVirtualPriceQueueResponse,
+    } as QueryAllVirtualPriceQueueResponse;
+    message.virtualPriceQueue = [];
+    if (
+      object.virtualPriceQueue !== undefined &&
+      object.virtualPriceQueue !== null
+    ) {
+      for (const e of object.virtualPriceQueue) {
+        message.virtualPriceQueue.push(VirtualPriceQueue.fromPartial(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -2112,26 +1754,10 @@ export interface Query {
   Nodes(request: QueryGetNodesRequest): Promise<QueryGetNodesResponse>;
   /** Queries a list of Nodes items. */
   NodesAll(request: QueryAllNodesRequest): Promise<QueryAllNodesResponse>;
-  /** Queries a VirtualPriceTickQueue by id. */
-  VirtualPriceTickQueue(
-    request: QueryGetVirtualPriceTickQueueRequest
-  ): Promise<QueryGetVirtualPriceTickQueueResponse>;
-  /** Queries a list of VirtualPriceTickQueue items. */
-  VirtualPriceTickQueueAll(
-    request: QueryAllVirtualPriceTickQueueRequest
-  ): Promise<QueryAllVirtualPriceTickQueueResponse>;
   /** Queries a Ticks by index. */
   Ticks(request: QueryGetTicksRequest): Promise<QueryGetTicksResponse>;
   /** Queries a list of Ticks items. */
   TicksAll(request: QueryAllTicksRequest): Promise<QueryAllTicksResponse>;
-  /** Queries a VirtualPriceTickList by index. */
-  VirtualPriceTickList(
-    request: QueryGetVirtualPriceTickListRequest
-  ): Promise<QueryGetVirtualPriceTickListResponse>;
-  /** Queries a list of VirtualPriceTickList items. */
-  VirtualPriceTickListAll(
-    request: QueryAllVirtualPriceTickListRequest
-  ): Promise<QueryAllVirtualPriceTickListResponse>;
   /** Queries a BitArr by id. */
   BitArr(request: QueryGetBitArrRequest): Promise<QueryGetBitArrResponse>;
   /** Queries a list of BitArr items. */
@@ -2140,6 +1766,14 @@ export interface Query {
   Pairs(request: QueryGetPairsRequest): Promise<QueryGetPairsResponse>;
   /** Queries a list of Pairs items. */
   PairsAll(request: QueryAllPairsRequest): Promise<QueryAllPairsResponse>;
+  /** Queries a VirtualPriceQueue by index. */
+  VirtualPriceQueue(
+    request: QueryGetVirtualPriceQueueRequest
+  ): Promise<QueryGetVirtualPriceQueueResponse>;
+  /** Queries a list of VirtualPriceQueue items. */
+  VirtualPriceQueueAll(
+    request: QueryAllVirtualPriceQueueRequest
+  ): Promise<QueryAllVirtualPriceQueueResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -2181,34 +1815,6 @@ export class QueryClientImpl implements Query {
     );
   }
 
-  VirtualPriceTickQueue(
-    request: QueryGetVirtualPriceTickQueueRequest
-  ): Promise<QueryGetVirtualPriceTickQueueResponse> {
-    const data = QueryGetVirtualPriceTickQueueRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      "nicholasdotsol.duality.dex.Query",
-      "VirtualPriceTickQueue",
-      data
-    );
-    return promise.then((data) =>
-      QueryGetVirtualPriceTickQueueResponse.decode(new Reader(data))
-    );
-  }
-
-  VirtualPriceTickQueueAll(
-    request: QueryAllVirtualPriceTickQueueRequest
-  ): Promise<QueryAllVirtualPriceTickQueueResponse> {
-    const data = QueryAllVirtualPriceTickQueueRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      "nicholasdotsol.duality.dex.Query",
-      "VirtualPriceTickQueueAll",
-      data
-    );
-    return promise.then((data) =>
-      QueryAllVirtualPriceTickQueueResponse.decode(new Reader(data))
-    );
-  }
-
   Ticks(request: QueryGetTicksRequest): Promise<QueryGetTicksResponse> {
     const data = QueryGetTicksRequest.encode(request).finish();
     const promise = this.rpc.request(
@@ -2230,34 +1836,6 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QueryAllTicksResponse.decode(new Reader(data))
-    );
-  }
-
-  VirtualPriceTickList(
-    request: QueryGetVirtualPriceTickListRequest
-  ): Promise<QueryGetVirtualPriceTickListResponse> {
-    const data = QueryGetVirtualPriceTickListRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      "nicholasdotsol.duality.dex.Query",
-      "VirtualPriceTickList",
-      data
-    );
-    return promise.then((data) =>
-      QueryGetVirtualPriceTickListResponse.decode(new Reader(data))
-    );
-  }
-
-  VirtualPriceTickListAll(
-    request: QueryAllVirtualPriceTickListRequest
-  ): Promise<QueryAllVirtualPriceTickListResponse> {
-    const data = QueryAllVirtualPriceTickListRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      "nicholasdotsol.duality.dex.Query",
-      "VirtualPriceTickListAll",
-      data
-    );
-    return promise.then((data) =>
-      QueryAllVirtualPriceTickListResponse.decode(new Reader(data))
     );
   }
 
@@ -2306,6 +1884,34 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QueryAllPairsResponse.decode(new Reader(data))
+    );
+  }
+
+  VirtualPriceQueue(
+    request: QueryGetVirtualPriceQueueRequest
+  ): Promise<QueryGetVirtualPriceQueueResponse> {
+    const data = QueryGetVirtualPriceQueueRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "VirtualPriceQueue",
+      data
+    );
+    return promise.then((data) =>
+      QueryGetVirtualPriceQueueResponse.decode(new Reader(data))
+    );
+  }
+
+  VirtualPriceQueueAll(
+    request: QueryAllVirtualPriceQueueRequest
+  ): Promise<QueryAllVirtualPriceQueueResponse> {
+    const data = QueryAllVirtualPriceQueueRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "VirtualPriceQueueAll",
+      data
+    );
+    return promise.then((data) =>
+      QueryAllVirtualPriceQueueResponse.decode(new Reader(data))
     );
   }
 }

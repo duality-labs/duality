@@ -3,11 +3,10 @@ import * as Long from "long";
 import { util, configure, Writer, Reader } from "protobufjs/minimal";
 import { Params } from "../dex/params";
 import { Nodes } from "../dex/nodes";
-import { VirtualPriceTickQueue } from "../dex/virtual_price_tick_queue";
 import { Ticks } from "../dex/ticks";
-import { VirtualPriceTickList } from "../dex/virtual_price_tick_list";
 import { BitArr } from "../dex/bit_arr";
 import { Pairs } from "../dex/pairs";
+import { VirtualPriceQueue } from "../dex/virtual_price_queue";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -16,21 +15,15 @@ export interface GenesisState {
   params: Params | undefined;
   nodesList: Nodes[];
   nodesCount: number;
-  virtualPriceTickQueueList: VirtualPriceTickQueue[];
-  virtualPriceTickQueueCount: number;
   ticksList: Ticks[];
-  virtualPriceTickListList: VirtualPriceTickList[];
   bitArrList: BitArr[];
   bitArrCount: number;
-  /** this line is used by starport scaffolding # genesis/proto/state */
   pairsList: Pairs[];
+  /** this line is used by starport scaffolding # genesis/proto/state */
+  virtualPriceQueueList: VirtualPriceQueue[];
 }
 
-const baseGenesisState: object = {
-  nodesCount: 0,
-  virtualPriceTickQueueCount: 0,
-  bitArrCount: 0,
-};
+const baseGenesisState: object = { nodesCount: 0, bitArrCount: 0 };
 
 export const GenesisState = {
   encode(message: GenesisState, writer: Writer = Writer.create()): Writer {
@@ -43,26 +36,20 @@ export const GenesisState = {
     if (message.nodesCount !== 0) {
       writer.uint32(24).uint64(message.nodesCount);
     }
-    for (const v of message.virtualPriceTickQueueList) {
-      VirtualPriceTickQueue.encode(v!, writer.uint32(34).fork()).ldelim();
-    }
-    if (message.virtualPriceTickQueueCount !== 0) {
-      writer.uint32(40).uint64(message.virtualPriceTickQueueCount);
-    }
     for (const v of message.ticksList) {
-      Ticks.encode(v!, writer.uint32(50).fork()).ldelim();
-    }
-    for (const v of message.virtualPriceTickListList) {
-      VirtualPriceTickList.encode(v!, writer.uint32(58).fork()).ldelim();
+      Ticks.encode(v!, writer.uint32(34).fork()).ldelim();
     }
     for (const v of message.bitArrList) {
-      BitArr.encode(v!, writer.uint32(66).fork()).ldelim();
+      BitArr.encode(v!, writer.uint32(42).fork()).ldelim();
     }
     if (message.bitArrCount !== 0) {
-      writer.uint32(72).uint64(message.bitArrCount);
+      writer.uint32(48).uint64(message.bitArrCount);
     }
     for (const v of message.pairsList) {
-      Pairs.encode(v!, writer.uint32(82).fork()).ldelim();
+      Pairs.encode(v!, writer.uint32(58).fork()).ldelim();
+    }
+    for (const v of message.virtualPriceQueueList) {
+      VirtualPriceQueue.encode(v!, writer.uint32(66).fork()).ldelim();
     }
     return writer;
   },
@@ -72,11 +59,10 @@ export const GenesisState = {
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseGenesisState } as GenesisState;
     message.nodesList = [];
-    message.virtualPriceTickQueueList = [];
     message.ticksList = [];
-    message.virtualPriceTickListList = [];
     message.bitArrList = [];
     message.pairsList = [];
+    message.virtualPriceQueueList = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -90,31 +76,21 @@ export const GenesisState = {
           message.nodesCount = longToNumber(reader.uint64() as Long);
           break;
         case 4:
-          message.virtualPriceTickQueueList.push(
-            VirtualPriceTickQueue.decode(reader, reader.uint32())
-          );
-          break;
-        case 5:
-          message.virtualPriceTickQueueCount = longToNumber(
-            reader.uint64() as Long
-          );
-          break;
-        case 6:
           message.ticksList.push(Ticks.decode(reader, reader.uint32()));
           break;
-        case 7:
-          message.virtualPriceTickListList.push(
-            VirtualPriceTickList.decode(reader, reader.uint32())
-          );
-          break;
-        case 8:
+        case 5:
           message.bitArrList.push(BitArr.decode(reader, reader.uint32()));
           break;
-        case 9:
+        case 6:
           message.bitArrCount = longToNumber(reader.uint64() as Long);
           break;
-        case 10:
+        case 7:
           message.pairsList.push(Pairs.decode(reader, reader.uint32()));
+          break;
+        case 8:
+          message.virtualPriceQueueList.push(
+            VirtualPriceQueue.decode(reader, reader.uint32())
+          );
           break;
         default:
           reader.skipType(tag & 7);
@@ -127,11 +103,10 @@ export const GenesisState = {
   fromJSON(object: any): GenesisState {
     const message = { ...baseGenesisState } as GenesisState;
     message.nodesList = [];
-    message.virtualPriceTickQueueList = [];
     message.ticksList = [];
-    message.virtualPriceTickListList = [];
     message.bitArrList = [];
     message.pairsList = [];
+    message.virtualPriceQueueList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromJSON(object.params);
     } else {
@@ -147,37 +122,9 @@ export const GenesisState = {
     } else {
       message.nodesCount = 0;
     }
-    if (
-      object.virtualPriceTickQueueList !== undefined &&
-      object.virtualPriceTickQueueList !== null
-    ) {
-      for (const e of object.virtualPriceTickQueueList) {
-        message.virtualPriceTickQueueList.push(
-          VirtualPriceTickQueue.fromJSON(e)
-        );
-      }
-    }
-    if (
-      object.virtualPriceTickQueueCount !== undefined &&
-      object.virtualPriceTickQueueCount !== null
-    ) {
-      message.virtualPriceTickQueueCount = Number(
-        object.virtualPriceTickQueueCount
-      );
-    } else {
-      message.virtualPriceTickQueueCount = 0;
-    }
     if (object.ticksList !== undefined && object.ticksList !== null) {
       for (const e of object.ticksList) {
         message.ticksList.push(Ticks.fromJSON(e));
-      }
-    }
-    if (
-      object.virtualPriceTickListList !== undefined &&
-      object.virtualPriceTickListList !== null
-    ) {
-      for (const e of object.virtualPriceTickListList) {
-        message.virtualPriceTickListList.push(VirtualPriceTickList.fromJSON(e));
       }
     }
     if (object.bitArrList !== undefined && object.bitArrList !== null) {
@@ -195,6 +142,14 @@ export const GenesisState = {
         message.pairsList.push(Pairs.fromJSON(e));
       }
     }
+    if (
+      object.virtualPriceQueueList !== undefined &&
+      object.virtualPriceQueueList !== null
+    ) {
+      for (const e of object.virtualPriceQueueList) {
+        message.virtualPriceQueueList.push(VirtualPriceQueue.fromJSON(e));
+      }
+    }
     return message;
   },
 
@@ -210,28 +165,12 @@ export const GenesisState = {
       obj.nodesList = [];
     }
     message.nodesCount !== undefined && (obj.nodesCount = message.nodesCount);
-    if (message.virtualPriceTickQueueList) {
-      obj.virtualPriceTickQueueList = message.virtualPriceTickQueueList.map(
-        (e) => (e ? VirtualPriceTickQueue.toJSON(e) : undefined)
-      );
-    } else {
-      obj.virtualPriceTickQueueList = [];
-    }
-    message.virtualPriceTickQueueCount !== undefined &&
-      (obj.virtualPriceTickQueueCount = message.virtualPriceTickQueueCount);
     if (message.ticksList) {
       obj.ticksList = message.ticksList.map((e) =>
         e ? Ticks.toJSON(e) : undefined
       );
     } else {
       obj.ticksList = [];
-    }
-    if (message.virtualPriceTickListList) {
-      obj.virtualPriceTickListList = message.virtualPriceTickListList.map((e) =>
-        e ? VirtualPriceTickList.toJSON(e) : undefined
-      );
-    } else {
-      obj.virtualPriceTickListList = [];
     }
     if (message.bitArrList) {
       obj.bitArrList = message.bitArrList.map((e) =>
@@ -249,17 +188,23 @@ export const GenesisState = {
     } else {
       obj.pairsList = [];
     }
+    if (message.virtualPriceQueueList) {
+      obj.virtualPriceQueueList = message.virtualPriceQueueList.map((e) =>
+        e ? VirtualPriceQueue.toJSON(e) : undefined
+      );
+    } else {
+      obj.virtualPriceQueueList = [];
+    }
     return obj;
   },
 
   fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = { ...baseGenesisState } as GenesisState;
     message.nodesList = [];
-    message.virtualPriceTickQueueList = [];
     message.ticksList = [];
-    message.virtualPriceTickListList = [];
     message.bitArrList = [];
     message.pairsList = [];
+    message.virtualPriceQueueList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromPartial(object.params);
     } else {
@@ -275,37 +220,9 @@ export const GenesisState = {
     } else {
       message.nodesCount = 0;
     }
-    if (
-      object.virtualPriceTickQueueList !== undefined &&
-      object.virtualPriceTickQueueList !== null
-    ) {
-      for (const e of object.virtualPriceTickQueueList) {
-        message.virtualPriceTickQueueList.push(
-          VirtualPriceTickQueue.fromPartial(e)
-        );
-      }
-    }
-    if (
-      object.virtualPriceTickQueueCount !== undefined &&
-      object.virtualPriceTickQueueCount !== null
-    ) {
-      message.virtualPriceTickQueueCount = object.virtualPriceTickQueueCount;
-    } else {
-      message.virtualPriceTickQueueCount = 0;
-    }
     if (object.ticksList !== undefined && object.ticksList !== null) {
       for (const e of object.ticksList) {
         message.ticksList.push(Ticks.fromPartial(e));
-      }
-    }
-    if (
-      object.virtualPriceTickListList !== undefined &&
-      object.virtualPriceTickListList !== null
-    ) {
-      for (const e of object.virtualPriceTickListList) {
-        message.virtualPriceTickListList.push(
-          VirtualPriceTickList.fromPartial(e)
-        );
       }
     }
     if (object.bitArrList !== undefined && object.bitArrList !== null) {
@@ -321,6 +238,14 @@ export const GenesisState = {
     if (object.pairsList !== undefined && object.pairsList !== null) {
       for (const e of object.pairsList) {
         message.pairsList.push(Pairs.fromPartial(e));
+      }
+    }
+    if (
+      object.virtualPriceQueueList !== undefined &&
+      object.virtualPriceQueueList !== null
+    ) {
+      for (const e of object.virtualPriceQueueList) {
+        message.virtualPriceQueueList.push(VirtualPriceQueue.fromPartial(e));
       }
     }
     return message;

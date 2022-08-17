@@ -2,6 +2,7 @@ package cli_test
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -17,77 +18,94 @@ import (
 	"github.com/NicholasDotSol/duality/x/dex/types"
 )
 
-func networkWithVirtualPriceTickQueueObjects(t *testing.T, n int) (*network.Network, []types.VirtualPriceTickQueue) {
+// Prevent strconv unused error
+var _ = strconv.IntSize
+
+func networkWithVirtualPriceQueueObjects(t *testing.T, n int) (*network.Network, []types.VirtualPriceQueue) {
 	t.Helper()
 	cfg := network.DefaultConfig()
 	state := types.GenesisState{}
 	require.NoError(t, cfg.Codec.UnmarshalJSON(cfg.GenesisState[types.ModuleName], &state))
 
 	for i := 0; i < n; i++ {
-		virtualPriceTickQueue := types.VirtualPriceTickQueue{
-			Id: uint64(i),
+		virtualPriceQueue := types.VirtualPriceQueue{
+			VPrice:    strconv.Itoa(i),
+			Direction: strconv.Itoa(i),
+			OrderType: strconv.Itoa(i),
 		}
-		nullify.Fill(&virtualPriceTickQueue)
-		state.VirtualPriceTickQueueList = append(state.VirtualPriceTickQueueList, virtualPriceTickQueue)
+		nullify.Fill(&virtualPriceQueue)
+		state.VirtualPriceQueueList = append(state.VirtualPriceQueueList, virtualPriceQueue)
 	}
 	buf, err := cfg.Codec.MarshalJSON(&state)
 	require.NoError(t, err)
 	cfg.GenesisState[types.ModuleName] = buf
-	return network.New(t, cfg), state.VirtualPriceTickQueueList
+	return network.New(t, cfg), state.VirtualPriceQueueList
 }
 
-func TestShowVirtualPriceTickQueue(t *testing.T) {
-	net, objs := networkWithVirtualPriceTickQueueObjects(t, 2)
+func TestShowVirtualPriceQueue(t *testing.T) {
+	net, objs := networkWithVirtualPriceQueueObjects(t, 2)
 
 	ctx := net.Validators[0].ClientCtx
 	common := []string{
 		fmt.Sprintf("--%s=json", tmcli.OutputFlag),
 	}
 	for _, tc := range []struct {
-		desc string
-		id   string
+		desc        string
+		idVPrice    string
+		idDirection string
+		idOrderType string
+
 		args []string
 		err  error
-		obj  types.VirtualPriceTickQueue
+		obj  types.VirtualPriceQueue
 	}{
 		{
-			desc: "found",
-			id:   fmt.Sprintf("%d", objs[0].Id),
+			desc:        "found",
+			idVPrice:    objs[0].VPrice,
+			idDirection: objs[0].Direction,
+			idOrderType: objs[0].OrderType,
+
 			args: common,
 			obj:  objs[0],
 		},
 		{
-			desc: "not found",
-			id:   "not_found",
+			desc:        "not found",
+			idVPrice:    strconv.Itoa(100000),
+			idDirection: strconv.Itoa(100000),
+			idOrderType: strconv.Itoa(100000),
+
 			args: common,
 			err:  status.Error(codes.NotFound, "not found"),
 		},
 	} {
-		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
-			args := []string{tc.id}
+			args := []string{
+				tc.idVPrice,
+				tc.idDirection,
+				tc.idOrderType,
+			}
 			args = append(args, tc.args...)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowVirtualPriceTickQueue(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowVirtualPriceQueue(), args)
 			if tc.err != nil {
 				stat, ok := status.FromError(tc.err)
 				require.True(t, ok)
 				require.ErrorIs(t, stat.Err(), tc.err)
 			} else {
 				require.NoError(t, err)
-				var resp types.QueryGetVirtualPriceTickQueueResponse
+				var resp types.QueryGetVirtualPriceQueueResponse
 				require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-				require.NotNil(t, resp.VirtualPriceTickQueue)
+				require.NotNil(t, resp.VirtualPriceQueue)
 				require.Equal(t,
 					nullify.Fill(&tc.obj),
-					nullify.Fill(&resp.VirtualPriceTickQueue),
+					nullify.Fill(&resp.VirtualPriceQueue),
 				)
 			}
 		})
 	}
 }
 
-func TestListVirtualPriceTickQueue(t *testing.T) {
-	net, objs := networkWithVirtualPriceTickQueueObjects(t, 5)
+func TestListVirtualPriceQueue(t *testing.T) {
+	net, objs := networkWithVirtualPriceQueueObjects(t, 5)
 
 	ctx := net.Validators[0].ClientCtx
 	request := func(next []byte, offset, limit uint64, total bool) []string {
@@ -109,14 +127,14 @@ func TestListVirtualPriceTickQueue(t *testing.T) {
 		step := 2
 		for i := 0; i < len(objs); i += step {
 			args := request(nil, uint64(i), uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListVirtualPriceTickQueue(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListVirtualPriceQueue(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllVirtualPriceTickQueueResponse
+			var resp types.QueryAllVirtualPriceQueueResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.VirtualPriceTickQueue), step)
+			require.LessOrEqual(t, len(resp.VirtualPriceQueue), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.VirtualPriceTickQueue),
+				nullify.Fill(resp.VirtualPriceQueue),
 			)
 		}
 	})
@@ -125,29 +143,29 @@ func TestListVirtualPriceTickQueue(t *testing.T) {
 		var next []byte
 		for i := 0; i < len(objs); i += step {
 			args := request(next, 0, uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListVirtualPriceTickQueue(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListVirtualPriceQueue(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllVirtualPriceTickQueueResponse
+			var resp types.QueryAllVirtualPriceQueueResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.VirtualPriceTickQueue), step)
+			require.LessOrEqual(t, len(resp.VirtualPriceQueue), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.VirtualPriceTickQueue),
+				nullify.Fill(resp.VirtualPriceQueue),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
 		args := request(nil, 0, uint64(len(objs)), true)
-		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListVirtualPriceTickQueue(), args)
+		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListVirtualPriceQueue(), args)
 		require.NoError(t, err)
-		var resp types.QueryAllVirtualPriceTickQueueResponse
+		var resp types.QueryAllVirtualPriceQueueResponse
 		require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 		require.NoError(t, err)
 		require.Equal(t, len(objs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(objs),
-			nullify.Fill(resp.VirtualPriceTickQueue),
+			nullify.Fill(resp.VirtualPriceQueue),
 		)
 	})
 }
