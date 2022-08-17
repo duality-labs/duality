@@ -26,7 +26,7 @@ func (k msgServer) CreateNewPair(goCtx context.Context, token0 string, token1 st
 	return nil
 }
 
-func (k msgServer) SingleDeposit(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, msg *types.MsgAddLiquidity, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
+func (k msgServer) SingleDeposit(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, price sdk.Dec, msg *types.MsgAddLiquidity, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	/*
 			// Check if the pair already exists
