@@ -8,27 +8,18 @@ import (
 	//sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k msgServer) CreateNewPair(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, msg *types.MsgAddLiquidity, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
+// TODO: Decide whether to addLiquidity if pair exists
+// TODO: Add current tick specification for pair multi-deposit
+// TODO: Determine how we plan to set tick spacing for pair
+func (k msgServer) CreateNewPair(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, msg *types.MsgCreatePair, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	/*
-			// Check if the pair already exists
-			1) Find Pair
-			   a) If pair exists, get the pair
-			   b) If pair does not exist, init pair
-			       i) If nodes do not exist, init nodes
-				       1) Add outgoingEdges to storage
-				   ii) If nodes exist
-					   1) Add tokenA, tokenB to eachother's outgoingEdges
-			2) Find Tick
-		       a) If virtual price tick/index does not exist, add new index
-				    i) Initialize index to 1 in bitmap
-					ii) Create new tick w/ amount in virtual_price_tick_list
-					iii) Add tick w/ amount to virtual_price_tick_queue
-			   b) If exists
-					i) Update tick (+= amount) in virtual_price_tick_list
-					ii) Add amount to existing tick in corresponding queue
-			3) Update Shares
-				i) TBD
+		1) Check if pair exists
+		   a) If so, output pair
+		   b) Else, init pair
+		       i) If nodes do not exist, init nodes
+			   ii) Add tokenA, tokenB to eachother's outgoingEdges
+		2) Call SingleDeposit on pool & set currTick equivalent to corresponding virtualTick (for price, fee)
 	*/
 
 	_ = ctx
@@ -41,11 +32,7 @@ func (k msgServer) SingleDeposit(goCtx context.Context, token0 string, token1 st
 			// Check if the pair already exists
 			1) Find Pair
 			   a) If pair exists, get the pair
-			   b) If pair does not exist, init pair
-			       i) If nodes do not exist, init nodes
-				       1) Add outgoingEdges to storage
-				   ii) If nodes exist
-					   1) Add tokenA, tokenB to eachother's outgoingEdges
+			   b) If pair does not exist, error
 			2) Find Tick
 		       a) If virtual price tick/index does not exist, add new index
 				    i) Initialize index to 1 in bitmap
@@ -62,12 +49,12 @@ func (k msgServer) SingleDeposit(goCtx context.Context, token0 string, token1 st
 	return nil
 }
 
-func (k msgServer) SingleWithdraw(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, msg *types.MsgAddLiquidity, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
+func (k msgServer) SingleWithdraw(goCtx context.Context, token0 string, token1 string, shares sdk.Dec, msg *types.MsgRemoveLiquidity, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	/*
 			1) Find Pair
 			   a) If pair exists, get the pair
-			   b) If pair does not exist, exit
+			   b) If pair does not exist, error
 
 			2) Find Tick
 		       a) If virtual price tick/index does not exist, exit
@@ -84,12 +71,12 @@ func (k msgServer) SingleWithdraw(goCtx context.Context, token0 string, token1 s
 }
 
 // Need to figure out logic for route vs. swap
-func (k msgServer) SingleSwap(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, msg *types.MsgAddLiquidity, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
+func (k msgServer) SingleSwapIn(goCtx context.Context, token0 string, token1 string, amountIn sdk.Dec, msg *types.MsgSwap, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	/*
 		1) Find Pair
 		   a) If pair exists, get the pair
-		   b) If pair does not exist, exit
+		   b) If pair does not exist, error
 		2) Get CurrTick & corresponding list for direction
 		3) Attempt to swap amount through the ticks in pair
 			i) Loop through queue for virtual tick & empty ticks
