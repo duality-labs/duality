@@ -8,7 +8,7 @@ services:
     command: >
       /bin/sh -c "
         sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /data/node$$ID/dualityd/config/config.toml;
-        dualityd --home /data/node$$ID/dualityd start;
+        dualityd --home /data/node$$ID/dualityd start --moniker duality;
       "
     environment:
       - DEBUG=1
@@ -36,7 +36,7 @@ services:
     command: >
       /bin/sh -c "
         sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /data/node$$ID/dualityd/config/config.toml;
-        dualityd --home /data/node$$ID/dualityd start;
+        dualityd --home /data/node$$ID/dualityd start --moniker duality;
       "
     environment:
       - DEBUG=0
@@ -64,7 +64,7 @@ services:
     command: >
       /bin/sh -c "
         sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /data/node$$ID/dualityd/config/config.toml;
-        dualityd --home /data/node$$ID/dualityd start;
+        dualityd --home /data/node$$ID/dualityd start --moniker duality;
       "
     environment:
       - DEBUG=0
@@ -92,7 +92,7 @@ services:
     command: >
       /bin/sh -c "
         sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /data/node$$ID/dualityd/config/config.toml;
-        dualityd --home /data/node$$ID/dualityd start;
+        dualityd --home /data/node$$ID/dualityd start --moniker duality;
       "
     environment:
       - DEBUG=0
