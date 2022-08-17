@@ -21,7 +21,7 @@ func (k Keeper) CalculateVirtualPrice(token0 string, token1 string, tokenDirecti
 
 }
 
-func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, msg *types.MsgAddLiquidity, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
+func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, price sdk.Dec, msg *types.MsgAddLiquidity, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -29,12 +29,6 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 
 	if !PairFound {
 		sdkerrors.Wrapf(types.ErrValidPairNotFound, "Valid pair not found")
-	}
-
-	price, err := sdk.NewDecFromStr(msg.Price)
-	// Error checking for valid sdk.Dec
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
 	fee, err := sdk.NewDecFromStr(msg.Fee)
@@ -48,8 +42,8 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Virtual Price Calculations resulted in a non-valid type: %s", err)
 	}
-
-	PairOld.CurrentIndex
+	_ = vprice
+	_ = PairOld
 
 	return nil
 }

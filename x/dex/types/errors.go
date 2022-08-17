@@ -15,4 +15,5 @@ var (
 	ErrNotEnoughShares      = sdkerrors.Register(ModuleName, 1104, "Not enough shares are owned by:  %s")
 	ErrValidShareNotFound   = sdkerrors.Register(ModuleName, 1105, "Valid share not found")
 	ErrValidTickNotFound    = sdkerrors.Register(ModuleName, 1106, "Valid tick not found")
+	ErrValidPairNotFound    = sdkerrors.Register(ModuleName, 1107, "Valid pair not found")
 )

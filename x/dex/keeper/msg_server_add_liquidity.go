@@ -10,13 +10,13 @@ import (
 func (k msgServer) AddLiquidity(goCtx context.Context, msg *types.MsgAddLiquidity) (*types.MsgAddLiquidityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, callerAdr, receiverAdr, amounts, err := k.AddLiquidityVerification(goCtx, msg)
+	token0, token1, callerAdr, receiverAdr, amounts, price, err := k.AddLiquidityVerification(goCtx, msg)
 
 	if err != nil {
 		return nil, err
 	}
 
-	err = k.SingleDeposit(goCtx, token0, token1, amounts, msg, callerAdr, receiverAdr)
+	err = k.SingleDeposit(goCtx, token0, token1, amounts, price, msg, callerAdr, receiverAdr)
 
 	if err != nil {
 		return nil, err
