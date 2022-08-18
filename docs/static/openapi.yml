@@ -29922,16 +29922,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/bit_arr/{id}':
@@ -30098,16 +30088,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/nodes/{id}':
@@ -30225,7 +30205,7 @@ paths:
                                 type: string
                               orderShares:
                                 type: string
-                    virtualPricemap:
+                    virtualPriceMap:
                       type: object
                       properties:
                         vPrice:
@@ -30234,18 +30214,12 @@ paths:
                           type: string
                         orderType:
                           type: string
-                        virtualTicks:
-                          type: object
-                          properties:
-                            id:
-                              type: string
-                              format: uint64
-                            price:
-                              type: string
-                            fee:
-                              type: string
-                            orderType:
-                              type: string
+                        price:
+                          type: string
+                        fee:
+                          type: string
+                        orderparams:
+                          type: string
               pagination:
                 type: object
                 properties:
@@ -30338,16 +30312,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/pairs/{token0}/{token1}':
@@ -30412,7 +30376,7 @@ paths:
                               type: string
                             orderShares:
                               type: string
-                  virtualPricemap:
+                  virtualPriceMap:
                     type: object
                     properties:
                       vPrice:
@@ -30421,18 +30385,12 @@ paths:
                         type: string
                       orderType:
                         type: string
-                      virtualTicks:
-                        type: object
-                        properties:
-                          id:
-                            type: string
-                            format: uint64
-                          price:
-                            type: string
-                          fee:
-                            type: string
-                          orderType:
-                            type: string
+                      price:
+                        type: string
+                      fee:
+                        type: string
+                      orderparams:
+                        type: string
         default:
           description: An unexpected error response.
           schema:
@@ -30632,16 +30590,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/ticks/{price}/{fee}/{direction}/{orderType}':
@@ -30721,17 +30669,17 @@ paths:
           type: string
       tags:
         - Query
-  /NicholasDotSol/duality/dex/virtual_price_tick_list:
+  /NicholasDotSol/duality/dex/virtual_price_queue:
     get:
-      summary: Queries a list of VirtualPriceTickList items.
-      operationId: NicholasdotsolDualityDexVirtualPriceTickListAll
+      summary: Queries a list of VirtualPriceQueue items.
+      operationId: NicholasdotsolDualityDexVirtualPriceQueueAll
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              virtualPriceTickList:
+              virtualPriceQueue:
                 type: array
                 items:
                   type: object
@@ -30742,18 +30690,12 @@ paths:
                       type: string
                     orderType:
                       type: string
-                    virtualTicks:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          format: uint64
-                        price:
-                          type: string
-                        fee:
-                          type: string
-                        orderType:
-                          type: string
+                    price:
+                      type: string
+                    fee:
+                      type: string
+                    orderparams:
+                      type: string
               pagination:
                 type: object
                 properties:
@@ -30846,29 +30788,19 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/virtual_price_tick_list/{vPrice}/{direction}/{orderType}':
+  '/NicholasDotSol/duality/dex/virtual_price_queue/{vPrice}/{direction}/{orderType}':
     get:
-      summary: Queries a VirtualPriceTickList by index.
-      operationId: NicholasdotsolDualityDexVirtualPriceTickList
+      summary: Queries a VirtualPriceQueue by index.
+      operationId: NicholasdotsolDualityDexVirtualPriceQueue
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              virtualPriceTickList:
+              virtualPriceQueue:
                 type: object
                 properties:
                   vPrice:
@@ -30877,18 +30809,12 @@ paths:
                     type: string
                   orderType:
                     type: string
-                  virtualTicks:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        format: uint64
-                      price:
-                        type: string
-                      fee:
-                        type: string
-                      orderType:
-                        type: string
+                  price:
+                    type: string
+                  fee:
+                    type: string
+                  orderparams:
+                    type: string
         default:
           description: An unexpected error response.
           schema:
@@ -30920,182 +30846,6 @@ paths:
           in: path
           required: true
           type: string
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/virtual_price_tick_queue:
-    get:
-      summary: Queries a list of VirtualPriceTickQueue items.
-      operationId: NicholasdotsolDualityDexVirtualPriceTickQueueAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              VirtualPriceTickQueue:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      format: uint64
-                    price:
-                      type: string
-                    fee:
-                      type: string
-                    orderType:
-                      type: string
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
-      tags:
-        - Query
-  '/NicholasDotSol/duality/dex/virtual_price_tick_queue/{id}':
-    get:
-      summary: Queries a VirtualPriceTickQueue by id.
-      operationId: NicholasdotsolDualityDexVirtualPriceTickQueue
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              VirtualPriceTickQueue:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    format: uint64
-                  price:
-                    type: string
-                  fee:
-                    type: string
-                  orderType:
-                    type: string
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: string
-          format: uint64
       tags:
         - Query
   /tendermint/spn/claim/airdrop_supply:
@@ -52907,7 +52657,7 @@ definitions:
                   type: string
                 orderShares:
                   type: string
-      virtualPricemap:
+      virtualPriceMap:
         type: object
         properties:
           vPrice:
@@ -52916,18 +52666,12 @@ definitions:
             type: string
           orderType:
             type: string
-          virtualTicks:
-            type: object
-            properties:
-              id:
-                type: string
-                format: uint64
-              price:
-                type: string
-              fee:
-                type: string
-              orderType:
-                type: string
+          price:
+            type: string
+          fee:
+            type: string
+          orderparams:
+            type: string
   nicholasdotsol.duality.dex.Params:
     type: object
     description: Params defines the parameters for the module.
@@ -53072,7 +52816,7 @@ definitions:
                         type: string
                       orderShares:
                         type: string
-            virtualPricemap:
+            virtualPriceMap:
               type: object
               properties:
                 vPrice:
@@ -53081,18 +52825,12 @@ definitions:
                   type: string
                 orderType:
                   type: string
-                virtualTicks:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      format: uint64
-                    price:
-                      type: string
-                    fee:
-                      type: string
-                    orderType:
-                      type: string
+                price:
+                  type: string
+                fee:
+                  type: string
+                orderparams:
+                  type: string
       pagination:
         type: object
         properties:
@@ -53178,10 +52916,10 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  nicholasdotsol.duality.dex.QueryAllVirtualPriceTickListResponse:
+  nicholasdotsol.duality.dex.QueryAllVirtualPriceQueueResponse:
     type: object
     properties:
-      virtualPriceTickList:
+      virtualPriceQueue:
         type: array
         items:
           type: object
@@ -53192,59 +52930,11 @@ definitions:
               type: string
             orderType:
               type: string
-            virtualTicks:
-              type: object
-              properties:
-                id:
-                  type: string
-                  format: uint64
-                price:
-                  type: string
-                fee:
-                  type: string
-                orderType:
-                  type: string
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
-  nicholasdotsol.duality.dex.QueryAllVirtualPriceTickQueueResponse:
-    type: object
-    properties:
-      VirtualPriceTickQueue:
-        type: array
-        items:
-          type: object
-          properties:
-            id:
-              type: string
-              format: uint64
             price:
               type: string
             fee:
               type: string
-            orderType:
+            orderparams:
               type: string
       pagination:
         type: object
@@ -53356,7 +53046,7 @@ definitions:
                       type: string
                     orderShares:
                       type: string
-          virtualPricemap:
+          virtualPriceMap:
             type: object
             properties:
               vPrice:
@@ -53365,18 +53055,12 @@ definitions:
                 type: string
               orderType:
                 type: string
-              virtualTicks:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    format: uint64
-                  price:
-                    type: string
-                  fee:
-                    type: string
-                  orderType:
-                    type: string
+              price:
+                type: string
+              fee:
+                type: string
+              orderparams:
+                type: string
   nicholasdotsol.duality.dex.QueryGetTicksResponse:
     type: object
     properties:
@@ -53410,10 +53094,10 @@ definitions:
                   type: string
                 orderShares:
                   type: string
-  nicholasdotsol.duality.dex.QueryGetVirtualPriceTickListResponse:
+  nicholasdotsol.duality.dex.QueryGetVirtualPriceQueueResponse:
     type: object
     properties:
-      virtualPriceTickList:
+      virtualPriceQueue:
         type: object
         properties:
           vPrice:
@@ -53422,32 +53106,11 @@ definitions:
             type: string
           orderType:
             type: string
-          virtualTicks:
-            type: object
-            properties:
-              id:
-                type: string
-                format: uint64
-              price:
-                type: string
-              fee:
-                type: string
-              orderType:
-                type: string
-  nicholasdotsol.duality.dex.QueryGetVirtualPriceTickQueueResponse:
-    type: object
-    properties:
-      VirtualPriceTickQueue:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uint64
           price:
             type: string
           fee:
             type: string
-          orderType:
+          orderparams:
             type: string
   nicholasdotsol.duality.dex.QueryParamsResponse:
     type: object
@@ -53486,7 +53149,7 @@ definitions:
               type: string
             orderShares:
               type: string
-  nicholasdotsol.duality.dex.VirtualPriceTickList:
+  nicholasdotsol.duality.dex.VirtualPriceQueue:
     type: object
     properties:
       vPrice:
@@ -53495,29 +53158,11 @@ definitions:
         type: string
       orderType:
         type: string
-      virtualTicks:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uint64
-          price:
-            type: string
-          fee:
-            type: string
-          orderType:
-            type: string
-  nicholasdotsol.duality.dex.VirtualPriceTickQueue:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uint64
       price:
         type: string
       fee:
         type: string
-      orderType:
+      orderparams:
         type: string
   tendermint.spn.claim.ClaimRecord:
     type: object

@@ -10,12 +10,11 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		NodesList:                 []Nodes{},
-		VirtualPriceTickQueueList: []VirtualPriceTickQueue{},
-		TicksList:                 []Ticks{},
-		VirtualPriceTickListList:  []VirtualPriceTickList{},
-		BitArrList:                []BitArr{},
-		PairsList:                 []Pairs{},
+		NodesList:             []Nodes{},
+		TicksList:             []Ticks{},
+		BitArrList:            []BitArr{},
+		PairsList:             []Pairs{},
+		VirtualPriceQueueList: []VirtualPriceQueue{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -36,18 +35,7 @@ func (gs GenesisState) Validate() error {
 		}
 		nodesIdMap[elem.Id] = true
 	}
-	// Check for duplicated ID in virtualPriceTickQueue
-	virtualPriceTickQueueIdMap := make(map[uint64]bool)
-	virtualPriceTickQueueCount := gs.GetVirtualPriceTickQueueCount()
-	for _, elem := range gs.VirtualPriceTickQueueList {
-		if _, ok := virtualPriceTickQueueIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for virtualPriceTickQueue")
-		}
-		if elem.Id >= virtualPriceTickQueueCount {
-			return fmt.Errorf("virtualPriceTickQueue id should be lower or equal than the last id")
-		}
-		virtualPriceTickQueueIdMap[elem.Id] = true
-	}
+
 	// Check for duplicated index in ticks
 	ticksIndexMap := make(map[string]struct{})
 
@@ -58,16 +46,7 @@ func (gs GenesisState) Validate() error {
 		}
 		ticksIndexMap[index] = struct{}{}
 	}
-	// Check for duplicated index in virtualPriceTickList
-	virtualPriceTickListIndexMap := make(map[string]struct{})
 
-	for _, elem := range gs.VirtualPriceTickListList {
-		index := string(VirtualPriceTickListKey(elem.VPrice, elem.Direction, elem.OrderType))
-		if _, ok := virtualPriceTickListIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for virtualPriceTickList")
-		}
-		virtualPriceTickListIndexMap[index] = struct{}{}
-	}
 	// Check for duplicated ID in bitArr
 	bitArrIdMap := make(map[uint64]bool)
 	bitArrCount := gs.GetBitArrCount()
@@ -89,6 +68,16 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("duplicated index for pairs")
 		}
 		pairsIndexMap[index] = struct{}{}
+	}
+	// Check for duplicated index in virtualPriceQueue
+	virtualPriceQueueIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.VirtualPriceQueueList {
+		index := string(VirtualPriceQueueKey(elem.VPrice, elem.Direction, elem.OrderType))
+		if _, ok := virtualPriceQueueIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for virtualPriceQueue")
+		}
+		virtualPriceQueueIndexMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 
