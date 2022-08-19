@@ -16,6 +16,11 @@ RUN apt-get install -y \
 ARG IGNITE_CLI_VERSION="v0.22.0"
 RUN curl "https://get.ignite.com/cli@$IGNITE_CLI_VERSION!" | bash
 
+# [Choice] Node.js version: none, lts/*, 16, 14, 12, 10
+ARG NODE_VERSION="16.14.2"
+RUN curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION | bash -
+RUN apt-get install -y nodejs
+
 WORKDIR /usr/src
 
 # Get Go dependencies
@@ -35,6 +40,11 @@ COPY config.yml ./config.yml
 
 # compile dualityd
 RUN go install ./cmd/dualityd
+
+# create genesis files
+RUN dualityd init duality
+
+COPY rewrite-genesis.js ./rewrite-genesis.js
 
 # see docs for exposed ports:
 #   https://docs.ignite.com/kb/config.html#host
