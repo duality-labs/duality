@@ -34,7 +34,7 @@ COPY x ./x
 COPY config.yml ./config.yml
 
 # compile dualityd
-RUN ignite chain build
+RUN go install ./cmd/dualityd
 
 # see docs for exposed ports:
 #   https://docs.ignite.com/kb/config.html#host
