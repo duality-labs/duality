@@ -8,6 +8,7 @@ services:
     command: >
       /bin/sh -c "
         sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /data/node$$ID/dualityd/config/config.toml;
+        node -p \"require('./rewrite-genesis.js')('/data/node$$ID/dualityd/config/genesis.json', '/root/.duality/config/genesis.json')\";
         dualityd --home /data/node$$ID/dualityd start --moniker duality;
       "
     environment:
@@ -36,6 +37,7 @@ services:
     command: >
       /bin/sh -c "
         sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /data/node$$ID/dualityd/config/config.toml;
+        node -p \"require('./rewrite-genesis.js')('/data/node$$ID/dualityd/config/genesis.json', '/root/.duality/config/genesis.json')\";
         dualityd --home /data/node$$ID/dualityd start --moniker duality;
       "
     environment:
@@ -64,6 +66,7 @@ services:
     command: >
       /bin/sh -c "
         sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /data/node$$ID/dualityd/config/config.toml;
+        node -p \"require('./rewrite-genesis.js')('/data/node$$ID/dualityd/config/genesis.json', '/root/.duality/config/genesis.json')\";
         dualityd --home /data/node$$ID/dualityd start --moniker duality;
       "
     environment:
@@ -92,6 +95,7 @@ services:
     command: >
       /bin/sh -c "
         sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /data/node$$ID/dualityd/config/config.toml;
+        node -p \"require('./rewrite-genesis.js')('/data/node$$ID/dualityd/config/genesis.json', '/root/.duality/config/genesis.json')\";
         dualityd --home /data/node$$ID/dualityd start --moniker duality;
       "
     environment:
