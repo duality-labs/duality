@@ -29809,6 +29809,214 @@ paths:
           format: uint64
       tags:
         - Query
+  /NicholasDotSol/duality/dex/index_queue:
+    get:
+      summary: Queries a list of IndexQueue items.
+      operationId: NicholasdotsolDualityDexIndexQueueAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              indexQueue:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    index:
+                      type: integer
+                      format: int32
+                    queue:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          price:
+                            type: string
+                          fee:
+                            type: string
+                          orderparams:
+                            type: object
+                            properties:
+                              orderRule:
+                                type: string
+                              orderType:
+                                type: string
+                              orderShares:
+                                type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/NicholasDotSol/duality/dex/index_queue/{index}':
+    get:
+      summary: Queries a IndexQueue by index.
+      operationId: NicholasdotsolDualityDexIndexQueue
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              indexQueue:
+                type: object
+                properties:
+                  index:
+                    type: integer
+                    format: int32
+                  queue:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        price:
+                          type: string
+                        fee:
+                          type: string
+                        orderparams:
+                          type: object
+                          properties:
+                            orderRule:
+                              type: string
+                            orderType:
+                              type: string
+                            orderShares:
+                              type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: index
+          in: path
+          required: true
+          type: integer
+          format: int32
+        - name: token0
+          in: query
+          required: false
+          type: string
+        - name: token1
+          in: query
+          required: false
+          type: string
+      tags:
+        - Query
   /NicholasDotSol/duality/dex/nodes:
     get:
       summary: Queries a list of Nodes items.
@@ -30012,14 +30220,10 @@ paths:
                       type: string
                     tickSpacing:
                       type: string
-                      format: uint64
-                    currentPrice:
-                      type: string
-                    bitArray:
-                      type: array
-                      items:
-                        type: string
-                        format: byte
+                      format: int64
+                    currentIndex:
+                      type: integer
+                      format: int32
                     tickmap:
                       type: object
                       properties:
@@ -30050,15 +30254,12 @@ paths:
                                 type: string
                               orderShares:
                                 type: string
-                    virtualPriceMap:
+                    IndexMap:
                       type: object
                       properties:
-                        vPrice:
-                          type: string
-                        direction:
-                          type: string
-                        orderType:
-                          type: string
+                        index:
+                          type: integer
+                          format: int32
                         queue:
                           type: array
                           items:
@@ -30200,14 +30401,10 @@ paths:
                     type: string
                   tickSpacing:
                     type: string
-                    format: uint64
-                  currentPrice:
-                    type: string
-                  bitArray:
-                    type: array
-                    items:
-                      type: string
-                      format: byte
+                    format: int64
+                  currentIndex:
+                    type: integer
+                    format: int32
                   tickmap:
                     type: object
                     properties:
@@ -30238,15 +30435,12 @@ paths:
                               type: string
                             orderShares:
                               type: string
-                  virtualPriceMap:
+                  IndexMap:
                     type: object
                     properties:
-                      vPrice:
-                        type: string
-                      direction:
-                        type: string
-                      orderType:
-                        type: string
+                      index:
+                        type: integer
+                        format: int32
                       queue:
                         type: array
                         items:
@@ -30551,218 +30745,13 @@ paths:
           in: path
           required: true
           type: string
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/virtual_price_queue:
-    get:
-      summary: Queries a list of VirtualPriceQueue items.
-      operationId: NicholasdotsolDualityDexVirtualPriceQueueAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              virtualPriceQueue:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    vPrice:
-                      type: string
-                    direction:
-                      type: string
-                    orderType:
-                      type: string
-                    queue:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          price:
-                            type: string
-                          fee:
-                            type: string
-                          orderparams:
-                            type: object
-                            properties:
-                              orderRule:
-                                type: string
-                              orderType:
-                                type: string
-                              orderShares:
-                                type: string
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
+        - name: token0
           in: query
           required: false
           type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
+        - name: token1
           in: query
           required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
-      tags:
-        - Query
-  '/NicholasDotSol/duality/dex/virtual_price_queue/{vPrice}/{direction}/{orderType}':
-    get:
-      summary: Queries a VirtualPriceQueue by index.
-      operationId: NicholasdotsolDualityDexVirtualPriceQueue
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              virtualPriceQueue:
-                type: object
-                properties:
-                  vPrice:
-                    type: string
-                  direction:
-                    type: string
-                  orderType:
-                    type: string
-                  queue:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        price:
-                          type: string
-                        fee:
-                          type: string
-                        orderparams:
-                          type: object
-                          properties:
-                            orderRule:
-                              type: string
-                            orderType:
-                              type: string
-                            orderShares:
-                              type: string
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: vPrice
-          in: path
-          required: true
-          type: string
-        - name: direction
-          in: path
-          required: true
-          type: string
-        - name: orderType
-          in: path
-          required: true
           type: string
       tags:
         - Query
@@ -52473,6 +52462,46 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
+  nicholasdotsol.duality.dex.IndexQueue:
+    type: object
+    properties:
+      index:
+        type: integer
+        format: int32
+      queue:
+        type: array
+        items:
+          type: object
+          properties:
+            price:
+              type: string
+            fee:
+              type: string
+            orderparams:
+              type: object
+              properties:
+                orderRule:
+                  type: string
+                orderType:
+                  type: string
+                orderShares:
+                  type: string
+  nicholasdotsol.duality.dex.IndexQueueType:
+    type: object
+    properties:
+      price:
+        type: string
+      fee:
+        type: string
+      orderparams:
+        type: object
+        properties:
+          orderRule:
+            type: string
+          orderType:
+            type: string
+          orderShares:
+            type: string
   nicholasdotsol.duality.dex.MsgAddLiquidityResponse:
     type: object
   nicholasdotsol.duality.dex.MsgCreatePairResponse:
@@ -52523,14 +52552,10 @@ definitions:
         type: string
       tickSpacing:
         type: string
-        format: uint64
-      currentPrice:
-        type: string
-      bitArray:
-        type: array
-        items:
-          type: string
-          format: byte
+        format: int64
+      currentIndex:
+        type: integer
+        format: int32
       tickmap:
         type: object
         properties:
@@ -52561,15 +52586,12 @@ definitions:
                   type: string
                 orderShares:
                   type: string
-      virtualPriceMap:
+      IndexMap:
         type: object
         properties:
-          vPrice:
-            type: string
-          direction:
-            type: string
-          orderType:
-            type: string
+          index:
+            type: integer
+            format: int32
           queue:
             type: array
             items:
@@ -52591,6 +52613,60 @@ definitions:
   nicholasdotsol.duality.dex.Params:
     type: object
     description: Params defines the parameters for the module.
+  nicholasdotsol.duality.dex.QueryAllIndexQueueResponse:
+    type: object
+    properties:
+      indexQueue:
+        type: array
+        items:
+          type: object
+          properties:
+            index:
+              type: integer
+              format: int32
+            queue:
+              type: array
+              items:
+                type: object
+                properties:
+                  price:
+                    type: string
+                  fee:
+                    type: string
+                  orderparams:
+                    type: object
+                    properties:
+                      orderRule:
+                        type: string
+                      orderType:
+                        type: string
+                      orderShares:
+                        type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
   nicholasdotsol.duality.dex.QueryAllNodesResponse:
     type: object
     properties:
@@ -52650,14 +52726,10 @@ definitions:
               type: string
             tickSpacing:
               type: string
-              format: uint64
-            currentPrice:
-              type: string
-            bitArray:
-              type: array
-              items:
-                type: string
-                format: byte
+              format: int64
+            currentIndex:
+              type: integer
+              format: int32
             tickmap:
               type: object
               properties:
@@ -52688,15 +52760,12 @@ definitions:
                         type: string
                       orderShares:
                         type: string
-            virtualPriceMap:
+            IndexMap:
               type: object
               properties:
-                vPrice:
-                  type: string
-                direction:
-                  type: string
-                orderType:
-                  type: string
+                index:
+                  type: integer
+                  format: int32
                 queue:
                   type: array
                   items:
@@ -52800,63 +52869,33 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  nicholasdotsol.duality.dex.QueryAllVirtualPriceQueueResponse:
+  nicholasdotsol.duality.dex.QueryGetIndexQueueResponse:
     type: object
     properties:
-      virtualPriceQueue:
-        type: array
-        items:
-          type: object
-          properties:
-            vPrice:
-              type: string
-            direction:
-              type: string
-            orderType:
-              type: string
-            queue:
-              type: array
-              items:
-                type: object
-                properties:
-                  price:
-                    type: string
-                  fee:
-                    type: string
-                  orderparams:
-                    type: object
-                    properties:
-                      orderRule:
-                        type: string
-                      orderType:
-                        type: string
-                      orderShares:
-                        type: string
-      pagination:
+      indexQueue:
         type: object
         properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
+          index:
+            type: integer
+            format: int32
+          queue:
+            type: array
+            items:
+              type: object
+              properties:
+                price:
+                  type: string
+                fee:
+                  type: string
+                orderparams:
+                  type: object
+                  properties:
+                    orderRule:
+                      type: string
+                    orderType:
+                      type: string
+                    orderShares:
+                      type: string
   nicholasdotsol.duality.dex.QueryGetNodesResponse:
     type: object
     properties:
@@ -52887,14 +52926,10 @@ definitions:
             type: string
           tickSpacing:
             type: string
-            format: uint64
-          currentPrice:
-            type: string
-          bitArray:
-            type: array
-            items:
-              type: string
-              format: byte
+            format: int64
+          currentIndex:
+            type: integer
+            format: int32
           tickmap:
             type: object
             properties:
@@ -52925,15 +52960,12 @@ definitions:
                       type: string
                     orderShares:
                       type: string
-          virtualPriceMap:
+          IndexMap:
             type: object
             properties:
-              vPrice:
-                type: string
-              direction:
-                type: string
-              orderType:
-                type: string
+              index:
+                type: integer
+                format: int32
               queue:
                 type: array
                 items:
@@ -52985,36 +53017,6 @@ definitions:
                   type: string
                 orderShares:
                   type: string
-  nicholasdotsol.duality.dex.QueryGetVirtualPriceQueueResponse:
-    type: object
-    properties:
-      virtualPriceQueue:
-        type: object
-        properties:
-          vPrice:
-            type: string
-          direction:
-            type: string
-          orderType:
-            type: string
-          queue:
-            type: array
-            items:
-              type: object
-              properties:
-                price:
-                  type: string
-                fee:
-                  type: string
-                orderparams:
-                  type: object
-                  properties:
-                    orderRule:
-                      type: string
-                    orderType:
-                      type: string
-                    orderShares:
-                      type: string
   nicholasdotsol.duality.dex.QueryParamsResponse:
     type: object
     properties:
@@ -53052,49 +53054,6 @@ definitions:
               type: string
             orderShares:
               type: string
-  nicholasdotsol.duality.dex.VirtualPriceQueue:
-    type: object
-    properties:
-      vPrice:
-        type: string
-      direction:
-        type: string
-      orderType:
-        type: string
-      queue:
-        type: array
-        items:
-          type: object
-          properties:
-            price:
-              type: string
-            fee:
-              type: string
-            orderparams:
-              type: object
-              properties:
-                orderRule:
-                  type: string
-                orderType:
-                  type: string
-                orderShares:
-                  type: string
-  nicholasdotsol.duality.dex.VirtualPriceQueueType:
-    type: object
-    properties:
-      price:
-        type: string
-      fee:
-        type: string
-      orderparams:
-        type: object
-        properties:
-          orderRule:
-            type: string
-          orderType:
-            type: string
-          orderShares:
-            type: string
   tendermint.spn.claim.ClaimRecord:
     type: object
     properties:

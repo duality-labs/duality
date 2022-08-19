@@ -47,6 +47,8 @@ func (k Keeper) Ticks(c context.Context, req *types.QueryGetTicksRequest) (*type
 
 	val, found := k.GetTicks(
 		ctx,
+		req.Token0,
+		req.Token1,
 		req.Price,
 		req.Fee,
 		req.Direction,

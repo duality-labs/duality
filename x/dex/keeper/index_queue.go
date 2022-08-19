@@ -22,10 +22,10 @@ func (k Keeper) dequeue(ctx sdk.Context, queue []*types.IndexQueueType) (types.I
 }
 
 // SetIndexQueue set a specific IndexQueue in the store from its index
-func (k Keeper) SetIndexQueue(ctx sdk.Context, IndexQueue types.IndexQueue) {
+func (k Keeper) SetIndexQueue(ctx sdk.Context, token0 string, token1 string, IndexQueue types.IndexQueue) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.IndexQueueKeyPrefix))
 	b := k.cdc.MustMarshal(&IndexQueue)
-	store.Set(types.IndexQueueKey(
+	store.Set(types.IndexQueueKey(token0, token1,
 		IndexQueue.Index,
 	), b)
 }
@@ -33,12 +33,14 @@ func (k Keeper) SetIndexQueue(ctx sdk.Context, IndexQueue types.IndexQueue) {
 // GetIndexQueue returns a IndexQueue from its index
 func (k Keeper) GetIndexQueue(
 	ctx sdk.Context,
+	token0 string,
+	token1 string,
 	index int32,
 
 ) (val types.IndexQueue, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.IndexQueueKeyPrefix))
 
-	b := store.Get(types.IndexQueueKey(
+	b := store.Get(types.IndexQueueKey(token0, token1,
 		index,
 	))
 	if b == nil {
@@ -52,11 +54,13 @@ func (k Keeper) GetIndexQueue(
 // RemoveIndexQueue removes a IndexQueue from the store
 func (k Keeper) RemoveIndexQueue(
 	ctx sdk.Context,
+	token0 string,
+	token1 string,
 	index int32,
 
 ) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.IndexQueueKeyPrefix))
-	store.Delete(types.IndexQueueKey(
+	store.Delete(types.IndexQueueKey(token0, token1,
 		index,
 	))
 }

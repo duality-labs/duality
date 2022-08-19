@@ -93,10 +93,13 @@ message QueryAllNodesResponse {
 
 
 message QueryGetTicksRequest {
-	  string price = 1;
-  string fee = 2;
-  string direction = 3;
-  string orderType = 4;
+  string token0 = 1;
+  string token1 = 2;
+  string price = 3;
+  string fee = 4;
+  string direction = 5;
+  string orderType = 6;
+  
 
 }
 
@@ -133,7 +136,9 @@ message QueryAllPairsResponse {
 }
 
 message QueryGetIndexQueueRequest {
-	int32 index = 1;
+	string token0 = 1;
+	string token1 = 2;
+	int32 index = 3;
 
 }
 

@@ -20,7 +20,7 @@ func createNIndexQueue(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.In
 	for i := range items {
 		items[i].Index = int32(i)
 
-		keeper.SetIndexQueue(ctx, items[i])
+		keeper.SetIndexQueue(ctx, "0", "1", items[i])
 	}
 	return items
 }
@@ -30,6 +30,7 @@ func TestIndexQueueGet(t *testing.T) {
 	items := createNIndexQueue(keeper, ctx, 10)
 	for _, item := range items {
 		rst, found := keeper.GetIndexQueue(ctx,
+			"0", "1,",
 			item.Index,
 		)
 		require.True(t, found)
@@ -43,10 +44,10 @@ func TestIndexQueueRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNIndexQueue(keeper, ctx, 10)
 	for _, item := range items {
-		keeper.RemoveIndexQueue(ctx,
+		keeper.RemoveIndexQueue(ctx, "0", "1",
 			item.Index,
 		)
-		_, found := keeper.GetIndexQueue(ctx,
+		_, found := keeper.GetIndexQueue(ctx, "0", "1",
 			item.Index,
 		)
 		require.False(t, found)

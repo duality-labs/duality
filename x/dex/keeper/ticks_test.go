@@ -27,7 +27,7 @@ func createNTicks(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Ticks {
 		items[i].PairPrice = sdk.ZeroDec()
 		items[i].TotalShares = sdk.ZeroDec()
 
-		keeper.SetTicks(ctx, items[i])
+		keeper.SetTicks(ctx, "0", "1", items[i])
 	}
 	return items
 }
@@ -37,6 +37,8 @@ func TestTicksGet(t *testing.T) {
 	items := createNTicks(keeper, ctx, 10)
 	for _, item := range items {
 		rst, found := keeper.GetTicks(ctx,
+			"0",
+			"1",
 			item.Price,
 			item.Fee,
 			item.Direction,
@@ -54,12 +56,16 @@ func TestTicksRemove(t *testing.T) {
 	items := createNTicks(keeper, ctx, 10)
 	for _, item := range items {
 		keeper.RemoveTicks(ctx,
+			"0",
+			"1",
 			item.Price,
 			item.Fee,
 			item.Direction,
 			item.OrderType,
 		)
 		_, found := keeper.GetTicks(ctx,
+			"0",
+			"1",
 			item.Price,
 			item.Fee,
 			item.Direction,

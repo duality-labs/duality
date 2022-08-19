@@ -32,9 +32,10 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit token1 at a price/fee pair greater than the current price")
 	}
 
-	IndexQueueOld, IndexQueueFound := k.GetIndexQueue(ctx, msg.Index)
+	IndexQueueOld, IndexQueueFound := k.GetIndexQueue(ctx, token0, token1, msg.Index)
 
-	//shares := amount.Mul(vprice)
+	//FIX ME
+	shares := amount.Mul(price.Mul(fee))
 
 	if !IndexQueueFound {
 

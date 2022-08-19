@@ -47,6 +47,8 @@ func (k Keeper) IndexQueue(c context.Context, req *types.QueryGetIndexQueueReque
 
 	val, found := k.GetIndexQueue(
 		ctx,
+		req.Token0,
+		req.Token1,
 		req.Index,
 	)
 	if !found {
