@@ -33,7 +33,6 @@ func TestTicksQuerySingle(t *testing.T) {
 			request: &types.QueryGetTicksRequest{
 				Price:     msgs[0].Price,
 				Fee:       msgs[0].Fee,
-				Direction: msgs[0].Direction,
 				OrderType: msgs[0].OrderType,
 			},
 			response: &types.QueryGetTicksResponse{Ticks: msgs[0]},
@@ -43,7 +42,6 @@ func TestTicksQuerySingle(t *testing.T) {
 			request: &types.QueryGetTicksRequest{
 				Price:     msgs[1].Price,
 				Fee:       msgs[1].Fee,
-				Direction: msgs[1].Direction,
 				OrderType: msgs[1].OrderType,
 			},
 			response: &types.QueryGetTicksResponse{Ticks: msgs[1]},

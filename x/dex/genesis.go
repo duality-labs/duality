@@ -17,19 +17,22 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	// Set nodes count
 	k.SetNodesCount(ctx, genState.NodesCount)
 
-	// Set all the ticks
-	for _, elem := range genState.TicksList {
-		k.SetTicks(ctx, elem)
-	}
-
 	// Set all the pairs
 	for _, elem := range genState.PairsList {
 		k.SetPairs(ctx, elem)
+
+		// // Set all the ticks
+		// for _, elem2 := range genState.TicksList {
+		// 	k.SetTicks(ctx, elem.Token0, elem.Token1, elem2)
+		// }
+
+		// // Set all the virtualPriceQueue
+		// for _, elem2 := range genState.IndexQueueList {
+		// 	k.SetIndexQueue(ctx, elem.Token0, elem.Token1, elem2)
+		// }
+
 	}
-	// Set all the virtualPriceQueue
-	for _, elem := range genState.VirtualPriceQueueList {
-		k.SetVirtualPriceQueue(ctx, elem)
-	}
+
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
 }
@@ -43,7 +46,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.NodesCount = k.GetNodesCount(ctx)
 	genesis.TicksList = k.GetAllTicks(ctx)
 	genesis.PairsList = k.GetAllPairs(ctx)
-	genesis.VirtualPriceQueueList = k.GetAllVirtualPriceQueue(ctx)
+	genesis.IndexQueueList = k.GetAllIndexQueue(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis

@@ -8,6 +8,7 @@ export interface MsgAddLiquidity {
   tokenA: string;
   tokenB: string;
   tokenDirection: string;
+  index: number;
   amount: string;
   price: string;
   fee: string;
@@ -22,6 +23,7 @@ export interface MsgRemoveLiquidity {
   tokenA: string;
   tokenB: string;
   tokenDirection: string;
+  index: number;
   shares: string;
   price: string;
   fee: string;
@@ -54,6 +56,7 @@ const baseMsgAddLiquidity: object = {
   tokenA: "",
   tokenB: "",
   tokenDirection: "",
+  index: 0,
   amount: "",
   price: "",
   fee: "",
@@ -75,20 +78,23 @@ export const MsgAddLiquidity = {
     if (message.tokenDirection !== "") {
       writer.uint32(34).string(message.tokenDirection);
     }
+    if (message.index !== 0) {
+      writer.uint32(40).int32(message.index);
+    }
     if (message.amount !== "") {
-      writer.uint32(42).string(message.amount);
+      writer.uint32(50).string(message.amount);
     }
     if (message.price !== "") {
-      writer.uint32(50).string(message.price);
+      writer.uint32(58).string(message.price);
     }
     if (message.fee !== "") {
-      writer.uint32(58).string(message.fee);
+      writer.uint32(66).string(message.fee);
     }
     if (message.orderType !== "") {
-      writer.uint32(66).string(message.orderType);
+      writer.uint32(74).string(message.orderType);
     }
     if (message.receiver !== "") {
-      writer.uint32(74).string(message.receiver);
+      writer.uint32(82).string(message.receiver);
     }
     return writer;
   },
@@ -113,18 +119,21 @@ export const MsgAddLiquidity = {
           message.tokenDirection = reader.string();
           break;
         case 5:
-          message.amount = reader.string();
+          message.index = reader.int32();
           break;
         case 6:
-          message.price = reader.string();
+          message.amount = reader.string();
           break;
         case 7:
-          message.fee = reader.string();
+          message.price = reader.string();
           break;
         case 8:
-          message.orderType = reader.string();
+          message.fee = reader.string();
           break;
         case 9:
+          message.orderType = reader.string();
+          break;
+        case 10:
           message.receiver = reader.string();
           break;
         default:
@@ -156,6 +165,11 @@ export const MsgAddLiquidity = {
       message.tokenDirection = String(object.tokenDirection);
     } else {
       message.tokenDirection = "";
+    }
+    if (object.index !== undefined && object.index !== null) {
+      message.index = Number(object.index);
+    } else {
+      message.index = 0;
     }
     if (object.amount !== undefined && object.amount !== null) {
       message.amount = String(object.amount);
@@ -192,6 +206,7 @@ export const MsgAddLiquidity = {
     message.tokenB !== undefined && (obj.tokenB = message.tokenB);
     message.tokenDirection !== undefined &&
       (obj.tokenDirection = message.tokenDirection);
+    message.index !== undefined && (obj.index = message.index);
     message.amount !== undefined && (obj.amount = message.amount);
     message.price !== undefined && (obj.price = message.price);
     message.fee !== undefined && (obj.fee = message.fee);
@@ -221,6 +236,11 @@ export const MsgAddLiquidity = {
       message.tokenDirection = object.tokenDirection;
     } else {
       message.tokenDirection = "";
+    }
+    if (object.index !== undefined && object.index !== null) {
+      message.index = object.index;
+    } else {
+      message.index = 0;
     }
     if (object.amount !== undefined && object.amount !== null) {
       message.amount = object.amount;
@@ -302,6 +322,7 @@ const baseMsgRemoveLiquidity: object = {
   tokenA: "",
   tokenB: "",
   tokenDirection: "",
+  index: 0,
   shares: "",
   price: "",
   fee: "",
@@ -326,20 +347,23 @@ export const MsgRemoveLiquidity = {
     if (message.tokenDirection !== "") {
       writer.uint32(34).string(message.tokenDirection);
     }
+    if (message.index !== 0) {
+      writer.uint32(40).int32(message.index);
+    }
     if (message.shares !== "") {
-      writer.uint32(42).string(message.shares);
+      writer.uint32(50).string(message.shares);
     }
     if (message.price !== "") {
-      writer.uint32(50).string(message.price);
+      writer.uint32(58).string(message.price);
     }
     if (message.fee !== "") {
-      writer.uint32(58).string(message.fee);
+      writer.uint32(66).string(message.fee);
     }
     if (message.orderType !== "") {
-      writer.uint32(66).string(message.orderType);
+      writer.uint32(74).string(message.orderType);
     }
     if (message.receiver !== "") {
-      writer.uint32(74).string(message.receiver);
+      writer.uint32(82).string(message.receiver);
     }
     return writer;
   },
@@ -364,18 +388,21 @@ export const MsgRemoveLiquidity = {
           message.tokenDirection = reader.string();
           break;
         case 5:
-          message.shares = reader.string();
+          message.index = reader.int32();
           break;
         case 6:
-          message.price = reader.string();
+          message.shares = reader.string();
           break;
         case 7:
-          message.fee = reader.string();
+          message.price = reader.string();
           break;
         case 8:
-          message.orderType = reader.string();
+          message.fee = reader.string();
           break;
         case 9:
+          message.orderType = reader.string();
+          break;
+        case 10:
           message.receiver = reader.string();
           break;
         default:
@@ -407,6 +434,11 @@ export const MsgRemoveLiquidity = {
       message.tokenDirection = String(object.tokenDirection);
     } else {
       message.tokenDirection = "";
+    }
+    if (object.index !== undefined && object.index !== null) {
+      message.index = Number(object.index);
+    } else {
+      message.index = 0;
     }
     if (object.shares !== undefined && object.shares !== null) {
       message.shares = String(object.shares);
@@ -443,6 +475,7 @@ export const MsgRemoveLiquidity = {
     message.tokenB !== undefined && (obj.tokenB = message.tokenB);
     message.tokenDirection !== undefined &&
       (obj.tokenDirection = message.tokenDirection);
+    message.index !== undefined && (obj.index = message.index);
     message.shares !== undefined && (obj.shares = message.shares);
     message.price !== undefined && (obj.price = message.price);
     message.fee !== undefined && (obj.fee = message.fee);
@@ -472,6 +505,11 @@ export const MsgRemoveLiquidity = {
       message.tokenDirection = object.tokenDirection;
     } else {
       message.tokenDirection = "";
+    }
+    if (object.index !== undefined && object.index !== null) {
+      message.index = object.index;
+    } else {
+      message.index = 0;
     }
     if (object.shares !== undefined && object.shares !== null) {
       message.shares = object.shares;

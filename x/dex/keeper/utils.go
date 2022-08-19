@@ -6,18 +6,18 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// func (k Keeper) CalculateVirtualPrice(token0 string, token1 string, tokenDirection string, amount sdk.Dec, fee sdk.Dec, price sdk.Dec) (sdk.Dec, error) {
+func (k Keeper) CalculateVirtualPrice(token0 string, token1 string, tokenDirection string, fee sdk.Dec, price sdk.Dec) (sdk.Dec, error) {
 
-// 	if token0 == tokenDirection {
+	if token0 == tokenDirection {
 
-// 		return fee.Quo(price.Mul(sdk.NewDec(10000))), nil
-// 	} else if token1 == tokenDirection {
-// 		// pools[j].Price.Mul(pools[j].Fee)).Quo(sdk.NewDec(10000)))
-// 		return price.Mul(fee).Quo(sdk.NewDec(10000)), nil
-// 	}
-// 	return sdk.ZeroDec(), nil
+		return fee.Quo(price.Mul(sdk.NewDec(10000))), nil
+	} else if token1 == tokenDirection {
+		// pools[j].Price.Mul(pools[j].Fee)).Quo(sdk.NewDec(10000)))
+		return price.Mul(fee).Quo(sdk.NewDec(10000)), nil
+	}
+	return sdk.ZeroDec(), nil
 
-// }
+}
 
 // Returns corresponding tick index for a given virtualPrice, always rounds down
 func (k Keeper) CalculateTick(virtualPrice sdk.Dec) (uint64, error) {

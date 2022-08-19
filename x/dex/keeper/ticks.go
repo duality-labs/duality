@@ -7,13 +7,14 @@ import (
 )
 
 // SetTicks set a specific ticks in the store from its index
-func (k Keeper) SetTicks(ctx sdk.Context, ticks types.Ticks) {
+func (k Keeper) SetTicks(ctx sdk.Context, token0 string, token1 string, ticks types.Ticks) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TicksKeyPrefix))
 	b := k.cdc.MustMarshal(&ticks)
 	store.Set(types.TicksKey(
+		token0,
+		token1,
 		ticks.Price,
 		ticks.Fee,
-		ticks.Direction,
 		ticks.OrderType,
 	), b)
 }
@@ -21,18 +22,20 @@ func (k Keeper) SetTicks(ctx sdk.Context, ticks types.Ticks) {
 // GetTicks returns a ticks from its index
 func (k Keeper) GetTicks(
 	ctx sdk.Context,
+	token0 string,
+	token1 string,
 	price string,
 	fee string,
-	direction string,
 	orderType string,
 
 ) (val types.Ticks, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TicksKeyPrefix))
 
 	b := store.Get(types.TicksKey(
+		token0,
+		token1,
 		price,
 		fee,
-		direction,
 		orderType,
 	))
 	if b == nil {
@@ -46,17 +49,19 @@ func (k Keeper) GetTicks(
 // RemoveTicks removes a ticks from the store
 func (k Keeper) RemoveTicks(
 	ctx sdk.Context,
+	token0 string,
+	token1 string,
 	price string,
 	fee string,
-	direction string,
 	orderType string,
 
 ) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TicksKeyPrefix))
 	store.Delete(types.TicksKey(
+		token0,
+		token1,
 		price,
 		fee,
-		direction,
 		orderType,
 	))
 }

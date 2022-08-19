@@ -21,58 +21,50 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func networkWithVirtualPriceQueueObjects(t *testing.T, n int) (*network.Network, []types.VirtualPriceQueue) {
+func networkWithIndexQueueObjects(t *testing.T, n int) (*network.Network, []types.IndexQueue) {
 	t.Helper()
 	cfg := network.DefaultConfig()
 	state := types.GenesisState{}
 	require.NoError(t, cfg.Codec.UnmarshalJSON(cfg.GenesisState[types.ModuleName], &state))
 
 	for i := 0; i < n; i++ {
-		virtualPriceQueue := types.VirtualPriceQueue{
-			VPrice:    strconv.Itoa(i),
-			Direction: strconv.Itoa(i),
-			OrderType: strconv.Itoa(i),
+		IndexQueue := types.IndexQueue{
+			Index: int32(i),
 		}
-		nullify.Fill(&virtualPriceQueue)
-		state.VirtualPriceQueueList = append(state.VirtualPriceQueueList, virtualPriceQueue)
+		nullify.Fill(&IndexQueue)
+		state.IndexQueueList = append(state.IndexQueueList, IndexQueue)
 	}
 	buf, err := cfg.Codec.MarshalJSON(&state)
 	require.NoError(t, err)
 	cfg.GenesisState[types.ModuleName] = buf
-	return network.New(t, cfg), state.VirtualPriceQueueList
+	return network.New(t, cfg), state.IndexQueueList
 }
 
-func TestShowVirtualPriceQueue(t *testing.T) {
-	net, objs := networkWithVirtualPriceQueueObjects(t, 2)
+func TestShowIndexQueue(t *testing.T) {
+	net, objs := networkWithIndexQueueObjects(t, 2)
 
 	ctx := net.Validators[0].ClientCtx
 	common := []string{
 		fmt.Sprintf("--%s=json", tmcli.OutputFlag),
 	}
 	for _, tc := range []struct {
-		desc        string
-		idVPrice    string
-		idDirection string
-		idOrderType string
+		desc    string
+		idIndex int32
 
 		args []string
 		err  error
-		obj  types.VirtualPriceQueue
+		obj  types.IndexQueue
 	}{
 		{
-			desc:        "found",
-			idVPrice:    objs[0].VPrice,
-			idDirection: objs[0].Direction,
-			idOrderType: objs[0].OrderType,
+			desc:    "found",
+			idIndex: objs[0].Index,
 
 			args: common,
 			obj:  objs[0],
 		},
 		{
-			desc:        "not found",
-			idVPrice:    strconv.Itoa(100000),
-			idDirection: strconv.Itoa(100000),
-			idOrderType: strconv.Itoa(100000),
+			desc:    "not found",
+			idIndex: 100000,
 
 			args: common,
 			err:  status.Error(codes.NotFound, "not found"),
@@ -80,32 +72,30 @@ func TestShowVirtualPriceQueue(t *testing.T) {
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
 			args := []string{
-				tc.idVPrice,
-				tc.idDirection,
-				tc.idOrderType,
+				strconv.Itoa(int(tc.idIndex)),
 			}
 			args = append(args, tc.args...)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowVirtualPriceQueue(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowIndexQueue(), args)
 			if tc.err != nil {
 				stat, ok := status.FromError(tc.err)
 				require.True(t, ok)
 				require.ErrorIs(t, stat.Err(), tc.err)
 			} else {
 				require.NoError(t, err)
-				var resp types.QueryGetVirtualPriceQueueResponse
+				var resp types.QueryGetIndexQueueResponse
 				require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-				require.NotNil(t, resp.VirtualPriceQueue)
+				require.NotNil(t, resp.IndexQueue)
 				require.Equal(t,
 					nullify.Fill(&tc.obj),
-					nullify.Fill(&resp.VirtualPriceQueue),
+					nullify.Fill(&resp.IndexQueue),
 				)
 			}
 		})
 	}
 }
 
-func TestListVirtualPriceQueue(t *testing.T) {
-	net, objs := networkWithVirtualPriceQueueObjects(t, 5)
+func TestListIndexQueue(t *testing.T) {
+	net, objs := networkWithIndexQueueObjects(t, 5)
 
 	ctx := net.Validators[0].ClientCtx
 	request := func(next []byte, offset, limit uint64, total bool) []string {
@@ -127,14 +117,14 @@ func TestListVirtualPriceQueue(t *testing.T) {
 		step := 2
 		for i := 0; i < len(objs); i += step {
 			args := request(nil, uint64(i), uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListVirtualPriceQueue(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListIndexQueue(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllVirtualPriceQueueResponse
+			var resp types.QueryAllIndexQueueResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.VirtualPriceQueue), step)
+			require.LessOrEqual(t, len(resp.IndexQueue), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.VirtualPriceQueue),
+				nullify.Fill(resp.IndexQueue),
 			)
 		}
 	})
@@ -143,29 +133,29 @@ func TestListVirtualPriceQueue(t *testing.T) {
 		var next []byte
 		for i := 0; i < len(objs); i += step {
 			args := request(next, 0, uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListVirtualPriceQueue(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListIndexQueue(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllVirtualPriceQueueResponse
+			var resp types.QueryAllIndexQueueResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.VirtualPriceQueue), step)
+			require.LessOrEqual(t, len(resp.IndexQueue), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.VirtualPriceQueue),
+				nullify.Fill(resp.IndexQueue),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
 		args := request(nil, 0, uint64(len(objs)), true)
-		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListVirtualPriceQueue(), args)
+		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListIndexQueue(), args)
 		require.NoError(t, err)
-		var resp types.QueryAllVirtualPriceQueueResponse
+		var resp types.QueryAllIndexQueueResponse
 		require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 		require.NoError(t, err)
 		require.Equal(t, len(objs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(objs),
-			nullify.Fill(resp.VirtualPriceQueue),
+			nullify.Fill(resp.IndexQueue),
 		)
 	})
 }

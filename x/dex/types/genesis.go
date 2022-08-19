@@ -10,10 +10,10 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		NodesList:             []Nodes{},
-		TicksList:             []Ticks{},
-		PairsList:             []Pairs{},
-		VirtualPriceQueueList: []VirtualPriceQueue{},
+		NodesList: []Nodes{},
+		//TicksList:      []Ticks{},
+		PairsList: []Pairs{},
+		//IndexQueueList: []IndexQueue{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -35,16 +35,16 @@ func (gs GenesisState) Validate() error {
 		nodesIdMap[elem.Id] = true
 	}
 
-	// Check for duplicated index in ticks
-	ticksIndexMap := make(map[string]struct{})
+	// // Check for duplicated index in ticks
+	// ticksIndexMap := make(map[string]struct{})
 
-	for _, elem := range gs.TicksList {
-		index := string(TicksKey(elem.Price, elem.Fee, elem.Direction, elem.OrderType))
-		if _, ok := ticksIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for ticks")
-		}
-		ticksIndexMap[index] = struct{}{}
-	}
+	// for _, elem := range gs.TicksList {
+	// 	index := string(TicksKey(elem.Price, elem.Fee, elem.Direction, elem.OrderType))
+	// 	if _, ok := ticksIndexMap[index]; ok {
+	// 		return fmt.Errorf("duplicated index for ticks")
+	// 	}
+	// 	ticksIndexMap[index] = struct{}{}
+	// }
 
 	// Check for duplicated index in pairs
 	pairsIndexMap := make(map[string]struct{})
@@ -54,18 +54,21 @@ func (gs GenesisState) Validate() error {
 		if _, ok := pairsIndexMap[index]; ok {
 			return fmt.Errorf("duplicated index for pairs")
 		}
+
 		pairsIndexMap[index] = struct{}{}
 	}
-	// Check for duplicated index in virtualPriceQueue
-	virtualPriceQueueIndexMap := make(map[string]struct{})
 
-	for _, elem := range gs.VirtualPriceQueueList {
-		index := string(VirtualPriceQueueKey(elem.VPrice, elem.Direction, elem.OrderType))
-		if _, ok := virtualPriceQueueIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for virtualPriceQueue")
-		}
-		virtualPriceQueueIndexMap[index] = struct{}{}
-	}
+	// // Check for duplicated index in IndexQueue
+	// IndexQueueIndexMap := make(map[string]struct{})
+
+	// for _, elem := range gs.IndexQueueList {
+	// 	index := string(IndexQueueKey(elem.Index))
+	// 	if _, ok := IndexQueueIndexMap[index]; ok {
+	// 		return fmt.Errorf("duplicated index for IndexQueue")
+	// 	}
+	// 	IndexQueueIndexMap[index] = struct{}{}
+	//}
+
 	// this line is used by starport scaffolding # genesis/types/validate
 
 	return gs.Params.Validate()

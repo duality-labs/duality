@@ -1,0 +1,13 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+
+import "dex/index_queue_type.proto";
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+
+message IndexQueue {
+  int32 index = 1;
+  repeated IndexQueueType queue = 3; 
+  
+  
+}

@@ -5,7 +5,7 @@ import { Params } from "../dex/params";
 import { Nodes } from "../dex/nodes";
 import { Ticks } from "../dex/ticks";
 import { Pairs } from "../dex/pairs";
-import { VirtualPriceQueue } from "../dex/virtual_price_queue";
+import { IndexQueue } from "../dex/index_queue";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -17,7 +17,7 @@ export interface GenesisState {
   ticksList: Ticks[];
   pairsList: Pairs[];
   /** this line is used by starport scaffolding # genesis/proto/state */
-  virtualPriceQueueList: VirtualPriceQueue[];
+  indexQueueList: IndexQueue[];
 }
 
 const baseGenesisState: object = { nodesCount: 0 };
@@ -39,8 +39,8 @@ export const GenesisState = {
     for (const v of message.pairsList) {
       Pairs.encode(v!, writer.uint32(42).fork()).ldelim();
     }
-    for (const v of message.virtualPriceQueueList) {
-      VirtualPriceQueue.encode(v!, writer.uint32(50).fork()).ldelim();
+    for (const v of message.indexQueueList) {
+      IndexQueue.encode(v!, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -52,7 +52,7 @@ export const GenesisState = {
     message.nodesList = [];
     message.ticksList = [];
     message.pairsList = [];
-    message.virtualPriceQueueList = [];
+    message.indexQueueList = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -72,8 +72,8 @@ export const GenesisState = {
           message.pairsList.push(Pairs.decode(reader, reader.uint32()));
           break;
         case 6:
-          message.virtualPriceQueueList.push(
-            VirtualPriceQueue.decode(reader, reader.uint32())
+          message.indexQueueList.push(
+            IndexQueue.decode(reader, reader.uint32())
           );
           break;
         default:
@@ -89,7 +89,7 @@ export const GenesisState = {
     message.nodesList = [];
     message.ticksList = [];
     message.pairsList = [];
-    message.virtualPriceQueueList = [];
+    message.indexQueueList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromJSON(object.params);
     } else {
@@ -115,12 +115,9 @@ export const GenesisState = {
         message.pairsList.push(Pairs.fromJSON(e));
       }
     }
-    if (
-      object.virtualPriceQueueList !== undefined &&
-      object.virtualPriceQueueList !== null
-    ) {
-      for (const e of object.virtualPriceQueueList) {
-        message.virtualPriceQueueList.push(VirtualPriceQueue.fromJSON(e));
+    if (object.indexQueueList !== undefined && object.indexQueueList !== null) {
+      for (const e of object.indexQueueList) {
+        message.indexQueueList.push(IndexQueue.fromJSON(e));
       }
     }
     return message;
@@ -152,12 +149,12 @@ export const GenesisState = {
     } else {
       obj.pairsList = [];
     }
-    if (message.virtualPriceQueueList) {
-      obj.virtualPriceQueueList = message.virtualPriceQueueList.map((e) =>
-        e ? VirtualPriceQueue.toJSON(e) : undefined
+    if (message.indexQueueList) {
+      obj.indexQueueList = message.indexQueueList.map((e) =>
+        e ? IndexQueue.toJSON(e) : undefined
       );
     } else {
-      obj.virtualPriceQueueList = [];
+      obj.indexQueueList = [];
     }
     return obj;
   },
@@ -167,7 +164,7 @@ export const GenesisState = {
     message.nodesList = [];
     message.ticksList = [];
     message.pairsList = [];
-    message.virtualPriceQueueList = [];
+    message.indexQueueList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromPartial(object.params);
     } else {
@@ -193,12 +190,9 @@ export const GenesisState = {
         message.pairsList.push(Pairs.fromPartial(e));
       }
     }
-    if (
-      object.virtualPriceQueueList !== undefined &&
-      object.virtualPriceQueueList !== null
-    ) {
-      for (const e of object.virtualPriceQueueList) {
-        message.virtualPriceQueueList.push(VirtualPriceQueue.fromPartial(e));
+    if (object.indexQueueList !== undefined && object.indexQueueList !== null) {
+      for (const e of object.indexQueueList) {
+        message.indexQueueList.push(IndexQueue.fromPartial(e));
       }
     }
     return message;

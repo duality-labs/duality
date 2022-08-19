@@ -4,17 +4,17 @@ import { StdFee } from "@cosmjs/launchpad";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Registry, OfflineSigner, EncodeObject, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Api } from "./rest";
-import { MsgAddLiquidity } from "./types/dex/tx";
-import { MsgCreatePair } from "./types/dex/tx";
 import { MsgSwap } from "./types/dex/tx";
 import { MsgRemoveLiquidity } from "./types/dex/tx";
+import { MsgAddLiquidity } from "./types/dex/tx";
+import { MsgCreatePair } from "./types/dex/tx";
 
 
 const types = [
-  ["/nicholasdotsol.duality.dex.MsgAddLiquidity", MsgAddLiquidity],
-  ["/nicholasdotsol.duality.dex.MsgCreatePair", MsgCreatePair],
   ["/nicholasdotsol.duality.dex.MsgSwap", MsgSwap],
   ["/nicholasdotsol.duality.dex.MsgRemoveLiquidity", MsgRemoveLiquidity],
+  ["/nicholasdotsol.duality.dex.MsgAddLiquidity", MsgAddLiquidity],
+  ["/nicholasdotsol.duality.dex.MsgCreatePair", MsgCreatePair],
   
 ];
 export const MissingWalletError = new Error("wallet is required");
@@ -47,10 +47,10 @@ const txClient = async (wallet: OfflineSigner, { addr: addr }: TxClientOptions =
 
   return {
     signAndBroadcast: (msgs: EncodeObject[], { fee, memo }: SignAndBroadcastOptions = {fee: defaultFee, memo: ""}) => client.signAndBroadcast(address, msgs, fee,memo),
-    msgAddLiquidity: (data: MsgAddLiquidity): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgAddLiquidity", value: MsgAddLiquidity.fromPartial( data ) }),
-    msgCreatePair: (data: MsgCreatePair): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgCreatePair", value: MsgCreatePair.fromPartial( data ) }),
     msgSwap: (data: MsgSwap): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgSwap", value: MsgSwap.fromPartial( data ) }),
     msgRemoveLiquidity: (data: MsgRemoveLiquidity): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgRemoveLiquidity", value: MsgRemoveLiquidity.fromPartial( data ) }),
+    msgAddLiquidity: (data: MsgAddLiquidity): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgAddLiquidity", value: MsgAddLiquidity.fromPartial( data ) }),
+    msgCreatePair: (data: MsgCreatePair): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgCreatePair", value: MsgCreatePair.fromPartial( data ) }),
     
   };
 };

@@ -2,7 +2,7 @@
 import * as Long from "long";
 import { util, configure, Writer, Reader } from "protobufjs/minimal";
 import { Ticks } from "../dex/ticks";
-import { VirtualPriceQueue } from "../dex/virtual_price_queue";
+import { IndexQueue } from "../dex/index_queue";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -10,17 +10,16 @@ export interface Pairs {
   token0: string;
   token1: string;
   tickSpacing: number;
-  currentPrice: string;
-  bitArray: Uint8Array[];
+  currentIndex: number;
   tickmap: Ticks | undefined;
-  virtualPriceMap: VirtualPriceQueue | undefined;
+  IndexMap: IndexQueue | undefined;
 }
 
 const basePairs: object = {
   token0: "",
   token1: "",
   tickSpacing: 0,
-  currentPrice: "",
+  currentIndex: 0,
 };
 
 export const Pairs = {
@@ -32,22 +31,16 @@ export const Pairs = {
       writer.uint32(18).string(message.token1);
     }
     if (message.tickSpacing !== 0) {
-      writer.uint32(24).uint64(message.tickSpacing);
+      writer.uint32(24).int64(message.tickSpacing);
     }
-    if (message.currentPrice !== "") {
-      writer.uint32(34).string(message.currentPrice);
-    }
-    for (const v of message.bitArray) {
-      writer.uint32(42).bytes(v!);
+    if (message.currentIndex !== 0) {
+      writer.uint32(32).int32(message.currentIndex);
     }
     if (message.tickmap !== undefined) {
-      Ticks.encode(message.tickmap, writer.uint32(50).fork()).ldelim();
+      Ticks.encode(message.tickmap, writer.uint32(42).fork()).ldelim();
     }
-    if (message.virtualPriceMap !== undefined) {
-      VirtualPriceQueue.encode(
-        message.virtualPriceMap,
-        writer.uint32(58).fork()
-      ).ldelim();
+    if (message.IndexMap !== undefined) {
+      IndexQueue.encode(message.IndexMap, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -56,7 +49,6 @@ export const Pairs = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...basePairs } as Pairs;
-    message.bitArray = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -67,22 +59,16 @@ export const Pairs = {
           message.token1 = reader.string();
           break;
         case 3:
-          message.tickSpacing = longToNumber(reader.uint64() as Long);
+          message.tickSpacing = longToNumber(reader.int64() as Long);
           break;
         case 4:
-          message.currentPrice = reader.string();
+          message.currentIndex = reader.int32();
           break;
         case 5:
-          message.bitArray.push(reader.bytes());
-          break;
-        case 6:
           message.tickmap = Ticks.decode(reader, reader.uint32());
           break;
-        case 7:
-          message.virtualPriceMap = VirtualPriceQueue.decode(
-            reader,
-            reader.uint32()
-          );
+        case 6:
+          message.IndexMap = IndexQueue.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -94,7 +80,6 @@ export const Pairs = {
 
   fromJSON(object: any): Pairs {
     const message = { ...basePairs } as Pairs;
-    message.bitArray = [];
     if (object.token0 !== undefined && object.token0 !== null) {
       message.token0 = String(object.token0);
     } else {
@@ -110,30 +95,20 @@ export const Pairs = {
     } else {
       message.tickSpacing = 0;
     }
-    if (object.currentPrice !== undefined && object.currentPrice !== null) {
-      message.currentPrice = String(object.currentPrice);
+    if (object.currentIndex !== undefined && object.currentIndex !== null) {
+      message.currentIndex = Number(object.currentIndex);
     } else {
-      message.currentPrice = "";
-    }
-    if (object.bitArray !== undefined && object.bitArray !== null) {
-      for (const e of object.bitArray) {
-        message.bitArray.push(bytesFromBase64(e));
-      }
+      message.currentIndex = 0;
     }
     if (object.tickmap !== undefined && object.tickmap !== null) {
       message.tickmap = Ticks.fromJSON(object.tickmap);
     } else {
       message.tickmap = undefined;
     }
-    if (
-      object.virtualPriceMap !== undefined &&
-      object.virtualPriceMap !== null
-    ) {
-      message.virtualPriceMap = VirtualPriceQueue.fromJSON(
-        object.virtualPriceMap
-      );
+    if (object.IndexMap !== undefined && object.IndexMap !== null) {
+      message.IndexMap = IndexQueue.fromJSON(object.IndexMap);
     } else {
-      message.virtualPriceMap = undefined;
+      message.IndexMap = undefined;
     }
     return message;
   },
@@ -144,29 +119,21 @@ export const Pairs = {
     message.token1 !== undefined && (obj.token1 = message.token1);
     message.tickSpacing !== undefined &&
       (obj.tickSpacing = message.tickSpacing);
-    message.currentPrice !== undefined &&
-      (obj.currentPrice = message.currentPrice);
-    if (message.bitArray) {
-      obj.bitArray = message.bitArray.map((e) =>
-        base64FromBytes(e !== undefined ? e : new Uint8Array())
-      );
-    } else {
-      obj.bitArray = [];
-    }
+    message.currentIndex !== undefined &&
+      (obj.currentIndex = message.currentIndex);
     message.tickmap !== undefined &&
       (obj.tickmap = message.tickmap
         ? Ticks.toJSON(message.tickmap)
         : undefined);
-    message.virtualPriceMap !== undefined &&
-      (obj.virtualPriceMap = message.virtualPriceMap
-        ? VirtualPriceQueue.toJSON(message.virtualPriceMap)
+    message.IndexMap !== undefined &&
+      (obj.IndexMap = message.IndexMap
+        ? IndexQueue.toJSON(message.IndexMap)
         : undefined);
     return obj;
   },
 
   fromPartial(object: DeepPartial<Pairs>): Pairs {
     const message = { ...basePairs } as Pairs;
-    message.bitArray = [];
     if (object.token0 !== undefined && object.token0 !== null) {
       message.token0 = object.token0;
     } else {
@@ -182,30 +149,20 @@ export const Pairs = {
     } else {
       message.tickSpacing = 0;
     }
-    if (object.currentPrice !== undefined && object.currentPrice !== null) {
-      message.currentPrice = object.currentPrice;
+    if (object.currentIndex !== undefined && object.currentIndex !== null) {
+      message.currentIndex = object.currentIndex;
     } else {
-      message.currentPrice = "";
-    }
-    if (object.bitArray !== undefined && object.bitArray !== null) {
-      for (const e of object.bitArray) {
-        message.bitArray.push(e);
-      }
+      message.currentIndex = 0;
     }
     if (object.tickmap !== undefined && object.tickmap !== null) {
       message.tickmap = Ticks.fromPartial(object.tickmap);
     } else {
       message.tickmap = undefined;
     }
-    if (
-      object.virtualPriceMap !== undefined &&
-      object.virtualPriceMap !== null
-    ) {
-      message.virtualPriceMap = VirtualPriceQueue.fromPartial(
-        object.virtualPriceMap
-      );
+    if (object.IndexMap !== undefined && object.IndexMap !== null) {
+      message.IndexMap = IndexQueue.fromPartial(object.IndexMap);
     } else {
-      message.virtualPriceMap = undefined;
+      message.IndexMap = undefined;
     }
     return message;
   },
@@ -220,29 +177,6 @@ var globalThis: any = (() => {
   if (typeof global !== "undefined") return global;
   throw "Unable to locate global object";
 })();
-
-const atob: (b64: string) => string =
-  globalThis.atob ||
-  ((b64) => globalThis.Buffer.from(b64, "base64").toString("binary"));
-function bytesFromBase64(b64: string): Uint8Array {
-  const bin = atob(b64);
-  const arr = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; ++i) {
-    arr[i] = bin.charCodeAt(i);
-  }
-  return arr;
-}
-
-const btoa: (bin: string) => string =
-  globalThis.btoa ||
-  ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
-function base64FromBytes(arr: Uint8Array): string {
-  const bin: string[] = [];
-  for (let i = 0; i < arr.byteLength; ++i) {
-    bin.push(String.fromCharCode(arr[i]));
-  }
-  return btoa(bin.join(""));
-}
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 export type DeepPartial<T> = T extends Builtin

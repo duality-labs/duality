@@ -11,12 +11,21 @@ const (
 
 // TicksKey returns the store key to retrieve a Ticks from the index fields
 func TicksKey(
+	token0 string,
+	token1 string,
 	price string,
 	fee string,
-	direction string,
 	orderType string,
 ) []byte {
 	var key []byte
+
+	token0Bytes := []byte(token0)
+	key = append(key, token0Bytes...)
+	key = append(key, []byte("/")...)
+
+	token1Bytes := []byte(token1)
+	key = append(key, token1Bytes...)
+	key = append(key, []byte("/")...)
 
 	priceBytes := []byte(price)
 	key = append(key, priceBytes...)
@@ -24,10 +33,6 @@ func TicksKey(
 
 	feeBytes := []byte(fee)
 	key = append(key, feeBytes...)
-	key = append(key, []byte("/")...)
-
-	directionBytes := []byte(direction)
-	key = append(key, directionBytes...)
 	key = append(key, []byte("/")...)
 
 	orderTypeBytes := []byte(orderType)

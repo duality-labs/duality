@@ -31,7 +31,6 @@ func networkWithTicksObjects(t *testing.T, n int) (*network.Network, []types.Tic
 		ticks := types.Ticks{
 			Price:     strconv.Itoa(i),
 			Fee:       strconv.Itoa(i),
-			Direction: strconv.Itoa(i),
 			OrderType: strconv.Itoa(i),
 		}
 		nullify.Fill(&ticks)
@@ -54,7 +53,6 @@ func TestShowTicks(t *testing.T) {
 		desc        string
 		idPrice     string
 		idFee       string
-		idDirection string
 		idOrderType string
 
 		args []string
@@ -65,7 +63,6 @@ func TestShowTicks(t *testing.T) {
 			desc:        "found",
 			idPrice:     objs[0].Price,
 			idFee:       objs[0].Fee,
-			idDirection: objs[0].Direction,
 			idOrderType: objs[0].OrderType,
 
 			args: common,
@@ -75,7 +72,6 @@ func TestShowTicks(t *testing.T) {
 			desc:        "not found",
 			idPrice:     strconv.Itoa(100000),
 			idFee:       strconv.Itoa(100000),
-			idDirection: strconv.Itoa(100000),
 			idOrderType: strconv.Itoa(100000),
 
 			args: common,
@@ -86,7 +82,6 @@ func TestShowTicks(t *testing.T) {
 			args := []string{
 				tc.idPrice,
 				tc.idFee,
-				tc.idDirection,
 				tc.idOrderType,
 			}
 			args = append(args, tc.args...)

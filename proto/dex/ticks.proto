@@ -8,13 +8,18 @@ import "dex/order_params.proto";
 message Ticks {
   string price = 1;
   string fee = 2;
-  string direction = 3; 
-  string orderType = 4; 
-  string reserve = 5 [
-      (gogoproto.moretags)   = "yaml:\"reserve\"",
+  string orderType = 3; 
+  string reserve0 = 4 [
+      (gogoproto.moretags)   = "yaml:\"reserve0\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
       (gogoproto.nullable)   = false,
-      (gogoproto.jsontag) = "reserve"
+      (gogoproto.jsontag) = "reserve0"
+  ]; 
+  string reserve1 = 5 [
+      (gogoproto.moretags)   = "yaml:\"reserve1\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "reserve1"
   ]; 
   string pairPrice = 6 [
       (gogoproto.moretags)   = "yaml:\"pairprice\"",

@@ -7,7 +7,7 @@ import "gogoproto/gogo.proto";
 import "dex/order_params.proto";
 
 
-message VirtualPriceQueueType {
+message IndexQueueType {
   
   string price = 1 [
       (gogoproto.moretags)   = "yaml:\"price\"",

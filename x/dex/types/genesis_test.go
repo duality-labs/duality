@@ -35,13 +35,11 @@ func TestGenesisState_Validate(t *testing.T) {
 					{
 						Price:     "0",
 						Fee:       "0",
-						Direction: "0",
 						OrderType: "0",
 					},
 					{
 						Price:     "1",
 						Fee:       "1",
-						Direction: "1",
 						OrderType: "1",
 					},
 				},
@@ -56,16 +54,12 @@ func TestGenesisState_Validate(t *testing.T) {
 						Token1: "1",
 					},
 				},
-				VirtualPriceQueueList: []types.VirtualPriceQueue{
+				IndexQueueList: []types.IndexQueue{
 					{
-						VPrice:    "0",
-						Direction: "0",
-						OrderType: "0",
+						Index: 0,
 					},
 					{
-						VPrice:    "1",
-						Direction: "1",
-						OrderType: "1",
+						Index: 1,
 					},
 				},
 				// this line is used by starport scaffolding # types/genesis/validField
@@ -106,13 +100,11 @@ func TestGenesisState_Validate(t *testing.T) {
 					{
 						Price:     "0",
 						Fee:       "0",
-						Direction: "0",
 						OrderType: "0",
 					},
 					{
 						Price:     "0",
 						Fee:       "0",
-						Direction: "0",
 						OrderType: "0",
 					},
 				},
@@ -139,16 +131,12 @@ func TestGenesisState_Validate(t *testing.T) {
 		{
 			desc: "duplicated virtualPriceQueue",
 			genState: &types.GenesisState{
-				VirtualPriceQueueList: []types.VirtualPriceQueue{
+				IndexQueueList: []types.IndexQueue{
 					{
-						VPrice:    "0",
-						Direction: "0",
-						OrderType: "0",
+						Index: 0,
 					},
 					{
-						VPrice:    "0",
-						Direction: "0",
-						OrderType: "0",
+						Index: 0,
 					},
 				},
 			},

@@ -9,7 +9,7 @@ import {
 } from "../cosmos/base/query/v1beta1/pagination";
 import { Ticks } from "../dex/ticks";
 import { Pairs } from "../dex/pairs";
-import { VirtualPriceQueue } from "../dex/virtual_price_queue";
+import { IndexQueue } from "../dex/index_queue";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -40,6 +40,8 @@ export interface QueryAllNodesResponse {
 }
 
 export interface QueryGetTicksRequest {
+  token0: string;
+  token1: string;
   price: string;
   fee: string;
   direction: string;
@@ -77,22 +79,22 @@ export interface QueryAllPairsResponse {
   pagination: PageResponse | undefined;
 }
 
-export interface QueryGetVirtualPriceQueueRequest {
-  vPrice: string;
-  direction: string;
-  orderType: string;
+export interface QueryGetIndexQueueRequest {
+  token0: string;
+  token1: string;
+  index: number;
 }
 
-export interface QueryGetVirtualPriceQueueResponse {
-  virtualPriceQueue: VirtualPriceQueue | undefined;
+export interface QueryGetIndexQueueResponse {
+  indexQueue: IndexQueue | undefined;
 }
 
-export interface QueryAllVirtualPriceQueueRequest {
+export interface QueryAllIndexQueueRequest {
   pagination: PageRequest | undefined;
 }
 
-export interface QueryAllVirtualPriceQueueResponse {
-  virtualPriceQueue: VirtualPriceQueue[];
+export interface QueryAllIndexQueueResponse {
+  indexQueue: IndexQueue[];
   pagination: PageResponse | undefined;
 }
 
@@ -464,6 +466,8 @@ export const QueryAllNodesResponse = {
 };
 
 const baseQueryGetTicksRequest: object = {
+  token0: "",
+  token1: "",
   price: "",
   fee: "",
   direction: "",
@@ -475,17 +479,23 @@ export const QueryGetTicksRequest = {
     message: QueryGetTicksRequest,
     writer: Writer = Writer.create()
   ): Writer {
+    if (message.token0 !== "") {
+      writer.uint32(10).string(message.token0);
+    }
+    if (message.token1 !== "") {
+      writer.uint32(18).string(message.token1);
+    }
     if (message.price !== "") {
-      writer.uint32(10).string(message.price);
+      writer.uint32(26).string(message.price);
     }
     if (message.fee !== "") {
-      writer.uint32(18).string(message.fee);
+      writer.uint32(34).string(message.fee);
     }
     if (message.direction !== "") {
-      writer.uint32(26).string(message.direction);
+      writer.uint32(42).string(message.direction);
     }
     if (message.orderType !== "") {
-      writer.uint32(34).string(message.orderType);
+      writer.uint32(50).string(message.orderType);
     }
     return writer;
   },
@@ -498,15 +508,21 @@ export const QueryGetTicksRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.price = reader.string();
+          message.token0 = reader.string();
           break;
         case 2:
-          message.fee = reader.string();
+          message.token1 = reader.string();
           break;
         case 3:
-          message.direction = reader.string();
+          message.price = reader.string();
           break;
         case 4:
+          message.fee = reader.string();
+          break;
+        case 5:
+          message.direction = reader.string();
+          break;
+        case 6:
           message.orderType = reader.string();
           break;
         default:
@@ -519,6 +535,16 @@ export const QueryGetTicksRequest = {
 
   fromJSON(object: any): QueryGetTicksRequest {
     const message = { ...baseQueryGetTicksRequest } as QueryGetTicksRequest;
+    if (object.token0 !== undefined && object.token0 !== null) {
+      message.token0 = String(object.token0);
+    } else {
+      message.token0 = "";
+    }
+    if (object.token1 !== undefined && object.token1 !== null) {
+      message.token1 = String(object.token1);
+    } else {
+      message.token1 = "";
+    }
     if (object.price !== undefined && object.price !== null) {
       message.price = String(object.price);
     } else {
@@ -544,6 +570,8 @@ export const QueryGetTicksRequest = {
 
   toJSON(message: QueryGetTicksRequest): unknown {
     const obj: any = {};
+    message.token0 !== undefined && (obj.token0 = message.token0);
+    message.token1 !== undefined && (obj.token1 = message.token1);
     message.price !== undefined && (obj.price = message.price);
     message.fee !== undefined && (obj.fee = message.fee);
     message.direction !== undefined && (obj.direction = message.direction);
@@ -553,6 +581,16 @@ export const QueryGetTicksRequest = {
 
   fromPartial(object: DeepPartial<QueryGetTicksRequest>): QueryGetTicksRequest {
     const message = { ...baseQueryGetTicksRequest } as QueryGetTicksRequest;
+    if (object.token0 !== undefined && object.token0 !== null) {
+      message.token0 = object.token0;
+    } else {
+      message.token0 = "";
+    }
+    if (object.token1 !== undefined && object.token1 !== null) {
+      message.token1 = object.token1;
+    } else {
+      message.token1 = "";
+    }
     if (object.price !== undefined && object.price !== null) {
       message.price = object.price;
     } else {
@@ -1076,25 +1114,25 @@ export const QueryAllPairsResponse = {
   },
 };
 
-const baseQueryGetVirtualPriceQueueRequest: object = {
-  vPrice: "",
-  direction: "",
-  orderType: "",
+const baseQueryGetIndexQueueRequest: object = {
+  token0: "",
+  token1: "",
+  index: 0,
 };
 
-export const QueryGetVirtualPriceQueueRequest = {
+export const QueryGetIndexQueueRequest = {
   encode(
-    message: QueryGetVirtualPriceQueueRequest,
+    message: QueryGetIndexQueueRequest,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.vPrice !== "") {
-      writer.uint32(10).string(message.vPrice);
+    if (message.token0 !== "") {
+      writer.uint32(10).string(message.token0);
     }
-    if (message.direction !== "") {
-      writer.uint32(18).string(message.direction);
+    if (message.token1 !== "") {
+      writer.uint32(18).string(message.token1);
     }
-    if (message.orderType !== "") {
-      writer.uint32(26).string(message.orderType);
+    if (message.index !== 0) {
+      writer.uint32(24).int32(message.index);
     }
     return writer;
   },
@@ -1102,23 +1140,23 @@ export const QueryGetVirtualPriceQueueRequest = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryGetVirtualPriceQueueRequest {
+  ): QueryGetIndexQueueRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryGetVirtualPriceQueueRequest,
-    } as QueryGetVirtualPriceQueueRequest;
+      ...baseQueryGetIndexQueueRequest,
+    } as QueryGetIndexQueueRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.vPrice = reader.string();
+          message.token0 = reader.string();
           break;
         case 2:
-          message.direction = reader.string();
+          message.token1 = reader.string();
           break;
         case 3:
-          message.orderType = reader.string();
+          message.index = reader.int32();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1128,73 +1166,70 @@ export const QueryGetVirtualPriceQueueRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetVirtualPriceQueueRequest {
+  fromJSON(object: any): QueryGetIndexQueueRequest {
     const message = {
-      ...baseQueryGetVirtualPriceQueueRequest,
-    } as QueryGetVirtualPriceQueueRequest;
-    if (object.vPrice !== undefined && object.vPrice !== null) {
-      message.vPrice = String(object.vPrice);
+      ...baseQueryGetIndexQueueRequest,
+    } as QueryGetIndexQueueRequest;
+    if (object.token0 !== undefined && object.token0 !== null) {
+      message.token0 = String(object.token0);
     } else {
-      message.vPrice = "";
+      message.token0 = "";
     }
-    if (object.direction !== undefined && object.direction !== null) {
-      message.direction = String(object.direction);
+    if (object.token1 !== undefined && object.token1 !== null) {
+      message.token1 = String(object.token1);
     } else {
-      message.direction = "";
+      message.token1 = "";
     }
-    if (object.orderType !== undefined && object.orderType !== null) {
-      message.orderType = String(object.orderType);
+    if (object.index !== undefined && object.index !== null) {
+      message.index = Number(object.index);
     } else {
-      message.orderType = "";
+      message.index = 0;
     }
     return message;
   },
 
-  toJSON(message: QueryGetVirtualPriceQueueRequest): unknown {
+  toJSON(message: QueryGetIndexQueueRequest): unknown {
     const obj: any = {};
-    message.vPrice !== undefined && (obj.vPrice = message.vPrice);
-    message.direction !== undefined && (obj.direction = message.direction);
-    message.orderType !== undefined && (obj.orderType = message.orderType);
+    message.token0 !== undefined && (obj.token0 = message.token0);
+    message.token1 !== undefined && (obj.token1 = message.token1);
+    message.index !== undefined && (obj.index = message.index);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetVirtualPriceQueueRequest>
-  ): QueryGetVirtualPriceQueueRequest {
+    object: DeepPartial<QueryGetIndexQueueRequest>
+  ): QueryGetIndexQueueRequest {
     const message = {
-      ...baseQueryGetVirtualPriceQueueRequest,
-    } as QueryGetVirtualPriceQueueRequest;
-    if (object.vPrice !== undefined && object.vPrice !== null) {
-      message.vPrice = object.vPrice;
+      ...baseQueryGetIndexQueueRequest,
+    } as QueryGetIndexQueueRequest;
+    if (object.token0 !== undefined && object.token0 !== null) {
+      message.token0 = object.token0;
     } else {
-      message.vPrice = "";
+      message.token0 = "";
     }
-    if (object.direction !== undefined && object.direction !== null) {
-      message.direction = object.direction;
+    if (object.token1 !== undefined && object.token1 !== null) {
+      message.token1 = object.token1;
     } else {
-      message.direction = "";
+      message.token1 = "";
     }
-    if (object.orderType !== undefined && object.orderType !== null) {
-      message.orderType = object.orderType;
+    if (object.index !== undefined && object.index !== null) {
+      message.index = object.index;
     } else {
-      message.orderType = "";
+      message.index = 0;
     }
     return message;
   },
 };
 
-const baseQueryGetVirtualPriceQueueResponse: object = {};
+const baseQueryGetIndexQueueResponse: object = {};
 
-export const QueryGetVirtualPriceQueueResponse = {
+export const QueryGetIndexQueueResponse = {
   encode(
-    message: QueryGetVirtualPriceQueueResponse,
+    message: QueryGetIndexQueueResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.virtualPriceQueue !== undefined) {
-      VirtualPriceQueue.encode(
-        message.virtualPriceQueue,
-        writer.uint32(10).fork()
-      ).ldelim();
+    if (message.indexQueue !== undefined) {
+      IndexQueue.encode(message.indexQueue, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -1202,20 +1237,17 @@ export const QueryGetVirtualPriceQueueResponse = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryGetVirtualPriceQueueResponse {
+  ): QueryGetIndexQueueResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryGetVirtualPriceQueueResponse,
-    } as QueryGetVirtualPriceQueueResponse;
+      ...baseQueryGetIndexQueueResponse,
+    } as QueryGetIndexQueueResponse;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.virtualPriceQueue = VirtualPriceQueue.decode(
-            reader,
-            reader.uint32()
-          );
+          message.indexQueue = IndexQueue.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1225,57 +1257,47 @@ export const QueryGetVirtualPriceQueueResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetVirtualPriceQueueResponse {
+  fromJSON(object: any): QueryGetIndexQueueResponse {
     const message = {
-      ...baseQueryGetVirtualPriceQueueResponse,
-    } as QueryGetVirtualPriceQueueResponse;
-    if (
-      object.virtualPriceQueue !== undefined &&
-      object.virtualPriceQueue !== null
-    ) {
-      message.virtualPriceQueue = VirtualPriceQueue.fromJSON(
-        object.virtualPriceQueue
-      );
+      ...baseQueryGetIndexQueueResponse,
+    } as QueryGetIndexQueueResponse;
+    if (object.indexQueue !== undefined && object.indexQueue !== null) {
+      message.indexQueue = IndexQueue.fromJSON(object.indexQueue);
     } else {
-      message.virtualPriceQueue = undefined;
+      message.indexQueue = undefined;
     }
     return message;
   },
 
-  toJSON(message: QueryGetVirtualPriceQueueResponse): unknown {
+  toJSON(message: QueryGetIndexQueueResponse): unknown {
     const obj: any = {};
-    message.virtualPriceQueue !== undefined &&
-      (obj.virtualPriceQueue = message.virtualPriceQueue
-        ? VirtualPriceQueue.toJSON(message.virtualPriceQueue)
+    message.indexQueue !== undefined &&
+      (obj.indexQueue = message.indexQueue
+        ? IndexQueue.toJSON(message.indexQueue)
         : undefined);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetVirtualPriceQueueResponse>
-  ): QueryGetVirtualPriceQueueResponse {
+    object: DeepPartial<QueryGetIndexQueueResponse>
+  ): QueryGetIndexQueueResponse {
     const message = {
-      ...baseQueryGetVirtualPriceQueueResponse,
-    } as QueryGetVirtualPriceQueueResponse;
-    if (
-      object.virtualPriceQueue !== undefined &&
-      object.virtualPriceQueue !== null
-    ) {
-      message.virtualPriceQueue = VirtualPriceQueue.fromPartial(
-        object.virtualPriceQueue
-      );
+      ...baseQueryGetIndexQueueResponse,
+    } as QueryGetIndexQueueResponse;
+    if (object.indexQueue !== undefined && object.indexQueue !== null) {
+      message.indexQueue = IndexQueue.fromPartial(object.indexQueue);
     } else {
-      message.virtualPriceQueue = undefined;
+      message.indexQueue = undefined;
     }
     return message;
   },
 };
 
-const baseQueryAllVirtualPriceQueueRequest: object = {};
+const baseQueryAllIndexQueueRequest: object = {};
 
-export const QueryAllVirtualPriceQueueRequest = {
+export const QueryAllIndexQueueRequest = {
   encode(
-    message: QueryAllVirtualPriceQueueRequest,
+    message: QueryAllIndexQueueRequest,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.pagination !== undefined) {
@@ -1287,12 +1309,12 @@ export const QueryAllVirtualPriceQueueRequest = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryAllVirtualPriceQueueRequest {
+  ): QueryAllIndexQueueRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryAllVirtualPriceQueueRequest,
-    } as QueryAllVirtualPriceQueueRequest;
+      ...baseQueryAllIndexQueueRequest,
+    } as QueryAllIndexQueueRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1307,10 +1329,10 @@ export const QueryAllVirtualPriceQueueRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllVirtualPriceQueueRequest {
+  fromJSON(object: any): QueryAllIndexQueueRequest {
     const message = {
-      ...baseQueryAllVirtualPriceQueueRequest,
-    } as QueryAllVirtualPriceQueueRequest;
+      ...baseQueryAllIndexQueueRequest,
+    } as QueryAllIndexQueueRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromJSON(object.pagination);
     } else {
@@ -1319,7 +1341,7 @@ export const QueryAllVirtualPriceQueueRequest = {
     return message;
   },
 
-  toJSON(message: QueryAllVirtualPriceQueueRequest): unknown {
+  toJSON(message: QueryAllIndexQueueRequest): unknown {
     const obj: any = {};
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -1329,11 +1351,11 @@ export const QueryAllVirtualPriceQueueRequest = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryAllVirtualPriceQueueRequest>
-  ): QueryAllVirtualPriceQueueRequest {
+    object: DeepPartial<QueryAllIndexQueueRequest>
+  ): QueryAllIndexQueueRequest {
     const message = {
-      ...baseQueryAllVirtualPriceQueueRequest,
-    } as QueryAllVirtualPriceQueueRequest;
+      ...baseQueryAllIndexQueueRequest,
+    } as QueryAllIndexQueueRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromPartial(object.pagination);
     } else {
@@ -1343,15 +1365,15 @@ export const QueryAllVirtualPriceQueueRequest = {
   },
 };
 
-const baseQueryAllVirtualPriceQueueResponse: object = {};
+const baseQueryAllIndexQueueResponse: object = {};
 
-export const QueryAllVirtualPriceQueueResponse = {
+export const QueryAllIndexQueueResponse = {
   encode(
-    message: QueryAllVirtualPriceQueueResponse,
+    message: QueryAllIndexQueueResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    for (const v of message.virtualPriceQueue) {
-      VirtualPriceQueue.encode(v!, writer.uint32(10).fork()).ldelim();
+    for (const v of message.indexQueue) {
+      IndexQueue.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
       PageResponse.encode(
@@ -1365,20 +1387,18 @@ export const QueryAllVirtualPriceQueueResponse = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryAllVirtualPriceQueueResponse {
+  ): QueryAllIndexQueueResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryAllVirtualPriceQueueResponse,
-    } as QueryAllVirtualPriceQueueResponse;
-    message.virtualPriceQueue = [];
+      ...baseQueryAllIndexQueueResponse,
+    } as QueryAllIndexQueueResponse;
+    message.indexQueue = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.virtualPriceQueue.push(
-            VirtualPriceQueue.decode(reader, reader.uint32())
-          );
+          message.indexQueue.push(IndexQueue.decode(reader, reader.uint32()));
           break;
         case 2:
           message.pagination = PageResponse.decode(reader, reader.uint32());
@@ -1391,17 +1411,14 @@ export const QueryAllVirtualPriceQueueResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllVirtualPriceQueueResponse {
+  fromJSON(object: any): QueryAllIndexQueueResponse {
     const message = {
-      ...baseQueryAllVirtualPriceQueueResponse,
-    } as QueryAllVirtualPriceQueueResponse;
-    message.virtualPriceQueue = [];
-    if (
-      object.virtualPriceQueue !== undefined &&
-      object.virtualPriceQueue !== null
-    ) {
-      for (const e of object.virtualPriceQueue) {
-        message.virtualPriceQueue.push(VirtualPriceQueue.fromJSON(e));
+      ...baseQueryAllIndexQueueResponse,
+    } as QueryAllIndexQueueResponse;
+    message.indexQueue = [];
+    if (object.indexQueue !== undefined && object.indexQueue !== null) {
+      for (const e of object.indexQueue) {
+        message.indexQueue.push(IndexQueue.fromJSON(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -1412,14 +1429,14 @@ export const QueryAllVirtualPriceQueueResponse = {
     return message;
   },
 
-  toJSON(message: QueryAllVirtualPriceQueueResponse): unknown {
+  toJSON(message: QueryAllIndexQueueResponse): unknown {
     const obj: any = {};
-    if (message.virtualPriceQueue) {
-      obj.virtualPriceQueue = message.virtualPriceQueue.map((e) =>
-        e ? VirtualPriceQueue.toJSON(e) : undefined
+    if (message.indexQueue) {
+      obj.indexQueue = message.indexQueue.map((e) =>
+        e ? IndexQueue.toJSON(e) : undefined
       );
     } else {
-      obj.virtualPriceQueue = [];
+      obj.indexQueue = [];
     }
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -1429,18 +1446,15 @@ export const QueryAllVirtualPriceQueueResponse = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryAllVirtualPriceQueueResponse>
-  ): QueryAllVirtualPriceQueueResponse {
+    object: DeepPartial<QueryAllIndexQueueResponse>
+  ): QueryAllIndexQueueResponse {
     const message = {
-      ...baseQueryAllVirtualPriceQueueResponse,
-    } as QueryAllVirtualPriceQueueResponse;
-    message.virtualPriceQueue = [];
-    if (
-      object.virtualPriceQueue !== undefined &&
-      object.virtualPriceQueue !== null
-    ) {
-      for (const e of object.virtualPriceQueue) {
-        message.virtualPriceQueue.push(VirtualPriceQueue.fromPartial(e));
+      ...baseQueryAllIndexQueueResponse,
+    } as QueryAllIndexQueueResponse;
+    message.indexQueue = [];
+    if (object.indexQueue !== undefined && object.indexQueue !== null) {
+      for (const e of object.indexQueue) {
+        message.indexQueue.push(IndexQueue.fromPartial(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -1468,14 +1482,14 @@ export interface Query {
   Pairs(request: QueryGetPairsRequest): Promise<QueryGetPairsResponse>;
   /** Queries a list of Pairs items. */
   PairsAll(request: QueryAllPairsRequest): Promise<QueryAllPairsResponse>;
-  /** Queries a VirtualPriceQueue by index. */
-  VirtualPriceQueue(
-    request: QueryGetVirtualPriceQueueRequest
-  ): Promise<QueryGetVirtualPriceQueueResponse>;
-  /** Queries a list of VirtualPriceQueue items. */
-  VirtualPriceQueueAll(
-    request: QueryAllVirtualPriceQueueRequest
-  ): Promise<QueryAllVirtualPriceQueueResponse>;
+  /** Queries a IndexQueue by index. */
+  IndexQueue(
+    request: QueryGetIndexQueueRequest
+  ): Promise<QueryGetIndexQueueResponse>;
+  /** Queries a list of IndexQueue items. */
+  IndexQueueAll(
+    request: QueryAllIndexQueueRequest
+  ): Promise<QueryAllIndexQueueResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -1565,31 +1579,31 @@ export class QueryClientImpl implements Query {
     );
   }
 
-  VirtualPriceQueue(
-    request: QueryGetVirtualPriceQueueRequest
-  ): Promise<QueryGetVirtualPriceQueueResponse> {
-    const data = QueryGetVirtualPriceQueueRequest.encode(request).finish();
+  IndexQueue(
+    request: QueryGetIndexQueueRequest
+  ): Promise<QueryGetIndexQueueResponse> {
+    const data = QueryGetIndexQueueRequest.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
-      "VirtualPriceQueue",
+      "IndexQueue",
       data
     );
     return promise.then((data) =>
-      QueryGetVirtualPriceQueueResponse.decode(new Reader(data))
+      QueryGetIndexQueueResponse.decode(new Reader(data))
     );
   }
 
-  VirtualPriceQueueAll(
-    request: QueryAllVirtualPriceQueueRequest
-  ): Promise<QueryAllVirtualPriceQueueResponse> {
-    const data = QueryAllVirtualPriceQueueRequest.encode(request).finish();
+  IndexQueueAll(
+    request: QueryAllIndexQueueRequest
+  ): Promise<QueryAllIndexQueueResponse> {
+    const data = QueryAllIndexQueueRequest.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
-      "VirtualPriceQueueAll",
+      "IndexQueueAll",
       data
     );
     return promise.then((data) =>
-      QueryAllVirtualPriceQueueResponse.decode(new Reader(data))
+      QueryAllIndexQueueResponse.decode(new Reader(data))
     );
   }
 }

@@ -9,6 +9,18 @@
  * ---------------------------------------------------------------
  */
 
+export interface DexIndexQueue {
+  /** @format int32 */
+  index?: number;
+  queue?: DexIndexQueueType[];
+}
+
+export interface DexIndexQueueType {
+  price?: string;
+  fee?: string;
+  orderparams?: DexOrderParams;
+}
+
 export type DexMsgAddLiquidityResponse = object;
 
 export type DexMsgCreatePairResponse = object;
@@ -38,18 +50,34 @@ export interface DexPairs {
   token0?: string;
   token1?: string;
 
-  /** @format uint64 */
+  /** @format int64 */
   tickSpacing?: string;
-  currentPrice?: string;
-  bitArray?: string[];
+
+  /** @format int32 */
+  currentIndex?: number;
   tickmap?: DexTicks;
-  virtualPriceMap?: DexVirtualPriceQueue;
+  IndexMap?: DexIndexQueue;
 }
 
 /**
  * Params defines the parameters for the module.
  */
 export type DexParams = object;
+
+export interface DexQueryAllIndexQueueResponse {
+  indexQueue?: DexIndexQueue[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
 
 export interface DexQueryAllNodesResponse {
   Nodes?: DexNodes[];
@@ -96,19 +124,8 @@ export interface DexQueryAllTicksResponse {
   pagination?: V1Beta1PageResponse;
 }
 
-export interface DexQueryAllVirtualPriceQueueResponse {
-  virtualPriceQueue?: DexVirtualPriceQueue[];
-
-  /**
-   * PageResponse is to be embedded in gRPC response messages where the
-   * corresponding request message has used PageRequest.
-   *
-   *  message SomeResponse {
-   *          repeated Bar results = 1;
-   *          PageResponse page = 2;
-   *  }
-   */
-  pagination?: V1Beta1PageResponse;
+export interface DexQueryGetIndexQueueResponse {
+  indexQueue?: DexIndexQueue;
 }
 
 export interface DexQueryGetNodesResponse {
@@ -123,10 +140,6 @@ export interface DexQueryGetTicksResponse {
   ticks?: DexTicks;
 }
 
-export interface DexQueryGetVirtualPriceQueueResponse {
-  virtualPriceQueue?: DexVirtualPriceQueue;
-}
-
 /**
  * QueryParamsResponse is response type for the Query/Params RPC method.
  */
@@ -138,26 +151,13 @@ export interface DexQueryParamsResponse {
 export interface DexTicks {
   price?: string;
   fee?: string;
-  direction?: string;
   orderType?: string;
-  reserve?: string;
+  reserve0?: string;
+  reserve1?: string;
   pairPrice?: string;
   pairFee?: string;
   totalShares?: string;
   orderparams?: DexOrderParams[];
-}
-
-export interface DexVirtualPriceQueue {
-  vPrice?: string;
-  direction?: string;
-  orderType?: string;
-  queue?: DexVirtualPriceQueueType[];
-}
-
-export interface DexVirtualPriceQueueType {
-  price?: string;
-  fee?: string;
-  orderparams?: DexOrderParams;
 }
 
 export interface ProtobufAny {
@@ -208,13 +208,6 @@ export interface V1Beta1PageRequest {
    * is set.
    */
   count_total?: boolean;
-
-  /**
-   * reverse is set to true if results are to be returned in the descending order.
-   *
-   * Since: cosmos-sdk 0.43
-   */
-  reverse?: boolean;
 }
 
 /**
@@ -434,6 +427,48 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
+   * @name QueryIndexQueueAll
+   * @summary Queries a list of IndexQueue items.
+   * @request GET:/NicholasDotSol/duality/dex/index_queue
+   */
+  queryIndexQueueAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<DexQueryAllIndexQueueResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/index_queue`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryIndexQueue
+   * @summary Queries a IndexQueue by index.
+   * @request GET:/NicholasDotSol/duality/dex/index_queue/{index}
+   */
+  queryIndexQueue = (index: number, query?: { token0?: string; token1?: string }, params: RequestParams = {}) =>
+    this.request<DexQueryGetIndexQueueResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/index_queue/${index}`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
    * @name QueryNodesAll
    * @summary Queries a list of Nodes items.
    * @request GET:/NicholasDotSol/duality/dex/nodes
@@ -444,7 +479,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -486,7 +520,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -544,7 +577,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -564,52 +596,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @summary Queries a Ticks by index.
    * @request GET:/NicholasDotSol/duality/dex/ticks/{price}/{fee}/{direction}/{orderType}
    */
-  queryTicks = (price: string, fee: string, direction: string, orderType: string, params: RequestParams = {}) =>
+  queryTicks = (
+    price: string,
+    fee: string,
+    direction: string,
+    orderType: string,
+    query?: { token0?: string; token1?: string },
+    params: RequestParams = {},
+  ) =>
     this.request<DexQueryGetTicksResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/ticks/${price}/${fee}/${direction}/${orderType}`,
       method: "GET",
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryVirtualPriceQueueAll
-   * @summary Queries a list of VirtualPriceQueue items.
-   * @request GET:/NicholasDotSol/duality/dex/virtual_price_queue
-   */
-  queryVirtualPriceQueueAll = (
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<DexQueryAllVirtualPriceQueueResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/virtual_price_queue`,
-      method: "GET",
       query: query,
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryVirtualPriceQueue
-   * @summary Queries a VirtualPriceQueue by index.
-   * @request GET:/NicholasDotSol/duality/dex/virtual_price_queue/{vPrice}/{direction}/{orderType}
-   */
-  queryVirtualPriceQueue = (vPrice: string, direction: string, orderType: string, params: RequestParams = {}) =>
-    this.request<DexQueryGetVirtualPriceQueueResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/virtual_price_queue/${vPrice}/${direction}/${orderType}`,
-      method: "GET",
       format: "json",
       ...params,
     });

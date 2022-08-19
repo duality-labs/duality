@@ -1,16 +1,16 @@
 import { txClient, queryClient, MissingWalletError , registry} from './module'
 
+import { IndexQueue } from "./module/types/dex/index_queue"
+import { IndexQueueType } from "./module/types/dex/index_queue_type"
 import { Node } from "./module/types/dex/node"
 import { Nodes } from "./module/types/dex/nodes"
 import { OrderParams } from "./module/types/dex/order_params"
 import { Pairs } from "./module/types/dex/pairs"
 import { Params } from "./module/types/dex/params"
 import { Ticks } from "./module/types/dex/ticks"
-import { VirtualPriceQueue } from "./module/types/dex/virtual_price_queue"
-import { VirtualPriceQueueType } from "./module/types/dex/virtual_price_queue_type"
 
 
-export { Node, Nodes, OrderParams, Pairs, Params, Ticks, VirtualPriceQueue, VirtualPriceQueueType };
+export { IndexQueue, IndexQueueType, Node, Nodes, OrderParams, Pairs, Params, Ticks };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -55,18 +55,18 @@ const getDefaultState = () => {
 				TicksAll: {},
 				Pairs: {},
 				PairsAll: {},
-				VirtualPriceQueue: {},
-				VirtualPriceQueueAll: {},
+				IndexQueue: {},
+				IndexQueueAll: {},
 				
 				_Structure: {
+						IndexQueue: getStructure(IndexQueue.fromPartial({})),
+						IndexQueueType: getStructure(IndexQueueType.fromPartial({})),
 						Node: getStructure(Node.fromPartial({})),
 						Nodes: getStructure(Nodes.fromPartial({})),
 						OrderParams: getStructure(OrderParams.fromPartial({})),
 						Pairs: getStructure(Pairs.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						Ticks: getStructure(Ticks.fromPartial({})),
-						VirtualPriceQueue: getStructure(VirtualPriceQueue.fromPartial({})),
-						VirtualPriceQueueType: getStructure(VirtualPriceQueueType.fromPartial({})),
 						
 		},
 		_Registry: registry,
@@ -137,17 +137,17 @@ export default {
 					}
 			return state.PairsAll[JSON.stringify(params)] ?? {}
 		},
-				getVirtualPriceQueue: (state) => (params = { params: {}}) => {
+				getIndexQueue: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.VirtualPriceQueue[JSON.stringify(params)] ?? {}
+			return state.IndexQueue[JSON.stringify(params)] ?? {}
 		},
-				getVirtualPriceQueueAll: (state) => (params = { params: {}}) => {
+				getIndexQueueAll: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.VirtualPriceQueueAll[JSON.stringify(params)] ?? {}
+			return state.IndexQueueAll[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -262,9 +262,13 @@ export default {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryTicks( key.price,  key.fee,  key.direction,  key.orderType)).data
+				let value= (await queryClient.queryTicks( key.price,  key.fee,  key.direction,  key.orderType, query)).data
 				
 					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await queryClient.queryTicks( key.price,  key.fee,  key.direction,  key.orderType, {...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					value = mergeResults(value, next_values);
+				}
 				commit('QUERY', { query: 'Ticks', key: { params: {...key}, query}, value })
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTicks', payload: { options: { all }, params: {...key},query }})
 				return getters['getTicks']( { params: {...key}, query}) ?? {}
@@ -354,18 +358,22 @@ export default {
 		 		
 		
 		
-		async QueryVirtualPriceQueue({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryIndexQueue({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryVirtualPriceQueue( key.vPrice,  key.direction,  key.orderType)).data
+				let value= (await queryClient.queryIndexQueue( key.index, query)).data
 				
 					
-				commit('QUERY', { query: 'VirtualPriceQueue', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryVirtualPriceQueue', payload: { options: { all }, params: {...key},query }})
-				return getters['getVirtualPriceQueue']( { params: {...key}, query}) ?? {}
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await queryClient.queryIndexQueue( key.index, {...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'IndexQueue', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryIndexQueue', payload: { options: { all }, params: {...key},query }})
+				return getters['getIndexQueue']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryVirtualPriceQueue API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryIndexQueue API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -376,57 +384,27 @@ export default {
 		 		
 		
 		
-		async QueryVirtualPriceQueueAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryIndexQueueAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryVirtualPriceQueueAll(query)).data
+				let value= (await queryClient.queryIndexQueueAll(query)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryVirtualPriceQueueAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await queryClient.queryIndexQueueAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
 					value = mergeResults(value, next_values);
 				}
-				commit('QUERY', { query: 'VirtualPriceQueueAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryVirtualPriceQueueAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getVirtualPriceQueueAll']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'IndexQueueAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryIndexQueueAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getIndexQueueAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryVirtualPriceQueueAll API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryIndexQueueAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
 		
 		
-		async sendMsgAddLiquidity({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgAddLiquidity(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgAddLiquidity:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgAddLiquidity:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgCreatePair({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgCreatePair(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCreatePair:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgCreatePair:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
 		async sendMsgSwap({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -457,33 +435,37 @@ export default {
 				}
 			}
 		},
-		
-		async MsgAddLiquidity({ rootGetters }, { value }) {
+		async sendMsgAddLiquidity({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
 				const msg = await txClient.msgAddLiquidity(value)
-				return msg
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
 					throw new Error('TxClient:MsgAddLiquidity:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgAddLiquidity:Create Could not create message: ' + e.message)
+				}else{
+					throw new Error('TxClient:MsgAddLiquidity:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
-		async MsgCreatePair({ rootGetters }, { value }) {
+		async sendMsgCreatePair({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
 				const msg = await txClient.msgCreatePair(value)
-				return msg
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
 					throw new Error('TxClient:MsgCreatePair:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgCreatePair:Create Could not create message: ' + e.message)
+				}else{
+					throw new Error('TxClient:MsgCreatePair:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
+		
 		async MsgSwap({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -507,6 +489,32 @@ export default {
 					throw new Error('TxClient:MsgRemoveLiquidity:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgRemoveLiquidity:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgAddLiquidity({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgAddLiquidity(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgAddLiquidity:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgAddLiquidity:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgCreatePair({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgCreatePair(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgCreatePair:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgCreatePair:Create Could not create message: ' + e.message)
 				}
 			}
 		},
