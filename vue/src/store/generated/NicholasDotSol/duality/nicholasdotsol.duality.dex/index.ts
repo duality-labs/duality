@@ -1,6 +1,5 @@
 import { txClient, queryClient, MissingWalletError , registry} from './module'
 
-import { BitArr } from "./module/types/dex/bit_arr"
 import { Node } from "./module/types/dex/node"
 import { Nodes } from "./module/types/dex/nodes"
 import { OrderParams } from "./module/types/dex/order_params"
@@ -8,9 +7,10 @@ import { Pairs } from "./module/types/dex/pairs"
 import { Params } from "./module/types/dex/params"
 import { Ticks } from "./module/types/dex/ticks"
 import { VirtualPriceQueue } from "./module/types/dex/virtual_price_queue"
+import { VirtualPriceQueueType } from "./module/types/dex/virtual_price_queue_type"
 
 
-export { BitArr, Node, Nodes, OrderParams, Pairs, Params, Ticks, VirtualPriceQueue };
+export { Node, Nodes, OrderParams, Pairs, Params, Ticks, VirtualPriceQueue, VirtualPriceQueueType };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -53,15 +53,12 @@ const getDefaultState = () => {
 				NodesAll: {},
 				Ticks: {},
 				TicksAll: {},
-				BitArr: {},
-				BitArrAll: {},
 				Pairs: {},
 				PairsAll: {},
 				VirtualPriceQueue: {},
 				VirtualPriceQueueAll: {},
 				
 				_Structure: {
-						BitArr: getStructure(BitArr.fromPartial({})),
 						Node: getStructure(Node.fromPartial({})),
 						Nodes: getStructure(Nodes.fromPartial({})),
 						OrderParams: getStructure(OrderParams.fromPartial({})),
@@ -69,6 +66,7 @@ const getDefaultState = () => {
 						Params: getStructure(Params.fromPartial({})),
 						Ticks: getStructure(Ticks.fromPartial({})),
 						VirtualPriceQueue: getStructure(VirtualPriceQueue.fromPartial({})),
+						VirtualPriceQueueType: getStructure(VirtualPriceQueueType.fromPartial({})),
 						
 		},
 		_Registry: registry,
@@ -126,18 +124,6 @@ export default {
 						(<any> params).query=null
 					}
 			return state.TicksAll[JSON.stringify(params)] ?? {}
-		},
-				getBitArr: (state) => (params = { params: {}}) => {
-					if (!(<any> params).query) {
-						(<any> params).query=null
-					}
-			return state.BitArr[JSON.stringify(params)] ?? {}
-		},
-				getBitArrAll: (state) => (params = { params: {}}) => {
-					if (!(<any> params).query) {
-						(<any> params).query=null
-					}
-			return state.BitArrAll[JSON.stringify(params)] ?? {}
 		},
 				getPairs: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
@@ -320,54 +306,6 @@ export default {
 		 		
 		
 		
-		async QueryBitArr({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
-			try {
-				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryBitArr( key.id)).data
-				
-					
-				commit('QUERY', { query: 'BitArr', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryBitArr', payload: { options: { all }, params: {...key},query }})
-				return getters['getBitArr']( { params: {...key}, query}) ?? {}
-			} catch (e) {
-				throw new Error('QueryClient:QueryBitArr API Node Unavailable. Could not perform query: ' + e.message)
-				
-			}
-		},
-		
-		
-		
-		
-		 		
-		
-		
-		async QueryBitArrAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
-			try {
-				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryBitArrAll(query)).data
-				
-					
-				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryBitArrAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
-					value = mergeResults(value, next_values);
-				}
-				commit('QUERY', { query: 'BitArrAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryBitArrAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getBitArrAll']( { params: {...key}, query}) ?? {}
-			} catch (e) {
-				throw new Error('QueryClient:QueryBitArrAll API Node Unavailable. Could not perform query: ' + e.message)
-				
-			}
-		},
-		
-		
-		
-		
-		 		
-		
-		
 		async QueryPairs({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
@@ -459,21 +397,6 @@ export default {
 		},
 		
 		
-		async sendMsgCreatePair({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgCreatePair(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCreatePair:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgCreatePair:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
 		async sendMsgAddLiquidity({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -486,6 +409,21 @@ export default {
 					throw new Error('TxClient:MsgAddLiquidity:Init Could not initialize signing client. Wallet is required.')
 				}else{
 					throw new Error('TxClient:MsgAddLiquidity:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgCreatePair({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgCreatePair(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgCreatePair:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgCreatePair:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -520,19 +458,6 @@ export default {
 			}
 		},
 		
-		async MsgCreatePair({ rootGetters }, { value }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgCreatePair(value)
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCreatePair:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgCreatePair:Create Could not create message: ' + e.message)
-				}
-			}
-		},
 		async MsgAddLiquidity({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -543,6 +468,19 @@ export default {
 					throw new Error('TxClient:MsgAddLiquidity:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgAddLiquidity:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgCreatePair({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgCreatePair(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgCreatePair:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgCreatePair:Create Could not create message: ' + e.message)
 				}
 			}
 		},

@@ -1,15 +1,15 @@
 syntax = "proto3";
 package nicholasdotsol.duality.dex;
 
+
+import "dex/virtual_price_queue_type.proto";
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 
 message VirtualPriceQueue {
-  string vPrice = 1; 
+  string vPrice = 1;
   string direction = 2; 
-  string orderType = 3; 
-  string price = 4; 
-  string fee = 5; 
-  string orderparams = 6; 
+  string orderType = 3;
+  repeated VirtualPriceQueueType queue = 4; 
+  
   
 }
-

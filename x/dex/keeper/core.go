@@ -27,24 +27,8 @@ func (k Keeper) CreateNewPair(goCtx context.Context, token0 string, token1 strin
 	return nil
 }
 
-func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, price sdk.Dec, msg *types.MsgAddLiquidity, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
+func (k Keeper) SingleDepositCore(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, price sdk.Dec, msg *types.MsgAddLiquidity, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	/*
-			// Check if the pair already exists
-			1) Find Pair
-			   a) If pair exists, get the pair
-			   b) If pair does not exist, error
-			2) Find Tick
-		       a) If virtual price tick/index does not exist, add new index
-				    i) Initialize index to 1 in bitmap
-					ii) Create new tick w/ amount in virtual_price_tick_list
-					iii) Add tick w/ amount to virtual_price_tick_queue
-			   b) If exists
-					i) Update tick (+= amount) in virtual_price_tick_list
-					ii) Add amount to existing tick in corresponding queue
-			3) Update Shares
-				i) TBD
-	*/
 
 	PairOld, PairFound := k.GetPairs(ctx, token0, token1)
 

@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { VirtualPriceQueueType } from "../dex/virtual_price_queue_type";
 import { Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
@@ -7,18 +8,13 @@ export interface VirtualPriceQueue {
   vPrice: string;
   direction: string;
   orderType: string;
-  price: string;
-  fee: string;
-  orderparams: string;
+  queue: VirtualPriceQueueType[];
 }
 
 const baseVirtualPriceQueue: object = {
   vPrice: "",
   direction: "",
   orderType: "",
-  price: "",
-  fee: "",
-  orderparams: "",
 };
 
 export const VirtualPriceQueue = {
@@ -32,14 +28,8 @@ export const VirtualPriceQueue = {
     if (message.orderType !== "") {
       writer.uint32(26).string(message.orderType);
     }
-    if (message.price !== "") {
-      writer.uint32(34).string(message.price);
-    }
-    if (message.fee !== "") {
-      writer.uint32(42).string(message.fee);
-    }
-    if (message.orderparams !== "") {
-      writer.uint32(50).string(message.orderparams);
+    for (const v of message.queue) {
+      VirtualPriceQueueType.encode(v!, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -48,6 +38,7 @@ export const VirtualPriceQueue = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseVirtualPriceQueue } as VirtualPriceQueue;
+    message.queue = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -61,13 +52,9 @@ export const VirtualPriceQueue = {
           message.orderType = reader.string();
           break;
         case 4:
-          message.price = reader.string();
-          break;
-        case 5:
-          message.fee = reader.string();
-          break;
-        case 6:
-          message.orderparams = reader.string();
+          message.queue.push(
+            VirtualPriceQueueType.decode(reader, reader.uint32())
+          );
           break;
         default:
           reader.skipType(tag & 7);
@@ -79,6 +66,7 @@ export const VirtualPriceQueue = {
 
   fromJSON(object: any): VirtualPriceQueue {
     const message = { ...baseVirtualPriceQueue } as VirtualPriceQueue;
+    message.queue = [];
     if (object.vPrice !== undefined && object.vPrice !== null) {
       message.vPrice = String(object.vPrice);
     } else {
@@ -94,20 +82,10 @@ export const VirtualPriceQueue = {
     } else {
       message.orderType = "";
     }
-    if (object.price !== undefined && object.price !== null) {
-      message.price = String(object.price);
-    } else {
-      message.price = "";
-    }
-    if (object.fee !== undefined && object.fee !== null) {
-      message.fee = String(object.fee);
-    } else {
-      message.fee = "";
-    }
-    if (object.orderparams !== undefined && object.orderparams !== null) {
-      message.orderparams = String(object.orderparams);
-    } else {
-      message.orderparams = "";
+    if (object.queue !== undefined && object.queue !== null) {
+      for (const e of object.queue) {
+        message.queue.push(VirtualPriceQueueType.fromJSON(e));
+      }
     }
     return message;
   },
@@ -117,15 +95,19 @@ export const VirtualPriceQueue = {
     message.vPrice !== undefined && (obj.vPrice = message.vPrice);
     message.direction !== undefined && (obj.direction = message.direction);
     message.orderType !== undefined && (obj.orderType = message.orderType);
-    message.price !== undefined && (obj.price = message.price);
-    message.fee !== undefined && (obj.fee = message.fee);
-    message.orderparams !== undefined &&
-      (obj.orderparams = message.orderparams);
+    if (message.queue) {
+      obj.queue = message.queue.map((e) =>
+        e ? VirtualPriceQueueType.toJSON(e) : undefined
+      );
+    } else {
+      obj.queue = [];
+    }
     return obj;
   },
 
   fromPartial(object: DeepPartial<VirtualPriceQueue>): VirtualPriceQueue {
     const message = { ...baseVirtualPriceQueue } as VirtualPriceQueue;
+    message.queue = [];
     if (object.vPrice !== undefined && object.vPrice !== null) {
       message.vPrice = object.vPrice;
     } else {
@@ -141,20 +123,10 @@ export const VirtualPriceQueue = {
     } else {
       message.orderType = "";
     }
-    if (object.price !== undefined && object.price !== null) {
-      message.price = object.price;
-    } else {
-      message.price = "";
-    }
-    if (object.fee !== undefined && object.fee !== null) {
-      message.fee = object.fee;
-    } else {
-      message.fee = "";
-    }
-    if (object.orderparams !== undefined && object.orderparams !== null) {
-      message.orderparams = object.orderparams;
-    } else {
-      message.orderparams = "";
+    if (object.queue !== undefined && object.queue !== null) {
+      for (const e of object.queue) {
+        message.queue.push(VirtualPriceQueueType.fromPartial(e));
+      }
     }
     return message;
   },

@@ -1,7 +1,6 @@
 /* eslint-disable */
 import * as Long from "long";
 import { util, configure, Writer, Reader } from "protobufjs/minimal";
-import { BitArr } from "../dex/bit_arr";
 import { Ticks } from "../dex/ticks";
 import { VirtualPriceQueue } from "../dex/virtual_price_queue";
 
@@ -11,8 +10,8 @@ export interface Pairs {
   token0: string;
   token1: string;
   tickSpacing: number;
-  currentIndex: number;
-  bitArray: BitArr | undefined;
+  currentPrice: string;
+  bitArray: Uint8Array[];
   tickmap: Ticks | undefined;
   virtualPriceMap: VirtualPriceQueue | undefined;
 }
@@ -21,7 +20,7 @@ const basePairs: object = {
   token0: "",
   token1: "",
   tickSpacing: 0,
-  currentIndex: 0,
+  currentPrice: "",
 };
 
 export const Pairs = {
@@ -35,11 +34,11 @@ export const Pairs = {
     if (message.tickSpacing !== 0) {
       writer.uint32(24).uint64(message.tickSpacing);
     }
-    if (message.currentIndex !== 0) {
-      writer.uint32(32).uint64(message.currentIndex);
+    if (message.currentPrice !== "") {
+      writer.uint32(34).string(message.currentPrice);
     }
-    if (message.bitArray !== undefined) {
-      BitArr.encode(message.bitArray, writer.uint32(42).fork()).ldelim();
+    for (const v of message.bitArray) {
+      writer.uint32(42).bytes(v!);
     }
     if (message.tickmap !== undefined) {
       Ticks.encode(message.tickmap, writer.uint32(50).fork()).ldelim();
@@ -57,6 +56,7 @@ export const Pairs = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...basePairs } as Pairs;
+    message.bitArray = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -70,10 +70,10 @@ export const Pairs = {
           message.tickSpacing = longToNumber(reader.uint64() as Long);
           break;
         case 4:
-          message.currentIndex = longToNumber(reader.uint64() as Long);
+          message.currentPrice = reader.string();
           break;
         case 5:
-          message.bitArray = BitArr.decode(reader, reader.uint32());
+          message.bitArray.push(reader.bytes());
           break;
         case 6:
           message.tickmap = Ticks.decode(reader, reader.uint32());
@@ -94,6 +94,7 @@ export const Pairs = {
 
   fromJSON(object: any): Pairs {
     const message = { ...basePairs } as Pairs;
+    message.bitArray = [];
     if (object.token0 !== undefined && object.token0 !== null) {
       message.token0 = String(object.token0);
     } else {
@@ -109,15 +110,15 @@ export const Pairs = {
     } else {
       message.tickSpacing = 0;
     }
-    if (object.currentIndex !== undefined && object.currentIndex !== null) {
-      message.currentIndex = Number(object.currentIndex);
+    if (object.currentPrice !== undefined && object.currentPrice !== null) {
+      message.currentPrice = String(object.currentPrice);
     } else {
-      message.currentIndex = 0;
+      message.currentPrice = "";
     }
     if (object.bitArray !== undefined && object.bitArray !== null) {
-      message.bitArray = BitArr.fromJSON(object.bitArray);
-    } else {
-      message.bitArray = undefined;
+      for (const e of object.bitArray) {
+        message.bitArray.push(bytesFromBase64(e));
+      }
     }
     if (object.tickmap !== undefined && object.tickmap !== null) {
       message.tickmap = Ticks.fromJSON(object.tickmap);
@@ -143,12 +144,15 @@ export const Pairs = {
     message.token1 !== undefined && (obj.token1 = message.token1);
     message.tickSpacing !== undefined &&
       (obj.tickSpacing = message.tickSpacing);
-    message.currentIndex !== undefined &&
-      (obj.currentIndex = message.currentIndex);
-    message.bitArray !== undefined &&
-      (obj.bitArray = message.bitArray
-        ? BitArr.toJSON(message.bitArray)
-        : undefined);
+    message.currentPrice !== undefined &&
+      (obj.currentPrice = message.currentPrice);
+    if (message.bitArray) {
+      obj.bitArray = message.bitArray.map((e) =>
+        base64FromBytes(e !== undefined ? e : new Uint8Array())
+      );
+    } else {
+      obj.bitArray = [];
+    }
     message.tickmap !== undefined &&
       (obj.tickmap = message.tickmap
         ? Ticks.toJSON(message.tickmap)
@@ -162,6 +166,7 @@ export const Pairs = {
 
   fromPartial(object: DeepPartial<Pairs>): Pairs {
     const message = { ...basePairs } as Pairs;
+    message.bitArray = [];
     if (object.token0 !== undefined && object.token0 !== null) {
       message.token0 = object.token0;
     } else {
@@ -177,15 +182,15 @@ export const Pairs = {
     } else {
       message.tickSpacing = 0;
     }
-    if (object.currentIndex !== undefined && object.currentIndex !== null) {
-      message.currentIndex = object.currentIndex;
+    if (object.currentPrice !== undefined && object.currentPrice !== null) {
+      message.currentPrice = object.currentPrice;
     } else {
-      message.currentIndex = 0;
+      message.currentPrice = "";
     }
     if (object.bitArray !== undefined && object.bitArray !== null) {
-      message.bitArray = BitArr.fromPartial(object.bitArray);
-    } else {
-      message.bitArray = undefined;
+      for (const e of object.bitArray) {
+        message.bitArray.push(e);
+      }
     }
     if (object.tickmap !== undefined && object.tickmap !== null) {
       message.tickmap = Ticks.fromPartial(object.tickmap);
@@ -215,6 +220,29 @@ var globalThis: any = (() => {
   if (typeof global !== "undefined") return global;
   throw "Unable to locate global object";
 })();
+
+const atob: (b64: string) => string =
+  globalThis.atob ||
+  ((b64) => globalThis.Buffer.from(b64, "base64").toString("binary"));
+function bytesFromBase64(b64: string): Uint8Array {
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; ++i) {
+    arr[i] = bin.charCodeAt(i);
+  }
+  return arr;
+}
+
+const btoa: (bin: string) => string =
+  globalThis.btoa ||
+  ((bin) => globalThis.Buffer.from(bin, "binary").toString("base64"));
+function base64FromBytes(arr: Uint8Array): string {
+  const bin: string[] = [];
+  for (let i = 0; i < arr.byteLength; ++i) {
+    bin.push(String.fromCharCode(arr[i]));
+  }
+  return btoa(bin.join(""));
+}
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 export type DeepPartial<T> = T extends Builtin

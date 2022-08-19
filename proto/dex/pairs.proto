@@ -1,8 +1,8 @@
 syntax = "proto3";
 package nicholasdotsol.duality.dex;
 
+import "gogoproto/gogo.proto";
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
-import "dex/bit_arr.proto"; 
 import "dex/ticks.proto"; 
 import "dex/virtual_price_queue.proto"; 
 
@@ -10,8 +10,13 @@ message Pairs {
   string token0 = 1; 
   string token1 = 2; 
   uint64 tickSpacing = 3; 
-  uint64 currentIndex = 4; 
-  BitArr bitArray = 5; 
+  string currentPrice = 4 [
+      (gogoproto.moretags)   = "yaml:\"currentPrice\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "currentPrice"
+  ]; 
+  repeated bytes bitArray = 5; 
   Ticks tickmap = 6; 
   VirtualPriceQueue virtualPriceMap = 7; 
   
