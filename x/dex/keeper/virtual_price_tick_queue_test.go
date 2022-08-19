@@ -26,6 +26,7 @@ func TestVirtualPriceTickQueueGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNVirtualPriceTickQueue(keeper, ctx, 10)
 	for _, item := range items {
+		println(item.Id)
 		got, found := keeper.GetVirtualPriceTickQueue(ctx, item.Id)
 		require.True(t, found)
 		require.Equal(t,

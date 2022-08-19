@@ -18,6 +18,7 @@ func (k Keeper) SetVirtualPriceQueue(ctx sdk.Context, virtualPriceQueue types.Vi
 }
 
 // GetVirtualPriceQueue returns a virtualPriceQueue from its index
+// TODO: Map each virtualpricequeue with respect to id instead of vPrice
 func (k Keeper) GetVirtualPriceQueue(
 	ctx sdk.Context,
 	vPrice string,
