@@ -46,15 +46,6 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 
-				BitArrList: []types.BitArr{
-					{
-						Id: 0,
-					},
-					{
-						Id: 1,
-					},
-				},
-				BitArrCount: 2,
 				PairsList: []types.Pairs{
 					{
 						Token0: "0",
@@ -129,32 +120,6 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 
-		{
-			desc: "duplicated bitArr",
-			genState: &types.GenesisState{
-				BitArrList: []types.BitArr{
-					{
-						Id: 0,
-					},
-					{
-						Id: 0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "invalid bitArr count",
-			genState: &types.GenesisState{
-				BitArrList: []types.BitArr{
-					{
-						Id: 1,
-					},
-				},
-				BitArrCount: 0,
-			},
-			valid: false,
-		},
 		{
 			desc: "duplicated pairs",
 			genState: &types.GenesisState{

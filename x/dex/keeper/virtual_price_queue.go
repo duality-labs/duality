@@ -6,6 +6,21 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+func (k Keeper) enqueue(ctx sdk.Context, queue []*types.VirtualPriceQueueType, newQueueItem types.VirtualPriceQueueType) []*types.VirtualPriceQueueType {
+
+	queue = append(queue, &newQueueItem)
+	return queue
+}
+
+func (k Keeper) dequeue(ctx sdk.Context, queue []*types.VirtualPriceQueueType) (types.VirtualPriceQueueType, []*types.VirtualPriceQueueType) {
+	if len(queue) == 0 {
+		return types.VirtualPriceQueueType{sdk.ZeroDec(), sdk.ZeroDec(), &types.OrderParams{"", "", sdk.ZeroDec()}}, nil
+	}
+	element := queue[0]
+	queue = queue[1:]
+	return *element, queue
+}
+
 // SetVirtualPriceQueue set a specific virtualPriceQueue in the store from its index
 func (k Keeper) SetVirtualPriceQueue(ctx sdk.Context, virtualPriceQueue types.VirtualPriceQueue) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.VirtualPriceQueueKeyPrefix))

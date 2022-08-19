@@ -4,7 +4,6 @@ import { util, configure, Writer, Reader } from "protobufjs/minimal";
 import { Params } from "../dex/params";
 import { Nodes } from "../dex/nodes";
 import { Ticks } from "../dex/ticks";
-import { BitArr } from "../dex/bit_arr";
 import { Pairs } from "../dex/pairs";
 import { VirtualPriceQueue } from "../dex/virtual_price_queue";
 
@@ -16,14 +15,12 @@ export interface GenesisState {
   nodesList: Nodes[];
   nodesCount: number;
   ticksList: Ticks[];
-  bitArrList: BitArr[];
-  bitArrCount: number;
   pairsList: Pairs[];
   /** this line is used by starport scaffolding # genesis/proto/state */
   virtualPriceQueueList: VirtualPriceQueue[];
 }
 
-const baseGenesisState: object = { nodesCount: 0, bitArrCount: 0 };
+const baseGenesisState: object = { nodesCount: 0 };
 
 export const GenesisState = {
   encode(message: GenesisState, writer: Writer = Writer.create()): Writer {
@@ -39,17 +36,11 @@ export const GenesisState = {
     for (const v of message.ticksList) {
       Ticks.encode(v!, writer.uint32(34).fork()).ldelim();
     }
-    for (const v of message.bitArrList) {
-      BitArr.encode(v!, writer.uint32(42).fork()).ldelim();
-    }
-    if (message.bitArrCount !== 0) {
-      writer.uint32(48).uint64(message.bitArrCount);
-    }
     for (const v of message.pairsList) {
-      Pairs.encode(v!, writer.uint32(58).fork()).ldelim();
+      Pairs.encode(v!, writer.uint32(42).fork()).ldelim();
     }
     for (const v of message.virtualPriceQueueList) {
-      VirtualPriceQueue.encode(v!, writer.uint32(66).fork()).ldelim();
+      VirtualPriceQueue.encode(v!, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -60,7 +51,6 @@ export const GenesisState = {
     const message = { ...baseGenesisState } as GenesisState;
     message.nodesList = [];
     message.ticksList = [];
-    message.bitArrList = [];
     message.pairsList = [];
     message.virtualPriceQueueList = [];
     while (reader.pos < end) {
@@ -79,15 +69,9 @@ export const GenesisState = {
           message.ticksList.push(Ticks.decode(reader, reader.uint32()));
           break;
         case 5:
-          message.bitArrList.push(BitArr.decode(reader, reader.uint32()));
-          break;
-        case 6:
-          message.bitArrCount = longToNumber(reader.uint64() as Long);
-          break;
-        case 7:
           message.pairsList.push(Pairs.decode(reader, reader.uint32()));
           break;
-        case 8:
+        case 6:
           message.virtualPriceQueueList.push(
             VirtualPriceQueue.decode(reader, reader.uint32())
           );
@@ -104,7 +88,6 @@ export const GenesisState = {
     const message = { ...baseGenesisState } as GenesisState;
     message.nodesList = [];
     message.ticksList = [];
-    message.bitArrList = [];
     message.pairsList = [];
     message.virtualPriceQueueList = [];
     if (object.params !== undefined && object.params !== null) {
@@ -126,16 +109,6 @@ export const GenesisState = {
       for (const e of object.ticksList) {
         message.ticksList.push(Ticks.fromJSON(e));
       }
-    }
-    if (object.bitArrList !== undefined && object.bitArrList !== null) {
-      for (const e of object.bitArrList) {
-        message.bitArrList.push(BitArr.fromJSON(e));
-      }
-    }
-    if (object.bitArrCount !== undefined && object.bitArrCount !== null) {
-      message.bitArrCount = Number(object.bitArrCount);
-    } else {
-      message.bitArrCount = 0;
     }
     if (object.pairsList !== undefined && object.pairsList !== null) {
       for (const e of object.pairsList) {
@@ -172,15 +145,6 @@ export const GenesisState = {
     } else {
       obj.ticksList = [];
     }
-    if (message.bitArrList) {
-      obj.bitArrList = message.bitArrList.map((e) =>
-        e ? BitArr.toJSON(e) : undefined
-      );
-    } else {
-      obj.bitArrList = [];
-    }
-    message.bitArrCount !== undefined &&
-      (obj.bitArrCount = message.bitArrCount);
     if (message.pairsList) {
       obj.pairsList = message.pairsList.map((e) =>
         e ? Pairs.toJSON(e) : undefined
@@ -202,7 +166,6 @@ export const GenesisState = {
     const message = { ...baseGenesisState } as GenesisState;
     message.nodesList = [];
     message.ticksList = [];
-    message.bitArrList = [];
     message.pairsList = [];
     message.virtualPriceQueueList = [];
     if (object.params !== undefined && object.params !== null) {
@@ -224,16 +187,6 @@ export const GenesisState = {
       for (const e of object.ticksList) {
         message.ticksList.push(Ticks.fromPartial(e));
       }
-    }
-    if (object.bitArrList !== undefined && object.bitArrList !== null) {
-      for (const e of object.bitArrList) {
-        message.bitArrList.push(BitArr.fromPartial(e));
-      }
-    }
-    if (object.bitArrCount !== undefined && object.bitArrCount !== null) {
-      message.bitArrCount = object.bitArrCount;
-    } else {
-      message.bitArrCount = 0;
     }
     if (object.pairsList !== undefined && object.pairsList !== null) {
       for (const e of object.pairsList) {
