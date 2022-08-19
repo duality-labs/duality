@@ -19,11 +19,12 @@ message MsgAddLiquidity {
   string tokenA = 2;
   string tokenB = 3;
   string tokenDirection = 4;
-  string amount = 5;
-  string price = 6;
-  string fee = 7;
-  string orderType = 8;
-  string receiver = 9;
+  string index = 5;
+  string amount = 6;
+  string price = 7;
+  string fee = 8;
+  string orderType = 9;
+  string receiver = 10;
 }
 
 message MsgAddLiquidityResponse {
@@ -34,11 +35,12 @@ message MsgRemoveLiquidity {
   string tokenA = 2;
   string tokenB = 3;
   string tokenDirection = 4;
-  string shares = 5;
-  string price = 6;
-  string fee = 7;
-  string orderType = 8;
-  string receiver = 9;
+  string index = 5;
+  string shares = 6;
+  string price = 7;
+  string fee = 8;
+  string orderType = 9;
+  string receiver = 10;
 }
 
 message MsgRemoveLiquidityResponse {
