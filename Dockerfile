@@ -12,10 +12,6 @@ RUN apt-get install -y \
     # make \
     curl
 
-# [Choice] Ignite CLI version (align this with go.mod "github.com/ignite-hq/cli" version)
-ARG IGNITE_CLI_VERSION="v0.22.0"
-RUN curl "https://get.ignite.com/cli@$IGNITE_CLI_VERSION!" | bash
-
 WORKDIR /usr/src
 
 # Get Go dependencies
@@ -27,7 +23,7 @@ RUN go mod download
 COPY . .
 
 # compile dualityd
-RUN ignite chain build
+RUN go install ./cmd/dualityd
 
 # see docs for exposed ports:
 #   https://docs.ignite.com/kb/config.html#host
