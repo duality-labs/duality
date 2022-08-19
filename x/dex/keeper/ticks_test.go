@@ -20,9 +20,7 @@ func createNTicks(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Ticks {
 	for i := range items {
 		items[i].Price = strconv.Itoa(i)
 		items[i].Fee = strconv.Itoa(i)
-		items[i].Direction = strconv.Itoa(i)
 		items[i].OrderType = strconv.Itoa(i)
-		items[i].Reserve = sdk.ZeroDec()
 		items[i].PairFee = sdk.ZeroDec()
 		items[i].PairPrice = sdk.ZeroDec()
 		items[i].TotalShares = sdk.ZeroDec()
@@ -41,7 +39,6 @@ func TestTicksGet(t *testing.T) {
 			"1",
 			item.Price,
 			item.Fee,
-			item.Direction,
 			item.OrderType,
 		)
 		require.True(t, found)
@@ -60,7 +57,6 @@ func TestTicksRemove(t *testing.T) {
 			"1",
 			item.Price,
 			item.Fee,
-			item.Direction,
 			item.OrderType,
 		)
 		_, found := keeper.GetTicks(ctx,
@@ -68,7 +64,6 @@ func TestTicksRemove(t *testing.T) {
 			"1",
 			item.Price,
 			item.Fee,
-			item.Direction,
 			item.OrderType,
 		)
 		require.False(t, found)

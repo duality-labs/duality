@@ -30231,11 +30231,11 @@ paths:
                           type: string
                         fee:
                           type: string
-                        direction:
-                          type: string
                         orderType:
                           type: string
-                        reserve:
+                        reserve0:
+                          type: string
+                        reserve1:
                           type: string
                         pairPrice:
                           type: string
@@ -30412,11 +30412,11 @@ paths:
                         type: string
                       fee:
                         type: string
-                      direction:
-                        type: string
                       orderType:
                         type: string
-                      reserve:
+                      reserve0:
+                        type: string
+                      reserve1:
                         type: string
                       pairPrice:
                         type: string
@@ -30543,11 +30543,11 @@ paths:
                       type: string
                     fee:
                       type: string
-                    direction:
-                      type: string
                     orderType:
                       type: string
-                    reserve:
+                    reserve0:
+                      type: string
+                    reserve1:
                       type: string
                     pairPrice:
                       type: string
@@ -30687,11 +30687,11 @@ paths:
                     type: string
                   fee:
                     type: string
-                  direction:
-                    type: string
                   orderType:
                     type: string
-                  reserve:
+                  reserve0:
+                    type: string
+                  reserve1:
                     type: string
                   pairPrice:
                     type: string
@@ -52563,11 +52563,11 @@ definitions:
             type: string
           fee:
             type: string
-          direction:
-            type: string
           orderType:
             type: string
-          reserve:
+          reserve0:
+            type: string
+          reserve1:
             type: string
           pairPrice:
             type: string
@@ -52737,11 +52737,11 @@ definitions:
                   type: string
                 fee:
                   type: string
-                direction:
-                  type: string
                 orderType:
                   type: string
-                reserve:
+                reserve0:
+                  type: string
+                reserve1:
                   type: string
                 pairPrice:
                   type: string
@@ -52821,11 +52821,11 @@ definitions:
               type: string
             fee:
               type: string
-            direction:
-              type: string
             orderType:
               type: string
-            reserve:
+            reserve0:
+              type: string
+            reserve1:
               type: string
             pairPrice:
               type: string
@@ -52937,11 +52937,11 @@ definitions:
                 type: string
               fee:
                 type: string
-              direction:
-                type: string
               orderType:
                 type: string
-              reserve:
+              reserve0:
+                type: string
+              reserve1:
                 type: string
               pairPrice:
                 type: string
@@ -52994,11 +52994,11 @@ definitions:
             type: string
           fee:
             type: string
-          direction:
-            type: string
           orderType:
             type: string
-          reserve:
+          reserve0:
+            type: string
+          reserve1:
             type: string
           pairPrice:
             type: string
@@ -53031,11 +53031,11 @@ definitions:
         type: string
       fee:
         type: string
-      direction:
-        type: string
       orderType:
         type: string
-      reserve:
+      reserve0:
+        type: string
+      reserve1:
         type: string
       pairPrice:
         type: string

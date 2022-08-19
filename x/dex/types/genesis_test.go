@@ -35,13 +35,11 @@ func TestGenesisState_Validate(t *testing.T) {
 					{
 						Price:     "0",
 						Fee:       "0",
-						Direction: "0",
 						OrderType: "0",
 					},
 					{
 						Price:     "1",
 						Fee:       "1",
-						Direction: "1",
 						OrderType: "1",
 					},
 				},
@@ -102,13 +100,11 @@ func TestGenesisState_Validate(t *testing.T) {
 					{
 						Price:     "0",
 						Fee:       "0",
-						Direction: "0",
 						OrderType: "0",
 					},
 					{
 						Price:     "0",
 						Fee:       "0",
-						Direction: "0",
 						OrderType: "0",
 					},
 				},

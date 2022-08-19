@@ -51,7 +51,6 @@ func (k Keeper) Ticks(c context.Context, req *types.QueryGetTicksRequest) (*type
 		req.Token1,
 		req.Price,
 		req.Fee,
-		req.Direction,
 		req.OrderType,
 	)
 	if !found {

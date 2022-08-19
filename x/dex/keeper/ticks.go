@@ -15,7 +15,6 @@ func (k Keeper) SetTicks(ctx sdk.Context, token0 string, token1 string, ticks ty
 		token1,
 		ticks.Price,
 		ticks.Fee,
-		ticks.Direction,
 		ticks.OrderType,
 	), b)
 }
@@ -27,7 +26,6 @@ func (k Keeper) GetTicks(
 	token1 string,
 	price string,
 	fee string,
-	direction string,
 	orderType string,
 
 ) (val types.Ticks, found bool) {
@@ -38,7 +36,6 @@ func (k Keeper) GetTicks(
 		token1,
 		price,
 		fee,
-		direction,
 		orderType,
 	))
 	if b == nil {
@@ -56,7 +53,6 @@ func (k Keeper) RemoveTicks(
 	token1 string,
 	price string,
 	fee string,
-	direction string,
 	orderType string,
 
 ) {
@@ -66,7 +62,6 @@ func (k Keeper) RemoveTicks(
 		token1,
 		price,
 		fee,
-		direction,
 		orderType,
 	))
 }

@@ -15,7 +15,6 @@ func TicksKey(
 	token1 string,
 	price string,
 	fee string,
-	direction string,
 	orderType string,
 ) []byte {
 	var key []byte
@@ -34,10 +33,6 @@ func TicksKey(
 
 	feeBytes := []byte(fee)
 	key = append(key, feeBytes...)
-	key = append(key, []byte("/")...)
-
-	directionBytes := []byte(direction)
-	key = append(key, directionBytes...)
 	key = append(key, []byte("/")...)
 
 	orderTypeBytes := []byte(orderType)

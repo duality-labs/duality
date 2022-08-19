@@ -7,9 +7,9 @@ export const protobufPackage = "nicholasdotsol.duality.dex";
 export interface Ticks {
   price: string;
   fee: string;
-  direction: string;
   orderType: string;
-  reserve: string;
+  reserve0: string;
+  reserve1: string;
   pairPrice: string;
   pairFee: string;
   totalShares: string;
@@ -19,9 +19,9 @@ export interface Ticks {
 const baseTicks: object = {
   price: "",
   fee: "",
-  direction: "",
   orderType: "",
-  reserve: "",
+  reserve0: "",
+  reserve1: "",
   pairPrice: "",
   pairFee: "",
   totalShares: "",
@@ -35,14 +35,14 @@ export const Ticks = {
     if (message.fee !== "") {
       writer.uint32(18).string(message.fee);
     }
-    if (message.direction !== "") {
-      writer.uint32(26).string(message.direction);
-    }
     if (message.orderType !== "") {
-      writer.uint32(34).string(message.orderType);
+      writer.uint32(26).string(message.orderType);
     }
-    if (message.reserve !== "") {
-      writer.uint32(42).string(message.reserve);
+    if (message.reserve0 !== "") {
+      writer.uint32(34).string(message.reserve0);
+    }
+    if (message.reserve1 !== "") {
+      writer.uint32(42).string(message.reserve1);
     }
     if (message.pairPrice !== "") {
       writer.uint32(50).string(message.pairPrice);
@@ -74,13 +74,13 @@ export const Ticks = {
           message.fee = reader.string();
           break;
         case 3:
-          message.direction = reader.string();
-          break;
-        case 4:
           message.orderType = reader.string();
           break;
+        case 4:
+          message.reserve0 = reader.string();
+          break;
         case 5:
-          message.reserve = reader.string();
+          message.reserve1 = reader.string();
           break;
         case 6:
           message.pairPrice = reader.string();
@@ -115,20 +115,20 @@ export const Ticks = {
     } else {
       message.fee = "";
     }
-    if (object.direction !== undefined && object.direction !== null) {
-      message.direction = String(object.direction);
-    } else {
-      message.direction = "";
-    }
     if (object.orderType !== undefined && object.orderType !== null) {
       message.orderType = String(object.orderType);
     } else {
       message.orderType = "";
     }
-    if (object.reserve !== undefined && object.reserve !== null) {
-      message.reserve = String(object.reserve);
+    if (object.reserve0 !== undefined && object.reserve0 !== null) {
+      message.reserve0 = String(object.reserve0);
     } else {
-      message.reserve = "";
+      message.reserve0 = "";
+    }
+    if (object.reserve1 !== undefined && object.reserve1 !== null) {
+      message.reserve1 = String(object.reserve1);
+    } else {
+      message.reserve1 = "";
     }
     if (object.pairPrice !== undefined && object.pairPrice !== null) {
       message.pairPrice = String(object.pairPrice);
@@ -157,9 +157,9 @@ export const Ticks = {
     const obj: any = {};
     message.price !== undefined && (obj.price = message.price);
     message.fee !== undefined && (obj.fee = message.fee);
-    message.direction !== undefined && (obj.direction = message.direction);
     message.orderType !== undefined && (obj.orderType = message.orderType);
-    message.reserve !== undefined && (obj.reserve = message.reserve);
+    message.reserve0 !== undefined && (obj.reserve0 = message.reserve0);
+    message.reserve1 !== undefined && (obj.reserve1 = message.reserve1);
     message.pairPrice !== undefined && (obj.pairPrice = message.pairPrice);
     message.pairFee !== undefined && (obj.pairFee = message.pairFee);
     message.totalShares !== undefined &&
@@ -187,20 +187,20 @@ export const Ticks = {
     } else {
       message.fee = "";
     }
-    if (object.direction !== undefined && object.direction !== null) {
-      message.direction = object.direction;
-    } else {
-      message.direction = "";
-    }
     if (object.orderType !== undefined && object.orderType !== null) {
       message.orderType = object.orderType;
     } else {
       message.orderType = "";
     }
-    if (object.reserve !== undefined && object.reserve !== null) {
-      message.reserve = object.reserve;
+    if (object.reserve0 !== undefined && object.reserve0 !== null) {
+      message.reserve0 = object.reserve0;
     } else {
-      message.reserve = "";
+      message.reserve0 = "";
+    }
+    if (object.reserve1 !== undefined && object.reserve1 !== null) {
+      message.reserve1 = object.reserve1;
+    } else {
+      message.reserve1 = "";
     }
     if (object.pairPrice !== undefined && object.pairPrice !== null) {
       message.pairPrice = object.pairPrice;
