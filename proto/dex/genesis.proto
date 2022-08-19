@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "dex/params.proto";
 import "dex/nodes.proto";
 import "dex/ticks.proto";
-import "dex/bit_arr.proto";
+
 import "dex/pairs.proto";
 import "dex/virtual_price_queue.proto";
 // this line is used by starport scaffolding # genesis/proto/import
@@ -18,9 +18,8 @@ message GenesisState {
   repeated Nodes nodesList = 2 [(gogoproto.nullable) = false];
   uint64 nodesCount = 3;
   repeated Ticks ticksList = 4 [(gogoproto.nullable) = false];
-  repeated BitArr bitArrList = 5 [(gogoproto.nullable) = false];
-  uint64 bitArrCount = 6;
-  repeated Pairs pairsList = 7 [(gogoproto.nullable) = false];
-  repeated VirtualPriceQueue virtualPriceQueueList = 8 [(gogoproto.nullable) = false];
+  
+  repeated Pairs pairsList = 5 [(gogoproto.nullable) = false];
+  repeated VirtualPriceQueue virtualPriceQueueList = 6 [(gogoproto.nullable) = false];
   // this line is used by starport scaffolding # genesis/proto/state
 }

@@ -9,14 +9,6 @@
  * ---------------------------------------------------------------
  */
 
-export interface DexBitArr {
-  /** @format uint64 */
-  id?: string;
-
-  /** @format byte */
-  bit?: string;
-}
-
 export type DexMsgAddLiquidityResponse = object;
 
 export type DexMsgCreatePairResponse = object;
@@ -48,10 +40,8 @@ export interface DexPairs {
 
   /** @format uint64 */
   tickSpacing?: string;
-
-  /** @format uint64 */
-  currentIndex?: string;
-  bitArray?: DexBitArr;
+  currentPrice?: string;
+  bitArray?: string[];
   tickmap?: DexTicks;
   virtualPriceMap?: DexVirtualPriceQueue;
 }
@@ -60,21 +50,6 @@ export interface DexPairs {
  * Params defines the parameters for the module.
  */
 export type DexParams = object;
-
-export interface DexQueryAllBitArrResponse {
-  BitArr?: DexBitArr[];
-
-  /**
-   * PageResponse is to be embedded in gRPC response messages where the
-   * corresponding request message has used PageRequest.
-   *
-   *  message SomeResponse {
-   *          repeated Bar results = 1;
-   *          PageResponse page = 2;
-   *  }
-   */
-  pagination?: V1Beta1PageResponse;
-}
 
 export interface DexQueryAllNodesResponse {
   Nodes?: DexNodes[];
@@ -136,10 +111,6 @@ export interface DexQueryAllVirtualPriceQueueResponse {
   pagination?: V1Beta1PageResponse;
 }
 
-export interface DexQueryGetBitArrResponse {
-  BitArr?: DexBitArr;
-}
-
 export interface DexQueryGetNodesResponse {
   Nodes?: DexNodes;
 }
@@ -180,9 +151,13 @@ export interface DexVirtualPriceQueue {
   vPrice?: string;
   direction?: string;
   orderType?: string;
+  queue?: DexVirtualPriceQueueType[];
+}
+
+export interface DexVirtualPriceQueueType {
   price?: string;
   fee?: string;
-  orderparams?: string;
+  orderparams?: DexOrderParams;
 }
 
 export interface ProtobufAny {
@@ -444,51 +419,10 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title dex/bit_arr.proto
+ * @title dex/genesis.proto
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryBitArrAll
-   * @summary Queries a list of BitArr items.
-   * @request GET:/NicholasDotSol/duality/dex/bit_arr
-   */
-  queryBitArrAll = (
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<DexQueryAllBitArrResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/bit_arr`,
-      method: "GET",
-      query: query,
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryBitArr
-   * @summary Queries a BitArr by id.
-   * @request GET:/NicholasDotSol/duality/dex/bit_arr/{id}
-   */
-  queryBitArr = (id: string, params: RequestParams = {}) =>
-    this.request<DexQueryGetBitArrResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/bit_arr/${id}`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-
   /**
    * No description
    *

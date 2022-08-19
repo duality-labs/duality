@@ -8,19 +8,19 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) enqueue(ctx sdk.Context, queue *([]types.VirtualPriceTickQueue), newQueueItem types.VirtualPriceTickQueue) *([]types.VirtualPriceTickQueue) {
+func (k Keeper) enqueue(ctx sdk.Context, queue []*types.VirtualPriceQueueType, newQueueItem types.VirtualPriceQueueType) []*types.VirtualPriceQueueType {
 
-	*queue = append(*(queue), newQueueItem)
+	queue = append(queue, &newQueueItem)
 	return queue
 }
 
-func (k Keeper) dequeue(ctx sdk.Context, queue *([]types.VirtualPriceTickQueue)) (types.VirtualPriceTickQueue, *([]types.VirtualPriceTickQueue)) {
-	if len(*queue) == 0 {
-		return types.VirtualPriceTickQueue{0, sdk.ZeroDec(), sdk.ZeroDec(), ""}, nil
+func (k Keeper) dequeue(ctx sdk.Context, queue []*types.VirtualPriceQueueType) (types.VirtualPriceQueueType, []*types.VirtualPriceQueueType) {
+	if len(queue) == 0 {
+		return types.VirtualPriceQueueType{sdk.ZeroDec(), sdk.ZeroDec(), &types.OrderParams{"", "", sdk.ZeroDec()}}, nil
 	}
-	element := (*queue)[0]
-	*queue = (*queue)[1:]
-	return element, queue
+	element := queue[0]
+	queue = queue[1:]
+	return *element, queue
 }
 
 // GetVirtualPriceTickQueueCount get the total number of virtualPriceTickQueue
