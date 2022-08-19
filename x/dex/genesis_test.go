@@ -48,16 +48,12 @@ func TestGenesis(t *testing.T) {
 				Token1: "1",
 			},
 		},
-		VirtualPriceQueueList: []types.VirtualPriceQueue{
+		IndexQueueList: []types.IndexQueue{
 			{
-				VPrice:    "0",
-				Direction: "0",
-				OrderType: "0",
+				Index: 0,
 			},
 			{
-				VPrice:    "1",
-				Direction: "1",
-				OrderType: "1",
+				Index: 1,
 			},
 		},
 		// this line is used by starport scaffolding # genesis/test/state
@@ -74,6 +70,6 @@ func TestGenesis(t *testing.T) {
 	require.Equal(t, genesisState.NodesCount, got.NodesCount)
 	require.ElementsMatch(t, genesisState.TicksList, got.TicksList)
 	require.ElementsMatch(t, genesisState.PairsList, got.PairsList)
-	require.ElementsMatch(t, genesisState.VirtualPriceQueueList, got.VirtualPriceQueueList)
+	require.ElementsMatch(t, genesisState.IndexQueueList, got.IndexQueueList)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

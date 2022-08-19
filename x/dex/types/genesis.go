@@ -10,10 +10,10 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		NodesList:             []Nodes{},
-		TicksList:             []Ticks{},
-		PairsList:             []Pairs{},
-		VirtualPriceQueueList: []VirtualPriceQueue{},
+		NodesList:      []Nodes{},
+		TicksList:      []Ticks{},
+		PairsList:      []Pairs{},
+		IndexQueueList: []IndexQueue{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -56,15 +56,15 @@ func (gs GenesisState) Validate() error {
 		}
 		pairsIndexMap[index] = struct{}{}
 	}
-	// Check for duplicated index in virtualPriceQueue
-	virtualPriceQueueIndexMap := make(map[string]struct{})
+	// Check for duplicated index in IndexQueue
+	IndexQueueIndexMap := make(map[string]struct{})
 
-	for _, elem := range gs.VirtualPriceQueueList {
-		index := string(VirtualPriceQueueKey(elem.VPrice, elem.Direction, elem.OrderType))
-		if _, ok := virtualPriceQueueIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for virtualPriceQueue")
+	for _, elem := range gs.IndexQueueList {
+		index := string(IndexQueueKey(elem.Index))
+		if _, ok := IndexQueueIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for IndexQueue")
 		}
-		virtualPriceQueueIndexMap[index] = struct{}{}
+		IndexQueueIndexMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 

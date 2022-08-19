@@ -18,40 +18,34 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func TestVirtualPriceQueueQuerySingle(t *testing.T) {
+func TestIndexQueueQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNVirtualPriceQueue(keeper, ctx, 2)
+	msgs := createNIndexQueue(keeper, ctx, 2)
 	for _, tc := range []struct {
 		desc     string
-		request  *types.QueryGetVirtualPriceQueueRequest
-		response *types.QueryGetVirtualPriceQueueResponse
+		request  *types.QueryGetIndexQueueRequest
+		response *types.QueryGetIndexQueueResponse
 		err      error
 	}{
 		{
 			desc: "First",
-			request: &types.QueryGetVirtualPriceQueueRequest{
-				VPrice:    msgs[0].VPrice,
-				Direction: msgs[0].Direction,
-				OrderType: msgs[0].OrderType,
+			request: &types.QueryGetIndexQueueRequest{
+				Index: msgs[0].Index,
 			},
-			response: &types.QueryGetVirtualPriceQueueResponse{VirtualPriceQueue: msgs[0]},
+			response: &types.QueryGetIndexQueueResponse{IndexQueue: msgs[0]},
 		},
 		{
 			desc: "Second",
-			request: &types.QueryGetVirtualPriceQueueRequest{
-				VPrice:    msgs[1].VPrice,
-				Direction: msgs[1].Direction,
-				OrderType: msgs[1].OrderType,
+			request: &types.QueryGetIndexQueueRequest{
+				Index: msgs[1].Index,
 			},
-			response: &types.QueryGetVirtualPriceQueueResponse{VirtualPriceQueue: msgs[1]},
+			response: &types.QueryGetIndexQueueResponse{IndexQueue: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
-			request: &types.QueryGetVirtualPriceQueueRequest{
-				VPrice:    strconv.Itoa(100000),
-				Direction: strconv.Itoa(100000),
-				OrderType: strconv.Itoa(100000),
+			request: &types.QueryGetIndexQueueRequest{
+				Index: 100000,
 			},
 			err: status.Error(codes.NotFound, "not found"),
 		},
@@ -61,7 +55,7 @@ func TestVirtualPriceQueueQuerySingle(t *testing.T) {
 		},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
-			response, err := keeper.VirtualPriceQueue(wctx, tc.request)
+			response, err := keeper.IndexQueue(wctx, tc.request)
 			if tc.err != nil {
 				require.ErrorIs(t, err, tc.err)
 			} else {
@@ -75,13 +69,13 @@ func TestVirtualPriceQueueQuerySingle(t *testing.T) {
 	}
 }
 
-func TestVirtualPriceQueueQueryPaginated(t *testing.T) {
+func TestIndexQueueQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNVirtualPriceQueue(keeper, ctx, 5)
+	msgs := createNIndexQueue(keeper, ctx, 5)
 
-	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllVirtualPriceQueueRequest {
-		return &types.QueryAllVirtualPriceQueueRequest{
+	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllIndexQueueRequest {
+		return &types.QueryAllIndexQueueRequest{
 			Pagination: &query.PageRequest{
 				Key:        next,
 				Offset:     offset,
@@ -93,12 +87,12 @@ func TestVirtualPriceQueueQueryPaginated(t *testing.T) {
 	t.Run("ByOffset", func(t *testing.T) {
 		step := 2
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.VirtualPriceQueueAll(wctx, request(nil, uint64(i), uint64(step), false))
+			resp, err := keeper.IndexQueueAll(wctx, request(nil, uint64(i), uint64(step), false))
 			require.NoError(t, err)
-			require.LessOrEqual(t, len(resp.VirtualPriceQueue), step)
+			require.LessOrEqual(t, len(resp.IndexQueue), step)
 			require.Subset(t,
 				nullify.Fill(msgs),
-				nullify.Fill(resp.VirtualPriceQueue),
+				nullify.Fill(resp.IndexQueue),
 			)
 		}
 	})
@@ -106,27 +100,27 @@ func TestVirtualPriceQueueQueryPaginated(t *testing.T) {
 		step := 2
 		var next []byte
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.VirtualPriceQueueAll(wctx, request(next, 0, uint64(step), false))
+			resp, err := keeper.IndexQueueAll(wctx, request(next, 0, uint64(step), false))
 			require.NoError(t, err)
-			require.LessOrEqual(t, len(resp.VirtualPriceQueue), step)
+			require.LessOrEqual(t, len(resp.IndexQueue), step)
 			require.Subset(t,
 				nullify.Fill(msgs),
-				nullify.Fill(resp.VirtualPriceQueue),
+				nullify.Fill(resp.IndexQueue),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
-		resp, err := keeper.VirtualPriceQueueAll(wctx, request(nil, 0, 0, true))
+		resp, err := keeper.IndexQueueAll(wctx, request(nil, 0, 0, true))
 		require.NoError(t, err)
 		require.Equal(t, len(msgs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(msgs),
-			nullify.Fill(resp.VirtualPriceQueue),
+			nullify.Fill(resp.IndexQueue),
 		)
 	})
 	t.Run("InvalidRequest", func(t *testing.T) {
-		_, err := keeper.VirtualPriceQueueAll(wctx, nil)
+		_, err := keeper.IndexQueueAll(wctx, nil)
 		require.ErrorIs(t, err, status.Error(codes.InvalidArgument, "invalid request"))
 	})
 }

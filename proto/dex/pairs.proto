@@ -1,10 +1,10 @@
 syntax = "proto3";
 package nicholasdotsol.duality.dex;
 
-import "gogoproto/gogo.proto";
+
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 import "dex/ticks.proto"; 
-import "dex/virtual_price_queue.proto"; 
+import "dex/index_queue.proto"; 
 
 message Pairs {
   string token0 = 1; 
@@ -12,7 +12,7 @@ message Pairs {
   int64 tickSpacing = 3;
   int32 currentIndex = 4;
   Ticks tickmap = 5; 
-  VirtualPriceQueue virtualPriceMap = 6; 
+  IndexQueue IndexMap = 6; 
   
 }
 

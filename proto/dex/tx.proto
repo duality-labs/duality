@@ -19,7 +19,7 @@ message MsgAddLiquidity {
   string tokenA = 2;
   string tokenB = 3;
   string tokenDirection = 4;
-  string index = 5;
+  int32 index = 5;
   string amount = 6;
   string price = 7;
   string fee = 8;
@@ -35,7 +35,7 @@ message MsgRemoveLiquidity {
   string tokenA = 2;
   string tokenB = 3;
   string tokenDirection = 4;
-  string index = 5;
+  int32 index = 5;
   string shares = 6;
   string price = 7;
   string fee = 8;

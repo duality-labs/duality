@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -9,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListVirtualPriceQueue() *cobra.Command {
+func CmdListIndexQueue() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-virtual-price-queue",
-		Short: "list all virtualPriceQueue",
+		Short: "list all IndexQueue",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -23,11 +24,11 @@ func CmdListVirtualPriceQueue() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllVirtualPriceQueueRequest{
+			params := &types.QueryAllIndexQueueRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.VirtualPriceQueueAll(context.Background(), params)
+			res, err := queryClient.IndexQueueAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -42,27 +43,27 @@ func CmdListVirtualPriceQueue() *cobra.Command {
 	return cmd
 }
 
-func CmdShowVirtualPriceQueue() *cobra.Command {
+func CmdShowIndexQueue() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "show-virtual-price-queue [v-price] [direction] [order-type]",
-		Short: "shows a virtualPriceQueue",
+		Short: "shows a IndexQueue",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			argVPrice := args[0]
-			argDirection := args[1]
-			argOrderType := args[2]
+			i, err := strconv.ParseInt(args[0], 10, 32)
 
-			params := &types.QueryGetVirtualPriceQueueRequest{
-				VPrice:    argVPrice,
-				Direction: argDirection,
-				OrderType: argOrderType,
+			if err != nil {
+				return err
 			}
 
-			res, err := queryClient.VirtualPriceQueue(context.Background(), params)
+			params := &types.QueryGetIndexQueueRequest{
+				Index: int32(i),
+			}
+
+			res, err := queryClient.IndexQueue(context.Background(), params)
 			if err != nil {
 				return err
 			}
