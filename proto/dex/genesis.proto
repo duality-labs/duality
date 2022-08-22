@@ -3,11 +3,11 @@ package nicholasdotsol.duality.dex;
 
 import "gogoproto/gogo.proto";
 import "dex/params.proto";
-import "dex/nodes.proto";
 import "dex/ticks.proto";
 
 import "dex/pairs.proto";
 import "dex/index_queue.proto";
+import "dex/nodes.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -15,10 +15,9 @@ option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 // GenesisState defines the dex module's genesis state.
 message GenesisState {
   Params params = 1 [(gogoproto.nullable) = false];
-  repeated Nodes nodesList = 2 [(gogoproto.nullable) = false];
-  uint64 nodesCount = 3;
-  repeated Ticks ticksList = 4 [(gogoproto.nullable) = false];
-  repeated Pairs pairsList = 5 [(gogoproto.nullable) = false];
-  repeated IndexQueue indexQueueList = 6 [(gogoproto.nullable) = false];
+  repeated Ticks ticksList = 2 [(gogoproto.nullable) = false];
+  repeated Pairs pairsList = 3 [(gogoproto.nullable) = false];
+  repeated IndexQueue indexQueueList = 4 [(gogoproto.nullable) = false];
+  repeated Nodes nodesList = 5 [(gogoproto.nullable) = false];
   // this line is used by starport scaffolding # genesis/proto/state
 }

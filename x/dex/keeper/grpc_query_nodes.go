@@ -6,7 +6,6 @@ import (
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -21,7 +20,7 @@ func (k Keeper) NodesAll(c context.Context, req *types.QueryAllNodesRequest) (*t
 	ctx := sdk.UnwrapSDKContext(c)
 
 	store := ctx.KVStore(k.storeKey)
-	nodesStore := prefix.NewStore(store, types.KeyPrefix(types.NodesKey))
+	nodesStore := prefix.NewStore(store, types.KeyPrefix(types.NodesKeyPrefix))
 
 	pageRes, err := query.Paginate(nodesStore, req.Pagination, func(key []byte, value []byte) error {
 		var nodes types.Nodes
@@ -44,12 +43,16 @@ func (k Keeper) Nodes(c context.Context, req *types.QueryGetNodesRequest) (*type
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
-
 	ctx := sdk.UnwrapSDKContext(c)
-	nodes, found := k.GetNodes(ctx, req.Id)
+
+	val, found := k.GetNodes(
+		ctx,
+		req.Node,
+		req.OutgoingEdges,
+	)
 	if !found {
-		return nil, sdkerrors.ErrKeyNotFound
+		return nil, status.Error(codes.NotFound, "not found")
 	}
 
-	return &types.QueryGetNodesResponse{Nodes: nodes}, nil
+	return &types.QueryGetNodesResponse{Nodes: val}, nil
 }

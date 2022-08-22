@@ -21,7 +21,17 @@ func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
 
+// Deposit Event Attributes
 const (
-	NodesKey      = "Nodes-value-"
-	NodesCountKey = "Nodes-count-"
+	DepositEventKey          = "NewDeposit"
+	DepositEventCreator      = "Creator"
+	DepositEventToken0       = "Token0"
+	DepositEventToken1       = "Token1"
+	DepositEventPrice        = "Price"
+	DepositEventFee          = "Fee"
+	DepositEventReceiver     = "Receiver"
+	DepositTokenDirection    = "TokenDirection"
+	DepositEventOldReserves  = "OldReserves"
+	DepositEventNewReserves  = "NewReserves"
+	DepositEventSharesMinted = "SharesMinted"
 )

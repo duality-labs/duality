@@ -14,16 +14,6 @@ func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
 
-		NodesList: []types.Nodes{
-			{
-				Id: 0,
-			},
-			{
-				Id: 1,
-			},
-		},
-		NodesCount: 2,
-
 		TicksList: []types.Ticks{
 			{
 				Price:     "0",
@@ -54,6 +44,16 @@ func TestGenesis(t *testing.T) {
 				Index: 1,
 			},
 		},
+		NodesList: []types.Nodes{
+			{
+				Node:          "0",
+				OutgoingEdges: "0",
+			},
+			{
+				Node:          "1",
+				OutgoingEdges: "1",
+			},
+		},
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
@@ -64,10 +64,9 @@ func TestGenesis(t *testing.T) {
 
 	nullify.Fill(&genesisState)
 	nullify.Fill(got)
-	require.ElementsMatch(t, genesisState.NodesList, got.NodesList)
-	require.Equal(t, genesisState.NodesCount, got.NodesCount)
 	require.ElementsMatch(t, genesisState.TicksList, got.TicksList)
 	require.ElementsMatch(t, genesisState.PairsList, got.PairsList)
 	require.ElementsMatch(t, genesisState.IndexQueueList, got.IndexQueueList)
+	require.ElementsMatch(t, genesisState.NodesList, got.NodesList)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

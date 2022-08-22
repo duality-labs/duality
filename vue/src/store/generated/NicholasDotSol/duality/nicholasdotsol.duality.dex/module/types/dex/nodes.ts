@@ -1,24 +1,22 @@
 /* eslint-disable */
-import * as Long from "long";
-import { util, configure, Writer, Reader } from "protobufjs/minimal";
-import { Node } from "../dex/node";
+import { Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
 export interface Nodes {
-  id: number;
-  node: Node | undefined;
+  node: string;
+  outgoingEdges: string[];
 }
 
-const baseNodes: object = { id: 0 };
+const baseNodes: object = { node: "", outgoingEdges: "" };
 
 export const Nodes = {
   encode(message: Nodes, writer: Writer = Writer.create()): Writer {
-    if (message.id !== 0) {
-      writer.uint32(8).uint64(message.id);
+    if (message.node !== "") {
+      writer.uint32(10).string(message.node);
     }
-    if (message.node !== undefined) {
-      Node.encode(message.node, writer.uint32(18).fork()).ldelim();
+    for (const v of message.outgoingEdges) {
+      writer.uint32(18).string(v!);
     }
     return writer;
   },
@@ -27,14 +25,15 @@ export const Nodes = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseNodes } as Nodes;
+    message.outgoingEdges = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = longToNumber(reader.uint64() as Long);
+          message.node = reader.string();
           break;
         case 2:
-          message.node = Node.decode(reader, reader.uint32());
+          message.outgoingEdges.push(reader.string());
           break;
         default:
           reader.skipType(tag & 7);
@@ -46,52 +45,47 @@ export const Nodes = {
 
   fromJSON(object: any): Nodes {
     const message = { ...baseNodes } as Nodes;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = Number(object.id);
-    } else {
-      message.id = 0;
-    }
+    message.outgoingEdges = [];
     if (object.node !== undefined && object.node !== null) {
-      message.node = Node.fromJSON(object.node);
+      message.node = String(object.node);
     } else {
-      message.node = undefined;
+      message.node = "";
+    }
+    if (object.outgoingEdges !== undefined && object.outgoingEdges !== null) {
+      for (const e of object.outgoingEdges) {
+        message.outgoingEdges.push(String(e));
+      }
     }
     return message;
   },
 
   toJSON(message: Nodes): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    message.node !== undefined &&
-      (obj.node = message.node ? Node.toJSON(message.node) : undefined);
+    message.node !== undefined && (obj.node = message.node);
+    if (message.outgoingEdges) {
+      obj.outgoingEdges = message.outgoingEdges.map((e) => e);
+    } else {
+      obj.outgoingEdges = [];
+    }
     return obj;
   },
 
   fromPartial(object: DeepPartial<Nodes>): Nodes {
     const message = { ...baseNodes } as Nodes;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id;
-    } else {
-      message.id = 0;
-    }
+    message.outgoingEdges = [];
     if (object.node !== undefined && object.node !== null) {
-      message.node = Node.fromPartial(object.node);
+      message.node = object.node;
     } else {
-      message.node = undefined;
+      message.node = "";
+    }
+    if (object.outgoingEdges !== undefined && object.outgoingEdges !== null) {
+      for (const e of object.outgoingEdges) {
+        message.outgoingEdges.push(e);
+      }
     }
     return message;
   },
 };
-
-declare var self: any | undefined;
-declare var window: any | undefined;
-var globalThis: any = (() => {
-  if (typeof globalThis !== "undefined") return globalThis;
-  if (typeof self !== "undefined") return self;
-  if (typeof window !== "undefined") return window;
-  if (typeof global !== "undefined") return global;
-  throw "Unable to locate global object";
-})();
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 export type DeepPartial<T> = T extends Builtin
@@ -103,15 +97,3 @@ export type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
-
-function longToNumber(long: Long): number {
-  if (long.gt(Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  return long.toNumber();
-}
-
-if (util.Long !== Long) {
-  util.Long = Long as any;
-  configure();
-}

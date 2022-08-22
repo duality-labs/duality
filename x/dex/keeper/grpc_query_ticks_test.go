@@ -51,7 +51,6 @@ func TestTicksQuerySingle(t *testing.T) {
 			request: &types.QueryGetTicksRequest{
 				Price:     strconv.Itoa(100000),
 				Fee:       strconv.Itoa(100000),
-				Direction: strconv.Itoa(100000),
 				OrderType: strconv.Itoa(100000),
 			},
 			err: status.Error(codes.NotFound, "not found"),

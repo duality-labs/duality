@@ -2,10 +2,10 @@ syntax = "proto3";
 package nicholasdotsol.duality.dex;
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
-import "dex/node.proto"; 
 
 message Nodes {
-  uint64 id = 1;
-  Node node = 2; 
+  string node = 1; 
+  repeated string outgoingEdges = 2; 
   
 }
+

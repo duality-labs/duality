@@ -50,6 +50,13 @@ message MsgCreatePair {
   string creator = 1;
   string tokenA = 2;
   string tokenB = 3;
+  string tokenDirection = 4;
+  int32 index = 5;
+  string amount = 6;
+  string price = 7;
+  string fee = 8;
+  string orderType = 9;
+  string receiver = 10;
 }
 
 message MsgCreatePairResponse {

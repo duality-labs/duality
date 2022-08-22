@@ -1,10 +1,10 @@
 package keeper_test
 
 import (
+	"strconv"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -14,6 +14,9 @@ import (
 	"github.com/NicholasDotSol/duality/testutil/nullify"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 )
+
+// Prevent strconv unused error
+var _ = strconv.IntSize
 
 func TestNodesQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
@@ -26,19 +29,28 @@ func TestNodesQuerySingle(t *testing.T) {
 		err      error
 	}{
 		{
-			desc:     "First",
-			request:  &types.QueryGetNodesRequest{Id: msgs[0].Id},
+			desc: "First",
+			request: &types.QueryGetNodesRequest{
+				Node:          msgs[0].Node,
+				OutgoingEdges: msgs[0].OutgoingEdges,
+			},
 			response: &types.QueryGetNodesResponse{Nodes: msgs[0]},
 		},
 		{
-			desc:     "Second",
-			request:  &types.QueryGetNodesRequest{Id: msgs[1].Id},
+			desc: "Second",
+			request: &types.QueryGetNodesRequest{
+				Node:          msgs[1].Node,
+				OutgoingEdges: msgs[1].OutgoingEdges,
+			},
 			response: &types.QueryGetNodesResponse{Nodes: msgs[1]},
 		},
 		{
-			desc:    "KeyNotFound",
-			request: &types.QueryGetNodesRequest{Id: uint64(len(msgs))},
-			err:     sdkerrors.ErrKeyNotFound,
+			desc: "KeyNotFound",
+			request: &types.QueryGetNodesRequest{
+				Node:          strconv.Itoa(100000),
+				OutgoingEdges: strconv.Itoa(100000),
+			},
+			err: status.Error(codes.NotFound, "not found"),
 		},
 		{
 			desc: "InvalidRequest",

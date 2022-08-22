@@ -2,6 +2,7 @@ package cli_test
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -17,6 +18,9 @@ import (
 	"github.com/NicholasDotSol/duality/x/dex/types"
 )
 
+// Prevent strconv unused error
+var _ = strconv.IntSize
+
 func networkWithNodesObjects(t *testing.T, n int) (*network.Network, []types.Nodes) {
 	t.Helper()
 	cfg := network.DefaultConfig()
@@ -25,7 +29,8 @@ func networkWithNodesObjects(t *testing.T, n int) (*network.Network, []types.Nod
 
 	for i := 0; i < n; i++ {
 		nodes := types.Nodes{
-			Id: uint64(i),
+			Node:          strconv.Itoa(i),
+			OutgoingEdges: strconv.Itoa(i),
 		}
 		nullify.Fill(&nodes)
 		state.NodesList = append(state.NodesList, nodes)
@@ -44,28 +49,36 @@ func TestShowNodes(t *testing.T) {
 		fmt.Sprintf("--%s=json", tmcli.OutputFlag),
 	}
 	for _, tc := range []struct {
-		desc string
-		id   string
+		desc            string
+		idNode          string
+		idOutgoingEdges string
+
 		args []string
 		err  error
 		obj  types.Nodes
 	}{
 		{
-			desc: "found",
-			id:   fmt.Sprintf("%d", objs[0].Id),
+			desc:            "found",
+			idNode:          objs[0].Node,
+			idOutgoingEdges: objs[0].OutgoingEdges,
+
 			args: common,
 			obj:  objs[0],
 		},
 		{
-			desc: "not found",
-			id:   "not_found",
+			desc:            "not found",
+			idNode:          strconv.Itoa(100000),
+			idOutgoingEdges: strconv.Itoa(100000),
+
 			args: common,
 			err:  status.Error(codes.NotFound, "not found"),
 		},
 	} {
-		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
-			args := []string{tc.id}
+			args := []string{
+				tc.idNode,
+				tc.idOutgoingEdges,
+			}
 			args = append(args, tc.args...)
 			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowNodes(), args)
 			if tc.err != nil {

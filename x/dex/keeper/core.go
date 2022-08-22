@@ -27,24 +27,7 @@ func (k Keeper) CreateNewPair(goCtx context.Context, token0 string, token1 strin
 	return nil
 }
 
-func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, price sdk.Dec, msg *types.MsgAddLiquidity, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
-
-	/*
-			// Check if the pair already exists
-			1) Find Pair
-			   a) If pair exists, get the pair
-			   b) If pair does not exist, error
-			2) Find Tick
-		       a) If virtual price tick/index does not exist, add new index
-				    i) Initialize index to 1 in bitmap
-					ii) Create new tick w/ amount in virtual_price_tick_list
-					iii) Add tick w/ amount to virtual_price_tick_queue
-			   b) If exists
-					i) Update tick (+= amount) in virtual_price_tick_list
-					ii) Add amount to existing tick in corresponding queue
-			3) Update Shares
-				i) TBD
-	*/
+func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, price sdk.Dec, msg *types.MsgAddLiquidity, callerAddr sdk.AccAddress, receiver sdk.AccAddress) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -68,15 +51,27 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit token1 at a price/fee pair greater than the current price")
 	}
 
-	IndexQueueOld, IndexQueueFound := k.GetIndexQueue(ctx, token0, token1, msg.Index)
+	IndexQueue, IndexQueueFound := k.GetIndexQueue(ctx, token0, token1, msg.Index)
 
-	//FIX ME
-	shares := amount.Mul(price)
+	// Tick from the tick store
+	Tick, TickFound := k.GetTicks(ctx, token0, token1, msg.Price, msg.Fee, msg.OrderType)
+
+	var NewTick types.Ticks
+	var oldAmount sdk.Dec //Event variable
+	var shares sdk.Dec
+
+	if msg.TokenDirection == token0 {
+		shares = amount.Mul(price.Mul(fee))
+	} else {
+		shares = amount.Mul(sdk.OneDec().Quo(fee))
+	}
+
+	// Index Queue Logic
 
 	if !IndexQueueFound {
 
 		NewQueue := []*types.IndexQueueType{
-			{
+			&types.IndexQueueType{
 				Price: price,
 				Fee:   fee,
 				Orderparams: &types.OrderParams{
@@ -86,34 +81,17 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 				},
 			},
 		}
-		IndexQueueOld = types.IndexQueue{
+		IndexQueue = types.IndexQueue{
 			Index: msg.Index,
 			Queue: NewQueue,
 		}
 
 	} else {
-		TickIndexFound := -1
-		for i := 0; i < len(IndexQueueOld.Queue); i++ {
-			if IndexQueueOld.Queue[i].Price.Equal(price) && IndexQueueOld.Queue[i].Fee.Equal(fee) && IndexQueueOld.Queue[i].Orderparams.OrderType == msg.OrderType {
-				TickIndexFound = i
-				break
-			}
-		}
 
-		if TickIndexFound != -1 {
+		if !TickFound {
 
-			IndexQueueOld.Queue[TickIndexFound] = &types.IndexQueueType{
-				Price: price,
-				Fee:   fee,
-				Orderparams: &types.OrderParams{
-					OrderRule:   "",
-					OrderType:   msg.OrderType,
-					OrderShares: IndexQueueOld.Queue[TickIndexFound].Orderparams.OrderShares.Add(shares),
-				},
-			}
-		} else {
-
-			IndexQueueOld.Queue = k.enqueue(ctx, IndexQueueOld.Queue, types.IndexQueueType{
+			// Add tick to the IndexQueue
+			IndexQueue.Queue = k.enqueue(ctx, IndexQueue.Queue, types.IndexQueueType{
 				Price: price,
 				Fee:   fee,
 				Orderparams: &types.OrderParams{
@@ -122,41 +100,172 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 					OrderShares: shares,
 				},
 			})
+
+		} else {
+			tickIndex := -1
+			// Do a linear search over the queue to find the tick with the matching price + fee
+			for i, tick := range IndexQueue.Queue {
+				if tick.Price.Equal(price) && tick.Fee.Equal(fee) {
+					tickIndex = i
+					break
+				}
+			}
+			if tickIndex == -1 {
+				return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Tick not found in queue")
+			}
+
+			// Update the existing tick with the new amount
+			// Multiple deposits can go to the same tick
+			// Need to do this as tick mapping is not tied to an address/unique to a deposit
+			IndexQueue.Queue[tickIndex] = &types.IndexQueueType{
+				Price: price,
+				Fee:   fee,
+				Orderparams: &types.OrderParams{
+					OrderRule:   "",
+					OrderType:   msg.OrderType,
+					OrderShares: Tick.TotalShares.Add(shares),
+				},
+			}
+		}
+	}
+	//// Tick Logic
+	if !TickFound {
+
+		if msg.TokenDirection == token0 {
+			NewTick = types.Ticks{
+				Price:       msg.Price,
+				Fee:         msg.Fee,
+				OrderType:   msg.OrderType,
+				Reserve0:    amount,
+				Reserve1:    sdk.ZeroDec(),
+				PairPrice:   price,
+				PairFee:     fee,
+				TotalShares: shares,
+				Orderparams: &types.OrderParams{
+					OrderRule:   "",
+					OrderType:   msg.OrderType,
+					OrderShares: shares,
+				},
+			}
+
+			oldAmount = sdk.ZeroDec()
+		} else {
+			NewTick = types.Ticks{
+				Price:       msg.Price,
+				Fee:         msg.Fee,
+				OrderType:   msg.OrderType,
+				Reserve0:    sdk.ZeroDec(),
+				Reserve1:    amount,
+				PairPrice:   price,
+				PairFee:     fee,
+				TotalShares: shares,
+				Orderparams: &types.OrderParams{
+					OrderRule:   "",
+					OrderType:   msg.OrderType,
+					OrderShares: shares,
+				},
+			}
+			oldAmount = sdk.ZeroDec()
+		}
+
+	} else {
+		// If the tick is found, add it to the existing reserve for the tick storage
+
+		if msg.TokenDirection == token0 {
+			oldAmount = Tick.Reserve0
+			NewTick = types.Ticks{
+				Price:       msg.Price,
+				Fee:         msg.Fee,
+				OrderType:   msg.OrderType,
+				Reserve0:    Tick.Reserve0.Add(amount),
+				Reserve1:    Tick.Reserve1,
+				PairPrice:   price,
+				PairFee:     fee,
+				TotalShares: Tick.TotalShares.Add(shares),
+				Orderparams: &types.OrderParams{
+					OrderRule:   "",
+					OrderType:   msg.OrderType,
+					OrderShares: Tick.TotalShares.Add(shares),
+				},
+			}
+
+		} else {
+			oldAmount = Tick.Reserve1
+			NewTick = types.Ticks{
+				Price:       msg.Price,
+				Fee:         msg.Fee,
+				OrderType:   msg.OrderType,
+				Reserve0:    Tick.Reserve0,
+				Reserve1:    Tick.Reserve1.Add(amount),
+				PairPrice:   price,
+				PairFee:     fee,
+				TotalShares: Tick.TotalShares.Add(shares),
+				Orderparams: &types.OrderParams{
+					OrderRule:   "",
+					OrderType:   msg.OrderType,
+					OrderShares: Tick.TotalShares.Add(shares),
+				},
+			}
+		}
+
+	}
+
+	// Sending tokens from the user to the module, might be necessary to do this before the rest of logic to avoid reentrancy/failure attacks
+	if msg.TokenDirection == token0 {
+		if amount.GT(sdk.ZeroDec()) {
+			coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount.BigInt()))
+			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
+				return err
+			}
+		} else {
+			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Cannnot send zero amount")
+		}
+
+	} else {
+		if amount.GT(sdk.ZeroDec()) {
+			coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount.BigInt()))
+			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
+				return err
+			}
+		} else {
+			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Cannnot send zero amount")
 		}
 	}
 
-	k.SetPairs(ctx, types.Pairs{
+	k.SetTicks(ctx, token0, token1, NewTick)
+	k.SetIndexQueue(ctx, token0, token1, IndexQueue)
+
+	PairNew, PairFound := k.GetPairs(ctx, token0, token1)
+
+	NewPairs := types.Pairs{
 		Token0:       token0,
 		Token1:       token1,
-		TickSpacing:  PairOld.TickSpacing,
 		CurrentIndex: PairOld.CurrentIndex,
-		Tickmap:      PairOld.Tickmap,
-		IndexMap:     &IndexQueueOld,
-	},
-	)
+		TickSpacing:  PairOld.TickSpacing,
+		Tickmap:      PairNew.Tickmap,
+		IndexMap:     PairNew.IndexMap,
+	}
+
+	k.SetPairs(ctx, NewPairs)
+
+	ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator,
+		token0, token1, price.String(), fee.String(), msg.TokenDirection,
+		oldAmount.String(), oldAmount.Add(amount).String(),
+		sdk.NewAttribute(types.DepositEventSharesMinted, shares.String()),
+	))
 
 	return nil
+
 }
 
-// price is in terms of token1/token0, whereas for msg.Price we have no guarantees on whether tokenA == token0, so we need to use price
+// Can take amount or shares here, depends on what we want to calculate
 
-// Updates the internal data structs for withdraw operations
-func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 string, shares sdk.Dec, price sdk.Dec, msg *types.MsgRemoveLiquidity, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
+// Withdraws shares from given price, fee
+// Makes more sense, as calculating price & fee can be difficult
+func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, price sdk.Dec, msg *types.MsgRemoveLiquidity, callerAddr sdk.AccAddress, receiver sdk.AccAddress) error {
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	/*
-			1) Find Pair
-			   a) If pair exists, get the pair
-			   b) If pair does not exist, error
 
-			2) Find Tick
-		       a) If virtual price tick/index does not exist, exit
-			   b) If exists
-					i) Update tick (-= amount) in virtual_price_tick_list
-					ii) Subtract amount from existing tick in corresponding queue
-					iii) If tick cleared, uninitialize index in bitmap, remove from virtual_price_tick_list & remove from queue
-			3) Update Shares
-				i) TBD
-	*/
 	PairOld, PairFound := k.GetPairs(ctx, token0, token1)
 
 	if !PairFound {
@@ -169,62 +278,195 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
-	IndexQueueOld, IndexQueueFound := k.GetIndexQueue(ctx, token0, token1, msg.Index)
+	IndexQueue, IndexQueueFound := k.GetIndexQueue(ctx, token0, token1, msg.Index)
 
-	//FIX ME
-	if !IndexQueueFound {
-		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Cannot withdraw shares from a price/fee pair that does not exist")
+	// Tick from the tick store
+	Tick, TickFound := k.GetTicks(ctx, token0, token1, msg.Price, msg.Fee, msg.OrderType)
+
+	var NewTick types.Ticks
+	var oldAmount sdk.Dec //Event variable
+	var shares sdk.Dec
+
+	if msg.TokenDirection == token0 {
+		shares = amount.Mul(price.Mul(fee))
+	} else {
+		shares = amount.Mul(sdk.OneDec().Quo(fee))
+	}
+
+	// Index Queue Logic
+	removeTick := false
+	// Check if tick exists
+	if !IndexQueueFound || !TickFound {
+		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Can't withdraw liquidity from a tick that does not exist!", err)
 
 	} else {
-		TickIndexFound := -1
-		for i := 0; i < len(IndexQueueOld.Queue); i++ {
-			if IndexQueueOld.Queue[i].Price.Equal(price) && IndexQueueOld.Queue[i].Fee.Equal(fee) && IndexQueueOld.Queue[i].Orderparams.OrderType == msg.OrderType {
-				TickIndexFound = i
+
+		tickIndex := -1
+		// Do a linear search over the queue to find the tick with the matching price + fee
+		for i, tick := range IndexQueue.Queue {
+			if tick.Price.Equal(price) && tick.Fee.Equal(fee) {
+				tickIndex = i
 				break
 			}
 		}
+		if tickIndex == -1 {
+			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Tick not found in queue")
+		}
 
-		if TickIndexFound != -1 {
-			// Assumes we've already done pre-verification on the number of shares to withdraw & that the user
-			// If withdrawing more shares than available, this should be caught before this function is called
-			if IndexQueueOld.Queue[TickIndexFound].Orderparams.OrderShares.Sub(shares).Equal(sdk.ZeroDec()) {
-				// No simple way to remove element from queue, so we'll just set the tick to 0 & remove from list
-				tickToRemove := IndexQueueOld.Queue[TickIndexFound]
-				// Set this to empty for now
-				_ = tickToRemove
+		// Update the existing tick with the new amount
+		// Multiple deposits can go to the same tick
+		// Need to do this as tick mapping is not tied to an address/unique to a deposit
 
-				// Remove from queue
-				IndexQueueOld.Queue = append(IndexQueueOld.Queue[:TickIndexFound], IndexQueueOld.Queue[TickIndexFound+1:]...)
-			} else {
-				// Subtract respective shares from this tick
-				IndexQueueOld.Queue[TickIndexFound] = &types.IndexQueueType{
-					Price: price,
-					Fee:   fee,
-					Orderparams: &types.OrderParams{
-						OrderRule:   "",
-						OrderType:   msg.OrderType,
-						OrderShares: IndexQueueOld.Queue[TickIndexFound].Orderparams.OrderShares.Sub(shares),
-					},
-				}
+		if Tick.TotalShares.GT(shares) {
+			IndexQueue.Queue[tickIndex] = &types.IndexQueueType{
+				Price: price,
+				Fee:   fee,
+				Orderparams: &types.OrderParams{
+					OrderRule:   "",
+					OrderType:   msg.OrderType,
+					OrderShares: Tick.TotalShares.Sub(shares),
+				},
 			}
 		} else {
-			sdkerrors.Wrapf(types.ErrValidTickNotFound, "Valid tick not found in corresponding queue (index is incorrectly called)")
+			// We should confirm that shares matches the tick amount (to ensure we're not withdrawing more than we have)
+
+			if !Tick.TotalShares.Equal(shares) {
+				return sdkerrors.Wrapf(types.ErrNotEnoughShares, "Trying to withdraw more shares than available")
+			}
+			removeTick = true
+
+			// Remove tick from queue
+			IndexQueue.Queue = append(IndexQueue.Queue[:tickIndex], IndexQueue.Queue[tickIndex+1:]...)
+		}
+	}
+	//// Updating Tick Logic
+	if !TickFound {
+
+		if msg.TokenDirection == token0 {
+			NewTick = types.Ticks{
+				Price:       msg.Price,
+				Fee:         msg.Fee,
+				OrderType:   msg.OrderType,
+				Reserve0:    amount,
+				Reserve1:    sdk.ZeroDec(),
+				PairPrice:   price,
+				PairFee:     fee,
+				TotalShares: shares,
+				Orderparams: &types.OrderParams{
+					OrderRule:   "",
+					OrderType:   msg.OrderType,
+					OrderShares: shares,
+				},
+			}
+
+			oldAmount = sdk.ZeroDec()
+		} else {
+			NewTick = types.Ticks{
+				Price:       msg.Price,
+				Fee:         msg.Fee,
+				OrderType:   msg.OrderType,
+				Reserve0:    sdk.ZeroDec(),
+				Reserve1:    amount,
+				PairPrice:   price,
+				PairFee:     fee,
+				TotalShares: shares,
+				Orderparams: &types.OrderParams{
+					OrderRule:   "",
+					OrderType:   msg.OrderType,
+					OrderShares: shares,
+				},
+			}
+			oldAmount = sdk.ZeroDec()
+		}
+
+	} else {
+		// If the tick is found, add it to the existing reserve for the tick storage
+
+		if msg.TokenDirection == token0 {
+			oldAmount = Tick.Reserve0
+			NewTick = types.Ticks{
+				Price:       msg.Price,
+				Fee:         msg.Fee,
+				OrderType:   msg.OrderType,
+				Reserve0:    Tick.Reserve0.Add(amount),
+				Reserve1:    Tick.Reserve1,
+				PairPrice:   price,
+				PairFee:     fee,
+				TotalShares: Tick.TotalShares.Add(shares),
+				Orderparams: &types.OrderParams{
+					OrderRule:   "",
+					OrderType:   msg.OrderType,
+					OrderShares: Tick.TotalShares.Add(shares),
+				},
+			}
+
+		} else {
+			oldAmount = Tick.Reserve1
+			NewTick = types.Ticks{
+				Price:       msg.Price,
+				Fee:         msg.Fee,
+				OrderType:   msg.OrderType,
+				Reserve0:    Tick.Reserve0,
+				Reserve1:    Tick.Reserve1.Add(amount),
+				PairPrice:   price,
+				PairFee:     fee,
+				TotalShares: Tick.TotalShares.Add(shares),
+				Orderparams: &types.OrderParams{
+					OrderRule:   "",
+					OrderType:   msg.OrderType,
+					OrderShares: Tick.TotalShares.Add(shares),
+				},
+			}
+		}
+
+	}
+
+	// Sending tokens from the user to the module, might be necessary to do this before the rest of logic to avoid reentrancy/failure attacks
+	if msg.TokenDirection == token0 {
+		if amount.GT(sdk.ZeroDec()) {
+			coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount.BigInt()))
+			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
+				return err
+			}
+		} else {
+			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Cannnot send zero amount")
+		}
+
+	} else {
+		if amount.GT(sdk.ZeroDec()) {
+			coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount.BigInt()))
+			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
+				return err
+			}
+		} else {
+			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Cannnot send zero amount")
 		}
 	}
 
-	k.SetPairs(ctx, types.Pairs{
+	k.SetTicks(ctx, token0, token1, NewTick)
+	k.SetIndexQueue(ctx, token0, token1, IndexQueue)
+
+	PairNew, PairFound := k.GetPairs(ctx, token0, token1)
+
+	NewPairs := types.Pairs{
 		Token0:       token0,
 		Token1:       token1,
-		TickSpacing:  PairOld.TickSpacing,
 		CurrentIndex: PairOld.CurrentIndex,
-		Tickmap:      PairOld.Tickmap,
-		IndexMap:     &IndexQueueOld,
-	},
-	)
+		TickSpacing:  PairOld.TickSpacing,
+		Tickmap:      PairNew.Tickmap,
+		IndexMap:     PairNew.IndexMap,
+	}
+
+	k.SetPairs(ctx, NewPairs)
+
+	ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator,
+		token0, token1, price.String(), fee.String(), msg.TokenDirection,
+		oldAmount.String(), oldAmount.Add(amount).String(),
+		sdk.NewAttribute(types.DepositEventSharesMinted, shares.String()),
+	))
 
 	return nil
-	_ = ctx
-	return nil
+
 }
 
 // Need to figure out logic for route vs. swap

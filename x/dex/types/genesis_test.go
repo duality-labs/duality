@@ -22,15 +22,6 @@ func TestGenesisState_Validate(t *testing.T) {
 			desc: "valid genesis state",
 			genState: &types.GenesisState{
 
-				NodesList: []types.Nodes{
-					{
-						Id: 0,
-					},
-					{
-						Id: 1,
-					},
-				},
-				NodesCount: 2,
 				TicksList: []types.Ticks{
 					{
 						Price:     "0",
@@ -62,35 +53,19 @@ func TestGenesisState_Validate(t *testing.T) {
 						Index: 1,
 					},
 				},
+				NodesList: []types.Nodes{
+					{
+						Node:          "0",
+						OutgoingEdges: "0",
+					},
+					{
+						Node:          "1",
+						OutgoingEdges: "1",
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
-		},
-		{
-			desc: "duplicated nodes",
-			genState: &types.GenesisState{
-				NodesList: []types.Nodes{
-					{
-						Id: 0,
-					},
-					{
-						Id: 0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "invalid nodes count",
-			genState: &types.GenesisState{
-				NodesList: []types.Nodes{
-					{
-						Id: 1,
-					},
-				},
-				NodesCount: 0,
-			},
-			valid: false,
 		},
 
 		{
@@ -137,6 +112,22 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 					{
 						Index: 0,
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated nodes",
+			genState: &types.GenesisState{
+				NodesList: []types.Nodes{
+					{
+						Node:          "0",
+						OutgoingEdges: "0",
+					},
+					{
+						Node:          "0",
+						OutgoingEdges: "0",
 					},
 				},
 			},

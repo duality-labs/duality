@@ -37,6 +37,13 @@ export interface MsgCreatePair {
   creator: string;
   tokenA: string;
   tokenB: string;
+  tokenDirection: string;
+  index: number;
+  amount: string;
+  price: string;
+  fee: string;
+  orderType: string;
+  receiver: string;
 }
 
 export interface MsgCreatePairResponse {}
@@ -592,7 +599,18 @@ export const MsgRemoveLiquidityResponse = {
   },
 };
 
-const baseMsgCreatePair: object = { creator: "", tokenA: "", tokenB: "" };
+const baseMsgCreatePair: object = {
+  creator: "",
+  tokenA: "",
+  tokenB: "",
+  tokenDirection: "",
+  index: 0,
+  amount: "",
+  price: "",
+  fee: "",
+  orderType: "",
+  receiver: "",
+};
 
 export const MsgCreatePair = {
   encode(message: MsgCreatePair, writer: Writer = Writer.create()): Writer {
@@ -604,6 +622,27 @@ export const MsgCreatePair = {
     }
     if (message.tokenB !== "") {
       writer.uint32(26).string(message.tokenB);
+    }
+    if (message.tokenDirection !== "") {
+      writer.uint32(34).string(message.tokenDirection);
+    }
+    if (message.index !== 0) {
+      writer.uint32(40).int32(message.index);
+    }
+    if (message.amount !== "") {
+      writer.uint32(50).string(message.amount);
+    }
+    if (message.price !== "") {
+      writer.uint32(58).string(message.price);
+    }
+    if (message.fee !== "") {
+      writer.uint32(66).string(message.fee);
+    }
+    if (message.orderType !== "") {
+      writer.uint32(74).string(message.orderType);
+    }
+    if (message.receiver !== "") {
+      writer.uint32(82).string(message.receiver);
     }
     return writer;
   },
@@ -623,6 +662,27 @@ export const MsgCreatePair = {
           break;
         case 3:
           message.tokenB = reader.string();
+          break;
+        case 4:
+          message.tokenDirection = reader.string();
+          break;
+        case 5:
+          message.index = reader.int32();
+          break;
+        case 6:
+          message.amount = reader.string();
+          break;
+        case 7:
+          message.price = reader.string();
+          break;
+        case 8:
+          message.fee = reader.string();
+          break;
+        case 9:
+          message.orderType = reader.string();
+          break;
+        case 10:
+          message.receiver = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -649,6 +709,41 @@ export const MsgCreatePair = {
     } else {
       message.tokenB = "";
     }
+    if (object.tokenDirection !== undefined && object.tokenDirection !== null) {
+      message.tokenDirection = String(object.tokenDirection);
+    } else {
+      message.tokenDirection = "";
+    }
+    if (object.index !== undefined && object.index !== null) {
+      message.index = Number(object.index);
+    } else {
+      message.index = 0;
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = String(object.amount);
+    } else {
+      message.amount = "";
+    }
+    if (object.price !== undefined && object.price !== null) {
+      message.price = String(object.price);
+    } else {
+      message.price = "";
+    }
+    if (object.fee !== undefined && object.fee !== null) {
+      message.fee = String(object.fee);
+    } else {
+      message.fee = "";
+    }
+    if (object.orderType !== undefined && object.orderType !== null) {
+      message.orderType = String(object.orderType);
+    } else {
+      message.orderType = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = String(object.receiver);
+    } else {
+      message.receiver = "";
+    }
     return message;
   },
 
@@ -657,6 +752,14 @@ export const MsgCreatePair = {
     message.creator !== undefined && (obj.creator = message.creator);
     message.tokenA !== undefined && (obj.tokenA = message.tokenA);
     message.tokenB !== undefined && (obj.tokenB = message.tokenB);
+    message.tokenDirection !== undefined &&
+      (obj.tokenDirection = message.tokenDirection);
+    message.index !== undefined && (obj.index = message.index);
+    message.amount !== undefined && (obj.amount = message.amount);
+    message.price !== undefined && (obj.price = message.price);
+    message.fee !== undefined && (obj.fee = message.fee);
+    message.orderType !== undefined && (obj.orderType = message.orderType);
+    message.receiver !== undefined && (obj.receiver = message.receiver);
     return obj;
   },
 
@@ -676,6 +779,41 @@ export const MsgCreatePair = {
       message.tokenB = object.tokenB;
     } else {
       message.tokenB = "";
+    }
+    if (object.tokenDirection !== undefined && object.tokenDirection !== null) {
+      message.tokenDirection = object.tokenDirection;
+    } else {
+      message.tokenDirection = "";
+    }
+    if (object.index !== undefined && object.index !== null) {
+      message.index = object.index;
+    } else {
+      message.index = 0;
+    }
+    if (object.amount !== undefined && object.amount !== null) {
+      message.amount = object.amount;
+    } else {
+      message.amount = "";
+    }
+    if (object.price !== undefined && object.price !== null) {
+      message.price = object.price;
+    } else {
+      message.price = "";
+    }
+    if (object.fee !== undefined && object.fee !== null) {
+      message.fee = object.fee;
+    } else {
+      message.fee = "";
+    }
+    if (object.orderType !== undefined && object.orderType !== null) {
+      message.orderType = object.orderType;
+    } else {
+      message.orderType = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = object.receiver;
+    } else {
+      message.receiver = "";
     }
     return message;
   },

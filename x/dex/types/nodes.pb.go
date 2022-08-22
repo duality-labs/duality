@@ -23,8 +23,8 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type Nodes struct {
-	Id   uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Node *Node  `protobuf:"bytes,2,opt,name=node,proto3" json:"node,omitempty"`
+	Node          string   `protobuf:"bytes,1,opt,name=node,proto3" json:"node,omitempty"`
+	OutgoingEdges []string `protobuf:"bytes,2,rep,name=outgoingEdges,proto3" json:"outgoingEdges,omitempty"`
 }
 
 func (m *Nodes) Reset()         { *m = Nodes{} }
@@ -60,16 +60,16 @@ func (m *Nodes) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Nodes proto.InternalMessageInfo
 
-func (m *Nodes) GetId() uint64 {
-	if m != nil {
-		return m.Id
-	}
-	return 0
-}
-
-func (m *Nodes) GetNode() *Node {
+func (m *Nodes) GetNode() string {
 	if m != nil {
 		return m.Node
+	}
+	return ""
+}
+
+func (m *Nodes) GetOutgoingEdges() []string {
+	if m != nil {
+		return m.OutgoingEdges
 	}
 	return nil
 }
@@ -81,19 +81,19 @@ func init() {
 func init() { proto.RegisterFile("dex/nodes.proto", fileDescriptor_df7c99d9da136ca0) }
 
 var fileDescriptor_df7c99d9da136ca0 = []byte{
-	// 190 bytes of a gzipped FileDescriptorProto
+	// 185 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4f, 0x49, 0xad, 0xd0,
 	0xcf, 0xcb, 0x4f, 0x49, 0x2d, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x92, 0xca, 0xcb, 0x4c,
 	0xce, 0xc8, 0xcf, 0x49, 0x2c, 0x4e, 0xc9, 0x2f, 0x29, 0xce, 0xcf, 0xd1, 0x4b, 0x29, 0x4d, 0xcc,
-	0xc9, 0x2c, 0xa9, 0xd4, 0x4b, 0x49, 0xad, 0x90, 0xe2, 0x83, 0x29, 0x86, 0xa8, 0x55, 0xf2, 0xe5,
-	0x62, 0xf5, 0x03, 0x69, 0x15, 0xe2, 0xe3, 0x62, 0xca, 0x4c, 0x91, 0x60, 0x54, 0x60, 0xd4, 0x60,
-	0x09, 0x62, 0xca, 0x4c, 0x11, 0x32, 0xe1, 0x62, 0x01, 0x29, 0x93, 0x60, 0x52, 0x60, 0xd4, 0xe0,
-	0x36, 0x52, 0xd0, 0xc3, 0x6d, 0xa6, 0x1e, 0xc8, 0x80, 0x20, 0xb0, 0x6a, 0x27, 0xf7, 0x13, 0x8f,
-	0xe4, 0x18, 0x2f, 0x3c, 0x92, 0x63, 0x7c, 0xf0, 0x48, 0x8e, 0x71, 0xc2, 0x63, 0x39, 0x86, 0x0b,
-	0x8f, 0xe5, 0x18, 0x6e, 0x3c, 0x96, 0x63, 0x88, 0xd2, 0x4d, 0xcf, 0x2c, 0xc9, 0x28, 0x4d, 0xd2,
-	0x4b, 0xce, 0xcf, 0xd5, 0xf7, 0x83, 0x9a, 0xe5, 0x92, 0x5f, 0x12, 0x9c, 0x9f, 0xa3, 0x0f, 0x35,
-	0x4b, 0xbf, 0x42, 0x1f, 0xe4, 0xb8, 0x92, 0xca, 0x82, 0xd4, 0xe2, 0x24, 0x36, 0xb0, 0xf3, 0x8c,
-	0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0x71, 0x6a, 0x3a, 0x21, 0xdd, 0x00, 0x00, 0x00,
+	0xc9, 0x2c, 0xa9, 0xd4, 0x4b, 0x49, 0xad, 0x50, 0x72, 0xe4, 0x62, 0xf5, 0x03, 0x29, 0x15, 0x12,
+	0xe2, 0x62, 0x01, 0xe9, 0x91, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x02, 0xb3, 0x85, 0x54, 0xb8,
+	0x78, 0xf3, 0x4b, 0x4b, 0xd2, 0xf3, 0x33, 0xf3, 0xd2, 0x5d, 0x53, 0xd2, 0x53, 0x8b, 0x25, 0x98,
+	0x14, 0x98, 0x35, 0x38, 0x83, 0x50, 0x05, 0x9d, 0xdc, 0x4f, 0x3c, 0x92, 0x63, 0xbc, 0xf0, 0x48,
+	0x8e, 0xf1, 0xc1, 0x23, 0x39, 0xc6, 0x09, 0x8f, 0xe5, 0x18, 0x2e, 0x3c, 0x96, 0x63, 0xb8, 0xf1,
+	0x58, 0x8e, 0x21, 0x4a, 0x37, 0x3d, 0xb3, 0x24, 0xa3, 0x34, 0x49, 0x2f, 0x39, 0x3f, 0x57, 0xdf,
+	0x0f, 0xea, 0x06, 0x97, 0xfc, 0x92, 0xe0, 0xfc, 0x1c, 0x7d, 0xa8, 0x1b, 0xf4, 0x2b, 0xf4, 0x41,
+	0xae, 0x2d, 0xa9, 0x2c, 0x48, 0x2d, 0x4e, 0x62, 0x03, 0x3b, 0xd7, 0x18, 0x10, 0x00, 0x00, 0xff,
+	0xff, 0x7d, 0xd8, 0xfa, 0xfa, 0xc1, 0x00, 0x00, 0x00,
 }
 
 func (m *Nodes) Marshal() (dAtA []byte, err error) {
@@ -116,22 +116,21 @@ func (m *Nodes) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Node != nil {
-		{
-			size, err := m.Node.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintNodes(dAtA, i, uint64(size))
+	if len(m.OutgoingEdges) > 0 {
+		for iNdEx := len(m.OutgoingEdges) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.OutgoingEdges[iNdEx])
+			copy(dAtA[i:], m.OutgoingEdges[iNdEx])
+			i = encodeVarintNodes(dAtA, i, uint64(len(m.OutgoingEdges[iNdEx])))
+			i--
+			dAtA[i] = 0x12
 		}
-		i--
-		dAtA[i] = 0x12
 	}
-	if m.Id != 0 {
-		i = encodeVarintNodes(dAtA, i, uint64(m.Id))
+	if len(m.Node) > 0 {
+		i -= len(m.Node)
+		copy(dAtA[i:], m.Node)
+		i = encodeVarintNodes(dAtA, i, uint64(len(m.Node)))
 		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -153,12 +152,15 @@ func (m *Nodes) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Id != 0 {
-		n += 1 + sovNodes(uint64(m.Id))
-	}
-	if m.Node != nil {
-		l = m.Node.Size()
+	l = len(m.Node)
+	if l > 0 {
 		n += 1 + l + sovNodes(uint64(l))
+	}
+	if len(m.OutgoingEdges) > 0 {
+		for _, s := range m.OutgoingEdges {
+			l = len(s)
+			n += 1 + l + sovNodes(uint64(l))
+		}
 	}
 	return n
 }
@@ -199,29 +201,10 @@ func (m *Nodes) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
-			}
-			m.Id = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowNodes
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Id |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Node", wireType)
 			}
-			var msglen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowNodes
@@ -231,27 +214,55 @@ func (m *Nodes) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthNodes
 			}
-			postIndex := iNdEx + msglen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthNodes
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Node == nil {
-				m.Node = &Node{}
+			m.Node = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OutgoingEdges", wireType)
 			}
-			if err := m.Node.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowNodes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthNodes
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthNodes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OutgoingEdges = append(m.OutgoingEdges, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

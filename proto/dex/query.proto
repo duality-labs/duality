@@ -5,10 +5,10 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "dex/params.proto";
-import "dex/nodes.proto";
 import "dex/ticks.proto";
 import "dex/pairs.proto";
 import "dex/index_queue.proto";
+import "dex/nodes.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -19,21 +19,12 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/NicholasDotSol/duality/dex/params";
   }
-  // Queries a Nodes by id.
-	rpc Nodes(QueryGetNodesRequest) returns (QueryGetNodesResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/nodes/{id}";
-	}
-
-	// Queries a list of Nodes items.
-	rpc NodesAll(QueryAllNodesRequest) returns (QueryAllNodesResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/nodes";
-	}
 
 
 
 // Queries a Ticks by index.
 	rpc Ticks(QueryGetTicksRequest) returns (QueryGetTicksResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/ticks/{price}/{fee}/{direction}/{orderType}";
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/ticks/{price}/{fee}/{orderType}";
 	}
 
 	// Queries a list of Ticks items.
@@ -61,6 +52,16 @@ service Query {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/index_queue";
 	}
 
+// Queries a Nodes by index.
+	rpc Nodes(QueryGetNodesRequest) returns (QueryGetNodesResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/nodes/{node}/{outgoingEdges}";
+	}
+
+	// Queries a list of Nodes items.
+	rpc NodesAll(QueryAllNodesRequest) returns (QueryAllNodesResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/nodes";
+	}
+
 // this line is used by starport scaffolding # 2
 }
 
@@ -73,22 +74,6 @@ message QueryParamsResponse {
   Params params = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryGetNodesRequest {
-	uint64 id = 1;
-}
-
-message QueryGetNodesResponse {
-	Nodes Nodes = 1 [(gogoproto.nullable) = false];
-}
-
-message QueryAllNodesRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
-}
-
-message QueryAllNodesResponse {
-	repeated Nodes Nodes = 1 [(gogoproto.nullable) = false];
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
-}
 
 
 
@@ -97,8 +82,7 @@ message QueryGetTicksRequest {
   string token1 = 2;
   string price = 3;
   string fee = 4;
-  string direction = 5;
-  string orderType = 6;
+  string orderType = 5;
   
 
 }
@@ -152,6 +136,25 @@ message QueryAllIndexQueueRequest {
 
 message QueryAllIndexQueueResponse {
 	repeated IndexQueue indexQueue = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetNodesRequest {
+	  string node = 1;
+  string outgoingEdges = 2;
+
+}
+
+message QueryGetNodesResponse {
+	Nodes nodes = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllNodesRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllNodesResponse {
+	repeated Nodes nodes = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
