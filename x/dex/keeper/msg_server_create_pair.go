@@ -30,6 +30,7 @@ func (k msgServer) CreatePair(goCtx context.Context, msg *types.MsgCreatePair) (
 	}
 
 	pair, pairFound := k.GetPairs(ctx, token0, token1)
+	_ = pair
 
 	if pairFound {
 		sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair has already been initialized")
@@ -45,7 +46,27 @@ func (k msgServer) CreatePair(goCtx context.Context, msg *types.MsgCreatePair) (
 		IndexMap:     nil,
 	})
 
-	_ = pair
+	// Get and Set Node for Token0
+	NodeToken0, NodeToken0Found := k.GetNodes(ctx, token0)
+
+	if NodeToken0Found {
+		NodeToken0.OutgoingEdges = append(NodeToken0.OutgoingEdges, token1)
+	} else {
+		NodeToken0.OutgoingEdges = []string{token1}
+	}
+
+	k.SetNodes(ctx, types.Nodes{token0, NodeToken0.OutgoingEdges})
+
+	// Get and Set Node for Token1
+	NodeToken1, NodeToken1Found := k.GetNodes(ctx, token1)
+
+	if NodeToken1Found {
+		NodeToken1.OutgoingEdges = append(NodeToken1.OutgoingEdges, token0)
+	} else {
+		NodeToken1.OutgoingEdges = []string{token0}
+	}
+
+	k.SetNodes(ctx, types.Nodes{token1, NodeToken1.OutgoingEdges})
 
 	err = k.SingleDeposit(goCtx, token0, token1, amounts, price, msgAddLP, callerAdr, receiverAdr)
 
