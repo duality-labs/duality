@@ -46,21 +46,23 @@ func CmdShowTicks() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "show-ticks [price] [fee] [direction] [order-type]",
 		Short: "shows a ticks",
-		Args:  cobra.ExactArgs(4),
+		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			argPrice := args[0]
-			argFee := args[1]
-			argDirection := args[2]
-			argOrderType := args[3]
+			argToken0 := args[0]
+			argToken1 := args[1]
+			argPrice := args[2]
+			argFee := args[3]
+			argOrderType := args[4]
 
 			params := &types.QueryGetTicksRequest{
+				Token0:    argToken0,
+				Token1:    argToken1,
 				Price:     argPrice,
 				Fee:       argFee,
-				Direction: argDirection,
 				OrderType: argOrderType,
 			}
 

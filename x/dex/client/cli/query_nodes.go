@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -13,7 +12,7 @@ import (
 func CmdListNodes() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-nodes",
-		Short: "list all Nodes",
+		Short: "list all nodes",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -45,21 +44,20 @@ func CmdListNodes() *cobra.Command {
 
 func CmdShowNodes() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-nodes [id]",
-		Short: "shows a Nodes",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Use:   "show-nodes [node] [outgoing-edges]",
+		Short: "shows a nodes",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			id, err := strconv.ParseUint(args[0], 10, 64)
-			if err != nil {
-				return err
-			}
+			argNode := args[0]
+			argOutgoingEdges := args[1]
 
 			params := &types.QueryGetNodesRequest{
-				Id: id,
+				Node:          argNode,
+				OutgoingEdges: argOutgoingEdges,
 			}
 
 			res, err := queryClient.Nodes(context.Background(), params)

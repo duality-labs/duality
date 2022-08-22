@@ -29,15 +29,9 @@ export type DexMsgRemoveLiquidityResponse = object;
 
 export type DexMsgSwapResponse = object;
 
-export interface DexNode {
-  token?: string;
-  outgoingEdges?: string[];
-}
-
 export interface DexNodes {
-  /** @format uint64 */
-  id?: string;
-  node?: DexNode;
+  node?: string;
+  outgoingEdges?: string;
 }
 
 export interface DexOrderParams {
@@ -80,7 +74,7 @@ export interface DexQueryAllIndexQueueResponse {
 }
 
 export interface DexQueryAllNodesResponse {
-  Nodes?: DexNodes[];
+  nodes?: DexNodes[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -129,7 +123,7 @@ export interface DexQueryGetIndexQueueResponse {
 }
 
 export interface DexQueryGetNodesResponse {
-  Nodes?: DexNodes;
+  nodes?: DexNodes;
 }
 
 export interface DexQueryGetPairsResponse {
@@ -208,6 +202,13 @@ export interface V1Beta1PageRequest {
    * is set.
    */
   count_total?: boolean;
+
+  /**
+   * reverse is set to true if results are to be returned in the descending order.
+   *
+   * Since: cosmos-sdk 0.43
+   */
+  reverse?: boolean;
 }
 
 /**
@@ -437,6 +438,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -479,6 +481,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -495,12 +498,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    *
    * @tags Query
    * @name QueryNodes
-   * @summary Queries a Nodes by id.
-   * @request GET:/NicholasDotSol/duality/dex/nodes/{id}
+   * @summary Queries a Nodes by index.
+   * @request GET:/NicholasDotSol/duality/dex/nodes/{node}/{outgoingEdges}
    */
-  queryNodes = (id: string, params: RequestParams = {}) =>
+  queryNodes = (node: string, outgoingEdges: string, params: RequestParams = {}) =>
     this.request<DexQueryGetNodesResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/nodes/${id}`,
+      path: `/NicholasDotSol/duality/dex/nodes/${node}/${outgoingEdges}`,
       method: "GET",
       format: "json",
       ...params,
@@ -520,6 +523,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -577,6 +581,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -594,18 +599,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @tags Query
    * @name QueryTicks
    * @summary Queries a Ticks by index.
-   * @request GET:/NicholasDotSol/duality/dex/ticks/{price}/{fee}/{direction}/{orderType}
+   * @request GET:/NicholasDotSol/duality/dex/ticks/{price}/{fee}/{orderType}
    */
   queryTicks = (
     price: string,
     fee: string,
-    direction: string,
     orderType: string,
     query?: { token0?: string; token1?: string },
     params: RequestParams = {},
   ) =>
     this.request<DexQueryGetTicksResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/ticks/${price}/${fee}/${direction}/${orderType}`,
+      path: `/NicholasDotSol/duality/dex/ticks/${price}/${fee}/${orderType}`,
       method: "GET",
       query: query,
       format: "json",

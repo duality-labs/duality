@@ -1,15 +1,14 @@
 /* eslint-disable */
-import { Reader, util, configure, Writer } from "protobufjs/minimal";
-import * as Long from "long";
+import { Reader, Writer } from "protobufjs/minimal";
 import { Params } from "../dex/params";
-import { Nodes } from "../dex/nodes";
+import { Ticks } from "../dex/ticks";
 import {
   PageRequest,
   PageResponse,
 } from "../cosmos/base/query/v1beta1/pagination";
-import { Ticks } from "../dex/ticks";
 import { Pairs } from "../dex/pairs";
 import { IndexQueue } from "../dex/index_queue";
+import { Nodes } from "../dex/nodes";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -22,29 +21,11 @@ export interface QueryParamsResponse {
   params: Params | undefined;
 }
 
-export interface QueryGetNodesRequest {
-  id: number;
-}
-
-export interface QueryGetNodesResponse {
-  Nodes: Nodes | undefined;
-}
-
-export interface QueryAllNodesRequest {
-  pagination: PageRequest | undefined;
-}
-
-export interface QueryAllNodesResponse {
-  Nodes: Nodes[];
-  pagination: PageResponse | undefined;
-}
-
 export interface QueryGetTicksRequest {
   token0: string;
   token1: string;
   price: string;
   fee: string;
-  direction: string;
   orderType: string;
 }
 
@@ -95,6 +76,24 @@ export interface QueryAllIndexQueueRequest {
 
 export interface QueryAllIndexQueueResponse {
   indexQueue: IndexQueue[];
+  pagination: PageResponse | undefined;
+}
+
+export interface QueryGetNodesRequest {
+  node: string;
+  outgoingEdges: string;
+}
+
+export interface QueryGetNodesResponse {
+  nodes: Nodes | undefined;
+}
+
+export interface QueryAllNodesRequest {
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryAllNodesResponse {
+  nodes: Nodes[];
   pagination: PageResponse | undefined;
 }
 
@@ -195,282 +194,11 @@ export const QueryParamsResponse = {
   },
 };
 
-const baseQueryGetNodesRequest: object = { id: 0 };
-
-export const QueryGetNodesRequest = {
-  encode(
-    message: QueryGetNodesRequest,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.id !== 0) {
-      writer.uint32(8).uint64(message.id);
-    }
-    return writer;
-  },
-
-  decode(input: Reader | Uint8Array, length?: number): QueryGetNodesRequest {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseQueryGetNodesRequest } as QueryGetNodesRequest;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.id = longToNumber(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryGetNodesRequest {
-    const message = { ...baseQueryGetNodesRequest } as QueryGetNodesRequest;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = Number(object.id);
-    } else {
-      message.id = 0;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryGetNodesRequest): unknown {
-    const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<QueryGetNodesRequest>): QueryGetNodesRequest {
-    const message = { ...baseQueryGetNodesRequest } as QueryGetNodesRequest;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id;
-    } else {
-      message.id = 0;
-    }
-    return message;
-  },
-};
-
-const baseQueryGetNodesResponse: object = {};
-
-export const QueryGetNodesResponse = {
-  encode(
-    message: QueryGetNodesResponse,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.Nodes !== undefined) {
-      Nodes.encode(message.Nodes, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: Reader | Uint8Array, length?: number): QueryGetNodesResponse {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseQueryGetNodesResponse } as QueryGetNodesResponse;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.Nodes = Nodes.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryGetNodesResponse {
-    const message = { ...baseQueryGetNodesResponse } as QueryGetNodesResponse;
-    if (object.Nodes !== undefined && object.Nodes !== null) {
-      message.Nodes = Nodes.fromJSON(object.Nodes);
-    } else {
-      message.Nodes = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryGetNodesResponse): unknown {
-    const obj: any = {};
-    message.Nodes !== undefined &&
-      (obj.Nodes = message.Nodes ? Nodes.toJSON(message.Nodes) : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryGetNodesResponse>
-  ): QueryGetNodesResponse {
-    const message = { ...baseQueryGetNodesResponse } as QueryGetNodesResponse;
-    if (object.Nodes !== undefined && object.Nodes !== null) {
-      message.Nodes = Nodes.fromPartial(object.Nodes);
-    } else {
-      message.Nodes = undefined;
-    }
-    return message;
-  },
-};
-
-const baseQueryAllNodesRequest: object = {};
-
-export const QueryAllNodesRequest = {
-  encode(
-    message: QueryAllNodesRequest,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.pagination !== undefined) {
-      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: Reader | Uint8Array, length?: number): QueryAllNodesRequest {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseQueryAllNodesRequest } as QueryAllNodesRequest;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.pagination = PageRequest.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryAllNodesRequest {
-    const message = { ...baseQueryAllNodesRequest } as QueryAllNodesRequest;
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromJSON(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryAllNodesRequest): unknown {
-    const obj: any = {};
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination
-        ? PageRequest.toJSON(message.pagination)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<QueryAllNodesRequest>): QueryAllNodesRequest {
-    const message = { ...baseQueryAllNodesRequest } as QueryAllNodesRequest;
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromPartial(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-};
-
-const baseQueryAllNodesResponse: object = {};
-
-export const QueryAllNodesResponse = {
-  encode(
-    message: QueryAllNodesResponse,
-    writer: Writer = Writer.create()
-  ): Writer {
-    for (const v of message.Nodes) {
-      Nodes.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.pagination !== undefined) {
-      PageResponse.encode(
-        message.pagination,
-        writer.uint32(18).fork()
-      ).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: Reader | Uint8Array, length?: number): QueryAllNodesResponse {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseQueryAllNodesResponse } as QueryAllNodesResponse;
-    message.Nodes = [];
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.Nodes.push(Nodes.decode(reader, reader.uint32()));
-          break;
-        case 2:
-          message.pagination = PageResponse.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryAllNodesResponse {
-    const message = { ...baseQueryAllNodesResponse } as QueryAllNodesResponse;
-    message.Nodes = [];
-    if (object.Nodes !== undefined && object.Nodes !== null) {
-      for (const e of object.Nodes) {
-        message.Nodes.push(Nodes.fromJSON(e));
-      }
-    }
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromJSON(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryAllNodesResponse): unknown {
-    const obj: any = {};
-    if (message.Nodes) {
-      obj.Nodes = message.Nodes.map((e) => (e ? Nodes.toJSON(e) : undefined));
-    } else {
-      obj.Nodes = [];
-    }
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination
-        ? PageResponse.toJSON(message.pagination)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryAllNodesResponse>
-  ): QueryAllNodesResponse {
-    const message = { ...baseQueryAllNodesResponse } as QueryAllNodesResponse;
-    message.Nodes = [];
-    if (object.Nodes !== undefined && object.Nodes !== null) {
-      for (const e of object.Nodes) {
-        message.Nodes.push(Nodes.fromPartial(e));
-      }
-    }
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromPartial(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-};
-
 const baseQueryGetTicksRequest: object = {
   token0: "",
   token1: "",
   price: "",
   fee: "",
-  direction: "",
   orderType: "",
 };
 
@@ -491,11 +219,8 @@ export const QueryGetTicksRequest = {
     if (message.fee !== "") {
       writer.uint32(34).string(message.fee);
     }
-    if (message.direction !== "") {
-      writer.uint32(42).string(message.direction);
-    }
     if (message.orderType !== "") {
-      writer.uint32(50).string(message.orderType);
+      writer.uint32(42).string(message.orderType);
     }
     return writer;
   },
@@ -520,9 +245,6 @@ export const QueryGetTicksRequest = {
           message.fee = reader.string();
           break;
         case 5:
-          message.direction = reader.string();
-          break;
-        case 6:
           message.orderType = reader.string();
           break;
         default:
@@ -555,11 +277,6 @@ export const QueryGetTicksRequest = {
     } else {
       message.fee = "";
     }
-    if (object.direction !== undefined && object.direction !== null) {
-      message.direction = String(object.direction);
-    } else {
-      message.direction = "";
-    }
     if (object.orderType !== undefined && object.orderType !== null) {
       message.orderType = String(object.orderType);
     } else {
@@ -574,7 +291,6 @@ export const QueryGetTicksRequest = {
     message.token1 !== undefined && (obj.token1 = message.token1);
     message.price !== undefined && (obj.price = message.price);
     message.fee !== undefined && (obj.fee = message.fee);
-    message.direction !== undefined && (obj.direction = message.direction);
     message.orderType !== undefined && (obj.orderType = message.orderType);
     return obj;
   },
@@ -600,11 +316,6 @@ export const QueryGetTicksRequest = {
       message.fee = object.fee;
     } else {
       message.fee = "";
-    }
-    if (object.direction !== undefined && object.direction !== null) {
-      message.direction = object.direction;
-    } else {
-      message.direction = "";
     }
     if (object.orderType !== undefined && object.orderType !== null) {
       message.orderType = object.orderType;
@@ -1466,14 +1177,298 @@ export const QueryAllIndexQueueResponse = {
   },
 };
 
+const baseQueryGetNodesRequest: object = { node: "", outgoingEdges: "" };
+
+export const QueryGetNodesRequest = {
+  encode(
+    message: QueryGetNodesRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.node !== "") {
+      writer.uint32(10).string(message.node);
+    }
+    if (message.outgoingEdges !== "") {
+      writer.uint32(18).string(message.outgoingEdges);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryGetNodesRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGetNodesRequest } as QueryGetNodesRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.node = reader.string();
+          break;
+        case 2:
+          message.outgoingEdges = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetNodesRequest {
+    const message = { ...baseQueryGetNodesRequest } as QueryGetNodesRequest;
+    if (object.node !== undefined && object.node !== null) {
+      message.node = String(object.node);
+    } else {
+      message.node = "";
+    }
+    if (object.outgoingEdges !== undefined && object.outgoingEdges !== null) {
+      message.outgoingEdges = String(object.outgoingEdges);
+    } else {
+      message.outgoingEdges = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetNodesRequest): unknown {
+    const obj: any = {};
+    message.node !== undefined && (obj.node = message.node);
+    message.outgoingEdges !== undefined &&
+      (obj.outgoingEdges = message.outgoingEdges);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryGetNodesRequest>): QueryGetNodesRequest {
+    const message = { ...baseQueryGetNodesRequest } as QueryGetNodesRequest;
+    if (object.node !== undefined && object.node !== null) {
+      message.node = object.node;
+    } else {
+      message.node = "";
+    }
+    if (object.outgoingEdges !== undefined && object.outgoingEdges !== null) {
+      message.outgoingEdges = object.outgoingEdges;
+    } else {
+      message.outgoingEdges = "";
+    }
+    return message;
+  },
+};
+
+const baseQueryGetNodesResponse: object = {};
+
+export const QueryGetNodesResponse = {
+  encode(
+    message: QueryGetNodesResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.nodes !== undefined) {
+      Nodes.encode(message.nodes, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryGetNodesResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGetNodesResponse } as QueryGetNodesResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.nodes = Nodes.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetNodesResponse {
+    const message = { ...baseQueryGetNodesResponse } as QueryGetNodesResponse;
+    if (object.nodes !== undefined && object.nodes !== null) {
+      message.nodes = Nodes.fromJSON(object.nodes);
+    } else {
+      message.nodes = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetNodesResponse): unknown {
+    const obj: any = {};
+    message.nodes !== undefined &&
+      (obj.nodes = message.nodes ? Nodes.toJSON(message.nodes) : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetNodesResponse>
+  ): QueryGetNodesResponse {
+    const message = { ...baseQueryGetNodesResponse } as QueryGetNodesResponse;
+    if (object.nodes !== undefined && object.nodes !== null) {
+      message.nodes = Nodes.fromPartial(object.nodes);
+    } else {
+      message.nodes = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllNodesRequest: object = {};
+
+export const QueryAllNodesRequest = {
+  encode(
+    message: QueryAllNodesRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryAllNodesRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryAllNodesRequest } as QueryAllNodesRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllNodesRequest {
+    const message = { ...baseQueryAllNodesRequest } as QueryAllNodesRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllNodesRequest): unknown {
+    const obj: any = {};
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageRequest.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryAllNodesRequest>): QueryAllNodesRequest {
+    const message = { ...baseQueryAllNodesRequest } as QueryAllNodesRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllNodesResponse: object = {};
+
+export const QueryAllNodesResponse = {
+  encode(
+    message: QueryAllNodesResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    for (const v of message.nodes) {
+      Nodes.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(
+        message.pagination,
+        writer.uint32(18).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryAllNodesResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryAllNodesResponse } as QueryAllNodesResponse;
+    message.nodes = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.nodes.push(Nodes.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllNodesResponse {
+    const message = { ...baseQueryAllNodesResponse } as QueryAllNodesResponse;
+    message.nodes = [];
+    if (object.nodes !== undefined && object.nodes !== null) {
+      for (const e of object.nodes) {
+        message.nodes.push(Nodes.fromJSON(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllNodesResponse): unknown {
+    const obj: any = {};
+    if (message.nodes) {
+      obj.nodes = message.nodes.map((e) => (e ? Nodes.toJSON(e) : undefined));
+    } else {
+      obj.nodes = [];
+    }
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageResponse.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryAllNodesResponse>
+  ): QueryAllNodesResponse {
+    const message = { ...baseQueryAllNodesResponse } as QueryAllNodesResponse;
+    message.nodes = [];
+    if (object.nodes !== undefined && object.nodes !== null) {
+      for (const e of object.nodes) {
+        message.nodes.push(Nodes.fromPartial(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
-  /** Queries a Nodes by id. */
-  Nodes(request: QueryGetNodesRequest): Promise<QueryGetNodesResponse>;
-  /** Queries a list of Nodes items. */
-  NodesAll(request: QueryAllNodesRequest): Promise<QueryAllNodesResponse>;
   /** Queries a Ticks by index. */
   Ticks(request: QueryGetTicksRequest): Promise<QueryGetTicksResponse>;
   /** Queries a list of Ticks items. */
@@ -1490,6 +1485,10 @@ export interface Query {
   IndexQueueAll(
     request: QueryAllIndexQueueRequest
   ): Promise<QueryAllIndexQueueResponse>;
+  /** Queries a Nodes by index. */
+  Nodes(request: QueryGetNodesRequest): Promise<QueryGetNodesResponse>;
+  /** Queries a list of Nodes items. */
+  NodesAll(request: QueryAllNodesRequest): Promise<QueryAllNodesResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -1505,30 +1504,6 @@ export class QueryClientImpl implements Query {
       data
     );
     return promise.then((data) => QueryParamsResponse.decode(new Reader(data)));
-  }
-
-  Nodes(request: QueryGetNodesRequest): Promise<QueryGetNodesResponse> {
-    const data = QueryGetNodesRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      "nicholasdotsol.duality.dex.Query",
-      "Nodes",
-      data
-    );
-    return promise.then((data) =>
-      QueryGetNodesResponse.decode(new Reader(data))
-    );
-  }
-
-  NodesAll(request: QueryAllNodesRequest): Promise<QueryAllNodesResponse> {
-    const data = QueryAllNodesRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      "nicholasdotsol.duality.dex.Query",
-      "NodesAll",
-      data
-    );
-    return promise.then((data) =>
-      QueryAllNodesResponse.decode(new Reader(data))
-    );
   }
 
   Ticks(request: QueryGetTicksRequest): Promise<QueryGetTicksResponse> {
@@ -1606,6 +1581,30 @@ export class QueryClientImpl implements Query {
       QueryAllIndexQueueResponse.decode(new Reader(data))
     );
   }
+
+  Nodes(request: QueryGetNodesRequest): Promise<QueryGetNodesResponse> {
+    const data = QueryGetNodesRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "Nodes",
+      data
+    );
+    return promise.then((data) =>
+      QueryGetNodesResponse.decode(new Reader(data))
+    );
+  }
+
+  NodesAll(request: QueryAllNodesRequest): Promise<QueryAllNodesResponse> {
+    const data = QueryAllNodesRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "NodesAll",
+      data
+    );
+    return promise.then((data) =>
+      QueryAllNodesResponse.decode(new Reader(data))
+    );
+  }
 }
 
 interface Rpc {
@@ -1615,16 +1614,6 @@ interface Rpc {
     data: Uint8Array
   ): Promise<Uint8Array>;
 }
-
-declare var self: any | undefined;
-declare var window: any | undefined;
-var globalThis: any = (() => {
-  if (typeof globalThis !== "undefined") return globalThis;
-  if (typeof self !== "undefined") return self;
-  if (typeof window !== "undefined") return window;
-  if (typeof global !== "undefined") return global;
-  throw "Unable to locate global object";
-})();
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 export type DeepPartial<T> = T extends Builtin
@@ -1636,15 +1625,3 @@ export type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
-
-function longToNumber(long: Long): number {
-  if (long.gt(Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  return long.toNumber();
-}
-
-if (util.Long !== Long) {
-  util.Long = Long as any;
-  configure();
-}

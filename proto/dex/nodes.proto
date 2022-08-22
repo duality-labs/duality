@@ -1,0 +1,11 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+
+message Nodes {
+  string node = 1; 
+  repeated string outgoingEdges = 2; 
+  
+}
+

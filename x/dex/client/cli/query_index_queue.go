@@ -45,7 +45,7 @@ func CmdListIndexQueue() *cobra.Command {
 
 func CmdShowIndexQueue() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-virtual-price-queue [v-price] [direction] [order-type]",
+		Use:   "show-virtual-price-queue  [token0] [token1] [v-price] ",
 		Short: "shows a IndexQueue",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -53,6 +53,8 @@ func CmdShowIndexQueue() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
+			token0 := args[0]
+			token1 := args[1]
 			i, err := strconv.ParseInt(args[0], 10, 32)
 
 			if err != nil {
@@ -60,7 +62,9 @@ func CmdShowIndexQueue() *cobra.Command {
 			}
 
 			params := &types.QueryGetIndexQueueRequest{
-				Index: int32(i),
+				Token0: token0,
+				Token1: token1,
+				Index:  int32(i),
 			}
 
 			res, err := queryClient.IndexQueue(context.Background(), params)

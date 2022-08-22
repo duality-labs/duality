@@ -8,6 +8,7 @@ import "dex/params.proto";
 import "dex/ticks.proto";
 import "dex/pairs.proto";
 import "dex/index_queue.proto";
+import "dex/nodes.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -49,6 +50,16 @@ service Query {
 	// Queries a list of IndexQueue items.
 	rpc IndexQueueAll(QueryAllIndexQueueRequest) returns (QueryAllIndexQueueResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/index_queue";
+	}
+
+// Queries a Nodes by index.
+	rpc Nodes(QueryGetNodesRequest) returns (QueryGetNodesResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/nodes/{node}/{outgoingEdges}";
+	}
+
+	// Queries a list of Nodes items.
+	rpc NodesAll(QueryAllNodesRequest) returns (QueryAllNodesResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/nodes";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -125,6 +136,25 @@ message QueryAllIndexQueueRequest {
 
 message QueryAllIndexQueueResponse {
 	repeated IndexQueue indexQueue = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetNodesRequest {
+	  string node = 1;
+  string outgoingEdges = 2;
+
+}
+
+message QueryGetNodesResponse {
+	Nodes nodes = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllNodesRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllNodesResponse {
+	repeated Nodes nodes = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
