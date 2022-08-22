@@ -9,13 +9,6 @@ import (
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
-	// Set all the nodes
-	for _, elem := range genState.NodesList {
-		k.SetNodes(ctx, elem)
-	}
-
-	// Set nodes count
-	k.SetNodesCount(ctx, genState.NodesCount)
 
 	// Set all the pairs
 	for _, elem := range genState.PairsList {
@@ -41,9 +34,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
 	genesis.Params = k.GetParams(ctx)
-
-	genesis.NodesList = k.GetAllNodes(ctx)
-	genesis.NodesCount = k.GetNodesCount(ctx)
 	genesis.TicksList = k.GetAllTicks(ctx)
 	genesis.PairsList = k.GetAllPairs(ctx)
 	genesis.IndexQueueList = k.GetAllIndexQueue(ctx)
