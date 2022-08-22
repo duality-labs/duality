@@ -97,7 +97,6 @@ message QueryGetTicksRequest {
   string token1 = 2;
   string price = 3;
   string fee = 4;
-  string direction = 5;
   string orderType = 6;
   
 
