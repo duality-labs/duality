@@ -80,18 +80,18 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 				},
 			})
 
-		} else {
+		} //else {
 
-			IndexQueue.Queue = k.enqueue(ctx, IndexQueue.Queue, types.IndexQueueType{
-				Price: price,
-				Fee:   fee,
-				Orderparams: &types.OrderParams{
-					OrderRule:   "",
-					OrderType:   msg.OrderType,
-					OrderShares: Tick.TotalShares.Add(shares),
-				},
-			})
-		}
+		// 	IndexQueue.Queue = k.enqueue(ctx, IndexQueue.Queue, types.IndexQueueType{
+		// 		Price: price,
+		// 		Fee:   fee,
+		// 		Orderparams: &types.OrderParams{
+		// 			OrderRule:   "",
+		// 			OrderType:   msg.OrderType,
+		// 			OrderShares: Tick.TotalShares.Add(shares),
+		// 		},
+		// 	})
+		// }
 	}
 	//// Tick Logic
 	if !TickFound {
