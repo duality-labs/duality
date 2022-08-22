@@ -31,24 +31,21 @@ func TestNodesQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetNodesRequest{
-				Node:          msgs[0].Node,
-				OutgoingEdges: msgs[0].OutgoingEdges,
+				Node: msgs[0].Node,
 			},
 			response: &types.QueryGetNodesResponse{Nodes: msgs[0]},
 		},
 		{
 			desc: "Second",
 			request: &types.QueryGetNodesRequest{
-				Node:          msgs[1].Node,
-				OutgoingEdges: msgs[1].OutgoingEdges,
+				Node: msgs[1].Node,
 			},
 			response: &types.QueryGetNodesResponse{Nodes: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetNodesRequest{
-				Node:          strconv.Itoa(100000),
-				OutgoingEdges: strconv.Itoa(100000),
+				Node: strconv.Itoa(100000),
 			},
 			err: status.Error(codes.NotFound, "not found"),
 		},

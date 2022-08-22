@@ -44,20 +44,18 @@ func CmdListNodes() *cobra.Command {
 
 func CmdShowNodes() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-nodes [node] [outgoing-edges]",
+		Use:   "show-nodes [node] ",
 		Short: "shows a nodes",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			queryClient := types.NewQueryClient(clientCtx)
 
 			argNode := args[0]
-			argOutgoingEdges := args[1]
 
 			params := &types.QueryGetNodesRequest{
-				Node:          argNode,
-				OutgoingEdges: argOutgoingEdges,
+				Node: argNode,
 			}
 
 			res, err := queryClient.Nodes(context.Background(), params)

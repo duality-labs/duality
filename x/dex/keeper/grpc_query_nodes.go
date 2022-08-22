@@ -48,7 +48,6 @@ func (k Keeper) Nodes(c context.Context, req *types.QueryGetNodesRequest) (*type
 	val, found := k.GetNodes(
 		ctx,
 		req.Node,
-		req.OutgoingEdges,
 	)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")

@@ -19,7 +19,6 @@ func createNNodes(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Nodes {
 	items := make([]types.Nodes, n)
 	for i := range items {
 		items[i].Node = strconv.Itoa(i)
-		items[i].OutgoingEdges = strconv.Itoa(i)
 
 		keeper.SetNodes(ctx, items[i])
 	}
@@ -32,7 +31,6 @@ func TestNodesGet(t *testing.T) {
 	for _, item := range items {
 		rst, found := keeper.GetNodes(ctx,
 			item.Node,
-			item.OutgoingEdges,
 		)
 		require.True(t, found)
 		require.Equal(t,
@@ -47,11 +45,9 @@ func TestNodesRemove(t *testing.T) {
 	for _, item := range items {
 		keeper.RemoveNodes(ctx,
 			item.Node,
-			item.OutgoingEdges,
 		)
 		_, found := keeper.GetNodes(ctx,
 			item.Node,
-			item.OutgoingEdges,
 		)
 		require.False(t, found)
 	}

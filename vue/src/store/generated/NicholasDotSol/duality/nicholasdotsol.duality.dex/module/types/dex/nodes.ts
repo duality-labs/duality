@@ -5,7 +5,7 @@ export const protobufPackage = "nicholasdotsol.duality.dex";
 
 export interface Nodes {
   node: string;
-  outgoingEdges: string;
+  outgoingEdges: string[];
 }
 
 const baseNodes: object = { node: "", outgoingEdges: "" };
@@ -15,8 +15,8 @@ export const Nodes = {
     if (message.node !== "") {
       writer.uint32(10).string(message.node);
     }
-    if (message.outgoingEdges !== "") {
-      writer.uint32(18).string(message.outgoingEdges);
+    for (const v of message.outgoingEdges) {
+      writer.uint32(18).string(v!);
     }
     return writer;
   },
@@ -25,6 +25,7 @@ export const Nodes = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseNodes } as Nodes;
+    message.outgoingEdges = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -32,7 +33,7 @@ export const Nodes = {
           message.node = reader.string();
           break;
         case 2:
-          message.outgoingEdges = reader.string();
+          message.outgoingEdges.push(reader.string());
           break;
         default:
           reader.skipType(tag & 7);
@@ -44,15 +45,16 @@ export const Nodes = {
 
   fromJSON(object: any): Nodes {
     const message = { ...baseNodes } as Nodes;
+    message.outgoingEdges = [];
     if (object.node !== undefined && object.node !== null) {
       message.node = String(object.node);
     } else {
       message.node = "";
     }
     if (object.outgoingEdges !== undefined && object.outgoingEdges !== null) {
-      message.outgoingEdges = String(object.outgoingEdges);
-    } else {
-      message.outgoingEdges = "";
+      for (const e of object.outgoingEdges) {
+        message.outgoingEdges.push(String(e));
+      }
     }
     return message;
   },
@@ -60,22 +62,26 @@ export const Nodes = {
   toJSON(message: Nodes): unknown {
     const obj: any = {};
     message.node !== undefined && (obj.node = message.node);
-    message.outgoingEdges !== undefined &&
-      (obj.outgoingEdges = message.outgoingEdges);
+    if (message.outgoingEdges) {
+      obj.outgoingEdges = message.outgoingEdges.map((e) => e);
+    } else {
+      obj.outgoingEdges = [];
+    }
     return obj;
   },
 
   fromPartial(object: DeepPartial<Nodes>): Nodes {
     const message = { ...baseNodes } as Nodes;
+    message.outgoingEdges = [];
     if (object.node !== undefined && object.node !== null) {
       message.node = object.node;
     } else {
       message.node = "";
     }
     if (object.outgoingEdges !== undefined && object.outgoingEdges !== null) {
-      message.outgoingEdges = object.outgoingEdges;
-    } else {
-      message.outgoingEdges = "";
+      for (const e of object.outgoingEdges) {
+        message.outgoingEdges.push(e);
+      }
     }
     return message;
   },
