@@ -39,7 +39,7 @@ message Ticks {
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "totalShares"
   ];
-  repeated OrderParams orderparams = 9; 
+  OrderParams orderparams = 9; 
   
 }
 

@@ -29937,16 +29937,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/index_queue/{index}':
@@ -30136,16 +30126,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/nodes/{id}':
@@ -30244,16 +30224,14 @@ paths:
                         totalShares:
                           type: string
                         orderparams:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              orderRule:
-                                type: string
-                              orderType:
-                                type: string
-                              orderShares:
-                                type: string
+                          type: object
+                          properties:
+                            orderRule:
+                              type: string
+                            orderType:
+                              type: string
+                            orderShares:
+                              type: string
                     IndexMap:
                       type: object
                       properties:
@@ -30370,16 +30348,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/pairs/{token0}/{token1}':
@@ -30425,16 +30393,14 @@ paths:
                       totalShares:
                         type: string
                       orderparams:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            orderRule:
-                              type: string
-                            orderType:
-                              type: string
-                            orderShares:
-                              type: string
+                        type: object
+                        properties:
+                          orderRule:
+                            type: string
+                          orderType:
+                            type: string
+                          orderShares:
+                            type: string
                   IndexMap:
                     type: object
                     properties:
@@ -30556,16 +30522,14 @@ paths:
                     totalShares:
                       type: string
                     orderparams:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          orderRule:
-                            type: string
-                          orderType:
-                            type: string
-                          orderShares:
-                            type: string
+                      type: object
+                      properties:
+                        orderRule:
+                          type: string
+                        orderType:
+                          type: string
+                        orderShares:
+                          type: string
               pagination:
                 type: object
                 properties:
@@ -30658,16 +30622,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/ticks/{price}/{fee}/{direction}/{orderType}':
@@ -30700,16 +30654,14 @@ paths:
                   totalShares:
                     type: string
                   orderparams:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        orderRule:
-                          type: string
-                        orderType:
-                          type: string
-                        orderShares:
-                          type: string
+                    type: object
+                    properties:
+                      orderRule:
+                        type: string
+                      orderType:
+                        type: string
+                      orderShares:
+                        type: string
         default:
           description: An unexpected error response.
           schema:
@@ -52576,16 +52528,14 @@ definitions:
           totalShares:
             type: string
           orderparams:
-            type: array
-            items:
-              type: object
-              properties:
-                orderRule:
-                  type: string
-                orderType:
-                  type: string
-                orderShares:
-                  type: string
+            type: object
+            properties:
+              orderRule:
+                type: string
+              orderType:
+                type: string
+              orderShares:
+                type: string
       IndexMap:
         type: object
         properties:
@@ -52750,16 +52700,14 @@ definitions:
                 totalShares:
                   type: string
                 orderparams:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      orderRule:
-                        type: string
-                      orderType:
-                        type: string
-                      orderShares:
-                        type: string
+                  type: object
+                  properties:
+                    orderRule:
+                      type: string
+                    orderType:
+                      type: string
+                    orderShares:
+                      type: string
             IndexMap:
               type: object
               properties:
@@ -52834,16 +52782,14 @@ definitions:
             totalShares:
               type: string
             orderparams:
-              type: array
-              items:
-                type: object
-                properties:
-                  orderRule:
-                    type: string
-                  orderType:
-                    type: string
-                  orderShares:
-                    type: string
+              type: object
+              properties:
+                orderRule:
+                  type: string
+                orderType:
+                  type: string
+                orderShares:
+                  type: string
       pagination:
         type: object
         properties:
@@ -52950,16 +52896,14 @@ definitions:
               totalShares:
                 type: string
               orderparams:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    orderRule:
-                      type: string
-                    orderType:
-                      type: string
-                    orderShares:
-                      type: string
+                type: object
+                properties:
+                  orderRule:
+                    type: string
+                  orderType:
+                    type: string
+                  orderShares:
+                    type: string
           IndexMap:
             type: object
             properties:
@@ -53007,16 +52951,14 @@ definitions:
           totalShares:
             type: string
           orderparams:
-            type: array
-            items:
-              type: object
-              properties:
-                orderRule:
-                  type: string
-                orderType:
-                  type: string
-                orderShares:
-                  type: string
+            type: object
+            properties:
+              orderRule:
+                type: string
+              orderType:
+                type: string
+              orderShares:
+                type: string
   nicholasdotsol.duality.dex.QueryParamsResponse:
     type: object
     properties:
@@ -53044,16 +52986,14 @@ definitions:
       totalShares:
         type: string
       orderparams:
-        type: array
-        items:
-          type: object
-          properties:
-            orderRule:
-              type: string
-            orderType:
-              type: string
-            orderShares:
-              type: string
+        type: object
+        properties:
+          orderRule:
+            type: string
+          orderType:
+            type: string
+          orderShares:
+            type: string
   tendermint.spn.claim.ClaimRecord:
     type: object
     properties:

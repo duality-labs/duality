@@ -157,7 +157,7 @@ export interface DexTicks {
   pairPrice?: string;
   pairFee?: string;
   totalShares?: string;
-  orderparams?: DexOrderParams[];
+  orderparams?: DexOrderParams;
 }
 
 export interface ProtobufAny {

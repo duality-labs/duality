@@ -22,15 +22,7 @@ func (k msgServer) AddLiquidity(goCtx context.Context, msg *types.MsgAddLiquidit
 		return nil, err
 	}
 
-	//else {
-	// MultiDepsoit
-	//}
-	_ = token0
-	_ = token1
-	_ = callerAdr
-	_ = receiverAdr
-	_ = amounts
-	_ = ctx
+	_, _, _, _, _, _ = token0, token1, callerAdr, receiverAdr, amounts, ctx
 
 	return &types.MsgAddLiquidityResponse{}, nil
 }

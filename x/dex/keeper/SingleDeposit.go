@@ -8,7 +8,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, price sdk.Dec, msg *types.MsgAddLiquidity, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
+func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, price sdk.Dec, msg *types.MsgAddLiquidity, callerAddr sdk.AccAddress, receiver sdk.AccAddress) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -32,10 +32,21 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit token1 at a price/fee pair greater than the current price")
 	}
 
-	IndexQueueOld, IndexQueueFound := k.GetIndexQueue(ctx, token0, token1, msg.Index)
+	IndexQueue, IndexQueueFound := k.GetIndexQueue(ctx, token0, token1, msg.Index)
 
-	//FIX ME
-	shares := amount.Mul(price.Mul(fee))
+	Tick, TickFound := k.GetTicks(ctx, token0, token1, msg.Price, msg.Fee, msg.OrderType)
+
+	var NewTick types.Ticks
+	var oldAmount sdk.Dec //Event variable
+	var shares sdk.Dec
+
+	if msg.TokenDirection == token0 {
+		shares = amount.Mul(price.Mul(fee))
+	} else {
+		shares = amount.Mul(sdk.OneDec().Quo(fee))
+	}
+
+	// Index QUeue Logic
 
 	if !IndexQueueFound {
 
@@ -50,34 +61,16 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 				},
 			},
 		}
-		IndexQueueOld = types.IndexQueue{
+		IndexQueue = types.IndexQueue{
 			Index: msg.Index,
 			Queue: NewQueue,
 		}
 
 	} else {
-		TickIndexFound := -1
-		for i := 0; i < len(IndexQueueOld.Queue); i++ {
-			if IndexQueueOld.Queue[i].Price.Equal(price) && IndexQueueOld.Queue[i].Fee.Equal(fee) && IndexQueueOld.Queue[i].Orderparams.OrderType == msg.OrderType {
-				TickIndexFound = i
-				break
-			}
-		}
 
-		if TickIndexFound != -1 {
+		if !TickFound {
 
-			IndexQueueOld.Queue[TickIndexFound] = &types.IndexQueueType{
-				Price: price,
-				Fee:   fee,
-				Orderparams: &types.OrderParams{
-					OrderRule:   "",
-					OrderType:   msg.OrderType,
-					OrderShares: IndexQueueOld.Queue[TickIndexFound].Orderparams.OrderShares.Add(shares),
-				},
-			}
-		} else {
-
-			IndexQueueOld.Queue = k.enqueue(ctx, IndexQueueOld.Queue, types.IndexQueueType{
+			IndexQueue.Queue = k.enqueue(ctx, IndexQueue.Queue, types.IndexQueueType{
 				Price: price,
 				Fee:   fee,
 				Orderparams: &types.OrderParams{
@@ -86,18 +79,143 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 					OrderShares: shares,
 				},
 			})
+
+		} else {
+
+			IndexQueue.Queue = k.enqueue(ctx, IndexQueue.Queue, types.IndexQueueType{
+				Price: price,
+				Fee:   fee,
+				Orderparams: &types.OrderParams{
+					OrderRule:   "",
+					OrderType:   msg.OrderType,
+					OrderShares: Tick.TotalShares.Add(shares),
+				},
+			})
+		}
+	}
+	//// Tick Logic
+	if !TickFound {
+
+		if msg.TokenDirection == token0 {
+			NewTick = types.Ticks{
+				Price:       msg.Price,
+				Fee:         msg.Fee,
+				OrderType:   msg.OrderType,
+				Reserve0:    amount,
+				Reserve1:    sdk.ZeroDec(),
+				PairPrice:   price,
+				PairFee:     fee,
+				TotalShares: shares,
+				Orderparams: &types.OrderParams{
+					OrderRule:   "",
+					OrderType:   msg.OrderType,
+					OrderShares: shares,
+				},
+			}
+
+			oldAmount = sdk.ZeroDec()
+		} else {
+			NewTick = types.Ticks{
+				Price:       msg.Price,
+				Fee:         msg.Fee,
+				OrderType:   msg.OrderType,
+				Reserve0:    sdk.ZeroDec(),
+				Reserve1:    amount,
+				PairPrice:   price,
+				PairFee:     fee,
+				TotalShares: shares,
+				Orderparams: &types.OrderParams{
+					OrderRule:   "",
+					OrderType:   msg.OrderType,
+					OrderShares: shares,
+				},
+			}
+			oldAmount = sdk.ZeroDec()
+		}
+
+	} else {
+		if msg.TokenDirection == token0 {
+			NewTick = types.Ticks{
+				Price:       msg.Price,
+				Fee:         msg.Fee,
+				OrderType:   msg.OrderType,
+				Reserve0:    Tick.Reserve0.Add(amount),
+				Reserve1:    Tick.Reserve1,
+				PairPrice:   price,
+				PairFee:     fee,
+				TotalShares: Tick.TotalShares.Add(shares),
+				Orderparams: &types.OrderParams{
+					OrderRule:   "",
+					OrderType:   msg.OrderType,
+					OrderShares: Tick.TotalShares.Add(shares),
+				},
+			}
+
+			oldAmount = Tick.Reserve0
+		} else {
+			NewTick = types.Ticks{
+				Price:       msg.Price,
+				Fee:         msg.Fee,
+				OrderType:   msg.OrderType,
+				Reserve0:    Tick.Reserve0,
+				Reserve1:    Tick.Reserve1.Add(amount),
+				PairPrice:   price,
+				PairFee:     fee,
+				TotalShares: Tick.TotalShares.Add(shares),
+				Orderparams: &types.OrderParams{
+					OrderRule:   "",
+					OrderType:   msg.OrderType,
+					OrderShares: Tick.TotalShares.Add(shares),
+				},
+			}
+			oldAmount = Tick.Reserve1
+		}
+
+	}
+
+	if msg.TokenDirection == token0 {
+		if amount.GT(sdk.ZeroDec()) {
+			coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount.BigInt()))
+			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
+				return err
+			}
+		} else {
+			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Cannnot send zero amount")
+		}
+
+	} else {
+		if amount.GT(sdk.ZeroDec()) {
+			coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount.BigInt()))
+			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
+				return err
+			}
+		} else {
+			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Cannnot send zero amount")
 		}
 	}
 
-	k.SetPairs(ctx, types.Pairs{
+	k.SetTicks(ctx, token0, token1, NewTick)
+	k.SetIndexQueue(ctx, token0, token1, IndexQueue)
+
+	PairNew, PairFound := k.GetPairs(ctx, token0, token1)
+
+	NewPairs := types.Pairs{
 		Token0:       token0,
 		Token1:       token1,
-		TickSpacing:  PairOld.TickSpacing,
 		CurrentIndex: PairOld.CurrentIndex,
-		Tickmap:      PairOld.Tickmap,
-		IndexMap:     &IndexQueueOld,
-	},
-	)
+		TickSpacing:  PairOld.TickSpacing,
+		Tickmap:      PairNew.Tickmap,
+		IndexMap:     PairNew.IndexMap,
+	}
+
+	k.SetPairs(ctx, NewPairs)
+
+	ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator,
+		token0, token1, price.String(), fee.String(), msg.TokenDirection,
+		oldAmount.String(), oldAmount.Add(amount).String(),
+		sdk.NewAttribute(types.DepositEventSharesMinted, shares.String()),
+	))
 
 	return nil
+
 }

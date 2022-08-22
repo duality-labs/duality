@@ -50,6 +50,7 @@ message MsgCreatePair {
   string creator = 1;
   string tokenA = 2;
   string tokenB = 3;
+ 
 }
 
 message MsgCreatePairResponse {

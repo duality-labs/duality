@@ -25,3 +25,18 @@ const (
 	NodesKey      = "Nodes-value-"
 	NodesCountKey = "Nodes-count-"
 )
+
+// Deposit Event Attributes
+const (
+	DepositEventKey          = "NewDeposit"
+	DepositEventCreator      = "Creator"
+	DepositEventToken0       = "Token0"
+	DepositEventToken1       = "Token1"
+	DepositEventPrice        = "Price"
+	DepositEventFee          = "Fee"
+	DepositEventReceiver     = "Receiver"
+	DepositTokenDirection    = "TokenDirection"
+	DepositEventOldReserves  = "OldReserves"
+	DepositEventNewReserves  = "NewReserves"
+	DepositEventSharesMinted = "SharesMinted"
+)
