@@ -35,3 +35,19 @@ const (
 	DepositEventNewReserves  = "NewReserves"
 	DepositEventSharesMinted = "SharesMinted"
 )
+
+// Withdraw Event Attributes
+const (
+	WithdrawEventKey           = "NewWithdraw"
+	WithdrawEventCreator       = "Creator"
+	WithdrawEventToken0        = "Token0"
+	WithdrawEventToken1        = "Token1"
+	WithdrawEventPrice         = "Price"
+	WithdrawEventFee           = "Fee"
+	WithdrawEventReceiver      = "Receiver"
+	WithdrawEventOldReserve0   = "OldReserve0"
+	WithdrawEventOldReserve1   = "OldReserve0"
+	WithdrawEventNewReserve0   = "NewReserve0"
+	WithdrawEventNewReserve1   = "NewReserve1"
+	WithdrawEventSharesRemoved = "SharesRemoved"
+)

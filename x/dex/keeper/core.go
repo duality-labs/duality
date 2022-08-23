@@ -60,6 +60,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 	var oldAmount sdk.Dec //Event variable
 	var shares sdk.Dec
 
+	// TODO: Confirm this is the correct way to calculate price
 	if msg.TokenDirection == token0 {
 		shares = amount.Mul(price.Mul(fee))
 	} else {
@@ -266,7 +267,14 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 
 // TODO: If withdrawing from one tick with two tokens (i.e. currentTick), will require two withdraw operations
 
-func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, price sdk.Dec, msg *types.MsgRemoveLiquidity, callerAddr sdk.AccAddress, receiver sdk.AccAddress) error {
+// TODO: Confirm price is always token1/token0, otherwise oldAmount calculation will not work
+// TODO: Remove tokenDirection from msg, as it is redundant
+
+/*
+	Remove Liquidity needs to have verification that the user has enough shares to withdraw & must check re-entrancy attacks
+
+*/
+func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 string, shares sdk.Dec, price sdk.Dec, msg *types.MsgRemoveLiquidity, callerAddr sdk.AccAddress, receiver sdk.AccAddress) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -288,15 +296,6 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 	Tick, TickFound := k.GetTicks(ctx, token0, token1, msg.Price, msg.Fee, msg.OrderType)
 
 	var NewTick types.Ticks
-	var oldAmount sdk.Dec //Event variable
-	var shares sdk.Dec
-
-	if msg.TokenDirection == token0 {
-		shares = amount.Mul(price.Mul(fee))
-	} else {
-		shares = amount.Mul(sdk.OneDec().Quo(fee))
-	}
-
 	// Index Queue Logic
 	removeTick := false
 	// Check if tick exists
@@ -344,43 +343,31 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 		}
 	}
 	//// Updating Tick Logic
+	oldReserve0 := Tick.Reserve0
+	oldReserve1 := Tick.Reserve1
+	amount0toRemove := Tick.Reserve0
+	amount1toRemove := Tick.Reserve1
 	if !removeTick {
+		// TODO: Decimal precision checks on quotient
+		ratio := Tick.Reserve1.Quo(Tick.Reserve0.Add(Tick.Reserve1))
+		// r0 * price * 1/(r1/r0+r1)
+		amount0toRemove := Tick.Reserve0.Mul(price).Mul(sdk.NewDec(1).Sub(ratio))
+		amount1toRemove := Tick.Reserve1.Mul(ratio)
 
-		if msg.TokenDirection == token0 {
-			NewTick = types.Ticks{
-				Price:       msg.Price,
-				Fee:         msg.Fee,
+		NewTick = types.Ticks{
+			Price:       msg.Price,
+			Fee:         msg.Fee,
+			OrderType:   msg.OrderType,
+			Reserve0:    Tick.Reserve0.Sub(amount0toRemove),
+			Reserve1:    Tick.Reserve1.Sub(amount1toRemove),
+			PairPrice:   price,
+			PairFee:     fee,
+			TotalShares: Tick.TotalShares.Sub(shares),
+			Orderparams: &types.OrderParams{
+				OrderRule:   "",
 				OrderType:   msg.OrderType,
-				Reserve0:    Tick.Reserve0.Sub(amount),
-				Reserve1:    Tick.Reserve1,
-				PairPrice:   price,
-				PairFee:     fee,
-				TotalShares: Tick.TotalShares.Sub(shares),
-				Orderparams: &types.OrderParams{
-					OrderRule:   "",
-					OrderType:   msg.OrderType,
-					OrderShares: Tick.TotalShares.Sub(shares),
-				},
-			}
-
-			oldAmount = sdk.ZeroDec()
-		} else {
-			NewTick = types.Ticks{
-				Price:       msg.Price,
-				Fee:         msg.Fee,
-				OrderType:   msg.OrderType,
-				Reserve0:    Tick.Reserve0,
-				Reserve1:    Tick.Reserve1.Sub(amount),
-				PairPrice:   price,
-				PairFee:     fee,
-				TotalShares: Tick.TotalShares.Sub(shares),
-				Orderparams: &types.OrderParams{
-					OrderRule:   "",
-					OrderType:   msg.OrderType,
-					OrderShares: Tick.TotalShares.Sub(shares),
-				},
-			}
-			oldAmount = sdk.ZeroDec()
+				OrderShares: Tick.TotalShares.Sub(shares),
+			},
 		}
 
 	}
@@ -405,32 +392,30 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 
 	k.SetPairs(ctx, NewPairs)
 
-	// Sending tokens from the user to the module, might be necessary to do this before the rest of logic to avoid reentrancy/failure attacks
-	if msg.TokenDirection == token0 {
-		if amount.GT(sdk.ZeroDec()) {
-			coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount.BigInt()))
-			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
-				return err
-			}
-		} else {
-			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Cannnot send zero amount")
-		}
+	if !amount0toRemove.GT(sdk.ZeroDec()) && !amount1toRemove.GT(sdk.ZeroDec()) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Cannnot send zero amount")
+	}
 
-	} else {
-		if amount.GT(sdk.ZeroDec()) {
-			coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount.BigInt()))
-			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
-				return err
-			}
-		} else {
-			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Cannnot send zero amount")
+	// TODO: Sending tokens from the user to the module, will be necessary to do this before the rest of logic to avoid reentrancy/failure attacks
+	if amount0toRemove.GT(sdk.ZeroDec()) {
+		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount0toRemove.BigInt()))
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
+			return err
 		}
 	}
 
-	ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator,
-		token0, token1, price.String(), fee.String(), msg.TokenDirection,
-		oldAmount.String(), oldAmount.Add(amount).String(),
-		sdk.NewAttribute(types.DepositEventSharesMinted, shares.String()),
+	if amount1toRemove.GT(sdk.ZeroDec()) {
+		coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount1toRemove.BigInt()))
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
+			return err
+		}
+	}
+
+	// TODO: Is this the best format for events with liquidity?
+	ctx.EventManager().EmitEvent(types.CreateWithdrawEvent(msg.Creator,
+		token0, token1, price.String(), fee.String(), oldReserve0.String(), oldReserve1.String(),
+		NewTick.Reserve0.String(), NewTick.Reserve1.String(),
+		sdk.NewAttribute(types.WithdrawEventSharesRemoved, shares.String()),
 	))
 
 	return nil
