@@ -46,12 +46,10 @@ func TestGenesis(t *testing.T) {
 		},
 		NodesList: []types.Nodes{
 			{
-				Node:          "0",
-				OutgoingEdges: "0",
+				Node: "0",
 			},
 			{
-				Node:          "1",
-				OutgoingEdges: "1",
+				Node: "1",
 			},
 		},
 		// this line is used by starport scaffolding # genesis/test/state

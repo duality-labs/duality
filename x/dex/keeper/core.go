@@ -210,6 +210,23 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 
 	}
 
+	// Update the storage
+	k.SetTicks(ctx, token0, token1, NewTick)
+	k.SetIndexQueue(ctx, token0, token1, IndexQueue)
+
+	PairNew, PairFound := k.GetPairs(ctx, token0, token1)
+
+	NewPairs := types.Pairs{
+		Token0:       token0,
+		Token1:       token1,
+		CurrentIndex: PairOld.CurrentIndex,
+		TickSpacing:  PairOld.TickSpacing,
+		Tickmap:      PairNew.Tickmap,
+		IndexMap:     PairNew.IndexMap,
+	}
+
+	k.SetPairs(ctx, NewPairs)
+
 	// Sending tokens from the user to the module, might be necessary to do this before the rest of logic to avoid reentrancy/failure attacks
 	if msg.TokenDirection == token0 {
 		if amount.GT(sdk.ZeroDec()) {
@@ -232,22 +249,6 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 		}
 	}
 
-	k.SetTicks(ctx, token0, token1, NewTick)
-	k.SetIndexQueue(ctx, token0, token1, IndexQueue)
-
-	PairNew, PairFound := k.GetPairs(ctx, token0, token1)
-
-	NewPairs := types.Pairs{
-		Token0:       token0,
-		Token1:       token1,
-		CurrentIndex: PairOld.CurrentIndex,
-		TickSpacing:  PairOld.TickSpacing,
-		Tickmap:      PairNew.Tickmap,
-		IndexMap:     PairNew.IndexMap,
-	}
-
-	k.SetPairs(ctx, NewPairs)
-
 	ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator,
 		token0, token1, price.String(), fee.String(), msg.TokenDirection,
 		oldAmount.String(), oldAmount.Add(amount).String(),
@@ -262,6 +263,9 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 
 // Withdraws shares from given price, fee
 // Makes more sense, as calculating price & fee can be difficult
+
+// TODO: If withdrawing from one tick with two tokens (i.e. currentTick), will require two withdraw operations
+
 func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, price sdk.Dec, msg *types.MsgRemoveLiquidity, callerAddr sdk.AccAddress, receiver sdk.AccAddress) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -328,7 +332,7 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 				},
 			}
 		} else {
-			// We should confirm that shares matches the tick amount (to ensure we're not withdrawing more than we have)
+			// TODO: We should confirm that shares matches the tick amount (to ensure we're not withdrawing more than we have)
 
 			if !Tick.TotalShares.Equal(shares) {
 				return sdkerrors.Wrapf(types.ErrNotEnoughShares, "Trying to withdraw more shares than available")
@@ -340,86 +344,66 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 		}
 	}
 	//// Updating Tick Logic
-	if !TickFound {
+	if !removeTick {
 
 		if msg.TokenDirection == token0 {
 			NewTick = types.Ticks{
 				Price:       msg.Price,
 				Fee:         msg.Fee,
 				OrderType:   msg.OrderType,
-				Reserve0:    amount,
-				Reserve1:    sdk.ZeroDec(),
-				PairPrice:   price,
-				PairFee:     fee,
-				TotalShares: shares,
-				Orderparams: &types.OrderParams{
-					OrderRule:   "",
-					OrderType:   msg.OrderType,
-					OrderShares: shares,
-				},
-			}
-
-			oldAmount = sdk.ZeroDec()
-		} else {
-			NewTick = types.Ticks{
-				Price:       msg.Price,
-				Fee:         msg.Fee,
-				OrderType:   msg.OrderType,
-				Reserve0:    sdk.ZeroDec(),
-				Reserve1:    amount,
-				PairPrice:   price,
-				PairFee:     fee,
-				TotalShares: shares,
-				Orderparams: &types.OrderParams{
-					OrderRule:   "",
-					OrderType:   msg.OrderType,
-					OrderShares: shares,
-				},
-			}
-			oldAmount = sdk.ZeroDec()
-		}
-
-	} else {
-		// If the tick is found, add it to the existing reserve for the tick storage
-
-		if msg.TokenDirection == token0 {
-			oldAmount = Tick.Reserve0
-			NewTick = types.Ticks{
-				Price:       msg.Price,
-				Fee:         msg.Fee,
-				OrderType:   msg.OrderType,
-				Reserve0:    Tick.Reserve0.Add(amount),
+				Reserve0:    Tick.Reserve0.Sub(amount),
 				Reserve1:    Tick.Reserve1,
 				PairPrice:   price,
 				PairFee:     fee,
-				TotalShares: Tick.TotalShares.Add(shares),
+				TotalShares: Tick.TotalShares.Sub(shares),
 				Orderparams: &types.OrderParams{
 					OrderRule:   "",
 					OrderType:   msg.OrderType,
-					OrderShares: Tick.TotalShares.Add(shares),
+					OrderShares: Tick.TotalShares.Sub(shares),
 				},
 			}
 
+			oldAmount = sdk.ZeroDec()
 		} else {
-			oldAmount = Tick.Reserve1
 			NewTick = types.Ticks{
 				Price:       msg.Price,
 				Fee:         msg.Fee,
 				OrderType:   msg.OrderType,
 				Reserve0:    Tick.Reserve0,
-				Reserve1:    Tick.Reserve1.Add(amount),
+				Reserve1:    Tick.Reserve1.Sub(amount),
 				PairPrice:   price,
 				PairFee:     fee,
-				TotalShares: Tick.TotalShares.Add(shares),
+				TotalShares: Tick.TotalShares.Sub(shares),
 				Orderparams: &types.OrderParams{
 					OrderRule:   "",
 					OrderType:   msg.OrderType,
-					OrderShares: Tick.TotalShares.Add(shares),
+					OrderShares: Tick.TotalShares.Sub(shares),
 				},
 			}
+			oldAmount = sdk.ZeroDec()
 		}
 
 	}
+
+	k.SetIndexQueue(ctx, token0, token1, IndexQueue)
+	if removeTick {
+		k.RemoveTicks(ctx, token0, token1, msg.Price, msg.Fee, msg.OrderType)
+	} else {
+		k.SetTicks(ctx, token0, token1, NewTick)
+	}
+
+	PairNew, _ := k.GetPairs(ctx, token0, token1)
+
+	NewPairs := types.Pairs{
+		Token0:       token0,
+		Token1:       token1,
+		CurrentIndex: PairOld.CurrentIndex,
+		TickSpacing:  PairOld.TickSpacing,
+		Tickmap:      PairNew.Tickmap,
+		IndexMap:     PairNew.IndexMap,
+	}
+
+	k.SetPairs(ctx, NewPairs)
 
 	// Sending tokens from the user to the module, might be necessary to do this before the rest of logic to avoid reentrancy/failure attacks
 	if msg.TokenDirection == token0 {
@@ -442,22 +426,6 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Cannnot send zero amount")
 		}
 	}
-
-	k.SetTicks(ctx, token0, token1, NewTick)
-	k.SetIndexQueue(ctx, token0, token1, IndexQueue)
-
-	PairNew, PairFound := k.GetPairs(ctx, token0, token1)
-
-	NewPairs := types.Pairs{
-		Token0:       token0,
-		Token1:       token1,
-		CurrentIndex: PairOld.CurrentIndex,
-		TickSpacing:  PairOld.TickSpacing,
-		Tickmap:      PairNew.Tickmap,
-		IndexMap:     PairNew.IndexMap,
-	}
-
-	k.SetPairs(ctx, NewPairs)
 
 	ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator,
 		token0, token1, price.String(), fee.String(), msg.TokenDirection,

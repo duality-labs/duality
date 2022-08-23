@@ -54,7 +54,7 @@ service Query {
 
 // Queries a Nodes by index.
 	rpc Nodes(QueryGetNodesRequest) returns (QueryGetNodesResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/nodes/{node}/{outgoingEdges}";
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/nodes/{node}";
 	}
 
 	// Queries a list of Nodes items.
@@ -141,7 +141,6 @@ message QueryAllIndexQueueResponse {
 
 message QueryGetNodesRequest {
 	  string node = 1;
-  string outgoingEdges = 2;
 
 }
 

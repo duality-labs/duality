@@ -29937,6 +29937,7 @@ paths:
           in: query
           required: false
           type: boolean
+<<<<<<< HEAD
         - name: pagination.reverse
           description: >-
             reverse is set to true if results are to be returned in the
@@ -29947,6 +29948,8 @@ paths:
           in: query
           required: false
           type: boolean
+=======
+>>>>>>> origin/tickspacing-base
       tags:
         - Query
   '/NicholasDotSol/duality/dex/index_queue/{index}':
@@ -30130,6 +30133,7 @@ paths:
           in: query
           required: false
           type: boolean
+<<<<<<< HEAD
         - name: pagination.reverse
           description: >-
             reverse is set to true if results are to be returned in the
@@ -30143,6 +30147,11 @@ paths:
       tags:
         - Query
   '/NicholasDotSol/duality/dex/nodes/{node}/{outgoingEdges}':
+=======
+      tags:
+        - Query
+  '/NicholasDotSol/duality/dex/nodes/{node}':
+>>>>>>> origin/tickspacing-base
     get:
       summary: Queries a Nodes by index.
       operationId: NicholasdotsolDualityDexNodes
@@ -30184,10 +30193,13 @@ paths:
           in: path
           required: true
           type: string
+<<<<<<< HEAD
         - name: outgoingEdges
           in: path
           required: true
           type: string
+=======
+>>>>>>> origin/tickspacing-base
       tags:
         - Query
   /NicholasDotSol/duality/dex/pairs:
@@ -30359,6 +30371,7 @@ paths:
           in: query
           required: false
           type: boolean
+<<<<<<< HEAD
         - name: pagination.reverse
           description: >-
             reverse is set to true if results are to be returned in the
@@ -30369,6 +30382,8 @@ paths:
           in: query
           required: false
           type: boolean
+=======
+>>>>>>> origin/tickspacing-base
       tags:
         - Query
   '/NicholasDotSol/duality/dex/pairs/{token0}/{token1}':
@@ -30640,16 +30655,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean

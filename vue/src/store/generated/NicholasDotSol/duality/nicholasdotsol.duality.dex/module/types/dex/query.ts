@@ -81,7 +81,6 @@ export interface QueryAllIndexQueueResponse {
 
 export interface QueryGetNodesRequest {
   node: string;
-  outgoingEdges: string;
 }
 
 export interface QueryGetNodesResponse {
@@ -1177,7 +1176,7 @@ export const QueryAllIndexQueueResponse = {
   },
 };
 
-const baseQueryGetNodesRequest: object = { node: "", outgoingEdges: "" };
+const baseQueryGetNodesRequest: object = { node: "" };
 
 export const QueryGetNodesRequest = {
   encode(
@@ -1186,9 +1185,6 @@ export const QueryGetNodesRequest = {
   ): Writer {
     if (message.node !== "") {
       writer.uint32(10).string(message.node);
-    }
-    if (message.outgoingEdges !== "") {
-      writer.uint32(18).string(message.outgoingEdges);
     }
     return writer;
   },
@@ -1202,9 +1198,6 @@ export const QueryGetNodesRequest = {
       switch (tag >>> 3) {
         case 1:
           message.node = reader.string();
-          break;
-        case 2:
-          message.outgoingEdges = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1221,19 +1214,12 @@ export const QueryGetNodesRequest = {
     } else {
       message.node = "";
     }
-    if (object.outgoingEdges !== undefined && object.outgoingEdges !== null) {
-      message.outgoingEdges = String(object.outgoingEdges);
-    } else {
-      message.outgoingEdges = "";
-    }
     return message;
   },
 
   toJSON(message: QueryGetNodesRequest): unknown {
     const obj: any = {};
     message.node !== undefined && (obj.node = message.node);
-    message.outgoingEdges !== undefined &&
-      (obj.outgoingEdges = message.outgoingEdges);
     return obj;
   },
 
@@ -1243,11 +1229,6 @@ export const QueryGetNodesRequest = {
       message.node = object.node;
     } else {
       message.node = "";
-    }
-    if (object.outgoingEdges !== undefined && object.outgoingEdges !== null) {
-      message.outgoingEdges = object.outgoingEdges;
-    } else {
-      message.outgoingEdges = "";
     }
     return message;
   },

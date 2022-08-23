@@ -12,7 +12,6 @@ func (k Keeper) SetNodes(ctx sdk.Context, nodes types.Nodes) {
 	b := k.cdc.MustMarshal(&nodes)
 	store.Set(types.NodesKey(
 		nodes.Node,
-		nodes.OutgoingEdges,
 	), b)
 }
 
@@ -20,14 +19,12 @@ func (k Keeper) SetNodes(ctx sdk.Context, nodes types.Nodes) {
 func (k Keeper) GetNodes(
 	ctx sdk.Context,
 	node string,
-	outgoingEdges string,
 
 ) (val types.Nodes, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.NodesKeyPrefix))
 
 	b := store.Get(types.NodesKey(
 		node,
-		outgoingEdges,
 	))
 	if b == nil {
 		return val, false
@@ -41,13 +38,11 @@ func (k Keeper) GetNodes(
 func (k Keeper) RemoveNodes(
 	ctx sdk.Context,
 	node string,
-	outgoingEdges string,
 
 ) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.NodesKeyPrefix))
 	store.Delete(types.NodesKey(
 		node,
-		outgoingEdges,
 	))
 }
 

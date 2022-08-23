@@ -445,17 +445,6 @@ func request_Query_Nodes_0(ctx context.Context, marshaler runtime.Marshaler, cli
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "node", err)
 	}
 
-	val, ok = pathParams["outgoingEdges"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "outgoingEdges")
-	}
-
-	protoReq.OutgoingEdges, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "outgoingEdges", err)
-	}
-
 	msg, err := client.Nodes(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
@@ -481,17 +470,6 @@ func local_request_Query_Nodes_0(ctx context.Context, marshaler runtime.Marshale
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "node", err)
-	}
-
-	val, ok = pathParams["outgoingEdges"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "outgoingEdges")
-	}
-
-	protoReq.OutgoingEdges, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "outgoingEdges", err)
 	}
 
 	msg, err := server.Nodes(ctx, &protoReq)
@@ -987,7 +965,7 @@ var (
 
 	pattern_Query_IndexQueueAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "index_queue"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Nodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"NicholasDotSol", "duality", "dex", "nodes", "node", "outgoingEdges"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Nodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"NicholasDotSol", "duality", "dex", "nodes", "node"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_NodesAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "nodes"}, "", runtime.AssumeColonVerbOpt(true)))
 )
