@@ -29,8 +29,7 @@ func networkWithNodesObjects(t *testing.T, n int) (*network.Network, []types.Nod
 
 	for i := 0; i < n; i++ {
 		nodes := types.Nodes{
-			Node:          strconv.Itoa(i),
-			OutgoingEdges: strconv.Itoa(i),
+			Node: strconv.Itoa(i),
 		}
 		nullify.Fill(&nodes)
 		state.NodesList = append(state.NodesList, nodes)
@@ -58,9 +57,8 @@ func TestShowNodes(t *testing.T) {
 		obj  types.Nodes
 	}{
 		{
-			desc:            "found",
-			idNode:          objs[0].Node,
-			idOutgoingEdges: objs[0].OutgoingEdges,
+			desc:   "found",
+			idNode: objs[0].Node,
 
 			args: common,
 			obj:  objs[0],

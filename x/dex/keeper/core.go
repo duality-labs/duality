@@ -8,6 +8,58 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+func (k msgServer) AddLiquidityVerification(goCtx context.Context, msg *types.MsgAddLiquidity) (string, string, sdk.AccAddress, sdk.AccAddress, sdk.Dec, sdk.Dec, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	price, err := sdk.NewDecFromStr(msg.Price)
+	// Error checking for valid sdk.Dec
+	if err != nil {
+		return "", "", nil, nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
+	}
+
+	token0, token1, priceDec, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB, price)
+
+	if err != nil {
+		return "", "", nil, nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+	}
+
+	// Converts input address (string) to sdk.AccAddress
+	callerAddr, err := sdk.AccAddressFromBech32(msg.Creator)
+	// Error checking for the calling address
+	if err != nil {
+		return "", "", nil, nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+
+	// Converts receiver address (string) to sdk.AccAddress
+	receiverAddr, err := sdk.AccAddressFromBech32(msg.Receiver)
+	// Error checking for the valid receiver address
+	if err != nil {
+		return "", "", nil, nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+	}
+
+	amount, err := sdk.NewDecFromStr(msg.Amount)
+	// Error checking for valid sdk.Dec
+	if err != nil {
+		return "", "", nil, nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
+	}
+
+	if msg.TokenDirection != msg.TokenA && msg.TokenB != msg.TokenDirection {
+		return "", "", nil, nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Token Direction must be the same as either Token A or Token B")
+	}
+	//var decAmounts []sdk.Dec
+	// for i := 0; i < len(msg.Amount); i++ {
+
+	//amount, err := sdk.NewDecFromStr(msg.Amount)
+	// // Error checking for valid sdk.Dec
+	//if err != nil {
+	// return "", "", nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
+	// }
+	// decAmounts = append(decAmounts, amount)
+	// }
+
+	return token0, token1, callerAddr, receiverAddr, amount, priceDec, nil
+}
+
 func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, price sdk.Dec, msg *types.MsgAddLiquidity, callerAddr sdk.AccAddress, receiver sdk.AccAddress) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -15,14 +67,17 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 	PairOld, PairFound := k.GetPairs(ctx, token0, token1)
 
 	if !PairFound {
-		sdkerrors.Wrapf(types.ErrValidPairNotFound, "Valid pair not found")
+		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Valid pair not found")
 	}
 
+	// Fee is some value in {0, 10000} where fee/10000 is equal the exchange rate
 	fee, err := sdk.NewDecFromStr(msg.Fee)
 	// Error checking for valid sdk.Dec
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
+
+	fee = fee.Quo(sdk.NewDec(10000))
 
 	// Can only deposit amount0 where vPrice >= CurrentPrice
 	if msg.Index < (PairOld.CurrentIndex) && msg.TokenDirection == token0 {
@@ -45,7 +100,6 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 	} else {
 		shares = amount.Mul(sdk.OneDec().Quo(fee))
 	}
-
 	// Index QUeue Logic
 
 	if !IndexQueueFound {
@@ -218,4 +272,27 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 
 	return nil
 
+}
+
+// Need to figure out logic for route vs. swap
+func (k Keeper) SingleSwapIn(goCtx context.Context, token0 string, token1 string, amountIn sdk.Dec, msg *types.MsgSwap, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	/*
+		1) Find Pair
+		   a) If pair exists, get the pair
+		   b) If pair does not exist, error
+		2) Get CurrTick & corresponding list for direction
+		3) Attempt to swap amount through the ticks in pair
+			i) Loop through queue for virtual tick & empty ticks
+			ii) If queue empty, query next virtualTick from bitmap
+			iii) Continue looping until amount == 0
+			iv) Store last tick, will be new currTick
+		4) Perform swap
+		5) Update CurrTick
+		6) Update Shares
+			i) TBD
+	*/
+
+	_ = ctx
+	return nil
 }

@@ -18,6 +18,8 @@ var _ = strconv.IntSize
 func createNTicks(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Ticks {
 	items := make([]types.Ticks, n)
 	for i := range items {
+		items[i].Reserve0 = sdk.ZeroDec()
+		items[i].Reserve1 = sdk.ZeroDec()
 		items[i].Price = strconv.Itoa(i)
 		items[i].Fee = strconv.Itoa(i)
 		items[i].OrderType = strconv.Itoa(i)

@@ -18,24 +18,35 @@ var _ = strconv.IntSize
 func createNIndexQueue(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.IndexQueue {
 	items := make([]types.IndexQueue, n)
 	for i := range items {
+		items[i].Queue = append(items[i].Queue, &types.IndexQueueType{
+			Price: sdk.NewDec(1),
+			Fee:   sdk.ZeroDec(),
+			Orderparams: &types.OrderParams{
+				"",
+				"",
+				sdk.ZeroDec(),
+			},
+		})
 		items[i].Index = int32(i)
 
-		keeper.SetIndexQueue(ctx, "0", "1", items[i])
+		keeper.SetIndexQueue(ctx, "Token0", "Token1", items[i])
 	}
+	//fmt.Println(items)
 	return items
 }
 
 func TestIndexQueueGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNIndexQueue(keeper, ctx, 10)
-	for _, item := range items {
+	for i := range items {
 		rst, found := keeper.GetIndexQueue(ctx,
-			"0", "1,",
-			item.Index,
+			"Token0", "Token1",
+			items[i].Index,
 		)
+
 		require.True(t, found)
 		require.Equal(t,
-			nullify.Fill(&item),
+			nullify.Fill(&items[i]),
 			nullify.Fill(&rst),
 		)
 	}
@@ -44,10 +55,10 @@ func TestIndexQueueRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNIndexQueue(keeper, ctx, 10)
 	for _, item := range items {
-		keeper.RemoveIndexQueue(ctx, "0", "1",
+		keeper.RemoveIndexQueue(ctx, "Token0", "Token1",
 			item.Index,
 		)
-		_, found := keeper.GetIndexQueue(ctx, "0", "1",
+		_, found := keeper.GetIndexQueue(ctx, "Token0", "Token1",
 			item.Index,
 		)
 		require.False(t, found)

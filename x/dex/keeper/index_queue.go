@@ -25,6 +25,9 @@ func (k Keeper) dequeue(ctx sdk.Context, queue []*types.IndexQueueType) (types.I
 func (k Keeper) SetIndexQueue(ctx sdk.Context, token0 string, token1 string, IndexQueue types.IndexQueue) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.IndexQueueKeyPrefix))
 	b := k.cdc.MustMarshal(&IndexQueue)
+	//fmt.Println(token0)
+	//fmt.Println(token1)
+	//fmt.Println("set index", IndexQueue.Index)
 	store.Set(types.IndexQueueKey(token0, token1,
 		IndexQueue.Index,
 	), b)
@@ -39,10 +42,13 @@ func (k Keeper) GetIndexQueue(
 
 ) (val types.IndexQueue, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.IndexQueueKeyPrefix))
-
+	//fmt.Println(token0)
+	//fmt.Println(token1)
+	//fmt.Println("Get Index:", index)
 	b := store.Get(types.IndexQueueKey(token0, token1,
 		index,
 	))
+	//fmt.Println(b)
 	if b == nil {
 		return val, false
 	}
