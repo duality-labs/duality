@@ -1,5 +1,15 @@
 version: "3"
 
+# to run testnet for the first time, or first time since changes have been made:
+#   $ docker-compose build
+#   $ docker-compose up
+#   or
+#   $ docker-compose up --build
+# to run built testnet again
+#   $ docker-compose up
+# to remove testnet
+#   $ docker-compose down
+
 services:
   dualitynode0:
     container_name: dualitynode0
