@@ -18,6 +18,13 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 0
+    # print out test keys before running test node
+    command: >
+      /bin/sh -c "
+        echo \"test keys:\";
+        jq -s . /root/.duality/testkeys/*;
+        dualityd --home /testnet/dualityd start --moniker duality;
+      "
     environment:
       - DEBUG=1
       - ID=0
