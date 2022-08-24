@@ -19,12 +19,8 @@ RUN apt update && \
 RUN apt-get install -y \
     build-essential \
     ca-certificates \
+    jq \
     curl
-
-# [Choice] Node.js version: none, lts/*, 16, 14, 12, 10
-ARG NODE_VERSION="16.14.2"
-RUN curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION | bash -
-RUN apt-get install -y nodejs
 
 WORKDIR /usr/src
 
@@ -53,9 +49,13 @@ RUN dualityd init duality
 ARG NODE_ID
 COPY --from=testnetconfig /root/.testnet/node$NODE_ID /testnet/
 
-# merge genesis files together
-COPY docker-testnet-genesis.js ./docker-testnet-genesis.js
-RUN node -p "require('./docker-testnet-genesis.js')('/testnet/dualityd/config/genesis.json', '/root/.duality/config/genesis.json')";
+# merge genesis files together:
+# take initial state of "auth", "bank", and "genutil" (the genesis txs) from the testnets configuration only
+RUN jq -s '.[0] * { app_state: { auth: .[1].app_state.auth, bank: .[1].app_state.bank, genutil: .[1].app_state.genutil } }' \
+    /root/.duality/config/genesis.json /testnet/dualityd/config/genesis.json \
+    > /root/combined-genesis.json
+# overwrite genesis file that will be used
+RUN cp /root/combined-genesis.json /testnet/dualityd/config/genesis.json
 
 # modify node configuration files
 # prevent 'local network address' warning from showing
