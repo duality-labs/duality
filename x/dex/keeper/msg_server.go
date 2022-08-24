@@ -36,6 +36,7 @@ func (k msgServer) CreatePair(goCtx context.Context, msg *types.MsgCreatePair) (
 		Receiver:       msg.Receiver,
 	}
 
+	// TODO: Do want any other verification checks for creating pair?
 	token0, token1, callerAdr, receiverAdr, amounts, price, err := k.AddLiquidityVerification(goCtx, msgAddLP)
 	if err != nil {
 		return nil, err
@@ -112,8 +113,19 @@ func (k msgServer) AddLiquidity(goCtx context.Context, msg *types.MsgAddLiquidit
 func (k msgServer) RemoveLiquidity(goCtx context.Context, msg *types.MsgRemoveLiquidity) (*types.MsgRemoveLiquidityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// TODO: Handling the message
-	_ = ctx
+	token0, token1, callerAdr, receiverAdr, shares, price, err := k.RemoveLiquidityVerification(goCtx, msg)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = k.SingleWithdraw(goCtx, token0, token1, shares, price, msg, callerAdr, receiverAdr)
+
+	if err != nil {
+		return nil, err
+	}
+
+	_, _, _, _, _, _ = token0, token1, callerAdr, receiverAdr, shares, ctx
 
 	return &types.MsgRemoveLiquidityResponse{}, nil
 }
