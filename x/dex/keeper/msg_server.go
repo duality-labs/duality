@@ -99,6 +99,8 @@ func (k msgServer) AddLiquidity(goCtx context.Context, msg *types.MsgAddLiquidit
 		return nil, err
 	}
 
+	// TODO: Add checks on user having liquidity to deposit
+
 	err = k.SingleDeposit(goCtx, token0, token1, amounts, price, msg, callerAdr, receiverAdr)
 
 	if err != nil {
@@ -119,6 +121,7 @@ func (k msgServer) RemoveLiquidity(goCtx context.Context, msg *types.MsgRemoveLi
 		return nil, err
 	}
 
+	// TODO: Add checks on user having liquidity to withdraw & check against shares mapping for shares
 	err = k.SingleWithdraw(goCtx, token0, token1, shares, price, msg, callerAdr, receiverAdr)
 
 	if err != nil {
