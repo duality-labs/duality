@@ -45,13 +45,22 @@ RUN go install ./cmd/dualityd
 # create duality chain config files
 RUN dualityd init duality
 
+# add test accounts
+RUN mkdir /root/.duality/testkeys
+RUN dualityd keys add alice --keyring-backend test --output json > /root/.duality/testkeys/alice.json
+RUN dualityd add-genesis-account $(dualityd keys show alice -a --keyring-backend test) 1000000testtoken,1000000stake --keyring-backend test
+
+# Add gentxs to the genesis file
+RUN dualityd gentx alice 1000000stake --chain-id duality --keyring-backend test
+RUN dualityd collect-gentxs
+
 # get testnet config files
 ARG NODE_ID
 COPY --from=testnetconfig /root/.testnet/node$NODE_ID /testnet/
 
 # merge genesis files together:
 # take initial state of "auth", "bank", and "genutil" (the genesis txs) from the testnets configuration only
-RUN jq -s '.[0] * { app_state: { auth: .[1].app_state.auth, bank: .[1].app_state.bank, genutil: .[1].app_state.genutil } }' \
+RUN jq -s '.[0] * { app_state: { auth: { accounts: [ .[0].app_state.auth.accounts[], .[1].app_state.auth.accounts[] ] }, bank: { balances: [ .[0].app_state.bank.balances[], .[1].app_state.bank.balances[] ] }, genutil: .[1].app_state.genutil } }' \
     /root/.duality/config/genesis.json /testnet/dualityd/config/genesis.json \
     > /root/combined-genesis.json
 # overwrite genesis file that will be used
