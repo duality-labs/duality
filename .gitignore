@@ -5,5 +5,3 @@ release/
 .DS_Store
 ts-client/
 tmp
-
-.testnets/

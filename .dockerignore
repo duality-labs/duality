@@ -1,5 +1,3 @@
 Dockerfile
+Dockerfile-testnet
 docker-compose.yml
-docker-compose.setup.yml
-
-.testnets
