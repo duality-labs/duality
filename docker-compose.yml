@@ -31,6 +31,8 @@ services:
       - "1317:1317"
       - "9090:9090"
       - "2345:2345"
+    volumes:
+      - go-modules:/go/pkg/mod
     networks:
       localnet:
         ipv4_address: 192.168.10.2
@@ -55,6 +57,8 @@ services:
       - "1318:1317"
       - "9091:9090"
       - "2346:2345"
+    volumes:
+      - go-modules:/go/pkg/mod
     networks:
       localnet:
         ipv4_address: 192.168.10.3
@@ -79,6 +83,8 @@ services:
       - "1319:1317"
       - "9092:9090"
       - "2347:2345"
+    volumes:
+      - go-modules:/go/pkg/mod
     networks:
       localnet:
         ipv4_address: 192.168.10.4
@@ -103,6 +109,8 @@ services:
       - "1320:1317"
       - "9093:9090"
       - "2348:2345"
+    volumes:
+      - go-modules:/go/pkg/mod
     networks:
       localnet:
         ipv4_address: 192.168.10.5
@@ -114,3 +122,8 @@ networks:
       driver: default
       config:
         - subnet: 192.168.10.0/25
+
+# this Docker volume space can be reclaimed using:
+#   $ docker volume rm go-modules
+volumes:
+  go-modules: # Cached Go module dependencies are stored here
