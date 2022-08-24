@@ -5,19 +5,9 @@ services:
     container_name: dualitynode0
     build:
       context: .
-    command: >
-      /bin/sh -c "
-        # prevent 'local network address' warning from showing
-        sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /data/node$$ID/dualityd/config/config.toml;
-        # overwrite CORS rules to allow browser testing and development with frontend local builds
-        sed -i 's/enabled-unsafe-cors = false/enabled-unsafe-cors = true/g' /data/node$$ID/dualityd/config/app.toml;
-        sed -i 's/cors_allowed_origins = \[\]/cors_allowed_origins = [\"*\", ]/g' /data/node$$ID/dualityd/config/config.toml;
-        echo '\n\n[rpc]\ncors_allowed_origins = [\"*\"]' >> /data/node$$ID/dualityd/config/app.toml
-        # combine custom chain initial state with testnet initial state configuration
-        node -p \"require('./rewrite-genesis.js')('/data/node$$ID/dualityd/config/genesis.json', '/root/.duality/config/genesis.json')\";
-        # start chain from appropriate configuration files
-        dualityd --home /data/node$$ID/dualityd start --moniker duality;
-      "
+      dockerfile: Dockerfile-testnet
+      args:
+        NODE_ID: 0
     environment:
       - DEBUG=1
       - ID=0
@@ -31,8 +21,6 @@ services:
       - "1317:1317"
       - "9090:9090"
       - "2345:2345"
-    volumes:
-      - ./.testnets:/data:Z
     networks:
       localnet:
         ipv4_address: 192.168.10.2
@@ -41,19 +29,9 @@ services:
     container_name: dualitynode1
     build:
       context: .
-    command: >
-      /bin/sh -c "
-        # prevent 'local network address' warning from showing
-        sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /data/node$$ID/dualityd/config/config.toml;
-        # overwrite CORS rules to allow browser testing and development with frontend local builds
-        sed -i 's/enabled-unsafe-cors = false/enabled-unsafe-cors = true/g' /data/node$$ID/dualityd/config/app.toml;
-        sed -i 's/cors_allowed_origins = \[\]/cors_allowed_origins = [\"*\", ]/g' /data/node$$ID/dualityd/config/config.toml;
-        echo '\n\n[rpc]\ncors_allowed_origins = [\"*\"]' >> /data/node$$ID/dualityd/config/app.toml
-        # combine custom chain initial state with testnet initial state configuration
-        node -p \"require('./rewrite-genesis.js')('/data/node$$ID/dualityd/config/genesis.json', '/root/.duality/config/genesis.json')\";
-        # start chain from appropriate configuration files
-        dualityd --home /data/node$$ID/dualityd start --moniker duality;
-      "
+      dockerfile: Dockerfile-testnet
+      args:
+        NODE_ID: 1
     environment:
       - DEBUG=0
       - ID=1
@@ -67,8 +45,6 @@ services:
       - "1318:1317"
       - "9091:9090"
       - "2346:2345"
-    volumes:
-      - ./.testnets:/data:Z
     networks:
       localnet:
         ipv4_address: 192.168.10.3
@@ -77,19 +53,9 @@ services:
     container_name: dualitynode2
     build:
       context: .
-    command: >
-      /bin/sh -c "
-        # prevent 'local network address' warning from showing
-        sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /data/node$$ID/dualityd/config/config.toml;
-        # overwrite CORS rules to allow browser testing and development with frontend local builds
-        sed -i 's/enabled-unsafe-cors = false/enabled-unsafe-cors = true/g' /data/node$$ID/dualityd/config/app.toml;
-        sed -i 's/cors_allowed_origins = \[\]/cors_allowed_origins = [\"*\", ]/g' /data/node$$ID/dualityd/config/config.toml;
-        echo '\n\n[rpc]\ncors_allowed_origins = [\"*\"]' >> /data/node$$ID/dualityd/config/app.toml
-        # combine custom chain initial state with testnet initial state configuration
-        node -p \"require('./rewrite-genesis.js')('/data/node$$ID/dualityd/config/genesis.json', '/root/.duality/config/genesis.json')\";
-        # start chain from appropriate configuration files
-        dualityd --home /data/node$$ID/dualityd start --moniker duality;
-      "
+      dockerfile: Dockerfile-testnet
+      args:
+        NODE_ID: 2
     environment:
       - DEBUG=0
       - ID=2
@@ -103,8 +69,6 @@ services:
       - "1319:1317"
       - "9092:9090"
       - "2347:2345"
-    volumes:
-      - ./.testnets:/data:Z
     networks:
       localnet:
         ipv4_address: 192.168.10.4
@@ -113,19 +77,9 @@ services:
     container_name: dualitynode3
     build:
       context: .
-    command: >
-      /bin/sh -c "
-        # prevent 'local network address' warning from showing
-        sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /data/node$$ID/dualityd/config/config.toml;
-        # overwrite CORS rules to allow browser testing and development with frontend local builds
-        sed -i 's/enabled-unsafe-cors = false/enabled-unsafe-cors = true/g' /data/node$$ID/dualityd/config/app.toml;
-        sed -i 's/cors_allowed_origins = \[\]/cors_allowed_origins = [\"*\", ]/g' /data/node$$ID/dualityd/config/config.toml;
-        echo '\n\n[rpc]\ncors_allowed_origins = [\"*\"]' >> /data/node$$ID/dualityd/config/app.toml
-        # combine custom chain initial state with testnet initial state configuration
-        node -p \"require('./rewrite-genesis.js')('/data/node$$ID/dualityd/config/genesis.json', '/root/.duality/config/genesis.json')\";
-        # start chain from appropriate configuration files
-        dualityd --home /data/node$$ID/dualityd start --moniker duality;
-      "
+      dockerfile: Dockerfile-testnet
+      args:
+        NODE_ID: 3
     environment:
       - DEBUG=0
       - ID=3
@@ -139,8 +93,6 @@ services:
       - "1320:1317"
       - "9093:9090"
       - "2348:2345"
-    volumes:
-      - ./.testnets:/data:Z
     networks:
       localnet:
         ipv4_address: 192.168.10.5
