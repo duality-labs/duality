@@ -7,8 +7,11 @@ services:
       context: .
     command: >
       /bin/sh -c "
+        # prevent 'local network address' warning from showing
         sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /data/node$$ID/dualityd/config/config.toml;
+        # combine custom chain initial state with testnet initial state configuration
         node -p \"require('./rewrite-genesis.js')('/data/node$$ID/dualityd/config/genesis.json', '/root/.duality/config/genesis.json')\";
+        # start chain from appropriate configuration files
         dualityd --home /data/node$$ID/dualityd start --moniker duality;
       "
     environment:
@@ -36,8 +39,11 @@ services:
       context: .
     command: >
       /bin/sh -c "
+        # prevent 'local network address' warning from showing
         sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /data/node$$ID/dualityd/config/config.toml;
+        # combine custom chain initial state with testnet initial state configuration
         node -p \"require('./rewrite-genesis.js')('/data/node$$ID/dualityd/config/genesis.json', '/root/.duality/config/genesis.json')\";
+        # start chain from appropriate configuration files
         dualityd --home /data/node$$ID/dualityd start --moniker duality;
       "
     environment:
@@ -65,8 +71,11 @@ services:
       context: .
     command: >
       /bin/sh -c "
+        # prevent 'local network address' warning from showing
         sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /data/node$$ID/dualityd/config/config.toml;
+        # combine custom chain initial state with testnet initial state configuration
         node -p \"require('./rewrite-genesis.js')('/data/node$$ID/dualityd/config/genesis.json', '/root/.duality/config/genesis.json')\";
+        # start chain from appropriate configuration files
         dualityd --home /data/node$$ID/dualityd start --moniker duality;
       "
     environment:
@@ -94,8 +103,11 @@ services:
       context: .
     command: >
       /bin/sh -c "
+        # prevent 'local network address' warning from showing
         sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /data/node$$ID/dualityd/config/config.toml;
+        # combine custom chain initial state with testnet initial state configuration
         node -p \"require('./rewrite-genesis.js')('/data/node$$ID/dualityd/config/genesis.json', '/root/.duality/config/genesis.json')\";
+        # start chain from appropriate configuration files
         dualityd --home /data/node$$ID/dualityd start --moniker duality;
       "
     environment:
