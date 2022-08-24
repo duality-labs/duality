@@ -9,24 +9,6 @@ import (
 	//sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// TODO: Decide whether to addLiquidity if pair exists
-// TODO: Add current tick specification for pair multi-deposit
-// TODO: Determine how we plan to set tick spacing for pair
-func (k Keeper) CreateNewPair(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, msg *types.MsgCreatePair, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	/*
-		1) Check if pair exists
-		   a) If so, output pair
-		   b) Else, init pair
-		       i) If nodes do not exist, init nodes
-			   ii) Add tokenA, tokenB to eachother's outgoingEdges
-		2) Call SingleDeposit on pool & set currTick equivalent to corresponding virtualTick (for price, fee)
-	*/
-
-	_ = ctx
-	return nil
-}
-
 func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, price sdk.Dec, msg *types.MsgAddLiquidity, callerAddr sdk.AccAddress, receiver sdk.AccAddress) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -398,14 +380,14 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 	// TODO: Sending tokens from the user to the module, will be necessary to do this before the rest of logic to avoid reentrancy/failure attacks
 	if amount0toRemove.GT(sdk.ZeroDec()) {
 		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount0toRemove.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coin0}); err != nil {
 			return err
 		}
 	}
 
 	if amount1toRemove.GT(sdk.ZeroDec()) {
 		coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount1toRemove.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coin1}); err != nil {
 			return err
 		}
 	}
