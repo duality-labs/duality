@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -15,11 +16,13 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 
 	PairOld, PairFound := k.GetPairs(ctx, token0, token1)
 
+	fmt.Println(PairOld.Tickmap)
 	if !PairFound {
-		sdkerrors.Wrapf(types.ErrValidPairNotFound, "Valid pair not found")
+		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Valid pair not found")
 	}
 
 	fee, err := sdk.NewDecFromStr(msg.Fee)
+	fee = fee.Quo(sdk.NewDec(10000))
 	// Error checking for valid sdk.Dec
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
@@ -199,6 +202,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 
 	PairNew, PairFound := k.GetPairs(ctx, token0, token1)
 
+	fmt.Println("Pair New", PairNew, PairFound)
 	NewPairs := types.Pairs{
 		Token0:       token0,
 		Token1:       token1,
@@ -262,7 +266,7 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 	PairOld, PairFound := k.GetPairs(ctx, token0, token1)
 
 	if !PairFound {
-		sdkerrors.Wrapf(types.ErrValidPairNotFound, "Valid pair not found")
+		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Valid pair not found")
 	}
 
 	fee, err := sdk.NewDecFromStr(msg.Fee)
@@ -281,7 +285,7 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 	removeTick := false
 	// Check if tick exists
 	if !IndexQueueFound || !TickFound {
-		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Can't withdraw liquidity from a tick that does not exist!", err)
+		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Can't withdraw liquidity from a tick that does not exist!, %s", err)
 
 	} else {
 
