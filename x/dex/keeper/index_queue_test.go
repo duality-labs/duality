@@ -70,6 +70,6 @@ func TestIndexQueueGetAll(t *testing.T) {
 	items := createNIndexQueue(keeper, ctx, 10)
 	require.ElementsMatch(t,
 		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllIndexQueue(ctx)),
+		nullify.Fill(keeper.GetAllIndexQueueByPair(ctx, "Token0", "Token1")),
 	)
 }

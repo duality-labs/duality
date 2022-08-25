@@ -23,12 +23,12 @@ func (k Keeper) dequeue(ctx sdk.Context, queue []*types.IndexQueueType) (types.I
 
 // SetIndexQueue set a specific IndexQueue in the store from its index
 func (k Keeper) SetIndexQueue(ctx sdk.Context, token0 string, token1 string, IndexQueue types.IndexQueue) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.IndexQueueKeyPrefix))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.IndexQueuePrefix(token0, token1))
 	b := k.cdc.MustMarshal(&IndexQueue)
 	//fmt.Println(token0)
 	//fmt.Println(token1)
 	//fmt.Println("set index", IndexQueue.Index)
-	store.Set(types.IndexQueueKey(token0, token1,
+	store.Set(types.IndexQueueKey(
 		IndexQueue.Index,
 	), b)
 }
@@ -41,11 +41,9 @@ func (k Keeper) GetIndexQueue(
 	index int32,
 
 ) (val types.IndexQueue, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.IndexQueueKeyPrefix))
-	//fmt.Println(token0)
-	//fmt.Println(token1)
-	//fmt.Println("Get Index:", index)
-	b := store.Get(types.IndexQueueKey(token0, token1,
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.IndexQueuePrefix(token0, token1))
+
+	b := store.Get(types.IndexQueueKey(
 		index,
 	))
 	//fmt.Println(b)
@@ -65,15 +63,15 @@ func (k Keeper) RemoveIndexQueue(
 	index int32,
 
 ) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.IndexQueueKeyPrefix))
-	store.Delete(types.IndexQueueKey(token0, token1,
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.IndexQueuePrefix(token0, token1))
+	store.Delete(types.IndexQueueKey(
 		index,
 	))
 }
 
 // GetAllIndexQueue returns all IndexQueue
-func (k Keeper) GetAllIndexQueue(ctx sdk.Context) (list []types.IndexQueue) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.IndexQueueKeyPrefix))
+func (k Keeper) GetAllIndexQueueByPair(ctx sdk.Context, token0 string, token1 string) (list []types.IndexQueue) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.IndexQueuePrefix(token0, token1))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
@@ -84,5 +82,21 @@ func (k Keeper) GetAllIndexQueue(ctx sdk.Context) (list []types.IndexQueue) {
 		list = append(list, val)
 	}
 
-	return
+	return list
+}
+
+func (k Keeper) GetAllIndexQueue(ctx sdk.Context) (list []types.IndexQueue) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseIndexQueueKeyPrefix))
+	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var val types.IndexQueue
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
+		list = append(list, val)
+	}
+
+	return list
+
 }

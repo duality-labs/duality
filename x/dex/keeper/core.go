@@ -16,7 +16,6 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 
 	PairOld, PairFound := k.GetPairs(ctx, token0, token1)
 
-	fmt.Println(PairOld.Tickmap)
 	if !PairFound {
 		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Valid pair not found")
 	}
@@ -208,8 +207,6 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 		Token1:       token1,
 		CurrentIndex: PairOld.CurrentIndex,
 		TickSpacing:  PairOld.TickSpacing,
-		Tickmap:      PairNew.Tickmap,
-		IndexMap:     PairNew.IndexMap,
 	}
 
 	k.SetPairs(ctx, NewPairs)
@@ -364,15 +361,13 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 		k.SetTicks(ctx, token0, token1, NewTick)
 	}
 
-	PairNew, _ := k.GetPairs(ctx, token0, token1)
+	//PairNew, _ := k.GetPairs(ctx, token0, token1)
 
 	NewPairs := types.Pairs{
 		Token0:       token0,
 		Token1:       token1,
 		CurrentIndex: PairOld.CurrentIndex,
 		TickSpacing:  PairOld.TickSpacing,
-		Tickmap:      PairNew.Tickmap,
-		IndexMap:     PairNew.IndexMap,
 	}
 
 	k.SetPairs(ctx, NewPairs)

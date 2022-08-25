@@ -8,11 +8,9 @@ import (
 
 // SetTicks set a specific ticks in the store from its index
 func (k Keeper) SetTicks(ctx sdk.Context, token0 string, token1 string, ticks types.Ticks) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TicksKeyPrefix))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TicksPrefix(token0, token1))
 	b := k.cdc.MustMarshal(&ticks)
 	store.Set(types.TicksKey(
-		token0,
-		token1,
 		ticks.Price,
 		ticks.Fee,
 		ticks.OrderType,
@@ -29,11 +27,9 @@ func (k Keeper) GetTicks(
 	orderType string,
 
 ) (val types.Ticks, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TicksKeyPrefix))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TicksPrefix(token0, token1))
 
 	b := store.Get(types.TicksKey(
-		token0,
-		token1,
 		price,
 		fee,
 		orderType,
@@ -56,10 +52,8 @@ func (k Keeper) RemoveTicks(
 	orderType string,
 
 ) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TicksKeyPrefix))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TicksPrefix(token0, token1))
 	store.Delete(types.TicksKey(
-		token0,
-		token1,
 		price,
 		fee,
 		orderType,
@@ -67,8 +61,8 @@ func (k Keeper) RemoveTicks(
 }
 
 // GetAllTicks returns all ticks
-func (k Keeper) GetAllTicks(ctx sdk.Context) (list []types.Ticks) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TicksKeyPrefix))
+func (k Keeper) GetAllTicksByPair(ctx sdk.Context, token0 string, token1 string) (list []types.Ticks) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TicksPrefix(token0, token1))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
@@ -79,5 +73,21 @@ func (k Keeper) GetAllTicks(ctx sdk.Context) (list []types.Ticks) {
 		list = append(list, val)
 	}
 
-	return
+	return list
+}
+
+func (k Keeper) GetAllTicks(ctx sdk.Context) (list []types.Ticks) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTicksKeyPrefix))
+	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var val types.Ticks
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
+		list = append(list, val)
+	}
+
+	return list
+
 }
