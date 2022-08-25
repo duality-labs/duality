@@ -44,7 +44,7 @@ func CmdListTicks() *cobra.Command {
 
 func CmdShowTicks() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-ticks [price] [fee] [direction] [order-type]",
+		Use:   "show-ticks [token0] [token1] [price] [fee] [direction] [order-type]",
 		Short: "shows a ticks",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {

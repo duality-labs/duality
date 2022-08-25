@@ -45,7 +45,7 @@ func CmdListIndexQueue() *cobra.Command {
 
 func CmdShowIndexQueue() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-virtual-price-queue  [token0] [token1] [v-price] ",
+		Use:   "show-virtual-price-queue  [token0] [token1] [index] ",
 		Short: "shows a IndexQueue",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {

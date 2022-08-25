@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -198,18 +197,6 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 	// Update the storage
 	k.SetTicks(ctx, token0, token1, NewTick)
 	k.SetIndexQueue(ctx, token0, token1, IndexQueue)
-
-	PairNew, PairFound := k.GetPairs(ctx, token0, token1)
-
-	fmt.Println("Pair New", PairNew, PairFound)
-	NewPairs := types.Pairs{
-		Token0:       token0,
-		Token1:       token1,
-		CurrentIndex: PairOld.CurrentIndex,
-		TickSpacing:  PairOld.TickSpacing,
-	}
-
-	k.SetPairs(ctx, NewPairs)
 
 	// Sending tokens from the user to the module, might be necessary to do this before the rest of logic to avoid reentrancy/failure attacks
 	if msg.TokenDirection == token0 {

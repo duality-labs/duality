@@ -78,7 +78,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("0"))))
 
 	// Note this is the "correct"sorted order based of sha256 sort in sort_tokens
-	fmt.Println(app.DexKeeper.GetPairs(ctx, "TokenB", "TokenA"))
+	fmt.Println(app.DexKeeper.GetAllTicksByPair(ctx, "TokenB", "TokenA"))
 	_ = createResponse
 
 	_ = ctx
