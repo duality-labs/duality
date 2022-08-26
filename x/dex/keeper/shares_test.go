@@ -18,6 +18,7 @@ var _ = strconv.IntSize
 func createNShares(keeper *keeper.Keeper, ctx sdk.Context, n int, token0 string, token1 string) []types.Shares {
 	items := make([]types.Shares, n)
 	for i := range items {
+		items[i].SharesOwned = sdk.ZeroDec()
 		items[i].Address = strconv.Itoa(i)
 		items[i].Price = strconv.Itoa(i)
 		items[i].Fee = strconv.Itoa(i)
@@ -73,9 +74,9 @@ func TestSharesRemove(t *testing.T) {
 
 func TestSharesGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNShares(keeper, ctx, 10, "TokenB", "TokenA")
+	items := createNShares(keeper, ctx, 10, "Token0", "Token1")
 	require.ElementsMatch(t,
 		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllShares(ctx)),
+		nullify.Fill(keeper.GetAllSharesByPair(ctx, "Token0", "Token1")),
 	)
 }
