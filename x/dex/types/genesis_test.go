@@ -61,6 +61,20 @@ func TestGenesisState_Validate(t *testing.T) {
 						Node: "1",
 					},
 				},
+				SharesList: []types.Shares{
+					{
+						Address:   "0",
+						Price:     "0",
+						Fee:       "0",
+						OrderType: "0",
+					},
+					{
+						Address:   "1",
+						Price:     "1",
+						Fee:       "1",
+						OrderType: "1",
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -124,6 +138,26 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 					{
 						Node: "0"},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated shares",
+			genState: &types.GenesisState{
+				SharesList: []types.Shares{
+					{
+						Address:   "0",
+						Price:     "0",
+						Fee:       "0",
+						OrderType: "0",
+					},
+					{
+						Address:   "0",
+						Price:     "0",
+						Fee:       "0",
+						OrderType: "0",
+					},
 				},
 			},
 			valid: false,

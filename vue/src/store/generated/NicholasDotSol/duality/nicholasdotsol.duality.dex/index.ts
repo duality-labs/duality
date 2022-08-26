@@ -6,10 +6,11 @@ import { Nodes } from "./module/types/dex/nodes"
 import { OrderParams } from "./module/types/dex/order_params"
 import { Pairs } from "./module/types/dex/pairs"
 import { Params } from "./module/types/dex/params"
+import { Shares } from "./module/types/dex/shares"
 import { Ticks } from "./module/types/dex/ticks"
 
 
-export { IndexQueue, IndexQueueType, Nodes, OrderParams, Pairs, Params, Ticks };
+export { IndexQueue, IndexQueueType, Nodes, OrderParams, Pairs, Params, Shares, Ticks };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -56,6 +57,8 @@ const getDefaultState = () => {
 				IndexQueueAll: {},
 				Nodes: {},
 				NodesAll: {},
+				Shares: {},
+				SharesAll: {},
 				
 				_Structure: {
 						IndexQueue: getStructure(IndexQueue.fromPartial({})),
@@ -64,6 +67,7 @@ const getDefaultState = () => {
 						OrderParams: getStructure(OrderParams.fromPartial({})),
 						Pairs: getStructure(Pairs.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
+						Shares: getStructure(Shares.fromPartial({})),
 						Ticks: getStructure(Ticks.fromPartial({})),
 						
 		},
@@ -146,6 +150,18 @@ export default {
 						(<any> params).query=null
 					}
 			return state.NodesAll[JSON.stringify(params)] ?? {}
+		},
+				getShares: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.Shares[JSON.stringify(params)] ?? {}
+		},
+				getSharesAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.SharesAll[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -403,6 +419,69 @@ export default {
 		},
 		
 		
+		
+		
+		 		
+		
+		
+		async QueryShares({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryShares( key.address,  key.price,  key.fee,  key.orderType)).data
+				
+					
+				commit('QUERY', { query: 'Shares', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryShares', payload: { options: { all }, params: {...key},query }})
+				return getters['getShares']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryShares API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QuerySharesAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.querySharesAll(query)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await queryClient.querySharesAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'SharesAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QuerySharesAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getSharesAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QuerySharesAll API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		async sendMsgRemoveLiquidity({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgRemoveLiquidity(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgRemoveLiquidity:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgRemoveLiquidity:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
 		async sendMsgSwap({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -433,21 +512,6 @@ export default {
 				}
 			}
 		},
-		async sendMsgRemoveLiquidity({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgRemoveLiquidity(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgRemoveLiquidity:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgRemoveLiquidity:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
 		async sendMsgCreatePair({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -464,6 +528,19 @@ export default {
 			}
 		},
 		
+		async MsgRemoveLiquidity({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgRemoveLiquidity(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgRemoveLiquidity:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgRemoveLiquidity:Create Could not create message: ' + e.message)
+				}
+			}
+		},
 		async MsgSwap({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -487,19 +564,6 @@ export default {
 					throw new Error('TxClient:MsgAddLiquidity:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgAddLiquidity:Create Could not create message: ' + e.message)
-				}
-			}
-		},
-		async MsgRemoveLiquidity({ rootGetters }, { value }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgRemoveLiquidity(value)
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgRemoveLiquidity:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgRemoveLiquidity:Create Could not create message: ' + e.message)
 				}
 			}
 		},

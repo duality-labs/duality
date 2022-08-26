@@ -8,6 +8,7 @@ import "dex/ticks.proto";
 import "dex/pairs.proto";
 import "dex/index_queue.proto";
 import "dex/nodes.proto";
+import "dex/shares.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -19,5 +20,6 @@ message GenesisState {
   repeated Pairs pairsList = 3 [(gogoproto.nullable) = false];
   repeated IndexQueue indexQueueList = 4 [(gogoproto.nullable) = false];
   repeated Nodes nodesList = 5 [(gogoproto.nullable) = false];
+  repeated Shares sharesList = 6 [(gogoproto.nullable) = false];
   // this line is used by starport scaffolding # genesis/proto/state
 }

@@ -1,8 +1,6 @@
 /* eslint-disable */
 import * as Long from "long";
 import { util, configure, Writer, Reader } from "protobufjs/minimal";
-import { Ticks } from "../dex/ticks";
-import { IndexQueue } from "../dex/index_queue";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -11,8 +9,6 @@ export interface Pairs {
   token1: string;
   tickSpacing: number;
   currentIndex: number;
-  tickmap: Ticks | undefined;
-  IndexMap: IndexQueue | undefined;
 }
 
 const basePairs: object = {
@@ -36,12 +32,6 @@ export const Pairs = {
     if (message.currentIndex !== 0) {
       writer.uint32(32).int32(message.currentIndex);
     }
-    if (message.tickmap !== undefined) {
-      Ticks.encode(message.tickmap, writer.uint32(42).fork()).ldelim();
-    }
-    if (message.IndexMap !== undefined) {
-      IndexQueue.encode(message.IndexMap, writer.uint32(50).fork()).ldelim();
-    }
     return writer;
   },
 
@@ -63,12 +53,6 @@ export const Pairs = {
           break;
         case 4:
           message.currentIndex = reader.int32();
-          break;
-        case 5:
-          message.tickmap = Ticks.decode(reader, reader.uint32());
-          break;
-        case 6:
-          message.IndexMap = IndexQueue.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -100,16 +84,6 @@ export const Pairs = {
     } else {
       message.currentIndex = 0;
     }
-    if (object.tickmap !== undefined && object.tickmap !== null) {
-      message.tickmap = Ticks.fromJSON(object.tickmap);
-    } else {
-      message.tickmap = undefined;
-    }
-    if (object.IndexMap !== undefined && object.IndexMap !== null) {
-      message.IndexMap = IndexQueue.fromJSON(object.IndexMap);
-    } else {
-      message.IndexMap = undefined;
-    }
     return message;
   },
 
@@ -121,14 +95,6 @@ export const Pairs = {
       (obj.tickSpacing = message.tickSpacing);
     message.currentIndex !== undefined &&
       (obj.currentIndex = message.currentIndex);
-    message.tickmap !== undefined &&
-      (obj.tickmap = message.tickmap
-        ? Ticks.toJSON(message.tickmap)
-        : undefined);
-    message.IndexMap !== undefined &&
-      (obj.IndexMap = message.IndexMap
-        ? IndexQueue.toJSON(message.IndexMap)
-        : undefined);
     return obj;
   },
 
@@ -153,16 +119,6 @@ export const Pairs = {
       message.currentIndex = object.currentIndex;
     } else {
       message.currentIndex = 0;
-    }
-    if (object.tickmap !== undefined && object.tickmap !== null) {
-      message.tickmap = Ticks.fromPartial(object.tickmap);
-    } else {
-      message.tickmap = undefined;
-    }
-    if (object.IndexMap !== undefined && object.IndexMap !== null) {
-      message.IndexMap = IndexQueue.fromPartial(object.IndexMap);
-    } else {
-      message.IndexMap = undefined;
     }
     return message;
   },

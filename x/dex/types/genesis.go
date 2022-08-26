@@ -13,6 +13,7 @@ func DefaultGenesis() *GenesisState {
 		//TicksList:      []Ticks{},
 		PairsList: []Pairs{},
 		//IndexQueueList: []IndexQueue{},
+		SharesList: []Shares{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -56,6 +57,16 @@ func (gs GenesisState) Validate() error {
 	// 	IndexQueueIndexMap[index] = struct{}{}
 	//}
 
+	// Check for duplicated index in shares
+	sharesIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.SharesList {
+		index := string(SharesKey(elem.Address, elem.Price, elem.Fee, elem.OrderType))
+		if _, ok := sharesIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for shares")
+		}
+		sharesIndexMap[index] = struct{}{}
+	}
 	// this line is used by starport scaffolding # genesis/types/validate
 
 	return gs.Params.Validate()
