@@ -20,7 +20,7 @@ func (k Keeper) SharesAll(c context.Context, req *types.QueryAllSharesRequest) (
 	ctx := sdk.UnwrapSDKContext(c)
 
 	store := ctx.KVStore(k.storeKey)
-	sharesStore := prefix.NewStore(store, types.KeyPrefix(types.SharesKeyPrefix))
+	sharesStore := prefix.NewStore(store, types.SharesPrefix(req.Token0, req.Token1))
 
 	pageRes, err := query.Paginate(sharesStore, req.Pagination, func(key []byte, value []byte) error {
 		var shares types.Shares
@@ -47,6 +47,8 @@ func (k Keeper) Shares(c context.Context, req *types.QueryGetSharesRequest) (*ty
 
 	val, found := k.GetShares(
 		ctx,
+		req.Token0,
+		req.Token1,
 		req.Address,
 		req.Price,
 		req.Fee,

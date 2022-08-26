@@ -57,6 +57,9 @@ const (
 
 	// PairsKeyPrefix is the prefix to retrieve all Pairs
 	BasePairsKeyPrefix = "Pairs/value/"
+
+	// SharesKeyPrefix is the prefix to retrieve all Shares
+	BaseSharesKeyPrefix = "Shares/value/"
 )
 
 func PairsPrefix() []byte {
@@ -69,22 +72,38 @@ func PairPrefixHelper(token0, token1 string) []byte {
 
 func IndexQueuePrefix(token0 string, token1 string) []byte {
 	return append(KeyPrefix(BaseIndexQueueKeyPrefix), PairPrefixHelper(token0, token1)...)
-	//return append(KeyPrefix(BasePairsKeyPrefix), append(PairPrefixHelper(token0, token1), append(KeyPrefix(Separator), KeyPrefix(BaseIndexQueueKeyPrefix)...)...)...)
 }
 
 func TicksPrefix(token0 string, token1 string) []byte {
 	return append(KeyPrefix(BaseTicksKeyPrefix), PairPrefixHelper(token0, token1)...)
 }
 
-// One Possible ways to Catergorize Ticks / IndexQueue
-// If change back remove Seperators
-//func IndexQueuePrefix(token0 string, token1 string) []byte {
-//return append(KeyPrefix(BasePairsKeyPrefix), append(PairPrefixHelper(token0, token1), append(KeyPrefix(Separator), KeyPrefix(BaseIndexQueueKeyPrefix)...)...)...)
-//}
+func SharesPrefix(token0 string, token1 string) []byte {
+	return append(KeyPrefix(BaseSharesKeyPrefix), PairPrefixHelper(token0, token1)...)
+}
 
-//func TicksPrefix(token0 string, token1 string) []byte {
-//return append(KeyPrefix(BasePairsKeyPrefix), append(PairPrefixHelper(token0, token1), append(KeyPrefix(Separator), KeyPrefix(BaseTicksKeyPrefix)...)...)...)
-//}
+// SharesKey returns the store key to retrieve a Shares from the index fields
+func SharesKey(address string, price string, fee string, orderType string) []byte {
+	var key []byte
+
+	addressBytes := []byte(address)
+	key = append(key, addressBytes...)
+	key = append(key, []byte("/")...)
+
+	priceBytes := []byte(price)
+	key = append(key, priceBytes...)
+	key = append(key, []byte("/")...)
+
+	feeBytes := []byte(fee)
+	key = append(key, feeBytes...)
+	key = append(key, []byte("/")...)
+
+	orderTypeBytes := []byte(orderType)
+	key = append(key, orderTypeBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
 
 // NodesKey returns the store key to retrieve a Nodes from the index fields
 func NodesKey(node string) []byte {

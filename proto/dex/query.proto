@@ -179,6 +179,8 @@ message QueryGetSharesRequest {
   string price = 2;
   string fee = 3;
   string orderType = 4;
+  string token0 = 5;
+	string token1 = 6;
 
 }
 
@@ -188,6 +190,8 @@ message QueryGetSharesResponse {
 
 message QueryAllSharesRequest {
 	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+	string token0 = 2;
+	string token1 = 3;
 }
 
 message QueryAllSharesResponse {

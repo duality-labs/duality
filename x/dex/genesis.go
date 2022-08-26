@@ -15,14 +15,18 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.SetPairs(ctx, elem)
 
 		// // Set all the ticks
-		// for _, elem2 := range genState.TicksList {
-		// 	k.SetTicks(ctx, elem.Token0, elem.Token1, elem2)
-		// }
+		for _, elem2 := range genState.TicksList {
+			k.SetTicks(ctx, elem.Token0, elem.Token1, elem2)
+		}
 
 		// // Set all the virtualPriceQueue
-		// for _, elem2 := range genState.IndexQueueList {
-		// 	k.SetIndexQueue(ctx, elem.Token0, elem.Token1, elem2)
-		// }
+		for _, elem2 := range genState.IndexQueueList {
+			k.SetIndexQueue(ctx, elem.Token0, elem.Token1, elem2)
+		}
+
+		for _, elem2 := range genState.SharesList {
+			k.SetShares(ctx, elem.Token0, elem.Token1, elem2)
+		}
 
 	}
 
@@ -31,9 +35,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.SetNodes(ctx, elem)
 	}
 	// Set all the shares
-	for _, elem := range genState.SharesList {
-		k.SetShares(ctx, elem)
-	}
+	//for _, elem := range genState.SharesList {
+	//	k.SetShares(ctx, elem)
+	//}
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
 }

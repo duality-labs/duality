@@ -15,7 +15,7 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNShares(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Shares {
+func createNShares(keeper *keeper.Keeper, ctx sdk.Context, n int, token0 string, token1 string) []types.Shares {
 	items := make([]types.Shares, n)
 	for i := range items {
 		items[i].Address = strconv.Itoa(i)
@@ -23,16 +23,18 @@ func createNShares(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Shares
 		items[i].Fee = strconv.Itoa(i)
 		items[i].OrderType = strconv.Itoa(i)
 
-		keeper.SetShares(ctx, items[i])
+		keeper.SetShares(ctx, token0, token1, items[i])
 	}
 	return items
 }
 
 func TestSharesGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNShares(keeper, ctx, 10)
+	items := createNShares(keeper, ctx, 10, "TokenB", "TokenA")
 	for _, item := range items {
 		rst, found := keeper.GetShares(ctx,
+			"TokenB",
+			"TokenA",
 			item.Address,
 			item.Price,
 			item.Fee,
@@ -47,15 +49,19 @@ func TestSharesGet(t *testing.T) {
 }
 func TestSharesRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNShares(keeper, ctx, 10)
+	items := createNShares(keeper, ctx, 10, "TokenB", "TokenA")
 	for _, item := range items {
 		keeper.RemoveShares(ctx,
+			"TokenB",
+			"TokenA",
 			item.Address,
 			item.Price,
 			item.Fee,
 			item.OrderType,
 		)
 		_, found := keeper.GetShares(ctx,
+			"TokenB",
+			"TokenA",
 			item.Address,
 			item.Price,
 			item.Fee,
@@ -67,7 +73,7 @@ func TestSharesRemove(t *testing.T) {
 
 func TestSharesGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNShares(keeper, ctx, 10)
+	items := createNShares(keeper, ctx, 10, "TokenB", "TokenA")
 	require.ElementsMatch(t,
 		nullify.Fill(items),
 		nullify.Fill(keeper.GetAllShares(ctx)),

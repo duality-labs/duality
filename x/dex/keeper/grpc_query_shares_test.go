@@ -21,7 +21,7 @@ var _ = strconv.IntSize
 func TestSharesQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNShares(keeper, ctx, 2)
+	msgs := createNShares(keeper, ctx, 2, "TokenB", "TokenA")
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetSharesRequest
@@ -81,7 +81,7 @@ func TestSharesQuerySingle(t *testing.T) {
 func TestSharesQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNShares(keeper, ctx, 5)
+	msgs := createNShares(keeper, ctx, 5, "TokenB", "TokenA")
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllSharesRequest {
 		return &types.QueryAllSharesRequest{
