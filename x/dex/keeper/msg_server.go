@@ -113,13 +113,13 @@ func (k msgServer) RemoveLiquidity(goCtx context.Context, msg *types.MsgRemoveLi
 
 	// TODO: Handling the message
 	_ = ctx
-	token0, token1, callerAdr, receiverAdr, shares, price, err := k.RemoveLiquidityVerification(goCtx, msg)
+	token0, token1, callerAdr, receiverAdr, shares, prevSharesOwned, price, err := k.RemoveLiquidityVerification(goCtx, msg)
 
 	if err != nil {
 		return nil, err
 	}
 
-	err = k.SingleWithdraw(goCtx, token0, token1, shares, price, msg, callerAdr, receiverAdr)
+	err = k.SingleWithdraw(goCtx, token0, token1, shares, prevSharesOwned, price, msg, callerAdr, receiverAdr)
 
 	if err != nil {
 		return nil, err

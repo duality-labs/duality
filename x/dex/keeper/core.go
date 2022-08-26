@@ -41,13 +41,13 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 
 	var NewTick types.Ticks
 	var oldAmount sdk.Dec //Event variable
-	var shares sdk.Dec
+	var sharesMinted sdk.Dec
 
 	// TODO: Confirm this is the correct way to calculate price
 	if msg.TokenDirection == token0 {
-		shares = amount.Mul(price.Mul(fee))
+		sharesMinted = amount.Mul(price.Mul(fee))
 	} else {
-		shares = amount.Mul(sdk.OneDec().Quo(fee))
+		sharesMinted = amount.Mul(sdk.OneDec().Quo(fee))
 	}
 
 	// Index Queue Logic
@@ -61,7 +61,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 				Orderparams: &types.OrderParams{
 					OrderRule:   "",
 					OrderType:   msg.OrderType,
-					OrderShares: shares,
+					OrderShares: sharesMinted,
 				},
 			},
 		}
@@ -81,7 +81,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 				Orderparams: &types.OrderParams{
 					OrderRule:   "",
 					OrderType:   msg.OrderType,
-					OrderShares: shares,
+					OrderShares: sharesMinted,
 				},
 			})
 
@@ -107,7 +107,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 				Orderparams: &types.OrderParams{
 					OrderRule:   "",
 					OrderType:   msg.OrderType,
-					OrderShares: Tick.TotalShares.Add(shares),
+					OrderShares: Tick.TotalShares.Add(sharesMinted),
 				},
 			}
 		}
@@ -124,11 +124,11 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 				Reserve1:    sdk.ZeroDec(),
 				PairPrice:   price,
 				PairFee:     fee,
-				TotalShares: shares,
+				TotalShares: sharesMinted,
 				Orderparams: &types.OrderParams{
 					OrderRule:   "",
 					OrderType:   msg.OrderType,
-					OrderShares: shares,
+					OrderShares: sharesMinted,
 				},
 			}
 
@@ -142,11 +142,11 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 				Reserve1:    amount,
 				PairPrice:   price,
 				PairFee:     fee,
-				TotalShares: shares,
+				TotalShares: sharesMinted,
 				Orderparams: &types.OrderParams{
 					OrderRule:   "",
 					OrderType:   msg.OrderType,
-					OrderShares: shares,
+					OrderShares: sharesMinted,
 				},
 			}
 			oldAmount = sdk.ZeroDec()
@@ -165,11 +165,11 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 				Reserve1:    Tick.Reserve1,
 				PairPrice:   price,
 				PairFee:     fee,
-				TotalShares: Tick.TotalShares.Add(shares),
+				TotalShares: Tick.TotalShares.Add(sharesMinted),
 				Orderparams: &types.OrderParams{
 					OrderRule:   "",
 					OrderType:   msg.OrderType,
-					OrderShares: Tick.TotalShares.Add(shares),
+					OrderShares: Tick.TotalShares.Add(sharesMinted),
 				},
 			}
 
@@ -183,18 +183,40 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 				Reserve1:    Tick.Reserve1.Add(amount),
 				PairPrice:   price,
 				PairFee:     fee,
-				TotalShares: Tick.TotalShares.Add(shares),
+				TotalShares: Tick.TotalShares.Add(sharesMinted),
 				Orderparams: &types.OrderParams{
 					OrderRule:   "",
 					OrderType:   msg.OrderType,
-					OrderShares: Tick.TotalShares.Add(shares),
+					OrderShares: Tick.TotalShares.Add(sharesMinted),
 				},
 			}
 		}
 
 	}
 
+	oldShares, SharesFound := k.GetShares(ctx, token0, token1, msg.Creator, msg.Price, msg.Fee, msg.OrderType)
+	var NewShares types.Shares
+	if !SharesFound {
+		NewShares = types.Shares{
+			msg.Creator,
+			msg.Price,
+			msg.Fee,
+			msg.OrderType,
+			sharesMinted,
+		}
+	} else {
+
+		NewShares = types.Shares{
+			msg.Creator,
+			msg.Price,
+			msg.Fee,
+			msg.OrderType,
+			oldShares.SharesOwned.Add(sharesMinted),
+		}
+	}
+
 	// Update the storage
+	k.SetShares(ctx, token0, token1, NewShares)
 	k.SetTicks(ctx, token0, token1, NewTick)
 	k.SetIndexQueue(ctx, token0, token1, IndexQueue)
 
@@ -223,7 +245,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 	ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator,
 		token0, token1, price.String(), fee.String(), msg.TokenDirection,
 		oldAmount.String(), oldAmount.Add(amount).String(),
-		sdk.NewAttribute(types.DepositEventSharesMinted, shares.String()),
+		sdk.NewAttribute(types.DepositEventSharesMinted, sharesMinted.String()),
 	))
 
 	return nil
@@ -243,7 +265,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 /*
 Remove Liquidity needs to have verification that the user has enough shares to withdraw & must check re-entrancy attacks
 */
-func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 string, shares sdk.Dec, price sdk.Dec, msg *types.MsgRemoveLiquidity, callerAddr sdk.AccAddress, receiver sdk.AccAddress) error {
+func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 string, sharesToRemove sdk.Dec, prevSharesOwned sdk.Dec, price sdk.Dec, msg *types.MsgRemoveLiquidity, callerAddr sdk.AccAddress, receiver sdk.AccAddress) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -291,21 +313,21 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 		// Multiple deposits can go to the same tick
 		// Need to do this as tick mapping is not tied to an address/unique to a deposit
 
-		if Tick.TotalShares.GT(shares) {
+		if Tick.TotalShares.GT(sharesToRemove) {
 			IndexQueue.Queue[tickIndex] = &types.IndexQueueType{
 				Price: price,
 				Fee:   fee,
 				Orderparams: &types.OrderParams{
 					OrderRule:   "",
 					OrderType:   msg.OrderType,
-					OrderShares: Tick.TotalShares.Sub(shares),
+					OrderShares: Tick.TotalShares.Sub(sharesToRemove),
 				},
 			}
 		} else {
 			// TODO: We should confirm that shares matches the tick amount (to ensure we're not withdrawing more than we have)
 
-			if !Tick.TotalShares.Equal(shares) {
-				return sdkerrors.Wrapf(types.ErrNotEnoughShares, "Trying to withdraw more shares than available")
+			if !Tick.TotalShares.Equal(sharesToRemove) {
+				return sdkerrors.Wrapf(types.ErrNotEnoughShares, "Trying to withdraw more sharesMinted than available")
 			}
 			removeTick = true
 
@@ -333,16 +355,25 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 			Reserve1:    Tick.Reserve1.Sub(amount1toRemove),
 			PairPrice:   price,
 			PairFee:     fee,
-			TotalShares: Tick.TotalShares.Sub(shares),
+			TotalShares: Tick.TotalShares.Sub(sharesToRemove),
 			Orderparams: &types.OrderParams{
 				OrderRule:   "",
 				OrderType:   msg.OrderType,
-				OrderShares: Tick.TotalShares.Sub(shares),
+				OrderShares: Tick.TotalShares.Sub(sharesToRemove),
 			},
 		}
 
 	}
 
+	NewShares := types.Shares{
+		msg.Creator,
+		msg.Price,
+		msg.Fee,
+		msg.OrderType,
+		prevSharesOwned.Sub(sharesToRemove),
+	}
+
+	k.SetShares(ctx, token0, token1, NewShares)
 	k.SetIndexQueue(ctx, token0, token1, IndexQueue)
 	if removeTick {
 		k.RemoveTicks(ctx, token0, token1, msg.Price, msg.Fee, msg.OrderType)
@@ -384,7 +415,7 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 	ctx.EventManager().EmitEvent(types.CreateWithdrawEvent(msg.Creator,
 		token0, token1, price.String(), fee.String(), oldReserve0.String(), oldReserve1.String(),
 		NewTick.Reserve0.String(), NewTick.Reserve1.String(),
-		sdk.NewAttribute(types.WithdrawEventSharesRemoved, shares.String()),
+		sdk.NewAttribute(types.WithdrawEventSharesRemoved, sharesToRemove.String()),
 	))
 
 	return nil

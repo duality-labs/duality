@@ -31,6 +31,8 @@ func TestSharesQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetSharesRequest{
+				Token0:    "TokenB",
+				Token1:    "TokenA",
 				Address:   msgs[0].Address,
 				Price:     msgs[0].Price,
 				Fee:       msgs[0].Fee,
@@ -41,6 +43,8 @@ func TestSharesQuerySingle(t *testing.T) {
 		{
 			desc: "Second",
 			request: &types.QueryGetSharesRequest{
+				Token0:    "TokenB",
+				Token1:    "TokenA",
 				Address:   msgs[1].Address,
 				Price:     msgs[1].Price,
 				Fee:       msgs[1].Fee,
@@ -51,6 +55,8 @@ func TestSharesQuerySingle(t *testing.T) {
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetSharesRequest{
+				Token0:    "TokenB",
+				Token1:    "TokenA",
 				Address:   strconv.Itoa(100000),
 				Price:     strconv.Itoa(100000),
 				Fee:       strconv.Itoa(100000),
@@ -85,6 +91,8 @@ func TestSharesQueryPaginated(t *testing.T) {
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllSharesRequest {
 		return &types.QueryAllSharesRequest{
+			Token0: "TokenB",
+			Token1: "TokenA",
 			Pagination: &query.PageRequest{
 				Key:        next,
 				Offset:     offset,
