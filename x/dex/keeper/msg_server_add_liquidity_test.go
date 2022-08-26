@@ -9,6 +9,18 @@ import (
 	//authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
+// Returns -1 if error
+func newDec(amount string) sdk.Dec {
+	amt, err := sdk.NewDecFromStr(amount)
+
+	if err != nil {
+		return sdk.NewDec(-1)
+	}
+
+	return amt
+
+}
+
 func newACoin(amt sdk.Int) sdk.Coin {
 	return sdk.NewCoin("TokenA", amt)
 }
@@ -76,7 +88,7 @@ func (suite *IntegrationTestSuite) TestSingleDeposit() {
 		Price:          "1.0",
 		Fee:            "0",
 		Amount:         "50",
-		OrderType:      "Market",
+		OrderType:      "LP",
 		Receiver:       alice.String(),
 	})
 
@@ -103,7 +115,7 @@ func (suite *IntegrationTestSuite) TestSingleDeposit() {
 		Price:          "1.0",
 		Fee:            "0",
 		Amount:         "50",
-		OrderType:      "Market",
+		OrderType:      "LP",
 		Receiver:       alice.String(),
 	})
 
@@ -119,6 +131,25 @@ func (suite *IntegrationTestSuite) TestSingleDeposit() {
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("50000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("0"))))
 
+	expectedTick := types.Ticks{
+		Price:       "1.0",
+		Fee:         "0",
+		OrderType:   "LP",
+		Reserve0:    newDec("50"),
+		Reserve1:    newDec("0"),
+		PairPrice:   newDec("1"),
+		PairFee:     newDec("0"),
+		TotalShares: newDec("0"),
+		Orderparams: &types.OrderParams{
+			OrderRule:   "",
+			OrderType:   "LP",
+			OrderShares: newDec("0"),
+		},
+	}
+	tickactual, _ := app.DexKeeper.GetTicks(ctx, "TokenB", "TokenA", "1.0", "0", "LP")
+
+	suite.Require().Equal(expectedTick, tickactual)
+
 	_ = createResponse2
 
 	createResponse3, err := suite.msgServer.AddLiquidity(goCtx, &types.MsgAddLiquidity{
@@ -130,7 +161,7 @@ func (suite *IntegrationTestSuite) TestSingleDeposit() {
 		Price:          "1.0",
 		Fee:            "300",
 		Amount:         "50",
-		OrderType:      "Market",
+		OrderType:      "LP",
 		Receiver:       alice.String(),
 	})
 
@@ -145,6 +176,26 @@ func (suite *IntegrationTestSuite) TestSingleDeposit() {
 
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("100000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("0"))))
+
+	expectedTick2 := types.Ticks{
+		Price:       "1.0",
+		Fee:         "300",
+		OrderType:   "LP",
+		Reserve0:    newDec("50"),
+		Reserve1:    newDec("0"),
+		PairPrice:   newDec("1"),
+		PairFee:     newDec("0.03"),
+		TotalShares: newDec("1.5"),
+		Orderparams: &types.OrderParams{
+			OrderRule:   "",
+			OrderType:   "LP",
+			OrderShares: newDec("1.5"),
+		},
+	}
+	tickactual2, _ := app.DexKeeper.GetTicks(ctx, "TokenB", "TokenA", "1.0", "300", "LP")
+
+	suite.Require().Equal(expectedTick2, tickactual2)
+
 	_ = createResponse3
 
 	// suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000"))))
@@ -163,7 +214,7 @@ func (suite *IntegrationTestSuite) TestSingleDeposit() {
 		Price:          "1.0",
 		Fee:            "0",
 		Amount:         "50",
-		OrderType:      "Market",
+		OrderType:      "LP",
 		Receiver:       alice.String(),
 	})
 	suite.Require().Error(err)
@@ -188,7 +239,7 @@ func (suite *IntegrationTestSuite) TestSingleDeposit() {
 		Price:          "1.0",
 		Fee:            "300",
 		Amount:         "20",
-		OrderType:      "Market",
+		OrderType:      "LP",
 		Receiver:       bob.String(),
 	})
 
@@ -203,6 +254,26 @@ func (suite *IntegrationTestSuite) TestSingleDeposit() {
 
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("100000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("20000000000000000000"))))
+
+	expectedTick3 := types.Ticks{
+		Price:       "1.0",
+		Fee:         "300",
+		OrderType:   "LP",
+		Reserve0:    newDec("50"),
+		Reserve1:    newDec("20"),
+		PairPrice:   newDec("1"),
+		PairFee:     newDec("0.03"),
+		TotalShares: newDec("668.166666666666666660"),
+		Orderparams: &types.OrderParams{
+			OrderRule:   "",
+			OrderType:   "LP",
+			OrderShares: newDec("668.166666666666666660"),
+		},
+	}
+	tickactual3, _ := app.DexKeeper.GetTicks(ctx, "TokenB", "TokenA", "1.0", "300", "LP")
+
+	suite.Require().Equal(expectedTick3, tickactual3)
+
 	_ = createResponse5
 
 	_ = goCtx

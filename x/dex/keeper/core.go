@@ -89,7 +89,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 			tickIndex := -1
 			// Do a linear search over the queue to find the tick with the matching price + fee
 			for i, tick := range IndexQueue.Queue {
-				if tick.Price.Equal(price) && tick.Fee.Equal(fee) {
+				if tick.Price.Equal(price) && tick.Fee.Equal(fee) && tick.Orderparams.OrderType == msg.OrderType {
 					tickIndex = i
 					break
 				}
@@ -254,6 +254,7 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 	}
 
 	fee, err := sdk.NewDecFromStr(msg.Fee)
+	fee = fee.Quo(sdk.NewDec(10000))
 	// Error checking for valid sdk.Dec
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
@@ -276,7 +277,8 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 		tickIndex := -1
 		// Do a linear search over the queue to find the tick with the matching price + fee
 		for i, tick := range IndexQueue.Queue {
-			if tick.Price.Equal(price) && tick.Fee.Equal(fee) {
+
+			if tick.Price.Equal(price) && tick.Fee.Equal(fee) && tick.Orderparams.OrderType == msg.OrderType {
 				tickIndex = i
 				break
 			}

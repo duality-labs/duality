@@ -59,9 +59,9 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		TokenDirection: "TokenB",
 		Index:          0,
 		Price:          "1.0",
-		Fee:            "0",
+		Fee:            "300",
 		Amount:         "50",
-		OrderType:      "Market",
+		OrderType:      "LP",
 		Receiver:       alice.String(),
 	})
 
@@ -78,8 +78,227 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("0"))))
 
 	// Note this is the "correct"sorted order based of sha256 sort in sort_tokens
-	fmt.Println(app.DexKeeper.GetAllTicksByPair(ctx, "TokenB", "TokenA"))
+	expectedTick := types.Ticks{
+		Price:       "1.0",
+		Fee:         "300",
+		OrderType:   "LP",
+		Reserve0:    newDec("50"),
+		Reserve1:    newDec("0"),
+		PairPrice:   newDec("1"),
+		PairFee:     newDec("0.03"),
+		TotalShares: newDec("1.5"),
+		Orderparams: &types.OrderParams{
+			OrderRule:   "",
+			OrderType:   "LP",
+			OrderShares: newDec("1.5"),
+		},
+	}
+	tickactual, _ := app.DexKeeper.GetTicks(ctx, "TokenB", "TokenA", "1.0", "300", "LP")
+
+	expectedIndexQueue, _ := app.DexKeeper.GetIndexQueue(ctx, "TokenB", "TokenA", 0)
+
+	actualIndexQueueArray := []*types.IndexQueueType{
+
+		&types.IndexQueueType{
+			Price: newDec("1"),
+			Fee:   newDec("0.03"),
+			Orderparams: &types.OrderParams{
+				OrderRule:   "",
+				OrderType:   "LP",
+				OrderShares: newDec("1.5"),
+			},
+		},
+	}
+
+	actualIndexQueue := types.IndexQueue{
+		Index: 0,
+		Queue: actualIndexQueueArray,
+	}
+
+	suite.Require().Equal(expectedIndexQueue, actualIndexQueue)
+
+	suite.Require().Equal(expectedTick, tickactual)
+
 	_ = createResponse
 
+	withdrawResponse, err := suite.msgServer.RemoveLiquidity(goCtx, &types.MsgRemoveLiquidity{
+		Creator:        alice.String(),
+		TokenA:         "TokenA",
+		TokenB:         "TokenB",
+		TokenDirection: "TokenB",
+		Index:          0,
+		Price:          "1.0",
+		Fee:            "300",
+		Shares:         "1.5",
+		OrderType:      "LP",
+		Receiver:       alice.String(),
+	})
+
+	suite.Require().Nil(err)
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("0"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("0"))))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
+	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("1000000000000000000000"))))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+
+	tickactual2, _ := app.DexKeeper.GetTicks(ctx, "TokenB", "TokenA", "1.0", "300", "LP")
+
+	suite.Require().True(tickactual2.Reserve0.IsNil())
+	suite.Require().True(tickactual2.Reserve1.IsNil())
+	suite.Require().True(tickactual2.TotalShares.IsNil())
+	suite.Require().True(tickactual2.PairPrice.IsNil())
+	suite.Require().True(tickactual2.PairFee.IsNil())
+	suite.Require().True(tickactual2.Price == "")
+	suite.Require().True(tickactual2.Fee == "")
+	suite.Require().True(tickactual2.OrderType == "")
+
+	indexQueue2, _ := app.DexKeeper.GetIndexQueue(ctx, "TokenB", "TokenA", 0)
+
+	suite.Require().True(len(indexQueue2.Queue) == 0)
+
+	_ = withdrawResponse
+
+	withdrawResponse2, err := suite.msgServer.RemoveLiquidity(goCtx, &types.MsgRemoveLiquidity{
+		Creator:        alice.String(),
+		TokenA:         "TokenA",
+		TokenB:         "TokenB",
+		TokenDirection: "TokenB",
+		Index:          0,
+		Price:          "1.0",
+		Fee:            "300",
+		Shares:         "1.5",
+		OrderType:      "LP",
+		Receiver:       alice.String(),
+	})
+
+	suite.Require().Error(err)
+
+	_ = withdrawResponse2
+
+	createResponse2, err := suite.msgServer.AddLiquidity(goCtx, &types.MsgAddLiquidity{
+		Creator:        bob.String(),
+		TokenA:         "TokenA",
+		TokenB:         "TokenB",
+		TokenDirection: "TokenA",
+		Index:          0,
+		Price:          "1.0",
+		Fee:            "300",
+		Amount:         "20",
+		OrderType:      "LP",
+		Receiver:       bob.String(),
+	})
+
+	suite.Require().Nil(err)
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("80000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("0"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("20000000000000000000"))))
+
+	_ = createResponse2
+
+	createResponse3, err := suite.msgServer.AddLiquidity(goCtx, &types.MsgAddLiquidity{
+		Creator:        bob.String(),
+		TokenA:         "TokenA",
+		TokenB:         "TokenB",
+		TokenDirection: "TokenA",
+		Index:          0,
+		Price:          "1.0",
+		Fee:            "300",
+		Amount:         "20",
+		OrderType:      "LP",
+		Receiver:       bob.String(),
+	})
+
+	fmt.Println(app.DexKeeper.GetTicks(ctx, "TokenB", "TokenA", "1.0", "300", "LP"))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("50000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("0"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("40000000000000000000"))))
+
+	_ = createResponse3
+
+	withdrawResponse3, err := suite.msgServer.RemoveLiquidity(goCtx, &types.MsgRemoveLiquidity{
+		Creator:        bob.String(),
+		TokenA:         "TokenA",
+		TokenB:         "TokenB",
+		TokenDirection: "TokenB",
+		Index:          0,
+		Price:          "1.0",
+		Fee:            "300",
+		Shares:         "1333.333333333333333321",
+		OrderType:      "LP",
+		Receiver:       bob.String(),
+	})
+
+	_ = withdrawResponse3
+
+	suite.Require().Error(err)
+
+	withdrawResponse4, err := suite.msgServer.RemoveLiquidity(goCtx, &types.MsgRemoveLiquidity{
+		Creator:        bob.String(),
+		TokenA:         "TokenC",
+		TokenB:         "TokenB",
+		TokenDirection: "TokenB",
+		Index:          0,
+		Price:          "1.0",
+		Fee:            "300",
+		Shares:         "1333.333333333333333321",
+		OrderType:      "LP",
+		Receiver:       bob.String(),
+	})
+
+	_ = withdrawResponse4
+
+	suite.Require().Error(err)
+
+	withdrawResponse5, err := suite.msgServer.RemoveLiquidity(goCtx, &types.MsgRemoveLiquidity{
+		Creator:        bob.String(),
+		TokenA:         "TokenA",
+		TokenB:         "TokenB",
+		TokenDirection: "TokenB",
+		Index:          0,
+		Price:          "1.0",
+		Fee:            "300",
+		Shares:         "1333.333333333333333320",
+		OrderType:      "Limit",
+		Receiver:       bob.String(),
+	})
+
+	_ = withdrawResponse5
+
+	suite.Require().Error(err)
+
+	withdrawResponse6, err := suite.msgServer.RemoveLiquidity(goCtx, &types.MsgRemoveLiquidity{
+		Creator:        alice.String(),
+		TokenA:         "TokenA",
+		TokenB:         "TokenB",
+		TokenDirection: "TokenB",
+		Index:          0,
+		Price:          "1.0",
+		Fee:            "300",
+		Shares:         "1333.333333333333333320",
+		OrderType:      "LP",
+		Receiver:       alice.String(),
+	})
+
+	_ = withdrawResponse6
+
+	suite.Require().Error(err)
 	_ = ctx
+
 }
