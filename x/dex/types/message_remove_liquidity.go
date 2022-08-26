@@ -9,17 +9,16 @@ const TypeMsgRemoveLiquidity = "remove_liquidity"
 
 var _ sdk.Msg = &MsgRemoveLiquidity{}
 
-func NewMsgRemoveLiquidity(creator string, tokenA string, tokenB string, tokenDirection string, shares string, price string, fee string, orderType string, receiver string) *MsgRemoveLiquidity {
+func NewMsgRemoveLiquidity(creator string, tokenA string, tokenB string, shares string, price string, fee string, orderType string, receiver string) *MsgRemoveLiquidity {
 	return &MsgRemoveLiquidity{
-		Creator:        creator,
-		TokenA:         tokenA,
-		TokenB:         tokenB,
-		TokenDirection: tokenDirection,
-		Shares:         shares,
-		Price:          price,
-		Fee:            fee,
-		OrderType:      orderType,
-		Receiver:       receiver,
+		Creator:   creator,
+		TokenA:    tokenA,
+		TokenB:    tokenB,
+		Shares:    shares,
+		Price:     price,
+		Fee:       fee,
+		OrderType: orderType,
+		Receiver:  receiver,
 	}
 }
 

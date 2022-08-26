@@ -122,16 +122,15 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	_ = createResponse
 
 	withdrawResponse, err := suite.msgServer.RemoveLiquidity(goCtx, &types.MsgRemoveLiquidity{
-		Creator:        alice.String(),
-		TokenA:         "TokenA",
-		TokenB:         "TokenB",
-		TokenDirection: "TokenB",
-		Index:          0,
-		Price:          "1.0",
-		Fee:            "300",
-		Shares:         "1.5",
-		OrderType:      "LP",
-		Receiver:       alice.String(),
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		Index:     0,
+		Price:     "1.0",
+		Fee:       "300",
+		Shares:    "1.5",
+		OrderType: "LP",
+		Receiver:  alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -164,16 +163,15 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	_ = withdrawResponse
 
 	withdrawResponse2, err := suite.msgServer.RemoveLiquidity(goCtx, &types.MsgRemoveLiquidity{
-		Creator:        alice.String(),
-		TokenA:         "TokenA",
-		TokenB:         "TokenB",
-		TokenDirection: "TokenB",
-		Index:          0,
-		Price:          "1.0",
-		Fee:            "300",
-		Shares:         "1.5",
-		OrderType:      "LP",
-		Receiver:       alice.String(),
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		Index:     0,
+		Price:     "1.0",
+		Fee:       "300",
+		Shares:    "1.5",
+		OrderType: "LP",
+		Receiver:  alice.String(),
 	})
 
 	suite.Require().Error(err)
@@ -233,16 +231,15 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	_ = createResponse3
 
 	withdrawResponse3, err := suite.msgServer.RemoveLiquidity(goCtx, &types.MsgRemoveLiquidity{
-		Creator:        bob.String(),
-		TokenA:         "TokenA",
-		TokenB:         "TokenB",
-		TokenDirection: "TokenB",
-		Index:          0,
-		Price:          "1.0",
-		Fee:            "300",
-		Shares:         "1333.333333333333333321",
-		OrderType:      "LP",
-		Receiver:       bob.String(),
+		Creator:   bob.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		Index:     0,
+		Price:     "1.0",
+		Fee:       "300",
+		Shares:    "1333.333333333333333321",
+		OrderType: "LP",
+		Receiver:  bob.String(),
 	})
 
 	_ = withdrawResponse3
@@ -250,16 +247,15 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	suite.Require().Error(err)
 
 	withdrawResponse4, err := suite.msgServer.RemoveLiquidity(goCtx, &types.MsgRemoveLiquidity{
-		Creator:        bob.String(),
-		TokenA:         "TokenC",
-		TokenB:         "TokenB",
-		TokenDirection: "TokenB",
-		Index:          0,
-		Price:          "1.0",
-		Fee:            "300",
-		Shares:         "1333.333333333333333321",
-		OrderType:      "LP",
-		Receiver:       bob.String(),
+		Creator:   bob.String(),
+		TokenA:    "TokenC",
+		TokenB:    "TokenB",
+		Index:     0,
+		Price:     "1.0",
+		Fee:       "300",
+		Shares:    "1333.333333333333333321",
+		OrderType: "LP",
+		Receiver:  bob.String(),
 	})
 
 	_ = withdrawResponse4
@@ -267,16 +263,15 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	suite.Require().Error(err)
 
 	withdrawResponse5, err := suite.msgServer.RemoveLiquidity(goCtx, &types.MsgRemoveLiquidity{
-		Creator:        bob.String(),
-		TokenA:         "TokenA",
-		TokenB:         "TokenB",
-		TokenDirection: "TokenB",
-		Index:          0,
-		Price:          "1.0",
-		Fee:            "300",
-		Shares:         "1333.333333333333333320",
-		OrderType:      "Limit",
-		Receiver:       bob.String(),
+		Creator:   bob.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		Index:     0,
+		Price:     "1.0",
+		Fee:       "300",
+		Shares:    "1333.333333333333333320",
+		OrderType: "Limit",
+		Receiver:  bob.String(),
 	})
 
 	_ = withdrawResponse5
@@ -284,16 +279,15 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	suite.Require().Error(err)
 
 	withdrawResponse6, err := suite.msgServer.RemoveLiquidity(goCtx, &types.MsgRemoveLiquidity{
-		Creator:        alice.String(),
-		TokenA:         "TokenA",
-		TokenB:         "TokenB",
-		TokenDirection: "TokenB",
-		Index:          0,
-		Price:          "1.0",
-		Fee:            "300",
-		Shares:         "1333.333333333333333320",
-		OrderType:      "LP",
-		Receiver:       alice.String(),
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		Index:     0,
+		Price:     "1.0",
+		Fee:       "300",
+		Shares:    "1333.333333333333333320",
+		OrderType: "LP",
+		Receiver:  alice.String(),
 	})
 
 	_ = withdrawResponse6

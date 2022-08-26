@@ -53,16 +53,6 @@ func (k msgServer) AddLiquidityVerification(goCtx context.Context, msg *types.Ms
 	if AccountsToken0Balance.LT(amount) {
 		return "", "", nil, nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
-	//var decAmounts []sdk.Dec
-	// for i := 0; i < len(msg.Amount); i++ {
-
-	//amount, err := sdk.NewDecFromStr(msg.Amount)
-	// // Error checking for valid sdk.Dec
-	//if err != nil {
-	// return "", "", nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
-	// }
-	// decAmounts = append(decAmounts, amount)
-	// }
 
 	return token0, token1, callerAddr, receiverAddr, amount, priceDec, nil
 }
@@ -100,10 +90,6 @@ func (k msgServer) RemoveLiquidityVerification(goCtx context.Context, msg *types
 	// Error checking for valid sdk.Dec
 	if err != nil {
 		return "", "", nil, nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
-	}
-
-	if msg.TokenDirection != msg.TokenA && msg.TokenB != msg.TokenDirection {
-		return "", "", nil, nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Token Direction must be the same as either Token A or Token B")
 	}
 
 	return token0, token1, callerAddr, receiverAddr, shares, priceDec, nil

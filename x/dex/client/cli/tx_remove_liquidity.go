@@ -14,18 +14,17 @@ var _ = strconv.Itoa(0)
 
 func CmdRemoveLiquidity() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "remove-liquidity [token-a] [token-b] [token-direction] [shares] [price] [fee] [order-type]",
+		Use:   "remove-liquidity [token-a] [token-b] [shares] [price] [fee] [order-type]",
 		Short: "Broadcast message RemoveLiquidity",
 		Args:  cobra.ExactArgs(7),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argTokenA := args[0]
 			argTokenB := args[1]
-			argTokenDirection := args[2]
-			argShares := args[3]
-			argPrice := args[4]
-			argFee := args[5]
-			argOrderType := args[6]
-			argReceiver := args[7]
+			argShares := args[2]
+			argPrice := args[3]
+			argFee := args[4]
+			argOrderType := args[5]
+			argReceiver := args[6]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -36,7 +35,6 @@ func CmdRemoveLiquidity() *cobra.Command {
 				clientCtx.GetFromAddress().String(),
 				argTokenA,
 				argTokenB,
-				argTokenDirection,
 				argShares,
 				argPrice,
 				argFee,
