@@ -20,7 +20,7 @@ func (k Keeper) PairsAll(c context.Context, req *types.QueryAllPairsRequest) (*t
 	ctx := sdk.UnwrapSDKContext(c)
 
 	store := ctx.KVStore(k.storeKey)
-	pairsStore := prefix.NewStore(store, types.KeyPrefix(types.PairsKeyPrefix))
+	pairsStore := prefix.NewStore(store, types.PairsPrefix())
 
 	pageRes, err := query.Paginate(pairsStore, req.Pagination, func(key []byte, value []byte) error {
 		var pairs types.Pairs

@@ -88,11 +88,15 @@ message QueryGetTicksRequest {
 }
 
 message QueryGetTicksResponse {
-	Ticks ticks = 1 [(gogoproto.nullable) = false];
+	string token0 = 1;
+	string token1 = 2;
+	Ticks ticks = 3 [(gogoproto.nullable) = false];
 }
 
 message QueryAllTicksRequest {
 	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+	string token0 = 2;
+	string token1 = 3;
 }
 
 message QueryAllTicksResponse {
@@ -132,6 +136,8 @@ message QueryGetIndexQueueResponse {
 
 message QueryAllIndexQueueRequest {
 	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+	string token0 = 2;
+	string token1 = 3;
 }
 
 message QueryAllIndexQueueResponse {

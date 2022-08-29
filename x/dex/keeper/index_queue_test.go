@@ -15,7 +15,7 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNIndexQueue(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.IndexQueue {
+func createNIndexQueue(keeper *keeper.Keeper, ctx sdk.Context, n int, token0 string, token1 string) []types.IndexQueue {
 	items := make([]types.IndexQueue, n)
 	for i := range items {
 		items[i].Queue = append(items[i].Queue, &types.IndexQueueType{
@@ -29,7 +29,7 @@ func createNIndexQueue(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.In
 		})
 		items[i].Index = int32(i)
 
-		keeper.SetIndexQueue(ctx, "Token0", "Token1", items[i])
+		keeper.SetIndexQueue(ctx, token0, token1, items[i])
 	}
 	//fmt.Println(items)
 	return items
@@ -37,7 +37,7 @@ func createNIndexQueue(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.In
 
 func TestIndexQueueGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNIndexQueue(keeper, ctx, 10)
+	items := createNIndexQueue(keeper, ctx, 10, "Token0", "Token1")
 	for i := range items {
 		rst, found := keeper.GetIndexQueue(ctx,
 			"Token0", "Token1",
@@ -53,7 +53,7 @@ func TestIndexQueueGet(t *testing.T) {
 }
 func TestIndexQueueRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNIndexQueue(keeper, ctx, 10)
+	items := createNIndexQueue(keeper, ctx, 10, "Token0", "Token1")
 	for _, item := range items {
 		keeper.RemoveIndexQueue(ctx, "Token0", "Token1",
 			item.Index,
@@ -67,9 +67,9 @@ func TestIndexQueueRemove(t *testing.T) {
 
 func TestIndexQueueGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNIndexQueue(keeper, ctx, 10)
+	items := createNIndexQueue(keeper, ctx, 10, "Token0", "Token1")
 	require.ElementsMatch(t,
 		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllIndexQueue(ctx)),
+		nullify.Fill(keeper.GetAllIndexQueueByPair(ctx, "Token0", "Token1")),
 	)
 }

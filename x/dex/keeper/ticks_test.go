@@ -15,7 +15,7 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNTicks(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Ticks {
+func createNTicks(keeper *keeper.Keeper, ctx sdk.Context, n int, token0 string, token1 string) []types.Ticks {
 	items := make([]types.Ticks, n)
 	for i := range items {
 		items[i].Reserve0 = sdk.ZeroDec()
@@ -27,18 +27,18 @@ func createNTicks(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Ticks {
 		items[i].PairPrice = sdk.ZeroDec()
 		items[i].TotalShares = sdk.ZeroDec()
 
-		keeper.SetTicks(ctx, "0", "1", items[i])
+		keeper.SetTicks(ctx, token0, token1, items[i])
 	}
 	return items
 }
 
 func TestTicksGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNTicks(keeper, ctx, 10)
+	items := createNTicks(keeper, ctx, 10, "Token0", "Token1")
 	for _, item := range items {
 		rst, found := keeper.GetTicks(ctx,
-			"0",
-			"1",
+			"Token0",
+			"Token1",
 			item.Price,
 			item.Fee,
 			item.OrderType,
@@ -52,18 +52,18 @@ func TestTicksGet(t *testing.T) {
 }
 func TestTicksRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNTicks(keeper, ctx, 10)
+	items := createNTicks(keeper, ctx, 10, "Token0", "Token1")
 	for _, item := range items {
 		keeper.RemoveTicks(ctx,
-			"0",
-			"1",
+			"Token0",
+			"Token1",
 			item.Price,
 			item.Fee,
 			item.OrderType,
 		)
 		_, found := keeper.GetTicks(ctx,
-			"0",
-			"1",
+			"Token0",
+			"Token1",
 			item.Price,
 			item.Fee,
 			item.OrderType,
@@ -74,9 +74,9 @@ func TestTicksRemove(t *testing.T) {
 
 func TestTicksGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNTicks(keeper, ctx, 10)
+	items := createNTicks(keeper, ctx, 10, "Token0", "Token1")
 	require.ElementsMatch(t,
 		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllTicks(ctx)),
+		nullify.Fill(keeper.GetAllTicksByPair(ctx, "Token0", "Token1")),
 	)
 }

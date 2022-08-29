@@ -20,7 +20,7 @@ func (k Keeper) IndexQueueAll(c context.Context, req *types.QueryAllIndexQueueRe
 	ctx := sdk.UnwrapSDKContext(c)
 
 	store := ctx.KVStore(k.storeKey)
-	IndexQueueStore := prefix.NewStore(store, types.KeyPrefix(types.IndexQueueKeyPrefix))
+	IndexQueueStore := prefix.NewStore(store, types.IndexQueuePrefix(req.Token0, req.Token1))
 
 	pageRes, err := query.Paginate(IndexQueueStore, req.Pagination, func(key []byte, value []byte) error {
 		var IndexQueue types.IndexQueue

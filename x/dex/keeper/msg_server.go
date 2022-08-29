@@ -54,8 +54,6 @@ func (k msgServer) CreatePair(goCtx context.Context, msg *types.MsgCreatePair) (
 		Token1:       token1,
 		TickSpacing:  1,
 		CurrentIndex: msg.Index,
-		Tickmap:      nil,
-		IndexMap:     nil,
 	})
 
 	// Get and Set Node for Token0

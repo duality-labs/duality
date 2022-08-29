@@ -9,24 +9,6 @@ import (
 	//sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// TODO: Decide whether to addLiquidity if pair exists
-// TODO: Add current tick specification for pair multi-deposit
-// TODO: Determine how we plan to set tick spacing for pair
-func (k Keeper) CreateNewPair(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, msg *types.MsgCreatePair, callerAdr sdk.AccAddress, receiver sdk.AccAddress) error {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	/*
-		1) Check if pair exists
-		   a) If so, output pair
-		   b) Else, init pair
-		       i) If nodes do not exist, init nodes
-			   ii) Add tokenA, tokenB to eachother's outgoingEdges
-		2) Call SingleDeposit on pool & set currTick equivalent to corresponding virtualTick (for price, fee)
-	*/
-
-	_ = ctx
-	return nil
-}
-
 func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, price sdk.Dec, msg *types.MsgAddLiquidity, callerAddr sdk.AccAddress, receiver sdk.AccAddress) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -34,10 +16,11 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 	PairOld, PairFound := k.GetPairs(ctx, token0, token1)
 
 	if !PairFound {
-		sdkerrors.Wrapf(types.ErrValidPairNotFound, "Valid pair not found")
+		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Valid pair not found")
 	}
 
 	fee, err := sdk.NewDecFromStr(msg.Fee)
+	fee = fee.Quo(sdk.NewDec(10000))
 	// Error checking for valid sdk.Dec
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
@@ -215,19 +198,6 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 	k.SetTicks(ctx, token0, token1, NewTick)
 	k.SetIndexQueue(ctx, token0, token1, IndexQueue)
 
-	PairNew, PairFound := k.GetPairs(ctx, token0, token1)
-
-	NewPairs := types.Pairs{
-		Token0:       token0,
-		Token1:       token1,
-		CurrentIndex: PairOld.CurrentIndex,
-		TickSpacing:  PairOld.TickSpacing,
-		Tickmap:      PairNew.Tickmap,
-		IndexMap:     PairNew.IndexMap,
-	}
-
-	k.SetPairs(ctx, NewPairs)
-
 	// Sending tokens from the user to the module, might be necessary to do this before the rest of logic to avoid reentrancy/failure attacks
 	if msg.TokenDirection == token0 {
 		if amount.GT(sdk.ZeroDec()) {
@@ -280,7 +250,7 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 	PairOld, PairFound := k.GetPairs(ctx, token0, token1)
 
 	if !PairFound {
-		sdkerrors.Wrapf(types.ErrValidPairNotFound, "Valid pair not found")
+		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Valid pair not found")
 	}
 
 	fee, err := sdk.NewDecFromStr(msg.Fee)
@@ -299,7 +269,7 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 	removeTick := false
 	// Check if tick exists
 	if !IndexQueueFound || !TickFound {
-		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Can't withdraw liquidity from a tick that does not exist!", err)
+		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Can't withdraw liquidity from a tick that does not exist!, %s", err)
 
 	} else {
 
@@ -378,15 +348,13 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 		k.SetTicks(ctx, token0, token1, NewTick)
 	}
 
-	PairNew, _ := k.GetPairs(ctx, token0, token1)
+	//PairNew, _ := k.GetPairs(ctx, token0, token1)
 
 	NewPairs := types.Pairs{
 		Token0:       token0,
 		Token1:       token1,
 		CurrentIndex: PairOld.CurrentIndex,
 		TickSpacing:  PairOld.TickSpacing,
-		Tickmap:      PairNew.Tickmap,
-		IndexMap:     PairNew.IndexMap,
 	}
 
 	k.SetPairs(ctx, NewPairs)
@@ -398,14 +366,14 @@ func (k Keeper) SingleWithdraw(goCtx context.Context, token0 string, token1 stri
 	// TODO: Sending tokens from the user to the module, will be necessary to do this before the rest of logic to avoid reentrancy/failure attacks
 	if amount0toRemove.GT(sdk.ZeroDec()) {
 		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount0toRemove.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coin0}); err != nil {
 			return err
 		}
 	}
 
 	if amount1toRemove.GT(sdk.ZeroDec()) {
 		coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount1toRemove.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coin1}); err != nil {
 			return err
 		}
 	}
@@ -452,160 +420,144 @@ func (k Keeper) SingleSwapIn(goCtx context.Context, token0 string, token1 string
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
+	// Decides which reserve we will query
+	swapToToken0 := true
+
+	if msg.TokenOut == token1 {
+		swapToToken0 = false
+	}
+
 	currIdx := Pair.CurrentIndex
 
-	// Tracker of how much liquidity has been currently filled
-	currFilled := sdk.ZeroDec()
+	// Tracker of how much liquidity has been currently filled of the tokenIn
+	remainingAmount := amountIn
 
-	for currFilled.LT(minOut) {
+	// TotalAmountOut
+	totalAmountOut := sdk.ZeroDec()
+
+	// IndexQueues that were modified in process of swap
+	usedIndexQueues := make([]types.IndexQueue, 0)
+
+	// Ticks that were filled & updated amount of liquidity inside of them
+	// Need to call setTicks with this updated tick list
+	usedTicks := make([]types.Ticks, 0)
+
+	// TODO: Handle Reverts - any message that returns an error will not be committed
+	for remainingAmount.GT(sdk.ZeroDec()) {
 		IndexQueue, IndexQueueFound := k.GetIndexQueue(ctx, token0, token1, currIdx)
 		if !IndexQueueFound {
-			return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Can't swap liqudity through a tick that does not exist!", err)
+			// TODO: Update Error Types
+			return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Ran out of liquidity to swap through (no more index queues!", err)
 
 		}
-		for i, tickRef := range IndexQueue.Queue {
+		for _, tickRef := range IndexQueue.Queue {
+			// Gets values, not pointers
 			Tick, TickFound := k.GetTicks(ctx, token0, token1, tickRef.Price.String(), tickRef.Fee.String(), tickRef.Orderparams.OrderType)
 			if !TickFound {
 				return sdkerrors.Wrapf(types.ErrValidTickNotFound, "No corresponding tick for price, fee, orderType!", err)
 
 			}
-			// Check if there's enough liquidity in tick to fulfill minOut - currFilled
+			// Which reserve to use
 
-			// Create temp tick map, to be used to update tickmap
+			/*
+				1) Need to calculate liquidity in terms of minOut
+				Need to add a function to move liquidity for an LP order
+				2) Need to add a function
+				3)
+				4)
+				5)
+
+
+			*/
+			virtualPrice, err := k.GetVirtualPriceFromTick(Pair.CurrentIndex)
+			if err != nil {
+
+			}
+
+			if swapToToken0 {
+				// TODO: Make sure virtualPrice is calculated correctly in both directions
+				requiredToDeplete := Tick.Reserve0.Add(Tick.Reserve0.Mul(tickRef.Fee).Quo(virtualPrice))
+				// Enough liquidity to fulfill minOut - currFilled
+				if requiredToDeplete.GTE(remainingAmount) {
+					amountOut := remainingAmount.Sub(remainingAmount.Mul(tickRef.Fee.Quo(virtualPrice)))
+					// Update tick & append to usedTicks array
+					Tick.Reserve0 = Tick.Reserve0.Sub(amountOut)
+					// Shift order to other side
+					if tickRef.Orderparams.OrderType == "LP" {
+						// Calculate flip price
+						flipPrice := sdk.NewDec(1).Quo(virtualPrice.Mul(tickRef.Fee))
+						// Tick to flip liquidity to, how do we know how much liquidity to flip
+					} else {
+						// Remove order from queue
+
+					}
+
+					// Tells us which ticks to delete
+					usedTicks = append(usedTicks, Tick)
+					break
+
+				} else {
+					// Swap amountIn to token1
+					amountLeft = amountLeft.Sub(Tick.Reserve0)
+
+					// Update tick & append to usedTicks array
+					Tick.Reserve0 = sdk.ZeroDec()
+					usedTicks = append(usedTicks, Tick)
+
+				}
+			} else {
+				totalAmount := Tick.Reserve1.Mul(sdk.NewDec(1).Quo(virtualPrice))
+				// Enough liquidity to fulfill minOut - currFilled
+				if Tick.Reserve1.GT(minOut.Sub(amountLeft)) {
+					amountLeft = sdk.ZeroDec()
+
+					// Update tick & append to usedTicks array
+					Tick.Reserve1 = Tick.Reserve1.Sub(amountLeft)
+					usedTicks = append(usedTicks, Tick)
+					break
+				} else {
+					// Swap amountIn to token1
+					amountLeft = amountLeft.Sub(Tick.Reserve1)
+					// Update tick & append to usedTicks array
+					Tick.Reserve1 = sdk.ZeroDec()
+					usedTicks = append(usedTicks, Tick)
+				}
+			}
 
 		}
 
-		// Update currTick if necessary
+		// Update currIdx if necessary
 		// TODO: Create helper method to search for nextTick with liquidity (based off of tick spacing)
+		newCurrIdx, idxQueueFound := k.GetNextIndex(ctx, Pair, swapToToken0)
+
+		// No liquidity left in pool
+		if !idxQueueFound {
+			// TODO: Update this to a new error type
+			return sdkerrors.Wrapf(types.ErrValidTickNotFound, "No next tick, ran out of liquidity in pair for swap", err)
+		}
+		usedIndexQueues = append(usedIndexQueues, IndexQueue)
+		Pair.CurrentIndex = newCurrIdx
+
 	}
 
+	// Set Ticks (with updated ticks)
+	for _, usedTick := range usedTicks {
+		if usedTick.OrderType == "LIMIT" {
+			// Limit Order
+			// Remove tick if empty, otherwise update with new tick value
+
+		} else if usedTick.OrderType == "LP" {
+			// CSMM Order
+			// Flip tick depending on how much the reserve got swapped to
+
+		}
+		k.SetTicks(ctx, token0, token1, usedTick)
+	}
+	// Set IndexQueue (with updated queues)
+	for _, usedTick := range usedTicks {
+		k.SetIndexQueue(ctx, token0, token1, usedTick)
+	}
+	// Set Pair (with updated currentIndex)
 	// Tick from the tick store
-	Tick, TickFound := k.GetTicks(ctx, token0, token1, msg.Price, msg.Fee, msg.OrderType)
-
-	var NewTick types.Ticks
-	// Index Queue Logic
-	removeTick := false
-	// Check if tick exists
-	if !IndexQueueFound || !TickFound {
-		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Can't withdraw liquidity from a tick that does not exist!", err)
-
-	} else {
-
-		tickIndex := -1
-		// Do a linear search over the queue to find the tick with the matching price + fee
-		for i, tick := range IndexQueue.Queue {
-			if tick.Price.Equal(price) && tick.Fee.Equal(fee) {
-				tickIndex = i
-				break
-			}
-		}
-		if tickIndex == -1 {
-			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Tick not found in queue")
-		}
-
-		// Update the existing tick with the new amount
-		// Multiple deposits can go to the same tick
-		// Need to do this as tick mapping is not tied to an address/unique to a deposit
-
-		if Tick.TotalShares.GT(shares) {
-			IndexQueue.Queue[tickIndex] = &types.IndexQueueType{
-				Price: price,
-				Fee:   fee,
-				Orderparams: &types.OrderParams{
-					OrderRule:   "",
-					OrderType:   msg.OrderType,
-					OrderShares: Tick.TotalShares.Sub(shares),
-				},
-			}
-		} else {
-			// TODO: We should confirm that shares matches the tick amount (to ensure we're not withdrawing more than we have)
-
-			if !Tick.TotalShares.Equal(shares) {
-				return sdkerrors.Wrapf(types.ErrNotEnoughShares, "Trying to withdraw more shares than available")
-			}
-			removeTick = true
-
-			// Remove tick from queue
-			IndexQueue.Queue = append(IndexQueue.Queue[:tickIndex], IndexQueue.Queue[tickIndex+1:]...)
-		}
-	}
-	//// Updating Tick Logic
-	oldReserve0 := Tick.Reserve0
-	oldReserve1 := Tick.Reserve1
-	amount0toRemove := Tick.Reserve0
-	amount1toRemove := Tick.Reserve1
-	if !removeTick {
-		// TODO: Decimal precision checks on quotient
-		ratio := Tick.Reserve1.Quo(Tick.Reserve0.Add(Tick.Reserve1))
-		// r0 * price * 1/(r1/r0+r1)
-		amount0toRemove := Tick.Reserve0.Mul(price).Mul(sdk.NewDec(1).Sub(ratio))
-		amount1toRemove := Tick.Reserve1.Mul(ratio)
-
-		NewTick = types.Ticks{
-			Price:       msg.Price,
-			Fee:         msg.Fee,
-			OrderType:   msg.OrderType,
-			Reserve0:    Tick.Reserve0.Sub(amount0toRemove),
-			Reserve1:    Tick.Reserve1.Sub(amount1toRemove),
-			PairPrice:   price,
-			PairFee:     fee,
-			TotalShares: Tick.TotalShares.Sub(shares),
-			Orderparams: &types.OrderParams{
-				OrderRule:   "",
-				OrderType:   msg.OrderType,
-				OrderShares: Tick.TotalShares.Sub(shares),
-			},
-		}
-
-	}
-
-	k.SetIndexQueue(ctx, token0, token1, IndexQueue)
-	if removeTick {
-		k.RemoveTicks(ctx, token0, token1, msg.Price, msg.Fee, msg.OrderType)
-	} else {
-		k.SetTicks(ctx, token0, token1, NewTick)
-	}
-
-	PairNew, _ := k.GetPairs(ctx, token0, token1)
-
-	NewPairs := types.Pairs{
-		Token0:       token0,
-		Token1:       token1,
-		CurrentIndex: PairOld.CurrentIndex,
-		TickSpacing:  PairOld.TickSpacing,
-		Tickmap:      PairNew.Tickmap,
-		IndexMap:     PairNew.IndexMap,
-	}
-
-	k.SetPairs(ctx, NewPairs)
-
-	if !amount0toRemove.GT(sdk.ZeroDec()) && !amount1toRemove.GT(sdk.ZeroDec()) {
-		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "Cannnot send zero amount")
-	}
-
-	// TODO: Sending tokens from the user to the module, will be necessary to do this before the rest of logic to avoid reentrancy/failure attacks
-	if amount0toRemove.GT(sdk.ZeroDec()) {
-		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount0toRemove.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
-			return err
-		}
-	}
-
-	if amount1toRemove.GT(sdk.ZeroDec()) {
-		coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount1toRemove.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
-			return err
-		}
-	}
-
-	// TODO: Is this the best format for events with liquidity?
-	ctx.EventManager().EmitEvent(types.CreateWithdrawEvent(msg.Creator,
-		token0, token1, price.String(), fee.String(), oldReserve0.String(), oldReserve1.String(),
-		NewTick.Reserve0.String(), NewTick.Reserve1.String(),
-		sdk.NewAttribute(types.WithdrawEventSharesRemoved, shares.String()),
-	))
-
-	return nil
-	_ = ctx
 	return nil
 }

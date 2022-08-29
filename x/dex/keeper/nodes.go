@@ -59,5 +59,5 @@ func (k Keeper) GetAllNodes(ctx sdk.Context) (list []types.Nodes) {
 		list = append(list, val)
 	}
 
-	return
+	return list
 }

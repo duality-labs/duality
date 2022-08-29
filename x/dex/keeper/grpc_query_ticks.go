@@ -20,7 +20,7 @@ func (k Keeper) TicksAll(c context.Context, req *types.QueryAllTicksRequest) (*t
 	ctx := sdk.UnwrapSDKContext(c)
 
 	store := ctx.KVStore(k.storeKey)
-	ticksStore := prefix.NewStore(store, types.KeyPrefix(types.TicksKeyPrefix))
+	ticksStore := prefix.NewStore(store, types.TicksPrefix(req.Token0, req.Token1))
 
 	pageRes, err := query.Paginate(ticksStore, req.Pagination, func(key []byte, value []byte) error {
 		var ticks types.Ticks

@@ -8,7 +8,7 @@ import (
 
 // SetPairs set a specific pairs in the store from its index
 func (k Keeper) SetPairs(ctx sdk.Context, pairs types.Pairs) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PairsKeyPrefix))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PairsPrefix())
 	b := k.cdc.MustMarshal(&pairs)
 	store.Set(types.PairsKey(
 		pairs.Token0,
@@ -23,7 +23,7 @@ func (k Keeper) GetPairs(
 	token1 string,
 
 ) (val types.Pairs, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PairsKeyPrefix))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PairsPrefix())
 
 	b := store.Get(types.PairsKey(
 		token0,
@@ -44,7 +44,7 @@ func (k Keeper) RemovePairs(
 	token1 string,
 
 ) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PairsKeyPrefix))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PairsPrefix())
 	store.Delete(types.PairsKey(
 		token0,
 		token1,
@@ -53,7 +53,7 @@ func (k Keeper) RemovePairs(
 
 // GetAllPairs returns all pairs
 func (k Keeper) GetAllPairs(ctx sdk.Context) (list []types.Pairs) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PairsKeyPrefix))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.PairsPrefix())
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
@@ -64,5 +64,5 @@ func (k Keeper) GetAllPairs(ctx sdk.Context) (list []types.Pairs) {
 		list = append(list, val)
 	}
 
-	return
+	return list
 }
