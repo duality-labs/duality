@@ -430,7 +430,7 @@ func (k Keeper) SingleSwapIn(goCtx context.Context, token0 string, token1 string
 	currIdx := Pair.CurrentIndex
 
 	// Tracker of how much liquidity has been currently filled of the tokenIn
-	remainingAmount := amountIn
+	remainingAmountIn := amountIn
 
 	// TotalAmountOut
 	totalAmountOut := sdk.ZeroDec()
@@ -443,7 +443,7 @@ func (k Keeper) SingleSwapIn(goCtx context.Context, token0 string, token1 string
 	usedTicks := make([]types.Ticks, 0)
 
 	// TODO: Handle Reverts - any message that returns an error will not be committed
-	for remainingAmount.GT(sdk.ZeroDec()) {
+	for remainingAmountIn.GT(sdk.ZeroDec()) {
 		IndexQueue, IndexQueueFound := k.GetIndexQueue(ctx, token0, token1, currIdx)
 		if !IndexQueueFound {
 			// TODO: Update Error Types
@@ -454,7 +454,7 @@ func (k Keeper) SingleSwapIn(goCtx context.Context, token0 string, token1 string
 			// Gets values, not pointers
 			Tick, TickFound := k.GetTicks(ctx, token0, token1, tickRef.Price.String(), tickRef.Fee.String(), tickRef.Orderparams.OrderType)
 			if !TickFound {
-				return sdkerrors.Wrapf(types.ErrValidTickNotFound, "No corresponding tick for price, fee, orderType!", err)
+				return sdkerrors.Wrapf(types.ErrValidTickNotFound, "No ticks left in queue!", err)
 
 			}
 			// Which reserve to use
@@ -469,42 +469,51 @@ func (k Keeper) SingleSwapIn(goCtx context.Context, token0 string, token1 string
 
 
 			*/
-			virtualPrice, err := k.GetVirtualPriceFromTick(Pair.CurrentIndex)
 			if err != nil {
 
 			}
+			fee := tickRef.Fee
 
 			if swapToToken0 {
 				// TODO: Make sure virtualPrice is calculated correctly in both directions
-				requiredToDeplete := Tick.Reserve0.Add(Tick.Reserve0.Mul(tickRef.Fee).Quo(virtualPrice))
+				// In terms of token0
+				requiredToDeplete := Tick.Reserve0.Add(Tick.Reserve0.Mul(fee).Mul(virtualPrice))
 				// Enough liquidity to fulfill minOut - currFilled
-				if requiredToDeplete.GTE(remainingAmount) {
-					amountOut := remainingAmount.Sub(remainingAmount.Mul(tickRef.Fee.Quo(virtualPrice)))
+				if requiredToDeplete.GTE(remainingAmountIn) {
+					amountOut := remainingAmountIn.Sub(remainingAmountIn.Mul(fee.Mul(virtualPrice)))
 					// Update tick & append to usedTicks array
-					Tick.Reserve0 = Tick.Reserve0.Sub(amountOut)
+					NewReserve0 := Tick.Reserve0.Sub(amountOut)
 					// Shift order to other side
 					if tickRef.Orderparams.OrderType == "LP" {
-						// Calculate flip price
-						flipPrice := sdk.NewDec(1).Quo(virtualPrice.Mul(tickRef.Fee))
-						// Tick to flip liquidity to, how do we know how much liquidity to flip
+						// How much liquidity to flip
+						NewReserve1 := remainingAmountIn
+						// Set New Reserves
+						Tick.Reserve0 = NewReserve0
+						Tick.Reserve1 = NewReserve1
 					} else {
-						// Remove order from queue
+						// TODO: Remove order from queue
+						// TODO: Need to figure out how to set and remove ticks
+						// TODO: Limit order should cost more
 
 					}
-
+					totalAmountOut = totalAmountOut.Add(amountOut)
+					remainingAmountIn = sdk.ZeroDec()
 					// Tells us which ticks to delete
 					usedTicks = append(usedTicks, Tick)
 					break
 
 				} else {
-					// Swap amountIn to token1
-					amountLeft = amountLeft.Sub(Tick.Reserve0)
-
+					// Swap amountIn to token0
+					// In terms of token0
+					amountOut := Tick.Reserve0.Sub(Tick.Reserve0.Mul(fee.Mul(virtualPrice)))
+					remainingAmountIn = remainingAmountIn.Sub(requiredToDeplete.Mul())
 					// Update tick & append to usedTicks array
 					Tick.Reserve0 = sdk.ZeroDec()
+					Tick.Reserve1 = Tick.Reserve0.Mul(virtualPrice)
 					usedTicks = append(usedTicks, Tick)
 
 				}
+				// Swap to token 1
 			} else {
 				totalAmount := Tick.Reserve1.Mul(sdk.NewDec(1).Quo(virtualPrice))
 				// Enough liquidity to fulfill minOut - currFilled
