@@ -51,10 +51,12 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 0
+    command: --log_level $LOG_LEVEL
     environment:
       - DEBUG=1
       - ID=0
       - LOG=${LOG:-simd.log}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
     cap_add:
       - SYS_PTRACE
     security_opt:
@@ -77,10 +79,12 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 1
+    command: --log_level $LOG_LEVEL
     environment:
       - DEBUG=0
       - ID=1
       - LOG=${LOG:-simd.log}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
     cap_add:
       - SYS_PTRACE
     security_opt:
@@ -103,10 +107,12 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 2
+    command: --log_level $LOG_LEVEL
     environment:
       - DEBUG=0
       - ID=2
       - LOG=${LOG:-simd.log}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
     cap_add:
       - SYS_PTRACE
     security_opt:
@@ -129,10 +135,12 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 3
+    command: --log_level $LOG_LEVEL
     environment:
       - DEBUG=0
       - ID=3
       - LOG=${LOG:-simd.log}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
     cap_add:
       - SYS_PTRACE
     security_opt:

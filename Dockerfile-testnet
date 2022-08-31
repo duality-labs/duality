@@ -90,4 +90,4 @@ EXPOSE 9090
 EXPOSE 1317
 
 # default to serving the chain with the modified testnet data
-CMD ["dualityd", "--home", "/testnet/dualityd", "start", "--moniker", "duality"]
+ENTRYPOINT ["dualityd", "--home", "/testnet/dualityd", "start", "--moniker", "duality"]
