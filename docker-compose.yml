@@ -24,7 +24,14 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 0 # setup simmilar to node 0 (but without running the chain)
-    command: tail -f /dev/null
+    command: >
+      /bin/sh -c "
+        # print out test keys before running test node
+        echo \"test keys:\";
+        jq -s . /root/.duality/testkeys/*;
+        # keep container running
+        tail -f /dev/null;
+      "
     environment:
       - DEBUG=1
     cap_add:
@@ -44,13 +51,6 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 0
-    # print out test keys before running test node
-    command: >
-      /bin/sh -c "
-        echo \"test keys:\";
-        jq -s . /root/.duality/testkeys/*;
-        dualityd --home /testnet/dualityd start --moniker duality;
-      "
     environment:
       - DEBUG=1
       - ID=0
