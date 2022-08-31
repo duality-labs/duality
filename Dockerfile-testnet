@@ -10,7 +10,7 @@ RUN simd testnet init-files \
     --node-daemon-home dualityd
 
 # [Choice] Go version (use -bullseye variants on local arm64/Apple Silicon): 1, 1.16, 1.17, 1-bullseye, 1.16-bullseye, 1.17-bullseye, 1-buster, 1.16-buster, 1.17-buster
-FROM golang:1.18-bullseye
+FROM golang:1.18-bullseye as commonconfig
 
 # install additional OS packages.
 RUN apt update && \
@@ -57,6 +57,9 @@ RUN dualityd add-genesis-account $(dualityd keys show bob -a --keyring-backend t
 # Add gentxs to the genesis file
 RUN dualityd gentx alice 1000000stake --chain-id duality --keyring-backend test
 RUN dualityd collect-gentxs
+
+# build each nodes settings
+FROM commonconfig
 
 # get testnet config files
 ARG NODE_ID
