@@ -57,7 +57,7 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 0
-    command: --log_level $LOG_LEVEL
+    command: dualityd --home /testnet/dualityd start --moniker duality --log_level $LOG_LEVEL
     environment:
       - DEBUG=1
       - ID=0
@@ -85,7 +85,7 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 1
-    command: --log_level $LOG_LEVEL
+    command: dualityd --home /testnet/dualityd start --moniker duality --log_level $LOG_LEVEL
     environment:
       - DEBUG=0
       - ID=1
@@ -113,7 +113,7 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 2
-    command: --log_level $LOG_LEVEL
+    command: dualityd --home /testnet/dualityd start --moniker duality --log_level $LOG_LEVEL
     environment:
       - DEBUG=0
       - ID=2
@@ -141,7 +141,7 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 3
-    command: --log_level $LOG_LEVEL
+    command: dualityd --home /testnet/dualityd start --moniker duality --log_level $LOG_LEVEL
     environment:
       - DEBUG=0
       - ID=3
