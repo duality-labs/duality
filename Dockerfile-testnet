@@ -16,6 +16,12 @@ WORKDIR /usr/src
 
 RUN git clone --single-branch --branch 'v0.45.4' https://github.com/cosmos/cosmos-sdk.git /usr/src
 
+# pre-download all dependencies
+RUN go mod download
+
+# rename the generated token names
+RUN sed -i 's/"testtoken"/"token"/g' simapp/simd/cmd/testnet.go;
+
 RUN make build-linux
 
 # generate base chain testnet configurations /root/.testnet
@@ -67,10 +73,10 @@ RUN dualityd init duality
 RUN mkdir /root/.duality/testkeys
 # alice
 RUN dualityd keys add alice --keyring-backend test --output json > /root/.duality/testkeys/alice.json
-RUN dualityd add-genesis-account $(dualityd keys show alice -a --keyring-backend test) 1000000testtoken,1000000stake --keyring-backend test
+RUN dualityd add-genesis-account $(dualityd keys show alice -a --keyring-backend test) 1000000token,1000000stake --keyring-backend test
 # bob
 RUN dualityd keys add bob --keyring-backend test --output json > /root/.duality/testkeys/bob.json
-RUN dualityd add-genesis-account $(dualityd keys show bob -a --keyring-backend test) 1000000testtoken,1000000stake --keyring-backend test
+RUN dualityd add-genesis-account $(dualityd keys show bob -a --keyring-backend test) 1000000token,1000000stake --keyring-backend test
 
 # Add gentxs to the genesis file
 RUN dualityd gentx alice 1000000stake --chain-id duality --keyring-backend test
