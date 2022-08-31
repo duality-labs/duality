@@ -9,7 +9,8 @@ export interface MsgAddLiquidity {
   tokenB: string;
   tokenDirection: string;
   index: number;
-  amount: string;
+  amountA: string;
+  amountB: string;
   price: string;
   fee: string;
   orderType: string;
@@ -22,7 +23,6 @@ export interface MsgRemoveLiquidity {
   creator: string;
   tokenA: string;
   tokenB: string;
-  tokenDirection: string;
   index: number;
   shares: string;
   price: string;
@@ -39,7 +39,8 @@ export interface MsgCreatePair {
   tokenB: string;
   tokenDirection: string;
   index: number;
-  amount: string;
+  amountA: string;
+  amountB: string;
   price: string;
   fee: string;
   orderType: string;
@@ -64,7 +65,8 @@ const baseMsgAddLiquidity: object = {
   tokenB: "",
   tokenDirection: "",
   index: 0,
-  amount: "",
+  amountA: "",
+  amountB: "",
   price: "",
   fee: "",
   orderType: "",
@@ -88,20 +90,23 @@ export const MsgAddLiquidity = {
     if (message.index !== 0) {
       writer.uint32(40).int32(message.index);
     }
-    if (message.amount !== "") {
-      writer.uint32(50).string(message.amount);
+    if (message.amountA !== "") {
+      writer.uint32(50).string(message.amountA);
+    }
+    if (message.amountB !== "") {
+      writer.uint32(58).string(message.amountB);
     }
     if (message.price !== "") {
-      writer.uint32(58).string(message.price);
+      writer.uint32(66).string(message.price);
     }
     if (message.fee !== "") {
-      writer.uint32(66).string(message.fee);
+      writer.uint32(74).string(message.fee);
     }
     if (message.orderType !== "") {
-      writer.uint32(74).string(message.orderType);
+      writer.uint32(82).string(message.orderType);
     }
     if (message.receiver !== "") {
-      writer.uint32(82).string(message.receiver);
+      writer.uint32(90).string(message.receiver);
     }
     return writer;
   },
@@ -129,18 +134,21 @@ export const MsgAddLiquidity = {
           message.index = reader.int32();
           break;
         case 6:
-          message.amount = reader.string();
+          message.amountA = reader.string();
           break;
         case 7:
-          message.price = reader.string();
+          message.amountB = reader.string();
           break;
         case 8:
-          message.fee = reader.string();
+          message.price = reader.string();
           break;
         case 9:
-          message.orderType = reader.string();
+          message.fee = reader.string();
           break;
         case 10:
+          message.orderType = reader.string();
+          break;
+        case 11:
           message.receiver = reader.string();
           break;
         default:
@@ -178,10 +186,15 @@ export const MsgAddLiquidity = {
     } else {
       message.index = 0;
     }
-    if (object.amount !== undefined && object.amount !== null) {
-      message.amount = String(object.amount);
+    if (object.amountA !== undefined && object.amountA !== null) {
+      message.amountA = String(object.amountA);
     } else {
-      message.amount = "";
+      message.amountA = "";
+    }
+    if (object.amountB !== undefined && object.amountB !== null) {
+      message.amountB = String(object.amountB);
+    } else {
+      message.amountB = "";
     }
     if (object.price !== undefined && object.price !== null) {
       message.price = String(object.price);
@@ -214,7 +227,8 @@ export const MsgAddLiquidity = {
     message.tokenDirection !== undefined &&
       (obj.tokenDirection = message.tokenDirection);
     message.index !== undefined && (obj.index = message.index);
-    message.amount !== undefined && (obj.amount = message.amount);
+    message.amountA !== undefined && (obj.amountA = message.amountA);
+    message.amountB !== undefined && (obj.amountB = message.amountB);
     message.price !== undefined && (obj.price = message.price);
     message.fee !== undefined && (obj.fee = message.fee);
     message.orderType !== undefined && (obj.orderType = message.orderType);
@@ -249,10 +263,15 @@ export const MsgAddLiquidity = {
     } else {
       message.index = 0;
     }
-    if (object.amount !== undefined && object.amount !== null) {
-      message.amount = object.amount;
+    if (object.amountA !== undefined && object.amountA !== null) {
+      message.amountA = object.amountA;
     } else {
-      message.amount = "";
+      message.amountA = "";
+    }
+    if (object.amountB !== undefined && object.amountB !== null) {
+      message.amountB = object.amountB;
+    } else {
+      message.amountB = "";
     }
     if (object.price !== undefined && object.price !== null) {
       message.price = object.price;
@@ -328,7 +347,6 @@ const baseMsgRemoveLiquidity: object = {
   creator: "",
   tokenA: "",
   tokenB: "",
-  tokenDirection: "",
   index: 0,
   shares: "",
   price: "",
@@ -351,26 +369,23 @@ export const MsgRemoveLiquidity = {
     if (message.tokenB !== "") {
       writer.uint32(26).string(message.tokenB);
     }
-    if (message.tokenDirection !== "") {
-      writer.uint32(34).string(message.tokenDirection);
-    }
     if (message.index !== 0) {
-      writer.uint32(40).int32(message.index);
+      writer.uint32(32).int32(message.index);
     }
     if (message.shares !== "") {
-      writer.uint32(50).string(message.shares);
+      writer.uint32(42).string(message.shares);
     }
     if (message.price !== "") {
-      writer.uint32(58).string(message.price);
+      writer.uint32(50).string(message.price);
     }
     if (message.fee !== "") {
-      writer.uint32(66).string(message.fee);
+      writer.uint32(58).string(message.fee);
     }
     if (message.orderType !== "") {
-      writer.uint32(74).string(message.orderType);
+      writer.uint32(66).string(message.orderType);
     }
     if (message.receiver !== "") {
-      writer.uint32(82).string(message.receiver);
+      writer.uint32(74).string(message.receiver);
     }
     return writer;
   },
@@ -392,24 +407,21 @@ export const MsgRemoveLiquidity = {
           message.tokenB = reader.string();
           break;
         case 4:
-          message.tokenDirection = reader.string();
-          break;
-        case 5:
           message.index = reader.int32();
           break;
-        case 6:
+        case 5:
           message.shares = reader.string();
           break;
-        case 7:
+        case 6:
           message.price = reader.string();
           break;
-        case 8:
+        case 7:
           message.fee = reader.string();
           break;
-        case 9:
+        case 8:
           message.orderType = reader.string();
           break;
-        case 10:
+        case 9:
           message.receiver = reader.string();
           break;
         default:
@@ -436,11 +448,6 @@ export const MsgRemoveLiquidity = {
       message.tokenB = String(object.tokenB);
     } else {
       message.tokenB = "";
-    }
-    if (object.tokenDirection !== undefined && object.tokenDirection !== null) {
-      message.tokenDirection = String(object.tokenDirection);
-    } else {
-      message.tokenDirection = "";
     }
     if (object.index !== undefined && object.index !== null) {
       message.index = Number(object.index);
@@ -480,8 +487,6 @@ export const MsgRemoveLiquidity = {
     message.creator !== undefined && (obj.creator = message.creator);
     message.tokenA !== undefined && (obj.tokenA = message.tokenA);
     message.tokenB !== undefined && (obj.tokenB = message.tokenB);
-    message.tokenDirection !== undefined &&
-      (obj.tokenDirection = message.tokenDirection);
     message.index !== undefined && (obj.index = message.index);
     message.shares !== undefined && (obj.shares = message.shares);
     message.price !== undefined && (obj.price = message.price);
@@ -507,11 +512,6 @@ export const MsgRemoveLiquidity = {
       message.tokenB = object.tokenB;
     } else {
       message.tokenB = "";
-    }
-    if (object.tokenDirection !== undefined && object.tokenDirection !== null) {
-      message.tokenDirection = object.tokenDirection;
-    } else {
-      message.tokenDirection = "";
     }
     if (object.index !== undefined && object.index !== null) {
       message.index = object.index;
@@ -605,7 +605,8 @@ const baseMsgCreatePair: object = {
   tokenB: "",
   tokenDirection: "",
   index: 0,
-  amount: "",
+  amountA: "",
+  amountB: "",
   price: "",
   fee: "",
   orderType: "",
@@ -629,20 +630,23 @@ export const MsgCreatePair = {
     if (message.index !== 0) {
       writer.uint32(40).int32(message.index);
     }
-    if (message.amount !== "") {
-      writer.uint32(50).string(message.amount);
+    if (message.amountA !== "") {
+      writer.uint32(50).string(message.amountA);
+    }
+    if (message.amountB !== "") {
+      writer.uint32(58).string(message.amountB);
     }
     if (message.price !== "") {
-      writer.uint32(58).string(message.price);
+      writer.uint32(66).string(message.price);
     }
     if (message.fee !== "") {
-      writer.uint32(66).string(message.fee);
+      writer.uint32(74).string(message.fee);
     }
     if (message.orderType !== "") {
-      writer.uint32(74).string(message.orderType);
+      writer.uint32(82).string(message.orderType);
     }
     if (message.receiver !== "") {
-      writer.uint32(82).string(message.receiver);
+      writer.uint32(90).string(message.receiver);
     }
     return writer;
   },
@@ -670,18 +674,21 @@ export const MsgCreatePair = {
           message.index = reader.int32();
           break;
         case 6:
-          message.amount = reader.string();
+          message.amountA = reader.string();
           break;
         case 7:
-          message.price = reader.string();
+          message.amountB = reader.string();
           break;
         case 8:
-          message.fee = reader.string();
+          message.price = reader.string();
           break;
         case 9:
-          message.orderType = reader.string();
+          message.fee = reader.string();
           break;
         case 10:
+          message.orderType = reader.string();
+          break;
+        case 11:
           message.receiver = reader.string();
           break;
         default:
@@ -719,10 +726,15 @@ export const MsgCreatePair = {
     } else {
       message.index = 0;
     }
-    if (object.amount !== undefined && object.amount !== null) {
-      message.amount = String(object.amount);
+    if (object.amountA !== undefined && object.amountA !== null) {
+      message.amountA = String(object.amountA);
     } else {
-      message.amount = "";
+      message.amountA = "";
+    }
+    if (object.amountB !== undefined && object.amountB !== null) {
+      message.amountB = String(object.amountB);
+    } else {
+      message.amountB = "";
     }
     if (object.price !== undefined && object.price !== null) {
       message.price = String(object.price);
@@ -755,7 +767,8 @@ export const MsgCreatePair = {
     message.tokenDirection !== undefined &&
       (obj.tokenDirection = message.tokenDirection);
     message.index !== undefined && (obj.index = message.index);
-    message.amount !== undefined && (obj.amount = message.amount);
+    message.amountA !== undefined && (obj.amountA = message.amountA);
+    message.amountB !== undefined && (obj.amountB = message.amountB);
     message.price !== undefined && (obj.price = message.price);
     message.fee !== undefined && (obj.fee = message.fee);
     message.orderType !== undefined && (obj.orderType = message.orderType);
@@ -790,10 +803,15 @@ export const MsgCreatePair = {
     } else {
       message.index = 0;
     }
-    if (object.amount !== undefined && object.amount !== null) {
-      message.amount = object.amount;
+    if (object.amountA !== undefined && object.amountA !== null) {
+      message.amountA = object.amountA;
     } else {
-      message.amount = "";
+      message.amountA = "";
+    }
+    if (object.amountB !== undefined && object.amountB !== null) {
+      message.amountB = object.amountB;
+    } else {
+      message.amountB = "";
     }
     if (object.price !== undefined && object.price !== null) {
       message.price = object.price;

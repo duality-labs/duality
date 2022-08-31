@@ -108,6 +108,8 @@ export interface QueryGetSharesRequest {
   price: string;
   fee: string;
   orderType: string;
+  token0: string;
+  token1: string;
 }
 
 export interface QueryGetSharesResponse {
@@ -116,6 +118,8 @@ export interface QueryGetSharesResponse {
 
 export interface QueryAllSharesRequest {
   pagination: PageRequest | undefined;
+  token0: string;
+  token1: string;
 }
 
 export interface QueryAllSharesResponse {
@@ -1580,6 +1584,8 @@ const baseQueryGetSharesRequest: object = {
   price: "",
   fee: "",
   orderType: "",
+  token0: "",
+  token1: "",
 };
 
 export const QueryGetSharesRequest = {
@@ -1598,6 +1604,12 @@ export const QueryGetSharesRequest = {
     }
     if (message.orderType !== "") {
       writer.uint32(34).string(message.orderType);
+    }
+    if (message.token0 !== "") {
+      writer.uint32(42).string(message.token0);
+    }
+    if (message.token1 !== "") {
+      writer.uint32(50).string(message.token1);
     }
     return writer;
   },
@@ -1620,6 +1632,12 @@ export const QueryGetSharesRequest = {
           break;
         case 4:
           message.orderType = reader.string();
+          break;
+        case 5:
+          message.token0 = reader.string();
+          break;
+        case 6:
+          message.token1 = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1651,6 +1669,16 @@ export const QueryGetSharesRequest = {
     } else {
       message.orderType = "";
     }
+    if (object.token0 !== undefined && object.token0 !== null) {
+      message.token0 = String(object.token0);
+    } else {
+      message.token0 = "";
+    }
+    if (object.token1 !== undefined && object.token1 !== null) {
+      message.token1 = String(object.token1);
+    } else {
+      message.token1 = "";
+    }
     return message;
   },
 
@@ -1660,6 +1688,8 @@ export const QueryGetSharesRequest = {
     message.price !== undefined && (obj.price = message.price);
     message.fee !== undefined && (obj.fee = message.fee);
     message.orderType !== undefined && (obj.orderType = message.orderType);
+    message.token0 !== undefined && (obj.token0 = message.token0);
+    message.token1 !== undefined && (obj.token1 = message.token1);
     return obj;
   },
 
@@ -1686,6 +1716,16 @@ export const QueryGetSharesRequest = {
       message.orderType = object.orderType;
     } else {
       message.orderType = "";
+    }
+    if (object.token0 !== undefined && object.token0 !== null) {
+      message.token0 = object.token0;
+    } else {
+      message.token0 = "";
+    }
+    if (object.token1 !== undefined && object.token1 !== null) {
+      message.token1 = object.token1;
+    } else {
+      message.token1 = "";
     }
     return message;
   },
@@ -1752,7 +1792,7 @@ export const QueryGetSharesResponse = {
   },
 };
 
-const baseQueryAllSharesRequest: object = {};
+const baseQueryAllSharesRequest: object = { token0: "", token1: "" };
 
 export const QueryAllSharesRequest = {
   encode(
@@ -1761,6 +1801,12 @@ export const QueryAllSharesRequest = {
   ): Writer {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.token0 !== "") {
+      writer.uint32(18).string(message.token0);
+    }
+    if (message.token1 !== "") {
+      writer.uint32(26).string(message.token1);
     }
     return writer;
   },
@@ -1774,6 +1820,12 @@ export const QueryAllSharesRequest = {
       switch (tag >>> 3) {
         case 1:
           message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.token0 = reader.string();
+          break;
+        case 3:
+          message.token1 = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1790,6 +1842,16 @@ export const QueryAllSharesRequest = {
     } else {
       message.pagination = undefined;
     }
+    if (object.token0 !== undefined && object.token0 !== null) {
+      message.token0 = String(object.token0);
+    } else {
+      message.token0 = "";
+    }
+    if (object.token1 !== undefined && object.token1 !== null) {
+      message.token1 = String(object.token1);
+    } else {
+      message.token1 = "";
+    }
     return message;
   },
 
@@ -1799,6 +1861,8 @@ export const QueryAllSharesRequest = {
       (obj.pagination = message.pagination
         ? PageRequest.toJSON(message.pagination)
         : undefined);
+    message.token0 !== undefined && (obj.token0 = message.token0);
+    message.token1 !== undefined && (obj.token1 = message.token1);
     return obj;
   },
 
@@ -1810,6 +1874,16 @@ export const QueryAllSharesRequest = {
       message.pagination = PageRequest.fromPartial(object.pagination);
     } else {
       message.pagination = undefined;
+    }
+    if (object.token0 !== undefined && object.token0 !== null) {
+      message.token0 = object.token0;
+    } else {
+      message.token0 = "";
+    }
+    if (object.token1 !== undefined && object.token1 !== null) {
+      message.token1 = object.token1;
+    } else {
+      message.token1 = "";
     }
     return message;
   },

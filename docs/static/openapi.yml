@@ -29937,16 +29937,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
         - name: token0
           in: query
           required: false
@@ -30138,16 +30128,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/nodes/{node}':
@@ -30308,16 +30288,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -30528,16 +30498,14 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
+        - name: token0
           in: query
           required: false
-          type: boolean
+          type: string
+        - name: token1
+          in: query
+          required: false
+          type: string
       tags:
         - Query
   '/NicholasDotSol/duality/dex/shares/{address}/{price}/{fee}/{orderType}':
@@ -30597,6 +30565,14 @@ paths:
         - name: orderType
           in: path
           required: true
+          type: string
+        - name: token0
+          in: query
+          required: false
+          type: string
+        - name: token1
+          in: query
+          required: false
           type: string
       tags:
         - Query
@@ -30729,16 +30705,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean

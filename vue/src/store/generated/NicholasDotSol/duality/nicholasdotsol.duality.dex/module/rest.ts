@@ -600,6 +600,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      token0?: string;
+      token1?: string;
     },
     params: RequestParams = {},
   ) =>
@@ -619,10 +621,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @summary Queries a Shares by index.
    * @request GET:/NicholasDotSol/duality/dex/shares/{address}/{price}/{fee}/{orderType}
    */
-  queryShares = (address: string, price: string, fee: string, orderType: string, params: RequestParams = {}) =>
+  queryShares = (
+    address: string,
+    price: string,
+    fee: string,
+    orderType: string,
+    query?: { token0?: string; token1?: string },
+    params: RequestParams = {},
+  ) =>
     this.request<DexQueryGetSharesResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/shares/${address}/${price}/${fee}/${orderType}`,
       method: "GET",
+      query: query,
       format: "json",
       ...params,
     });

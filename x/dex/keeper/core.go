@@ -9,7 +9,15 @@ import (
 	//sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 string, amount sdk.Dec, price sdk.Dec, msg *types.MsgAddLiquidity, callerAddr sdk.AccAddress, receiver sdk.AccAddress) error {
+// Calculates and returns the minimum element of two sdk.Dec (fixed point integer) values
+func (k Keeper) Min(a, b sdk.Dec) sdk.Dec {
+	if a.LT(b) {
+		return a
+	}
+	return b
+}
+
+func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 string, amount0 sdk.Dec, amount1 sdk.Dec, price sdk.Dec, msg *types.MsgAddLiquidity, callerAddr sdk.AccAddress, receiver sdk.AccAddress) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -34,6 +42,9 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit token1 at a price/fee pair greater than the current price")
 	}
 
+	if (!(amount0.Equal(sdk.ZeroDec())) && !(amount1.Equal(sdk.ZeroDec()))) && msg.Index != PairOld.CurrentIndex {
+		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot  deposit both token0 and token1 at a price/fee pair other than the current price")
+	}
 	IndexQueue, IndexQueueFound := k.GetIndexQueue(ctx, token0, token1, msg.Index)
 
 	// Tick from the tick store
@@ -42,12 +53,36 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 	var NewTick types.Ticks
 	var oldAmount sdk.Dec //Event variable
 	var sharesMinted sdk.Dec
+	var trueAmounts0 = amount0
+	var trueAmounts1 = amount1
 
-	// TODO: Confirm this is the correct way to calculate price
-	if msg.TokenDirection == token0 {
-		sharesMinted = amount.Mul(price.Mul(fee))
+	if Tick.TotalShares.Equal(sdk.ZeroDec()) || !TickFound {
+		sharesMinted = amount0.Add(amount1.Mul(price))
 	} else {
-		sharesMinted = amount.Mul(sdk.OneDec().Quo(fee))
+
+		// Check to see if input amount of Token 0 follows tick ratio
+		if Tick.Reserve0.GT(sdk.ZeroDec()) {
+			trueAmounts1 = k.Min(amount1, (Tick.Reserve1.Mul(amount0)).Quo(Tick.Reserve0))
+		}
+
+		// Check to see if input amount of Token 1 follows tick ratio
+		if Tick.Reserve1.GT(sdk.ZeroDec()) {
+
+			trueAmounts0 = k.Min(amount0, (Tick.Reserve0.Mul(amount1)).Quo(Tick.Reserve1))
+		}
+		// autoswap if token 0 needs to reach target
+		if trueAmounts0 == amount0 && trueAmounts1 != amount1 {
+
+			trueAmounts1 = amount1.Add(((amount1.Sub(trueAmounts1)).Mul(Tick.PairFee)).Quo(sdk.NewDec(10000).Sub(Tick.PairFee)))
+
+			// autoswap if token 1 needs to reach target
+		} else if trueAmounts1 == amount1 && trueAmounts0 != amount0 {
+
+			trueAmounts0 = amount0.Add(((amount0.Add(trueAmounts0)).Mul(Tick.PairFee)).Quo(sdk.NewDec(10000).Sub(Tick.PairFee)))
+		}
+
+		// ((TotalShares * (Amt0 + Amt1 * Price)) / Reserve0 + Reserve1 * Price
+		sharesMinted = (Tick.TotalShares.Mul(amount0.Add(amount1.Mul(Tick.PairPrice)))).Quo(Tick.Reserve0.Add(Tick.Reserve1.Mul(Tick.PairPrice)))
 	}
 
 	// Index Queue Logic
@@ -115,81 +150,41 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 	//// Tick Logic
 	if !TickFound {
 
-		if msg.TokenDirection == token0 {
-			NewTick = types.Ticks{
-				Price:       msg.Price,
-				Fee:         msg.Fee,
+		NewTick = types.Ticks{
+			Price:       msg.Price,
+			Fee:         msg.Fee,
+			OrderType:   msg.OrderType,
+			Reserve0:    trueAmounts0,
+			Reserve1:    trueAmounts1,
+			PairPrice:   price,
+			PairFee:     fee,
+			TotalShares: sharesMinted,
+			Orderparams: &types.OrderParams{
+				OrderRule:   "",
 				OrderType:   msg.OrderType,
-				Reserve0:    amount,
-				Reserve1:    sdk.ZeroDec(),
-				PairPrice:   price,
-				PairFee:     fee,
-				TotalShares: sharesMinted,
-				Orderparams: &types.OrderParams{
-					OrderRule:   "",
-					OrderType:   msg.OrderType,
-					OrderShares: sharesMinted,
-				},
-			}
-
-			oldAmount = sdk.ZeroDec()
-		} else {
-			NewTick = types.Ticks{
-				Price:       msg.Price,
-				Fee:         msg.Fee,
-				OrderType:   msg.OrderType,
-				Reserve0:    sdk.ZeroDec(),
-				Reserve1:    amount,
-				PairPrice:   price,
-				PairFee:     fee,
-				TotalShares: sharesMinted,
-				Orderparams: &types.OrderParams{
-					OrderRule:   "",
-					OrderType:   msg.OrderType,
-					OrderShares: sharesMinted,
-				},
-			}
-			oldAmount = sdk.ZeroDec()
+				OrderShares: sharesMinted,
+			},
 		}
+
+		oldAmount = sdk.ZeroDec()
 
 	} else {
 		// If the tick is found, add it to the existing reserve for the tick storage
-
-		if msg.TokenDirection == token0 {
-			oldAmount = Tick.Reserve0
-			NewTick = types.Ticks{
-				Price:       msg.Price,
-				Fee:         msg.Fee,
+		oldAmount = Tick.Reserve0
+		NewTick = types.Ticks{
+			Price:       msg.Price,
+			Fee:         msg.Fee,
+			OrderType:   msg.OrderType,
+			Reserve0:    Tick.Reserve0.Add(trueAmounts0),
+			Reserve1:    Tick.Reserve1.Add(trueAmounts1),
+			PairPrice:   price,
+			PairFee:     fee,
+			TotalShares: Tick.TotalShares.Add(sharesMinted),
+			Orderparams: &types.OrderParams{
+				OrderRule:   "",
 				OrderType:   msg.OrderType,
-				Reserve0:    Tick.Reserve0.Add(amount),
-				Reserve1:    Tick.Reserve1,
-				PairPrice:   price,
-				PairFee:     fee,
-				TotalShares: Tick.TotalShares.Add(sharesMinted),
-				Orderparams: &types.OrderParams{
-					OrderRule:   "",
-					OrderType:   msg.OrderType,
-					OrderShares: Tick.TotalShares.Add(sharesMinted),
-				},
-			}
-
-		} else {
-			oldAmount = Tick.Reserve1
-			NewTick = types.Ticks{
-				Price:       msg.Price,
-				Fee:         msg.Fee,
-				OrderType:   msg.OrderType,
-				Reserve0:    Tick.Reserve0,
-				Reserve1:    Tick.Reserve1.Add(amount),
-				PairPrice:   price,
-				PairFee:     fee,
-				TotalShares: Tick.TotalShares.Add(sharesMinted),
-				Orderparams: &types.OrderParams{
-					OrderRule:   "",
-					OrderType:   msg.OrderType,
-					OrderShares: Tick.TotalShares.Add(sharesMinted),
-				},
-			}
+				OrderShares: Tick.TotalShares.Add(sharesMinted),
+			},
 		}
 
 	}
@@ -222,8 +217,8 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 
 	// Sending tokens from the user to the module, might be necessary to do this before the rest of logic to avoid reentrancy/failure attacks
 	if msg.TokenDirection == token0 {
-		if amount.GT(sdk.ZeroDec()) {
-			coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount.BigInt()))
+		if amount0.GT(sdk.ZeroDec()) {
+			coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount0.BigInt()))
 			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
 				return err
 			}
@@ -232,8 +227,8 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 		}
 
 	} else {
-		if amount.GT(sdk.ZeroDec()) {
-			coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount.BigInt()))
+		if amount1.GT(sdk.ZeroDec()) {
+			coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount1.BigInt()))
 			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
 				return err
 			}
@@ -244,7 +239,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 
 	ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator,
 		token0, token1, price.String(), fee.String(), msg.TokenDirection,
-		oldAmount.String(), oldAmount.Add(amount).String(),
+		oldAmount.String(), oldAmount.Add(amount0).String(),
 		sdk.NewAttribute(types.DepositEventSharesMinted, sharesMinted.String()),
 	))
 

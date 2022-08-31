@@ -9,13 +9,14 @@ const TypeMsgAddLiquidity = "add_liquidity"
 
 var _ sdk.Msg = &MsgAddLiquidity{}
 
-func NewMsgAddLiquidity(creator string, tokenA string, tokenB string, tokenDirection string, amount string, price string, fee string, orderType string, receiver string) *MsgAddLiquidity {
+func NewMsgAddLiquidity(creator string, tokenA string, tokenB string, tokenDirection string, amountA string, amountB string, price string, fee string, orderType string, receiver string) *MsgAddLiquidity {
 	return &MsgAddLiquidity{
 		Creator:        creator,
 		TokenA:         tokenA,
 		TokenB:         tokenB,
 		TokenDirection: tokenDirection,
-		Amount:         amount,
+		AmountA:        amountA,
+		AmountB:        amountB,
 		Price:          price,
 		Fee:            fee,
 		OrderType:      orderType,

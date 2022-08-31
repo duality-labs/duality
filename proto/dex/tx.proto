@@ -20,14 +20,16 @@ message MsgAddLiquidity {
   string tokenB = 3;
   string tokenDirection = 4;
   int32 index = 5;
-  string amount = 6;
-  string price = 7;
-  string fee = 8;
-  string orderType = 9;
-  string receiver = 10;
+  string amountA = 6;
+  string amountB = 7;
+  string price = 8;
+  string fee = 9;
+  string orderType = 10;
+  string receiver = 11;
 }
 
 message MsgAddLiquidityResponse {
+
 }
 
 message MsgRemoveLiquidity {
@@ -51,11 +53,12 @@ message MsgCreatePair {
   string tokenB = 3;
   string tokenDirection = 4;
   int32 index = 5;
-  string amount = 6;
-  string price = 7;
-  string fee = 8;
-  string orderType = 9;
-  string receiver = 10;
+  string amountA = 6;
+  string amountB = 7;
+  string price = 8;
+  string fee = 9;
+  string orderType = 10;
+  string receiver = 11;
 }
 
 message MsgCreatePairResponse {

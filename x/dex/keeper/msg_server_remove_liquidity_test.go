@@ -60,7 +60,8 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		Index:          0,
 		Price:          "1.0",
 		Fee:            "300",
-		Amount:         "50",
+		AmountA:        "0",
+		AmountB:        "50",
 		OrderType:      "LP",
 		Receiver:       alice.String(),
 	})
@@ -186,7 +187,8 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		Index:          0,
 		Price:          "1.0",
 		Fee:            "300",
-		Amount:         "20",
+		AmountA:        "20",
+		AmountB:        "0",
 		OrderType:      "LP",
 		Receiver:       bob.String(),
 	})
@@ -212,7 +214,8 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		Index:          0,
 		Price:          "1.0",
 		Fee:            "300",
-		Amount:         "20",
+		AmountA:        "20",
+		AmountB:        "0",
 		OrderType:      "LP",
 		Receiver:       bob.String(),
 	})

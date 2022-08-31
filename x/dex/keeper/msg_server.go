@@ -29,7 +29,8 @@ func (k msgServer) CreatePair(goCtx context.Context, msg *types.MsgCreatePair) (
 		TokenB:         msg.TokenB,
 		TokenDirection: msg.TokenDirection,
 		Index:          msg.Index,
-		Amount:         msg.Amount,
+		AmountA:        msg.AmountA,
+		AmountB:        msg.AmountB,
 		Price:          msg.Price,
 		Fee:            msg.Fee,
 		OrderType:      msg.OrderType,
@@ -37,7 +38,7 @@ func (k msgServer) CreatePair(goCtx context.Context, msg *types.MsgCreatePair) (
 	}
 
 	// TODO: Do want any other verification checks for creating pair?
-	token0, token1, callerAdr, receiverAdr, amounts, price, err := k.AddLiquidityVerification(goCtx, msgAddLP)
+	token0, token1, callerAdr, receiverAdr, amountsA, amountsB, price, err := k.AddLiquidityVerification(goCtx, msgAddLP)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +79,7 @@ func (k msgServer) CreatePair(goCtx context.Context, msg *types.MsgCreatePair) (
 
 	k.SetNodes(ctx, types.Nodes{token1, NodeToken1.OutgoingEdges})
 
-	err = k.SingleDeposit(goCtx, token0, token1, amounts, price, msgAddLP, callerAdr, receiverAdr)
+	err = k.SingleDeposit(goCtx, token0, token1, amountsA, amountsB, price, msgAddLP, callerAdr, receiverAdr)
 
 	if err != nil {
 		return nil, err
@@ -91,19 +92,19 @@ func (k msgServer) CreatePair(goCtx context.Context, msg *types.MsgCreatePair) (
 func (k msgServer) AddLiquidity(goCtx context.Context, msg *types.MsgAddLiquidity) (*types.MsgAddLiquidityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, callerAdr, receiverAdr, amounts, price, err := k.AddLiquidityVerification(goCtx, msg)
+	token0, token1, callerAdr, receiverAdr, amountA, amountB, price, err := k.AddLiquidityVerification(goCtx, msg)
 
 	if err != nil {
 		return nil, err
 	}
 
-	err = k.SingleDeposit(goCtx, token0, token1, amounts, price, msg, callerAdr, receiverAdr)
+	err = k.SingleDeposit(goCtx, token0, token1, amountA, amountB, price, msg, callerAdr, receiverAdr)
 
 	if err != nil {
 		return nil, err
 	}
 
-	_, _, _, _, _, _ = token0, token1, callerAdr, receiverAdr, amounts, ctx
+	_, _, _, _, _, _, _ = token0, token1, callerAdr, receiverAdr, amountA, amountB, ctx
 
 	return &types.MsgAddLiquidityResponse{}, nil
 }
