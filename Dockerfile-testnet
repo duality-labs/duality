@@ -1,9 +1,27 @@
-# get testnet configurations
-FROM interchainio/simapp:v0.45.4 as testnetconfig
+# build custom simd command to get testnet configurations
+FROM golang:1.18-alpine AS testnetconfig
+
+RUN apk add \
+    curl \
+    make \
+    git \
+    libc-dev \
+    bash \
+    gcc \
+    linux-headers \
+    eudev-dev \
+    python3
+
+WORKDIR /usr/src
+
+RUN git clone --single-branch --branch 'v0.45.4' https://github.com/cosmos/cosmos-sdk.git /usr/src
+
+RUN make build-linux
+
 # generate base chain testnet configurations /root/.testnet
-RUN simd testnet init-files \
+RUN build/simd testnet init-files \
     --v 4 \
-    -o .testnet \
+    -o /root/.testnet \
     --starting-ip-address 192.168.10.10 \
     --keyring-backend test \
     --chain-id duality \
