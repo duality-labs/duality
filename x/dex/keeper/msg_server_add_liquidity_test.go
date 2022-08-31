@@ -141,11 +141,11 @@ func (suite *IntegrationTestSuite) TestSingleDeposit() {
 		Reserve1:    newDec("0"),
 		PairPrice:   newDec("1"),
 		PairFee:     newDec("0"),
-		TotalShares: newDec("0"),
+		TotalShares: newDec("50"),
 		Orderparams: &types.OrderParams{
 			OrderRule:   "",
 			OrderType:   "LP",
-			OrderShares: newDec("0"),
+			OrderShares: newDec("50"),
 		},
 	}
 	tickactual, _ := app.DexKeeper.GetTicks(ctx, "TokenB", "TokenA", "1.0", "0", "LP")
@@ -188,11 +188,11 @@ func (suite *IntegrationTestSuite) TestSingleDeposit() {
 		Reserve1:    newDec("0"),
 		PairPrice:   newDec("1"),
 		PairFee:     newDec("0.03"),
-		TotalShares: newDec("1.5"),
+		TotalShares: newDec("50"),
 		Orderparams: &types.OrderParams{
 			OrderRule:   "",
 			OrderType:   "LP",
-			OrderShares: newDec("1.5"),
+			OrderShares: newDec("50"),
 		},
 	}
 	tickactual2, _ := app.DexKeeper.GetTicks(ctx, "TokenB", "TokenA", "1.0", "300", "LP")
@@ -265,14 +265,14 @@ func (suite *IntegrationTestSuite) TestSingleDeposit() {
 		Fee:         "300",
 		OrderType:   "LP",
 		Reserve0:    newDec("50"),
-		Reserve1:    newDec("20"),
+		Reserve1:    newDec("20.000060000180000540"),
 		PairPrice:   newDec("1"),
 		PairFee:     newDec("0.03"),
-		TotalShares: newDec("668.166666666666666660"),
+		TotalShares: newDec("70"),
 		Orderparams: &types.OrderParams{
 			OrderRule:   "",
 			OrderType:   "LP",
-			OrderShares: newDec("668.166666666666666660"),
+			OrderShares: newDec("70"),
 		},
 	}
 	tickactual3, _ := app.DexKeeper.GetTicks(ctx, "TokenB", "TokenA", "1.0", "300", "LP")

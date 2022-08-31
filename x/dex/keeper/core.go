@@ -56,7 +56,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, token0 string, token1 strin
 	var trueAmounts0 = amount0
 	var trueAmounts1 = amount1
 
-	if Tick.TotalShares.Equal(sdk.ZeroDec()) || !TickFound {
+	if !TickFound || Tick.TotalShares.Equal(sdk.ZeroDec()) {
 		sharesMinted = amount0.Add(amount1.Mul(price))
 	} else {
 

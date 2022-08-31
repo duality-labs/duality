@@ -87,11 +87,11 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		Reserve1:    newDec("0"),
 		PairPrice:   newDec("1"),
 		PairFee:     newDec("0.03"),
-		TotalShares: newDec("1.5"),
+		TotalShares: newDec("50"),
 		Orderparams: &types.OrderParams{
 			OrderRule:   "",
 			OrderType:   "LP",
-			OrderShares: newDec("1.5"),
+			OrderShares: newDec("50"),
 		},
 	}
 	tickactual, _ := app.DexKeeper.GetTicks(ctx, "TokenB", "TokenA", "1.0", "300", "LP")
@@ -106,7 +106,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 			Orderparams: &types.OrderParams{
 				OrderRule:   "",
 				OrderType:   "LP",
-				OrderShares: newDec("1.5"),
+				OrderShares: newDec("50"),
 			},
 		},
 	}
@@ -129,7 +129,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		Index:     0,
 		Price:     "1.0",
 		Fee:       "300",
-		Shares:    "1.5",
+		Shares:    "50",
 		OrderType: "LP",
 		Receiver:  alice.String(),
 	})
@@ -240,7 +240,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		Index:     0,
 		Price:     "1.0",
 		Fee:       "300",
-		Shares:    "1333.333333333333333321",
+		Shares:    "40.01",
 		OrderType: "LP",
 		Receiver:  bob.String(),
 	})
@@ -256,7 +256,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		Index:     0,
 		Price:     "1.0",
 		Fee:       "300",
-		Shares:    "1333.333333333333333321",
+		Shares:    "40",
 		OrderType: "LP",
 		Receiver:  bob.String(),
 	})
@@ -272,7 +272,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		Index:     0,
 		Price:     "1.0",
 		Fee:       "300",
-		Shares:    "1333.333333333333333320",
+		Shares:    "40",
 		OrderType: "Limit",
 		Receiver:  bob.String(),
 	})
@@ -288,7 +288,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		Index:     0,
 		Price:     "1.0",
 		Fee:       "300",
-		Shares:    "1333.333333333333333320",
+		Shares:    "40",
 		OrderType: "LP",
 		Receiver:  alice.String(),
 	})
@@ -296,6 +296,64 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	_ = withdrawResponse6
 
 	suite.Require().Error(err)
+
+	createResponse4, err := suite.msgServer.AddLiquidity(goCtx, &types.MsgAddLiquidity{
+		Creator:        bob.String(),
+		TokenA:         "TokenA",
+		TokenB:         "TokenB",
+		TokenDirection: "TokenA",
+		Index:          0,
+		Price:          "1.0",
+		Fee:            "300",
+		AmountA:        "0",
+		AmountB:        "20",
+		OrderType:      "LP",
+		Receiver:       bob.String(),
+	})
+
+	suite.Require().Error(err)
+	_ = createResponse4
+
+	withdrawResponse7, err := suite.msgServer.RemoveLiquidity(goCtx, &types.MsgRemoveLiquidity{
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		Index:     0,
+		Price:     "1.0",
+		Fee:       "300",
+		Shares:    "60",
+		OrderType: "LP",
+		Receiver:  alice.String(),
+	})
+
+	_ = withdrawResponse7
+
+	suite.Require().Error(err)
+
+	withdrawResponse8, err := suite.msgServer.RemoveLiquidity(goCtx, &types.MsgRemoveLiquidity{
+		Creator:   bob.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		Index:     0,
+		Price:     "1.0",
+		Fee:       "300",
+		Shares:    "60",
+		OrderType: "LP",
+		Receiver:  bob.String(),
+	})
+
+	_ = withdrawResponse8
+
+	tickactual3, _ := app.DexKeeper.GetTicks(ctx, "TokenB", "TokenA", "1.0", "300", "LP")
+	suite.Require().True(tickactual3.Reserve0.IsNil())
+	suite.Require().True(tickactual3.Reserve1.IsNil())
+	suite.Require().True(tickactual3.TotalShares.IsNil())
+	suite.Require().True(tickactual3.PairPrice.IsNil())
+	suite.Require().True(tickactual3.PairFee.IsNil())
+	suite.Require().True(tickactual3.Price == "")
+	suite.Require().True(tickactual3.Fee == "")
+	suite.Require().True(tickactual3.OrderType == "")
+	_ = tickactual3
 	_ = ctx
 
 }
