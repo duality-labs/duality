@@ -22,8 +22,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-testnet
-      args:
-        NODE_ID: 0 # setup simmilar to node 0 (but without running the chain)
+      target: commonconfig
     command: >
       /bin/sh -c "
         # print out test keys before running test node
