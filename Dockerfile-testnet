@@ -85,24 +85,16 @@ RUN dualityd add-genesis-account $(dualityd keys show bob -a) 1000000token,10000
 RUN dualityd gentx alice 1000000stake --chain-id duality
 RUN dualityd collect-gentxs
 
-# build each nodes settings
-FROM commonconfig
-
-# get testnet config files
-ARG NODE_ID
-COPY --from=testnetconfig /root/.testnet/node$NODE_ID /testnet/
+COPY --from=testnetconfig /root/.testnet /root/.testnet
 
 # merge genesis files together:
 # take initial state of "auth", "bank", and "genutil" (the genesis txs) from the testnets configuration only
 RUN jq -s '.[0] * { app_state: { auth: { accounts: [ .[0].app_state.auth.accounts[], .[1].app_state.auth.accounts[] ] }, bank: { balances: [ .[0].app_state.bank.balances[], .[1].app_state.bank.balances[] ] }, genutil: .[1].app_state.genutil } }' \
-    /root/.duality/config/genesis.json /testnet/dualityd/config/genesis.json \
+    /root/.duality/config/genesis.json /root/.testnet/node0/dualityd/config/genesis.json \
     > /root/combined-genesis.json
 
-#  replace original (Ignite CLI) configuration with simd
-RUN rm -rf /root/.duality/config/*
-RUN rm -rf /root/.duality/data/*
-RUN cp -r /testnet/dualityd/config/* /root/.duality/config/
-RUN cp -r /testnet/dualityd/data/* /root/.duality/data/
+# build the test node's settings
+FROM commonconfig as testnode
 
 # overwrite genesis file that will be used
 RUN cp /root/combined-genesis.json /root/.duality/config/genesis.json
@@ -115,6 +107,37 @@ RUN sed -i 's/enabled-unsafe-cors = false/enabled-unsafe-cors = true/g' /root/.d
 RUN sed -i 's/cors_allowed_origins = \[\]/cors_allowed_origins = ["*", ]/g' /root/.duality/config/config.toml;
 RUN echo '\n\n[rpc]\ncors_allowed_origins = ["*"]' >> /root/.duality/config/app.toml
 
+# copy over peer address as made by simd onto the base testnet config
+RUN sed -i "s/persistent_peers = \".*\"/$(cat /root/.testnet/node0/dualityd/config/config.toml | grep 'persistent_peers = \"*\"')/g" /root/.duality/config/config.toml
+
+# see docs for exposed ports:
+#   https://docs.ignite.com/kb/config.html#host
+EXPOSE 26657
+EXPOSE 26656
+EXPOSE 6060
+EXPOSE 9090
+EXPOSE 1317
+
+CMD ["dualityd", "start", "--moniker", "testnode"]
+
+
+# build each validator node's settings
+FROM commonconfig
+
+# get testnet config files
+ARG NODE_ID
+COPY --from=testnetconfig /root/.testnet/node$NODE_ID /testnet/
+
+# overwrite genesis file that will be used
+RUN cp /root/combined-genesis.json /testnet/dualityd/config/genesis.json
+
+# modify node configuration files
+RUN sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /testnet/dualityd/config/config.toml;
+# overwrite CORS rules to allow browser testing and development with frontend local builds
+RUN sed -i 's/enabled-unsafe-cors = false/enabled-unsafe-cors = true/g' /testnet/dualityd/config/app.toml;
+RUN sed -i 's/cors_allowed_origins = \[\]/cors_allowed_origins = ["*", ]/g' /testnet/dualityd/config/config.toml;
+RUN echo '\n\n[rpc]\ncors_allowed_origins = ["*"]' >> /testnet/dualityd/config/app.toml
+
 # see docs for exposed ports:
 #   https://docs.ignite.com/kb/config.html#host
 EXPOSE 26657
@@ -124,4 +147,4 @@ EXPOSE 9090
 EXPOSE 1317
 
 # default to serving the chain with the modified testnet data
-CMD ["dualityd", "start", "--moniker", "duality"]
+CMD ["dualityd", "--home", "/testnet/dualityd", "start", "--moniker", "dualitynode$NODE_ID"]
