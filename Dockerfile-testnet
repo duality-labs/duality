@@ -76,10 +76,10 @@ RUN sed -i 's/keyring-backend = ".*"/keyring-backend = "test"/g' /root/.duality/
 
 # alice
 RUN dualityd keys add alice --output json > /root/.duality/testkeys/alice.json
-RUN dualityd add-genesis-account $(dualityd keys show alice -a) 1000000token,1000000stake
+RUN dualityd add-genesis-account $(dualityd keys show alice -a) 1000000000token,1000000000stake
 # bob
 RUN dualityd keys add bob --output json > /root/.duality/testkeys/bob.json
-RUN dualityd add-genesis-account $(dualityd keys show bob -a) 1000000token,1000000stake
+RUN dualityd add-genesis-account $(dualityd keys show bob -a) 1000000000token,1000000000stake
 
 # Add gentxs to the genesis file
 RUN dualityd gentx alice 1000000stake --chain-id duality
