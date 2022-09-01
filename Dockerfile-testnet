@@ -70,12 +70,12 @@ RUN go install ./cmd/dualityd
 RUN dualityd init duality
 
 # add test accounts
-RUN mkdir /root/.duality/testkeys
+RUN mkdir /root/testkeys
 # alice
-RUN dualityd keys add alice --keyring-backend test --output json > /root/.duality/testkeys/alice.json
+RUN dualityd keys add alice --keyring-backend test --output json > /root/testkeys/alice.json
 RUN dualityd add-genesis-account $(dualityd keys show alice -a --keyring-backend test) 1000000token,1000000stake --keyring-backend test
 # bob
-RUN dualityd keys add bob --keyring-backend test --output json > /root/.duality/testkeys/bob.json
+RUN dualityd keys add bob --keyring-backend test --output json > /root/testkeys/bob.json
 RUN dualityd add-genesis-account $(dualityd keys show bob -a --keyring-backend test) 1000000token,1000000stake --keyring-backend test
 
 # Add gentxs to the genesis file
@@ -94,16 +94,22 @@ COPY --from=testnetconfig /root/.testnet/node$NODE_ID /testnet/
 RUN jq -s '.[0] * { app_state: { auth: { accounts: [ .[0].app_state.auth.accounts[], .[1].app_state.auth.accounts[] ] }, bank: { balances: [ .[0].app_state.bank.balances[], .[1].app_state.bank.balances[] ] }, genutil: .[1].app_state.genutil } }' \
     /root/.duality/config/genesis.json /testnet/dualityd/config/genesis.json \
     > /root/combined-genesis.json
+
+#  replace original (Ignite CLI) configuration with simd
+RUN rm -rf /root/.duality/*
+RUN cp -r /testnet/dualityd/* /root/.duality/
+
 # overwrite genesis file that will be used
-RUN cp /root/combined-genesis.json /testnet/dualityd/config/genesis.json
+RUN cp /root/combined-genesis.json /root/.duality/config/genesis.json
+
+# add testnet base configuration
+COPY testnet-base/app.toml /root/.duality/config/app.toml
+COPY testnet-base/client.toml /root/.duality/config/client.toml
+COPY testnet-base/config.toml /root/.duality/config/config.toml
 
 # modify node configuration files
-# prevent 'local network address' warning from showing
-RUN sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /testnet/dualityd/config/config.toml;
-# overwrite CORS rules to allow browser testing and development with frontend local builds
-RUN sed -i 's/enabled-unsafe-cors = false/enabled-unsafe-cors = true/g' /testnet/dualityd/config/app.toml;
-RUN sed -i 's/cors_allowed_origins = \[\]/cors_allowed_origins = ["*", ]/g' /testnet/dualityd/config/config.toml;
-RUN echo '\n\n[rpc]\ncors_allowed_origins = ["*"]' >> /testnet/dualityd/config/app.toml
+# copy over peer address as made by simd onto the base testnet config
+RUN sed -i "s/persistent_peers = \".*\"/$(cat /testnet/dualityd/config/config.toml | grep 'persistent_peers = \"*\"')/g" /root/.duality/config/config.toml
 
 # see docs for exposed ports:
 #   https://docs.ignite.com/kb/config.html#host
@@ -114,4 +120,4 @@ EXPOSE 9090
 EXPOSE 1317
 
 # default to serving the chain with the modified testnet data
-CMD ["dualityd", "--home", "/testnet/dualityd", "start", "--moniker", "duality"]
+CMD ["dualityd", "start", "--moniker", "duality"]
