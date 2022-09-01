@@ -40,7 +40,7 @@ services:
         sleep 10;
         # start as full node
         echo "starting test full node";
-        dualityd start --log_level $LOG_LEVEL --moniker testnode;
+        dualityd start --log_level $LOG_LEVEL --moniker testnode & \
 
         # wait a bit more to prove we are transitioning to a full node
         sleep 10;
