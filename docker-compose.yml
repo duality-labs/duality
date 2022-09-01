@@ -34,7 +34,7 @@ services:
       /bin/sh -c "
         # print out test keys before running test node
         echo \"test keys:\";
-        jq -s . /root/testkeys/*;
+        jq -s . /root/.duality/testkeys/*;
         # keep container running
         tail -f /dev/null;
       "

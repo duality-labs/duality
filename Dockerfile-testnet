@@ -70,12 +70,12 @@ RUN go install ./cmd/dualityd
 RUN dualityd init duality
 
 # add test accounts
-RUN mkdir /root/testkeys
+RUN mkdir /root/.duality/testkeys
 # alice
-RUN dualityd keys add alice --keyring-backend test --output json > /root/testkeys/alice.json
+RUN dualityd keys add alice --keyring-backend test --output json > /root/.duality/testkeys/alice.json
 RUN dualityd add-genesis-account $(dualityd keys show alice -a --keyring-backend test) 1000000token,1000000stake --keyring-backend test
 # bob
-RUN dualityd keys add bob --keyring-backend test --output json > /root/testkeys/bob.json
+RUN dualityd keys add bob --keyring-backend test --output json > /root/.duality/testkeys/bob.json
 RUN dualityd add-genesis-account $(dualityd keys show bob -a --keyring-backend test) 1000000token,1000000stake --keyring-backend test
 
 # Add gentxs to the genesis file
@@ -96,8 +96,10 @@ RUN jq -s '.[0] * { app_state: { auth: { accounts: [ .[0].app_state.auth.account
     > /root/combined-genesis.json
 
 #  replace original (Ignite CLI) configuration with simd
-RUN rm -rf /root/.duality/*
-RUN cp -r /testnet/dualityd/* /root/.duality/
+RUN rm -rf /root/.duality/config/*
+RUN rm -rf /root/.duality/data/*
+RUN cp -r /testnet/dualityd/config/* /root/.duality/config/
+RUN cp -r /testnet/dualityd/data/* /root/.duality/data/
 
 # overwrite genesis file that will be used
 RUN cp /root/combined-genesis.json /root/.duality/config/genesis.json
