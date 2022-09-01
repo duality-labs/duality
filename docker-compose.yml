@@ -44,9 +44,30 @@ services:
 
         # wait a bit more to prove we are transitioning to a full node
         sleep 10;
+
+        # check if part of the validator set (according to another node)
+        echo "validator voiting power:";
+        curl -s http://dualitynode2:26657/validators | jq ".result.validators[] | select(.pub_key.value == `dualityd tendermint show-validator | jq .key`).voting_power";
+
         # request to be a validator
         echo "requesting test full node to become a validator";
         dualityd tx staking create-validator --node tcp://dualitynode1:26657 --moniker testnode --node-id `dualityd tendermint show-node-id` --pubkey `dualityd tendermint show-validator` --commission-rate="1.0" --commission-max-rate="1.0" --commission-max-change-rate="1.0" --min-self-delegation="1" --gas="auto" --amount 100000000stake --fees 1000token --from alice -y
+
+        # check if part of the validator set (according to another node)
+        echo "validator voiting power:";
+        curl -s http://dualitynode2:26657/validators | jq ".result.validators[] | select(.pub_key.value == `dualityd tendermint show-validator | jq .key`).voting_power";
+
+        sleep 5;
+
+        # check if part of the validator set (according to another node)
+        echo "validator voiting power:";
+        curl -s http://dualitynode2:26657/validators | jq ".result.validators[] | select(.pub_key.value == `dualityd tendermint show-validator | jq .key`).voting_power";
+
+        sleep 10;
+
+        # check if part of the validator set (according to another node)
+        echo "validator voiting power:";
+        curl -s http://dualitynode2:26657/validators | jq ".result.validators[] | select(.pub_key.value == `dualityd tendermint show-validator | jq .key`).voting_power";
 
         # keep container running
         tail -f /dev/null;
