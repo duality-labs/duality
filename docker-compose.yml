@@ -29,21 +29,48 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-testnet
-      target: commonconfig
+      args:
+        NODE_ID: 0 # copy node 0's settings
     command: >
-      /bin/sh -c "
+      /bin/sh -c '
         # print out test keys before running test node
-        echo \"test keys:\";
+        echo "test keys:";
         jq -s . /root/.duality/testkeys/*;
+
+        # remove ID of node 0
+        rm /root/.duality/config/node_key.json
+        rm /root/.duality/config/priv_validator_key.json
+
+        # setup new full node
+        dualityd init testnode --overwrite
+        # copy original genesis across
+        cp /root/combined-genesis.json /root/.duality/config/genesis.json
+
+        # wait a bit to prove we are catching up
+        sleep 15;
+        # start as full node
+        dualityd start --log_level $LOG_LEVEL;
+
+        # wait a bit more to prove we are transitioning to a full node
+        sleep 15;
+        # request to be a validator
+        dualityd tx staking create-validator --node tcp://dualitynode0:26657 --pubkey `dualityd tendermint show-validator` --commission-rate="0.10" --commission-max-rate="0.20" --commission-max-change-rate="0.01" --min-self-delegation="100000" --gas="auto" --amount 100000stake --from alice
+
         # keep container running
         tail -f /dev/null;
-      "
+      '
     environment:
       - DEBUG=1
+      - LOG_LEVEL=${LOG_LEVEL:-info}
     cap_add:
       - SYS_PTRACE
     security_opt:
       - seccomp:unconfined
+    ports:
+      - "26646-26647:26656-26657"
+      - "1316:1317"
+      - "9089:9090"
+      - "2344:2345"
     volumes:
       - go-modules:/go/pkg/mod
     networks:
