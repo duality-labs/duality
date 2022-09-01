@@ -98,9 +98,9 @@ FROM commonconfig as testnode
 RUN cp /root/combined-genesis.json /root/.duality/config/genesis.json
 
 # add testnet base configuration
-COPY testnet-base/app.toml /root/.duality/config/app.toml
-COPY testnet-base/client.toml /root/.duality/config/client.toml
-COPY testnet-base/config.toml /root/.duality/config/config.toml
+COPY testnet/config/app.toml /root/.duality/config/app.toml
+COPY testnet/config/client.toml /root/.duality/config/client.toml
+COPY testnet/config/config.toml /root/.duality/config/config.toml
 
 # modify node configuration files
 # copy over peer address as made by simd onto the base testnet config
@@ -128,9 +128,9 @@ COPY --from=testnetconfig /root/.testnet/node$NODE_ID /testnet/
 RUN cp /root/combined-genesis.json /testnet/dualityd/config/genesis.json
 
 # add testnet base configuration
-COPY testnet-base/app.toml /testnet/dualityd/config/app.toml
-COPY testnet-base/client.toml /testnet/dualityd/config/client.toml
-COPY testnet-base/config.toml /testnet/dualityd/config/config.toml
+COPY testnet/config/app.toml /testnet/dualityd/config/app.toml
+COPY testnet/config/client.toml /testnet/dualityd/config/client.toml
+COPY testnet/config/config.toml /testnet/dualityd/config/config.toml
 
 # modify node configuration files
 # copy over peer address as made by simd onto the base testnet config
