@@ -101,6 +101,7 @@ RUN cp /root/combined-genesis.json /root/.duality/config/genesis.json
 COPY testnet/config/app.toml /root/.duality/config/app.toml
 COPY testnet/config/client.toml /root/.duality/config/client.toml
 COPY testnet/config/config.toml /root/.duality/config/config.toml
+COPY testnet/scripts /root/.duality/scripts
 
 # modify node configuration files
 # copy over peer address as made by simd onto the base testnet config
