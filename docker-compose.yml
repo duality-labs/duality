@@ -36,38 +36,27 @@ services:
         echo "test keys:";
         jq -s . /root/.duality/testkeys/*;
 
+        # check if we can get information from the testnet
+        bash /root/.duality/scripts/check_testnet_status.sh
+
         # wait a bit to prove we are catching up
+        echo "waiting for testnet to progress in height a little...";
         sleep 10;
         # start as full node
-        echo "starting test full node";
+        echo "starting as full node";
         dualityd start --log_level $LOG_LEVEL --moniker testnode & \
 
         # wait a bit more to prove we are transitioning to a full node
         sleep 10;
 
-        # check if part of the validator set (according to another node)
-        echo "validator voiting power:";
-        curl -s http://dualitynode2:26657/validators | jq ".result.validators[] | select(.pub_key.value == `dualityd tendermint show-validator | jq .key`).voting_power";
+        # todo: maybe add a `bash /root/.duality/scripts/check_fullnode_status.sh
+        # to check is the node is known by its peers
 
         # request to be a validator
         echo "requesting test full node to become a validator";
         dualityd tx staking create-validator --node tcp://dualitynode1:26657 --moniker testnode --node-id `dualityd tendermint show-node-id` --pubkey `dualityd tendermint show-validator` --commission-rate="1.0" --commission-max-rate="1.0" --commission-max-change-rate="1.0" --min-self-delegation="1" --gas="auto" --amount 100000000stake --fees 1000token --from alice -y
 
-        # check if part of the validator set (according to another node)
-        echo "validator voiting power:";
-        curl -s http://dualitynode2:26657/validators | jq ".result.validators[] | select(.pub_key.value == `dualityd tendermint show-validator | jq .key`).voting_power";
-
-        sleep 5;
-
-        # check if part of the validator set (according to another node)
-        echo "validator voiting power:";
-        curl -s http://dualitynode2:26657/validators | jq ".result.validators[] | select(.pub_key.value == `dualityd tendermint show-validator | jq .key`).voting_power";
-
-        sleep 10;
-
-        # check if part of the validator set (according to another node)
-        echo "validator voiting power:";
-        curl -s http://dualitynode2:26657/validators | jq ".result.validators[] | select(.pub_key.value == `dualityd tendermint show-validator | jq .key`).voting_power";
+        bash /root/.duality/scripts/check_validator_status.sh
 
         # keep container running
         tail -f /dev/null;

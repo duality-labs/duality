@@ -108,6 +108,9 @@ FROM commonconfig as testnode
 # overwrite genesis file that will be used
 RUN cp /root/combined-genesis.json /root/.duality/config/genesis.json
 
+# add scripts to run
+COPY testnet/scripts /root/.duality/scripts
+
 # modify node configuration files
 # prevent 'local network address' warning from showing
 RUN sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /root/.duality/config/config.toml;
