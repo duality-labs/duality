@@ -9,10 +9,30 @@
  * ---------------------------------------------------------------
  */
 
+export interface DexPairMap {
+  pairId?: string;
+  tokenPair?: string;
+}
+
 /**
  * Params defines the parameters for the module.
  */
 export type DexParams = object;
+
+export interface DexQueryAllPairMapResponse {
+  pairMap?: DexPairMap[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
 
 export interface DexQueryAllTickMapResponse {
   tickMap?: DexTickMap[];
@@ -27,6 +47,10 @@ export interface DexQueryAllTickMapResponse {
    *  }
    */
   pagination?: V1Beta1PageResponse;
+}
+
+export interface DexQueryGetPairMapResponse {
+  pairMap?: DexPairMap;
 }
 
 export interface DexQueryGetTickMapResponse {
@@ -327,6 +351,48 @@ export class HttpClient<SecurityDataType = unknown> {
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryPairMapAll
+   * @summary Queries a list of PairMap items.
+   * @request GET:/NicholasDotSol/duality/dex/pair_map
+   */
+  queryPairMapAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<DexQueryAllPairMapResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/pair_map`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryPairMap
+   * @summary Queries a PairMap by index.
+   * @request GET:/NicholasDotSol/duality/dex/pair_map/{pairId}
+   */
+  queryPairMap = (pairId: string, params: RequestParams = {}) =>
+    this.request<DexQueryGetPairMapResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/pair_map/${pairId}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
   /**
    * No description
    *

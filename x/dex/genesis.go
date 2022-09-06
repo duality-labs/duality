@@ -13,6 +13,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, elem := range genState.TickMapList {
 		k.SetTickMap(ctx, elem)
 	}
+	// Set all the pairMap
+	for _, elem := range genState.PairMapList {
+		k.SetPairMap(ctx, elem)
+	}
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
 }
@@ -23,6 +27,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.Params = k.GetParams(ctx)
 
 	genesis.TickMapList = k.GetAllTickMap(ctx)
+	genesis.PairMapList = k.GetAllPairMap(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis

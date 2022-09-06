@@ -30,6 +30,14 @@ func TestGenesisState_Validate(t *testing.T) {
 						TickIndex: "1",
 					},
 				},
+				PairMapList: []types.PairMap{
+					{
+						PairId: "0",
+					},
+					{
+						PairId: "1",
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -43,6 +51,20 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 					{
 						TickIndex: "0",
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated pairMap",
+			genState: &types.GenesisState{
+				PairMapList: []types.PairMap{
+					{
+						PairId: "0",
+					},
+					{
+						PairId: "0",
 					},
 				},
 			},

@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { Params } from "../dex/params";
 import { TickMap } from "../dex/tick_map";
+import { PairMap } from "../dex/pair_map";
 import { Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
@@ -8,8 +9,9 @@ export const protobufPackage = "nicholasdotsol.duality.dex";
 /** GenesisState defines the dex module's genesis state. */
 export interface GenesisState {
   params: Params | undefined;
-  /** this line is used by starport scaffolding # genesis/proto/state */
   tickMapList: TickMap[];
+  /** this line is used by starport scaffolding # genesis/proto/state */
+  pairMapList: PairMap[];
 }
 
 const baseGenesisState: object = {};
@@ -22,6 +24,9 @@ export const GenesisState = {
     for (const v of message.tickMapList) {
       TickMap.encode(v!, writer.uint32(18).fork()).ldelim();
     }
+    for (const v of message.pairMapList) {
+      PairMap.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
     return writer;
   },
 
@@ -30,6 +35,7 @@ export const GenesisState = {
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseGenesisState } as GenesisState;
     message.tickMapList = [];
+    message.pairMapList = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -38,6 +44,9 @@ export const GenesisState = {
           break;
         case 2:
           message.tickMapList.push(TickMap.decode(reader, reader.uint32()));
+          break;
+        case 3:
+          message.pairMapList.push(PairMap.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -50,6 +59,7 @@ export const GenesisState = {
   fromJSON(object: any): GenesisState {
     const message = { ...baseGenesisState } as GenesisState;
     message.tickMapList = [];
+    message.pairMapList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromJSON(object.params);
     } else {
@@ -58,6 +68,11 @@ export const GenesisState = {
     if (object.tickMapList !== undefined && object.tickMapList !== null) {
       for (const e of object.tickMapList) {
         message.tickMapList.push(TickMap.fromJSON(e));
+      }
+    }
+    if (object.pairMapList !== undefined && object.pairMapList !== null) {
+      for (const e of object.pairMapList) {
+        message.pairMapList.push(PairMap.fromJSON(e));
       }
     }
     return message;
@@ -74,12 +89,20 @@ export const GenesisState = {
     } else {
       obj.tickMapList = [];
     }
+    if (message.pairMapList) {
+      obj.pairMapList = message.pairMapList.map((e) =>
+        e ? PairMap.toJSON(e) : undefined
+      );
+    } else {
+      obj.pairMapList = [];
+    }
     return obj;
   },
 
   fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = { ...baseGenesisState } as GenesisState;
     message.tickMapList = [];
+    message.pairMapList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromPartial(object.params);
     } else {
@@ -88,6 +111,11 @@ export const GenesisState = {
     if (object.tickMapList !== undefined && object.tickMapList !== null) {
       for (const e of object.tickMapList) {
         message.tickMapList.push(TickMap.fromPartial(e));
+      }
+    }
+    if (object.pairMapList !== undefined && object.pairMapList !== null) {
+      for (const e of object.pairMapList) {
+        message.pairMapList.push(PairMap.fromPartial(e));
       }
     }
     return message;

@@ -22,6 +22,14 @@ func TestGenesis(t *testing.T) {
 				TickIndex: "1",
 			},
 		},
+		PairMapList: []types.PairMap{
+			{
+				PairId: "0",
+			},
+			{
+				PairId: "1",
+			},
+		},
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
@@ -34,5 +42,6 @@ func TestGenesis(t *testing.T) {
 	nullify.Fill(got)
 
 	require.ElementsMatch(t, genesisState.TickMapList, got.TickMapList)
+	require.ElementsMatch(t, genesisState.PairMapList, got.PairMapList)
 	// this line is used by starport scaffolding # genesis/test/assert
 }
