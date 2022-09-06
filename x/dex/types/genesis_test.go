@@ -19,12 +19,34 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid:    true,
 		},
 		{
-			desc:     "valid genesis state",
+			desc: "valid genesis state",
 			genState: &types.GenesisState{
 
+				TickMapList: []types.TickMap{
+					{
+						TickIndex: "0",
+					},
+					{
+						TickIndex: "1",
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
+		},
+		{
+			desc: "duplicated tickMap",
+			genState: &types.GenesisState{
+				TickMapList: []types.TickMap{
+					{
+						TickIndex: "0",
+					},
+					{
+						TickIndex: "0",
+					},
+				},
+			},
+			valid: false,
 		},
 		// this line is used by starport scaffolding # types/genesis/testcase
 	} {

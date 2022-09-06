@@ -1,0 +1,12 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+
+import "dex/tick_data_type.proto";
+message TickMap {
+  int64 tickIndex = 1; 
+  TickDataType tickData = 2; 
+  
+}
+

@@ -5,6 +5,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "dex/params.proto";
+import "dex/tick_map.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -15,7 +16,17 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/NicholasDotSol/duality/dex/params";
   }
-  // this line is used by starport scaffolding # 2
+  // Queries a TickMap by index.
+	rpc TickMap(QueryGetTickMapRequest) returns (QueryGetTickMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick_map/{tickIndex}";
+	}
+
+	// Queries a list of TickMap items.
+	rpc TickMapAll(QueryAllTickMapRequest) returns (QueryAllTickMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick_map";
+	}
+
+// this line is used by starport scaffolding # 2
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -25,6 +36,24 @@ message QueryParamsRequest {}
 message QueryParamsResponse {
   // params holds all the parameters of this module.
   Params params = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryGetTickMapRequest {
+	  string tickIndex = 1;
+
+}
+
+message QueryGetTickMapResponse {
+	TickMap tickMap = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllTickMapRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllTickMapResponse {
+	repeated TickMap tickMap = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // this line is used by starport scaffolding # 3
