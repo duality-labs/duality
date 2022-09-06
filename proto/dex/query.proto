@@ -7,6 +7,7 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 import "dex/params.proto";
 import "dex/tick_map.proto";
 import "dex/pair_map.proto";
+import "dex/tokens.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -35,6 +36,16 @@ service Query {
 	// Queries a list of PairMap items.
 	rpc PairMapAll(QueryAllPairMapRequest) returns (QueryAllPairMapResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/pair_map";
+	}
+
+// Queries a Tokens by id.
+	rpc Tokens(QueryGetTokensRequest) returns (QueryGetTokensResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/tokens/{id}";
+	}
+
+	// Queries a list of Tokens items.
+	rpc TokensAll(QueryAllTokensRequest) returns (QueryAllTokensResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/tokens";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -82,6 +93,23 @@ message QueryAllPairMapRequest {
 
 message QueryAllPairMapResponse {
 	repeated PairMap pairMap = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetTokensRequest {
+	uint64 id = 1;
+}
+
+message QueryGetTokensResponse {
+	Tokens Tokens = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllTokensRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllTokensResponse {
+	repeated Tokens Tokens = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

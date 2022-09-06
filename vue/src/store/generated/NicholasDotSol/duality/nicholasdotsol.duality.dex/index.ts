@@ -6,9 +6,10 @@ import { Reserve0AndSharesType } from "./module/types/dex/reserve_0_and_shares_t
 import { TickDataType } from "./module/types/dex/tick_data_type"
 import { TickMap } from "./module/types/dex/tick_map"
 import { TokenPairType } from "./module/types/dex/token_pair_type"
+import { Tokens } from "./module/types/dex/tokens"
 
 
-export { PairMap, Params, Reserve0AndSharesType, TickDataType, TickMap, TokenPairType };
+export { PairMap, Params, Reserve0AndSharesType, TickDataType, TickMap, TokenPairType, Tokens };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -51,6 +52,8 @@ const getDefaultState = () => {
 				TickMapAll: {},
 				PairMap: {},
 				PairMapAll: {},
+				Tokens: {},
+				TokensAll: {},
 				
 				_Structure: {
 						PairMap: getStructure(PairMap.fromPartial({})),
@@ -59,6 +62,7 @@ const getDefaultState = () => {
 						TickDataType: getStructure(TickDataType.fromPartial({})),
 						TickMap: getStructure(TickMap.fromPartial({})),
 						TokenPairType: getStructure(TokenPairType.fromPartial({})),
+						Tokens: getStructure(Tokens.fromPartial({})),
 						
 		},
 		_Registry: registry,
@@ -116,6 +120,18 @@ export default {
 						(<any> params).query=null
 					}
 			return state.PairMapAll[JSON.stringify(params)] ?? {}
+		},
+				getTokens: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.Tokens[JSON.stringify(params)] ?? {}
+		},
+				getTokensAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.TokensAll[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -264,6 +280,54 @@ export default {
 				return getters['getPairMapAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:QueryPairMapAll API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryTokens({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryTokens( key.id)).data
+				
+					
+				commit('QUERY', { query: 'Tokens', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTokens', payload: { options: { all }, params: {...key},query }})
+				return getters['getTokens']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryTokens API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryTokensAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryTokensAll(query)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await queryClient.queryTokensAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'TokensAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTokensAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getTokensAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryTokensAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

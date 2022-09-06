@@ -11,7 +11,7 @@
 
 export interface DexPairMap {
   pairId?: string;
-  tokenPair?: string;
+  tokenPair?: DexTokenPairType;
 }
 
 /**
@@ -49,12 +49,31 @@ export interface DexQueryAllTickMapResponse {
   pagination?: V1Beta1PageResponse;
 }
 
+export interface DexQueryAllTokensResponse {
+  Tokens?: DexTokens[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
 export interface DexQueryGetPairMapResponse {
   pairMap?: DexPairMap;
 }
 
 export interface DexQueryGetTickMapResponse {
   tickMap?: DexTickMap;
+}
+
+export interface DexQueryGetTokensResponse {
+  Tokens?: DexTokens;
 }
 
 /**
@@ -79,6 +98,20 @@ export interface DexTickMap {
   /** @format int64 */
   tickIndex?: string;
   tickData?: DexTickDataType;
+}
+
+export interface DexTokenPairType {
+  /** @format int64 */
+  currentTick0To1?: string;
+
+  /** @format int64 */
+  currentTick1To0?: string;
+}
+
+export interface DexTokens {
+  /** @format uint64 */
+  id?: string;
+  address?: string;
 }
 
 export interface ProtobufAny {
@@ -446,6 +479,48 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   queryTickMap = (tickIndex: string, params: RequestParams = {}) =>
     this.request<DexQueryGetTickMapResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/tick_map/${tickIndex}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryTokensAll
+   * @summary Queries a list of Tokens items.
+   * @request GET:/NicholasDotSol/duality/dex/tokens
+   */
+  queryTokensAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<DexQueryAllTokensResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/tokens`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryTokens
+   * @summary Queries a Tokens by id.
+   * @request GET:/NicholasDotSol/duality/dex/tokens/{id}
+   */
+  queryTokens = (id: string, params: RequestParams = {}) =>
+    this.request<DexQueryGetTokensResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/tokens/${id}`,
       method: "GET",
       format: "json",
       ...params,

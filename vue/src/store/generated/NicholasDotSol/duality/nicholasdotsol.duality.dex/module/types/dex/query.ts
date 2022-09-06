@@ -1,5 +1,6 @@
 /* eslint-disable */
-import { Reader, Writer } from "protobufjs/minimal";
+import { Reader, util, configure, Writer } from "protobufjs/minimal";
+import * as Long from "long";
 import { Params } from "../dex/params";
 import { TickMap } from "../dex/tick_map";
 import {
@@ -7,6 +8,7 @@ import {
   PageResponse,
 } from "../cosmos/base/query/v1beta1/pagination";
 import { PairMap } from "../dex/pair_map";
+import { Tokens } from "../dex/tokens";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -50,6 +52,23 @@ export interface QueryAllPairMapRequest {
 
 export interface QueryAllPairMapResponse {
   pairMap: PairMap[];
+  pagination: PageResponse | undefined;
+}
+
+export interface QueryGetTokensRequest {
+  id: number;
+}
+
+export interface QueryGetTokensResponse {
+  Tokens: Tokens | undefined;
+}
+
+export interface QueryAllTokensRequest {
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryAllTokensResponse {
+  Tokens: Tokens[];
   pagination: PageResponse | undefined;
 }
 
@@ -730,6 +749,282 @@ export const QueryAllPairMapResponse = {
   },
 };
 
+const baseQueryGetTokensRequest: object = { id: 0 };
+
+export const QueryGetTokensRequest = {
+  encode(
+    message: QueryGetTokensRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.id !== 0) {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryGetTokensRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGetTokensRequest } as QueryGetTokensRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetTokensRequest {
+    const message = { ...baseQueryGetTokensRequest } as QueryGetTokensRequest;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = Number(object.id);
+    } else {
+      message.id = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetTokensRequest): unknown {
+    const obj: any = {};
+    message.id !== undefined && (obj.id = message.id);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetTokensRequest>
+  ): QueryGetTokensRequest {
+    const message = { ...baseQueryGetTokensRequest } as QueryGetTokensRequest;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
+    } else {
+      message.id = 0;
+    }
+    return message;
+  },
+};
+
+const baseQueryGetTokensResponse: object = {};
+
+export const QueryGetTokensResponse = {
+  encode(
+    message: QueryGetTokensResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.Tokens !== undefined) {
+      Tokens.encode(message.Tokens, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryGetTokensResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGetTokensResponse } as QueryGetTokensResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.Tokens = Tokens.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetTokensResponse {
+    const message = { ...baseQueryGetTokensResponse } as QueryGetTokensResponse;
+    if (object.Tokens !== undefined && object.Tokens !== null) {
+      message.Tokens = Tokens.fromJSON(object.Tokens);
+    } else {
+      message.Tokens = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetTokensResponse): unknown {
+    const obj: any = {};
+    message.Tokens !== undefined &&
+      (obj.Tokens = message.Tokens ? Tokens.toJSON(message.Tokens) : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetTokensResponse>
+  ): QueryGetTokensResponse {
+    const message = { ...baseQueryGetTokensResponse } as QueryGetTokensResponse;
+    if (object.Tokens !== undefined && object.Tokens !== null) {
+      message.Tokens = Tokens.fromPartial(object.Tokens);
+    } else {
+      message.Tokens = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllTokensRequest: object = {};
+
+export const QueryAllTokensRequest = {
+  encode(
+    message: QueryAllTokensRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryAllTokensRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryAllTokensRequest } as QueryAllTokensRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllTokensRequest {
+    const message = { ...baseQueryAllTokensRequest } as QueryAllTokensRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllTokensRequest): unknown {
+    const obj: any = {};
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageRequest.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryAllTokensRequest>
+  ): QueryAllTokensRequest {
+    const message = { ...baseQueryAllTokensRequest } as QueryAllTokensRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllTokensResponse: object = {};
+
+export const QueryAllTokensResponse = {
+  encode(
+    message: QueryAllTokensResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    for (const v of message.Tokens) {
+      Tokens.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(
+        message.pagination,
+        writer.uint32(18).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryAllTokensResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryAllTokensResponse } as QueryAllTokensResponse;
+    message.Tokens = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.Tokens.push(Tokens.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllTokensResponse {
+    const message = { ...baseQueryAllTokensResponse } as QueryAllTokensResponse;
+    message.Tokens = [];
+    if (object.Tokens !== undefined && object.Tokens !== null) {
+      for (const e of object.Tokens) {
+        message.Tokens.push(Tokens.fromJSON(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllTokensResponse): unknown {
+    const obj: any = {};
+    if (message.Tokens) {
+      obj.Tokens = message.Tokens.map((e) =>
+        e ? Tokens.toJSON(e) : undefined
+      );
+    } else {
+      obj.Tokens = [];
+    }
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageResponse.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryAllTokensResponse>
+  ): QueryAllTokensResponse {
+    const message = { ...baseQueryAllTokensResponse } as QueryAllTokensResponse;
+    message.Tokens = [];
+    if (object.Tokens !== undefined && object.Tokens !== null) {
+      for (const e of object.Tokens) {
+        message.Tokens.push(Tokens.fromPartial(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -742,6 +1037,10 @@ export interface Query {
   PairMap(request: QueryGetPairMapRequest): Promise<QueryGetPairMapResponse>;
   /** Queries a list of PairMap items. */
   PairMapAll(request: QueryAllPairMapRequest): Promise<QueryAllPairMapResponse>;
+  /** Queries a Tokens by id. */
+  Tokens(request: QueryGetTokensRequest): Promise<QueryGetTokensResponse>;
+  /** Queries a list of Tokens items. */
+  TokensAll(request: QueryAllTokensRequest): Promise<QueryAllTokensResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -810,6 +1109,30 @@ export class QueryClientImpl implements Query {
       QueryAllPairMapResponse.decode(new Reader(data))
     );
   }
+
+  Tokens(request: QueryGetTokensRequest): Promise<QueryGetTokensResponse> {
+    const data = QueryGetTokensRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "Tokens",
+      data
+    );
+    return promise.then((data) =>
+      QueryGetTokensResponse.decode(new Reader(data))
+    );
+  }
+
+  TokensAll(request: QueryAllTokensRequest): Promise<QueryAllTokensResponse> {
+    const data = QueryAllTokensRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "TokensAll",
+      data
+    );
+    return promise.then((data) =>
+      QueryAllTokensResponse.decode(new Reader(data))
+    );
+  }
 }
 
 interface Rpc {
@@ -819,6 +1142,16 @@ interface Rpc {
     data: Uint8Array
   ): Promise<Uint8Array>;
 }
+
+declare var self: any | undefined;
+declare var window: any | undefined;
+var globalThis: any = (() => {
+  if (typeof globalThis !== "undefined") return globalThis;
+  if (typeof self !== "undefined") return self;
+  if (typeof window !== "undefined") return window;
+  if (typeof global !== "undefined") return global;
+  throw "Unable to locate global object";
+})();
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 export type DeepPartial<T> = T extends Builtin
@@ -830,3 +1163,15 @@ export type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+function longToNumber(long: Long): number {
+  if (long.gt(Number.MAX_SAFE_INTEGER)) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  return long.toNumber();
+}
+
+if (util.Long !== Long) {
+  util.Long = Long as any;
+  configure();
+}

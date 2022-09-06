@@ -38,6 +38,15 @@ func TestGenesisState_Validate(t *testing.T) {
 						PairId: "1",
 					},
 				},
+				TokensList: []types.Tokens{
+					{
+						Id: 0,
+					},
+					{
+						Id: 1,
+					},
+				},
+				TokensCount: 2,
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -67,6 +76,32 @@ func TestGenesisState_Validate(t *testing.T) {
 						PairId: "0",
 					},
 				},
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated tokens",
+			genState: &types.GenesisState{
+				TokensList: []types.Tokens{
+					{
+						Id: 0,
+					},
+					{
+						Id: 0,
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "invalid tokens count",
+			genState: &types.GenesisState{
+				TokensList: []types.Tokens{
+					{
+						Id: 1,
+					},
+				},
+				TokensCount: 0,
 			},
 			valid: false,
 		},

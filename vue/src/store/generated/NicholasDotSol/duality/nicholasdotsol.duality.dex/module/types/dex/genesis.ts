@@ -1,8 +1,10 @@
 /* eslint-disable */
+import * as Long from "long";
+import { util, configure, Writer, Reader } from "protobufjs/minimal";
 import { Params } from "../dex/params";
 import { TickMap } from "../dex/tick_map";
 import { PairMap } from "../dex/pair_map";
-import { Writer, Reader } from "protobufjs/minimal";
+import { Tokens } from "../dex/tokens";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -10,11 +12,13 @@ export const protobufPackage = "nicholasdotsol.duality.dex";
 export interface GenesisState {
   params: Params | undefined;
   tickMapList: TickMap[];
-  /** this line is used by starport scaffolding # genesis/proto/state */
   pairMapList: PairMap[];
+  tokensList: Tokens[];
+  /** this line is used by starport scaffolding # genesis/proto/state */
+  tokensCount: number;
 }
 
-const baseGenesisState: object = {};
+const baseGenesisState: object = { tokensCount: 0 };
 
 export const GenesisState = {
   encode(message: GenesisState, writer: Writer = Writer.create()): Writer {
@@ -27,6 +31,12 @@ export const GenesisState = {
     for (const v of message.pairMapList) {
       PairMap.encode(v!, writer.uint32(26).fork()).ldelim();
     }
+    for (const v of message.tokensList) {
+      Tokens.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.tokensCount !== 0) {
+      writer.uint32(40).uint64(message.tokensCount);
+    }
     return writer;
   },
 
@@ -36,6 +46,7 @@ export const GenesisState = {
     const message = { ...baseGenesisState } as GenesisState;
     message.tickMapList = [];
     message.pairMapList = [];
+    message.tokensList = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -47,6 +58,12 @@ export const GenesisState = {
           break;
         case 3:
           message.pairMapList.push(PairMap.decode(reader, reader.uint32()));
+          break;
+        case 4:
+          message.tokensList.push(Tokens.decode(reader, reader.uint32()));
+          break;
+        case 5:
+          message.tokensCount = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -60,6 +77,7 @@ export const GenesisState = {
     const message = { ...baseGenesisState } as GenesisState;
     message.tickMapList = [];
     message.pairMapList = [];
+    message.tokensList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromJSON(object.params);
     } else {
@@ -74,6 +92,16 @@ export const GenesisState = {
       for (const e of object.pairMapList) {
         message.pairMapList.push(PairMap.fromJSON(e));
       }
+    }
+    if (object.tokensList !== undefined && object.tokensList !== null) {
+      for (const e of object.tokensList) {
+        message.tokensList.push(Tokens.fromJSON(e));
+      }
+    }
+    if (object.tokensCount !== undefined && object.tokensCount !== null) {
+      message.tokensCount = Number(object.tokensCount);
+    } else {
+      message.tokensCount = 0;
     }
     return message;
   },
@@ -96,6 +124,15 @@ export const GenesisState = {
     } else {
       obj.pairMapList = [];
     }
+    if (message.tokensList) {
+      obj.tokensList = message.tokensList.map((e) =>
+        e ? Tokens.toJSON(e) : undefined
+      );
+    } else {
+      obj.tokensList = [];
+    }
+    message.tokensCount !== undefined &&
+      (obj.tokensCount = message.tokensCount);
     return obj;
   },
 
@@ -103,6 +140,7 @@ export const GenesisState = {
     const message = { ...baseGenesisState } as GenesisState;
     message.tickMapList = [];
     message.pairMapList = [];
+    message.tokensList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromPartial(object.params);
     } else {
@@ -118,9 +156,29 @@ export const GenesisState = {
         message.pairMapList.push(PairMap.fromPartial(e));
       }
     }
+    if (object.tokensList !== undefined && object.tokensList !== null) {
+      for (const e of object.tokensList) {
+        message.tokensList.push(Tokens.fromPartial(e));
+      }
+    }
+    if (object.tokensCount !== undefined && object.tokensCount !== null) {
+      message.tokensCount = object.tokensCount;
+    } else {
+      message.tokensCount = 0;
+    }
     return message;
   },
 };
+
+declare var self: any | undefined;
+declare var window: any | undefined;
+var globalThis: any = (() => {
+  if (typeof globalThis !== "undefined") return globalThis;
+  if (typeof self !== "undefined") return self;
+  if (typeof window !== "undefined") return window;
+  if (typeof global !== "undefined") return global;
+  throw "Unable to locate global object";
+})();
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 export type DeepPartial<T> = T extends Builtin
@@ -132,3 +190,15 @@ export type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+function longToNumber(long: Long): number {
+  if (long.gt(Number.MAX_SAFE_INTEGER)) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  return long.toNumber();
+}
+
+if (util.Long !== Long) {
+  util.Long = Long as any;
+  configure();
+}

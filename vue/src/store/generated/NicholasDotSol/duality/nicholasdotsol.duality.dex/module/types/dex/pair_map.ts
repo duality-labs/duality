@@ -1,22 +1,26 @@
 /* eslint-disable */
+import { TokenPairType } from "../dex/token_pair_type";
 import { Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
 export interface PairMap {
   pairId: string;
-  tokenPair: string;
+  tokenPair: TokenPairType | undefined;
 }
 
-const basePairMap: object = { pairId: "", tokenPair: "" };
+const basePairMap: object = { pairId: "" };
 
 export const PairMap = {
   encode(message: PairMap, writer: Writer = Writer.create()): Writer {
     if (message.pairId !== "") {
       writer.uint32(10).string(message.pairId);
     }
-    if (message.tokenPair !== "") {
-      writer.uint32(18).string(message.tokenPair);
+    if (message.tokenPair !== undefined) {
+      TokenPairType.encode(
+        message.tokenPair,
+        writer.uint32(18).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -32,7 +36,7 @@ export const PairMap = {
           message.pairId = reader.string();
           break;
         case 2:
-          message.tokenPair = reader.string();
+          message.tokenPair = TokenPairType.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -50,9 +54,9 @@ export const PairMap = {
       message.pairId = "";
     }
     if (object.tokenPair !== undefined && object.tokenPair !== null) {
-      message.tokenPair = String(object.tokenPair);
+      message.tokenPair = TokenPairType.fromJSON(object.tokenPair);
     } else {
-      message.tokenPair = "";
+      message.tokenPair = undefined;
     }
     return message;
   },
@@ -60,7 +64,10 @@ export const PairMap = {
   toJSON(message: PairMap): unknown {
     const obj: any = {};
     message.pairId !== undefined && (obj.pairId = message.pairId);
-    message.tokenPair !== undefined && (obj.tokenPair = message.tokenPair);
+    message.tokenPair !== undefined &&
+      (obj.tokenPair = message.tokenPair
+        ? TokenPairType.toJSON(message.tokenPair)
+        : undefined);
     return obj;
   },
 
@@ -72,9 +79,9 @@ export const PairMap = {
       message.pairId = "";
     }
     if (object.tokenPair !== undefined && object.tokenPair !== null) {
-      message.tokenPair = object.tokenPair;
+      message.tokenPair = TokenPairType.fromPartial(object.tokenPair);
     } else {
-      message.tokenPair = "";
+      message.tokenPair = undefined;
     }
     return message;
   },
