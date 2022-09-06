@@ -1,0 +1,10 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+
+message TokenPairType {
+  
+  int64 currentTick0To1 = 1; 
+  int64 currentTick1To0 = 2; 
+}

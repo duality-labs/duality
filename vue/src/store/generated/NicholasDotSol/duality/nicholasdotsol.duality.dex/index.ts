@@ -4,9 +4,10 @@ import { Params } from "./module/types/dex/params"
 import { Reserve0AndSharesType } from "./module/types/dex/reserve_0_and_shares_type"
 import { TickDataType } from "./module/types/dex/tick_data_type"
 import { TickMap } from "./module/types/dex/tick_map"
+import { TokenPairType } from "./module/types/dex/token_pair_type"
 
 
-export { Params, Reserve0AndSharesType, TickDataType, TickMap };
+export { Params, Reserve0AndSharesType, TickDataType, TickMap, TokenPairType };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -53,6 +54,7 @@ const getDefaultState = () => {
 						Reserve0AndSharesType: getStructure(Reserve0AndSharesType.fromPartial({})),
 						TickDataType: getStructure(TickDataType.fromPartial({})),
 						TickMap: getStructure(TickMap.fromPartial({})),
+						TokenPairType: getStructure(TokenPairType.fromPartial({})),
 						
 		},
 		_Registry: registry,
