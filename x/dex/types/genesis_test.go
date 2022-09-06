@@ -24,10 +24,10 @@ func TestGenesisState_Validate(t *testing.T) {
 
 				TickMapList: []types.TickMap{
 					{
-						TickIndex: "0",
+						TickIndex: 0,
 					},
 					{
-						TickIndex: "1",
+						TickIndex: 1,
 					},
 				},
 				PairMapList: []types.PairMap{
@@ -56,10 +56,10 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				TickMapList: []types.TickMap{
 					{
-						TickIndex: "0",
+						TickIndex: 0,
 					},
 					{
-						TickIndex: "0",
+						TickIndex: 1,
 					},
 				},
 			},

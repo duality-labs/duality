@@ -61,7 +61,7 @@ message QueryParamsResponse {
 }
 
 message QueryGetTickMapRequest {
-	  string tickIndex = 1;
+	  int64 tickIndex = 1;
 
 }
 
@@ -79,7 +79,7 @@ message QueryAllTickMapResponse {
 }
 
 message QueryGetPairMapRequest {
-	  string pairId = 1;
+	  int64 pairId = 1;
 
 }
 

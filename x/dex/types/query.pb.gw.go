@@ -67,7 +67,7 @@ func request_Query_TickMap_0(ctx context.Context, marshaler runtime.Marshaler, c
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "tickIndex")
 	}
 
-	protoReq.TickIndex, err = runtime.String(val)
+	protoReq.TickIndex, err = runtime.Int64(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tickIndex", err)
@@ -94,7 +94,7 @@ func local_request_Query_TickMap_0(ctx context.Context, marshaler runtime.Marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "tickIndex")
 	}
 
-	protoReq.TickIndex, err = runtime.String(val)
+	protoReq.TickIndex, err = runtime.Int64(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tickIndex", err)
@@ -157,7 +157,7 @@ func request_Query_PairMap_0(ctx context.Context, marshaler runtime.Marshaler, c
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
 	}
 
-	protoReq.PairId, err = runtime.String(val)
+	protoReq.PairId, err = runtime.Int64(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
@@ -184,7 +184,7 @@ func local_request_Query_PairMap_0(ctx context.Context, marshaler runtime.Marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
 	}
 
-	protoReq.PairId, err = runtime.String(val)
+	protoReq.PairId, err = runtime.Int64(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
