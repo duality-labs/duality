@@ -2,9 +2,10 @@ import { txClient, queryClient, MissingWalletError , registry} from './module'
 
 import { Params } from "./module/types/dex/params"
 import { Reserve0AndSharesType } from "./module/types/dex/reserve_0_and_shares_type"
+import { TickDataType } from "./module/types/dex/tick_data_type"
 
 
-export { Params, Reserve0AndSharesType };
+export { Params, Reserve0AndSharesType, TickDataType };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -47,6 +48,7 @@ const getDefaultState = () => {
 				_Structure: {
 						Params: getStructure(Params.fromPartial({})),
 						Reserve0AndSharesType: getStructure(Reserve0AndSharesType.fromPartial({})),
+						TickDataType: getStructure(TickDataType.fromPartial({})),
 						
 		},
 		_Registry: registry,
