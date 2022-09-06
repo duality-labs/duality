@@ -17356,6 +17356,9 @@ paths:
                         }
       parameters:
         - name: body
+          description: |-
+            SimulateRequest is the request type for the Service.Simulate
+            RPC method.
           in: body
           required: true
           schema:
@@ -18155,6 +18158,11 @@ paths:
                         }
       parameters:
         - name: body
+          description: >-
+            BroadcastTxRequest is the request type for the
+            Service.BroadcastTxRequest
+
+            RPC method.
           in: body
           required: true
           schema:
@@ -29799,6 +29807,42 @@ paths:
           required: true
           type: string
           format: uint64
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/params:
+    get:
+      summary: Parameters queries the parameters of the module.
+      operationId: NicholasdotsolDualityDexParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params holds all the parameters of this module.
+                type: object
+            description: >-
+              QueryParamsResponse is response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
       tags:
         - Query
   /tendermint/spn/claim/airdrop_supply:
@@ -51508,6 +51552,16 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
+  nicholasdotsol.duality.dex.Params:
+    type: object
+    description: Params defines the parameters for the module.
+  nicholasdotsol.duality.dex.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params holds all the parameters of this module.
+        type: object
+    description: QueryParamsResponse is response type for the Query/Params RPC method.
   tendermint.spn.claim.ClaimRecord:
     type: object
     properties:
