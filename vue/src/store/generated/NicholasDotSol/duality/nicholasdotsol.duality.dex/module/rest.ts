@@ -49,6 +49,21 @@ export interface DexQueryAllTickMapResponse {
   pagination?: V1Beta1PageResponse;
 }
 
+export interface DexQueryAllTokenMapResponse {
+  tokenMap?: DexTokenMap[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
 export interface DexQueryAllTokensResponse {
   Tokens?: DexTokens[];
 
@@ -70,6 +85,10 @@ export interface DexQueryGetPairMapResponse {
 
 export interface DexQueryGetTickMapResponse {
   tickMap?: DexTickMap;
+}
+
+export interface DexQueryGetTokenMapResponse {
+  tokenMap?: DexTokenMap;
 }
 
 export interface DexQueryGetTokensResponse {
@@ -98,6 +117,11 @@ export interface DexTickMap {
   /** @format int64 */
   tickIndex?: string;
   tickData?: DexTickDataType;
+}
+
+export interface DexTokenMap {
+  address?: string;
+  index?: string;
 }
 
 export interface DexTokenPairType {
@@ -479,6 +503,48 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
   queryTickMap = (tickIndex: string, params: RequestParams = {}) =>
     this.request<DexQueryGetTickMapResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/tick_map/${tickIndex}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryTokenMapAll
+   * @summary Queries a list of TokenMap items.
+   * @request GET:/NicholasDotSol/duality/dex/token_map
+   */
+  queryTokenMapAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<DexQueryAllTokenMapResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/token_map`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryTokenMap
+   * @summary Queries a TokenMap by index.
+   * @request GET:/NicholasDotSol/duality/dex/token_map/{address}
+   */
+  queryTokenMap = (address: string, params: RequestParams = {}) =>
+    this.request<DexQueryGetTokenMapResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/token_map/${address}`,
       method: "GET",
       format: "json",
       ...params,

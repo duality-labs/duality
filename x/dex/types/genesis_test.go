@@ -47,6 +47,14 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 				TokensCount: 2,
+				TokenMapList: []types.TokenMap{
+					{
+						Address: "0",
+					},
+					{
+						Address: "1",
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -102,6 +110,20 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 				TokensCount: 0,
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated tokenMap",
+			genState: &types.GenesisState{
+				TokenMapList: []types.TokenMap{
+					{
+						Address: "0",
+					},
+					{
+						Address: "0",
+					},
+				},
 			},
 			valid: false,
 		},

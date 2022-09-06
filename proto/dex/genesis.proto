@@ -6,6 +6,7 @@ import "dex/params.proto";
 import "dex/tick_map.proto";
 import "dex/pair_map.proto";
 import "dex/tokens.proto";
+import "dex/token_map.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -17,5 +18,6 @@ message GenesisState {
   repeated PairMap pairMapList = 3 [(gogoproto.nullable) = false];
   repeated Tokens tokensList = 4 [(gogoproto.nullable) = false];
   uint64 tokensCount = 5;
+  repeated TokenMap tokenMapList = 6 [(gogoproto.nullable) = false];
   // this line is used by starport scaffolding # genesis/proto/state
 }
