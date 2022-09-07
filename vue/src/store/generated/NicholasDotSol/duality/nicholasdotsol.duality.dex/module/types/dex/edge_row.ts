@@ -4,16 +4,18 @@ import { Writer, Reader } from "protobufjs/minimal";
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
 export interface EdgeRow {
-  edge: string;
+  edge: boolean[];
 }
 
-const baseEdgeRow: object = { edge: "" };
+const baseEdgeRow: object = { edge: false };
 
 export const EdgeRow = {
   encode(message: EdgeRow, writer: Writer = Writer.create()): Writer {
-    if (message.edge !== "") {
-      writer.uint32(10).string(message.edge);
+    writer.uint32(10).fork();
+    for (const v of message.edge) {
+      writer.bool(v);
     }
+    writer.ldelim();
     return writer;
   },
 
@@ -21,11 +23,19 @@ export const EdgeRow = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseEdgeRow } as EdgeRow;
+    message.edge = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.edge = reader.string();
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.edge.push(reader.bool());
+            }
+          } else {
+            message.edge.push(reader.bool());
+          }
           break;
         default:
           reader.skipType(tag & 7);
@@ -37,26 +47,32 @@ export const EdgeRow = {
 
   fromJSON(object: any): EdgeRow {
     const message = { ...baseEdgeRow } as EdgeRow;
+    message.edge = [];
     if (object.edge !== undefined && object.edge !== null) {
-      message.edge = String(object.edge);
-    } else {
-      message.edge = "";
+      for (const e of object.edge) {
+        message.edge.push(Boolean(e));
+      }
     }
     return message;
   },
 
   toJSON(message: EdgeRow): unknown {
     const obj: any = {};
-    message.edge !== undefined && (obj.edge = message.edge);
+    if (message.edge) {
+      obj.edge = message.edge.map((e) => e);
+    } else {
+      obj.edge = [];
+    }
     return obj;
   },
 
   fromPartial(object: DeepPartial<EdgeRow>): EdgeRow {
     const message = { ...baseEdgeRow } as EdgeRow;
+    message.edge = [];
     if (object.edge !== undefined && object.edge !== null) {
-      message.edge = object.edge;
-    } else {
-      message.edge = "";
+      for (const e of object.edge) {
+        message.edge.push(e);
+      }
     }
     return message;
   },

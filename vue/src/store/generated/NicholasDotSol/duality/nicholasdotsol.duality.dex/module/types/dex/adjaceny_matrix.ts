@@ -1,21 +1,20 @@
 /* eslint-disable */
+import { EdgeRow } from "../dex/edge_row";
 import { Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
 export interface AdjacenyMatrix {
-  edgeMatrix: boolean[];
+  EdgeMatrix: EdgeRow[];
 }
 
-const baseAdjacenyMatrix: object = { edgeMatrix: false };
+const baseAdjacenyMatrix: object = {};
 
 export const AdjacenyMatrix = {
   encode(message: AdjacenyMatrix, writer: Writer = Writer.create()): Writer {
-    writer.uint32(10).fork();
-    for (const v of message.edgeMatrix) {
-      writer.bool(v);
+    for (const v of message.EdgeMatrix) {
+      EdgeRow.encode(v!, writer.uint32(10).fork()).ldelim();
     }
-    writer.ldelim();
     return writer;
   },
 
@@ -23,19 +22,12 @@ export const AdjacenyMatrix = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseAdjacenyMatrix } as AdjacenyMatrix;
-    message.edgeMatrix = [];
+    message.EdgeMatrix = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if ((tag & 7) === 2) {
-            const end2 = reader.uint32() + reader.pos;
-            while (reader.pos < end2) {
-              message.edgeMatrix.push(reader.bool());
-            }
-          } else {
-            message.edgeMatrix.push(reader.bool());
-          }
+          message.EdgeMatrix.push(EdgeRow.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -47,10 +39,10 @@ export const AdjacenyMatrix = {
 
   fromJSON(object: any): AdjacenyMatrix {
     const message = { ...baseAdjacenyMatrix } as AdjacenyMatrix;
-    message.edgeMatrix = [];
-    if (object.edgeMatrix !== undefined && object.edgeMatrix !== null) {
-      for (const e of object.edgeMatrix) {
-        message.edgeMatrix.push(Boolean(e));
+    message.EdgeMatrix = [];
+    if (object.EdgeMatrix !== undefined && object.EdgeMatrix !== null) {
+      for (const e of object.EdgeMatrix) {
+        message.EdgeMatrix.push(EdgeRow.fromJSON(e));
       }
     }
     return message;
@@ -58,20 +50,22 @@ export const AdjacenyMatrix = {
 
   toJSON(message: AdjacenyMatrix): unknown {
     const obj: any = {};
-    if (message.edgeMatrix) {
-      obj.edgeMatrix = message.edgeMatrix.map((e) => e);
+    if (message.EdgeMatrix) {
+      obj.EdgeMatrix = message.EdgeMatrix.map((e) =>
+        e ? EdgeRow.toJSON(e) : undefined
+      );
     } else {
-      obj.edgeMatrix = [];
+      obj.EdgeMatrix = [];
     }
     return obj;
   },
 
   fromPartial(object: DeepPartial<AdjacenyMatrix>): AdjacenyMatrix {
     const message = { ...baseAdjacenyMatrix } as AdjacenyMatrix;
-    message.edgeMatrix = [];
-    if (object.edgeMatrix !== undefined && object.edgeMatrix !== null) {
-      for (const e of object.edgeMatrix) {
-        message.edgeMatrix.push(e);
+    message.EdgeMatrix = [];
+    if (object.EdgeMatrix !== undefined && object.EdgeMatrix !== null) {
+      for (const e of object.EdgeMatrix) {
+        message.EdgeMatrix.push(EdgeRow.fromPartial(e));
       }
     }
     return message;

@@ -23,7 +23,7 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type EdgeRow struct {
-	Edge string `protobuf:"bytes,1,opt,name=edge,proto3" json:"edge,omitempty"`
+	Edge []bool `protobuf:"varint,1,rep,packed,name=edge,proto3" json:"edge,omitempty"`
 }
 
 func (m *EdgeRow) Reset()         { *m = EdgeRow{} }
@@ -59,11 +59,11 @@ func (m *EdgeRow) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_EdgeRow proto.InternalMessageInfo
 
-func (m *EdgeRow) GetEdge() string {
+func (m *EdgeRow) GetEdge() []bool {
 	if m != nil {
 		return m.Edge
 	}
-	return ""
+	return nil
 }
 
 func init() {
@@ -78,13 +78,13 @@ var fileDescriptor_26e8b8a06fd0da66 = []byte{
 	0x4f, 0x4d, 0x49, 0x4f, 0x8d, 0x2f, 0xca, 0x2f, 0xd7, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x92,
 	0xca, 0xcb, 0x4c, 0xce, 0xc8, 0xcf, 0x49, 0x2c, 0x4e, 0xc9, 0x2f, 0x29, 0xce, 0xcf, 0xd1, 0x4b,
 	0x29, 0x4d, 0xcc, 0xc9, 0x2c, 0xa9, 0xd4, 0x4b, 0x49, 0xad, 0x50, 0x92, 0xe5, 0x62, 0x77, 0x4d,
-	0x49, 0x4f, 0x0d, 0xca, 0x2f, 0x17, 0x12, 0xe2, 0x62, 0x01, 0x69, 0x94, 0x60, 0x54, 0x60, 0xd4,
-	0xe0, 0x0c, 0x02, 0xb3, 0x9d, 0xdc, 0x4f, 0x3c, 0x92, 0x63, 0xbc, 0xf0, 0x48, 0x8e, 0xf1, 0xc1,
+	0x49, 0x4f, 0x0d, 0xca, 0x2f, 0x17, 0x12, 0xe2, 0x62, 0x01, 0x69, 0x94, 0x60, 0x54, 0x60, 0xd6,
+	0xe0, 0x08, 0x02, 0xb3, 0x9d, 0xdc, 0x4f, 0x3c, 0x92, 0x63, 0xbc, 0xf0, 0x48, 0x8e, 0xf1, 0xc1,
 	0x23, 0x39, 0xc6, 0x09, 0x8f, 0xe5, 0x18, 0x2e, 0x3c, 0x96, 0x63, 0xb8, 0xf1, 0x58, 0x8e, 0x21,
 	0x4a, 0x37, 0x3d, 0xb3, 0x24, 0xa3, 0x34, 0x49, 0x2f, 0x39, 0x3f, 0x57, 0xdf, 0x0f, 0x6a, 0xbe,
 	0x4b, 0x7e, 0x49, 0x70, 0x7e, 0x8e, 0x3e, 0xd4, 0x7c, 0xfd, 0x0a, 0x7d, 0x90, 0x63, 0x4a, 0x2a,
-	0x0b, 0x52, 0x8b, 0x93, 0xd8, 0xc0, 0x4e, 0x31, 0x06, 0x04, 0x00, 0x00, 0xff, 0xff, 0x04, 0x59,
-	0xe9, 0xa9, 0xa0, 0x00, 0x00, 0x00,
+	0x0b, 0x52, 0x8b, 0x93, 0xd8, 0xc0, 0x4e, 0x31, 0x06, 0x04, 0x00, 0x00, 0xff, 0xff, 0xa2, 0x79,
+	0x53, 0xe3, 0xa0, 0x00, 0x00, 0x00,
 }
 
 func (m *EdgeRow) Marshal() (dAtA []byte, err error) {
@@ -108,8 +108,14 @@ func (m *EdgeRow) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	if len(m.Edge) > 0 {
-		i -= len(m.Edge)
-		copy(dAtA[i:], m.Edge)
+		for iNdEx := len(m.Edge) - 1; iNdEx >= 0; iNdEx-- {
+			i--
+			if m.Edge[iNdEx] {
+				dAtA[i] = 1
+			} else {
+				dAtA[i] = 0
+			}
+		}
 		i = encodeVarintEdgeRow(dAtA, i, uint64(len(m.Edge)))
 		i--
 		dAtA[i] = 0xa
@@ -134,9 +140,8 @@ func (m *EdgeRow) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Edge)
-	if l > 0 {
-		n += 1 + l + sovEdgeRow(uint64(l))
+	if len(m.Edge) > 0 {
+		n += 1 + sovEdgeRow(uint64(len(m.Edge))) + len(m.Edge)*1
 	}
 	return n
 }
@@ -177,37 +182,75 @@ func (m *EdgeRow) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Edge", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEdgeRow
+			if wireType == 0 {
+				var v int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowEdgeRow
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
 				}
-				if iNdEx >= l {
+				m.Edge = append(m.Edge, bool(v != 0))
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowEdgeRow
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthEdgeRow
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex < 0 {
+					return ErrInvalidLengthEdgeRow
+				}
+				if postIndex > l {
 					return io.ErrUnexpectedEOF
 				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
+				var elementCount int
+				elementCount = packedLen
+				if elementCount != 0 && len(m.Edge) == 0 {
+					m.Edge = make([]bool, 0, elementCount)
 				}
+				for iNdEx < postIndex {
+					var v int
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowEdgeRow
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= int(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.Edge = append(m.Edge, bool(v != 0))
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field Edge", wireType)
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthEdgeRow
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthEdgeRow
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Edge = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipEdgeRow(dAtA[iNdEx:])

@@ -9,6 +9,8 @@
  * ---------------------------------------------------------------
  */
 
+export type DexMsgDepositResponse = object;
+
 export interface DexPairMap {
   pairId?: string;
   tokenPair?: DexTokenPairType;
