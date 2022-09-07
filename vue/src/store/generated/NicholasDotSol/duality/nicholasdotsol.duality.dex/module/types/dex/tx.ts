@@ -15,6 +15,18 @@ export interface MsgDeposit {
 
 export interface MsgDepositResponse {}
 
+export interface MsgWithdrawl {
+  creator: string;
+  tokenA: string;
+  tokenB: string;
+  sharesToRemove: string;
+  priceIndex: string;
+  fee: string;
+  receiver: string;
+}
+
+export interface MsgWithdrawlResponse {}
+
 const baseMsgDeposit: object = {
   creator: "",
   tokenA: "",
@@ -218,10 +230,215 @@ export const MsgDepositResponse = {
   },
 };
 
+const baseMsgWithdrawl: object = {
+  creator: "",
+  tokenA: "",
+  tokenB: "",
+  sharesToRemove: "",
+  priceIndex: "",
+  fee: "",
+  receiver: "",
+};
+
+export const MsgWithdrawl = {
+  encode(message: MsgWithdrawl, writer: Writer = Writer.create()): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.tokenA !== "") {
+      writer.uint32(18).string(message.tokenA);
+    }
+    if (message.tokenB !== "") {
+      writer.uint32(26).string(message.tokenB);
+    }
+    if (message.sharesToRemove !== "") {
+      writer.uint32(34).string(message.sharesToRemove);
+    }
+    if (message.priceIndex !== "") {
+      writer.uint32(42).string(message.priceIndex);
+    }
+    if (message.fee !== "") {
+      writer.uint32(50).string(message.fee);
+    }
+    if (message.receiver !== "") {
+      writer.uint32(58).string(message.receiver);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgWithdrawl {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgWithdrawl } as MsgWithdrawl;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.tokenA = reader.string();
+          break;
+        case 3:
+          message.tokenB = reader.string();
+          break;
+        case 4:
+          message.sharesToRemove = reader.string();
+          break;
+        case 5:
+          message.priceIndex = reader.string();
+          break;
+        case 6:
+          message.fee = reader.string();
+          break;
+        case 7:
+          message.receiver = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgWithdrawl {
+    const message = { ...baseMsgWithdrawl } as MsgWithdrawl;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.tokenA !== undefined && object.tokenA !== null) {
+      message.tokenA = String(object.tokenA);
+    } else {
+      message.tokenA = "";
+    }
+    if (object.tokenB !== undefined && object.tokenB !== null) {
+      message.tokenB = String(object.tokenB);
+    } else {
+      message.tokenB = "";
+    }
+    if (object.sharesToRemove !== undefined && object.sharesToRemove !== null) {
+      message.sharesToRemove = String(object.sharesToRemove);
+    } else {
+      message.sharesToRemove = "";
+    }
+    if (object.priceIndex !== undefined && object.priceIndex !== null) {
+      message.priceIndex = String(object.priceIndex);
+    } else {
+      message.priceIndex = "";
+    }
+    if (object.fee !== undefined && object.fee !== null) {
+      message.fee = String(object.fee);
+    } else {
+      message.fee = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = String(object.receiver);
+    } else {
+      message.receiver = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgWithdrawl): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.tokenA !== undefined && (obj.tokenA = message.tokenA);
+    message.tokenB !== undefined && (obj.tokenB = message.tokenB);
+    message.sharesToRemove !== undefined &&
+      (obj.sharesToRemove = message.sharesToRemove);
+    message.priceIndex !== undefined && (obj.priceIndex = message.priceIndex);
+    message.fee !== undefined && (obj.fee = message.fee);
+    message.receiver !== undefined && (obj.receiver = message.receiver);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgWithdrawl>): MsgWithdrawl {
+    const message = { ...baseMsgWithdrawl } as MsgWithdrawl;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.tokenA !== undefined && object.tokenA !== null) {
+      message.tokenA = object.tokenA;
+    } else {
+      message.tokenA = "";
+    }
+    if (object.tokenB !== undefined && object.tokenB !== null) {
+      message.tokenB = object.tokenB;
+    } else {
+      message.tokenB = "";
+    }
+    if (object.sharesToRemove !== undefined && object.sharesToRemove !== null) {
+      message.sharesToRemove = object.sharesToRemove;
+    } else {
+      message.sharesToRemove = "";
+    }
+    if (object.priceIndex !== undefined && object.priceIndex !== null) {
+      message.priceIndex = object.priceIndex;
+    } else {
+      message.priceIndex = "";
+    }
+    if (object.fee !== undefined && object.fee !== null) {
+      message.fee = object.fee;
+    } else {
+      message.fee = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = object.receiver;
+    } else {
+      message.receiver = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgWithdrawlResponse: object = {};
+
+export const MsgWithdrawlResponse = {
+  encode(_: MsgWithdrawlResponse, writer: Writer = Writer.create()): Writer {
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgWithdrawlResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgWithdrawlResponse } as MsgWithdrawlResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgWithdrawlResponse {
+    const message = { ...baseMsgWithdrawlResponse } as MsgWithdrawlResponse;
+    return message;
+  },
+
+  toJSON(_: MsgWithdrawlResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(_: DeepPartial<MsgWithdrawlResponse>): MsgWithdrawlResponse {
+    const message = { ...baseMsgWithdrawlResponse } as MsgWithdrawlResponse;
+    return message;
+  },
+};
+
 /** Msg defines the Msg service. */
 export interface Msg {
-  /** this line is used by starport scaffolding # proto/tx/rpc */
   Deposit(request: MsgDeposit): Promise<MsgDepositResponse>;
+  /** this line is used by starport scaffolding # proto/tx/rpc */
+  Withdrawl(request: MsgWithdrawl): Promise<MsgWithdrawlResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -237,6 +454,18 @@ export class MsgClientImpl implements Msg {
       data
     );
     return promise.then((data) => MsgDepositResponse.decode(new Reader(data)));
+  }
+
+  Withdrawl(request: MsgWithdrawl): Promise<MsgWithdrawlResponse> {
+    const data = MsgWithdrawl.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Msg",
+      "Withdrawl",
+      data
+    );
+    return promise.then((data) =>
+      MsgWithdrawlResponse.decode(new Reader(data))
+    );
   }
 }
 
