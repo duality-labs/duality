@@ -1,0 +1,14 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+
+message Shares {
+  string address = 1; 
+  string pairId = 2; 
+  string priceIndex = 3; 
+  string fee = 4; 
+  string sharesOwned = 5; 
+  
+}
+

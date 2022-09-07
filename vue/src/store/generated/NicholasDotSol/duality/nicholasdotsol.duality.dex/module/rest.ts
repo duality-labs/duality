@@ -40,6 +40,21 @@ export interface DexQueryAllPairMapResponse {
   pagination?: V1Beta1PageResponse;
 }
 
+export interface DexQueryAllSharesResponse {
+  shares?: DexShares[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
 export interface DexQueryAllTickMapResponse {
   tickMap?: DexTickMap[];
 
@@ -89,6 +104,10 @@ export interface DexQueryGetPairMapResponse {
   pairMap?: DexPairMap;
 }
 
+export interface DexQueryGetSharesResponse {
+  shares?: DexShares;
+}
+
 export interface DexQueryGetTickMapResponse {
   tickMap?: DexTickMap;
 }
@@ -112,6 +131,14 @@ export interface DexQueryParamsResponse {
 export interface DexReserve0AndSharesType {
   reserve0?: string;
   totalShares?: string;
+}
+
+export interface DexShares {
+  address?: string;
+  pairId?: string;
+  priceIndex?: string;
+  fee?: string;
+  sharesOwned?: string;
 }
 
 export interface DexTickDataType {
@@ -478,6 +505,48 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
+   * @name QuerySharesAll
+   * @summary Queries a list of Shares items.
+   * @request GET:/NicholasDotSol/duality/dex/shares
+   */
+  querySharesAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<DexQueryAllSharesResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/shares`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryShares
+   * @summary Queries a Shares by index.
+   * @request GET:/NicholasDotSol/duality/dex/shares/{address}/{pairId}/{priceIndex}/{fee}
+   */
+  queryShares = (address: string, pairId: string, priceIndex: string, fee: string, params: RequestParams = {}) =>
+    this.request<DexQueryGetSharesResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/shares/${address}/${pairId}/${priceIndex}/${fee}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
    * @name QueryTickMapAll
    * @summary Queries a list of TickMap items.
    * @request GET:/NicholasDotSol/duality/dex/tick_map
@@ -508,10 +577,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @summary Queries a TickMap by index.
    * @request GET:/NicholasDotSol/duality/dex/tick_map/{tickIndex}
    */
-  queryTickMap = (tickIndex: string, params: RequestParams = {}) =>
+  queryTickMap = (tickIndex: string, query?: { pairId?: string }, params: RequestParams = {}) =>
     this.request<DexQueryGetTickMapResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/tick_map/${tickIndex}`,
       method: "GET",
+      query: query,
       format: "json",
       ...params,
     });

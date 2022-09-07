@@ -15,28 +15,27 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNTickMap(keeper *keeper.Keeper, ctx sdk.Context, token0 string, token1 string, n int) []types.TickMap {
+func createNTickMap(keeper *keeper.Keeper, ctx sdk.Context, pairId string, n int) []types.TickMap {
 	items := make([]types.TickMap, n)
 	for i := range items {
 
-		items[i].TickData = &types.TickDataType{
-			Reserve0AndShares: append(items[i].TickData.Reserve0AndShares, &types.Reserve0AndSharesType{
-				Reserve0:    sdk.OneDec(),
-				TotalShares: sdk.ZeroDec(),
-			}),
-			Reserve1: append(items[i].TickData.Reserve1, sdk.ZeroDec()),
-		}
+		// items[i].TickData = &types.TickDataType{
+		// 	Reserve0AndShares: append(items[i].TickData.Reserve0AndShares, &types.Reserve0AndSharesType{
+		// 		Reserve0:    sdk.OneDec(),
+		// 		TotalShares: sdk.ZeroDec(),
+		// 	}),
+		// 	Reserve1: append(items[i].TickData.Reserve1, sdk.ZeroDec()),
+		// }
 
-		items[i].TickIndex = int64(i),
-
-			keeper.SetTickMap(ctx, token0, token1, items[i])
+		// items[i].TickIndex = int64(i),
+		keeper.SetTickMap(ctx, pairId, items[i])
 	}
 	return items
 }
 
 func TestTickMapGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNTickMap(keeper, ctx, "TokenB", "TokenA", 10)
+	items := createNTickMap(keeper, ctx, "TokenB/TokenA", 10)
 	for _, item := range items {
 		rst, found := keeper.GetTickMap(ctx,
 			item.TickIndex,
@@ -50,12 +49,14 @@ func TestTickMapGet(t *testing.T) {
 }
 func TestTickMapRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNTickMap(keeper, ctx, "TokenB", "TokenA", 10)
+	items := createNTickMap(keeper, ctx, "TokenB/TokenA", 10)
 	for _, item := range items {
 		keeper.RemoveTickMap(ctx,
+			"TokenB/TokenA",
 			item.TickIndex,
 		)
 		_, found := keeper.GetTickMap(ctx,
+			"TokenB/TokenA",
 			item.TickIndex,
 		)
 		require.False(t, found)
@@ -64,7 +65,7 @@ func TestTickMapRemove(t *testing.T) {
 
 func TestTickMapGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNTickMap(keeper, ctx, "TokenB", "TokenA", 10)
+	items := createNTickMap(keeper, ctx, "TokenB/TokenA", 10)
 	require.ElementsMatch(t,
 		nullify.Fill(items),
 		nullify.Fill(keeper.GetAllTickMap(ctx)),

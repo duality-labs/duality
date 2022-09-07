@@ -29,6 +29,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, elem := range genState.TokenMapList {
 		k.SetTokenMap(ctx, elem)
 	}
+	// Set all the shares
+	for _, elem := range genState.SharesList {
+		k.SetShares(ctx, elem)
+	}
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
 }
@@ -43,6 +47,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.TokensList = k.GetAllTokens(ctx)
 	genesis.TokensCount = k.GetTokensCount(ctx)
 	genesis.TokenMapList = k.GetAllTokenMap(ctx)
+	genesis.SharesList = k.GetAllShares(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis

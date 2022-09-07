@@ -6,6 +6,7 @@ import { TickMap } from "../dex/tick_map";
 import { PairMap } from "../dex/pair_map";
 import { Tokens } from "../dex/tokens";
 import { TokenMap } from "../dex/token_map";
+import { Shares } from "../dex/shares";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -16,8 +17,9 @@ export interface GenesisState {
   pairMapList: PairMap[];
   tokensList: Tokens[];
   tokensCount: number;
-  /** this line is used by starport scaffolding # genesis/proto/state */
   tokenMapList: TokenMap[];
+  /** this line is used by starport scaffolding # genesis/proto/state */
+  sharesList: Shares[];
 }
 
 const baseGenesisState: object = { tokensCount: 0 };
@@ -42,6 +44,9 @@ export const GenesisState = {
     for (const v of message.tokenMapList) {
       TokenMap.encode(v!, writer.uint32(50).fork()).ldelim();
     }
+    for (const v of message.sharesList) {
+      Shares.encode(v!, writer.uint32(58).fork()).ldelim();
+    }
     return writer;
   },
 
@@ -53,6 +58,7 @@ export const GenesisState = {
     message.pairMapList = [];
     message.tokensList = [];
     message.tokenMapList = [];
+    message.sharesList = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -74,6 +80,9 @@ export const GenesisState = {
         case 6:
           message.tokenMapList.push(TokenMap.decode(reader, reader.uint32()));
           break;
+        case 7:
+          message.sharesList.push(Shares.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -88,6 +97,7 @@ export const GenesisState = {
     message.pairMapList = [];
     message.tokensList = [];
     message.tokenMapList = [];
+    message.sharesList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromJSON(object.params);
     } else {
@@ -116,6 +126,11 @@ export const GenesisState = {
     if (object.tokenMapList !== undefined && object.tokenMapList !== null) {
       for (const e of object.tokenMapList) {
         message.tokenMapList.push(TokenMap.fromJSON(e));
+      }
+    }
+    if (object.sharesList !== undefined && object.sharesList !== null) {
+      for (const e of object.sharesList) {
+        message.sharesList.push(Shares.fromJSON(e));
       }
     }
     return message;
@@ -155,6 +170,13 @@ export const GenesisState = {
     } else {
       obj.tokenMapList = [];
     }
+    if (message.sharesList) {
+      obj.sharesList = message.sharesList.map((e) =>
+        e ? Shares.toJSON(e) : undefined
+      );
+    } else {
+      obj.sharesList = [];
+    }
     return obj;
   },
 
@@ -164,6 +186,7 @@ export const GenesisState = {
     message.pairMapList = [];
     message.tokensList = [];
     message.tokenMapList = [];
+    message.sharesList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromPartial(object.params);
     } else {
@@ -192,6 +215,11 @@ export const GenesisState = {
     if (object.tokenMapList !== undefined && object.tokenMapList !== null) {
       for (const e of object.tokenMapList) {
         message.tokenMapList.push(TokenMap.fromPartial(e));
+      }
+    }
+    if (object.sharesList !== undefined && object.sharesList !== null) {
+      for (const e of object.sharesList) {
+        message.sharesList.push(Shares.fromPartial(e));
       }
     }
     return message;
