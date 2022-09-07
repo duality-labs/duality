@@ -37,7 +37,7 @@ func TestTickMapGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNTickMap(keeper, ctx, "TokenB/TokenA", 10)
 	for _, item := range items {
-		rst, found := keeper.GetTickMap(ctx,
+		rst, found := keeper.GetTickMap(ctx, "TokenB/TokenA",
 			item.TickIndex,
 		)
 		require.True(t, found)
