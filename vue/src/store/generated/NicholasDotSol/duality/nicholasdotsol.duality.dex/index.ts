@@ -1,5 +1,7 @@
 import { txClient, queryClient, MissingWalletError , registry} from './module'
 
+import { AdjacenyMatrix } from "./module/types/dex/adjaceny_matrix"
+import { EdgeRow } from "./module/types/dex/edge_row"
 import { PairMap } from "./module/types/dex/pair_map"
 import { Params } from "./module/types/dex/params"
 import { Reserve0AndSharesType } from "./module/types/dex/reserve_0_and_shares_type"
@@ -10,7 +12,7 @@ import { TokenPairType } from "./module/types/dex/token_pair_type"
 import { Tokens } from "./module/types/dex/tokens"
 
 
-export { PairMap, Params, Reserve0AndSharesType, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
+export { AdjacenyMatrix, EdgeRow, PairMap, Params, Reserve0AndSharesType, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -59,6 +61,8 @@ const getDefaultState = () => {
 				TokenMapAll: {},
 				
 				_Structure: {
+						AdjacenyMatrix: getStructure(AdjacenyMatrix.fromPartial({})),
+						EdgeRow: getStructure(EdgeRow.fromPartial({})),
 						PairMap: getStructure(PairMap.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						Reserve0AndSharesType: getStructure(Reserve0AndSharesType.fromPartial({})),

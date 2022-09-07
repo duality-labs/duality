@@ -121,6 +121,8 @@ export interface DexTickMap {
 
 export interface DexTokenMap {
   address?: string;
+
+  /** @format int64 */
   index?: string;
 }
 
@@ -404,7 +406,7 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title dex/genesis.proto
+ * @title dex/adjaceny_matrix.proto
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {

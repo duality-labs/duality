@@ -29927,16 +29927,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/pair_map/{pairId}':
@@ -30151,16 +30141,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/tick_map/{tickIndex}':
@@ -30240,6 +30220,7 @@ paths:
                       type: string
                     index:
                       type: string
+                      format: int64
               pagination:
                 type: object
                 properties:
@@ -30332,16 +30313,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/token_map/{address}':
@@ -30361,6 +30332,7 @@ paths:
                     type: string
                   index:
                     type: string
+                    format: int64
         default:
           description: An unexpected error response.
           schema:
@@ -30495,16 +30467,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -52386,6 +52348,7 @@ definitions:
               type: string
             index:
               type: string
+              format: int64
       pagination:
         type: object
         properties:
@@ -52501,6 +52464,7 @@ definitions:
             type: string
           index:
             type: string
+            format: int64
   nicholasdotsol.duality.dex.QueryGetTokensResponse:
     type: object
     properties:
@@ -52571,6 +52535,7 @@ definitions:
         type: string
       index:
         type: string
+        format: int64
   nicholasdotsol.duality.dex.TokenPairType:
     type: object
     properties:
