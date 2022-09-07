@@ -52265,6 +52265,8 @@ definitions:
       the connection handshake.
   nicholasdotsol.duality.dex.MsgDepositResponse:
     type: object
+  nicholasdotsol.duality.dex.MsgSwapResponse:
+    type: object
   nicholasdotsol.duality.dex.MsgWithdrawlResponse:
     type: object
   nicholasdotsol.duality.dex.PairMap:

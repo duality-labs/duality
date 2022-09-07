@@ -11,6 +11,8 @@
 
 export type DexMsgDepositResponse = object;
 
+export type DexMsgSwapResponse = object;
+
 export type DexMsgWithdrawlResponse = object;
 
 export interface DexPairMap {

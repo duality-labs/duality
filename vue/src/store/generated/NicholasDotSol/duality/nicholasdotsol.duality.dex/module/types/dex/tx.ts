@@ -27,6 +27,15 @@ export interface MsgWithdrawl {
 
 export interface MsgWithdrawlResponse {}
 
+export interface MsgSwap {
+  creator: string;
+  amountIn: string;
+  tokenIn: string;
+  slippageTolerance: string;
+}
+
+export interface MsgSwapResponse {}
+
 const baseMsgDeposit: object = {
   creator: "",
   tokenA: "",
@@ -434,11 +443,168 @@ export const MsgWithdrawlResponse = {
   },
 };
 
+const baseMsgSwap: object = {
+  creator: "",
+  amountIn: "",
+  tokenIn: "",
+  slippageTolerance: "",
+};
+
+export const MsgSwap = {
+  encode(message: MsgSwap, writer: Writer = Writer.create()): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.amountIn !== "") {
+      writer.uint32(18).string(message.amountIn);
+    }
+    if (message.tokenIn !== "") {
+      writer.uint32(26).string(message.tokenIn);
+    }
+    if (message.slippageTolerance !== "") {
+      writer.uint32(34).string(message.slippageTolerance);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgSwap {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgSwap } as MsgSwap;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.amountIn = reader.string();
+          break;
+        case 3:
+          message.tokenIn = reader.string();
+          break;
+        case 4:
+          message.slippageTolerance = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgSwap {
+    const message = { ...baseMsgSwap } as MsgSwap;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.amountIn !== undefined && object.amountIn !== null) {
+      message.amountIn = String(object.amountIn);
+    } else {
+      message.amountIn = "";
+    }
+    if (object.tokenIn !== undefined && object.tokenIn !== null) {
+      message.tokenIn = String(object.tokenIn);
+    } else {
+      message.tokenIn = "";
+    }
+    if (
+      object.slippageTolerance !== undefined &&
+      object.slippageTolerance !== null
+    ) {
+      message.slippageTolerance = String(object.slippageTolerance);
+    } else {
+      message.slippageTolerance = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgSwap): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.amountIn !== undefined && (obj.amountIn = message.amountIn);
+    message.tokenIn !== undefined && (obj.tokenIn = message.tokenIn);
+    message.slippageTolerance !== undefined &&
+      (obj.slippageTolerance = message.slippageTolerance);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgSwap>): MsgSwap {
+    const message = { ...baseMsgSwap } as MsgSwap;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.amountIn !== undefined && object.amountIn !== null) {
+      message.amountIn = object.amountIn;
+    } else {
+      message.amountIn = "";
+    }
+    if (object.tokenIn !== undefined && object.tokenIn !== null) {
+      message.tokenIn = object.tokenIn;
+    } else {
+      message.tokenIn = "";
+    }
+    if (
+      object.slippageTolerance !== undefined &&
+      object.slippageTolerance !== null
+    ) {
+      message.slippageTolerance = object.slippageTolerance;
+    } else {
+      message.slippageTolerance = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgSwapResponse: object = {};
+
+export const MsgSwapResponse = {
+  encode(_: MsgSwapResponse, writer: Writer = Writer.create()): Writer {
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgSwapResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgSwapResponse } as MsgSwapResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgSwapResponse {
+    const message = { ...baseMsgSwapResponse } as MsgSwapResponse;
+    return message;
+  },
+
+  toJSON(_: MsgSwapResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(_: DeepPartial<MsgSwapResponse>): MsgSwapResponse {
+    const message = { ...baseMsgSwapResponse } as MsgSwapResponse;
+    return message;
+  },
+};
+
 /** Msg defines the Msg service. */
 export interface Msg {
   Deposit(request: MsgDeposit): Promise<MsgDepositResponse>;
-  /** this line is used by starport scaffolding # proto/tx/rpc */
   Withdrawl(request: MsgWithdrawl): Promise<MsgWithdrawlResponse>;
+  /** this line is used by starport scaffolding # proto/tx/rpc */
+  Swap(request: MsgSwap): Promise<MsgSwapResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -466,6 +632,16 @@ export class MsgClientImpl implements Msg {
     return promise.then((data) =>
       MsgWithdrawlResponse.decode(new Reader(data))
     );
+  }
+
+  Swap(request: MsgSwap): Promise<MsgSwapResponse> {
+    const data = MsgSwap.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Msg",
+      "Swap",
+      data
+    );
+    return promise.then((data) => MsgSwapResponse.decode(new Reader(data)));
   }
 }
 
