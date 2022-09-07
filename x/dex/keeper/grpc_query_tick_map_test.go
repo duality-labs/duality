@@ -45,7 +45,7 @@ func TestTickMapQuerySingle(t *testing.T) {
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetTickMapRequest{
-				TickIndex: strconv.Itoa(100000),
+				TickIndex: 100000,
 			},
 			err: status.Error(codes.NotFound, "not found"),
 		},

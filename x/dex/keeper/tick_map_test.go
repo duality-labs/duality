@@ -18,7 +18,17 @@ var _ = strconv.IntSize
 func createNTickMap(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.TickMap {
 	items := make([]types.TickMap, n)
 	for i := range items {
-		items[i].TickIndex = strconv.Itoa(i)
+		items[i].TickData = &types.TickDataType{
+			Reserve0AndShares: {&types.Reserve0AndSharesType {
+				Reserve0: sdk.ZeroDec(),
+				TotalShares: sdk.ZeroDec(),
+			},},
+
+			&types.Reserve1: {sdk.ZeroDec()},
+
+		},
+
+		items[i].TickIndex = int64(i),
 
 		keeper.SetTickMap(ctx, items[i])
 	}

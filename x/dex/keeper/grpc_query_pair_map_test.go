@@ -31,7 +31,7 @@ func TestPairMapQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetPairMapRequest{
-				PairId: msgs[0].PairId,
+				pairId: pairTmp,
 			},
 			response: &types.QueryGetPairMapResponse{PairMap: msgs[0]},
 		},
