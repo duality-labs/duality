@@ -1,5 +1,7 @@
 package types
 
+import "strconv"
+
 const (
 	// ModuleName defines the module name
 	ModuleName = "dex"
@@ -15,6 +17,8 @@ const (
 
 	// MemStoreKey defines the in-memory store key
 	MemStoreKey = "mem_dex"
+
+	Separator = "/"
 )
 
 func KeyPrefix(p string) []byte {
@@ -26,7 +30,7 @@ const (
 	TokensCountKey = "Tokens-count-"
 
 	// TokenMapKeyPrefix is the prefix to retrieve all TokenMap
-	TokenMapKeyPrefix = "TokenMap/value/"
+	BaseTokenMapKeyPrefix = "TokenMap/value/"
 
 	// TickMapKeyPrefix is the prefix to retrieve all TickMap
 	TickMapKeyPrefix = "TickMap/value/"
@@ -34,6 +38,10 @@ const (
 	// PairMapKeyPrefix is the prefix to retrieve all PairMap
 	PairMapKeyPrefix = "PairMap/value/"
 )
+
+func PairPrefixHelper(token0, token1 string) []byte {
+	return append(KeyPrefix(token0), append(KeyPrefix(Separator), append(KeyPrefix(token1), KeyPrefix(Separator)...)...)...)
+}
 
 // TokenMapKey returns the store key to retrieve a TokenMap from the index fields
 func TokenMapKey(address string) []byte {
@@ -46,10 +54,10 @@ func TokenMapKey(address string) []byte {
 	return key
 }
 
-func TickMapKey(tickIndex string) []byte {
+func TickMapKey(tickIndex int64) []byte {
 	var key []byte
 
-	tickIndexBytes := []byte(tickIndex)
+	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
@@ -65,3 +73,35 @@ func PairMapKey(pairId string) []byte {
 
 	return key
 }
+
+// Deposit Event Attributes
+const (
+	DepositEventKey          = "NewDeposit"
+	DepositEventCreator      = "Creator"
+	DepositEventToken0       = "Token0"
+	DepositEventToken1       = "Token1"
+	DepositEventPrice        = "Price"
+	DepositEventFee          = "Fee"
+	DepositEventReceiver     = "Receiver"
+	DepositEventOldReserves0 = "OldReserves0"
+	DepositEventOldReserves1 = "OldReserves1"
+	DepositEventNewReserves0 = "NewReserves0"
+	DepositEventNewReserves1 = "NewReserves1"
+	DepositEventSharesMinted = "SharesMinted"
+)
+
+// Withdraw Event Attributes
+const (
+	WithdrawEventKey           = "NewWithdraw"
+	WithdrawEventCreator       = "Creator"
+	WithdrawEventToken0        = "Token0"
+	WithdrawEventToken1        = "Token1"
+	WithdrawEventPrice         = "Price"
+	WithdrawEventFee           = "Fee"
+	WithdrawEventReceiver      = "Receiver"
+	WithdrawEventOldReserve0   = "OldReserve0"
+	WithdrawEventOldReserve1   = "OldReserve0"
+	WithdrawEventNewReserve0   = "NewReserve0"
+	WithdrawEventNewReserve1   = "NewReserve1"
+	WithdrawEventSharesRemoved = "SharesRemoved"
+)
