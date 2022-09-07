@@ -63,12 +63,18 @@ RUN dualityd add-genesis-account $(dualityd keys show bob -a --keyring-backend t
 RUN dualityd gentx alice 1000000stake --chain-id duality --keyring-backend test
 RUN dualityd collect-gentxs
 
+COPY testnet/config/app.toml /root/.duality/config/app.toml
+COPY testnet/config/client.toml /root/.duality/config/client.toml
+COPY testnet/config/config.toml /root/.duality/config/config.toml
+
 # see docs for exposed ports:
 #   https://docs.ignite.com/kb/config.html#host
+EXPOSE 26658
 EXPOSE 26657
 EXPOSE 26656
 EXPOSE 6060
 EXPOSE 9090
+EXPOSE 9091
 EXPOSE 1317
 
 # default to serving the chain with default data and name
