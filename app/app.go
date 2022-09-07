@@ -169,6 +169,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		dexmoduletypes.ModuleName:      {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -252,6 +253,32 @@ func New(
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) cosmoscmd.App {
+	return NewApp(
+		logger,
+		db,
+		traceStore,
+		loadLatest,
+		skipUpgradeHeights,
+		homePath,
+		invCheckPeriod,
+		encodingConfig,
+		appOpts,
+		baseAppOptions...)
+}
+
+func NewApp(
+	logger log.Logger,
+	db dbm.DB,
+	traceStore io.Writer,
+	loadLatest bool,
+	skipUpgradeHeights map[int64]bool,
+	homePath string,
+	invCheckPeriod uint,
+	encodingConfig cosmoscmd.EncodingConfig,
+	appOpts servertypes.AppOptions,
+	baseAppOptions ...func(*baseapp.BaseApp),
+) *App {
+
 	appCodec := encodingConfig.Marshaler
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
@@ -394,7 +421,7 @@ func New(
 		keys[dexmoduletypes.MemStoreKey],
 		app.GetSubspace(dexmoduletypes.ModuleName),
 
-		app.AccountKeeper,
+		app.BankKeeper,
 	)
 	dexModule := dexmodule.NewAppModule(appCodec, app.DexKeeper, app.AccountKeeper, app.BankKeeper)
 

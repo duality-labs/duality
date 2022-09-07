@@ -24,4 +24,44 @@ func KeyPrefix(p string) []byte {
 const (
 	TokensKey      = "Tokens-value-"
 	TokensCountKey = "Tokens-count-"
+
+	// TokenMapKeyPrefix is the prefix to retrieve all TokenMap
+	TokenMapKeyPrefix = "TokenMap/value/"
+
+	// TickMapKeyPrefix is the prefix to retrieve all TickMap
+	TickMapKeyPrefix = "TickMap/value/"
+
+	// PairMapKeyPrefix is the prefix to retrieve all PairMap
+	PairMapKeyPrefix = "PairMap/value/"
 )
+
+// TokenMapKey returns the store key to retrieve a TokenMap from the index fields
+func TokenMapKey(address string) []byte {
+	var key []byte
+
+	addressBytes := []byte(address)
+	key = append(key, addressBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+func TickMapKey(tickIndex string) []byte {
+	var key []byte
+
+	tickIndexBytes := []byte(tickIndex)
+	key = append(key, tickIndexBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+func PairMapKey(pairId string) []byte {
+	var key []byte
+
+	pairIdBytes := []byte(pairId)
+	key = append(key, pairIdBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
