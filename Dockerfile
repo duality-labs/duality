@@ -1,5 +1,5 @@
 # [Choice] Go version (use -bullseye variants on local arm64/Apple Silicon): 1, 1.16, 1.17, 1-bullseye, 1.16-bullseye, 1.17-bullseye, 1-buster, 1.16-buster, 1.17-buster
-FROM golang:1.18-bullseye as build-env
+FROM golang:1.18-bullseye
 
 # install additional OS packages.
 RUN apt update && \
@@ -8,8 +8,18 @@ RUN apt update && \
 RUN apt-get install -y \
     build-essential \
     ca-certificates \
-    # must install cross compiler for arm64
-    gcc-aarch64-linux-gnu
+    # gcc \
+    # make \
+    curl
+
+# [Choice] Ignite CLI version (align this with go.mod "github.com/ignite-hq/cli" version)
+ARG IGNITE_CLI_VERSION="v0.22.0"
+RUN curl "https://get.ignite.com/cli@$IGNITE_CLI_VERSION!" | bash
+
+# [Choice] Node.js version: none, lts/*, 16, 14, 12, 10
+ARG NODE_VERSION="16.14.2"
+RUN curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION | bash -
+RUN apt-get install -y nodejs
 
 WORKDIR /usr/src
 
@@ -21,40 +31,11 @@ RUN go mod download
 # Copy rest of files
 COPY . .
 
-# compile dualityd to ARM64 architecture for final image
-RUN CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -o build/dualityd_arm64 ./cmd/dualityd
+# compile dualityd
+RUN go install ./cmd/dualityd
 
-
-# Final image build on small stable release of ARM64 Linux
-FROM arm64v8/alpine:20220715
-
-# Install ca-certificates
-RUN apk add --update \
-    # required for dualityd to work
-    libc6-compat \
-    # required for HTTPS to connect properly
-    ca-certificates
-
-WORKDIR /usr/src
-
-# Copy over binaries from the build-env
-COPY --from=build-env /usr/src/build/dualityd_arm64 /usr/bin/dualityd
-
-# create duality chain config files
+# create genesis files
 RUN dualityd init duality
-
-# add test accounts
-RUN mkdir /root/.duality/testkeys
-# alice
-RUN dualityd keys add alice --keyring-backend test --output json > /root/.duality/testkeys/alice.json
-RUN dualityd add-genesis-account $(dualityd keys show alice -a --keyring-backend test) 1000000000token,1000000000stake --keyring-backend test
-# bob
-RUN dualityd keys add bob --keyring-backend test --output json > /root/.duality/testkeys/bob.json
-RUN dualityd add-genesis-account $(dualityd keys show bob -a --keyring-backend test) 1000000000token,1000000000stake --keyring-backend test
-
-# Add gentxs to the genesis file
-RUN dualityd gentx alice 1000000stake --chain-id duality --keyring-backend test
-RUN dualityd collect-gentxs
 
 # see docs for exposed ports:
 #   https://docs.ignite.com/kb/config.html#host
@@ -62,7 +43,8 @@ EXPOSE 26657
 EXPOSE 26656
 EXPOSE 9090
 EXPOSE 6060
+EXPOSE 4500
 EXPOSE 1317
 
 # default to serving the chain with default data and name
-CMD ["dualityd", "start", "--moniker", "duality"]
+CMD ["ignite", "chain", "serve", "-r"]
