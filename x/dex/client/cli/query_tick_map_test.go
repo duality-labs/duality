@@ -29,7 +29,7 @@ func networkWithTickMapObjects(t *testing.T, n int) (*network.Network, []types.T
 
 	for i := 0; i < n; i++ {
 		tickMap := types.TickMap{
-			TickIndex: strconv.Itoa(i),
+			TickIndex: int64(i),
 		}
 		nullify.Fill(&tickMap)
 		state.TickMapList = append(state.TickMapList, tickMap)
@@ -49,11 +49,10 @@ func TestShowTickMap(t *testing.T) {
 	}
 	for _, tc := range []struct {
 		desc        string
-		idTickIndex string
-
-		args []string
-		err  error
-		obj  types.TickMap
+		idTickIndex int64
+		args        []string
+		err         error
+		obj         types.TickMap
 	}{
 		{
 			desc:        "found",
@@ -64,7 +63,7 @@ func TestShowTickMap(t *testing.T) {
 		},
 		{
 			desc:        "not found",
-			idTickIndex: strconv.Itoa(100000),
+			idTickIndex: 100000,
 
 			args: common,
 			err:  status.Error(codes.NotFound, "not found"),
@@ -72,7 +71,7 @@ func TestShowTickMap(t *testing.T) {
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
 			args := []string{
-				tc.idTickIndex,
+				string(tc.idTickIndex),
 			}
 			args = append(args, tc.args...)
 			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowTickMap(), args)

@@ -20,7 +20,7 @@ func (k Keeper) TickMapAll(c context.Context, req *types.QueryAllTickMapRequest)
 	ctx := sdk.UnwrapSDKContext(c)
 
 	store := ctx.KVStore(k.storeKey)
-	tickMapStore := prefix.NewStore(store, types.KeyPrefix(types.TickMapKeyPrefix))
+	tickMapStore := prefix.NewStore(store, types.KeyPrefix(types.BaseTickMapKeyPrefix))
 
 	pageRes, err := query.Paginate(tickMapStore, req.Pagination, func(key []byte, value []byte) error {
 		var tickMap types.TickMap
@@ -47,6 +47,7 @@ func (k Keeper) TickMap(c context.Context, req *types.QueryGetTickMapRequest) (*
 
 	val, found := k.GetTickMap(
 		ctx,
+		req.PairId,
 		req.TickIndex,
 	)
 	if !found {

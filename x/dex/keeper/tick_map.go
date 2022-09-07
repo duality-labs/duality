@@ -7,8 +7,8 @@ import (
 )
 
 // SetTickMap set a specific tickMap in the store from its index
-func (k Keeper) SetTickMap(ctx sdk.Context, tickMap types.TickMap) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickMapKeyPrefix))
+func (k Keeper) SetTickMap(ctx sdk.Context, pairId string, tickMap types.TickMap) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TickPrefix(pairId))
 	b := k.cdc.MustMarshal(&tickMap)
 	store.Set(types.TickMapKey(
 		tickMap.TickIndex,
@@ -18,10 +18,11 @@ func (k Keeper) SetTickMap(ctx sdk.Context, tickMap types.TickMap) {
 // GetTickMap returns a tickMap from its index
 func (k Keeper) GetTickMap(
 	ctx sdk.Context,
-	tickIndex string,
+	pairId string,
+	tickIndex int64,
 
 ) (val types.TickMap, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickMapKeyPrefix))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TickPrefix(pairId))
 
 	b := store.Get(types.TickMapKey(
 		tickIndex,
@@ -37,10 +38,11 @@ func (k Keeper) GetTickMap(
 // RemoveTickMap removes a tickMap from the store
 func (k Keeper) RemoveTickMap(
 	ctx sdk.Context,
-	tickIndex string,
+	pairId string,
+	tickIndex int64,
 
 ) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickMapKeyPrefix))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TickPrefix(pairId))
 	store.Delete(types.TickMapKey(
 		tickIndex,
 	))
@@ -48,7 +50,7 @@ func (k Keeper) RemoveTickMap(
 
 // GetAllTickMap returns all tickMap
 func (k Keeper) GetAllTickMap(ctx sdk.Context) (list []types.TickMap) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickMapKeyPrefix))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickMapKeyPrefix))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()

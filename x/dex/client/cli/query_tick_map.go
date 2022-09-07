@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -54,8 +55,9 @@ func CmdShowTickMap() *cobra.Command {
 
 			argTickIndex := args[0]
 
+			tmpTickIndex, _ := strconv.Atoi(argTickIndex)
 			params := &types.QueryGetTickMapRequest{
-				TickIndex: argTickIndex,
+				TickIndex: int64(tmpTickIndex),
 			}
 
 			res, err := queryClient.TickMap(context.Background(), params)

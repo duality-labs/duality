@@ -9,13 +9,14 @@ import (
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
-	// Set all the tickMap
-	for _, elem := range genState.TickMapList {
-		k.SetTickMap(ctx, elem)
-	}
+
 	// Set all the pairMap
 	for _, elem := range genState.PairMapList {
 		k.SetPairMap(ctx, elem)
+		// Set all the tickMap
+		for _, elem2 := range genState.TickMapList {
+			k.SetTickMap(ctx, elem.PairId, elem2)
+		}
 	}
 	// Set all the tokens
 	for _, elem := range genState.TokensList {

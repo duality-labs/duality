@@ -30,17 +30,17 @@ const (
 	TokensCountKey = "Tokens-count-"
 
 	// TokenMapKeyPrefix is the prefix to retrieve all TokenMap
-	BaseTokenMapKeyPrefix = "TokenMap/value/"
+	TokenMapKeyPrefix = "TokenMap/value/"
 
 	// TickMapKeyPrefix is the prefix to retrieve all TickMap
-	TickMapKeyPrefix = "TickMap/value/"
+	BaseTickMapKeyPrefix = "TickMap/value/"
 
 	// PairMapKeyPrefix is the prefix to retrieve all PairMap
 	PairMapKeyPrefix = "PairMap/value/"
 )
 
-func PairPrefixHelper(token0, token1 string) []byte {
-	return append(KeyPrefix(token0), append(KeyPrefix(Separator), append(KeyPrefix(token1), KeyPrefix(Separator)...)...)...)
+func TickPrefix(pairId string) []byte {
+	return append(KeyPrefix(BaseTickMapKeyPrefix), KeyPrefix(pairId)...)
 }
 
 // TokenMapKey returns the store key to retrieve a TokenMap from the index fields
