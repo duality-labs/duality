@@ -7,6 +7,7 @@ import { PairMap } from "../dex/pair_map";
 import { Tokens } from "../dex/tokens";
 import { TokenMap } from "../dex/token_map";
 import { Shares } from "../dex/shares";
+import { FeeList } from "../dex/fee_list";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -18,11 +19,13 @@ export interface GenesisState {
   tokensList: Tokens[];
   tokensCount: number;
   tokenMapList: TokenMap[];
-  /** this line is used by starport scaffolding # genesis/proto/state */
   sharesList: Shares[];
+  feeListList: FeeList[];
+  /** this line is used by starport scaffolding # genesis/proto/state */
+  feeListCount: number;
 }
 
-const baseGenesisState: object = { tokensCount: 0 };
+const baseGenesisState: object = { tokensCount: 0, feeListCount: 0 };
 
 export const GenesisState = {
   encode(message: GenesisState, writer: Writer = Writer.create()): Writer {
@@ -47,6 +50,12 @@ export const GenesisState = {
     for (const v of message.sharesList) {
       Shares.encode(v!, writer.uint32(58).fork()).ldelim();
     }
+    for (const v of message.feeListList) {
+      FeeList.encode(v!, writer.uint32(66).fork()).ldelim();
+    }
+    if (message.feeListCount !== 0) {
+      writer.uint32(72).uint64(message.feeListCount);
+    }
     return writer;
   },
 
@@ -59,6 +68,7 @@ export const GenesisState = {
     message.tokensList = [];
     message.tokenMapList = [];
     message.sharesList = [];
+    message.feeListList = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -83,6 +93,12 @@ export const GenesisState = {
         case 7:
           message.sharesList.push(Shares.decode(reader, reader.uint32()));
           break;
+        case 8:
+          message.feeListList.push(FeeList.decode(reader, reader.uint32()));
+          break;
+        case 9:
+          message.feeListCount = longToNumber(reader.uint64() as Long);
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -98,6 +114,7 @@ export const GenesisState = {
     message.tokensList = [];
     message.tokenMapList = [];
     message.sharesList = [];
+    message.feeListList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromJSON(object.params);
     } else {
@@ -132,6 +149,16 @@ export const GenesisState = {
       for (const e of object.sharesList) {
         message.sharesList.push(Shares.fromJSON(e));
       }
+    }
+    if (object.feeListList !== undefined && object.feeListList !== null) {
+      for (const e of object.feeListList) {
+        message.feeListList.push(FeeList.fromJSON(e));
+      }
+    }
+    if (object.feeListCount !== undefined && object.feeListCount !== null) {
+      message.feeListCount = Number(object.feeListCount);
+    } else {
+      message.feeListCount = 0;
     }
     return message;
   },
@@ -177,6 +204,15 @@ export const GenesisState = {
     } else {
       obj.sharesList = [];
     }
+    if (message.feeListList) {
+      obj.feeListList = message.feeListList.map((e) =>
+        e ? FeeList.toJSON(e) : undefined
+      );
+    } else {
+      obj.feeListList = [];
+    }
+    message.feeListCount !== undefined &&
+      (obj.feeListCount = message.feeListCount);
     return obj;
   },
 
@@ -187,6 +223,7 @@ export const GenesisState = {
     message.tokensList = [];
     message.tokenMapList = [];
     message.sharesList = [];
+    message.feeListList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromPartial(object.params);
     } else {
@@ -221,6 +258,16 @@ export const GenesisState = {
       for (const e of object.sharesList) {
         message.sharesList.push(Shares.fromPartial(e));
       }
+    }
+    if (object.feeListList !== undefined && object.feeListList !== null) {
+      for (const e of object.feeListList) {
+        message.feeListList.push(FeeList.fromPartial(e));
+      }
+    }
+    if (object.feeListCount !== undefined && object.feeListCount !== null) {
+      message.feeListCount = object.feeListCount;
+    } else {
+      message.feeListCount = 0;
     }
     return message;
   },

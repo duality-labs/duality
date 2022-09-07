@@ -53,6 +53,15 @@ func TestGenesis(t *testing.T) {
 				Fee:        "1",
 			},
 		},
+		FeeListList: []types.FeeList{
+			{
+				Id: 0,
+			},
+			{
+				Id: 1,
+			},
+		},
+		FeeListCount: 2,
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
@@ -69,5 +78,7 @@ func TestGenesis(t *testing.T) {
 	require.ElementsMatch(t, genesisState.TokensList, got.TokensList)
 	require.Equal(t, genesisState.TokensCount, got.TokensCount)
 	require.ElementsMatch(t, genesisState.SharesList, got.SharesList)
+	require.ElementsMatch(t, genesisState.FeeListList, got.FeeListList)
+	require.Equal(t, genesisState.FeeListCount, got.FeeListCount)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

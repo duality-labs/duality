@@ -10,6 +10,7 @@ import "dex/pair_map.proto";
 import "dex/tokens.proto";
 import "dex/token_map.proto";
 import "dex/shares.proto";
+import "dex/fee_list.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -68,6 +69,16 @@ service Query {
 	// Queries a list of Shares items.
 	rpc SharesAll(QueryAllSharesRequest) returns (QueryAllSharesResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/shares";
+	}
+
+// Queries a FeeList by id.
+	rpc FeeList(QueryGetFeeListRequest) returns (QueryGetFeeListResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/fee_list/{id}";
+	}
+
+	// Queries a list of FeeList items.
+	rpc FeeListAll(QueryAllFeeListRequest) returns (QueryAllFeeListResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/fee_list";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -173,6 +184,23 @@ message QueryAllSharesRequest {
 
 message QueryAllSharesResponse {
 	repeated Shares shares = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetFeeListRequest {
+	uint64 id = 1;
+}
+
+message QueryGetFeeListResponse {
+	FeeList FeeList = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllFeeListRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllFeeListResponse {
+	repeated FeeList FeeList = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

@@ -11,6 +11,7 @@ import { PairMap } from "../dex/pair_map";
 import { Tokens } from "../dex/tokens";
 import { TokenMap } from "../dex/token_map";
 import { Shares } from "../dex/shares";
+import { FeeList } from "../dex/fee_list";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -109,6 +110,23 @@ export interface QueryAllSharesRequest {
 
 export interface QueryAllSharesResponse {
   shares: Shares[];
+  pagination: PageResponse | undefined;
+}
+
+export interface QueryGetFeeListRequest {
+  id: number;
+}
+
+export interface QueryGetFeeListResponse {
+  FeeList: FeeList | undefined;
+}
+
+export interface QueryAllFeeListRequest {
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryAllFeeListResponse {
+  FeeList: FeeList[];
   pagination: PageResponse | undefined;
 }
 
@@ -1722,6 +1740,296 @@ export const QueryAllSharesResponse = {
   },
 };
 
+const baseQueryGetFeeListRequest: object = { id: 0 };
+
+export const QueryGetFeeListRequest = {
+  encode(
+    message: QueryGetFeeListRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.id !== 0) {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryGetFeeListRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGetFeeListRequest } as QueryGetFeeListRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetFeeListRequest {
+    const message = { ...baseQueryGetFeeListRequest } as QueryGetFeeListRequest;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = Number(object.id);
+    } else {
+      message.id = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetFeeListRequest): unknown {
+    const obj: any = {};
+    message.id !== undefined && (obj.id = message.id);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetFeeListRequest>
+  ): QueryGetFeeListRequest {
+    const message = { ...baseQueryGetFeeListRequest } as QueryGetFeeListRequest;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
+    } else {
+      message.id = 0;
+    }
+    return message;
+  },
+};
+
+const baseQueryGetFeeListResponse: object = {};
+
+export const QueryGetFeeListResponse = {
+  encode(
+    message: QueryGetFeeListResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.FeeList !== undefined) {
+      FeeList.encode(message.FeeList, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryGetFeeListResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryGetFeeListResponse,
+    } as QueryGetFeeListResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.FeeList = FeeList.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetFeeListResponse {
+    const message = {
+      ...baseQueryGetFeeListResponse,
+    } as QueryGetFeeListResponse;
+    if (object.FeeList !== undefined && object.FeeList !== null) {
+      message.FeeList = FeeList.fromJSON(object.FeeList);
+    } else {
+      message.FeeList = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetFeeListResponse): unknown {
+    const obj: any = {};
+    message.FeeList !== undefined &&
+      (obj.FeeList = message.FeeList
+        ? FeeList.toJSON(message.FeeList)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetFeeListResponse>
+  ): QueryGetFeeListResponse {
+    const message = {
+      ...baseQueryGetFeeListResponse,
+    } as QueryGetFeeListResponse;
+    if (object.FeeList !== undefined && object.FeeList !== null) {
+      message.FeeList = FeeList.fromPartial(object.FeeList);
+    } else {
+      message.FeeList = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllFeeListRequest: object = {};
+
+export const QueryAllFeeListRequest = {
+  encode(
+    message: QueryAllFeeListRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryAllFeeListRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryAllFeeListRequest } as QueryAllFeeListRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllFeeListRequest {
+    const message = { ...baseQueryAllFeeListRequest } as QueryAllFeeListRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllFeeListRequest): unknown {
+    const obj: any = {};
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageRequest.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryAllFeeListRequest>
+  ): QueryAllFeeListRequest {
+    const message = { ...baseQueryAllFeeListRequest } as QueryAllFeeListRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllFeeListResponse: object = {};
+
+export const QueryAllFeeListResponse = {
+  encode(
+    message: QueryAllFeeListResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    for (const v of message.FeeList) {
+      FeeList.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(
+        message.pagination,
+        writer.uint32(18).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryAllFeeListResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryAllFeeListResponse,
+    } as QueryAllFeeListResponse;
+    message.FeeList = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.FeeList.push(FeeList.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllFeeListResponse {
+    const message = {
+      ...baseQueryAllFeeListResponse,
+    } as QueryAllFeeListResponse;
+    message.FeeList = [];
+    if (object.FeeList !== undefined && object.FeeList !== null) {
+      for (const e of object.FeeList) {
+        message.FeeList.push(FeeList.fromJSON(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllFeeListResponse): unknown {
+    const obj: any = {};
+    if (message.FeeList) {
+      obj.FeeList = message.FeeList.map((e) =>
+        e ? FeeList.toJSON(e) : undefined
+      );
+    } else {
+      obj.FeeList = [];
+    }
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageResponse.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryAllFeeListResponse>
+  ): QueryAllFeeListResponse {
+    const message = {
+      ...baseQueryAllFeeListResponse,
+    } as QueryAllFeeListResponse;
+    message.FeeList = [];
+    if (object.FeeList !== undefined && object.FeeList !== null) {
+      for (const e of object.FeeList) {
+        message.FeeList.push(FeeList.fromPartial(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -1748,6 +2056,10 @@ export interface Query {
   Shares(request: QueryGetSharesRequest): Promise<QueryGetSharesResponse>;
   /** Queries a list of Shares items. */
   SharesAll(request: QueryAllSharesRequest): Promise<QueryAllSharesResponse>;
+  /** Queries a FeeList by id. */
+  FeeList(request: QueryGetFeeListRequest): Promise<QueryGetFeeListResponse>;
+  /** Queries a list of FeeList items. */
+  FeeListAll(request: QueryAllFeeListRequest): Promise<QueryAllFeeListResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -1890,6 +2202,32 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QueryAllSharesResponse.decode(new Reader(data))
+    );
+  }
+
+  FeeList(request: QueryGetFeeListRequest): Promise<QueryGetFeeListResponse> {
+    const data = QueryGetFeeListRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "FeeList",
+      data
+    );
+    return promise.then((data) =>
+      QueryGetFeeListResponse.decode(new Reader(data))
+    );
+  }
+
+  FeeListAll(
+    request: QueryAllFeeListRequest
+  ): Promise<QueryAllFeeListResponse> {
+    const data = QueryAllFeeListRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "FeeListAll",
+      data
+    );
+    return promise.then((data) =>
+      QueryAllFeeListResponse.decode(new Reader(data))
     );
   }
 }

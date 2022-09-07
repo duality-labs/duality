@@ -9,6 +9,12 @@
  * ---------------------------------------------------------------
  */
 
+export interface DexFeeList {
+  /** @format uint64 */
+  id?: string;
+  fee?: string;
+}
+
 export type DexMsgDepositResponse = object;
 
 export type DexMsgSwapResponse = object;
@@ -24,6 +30,21 @@ export interface DexPairMap {
  * Params defines the parameters for the module.
  */
 export type DexParams = object;
+
+export interface DexQueryAllFeeListResponse {
+  FeeList?: DexFeeList[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
 
 export interface DexQueryAllPairMapResponse {
   pairMap?: DexPairMap[];
@@ -98,6 +119,10 @@ export interface DexQueryAllTokensResponse {
    *  }
    */
   pagination?: V1Beta1PageResponse;
+}
+
+export interface DexQueryGetFeeListResponse {
+  FeeList?: DexFeeList;
 }
 
 export interface DexQueryGetPairMapResponse {
@@ -221,13 +246,6 @@ export interface V1Beta1PageRequest {
    * is set.
    */
   count_total?: boolean;
-
-  /**
-   * reverse is set to true if results are to be returned in the descending order.
-   *
-   * Since: cosmos-sdk 0.43
-   */
-  reverse?: boolean;
 }
 
 /**
@@ -447,6 +465,47 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
+   * @name QueryFeeListAll
+   * @summary Queries a list of FeeList items.
+   * @request GET:/NicholasDotSol/duality/dex/fee_list
+   */
+  queryFeeListAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<DexQueryAllFeeListResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/fee_list`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryFeeList
+   * @summary Queries a FeeList by id.
+   * @request GET:/NicholasDotSol/duality/dex/fee_list/{id}
+   */
+  queryFeeList = (id: string, params: RequestParams = {}) =>
+    this.request<DexQueryGetFeeListResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/fee_list/${id}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
    * @name QueryPairMapAll
    * @summary Queries a list of PairMap items.
    * @request GET:/NicholasDotSol/duality/dex/pair_map
@@ -457,7 +516,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -515,7 +573,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -557,7 +614,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -600,7 +656,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -642,7 +697,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>

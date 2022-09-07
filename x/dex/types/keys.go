@@ -105,3 +105,8 @@ const (
 	WithdrawEventNewReserve1   = "NewReserve1"
 	WithdrawEventSharesRemoved = "SharesRemoved"
 )
+
+const (
+	FeeListKey      = "FeeList-value-"
+	FeeListCountKey = "FeeList-count-"
+)

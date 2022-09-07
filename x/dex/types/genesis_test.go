@@ -69,6 +69,15 @@ func TestGenesisState_Validate(t *testing.T) {
 						Fee:        "1",
 					},
 				},
+				FeeListList: []types.FeeList{
+					{
+						Id: 0,
+					},
+					{
+						Id: 1,
+					},
+				},
+				FeeListCount: 2,
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -158,6 +167,32 @@ func TestGenesisState_Validate(t *testing.T) {
 						Fee:        "0",
 					},
 				},
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated feeList",
+			genState: &types.GenesisState{
+				FeeListList: []types.FeeList{
+					{
+						Id: 0,
+					},
+					{
+						Id: 0,
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "invalid feeList count",
+			genState: &types.GenesisState{
+				FeeListList: []types.FeeList{
+					{
+						Id: 1,
+					},
+				},
+				FeeListCount: 0,
 			},
 			valid: false,
 		},

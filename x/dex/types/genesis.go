@@ -15,6 +15,7 @@ func DefaultGenesis() *GenesisState {
 		TokensList:   []Tokens{},
 		TokenMapList: []TokenMap{},
 		SharesList:   []Shares{},
+		FeeListList:  []FeeList{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -74,6 +75,18 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("duplicated index for shares")
 		}
 		sharesIndexMap[index] = struct{}{}
+	}
+	// Check for duplicated ID in feeList
+	feeListIdMap := make(map[uint64]bool)
+	feeListCount := gs.GetFeeListCount()
+	for _, elem := range gs.FeeListList {
+		if _, ok := feeListIdMap[elem.Id]; ok {
+			return fmt.Errorf("duplicated id for feeList")
+		}
+		if elem.Id >= feeListCount {
+			return fmt.Errorf("feeList id should be lower or equal than the last id")
+		}
+		feeListIdMap[elem.Id] = true
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 
