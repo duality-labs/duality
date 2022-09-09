@@ -19,8 +19,8 @@ message MsgDeposit {
   string tokenB = 3;
   string amountA = 4;
   string amountB = 5;
-  string priceIndex = 6;
-  string fee = 7;
+  int64 priceIndex = 6;
+  int64 fee = 7;
 }
 
 message MsgDepositResponse {
@@ -31,8 +31,8 @@ message MsgWithdrawl {
   string tokenA = 2;
   string tokenB = 3;
   string sharesToRemove = 4;
-  string priceIndex = 5;
-  string fee = 6;
+  int64 priceIndex = 5;
+  int64 fee = 6;
   string receiver = 7;
 }
 

@@ -2,33 +2,26 @@ package keeper
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k Keeper) depositVerification(goCtx context.Context, msg types.MsgDeposit) (string, string, sdk.AccAddress, sdk.Dec, sdk.Dec, int64, error) {
+func (k Keeper) depositVerification(goCtx context.Context, msg types.MsgDeposit) (string, string, sdk.AccAddress, sdk.Dec, sdk.Dec, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	price_index, err := strconv.Atoi(msg.PriceIndex)
-
-	if err != nil {
-		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), 0, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid integer index - price index must be an int64 integer")
-	}
 
 	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
 
 	if err != nil {
-		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), 0, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
 	}
 
 	// Converts input address (string) to sdk.AccAddress
 	callerAddr, err := sdk.AccAddressFromBech32(msg.Creator)
 	// Error checking for the calling address
 	if err != nil {
-		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), 0, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
 	amount0, err := sdk.NewDecFromStr(msg.AmountA)
@@ -42,22 +35,22 @@ func (k Keeper) depositVerification(goCtx context.Context, msg types.MsgDeposit)
 
 	// Error checking for valid sdk.Dec
 	if err != nil {
-		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), 0, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
+		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
 	AccountsToken0Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, token0).Amount)
 
 	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 	if AccountsToken0Balance.LT(amount0) {
-		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), 0, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
+		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
 	AccountsToken1Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, token1).Amount)
 
 	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 	if AccountsToken1Balance.LT(amount1) {
-		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), 0, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
+		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
-	return token0, token1, callerAddr, amount0, amount1, int64(price_index), nil
+	return token0, token1, callerAddr, amount0, amount1, nil
 }

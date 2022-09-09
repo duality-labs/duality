@@ -25,6 +25,17 @@ func CmdWithdrawl() *cobra.Command {
 			argFee := args[4]
 			argReceiver := args[5]
 
+			tmpArgPriceIndex, err := strconv.Atoi(argPriceIndex)
+
+			if err != nil {
+				return err
+			}
+
+			tmpArgFee, err := strconv.Atoi(argFee)
+
+			if err != nil {
+				return err
+			}
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -35,8 +46,8 @@ func CmdWithdrawl() *cobra.Command {
 				argTokenA,
 				argTokenB,
 				argSharesToRemove,
-				argPriceIndex,
-				argFee,
+				int64(tmpArgPriceIndex),
+				int64(tmpArgFee),
 				argReceiver,
 			)
 			if err := msg.ValidateBasic(); err != nil {

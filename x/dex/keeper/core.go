@@ -46,7 +46,7 @@ func (k Keeper) addEdge(goCtx context.Context, token0Index int64, token1Index in
 
 }
 
-func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, token0 string, token1 string, createrAddr sdk.AccAddress, amount0 sdk.Dec, amount1 sdk.Dec, price_index int64) error {
+func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, token0 string, token1 string, createrAddr sdk.AccAddress, amount0 sdk.Dec, amount1 sdk.Dec) error {
 
 	_ = goCtx
 	return nil

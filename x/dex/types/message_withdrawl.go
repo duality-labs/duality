@@ -9,7 +9,7 @@ const TypeMsgWithdrawl = "withdrawl"
 
 var _ sdk.Msg = &MsgWithdrawl{}
 
-func NewMsgWithdrawl(creator string, tokenA string, tokenB string, sharesToRemove string, priceIndex string, fee string, receiver string) *MsgWithdrawl {
+func NewMsgWithdrawl(creator string, tokenA string, tokenB string, sharesToRemove string, priceIndex int64, fee int64, receiver string) *MsgWithdrawl {
 	return &MsgWithdrawl{
 		Creator:        creator,
 		TokenA:         tokenA,

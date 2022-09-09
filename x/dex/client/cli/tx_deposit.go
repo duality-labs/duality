@@ -25,6 +25,18 @@ func CmdDeposit() *cobra.Command {
 			argPriceIndex := args[4]
 			argFee := args[5]
 
+			tmpArgPriceIndex, err := strconv.Atoi(argPriceIndex)
+
+			if err != nil {
+				return err
+			}
+
+			tmpArgFee, err := strconv.Atoi(argFee)
+
+			if err != nil {
+				return err
+			}
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -36,8 +48,8 @@ func CmdDeposit() *cobra.Command {
 				argTokenB,
 				argAmount0,
 				argAmount1,
-				argPriceIndex,
-				argFee,
+				int64(tmpArgPriceIndex),
+				int64(tmpArgFee),
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
