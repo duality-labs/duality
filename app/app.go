@@ -231,6 +231,7 @@ type App struct {
 	ScopedMonitoringKeeper capabilitykeeper.ScopedKeeper
 
 	DexKeeper dexmodulekeeper.Keeper
+
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -495,6 +496,7 @@ func NewApp(
 		paramstypes.ModuleName,
 		monitoringptypes.ModuleName,
 		dexmoduletypes.ModuleName,
+
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -519,6 +521,7 @@ func NewApp(
 		ibctransfertypes.ModuleName,
 		monitoringptypes.ModuleName,
 		dexmoduletypes.ModuleName,
+
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -548,6 +551,7 @@ func NewApp(
 		feegrant.ModuleName,
 		monitoringptypes.ModuleName,
 		dexmoduletypes.ModuleName,
+
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -573,6 +577,7 @@ func NewApp(
 		transferModule,
 		monitoringModule,
 		dexModule,
+
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 	app.sm.RegisterStoreDecoders()

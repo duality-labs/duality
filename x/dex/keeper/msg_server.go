@@ -1,7 +1,10 @@
 package keeper
 
 import (
+	"context"
+
 	"github.com/NicholasDotSol/duality/x/dex/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type msgServer struct {
@@ -15,3 +18,43 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 }
 
 var _ types.MsgServer = msgServer{}
+
+func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.MsgDepositResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	token0, token1, createrAddr, amount0, amount1, price_index, err := k.depositVerification(goCtx, *msg)
+
+	if err != nil {
+		return nil, err
+	}
+
+	//TODO add cases for multiDeposit when tickIndex != 1
+
+	err = k.SingleDeposit(goCtx, msg, token0, token1, createrAddr, amount0, amount1, price_index)
+
+	if err != nil {
+		return nil, err
+	}
+
+	_ = ctx
+
+	return &types.MsgDepositResponse{}, nil
+}
+
+func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*types.MsgWithdrawlResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// TODO: Handling the message
+	_ = ctx
+
+	return &types.MsgWithdrawlResponse{}, nil
+}
+
+func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSwapResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// TODO: Handling the message
+	_ = ctx
+
+	return &types.MsgSwapResponse{}, nil
+}

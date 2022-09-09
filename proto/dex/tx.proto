@@ -17,8 +17,8 @@ message MsgDeposit {
   string creator = 1;
   string tokenA = 2;
   string tokenB = 3;
-  string amount0 = 4;
-  string amount1 = 5;
+  string amountA = 4;
+  string amountB = 5;
   string priceIndex = 6;
   string fee = 7;
 }
