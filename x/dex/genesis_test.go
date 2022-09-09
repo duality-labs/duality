@@ -62,6 +62,15 @@ func TestGenesis(t *testing.T) {
 			},
 		},
 		FeeListCount: 2,
+		EdgeRowList: []types.EdgeRow{
+			{
+				Id: 0,
+			},
+			{
+				Id: 1,
+			},
+		},
+		EdgeRowCount: 2,
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
@@ -80,5 +89,7 @@ func TestGenesis(t *testing.T) {
 	require.ElementsMatch(t, genesisState.SharesList, got.SharesList)
 	require.ElementsMatch(t, genesisState.FeeListList, got.FeeListList)
 	require.Equal(t, genesisState.FeeListCount, got.FeeListCount)
+	require.ElementsMatch(t, genesisState.EdgeRowList, got.EdgeRowList)
+	require.Equal(t, genesisState.EdgeRowCount, got.EdgeRowCount)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

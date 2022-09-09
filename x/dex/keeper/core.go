@@ -7,8 +7,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func addAdd()
-
 func (k Keeper) depositPairHelper(goCtx context.Context, token0 string, token1 string) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -43,11 +41,15 @@ func (k Keeper) depositPairHelper(goCtx context.Context, token0 string, token1 s
 }
 
 func (k Keeper) addEdge(goCtx context.Context, token0Index int64, token1Index int64) {
-
+	x := 4
+	_ = x
 }
 
 func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, token0 string, token1 string, createrAddr sdk.AccAddress, amount0 sdk.Dec, amount1 sdk.Dec) error {
 
+	// DepositPairHelper(token0 token1)
+
+	//
 	_ = goCtx
 	return nil
 }

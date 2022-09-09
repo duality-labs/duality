@@ -110,3 +110,8 @@ const (
 	FeeListKey      = "FeeList-value-"
 	FeeListCountKey = "FeeList-count-"
 )
+
+const (
+	EdgeRowKey      = "EdgeRow-value-"
+	EdgeRowCountKey = "EdgeRow-count-"
+)

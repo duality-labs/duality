@@ -8,6 +8,7 @@ import { Tokens } from "../dex/tokens";
 import { TokenMap } from "../dex/token_map";
 import { Shares } from "../dex/shares";
 import { FeeList } from "../dex/fee_list";
+import { EdgeRow } from "../dex/edge_row";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -21,11 +22,17 @@ export interface GenesisState {
   tokenMapList: TokenMap[];
   sharesList: Shares[];
   feeListList: FeeList[];
-  /** this line is used by starport scaffolding # genesis/proto/state */
   feeListCount: number;
+  edgeRowList: EdgeRow[];
+  /** this line is used by starport scaffolding # genesis/proto/state */
+  edgeRowCount: number;
 }
 
-const baseGenesisState: object = { tokensCount: 0, feeListCount: 0 };
+const baseGenesisState: object = {
+  tokensCount: 0,
+  feeListCount: 0,
+  edgeRowCount: 0,
+};
 
 export const GenesisState = {
   encode(message: GenesisState, writer: Writer = Writer.create()): Writer {
@@ -56,6 +63,12 @@ export const GenesisState = {
     if (message.feeListCount !== 0) {
       writer.uint32(72).uint64(message.feeListCount);
     }
+    for (const v of message.edgeRowList) {
+      EdgeRow.encode(v!, writer.uint32(82).fork()).ldelim();
+    }
+    if (message.edgeRowCount !== 0) {
+      writer.uint32(88).uint64(message.edgeRowCount);
+    }
     return writer;
   },
 
@@ -69,6 +82,7 @@ export const GenesisState = {
     message.tokenMapList = [];
     message.sharesList = [];
     message.feeListList = [];
+    message.edgeRowList = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -99,6 +113,12 @@ export const GenesisState = {
         case 9:
           message.feeListCount = longToNumber(reader.uint64() as Long);
           break;
+        case 10:
+          message.edgeRowList.push(EdgeRow.decode(reader, reader.uint32()));
+          break;
+        case 11:
+          message.edgeRowCount = longToNumber(reader.uint64() as Long);
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -115,6 +135,7 @@ export const GenesisState = {
     message.tokenMapList = [];
     message.sharesList = [];
     message.feeListList = [];
+    message.edgeRowList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromJSON(object.params);
     } else {
@@ -159,6 +180,16 @@ export const GenesisState = {
       message.feeListCount = Number(object.feeListCount);
     } else {
       message.feeListCount = 0;
+    }
+    if (object.edgeRowList !== undefined && object.edgeRowList !== null) {
+      for (const e of object.edgeRowList) {
+        message.edgeRowList.push(EdgeRow.fromJSON(e));
+      }
+    }
+    if (object.edgeRowCount !== undefined && object.edgeRowCount !== null) {
+      message.edgeRowCount = Number(object.edgeRowCount);
+    } else {
+      message.edgeRowCount = 0;
     }
     return message;
   },
@@ -213,6 +244,15 @@ export const GenesisState = {
     }
     message.feeListCount !== undefined &&
       (obj.feeListCount = message.feeListCount);
+    if (message.edgeRowList) {
+      obj.edgeRowList = message.edgeRowList.map((e) =>
+        e ? EdgeRow.toJSON(e) : undefined
+      );
+    } else {
+      obj.edgeRowList = [];
+    }
+    message.edgeRowCount !== undefined &&
+      (obj.edgeRowCount = message.edgeRowCount);
     return obj;
   },
 
@@ -224,6 +264,7 @@ export const GenesisState = {
     message.tokenMapList = [];
     message.sharesList = [];
     message.feeListList = [];
+    message.edgeRowList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromPartial(object.params);
     } else {
@@ -268,6 +309,16 @@ export const GenesisState = {
       message.feeListCount = object.feeListCount;
     } else {
       message.feeListCount = 0;
+    }
+    if (object.edgeRowList !== undefined && object.edgeRowList !== null) {
+      for (const e of object.edgeRowList) {
+        message.edgeRowList.push(EdgeRow.fromPartial(e));
+      }
+    }
+    if (object.edgeRowCount !== undefined && object.edgeRowCount !== null) {
+      message.edgeRowCount = object.edgeRowCount;
+    } else {
+      message.edgeRowCount = 0;
     }
     return message;
   },

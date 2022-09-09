@@ -78,6 +78,15 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 				FeeListCount: 2,
+				EdgeRowList: []types.EdgeRow{
+					{
+						Id: 0,
+					},
+					{
+						Id: 1,
+					},
+				},
+				EdgeRowCount: 2,
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -193,6 +202,32 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 				FeeListCount: 0,
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated edgeRow",
+			genState: &types.GenesisState{
+				EdgeRowList: []types.EdgeRow{
+					{
+						Id: 0,
+					},
+					{
+						Id: 0,
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "invalid edgeRow count",
+			genState: &types.GenesisState{
+				EdgeRowList: []types.EdgeRow{
+					{
+						Id: 1,
+					},
+				},
+				EdgeRowCount: 0,
 			},
 			valid: false,
 		},

@@ -1,6 +1,5 @@
 import { txClient, queryClient, MissingWalletError , registry} from './module'
 
-import { AdjacenyMatrix } from "./module/types/dex/adjaceny_matrix"
 import { EdgeRow } from "./module/types/dex/edge_row"
 import { FeeList } from "./module/types/dex/fee_list"
 import { PairMap } from "./module/types/dex/pair_map"
@@ -14,7 +13,7 @@ import { TokenPairType } from "./module/types/dex/token_pair_type"
 import { Tokens } from "./module/types/dex/tokens"
 
 
-export { AdjacenyMatrix, EdgeRow, FeeList, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
+export { EdgeRow, FeeList, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -65,9 +64,10 @@ const getDefaultState = () => {
 				SharesAll: {},
 				FeeList: {},
 				FeeListAll: {},
+				EdgeRow: {},
+				EdgeRowAll: {},
 				
 				_Structure: {
-						AdjacenyMatrix: getStructure(AdjacenyMatrix.fromPartial({})),
 						EdgeRow: getStructure(EdgeRow.fromPartial({})),
 						FeeList: getStructure(FeeList.fromPartial({})),
 						PairMap: getStructure(PairMap.fromPartial({})),
@@ -184,6 +184,18 @@ export default {
 						(<any> params).query=null
 					}
 			return state.FeeListAll[JSON.stringify(params)] ?? {}
+		},
+				getEdgeRow: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.EdgeRow[JSON.stringify(params)] ?? {}
+		},
+				getEdgeRowAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.EdgeRowAll[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -528,6 +540,54 @@ export default {
 				return getters['getFeeListAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:QueryFeeListAll API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryEdgeRow({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryEdgeRow( key.id)).data
+				
+					
+				commit('QUERY', { query: 'EdgeRow', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryEdgeRow', payload: { options: { all }, params: {...key},query }})
+				return getters['getEdgeRow']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryEdgeRow API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryEdgeRowAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryEdgeRowAll(query)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await queryClient.queryEdgeRowAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'EdgeRowAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryEdgeRowAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getEdgeRowAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryEdgeRowAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

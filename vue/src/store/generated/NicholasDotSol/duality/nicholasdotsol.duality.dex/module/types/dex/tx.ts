@@ -1,5 +1,6 @@
 /* eslint-disable */
-import { Reader, Writer } from "protobufjs/minimal";
+import { Reader, util, configure, Writer } from "protobufjs/minimal";
+import * as Long from "long";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -7,10 +8,10 @@ export interface MsgDeposit {
   creator: string;
   tokenA: string;
   tokenB: string;
-  amount0: string;
-  amount1: string;
-  priceIndex: string;
-  fee: string;
+  amountA: string;
+  amountB: string;
+  priceIndex: number;
+  fee: number;
 }
 
 export interface MsgDepositResponse {}
@@ -20,8 +21,8 @@ export interface MsgWithdrawl {
   tokenA: string;
   tokenB: string;
   sharesToRemove: string;
-  priceIndex: string;
-  fee: string;
+  priceIndex: number;
+  fee: number;
   receiver: string;
 }
 
@@ -40,10 +41,10 @@ const baseMsgDeposit: object = {
   creator: "",
   tokenA: "",
   tokenB: "",
-  amount0: "",
-  amount1: "",
-  priceIndex: "",
-  fee: "",
+  amountA: "",
+  amountB: "",
+  priceIndex: 0,
+  fee: 0,
 };
 
 export const MsgDeposit = {
@@ -57,17 +58,17 @@ export const MsgDeposit = {
     if (message.tokenB !== "") {
       writer.uint32(26).string(message.tokenB);
     }
-    if (message.amount0 !== "") {
-      writer.uint32(34).string(message.amount0);
+    if (message.amountA !== "") {
+      writer.uint32(34).string(message.amountA);
     }
-    if (message.amount1 !== "") {
-      writer.uint32(42).string(message.amount1);
+    if (message.amountB !== "") {
+      writer.uint32(42).string(message.amountB);
     }
-    if (message.priceIndex !== "") {
-      writer.uint32(50).string(message.priceIndex);
+    if (message.priceIndex !== 0) {
+      writer.uint32(48).int64(message.priceIndex);
     }
-    if (message.fee !== "") {
-      writer.uint32(58).string(message.fee);
+    if (message.fee !== 0) {
+      writer.uint32(56).int64(message.fee);
     }
     return writer;
   },
@@ -89,16 +90,16 @@ export const MsgDeposit = {
           message.tokenB = reader.string();
           break;
         case 4:
-          message.amount0 = reader.string();
+          message.amountA = reader.string();
           break;
         case 5:
-          message.amount1 = reader.string();
+          message.amountB = reader.string();
           break;
         case 6:
-          message.priceIndex = reader.string();
+          message.priceIndex = longToNumber(reader.int64() as Long);
           break;
         case 7:
-          message.fee = reader.string();
+          message.fee = longToNumber(reader.int64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -125,25 +126,25 @@ export const MsgDeposit = {
     } else {
       message.tokenB = "";
     }
-    if (object.amount0 !== undefined && object.amount0 !== null) {
-      message.amount0 = String(object.amount0);
+    if (object.amountA !== undefined && object.amountA !== null) {
+      message.amountA = String(object.amountA);
     } else {
-      message.amount0 = "";
+      message.amountA = "";
     }
-    if (object.amount1 !== undefined && object.amount1 !== null) {
-      message.amount1 = String(object.amount1);
+    if (object.amountB !== undefined && object.amountB !== null) {
+      message.amountB = String(object.amountB);
     } else {
-      message.amount1 = "";
+      message.amountB = "";
     }
     if (object.priceIndex !== undefined && object.priceIndex !== null) {
-      message.priceIndex = String(object.priceIndex);
+      message.priceIndex = Number(object.priceIndex);
     } else {
-      message.priceIndex = "";
+      message.priceIndex = 0;
     }
     if (object.fee !== undefined && object.fee !== null) {
-      message.fee = String(object.fee);
+      message.fee = Number(object.fee);
     } else {
-      message.fee = "";
+      message.fee = 0;
     }
     return message;
   },
@@ -153,8 +154,8 @@ export const MsgDeposit = {
     message.creator !== undefined && (obj.creator = message.creator);
     message.tokenA !== undefined && (obj.tokenA = message.tokenA);
     message.tokenB !== undefined && (obj.tokenB = message.tokenB);
-    message.amount0 !== undefined && (obj.amount0 = message.amount0);
-    message.amount1 !== undefined && (obj.amount1 = message.amount1);
+    message.amountA !== undefined && (obj.amountA = message.amountA);
+    message.amountB !== undefined && (obj.amountB = message.amountB);
     message.priceIndex !== undefined && (obj.priceIndex = message.priceIndex);
     message.fee !== undefined && (obj.fee = message.fee);
     return obj;
@@ -177,25 +178,25 @@ export const MsgDeposit = {
     } else {
       message.tokenB = "";
     }
-    if (object.amount0 !== undefined && object.amount0 !== null) {
-      message.amount0 = object.amount0;
+    if (object.amountA !== undefined && object.amountA !== null) {
+      message.amountA = object.amountA;
     } else {
-      message.amount0 = "";
+      message.amountA = "";
     }
-    if (object.amount1 !== undefined && object.amount1 !== null) {
-      message.amount1 = object.amount1;
+    if (object.amountB !== undefined && object.amountB !== null) {
+      message.amountB = object.amountB;
     } else {
-      message.amount1 = "";
+      message.amountB = "";
     }
     if (object.priceIndex !== undefined && object.priceIndex !== null) {
       message.priceIndex = object.priceIndex;
     } else {
-      message.priceIndex = "";
+      message.priceIndex = 0;
     }
     if (object.fee !== undefined && object.fee !== null) {
       message.fee = object.fee;
     } else {
-      message.fee = "";
+      message.fee = 0;
     }
     return message;
   },
@@ -244,8 +245,8 @@ const baseMsgWithdrawl: object = {
   tokenA: "",
   tokenB: "",
   sharesToRemove: "",
-  priceIndex: "",
-  fee: "",
+  priceIndex: 0,
+  fee: 0,
   receiver: "",
 };
 
@@ -263,11 +264,11 @@ export const MsgWithdrawl = {
     if (message.sharesToRemove !== "") {
       writer.uint32(34).string(message.sharesToRemove);
     }
-    if (message.priceIndex !== "") {
-      writer.uint32(42).string(message.priceIndex);
+    if (message.priceIndex !== 0) {
+      writer.uint32(40).int64(message.priceIndex);
     }
-    if (message.fee !== "") {
-      writer.uint32(50).string(message.fee);
+    if (message.fee !== 0) {
+      writer.uint32(48).int64(message.fee);
     }
     if (message.receiver !== "") {
       writer.uint32(58).string(message.receiver);
@@ -295,10 +296,10 @@ export const MsgWithdrawl = {
           message.sharesToRemove = reader.string();
           break;
         case 5:
-          message.priceIndex = reader.string();
+          message.priceIndex = longToNumber(reader.int64() as Long);
           break;
         case 6:
-          message.fee = reader.string();
+          message.fee = longToNumber(reader.int64() as Long);
           break;
         case 7:
           message.receiver = reader.string();
@@ -334,14 +335,14 @@ export const MsgWithdrawl = {
       message.sharesToRemove = "";
     }
     if (object.priceIndex !== undefined && object.priceIndex !== null) {
-      message.priceIndex = String(object.priceIndex);
+      message.priceIndex = Number(object.priceIndex);
     } else {
-      message.priceIndex = "";
+      message.priceIndex = 0;
     }
     if (object.fee !== undefined && object.fee !== null) {
-      message.fee = String(object.fee);
+      message.fee = Number(object.fee);
     } else {
-      message.fee = "";
+      message.fee = 0;
     }
     if (object.receiver !== undefined && object.receiver !== null) {
       message.receiver = String(object.receiver);
@@ -389,12 +390,12 @@ export const MsgWithdrawl = {
     if (object.priceIndex !== undefined && object.priceIndex !== null) {
       message.priceIndex = object.priceIndex;
     } else {
-      message.priceIndex = "";
+      message.priceIndex = 0;
     }
     if (object.fee !== undefined && object.fee !== null) {
       message.fee = object.fee;
     } else {
-      message.fee = "";
+      message.fee = 0;
     }
     if (object.receiver !== undefined && object.receiver !== null) {
       message.receiver = object.receiver;
@@ -653,6 +654,16 @@ interface Rpc {
   ): Promise<Uint8Array>;
 }
 
+declare var self: any | undefined;
+declare var window: any | undefined;
+var globalThis: any = (() => {
+  if (typeof globalThis !== "undefined") return globalThis;
+  if (typeof self !== "undefined") return self;
+  if (typeof window !== "undefined") return window;
+  if (typeof global !== "undefined") return global;
+  throw "Unable to locate global object";
+})();
+
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 export type DeepPartial<T> = T extends Builtin
   ? T
@@ -663,3 +674,15 @@ export type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+function longToNumber(long: Long): number {
+  if (long.gt(Number.MAX_SAFE_INTEGER)) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  return long.toNumber();
+}
+
+if (util.Long !== Long) {
+  util.Long = Long as any;
+  configure();
+}

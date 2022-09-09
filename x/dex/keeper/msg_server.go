@@ -22,7 +22,7 @@ var _ types.MsgServer = msgServer{}
 func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.MsgDepositResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, createrAddr, amount0, amount1, price_index, err := k.depositVerification(goCtx, *msg)
+	token0, token1, createrAddr, amount0, amount1, err := k.depositVerification(goCtx, *msg)
 
 	if err != nil {
 		return nil, err
@@ -30,7 +30,7 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 
 	//TODO add cases for multiDeposit when tickIndex != 1
 
-	err = k.SingleDeposit(goCtx, msg, token0, token1, createrAddr, amount0, amount1, price_index)
+	err = k.SingleDeposit(goCtx, msg, token0, token1, createrAddr, amount0, amount1)
 
 	if err != nil {
 		return nil, err

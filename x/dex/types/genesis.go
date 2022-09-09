@@ -16,6 +16,7 @@ func DefaultGenesis() *GenesisState {
 		TokenMapList: []TokenMap{},
 		SharesList:   []Shares{},
 		FeeListList:  []FeeList{},
+		EdgeRowList:  []EdgeRow{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -87,6 +88,18 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("feeList id should be lower or equal than the last id")
 		}
 		feeListIdMap[elem.Id] = true
+	}
+	// Check for duplicated ID in edgeRow
+	edgeRowIdMap := make(map[uint64]bool)
+	edgeRowCount := gs.GetEdgeRowCount()
+	for _, elem := range gs.EdgeRowList {
+		if _, ok := edgeRowIdMap[elem.Id]; ok {
+			return fmt.Errorf("duplicated id for edgeRow")
+		}
+		if elem.Id >= edgeRowCount {
+			return fmt.Errorf("edgeRow id should be lower or equal than the last id")
+		}
+		edgeRowIdMap[elem.Id] = true
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 

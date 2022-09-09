@@ -11,6 +11,7 @@ import "dex/tokens.proto";
 import "dex/token_map.proto";
 import "dex/shares.proto";
 import "dex/fee_list.proto";
+import "dex/edge_row.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -79,6 +80,16 @@ service Query {
 	// Queries a list of FeeList items.
 	rpc FeeListAll(QueryAllFeeListRequest) returns (QueryAllFeeListResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/fee_list";
+	}
+
+// Queries a EdgeRow by id.
+	rpc EdgeRow(QueryGetEdgeRowRequest) returns (QueryGetEdgeRowResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/edge_row/{id}";
+	}
+
+	// Queries a list of EdgeRow items.
+	rpc EdgeRowAll(QueryAllEdgeRowRequest) returns (QueryAllEdgeRowResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/edge_row";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -201,6 +212,23 @@ message QueryAllFeeListRequest {
 
 message QueryAllFeeListResponse {
 	repeated FeeList FeeList = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetEdgeRowRequest {
+	uint64 id = 1;
+}
+
+message QueryGetEdgeRowResponse {
+	EdgeRow EdgeRow = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllEdgeRowRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllEdgeRowResponse {
+	repeated EdgeRow EdgeRow = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

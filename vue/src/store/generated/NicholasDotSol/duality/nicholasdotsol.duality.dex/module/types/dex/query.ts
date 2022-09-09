@@ -12,6 +12,7 @@ import { Tokens } from "../dex/tokens";
 import { TokenMap } from "../dex/token_map";
 import { Shares } from "../dex/shares";
 import { FeeList } from "../dex/fee_list";
+import { EdgeRow } from "../dex/edge_row";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -127,6 +128,23 @@ export interface QueryAllFeeListRequest {
 
 export interface QueryAllFeeListResponse {
   FeeList: FeeList[];
+  pagination: PageResponse | undefined;
+}
+
+export interface QueryGetEdgeRowRequest {
+  id: number;
+}
+
+export interface QueryGetEdgeRowResponse {
+  EdgeRow: EdgeRow | undefined;
+}
+
+export interface QueryAllEdgeRowRequest {
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryAllEdgeRowResponse {
+  EdgeRow: EdgeRow[];
   pagination: PageResponse | undefined;
 }
 
@@ -2030,6 +2048,296 @@ export const QueryAllFeeListResponse = {
   },
 };
 
+const baseQueryGetEdgeRowRequest: object = { id: 0 };
+
+export const QueryGetEdgeRowRequest = {
+  encode(
+    message: QueryGetEdgeRowRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.id !== 0) {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryGetEdgeRowRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGetEdgeRowRequest } as QueryGetEdgeRowRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetEdgeRowRequest {
+    const message = { ...baseQueryGetEdgeRowRequest } as QueryGetEdgeRowRequest;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = Number(object.id);
+    } else {
+      message.id = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetEdgeRowRequest): unknown {
+    const obj: any = {};
+    message.id !== undefined && (obj.id = message.id);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetEdgeRowRequest>
+  ): QueryGetEdgeRowRequest {
+    const message = { ...baseQueryGetEdgeRowRequest } as QueryGetEdgeRowRequest;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
+    } else {
+      message.id = 0;
+    }
+    return message;
+  },
+};
+
+const baseQueryGetEdgeRowResponse: object = {};
+
+export const QueryGetEdgeRowResponse = {
+  encode(
+    message: QueryGetEdgeRowResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.EdgeRow !== undefined) {
+      EdgeRow.encode(message.EdgeRow, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryGetEdgeRowResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryGetEdgeRowResponse,
+    } as QueryGetEdgeRowResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.EdgeRow = EdgeRow.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetEdgeRowResponse {
+    const message = {
+      ...baseQueryGetEdgeRowResponse,
+    } as QueryGetEdgeRowResponse;
+    if (object.EdgeRow !== undefined && object.EdgeRow !== null) {
+      message.EdgeRow = EdgeRow.fromJSON(object.EdgeRow);
+    } else {
+      message.EdgeRow = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetEdgeRowResponse): unknown {
+    const obj: any = {};
+    message.EdgeRow !== undefined &&
+      (obj.EdgeRow = message.EdgeRow
+        ? EdgeRow.toJSON(message.EdgeRow)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetEdgeRowResponse>
+  ): QueryGetEdgeRowResponse {
+    const message = {
+      ...baseQueryGetEdgeRowResponse,
+    } as QueryGetEdgeRowResponse;
+    if (object.EdgeRow !== undefined && object.EdgeRow !== null) {
+      message.EdgeRow = EdgeRow.fromPartial(object.EdgeRow);
+    } else {
+      message.EdgeRow = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllEdgeRowRequest: object = {};
+
+export const QueryAllEdgeRowRequest = {
+  encode(
+    message: QueryAllEdgeRowRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryAllEdgeRowRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryAllEdgeRowRequest } as QueryAllEdgeRowRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllEdgeRowRequest {
+    const message = { ...baseQueryAllEdgeRowRequest } as QueryAllEdgeRowRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllEdgeRowRequest): unknown {
+    const obj: any = {};
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageRequest.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryAllEdgeRowRequest>
+  ): QueryAllEdgeRowRequest {
+    const message = { ...baseQueryAllEdgeRowRequest } as QueryAllEdgeRowRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllEdgeRowResponse: object = {};
+
+export const QueryAllEdgeRowResponse = {
+  encode(
+    message: QueryAllEdgeRowResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    for (const v of message.EdgeRow) {
+      EdgeRow.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(
+        message.pagination,
+        writer.uint32(18).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): QueryAllEdgeRowResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryAllEdgeRowResponse,
+    } as QueryAllEdgeRowResponse;
+    message.EdgeRow = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.EdgeRow.push(EdgeRow.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllEdgeRowResponse {
+    const message = {
+      ...baseQueryAllEdgeRowResponse,
+    } as QueryAllEdgeRowResponse;
+    message.EdgeRow = [];
+    if (object.EdgeRow !== undefined && object.EdgeRow !== null) {
+      for (const e of object.EdgeRow) {
+        message.EdgeRow.push(EdgeRow.fromJSON(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllEdgeRowResponse): unknown {
+    const obj: any = {};
+    if (message.EdgeRow) {
+      obj.EdgeRow = message.EdgeRow.map((e) =>
+        e ? EdgeRow.toJSON(e) : undefined
+      );
+    } else {
+      obj.EdgeRow = [];
+    }
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageResponse.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryAllEdgeRowResponse>
+  ): QueryAllEdgeRowResponse {
+    const message = {
+      ...baseQueryAllEdgeRowResponse,
+    } as QueryAllEdgeRowResponse;
+    message.EdgeRow = [];
+    if (object.EdgeRow !== undefined && object.EdgeRow !== null) {
+      for (const e of object.EdgeRow) {
+        message.EdgeRow.push(EdgeRow.fromPartial(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -2060,6 +2368,10 @@ export interface Query {
   FeeList(request: QueryGetFeeListRequest): Promise<QueryGetFeeListResponse>;
   /** Queries a list of FeeList items. */
   FeeListAll(request: QueryAllFeeListRequest): Promise<QueryAllFeeListResponse>;
+  /** Queries a EdgeRow by id. */
+  EdgeRow(request: QueryGetEdgeRowRequest): Promise<QueryGetEdgeRowResponse>;
+  /** Queries a list of EdgeRow items. */
+  EdgeRowAll(request: QueryAllEdgeRowRequest): Promise<QueryAllEdgeRowResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -2228,6 +2540,32 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QueryAllFeeListResponse.decode(new Reader(data))
+    );
+  }
+
+  EdgeRow(request: QueryGetEdgeRowRequest): Promise<QueryGetEdgeRowResponse> {
+    const data = QueryGetEdgeRowRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "EdgeRow",
+      data
+    );
+    return promise.then((data) =>
+      QueryGetEdgeRowResponse.decode(new Reader(data))
+    );
+  }
+
+  EdgeRowAll(
+    request: QueryAllEdgeRowRequest
+  ): Promise<QueryAllEdgeRowResponse> {
+    const data = QueryAllEdgeRowRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "EdgeRowAll",
+      data
+    );
+    return promise.then((data) =>
+      QueryAllEdgeRowResponse.decode(new Reader(data))
     );
   }
 }

@@ -9,6 +9,12 @@
  * ---------------------------------------------------------------
  */
 
+export interface DexEdgeRow {
+  /** @format uint64 */
+  id?: string;
+  edge?: string;
+}
+
 export interface DexFeeList {
   /** @format uint64 */
   id?: string;
@@ -30,6 +36,21 @@ export interface DexPairMap {
  * Params defines the parameters for the module.
  */
 export type DexParams = object;
+
+export interface DexQueryAllEdgeRowResponse {
+  EdgeRow?: DexEdgeRow[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
 
 export interface DexQueryAllFeeListResponse {
   FeeList?: DexFeeList[];
@@ -119,6 +140,10 @@ export interface DexQueryAllTokensResponse {
    *  }
    */
   pagination?: V1Beta1PageResponse;
+}
+
+export interface DexQueryGetEdgeRowResponse {
+  EdgeRow?: DexEdgeRow;
 }
 
 export interface DexQueryGetFeeListResponse {
@@ -457,10 +482,51 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title dex/adjaceny_matrix.proto
+ * @title dex/edge_row.proto
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryEdgeRowAll
+   * @summary Queries a list of EdgeRow items.
+   * @request GET:/NicholasDotSol/duality/dex/edge_row
+   */
+  queryEdgeRowAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<DexQueryAllEdgeRowResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/edge_row`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryEdgeRow
+   * @summary Queries a EdgeRow by id.
+   * @request GET:/NicholasDotSol/duality/dex/edge_row/{id}
+   */
+  queryEdgeRow = (id: string, params: RequestParams = {}) =>
+    this.request<DexQueryGetEdgeRowResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/edge_row/${id}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
   /**
    * No description
    *

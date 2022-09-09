@@ -40,6 +40,13 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 
 	// Set feeList count
 	k.SetFeeListCount(ctx, genState.FeeListCount)
+	// Set all the edgeRow
+	for _, elem := range genState.EdgeRowList {
+		k.SetEdgeRow(ctx, elem)
+	}
+
+	// Set edgeRow count
+	k.SetEdgeRowCount(ctx, genState.EdgeRowCount)
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
 }
@@ -57,6 +64,8 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.SharesList = k.GetAllShares(ctx)
 	genesis.FeeListList = k.GetAllFeeList(ctx)
 	genesis.FeeListCount = k.GetFeeListCount(ctx)
+	genesis.EdgeRowList = k.GetAllEdgeRow(ctx)
+	genesis.EdgeRowCount = k.GetEdgeRowCount(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis

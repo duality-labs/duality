@@ -9,6 +9,7 @@ import "dex/tokens.proto";
 import "dex/token_map.proto";
 import "dex/shares.proto";
 import "dex/fee_list.proto";
+import "dex/edge_row.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -24,5 +25,7 @@ message GenesisState {
   repeated Shares sharesList = 7 [(gogoproto.nullable) = false];
   repeated FeeList feeListList = 8 [(gogoproto.nullable) = false];
   uint64 feeListCount = 9;
+  repeated EdgeRow edgeRowList = 10 [(gogoproto.nullable) = false];
+  uint64 edgeRowCount = 11;
   // this line is used by starport scaffolding # genesis/proto/state
 }
