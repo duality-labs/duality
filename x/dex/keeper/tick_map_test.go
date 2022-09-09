@@ -19,17 +19,26 @@ func createNTickMap(keeper *keeper.Keeper, ctx sdk.Context, pairId string, n int
 	items := make([]types.TickMap, n)
 	for i := range items {
 
-		// items[i].TickData = &types.TickDataType{
-		// 	Reserve0AndShares: append(items[i].TickData.Reserve0AndShares, &types.Reserve0AndSharesType{
-		// 		Reserve0:    sdk.OneDec(),
-		// 		TotalShares: sdk.ZeroDec(),
-		// 	}),
-		// 	Reserve1: append(items[i].TickData.Reserve1, sdk.ZeroDec()),
-		// }
+		items[i].TickData = &types.TickDataType{
+			Reserve0AndShares: []*types.Reserve0AndSharesType{
+				{Reserve0: sdk.OneDec(),
+					TotalShares: sdk.ZeroDec(),
+				}},
+			Reserve1: []sdk.Dec{sdk.ZeroDec()},
+		}
 
-		// items[i].TickIndex = int64(i),
+		items[i].TickIndex = int64(i)
+
+		// testTickMap :=  &types.TickMap{0, &types.TickDataType{Reserve0AndShares: []*types.Reserve0AndSharesType{
+		// 	{Reserve0: sdk.OneDec(),
+		// 	TotalShares: sdk.ZeroDec(),
+		// }},
+		// Reserve1: []sdk.Dec{sdk.ZeroDec()},
+		// }}
+
 		keeper.SetTickMap(ctx, pairId, items[i])
 	}
+
 	return items
 }
 
