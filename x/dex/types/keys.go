@@ -115,3 +115,8 @@ const (
 	EdgeRowKey      = "EdgeRow-value-"
 	EdgeRowCountKey = "EdgeRow-count-"
 )
+
+const (
+	AdjanceyMatrixKey      = "AdjanceyMatrix-value-"
+	AdjanceyMatrixCountKey = "AdjanceyMatrix-count-"
+)

@@ -9,6 +9,7 @@ import { TokenMap } from "../dex/token_map";
 import { Shares } from "../dex/shares";
 import { FeeList } from "../dex/fee_list";
 import { EdgeRow } from "../dex/edge_row";
+import { AdjanceyMatrix } from "../dex/adjancey_matrix";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -24,14 +25,17 @@ export interface GenesisState {
   feeListList: FeeList[];
   feeListCount: number;
   edgeRowList: EdgeRow[];
-  /** this line is used by starport scaffolding # genesis/proto/state */
   edgeRowCount: number;
+  adjanceyMatrixList: AdjanceyMatrix[];
+  /** this line is used by starport scaffolding # genesis/proto/state */
+  adjanceyMatrixCount: number;
 }
 
 const baseGenesisState: object = {
   tokensCount: 0,
   feeListCount: 0,
   edgeRowCount: 0,
+  adjanceyMatrixCount: 0,
 };
 
 export const GenesisState = {
@@ -69,6 +73,12 @@ export const GenesisState = {
     if (message.edgeRowCount !== 0) {
       writer.uint32(88).uint64(message.edgeRowCount);
     }
+    for (const v of message.adjanceyMatrixList) {
+      AdjanceyMatrix.encode(v!, writer.uint32(98).fork()).ldelim();
+    }
+    if (message.adjanceyMatrixCount !== 0) {
+      writer.uint32(104).uint64(message.adjanceyMatrixCount);
+    }
     return writer;
   },
 
@@ -83,6 +93,7 @@ export const GenesisState = {
     message.sharesList = [];
     message.feeListList = [];
     message.edgeRowList = [];
+    message.adjanceyMatrixList = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -119,6 +130,14 @@ export const GenesisState = {
         case 11:
           message.edgeRowCount = longToNumber(reader.uint64() as Long);
           break;
+        case 12:
+          message.adjanceyMatrixList.push(
+            AdjanceyMatrix.decode(reader, reader.uint32())
+          );
+          break;
+        case 13:
+          message.adjanceyMatrixCount = longToNumber(reader.uint64() as Long);
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -136,6 +155,7 @@ export const GenesisState = {
     message.sharesList = [];
     message.feeListList = [];
     message.edgeRowList = [];
+    message.adjanceyMatrixList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromJSON(object.params);
     } else {
@@ -190,6 +210,22 @@ export const GenesisState = {
       message.edgeRowCount = Number(object.edgeRowCount);
     } else {
       message.edgeRowCount = 0;
+    }
+    if (
+      object.adjanceyMatrixList !== undefined &&
+      object.adjanceyMatrixList !== null
+    ) {
+      for (const e of object.adjanceyMatrixList) {
+        message.adjanceyMatrixList.push(AdjanceyMatrix.fromJSON(e));
+      }
+    }
+    if (
+      object.adjanceyMatrixCount !== undefined &&
+      object.adjanceyMatrixCount !== null
+    ) {
+      message.adjanceyMatrixCount = Number(object.adjanceyMatrixCount);
+    } else {
+      message.adjanceyMatrixCount = 0;
     }
     return message;
   },
@@ -253,6 +289,15 @@ export const GenesisState = {
     }
     message.edgeRowCount !== undefined &&
       (obj.edgeRowCount = message.edgeRowCount);
+    if (message.adjanceyMatrixList) {
+      obj.adjanceyMatrixList = message.adjanceyMatrixList.map((e) =>
+        e ? AdjanceyMatrix.toJSON(e) : undefined
+      );
+    } else {
+      obj.adjanceyMatrixList = [];
+    }
+    message.adjanceyMatrixCount !== undefined &&
+      (obj.adjanceyMatrixCount = message.adjanceyMatrixCount);
     return obj;
   },
 
@@ -265,6 +310,7 @@ export const GenesisState = {
     message.sharesList = [];
     message.feeListList = [];
     message.edgeRowList = [];
+    message.adjanceyMatrixList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromPartial(object.params);
     } else {
@@ -319,6 +365,22 @@ export const GenesisState = {
       message.edgeRowCount = object.edgeRowCount;
     } else {
       message.edgeRowCount = 0;
+    }
+    if (
+      object.adjanceyMatrixList !== undefined &&
+      object.adjanceyMatrixList !== null
+    ) {
+      for (const e of object.adjanceyMatrixList) {
+        message.adjanceyMatrixList.push(AdjanceyMatrix.fromPartial(e));
+      }
+    }
+    if (
+      object.adjanceyMatrixCount !== undefined &&
+      object.adjanceyMatrixCount !== null
+    ) {
+      message.adjanceyMatrixCount = object.adjanceyMatrixCount;
+    } else {
+      message.adjanceyMatrixCount = 0;
     }
     return message;
   },

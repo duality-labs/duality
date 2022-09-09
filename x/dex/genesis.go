@@ -47,6 +47,13 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 
 	// Set edgeRow count
 	k.SetEdgeRowCount(ctx, genState.EdgeRowCount)
+	// Set all the adjanceyMatrix
+	for _, elem := range genState.AdjanceyMatrixList {
+		k.SetAdjanceyMatrix(ctx, elem)
+	}
+
+	// Set adjanceyMatrix count
+	k.SetAdjanceyMatrixCount(ctx, genState.AdjanceyMatrixCount)
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
 }
@@ -66,6 +73,8 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.FeeListCount = k.GetFeeListCount(ctx)
 	genesis.EdgeRowList = k.GetAllEdgeRow(ctx)
 	genesis.EdgeRowCount = k.GetEdgeRowCount(ctx)
+	genesis.AdjanceyMatrixList = k.GetAllAdjanceyMatrix(ctx)
+	genesis.AdjanceyMatrixCount = k.GetAdjanceyMatrixCount(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis

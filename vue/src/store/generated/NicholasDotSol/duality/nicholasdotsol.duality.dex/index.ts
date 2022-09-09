@@ -1,5 +1,6 @@
 import { txClient, queryClient, MissingWalletError , registry} from './module'
 
+import { AdjanceyMatrix } from "./module/types/dex/adjancey_matrix"
 import { EdgeRow } from "./module/types/dex/edge_row"
 import { FeeList } from "./module/types/dex/fee_list"
 import { PairMap } from "./module/types/dex/pair_map"
@@ -13,7 +14,7 @@ import { TokenPairType } from "./module/types/dex/token_pair_type"
 import { Tokens } from "./module/types/dex/tokens"
 
 
-export { EdgeRow, FeeList, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
+export { AdjanceyMatrix, EdgeRow, FeeList, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -66,8 +67,11 @@ const getDefaultState = () => {
 				FeeListAll: {},
 				EdgeRow: {},
 				EdgeRowAll: {},
+				AdjanceyMatrix: {},
+				AdjanceyMatrixAll: {},
 				
 				_Structure: {
+						AdjanceyMatrix: getStructure(AdjanceyMatrix.fromPartial({})),
 						EdgeRow: getStructure(EdgeRow.fromPartial({})),
 						FeeList: getStructure(FeeList.fromPartial({})),
 						PairMap: getStructure(PairMap.fromPartial({})),
@@ -196,6 +200,18 @@ export default {
 						(<any> params).query=null
 					}
 			return state.EdgeRowAll[JSON.stringify(params)] ?? {}
+		},
+				getAdjanceyMatrix: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.AdjanceyMatrix[JSON.stringify(params)] ?? {}
+		},
+				getAdjanceyMatrixAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.AdjanceyMatrixAll[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -588,6 +604,54 @@ export default {
 				return getters['getEdgeRowAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:QueryEdgeRowAll API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryAdjanceyMatrix({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryAdjanceyMatrix( key.id)).data
+				
+					
+				commit('QUERY', { query: 'AdjanceyMatrix', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryAdjanceyMatrix', payload: { options: { all }, params: {...key},query }})
+				return getters['getAdjanceyMatrix']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryAdjanceyMatrix API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryAdjanceyMatrixAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryAdjanceyMatrixAll(query)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await queryClient.queryAdjanceyMatrixAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'AdjanceyMatrixAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryAdjanceyMatrixAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getAdjanceyMatrixAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryAdjanceyMatrixAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

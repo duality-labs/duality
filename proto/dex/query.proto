@@ -12,6 +12,7 @@ import "dex/token_map.proto";
 import "dex/shares.proto";
 import "dex/fee_list.proto";
 import "dex/edge_row.proto";
+import "dex/adjancey_matrix.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -90,6 +91,16 @@ service Query {
 	// Queries a list of EdgeRow items.
 	rpc EdgeRowAll(QueryAllEdgeRowRequest) returns (QueryAllEdgeRowResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/edge_row";
+	}
+
+// Queries a AdjanceyMatrix by id.
+	rpc AdjanceyMatrix(QueryGetAdjanceyMatrixRequest) returns (QueryGetAdjanceyMatrixResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/adjancey_matrix/{id}";
+	}
+
+	// Queries a list of AdjanceyMatrix items.
+	rpc AdjanceyMatrixAll(QueryAllAdjanceyMatrixRequest) returns (QueryAllAdjanceyMatrixResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/adjancey_matrix";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -229,6 +240,23 @@ message QueryAllEdgeRowRequest {
 
 message QueryAllEdgeRowResponse {
 	repeated EdgeRow EdgeRow = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetAdjanceyMatrixRequest {
+	uint64 id = 1;
+}
+
+message QueryGetAdjanceyMatrixResponse {
+	AdjanceyMatrix AdjanceyMatrix = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllAdjanceyMatrixRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllAdjanceyMatrixResponse {
+	repeated AdjanceyMatrix AdjanceyMatrix = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

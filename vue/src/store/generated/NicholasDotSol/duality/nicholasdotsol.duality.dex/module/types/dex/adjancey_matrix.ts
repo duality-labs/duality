@@ -4,28 +4,28 @@ import { util, configure, Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
-export interface EdgeRow {
+export interface AdjanceyMatrix {
   id: number;
-  edge: boolean;
+  edgeRow: string;
 }
 
-const baseEdgeRow: object = { id: 0, edge: false };
+const baseAdjanceyMatrix: object = { id: 0, edgeRow: "" };
 
-export const EdgeRow = {
-  encode(message: EdgeRow, writer: Writer = Writer.create()): Writer {
+export const AdjanceyMatrix = {
+  encode(message: AdjanceyMatrix, writer: Writer = Writer.create()): Writer {
     if (message.id !== 0) {
       writer.uint32(8).uint64(message.id);
     }
-    if (message.edge === true) {
-      writer.uint32(16).bool(message.edge);
+    if (message.edgeRow !== "") {
+      writer.uint32(18).string(message.edgeRow);
     }
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): EdgeRow {
+  decode(input: Reader | Uint8Array, length?: number): AdjanceyMatrix {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseEdgeRow } as EdgeRow;
+    const message = { ...baseAdjanceyMatrix } as AdjanceyMatrix;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -33,7 +33,7 @@ export const EdgeRow = {
           message.id = longToNumber(reader.uint64() as Long);
           break;
         case 2:
-          message.edge = reader.bool();
+          message.edgeRow = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -43,39 +43,39 @@ export const EdgeRow = {
     return message;
   },
 
-  fromJSON(object: any): EdgeRow {
-    const message = { ...baseEdgeRow } as EdgeRow;
+  fromJSON(object: any): AdjanceyMatrix {
+    const message = { ...baseAdjanceyMatrix } as AdjanceyMatrix;
     if (object.id !== undefined && object.id !== null) {
       message.id = Number(object.id);
     } else {
       message.id = 0;
     }
-    if (object.edge !== undefined && object.edge !== null) {
-      message.edge = Boolean(object.edge);
+    if (object.edgeRow !== undefined && object.edgeRow !== null) {
+      message.edgeRow = String(object.edgeRow);
     } else {
-      message.edge = false;
+      message.edgeRow = "";
     }
     return message;
   },
 
-  toJSON(message: EdgeRow): unknown {
+  toJSON(message: AdjanceyMatrix): unknown {
     const obj: any = {};
     message.id !== undefined && (obj.id = message.id);
-    message.edge !== undefined && (obj.edge = message.edge);
+    message.edgeRow !== undefined && (obj.edgeRow = message.edgeRow);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<EdgeRow>): EdgeRow {
-    const message = { ...baseEdgeRow } as EdgeRow;
+  fromPartial(object: DeepPartial<AdjanceyMatrix>): AdjanceyMatrix {
+    const message = { ...baseAdjanceyMatrix } as AdjanceyMatrix;
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
     } else {
       message.id = 0;
     }
-    if (object.edge !== undefined && object.edge !== null) {
-      message.edge = object.edge;
+    if (object.edgeRow !== undefined && object.edgeRow !== null) {
+      message.edgeRow = object.edgeRow;
     } else {
-      message.edge = false;
+      message.edgeRow = "";
     }
     return message;
   },

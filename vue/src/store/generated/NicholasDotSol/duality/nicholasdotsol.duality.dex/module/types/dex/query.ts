@@ -13,6 +13,7 @@ import { TokenMap } from "../dex/token_map";
 import { Shares } from "../dex/shares";
 import { FeeList } from "../dex/fee_list";
 import { EdgeRow } from "../dex/edge_row";
+import { AdjanceyMatrix } from "../dex/adjancey_matrix";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -145,6 +146,23 @@ export interface QueryAllEdgeRowRequest {
 
 export interface QueryAllEdgeRowResponse {
   EdgeRow: EdgeRow[];
+  pagination: PageResponse | undefined;
+}
+
+export interface QueryGetAdjanceyMatrixRequest {
+  id: number;
+}
+
+export interface QueryGetAdjanceyMatrixResponse {
+  AdjanceyMatrix: AdjanceyMatrix | undefined;
+}
+
+export interface QueryAllAdjanceyMatrixRequest {
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryAllAdjanceyMatrixResponse {
+  AdjanceyMatrix: AdjanceyMatrix[];
   pagination: PageResponse | undefined;
 }
 
@@ -2338,6 +2356,330 @@ export const QueryAllEdgeRowResponse = {
   },
 };
 
+const baseQueryGetAdjanceyMatrixRequest: object = { id: 0 };
+
+export const QueryGetAdjanceyMatrixRequest = {
+  encode(
+    message: QueryGetAdjanceyMatrixRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.id !== 0) {
+      writer.uint32(8).uint64(message.id);
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryGetAdjanceyMatrixRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryGetAdjanceyMatrixRequest,
+    } as QueryGetAdjanceyMatrixRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetAdjanceyMatrixRequest {
+    const message = {
+      ...baseQueryGetAdjanceyMatrixRequest,
+    } as QueryGetAdjanceyMatrixRequest;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = Number(object.id);
+    } else {
+      message.id = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetAdjanceyMatrixRequest): unknown {
+    const obj: any = {};
+    message.id !== undefined && (obj.id = message.id);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetAdjanceyMatrixRequest>
+  ): QueryGetAdjanceyMatrixRequest {
+    const message = {
+      ...baseQueryGetAdjanceyMatrixRequest,
+    } as QueryGetAdjanceyMatrixRequest;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
+    } else {
+      message.id = 0;
+    }
+    return message;
+  },
+};
+
+const baseQueryGetAdjanceyMatrixResponse: object = {};
+
+export const QueryGetAdjanceyMatrixResponse = {
+  encode(
+    message: QueryGetAdjanceyMatrixResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.AdjanceyMatrix !== undefined) {
+      AdjanceyMatrix.encode(
+        message.AdjanceyMatrix,
+        writer.uint32(10).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryGetAdjanceyMatrixResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryGetAdjanceyMatrixResponse,
+    } as QueryGetAdjanceyMatrixResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.AdjanceyMatrix = AdjanceyMatrix.decode(
+            reader,
+            reader.uint32()
+          );
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetAdjanceyMatrixResponse {
+    const message = {
+      ...baseQueryGetAdjanceyMatrixResponse,
+    } as QueryGetAdjanceyMatrixResponse;
+    if (object.AdjanceyMatrix !== undefined && object.AdjanceyMatrix !== null) {
+      message.AdjanceyMatrix = AdjanceyMatrix.fromJSON(object.AdjanceyMatrix);
+    } else {
+      message.AdjanceyMatrix = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetAdjanceyMatrixResponse): unknown {
+    const obj: any = {};
+    message.AdjanceyMatrix !== undefined &&
+      (obj.AdjanceyMatrix = message.AdjanceyMatrix
+        ? AdjanceyMatrix.toJSON(message.AdjanceyMatrix)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetAdjanceyMatrixResponse>
+  ): QueryGetAdjanceyMatrixResponse {
+    const message = {
+      ...baseQueryGetAdjanceyMatrixResponse,
+    } as QueryGetAdjanceyMatrixResponse;
+    if (object.AdjanceyMatrix !== undefined && object.AdjanceyMatrix !== null) {
+      message.AdjanceyMatrix = AdjanceyMatrix.fromPartial(
+        object.AdjanceyMatrix
+      );
+    } else {
+      message.AdjanceyMatrix = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllAdjanceyMatrixRequest: object = {};
+
+export const QueryAllAdjanceyMatrixRequest = {
+  encode(
+    message: QueryAllAdjanceyMatrixRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryAllAdjanceyMatrixRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryAllAdjanceyMatrixRequest,
+    } as QueryAllAdjanceyMatrixRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllAdjanceyMatrixRequest {
+    const message = {
+      ...baseQueryAllAdjanceyMatrixRequest,
+    } as QueryAllAdjanceyMatrixRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllAdjanceyMatrixRequest): unknown {
+    const obj: any = {};
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageRequest.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryAllAdjanceyMatrixRequest>
+  ): QueryAllAdjanceyMatrixRequest {
+    const message = {
+      ...baseQueryAllAdjanceyMatrixRequest,
+    } as QueryAllAdjanceyMatrixRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllAdjanceyMatrixResponse: object = {};
+
+export const QueryAllAdjanceyMatrixResponse = {
+  encode(
+    message: QueryAllAdjanceyMatrixResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    for (const v of message.AdjanceyMatrix) {
+      AdjanceyMatrix.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(
+        message.pagination,
+        writer.uint32(18).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryAllAdjanceyMatrixResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryAllAdjanceyMatrixResponse,
+    } as QueryAllAdjanceyMatrixResponse;
+    message.AdjanceyMatrix = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.AdjanceyMatrix.push(
+            AdjanceyMatrix.decode(reader, reader.uint32())
+          );
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllAdjanceyMatrixResponse {
+    const message = {
+      ...baseQueryAllAdjanceyMatrixResponse,
+    } as QueryAllAdjanceyMatrixResponse;
+    message.AdjanceyMatrix = [];
+    if (object.AdjanceyMatrix !== undefined && object.AdjanceyMatrix !== null) {
+      for (const e of object.AdjanceyMatrix) {
+        message.AdjanceyMatrix.push(AdjanceyMatrix.fromJSON(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllAdjanceyMatrixResponse): unknown {
+    const obj: any = {};
+    if (message.AdjanceyMatrix) {
+      obj.AdjanceyMatrix = message.AdjanceyMatrix.map((e) =>
+        e ? AdjanceyMatrix.toJSON(e) : undefined
+      );
+    } else {
+      obj.AdjanceyMatrix = [];
+    }
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageResponse.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryAllAdjanceyMatrixResponse>
+  ): QueryAllAdjanceyMatrixResponse {
+    const message = {
+      ...baseQueryAllAdjanceyMatrixResponse,
+    } as QueryAllAdjanceyMatrixResponse;
+    message.AdjanceyMatrix = [];
+    if (object.AdjanceyMatrix !== undefined && object.AdjanceyMatrix !== null) {
+      for (const e of object.AdjanceyMatrix) {
+        message.AdjanceyMatrix.push(AdjanceyMatrix.fromPartial(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -2372,6 +2714,14 @@ export interface Query {
   EdgeRow(request: QueryGetEdgeRowRequest): Promise<QueryGetEdgeRowResponse>;
   /** Queries a list of EdgeRow items. */
   EdgeRowAll(request: QueryAllEdgeRowRequest): Promise<QueryAllEdgeRowResponse>;
+  /** Queries a AdjanceyMatrix by id. */
+  AdjanceyMatrix(
+    request: QueryGetAdjanceyMatrixRequest
+  ): Promise<QueryGetAdjanceyMatrixResponse>;
+  /** Queries a list of AdjanceyMatrix items. */
+  AdjanceyMatrixAll(
+    request: QueryAllAdjanceyMatrixRequest
+  ): Promise<QueryAllAdjanceyMatrixResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -2566,6 +2916,34 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QueryAllEdgeRowResponse.decode(new Reader(data))
+    );
+  }
+
+  AdjanceyMatrix(
+    request: QueryGetAdjanceyMatrixRequest
+  ): Promise<QueryGetAdjanceyMatrixResponse> {
+    const data = QueryGetAdjanceyMatrixRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "AdjanceyMatrix",
+      data
+    );
+    return promise.then((data) =>
+      QueryGetAdjanceyMatrixResponse.decode(new Reader(data))
+    );
+  }
+
+  AdjanceyMatrixAll(
+    request: QueryAllAdjanceyMatrixRequest
+  ): Promise<QueryAllAdjanceyMatrixResponse> {
+    const data = QueryAllAdjanceyMatrixRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "AdjanceyMatrixAll",
+      data
+    );
+    return promise.then((data) =>
+      QueryAllAdjanceyMatrixResponse.decode(new Reader(data))
     );
   }
 }
