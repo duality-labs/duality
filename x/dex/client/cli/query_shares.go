@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -55,13 +56,25 @@ func CmdShowShares() *cobra.Command {
 			argAddress := args[0]
 			argPairId := args[1]
 			argPriceIndex := args[2]
-			argFee := args[3]
+			argFeeIndex := args[3]
+
+			tmpArgPriceIndex, err := strconv.Atoi(argPriceIndex)
+
+			if err != nil {
+				return err
+			}
+
+			tmpArgFeeIndex, err := strconv.Atoi(argFeeIndex)
+
+			if err != nil {
+				return err
+			}
 
 			params := &types.QueryGetSharesRequest{
 				Address:    argAddress,
 				PairId:     argPairId,
-				PriceIndex: argPriceIndex,
-				Fee:        argFee,
+				PriceIndex: int64(tmpArgPriceIndex),
+				Fee:        uint64(tmpArgFeeIndex),
 			}
 
 			res, err := queryClient.Shares(context.Background(), params)

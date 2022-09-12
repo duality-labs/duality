@@ -37,6 +37,9 @@ const (
 
 	// PairMapKeyPrefix is the prefix to retrieve all PairMap
 	PairMapKeyPrefix = "PairMap/value/"
+
+	// SharesKeyPrefix is the prefix to retrieve all Shares
+	SharesKeyPrefix = "Shares/value/"
 )
 
 func TickPrefix(pairId string) []byte {
@@ -69,6 +72,29 @@ func PairMapKey(pairId string) []byte {
 
 	pairIdBytes := []byte(pairId)
 	key = append(key, pairIdBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+// SharesKey returns the store key to retrieve a Shares from the index fields
+func SharesKey(address string, pairId string, priceIndex int64, feeIndex uint64) []byte {
+	var key []byte
+
+	addressBytes := []byte(address)
+	key = append(key, addressBytes...)
+	key = append(key, []byte("/")...)
+
+	pairIdBytes := []byte(pairId)
+	key = append(key, pairIdBytes...)
+	key = append(key, []byte("/")...)
+
+	priceIndexBytes := []byte(string(priceIndex))
+	key = append(key, priceIndexBytes...)
+	key = append(key, []byte("/")...)
+
+	feeBytes := []byte(string(feeIndex))
+	key = append(key, feeBytes...)
 	key = append(key, []byte("/")...)
 
 	return key

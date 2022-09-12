@@ -191,8 +191,8 @@ message QueryAllTokenMapResponse {
 message QueryGetSharesRequest {
 	  string address = 1;
   string pairId = 2;
-  string priceIndex = 3;
-  string fee = 4;
+  int64 priceIndex = 3;
+  uint64 fee = 4;
 
 }
 

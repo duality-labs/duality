@@ -31,8 +31,8 @@ func networkWithSharesObjects(t *testing.T, n int) (*network.Network, []types.Sh
 		shares := types.Shares{
 			Address:    strconv.Itoa(i),
 			PairId:     strconv.Itoa(i),
-			PriceIndex: strconv.Itoa(i),
-			Fee:        strconv.Itoa(i),
+			PriceIndex: int64(i),
+			FeeIndex:   uint64(i),
 		}
 		nullify.Fill(&shares)
 		state.SharesList = append(state.SharesList, shares)
@@ -54,8 +54,8 @@ func TestShowShares(t *testing.T) {
 		desc         string
 		idAddress    string
 		idPairId     string
-		idPriceIndex string
-		idFee        string
+		idPriceIndex int64
+		idFee        uint64
 
 		args []string
 		err  error
@@ -66,7 +66,7 @@ func TestShowShares(t *testing.T) {
 			idAddress:    objs[0].Address,
 			idPairId:     objs[0].PairId,
 			idPriceIndex: objs[0].PriceIndex,
-			idFee:        objs[0].Fee,
+			idFee:        objs[0].FeeIndex,
 
 			args: common,
 			obj:  objs[0],
@@ -75,8 +75,8 @@ func TestShowShares(t *testing.T) {
 			desc:         "not found",
 			idAddress:    strconv.Itoa(100000),
 			idPairId:     strconv.Itoa(100000),
-			idPriceIndex: strconv.Itoa(100000),
-			idFee:        strconv.Itoa(100000),
+			idPriceIndex: int64(100000),
+			idFee:        uint64(100000),
 
 			args: common,
 			err:  status.Error(codes.NotFound, "not found"),
@@ -86,8 +86,8 @@ func TestShowShares(t *testing.T) {
 			args := []string{
 				tc.idAddress,
 				tc.idPairId,
-				tc.idPriceIndex,
-				tc.idFee,
+				string(tc.idPriceIndex),
+				string(tc.idFee),
 			}
 			args = append(args, tc.args...)
 			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowShares(), args)

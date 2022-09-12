@@ -467,7 +467,7 @@ func request_Query_Shares_0(ctx context.Context, marshaler runtime.Marshaler, cl
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "priceIndex")
 	}
 
-	protoReq.PriceIndex, err = runtime.String(val)
+	protoReq.PriceIndex, err = runtime.Int64(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "priceIndex", err)
@@ -478,7 +478,7 @@ func request_Query_Shares_0(ctx context.Context, marshaler runtime.Marshaler, cl
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "fee")
 	}
 
-	protoReq.Fee, err = runtime.String(val)
+	protoReq.Fee, err = runtime.Uint64(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "fee", err)
@@ -527,7 +527,7 @@ func local_request_Query_Shares_0(ctx context.Context, marshaler runtime.Marshal
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "priceIndex")
 	}
 
-	protoReq.PriceIndex, err = runtime.String(val)
+	protoReq.PriceIndex, err = runtime.Int64(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "priceIndex", err)
@@ -538,7 +538,7 @@ func local_request_Query_Shares_0(ctx context.Context, marshaler runtime.Marshal
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "fee")
 	}
 
-	protoReq.Fee, err = runtime.String(val)
+	protoReq.Fee, err = runtime.Uint64(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "fee", err)

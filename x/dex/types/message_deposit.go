@@ -9,7 +9,7 @@ const TypeMsgDeposit = "deposit"
 
 var _ sdk.Msg = &MsgDeposit{}
 
-func NewMsgDeposit(creator string, tokenA string, tokenB string, amountA string, amountB string, priceIndex int64, fee int64) *MsgDeposit {
+func NewMsgDeposit(creator string, tokenA string, tokenB string, amountA string, amountB string, priceIndex int64, feeIndex uint64) *MsgDeposit {
 	return &MsgDeposit{
 		Creator:    creator,
 		TokenA:     tokenA,
@@ -17,7 +17,7 @@ func NewMsgDeposit(creator string, tokenA string, tokenB string, amountA string,
 		AmountA:    amountA,
 		AmountB:    amountB,
 		PriceIndex: priceIndex,
-		Fee:        fee,
+		FeeIndex:   feeIndex,
 	}
 }
 

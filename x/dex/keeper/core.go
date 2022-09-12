@@ -144,7 +144,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 
 	}
 
-	shares, sharesFound := k.GetShares(ctx, msg.Creator, pairId, string(msg.PriceIndex), string(msg.FeeIndex))
+	shares, sharesFound := k.GetShares(ctx, msg.Creator, pairId, msg.PriceIndex, msg.FeeIndex)
 
 	if !sharesFound {
 		shares.SharesOwned = sharesMinted

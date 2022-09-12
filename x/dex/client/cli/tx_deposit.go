@@ -31,7 +31,7 @@ func CmdDeposit() *cobra.Command {
 				return err
 			}
 
-			tmpArgFee, err := strconv.Atoi(argFee)
+			tmpArgFeeIndex, err := strconv.Atoi(argFee)
 
 			if err != nil {
 				return err
@@ -49,7 +49,7 @@ func CmdDeposit() *cobra.Command {
 				argAmount0,
 				argAmount1,
 				int64(tmpArgPriceIndex),
-				int64(tmpArgFee),
+				uint64(tmpArgFeeIndex),
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

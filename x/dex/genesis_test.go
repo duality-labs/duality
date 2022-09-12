@@ -43,14 +43,14 @@ func TestGenesis(t *testing.T) {
 			{
 				Address:    "0",
 				PairId:     "0",
-				PriceIndex: "0",
-				Fee:        "0",
+				PriceIndex: 0,
+				FeeIndex:   0,
 			},
 			{
 				Address:    "1",
 				PairId:     "1",
-				PriceIndex: "1",
-				Fee:        "1",
+				PriceIndex: 1,
+				FeeIndex:   uint64(1),
 			},
 		},
 		FeeListList: []types.FeeList{
