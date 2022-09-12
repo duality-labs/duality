@@ -102,6 +102,8 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 	trueAmount0 := amount0
 	trueAmount1 := amount1
 	var sharesMinted sdk.Dec
+	var oldReserve0 sdk.Dec
+	var oldReserve1 sdk.Dec
 
 	price, err := calc_price(msg.PriceIndex)
 
@@ -121,6 +123,9 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 			subFeeTick.TickData.Reserve1 = make([]sdk.Dec, k.GetFeeListCount(ctx))
 		}
 
+		oldReserve0 = sdk.ZeroDec()
+		oldReserve1 = sdk.ZeroDec()
+
 		addFeeTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0 = trueAmount0
 		addFeeTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares = sharesMinted
 
@@ -137,6 +142,8 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 
 		sharesMinted = (trueAmount0.Quo(addFeeTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0).Mul(addFeeTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares)).Add(trueAmount1.Quo(subFeeTick.TickData.Reserve1[msg.FeeIndex]).Mul(addFeeTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares))
 
+		oldReserve0 = addFeeTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0
+		oldReserve1 = subFeeTick.TickData.Reserve1[msg.FeeIndex]
 		addFeeTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0 = addFeeTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.Add(trueAmount0)
 		addFeeTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares = addFeeTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares.Add(sharesMinted)
 
@@ -173,6 +180,12 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 	k.SetTickMap(ctx, pairId, addFeeTick)
 	k.SetTickMap(ctx, pairId, subFeeTick)
 	k.SetShares(ctx, shares)
+
+	ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator,
+		token0, token1, string(msg.PriceIndex), string(msg.FeeIndex),
+		oldReserve0.String(), oldReserve1.String(), subFeeTick.TickData.Reserve1[msg.FeeIndex].String(), addFeeTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.String(),
+		sharesMinted.String()),
+	)
 
 	_ = goCtx
 	return nil
