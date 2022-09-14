@@ -29828,7 +29828,13 @@ paths:
                       type: string
                       format: uint64
                     edgeRow:
-                      type: string
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uint64
+                        edge:
+                          type: boolean
               pagination:
                 type: object
                 properties:
@@ -29950,7 +29956,13 @@ paths:
                     type: string
                     format: uint64
                   edgeRow:
-                    type: string
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uint64
+                      edge:
+                        type: boolean
         default:
           description: An unexpected error response.
           schema:
@@ -30165,6 +30177,7 @@ paths:
                       format: uint64
                     fee:
                       type: string
+                      format: int64
               pagination:
                 type: object
                 properties:
@@ -30287,6 +30300,7 @@ paths:
                     format: uint64
                   fee:
                     type: string
+                    format: int64
         default:
           description: An unexpected error response.
           schema:
@@ -30549,8 +30563,10 @@ paths:
                       type: string
                     priceIndex:
                       type: string
-                    fee:
+                      format: int64
+                    feeIndex:
                       type: string
+                      format: uint64
                     sharesOwned:
                       type: string
               pagination:
@@ -30676,8 +30692,10 @@ paths:
                     type: string
                   priceIndex:
                     type: string
-                  fee:
+                    format: int64
+                  feeIndex:
                     type: string
+                    format: uint64
                   sharesOwned:
                     type: string
         default:
@@ -30711,10 +30729,12 @@ paths:
           in: path
           required: true
           type: string
+          format: int64
         - name: fee
           in: path
           required: true
           type: string
+          format: uint64
       tags:
         - Query
   /NicholasDotSol/duality/dex/tick_map:
@@ -52966,7 +52986,13 @@ definitions:
         type: string
         format: uint64
       edgeRow:
-        type: string
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+          edge:
+            type: boolean
   nicholasdotsol.duality.dex.EdgeRow:
     type: object
     properties:
@@ -52983,6 +53009,7 @@ definitions:
         format: uint64
       fee:
         type: string
+        format: int64
   nicholasdotsol.duality.dex.MsgDepositResponse:
     type: object
   nicholasdotsol.duality.dex.MsgSwapResponse:
@@ -53018,7 +53045,13 @@ definitions:
               type: string
               format: uint64
             edgeRow:
-              type: string
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uint64
+                edge:
+                  type: boolean
       pagination:
         type: object
         properties:
@@ -53095,6 +53128,7 @@ definitions:
               format: uint64
             fee:
               type: string
+              format: int64
       pagination:
         type: object
         properties:
@@ -53178,8 +53212,10 @@ definitions:
               type: string
             priceIndex:
               type: string
-            fee:
+              format: int64
+            feeIndex:
               type: string
+              format: uint64
             sharesOwned:
               type: string
       pagination:
@@ -53345,7 +53381,13 @@ definitions:
             type: string
             format: uint64
           edgeRow:
-            type: string
+            type: object
+            properties:
+              id:
+                type: string
+                format: uint64
+              edge:
+                type: boolean
   nicholasdotsol.duality.dex.QueryGetEdgeRowResponse:
     type: object
     properties:
@@ -53368,6 +53410,7 @@ definitions:
             format: uint64
           fee:
             type: string
+            format: int64
   nicholasdotsol.duality.dex.QueryGetPairMapResponse:
     type: object
     properties:
@@ -53397,8 +53440,10 @@ definitions:
             type: string
           priceIndex:
             type: string
-          fee:
+            format: int64
+          feeIndex:
             type: string
+            format: uint64
           sharesOwned:
             type: string
   nicholasdotsol.duality.dex.QueryGetTickMapResponse:
@@ -53471,8 +53516,10 @@ definitions:
         type: string
       priceIndex:
         type: string
-      fee:
+        format: int64
+      feeIndex:
         type: string
+        format: uint64
       sharesOwned:
         type: string
   nicholasdotsol.duality.dex.TickDataType:

@@ -1,23 +1,24 @@
 /* eslint-disable */
 import * as Long from "long";
 import { util, configure, Writer, Reader } from "protobufjs/minimal";
+import { EdgeRow } from "../dex/edge_row";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
 export interface AdjanceyMatrix {
   id: number;
-  edgeRow: string;
+  edgeRow: EdgeRow | undefined;
 }
 
-const baseAdjanceyMatrix: object = { id: 0, edgeRow: "" };
+const baseAdjanceyMatrix: object = { id: 0 };
 
 export const AdjanceyMatrix = {
   encode(message: AdjanceyMatrix, writer: Writer = Writer.create()): Writer {
     if (message.id !== 0) {
       writer.uint32(8).uint64(message.id);
     }
-    if (message.edgeRow !== "") {
-      writer.uint32(18).string(message.edgeRow);
+    if (message.edgeRow !== undefined) {
+      EdgeRow.encode(message.edgeRow, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -33,7 +34,7 @@ export const AdjanceyMatrix = {
           message.id = longToNumber(reader.uint64() as Long);
           break;
         case 2:
-          message.edgeRow = reader.string();
+          message.edgeRow = EdgeRow.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -51,9 +52,9 @@ export const AdjanceyMatrix = {
       message.id = 0;
     }
     if (object.edgeRow !== undefined && object.edgeRow !== null) {
-      message.edgeRow = String(object.edgeRow);
+      message.edgeRow = EdgeRow.fromJSON(object.edgeRow);
     } else {
-      message.edgeRow = "";
+      message.edgeRow = undefined;
     }
     return message;
   },
@@ -61,7 +62,10 @@ export const AdjanceyMatrix = {
   toJSON(message: AdjanceyMatrix): unknown {
     const obj: any = {};
     message.id !== undefined && (obj.id = message.id);
-    message.edgeRow !== undefined && (obj.edgeRow = message.edgeRow);
+    message.edgeRow !== undefined &&
+      (obj.edgeRow = message.edgeRow
+        ? EdgeRow.toJSON(message.edgeRow)
+        : undefined);
     return obj;
   },
 
@@ -73,9 +77,9 @@ export const AdjanceyMatrix = {
       message.id = 0;
     }
     if (object.edgeRow !== undefined && object.edgeRow !== null) {
-      message.edgeRow = object.edgeRow;
+      message.edgeRow = EdgeRow.fromPartial(object.edgeRow);
     } else {
-      message.edgeRow = "";
+      message.edgeRow = undefined;
     }
     return message;
   },

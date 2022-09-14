@@ -1,21 +1,22 @@
 /* eslint-disable */
-import { Writer, Reader } from "protobufjs/minimal";
+import * as Long from "long";
+import { util, configure, Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
 export interface Shares {
   address: string;
   pairId: string;
-  priceIndex: string;
-  fee: string;
+  priceIndex: number;
+  feeIndex: number;
   sharesOwned: string;
 }
 
 const baseShares: object = {
   address: "",
   pairId: "",
-  priceIndex: "",
-  fee: "",
+  priceIndex: 0,
+  feeIndex: 0,
   sharesOwned: "",
 };
 
@@ -27,11 +28,11 @@ export const Shares = {
     if (message.pairId !== "") {
       writer.uint32(18).string(message.pairId);
     }
-    if (message.priceIndex !== "") {
-      writer.uint32(26).string(message.priceIndex);
+    if (message.priceIndex !== 0) {
+      writer.uint32(24).int64(message.priceIndex);
     }
-    if (message.fee !== "") {
-      writer.uint32(34).string(message.fee);
+    if (message.feeIndex !== 0) {
+      writer.uint32(32).uint64(message.feeIndex);
     }
     if (message.sharesOwned !== "") {
       writer.uint32(42).string(message.sharesOwned);
@@ -53,10 +54,10 @@ export const Shares = {
           message.pairId = reader.string();
           break;
         case 3:
-          message.priceIndex = reader.string();
+          message.priceIndex = longToNumber(reader.int64() as Long);
           break;
         case 4:
-          message.fee = reader.string();
+          message.feeIndex = longToNumber(reader.uint64() as Long);
           break;
         case 5:
           message.sharesOwned = reader.string();
@@ -82,14 +83,14 @@ export const Shares = {
       message.pairId = "";
     }
     if (object.priceIndex !== undefined && object.priceIndex !== null) {
-      message.priceIndex = String(object.priceIndex);
+      message.priceIndex = Number(object.priceIndex);
     } else {
-      message.priceIndex = "";
+      message.priceIndex = 0;
     }
-    if (object.fee !== undefined && object.fee !== null) {
-      message.fee = String(object.fee);
+    if (object.feeIndex !== undefined && object.feeIndex !== null) {
+      message.feeIndex = Number(object.feeIndex);
     } else {
-      message.fee = "";
+      message.feeIndex = 0;
     }
     if (object.sharesOwned !== undefined && object.sharesOwned !== null) {
       message.sharesOwned = String(object.sharesOwned);
@@ -104,7 +105,7 @@ export const Shares = {
     message.address !== undefined && (obj.address = message.address);
     message.pairId !== undefined && (obj.pairId = message.pairId);
     message.priceIndex !== undefined && (obj.priceIndex = message.priceIndex);
-    message.fee !== undefined && (obj.fee = message.fee);
+    message.feeIndex !== undefined && (obj.feeIndex = message.feeIndex);
     message.sharesOwned !== undefined &&
       (obj.sharesOwned = message.sharesOwned);
     return obj;
@@ -125,12 +126,12 @@ export const Shares = {
     if (object.priceIndex !== undefined && object.priceIndex !== null) {
       message.priceIndex = object.priceIndex;
     } else {
-      message.priceIndex = "";
+      message.priceIndex = 0;
     }
-    if (object.fee !== undefined && object.fee !== null) {
-      message.fee = object.fee;
+    if (object.feeIndex !== undefined && object.feeIndex !== null) {
+      message.feeIndex = object.feeIndex;
     } else {
-      message.fee = "";
+      message.feeIndex = 0;
     }
     if (object.sharesOwned !== undefined && object.sharesOwned !== null) {
       message.sharesOwned = object.sharesOwned;
@@ -140,6 +141,16 @@ export const Shares = {
     return message;
   },
 };
+
+declare var self: any | undefined;
+declare var window: any | undefined;
+var globalThis: any = (() => {
+  if (typeof globalThis !== "undefined") return globalThis;
+  if (typeof self !== "undefined") return self;
+  if (typeof window !== "undefined") return window;
+  if (typeof global !== "undefined") return global;
+  throw "Unable to locate global object";
+})();
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 export type DeepPartial<T> = T extends Builtin
@@ -151,3 +162,15 @@ export type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+function longToNumber(long: Long): number {
+  if (long.gt(Number.MAX_SAFE_INTEGER)) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  return long.toNumber();
+}
+
+if (util.Long !== Long) {
+  util.Long = Long as any;
+  configure();
+}

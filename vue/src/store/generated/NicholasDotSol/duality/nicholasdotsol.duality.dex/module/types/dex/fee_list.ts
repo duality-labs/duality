@@ -6,18 +6,18 @@ export const protobufPackage = "nicholasdotsol.duality.dex";
 
 export interface FeeList {
   id: number;
-  fee: string;
+  fee: number;
 }
 
-const baseFeeList: object = { id: 0, fee: "" };
+const baseFeeList: object = { id: 0, fee: 0 };
 
 export const FeeList = {
   encode(message: FeeList, writer: Writer = Writer.create()): Writer {
     if (message.id !== 0) {
       writer.uint32(8).uint64(message.id);
     }
-    if (message.fee !== "") {
-      writer.uint32(18).string(message.fee);
+    if (message.fee !== 0) {
+      writer.uint32(16).int64(message.fee);
     }
     return writer;
   },
@@ -33,7 +33,7 @@ export const FeeList = {
           message.id = longToNumber(reader.uint64() as Long);
           break;
         case 2:
-          message.fee = reader.string();
+          message.fee = longToNumber(reader.int64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -51,9 +51,9 @@ export const FeeList = {
       message.id = 0;
     }
     if (object.fee !== undefined && object.fee !== null) {
-      message.fee = String(object.fee);
+      message.fee = Number(object.fee);
     } else {
-      message.fee = "";
+      message.fee = 0;
     }
     return message;
   },
@@ -75,7 +75,7 @@ export const FeeList = {
     if (object.fee !== undefined && object.fee !== null) {
       message.fee = object.fee;
     } else {
-      message.fee = "";
+      message.fee = 0;
     }
     return message;
   },

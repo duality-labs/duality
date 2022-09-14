@@ -12,7 +12,7 @@
 export interface DexAdjanceyMatrix {
   /** @format uint64 */
   id?: string;
-  edgeRow?: string;
+  edgeRow?: DexEdgeRow;
 }
 
 export interface DexEdgeRow {
@@ -24,6 +24,8 @@ export interface DexEdgeRow {
 export interface DexFeeList {
   /** @format uint64 */
   id?: string;
+
+  /** @format int64 */
   fee?: string;
 }
 
@@ -211,8 +213,12 @@ export interface DexReserve0AndSharesType {
 export interface DexShares {
   address?: string;
   pairId?: string;
+
+  /** @format int64 */
   priceIndex?: string;
-  fee?: string;
+
+  /** @format uint64 */
+  feeIndex?: string;
   sharesOwned?: string;
 }
 

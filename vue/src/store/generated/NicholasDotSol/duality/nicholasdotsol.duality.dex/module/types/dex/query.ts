@@ -98,8 +98,8 @@ export interface QueryAllTokenMapResponse {
 export interface QueryGetSharesRequest {
   address: string;
   pairId: string;
-  priceIndex: string;
-  fee: string;
+  priceIndex: number;
+  fee: number;
 }
 
 export interface QueryGetSharesResponse {
@@ -1447,8 +1447,8 @@ export const QueryAllTokenMapResponse = {
 const baseQueryGetSharesRequest: object = {
   address: "",
   pairId: "",
-  priceIndex: "",
-  fee: "",
+  priceIndex: 0,
+  fee: 0,
 };
 
 export const QueryGetSharesRequest = {
@@ -1462,11 +1462,11 @@ export const QueryGetSharesRequest = {
     if (message.pairId !== "") {
       writer.uint32(18).string(message.pairId);
     }
-    if (message.priceIndex !== "") {
-      writer.uint32(26).string(message.priceIndex);
+    if (message.priceIndex !== 0) {
+      writer.uint32(24).int64(message.priceIndex);
     }
-    if (message.fee !== "") {
-      writer.uint32(34).string(message.fee);
+    if (message.fee !== 0) {
+      writer.uint32(32).uint64(message.fee);
     }
     return writer;
   },
@@ -1485,10 +1485,10 @@ export const QueryGetSharesRequest = {
           message.pairId = reader.string();
           break;
         case 3:
-          message.priceIndex = reader.string();
+          message.priceIndex = longToNumber(reader.int64() as Long);
           break;
         case 4:
-          message.fee = reader.string();
+          message.fee = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -1511,14 +1511,14 @@ export const QueryGetSharesRequest = {
       message.pairId = "";
     }
     if (object.priceIndex !== undefined && object.priceIndex !== null) {
-      message.priceIndex = String(object.priceIndex);
+      message.priceIndex = Number(object.priceIndex);
     } else {
-      message.priceIndex = "";
+      message.priceIndex = 0;
     }
     if (object.fee !== undefined && object.fee !== null) {
-      message.fee = String(object.fee);
+      message.fee = Number(object.fee);
     } else {
-      message.fee = "";
+      message.fee = 0;
     }
     return message;
   },
@@ -1549,12 +1549,12 @@ export const QueryGetSharesRequest = {
     if (object.priceIndex !== undefined && object.priceIndex !== null) {
       message.priceIndex = object.priceIndex;
     } else {
-      message.priceIndex = "";
+      message.priceIndex = 0;
     }
     if (object.fee !== undefined && object.fee !== null) {
       message.fee = object.fee;
     } else {
-      message.fee = "";
+      message.fee = 0;
     }
     return message;
   },

@@ -11,7 +11,7 @@ export interface MsgDeposit {
   amountA: string;
   amountB: string;
   priceIndex: number;
-  fee: number;
+  feeIndex: number;
 }
 
 export interface MsgDepositResponse {}
@@ -22,7 +22,7 @@ export interface MsgWithdrawl {
   tokenB: string;
   sharesToRemove: string;
   priceIndex: number;
-  fee: number;
+  feeIndex: number;
   receiver: string;
 }
 
@@ -44,7 +44,7 @@ const baseMsgDeposit: object = {
   amountA: "",
   amountB: "",
   priceIndex: 0,
-  fee: 0,
+  feeIndex: 0,
 };
 
 export const MsgDeposit = {
@@ -67,8 +67,8 @@ export const MsgDeposit = {
     if (message.priceIndex !== 0) {
       writer.uint32(48).int64(message.priceIndex);
     }
-    if (message.fee !== 0) {
-      writer.uint32(56).int64(message.fee);
+    if (message.feeIndex !== 0) {
+      writer.uint32(56).uint64(message.feeIndex);
     }
     return writer;
   },
@@ -99,7 +99,7 @@ export const MsgDeposit = {
           message.priceIndex = longToNumber(reader.int64() as Long);
           break;
         case 7:
-          message.fee = longToNumber(reader.int64() as Long);
+          message.feeIndex = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -141,10 +141,10 @@ export const MsgDeposit = {
     } else {
       message.priceIndex = 0;
     }
-    if (object.fee !== undefined && object.fee !== null) {
-      message.fee = Number(object.fee);
+    if (object.feeIndex !== undefined && object.feeIndex !== null) {
+      message.feeIndex = Number(object.feeIndex);
     } else {
-      message.fee = 0;
+      message.feeIndex = 0;
     }
     return message;
   },
@@ -157,7 +157,7 @@ export const MsgDeposit = {
     message.amountA !== undefined && (obj.amountA = message.amountA);
     message.amountB !== undefined && (obj.amountB = message.amountB);
     message.priceIndex !== undefined && (obj.priceIndex = message.priceIndex);
-    message.fee !== undefined && (obj.fee = message.fee);
+    message.feeIndex !== undefined && (obj.feeIndex = message.feeIndex);
     return obj;
   },
 
@@ -193,10 +193,10 @@ export const MsgDeposit = {
     } else {
       message.priceIndex = 0;
     }
-    if (object.fee !== undefined && object.fee !== null) {
-      message.fee = object.fee;
+    if (object.feeIndex !== undefined && object.feeIndex !== null) {
+      message.feeIndex = object.feeIndex;
     } else {
-      message.fee = 0;
+      message.feeIndex = 0;
     }
     return message;
   },
@@ -246,7 +246,7 @@ const baseMsgWithdrawl: object = {
   tokenB: "",
   sharesToRemove: "",
   priceIndex: 0,
-  fee: 0,
+  feeIndex: 0,
   receiver: "",
 };
 
@@ -267,8 +267,8 @@ export const MsgWithdrawl = {
     if (message.priceIndex !== 0) {
       writer.uint32(40).int64(message.priceIndex);
     }
-    if (message.fee !== 0) {
-      writer.uint32(48).int64(message.fee);
+    if (message.feeIndex !== 0) {
+      writer.uint32(48).uint64(message.feeIndex);
     }
     if (message.receiver !== "") {
       writer.uint32(58).string(message.receiver);
@@ -299,7 +299,7 @@ export const MsgWithdrawl = {
           message.priceIndex = longToNumber(reader.int64() as Long);
           break;
         case 6:
-          message.fee = longToNumber(reader.int64() as Long);
+          message.feeIndex = longToNumber(reader.uint64() as Long);
           break;
         case 7:
           message.receiver = reader.string();
@@ -339,10 +339,10 @@ export const MsgWithdrawl = {
     } else {
       message.priceIndex = 0;
     }
-    if (object.fee !== undefined && object.fee !== null) {
-      message.fee = Number(object.fee);
+    if (object.feeIndex !== undefined && object.feeIndex !== null) {
+      message.feeIndex = Number(object.feeIndex);
     } else {
-      message.fee = 0;
+      message.feeIndex = 0;
     }
     if (object.receiver !== undefined && object.receiver !== null) {
       message.receiver = String(object.receiver);
@@ -360,7 +360,7 @@ export const MsgWithdrawl = {
     message.sharesToRemove !== undefined &&
       (obj.sharesToRemove = message.sharesToRemove);
     message.priceIndex !== undefined && (obj.priceIndex = message.priceIndex);
-    message.fee !== undefined && (obj.fee = message.fee);
+    message.feeIndex !== undefined && (obj.feeIndex = message.feeIndex);
     message.receiver !== undefined && (obj.receiver = message.receiver);
     return obj;
   },
@@ -392,10 +392,10 @@ export const MsgWithdrawl = {
     } else {
       message.priceIndex = 0;
     }
-    if (object.fee !== undefined && object.fee !== null) {
-      message.fee = object.fee;
+    if (object.feeIndex !== undefined && object.feeIndex !== null) {
+      message.feeIndex = object.feeIndex;
     } else {
-      message.fee = 0;
+      message.feeIndex = 0;
     }
     if (object.receiver !== undefined && object.receiver !== null) {
       message.receiver = object.receiver;

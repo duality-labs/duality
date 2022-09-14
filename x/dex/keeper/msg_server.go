@@ -30,6 +30,7 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 
 	//TODO add cases for multiDeposit when tickIndex != 1
 
+	//TODO remove msg if not needed
 	err = k.SingleDeposit(goCtx, msg, token0, token1, createrAddr, amount0, amount1)
 
 	if err != nil {
@@ -44,7 +45,13 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*types.MsgWithdrawlResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// TODO: Handling the message
+	token0, token1, createrAddr, sharesToRemove, err := k.withdrawlVerification(goCtx, *msg)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = k.SingleWithdrawl(goCtx, msg, token0, token1, createrAddr, sharesToRemove)
 	_ = ctx
 
 	return &types.MsgWithdrawlResponse{}, nil
