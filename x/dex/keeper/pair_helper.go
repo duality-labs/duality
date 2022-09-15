@@ -38,6 +38,6 @@ func (k Keeper) SortTokens(ctx sdk.Context, tokenA string, tokenB string) (strin
 
 }
 
-func (k Keeper) createPairId(token0 string, token1 string) (pairId string) {
+func (k Keeper) CreatePairId(token0 string, token1 string) (pairId string) {
 	return (token0 + "/" + token1)
 }

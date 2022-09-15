@@ -28,7 +28,7 @@ func (k Keeper) depositVerification(goCtx context.Context, msg types.MsgDeposit)
 	maxFee := k.GetFeeListCount(ctx)
 
 	if msg.FeeIndex >= maxFee {
-		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%s) does not correspond to a valid fee", msg.FeeIndex)
+		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", msg.FeeIndex)
 	}
 
 	amount0, err := sdk.NewDecFromStr(msg.AmountA)
@@ -75,7 +75,7 @@ func (k Keeper) withdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 	maxFee := k.GetFeeListCount(ctx)
 
 	if msg.FeeIndex >= maxFee {
-		return "", "", nil, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%s) does not correspond to a valid fee", msg.FeeIndex)
+		return "", "", nil, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", msg.FeeIndex)
 	}
 
 	// Converts input address (string) to sdk.AccAddress
@@ -92,7 +92,7 @@ func (k Keeper) withdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 		return "", "", nil, sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
-	pairId := k.createPairId(token0, token1)
+	pairId := k.CreatePairId(token0, token1)
 	shares, sharesFound := k.GetShares(ctx, msg.Creator, pairId, msg.PriceIndex, msg.FeeIndex)
 
 	if !sharesFound {

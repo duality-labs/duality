@@ -32,6 +32,7 @@ func TestTickMapQuerySingle(t *testing.T) {
 			desc: "First",
 			request: &types.QueryGetTickMapRequest{
 				TickIndex: msgs[0].TickIndex,
+				PairId:    "TokenA/TokenB",
 			},
 			response: &types.QueryGetTickMapResponse{TickMap: msgs[0]},
 		},
@@ -39,6 +40,7 @@ func TestTickMapQuerySingle(t *testing.T) {
 			desc: "Second",
 			request: &types.QueryGetTickMapRequest{
 				TickIndex: msgs[1].TickIndex,
+				PairId:    "TokenA/TokenB",
 			},
 			response: &types.QueryGetTickMapResponse{TickMap: msgs[1]},
 		},
