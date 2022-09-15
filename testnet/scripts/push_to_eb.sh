@@ -34,7 +34,7 @@ aws s3 cp $TMP_DIR/$APPLICATION_VERSION.zip s3://$EB_BUCKET/$EB_BUCKET_FOLDER/$A
 aws elasticbeanstalk create-application-version \
   --application-name $EB_APP_NAME \
   --version-label $APPLICATION_VERSION \
-  --source-bundle S3Bucket=$EB_BUCKET,S3Key=$EB_BUCKET_FOLDER/$APPLICATION_VERSION.zip
+  --source-bundle S3Bucket=$EB_BUCKET,S3Key=$EB_BUCKET_FOLDER/$APPLICATION_VERSION.zip & \
 
 # Update Elastic Beanstalk environment to new version
 aws elasticbeanstalk update-environment \
