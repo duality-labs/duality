@@ -60,7 +60,20 @@ func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*t
 func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSwapResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// TODO: Handling the message
+	token0, token1, createrAddr, amountIn, err := k.swapVerification(goCtx, *msg)
+
+	if msg.TokenIn == token0 {
+		err = k.Swap0to1(goCtx, msg, token0, token1, createrAddr, amountIn)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err = k.Swap1to0(goCtx, msg, token0, token1, createrAddr, amountIn)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	_ = ctx
 
 	return &types.MsgSwapResponse{}, nil

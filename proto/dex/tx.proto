@@ -41,9 +41,11 @@ message MsgWithdrawlResponse {
 
 message MsgSwap {
   string creator = 1;
-  string amountIn = 2;
-  string tokenIn = 3;
-  string slippageTolerance = 4;
+  string tokenA = 2;
+  string tokenB = 3;
+  string amountIn = 4;
+  string tokenIn = 5;
+  int64 slippageToleranceIndex = 6;
 }
 
 message MsgSwapResponse {

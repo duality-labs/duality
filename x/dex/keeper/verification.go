@@ -105,3 +105,40 @@ func (k Keeper) withdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 
 	return token0, token1, callerAddr, sharesToRemove, nil
 }
+
+func (k Keeper) swapVerification(goCtx context.Context, msg types.MsgSwap) (string, string, sdk.AccAddress, sdk.Dec, error) {
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
+
+	if err != nil {
+		return "", "", nil, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+	}
+
+	// Converts input address (string) to sdk.AccAddress
+	callerAddr, err := sdk.AccAddressFromBech32(msg.Creator)
+	// Error checking for the calling address
+	if err != nil {
+		return "", "", nil, sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+
+	amountIn, err := sdk.NewDecFromStr(msg.AmountIn)
+
+	if msg.TokenIn != token0 || msg.TokenIn != token1 {
+		return "", "", nil, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
+	}
+	// Error checking for valid sdk.Dec
+	if err != nil {
+		return "", "", nil, sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
+	}
+
+	AccountsAmountInBalance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, msg.TokenIn).Amount)
+
+	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
+	if AccountsAmountInBalance.LT(amountIn) {
+		return "", "", nil, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
+	}
+
+	return token0, token1, callerAddr, amountIn, nil
+}
