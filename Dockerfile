@@ -64,5 +64,8 @@ EXPOSE 9090
 EXPOSE 6060
 EXPOSE 1317
 
+# add startup scripts
+COPY testnet/scripts scripts
+
 # default to serving the chain with default data and name
-CMD ["dualityd", "start", "--moniker", "duality"]
+CMD ["sh", "./scripts/startup.sh"]
