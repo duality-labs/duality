@@ -30,9 +30,12 @@ export interface MsgWithdrawlResponse {}
 
 export interface MsgSwap {
   creator: string;
+  tokenA: string;
+  tokenB: string;
   amountIn: string;
   tokenIn: string;
-  slippageTolerance: string;
+  minOut: string;
+  slippageToleranceIndex: number;
 }
 
 export interface MsgSwapResponse {}
@@ -446,9 +449,12 @@ export const MsgWithdrawlResponse = {
 
 const baseMsgSwap: object = {
   creator: "",
+  tokenA: "",
+  tokenB: "",
   amountIn: "",
   tokenIn: "",
-  slippageTolerance: "",
+  minOut: "",
+  slippageToleranceIndex: 0,
 };
 
 export const MsgSwap = {
@@ -456,14 +462,23 @@ export const MsgSwap = {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
+    if (message.tokenA !== "") {
+      writer.uint32(18).string(message.tokenA);
+    }
+    if (message.tokenB !== "") {
+      writer.uint32(26).string(message.tokenB);
+    }
     if (message.amountIn !== "") {
-      writer.uint32(18).string(message.amountIn);
+      writer.uint32(34).string(message.amountIn);
     }
     if (message.tokenIn !== "") {
-      writer.uint32(26).string(message.tokenIn);
+      writer.uint32(42).string(message.tokenIn);
     }
-    if (message.slippageTolerance !== "") {
-      writer.uint32(34).string(message.slippageTolerance);
+    if (message.minOut !== "") {
+      writer.uint32(50).string(message.minOut);
+    }
+    if (message.slippageToleranceIndex !== 0) {
+      writer.uint32(56).int64(message.slippageToleranceIndex);
     }
     return writer;
   },
@@ -479,13 +494,22 @@ export const MsgSwap = {
           message.creator = reader.string();
           break;
         case 2:
-          message.amountIn = reader.string();
+          message.tokenA = reader.string();
           break;
         case 3:
-          message.tokenIn = reader.string();
+          message.tokenB = reader.string();
           break;
         case 4:
-          message.slippageTolerance = reader.string();
+          message.amountIn = reader.string();
+          break;
+        case 5:
+          message.tokenIn = reader.string();
+          break;
+        case 6:
+          message.minOut = reader.string();
+          break;
+        case 7:
+          message.slippageToleranceIndex = longToNumber(reader.int64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -502,6 +526,16 @@ export const MsgSwap = {
     } else {
       message.creator = "";
     }
+    if (object.tokenA !== undefined && object.tokenA !== null) {
+      message.tokenA = String(object.tokenA);
+    } else {
+      message.tokenA = "";
+    }
+    if (object.tokenB !== undefined && object.tokenB !== null) {
+      message.tokenB = String(object.tokenB);
+    } else {
+      message.tokenB = "";
+    }
     if (object.amountIn !== undefined && object.amountIn !== null) {
       message.amountIn = String(object.amountIn);
     } else {
@@ -512,13 +546,18 @@ export const MsgSwap = {
     } else {
       message.tokenIn = "";
     }
-    if (
-      object.slippageTolerance !== undefined &&
-      object.slippageTolerance !== null
-    ) {
-      message.slippageTolerance = String(object.slippageTolerance);
+    if (object.minOut !== undefined && object.minOut !== null) {
+      message.minOut = String(object.minOut);
     } else {
-      message.slippageTolerance = "";
+      message.minOut = "";
+    }
+    if (
+      object.slippageToleranceIndex !== undefined &&
+      object.slippageToleranceIndex !== null
+    ) {
+      message.slippageToleranceIndex = Number(object.slippageToleranceIndex);
+    } else {
+      message.slippageToleranceIndex = 0;
     }
     return message;
   },
@@ -526,10 +565,13 @@ export const MsgSwap = {
   toJSON(message: MsgSwap): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
+    message.tokenA !== undefined && (obj.tokenA = message.tokenA);
+    message.tokenB !== undefined && (obj.tokenB = message.tokenB);
     message.amountIn !== undefined && (obj.amountIn = message.amountIn);
     message.tokenIn !== undefined && (obj.tokenIn = message.tokenIn);
-    message.slippageTolerance !== undefined &&
-      (obj.slippageTolerance = message.slippageTolerance);
+    message.minOut !== undefined && (obj.minOut = message.minOut);
+    message.slippageToleranceIndex !== undefined &&
+      (obj.slippageToleranceIndex = message.slippageToleranceIndex);
     return obj;
   },
 
@@ -539,6 +581,16 @@ export const MsgSwap = {
       message.creator = object.creator;
     } else {
       message.creator = "";
+    }
+    if (object.tokenA !== undefined && object.tokenA !== null) {
+      message.tokenA = object.tokenA;
+    } else {
+      message.tokenA = "";
+    }
+    if (object.tokenB !== undefined && object.tokenB !== null) {
+      message.tokenB = object.tokenB;
+    } else {
+      message.tokenB = "";
     }
     if (object.amountIn !== undefined && object.amountIn !== null) {
       message.amountIn = object.amountIn;
@@ -550,13 +602,18 @@ export const MsgSwap = {
     } else {
       message.tokenIn = "";
     }
-    if (
-      object.slippageTolerance !== undefined &&
-      object.slippageTolerance !== null
-    ) {
-      message.slippageTolerance = object.slippageTolerance;
+    if (object.minOut !== undefined && object.minOut !== null) {
+      message.minOut = object.minOut;
     } else {
-      message.slippageTolerance = "";
+      message.minOut = "";
+    }
+    if (
+      object.slippageToleranceIndex !== undefined &&
+      object.slippageToleranceIndex !== null
+    ) {
+      message.slippageToleranceIndex = object.slippageToleranceIndex;
+    } else {
+      message.slippageToleranceIndex = 0;
     }
     return message;
   },

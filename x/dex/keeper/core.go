@@ -20,7 +20,7 @@ import (
 // 	}
 // }
 
-func (k Keeper) depositPairHelper(goCtx context.Context, token0 string, token1 string, price_index int64, feeIndex int64) error {
+func (k Keeper) DepositPairHelper(goCtx context.Context, token0 string, token1 string, price_index int64, feeIndex int64) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -66,7 +66,7 @@ func (k Keeper) depositPairHelper(goCtx context.Context, token0 string, token1 s
 
 }
 
-func calc_price(price_Index int64) (sdk.Dec, error) {
+func (k Keeper) Calc_price(price_Index int64) (sdk.Dec, error) {
 	floatPrice := math.Pow(1.0001, float64(price_Index))
 	sPrice := fmt.Sprintf("%f", floatPrice)
 
@@ -92,7 +92,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	feeValue, _ := k.GetFeeList(ctx, uint64(msg.FeeIndex))
 	fee := feeValue.Fee
-	k.depositPairHelper(goCtx, token0, token1, msg.PriceIndex, fee)
+	k.DepositPairHelper(goCtx, token0, token1, msg.PriceIndex, fee)
 
 	pairId := k.CreatePairId(token0, token1)
 
@@ -121,7 +121,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick greater than the CurrentTick0to1")
 	}
 
-	price, err := calc_price(msg.PriceIndex)
+	price, err := k.Calc_price(msg.PriceIndex)
 
 	if err != nil {
 		return err
@@ -388,12 +388,166 @@ func (k Keeper) SingleWithdrawl(goCtx context.Context, msg *types.MsgWithdrawl, 
 
 ////// Swap Functions
 
-func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec) error {
+func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, minOut sdk.Dec) error {
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	pairId := k.CreatePairId(token0, token1)
+
+	feeSize := k.GetFeeListCount(ctx)
+	pair, pairFound := k.GetPairMap(ctx, pairId)
+
+	if !pairFound {
+		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
+	}
+
+	amount_left := amountIn
+	amount_out := sdk.ZeroDec()
+
+	for amount_left.Neg().Equal(sdk.ZeroDec()) {
+		Current1Data, _ := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1)
+		var i uint64
+		i = 0
+		for i < feeSize || amount_left.Neg().Equal(sdk.ZeroDec()) {
+			fee, _ := k.GetFeeList(ctx, i)
+			feeIndex := fee.Fee
+			Current0Data, _ := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1+2*feeIndex)
+			//Current0Datam := Current0Data.TickData.Reserve1[i]
+
+			price, err := k.Calc_price(pair.TokenPair.CurrentTick0To1)
+
+			if err != nil {
+				return err
+			}
+
+			if price.Mul(Current1Data.TickData.Reserve1[i]).LT(amount_left) {
+				amount_out = amount_out.Add(Current1Data.TickData.Reserve1[i])
+				amount_left = amount_left.Sub(price.Mul(Current1Data.TickData.Reserve1[i]))
+				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Add(price.Mul(Current1Data.TickData.Reserve1[i]))
+				Current1Data.TickData.Reserve1[i] = sdk.ZeroDec()
+
+				i++
+
+			} else {
+				amount_out = amount_out.Add(amount_left.Mul(price))
+				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Add(amount_left)
+				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Sub(amount_left.Mul(price))
+				amount_left = sdk.ZeroDec()
+			}
+
+			k.SetTickMap(ctx, pairId, Current0Data)
+			k.SetTickMap(ctx, pairId, Current1Data)
+		}
+
+		if i == feeSize-1 {
+			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 + 1
+		}
+	}
+
+	k.SetPairMap(ctx, pair)
+	// Todo add slippage tolerance
+
+	if amount_out.LT(minOut) {
+		return sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
+	}
+
+	if amountIn.GT(sdk.ZeroDec()) {
+		coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountIn.BigInt()))
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
+			return err
+		}
+	} else {
+		return sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
+	}
+
+	if amount_out.GT(sdk.ZeroDec()) {
+		coinOut := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount_out.BigInt()))
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
 
-func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec) error {
+func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, minOut sdk.Dec) error {
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	pairId := k.CreatePairId(token0, token1)
+
+	feeSize := k.GetFeeListCount(ctx)
+	pair, pairFound := k.GetPairMap(ctx, pairId)
+
+	if !pairFound {
+		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
+	}
+
+	amount_left := amountIn
+	amount_out := sdk.ZeroDec()
+
+	for amount_left.Neg().Equal(sdk.ZeroDec()) {
+		Current0Data, _ := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick1To0)
+		var i uint64
+		i = 0
+		for i < feeSize || amount_left.Neg().Equal(sdk.ZeroDec()) {
+			fee, _ := k.GetFeeList(ctx, i)
+			feeIndex := fee.Fee
+			Current1Data, _ := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick1To0-2*feeIndex)
+			//Current0Datam := Current0Data.TickData.Reserve1[i]
+
+			price, err := k.Calc_price(pair.TokenPair.CurrentTick1To0)
+
+			if err != nil {
+				return err
+			}
+
+			if price.Mul(Current0Data.TickData.Reserve0AndShares[i].Reserve0).LT(amount_left) {
+				amount_out = amount_out.Add(Current0Data.TickData.Reserve0AndShares[i].Reserve0)
+				amount_left = amount_left.Sub(price.Mul(Current0Data.TickData.Reserve0AndShares[i].Reserve0))
+				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Add(price.Mul(Current0Data.TickData.Reserve0AndShares[i].Reserve0))
+				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = sdk.ZeroDec()
+
+				i++
+
+			} else {
+				amount_out = amount_out.Add(amount_left.Mul(price))
+				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Add(amount_left)
+				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Sub(amount_left.Mul(price))
+				amount_left = sdk.ZeroDec()
+			}
+
+			k.SetTickMap(ctx, pairId, Current0Data)
+			k.SetTickMap(ctx, pairId, Current1Data)
+		}
+
+		if i == feeSize-1 {
+			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 - 1
+		}
+	}
+
+	k.SetPairMap(ctx, pair)
+	// Todo add slippage tolerance
+
+	if amount_out.LT(minOut) {
+		return sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
+	}
+
+	if amountIn.GT(sdk.ZeroDec()) {
+		coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountIn.BigInt()))
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
+			return err
+		}
+	} else {
+		return sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
+	}
+
+	if amount_out.GT(sdk.ZeroDec()) {
+		coinOut := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount_out.BigInt()))
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
