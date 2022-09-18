@@ -32,6 +32,8 @@ FROM arm64v8/alpine:20220715
 RUN apk add --update \
     # required for dualityd to work
     libc6-compat \
+    # allow JSON parsing in startup shell scripts
+    jq \
     # required for HTTPS to connect properly
     ca-certificates
 
