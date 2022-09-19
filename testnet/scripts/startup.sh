@@ -31,4 +31,7 @@ else
         exit 1
     fi
 
+    # get current net information
+    net_info_json=$( wget -q -O - $RPC_ADDRESS/net_info )
+
 fi
