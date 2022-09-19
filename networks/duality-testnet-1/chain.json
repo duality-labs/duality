@@ -49,8 +49,8 @@
         "seeds": [],
         "persistent_peers": [
             {
-                "id": "ECE620B125BA5CA810129F37D6FF0119912CCA4D",
-                "address": "54.193.230.243:26657",
+                "id": "4504a164bae3ad5057d45591a01c18c5045dd83b",
+                "address": "54.193.230.243:26656",
                 "provider": "duality-dev"
             }
         ]
