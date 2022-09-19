@@ -2,6 +2,12 @@
 # set variable defaults
 STARTUP_MODE="${MODE:-new}"
 
+# check current working directorys
+if [[ ! -e scripts/startup.sh ]]; then
+    echo >&2 "Please run this script from the base repo directory"
+    exit 1
+fi
+
 echo "Startup mode: $STARTUP_MODE"
 
 # start or join a chain
