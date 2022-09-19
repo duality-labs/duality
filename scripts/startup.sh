@@ -49,7 +49,7 @@ else
     persistent_peers="$( echo $persistent_peers_array | jq -r 'map(.id + "@" + .address) | join(",")' )"
 
     # set chain settings
-    sed -i 's/persistent_peers = ""/persistent_peers = "'"$persistent_peers"'"/' /root/.duality/config/config.toml
+    sed -i 's#persistent_peers = ""#persistent_peers = "'"$persistent_peers"'"#' /root/.duality/config/config.toml
     mv networks/duality-testnet-1/genesis.json /root/.duality/config/genesis.json
 
     dualityd start --moniker new-validator
