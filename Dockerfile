@@ -80,7 +80,7 @@ EXPOSE 9091
 EXPOSE 1317
 
 # add startup scripts and their dependencies
-COPY testnet/scripts scripts
+COPY scripts scripts
 COPY networks networks
 
 # default to serving the chain with default data and name
