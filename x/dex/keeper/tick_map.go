@@ -63,3 +63,19 @@ func (k Keeper) GetAllTickMap(ctx sdk.Context) (list []types.TickMap) {
 
 	return
 }
+
+// GetAllTickMap returns all tickMap
+func (k Keeper) GetAllTickMapByPair(ctx sdk.Context, pairId string) (list []types.TickMap) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TickPrefix(pairId))
+	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var val types.TickMap
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
+		list = append(list, val)
+	}
+
+	return
+}
