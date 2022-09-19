@@ -125,7 +125,7 @@ func (k Keeper) swapVerification(goCtx context.Context, msg types.MsgSwap) (stri
 
 	amountIn, err := sdk.NewDecFromStr(msg.AmountIn)
 
-	if msg.TokenIn != token0 || msg.TokenIn != token1 {
+	if msg.TokenIn != token0 && msg.TokenIn != token1 {
 		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
 	}
 	// Error checking for valid sdk.Dec

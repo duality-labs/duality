@@ -8,6 +8,6 @@ import "dex/token_pair_type.proto";
 message PairMap {
   string pairId = 1; 
   TokenPairType tokenPair = 2; 
-  
+  int64 pairCount = 3;
 }
 

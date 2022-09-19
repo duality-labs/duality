@@ -62,6 +62,10 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 	token0, token1, createrAddr, amountIn, minOut, err := k.swapVerification(goCtx, *msg)
 
+	if err != nil {
+		return nil, err
+	}
+
 	if msg.TokenIn == token0 {
 		err = k.Swap0to1(goCtx, msg, token0, token1, createrAddr, amountIn, minOut)
 		if err != nil {

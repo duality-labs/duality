@@ -38,6 +38,9 @@ export type DexMsgWithdrawlResponse = object;
 export interface DexPairMap {
   pairId?: string;
   tokenPair?: DexTokenPairType;
+
+  /** @format int64 */
+  pairCount?: string;
 }
 
 /**

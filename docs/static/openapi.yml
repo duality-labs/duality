@@ -30353,6 +30353,9 @@ paths:
                         currentTick1To0:
                           type: string
                           format: int64
+                    pairCount:
+                      type: string
+                      format: int64
               pagination:
                 type: object
                 properties:
@@ -30481,6 +30484,9 @@ paths:
                       currentTick1To0:
                         type: string
                         format: int64
+                  pairCount:
+                    type: string
+                    format: int64
         default:
           description: An unexpected error response.
           schema:
@@ -53030,6 +53036,9 @@ definitions:
           currentTick1To0:
             type: string
             format: int64
+      pairCount:
+        type: string
+        format: int64
   nicholasdotsol.duality.dex.Params:
     type: object
     description: Params defines the parameters for the module.
@@ -53173,6 +53182,9 @@ definitions:
                 currentTick1To0:
                   type: string
                   format: int64
+            pairCount:
+              type: string
+              format: int64
       pagination:
         type: object
         properties:
@@ -53428,6 +53440,9 @@ definitions:
               currentTick1To0:
                 type: string
                 format: int64
+          pairCount:
+            type: string
+            format: int64
   nicholasdotsol.duality.dex.QueryGetSharesResponse:
     type: object
     properties:

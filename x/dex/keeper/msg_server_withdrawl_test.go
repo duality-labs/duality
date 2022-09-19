@@ -202,6 +202,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		FeeIndex:       1,
 	})
 
+	fmt.Println("test here")
 	suite.Require().Nil(err)
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("50000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("450000000000000000000"))))
@@ -234,4 +235,6 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("50000000000000000000"))))
 
 	_ = createResponse5
+
+	fmt.Println("Withdrawl Tests complete")
 }
