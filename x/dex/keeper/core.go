@@ -410,20 +410,24 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	for !amount_left.Equal(sdk.ZeroDec()) && (count < int(pair.PairCount)) {
 		Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1)
 
+		count++
+
+		fmt.Println(count)
 		if !Current1Found {
-			count++
 			continue
 		}
 
 		var i uint64
 		i = 0
-		for i < feeSize || !amount_left.Equal(sdk.ZeroDec()) {
+		for i < feeSize && !amount_left.Equal(sdk.ZeroDec()) {
 			fee, _ := k.GetFeeList(ctx, i)
+			fmt.Println(fee)
 			feeIndex := fee.Fee
 			Current0Data, Current0Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1+2*feeIndex)
 			//Current0Datam := Current0Data.TickData.Reserve1[i]
 
 			if !Current0Found {
+				i++
 				continue
 			}
 			price, err := k.Calc_price(pair.TokenPair.CurrentTick0To1)
@@ -438,15 +442,13 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Add(price.Mul(Current1Data.TickData.Reserve1[i]))
 				Current1Data.TickData.Reserve1[i] = sdk.ZeroDec()
 
-				i++
-
 			} else {
 				amount_out = amount_out.Add(amount_left.Mul(price))
 				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Add(amount_left)
 				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Sub(amount_left.Mul(price))
 				amount_left = sdk.ZeroDec()
 			}
-
+			i++
 			k.SetTickMap(ctx, pairId, Current0Data)
 			k.SetTickMap(ctx, pairId, Current1Data)
 		}
@@ -464,7 +466,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	}
 
 	if amountIn.GT(sdk.ZeroDec()) {
-		coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountIn.BigInt()))
+		coinIn := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amountIn.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
 			return err
 		}
@@ -504,8 +506,9 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 		Current0Data, Current0Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick1To0)
 
+		count++
 		if !Current0Found {
-			count++
+
 			continue
 		}
 		var i uint64
@@ -516,6 +519,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick1To0-2*feeIndex)
 
 			if !Current1Found {
+				i++
 				continue
 			}
 			//Current0Datam := Current0Data.TickData.Reserve1[i]
@@ -532,8 +536,6 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Add(price.Mul(Current0Data.TickData.Reserve0AndShares[i].Reserve0))
 				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = sdk.ZeroDec()
 
-				i++
-
 			} else {
 				amount_out = amount_out.Add(amount_left.Mul(price))
 				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Add(amount_left)
@@ -541,6 +543,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				amount_left = sdk.ZeroDec()
 			}
 
+			i++
 			k.SetTickMap(ctx, pairId, Current0Data)
 			k.SetTickMap(ctx, pairId, Current1Data)
 		}
@@ -567,7 +570,8 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	}
 
 	if amount_out.GT(sdk.ZeroDec()) {
-		coinOut := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount_out.BigInt()))
+
+		coinOut := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}

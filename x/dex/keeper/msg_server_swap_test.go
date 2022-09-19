@@ -75,7 +75,7 @@ func (suite *IntegrationTestSuite) TestSwap() {
 
 	suite.Require().Nil(err)
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("1050000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("99950000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
 	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000001"))))
 
@@ -153,5 +153,272 @@ func (suite *IntegrationTestSuite) TestSwap() {
 	_ = pairId
 	_ = goCtx
 
-	fmt.Println("Swap tests complete")
+}
+
+func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection() {
+	fmt.Println("Swap Tests")
+	app, ctx := suite.app, suite.ctx
+	//holderAcc := authtypes.NewEmptyModuleAccount("holder")
+	alice := sdk.AccAddress([]byte("alice"))
+	bob := sdk.AccAddress([]byte("bob"))
+
+	accAlice := app.AccountKeeper.NewAccountWithAddress(ctx, alice)
+	app.AccountKeeper.SetAccount(ctx, accAlice)
+	accBob := app.AccountKeeper.NewAccountWithAddress(ctx, bob)
+	app.AccountKeeper.SetAccount(ctx, accBob)
+
+	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000000")), newBCoin(convInt("500000000000000000000")))
+	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
+
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
+	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000001"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+
+	goCtx := sdk.WrapSDKContext(ctx)
+
+	// Set Fee List
+
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{0, 1})
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{1, 2})
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{2, 3})
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{3, 4})
+
+	//fmt.Println("FeeList")
+	feeList := app.DexKeeper.GetAllFeeList(ctx)
+	fmt.Println(feeList)
+
+	createResponse, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
+		Creator:    alice.String(),
+		TokenA:     "TokenA",
+		TokenB:     "TokenB",
+		AmountA:    "50",
+		AmountB:    "0",
+		PriceIndex: 0,
+		FeeIndex:   0,
+	})
+
+	suite.Require().Nil(err)
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("99950000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
+	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000001"))))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("0"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("50000000000000000000"))))
+
+	_ = createResponse
+	_ = goCtx
+
+	swapRepsone, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
+		Creator:                bob.String(),
+		TokenA:                 "TokenA",
+		TokenB:                 "TokenB",
+		AmountIn:               "49.99500",
+		TokenIn:                "TokenB",
+		MinOut:                 "10",
+		SlippageToleranceIndex: 0,
+	})
+
+	_ = swapRepsone
+
+	suite.Require().Nil(err)
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("0"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("49995000000000000000"))))
+
+}
+
+func (suite *IntegrationTestSuite) TestSwapSingleSidedWrongDirection() {
+	fmt.Println("Swap Tests")
+	app, ctx := suite.app, suite.ctx
+	//holderAcc := authtypes.NewEmptyModuleAccount("holder")
+	alice := sdk.AccAddress([]byte("alice"))
+	bob := sdk.AccAddress([]byte("bob"))
+
+	accAlice := app.AccountKeeper.NewAccountWithAddress(ctx, alice)
+	app.AccountKeeper.SetAccount(ctx, accAlice)
+	accBob := app.AccountKeeper.NewAccountWithAddress(ctx, bob)
+	app.AccountKeeper.SetAccount(ctx, accBob)
+
+	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000000")), newBCoin(convInt("500000000000000000000")))
+	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
+
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
+	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000001"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+
+	goCtx := sdk.WrapSDKContext(ctx)
+
+	// Set Fee List
+
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{0, 1})
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{1, 2})
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{2, 3})
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{3, 4})
+
+	//fmt.Println("FeeList")
+	feeList := app.DexKeeper.GetAllFeeList(ctx)
+	fmt.Println(feeList)
+
+	createResponse, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
+		Creator:    alice.String(),
+		TokenA:     "TokenA",
+		TokenB:     "TokenB",
+		AmountA:    "50",
+		AmountB:    "0",
+		PriceIndex: 0,
+		FeeIndex:   0,
+	})
+
+	suite.Require().Nil(err)
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("99950000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
+	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000001"))))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("0"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("50000000000000000000"))))
+
+	_ = createResponse
+	_ = goCtx
+
+	swapRepsone, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
+		Creator:                bob.String(),
+		TokenA:                 "TokenA",
+		TokenB:                 "TokenB",
+		AmountIn:               "49.99500",
+		TokenIn:                "TokenA",
+		MinOut:                 "10",
+		SlippageToleranceIndex: 0,
+	})
+
+	_ = swapRepsone
+
+	suite.Require().Error(err)
+	suite.Require().False(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("49995000000000000000"))))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("0"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("50000000000000000000"))))
+}
+
+func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection2() {
+	fmt.Println("Swap Tests")
+	app, ctx := suite.app, suite.ctx
+	//holderAcc := authtypes.NewEmptyModuleAccount("holder")
+	alice := sdk.AccAddress([]byte("alice"))
+	bob := sdk.AccAddress([]byte("bob"))
+
+	accAlice := app.AccountKeeper.NewAccountWithAddress(ctx, alice)
+	app.AccountKeeper.SetAccount(ctx, accAlice)
+	accBob := app.AccountKeeper.NewAccountWithAddress(ctx, bob)
+	app.AccountKeeper.SetAccount(ctx, accBob)
+
+	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000000")), newBCoin(convInt("500000000000000000000")))
+	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
+
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
+	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000001"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+
+	goCtx := sdk.WrapSDKContext(ctx)
+
+	// Set Fee List
+
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{0, 1})
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{1, 2})
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{2, 3})
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{3, 4})
+
+	//fmt.Println("FeeList")
+	feeList := app.DexKeeper.GetAllFeeList(ctx)
+	fmt.Println(feeList)
+
+	createResponse, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
+		Creator:    alice.String(),
+		TokenA:     "TokenA",
+		TokenB:     "TokenB",
+		AmountA:    "50",
+		AmountB:    "0",
+		PriceIndex: 0,
+		FeeIndex:   0,
+	})
+
+	suite.Require().Nil(err)
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("99950000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
+	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000001"))))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("0"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("50000000000000000000"))))
+
+	_ = createResponse
+
+	createResponse2, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
+		Creator:    alice.String(),
+		TokenA:     "TokenA",
+		TokenB:     "TokenB",
+		AmountA:    "50",
+		AmountB:    "0",
+		PriceIndex: 100000,
+		FeeIndex:   0,
+	})
+
+	suite.Require().Nil(err)
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("99900000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
+	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000001"))))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("0"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("50000000000000000000"))))
+
+	_ = createResponse2
+
+	swapRepsone, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
+		Creator:                bob.String(),
+		TokenA:                 "TokenA",
+		TokenB:                 "TokenB",
+		AmountIn:               "60",
+		TokenIn:                "TokenB",
+		MinOut:                 "10",
+		SlippageToleranceIndex: 0,
+	})
+
+	_ = swapRepsone
+
+	suite.Require().Nil(err)
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("0"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("60000000000000000000"))))
+
+	_ = goCtx
+
 }
