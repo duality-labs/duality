@@ -1,9 +1,13 @@
 
+# set variable defaults
+STARTUP_MODE="${MODE:-new}"
+
+echo "Startup mode: $STARTUP_MODE"
+
 # start or join a chain
-if [ -z $RPC_ADDRESS ]
+if [ $STARTUP_MODE == "new" ]
 then
 
-    echo "No seed RPC given"
     echo "Starting new chain..."
 
     if [ ! -z $MONIKER ]
@@ -16,12 +20,14 @@ then
 
 else
 
-    echo "Have seed RPC: $RPC_ADDRESS"
-    echo "Will attempt to join the network"
+    echo "Will attempt to join the network using chain.json information"
     echo "Contacting network..."
 
+    # find an RPC address to check the live chain with
+    rpc_address="$( jq -r .apis.rpc[0].address networks/duality-testnet-1/chain.json )"
+
     # check if we can get information from the current network
-    abci_info_json=$( wget --tries 30 -q -O - $RPC_ADDRESS/abci_info )
+    abci_info_json=$( wget --tries 30 -q -O - $rpc_address/abci_info )
     if [[ "$( echo $abci_info_json | jq -r ".result.response.data" )" == "duality" ]]
     then
         echo "Found Duality chain!"
@@ -31,7 +37,7 @@ else
         exit 1
     fi
 
-    # get current net information
-    net_info_json=$( wget -q -O - $RPC_ADDRESS/net_info )
-
+    # read out peers from chain.json
+    persistent_peers_array="$( jq .peers.persistent_peers networks/duality-testnet-1/chain.json )"
+    persistent_peers="$( echo $persistent_peers_array | jq -r 'map(.id + "@" + .address) | join(",")' )"
 fi
