@@ -50,7 +50,7 @@
         "persistent_peers": [
             {
                 "id": "ECE620B125BA5CA810129F37D6FF0119912CCA4D",
-                "address": "http://54.193.230.243:26657",
+                "address": "54.193.230.243:26657",
                 "provider": "duality-dev"
             }
         ]
