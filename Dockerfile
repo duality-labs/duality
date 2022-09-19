@@ -79,8 +79,9 @@ EXPOSE 9090
 EXPOSE 9091
 EXPOSE 1317
 
-# add startup scripts
+# add startup scripts and their dependencies
 COPY testnet/scripts scripts
+COPY networks networks
 
 # default to serving the chain with default data and name
 CMD ["sh", "./scripts/startup.sh"]
