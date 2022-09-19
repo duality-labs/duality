@@ -1,3 +1,4 @@
+#!/bin/sh
 
 # set variable defaults
 STARTUP_MODE="${MODE:-new}"
