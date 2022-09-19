@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # set variable defaults
-STARTUP_MODE="${MODE:-new}"
+STARTUP_MODE="${MODE:-fullnode}"
 
 # check current working directorys
 if [[ ! -e scripts/startup.sh ]]; then
