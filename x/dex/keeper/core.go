@@ -131,6 +131,9 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 		sharesMinted = trueAmount0.Add(amount1.Mul(price))
 
 		feeSize := k.GetFeeListCount(ctx)
+		if !bottomTickFound || !topTickFound {
+			pair.PairCount = pair.PairCount + 1
+		}
 		if !bottomTickFound {
 
 			bottomTick = types.TickMap{
@@ -233,8 +236,6 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 
 	shares, sharesFound := k.GetShares(ctx, msg.Creator, pairId, msg.PriceIndex, msg.FeeIndex)
 
-	pair.PairCount = pair.PairCount + 1
-
 	if !sharesFound {
 		shares = types.Shares{
 			Address:     msg.Creator,
@@ -333,6 +334,9 @@ func (k Keeper) SingleWithdrawl(goCtx context.Context, msg *types.MsgWithdrawl, 
 				removeTick = false
 			}
 		}
+	}
+	if removeTick {
+		pair.PairCount = pair.PairCount - 1
 	}
 	if removeTick && (msg.PriceIndex+int64(fee) == pair.TokenPair.CurrentTick1To0) {
 
