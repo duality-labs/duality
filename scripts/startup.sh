@@ -63,6 +63,7 @@ else
             node_block_height=$( echo $node_status_json | jq -r .SyncInfo.latest_block_height )
             echo "Node is catching up to chain height... (~$(( 100 * $node_block_height / $chain_block_height ))% done)"
             sleep 10
+            node_status_json=$( dualityd status )
         done
         echo "Node has caught up to chain height"
 
