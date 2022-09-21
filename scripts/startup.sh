@@ -63,9 +63,12 @@ else
     if [ $STARTUP_MODE == "validator" ] && [ -z $MNEMONIC ]
     then
         # wait for node to finish catching up to the chain's current height
-        while [[ dualityd status | jq .SyncInfo.catching_up == true ]]
+        chain_block_height=$(echo $abci_info_json | jq -r ".result.response.last_block_height")
+        node_status_json=$( dualityd status )
+        while [[ echo $node_status_json | jq .SyncInfo.catching_up == true ]]
         do
-            echo "Node is catching up to chain height..."
+            node_block_height=$( echo $node_status_json | jq -r .SyncInfo.latest_block_height )
+            echo "Node is catching up to chain height... (~$(( 100 * $node_block_height / $chain_block_height ))% done)"
             sleep 10
         done
         echo "Node has caught up to chain height"
