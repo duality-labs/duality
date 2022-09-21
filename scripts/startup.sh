@@ -48,7 +48,7 @@ else
     mv networks/duality/genesis.json /root/.duality/config/genesis.json
 
     # check if this node intends to become a validator
-    if [ $STARTUP_MODE == "validator" ] && [ -z $MNEMONIC ]
+    if [[ "$STARTUP_MODE" == "validator" && ! -z "$MNEMONIC" ]]
     then
 
         echo "Starting future validator fullnode..."
