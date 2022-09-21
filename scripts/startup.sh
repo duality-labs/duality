@@ -17,7 +17,7 @@ if [ $STARTUP_MODE == "new" ]
 then
 
     echo "Starting new chain..."
-    dualityd start --moniker $NODE_MONIKER
+    dualityd --log_level ${LOG_LEVEL:-info} start --moniker $NODE_MONIKER
     exit
 
 else
@@ -52,7 +52,7 @@ else
     then
 
         echo "Starting future validator fullnode..."
-        dualityd start --moniker $NODE_MONIKER & :
+        dualityd --log_level ${LOG_LEVEL:-info} start --moniker $NODE_MONIKER & :
 
         # wait for node to finish catching up to the chain's current height
         chain_block_height=$(echo $abci_info_json | jq -r ".result.response.last_block_height")
@@ -108,6 +108,6 @@ else
     else
         # start as not a validator
         echo "Starting fullnode..."
-        dualityd start --moniker $NODE_MONIKER
+        dualityd --log_level ${LOG_LEVEL:-info} start --moniker $NODE_MONIKER
     fi
 fi
