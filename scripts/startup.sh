@@ -71,11 +71,9 @@ else
         echo $MNEMONIC | dualityd keys add validator --recover --no-backup
 
         # sent request to become a validator (to the first RPC address defined)
-        rpc_address_host=$( jq .apis.rpc[0].address networks/duality/chain.json | jq 'split("://")'[-1] | jq -r 'split(":")'[0] )
-        rpc_address_port=$( jq .apis.rpc[0].address networks/duality/chain.json | jq 'split("://")'[-1] | jq -r 'split(":")'[1] )
         dualityd tx staking create-validator \
             --moniker $NODE_MONIKER \
-            --node "tcp://$rpc_address_host:${rpc_address_port:-443}" \
+            --node "tcp://$( jq .apis.rpc[0].address networks/duality/chain.json | jq 'if test("^https://") then [split("://")[1], "443"]  else [.] end' | jq -r 'join(":")' )" \
             --node-id `dualityd tendermint show-node-id` \
             --pubkey `dualityd tendermint show-validator` \
             --commission-rate="${VALIDATOR_COMMISSION_RATE:-1.0}" \
