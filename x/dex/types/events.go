@@ -60,3 +60,31 @@ func CreateWithdrawEvent(creator string, token0 string, token1 string, priceInde
 		sdk.NewAttribute(WithdrawEventNewReserve1, newReserve1),
 	)
 }
+
+func createSwapEvent(creator string, token0 string, token1 string, tokenIn string, amountIn string, amountOut string, minOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+	attrs := []sdk.Attribute{
+		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
+		sdk.NewAttribute(sdk.AttributeKeyAction, SwapEventKey),
+		sdk.NewAttribute(WithdrawEventCreator, creator),
+		sdk.NewAttribute(SwapEventToken0, token0),
+		sdk.NewAttribute(SwapEventToken1, token1),
+		sdk.NewAttribute(SwapEventTokenIn, tokenIn),
+		sdk.NewAttribute(SwapEventAmountIn, amountIn),
+		sdk.NewAttribute(SwapEventAmoutOut, amountOut),
+		sdk.NewAttribute(SwapEventMinOut, minOut),
+	}
+	attrs = append(attrs, otherAttrs...)
+	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
+}
+
+func CreateSwapEvent(creator string, token0 string, token1 string, tokenIn string, amountIn string, amountOut string, minOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+	return createSwapEvent(
+		creator,
+		token0,
+		token1,
+		tokenIn,
+		amountIn,
+		amountOut,
+		minOut,
+	)
+}

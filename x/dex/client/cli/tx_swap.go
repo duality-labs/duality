@@ -22,11 +22,7 @@ func CmdSwap() *cobra.Command {
 			argTokenA := args[1]
 			argTokenB := args[2]
 			argTokenIn := args[3]
-			argSlippageTolerance := args[4]
-
-			tmpSlippage, err := strconv.Atoi(argSlippageTolerance)
-
-			argminOut := args[5]
+			argminOut := args[4]
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -38,7 +34,6 @@ func CmdSwap() *cobra.Command {
 				argTokenB,
 				argAmountIn,
 				argTokenIn,
-				int64(tmpSlippage),
 				argminOut,
 			)
 			if err := msg.ValidateBasic(); err != nil {

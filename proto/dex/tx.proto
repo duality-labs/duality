@@ -46,7 +46,6 @@ message MsgSwap {
   string amountIn = 4;
   string tokenIn = 5;
   string minOut = 6;
-  int64 slippageToleranceIndex = 7;
 }
 
 message MsgSwapResponse {

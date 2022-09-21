@@ -136,13 +136,12 @@ func (suite *IntegrationTestSuite) TestSwap() {
 	//fmt.Println(app.DexKeeper.GetAllPairMap(ctx))
 
 	swapRepsone, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
-		Creator:                alice.String(),
-		TokenA:                 "TokenA",
-		TokenB:                 "TokenB",
-		AmountIn:               "20",
-		TokenIn:                "TokenB",
-		MinOut:                 "10",
-		SlippageToleranceIndex: 0,
+		Creator:  alice.String(),
+		TokenA:   "TokenA",
+		TokenB:   "TokenB",
+		AmountIn: "20",
+		TokenIn:  "TokenB",
+		MinOut:   "10",
 	})
 
 	_ = swapRepsone
@@ -218,13 +217,12 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection() {
 	_ = goCtx
 
 	swapRepsone, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
-		Creator:                bob.String(),
-		TokenA:                 "TokenA",
-		TokenB:                 "TokenB",
-		AmountIn:               "49.99500",
-		TokenIn:                "TokenB",
-		MinOut:                 "10",
-		SlippageToleranceIndex: 0,
+		Creator:  bob.String(),
+		TokenA:   "TokenA",
+		TokenB:   "TokenB",
+		AmountIn: "49.99500",
+		TokenIn:  "TokenB",
+		MinOut:   "10",
 	})
 
 	_ = swapRepsone
@@ -299,13 +297,12 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedWrongDirection() {
 	_ = goCtx
 
 	swapRepsone, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
-		Creator:                bob.String(),
-		TokenA:                 "TokenA",
-		TokenB:                 "TokenB",
-		AmountIn:               "49.99500",
-		TokenIn:                "TokenA",
-		MinOut:                 "10",
-		SlippageToleranceIndex: 0,
+		Creator:  bob.String(),
+		TokenA:   "TokenA",
+		TokenB:   "TokenB",
+		AmountIn: "49.99500",
+		TokenIn:  "TokenA",
+		MinOut:   "10",
 	})
 
 	_ = swapRepsone
@@ -403,13 +400,12 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection2() {
 	_ = createResponse2
 
 	swapRepsone, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
-		Creator:                bob.String(),
-		TokenA:                 "TokenA",
-		TokenB:                 "TokenB",
-		AmountIn:               "60",
-		TokenIn:                "TokenB",
-		MinOut:                 "10",
-		SlippageToleranceIndex: 0,
+		Creator:  bob.String(),
+		TokenA:   "TokenA",
+		TokenB:   "TokenB",
+		AmountIn: "60",
+		TokenIn:  "TokenB",
+		MinOut:   "10",
 	})
 
 	_ = swapRepsone

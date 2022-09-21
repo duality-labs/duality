@@ -35,7 +35,6 @@ export interface MsgSwap {
   amountIn: string;
   tokenIn: string;
   minOut: string;
-  slippageToleranceIndex: number;
 }
 
 export interface MsgSwapResponse {}
@@ -454,7 +453,6 @@ const baseMsgSwap: object = {
   amountIn: "",
   tokenIn: "",
   minOut: "",
-  slippageToleranceIndex: 0,
 };
 
 export const MsgSwap = {
@@ -476,9 +474,6 @@ export const MsgSwap = {
     }
     if (message.minOut !== "") {
       writer.uint32(50).string(message.minOut);
-    }
-    if (message.slippageToleranceIndex !== 0) {
-      writer.uint32(56).int64(message.slippageToleranceIndex);
     }
     return writer;
   },
@@ -507,9 +502,6 @@ export const MsgSwap = {
           break;
         case 6:
           message.minOut = reader.string();
-          break;
-        case 7:
-          message.slippageToleranceIndex = longToNumber(reader.int64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -551,14 +543,6 @@ export const MsgSwap = {
     } else {
       message.minOut = "";
     }
-    if (
-      object.slippageToleranceIndex !== undefined &&
-      object.slippageToleranceIndex !== null
-    ) {
-      message.slippageToleranceIndex = Number(object.slippageToleranceIndex);
-    } else {
-      message.slippageToleranceIndex = 0;
-    }
     return message;
   },
 
@@ -570,8 +554,6 @@ export const MsgSwap = {
     message.amountIn !== undefined && (obj.amountIn = message.amountIn);
     message.tokenIn !== undefined && (obj.tokenIn = message.tokenIn);
     message.minOut !== undefined && (obj.minOut = message.minOut);
-    message.slippageToleranceIndex !== undefined &&
-      (obj.slippageToleranceIndex = message.slippageToleranceIndex);
     return obj;
   },
 
@@ -606,14 +588,6 @@ export const MsgSwap = {
       message.minOut = object.minOut;
     } else {
       message.minOut = "";
-    }
-    if (
-      object.slippageToleranceIndex !== undefined &&
-      object.slippageToleranceIndex !== null
-    ) {
-      message.slippageToleranceIndex = object.slippageToleranceIndex;
-    } else {
-      message.slippageToleranceIndex = 0;
     }
     return message;
   },
