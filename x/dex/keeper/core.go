@@ -10,16 +10,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// func (k Keeper) addEdges(goCtx context.Context, token0Index int64, token1Index int64) {
-// 	ctx := sdk.UnwrapSDKContext(goCtx)
-
-// 	if k.GetTokensCount(ctx) <  2 * k.GetEdgeRowCount(ctx) {
-
-// 		id := k.AppendEdgeRow(ctx, types.EdgeRow{k.GetEdgeRowCount(ctx), false})
-// 		k.AppendAdjanceyMatrix(ctx, types.AdjanceyMatrix{id, make([]types.EdgeRow, k.GetEdgeRowCount8(ctx))})
-// 	}
-// }
-
 func (k Keeper) DepositPairHelper(goCtx context.Context, token0 string, token1 string, price_index int64, fee int64) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -436,6 +426,10 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			}
 			price, err := k.Calc_price(pair.TokenPair.CurrentTick0To1)
 
+			if price.Mul(amount_left).Add(amount_out).LT(minOut) {
+				return sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
+			}
+
 			if err != nil {
 				return err
 			}
@@ -485,6 +479,10 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		}
 	}
 
+	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator,
+		token0, token1, msg.TokenIn, amountIn.String(), amount_out.String(), msg.MinOut,
+	))
+
 	return nil
 }
 
@@ -520,6 +518,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		for i < feeSize && !amount_left.Equal(sdk.ZeroDec()) {
 			fee, _ := k.GetFeeList(ctx, i)
 			feeIndex := fee.Fee
+
 			Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick1To0-2*feeIndex)
 
 			if !Current1Found {
@@ -532,6 +531,10 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 			if err != nil {
 				return err
+			}
+
+			if price.Mul(amount_left).Add(amount_out).LT(minOut) {
+				return sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 			}
 
 			if price.Mul(Current0Data.TickData.Reserve0AndShares[i].Reserve0).LT(amount_left) {

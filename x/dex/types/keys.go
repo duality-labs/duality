@@ -133,6 +133,17 @@ const (
 )
 
 const (
+	SwapEventKey      = "NewWithdraw"
+	SwapEventCreator  = "Creator"
+	SwapEventToken0   = "Token0"
+	SwapEventToken1   = "Token1"
+	SwapEventTokenIn  = "TokenIn"
+	SwapEventAmountIn = "AmountIn"
+	SwapEventMinOut   = "MinOut"
+	SwapEventAmoutOut = "AmountOut"
+)
+
+const (
 	FeeListKey      = "FeeList-value-"
 	FeeListCountKey = "FeeList-count-"
 )
