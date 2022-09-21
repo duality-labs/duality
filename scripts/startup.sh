@@ -90,7 +90,7 @@ else
         pub_key=$( dualityd tendermint show-validator | jq .key )
         while [[ ! $voting_power -gt 0 ]]
         do
-            validator_set=$( curl -s $rpc_address/validators );
+            validator_set=$( wget --tries 3 -q -O - $rpc_address/validators );
             new_voting_power=$( echo $validator_set | jq -r ".result.validators[] | select(.pub_key.value == $pub_key).voting_power" )
             if [[ "$new_voting_power" == "" ]]
             then
