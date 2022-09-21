@@ -90,5 +90,27 @@ else
             --amount "${VALIDATOR_AMOUNT:-1000000stake}" \
             --fees "${VALIDATOR_FEES:-0token}" \
             --from validator -y
+
+        # wait to check the node's validator status
+        voting_power=""
+        pub_key=$( dualityd tendermint show-validator | jq .key )
+        while [[ ! $voting_power -gt 0 ]]
+        do
+            validator_set=$( curl -s $rpc_address/validators );
+            new_voting_power=$( echo $validator_set | jq -r ".result.validators[] | select(.pub_key.value == $pub_key).voting_power" )
+            if [[ "$new_voting_power" == "" ]]
+            then
+                echo "Validator is in not validator set yet..."
+                sleep 10
+            elif [[ "$new_voting_power" != "$voting_power" ]]
+            then
+                voting_power=$new_voting_power;
+                echo "Validator is in validator set, voting power: $voting_power"
+            fi
+        done
+        echo "Validator node setup complete."
+
+        # keep container running
+        tail -f /dev/null;
     fi
 fi
