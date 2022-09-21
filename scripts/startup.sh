@@ -58,4 +58,16 @@ else
     else
         dualityd start
     fi
+
+    # check if this node intends to become a validator
+    if [ $STARTUP_MODE == "validator" ] && [ -z $MNEMONIC ]
+    then
+        # wait for node to finish catching up to the chain's current height
+        while [[ dualityd status | jq .SyncInfo.catching_up == true ]]
+        do
+            echo "Node is catching up to chain height..."
+            sleep 10
+        done
+        echo "Node has caught up to chain height"
+    fi
 fi
