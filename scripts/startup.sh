@@ -55,6 +55,7 @@ else
         dualityd --log_level ${LOG_LEVEL:-info} start --moniker $NODE_MONIKER & :
 
         # wait for node to finish catching up to the chain's current height
+        sleep 5
         chain_block_height=$(echo $abci_info_json | jq -r ".result.response.last_block_height")
         node_status_json=$( dualityd status )
         while [[ echo $node_status_json | jq .SyncInfo.catching_up == true ]]
