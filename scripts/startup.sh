@@ -52,6 +52,8 @@ else
     sed -i 's#persistent_peers = ""#persistent_peers = "'"$persistent_peers"'"#' /root/.duality/config/config.toml
     mv networks/duality-testnet-1/genesis.json /root/.duality/config/genesis.json
 
+    echo "Starting fullnode..."
+
     if [ ! -z $MONIKER ]
     then
         dualityd start --moniker $MONIKER
