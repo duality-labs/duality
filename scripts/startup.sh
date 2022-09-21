@@ -52,5 +52,10 @@ else
     sed -i 's#persistent_peers = ""#persistent_peers = "'"$persistent_peers"'"#' /root/.duality/config/config.toml
     mv networks/duality-testnet-1/genesis.json /root/.duality/config/genesis.json
 
-    dualityd start --moniker new-validator
+    if [ ! -z $MONIKER ]
+    then
+        dualityd start --moniker $MONIKER
+    else
+        dualityd start
+    fi
 fi
