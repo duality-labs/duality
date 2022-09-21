@@ -47,12 +47,13 @@ else
     sed -i 's#persistent_peers = ""#persistent_peers = "'"$persistent_peers"'"#' /root/.duality/config/config.toml
     mv networks/duality-testnet-1/genesis.json /root/.duality/config/genesis.json
 
-    echo "Starting fullnode..."
-    dualityd start --moniker $NODE_MONIKER
-
     # check if this node intends to become a validator
     if [ $STARTUP_MODE == "validator" ] && [ -z $MNEMONIC ]
     then
+
+        echo "Starting future validator fullnode..."
+        dualityd start --moniker $NODE_MONIKER & :
+
         # wait for node to finish catching up to the chain's current height
         chain_block_height=$(echo $abci_info_json | jq -r ".result.response.last_block_height")
         node_status_json=$( dualityd status )
@@ -103,5 +104,10 @@ else
 
         # keep container running
         tail -f /dev/null;
+
+    else
+        # start as not a validator
+        echo "Starting fullnode..."
+        dualityd start --moniker $NODE_MONIKER
     fi
 fi
