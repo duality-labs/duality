@@ -2,7 +2,7 @@
 
 # set variable defaults
 STARTUP_MODE="${MODE:-fullnode}"
-MONIKER="${MONIKER:-$( head /dev/urandom | tr -dc 0-9a-f | head -c12 )}"
+NODE_MONIKER="${MONIKER:-$( head /dev/urandom | tr -dc 0-9a-f | head -c12 )}"
 
 # check current working directorys
 if [[ ! -e scripts/startup.sh ]]; then
@@ -17,7 +17,7 @@ if [ $STARTUP_MODE == "new" ]
 then
 
     echo "Starting new chain..."
-    dualityd start --moniker $MONIKER
+    dualityd start --moniker $NODE_MONIKER
     exit
 
 else
@@ -48,7 +48,7 @@ else
     mv networks/duality-testnet-1/genesis.json /root/.duality/config/genesis.json
 
     echo "Starting fullnode..."
-    dualityd start --moniker $MONIKER
+    dualityd start --moniker $NODE_MONIKER
 
     # check if this node intends to become a validator
     if [ $STARTUP_MODE == "validator" ] && [ -z $MNEMONIC ]
@@ -69,7 +69,7 @@ else
 
         # sent request to become a validator (to the first RPC address defined)
         dualityd tx staking create-validator \
-            --moniker $MONIKER \
+            --moniker $NODE_MONIKER \
             --node $rpc_address \
             --node-id `dualityd tendermint show-node-id` \
             --pubkey `dualityd tendermint show-validator` \
