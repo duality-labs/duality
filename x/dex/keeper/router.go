@@ -36,6 +36,7 @@ func getIntermediaryPaths() []Route {
 	}
 }
 
+// Uses intermediary paths to create potential routes
 func getRoutes(tokenIn string, tokenOut string) []Route {
 	allRoutes := []Route{}
 	baseRoute := Route{
@@ -44,6 +45,7 @@ func getRoutes(tokenIn string, tokenOut string) []Route {
 	allRoutes = append(allRoutes, baseRoute)
 	intermediaryPaths := getIntermediaryPaths()
 	for _, route := range intermediaryPaths {
+		// Create path: tokenIn -> intermediaryPath -> tokenOut
 		newPath := append(append([]string{tokenIn}, route.path[:]...), tokenOut)
 		newRoute := Route{
 			path: newPath,
@@ -53,7 +55,7 @@ func getRoutes(tokenIn string, tokenOut string) []Route {
 	return allRoutes
 }
 
-// Get valid routes from routes & calculates the price of given valid routes
+// Validate that routes exist & calculate the price of valid routes
 func (k Keeper) getValidRoutes(goCtx context.Context, tokenIn string, tokenOut string, routes []Route) ([]Route, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -106,63 +108,67 @@ func (k Keeper) getValidRoutes(goCtx context.Context, tokenIn string, tokenOut s
 	return validRoutes, nil
 }
 
-// Assumes all routes are valid
+// Updates the prices across all routes passed in
+// Assumes all routes passed in are valid
 func (k Keeper) updatePrices(goCtx context.Context, tokenIn string, tokenOut string, routes []Route) ([]Route, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	for _, route := range routes {
-		price := sdk.NewDec(1)
-		for i := 0; i < len(route.path)-1; i++ {
-			// Gets each pair sequentially
-			token0, token1, err := k.SortTokens(route.path[i], route.path[i+1])
-			if err == nil {
-				pairId := k.CreatePairId(token0, token1)
-				pair, pairFound := k.GetPairMap(ctx, pairId)
-
-				if pairFound {
-					// Multiply price according to tick
-					if route.path[i] == token0 {
-						tickPrice, err := k.Calc_price(pair.TokenPair.CurrentTick0To1)
-						if err != nil {
-							return nil, err
-						}
-						price = price.Mul(tickPrice)
-					} else {
-						tickPrice, err := k.Calc_price(pair.TokenPair.CurrentTick1To0)
-						if err != nil {
-							return nil, err
-						}
-						price = price.Mul(tickPrice)
-					}
-				} else {
-					break
-				}
-			} else {
-				break
-			}
-
+		price, err := k.updateRoutePrice(ctx, route)
+		if err != nil {
+			return nil, err
 		}
-		// If all pairs are valid, add to valid routes
 		route.price = price
 	}
 	return routes, nil
 }
 
+// Updates price for a specific route
+func (k Keeper) updateRoutePrice(ctx sdk.Context, route Route) (sdk.Dec, error) {
+	price := sdk.NewDec(1)
+	for i := 0; i < len(route.path)-1; i++ {
+		// Gets each pair sequentially
+		token0, token1, err := k.SortTokens(route.path[i], route.path[i+1])
+		if err == nil {
+			pairId := k.CreatePairId(token0, token1)
+			pair, pairFound := k.GetPairMap(ctx, pairId)
+
+			if pairFound {
+				// Multiply price according to tick
+				if route.path[i] == token0 {
+					tickPrice, err := k.Calc_price(pair.TokenPair.CurrentTick0To1)
+					if err != nil {
+						return sdk.ZeroDec(), err
+					}
+					price = price.Mul(tickPrice)
+				} else {
+					tickPrice, err := k.Calc_price(pair.TokenPair.CurrentTick1To0)
+					if err != nil {
+						return sdk.ZeroDec(), err
+					}
+					price = price.Mul(tickPrice)
+				}
+			}
+		}
+	}
+	return price, nil
+}
+
 /* TODO: Need to figure out how to compare against updated prices of all routes
 // Working theory: Not an issue because we save the price in a variable
 
-
-
 */
 func (k Keeper) SwapDynamicRouter(goCtx context.Context, msg *types.MsgSwap, callerAddress sdk.AccAddress, tokenIn string, tokenOut string, amountIn sdk.Dec, minOut sdk.Dec) (sdk.Dec, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
 	routes, err := k.getValidRoutes(goCtx, tokenIn, tokenOut, getRoutes(tokenIn, tokenOut))
 	// No valid routes found! Cannot perform swap
 	if len(routes) == 0 {
 		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNoValidRoutes, "No valid routes found")
 	}
 
-	// Valid routes are incorrect
+	// Valid routes failure
 	if err != nil {
-		panic(err)
+		return sdk.ZeroDec(), err
 	}
 
 	amountLeft := amountIn
@@ -181,20 +187,27 @@ func (k Keeper) SwapDynamicRouter(goCtx context.Context, msg *types.MsgSwap, cal
 		if (bestRoute.price.Mul(amountLeft).Add(totalAmountOut)).LT(minOut) {
 			return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 		}
+		for bestRoute.price.GT(secondBestPrice) {
+			// Either take 5% chunk or amountLeft if smaller than 5% of amountIn
+			amountToSwap := sdk.MinDec(amountIn.QuoInt64(20), amountLeft)
 
-		// Swap in 5% chunks across the route (arbitrary)
-		amountToSwap := sdk.MinDec(amountIn.QuoInt64(20), amountLeft)
+			// Swap the 5% chunk and see what amountOutFromSwap is
+			amountOutFromSwap, err := k.swapAcrossRoute(goCtx, msg, callerAddress, bestRoute, amountToSwap)
 
-		// Swap the 5% chunk and see what amountOutFromSwap is
-		amountOutFromSwap, err := k.swapWhileBestPrice(goCtx, msg, callerAddress, bestRoute, secondBestPrice, amountToSwap)
+			if err != nil {
+				return sdk.ZeroDec(), err
+			}
 
-		if err != nil {
-			return sdk.ZeroDec(), err
+			// Add amountOut from swap to totalAmountOut
+			totalAmountOut = totalAmountOut.Add(amountOutFromSwap)
+
+			// Update the route price for the best route
+			updatedPrice, err := k.updateRoutePrice(ctx, bestRoute)
+			if err != nil {
+				return sdk.ZeroDec(), err
+			}
+			bestRoute.price = updatedPrice
 		}
-
-		// Add amountOut from swap to totalAmountOut
-		totalAmountOut = totalAmountOut.Add(amountOutFromSwap)
-
 		// Update prices according to new updates from swap
 		routes, err = k.updatePrices(goCtx, tokenIn, tokenOut, routes)
 
@@ -207,8 +220,8 @@ func (k Keeper) SwapDynamicRouter(goCtx context.Context, msg *types.MsgSwap, cal
 	return totalAmountOut, nil
 }
 
-// Use same msg type for swapRoute
-func (k Keeper) swapWhileBestPrice(goCtx context.Context, msg *types.MsgSwap, callerAddress sdk.AccAddress, bestRoute Route, secondBestPrice sdk.Dec, amountIn sdk.Dec) (amountFromSwap sdk.Dec, err error) {
+// Swap across a route
+func (k Keeper) swapAcrossRoute(goCtx context.Context, msg *types.MsgSwap, callerAddress sdk.AccAddress, bestRoute Route, amountIn sdk.Dec) (amountFromSwap sdk.Dec, err error) {
 	amountToSwap := amountIn
 
 	// Passes in the amountOut from the previous pair into the next pair until we swap to the end of route
