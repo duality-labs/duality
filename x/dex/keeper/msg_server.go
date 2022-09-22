@@ -83,6 +83,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	return &types.MsgSwapResponse{}, nil
 }
 
+// TODO: Add functionality for SwapRoute msg
 func (k msgServer) SwapRoute(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSwapResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
