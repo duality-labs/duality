@@ -15,6 +15,9 @@ echo "Startup mode: $STARTUP_MODE"
 echo "Initializing chain..."
 dualityd init duality
 
+# replace moniker in the config
+sed -i 's#moniker = ".*"#moniker = "'"$NODE_MONIKER"'"#' /root/.duality/config/config.toml
+
 # start or join a chain
 if [ $STARTUP_MODE == "new" ]
 then
@@ -35,7 +38,7 @@ then
     dualityd collect-gentxs
 
     echo "Starting new chain..."
-    dualityd --log_level ${LOG_LEVEL:-info} start --moniker $NODE_MONIKER
+    dualityd --log_level ${LOG_LEVEL:-info} start
     exit
 
 else
@@ -70,7 +73,7 @@ else
     then
 
         echo "Starting future validator fullnode..."
-        dualityd --log_level ${LOG_LEVEL:-info} start --moniker $NODE_MONIKER & :
+        dualityd --log_level ${LOG_LEVEL:-info} start & :
 
         # wait for node to finish catching up to the chain's current height
         sleep 5
@@ -90,7 +93,6 @@ else
 
         # sent request to become a validator (to the first RPC address defined)
         dualityd tx staking create-validator \
-            --moniker $NODE_MONIKER \
             --node-id `dualityd tendermint show-node-id` \
             --pubkey `dualityd tendermint show-validator` \
             --commission-rate="${VALIDATOR_COMMISSION_RATE:-1.0}" \
@@ -127,6 +129,6 @@ else
     else
         # start as not a validator
         echo "Starting fullnode..."
-        dualityd --log_level ${LOG_LEVEL:-info} start --moniker $NODE_MONIKER
+        dualityd --log_level ${LOG_LEVEL:-info} start
     fi
 fi
