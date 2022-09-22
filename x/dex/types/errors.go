@@ -17,4 +17,5 @@ var (
 	ErrValidTickNotFound     = sdkerrors.Register(ModuleName, 1106, "Valid tick not found")
 	ErrValidPairNotFound     = sdkerrors.Register(ModuleName, 1107, "Valid pair not found")
 	ErrValidFeeIndexNotFound = sdkerrors.Register(ModuleName, 1108, "Valid FeeIndex not found: %s ")
+	ErrNoValidRoutes         = sdkerrors.Register(ModuleName, 1109, "No valid routes found: %s")
 )
