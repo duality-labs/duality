@@ -12,6 +12,9 @@ fi
 
 echo "Startup mode: $STARTUP_MODE"
 
+echo "Initializing chain..."
+dualityd init duality
+
 # start or join a chain
 if [ $STARTUP_MODE == "new" ]
 then
