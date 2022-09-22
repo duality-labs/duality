@@ -12,7 +12,7 @@ func (k Keeper) depositVerification(goCtx context.Context, msg types.MsgDeposit)
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
+	token0, token1, err := k.SortTokens(msg.TokenA, msg.TokenB)
 
 	if err != nil {
 		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
@@ -66,7 +66,7 @@ func (k Keeper) withdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
+	token0, token1, err := k.SortTokens(msg.TokenA, msg.TokenB)
 
 	if err != nil {
 		return "", "", nil, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
@@ -110,7 +110,7 @@ func (k Keeper) swapVerification(goCtx context.Context, msg types.MsgSwap) (stri
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
+	token0, token1, err := k.SortTokens(msg.TokenA, msg.TokenB)
 
 	if err != nil {
 		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
