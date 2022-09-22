@@ -85,7 +85,7 @@ else
             --from validator -y
 
         # wait to check the node's validator status
-        voting_power=""
+        voting_power=0
         pub_key=$( dualityd tendermint show-validator | jq .key )
         while [[ ! $voting_power -gt 0 ]]
         do
