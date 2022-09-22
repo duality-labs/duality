@@ -16,6 +16,21 @@ echo "Startup mode: $STARTUP_MODE"
 if [ $STARTUP_MODE == "new" ]
 then
 
+    # add new test accounts
+    echo "Creating test accounts..."
+    mkdir /root/.duality/testkeys
+
+    # alice
+    dualityd keys add alice --keyring-backend test --output json > /root/.duality/testkeys/alice.json
+    dualityd add-genesis-account $(dualityd keys show alice -a --keyring-backend test) 1000000000token,1000000000stake --keyring-backend test
+    # bob
+    dualityd keys add bob --keyring-backend test --output json > /root/.duality/testkeys/bob.json
+    dualityd add-genesis-account $(dualityd keys show bob -a --keyring-backend test) 1000000000token,1000000000stake --keyring-backend test
+
+    # Add gentxs to the genesis file
+    dualityd gentx alice 1000000stake --chain-id duality --keyring-backend test
+    dualityd collect-gentxs
+
     echo "Starting new chain..."
     dualityd --log_level ${LOG_LEVEL:-info} start --moniker $NODE_MONIKER
     exit

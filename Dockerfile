@@ -45,19 +45,6 @@ COPY --from=build-env /usr/src/build/dualityd_arm64 /usr/bin/dualityd
 # create duality chain config files
 RUN dualityd init duality
 
-# add test accounts
-RUN mkdir /root/.duality/testkeys
-# alice
-RUN dualityd keys add alice --keyring-backend test --output json > /root/.duality/testkeys/alice.json
-RUN dualityd add-genesis-account $(dualityd keys show alice -a --keyring-backend test) 1000000000token,1000000000stake --keyring-backend test
-# bob
-RUN dualityd keys add bob --keyring-backend test --output json > /root/.duality/testkeys/bob.json
-RUN dualityd add-genesis-account $(dualityd keys show bob -a --keyring-backend test) 1000000000token,1000000000stake --keyring-backend test
-
-# Add gentxs to the genesis file
-RUN dualityd gentx alice 1000000stake --chain-id duality --keyring-backend test
-RUN dualityd collect-gentxs
-
 # see docs for exposed ports:
 #   https://docs.ignite.com/kb/config.html#host
 EXPOSE 26657
