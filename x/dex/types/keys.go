@@ -154,6 +154,6 @@ const (
 )
 
 const (
-	AdjanceyMatrixKey      = "AdjanceyMatrix-value-"
-	AdjanceyMatrixCountKey = "AdjanceyMatrix-count-"
+	AdjMatrixKey      = "AdjMatrix-value-"
+	AdjMatrixCountKey = "AdjMatrix-count-"
 )

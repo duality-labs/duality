@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { EdgeRow } from "../dex/edge_row";
+import { EdgeRow } from "./edge_row";
 import { Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";

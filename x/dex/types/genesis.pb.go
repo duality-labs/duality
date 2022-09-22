@@ -36,8 +36,8 @@ type GenesisState struct {
 	FeeListCount        uint64           `protobuf:"varint,9,opt,name=feeListCount,proto3" json:"feeListCount,omitempty"`
 	EdgeRowList         []EdgeRow        `protobuf:"bytes,10,rep,name=edgeRowList,proto3" json:"edgeRowList"`
 	EdgeRowCount        uint64           `protobuf:"varint,11,opt,name=edgeRowCount,proto3" json:"edgeRowCount,omitempty"`
-	AdjanceyMatrixList  []AdjanceyMatrix `protobuf:"bytes,12,rep,name=adjanceyMatrixList,proto3" json:"adjanceyMatrixList"`
-	AdjanceyMatrixCount uint64           `protobuf:"varint,13,opt,name=adjanceyMatrixCount,proto3" json:"adjanceyMatrixCount,omitempty"`
+	AdjMatrixList  []AdjMatrix `protobuf:"bytes,12,rep,name=adjMatrixList,proto3" json:"adjMatrixList"`
+	AdjMatrixCount uint64           `protobuf:"varint,13,opt,name=adjMatrixCount,proto3" json:"adjMatrixCount,omitempty"`
 }
 
 func (m *GenesisState) Reset()         { *m = GenesisState{} }
@@ -150,16 +150,16 @@ func (m *GenesisState) GetEdgeRowCount() uint64 {
 	return 0
 }
 
-func (m *GenesisState) GetAdjanceyMatrixList() []AdjanceyMatrix {
+func (m *GenesisState) GetAdjMatrixList() []AdjMatrix {
 	if m != nil {
-		return m.AdjanceyMatrixList
+		return m.AdjMatrixList
 	}
 	return nil
 }
 
-func (m *GenesisState) GetAdjanceyMatrixCount() uint64 {
+func (m *GenesisState) GetAdjMatrixCount() uint64 {
 	if m != nil {
-		return m.AdjanceyMatrixCount
+		return m.AdjMatrixCount
 	}
 	return 0
 }
@@ -225,15 +225,15 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.AdjanceyMatrixCount != 0 {
-		i = encodeVarintGenesis(dAtA, i, uint64(m.AdjanceyMatrixCount))
+	if m.AdjMatrixCount != 0 {
+		i = encodeVarintGenesis(dAtA, i, uint64(m.AdjMatrixCount))
 		i--
 		dAtA[i] = 0x68
 	}
-	if len(m.AdjanceyMatrixList) > 0 {
-		for iNdEx := len(m.AdjanceyMatrixList) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.AdjMatrixList) > 0 {
+		for iNdEx := len(m.AdjMatrixList) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.AdjanceyMatrixList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.AdjMatrixList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -440,14 +440,14 @@ func (m *GenesisState) Size() (n int) {
 	if m.EdgeRowCount != 0 {
 		n += 1 + sovGenesis(uint64(m.EdgeRowCount))
 	}
-	if len(m.AdjanceyMatrixList) > 0 {
-		for _, e := range m.AdjanceyMatrixList {
+	if len(m.AdjMatrixList) > 0 {
+		for _, e := range m.AdjMatrixList {
 			l = e.Size()
 			n += 1 + l + sovGenesis(uint64(l))
 		}
 	}
-	if m.AdjanceyMatrixCount != 0 {
-		n += 1 + sovGenesis(uint64(m.AdjanceyMatrixCount))
+	if m.AdjMatrixCount != 0 {
+		n += 1 + sovGenesis(uint64(m.AdjMatrixCount))
 	}
 	return n
 }
@@ -817,7 +817,7 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			}
 		case 12:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AdjanceyMatrixList", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AdjMatrixList", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -844,16 +844,16 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AdjanceyMatrixList = append(m.AdjanceyMatrixList, AdjanceyMatrix{})
-			if err := m.AdjanceyMatrixList[len(m.AdjanceyMatrixList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.AdjMatrixList = append(m.AdjMatrixList, AdjMatrix{})
+			if err := m.AdjMatrixList[len(m.AdjMatrixList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 13:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AdjanceyMatrixCount", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AdjMatrixCount", wireType)
 			}
-			m.AdjanceyMatrixCount = 0
+			m.AdjMatrixCount = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGenesis
@@ -863,7 +863,7 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.AdjanceyMatrixCount |= uint64(b&0x7F) << shift
+				m.AdjMatrixCount |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}

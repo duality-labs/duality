@@ -12,7 +12,7 @@ import "dex/token_map.proto";
 import "dex/shares.proto";
 import "dex/fee_list.proto";
 import "dex/edge_row.proto";
-import "dex/adjancey_matrix.proto";
+import "dex/adj_matrix.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -93,14 +93,14 @@ service Query {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/edge_row";
 	}
 
-// Queries a AdjanceyMatrix by id.
-	rpc AdjanceyMatrix(QueryGetAdjanceyMatrixRequest) returns (QueryGetAdjanceyMatrixResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/adjancey_matrix/{id}";
+// Queries a AdjMatrix by id.
+	rpc AdjMatrix(QueryGetAdjMatrixRequest) returns (QueryGetAdjMatrixResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/adj_matrix/{id}";
 	}
 
-	// Queries a list of AdjanceyMatrix items.
-	rpc AdjanceyMatrixAll(QueryAllAdjanceyMatrixRequest) returns (QueryAllAdjanceyMatrixResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/adjancey_matrix";
+	// Queries a list of AdjMatrix items.
+	rpc AdjMatrixAll(QueryAllAdjMatrixRequest) returns (QueryAllAdjMatrixResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/adj_matrix";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -243,20 +243,20 @@ message QueryAllEdgeRowResponse {
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-message QueryGetAdjanceyMatrixRequest {
+message QueryGetAdjMatrixRequest {
 	uint64 id = 1;
 }
 
-message QueryGetAdjanceyMatrixResponse {
-	AdjanceyMatrix AdjanceyMatrix = 1 [(gogoproto.nullable) = false];
+message QueryGetAdjMatrixResponse {
+	AdjMatrix AdjMatrix = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryAllAdjanceyMatrixRequest {
+message QueryAllAdjMatrixRequest {
 	cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-message QueryAllAdjanceyMatrixResponse {
-	repeated AdjanceyMatrix AdjanceyMatrix = 1 [(gogoproto.nullable) = false];
+message QueryAllAdjMatrixResponse {
+	repeated AdjMatrix AdjMatrix = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

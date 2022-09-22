@@ -8,10 +8,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// GetAdjanceyMatrixCount get the total number of adjanceyMatrix
-func (k Keeper) GetAdjanceyMatrixCount(ctx sdk.Context) uint64 {
+// GetAdjMatrixCount get the total number of adjMatrix
+func (k Keeper) GetAdjMatrixCount(ctx sdk.Context) uint64 {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte{})
-	byteKey := types.KeyPrefix(types.AdjanceyMatrixCountKey)
+	byteKey := types.KeyPrefix(types.AdjMatrixCountKey)
 	bz := store.Get(byteKey)
 
 	// Count doesn't exist: no element
@@ -23,47 +23,47 @@ func (k Keeper) GetAdjanceyMatrixCount(ctx sdk.Context) uint64 {
 	return binary.BigEndian.Uint64(bz)
 }
 
-// SetAdjanceyMatrixCount set the total number of adjanceyMatrix
-func (k Keeper) SetAdjanceyMatrixCount(ctx sdk.Context, count uint64) {
+// SetAdjMatrixCount set the total number of adjMatrix
+func (k Keeper) SetAdjMatrixCount(ctx sdk.Context, count uint64) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte{})
-	byteKey := types.KeyPrefix(types.AdjanceyMatrixCountKey)
+	byteKey := types.KeyPrefix(types.AdjMatrixCountKey)
 	bz := make([]byte, 8)
 	binary.BigEndian.PutUint64(bz, count)
 	store.Set(byteKey, bz)
 }
 
-// AppendAdjanceyMatrix appends a adjanceyMatrix in the store with a new id and update the count
-func (k Keeper) AppendAdjanceyMatrix(
+// AppendAdjMatrix appends a adjMatrix in the store with a new id and update the count
+func (k Keeper) AppendAdjMatrix(
 	ctx sdk.Context,
-	adjanceyMatrix types.AdjanceyMatrix,
+	adjMatrix types.AdjMatrix,
 ) uint64 {
-	// Create the adjanceyMatrix
-	count := k.GetAdjanceyMatrixCount(ctx)
+	// Create the adjMatrix
+	count := k.GetAdjMatrixCount(ctx)
 
 	// Set the ID of the appended value
-	adjanceyMatrix.Id = count
+	adjMatrix.Id = count
 
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AdjanceyMatrixKey))
-	appendedValue := k.cdc.MustMarshal(&adjanceyMatrix)
-	store.Set(GetAdjanceyMatrixIDBytes(adjanceyMatrix.Id), appendedValue)
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AdjMatrixKey))
+	appendedValue := k.cdc.MustMarshal(&adjMatrix)
+	store.Set(GetAdjMatrixIDBytes(adjMatrix.Id), appendedValue)
 
-	// Update adjanceyMatrix count
-	k.SetAdjanceyMatrixCount(ctx, count+1)
+	// Update adjMatrix count
+	k.SetAdjMatrixCount(ctx, count+1)
 
 	return count
 }
 
-// SetAdjanceyMatrix set a specific adjanceyMatrix in the store
-func (k Keeper) SetAdjanceyMatrix(ctx sdk.Context, adjanceyMatrix types.AdjanceyMatrix) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AdjanceyMatrixKey))
-	b := k.cdc.MustMarshal(&adjanceyMatrix)
-	store.Set(GetAdjanceyMatrixIDBytes(adjanceyMatrix.Id), b)
+// SetAdjMatrix set a specific adjMatrix in the store
+func (k Keeper) SetAdjMatrix(ctx sdk.Context, adjMatrix types.AdjMatrix) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AdjMatrixKey))
+	b := k.cdc.MustMarshal(&adjMatrix)
+	store.Set(GetAdjMatrixIDBytes(adjMatrix.Id), b)
 }
 
-// GetAdjanceyMatrix returns a adjanceyMatrix from its id
-func (k Keeper) GetAdjanceyMatrix(ctx sdk.Context, id uint64) (val types.AdjanceyMatrix, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AdjanceyMatrixKey))
-	b := store.Get(GetAdjanceyMatrixIDBytes(id))
+// GetAdjMatrix returns a adjMatrix from its id
+func (k Keeper) GetAdjMatrix(ctx sdk.Context, id uint64) (val types.AdjMatrix, found bool) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AdjMatrixKey))
+	b := store.Get(GetAdjMatrixIDBytes(id))
 	if b == nil {
 		return val, false
 	}
@@ -71,21 +71,21 @@ func (k Keeper) GetAdjanceyMatrix(ctx sdk.Context, id uint64) (val types.Adjance
 	return val, true
 }
 
-// RemoveAdjanceyMatrix removes a adjanceyMatrix from the store
-func (k Keeper) RemoveAdjanceyMatrix(ctx sdk.Context, id uint64) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AdjanceyMatrixKey))
-	store.Delete(GetAdjanceyMatrixIDBytes(id))
+// RemoveAdjMatrix removes a adjMatrix from the store
+func (k Keeper) RemoveAdjMatrix(ctx sdk.Context, id uint64) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AdjMatrixKey))
+	store.Delete(GetAdjMatrixIDBytes(id))
 }
 
-// GetAllAdjanceyMatrix returns all adjanceyMatrix
-func (k Keeper) GetAllAdjanceyMatrix(ctx sdk.Context) (list []types.AdjanceyMatrix) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AdjanceyMatrixKey))
+// GetAllAdjMatrix returns all adjMatrix
+func (k Keeper) GetAllAdjMatrix(ctx sdk.Context) (list []types.AdjMatrix) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.AdjMatrixKey))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var val types.AdjanceyMatrix
+		var val types.AdjMatrix
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
 		list = append(list, val)
 	}
@@ -93,14 +93,14 @@ func (k Keeper) GetAllAdjanceyMatrix(ctx sdk.Context) (list []types.AdjanceyMatr
 	return
 }
 
-// GetAdjanceyMatrixIDBytes returns the byte representation of the ID
-func GetAdjanceyMatrixIDBytes(id uint64) []byte {
+// GetAdjMatrixIDBytes returns the byte representation of the ID
+func GetAdjMatrixIDBytes(id uint64) []byte {
 	bz := make([]byte, 8)
 	binary.BigEndian.PutUint64(bz, id)
 	return bz
 }
 
-// GetAdjanceyMatrixIDFromBytes returns ID in uint64 format from a byte array
-func GetAdjanceyMatrixIDFromBytes(bz []byte) uint64 {
+// GetAdjMatrixIDFromBytes returns ID in uint64 format from a byte array
+func GetAdjMatrixIDFromBytes(bz []byte) uint64 {
 	return binary.BigEndian.Uint64(bz)
 }

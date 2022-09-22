@@ -71,7 +71,7 @@ func TestGenesis(t *testing.T) {
 			},
 		},
 		EdgeRowCount: 2,
-		AdjanceyMatrixList: []types.AdjanceyMatrix{
+		AdjMatrixList: []types.AdjMatrix{
 			{
 				Id: 0,
 			},
@@ -79,7 +79,7 @@ func TestGenesis(t *testing.T) {
 				Id: 1,
 			},
 		},
-		AdjanceyMatrixCount: 2,
+		AdjMatrixCount: 2,
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
@@ -100,7 +100,7 @@ func TestGenesis(t *testing.T) {
 	require.Equal(t, genesisState.FeeListCount, got.FeeListCount)
 	require.ElementsMatch(t, genesisState.EdgeRowList, got.EdgeRowList)
 	require.Equal(t, genesisState.EdgeRowCount, got.EdgeRowCount)
-	require.ElementsMatch(t, genesisState.AdjanceyMatrixList, got.AdjanceyMatrixList)
-	require.Equal(t, genesisState.AdjanceyMatrixCount, got.AdjanceyMatrixCount)
+	require.ElementsMatch(t, genesisState.AdjMatrixList, got.AdjMatrixList)
+	require.Equal(t, genesisState.AdjMatrixCount, got.AdjMatrixCount)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

@@ -29809,17 +29809,17 @@ paths:
           format: uint64
       tags:
         - Query
-  /NicholasDotSol/duality/dex/adjancey_matrix:
+  /NicholasDotSol/duality/dex/adj_matrix:
     get:
-      summary: Queries a list of AdjanceyMatrix items.
-      operationId: NicholasdotsolDualityDexAdjanceyMatrixAll
+      summary: Queries a list of AdjMatrix items.
+      operationId: NicholasdotsolDualityDexAdjMatrixAll
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              AdjanceyMatrix:
+              AdjMatrix:
                 type: array
                 items:
                   type: object
@@ -29939,17 +29939,17 @@ paths:
           type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/adjancey_matrix/{id}':
+  '/NicholasDotSol/duality/dex/adj_matrix/{id}':
     get:
-      summary: Queries a AdjanceyMatrix by id.
-      operationId: NicholasdotsolDualityDexAdjanceyMatrix
+      summary: Queries a AdjMatrix by id.
+      operationId: NicholasdotsolDualityDexAdjMatrix
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              AdjanceyMatrix:
+              AdjMatrix:
                 type: object
                 properties:
                   id:
@@ -52985,7 +52985,7 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
-  nicholasdotsol.duality.dex.AdjanceyMatrix:
+  nicholasdotsol.duality.dex.AdjMatrix:
     type: object
     properties:
       id:
@@ -53042,10 +53042,10 @@ definitions:
   nicholasdotsol.duality.dex.Params:
     type: object
     description: Params defines the parameters for the module.
-  nicholasdotsol.duality.dex.QueryAllAdjanceyMatrixResponse:
+  nicholasdotsol.duality.dex.QueryAllAdjMatrixResponse:
     type: object
     properties:
-      AdjanceyMatrix:
+      AdjMatrix:
         type: array
         items:
           type: object
@@ -53383,10 +53383,10 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  nicholasdotsol.duality.dex.QueryGetAdjanceyMatrixResponse:
+  nicholasdotsol.duality.dex.QueryGetAdjMatrixResponse:
     type: object
     properties:
-      AdjanceyMatrix:
+      AdjMatrix:
         type: object
         properties:
           id:

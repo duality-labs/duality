@@ -1433,22 +1433,22 @@ func (m *QueryAllEdgeRowResponse) GetPagination() *query.PageResponse {
 	return nil
 }
 
-type QueryGetAdjanceyMatrixRequest struct {
+type QueryGetAdjMatrixRequest struct {
 	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
-func (m *QueryGetAdjanceyMatrixRequest) Reset()         { *m = QueryGetAdjanceyMatrixRequest{} }
-func (m *QueryGetAdjanceyMatrixRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetAdjanceyMatrixRequest) ProtoMessage()    {}
-func (*QueryGetAdjanceyMatrixRequest) Descriptor() ([]byte, []int) {
+func (m *QueryGetAdjMatrixRequest) Reset()         { *m = QueryGetAdjMatrixRequest{} }
+func (m *QueryGetAdjMatrixRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryGetAdjMatrixRequest) ProtoMessage()    {}
+func (*QueryGetAdjMatrixRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d8e98105e6e08a59, []int{30}
 }
-func (m *QueryGetAdjanceyMatrixRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryGetAdjMatrixRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetAdjanceyMatrixRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGetAdjMatrixRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetAdjanceyMatrixRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGetAdjMatrixRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1458,41 +1458,41 @@ func (m *QueryGetAdjanceyMatrixRequest) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *QueryGetAdjanceyMatrixRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetAdjanceyMatrixRequest.Merge(m, src)
+func (m *QueryGetAdjMatrixRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetAdjMatrixRequest.Merge(m, src)
 }
-func (m *QueryGetAdjanceyMatrixRequest) XXX_Size() int {
+func (m *QueryGetAdjMatrixRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetAdjanceyMatrixRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetAdjanceyMatrixRequest.DiscardUnknown(m)
+func (m *QueryGetAdjMatrixRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetAdjMatrixRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetAdjanceyMatrixRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryGetAdjMatrixRequest proto.InternalMessageInfo
 
-func (m *QueryGetAdjanceyMatrixRequest) GetId() uint64 {
+func (m *QueryGetAdjMatrixRequest) GetId() uint64 {
 	if m != nil {
 		return m.Id
 	}
 	return 0
 }
 
-type QueryGetAdjanceyMatrixResponse struct {
-	AdjanceyMatrix AdjanceyMatrix `protobuf:"bytes,1,opt,name=AdjanceyMatrix,proto3" json:"AdjanceyMatrix"`
+type QueryGetAdjMatrixResponse struct {
+	AdjMatrix AdjMatrix `protobuf:"bytes,1,opt,name=AdjMatrix,proto3" json:"AdjMatrix"`
 }
 
-func (m *QueryGetAdjanceyMatrixResponse) Reset()         { *m = QueryGetAdjanceyMatrixResponse{} }
-func (m *QueryGetAdjanceyMatrixResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryGetAdjanceyMatrixResponse) ProtoMessage()    {}
-func (*QueryGetAdjanceyMatrixResponse) Descriptor() ([]byte, []int) {
+func (m *QueryGetAdjMatrixResponse) Reset()         { *m = QueryGetAdjMatrixResponse{} }
+func (m *QueryGetAdjMatrixResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryGetAdjMatrixResponse) ProtoMessage()    {}
+func (*QueryGetAdjMatrixResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d8e98105e6e08a59, []int{31}
 }
-func (m *QueryGetAdjanceyMatrixResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryGetAdjMatrixResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetAdjanceyMatrixResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGetAdjMatrixResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetAdjanceyMatrixResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGetAdjMatrixResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1502,41 +1502,41 @@ func (m *QueryGetAdjanceyMatrixResponse) XXX_Marshal(b []byte, deterministic boo
 		return b[:n], nil
 	}
 }
-func (m *QueryGetAdjanceyMatrixResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetAdjanceyMatrixResponse.Merge(m, src)
+func (m *QueryGetAdjMatrixResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetAdjMatrixResponse.Merge(m, src)
 }
-func (m *QueryGetAdjanceyMatrixResponse) XXX_Size() int {
+func (m *QueryGetAdjMatrixResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetAdjanceyMatrixResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetAdjanceyMatrixResponse.DiscardUnknown(m)
+func (m *QueryGetAdjMatrixResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetAdjMatrixResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetAdjanceyMatrixResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryGetAdjMatrixResponse proto.InternalMessageInfo
 
-func (m *QueryGetAdjanceyMatrixResponse) GetAdjanceyMatrix() AdjanceyMatrix {
+func (m *QueryGetAdjMatrixResponse) GetAdjMatrix() AdjMatrix {
 	if m != nil {
-		return m.AdjanceyMatrix
+		return m.AdjMatrix
 	}
-	return AdjanceyMatrix{}
+	return AdjMatrix{}
 }
 
-type QueryAllAdjanceyMatrixRequest struct {
+type QueryAllAdjMatrixRequest struct {
 	Pagination *query.PageRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryAllAdjanceyMatrixRequest) Reset()         { *m = QueryAllAdjanceyMatrixRequest{} }
-func (m *QueryAllAdjanceyMatrixRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryAllAdjanceyMatrixRequest) ProtoMessage()    {}
-func (*QueryAllAdjanceyMatrixRequest) Descriptor() ([]byte, []int) {
+func (m *QueryAllAdjMatrixRequest) Reset()         { *m = QueryAllAdjMatrixRequest{} }
+func (m *QueryAllAdjMatrixRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryAllAdjMatrixRequest) ProtoMessage()    {}
+func (*QueryAllAdjMatrixRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d8e98105e6e08a59, []int{32}
 }
-func (m *QueryAllAdjanceyMatrixRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryAllAdjMatrixRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryAllAdjanceyMatrixRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryAllAdjMatrixRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryAllAdjanceyMatrixRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryAllAdjMatrixRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1546,42 +1546,42 @@ func (m *QueryAllAdjanceyMatrixRequest) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *QueryAllAdjanceyMatrixRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryAllAdjanceyMatrixRequest.Merge(m, src)
+func (m *QueryAllAdjMatrixRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryAllAdjMatrixRequest.Merge(m, src)
 }
-func (m *QueryAllAdjanceyMatrixRequest) XXX_Size() int {
+func (m *QueryAllAdjMatrixRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryAllAdjanceyMatrixRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryAllAdjanceyMatrixRequest.DiscardUnknown(m)
+func (m *QueryAllAdjMatrixRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryAllAdjMatrixRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryAllAdjanceyMatrixRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryAllAdjMatrixRequest proto.InternalMessageInfo
 
-func (m *QueryAllAdjanceyMatrixRequest) GetPagination() *query.PageRequest {
+func (m *QueryAllAdjMatrixRequest) GetPagination() *query.PageRequest {
 	if m != nil {
 		return m.Pagination
 	}
 	return nil
 }
 
-type QueryAllAdjanceyMatrixResponse struct {
-	AdjanceyMatrix []AdjanceyMatrix    `protobuf:"bytes,1,rep,name=AdjanceyMatrix,proto3" json:"AdjanceyMatrix"`
+type QueryAllAdjMatrixResponse struct {
+	AdjMatrix []AdjMatrix    `protobuf:"bytes,1,rep,name=AdjMatrix,proto3" json:"AdjMatrix"`
 	Pagination     *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryAllAdjanceyMatrixResponse) Reset()         { *m = QueryAllAdjanceyMatrixResponse{} }
-func (m *QueryAllAdjanceyMatrixResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryAllAdjanceyMatrixResponse) ProtoMessage()    {}
-func (*QueryAllAdjanceyMatrixResponse) Descriptor() ([]byte, []int) {
+func (m *QueryAllAdjMatrixResponse) Reset()         { *m = QueryAllAdjMatrixResponse{} }
+func (m *QueryAllAdjMatrixResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryAllAdjMatrixResponse) ProtoMessage()    {}
+func (*QueryAllAdjMatrixResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d8e98105e6e08a59, []int{33}
 }
-func (m *QueryAllAdjanceyMatrixResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryAllAdjMatrixResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryAllAdjanceyMatrixResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryAllAdjMatrixResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryAllAdjanceyMatrixResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryAllAdjMatrixResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1591,26 +1591,26 @@ func (m *QueryAllAdjanceyMatrixResponse) XXX_Marshal(b []byte, deterministic boo
 		return b[:n], nil
 	}
 }
-func (m *QueryAllAdjanceyMatrixResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryAllAdjanceyMatrixResponse.Merge(m, src)
+func (m *QueryAllAdjMatrixResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryAllAdjMatrixResponse.Merge(m, src)
 }
-func (m *QueryAllAdjanceyMatrixResponse) XXX_Size() int {
+func (m *QueryAllAdjMatrixResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryAllAdjanceyMatrixResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryAllAdjanceyMatrixResponse.DiscardUnknown(m)
+func (m *QueryAllAdjMatrixResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryAllAdjMatrixResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryAllAdjanceyMatrixResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryAllAdjMatrixResponse proto.InternalMessageInfo
 
-func (m *QueryAllAdjanceyMatrixResponse) GetAdjanceyMatrix() []AdjanceyMatrix {
+func (m *QueryAllAdjMatrixResponse) GetAdjMatrix() []AdjMatrix {
 	if m != nil {
-		return m.AdjanceyMatrix
+		return m.AdjMatrix
 	}
 	return nil
 }
 
-func (m *QueryAllAdjanceyMatrixResponse) GetPagination() *query.PageResponse {
+func (m *QueryAllAdjMatrixResponse) GetPagination() *query.PageResponse {
 	if m != nil {
 		return m.Pagination
 	}
@@ -1648,10 +1648,10 @@ func init() {
 	proto.RegisterType((*QueryGetEdgeRowResponse)(nil), "nicholasdotsol.duality.dex.QueryGetEdgeRowResponse")
 	proto.RegisterType((*QueryAllEdgeRowRequest)(nil), "nicholasdotsol.duality.dex.QueryAllEdgeRowRequest")
 	proto.RegisterType((*QueryAllEdgeRowResponse)(nil), "nicholasdotsol.duality.dex.QueryAllEdgeRowResponse")
-	proto.RegisterType((*QueryGetAdjanceyMatrixRequest)(nil), "nicholasdotsol.duality.dex.QueryGetAdjanceyMatrixRequest")
-	proto.RegisterType((*QueryGetAdjanceyMatrixResponse)(nil), "nicholasdotsol.duality.dex.QueryGetAdjanceyMatrixResponse")
-	proto.RegisterType((*QueryAllAdjanceyMatrixRequest)(nil), "nicholasdotsol.duality.dex.QueryAllAdjanceyMatrixRequest")
-	proto.RegisterType((*QueryAllAdjanceyMatrixResponse)(nil), "nicholasdotsol.duality.dex.QueryAllAdjanceyMatrixResponse")
+	proto.RegisterType((*QueryGetAdjMatrixRequest)(nil), "nicholasdotsol.duality.dex.QueryGetAdjMatrixRequest")
+	proto.RegisterType((*QueryGetAdjMatrixResponse)(nil), "nicholasdotsol.duality.dex.QueryGetAdjMatrixResponse")
+	proto.RegisterType((*QueryAllAdjMatrixRequest)(nil), "nicholasdotsol.duality.dex.QueryAllAdjMatrixRequest")
+	proto.RegisterType((*QueryAllAdjMatrixResponse)(nil), "nicholasdotsol.duality.dex.QueryAllAdjMatrixResponse")
 }
 
 func init() { proto.RegisterFile("dex/query.proto", fileDescriptor_d8e98105e6e08a59) }
@@ -1786,10 +1786,10 @@ type QueryClient interface {
 	EdgeRow(ctx context.Context, in *QueryGetEdgeRowRequest, opts ...grpc.CallOption) (*QueryGetEdgeRowResponse, error)
 	// Queries a list of EdgeRow items.
 	EdgeRowAll(ctx context.Context, in *QueryAllEdgeRowRequest, opts ...grpc.CallOption) (*QueryAllEdgeRowResponse, error)
-	// Queries a AdjanceyMatrix by id.
-	AdjanceyMatrix(ctx context.Context, in *QueryGetAdjanceyMatrixRequest, opts ...grpc.CallOption) (*QueryGetAdjanceyMatrixResponse, error)
-	// Queries a list of AdjanceyMatrix items.
-	AdjanceyMatrixAll(ctx context.Context, in *QueryAllAdjanceyMatrixRequest, opts ...grpc.CallOption) (*QueryAllAdjanceyMatrixResponse, error)
+	// Queries a AdjMatrix by id.
+	AdjMatrix(ctx context.Context, in *QueryGetAdjMatrixRequest, opts ...grpc.CallOption) (*QueryGetAdjMatrixResponse, error)
+	// Queries a list of AdjMatrix items.
+	AdjMatrixAll(ctx context.Context, in *QueryAllAdjMatrixRequest, opts ...grpc.CallOption) (*QueryAllAdjMatrixResponse, error)
 }
 
 type queryClient struct {
@@ -1935,18 +1935,18 @@ func (c *queryClient) EdgeRowAll(ctx context.Context, in *QueryAllEdgeRowRequest
 	return out, nil
 }
 
-func (c *queryClient) AdjanceyMatrix(ctx context.Context, in *QueryGetAdjanceyMatrixRequest, opts ...grpc.CallOption) (*QueryGetAdjanceyMatrixResponse, error) {
-	out := new(QueryGetAdjanceyMatrixResponse)
-	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Query/AdjanceyMatrix", in, out, opts...)
+func (c *queryClient) AdjMatrix(ctx context.Context, in *QueryGetAdjMatrixRequest, opts ...grpc.CallOption) (*QueryGetAdjMatrixResponse, error) {
+	out := new(QueryGetAdjMatrixResponse)
+	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Query/AdjMatrix", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *queryClient) AdjanceyMatrixAll(ctx context.Context, in *QueryAllAdjanceyMatrixRequest, opts ...grpc.CallOption) (*QueryAllAdjanceyMatrixResponse, error) {
-	out := new(QueryAllAdjanceyMatrixResponse)
-	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Query/AdjanceyMatrixAll", in, out, opts...)
+func (c *queryClient) AdjMatrixAll(ctx context.Context, in *QueryAllAdjMatrixRequest, opts ...grpc.CallOption) (*QueryAllAdjMatrixResponse, error) {
+	out := new(QueryAllAdjMatrixResponse)
+	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Query/AdjMatrixAll", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1985,10 +1985,10 @@ type QueryServer interface {
 	EdgeRow(context.Context, *QueryGetEdgeRowRequest) (*QueryGetEdgeRowResponse, error)
 	// Queries a list of EdgeRow items.
 	EdgeRowAll(context.Context, *QueryAllEdgeRowRequest) (*QueryAllEdgeRowResponse, error)
-	// Queries a AdjanceyMatrix by id.
-	AdjanceyMatrix(context.Context, *QueryGetAdjanceyMatrixRequest) (*QueryGetAdjanceyMatrixResponse, error)
-	// Queries a list of AdjanceyMatrix items.
-	AdjanceyMatrixAll(context.Context, *QueryAllAdjanceyMatrixRequest) (*QueryAllAdjanceyMatrixResponse, error)
+	// Queries a AdjMatrix by id.
+	AdjMatrix(context.Context, *QueryGetAdjMatrixRequest) (*QueryGetAdjMatrixResponse, error)
+	// Queries a list of AdjMatrix items.
+	AdjMatrixAll(context.Context, *QueryAllAdjMatrixRequest) (*QueryAllAdjMatrixResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -2040,11 +2040,11 @@ func (*UnimplementedQueryServer) EdgeRow(ctx context.Context, req *QueryGetEdgeR
 func (*UnimplementedQueryServer) EdgeRowAll(ctx context.Context, req *QueryAllEdgeRowRequest) (*QueryAllEdgeRowResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EdgeRowAll not implemented")
 }
-func (*UnimplementedQueryServer) AdjanceyMatrix(ctx context.Context, req *QueryGetAdjanceyMatrixRequest) (*QueryGetAdjanceyMatrixResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AdjanceyMatrix not implemented")
+func (*UnimplementedQueryServer) AdjMatrix(ctx context.Context, req *QueryGetAdjMatrixRequest) (*QueryGetAdjMatrixResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdjMatrix not implemented")
 }
-func (*UnimplementedQueryServer) AdjanceyMatrixAll(ctx context.Context, req *QueryAllAdjanceyMatrixRequest) (*QueryAllAdjanceyMatrixResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AdjanceyMatrixAll not implemented")
+func (*UnimplementedQueryServer) AdjMatrixAll(ctx context.Context, req *QueryAllAdjMatrixRequest) (*QueryAllAdjMatrixResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdjMatrixAll not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -2321,38 +2321,38 @@ func _Query_EdgeRowAll_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_AdjanceyMatrix_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetAdjanceyMatrixRequest)
+func _Query_AdjMatrix_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGetAdjMatrixRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).AdjanceyMatrix(ctx, in)
+		return srv.(QueryServer).AdjMatrix(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/nicholasdotsol.duality.dex.Query/AdjanceyMatrix",
+		FullMethod: "/nicholasdotsol.duality.dex.Query/AdjMatrix",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).AdjanceyMatrix(ctx, req.(*QueryGetAdjanceyMatrixRequest))
+		return srv.(QueryServer).AdjMatrix(ctx, req.(*QueryGetAdjMatrixRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_AdjanceyMatrixAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryAllAdjanceyMatrixRequest)
+func _Query_AdjMatrixAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryAllAdjMatrixRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).AdjanceyMatrixAll(ctx, in)
+		return srv.(QueryServer).AdjMatrixAll(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/nicholasdotsol.duality.dex.Query/AdjanceyMatrixAll",
+		FullMethod: "/nicholasdotsol.duality.dex.Query/AdjMatrixAll",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).AdjanceyMatrixAll(ctx, req.(*QueryAllAdjanceyMatrixRequest))
+		return srv.(QueryServer).AdjMatrixAll(ctx, req.(*QueryAllAdjMatrixRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2422,12 +2422,12 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Query_EdgeRowAll_Handler,
 		},
 		{
-			MethodName: "AdjanceyMatrix",
-			Handler:    _Query_AdjanceyMatrix_Handler,
+			MethodName: "AdjMatrix",
+			Handler:    _Query_AdjMatrix_Handler,
 		},
 		{
-			MethodName: "AdjanceyMatrixAll",
-			Handler:    _Query_AdjanceyMatrixAll_Handler,
+			MethodName: "AdjMatrixAll",
+			Handler:    _Query_AdjMatrixAll_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -3535,7 +3535,7 @@ func (m *QueryAllEdgeRowResponse) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetAdjanceyMatrixRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryGetAdjMatrixRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -3545,12 +3545,12 @@ func (m *QueryGetAdjanceyMatrixRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetAdjanceyMatrixRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGetAdjMatrixRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetAdjanceyMatrixRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGetAdjMatrixRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -3563,7 +3563,7 @@ func (m *QueryGetAdjanceyMatrixRequest) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetAdjanceyMatrixResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryGetAdjMatrixResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -3573,18 +3573,18 @@ func (m *QueryGetAdjanceyMatrixResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetAdjanceyMatrixResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGetAdjMatrixResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetAdjanceyMatrixResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGetAdjMatrixResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	{
-		size, err := m.AdjanceyMatrix.MarshalToSizedBuffer(dAtA[:i])
+		size, err := m.AdjMatrix.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -3596,7 +3596,7 @@ func (m *QueryGetAdjanceyMatrixResponse) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryAllAdjanceyMatrixRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryAllAdjMatrixRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -3606,12 +3606,12 @@ func (m *QueryAllAdjanceyMatrixRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryAllAdjanceyMatrixRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryAllAdjMatrixRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryAllAdjanceyMatrixRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryAllAdjMatrixRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -3631,7 +3631,7 @@ func (m *QueryAllAdjanceyMatrixRequest) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryAllAdjanceyMatrixResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryAllAdjMatrixResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -3641,12 +3641,12 @@ func (m *QueryAllAdjanceyMatrixResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryAllAdjanceyMatrixResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryAllAdjMatrixResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryAllAdjanceyMatrixResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryAllAdjMatrixResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -3663,10 +3663,10 @@ func (m *QueryAllAdjanceyMatrixResponse) MarshalToSizedBuffer(dAtA []byte) (int,
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.AdjanceyMatrix) > 0 {
-		for iNdEx := len(m.AdjanceyMatrix) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.AdjMatrix) > 0 {
+		for iNdEx := len(m.AdjMatrix) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.AdjanceyMatrix[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.AdjMatrix[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -4113,7 +4113,7 @@ func (m *QueryAllEdgeRowResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetAdjanceyMatrixRequest) Size() (n int) {
+func (m *QueryGetAdjMatrixRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -4125,18 +4125,18 @@ func (m *QueryGetAdjanceyMatrixRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetAdjanceyMatrixResponse) Size() (n int) {
+func (m *QueryGetAdjMatrixResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = m.AdjanceyMatrix.Size()
+	l = m.AdjMatrix.Size()
 	n += 1 + l + sovQuery(uint64(l))
 	return n
 }
 
-func (m *QueryAllAdjanceyMatrixRequest) Size() (n int) {
+func (m *QueryAllAdjMatrixRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -4149,14 +4149,14 @@ func (m *QueryAllAdjanceyMatrixRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryAllAdjanceyMatrixResponse) Size() (n int) {
+func (m *QueryAllAdjMatrixResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.AdjanceyMatrix) > 0 {
-		for _, e := range m.AdjanceyMatrix {
+	if len(m.AdjMatrix) > 0 {
+		for _, e := range m.AdjMatrix {
 			l = e.Size()
 			n += 1 + l + sovQuery(uint64(l))
 		}
@@ -6954,7 +6954,7 @@ func (m *QueryAllEdgeRowResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetAdjanceyMatrixRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryGetAdjMatrixRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -6977,10 +6977,10 @@ func (m *QueryGetAdjanceyMatrixRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetAdjanceyMatrixRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGetAdjMatrixRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetAdjanceyMatrixRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGetAdjMatrixRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -7023,7 +7023,7 @@ func (m *QueryGetAdjanceyMatrixRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetAdjanceyMatrixResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryGetAdjMatrixResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -7046,15 +7046,15 @@ func (m *QueryGetAdjanceyMatrixResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetAdjanceyMatrixResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGetAdjMatrixResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetAdjanceyMatrixResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGetAdjMatrixResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AdjanceyMatrix", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AdjMatrix", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -7081,7 +7081,7 @@ func (m *QueryGetAdjanceyMatrixResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.AdjanceyMatrix.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.AdjMatrix.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -7106,7 +7106,7 @@ func (m *QueryGetAdjanceyMatrixResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryAllAdjanceyMatrixRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryAllAdjMatrixRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -7129,10 +7129,10 @@ func (m *QueryAllAdjanceyMatrixRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryAllAdjanceyMatrixRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryAllAdjMatrixRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryAllAdjanceyMatrixRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryAllAdjMatrixRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -7192,7 +7192,7 @@ func (m *QueryAllAdjanceyMatrixRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryAllAdjanceyMatrixResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryAllAdjMatrixResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -7215,15 +7215,15 @@ func (m *QueryAllAdjanceyMatrixResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryAllAdjanceyMatrixResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryAllAdjMatrixResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryAllAdjanceyMatrixResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryAllAdjMatrixResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AdjanceyMatrix", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field AdjMatrix", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -7250,8 +7250,8 @@ func (m *QueryAllAdjanceyMatrixResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AdjanceyMatrix = append(m.AdjanceyMatrix, AdjanceyMatrix{})
-			if err := m.AdjanceyMatrix[len(m.AdjanceyMatrix)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.AdjMatrix = append(m.AdjMatrix, AdjMatrix{})
+			if err := m.AdjMatrix[len(m.AdjMatrix)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

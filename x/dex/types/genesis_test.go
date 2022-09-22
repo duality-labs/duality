@@ -87,7 +87,7 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 				EdgeRowCount: 2,
-				AdjanceyMatrixList: []types.AdjanceyMatrix{
+				AdjMatrixList: []types.AdjMatrix{
 					{
 						Id: 0,
 					},
@@ -95,7 +95,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						Id: 1,
 					},
 				},
-				AdjanceyMatrixCount: 2,
+				AdjMatrixCount: 2,
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -241,9 +241,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated adjanceyMatrix",
+			desc: "duplicated adjMatrix",
 			genState: &types.GenesisState{
-				AdjanceyMatrixList: []types.AdjanceyMatrix{
+				AdjMatrixList: []types.AdjMatrix{
 					{
 						Id: 0,
 					},
@@ -255,14 +255,14 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "invalid adjanceyMatrix count",
+			desc: "invalid adjMatrix count",
 			genState: &types.GenesisState{
-				AdjanceyMatrixList: []types.AdjanceyMatrix{
+				AdjMatrixList: []types.AdjMatrix{
 					{
 						Id: 1,
 					},
 				},
-				AdjanceyMatrixCount: 0,
+				AdjMatrixCount: 0,
 			},
 			valid: false,
 		},

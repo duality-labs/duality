@@ -10,14 +10,14 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		TickMapList:        []TickMap{},
-		PairMapList:        []PairMap{},
-		TokensList:         []Tokens{},
-		TokenMapList:       []TokenMap{},
-		SharesList:         []Shares{},
-		FeeListList:        []FeeList{},
-		EdgeRowList:        []EdgeRow{},
-		AdjanceyMatrixList: []AdjanceyMatrix{},
+		TickMapList:   []TickMap{},
+		PairMapList:   []PairMap{},
+		TokensList:    []Tokens{},
+		TokenMapList:  []TokenMap{},
+		SharesList:    []Shares{},
+		FeeListList:   []FeeList{},
+		EdgeRowList:   []EdgeRow{},
+		AdjMatrixList: []AdjMatrix{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -102,17 +102,17 @@ func (gs GenesisState) Validate() error {
 		}
 		edgeRowIdMap[elem.Id] = true
 	}
-	// Check for duplicated ID in adjanceyMatrix
-	adjanceyMatrixIdMap := make(map[uint64]bool)
-	adjanceyMatrixCount := gs.GetAdjanceyMatrixCount()
-	for _, elem := range gs.AdjanceyMatrixList {
-		if _, ok := adjanceyMatrixIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for adjanceyMatrix")
+	// Check for duplicated ID in adjMatrix
+	adjMatrixIdMap := make(map[uint64]bool)
+	adjMatrixCount := gs.GetAdjMatrixCount()
+	for _, elem := range gs.AdjMatrixList {
+		if _, ok := adjMatrixIdMap[elem.Id]; ok {
+			return fmt.Errorf("duplicated id for adjMatrix")
 		}
-		if elem.Id >= adjanceyMatrixCount {
-			return fmt.Errorf("adjanceyMatrix id should be lower or equal than the last id")
+		if elem.Id >= adjMatrixCount {
+			return fmt.Errorf("adjMatrix id should be lower or equal than the last id")
 		}
-		adjanceyMatrixIdMap[elem.Id] = true
+		adjMatrixIdMap[elem.Id] = true
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 

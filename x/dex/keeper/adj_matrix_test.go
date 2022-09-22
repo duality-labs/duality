@@ -11,19 +11,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createNAdjanceyMatrix(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.AdjanceyMatrix {
-	items := make([]types.AdjanceyMatrix, n)
+func createNAdjMatrix(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.AdjMatrix {
+	items := make([]types.AdjMatrix, n)
 	for i := range items {
-		items[i].Id = keeper.AppendAdjanceyMatrix(ctx, items[i])
+		items[i].Id = keeper.AppendAdjMatrix(ctx, items[i])
 	}
 	return items
 }
 
-func TestAdjanceyMatrixGet(t *testing.T) {
+func TestAdjMatrixGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNAdjanceyMatrix(keeper, ctx, 10)
+	items := createNAdjMatrix(keeper, ctx, 10)
 	for _, item := range items {
-		got, found := keeper.GetAdjanceyMatrix(ctx, item.Id)
+		got, found := keeper.GetAdjMatrix(ctx, item.Id)
 		require.True(t, found)
 		require.Equal(t,
 			nullify.Fill(&item),
@@ -32,28 +32,28 @@ func TestAdjanceyMatrixGet(t *testing.T) {
 	}
 }
 
-func TestAdjanceyMatrixRemove(t *testing.T) {
+func TestAdjMatrixRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNAdjanceyMatrix(keeper, ctx, 10)
+	items := createNAdjMatrix(keeper, ctx, 10)
 	for _, item := range items {
-		keeper.RemoveAdjanceyMatrix(ctx, item.Id)
-		_, found := keeper.GetAdjanceyMatrix(ctx, item.Id)
+		keeper.RemoveAdjMatrix(ctx, item.Id)
+		_, found := keeper.GetAdjMatrix(ctx, item.Id)
 		require.False(t, found)
 	}
 }
 
-func TestAdjanceyMatrixGetAll(t *testing.T) {
+func TestAdjMatrixGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNAdjanceyMatrix(keeper, ctx, 10)
+	items := createNAdjMatrix(keeper, ctx, 10)
 	require.ElementsMatch(t,
 		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllAdjanceyMatrix(ctx)),
+		nullify.Fill(keeper.GetAllAdjMatrix(ctx)),
 	)
 }
 
-func TestAdjanceyMatrixCount(t *testing.T) {
+func TestAdjMatrixCount(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNAdjanceyMatrix(keeper, ctx, 10)
+	items := createNAdjMatrix(keeper, ctx, 10)
 	count := uint64(len(items))
-	require.Equal(t, count, keeper.GetAdjanceyMatrixCount(ctx))
+	require.Equal(t, count, keeper.GetAdjMatrixCount(ctx))
 }

@@ -13,7 +13,7 @@ import { TokenMap } from "../dex/token_map";
 import { Shares } from "../dex/shares";
 import { FeeList } from "../dex/fee_list";
 import { EdgeRow } from "../dex/edge_row";
-import { AdjanceyMatrix } from "../dex/adjancey_matrix";
+import { AdjMatrix } from "../dex/adj_matrix";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -149,20 +149,20 @@ export interface QueryAllEdgeRowResponse {
   pagination: PageResponse | undefined;
 }
 
-export interface QueryGetAdjanceyMatrixRequest {
+export interface QueryGetAdjMatrixRequest {
   id: number;
 }
 
-export interface QueryGetAdjanceyMatrixResponse {
-  AdjanceyMatrix: AdjanceyMatrix | undefined;
+export interface QueryGetAdjMatrixResponse {
+  AdjMatrix: AdjMatrix | undefined;
 }
 
-export interface QueryAllAdjanceyMatrixRequest {
+export interface QueryAllAdjMatrixRequest {
   pagination: PageRequest | undefined;
 }
 
-export interface QueryAllAdjanceyMatrixResponse {
-  AdjanceyMatrix: AdjanceyMatrix[];
+export interface QueryAllAdjMatrixResponse {
+  AdjMatrix: AdjMatrix[];
   pagination: PageResponse | undefined;
 }
 
@@ -2356,11 +2356,11 @@ export const QueryAllEdgeRowResponse = {
   },
 };
 
-const baseQueryGetAdjanceyMatrixRequest: object = { id: 0 };
+const baseQueryGetAdjMatrixRequest: object = { id: 0 };
 
-export const QueryGetAdjanceyMatrixRequest = {
+export const QueryGetAdjMatrixRequest = {
   encode(
-    message: QueryGetAdjanceyMatrixRequest,
+    message: QueryGetAdjMatrixRequest,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.id !== 0) {
@@ -2372,12 +2372,12 @@ export const QueryGetAdjanceyMatrixRequest = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryGetAdjanceyMatrixRequest {
+  ): QueryGetAdjMatrixRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryGetAdjanceyMatrixRequest,
-    } as QueryGetAdjanceyMatrixRequest;
+      ...baseQueryGetAdjMatrixRequest,
+    } as QueryGetAdjMatrixRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2392,10 +2392,10 @@ export const QueryGetAdjanceyMatrixRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetAdjanceyMatrixRequest {
+  fromJSON(object: any): QueryGetAdjMatrixRequest {
     const message = {
-      ...baseQueryGetAdjanceyMatrixRequest,
-    } as QueryGetAdjanceyMatrixRequest;
+      ...baseQueryGetAdjMatrixRequest,
+    } as QueryGetAdjMatrixRequest;
     if (object.id !== undefined && object.id !== null) {
       message.id = Number(object.id);
     } else {
@@ -2404,18 +2404,18 @@ export const QueryGetAdjanceyMatrixRequest = {
     return message;
   },
 
-  toJSON(message: QueryGetAdjanceyMatrixRequest): unknown {
+  toJSON(message: QueryGetAdjMatrixRequest): unknown {
     const obj: any = {};
     message.id !== undefined && (obj.id = message.id);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetAdjanceyMatrixRequest>
-  ): QueryGetAdjanceyMatrixRequest {
+    object: DeepPartial<QueryGetAdjMatrixRequest>
+  ): QueryGetAdjMatrixRequest {
     const message = {
-      ...baseQueryGetAdjanceyMatrixRequest,
-    } as QueryGetAdjanceyMatrixRequest;
+      ...baseQueryGetAdjMatrixRequest,
+    } as QueryGetAdjMatrixRequest;
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
     } else {
@@ -2425,16 +2425,16 @@ export const QueryGetAdjanceyMatrixRequest = {
   },
 };
 
-const baseQueryGetAdjanceyMatrixResponse: object = {};
+const baseQueryGetAdjMatrixResponse: object = {};
 
-export const QueryGetAdjanceyMatrixResponse = {
+export const QueryGetAdjMatrixResponse = {
   encode(
-    message: QueryGetAdjanceyMatrixResponse,
+    message: QueryGetAdjMatrixResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.AdjanceyMatrix !== undefined) {
-      AdjanceyMatrix.encode(
-        message.AdjanceyMatrix,
+    if (message.AdjMatrix !== undefined) {
+      AdjMatrix.encode(
+        message.AdjMatrix,
         writer.uint32(10).fork()
       ).ldelim();
     }
@@ -2444,17 +2444,17 @@ export const QueryGetAdjanceyMatrixResponse = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryGetAdjanceyMatrixResponse {
+  ): QueryGetAdjMatrixResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryGetAdjanceyMatrixResponse,
-    } as QueryGetAdjanceyMatrixResponse;
+      ...baseQueryGetAdjMatrixResponse,
+    } as QueryGetAdjMatrixResponse;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.AdjanceyMatrix = AdjanceyMatrix.decode(
+          message.AdjMatrix = AdjMatrix.decode(
             reader,
             reader.uint32()
           );
@@ -2467,49 +2467,49 @@ export const QueryGetAdjanceyMatrixResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetAdjanceyMatrixResponse {
+  fromJSON(object: any): QueryGetAdjMatrixResponse {
     const message = {
-      ...baseQueryGetAdjanceyMatrixResponse,
-    } as QueryGetAdjanceyMatrixResponse;
-    if (object.AdjanceyMatrix !== undefined && object.AdjanceyMatrix !== null) {
-      message.AdjanceyMatrix = AdjanceyMatrix.fromJSON(object.AdjanceyMatrix);
+      ...baseQueryGetAdjMatrixResponse,
+    } as QueryGetAdjMatrixResponse;
+    if (object.AdjMatrix !== undefined && object.AdjMatrix !== null) {
+      message.AdjMatrix = AdjMatrix.fromJSON(object.AdjMatrix);
     } else {
-      message.AdjanceyMatrix = undefined;
+      message.AdjMatrix = undefined;
     }
     return message;
   },
 
-  toJSON(message: QueryGetAdjanceyMatrixResponse): unknown {
+  toJSON(message: QueryGetAdjMatrixResponse): unknown {
     const obj: any = {};
-    message.AdjanceyMatrix !== undefined &&
-      (obj.AdjanceyMatrix = message.AdjanceyMatrix
-        ? AdjanceyMatrix.toJSON(message.AdjanceyMatrix)
+    message.AdjMatrix !== undefined &&
+      (obj.AdjMatrix = message.AdjMatrix
+        ? AdjMatrix.toJSON(message.AdjMatrix)
         : undefined);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetAdjanceyMatrixResponse>
-  ): QueryGetAdjanceyMatrixResponse {
+    object: DeepPartial<QueryGetAdjMatrixResponse>
+  ): QueryGetAdjMatrixResponse {
     const message = {
-      ...baseQueryGetAdjanceyMatrixResponse,
-    } as QueryGetAdjanceyMatrixResponse;
-    if (object.AdjanceyMatrix !== undefined && object.AdjanceyMatrix !== null) {
-      message.AdjanceyMatrix = AdjanceyMatrix.fromPartial(
-        object.AdjanceyMatrix
+      ...baseQueryGetAdjMatrixResponse,
+    } as QueryGetAdjMatrixResponse;
+    if (object.AdjMatrix !== undefined && object.AdjMatrix !== null) {
+      message.AdjMatrix = AdjMatrix.fromPartial(
+        object.AdjMatrix
       );
     } else {
-      message.AdjanceyMatrix = undefined;
+      message.AdjMatrix = undefined;
     }
     return message;
   },
 };
 
-const baseQueryAllAdjanceyMatrixRequest: object = {};
+const baseQueryAllAdjMatrixRequest: object = {};
 
-export const QueryAllAdjanceyMatrixRequest = {
+export const QueryAllAdjMatrixRequest = {
   encode(
-    message: QueryAllAdjanceyMatrixRequest,
+    message: QueryAllAdjMatrixRequest,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.pagination !== undefined) {
@@ -2521,12 +2521,12 @@ export const QueryAllAdjanceyMatrixRequest = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryAllAdjanceyMatrixRequest {
+  ): QueryAllAdjMatrixRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryAllAdjanceyMatrixRequest,
-    } as QueryAllAdjanceyMatrixRequest;
+      ...baseQueryAllAdjMatrixRequest,
+    } as QueryAllAdjMatrixRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2541,10 +2541,10 @@ export const QueryAllAdjanceyMatrixRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllAdjanceyMatrixRequest {
+  fromJSON(object: any): QueryAllAdjMatrixRequest {
     const message = {
-      ...baseQueryAllAdjanceyMatrixRequest,
-    } as QueryAllAdjanceyMatrixRequest;
+      ...baseQueryAllAdjMatrixRequest,
+    } as QueryAllAdjMatrixRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromJSON(object.pagination);
     } else {
@@ -2553,7 +2553,7 @@ export const QueryAllAdjanceyMatrixRequest = {
     return message;
   },
 
-  toJSON(message: QueryAllAdjanceyMatrixRequest): unknown {
+  toJSON(message: QueryAllAdjMatrixRequest): unknown {
     const obj: any = {};
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -2563,11 +2563,11 @@ export const QueryAllAdjanceyMatrixRequest = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryAllAdjanceyMatrixRequest>
-  ): QueryAllAdjanceyMatrixRequest {
+    object: DeepPartial<QueryAllAdjMatrixRequest>
+  ): QueryAllAdjMatrixRequest {
     const message = {
-      ...baseQueryAllAdjanceyMatrixRequest,
-    } as QueryAllAdjanceyMatrixRequest;
+      ...baseQueryAllAdjMatrixRequest,
+    } as QueryAllAdjMatrixRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromPartial(object.pagination);
     } else {
@@ -2577,15 +2577,15 @@ export const QueryAllAdjanceyMatrixRequest = {
   },
 };
 
-const baseQueryAllAdjanceyMatrixResponse: object = {};
+const baseQueryAllAdjMatrixResponse: object = {};
 
-export const QueryAllAdjanceyMatrixResponse = {
+export const QueryAllAdjMatrixResponse = {
   encode(
-    message: QueryAllAdjanceyMatrixResponse,
+    message: QueryAllAdjMatrixResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    for (const v of message.AdjanceyMatrix) {
-      AdjanceyMatrix.encode(v!, writer.uint32(10).fork()).ldelim();
+    for (const v of message.AdjMatrix) {
+      AdjMatrix.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
       PageResponse.encode(
@@ -2599,19 +2599,19 @@ export const QueryAllAdjanceyMatrixResponse = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryAllAdjanceyMatrixResponse {
+  ): QueryAllAdjMatrixResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryAllAdjanceyMatrixResponse,
-    } as QueryAllAdjanceyMatrixResponse;
-    message.AdjanceyMatrix = [];
+      ...baseQueryAllAdjMatrixResponse,
+    } as QueryAllAdjMatrixResponse;
+    message.AdjMatrix = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.AdjanceyMatrix.push(
-            AdjanceyMatrix.decode(reader, reader.uint32())
+          message.AdjMatrix.push(
+            AdjMatrix.decode(reader, reader.uint32())
           );
           break;
         case 2:
@@ -2625,14 +2625,14 @@ export const QueryAllAdjanceyMatrixResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllAdjanceyMatrixResponse {
+  fromJSON(object: any): QueryAllAdjMatrixResponse {
     const message = {
-      ...baseQueryAllAdjanceyMatrixResponse,
-    } as QueryAllAdjanceyMatrixResponse;
-    message.AdjanceyMatrix = [];
-    if (object.AdjanceyMatrix !== undefined && object.AdjanceyMatrix !== null) {
-      for (const e of object.AdjanceyMatrix) {
-        message.AdjanceyMatrix.push(AdjanceyMatrix.fromJSON(e));
+      ...baseQueryAllAdjMatrixResponse,
+    } as QueryAllAdjMatrixResponse;
+    message.AdjMatrix = [];
+    if (object.AdjMatrix !== undefined && object.AdjMatrix !== null) {
+      for (const e of object.AdjMatrix) {
+        message.AdjMatrix.push(AdjMatrix.fromJSON(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -2643,14 +2643,14 @@ export const QueryAllAdjanceyMatrixResponse = {
     return message;
   },
 
-  toJSON(message: QueryAllAdjanceyMatrixResponse): unknown {
+  toJSON(message: QueryAllAdjMatrixResponse): unknown {
     const obj: any = {};
-    if (message.AdjanceyMatrix) {
-      obj.AdjanceyMatrix = message.AdjanceyMatrix.map((e) =>
-        e ? AdjanceyMatrix.toJSON(e) : undefined
+    if (message.AdjMatrix) {
+      obj.AdjMatrix = message.AdjMatrix.map((e) =>
+        e ? AdjMatrix.toJSON(e) : undefined
       );
     } else {
-      obj.AdjanceyMatrix = [];
+      obj.AdjMatrix = [];
     }
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -2660,15 +2660,15 @@ export const QueryAllAdjanceyMatrixResponse = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryAllAdjanceyMatrixResponse>
-  ): QueryAllAdjanceyMatrixResponse {
+    object: DeepPartial<QueryAllAdjMatrixResponse>
+  ): QueryAllAdjMatrixResponse {
     const message = {
-      ...baseQueryAllAdjanceyMatrixResponse,
-    } as QueryAllAdjanceyMatrixResponse;
-    message.AdjanceyMatrix = [];
-    if (object.AdjanceyMatrix !== undefined && object.AdjanceyMatrix !== null) {
-      for (const e of object.AdjanceyMatrix) {
-        message.AdjanceyMatrix.push(AdjanceyMatrix.fromPartial(e));
+      ...baseQueryAllAdjMatrixResponse,
+    } as QueryAllAdjMatrixResponse;
+    message.AdjMatrix = [];
+    if (object.AdjMatrix !== undefined && object.AdjMatrix !== null) {
+      for (const e of object.AdjMatrix) {
+        message.AdjMatrix.push(AdjMatrix.fromPartial(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -2714,14 +2714,14 @@ export interface Query {
   EdgeRow(request: QueryGetEdgeRowRequest): Promise<QueryGetEdgeRowResponse>;
   /** Queries a list of EdgeRow items. */
   EdgeRowAll(request: QueryAllEdgeRowRequest): Promise<QueryAllEdgeRowResponse>;
-  /** Queries a AdjanceyMatrix by id. */
-  AdjanceyMatrix(
-    request: QueryGetAdjanceyMatrixRequest
-  ): Promise<QueryGetAdjanceyMatrixResponse>;
-  /** Queries a list of AdjanceyMatrix items. */
-  AdjanceyMatrixAll(
-    request: QueryAllAdjanceyMatrixRequest
-  ): Promise<QueryAllAdjanceyMatrixResponse>;
+  /** Queries a AdjMatrix by id. */
+  AdjMatrix(
+    request: QueryGetAdjMatrixRequest
+  ): Promise<QueryGetAdjMatrixResponse>;
+  /** Queries a list of AdjMatrix items. */
+  AdjMatrixAll(
+    request: QueryAllAdjMatrixRequest
+  ): Promise<QueryAllAdjMatrixResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -2919,31 +2919,31 @@ export class QueryClientImpl implements Query {
     );
   }
 
-  AdjanceyMatrix(
-    request: QueryGetAdjanceyMatrixRequest
-  ): Promise<QueryGetAdjanceyMatrixResponse> {
-    const data = QueryGetAdjanceyMatrixRequest.encode(request).finish();
+  AdjMatrix(
+    request: QueryGetAdjMatrixRequest
+  ): Promise<QueryGetAdjMatrixResponse> {
+    const data = QueryGetAdjMatrixRequest.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
-      "AdjanceyMatrix",
+      "AdjMatrix",
       data
     );
     return promise.then((data) =>
-      QueryGetAdjanceyMatrixResponse.decode(new Reader(data))
+      QueryGetAdjMatrixResponse.decode(new Reader(data))
     );
   }
 
-  AdjanceyMatrixAll(
-    request: QueryAllAdjanceyMatrixRequest
-  ): Promise<QueryAllAdjanceyMatrixResponse> {
-    const data = QueryAllAdjanceyMatrixRequest.encode(request).finish();
+  AdjMatrixAll(
+    request: QueryAllAdjMatrixRequest
+  ): Promise<QueryAllAdjMatrixResponse> {
+    const data = QueryAllAdjMatrixRequest.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
-      "AdjanceyMatrixAll",
+      "AdjMatrixAll",
       data
     );
     return promise.then((data) =>
-      QueryAllAdjanceyMatrixResponse.decode(new Reader(data))
+      QueryAllAdjMatrixResponse.decode(new Reader(data))
     );
   }
 }

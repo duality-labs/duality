@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListAdjanceyMatrix() *cobra.Command {
+func CmdListAdjMatrix() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-adjancey-matrix",
-		Short: "list all AdjanceyMatrix",
+		Use:   "list-adj-matrix",
+		Short: "list all AdjMatrix",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -24,11 +24,11 @@ func CmdListAdjanceyMatrix() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllAdjanceyMatrixRequest{
+			params := &types.QueryAllAdjMatrixRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.AdjanceyMatrixAll(context.Background(), params)
+			res, err := queryClient.AdjMatrixAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -43,10 +43,10 @@ func CmdListAdjanceyMatrix() *cobra.Command {
 	return cmd
 }
 
-func CmdShowAdjanceyMatrix() *cobra.Command {
+func CmdShowAdjMatrix() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-adjancey-matrix [id]",
-		Short: "shows a AdjanceyMatrix",
+		Use:   "show-adj-matrix [id]",
+		Short: "shows a AdjMatrix",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -58,11 +58,11 @@ func CmdShowAdjanceyMatrix() *cobra.Command {
 				return err
 			}
 
-			params := &types.QueryGetAdjanceyMatrixRequest{
+			params := &types.QueryGetAdjMatrixRequest{
 				Id: id,
 			}
 
-			res, err := queryClient.AdjanceyMatrix(context.Background(), params)
+			res, err := queryClient.AdjMatrix(context.Background(), params)
 			if err != nil {
 				return err
 			}

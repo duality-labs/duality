@@ -9,7 +9,7 @@
  * ---------------------------------------------------------------
  */
 
-export interface DexAdjanceyMatrix {
+export interface DexAdjMatrix {
   /** @format uint64 */
   id?: string;
   edgeRow?: DexEdgeRow;
@@ -48,8 +48,8 @@ export interface DexPairMap {
  */
 export type DexParams = object;
 
-export interface DexQueryAllAdjanceyMatrixResponse {
-  AdjanceyMatrix?: DexAdjanceyMatrix[];
+export interface DexQueryAllAdjMatrixResponse {
+  AdjMatrix?: DexAdjMatrix[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -168,8 +168,8 @@ export interface DexQueryAllTokensResponse {
   pagination?: V1Beta1PageResponse;
 }
 
-export interface DexQueryGetAdjanceyMatrixResponse {
-  AdjanceyMatrix?: DexAdjanceyMatrix;
+export interface DexQueryGetAdjMatrixResponse {
+  AdjMatrix?: DexAdjMatrix;
 }
 
 export interface DexQueryGetEdgeRowResponse {
@@ -523,7 +523,7 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title dex/adjancey_matrix.proto
+ * @title dex/adj_matrix.proto
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
@@ -531,11 +531,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryAdjanceyMatrixAll
-   * @summary Queries a list of AdjanceyMatrix items.
-   * @request GET:/NicholasDotSol/duality/dex/adjancey_matrix
+   * @name QueryAdjMatrixAll
+   * @summary Queries a list of AdjMatrix items.
+   * @request GET:/NicholasDotSol/duality/dex/adj_matrix
    */
-  queryAdjanceyMatrixAll = (
+  queryAdjMatrixAll = (
     query?: {
       "pagination.key"?: string;
       "pagination.offset"?: string;
@@ -545,8 +545,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     },
     params: RequestParams = {},
   ) =>
-    this.request<DexQueryAllAdjanceyMatrixResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/adjancey_matrix`,
+    this.request<DexQueryAllAdjMatrixResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/adj_matrix`,
       method: "GET",
       query: query,
       format: "json",
@@ -557,13 +557,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryAdjanceyMatrix
-   * @summary Queries a AdjanceyMatrix by id.
-   * @request GET:/NicholasDotSol/duality/dex/adjancey_matrix/{id}
+   * @name QueryAdjMatrix
+   * @summary Queries a AdjMatrix by id.
+   * @request GET:/NicholasDotSol/duality/dex/adj_matrix/{id}
    */
-  queryAdjanceyMatrix = (id: string, params: RequestParams = {}) =>
-    this.request<DexQueryGetAdjanceyMatrixResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/adjancey_matrix/${id}`,
+  queryAdjMatrix = (id: string, params: RequestParams = {}) =>
+    this.request<DexQueryGetAdjMatrixResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/adj_matrix/${id}`,
       method: "GET",
       format: "json",
       ...params,
