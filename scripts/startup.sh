@@ -44,7 +44,7 @@ else
     echo "Contacting network..."
 
     # find an RPC address to check the live chain with
-    rpc_address="$( jq -r .apis.rpc[0].address networks/duality/chain.json )"
+    rpc_address="$( jq -r .apis.rpc[0].address networks/duality-1/chain.json )"
 
     # check if we can get information from the current network
     abci_info_json=$( wget --tries 30 -q -O - $rpc_address/abci_info )
@@ -58,12 +58,12 @@ else
     fi
 
     # read out peers from chain.json
-    persistent_peers_array="$( jq .peers.persistent_peers networks/duality/chain.json )"
+    persistent_peers_array="$( jq .peers.persistent_peers networks/duality-1/chain.json )"
     persistent_peers="$( echo $persistent_peers_array | jq -r 'map(.id + "@" + .address) | join(",")' )"
 
     # set chain settings
     sed -i 's#persistent_peers = ""#persistent_peers = "'"$persistent_peers"'"#' /root/.duality/config/config.toml
-    mv networks/duality/genesis.json /root/.duality/config/genesis.json
+    mv networks/duality-1/genesis.json /root/.duality/config/genesis.json
 
     # check if this node intends to become a validator
     if [[ "$STARTUP_MODE" == "validator" && ! -z "$MNEMONIC" ]]
