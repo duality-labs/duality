@@ -73,7 +73,6 @@ else
         # sent request to become a validator (to the first RPC address defined)
         dualityd tx staking create-validator \
             --moniker $NODE_MONIKER \
-            --node "tcp://$( jq .apis.rpc[0].address networks/duality/chain.json | jq 'if test("^https://") then [split("://")[1], "443"]  else [.] end' | jq -r 'join(":")' )" \
             --node-id `dualityd tendermint show-node-id` \
             --pubkey `dualityd tendermint show-validator` \
             --commission-rate="${VALIDATOR_COMMISSION_RATE:-1.0}" \
