@@ -155,7 +155,7 @@ func (m *MsgDepositResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDepositResponse proto.InternalMessageInfo
 
-type MsgWithdrawl struct {
+type MsgWithdrawal struct {
 	Creator        string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	TokenA         string `protobuf:"bytes,2,opt,name=tokenA,proto3" json:"tokenA,omitempty"`
 	TokenB         string `protobuf:"bytes,3,opt,name=tokenB,proto3" json:"tokenB,omitempty"`
@@ -165,18 +165,18 @@ type MsgWithdrawl struct {
 	Receiver       string `protobuf:"bytes,7,opt,name=receiver,proto3" json:"receiver,omitempty"`
 }
 
-func (m *MsgWithdrawl) Reset()         { *m = MsgWithdrawl{} }
-func (m *MsgWithdrawl) String() string { return proto.CompactTextString(m) }
-func (*MsgWithdrawl) ProtoMessage()    {}
-func (*MsgWithdrawl) Descriptor() ([]byte, []int) {
+func (m *MsgWithdrawal) Reset()         { *m = MsgWithdrawal{} }
+func (m *MsgWithdrawal) String() string { return proto.CompactTextString(m) }
+func (*MsgWithdrawal) ProtoMessage()    {}
+func (*MsgWithdrawal) Descriptor() ([]byte, []int) {
 	return fileDescriptor_463701e671e5a5e0, []int{2}
 }
-func (m *MsgWithdrawl) XXX_Unmarshal(b []byte) error {
+func (m *MsgWithdrawal) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgWithdrawl) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgWithdrawal) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgWithdrawl.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgWithdrawal.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -186,82 +186,82 @@ func (m *MsgWithdrawl) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return b[:n], nil
 	}
 }
-func (m *MsgWithdrawl) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgWithdrawl.Merge(m, src)
+func (m *MsgWithdrawal) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgWithdrawal.Merge(m, src)
 }
-func (m *MsgWithdrawl) XXX_Size() int {
+func (m *MsgWithdrawal) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgWithdrawl) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgWithdrawl.DiscardUnknown(m)
+func (m *MsgWithdrawal) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgWithdrawal.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgWithdrawl proto.InternalMessageInfo
+var xxx_messageInfo_MsgWithdrawal proto.InternalMessageInfo
 
-func (m *MsgWithdrawl) GetCreator() string {
+func (m *MsgWithdrawal) GetCreator() string {
 	if m != nil {
 		return m.Creator
 	}
 	return ""
 }
 
-func (m *MsgWithdrawl) GetTokenA() string {
+func (m *MsgWithdrawal) GetTokenA() string {
 	if m != nil {
 		return m.TokenA
 	}
 	return ""
 }
 
-func (m *MsgWithdrawl) GetTokenB() string {
+func (m *MsgWithdrawal) GetTokenB() string {
 	if m != nil {
 		return m.TokenB
 	}
 	return ""
 }
 
-func (m *MsgWithdrawl) GetSharesToRemove() string {
+func (m *MsgWithdrawal) GetSharesToRemove() string {
 	if m != nil {
 		return m.SharesToRemove
 	}
 	return ""
 }
 
-func (m *MsgWithdrawl) GetPriceIndex() int64 {
+func (m *MsgWithdrawal) GetPriceIndex() int64 {
 	if m != nil {
 		return m.PriceIndex
 	}
 	return 0
 }
 
-func (m *MsgWithdrawl) GetFeeIndex() uint64 {
+func (m *MsgWithdrawal) GetFeeIndex() uint64 {
 	if m != nil {
 		return m.FeeIndex
 	}
 	return 0
 }
 
-func (m *MsgWithdrawl) GetReceiver() string {
+func (m *MsgWithdrawal) GetReceiver() string {
 	if m != nil {
 		return m.Receiver
 	}
 	return ""
 }
 
-type MsgWithdrawlResponse struct {
+type MsgWithdrawalResponse struct {
 }
 
-func (m *MsgWithdrawlResponse) Reset()         { *m = MsgWithdrawlResponse{} }
-func (m *MsgWithdrawlResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgWithdrawlResponse) ProtoMessage()    {}
-func (*MsgWithdrawlResponse) Descriptor() ([]byte, []int) {
+func (m *MsgWithdrawalResponse) Reset()         { *m = MsgWithdrawalResponse{} }
+func (m *MsgWithdrawalResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgWithdrawalResponse) ProtoMessage()    {}
+func (*MsgWithdrawalResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_463701e671e5a5e0, []int{3}
 }
-func (m *MsgWithdrawlResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgWithdrawalResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgWithdrawlResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgWithdrawalResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgWithdrawlResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgWithdrawalResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -271,17 +271,17 @@ func (m *MsgWithdrawlResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *MsgWithdrawlResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgWithdrawlResponse.Merge(m, src)
+func (m *MsgWithdrawalResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgWithdrawalResponse.Merge(m, src)
 }
-func (m *MsgWithdrawlResponse) XXX_Size() int {
+func (m *MsgWithdrawalResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgWithdrawlResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgWithdrawlResponse.DiscardUnknown(m)
+func (m *MsgWithdrawalResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgWithdrawalResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgWithdrawlResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgWithdrawalResponse proto.InternalMessageInfo
 
 type MsgSwap struct {
 	Creator  string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
@@ -406,8 +406,8 @@ var xxx_messageInfo_MsgSwapResponse proto.InternalMessageInfo
 func init() {
 	proto.RegisterType((*MsgDeposit)(nil), "nicholasdotsol.duality.dex.MsgDeposit")
 	proto.RegisterType((*MsgDepositResponse)(nil), "nicholasdotsol.duality.dex.MsgDepositResponse")
-	proto.RegisterType((*MsgWithdrawl)(nil), "nicholasdotsol.duality.dex.MsgWithdrawl")
-	proto.RegisterType((*MsgWithdrawlResponse)(nil), "nicholasdotsol.duality.dex.MsgWithdrawlResponse")
+	proto.RegisterType((*MsgWithdrawal)(nil), "nicholasdotsol.duality.dex.MsgWithdrawal")
+	proto.RegisterType((*MsgWithdrawalResponse)(nil), "nicholasdotsol.duality.dex.MsgWithdrawalResponse")
 	proto.RegisterType((*MsgSwap)(nil), "nicholasdotsol.duality.dex.MsgSwap")
 	proto.RegisterType((*MsgSwapResponse)(nil), "nicholasdotsol.duality.dex.MsgSwapResponse")
 }
@@ -460,7 +460,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
 	Deposit(ctx context.Context, in *MsgDeposit, opts ...grpc.CallOption) (*MsgDepositResponse, error)
-	Withdrawl(ctx context.Context, in *MsgWithdrawl, opts ...grpc.CallOption) (*MsgWithdrawlResponse, error)
+	Withdrawal(ctx context.Context, in *MsgWithdrawal, opts ...grpc.CallOption) (*MsgWithdrawalResponse, error)
 	Swap(ctx context.Context, in *MsgSwap, opts ...grpc.CallOption) (*MsgSwapResponse, error)
 }
 
@@ -481,9 +481,9 @@ func (c *msgClient) Deposit(ctx context.Context, in *MsgDeposit, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *msgClient) Withdrawl(ctx context.Context, in *MsgWithdrawl, opts ...grpc.CallOption) (*MsgWithdrawlResponse, error) {
-	out := new(MsgWithdrawlResponse)
-	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Msg/Withdrawl", in, out, opts...)
+func (c *msgClient) Withdrawal(ctx context.Context, in *MsgWithdrawal, opts ...grpc.CallOption) (*MsgWithdrawalResponse, error) {
+	out := new(MsgWithdrawalResponse)
+	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Msg/Withdrawal", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -502,7 +502,7 @@ func (c *msgClient) Swap(ctx context.Context, in *MsgSwap, opts ...grpc.CallOpti
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	Deposit(context.Context, *MsgDeposit) (*MsgDepositResponse, error)
-	Withdrawl(context.Context, *MsgWithdrawl) (*MsgWithdrawlResponse, error)
+	Withdrawal(context.Context, *MsgWithdrawal) (*MsgWithdrawalResponse, error)
 	Swap(context.Context, *MsgSwap) (*MsgSwapResponse, error)
 }
 
@@ -513,8 +513,8 @@ type UnimplementedMsgServer struct {
 func (*UnimplementedMsgServer) Deposit(ctx context.Context, req *MsgDeposit) (*MsgDepositResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Deposit not implemented")
 }
-func (*UnimplementedMsgServer) Withdrawl(ctx context.Context, req *MsgWithdrawl) (*MsgWithdrawlResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Withdrawl not implemented")
+func (*UnimplementedMsgServer) Withdrawal(ctx context.Context, req *MsgWithdrawal) (*MsgWithdrawalResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Withdrawal not implemented")
 }
 func (*UnimplementedMsgServer) Swap(ctx context.Context, req *MsgSwap) (*MsgSwapResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Swap not implemented")
@@ -542,20 +542,20 @@ func _Msg_Deposit_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_Withdrawl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgWithdrawl)
+func _Msg_Withdrawal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgWithdrawal)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).Withdrawl(ctx, in)
+		return srv.(MsgServer).Withdrawal(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/nicholasdotsol.duality.dex.Msg/Withdrawl",
+		FullMethod: "/nicholasdotsol.duality.dex.Msg/Withdrawal",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).Withdrawl(ctx, req.(*MsgWithdrawl))
+		return srv.(MsgServer).Withdrawal(ctx, req.(*MsgWithdrawal))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -587,8 +587,8 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_Deposit_Handler,
 		},
 		{
-			MethodName: "Withdrawl",
-			Handler:    _Msg_Withdrawl_Handler,
+			MethodName: "Withdrawal",
+			Handler:    _Msg_Withdrawal_Handler,
 		},
 		{
 			MethodName: "Swap",
@@ -690,7 +690,7 @@ func (m *MsgDepositResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgWithdrawl) Marshal() (dAtA []byte, err error) {
+func (m *MsgWithdrawal) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -700,12 +700,12 @@ func (m *MsgWithdrawl) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgWithdrawl) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgWithdrawal) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgWithdrawl) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgWithdrawal) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -758,7 +758,7 @@ func (m *MsgWithdrawl) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgWithdrawlResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgWithdrawalResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -768,12 +768,12 @@ func (m *MsgWithdrawlResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgWithdrawlResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgWithdrawalResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgWithdrawlResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgWithdrawalResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -924,7 +924,7 @@ func (m *MsgDepositResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgWithdrawl) Size() (n int) {
+func (m *MsgWithdrawal) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -959,7 +959,7 @@ func (m *MsgWithdrawl) Size() (n int) {
 	return n
 }
 
-func (m *MsgWithdrawlResponse) Size() (n int) {
+func (m *MsgWithdrawalResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1314,7 +1314,7 @@ func (m *MsgDepositResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgWithdrawl) Unmarshal(dAtA []byte) error {
+func (m *MsgWithdrawal) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1337,10 +1337,10 @@ func (m *MsgWithdrawl) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgWithdrawl: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgWithdrawal: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgWithdrawl: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgWithdrawal: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1562,7 +1562,7 @@ func (m *MsgWithdrawl) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgWithdrawlResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgWithdrawalResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1585,10 +1585,10 @@ func (m *MsgWithdrawlResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgWithdrawlResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgWithdrawalResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgWithdrawlResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgWithdrawalResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

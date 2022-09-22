@@ -26,8 +26,8 @@ func (suite *IntegrationTestSuite) TestHasBalance2() {
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, addr, newACoin(sdk.NewInt(1))))
 }
 
-func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
-	fmt.Println("Testing TestSingleWithdrawl")
+func (suite *IntegrationTestSuite) TestSingleWithdrawal() {
+	fmt.Println("Testing TestSingleWithdrawal")
 	app, ctx := suite.app, suite.ctx
 	//holderAcc := authtypes.NewEmptyModuleAccount("holder")
 	alice := sdk.AccAddress([]byte("alice"))
@@ -92,7 +92,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 
 	pairId := app.DexKeeper.CreatePairId("TokenA", "TokenB")
 	fmt.Println(app.DexKeeper.GetShares(ctx, alice.String(), pairId, 0, 0))
-	withdrawlResponse, err := suite.msgServer.Withdrawl(goCtx, &types.MsgWithdrawl{
+	WithdrawalResponse, err := suite.msgServer.Withdrawal(goCtx, &types.MsgWithdrawal{
 		Creator:        alice.String(),
 		TokenA:         "TokenA",
 		TokenB:         "TokenB",
@@ -102,10 +102,10 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	})
 
 	suite.Require().Nil(err)
-	fmt.Println("Post Withdrawl")
+	fmt.Println("Post Withdrawal")
 	fmt.Println(app.DexKeeper.GetShares(ctx, alice.String(), pairId, 0, 0))
 
-	_ = withdrawlResponse
+	_ = WithdrawalResponse
 	_ = goCtx
 
 	createResponse2, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
@@ -193,7 +193,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	_ = createResponse3
 	_ = createResponse4
 
-	withdrawlResponse2, err := suite.msgServer.Withdrawl(goCtx, &types.MsgWithdrawl{
+	WithdrawalResponse2, err := suite.msgServer.Withdrawal(goCtx, &types.MsgWithdrawal{
 		Creator:        alice.String(),
 		TokenA:         "TokenA",
 		TokenB:         "TokenB",
@@ -208,7 +208,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("450000000000000000000"))))
 
 	fmt.Println(app.DexKeeper.GetShares(ctx, alice.String(), pairId, 0, 1))
-	_ = withdrawlResponse2
+	_ = WithdrawalResponse2
 
 	createResponse5, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
 		Creator:    alice.String(),
@@ -236,5 +236,5 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 
 	_ = createResponse5
 
-	fmt.Println("Withdrawl Tests complete")
+	fmt.Println("Withdrawal Tests complete")
 }

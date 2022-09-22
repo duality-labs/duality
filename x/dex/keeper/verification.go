@@ -62,7 +62,7 @@ func (k Keeper) depositVerification(goCtx context.Context, msg types.MsgDeposit)
 	return token0, token1, callerAddr, amount0, amount1, nil
 }
 
-func (k Keeper) withdrawlVerification(goCtx context.Context, msg types.MsgWithdrawl) (string, string, sdk.AccAddress, sdk.Dec, error) {
+func (k Keeper) WithdrawalVerification(goCtx context.Context, msg types.MsgWithdrawal) (string, string, sdk.AccAddress, sdk.Dec, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 

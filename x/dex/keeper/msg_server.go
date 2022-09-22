@@ -42,19 +42,19 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 	return &types.MsgDepositResponse{}, nil
 }
 
-func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*types.MsgWithdrawlResponse, error) {
+func (k msgServer) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (*types.MsgWithdrawalResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, createrAddr, sharesToRemove, err := k.withdrawlVerification(goCtx, *msg)
+	token0, token1, createrAddr, sharesToRemove, err := k.WithdrawalVerification(goCtx, *msg)
 
 	if err != nil {
 		return nil, err
 	}
 
-	err = k.SingleWithdrawl(goCtx, msg, token0, token1, createrAddr, sharesToRemove)
+	err = k.SingleWithdrawal(goCtx, msg, token0, token1, createrAddr, sharesToRemove)
 	_ = ctx
 
-	return &types.MsgWithdrawlResponse{}, nil
+	return &types.MsgWithdrawalResponse{}, nil
 }
 
 func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSwapResponse, error) {

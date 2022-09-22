@@ -8,21 +8,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
+func TestMsgWithdrawal_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgWithdrawl
+		msg  MsgWithdrawal
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgWithdrawl{
+			msg: MsgWithdrawal{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: MsgWithdrawl{
+			msg: MsgWithdrawal{
 				Creator: sample.AccAddress(),
 			},
 		},

@@ -20,8 +20,8 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgDeposit:
 			res, err := msgServer.Deposit(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgWithdrawl:
-			res, err := msgServer.Withdrawl(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgWithdrawal:
+			res, err := msgServer.Withdrawal(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgSwap:
 			res, err := msgServer.Swap(sdk.WrapSDKContext(ctx), msg)

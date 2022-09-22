@@ -12,10 +12,10 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdWithdrawl() *cobra.Command {
+func CmdWithdrawal() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "withdrawl [token-a] [token-b] [shares-to-remove] [price-index] [fee] [receiver]",
-		Short: "Broadcast message withdrawl",
+		Use:   "Withdrawal [token-a] [token-b] [shares-to-remove] [price-index] [fee] [receiver]",
+		Short: "Broadcast message Withdrawal",
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argTokenA := args[0]
@@ -41,7 +41,7 @@ func CmdWithdrawl() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgWithdrawl(
+			msg := types.NewMsgWithdrawal(
 				clientCtx.GetFromAddress().String(),
 				argTokenA,
 				argTokenB,

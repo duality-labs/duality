@@ -53020,7 +53020,7 @@ definitions:
     type: object
   nicholasdotsol.duality.dex.MsgSwapResponse:
     type: object
-  nicholasdotsol.duality.dex.MsgWithdrawlResponse:
+  nicholasdotsol.duality.dex.MsgWithdrawalResponse:
     type: object
   nicholasdotsol.duality.dex.PairMap:
     type: object

@@ -33,7 +33,7 @@ export type DexMsgDepositResponse = object;
 
 export type DexMsgSwapResponse = object;
 
-export type DexMsgWithdrawlResponse = object;
+export type DexMsgWithdrawalResponse = object;
 
 export interface DexPairMap {
   pairId?: string;

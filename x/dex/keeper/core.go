@@ -273,7 +273,7 @@ func (k Keeper) MultiDeposit(goCtx context.Context, msg *types.MsgDeposit) error
 	return nil
 }
 
-func (k Keeper) SingleWithdrawl(goCtx context.Context, msg *types.MsgWithdrawl, token0 string, token1 string, callerAddr sdk.AccAddress, sharesToRemove sdk.Dec) error {
+func (k Keeper) SingleWithdrawal(goCtx context.Context, msg *types.MsgWithdrawal, token0 string, token1 string, callerAddr sdk.AccAddress, sharesToRemove sdk.Dec) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	feeValue, _ := k.GetFeeList(ctx, uint64(msg.FeeIndex))
 	fee := feeValue.Fee

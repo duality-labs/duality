@@ -7,8 +7,8 @@ option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 
 // Msg defines the Msg service.
 service Msg {
-      rpc Deposit(MsgDeposit) returns (MsgDepositResponse);
-  rpc Withdrawl(MsgWithdrawl) returns (MsgWithdrawlResponse);
+  rpc Deposit(MsgDeposit) returns (MsgDepositResponse);
+  rpc Withdrawal(MsgWithdrawal) returns (MsgWithdrawalResponse);
   rpc Swap(MsgSwap) returns (MsgSwapResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
@@ -26,7 +26,7 @@ message MsgDeposit {
 message MsgDepositResponse {
 }
 
-message MsgWithdrawl {
+message MsgWithdrawal {
   string creator = 1;
   string tokenA = 2;
   string tokenB = 3;
@@ -36,7 +36,7 @@ message MsgWithdrawl {
   string receiver = 7;
 }
 
-message MsgWithdrawlResponse {
+message MsgWithdrawalResponse {
 }
 
 message MsgSwap {

@@ -16,7 +16,7 @@ export interface MsgDeposit {
 
 export interface MsgDepositResponse {}
 
-export interface MsgWithdrawl {
+export interface MsgWithdrawal {
   creator: string;
   tokenA: string;
   tokenB: string;
@@ -26,7 +26,7 @@ export interface MsgWithdrawl {
   receiver: string;
 }
 
-export interface MsgWithdrawlResponse {}
+export interface MsgWithdrawalResponse {}
 
 export interface MsgSwap {
   creator: string;
@@ -242,7 +242,7 @@ export const MsgDepositResponse = {
   },
 };
 
-const baseMsgWithdrawl: object = {
+const baseMsgWithdrawal: object = {
   creator: "",
   tokenA: "",
   tokenB: "",
@@ -252,8 +252,8 @@ const baseMsgWithdrawl: object = {
   receiver: "",
 };
 
-export const MsgWithdrawl = {
-  encode(message: MsgWithdrawl, writer: Writer = Writer.create()): Writer {
+export const MsgWithdrawal = {
+  encode(message: MsgWithdrawal, writer: Writer = Writer.create()): Writer {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
@@ -278,10 +278,10 @@ export const MsgWithdrawl = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): MsgWithdrawl {
+  decode(input: Reader | Uint8Array, length?: number): MsgWithdrawal {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseMsgWithdrawl } as MsgWithdrawl;
+    const message = { ...baseMsgWithdrawal } as MsgWithdrawal;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -314,8 +314,8 @@ export const MsgWithdrawl = {
     return message;
   },
 
-  fromJSON(object: any): MsgWithdrawl {
-    const message = { ...baseMsgWithdrawl } as MsgWithdrawl;
+  fromJSON(object: any): MsgWithdrawal {
+    const message = { ...baseMsgWithdrawal } as MsgWithdrawal;
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = String(object.creator);
     } else {
@@ -354,7 +354,7 @@ export const MsgWithdrawl = {
     return message;
   },
 
-  toJSON(message: MsgWithdrawl): unknown {
+  toJSON(message: MsgWithdrawal): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.tokenA !== undefined && (obj.tokenA = message.tokenA);
@@ -367,8 +367,8 @@ export const MsgWithdrawl = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<MsgWithdrawl>): MsgWithdrawl {
-    const message = { ...baseMsgWithdrawl } as MsgWithdrawl;
+  fromPartial(object: DeepPartial<MsgWithdrawal>): MsgWithdrawal {
+    const message = { ...baseMsgWithdrawal } as MsgWithdrawal;
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = object.creator;
     } else {
@@ -408,17 +408,17 @@ export const MsgWithdrawl = {
   },
 };
 
-const baseMsgWithdrawlResponse: object = {};
+const baseMsgWithdrawalResponse: object = {};
 
-export const MsgWithdrawlResponse = {
-  encode(_: MsgWithdrawlResponse, writer: Writer = Writer.create()): Writer {
+export const MsgWithdrawalResponse = {
+  encode(_: MsgWithdrawalResponse, writer: Writer = Writer.create()): Writer {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): MsgWithdrawlResponse {
+  decode(input: Reader | Uint8Array, length?: number): MsgWithdrawalResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseMsgWithdrawlResponse } as MsgWithdrawlResponse;
+    const message = { ...baseMsgWithdrawalResponse } as MsgWithdrawalResponse;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -430,18 +430,18 @@ export const MsgWithdrawlResponse = {
     return message;
   },
 
-  fromJSON(_: any): MsgWithdrawlResponse {
-    const message = { ...baseMsgWithdrawlResponse } as MsgWithdrawlResponse;
+  fromJSON(_: any): MsgWithdrawalResponse {
+    const message = { ...baseMsgWithdrawalResponse } as MsgWithdrawalResponse;
     return message;
   },
 
-  toJSON(_: MsgWithdrawlResponse): unknown {
+  toJSON(_: MsgWithdrawalResponse): unknown {
     const obj: any = {};
     return obj;
   },
 
-  fromPartial(_: DeepPartial<MsgWithdrawlResponse>): MsgWithdrawlResponse {
-    const message = { ...baseMsgWithdrawlResponse } as MsgWithdrawlResponse;
+  fromPartial(_: DeepPartial<MsgWithdrawalResponse>): MsgWithdrawalResponse {
+    const message = { ...baseMsgWithdrawalResponse } as MsgWithdrawalResponse;
     return message;
   },
 };
@@ -634,7 +634,7 @@ export const MsgSwapResponse = {
 /** Msg defines the Msg service. */
 export interface Msg {
   Deposit(request: MsgDeposit): Promise<MsgDepositResponse>;
-  Withdrawl(request: MsgWithdrawl): Promise<MsgWithdrawlResponse>;
+  Withdrawal(request: MsgWithdrawal): Promise<MsgWithdrawalResponse>;
   /** this line is used by starport scaffolding # proto/tx/rpc */
   Swap(request: MsgSwap): Promise<MsgSwapResponse>;
 }
@@ -654,15 +654,15 @@ export class MsgClientImpl implements Msg {
     return promise.then((data) => MsgDepositResponse.decode(new Reader(data)));
   }
 
-  Withdrawl(request: MsgWithdrawl): Promise<MsgWithdrawlResponse> {
-    const data = MsgWithdrawl.encode(request).finish();
+  Withdrawal(request: MsgWithdrawal): Promise<MsgWithdrawalResponse> {
+    const data = MsgWithdrawal.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Msg",
-      "Withdrawl",
+      "Withdrawal",
       data
     );
     return promise.then((data) =>
-      MsgWithdrawlResponse.decode(new Reader(data))
+      MsgWithdrawalResponse.decode(new Reader(data))
     );
   }
 
