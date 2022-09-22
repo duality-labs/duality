@@ -24,10 +24,10 @@ then
     mkdir /root/.duality/testkeys
 
     # alice
-    dualityd keys add alice --keyring-backend test --output json > /root/.duality/testkeys/alice.json
+    dualityd keys add alice --keyring-backend test
     dualityd add-genesis-account $(dualityd keys show alice -a --keyring-backend test) 1000000000token,1000000000stake --keyring-backend test
     # bob
-    dualityd keys add bob --keyring-backend test --output json > /root/.duality/testkeys/bob.json
+    dualityd keys add bob --keyring-backend test
     dualityd add-genesis-account $(dualityd keys show bob -a --keyring-backend test) 1000000000token,1000000000stake --keyring-backend test
 
     # Add gentxs to the genesis file
