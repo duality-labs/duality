@@ -49,9 +49,7 @@ WORKDIR /usr/src
 # Copy over binaries from the build-env
 COPY --from=build-env /usr/src/build/dualityd_arm64 /usr/bin/dualityd
 
-# create duality chain config files
-RUN dualityd init duality
-
+# Copy our configuration settings
 COPY testnet/config/app.toml /root/.duality/config/app.toml
 COPY testnet/config/client.toml /root/.duality/config/client.toml
 COPY testnet/config/config.toml /root/.duality/config/config.toml
