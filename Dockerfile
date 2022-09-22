@@ -42,9 +42,6 @@ WORKDIR /usr/src
 # Copy over binaries from the build-env
 COPY --from=build-env /usr/src/build/dualityd_arm64 /usr/bin/dualityd
 
-# create duality chain config files
-RUN dualityd init duality
-
 # see docs for exposed ports:
 #   https://docs.ignite.com/kb/config.html#host
 EXPOSE 26657
