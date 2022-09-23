@@ -71,6 +71,7 @@ func (suite *IntegrationTestSuite) TestSwap() {
 		AmountB:    "0",
 		PriceIndex: 0,
 		FeeIndex:   0,
+		Receiver:   alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -97,6 +98,7 @@ func (suite *IntegrationTestSuite) TestSwap() {
 		AmountB:    "0",
 		PriceIndex: 0,
 		FeeIndex:   1,
+		Receiver:   alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -111,6 +113,7 @@ func (suite *IntegrationTestSuite) TestSwap() {
 		AmountB:    "50",
 		PriceIndex: -2,
 		FeeIndex:   0,
+		Receiver:   alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -124,6 +127,7 @@ func (suite *IntegrationTestSuite) TestSwap() {
 		AmountB:    "50",
 		PriceIndex: -1,
 		FeeIndex:   0,
+		Receiver:   alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -142,6 +146,7 @@ func (suite *IntegrationTestSuite) TestSwap() {
 		AmountIn: "20",
 		TokenIn:  "TokenB",
 		MinOut:   "10",
+		Receiver: alice.String(),
 	})
 
 	_ = swapRepsone
@@ -199,6 +204,7 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection() {
 		AmountB:    "0",
 		PriceIndex: 0,
 		FeeIndex:   0,
+		Receiver:   alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -223,6 +229,7 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection() {
 		AmountIn: "49.99500",
 		TokenIn:  "TokenB",
 		MinOut:   "10",
+		Receiver: bob.String(),
 	})
 
 	_ = swapRepsone
@@ -279,6 +286,7 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedWrongDirection() {
 		AmountB:    "0",
 		PriceIndex: 0,
 		FeeIndex:   0,
+		Receiver:   alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -303,6 +311,7 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedWrongDirection() {
 		AmountIn: "49.99500",
 		TokenIn:  "TokenA",
 		MinOut:   "10",
+		Receiver: bob.String(),
 	})
 
 	_ = swapRepsone
@@ -359,6 +368,7 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection2() {
 		AmountB:    "0",
 		PriceIndex: 0,
 		FeeIndex:   0,
+		Receiver:   alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -383,6 +393,7 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection2() {
 		AmountB:    "0",
 		PriceIndex: 100000,
 		FeeIndex:   0,
+		Receiver:   alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -406,6 +417,7 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection2() {
 		AmountIn: "60",
 		TokenIn:  "TokenB",
 		MinOut:   "10",
+		Receiver: bob.String(),
 	})
 
 	_ = swapRepsone

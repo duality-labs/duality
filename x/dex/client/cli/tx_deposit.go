@@ -14,7 +14,7 @@ var _ = strconv.Itoa(0)
 
 func CmdDeposit() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deposit [token-a] [token-b] [amount-0] [amount-1] [price-index] [fee]",
+		Use:   "deposit [token-a] [token-b] [amount-0] [amount-1] [tick-index] [fee] [receiver]",
 		Short: "Broadcast message deposit",
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -37,6 +37,7 @@ func CmdDeposit() *cobra.Command {
 				return err
 			}
 
+			argReceiver := args[7]
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -50,6 +51,7 @@ func CmdDeposit() *cobra.Command {
 				argAmount1,
 				int64(tmpArgPriceIndex),
 				uint64(tmpArgFeeIndex),
+				argReceiver,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

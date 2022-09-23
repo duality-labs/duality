@@ -21,6 +21,7 @@ message MsgDeposit {
   string amountB = 5;
   int64 priceIndex = 6;
   uint64 feeIndex = 7;
+  string receiver = 8;
 }
 
 message MsgDepositResponse {
@@ -46,6 +47,7 @@ message MsgSwap {
   string amountIn = 4;
   string tokenIn = 5;
   string minOut = 6;
+  string receiver = 7;
 }
 
 message MsgSwapResponse {

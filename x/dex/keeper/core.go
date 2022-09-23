@@ -224,11 +224,11 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 		pair.TokenPair.CurrentTick0To1 = msg.PriceIndex - fee
 	}
 
-	shares, sharesFound := k.GetShares(ctx, msg.Creator, pairId, msg.PriceIndex, msg.FeeIndex)
+	shares, sharesFound := k.GetShares(ctx, msg.Receiver, pairId, msg.PriceIndex, msg.FeeIndex)
 
 	if !sharesFound {
 		shares = types.Shares{
-			Address:     msg.Creator,
+			Address:     msg.Receiver,
 			PairId:      pairId,
 			PriceIndex:  msg.PriceIndex,
 			FeeIndex:    msg.FeeIndex,
@@ -474,7 +474,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 	if amount_out.GT(sdk.ZeroDec()) {
 		coinOut := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount_out.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(msg.Receiver), sdk.Coins{coinOut}); err != nil {
 			return err
 		}
 	}
@@ -579,7 +579,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	if amount_out.GT(sdk.ZeroDec()) {
 
 		coinOut := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(msg.Receiver), sdk.Coins{coinOut}); err != nil {
 			return err
 		}
 	}

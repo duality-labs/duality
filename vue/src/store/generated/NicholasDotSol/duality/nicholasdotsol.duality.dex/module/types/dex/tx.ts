@@ -12,6 +12,7 @@ export interface MsgDeposit {
   amountB: string;
   priceIndex: number;
   feeIndex: number;
+  receiver: string;
 }
 
 export interface MsgDepositResponse {}
@@ -35,6 +36,7 @@ export interface MsgSwap {
   amountIn: string;
   tokenIn: string;
   minOut: string;
+  receiver: string;
 }
 
 export interface MsgSwapResponse {}
@@ -47,6 +49,7 @@ const baseMsgDeposit: object = {
   amountB: "",
   priceIndex: 0,
   feeIndex: 0,
+  receiver: "",
 };
 
 export const MsgDeposit = {
@@ -71,6 +74,9 @@ export const MsgDeposit = {
     }
     if (message.feeIndex !== 0) {
       writer.uint32(56).uint64(message.feeIndex);
+    }
+    if (message.receiver !== "") {
+      writer.uint32(66).string(message.receiver);
     }
     return writer;
   },
@@ -102,6 +108,9 @@ export const MsgDeposit = {
           break;
         case 7:
           message.feeIndex = longToNumber(reader.uint64() as Long);
+          break;
+        case 8:
+          message.receiver = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -148,6 +157,11 @@ export const MsgDeposit = {
     } else {
       message.feeIndex = 0;
     }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = String(object.receiver);
+    } else {
+      message.receiver = "";
+    }
     return message;
   },
 
@@ -160,6 +174,7 @@ export const MsgDeposit = {
     message.amountB !== undefined && (obj.amountB = message.amountB);
     message.priceIndex !== undefined && (obj.priceIndex = message.priceIndex);
     message.feeIndex !== undefined && (obj.feeIndex = message.feeIndex);
+    message.receiver !== undefined && (obj.receiver = message.receiver);
     return obj;
   },
 
@@ -199,6 +214,11 @@ export const MsgDeposit = {
       message.feeIndex = object.feeIndex;
     } else {
       message.feeIndex = 0;
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = object.receiver;
+    } else {
+      message.receiver = "";
     }
     return message;
   },
@@ -453,6 +473,7 @@ const baseMsgSwap: object = {
   amountIn: "",
   tokenIn: "",
   minOut: "",
+  receiver: "",
 };
 
 export const MsgSwap = {
@@ -474,6 +495,9 @@ export const MsgSwap = {
     }
     if (message.minOut !== "") {
       writer.uint32(50).string(message.minOut);
+    }
+    if (message.receiver !== "") {
+      writer.uint32(58).string(message.receiver);
     }
     return writer;
   },
@@ -502,6 +526,9 @@ export const MsgSwap = {
           break;
         case 6:
           message.minOut = reader.string();
+          break;
+        case 7:
+          message.receiver = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -543,6 +570,11 @@ export const MsgSwap = {
     } else {
       message.minOut = "";
     }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = String(object.receiver);
+    } else {
+      message.receiver = "";
+    }
     return message;
   },
 
@@ -554,6 +586,7 @@ export const MsgSwap = {
     message.amountIn !== undefined && (obj.amountIn = message.amountIn);
     message.tokenIn !== undefined && (obj.tokenIn = message.tokenIn);
     message.minOut !== undefined && (obj.minOut = message.minOut);
+    message.receiver !== undefined && (obj.receiver = message.receiver);
     return obj;
   },
 
@@ -588,6 +621,11 @@ export const MsgSwap = {
       message.minOut = object.minOut;
     } else {
       message.minOut = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = object.receiver;
+    } else {
+      message.receiver = "";
     }
     return message;
   },

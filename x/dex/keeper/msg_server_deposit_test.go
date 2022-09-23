@@ -94,6 +94,7 @@ func (suite *IntegrationTestSuite) TestSingleDeposit() {
 		AmountB:    "50",
 		PriceIndex: 0,
 		FeeIndex:   0,
+		Receiver:   alice.String(),
 	})
 
 	suite.Require().Nil(err)

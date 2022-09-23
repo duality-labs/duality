@@ -71,6 +71,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		AmountB:    "0",
 		PriceIndex: 0,
 		FeeIndex:   0,
+		Receiver:   alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -99,6 +100,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		SharesToRemove: "50",
 		PriceIndex:     0,
 		FeeIndex:       0,
+		Receiver:       alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -116,6 +118,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		AmountB:    "50",
 		PriceIndex: 0,
 		FeeIndex:   1,
+		Receiver:   alice.String(),
 	})
 
 	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 2))
@@ -151,6 +154,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		AmountB:    "0",
 		PriceIndex: 1,
 		FeeIndex:   1,
+		Receiver:   alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -174,6 +178,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		AmountB:    "50",
 		PriceIndex: 0,
 		FeeIndex:   1,
+		Receiver:   alice.String(),
 	})
 
 	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 2))
@@ -200,6 +205,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		SharesToRemove: "50",
 		PriceIndex:     0,
 		FeeIndex:       1,
+		Receiver:       alice.String(),
 	})
 
 	fmt.Println("test here")
@@ -218,6 +224,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		AmountB:    "50",
 		PriceIndex: 0,
 		FeeIndex:   1,
+		Receiver:   alice.String(),
 	})
 
 	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 2))

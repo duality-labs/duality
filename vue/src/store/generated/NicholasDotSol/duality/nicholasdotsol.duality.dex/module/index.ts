@@ -4,14 +4,14 @@ import { StdFee } from "@cosmjs/launchpad";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Registry, OfflineSigner, EncodeObject, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Api } from "./rest";
-import { MsgDeposit } from "./types/dex/tx";
 import { MsgSwap } from "./types/dex/tx";
+import { MsgDeposit } from "./types/dex/tx";
 import { MsgWithdrawl } from "./types/dex/tx";
 
 
 const types = [
-  ["/nicholasdotsol.duality.dex.MsgDeposit", MsgDeposit],
   ["/nicholasdotsol.duality.dex.MsgSwap", MsgSwap],
+  ["/nicholasdotsol.duality.dex.MsgDeposit", MsgDeposit],
   ["/nicholasdotsol.duality.dex.MsgWithdrawl", MsgWithdrawl],
   
 ];
@@ -45,8 +45,8 @@ const txClient = async (wallet: OfflineSigner, { addr: addr }: TxClientOptions =
 
   return {
     signAndBroadcast: (msgs: EncodeObject[], { fee, memo }: SignAndBroadcastOptions = {fee: defaultFee, memo: ""}) => client.signAndBroadcast(address, msgs, fee,memo),
-    msgDeposit: (data: MsgDeposit): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgDeposit", value: MsgDeposit.fromPartial( data ) }),
     msgSwap: (data: MsgSwap): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgSwap", value: MsgSwap.fromPartial( data ) }),
+    msgDeposit: (data: MsgDeposit): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgDeposit", value: MsgDeposit.fromPartial( data ) }),
     msgWithdrawl: (data: MsgWithdrawl): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgWithdrawl", value: MsgWithdrawl.fromPartial( data ) }),
     
   };
