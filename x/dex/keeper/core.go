@@ -10,13 +10,15 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k Keeper) DepositPairInit(goCtx context.Context, token0 string, token1 string, price_index int64, fee int64) (string, error) {
+func (k Keeper) DepositPairInit(goCtx context.Context, token0 string, token1 string, tick_index int64, fee int64) (string, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	// Checks to see if the token0 is contained in the tokenLsit
 	token0Index, token0Found := k.GetTokenMap(ctx, token0)
 	tokenLength := k.GetTokensCount(ctx)
 
+	// If token0 is not found, add it to the list
 	if !token0Found {
 		k.SetTokenMap(ctx, types.TokenMap{Address: token0, Index: int64(tokenLength)})
 		newTokenLength := tokenLength + 1
@@ -25,8 +27,10 @@ func (k Keeper) DepositPairInit(goCtx context.Context, token0 string, token1 str
 		k.AppendTokens(ctx, types.Tokens{Id: tokenLength, Address: token0})
 	}
 
+	// Checks to see if the token1 is contained in the tokenLsit
 	token1Index, token1Found := k.GetTokenMap(ctx, token1)
 
+	// If token1 is not found, add it to the list
 	if !token1Found {
 		k.SetTokenMap(ctx, types.TokenMap{Address: token1, Index: int64(tokenLength)})
 		newTokenLength := tokenLength + 1
@@ -36,16 +40,20 @@ func (k Keeper) DepositPairInit(goCtx context.Context, token0 string, token1 str
 	}
 
 	pairId := k.CreatePairId(token0, token1)
+	// Check for pair existance, if it does not exist, initialize it.
 	_, PairFound := k.GetPairMap(ctx, pairId)
 
 	if !PairFound {
 
 		// addEdges(goCtx, token0Index.Index, token1Index.Index)
+
+		// Initializes a new pair object in mapping.
+		// Note this is only one when nno ticks currently exists, and thus we set currentTick0to1 and currentTick1to0 to be tick_index +- fee
 		k.SetPairMap(ctx, types.PairMap{
 			PairId: pairId,
 			TokenPair: &types.TokenPairType{
-				CurrentTick0To1: price_index - fee,
-				CurrentTick1To0: price_index + fee,
+				CurrentTick0To1: tick_index - fee,
+				CurrentTick1To0: tick_index + fee,
 			},
 			PairCount: 0,
 		})
@@ -59,27 +67,38 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	// Getter functions for the tick that corresponds to reserve0 and shares (upper tick), and reserve1 (lower tick)
 	lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, tickIndex-int64(fee))
 	upperTick, upperTickFound := k.GetTickMap(ctx, pairId, tickIndex+int64(fee))
 
+	// Default sets trueAmounts0/1 to amount0/1
 	trueAmount0 := amount0
 	trueAmount1 := amount1
 	var sharesMinted sdk.Dec
 
 	price, err := k.Calc_price(tickIndex)
 
+	// Error check that price was calculated without error
 	if err != nil {
 		return sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec(), err
 	}
 
+	// In the case that the lower, upper tick is not found, or that the specified fee tier of the tick is empty, we default calculate shares (no reblancing, and setting initial share amounts)
 	if !lowerTickFound || !upperTickFound || upperTick.TickData.Reserve0AndShares[feeIndex].TotalShares.Equal(sdk.ZeroDec()) {
-		sharesMinted = trueAmount0.Add(amount1.Mul(price))
 
+		// a0 + a1 * price
+		sharesMinted = amount0.Add(amount1.Mul(price))
+
+		// Gets feeSize for feelist
 		feeSize := k.GetFeeListCount(ctx)
+		// if either of the lower or upper tick is not found we enumerate pairCount
 		if !lowerTickFound || !upperTickFound {
 			pair.PairCount = pair.PairCount + 1
 		}
+		// initialize lowerTick if not found
 		if !lowerTickFound {
+
+			// Creates an tick object of the speciied size and then iterates over each sub struct filling it with 0 values.
 
 			lowerTick = types.TickMap{
 				TickIndex: tickIndex - fee,
@@ -96,10 +115,14 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 			for i, _ := range lowerTick.TickData.Reserve1 {
 				lowerTick.TickData.Reserve1[i] = sdk.ZeroDec()
 			}
-			//lowerTick = NewTick
+
 		}
 
+		// intialize uppertick
 		if !upperTickFound {
+
+			// Creates an tick object of the speciied size and then iterates over each sub struct filling it with 0 values.
+
 			upperTick = types.TickMap{
 				TickIndex: tickIndex + fee,
 				TickData: &types.TickDataType{
@@ -115,9 +138,13 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 			for i, _ := range upperTick.TickData.Reserve1 {
 				upperTick.TickData.Reserve1[i] = sdk.ZeroDec()
 			}
-			//upperTick = NewTick
+
 		}
 
+		// No rebalancing is needed set trueamount0/1 to amount0/1
+		trueAmount0 = amount0
+		trueAmount1 = amount1
+		// Sets the specifed tick/fee index in the array with the calculated value
 		NewReserve0andShares := &types.Reserve0AndSharesType{
 			Reserve0:    trueAmount0,
 			TotalShares: sharesMinted,
