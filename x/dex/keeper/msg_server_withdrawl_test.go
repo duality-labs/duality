@@ -64,14 +64,14 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	fmt.Println(feeList)
 
 	createResponse, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:    alice.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
-		AmountA:    "50",
-		AmountB:    "0",
-		PriceIndex: 0,
-		FeeIndex:   0,
-		Receiver:   alice.String(),
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		AmountA:   "50",
+		AmountB:   "0",
+		TickIndex: 0,
+		FeeIndex:  0,
+		Receiver:  alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -98,7 +98,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		TokenA:         "TokenA",
 		TokenB:         "TokenB",
 		SharesToRemove: "50",
-		PriceIndex:     0,
+		TickIndex:      0,
 		FeeIndex:       0,
 		Receiver:       alice.String(),
 	})
@@ -111,14 +111,14 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	_ = goCtx
 
 	createResponse2, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:    alice.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
-		AmountA:    "0",
-		AmountB:    "50",
-		PriceIndex: 0,
-		FeeIndex:   1,
-		Receiver:   alice.String(),
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		AmountA:   "0",
+		AmountB:   "50",
+		TickIndex: 0,
+		FeeIndex:  1,
+		Receiver:  alice.String(),
 	})
 
 	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 2))
@@ -147,14 +147,14 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	suite.Require().Equal(bottomTick.TickData.Reserve1[1], sdk.NewDec(50))
 
 	createResponse3, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:    alice.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
-		AmountA:    "50",
-		AmountB:    "0",
-		PriceIndex: 1,
-		FeeIndex:   1,
-		Receiver:   alice.String(),
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		AmountA:   "50",
+		AmountB:   "0",
+		TickIndex: 1,
+		FeeIndex:  1,
+		Receiver:  alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -171,14 +171,14 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	_ = createResponse3
 
 	createResponse4, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:    alice.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
-		AmountA:    "0",
-		AmountB:    "50",
-		PriceIndex: 0,
-		FeeIndex:   1,
-		Receiver:   alice.String(),
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		AmountA:   "0",
+		AmountB:   "50",
+		TickIndex: 0,
+		FeeIndex:  1,
+		Receiver:  alice.String(),
 	})
 
 	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 2))
@@ -203,7 +203,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		TokenA:         "TokenA",
 		TokenB:         "TokenB",
 		SharesToRemove: "50",
-		PriceIndex:     0,
+		TickIndex:      0,
 		FeeIndex:       1,
 		Receiver:       alice.String(),
 	})
@@ -217,14 +217,14 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	_ = withdrawlResponse2
 
 	createResponse5, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:    alice.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
-		AmountA:    "0",
-		AmountB:    "50",
-		PriceIndex: 0,
-		FeeIndex:   1,
-		Receiver:   alice.String(),
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		AmountA:   "0",
+		AmountB:   "50",
+		TickIndex: 0,
+		FeeIndex:  1,
+		Receiver:  alice.String(),
 	})
 
 	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 2))

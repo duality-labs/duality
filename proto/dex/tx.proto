@@ -19,7 +19,7 @@ message MsgDeposit {
   string tokenB = 3;
   string amountA = 4;
   string amountB = 5;
-  int64 priceIndex = 6;
+  int64 tickIndex = 6;
   uint64 feeIndex = 7;
   string receiver = 8;
 }
@@ -32,7 +32,7 @@ message MsgWithdrawl {
   string tokenA = 2;
   string tokenB = 3;
   string sharesToRemove = 4;
-  int64 priceIndex = 5;
+  int64 tickIndex = 5;
   uint64 feeIndex = 6;
   string receiver = 7;
 }

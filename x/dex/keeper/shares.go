@@ -13,7 +13,7 @@ func (k Keeper) SetShares(ctx sdk.Context, shares types.Shares) {
 	store.Set(types.SharesKey(
 		shares.Address,
 		shares.PairId,
-		shares.PriceIndex,
+		shares.TickIndex,
 		shares.FeeIndex,
 	), b)
 }
@@ -23,7 +23,7 @@ func (k Keeper) GetShares(
 	ctx sdk.Context,
 	address string,
 	pairId string,
-	priceIndex int64,
+	tickIndex int64,
 	feeIndex uint64,
 
 ) (val types.Shares, found bool) {
@@ -32,7 +32,7 @@ func (k Keeper) GetShares(
 	b := store.Get(types.SharesKey(
 		address,
 		pairId,
-		priceIndex,
+		tickIndex,
 		feeIndex,
 	))
 	if b == nil {
@@ -48,7 +48,7 @@ func (k Keeper) RemoveShares(
 	ctx sdk.Context,
 	address string,
 	pairId string,
-	priceIndex int64,
+	tickIndex int64,
 	feeIndex uint64,
 
 ) {
@@ -56,7 +56,7 @@ func (k Keeper) RemoveShares(
 	store.Delete(types.SharesKey(
 		address,
 		pairId,
-		priceIndex,
+		tickIndex,
 		feeIndex,
 	))
 }

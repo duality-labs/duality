@@ -22,10 +22,10 @@ func CmdDeposit() *cobra.Command {
 			argTokenB := args[1]
 			argAmount0 := args[2]
 			argAmount1 := args[3]
-			argPriceIndex := args[4]
+			argTickIndex := args[4]
 			argFee := args[5]
 
-			tmpArgPriceIndex, err := strconv.Atoi(argPriceIndex)
+			tmpArgTickIndex, err := strconv.Atoi(argTickIndex)
 
 			if err != nil {
 				return err
@@ -49,7 +49,7 @@ func CmdDeposit() *cobra.Command {
 				argTokenB,
 				argAmount0,
 				argAmount1,
-				int64(tmpArgPriceIndex),
+				int64(tmpArgTickIndex),
 				uint64(tmpArgFeeIndex),
 				argReceiver,
 			)

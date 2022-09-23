@@ -81,7 +81,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	feeValue, _ := k.GetFeeList(ctx, uint64(msg.FeeIndex))
 	fee := feeValue.Fee
-	k.DepositPairHelper(goCtx, token0, token1, msg.PriceIndex, fee)
+	k.DepositPairHelper(goCtx, token0, token1, msg.TickIndex, fee)
 
 	pairId := k.CreatePairId(token0, token1)
 
@@ -91,8 +91,8 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 
-	bottomTick, bottomTickFound := k.GetTickMap(ctx, pairId, msg.PriceIndex-int64(fee))
-	topTick, topTickFound := k.GetTickMap(ctx, pairId, msg.PriceIndex+int64(fee))
+	bottomTick, bottomTickFound := k.GetTickMap(ctx, pairId, msg.TickIndex-int64(fee))
+	topTick, topTickFound := k.GetTickMap(ctx, pairId, msg.TickIndex+int64(fee))
 
 	trueAmount0 := amount0
 	trueAmount1 := amount1
@@ -100,15 +100,15 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 	var oldReserve0 sdk.Dec
 	var oldReserve1 sdk.Dec
 
-	if amount0.GT(sdk.ZeroDec()) && ((msg.PriceIndex + fee) < pair.TokenPair.CurrentTick0To1) {
+	if amount0.GT(sdk.ZeroDec()) && ((msg.TickIndex + fee) < pair.TokenPair.CurrentTick0To1) {
 		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick less than the CurrentTick1to0")
 	}
 
-	if amount1.GT(sdk.ZeroDec()) && ((msg.PriceIndex - fee) > pair.TokenPair.CurrentTick1To0) {
+	if amount1.GT(sdk.ZeroDec()) && ((msg.TickIndex - fee) > pair.TokenPair.CurrentTick1To0) {
 		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick greater than the CurrentTick0to1")
 	}
 
-	price, err := k.Calc_price(msg.PriceIndex)
+	price, err := k.Calc_price(msg.TickIndex)
 
 	if err != nil {
 		return err
@@ -127,7 +127,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 		if !bottomTickFound {
 
 			bottomTick = types.TickMap{
-				TickIndex: msg.PriceIndex - fee,
+				TickIndex: msg.TickIndex - fee,
 				TickData: &types.TickDataType{
 					Reserve0AndShares: make([]*types.Reserve0AndSharesType, feeSize),
 					Reserve1:          make([]sdk.Dec, feeSize),
@@ -146,7 +146,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 
 		if !topTickFound {
 			topTick = types.TickMap{
-				TickIndex: msg.PriceIndex + fee,
+				TickIndex: msg.TickIndex + fee,
 				TickData: &types.TickDataType{
 					Reserve0AndShares: make([]*types.Reserve0AndSharesType, feeSize),
 					Reserve1:          make([]sdk.Dec, feeSize),
@@ -214,23 +214,23 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 
 	}
 
-	if trueAmount0.GT(sdk.ZeroDec()) && ((msg.PriceIndex+fee > pair.TokenPair.CurrentTick0To1) && (msg.PriceIndex+fee < pair.TokenPair.CurrentTick1To0)) {
+	if trueAmount0.GT(sdk.ZeroDec()) && ((msg.TickIndex+fee > pair.TokenPair.CurrentTick0To1) && (msg.TickIndex+fee < pair.TokenPair.CurrentTick1To0)) {
 		fmt.Println("does this trigger")
-		pair.TokenPair.CurrentTick1To0 = msg.PriceIndex + fee
+		pair.TokenPair.CurrentTick1To0 = msg.TickIndex + fee
 	}
 
-	if trueAmount1.GT(sdk.ZeroDec()) && ((msg.PriceIndex-fee > pair.TokenPair.CurrentTick0To1) && (msg.PriceIndex-fee < pair.TokenPair.CurrentTick1To0)) {
+	if trueAmount1.GT(sdk.ZeroDec()) && ((msg.TickIndex-fee > pair.TokenPair.CurrentTick0To1) && (msg.TickIndex-fee < pair.TokenPair.CurrentTick1To0)) {
 		fmt.Println("does this trigger 2")
-		pair.TokenPair.CurrentTick0To1 = msg.PriceIndex - fee
+		pair.TokenPair.CurrentTick0To1 = msg.TickIndex - fee
 	}
 
-	shares, sharesFound := k.GetShares(ctx, msg.Receiver, pairId, msg.PriceIndex, msg.FeeIndex)
+	shares, sharesFound := k.GetShares(ctx, msg.Receiver, pairId, msg.TickIndex, msg.FeeIndex)
 
 	if !sharesFound {
 		shares = types.Shares{
 			Address:     msg.Receiver,
 			PairId:      pairId,
-			PriceIndex:  msg.PriceIndex,
+			TickIndex:   msg.TickIndex,
 			FeeIndex:    msg.FeeIndex,
 			SharesOwned: sharesMinted,
 		}
@@ -258,7 +258,7 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 	k.SetShares(ctx, shares)
 
 	ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator,
-		token0, token1, fmt.Sprint(msg.PriceIndex), fmt.Sprint(msg.FeeIndex),
+		token0, token1, fmt.Sprint(msg.TickIndex), fmt.Sprint(msg.FeeIndex),
 		oldReserve0.String(), oldReserve1.String(), bottomTick.TickData.Reserve1[msg.FeeIndex].String(), topTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.String(),
 		sharesMinted.String()),
 	)
@@ -286,8 +286,8 @@ func (k Keeper) SingleWithdrawl(goCtx context.Context, msg *types.MsgWithdrawl, 
 		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 
-	addtick, addtickFound := k.GetTickMap(ctx, pairId, msg.PriceIndex+int64(fee))
-	subtick, subTickFound := k.GetTickMap(ctx, pairId, msg.PriceIndex-int64(fee))
+	addtick, addtickFound := k.GetTickMap(ctx, pairId, msg.TickIndex+int64(fee))
+	subtick, subTickFound := k.GetTickMap(ctx, pairId, msg.TickIndex-int64(fee))
 
 	var OldReserve0 sdk.Dec
 	var OldReserve1 sdk.Dec
@@ -309,7 +309,7 @@ func (k Keeper) SingleWithdrawl(goCtx context.Context, msg *types.MsgWithdrawl, 
 	subtick.TickData.Reserve1[msg.FeeIndex] = subtick.TickData.Reserve1[msg.FeeIndex].Sub(reserve1ToRemove)
 	addtick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares = addtick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares.Sub(sharesToRemove)
 
-	shareOwner, shareOwnerFound := k.GetShares(ctx, msg.Creator, pairId, msg.PriceIndex, msg.FeeIndex)
+	shareOwner, shareOwnerFound := k.GetShares(ctx, msg.Creator, pairId, msg.TickIndex, msg.FeeIndex)
 
 	if !shareOwnerFound {
 		return sdkerrors.Wrapf(types.ErrValidShareNotFound, "No valid share owner fonnd")
@@ -328,30 +328,30 @@ func (k Keeper) SingleWithdrawl(goCtx context.Context, msg *types.MsgWithdrawl, 
 	if removeTick {
 		pair.PairCount = pair.PairCount - 1
 	}
-	if removeTick && (msg.PriceIndex+int64(fee) == pair.TokenPair.CurrentTick1To0) {
+	if removeTick && (msg.TickIndex+int64(fee) == pair.TokenPair.CurrentTick1To0) {
 
 		tickFound := false
 		c := 0
 		for tickFound != true && pair.PairCount < int64(c) {
 			c++
-			_, tickFound = k.GetTickMap(ctx, pairId, (msg.PriceIndex + fee + int64(c)))
+			_, tickFound = k.GetTickMap(ctx, pairId, (msg.TickIndex + fee + int64(c)))
 
 		}
 
-		pair.TokenPair.CurrentTick1To0 = (msg.PriceIndex + fee + int64(c))
+		pair.TokenPair.CurrentTick1To0 = (msg.TickIndex + fee + int64(c))
 	}
 
-	if removeTick && (msg.PriceIndex-int64(fee) == pair.TokenPair.CurrentTick0To1) {
+	if removeTick && (msg.TickIndex-int64(fee) == pair.TokenPair.CurrentTick0To1) {
 
 		tickFound := false
 		c := 0
 		for tickFound != true && pair.PairCount < int64(c) {
 			c++
-			_, tickFound = k.GetTickMap(ctx, pairId, (msg.PriceIndex - fee - int64(c)))
+			_, tickFound = k.GetTickMap(ctx, pairId, (msg.TickIndex - fee - int64(c)))
 
 		}
 
-		pair.TokenPair.CurrentTick1To0 = (msg.PriceIndex - fee - int64(c))
+		pair.TokenPair.CurrentTick1To0 = (msg.TickIndex - fee - int64(c))
 	}
 
 	k.SetPairMap(ctx, pair)
@@ -374,7 +374,7 @@ func (k Keeper) SingleWithdrawl(goCtx context.Context, msg *types.MsgWithdrawl, 
 	}
 
 	ctx.EventManager().EmitEvent(types.CreateWithdrawEvent(msg.Creator,
-		token0, token1, fmt.Sprint(msg.PriceIndex), fmt.Sprint(msg.FeeIndex), OldReserve0.String(), OldReserve1.String(),
+		token0, token1, fmt.Sprint(msg.TickIndex), fmt.Sprint(msg.FeeIndex), OldReserve0.String(), OldReserve1.String(),
 		addtick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.String(), subtick.TickData.Reserve1[msg.FeeIndex].String(),
 		sdk.NewAttribute(types.WithdrawEventSharesRemoved, sharesToRemove.String()),
 	))

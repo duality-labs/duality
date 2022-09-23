@@ -462,15 +462,15 @@ func request_Query_Shares_0(ctx context.Context, marshaler runtime.Marshaler, cl
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
 	}
 
-	val, ok = pathParams["priceIndex"]
+	val, ok = pathParams["tickIndex"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "priceIndex")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "tickIndex")
 	}
 
-	protoReq.PriceIndex, err = runtime.Int64(val)
+	protoReq.TickIndex, err = runtime.Int64(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "priceIndex", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tickIndex", err)
 	}
 
 	val, ok = pathParams["fee"]
@@ -522,15 +522,15 @@ func local_request_Query_Shares_0(ctx context.Context, marshaler runtime.Marshal
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
 	}
 
-	val, ok = pathParams["priceIndex"]
+	val, ok = pathParams["tickIndex"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "priceIndex")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "tickIndex")
 	}
 
-	protoReq.PriceIndex, err = runtime.Int64(val)
+	protoReq.TickIndex, err = runtime.Int64(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "priceIndex", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tickIndex", err)
 	}
 
 	val, ok = pathParams["fee"]
@@ -1655,7 +1655,7 @@ var (
 
 	pattern_Query_TokenMapAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "token_map"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Shares_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"NicholasDotSol", "duality", "dex", "shares", "address", "pairId", "priceIndex", "fee"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Shares_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"NicholasDotSol", "duality", "dex", "shares", "address", "pairId", "tickIndex", "fee"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_SharesAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "shares"}, "", runtime.AssumeColonVerbOpt(true)))
 

@@ -21,7 +21,7 @@ func createNShares(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Shares
 		items[i].SharesOwned = sdk.ZeroDec()
 		items[i].Address = strconv.Itoa(i)
 		items[i].PairId = strconv.Itoa(i)
-		items[i].PriceIndex = int64(i)
+		items[i].TickIndex = int64(i)
 		items[i].FeeIndex = uint64(i)
 
 		keeper.SetShares(ctx, items[i])
@@ -36,7 +36,7 @@ func TestSharesGet(t *testing.T) {
 		rst, found := keeper.GetShares(ctx,
 			item.Address,
 			item.PairId,
-			item.PriceIndex,
+			item.TickIndex,
 			item.FeeIndex,
 		)
 		require.True(t, found)
@@ -53,13 +53,13 @@ func TestSharesRemove(t *testing.T) {
 		keeper.RemoveShares(ctx,
 			item.Address,
 			item.PairId,
-			item.PriceIndex,
+			item.TickIndex,
 			item.FeeIndex,
 		)
 		_, found := keeper.GetShares(ctx,
 			item.Address,
 			item.PairId,
-			item.PriceIndex,
+			item.TickIndex,
 			item.FeeIndex,
 		)
 		require.False(t, found)

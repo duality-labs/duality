@@ -107,7 +107,7 @@ func (k Keeper) withdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 	}
 
 	pairId := k.CreatePairId(token0, token1)
-	shares, sharesFound := k.GetShares(ctx, msg.Creator, pairId, msg.PriceIndex, msg.FeeIndex)
+	shares, sharesFound := k.GetShares(ctx, msg.Creator, pairId, msg.TickIndex, msg.FeeIndex)
 
 	if !sharesFound {
 		return "", "", nil, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")

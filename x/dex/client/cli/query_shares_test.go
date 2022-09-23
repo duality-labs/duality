@@ -29,10 +29,10 @@ func networkWithSharesObjects(t *testing.T, n int) (*network.Network, []types.Sh
 
 	for i := 0; i < n; i++ {
 		shares := types.Shares{
-			Address:    strconv.Itoa(i),
-			PairId:     strconv.Itoa(i),
-			PriceIndex: int64(i),
-			FeeIndex:   uint64(i),
+			Address:   strconv.Itoa(i),
+			PairId:    strconv.Itoa(i),
+			TickIndex: int64(i),
+			FeeIndex:  uint64(i),
 		}
 		nullify.Fill(&shares)
 		state.SharesList = append(state.SharesList, shares)
@@ -51,32 +51,32 @@ func TestShowShares(t *testing.T) {
 		fmt.Sprintf("--%s=json", tmcli.OutputFlag),
 	}
 	for _, tc := range []struct {
-		desc         string
-		idAddress    string
-		idPairId     string
-		idPriceIndex int64
-		idFee        uint64
+		desc        string
+		idAddress   string
+		idPairId    string
+		idTickIndex int64
+		idFee       uint64
 
 		args []string
 		err  error
 		obj  types.Shares
 	}{
 		{
-			desc:         "found",
-			idAddress:    objs[0].Address,
-			idPairId:     objs[0].PairId,
-			idPriceIndex: objs[0].PriceIndex,
-			idFee:        objs[0].FeeIndex,
+			desc:        "found",
+			idAddress:   objs[0].Address,
+			idPairId:    objs[0].PairId,
+			idTickIndex: objs[0].TickIndex,
+			idFee:       objs[0].FeeIndex,
 
 			args: common,
 			obj:  objs[0],
 		},
 		{
-			desc:         "not found",
-			idAddress:    strconv.Itoa(100000),
-			idPairId:     strconv.Itoa(100000),
-			idPriceIndex: int64(100000),
-			idFee:        uint64(100000),
+			desc:        "not found",
+			idAddress:   strconv.Itoa(100000),
+			idPairId:    strconv.Itoa(100000),
+			idTickIndex: int64(100000),
+			idFee:       uint64(100000),
 
 			args: common,
 			err:  status.Error(codes.NotFound, "not found"),
@@ -86,7 +86,7 @@ func TestShowShares(t *testing.T) {
 			args := []string{
 				tc.idAddress,
 				tc.idPairId,
-				string(tc.idPriceIndex),
+				string(tc.idTickIndex),
 				string(tc.idFee),
 			}
 			args = append(args, tc.args...)

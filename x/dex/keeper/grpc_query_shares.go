@@ -49,7 +49,7 @@ func (k Keeper) Shares(c context.Context, req *types.QueryGetSharesRequest) (*ty
 		ctx,
 		req.Address,
 		req.PairId,
-		req.PriceIndex,
+		req.TickIndex,
 		req.Fee,
 	)
 	if !found {

@@ -64,14 +64,14 @@ func (suite *IntegrationTestSuite) TestSwap() {
 	fmt.Println(feeList)
 
 	createResponse, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:    alice.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
-		AmountA:    "50",
-		AmountB:    "0",
-		PriceIndex: 0,
-		FeeIndex:   0,
-		Receiver:   alice.String(),
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		AmountA:   "50",
+		AmountB:   "0",
+		TickIndex: 0,
+		FeeIndex:  0,
+		Receiver:  alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -91,14 +91,14 @@ func (suite *IntegrationTestSuite) TestSwap() {
 	pairId := app.DexKeeper.CreatePairId("TokenA", "TokenB")
 
 	createResponse2, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:    alice.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
-		AmountA:    "50",
-		AmountB:    "0",
-		PriceIndex: 0,
-		FeeIndex:   1,
-		Receiver:   alice.String(),
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		AmountA:   "50",
+		AmountB:   "0",
+		TickIndex: 0,
+		FeeIndex:  1,
+		Receiver:  alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -106,28 +106,28 @@ func (suite *IntegrationTestSuite) TestSwap() {
 	_ = createResponse2
 
 	createResponse3, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:    alice.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
-		AmountA:    "0",
-		AmountB:    "50",
-		PriceIndex: -2,
-		FeeIndex:   0,
-		Receiver:   alice.String(),
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		AmountA:   "0",
+		AmountB:   "50",
+		TickIndex: -2,
+		FeeIndex:  0,
+		Receiver:  alice.String(),
 	})
 
 	suite.Require().Nil(err)
 	_ = createResponse3
 
 	createResponse4, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:    alice.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
-		AmountA:    "0",
-		AmountB:    "50",
-		PriceIndex: -1,
-		FeeIndex:   0,
-		Receiver:   alice.String(),
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		AmountA:   "0",
+		AmountB:   "50",
+		TickIndex: -1,
+		FeeIndex:  0,
+		Receiver:  alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -197,14 +197,14 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection() {
 	fmt.Println(feeList)
 
 	createResponse, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:    alice.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
-		AmountA:    "50",
-		AmountB:    "0",
-		PriceIndex: 0,
-		FeeIndex:   0,
-		Receiver:   alice.String(),
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		AmountA:   "50",
+		AmountB:   "0",
+		TickIndex: 0,
+		FeeIndex:  0,
+		Receiver:  alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -279,14 +279,14 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedWrongDirection() {
 	fmt.Println(feeList)
 
 	createResponse, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:    alice.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
-		AmountA:    "50",
-		AmountB:    "0",
-		PriceIndex: 0,
-		FeeIndex:   0,
-		Receiver:   alice.String(),
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		AmountA:   "50",
+		AmountB:   "0",
+		TickIndex: 0,
+		FeeIndex:  0,
+		Receiver:  alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -361,14 +361,14 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection2() {
 	fmt.Println(feeList)
 
 	createResponse, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:    alice.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
-		AmountA:    "50",
-		AmountB:    "0",
-		PriceIndex: 0,
-		FeeIndex:   0,
-		Receiver:   alice.String(),
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		AmountA:   "50",
+		AmountB:   "0",
+		TickIndex: 0,
+		FeeIndex:  0,
+		Receiver:  alice.String(),
 	})
 
 	suite.Require().Nil(err)
@@ -386,14 +386,14 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection2() {
 	_ = createResponse
 
 	createResponse2, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:    alice.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
-		AmountA:    "50",
-		AmountB:    "0",
-		PriceIndex: 100000,
-		FeeIndex:   0,
-		Receiver:   alice.String(),
+		Creator:   alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		AmountA:   "50",
+		AmountB:   "0",
+		TickIndex: 100000,
+		FeeIndex:  0,
+		Receiver:  alice.String(),
 	})
 
 	suite.Require().Nil(err)

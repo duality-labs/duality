@@ -41,16 +41,16 @@ func TestGenesis(t *testing.T) {
 		TokensCount: 2,
 		SharesList: []types.Shares{
 			{
-				Address:    "0",
-				PairId:     "0",
-				PriceIndex: 0,
-				FeeIndex:   0,
+				Address:   "0",
+				PairId:    "0",
+				TickIndex: 0,
+				FeeIndex:  0,
 			},
 			{
-				Address:    "1",
-				PairId:     "1",
-				PriceIndex: 1,
-				FeeIndex:   uint64(1),
+				Address:   "1",
+				PairId:    "1",
+				TickIndex: 1,
+				FeeIndex:  uint64(1),
 			},
 		},
 		FeeListList: []types.FeeList{
