@@ -135,6 +135,7 @@ const (
 const (
 	SwapEventKey      = "NewWithdraw"
 	SwapEventCreator  = "Creator"
+	SwapEventReceiver = "Receiver"
 	SwapEventToken0   = "Token0"
 	SwapEventToken1   = "Token1"
 	SwapEventTokenIn  = "TokenIn"
