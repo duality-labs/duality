@@ -85,14 +85,10 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 
 	pairId := k.CreatePairId(token0, token1)
 
-	pair, pairFound := k.GetPairMap(ctx, pairId)
+	pair, _ := k.GetPairMap(ctx, pairId)
 
-	if !pairFound {
-		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
-	}
-
-	bottomTick, bottomTickFound := k.GetTickMap(ctx, pairId, msg.TickIndex-int64(fee))
-	topTick, topTickFound := k.GetTickMap(ctx, pairId, msg.TickIndex+int64(fee))
+	lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, msg.TickIndex-int64(fee))
+	upperTick, upperTickFound := k.GetTickMap(ctx, pairId, msg.TickIndex+int64(fee))
 
 	trueAmount0 := amount0
 	trueAmount1 := amount1
@@ -114,19 +110,16 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 		return err
 	}
 
-	// TODO add support for adding n+1 tick given we have a fee_list of size n
-	// check if tick array is < than fee_list if so append to equal that size.
-
-	if !bottomTickFound || !topTickFound || topTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares.Equal(sdk.ZeroDec()) {
+	if !lowerTickFound || !upperTickFound || upperTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares.Equal(sdk.ZeroDec()) {
 		sharesMinted = trueAmount0.Add(amount1.Mul(price))
 
 		feeSize := k.GetFeeListCount(ctx)
-		if !bottomTickFound || !topTickFound {
+		if !lowerTickFound || !upperTickFound {
 			pair.PairCount = pair.PairCount + 1
 		}
-		if !bottomTickFound {
+		if !lowerTickFound {
 
-			bottomTick = types.TickMap{
+			lowerTick = types.TickMap{
 				TickIndex: msg.TickIndex - fee,
 				TickData: &types.TickDataType{
 					Reserve0AndShares: make([]*types.Reserve0AndSharesType, feeSize),
@@ -134,18 +127,18 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 				},
 			}
 
-			for i, _ := range bottomTick.TickData.Reserve0AndShares {
-				bottomTick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}
+			for i, _ := range lowerTick.TickData.Reserve0AndShares {
+				lowerTick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}
 
 			}
-			for i, _ := range bottomTick.TickData.Reserve1 {
-				bottomTick.TickData.Reserve1[i] = sdk.ZeroDec()
+			for i, _ := range lowerTick.TickData.Reserve1 {
+				lowerTick.TickData.Reserve1[i] = sdk.ZeroDec()
 			}
-			//bottomTick = NewTick
+			//lowerTick = NewTick
 		}
 
-		if !topTickFound {
-			topTick = types.TickMap{
+		if !upperTickFound {
+			upperTick = types.TickMap{
 				TickIndex: msg.TickIndex + fee,
 				TickData: &types.TickDataType{
 					Reserve0AndShares: make([]*types.Reserve0AndSharesType, feeSize),
@@ -153,14 +146,14 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 				},
 			}
 
-			for i, _ := range topTick.TickData.Reserve0AndShares {
-				topTick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}
+			for i, _ := range upperTick.TickData.Reserve0AndShares {
+				upperTick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}
 
 			}
-			for i, _ := range topTick.TickData.Reserve1 {
-				topTick.TickData.Reserve1[i] = sdk.ZeroDec()
+			for i, _ := range upperTick.TickData.Reserve1 {
+				upperTick.TickData.Reserve1[i] = sdk.ZeroDec()
 			}
-			//topTick = NewTick
+			//upperTick = NewTick
 		}
 
 		oldReserve0 = sdk.ZeroDec()
@@ -171,56 +164,54 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 			TotalShares: sharesMinted,
 		}
 
-		topTick.TickData.Reserve0AndShares[msg.FeeIndex] = NewReserve0andShares
+		upperTick.TickData.Reserve0AndShares[msg.FeeIndex] = NewReserve0andShares
 
-		bottomTick.TickData.Reserve1[msg.FeeIndex] = trueAmount1
+		lowerTick.TickData.Reserve1[msg.FeeIndex] = trueAmount1
 
 	} else {
 
-		if uint64(len(topTick.TickData.Reserve1)) < k.GetFeeListCount(ctx) {
-			topTick.TickData.Reserve1 = append(topTick.TickData.Reserve1, sdk.ZeroDec())
-			topTick.TickData.Reserve0AndShares = append(topTick.TickData.Reserve0AndShares, &types.Reserve0AndSharesType{})
+		if uint64(len(upperTick.TickData.Reserve1)) < k.GetFeeListCount(ctx) {
+			upperTick.TickData.Reserve1 = append(upperTick.TickData.Reserve1, sdk.ZeroDec())
+			upperTick.TickData.Reserve0AndShares = append(upperTick.TickData.Reserve0AndShares, &types.Reserve0AndSharesType{})
 		}
 
-		if uint64(len(bottomTick.TickData.Reserve1)) < k.GetFeeListCount(ctx) {
-			bottomTick.TickData.Reserve1 = append(bottomTick.TickData.Reserve1, sdk.ZeroDec())
-			bottomTick.TickData.Reserve0AndShares = append(bottomTick.TickData.Reserve0AndShares, &types.Reserve0AndSharesType{})
+		if uint64(len(lowerTick.TickData.Reserve1)) < k.GetFeeListCount(ctx) {
+			lowerTick.TickData.Reserve1 = append(lowerTick.TickData.Reserve1, sdk.ZeroDec())
+			lowerTick.TickData.Reserve0AndShares = append(lowerTick.TickData.Reserve0AndShares, &types.Reserve0AndSharesType{})
 		}
 
-		if topTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.GT(sdk.ZeroDec()) {
-			trueAmount1 = k.Min(amount1, bottomTick.TickData.Reserve1[msg.FeeIndex].Mul(amount0).Quo(topTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0))
+		if upperTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.GT(sdk.ZeroDec()) {
+			trueAmount1 = k.Min(amount1, lowerTick.TickData.Reserve1[msg.FeeIndex].Mul(amount0).Quo(upperTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0))
 			// trueAmount1 = min(amt1 , (reserve1 * amt0)/reserve0 )
 		}
 
-		if bottomTick.TickData.Reserve1[msg.FeeIndex].GT(sdk.ZeroDec()) {
-			trueAmount0 = k.Min(amount0, topTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.Mul(amount1).Quo(bottomTick.TickData.Reserve1[msg.FeeIndex]))
+		if lowerTick.TickData.Reserve1[msg.FeeIndex].GT(sdk.ZeroDec()) {
+			trueAmount0 = k.Min(amount0, upperTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.Mul(amount1).Quo(lowerTick.TickData.Reserve1[msg.FeeIndex]))
 		}
 
 		// if amount0 is 0 amt1/reserve1 * totalShares = sharesMinted
 		// else if amt0/reserve0 * totalShares
 		if trueAmount0.GT(sdk.ZeroDec()) {
-			sharesMinted = (trueAmount0.Quo(topTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0).Mul(topTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares))
+			sharesMinted = (trueAmount0.Quo(upperTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0).Mul(upperTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares))
 		} else {
-			sharesMinted = (trueAmount1.Quo(bottomTick.TickData.Reserve1[msg.FeeIndex]).Mul(topTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares))
+			sharesMinted = (trueAmount1.Quo(lowerTick.TickData.Reserve1[msg.FeeIndex]).Mul(upperTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares))
 		}
 
 		// ((amt0 / reserve0 )* totalShares) + ((amt1 / reserve1) * totalShares)
-		oldReserve0 = topTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0
-		oldReserve1 = bottomTick.TickData.Reserve1[msg.FeeIndex]
-		topTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0 = topTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.Add(trueAmount0)
-		topTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares = topTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares.Add(sharesMinted)
+		oldReserve0 = upperTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0
+		oldReserve1 = lowerTick.TickData.Reserve1[msg.FeeIndex]
+		upperTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0 = upperTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.Add(trueAmount0)
+		upperTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares = upperTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares.Add(sharesMinted)
 
-		bottomTick.TickData.Reserve1[msg.FeeIndex] = bottomTick.TickData.Reserve1[msg.FeeIndex].Add(trueAmount1)
+		lowerTick.TickData.Reserve1[msg.FeeIndex] = lowerTick.TickData.Reserve1[msg.FeeIndex].Add(trueAmount1)
 
 	}
 
 	if trueAmount0.GT(sdk.ZeroDec()) && ((msg.TickIndex+fee > pair.TokenPair.CurrentTick0To1) && (msg.TickIndex+fee < pair.TokenPair.CurrentTick1To0)) {
-		fmt.Println("does this trigger")
 		pair.TokenPair.CurrentTick1To0 = msg.TickIndex + fee
 	}
 
 	if trueAmount1.GT(sdk.ZeroDec()) && ((msg.TickIndex-fee > pair.TokenPair.CurrentTick0To1) && (msg.TickIndex-fee < pair.TokenPair.CurrentTick1To0)) {
-		fmt.Println("does this trigger 2")
 		pair.TokenPair.CurrentTick0To1 = msg.TickIndex - fee
 	}
 
@@ -253,13 +244,13 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 	}
 
 	k.SetPairMap(ctx, pair)
-	k.SetTickMap(ctx, pairId, bottomTick)
-	k.SetTickMap(ctx, pairId, topTick)
+	k.SetTickMap(ctx, pairId, lowerTick)
+	k.SetTickMap(ctx, pairId, upperTick)
 	k.SetShares(ctx, shares)
 
 	ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator,
 		token0, token1, fmt.Sprint(msg.TickIndex), fmt.Sprint(msg.FeeIndex),
-		oldReserve0.String(), oldReserve1.String(), bottomTick.TickData.Reserve1[msg.FeeIndex].String(), topTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.String(),
+		oldReserve0.String(), oldReserve1.String(), lowerTick.TickData.Reserve1[msg.FeeIndex].String(), upperTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.String(),
 		sharesMinted.String()),
 	)
 

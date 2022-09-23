@@ -138,13 +138,13 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 
 	_ = createResponse2
 
-	bottomTick, _ := app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", -2)
-	topTick, _ := app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 2)
+	lowerTick, _ := app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", -2)
+	upperTick, _ := app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 2)
 
-	suite.Require().Equal(topTick.TickData.Reserve0AndShares[1].Reserve0, sdk.NewDec(0))
-	suite.Require().Equal(topTick.TickData.Reserve0AndShares[1].TotalShares, sdk.NewDec(50))
+	suite.Require().Equal(upperTick.TickData.Reserve0AndShares[1].Reserve0, sdk.NewDec(0))
+	suite.Require().Equal(upperTick.TickData.Reserve0AndShares[1].TotalShares, sdk.NewDec(50))
 
-	suite.Require().Equal(bottomTick.TickData.Reserve1[1], sdk.NewDec(50))
+	suite.Require().Equal(lowerTick.TickData.Reserve1[1], sdk.NewDec(50))
 
 	createResponse3, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
 		Creator:   alice.String(),
