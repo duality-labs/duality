@@ -343,28 +343,28 @@ func (k Keeper) SingleWithdrawl(goCtx context.Context, msg *types.MsgWithdrawl, 
 		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 
-	addtick, addtickFound := k.GetTickMap(ctx, pairId, msg.TickIndex+int64(fee))
-	subtick, subTickFound := k.GetTickMap(ctx, pairId, msg.TickIndex-int64(fee))
+	upperTick, upperTickFound := k.GetTickMap(ctx, pairId, msg.TickIndex+int64(fee))
+	lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, msg.TickIndex-int64(fee))
 
 	var OldReserve0 sdk.Dec
 	var OldReserve1 sdk.Dec
-	if !addtickFound || !subTickFound {
+	if !upperTickFound || !lowerTickFound {
 		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "No tick found at the requested index")
 	}
 
-	if addtick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares.Equal(sdk.ZeroDec()) {
+	if upperTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares.Equal(sdk.ZeroDec()) {
 		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "No tick found at the requested index")
 	}
 
-	reserve0ToRemove := (sharesToRemove.Quo(addtick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares)).Mul(addtick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0)
-	reserve1ToRemove := (sharesToRemove.Quo(addtick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares)).Mul(subtick.TickData.Reserve1[msg.FeeIndex])
+	reserve0ToRemove := (sharesToRemove.Quo(upperTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares)).Mul(upperTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0)
+	reserve1ToRemove := (sharesToRemove.Quo(upperTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares)).Mul(lowerTick.TickData.Reserve1[msg.FeeIndex])
 
-	OldReserve0 = addtick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0
-	OldReserve1 = subtick.TickData.Reserve1[msg.FeeIndex]
+	OldReserve0 = upperTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0
+	OldReserve1 = lowerTick.TickData.Reserve1[msg.FeeIndex]
 
-	addtick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0 = addtick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.Sub(reserve0ToRemove)
-	subtick.TickData.Reserve1[msg.FeeIndex] = subtick.TickData.Reserve1[msg.FeeIndex].Sub(reserve1ToRemove)
-	addtick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares = addtick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares.Sub(sharesToRemove)
+	upperTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0 = upperTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.Sub(reserve0ToRemove)
+	lowerTick.TickData.Reserve1[msg.FeeIndex] = lowerTick.TickData.Reserve1[msg.FeeIndex].Sub(reserve1ToRemove)
+	upperTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares = upperTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares.Sub(sharesToRemove)
 
 	shareOwner, shareOwnerFound := k.GetShares(ctx, msg.Creator, pairId, msg.TickIndex, msg.FeeIndex)
 
@@ -375,8 +375,8 @@ func (k Keeper) SingleWithdrawl(goCtx context.Context, msg *types.MsgWithdrawl, 
 	shareOwner.SharesOwned = shareOwner.SharesOwned.Sub(sharesToRemove)
 
 	removeTick := true
-	if addtick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares.Equal(sdk.ZeroDec()) {
-		for _, s := range addtick.TickData.Reserve0AndShares {
+	if upperTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares.Equal(sdk.ZeroDec()) {
+		for _, s := range upperTick.TickData.Reserve0AndShares {
 			if s.TotalShares.GT(sdk.ZeroDec()) {
 				removeTick = false
 			}
@@ -413,8 +413,8 @@ func (k Keeper) SingleWithdrawl(goCtx context.Context, msg *types.MsgWithdrawl, 
 
 	k.SetPairMap(ctx, pair)
 	k.SetShares(ctx, shareOwner)
-	k.SetTickMap(ctx, pairId, addtick)
-	k.SetTickMap(ctx, pairId, subtick)
+	k.SetTickMap(ctx, pairId, upperTick)
+	k.SetTickMap(ctx, pairId, lowerTick)
 
 	if reserve0ToRemove.GT(sdk.ZeroDec()) {
 		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(reserve0ToRemove.BigInt()))
@@ -432,7 +432,7 @@ func (k Keeper) SingleWithdrawl(goCtx context.Context, msg *types.MsgWithdrawl, 
 
 	ctx.EventManager().EmitEvent(types.CreateWithdrawEvent(msg.Creator, msg.Receiver,
 		token0, token1, fmt.Sprint(msg.TickIndex), fmt.Sprint(msg.FeeIndex), OldReserve0.String(), OldReserve1.String(),
-		addtick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.String(), subtick.TickData.Reserve1[msg.FeeIndex].String(),
+		upperTick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.String(), lowerTick.TickData.Reserve1[msg.FeeIndex].String(),
 	))
 	_ = ctx
 	return nil
