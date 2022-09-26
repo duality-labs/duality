@@ -374,18 +374,18 @@ func (k Keeper) SingleWithdrawl(goCtx context.Context, msg *types.MsgWithdrawl, 
 
 	shareOwner.SharesOwned = shareOwner.SharesOwned.Sub(sharesToRemove)
 
-	removeTick := true
+	isTickEmpty := true
 	if upperTick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares.Equal(sdk.ZeroDec()) {
 		for _, s := range upperTick.TickData.Reserve0AndShares {
 			if s.TotalShares.GT(sdk.ZeroDec()) {
-				removeTick = false
+				isTickEmpty = false
 			}
 		}
 	}
-	if removeTick {
+	if isTickEmpty {
 		pair.PairCount = pair.PairCount - 1
 	}
-	if removeTick && (msg.TickIndex+int64(fee) == pair.TokenPair.CurrentTick1To0) {
+	if isTickEmpty && (msg.TickIndex+int64(fee) == pair.TokenPair.CurrentTick1To0) {
 
 		tickFound := false
 		c := 0
@@ -398,7 +398,7 @@ func (k Keeper) SingleWithdrawl(goCtx context.Context, msg *types.MsgWithdrawl, 
 		pair.TokenPair.CurrentTick1To0 = (msg.TickIndex + fee + int64(c))
 	}
 
-	if removeTick && (msg.TickIndex-int64(fee) == pair.TokenPair.CurrentTick0To1) {
+	if isTickEmpty && (msg.TickIndex-int64(fee) == pair.TokenPair.CurrentTick0To1) {
 
 		tickFound := false
 		c := 0
