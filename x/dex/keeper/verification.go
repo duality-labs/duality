@@ -32,9 +32,9 @@ func (k Keeper) depositVerification(goCtx context.Context, msg types.MsgDeposit)
 		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
-	maxFee := k.GetFeeListCount(ctx)
+	feeCount := k.GetFeeListCount(ctx)
 
-	if msg.FeeIndex >= maxFee {
+	if msg.FeeIndex >= feeCount {
 		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", msg.FeeIndex)
 	}
 
@@ -79,9 +79,9 @@ func (k Keeper) withdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 		return "", "", nil, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
 	}
 
-	maxFee := k.GetFeeListCount(ctx)
+	feeCount := k.GetFeeListCount(ctx)
 
-	if msg.FeeIndex >= maxFee {
+	if msg.FeeIndex >= feeCount {
 		return "", "", nil, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", msg.FeeIndex)
 	}
 
