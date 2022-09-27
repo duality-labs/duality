@@ -21,11 +21,11 @@ func CmdWithdrawal() *cobra.Command {
 			argTokenA := args[0]
 			argTokenB := args[1]
 			argSharesToRemove := args[2]
-			argPriceIndex := args[3]
+			argTickIndex := args[3]
 			argFee := args[4]
 			argReceiver := args[5]
 
-			tmpArgPriceIndex, err := strconv.Atoi(argPriceIndex)
+			tmpArgTickIndex, err := strconv.Atoi(argTickIndex)
 
 			if err != nil {
 				return err
@@ -46,7 +46,7 @@ func CmdWithdrawal() *cobra.Command {
 				argTokenA,
 				argTokenB,
 				argSharesToRemove,
-				int64(tmpArgPriceIndex),
+				int64(tmpArgTickIndex),
 				uint64(tmpArgFeeIndex),
 				argReceiver,
 			)

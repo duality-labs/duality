@@ -15,7 +15,7 @@ func NewMsgWithdrawal(creator string, tokenA string, tokenB string, sharesToRemo
 		TokenA:         tokenA,
 		TokenB:         tokenB,
 		SharesToRemove: sharesToRemove,
-		PriceIndex:     priceIndex,
+		TickIndex:      priceIndex,
 		FeeIndex:       feeIndex,
 		Receiver:       receiver,
 	}

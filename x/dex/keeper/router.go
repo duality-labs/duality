@@ -17,7 +17,7 @@ type Route struct {
 }
 
 // TODO: Update intermediary pairs to be a KV store only upgradeable by governance
-
+// Intermediary paths need to be stored in both directions
 // Route and intermediary routes needed to be added to each other
 func getIntermediaryPaths() []Route {
 	// Hardcoded for now!!!
@@ -190,6 +190,9 @@ func (k Keeper) SwapDynamicRouter(goCtx context.Context, msg *types.MsgSwap, cal
 		for bestRoute.price.GT(secondBestPrice) {
 			// Either take 5% chunk or amountLeft if smaller than 5% of amountIn
 			amountToSwap := sdk.MinDec(amountIn.QuoInt64(20), amountLeft)
+
+			// Subtract amountToSwap from amountLeft
+			amountLeft = amountLeft.Sub(amountToSwap)
 
 			// Swap the 5% chunk and see what amountOutFromSwap is
 			amountOutFromSwap, err := k.swapAcrossRoute(goCtx, msg, callerAddress, bestRoute, amountToSwap)

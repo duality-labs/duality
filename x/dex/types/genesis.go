@@ -72,7 +72,7 @@ func (gs GenesisState) Validate() error {
 	sharesIndexMap := make(map[string]struct{})
 
 	for _, elem := range gs.SharesList {
-		index := string(SharesKey(elem.Address, elem.PairId, elem.PriceIndex, elem.FeeIndex))
+		index := string(SharesKey(elem.Address, elem.PairId, elem.TickIndex, elem.FeeIndex))
 		if _, ok := sharesIndexMap[index]; ok {
 			return fmt.Errorf("duplicated index for shares")
 		}

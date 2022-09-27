@@ -45,7 +45,7 @@ func CmdListShares() *cobra.Command {
 
 func CmdShowShares() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-shares [address] [pair-id] [price-index] [fee]",
+		Use:   "show-shares [address] [pair-id] [tick-index] [fee]",
 		Short: "shows a Shares",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -55,10 +55,10 @@ func CmdShowShares() *cobra.Command {
 
 			argAddress := args[0]
 			argPairId := args[1]
-			argPriceIndex := args[2]
+			argTickIndex := args[2]
 			argFeeIndex := args[3]
 
-			tmpArgPriceIndex, err := strconv.Atoi(argPriceIndex)
+			tmpArgTickIndex, err := strconv.Atoi(argTickIndex)
 
 			if err != nil {
 				return err
@@ -71,10 +71,10 @@ func CmdShowShares() *cobra.Command {
 			}
 
 			params := &types.QueryGetSharesRequest{
-				Address:    argAddress,
-				PairId:     argPairId,
-				PriceIndex: int64(tmpArgPriceIndex),
-				Fee:        uint64(tmpArgFeeIndex),
+				Address:   argAddress,
+				PairId:    argPairId,
+				TickIndex: int64(tmpArgTickIndex),
+				Fee:       uint64(tmpArgFeeIndex),
 			}
 
 			res, err := queryClient.Shares(context.Background(), params)

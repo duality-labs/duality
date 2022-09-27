@@ -17,13 +17,13 @@ func SimulateMsgWithdrawal(
 ) simtypes.Operation {
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-		simAccount, _ := simtypes.RandomAcc(r, accs)
-		msg := &types.MsgWithdrawal{
-			Creator: simAccount.Address.String(),
-		}
+		// simAccount, _ := simtypes.RandomAcc(r, accs)
+		// msg := &types.MsgWithdrawal{
+		// 	Creator: simAccount.Address.String(),
+		// }
 
 		// TODO: Handling the Withdrawal simulation
 
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "Withdrawal simulation not implemented"), nil, nil
+		return simtypes.NoOpMsg(types.ModuleName, types.TypeMsgWithdrawal, "Withdrawal simulation not implemented"), nil, nil
 	}
 }

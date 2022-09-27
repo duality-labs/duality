@@ -25,6 +25,13 @@ func (k Keeper) depositVerification(goCtx context.Context, msg types.MsgDeposit)
 		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
+	_, err = sdk.AccAddressFromBech32(msg.Receiver)
+	// Error Checking for receiver address
+	// Note we do not actually need to save the sdk.AccAddress here but we do want the address to be checked to determine if it valid
+	if err != nil {
+		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+	}
+
 	maxFee := k.GetFeeListCount(ctx)
 
 	if msg.FeeIndex >= maxFee {
@@ -85,6 +92,13 @@ func (k Keeper) WithdrawalVerification(goCtx context.Context, msg types.MsgWithd
 		return "", "", nil, sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
+	_, err = sdk.AccAddressFromBech32(msg.Receiver)
+	// Error Checking for receiver address
+	// Note we do not actually need to save the sdk.AccAddress here but we do want the address to be checked to determine if it valid
+	if err != nil {
+		return "", "", nil, sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+	}
+
 	sharesToRemove, err := sdk.NewDecFromStr(msg.SharesToRemove)
 
 	// Error checking for valid sdk.Dec
@@ -93,7 +107,7 @@ func (k Keeper) WithdrawalVerification(goCtx context.Context, msg types.MsgWithd
 	}
 
 	pairId := k.CreatePairId(token0, token1)
-	shares, sharesFound := k.GetShares(ctx, msg.Creator, pairId, msg.PriceIndex, msg.FeeIndex)
+	shares, sharesFound := k.GetShares(ctx, msg.Creator, pairId, msg.TickIndex, msg.FeeIndex)
 
 	if !sharesFound {
 		return "", "", nil, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
@@ -121,6 +135,13 @@ func (k Keeper) swapVerification(goCtx context.Context, msg types.MsgSwap) (stri
 	// Error checking for the calling address
 	if err != nil {
 		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+
+	_, err = sdk.AccAddressFromBech32(msg.Receiver)
+	// Error Checking for receiver address
+	// Note we do not actually need to save the sdk.AccAddress here but we do want the address to be checked to determine if it valid
+	if err != nil {
+		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
 	amountIn, err := sdk.NewDecFromStr(msg.AmountIn)

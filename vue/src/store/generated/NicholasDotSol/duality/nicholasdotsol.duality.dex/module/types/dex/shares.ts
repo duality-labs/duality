@@ -7,7 +7,7 @@ export const protobufPackage = "nicholasdotsol.duality.dex";
 export interface Shares {
   address: string;
   pairId: string;
-  priceIndex: number;
+  tickIndex: number;
   feeIndex: number;
   sharesOwned: string;
 }
@@ -15,7 +15,7 @@ export interface Shares {
 const baseShares: object = {
   address: "",
   pairId: "",
-  priceIndex: 0,
+  tickIndex: 0,
   feeIndex: 0,
   sharesOwned: "",
 };
@@ -28,8 +28,8 @@ export const Shares = {
     if (message.pairId !== "") {
       writer.uint32(18).string(message.pairId);
     }
-    if (message.priceIndex !== 0) {
-      writer.uint32(24).int64(message.priceIndex);
+    if (message.tickIndex !== 0) {
+      writer.uint32(24).int64(message.tickIndex);
     }
     if (message.feeIndex !== 0) {
       writer.uint32(32).uint64(message.feeIndex);
@@ -54,7 +54,7 @@ export const Shares = {
           message.pairId = reader.string();
           break;
         case 3:
-          message.priceIndex = longToNumber(reader.int64() as Long);
+          message.tickIndex = longToNumber(reader.int64() as Long);
           break;
         case 4:
           message.feeIndex = longToNumber(reader.uint64() as Long);
@@ -82,10 +82,10 @@ export const Shares = {
     } else {
       message.pairId = "";
     }
-    if (object.priceIndex !== undefined && object.priceIndex !== null) {
-      message.priceIndex = Number(object.priceIndex);
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = Number(object.tickIndex);
     } else {
-      message.priceIndex = 0;
+      message.tickIndex = 0;
     }
     if (object.feeIndex !== undefined && object.feeIndex !== null) {
       message.feeIndex = Number(object.feeIndex);
@@ -104,7 +104,7 @@ export const Shares = {
     const obj: any = {};
     message.address !== undefined && (obj.address = message.address);
     message.pairId !== undefined && (obj.pairId = message.pairId);
-    message.priceIndex !== undefined && (obj.priceIndex = message.priceIndex);
+    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
     message.feeIndex !== undefined && (obj.feeIndex = message.feeIndex);
     message.sharesOwned !== undefined &&
       (obj.sharesOwned = message.sharesOwned);
@@ -123,10 +123,10 @@ export const Shares = {
     } else {
       message.pairId = "";
     }
-    if (object.priceIndex !== undefined && object.priceIndex !== null) {
-      message.priceIndex = object.priceIndex;
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = object.tickIndex;
     } else {
-      message.priceIndex = 0;
+      message.tickIndex = 0;
     }
     if (object.feeIndex !== undefined && object.feeIndex !== null) {
       message.feeIndex = object.feeIndex;

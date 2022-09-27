@@ -78,7 +78,7 @@ func PairMapKey(pairId string) []byte {
 }
 
 // SharesKey returns the store key to retrieve a Shares from the index fields
-func SharesKey(address string, pairId string, priceIndex int64, feeIndex uint64) []byte {
+func SharesKey(address string, pairId string, tickIndex int64, feeIndex uint64) []byte {
 	var key []byte
 
 	addressBytes := []byte(address)
@@ -89,8 +89,9 @@ func SharesKey(address string, pairId string, priceIndex int64, feeIndex uint64)
 	key = append(key, pairIdBytes...)
 	key = append(key, []byte("/")...)
 
-	priceIndexBytes := []byte(string(priceIndex))
-	key = append(key, priceIndexBytes...)
+	newTickIndex := int(tickIndex)
+	tickIndexBytes := []byte(strconv.FormatInt(tickIndex))
+	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
 	feeBytes := []byte(string(feeIndex))
@@ -106,7 +107,7 @@ const (
 	DepositEventCreator      = "Creator"
 	DepositEventToken0       = "Token0"
 	DepositEventToken1       = "Token1"
-	DepositEventPrice        = "PriceIndex"
+	DepositEventPrice        = "TickIndex"
 	DepositEventFeeIndex     = "FeeIndex"
 	DepositEventReceiver     = "Receiver"
 	DepositEventOldReserves0 = "OldReserves0"
@@ -122,7 +123,7 @@ const (
 	WithdrawEventCreator       = "Creator"
 	WithdrawEventToken0        = "Token0"
 	WithdrawEventToken1        = "Token1"
-	WithdrawEventPrice         = "PriceIndex"
+	WithdrawEventPrice         = "TickIndex"
 	WithdrawEventFee           = "FeeIndex"
 	WithdrawEventReceiver      = "Receiver"
 	WithdrawEventOldReserve0   = "OldReserve0"
@@ -135,6 +136,7 @@ const (
 const (
 	SwapEventKey      = "NewWithdraw"
 	SwapEventCreator  = "Creator"
+	SwapEventReceiver = "Receiver"
 	SwapEventToken0   = "Token0"
 	SwapEventToken1   = "Token1"
 	SwapEventTokenIn  = "TokenIn"

@@ -4,26 +4,28 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func createDepositEvent(creator string, token0 string, token1 string, priceIndex string, feeIndex string, otherAttrs ...sdk.Attribute) sdk.Event {
+func createDepositEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, otherAttrs ...sdk.Attribute) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, DepositEventKey),
 		sdk.NewAttribute(DepositEventCreator, creator),
+		sdk.NewAttribute(DepositEventReceiver, receiver),
 		sdk.NewAttribute(DepositEventToken0, token0),
 		sdk.NewAttribute(DepositEventToken1, token1),
-		sdk.NewAttribute(DepositEventPrice, priceIndex),
+		sdk.NewAttribute(DepositEventPrice, tickIndex),
 		sdk.NewAttribute(DepositEventFeeIndex, feeIndex),
 	}
 	attrs = append(attrs, otherAttrs...)
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateDepositEvent(creator string, token0 string, token1 string, priceIndex string, feeIndex string, tokenDirection string, oldReserve0 string, oldReserve1 string, newReserve0 string, newReserve1 string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreateDepositEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, tokenDirection string, oldReserve0 string, oldReserve1 string, newReserve0 string, newReserve1 string, otherAttrs ...sdk.Attribute) sdk.Event {
 	return createDepositEvent(
 		creator,
+		receiver,
 		token0,
 		token1,
-		priceIndex,
+		tickIndex,
 		feeIndex,
 
 		sdk.NewAttribute(DepositEventOldReserves0, oldReserve0),
@@ -33,26 +35,28 @@ func CreateDepositEvent(creator string, token0 string, token1 string, priceIndex
 	)
 }
 
-func createWithdrawEvent(creator string, token0 string, token1 string, priceIndex string, feeIndex string, otherAttrs ...sdk.Attribute) sdk.Event {
+func createWithdrawEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, otherAttrs ...sdk.Attribute) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, WithdrawEventKey),
 		sdk.NewAttribute(WithdrawEventCreator, creator),
+		sdk.NewAttribute(WithdrawEventReceiver, receiver),
 		sdk.NewAttribute(WithdrawEventToken0, token0),
 		sdk.NewAttribute(WithdrawEventToken1, token1),
-		sdk.NewAttribute(WithdrawEventPrice, priceIndex),
+		sdk.NewAttribute(WithdrawEventPrice, tickIndex),
 		sdk.NewAttribute(WithdrawEventFee, feeIndex),
 	}
 	attrs = append(attrs, otherAttrs...)
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateWithdrawEvent(creator string, token0 string, token1 string, priceIndex string, feeIndex string, oldReserve0 string, oldReserve1 string, newReserve0 string, newReserve1 string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreateWithdrawEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, oldReserve0 string, oldReserve1 string, newReserve0 string, newReserve1 string, otherAttrs ...sdk.Attribute) sdk.Event {
 	return createWithdrawEvent(
 		creator,
+		receiver,
 		token0,
 		token1,
-		priceIndex,
+		tickIndex,
 		feeIndex,
 		sdk.NewAttribute(WithdrawEventOldReserve0, oldReserve0),
 		sdk.NewAttribute(WithdrawEventOldReserve1, oldReserve1),
@@ -61,11 +65,12 @@ func CreateWithdrawEvent(creator string, token0 string, token1 string, priceInde
 	)
 }
 
-func createSwapEvent(creator string, token0 string, token1 string, tokenIn string, amountIn string, amountOut string, minOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+func createSwapEvent(creator string, receiver string, token0 string, token1 string, tokenIn string, amountIn string, amountOut string, minOut string, otherAttrs ...sdk.Attribute) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, SwapEventKey),
 		sdk.NewAttribute(WithdrawEventCreator, creator),
+		sdk.NewAttribute(SwapEventReceiver, receiver),
 		sdk.NewAttribute(SwapEventToken0, token0),
 		sdk.NewAttribute(SwapEventToken1, token1),
 		sdk.NewAttribute(SwapEventTokenIn, tokenIn),
@@ -77,9 +82,10 @@ func createSwapEvent(creator string, token0 string, token1 string, tokenIn strin
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateSwapEvent(creator string, token0 string, token1 string, tokenIn string, amountIn string, amountOut string, minOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreateSwapEvent(creator string, receiver string, token0 string, token1 string, tokenIn string, amountIn string, amountOut string, minOut string, otherAttrs ...sdk.Attribute) sdk.Event {
 	return createSwapEvent(
 		creator,
+		receiver,
 		token0,
 		token1,
 		tokenIn,

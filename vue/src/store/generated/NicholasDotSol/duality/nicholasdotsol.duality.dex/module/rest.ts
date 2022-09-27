@@ -218,7 +218,7 @@ export interface DexShares {
   pairId?: string;
 
   /** @format int64 */
-  priceIndex?: string;
+  tickIndex?: string;
 
   /** @format uint64 */
   feeIndex?: string;
@@ -743,11 +743,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @tags Query
    * @name QueryShares
    * @summary Queries a Shares by index.
-   * @request GET:/NicholasDotSol/duality/dex/shares/{address}/{pairId}/{priceIndex}/{fee}
+   * @request GET:/NicholasDotSol/duality/dex/shares/{address}/{pairId}/{tickIndex}/{fee}
    */
-  queryShares = (address: string, pairId: string, priceIndex: string, fee: string, params: RequestParams = {}) =>
+  queryShares = (address: string, pairId: string, tickIndex: string, fee: string, params: RequestParams = {}) =>
     this.request<DexQueryGetSharesResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/shares/${address}/${pairId}/${priceIndex}/${fee}`,
+      path: `/NicholasDotSol/duality/dex/shares/${address}/${pairId}/${tickIndex}/${fee}`,
       method: "GET",
       format: "json",
       ...params,

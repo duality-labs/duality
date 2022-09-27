@@ -9,15 +9,16 @@ const TypeMsgDeposit = "deposit"
 
 var _ sdk.Msg = &MsgDeposit{}
 
-func NewMsgDeposit(creator string, tokenA string, tokenB string, amountA string, amountB string, priceIndex int64, feeIndex uint64) *MsgDeposit {
+func NewMsgDeposit(creator string, tokenA string, tokenB string, amountA string, amountB string, tickIndex int64, feeIndex uint64, receiver string) *MsgDeposit {
 	return &MsgDeposit{
-		Creator:    creator,
-		TokenA:     tokenA,
-		TokenB:     tokenB,
-		AmountA:    amountA,
-		AmountB:    amountB,
-		PriceIndex: priceIndex,
-		FeeIndex:   feeIndex,
+		Creator:   creator,
+		TokenA:    tokenA,
+		TokenB:    tokenB,
+		AmountA:   amountA,
+		AmountB:   amountB,
+		TickIndex: tickIndex,
+		FeeIndex:  feeIndex,
+		Receiver:  receiver,
 	}
 }
 

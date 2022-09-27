@@ -65,7 +65,7 @@ service Query {
 
 // Queries a Shares by index.
 	rpc Shares(QueryGetSharesRequest) returns (QueryGetSharesResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/shares/{address}/{pairId}/{priceIndex}/{fee}";
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/shares/{address}/{pairId}/{tickIndex}/{fee}";
 	}
 
 	// Queries a list of Shares items.
@@ -191,7 +191,7 @@ message QueryAllTokenMapResponse {
 message QueryGetSharesRequest {
 	  string address = 1;
   string pairId = 2;
-  int64 priceIndex = 3;
+  int64 tickIndex = 3;
   uint64 fee = 4;
 
 }
