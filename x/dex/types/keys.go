@@ -90,11 +90,20 @@ func SharesKey(address string, pairId string, tickIndex int64, feeIndex uint64) 
 	key = append(key, []byte("/")...)
 
 	newTickIndex := int(tickIndex)
-	tickIndexBytes := []byte(strconv.FormatInt(tickIndex))
+	// Checks for integer conversion
+	if int64(newTickIndex) != tickIndex {
+		panic("tickIndex is too large")
+	}
+	tickIndexBytes := []byte(strconv.Itoa(newTickIndex))
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
-	feeBytes := []byte(string(feeIndex))
+	newFeeIndex := int(feeIndex)
+	// Checks for integer conversion
+	if uint64(newFeeIndex) != feeIndex {
+		panic("tickIndex is too large")
+	}
+	feeBytes := []byte(strconv.Itoa(newFeeIndex))
 	key = append(key, feeBytes...)
 	key = append(key, []byte("/")...)
 
