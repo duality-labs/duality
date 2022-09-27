@@ -83,7 +83,7 @@ func CmdWithdrawl() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-	cmd.Flags().StringArrayVarP(&sharesToRemove, "sharesToRemove", "s", []string{}, "")
+	cmd.Flags().StringArrayVarP(&sharesToRemove, "sharesToRemove", "r", []string{}, "")
 	cmd.Flags().StringArrayVarP(&TicksIndexes, "ticksIndexes", "t", []string{}, "")
 	cmd.Flags().StringArrayVarP(&FeesIndexes, "feeIndexes", "f", []string{}, "")
 
