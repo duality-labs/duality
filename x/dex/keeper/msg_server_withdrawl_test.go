@@ -93,14 +93,17 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 
 	pairId := app.DexKeeper.CreatePairId("TokenA", "TokenB")
 	fmt.Println(app.DexKeeper.GetShares(ctx, alice.String(), pairId, 0, 0))
+
+	sharesToRemove, _ := sdk.NewDecFromStr("50")
+
 	withdrawlResponse, err := suite.msgServer.Withdrawl(goCtx, &types.MsgWithdrawl{
 		Creator:        alice.String(),
+		Receiver:       alice.String(),
 		TokenA:         "TokenA",
 		TokenB:         "TokenB",
-		SharesToRemove: "50",
-		TickIndex:      0,
-		FeeIndex:       0,
-		Receiver:       alice.String(),
+		SharesToRemove: []sdk.Dec{sharesToRemove},
+		TickIndexes:    []int64{0},
+		FeeIndexes:     []uint64{0},
 	})
 
 	suite.Require().Nil(err)
@@ -198,13 +201,15 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 	_ = createResponse3
 	_ = createResponse4
 
+	sharesToRemove, _ = sdk.NewDecFromStr("50")
+
 	withdrawlResponse2, err := suite.msgServer.Withdrawl(goCtx, &types.MsgWithdrawl{
 		Creator:        alice.String(),
 		TokenA:         "TokenA",
 		TokenB:         "TokenB",
-		SharesToRemove: "50",
-		TickIndex:      0,
-		FeeIndex:       1,
+		SharesToRemove: []sdk.Dec{sharesToRemove},
+		TickIndexes:    []int64{0},
+		FeeIndexes:     []uint64{1},
 		Receiver:       alice.String(),
 	})
 
