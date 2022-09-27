@@ -63,7 +63,7 @@ func (k Keeper) DepositPairInit(goCtx context.Context, token0 string, token1 str
 
 }
 
-func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.PairMap, tickIndex int64, amount0 sdk.Dec, amount1 sdk.Dec, fee int64, feeIndex uint64) (sdk.Dec, sdk.Dec, sdk.Dec, sdk.Dec, sdk.Dec, error) {
+func (k Keeper) NewDepositHelper(goCtx context.Context, pairId string, pair types.PairMap, tickIndex int64, amount0 sdk.Dec, amount1 sdk.Dec, fee int64, feeIndex uint64) (sdk.Dec, sdk.Dec, sdk.Dec, sdk.Dec, sdk.Dec, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -121,7 +121,7 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 		// intialize uppertick
 		if !upperTickFound {
 
-			// Creates an tick object of the speciied size and then iterates over each sub struct filling it with 0 values.
+			// Creates an tick object of the specied size and then iterates over each sub struct filling it with 0 values.
 
 			upperTick = types.TickMap{
 				TickIndex: tickIndex + fee,
@@ -551,7 +551,6 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	feeSize := k.GetFeeListCount(ctx)
 	pair, pairFound := k.GetPairMap(ctx, pairId)
 
-	fmt.Println("Token0: ", token0)
 	if !pairFound {
 		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
@@ -584,6 +583,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			//Current0Datam := Current0Data.TickData.Reserve1[i]
 
 			price, err := k.Calc_price(pair.TokenPair.CurrentTick1To0)
+			price = sdk.OneDec().Quo(price)
 
 			if err != nil {
 				return err
