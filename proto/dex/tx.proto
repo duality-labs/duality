@@ -4,7 +4,7 @@ package nicholasdotsol.duality.dex;
 // this line is used by starport scaffolding # proto/tx/import
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
-
+import "gogoproto/gogo.proto";
 // Msg defines the Msg service.
 service Msg {
       rpc Deposit(MsgDeposit) returns (MsgDepositResponse);
@@ -15,26 +15,33 @@ service Msg {
 
 message MsgDeposit {
   string creator = 1;
-  string tokenA = 2;
-  string tokenB = 3;
-  string amountA = 4;
-  string amountB = 5;
-  int64 tickIndex = 6;
-  uint64 feeIndex = 7;
-  string receiver = 8;
+  string receiver = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  string amountA = 5;
+  string amountB = 6;
+  int64 tickIndex = 7;
+  uint64 feeIndex = 8;
+  
 }
 
 message MsgDepositResponse {
 }
 
 message MsgWithdrawl {
-  string creator = 1;
-  string tokenA = 2;
-  string tokenB = 3;
-  string sharesToRemove = 4;
-  int64 tickIndex = 5;
-  uint64 feeIndex = 6;
-  string receiver = 7;
+  string receiver = 1;
+  string creator = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  repeated string sharesToRemove = 5  [
+      (gogoproto.moretags)   = "yaml:\"sharesToRemove\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "sharesToRemove"
+  ]; 
+  repeated int64 tickIndexes = 6;
+  repeated uint64 feeIndexes = 7;
+  
 }
 
 message MsgWithdrawlResponse {
@@ -42,12 +49,13 @@ message MsgWithdrawlResponse {
 
 message MsgSwap {
   string creator = 1;
-  string tokenA = 2;
-  string tokenB = 3;
-  string amountIn = 4;
-  string tokenIn = 5;
-  string minOut = 6;
-  string receiver = 7;
+  string receiver = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  string amountIn = 5;
+  string tokenIn = 6;
+  string minOut = 7;
+  
 }
 
 message MsgSwapResponse {

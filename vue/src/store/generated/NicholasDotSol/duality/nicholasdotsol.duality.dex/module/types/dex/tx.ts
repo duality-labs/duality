@@ -21,9 +21,9 @@ export interface MsgWithdrawl {
   creator: string;
   tokenA: string;
   tokenB: string;
-  sharesToRemove: string;
-  tickIndex: number;
-  feeIndex: number;
+  sharesToRemove: string[];
+  tickIndex: number[];
+  feeIndex: number[];
   receiver: string;
 }
 
@@ -283,15 +283,19 @@ export const MsgWithdrawl = {
     if (message.tokenB !== "") {
       writer.uint32(26).string(message.tokenB);
     }
-    if (message.sharesToRemove !== "") {
-      writer.uint32(34).string(message.sharesToRemove);
+    for (const v of message.sharesToRemove) {
+      writer.uint32(34).string(v!);
     }
-    if (message.tickIndex !== 0) {
-      writer.uint32(40).int64(message.tickIndex);
+    writer.uint32(42).fork();
+    for (const v of message.tickIndex) {
+      writer.int64(v);
     }
-    if (message.feeIndex !== 0) {
-      writer.uint32(48).uint64(message.feeIndex);
+    writer.ldelim();
+    writer.uint32(50).fork();
+    for (const v of message.feeIndex) {
+      writer.uint64(v);
     }
+    writer.ldelim();
     if (message.receiver !== "") {
       writer.uint32(58).string(message.receiver);
     }
@@ -302,6 +306,9 @@ export const MsgWithdrawl = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseMsgWithdrawl } as MsgWithdrawl;
+    message.sharesToRemove = [];
+    message.tickIndex = [];
+    message.feeIndex = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -315,13 +322,27 @@ export const MsgWithdrawl = {
           message.tokenB = reader.string();
           break;
         case 4:
-          message.sharesToRemove = reader.string();
+          message.sharesToRemove.push(reader.string());
           break;
         case 5:
-          message.tickIndex = longToNumber(reader.int64() as Long);
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.tickIndex.push(longToNumber(reader.int64() as Long));
+            }
+          } else {
+            message.tickIndex.push(longToNumber(reader.int64() as Long));
+          }
           break;
         case 6:
-          message.feeIndex = longToNumber(reader.uint64() as Long);
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.feeIndex.push(longToNumber(reader.uint64() as Long));
+            }
+          } else {
+            message.feeIndex.push(longToNumber(reader.uint64() as Long));
+          }
           break;
         case 7:
           message.receiver = reader.string();
@@ -336,6 +357,9 @@ export const MsgWithdrawl = {
 
   fromJSON(object: any): MsgWithdrawl {
     const message = { ...baseMsgWithdrawl } as MsgWithdrawl;
+    message.sharesToRemove = [];
+    message.tickIndex = [];
+    message.feeIndex = [];
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = String(object.creator);
     } else {
@@ -352,19 +376,19 @@ export const MsgWithdrawl = {
       message.tokenB = "";
     }
     if (object.sharesToRemove !== undefined && object.sharesToRemove !== null) {
-      message.sharesToRemove = String(object.sharesToRemove);
-    } else {
-      message.sharesToRemove = "";
+      for (const e of object.sharesToRemove) {
+        message.sharesToRemove.push(String(e));
+      }
     }
     if (object.tickIndex !== undefined && object.tickIndex !== null) {
-      message.tickIndex = Number(object.tickIndex);
-    } else {
-      message.tickIndex = 0;
+      for (const e of object.tickIndex) {
+        message.tickIndex.push(Number(e));
+      }
     }
     if (object.feeIndex !== undefined && object.feeIndex !== null) {
-      message.feeIndex = Number(object.feeIndex);
-    } else {
-      message.feeIndex = 0;
+      for (const e of object.feeIndex) {
+        message.feeIndex.push(Number(e));
+      }
     }
     if (object.receiver !== undefined && object.receiver !== null) {
       message.receiver = String(object.receiver);
@@ -379,16 +403,30 @@ export const MsgWithdrawl = {
     message.creator !== undefined && (obj.creator = message.creator);
     message.tokenA !== undefined && (obj.tokenA = message.tokenA);
     message.tokenB !== undefined && (obj.tokenB = message.tokenB);
-    message.sharesToRemove !== undefined &&
-      (obj.sharesToRemove = message.sharesToRemove);
-    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
-    message.feeIndex !== undefined && (obj.feeIndex = message.feeIndex);
+    if (message.sharesToRemove) {
+      obj.sharesToRemove = message.sharesToRemove.map((e) => e);
+    } else {
+      obj.sharesToRemove = [];
+    }
+    if (message.tickIndex) {
+      obj.tickIndex = message.tickIndex.map((e) => e);
+    } else {
+      obj.tickIndex = [];
+    }
+    if (message.feeIndex) {
+      obj.feeIndex = message.feeIndex.map((e) => e);
+    } else {
+      obj.feeIndex = [];
+    }
     message.receiver !== undefined && (obj.receiver = message.receiver);
     return obj;
   },
 
   fromPartial(object: DeepPartial<MsgWithdrawl>): MsgWithdrawl {
     const message = { ...baseMsgWithdrawl } as MsgWithdrawl;
+    message.sharesToRemove = [];
+    message.tickIndex = [];
+    message.feeIndex = [];
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = object.creator;
     } else {
@@ -405,19 +443,19 @@ export const MsgWithdrawl = {
       message.tokenB = "";
     }
     if (object.sharesToRemove !== undefined && object.sharesToRemove !== null) {
-      message.sharesToRemove = object.sharesToRemove;
-    } else {
-      message.sharesToRemove = "";
+      for (const e of object.sharesToRemove) {
+        message.sharesToRemove.push(e);
+      }
     }
     if (object.tickIndex !== undefined && object.tickIndex !== null) {
-      message.tickIndex = object.tickIndex;
-    } else {
-      message.tickIndex = 0;
+      for (const e of object.tickIndex) {
+        message.tickIndex.push(e);
+      }
     }
     if (object.feeIndex !== undefined && object.feeIndex !== null) {
-      message.feeIndex = object.feeIndex;
-    } else {
-      message.feeIndex = 0;
+      for (const e of object.feeIndex) {
+        message.feeIndex.push(e);
+      }
     }
     if (object.receiver !== undefined && object.receiver !== null) {
       message.receiver = object.receiver;
