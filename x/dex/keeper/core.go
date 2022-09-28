@@ -450,7 +450,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 
 ////// Swap Functions
 
-func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, minOut sdk.Dec) error {
+func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, minOut sdk.Dec) (sdk.Dec, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -460,7 +460,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	pair, pairFound := k.GetPairMap(ctx, pairId)
 
 	if !pairFound {
-		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
+		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 
 	count := 0
@@ -493,11 +493,11 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			price, err := k.Calc_price(pair.TokenPair.CurrentTick0To1)
 
 			if price.Mul(amount_left).Add(amount_out).LT(minOut) {
-				return sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
+				return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 			}
 
 			if err != nil {
-				return err
+				return sdk.ZeroDec(), err
 			}
 
 			if price.Mul(Current1Data.TickData.Reserve1[i]).LT(amount_left) {
@@ -523,36 +523,19 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	}
 
 	k.SetPairMap(ctx, pair)
-	// Todo add slippage tolerance
 
 	if amount_out.LT(minOut) {
-		return sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
-	}
-
-	if amountIn.GT(sdk.ZeroDec()) {
-		coinIn := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amountIn.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
-			return err
-		}
-	} else {
-		return sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
-	}
-
-	if amount_out.GT(sdk.ZeroDec()) {
-		coinOut := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount_out.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(msg.Receiver), sdk.Coins{coinOut}); err != nil {
-			return err
-		}
+		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 	}
 
 	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
 		token0, token1, msg.TokenIn, amountIn.String(), amount_out.String(), msg.MinOut,
 	))
 
-	return nil
+	return amount_out, nil
 }
 
-func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, minOut sdk.Dec) error {
+func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, minOut sdk.Dec) (sdk.Dec, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -562,7 +545,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	pair, pairFound := k.GetPairMap(ctx, pairId)
 
 	if !pairFound {
-		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
+		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 
 	count := 0
@@ -596,11 +579,11 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			price = sdk.OneDec().Quo(price)
 
 			if err != nil {
-				return err
+				return sdk.ZeroDec(), err
 			}
 
 			if price.Mul(amount_left).Add(amount_out).LT(minOut) {
-				return sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
+				return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 			}
 
 			if price.Mul(Current0Data.TickData.Reserve0AndShares[i].Reserve0).LT(amount_left) {
@@ -627,28 +610,14 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	}
 
 	k.SetPairMap(ctx, pair)
-	// Todo add slippage tolerance
 
 	if amount_out.LT(minOut) {
-		return sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
+		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 	}
 
-	if amountIn.GT(sdk.ZeroDec()) {
-		coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountIn.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
-			return err
-		}
-	} else {
-		return sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
-	}
+	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
+		token0, token1, msg.TokenIn, amountIn.String(), amount_out.String(), msg.MinOut,
+	))
 
-	if amount_out.GT(sdk.ZeroDec()) {
-
-		coinOut := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(msg.Receiver), sdk.Coins{coinOut}); err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return amount_out, nil
 }

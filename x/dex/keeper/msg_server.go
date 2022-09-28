@@ -5,6 +5,7 @@ import (
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 type msgServer struct {
@@ -28,9 +29,6 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 		return nil, err
 	}
 
-	//TODO add cases for multiDeposit when tickIndex != 1
-
-	//TODO remove msg if not needed
 	err = k.DepositCore(goCtx, msg, token0, token1, createrAddr, amount0, amount1)
 
 	if err != nil {
@@ -66,15 +64,38 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		return nil, err
 	}
 
+	var amount_out sdk.Dec
+
 	if msg.TokenIn == token0 {
-		err = k.Swap0to1(goCtx, msg, token0, token1, createrAddr, amountIn, minOut)
+		amount_out, err = k.Swap0to1(goCtx, msg, token0, token1, createrAddr, amountIn, minOut)
+
 		if err != nil {
 			return nil, err
 		}
+
 	} else {
-		err = k.Swap1to0(goCtx, msg, token0, token1, createrAddr, amountIn, minOut)
+		amount_out, err = k.Swap1to0(goCtx, msg, token0, token1, createrAddr, amountIn, minOut)
+
 		if err != nil {
 			return nil, err
+		}
+
+	}
+
+	if amountIn.GT(sdk.ZeroDec()) {
+		coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountIn.BigInt()))
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
+			return &types.MsgSwapResponse{}, err
+		}
+	} else {
+		return &types.MsgSwapResponse{}, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
+	}
+
+	if amount_out.GT(sdk.ZeroDec()) {
+
+		coinOut := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(msg.Receiver), sdk.Coins{coinOut}); err != nil {
+			return &types.MsgSwapResponse{}, err
 		}
 	}
 
