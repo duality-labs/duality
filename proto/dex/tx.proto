@@ -7,7 +7,7 @@ option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 import "gogoproto/gogo.proto";
 // Msg defines the Msg service.
 service Msg {
-      rpc Deposit(MsgDeposit) returns (MsgDepositResponse);
+  rpc Deposit(MsgDeposit) returns (MsgDepositResponse);
   rpc Withdrawl(MsgWithdrawl) returns (MsgWithdrawlResponse);
   rpc Swap(MsgSwap) returns (MsgSwapResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
@@ -18,10 +18,20 @@ message MsgDeposit {
   string receiver = 2;
   string tokenA = 3;
   string tokenB = 4;
-  string amountA = 5;
-  string amountB = 6;
-  int64 tickIndex = 7;
-  uint64 feeIndex = 8;
+  repeated string amountsA = 5  [
+      (gogoproto.moretags)   = "yaml:\"amountA\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "amountA"
+  ]; 
+   repeated string amountsB = 6  [
+      (gogoproto.moretags)   = "yaml:\"amountB\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "amountB"
+  ]; 
+  repeated int64 tickIndexes = 7;
+  repeated uint64 feeIndexes = 8;
   
 }
 

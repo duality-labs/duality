@@ -31,7 +31,7 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 	//TODO add cases for multiDeposit when tickIndex != 1
 
 	//TODO remove msg if not needed
-	err = k.SingleDeposit(goCtx, msg, token0, token1, createrAddr, amount0, amount1)
+	err = k.DepositCore(goCtx, msg, token0, token1, createrAddr, amount0, amount1)
 
 	if err != nil {
 		return nil, err

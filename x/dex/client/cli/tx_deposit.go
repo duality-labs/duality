@@ -7,37 +7,73 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
 )
 
 var _ = strconv.Itoa(0)
 
 func CmdDeposit() *cobra.Command {
+	var argAmountsA []string
+	var argAmountsB []string
+	var argTicksIndexes []string
+	var argFeesIndexes []string
+
 	cmd := &cobra.Command{
-		Use:   "deposit [token-a] [token-b] [amount-0] [amount-1] [tick-index] [fee] [receiver]",
+		Use:   "deposit [receiver] [token-a] [token-b] [list of amount-0] [list of amount-1] [list of tick-index] [list of fee] ",
 		Short: "Broadcast message deposit",
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argTokenA := args[0]
-			argTokenB := args[1]
-			argAmount0 := args[2]
-			argAmount1 := args[3]
-			argTickIndex := args[4]
-			argFee := args[5]
+			argReceiver := args[0]
+			argTokenA := args[1]
+			argTokenB := args[2]
 
-			tmpArgTickIndex, err := strconv.Atoi(argTickIndex)
+			var AmountsADec []sdk.Dec
+			var AmountsBDec []sdk.Dec
+			var TicksIndexesInt []int64
+			var FeesIndexesUint []uint64
 
-			if err != nil {
-				return err
+			for _, s := range argAmountsA {
+				amountA, err := sdk.NewDecFromStr(s)
+
+				if err != nil {
+					return err
+				}
+
+				AmountsADec = append(AmountsADec, amountA)
 			}
 
-			tmpArgFeeIndex, err := strconv.Atoi(argFee)
+			for _, s := range argAmountsB {
+				amountB, err := sdk.NewDecFromStr(s)
 
-			if err != nil {
-				return err
+				if err != nil {
+					return err
+				}
+
+				AmountsADec = append(AmountsBDec, amountB)
 			}
 
-			argReceiver := args[7]
+			for _, s := range argTicksIndexes {
+				TickIndexInt, err := strconv.Atoi(s)
+
+				if err != nil {
+					return err
+				}
+
+				TicksIndexesInt = append(TicksIndexesInt, int64(TickIndexInt))
+
+			}
+
+			for _, s := range argFeesIndexes {
+				FeeIndexInt, err := strconv.Atoi(s)
+
+				if err != nil {
+					return err
+				}
+
+				FeesIndexesUint = append(FeesIndexesUint, uint64(FeeIndexInt))
+			}
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -45,13 +81,13 @@ func CmdDeposit() *cobra.Command {
 
 			msg := types.NewMsgDeposit(
 				clientCtx.GetFromAddress().String(),
+				argReceiver,
 				argTokenA,
 				argTokenB,
-				argAmount0,
-				argAmount1,
-				int64(tmpArgTickIndex),
-				uint64(tmpArgFeeIndex),
-				argReceiver,
+				AmountsADec,
+				AmountsBDec,
+				TicksIndexesInt,
+				FeesIndexesUint,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -61,6 +97,11 @@ func CmdDeposit() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
+
+	cmd.Flags().StringArrayVarP(&argAmountsA, "amountA", "0", []string{}, "")
+	cmd.Flags().StringArrayVarP(&argAmountsA, "amountB", "1", []string{}, "")
+	cmd.Flags().StringArrayVarP(&argTicksIndexes, "ticksIndexes", "t", []string{}, "")
+	cmd.Flags().StringArrayVarP(&argFeesIndexes, "feeIndexes", "f", []string{}, "")
 
 	return cmd
 }

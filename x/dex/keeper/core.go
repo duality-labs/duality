@@ -150,6 +150,7 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 			TotalShares: sharesMinted,
 		}
 
+		fmt.Println(NewReserve0andShares)
 		upperTick.TickData.Reserve0AndShares[feeIndex] = NewReserve0andShares
 
 		lowerTick.TickData.Reserve1[feeIndex] = trueAmount1
@@ -238,64 +239,78 @@ func (k Keeper) Min(a, b sdk.Dec) sdk.Dec {
 	return b
 }
 
-func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, token0 string, token1 string, callerAddr sdk.AccAddress, amount0 sdk.Dec, amount1 sdk.Dec) error {
+func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0 string, token1 string, callerAddr sdk.AccAddress, amounts0 []sdk.Dec, amounts1 []sdk.Dec) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Note feeIndex is the corresponding index to a fee Value not the feeValue itself
-	feeValue, _ := k.GetFeeList(ctx, uint64(msg.FeeIndex))
-	fee := feeValue.Fee
+	// Fee Initialized to initialize tick if pair does not exists
+
+	feelist := k.GetAllFeeList(ctx)
 
 	//Checks to see if given pair has been initialied, if not intializes, and returns pairId and pairMap
-	pairId, err := k.DepositPairInit(goCtx, token0, token1, msg.TickIndex, fee)
+	pairId, err := k.DepositPairInit(goCtx, token0, token1, msg.TickIndexes[0], feelist[msg.FeeIndexes[0]].Fee)
 
 	if err != nil {
 		return err
 	}
 
 	pair, _ := k.GetPairMap(ctx, pairId)
+	totalAmountReserve0 := sdk.ZeroDec()
+	totalAmountReserve1 := sdk.ZeroDec()
 
-	fmt.Println(amount0)
-	fmt.Println(pair)
-	fmt.Println(msg.TickIndex)
-	// Errors if depositing amount0 at a tick less than CurrentTick1to0
-	if amount0.GT(sdk.ZeroDec()) && ((msg.TickIndex + fee) < pair.TokenPair.CurrentTick0To1) {
-		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick less than the CurrentTick1to0")
-	}
-
-	// Errors if depositing amount1 at a tick less than CurrentTick0to1
-	if amount1.GT(sdk.ZeroDec()) && ((msg.TickIndex - fee) > pair.TokenPair.CurrentTick1To0) {
-		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick greater than the CurrentTick0to1")
-	}
-
-	// Calls k.DepositHelper which calculates the true amounts of token0, token1, and sets the corresponding pair and tick maps
-	trueAmount0, trueAmount1, sharesMinted, newReserve0, newReserve1, err := k.DepositHelper(goCtx, pairId, pair, msg.TickIndex, amount0, amount1, fee, msg.FeeIndex)
-
-	if err != nil {
-		return nil
-	}
-
-	// Calculate Shares
-	shares, sharesFound := k.GetShares(ctx, msg.Receiver, pairId, msg.TickIndex, msg.FeeIndex)
-
-	// Initializes a new tick if sharesFound does not exists
-	if !sharesFound {
-		shares = types.Shares{
-			Address:     msg.Receiver,
-			PairId:      pairId,
-			TickIndex:   msg.TickIndex,
-			FeeIndex:    msg.FeeIndex,
-			SharesOwned: sharesMinted,
+	for i, _ := range amounts0 {
+		// Errors if depositing amount0 at a tick less than CurrentTick1to0
+		if amounts0[i].GT(sdk.ZeroDec()) && ((msg.TickIndexes[i] + feelist[msg.FeeIndexes[i]].Fee) < pair.TokenPair.CurrentTick0To1) {
+			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick less than the CurrentTick1to0")
 		}
-	} else {
-		//Updates shares.SharesOwned
-		shares.SharesOwned = shares.SharesOwned.Add(sharesMinted)
+		// Errors if depositing amount1 at a tick less than CurrentTick0to1
+		if amounts1[i].GT(sdk.ZeroDec()) && ((msg.TickIndexes[i] - feelist[msg.FeeIndexes[i]].Fee) > pair.TokenPair.CurrentTick1To0) {
+			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick greater than the CurrentTick0to1")
+		}
+
+		// Calls k.DepositHelper which calculates the true amounts of token0, token1, and sets the corresponding pair and tick maps
+		trueAmount0, trueAmount1, sharesMinted, newReserve0, newReserve1, err := k.DepositHelper(goCtx, pairId, pair, msg.TickIndexes[i], amounts0[i], amounts1[i], feelist[msg.FeeIndexes[i]].Fee, msg.FeeIndexes[i])
+
+		if err != nil {
+			return nil
+		}
+
+		// Calculate Shares
+		shares, sharesFound := k.GetShares(ctx, msg.Receiver, pairId, msg.TickIndexes[i], msg.FeeIndexes[i])
+
+		// Initializes a new tick if sharesFound does not exists
+		if !sharesFound {
+			shares = types.Shares{
+				Address:     msg.Receiver,
+				PairId:      pairId,
+				TickIndex:   msg.TickIndexes[i],
+				FeeIndex:    msg.FeeIndexes[i],
+				SharesOwned: sharesMinted,
+			}
+		} else {
+			//Updates shares.SharesOwned
+			shares.SharesOwned = shares.SharesOwned.Add(sharesMinted)
+		}
+
+		// Update share logic to KVStore
+		k.SetShares(ctx, shares)
+
+		totalAmountReserve0 = totalAmountReserve0.Add(trueAmount0)
+		totalAmountReserve1 = totalAmountReserve1.Add(trueAmount1)
+
+		// Event is defined in types/Events.go
+		ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator, msg.Receiver,
+			token0, token1, fmt.Sprint(msg.TickIndexes[i]), fmt.Sprint(msg.FeeIndexes[i]),
+			newReserve0.Sub(trueAmount0).String(), newReserve1.Sub(trueAmount1).String(), newReserve0.String(), newReserve1.String(),
+			sharesMinted.String()),
+		)
 	}
 
 	// Send TrueAmount0 to Module
 	/// @Dev Due to a sdk.send constraint this only sends if trueAmount0 is greater than 0
-	if trueAmount0.GT(sdk.ZeroDec()) {
-		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(trueAmount0.BigInt()))
+	if totalAmountReserve0.GT(sdk.ZeroDec()) {
+		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(totalAmountReserve0.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
 			return err
 		}
@@ -303,22 +318,12 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 
 	// Send TrueAmount1 to Module
 	/// @Dev Due to a sdk.send constraint this only sends if trueAmount1 is greater than 0
-	if trueAmount1.GT(sdk.ZeroDec()) {
-		coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(trueAmount1.BigInt()))
+	if totalAmountReserve1.GT(sdk.ZeroDec()) {
+		coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(totalAmountReserve1.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
 			return err
 		}
 	}
-
-	// Update share logic to KVStore
-	k.SetShares(ctx, shares)
-
-	// Event is defined in types/Events.go
-	ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator, msg.Receiver,
-		token0, token1, fmt.Sprint(msg.TickIndex), fmt.Sprint(msg.FeeIndex),
-		newReserve0.Sub(trueAmount0).String(), newReserve1.Sub(trueAmount1).String(), newReserve0.String(), newReserve1.String(),
-		sharesMinted.String()),
-	)
 
 	_ = goCtx
 	return nil

@@ -9,10 +9,10 @@ export interface MsgDeposit {
   receiver: string;
   tokenA: string;
   tokenB: string;
-  amountA: string;
-  amountB: string;
-  tickIndex: number;
-  feeIndex: number;
+  amountsA: string[];
+  amountsB: string[];
+  tickIndexes: number[];
+  feeIndexes: number[];
 }
 
 export interface MsgDepositResponse {}
@@ -46,10 +46,10 @@ const baseMsgDeposit: object = {
   receiver: "",
   tokenA: "",
   tokenB: "",
-  amountA: "",
-  amountB: "",
-  tickIndex: 0,
-  feeIndex: 0,
+  amountsA: "",
+  amountsB: "",
+  tickIndexes: 0,
+  feeIndexes: 0,
 };
 
 export const MsgDeposit = {
@@ -66,18 +66,22 @@ export const MsgDeposit = {
     if (message.tokenB !== "") {
       writer.uint32(34).string(message.tokenB);
     }
-    if (message.amountA !== "") {
-      writer.uint32(42).string(message.amountA);
+    for (const v of message.amountsA) {
+      writer.uint32(42).string(v!);
     }
-    if (message.amountB !== "") {
-      writer.uint32(50).string(message.amountB);
+    for (const v of message.amountsB) {
+      writer.uint32(50).string(v!);
     }
-    if (message.tickIndex !== 0) {
-      writer.uint32(56).int64(message.tickIndex);
+    writer.uint32(58).fork();
+    for (const v of message.tickIndexes) {
+      writer.int64(v);
     }
-    if (message.feeIndex !== 0) {
-      writer.uint32(64).uint64(message.feeIndex);
+    writer.ldelim();
+    writer.uint32(66).fork();
+    for (const v of message.feeIndexes) {
+      writer.uint64(v);
     }
+    writer.ldelim();
     return writer;
   },
 
@@ -85,6 +89,10 @@ export const MsgDeposit = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseMsgDeposit } as MsgDeposit;
+    message.amountsA = [];
+    message.amountsB = [];
+    message.tickIndexes = [];
+    message.feeIndexes = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -101,16 +109,30 @@ export const MsgDeposit = {
           message.tokenB = reader.string();
           break;
         case 5:
-          message.amountA = reader.string();
+          message.amountsA.push(reader.string());
           break;
         case 6:
-          message.amountB = reader.string();
+          message.amountsB.push(reader.string());
           break;
         case 7:
-          message.tickIndex = longToNumber(reader.int64() as Long);
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.tickIndexes.push(longToNumber(reader.int64() as Long));
+            }
+          } else {
+            message.tickIndexes.push(longToNumber(reader.int64() as Long));
+          }
           break;
         case 8:
-          message.feeIndex = longToNumber(reader.uint64() as Long);
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.feeIndexes.push(longToNumber(reader.uint64() as Long));
+            }
+          } else {
+            message.feeIndexes.push(longToNumber(reader.uint64() as Long));
+          }
           break;
         default:
           reader.skipType(tag & 7);
@@ -122,6 +144,10 @@ export const MsgDeposit = {
 
   fromJSON(object: any): MsgDeposit {
     const message = { ...baseMsgDeposit } as MsgDeposit;
+    message.amountsA = [];
+    message.amountsB = [];
+    message.tickIndexes = [];
+    message.feeIndexes = [];
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = String(object.creator);
     } else {
@@ -142,25 +168,25 @@ export const MsgDeposit = {
     } else {
       message.tokenB = "";
     }
-    if (object.amountA !== undefined && object.amountA !== null) {
-      message.amountA = String(object.amountA);
-    } else {
-      message.amountA = "";
+    if (object.amountsA !== undefined && object.amountsA !== null) {
+      for (const e of object.amountsA) {
+        message.amountsA.push(String(e));
+      }
     }
-    if (object.amountB !== undefined && object.amountB !== null) {
-      message.amountB = String(object.amountB);
-    } else {
-      message.amountB = "";
+    if (object.amountsB !== undefined && object.amountsB !== null) {
+      for (const e of object.amountsB) {
+        message.amountsB.push(String(e));
+      }
     }
-    if (object.tickIndex !== undefined && object.tickIndex !== null) {
-      message.tickIndex = Number(object.tickIndex);
-    } else {
-      message.tickIndex = 0;
+    if (object.tickIndexes !== undefined && object.tickIndexes !== null) {
+      for (const e of object.tickIndexes) {
+        message.tickIndexes.push(Number(e));
+      }
     }
-    if (object.feeIndex !== undefined && object.feeIndex !== null) {
-      message.feeIndex = Number(object.feeIndex);
-    } else {
-      message.feeIndex = 0;
+    if (object.feeIndexes !== undefined && object.feeIndexes !== null) {
+      for (const e of object.feeIndexes) {
+        message.feeIndexes.push(Number(e));
+      }
     }
     return message;
   },
@@ -171,15 +197,35 @@ export const MsgDeposit = {
     message.receiver !== undefined && (obj.receiver = message.receiver);
     message.tokenA !== undefined && (obj.tokenA = message.tokenA);
     message.tokenB !== undefined && (obj.tokenB = message.tokenB);
-    message.amountA !== undefined && (obj.amountA = message.amountA);
-    message.amountB !== undefined && (obj.amountB = message.amountB);
-    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
-    message.feeIndex !== undefined && (obj.feeIndex = message.feeIndex);
+    if (message.amountsA) {
+      obj.amountsA = message.amountsA.map((e) => e);
+    } else {
+      obj.amountsA = [];
+    }
+    if (message.amountsB) {
+      obj.amountsB = message.amountsB.map((e) => e);
+    } else {
+      obj.amountsB = [];
+    }
+    if (message.tickIndexes) {
+      obj.tickIndexes = message.tickIndexes.map((e) => e);
+    } else {
+      obj.tickIndexes = [];
+    }
+    if (message.feeIndexes) {
+      obj.feeIndexes = message.feeIndexes.map((e) => e);
+    } else {
+      obj.feeIndexes = [];
+    }
     return obj;
   },
 
   fromPartial(object: DeepPartial<MsgDeposit>): MsgDeposit {
     const message = { ...baseMsgDeposit } as MsgDeposit;
+    message.amountsA = [];
+    message.amountsB = [];
+    message.tickIndexes = [];
+    message.feeIndexes = [];
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = object.creator;
     } else {
@@ -200,25 +246,25 @@ export const MsgDeposit = {
     } else {
       message.tokenB = "";
     }
-    if (object.amountA !== undefined && object.amountA !== null) {
-      message.amountA = object.amountA;
-    } else {
-      message.amountA = "";
+    if (object.amountsA !== undefined && object.amountsA !== null) {
+      for (const e of object.amountsA) {
+        message.amountsA.push(e);
+      }
     }
-    if (object.amountB !== undefined && object.amountB !== null) {
-      message.amountB = object.amountB;
-    } else {
-      message.amountB = "";
+    if (object.amountsB !== undefined && object.amountsB !== null) {
+      for (const e of object.amountsB) {
+        message.amountsB.push(e);
+      }
     }
-    if (object.tickIndex !== undefined && object.tickIndex !== null) {
-      message.tickIndex = object.tickIndex;
-    } else {
-      message.tickIndex = 0;
+    if (object.tickIndexes !== undefined && object.tickIndexes !== null) {
+      for (const e of object.tickIndexes) {
+        message.tickIndexes.push(e);
+      }
     }
-    if (object.feeIndex !== undefined && object.feeIndex !== null) {
-      message.feeIndex = object.feeIndex;
-    } else {
-      message.feeIndex = 0;
+    if (object.feeIndexes !== undefined && object.feeIndexes !== null) {
+      for (const e of object.feeIndexes) {
+        message.feeIndexes.push(e);
+      }
     }
     return message;
   },

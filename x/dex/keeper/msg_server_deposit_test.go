@@ -86,15 +86,16 @@ func (suite *IntegrationTestSuite) TestSingleDeposit() {
 	app.DexKeeper.AppendFeeList(ctx, types.FeeList{2, 3})
 	app.DexKeeper.AppendFeeList(ctx, types.FeeList{3, 4})
 
+	fiftyDec, _ := sdk.NewDecFromStr("50")
 	createResponse, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:   alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		AmountA:   "0",
-		AmountB:   "50",
-		TickIndex: 0,
-		FeeIndex:  0,
-		Receiver:  alice.String(),
+		Creator:     alice.String(),
+		TokenA:      "TokenA",
+		TokenB:      "TokenB",
+		AmountsA:    []sdk.Dec{sdk.ZeroDec()},
+		AmountsB:    []sdk.Dec{fiftyDec},
+		TickIndexes: []int64{0},
+		FeeIndexes:  []uint64{0},
+		Receiver:    alice.String(),
 	})
 
 	suite.Require().Nil(err)

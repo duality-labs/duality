@@ -8,65 +8,70 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k Keeper) depositVerification(goCtx context.Context, msg types.MsgDeposit) (string, string, sdk.AccAddress, sdk.Dec, sdk.Dec, error) {
+func (k Keeper) depositVerification(goCtx context.Context, msg types.MsgDeposit) (string, string, sdk.AccAddress, []sdk.Dec, []sdk.Dec, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
 
 	if err != nil {
-		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
 	}
 
 	// Converts input address (string) to sdk.AccAddress
 	callerAddr, err := sdk.AccAddressFromBech32(msg.Creator)
 	// Error checking for the calling address
 	if err != nil {
-		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return "", "", nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
 	_, err = sdk.AccAddressFromBech32(msg.Receiver)
 	// Error Checking for receiver address
 	// Note we do not actually need to save the sdk.AccAddress here but we do want the address to be checked to determine if it valid
 	if err != nil {
-		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+		return "", "", nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
 	feeCount := k.GetFeeListCount(ctx)
 
-	if msg.FeeIndex >= feeCount {
-		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", msg.FeeIndex)
+	for i, _ := range msg.FeeIndexes {
+		if msg.FeeIndexes[i] >= feeCount {
+			return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", msg.FeeIndexes[i])
+		}
 	}
 
-	amount0, err := sdk.NewDecFromStr(msg.AmountA)
-	amount1, err := sdk.NewDecFromStr(msg.AmountB)
-
-	// Error checking for valid sdk.Dec
-	if err != nil || (amount0.Equal(sdk.ZeroDec()) && amount1.Equal(sdk.ZeroDec())) {
-		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid amount: %s", err)
-	}
+	amounts0 := msg.AmountsA
+	amounts1 := msg.AmountsB
 
 	if token0 != msg.TokenA {
-		tmp := amount0
-		amount0 = amount1
-		amount1 = tmp
+		tmp := msg.AmountsA
+		amounts0 = msg.AmountsB
+		amounts1 = tmp
 	}
 
-	AccountsToken0Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, token0).Amount)
+	for i, _ := range amounts0 {
+		// Error checking for valid sdk.Dec
+		if err != nil || (amounts0[i].Equal(sdk.ZeroDec()) && amounts1[i].Equal(sdk.ZeroDec())) {
+			return "", "", nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid amount: %s", err)
+		}
 
-	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
-	if AccountsToken0Balance.LT(amount0) {
-		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
+		AccountsToken0Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, token0).Amount)
+
+		// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
+		if AccountsToken0Balance.LT(amounts0[i]) {
+			return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
+		}
+
+		AccountsToken1Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, token1).Amount)
+
+		// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
+		if AccountsToken1Balance.LT(amounts1[i]) {
+			return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
+		}
+
 	}
 
-	AccountsToken1Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, token1).Amount)
-
-	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
-	if AccountsToken1Balance.LT(amount1) {
-		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
-	}
-
-	return token0, token1, callerAddr, amount0, amount1, nil
+	return token0, token1, callerAddr, amounts0, amounts1, nil
 }
 
 func (k Keeper) withdrawlVerification(goCtx context.Context, msg types.MsgWithdrawl) (string, string, sdk.AccAddress, error) {
