@@ -232,6 +232,9 @@ func (k Keeper) swapAcrossRoute(goCtx context.Context, msg *types.MsgSwap, calle
 		// Gets each pair sequentially
 		token0, token1, _ := k.SortTokens(bestRoute.path[i], bestRoute.path[i+1])
 		if token0 == bestRoute.path[i] {
+			// TODO: Slippage check for the route
+			// minAmountOut
+
 			// Use sdk.ZeroDec() for minOut as we can set a tighter bound later
 			amountToSwap, err = k.Swap0to1(goCtx, msg, token0, token1, callerAddress, amountToSwap, sdk.ZeroDec())
 			if err != nil {
@@ -239,6 +242,9 @@ func (k Keeper) swapAcrossRoute(goCtx context.Context, msg *types.MsgSwap, calle
 			}
 
 		} else {
+			// TODO: Slippage check for the route
+			// minAmountOut
+
 			// Use sdk.ZeroDec() for minOut as we can set a tighter bound later
 			amountToSwap, err = k.Swap1to0(goCtx, msg, token0, token1, callerAddress, amountToSwap, sdk.ZeroDec())
 			if err != nil {

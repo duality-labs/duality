@@ -52,6 +52,10 @@ func (k msgServer) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (
 	}
 
 	err = k.SingleWithdrawal(goCtx, msg, token0, token1, createrAddr, sharesToRemove)
+
+	if err != nil {
+		return nil, err
+	}
 	_ = ctx
 
 	return &types.MsgWithdrawalResponse{}, nil
