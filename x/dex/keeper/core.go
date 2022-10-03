@@ -695,3 +695,10 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	// @Dev token transfers happen in keeper/msg.server: Swap
 	return amount_out, nil
 }
+
+///// Limit Order Functions
+
+func (k Keeper) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLimitOrder) error {
+
+	return nil
+}
