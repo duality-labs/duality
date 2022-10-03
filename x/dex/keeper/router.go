@@ -236,7 +236,7 @@ func (k Keeper) swapAcrossRoute(goCtx context.Context, msg *types.MsgRoute, call
 			// minAmountOut
 
 			// Use sdk.ZeroDec() for minOut as we can set a tighter bound later
-			amountToSwap, err = k.Swap0to1(goCtx, msg, token0, token1, callerAddress, amountToSwap, sdk.ZeroDec())
+			amountToSwap, err = k.Swap0to1(goCtx, token0, token1, callerAddress, amountToSwap, sdk.ZeroDec())
 			if err != nil {
 				return sdk.ZeroDec(), err
 			}
@@ -246,7 +246,7 @@ func (k Keeper) swapAcrossRoute(goCtx context.Context, msg *types.MsgRoute, call
 			// minAmountOut
 
 			// Use sdk.ZeroDec() for minOut as we can set a tighter bound later
-			amountToSwap, err = k.Swap1to0(goCtx, msg, token0, token1, callerAddress, amountToSwap, sdk.ZeroDec())
+			amountToSwap, err = k.Swap1to0(goCtx, token0, token1, callerAddress, amountToSwap, sdk.ZeroDec())
 			if err != nil {
 				return sdk.ZeroDec(), err
 			}
