@@ -65,3 +65,12 @@ func TestLimitOrderPoolUserSharesFilledRemove(t *testing.T) {
 		require.False(t, found)
 	}
 }
+
+func TestLimitOrderPoolUserSharesFilledGetAll(t *testing.T) {
+	keeper, ctx := keepertest.DexKeeper(t)
+	items := createNLimitOrderPoolUserSharesFilled(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	require.ElementsMatch(t,
+		nullify.Fill(items),
+		nullify.Fill(keeper.GetAllLimitOrderPoolUserSharesFilled(ctx)),
+	)
+}

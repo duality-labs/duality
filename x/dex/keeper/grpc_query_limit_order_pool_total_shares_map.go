@@ -47,6 +47,9 @@ func (k Keeper) LimitOrderPoolTotalSharesMap(c context.Context, req *types.Query
 
 	val, found := k.GetLimitOrderPoolTotalSharesMap(
 		ctx,
+		req.PairId,
+		req.TickIndex,
+		req.Token,
 		req.Count,
 	)
 	if !found {

@@ -4,9 +4,12 @@ package nicholasdotsol.duality.dex;
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 
 import "dex/tick_data_type.proto";
+import "dex/limit_order_pool.proto";
+
 message TickMap {
   int64 tickIndex = 1; 
   TickDataType tickData = 2; 
-  
+  LimitOrderPool LimitOrderPool0to1 =3;
+  LimitOrderPool LimitOrderPool1to0 =4;
 }
 

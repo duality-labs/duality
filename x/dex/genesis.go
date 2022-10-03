@@ -17,6 +17,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		for _, elem2 := range genState.TickMapList {
 			k.SetTickMap(ctx, elem.PairId, elem2)
 		}
+
 	}
 	// Set all the tokens
 	for _, elem := range genState.TokensList {
