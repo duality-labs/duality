@@ -5,6 +5,7 @@ import { EdgeRow } from "./module/types/dex/edge_row"
 import { FeeList } from "./module/types/dex/fee_list"
 import { LimitOrderPool } from "./module/types/dex/limit_order_pool"
 import { LimitOrderPoolUserShareMap } from "./module/types/dex/limit_order_pool_user_share_map"
+import { LimitOrderPoolUserSharesFilled } from "./module/types/dex/limit_order_pool_user_shares_filled"
 import { PairMap } from "./module/types/dex/pair_map"
 import { Params } from "./module/types/dex/params"
 import { Reserve0AndSharesType } from "./module/types/dex/reserve_0_and_shares_type"
@@ -16,7 +17,7 @@ import { TokenPairType } from "./module/types/dex/token_pair_type"
 import { Tokens } from "./module/types/dex/tokens"
 
 
-export { AdjanceyMatrix, EdgeRow, FeeList, LimitOrderPool, LimitOrderPoolUserShareMap, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
+export { AdjanceyMatrix, EdgeRow, FeeList, LimitOrderPool, LimitOrderPoolUserShareMap, LimitOrderPoolUserSharesFilled, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -73,6 +74,8 @@ const getDefaultState = () => {
 				AdjanceyMatrixAll: {},
 				LimitOrderPoolUserShareMap: {},
 				LimitOrderPoolUserShareMapAll: {},
+				LimitOrderPoolUserSharesFilled: {},
+				LimitOrderPoolUserSharesFilledAll: {},
 				
 				_Structure: {
 						AdjanceyMatrix: getStructure(AdjanceyMatrix.fromPartial({})),
@@ -80,6 +83,7 @@ const getDefaultState = () => {
 						FeeList: getStructure(FeeList.fromPartial({})),
 						LimitOrderPool: getStructure(LimitOrderPool.fromPartial({})),
 						LimitOrderPoolUserShareMap: getStructure(LimitOrderPoolUserShareMap.fromPartial({})),
+						LimitOrderPoolUserSharesFilled: getStructure(LimitOrderPoolUserSharesFilled.fromPartial({})),
 						PairMap: getStructure(PairMap.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						Reserve0AndSharesType: getStructure(Reserve0AndSharesType.fromPartial({})),
@@ -230,6 +234,18 @@ export default {
 						(<any> params).query=null
 					}
 			return state.LimitOrderPoolUserShareMapAll[JSON.stringify(params)] ?? {}
+		},
+				getLimitOrderPoolUserSharesFilled: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.LimitOrderPoolUserSharesFilled[JSON.stringify(params)] ?? {}
+		},
+				getLimitOrderPoolUserSharesFilledAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.LimitOrderPoolUserSharesFilledAll[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -723,18 +739,66 @@ export default {
 		},
 		
 		
-		async sendMsgDeposit({ rootGetters }, { value, fee = [], memo = '' }) {
+		
+		
+		 		
+		
+		
+		async QueryLimitOrderPoolUserSharesFilled({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryLimitOrderPoolUserSharesFilled( key.count,  key.address)).data
+				
+					
+				commit('QUERY', { query: 'LimitOrderPoolUserSharesFilled', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolUserSharesFilled', payload: { options: { all }, params: {...key},query }})
+				return getters['getLimitOrderPoolUserSharesFilled']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryLimitOrderPoolUserSharesFilled API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryLimitOrderPoolUserSharesFilledAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+			try {
+				const key = params ?? {};
+				const queryClient=await initQueryClient(rootGetters)
+				let value= (await queryClient.queryLimitOrderPoolUserSharesFilledAll(query)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await queryClient.queryLimitOrderPoolUserSharesFilledAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					value = mergeResults(value, next_values);
+				}
+				commit('QUERY', { query: 'LimitOrderPoolUserSharesFilledAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolUserSharesFilledAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getLimitOrderPoolUserSharesFilledAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryLimitOrderPoolUserSharesFilledAll API Node Unavailable. Could not perform query: ' + e.message)
+				
+			}
+		},
+		
+		
+		async sendMsgSwap({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgDeposit(value)
+				const msg = await txClient.msgSwap(value)
 				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
 	gas: "200000" }, memo})
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgSwap:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgDeposit:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgSwap:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -753,32 +817,32 @@ export default {
 				}
 			}
 		},
-		async sendMsgSwap({ rootGetters }, { value, fee = [], memo = '' }) {
+		async sendMsgDeposit({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgSwap(value)
+				const msg = await txClient.msgDeposit(value)
 				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
 	gas: "200000" }, memo})
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSwap:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgSwap:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgDeposit:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
 		
-		async MsgDeposit({ rootGetters }, { value }) {
+		async MsgSwap({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgDeposit(value)
+				const msg = await txClient.msgSwap(value)
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgSwap:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgDeposit:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgSwap:Create Could not create message: ' + e.message)
 				}
 			}
 		},
@@ -795,16 +859,16 @@ export default {
 				}
 			}
 		},
-		async MsgSwap({ rootGetters }, { value }) {
+		async MsgDeposit({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgSwap(value)
+				const msg = await txClient.msgDeposit(value)
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSwap:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgSwap:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgDeposit:Create Could not create message: ' + e.message)
 				}
 			}
 		},

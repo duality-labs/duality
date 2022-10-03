@@ -11,6 +11,7 @@ import { FeeList } from "../dex/fee_list";
 import { EdgeRow } from "../dex/edge_row";
 import { AdjanceyMatrix } from "../dex/adjancey_matrix";
 import { LimitOrderPoolUserShareMap } from "../dex/limit_order_pool_user_share_map";
+import { LimitOrderPoolUserSharesFilled } from "../dex/limit_order_pool_user_shares_filled";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -29,8 +30,9 @@ export interface GenesisState {
   edgeRowCount: number;
   adjanceyMatrixList: AdjanceyMatrix[];
   adjanceyMatrixCount: number;
-  /** this line is used by starport scaffolding # genesis/proto/state */
   limitOrderPoolUserShareMapList: LimitOrderPoolUserShareMap[];
+  /** this line is used by starport scaffolding # genesis/proto/state */
+  limitOrderPoolUserSharesFilledList: LimitOrderPoolUserSharesFilled[];
 }
 
 const baseGenesisState: object = {
@@ -84,6 +86,12 @@ export const GenesisState = {
     for (const v of message.limitOrderPoolUserShareMapList) {
       LimitOrderPoolUserShareMap.encode(v!, writer.uint32(114).fork()).ldelim();
     }
+    for (const v of message.limitOrderPoolUserSharesFilledList) {
+      LimitOrderPoolUserSharesFilled.encode(
+        v!,
+        writer.uint32(122).fork()
+      ).ldelim();
+    }
     return writer;
   },
 
@@ -100,6 +108,7 @@ export const GenesisState = {
     message.edgeRowList = [];
     message.adjanceyMatrixList = [];
     message.limitOrderPoolUserShareMapList = [];
+    message.limitOrderPoolUserSharesFilledList = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -149,6 +158,11 @@ export const GenesisState = {
             LimitOrderPoolUserShareMap.decode(reader, reader.uint32())
           );
           break;
+        case 15:
+          message.limitOrderPoolUserSharesFilledList.push(
+            LimitOrderPoolUserSharesFilled.decode(reader, reader.uint32())
+          );
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -168,6 +182,7 @@ export const GenesisState = {
     message.edgeRowList = [];
     message.adjanceyMatrixList = [];
     message.limitOrderPoolUserShareMapList = [];
+    message.limitOrderPoolUserSharesFilledList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromJSON(object.params);
     } else {
@@ -249,6 +264,16 @@ export const GenesisState = {
         );
       }
     }
+    if (
+      object.limitOrderPoolUserSharesFilledList !== undefined &&
+      object.limitOrderPoolUserSharesFilledList !== null
+    ) {
+      for (const e of object.limitOrderPoolUserSharesFilledList) {
+        message.limitOrderPoolUserSharesFilledList.push(
+          LimitOrderPoolUserSharesFilled.fromJSON(e)
+        );
+      }
+    }
     return message;
   },
 
@@ -327,6 +352,13 @@ export const GenesisState = {
     } else {
       obj.limitOrderPoolUserShareMapList = [];
     }
+    if (message.limitOrderPoolUserSharesFilledList) {
+      obj.limitOrderPoolUserSharesFilledList = message.limitOrderPoolUserSharesFilledList.map(
+        (e) => (e ? LimitOrderPoolUserSharesFilled.toJSON(e) : undefined)
+      );
+    } else {
+      obj.limitOrderPoolUserSharesFilledList = [];
+    }
     return obj;
   },
 
@@ -341,6 +373,7 @@ export const GenesisState = {
     message.edgeRowList = [];
     message.adjanceyMatrixList = [];
     message.limitOrderPoolUserShareMapList = [];
+    message.limitOrderPoolUserSharesFilledList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromPartial(object.params);
     } else {
@@ -419,6 +452,16 @@ export const GenesisState = {
       for (const e of object.limitOrderPoolUserShareMapList) {
         message.limitOrderPoolUserShareMapList.push(
           LimitOrderPoolUserShareMap.fromPartial(e)
+        );
+      }
+    }
+    if (
+      object.limitOrderPoolUserSharesFilledList !== undefined &&
+      object.limitOrderPoolUserSharesFilledList !== null
+    ) {
+      for (const e of object.limitOrderPoolUserSharesFilledList) {
+        message.limitOrderPoolUserSharesFilledList.push(
+          LimitOrderPoolUserSharesFilled.fromPartial(e)
         );
       }
     }

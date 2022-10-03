@@ -58,6 +58,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, elem := range genState.LimitOrderPoolUserShareMapList {
 		k.SetLimitOrderPoolUserShareMap(ctx, elem)
 	}
+	// Set all the limitOrderPoolUserSharesFilled
+	for _, elem := range genState.LimitOrderPoolUserSharesFilledList {
+		k.SetLimitOrderPoolUserSharesFilled(ctx, elem)
+	}
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
 }
@@ -80,6 +84,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.AdjanceyMatrixList = k.GetAllAdjanceyMatrix(ctx)
 	genesis.AdjanceyMatrixCount = k.GetAdjanceyMatrixCount(ctx)
 	genesis.LimitOrderPoolUserShareMapList = k.GetAllLimitOrderPoolUserShareMap(ctx)
+	genesis.LimitOrderPoolUserSharesFilledList = k.GetAllLimitOrderPoolUserSharesFilled(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis

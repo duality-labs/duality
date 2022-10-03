@@ -30,9 +30,16 @@ export interface DexFeeList {
 }
 
 export interface DexLimitOrderPoolUserShareMap {
+  /** @format uint64 */
   count?: string;
   address?: string;
   sharesOwned?: string;
+}
+
+export interface DexLimitOrderPoolUserSharesFilled {
+  count?: string;
+  address?: string;
+  sharesFilled?: string;
 }
 
 export type DexMsgDepositResponse = object;
@@ -101,6 +108,21 @@ export interface DexQueryAllFeeListResponse {
 
 export interface DexQueryAllLimitOrderPoolUserShareMapResponse {
   limitOrderPoolUserShareMap?: DexLimitOrderPoolUserShareMap[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
+export interface DexQueryAllLimitOrderPoolUserSharesFilledResponse {
+  limitOrderPoolUserSharesFilled?: DexLimitOrderPoolUserSharesFilled[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -203,6 +225,10 @@ export interface DexQueryGetFeeListResponse {
 
 export interface DexQueryGetLimitOrderPoolUserShareMapResponse {
   limitOrderPoolUserShareMap?: DexLimitOrderPoolUserShareMap;
+}
+
+export interface DexQueryGetLimitOrderPoolUserSharesFilledResponse {
+  limitOrderPoolUserSharesFilled?: DexLimitOrderPoolUserSharesFilled;
 }
 
 export interface DexQueryGetPairMapResponse {
@@ -330,13 +356,6 @@ export interface V1Beta1PageRequest {
    * is set.
    */
   count_total?: boolean;
-
-  /**
-   * reverse is set to true if results are to be returned in the descending order.
-   *
-   * Since: cosmos-sdk 0.43
-   */
-  reverse?: boolean;
 }
 
 /**
@@ -566,7 +585,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -608,7 +626,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -650,7 +667,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -692,7 +708,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -724,6 +739,47 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
+   * @name QueryLimitOrderPoolUserSharesFilledAll
+   * @summary Queries a list of LimitOrderPoolUserSharesFilled items.
+   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_user_shares_filled
+   */
+  queryLimitOrderPoolUserSharesFilledAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<DexQueryAllLimitOrderPoolUserSharesFilledResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/limit_order_pool_user_shares_filled`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryLimitOrderPoolUserSharesFilled
+   * @summary Queries a LimitOrderPoolUserSharesFilled by index.
+   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_user_shares_filled/{count}/{address}
+   */
+  queryLimitOrderPoolUserSharesFilled = (count: string, address: string, params: RequestParams = {}) =>
+    this.request<DexQueryGetLimitOrderPoolUserSharesFilledResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/limit_order_pool_user_shares_filled/${count}/${address}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
    * @name QueryPairMapAll
    * @summary Queries a list of PairMap items.
    * @request GET:/NicholasDotSol/duality/dex/pair_map
@@ -734,7 +790,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -792,7 +847,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -834,7 +888,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -877,7 +930,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -919,7 +971,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
-      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>

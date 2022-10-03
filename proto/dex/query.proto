@@ -14,6 +14,7 @@ import "dex/fee_list.proto";
 import "dex/edge_row.proto";
 import "dex/adjancey_matrix.proto";
 import "dex/limit_order_pool_user_share_map.proto";
+import "dex/limit_order_pool_user_shares_filled.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -112,6 +113,16 @@ service Query {
 	// Queries a list of LimitOrderPoolUserShareMap items.
 	rpc LimitOrderPoolUserShareMapAll(QueryAllLimitOrderPoolUserShareMapRequest) returns (QueryAllLimitOrderPoolUserShareMapResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_share_map";
+	}
+
+// Queries a LimitOrderPoolUserSharesFilled by index.
+	rpc LimitOrderPoolUserSharesFilled(QueryGetLimitOrderPoolUserSharesFilledRequest) returns (QueryGetLimitOrderPoolUserSharesFilledResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_shares_filled/{count}/{address}";
+	}
+
+	// Queries a list of LimitOrderPoolUserSharesFilled items.
+	rpc LimitOrderPoolUserSharesFilledAll(QueryAllLimitOrderPoolUserSharesFilledRequest) returns (QueryAllLimitOrderPoolUserSharesFilledResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_shares_filled";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -287,6 +298,25 @@ message QueryAllLimitOrderPoolUserShareMapRequest {
 
 message QueryAllLimitOrderPoolUserShareMapResponse {
 	repeated LimitOrderPoolUserShareMap limitOrderPoolUserShareMap = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetLimitOrderPoolUserSharesFilledRequest {
+	  string count = 1;
+  string address = 2;
+
+}
+
+message QueryGetLimitOrderPoolUserSharesFilledResponse {
+	LimitOrderPoolUserSharesFilled limitOrderPoolUserSharesFilled = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllLimitOrderPoolUserSharesFilledRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllLimitOrderPoolUserSharesFilledResponse {
+	repeated LimitOrderPoolUserSharesFilled limitOrderPoolUserSharesFilled = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

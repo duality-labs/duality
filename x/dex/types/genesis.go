@@ -10,15 +10,16 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		TickMapList:                    []TickMap{},
-		PairMapList:                    []PairMap{},
-		TokensList:                     []Tokens{},
-		TokenMapList:                   []TokenMap{},
-		SharesList:                     []Shares{},
-		FeeListList:                    []FeeList{},
-		EdgeRowList:                    []EdgeRow{},
-		AdjanceyMatrixList:             []AdjanceyMatrix{},
-		LimitOrderPoolUserShareMapList: []LimitOrderPoolUserShareMap{},
+		TickMapList:                        []TickMap{},
+		PairMapList:                        []PairMap{},
+		TokensList:                         []Tokens{},
+		TokenMapList:                       []TokenMap{},
+		SharesList:                         []Shares{},
+		FeeListList:                        []FeeList{},
+		EdgeRowList:                        []EdgeRow{},
+		AdjanceyMatrixList:                 []AdjanceyMatrix{},
+		LimitOrderPoolUserShareMapList:     []LimitOrderPoolUserShareMap{},
+		LimitOrderPoolUserSharesFilledList: []LimitOrderPoolUserSharesFilled{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -124,6 +125,16 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("duplicated index for limitOrderPoolUserShareMap")
 		}
 		limitOrderPoolUserShareMapIndexMap[index] = struct{}{}
+	}
+	// Check for duplicated index in limitOrderPoolUserSharesFilled
+	limitOrderPoolUserSharesFilledIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.LimitOrderPoolUserSharesFilledList {
+		index := string(LimitOrderPoolUserSharesFilledKey(elem.Count, elem.Address))
+		if _, ok := limitOrderPoolUserSharesFilledIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for limitOrderPoolUserSharesFilled")
+		}
+		limitOrderPoolUserSharesFilledIndexMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 
