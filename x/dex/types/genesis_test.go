@@ -98,46 +98,46 @@ func TestGenesisState_Validate(t *testing.T) {
 				AdjanceyMatrixCount: 2,
 				LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
 					{
-						Count:   "0",
+						Count:   0,
 						Address: "0",
 					},
 					{
-						Count:   "1",
+						Count:   1,
 						Address: "1",
 					},
 				},
 				LimitOrderPoolUserSharesFilledList: []types.LimitOrderPoolUserSharesFilled{
 					{
-						Count:   "0",
+						Count:   0,
 						Address: "0",
 					},
 					{
-						Count:   "1",
+						Count:   1,
 						Address: "1",
 					},
 				},
 				LimitOrderPoolTotalSharesMapList: []types.LimitOrderPoolTotalSharesMap{
 					{
-						Count: "0",
+						Count: 0,
 					},
 					{
-						Count: "1",
+						Count: 1,
 					},
 				},
 				LimitOrderPoolReserveMapList: []types.LimitOrderPoolReserveMap{
 					{
-						Count: "0",
+						Count: 0,
 					},
 					{
-						Count: "1",
+						Count: 1,
 					},
 				},
 				LimitOrderPoolFillMapList: []types.LimitOrderPoolFillMap{
 					{
-						Count: "0",
+						Count: 0,
 					},
 					{
-						Count: "1",
+						Count: 1,
 					},
 				},
 				// this line is used by starport scaffolding # types/genesis/validField
@@ -315,11 +315,11 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
 					{
-						Count:   "0",
+						Count:   0,
 						Address: "0",
 					},
 					{
-						Count:   "0",
+						Count:   0,
 						Address: "0",
 					},
 				},
@@ -331,11 +331,11 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				LimitOrderPoolUserSharesFilledList: []types.LimitOrderPoolUserSharesFilled{
 					{
-						Count:   "0",
+						Count:   0,
 						Address: "0",
 					},
 					{
-						Count:   "0",
+						Count:   0,
 						Address: "0",
 					},
 				},
@@ -347,10 +347,10 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				LimitOrderPoolTotalSharesMapList: []types.LimitOrderPoolTotalSharesMap{
 					{
-						Count: "0",
+						Count: 0,
 					},
 					{
-						Count: "0",
+						Count: 0,
 					},
 				},
 			},
@@ -361,10 +361,10 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				LimitOrderPoolReserveMapList: []types.LimitOrderPoolReserveMap{
 					{
-						Count: "0",
+						Count: 0,
 					},
 					{
-						Count: "0",
+						Count: 0,
 					},
 				},
 			},
@@ -375,10 +375,10 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				LimitOrderPoolFillMapList: []types.LimitOrderPoolFillMap{
 					{
-						Count: "0",
+						Count: 0,
 					},
 					{
-						Count: "0",
+						Count: 0,
 					},
 				},
 			},

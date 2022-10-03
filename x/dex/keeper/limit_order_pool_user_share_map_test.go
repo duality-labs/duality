@@ -15,22 +15,25 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNLimitOrderPoolUserShareMap(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.LimitOrderPoolUserShareMap {
+func createNLimitOrderPoolUserShareMap(keeper *keeper.Keeper, ctx sdk.Context, pairId string, tickIndex int64, token string, n int) []types.LimitOrderPoolUserShareMap {
 	items := make([]types.LimitOrderPoolUserShareMap, n)
 	for i := range items {
-		items[i].Count = strconv.Itoa(i)
+		items[i].Count = uint64(i)
 		items[i].Address = strconv.Itoa(i)
 
-		keeper.SetLimitOrderPoolUserShareMap(ctx, items[i])
+		keeper.SetLimitOrderPoolUserShareMap(ctx, pairId, tickIndex, token, items[i])
 	}
 	return items
 }
 
 func TestLimitOrderPoolUserShareMapGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUserShareMap(keeper, ctx, 10)
+	items := createNLimitOrderPoolUserShareMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
 	for _, item := range items {
 		rst, found := keeper.GetLimitOrderPoolUserShareMap(ctx,
+			"TokenA/TokenB",
+			0,
+			"TokenA",
 			item.Count,
 			item.Address,
 		)
@@ -43,25 +46,22 @@ func TestLimitOrderPoolUserShareMapGet(t *testing.T) {
 }
 func TestLimitOrderPoolUserShareMapRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUserShareMap(keeper, ctx, 10)
+	items := createNLimitOrderPoolUserShareMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
 	for _, item := range items {
 		keeper.RemoveLimitOrderPoolUserShareMap(ctx,
+			"TokenA/TokenB",
+			0,
+			"TokenA",
 			item.Count,
 			item.Address,
 		)
 		_, found := keeper.GetLimitOrderPoolUserShareMap(ctx,
+			"TokenA/TokenB",
+			0,
+			"TokenA",
 			item.Count,
 			item.Address,
 		)
 		require.False(t, found)
 	}
-}
-
-func TestLimitOrderPoolUserShareMapGetAll(t *testing.T) {
-	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUserShareMap(keeper, ctx, 10)
-	require.ElementsMatch(t,
-		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllLimitOrderPoolUserShareMap(ctx)),
-	)
 }

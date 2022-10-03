@@ -29,7 +29,7 @@ func networkWithLimitOrderPoolFillMapObjects(t *testing.T, n int) (*network.Netw
 
 	for i := 0; i < n; i++ {
 		limitOrderPoolFillMap := types.LimitOrderPoolFillMap{
-			Count: strconv.Itoa(i),
+			Count: uint64(i),
 		}
 		nullify.Fill(&limitOrderPoolFillMap)
 		state.LimitOrderPoolFillMapList = append(state.LimitOrderPoolFillMapList, limitOrderPoolFillMap)
@@ -49,7 +49,7 @@ func TestShowLimitOrderPoolFillMap(t *testing.T) {
 	}
 	for _, tc := range []struct {
 		desc    string
-		idCount string
+		idCount uint64
 
 		args []string
 		err  error
@@ -64,7 +64,7 @@ func TestShowLimitOrderPoolFillMap(t *testing.T) {
 		},
 		{
 			desc:    "not found",
-			idCount: strconv.Itoa(100000),
+			idCount: 100000,
 
 			args: common,
 			err:  status.Error(codes.NotFound, "not found"),
@@ -72,7 +72,7 @@ func TestShowLimitOrderPoolFillMap(t *testing.T) {
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
 			args := []string{
-				tc.idCount,
+				strconv.Itoa(int(tc.idCount)),
 			}
 			args = append(args, tc.args...)
 			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowLimitOrderPoolFillMap(), args)

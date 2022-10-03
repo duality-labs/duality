@@ -15,21 +15,24 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNLimitOrderPoolFillMap(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.LimitOrderPoolFillMap {
+func createNLimitOrderPoolFillMap(keeper *keeper.Keeper, ctx sdk.Context, pairId string, tickIndex int64, token string, n int) []types.LimitOrderPoolFillMap {
 	items := make([]types.LimitOrderPoolFillMap, n)
 	for i := range items {
-		items[i].Count = strconv.Itoa(i)
+		items[i].Count = uint64(i)
 
-		keeper.SetLimitOrderPoolFillMap(ctx, items[i])
+		keeper.SetLimitOrderPoolFillMap(ctx, pairId, tickIndex, token, items[i])
 	}
 	return items
 }
 
 func TestLimitOrderPoolFillMapGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolFillMap(keeper, ctx, 10)
+	items := createNLimitOrderPoolFillMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
 	for _, item := range items {
 		rst, found := keeper.GetLimitOrderPoolFillMap(ctx,
+			"TokenA/TokenB",
+			0,
+			"TokenA",
 			item.Count,
 		)
 		require.True(t, found)
@@ -41,23 +44,20 @@ func TestLimitOrderPoolFillMapGet(t *testing.T) {
 }
 func TestLimitOrderPoolFillMapRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolFillMap(keeper, ctx, 10)
+	items := createNLimitOrderPoolFillMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
 	for _, item := range items {
 		keeper.RemoveLimitOrderPoolFillMap(ctx,
+			"TokenA/TokenB",
+			0,
+			"TokenA",
 			item.Count,
 		)
 		_, found := keeper.GetLimitOrderPoolFillMap(ctx,
+			"TokenA/TokenB",
+			0,
+			"TokenA",
 			item.Count,
 		)
 		require.False(t, found)
 	}
-}
-
-func TestLimitOrderPoolFillMapGetAll(t *testing.T) {
-	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolFillMap(keeper, ctx, 10)
-	require.ElementsMatch(t,
-		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllLimitOrderPoolFillMap(ctx)),
-	)
 }

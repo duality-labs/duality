@@ -100,6 +100,112 @@ func SharesKey(address string, pairId string, tickIndex int64, feeIndex uint64) 
 	return key
 }
 
+// Limit Order Pool Mappings and Keys
+const (
+	BaseLimitOrderPrefix = "LimitOrderPool/value/"
+
+	// LimitOrderPoolUserSharesFilledKeyPrefix is the prefix to retrieve all LimitOrderPoolUserSharesFilled
+	LimitOrderPoolUserSharesFilledKeyPrefix = "LimitOrderPoolUserSharesFilled/value/"
+
+	// LimitOrderPoolUserShareMapKeyPrefix is the prefix to retrieve all LimitOrderPoolUserShareMap
+	LimitOrderPoolUserShareMapKeyPrefix = "LimitOrderPoolUserShareMap/value/"
+
+	// LimitOrderPoolTotalSharesMapKeyPrefix is the prefix to retrieve all LimitOrderPoolTotalSharesMap
+	LimitOrderPoolTotalSharesMapKeyPrefix = "LimitOrderPoolTotalSharesMap/value/"
+
+	// LimitOrderPoolReserveMapKeyPrefix is the prefix to retrieve all LimitOrderPoolReserveMap
+	LimitOrderPoolReserveMapKeyPrefix = "LimitOrderPoolReserveMap/value/"
+
+	// LimitOrderPoolFillMapKeyPrefix is the prefix to retrieve all LimitOrderPoolFillMap
+	LimitOrderPoolFillMapKeyPrefix = "LimitOrderPoolFillMap/value/"
+)
+
+func LimitOrderPrefix(pairId string, tickIndex int64, token string) []byte {
+
+	return append(append(append(KeyPrefix(BaseLimitOrderPrefix), KeyPrefix(pairId)...), KeyPrefix(strconv.Itoa(int(tickIndex)))...), KeyPrefix(token)...)
+}
+
+func LimitOrderUserSharesMapPrefix(pairId string, tickIndex int64, token string) []byte {
+	return append(LimitOrderPrefix(pairId, tickIndex, token), KeyPrefix(LimitOrderPoolUserShareMapKeyPrefix)...)
+}
+
+func LimitOrderUserSharesFilledPrefix(pairId string, tickIndex int64, token string) []byte {
+	return append(LimitOrderPrefix(pairId, tickIndex, token), KeyPrefix(LimitOrderPoolUserSharesFilledKeyPrefix)...)
+}
+
+func LimitOrderTotalSharesMapPrefix(pairId string, tickIndex int64, token string) []byte {
+	return append(LimitOrderPrefix(pairId, tickIndex, token), KeyPrefix(LimitOrderPoolTotalSharesMapKeyPrefix)...)
+}
+
+func LimitOrderReseveMapPrefix(pairId string, tickIndex int64, token string) []byte {
+	return append(LimitOrderPrefix(pairId, tickIndex, token), KeyPrefix(LimitOrderPoolReserveMapKeyPrefix)...)
+}
+
+func LimitOrderFillMapPrefix(pairId string, tickIndex int64, token string) []byte {
+	return append(LimitOrderPrefix(pairId, tickIndex, token), KeyPrefix(LimitOrderPoolFillMapKeyPrefix)...)
+}
+
+// LimitOrderPoolUserSharesFilledKey returns the store key to retrieve a LimitOrderPoolUserSharesFilled from the index fields
+func LimitOrderPoolUserSharesFilledKey(count uint64, address string) []byte {
+	var key []byte
+
+	countBytes := []byte(strconv.Itoa(int(count)))
+	key = append(key, countBytes...)
+	key = append(key, []byte("/")...)
+
+	addressBytes := []byte(address)
+	key = append(key, addressBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+// LimitOrderPoolUserShareMapKey returns the store key to retrieve a LimitOrderPoolUserShareMap from the index fields
+func LimitOrderPoolUserShareMapKey(count uint64, address string) []byte {
+	var key []byte
+
+	countBytes := []byte(strconv.Itoa(int(count)))
+	key = append(key, countBytes...)
+	key = append(key, []byte("/")...)
+
+	addressBytes := []byte(address)
+	key = append(key, addressBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+// LimitOrderPoolTotalSharesMapKey returns the store key to retrieve a LimitOrderPoolTotalSharesMap from the index fields
+func LimitOrderPoolTotalSharesMapKey(count uint64) []byte {
+	var key []byte
+
+	countBytes := []byte(strconv.Itoa(int(count)))
+	key = append(key, countBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+func LimitOrderPoolReserveMapKey(count uint64) []byte {
+	var key []byte
+
+	countBytes := []byte(strconv.Itoa(int(count)))
+	key = append(key, countBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+func LimitOrderPoolFillMapKey(count uint64) []byte {
+	var key []byte
+
+	countBytes := []byte(strconv.Itoa(int(count)))
+	key = append(key, countBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
 // Deposit Event Attributes
 const (
 	DepositEventKey          = "NewDeposit"

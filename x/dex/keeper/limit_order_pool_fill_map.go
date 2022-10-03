@@ -7,8 +7,8 @@ import (
 )
 
 // SetLimitOrderPoolFillMap set a specific limitOrderPoolFillMap in the store from its index
-func (k Keeper) SetLimitOrderPoolFillMap(ctx sdk.Context, limitOrderPoolFillMap types.LimitOrderPoolFillMap) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderPoolFillMapKeyPrefix))
+func (k Keeper) SetLimitOrderPoolFillMap(ctx sdk.Context, pairId string, tickIndex int64, token string, limitOrderPoolFillMap types.LimitOrderPoolFillMap) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderFillMapPrefix(pairId, tickIndex, token))
 	b := k.cdc.MustMarshal(&limitOrderPoolFillMap)
 	store.Set(types.LimitOrderPoolFillMapKey(
 		limitOrderPoolFillMap.Count,
@@ -18,10 +18,13 @@ func (k Keeper) SetLimitOrderPoolFillMap(ctx sdk.Context, limitOrderPoolFillMap 
 // GetLimitOrderPoolFillMap returns a limitOrderPoolFillMap from its index
 func (k Keeper) GetLimitOrderPoolFillMap(
 	ctx sdk.Context,
-	count string,
+	pairId string,
+	tickIndex int64,
+	token string,
+	count uint64,
 
 ) (val types.LimitOrderPoolFillMap, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderPoolFillMapKeyPrefix))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderFillMapPrefix(pairId, tickIndex, token))
 
 	b := store.Get(types.LimitOrderPoolFillMapKey(
 		count,
@@ -37,27 +40,14 @@ func (k Keeper) GetLimitOrderPoolFillMap(
 // RemoveLimitOrderPoolFillMap removes a limitOrderPoolFillMap from the store
 func (k Keeper) RemoveLimitOrderPoolFillMap(
 	ctx sdk.Context,
-	count string,
+	pairId string,
+	tickIndex int64,
+	token string,
+	count uint64,
 
 ) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderPoolFillMapKeyPrefix))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderFillMapPrefix(pairId, tickIndex, token))
 	store.Delete(types.LimitOrderPoolFillMapKey(
 		count,
 	))
-}
-
-// GetAllLimitOrderPoolFillMap returns all limitOrderPoolFillMap
-func (k Keeper) GetAllLimitOrderPoolFillMap(ctx sdk.Context) (list []types.LimitOrderPoolFillMap) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderPoolFillMapKeyPrefix))
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
-
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		var val types.LimitOrderPoolFillMap
-		k.cdc.MustUnmarshal(iterator.Value(), &val)
-		list = append(list, val)
-	}
-
-	return
 }

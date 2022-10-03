@@ -15,22 +15,25 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNLimitOrderPoolUserSharesFilled(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.LimitOrderPoolUserSharesFilled {
+func createNLimitOrderPoolUserSharesFilled(keeper *keeper.Keeper, ctx sdk.Context, pairId string, tickIndex int64, token string, n int) []types.LimitOrderPoolUserSharesFilled {
 	items := make([]types.LimitOrderPoolUserSharesFilled, n)
 	for i := range items {
-		items[i].Count = strconv.Itoa(i)
+		items[i].Count = uint64(i)
 		items[i].Address = strconv.Itoa(i)
 
-		keeper.SetLimitOrderPoolUserSharesFilled(ctx, items[i])
+		keeper.SetLimitOrderPoolUserSharesFilled(ctx, pairId, tickIndex, token, items[i])
 	}
 	return items
 }
 
 func TestLimitOrderPoolUserSharesFilledGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUserSharesFilled(keeper, ctx, 10)
+	items := createNLimitOrderPoolUserSharesFilled(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
 	for _, item := range items {
 		rst, found := keeper.GetLimitOrderPoolUserSharesFilled(ctx,
+			"TokenA/TokenB",
+			0,
+			"TokenA",
 			item.Count,
 			item.Address,
 		)
@@ -43,25 +46,22 @@ func TestLimitOrderPoolUserSharesFilledGet(t *testing.T) {
 }
 func TestLimitOrderPoolUserSharesFilledRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUserSharesFilled(keeper, ctx, 10)
+	items := createNLimitOrderPoolUserSharesFilled(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
 	for _, item := range items {
 		keeper.RemoveLimitOrderPoolUserSharesFilled(ctx,
+			"TokenA/TokenB",
+			0,
+			"TokenA",
 			item.Count,
 			item.Address,
 		)
 		_, found := keeper.GetLimitOrderPoolUserSharesFilled(ctx,
+			"TokenA/TokenB",
+			0,
+			"TokenA",
 			item.Count,
 			item.Address,
 		)
 		require.False(t, found)
 	}
-}
-
-func TestLimitOrderPoolUserSharesFilledGetAll(t *testing.T) {
-	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUserSharesFilled(keeper, ctx, 10)
-	require.ElementsMatch(t,
-		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllLimitOrderPoolUserSharesFilled(ctx)),
-	)
 }

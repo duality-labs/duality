@@ -62,7 +62,7 @@ func CmdShowLimitOrderPoolReserveMap() *cobra.Command {
 			}
 
 			params := &types.QueryGetLimitOrderPoolReserveMapRequest{
-				Count: argCount,
+				Count: uint64(argCount),
 			}
 
 			res, err := queryClient.LimitOrderPoolReserveMap(context.Background(), params)

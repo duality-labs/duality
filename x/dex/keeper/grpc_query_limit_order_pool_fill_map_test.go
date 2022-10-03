@@ -45,7 +45,7 @@ func TestLimitOrderPoolFillMapQuerySingle(t *testing.T) {
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetLimitOrderPoolFillMapRequest{
-				Count: strconv.Itoa(100000),
+				Count: 100000,
 			},
 			err: status.Error(codes.NotFound, "not found"),
 		},

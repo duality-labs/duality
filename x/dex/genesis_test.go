@@ -82,46 +82,46 @@ func TestGenesis(t *testing.T) {
 		AdjanceyMatrixCount: 2,
 		LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
 			{
-				Count:   "0",
+				Count:   0,
 				Address: "0",
 			},
 			{
-				Count:   "1",
+				Count:   1,
 				Address: "1",
 			},
 		},
 		LimitOrderPoolUserSharesFilledList: []types.LimitOrderPoolUserSharesFilled{
 			{
-				Count:   "0",
+				Count:   0,
 				Address: "0",
 			},
 			{
-				Count:   "1",
+				Count:   1,
 				Address: "1",
 			},
 		},
 		LimitOrderPoolTotalSharesMapList: []types.LimitOrderPoolTotalSharesMap{
 			{
-				Count: "0",
+				Count: 0,
 			},
 			{
-				Count: "1",
+				Count: 1,
 			},
 		},
 		LimitOrderPoolReserveMapList: []types.LimitOrderPoolReserveMap{
 			{
-				Count: "0",
+				Count: 0,
 			},
 			{
-				Count: "1",
+				Count: 1,
 			},
 		},
 		LimitOrderPoolFillMapList: []types.LimitOrderPoolFillMap{
 			{
-				Count: "0",
+				Count: 0,
 			},
 			{
-				Count: "1",
+				Count: 1,
 			},
 		},
 		// this line is used by starport scaffolding # genesis/test/state

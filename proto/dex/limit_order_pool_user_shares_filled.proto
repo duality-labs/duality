@@ -5,7 +5,7 @@ option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 import "gogoproto/gogo.proto";
 
 message LimitOrderPoolUserSharesFilled {
-  string count = 1; 
+  uint64 count = 1; 
   string address = 2; 
   string sharesFilled = 3  [
       (gogoproto.moretags)   = "yaml:\"sharesFilled\"",
