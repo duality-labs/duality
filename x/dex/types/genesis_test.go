@@ -96,6 +96,16 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 				AdjanceyMatrixCount: 2,
+				LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
+					{
+						Count:   "0",
+						Address: "0",
+					},
+					{
+						Count:   "1",
+						Address: "1",
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -263,6 +273,22 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 				AdjanceyMatrixCount: 0,
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated limitOrderPoolUserShareMap",
+			genState: &types.GenesisState{
+				LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
+					{
+						Count:   "0",
+						Address: "0",
+					},
+					{
+						Count:   "0",
+						Address: "0",
+					},
+				},
 			},
 			valid: false,
 		},

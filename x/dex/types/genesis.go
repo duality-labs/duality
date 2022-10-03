@@ -10,14 +10,15 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		TickMapList:        []TickMap{},
-		PairMapList:        []PairMap{},
-		TokensList:         []Tokens{},
-		TokenMapList:       []TokenMap{},
-		SharesList:         []Shares{},
-		FeeListList:        []FeeList{},
-		EdgeRowList:        []EdgeRow{},
-		AdjanceyMatrixList: []AdjanceyMatrix{},
+		TickMapList:                    []TickMap{},
+		PairMapList:                    []PairMap{},
+		TokensList:                     []Tokens{},
+		TokenMapList:                   []TokenMap{},
+		SharesList:                     []Shares{},
+		FeeListList:                    []FeeList{},
+		EdgeRowList:                    []EdgeRow{},
+		AdjanceyMatrixList:             []AdjanceyMatrix{},
+		LimitOrderPoolUserShareMapList: []LimitOrderPoolUserShareMap{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -113,6 +114,16 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("adjanceyMatrix id should be lower or equal than the last id")
 		}
 		adjanceyMatrixIdMap[elem.Id] = true
+	}
+	// Check for duplicated index in limitOrderPoolUserShareMap
+	limitOrderPoolUserShareMapIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.LimitOrderPoolUserShareMapList {
+		index := string(LimitOrderPoolUserShareMapKey(elem.Count, elem.Address))
+		if _, ok := limitOrderPoolUserShareMapIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for limitOrderPoolUserShareMap")
+		}
+		limitOrderPoolUserShareMapIndexMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 

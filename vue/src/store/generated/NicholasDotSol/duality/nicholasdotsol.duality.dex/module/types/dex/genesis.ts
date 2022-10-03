@@ -10,6 +10,7 @@ import { Shares } from "../dex/shares";
 import { FeeList } from "../dex/fee_list";
 import { EdgeRow } from "../dex/edge_row";
 import { AdjanceyMatrix } from "../dex/adjancey_matrix";
+import { LimitOrderPoolUserShareMap } from "../dex/limit_order_pool_user_share_map";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -27,8 +28,9 @@ export interface GenesisState {
   edgeRowList: EdgeRow[];
   edgeRowCount: number;
   adjanceyMatrixList: AdjanceyMatrix[];
-  /** this line is used by starport scaffolding # genesis/proto/state */
   adjanceyMatrixCount: number;
+  /** this line is used by starport scaffolding # genesis/proto/state */
+  limitOrderPoolUserShareMapList: LimitOrderPoolUserShareMap[];
 }
 
 const baseGenesisState: object = {
@@ -79,6 +81,9 @@ export const GenesisState = {
     if (message.adjanceyMatrixCount !== 0) {
       writer.uint32(104).uint64(message.adjanceyMatrixCount);
     }
+    for (const v of message.limitOrderPoolUserShareMapList) {
+      LimitOrderPoolUserShareMap.encode(v!, writer.uint32(114).fork()).ldelim();
+    }
     return writer;
   },
 
@@ -94,6 +99,7 @@ export const GenesisState = {
     message.feeListList = [];
     message.edgeRowList = [];
     message.adjanceyMatrixList = [];
+    message.limitOrderPoolUserShareMapList = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -138,6 +144,11 @@ export const GenesisState = {
         case 13:
           message.adjanceyMatrixCount = longToNumber(reader.uint64() as Long);
           break;
+        case 14:
+          message.limitOrderPoolUserShareMapList.push(
+            LimitOrderPoolUserShareMap.decode(reader, reader.uint32())
+          );
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -156,6 +167,7 @@ export const GenesisState = {
     message.feeListList = [];
     message.edgeRowList = [];
     message.adjanceyMatrixList = [];
+    message.limitOrderPoolUserShareMapList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromJSON(object.params);
     } else {
@@ -226,6 +238,16 @@ export const GenesisState = {
       message.adjanceyMatrixCount = Number(object.adjanceyMatrixCount);
     } else {
       message.adjanceyMatrixCount = 0;
+    }
+    if (
+      object.limitOrderPoolUserShareMapList !== undefined &&
+      object.limitOrderPoolUserShareMapList !== null
+    ) {
+      for (const e of object.limitOrderPoolUserShareMapList) {
+        message.limitOrderPoolUserShareMapList.push(
+          LimitOrderPoolUserShareMap.fromJSON(e)
+        );
+      }
     }
     return message;
   },
@@ -298,6 +320,13 @@ export const GenesisState = {
     }
     message.adjanceyMatrixCount !== undefined &&
       (obj.adjanceyMatrixCount = message.adjanceyMatrixCount);
+    if (message.limitOrderPoolUserShareMapList) {
+      obj.limitOrderPoolUserShareMapList = message.limitOrderPoolUserShareMapList.map(
+        (e) => (e ? LimitOrderPoolUserShareMap.toJSON(e) : undefined)
+      );
+    } else {
+      obj.limitOrderPoolUserShareMapList = [];
+    }
     return obj;
   },
 
@@ -311,6 +340,7 @@ export const GenesisState = {
     message.feeListList = [];
     message.edgeRowList = [];
     message.adjanceyMatrixList = [];
+    message.limitOrderPoolUserShareMapList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromPartial(object.params);
     } else {
@@ -381,6 +411,16 @@ export const GenesisState = {
       message.adjanceyMatrixCount = object.adjanceyMatrixCount;
     } else {
       message.adjanceyMatrixCount = 0;
+    }
+    if (
+      object.limitOrderPoolUserShareMapList !== undefined &&
+      object.limitOrderPoolUserShareMapList !== null
+    ) {
+      for (const e of object.limitOrderPoolUserShareMapList) {
+        message.limitOrderPoolUserShareMapList.push(
+          LimitOrderPoolUserShareMap.fromPartial(e)
+        );
+      }
     }
     return message;
   },

@@ -1,0 +1,18 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+import "gogoproto/gogo.proto";
+
+message LimitOrderPoolUserShareMap {
+  uint64 count = 1; 
+  string address = 2; 
+  string sharesOwned = 3  [
+      (gogoproto.moretags)   = "yaml:\"sharesOwned\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "sharesOwned"
+  ];  
+  
+}
+

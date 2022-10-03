@@ -80,6 +80,16 @@ func TestGenesis(t *testing.T) {
 			},
 		},
 		AdjanceyMatrixCount: 2,
+		LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
+			{
+				Count:   "0",
+				Address: "0",
+			},
+			{
+				Count:   "1",
+				Address: "1",
+			},
+		},
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
@@ -102,5 +112,6 @@ func TestGenesis(t *testing.T) {
 	require.Equal(t, genesisState.EdgeRowCount, got.EdgeRowCount)
 	require.ElementsMatch(t, genesisState.AdjanceyMatrixList, got.AdjanceyMatrixList)
 	require.Equal(t, genesisState.AdjanceyMatrixCount, got.AdjanceyMatrixCount)
+	require.ElementsMatch(t, genesisState.LimitOrderPoolUserShareMapList, got.LimitOrderPoolUserShareMapList)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

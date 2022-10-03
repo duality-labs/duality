@@ -13,6 +13,7 @@ import "dex/shares.proto";
 import "dex/fee_list.proto";
 import "dex/edge_row.proto";
 import "dex/adjancey_matrix.proto";
+import "dex/limit_order_pool_user_share_map.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -101,6 +102,16 @@ service Query {
 	// Queries a list of AdjanceyMatrix items.
 	rpc AdjanceyMatrixAll(QueryAllAdjanceyMatrixRequest) returns (QueryAllAdjanceyMatrixResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/adjancey_matrix";
+	}
+
+// Queries a LimitOrderPoolUserShareMap by index.
+	rpc LimitOrderPoolUserShareMap(QueryGetLimitOrderPoolUserShareMapRequest) returns (QueryGetLimitOrderPoolUserShareMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_share_map/{count}/{address}";
+	}
+
+	// Queries a list of LimitOrderPoolUserShareMap items.
+	rpc LimitOrderPoolUserShareMapAll(QueryAllLimitOrderPoolUserShareMapRequest) returns (QueryAllLimitOrderPoolUserShareMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_share_map";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -257,6 +268,25 @@ message QueryAllAdjanceyMatrixRequest {
 
 message QueryAllAdjanceyMatrixResponse {
 	repeated AdjanceyMatrix AdjanceyMatrix = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetLimitOrderPoolUserShareMapRequest {
+	  string count = 1;
+  string address = 2;
+
+}
+
+message QueryGetLimitOrderPoolUserShareMapResponse {
+	LimitOrderPoolUserShareMap limitOrderPoolUserShareMap = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllLimitOrderPoolUserShareMapRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllLimitOrderPoolUserShareMapResponse {
+	repeated LimitOrderPoolUserShareMap limitOrderPoolUserShareMap = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
