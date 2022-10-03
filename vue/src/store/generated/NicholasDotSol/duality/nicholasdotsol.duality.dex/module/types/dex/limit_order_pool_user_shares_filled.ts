@@ -1,16 +1,17 @@
 /* eslint-disable */
-import { Writer, Reader } from "protobufjs/minimal";
+import * as Long from "long";
+import { util, configure, Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
 export interface LimitOrderPoolUserSharesFilled {
-  count: string;
+  count: number;
   address: string;
   sharesFilled: string;
 }
 
 const baseLimitOrderPoolUserSharesFilled: object = {
-  count: "",
+  count: 0,
   address: "",
   sharesFilled: "",
 };
@@ -20,8 +21,8 @@ export const LimitOrderPoolUserSharesFilled = {
     message: LimitOrderPoolUserSharesFilled,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.count !== "") {
-      writer.uint32(10).string(message.count);
+    if (message.count !== 0) {
+      writer.uint32(8).uint64(message.count);
     }
     if (message.address !== "") {
       writer.uint32(18).string(message.address);
@@ -45,7 +46,7 @@ export const LimitOrderPoolUserSharesFilled = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.count = reader.string();
+          message.count = longToNumber(reader.uint64() as Long);
           break;
         case 2:
           message.address = reader.string();
@@ -66,9 +67,9 @@ export const LimitOrderPoolUserSharesFilled = {
       ...baseLimitOrderPoolUserSharesFilled,
     } as LimitOrderPoolUserSharesFilled;
     if (object.count !== undefined && object.count !== null) {
-      message.count = String(object.count);
+      message.count = Number(object.count);
     } else {
-      message.count = "";
+      message.count = 0;
     }
     if (object.address !== undefined && object.address !== null) {
       message.address = String(object.address);
@@ -101,7 +102,7 @@ export const LimitOrderPoolUserSharesFilled = {
     if (object.count !== undefined && object.count !== null) {
       message.count = object.count;
     } else {
-      message.count = "";
+      message.count = 0;
     }
     if (object.address !== undefined && object.address !== null) {
       message.address = object.address;
@@ -117,6 +118,16 @@ export const LimitOrderPoolUserSharesFilled = {
   },
 };
 
+declare var self: any | undefined;
+declare var window: any | undefined;
+var globalThis: any = (() => {
+  if (typeof globalThis !== "undefined") return globalThis;
+  if (typeof self !== "undefined") return self;
+  if (typeof window !== "undefined") return window;
+  if (typeof global !== "undefined") return global;
+  throw "Unable to locate global object";
+})();
+
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 export type DeepPartial<T> = T extends Builtin
   ? T
@@ -127,3 +138,15 @@ export type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+function longToNumber(long: Long): number {
+  if (long.gt(Number.MAX_SAFE_INTEGER)) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  return long.toNumber();
+}
+
+if (util.Long !== Long) {
+  util.Long = Long as any;
+  configure();
+}

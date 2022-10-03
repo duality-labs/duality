@@ -41,6 +41,17 @@ export interface MsgSwap {
 
 export interface MsgSwapResponse {}
 
+export interface MsgPlaceLimitOrder {
+  creator: string;
+  tokenA: string;
+  tokenB: string;
+  tickIndex: string;
+  tokenIn: string;
+  amountIn: string;
+}
+
+export interface MsgPlaceLimitOrderResponse {}
+
 const baseMsgDeposit: object = {
   creator: "",
   receiver: "",
@@ -753,12 +764,217 @@ export const MsgSwapResponse = {
   },
 };
 
+const baseMsgPlaceLimitOrder: object = {
+  creator: "",
+  tokenA: "",
+  tokenB: "",
+  tickIndex: "",
+  tokenIn: "",
+  amountIn: "",
+};
+
+export const MsgPlaceLimitOrder = {
+  encode(
+    message: MsgPlaceLimitOrder,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.tokenA !== "") {
+      writer.uint32(18).string(message.tokenA);
+    }
+    if (message.tokenB !== "") {
+      writer.uint32(26).string(message.tokenB);
+    }
+    if (message.tickIndex !== "") {
+      writer.uint32(34).string(message.tickIndex);
+    }
+    if (message.tokenIn !== "") {
+      writer.uint32(42).string(message.tokenIn);
+    }
+    if (message.amountIn !== "") {
+      writer.uint32(50).string(message.amountIn);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgPlaceLimitOrder {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgPlaceLimitOrder } as MsgPlaceLimitOrder;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.tokenA = reader.string();
+          break;
+        case 3:
+          message.tokenB = reader.string();
+          break;
+        case 4:
+          message.tickIndex = reader.string();
+          break;
+        case 5:
+          message.tokenIn = reader.string();
+          break;
+        case 6:
+          message.amountIn = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgPlaceLimitOrder {
+    const message = { ...baseMsgPlaceLimitOrder } as MsgPlaceLimitOrder;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.tokenA !== undefined && object.tokenA !== null) {
+      message.tokenA = String(object.tokenA);
+    } else {
+      message.tokenA = "";
+    }
+    if (object.tokenB !== undefined && object.tokenB !== null) {
+      message.tokenB = String(object.tokenB);
+    } else {
+      message.tokenB = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = String(object.tickIndex);
+    } else {
+      message.tickIndex = "";
+    }
+    if (object.tokenIn !== undefined && object.tokenIn !== null) {
+      message.tokenIn = String(object.tokenIn);
+    } else {
+      message.tokenIn = "";
+    }
+    if (object.amountIn !== undefined && object.amountIn !== null) {
+      message.amountIn = String(object.amountIn);
+    } else {
+      message.amountIn = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgPlaceLimitOrder): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.tokenA !== undefined && (obj.tokenA = message.tokenA);
+    message.tokenB !== undefined && (obj.tokenB = message.tokenB);
+    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
+    message.tokenIn !== undefined && (obj.tokenIn = message.tokenIn);
+    message.amountIn !== undefined && (obj.amountIn = message.amountIn);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgPlaceLimitOrder>): MsgPlaceLimitOrder {
+    const message = { ...baseMsgPlaceLimitOrder } as MsgPlaceLimitOrder;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.tokenA !== undefined && object.tokenA !== null) {
+      message.tokenA = object.tokenA;
+    } else {
+      message.tokenA = "";
+    }
+    if (object.tokenB !== undefined && object.tokenB !== null) {
+      message.tokenB = object.tokenB;
+    } else {
+      message.tokenB = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = object.tickIndex;
+    } else {
+      message.tickIndex = "";
+    }
+    if (object.tokenIn !== undefined && object.tokenIn !== null) {
+      message.tokenIn = object.tokenIn;
+    } else {
+      message.tokenIn = "";
+    }
+    if (object.amountIn !== undefined && object.amountIn !== null) {
+      message.amountIn = object.amountIn;
+    } else {
+      message.amountIn = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgPlaceLimitOrderResponse: object = {};
+
+export const MsgPlaceLimitOrderResponse = {
+  encode(
+    _: MsgPlaceLimitOrderResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgPlaceLimitOrderResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgPlaceLimitOrderResponse,
+    } as MsgPlaceLimitOrderResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgPlaceLimitOrderResponse {
+    const message = {
+      ...baseMsgPlaceLimitOrderResponse,
+    } as MsgPlaceLimitOrderResponse;
+    return message;
+  },
+
+  toJSON(_: MsgPlaceLimitOrderResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(
+    _: DeepPartial<MsgPlaceLimitOrderResponse>
+  ): MsgPlaceLimitOrderResponse {
+    const message = {
+      ...baseMsgPlaceLimitOrderResponse,
+    } as MsgPlaceLimitOrderResponse;
+    return message;
+  },
+};
+
 /** Msg defines the Msg service. */
 export interface Msg {
   Deposit(request: MsgDeposit): Promise<MsgDepositResponse>;
   Withdrawl(request: MsgWithdrawl): Promise<MsgWithdrawlResponse>;
-  /** this line is used by starport scaffolding # proto/tx/rpc */
   Swap(request: MsgSwap): Promise<MsgSwapResponse>;
+  /** this line is used by starport scaffolding # proto/tx/rpc */
+  PlaceLimitOrder(
+    request: MsgPlaceLimitOrder
+  ): Promise<MsgPlaceLimitOrderResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -796,6 +1012,20 @@ export class MsgClientImpl implements Msg {
       data
     );
     return promise.then((data) => MsgSwapResponse.decode(new Reader(data)));
+  }
+
+  PlaceLimitOrder(
+    request: MsgPlaceLimitOrder
+  ): Promise<MsgPlaceLimitOrderResponse> {
+    const data = MsgPlaceLimitOrder.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Msg",
+      "PlaceLimitOrder",
+      data
+    );
+    return promise.then((data) =>
+      MsgPlaceLimitOrderResponse.decode(new Reader(data))
+    );
   }
 }
 

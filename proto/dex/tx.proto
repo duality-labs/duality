@@ -10,6 +10,7 @@ service Msg {
   rpc Deposit(MsgDeposit) returns (MsgDepositResponse);
   rpc Withdrawl(MsgWithdrawl) returns (MsgWithdrawlResponse);
   rpc Swap(MsgSwap) returns (MsgSwapResponse);
+  rpc PlaceLimitOrder(MsgPlaceLimitOrder) returns (MsgPlaceLimitOrderResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -39,8 +40,8 @@ message MsgDepositResponse {
 }
 
 message MsgWithdrawl {
-  string receiver = 1;
-  string creator = 2;
+  string creator = 1;
+  string receiver = 2;
   string tokenA = 3;
   string tokenB = 4;
   repeated string sharesToRemove = 5  [
@@ -62,13 +63,40 @@ message MsgSwap {
   string receiver = 2;
   string tokenA = 3;
   string tokenB = 4;
-  string amountIn = 5;
+  string amountIn = 5 [
+      (gogoproto.moretags)   = "yaml:\"amountIn\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "amountIn"
+  ]; 
   string tokenIn = 6;
-  string minOut = 7;
+  string minOut = 7 [
+      (gogoproto.moretags)   = "yaml:\"minOut\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "minOut"
+  ]; 
   
 }
 
 message MsgSwapResponse {
+}
+
+message MsgPlaceLimitOrder {
+  string creator = 1;
+  string tokenA = 2;
+  string tokenB = 3;
+  int64 tickIndex = 4;
+  string tokenIn = 5;
+  string amountIn = 6 [
+      (gogoproto.moretags)   = "yaml:\"amountIn\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "amountIn"
+  ]; 
+}
+
+message MsgPlaceLimitOrderResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message

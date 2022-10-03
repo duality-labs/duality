@@ -172,8 +172,11 @@ export interface QueryAllAdjanceyMatrixResponse {
 }
 
 export interface QueryGetLimitOrderPoolUserShareMapRequest {
-  count: string;
+  count: number;
   address: string;
+  pairId: string;
+  tickIndex: number;
+  token: string;
 }
 
 export interface QueryGetLimitOrderPoolUserShareMapResponse {
@@ -190,8 +193,11 @@ export interface QueryAllLimitOrderPoolUserShareMapResponse {
 }
 
 export interface QueryGetLimitOrderPoolUserSharesFilledRequest {
-  count: string;
+  count: number;
   address: string;
+  pairId: string;
+  tickIndex: number;
+  token: string;
 }
 
 export interface QueryGetLimitOrderPoolUserSharesFilledResponse {
@@ -208,7 +214,10 @@ export interface QueryAllLimitOrderPoolUserSharesFilledResponse {
 }
 
 export interface QueryGetLimitOrderPoolTotalSharesMapRequest {
-  count: string;
+  count: number;
+  pairId: string;
+  tickIndex: number;
+  token: string;
 }
 
 export interface QueryGetLimitOrderPoolTotalSharesMapResponse {
@@ -225,7 +234,10 @@ export interface QueryAllLimitOrderPoolTotalSharesMapResponse {
 }
 
 export interface QueryGetLimitOrderPoolReserveMapRequest {
-  count: string;
+  count: number;
+  pairId: string;
+  tickIndex: number;
+  token: string;
 }
 
 export interface QueryGetLimitOrderPoolReserveMapResponse {
@@ -242,7 +254,10 @@ export interface QueryAllLimitOrderPoolReserveMapResponse {
 }
 
 export interface QueryGetLimitOrderPoolFillMapRequest {
-  count: string;
+  count: number;
+  pairId: string;
+  tickIndex: number;
+  token: string;
 }
 
 export interface QueryGetLimitOrderPoolFillMapResponse {
@@ -2773,8 +2788,11 @@ export const QueryAllAdjanceyMatrixResponse = {
 };
 
 const baseQueryGetLimitOrderPoolUserShareMapRequest: object = {
-  count: "",
+  count: 0,
   address: "",
+  pairId: "",
+  tickIndex: 0,
+  token: "",
 };
 
 export const QueryGetLimitOrderPoolUserShareMapRequest = {
@@ -2782,11 +2800,20 @@ export const QueryGetLimitOrderPoolUserShareMapRequest = {
     message: QueryGetLimitOrderPoolUserShareMapRequest,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.count !== "") {
-      writer.uint32(10).string(message.count);
+    if (message.count !== 0) {
+      writer.uint32(8).uint64(message.count);
     }
     if (message.address !== "") {
       writer.uint32(18).string(message.address);
+    }
+    if (message.pairId !== "") {
+      writer.uint32(26).string(message.pairId);
+    }
+    if (message.tickIndex !== 0) {
+      writer.uint32(32).int64(message.tickIndex);
+    }
+    if (message.token !== "") {
+      writer.uint32(42).string(message.token);
     }
     return writer;
   },
@@ -2804,10 +2831,19 @@ export const QueryGetLimitOrderPoolUserShareMapRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.count = reader.string();
+          message.count = longToNumber(reader.uint64() as Long);
           break;
         case 2:
           message.address = reader.string();
+          break;
+        case 3:
+          message.pairId = reader.string();
+          break;
+        case 4:
+          message.tickIndex = longToNumber(reader.int64() as Long);
+          break;
+        case 5:
+          message.token = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -2822,14 +2858,29 @@ export const QueryGetLimitOrderPoolUserShareMapRequest = {
       ...baseQueryGetLimitOrderPoolUserShareMapRequest,
     } as QueryGetLimitOrderPoolUserShareMapRequest;
     if (object.count !== undefined && object.count !== null) {
-      message.count = String(object.count);
+      message.count = Number(object.count);
     } else {
-      message.count = "";
+      message.count = 0;
     }
     if (object.address !== undefined && object.address !== null) {
       message.address = String(object.address);
     } else {
       message.address = "";
+    }
+    if (object.pairId !== undefined && object.pairId !== null) {
+      message.pairId = String(object.pairId);
+    } else {
+      message.pairId = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = Number(object.tickIndex);
+    } else {
+      message.tickIndex = 0;
+    }
+    if (object.token !== undefined && object.token !== null) {
+      message.token = String(object.token);
+    } else {
+      message.token = "";
     }
     return message;
   },
@@ -2838,6 +2889,9 @@ export const QueryGetLimitOrderPoolUserShareMapRequest = {
     const obj: any = {};
     message.count !== undefined && (obj.count = message.count);
     message.address !== undefined && (obj.address = message.address);
+    message.pairId !== undefined && (obj.pairId = message.pairId);
+    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
+    message.token !== undefined && (obj.token = message.token);
     return obj;
   },
 
@@ -2850,12 +2904,27 @@ export const QueryGetLimitOrderPoolUserShareMapRequest = {
     if (object.count !== undefined && object.count !== null) {
       message.count = object.count;
     } else {
-      message.count = "";
+      message.count = 0;
     }
     if (object.address !== undefined && object.address !== null) {
       message.address = object.address;
     } else {
       message.address = "";
+    }
+    if (object.pairId !== undefined && object.pairId !== null) {
+      message.pairId = object.pairId;
+    } else {
+      message.pairId = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = object.tickIndex;
+    } else {
+      message.tickIndex = 0;
+    }
+    if (object.token !== undefined && object.token !== null) {
+      message.token = object.token;
+    } else {
+      message.token = "";
     }
     return message;
   },
@@ -3135,8 +3204,11 @@ export const QueryAllLimitOrderPoolUserShareMapResponse = {
 };
 
 const baseQueryGetLimitOrderPoolUserSharesFilledRequest: object = {
-  count: "",
+  count: 0,
   address: "",
+  pairId: "",
+  tickIndex: 0,
+  token: "",
 };
 
 export const QueryGetLimitOrderPoolUserSharesFilledRequest = {
@@ -3144,11 +3216,20 @@ export const QueryGetLimitOrderPoolUserSharesFilledRequest = {
     message: QueryGetLimitOrderPoolUserSharesFilledRequest,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.count !== "") {
-      writer.uint32(10).string(message.count);
+    if (message.count !== 0) {
+      writer.uint32(8).uint64(message.count);
     }
     if (message.address !== "") {
       writer.uint32(18).string(message.address);
+    }
+    if (message.pairId !== "") {
+      writer.uint32(26).string(message.pairId);
+    }
+    if (message.tickIndex !== 0) {
+      writer.uint32(32).int64(message.tickIndex);
+    }
+    if (message.token !== "") {
+      writer.uint32(42).string(message.token);
     }
     return writer;
   },
@@ -3166,10 +3247,19 @@ export const QueryGetLimitOrderPoolUserSharesFilledRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.count = reader.string();
+          message.count = longToNumber(reader.uint64() as Long);
           break;
         case 2:
           message.address = reader.string();
+          break;
+        case 3:
+          message.pairId = reader.string();
+          break;
+        case 4:
+          message.tickIndex = longToNumber(reader.int64() as Long);
+          break;
+        case 5:
+          message.token = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -3184,14 +3274,29 @@ export const QueryGetLimitOrderPoolUserSharesFilledRequest = {
       ...baseQueryGetLimitOrderPoolUserSharesFilledRequest,
     } as QueryGetLimitOrderPoolUserSharesFilledRequest;
     if (object.count !== undefined && object.count !== null) {
-      message.count = String(object.count);
+      message.count = Number(object.count);
     } else {
-      message.count = "";
+      message.count = 0;
     }
     if (object.address !== undefined && object.address !== null) {
       message.address = String(object.address);
     } else {
       message.address = "";
+    }
+    if (object.pairId !== undefined && object.pairId !== null) {
+      message.pairId = String(object.pairId);
+    } else {
+      message.pairId = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = Number(object.tickIndex);
+    } else {
+      message.tickIndex = 0;
+    }
+    if (object.token !== undefined && object.token !== null) {
+      message.token = String(object.token);
+    } else {
+      message.token = "";
     }
     return message;
   },
@@ -3200,6 +3305,9 @@ export const QueryGetLimitOrderPoolUserSharesFilledRequest = {
     const obj: any = {};
     message.count !== undefined && (obj.count = message.count);
     message.address !== undefined && (obj.address = message.address);
+    message.pairId !== undefined && (obj.pairId = message.pairId);
+    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
+    message.token !== undefined && (obj.token = message.token);
     return obj;
   },
 
@@ -3212,12 +3320,27 @@ export const QueryGetLimitOrderPoolUserSharesFilledRequest = {
     if (object.count !== undefined && object.count !== null) {
       message.count = object.count;
     } else {
-      message.count = "";
+      message.count = 0;
     }
     if (object.address !== undefined && object.address !== null) {
       message.address = object.address;
     } else {
       message.address = "";
+    }
+    if (object.pairId !== undefined && object.pairId !== null) {
+      message.pairId = object.pairId;
+    } else {
+      message.pairId = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = object.tickIndex;
+    } else {
+      message.tickIndex = 0;
+    }
+    if (object.token !== undefined && object.token !== null) {
+      message.token = object.token;
+    } else {
+      message.token = "";
     }
     return message;
   },
@@ -3501,15 +3624,29 @@ export const QueryAllLimitOrderPoolUserSharesFilledResponse = {
   },
 };
 
-const baseQueryGetLimitOrderPoolTotalSharesMapRequest: object = { count: "" };
+const baseQueryGetLimitOrderPoolTotalSharesMapRequest: object = {
+  count: 0,
+  pairId: "",
+  tickIndex: 0,
+  token: "",
+};
 
 export const QueryGetLimitOrderPoolTotalSharesMapRequest = {
   encode(
     message: QueryGetLimitOrderPoolTotalSharesMapRequest,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.count !== "") {
-      writer.uint32(10).string(message.count);
+    if (message.count !== 0) {
+      writer.uint32(8).uint64(message.count);
+    }
+    if (message.pairId !== "") {
+      writer.uint32(18).string(message.pairId);
+    }
+    if (message.tickIndex !== 0) {
+      writer.uint32(24).int64(message.tickIndex);
+    }
+    if (message.token !== "") {
+      writer.uint32(34).string(message.token);
     }
     return writer;
   },
@@ -3527,7 +3664,16 @@ export const QueryGetLimitOrderPoolTotalSharesMapRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.count = reader.string();
+          message.count = longToNumber(reader.uint64() as Long);
+          break;
+        case 2:
+          message.pairId = reader.string();
+          break;
+        case 3:
+          message.tickIndex = longToNumber(reader.int64() as Long);
+          break;
+        case 4:
+          message.token = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -3542,9 +3688,24 @@ export const QueryGetLimitOrderPoolTotalSharesMapRequest = {
       ...baseQueryGetLimitOrderPoolTotalSharesMapRequest,
     } as QueryGetLimitOrderPoolTotalSharesMapRequest;
     if (object.count !== undefined && object.count !== null) {
-      message.count = String(object.count);
+      message.count = Number(object.count);
     } else {
-      message.count = "";
+      message.count = 0;
+    }
+    if (object.pairId !== undefined && object.pairId !== null) {
+      message.pairId = String(object.pairId);
+    } else {
+      message.pairId = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = Number(object.tickIndex);
+    } else {
+      message.tickIndex = 0;
+    }
+    if (object.token !== undefined && object.token !== null) {
+      message.token = String(object.token);
+    } else {
+      message.token = "";
     }
     return message;
   },
@@ -3552,6 +3713,9 @@ export const QueryGetLimitOrderPoolTotalSharesMapRequest = {
   toJSON(message: QueryGetLimitOrderPoolTotalSharesMapRequest): unknown {
     const obj: any = {};
     message.count !== undefined && (obj.count = message.count);
+    message.pairId !== undefined && (obj.pairId = message.pairId);
+    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
+    message.token !== undefined && (obj.token = message.token);
     return obj;
   },
 
@@ -3564,7 +3728,22 @@ export const QueryGetLimitOrderPoolTotalSharesMapRequest = {
     if (object.count !== undefined && object.count !== null) {
       message.count = object.count;
     } else {
-      message.count = "";
+      message.count = 0;
+    }
+    if (object.pairId !== undefined && object.pairId !== null) {
+      message.pairId = object.pairId;
+    } else {
+      message.pairId = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = object.tickIndex;
+    } else {
+      message.tickIndex = 0;
+    }
+    if (object.token !== undefined && object.token !== null) {
+      message.token = object.token;
+    } else {
+      message.token = "";
     }
     return message;
   },
@@ -3848,15 +4027,29 @@ export const QueryAllLimitOrderPoolTotalSharesMapResponse = {
   },
 };
 
-const baseQueryGetLimitOrderPoolReserveMapRequest: object = { count: "" };
+const baseQueryGetLimitOrderPoolReserveMapRequest: object = {
+  count: 0,
+  pairId: "",
+  tickIndex: 0,
+  token: "",
+};
 
 export const QueryGetLimitOrderPoolReserveMapRequest = {
   encode(
     message: QueryGetLimitOrderPoolReserveMapRequest,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.count !== "") {
-      writer.uint32(10).string(message.count);
+    if (message.count !== 0) {
+      writer.uint32(8).uint64(message.count);
+    }
+    if (message.pairId !== "") {
+      writer.uint32(18).string(message.pairId);
+    }
+    if (message.tickIndex !== 0) {
+      writer.uint32(24).int64(message.tickIndex);
+    }
+    if (message.token !== "") {
+      writer.uint32(34).string(message.token);
     }
     return writer;
   },
@@ -3874,7 +4067,16 @@ export const QueryGetLimitOrderPoolReserveMapRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.count = reader.string();
+          message.count = longToNumber(reader.uint64() as Long);
+          break;
+        case 2:
+          message.pairId = reader.string();
+          break;
+        case 3:
+          message.tickIndex = longToNumber(reader.int64() as Long);
+          break;
+        case 4:
+          message.token = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -3889,9 +4091,24 @@ export const QueryGetLimitOrderPoolReserveMapRequest = {
       ...baseQueryGetLimitOrderPoolReserveMapRequest,
     } as QueryGetLimitOrderPoolReserveMapRequest;
     if (object.count !== undefined && object.count !== null) {
-      message.count = String(object.count);
+      message.count = Number(object.count);
     } else {
-      message.count = "";
+      message.count = 0;
+    }
+    if (object.pairId !== undefined && object.pairId !== null) {
+      message.pairId = String(object.pairId);
+    } else {
+      message.pairId = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = Number(object.tickIndex);
+    } else {
+      message.tickIndex = 0;
+    }
+    if (object.token !== undefined && object.token !== null) {
+      message.token = String(object.token);
+    } else {
+      message.token = "";
     }
     return message;
   },
@@ -3899,6 +4116,9 @@ export const QueryGetLimitOrderPoolReserveMapRequest = {
   toJSON(message: QueryGetLimitOrderPoolReserveMapRequest): unknown {
     const obj: any = {};
     message.count !== undefined && (obj.count = message.count);
+    message.pairId !== undefined && (obj.pairId = message.pairId);
+    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
+    message.token !== undefined && (obj.token = message.token);
     return obj;
   },
 
@@ -3911,7 +4131,22 @@ export const QueryGetLimitOrderPoolReserveMapRequest = {
     if (object.count !== undefined && object.count !== null) {
       message.count = object.count;
     } else {
-      message.count = "";
+      message.count = 0;
+    }
+    if (object.pairId !== undefined && object.pairId !== null) {
+      message.pairId = object.pairId;
+    } else {
+      message.pairId = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = object.tickIndex;
+    } else {
+      message.tickIndex = 0;
+    }
+    if (object.token !== undefined && object.token !== null) {
+      message.token = object.token;
+    } else {
+      message.token = "";
     }
     return message;
   },
@@ -4190,15 +4425,29 @@ export const QueryAllLimitOrderPoolReserveMapResponse = {
   },
 };
 
-const baseQueryGetLimitOrderPoolFillMapRequest: object = { count: "" };
+const baseQueryGetLimitOrderPoolFillMapRequest: object = {
+  count: 0,
+  pairId: "",
+  tickIndex: 0,
+  token: "",
+};
 
 export const QueryGetLimitOrderPoolFillMapRequest = {
   encode(
     message: QueryGetLimitOrderPoolFillMapRequest,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.count !== "") {
-      writer.uint32(10).string(message.count);
+    if (message.count !== 0) {
+      writer.uint32(8).uint64(message.count);
+    }
+    if (message.pairId !== "") {
+      writer.uint32(18).string(message.pairId);
+    }
+    if (message.tickIndex !== 0) {
+      writer.uint32(24).int64(message.tickIndex);
+    }
+    if (message.token !== "") {
+      writer.uint32(34).string(message.token);
     }
     return writer;
   },
@@ -4216,7 +4465,16 @@ export const QueryGetLimitOrderPoolFillMapRequest = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.count = reader.string();
+          message.count = longToNumber(reader.uint64() as Long);
+          break;
+        case 2:
+          message.pairId = reader.string();
+          break;
+        case 3:
+          message.tickIndex = longToNumber(reader.int64() as Long);
+          break;
+        case 4:
+          message.token = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -4231,9 +4489,24 @@ export const QueryGetLimitOrderPoolFillMapRequest = {
       ...baseQueryGetLimitOrderPoolFillMapRequest,
     } as QueryGetLimitOrderPoolFillMapRequest;
     if (object.count !== undefined && object.count !== null) {
-      message.count = String(object.count);
+      message.count = Number(object.count);
     } else {
-      message.count = "";
+      message.count = 0;
+    }
+    if (object.pairId !== undefined && object.pairId !== null) {
+      message.pairId = String(object.pairId);
+    } else {
+      message.pairId = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = Number(object.tickIndex);
+    } else {
+      message.tickIndex = 0;
+    }
+    if (object.token !== undefined && object.token !== null) {
+      message.token = String(object.token);
+    } else {
+      message.token = "";
     }
     return message;
   },
@@ -4241,6 +4514,9 @@ export const QueryGetLimitOrderPoolFillMapRequest = {
   toJSON(message: QueryGetLimitOrderPoolFillMapRequest): unknown {
     const obj: any = {};
     message.count !== undefined && (obj.count = message.count);
+    message.pairId !== undefined && (obj.pairId = message.pairId);
+    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
+    message.token !== undefined && (obj.token = message.token);
     return obj;
   },
 
@@ -4253,7 +4529,22 @@ export const QueryGetLimitOrderPoolFillMapRequest = {
     if (object.count !== undefined && object.count !== null) {
       message.count = object.count;
     } else {
-      message.count = "";
+      message.count = 0;
+    }
+    if (object.pairId !== undefined && object.pairId !== null) {
+      message.pairId = object.pairId;
+    } else {
+      message.pairId = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = object.tickIndex;
+    } else {
+      message.tickIndex = 0;
+    }
+    if (object.token !== undefined && object.token !== null) {
+      message.token = object.token;
+    } else {
+      message.token = "";
     }
     return message;
   },

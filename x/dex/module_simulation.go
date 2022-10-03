@@ -36,6 +36,10 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgSwap int = 100
 
+	opWeightMsgPlaceLimitOrder = "op_weight_msg_place_limit_order"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgPlaceLimitOrder int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -101,6 +105,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgSwap,
 		dexsimulation.SimulateMsgSwap(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgPlaceLimitOrder int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgPlaceLimitOrder, &weightMsgPlaceLimitOrder, nil,
+		func(_ *rand.Rand) {
+			weightMsgPlaceLimitOrder = defaultWeightMsgPlaceLimitOrder
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgPlaceLimitOrder,
+		dexsimulation.SimulateMsgPlaceLimitOrder(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation
