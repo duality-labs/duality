@@ -67,7 +67,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	var amount_out sdk.Dec
 
 	if msg.TokenIn == token0 {
-		amount_out, err = k.Swap0to1(goCtx, msg, token0, token1, createrAddr, amountIn, minOut)
+		amount_out, err = k.Swap0to1(goCtx, token0, token1, createrAddr, amountIn, minOut)
 
 		if err != nil {
 			return nil, err
@@ -78,7 +78,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		))
 
 	} else {
-		amount_out, err = k.Swap1to0(goCtx, msg, token0, token1, createrAddr, amountIn, minOut)
+		amount_out, err = k.Swap1to0(goCtx, token0, token1, createrAddr, amountIn, minOut)
 
 		if err != nil {
 			return nil, err
@@ -110,4 +110,61 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	_ = ctx
 
 	return &types.MsgSwapResponse{}, nil
+}
+
+func (k msgServer) Route(goCtx context.Context, msg *types.MsgRoute) (*types.MsgRouteResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	token0, token1, createrAddr, amountIn, minOut, err := k.routeVerification(goCtx, *msg)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var amount_out sdk.Dec
+
+	if msg.TokenIn == token0 {
+		amount_out, err = k.Swap0to1(goCtx, token0, token1, createrAddr, amountIn, minOut)
+
+		if err != nil {
+			return nil, err
+		}
+
+		ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
+			token0, token1, msg.TokenIn, amountIn.String(), amount_out.String(), msg.MinOut,
+		))
+
+	} else {
+		amount_out, err = k.Swap1to0(goCtx, token0, token1, createrAddr, amountIn, minOut)
+
+		if err != nil {
+			return nil, err
+		}
+
+		ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
+			token0, token1, msg.TokenIn, amountIn.String(), amount_out.String(), msg.MinOut,
+		))
+
+	}
+
+	if amountIn.GT(sdk.ZeroDec()) {
+		coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountIn.BigInt()))
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
+			return &types.MsgRouteResponse{}, err
+		}
+	} else {
+		return &types.MsgRouteResponse{}, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
+	}
+
+	if amount_out.GT(sdk.ZeroDec()) {
+
+		coinOut := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(msg.Receiver), sdk.Coins{coinOut}); err != nil {
+			return &types.MsgRouteResponse{}, err
+		}
+	}
+
+	_ = ctx
+
+	return &types.MsgRouteResponse{}, nil
 }
