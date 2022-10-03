@@ -73,6 +73,23 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 			return nil, err
 		}
 
+		if amountIn.GT(sdk.ZeroDec()) {
+			coinIn := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amountIn.BigInt()))
+			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
+				return &types.MsgSwapResponse{}, err
+			}
+		} else {
+			return &types.MsgSwapResponse{}, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
+		}
+
+		if amount_out.GT(sdk.ZeroDec()) {
+
+			coinOut := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount_out.BigInt()))
+			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(msg.Receiver), sdk.Coins{coinOut}); err != nil {
+				return &types.MsgSwapResponse{}, err
+			}
+		}
+
 	} else {
 		amount_out, err = k.Swap1to0(goCtx, msg, token0, token1, createrAddr, amountIn, minOut)
 
@@ -80,23 +97,23 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 			return nil, err
 		}
 
-	}
-
-	if amountIn.GT(sdk.ZeroDec()) {
-		coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountIn.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
-			return &types.MsgSwapResponse{}, err
+		if amountIn.GT(sdk.ZeroDec()) {
+			coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountIn.BigInt()))
+			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
+				return &types.MsgSwapResponse{}, err
+			}
+		} else {
+			return &types.MsgSwapResponse{}, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
 		}
-	} else {
-		return &types.MsgSwapResponse{}, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
-	}
 
-	if amount_out.GT(sdk.ZeroDec()) {
+		if amount_out.GT(sdk.ZeroDec()) {
 
-		coinOut := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(msg.Receiver), sdk.Coins{coinOut}); err != nil {
-			return &types.MsgSwapResponse{}, err
+			coinOut := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
+			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(msg.Receiver), sdk.Coins{coinOut}); err != nil {
+				return &types.MsgSwapResponse{}, err
+			}
 		}
+
 	}
 
 	_ = ctx
