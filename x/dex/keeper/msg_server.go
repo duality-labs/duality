@@ -73,12 +73,20 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 			return nil, err
 		}
 
+		ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
+			token0, token1, msg.TokenIn, amountIn.String(), amount_out.String(), msg.MinOut,
+		))
+
 	} else {
 		amount_out, err = k.Swap1to0(goCtx, msg, token0, token1, createrAddr, amountIn, minOut)
 
 		if err != nil {
 			return nil, err
 		}
+
+		ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
+			token0, token1, msg.TokenIn, amountIn.String(), amount_out.String(), msg.MinOut,
+		))
 
 	}
 
