@@ -11,6 +11,7 @@ service Msg {
   rpc Withdrawl(MsgWithdrawl) returns (MsgWithdrawlResponse);
   rpc Swap(MsgSwap) returns (MsgSwapResponse);
   rpc PlaceLimitOrder(MsgPlaceLimitOrder) returns (MsgPlaceLimitOrderResponse);
+  rpc WithdrawlFilledLimitOrder(MsgWithdrawlFilledLimitOrder) returns (MsgWithdrawlFilledLimitOrderResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -98,6 +99,18 @@ message MsgPlaceLimitOrder {
 }
 
 message MsgPlaceLimitOrderResponse {
+}
+
+message MsgWithdrawlFilledLimitOrder {
+  string creator = 1;
+  string tokenA = 2;
+  string tokenB = 3;
+  string tickIndex = 4;
+  string keyToken = 5;
+  string key = 6;
+}
+
+message MsgWithdrawlFilledLimitOrderResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message

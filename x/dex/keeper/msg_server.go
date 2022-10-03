@@ -103,3 +103,16 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 	return &types.MsgSwapResponse{}, nil
 }
+
+func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLimitOrder) (*types.MsgPlaceLimitOrderResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	err := PlaceLimitOrderCore(goCtx, msg)
+
+	if err != nil {
+		return &types.MsgPlaceLimitOrderResponse{}, err
+	}
+	_ = ctx
+
+	return &types.MsgPlaceLimitOrderResponse{}, nil
+}

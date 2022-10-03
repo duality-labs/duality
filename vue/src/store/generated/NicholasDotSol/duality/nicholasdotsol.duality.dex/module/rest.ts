@@ -75,6 +75,8 @@ export type DexMsgPlaceLimitOrderResponse = object;
 
 export type DexMsgSwapResponse = object;
 
+export type DexMsgWithdrawlFilledLimitOrderResponse = object;
+
 export type DexMsgWithdrawlResponse = object;
 
 export interface DexPairMap {
