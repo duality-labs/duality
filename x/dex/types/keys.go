@@ -132,8 +132,9 @@ const (
 	WithdrawEventSharesRemoved = "SharesRemoved"
 )
 
+// Swap Event Attribtutes
 const (
-	SwapEventKey      = "NewWithdraw"
+	SwapEventKey      = "NewSwap"
 	SwapEventCreator  = "Creator"
 	SwapEventReceiver = "Receiver"
 	SwapEventToken0   = "Token0"
@@ -142,6 +143,18 @@ const (
 	SwapEventAmountIn = "AmountIn"
 	SwapEventMinOut   = "MinOut"
 	SwapEventAmoutOut = "AmountOut"
+)
+
+// Route Event Attribtutes
+const (
+	RouteEventKey      = "NewSwap"
+	RouteEventCreator  = "Creator"
+	RouteEventReceiver = "Receiver"
+	RouteEventTokenIn  = "TokenIn"
+	RouteEventTokenOut = "TokenOut"
+	RouteEventAmountIn = "AmountIn"
+	RouteEventMinOut   = "MinOut"
+	RouteEventAmoutOut = "AmountOut"
 )
 
 const (

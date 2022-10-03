@@ -69,7 +69,7 @@ func createSwapEvent(creator string, receiver string, token0 string, token1 stri
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, SwapEventKey),
-		sdk.NewAttribute(WithdrawEventCreator, creator),
+		sdk.NewAttribute(SwapEventCreator, creator),
 		sdk.NewAttribute(SwapEventReceiver, receiver),
 		sdk.NewAttribute(SwapEventToken0, token0),
 		sdk.NewAttribute(SwapEventToken1, token1),
@@ -89,6 +89,34 @@ func CreateSwapEvent(creator string, receiver string, token0 string, token1 stri
 		token0,
 		token1,
 		tokenIn,
+		amountIn,
+		amountOut,
+		minOut,
+	)
+}
+
+func createRouteEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, amountOut string, minOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+	attrs := []sdk.Attribute{
+		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
+		sdk.NewAttribute(sdk.AttributeKeyAction, SwapEventKey),
+		sdk.NewAttribute(RouteEventCreator, creator),
+		sdk.NewAttribute(RouteEventReceiver, receiver),
+		sdk.NewAttribute(RouteEventTokenIn, tokenIn),
+		sdk.NewAttribute(RouteEventTokenOut, tokenOut),
+		sdk.NewAttribute(RouteEventAmountIn, amountIn),
+		sdk.NewAttribute(RouteEventAmoutOut, amountOut),
+		sdk.NewAttribute(RouteEventMinOut, minOut),
+	}
+	attrs = append(attrs, otherAttrs...)
+	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
+}
+
+func CreateRouteEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, amountOut string, minOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+	return createRouteEvent(
+		creator,
+		receiver,
+		tokenIn,
+		tokenOut,
 		amountIn,
 		amountOut,
 		minOut,

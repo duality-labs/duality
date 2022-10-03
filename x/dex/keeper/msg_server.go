@@ -134,8 +134,8 @@ func (k msgServer) Route(goCtx context.Context, msg *types.MsgRoute) (*types.Msg
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.TokenIn, amountIn.String(), amount_out.String(), msg.MinOut,
+	ctx.EventManager().EmitEvent(types.CreateRouteEvent(msg.Creator, msg.Receiver,
+		msg.TokenIn, msg.TokenOut, amountIn.String(), amount_out.String(), msg.MinOut,
 	))
 
 	if amountIn.GT(sdk.ZeroDec()) {
@@ -149,7 +149,7 @@ func (k msgServer) Route(goCtx context.Context, msg *types.MsgRoute) (*types.Msg
 
 	if amount_out.GT(sdk.ZeroDec()) {
 
-		coinOut := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
+		coinOut := sdk.NewCoin(msg.TokenOut, sdk.NewIntFromBigInt(amount_out.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(msg.Receiver), sdk.Coins{coinOut}); err != nil {
 			return &types.MsgRouteResponse{}, err
 		}
