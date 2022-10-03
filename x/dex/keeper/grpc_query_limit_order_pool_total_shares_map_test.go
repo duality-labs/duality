@@ -21,7 +21,7 @@ var _ = strconv.IntSize
 func TestLimitOrderPoolTotalSharesMapQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolTotalSharesMap(keeper, ctx, 2)
+	msgs := createNLimitOrderPoolTotalSharesMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetLimitOrderPoolTotalSharesMapRequest
@@ -31,21 +31,30 @@ func TestLimitOrderPoolTotalSharesMapQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetLimitOrderPoolTotalSharesMapRequest{
-				Count: msgs[0].Count,
+				PairId:    "TokenA/TokenB",
+				TickIndex: 0,
+				Token:     "TokenA",
+				Count:     msgs[0].Count,
 			},
 			response: &types.QueryGetLimitOrderPoolTotalSharesMapResponse{LimitOrderPoolTotalSharesMap: msgs[0]},
 		},
 		{
 			desc: "Second",
 			request: &types.QueryGetLimitOrderPoolTotalSharesMapRequest{
-				Count: msgs[1].Count,
+				PairId:    "TokenA/TokenB",
+				TickIndex: 0,
+				Token:     "TokenA",
+				Count:     msgs[1].Count,
 			},
 			response: &types.QueryGetLimitOrderPoolTotalSharesMapResponse{LimitOrderPoolTotalSharesMap: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetLimitOrderPoolTotalSharesMapRequest{
-				Count: strconv.Itoa(100000),
+				PairId:    "TokenA/TokenB",
+				TickIndex: 0,
+				Token:     "TokenA",
+				Count:     100000,
 			},
 			err: status.Error(codes.NotFound, "not found"),
 		},
@@ -72,7 +81,7 @@ func TestLimitOrderPoolTotalSharesMapQuerySingle(t *testing.T) {
 func TestLimitOrderPoolTotalSharesMapQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolTotalSharesMap(keeper, ctx, 5)
+	msgs := createNLimitOrderPoolTotalSharesMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 5)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderPoolTotalSharesMapRequest {
 		return &types.QueryAllLimitOrderPoolTotalSharesMapRequest{

@@ -855,6 +855,10 @@ func local_request_Query_AdjanceyMatrixAll_0(ctx context.Context, marshaler runt
 
 }
 
+var (
+	filter_Query_LimitOrderPoolUserShareMap_0 = &utilities.DoubleArray{Encoding: map[string]int{"count": 0, "address": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+)
+
 func request_Query_LimitOrderPoolUserShareMap_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryGetLimitOrderPoolUserShareMapRequest
 	var metadata runtime.ServerMetadata
@@ -886,6 +890,13 @@ func request_Query_LimitOrderPoolUserShareMap_0(ctx context.Context, marshaler r
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolUserShareMap_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.LimitOrderPoolUserShareMap(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -924,6 +935,13 @@ func local_request_Query_LimitOrderPoolUserShareMap_0(ctx context.Context, marsh
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolUserShareMap_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.LimitOrderPoolUserShareMap(ctx, &protoReq)
@@ -967,6 +985,10 @@ func local_request_Query_LimitOrderPoolUserShareMapAll_0(ctx context.Context, ma
 
 }
 
+var (
+	filter_Query_LimitOrderPoolUserSharesFilled_0 = &utilities.DoubleArray{Encoding: map[string]int{"count": 0, "address": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+)
+
 func request_Query_LimitOrderPoolUserSharesFilled_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryGetLimitOrderPoolUserSharesFilledRequest
 	var metadata runtime.ServerMetadata
@@ -998,6 +1020,13 @@ func request_Query_LimitOrderPoolUserSharesFilled_0(ctx context.Context, marshal
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolUserSharesFilled_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.LimitOrderPoolUserSharesFilled(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1036,6 +1065,13 @@ func local_request_Query_LimitOrderPoolUserSharesFilled_0(ctx context.Context, m
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolUserSharesFilled_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.LimitOrderPoolUserSharesFilled(ctx, &protoReq)
@@ -1079,6 +1115,10 @@ func local_request_Query_LimitOrderPoolUserSharesFilledAll_0(ctx context.Context
 
 }
 
+var (
+	filter_Query_LimitOrderPoolTotalSharesMap_0 = &utilities.DoubleArray{Encoding: map[string]int{"count": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+)
+
 func request_Query_LimitOrderPoolTotalSharesMap_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryGetLimitOrderPoolTotalSharesMapRequest
 	var metadata runtime.ServerMetadata
@@ -1099,6 +1139,13 @@ func request_Query_LimitOrderPoolTotalSharesMap_0(ctx context.Context, marshaler
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "count", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolTotalSharesMap_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.LimitOrderPoolTotalSharesMap(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1126,6 +1173,13 @@ func local_request_Query_LimitOrderPoolTotalSharesMap_0(ctx context.Context, mar
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "count", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolTotalSharesMap_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.LimitOrderPoolTotalSharesMap(ctx, &protoReq)
@@ -1169,6 +1223,10 @@ func local_request_Query_LimitOrderPoolTotalSharesMapAll_0(ctx context.Context, 
 
 }
 
+var (
+	filter_Query_LimitOrderPoolReserveMap_0 = &utilities.DoubleArray{Encoding: map[string]int{"count": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+)
+
 func request_Query_LimitOrderPoolReserveMap_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryGetLimitOrderPoolReserveMapRequest
 	var metadata runtime.ServerMetadata
@@ -1189,6 +1247,13 @@ func request_Query_LimitOrderPoolReserveMap_0(ctx context.Context, marshaler run
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "count", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolReserveMap_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.LimitOrderPoolReserveMap(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1216,6 +1281,13 @@ func local_request_Query_LimitOrderPoolReserveMap_0(ctx context.Context, marshal
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "count", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolReserveMap_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.LimitOrderPoolReserveMap(ctx, &protoReq)
@@ -1259,6 +1331,10 @@ func local_request_Query_LimitOrderPoolReserveMapAll_0(ctx context.Context, mars
 
 }
 
+var (
+	filter_Query_LimitOrderPoolFillMap_0 = &utilities.DoubleArray{Encoding: map[string]int{"count": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+)
+
 func request_Query_LimitOrderPoolFillMap_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryGetLimitOrderPoolFillMapRequest
 	var metadata runtime.ServerMetadata
@@ -1279,6 +1355,13 @@ func request_Query_LimitOrderPoolFillMap_0(ctx context.Context, marshaler runtim
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "count", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolFillMap_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.LimitOrderPoolFillMap(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1306,6 +1389,13 @@ func local_request_Query_LimitOrderPoolFillMap_0(ctx context.Context, marshaler 
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "count", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolFillMap_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.LimitOrderPoolFillMap(ctx, &protoReq)

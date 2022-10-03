@@ -21,7 +21,7 @@ var _ = strconv.IntSize
 func TestLimitOrderPoolReserveMapQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolReserveMap(keeper, ctx, 2)
+	msgs := createNLimitOrderPoolReserveMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetLimitOrderPoolReserveMapRequest
@@ -31,21 +31,30 @@ func TestLimitOrderPoolReserveMapQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetLimitOrderPoolReserveMapRequest{
-				Count: msgs[0].Count,
+				PairId:    "TokenA/TokenB",
+				TickIndex: 0,
+				Token:     "TokenA",
+				Count:     msgs[0].Count,
 			},
 			response: &types.QueryGetLimitOrderPoolReserveMapResponse{LimitOrderPoolReserveMap: msgs[0]},
 		},
 		{
 			desc: "Second",
 			request: &types.QueryGetLimitOrderPoolReserveMapRequest{
-				Count: msgs[1].Count,
+				PairId:    "TokenA/TokenB",
+				TickIndex: 0,
+				Token:     "TokenA",
+				Count:     msgs[1].Count,
 			},
 			response: &types.QueryGetLimitOrderPoolReserveMapResponse{LimitOrderPoolReserveMap: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetLimitOrderPoolReserveMapRequest{
-				Count: strconv.Itoa(100000),
+				PairId:    "TokenA/TokenB",
+				TickIndex: 0,
+				Token:     "TokenA",
+				Count:     100000,
 			},
 			err: status.Error(codes.NotFound, "not found"),
 		},
@@ -72,7 +81,7 @@ func TestLimitOrderPoolReserveMapQuerySingle(t *testing.T) {
 func TestLimitOrderPoolReserveMapQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolReserveMap(keeper, ctx, 5)
+	msgs := createNLimitOrderPoolReserveMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 5)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderPoolReserveMapRequest {
 		return &types.QueryAllLimitOrderPoolReserveMapRequest{

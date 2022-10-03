@@ -56,3 +56,19 @@ func (k Keeper) RemoveLimitOrderPoolUserShareMap(
 		address,
 	))
 }
+
+// GetAllLimitOrderPoolUserShareMap returns all limitOrderPoolUserShareMap
+func (k Keeper) GetAllLimitOrderPoolUserShareMap(ctx sdk.Context) (list []types.LimitOrderPoolUserShareMap) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderPoolUserShareMapKeyPrefix))
+	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var val types.LimitOrderPoolUserShareMap
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
+		list = append(list, val)
+	}
+
+	return
+}

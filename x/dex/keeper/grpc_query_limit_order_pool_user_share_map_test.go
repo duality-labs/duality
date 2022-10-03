@@ -21,7 +21,7 @@ var _ = strconv.IntSize
 func TestLimitOrderPoolUserShareMapQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolUserShareMap(keeper, ctx, 2)
+	msgs := createNLimitOrderPoolUserShareMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetLimitOrderPoolUserShareMapRequest
@@ -31,24 +31,33 @@ func TestLimitOrderPoolUserShareMapQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetLimitOrderPoolUserShareMapRequest{
-				Count:   msgs[0].Count,
-				Address: msgs[0].Address,
+				PairId:    "TokenA/TokenB",
+				TickIndex: 0,
+				Token:     "TokenA",
+				Count:     msgs[0].Count,
+				Address:   msgs[0].Address,
 			},
 			response: &types.QueryGetLimitOrderPoolUserShareMapResponse{LimitOrderPoolUserShareMap: msgs[0]},
 		},
 		{
 			desc: "Second",
 			request: &types.QueryGetLimitOrderPoolUserShareMapRequest{
-				Count:   msgs[1].Count,
-				Address: msgs[1].Address,
+				PairId:    "TokenA/TokenB",
+				TickIndex: 0,
+				Token:     "TokenA",
+				Count:     msgs[1].Count,
+				Address:   msgs[1].Address,
 			},
 			response: &types.QueryGetLimitOrderPoolUserShareMapResponse{LimitOrderPoolUserShareMap: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetLimitOrderPoolUserShareMapRequest{
-				Count:   strconv.Itoa(100000),
-				Address: strconv.Itoa(100000),
+				PairId:    "TokenA/TokenB",
+				TickIndex: 0,
+				Token:     "TokenA",
+				Count:     100000,
+				Address:   strconv.Itoa(100000),
 			},
 			err: status.Error(codes.NotFound, "not found"),
 		},
@@ -75,7 +84,7 @@ func TestLimitOrderPoolUserShareMapQuerySingle(t *testing.T) {
 func TestLimitOrderPoolUserShareMapQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolUserShareMap(keeper, ctx, 5)
+	msgs := createNLimitOrderPoolUserShareMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 5)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderPoolUserShareMapRequest {
 		return &types.QueryAllLimitOrderPoolUserShareMapRequest{

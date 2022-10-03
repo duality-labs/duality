@@ -318,6 +318,9 @@ message QueryAllAdjanceyMatrixResponse {
 message QueryGetLimitOrderPoolUserShareMapRequest {
 	uint64 count = 1;
   string address = 2;
+  string pairId = 3;
+  int64 tickIndex =4;
+  string token = 5;
 
 }
 
@@ -337,7 +340,9 @@ message QueryAllLimitOrderPoolUserShareMapResponse {
 message QueryGetLimitOrderPoolUserSharesFilledRequest {
 	uint64 count = 1;
   string address = 2;
-
+ string pairId = 3;
+  int64 tickIndex =4;
+  string token = 5;
 }
 
 message QueryGetLimitOrderPoolUserSharesFilledResponse {
@@ -355,6 +360,9 @@ message QueryAllLimitOrderPoolUserSharesFilledResponse {
 
 message QueryGetLimitOrderPoolTotalSharesMapRequest {
 	  uint64 count = 1;
+	   string pairId = 2;
+  int64 tickIndex =3;
+  string token = 4;
 
 }
 
@@ -373,6 +381,9 @@ message QueryAllLimitOrderPoolTotalSharesMapResponse {
 
 message QueryGetLimitOrderPoolReserveMapRequest {
 	  uint64 count = 1;
+	  string pairId = 2;
+  int64 tickIndex =3;
+  string token = 4;
 
 }
 
@@ -391,6 +402,9 @@ message QueryAllLimitOrderPoolReserveMapResponse {
 
 message QueryGetLimitOrderPoolFillMapRequest {
 	uint64 count = 1;
+	string pairId = 2;
+  int64 tickIndex =3;
+  string token = 4;
 
 }
 

@@ -29,7 +29,7 @@ func networkWithLimitOrderPoolUserSharesFilledObjects(t *testing.T, n int) (*net
 
 	for i := 0; i < n; i++ {
 		limitOrderPoolUserSharesFilled := types.LimitOrderPoolUserSharesFilled{
-			Count:   strconv.Itoa(i),
+			Count:   uint64(i),
 			Address: strconv.Itoa(i),
 		}
 		nullify.Fill(&limitOrderPoolUserSharesFilled)
@@ -50,7 +50,7 @@ func TestShowLimitOrderPoolUserSharesFilled(t *testing.T) {
 	}
 	for _, tc := range []struct {
 		desc      string
-		idCount   string
+		idCount   uint64
 		idAddress string
 
 		args []string
@@ -67,7 +67,7 @@ func TestShowLimitOrderPoolUserSharesFilled(t *testing.T) {
 		},
 		{
 			desc:      "not found",
-			idCount:   strconv.Itoa(100000),
+			idCount:   100000,
 			idAddress: strconv.Itoa(100000),
 
 			args: common,
@@ -76,7 +76,7 @@ func TestShowLimitOrderPoolUserSharesFilled(t *testing.T) {
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
 			args := []string{
-				tc.idCount,
+				strconv.Itoa(int(tc.idCount)),
 				tc.idAddress,
 			}
 			args = append(args, tc.args...)

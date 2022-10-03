@@ -47,6 +47,9 @@ func (k Keeper) LimitOrderPoolUserSharesFilled(c context.Context, req *types.Que
 
 	val, found := k.GetLimitOrderPoolUserSharesFilled(
 		ctx,
+		req.PairId,
+		req.TickIndex,
+		req.Token,
 		req.Count,
 		req.Address,
 	)

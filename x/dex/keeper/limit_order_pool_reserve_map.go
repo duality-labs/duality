@@ -51,3 +51,19 @@ func (k Keeper) RemoveLimitOrderPoolReserveMap(
 		count,
 	))
 }
+
+// GetAllLimitOrderPoolReserveMap returns all limitOrderPoolReserveMap
+func (k Keeper) GetAllLimitOrderPoolReserveMap(ctx sdk.Context) (list []types.LimitOrderPoolReserveMap) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderPoolReserveMapKeyPrefix))
+	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var val types.LimitOrderPoolReserveMap
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
+		list = append(list, val)
+	}
+
+	return
+}

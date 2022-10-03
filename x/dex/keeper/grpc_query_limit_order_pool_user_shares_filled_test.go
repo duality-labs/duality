@@ -21,7 +21,7 @@ var _ = strconv.IntSize
 func TestLimitOrderPoolUserSharesFilledQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolUserSharesFilled(keeper, ctx, 2)
+	msgs := createNLimitOrderPoolUserSharesFilled(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetLimitOrderPoolUserSharesFilledRequest
@@ -31,24 +31,33 @@ func TestLimitOrderPoolUserSharesFilledQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetLimitOrderPoolUserSharesFilledRequest{
-				Count:   msgs[0].Count,
-				Address: msgs[0].Address,
+				PairId:    "TokenA/TokenB",
+				TickIndex: 0,
+				Token:     "TokenA",
+				Count:     msgs[0].Count,
+				Address:   msgs[0].Address,
 			},
 			response: &types.QueryGetLimitOrderPoolUserSharesFilledResponse{LimitOrderPoolUserSharesFilled: msgs[0]},
 		},
 		{
 			desc: "Second",
 			request: &types.QueryGetLimitOrderPoolUserSharesFilledRequest{
-				Count:   msgs[1].Count,
-				Address: msgs[1].Address,
+				PairId:    "TokenA/TokenB",
+				TickIndex: 0,
+				Token:     "TokenA",
+				Count:     msgs[1].Count,
+				Address:   msgs[1].Address,
 			},
 			response: &types.QueryGetLimitOrderPoolUserSharesFilledResponse{LimitOrderPoolUserSharesFilled: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetLimitOrderPoolUserSharesFilledRequest{
-				Count:   strconv.Itoa(100000),
-				Address: strconv.Itoa(100000),
+				PairId:    "TokenA/TokenB",
+				TickIndex: 0,
+				Token:     "TokenA",
+				Count:     100000,
+				Address:   strconv.Itoa(100000),
 			},
 			err: status.Error(codes.NotFound, "not found"),
 		},
@@ -75,7 +84,7 @@ func TestLimitOrderPoolUserSharesFilledQuerySingle(t *testing.T) {
 func TestLimitOrderPoolUserSharesFilledQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolUserSharesFilled(keeper, ctx, 5)
+	msgs := createNLimitOrderPoolUserSharesFilled(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 5)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderPoolUserSharesFilledRequest {
 		return &types.QueryAllLimitOrderPoolUserSharesFilledRequest{

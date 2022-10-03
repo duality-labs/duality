@@ -56,3 +56,19 @@ func (k Keeper) RemoveLimitOrderPoolUserSharesFilled(
 		address,
 	))
 }
+
+// GetAllLimitOrderPoolUserSharesFilled returns all limitOrderPoolUserSharesFilled
+func (k Keeper) GetAllLimitOrderPoolUserSharesFilled(ctx sdk.Context) (list []types.LimitOrderPoolUserSharesFilled) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderPoolUserSharesFilledKeyPrefix))
+	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var val types.LimitOrderPoolUserSharesFilled
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
+		list = append(list, val)
+	}
+
+	return
+}

@@ -47,6 +47,9 @@ func (k Keeper) LimitOrderPoolReserveMap(c context.Context, req *types.QueryGetL
 
 	val, found := k.GetLimitOrderPoolReserveMap(
 		ctx,
+		req.PairId,
+		req.TickIndex,
+		req.Token,
 		req.Count,
 	)
 	if !found {

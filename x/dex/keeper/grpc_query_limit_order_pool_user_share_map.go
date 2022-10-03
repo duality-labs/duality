@@ -47,6 +47,9 @@ func (k Keeper) LimitOrderPoolUserShareMap(c context.Context, req *types.QueryGe
 
 	val, found := k.GetLimitOrderPoolUserShareMap(
 		ctx,
+		req.PairId,
+		req.TickIndex,
+		req.Token,
 		req.Count,
 		req.Address,
 	)

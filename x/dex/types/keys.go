@@ -22,7 +22,9 @@ const (
 )
 
 func KeyPrefix(p string) []byte {
-	return []byte(p)
+	key := []byte(p)
+	key = append(key, []byte("/")...)
+	return key
 }
 
 const (
@@ -30,16 +32,16 @@ const (
 	TokensCountKey = "Tokens-count-"
 
 	// TokenMapKeyPrefix is the prefix to retrieve all TokenMap
-	TokenMapKeyPrefix = "TokenMap/value/"
+	TokenMapKeyPrefix = "TokenMap/value"
 
 	// TickMapKeyPrefix is the prefix to retrieve all TickMap
-	BaseTickMapKeyPrefix = "TickMap/value/"
+	BaseTickMapKeyPrefix = "TickMap/value"
 
 	// PairMapKeyPrefix is the prefix to retrieve all PairMap
-	PairMapKeyPrefix = "PairMap/value/"
+	PairMapKeyPrefix = "PairMap/value"
 
 	// SharesKeyPrefix is the prefix to retrieve all Shares
-	SharesKeyPrefix = "Shares/value/"
+	SharesKeyPrefix = "Shares/value"
 )
 
 func TickPrefix(pairId string) []byte {
@@ -102,47 +104,42 @@ func SharesKey(address string, pairId string, tickIndex int64, feeIndex uint64) 
 
 // Limit Order Pool Mappings and Keys
 const (
-	BaseLimitOrderPrefix = "LimitOrderPool/value/"
+	BaseLimitOrderPrefix = "LimitOrderPool/value"
 
 	// LimitOrderPoolUserSharesFilledKeyPrefix is the prefix to retrieve all LimitOrderPoolUserSharesFilled
-	LimitOrderPoolUserSharesFilledKeyPrefix = "LimitOrderPoolUserSharesFilled/value/"
+	LimitOrderPoolUserSharesFilledKeyPrefix = "LimitOrderPoolUserSharesFilled/value"
 
 	// LimitOrderPoolUserShareMapKeyPrefix is the prefix to retrieve all LimitOrderPoolUserShareMap
-	LimitOrderPoolUserShareMapKeyPrefix = "LimitOrderPoolUserShareMap/value/"
+	LimitOrderPoolUserShareMapKeyPrefix = "LimitOrderPoolUserShareMap/value"
 
 	// LimitOrderPoolTotalSharesMapKeyPrefix is the prefix to retrieve all LimitOrderPoolTotalSharesMap
-	LimitOrderPoolTotalSharesMapKeyPrefix = "LimitOrderPoolTotalSharesMap/value/"
+	LimitOrderPoolTotalSharesMapKeyPrefix = "LimitOrderPoolTotalSharesMap/value"
 
 	// LimitOrderPoolReserveMapKeyPrefix is the prefix to retrieve all LimitOrderPoolReserveMap
-	LimitOrderPoolReserveMapKeyPrefix = "LimitOrderPoolReserveMap/value/"
+	LimitOrderPoolReserveMapKeyPrefix = "LimitOrderPoolReserveMap/value"
 
 	// LimitOrderPoolFillMapKeyPrefix is the prefix to retrieve all LimitOrderPoolFillMap
-	LimitOrderPoolFillMapKeyPrefix = "LimitOrderPoolFillMap/value/"
+	LimitOrderPoolFillMapKeyPrefix = "LimitOrderPoolFillMap/value"
 )
 
-func LimitOrderPrefix(pairId string, tickIndex int64, token string) []byte {
-
-	return append(append(append(KeyPrefix(BaseLimitOrderPrefix), KeyPrefix(pairId)...), KeyPrefix(strconv.Itoa(int(tickIndex)))...), KeyPrefix(token)...)
-}
-
 func LimitOrderUserSharesMapPrefix(pairId string, tickIndex int64, token string) []byte {
-	return append(LimitOrderPrefix(pairId, tickIndex, token), KeyPrefix(LimitOrderPoolUserShareMapKeyPrefix)...)
+	return append(append(append(KeyPrefix(LimitOrderPoolUserShareMapKeyPrefix), KeyPrefix(pairId)...), KeyPrefix(strconv.Itoa(int(tickIndex)))...), KeyPrefix(token)...)
 }
 
 func LimitOrderUserSharesFilledPrefix(pairId string, tickIndex int64, token string) []byte {
-	return append(LimitOrderPrefix(pairId, tickIndex, token), KeyPrefix(LimitOrderPoolUserSharesFilledKeyPrefix)...)
+	return append(append(append(KeyPrefix(LimitOrderPoolUserSharesFilledKeyPrefix), KeyPrefix(pairId)...), KeyPrefix(strconv.Itoa(int(tickIndex)))...), KeyPrefix(token)...)
 }
 
 func LimitOrderTotalSharesMapPrefix(pairId string, tickIndex int64, token string) []byte {
-	return append(LimitOrderPrefix(pairId, tickIndex, token), KeyPrefix(LimitOrderPoolTotalSharesMapKeyPrefix)...)
+	return append(append(append(KeyPrefix(LimitOrderPoolTotalSharesMapKeyPrefix), KeyPrefix(pairId)...), KeyPrefix(strconv.Itoa(int(tickIndex)))...), KeyPrefix(token)...)
 }
 
 func LimitOrderReseveMapPrefix(pairId string, tickIndex int64, token string) []byte {
-	return append(LimitOrderPrefix(pairId, tickIndex, token), KeyPrefix(LimitOrderPoolReserveMapKeyPrefix)...)
+	return append(append(append(KeyPrefix(LimitOrderPoolReserveMapKeyPrefix), KeyPrefix(pairId)...), KeyPrefix(strconv.Itoa(int(tickIndex)))...), KeyPrefix(token)...)
 }
 
 func LimitOrderFillMapPrefix(pairId string, tickIndex int64, token string) []byte {
-	return append(LimitOrderPrefix(pairId, tickIndex, token), KeyPrefix(LimitOrderPoolFillMapKeyPrefix)...)
+	return append(append(append(KeyPrefix(LimitOrderPoolFillMapKeyPrefix), KeyPrefix(pairId)...), KeyPrefix(strconv.Itoa(int(tickIndex)))...), KeyPrefix(token)...)
 }
 
 // LimitOrderPoolUserSharesFilledKey returns the store key to retrieve a LimitOrderPoolUserSharesFilled from the index fields
