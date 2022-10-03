@@ -59,7 +59,12 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	token0, token1, createrAddr, amountIn, minOut, err := k.swapVerification(goCtx, *msg)
-
+	tokenOut := ""
+	if token0 == msg.TokenIn {
+		tokenOut = token1
+	} else {
+		tokenOut = token0
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +96,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	}
 
 	if amountIn.GT(sdk.ZeroDec()) {
-		coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountIn.BigInt()))
+		coinIn := sdk.NewCoin(msg.TokenIn, sdk.NewIntFromBigInt(amountIn.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
 			return &types.MsgSwapResponse{}, err
 		}
@@ -101,7 +106,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 	if amount_out.GT(sdk.ZeroDec()) {
 
-		coinOut := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
+		coinOut := sdk.NewCoin(tokenOut, sdk.NewIntFromBigInt(amount_out.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(msg.Receiver), sdk.Coins{coinOut}); err != nil {
 			return &types.MsgSwapResponse{}, err
 		}
@@ -115,7 +120,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 func (k msgServer) Route(goCtx context.Context, msg *types.MsgRoute) (*types.MsgRouteResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, createrAddr, amountIn, minOut, err := k.routeVerification(goCtx, *msg)
+	createrAddr, amountIn, minOut, err := k.routeVerification(goCtx, *msg)
 
 	if err != nil {
 		return nil, err
@@ -123,32 +128,18 @@ func (k msgServer) Route(goCtx context.Context, msg *types.MsgRoute) (*types.Msg
 
 	var amount_out sdk.Dec
 
-	if msg.TokenIn == token0 {
-		amount_out, err = k.Swap0to1(goCtx, token0, token1, createrAddr, amountIn, minOut)
+	amount_out, err = k.SwapDynamicRouter(goCtx, createrAddr, msg.TokenIn, msg.TokenOut, amountIn, minOut)
 
-		if err != nil {
-			return nil, err
-		}
-
-		ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
-			token0, token1, msg.TokenIn, amountIn.String(), amount_out.String(), msg.MinOut,
-		))
-
-	} else {
-		amount_out, err = k.Swap1to0(goCtx, token0, token1, createrAddr, amountIn, minOut)
-
-		if err != nil {
-			return nil, err
-		}
-
-		ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
-			token0, token1, msg.TokenIn, amountIn.String(), amount_out.String(), msg.MinOut,
-		))
-
+	if err != nil {
+		return nil, err
 	}
 
+	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
+		token0, token1, msg.TokenIn, amountIn.String(), amount_out.String(), msg.MinOut,
+	))
+
 	if amountIn.GT(sdk.ZeroDec()) {
-		coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountIn.BigInt()))
+		coinIn := sdk.NewCoin(msg.TokenIn, sdk.NewIntFromBigInt(amountIn.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
 			return &types.MsgRouteResponse{}, err
 		}

@@ -41,6 +41,17 @@ export interface MsgSwap {
 
 export interface MsgSwapResponse {}
 
+export interface MsgRoute {
+  creator: string;
+  receiver: string;
+  tokenIn: string;
+  tokenOut: string;
+  amountIn: string;
+  minOut: string;
+}
+
+export interface MsgRouteResponse {}
+
 const baseMsgDeposit: object = {
   creator: "",
   receiver: "",
@@ -753,12 +764,198 @@ export const MsgSwapResponse = {
   },
 };
 
+const baseMsgRoute: object = {
+  creator: "",
+  receiver: "",
+  tokenIn: "",
+  tokenOut: "",
+  amountIn: "",
+  minOut: "",
+};
+
+export const MsgRoute = {
+  encode(message: MsgRoute, writer: Writer = Writer.create()): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.receiver !== "") {
+      writer.uint32(18).string(message.receiver);
+    }
+    if (message.tokenIn !== "") {
+      writer.uint32(26).string(message.tokenIn);
+    }
+    if (message.tokenOut !== "") {
+      writer.uint32(34).string(message.tokenOut);
+    }
+    if (message.amountIn !== "") {
+      writer.uint32(42).string(message.amountIn);
+    }
+    if (message.minOut !== "") {
+      writer.uint32(50).string(message.minOut);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgRoute {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgRoute } as MsgRoute;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.receiver = reader.string();
+          break;
+        case 3:
+          message.tokenIn = reader.string();
+          break;
+        case 4:
+          message.tokenOut = reader.string();
+          break;
+        case 5:
+          message.amountIn = reader.string();
+          break;
+        case 6:
+          message.minOut = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRoute {
+    const message = { ...baseMsgRoute } as MsgRoute;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = String(object.receiver);
+    } else {
+      message.receiver = "";
+    }
+    if (object.tokenIn !== undefined && object.tokenIn !== null) {
+      message.tokenIn = String(object.tokenIn);
+    } else {
+      message.tokenIn = "";
+    }
+    if (object.tokenOut !== undefined && object.tokenOut !== null) {
+      message.tokenOut = String(object.tokenOut);
+    } else {
+      message.tokenOut = "";
+    }
+    if (object.amountIn !== undefined && object.amountIn !== null) {
+      message.amountIn = String(object.amountIn);
+    } else {
+      message.amountIn = "";
+    }
+    if (object.minOut !== undefined && object.minOut !== null) {
+      message.minOut = String(object.minOut);
+    } else {
+      message.minOut = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgRoute): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.receiver !== undefined && (obj.receiver = message.receiver);
+    message.tokenIn !== undefined && (obj.tokenIn = message.tokenIn);
+    message.tokenOut !== undefined && (obj.tokenOut = message.tokenOut);
+    message.amountIn !== undefined && (obj.amountIn = message.amountIn);
+    message.minOut !== undefined && (obj.minOut = message.minOut);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgRoute>): MsgRoute {
+    const message = { ...baseMsgRoute } as MsgRoute;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = object.receiver;
+    } else {
+      message.receiver = "";
+    }
+    if (object.tokenIn !== undefined && object.tokenIn !== null) {
+      message.tokenIn = object.tokenIn;
+    } else {
+      message.tokenIn = "";
+    }
+    if (object.tokenOut !== undefined && object.tokenOut !== null) {
+      message.tokenOut = object.tokenOut;
+    } else {
+      message.tokenOut = "";
+    }
+    if (object.amountIn !== undefined && object.amountIn !== null) {
+      message.amountIn = object.amountIn;
+    } else {
+      message.amountIn = "";
+    }
+    if (object.minOut !== undefined && object.minOut !== null) {
+      message.minOut = object.minOut;
+    } else {
+      message.minOut = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgRouteResponse: object = {};
+
+export const MsgRouteResponse = {
+  encode(_: MsgRouteResponse, writer: Writer = Writer.create()): Writer {
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgRouteResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgRouteResponse } as MsgRouteResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgRouteResponse {
+    const message = { ...baseMsgRouteResponse } as MsgRouteResponse;
+    return message;
+  },
+
+  toJSON(_: MsgRouteResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(_: DeepPartial<MsgRouteResponse>): MsgRouteResponse {
+    const message = { ...baseMsgRouteResponse } as MsgRouteResponse;
+    return message;
+  },
+};
+
 /** Msg defines the Msg service. */
 export interface Msg {
   Deposit(request: MsgDeposit): Promise<MsgDepositResponse>;
   Withdrawl(request: MsgWithdrawl): Promise<MsgWithdrawlResponse>;
   Swap(request: MsgSwap): Promise<MsgSwapResponse>;
   /** this line is used by starport scaffolding # proto/tx/rpc */
+  Route(request: MsgRoute): Promise<MsgRouteResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -798,6 +995,15 @@ export class MsgClientImpl implements Msg {
     return promise.then((data) => MsgSwapResponse.decode(new Reader(data)));
   }
 
+  Route(request: MsgRoute): Promise<MsgRouteResponse> {
+    const data = MsgRoute.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Msg",
+      "Route",
+      data
+    );
+    return promise.then((data) => MsgRouteResponse.decode(new Reader(data)));
+  }
 }
 
 interface Rpc {
