@@ -13,6 +13,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgSwap{}, "dex/Swap", nil)
 	cdc.RegisterConcrete(&MsgPlaceLimitOrder{}, "dex/PlaceLimitOrder", nil)
 	cdc.RegisterConcrete(&MsgWithdrawlFilledLimitOrder{}, "dex/WithdrawlFilledLimitOrder", nil)
+	cdc.RegisterConcrete(&MsgCancelLimitOrder{}, "dex/CancelLimitOrder", nil)
 	// this line is used by starport scaffolding # 2
 }
 
@@ -31,6 +32,9 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgWithdrawlFilledLimitOrder{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgCancelLimitOrder{},
 	)
 	// this line is used by starport scaffolding # 3
 

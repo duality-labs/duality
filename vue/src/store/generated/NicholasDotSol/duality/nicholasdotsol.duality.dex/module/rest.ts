@@ -69,6 +69,8 @@ export interface DexLimitOrderPoolUserSharesFilled {
   sharesFilled?: string;
 }
 
+export type DexMsgCancelLimitOrderResponse = object;
+
 export type DexMsgDepositResponse = object;
 
 export type DexMsgPlaceLimitOrderResponse = object;
