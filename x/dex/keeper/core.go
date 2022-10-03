@@ -698,17 +698,237 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 ///// Limit Order Functions
 
-func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLimitOrder) error {
+func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress) error {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	pairId, err := k.DepositPairInit(goCtx, token0, token1, msg.TickIndex, 0)
+
+	if err != nil {
+		return err
+	}
+
+	// size of the feeList
+	feeSize := k.GetFeeListCount(ctx)
+	//feelist := k.GetAllFeeList(ctx)
+
+	tick, tickFound := k.GetTickMap(ctx, pairId, msg.TickIndex)
+
+	if !tickFound {
+
+		// If tick does not exists intialize it
+		// @Dev initialize reserves struct to avoid having to check for individual subtype existance between deposit and placeLimitOrder
+		tick = types.TickMap{
+			TickIndex: msg.TickIndex,
+			TickData: &types.TickDataType{
+				Reserve0AndShares: make([]*types.Reserve0AndSharesType, feeSize),
+				Reserve1:          make([]sdk.Dec, feeSize),
+			},
+		}
+
+		for i, _ := range tick.TickData.Reserve0AndShares {
+			tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}
+
+		}
+		for i, _ := range tick.TickData.Reserve1 {
+			tick.TickData.Reserve1[i] = sdk.ZeroDec()
+		}
+
+		tick.LimitOrderPool0To1.Count = 0
+		tick.LimitOrderPool0To1.CurrentLimitOrderKey = 0
+
+		tick.LimitOrderPool1To0.Count = 0
+		tick.LimitOrderPool1To0.CurrentLimitOrderKey = 0
+	}
+
+	if msg.TokenIn == token0 {
+		FillMap, FillMapFound := k.GetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
+
+		if !FillMapFound {
+			FillMap.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey
+			FillMap.Fill = sdk.ZeroDec()
+		}
+
+		if tick.LimitOrderPool0To1.Count == tick.LimitOrderPool0To1.CurrentLimitOrderKey {
+
+			if !FillMapFound && FillMap.Fill.GT(sdk.ZeroDec()) {
+				tick.LimitOrderPool0To1.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey + 1
+			}
+		} else {
+			tick.LimitOrderPool0To1.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey + 1
+		}
+
+		ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
+		UserShareMap, UserShareMapFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey, msg.Receiver)
+		TotalSharesMap, TotalShareMapFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
+
+		if !ReserveMapFound {
+			ReserveMap.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey
+			ReserveMap.Reserves = sdk.ZeroDec()
+		}
+
+		if !UserShareMapFound {
+			UserShareMap.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey
+			UserShareMap.Address = msg.Creator
+			UserShareMap.SharesOwned = sdk.ZeroDec()
+		}
+
+		if !TotalShareMapFound {
+			TotalSharesMap.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey
+			TotalSharesMap.TotalShares = sdk.ZeroDec()
+		}
+
+		ReserveMap.Reserves = ReserveMap.Reserves.Add(msg.AmountIn)
+		newShares, err := k.Calc_price(msg.TickIndex)
+		if err != nil {
+			return err
+		}
+		UserShareMap.SharesOwned = UserShareMap.SharesOwned.Add(newShares)
+		TotalSharesMap.TotalShares = TotalSharesMap.TotalShares.Add(newShares)
+
+		k.SetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.TokenIn, FillMap)
+		k.SetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.TokenIn, ReserveMap)
+		k.SetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.TokenIn, UserShareMap)
+		k.SetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.TokenIn, TotalSharesMap)
+
+	} else {
+		FillMap, FillMapFound := k.GetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+
+		if !FillMapFound {
+			FillMap.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey
+			FillMap.Fill = sdk.ZeroDec()
+		}
+
+		if tick.LimitOrderPool1To0.Count == tick.LimitOrderPool1To0.CurrentLimitOrderKey {
+
+			if !FillMapFound && FillMap.Fill.GT(sdk.ZeroDec()) {
+				tick.LimitOrderPool1To0.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey + 1
+			}
+		} else {
+			tick.LimitOrderPool1To0.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey + 1
+		}
+
+		ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+		UserShareMap, UserShareMapFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey, msg.Receiver)
+		TotalSharesMap, TotalShareMapFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+
+		if !ReserveMapFound {
+			ReserveMap.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey
+			ReserveMap.Reserves = sdk.ZeroDec()
+		}
+
+		if !UserShareMapFound {
+			UserShareMap.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey
+			UserShareMap.Address = msg.Creator
+			UserShareMap.SharesOwned = sdk.ZeroDec()
+		}
+
+		if !TotalShareMapFound {
+			TotalSharesMap.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey
+			TotalSharesMap.TotalShares = sdk.ZeroDec()
+		}
+
+		ReserveMap.Reserves = ReserveMap.Reserves.Add(msg.AmountIn)
+		newShares, err := k.Calc_price(msg.TickIndex)
+		if err != nil {
+			return err
+		}
+		UserShareMap.SharesOwned = UserShareMap.SharesOwned.Add(newShares)
+		TotalSharesMap.TotalShares = TotalSharesMap.TotalShares.Add(newShares)
+
+		k.SetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.TokenIn, FillMap)
+		k.SetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.TokenIn, ReserveMap)
+		k.SetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.TokenIn, UserShareMap)
+		k.SetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.TokenIn, TotalSharesMap)
+	}
+
+	if msg.AmountIn.GT(sdk.ZeroDec()) {
+		coin0 := sdk.NewCoin(msg.TokenIn, sdk.NewIntFromBigInt(msg.AmountIn.BigInt()))
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancelLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress) error {
 
 	return nil
 }
 
-func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancelLimitOrder) error {
+func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.MsgWithdrawlFilledLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress) error {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	pairId := k.CreatePairId(token0, token1)
+	tick, tickFound := k.GetTickMap(ctx, pairId, msg.TickIndex)
 
-	return nil
-}
+	if !tickFound {
+		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Valid tick not found ")
+	}
+	amountOut := sdk.ZeroDec()
+	if msg.KeyToken == token0 {
+		FillMap, FillMapFound := k.GetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.KeyToken, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
+		ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.KeyToken, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
+		UserShareMap, UserShareMapFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, tick.LimitOrderPool0To1.CurrentLimitOrderKey, msg.Creator)
+		UserSharesFillMap, UserSharesFillFound := k.GetLimitOrderPoolUserSharesFilled(ctx, pairId, msg.TickIndex, msg.KeyToken, tick.LimitOrderPool0To1.CurrentLimitOrderKey, msg.Creator)
+		TotalSharesMap, TotalShareMapFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.KeyToken, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
 
-func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.MsgWithdrawlFilledLimitOrder) error {
+		if !FillMapFound || !UserShareMapFound || !TotalShareMapFound || !ReserveMapFound || !UserSharesFillFound {
+			return sdkerrors.Wrapf(types.ErrValidLimitOrderMapsNotFound, "Valid mappings for limit order withdraw not found")
+		}
+
+		if FillMap.Fill.Quo(FillMap.Fill.Add(ReserveMap.Reserves)).LTE(UserSharesFillMap.SharesFilled.Quo(UserSharesFillMap.SharesFilled.Add(UserShareMap.SharesOwned))) {
+			// error here
+		}
+		sharesOut := ((FillMap.Fill.Mul(UserSharesFillMap.SharesFilled.Add(UserShareMap.SharesOwned))).Quo(FillMap.Fill.Add(ReserveMap.Reserves))).Sub(UserSharesFillMap.SharesFilled)
+		FillMap.Fill = FillMap.Fill.Sub(sharesOut.Mul(FillMap.Fill).Quo(TotalSharesMap.TotalShares))
+		UserSharesFillMap.SharesFilled = UserSharesFillMap.SharesFilled.Add(sharesOut)
+		UserShareMap.SharesOwned = UserShareMap.SharesOwned.Sub(sharesOut)
+		amountOut = (sharesOut.Mul(FillMap.Fill)).Quo(TotalSharesMap.TotalShares)
+
+		k.SetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.KeyToken, FillMap)
+		k.SetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.KeyToken, ReserveMap)
+		k.SetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, UserShareMap)
+		k.SetLimitOrderPoolUserSharesFilled(ctx, pairId, msg.TickIndex, msg.KeyToken, UserSharesFillMap)
+		k.SetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.KeyToken, TotalSharesMap)
+
+		if amountOut.GT(sdk.ZeroDec()) {
+			coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountOut.BigInt()))
+			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coin1}); err != nil {
+				return err
+			}
+		}
+
+	} else {
+		FillMap, FillMapFound := k.GetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.KeyToken, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+		ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.KeyToken, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+		UserShareMap, UserShareMapFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, tick.LimitOrderPool1To0.CurrentLimitOrderKey, msg.Creator)
+		UserSharesFillMap, UserSharesFillFound := k.GetLimitOrderPoolUserSharesFilled(ctx, pairId, msg.TickIndex, msg.KeyToken, tick.LimitOrderPool1To0.CurrentLimitOrderKey, msg.Creator)
+		TotalSharesMap, TotalShareMapFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.KeyToken, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+
+		if !FillMapFound || !UserShareMapFound || !TotalShareMapFound || !ReserveMapFound || !UserSharesFillFound {
+			return sdkerrors.Wrapf(types.ErrValidLimitOrderMapsNotFound, "Valid mappings for limit order withdraw not found")
+		}
+
+		if FillMap.Fill.Quo(FillMap.Fill.Add(ReserveMap.Reserves)).LTE(UserSharesFillMap.SharesFilled.Quo(UserSharesFillMap.SharesFilled.Add(UserShareMap.SharesOwned))) {
+			// error here
+		}
+		sharesOut := ((FillMap.Fill.Mul(UserSharesFillMap.SharesFilled.Add(UserShareMap.SharesOwned))).Quo(FillMap.Fill.Add(ReserveMap.Reserves))).Sub(UserSharesFillMap.SharesFilled)
+		FillMap.Fill = FillMap.Fill.Sub(sharesOut.Mul(FillMap.Fill).Quo(TotalSharesMap.TotalShares))
+		UserSharesFillMap.SharesFilled = UserSharesFillMap.SharesFilled.Add(sharesOut)
+		UserShareMap.SharesOwned = UserShareMap.SharesOwned.Sub(sharesOut)
+		amountOut = (sharesOut.Mul(FillMap.Fill)).Quo(TotalSharesMap.TotalShares)
+
+		k.SetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.KeyToken, FillMap)
+		k.SetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.KeyToken, ReserveMap)
+		k.SetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, UserShareMap)
+		k.SetLimitOrderPoolUserSharesFilled(ctx, pairId, msg.TickIndex, msg.KeyToken, UserSharesFillMap)
+		k.SetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.KeyToken, TotalSharesMap)
+
+		if amountOut.GT(sdk.ZeroDec()) {
+			coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountOut.BigInt()))
+			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coin1}); err != nil {
+				return err
+			}
+		}
+	}
 
 	return nil
 }
