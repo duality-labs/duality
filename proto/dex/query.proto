@@ -15,6 +15,7 @@ import "dex/edge_row.proto";
 import "dex/adjancey_matrix.proto";
 import "dex/limit_order_pool_user_share_map.proto";
 import "dex/limit_order_pool_user_shares_filled.proto";
+import "dex/limit_order_pool_total_shares_map.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -123,6 +124,16 @@ service Query {
 	// Queries a list of LimitOrderPoolUserSharesFilled items.
 	rpc LimitOrderPoolUserSharesFilledAll(QueryAllLimitOrderPoolUserSharesFilledRequest) returns (QueryAllLimitOrderPoolUserSharesFilledResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_shares_filled";
+	}
+
+// Queries a LimitOrderPoolTotalSharesMap by index.
+	rpc LimitOrderPoolTotalSharesMap(QueryGetLimitOrderPoolTotalSharesMapRequest) returns (QueryGetLimitOrderPoolTotalSharesMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map/{count}";
+	}
+
+	// Queries a list of LimitOrderPoolTotalSharesMap items.
+	rpc LimitOrderPoolTotalSharesMapAll(QueryAllLimitOrderPoolTotalSharesMapRequest) returns (QueryAllLimitOrderPoolTotalSharesMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -317,6 +328,24 @@ message QueryAllLimitOrderPoolUserSharesFilledRequest {
 
 message QueryAllLimitOrderPoolUserSharesFilledResponse {
 	repeated LimitOrderPoolUserSharesFilled limitOrderPoolUserSharesFilled = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetLimitOrderPoolTotalSharesMapRequest {
+	  string count = 1;
+
+}
+
+message QueryGetLimitOrderPoolTotalSharesMapResponse {
+	LimitOrderPoolTotalSharesMap limitOrderPoolTotalSharesMap = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllLimitOrderPoolTotalSharesMapRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllLimitOrderPoolTotalSharesMapResponse {
+	repeated LimitOrderPoolTotalSharesMap limitOrderPoolTotalSharesMap = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

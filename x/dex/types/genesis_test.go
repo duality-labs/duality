@@ -116,6 +116,14 @@ func TestGenesisState_Validate(t *testing.T) {
 						Address: "1",
 					},
 				},
+				LimitOrderPoolTotalSharesMapList: []types.LimitOrderPoolTotalSharesMap{
+					{
+						Count: "0",
+					},
+					{
+						Count: "1",
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -313,6 +321,20 @@ func TestGenesisState_Validate(t *testing.T) {
 					{
 						Count:   "0",
 						Address: "0",
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated limitOrderPoolTotalSharesMap",
+			genState: &types.GenesisState{
+				LimitOrderPoolTotalSharesMapList: []types.LimitOrderPoolTotalSharesMap{
+					{
+						Count: "0",
+					},
+					{
+						Count: "0",
 					},
 				},
 			},
