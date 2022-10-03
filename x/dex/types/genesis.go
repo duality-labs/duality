@@ -21,6 +21,7 @@ func DefaultGenesis() *GenesisState {
 		LimitOrderPoolUserShareMapList:     []LimitOrderPoolUserShareMap{},
 		LimitOrderPoolUserSharesFilledList: []LimitOrderPoolUserSharesFilled{},
 		LimitOrderPoolTotalSharesMapList:   []LimitOrderPoolTotalSharesMap{},
+		LimitOrderPoolReserveMapList:       []LimitOrderPoolReserveMap{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -146,6 +147,16 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("duplicated index for limitOrderPoolTotalSharesMap")
 		}
 		limitOrderPoolTotalSharesMapIndexMap[index] = struct{}{}
+	}
+	// Check for duplicated index in limitOrderPoolReserveMap
+	limitOrderPoolReserveMapIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.LimitOrderPoolReserveMapList {
+		index := string(LimitOrderPoolReserveMapKey(elem.Count))
+		if _, ok := limitOrderPoolReserveMapIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for limitOrderPoolReserveMap")
+		}
+		limitOrderPoolReserveMapIndexMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 

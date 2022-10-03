@@ -14,6 +14,7 @@ import "dex/adjancey_matrix.proto";
 import "dex/limit_order_pool_user_share_map.proto";
 import "dex/limit_order_pool_user_shares_filled.proto";
 import "dex/limit_order_pool_total_shares_map.proto";
+import "dex/limit_order_pool_reserve_map.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -36,5 +37,6 @@ message GenesisState {
   repeated LimitOrderPoolUserShareMap limitOrderPoolUserShareMapList = 14 [(gogoproto.nullable) = false];
   repeated LimitOrderPoolUserSharesFilled limitOrderPoolUserSharesFilledList = 15 [(gogoproto.nullable) = false];
   repeated LimitOrderPoolTotalSharesMap limitOrderPoolTotalSharesMapList = 16 [(gogoproto.nullable) = false];
+  repeated LimitOrderPoolReserveMap limitOrderPoolReserveMapList = 17 [(gogoproto.nullable) = false];
   // this line is used by starport scaffolding # genesis/proto/state
 }

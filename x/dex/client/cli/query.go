@@ -47,6 +47,8 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	cmd.AddCommand(CmdShowLimitOrderPoolUserSharesFilled())
 	cmd.AddCommand(CmdListLimitOrderPoolTotalSharesMap())
 	cmd.AddCommand(CmdShowLimitOrderPoolTotalSharesMap())
+	cmd.AddCommand(CmdListLimitOrderPoolReserveMap())
+	cmd.AddCommand(CmdShowLimitOrderPoolReserveMap())
 	// this line is used by starport scaffolding # 1
 
 	return cmd

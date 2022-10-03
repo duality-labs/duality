@@ -16,6 +16,7 @@ import "dex/adjancey_matrix.proto";
 import "dex/limit_order_pool_user_share_map.proto";
 import "dex/limit_order_pool_user_shares_filled.proto";
 import "dex/limit_order_pool_total_shares_map.proto";
+import "dex/limit_order_pool_reserve_map.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -134,6 +135,16 @@ service Query {
 	// Queries a list of LimitOrderPoolTotalSharesMap items.
 	rpc LimitOrderPoolTotalSharesMapAll(QueryAllLimitOrderPoolTotalSharesMapRequest) returns (QueryAllLimitOrderPoolTotalSharesMapResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map";
+	}
+
+// Queries a LimitOrderPoolReserveMap by index.
+	rpc LimitOrderPoolReserveMap(QueryGetLimitOrderPoolReserveMapRequest) returns (QueryGetLimitOrderPoolReserveMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_reserve_map/{count}";
+	}
+
+	// Queries a list of LimitOrderPoolReserveMap items.
+	rpc LimitOrderPoolReserveMapAll(QueryAllLimitOrderPoolReserveMapRequest) returns (QueryAllLimitOrderPoolReserveMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_reserve_map";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -346,6 +357,24 @@ message QueryAllLimitOrderPoolTotalSharesMapRequest {
 
 message QueryAllLimitOrderPoolTotalSharesMapResponse {
 	repeated LimitOrderPoolTotalSharesMap limitOrderPoolTotalSharesMap = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetLimitOrderPoolReserveMapRequest {
+	  string count = 1;
+
+}
+
+message QueryGetLimitOrderPoolReserveMapResponse {
+	LimitOrderPoolReserveMap limitOrderPoolReserveMap = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllLimitOrderPoolReserveMapRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllLimitOrderPoolReserveMapResponse {
+	repeated LimitOrderPoolReserveMap limitOrderPoolReserveMap = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
