@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
 )
 
@@ -19,10 +20,24 @@ func CmdSwap() *cobra.Command {
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argAmountIn := args[0]
+
+			argAmountInDec, err := sdk.NewDecFromStr(argAmountIn)
+
+			if err != nil {
+				return err
+			}
+
 			argTokenA := args[1]
 			argTokenB := args[2]
 			argTokenIn := args[3]
 			argminOut := args[4]
+
+			argminOutDec, err := sdk.NewDecFromStr(argminOut)
+
+			if err != nil {
+				return err
+			}
+
 			argReceiver := args[5]
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -33,9 +48,9 @@ func CmdSwap() *cobra.Command {
 				clientCtx.GetFromAddress().String(),
 				argTokenA,
 				argTokenB,
-				argAmountIn,
+				argAmountInDec,
 				argTokenIn,
-				argminOut,
+				argminOutDec,
 				argReceiver,
 			)
 			if err := msg.ValidateBasic(); err != nil {

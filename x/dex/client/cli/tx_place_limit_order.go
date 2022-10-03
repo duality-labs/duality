@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
 )
 
@@ -21,8 +22,21 @@ func CmdPlaceLimitOrder() *cobra.Command {
 			argTokenA := args[0]
 			argTokenB := args[1]
 			argTickIndex := args[2]
+
+			argTickIndexInt, err := strconv.Atoi(argTickIndex)
+
+			if err != nil {
+				return err
+			}
+
 			argTokenIn := args[3]
 			argAmountIn := args[4]
+
+			argAmountInDec, err := sdk.NewDecFromStr(argAmountIn)
+
+			if err != nil {
+				return err
+			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -33,9 +47,9 @@ func CmdPlaceLimitOrder() *cobra.Command {
 				clientCtx.GetFromAddress().String(),
 				argTokenA,
 				argTokenB,
-				argTickIndex,
+				int64(argTickIndexInt),
 				argTokenIn,
-				argAmountIn,
+				argAmountInDec,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
