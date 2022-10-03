@@ -131,9 +131,7 @@ export const GenesisState = {
           message.edgeRowCount = longToNumber(reader.uint64() as Long);
           break;
         case 12:
-          message.adjMatrixList.push(
-            AdjMatrix.decode(reader, reader.uint32())
-          );
+          message.adjMatrixList.push(AdjMatrix.decode(reader, reader.uint32()));
           break;
         case 13:
           message.adjMatrixCount = longToNumber(reader.uint64() as Long);
@@ -211,18 +209,12 @@ export const GenesisState = {
     } else {
       message.edgeRowCount = 0;
     }
-    if (
-      object.adjMatrixList !== undefined &&
-      object.adjMatrixList !== null
-    ) {
+    if (object.adjMatrixList !== undefined && object.adjMatrixList !== null) {
       for (const e of object.adjMatrixList) {
         message.adjMatrixList.push(AdjMatrix.fromJSON(e));
       }
     }
-    if (
-      object.adjMatrixCount !== undefined &&
-      object.adjMatrixCount !== null
-    ) {
+    if (object.adjMatrixCount !== undefined && object.adjMatrixCount !== null) {
       message.adjMatrixCount = Number(object.adjMatrixCount);
     } else {
       message.adjMatrixCount = 0;
@@ -366,18 +358,12 @@ export const GenesisState = {
     } else {
       message.edgeRowCount = 0;
     }
-    if (
-      object.adjMatrixList !== undefined &&
-      object.adjMatrixList !== null
-    ) {
+    if (object.adjMatrixList !== undefined && object.adjMatrixList !== null) {
       for (const e of object.adjMatrixList) {
         message.adjMatrixList.push(AdjMatrix.fromPartial(e));
       }
     }
-    if (
-      object.adjMatrixCount !== undefined &&
-      object.adjMatrixCount !== null
-    ) {
+    if (object.adjMatrixCount !== undefined && object.adjMatrixCount !== null) {
       message.adjMatrixCount = object.adjMatrixCount;
     } else {
       message.adjMatrixCount = 0;

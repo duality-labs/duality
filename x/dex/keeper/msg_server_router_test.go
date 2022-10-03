@@ -92,7 +92,7 @@ func (suite *IntegrationTestSuite) TestBasicMultiHopRoute() {
 
 	//fmt.Println(app.DexKeeper.GetAllPairMap(ctx))
 
-	swapResponse, err := suite.msgServer.SwapRoute(goCtx, &types.MsgSwap{
+	swapResponse, err := suite.msgServer.Route(goCtx, &types.MsgRoute{
 		Creator:  alice.String(),
 		TokenA:   "TokenA",
 		TokenB:   "TokenB",
@@ -106,7 +106,6 @@ func (suite *IntegrationTestSuite) TestBasicMultiHopRoute() {
 
 	suite.Require().Nil(err)
 
-	_ = createResponse4
 	_ = pairId
 	_ = goCtx
 

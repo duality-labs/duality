@@ -2433,10 +2433,7 @@ export const QueryGetAdjMatrixResponse = {
     writer: Writer = Writer.create()
   ): Writer {
     if (message.AdjMatrix !== undefined) {
-      AdjMatrix.encode(
-        message.AdjMatrix,
-        writer.uint32(10).fork()
-      ).ldelim();
+      AdjMatrix.encode(message.AdjMatrix, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -2454,10 +2451,7 @@ export const QueryGetAdjMatrixResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.AdjMatrix = AdjMatrix.decode(
-            reader,
-            reader.uint32()
-          );
+          message.AdjMatrix = AdjMatrix.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -2495,9 +2489,7 @@ export const QueryGetAdjMatrixResponse = {
       ...baseQueryGetAdjMatrixResponse,
     } as QueryGetAdjMatrixResponse;
     if (object.AdjMatrix !== undefined && object.AdjMatrix !== null) {
-      message.AdjMatrix = AdjMatrix.fromPartial(
-        object.AdjMatrix
-      );
+      message.AdjMatrix = AdjMatrix.fromPartial(object.AdjMatrix);
     } else {
       message.AdjMatrix = undefined;
     }
@@ -2610,9 +2602,7 @@ export const QueryAllAdjMatrixResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.AdjMatrix.push(
-            AdjMatrix.decode(reader, reader.uint32())
-          );
+          message.AdjMatrix.push(AdjMatrix.decode(reader, reader.uint32()));
           break;
         case 2:
           message.pagination = PageResponse.decode(reader, reader.uint32());

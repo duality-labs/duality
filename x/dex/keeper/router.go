@@ -157,7 +157,7 @@ func (k Keeper) updateRoutePrice(ctx sdk.Context, route Route) (sdk.Dec, error) 
 // Working theory: Not an issue because we save the price in a variable
 
 */
-func (k Keeper) SwapDynamicRouter(goCtx context.Context, msg *types.MsgSwap, callerAddress sdk.AccAddress, tokenIn string, tokenOut string, amountIn sdk.Dec, minOut sdk.Dec) (sdk.Dec, error) {
+func (k Keeper) SwapDynamicRouter(goCtx context.Context, msg *types.MsgRoute, callerAddress sdk.AccAddress, tokenIn string, tokenOut string, amountIn sdk.Dec, minOut sdk.Dec) (sdk.Dec, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	routes, err := k.getValidRoutes(goCtx, tokenIn, tokenOut, getRoutes(tokenIn, tokenOut))
@@ -224,7 +224,7 @@ func (k Keeper) SwapDynamicRouter(goCtx context.Context, msg *types.MsgSwap, cal
 }
 
 // Swap across a route
-func (k Keeper) swapAcrossRoute(goCtx context.Context, msg *types.MsgSwap, callerAddress sdk.AccAddress, bestRoute Route, amountIn sdk.Dec) (amountFromSwap sdk.Dec, err error) {
+func (k Keeper) swapAcrossRoute(goCtx context.Context, msg *types.MsgRoute, callerAddress sdk.AccAddress, bestRoute Route, amountIn sdk.Dec) (amountFromSwap sdk.Dec, err error) {
 	amountToSwap := amountIn
 
 	// Passes in the amountOut from the previous pair into the next pair until we swap to the end of route

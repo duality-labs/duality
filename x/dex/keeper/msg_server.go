@@ -105,10 +105,10 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 }
 
 // TODO: Add functionality for SwapRoute msg
-func (k msgServer) SwapRoute(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSwapResponse, error) {
+func (k msgServer) SwapRoute(goCtx context.Context, msg *types.MsgRoute) (*types.MsgRouteResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, createrAddr, amountIn, minOut, err := k.swapVerification(goCtx, *msg)
+	token0, token1, createrAddr, amountIn, minOut, err := k.routeVerification(goCtx, *msg)
 
 	if err != nil {
 		return nil, err
@@ -121,5 +121,5 @@ func (k msgServer) SwapRoute(goCtx context.Context, msg *types.MsgSwap) (*types.
 	_ = ctx
 
 	// TODO: Change to use a new response type (dynamic router)
-	return &types.MsgSwapResponse{}, nil
+	return &types.MsgRouteResponse{}, nil
 }
