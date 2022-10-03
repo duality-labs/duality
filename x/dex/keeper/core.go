@@ -121,7 +121,7 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 		// intialize uppertick
 		if !upperTickFound {
 
-			// Creates an tick object of the speciied size and then iterates over each sub struct filling it with 0 values.
+			// Creates an tick object of the specied size and then iterates over each sub struct filling it with 0 values.
 
 			upperTick = types.TickMap{
 				TickIndex: tickIndex + fee,
@@ -150,6 +150,7 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 			TotalShares: sharesMinted,
 		}
 
+		fmt.Println(NewReserve0andShares)
 		upperTick.TickData.Reserve0AndShares[feeIndex] = NewReserve0andShares
 
 		lowerTick.TickData.Reserve1[feeIndex] = trueAmount1
@@ -238,64 +239,78 @@ func (k Keeper) Min(a, b sdk.Dec) sdk.Dec {
 	return b
 }
 
-func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, token0 string, token1 string, callerAddr sdk.AccAddress, amount0 sdk.Dec, amount1 sdk.Dec) error {
+func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0 string, token1 string, callerAddr sdk.AccAddress, amounts0 []sdk.Dec, amounts1 []sdk.Dec) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Note feeIndex is the corresponding index to a fee Value not the feeValue itself
-	feeValue, _ := k.GetFeeList(ctx, uint64(msg.FeeIndex))
-	fee := feeValue.Fee
+	// Fee Initialized to initialize tick if pair does not exists
+
+	feelist := k.GetAllFeeList(ctx)
 
 	//Checks to see if given pair has been initialied, if not intializes, and returns pairId and pairMap
-	pairId, err := k.DepositPairInit(goCtx, token0, token1, msg.TickIndex, fee)
+	pairId, err := k.DepositPairInit(goCtx, token0, token1, msg.TickIndexes[0], feelist[msg.FeeIndexes[0]].Fee)
 
 	if err != nil {
 		return err
 	}
 
 	pair, _ := k.GetPairMap(ctx, pairId)
+	totalAmountReserve0 := sdk.ZeroDec()
+	totalAmountReserve1 := sdk.ZeroDec()
 
-	fmt.Println(amount0)
-	fmt.Println(pair)
-	fmt.Println(msg.TickIndex)
-	// Errors if depositing amount0 at a tick less than CurrentTick1to0
-	if amount0.GT(sdk.ZeroDec()) && ((msg.TickIndex + fee) < pair.TokenPair.CurrentTick0To1) {
-		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick less than the CurrentTick1to0")
-	}
-
-	// Errors if depositing amount1 at a tick less than CurrentTick0to1
-	if amount1.GT(sdk.ZeroDec()) && ((msg.TickIndex - fee) > pair.TokenPair.CurrentTick1To0) {
-		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick greater than the CurrentTick0to1")
-	}
-
-	// Calls k.DepositHelper which calculates the true amounts of token0, token1, and sets the corresponding pair and tick maps
-	trueAmount0, trueAmount1, sharesMinted, newReserve0, newReserve1, err := k.DepositHelper(goCtx, pairId, pair, msg.TickIndex, amount0, amount1, fee, msg.FeeIndex)
-
-	if err != nil {
-		return nil
-	}
-
-	// Calculate Shares
-	shares, sharesFound := k.GetShares(ctx, msg.Receiver, pairId, msg.TickIndex, msg.FeeIndex)
-
-	// Initializes a new tick if sharesFound does not exists
-	if !sharesFound {
-		shares = types.Shares{
-			Address:     msg.Receiver,
-			PairId:      pairId,
-			TickIndex:   msg.TickIndex,
-			FeeIndex:    msg.FeeIndex,
-			SharesOwned: sharesMinted,
+	for i, _ := range amounts0 {
+		// Errors if depositing amount0 at a tick less than CurrentTick1to0
+		if amounts0[i].GT(sdk.ZeroDec()) && ((msg.TickIndexes[i] + feelist[msg.FeeIndexes[i]].Fee) < pair.TokenPair.CurrentTick0To1) {
+			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick less than the CurrentTick1to0")
 		}
-	} else {
-		//Updates shares.SharesOwned
-		shares.SharesOwned = shares.SharesOwned.Add(sharesMinted)
+		// Errors if depositing amount1 at a tick less than CurrentTick0to1
+		if amounts1[i].GT(sdk.ZeroDec()) && ((msg.TickIndexes[i] - feelist[msg.FeeIndexes[i]].Fee) > pair.TokenPair.CurrentTick1To0) {
+			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick greater than the CurrentTick0to1")
+		}
+
+		// Calls k.DepositHelper which calculates the true amounts of token0, token1, and sets the corresponding pair and tick maps
+		trueAmount0, trueAmount1, sharesMinted, newReserve0, newReserve1, err := k.DepositHelper(goCtx, pairId, pair, msg.TickIndexes[i], amounts0[i], amounts1[i], feelist[msg.FeeIndexes[i]].Fee, msg.FeeIndexes[i])
+
+		if err != nil {
+			return nil
+		}
+
+		// Calculate Shares
+		shares, sharesFound := k.GetShares(ctx, msg.Receiver, pairId, msg.TickIndexes[i], msg.FeeIndexes[i])
+
+		// Initializes a new tick if sharesFound does not exists
+		if !sharesFound {
+			shares = types.Shares{
+				Address:     msg.Receiver,
+				PairId:      pairId,
+				TickIndex:   msg.TickIndexes[i],
+				FeeIndex:    msg.FeeIndexes[i],
+				SharesOwned: sharesMinted,
+			}
+		} else {
+			//Updates shares.SharesOwned
+			shares.SharesOwned = shares.SharesOwned.Add(sharesMinted)
+		}
+
+		// Update share logic to KVStore
+		k.SetShares(ctx, shares)
+
+		totalAmountReserve0 = totalAmountReserve0.Add(trueAmount0)
+		totalAmountReserve1 = totalAmountReserve1.Add(trueAmount1)
+
+		// Event is defined in types/Events.go
+		ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator, msg.Receiver,
+			token0, token1, fmt.Sprint(msg.TickIndexes[i]), fmt.Sprint(msg.FeeIndexes[i]),
+			newReserve0.Sub(trueAmount0).String(), newReserve1.Sub(trueAmount1).String(), newReserve0.String(), newReserve1.String(),
+			sharesMinted.String()),
+		)
 	}
 
 	// Send TrueAmount0 to Module
 	/// @Dev Due to a sdk.send constraint this only sends if trueAmount0 is greater than 0
-	if trueAmount0.GT(sdk.ZeroDec()) {
-		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(trueAmount0.BigInt()))
+	if totalAmountReserve0.GT(sdk.ZeroDec()) {
+		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(totalAmountReserve0.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
 			return err
 		}
@@ -303,37 +318,19 @@ func (k Keeper) SingleDeposit(goCtx context.Context, msg *types.MsgDeposit, toke
 
 	// Send TrueAmount1 to Module
 	/// @Dev Due to a sdk.send constraint this only sends if trueAmount1 is greater than 0
-	if trueAmount1.GT(sdk.ZeroDec()) {
-		coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(trueAmount1.BigInt()))
+	if totalAmountReserve1.GT(sdk.ZeroDec()) {
+		coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(totalAmountReserve1.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
 			return err
 		}
 	}
 
-	// Update share logic to KVStore
-	k.SetShares(ctx, shares)
-
-	// Event is defined in types/Events.go
-	ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator, msg.Receiver,
-		token0, token1, fmt.Sprint(msg.TickIndex), fmt.Sprint(msg.FeeIndex),
-		newReserve0.Sub(trueAmount0).String(), newReserve1.Sub(trueAmount1).String(), newReserve0.String(), newReserve1.String(),
-		sharesMinted.String()),
-	)
-
 	_ = goCtx
 	return nil
 }
 
-func (k Keeper) MultiDeposit(goCtx context.Context, msg *types.MsgDeposit) error {
-
-	_ = goCtx
-	return nil
-}
-
-func (k Keeper) SingleWithdrawal(goCtx context.Context, msg *types.MsgWithdrawal, token0 string, token1 string, callerAddr sdk.AccAddress, sharesToRemove sdk.Dec) error {
+func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, token0 string, token1 string, callerAddr sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	feeValue, _ := k.GetFeeList(ctx, uint64(msg.FeeIndex))
-	fee := feeValue.Fee
 
 	pairId := k.CreatePairId(token0, token1)
 
@@ -343,239 +340,289 @@ func (k Keeper) SingleWithdrawal(goCtx context.Context, msg *types.MsgWithdrawal
 		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 
-	addtick, addtickFound := k.GetTickMap(ctx, pairId, msg.TickIndex+int64(fee))
-	subtick, subTickFound := k.GetTickMap(ctx, pairId, msg.TickIndex-int64(fee))
+	totalReserve0ToRemove := sdk.ZeroDec()
+	totalReserve1ToRemove := sdk.ZeroDec()
 
-	var OldReserve0 sdk.Dec
-	var OldReserve1 sdk.Dec
-	if !addtickFound || !subTickFound {
-		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "No tick found at the requested index")
-	}
+	for i, _ := range msg.SharesToRemove {
+		feeValue, _ := k.GetFeeList(ctx, uint64(msg.FeeIndexes[i]))
+		fee := feeValue.Fee
 
-	if addtick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares.Equal(sdk.ZeroDec()) {
-		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "No tick found at the requested index")
-	}
+		upperTick, upperTickFound := k.GetTickMap(ctx, pairId, msg.TickIndexes[i]+int64(fee))
+		lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, msg.TickIndexes[i]-int64(fee))
 
-	reserve0ToRemove := (sharesToRemove.Quo(addtick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares)).Mul(addtick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0)
-	reserve1ToRemove := (sharesToRemove.Quo(addtick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares)).Mul(subtick.TickData.Reserve1[msg.FeeIndex])
+		var OldReserve0 sdk.Dec
+		var OldReserve1 sdk.Dec
+		if !upperTickFound || !lowerTickFound {
+			return sdkerrors.Wrapf(types.ErrValidTickNotFound, "No tick found at the requested index")
+		}
 
-	OldReserve0 = addtick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0
-	OldReserve1 = subtick.TickData.Reserve1[msg.FeeIndex]
+		if upperTick.TickData.Reserve0AndShares[msg.FeeIndexes[0]].TotalShares.Equal(sdk.ZeroDec()) {
+			return sdkerrors.Wrapf(types.ErrValidTickNotFound, "No tick found at the requested index")
+		}
 
-	addtick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0 = addtick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.Sub(reserve0ToRemove)
-	subtick.TickData.Reserve1[msg.FeeIndex] = subtick.TickData.Reserve1[msg.FeeIndex].Sub(reserve1ToRemove)
-	addtick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares = addtick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares.Sub(sharesToRemove)
+		reserve0ToRemove := (msg.SharesToRemove[i].Quo(upperTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].TotalShares)).Mul(upperTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].Reserve0)
+		reserve1ToRemove := (msg.SharesToRemove[i].Quo(upperTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].TotalShares)).Mul(lowerTick.TickData.Reserve1[msg.FeeIndexes[i]])
 
-	shareOwner, shareOwnerFound := k.GetShares(ctx, msg.Creator, pairId, msg.TickIndex, msg.FeeIndex)
+		OldReserve0 = upperTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].Reserve0
+		OldReserve1 = lowerTick.TickData.Reserve1[msg.FeeIndexes[i]]
 
-	if !shareOwnerFound {
-		return sdkerrors.Wrapf(types.ErrValidShareNotFound, "No valid share owner fonnd")
-	}
+		upperTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].Reserve0 = upperTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].Reserve0.Sub(reserve0ToRemove)
+		lowerTick.TickData.Reserve1[msg.FeeIndexes[i]] = lowerTick.TickData.Reserve1[msg.FeeIndexes[i]].Sub(reserve1ToRemove)
+		upperTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].TotalShares = upperTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].TotalShares.Sub(msg.SharesToRemove[i])
 
-	shareOwner.SharesOwned = shareOwner.SharesOwned.Sub(sharesToRemove)
+		shareOwner, shareOwnerFound := k.GetShares(ctx, msg.Creator, pairId, msg.TickIndexes[i], msg.FeeIndexes[i])
 
-	removeTick := true
-	if addtick.TickData.Reserve0AndShares[msg.FeeIndex].TotalShares.Equal(sdk.ZeroDec()) {
-		for _, s := range addtick.TickData.Reserve0AndShares {
-			if s.TotalShares.GT(sdk.ZeroDec()) {
-				removeTick = false
+		if !shareOwnerFound {
+			return sdkerrors.Wrapf(types.ErrValidShareNotFound, "No valid share owner fonnd")
+		}
+
+		shareOwner.SharesOwned = shareOwner.SharesOwned.Sub(msg.SharesToRemove[i])
+
+		isTickEmpty := true
+		if upperTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].TotalShares.Equal(sdk.ZeroDec()) {
+			for _, s := range upperTick.TickData.Reserve0AndShares {
+				if s.TotalShares.GT(sdk.ZeroDec()) {
+					isTickEmpty = false
+				}
 			}
 		}
-	}
-	if removeTick {
-		pair.PairCount = pair.PairCount - 1
-	}
-	if removeTick && (msg.TickIndex+int64(fee) == pair.TokenPair.CurrentTick1To0) {
+		if isTickEmpty {
+			pair.PairCount = pair.PairCount - 1
+		}
+		if isTickEmpty && (msg.TickIndexes[i]+int64(fee) == pair.TokenPair.CurrentTick1To0) {
 
-		tickFound := false
-		c := 0
-		for tickFound != true && pair.PairCount < int64(c) {
-			c++
-			_, tickFound = k.GetTickMap(ctx, pairId, (msg.TickIndex + fee + int64(c)))
+			tickFound := false
+			c := 0
+			for tickFound != true && pair.PairCount < int64(c) {
+				c++
+				_, tickFound = k.GetTickMap(ctx, pairId, (msg.TickIndexes[i] + fee + int64(c)))
 
+			}
+
+			pair.TokenPair.CurrentTick1To0 = (msg.TickIndexes[i] + fee + int64(c))
 		}
 
-		pair.TokenPair.CurrentTick1To0 = (msg.TickIndex + fee + int64(c))
-	}
+		if isTickEmpty && (msg.TickIndexes[i]-int64(fee) == pair.TokenPair.CurrentTick0To1) {
 
-	if removeTick && (msg.TickIndex-int64(fee) == pair.TokenPair.CurrentTick0To1) {
+			tickFound := false
+			c := 0
+			for tickFound != true && pair.PairCount < int64(c) {
+				c++
+				_, tickFound = k.GetTickMap(ctx, pairId, (msg.TickIndexes[i] - fee - int64(c)))
 
-		tickFound := false
-		c := 0
-		for tickFound != true && pair.PairCount < int64(c) {
-			c++
-			_, tickFound = k.GetTickMap(ctx, pairId, (msg.TickIndex - fee - int64(c)))
+			}
 
+			pair.TokenPair.CurrentTick1To0 = (msg.TickIndexes[i] - fee - int64(c))
 		}
 
-		pair.TokenPair.CurrentTick1To0 = (msg.TickIndex - fee - int64(c))
+		totalReserve0ToRemove = totalReserve0ToRemove.Add(reserve0ToRemove)
+		totalReserve1ToRemove = totalReserve1ToRemove.Add(reserve1ToRemove)
+
+		k.SetShares(ctx, shareOwner)
+		k.SetTickMap(ctx, pairId, upperTick)
+		k.SetTickMap(ctx, pairId, lowerTick)
+
+		ctx.EventManager().EmitEvent(types.CreateWithdrawEvent(msg.Creator, msg.Receiver,
+			token0, token1, fmt.Sprint(msg.TickIndexes), fmt.Sprint(msg.FeeIndexes), OldReserve0.String(), OldReserve1.String(),
+			upperTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].Reserve0.String(), lowerTick.TickData.Reserve1[msg.FeeIndexes[i]].String(),
+		))
 	}
 
 	k.SetPairMap(ctx, pair)
-	k.SetShares(ctx, shareOwner)
-	k.SetTickMap(ctx, pairId, addtick)
-	k.SetTickMap(ctx, pairId, subtick)
 
-	if reserve0ToRemove.GT(sdk.ZeroDec()) {
-		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(reserve0ToRemove.BigInt()))
+	if totalReserve0ToRemove.GT(sdk.ZeroDec()) {
+		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(totalReserve0ToRemove.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coin0}); err != nil {
 			return err
 		}
 	}
 
-	if reserve1ToRemove.GT(sdk.ZeroDec()) {
-		coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(reserve1ToRemove.BigInt()))
+	if totalReserve1ToRemove.GT(sdk.ZeroDec()) {
+		coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(totalReserve1ToRemove.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coin1}); err != nil {
 			return err
 		}
 	}
 
-	ctx.EventManager().EmitEvent(types.CreateWithdrawEvent(msg.Creator, msg.Receiver,
-		token0, token1, fmt.Sprint(msg.TickIndex), fmt.Sprint(msg.FeeIndex), OldReserve0.String(), OldReserve1.String(),
-		addtick.TickData.Reserve0AndShares[msg.FeeIndex].Reserve0.String(), subtick.TickData.Reserve1[msg.FeeIndex].String(),
-	))
 	_ = ctx
 	return nil
 }
 
 ////// Swap Functions
 
-func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, minOut sdk.Dec) (amountOut sdk.Dec, err error) {
+func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, minOut sdk.Dec) (sdk.Dec, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	// pair idea: "token0/token1"
 	pairId := k.CreatePairId(token0, token1)
 
+	// size of the feeList
 	feeSize := k.GetFeeListCount(ctx)
+	feelist := k.GetAllFeeList(ctx)
+	// geets the PairMap from the KVstore given pairId
 	pair, pairFound := k.GetPairMap(ctx, pairId)
 
+	// If toknePair does not exists a swap cannot be made through it, error
 	if !pairFound {
 		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 
+	// Counts how many ticks we have iterated through, compare to initialized ticks in the pair
+	// @Note Heuristic to remove unecessary looping
 	count := 0
+
+	//amount_left is the amount left to deposit
 	amount_left := amountIn
+	// amount to return to receiver
 	amount_out := sdk.ZeroDec()
 
+	// verify that amount left is not zero and that there are additional valid ticks to check
 	for !amount_left.Equal(sdk.ZeroDec()) && (count < int(pair.PairCount)) {
-		Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1)
 
-		count++
+		// Tick data for tick that holds information about reserve1
+		Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1)
 
 		fmt.Println(count)
 		if !Current1Found {
 			continue
 		}
 
+		// iterate count
+		count++
+
 		var i uint64
+
+		// iterator for feeList
 		i = 0
 		for i < feeSize && !amount_left.Equal(sdk.ZeroDec()) {
-			fee, _ := k.GetFeeList(ctx, i)
-			fmt.Println(fee)
-			feeIndex := fee.Fee
-			Current0Data, Current0Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1+2*feeIndex)
+			// gets fee for given feeIndex
+			fee := feelist[i].Fee
+			Current0Data, Current0Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1+2*fee)
 			//Current0Datam := Current0Data.TickData.Reserve1[i]
 
+			// If tick/feeIndex pair is not found continue
 			if !Current0Found {
 				i++
 				continue
 			}
+			// calculate currentPrice
 			price, err := k.Calc_price(pair.TokenPair.CurrentTick0To1)
-
-			if price.Mul(amount_left).Add(amount_out).LT(minOut) {
-				return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
-			}
 
 			if err != nil {
 				return sdk.ZeroDec(), err
 			}
 
+			// price * amout_left + amount_out < minOut, error we cannot meet minOut threshold
+			if price.Mul(amount_left).Add(amount_out).LT(minOut) {
+				return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
+			}
+
+			// price * r1 < amount_left
 			if price.Mul(Current1Data.TickData.Reserve1[i]).LT(amount_left) {
+				// amount_out += r1 (adds as all of reserve1 to amount_out)
 				amount_out = amount_out.Add(Current1Data.TickData.Reserve1[i])
+				// decrement amount_left by price * r1
 				amount_left = amount_left.Sub(price.Mul(Current1Data.TickData.Reserve1[i]))
+				//updates reserve0 with the new amountIn
 				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Add(price.Mul(Current1Data.TickData.Reserve1[i]))
+				// sets reserve1 to 0
 				Current1Data.TickData.Reserve1[i] = sdk.ZeroDec()
 
 			} else {
+				// amountOut += amount_left * price
 				amount_out = amount_out.Add(amount_left.Mul(price))
+				// increment reserve0 with amountLeft
 				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Add(amount_left)
+				// decrement reserve1 with amount_left * price
 				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Sub(amount_left.Mul(price))
+				// set amountLeft to 0
 				amount_left = sdk.ZeroDec()
 			}
+
+			//updates feeIndex
 			i++
+
+			//Make updates to tickMap containing reserve0/1 data to the KVStore
 			k.SetTickMap(ctx, pairId, Current0Data)
 			k.SetTickMap(ctx, pairId, Current1Data)
 		}
 
+		// if feeIndex is equal to the largest index in feeList
 		if i == feeSize-1 {
+			// iterates CurrentTick0to1
 			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 + 1
 		}
 	}
 
 	k.SetPairMap(ctx, pair)
-	// Todo add slippage tolerance
 
+	// Check to see if amount_out meets the threshold of minOut
 	if amount_out.LT(minOut) {
 		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
-	}
-
-	if amountIn.GT(sdk.ZeroDec()) {
-		coinIn := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amountIn.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
-			return sdk.ZeroDec(), err
-		}
-	} else {
-		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
-	}
-
-	if amount_out.GT(sdk.ZeroDec()) {
-		coinOut := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount_out.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
-			return sdk.ZeroDec(), err
-		}
 	}
 
 	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
 		token0, token1, msg.TokenIn, amountIn.String(), amount_out.String(), msg.MinOut,
 	))
 
+	// Returns amount_out to keeper/msg.server: Swap
+	// @Dev token transfers happen in keeper/msg.server: Swap
 	return amount_out, nil
 }
 
-func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, minOut sdk.Dec) (amountOut sdk.Dec, err error) {
+func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, minOut sdk.Dec) (sdk.Dec, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	// pair idea: "token0/token1"
 	pairId := k.CreatePairId(token0, token1)
 
+	// size of the feeList
 	feeSize := k.GetFeeListCount(ctx)
+	feelist := k.GetAllFeeList(ctx)
+	// geets the PairMap from the KVstore given pairId
 	pair, pairFound := k.GetPairMap(ctx, pairId)
 
-	fmt.Println("Token0: ", token0)
 	if !pairFound {
 		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 
+	// Counts how many ticks we have iterated through, compare to initialized ticks in the pair
+	// @Note Heuristic to remove unecessary looping
 	count := 0
+
+	//amount_left is the amount left to deposit
 	amount_left := amountIn
+
+	// amount to return to receiver
 	amount_out := sdk.ZeroDec()
 
+	// verify that amount left is not zero and that there are additional valid ticks to check
 	for !amount_left.Equal(sdk.ZeroDec()) && (count < int(pair.PairCount)) {
 
 		Current0Data, Current0Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick1To0)
+		//Current0Datam := Current0Data.TickData.Reserve1[i]
 
-		count++
+		// If tick/feeIndex pair is not found continue
+
 		if !Current0Found {
 
 			continue
 		}
+
+		// iterate count
+		count++
+
 		var i uint64
+
+		// iterator for feeList
 		i = 0
 		for i < feeSize && !amount_left.Equal(sdk.ZeroDec()) {
-			fee, _ := k.GetFeeList(ctx, i)
-			feeIndex := fee.Fee
+			// gets fee for given feeIndex
+			fee := feelist[i].Fee
 
-			Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick1To0-2*feeIndex)
+			Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick1To0-2*fee)
 
 			if !Current1Found {
 				i++
@@ -583,65 +630,68 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			}
 			//Current0Datam := Current0Data.TickData.Reserve1[i]
 
+			// calculate currentPrice and inverts
 			price, err := k.Calc_price(pair.TokenPair.CurrentTick1To0)
+			price = sdk.OneDec().Quo(price)
 
 			if err != nil {
 				return sdk.ZeroDec(), err
 			}
 
+			// price * amout_left + amount_out < minOut, error we cannot meet minOut threshold
 			if price.Mul(amount_left).Add(amount_out).LT(minOut) {
 				return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 			}
 
+			// price * r1 < amount_left
 			if price.Mul(Current0Data.TickData.Reserve0AndShares[i].Reserve0).LT(amount_left) {
+				// amountOut += amount_left * price
 				amount_out = amount_out.Add(Current0Data.TickData.Reserve0AndShares[i].Reserve0)
+				// decrement amount_left by price * reserve0
 				amount_left = amount_left.Sub(price.Mul(Current0Data.TickData.Reserve0AndShares[i].Reserve0))
+				//updates reserve1 with the new amountIn
 				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Add(price.Mul(Current0Data.TickData.Reserve0AndShares[i].Reserve0))
+				// sets reserve0 to 0
 				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = sdk.ZeroDec()
 
 			} else {
+				// amountOut += amount_left * price
 				amount_out = amount_out.Add(amount_left.Mul(price))
+				// increment reserve1 with amountLeft
 				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Add(amount_left)
+				// decrement reserve0 with amount_left * price
 				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Sub(amount_left.Mul(price))
+				// set amountLeft to 0
 				amount_left = sdk.ZeroDec()
 			}
 
+			//updates feeIndex
 			i++
+
+			//Make updates to tickMap containing reserve0/1 data to the KVStore
 			k.SetTickMap(ctx, pairId, Current0Data)
 			k.SetTickMap(ctx, pairId, Current1Data)
 		}
 
+		// if feeIndex is equal to the largest index in feeList
 		if i == feeSize-1 {
+
 			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 - 1
 		}
 	}
 
+	// Check to see if amount_out meets the threshold of minOut
 	k.SetPairMap(ctx, pair)
-	// Todo add slippage tolerance
 
 	if amount_out.LT(minOut) {
 		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 	}
 
-	if amountIn.GT(sdk.ZeroDec()) {
-		coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountIn.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
-			return sdk.ZeroDec(), err
-		}
-	} else {
-		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
-	}
+	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
+		token0, token1, msg.TokenIn, amountIn.String(), amount_out.String(), msg.MinOut,
+	))
 
-	if amount_out.GT(sdk.ZeroDec()) {
-
-		coinOut := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
-			return sdk.ZeroDec(), err
-		}
-	}
-
-	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator,
-		token0, token1, msg.TokenIn, amountIn.String(), amount_out.String(), msg.MinOut, msg.Receiver))
-
+	// Returns amount_out to keeper/msg.server: Swap
+	// @Dev token transfers happen in keeper/msg.server: Swap
 	return amount_out, nil
 }
