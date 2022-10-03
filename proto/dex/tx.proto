@@ -108,7 +108,7 @@ message MsgWithdrawlFilledLimitOrder {
   string tokenB = 3;
   string tickIndex = 4;
   string keyToken = 5;
-  string key = 6;
+  uint64 key = 6;
 }
 
 message MsgWithdrawlFilledLimitOrderResponse {
@@ -120,7 +120,7 @@ message MsgCancelLimitOrder {
   string tokenB = 3;
   string tickIndex = 4;
   string keyToken = 5;
-  string key = 6;
+  uint64 key = 6;
 }
 
 message MsgCancelLimitOrderResponse {

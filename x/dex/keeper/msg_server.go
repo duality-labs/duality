@@ -107,7 +107,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLimitOrder) (*types.MsgPlaceLimitOrderResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := PlaceLimitOrderCore(goCtx, msg)
+	err := k.PlaceLimitOrderCore(goCtx, msg)
 
 	if err != nil {
 		return &types.MsgPlaceLimitOrderResponse{}, err
@@ -115,4 +115,31 @@ func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLim
 	_ = ctx
 
 	return &types.MsgPlaceLimitOrderResponse{}, nil
+}
+
+func (k msgServer) WithdrawlFilledLimitOrder(goCtx context.Context, msg *types.MsgWithdrawlFilledLimitOrder) (*types.MsgWithdrawlFilledLimitOrderResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	err := k.WithdrawFilledLimitOrderCore(goCtx, msg)
+
+	if err != nil {
+		return &types.MsgWithdrawlFilledLimitOrderResponse{}, err
+	}
+
+	_ = ctx
+
+	return &types.MsgWithdrawlFilledLimitOrderResponse{}, nil
+}
+
+func (k msgServer) CancelLimitOrder(goCtx context.Context, msg *types.MsgCancelLimitOrder) (*types.MsgCancelLimitOrderResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	err := k.CancelLimitOrderCore(goCtx, msg)
+
+	if err != nil {
+		return &types.MsgCancelLimitOrderResponse{}, err
+	}
+	_ = ctx
+
+	return &types.MsgCancelLimitOrderResponse{}, nil
 }
