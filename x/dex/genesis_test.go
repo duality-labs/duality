@@ -116,6 +116,14 @@ func TestGenesis(t *testing.T) {
 				Count: "1",
 			},
 		},
+		LimitOrderPoolFillMapList: []types.LimitOrderPoolFillMap{
+			{
+				Count: "0",
+			},
+			{
+				Count: "1",
+			},
+		},
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
@@ -142,5 +150,6 @@ func TestGenesis(t *testing.T) {
 	require.ElementsMatch(t, genesisState.LimitOrderPoolUserSharesFilledList, got.LimitOrderPoolUserSharesFilledList)
 	require.ElementsMatch(t, genesisState.LimitOrderPoolTotalSharesMapList, got.LimitOrderPoolTotalSharesMapList)
 	require.ElementsMatch(t, genesisState.LimitOrderPoolReserveMapList, got.LimitOrderPoolReserveMapList)
+	require.ElementsMatch(t, genesisState.LimitOrderPoolFillMapList, got.LimitOrderPoolFillMapList)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

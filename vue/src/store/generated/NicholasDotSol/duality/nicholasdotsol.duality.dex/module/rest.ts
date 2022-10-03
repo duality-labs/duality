@@ -29,7 +29,13 @@ export interface DexFeeList {
   fee?: string;
 }
 
+export interface DexLimitOrderPoolFillMap {
+  count?: string;
+  fill?: string;
+}
+
 export interface DexLimitOrderPoolReserveMap {
+  /** @format uint64 */
   count?: string;
   reserves?: string;
 }
@@ -104,6 +110,21 @@ export interface DexQueryAllEdgeRowResponse {
 
 export interface DexQueryAllFeeListResponse {
   FeeList?: DexFeeList[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
+export interface DexQueryAllLimitOrderPoolFillMapResponse {
+  limitOrderPoolFillMap?: DexLimitOrderPoolFillMap[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -264,6 +285,10 @@ export interface DexQueryGetFeeListResponse {
   FeeList?: DexFeeList;
 }
 
+export interface DexQueryGetLimitOrderPoolFillMapResponse {
+  limitOrderPoolFillMap?: DexLimitOrderPoolFillMap;
+}
+
 export interface DexQueryGetLimitOrderPoolReserveMapResponse {
   limitOrderPoolReserveMap?: DexLimitOrderPoolReserveMap;
 }
@@ -405,6 +430,13 @@ export interface V1Beta1PageRequest {
    * is set.
    */
   count_total?: boolean;
+
+  /**
+   * reverse is set to true if results are to be returned in the descending order.
+   *
+   * Since: cosmos-sdk 0.43
+   */
+  reverse?: boolean;
 }
 
 /**
@@ -634,6 +666,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -675,6 +708,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -716,6 +750,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -747,6 +782,48 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
+   * @name QueryLimitOrderPoolFillMapAll
+   * @summary Queries a list of LimitOrderPoolFillMap items.
+   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_fill_map
+   */
+  queryLimitOrderPoolFillMapAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<DexQueryAllLimitOrderPoolFillMapResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/limit_order_pool_fill_map`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryLimitOrderPoolFillMap
+   * @summary Queries a LimitOrderPoolFillMap by index.
+   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_fill_map/{count}
+   */
+  queryLimitOrderPoolFillMap = (count: string, params: RequestParams = {}) =>
+    this.request<DexQueryGetLimitOrderPoolFillMapResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/limit_order_pool_fill_map/${count}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
    * @name QueryLimitOrderPoolReserveMapAll
    * @summary Queries a list of LimitOrderPoolReserveMap items.
    * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_reserve_map
@@ -757,6 +834,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -798,6 +876,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -839,6 +918,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -880,6 +960,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -921,6 +1002,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -978,6 +1060,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -1019,6 +1102,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -1061,6 +1145,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -1102,6 +1187,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       "pagination.offset"?: string;
       "pagination.limit"?: string;
       "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
     },
     params: RequestParams = {},
   ) =>

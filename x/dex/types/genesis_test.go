@@ -132,6 +132,14 @@ func TestGenesisState_Validate(t *testing.T) {
 						Count: "1",
 					},
 				},
+				LimitOrderPoolFillMapList: []types.LimitOrderPoolFillMap{
+					{
+						Count: "0",
+					},
+					{
+						Count: "1",
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -352,6 +360,20 @@ func TestGenesisState_Validate(t *testing.T) {
 			desc: "duplicated limitOrderPoolReserveMap",
 			genState: &types.GenesisState{
 				LimitOrderPoolReserveMapList: []types.LimitOrderPoolReserveMap{
+					{
+						Count: "0",
+					},
+					{
+						Count: "0",
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated limitOrderPoolFillMap",
+			genState: &types.GenesisState{
+				LimitOrderPoolFillMapList: []types.LimitOrderPoolFillMap{
 					{
 						Count: "0",
 					},

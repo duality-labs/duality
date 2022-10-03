@@ -17,6 +17,7 @@ import "dex/limit_order_pool_user_share_map.proto";
 import "dex/limit_order_pool_user_shares_filled.proto";
 import "dex/limit_order_pool_total_shares_map.proto";
 import "dex/limit_order_pool_reserve_map.proto";
+import "dex/limit_order_pool_fill_map.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -145,6 +146,16 @@ service Query {
 	// Queries a list of LimitOrderPoolReserveMap items.
 	rpc LimitOrderPoolReserveMapAll(QueryAllLimitOrderPoolReserveMapRequest) returns (QueryAllLimitOrderPoolReserveMapResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_reserve_map";
+	}
+
+// Queries a LimitOrderPoolFillMap by index.
+	rpc LimitOrderPoolFillMap(QueryGetLimitOrderPoolFillMapRequest) returns (QueryGetLimitOrderPoolFillMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_fill_map/{count}";
+	}
+
+	// Queries a list of LimitOrderPoolFillMap items.
+	rpc LimitOrderPoolFillMapAll(QueryAllLimitOrderPoolFillMapRequest) returns (QueryAllLimitOrderPoolFillMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_fill_map";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -305,7 +316,7 @@ message QueryAllAdjanceyMatrixResponse {
 }
 
 message QueryGetLimitOrderPoolUserShareMapRequest {
-	  string count = 1;
+	uint64 count = 1;
   string address = 2;
 
 }
@@ -324,7 +335,7 @@ message QueryAllLimitOrderPoolUserShareMapResponse {
 }
 
 message QueryGetLimitOrderPoolUserSharesFilledRequest {
-	  string count = 1;
+	uint64 count = 1;
   string address = 2;
 
 }
@@ -343,7 +354,7 @@ message QueryAllLimitOrderPoolUserSharesFilledResponse {
 }
 
 message QueryGetLimitOrderPoolTotalSharesMapRequest {
-	  string count = 1;
+	  uint64 count = 1;
 
 }
 
@@ -361,7 +372,7 @@ message QueryAllLimitOrderPoolTotalSharesMapResponse {
 }
 
 message QueryGetLimitOrderPoolReserveMapRequest {
-	  string count = 1;
+	  uint64 count = 1;
 
 }
 
@@ -375,6 +386,24 @@ message QueryAllLimitOrderPoolReserveMapRequest {
 
 message QueryAllLimitOrderPoolReserveMapResponse {
 	repeated LimitOrderPoolReserveMap limitOrderPoolReserveMap = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetLimitOrderPoolFillMapRequest {
+	uint64 count = 1;
+
+}
+
+message QueryGetLimitOrderPoolFillMapResponse {
+	LimitOrderPoolFillMap limitOrderPoolFillMap = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllLimitOrderPoolFillMapRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllLimitOrderPoolFillMapResponse {
+	repeated LimitOrderPoolFillMap limitOrderPoolFillMap = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

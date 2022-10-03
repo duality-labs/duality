@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListLimitOrderPoolTotalSharesMap() *cobra.Command {
+func CmdListLimitOrderPoolFillMap() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-limit-order-pool-total-shares-map",
-		Short: "list all LimitOrderPoolTotalSharesMap",
+		Use:   "list-limit-order-pool-fill-map",
+		Short: "list all LimitOrderPoolFillMap",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -24,11 +24,11 @@ func CmdListLimitOrderPoolTotalSharesMap() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllLimitOrderPoolTotalSharesMapRequest{
+			params := &types.QueryAllLimitOrderPoolFillMapRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.LimitOrderPoolTotalSharesMapAll(context.Background(), params)
+			res, err := queryClient.LimitOrderPoolFillMapAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -43,10 +43,10 @@ func CmdListLimitOrderPoolTotalSharesMap() *cobra.Command {
 	return cmd
 }
 
-func CmdShowLimitOrderPoolTotalSharesMap() *cobra.Command {
+func CmdShowLimitOrderPoolFillMap() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-limit-order-pool-total-shares-map [count]",
-		Short: "shows a LimitOrderPoolTotalSharesMap",
+		Use:   "show-limit-order-pool-fill-map [count]",
+		Short: "shows a LimitOrderPoolFillMap",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -61,11 +61,11 @@ func CmdShowLimitOrderPoolTotalSharesMap() *cobra.Command {
 				return err
 			}
 
-			params := &types.QueryGetLimitOrderPoolTotalSharesMapRequest{
+			params := &types.QueryGetLimitOrderPoolFillMapRequest{
 				Count: uint64(argCount),
 			}
 
-			res, err := queryClient.LimitOrderPoolTotalSharesMap(context.Background(), params)
+			res, err := queryClient.LimitOrderPoolFillMap(context.Background(), params)
 			if err != nil {
 				return err
 			}

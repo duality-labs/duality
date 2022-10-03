@@ -18,6 +18,7 @@ import { LimitOrderPoolUserShareMap } from "../dex/limit_order_pool_user_share_m
 import { LimitOrderPoolUserSharesFilled } from "../dex/limit_order_pool_user_shares_filled";
 import { LimitOrderPoolTotalSharesMap } from "../dex/limit_order_pool_total_shares_map";
 import { LimitOrderPoolReserveMap } from "../dex/limit_order_pool_reserve_map";
+import { LimitOrderPoolFillMap } from "../dex/limit_order_pool_fill_map";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -237,6 +238,23 @@ export interface QueryAllLimitOrderPoolReserveMapRequest {
 
 export interface QueryAllLimitOrderPoolReserveMapResponse {
   limitOrderPoolReserveMap: LimitOrderPoolReserveMap[];
+  pagination: PageResponse | undefined;
+}
+
+export interface QueryGetLimitOrderPoolFillMapRequest {
+  count: string;
+}
+
+export interface QueryGetLimitOrderPoolFillMapResponse {
+  limitOrderPoolFillMap: LimitOrderPoolFillMap | undefined;
+}
+
+export interface QueryAllLimitOrderPoolFillMapRequest {
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryAllLimitOrderPoolFillMapResponse {
+  limitOrderPoolFillMap: LimitOrderPoolFillMap[];
   pagination: PageResponse | undefined;
 }
 
@@ -4172,6 +4190,346 @@ export const QueryAllLimitOrderPoolReserveMapResponse = {
   },
 };
 
+const baseQueryGetLimitOrderPoolFillMapRequest: object = { count: "" };
+
+export const QueryGetLimitOrderPoolFillMapRequest = {
+  encode(
+    message: QueryGetLimitOrderPoolFillMapRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.count !== "") {
+      writer.uint32(10).string(message.count);
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryGetLimitOrderPoolFillMapRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryGetLimitOrderPoolFillMapRequest,
+    } as QueryGetLimitOrderPoolFillMapRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.count = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetLimitOrderPoolFillMapRequest {
+    const message = {
+      ...baseQueryGetLimitOrderPoolFillMapRequest,
+    } as QueryGetLimitOrderPoolFillMapRequest;
+    if (object.count !== undefined && object.count !== null) {
+      message.count = String(object.count);
+    } else {
+      message.count = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetLimitOrderPoolFillMapRequest): unknown {
+    const obj: any = {};
+    message.count !== undefined && (obj.count = message.count);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetLimitOrderPoolFillMapRequest>
+  ): QueryGetLimitOrderPoolFillMapRequest {
+    const message = {
+      ...baseQueryGetLimitOrderPoolFillMapRequest,
+    } as QueryGetLimitOrderPoolFillMapRequest;
+    if (object.count !== undefined && object.count !== null) {
+      message.count = object.count;
+    } else {
+      message.count = "";
+    }
+    return message;
+  },
+};
+
+const baseQueryGetLimitOrderPoolFillMapResponse: object = {};
+
+export const QueryGetLimitOrderPoolFillMapResponse = {
+  encode(
+    message: QueryGetLimitOrderPoolFillMapResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.limitOrderPoolFillMap !== undefined) {
+      LimitOrderPoolFillMap.encode(
+        message.limitOrderPoolFillMap,
+        writer.uint32(10).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryGetLimitOrderPoolFillMapResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryGetLimitOrderPoolFillMapResponse,
+    } as QueryGetLimitOrderPoolFillMapResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.limitOrderPoolFillMap = LimitOrderPoolFillMap.decode(
+            reader,
+            reader.uint32()
+          );
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetLimitOrderPoolFillMapResponse {
+    const message = {
+      ...baseQueryGetLimitOrderPoolFillMapResponse,
+    } as QueryGetLimitOrderPoolFillMapResponse;
+    if (
+      object.limitOrderPoolFillMap !== undefined &&
+      object.limitOrderPoolFillMap !== null
+    ) {
+      message.limitOrderPoolFillMap = LimitOrderPoolFillMap.fromJSON(
+        object.limitOrderPoolFillMap
+      );
+    } else {
+      message.limitOrderPoolFillMap = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetLimitOrderPoolFillMapResponse): unknown {
+    const obj: any = {};
+    message.limitOrderPoolFillMap !== undefined &&
+      (obj.limitOrderPoolFillMap = message.limitOrderPoolFillMap
+        ? LimitOrderPoolFillMap.toJSON(message.limitOrderPoolFillMap)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetLimitOrderPoolFillMapResponse>
+  ): QueryGetLimitOrderPoolFillMapResponse {
+    const message = {
+      ...baseQueryGetLimitOrderPoolFillMapResponse,
+    } as QueryGetLimitOrderPoolFillMapResponse;
+    if (
+      object.limitOrderPoolFillMap !== undefined &&
+      object.limitOrderPoolFillMap !== null
+    ) {
+      message.limitOrderPoolFillMap = LimitOrderPoolFillMap.fromPartial(
+        object.limitOrderPoolFillMap
+      );
+    } else {
+      message.limitOrderPoolFillMap = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllLimitOrderPoolFillMapRequest: object = {};
+
+export const QueryAllLimitOrderPoolFillMapRequest = {
+  encode(
+    message: QueryAllLimitOrderPoolFillMapRequest,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryAllLimitOrderPoolFillMapRequest {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryAllLimitOrderPoolFillMapRequest,
+    } as QueryAllLimitOrderPoolFillMapRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllLimitOrderPoolFillMapRequest {
+    const message = {
+      ...baseQueryAllLimitOrderPoolFillMapRequest,
+    } as QueryAllLimitOrderPoolFillMapRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllLimitOrderPoolFillMapRequest): unknown {
+    const obj: any = {};
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageRequest.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryAllLimitOrderPoolFillMapRequest>
+  ): QueryAllLimitOrderPoolFillMapRequest {
+    const message = {
+      ...baseQueryAllLimitOrderPoolFillMapRequest,
+    } as QueryAllLimitOrderPoolFillMapRequest;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryAllLimitOrderPoolFillMapResponse: object = {};
+
+export const QueryAllLimitOrderPoolFillMapResponse = {
+  encode(
+    message: QueryAllLimitOrderPoolFillMapResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    for (const v of message.limitOrderPoolFillMap) {
+      LimitOrderPoolFillMap.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(
+        message.pagination,
+        writer.uint32(18).fork()
+      ).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryAllLimitOrderPoolFillMapResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryAllLimitOrderPoolFillMapResponse,
+    } as QueryAllLimitOrderPoolFillMapResponse;
+    message.limitOrderPoolFillMap = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.limitOrderPoolFillMap.push(
+            LimitOrderPoolFillMap.decode(reader, reader.uint32())
+          );
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllLimitOrderPoolFillMapResponse {
+    const message = {
+      ...baseQueryAllLimitOrderPoolFillMapResponse,
+    } as QueryAllLimitOrderPoolFillMapResponse;
+    message.limitOrderPoolFillMap = [];
+    if (
+      object.limitOrderPoolFillMap !== undefined &&
+      object.limitOrderPoolFillMap !== null
+    ) {
+      for (const e of object.limitOrderPoolFillMap) {
+        message.limitOrderPoolFillMap.push(LimitOrderPoolFillMap.fromJSON(e));
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromJSON(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryAllLimitOrderPoolFillMapResponse): unknown {
+    const obj: any = {};
+    if (message.limitOrderPoolFillMap) {
+      obj.limitOrderPoolFillMap = message.limitOrderPoolFillMap.map((e) =>
+        e ? LimitOrderPoolFillMap.toJSON(e) : undefined
+      );
+    } else {
+      obj.limitOrderPoolFillMap = [];
+    }
+    message.pagination !== undefined &&
+      (obj.pagination = message.pagination
+        ? PageResponse.toJSON(message.pagination)
+        : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryAllLimitOrderPoolFillMapResponse>
+  ): QueryAllLimitOrderPoolFillMapResponse {
+    const message = {
+      ...baseQueryAllLimitOrderPoolFillMapResponse,
+    } as QueryAllLimitOrderPoolFillMapResponse;
+    message.limitOrderPoolFillMap = [];
+    if (
+      object.limitOrderPoolFillMap !== undefined &&
+      object.limitOrderPoolFillMap !== null
+    ) {
+      for (const e of object.limitOrderPoolFillMap) {
+        message.limitOrderPoolFillMap.push(
+          LimitOrderPoolFillMap.fromPartial(e)
+        );
+      }
+    }
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromPartial(object.pagination);
+    } else {
+      message.pagination = undefined;
+    }
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -4246,6 +4604,14 @@ export interface Query {
   LimitOrderPoolReserveMapAll(
     request: QueryAllLimitOrderPoolReserveMapRequest
   ): Promise<QueryAllLimitOrderPoolReserveMapResponse>;
+  /** Queries a LimitOrderPoolFillMap by index. */
+  LimitOrderPoolFillMap(
+    request: QueryGetLimitOrderPoolFillMapRequest
+  ): Promise<QueryGetLimitOrderPoolFillMapResponse>;
+  /** Queries a list of LimitOrderPoolFillMap items. */
+  LimitOrderPoolFillMapAll(
+    request: QueryAllLimitOrderPoolFillMapRequest
+  ): Promise<QueryAllLimitOrderPoolFillMapResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -4596,6 +4962,34 @@ export class QueryClientImpl implements Query {
     );
     return promise.then((data) =>
       QueryAllLimitOrderPoolReserveMapResponse.decode(new Reader(data))
+    );
+  }
+
+  LimitOrderPoolFillMap(
+    request: QueryGetLimitOrderPoolFillMapRequest
+  ): Promise<QueryGetLimitOrderPoolFillMapResponse> {
+    const data = QueryGetLimitOrderPoolFillMapRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "LimitOrderPoolFillMap",
+      data
+    );
+    return promise.then((data) =>
+      QueryGetLimitOrderPoolFillMapResponse.decode(new Reader(data))
+    );
+  }
+
+  LimitOrderPoolFillMapAll(
+    request: QueryAllLimitOrderPoolFillMapRequest
+  ): Promise<QueryAllLimitOrderPoolFillMapResponse> {
+    const data = QueryAllLimitOrderPoolFillMapRequest.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Query",
+      "LimitOrderPoolFillMapAll",
+      data
+    );
+    return promise.then((data) =>
+      QueryAllLimitOrderPoolFillMapResponse.decode(new Reader(data))
     );
   }
 }

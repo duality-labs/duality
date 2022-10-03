@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -52,11 +53,17 @@ func CmdShowLimitOrderPoolUserSharesFilled() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			argCount := args[0]
+			tmpargCount := args[0]
+
+			argCount, err := strconv.Atoi(tmpargCount)
+
+			if err != nil {
+				return err
+			}
 			argAddress := args[1]
 
 			params := &types.QueryGetLimitOrderPoolUserSharesFilledRequest{
-				Count:   argCount,
+				Count:   uint64(argCount),
 				Address: argAddress,
 			}
 

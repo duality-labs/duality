@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -52,7 +53,13 @@ func CmdShowLimitOrderPoolReserveMap() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			argCount := args[0]
+			tmpargCount := args[0]
+
+			argCount, err := strconv.Atoi(tmpargCount)
+
+			if err != nil {
+				return err
+			}
 
 			params := &types.QueryGetLimitOrderPoolReserveMapRequest{
 				Count: argCount,
