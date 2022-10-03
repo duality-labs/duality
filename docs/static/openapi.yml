@@ -52938,8 +52938,6 @@ definitions:
         format: int64
   nicholasdotsol.duality.dex.MsgDepositResponse:
     type: object
-  nicholasdotsol.duality.dex.MsgRouteResponse:
-    type: object
   nicholasdotsol.duality.dex.MsgSwapResponse:
     type: object
   nicholasdotsol.duality.dex.MsgWithdrawlResponse:

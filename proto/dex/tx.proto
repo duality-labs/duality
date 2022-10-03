@@ -10,7 +10,6 @@ service Msg {
   rpc Deposit(MsgDeposit) returns (MsgDepositResponse);
   rpc Withdrawl(MsgWithdrawl) returns (MsgWithdrawlResponse);
   rpc Swap(MsgSwap) returns (MsgSwapResponse);
-  rpc Route(MsgRoute) returns (MsgRouteResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -70,19 +69,6 @@ message MsgSwap {
 }
 
 message MsgSwapResponse {
-}
-
-message MsgRoute {
-  string creator = 1;
-  string receiver = 2;
-  string tokenA = 3;
-  string tokenB = 4;
-  string amountIn = 5;
-  string tokenIn = 6;
-  string minOut = 7;
-}
-
-message MsgRouteResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message

@@ -31,8 +31,6 @@ export interface DexFeeList {
 
 export type DexMsgDepositResponse = object;
 
-export type DexMsgRouteResponse = object;
-
 export type DexMsgSwapResponse = object;
 
 export type DexMsgWithdrawlResponse = object;

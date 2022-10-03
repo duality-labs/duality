@@ -36,10 +36,6 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgSwap int = 100
 
-	opWeightMsgRoute = "op_weight_msg_route"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgRoute int = 100
-
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -105,17 +101,6 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgSwap,
 		dexsimulation.SimulateMsgSwap(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
-	var weightMsgRoute int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgRoute, &weightMsgRoute, nil,
-		func(_ *rand.Rand) {
-			weightMsgRoute = defaultWeightMsgRoute
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgRoute,
-		dexsimulation.SimulateMsgRoute(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation

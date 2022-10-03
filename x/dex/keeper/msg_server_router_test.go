@@ -95,10 +95,9 @@ func (suite *IntegrationTestSuite) TestBasicMultiHopRoute() {
 
 	swapResponse, err := suite.msgServer.Route(goCtx, &types.MsgRoute{
 		Creator:  alice.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
+		TokenIn:  "TokenA",
+		TokenOut: "TokenB",
 		AmountIn: "20",
-		TokenIn:  "TokenB",
 		MinOut:   "10",
 		Receiver: alice.String(),
 	})
