@@ -9,34 +9,35 @@ import (
 	//authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
-func (suite *IntegrationTestSuite) TestHasBalance4() {
-
+func NewCoin(amt float64, tokenName string) sdk.Coin {
+	var newAmt int64 = int64(amt)
+	return sdk.NewCoin(tokenName, sdk.NewInt(newAmt))
 }
 
-func (suite *IntegrationTestSuite) TestRoute() {
-	fmt.Println("Swap Tests")
+// Swapping from JUNO to STARS through USDC
+func (suite *IntegrationTestSuite) TestBasicMultiHopRoute() {
+	fmt.Println("Route Tests")
 	app, ctx := suite.app, suite.ctx
 	//holderAcc := authtypes.NewEmptyModuleAccount("holder")
 	alice := sdk.AccAddress([]byte("alice"))
-	bob := sdk.AccAddress([]byte("bob"))
+	lp := sdk.AccAddress([]byte("lp"))
 
 	accAlice := app.AccountKeeper.NewAccountWithAddress(ctx, alice)
 	app.AccountKeeper.SetAccount(ctx, accAlice)
-	accBob := app.AccountKeeper.NewAccountWithAddress(ctx, bob)
-	app.AccountKeeper.SetAccount(ctx, accBob)
+	accLP := app.AccountKeeper.NewAccountWithAddress(ctx, lp)
+	app.AccountKeeper.SetAccount(ctx, accLP)
 
-	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000000")), newBCoin(convInt("500000000000000000000")))
-	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
+	// Base 18 decimals
+	balanceAlice := sdk.NewCoins(NewCoin(1e23, "JUNO"))
+	balanceLP := sdk.NewCoins(NewCoin(1e23, "STARS"), NewCoin(1e23, "DUAL"), NewCoin(1e23, "USDC"))
 
 	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, lp, balanceLP))
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
-	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000001"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
-
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, NewCoin(1e23, "JUNO")))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, lp, NewCoin(1e23, "STARS")))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, lp, NewCoin(1e23, "DUAL")))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, lp, NewCoin(1e23, "USDC")))
 	goCtx := sdk.WrapSDKContext(ctx)
 
 	// Set Fee List
@@ -51,82 +52,47 @@ func (suite *IntegrationTestSuite) TestRoute() {
 	fmt.Println(feeList)
 
 	createResponse, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:   alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		AmountA:   "50",
-		AmountB:   "0",
+		Creator:   lp.String(),
+		TokenA:    "JUNO",
+		TokenB:    "USDC",
+		AmountA:   "0",
+		AmountB:   "100",
 		TickIndex: 0,
 		FeeIndex:  0,
-		Receiver:  alice.String(),
+		Receiver:  lp.String(),
 	})
 
 	suite.Require().Nil(err)
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("99950000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
-	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000001"))))
+	// Confirm LP Balance post Deposit
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, lp, NewCoin(9.9e22, "STARS")))
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
-
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("0"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("50000000000000000000"))))
+	// Confirm Pool Balances
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), NewCoin(0, "STARS")))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), NewCoin(100e18, "JUNO")))
 
 	_ = createResponse
 
-	pairId := app.DexKeeper.CreatePairId("TokenA", "TokenB")
+	pairId := app.DexKeeper.CreatePairId("JUNO", "STARS")
 
 	createResponse2, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:   alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		AmountA:   "50",
-		AmountB:   "0",
+		Creator:   lp.String(),
+		TokenA:    "USDC",
+		TokenB:    "STARS",
+		AmountA:   "0",
+		AmountB:   "100",
 		TickIndex: 0,
 		FeeIndex:  1,
-		Receiver:  alice.String(),
+		Receiver:  lp.String(),
 	})
 
 	suite.Require().Nil(err)
 
 	_ = createResponse2
 
-	createResponse3, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:   alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		AmountA:   "0",
-		AmountB:   "50",
-		TickIndex: -2,
-		FeeIndex:  0,
-		Receiver:  alice.String(),
-	})
-
-	suite.Require().Nil(err)
-	_ = createResponse3
-
-	createResponse4, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:   alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		AmountA:   "0",
-		AmountB:   "50",
-		TickIndex: -1,
-		FeeIndex:  0,
-		Receiver:  alice.String(),
-	})
-
-	suite.Require().Nil(err)
-
-	pairId = app.DexKeeper.CreatePairId("TokenA", "TokenB")
-
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("100000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("100000000000000000000"))))
-
 	//fmt.Println(app.DexKeeper.GetAllPairMap(ctx))
 
-	swapRepsone, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
+	swapResponse, err := suite.msgServer.SwapRoute(goCtx, &types.MsgSwap{
 		Creator:  alice.String(),
 		TokenA:   "TokenA",
 		TokenB:   "TokenB",
@@ -136,7 +102,7 @@ func (suite *IntegrationTestSuite) TestRoute() {
 		Receiver: alice.String(),
 	})
 
-	_ = swapRepsone
+	_ = swapResponse
 
 	suite.Require().Nil(err)
 
