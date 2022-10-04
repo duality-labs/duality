@@ -449,7 +449,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 }
 
 // //// Swap Functions
-func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress) (sdk.Dec, error) {
+func (k Keeper) Swap0to1(goCtx context.Context, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, minOut sdk.Dec) (sdk.Dec, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -472,7 +472,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	count := 0
 
 	//amount_left is the amount left to deposit
-	amount_left := msg.AmountIn
+	amount_left := amountIn
 	// amount to return to receiver
 	amount_out := sdk.ZeroDec()
 
@@ -513,7 +513,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			}
 
 			// price * amout_left + amount_out < minOut, error we cannot meet minOut threshold
-			if price.Mul(amount_left).Add(amount_out).LT(msg.MinOut) {
+			if price.Mul(amount_left).Add(amount_out).LT(minOut) {
 				return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 			}
 
@@ -557,20 +557,16 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	k.SetPairMap(ctx, pair)
 
 	// Check to see if amount_out meets the threshold of minOut
-	if amount_out.LT(msg.MinOut) {
+	if amount_out.LT(minOut) {
 		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 	}
-
-	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.TokenIn, msg.AmountIn.String(), amount_out.String(), msg.MinOut.String(),
-	))
 
 	// Returns amount_out to keeper/msg.server: Swap
 	// @Dev token transfers happen in keeper/msg.server: Swap
 	return amount_out, nil
 }
 
-func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress) (sdk.Dec, error) {
+func (k Keeper) Swap1to0(goCtx context.Context, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, minOut sdk.Dec) (sdk.Dec, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -592,7 +588,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	count := 0
 
 	//amount_left is the amount left to deposit
-	amount_left := msg.AmountIn
+	amount_left := amountIn
 
 	// amount to return to receiver
 	amount_out := sdk.ZeroDec()
@@ -638,7 +634,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			}
 
 			// price * amout_left + amount_out < minOut, error we cannot meet minOut threshold
-			if price.Mul(amount_left).Add(amount_out).LT(msg.MinOut) {
+			if price.Mul(amount_left).Add(amount_out).LT(minOut) {
 				return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 			}
 
@@ -682,13 +678,9 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	// Check to see if amount_out meets the threshold of minOut
 	k.SetPairMap(ctx, pair)
 
-	if amount_out.LT(msg.MinOut) {
+	if amount_out.LT(minOut) {
 		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 	}
-
-	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.TokenIn, msg.AmountIn.String(), amount_out.String(), msg.MinOut.String(),
-	))
 
 	// Returns amount_out to keeper/msg.server: Swap
 	// @Dev token transfers happen in keeper/msg.server: Swap

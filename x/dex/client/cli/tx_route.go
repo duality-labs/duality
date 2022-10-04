@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +23,17 @@ func CmdRoute() *cobra.Command {
 			argTokenIn := args[1]
 			argTokenOut := args[2]
 			argAmountIn := args[3]
+			argAmountInDec, err := sdk.NewDecFromStr(argAmountIn)
+
+			if err != nil {
+				return err
+			}
 			argMinOut := args[4]
+			argMinOutDec, err := sdk.NewDecFromStr(argMinOut)
+
+			if err != nil {
+				return err
+			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -34,8 +45,8 @@ func CmdRoute() *cobra.Command {
 				argReceiver,
 				argTokenIn,
 				argTokenOut,
-				argAmountIn,
-				argMinOut,
+				argAmountInDec,
+				argMinOutDec,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

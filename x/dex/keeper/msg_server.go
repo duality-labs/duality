@@ -67,7 +67,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	var amount_out sdk.Dec
 
 	if msg.TokenIn == token0 {
-		amount_out, err = k.Swap0to1(goCtx, msg, token0, token1, createrAddr)
+		amount_out, err = k.Swap0to1(goCtx, token0, token1, createrAddr, msg.AmountIn, msg.MinOut)
 
 		if err != nil {
 			return nil, err
@@ -90,8 +90,12 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 			}
 		}
 
+		ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
+			token0, token1, msg.TokenIn, msg.AmountIn.String(), amount_out.String(), msg.MinOut.String(),
+		))
+
 	} else {
-		amount_out, err = k.Swap1to0(goCtx, msg, token0, token1, createrAddr)
+		amount_out, err = k.Swap1to0(goCtx, token0, token1, createrAddr, msg.AmountIn, msg.MinOut)
 
 		if err != nil {
 			return nil, err
@@ -113,6 +117,9 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 				return &types.MsgSwapResponse{}, err
 			}
 		}
+		ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
+			token0, token1, msg.TokenIn, msg.AmountIn.String(), amount_out.String(), msg.MinOut.String(),
+		))
 
 	}
 
@@ -137,10 +144,6 @@ func (k msgServer) Route(goCtx context.Context, msg *types.MsgRoute) (*types.Msg
 	if err != nil {
 		return nil, err
 	}
-
-	ctx.EventManager().EmitEvent(types.CreateRouteEvent(msg.Creator, msg.Receiver,
-		msg.TokenIn, msg.TokenOut, amountIn.String(), amount_out.String(), msg.MinOut,
-	))
 
 	if amountIn.GT(sdk.ZeroDec()) {
 		coinIn := sdk.NewCoin(msg.TokenIn, sdk.NewIntFromBigInt(amountIn.BigInt()))

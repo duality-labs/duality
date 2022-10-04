@@ -99,8 +99,8 @@ func (suite *IntegrationTestSuite) TestBasicMultiHopRoute() {
 		Creator:  alice.String(),
 		TokenIn:  "JUNO",
 		TokenOut: "STARS",
-		AmountIn: "10",
-		MinOut:   "0",
+		AmountIn: sdk.NewDec(10),
+		MinOut:   sdk.NewDec(0),
 		Receiver: alice.String(),
 	})
 
