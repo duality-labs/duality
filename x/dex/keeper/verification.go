@@ -175,8 +175,8 @@ func (k Keeper) tradeVerification(ctx sdk.Context, Creator string, Receiver stri
 
 	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 	if AccountsAmountInBalance.LT(UncheckedAmountIn) {
-		return "", "", nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
+		return nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
-	return token0, token1, callerAddr, nil
+	return callerAddr, UncheckedAmountIn, UncheckedMinOut, nil
 }
