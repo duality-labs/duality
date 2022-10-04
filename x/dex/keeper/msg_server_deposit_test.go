@@ -9,16 +9,10 @@ import (
 	//authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
-// Returns -1 if error
-func newDec(amount string) sdk.Dec {
-	amt, err := sdk.NewDecFromStr(amount)
+func newDec(amt string) sdk.Dec {
+	decAmt, _ := sdk.NewDecFromStr(amt)
 
-	if err != nil {
-		return sdk.NewDec(-1)
-	}
-
-	return amt
-
+	return decAmt
 }
 
 func newACoin(amt sdk.Int) sdk.Coin {
