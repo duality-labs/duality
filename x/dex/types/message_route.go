@@ -9,7 +9,7 @@ const TypeMsgRoute = "route"
 
 var _ sdk.Msg = &MsgRoute{}
 
-func NewMsgRoute(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, minOut string) *MsgRoute {
+func NewMsgRoute(creator string, receiver string, tokenIn string, tokenOut string, amountIn sdk.Dec, minOut sdk.Dec) *MsgRoute {
 	return &MsgRoute{
 		Creator:  creator,
 		Receiver: receiver,

@@ -657,7 +657,26 @@ export default {
 		},
 		
 		
+<<<<<<< HEAD
 		async sendMsgRoute({ rootGetters }, { value, fee = [], memo = '' }) {
+=======
+		async sendMsgSwap({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgSwap(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgSwap:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgSwap:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgWithdrawl({ rootGetters }, { value, fee = [], memo = '' }) {
+>>>>>>> origin/dexv3
 			try {
 				const txClient=await initTxClient(rootGetters)
 				const msg = await txClient.msgRoute(value)
@@ -687,21 +706,21 @@ export default {
 				}
 			}
 		},
-		async sendMsgSwap({ rootGetters }, { value, fee = [], memo = '' }) {
+		
+		async MsgSwap({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
 				const msg = await txClient.msgSwap(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
+				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
 					throw new Error('TxClient:MsgSwap:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgSwap:Send Could not broadcast Tx: '+ e.message)
+				} else{
+					throw new Error('TxClient:MsgSwap:Create Could not create message: ' + e.message)
 				}
 			}
 		},
+<<<<<<< HEAD
 		async sendMsgDeposit({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -719,6 +738,9 @@ export default {
 		},
 		
 		async MsgRoute({ rootGetters }, { value }) {
+=======
+		async MsgWithdrawl({ rootGetters }, { value }) {
+>>>>>>> origin/dexv3
 			try {
 				const txClient=await initTxClient(rootGetters)
 				const msg = await txClient.msgRoute(value)
@@ -744,6 +766,7 @@ export default {
 				}
 			}
 		},
+<<<<<<< HEAD
 		async MsgSwap({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -770,6 +793,8 @@ export default {
 				}
 			}
 		},
+=======
+>>>>>>> origin/dexv3
 		
 	}
 }

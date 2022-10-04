@@ -4,16 +4,26 @@ import { StdFee } from "@cosmjs/launchpad";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Registry, OfflineSigner, EncodeObject, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Api } from "./rest";
+<<<<<<< HEAD
 import { MsgRoute } from "./types/dex/tx";
 import { MsgWithdrawl } from "./types/dex/tx";
 import { MsgSwap } from "./types/dex/tx";
+=======
+import { MsgSwap } from "./types/dex/tx";
+import { MsgWithdrawl } from "./types/dex/tx";
+>>>>>>> origin/dexv3
 import { MsgDeposit } from "./types/dex/tx";
 
 
 const types = [
+<<<<<<< HEAD
   ["/nicholasdotsol.duality.dex.MsgRoute", MsgRoute],
   ["/nicholasdotsol.duality.dex.MsgWithdrawl", MsgWithdrawl],
   ["/nicholasdotsol.duality.dex.MsgSwap", MsgSwap],
+=======
+  ["/nicholasdotsol.duality.dex.MsgSwap", MsgSwap],
+  ["/nicholasdotsol.duality.dex.MsgWithdrawl", MsgWithdrawl],
+>>>>>>> origin/dexv3
   ["/nicholasdotsol.duality.dex.MsgDeposit", MsgDeposit],
   
 ];
@@ -47,9 +57,14 @@ const txClient = async (wallet: OfflineSigner, { addr: addr }: TxClientOptions =
 
   return {
     signAndBroadcast: (msgs: EncodeObject[], { fee, memo }: SignAndBroadcastOptions = {fee: defaultFee, memo: ""}) => client.signAndBroadcast(address, msgs, fee,memo),
+<<<<<<< HEAD
     msgRoute: (data: MsgRoute): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgRoute", value: MsgRoute.fromPartial( data ) }),
     msgWithdrawl: (data: MsgWithdrawl): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgWithdrawl", value: MsgWithdrawl.fromPartial( data ) }),
     msgSwap: (data: MsgSwap): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgSwap", value: MsgSwap.fromPartial( data ) }),
+=======
+    msgSwap: (data: MsgSwap): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgSwap", value: MsgSwap.fromPartial( data ) }),
+    msgWithdrawl: (data: MsgWithdrawl): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgWithdrawl", value: MsgWithdrawl.fromPartial( data ) }),
+>>>>>>> origin/dexv3
     msgDeposit: (data: MsgDeposit): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgDeposit", value: MsgDeposit.fromPartial( data ) }),
     
   };

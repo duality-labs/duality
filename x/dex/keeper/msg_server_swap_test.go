@@ -144,9 +144,9 @@ func (suite *IntegrationTestSuite) TestSwap() {
 		Creator:  alice.String(),
 		TokenA:   "TokenA",
 		TokenB:   "TokenB",
-		AmountIn: "20",
+		AmountIn: newDec("20"),
 		TokenIn:  "TokenB",
-		MinOut:   "10",
+		MinOut:   newDec("10"),
 		Receiver: alice.String(),
 	})
 
@@ -228,9 +228,9 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection() {
 		Creator:  bob.String(),
 		TokenA:   "TokenA",
 		TokenB:   "TokenB",
-		AmountIn: "49.99500",
+		AmountIn: newDec("49.99500"),
 		TokenIn:  "TokenB",
-		MinOut:   "10",
+		MinOut:   newDec("10"),
 		Receiver: bob.String(),
 	})
 
@@ -311,9 +311,9 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedWrongDirection() {
 		Creator:  bob.String(),
 		TokenA:   "TokenA",
 		TokenB:   "TokenB",
-		AmountIn: "49.99500",
+		AmountIn: newDec("49.99500"),
 		TokenIn:  "TokenA",
-		MinOut:   "10",
+		MinOut:   newDec("10"),
 		Receiver: bob.String(),
 	})
 
@@ -418,9 +418,9 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection2() {
 		Creator:  bob.String(),
 		TokenA:   "TokenA",
 		TokenB:   "TokenB",
-		AmountIn: "60",
+		AmountIn: newDec("60"),
 		TokenIn:  "TokenB",
-		MinOut:   "10",
+		MinOut:   newDec("10"),
 		Receiver: bob.String(),
 	})
 

@@ -138,24 +138,24 @@ func (k Keeper) routeVerification(goCtx context.Context, msg types.MsgRoute) (sd
 
 }
 
-func (k Keeper) swapVerification(goCtx context.Context, msg types.MsgSwap) (string, string, sdk.AccAddress, sdk.Dec, sdk.Dec, error) {
+func (k Keeper) swapVerification(goCtx context.Context, msg types.MsgSwap) (string, string, sdk.AccAddress, error) {
 
 	token0, token1, err := k.SortTokens(msg.TokenA, msg.TokenB)
 
 	if err != nil {
-		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+		return "", "", nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
 	}
 
 	if msg.TokenIn != token0 && msg.TokenIn != token1 {
-		return "", "", nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
+		return "", "", nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	callerAddr, amountIn, minOut, err := k.tradeVerification(ctx, msg.Creator, msg.Receiver, msg.AmountIn, msg.TokenIn, msg.MinOut)
-	return token0, token1, callerAddr, amountIn, minOut, err
+	callerAddr, _, _, err := k.tradeVerification(ctx, msg.Creator, msg.Receiver, msg.AmountIn, msg.TokenIn, msg.MinOut)
+	return token0, token1, callerAddr, err
 }
 
-func (k Keeper) tradeVerification(ctx sdk.Context, Creator string, Receiver string, UncheckedAmountIn string, TokenIn string, UncheckedMinOut string) (sdk.AccAddress, sdk.Dec, sdk.Dec, error) {
+func (k Keeper) tradeVerification(ctx sdk.Context, Creator string, Receiver string, UncheckedAmountIn sdk.Dec, TokenIn string, UncheckedMinOut sdk.Dec) (sdk.AccAddress, sdk.Dec, sdk.Dec, error) {
 
 	// Converts input address (string) to sdk.AccAddress
 	callerAddr, err := sdk.AccAddressFromBech32(Creator)
@@ -171,26 +171,12 @@ func (k Keeper) tradeVerification(ctx sdk.Context, Creator string, Receiver stri
 		return nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
-	amountIn, err := sdk.NewDecFromStr(UncheckedAmountIn)
-
-	// Error checking for valid sdk.Dec
-	if err != nil {
-		return nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
-	}
-
-	minOut, err := sdk.NewDecFromStr(UncheckedMinOut)
-
-	// Error checking for valid sdk.Dec
-	if err != nil {
-		return nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
-	}
-
 	AccountsAmountInBalance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, TokenIn).Amount)
 
-	// Error handling to verify the amount wished to deposit is NOT more then the creator holds in their accounts
-	if AccountsAmountInBalance.LT(amountIn) {
-		return nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
+	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
+	if AccountsAmountInBalance.LT(UncheckedAmountIn) {
+		return "", "", nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
-	return callerAddr, amountIn, minOut, nil
+	return token0, token1, callerAddr, nil
 }
