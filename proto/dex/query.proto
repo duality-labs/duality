@@ -30,7 +30,7 @@ service Query {
   }
   // Queries a TickMap by index.
 	rpc TickMap(QueryGetTickMapRequest) returns (QueryGetTickMapResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick_map/{tickIndex}";
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick_map/{pairId}/{tickIndex}";
 	}
 
 	// Queries a list of TickMap items.
@@ -110,7 +110,7 @@ service Query {
 
 // Queries a LimitOrderPoolUserShareMap by index.
 	rpc LimitOrderPoolUserShareMap(QueryGetLimitOrderPoolUserShareMapRequest) returns (QueryGetLimitOrderPoolUserShareMapResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_share_map/{token}/{tickIndex}/{count}/{address}";
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_share_map/{pairId}/{token}/{tickIndex}/{count}/{address}";
 	}
 
 	// Queries a list of LimitOrderPoolUserShareMap items.
@@ -120,7 +120,7 @@ service Query {
 
 // Queries a LimitOrderPoolUserSharesWithdrawn by index.
 	rpc LimitOrderPoolUserSharesWithdrawn(QueryGetLimitOrderPoolUserSharesWithdrawnRequest) returns (QueryGetLimitOrderPoolUserSharesWithdrawnResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn/{token}/{tickIndex}/{count}/{address}";
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn/{pairId}/{token}/{tickIndex}/{count}/{address}";
 	}
 
 	// Queries a list of LimitOrderPoolUserSharesWithdrawn items.
@@ -130,7 +130,7 @@ service Query {
 
 // Queries a LimitOrderPoolTotalSharesMap by index.
 	rpc LimitOrderPoolTotalSharesMap(QueryGetLimitOrderPoolTotalSharesMapRequest) returns (QueryGetLimitOrderPoolTotalSharesMapResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map/{token}/{tickIndex}/{count}";
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map/{pairId}/{token}/{tickIndex}/{count}";
 	}
 
 	// Queries a list of LimitOrderPoolTotalSharesMap items.
@@ -140,7 +140,7 @@ service Query {
 
 // Queries a LimitOrderPoolReserveMap by index.
 	rpc LimitOrderPoolReserveMap(QueryGetLimitOrderPoolReserveMapRequest) returns (QueryGetLimitOrderPoolReserveMapResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_reserve_map/{token}/{tickIndex}/{count}";
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_reserve_map/{pairId}/{token}/{tickIndex}/{count}";
 	}
 
 	// Queries a list of LimitOrderPoolReserveMap items.
@@ -150,7 +150,7 @@ service Query {
 
 // Queries a LimitOrderPoolFillMap by index.
 	rpc LimitOrderPoolFillMap(QueryGetLimitOrderPoolFillMapRequest) returns (QueryGetLimitOrderPoolFillMapResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_fill_map/{token}/{tickIndex}/{count}";
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_fill_map/{pairId}/{token}/{tickIndex}/{count}";
 	}
 
 	// Queries a list of LimitOrderPoolFillMap items.

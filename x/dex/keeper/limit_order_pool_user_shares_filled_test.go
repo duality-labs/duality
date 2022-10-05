@@ -20,10 +20,11 @@ func createNLimitOrderPoolUserSharesWithdrawn(keeper *keeper.Keeper, ctx sdk.Con
 	for i := range items {
 		items[i].Count = uint64(i)
 		items[i].Address = strconv.Itoa(i)
+		items[i].PairId = pairId
 		items[i].TickIndex = tickIndex
 		items[i].Token = token
 
-		keeper.SetLimitOrderPoolUserSharesWithdrawn(ctx, pairId, items[i])
+		keeper.SetLimitOrderPoolUserSharesWithdrawn(ctx, items[i])
 	}
 	return items
 }

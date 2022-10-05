@@ -7,10 +7,11 @@ import (
 )
 
 // SetLimitOrderPoolUserSharesWithdrawn set a specific limitOrderPoolUserSharesWithdrawn in the store from its index
-func (k Keeper) SetLimitOrderPoolUserSharesWithdrawn(ctx sdk.Context, pairId string, limitOrderPoolUserSharesWithdrawn types.LimitOrderPoolUserSharesWithdrawn) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderUserSharesWithdrawnPrefix(pairId))
+func (k Keeper) SetLimitOrderPoolUserSharesWithdrawn(ctx sdk.Context, limitOrderPoolUserSharesWithdrawn types.LimitOrderPoolUserSharesWithdrawn) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderPoolUserSharesWithdrawnKeyPrefix))
 	b := k.cdc.MustMarshal(&limitOrderPoolUserSharesWithdrawn)
 	store.Set(types.LimitOrderPoolUserSharesWithdrawnKey(
+		limitOrderPoolUserSharesWithdrawn.PairId,
 		limitOrderPoolUserSharesWithdrawn.TickIndex,
 		limitOrderPoolUserSharesWithdrawn.Token,
 		limitOrderPoolUserSharesWithdrawn.Count,
@@ -28,9 +29,10 @@ func (k Keeper) GetLimitOrderPoolUserSharesWithdrawn(
 	address string,
 
 ) (val types.LimitOrderPoolUserSharesWithdrawn, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderUserSharesWithdrawnPrefix(pairId))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderPoolUserSharesWithdrawnKeyPrefix))
 
 	b := store.Get(types.LimitOrderPoolUserSharesWithdrawnKey(
+		pairId,
 		tickIndex,
 		token,
 		count,
@@ -54,8 +56,9 @@ func (k Keeper) RemoveLimitOrderPoolUserSharesWithdrawn(
 	address string,
 
 ) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderUserSharesWithdrawnPrefix(pairId))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderPoolUserSharesWithdrawnKeyPrefix))
 	store.Delete(types.LimitOrderPoolUserSharesWithdrawnKey(
+		pairId,
 		tickIndex,
 		token,
 		count,

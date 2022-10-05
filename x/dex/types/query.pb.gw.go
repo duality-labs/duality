@@ -51,10 +51,6 @@ func local_request_Query_Params_0(ctx context.Context, marshaler runtime.Marshal
 
 }
 
-var (
-	filter_Query_TickMap_0 = &utilities.DoubleArray{Encoding: map[string]int{"tickIndex": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
-)
-
 func request_Query_TickMap_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryGetTickMapRequest
 	var metadata runtime.ServerMetadata
@@ -66,6 +62,17 @@ func request_Query_TickMap_0(ctx context.Context, marshaler runtime.Marshaler, c
 		_   = err
 	)
 
+	val, ok = pathParams["pairId"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+	}
+
+	protoReq.PairId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+	}
+
 	val, ok = pathParams["tickIndex"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "tickIndex")
@@ -75,13 +82,6 @@ func request_Query_TickMap_0(ctx context.Context, marshaler runtime.Marshaler, c
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tickIndex", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_TickMap_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.TickMap(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -100,6 +100,17 @@ func local_request_Query_TickMap_0(ctx context.Context, marshaler runtime.Marsha
 		_   = err
 	)
 
+	val, ok = pathParams["pairId"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+	}
+
+	protoReq.PairId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+	}
+
 	val, ok = pathParams["tickIndex"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "tickIndex")
@@ -109,13 +120,6 @@ func local_request_Query_TickMap_0(ctx context.Context, marshaler runtime.Marsha
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tickIndex", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_TickMap_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.TickMap(ctx, &protoReq)
@@ -855,10 +859,6 @@ func local_request_Query_AdjanceyMatrixAll_0(ctx context.Context, marshaler runt
 
 }
 
-var (
-	filter_Query_LimitOrderPoolUserShareMap_0 = &utilities.DoubleArray{Encoding: map[string]int{"token": 0, "tickIndex": 1, "count": 2, "address": 3}, Base: []int{1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 2, 3, 4, 5}}
-)
-
 func request_Query_LimitOrderPoolUserShareMap_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryGetLimitOrderPoolUserShareMapRequest
 	var metadata runtime.ServerMetadata
@@ -869,6 +869,17 @@ func request_Query_LimitOrderPoolUserShareMap_0(ctx context.Context, marshaler r
 		err error
 		_   = err
 	)
+
+	val, ok = pathParams["pairId"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+	}
+
+	protoReq.PairId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+	}
 
 	val, ok = pathParams["token"]
 	if !ok {
@@ -912,13 +923,6 @@ func request_Query_LimitOrderPoolUserShareMap_0(ctx context.Context, marshaler r
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolUserShareMap_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.LimitOrderPoolUserShareMap(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -937,6 +941,17 @@ func local_request_Query_LimitOrderPoolUserShareMap_0(ctx context.Context, marsh
 		_   = err
 	)
 
+	val, ok = pathParams["pairId"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+	}
+
+	protoReq.PairId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+	}
+
 	val, ok = pathParams["token"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "token")
@@ -979,13 +994,6 @@ func local_request_Query_LimitOrderPoolUserShareMap_0(ctx context.Context, marsh
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolUserShareMap_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.LimitOrderPoolUserShareMap(ctx, &protoReq)
@@ -1029,10 +1037,6 @@ func local_request_Query_LimitOrderPoolUserShareMapAll_0(ctx context.Context, ma
 
 }
 
-var (
-	filter_Query_LimitOrderPoolUserSharesWithdrawn_0 = &utilities.DoubleArray{Encoding: map[string]int{"token": 0, "tickIndex": 1, "count": 2, "address": 3}, Base: []int{1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 2, 3, 4, 5}}
-)
-
 func request_Query_LimitOrderPoolUserSharesWithdrawn_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryGetLimitOrderPoolUserSharesWithdrawnRequest
 	var metadata runtime.ServerMetadata
@@ -1043,6 +1047,17 @@ func request_Query_LimitOrderPoolUserSharesWithdrawn_0(ctx context.Context, mars
 		err error
 		_   = err
 	)
+
+	val, ok = pathParams["pairId"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+	}
+
+	protoReq.PairId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+	}
 
 	val, ok = pathParams["token"]
 	if !ok {
@@ -1086,13 +1101,6 @@ func request_Query_LimitOrderPoolUserSharesWithdrawn_0(ctx context.Context, mars
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolUserSharesWithdrawn_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.LimitOrderPoolUserSharesWithdrawn(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1111,6 +1119,17 @@ func local_request_Query_LimitOrderPoolUserSharesWithdrawn_0(ctx context.Context
 		_   = err
 	)
 
+	val, ok = pathParams["pairId"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+	}
+
+	protoReq.PairId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+	}
+
 	val, ok = pathParams["token"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "token")
@@ -1153,13 +1172,6 @@ func local_request_Query_LimitOrderPoolUserSharesWithdrawn_0(ctx context.Context
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolUserSharesWithdrawn_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.LimitOrderPoolUserSharesWithdrawn(ctx, &protoReq)
@@ -1203,10 +1215,6 @@ func local_request_Query_LimitOrderPoolUserSharesWithdrawnAll_0(ctx context.Cont
 
 }
 
-var (
-	filter_Query_LimitOrderPoolTotalSharesMap_0 = &utilities.DoubleArray{Encoding: map[string]int{"token": 0, "tickIndex": 1, "count": 2}, Base: []int{1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 1, 1, 2, 3, 4}}
-)
-
 func request_Query_LimitOrderPoolTotalSharesMap_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryGetLimitOrderPoolTotalSharesMapRequest
 	var metadata runtime.ServerMetadata
@@ -1217,6 +1225,17 @@ func request_Query_LimitOrderPoolTotalSharesMap_0(ctx context.Context, marshaler
 		err error
 		_   = err
 	)
+
+	val, ok = pathParams["pairId"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+	}
+
+	protoReq.PairId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+	}
 
 	val, ok = pathParams["token"]
 	if !ok {
@@ -1249,13 +1268,6 @@ func request_Query_LimitOrderPoolTotalSharesMap_0(ctx context.Context, marshaler
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "count", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolTotalSharesMap_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.LimitOrderPoolTotalSharesMap(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1274,6 +1286,17 @@ func local_request_Query_LimitOrderPoolTotalSharesMap_0(ctx context.Context, mar
 		_   = err
 	)
 
+	val, ok = pathParams["pairId"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+	}
+
+	protoReq.PairId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+	}
+
 	val, ok = pathParams["token"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "token")
@@ -1305,13 +1328,6 @@ func local_request_Query_LimitOrderPoolTotalSharesMap_0(ctx context.Context, mar
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "count", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolTotalSharesMap_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.LimitOrderPoolTotalSharesMap(ctx, &protoReq)
@@ -1355,10 +1371,6 @@ func local_request_Query_LimitOrderPoolTotalSharesMapAll_0(ctx context.Context, 
 
 }
 
-var (
-	filter_Query_LimitOrderPoolReserveMap_0 = &utilities.DoubleArray{Encoding: map[string]int{"token": 0, "tickIndex": 1, "count": 2}, Base: []int{1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 1, 1, 2, 3, 4}}
-)
-
 func request_Query_LimitOrderPoolReserveMap_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryGetLimitOrderPoolReserveMapRequest
 	var metadata runtime.ServerMetadata
@@ -1369,6 +1381,17 @@ func request_Query_LimitOrderPoolReserveMap_0(ctx context.Context, marshaler run
 		err error
 		_   = err
 	)
+
+	val, ok = pathParams["pairId"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+	}
+
+	protoReq.PairId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+	}
 
 	val, ok = pathParams["token"]
 	if !ok {
@@ -1401,13 +1424,6 @@ func request_Query_LimitOrderPoolReserveMap_0(ctx context.Context, marshaler run
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "count", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolReserveMap_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.LimitOrderPoolReserveMap(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1426,6 +1442,17 @@ func local_request_Query_LimitOrderPoolReserveMap_0(ctx context.Context, marshal
 		_   = err
 	)
 
+	val, ok = pathParams["pairId"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+	}
+
+	protoReq.PairId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+	}
+
 	val, ok = pathParams["token"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "token")
@@ -1457,13 +1484,6 @@ func local_request_Query_LimitOrderPoolReserveMap_0(ctx context.Context, marshal
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "count", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolReserveMap_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.LimitOrderPoolReserveMap(ctx, &protoReq)
@@ -1507,10 +1527,6 @@ func local_request_Query_LimitOrderPoolReserveMapAll_0(ctx context.Context, mars
 
 }
 
-var (
-	filter_Query_LimitOrderPoolFillMap_0 = &utilities.DoubleArray{Encoding: map[string]int{"token": 0, "tickIndex": 1, "count": 2}, Base: []int{1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 1, 1, 2, 3, 4}}
-)
-
 func request_Query_LimitOrderPoolFillMap_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryGetLimitOrderPoolFillMapRequest
 	var metadata runtime.ServerMetadata
@@ -1521,6 +1537,17 @@ func request_Query_LimitOrderPoolFillMap_0(ctx context.Context, marshaler runtim
 		err error
 		_   = err
 	)
+
+	val, ok = pathParams["pairId"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+	}
+
+	protoReq.PairId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+	}
 
 	val, ok = pathParams["token"]
 	if !ok {
@@ -1553,13 +1580,6 @@ func request_Query_LimitOrderPoolFillMap_0(ctx context.Context, marshaler runtim
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "count", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolFillMap_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.LimitOrderPoolFillMap(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1578,6 +1598,17 @@ func local_request_Query_LimitOrderPoolFillMap_0(ctx context.Context, marshaler 
 		_   = err
 	)
 
+	val, ok = pathParams["pairId"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+	}
+
+	protoReq.PairId, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+	}
+
 	val, ok = pathParams["token"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "token")
@@ -1609,13 +1640,6 @@ func local_request_Query_LimitOrderPoolFillMap_0(ctx context.Context, marshaler 
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "count", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_LimitOrderPoolFillMap_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.LimitOrderPoolFillMap(ctx, &protoReq)
@@ -2873,7 +2897,7 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 var (
 	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "params"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_TickMap_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"NicholasDotSol", "duality", "dex", "tick_map", "tickIndex"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_TickMap_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"NicholasDotSol", "duality", "dex", "tick_map", "pairId", "tickIndex"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_TickMapAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "tick_map"}, "", runtime.AssumeColonVerbOpt(true)))
 
@@ -2905,23 +2929,23 @@ var (
 
 	pattern_Query_AdjanceyMatrixAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "adjancey_matrix"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_LimitOrderPoolUserShareMap_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"NicholasDotSol", "duality", "dex", "limit_order_pool_user_share_map", "token", "tickIndex", "count", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LimitOrderPoolUserShareMap_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"NicholasDotSol", "duality", "dex", "limit_order_pool_user_share_map", "pairId", "token", "tickIndex", "count", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_LimitOrderPoolUserShareMapAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "limit_order_pool_user_share_map"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_LimitOrderPoolUserSharesWithdrawn_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"NicholasDotSol", "duality", "dex", "limit_order_pool_user_shares_withdrawn", "token", "tickIndex", "count", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LimitOrderPoolUserSharesWithdrawn_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"NicholasDotSol", "duality", "dex", "limit_order_pool_user_shares_withdrawn", "pairId", "token", "tickIndex", "count", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_LimitOrderPoolUserSharesWithdrawnAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "limit_order_pool_user_shares_withdrawn"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_LimitOrderPoolTotalSharesMap_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"NicholasDotSol", "duality", "dex", "limit_order_pool_total_shares_map", "token", "tickIndex", "count"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LimitOrderPoolTotalSharesMap_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"NicholasDotSol", "duality", "dex", "limit_order_pool_total_shares_map", "pairId", "token", "tickIndex", "count"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_LimitOrderPoolTotalSharesMapAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "limit_order_pool_total_shares_map"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_LimitOrderPoolReserveMap_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"NicholasDotSol", "duality", "dex", "limit_order_pool_reserve_map", "token", "tickIndex", "count"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LimitOrderPoolReserveMap_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"NicholasDotSol", "duality", "dex", "limit_order_pool_reserve_map", "pairId", "token", "tickIndex", "count"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_LimitOrderPoolReserveMapAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "limit_order_pool_reserve_map"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_LimitOrderPoolFillMap_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"NicholasDotSol", "duality", "dex", "limit_order_pool_fill_map", "token", "tickIndex", "count"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LimitOrderPoolFillMap_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"NicholasDotSol", "duality", "dex", "limit_order_pool_fill_map", "pairId", "token", "tickIndex", "count"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_LimitOrderPoolFillMapAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "limit_order_pool_fill_map"}, "", runtime.AssumeColonVerbOpt(true)))
 )

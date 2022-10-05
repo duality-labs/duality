@@ -7,10 +7,11 @@ import (
 )
 
 // SetLimitOrderPoolTotalSharesMap set a specific limitOrderPoolTotalSharesMap in the store from its index
-func (k Keeper) SetLimitOrderPoolTotalSharesMap(ctx sdk.Context, pairId string, limitOrderPoolTotalSharesMap types.LimitOrderPoolTotalSharesMap) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderTotalSharesMapPrefix(pairId))
+func (k Keeper) SetLimitOrderPoolTotalSharesMap(ctx sdk.Context, limitOrderPoolTotalSharesMap types.LimitOrderPoolTotalSharesMap) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderPoolTotalSharesMapKeyPrefix))
 	b := k.cdc.MustMarshal(&limitOrderPoolTotalSharesMap)
 	store.Set(types.LimitOrderPoolTotalSharesMapKey(
+		limitOrderPoolTotalSharesMap.PairId,
 		limitOrderPoolTotalSharesMap.TickIndex,
 		limitOrderPoolTotalSharesMap.Token,
 		limitOrderPoolTotalSharesMap.Count,
@@ -26,9 +27,10 @@ func (k Keeper) GetLimitOrderPoolTotalSharesMap(
 	count uint64,
 
 ) (val types.LimitOrderPoolTotalSharesMap, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderTotalSharesMapPrefix(pairId))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderPoolTotalSharesMapKeyPrefix))
 
 	b := store.Get(types.LimitOrderPoolTotalSharesMapKey(
+		pairId,
 		tickIndex,
 		token,
 		count,
@@ -50,8 +52,9 @@ func (k Keeper) RemoveLimitOrderPoolTotalSharesMap(
 	count uint64,
 
 ) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderTotalSharesMapPrefix(pairId))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderPoolTotalSharesMapKeyPrefix))
 	store.Delete(types.LimitOrderPoolTotalSharesMapKey(
+		pairId,
 		tickIndex,
 		token,
 		count,

@@ -35,7 +35,7 @@ func (gs GenesisState) Validate() error {
 	tickMapIndexMap := make(map[string]struct{})
 
 	for _, elem := range gs.TickMapList {
-		index := string(TickMapKey(elem.TickIndex))
+		index := string(TickMapKey(elem.PairId, elem.TickIndex))
 		if _, ok := tickMapIndexMap[index]; ok {
 			return fmt.Errorf("duplicated index for tickMap")
 		}
@@ -123,7 +123,7 @@ func (gs GenesisState) Validate() error {
 	limitOrderPoolUserShareMapIndexMap := make(map[string]struct{})
 
 	for _, elem := range gs.LimitOrderPoolUserShareMapList {
-		index := string(LimitOrderPoolUserShareMapKey(elem.TickIndex, elem.Token, elem.Count, elem.Address))
+		index := string(LimitOrderPoolUserShareMapKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count, elem.Address))
 		if _, ok := limitOrderPoolUserShareMapIndexMap[index]; ok {
 			return fmt.Errorf("duplicated index for limitOrderPoolUserShareMap")
 		}
@@ -133,7 +133,7 @@ func (gs GenesisState) Validate() error {
 	limitOrderPoolUserSharesWithdrawnIndexMap := make(map[string]struct{})
 
 	for _, elem := range gs.LimitOrderPoolUserSharesWithdrawnList {
-		index := string(LimitOrderPoolUserSharesWithdrawnKey(elem.TickIndex, elem.Token, elem.Count, elem.Address))
+		index := string(LimitOrderPoolUserSharesWithdrawnKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count, elem.Address))
 		if _, ok := limitOrderPoolUserSharesWithdrawnIndexMap[index]; ok {
 			return fmt.Errorf("duplicated index for limitOrderPoolUserSharesWithdrawn")
 		}
@@ -143,7 +143,7 @@ func (gs GenesisState) Validate() error {
 	limitOrderPoolTotalSharesMapIndexMap := make(map[string]struct{})
 
 	for _, elem := range gs.LimitOrderPoolTotalSharesMapList {
-		index := string(LimitOrderPoolTotalSharesMapKey(elem.TickIndex, elem.Token, elem.Count))
+		index := string(LimitOrderPoolTotalSharesMapKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count))
 		if _, ok := limitOrderPoolTotalSharesMapIndexMap[index]; ok {
 			return fmt.Errorf("duplicated index for limitOrderPoolTotalSharesMap")
 		}
@@ -153,7 +153,7 @@ func (gs GenesisState) Validate() error {
 	limitOrderPoolReserveMapIndexMap := make(map[string]struct{})
 
 	for _, elem := range gs.LimitOrderPoolReserveMapList {
-		index := string(LimitOrderPoolReserveMapKey(elem.TickIndex, elem.Token, elem.Count))
+		index := string(LimitOrderPoolReserveMapKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count))
 		if _, ok := limitOrderPoolReserveMapIndexMap[index]; ok {
 			return fmt.Errorf("duplicated index for limitOrderPoolReserveMap")
 		}
@@ -163,7 +163,7 @@ func (gs GenesisState) Validate() error {
 	limitOrderPoolFillMapIndexMap := make(map[string]struct{})
 
 	for _, elem := range gs.LimitOrderPoolFillMapList {
-		index := string(LimitOrderPoolFillMapKey(elem.TickIndex, elem.Token, elem.Count))
+		index := string(LimitOrderPoolFillMapKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count))
 		if _, ok := limitOrderPoolFillMapIndexMap[index]; ok {
 			return fmt.Errorf("duplicated index for limitOrderPoolFillMap")
 		}
