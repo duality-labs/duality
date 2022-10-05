@@ -4,21 +4,21 @@ import { util, configure, Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
-export interface LimitOrderPoolUserSharesFilled {
+export interface LimitOrderPoolUserSharesWithdrawn {
   count: number;
   address: string;
-  sharesFilled: string;
+  sharesWithdrawn: string;
 }
 
-const baseLimitOrderPoolUserSharesFilled: object = {
+const baseLimitOrderPoolUserSharesWithdrawn: object = {
   count: 0,
   address: "",
-  sharesFilled: "",
+  sharesWithdrawn: "",
 };
 
-export const LimitOrderPoolUserSharesFilled = {
+export const LimitOrderPoolUserSharesWithdrawn = {
   encode(
-    message: LimitOrderPoolUserSharesFilled,
+    message: LimitOrderPoolUserSharesWithdrawn,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.count !== 0) {
@@ -27,8 +27,8 @@ export const LimitOrderPoolUserSharesFilled = {
     if (message.address !== "") {
       writer.uint32(18).string(message.address);
     }
-    if (message.sharesFilled !== "") {
-      writer.uint32(26).string(message.sharesFilled);
+    if (message.sharesWithdrawn !== "") {
+      writer.uint32(26).string(message.sharesWithdrawn);
     }
     return writer;
   },
@@ -36,12 +36,12 @@ export const LimitOrderPoolUserSharesFilled = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): LimitOrderPoolUserSharesFilled {
+  ): LimitOrderPoolUserSharesWithdrawn {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseLimitOrderPoolUserSharesFilled,
-    } as LimitOrderPoolUserSharesFilled;
+      ...baseLimitOrderPoolUserSharesWithdrawn,
+    } as LimitOrderPoolUserSharesWithdrawn;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -52,7 +52,7 @@ export const LimitOrderPoolUserSharesFilled = {
           message.address = reader.string();
           break;
         case 3:
-          message.sharesFilled = reader.string();
+          message.sharesWithdrawn = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -62,10 +62,10 @@ export const LimitOrderPoolUserSharesFilled = {
     return message;
   },
 
-  fromJSON(object: any): LimitOrderPoolUserSharesFilled {
+  fromJSON(object: any): LimitOrderPoolUserSharesWithdrawn {
     const message = {
-      ...baseLimitOrderPoolUserSharesFilled,
-    } as LimitOrderPoolUserSharesFilled;
+      ...baseLimitOrderPoolUserSharesWithdrawn,
+    } as LimitOrderPoolUserSharesWithdrawn;
     if (object.count !== undefined && object.count !== null) {
       message.count = Number(object.count);
     } else {
@@ -76,29 +76,29 @@ export const LimitOrderPoolUserSharesFilled = {
     } else {
       message.address = "";
     }
-    if (object.sharesFilled !== undefined && object.sharesFilled !== null) {
-      message.sharesFilled = String(object.sharesFilled);
+    if (object.sharesWithdrawn !== undefined && object.sharesWithdrawn !== null) {
+      message.sharesWithdrawn = String(object.sharesWithdrawn);
     } else {
-      message.sharesFilled = "";
+      message.sharesWithdrawn = "";
     }
     return message;
   },
 
-  toJSON(message: LimitOrderPoolUserSharesFilled): unknown {
+  toJSON(message: LimitOrderPoolUserSharesWithdrawn): unknown {
     const obj: any = {};
     message.count !== undefined && (obj.count = message.count);
     message.address !== undefined && (obj.address = message.address);
-    message.sharesFilled !== undefined &&
-      (obj.sharesFilled = message.sharesFilled);
+    message.sharesWithdrawn !== undefined &&
+      (obj.sharesWithdrawn = message.sharesWithdrawn);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<LimitOrderPoolUserSharesFilled>
-  ): LimitOrderPoolUserSharesFilled {
+    object: DeepPartial<LimitOrderPoolUserSharesWithdrawn>
+  ): LimitOrderPoolUserSharesWithdrawn {
     const message = {
-      ...baseLimitOrderPoolUserSharesFilled,
-    } as LimitOrderPoolUserSharesFilled;
+      ...baseLimitOrderPoolUserSharesWithdrawn,
+    } as LimitOrderPoolUserSharesWithdrawn;
     if (object.count !== undefined && object.count !== null) {
       message.count = object.count;
     } else {
@@ -109,10 +109,10 @@ export const LimitOrderPoolUserSharesFilled = {
     } else {
       message.address = "";
     }
-    if (object.sharesFilled !== undefined && object.sharesFilled !== null) {
-      message.sharesFilled = object.sharesFilled;
+    if (object.sharesWithdrawn !== undefined && object.sharesWithdrawn !== null) {
+      message.sharesWithdrawn = object.sharesWithdrawn;
     } else {
-      message.sharesFilled = "";
+      message.sharesWithdrawn = "";
     }
     return message;
   },

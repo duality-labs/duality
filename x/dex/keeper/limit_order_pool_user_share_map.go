@@ -7,10 +7,12 @@ import (
 )
 
 // SetLimitOrderPoolUserShareMap set a specific limitOrderPoolUserShareMap in the store from its index
-func (k Keeper) SetLimitOrderPoolUserShareMap(ctx sdk.Context, pairId string, tickIndex int64, token string, limitOrderPoolUserShareMap types.LimitOrderPoolUserShareMap) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderUserSharesMapPrefix(pairId, tickIndex, token))
+func (k Keeper) SetLimitOrderPoolUserShareMap(ctx sdk.Context, pairId string, limitOrderPoolUserShareMap types.LimitOrderPoolUserShareMap) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderUserSharesMapPrefix(pairId))
 	b := k.cdc.MustMarshal(&limitOrderPoolUserShareMap)
 	store.Set(types.LimitOrderPoolUserShareMapKey(
+		limitOrderPoolUserShareMap.TickIndex,
+		limitOrderPoolUserShareMap.Token,
 		limitOrderPoolUserShareMap.Count,
 		limitOrderPoolUserShareMap.Address,
 	), b)
@@ -26,9 +28,11 @@ func (k Keeper) GetLimitOrderPoolUserShareMap(
 	address string,
 
 ) (val types.LimitOrderPoolUserShareMap, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderUserSharesMapPrefix(pairId, tickIndex, token))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderUserSharesMapPrefix(pairId))
 
 	b := store.Get(types.LimitOrderPoolUserShareMapKey(
+		tickIndex,
+		token,
 		count,
 		address,
 	))
@@ -50,8 +54,10 @@ func (k Keeper) RemoveLimitOrderPoolUserShareMap(
 	address string,
 
 ) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderUserSharesMapPrefix(pairId, tickIndex, token))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderUserSharesMapPrefix(pairId))
 	store.Delete(types.LimitOrderPoolUserShareMapKey(
+		tickIndex,
+		token,
 		count,
 		address,
 	))

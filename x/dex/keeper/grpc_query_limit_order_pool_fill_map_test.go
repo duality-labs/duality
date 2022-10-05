@@ -21,7 +21,7 @@ var _ = strconv.IntSize
 func TestLimitOrderPoolFillMapQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolFillMap(keeper, ctx, 2)
+	msgs := createNLimitOrderPoolFillMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetLimitOrderPoolFillMapRequest
@@ -72,7 +72,7 @@ func TestLimitOrderPoolFillMapQuerySingle(t *testing.T) {
 func TestLimitOrderPoolFillMapQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolFillMap(keeper, ctx, 5)
+	msgs := createNLimitOrderPoolFillMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 5)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderPoolFillMapRequest {
 		return &types.QueryAllLimitOrderPoolFillMapRequest{

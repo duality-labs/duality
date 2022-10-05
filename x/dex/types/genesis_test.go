@@ -106,7 +106,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						Address: "1",
 					},
 				},
-				LimitOrderPoolUserSharesFilledList: []types.LimitOrderPoolUserSharesFilled{
+				LimitOrderPoolUserSharesWithdrawnList: []types.LimitOrderPoolUserSharesWithdrawn{
 					{
 						Count:   0,
 						Address: "0",
@@ -327,9 +327,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated limitOrderPoolUserSharesFilled",
+			desc: "duplicated limitOrderPoolUserSharesWithdrawn",
 			genState: &types.GenesisState{
-				LimitOrderPoolUserSharesFilledList: []types.LimitOrderPoolUserSharesFilled{
+				LimitOrderPoolUserSharesWithdrawnList: []types.LimitOrderPoolUserSharesWithdrawn{
 					{
 						Count:   0,
 						Address: "0",

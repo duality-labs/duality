@@ -5,8 +5,10 @@ option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 import "gogoproto/gogo.proto";
 
 message LimitOrderPoolFillMap {
-  uint64 count = 1; 
-  string fill = 2  [
+  string token = 1;
+  int64 tickIndex = 2;
+  uint64 count = 3; 
+  string fill = 4  [
       (gogoproto.moretags)   = "yaml:\"fill\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
       (gogoproto.nullable)   = false,

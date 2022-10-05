@@ -21,28 +21,28 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func networkWithLimitOrderPoolUserSharesFilledObjects(t *testing.T, n int) (*network.Network, []types.LimitOrderPoolUserSharesFilled) {
+func networkWithLimitOrderPoolUserSharesWithdrawnObjects(t *testing.T, n int) (*network.Network, []types.LimitOrderPoolUserSharesWithdrawn) {
 	t.Helper()
 	cfg := network.DefaultConfig()
 	state := types.GenesisState{}
 	require.NoError(t, cfg.Codec.UnmarshalJSON(cfg.GenesisState[types.ModuleName], &state))
 
 	for i := 0; i < n; i++ {
-		limitOrderPoolUserSharesFilled := types.LimitOrderPoolUserSharesFilled{
+		limitOrderPoolUserSharesWithdrawn := types.LimitOrderPoolUserSharesWithdrawn{
 			Count:   uint64(i),
 			Address: strconv.Itoa(i),
 		}
-		nullify.Fill(&limitOrderPoolUserSharesFilled)
-		state.LimitOrderPoolUserSharesFilledList = append(state.LimitOrderPoolUserSharesFilledList, limitOrderPoolUserSharesFilled)
+		nullify.Fill(&limitOrderPoolUserSharesWithdrawn)
+		state.LimitOrderPoolUserSharesWithdrawnList = append(state.LimitOrderPoolUserSharesWithdrawnList, limitOrderPoolUserSharesWithdrawn)
 	}
 	buf, err := cfg.Codec.MarshalJSON(&state)
 	require.NoError(t, err)
 	cfg.GenesisState[types.ModuleName] = buf
-	return network.New(t, cfg), state.LimitOrderPoolUserSharesFilledList
+	return network.New(t, cfg), state.LimitOrderPoolUserSharesWithdrawnList
 }
 
-func TestShowLimitOrderPoolUserSharesFilled(t *testing.T) {
-	net, objs := networkWithLimitOrderPoolUserSharesFilledObjects(t, 2)
+func TestShowLimitOrderPoolUserSharesWithdrawn(t *testing.T) {
+	net, objs := networkWithLimitOrderPoolUserSharesWithdrawnObjects(t, 2)
 
 	ctx := net.Validators[0].ClientCtx
 	common := []string{
@@ -55,7 +55,7 @@ func TestShowLimitOrderPoolUserSharesFilled(t *testing.T) {
 
 		args []string
 		err  error
-		obj  types.LimitOrderPoolUserSharesFilled
+		obj  types.LimitOrderPoolUserSharesWithdrawn
 	}{
 		{
 			desc:      "found",
@@ -80,27 +80,27 @@ func TestShowLimitOrderPoolUserSharesFilled(t *testing.T) {
 				tc.idAddress,
 			}
 			args = append(args, tc.args...)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowLimitOrderPoolUserSharesFilled(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowLimitOrderPoolUserSharesWithdrawn(), args)
 			if tc.err != nil {
 				stat, ok := status.FromError(tc.err)
 				require.True(t, ok)
 				require.ErrorIs(t, stat.Err(), tc.err)
 			} else {
 				require.NoError(t, err)
-				var resp types.QueryGetLimitOrderPoolUserSharesFilledResponse
+				var resp types.QueryGetLimitOrderPoolUserSharesWithdrawnResponse
 				require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-				require.NotNil(t, resp.LimitOrderPoolUserSharesFilled)
+				require.NotNil(t, resp.LimitOrderPoolUserSharesWithdrawn)
 				require.Equal(t,
 					nullify.Fill(&tc.obj),
-					nullify.Fill(&resp.LimitOrderPoolUserSharesFilled),
+					nullify.Fill(&resp.LimitOrderPoolUserSharesWithdrawn),
 				)
 			}
 		})
 	}
 }
 
-func TestListLimitOrderPoolUserSharesFilled(t *testing.T) {
-	net, objs := networkWithLimitOrderPoolUserSharesFilledObjects(t, 5)
+func TestListLimitOrderPoolUserSharesWithdrawn(t *testing.T) {
+	net, objs := networkWithLimitOrderPoolUserSharesWithdrawnObjects(t, 5)
 
 	ctx := net.Validators[0].ClientCtx
 	request := func(next []byte, offset, limit uint64, total bool) []string {
@@ -122,14 +122,14 @@ func TestListLimitOrderPoolUserSharesFilled(t *testing.T) {
 		step := 2
 		for i := 0; i < len(objs); i += step {
 			args := request(nil, uint64(i), uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUserSharesFilled(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUserSharesWithdrawn(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllLimitOrderPoolUserSharesFilledResponse
+			var resp types.QueryAllLimitOrderPoolUserSharesWithdrawnResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.LimitOrderPoolUserSharesFilled), step)
+			require.LessOrEqual(t, len(resp.LimitOrderPoolUserSharesWithdrawn), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.LimitOrderPoolUserSharesFilled),
+				nullify.Fill(resp.LimitOrderPoolUserSharesWithdrawn),
 			)
 		}
 	})
@@ -138,29 +138,29 @@ func TestListLimitOrderPoolUserSharesFilled(t *testing.T) {
 		var next []byte
 		for i := 0; i < len(objs); i += step {
 			args := request(next, 0, uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUserSharesFilled(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUserSharesWithdrawn(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllLimitOrderPoolUserSharesFilledResponse
+			var resp types.QueryAllLimitOrderPoolUserSharesWithdrawnResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.LimitOrderPoolUserSharesFilled), step)
+			require.LessOrEqual(t, len(resp.LimitOrderPoolUserSharesWithdrawn), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.LimitOrderPoolUserSharesFilled),
+				nullify.Fill(resp.LimitOrderPoolUserSharesWithdrawn),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
 		args := request(nil, 0, uint64(len(objs)), true)
-		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUserSharesFilled(), args)
+		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUserSharesWithdrawn(), args)
 		require.NoError(t, err)
-		var resp types.QueryAllLimitOrderPoolUserSharesFilledResponse
+		var resp types.QueryAllLimitOrderPoolUserSharesWithdrawnResponse
 		require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 		require.NoError(t, err)
 		require.Equal(t, len(objs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(objs),
-			nullify.Fill(resp.LimitOrderPoolUserSharesFilled),
+			nullify.Fill(resp.LimitOrderPoolUserSharesWithdrawn),
 		)
 	})
 }

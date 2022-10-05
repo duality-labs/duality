@@ -30989,17 +30989,17 @@ paths:
           type: string
       tags:
         - Query
-  /NicholasDotSol/duality/dex/limit_order_pool_user_shares_filled:
+  /NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn:
     get:
-      summary: Queries a list of LimitOrderPoolUserSharesFilled items.
-      operationId: NicholasdotsolDualityDexLimitOrderPoolUserSharesFilledAll
+      summary: Queries a list of LimitOrderPoolUserSharesWithdrawn items.
+      operationId: NicholasdotsolDualityDexLimitOrderPoolUserSharesWithdrawnAll
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              limitOrderPoolUserSharesFilled:
+              limitOrderPoolUserSharesWithdrawn:
                 type: array
                 items:
                   type: object
@@ -31009,7 +31009,7 @@ paths:
                       format: uint64
                     address:
                       type: string
-                    sharesFilled:
+                    sharesWithdrawn:
                       type: string
               pagination:
                 type: object
@@ -31105,17 +31105,17 @@ paths:
           type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/limit_order_pool_user_shares_filled/{count}/{address}':
+  '/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn/{count}/{address}':
     get:
-      summary: Queries a LimitOrderPoolUserSharesFilled by index.
-      operationId: NicholasdotsolDualityDexLimitOrderPoolUserSharesFilled
+      summary: Queries a LimitOrderPoolUserSharesWithdrawn by index.
+      operationId: NicholasdotsolDualityDexLimitOrderPoolUserSharesWithdrawn
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              limitOrderPoolUserSharesFilled:
+              limitOrderPoolUserSharesWithdrawn:
                 type: object
                 properties:
                   count:
@@ -31123,7 +31123,7 @@ paths:
                     format: uint64
                   address:
                     type: string
-                  sharesFilled:
+                  sharesWithdrawn:
                     type: string
         default:
           description: An unexpected error response.
@@ -53886,7 +53886,7 @@ definitions:
         type: string
       sharesOwned:
         type: string
-  nicholasdotsol.duality.dex.LimitOrderPoolUserSharesFilled:
+  nicholasdotsol.duality.dex.LimitOrderPoolUserSharesWithdrawn:
     type: object
     properties:
       count:
@@ -53894,7 +53894,7 @@ definitions:
         format: uint64
       address:
         type: string
-      sharesFilled:
+      sharesWithdrawn:
         type: string
   nicholasdotsol.duality.dex.MsgCancelLimitOrderResponse:
     type: object
@@ -53904,7 +53904,7 @@ definitions:
     type: object
   nicholasdotsol.duality.dex.MsgSwapResponse:
     type: object
-  nicholasdotsol.duality.dex.MsgWithdrawlFilledLimitOrderResponse:
+  nicholasdotsol.duality.dex.MsgWithdrawlWithdrawnLimitOrderResponse:
     type: object
   nicholasdotsol.duality.dex.MsgWithdrawlResponse:
     type: object
@@ -54203,10 +54203,10 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  nicholasdotsol.duality.dex.QueryAllLimitOrderPoolUserSharesFilledResponse:
+  nicholasdotsol.duality.dex.QueryAllLimitOrderPoolUserSharesWithdrawnResponse:
     type: object
     properties:
-      limitOrderPoolUserSharesFilled:
+      limitOrderPoolUserSharesWithdrawn:
         type: array
         items:
           type: object
@@ -54216,7 +54216,7 @@ definitions:
               format: uint64
             address:
               type: string
-            sharesFilled:
+            sharesWithdrawn:
               type: string
       pagination:
         type: object
@@ -54567,10 +54567,10 @@ definitions:
             type: string
           sharesOwned:
             type: string
-  nicholasdotsol.duality.dex.QueryGetLimitOrderPoolUserSharesFilledResponse:
+  nicholasdotsol.duality.dex.QueryGetLimitOrderPoolUserSharesWithdrawnResponse:
     type: object
     properties:
-      limitOrderPoolUserSharesFilled:
+      limitOrderPoolUserSharesWithdrawn:
         type: object
         properties:
           count:
@@ -54578,7 +54578,7 @@ definitions:
             format: uint64
           address:
             type: string
-          sharesFilled:
+          sharesWithdrawn:
             type: string
   nicholasdotsol.duality.dex.QueryGetPairMapResponse:
     type: object

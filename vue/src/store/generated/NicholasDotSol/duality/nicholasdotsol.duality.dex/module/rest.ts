@@ -62,11 +62,11 @@ export interface DexLimitOrderPoolUserShareMap {
   sharesOwned?: string;
 }
 
-export interface DexLimitOrderPoolUserSharesFilled {
+export interface DexLimitOrderPoolUserSharesWithdrawn {
   /** @format uint64 */
   count?: string;
   address?: string;
-  sharesFilled?: string;
+  sharesWithdrawn?: string;
 }
 
 export type DexMsgCancelLimitOrderResponse = object;
@@ -77,7 +77,7 @@ export type DexMsgPlaceLimitOrderResponse = object;
 
 export type DexMsgSwapResponse = object;
 
-export type DexMsgWithdrawlFilledLimitOrderResponse = object;
+export type DexMsgWithdrawlWithdrawnLimitOrderResponse = object;
 
 export type DexMsgWithdrawlResponse = object;
 
@@ -199,8 +199,8 @@ export interface DexQueryAllLimitOrderPoolUserShareMapResponse {
   pagination?: V1Beta1PageResponse;
 }
 
-export interface DexQueryAllLimitOrderPoolUserSharesFilledResponse {
-  limitOrderPoolUserSharesFilled?: DexLimitOrderPoolUserSharesFilled[];
+export interface DexQueryAllLimitOrderPoolUserSharesWithdrawnResponse {
+  limitOrderPoolUserSharesWithdrawn?: DexLimitOrderPoolUserSharesWithdrawn[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -317,8 +317,8 @@ export interface DexQueryGetLimitOrderPoolUserShareMapResponse {
   limitOrderPoolUserShareMap?: DexLimitOrderPoolUserShareMap;
 }
 
-export interface DexQueryGetLimitOrderPoolUserSharesFilledResponse {
-  limitOrderPoolUserSharesFilled?: DexLimitOrderPoolUserSharesFilled;
+export interface DexQueryGetLimitOrderPoolUserSharesWithdrawnResponse {
+  limitOrderPoolUserSharesWithdrawn?: DexLimitOrderPoolUserSharesWithdrawn;
 }
 
 export interface DexQueryGetPairMapResponse {
@@ -975,11 +975,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryLimitOrderPoolUserSharesFilledAll
-   * @summary Queries a list of LimitOrderPoolUserSharesFilled items.
-   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_user_shares_filled
+   * @name QueryLimitOrderPoolUserSharesWithdrawnAll
+   * @summary Queries a list of LimitOrderPoolUserSharesWithdrawn items.
+   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn
    */
-  queryLimitOrderPoolUserSharesFilledAll = (
+  queryLimitOrderPoolUserSharesWithdrawnAll = (
     query?: {
       "pagination.key"?: string;
       "pagination.offset"?: string;
@@ -988,8 +988,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     },
     params: RequestParams = {},
   ) =>
-    this.request<DexQueryAllLimitOrderPoolUserSharesFilledResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/limit_order_pool_user_shares_filled`,
+    this.request<DexQueryAllLimitOrderPoolUserSharesWithdrawnResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn`,
       method: "GET",
       query: query,
       format: "json",
@@ -1000,18 +1000,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryLimitOrderPoolUserSharesFilled
-   * @summary Queries a LimitOrderPoolUserSharesFilled by index.
-   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_user_shares_filled/{count}/{address}
+   * @name QueryLimitOrderPoolUserSharesWithdrawn
+   * @summary Queries a LimitOrderPoolUserSharesWithdrawn by index.
+   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn/{count}/{address}
    */
-  queryLimitOrderPoolUserSharesFilled = (
+  queryLimitOrderPoolUserSharesWithdrawn = (
     count: string,
     address: string,
     query?: { pairId?: string; tickIndex?: string; token?: string },
     params: RequestParams = {},
   ) =>
-    this.request<DexQueryGetLimitOrderPoolUserSharesFilledResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/limit_order_pool_user_shares_filled/${count}/${address}`,
+    this.request<DexQueryGetLimitOrderPoolUserSharesWithdrawnResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn/${count}/${address}`,
       method: "GET",
       query: query,
       format: "json",

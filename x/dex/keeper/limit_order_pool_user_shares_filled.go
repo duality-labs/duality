@@ -6,18 +6,20 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// SetLimitOrderPoolUserSharesFilled set a specific limitOrderPoolUserSharesFilled in the store from its index
-func (k Keeper) SetLimitOrderPoolUserSharesFilled(ctx sdk.Context, pairId string, tickIndex int64, token string, limitOrderPoolUserSharesFilled types.LimitOrderPoolUserSharesFilled) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderUserSharesFilledPrefix(pairId, tickIndex, token))
-	b := k.cdc.MustMarshal(&limitOrderPoolUserSharesFilled)
-	store.Set(types.LimitOrderPoolUserSharesFilledKey(
-		limitOrderPoolUserSharesFilled.Count,
-		limitOrderPoolUserSharesFilled.Address,
+// SetLimitOrderPoolUserSharesWithdrawn set a specific limitOrderPoolUserSharesWithdrawn in the store from its index
+func (k Keeper) SetLimitOrderPoolUserSharesWithdrawn(ctx sdk.Context, pairId string, limitOrderPoolUserSharesWithdrawn types.LimitOrderPoolUserSharesWithdrawn) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderUserSharesWithdrawnPrefix(pairId))
+	b := k.cdc.MustMarshal(&limitOrderPoolUserSharesWithdrawn)
+	store.Set(types.LimitOrderPoolUserSharesWithdrawnKey(
+		limitOrderPoolUserSharesWithdrawn.TickIndex,
+		limitOrderPoolUserSharesWithdrawn.Token,
+		limitOrderPoolUserSharesWithdrawn.Count,
+		limitOrderPoolUserSharesWithdrawn.Address,
 	), b)
 }
 
-// GetLimitOrderPoolUserSharesFilled returns a limitOrderPoolUserSharesFilled from its index
-func (k Keeper) GetLimitOrderPoolUserSharesFilled(
+// GetLimitOrderPoolUserSharesWithdrawn returns a limitOrderPoolUserSharesWithdrawn from its index
+func (k Keeper) GetLimitOrderPoolUserSharesWithdrawn(
 	ctx sdk.Context,
 	pairId string,
 	tickIndex int64,
@@ -25,10 +27,12 @@ func (k Keeper) GetLimitOrderPoolUserSharesFilled(
 	count uint64,
 	address string,
 
-) (val types.LimitOrderPoolUserSharesFilled, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderUserSharesFilledPrefix(pairId, tickIndex, token))
+) (val types.LimitOrderPoolUserSharesWithdrawn, found bool) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderUserSharesWithdrawnPrefix(pairId))
 
-	b := store.Get(types.LimitOrderPoolUserSharesFilledKey(
+	b := store.Get(types.LimitOrderPoolUserSharesWithdrawnKey(
+		tickIndex,
+		token,
 		count,
 		address,
 	))
@@ -40,8 +44,8 @@ func (k Keeper) GetLimitOrderPoolUserSharesFilled(
 	return val, true
 }
 
-// RemoveLimitOrderPoolUserSharesFilled removes a limitOrderPoolUserSharesFilled from the store
-func (k Keeper) RemoveLimitOrderPoolUserSharesFilled(
+// RemoveLimitOrderPoolUserSharesWithdrawn removes a limitOrderPoolUserSharesWithdrawn from the store
+func (k Keeper) RemoveLimitOrderPoolUserSharesWithdrawn(
 	ctx sdk.Context,
 	pairId string,
 	tickIndex int64,
@@ -50,22 +54,24 @@ func (k Keeper) RemoveLimitOrderPoolUserSharesFilled(
 	address string,
 
 ) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderUserSharesFilledPrefix(pairId, tickIndex, token))
-	store.Delete(types.LimitOrderPoolUserSharesFilledKey(
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderUserSharesWithdrawnPrefix(pairId))
+	store.Delete(types.LimitOrderPoolUserSharesWithdrawnKey(
+		tickIndex,
+		token,
 		count,
 		address,
 	))
 }
 
-// GetAllLimitOrderPoolUserSharesFilled returns all limitOrderPoolUserSharesFilled
-func (k Keeper) GetAllLimitOrderPoolUserSharesFilled(ctx sdk.Context) (list []types.LimitOrderPoolUserSharesFilled) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderPoolUserSharesFilledKeyPrefix))
+// GetAllLimitOrderPoolUserSharesWithdrawn returns all limitOrderPoolUserSharesWithdrawn
+func (k Keeper) GetAllLimitOrderPoolUserSharesWithdrawn(ctx sdk.Context) (list []types.LimitOrderPoolUserSharesWithdrawn) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderPoolUserSharesWithdrawnKeyPrefix))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var val types.LimitOrderPoolUserSharesFilled
+		var val types.LimitOrderPoolUserSharesWithdrawn
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
 		list = append(list, val)
 	}

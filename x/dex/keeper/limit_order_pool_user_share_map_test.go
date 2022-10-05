@@ -20,8 +20,10 @@ func createNLimitOrderPoolUserShareMap(keeper *keeper.Keeper, ctx sdk.Context, p
 	for i := range items {
 		items[i].Count = uint64(i)
 		items[i].Address = strconv.Itoa(i)
+		items[i].Token = token
+		items[i].TickIndex = tickIndex
 
-		keeper.SetLimitOrderPoolUserShareMap(ctx, pairId, tickIndex, token, items[i])
+		keeper.SetLimitOrderPoolUserShareMap(ctx, pairId, items[i])
 	}
 	return items
 }

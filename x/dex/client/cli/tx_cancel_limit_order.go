@@ -21,6 +21,13 @@ func CmdCancelLimitOrder() *cobra.Command {
 			argTokenA := args[0]
 			argTokenB := args[1]
 			argTickIndex := args[2]
+
+			argTickIndexInt, err := strconv.Atoi(argTickIndex)
+
+			if err != nil {
+				return err
+			}
+
 			argKeyToken := args[3]
 			argKey := args[4]
 
@@ -39,7 +46,7 @@ func CmdCancelLimitOrder() *cobra.Command {
 				clientCtx.GetFromAddress().String(),
 				argTokenA,
 				argTokenB,
-				argTickIndex,
+				int64(argTickIndexInt),
 				argKeyToken,
 				uint64(argKeyInt),
 			)

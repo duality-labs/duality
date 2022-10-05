@@ -117,18 +117,18 @@ func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLim
 	return &types.MsgPlaceLimitOrderResponse{}, nil
 }
 
-func (k msgServer) WithdrawlFilledLimitOrder(goCtx context.Context, msg *types.MsgWithdrawlFilledLimitOrder) (*types.MsgWithdrawlFilledLimitOrderResponse, error) {
+func (k msgServer) WithdrawlWithdrawnLimitOrder(goCtx context.Context, msg *types.MsgWithdrawlWithdrawnLimitOrder) (*types.MsgWithdrawlWithdrawnLimitOrderResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := k.WithdrawFilledLimitOrderCore(goCtx, msg)
+	err := k.WithdrawWithdrawnLimitOrderCore(goCtx, msg)
 
 	if err != nil {
-		return &types.MsgWithdrawlFilledLimitOrderResponse{}, err
+		return &types.MsgWithdrawlWithdrawnLimitOrderResponse{}, err
 	}
 
 	_ = ctx
 
-	return &types.MsgWithdrawlFilledLimitOrderResponse{}, nil
+	return &types.MsgWithdrawlWithdrawnLimitOrderResponse{}, nil
 }
 
 func (k msgServer) CancelLimitOrder(goCtx context.Context, msg *types.MsgCancelLimitOrder) (*types.MsgCancelLimitOrderResponse, error) {

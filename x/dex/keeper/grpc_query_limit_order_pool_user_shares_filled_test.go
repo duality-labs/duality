@@ -18,41 +18,41 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func TestLimitOrderPoolUserSharesFilledQuerySingle(t *testing.T) {
+func TestLimitOrderPoolUserSharesWithdrawnQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolUserSharesFilled(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 2)
+	msgs := createNLimitOrderPoolUserSharesWithdrawn(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 2)
 	for _, tc := range []struct {
 		desc     string
-		request  *types.QueryGetLimitOrderPoolUserSharesFilledRequest
-		response *types.QueryGetLimitOrderPoolUserSharesFilledResponse
+		request  *types.QueryGetLimitOrderPoolUserSharesWithdrawnRequest
+		response *types.QueryGetLimitOrderPoolUserSharesWithdrawnResponse
 		err      error
 	}{
 		{
 			desc: "First",
-			request: &types.QueryGetLimitOrderPoolUserSharesFilledRequest{
+			request: &types.QueryGetLimitOrderPoolUserSharesWithdrawnRequest{
 				PairId:    "TokenA/TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
 				Count:     msgs[0].Count,
 				Address:   msgs[0].Address,
 			},
-			response: &types.QueryGetLimitOrderPoolUserSharesFilledResponse{LimitOrderPoolUserSharesFilled: msgs[0]},
+			response: &types.QueryGetLimitOrderPoolUserSharesWithdrawnResponse{LimitOrderPoolUserSharesWithdrawn: msgs[0]},
 		},
 		{
 			desc: "Second",
-			request: &types.QueryGetLimitOrderPoolUserSharesFilledRequest{
+			request: &types.QueryGetLimitOrderPoolUserSharesWithdrawnRequest{
 				PairId:    "TokenA/TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
 				Count:     msgs[1].Count,
 				Address:   msgs[1].Address,
 			},
-			response: &types.QueryGetLimitOrderPoolUserSharesFilledResponse{LimitOrderPoolUserSharesFilled: msgs[1]},
+			response: &types.QueryGetLimitOrderPoolUserSharesWithdrawnResponse{LimitOrderPoolUserSharesWithdrawn: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
-			request: &types.QueryGetLimitOrderPoolUserSharesFilledRequest{
+			request: &types.QueryGetLimitOrderPoolUserSharesWithdrawnRequest{
 				PairId:    "TokenA/TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
@@ -67,7 +67,7 @@ func TestLimitOrderPoolUserSharesFilledQuerySingle(t *testing.T) {
 		},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
-			response, err := keeper.LimitOrderPoolUserSharesFilled(wctx, tc.request)
+			response, err := keeper.LimitOrderPoolUserSharesWithdrawn(wctx, tc.request)
 			if tc.err != nil {
 				require.ErrorIs(t, err, tc.err)
 			} else {
@@ -81,13 +81,13 @@ func TestLimitOrderPoolUserSharesFilledQuerySingle(t *testing.T) {
 	}
 }
 
-func TestLimitOrderPoolUserSharesFilledQueryPaginated(t *testing.T) {
+func TestLimitOrderPoolUserSharesWithdrawnQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolUserSharesFilled(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 5)
+	msgs := createNLimitOrderPoolUserSharesWithdrawn(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 5)
 
-	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderPoolUserSharesFilledRequest {
-		return &types.QueryAllLimitOrderPoolUserSharesFilledRequest{
+	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderPoolUserSharesWithdrawnRequest {
+		return &types.QueryAllLimitOrderPoolUserSharesWithdrawnRequest{
 			Pagination: &query.PageRequest{
 				Key:        next,
 				Offset:     offset,
@@ -99,12 +99,12 @@ func TestLimitOrderPoolUserSharesFilledQueryPaginated(t *testing.T) {
 	t.Run("ByOffset", func(t *testing.T) {
 		step := 2
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.LimitOrderPoolUserSharesFilledAll(wctx, request(nil, uint64(i), uint64(step), false))
+			resp, err := keeper.LimitOrderPoolUserSharesWithdrawnAll(wctx, request(nil, uint64(i), uint64(step), false))
 			require.NoError(t, err)
-			require.LessOrEqual(t, len(resp.LimitOrderPoolUserSharesFilled), step)
+			require.LessOrEqual(t, len(resp.LimitOrderPoolUserSharesWithdrawn), step)
 			require.Subset(t,
 				nullify.Fill(msgs),
-				nullify.Fill(resp.LimitOrderPoolUserSharesFilled),
+				nullify.Fill(resp.LimitOrderPoolUserSharesWithdrawn),
 			)
 		}
 	})
@@ -112,27 +112,27 @@ func TestLimitOrderPoolUserSharesFilledQueryPaginated(t *testing.T) {
 		step := 2
 		var next []byte
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.LimitOrderPoolUserSharesFilledAll(wctx, request(next, 0, uint64(step), false))
+			resp, err := keeper.LimitOrderPoolUserSharesWithdrawnAll(wctx, request(next, 0, uint64(step), false))
 			require.NoError(t, err)
-			require.LessOrEqual(t, len(resp.LimitOrderPoolUserSharesFilled), step)
+			require.LessOrEqual(t, len(resp.LimitOrderPoolUserSharesWithdrawn), step)
 			require.Subset(t,
 				nullify.Fill(msgs),
-				nullify.Fill(resp.LimitOrderPoolUserSharesFilled),
+				nullify.Fill(resp.LimitOrderPoolUserSharesWithdrawn),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
-		resp, err := keeper.LimitOrderPoolUserSharesFilledAll(wctx, request(nil, 0, 0, true))
+		resp, err := keeper.LimitOrderPoolUserSharesWithdrawnAll(wctx, request(nil, 0, 0, true))
 		require.NoError(t, err)
 		require.Equal(t, len(msgs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(msgs),
-			nullify.Fill(resp.LimitOrderPoolUserSharesFilled),
+			nullify.Fill(resp.LimitOrderPoolUserSharesWithdrawn),
 		)
 	})
 	t.Run("InvalidRequest", func(t *testing.T) {
-		_, err := keeper.LimitOrderPoolUserSharesFilledAll(wctx, nil)
+		_, err := keeper.LimitOrderPoolUserSharesWithdrawnAll(wctx, nil)
 		require.ErrorIs(t, err, status.Error(codes.InvalidArgument, "invalid request"))
 	})
 }

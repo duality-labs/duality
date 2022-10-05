@@ -5,9 +5,11 @@ option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 import "gogoproto/gogo.proto";
 
 message LimitOrderPoolUserShareMap {
-  uint64 count = 1; 
-  string address = 2; 
-  string sharesOwned = 3  [
+  string token = 1;
+  int64 tickIndex = 2;
+  uint64 count = 3; 
+  string address = 4; 
+  string sharesOwned = 5  [
       (gogoproto.moretags)   = "yaml:\"sharesOwned\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
       (gogoproto.nullable)   = false,

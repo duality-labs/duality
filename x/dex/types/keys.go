@@ -106,8 +106,8 @@ func SharesKey(address string, pairId string, tickIndex int64, feeIndex uint64) 
 const (
 	BaseLimitOrderPrefix = "LimitOrderPool/value"
 
-	// LimitOrderPoolUserSharesFilledKeyPrefix is the prefix to retrieve all LimitOrderPoolUserSharesFilled
-	LimitOrderPoolUserSharesFilledKeyPrefix = "LimitOrderPoolUserSharesFilled/value"
+	// LimitOrderPoolUserSharesWithdrawnKeyPrefix is the prefix to retrieve all LimitOrderPoolUserSharesWithdrawn
+	LimitOrderPoolUserSharesWithdrawnKeyPrefix = "LimitOrderPoolUserSharesWithdrawn/value"
 
 	// LimitOrderPoolUserShareMapKeyPrefix is the prefix to retrieve all LimitOrderPoolUserShareMap
 	LimitOrderPoolUserShareMapKeyPrefix = "LimitOrderPoolUserShareMap/value"
@@ -122,29 +122,37 @@ const (
 	LimitOrderPoolFillMapKeyPrefix = "LimitOrderPoolFillMap/value"
 )
 
-func LimitOrderUserSharesMapPrefix(pairId string, tickIndex int64, token string) []byte {
-	return append(append(append(KeyPrefix(LimitOrderPoolUserShareMapKeyPrefix), KeyPrefix(pairId)...), KeyPrefix(strconv.Itoa(int(tickIndex)))...), KeyPrefix(token)...)
+func LimitOrderUserSharesMapPrefix(pairId string) []byte {
+	return append(KeyPrefix(LimitOrderPoolUserShareMapKeyPrefix), KeyPrefix(pairId)...)
 }
 
-func LimitOrderUserSharesFilledPrefix(pairId string, tickIndex int64, token string) []byte {
-	return append(append(append(KeyPrefix(LimitOrderPoolUserSharesFilledKeyPrefix), KeyPrefix(pairId)...), KeyPrefix(strconv.Itoa(int(tickIndex)))...), KeyPrefix(token)...)
+func LimitOrderUserSharesWithdrawnPrefix(pairId string) []byte {
+	return append(KeyPrefix(LimitOrderPoolUserSharesWithdrawnKeyPrefix), KeyPrefix(pairId)...)
 }
 
-func LimitOrderTotalSharesMapPrefix(pairId string, tickIndex int64, token string) []byte {
-	return append(append(append(KeyPrefix(LimitOrderPoolTotalSharesMapKeyPrefix), KeyPrefix(pairId)...), KeyPrefix(strconv.Itoa(int(tickIndex)))...), KeyPrefix(token)...)
+func LimitOrderTotalSharesMapPrefix(pairId string) []byte {
+	return append(KeyPrefix(LimitOrderPoolTotalSharesMapKeyPrefix), KeyPrefix(pairId)...)
 }
 
-func LimitOrderReseveMapPrefix(pairId string, tickIndex int64, token string) []byte {
-	return append(append(append(KeyPrefix(LimitOrderPoolReserveMapKeyPrefix), KeyPrefix(pairId)...), KeyPrefix(strconv.Itoa(int(tickIndex)))...), KeyPrefix(token)...)
+func LimitOrderReseveMapPrefix(pairId string) []byte {
+	return append(KeyPrefix(LimitOrderPoolReserveMapKeyPrefix), KeyPrefix(pairId)...)
 }
 
-func LimitOrderFillMapPrefix(pairId string, tickIndex int64, token string) []byte {
-	return append(append(append(KeyPrefix(LimitOrderPoolFillMapKeyPrefix), KeyPrefix(pairId)...), KeyPrefix(strconv.Itoa(int(tickIndex)))...), KeyPrefix(token)...)
+func LimitOrderFillMapPrefix(pairId string) []byte {
+	return append(KeyPrefix(LimitOrderPoolFillMapKeyPrefix), KeyPrefix(pairId)...)
 }
 
-// LimitOrderPoolUserSharesFilledKey returns the store key to retrieve a LimitOrderPoolUserSharesFilled from the index fields
-func LimitOrderPoolUserSharesFilledKey(count uint64, address string) []byte {
+// LimitOrderPoolUserSharesWithdrawnKey returns the store key to retrieve a LimitOrderPoolUserSharesWithdrawn from the index fields
+func LimitOrderPoolUserSharesWithdrawnKey(tickIndex int64, token string, count uint64, address string) []byte {
 	var key []byte
+
+	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
+	key = append(key, tickIndexBytes...)
+	key = append(key, []byte("/")...)
+
+	tokenBytes := []byte(token)
+	key = append(key, tokenBytes...)
+	key = append(key, []byte("/")...)
 
 	countBytes := []byte(strconv.Itoa(int(count)))
 	key = append(key, countBytes...)
@@ -158,8 +166,16 @@ func LimitOrderPoolUserSharesFilledKey(count uint64, address string) []byte {
 }
 
 // LimitOrderPoolUserShareMapKey returns the store key to retrieve a LimitOrderPoolUserShareMap from the index fields
-func LimitOrderPoolUserShareMapKey(count uint64, address string) []byte {
+func LimitOrderPoolUserShareMapKey(tickIndex int64, token string, count uint64, address string) []byte {
 	var key []byte
+
+	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
+	key = append(key, tickIndexBytes...)
+	key = append(key, []byte("/")...)
+
+	tokenBytes := []byte(token)
+	key = append(key, tokenBytes...)
+	key = append(key, []byte("/")...)
 
 	countBytes := []byte(strconv.Itoa(int(count)))
 	key = append(key, countBytes...)
@@ -173,8 +189,16 @@ func LimitOrderPoolUserShareMapKey(count uint64, address string) []byte {
 }
 
 // LimitOrderPoolTotalSharesMapKey returns the store key to retrieve a LimitOrderPoolTotalSharesMap from the index fields
-func LimitOrderPoolTotalSharesMapKey(count uint64) []byte {
+func LimitOrderPoolTotalSharesMapKey(tickIndex int64, token string, count uint64) []byte {
 	var key []byte
+
+	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
+	key = append(key, tickIndexBytes...)
+	key = append(key, []byte("/")...)
+
+	tokenBytes := []byte(token)
+	key = append(key, tokenBytes...)
+	key = append(key, []byte("/")...)
 
 	countBytes := []byte(strconv.Itoa(int(count)))
 	key = append(key, countBytes...)
@@ -183,8 +207,16 @@ func LimitOrderPoolTotalSharesMapKey(count uint64) []byte {
 	return key
 }
 
-func LimitOrderPoolReserveMapKey(count uint64) []byte {
+func LimitOrderPoolReserveMapKey(tickIndex int64, token string, count uint64) []byte {
 	var key []byte
+
+	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
+	key = append(key, tickIndexBytes...)
+	key = append(key, []byte("/")...)
+
+	tokenBytes := []byte(token)
+	key = append(key, tokenBytes...)
+	key = append(key, []byte("/")...)
 
 	countBytes := []byte(strconv.Itoa(int(count)))
 	key = append(key, countBytes...)
@@ -193,8 +225,16 @@ func LimitOrderPoolReserveMapKey(count uint64) []byte {
 	return key
 }
 
-func LimitOrderPoolFillMapKey(count uint64) []byte {
+func LimitOrderPoolFillMapKey(tickIndex int64, token string, count uint64) []byte {
 	var key []byte
+
+	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
+	key = append(key, tickIndexBytes...)
+	key = append(key, []byte("/")...)
+
+	tokenBytes := []byte(token)
+	key = append(key, tokenBytes...)
+	key = append(key, []byte("/")...)
 
 	countBytes := []byte(strconv.Itoa(int(count)))
 	key = append(key, countBytes...)

@@ -14,7 +14,7 @@ import "dex/fee_list.proto";
 import "dex/edge_row.proto";
 import "dex/adjancey_matrix.proto";
 import "dex/limit_order_pool_user_share_map.proto";
-import "dex/limit_order_pool_user_shares_filled.proto";
+import "dex/limit_order_pool_user_shares_withdrawn.proto";
 import "dex/limit_order_pool_total_shares_map.proto";
 import "dex/limit_order_pool_reserve_map.proto";
 import "dex/limit_order_pool_fill_map.proto";
@@ -110,7 +110,7 @@ service Query {
 
 // Queries a LimitOrderPoolUserShareMap by index.
 	rpc LimitOrderPoolUserShareMap(QueryGetLimitOrderPoolUserShareMapRequest) returns (QueryGetLimitOrderPoolUserShareMapResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_share_map/{count}/{address}";
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_share_map/{token}/{tickIndex}/{count}/{address}";
 	}
 
 	// Queries a list of LimitOrderPoolUserShareMap items.
@@ -118,19 +118,19 @@ service Query {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_share_map";
 	}
 
-// Queries a LimitOrderPoolUserSharesFilled by index.
-	rpc LimitOrderPoolUserSharesFilled(QueryGetLimitOrderPoolUserSharesFilledRequest) returns (QueryGetLimitOrderPoolUserSharesFilledResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_shares_filled/{count}/{address}";
+// Queries a LimitOrderPoolUserSharesWithdrawn by index.
+	rpc LimitOrderPoolUserSharesWithdrawn(QueryGetLimitOrderPoolUserSharesWithdrawnRequest) returns (QueryGetLimitOrderPoolUserSharesWithdrawnResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn/{token}/{tickIndex}/{count}/{address}";
 	}
 
-	// Queries a list of LimitOrderPoolUserSharesFilled items.
-	rpc LimitOrderPoolUserSharesFilledAll(QueryAllLimitOrderPoolUserSharesFilledRequest) returns (QueryAllLimitOrderPoolUserSharesFilledResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_shares_filled";
+	// Queries a list of LimitOrderPoolUserSharesWithdrawn items.
+	rpc LimitOrderPoolUserSharesWithdrawnAll(QueryAllLimitOrderPoolUserSharesWithdrawnRequest) returns (QueryAllLimitOrderPoolUserSharesWithdrawnResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn";
 	}
 
 // Queries a LimitOrderPoolTotalSharesMap by index.
 	rpc LimitOrderPoolTotalSharesMap(QueryGetLimitOrderPoolTotalSharesMapRequest) returns (QueryGetLimitOrderPoolTotalSharesMapResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map/{count}";
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map/{token}/{tickIndex}/{count}";
 	}
 
 	// Queries a list of LimitOrderPoolTotalSharesMap items.
@@ -140,7 +140,7 @@ service Query {
 
 // Queries a LimitOrderPoolReserveMap by index.
 	rpc LimitOrderPoolReserveMap(QueryGetLimitOrderPoolReserveMapRequest) returns (QueryGetLimitOrderPoolReserveMapResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_reserve_map/{count}";
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_reserve_map/{token}/{tickIndex}/{count}";
 	}
 
 	// Queries a list of LimitOrderPoolReserveMap items.
@@ -150,7 +150,7 @@ service Query {
 
 // Queries a LimitOrderPoolFillMap by index.
 	rpc LimitOrderPoolFillMap(QueryGetLimitOrderPoolFillMapRequest) returns (QueryGetLimitOrderPoolFillMapResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_fill_map/{count}";
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_fill_map/{token}/{tickIndex}/{count}";
 	}
 
 	// Queries a list of LimitOrderPoolFillMap items.
@@ -316,11 +316,11 @@ message QueryAllAdjanceyMatrixResponse {
 }
 
 message QueryGetLimitOrderPoolUserShareMapRequest {
-	uint64 count = 1;
-  string address = 2;
-  string pairId = 3;
-  int64 tickIndex =4;
-  string token = 5;
+  string pairId = 1;
+  int64 tickIndex =2;
+  string token = 3;
+    uint64 count = 4;
+  string address = 5;
 
 }
 
@@ -337,32 +337,32 @@ message QueryAllLimitOrderPoolUserShareMapResponse {
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-message QueryGetLimitOrderPoolUserSharesFilledRequest {
-	uint64 count = 1;
-  string address = 2;
- string pairId = 3;
-  int64 tickIndex =4;
-  string token = 5;
+message QueryGetLimitOrderPoolUserSharesWithdrawnRequest {
+string pairId = 1;
+  int64 tickIndex =2;
+  string token = 3;
+    uint64 count = 4;
+  string address = 5;
 }
 
-message QueryGetLimitOrderPoolUserSharesFilledResponse {
-	LimitOrderPoolUserSharesFilled limitOrderPoolUserSharesFilled = 1 [(gogoproto.nullable) = false];
+message QueryGetLimitOrderPoolUserSharesWithdrawnResponse {
+	LimitOrderPoolUserSharesWithdrawn limitOrderPoolUserSharesWithdrawn = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryAllLimitOrderPoolUserSharesFilledRequest {
+message QueryAllLimitOrderPoolUserSharesWithdrawnRequest {
 	cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-message QueryAllLimitOrderPoolUserSharesFilledResponse {
-	repeated LimitOrderPoolUserSharesFilled limitOrderPoolUserSharesFilled = 1 [(gogoproto.nullable) = false];
+message QueryAllLimitOrderPoolUserSharesWithdrawnResponse {
+	repeated LimitOrderPoolUserSharesWithdrawn limitOrderPoolUserSharesWithdrawn = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 message QueryGetLimitOrderPoolTotalSharesMapRequest {
-	  uint64 count = 1;
-	   string pairId = 2;
-  int64 tickIndex =3;
-  string token = 4;
+	  string pairId = 1;
+  int64 tickIndex =2;
+  string token = 3;
+    uint64 count = 4;
 
 }
 
@@ -380,10 +380,10 @@ message QueryAllLimitOrderPoolTotalSharesMapResponse {
 }
 
 message QueryGetLimitOrderPoolReserveMapRequest {
-	  uint64 count = 1;
-	  string pairId = 2;
-  int64 tickIndex =3;
-  string token = 4;
+	  string pairId = 1;
+  int64 tickIndex =2;
+  string token = 3;
+    uint64 count = 4;
 
 }
 
@@ -401,10 +401,10 @@ message QueryAllLimitOrderPoolReserveMapResponse {
 }
 
 message QueryGetLimitOrderPoolFillMapRequest {
-	uint64 count = 1;
-	string pairId = 2;
-  int64 tickIndex =3;
-  string token = 4;
+	  string pairId = 1;
+  int64 tickIndex =2;
+  string token = 3;
+    uint64 count = 4;
 
 }
 

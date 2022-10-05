@@ -15,7 +15,7 @@ import { FeeList } from "../dex/fee_list";
 import { EdgeRow } from "../dex/edge_row";
 import { AdjanceyMatrix } from "../dex/adjancey_matrix";
 import { LimitOrderPoolUserShareMap } from "../dex/limit_order_pool_user_share_map";
-import { LimitOrderPoolUserSharesFilled } from "../dex/limit_order_pool_user_shares_filled";
+import { LimitOrderPoolUserSharesWithdrawn } from "../dex/limit_order_pool_user_shares_withdrawn";
 import { LimitOrderPoolTotalSharesMap } from "../dex/limit_order_pool_total_shares_map";
 import { LimitOrderPoolReserveMap } from "../dex/limit_order_pool_reserve_map";
 import { LimitOrderPoolFillMap } from "../dex/limit_order_pool_fill_map";
@@ -192,7 +192,7 @@ export interface QueryAllLimitOrderPoolUserShareMapResponse {
   pagination: PageResponse | undefined;
 }
 
-export interface QueryGetLimitOrderPoolUserSharesFilledRequest {
+export interface QueryGetLimitOrderPoolUserSharesWithdrawnRequest {
   count: number;
   address: string;
   pairId: string;
@@ -200,16 +200,16 @@ export interface QueryGetLimitOrderPoolUserSharesFilledRequest {
   token: string;
 }
 
-export interface QueryGetLimitOrderPoolUserSharesFilledResponse {
-  limitOrderPoolUserSharesFilled: LimitOrderPoolUserSharesFilled | undefined;
+export interface QueryGetLimitOrderPoolUserSharesWithdrawnResponse {
+  limitOrderPoolUserSharesWithdrawn: LimitOrderPoolUserSharesWithdrawn | undefined;
 }
 
-export interface QueryAllLimitOrderPoolUserSharesFilledRequest {
+export interface QueryAllLimitOrderPoolUserSharesWithdrawnRequest {
   pagination: PageRequest | undefined;
 }
 
-export interface QueryAllLimitOrderPoolUserSharesFilledResponse {
-  limitOrderPoolUserSharesFilled: LimitOrderPoolUserSharesFilled[];
+export interface QueryAllLimitOrderPoolUserSharesWithdrawnResponse {
+  limitOrderPoolUserSharesWithdrawn: LimitOrderPoolUserSharesWithdrawn[];
   pagination: PageResponse | undefined;
 }
 
@@ -3203,7 +3203,7 @@ export const QueryAllLimitOrderPoolUserShareMapResponse = {
   },
 };
 
-const baseQueryGetLimitOrderPoolUserSharesFilledRequest: object = {
+const baseQueryGetLimitOrderPoolUserSharesWithdrawnRequest: object = {
   count: 0,
   address: "",
   pairId: "",
@@ -3211,9 +3211,9 @@ const baseQueryGetLimitOrderPoolUserSharesFilledRequest: object = {
   token: "",
 };
 
-export const QueryGetLimitOrderPoolUserSharesFilledRequest = {
+export const QueryGetLimitOrderPoolUserSharesWithdrawnRequest = {
   encode(
-    message: QueryGetLimitOrderPoolUserSharesFilledRequest,
+    message: QueryGetLimitOrderPoolUserSharesWithdrawnRequest,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.count !== 0) {
@@ -3237,12 +3237,12 @@ export const QueryGetLimitOrderPoolUserSharesFilledRequest = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryGetLimitOrderPoolUserSharesFilledRequest {
+  ): QueryGetLimitOrderPoolUserSharesWithdrawnRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryGetLimitOrderPoolUserSharesFilledRequest,
-    } as QueryGetLimitOrderPoolUserSharesFilledRequest;
+      ...baseQueryGetLimitOrderPoolUserSharesWithdrawnRequest,
+    } as QueryGetLimitOrderPoolUserSharesWithdrawnRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -3269,10 +3269,10 @@ export const QueryGetLimitOrderPoolUserSharesFilledRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetLimitOrderPoolUserSharesFilledRequest {
+  fromJSON(object: any): QueryGetLimitOrderPoolUserSharesWithdrawnRequest {
     const message = {
-      ...baseQueryGetLimitOrderPoolUserSharesFilledRequest,
-    } as QueryGetLimitOrderPoolUserSharesFilledRequest;
+      ...baseQueryGetLimitOrderPoolUserSharesWithdrawnRequest,
+    } as QueryGetLimitOrderPoolUserSharesWithdrawnRequest;
     if (object.count !== undefined && object.count !== null) {
       message.count = Number(object.count);
     } else {
@@ -3301,7 +3301,7 @@ export const QueryGetLimitOrderPoolUserSharesFilledRequest = {
     return message;
   },
 
-  toJSON(message: QueryGetLimitOrderPoolUserSharesFilledRequest): unknown {
+  toJSON(message: QueryGetLimitOrderPoolUserSharesWithdrawnRequest): unknown {
     const obj: any = {};
     message.count !== undefined && (obj.count = message.count);
     message.address !== undefined && (obj.address = message.address);
@@ -3312,11 +3312,11 @@ export const QueryGetLimitOrderPoolUserSharesFilledRequest = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetLimitOrderPoolUserSharesFilledRequest>
-  ): QueryGetLimitOrderPoolUserSharesFilledRequest {
+    object: DeepPartial<QueryGetLimitOrderPoolUserSharesWithdrawnRequest>
+  ): QueryGetLimitOrderPoolUserSharesWithdrawnRequest {
     const message = {
-      ...baseQueryGetLimitOrderPoolUserSharesFilledRequest,
-    } as QueryGetLimitOrderPoolUserSharesFilledRequest;
+      ...baseQueryGetLimitOrderPoolUserSharesWithdrawnRequest,
+    } as QueryGetLimitOrderPoolUserSharesWithdrawnRequest;
     if (object.count !== undefined && object.count !== null) {
       message.count = object.count;
     } else {
@@ -3346,16 +3346,16 @@ export const QueryGetLimitOrderPoolUserSharesFilledRequest = {
   },
 };
 
-const baseQueryGetLimitOrderPoolUserSharesFilledResponse: object = {};
+const baseQueryGetLimitOrderPoolUserSharesWithdrawnResponse: object = {};
 
-export const QueryGetLimitOrderPoolUserSharesFilledResponse = {
+export const QueryGetLimitOrderPoolUserSharesWithdrawnResponse = {
   encode(
-    message: QueryGetLimitOrderPoolUserSharesFilledResponse,
+    message: QueryGetLimitOrderPoolUserSharesWithdrawnResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.limitOrderPoolUserSharesFilled !== undefined) {
-      LimitOrderPoolUserSharesFilled.encode(
-        message.limitOrderPoolUserSharesFilled,
+    if (message.limitOrderPoolUserSharesWithdrawn !== undefined) {
+      LimitOrderPoolUserSharesWithdrawn.encode(
+        message.limitOrderPoolUserSharesWithdrawn,
         writer.uint32(10).fork()
       ).ldelim();
     }
@@ -3365,17 +3365,17 @@ export const QueryGetLimitOrderPoolUserSharesFilledResponse = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryGetLimitOrderPoolUserSharesFilledResponse {
+  ): QueryGetLimitOrderPoolUserSharesWithdrawnResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryGetLimitOrderPoolUserSharesFilledResponse,
-    } as QueryGetLimitOrderPoolUserSharesFilledResponse;
+      ...baseQueryGetLimitOrderPoolUserSharesWithdrawnResponse,
+    } as QueryGetLimitOrderPoolUserSharesWithdrawnResponse;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.limitOrderPoolUserSharesFilled = LimitOrderPoolUserSharesFilled.decode(
+          message.limitOrderPoolUserSharesWithdrawn = LimitOrderPoolUserSharesWithdrawn.decode(
             reader,
             reader.uint32()
           );
@@ -3388,59 +3388,59 @@ export const QueryGetLimitOrderPoolUserSharesFilledResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetLimitOrderPoolUserSharesFilledResponse {
+  fromJSON(object: any): QueryGetLimitOrderPoolUserSharesWithdrawnResponse {
     const message = {
-      ...baseQueryGetLimitOrderPoolUserSharesFilledResponse,
-    } as QueryGetLimitOrderPoolUserSharesFilledResponse;
+      ...baseQueryGetLimitOrderPoolUserSharesWithdrawnResponse,
+    } as QueryGetLimitOrderPoolUserSharesWithdrawnResponse;
     if (
-      object.limitOrderPoolUserSharesFilled !== undefined &&
-      object.limitOrderPoolUserSharesFilled !== null
+      object.limitOrderPoolUserSharesWithdrawn !== undefined &&
+      object.limitOrderPoolUserSharesWithdrawn !== null
     ) {
-      message.limitOrderPoolUserSharesFilled = LimitOrderPoolUserSharesFilled.fromJSON(
-        object.limitOrderPoolUserSharesFilled
+      message.limitOrderPoolUserSharesWithdrawn = LimitOrderPoolUserSharesWithdrawn.fromJSON(
+        object.limitOrderPoolUserSharesWithdrawn
       );
     } else {
-      message.limitOrderPoolUserSharesFilled = undefined;
+      message.limitOrderPoolUserSharesWithdrawn = undefined;
     }
     return message;
   },
 
-  toJSON(message: QueryGetLimitOrderPoolUserSharesFilledResponse): unknown {
+  toJSON(message: QueryGetLimitOrderPoolUserSharesWithdrawnResponse): unknown {
     const obj: any = {};
-    message.limitOrderPoolUserSharesFilled !== undefined &&
-      (obj.limitOrderPoolUserSharesFilled = message.limitOrderPoolUserSharesFilled
-        ? LimitOrderPoolUserSharesFilled.toJSON(
-            message.limitOrderPoolUserSharesFilled
+    message.limitOrderPoolUserSharesWithdrawn !== undefined &&
+      (obj.limitOrderPoolUserSharesWithdrawn = message.limitOrderPoolUserSharesWithdrawn
+        ? LimitOrderPoolUserSharesWithdrawn.toJSON(
+            message.limitOrderPoolUserSharesWithdrawn
           )
         : undefined);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetLimitOrderPoolUserSharesFilledResponse>
-  ): QueryGetLimitOrderPoolUserSharesFilledResponse {
+    object: DeepPartial<QueryGetLimitOrderPoolUserSharesWithdrawnResponse>
+  ): QueryGetLimitOrderPoolUserSharesWithdrawnResponse {
     const message = {
-      ...baseQueryGetLimitOrderPoolUserSharesFilledResponse,
-    } as QueryGetLimitOrderPoolUserSharesFilledResponse;
+      ...baseQueryGetLimitOrderPoolUserSharesWithdrawnResponse,
+    } as QueryGetLimitOrderPoolUserSharesWithdrawnResponse;
     if (
-      object.limitOrderPoolUserSharesFilled !== undefined &&
-      object.limitOrderPoolUserSharesFilled !== null
+      object.limitOrderPoolUserSharesWithdrawn !== undefined &&
+      object.limitOrderPoolUserSharesWithdrawn !== null
     ) {
-      message.limitOrderPoolUserSharesFilled = LimitOrderPoolUserSharesFilled.fromPartial(
-        object.limitOrderPoolUserSharesFilled
+      message.limitOrderPoolUserSharesWithdrawn = LimitOrderPoolUserSharesWithdrawn.fromPartial(
+        object.limitOrderPoolUserSharesWithdrawn
       );
     } else {
-      message.limitOrderPoolUserSharesFilled = undefined;
+      message.limitOrderPoolUserSharesWithdrawn = undefined;
     }
     return message;
   },
 };
 
-const baseQueryAllLimitOrderPoolUserSharesFilledRequest: object = {};
+const baseQueryAllLimitOrderPoolUserSharesWithdrawnRequest: object = {};
 
-export const QueryAllLimitOrderPoolUserSharesFilledRequest = {
+export const QueryAllLimitOrderPoolUserSharesWithdrawnRequest = {
   encode(
-    message: QueryAllLimitOrderPoolUserSharesFilledRequest,
+    message: QueryAllLimitOrderPoolUserSharesWithdrawnRequest,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.pagination !== undefined) {
@@ -3452,12 +3452,12 @@ export const QueryAllLimitOrderPoolUserSharesFilledRequest = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryAllLimitOrderPoolUserSharesFilledRequest {
+  ): QueryAllLimitOrderPoolUserSharesWithdrawnRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryAllLimitOrderPoolUserSharesFilledRequest,
-    } as QueryAllLimitOrderPoolUserSharesFilledRequest;
+      ...baseQueryAllLimitOrderPoolUserSharesWithdrawnRequest,
+    } as QueryAllLimitOrderPoolUserSharesWithdrawnRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -3472,10 +3472,10 @@ export const QueryAllLimitOrderPoolUserSharesFilledRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllLimitOrderPoolUserSharesFilledRequest {
+  fromJSON(object: any): QueryAllLimitOrderPoolUserSharesWithdrawnRequest {
     const message = {
-      ...baseQueryAllLimitOrderPoolUserSharesFilledRequest,
-    } as QueryAllLimitOrderPoolUserSharesFilledRequest;
+      ...baseQueryAllLimitOrderPoolUserSharesWithdrawnRequest,
+    } as QueryAllLimitOrderPoolUserSharesWithdrawnRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromJSON(object.pagination);
     } else {
@@ -3484,7 +3484,7 @@ export const QueryAllLimitOrderPoolUserSharesFilledRequest = {
     return message;
   },
 
-  toJSON(message: QueryAllLimitOrderPoolUserSharesFilledRequest): unknown {
+  toJSON(message: QueryAllLimitOrderPoolUserSharesWithdrawnRequest): unknown {
     const obj: any = {};
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -3494,11 +3494,11 @@ export const QueryAllLimitOrderPoolUserSharesFilledRequest = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryAllLimitOrderPoolUserSharesFilledRequest>
-  ): QueryAllLimitOrderPoolUserSharesFilledRequest {
+    object: DeepPartial<QueryAllLimitOrderPoolUserSharesWithdrawnRequest>
+  ): QueryAllLimitOrderPoolUserSharesWithdrawnRequest {
     const message = {
-      ...baseQueryAllLimitOrderPoolUserSharesFilledRequest,
-    } as QueryAllLimitOrderPoolUserSharesFilledRequest;
+      ...baseQueryAllLimitOrderPoolUserSharesWithdrawnRequest,
+    } as QueryAllLimitOrderPoolUserSharesWithdrawnRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromPartial(object.pagination);
     } else {
@@ -3508,15 +3508,15 @@ export const QueryAllLimitOrderPoolUserSharesFilledRequest = {
   },
 };
 
-const baseQueryAllLimitOrderPoolUserSharesFilledResponse: object = {};
+const baseQueryAllLimitOrderPoolUserSharesWithdrawnResponse: object = {};
 
-export const QueryAllLimitOrderPoolUserSharesFilledResponse = {
+export const QueryAllLimitOrderPoolUserSharesWithdrawnResponse = {
   encode(
-    message: QueryAllLimitOrderPoolUserSharesFilledResponse,
+    message: QueryAllLimitOrderPoolUserSharesWithdrawnResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    for (const v of message.limitOrderPoolUserSharesFilled) {
-      LimitOrderPoolUserSharesFilled.encode(
+    for (const v of message.limitOrderPoolUserSharesWithdrawn) {
+      LimitOrderPoolUserSharesWithdrawn.encode(
         v!,
         writer.uint32(10).fork()
       ).ldelim();
@@ -3533,19 +3533,19 @@ export const QueryAllLimitOrderPoolUserSharesFilledResponse = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryAllLimitOrderPoolUserSharesFilledResponse {
+  ): QueryAllLimitOrderPoolUserSharesWithdrawnResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryAllLimitOrderPoolUserSharesFilledResponse,
-    } as QueryAllLimitOrderPoolUserSharesFilledResponse;
-    message.limitOrderPoolUserSharesFilled = [];
+      ...baseQueryAllLimitOrderPoolUserSharesWithdrawnResponse,
+    } as QueryAllLimitOrderPoolUserSharesWithdrawnResponse;
+    message.limitOrderPoolUserSharesWithdrawn = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.limitOrderPoolUserSharesFilled.push(
-            LimitOrderPoolUserSharesFilled.decode(reader, reader.uint32())
+          message.limitOrderPoolUserSharesWithdrawn.push(
+            LimitOrderPoolUserSharesWithdrawn.decode(reader, reader.uint32())
           );
           break;
         case 2:
@@ -3559,18 +3559,18 @@ export const QueryAllLimitOrderPoolUserSharesFilledResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllLimitOrderPoolUserSharesFilledResponse {
+  fromJSON(object: any): QueryAllLimitOrderPoolUserSharesWithdrawnResponse {
     const message = {
-      ...baseQueryAllLimitOrderPoolUserSharesFilledResponse,
-    } as QueryAllLimitOrderPoolUserSharesFilledResponse;
-    message.limitOrderPoolUserSharesFilled = [];
+      ...baseQueryAllLimitOrderPoolUserSharesWithdrawnResponse,
+    } as QueryAllLimitOrderPoolUserSharesWithdrawnResponse;
+    message.limitOrderPoolUserSharesWithdrawn = [];
     if (
-      object.limitOrderPoolUserSharesFilled !== undefined &&
-      object.limitOrderPoolUserSharesFilled !== null
+      object.limitOrderPoolUserSharesWithdrawn !== undefined &&
+      object.limitOrderPoolUserSharesWithdrawn !== null
     ) {
-      for (const e of object.limitOrderPoolUserSharesFilled) {
-        message.limitOrderPoolUserSharesFilled.push(
-          LimitOrderPoolUserSharesFilled.fromJSON(e)
+      for (const e of object.limitOrderPoolUserSharesWithdrawn) {
+        message.limitOrderPoolUserSharesWithdrawn.push(
+          LimitOrderPoolUserSharesWithdrawn.fromJSON(e)
         );
       }
     }
@@ -3582,14 +3582,14 @@ export const QueryAllLimitOrderPoolUserSharesFilledResponse = {
     return message;
   },
 
-  toJSON(message: QueryAllLimitOrderPoolUserSharesFilledResponse): unknown {
+  toJSON(message: QueryAllLimitOrderPoolUserSharesWithdrawnResponse): unknown {
     const obj: any = {};
-    if (message.limitOrderPoolUserSharesFilled) {
-      obj.limitOrderPoolUserSharesFilled = message.limitOrderPoolUserSharesFilled.map(
-        (e) => (e ? LimitOrderPoolUserSharesFilled.toJSON(e) : undefined)
+    if (message.limitOrderPoolUserSharesWithdrawn) {
+      obj.limitOrderPoolUserSharesWithdrawn = message.limitOrderPoolUserSharesWithdrawn.map(
+        (e) => (e ? LimitOrderPoolUserSharesWithdrawn.toJSON(e) : undefined)
       );
     } else {
-      obj.limitOrderPoolUserSharesFilled = [];
+      obj.limitOrderPoolUserSharesWithdrawn = [];
     }
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -3599,19 +3599,19 @@ export const QueryAllLimitOrderPoolUserSharesFilledResponse = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryAllLimitOrderPoolUserSharesFilledResponse>
-  ): QueryAllLimitOrderPoolUserSharesFilledResponse {
+    object: DeepPartial<QueryAllLimitOrderPoolUserSharesWithdrawnResponse>
+  ): QueryAllLimitOrderPoolUserSharesWithdrawnResponse {
     const message = {
-      ...baseQueryAllLimitOrderPoolUserSharesFilledResponse,
-    } as QueryAllLimitOrderPoolUserSharesFilledResponse;
-    message.limitOrderPoolUserSharesFilled = [];
+      ...baseQueryAllLimitOrderPoolUserSharesWithdrawnResponse,
+    } as QueryAllLimitOrderPoolUserSharesWithdrawnResponse;
+    message.limitOrderPoolUserSharesWithdrawn = [];
     if (
-      object.limitOrderPoolUserSharesFilled !== undefined &&
-      object.limitOrderPoolUserSharesFilled !== null
+      object.limitOrderPoolUserSharesWithdrawn !== undefined &&
+      object.limitOrderPoolUserSharesWithdrawn !== null
     ) {
-      for (const e of object.limitOrderPoolUserSharesFilled) {
-        message.limitOrderPoolUserSharesFilled.push(
-          LimitOrderPoolUserSharesFilled.fromPartial(e)
+      for (const e of object.limitOrderPoolUserSharesWithdrawn) {
+        message.limitOrderPoolUserSharesWithdrawn.push(
+          LimitOrderPoolUserSharesWithdrawn.fromPartial(e)
         );
       }
     }
@@ -4871,14 +4871,14 @@ export interface Query {
   LimitOrderPoolUserShareMapAll(
     request: QueryAllLimitOrderPoolUserShareMapRequest
   ): Promise<QueryAllLimitOrderPoolUserShareMapResponse>;
-  /** Queries a LimitOrderPoolUserSharesFilled by index. */
-  LimitOrderPoolUserSharesFilled(
-    request: QueryGetLimitOrderPoolUserSharesFilledRequest
-  ): Promise<QueryGetLimitOrderPoolUserSharesFilledResponse>;
-  /** Queries a list of LimitOrderPoolUserSharesFilled items. */
-  LimitOrderPoolUserSharesFilledAll(
-    request: QueryAllLimitOrderPoolUserSharesFilledRequest
-  ): Promise<QueryAllLimitOrderPoolUserSharesFilledResponse>;
+  /** Queries a LimitOrderPoolUserSharesWithdrawn by index. */
+  LimitOrderPoolUserSharesWithdrawn(
+    request: QueryGetLimitOrderPoolUserSharesWithdrawnRequest
+  ): Promise<QueryGetLimitOrderPoolUserSharesWithdrawnResponse>;
+  /** Queries a list of LimitOrderPoolUserSharesWithdrawn items. */
+  LimitOrderPoolUserSharesWithdrawnAll(
+    request: QueryAllLimitOrderPoolUserSharesWithdrawnRequest
+  ): Promise<QueryAllLimitOrderPoolUserSharesWithdrawnResponse>;
   /** Queries a LimitOrderPoolTotalSharesMap by index. */
   LimitOrderPoolTotalSharesMap(
     request: QueryGetLimitOrderPoolTotalSharesMapRequest
@@ -5160,35 +5160,35 @@ export class QueryClientImpl implements Query {
     );
   }
 
-  LimitOrderPoolUserSharesFilled(
-    request: QueryGetLimitOrderPoolUserSharesFilledRequest
-  ): Promise<QueryGetLimitOrderPoolUserSharesFilledResponse> {
-    const data = QueryGetLimitOrderPoolUserSharesFilledRequest.encode(
+  LimitOrderPoolUserSharesWithdrawn(
+    request: QueryGetLimitOrderPoolUserSharesWithdrawnRequest
+  ): Promise<QueryGetLimitOrderPoolUserSharesWithdrawnResponse> {
+    const data = QueryGetLimitOrderPoolUserSharesWithdrawnRequest.encode(
       request
     ).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
-      "LimitOrderPoolUserSharesFilled",
+      "LimitOrderPoolUserSharesWithdrawn",
       data
     );
     return promise.then((data) =>
-      QueryGetLimitOrderPoolUserSharesFilledResponse.decode(new Reader(data))
+      QueryGetLimitOrderPoolUserSharesWithdrawnResponse.decode(new Reader(data))
     );
   }
 
-  LimitOrderPoolUserSharesFilledAll(
-    request: QueryAllLimitOrderPoolUserSharesFilledRequest
-  ): Promise<QueryAllLimitOrderPoolUserSharesFilledResponse> {
-    const data = QueryAllLimitOrderPoolUserSharesFilledRequest.encode(
+  LimitOrderPoolUserSharesWithdrawnAll(
+    request: QueryAllLimitOrderPoolUserSharesWithdrawnRequest
+  ): Promise<QueryAllLimitOrderPoolUserSharesWithdrawnResponse> {
+    const data = QueryAllLimitOrderPoolUserSharesWithdrawnRequest.encode(
       request
     ).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
-      "LimitOrderPoolUserSharesFilledAll",
+      "LimitOrderPoolUserSharesWithdrawnAll",
       data
     );
     return promise.then((data) =>
-      QueryAllLimitOrderPoolUserSharesFilledResponse.decode(new Reader(data))
+      QueryAllLimitOrderPoolUserSharesWithdrawnResponse.decode(new Reader(data))
     );
   }
 

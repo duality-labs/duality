@@ -1618,11 +1618,11 @@ func (m *QueryAllAdjanceyMatrixResponse) GetPagination() *query.PageResponse {
 }
 
 type QueryGetLimitOrderPoolUserShareMapRequest struct {
-	Count     uint64 `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
-	Address   string `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
-	PairId    string `protobuf:"bytes,3,opt,name=pairId,proto3" json:"pairId,omitempty"`
-	TickIndex int64  `protobuf:"varint,4,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
-	Token     string `protobuf:"bytes,5,opt,name=token,proto3" json:"token,omitempty"`
+	PairId    string `protobuf:"bytes,1,opt,name=pairId,proto3" json:"pairId,omitempty"`
+	TickIndex int64  `protobuf:"varint,2,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
+	Token     string `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"`
+	Count     uint64 `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`
+	Address   string `protobuf:"bytes,5,opt,name=address,proto3" json:"address,omitempty"`
 }
 
 func (m *QueryGetLimitOrderPoolUserShareMapRequest) Reset() {
@@ -1662,20 +1662,6 @@ func (m *QueryGetLimitOrderPoolUserShareMapRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryGetLimitOrderPoolUserShareMapRequest proto.InternalMessageInfo
 
-func (m *QueryGetLimitOrderPoolUserShareMapRequest) GetCount() uint64 {
-	if m != nil {
-		return m.Count
-	}
-	return 0
-}
-
-func (m *QueryGetLimitOrderPoolUserShareMapRequest) GetAddress() string {
-	if m != nil {
-		return m.Address
-	}
-	return ""
-}
-
 func (m *QueryGetLimitOrderPoolUserShareMapRequest) GetPairId() string {
 	if m != nil {
 		return m.PairId
@@ -1693,6 +1679,20 @@ func (m *QueryGetLimitOrderPoolUserShareMapRequest) GetTickIndex() int64 {
 func (m *QueryGetLimitOrderPoolUserShareMapRequest) GetToken() string {
 	if m != nil {
 		return m.Token
+	}
+	return ""
+}
+
+func (m *QueryGetLimitOrderPoolUserShareMapRequest) GetCount() uint64 {
+	if m != nil {
+		return m.Count
+	}
+	return 0
+}
+
+func (m *QueryGetLimitOrderPoolUserShareMapRequest) GetAddress() string {
+	if m != nil {
+		return m.Address
 	}
 	return ""
 }
@@ -1849,30 +1849,30 @@ func (m *QueryAllLimitOrderPoolUserShareMapResponse) GetPagination() *query.Page
 	return nil
 }
 
-type QueryGetLimitOrderPoolUserSharesFilledRequest struct {
-	Count     uint64 `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
-	Address   string `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
-	PairId    string `protobuf:"bytes,3,opt,name=pairId,proto3" json:"pairId,omitempty"`
-	TickIndex int64  `protobuf:"varint,4,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
-	Token     string `protobuf:"bytes,5,opt,name=token,proto3" json:"token,omitempty"`
+type QueryGetLimitOrderPoolUserSharesWithdrawnRequest struct {
+	PairId    string `protobuf:"bytes,1,opt,name=pairId,proto3" json:"pairId,omitempty"`
+	TickIndex int64  `protobuf:"varint,2,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
+	Token     string `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"`
+	Count     uint64 `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`
+	Address   string `protobuf:"bytes,5,opt,name=address,proto3" json:"address,omitempty"`
 }
 
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) Reset() {
-	*m = QueryGetLimitOrderPoolUserSharesFilledRequest{}
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) Reset() {
+	*m = QueryGetLimitOrderPoolUserSharesWithdrawnRequest{}
 }
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) String() string {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) String() string {
 	return proto.CompactTextString(m)
 }
-func (*QueryGetLimitOrderPoolUserSharesFilledRequest) ProtoMessage() {}
-func (*QueryGetLimitOrderPoolUserSharesFilledRequest) Descriptor() ([]byte, []int) {
+func (*QueryGetLimitOrderPoolUserSharesWithdrawnRequest) ProtoMessage() {}
+func (*QueryGetLimitOrderPoolUserSharesWithdrawnRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d8e98105e6e08a59, []int{38}
 }
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetLimitOrderPoolUserSharesFilledRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGetLimitOrderPoolUserSharesWithdrawnRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1882,73 +1882,73 @@ func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) XXX_Marshal(b []byte, de
 		return b[:n], nil
 	}
 }
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetLimitOrderPoolUserSharesFilledRequest.Merge(m, src)
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetLimitOrderPoolUserSharesWithdrawnRequest.Merge(m, src)
 }
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) XXX_Size() int {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetLimitOrderPoolUserSharesFilledRequest.DiscardUnknown(m)
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetLimitOrderPoolUserSharesWithdrawnRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetLimitOrderPoolUserSharesFilledRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryGetLimitOrderPoolUserSharesWithdrawnRequest proto.InternalMessageInfo
 
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) GetCount() uint64 {
-	if m != nil {
-		return m.Count
-	}
-	return 0
-}
-
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) GetAddress() string {
-	if m != nil {
-		return m.Address
-	}
-	return ""
-}
-
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) GetPairId() string {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) GetPairId() string {
 	if m != nil {
 		return m.PairId
 	}
 	return ""
 }
 
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) GetTickIndex() int64 {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) GetTickIndex() int64 {
 	if m != nil {
 		return m.TickIndex
 	}
 	return 0
 }
 
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) GetToken() string {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) GetToken() string {
 	if m != nil {
 		return m.Token
 	}
 	return ""
 }
 
-type QueryGetLimitOrderPoolUserSharesFilledResponse struct {
-	LimitOrderPoolUserSharesFilled LimitOrderPoolUserSharesFilled `protobuf:"bytes,1,opt,name=limitOrderPoolUserSharesFilled,proto3" json:"limitOrderPoolUserSharesFilled"`
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) GetCount() uint64 {
+	if m != nil {
+		return m.Count
+	}
+	return 0
 }
 
-func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) Reset() {
-	*m = QueryGetLimitOrderPoolUserSharesFilledResponse{}
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) GetAddress() string {
+	if m != nil {
+		return m.Address
+	}
+	return ""
 }
-func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) String() string {
+
+type QueryGetLimitOrderPoolUserSharesWithdrawnResponse struct {
+	LimitOrderPoolUserSharesWithdrawn LimitOrderPoolUserSharesWithdrawn `protobuf:"bytes,1,opt,name=limitOrderPoolUserSharesWithdrawn,proto3" json:"limitOrderPoolUserSharesWithdrawn"`
+}
+
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnResponse) Reset() {
+	*m = QueryGetLimitOrderPoolUserSharesWithdrawnResponse{}
+}
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnResponse) String() string {
 	return proto.CompactTextString(m)
 }
-func (*QueryGetLimitOrderPoolUserSharesFilledResponse) ProtoMessage() {}
-func (*QueryGetLimitOrderPoolUserSharesFilledResponse) Descriptor() ([]byte, []int) {
+func (*QueryGetLimitOrderPoolUserSharesWithdrawnResponse) ProtoMessage() {}
+func (*QueryGetLimitOrderPoolUserSharesWithdrawnResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d8e98105e6e08a59, []int{39}
 }
-func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetLimitOrderPoolUserSharesFilledResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGetLimitOrderPoolUserSharesWithdrawnResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1958,45 +1958,45 @@ func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) XXX_Marshal(b []byte, d
 		return b[:n], nil
 	}
 }
-func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetLimitOrderPoolUserSharesFilledResponse.Merge(m, src)
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetLimitOrderPoolUserSharesWithdrawnResponse.Merge(m, src)
 }
-func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) XXX_Size() int {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetLimitOrderPoolUserSharesFilledResponse.DiscardUnknown(m)
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetLimitOrderPoolUserSharesWithdrawnResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetLimitOrderPoolUserSharesFilledResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryGetLimitOrderPoolUserSharesWithdrawnResponse proto.InternalMessageInfo
 
-func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) GetLimitOrderPoolUserSharesFilled() LimitOrderPoolUserSharesFilled {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnResponse) GetLimitOrderPoolUserSharesWithdrawn() LimitOrderPoolUserSharesWithdrawn {
 	if m != nil {
-		return m.LimitOrderPoolUserSharesFilled
+		return m.LimitOrderPoolUserSharesWithdrawn
 	}
-	return LimitOrderPoolUserSharesFilled{}
+	return LimitOrderPoolUserSharesWithdrawn{}
 }
 
-type QueryAllLimitOrderPoolUserSharesFilledRequest struct {
+type QueryAllLimitOrderPoolUserSharesWithdrawnRequest struct {
 	Pagination *query.PageRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) Reset() {
-	*m = QueryAllLimitOrderPoolUserSharesFilledRequest{}
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnRequest) Reset() {
+	*m = QueryAllLimitOrderPoolUserSharesWithdrawnRequest{}
 }
-func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) String() string {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnRequest) String() string {
 	return proto.CompactTextString(m)
 }
-func (*QueryAllLimitOrderPoolUserSharesFilledRequest) ProtoMessage() {}
-func (*QueryAllLimitOrderPoolUserSharesFilledRequest) Descriptor() ([]byte, []int) {
+func (*QueryAllLimitOrderPoolUserSharesWithdrawnRequest) ProtoMessage() {}
+func (*QueryAllLimitOrderPoolUserSharesWithdrawnRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d8e98105e6e08a59, []int{40}
 }
-func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryAllLimitOrderPoolUserSharesFilledRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryAllLimitOrderPoolUserSharesWithdrawnRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2006,46 +2006,46 @@ func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) XXX_Marshal(b []byte, de
 		return b[:n], nil
 	}
 }
-func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryAllLimitOrderPoolUserSharesFilledRequest.Merge(m, src)
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryAllLimitOrderPoolUserSharesWithdrawnRequest.Merge(m, src)
 }
-func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) XXX_Size() int {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryAllLimitOrderPoolUserSharesFilledRequest.DiscardUnknown(m)
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryAllLimitOrderPoolUserSharesWithdrawnRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryAllLimitOrderPoolUserSharesFilledRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryAllLimitOrderPoolUserSharesWithdrawnRequest proto.InternalMessageInfo
 
-func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) GetPagination() *query.PageRequest {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnRequest) GetPagination() *query.PageRequest {
 	if m != nil {
 		return m.Pagination
 	}
 	return nil
 }
 
-type QueryAllLimitOrderPoolUserSharesFilledResponse struct {
-	LimitOrderPoolUserSharesFilled []LimitOrderPoolUserSharesFilled `protobuf:"bytes,1,rep,name=limitOrderPoolUserSharesFilled,proto3" json:"limitOrderPoolUserSharesFilled"`
-	Pagination                     *query.PageResponse              `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+type QueryAllLimitOrderPoolUserSharesWithdrawnResponse struct {
+	LimitOrderPoolUserSharesWithdrawn []LimitOrderPoolUserSharesWithdrawn `protobuf:"bytes,1,rep,name=limitOrderPoolUserSharesWithdrawn,proto3" json:"limitOrderPoolUserSharesWithdrawn"`
+	Pagination                        *query.PageResponse                 `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) Reset() {
-	*m = QueryAllLimitOrderPoolUserSharesFilledResponse{}
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnResponse) Reset() {
+	*m = QueryAllLimitOrderPoolUserSharesWithdrawnResponse{}
 }
-func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) String() string {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnResponse) String() string {
 	return proto.CompactTextString(m)
 }
-func (*QueryAllLimitOrderPoolUserSharesFilledResponse) ProtoMessage() {}
-func (*QueryAllLimitOrderPoolUserSharesFilledResponse) Descriptor() ([]byte, []int) {
+func (*QueryAllLimitOrderPoolUserSharesWithdrawnResponse) ProtoMessage() {}
+func (*QueryAllLimitOrderPoolUserSharesWithdrawnResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d8e98105e6e08a59, []int{41}
 }
-func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryAllLimitOrderPoolUserSharesFilledResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryAllLimitOrderPoolUserSharesWithdrawnResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2055,26 +2055,26 @@ func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) XXX_Marshal(b []byte, d
 		return b[:n], nil
 	}
 }
-func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryAllLimitOrderPoolUserSharesFilledResponse.Merge(m, src)
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryAllLimitOrderPoolUserSharesWithdrawnResponse.Merge(m, src)
 }
-func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) XXX_Size() int {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryAllLimitOrderPoolUserSharesFilledResponse.DiscardUnknown(m)
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryAllLimitOrderPoolUserSharesWithdrawnResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryAllLimitOrderPoolUserSharesFilledResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryAllLimitOrderPoolUserSharesWithdrawnResponse proto.InternalMessageInfo
 
-func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) GetLimitOrderPoolUserSharesFilled() []LimitOrderPoolUserSharesFilled {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnResponse) GetLimitOrderPoolUserSharesWithdrawn() []LimitOrderPoolUserSharesWithdrawn {
 	if m != nil {
-		return m.LimitOrderPoolUserSharesFilled
+		return m.LimitOrderPoolUserSharesWithdrawn
 	}
 	return nil
 }
 
-func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) GetPagination() *query.PageResponse {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnResponse) GetPagination() *query.PageResponse {
 	if m != nil {
 		return m.Pagination
 	}
@@ -2082,10 +2082,10 @@ func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) GetPagination() *query.
 }
 
 type QueryGetLimitOrderPoolTotalSharesMapRequest struct {
-	Count     uint64 `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
-	PairId    string `protobuf:"bytes,2,opt,name=pairId,proto3" json:"pairId,omitempty"`
-	TickIndex int64  `protobuf:"varint,3,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
-	Token     string `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
+	PairId    string `protobuf:"bytes,1,opt,name=pairId,proto3" json:"pairId,omitempty"`
+	TickIndex int64  `protobuf:"varint,2,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
+	Token     string `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"`
+	Count     uint64 `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`
 }
 
 func (m *QueryGetLimitOrderPoolTotalSharesMapRequest) Reset() {
@@ -2125,13 +2125,6 @@ func (m *QueryGetLimitOrderPoolTotalSharesMapRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryGetLimitOrderPoolTotalSharesMapRequest proto.InternalMessageInfo
 
-func (m *QueryGetLimitOrderPoolTotalSharesMapRequest) GetCount() uint64 {
-	if m != nil {
-		return m.Count
-	}
-	return 0
-}
-
 func (m *QueryGetLimitOrderPoolTotalSharesMapRequest) GetPairId() string {
 	if m != nil {
 		return m.PairId
@@ -2151,6 +2144,13 @@ func (m *QueryGetLimitOrderPoolTotalSharesMapRequest) GetToken() string {
 		return m.Token
 	}
 	return ""
+}
+
+func (m *QueryGetLimitOrderPoolTotalSharesMapRequest) GetCount() uint64 {
+	if m != nil {
+		return m.Count
+	}
+	return 0
 }
 
 type QueryGetLimitOrderPoolTotalSharesMapResponse struct {
@@ -2306,10 +2306,10 @@ func (m *QueryAllLimitOrderPoolTotalSharesMapResponse) GetPagination() *query.Pa
 }
 
 type QueryGetLimitOrderPoolReserveMapRequest struct {
-	Count     uint64 `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
-	PairId    string `protobuf:"bytes,2,opt,name=pairId,proto3" json:"pairId,omitempty"`
-	TickIndex int64  `protobuf:"varint,3,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
-	Token     string `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
+	PairId    string `protobuf:"bytes,1,opt,name=pairId,proto3" json:"pairId,omitempty"`
+	TickIndex int64  `protobuf:"varint,2,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
+	Token     string `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"`
+	Count     uint64 `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`
 }
 
 func (m *QueryGetLimitOrderPoolReserveMapRequest) Reset() {
@@ -2347,13 +2347,6 @@ func (m *QueryGetLimitOrderPoolReserveMapRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryGetLimitOrderPoolReserveMapRequest proto.InternalMessageInfo
 
-func (m *QueryGetLimitOrderPoolReserveMapRequest) GetCount() uint64 {
-	if m != nil {
-		return m.Count
-	}
-	return 0
-}
-
 func (m *QueryGetLimitOrderPoolReserveMapRequest) GetPairId() string {
 	if m != nil {
 		return m.PairId
@@ -2373,6 +2366,13 @@ func (m *QueryGetLimitOrderPoolReserveMapRequest) GetToken() string {
 		return m.Token
 	}
 	return ""
+}
+
+func (m *QueryGetLimitOrderPoolReserveMapRequest) GetCount() uint64 {
+	if m != nil {
+		return m.Count
+	}
+	return 0
 }
 
 type QueryGetLimitOrderPoolReserveMapResponse struct {
@@ -2522,10 +2522,10 @@ func (m *QueryAllLimitOrderPoolReserveMapResponse) GetPagination() *query.PageRe
 }
 
 type QueryGetLimitOrderPoolFillMapRequest struct {
-	Count     uint64 `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
-	PairId    string `protobuf:"bytes,2,opt,name=pairId,proto3" json:"pairId,omitempty"`
-	TickIndex int64  `protobuf:"varint,3,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
-	Token     string `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
+	PairId    string `protobuf:"bytes,1,opt,name=pairId,proto3" json:"pairId,omitempty"`
+	TickIndex int64  `protobuf:"varint,2,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
+	Token     string `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"`
+	Count     uint64 `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`
 }
 
 func (m *QueryGetLimitOrderPoolFillMapRequest) Reset()         { *m = QueryGetLimitOrderPoolFillMapRequest{} }
@@ -2561,13 +2561,6 @@ func (m *QueryGetLimitOrderPoolFillMapRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryGetLimitOrderPoolFillMapRequest proto.InternalMessageInfo
 
-func (m *QueryGetLimitOrderPoolFillMapRequest) GetCount() uint64 {
-	if m != nil {
-		return m.Count
-	}
-	return 0
-}
-
 func (m *QueryGetLimitOrderPoolFillMapRequest) GetPairId() string {
 	if m != nil {
 		return m.PairId
@@ -2587,6 +2580,13 @@ func (m *QueryGetLimitOrderPoolFillMapRequest) GetToken() string {
 		return m.Token
 	}
 	return ""
+}
+
+func (m *QueryGetLimitOrderPoolFillMapRequest) GetCount() uint64 {
+	if m != nil {
+		return m.Count
+	}
+	return 0
 }
 
 type QueryGetLimitOrderPoolFillMapResponse struct {
@@ -2768,10 +2768,10 @@ func init() {
 	proto.RegisterType((*QueryGetLimitOrderPoolUserShareMapResponse)(nil), "nicholasdotsol.duality.dex.QueryGetLimitOrderPoolUserShareMapResponse")
 	proto.RegisterType((*QueryAllLimitOrderPoolUserShareMapRequest)(nil), "nicholasdotsol.duality.dex.QueryAllLimitOrderPoolUserShareMapRequest")
 	proto.RegisterType((*QueryAllLimitOrderPoolUserShareMapResponse)(nil), "nicholasdotsol.duality.dex.QueryAllLimitOrderPoolUserShareMapResponse")
-	proto.RegisterType((*QueryGetLimitOrderPoolUserSharesFilledRequest)(nil), "nicholasdotsol.duality.dex.QueryGetLimitOrderPoolUserSharesFilledRequest")
-	proto.RegisterType((*QueryGetLimitOrderPoolUserSharesFilledResponse)(nil), "nicholasdotsol.duality.dex.QueryGetLimitOrderPoolUserSharesFilledResponse")
-	proto.RegisterType((*QueryAllLimitOrderPoolUserSharesFilledRequest)(nil), "nicholasdotsol.duality.dex.QueryAllLimitOrderPoolUserSharesFilledRequest")
-	proto.RegisterType((*QueryAllLimitOrderPoolUserSharesFilledResponse)(nil), "nicholasdotsol.duality.dex.QueryAllLimitOrderPoolUserSharesFilledResponse")
+	proto.RegisterType((*QueryGetLimitOrderPoolUserSharesWithdrawnRequest)(nil), "nicholasdotsol.duality.dex.QueryGetLimitOrderPoolUserSharesWithdrawnRequest")
+	proto.RegisterType((*QueryGetLimitOrderPoolUserSharesWithdrawnResponse)(nil), "nicholasdotsol.duality.dex.QueryGetLimitOrderPoolUserSharesWithdrawnResponse")
+	proto.RegisterType((*QueryAllLimitOrderPoolUserSharesWithdrawnRequest)(nil), "nicholasdotsol.duality.dex.QueryAllLimitOrderPoolUserSharesWithdrawnRequest")
+	proto.RegisterType((*QueryAllLimitOrderPoolUserSharesWithdrawnResponse)(nil), "nicholasdotsol.duality.dex.QueryAllLimitOrderPoolUserSharesWithdrawnResponse")
 	proto.RegisterType((*QueryGetLimitOrderPoolTotalSharesMapRequest)(nil), "nicholasdotsol.duality.dex.QueryGetLimitOrderPoolTotalSharesMapRequest")
 	proto.RegisterType((*QueryGetLimitOrderPoolTotalSharesMapResponse)(nil), "nicholasdotsol.duality.dex.QueryGetLimitOrderPoolTotalSharesMapResponse")
 	proto.RegisterType((*QueryAllLimitOrderPoolTotalSharesMapRequest)(nil), "nicholasdotsol.duality.dex.QueryAllLimitOrderPoolTotalSharesMapRequest")
@@ -2789,138 +2789,139 @@ func init() {
 func init() { proto.RegisterFile("dex/query.proto", fileDescriptor_d8e98105e6e08a59) }
 
 var fileDescriptor_d8e98105e6e08a59 = []byte{
-	// 2095 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x5b, 0x4d, 0x6c, 0x24, 0x47,
-	0x15, 0xde, 0x9a, 0xf6, 0x4f, 0xb6, 0x22, 0x85, 0x50, 0xf1, 0x86, 0x61, 0x70, 0x26, 0xa1, 0xe3,
-	0xac, 0xff, 0xe2, 0xe9, 0xd8, 0x4e, 0xc8, 0x66, 0xd1, 0x2a, 0xf6, 0x3a, 0xb6, 0x63, 0xb4, 0xce,
-	0x3a, 0xb3, 0x89, 0x80, 0x1c, 0x18, 0xda, 0x9e, 0xf2, 0x6c, 0xb3, 0xed, 0xe9, 0xd9, 0xee, 0xf6,
-	0xae, 0x8d, 0xb1, 0x84, 0x16, 0x0e, 0x91, 0x38, 0x80, 0x40, 0x70, 0x44, 0x88, 0x08, 0x2d, 0x10,
-	0xc4, 0x85, 0x23, 0x07, 0x40, 0x5c, 0x72, 0x8c, 0xc4, 0x85, 0x53, 0x40, 0x6b, 0x4e, 0x70, 0xe0,
-	0xb0, 0x47, 0x38, 0xa0, 0xae, 0x7a, 0x3d, 0xfd, 0xdf, 0x5d, 0xdd, 0xd3, 0xb3, 0xe2, 0xb6, 0x5d,
-	0xae, 0xf7, 0xde, 0xf7, 0xbe, 0xef, 0x55, 0xd5, 0x74, 0xbd, 0x5e, 0xfc, 0xa9, 0x36, 0x3d, 0x52,
-	0x6e, 0x1f, 0x52, 0xf3, 0xb8, 0xd1, 0x33, 0x0d, 0xdb, 0x20, 0xb5, 0xae, 0xb6, 0x77, 0xd3, 0xd0,
-	0x55, 0xab, 0x6d, 0xd8, 0x96, 0xa1, 0x37, 0xda, 0x87, 0xaa, 0xae, 0xd9, 0xc7, 0x8d, 0x36, 0x3d,
-	0xaa, 0x4d, 0x74, 0x8c, 0x8e, 0xc1, 0xa6, 0x29, 0xce, 0xbf, 0xb8, 0x45, 0x6d, 0xb2, 0x63, 0x18,
-	0x1d, 0x9d, 0x2a, 0x6a, 0x4f, 0x53, 0xd4, 0x6e, 0xd7, 0xb0, 0x55, 0x5b, 0x33, 0xba, 0x16, 0xfc,
-	0x75, 0x6e, 0xcf, 0xb0, 0x0e, 0x0c, 0x4b, 0xd9, 0x55, 0x2d, 0xca, 0x03, 0x29, 0x77, 0x16, 0x77,
-	0xa9, 0xad, 0x2e, 0x2a, 0x3d, 0xb5, 0xa3, 0x75, 0xd9, 0x64, 0x98, 0xfb, 0xa4, 0x03, 0xa6, 0xa7,
-	0x9a, 0xea, 0x81, 0x6b, 0x4d, 0x9c, 0x11, 0x5b, 0xdb, 0xbb, 0xd5, 0x3a, 0x50, 0x7b, 0xfe, 0xb1,
-	0x9e, 0xaa, 0x99, 0xbe, 0x31, 0x66, 0x69, 0x1b, 0xb7, 0x68, 0x3f, 0xee, 0x53, 0xfd, 0x91, 0xf0,
-	0x34, 0xeb, 0xa6, 0x6a, 0xd2, 0x40, 0x80, 0x7d, 0x4a, 0x5b, 0xba, 0x66, 0xd9, 0xfe, 0x31, 0xda,
-	0xee, 0xd0, 0x96, 0x69, 0xdc, 0x85, 0xb1, 0xcf, 0x3a, 0x63, 0x6a, 0xfb, 0x1b, 0x6a, 0x77, 0x8f,
-	0x1e, 0xb7, 0x0e, 0x54, 0xdb, 0xd4, 0x8e, 0xe0, 0x4f, 0xb3, 0xce, 0x9f, 0x74, 0xed, 0x40, 0xb3,
-	0x5b, 0x86, 0xd9, 0xa6, 0x66, 0xab, 0x67, 0x18, 0x7a, 0xeb, 0xd0, 0xa2, 0x66, 0x8b, 0x85, 0xf2,
-	0xc5, 0x5f, 0xc8, 0x98, 0x6a, 0xb5, 0xf6, 0x35, 0x5d, 0xa7, 0x6d, 0x98, 0x3e, 0x1f, 0x3b, 0xdd,
-	0x36, 0x6c, 0x55, 0x77, 0xe7, 0x7b, 0xbe, 0x2f, 0xc6, 0x4e, 0x36, 0xa9, 0x45, 0xcd, 0x3b, 0x7e,
-	0x0c, 0xcf, 0xc7, 0xce, 0x73, 0xe2, 0x7a, 0x93, 0xe4, 0x09, 0x4c, 0xde, 0x76, 0xb4, 0xda, 0x61,
-	0x62, 0x34, 0xe9, 0xed, 0x43, 0x6a, 0xd9, 0xf2, 0x97, 0xf1, 0x53, 0x81, 0x51, 0xab, 0x67, 0x74,
-	0x2d, 0x4a, 0x56, 0xf0, 0x18, 0x17, 0xad, 0x8a, 0x9e, 0x43, 0x33, 0x8f, 0x2f, 0xc9, 0x8d, 0xe4,
-	0x1a, 0x6a, 0x70, 0xdb, 0xab, 0x23, 0x1f, 0x7d, 0xf2, 0xec, 0xb9, 0x26, 0xd8, 0xc9, 0x6f, 0xe1,
-	0xa7, 0x99, 0xe3, 0x4d, 0x6a, 0xbf, 0xa3, 0xed, 0xdd, 0xda, 0x56, 0x7b, 0x10, 0x92, 0x4c, 0xe2,
-	0xf3, 0x8e, 0xfc, 0x5b, 0xdd, 0x36, 0x3d, 0x62, 0xee, 0xa5, 0xa6, 0x37, 0x40, 0x9e, 0x76, 0x22,
-	0x6b, 0xe6, 0x56, 0xbb, 0x5a, 0x79, 0x0e, 0xcd, 0x9c, 0x6f, 0xc2, 0x93, 0xfc, 0x35, 0xfc, 0x99,
-	0x88, 0x3f, 0x00, 0xbb, 0x86, 0xc7, 0x6d, 0x3e, 0x04, 0x68, 0x9f, 0x4f, 0x43, 0x0b, 0xd6, 0x00,
-	0xd7, 0xb5, 0x94, 0xbf, 0x0e, 0x78, 0x57, 0x75, 0x3d, 0x84, 0x77, 0x03, 0x63, 0xaf, 0xac, 0x21,
-	0xc2, 0xc5, 0x06, 0x5f, 0x03, 0x0d, 0x67, 0x0d, 0x34, 0xf8, 0x62, 0x83, 0x35, 0xd0, 0xd8, 0x51,
-	0x3b, 0x14, 0x6c, 0x9b, 0x3e, 0x4b, 0xf9, 0x3e, 0x82, 0x14, 0xfc, 0x21, 0xe2, 0x52, 0x90, 0x8a,
-	0xa5, 0x40, 0x36, 0x03, 0x40, 0x2b, 0x0c, 0xe8, 0x74, 0x26, 0x50, 0x8e, 0x20, 0x80, 0xf4, 0x25,
-	0x4f, 0xbb, 0x1d, 0x55, 0x33, 0x7d, 0x5c, 0x78, 0xea, 0xa0, 0x24, 0x75, 0xfa, 0x16, 0x5e, 0x6a,
-	0x3d, 0x3e, 0x24, 0xa2, 0x0e, 0x58, 0xbb, 0xa9, 0x81, 0xa5, 0x5f, 0x9d, 0x10, 0xa2, 0x61, 0xa8,
-	0x93, 0x9a, 0x82, 0x54, 0x2c, 0x85, 0xf2, 0xd4, 0x99, 0xc6, 0x17, 0xfa, 0x2b, 0x81, 0x6d, 0x8f,
-	0x2e, 0x15, 0x4f, 0xe0, 0x8a, 0xc6, 0x85, 0x19, 0x69, 0x56, 0xb4, 0xb6, 0xfc, 0x9e, 0x6f, 0x09,
-	0xc2, 0x44, 0x6f, 0x79, 0xf3, 0x11, 0x91, 0xe5, 0xcd, 0x67, 0xba, 0xcb, 0x9b, 0x3f, 0xc9, 0x2d,
-	0x00, 0xe1, 0xd4, 0x72, 0x00, 0x44, 0x59, 0x7a, 0x7c, 0x80, 0x7c, 0x0b, 0x32, 0x19, 0xbd, 0x54,
-	0x04, 0x7d, 0x79, 0x5a, 0x2c, 0xfb, 0x76, 0x25, 0xc7, 0xb5, 0xaf, 0x30, 0xab, 0x78, 0x5c, 0x6d,
-	0xb7, 0x4d, 0x6a, 0x59, 0xb0, 0x56, 0xdc, 0x47, 0x79, 0x17, 0x57, 0xa3, 0x46, 0x90, 0xdb, 0x06,
-	0x7e, 0xcc, 0x86, 0x31, 0x20, 0x6f, 0x2a, 0x33, 0x3b, 0xaf, 0xd8, 0xfa, 0xb6, 0xb2, 0xea, 0xdb,
-	0x6b, 0x42, 0xc0, 0xca, 0x52, 0xe8, 0x43, 0x04, 0x79, 0x04, 0x62, 0xc4, 0xe6, 0x21, 0x15, 0xcd,
-	0xa3, 0x3c, 0xa5, 0x8e, 0xbd, 0x55, 0x73, 0x83, 0x9d, 0xb3, 0x99, 0x3a, 0x25, 0x1d, 0x45, 0xc1,
-	0x03, 0x4c, 0x0a, 0x1f, 0x60, 0x4f, 0x62, 0x69, 0x9f, 0xd2, 0xea, 0x08, 0x5b, 0x86, 0xce, 0x3f,
-	0xfd, 0xeb, 0xd0, 0x0d, 0xed, 0x55, 0x32, 0x3f, 0xf4, 0x45, 0xd6, 0x21, 0xb7, 0x75, 0x2b, 0x99,
-	0xdb, 0xf9, 0xd7, 0x61, 0x30, 0xad, 0x61, 0xac, 0xc3, 0x14, 0xf4, 0x52, 0x11, 0xf4, 0xe5, 0xa9,
-	0x3b, 0xe3, 0x51, 0xbc, 0x41, 0xe9, 0x35, 0xcd, 0xb2, 0x93, 0x36, 0x45, 0xdf, 0x49, 0xd5, 0x9f,
-	0xe9, 0x6d, 0xf3, 0x30, 0x24, 0x72, 0x52, 0xc1, 0x54, 0x77, 0x9b, 0x87, 0x47, 0xff, 0x49, 0x15,
-	0x42, 0x32, 0x8c, 0x93, 0x2a, 0x35, 0x05, 0xa9, 0x58, 0x0a, 0x43, 0x51, 0x65, 0xbd, 0xdd, 0xa1,
-	0x4d, 0xe3, 0xae, 0x80, 0x2a, 0xfd, 0x99, 0x5e, 0x4a, 0x30, 0x24, 0xa2, 0x0a, 0x4c, 0x75, 0x53,
-	0x82, 0x47, 0xbf, 0x2a, 0x21, 0x24, 0xc3, 0x50, 0x25, 0x35, 0x05, 0xa9, 0x58, 0x0a, 0xe5, 0xa9,
-	0xa2, 0xe0, 0x67, 0x5c, 0xae, 0x57, 0xe1, 0xed, 0x67, 0x9b, 0xbd, 0xfc, 0x24, 0x89, 0xf3, 0x4d,
-	0x5c, 0x4f, 0x32, 0x80, 0x04, 0xbf, 0x82, 0x9f, 0x08, 0xfe, 0x05, 0x88, 0x9c, 0x4b, 0xcb, 0x33,
-	0x68, 0x01, 0xe9, 0x86, 0xfc, 0xc8, 0x1d, 0x00, 0xbb, 0xaa, 0xeb, 0xf1, 0x60, 0xcb, 0xd2, 0xef,
-	0xcf, 0x08, 0xb2, 0x8c, 0x89, 0x94, 0x92, 0xa5, 0x54, 0x46, 0x96, 0xe5, 0x69, 0x7b, 0x1f, 0xe1,
-	0x59, 0x57, 0xab, 0x6b, 0xce, 0x0b, 0xe1, 0x75, 0xe7, 0x7d, 0x70, 0xc7, 0x30, 0xf4, 0x77, 0x2d,
-	0x6a, 0xb2, 0x3d, 0xd8, 0xf7, 0x4b, 0x60, 0x02, 0x8f, 0xee, 0x19, 0x87, 0x5d, 0x1b, 0xb4, 0xe6,
-	0x0f, 0xfe, 0x03, 0xb1, 0x92, 0x74, 0x20, 0x4a, 0xc9, 0x07, 0xe2, 0x48, 0xf8, 0x40, 0x9c, 0xc0,
-	0xa3, 0xec, 0x38, 0xaf, 0x8e, 0x32, 0x23, 0xfe, 0x20, 0xff, 0x1a, 0xe1, 0x39, 0x11, 0xa4, 0xc0,
-	0xfd, 0xb7, 0x70, 0x4d, 0x4f, 0x9c, 0x05, 0xb2, 0x7f, 0x21, 0x4d, 0x87, 0xe4, 0x18, 0xa0, 0x49,
-	0x8a, 0x7f, 0xd9, 0x02, 0x56, 0x57, 0x75, 0x3d, 0x9b, 0xd5, 0xb2, 0x2a, 0xf2, 0xa1, 0xcb, 0x50,
-	0x46, 0x54, 0x41, 0x86, 0xa4, 0x61, 0x32, 0x54, 0x5e, 0x05, 0x7f, 0x88, 0xf0, 0x42, 0x46, 0x5d,
-	0x58, 0x1b, 0xec, 0x46, 0xe5, 0xff, 0xa1, 0x8a, 0x7f, 0x8f, 0x70, 0x43, 0x14, 0x2d, 0xe8, 0xf4,
-	0x3e, 0xc2, 0x75, 0x3d, 0x75, 0x2a, 0xd4, 0xcc, 0xe5, 0x02, 0x62, 0x81, 0x07, 0x10, 0x2c, 0x23,
-	0x8e, 0x7c, 0x17, 0xa8, 0x4e, 0x2e, 0xb0, 0x10, 0xd5, 0x65, 0x95, 0xf6, 0x77, 0x2b, 0x40, 0x9b,
-	0x40, 0xe4, 0x3c, 0xb4, 0x49, 0x8f, 0x82, 0xb6, 0xf2, 0x6a, 0xfd, 0xfb, 0x08, 0xcf, 0xc7, 0x57,
-	0xcf, 0x3b, 0x86, 0xad, 0xc2, 0xcf, 0xed, 0xcc, 0xfd, 0xba, 0xd8, 0x6b, 0x4a, 0xbf, 0x9e, 0x47,
-	0xfc, 0xf5, 0xfc, 0x3b, 0x84, 0x5f, 0x14, 0x43, 0x04, 0xb2, 0xdc, 0x43, 0x78, 0x52, 0x4f, 0x99,
-	0x08, 0x45, 0x72, 0x49, 0x5c, 0x94, 0xa0, 0x3d, 0x48, 0x92, 0x1a, 0x43, 0x3e, 0x04, 0x1a, 0x23,
-	0xd5, 0x14, 0x4f, 0x63, 0x59, 0x55, 0xfc, 0x5f, 0x97, 0xac, 0xcc, 0xb8, 0xe2, 0x64, 0x49, 0xc3,
-	0x26, 0xab, 0xbc, 0xea, 0xfd, 0x1e, 0xc2, 0xd3, 0xf1, 0xb5, 0xd2, 0xe4, 0x37, 0xd4, 0x8f, 0xb4,
-	0x72, 0x7f, 0x8e, 0xf0, 0x4c, 0x36, 0x1a, 0x10, 0xe2, 0x0e, 0xae, 0xea, 0x09, 0x73, 0xa0, 0x1e,
-	0x5e, 0x16, 0xd7, 0xc0, 0xb3, 0x05, 0xfe, 0x13, 0x7d, 0xcb, 0xb7, 0x81, 0xb1, 0x48, 0xc1, 0x44,
-	0x19, 0x2b, 0xab, 0x48, 0xff, 0xe5, 0xf2, 0x92, 0x1a, 0x53, 0x88, 0x17, 0x69, 0x58, 0xbc, 0x94,
-	0x57, 0x93, 0xef, 0x23, 0x3c, 0x15, 0x5f, 0x05, 0xce, 0xde, 0xfd, 0x48, 0x0b, 0xf2, 0x27, 0x08,
-	0xbf, 0x90, 0x01, 0x05, 0x58, 0x3f, 0xc0, 0x17, 0xf4, 0xb8, 0x09, 0xa0, 0xfa, 0xa2, 0x38, 0xe5,
-	0x60, 0x08, 0x7c, 0xc7, 0x7b, 0x95, 0xbb, 0x40, 0x51, 0xa4, 0x20, 0x42, 0x14, 0x95, 0x55, 0x81,
-	0x7f, 0x73, 0x89, 0x48, 0x0e, 0x98, 0x4d, 0x84, 0x54, 0x3e, 0x11, 0xa5, 0x55, 0xdd, 0xd2, 0x2f,
-	0xe7, 0xf0, 0x28, 0xcb, 0x90, 0xfc, 0x18, 0xe1, 0x31, 0xde, 0x0e, 0x23, 0x8d, 0x34, 0xb4, 0xd1,
-	0x4e, 0x5c, 0x4d, 0x11, 0x9e, 0xcf, 0x11, 0xc8, 0x73, 0xf7, 0xfe, 0xf2, 0x8f, 0x1f, 0x55, 0xa6,
-	0x88, 0xac, 0xbc, 0x05, 0x86, 0x6f, 0x18, 0xf6, 0x0d, 0x43, 0x57, 0xc0, 0x50, 0xf1, 0x5a, 0xaf,
-	0xe4, 0x37, 0x08, 0x8f, 0x43, 0xd7, 0x88, 0x2c, 0x65, 0x06, 0x8a, 0xf4, 0xec, 0x6a, 0xcb, 0xb9,
-	0x6c, 0x00, 0xe0, 0x25, 0x06, 0x70, 0x89, 0xbc, 0x94, 0x06, 0xd0, 0xed, 0x04, 0x2b, 0x27, 0xfd,
-	0x05, 0x75, 0x4a, 0x3e, 0x40, 0x18, 0x83, 0xb7, 0x55, 0x5d, 0x17, 0x40, 0x1c, 0xe9, 0xda, 0x09,
-	0x20, 0x8e, 0xb6, 0xe1, 0xe4, 0x17, 0x19, 0xe2, 0x8b, 0x64, 0x4a, 0x04, 0x31, 0xf9, 0x15, 0xc2,
-	0xe3, 0xd0, 0xec, 0x11, 0x23, 0x35, 0xd8, 0xba, 0x12, 0x23, 0x35, 0xd4, 0x8b, 0x92, 0x5f, 0x61,
-	0x10, 0x15, 0xb2, 0x90, 0xae, 0x3a, 0x6f, 0xa5, 0x2b, 0x27, 0x7c, 0x03, 0xe3, 0x8c, 0x82, 0x2b,
-	0x61, 0x46, 0x73, 0xc3, 0x8d, 0xb6, 0xce, 0xc4, 0x18, 0x75, 0xe1, 0x92, 0x9f, 0x21, 0xb7, 0xb5,
-	0x43, 0x16, 0x85, 0x2a, 0xce, 0xdf, 0x7a, 0xaa, 0x2d, 0xe5, 0x31, 0x01, 0x7c, 0x0a, 0xc3, 0x37,
-	0x4b, 0xa6, 0x53, 0x15, 0x67, 0x36, 0xca, 0x89, 0xd6, 0x3e, 0x25, 0x3f, 0x45, 0xf8, 0x3c, 0xf7,
-	0xe1, 0xf0, 0xb8, 0x28, 0x54, 0x65, 0x39, 0x51, 0x46, 0x3a, 0x5e, 0x62, 0x4b, 0x9d, 0xa3, 0x24,
-	0xbf, 0x45, 0xf8, 0x31, 0xb7, 0x9d, 0x42, 0x96, 0x85, 0x29, 0xf1, 0x09, 0xfd, 0x72, 0x3e, 0x23,
-	0xc0, 0xf8, 0x2a, 0xc3, 0xb8, 0x48, 0x94, 0x4c, 0x8c, 0xbc, 0x32, 0xe1, 0x75, 0xfc, 0x94, 0xdc,
-	0x47, 0xf8, 0x71, 0xd7, 0x9b, 0xc3, 0xe9, 0xb2, 0x30, 0x41, 0xb9, 0x30, 0xc7, 0x74, 0xa9, 0xe4,
-	0x05, 0x86, 0x79, 0x9a, 0xbc, 0x20, 0x84, 0x99, 0xfc, 0x11, 0xe1, 0x31, 0xfe, 0x43, 0x5a, 0xac,
-	0x3c, 0x03, 0x1d, 0x19, 0xb1, 0xf2, 0x0c, 0xb6, 0x58, 0xe4, 0xeb, 0x0c, 0xe0, 0x16, 0xd9, 0x4c,
-	0x03, 0xc8, 0x9b, 0x29, 0x1e, 0xa3, 0xfd, 0x55, 0xef, 0xdf, 0x53, 0x95, 0x93, 0x7d, 0x4a, 0x79,
-	0xf9, 0xf2, 0x18, 0xc2, 0xe5, 0x9b, 0x37, 0x8b, 0x48, 0xa3, 0x48, 0xac, 0x7c, 0xa1, 0x25, 0xf4,
-	0x0b, 0xd4, 0x6f, 0x61, 0x88, 0x6d, 0xaa, 0xc1, 0x2e, 0x8b, 0xd8, 0xa6, 0x1a, 0x6a, 0x9b, 0xc8,
-	0x8b, 0x0c, 0xe0, 0x3c, 0x99, 0x4d, 0x03, 0xe8, 0x7e, 0x52, 0xc4, 0xf7, 0x01, 0x67, 0x43, 0x05,
-	0x37, 0xc2, 0x1b, 0x6a, 0x6e, 0xa8, 0xd1, 0x0e, 0x8f, 0xd8, 0x86, 0xea, 0x42, 0x65, 0x6c, 0xba,
-	0x0d, 0x04, 0x21, 0x36, 0x83, 0xdd, 0x11, 0x31, 0x36, 0x43, 0xed, 0x0e, 0x31, 0x36, 0xdd, 0x8f,
-	0xb1, 0x3c, 0x36, 0xc1, 0x8d, 0x30, 0x9b, 0xb9, 0xa1, 0x46, 0x3b, 0x33, 0x62, 0x6c, 0xba, 0x50,
-	0xc9, 0x9f, 0x50, 0xb8, 0x03, 0x40, 0x5e, 0x13, 0x21, 0x28, 0xb6, 0x73, 0x51, 0xbb, 0x5c, 0xc4,
-	0x34, 0xcf, 0x4f, 0xab, 0xd0, 0xb7, 0x6d, 0x9c, 0xe9, 0x3f, 0x20, 0xfc, 0xe9, 0xa0, 0x53, 0x87,
-	0xf0, 0xd7, 0x44, 0xc8, 0x2b, 0x9a, 0x46, 0x62, 0x47, 0x45, 0x5e, 0x66, 0x69, 0x2c, 0x90, 0xf9,
-	0x1c, 0x69, 0x90, 0x7b, 0x15, 0x5c, 0x4b, 0xbe, 0xab, 0x26, 0xeb, 0x22, 0xb4, 0x66, 0xde, 0xe2,
-	0xd7, 0x36, 0x06, 0x75, 0x03, 0x29, 0xbe, 0xcb, 0x52, 0xbc, 0x4e, 0xb6, 0xd3, 0x52, 0xcc, 0xf8,
-	0xd4, 0x50, 0x39, 0x61, 0xaf, 0xa7, 0xa7, 0xbe, 0x43, 0xf3, 0x21, 0xc2, 0xcf, 0x24, 0x47, 0x77,
-	0x24, 0x5d, 0x17, 0xd1, 0xa5, 0x0c, 0x1e, 0x84, 0xda, 0x13, 0xf2, 0x1a, 0xe3, 0xe1, 0x0a, 0xf9,
-	0xe2, 0x00, 0x3c, 0x90, 0x1f, 0x56, 0x70, 0x3d, 0xfd, 0x0a, 0x97, 0x6c, 0x0d, 0xa0, 0x5b, 0xf0,
-	0xb6, 0xbb, 0xf6, 0xa5, 0x32, 0x5c, 0x41, 0xfa, 0x5f, 0x65, 0xe9, 0xdf, 0x20, 0x6f, 0x17, 0x4c,
-	0xdf, 0xfd, 0x8c, 0x34, 0xa6, 0x14, 0xbe, 0x53, 0xc1, 0x9f, 0x4f, 0x47, 0xe1, 0x94, 0xc3, 0xd6,
-	0x00, 0x3a, 0xe6, 0xe6, 0x45, 0xf8, 0x5a, 0x5f, 0xde, 0x64, 0xbc, 0xac, 0x92, 0xd7, 0x07, 0xe4,
-	0x85, 0x7c, 0xbb, 0x82, 0x27, 0xaf, 0xa5, 0xde, 0x7b, 0xe6, 0x57, 0x33, 0xf6, 0xfa, 0xb8, 0xf6,
-	0xe6, 0xe0, 0x8e, 0x20, 0xf9, 0x6d, 0x96, 0xfc, 0x26, 0x59, 0xcf, 0x95, 0x7c, 0xf8, 0x63, 0x61,
-	0xb7, 0x24, 0xc8, 0x7f, 0x10, 0x7e, 0x36, 0x2d, 0xae, 0x53, 0x06, 0x9b, 0xf9, 0xb5, 0x2b, 0xca,
-	0x82, 0xe0, 0xad, 0xb8, 0xbc, 0xce, 0x58, 0x78, 0x9d, 0x5c, 0x19, 0x88, 0x05, 0xf2, 0x6f, 0x84,
-	0xab, 0x49, 0x17, 0x90, 0x64, 0x2d, 0xbf, 0x66, 0x91, 0x2b, 0xd9, 0xda, 0x1b, 0x83, 0x39, 0x81,
-	0x74, 0xdf, 0x64, 0xe9, 0x5e, 0x25, 0x2b, 0xb9, 0xd2, 0xf5, 0x7d, 0xf4, 0xdd, 0xd7, 0xfb, 0x9f,
-	0x08, 0x7f, 0x2e, 0x29, 0x9c, 0xa3, 0xf5, 0x5a, 0x7e, 0x89, 0x8a, 0x24, 0x2d, 0x70, 0xb1, 0x2c,
-	0xaf, 0xb0, 0xa4, 0x2f, 0x93, 0x4b, 0x45, 0x93, 0x26, 0x67, 0x08, 0x5f, 0x88, 0xbd, 0xe3, 0x23,
-	0x2b, 0xf9, 0x65, 0x09, 0xde, 0x74, 0xd6, 0x56, 0x07, 0xf0, 0x30, 0x50, 0x11, 0xbb, 0x9f, 0xe8,
-	0xf7, 0x25, 0xfd, 0x24, 0x52, 0xc4, 0x10, 0xc8, 0xd1, 0x73, 0x25, 0xbf, 0x14, 0xb9, 0x13, 0xcd,
-	0xba, 0xa3, 0x95, 0xaf, 0xb0, 0x44, 0x5f, 0x25, 0xaf, 0x14, 0x4a, 0xf4, 0xea, 0xe6, 0x47, 0x0f,
-	0xea, 0xe8, 0xe3, 0x07, 0x75, 0xf4, 0xf7, 0x07, 0x75, 0xf4, 0x83, 0xb3, 0xfa, 0xb9, 0x8f, 0xcf,
-	0xea, 0xe7, 0xfe, 0x7a, 0x56, 0x3f, 0xf7, 0xde, 0x42, 0x47, 0xb3, 0x6f, 0x1e, 0xee, 0x36, 0xf6,
-	0x8c, 0x83, 0x24, 0xd7, 0x47, 0xfc, 0x7d, 0xfc, 0xb8, 0x47, 0xad, 0xdd, 0x31, 0xf6, 0xbf, 0x1a,
-	0x96, 0xff, 0x17, 0x00, 0x00, 0xff, 0xff, 0x2e, 0xfd, 0x11, 0xe6, 0xee, 0x32, 0x00, 0x00,
+	// 2108 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x5b, 0xcd, 0x73, 0x1c, 0x47,
+	0x15, 0x77, 0xef, 0xf8, 0x23, 0xee, 0x54, 0x85, 0xd0, 0xb1, 0x83, 0x58, 0x14, 0x25, 0x99, 0x28,
+	0xd6, 0x57, 0xb4, 0xa3, 0x95, 0x12, 0xe2, 0x84, 0x52, 0x21, 0x59, 0x96, 0x84, 0x29, 0x39, 0x51,
+	0xd6, 0x86, 0x90, 0x40, 0xb1, 0x8c, 0x76, 0x5b, 0xab, 0x89, 0x47, 0x3b, 0xeb, 0x99, 0x91, 0x25,
+	0x45, 0xe8, 0x12, 0x2e, 0x54, 0x71, 0x48, 0x28, 0x20, 0x47, 0x8a, 0x22, 0x50, 0x2e, 0x3e, 0x2a,
+	0x07, 0xf8, 0x03, 0x80, 0xe2, 0x40, 0x8e, 0xa9, 0xe2, 0xc2, 0x29, 0x50, 0x36, 0x27, 0x38, 0xfa,
+	0xc0, 0x01, 0x0e, 0xd4, 0x74, 0xbf, 0xd9, 0xf9, 0x9e, 0xe9, 0x99, 0x9d, 0x55, 0xe5, 0xa6, 0xe9,
+	0xed, 0xf7, 0xde, 0xef, 0xfd, 0x7e, 0xaf, 0xbb, 0x77, 0xfb, 0x8d, 0xf0, 0x67, 0xda, 0xf4, 0x40,
+	0xb9, 0xbd, 0x47, 0xcd, 0xc3, 0x5a, 0xcf, 0x34, 0x6c, 0x83, 0x54, 0xbb, 0x5a, 0x6b, 0xc7, 0xd0,
+	0x55, 0xab, 0x6d, 0xd8, 0x96, 0xa1, 0xd7, 0xda, 0x7b, 0xaa, 0xae, 0xd9, 0x87, 0xb5, 0x36, 0x3d,
+	0xa8, 0x5e, 0xe8, 0x18, 0x1d, 0x83, 0x4d, 0x53, 0x9c, 0xbf, 0xb8, 0x45, 0x75, 0xb4, 0x63, 0x18,
+	0x1d, 0x9d, 0x2a, 0x6a, 0x4f, 0x53, 0xd4, 0x6e, 0xd7, 0xb0, 0x55, 0x5b, 0x33, 0xba, 0x16, 0x7c,
+	0x3a, 0xdd, 0x32, 0xac, 0x5d, 0xc3, 0x52, 0xb6, 0x54, 0x8b, 0xf2, 0x40, 0xca, 0x9d, 0xfa, 0x16,
+	0xb5, 0xd5, 0xba, 0xd2, 0x53, 0x3b, 0x5a, 0x97, 0x4d, 0x86, 0xb9, 0x8f, 0x3a, 0x60, 0x7a, 0xaa,
+	0xa9, 0xee, 0xba, 0xd6, 0xc4, 0x19, 0xb1, 0xb5, 0xd6, 0xad, 0xe6, 0xae, 0xda, 0xf3, 0x8f, 0xf5,
+	0x54, 0xcd, 0xf4, 0x8d, 0x31, 0x4b, 0xdb, 0xb8, 0x45, 0xfb, 0x71, 0x1f, 0xeb, 0x8f, 0x84, 0xa7,
+	0x59, 0x3b, 0xaa, 0x49, 0x03, 0x01, 0xb6, 0x29, 0x6d, 0xea, 0x9a, 0x65, 0xfb, 0xc7, 0x68, 0xbb,
+	0x43, 0x9b, 0xa6, 0xb1, 0x0f, 0x63, 0x9f, 0x77, 0xc6, 0xd4, 0xf6, 0x5b, 0x6a, 0xb7, 0x45, 0x0f,
+	0x9b, 0xbb, 0xaa, 0x6d, 0x6a, 0x07, 0xf0, 0xd1, 0x94, 0xf3, 0x91, 0xae, 0xed, 0x6a, 0x76, 0xd3,
+	0x30, 0xdb, 0xd4, 0x6c, 0xf6, 0x0c, 0x43, 0x6f, 0xee, 0x59, 0xd4, 0x6c, 0xb2, 0x50, 0xbe, 0xf8,
+	0x73, 0x19, 0x53, 0xad, 0xe6, 0xbe, 0x66, 0xef, 0xb4, 0x4d, 0x75, 0xdf, 0xa5, 0x64, 0x26, 0xd6,
+	0xc2, 0x36, 0x6c, 0x55, 0x77, 0x4d, 0x3c, 0xf7, 0x97, 0x62, 0x27, 0x9b, 0xd4, 0xa2, 0xe6, 0x1d,
+	0x3f, 0x8c, 0x67, 0x62, 0xe7, 0x6d, 0x6b, 0xba, 0xee, 0x4d, 0x92, 0x2f, 0x60, 0xf2, 0x9a, 0x23,
+	0xd7, 0x26, 0xd3, 0xa3, 0x41, 0x6f, 0xef, 0x51, 0xcb, 0x96, 0x5f, 0xc7, 0x8f, 0x05, 0x46, 0xad,
+	0x9e, 0xd1, 0xb5, 0x28, 0x59, 0xc2, 0x67, 0xb9, 0x6e, 0x23, 0xe8, 0x29, 0x34, 0xf9, 0xf0, 0xbc,
+	0x5c, 0x4b, 0x2e, 0xa3, 0x1a, 0xb7, 0xbd, 0x72, 0xfa, 0xa3, 0x4f, 0x9e, 0x3c, 0xd5, 0x00, 0x3b,
+	0xf9, 0x15, 0xfc, 0x38, 0x73, 0xbc, 0x4e, 0xed, 0x9b, 0x5a, 0xeb, 0xd6, 0x75, 0xb5, 0x07, 0x21,
+	0xc9, 0x28, 0x3e, 0xef, 0x54, 0xc0, 0xb5, 0x6e, 0x9b, 0x1e, 0x30, 0xf7, 0x52, 0xc3, 0x1b, 0x20,
+	0x8f, 0x3b, 0x91, 0x35, 0xf3, 0x5a, 0x7b, 0xa4, 0xf2, 0x14, 0x9a, 0x3c, 0xdf, 0x80, 0x27, 0xf9,
+	0xdb, 0xf8, 0x73, 0x11, 0x7f, 0x00, 0x76, 0x05, 0x9f, 0xb3, 0xf9, 0x10, 0xa0, 0x7d, 0x26, 0x0d,
+	0x2d, 0x58, 0x03, 0x5c, 0xd7, 0x52, 0xfe, 0x0e, 0xe0, 0x5d, 0xd6, 0xf5, 0x10, 0xde, 0x35, 0x8c,
+	0xbd, 0xca, 0x86, 0x08, 0x97, 0x6a, 0x7c, 0x19, 0xd4, 0x9c, 0x65, 0x50, 0xe3, 0xeb, 0x0d, 0x96,
+	0x41, 0x6d, 0x53, 0xed, 0x50, 0xb0, 0x6d, 0xf8, 0x2c, 0xe5, 0xbb, 0x08, 0x52, 0xf0, 0x87, 0x88,
+	0x4b, 0x41, 0x2a, 0x96, 0x02, 0x59, 0x0f, 0x00, 0xad, 0x30, 0xa0, 0x13, 0x99, 0x40, 0x39, 0x82,
+	0x00, 0xd2, 0x39, 0x4f, 0xbb, 0x4d, 0x55, 0x33, 0x7d, 0x5c, 0x78, 0xea, 0xa0, 0x24, 0x75, 0xfa,
+	0x16, 0x5e, 0x6a, 0x3d, 0x3e, 0x24, 0xa2, 0x0e, 0x58, 0xbb, 0xa9, 0x81, 0xa5, 0x5f, 0x9d, 0x10,
+	0xa2, 0x61, 0xa8, 0x93, 0x9a, 0x82, 0x54, 0x2c, 0x85, 0xf2, 0xd4, 0x99, 0xc0, 0x17, 0xfb, 0x2b,
+	0x81, 0xed, 0x90, 0x2e, 0x15, 0x8f, 0xe0, 0x8a, 0xc6, 0x85, 0x39, 0xdd, 0xa8, 0x68, 0x6d, 0xf9,
+	0x4d, 0xdf, 0x12, 0x84, 0x89, 0xde, 0xf2, 0xe6, 0x23, 0x22, 0xcb, 0x9b, 0xcf, 0x74, 0x97, 0x37,
+	0x7f, 0x92, 0x9b, 0x00, 0xc2, 0xa9, 0xe5, 0x00, 0x88, 0xb2, 0xf4, 0xf8, 0x00, 0xf9, 0x16, 0x64,
+	0x32, 0x7a, 0xa9, 0x08, 0xfa, 0xf2, 0xb4, 0x58, 0xf0, 0xed, 0x4a, 0x8e, 0x6b, 0x5f, 0x61, 0x8e,
+	0xe0, 0x73, 0x6a, 0xbb, 0x6d, 0x52, 0xcb, 0x82, 0xb5, 0xe2, 0x3e, 0xca, 0x5b, 0x78, 0x24, 0x6a,
+	0x04, 0xb9, 0xad, 0xe1, 0x87, 0x6c, 0x18, 0x03, 0xf2, 0xc6, 0x33, 0xb3, 0xf3, 0x8a, 0xad, 0x6f,
+	0x2b, 0xab, 0xbe, 0xbd, 0x26, 0x04, 0xac, 0x2c, 0x85, 0x7e, 0x83, 0x20, 0x8f, 0x40, 0x8c, 0xd8,
+	0x3c, 0xa4, 0xa2, 0x79, 0x94, 0xa7, 0xd4, 0xa1, 0xb7, 0x6a, 0x6e, 0xb0, 0x73, 0x36, 0x53, 0xa7,
+	0xa4, 0xa3, 0x28, 0x78, 0x80, 0x49, 0xe1, 0x03, 0xec, 0x51, 0x2c, 0x6d, 0x53, 0x3a, 0x72, 0x9a,
+	0x2d, 0x43, 0xe7, 0x4f, 0xff, 0x3a, 0x74, 0x43, 0x7b, 0x95, 0xcc, 0x0f, 0x7d, 0x91, 0x75, 0xc8,
+	0x6d, 0xdd, 0x4a, 0xe6, 0x76, 0xfe, 0x75, 0x18, 0x4c, 0x6b, 0x18, 0xeb, 0x30, 0x05, 0xbd, 0x54,
+	0x04, 0x7d, 0x79, 0xea, 0x4e, 0x7a, 0x14, 0xaf, 0x51, 0xba, 0xa1, 0x59, 0x76, 0xd2, 0xa6, 0xe8,
+	0x3b, 0xa9, 0xfa, 0x33, 0xbd, 0x6d, 0x1e, 0x86, 0x44, 0x4e, 0x2a, 0x98, 0xea, 0x6e, 0xf3, 0xf0,
+	0xe8, 0x3f, 0xa9, 0x42, 0x48, 0x86, 0x71, 0x52, 0xa5, 0xa6, 0x20, 0x15, 0x4b, 0x61, 0x28, 0xaa,
+	0xac, 0xb6, 0x3b, 0xb4, 0x61, 0xec, 0x0b, 0xa8, 0xd2, 0x9f, 0xe9, 0xa5, 0x04, 0x43, 0x22, 0xaa,
+	0xc0, 0x54, 0x37, 0x25, 0x78, 0xf4, 0xab, 0x12, 0x42, 0x32, 0x0c, 0x55, 0x52, 0x53, 0x90, 0x8a,
+	0xa5, 0x50, 0x9e, 0x2a, 0x0a, 0x7e, 0xc2, 0xe5, 0x7a, 0x19, 0x7e, 0x00, 0x5d, 0x67, 0xbf, 0x7f,
+	0x92, 0xc4, 0x79, 0x1b, 0x8f, 0x25, 0x19, 0x40, 0x82, 0xdf, 0xc0, 0x8f, 0x04, 0x3f, 0x01, 0x22,
+	0xa7, 0xd3, 0xf2, 0x0c, 0x5a, 0x40, 0xba, 0x21, 0x3f, 0x72, 0x07, 0xc0, 0x2e, 0xeb, 0x7a, 0x3c,
+	0xd8, 0xb2, 0xf4, 0xfb, 0x33, 0x82, 0x2c, 0x63, 0x22, 0xa5, 0x64, 0x29, 0x95, 0x91, 0x65, 0x79,
+	0xda, 0xde, 0x45, 0x78, 0xca, 0xd5, 0x6a, 0xc3, 0xf9, 0x41, 0xf8, 0xaa, 0xf3, 0x7b, 0x70, 0xd3,
+	0x30, 0xf4, 0xaf, 0x59, 0xd4, 0x64, 0x7b, 0x70, 0xf6, 0xb7, 0xf9, 0xe0, 0x01, 0x57, 0x09, 0x1f,
+	0x70, 0x17, 0xf0, 0x19, 0x76, 0x3c, 0xb3, 0xa3, 0xef, 0x7c, 0x83, 0x3f, 0x38, 0xa3, 0x2d, 0x63,
+	0xaf, 0x6b, 0xc3, 0xc1, 0xc7, 0x1f, 0xfc, 0x87, 0xeb, 0x99, 0xe0, 0x97, 0xa0, 0x5f, 0x23, 0x3c,
+	0x2d, 0x82, 0x14, 0xb8, 0xff, 0x2e, 0xae, 0xea, 0x89, 0xb3, 0x40, 0xf6, 0x2f, 0xa6, 0xe9, 0x90,
+	0x1c, 0x03, 0x34, 0x49, 0xf1, 0x2f, 0x5b, 0xc0, 0xea, 0xb2, 0xae, 0x67, 0xb3, 0x5a, 0x56, 0x45,
+	0x3e, 0x70, 0x19, 0xca, 0x88, 0x2a, 0xc8, 0x90, 0x34, 0x4c, 0x86, 0xca, 0xab, 0xe0, 0x0f, 0x11,
+	0x9e, 0xcb, 0xa8, 0x0b, 0xeb, 0x75, 0xf7, 0x52, 0xe5, 0xd3, 0x50, 0xc8, 0x7f, 0x41, 0xb8, 0x9e,
+	0x03, 0x30, 0xa8, 0xf5, 0x43, 0x84, 0x9f, 0xd6, 0xb3, 0x66, 0x43, 0xf1, 0x2c, 0x16, 0x50, 0xcd,
+	0x73, 0x02, 0xe2, 0x65, 0x47, 0x93, 0xdf, 0x06, 0xe6, 0x93, 0xeb, 0x2d, 0xca, 0x7c, 0x59, 0xc5,
+	0xfe, 0x5e, 0x05, 0x58, 0x14, 0x0b, 0x9e, 0x93, 0x45, 0xe9, 0xe4, 0x58, 0x2c, 0x6f, 0x25, 0xbc,
+	0x8b, 0xf0, 0x4c, 0x7c, 0x61, 0xdd, 0x34, 0x6c, 0x15, 0xbe, 0x8c, 0x9f, 0xe4, 0x6e, 0x2e, 0xff,
+	0x1e, 0xe1, 0xe7, 0xc4, 0x10, 0x81, 0x3e, 0xef, 0x20, 0x3c, 0xaa, 0xa7, 0x4c, 0x84, 0x82, 0xb9,
+	0x2c, 0x2e, 0x4d, 0xd0, 0x1e, 0x54, 0x49, 0x8d, 0x21, 0xef, 0x01, 0x8d, 0x91, 0xca, 0x8a, 0xa7,
+	0xb1, 0xac, 0x8a, 0xfe, 0x9f, 0x4b, 0x56, 0x66, 0x5c, 0x71, 0xb2, 0xa4, 0x61, 0x93, 0x55, 0x5e,
+	0xf5, 0xfe, 0x00, 0xe1, 0x89, 0xf8, 0x5a, 0x69, 0xf0, 0xfb, 0xeb, 0x13, 0xad, 0xdc, 0x9f, 0x23,
+	0x3c, 0x99, 0x8d, 0x06, 0x84, 0xb8, 0x83, 0x47, 0xf4, 0x84, 0x39, 0x50, 0x0f, 0xcf, 0x8b, 0x6b,
+	0xe0, 0xd9, 0x02, 0xff, 0x89, 0xbe, 0xe5, 0xdb, 0xc0, 0x58, 0xa4, 0x60, 0xa2, 0x8c, 0x95, 0x55,
+	0xa4, 0xff, 0x76, 0x79, 0x49, 0x8d, 0x29, 0xc4, 0x8b, 0x34, 0x2c, 0x5e, 0xca, 0xab, 0xc9, 0xef,
+	0x23, 0x3c, 0x1e, 0x5f, 0x05, 0x6b, 0x9a, 0xae, 0x9f, 0x68, 0x41, 0xbe, 0x8f, 0xf0, 0xb3, 0x19,
+	0x50, 0x80, 0xf5, 0x5d, 0x7c, 0x51, 0x8f, 0x9b, 0x00, 0xaa, 0xd7, 0xc5, 0x29, 0x07, 0x43, 0xe0,
+	0x3b, 0xde, 0xab, 0xdc, 0x05, 0x8a, 0x22, 0x05, 0x11, 0xa2, 0xa8, 0xac, 0x0a, 0xfc, 0xbb, 0x4b,
+	0x44, 0x72, 0xc0, 0x6c, 0x22, 0xa4, 0xf2, 0x89, 0x28, 0xad, 0xea, 0xe6, 0x7f, 0x31, 0x83, 0xcf,
+	0xb0, 0x0c, 0xc9, 0x4f, 0x10, 0x3e, 0xcb, 0x9b, 0x65, 0xa4, 0x96, 0x86, 0x36, 0xda, 0xa7, 0xab,
+	0x2a, 0xc2, 0xf3, 0x39, 0x02, 0x79, 0xfa, 0x9d, 0xbf, 0xfe, 0xf3, 0x47, 0x95, 0x71, 0x22, 0x2b,
+	0xaf, 0x80, 0xe1, 0x55, 0xc3, 0xbe, 0x61, 0xe8, 0x0a, 0x18, 0x2a, 0x5e, 0x6f, 0x96, 0xfc, 0x16,
+	0xe1, 0x73, 0xd0, 0x53, 0x22, 0xf3, 0x99, 0x81, 0x22, 0x1d, 0xbd, 0xea, 0x42, 0x2e, 0x1b, 0x00,
+	0x78, 0x99, 0x01, 0x9c, 0x27, 0x73, 0x69, 0x00, 0xdd, 0x56, 0xb1, 0x72, 0xd4, 0x5f, 0x66, 0xc7,
+	0xe4, 0x03, 0x84, 0x31, 0x78, 0x5b, 0xd6, 0x75, 0x01, 0xc4, 0x91, 0x9e, 0x9e, 0x00, 0xe2, 0x68,
+	0x93, 0x4e, 0x7e, 0x8e, 0x21, 0xbe, 0x44, 0xc6, 0x45, 0x10, 0x93, 0x5f, 0x21, 0x7c, 0x0e, 0x5a,
+	0x41, 0x62, 0xa4, 0x06, 0x1b, 0x5b, 0x62, 0xa4, 0x86, 0x3a, 0x55, 0xf2, 0x0b, 0x0c, 0xa2, 0x42,
+	0x66, 0xd3, 0x55, 0xe7, 0xbd, 0x76, 0xe5, 0x88, 0x6f, 0x6b, 0x9c, 0x51, 0x70, 0x25, 0xcc, 0x68,
+	0x6e, 0xb8, 0xd1, 0xc6, 0x9a, 0x18, 0xa3, 0x2e, 0x5c, 0xf2, 0x33, 0xe4, 0x36, 0x7e, 0x48, 0x5d,
+	0xa8, 0xe2, 0xfc, 0x8d, 0xa9, 0xea, 0x7c, 0x1e, 0x13, 0xc0, 0xa7, 0x30, 0x7c, 0x53, 0x64, 0x22,
+	0x55, 0x71, 0x66, 0xa3, 0x1c, 0x69, 0xed, 0x63, 0xf2, 0x53, 0x84, 0xcf, 0x73, 0x1f, 0x0e, 0x8f,
+	0x75, 0xa1, 0x2a, 0xcb, 0x89, 0x32, 0xd2, 0x0f, 0x13, 0x5b, 0xea, 0x1c, 0x25, 0xf9, 0x10, 0xe1,
+	0x87, 0xdc, 0x66, 0x0b, 0x59, 0x10, 0xa6, 0xc4, 0x27, 0xf4, 0xf3, 0xf9, 0x8c, 0x00, 0xe3, 0x8b,
+	0x0c, 0x63, 0x9d, 0x28, 0x99, 0x18, 0x79, 0x65, 0xc2, 0xaf, 0xeb, 0x63, 0x72, 0x17, 0xe1, 0x87,
+	0x5d, 0x6f, 0x0e, 0xa7, 0x0b, 0xc2, 0x04, 0xe5, 0xc2, 0x1c, 0xd3, 0xc3, 0x92, 0x67, 0x19, 0xe6,
+	0x09, 0xf2, 0xac, 0x10, 0x66, 0xf2, 0x47, 0x84, 0xcf, 0xf2, 0x2f, 0xd2, 0x62, 0xe5, 0x19, 0xe8,
+	0xd7, 0x88, 0x95, 0x67, 0xb0, 0x01, 0x23, 0xbf, 0xca, 0x00, 0x5e, 0x23, 0xeb, 0x69, 0x00, 0x79,
+	0xab, 0xc5, 0x63, 0xb4, 0xbf, 0xea, 0xfd, 0x7b, 0xaa, 0x72, 0xb4, 0x4d, 0x29, 0x2f, 0x5f, 0x1e,
+	0x43, 0xb8, 0x7c, 0xf3, 0x66, 0x11, 0x69, 0x23, 0x89, 0x95, 0x2f, 0x34, 0x8c, 0x7e, 0x89, 0xfa,
+	0x0d, 0x0e, 0xb1, 0x4d, 0x35, 0xd8, 0x83, 0x11, 0xdb, 0x54, 0x43, 0x4d, 0x15, 0xb9, 0xce, 0x00,
+	0xce, 0x90, 0xa9, 0x34, 0x80, 0xee, 0x3b, 0x47, 0x7c, 0x1f, 0x70, 0x36, 0x54, 0x70, 0x23, 0xbc,
+	0xa1, 0xe6, 0x86, 0x1a, 0xed, 0xff, 0x88, 0x6d, 0xa8, 0x2e, 0x54, 0xc6, 0xa6, 0xdb, 0x5e, 0x10,
+	0x62, 0x33, 0xd8, 0x3b, 0x11, 0x63, 0x33, 0xd4, 0x0c, 0x11, 0x63, 0xd3, 0x7d, 0x5b, 0xcb, 0x63,
+	0x13, 0xdc, 0x08, 0xb3, 0x99, 0x1b, 0x6a, 0xb4, 0x6f, 0x23, 0xc6, 0xa6, 0x0b, 0x95, 0xfc, 0x09,
+	0x85, 0xfb, 0x03, 0xe4, 0x25, 0x11, 0x82, 0x62, 0xfb, 0x1a, 0xd5, 0x97, 0x8b, 0x98, 0xe6, 0xf9,
+	0x6a, 0x15, 0x7a, 0xf9, 0x8d, 0x33, 0xfd, 0x07, 0x84, 0x3f, 0x1b, 0x74, 0xea, 0x10, 0xfe, 0x92,
+	0x08, 0x79, 0x45, 0xd3, 0x48, 0xec, 0xb7, 0xc8, 0x0b, 0x2c, 0x8d, 0x59, 0x32, 0x93, 0x23, 0x0d,
+	0xf2, 0x7e, 0x05, 0x57, 0x93, 0x6f, 0xb2, 0xc9, 0xaa, 0x08, 0xad, 0x99, 0x77, 0xfc, 0xd5, 0xb5,
+	0x41, 0xdd, 0x40, 0x8a, 0x1a, 0x4b, 0xb1, 0x45, 0xd4, 0xb4, 0x14, 0x33, 0xde, 0x45, 0x54, 0x8e,
+	0xd8, 0x19, 0x14, 0xda, 0xcf, 0xd9, 0xcf, 0xcc, 0x63, 0xdf, 0x41, 0xfa, 0x00, 0xe1, 0x27, 0x92,
+	0x11, 0x39, 0x32, 0xaf, 0x8a, 0x68, 0x55, 0x06, 0x37, 0x42, 0x0d, 0x0d, 0x79, 0x85, 0x71, 0xb3,
+	0x48, 0xbe, 0x34, 0x00, 0x37, 0xe4, 0x77, 0x15, 0xfc, 0x74, 0xe6, 0xe5, 0x2e, 0xd9, 0x18, 0x40,
+	0xce, 0xc8, 0x9d, 0x78, 0xf5, 0x7a, 0x49, 0xde, 0x80, 0x87, 0x1e, 0xe3, 0xe1, 0x2d, 0xb2, 0x53,
+	0x90, 0x07, 0xdf, 0x4b, 0xa8, 0x82, 0xa5, 0xf2, 0x6e, 0x05, 0x8f, 0x67, 0xe2, 0x73, 0x2a, 0x66,
+	0x63, 0x00, 0xa9, 0x8b, 0xf0, 0x96, 0xa7, 0x39, 0x20, 0x7f, 0x95, 0xf1, 0x76, 0x95, 0x5c, 0x19,
+	0x9c, 0x37, 0xf2, 0xe3, 0x0a, 0x1e, 0xdd, 0x48, 0xbd, 0x37, 0xcd, 0xaf, 0x79, 0xec, 0xf5, 0x73,
+	0xf5, 0x2b, 0x83, 0x3b, 0x82, 0xfc, 0x55, 0x96, 0xff, 0x37, 0xc9, 0x1b, 0xb9, 0xf2, 0x0f, 0xbf,
+	0x8a, 0x9c, 0x56, 0x32, 0xe4, 0xbf, 0x08, 0x3f, 0x99, 0x86, 0xc5, 0xa9, 0x91, 0xf5, 0xfc, 0xaa,
+	0x16, 0x65, 0x46, 0xf0, 0xa6, 0x5d, 0x5e, 0x65, 0xcc, 0x7c, 0x99, 0x2c, 0x0e, 0xc4, 0x0c, 0xf9,
+	0x5e, 0x05, 0x8f, 0x24, 0x5d, 0x6a, 0x92, 0x95, 0xfc, 0x3a, 0x46, 0xae, 0x79, 0xab, 0x57, 0x07,
+	0x73, 0x02, 0xe9, 0x7e, 0x8b, 0xa5, 0xfb, 0x75, 0x72, 0x33, 0x57, 0xba, 0xbe, 0xd7, 0xcc, 0x53,
+	0x6b, 0xe0, 0x5f, 0x08, 0x7f, 0x21, 0x09, 0x82, 0xa3, 0xff, 0x4a, 0x7e, 0xd9, 0x8a, 0x10, 0x21,
+	0x70, 0x81, 0x2d, 0x2f, 0x31, 0x22, 0x5e, 0x26, 0x97, 0x8b, 0x12, 0x41, 0xfe, 0x83, 0xf0, 0xc5,
+	0xd8, 0xbb, 0x44, 0xb2, 0x94, 0x5f, 0xaa, 0xe0, 0x8d, 0x6a, 0x75, 0x79, 0x00, 0x0f, 0x90, 0xe0,
+	0x1b, 0x2c, 0xc1, 0x1b, 0xe4, 0xb5, 0x5c, 0x09, 0xba, 0xff, 0x28, 0x90, 0x2a, 0xf3, 0x27, 0x28,
+	0x5c, 0xec, 0x10, 0xdc, 0xd1, 0x78, 0x29, 0xbf, 0x3c, 0xb9, 0x93, 0xcf, 0xba, 0x1f, 0x96, 0x17,
+	0x59, 0xf2, 0x2f, 0x92, 0x17, 0x0a, 0x25, 0x7f, 0x65, 0xfd, 0xa3, 0x7b, 0x63, 0xe8, 0xe3, 0x7b,
+	0x63, 0xe8, 0x1f, 0xf7, 0xc6, 0xd0, 0x7b, 0xf7, 0xc7, 0x4e, 0x7d, 0x7c, 0x7f, 0xec, 0xd4, 0xdf,
+	0xee, 0x8f, 0x9d, 0x7a, 0x73, 0xb6, 0xa3, 0xd9, 0x3b, 0x7b, 0x5b, 0xb5, 0x96, 0xb1, 0x9b, 0xe4,
+	0xfa, 0x80, 0xdf, 0x05, 0x1c, 0xf6, 0xa8, 0xb5, 0x75, 0x96, 0xfd, 0xbf, 0xc5, 0xc2, 0xff, 0x03,
+	0x00, 0x00, 0xff, 0xff, 0x54, 0xce, 0xf1, 0xd6, 0x8b, 0x33, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -2973,10 +2974,10 @@ type QueryClient interface {
 	LimitOrderPoolUserShareMap(ctx context.Context, in *QueryGetLimitOrderPoolUserShareMapRequest, opts ...grpc.CallOption) (*QueryGetLimitOrderPoolUserShareMapResponse, error)
 	// Queries a list of LimitOrderPoolUserShareMap items.
 	LimitOrderPoolUserShareMapAll(ctx context.Context, in *QueryAllLimitOrderPoolUserShareMapRequest, opts ...grpc.CallOption) (*QueryAllLimitOrderPoolUserShareMapResponse, error)
-	// Queries a LimitOrderPoolUserSharesFilled by index.
-	LimitOrderPoolUserSharesFilled(ctx context.Context, in *QueryGetLimitOrderPoolUserSharesFilledRequest, opts ...grpc.CallOption) (*QueryGetLimitOrderPoolUserSharesFilledResponse, error)
-	// Queries a list of LimitOrderPoolUserSharesFilled items.
-	LimitOrderPoolUserSharesFilledAll(ctx context.Context, in *QueryAllLimitOrderPoolUserSharesFilledRequest, opts ...grpc.CallOption) (*QueryAllLimitOrderPoolUserSharesFilledResponse, error)
+	// Queries a LimitOrderPoolUserSharesWithdrawn by index.
+	LimitOrderPoolUserSharesWithdrawn(ctx context.Context, in *QueryGetLimitOrderPoolUserSharesWithdrawnRequest, opts ...grpc.CallOption) (*QueryGetLimitOrderPoolUserSharesWithdrawnResponse, error)
+	// Queries a list of LimitOrderPoolUserSharesWithdrawn items.
+	LimitOrderPoolUserSharesWithdrawnAll(ctx context.Context, in *QueryAllLimitOrderPoolUserSharesWithdrawnRequest, opts ...grpc.CallOption) (*QueryAllLimitOrderPoolUserSharesWithdrawnResponse, error)
 	// Queries a LimitOrderPoolTotalSharesMap by index.
 	LimitOrderPoolTotalSharesMap(ctx context.Context, in *QueryGetLimitOrderPoolTotalSharesMapRequest, opts ...grpc.CallOption) (*QueryGetLimitOrderPoolTotalSharesMapResponse, error)
 	// Queries a list of LimitOrderPoolTotalSharesMap items.
@@ -3170,18 +3171,18 @@ func (c *queryClient) LimitOrderPoolUserShareMapAll(ctx context.Context, in *Que
 	return out, nil
 }
 
-func (c *queryClient) LimitOrderPoolUserSharesFilled(ctx context.Context, in *QueryGetLimitOrderPoolUserSharesFilledRequest, opts ...grpc.CallOption) (*QueryGetLimitOrderPoolUserSharesFilledResponse, error) {
-	out := new(QueryGetLimitOrderPoolUserSharesFilledResponse)
-	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Query/LimitOrderPoolUserSharesFilled", in, out, opts...)
+func (c *queryClient) LimitOrderPoolUserSharesWithdrawn(ctx context.Context, in *QueryGetLimitOrderPoolUserSharesWithdrawnRequest, opts ...grpc.CallOption) (*QueryGetLimitOrderPoolUserSharesWithdrawnResponse, error) {
+	out := new(QueryGetLimitOrderPoolUserSharesWithdrawnResponse)
+	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Query/LimitOrderPoolUserSharesWithdrawn", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *queryClient) LimitOrderPoolUserSharesFilledAll(ctx context.Context, in *QueryAllLimitOrderPoolUserSharesFilledRequest, opts ...grpc.CallOption) (*QueryAllLimitOrderPoolUserSharesFilledResponse, error) {
-	out := new(QueryAllLimitOrderPoolUserSharesFilledResponse)
-	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Query/LimitOrderPoolUserSharesFilledAll", in, out, opts...)
+func (c *queryClient) LimitOrderPoolUserSharesWithdrawnAll(ctx context.Context, in *QueryAllLimitOrderPoolUserSharesWithdrawnRequest, opts ...grpc.CallOption) (*QueryAllLimitOrderPoolUserSharesWithdrawnResponse, error) {
+	out := new(QueryAllLimitOrderPoolUserSharesWithdrawnResponse)
+	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Query/LimitOrderPoolUserSharesWithdrawnAll", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -3282,10 +3283,10 @@ type QueryServer interface {
 	LimitOrderPoolUserShareMap(context.Context, *QueryGetLimitOrderPoolUserShareMapRequest) (*QueryGetLimitOrderPoolUserShareMapResponse, error)
 	// Queries a list of LimitOrderPoolUserShareMap items.
 	LimitOrderPoolUserShareMapAll(context.Context, *QueryAllLimitOrderPoolUserShareMapRequest) (*QueryAllLimitOrderPoolUserShareMapResponse, error)
-	// Queries a LimitOrderPoolUserSharesFilled by index.
-	LimitOrderPoolUserSharesFilled(context.Context, *QueryGetLimitOrderPoolUserSharesFilledRequest) (*QueryGetLimitOrderPoolUserSharesFilledResponse, error)
-	// Queries a list of LimitOrderPoolUserSharesFilled items.
-	LimitOrderPoolUserSharesFilledAll(context.Context, *QueryAllLimitOrderPoolUserSharesFilledRequest) (*QueryAllLimitOrderPoolUserSharesFilledResponse, error)
+	// Queries a LimitOrderPoolUserSharesWithdrawn by index.
+	LimitOrderPoolUserSharesWithdrawn(context.Context, *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) (*QueryGetLimitOrderPoolUserSharesWithdrawnResponse, error)
+	// Queries a list of LimitOrderPoolUserSharesWithdrawn items.
+	LimitOrderPoolUserSharesWithdrawnAll(context.Context, *QueryAllLimitOrderPoolUserSharesWithdrawnRequest) (*QueryAllLimitOrderPoolUserSharesWithdrawnResponse, error)
 	// Queries a LimitOrderPoolTotalSharesMap by index.
 	LimitOrderPoolTotalSharesMap(context.Context, *QueryGetLimitOrderPoolTotalSharesMapRequest) (*QueryGetLimitOrderPoolTotalSharesMapResponse, error)
 	// Queries a list of LimitOrderPoolTotalSharesMap items.
@@ -3361,11 +3362,11 @@ func (*UnimplementedQueryServer) LimitOrderPoolUserShareMap(ctx context.Context,
 func (*UnimplementedQueryServer) LimitOrderPoolUserShareMapAll(ctx context.Context, req *QueryAllLimitOrderPoolUserShareMapRequest) (*QueryAllLimitOrderPoolUserShareMapResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LimitOrderPoolUserShareMapAll not implemented")
 }
-func (*UnimplementedQueryServer) LimitOrderPoolUserSharesFilled(ctx context.Context, req *QueryGetLimitOrderPoolUserSharesFilledRequest) (*QueryGetLimitOrderPoolUserSharesFilledResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method LimitOrderPoolUserSharesFilled not implemented")
+func (*UnimplementedQueryServer) LimitOrderPoolUserSharesWithdrawn(ctx context.Context, req *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) (*QueryGetLimitOrderPoolUserSharesWithdrawnResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LimitOrderPoolUserSharesWithdrawn not implemented")
 }
-func (*UnimplementedQueryServer) LimitOrderPoolUserSharesFilledAll(ctx context.Context, req *QueryAllLimitOrderPoolUserSharesFilledRequest) (*QueryAllLimitOrderPoolUserSharesFilledResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method LimitOrderPoolUserSharesFilledAll not implemented")
+func (*UnimplementedQueryServer) LimitOrderPoolUserSharesWithdrawnAll(ctx context.Context, req *QueryAllLimitOrderPoolUserSharesWithdrawnRequest) (*QueryAllLimitOrderPoolUserSharesWithdrawnResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LimitOrderPoolUserSharesWithdrawnAll not implemented")
 }
 func (*UnimplementedQueryServer) LimitOrderPoolTotalSharesMap(ctx context.Context, req *QueryGetLimitOrderPoolTotalSharesMapRequest) (*QueryGetLimitOrderPoolTotalSharesMapResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LimitOrderPoolTotalSharesMap not implemented")
@@ -3732,38 +3733,38 @@ func _Query_LimitOrderPoolUserShareMapAll_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_LimitOrderPoolUserSharesFilled_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetLimitOrderPoolUserSharesFilledRequest)
+func _Query_LimitOrderPoolUserSharesWithdrawn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGetLimitOrderPoolUserSharesWithdrawnRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).LimitOrderPoolUserSharesFilled(ctx, in)
+		return srv.(QueryServer).LimitOrderPoolUserSharesWithdrawn(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/nicholasdotsol.duality.dex.Query/LimitOrderPoolUserSharesFilled",
+		FullMethod: "/nicholasdotsol.duality.dex.Query/LimitOrderPoolUserSharesWithdrawn",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).LimitOrderPoolUserSharesFilled(ctx, req.(*QueryGetLimitOrderPoolUserSharesFilledRequest))
+		return srv.(QueryServer).LimitOrderPoolUserSharesWithdrawn(ctx, req.(*QueryGetLimitOrderPoolUserSharesWithdrawnRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_LimitOrderPoolUserSharesFilledAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryAllLimitOrderPoolUserSharesFilledRequest)
+func _Query_LimitOrderPoolUserSharesWithdrawnAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryAllLimitOrderPoolUserSharesWithdrawnRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).LimitOrderPoolUserSharesFilledAll(ctx, in)
+		return srv.(QueryServer).LimitOrderPoolUserSharesWithdrawnAll(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/nicholasdotsol.duality.dex.Query/LimitOrderPoolUserSharesFilledAll",
+		FullMethod: "/nicholasdotsol.duality.dex.Query/LimitOrderPoolUserSharesWithdrawnAll",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).LimitOrderPoolUserSharesFilledAll(ctx, req.(*QueryAllLimitOrderPoolUserSharesFilledRequest))
+		return srv.(QueryServer).LimitOrderPoolUserSharesWithdrawnAll(ctx, req.(*QueryAllLimitOrderPoolUserSharesWithdrawnRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -3957,12 +3958,12 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Query_LimitOrderPoolUserShareMapAll_Handler,
 		},
 		{
-			MethodName: "LimitOrderPoolUserSharesFilled",
-			Handler:    _Query_LimitOrderPoolUserSharesFilled_Handler,
+			MethodName: "LimitOrderPoolUserSharesWithdrawn",
+			Handler:    _Query_LimitOrderPoolUserSharesWithdrawn_Handler,
 		},
 		{
-			MethodName: "LimitOrderPoolUserSharesFilledAll",
-			Handler:    _Query_LimitOrderPoolUserSharesFilledAll_Handler,
+			MethodName: "LimitOrderPoolUserSharesWithdrawnAll",
+			Handler:    _Query_LimitOrderPoolUserSharesWithdrawnAll_Handler,
 		},
 		{
 			MethodName: "LimitOrderPoolTotalSharesMap",
@@ -5259,36 +5260,36 @@ func (m *QueryGetLimitOrderPoolUserShareMapRequest) MarshalToSizedBuffer(dAtA []
 	_ = i
 	var l int
 	_ = l
+	if len(m.Address) > 0 {
+		i -= len(m.Address)
+		copy(dAtA[i:], m.Address)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Address)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.Count != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.Count))
+		i--
+		dAtA[i] = 0x20
+	}
 	if len(m.Token) > 0 {
 		i -= len(m.Token)
 		copy(dAtA[i:], m.Token)
 		i = encodeVarintQuery(dAtA, i, uint64(len(m.Token)))
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x1a
 	}
 	if m.TickIndex != 0 {
 		i = encodeVarintQuery(dAtA, i, uint64(m.TickIndex))
 		i--
-		dAtA[i] = 0x20
+		dAtA[i] = 0x10
 	}
 	if len(m.PairId) > 0 {
 		i -= len(m.PairId)
 		copy(dAtA[i:], m.PairId)
 		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairId)))
 		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Address) > 0 {
-		i -= len(m.Address)
-		copy(dAtA[i:], m.Address)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.Address)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.Count != 0 {
-		i = encodeVarintQuery(dAtA, i, uint64(m.Count))
-		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -5410,7 +5411,7 @@ func (m *QueryAllLimitOrderPoolUserShareMapResponse) MarshalToSizedBuffer(dAtA [
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -5420,51 +5421,51 @@ func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) Marshal() (dAtA []byte, 
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
+	if len(m.Address) > 0 {
+		i -= len(m.Address)
+		copy(dAtA[i:], m.Address)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Address)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.Count != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.Count))
+		i--
+		dAtA[i] = 0x20
+	}
 	if len(m.Token) > 0 {
 		i -= len(m.Token)
 		copy(dAtA[i:], m.Token)
 		i = encodeVarintQuery(dAtA, i, uint64(len(m.Token)))
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x1a
 	}
 	if m.TickIndex != 0 {
 		i = encodeVarintQuery(dAtA, i, uint64(m.TickIndex))
 		i--
-		dAtA[i] = 0x20
+		dAtA[i] = 0x10
 	}
 	if len(m.PairId) > 0 {
 		i -= len(m.PairId)
 		copy(dAtA[i:], m.PairId)
 		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairId)))
 		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Address) > 0 {
-		i -= len(m.Address)
-		copy(dAtA[i:], m.Address)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.Address)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.Count != 0 {
-		i = encodeVarintQuery(dAtA, i, uint64(m.Count))
-		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -5474,18 +5475,18 @@ func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) Marshal() (dAtA []byte,
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	{
-		size, err := m.LimitOrderPoolUserSharesFilled.MarshalToSizedBuffer(dAtA[:i])
+		size, err := m.LimitOrderPoolUserSharesWithdrawn.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -5497,7 +5498,7 @@ func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) MarshalToSizedBuffer(dA
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -5507,12 +5508,12 @@ func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) Marshal() (dAtA []byte, 
 	return dAtA[:n], nil
 }
 
-func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -5532,7 +5533,7 @@ func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) MarshalToSizedBuffer(dAt
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -5542,12 +5543,12 @@ func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) Marshal() (dAtA []byte,
 	return dAtA[:n], nil
 }
 
-func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -5564,10 +5565,10 @@ func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) MarshalToSizedBuffer(dA
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.LimitOrderPoolUserSharesFilled) > 0 {
-		for iNdEx := len(m.LimitOrderPoolUserSharesFilled) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.LimitOrderPoolUserSharesWithdrawn) > 0 {
+		for iNdEx := len(m.LimitOrderPoolUserSharesWithdrawn) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.LimitOrderPoolUserSharesFilled[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.LimitOrderPoolUserSharesWithdrawn[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -5601,29 +5602,29 @@ func (m *QueryGetLimitOrderPoolTotalSharesMapRequest) MarshalToSizedBuffer(dAtA 
 	_ = i
 	var l int
 	_ = l
+	if m.Count != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.Count))
+		i--
+		dAtA[i] = 0x20
+	}
 	if len(m.Token) > 0 {
 		i -= len(m.Token)
 		copy(dAtA[i:], m.Token)
 		i = encodeVarintQuery(dAtA, i, uint64(len(m.Token)))
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x1a
 	}
 	if m.TickIndex != 0 {
 		i = encodeVarintQuery(dAtA, i, uint64(m.TickIndex))
 		i--
-		dAtA[i] = 0x18
+		dAtA[i] = 0x10
 	}
 	if len(m.PairId) > 0 {
 		i -= len(m.PairId)
 		copy(dAtA[i:], m.PairId)
 		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairId)))
 		i--
-		dAtA[i] = 0x12
-	}
-	if m.Count != 0 {
-		i = encodeVarintQuery(dAtA, i, uint64(m.Count))
-		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -5765,29 +5766,29 @@ func (m *QueryGetLimitOrderPoolReserveMapRequest) MarshalToSizedBuffer(dAtA []by
 	_ = i
 	var l int
 	_ = l
+	if m.Count != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.Count))
+		i--
+		dAtA[i] = 0x20
+	}
 	if len(m.Token) > 0 {
 		i -= len(m.Token)
 		copy(dAtA[i:], m.Token)
 		i = encodeVarintQuery(dAtA, i, uint64(len(m.Token)))
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x1a
 	}
 	if m.TickIndex != 0 {
 		i = encodeVarintQuery(dAtA, i, uint64(m.TickIndex))
 		i--
-		dAtA[i] = 0x18
+		dAtA[i] = 0x10
 	}
 	if len(m.PairId) > 0 {
 		i -= len(m.PairId)
 		copy(dAtA[i:], m.PairId)
 		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairId)))
 		i--
-		dAtA[i] = 0x12
-	}
-	if m.Count != 0 {
-		i = encodeVarintQuery(dAtA, i, uint64(m.Count))
-		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -5929,29 +5930,29 @@ func (m *QueryGetLimitOrderPoolFillMapRequest) MarshalToSizedBuffer(dAtA []byte)
 	_ = i
 	var l int
 	_ = l
+	if m.Count != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.Count))
+		i--
+		dAtA[i] = 0x20
+	}
 	if len(m.Token) > 0 {
 		i -= len(m.Token)
 		copy(dAtA[i:], m.Token)
 		i = encodeVarintQuery(dAtA, i, uint64(len(m.Token)))
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x1a
 	}
 	if m.TickIndex != 0 {
 		i = encodeVarintQuery(dAtA, i, uint64(m.TickIndex))
 		i--
-		dAtA[i] = 0x18
+		dAtA[i] = 0x10
 	}
 	if len(m.PairId) > 0 {
 		i -= len(m.PairId)
 		copy(dAtA[i:], m.PairId)
 		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairId)))
 		i--
-		dAtA[i] = 0x12
-	}
-	if m.Count != 0 {
-		i = encodeVarintQuery(dAtA, i, uint64(m.Count))
-		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -6567,13 +6568,6 @@ func (m *QueryGetLimitOrderPoolUserShareMapRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Count != 0 {
-		n += 1 + sovQuery(uint64(m.Count))
-	}
-	l = len(m.Address)
-	if l > 0 {
-		n += 1 + l + sovQuery(uint64(l))
-	}
 	l = len(m.PairId)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
@@ -6582,6 +6576,13 @@ func (m *QueryGetLimitOrderPoolUserShareMapRequest) Size() (n int) {
 		n += 1 + sovQuery(uint64(m.TickIndex))
 	}
 	l = len(m.Token)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	if m.Count != 0 {
+		n += 1 + sovQuery(uint64(m.Count))
+	}
+	l = len(m.Address)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
@@ -6631,19 +6632,12 @@ func (m *QueryAllLimitOrderPoolUserShareMapResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) Size() (n int) {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.Count != 0 {
-		n += 1 + sovQuery(uint64(m.Count))
-	}
-	l = len(m.Address)
-	if l > 0 {
-		n += 1 + l + sovQuery(uint64(l))
-	}
 	l = len(m.PairId)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
@@ -6655,21 +6649,28 @@ func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
+	if m.Count != 0 {
+		n += 1 + sovQuery(uint64(m.Count))
+	}
+	l = len(m.Address)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
 	return n
 }
 
-func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) Size() (n int) {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = m.LimitOrderPoolUserSharesFilled.Size()
+	l = m.LimitOrderPoolUserSharesWithdrawn.Size()
 	n += 1 + l + sovQuery(uint64(l))
 	return n
 }
 
-func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) Size() (n int) {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -6682,14 +6683,14 @@ func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) Size() (n int) {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.LimitOrderPoolUserSharesFilled) > 0 {
-		for _, e := range m.LimitOrderPoolUserSharesFilled {
+	if len(m.LimitOrderPoolUserSharesWithdrawn) > 0 {
+		for _, e := range m.LimitOrderPoolUserSharesWithdrawn {
 			l = e.Size()
 			n += 1 + l + sovQuery(uint64(l))
 		}
@@ -6707,9 +6708,6 @@ func (m *QueryGetLimitOrderPoolTotalSharesMapRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Count != 0 {
-		n += 1 + sovQuery(uint64(m.Count))
-	}
 	l = len(m.PairId)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
@@ -6720,6 +6718,9 @@ func (m *QueryGetLimitOrderPoolTotalSharesMapRequest) Size() (n int) {
 	l = len(m.Token)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
+	}
+	if m.Count != 0 {
+		n += 1 + sovQuery(uint64(m.Count))
 	}
 	return n
 }
@@ -6773,9 +6774,6 @@ func (m *QueryGetLimitOrderPoolReserveMapRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Count != 0 {
-		n += 1 + sovQuery(uint64(m.Count))
-	}
 	l = len(m.PairId)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
@@ -6786,6 +6784,9 @@ func (m *QueryGetLimitOrderPoolReserveMapRequest) Size() (n int) {
 	l = len(m.Token)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
+	}
+	if m.Count != 0 {
+		n += 1 + sovQuery(uint64(m.Count))
 	}
 	return n
 }
@@ -6839,9 +6840,6 @@ func (m *QueryGetLimitOrderPoolFillMapRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Count != 0 {
-		n += 1 + sovQuery(uint64(m.Count))
-	}
 	l = len(m.PairId)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
@@ -6852,6 +6850,9 @@ func (m *QueryGetLimitOrderPoolFillMapRequest) Size() (n int) {
 	l = len(m.Token)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
+	}
+	if m.Count != 0 {
+		n += 1 + sovQuery(uint64(m.Count))
 	}
 	return n
 }
@@ -10073,57 +10074,6 @@ func (m *QueryGetLimitOrderPoolUserShareMapRequest) Unmarshal(dAtA []byte) error
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
-			}
-			m.Count = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Count |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Address = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PairId", wireType)
 			}
@@ -10155,7 +10105,7 @@ func (m *QueryGetLimitOrderPoolUserShareMapRequest) Unmarshal(dAtA []byte) error
 			}
 			m.PairId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TickIndex", wireType)
 			}
@@ -10174,7 +10124,7 @@ func (m *QueryGetLimitOrderPoolUserShareMapRequest) Unmarshal(dAtA []byte) error
 					break
 				}
 			}
-		case 5:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Token", wireType)
 			}
@@ -10205,6 +10155,57 @@ func (m *QueryGetLimitOrderPoolUserShareMapRequest) Unmarshal(dAtA []byte) error
 				return io.ErrUnexpectedEOF
 			}
 			m.Token = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
+			}
+			m.Count = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Count |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Address = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -10516,7 +10517,7 @@ func (m *QueryAllLimitOrderPoolUserShareMapResponse) Unmarshal(dAtA []byte) erro
 	}
 	return nil
 }
-func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -10539,64 +10540,13 @@ func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) Unmarshal(dAtA []byte) e
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetLimitOrderPoolUserSharesFilledRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGetLimitOrderPoolUserSharesWithdrawnRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetLimitOrderPoolUserSharesFilledRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGetLimitOrderPoolUserSharesWithdrawnRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
-			}
-			m.Count = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Count |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Address = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PairId", wireType)
 			}
@@ -10628,7 +10578,7 @@ func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) Unmarshal(dAtA []byte) e
 			}
 			m.PairId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TickIndex", wireType)
 			}
@@ -10647,7 +10597,7 @@ func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) Unmarshal(dAtA []byte) e
 					break
 				}
 			}
-		case 5:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Token", wireType)
 			}
@@ -10679,6 +10629,57 @@ func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) Unmarshal(dAtA []byte) e
 			}
 			m.Token = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
+			}
+			m.Count = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Count |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Address = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipQuery(dAtA[iNdEx:])
@@ -10700,7 +10701,7 @@ func (m *QueryGetLimitOrderPoolUserSharesFilledRequest) Unmarshal(dAtA []byte) e
 	}
 	return nil
 }
-func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryGetLimitOrderPoolUserSharesWithdrawnResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -10723,15 +10724,15 @@ func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) Unmarshal(dAtA []byte) 
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetLimitOrderPoolUserSharesFilledResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGetLimitOrderPoolUserSharesWithdrawnResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetLimitOrderPoolUserSharesFilledResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGetLimitOrderPoolUserSharesWithdrawnResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LimitOrderPoolUserSharesFilled", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LimitOrderPoolUserSharesWithdrawn", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -10758,7 +10759,7 @@ func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) Unmarshal(dAtA []byte) 
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.LimitOrderPoolUserSharesFilled.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.LimitOrderPoolUserSharesWithdrawn.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -10783,7 +10784,7 @@ func (m *QueryGetLimitOrderPoolUserSharesFilledResponse) Unmarshal(dAtA []byte) 
 	}
 	return nil
 }
-func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -10806,10 +10807,10 @@ func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) Unmarshal(dAtA []byte) e
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryAllLimitOrderPoolUserSharesFilledRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryAllLimitOrderPoolUserSharesWithdrawnRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryAllLimitOrderPoolUserSharesFilledRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryAllLimitOrderPoolUserSharesWithdrawnRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -10869,7 +10870,7 @@ func (m *QueryAllLimitOrderPoolUserSharesFilledRequest) Unmarshal(dAtA []byte) e
 	}
 	return nil
 }
-func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryAllLimitOrderPoolUserSharesWithdrawnResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -10892,15 +10893,15 @@ func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) Unmarshal(dAtA []byte) 
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryAllLimitOrderPoolUserSharesFilledResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryAllLimitOrderPoolUserSharesWithdrawnResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryAllLimitOrderPoolUserSharesFilledResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryAllLimitOrderPoolUserSharesWithdrawnResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LimitOrderPoolUserSharesFilled", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LimitOrderPoolUserSharesWithdrawn", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -10927,8 +10928,8 @@ func (m *QueryAllLimitOrderPoolUserSharesFilledResponse) Unmarshal(dAtA []byte) 
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.LimitOrderPoolUserSharesFilled = append(m.LimitOrderPoolUserSharesFilled, LimitOrderPoolUserSharesFilled{})
-			if err := m.LimitOrderPoolUserSharesFilled[len(m.LimitOrderPoolUserSharesFilled)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.LimitOrderPoolUserSharesWithdrawn = append(m.LimitOrderPoolUserSharesWithdrawn, LimitOrderPoolUserSharesWithdrawn{})
+			if err := m.LimitOrderPoolUserSharesWithdrawn[len(m.LimitOrderPoolUserSharesWithdrawn)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -11019,25 +11020,6 @@ func (m *QueryGetLimitOrderPoolTotalSharesMapRequest) Unmarshal(dAtA []byte) err
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
-			}
-			m.Count = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Count |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PairId", wireType)
 			}
@@ -11069,7 +11051,7 @@ func (m *QueryGetLimitOrderPoolTotalSharesMapRequest) Unmarshal(dAtA []byte) err
 			}
 			m.PairId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 3:
+		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TickIndex", wireType)
 			}
@@ -11088,7 +11070,7 @@ func (m *QueryGetLimitOrderPoolTotalSharesMapRequest) Unmarshal(dAtA []byte) err
 					break
 				}
 			}
-		case 4:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Token", wireType)
 			}
@@ -11120,6 +11102,25 @@ func (m *QueryGetLimitOrderPoolTotalSharesMapRequest) Unmarshal(dAtA []byte) err
 			}
 			m.Token = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
+			}
+			m.Count = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Count |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipQuery(dAtA[iNdEx:])
@@ -11460,25 +11461,6 @@ func (m *QueryGetLimitOrderPoolReserveMapRequest) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
-			}
-			m.Count = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Count |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PairId", wireType)
 			}
@@ -11510,7 +11492,7 @@ func (m *QueryGetLimitOrderPoolReserveMapRequest) Unmarshal(dAtA []byte) error {
 			}
 			m.PairId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 3:
+		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TickIndex", wireType)
 			}
@@ -11529,7 +11511,7 @@ func (m *QueryGetLimitOrderPoolReserveMapRequest) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 4:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Token", wireType)
 			}
@@ -11561,6 +11543,25 @@ func (m *QueryGetLimitOrderPoolReserveMapRequest) Unmarshal(dAtA []byte) error {
 			}
 			m.Token = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
+			}
+			m.Count = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Count |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipQuery(dAtA[iNdEx:])
@@ -11901,25 +11902,6 @@ func (m *QueryGetLimitOrderPoolFillMapRequest) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
-			}
-			m.Count = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Count |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PairId", wireType)
 			}
@@ -11951,7 +11933,7 @@ func (m *QueryGetLimitOrderPoolFillMapRequest) Unmarshal(dAtA []byte) error {
 			}
 			m.PairId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 3:
+		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TickIndex", wireType)
 			}
@@ -11970,7 +11952,7 @@ func (m *QueryGetLimitOrderPoolFillMapRequest) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 4:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Token", wireType)
 			}
@@ -12002,6 +11984,25 @@ func (m *QueryGetLimitOrderPoolFillMapRequest) Unmarshal(dAtA []byte) error {
 			}
 			m.Token = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Count", wireType)
+			}
+			m.Count = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Count |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipQuery(dAtA[iNdEx:])

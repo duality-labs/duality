@@ -40,9 +40,9 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgPlaceLimitOrder int = 100
 
-	opWeightMsgWithdrawlFilledLimitOrder = "op_weight_msg_withdrawl_filled_limit_order"
+	opWeightMsgWithdrawlWithdrawnLimitOrder = "op_weight_msg_withdrawl_withdrawn_limit_order"
 	// TODO: Determine the simulation weight value
-	defaultWeightMsgWithdrawlFilledLimitOrder int = 100
+	defaultWeightMsgWithdrawlWithdrawnLimitOrder int = 100
 
 	opWeightMsgCancelLimitOrder = "op_weight_msg_cancel_limit_order"
 	// TODO: Determine the simulation weight value
@@ -126,15 +126,15 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		dexsimulation.SimulateMsgPlaceLimitOrder(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-	var weightMsgWithdrawlFilledLimitOrder int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgWithdrawlFilledLimitOrder, &weightMsgWithdrawlFilledLimitOrder, nil,
+	var weightMsgWithdrawlWithdrawnLimitOrder int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgWithdrawlWithdrawnLimitOrder, &weightMsgWithdrawlWithdrawnLimitOrder, nil,
 		func(_ *rand.Rand) {
-			weightMsgWithdrawlFilledLimitOrder = defaultWeightMsgWithdrawlFilledLimitOrder
+			weightMsgWithdrawlWithdrawnLimitOrder = defaultWeightMsgWithdrawlWithdrawnLimitOrder
 		},
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgWithdrawlFilledLimitOrder,
-		dexsimulation.SimulateMsgWithdrawlFilledLimitOrder(am.accountKeeper, am.bankKeeper, am.keeper),
+		weightMsgWithdrawlWithdrawnLimitOrder,
+		dexsimulation.SimulateMsgWithdrawlWithdrawnLimitOrder(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	var weightMsgCancelLimitOrder int

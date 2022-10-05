@@ -53,7 +53,7 @@ export interface MsgPlaceLimitOrder {
 
 export interface MsgPlaceLimitOrderResponse {}
 
-export interface MsgWithdrawlFilledLimitOrder {
+export interface MsgWithdrawlWithdrawnLimitOrder {
   creator: string;
   tokenA: string;
   tokenB: string;
@@ -62,7 +62,7 @@ export interface MsgWithdrawlFilledLimitOrder {
   key: string;
 }
 
-export interface MsgWithdrawlFilledLimitOrderResponse {}
+export interface MsgWithdrawlWithdrawnLimitOrderResponse {}
 
 export interface MsgCancelLimitOrder {
   creator: string;
@@ -1007,7 +1007,7 @@ export const MsgPlaceLimitOrderResponse = {
   },
 };
 
-const baseMsgWithdrawlFilledLimitOrder: object = {
+const baseMsgWithdrawlWithdrawnLimitOrder: object = {
   creator: "",
   tokenA: "",
   tokenB: "",
@@ -1016,9 +1016,9 @@ const baseMsgWithdrawlFilledLimitOrder: object = {
   key: "",
 };
 
-export const MsgWithdrawlFilledLimitOrder = {
+export const MsgWithdrawlWithdrawnLimitOrder = {
   encode(
-    message: MsgWithdrawlFilledLimitOrder,
+    message: MsgWithdrawlWithdrawnLimitOrder,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.creator !== "") {
@@ -1045,12 +1045,12 @@ export const MsgWithdrawlFilledLimitOrder = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): MsgWithdrawlFilledLimitOrder {
+  ): MsgWithdrawlWithdrawnLimitOrder {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseMsgWithdrawlFilledLimitOrder,
-    } as MsgWithdrawlFilledLimitOrder;
+      ...baseMsgWithdrawlWithdrawnLimitOrder,
+    } as MsgWithdrawlWithdrawnLimitOrder;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1080,10 +1080,10 @@ export const MsgWithdrawlFilledLimitOrder = {
     return message;
   },
 
-  fromJSON(object: any): MsgWithdrawlFilledLimitOrder {
+  fromJSON(object: any): MsgWithdrawlWithdrawnLimitOrder {
     const message = {
-      ...baseMsgWithdrawlFilledLimitOrder,
-    } as MsgWithdrawlFilledLimitOrder;
+      ...baseMsgWithdrawlWithdrawnLimitOrder,
+    } as MsgWithdrawlWithdrawnLimitOrder;
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = String(object.creator);
     } else {
@@ -1117,7 +1117,7 @@ export const MsgWithdrawlFilledLimitOrder = {
     return message;
   },
 
-  toJSON(message: MsgWithdrawlFilledLimitOrder): unknown {
+  toJSON(message: MsgWithdrawlWithdrawnLimitOrder): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.tokenA !== undefined && (obj.tokenA = message.tokenA);
@@ -1129,11 +1129,11 @@ export const MsgWithdrawlFilledLimitOrder = {
   },
 
   fromPartial(
-    object: DeepPartial<MsgWithdrawlFilledLimitOrder>
-  ): MsgWithdrawlFilledLimitOrder {
+    object: DeepPartial<MsgWithdrawlWithdrawnLimitOrder>
+  ): MsgWithdrawlWithdrawnLimitOrder {
     const message = {
-      ...baseMsgWithdrawlFilledLimitOrder,
-    } as MsgWithdrawlFilledLimitOrder;
+      ...baseMsgWithdrawlWithdrawnLimitOrder,
+    } as MsgWithdrawlWithdrawnLimitOrder;
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = object.creator;
     } else {
@@ -1168,11 +1168,11 @@ export const MsgWithdrawlFilledLimitOrder = {
   },
 };
 
-const baseMsgWithdrawlFilledLimitOrderResponse: object = {};
+const baseMsgWithdrawlWithdrawnLimitOrderResponse: object = {};
 
-export const MsgWithdrawlFilledLimitOrderResponse = {
+export const MsgWithdrawlWithdrawnLimitOrderResponse = {
   encode(
-    _: MsgWithdrawlFilledLimitOrderResponse,
+    _: MsgWithdrawlWithdrawnLimitOrderResponse,
     writer: Writer = Writer.create()
   ): Writer {
     return writer;
@@ -1181,12 +1181,12 @@ export const MsgWithdrawlFilledLimitOrderResponse = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): MsgWithdrawlFilledLimitOrderResponse {
+  ): MsgWithdrawlWithdrawnLimitOrderResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseMsgWithdrawlFilledLimitOrderResponse,
-    } as MsgWithdrawlFilledLimitOrderResponse;
+      ...baseMsgWithdrawlWithdrawnLimitOrderResponse,
+    } as MsgWithdrawlWithdrawnLimitOrderResponse;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1198,24 +1198,24 @@ export const MsgWithdrawlFilledLimitOrderResponse = {
     return message;
   },
 
-  fromJSON(_: any): MsgWithdrawlFilledLimitOrderResponse {
+  fromJSON(_: any): MsgWithdrawlWithdrawnLimitOrderResponse {
     const message = {
-      ...baseMsgWithdrawlFilledLimitOrderResponse,
-    } as MsgWithdrawlFilledLimitOrderResponse;
+      ...baseMsgWithdrawlWithdrawnLimitOrderResponse,
+    } as MsgWithdrawlWithdrawnLimitOrderResponse;
     return message;
   },
 
-  toJSON(_: MsgWithdrawlFilledLimitOrderResponse): unknown {
+  toJSON(_: MsgWithdrawlWithdrawnLimitOrderResponse): unknown {
     const obj: any = {};
     return obj;
   },
 
   fromPartial(
-    _: DeepPartial<MsgWithdrawlFilledLimitOrderResponse>
-  ): MsgWithdrawlFilledLimitOrderResponse {
+    _: DeepPartial<MsgWithdrawlWithdrawnLimitOrderResponse>
+  ): MsgWithdrawlWithdrawnLimitOrderResponse {
     const message = {
-      ...baseMsgWithdrawlFilledLimitOrderResponse,
-    } as MsgWithdrawlFilledLimitOrderResponse;
+      ...baseMsgWithdrawlWithdrawnLimitOrderResponse,
+    } as MsgWithdrawlWithdrawnLimitOrderResponse;
     return message;
   },
 };
@@ -1430,9 +1430,9 @@ export interface Msg {
   PlaceLimitOrder(
     request: MsgPlaceLimitOrder
   ): Promise<MsgPlaceLimitOrderResponse>;
-  WithdrawlFilledLimitOrder(
-    request: MsgWithdrawlFilledLimitOrder
-  ): Promise<MsgWithdrawlFilledLimitOrderResponse>;
+  WithdrawlWithdrawnLimitOrder(
+    request: MsgWithdrawlWithdrawnLimitOrder
+  ): Promise<MsgWithdrawlWithdrawnLimitOrderResponse>;
   /** this line is used by starport scaffolding # proto/tx/rpc */
   CancelLimitOrder(
     request: MsgCancelLimitOrder
@@ -1490,17 +1490,17 @@ export class MsgClientImpl implements Msg {
     );
   }
 
-  WithdrawlFilledLimitOrder(
-    request: MsgWithdrawlFilledLimitOrder
-  ): Promise<MsgWithdrawlFilledLimitOrderResponse> {
-    const data = MsgWithdrawlFilledLimitOrder.encode(request).finish();
+  WithdrawlWithdrawnLimitOrder(
+    request: MsgWithdrawlWithdrawnLimitOrder
+  ): Promise<MsgWithdrawlWithdrawnLimitOrderResponse> {
+    const data = MsgWithdrawlWithdrawnLimitOrder.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Msg",
-      "WithdrawlFilledLimitOrder",
+      "WithdrawlWithdrawnLimitOrder",
       data
     );
     return promise.then((data) =>
-      MsgWithdrawlFilledLimitOrderResponse.decode(new Reader(data))
+      MsgWithdrawlWithdrawnLimitOrderResponse.decode(new Reader(data))
     );
   }
 

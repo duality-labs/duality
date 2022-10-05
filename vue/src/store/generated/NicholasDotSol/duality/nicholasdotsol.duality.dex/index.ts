@@ -8,7 +8,7 @@ import { LimitOrderPoolFillMap } from "./module/types/dex/limit_order_pool_fill_
 import { LimitOrderPoolReserveMap } from "./module/types/dex/limit_order_pool_reserve_map"
 import { LimitOrderPoolTotalSharesMap } from "./module/types/dex/limit_order_pool_total_shares_map"
 import { LimitOrderPoolUserShareMap } from "./module/types/dex/limit_order_pool_user_share_map"
-import { LimitOrderPoolUserSharesFilled } from "./module/types/dex/limit_order_pool_user_shares_filled"
+import { LimitOrderPoolUserSharesWithdrawn } from "./module/types/dex/limit_order_pool_user_shares_withdrawn"
 import { PairMap } from "./module/types/dex/pair_map"
 import { Params } from "./module/types/dex/params"
 import { Reserve0AndSharesType } from "./module/types/dex/reserve_0_and_shares_type"
@@ -20,7 +20,7 @@ import { TokenPairType } from "./module/types/dex/token_pair_type"
 import { Tokens } from "./module/types/dex/tokens"
 
 
-export { AdjanceyMatrix, EdgeRow, FeeList, LimitOrderPool, LimitOrderPoolFillMap, LimitOrderPoolReserveMap, LimitOrderPoolTotalSharesMap, LimitOrderPoolUserShareMap, LimitOrderPoolUserSharesFilled, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
+export { AdjanceyMatrix, EdgeRow, FeeList, LimitOrderPool, LimitOrderPoolFillMap, LimitOrderPoolReserveMap, LimitOrderPoolTotalSharesMap, LimitOrderPoolUserShareMap, LimitOrderPoolUserSharesWithdrawn, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -77,8 +77,8 @@ const getDefaultState = () => {
 				AdjanceyMatrixAll: {},
 				LimitOrderPoolUserShareMap: {},
 				LimitOrderPoolUserShareMapAll: {},
-				LimitOrderPoolUserSharesFilled: {},
-				LimitOrderPoolUserSharesFilledAll: {},
+				LimitOrderPoolUserSharesWithdrawn: {},
+				LimitOrderPoolUserSharesWithdrawnAll: {},
 				LimitOrderPoolTotalSharesMap: {},
 				LimitOrderPoolTotalSharesMapAll: {},
 				LimitOrderPoolReserveMap: {},
@@ -95,7 +95,7 @@ const getDefaultState = () => {
 						LimitOrderPoolReserveMap: getStructure(LimitOrderPoolReserveMap.fromPartial({})),
 						LimitOrderPoolTotalSharesMap: getStructure(LimitOrderPoolTotalSharesMap.fromPartial({})),
 						LimitOrderPoolUserShareMap: getStructure(LimitOrderPoolUserShareMap.fromPartial({})),
-						LimitOrderPoolUserSharesFilled: getStructure(LimitOrderPoolUserSharesFilled.fromPartial({})),
+						LimitOrderPoolUserSharesWithdrawn: getStructure(LimitOrderPoolUserSharesWithdrawn.fromPartial({})),
 						PairMap: getStructure(PairMap.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						Reserve0AndSharesType: getStructure(Reserve0AndSharesType.fromPartial({})),
@@ -247,17 +247,17 @@ export default {
 					}
 			return state.LimitOrderPoolUserShareMapAll[JSON.stringify(params)] ?? {}
 		},
-				getLimitOrderPoolUserSharesFilled: (state) => (params = { params: {}}) => {
+				getLimitOrderPoolUserSharesWithdrawn: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.LimitOrderPoolUserSharesFilled[JSON.stringify(params)] ?? {}
+			return state.LimitOrderPoolUserSharesWithdrawn[JSON.stringify(params)] ?? {}
 		},
-				getLimitOrderPoolUserSharesFilledAll: (state) => (params = { params: {}}) => {
+				getLimitOrderPoolUserSharesWithdrawnAll: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.LimitOrderPoolUserSharesFilledAll[JSON.stringify(params)] ?? {}
+			return state.LimitOrderPoolUserSharesWithdrawnAll[JSON.stringify(params)] ?? {}
 		},
 				getLimitOrderPoolTotalSharesMap: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
@@ -796,22 +796,22 @@ export default {
 		 		
 		
 		
-		async QueryLimitOrderPoolUserSharesFilled({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryLimitOrderPoolUserSharesWithdrawn({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolUserSharesFilled( key.count,  key.address, query)).data
+				let value= (await queryClient.queryLimitOrderPoolUserSharesWithdrawn( key.count,  key.address, query)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryLimitOrderPoolUserSharesFilled( key.count,  key.address, {...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await queryClient.queryLimitOrderPoolUserSharesWithdrawn( key.count,  key.address, {...query, 'pagination.key':(<any> value).pagination.next_key})).data
 					value = mergeResults(value, next_values);
 				}
-				commit('QUERY', { query: 'LimitOrderPoolUserSharesFilled', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolUserSharesFilled', payload: { options: { all }, params: {...key},query }})
-				return getters['getLimitOrderPoolUserSharesFilled']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'LimitOrderPoolUserSharesWithdrawn', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolUserSharesWithdrawn', payload: { options: { all }, params: {...key},query }})
+				return getters['getLimitOrderPoolUserSharesWithdrawn']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryLimitOrderPoolUserSharesFilled API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryLimitOrderPoolUserSharesWithdrawn API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -822,22 +822,22 @@ export default {
 		 		
 		
 		
-		async QueryLimitOrderPoolUserSharesFilledAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryLimitOrderPoolUserSharesWithdrawnAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolUserSharesFilledAll(query)).data
+				let value= (await queryClient.queryLimitOrderPoolUserSharesWithdrawnAll(query)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryLimitOrderPoolUserSharesFilledAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await queryClient.queryLimitOrderPoolUserSharesWithdrawnAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
 					value = mergeResults(value, next_values);
 				}
-				commit('QUERY', { query: 'LimitOrderPoolUserSharesFilledAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolUserSharesFilledAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getLimitOrderPoolUserSharesFilledAll']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'LimitOrderPoolUserSharesWithdrawnAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolUserSharesWithdrawnAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getLimitOrderPoolUserSharesWithdrawnAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryLimitOrderPoolUserSharesFilledAll API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryLimitOrderPoolUserSharesWithdrawnAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -1059,18 +1059,18 @@ export default {
 				}
 			}
 		},
-		async sendMsgWithdrawlFilledLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
+		async sendMsgWithdrawlWithdrawnLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgWithdrawlFilledLimitOrder(value)
+				const msg = await txClient.msgWithdrawlWithdrawnLimitOrder(value)
 				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
 	gas: "200000" }, memo})
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgWithdrawlFilledLimitOrder:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgWithdrawlWithdrawnLimitOrder:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgWithdrawlFilledLimitOrder:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgWithdrawlWithdrawnLimitOrder:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -1142,16 +1142,16 @@ export default {
 				}
 			}
 		},
-		async MsgWithdrawlFilledLimitOrder({ rootGetters }, { value }) {
+		async MsgWithdrawlWithdrawnLimitOrder({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgWithdrawlFilledLimitOrder(value)
+				const msg = await txClient.msgWithdrawlWithdrawnLimitOrder(value)
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgWithdrawlFilledLimitOrder:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgWithdrawlWithdrawnLimitOrder:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgWithdrawlFilledLimitOrder:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgWithdrawlWithdrawnLimitOrder:Create Could not create message: ' + e.message)
 				}
 			}
 		},

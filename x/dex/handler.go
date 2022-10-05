@@ -29,8 +29,8 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgPlaceLimitOrder:
 			res, err := msgServer.PlaceLimitOrder(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgWithdrawlFilledLimitOrder:
-			res, err := msgServer.WithdrawlFilledLimitOrder(sdk.WrapSDKContext(ctx), msg)
+		case *types.MsgWithdrawlWithdrawnLimitOrder:
+			res, err := msgServer.WithdrawlWithdrawnLimitOrder(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgCancelLimitOrder:
 			res, err := msgServer.CancelLimitOrder(sdk.WrapSDKContext(ctx), msg)

@@ -59,9 +59,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, elem := range genState.LimitOrderPoolUserShareMapList {
 		k.SetLimitOrderPoolUserShareMap(ctx, elem)
 	}
-	// Set all the limitOrderPoolUserSharesFilled
-	for _, elem := range genState.LimitOrderPoolUserSharesFilledList {
-		k.SetLimitOrderPoolUserSharesFilled(ctx, elem)
+	// Set all the limitOrderPoolUserSharesWithdrawn
+	for _, elem := range genState.LimitOrderPoolUserSharesWithdrawnList {
+		k.SetLimitOrderPoolUserSharesWithdrawn(ctx, elem)
 	}
 	// Set all the limitOrderPoolTotalSharesMap
 	for _, elem := range genState.LimitOrderPoolTotalSharesMapList {
@@ -97,7 +97,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.AdjanceyMatrixList = k.GetAllAdjanceyMatrix(ctx)
 	genesis.AdjanceyMatrixCount = k.GetAdjanceyMatrixCount(ctx)
 	genesis.LimitOrderPoolUserShareMapList = k.GetAllLimitOrderPoolUserShareMap(ctx)
-	genesis.LimitOrderPoolUserSharesFilledList = k.GetAllLimitOrderPoolUserSharesFilled(ctx)
+	genesis.LimitOrderPoolUserSharesWithdrawnList = k.GetAllLimitOrderPoolUserSharesWithdrawn(ctx)
 	genesis.LimitOrderPoolTotalSharesMapList = k.GetAllLimitOrderPoolTotalSharesMap(ctx)
 	genesis.LimitOrderPoolReserveMapList = k.GetAllLimitOrderPoolReserveMap(ctx)
 	genesis.LimitOrderPoolFillMapList = k.GetAllLimitOrderPoolFillMap(ctx)

@@ -7,10 +7,12 @@ import (
 )
 
 // SetLimitOrderPoolReserveMap set a specific limitOrderPoolReserveMap in the store from its index
-func (k Keeper) SetLimitOrderPoolReserveMap(ctx sdk.Context, pairId string, tickIndex int64, token string, limitOrderPoolReserveMap types.LimitOrderPoolReserveMap) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderReseveMapPrefix(pairId, tickIndex, token))
+func (k Keeper) SetLimitOrderPoolReserveMap(ctx sdk.Context, pairId string, limitOrderPoolReserveMap types.LimitOrderPoolReserveMap) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderReseveMapPrefix(pairId))
 	b := k.cdc.MustMarshal(&limitOrderPoolReserveMap)
 	store.Set(types.LimitOrderPoolReserveMapKey(
+		limitOrderPoolReserveMap.TickIndex,
+		limitOrderPoolReserveMap.Token,
 		limitOrderPoolReserveMap.Count,
 	), b)
 }
@@ -24,9 +26,11 @@ func (k Keeper) GetLimitOrderPoolReserveMap(
 	count uint64,
 
 ) (val types.LimitOrderPoolReserveMap, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderReseveMapPrefix(pairId, tickIndex, token))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderReseveMapPrefix(pairId))
 
 	b := store.Get(types.LimitOrderPoolReserveMapKey(
+		tickIndex,
+		token,
 		count,
 	))
 	if b == nil {
@@ -46,8 +50,10 @@ func (k Keeper) RemoveLimitOrderPoolReserveMap(
 	count uint64,
 
 ) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderReseveMapPrefix(pairId, tickIndex, token))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.LimitOrderReseveMapPrefix(pairId))
 	store.Delete(types.LimitOrderPoolReserveMapKey(
+		tickIndex,
+		token,
 		count,
 	))
 }
