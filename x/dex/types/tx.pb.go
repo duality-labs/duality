@@ -507,27 +507,28 @@ func (m *MsgPlaceLimitOrderResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgPlaceLimitOrderResponse proto.InternalMessageInfo
 
-type MsgWithdrawlWithdrawnLimitOrder struct {
+type MsgWithdrawFilledLimitOrder struct {
 	Creator   string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	TokenA    string `protobuf:"bytes,2,opt,name=tokenA,proto3" json:"tokenA,omitempty"`
-	TokenB    string `protobuf:"bytes,3,opt,name=tokenB,proto3" json:"tokenB,omitempty"`
-	TickIndex int64  `protobuf:"varint,4,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
-	KeyToken  string `protobuf:"bytes,5,opt,name=keyToken,proto3" json:"keyToken,omitempty"`
-	Key       uint64 `protobuf:"varint,6,opt,name=key,proto3" json:"key,omitempty"`
+	Receiver  string `protobuf:"bytes,2,opt,name=receiver,proto3" json:"receiver,omitempty"`
+	TokenA    string `protobuf:"bytes,3,opt,name=tokenA,proto3" json:"tokenA,omitempty"`
+	TokenB    string `protobuf:"bytes,4,opt,name=tokenB,proto3" json:"tokenB,omitempty"`
+	TickIndex int64  `protobuf:"varint,5,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
+	KeyToken  string `protobuf:"bytes,6,opt,name=keyToken,proto3" json:"keyToken,omitempty"`
+	Key       uint64 `protobuf:"varint,7,opt,name=key,proto3" json:"key,omitempty"`
 }
 
-func (m *MsgWithdrawlWithdrawnLimitOrder) Reset()         { *m = MsgWithdrawlWithdrawnLimitOrder{} }
-func (m *MsgWithdrawlWithdrawnLimitOrder) String() string { return proto.CompactTextString(m) }
-func (*MsgWithdrawlWithdrawnLimitOrder) ProtoMessage()    {}
-func (*MsgWithdrawlWithdrawnLimitOrder) Descriptor() ([]byte, []int) {
+func (m *MsgWithdrawFilledLimitOrder) Reset()         { *m = MsgWithdrawFilledLimitOrder{} }
+func (m *MsgWithdrawFilledLimitOrder) String() string { return proto.CompactTextString(m) }
+func (*MsgWithdrawFilledLimitOrder) ProtoMessage()    {}
+func (*MsgWithdrawFilledLimitOrder) Descriptor() ([]byte, []int) {
 	return fileDescriptor_463701e671e5a5e0, []int{8}
 }
-func (m *MsgWithdrawlWithdrawnLimitOrder) XXX_Unmarshal(b []byte) error {
+func (m *MsgWithdrawFilledLimitOrder) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgWithdrawlWithdrawnLimitOrder) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgWithdrawFilledLimitOrder) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgWithdrawlWithdrawnLimitOrder.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgWithdrawFilledLimitOrder.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -537,77 +538,82 @@ func (m *MsgWithdrawlWithdrawnLimitOrder) XXX_Marshal(b []byte, deterministic bo
 		return b[:n], nil
 	}
 }
-func (m *MsgWithdrawlWithdrawnLimitOrder) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgWithdrawlWithdrawnLimitOrder.Merge(m, src)
+func (m *MsgWithdrawFilledLimitOrder) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgWithdrawFilledLimitOrder.Merge(m, src)
 }
-func (m *MsgWithdrawlWithdrawnLimitOrder) XXX_Size() int {
+func (m *MsgWithdrawFilledLimitOrder) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgWithdrawlWithdrawnLimitOrder) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgWithdrawlWithdrawnLimitOrder.DiscardUnknown(m)
+func (m *MsgWithdrawFilledLimitOrder) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgWithdrawFilledLimitOrder.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgWithdrawlWithdrawnLimitOrder proto.InternalMessageInfo
+var xxx_messageInfo_MsgWithdrawFilledLimitOrder proto.InternalMessageInfo
 
-func (m *MsgWithdrawlWithdrawnLimitOrder) GetCreator() string {
+func (m *MsgWithdrawFilledLimitOrder) GetCreator() string {
 	if m != nil {
 		return m.Creator
 	}
 	return ""
 }
 
-func (m *MsgWithdrawlWithdrawnLimitOrder) GetTokenA() string {
+func (m *MsgWithdrawFilledLimitOrder) GetReceiver() string {
+	if m != nil {
+		return m.Receiver
+	}
+	return ""
+}
+
+func (m *MsgWithdrawFilledLimitOrder) GetTokenA() string {
 	if m != nil {
 		return m.TokenA
 	}
 	return ""
 }
 
-func (m *MsgWithdrawlWithdrawnLimitOrder) GetTokenB() string {
+func (m *MsgWithdrawFilledLimitOrder) GetTokenB() string {
 	if m != nil {
 		return m.TokenB
 	}
 	return ""
 }
 
-func (m *MsgWithdrawlWithdrawnLimitOrder) GetTickIndex() int64 {
+func (m *MsgWithdrawFilledLimitOrder) GetTickIndex() int64 {
 	if m != nil {
 		return m.TickIndex
 	}
 	return 0
 }
 
-func (m *MsgWithdrawlWithdrawnLimitOrder) GetKeyToken() string {
+func (m *MsgWithdrawFilledLimitOrder) GetKeyToken() string {
 	if m != nil {
 		return m.KeyToken
 	}
 	return ""
 }
 
-func (m *MsgWithdrawlWithdrawnLimitOrder) GetKey() uint64 {
+func (m *MsgWithdrawFilledLimitOrder) GetKey() uint64 {
 	if m != nil {
 		return m.Key
 	}
 	return 0
 }
 
-type MsgWithdrawlWithdrawnLimitOrderResponse struct {
+type MsgWithdrawFilledLimitOrderResponse struct {
 }
 
-func (m *MsgWithdrawlWithdrawnLimitOrderResponse) Reset() {
-	*m = MsgWithdrawlWithdrawnLimitOrderResponse{}
-}
-func (m *MsgWithdrawlWithdrawnLimitOrderResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgWithdrawlWithdrawnLimitOrderResponse) ProtoMessage()    {}
-func (*MsgWithdrawlWithdrawnLimitOrderResponse) Descriptor() ([]byte, []int) {
+func (m *MsgWithdrawFilledLimitOrderResponse) Reset()         { *m = MsgWithdrawFilledLimitOrderResponse{} }
+func (m *MsgWithdrawFilledLimitOrderResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgWithdrawFilledLimitOrderResponse) ProtoMessage()    {}
+func (*MsgWithdrawFilledLimitOrderResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_463701e671e5a5e0, []int{9}
 }
-func (m *MsgWithdrawlWithdrawnLimitOrderResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgWithdrawFilledLimitOrderResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgWithdrawlWithdrawnLimitOrderResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgWithdrawFilledLimitOrderResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgWithdrawlWithdrawnLimitOrderResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgWithdrawFilledLimitOrderResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -617,25 +623,26 @@ func (m *MsgWithdrawlWithdrawnLimitOrderResponse) XXX_Marshal(b []byte, determin
 		return b[:n], nil
 	}
 }
-func (m *MsgWithdrawlWithdrawnLimitOrderResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgWithdrawlWithdrawnLimitOrderResponse.Merge(m, src)
+func (m *MsgWithdrawFilledLimitOrderResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgWithdrawFilledLimitOrderResponse.Merge(m, src)
 }
-func (m *MsgWithdrawlWithdrawnLimitOrderResponse) XXX_Size() int {
+func (m *MsgWithdrawFilledLimitOrderResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgWithdrawlWithdrawnLimitOrderResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgWithdrawlWithdrawnLimitOrderResponse.DiscardUnknown(m)
+func (m *MsgWithdrawFilledLimitOrderResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgWithdrawFilledLimitOrderResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgWithdrawlWithdrawnLimitOrderResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgWithdrawFilledLimitOrderResponse proto.InternalMessageInfo
 
 type MsgCancelLimitOrder struct {
 	Creator   string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	TokenA    string `protobuf:"bytes,2,opt,name=tokenA,proto3" json:"tokenA,omitempty"`
-	TokenB    string `protobuf:"bytes,3,opt,name=tokenB,proto3" json:"tokenB,omitempty"`
-	TickIndex int64  `protobuf:"varint,4,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
-	KeyToken  string `protobuf:"bytes,5,opt,name=keyToken,proto3" json:"keyToken,omitempty"`
-	Key       uint64 `protobuf:"varint,6,opt,name=key,proto3" json:"key,omitempty"`
+	Receiver  string `protobuf:"bytes,2,opt,name=receiver,proto3" json:"receiver,omitempty"`
+	TokenA    string `protobuf:"bytes,3,opt,name=tokenA,proto3" json:"tokenA,omitempty"`
+	TokenB    string `protobuf:"bytes,4,opt,name=tokenB,proto3" json:"tokenB,omitempty"`
+	TickIndex int64  `protobuf:"varint,5,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
+	KeyToken  string `protobuf:"bytes,6,opt,name=keyToken,proto3" json:"keyToken,omitempty"`
+	Key       uint64 `protobuf:"varint,7,opt,name=key,proto3" json:"key,omitempty"`
 }
 
 func (m *MsgCancelLimitOrder) Reset()         { *m = MsgCancelLimitOrder{} }
@@ -674,6 +681,13 @@ var xxx_messageInfo_MsgCancelLimitOrder proto.InternalMessageInfo
 func (m *MsgCancelLimitOrder) GetCreator() string {
 	if m != nil {
 		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgCancelLimitOrder) GetReceiver() string {
+	if m != nil {
+		return m.Receiver
 	}
 	return ""
 }
@@ -758,8 +772,8 @@ func init() {
 	proto.RegisterType((*MsgSwapResponse)(nil), "nicholasdotsol.duality.dex.MsgSwapResponse")
 	proto.RegisterType((*MsgPlaceLimitOrder)(nil), "nicholasdotsol.duality.dex.MsgPlaceLimitOrder")
 	proto.RegisterType((*MsgPlaceLimitOrderResponse)(nil), "nicholasdotsol.duality.dex.MsgPlaceLimitOrderResponse")
-	proto.RegisterType((*MsgWithdrawlWithdrawnLimitOrder)(nil), "nicholasdotsol.duality.dex.MsgWithdrawlWithdrawnLimitOrder")
-	proto.RegisterType((*MsgWithdrawlWithdrawnLimitOrderResponse)(nil), "nicholasdotsol.duality.dex.MsgWithdrawlWithdrawnLimitOrderResponse")
+	proto.RegisterType((*MsgWithdrawFilledLimitOrder)(nil), "nicholasdotsol.duality.dex.MsgWithdrawFilledLimitOrder")
+	proto.RegisterType((*MsgWithdrawFilledLimitOrderResponse)(nil), "nicholasdotsol.duality.dex.MsgWithdrawFilledLimitOrderResponse")
 	proto.RegisterType((*MsgCancelLimitOrder)(nil), "nicholasdotsol.duality.dex.MsgCancelLimitOrder")
 	proto.RegisterType((*MsgCancelLimitOrderResponse)(nil), "nicholasdotsol.duality.dex.MsgCancelLimitOrderResponse")
 }
@@ -767,55 +781,55 @@ func init() {
 func init() { proto.RegisterFile("dex/tx.proto", fileDescriptor_463701e671e5a5e0) }
 
 var fileDescriptor_463701e671e5a5e0 = []byte{
-	// 765 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x96, 0xcb, 0x6e, 0xd3, 0x4c,
-	0x14, 0xc7, 0xe3, 0x38, 0x8d, 0x93, 0xf3, 0xf5, 0x6b, 0x8b, 0x29, 0x95, 0x65, 0x4a, 0x1c, 0x19,
-	0xa9, 0x04, 0xa1, 0xda, 0x08, 0x24, 0x90, 0x60, 0x55, 0xb7, 0x12, 0x8a, 0x20, 0x14, 0xb9, 0x95,
-	0xb8, 0xec, 0x5c, 0x7b, 0x70, 0xac, 0x38, 0x9e, 0xc8, 0xe3, 0xb4, 0x89, 0xc4, 0x86, 0x0d, 0x6b,
-	0x5e, 0x00, 0x89, 0x3d, 0x0f, 0x80, 0xc4, 0x0b, 0xd0, 0x65, 0x77, 0x20, 0x16, 0x11, 0x6a, 0x77,
-	0x2c, 0xf3, 0x04, 0x28, 0x8e, 0x3d, 0x31, 0xee, 0x25, 0x89, 0x2a, 0x2a, 0x56, 0xf1, 0x39, 0xf3,
-	0x3f, 0x97, 0xf9, 0xcd, 0xc9, 0xd8, 0x30, 0x6b, 0xa1, 0x8e, 0x1a, 0x74, 0x94, 0x96, 0x8f, 0x03,
-	0xcc, 0x8b, 0x9e, 0x63, 0xd6, 0xb1, 0x6b, 0x10, 0x0b, 0x07, 0x04, 0xbb, 0x8a, 0xd5, 0x36, 0x5c,
-	0x27, 0xe8, 0x2a, 0x16, 0xea, 0x88, 0x8b, 0x36, 0xb6, 0x71, 0x28, 0x53, 0x07, 0x4f, 0xc3, 0x08,
-	0xf9, 0x1d, 0x0b, 0x50, 0x23, 0xf6, 0x06, 0x6a, 0x61, 0xe2, 0x04, 0xbc, 0x00, 0x9c, 0xe9, 0x23,
-	0x23, 0xc0, 0xbe, 0xc0, 0x94, 0x99, 0x4a, 0x51, 0x8f, 0x4d, 0x5e, 0x84, 0x82, 0x8f, 0x4c, 0xe4,
-	0xec, 0x22, 0x5f, 0xc8, 0x86, 0x4b, 0xd4, 0xe6, 0x97, 0x20, 0x1f, 0xe0, 0x06, 0xf2, 0xd6, 0x04,
-	0x36, 0x5c, 0x89, 0x2c, 0xea, 0xd7, 0x84, 0x5c, 0xc2, 0xaf, 0xf1, 0x36, 0x14, 0x8c, 0x26, 0x6e,
-	0x7b, 0x01, 0x59, 0x13, 0x66, 0xca, 0x6c, 0xa5, 0xa8, 0x3d, 0xde, 0xef, 0x49, 0x99, 0x1f, 0x3d,
-	0x69, 0xc5, 0x76, 0x82, 0x7a, 0x7b, 0x47, 0x31, 0x71, 0x53, 0x35, 0x31, 0x69, 0x62, 0x12, 0xfd,
-	0xac, 0x12, 0xab, 0xa1, 0x06, 0xdd, 0x16, 0x22, 0xca, 0x06, 0x32, 0x7f, 0xf5, 0x24, 0x6e, 0x98,
-	0x61, 0xad, 0xdf, 0x93, 0xe6, 0xba, 0x46, 0xd3, 0x7d, 0x20, 0x47, 0x0e, 0x59, 0xa7, 0xc9, 0x13,
-	0x85, 0x34, 0x21, 0x7f, 0xbe, 0x42, 0x5a, 0xba, 0x90, 0x36, 0x2a, 0xa4, 0xf1, 0x65, 0xf8, 0x2f,
-	0x70, 0xcc, 0x46, 0xd5, 0xb3, 0x50, 0x07, 0x11, 0x81, 0x2b, 0xb3, 0x15, 0x56, 0x4f, 0xba, 0xf8,
-	0x12, 0xc0, 0x6b, 0x84, 0x62, 0x41, 0xa1, 0xcc, 0x56, 0x72, 0x7a, 0xc2, 0x23, 0x2f, 0x02, 0x3f,
-	0x3a, 0x07, 0x1d, 0x91, 0x16, 0xf6, 0x08, 0x92, 0xbf, 0x64, 0x61, 0xb6, 0x46, 0xec, 0xe7, 0x4e,
-	0x50, 0xb7, 0x7c, 0x63, 0xcf, 0xbd, 0xa0, 0x03, 0x7a, 0xcb, 0xc0, 0x1c, 0xa9, 0x1b, 0x3e, 0x22,
-	0xdb, 0x58, 0x47, 0x4d, 0xbc, 0x8b, 0xa2, 0x73, 0x7a, 0x39, 0x35, 0xbe, 0x54, 0x9e, 0x7e, 0x4f,
-	0xba, 0x32, 0xa4, 0xf8, 0xa7, 0x5f, 0xd6, 0x53, 0xc2, 0x34, 0xd2, 0xfc, 0x38, 0xa4, 0xdc, 0x31,
-	0xa4, 0x4b, 0xb0, 0x98, 0x64, 0x47, 0xa1, 0x7e, 0xcb, 0x02, 0x57, 0x23, 0xf6, 0xd6, 0x9e, 0xd1,
-	0xba, 0x20, 0x9e, 0x4e, 0x3c, 0x87, 0x55, 0x4f, 0x98, 0x19, 0xac, 0x68, 0xb5, 0xa9, 0x41, 0xd2,
-	0x0c, 0xfd, 0x9e, 0x34, 0x9f, 0x1c, 0xc4, 0xaa, 0x47, 0x27, 0xb1, 0xea, 0x0d, 0x36, 0x14, 0x16,
-	0xad, 0x7a, 0x42, 0x7e, 0xb8, 0xa1, 0xc8, 0xe4, 0x0d, 0xc8, 0x37, 0x1d, 0x6f, 0xb3, 0x1d, 0x08,
-	0x5c, 0xd8, 0x42, 0x75, 0xea, 0x16, 0xa2, 0xf8, 0x7e, 0x4f, 0xfa, 0x7f, 0xd8, 0xc0, 0xd0, 0x96,
-	0xf5, 0x68, 0x41, 0xbe, 0x04, 0xf3, 0x11, 0x58, 0x0a, 0xfb, 0x43, 0x36, 0x1c, 0xec, 0x67, 0xae,
-	0x61, 0xa2, 0x27, 0x4e, 0xd3, 0x09, 0x36, 0x7d, 0x0b, 0xf9, 0x17, 0xc4, 0x7d, 0x19, 0x8a, 0x74,
-	0x60, 0x42, 0xf0, 0xac, 0x3e, 0x72, 0x9c, 0x81, 0x2a, 0x79, 0x5e, 0xdc, 0x5f, 0x3d, 0x2f, 0x79,
-	0x19, 0xc4, 0xe3, 0x78, 0x28, 0xbd, 0xcf, 0x0c, 0x48, 0xc9, 0x19, 0x8e, 0x1f, 0xbc, 0x89, 0x50,
-	0x8e, 0x70, 0x65, 0x4f, 0xc1, 0xc5, 0x9e, 0x8e, 0x2b, 0x97, 0xc6, 0x25, 0x42, 0xa1, 0x81, 0xba,
-	0xdb, 0x03, 0xe9, 0x70, 0x88, 0x75, 0x6a, 0xf3, 0x0b, 0xc0, 0x36, 0x50, 0x37, 0xc4, 0x98, 0xd3,
-	0x07, 0x8f, 0xf2, 0x4d, 0xb8, 0x31, 0xa6, 0x71, 0xba, 0xc9, 0x4f, 0x0c, 0x5c, 0xae, 0x11, 0x7b,
-	0xdd, 0xf0, 0x4c, 0xe4, 0xfe, 0xf3, 0x1b, 0xbb, 0x06, 0x57, 0x4f, 0x68, 0x36, 0xde, 0xcc, 0x9d,
-	0xaf, 0x33, 0xc0, 0xd6, 0x88, 0xcd, 0x1b, 0xc0, 0xc5, 0x2f, 0xd5, 0x15, 0xe5, 0xf4, 0xd7, 0xb2,
-	0x32, 0xba, 0xf4, 0x45, 0x65, 0x32, 0x5d, 0x5c, 0x8a, 0xb7, 0xa1, 0x38, 0x7a, 0x31, 0x54, 0xc6,
-	0x04, 0x53, 0xa5, 0x78, 0x7b, 0x52, 0x25, 0x2d, 0xf4, 0x02, 0x72, 0xe1, 0x65, 0x79, 0x7d, 0x4c,
-	0xe4, 0x40, 0x24, 0xde, 0x9a, 0x40, 0x44, 0x33, 0x77, 0x61, 0x3e, 0x7d, 0x33, 0x8c, 0xa3, 0x90,
-	0xd2, 0x8b, 0xf7, 0xa6, 0xd3, 0xd3, 0xd2, 0x1f, 0x19, 0x58, 0x3e, 0xf3, 0x7f, 0xf5, 0x70, 0x52,
-	0x4e, 0x27, 0x04, 0x8b, 0xeb, 0xe7, 0x08, 0xa6, 0x2d, 0xbe, 0x81, 0x85, 0x63, 0x7f, 0x0a, 0x75,
-	0x4c, 0xe2, 0x74, 0x80, 0x78, 0x7f, 0xca, 0x80, 0xb8, 0xba, 0xf6, 0x68, 0xff, 0xb0, 0xc4, 0x1c,
-	0x1c, 0x96, 0x98, 0x9f, 0x87, 0x25, 0xe6, 0xfd, 0x51, 0x29, 0x73, 0x70, 0x54, 0xca, 0x7c, 0x3f,
-	0x2a, 0x65, 0x5e, 0xad, 0x26, 0x2e, 0xc1, 0xa7, 0x51, 0xf2, 0x0d, 0x1c, 0x6c, 0x61, 0x57, 0x8d,
-	0x92, 0xab, 0x1d, 0x35, 0xfc, 0x30, 0x1d, 0xdc, 0x87, 0x3b, 0xf9, 0xf0, 0x53, 0xf3, 0xee, 0xef,
-	0x00, 0x00, 0x00, 0xff, 0xff, 0x1b, 0x4c, 0xd0, 0x5c, 0xac, 0x0a, 0x00, 0x00,
+	// 753 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x96, 0xcd, 0x6e, 0xd3, 0x4e,
+	0x10, 0xc0, 0xe3, 0x38, 0x8d, 0x93, 0xf9, 0xf7, 0xdf, 0x16, 0x53, 0x2a, 0xcb, 0x94, 0x24, 0x72,
+	0x45, 0x15, 0x09, 0xd5, 0x46, 0x20, 0x51, 0x89, 0x0b, 0xaa, 0xa9, 0x40, 0x11, 0x84, 0x22, 0xb7,
+	0x12, 0x1f, 0x37, 0xd7, 0x5e, 0x1c, 0x2b, 0x8e, 0x37, 0xf2, 0x6e, 0xda, 0x44, 0xe2, 0xc2, 0x85,
+	0x33, 0x07, 0xae, 0xbc, 0x08, 0x3c, 0x00, 0xbd, 0xd1, 0x1b, 0x88, 0x43, 0x84, 0xda, 0x1b, 0xc7,
+	0x3c, 0x01, 0x8a, 0xe3, 0x6c, 0x8c, 0xab, 0x36, 0x09, 0x88, 0x0a, 0x4e, 0xf6, 0xcc, 0xce, 0xc7,
+	0xce, 0x6f, 0xc6, 0xbb, 0x86, 0x59, 0x1b, 0xb5, 0x35, 0xda, 0x56, 0x9b, 0x01, 0xa6, 0x58, 0x94,
+	0x7d, 0xd7, 0xaa, 0x61, 0xcf, 0x24, 0x36, 0xa6, 0x04, 0x7b, 0xaa, 0xdd, 0x32, 0x3d, 0x97, 0x76,
+	0x54, 0x1b, 0xb5, 0xe5, 0x45, 0x07, 0x3b, 0x38, 0x34, 0xd3, 0xfa, 0x6f, 0x03, 0x0f, 0xe5, 0x35,
+	0x0f, 0x50, 0x25, 0xce, 0x26, 0x6a, 0x62, 0xe2, 0x52, 0x51, 0x02, 0xc1, 0x0a, 0x90, 0x49, 0x71,
+	0x20, 0x71, 0x25, 0xae, 0x9c, 0x37, 0x86, 0xa2, 0x28, 0x43, 0x2e, 0x40, 0x16, 0x72, 0xf7, 0x50,
+	0x20, 0xa5, 0xc3, 0x25, 0x26, 0x8b, 0x4b, 0x90, 0xa5, 0xb8, 0x8e, 0xfc, 0x0d, 0x89, 0x0f, 0x57,
+	0x22, 0x89, 0xe9, 0x75, 0x29, 0x13, 0xd3, 0xeb, 0xa2, 0x03, 0x39, 0xb3, 0x81, 0x5b, 0x3e, 0x25,
+	0x1b, 0xd2, 0x4c, 0x89, 0x2f, 0xe7, 0xf5, 0x07, 0x07, 0xdd, 0x62, 0xea, 0x6b, 0xb7, 0xb8, 0xea,
+	0xb8, 0xb4, 0xd6, 0xda, 0x55, 0x2d, 0xdc, 0xd0, 0x2c, 0x4c, 0x1a, 0x98, 0x44, 0x8f, 0x35, 0x62,
+	0xd7, 0x35, 0xda, 0x69, 0x22, 0xa2, 0x6e, 0x22, 0xeb, 0x7b, 0xb7, 0x28, 0x0c, 0x22, 0x6c, 0xf4,
+	0xba, 0xc5, 0xb9, 0x8e, 0xd9, 0xf0, 0x6e, 0x2b, 0x91, 0x42, 0x31, 0x58, 0xf0, 0x58, 0x22, 0x5d,
+	0xca, 0xfe, 0x5e, 0x22, 0x3d, 0x99, 0x48, 0x1f, 0x25, 0xd2, 0xc5, 0x12, 0xfc, 0x47, 0x5d, 0xab,
+	0x5e, 0xf1, 0x6d, 0xd4, 0x46, 0x44, 0x12, 0x4a, 0x7c, 0x99, 0x37, 0xe2, 0x2a, 0xb1, 0x00, 0xf0,
+	0x02, 0xa1, 0xa1, 0x41, 0xae, 0xc4, 0x97, 0x33, 0x46, 0x4c, 0xa3, 0x2c, 0x82, 0x38, 0xea, 0x83,
+	0x81, 0x48, 0x13, 0xfb, 0x04, 0x29, 0xef, 0xd3, 0x30, 0x5b, 0x25, 0xce, 0x13, 0x97, 0xd6, 0xec,
+	0xc0, 0xdc, 0xf7, 0xce, 0xa9, 0x41, 0xaf, 0x38, 0x98, 0x23, 0x35, 0x33, 0x40, 0x64, 0x07, 0x1b,
+	0xa8, 0x81, 0xf7, 0x50, 0xd4, 0xa7, 0x67, 0x53, 0xe3, 0x4b, 0xc4, 0xe9, 0x75, 0x8b, 0x97, 0x06,
+	0x14, 0x7f, 0xd6, 0x2b, 0x46, 0xc2, 0x30, 0x89, 0x34, 0x3b, 0x0e, 0xa9, 0x70, 0x02, 0xe9, 0x12,
+	0x2c, 0xc6, 0xd9, 0x31, 0xa8, 0x9f, 0xd3, 0x20, 0x54, 0x89, 0xb3, 0xbd, 0x6f, 0x36, 0xcf, 0x89,
+	0xa7, 0x3b, 0x9c, 0xc3, 0x8a, 0x2f, 0xcd, 0xf4, 0x57, 0xf4, 0xea, 0xd4, 0x20, 0x59, 0x84, 0x5e,
+	0xb7, 0x38, 0x1f, 0x1f, 0xc4, 0x8a, 0xcf, 0x26, 0xb1, 0xe2, 0xf7, 0x0b, 0x0a, 0x93, 0x56, 0x7c,
+	0x29, 0x3b, 0x28, 0x28, 0x12, 0x45, 0x13, 0xb2, 0x0d, 0xd7, 0xdf, 0x6a, 0x51, 0x49, 0x08, 0xb7,
+	0x50, 0x99, 0x7a, 0x0b, 0x91, 0x7f, 0xaf, 0x5b, 0xfc, 0x7f, 0xb0, 0x81, 0x81, 0xac, 0x18, 0xd1,
+	0x82, 0x72, 0x01, 0xe6, 0x23, 0xb0, 0x0c, 0xf6, 0xbb, 0x74, 0x38, 0xd8, 0x8f, 0x3d, 0xd3, 0x42,
+	0x0f, 0xdd, 0x86, 0x4b, 0xb7, 0x02, 0x1b, 0x05, 0xe7, 0xc4, 0x7d, 0x19, 0xf2, 0x6c, 0x60, 0x42,
+	0xf0, 0xbc, 0x31, 0x52, 0x9c, 0x81, 0x2a, 0xde, 0x2f, 0xe1, 0x8f, 0xf6, 0x4b, 0x59, 0x06, 0xf9,
+	0x24, 0x1e, 0x46, 0xef, 0x13, 0x07, 0x97, 0x63, 0x33, 0x7c, 0xcf, 0xf5, 0x3c, 0x64, 0xff, 0x65,
+	0x18, 0x65, 0xc8, 0xd5, 0x51, 0x67, 0xa7, 0x6f, 0x1a, 0x71, 0x64, 0xb2, 0xb8, 0x00, 0x7c, 0x1d,
+	0x75, 0x42, 0x86, 0x19, 0xa3, 0xff, 0xaa, 0x5c, 0x85, 0x95, 0x33, 0x0a, 0x62, 0x85, 0x7f, 0xe4,
+	0xe0, 0x62, 0x95, 0x38, 0x77, 0x4d, 0xdf, 0x42, 0xde, 0x3f, 0x5d, 0xf0, 0x95, 0xb0, 0x83, 0xc9,
+	0x42, 0x86, 0x85, 0xde, 0xf8, 0x30, 0x03, 0x7c, 0x95, 0x38, 0xa2, 0x09, 0xc2, 0xf0, 0x12, 0x5e,
+	0x55, 0x4f, 0xbf, 0xc6, 0xd5, 0xd1, 0x25, 0x21, 0xab, 0x93, 0xd9, 0x0d, 0x53, 0x89, 0x0e, 0xe4,
+	0x47, 0x17, 0x49, 0x79, 0x8c, 0x33, 0xb3, 0x94, 0xaf, 0x4f, 0x6a, 0xc9, 0x12, 0x3d, 0x85, 0x4c,
+	0x78, 0xb8, 0xae, 0x8c, 0xf1, 0xec, 0x1b, 0xc9, 0xd7, 0x26, 0x30, 0x62, 0x91, 0x3b, 0x30, 0x9f,
+	0x3c, 0x49, 0xc6, 0x51, 0x48, 0xd8, 0xcb, 0xb7, 0xa6, 0xb3, 0x67, 0xa9, 0xdf, 0x72, 0x20, 0x9d,
+	0xfa, 0x1d, 0xae, 0x4f, 0xc8, 0x28, 0xe9, 0x28, 0xdf, 0xf9, 0x45, 0x47, 0xb6, 0xad, 0x97, 0xb0,
+	0x70, 0xe2, 0x23, 0xd1, 0xc6, 0x04, 0x4d, 0x3a, 0xc8, 0xeb, 0x53, 0x3a, 0x0c, 0xb3, 0xeb, 0xf7,
+	0x0f, 0x8e, 0x0a, 0xdc, 0xe1, 0x51, 0x81, 0xfb, 0x76, 0x54, 0xe0, 0xde, 0x1c, 0x17, 0x52, 0x87,
+	0xc7, 0x85, 0xd4, 0x97, 0xe3, 0x42, 0xea, 0xf9, 0x5a, 0xec, 0xa0, 0x7c, 0x14, 0x05, 0xdf, 0xc4,
+	0x74, 0x1b, 0x7b, 0x5a, 0x14, 0x5c, 0x6b, 0x6b, 0xe1, 0xcf, 0x6b, 0xff, 0xcc, 0xdc, 0xcd, 0x86,
+	0xbf, 0xa3, 0x37, 0x7f, 0x04, 0x00, 0x00, 0xff, 0xff, 0xb7, 0xde, 0x23, 0xae, 0xd0, 0x0a, 0x00,
+	0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -834,7 +848,7 @@ type MsgClient interface {
 	Withdrawl(ctx context.Context, in *MsgWithdrawl, opts ...grpc.CallOption) (*MsgWithdrawlResponse, error)
 	Swap(ctx context.Context, in *MsgSwap, opts ...grpc.CallOption) (*MsgSwapResponse, error)
 	PlaceLimitOrder(ctx context.Context, in *MsgPlaceLimitOrder, opts ...grpc.CallOption) (*MsgPlaceLimitOrderResponse, error)
-	WithdrawlWithdrawnLimitOrder(ctx context.Context, in *MsgWithdrawlWithdrawnLimitOrder, opts ...grpc.CallOption) (*MsgWithdrawlWithdrawnLimitOrderResponse, error)
+	WithdrawFilledLimitOrder(ctx context.Context, in *MsgWithdrawFilledLimitOrder, opts ...grpc.CallOption) (*MsgWithdrawFilledLimitOrderResponse, error)
 	CancelLimitOrder(ctx context.Context, in *MsgCancelLimitOrder, opts ...grpc.CallOption) (*MsgCancelLimitOrderResponse, error)
 }
 
@@ -882,9 +896,9 @@ func (c *msgClient) PlaceLimitOrder(ctx context.Context, in *MsgPlaceLimitOrder,
 	return out, nil
 }
 
-func (c *msgClient) WithdrawlWithdrawnLimitOrder(ctx context.Context, in *MsgWithdrawlWithdrawnLimitOrder, opts ...grpc.CallOption) (*MsgWithdrawlWithdrawnLimitOrderResponse, error) {
-	out := new(MsgWithdrawlWithdrawnLimitOrderResponse)
-	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Msg/WithdrawlWithdrawnLimitOrder", in, out, opts...)
+func (c *msgClient) WithdrawFilledLimitOrder(ctx context.Context, in *MsgWithdrawFilledLimitOrder, opts ...grpc.CallOption) (*MsgWithdrawFilledLimitOrderResponse, error) {
+	out := new(MsgWithdrawFilledLimitOrderResponse)
+	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Msg/WithdrawFilledLimitOrder", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -906,7 +920,7 @@ type MsgServer interface {
 	Withdrawl(context.Context, *MsgWithdrawl) (*MsgWithdrawlResponse, error)
 	Swap(context.Context, *MsgSwap) (*MsgSwapResponse, error)
 	PlaceLimitOrder(context.Context, *MsgPlaceLimitOrder) (*MsgPlaceLimitOrderResponse, error)
-	WithdrawlWithdrawnLimitOrder(context.Context, *MsgWithdrawlWithdrawnLimitOrder) (*MsgWithdrawlWithdrawnLimitOrderResponse, error)
+	WithdrawFilledLimitOrder(context.Context, *MsgWithdrawFilledLimitOrder) (*MsgWithdrawFilledLimitOrderResponse, error)
 	CancelLimitOrder(context.Context, *MsgCancelLimitOrder) (*MsgCancelLimitOrderResponse, error)
 }
 
@@ -926,8 +940,8 @@ func (*UnimplementedMsgServer) Swap(ctx context.Context, req *MsgSwap) (*MsgSwap
 func (*UnimplementedMsgServer) PlaceLimitOrder(ctx context.Context, req *MsgPlaceLimitOrder) (*MsgPlaceLimitOrderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PlaceLimitOrder not implemented")
 }
-func (*UnimplementedMsgServer) WithdrawlWithdrawnLimitOrder(ctx context.Context, req *MsgWithdrawlWithdrawnLimitOrder) (*MsgWithdrawlWithdrawnLimitOrderResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method WithdrawlWithdrawnLimitOrder not implemented")
+func (*UnimplementedMsgServer) WithdrawFilledLimitOrder(ctx context.Context, req *MsgWithdrawFilledLimitOrder) (*MsgWithdrawFilledLimitOrderResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method WithdrawFilledLimitOrder not implemented")
 }
 func (*UnimplementedMsgServer) CancelLimitOrder(ctx context.Context, req *MsgCancelLimitOrder) (*MsgCancelLimitOrderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CancelLimitOrder not implemented")
@@ -1009,20 +1023,20 @@ func _Msg_PlaceLimitOrder_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_WithdrawlWithdrawnLimitOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgWithdrawlWithdrawnLimitOrder)
+func _Msg_WithdrawFilledLimitOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgWithdrawFilledLimitOrder)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).WithdrawlWithdrawnLimitOrder(ctx, in)
+		return srv.(MsgServer).WithdrawFilledLimitOrder(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/nicholasdotsol.duality.dex.Msg/WithdrawlWithdrawnLimitOrder",
+		FullMethod: "/nicholasdotsol.duality.dex.Msg/WithdrawFilledLimitOrder",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).WithdrawlWithdrawnLimitOrder(ctx, req.(*MsgWithdrawlWithdrawnLimitOrder))
+		return srv.(MsgServer).WithdrawFilledLimitOrder(ctx, req.(*MsgWithdrawFilledLimitOrder))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1066,8 +1080,8 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_PlaceLimitOrder_Handler,
 		},
 		{
-			MethodName: "WithdrawlWithdrawnLimitOrder",
-			Handler:    _Msg_WithdrawlWithdrawnLimitOrder_Handler,
+			MethodName: "WithdrawFilledLimitOrder",
+			Handler:    _Msg_WithdrawFilledLimitOrder_Handler,
 		},
 		{
 			MethodName: "CancelLimitOrder",
@@ -1539,7 +1553,7 @@ func (m *MsgPlaceLimitOrderResponse) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgWithdrawlWithdrawnLimitOrder) Marshal() (dAtA []byte, err error) {
+func (m *MsgWithdrawFilledLimitOrder) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1549,12 +1563,12 @@ func (m *MsgWithdrawlWithdrawnLimitOrder) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgWithdrawlWithdrawnLimitOrder) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgWithdrawFilledLimitOrder) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgWithdrawlWithdrawnLimitOrder) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgWithdrawFilledLimitOrder) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1562,31 +1576,38 @@ func (m *MsgWithdrawlWithdrawnLimitOrder) MarshalToSizedBuffer(dAtA []byte) (int
 	if m.Key != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.Key))
 		i--
-		dAtA[i] = 0x30
+		dAtA[i] = 0x38
 	}
 	if len(m.KeyToken) > 0 {
 		i -= len(m.KeyToken)
 		copy(dAtA[i:], m.KeyToken)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.KeyToken)))
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x32
 	}
 	if m.TickIndex != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.TickIndex))
 		i--
-		dAtA[i] = 0x20
+		dAtA[i] = 0x28
 	}
 	if len(m.TokenB) > 0 {
 		i -= len(m.TokenB)
 		copy(dAtA[i:], m.TokenB)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.TokenB)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x22
 	}
 	if len(m.TokenA) > 0 {
 		i -= len(m.TokenA)
 		copy(dAtA[i:], m.TokenA)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.TokenA)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Receiver) > 0 {
+		i -= len(m.Receiver)
+		copy(dAtA[i:], m.Receiver)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Receiver)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -1600,7 +1621,7 @@ func (m *MsgWithdrawlWithdrawnLimitOrder) MarshalToSizedBuffer(dAtA []byte) (int
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgWithdrawlWithdrawnLimitOrderResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgWithdrawFilledLimitOrderResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1610,12 +1631,12 @@ func (m *MsgWithdrawlWithdrawnLimitOrderResponse) Marshal() (dAtA []byte, err er
 	return dAtA[:n], nil
 }
 
-func (m *MsgWithdrawlWithdrawnLimitOrderResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgWithdrawFilledLimitOrderResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgWithdrawlWithdrawnLimitOrderResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgWithdrawFilledLimitOrderResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1646,31 +1667,38 @@ func (m *MsgCancelLimitOrder) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if m.Key != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.Key))
 		i--
-		dAtA[i] = 0x30
+		dAtA[i] = 0x38
 	}
 	if len(m.KeyToken) > 0 {
 		i -= len(m.KeyToken)
 		copy(dAtA[i:], m.KeyToken)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.KeyToken)))
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x32
 	}
 	if m.TickIndex != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.TickIndex))
 		i--
-		dAtA[i] = 0x20
+		dAtA[i] = 0x28
 	}
 	if len(m.TokenB) > 0 {
 		i -= len(m.TokenB)
 		copy(dAtA[i:], m.TokenB)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.TokenB)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x22
 	}
 	if len(m.TokenA) > 0 {
 		i -= len(m.TokenA)
 		copy(dAtA[i:], m.TokenA)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.TokenA)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Receiver) > 0 {
+		i -= len(m.Receiver)
+		copy(dAtA[i:], m.Receiver)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Receiver)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -1917,13 +1945,17 @@ func (m *MsgPlaceLimitOrderResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgWithdrawlWithdrawnLimitOrder) Size() (n int) {
+func (m *MsgWithdrawFilledLimitOrder) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
 	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Receiver)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -1948,7 +1980,7 @@ func (m *MsgWithdrawlWithdrawnLimitOrder) Size() (n int) {
 	return n
 }
 
-func (m *MsgWithdrawlWithdrawnLimitOrderResponse) Size() (n int) {
+func (m *MsgWithdrawFilledLimitOrderResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1964,6 +1996,10 @@ func (m *MsgCancelLimitOrder) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Receiver)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -3512,7 +3548,7 @@ func (m *MsgPlaceLimitOrderResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgWithdrawlWithdrawnLimitOrder) Unmarshal(dAtA []byte) error {
+func (m *MsgWithdrawFilledLimitOrder) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3535,10 +3571,10 @@ func (m *MsgWithdrawlWithdrawnLimitOrder) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgWithdrawlWithdrawnLimitOrder: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgWithdrawFilledLimitOrder: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgWithdrawlWithdrawnLimitOrder: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgWithdrawFilledLimitOrder: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -3575,6 +3611,38 @@ func (m *MsgWithdrawlWithdrawnLimitOrder) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Receiver", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Receiver = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TokenA", wireType)
 			}
 			var stringLen uint64
@@ -3605,7 +3673,7 @@ func (m *MsgWithdrawlWithdrawnLimitOrder) Unmarshal(dAtA []byte) error {
 			}
 			m.TokenA = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 3:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TokenB", wireType)
 			}
@@ -3637,7 +3705,7 @@ func (m *MsgWithdrawlWithdrawnLimitOrder) Unmarshal(dAtA []byte) error {
 			}
 			m.TokenB = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		case 5:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TickIndex", wireType)
 			}
@@ -3656,7 +3724,7 @@ func (m *MsgWithdrawlWithdrawnLimitOrder) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 5:
+		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field KeyToken", wireType)
 			}
@@ -3688,7 +3756,7 @@ func (m *MsgWithdrawlWithdrawnLimitOrder) Unmarshal(dAtA []byte) error {
 			}
 			m.KeyToken = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 6:
+		case 7:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
 			}
@@ -3728,7 +3796,7 @@ func (m *MsgWithdrawlWithdrawnLimitOrder) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgWithdrawlWithdrawnLimitOrderResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgWithdrawFilledLimitOrderResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3751,10 +3819,10 @@ func (m *MsgWithdrawlWithdrawnLimitOrderResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgWithdrawlWithdrawnLimitOrderResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgWithdrawFilledLimitOrderResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgWithdrawlWithdrawnLimitOrderResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgWithdrawFilledLimitOrderResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -3841,6 +3909,38 @@ func (m *MsgCancelLimitOrder) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Receiver", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Receiver = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TokenA", wireType)
 			}
 			var stringLen uint64
@@ -3871,7 +3971,7 @@ func (m *MsgCancelLimitOrder) Unmarshal(dAtA []byte) error {
 			}
 			m.TokenA = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 3:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TokenB", wireType)
 			}
@@ -3903,7 +4003,7 @@ func (m *MsgCancelLimitOrder) Unmarshal(dAtA []byte) error {
 			}
 			m.TokenB = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		case 5:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TickIndex", wireType)
 			}
@@ -3922,7 +4022,7 @@ func (m *MsgCancelLimitOrder) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 5:
+		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field KeyToken", wireType)
 			}
@@ -3954,7 +4054,7 @@ func (m *MsgCancelLimitOrder) Unmarshal(dAtA []byte) error {
 			}
 			m.KeyToken = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 6:
+		case 7:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
 			}

@@ -9,9 +9,10 @@ const TypeMsgPlaceLimitOrder = "place_limit_order"
 
 var _ sdk.Msg = &MsgPlaceLimitOrder{}
 
-func NewMsgPlaceLimitOrder(creator string, tokenA string, tokenB string, tickIndex int64, tokenIn string, amountIn sdk.Dec) *MsgPlaceLimitOrder {
+func NewMsgPlaceLimitOrder(creator string, receiver string, tokenA string, tokenB string, tickIndex int64, tokenIn string, amountIn sdk.Dec) *MsgPlaceLimitOrder {
 	return &MsgPlaceLimitOrder{
 		Creator:   creator,
+		Receiver:  receiver,
 		TokenA:    tokenA,
 		TokenB:    tokenB,
 		TickIndex: tickIndex,

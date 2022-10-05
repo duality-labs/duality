@@ -12,23 +12,24 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdWithdrawlWithdrawnLimitOrder() *cobra.Command {
+func CmdWithdrawFilledLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "withdrawl-withdrawn-limit-order [token-a] [token-b] [tick-index] [key-token] [key]",
-		Short: "Broadcast message WithdrawlWithdrawnLimitOrder",
+		Use:   "withdrawl-withdrawn-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [key]",
+		Short: "Broadcast message WithdrawFilledLimitOrder",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argTokenA := args[0]
-			argTokenB := args[1]
-			argTickIndex := args[2]
+			argReceiver := args[0]
+			argTokenA := args[1]
+			argTokenB := args[2]
+			argTickIndex := args[3]
 			argTickIndexInt, err := strconv.Atoi(argTickIndex)
 
 			if err != nil {
 				return err
 			}
 
-			argKeyToken := args[3]
-			argKey := args[4]
+			argKeyToken := args[4]
+			argKey := args[5]
 
 			argKeyInt, err := strconv.Atoi(argKey)
 
@@ -41,8 +42,9 @@ func CmdWithdrawlWithdrawnLimitOrder() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgWithdrawlWithdrawnLimitOrder(
+			msg := types.NewMsgWithdrawFilledLimitOrder(
 				clientCtx.GetFromAddress().String(),
+				argReceiver,
 				argTokenA,
 				argTokenB,
 				int64(argTickIndexInt),

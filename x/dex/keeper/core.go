@@ -763,17 +763,26 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		if !ReserveMapFound {
 			ReserveMap.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey
 			ReserveMap.Reserves = sdk.ZeroDec()
+			ReserveMap.TickIndex = msg.TickIndex
+			ReserveMap.Token = msg.TokenIn
+			ReserveMap.PairId = pairId
 		}
 
 		if !UserShareMapFound {
 			UserShareMap.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey
 			UserShareMap.Address = msg.Creator
 			UserShareMap.SharesOwned = sdk.ZeroDec()
+			UserShareMap.TickIndex = msg.TickIndex
+			UserShareMap.Token = msg.TokenIn
+			UserShareMap.PairId = pairId
 		}
 
 		if !TotalShareMapFound {
 			TotalSharesMap.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey
 			TotalSharesMap.TotalShares = sdk.ZeroDec()
+			TotalSharesMap.TickIndex = msg.TickIndex
+			TotalSharesMap.Token = msg.TokenIn
+			TotalSharesMap.PairId = pairId
 		}
 
 		ReserveMap.Reserves = ReserveMap.Reserves.Add(msg.AmountIn)
@@ -784,10 +793,10 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		UserShareMap.SharesOwned = UserShareMap.SharesOwned.Add(newShares)
 		TotalSharesMap.TotalShares = TotalSharesMap.TotalShares.Add(newShares)
 
-		k.SetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.TokenIn, FillMap)
-		k.SetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.TokenIn, ReserveMap)
-		k.SetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.TokenIn, UserShareMap)
-		k.SetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.TokenIn, TotalSharesMap)
+		k.SetLimitOrderPoolFillMap(ctx, FillMap)
+		k.SetLimitOrderPoolReserveMap(ctx, ReserveMap)
+		k.SetLimitOrderPoolUserShareMap(ctx, UserShareMap)
+		k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesMap)
 
 	} else {
 		FillMap, FillMapFound := k.GetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
@@ -834,10 +843,10 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		UserShareMap.SharesOwned = UserShareMap.SharesOwned.Add(newShares)
 		TotalSharesMap.TotalShares = TotalSharesMap.TotalShares.Add(newShares)
 
-		k.SetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.TokenIn, FillMap)
-		k.SetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.TokenIn, ReserveMap)
-		k.SetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.TokenIn, UserShareMap)
-		k.SetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.TokenIn, TotalSharesMap)
+		k.SetLimitOrderPoolFillMap(ctx, FillMap)
+		k.SetLimitOrderPoolReserveMap(ctx, ReserveMap)
+		k.SetLimitOrderPoolUserShareMap(ctx, UserShareMap)
+		k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesMap)
 	}
 
 	if msg.AmountIn.GT(sdk.ZeroDec()) {
@@ -854,7 +863,7 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	return nil
 }
 
-func (k Keeper) WithdrawWithdrawnLimitOrderCore(goCtx context.Context, msg *types.MsgWithdrawlWithdrawnLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress) error {
+func (k Keeper) WithdrawWithdrawnLimitOrderCore(goCtx context.Context, msg *types.MsgWithdrawFilledLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId := k.CreatePairId(token0, token1)
 	tick, tickFound := k.GetTickMap(ctx, pairId, msg.TickIndex)
@@ -883,11 +892,11 @@ func (k Keeper) WithdrawWithdrawnLimitOrderCore(goCtx context.Context, msg *type
 		UserShareMap.SharesOwned = UserShareMap.SharesOwned.Sub(sharesOut)
 		amountOut = (sharesOut.Mul(FillMap.Fill)).Quo(TotalSharesMap.TotalShares)
 
-		k.SetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.KeyToken, FillMap)
-		k.SetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.KeyToken, ReserveMap)
-		k.SetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, UserShareMap)
-		k.SetLimitOrderPoolUserSharesWithdrawn(ctx, pairId, msg.TickIndex, msg.KeyToken, UserSharesFillMap)
-		k.SetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.KeyToken, TotalSharesMap)
+		k.SetLimitOrderPoolFillMap(ctx, FillMap)
+		k.SetLimitOrderPoolReserveMap(ctx, ReserveMap)
+		k.SetLimitOrderPoolUserShareMap(ctx, UserShareMap)
+		k.SetLimitOrderPoolUserSharesWithdrawn(ctx, UserSharesFillMap)
+		k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesMap)
 
 		if amountOut.GT(sdk.ZeroDec()) {
 			coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountOut.BigInt()))
@@ -916,11 +925,11 @@ func (k Keeper) WithdrawWithdrawnLimitOrderCore(goCtx context.Context, msg *type
 		UserShareMap.SharesOwned = UserShareMap.SharesOwned.Sub(sharesOut)
 		amountOut = (sharesOut.Mul(FillMap.Fill)).Quo(TotalSharesMap.TotalShares)
 
-		k.SetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.KeyToken, FillMap)
-		k.SetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.KeyToken, ReserveMap)
-		k.SetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, UserShareMap)
-		k.SetLimitOrderPoolUserSharesWithdrawn(ctx, pairId, msg.TickIndex, msg.KeyToken, UserSharesFillMap)
-		k.SetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.KeyToken, TotalSharesMap)
+		k.SetLimitOrderPoolFillMap(ctx, FillMap)
+		k.SetLimitOrderPoolReserveMap(ctx, ReserveMap)
+		k.SetLimitOrderPoolUserShareMap(ctx, UserShareMap)
+		k.SetLimitOrderPoolUserSharesWithdrawn(ctx, UserSharesFillMap)
+		k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesMap)
 
 		if amountOut.GT(sdk.ZeroDec()) {
 			coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountOut.BigInt()))

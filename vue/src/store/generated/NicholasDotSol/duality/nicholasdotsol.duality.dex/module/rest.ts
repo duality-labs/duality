@@ -77,7 +77,7 @@ export type DexMsgPlaceLimitOrderResponse = object;
 
 export type DexMsgSwapResponse = object;
 
-export type DexMsgWithdrawlWithdrawnLimitOrderResponse = object;
+export type DexMsgWithdrawFilledLimitOrderResponse = object;
 
 export type DexMsgWithdrawlResponse = object;
 

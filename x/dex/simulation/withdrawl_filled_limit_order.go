@@ -10,7 +10,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 )
 
-func SimulateMsgWithdrawlWithdrawnLimitOrder(
+func SimulateMsgWithdrawFilledLimitOrder(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	k keeper.Keeper,
@@ -18,12 +18,12 @@ func SimulateMsgWithdrawlWithdrawnLimitOrder(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
-		msg := &types.MsgWithdrawlWithdrawnLimitOrder{
+		msg := &types.MsgWithdrawFilledLimitOrder{
 			Creator: simAccount.Address.String(),
 		}
 
-		// TODO: Handling the WithdrawlWithdrawnLimitOrder simulation
+		// TODO: Handling the WithdrawFilledLimitOrder simulation
 
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "WithdrawlWithdrawnLimitOrder simulation not implemented"), nil, nil
+		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "WithdrawFilledLimitOrder simulation not implemented"), nil, nil
 	}
 }

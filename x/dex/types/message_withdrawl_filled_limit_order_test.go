@@ -8,21 +8,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMsgWithdrawlWithdrawnLimitOrder_ValidateBasic(t *testing.T) {
+func TestMsgWithdrawFilledLimitOrder_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgWithdrawlWithdrawnLimitOrder
+		msg  MsgWithdrawFilledLimitOrder
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgWithdrawlWithdrawnLimitOrder{
+			msg: MsgWithdrawFilledLimitOrder{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: MsgWithdrawlWithdrawnLimitOrder{
+			msg: MsgWithdrawFilledLimitOrder{
 				Creator: sample.AccAddress(),
 			},
 		},

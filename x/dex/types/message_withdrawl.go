@@ -12,12 +12,12 @@ var _ sdk.Msg = &MsgWithdrawl{}
 func NewMsgWithdrawl(creator string, receiver string, tokenA string, tokenB string, sharesToRemove []sdk.Dec, tickIndexes []int64, feeIndexes []uint64) *MsgWithdrawl {
 	return &MsgWithdrawl{
 		Creator:        creator,
+		Receiver:       receiver,
 		TokenA:         tokenA,
 		TokenB:         tokenB,
 		SharesToRemove: sharesToRemove,
 		TickIndexes:    tickIndexes,
 		FeeIndexes:     feeIndexes,
-		Receiver:       receiver,
 	}
 }
 

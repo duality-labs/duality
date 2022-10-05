@@ -5,13 +5,14 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const TypeMsgWithdrawlWithdrawnLimitOrder = "withdrawl_withdrawn_limit_order"
+const TypeMsgWithdrawFilledLimitOrder = "withdrawl_withdrawn_limit_order"
 
-var _ sdk.Msg = &MsgWithdrawlWithdrawnLimitOrder{}
+var _ sdk.Msg = &MsgWithdrawFilledLimitOrder{}
 
-func NewMsgWithdrawlWithdrawnLimitOrder(creator string, tokenA string, tokenB string, tickIndex int64, keyToken string, key uint64) *MsgWithdrawlWithdrawnLimitOrder {
-	return &MsgWithdrawlWithdrawnLimitOrder{
+func NewMsgWithdrawFilledLimitOrder(creator string, receiver string, tokenA string, tokenB string, tickIndex int64, keyToken string, key uint64) *MsgWithdrawFilledLimitOrder {
+	return &MsgWithdrawFilledLimitOrder{
 		Creator:   creator,
+		Receiver:  receiver,
 		TokenA:    tokenA,
 		TokenB:    tokenB,
 		TickIndex: tickIndex,
@@ -20,15 +21,15 @@ func NewMsgWithdrawlWithdrawnLimitOrder(creator string, tokenA string, tokenB st
 	}
 }
 
-func (msg *MsgWithdrawlWithdrawnLimitOrder) Route() string {
+func (msg *MsgWithdrawFilledLimitOrder) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgWithdrawlWithdrawnLimitOrder) Type() string {
-	return TypeMsgWithdrawlWithdrawnLimitOrder
+func (msg *MsgWithdrawFilledLimitOrder) Type() string {
+	return TypeMsgWithdrawFilledLimitOrder
 }
 
-func (msg *MsgWithdrawlWithdrawnLimitOrder) GetSigners() []sdk.AccAddress {
+func (msg *MsgWithdrawFilledLimitOrder) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -36,12 +37,12 @@ func (msg *MsgWithdrawlWithdrawnLimitOrder) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgWithdrawlWithdrawnLimitOrder) GetSignBytes() []byte {
+func (msg *MsgWithdrawFilledLimitOrder) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgWithdrawlWithdrawnLimitOrder) ValidateBasic() error {
+func (msg *MsgWithdrawFilledLimitOrder) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)

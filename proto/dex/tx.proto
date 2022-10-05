@@ -11,7 +11,7 @@ service Msg {
   rpc Withdrawl(MsgWithdrawl) returns (MsgWithdrawlResponse);
   rpc Swap(MsgSwap) returns (MsgSwapResponse);
   rpc PlaceLimitOrder(MsgPlaceLimitOrder) returns (MsgPlaceLimitOrderResponse);
-  rpc WithdrawlWithdrawnLimitOrder(MsgWithdrawlWithdrawnLimitOrder) returns (MsgWithdrawlWithdrawnLimitOrderResponse);
+  rpc WithdrawFilledLimitOrder(MsgWithdrawFilledLimitOrder) returns (MsgWithdrawFilledLimitOrderResponse);
   rpc CancelLimitOrder(MsgCancelLimitOrder) returns (MsgCancelLimitOrderResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
@@ -102,25 +102,27 @@ message MsgPlaceLimitOrder {
 message MsgPlaceLimitOrderResponse {
 }
 
-message MsgWithdrawlWithdrawnLimitOrder {
+message MsgWithdrawFilledLimitOrder {
   string creator = 1;
-  string tokenA = 2;
-  string tokenB = 3;
-  int64 tickIndex = 4;
-  string keyToken = 5;
-  uint64 key = 6;
+  string receiver = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  int64 tickIndex = 5;
+  string keyToken = 6;
+  uint64 key = 7;
 }
 
-message MsgWithdrawlWithdrawnLimitOrderResponse {
+message MsgWithdrawFilledLimitOrderResponse {
 }
 
 message MsgCancelLimitOrder {
   string creator = 1;
-  string tokenA = 2;
-  string tokenB = 3;
-  int64 tickIndex = 4;
-  string keyToken = 5;
-  uint64 key = 6;
+  string receiver = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  int64 tickIndex = 5;
+  string keyToken = 6;
+  uint64 key = 7;
 }
 
 message MsgCancelLimitOrderResponse {
