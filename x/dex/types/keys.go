@@ -280,7 +280,7 @@ const (
 )
 
 const (
-	SwapEventKey      = "NewWithdraw"
+	SwapEventKey      = "NewSwap"
 	SwapEventCreator  = "Creator"
 	SwapEventReceiver = "Receiver"
 	SwapEventToken0   = "Token0"
@@ -289,6 +289,29 @@ const (
 	SwapEventAmountIn = "AmountIn"
 	SwapEventMinOut   = "MinOut"
 	SwapEventAmoutOut = "AmountOut"
+)
+
+const (
+	PlaceLimitOrderEventKey        = "NewPlaceLimitOrder"
+	PlaceLimitOrderEventCreator    = "Creator"
+	PlaceLimitOrderEventReceiver   = "Receiver"
+	PlaceLimitOrderEventToken0     = "Token0"
+	PlaceLimitOrderEventToken1     = "Token1"
+	PlaceLimitOrderEventTokenIn    = "TokenIn"
+	PlaceLimitOrderEventAmountIn   = "AmountIn"
+	PlaceLimitOrderEventShares     = "Shares"
+	PlaceLimitOrderEventCurrentKey = "CurrentLimitOrderKey"
+)
+
+const (
+	WithdrawFilledLimitOrderEventKey           = "NewWithdraw"
+	WithdrawFilledLimitOrderEventCreator       = "Creator"
+	WithdrawFilledLimitOrderEventReceiver      = "Receiver"
+	WithdrawFilledLimitOrderEventToken0        = "Token0"
+	WithdrawFilledLimitOrderEventToken1        = "Token1"
+	WithdrawFilledLimitOrderEventTokenKey      = "TokenKey"
+	WithdrawFilledLimitOrderEventLimitOrderKey = "LimitOrderKey"
+	WithdrawFilledLimitOrderEventAmountOut     = "AmountOut"
 )
 
 const (

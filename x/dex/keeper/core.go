@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"strconv"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -738,6 +739,8 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		tick.LimitOrderPool1To0.Count = 0
 		tick.LimitOrderPool1To0.CurrentLimitOrderKey = 0
 	}
+	var key uint64
+	var newShares sdk.Dec
 
 	if msg.TokenIn == token0 {
 		FillMap, FillMapFound := k.GetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
@@ -745,14 +748,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		if !FillMapFound {
 			FillMap.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey
 			FillMap.Fill = sdk.ZeroDec()
-		}
-
-		if tick.LimitOrderPool0To1.Count == tick.LimitOrderPool0To1.CurrentLimitOrderKey {
-
-			if !FillMapFound && FillMap.Fill.GT(sdk.ZeroDec()) {
-				tick.LimitOrderPool0To1.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey + 1
-			}
-		} else {
+		} else if tick.LimitOrderPool0To1.Count == tick.LimitOrderPool0To1.CurrentLimitOrderKey && FillMap.Fill.GT(sdk.ZeroDec()) {
 			tick.LimitOrderPool0To1.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey + 1
 		}
 
@@ -786,7 +782,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		}
 
 		ReserveMap.Reserves = ReserveMap.Reserves.Add(msg.AmountIn)
-		newShares, err := k.Calc_price(msg.TickIndex)
+		newShares, err = k.Calc_price(msg.TickIndex)
 		if err != nil {
 			return err
 		}
@@ -797,21 +793,14 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		k.SetLimitOrderPoolReserveMap(ctx, ReserveMap)
 		k.SetLimitOrderPoolUserShareMap(ctx, UserShareMap)
 		k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesMap)
-
+		key = tick.LimitOrderPool0To1.CurrentLimitOrderKey
 	} else {
 		FillMap, FillMapFound := k.GetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
 
 		if !FillMapFound {
 			FillMap.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey
 			FillMap.Fill = sdk.ZeroDec()
-		}
-
-		if tick.LimitOrderPool1To0.Count == tick.LimitOrderPool1To0.CurrentLimitOrderKey {
-
-			if !FillMapFound && FillMap.Fill.GT(sdk.ZeroDec()) {
-				tick.LimitOrderPool1To0.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey + 1
-			}
-		} else {
+		} else if tick.LimitOrderPool1To0.Count == tick.LimitOrderPool1To0.CurrentLimitOrderKey && FillMap.Fill.GT(sdk.ZeroDec()) {
 			tick.LimitOrderPool1To0.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey + 1
 		}
 
@@ -836,7 +825,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		}
 
 		ReserveMap.Reserves = ReserveMap.Reserves.Add(msg.AmountIn)
-		newShares, err := k.Calc_price(msg.TickIndex)
+		newShares, err = k.Calc_price(msg.TickIndex)
 		if err != nil {
 			return err
 		}
@@ -847,7 +836,19 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		k.SetLimitOrderPoolReserveMap(ctx, ReserveMap)
 		k.SetLimitOrderPoolUserShareMap(ctx, UserShareMap)
 		k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesMap)
+		key = tick.LimitOrderPool1To0.CurrentLimitOrderKey
 	}
+
+	pair, _ := k.GetPairMap(ctx, pairId)
+	// If a new tick has been placed that tigtens the range between currentTick0to1 and currentTick0to1 update CurrentTicks to the tighest ticks
+	// @Dev assumes that msg.amountIn > 0
+	if msg.TokenIn == token0 && ((msg.TickIndex > pair.TokenPair.CurrentTick0To1) && (msg.TickIndex < pair.TokenPair.CurrentTick1To0)) {
+		pair.TokenPair.CurrentTick1To0 = msg.TickIndex
+	} else if (msg.TickIndex > pair.TokenPair.CurrentTick0To1) && (msg.TickIndex < pair.TokenPair.CurrentTick1To0) {
+		pair.TokenPair.CurrentTick0To1 = msg.TickIndex
+	}
+	// updates currentTick1to0/0To1 given the conditionals above
+	k.SetPairMap(ctx, pair)
 
 	if msg.AmountIn.GT(sdk.ZeroDec()) {
 		coin0 := sdk.NewCoin(msg.TokenIn, sdk.NewIntFromBigInt(msg.AmountIn.BigInt()))
@@ -855,6 +856,11 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 			return err
 		}
 	}
+
+	ctx.EventManager().EmitEvent(types.CreatePlaceLimitOrderEvent(msg.Creator, msg.Receiver,
+		token0, token1, msg.TokenIn, msg.AmountIn.String(), newShares.String(), strconv.Itoa(int(key)),
+	))
+
 	return nil
 }
 
@@ -937,6 +943,10 @@ func (k Keeper) WithdrawWithdrawnLimitOrderCore(goCtx context.Context, msg *type
 				return err
 			}
 		}
+
+		ctx.EventManager().EmitEvent(types.WithdrawFilledLimitOrderEvent(msg.Creator, msg.Receiver,
+			token0, token1, msg.KeyToken, strconv.Itoa(int(msg.Key)), amountOut.String(),
+		))
 	}
 
 	return nil
