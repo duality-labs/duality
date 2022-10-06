@@ -113,17 +113,20 @@ func (k Keeper) getValidRoutes(goCtx context.Context, tokenIn string, tokenOut s
 // Assumes all routes passed in are valid
 func (k Keeper) updatePrices(goCtx context.Context, tokenIn string, tokenOut string, routes []Route) ([]Route, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	newRoutes := []Route{}
 	for _, route := range routes {
-		price, err := k.updateRoutePrice(ctx, route)
-		if err != nil {
-			return nil, err
+		// No err from route price
+		price, _ := k.updateRoutePrice(ctx, route)
+		if price.GT(sdk.ZeroDec()) {
+			newRoutes = append(newRoutes, Route{route.path, price})
 		}
-		route.price = price
 	}
-	return routes, nil
+	return newRoutes, nil
 }
 
 // Updates price for a specific route
+// TODO: Check that route has liquidity!
+// Return 0 if route has no liquidity
 func (k Keeper) updateRoutePrice(ctx sdk.Context, route Route) (sdk.Dec, error) {
 	price := sdk.NewDec(1)
 	for i := 0; i < len(route.path)-1; i++ {
@@ -136,17 +139,26 @@ func (k Keeper) updateRoutePrice(ctx sdk.Context, route Route) (sdk.Dec, error) 
 			if pairFound {
 				// Multiply price according to tick
 				if route.path[i] == token0 {
-					tickPrice, err := k.Calc_price(pair.TokenPair.CurrentTick0To1)
-					if err != nil {
-						return sdk.ZeroDec(), err
+					// Checks if there are active ticks
+					// TODO: THIS DOES NOT WORK B/C IT DOESN"T CHECK IF THERE ARE NO TICKS ON ONE SIDE
+					if pair.PairCount > 0 {
+						tickPrice, err := k.Calc_price(pair.TokenPair.CurrentTick0To1)
+						if err != nil {
+							return sdk.ZeroDec(), err
+						}
+						price = price.Mul(tickPrice)
 					}
-					price = price.Mul(tickPrice)
+
 				} else {
-					tickPrice, err := k.Calc_price(pair.TokenPair.CurrentTick1To0)
-					if err != nil {
-						return sdk.ZeroDec(), err
+					// Checks if there are active ticks
+					// TODO: THIS DOES NOT WORK B/C IT DOESN"T CHECK IF THERE ARE NO TICKS ON ONE SIDE
+					if pair.PairCount > 0 {
+						tickPrice, err := k.Calc_price(pair.TokenPair.CurrentTick1To0)
+						if err != nil {
+							return sdk.ZeroDec(), err
+						}
+						price = price.Mul(tickPrice)
 					}
-					price = price.Mul(tickPrice)
 				}
 			}
 		}
