@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 	"sort"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
@@ -175,42 +176,73 @@ func (k Keeper) SwapDynamicRouter(goCtx context.Context, callerAddress sdk.AccAd
 	totalAmountOut := sdk.ZeroDec()
 	// Swap while there is still amountIn
 	for amountLeft.GT(sdk.ZeroDec()) {
+		// TODO: Check this works, sort routes by price
 		sort.SliceStable(routes, func(i, j int) bool {
 			return routes[j].price.GT(routes[i].price)
 		})
+		fmt.Println("Sorted routes: ", routes)
 		// Get the best route & the second best price
 		bestRoute := routes[0]
-		secondBestPrice := routes[1].price
+		secondBestPrice := sdk.ZeroDec()
+		if len(routes) > 1 {
+			secondBestPrice = routes[1].price
+		}
 
 		// ((bestRoute.price*amountLeft)+totalAmountOut) < minOut
 		// If the price is no longer good enough (at best) to reach minOut, return
 		if (bestRoute.price.Mul(amountLeft).Add(totalAmountOut)).LT(minOut) {
 			return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 		}
-		for bestRoute.price.GT(secondBestPrice) {
-			// Either take 5% chunk or amountLeft if smaller than 5% of amountIn
-			amountToSwap := sdk.MinDec(amountIn.QuoInt64(20), amountLeft)
 
-			// Subtract amountToSwap from amountLeft
-			amountLeft = amountLeft.Sub(amountToSwap)
+		amountToSwap := amountLeft
+		minOutToSwitchRoutes := secondBestPrice.Mul(amountLeft).Add(totalAmountOut)
 
-			// Swap the 5% chunk and see what amountOutFromSwap is
-			amountOutFromSwap, err := k.swapAcrossRoute(goCtx, callerAddress, bestRoute, amountToSwap)
+		// Subtract amountToSwap from amountLeft
+		amountLeft = amountLeft.Sub(amountToSwap)
 
-			if err != nil {
-				return sdk.ZeroDec(), err
-			}
+		fmt.Println("BestRoute:  ", bestRoute, "AmountToSwap: ", amountToSwap)
+		// Swap the 5% chunk and see what amountOutFromSwap is
+		amountOutFromSwap, err := k.swapAcrossRoute(goCtx, callerAddress, bestRoute, amountToSwap)
 
-			// Add amountOut from swap to totalAmountOut
-			totalAmountOut = totalAmountOut.Add(amountOutFromSwap)
-
-			// Update the route price for the best route
-			updatedPrice, err := k.updateRoutePrice(ctx, bestRoute)
-			if err != nil {
-				return sdk.ZeroDec(), err
-			}
-			bestRoute.price = updatedPrice
+		if err != nil {
+			return sdk.ZeroDec(), err
 		}
+		// Add amountOut from swap to totalAmountOut
+		totalAmountOut = totalAmountOut.Add(amountOutFromSwap)
+		fmt.Println("totalAmountOut: ", totalAmountOut)
+
+		// Update the route price for the best route
+		updatedPrice, err := k.updateRoutePrice(ctx, bestRoute)
+		if err != nil {
+			return sdk.ZeroDec(), err
+		}
+		bestRoute.price = updatedPrice
+		// for bestRoute.price.GT(secondBestPrice) && amountLeft.GT(sdk.ZeroDec()) {
+		// 	// // Either take 5% chunk or amountLeft if smaller than 5% of amountIn
+		// 	// amountToSwap := sdk.MinDec(amountIn.QuoInt64(20), amountLeft)
+		// 	amountToSwap := amountLeft
+
+		// 	// Subtract amountToSwap from amountLeft
+		// 	amountLeft = amountLeft.Sub(amountToSwap)
+
+		// 	fmt.Println("BestRoute:  ", bestRoute, "AmountToSwap: ", amountToSwap)
+		// 	// Swap the 5% chunk and see what amountOutFromSwap is
+		// 	amountOutFromSwap, err := k.swapAcrossRoute(goCtx, callerAddress, bestRoute, amountToSwap)
+
+		// 	if err != nil {
+		// 		return sdk.ZeroDec(), err
+		// 	}
+		// 	// Add amountOut from swap to totalAmountOut
+		// 	totalAmountOut = totalAmountOut.Add(amountOutFromSwap)
+		// 	fmt.Println("totalAmountOut: ", totalAmountOut)
+
+		// 	// Update the route price for the best route
+		// 	updatedPrice, err := k.updateRoutePrice(ctx, bestRoute)
+		// 	if err != nil {
+		// 		return sdk.ZeroDec(), err
+		// 	}
+		// 	bestRoute.price = updatedPrice
+		// }
 		// Update prices according to new updates from swap
 		routes, err = k.updatePrices(goCtx, tokenIn, tokenOut, routes)
 
@@ -224,6 +256,9 @@ func (k Keeper) SwapDynamicRouter(goCtx context.Context, callerAddress sdk.AccAd
 }
 
 // Swap across a route
+
+// Core function, can use any arbitrary SwapDynamicRouter
+// i.e. Optimal Routing from Bain, BF, etc.
 func (k Keeper) swapAcrossRoute(goCtx context.Context, callerAddress sdk.AccAddress, bestRoute Route, amountIn sdk.Dec) (amountFromSwap sdk.Dec, err error) {
 	amountToSwap := amountIn
 
@@ -231,6 +266,7 @@ func (k Keeper) swapAcrossRoute(goCtx context.Context, callerAddress sdk.AccAddr
 	for i := 0; i < len(bestRoute.path)-1; i++ {
 		// Gets each pair sequentially
 		token0, token1, _ := k.SortTokens(bestRoute.path[i], bestRoute.path[i+1])
+		fmt.Println("Token0: ", token0, "Token1: ", token1)
 		if token0 == bestRoute.path[i] {
 			// TODO: Slippage check for the route
 			// minAmountOut
