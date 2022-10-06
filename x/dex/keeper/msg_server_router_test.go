@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"fmt"
-	"math/big"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
@@ -10,8 +9,8 @@ import (
 	//authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
-func NewCoin(amt *big.Int, tokenName string) sdk.Coin {
-	return sdk.NewCoin(tokenName, sdk.NewIntFromBigInt(amt))
+func NewBankBalance(tokenName string, amt int64) sdk.Coin {
+	return sdk.NewCoin(tokenName, sdk.NewIntFromBigInt(sdk.NewDec(amt).BigInt()))
 }
 
 // Swapping from JUNO to STARS through USDC
@@ -28,17 +27,17 @@ func (suite *IntegrationTestSuite) TestBasicMultiHopRoute() {
 	app.AccountKeeper.SetAccount(ctx, accLP)
 
 	// Base 18 decimals
-	balanceAlice := sdk.NewCoins(sdk.NewCoin("JUNO", sdk.NewInt(100000)))
-	fmt.Println(balanceAlice.AmountOf("JUNO"))
-	balanceLP := sdk.NewCoins(sdk.NewCoin("STARS", sdk.NewInt(100000)), sdk.NewCoin("DUAL", sdk.NewInt(100000)), sdk.NewCoin("USDC", sdk.NewInt(100000)))
+	balanceAlice := sdk.NewCoins(sdk.NewCoin("JUNO", sdk.NewIntFromBigInt(sdk.NewDec(100000).BigInt())))
+	fmt.Println("balance alice JUNO", balanceAlice.AmountOf("JUNO"))
+	balanceLP := sdk.NewCoins(sdk.NewCoin("STARS", sdk.NewIntFromBigInt(sdk.NewDec(100000).BigInt())), sdk.NewCoin("DUAL", sdk.NewIntFromBigInt(sdk.NewDec(100000).BigInt())), sdk.NewCoin("USDC", sdk.NewIntFromBigInt(sdk.NewDec(100000).BigInt())))
 
 	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
 	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, lp, balanceLP))
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, sdk.NewCoin("JUNO", sdk.NewInt(100000))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, lp, sdk.NewCoin("STARS", sdk.NewInt(100000))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, lp, sdk.NewCoin("DUAL", sdk.NewInt(100000))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, lp, sdk.NewCoin("USDC", sdk.NewInt(100000))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, sdk.NewCoin("JUNO", sdk.NewIntFromBigInt(sdk.NewDec(100000).BigInt()))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, lp, sdk.NewCoin("STARS", sdk.NewIntFromBigInt(sdk.NewDec(100000).BigInt()))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, lp, sdk.NewCoin("DUAL", sdk.NewIntFromBigInt(sdk.NewDec(100000).BigInt()))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, lp, sdk.NewCoin("USDC", sdk.NewIntFromBigInt(sdk.NewDec(100000).BigInt()))))
 	goCtx := sdk.WrapSDKContext(ctx)
 
 	// Set Fee List
@@ -53,8 +52,8 @@ func (suite *IntegrationTestSuite) TestBasicMultiHopRoute() {
 	_ = feeList
 	// fmt.Println(feeList)
 
-	tenThousandDec := sdk.NewDecFromInt(sdk.NewInt(10000))
-	fmt.Println(tenThousandDec)
+	tenThousandDec := sdk.NewDec(10000)
+	// fmt.Println("B2", tenThousandDec)
 	createResponse, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
 		Creator:     lp.String(),
 		TokenA:      "JUNO",
@@ -69,10 +68,10 @@ func (suite *IntegrationTestSuite) TestBasicMultiHopRoute() {
 	suite.Require().Nil(err)
 
 	// Confirm LP Balance post Deposit
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, lp, sdk.NewCoin("JUNO", sdk.NewInt(90000))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, lp, NewBankBalance("USDC", 90000)))
 
 	// Confirm Pool Balance
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), sdk.NewCoin("JUNO", sdk.NewInt(10000))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), NewBankBalance("USDC", 10000)))
 
 	_ = createResponse
 
@@ -93,8 +92,23 @@ func (suite *IntegrationTestSuite) TestBasicMultiHopRoute() {
 
 	_ = createResponse2
 
-	//fmt.Println(app.DexKeeper.GetAllPairMap(ctx))
+	// Slightly better price than 1:1
+	createResponse3, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
+		Creator:     lp.String(),
+		TokenA:      "JUNO",
+		TokenB:      "STARS",
+		AmountsA:    []sdk.Dec{sdk.ZeroDec()},
+		AmountsB:    []sdk.Dec{sdk.NewDec(5)},
+		TickIndexes: []int64{-1},
+		FeeIndexes:  []uint64{0},
+		Receiver:    lp.String(),
+	})
 
+	suite.Require().Nil(err)
+
+	_ = createResponse3
+
+	// fmt.Println("Making it to route")
 	swapResponse, err := suite.msgServer.Route(goCtx, &types.MsgRoute{
 		Creator:  alice.String(),
 		TokenIn:  "JUNO",
@@ -103,8 +117,10 @@ func (suite *IntegrationTestSuite) TestBasicMultiHopRoute() {
 		MinOut:   sdk.NewDec(0),
 		Receiver: alice.String(),
 	})
+	// fmt.Println("Post Route")
 
 	_ = swapResponse
+	// TODO: Figure out way to determine correct amount out
 	print(app.BankKeeper.GetBalance(ctx, alice, "STARS").Amount.String())
 	suite.Require().Nil(err)
 
