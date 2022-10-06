@@ -156,7 +156,7 @@ func (k Keeper) updateRoutePrice(ctx sdk.Context, route Route) (sdk.Dec, error) 
 
 /* TODO: Need to figure out how to compare against updated prices of all routes
 // Working theory: Not an issue because we save the price in a variable
-
+DUMMY ALGO
 */
 func (k Keeper) SwapDynamicRouter(goCtx context.Context, callerAddress sdk.AccAddress, tokenIn string, tokenOut string, amountIn sdk.Dec, minOut sdk.Dec) (sdk.Dec, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -194,20 +194,20 @@ func (k Keeper) SwapDynamicRouter(goCtx context.Context, callerAddress sdk.AccAd
 			return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 		}
 
-		amountToSwap := amountLeft
+		amountToSwap := sdk.MinDec(amountIn.QuoInt64(20), amountLeft)
 		minOutToSwitchRoutes := secondBestPrice.Mul(amountLeft).Add(totalAmountOut)
-
-		// Subtract amountToSwap from amountLeft
-		amountLeft = amountLeft.Sub(amountToSwap)
 
 		fmt.Println("BestRoute:  ", bestRoute, "AmountToSwap: ", amountToSwap)
 		// Swap the 5% chunk and see what amountOutFromSwap is
-		amountOutFromSwap, err := k.swapAcrossRoute(goCtx, callerAddress, bestRoute, amountToSwap)
+		amountOutFromSwap, err := k.swapAcrossRoute(goCtx, callerAddress, bestRoute, amountToSwap, minOutToSwitchRoutes)
 
 		if err != nil {
 			return sdk.ZeroDec(), err
 		}
-		// Add amountOut from swap to totalAmountOut
+		// Subtract amountToSwap from amountLeft
+		amountLeft = amountLeft.Sub(amountToSwap)
+
+		// Add amountOutFromSwap to totalAmountOut
 		totalAmountOut = totalAmountOut.Add(amountOutFromSwap)
 		fmt.Println("totalAmountOut: ", totalAmountOut)
 
@@ -217,33 +217,7 @@ func (k Keeper) SwapDynamicRouter(goCtx context.Context, callerAddress sdk.AccAd
 			return sdk.ZeroDec(), err
 		}
 		bestRoute.price = updatedPrice
-		// for bestRoute.price.GT(secondBestPrice) && amountLeft.GT(sdk.ZeroDec()) {
-		// 	// // Either take 5% chunk or amountLeft if smaller than 5% of amountIn
-		// 	// amountToSwap := sdk.MinDec(amountIn.QuoInt64(20), amountLeft)
-		// 	amountToSwap := amountLeft
 
-		// 	// Subtract amountToSwap from amountLeft
-		// 	amountLeft = amountLeft.Sub(amountToSwap)
-
-		// 	fmt.Println("BestRoute:  ", bestRoute, "AmountToSwap: ", amountToSwap)
-		// 	// Swap the 5% chunk and see what amountOutFromSwap is
-		// 	amountOutFromSwap, err := k.swapAcrossRoute(goCtx, callerAddress, bestRoute, amountToSwap)
-
-		// 	if err != nil {
-		// 		return sdk.ZeroDec(), err
-		// 	}
-		// 	// Add amountOut from swap to totalAmountOut
-		// 	totalAmountOut = totalAmountOut.Add(amountOutFromSwap)
-		// 	fmt.Println("totalAmountOut: ", totalAmountOut)
-
-		// 	// Update the route price for the best route
-		// 	updatedPrice, err := k.updateRoutePrice(ctx, bestRoute)
-		// 	if err != nil {
-		// 		return sdk.ZeroDec(), err
-		// 	}
-		// 	bestRoute.price = updatedPrice
-		// }
-		// Update prices according to new updates from swap
 		routes, err = k.updatePrices(goCtx, tokenIn, tokenOut, routes)
 
 		// Prices failed to Update
@@ -255,13 +229,12 @@ func (k Keeper) SwapDynamicRouter(goCtx context.Context, callerAddress sdk.AccAd
 	return totalAmountOut, nil
 }
 
-// Swap across a route
-
+// ORDERED LIST OF ROUTES, AMOUNT YOU WANT TO SWAP THROUGH THEM
 // Core function, can use any arbitrary SwapDynamicRouter
 // i.e. Optimal Routing from Bain, BF, etc.
-func (k Keeper) swapAcrossRoute(goCtx context.Context, callerAddress sdk.AccAddress, bestRoute Route, amountIn sdk.Dec) (amountFromSwap sdk.Dec, err error) {
+func (k Keeper) swapAcrossRoute(goCtx context.Context, callerAddress sdk.AccAddress, bestRoute Route, amountIn sdk.Dec, minOut sdk.Dec) (amountFromSwap sdk.Dec, err error) {
 	amountToSwap := amountIn
-
+	amountLeft := sdk.ZeroDec()
 	// Passes in the amountOut from the previous pair into the next pair until we swap to the end of route
 	for i := 0; i < len(bestRoute.path)-1; i++ {
 		// Gets each pair sequentially
@@ -272,7 +245,7 @@ func (k Keeper) swapAcrossRoute(goCtx context.Context, callerAddress sdk.AccAddr
 			// minAmountOut
 
 			// Use sdk.ZeroDec() for minOut as we can set a tighter bound later
-			amountToSwap, err = k.Swap0to1(goCtx, token0, token1, callerAddress, amountToSwap, sdk.ZeroDec())
+			amountLeft, amountToSwap, err = k.Swap0to1(goCtx, token0, token1, callerAddress, amountToSwap, sdk.ZeroDec())
 			if err != nil {
 				return sdk.ZeroDec(), err
 			}
@@ -282,12 +255,13 @@ func (k Keeper) swapAcrossRoute(goCtx context.Context, callerAddress sdk.AccAddr
 			// minAmountOut
 
 			// Use sdk.ZeroDec() for minOut as we can set a tighter bound later
-			amountToSwap, err = k.Swap1to0(goCtx, token0, token1, callerAddress, amountToSwap, sdk.ZeroDec())
+			amountLeft, amountToSwap, err = k.Swap1to0(goCtx, token0, token1, callerAddress, amountToSwap, sdk.ZeroDec())
 			if err != nil {
 				return sdk.ZeroDec(), err
 			}
 
 		}
 	}
+	_ = amountLeft
 	return amountToSwap, nil
 }
