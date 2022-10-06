@@ -76,7 +76,7 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 	trueAmount1 := amount1
 	var sharesMinted sdk.Dec
 
-	price, err := k.Calc_price(tickIndex)
+	price, err := k.Calc_price(tickIndex, false)
 
 	// Error check that price was calculated without error
 	if err != nil {
@@ -226,10 +226,11 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 
 }
 
-// FIX ME
 // While this works this s a rough get around to doing float based math with sdk.Decs
-func (k Keeper) Calc_price(price_Index int64) (sdk.Dec, error) {
-	floatPrice := math.Pow(1.0001, float64(price_Index))
+// tickIndex refers to the index of a specified tick for a given pool
+// StartingToken determines the ratio of our price, price when false, 1/price when true.
+func (k Keeper) Calc_price(tick_Index int64, startingToken bool) (sdk.Dec, error) {
+	floatPrice := math.Pow(1.0001, float64(tick_Index))
 	sPrice := fmt.Sprintf("%f", floatPrice)
 
 	price, err := sdk.NewDecFromStr(sPrice)
@@ -237,7 +238,13 @@ func (k Keeper) Calc_price(price_Index int64) (sdk.Dec, error) {
 	if err != nil {
 		return sdk.ZeroDec(), err
 	} else {
-		return price, nil
+		if startingToken {
+			price = sdk.OneDec().Quo(price)
+			return price, nil
+		} else {
+			return price, nil
+		}
+
 	}
 
 }
@@ -549,7 +556,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				continue
 			}
 			// calculate currentPrice
-			price, err := k.Calc_price(pair.TokenPair.CurrentTick0To1)
+			price, err := k.Calc_price(pair.TokenPair.CurrentTick0To1, false)
 
 			if err != nil {
 				return sdk.ZeroDec(), err
@@ -673,8 +680,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			//Current0Datam := Current0Data.TickData.Reserve1[i]
 
 			// calculate currentPrice and inverts
-			price, err := k.Calc_price(pair.TokenPair.CurrentTick1To0)
-			price = sdk.OneDec().Quo(price)
+			price, err := k.Calc_price(pair.TokenPair.CurrentTick1To0, true)
 
 			if err != nil {
 				return sdk.ZeroDec(), err
