@@ -41,9 +41,9 @@ func (k Keeper) DepositPairInit(goCtx context.Context, token0 string, token1 str
 
 	pairId := k.CreatePairId(token0, token1)
 	// Check for pair existance, if it does not exist, initialize it.
-	_, PairFound := k.GetPairMap(ctx, pairId)
+	pair, PairFound := k.GetPairMap(ctx, pairId)
 
-	if !PairFound {
+	if !PairFound || pair.PairCount == 0 {
 
 		// addEdges(goCtx, token0Index.Index, token1Index.Index)
 
