@@ -11,7 +11,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k Keeper) DepositPairInit(goCtx context.Context, token0 string, token1 string, tick_index int64, fee int64) (string, error) {
+func (k Keeper) PairInit(goCtx context.Context, token0 string, token1 string, tick_index int64, fee int64) (string, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -77,7 +77,7 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 	trueAmount1 := amount1
 	var sharesMinted sdk.Dec
 
-	price, err := k.Calc_price(tickIndex)
+	price, err := k.Calc_price(tickIndex, false)
 
 	// Error check that price was calculated without error
 	if err != nil {
@@ -216,10 +216,12 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 
 }
 
-// FIX ME
+// TODO
 // While this works this s a rough get around to doing float based math with sdk.Decs
-func (k Keeper) Calc_price(price_Index int64) (sdk.Dec, error) {
-	floatPrice := math.Pow(1.0001, float64(price_Index))
+// tickIndex refers to the index of a specified tick for a given pool
+// StartingToken determines the ratio of our price, price when false, 1/price when true.
+func (k Keeper) Calc_price(tick_Index int64, startingToken bool) (sdk.Dec, error) {
+	floatPrice := math.Pow(1.0001, float64(tick_Index))
 	sPrice := fmt.Sprintf("%f", floatPrice)
 
 	price, err := sdk.NewDecFromStr(sPrice)
@@ -227,7 +229,13 @@ func (k Keeper) Calc_price(price_Index int64) (sdk.Dec, error) {
 	if err != nil {
 		return sdk.ZeroDec(), err
 	} else {
-		return price, nil
+		if startingToken {
+			price = sdk.OneDec().Quo(price)
+			return price, nil
+		} else {
+			return price, nil
+		}
+
 	}
 
 }
@@ -250,7 +258,7 @@ func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0
 	feelist := k.GetAllFeeList(ctx)
 
 	//Checks to see if given pair has been initialied, if not intializes, and returns pairId and pairMap
-	pairId, err := k.DepositPairInit(goCtx, token0, token1, msg.TickIndexes[0], feelist[msg.FeeIndexes[0]].Fee)
+	pairId, err := k.PairInit(goCtx, token0, token1, msg.TickIndexes[0], feelist[msg.FeeIndexes[0]].Fee)
 
 	if err != nil {
 		return err
@@ -508,7 +516,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				continue
 			}
 			// calculate currentPrice
-			price, err := k.Calc_price(pair.TokenPair.CurrentTick0To1)
+			price, err := k.Calc_price(pair.TokenPair.CurrentTick0To1, false)
 
 			if err != nil {
 				return sdk.ZeroDec(), err
@@ -632,7 +640,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			//Current0Datam := Current0Data.TickData.Reserve1[i]
 
 			// calculate currentPrice and inverts
-			price, err := k.Calc_price(pair.TokenPair.CurrentTick1To0)
+			price, err := k.Calc_price(pair.TokenPair.CurrentTick1To0, true)
 			price = sdk.OneDec().Quo(price)
 
 			if err != nil {
@@ -701,7 +709,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	pairId, err := k.DepositPairInit(goCtx, token0, token1, msg.TickIndex, 0)
+	pairId, err := k.PairInit(goCtx, token0, token1, msg.TickIndex, 0)
 
 	if err != nil {
 		return err
@@ -782,7 +790,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		}
 
 		ReserveMap.Reserves = ReserveMap.Reserves.Add(msg.AmountIn)
-		newShares, err = k.Calc_price(msg.TickIndex)
+		newShares, err = k.Calc_price(msg.TickIndex, false)
 		if err != nil {
 			return err
 		}
@@ -825,7 +833,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		}
 
 		ReserveMap.Reserves = ReserveMap.Reserves.Add(msg.AmountIn)
-		newShares, err = k.Calc_price(msg.TickIndex)
+		newShares, err = k.Calc_price(msg.TickIndex, true)
 		if err != nil {
 			return err
 		}
