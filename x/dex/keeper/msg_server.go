@@ -67,7 +67,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	var amount_out sdk.Dec
 
 	if msg.TokenIn == token0 {
-		amount_out, err = k.Swap0to1(goCtx, token0, token1, createrAddr, msg.AmountIn, msg.MinOut)
+		_, amount_out, err = k.Swap0to1(goCtx, token0, token1, createrAddr, msg.AmountIn, msg.MinOut)
 
 		if err != nil {
 			return nil, err
@@ -95,7 +95,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		))
 
 	} else {
-		amount_out, err = k.Swap1to0(goCtx, token0, token1, createrAddr, msg.AmountIn, msg.MinOut)
+		_, amount_out, err = k.Swap1to0(goCtx, token0, token1, createrAddr, msg.AmountIn, msg.MinOut)
 
 		if err != nil {
 			return nil, err
