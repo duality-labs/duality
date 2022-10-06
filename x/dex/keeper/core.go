@@ -226,6 +226,7 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 
 }
 
+// TODO
 // While this works this s a rough get around to doing float based math with sdk.Decs
 // tickIndex refers to the index of a specified tick for a given pool
 // StartingToken determines the ratio of our price, price when false, 1/price when true.
