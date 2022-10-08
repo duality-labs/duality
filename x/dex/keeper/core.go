@@ -17,8 +17,8 @@ func (k Keeper) GetTotalReservesAtTick(goCtx context.Context, pairId string, tic
 	feelist := k.GetAllFeeList(ctx)
 
 	// inits totalReserve of 0 and 1 for all feeTiers
-	var totalReserve0 sdk.Dec
-	var totalReserve1 sdk.Dec
+	var totalReserve0 = sdk.ZeroDec()
+	var totalReserve1 = sdk.ZeroDec()
 
 	// retrivies tick from tickMaping
 	tick, tickFound := k.GetTickMap(ctx, pairId, tick_index_)
