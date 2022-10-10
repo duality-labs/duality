@@ -559,6 +559,14 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 		// if feeIndex is equal to the largest index in feeList
 		if i == feeSize-1 {
+
+			var err error
+			amount_left, amount_out, err = k.SwapLimitOrder1to0(goCtx, pairId, msg.TokenIn, amount_out, amount_left, pair.TokenPair.CurrentTick0To1)
+
+			if err != nil {
+				return sdk.ZeroDec(), err
+			}
+
 			// iterates CurrentTick0to1
 			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 + 1
 		}
@@ -683,8 +691,15 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 		// if feeIndex is equal to the largest index in feeList
 		if i == feeSize-1 {
+			// assigns a new variable err to handle err not being initialized in this conditional
+			var err error
+			amount_left, amount_out, err = k.SwapLimitOrder1to0(goCtx, pairId, msg.TokenIn, amount_out, amount_left, pair.TokenPair.CurrentTick1To0)
 
-			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 - 1
+			if err != nil {
+				return sdk.ZeroDec(), err
+			}
+
+			pair.TokenPair.CurrentTick1To0 = pair.TokenPair.CurrentTick1To0 - 1
 		}
 	}
 
@@ -719,7 +734,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 	tick, tickFound := k.GetTickMap(ctx, pairId, CurrentTick0to1)
 
 	if !tickFound {
-		return sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidTickNotFound, "No tick found at the requested index")
+		return sdk.ZeroDec(), sdk.ZeroDec(), nil
 	}
 
 	ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
@@ -727,7 +742,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 
 	// errors if ReserveMapFound is not found
 	if !ReserveMapFound {
-		return sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidLimitOrderMapsNotFound, "No Reserve mapping found at tick index %d", CurrentTick0to1)
+		return sdk.ZeroDec(), sdk.ZeroDec(), nil
 	}
 
 	// if no tokens have been filled at this key value, initialize to 0
@@ -806,7 +821,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 	tick, tickFound := k.GetTickMap(ctx, pairId, CurrentTick1to0)
 
 	if !tickFound {
-		return sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidTickNotFound, "No tick found at the requested index")
+		return sdk.ZeroDec(), sdk.ZeroDec(), nil
 	}
 
 	ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
@@ -814,7 +829,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 
 	// errors if ReserveMapFound is not found
 	if !ReserveMapFound {
-		return sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidLimitOrderMapsNotFound, "No Reserve mapping found at tick index %d", CurrentTick1to0)
+		return sdk.ZeroDec(), sdk.ZeroDec(), nil
 	}
 
 	// if no tokens have been filled at this key value, initialize to 0
