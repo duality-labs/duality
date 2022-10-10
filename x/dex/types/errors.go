@@ -19,4 +19,5 @@ var (
 	ErrValidFeeIndexNotFound       = sdkerrors.Register(ModuleName, 1108, "Valid FeeIndex not found: %s ")
 	ErrUnbalancedTxArray           = sdkerrors.Register(ModuleName, 1110, "Transaction Input Arrays are not of the same length")
 	ErrValidLimitOrderMapsNotFound = sdkerrors.Register(ModuleName, 1111, "Limit Order Mappings not found")
+	ErrCannotWithdrawLimitOrder    = sdkerrors.Register(ModuleName, 1112, "Cannot withdraw additional liqudity from this limit order at this time")
 )
