@@ -953,145 +953,181 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 
 ///// Limit Order Functions
 
-func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress) error {
+func (k Keeper) PlaceLimitOrderHelper(goCtx context.Context, pairId string, tickIndex int64) types.TickMap {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	pairId, err := k.PairInit(goCtx, token0, token1, msg.TickIndex, 0)
 
-	if err != nil {
-		return err
-	}
+	tick, tickFound := k.GetTickMap(ctx, pairId, tickIndex)
 
 	// size of the feeList
 	feeSize := k.GetFeeListCount(ctx)
-	//feelist := k.GetAllFeeList(ctx)
-
-	tick, tickFound := k.GetTickMap(ctx, pairId, msg.TickIndex)
 
 	if !tickFound {
 
 		// If tick does not exists intialize it
 		// @Dev initialize reserves struct to avoid having to check for individual subtype existance between deposit and placeLimitOrder
 		tick = types.TickMap{
-			TickIndex: msg.TickIndex,
+			TickIndex: tickIndex,
 			TickData: &types.TickDataType{
 				Reserve0AndShares: make([]*types.Reserve0AndSharesType, feeSize),
 				Reserve1:          make([]sdk.Dec, feeSize),
 			},
 		}
 
+		// Sets Reserve0AShares to 0
+		// Eliminates us having to check that each fee tier is nil or 0 when calling deposit
 		for i, _ := range tick.TickData.Reserve0AndShares {
 			tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}
 
 		}
+		// Sets Reserve1 to 0
+		// Eliminates us having to check that each fee tier is nil or 0 when calling deposit
 		for i, _ := range tick.TickData.Reserve1 {
 			tick.TickData.Reserve1[i] = sdk.ZeroDec()
 		}
 
+		// Sets Count and CurrentKey for 0to1 to 0
 		tick.LimitOrderPool0To1.Count = 0
 		tick.LimitOrderPool0To1.CurrentLimitOrderKey = 0
 
+		// Sets Count and CurrentKey for 1to0 to 0
 		tick.LimitOrderPool1To0.Count = 0
 		tick.LimitOrderPool1To0.CurrentLimitOrderKey = 0
 	}
-	var key uint64
+
+	return tick
+
+}
+
+func (k Keeper) PlaceLimitOrderMappingHelper(goCtx context.Context, pairId string, tickIndex int64, tokenIn string, currentLimitOrderKey uint64, receiver string) (types.LimitOrderPoolReserveMap, types.LimitOrderPoolUserShareMap, types.LimitOrderPoolTotalSharesMap) {
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Retrieves ReserveMap Object from KVStore
+	ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
+	// Retrieves UserShareMap object from KVStore
+	UserShareMap, UserShareMapFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
+	// Retrives TotalSharesMap object from KVStore
+	TotalSharesMap, TotalShareMapFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
+
+	// If ReserveMap object not found initialize it accordingly
+	if !ReserveMapFound {
+		ReserveMap.Count = currentLimitOrderKey
+		ReserveMap.Reserves = sdk.ZeroDec()
+		ReserveMap.TickIndex = tickIndex
+		ReserveMap.Token = tokenIn
+		ReserveMap.PairId = pairId
+	}
+
+	// If UserShareMap object is not found initialize it accordingly
+	if !UserShareMapFound {
+		UserShareMap.Count = currentLimitOrderKey
+		UserShareMap.Address = receiver
+		UserShareMap.SharesOwned = sdk.ZeroDec()
+		UserShareMap.TickIndex = tickIndex
+		UserShareMap.Token = tokenIn
+		UserShareMap.PairId = pairId
+	}
+
+	// If TotalSharesMap object is nout found initialize it accordingly
+	if !TotalShareMapFound {
+		TotalSharesMap.Count = currentLimitOrderKey
+		TotalSharesMap.TotalShares = sdk.ZeroDec()
+		TotalSharesMap.TickIndex = tickIndex
+		TotalSharesMap.Token = tokenIn
+		TotalSharesMap.PairId = pairId
+	}
+
+	_ = ctx
+
+	return ReserveMap, UserShareMap, TotalSharesMap
+}
+
+func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress) error {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// checks if pair is initialized, if not intialize it and return pairId
+	pairId, err := k.PairInit(goCtx, token0, token1, msg.TickIndex, 0)
+
+	if err != nil {
+		return err
+	}
+
+	//checks if tick is initialized and if not set count and currentLimitOrder key to 0
+	/// tick is an object of the tickMapping for the specified tickIndex and mapping
+	tick := k.PlaceLimitOrderHelper(goCtx, pairId, msg.TickIndex)
+
+	// currentLimitOrder key for Pool0to1 or Pool0to1
+	var currentLimitOrderKey uint64
+	// currentLimitOrder count for Pool0to1 or Pool0to1
+	var LimitOrderCount uint64
+	// Shares Minted
 	var newShares sdk.Dec
 
+	// If TokenIn == token0 set count and key to values of LimitOrderPool0to1
 	if msg.TokenIn == token0 {
-		FillMap, FillMapFound := k.GetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
-
-		if !FillMapFound {
-			FillMap.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey
-			FillMap.Fill = sdk.ZeroDec()
-		} else if tick.LimitOrderPool0To1.Count == tick.LimitOrderPool0To1.CurrentLimitOrderKey && FillMap.Fill.GT(sdk.ZeroDec()) {
-			tick.LimitOrderPool0To1.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey + 1
-		}
-
-		ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
-		UserShareMap, UserShareMapFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey, msg.Receiver)
-		TotalSharesMap, TotalShareMapFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
-
-		if !ReserveMapFound {
-			ReserveMap.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey
-			ReserveMap.Reserves = sdk.ZeroDec()
-			ReserveMap.TickIndex = msg.TickIndex
-			ReserveMap.Token = msg.TokenIn
-			ReserveMap.PairId = pairId
-		}
-
-		if !UserShareMapFound {
-			UserShareMap.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey
-			UserShareMap.Address = msg.Creator
-			UserShareMap.SharesOwned = sdk.ZeroDec()
-			UserShareMap.TickIndex = msg.TickIndex
-			UserShareMap.Token = msg.TokenIn
-			UserShareMap.PairId = pairId
-		}
-
-		if !TotalShareMapFound {
-			TotalSharesMap.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey
-			TotalSharesMap.TotalShares = sdk.ZeroDec()
-			TotalSharesMap.TickIndex = msg.TickIndex
-			TotalSharesMap.Token = msg.TokenIn
-			TotalSharesMap.PairId = pairId
-		}
-
-		ReserveMap.Reserves = ReserveMap.Reserves.Add(msg.AmountIn)
-		newShares, err = k.Calc_price(msg.TickIndex, false)
-		if err != nil {
-			return err
-		}
-		UserShareMap.SharesOwned = UserShareMap.SharesOwned.Add(newShares)
-		TotalSharesMap.TotalShares = TotalSharesMap.TotalShares.Add(newShares)
-
-		k.SetLimitOrderPoolFillMap(ctx, FillMap)
-		k.SetLimitOrderPoolReserveMap(ctx, ReserveMap)
-		k.SetLimitOrderPoolUserShareMap(ctx, UserShareMap)
-		k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesMap)
-		key = tick.LimitOrderPool0To1.CurrentLimitOrderKey
+		currentLimitOrderKey = tick.LimitOrderPool0To1.CurrentLimitOrderKey
+		LimitOrderCount = tick.LimitOrderPool0To1.Count
+		// If tokenIn == token1 set count and key to values of LimitOrderPool1to0
 	} else {
-		FillMap, FillMapFound := k.GetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+		currentLimitOrderKey = tick.LimitOrderPool1To0.CurrentLimitOrderKey
+		LimitOrderCount = tick.LimitOrderPool1To0.Count
+	}
 
-		if !FillMapFound {
-			FillMap.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey
-			FillMap.Fill = sdk.ZeroDec()
-		} else if tick.LimitOrderPool1To0.Count == tick.LimitOrderPool1To0.CurrentLimitOrderKey && FillMap.Fill.GT(sdk.ZeroDec()) {
-			tick.LimitOrderPool1To0.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey + 1
+	// Retrives FillMap object from FillMapping KVSTore
+	FillMap, FillMapFound := k.GetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.TokenIn, currentLimitOrderKey)
+
+	// inits FillMap object if not found
+	if !FillMapFound {
+		FillMap.PairId = pairId
+		FillMap.TickIndex = msg.TickIndex
+		FillMap.Token = msg.TokenIn
+		FillMap.Count = currentLimitOrderKey
+		FillMap.Fill = sdk.ZeroDec()
+
+		// Handles creating a limit order given the current limit order is already partially filled
+	} else if LimitOrderCount == currentLimitOrderKey && FillMap.Fill.GT(sdk.ZeroDec()) {
+		// increments currentLimitOrderKey
+		currentLimitOrderKey = currentLimitOrderKey + 1
+
+		// Updates Pool0t01 / Pool1to0 accordingly
+		if msg.TokenIn == token0 {
+			tick.LimitOrderPool0To1.CurrentLimitOrderKey = currentLimitOrderKey
+		} else {
+			tick.LimitOrderPool1To0.CurrentLimitOrderKey = currentLimitOrderKey
 		}
+	}
 
-		ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
-		UserShareMap, UserShareMapFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey, msg.Receiver)
-		TotalSharesMap, TotalShareMapFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.TokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+	// Returns Map object for Reserve, UserShares, and TotalShares mapping
+	ReserveMap, UserShareMap, TotalSharesMap := k.PlaceLimitOrderMappingHelper(goCtx, pairId, msg.TickIndex, msg.TokenIn, currentLimitOrderKey, msg.Receiver)
 
-		if !ReserveMapFound {
-			ReserveMap.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey
-			ReserveMap.Reserves = sdk.ZeroDec()
-		}
+	// Adds amountIn to ReserveMap
+	ReserveMap.Reserves = ReserveMap.Reserves.Add(msg.AmountIn)
 
-		if !UserShareMapFound {
-			UserShareMap.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey
-			UserShareMap.Address = msg.Creator
-			UserShareMap.SharesOwned = sdk.ZeroDec()
-		}
+	if msg.TokenIn == token0 {
+		// calculates NewShares given amountIn in terms of token0
+		newShares = msg.AmountIn
+	} else {
+		//Calculates price as amt1/amt0
+		price, err := k.Calc_price(msg.TickIndex, false)
 
-		if !TotalShareMapFound {
-			TotalSharesMap.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey
-			TotalSharesMap.TotalShares = sdk.ZeroDec()
-		}
-
-		ReserveMap.Reserves = ReserveMap.Reserves.Add(msg.AmountIn)
-		newShares, err = k.Calc_price(msg.TickIndex, true)
 		if err != nil {
 			return err
 		}
-		UserShareMap.SharesOwned = UserShareMap.SharesOwned.Add(newShares)
-		TotalSharesMap.TotalShares = TotalSharesMap.TotalShares.Add(newShares)
+		//calculates NewShares given amountIn is in term of token1
+		newShares = msg.AmountIn.Mul(price)
 
-		k.SetLimitOrderPoolFillMap(ctx, FillMap)
-		k.SetLimitOrderPoolReserveMap(ctx, ReserveMap)
-		k.SetLimitOrderPoolUserShareMap(ctx, UserShareMap)
-		k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesMap)
-		key = tick.LimitOrderPool1To0.CurrentLimitOrderKey
 	}
+
+	// Adds newShares to User's shares owned
+	UserShareMap.SharesOwned = UserShareMap.SharesOwned.Add(newShares)
+	// Adds newShares to totalShares
+	TotalSharesMap.TotalShares = TotalSharesMap.TotalShares.Add(newShares)
+
+	// Set Fill, Reserve, UserShares, and TotalShares maps in KVStore
+	k.SetLimitOrderPoolFillMap(ctx, FillMap)
+	k.SetLimitOrderPoolReserveMap(ctx, ReserveMap)
+	k.SetLimitOrderPoolUserShareMap(ctx, UserShareMap)
+	k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesMap)
 
 	pair, _ := k.GetPairMap(ctx, pairId)
 	// If a new tick has been placed that tigtens the range between currentTick0to1 and currentTick0to1 update CurrentTicks to the tighest ticks
@@ -1104,6 +1140,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	// updates currentTick1to0/0To1 given the conditionals above
 	k.SetPairMap(ctx, pair)
 
+	// Sends AmoutIn from Address to Module
 	if msg.AmountIn.GT(sdk.ZeroDec()) {
 		coin0 := sdk.NewCoin(msg.TokenIn, sdk.NewIntFromBigInt(msg.AmountIn.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
@@ -1112,7 +1149,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	}
 
 	ctx.EventManager().EmitEvent(types.CreatePlaceLimitOrderEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.TokenIn, msg.AmountIn.String(), newShares.String(), strconv.Itoa(int(key)),
+		token0, token1, msg.TokenIn, msg.AmountIn.String(), newShares.String(), strconv.Itoa(int(currentLimitOrderKey)),
 	))
 
 	return nil
