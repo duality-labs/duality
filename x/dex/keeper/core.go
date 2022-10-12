@@ -388,7 +388,7 @@ func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0
 	return nil
 }
 
-func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, token0 string, token1 string, callerAddr sdk.AccAddress) error {
+func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	//loads pairId for the gven token0/token1 pair
@@ -514,11 +514,6 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 	//Sets changes to pair mapping
 	k.SetPairMap(ctx, pair)
 
-	receiverAddr, err := sdk.AccAddressFromBech32(msg.Receiver)
-
-	if err != nil {
-		return err
-	}
 	// sends totalReserve0ToRemove to msg.Receiver
 	if totalReserve0ToRemove.GT(sdk.ZeroDec()) {
 		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(totalReserve0ToRemove.BigInt()))
@@ -575,6 +570,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 		fmt.Println(count)
 		if !Current1Found {
+			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 - 1
 			continue
 		}
 
@@ -639,9 +635,9 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		}
 
 		// if feeIndex is equal to the largest index in feeList
-		if i == feeSize-1 {
+		if i == feeSize {
 			// iterates CurrentTick0to1
-			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 + 1
+			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 - 1
 		}
 	}
 
@@ -697,7 +693,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		// If tick/feeIndex pair is not found continue
 
 		if !Current0Found {
-
+			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick1To0 + 1
 			continue
 		}
 
@@ -763,9 +759,9 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		}
 
 		// if feeIndex is equal to the largest index in feeList
-		if i == feeSize-1 {
+		if i == feeSize {
 
-			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 - 1
+			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick1To0 + 1
 		}
 	}
 

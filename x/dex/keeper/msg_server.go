@@ -43,13 +43,13 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*types.MsgWithdrawlResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, createrAddr, err := k.withdrawlVerification(goCtx, *msg)
+	token0, token1, createrAddr, receiverAddr, err := k.withdrawlVerification(goCtx, *msg)
 
 	if err != nil {
 		return nil, err
 	}
 
-	err = k.WithdrawCore(goCtx, msg, token0, token1, createrAddr)
+	err = k.WithdrawCore(goCtx, msg, token0, token1, createrAddr, receiverAddr)
 	_ = ctx
 
 	return &types.MsgWithdrawlResponse{}, nil
@@ -58,7 +58,7 @@ func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*t
 func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSwapResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, createrAddr, err := k.swapVerification(goCtx, *msg)
+	token0, token1, createrAddr, receiverAddr, err := k.swapVerification(goCtx, *msg)
 
 	if err != nil {
 		return nil, err
@@ -85,7 +85,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		if amount_out.GT(sdk.ZeroDec()) {
 
 			coinOut := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount_out.BigInt()))
-			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(msg.Receiver), sdk.Coins{coinOut}); err != nil {
+			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 				return &types.MsgSwapResponse{}, err
 			}
 		}
@@ -109,7 +109,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		if amount_out.GT(sdk.ZeroDec()) {
 
 			coinOut := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
-			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(msg.Receiver), sdk.Coins{coinOut}); err != nil {
+			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 				return &types.MsgSwapResponse{}, err
 			}
 		}
