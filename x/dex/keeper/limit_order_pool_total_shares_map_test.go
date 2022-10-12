@@ -22,6 +22,7 @@ func createNLimitOrderPoolTotalSharesMap(keeper *keeper.Keeper, ctx sdk.Context,
 		items[i].PairId = pairId
 		items[i].TickIndex = tickIndex
 		items[i].Token = token
+		items[i].TotalShares = sdk.ZeroDec()
 
 		keeper.SetLimitOrderPoolTotalSharesMap(ctx, items[i])
 	}

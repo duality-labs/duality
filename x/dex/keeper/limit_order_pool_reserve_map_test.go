@@ -22,6 +22,7 @@ func createNLimitOrderPoolReserveMap(keeper *keeper.Keeper, ctx sdk.Context, pai
 		items[i].TickIndex = tickIndex
 		items[i].Token = token
 		items[i].PairId = pairId
+		items[i].Reserves = sdk.ZeroDec()
 
 		keeper.SetLimitOrderPoolReserveMap(ctx, items[i])
 	}

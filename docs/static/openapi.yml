@@ -29927,6 +29927,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/adjancey_matrix/{id}':
@@ -30091,6 +30101,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/edge_row/{id}':
@@ -30250,6 +30270,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/fee_list/{id}':
@@ -30312,6 +30342,13 @@ paths:
                 items:
                   type: object
                   properties:
+                    pairId:
+                      type: string
+                    token:
+                      type: string
+                    tickIndex:
+                      type: string
+                      format: int64
                     count:
                       type: string
                       format: uint64
@@ -30409,9 +30446,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/limit_order_pool_fill_map/{count}':
+  '/NicholasDotSol/duality/dex/limit_order_pool_fill_map/{pairId}/{token}/{tickIndex}/{count}':
     get:
       summary: Queries a LimitOrderPoolFillMap by index.
       operationId: NicholasdotsolDualityDexLimitOrderPoolFillMap
@@ -30424,6 +30471,13 @@ paths:
               limitOrderPoolFillMap:
                 type: object
                 properties:
+                  pairId:
+                    type: string
+                  token:
+                    type: string
+                  tickIndex:
+                    type: string
+                    format: int64
                   count:
                     type: string
                     format: uint64
@@ -30448,24 +30502,24 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
+        - name: pairId
+          in: path
+          required: true
+          type: string
+        - name: token
+          in: path
+          required: true
+          type: string
+        - name: tickIndex
+          in: path
+          required: true
+          type: string
+          format: int64
         - name: count
           in: path
           required: true
           type: string
           format: uint64
-        - name: pairId
-          in: query
-          required: false
-          type: string
-        - name: tickIndex
-          in: query
-          required: false
-          type: string
-          format: int64
-        - name: token
-          in: query
-          required: false
-          type: string
       tags:
         - Query
   /NicholasDotSol/duality/dex/limit_order_pool_reserve_map:
@@ -30483,6 +30537,13 @@ paths:
                 items:
                   type: object
                   properties:
+                    pairId:
+                      type: string
+                    token:
+                      type: string
+                    tickIndex:
+                      type: string
+                      format: int64
                     count:
                       type: string
                       format: uint64
@@ -30580,9 +30641,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/limit_order_pool_reserve_map/{count}':
+  '/NicholasDotSol/duality/dex/limit_order_pool_reserve_map/{pairId}/{token}/{tickIndex}/{count}':
     get:
       summary: Queries a LimitOrderPoolReserveMap by index.
       operationId: NicholasdotsolDualityDexLimitOrderPoolReserveMap
@@ -30595,6 +30666,13 @@ paths:
               limitOrderPoolReserveMap:
                 type: object
                 properties:
+                  pairId:
+                    type: string
+                  token:
+                    type: string
+                  tickIndex:
+                    type: string
+                    format: int64
                   count:
                     type: string
                     format: uint64
@@ -30619,24 +30697,24 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
+        - name: pairId
+          in: path
+          required: true
+          type: string
+        - name: token
+          in: path
+          required: true
+          type: string
+        - name: tickIndex
+          in: path
+          required: true
+          type: string
+          format: int64
         - name: count
           in: path
           required: true
           type: string
           format: uint64
-        - name: pairId
-          in: query
-          required: false
-          type: string
-        - name: tickIndex
-          in: query
-          required: false
-          type: string
-          format: int64
-        - name: token
-          in: query
-          required: false
-          type: string
       tags:
         - Query
   /NicholasDotSol/duality/dex/limit_order_pool_total_shares_map:
@@ -30654,6 +30732,13 @@ paths:
                 items:
                   type: object
                   properties:
+                    pairId:
+                      type: string
+                    token:
+                      type: string
+                    tickIndex:
+                      type: string
+                      format: int64
                     count:
                       type: string
                       format: uint64
@@ -30751,9 +30836,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map/{count}':
+  '/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map/{pairId}/{token}/{tickIndex}/{count}':
     get:
       summary: Queries a LimitOrderPoolTotalSharesMap by index.
       operationId: NicholasdotsolDualityDexLimitOrderPoolTotalSharesMap
@@ -30766,6 +30861,13 @@ paths:
               limitOrderPoolTotalSharesMap:
                 type: object
                 properties:
+                  pairId:
+                    type: string
+                  token:
+                    type: string
+                  tickIndex:
+                    type: string
+                    format: int64
                   count:
                     type: string
                     format: uint64
@@ -30790,24 +30892,24 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
+        - name: pairId
+          in: path
+          required: true
+          type: string
+        - name: token
+          in: path
+          required: true
+          type: string
+        - name: tickIndex
+          in: path
+          required: true
+          type: string
+          format: int64
         - name: count
           in: path
           required: true
           type: string
           format: uint64
-        - name: pairId
-          in: query
-          required: false
-          type: string
-        - name: tickIndex
-          in: query
-          required: false
-          type: string
-          format: int64
-        - name: token
-          in: query
-          required: false
-          type: string
       tags:
         - Query
   /NicholasDotSol/duality/dex/limit_order_pool_user_share_map:
@@ -30825,6 +30927,13 @@ paths:
                 items:
                   type: object
                   properties:
+                    pairId:
+                      type: string
+                    token:
+                      type: string
+                    tickIndex:
+                      type: string
+                      format: int64
                     count:
                       type: string
                       format: uint64
@@ -30924,9 +31033,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/limit_order_pool_user_share_map/{count}/{address}':
+  '/NicholasDotSol/duality/dex/limit_order_pool_user_share_map/{pairId}/{token}/{tickIndex}/{count}/{address}':
     get:
       summary: Queries a LimitOrderPoolUserShareMap by index.
       operationId: NicholasdotsolDualityDexLimitOrderPoolUserShareMap
@@ -30939,6 +31058,13 @@ paths:
               limitOrderPoolUserShareMap:
                 type: object
                 properties:
+                  pairId:
+                    type: string
+                  token:
+                    type: string
+                  tickIndex:
+                    type: string
+                    format: int64
                   count:
                     type: string
                     format: uint64
@@ -30965,6 +31091,19 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
+        - name: pairId
+          in: path
+          required: true
+          type: string
+        - name: token
+          in: path
+          required: true
+          type: string
+        - name: tickIndex
+          in: path
+          required: true
+          type: string
+          format: int64
         - name: count
           in: path
           required: true
@@ -30973,19 +31112,6 @@ paths:
         - name: address
           in: path
           required: true
-          type: string
-        - name: pairId
-          in: query
-          required: false
-          type: string
-        - name: tickIndex
-          in: query
-          required: false
-          type: string
-          format: int64
-        - name: token
-          in: query
-          required: false
           type: string
       tags:
         - Query
@@ -31004,6 +31130,13 @@ paths:
                 items:
                   type: object
                   properties:
+                    pairId:
+                      type: string
+                    token:
+                      type: string
+                    tickIndex:
+                      type: string
+                      format: int64
                     count:
                       type: string
                       format: uint64
@@ -31103,9 +31236,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn/{count}/{address}':
+  '/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn/{pairId}/{token}/{tickIndex}/{count}/{address}':
     get:
       summary: Queries a LimitOrderPoolUserSharesWithdrawn by index.
       operationId: NicholasdotsolDualityDexLimitOrderPoolUserSharesWithdrawn
@@ -31118,6 +31261,13 @@ paths:
               limitOrderPoolUserSharesWithdrawn:
                 type: object
                 properties:
+                  pairId:
+                    type: string
+                  token:
+                    type: string
+                  tickIndex:
+                    type: string
+                    format: int64
                   count:
                     type: string
                     format: uint64
@@ -31144,6 +31294,19 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
+        - name: pairId
+          in: path
+          required: true
+          type: string
+        - name: token
+          in: path
+          required: true
+          type: string
+        - name: tickIndex
+          in: path
+          required: true
+          type: string
+          format: int64
         - name: count
           in: path
           required: true
@@ -31152,19 +31315,6 @@ paths:
         - name: address
           in: path
           required: true
-          type: string
-        - name: pairId
-          in: query
-          required: false
-          type: string
-        - name: tickIndex
-          in: query
-          required: false
-          type: string
-          format: int64
-        - name: token
-          in: query
-          required: false
           type: string
       tags:
         - Query
@@ -31286,6 +31436,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -31498,6 +31658,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/shares/{address}/{pairId}/{tickIndex}/{fee}':
@@ -31579,6 +31749,8 @@ paths:
                 items:
                   type: object
                   properties:
+                    pairId:
+                      type: string
                     tickIndex:
                       type: string
                       format: int64
@@ -31601,6 +31773,8 @@ paths:
                     LimitOrderPool0to1:
                       type: object
                       properties:
+                        pairId:
+                          type: string
                         count:
                           type: string
                           format: uint64
@@ -31610,6 +31784,8 @@ paths:
                     LimitOrderPool1to0:
                       type: object
                       properties:
+                        pairId:
+                          type: string
                         count:
                           type: string
                           format: uint64
@@ -31708,9 +31884,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/tick_map/{tickIndex}':
+  '/NicholasDotSol/duality/dex/tick_map/{pairId}/{tickIndex}':
     get:
       summary: Queries a TickMap by index.
       operationId: NicholasdotsolDualityDexTickMap
@@ -31723,6 +31909,8 @@ paths:
               tickMap:
                 type: object
                 properties:
+                  pairId:
+                    type: string
                   tickIndex:
                     type: string
                     format: int64
@@ -31745,6 +31933,8 @@ paths:
                   LimitOrderPool0to1:
                     type: object
                     properties:
+                      pairId:
+                        type: string
                       count:
                         type: string
                         format: uint64
@@ -31754,6 +31944,8 @@ paths:
                   LimitOrderPool1to0:
                     type: object
                     properties:
+                      pairId:
+                        type: string
                       count:
                         type: string
                         format: uint64
@@ -31779,15 +31971,15 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
+        - name: pairId
+          in: path
+          required: true
+          type: string
         - name: tickIndex
           in: path
           required: true
           type: string
           format: int64
-        - name: pairId
-          in: query
-          required: false
-          type: string
       tags:
         - Query
   /NicholasDotSol/duality/dex/token_map:
@@ -31899,6 +32091,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -32056,6 +32258,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -53846,6 +54058,8 @@ definitions:
   nicholasdotsol.duality.dex.LimitOrderPool:
     type: object
     properties:
+      pairId:
+        type: string
       count:
         type: string
         format: uint64
@@ -53855,6 +54069,13 @@ definitions:
   nicholasdotsol.duality.dex.LimitOrderPoolFillMap:
     type: object
     properties:
+      pairId:
+        type: string
+      token:
+        type: string
+      tickIndex:
+        type: string
+        format: int64
       count:
         type: string
         format: uint64
@@ -53863,6 +54084,13 @@ definitions:
   nicholasdotsol.duality.dex.LimitOrderPoolReserveMap:
     type: object
     properties:
+      pairId:
+        type: string
+      token:
+        type: string
+      tickIndex:
+        type: string
+        format: int64
       count:
         type: string
         format: uint64
@@ -53871,6 +54099,13 @@ definitions:
   nicholasdotsol.duality.dex.LimitOrderPoolTotalSharesMap:
     type: object
     properties:
+      pairId:
+        type: string
+      token:
+        type: string
+      tickIndex:
+        type: string
+        format: int64
       count:
         type: string
         format: uint64
@@ -53879,6 +54114,13 @@ definitions:
   nicholasdotsol.duality.dex.LimitOrderPoolUserShareMap:
     type: object
     properties:
+      pairId:
+        type: string
+      token:
+        type: string
+      tickIndex:
+        type: string
+        format: int64
       count:
         type: string
         format: uint64
@@ -53889,6 +54131,13 @@ definitions:
   nicholasdotsol.duality.dex.LimitOrderPoolUserSharesWithdrawn:
     type: object
     properties:
+      pairId:
+        type: string
+      token:
+        type: string
+      tickIndex:
+        type: string
+        format: int64
       count:
         type: string
         format: uint64
@@ -54057,6 +54306,13 @@ definitions:
         items:
           type: object
           properties:
+            pairId:
+              type: string
+            token:
+              type: string
+            tickIndex:
+              type: string
+              format: int64
             count:
               type: string
               format: uint64
@@ -54095,6 +54351,13 @@ definitions:
         items:
           type: object
           properties:
+            pairId:
+              type: string
+            token:
+              type: string
+            tickIndex:
+              type: string
+              format: int64
             count:
               type: string
               format: uint64
@@ -54133,6 +54396,13 @@ definitions:
         items:
           type: object
           properties:
+            pairId:
+              type: string
+            token:
+              type: string
+            tickIndex:
+              type: string
+              format: int64
             count:
               type: string
               format: uint64
@@ -54171,6 +54441,13 @@ definitions:
         items:
           type: object
           properties:
+            pairId:
+              type: string
+            token:
+              type: string
+            tickIndex:
+              type: string
+              format: int64
             count:
               type: string
               format: uint64
@@ -54211,6 +54488,13 @@ definitions:
         items:
           type: object
           properties:
+            pairId:
+              type: string
+            token:
+              type: string
+            tickIndex:
+              type: string
+              format: int64
             count:
               type: string
               format: uint64
@@ -54343,6 +54627,8 @@ definitions:
         items:
           type: object
           properties:
+            pairId:
+              type: string
             tickIndex:
               type: string
               format: int64
@@ -54365,6 +54651,8 @@ definitions:
             LimitOrderPool0to1:
               type: object
               properties:
+                pairId:
+                  type: string
                 count:
                   type: string
                   format: uint64
@@ -54374,6 +54662,8 @@ definitions:
             LimitOrderPool1to0:
               type: object
               properties:
+                pairId:
+                  type: string
                 count:
                   type: string
                   format: uint64
@@ -54527,6 +54817,13 @@ definitions:
       limitOrderPoolFillMap:
         type: object
         properties:
+          pairId:
+            type: string
+          token:
+            type: string
+          tickIndex:
+            type: string
+            format: int64
           count:
             type: string
             format: uint64
@@ -54538,6 +54835,13 @@ definitions:
       limitOrderPoolReserveMap:
         type: object
         properties:
+          pairId:
+            type: string
+          token:
+            type: string
+          tickIndex:
+            type: string
+            format: int64
           count:
             type: string
             format: uint64
@@ -54549,6 +54853,13 @@ definitions:
       limitOrderPoolTotalSharesMap:
         type: object
         properties:
+          pairId:
+            type: string
+          token:
+            type: string
+          tickIndex:
+            type: string
+            format: int64
           count:
             type: string
             format: uint64
@@ -54560,6 +54871,13 @@ definitions:
       limitOrderPoolUserShareMap:
         type: object
         properties:
+          pairId:
+            type: string
+          token:
+            type: string
+          tickIndex:
+            type: string
+            format: int64
           count:
             type: string
             format: uint64
@@ -54573,6 +54891,13 @@ definitions:
       limitOrderPoolUserSharesWithdrawn:
         type: object
         properties:
+          pairId:
+            type: string
+          token:
+            type: string
+          tickIndex:
+            type: string
+            format: int64
           count:
             type: string
             format: uint64
@@ -54624,6 +54949,8 @@ definitions:
       tickMap:
         type: object
         properties:
+          pairId:
+            type: string
           tickIndex:
             type: string
             format: int64
@@ -54646,6 +54973,8 @@ definitions:
           LimitOrderPool0to1:
             type: object
             properties:
+              pairId:
+                type: string
               count:
                 type: string
                 format: uint64
@@ -54655,6 +54984,8 @@ definitions:
           LimitOrderPool1to0:
             type: object
             properties:
+              pairId:
+                type: string
               count:
                 type: string
                 format: uint64
@@ -54731,6 +55062,8 @@ definitions:
   nicholasdotsol.duality.dex.TickMap:
     type: object
     properties:
+      pairId:
+        type: string
       tickIndex:
         type: string
         format: int64
@@ -54753,6 +55086,8 @@ definitions:
       LimitOrderPool0to1:
         type: object
         properties:
+          pairId:
+            type: string
           count:
             type: string
             format: uint64
@@ -54762,6 +55097,8 @@ definitions:
       LimitOrderPool1to0:
         type: object
         properties:
+          pairId:
+            type: string
           count:
             type: string
             format: uint64

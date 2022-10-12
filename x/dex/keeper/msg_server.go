@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -58,7 +59,7 @@ func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*t
 func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSwapResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, createrAddr, err := k.SwapVerification(goCtx, *msg)
+	token0, token1, createrAddr, receiverAddr, err := k.SwapVerification(goCtx, *msg)
 
 	if err != nil {
 		return nil, err
@@ -73,6 +74,23 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 			return nil, err
 		}
 
+		if msg.AmountIn.GT(sdk.ZeroDec()) {
+			coinIn := sdk.NewCoin(token0, sdk.NewIntFromBigInt(msg.AmountIn.BigInt()))
+			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
+				return &types.MsgSwapResponse{}, err
+			}
+		} else {
+			return &types.MsgSwapResponse{}, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
+		}
+
+		if amount_out.GT(sdk.ZeroDec()) {
+
+			coinOut := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount_out.BigInt()))
+			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
+				return &types.MsgSwapResponse{}, err
+			}
+		}
+
 	} else {
 		amount_out, err = k.Swap1to0(goCtx, msg, token0, token1, createrAddr)
 
@@ -80,23 +98,26 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 			return nil, err
 		}
 
-	}
-
-	if msg.AmountIn.GT(sdk.ZeroDec()) {
-		coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(msg.AmountIn.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
-			return &types.MsgSwapResponse{}, err
+		if msg.AmountIn.GT(sdk.ZeroDec()) {
+			coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(msg.AmountIn.BigInt()))
+			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
+				return &types.MsgSwapResponse{}, err
+			}
+		} else {
+			return &types.MsgSwapResponse{}, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
 		}
-	} else {
-		return &types.MsgSwapResponse{}, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
-	}
 
-	if amount_out.GT(sdk.ZeroDec()) {
+		fmt.Println("swap amount out:", amount_out)
+		if amount_out.GT(sdk.ZeroDec()) {
 
-		coinOut := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(msg.Receiver), sdk.Coins{coinOut}); err != nil {
-			return &types.MsgSwapResponse{}, err
+			coinOut := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
+			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
+				return &types.MsgSwapResponse{}, err
+			}
+
+			fmt.Println(coinOut)
 		}
+
 	}
 
 	_ = ctx

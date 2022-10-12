@@ -4,25 +4,27 @@ import { util, configure, Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
-export interface LimitOrderPoolTotalSharesMap {
+export interface LimitOrderPoolUserSharesWithdrawn {
   pairId: string;
   token: string;
   tickIndex: number;
   count: number;
-  totalShares: string;
+  address: string;
+  sharesWithdrawn: string;
 }
 
-const baseLimitOrderPoolTotalSharesMap: object = {
+const baseLimitOrderPoolUserSharesWithdrawn: object = {
   pairId: "",
   token: "",
   tickIndex: 0,
   count: 0,
-  totalShares: "",
+  address: "",
+  sharesWithdrawn: "",
 };
 
-export const LimitOrderPoolTotalSharesMap = {
+export const LimitOrderPoolUserSharesWithdrawn = {
   encode(
-    message: LimitOrderPoolTotalSharesMap,
+    message: LimitOrderPoolUserSharesWithdrawn,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.pairId !== "") {
@@ -37,8 +39,11 @@ export const LimitOrderPoolTotalSharesMap = {
     if (message.count !== 0) {
       writer.uint32(32).uint64(message.count);
     }
-    if (message.totalShares !== "") {
-      writer.uint32(42).string(message.totalShares);
+    if (message.address !== "") {
+      writer.uint32(42).string(message.address);
+    }
+    if (message.sharesWithdrawn !== "") {
+      writer.uint32(50).string(message.sharesWithdrawn);
     }
     return writer;
   },
@@ -46,12 +51,12 @@ export const LimitOrderPoolTotalSharesMap = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): LimitOrderPoolTotalSharesMap {
+  ): LimitOrderPoolUserSharesWithdrawn {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseLimitOrderPoolTotalSharesMap,
-    } as LimitOrderPoolTotalSharesMap;
+      ...baseLimitOrderPoolUserSharesWithdrawn,
+    } as LimitOrderPoolUserSharesWithdrawn;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -68,7 +73,10 @@ export const LimitOrderPoolTotalSharesMap = {
           message.count = longToNumber(reader.uint64() as Long);
           break;
         case 5:
-          message.totalShares = reader.string();
+          message.address = reader.string();
+          break;
+        case 6:
+          message.sharesWithdrawn = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -78,10 +86,10 @@ export const LimitOrderPoolTotalSharesMap = {
     return message;
   },
 
-  fromJSON(object: any): LimitOrderPoolTotalSharesMap {
+  fromJSON(object: any): LimitOrderPoolUserSharesWithdrawn {
     const message = {
-      ...baseLimitOrderPoolTotalSharesMap,
-    } as LimitOrderPoolTotalSharesMap;
+      ...baseLimitOrderPoolUserSharesWithdrawn,
+    } as LimitOrderPoolUserSharesWithdrawn;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = String(object.pairId);
     } else {
@@ -102,31 +110,40 @@ export const LimitOrderPoolTotalSharesMap = {
     } else {
       message.count = 0;
     }
-    if (object.totalShares !== undefined && object.totalShares !== null) {
-      message.totalShares = String(object.totalShares);
+    if (object.address !== undefined && object.address !== null) {
+      message.address = String(object.address);
     } else {
-      message.totalShares = "";
+      message.address = "";
+    }
+    if (
+      object.sharesWithdrawn !== undefined &&
+      object.sharesWithdrawn !== null
+    ) {
+      message.sharesWithdrawn = String(object.sharesWithdrawn);
+    } else {
+      message.sharesWithdrawn = "";
     }
     return message;
   },
 
-  toJSON(message: LimitOrderPoolTotalSharesMap): unknown {
+  toJSON(message: LimitOrderPoolUserSharesWithdrawn): unknown {
     const obj: any = {};
     message.pairId !== undefined && (obj.pairId = message.pairId);
     message.token !== undefined && (obj.token = message.token);
     message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
     message.count !== undefined && (obj.count = message.count);
-    message.totalShares !== undefined &&
-      (obj.totalShares = message.totalShares);
+    message.address !== undefined && (obj.address = message.address);
+    message.sharesWithdrawn !== undefined &&
+      (obj.sharesWithdrawn = message.sharesWithdrawn);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<LimitOrderPoolTotalSharesMap>
-  ): LimitOrderPoolTotalSharesMap {
+    object: DeepPartial<LimitOrderPoolUserSharesWithdrawn>
+  ): LimitOrderPoolUserSharesWithdrawn {
     const message = {
-      ...baseLimitOrderPoolTotalSharesMap,
-    } as LimitOrderPoolTotalSharesMap;
+      ...baseLimitOrderPoolUserSharesWithdrawn,
+    } as LimitOrderPoolUserSharesWithdrawn;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = object.pairId;
     } else {
@@ -147,10 +164,18 @@ export const LimitOrderPoolTotalSharesMap = {
     } else {
       message.count = 0;
     }
-    if (object.totalShares !== undefined && object.totalShares !== null) {
-      message.totalShares = object.totalShares;
+    if (object.address !== undefined && object.address !== null) {
+      message.address = object.address;
     } else {
-      message.totalShares = "";
+      message.address = "";
+    }
+    if (
+      object.sharesWithdrawn !== undefined &&
+      object.sharesWithdrawn !== null
+    ) {
+      message.sharesWithdrawn = object.sharesWithdrawn;
+    } else {
+      message.sharesWithdrawn = "";
     }
     return message;
   },

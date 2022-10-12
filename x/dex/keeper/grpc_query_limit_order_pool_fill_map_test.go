@@ -31,21 +31,30 @@ func TestLimitOrderPoolFillMapQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetLimitOrderPoolFillMapRequest{
-				Count: msgs[0].Count,
+				PairId:    "TokenA/TokenB",
+				TickIndex: 0,
+				Token:     "TokenA",
+				Count:     msgs[0].Count,
 			},
 			response: &types.QueryGetLimitOrderPoolFillMapResponse{LimitOrderPoolFillMap: msgs[0]},
 		},
 		{
 			desc: "Second",
 			request: &types.QueryGetLimitOrderPoolFillMapRequest{
-				Count: msgs[1].Count,
+				PairId:    "TokenA/TokenB",
+				TickIndex: 0,
+				Token:     "TokenA",
+				Count:     msgs[1].Count,
 			},
 			response: &types.QueryGetLimitOrderPoolFillMapResponse{LimitOrderPoolFillMap: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetLimitOrderPoolFillMapRequest{
-				Count: 100000,
+				PairId:    "TokenA/TokenB",
+				TickIndex: 0,
+				Token:     "TokenA",
+				Count:     100000,
 			},
 			err: status.Error(codes.NotFound, "not found"),
 		},

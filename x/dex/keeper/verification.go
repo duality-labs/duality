@@ -132,46 +132,46 @@ func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 	return token0, token1, callerAddr, nil
 }
 
-func (k Keeper) SwapVerification(goCtx context.Context, msg types.MsgSwap) (string, string, sdk.AccAddress, error) {
+func (k Keeper) SwapVerification(goCtx context.Context, msg types.MsgSwap) (string, string, sdk.AccAddress, sdk.AccAddress, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
 
 	if err != nil {
-		return "", "", nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
 	}
 
 	// Converts input address (string) to sdk.AccAddress
 	callerAddr, err := sdk.AccAddressFromBech32(msg.Creator)
 	// Error checking for the calling address
 	if err != nil {
-		return "", "", nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	_, err = sdk.AccAddressFromBech32(msg.Receiver)
+	receiverAddr, err := sdk.AccAddressFromBech32(msg.Receiver)
 	// Error Checking for receiver address
 	// Note we do not actually need to save the sdk.AccAddress here but we do want the address to be checked to determine if it valid
 	if err != nil {
-		return "", "", nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
 	if msg.TokenIn != token0 && msg.TokenIn != token1 {
-		return "", "", nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
+		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
 	}
 	// Error checking for valid sdk.Dec
 	if err != nil {
-		return "", "", nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
+		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
 	AccountsAmountInBalance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, msg.TokenIn).Amount)
 
 	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 	if AccountsAmountInBalance.LT(msg.AmountIn) {
-		return "", "", nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
+		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
-	return token0, token1, callerAddr, nil
+	return token0, token1, callerAddr, receiverAddr, nil
 }
 
 func (k Keeper) PlaceLimitOrderVerification(goCtx context.Context, msg types.MsgPlaceLimitOrder) (string, string, sdk.AccAddress, error) {

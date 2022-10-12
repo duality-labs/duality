@@ -55,22 +55,24 @@ export interface MsgPlaceLimitOrderResponse {}
 
 export interface MsgWithdrawFilledLimitOrder {
   creator: string;
+  receiver: string;
   tokenA: string;
   tokenB: string;
-  tickIndex: string;
+  tickIndex: number;
   keyToken: string;
-  key: string;
+  key: number;
 }
 
 export interface MsgWithdrawFilledLimitOrderResponse {}
 
 export interface MsgCancelLimitOrder {
   creator: string;
+  receiver: string;
   tokenA: string;
   tokenB: string;
-  tickIndex: string;
+  tickIndex: number;
   keyToken: string;
-  key: string;
+  key: number;
 }
 
 export interface MsgCancelLimitOrderResponse {}
@@ -1009,11 +1011,12 @@ export const MsgPlaceLimitOrderResponse = {
 
 const baseMsgWithdrawFilledLimitOrder: object = {
   creator: "",
+  receiver: "",
   tokenA: "",
   tokenB: "",
-  tickIndex: "",
+  tickIndex: 0,
   keyToken: "",
-  key: "",
+  key: 0,
 };
 
 export const MsgWithdrawFilledLimitOrder = {
@@ -1024,20 +1027,23 @@ export const MsgWithdrawFilledLimitOrder = {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
+    if (message.receiver !== "") {
+      writer.uint32(18).string(message.receiver);
+    }
     if (message.tokenA !== "") {
-      writer.uint32(18).string(message.tokenA);
+      writer.uint32(26).string(message.tokenA);
     }
     if (message.tokenB !== "") {
-      writer.uint32(26).string(message.tokenB);
+      writer.uint32(34).string(message.tokenB);
     }
-    if (message.tickIndex !== "") {
-      writer.uint32(34).string(message.tickIndex);
+    if (message.tickIndex !== 0) {
+      writer.uint32(40).int64(message.tickIndex);
     }
     if (message.keyToken !== "") {
-      writer.uint32(42).string(message.keyToken);
+      writer.uint32(50).string(message.keyToken);
     }
-    if (message.key !== "") {
-      writer.uint32(50).string(message.key);
+    if (message.key !== 0) {
+      writer.uint32(56).uint64(message.key);
     }
     return writer;
   },
@@ -1058,19 +1064,22 @@ export const MsgWithdrawFilledLimitOrder = {
           message.creator = reader.string();
           break;
         case 2:
-          message.tokenA = reader.string();
+          message.receiver = reader.string();
           break;
         case 3:
-          message.tokenB = reader.string();
+          message.tokenA = reader.string();
           break;
         case 4:
-          message.tickIndex = reader.string();
+          message.tokenB = reader.string();
           break;
         case 5:
-          message.keyToken = reader.string();
+          message.tickIndex = longToNumber(reader.int64() as Long);
           break;
         case 6:
-          message.key = reader.string();
+          message.keyToken = reader.string();
+          break;
+        case 7:
+          message.key = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -1089,6 +1098,11 @@ export const MsgWithdrawFilledLimitOrder = {
     } else {
       message.creator = "";
     }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = String(object.receiver);
+    } else {
+      message.receiver = "";
+    }
     if (object.tokenA !== undefined && object.tokenA !== null) {
       message.tokenA = String(object.tokenA);
     } else {
@@ -1100,9 +1114,9 @@ export const MsgWithdrawFilledLimitOrder = {
       message.tokenB = "";
     }
     if (object.tickIndex !== undefined && object.tickIndex !== null) {
-      message.tickIndex = String(object.tickIndex);
+      message.tickIndex = Number(object.tickIndex);
     } else {
-      message.tickIndex = "";
+      message.tickIndex = 0;
     }
     if (object.keyToken !== undefined && object.keyToken !== null) {
       message.keyToken = String(object.keyToken);
@@ -1110,9 +1124,9 @@ export const MsgWithdrawFilledLimitOrder = {
       message.keyToken = "";
     }
     if (object.key !== undefined && object.key !== null) {
-      message.key = String(object.key);
+      message.key = Number(object.key);
     } else {
-      message.key = "";
+      message.key = 0;
     }
     return message;
   },
@@ -1120,6 +1134,7 @@ export const MsgWithdrawFilledLimitOrder = {
   toJSON(message: MsgWithdrawFilledLimitOrder): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
+    message.receiver !== undefined && (obj.receiver = message.receiver);
     message.tokenA !== undefined && (obj.tokenA = message.tokenA);
     message.tokenB !== undefined && (obj.tokenB = message.tokenB);
     message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
@@ -1139,6 +1154,11 @@ export const MsgWithdrawFilledLimitOrder = {
     } else {
       message.creator = "";
     }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = object.receiver;
+    } else {
+      message.receiver = "";
+    }
     if (object.tokenA !== undefined && object.tokenA !== null) {
       message.tokenA = object.tokenA;
     } else {
@@ -1152,7 +1172,7 @@ export const MsgWithdrawFilledLimitOrder = {
     if (object.tickIndex !== undefined && object.tickIndex !== null) {
       message.tickIndex = object.tickIndex;
     } else {
-      message.tickIndex = "";
+      message.tickIndex = 0;
     }
     if (object.keyToken !== undefined && object.keyToken !== null) {
       message.keyToken = object.keyToken;
@@ -1162,7 +1182,7 @@ export const MsgWithdrawFilledLimitOrder = {
     if (object.key !== undefined && object.key !== null) {
       message.key = object.key;
     } else {
-      message.key = "";
+      message.key = 0;
     }
     return message;
   },
@@ -1222,11 +1242,12 @@ export const MsgWithdrawFilledLimitOrderResponse = {
 
 const baseMsgCancelLimitOrder: object = {
   creator: "",
+  receiver: "",
   tokenA: "",
   tokenB: "",
-  tickIndex: "",
+  tickIndex: 0,
   keyToken: "",
-  key: "",
+  key: 0,
 };
 
 export const MsgCancelLimitOrder = {
@@ -1237,20 +1258,23 @@ export const MsgCancelLimitOrder = {
     if (message.creator !== "") {
       writer.uint32(10).string(message.creator);
     }
+    if (message.receiver !== "") {
+      writer.uint32(18).string(message.receiver);
+    }
     if (message.tokenA !== "") {
-      writer.uint32(18).string(message.tokenA);
+      writer.uint32(26).string(message.tokenA);
     }
     if (message.tokenB !== "") {
-      writer.uint32(26).string(message.tokenB);
+      writer.uint32(34).string(message.tokenB);
     }
-    if (message.tickIndex !== "") {
-      writer.uint32(34).string(message.tickIndex);
+    if (message.tickIndex !== 0) {
+      writer.uint32(40).int64(message.tickIndex);
     }
     if (message.keyToken !== "") {
-      writer.uint32(42).string(message.keyToken);
+      writer.uint32(50).string(message.keyToken);
     }
-    if (message.key !== "") {
-      writer.uint32(50).string(message.key);
+    if (message.key !== 0) {
+      writer.uint32(56).uint64(message.key);
     }
     return writer;
   },
@@ -1266,19 +1290,22 @@ export const MsgCancelLimitOrder = {
           message.creator = reader.string();
           break;
         case 2:
-          message.tokenA = reader.string();
+          message.receiver = reader.string();
           break;
         case 3:
-          message.tokenB = reader.string();
+          message.tokenA = reader.string();
           break;
         case 4:
-          message.tickIndex = reader.string();
+          message.tokenB = reader.string();
           break;
         case 5:
-          message.keyToken = reader.string();
+          message.tickIndex = longToNumber(reader.int64() as Long);
           break;
         case 6:
-          message.key = reader.string();
+          message.keyToken = reader.string();
+          break;
+        case 7:
+          message.key = longToNumber(reader.uint64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -1295,6 +1322,11 @@ export const MsgCancelLimitOrder = {
     } else {
       message.creator = "";
     }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = String(object.receiver);
+    } else {
+      message.receiver = "";
+    }
     if (object.tokenA !== undefined && object.tokenA !== null) {
       message.tokenA = String(object.tokenA);
     } else {
@@ -1306,9 +1338,9 @@ export const MsgCancelLimitOrder = {
       message.tokenB = "";
     }
     if (object.tickIndex !== undefined && object.tickIndex !== null) {
-      message.tickIndex = String(object.tickIndex);
+      message.tickIndex = Number(object.tickIndex);
     } else {
-      message.tickIndex = "";
+      message.tickIndex = 0;
     }
     if (object.keyToken !== undefined && object.keyToken !== null) {
       message.keyToken = String(object.keyToken);
@@ -1316,9 +1348,9 @@ export const MsgCancelLimitOrder = {
       message.keyToken = "";
     }
     if (object.key !== undefined && object.key !== null) {
-      message.key = String(object.key);
+      message.key = Number(object.key);
     } else {
-      message.key = "";
+      message.key = 0;
     }
     return message;
   },
@@ -1326,6 +1358,7 @@ export const MsgCancelLimitOrder = {
   toJSON(message: MsgCancelLimitOrder): unknown {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
+    message.receiver !== undefined && (obj.receiver = message.receiver);
     message.tokenA !== undefined && (obj.tokenA = message.tokenA);
     message.tokenB !== undefined && (obj.tokenB = message.tokenB);
     message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
@@ -1341,6 +1374,11 @@ export const MsgCancelLimitOrder = {
     } else {
       message.creator = "";
     }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = object.receiver;
+    } else {
+      message.receiver = "";
+    }
     if (object.tokenA !== undefined && object.tokenA !== null) {
       message.tokenA = object.tokenA;
     } else {
@@ -1354,7 +1392,7 @@ export const MsgCancelLimitOrder = {
     if (object.tickIndex !== undefined && object.tickIndex !== null) {
       message.tickIndex = object.tickIndex;
     } else {
-      message.tickIndex = "";
+      message.tickIndex = 0;
     }
     if (object.keyToken !== undefined && object.keyToken !== null) {
       message.keyToken = object.keyToken;
@@ -1364,7 +1402,7 @@ export const MsgCancelLimitOrder = {
     if (object.key !== undefined && object.key !== null) {
       message.key = object.key;
     } else {
-      message.key = "";
+      message.key = 0;
     }
     return message;
   },

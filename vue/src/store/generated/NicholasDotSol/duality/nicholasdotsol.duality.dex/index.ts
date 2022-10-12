@@ -360,13 +360,9 @@ export default {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryTickMap( key.tickIndex, query)).data
+				let value= (await queryClient.queryTickMap( key.pairId,  key.tickIndex)).data
 				
 					
-				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryTickMap( key.tickIndex, {...query, 'pagination.key':(<any> value).pagination.next_key})).data
-					value = mergeResults(value, next_values);
-				}
 				commit('QUERY', { query: 'TickMap', key: { params: {...key}, query}, value })
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTickMap', payload: { options: { all }, params: {...key},query }})
 				return getters['getTickMap']( { params: {...key}, query}) ?? {}
@@ -748,13 +744,9 @@ export default {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolUserShareMap( key.count,  key.address, query)).data
+				let value= (await queryClient.queryLimitOrderPoolUserShareMap( key.pairId,  key.token,  key.tickIndex,  key.count,  key.address)).data
 				
 					
-				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryLimitOrderPoolUserShareMap( key.count,  key.address, {...query, 'pagination.key':(<any> value).pagination.next_key})).data
-					value = mergeResults(value, next_values);
-				}
 				commit('QUERY', { query: 'LimitOrderPoolUserShareMap', key: { params: {...key}, query}, value })
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolUserShareMap', payload: { options: { all }, params: {...key},query }})
 				return getters['getLimitOrderPoolUserShareMap']( { params: {...key}, query}) ?? {}
@@ -800,13 +792,9 @@ export default {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolUserSharesWithdrawn( key.count,  key.address, query)).data
+				let value= (await queryClient.queryLimitOrderPoolUserSharesWithdrawn( key.pairId,  key.token,  key.tickIndex,  key.count,  key.address)).data
 				
 					
-				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryLimitOrderPoolUserSharesWithdrawn( key.count,  key.address, {...query, 'pagination.key':(<any> value).pagination.next_key})).data
-					value = mergeResults(value, next_values);
-				}
 				commit('QUERY', { query: 'LimitOrderPoolUserSharesWithdrawn', key: { params: {...key}, query}, value })
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolUserSharesWithdrawn', payload: { options: { all }, params: {...key},query }})
 				return getters['getLimitOrderPoolUserSharesWithdrawn']( { params: {...key}, query}) ?? {}
@@ -852,13 +840,9 @@ export default {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolTotalSharesMap( key.count, query)).data
+				let value= (await queryClient.queryLimitOrderPoolTotalSharesMap( key.pairId,  key.token,  key.tickIndex,  key.count)).data
 				
 					
-				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryLimitOrderPoolTotalSharesMap( key.count, {...query, 'pagination.key':(<any> value).pagination.next_key})).data
-					value = mergeResults(value, next_values);
-				}
 				commit('QUERY', { query: 'LimitOrderPoolTotalSharesMap', key: { params: {...key}, query}, value })
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolTotalSharesMap', payload: { options: { all }, params: {...key},query }})
 				return getters['getLimitOrderPoolTotalSharesMap']( { params: {...key}, query}) ?? {}
@@ -904,13 +888,9 @@ export default {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolReserveMap( key.count, query)).data
+				let value= (await queryClient.queryLimitOrderPoolReserveMap( key.pairId,  key.token,  key.tickIndex,  key.count)).data
 				
 					
-				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryLimitOrderPoolReserveMap( key.count, {...query, 'pagination.key':(<any> value).pagination.next_key})).data
-					value = mergeResults(value, next_values);
-				}
 				commit('QUERY', { query: 'LimitOrderPoolReserveMap', key: { params: {...key}, query}, value })
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolReserveMap', payload: { options: { all }, params: {...key},query }})
 				return getters['getLimitOrderPoolReserveMap']( { params: {...key}, query}) ?? {}
@@ -956,13 +936,9 @@ export default {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolFillMap( key.count, query)).data
+				let value= (await queryClient.queryLimitOrderPoolFillMap( key.pairId,  key.token,  key.tickIndex,  key.count)).data
 				
 					
-				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryLimitOrderPoolFillMap( key.count, {...query, 'pagination.key':(<any> value).pagination.next_key})).data
-					value = mergeResults(value, next_values);
-				}
 				commit('QUERY', { query: 'LimitOrderPoolFillMap', key: { params: {...key}, query}, value })
 				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolFillMap', payload: { options: { all }, params: {...key},query }})
 				return getters['getLimitOrderPoolFillMap']( { params: {...key}, query}) ?? {}
@@ -999,33 +975,18 @@ export default {
 		},
 		
 		
-		async sendMsgCancelLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
+		async sendMsgWithdrawFilledLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgCancelLimitOrder(value)
+				const msg = await txClient.msgWithdrawFilledLimitOrder(value)
 				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
 	gas: "200000" }, memo})
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgCancelLimitOrder:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgDeposit({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgDeposit(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgDeposit:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -1059,18 +1020,33 @@ export default {
 				}
 			}
 		},
-		async sendMsgWithdrawFilledLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
+		async sendMsgCancelLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgWithdrawFilledLimitOrder(value)
+				const msg = await txClient.msgCancelLimitOrder(value)
 				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
 	gas: "200000" }, memo})
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgCancelLimitOrder:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgDeposit({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgDeposit(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgDeposit:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -1090,29 +1066,16 @@ export default {
 			}
 		},
 		
-		async MsgCancelLimitOrder({ rootGetters }, { value }) {
+		async MsgWithdrawFilledLimitOrder({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgCancelLimitOrder(value)
+				const msg = await txClient.msgWithdrawFilledLimitOrder(value)
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgCancelLimitOrder:Create Could not create message: ' + e.message)
-				}
-			}
-		},
-		async MsgDeposit({ rootGetters }, { value }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgDeposit(value)
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgDeposit:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Create Could not create message: ' + e.message)
 				}
 			}
 		},
@@ -1142,16 +1105,29 @@ export default {
 				}
 			}
 		},
-		async MsgWithdrawFilledLimitOrder({ rootGetters }, { value }) {
+		async MsgCancelLimitOrder({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgWithdrawFilledLimitOrder(value)
+				const msg = await txClient.msgCancelLimitOrder(value)
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgCancelLimitOrder:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgDeposit({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgDeposit(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgDeposit:Create Could not create message: ' + e.message)
 				}
 			}
 		},

@@ -107,6 +107,8 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 					Reserve0AndShares: make([]*types.Reserve0AndSharesType, feeSize),
 					Reserve1:          make([]sdk.Dec, feeSize),
 				},
+				LimitOrderPool0To1: &types.LimitOrderPool{0, 0},
+				LimitOrderPool1To0: &types.LimitOrderPool{0, 0},
 			}
 
 			for i, _ := range lowerTick.TickData.Reserve0AndShares {
@@ -494,6 +496,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 		fmt.Println(count)
 		if !Current1Found {
+			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 - 1
 			continue
 		}
 
@@ -558,7 +561,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		}
 
 		// if feeIndex is equal to the largest index in feeList
-		if i == feeSize-1 {
+		if i == feeSize {
 
 			// assigns a new variable err to handle err not being initialized in this conditional
 			var err error
@@ -570,7 +573,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			}
 
 			// iterates CurrentTick0to1
-			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 + 1
+			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 - 1
 		}
 	}
 
@@ -618,15 +621,15 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	amount_out := sdk.ZeroDec()
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
-	for !amount_left.Equal(sdk.ZeroDec()) && (count < int(pair.PairCount)) {
 
+	for !amount_left.Equal(sdk.ZeroDec()) && (count < int(pair.PairCount)) {
 		Current0Data, Current0Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick1To0)
 		//Current0Datam := Current0Data.TickData.Reserve1[i]
 
 		// If tick/feeIndex pair is not found continue
 
 		if !Current0Found {
-
+			pair.TokenPair.CurrentTick1To0 = pair.TokenPair.CurrentTick1To0 + 1
 			continue
 		}
 
@@ -692,7 +695,8 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		}
 
 		// if feeIndex is equal to the largest index in feeList
-		if i == feeSize-1 {
+		if i == feeSize {
+
 			// assigns a new variable err to handle err not being initialized in this conditional
 			var err error
 			// runs swaps for any limitOrders at the specified tick, updating amount_left, amount_out accordingly
@@ -703,7 +707,9 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				return sdk.ZeroDec(), err
 			}
 
-			pair.TokenPair.CurrentTick1To0 = pair.TokenPair.CurrentTick1To0 - 1
+			pair.TokenPair.CurrentTick1To0 = pair.TokenPair.CurrentTick1To0 + 1
+			fmt.Println(count)
+			fmt.Println(amount_left)
 		}
 	}
 
@@ -739,7 +745,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 	tick, tickFound := k.GetTickMap(ctx, pairId, CurrentTick1to0)
 
 	if !tickFound {
-		return sdk.ZeroDec(), sdk.ZeroDec(), nil
+		return amount_left, amount_out, nil
 	}
 
 	// Gets Reserve, Fill map for the specified CurrentLimitOrderKey
@@ -748,7 +754,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 
 	// errors if ReserveMapFound is not found
 	if !ReserveMapFound {
-		return sdk.ZeroDec(), sdk.ZeroDec(), nil
+		return amount_left, amount_out, nil
 	}
 
 	// if no tokens have been filled at this key value, initialize to 0
@@ -853,7 +859,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 	tick, tickFound := k.GetTickMap(ctx, pairId, CurrentTick0to1)
 
 	if !tickFound {
-		return sdk.ZeroDec(), sdk.ZeroDec(), nil
+		return amount_left, amount_out, nil
 	}
 
 	ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
@@ -861,7 +867,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 
 	// errors if ReserveMapFound is not found
 	if !ReserveMapFound {
-		return sdk.ZeroDec(), sdk.ZeroDec(), nil
+		return amount_left, amount_out, nil
 	}
 
 	// if no tokens have been filled at this key value, initialize to 0
@@ -966,11 +972,14 @@ func (k Keeper) PlaceLimitOrderHelper(goCtx context.Context, pairId string, tick
 		// If tick does not exists intialize it
 		// @Dev initialize reserves struct to avoid having to check for individual subtype existance between deposit and placeLimitOrder
 		tick = types.TickMap{
+			PairId:    pairId,
 			TickIndex: tickIndex,
 			TickData: &types.TickDataType{
 				Reserve0AndShares: make([]*types.Reserve0AndSharesType, feeSize),
 				Reserve1:          make([]sdk.Dec, feeSize),
 			},
+			LimitOrderPool0To1: &types.LimitOrderPool{0, 0},
+			LimitOrderPool1To0: &types.LimitOrderPool{0, 0},
 		}
 
 		// Sets Reserve0AShares to 0
@@ -984,14 +993,6 @@ func (k Keeper) PlaceLimitOrderHelper(goCtx context.Context, pairId string, tick
 		for i, _ := range tick.TickData.Reserve1 {
 			tick.TickData.Reserve1[i] = sdk.ZeroDec()
 		}
-
-		// Sets Count and CurrentKey for 0to1 to 0
-		tick.LimitOrderPool0To1.Count = 0
-		tick.LimitOrderPool0To1.CurrentLimitOrderKey = 0
-
-		// Sets Count and CurrentKey for 1to0 to 0
-		tick.LimitOrderPool1To0.Count = 0
-		tick.LimitOrderPool1To0.CurrentLimitOrderKey = 0
 	}
 
 	return tick

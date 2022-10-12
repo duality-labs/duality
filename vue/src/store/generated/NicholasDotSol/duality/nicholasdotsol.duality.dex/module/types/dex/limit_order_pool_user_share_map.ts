@@ -5,12 +5,18 @@ import { util, configure, Writer, Reader } from "protobufjs/minimal";
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
 export interface LimitOrderPoolUserShareMap {
+  pairId: string;
+  token: string;
+  tickIndex: number;
   count: number;
   address: string;
   sharesOwned: string;
 }
 
 const baseLimitOrderPoolUserShareMap: object = {
+  pairId: "",
+  token: "",
+  tickIndex: 0,
   count: 0,
   address: "",
   sharesOwned: "",
@@ -21,14 +27,23 @@ export const LimitOrderPoolUserShareMap = {
     message: LimitOrderPoolUserShareMap,
     writer: Writer = Writer.create()
   ): Writer {
+    if (message.pairId !== "") {
+      writer.uint32(10).string(message.pairId);
+    }
+    if (message.token !== "") {
+      writer.uint32(18).string(message.token);
+    }
+    if (message.tickIndex !== 0) {
+      writer.uint32(24).int64(message.tickIndex);
+    }
     if (message.count !== 0) {
-      writer.uint32(8).uint64(message.count);
+      writer.uint32(32).uint64(message.count);
     }
     if (message.address !== "") {
-      writer.uint32(18).string(message.address);
+      writer.uint32(42).string(message.address);
     }
     if (message.sharesOwned !== "") {
-      writer.uint32(26).string(message.sharesOwned);
+      writer.uint32(50).string(message.sharesOwned);
     }
     return writer;
   },
@@ -46,12 +61,21 @@ export const LimitOrderPoolUserShareMap = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.count = longToNumber(reader.uint64() as Long);
+          message.pairId = reader.string();
           break;
         case 2:
-          message.address = reader.string();
+          message.token = reader.string();
           break;
         case 3:
+          message.tickIndex = longToNumber(reader.int64() as Long);
+          break;
+        case 4:
+          message.count = longToNumber(reader.uint64() as Long);
+          break;
+        case 5:
+          message.address = reader.string();
+          break;
+        case 6:
           message.sharesOwned = reader.string();
           break;
         default:
@@ -66,6 +90,21 @@ export const LimitOrderPoolUserShareMap = {
     const message = {
       ...baseLimitOrderPoolUserShareMap,
     } as LimitOrderPoolUserShareMap;
+    if (object.pairId !== undefined && object.pairId !== null) {
+      message.pairId = String(object.pairId);
+    } else {
+      message.pairId = "";
+    }
+    if (object.token !== undefined && object.token !== null) {
+      message.token = String(object.token);
+    } else {
+      message.token = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = Number(object.tickIndex);
+    } else {
+      message.tickIndex = 0;
+    }
     if (object.count !== undefined && object.count !== null) {
       message.count = Number(object.count);
     } else {
@@ -86,6 +125,9 @@ export const LimitOrderPoolUserShareMap = {
 
   toJSON(message: LimitOrderPoolUserShareMap): unknown {
     const obj: any = {};
+    message.pairId !== undefined && (obj.pairId = message.pairId);
+    message.token !== undefined && (obj.token = message.token);
+    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
     message.count !== undefined && (obj.count = message.count);
     message.address !== undefined && (obj.address = message.address);
     message.sharesOwned !== undefined &&
@@ -99,6 +141,21 @@ export const LimitOrderPoolUserShareMap = {
     const message = {
       ...baseLimitOrderPoolUserShareMap,
     } as LimitOrderPoolUserShareMap;
+    if (object.pairId !== undefined && object.pairId !== null) {
+      message.pairId = object.pairId;
+    } else {
+      message.pairId = "";
+    }
+    if (object.token !== undefined && object.token !== null) {
+      message.token = object.token;
+    } else {
+      message.token = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = object.tickIndex;
+    } else {
+      message.tickIndex = 0;
+    }
     if (object.count !== undefined && object.count !== null) {
       message.count = object.count;
     } else {

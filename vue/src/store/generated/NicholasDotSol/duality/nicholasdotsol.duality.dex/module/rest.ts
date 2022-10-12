@@ -30,6 +30,8 @@ export interface DexFeeList {
 }
 
 export interface DexLimitOrderPool {
+  pairId?: string;
+
   /** @format uint64 */
   count?: string;
 
@@ -38,24 +40,48 @@ export interface DexLimitOrderPool {
 }
 
 export interface DexLimitOrderPoolFillMap {
+  pairId?: string;
+  token?: string;
+
+  /** @format int64 */
+  tickIndex?: string;
+
   /** @format uint64 */
   count?: string;
   fill?: string;
 }
 
 export interface DexLimitOrderPoolReserveMap {
+  pairId?: string;
+  token?: string;
+
+  /** @format int64 */
+  tickIndex?: string;
+
   /** @format uint64 */
   count?: string;
   reserves?: string;
 }
 
 export interface DexLimitOrderPoolTotalSharesMap {
+  pairId?: string;
+  token?: string;
+
+  /** @format int64 */
+  tickIndex?: string;
+
   /** @format uint64 */
   count?: string;
   totalShares?: string;
 }
 
 export interface DexLimitOrderPoolUserShareMap {
+  pairId?: string;
+  token?: string;
+
+  /** @format int64 */
+  tickIndex?: string;
+
   /** @format uint64 */
   count?: string;
   address?: string;
@@ -63,6 +89,12 @@ export interface DexLimitOrderPoolUserShareMap {
 }
 
 export interface DexLimitOrderPoolUserSharesWithdrawn {
+  pairId?: string;
+  token?: string;
+
+  /** @format int64 */
+  tickIndex?: string;
+
   /** @format uint64 */
   count?: string;
   address?: string;
@@ -372,6 +404,8 @@ export interface DexTickDataType {
 }
 
 export interface DexTickMap {
+  pairId?: string;
+
   /** @format int64 */
   tickIndex?: string;
   tickData?: DexTickDataType;
@@ -817,17 +851,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @tags Query
    * @name QueryLimitOrderPoolFillMap
    * @summary Queries a LimitOrderPoolFillMap by index.
-   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_fill_map/{count}
+   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_fill_map/{pairId}/{token}/{tickIndex}/{count}
    */
   queryLimitOrderPoolFillMap = (
+    pairId: string,
+    token: string,
+    tickIndex: string,
     count: string,
-    query?: { pairId?: string; tickIndex?: string; token?: string },
     params: RequestParams = {},
   ) =>
     this.request<DexQueryGetLimitOrderPoolFillMapResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/limit_order_pool_fill_map/${count}`,
+      path: `/NicholasDotSol/duality/dex/limit_order_pool_fill_map/${pairId}/${token}/${tickIndex}/${count}`,
       method: "GET",
-      query: query,
       format: "json",
       ...params,
     });
@@ -863,17 +898,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @tags Query
    * @name QueryLimitOrderPoolReserveMap
    * @summary Queries a LimitOrderPoolReserveMap by index.
-   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_reserve_map/{count}
+   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_reserve_map/{pairId}/{token}/{tickIndex}/{count}
    */
   queryLimitOrderPoolReserveMap = (
+    pairId: string,
+    token: string,
+    tickIndex: string,
     count: string,
-    query?: { pairId?: string; tickIndex?: string; token?: string },
     params: RequestParams = {},
   ) =>
     this.request<DexQueryGetLimitOrderPoolReserveMapResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/limit_order_pool_reserve_map/${count}`,
+      path: `/NicholasDotSol/duality/dex/limit_order_pool_reserve_map/${pairId}/${token}/${tickIndex}/${count}`,
       method: "GET",
-      query: query,
       format: "json",
       ...params,
     });
@@ -909,17 +945,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @tags Query
    * @name QueryLimitOrderPoolTotalSharesMap
    * @summary Queries a LimitOrderPoolTotalSharesMap by index.
-   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map/{count}
+   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map/{pairId}/{token}/{tickIndex}/{count}
    */
   queryLimitOrderPoolTotalSharesMap = (
+    pairId: string,
+    token: string,
+    tickIndex: string,
     count: string,
-    query?: { pairId?: string; tickIndex?: string; token?: string },
     params: RequestParams = {},
   ) =>
     this.request<DexQueryGetLimitOrderPoolTotalSharesMapResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map/${count}`,
+      path: `/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map/${pairId}/${token}/${tickIndex}/${count}`,
       method: "GET",
-      query: query,
       format: "json",
       ...params,
     });
@@ -955,18 +992,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @tags Query
    * @name QueryLimitOrderPoolUserShareMap
    * @summary Queries a LimitOrderPoolUserShareMap by index.
-   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_user_share_map/{count}/{address}
+   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_user_share_map/{pairId}/{token}/{tickIndex}/{count}/{address}
    */
   queryLimitOrderPoolUserShareMap = (
+    pairId: string,
+    token: string,
+    tickIndex: string,
     count: string,
     address: string,
-    query?: { pairId?: string; tickIndex?: string; token?: string },
     params: RequestParams = {},
   ) =>
     this.request<DexQueryGetLimitOrderPoolUserShareMapResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/limit_order_pool_user_share_map/${count}/${address}`,
+      path: `/NicholasDotSol/duality/dex/limit_order_pool_user_share_map/${pairId}/${token}/${tickIndex}/${count}/${address}`,
       method: "GET",
-      query: query,
       format: "json",
       ...params,
     });
@@ -1002,18 +1040,19 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @tags Query
    * @name QueryLimitOrderPoolUserSharesWithdrawn
    * @summary Queries a LimitOrderPoolUserSharesWithdrawn by index.
-   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn/{count}/{address}
+   * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn/{pairId}/{token}/{tickIndex}/{count}/{address}
    */
   queryLimitOrderPoolUserSharesWithdrawn = (
+    pairId: string,
+    token: string,
+    tickIndex: string,
     count: string,
     address: string,
-    query?: { pairId?: string; tickIndex?: string; token?: string },
     params: RequestParams = {},
   ) =>
     this.request<DexQueryGetLimitOrderPoolUserSharesWithdrawnResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn/${count}/${address}`,
+      path: `/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn/${pairId}/${token}/${tickIndex}/${count}/${address}`,
       method: "GET",
-      query: query,
       format: "json",
       ...params,
     });
@@ -1147,13 +1186,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @tags Query
    * @name QueryTickMap
    * @summary Queries a TickMap by index.
-   * @request GET:/NicholasDotSol/duality/dex/tick_map/{tickIndex}
+   * @request GET:/NicholasDotSol/duality/dex/tick_map/{pairId}/{tickIndex}
    */
-  queryTickMap = (tickIndex: string, query?: { pairId?: string }, params: RequestParams = {}) =>
+  queryTickMap = (pairId: string, tickIndex: string, params: RequestParams = {}) =>
     this.request<DexQueryGetTickMapResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/tick_map/${tickIndex}`,
+      path: `/NicholasDotSol/duality/dex/tick_map/${pairId}/${tickIndex}`,
       method: "GET",
-      query: query,
       format: "json",
       ...params,
     });

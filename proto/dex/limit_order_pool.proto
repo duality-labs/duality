@@ -4,8 +4,7 @@ package nicholasdotsol.duality.dex;
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 
 message LimitOrderPool {
-  
-  string pairId = 1;
-  uint64 count = 2; 
-  uint64 currentLimitOrderKey = 3; 
+
+  uint64 count = 1; 
+  uint64 currentLimitOrderKey = 2; 
 }

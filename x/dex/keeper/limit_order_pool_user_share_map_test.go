@@ -25,6 +25,8 @@ func createNLimitOrderPoolUserShareMap(keeper *keeper.Keeper, ctx sdk.Context, p
 		items[i].TickIndex = tickIndex
 
 		keeper.SetLimitOrderPoolUserShareMap(ctx, items[i])
+		items[i].SharesOwned = sdk.ZeroDec()
+
 	}
 	return items
 }

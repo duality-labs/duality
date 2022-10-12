@@ -22,6 +22,7 @@ func createNLimitOrderPoolFillMap(keeper *keeper.Keeper, ctx sdk.Context, pairId
 		items[i].PairId = pairId
 		items[i].TickIndex = tickIndex
 		items[i].Token = token
+		items[i].Fill = sdk.ZeroDec()
 		keeper.SetLimitOrderPoolFillMap(ctx, items[i])
 	}
 	return items
