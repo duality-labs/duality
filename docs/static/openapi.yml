@@ -17356,6 +17356,9 @@ paths:
                         }
       parameters:
         - name: body
+          description: |-
+            SimulateRequest is the request type for the Service.Simulate
+            RPC method.
           in: body
           required: true
           schema:
@@ -18155,6 +18158,11 @@ paths:
                         }
       parameters:
         - name: body
+          description: >-
+            BroadcastTxRequest is the request type for the
+            Service.BroadcastTxRequest
+
+            RPC method.
           in: body
           required: true
           schema:
@@ -29795,6 +29803,1395 @@ paths:
           type: string
           format: uint64
         - name: revision_height
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/adjancey_matrix:
+    get:
+      summary: Queries a list of AdjanceyMatrix items.
+      operationId: NicholasdotsolDualityDexAdjanceyMatrixAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              AdjanceyMatrix:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uint64
+                    edgeRow:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uint64
+                        edge:
+                          type: boolean
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/NicholasDotSol/duality/dex/adjancey_matrix/{id}':
+    get:
+      summary: Queries a AdjanceyMatrix by id.
+      operationId: NicholasdotsolDualityDexAdjanceyMatrix
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              AdjanceyMatrix:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uint64
+                  edgeRow:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uint64
+                      edge:
+                        type: boolean
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/edge_row:
+    get:
+      summary: Queries a list of EdgeRow items.
+      operationId: NicholasdotsolDualityDexEdgeRowAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              EdgeRow:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uint64
+                    edge:
+                      type: boolean
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/NicholasDotSol/duality/dex/edge_row/{id}':
+    get:
+      summary: Queries a EdgeRow by id.
+      operationId: NicholasdotsolDualityDexEdgeRow
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              EdgeRow:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uint64
+                  edge:
+                    type: boolean
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/fee_list:
+    get:
+      summary: Queries a list of FeeList items.
+      operationId: NicholasdotsolDualityDexFeeListAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              FeeList:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uint64
+                    fee:
+                      type: string
+                      format: int64
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/NicholasDotSol/duality/dex/fee_list/{id}':
+    get:
+      summary: Queries a FeeList by id.
+      operationId: NicholasdotsolDualityDexFeeList
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              FeeList:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uint64
+                  fee:
+                    type: string
+                    format: int64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/pair_map:
+    get:
+      summary: Queries a list of PairMap items.
+      operationId: NicholasdotsolDualityDexPairMapAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              pairMap:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pairId:
+                      type: string
+                    tokenPair:
+                      type: object
+                      properties:
+                        currentTick0To1:
+                          type: string
+                          format: int64
+                        currentTick1To0:
+                          type: string
+                          format: int64
+                    pairCount:
+                      type: string
+                      format: int64
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/NicholasDotSol/duality/dex/pair_map/{pairId}':
+    get:
+      summary: Queries a PairMap by index.
+      operationId: NicholasdotsolDualityDexPairMap
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              pairMap:
+                type: object
+                properties:
+                  pairId:
+                    type: string
+                  tokenPair:
+                    type: object
+                    properties:
+                      currentTick0To1:
+                        type: string
+                        format: int64
+                      currentTick1To0:
+                        type: string
+                        format: int64
+                  pairCount:
+                    type: string
+                    format: int64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pairId
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/params:
+    get:
+      summary: Parameters queries the parameters of the module.
+      operationId: NicholasdotsolDualityDexParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params holds all the parameters of this module.
+                type: object
+            description: >-
+              QueryParamsResponse is response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/shares:
+    get:
+      summary: Queries a list of Shares items.
+      operationId: NicholasdotsolDualityDexSharesAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              shares:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                    pairId:
+                      type: string
+                    tickIndex:
+                      type: string
+                      format: int64
+                    feeIndex:
+                      type: string
+                      format: uint64
+                    sharesOwned:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/NicholasDotSol/duality/dex/shares/{address}/{pairId}/{tickIndex}/{fee}':
+    get:
+      summary: Queries a Shares by index.
+      operationId: NicholasdotsolDualityDexShares
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              shares:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  pairId:
+                    type: string
+                  tickIndex:
+                    type: string
+                    format: int64
+                  feeIndex:
+                    type: string
+                    format: uint64
+                  sharesOwned:
+                    type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: address
+          in: path
+          required: true
+          type: string
+        - name: pairId
+          in: path
+          required: true
+          type: string
+        - name: tickIndex
+          in: path
+          required: true
+          type: string
+          format: int64
+        - name: fee
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/tick_map:
+    get:
+      summary: Queries a list of TickMap items.
+      operationId: NicholasdotsolDualityDexTickMapAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              tickMap:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tickIndex:
+                      type: string
+                      format: int64
+                    tickData:
+                      type: object
+                      properties:
+                        reserve0AndShares:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              reserve0:
+                                type: string
+                              totalShares:
+                                type: string
+                        reserve1:
+                          type: array
+                          items:
+                            type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/NicholasDotSol/duality/dex/tick_map/{tickIndex}':
+    get:
+      summary: Queries a TickMap by index.
+      operationId: NicholasdotsolDualityDexTickMap
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              tickMap:
+                type: object
+                properties:
+                  tickIndex:
+                    type: string
+                    format: int64
+                  tickData:
+                    type: object
+                    properties:
+                      reserve0AndShares:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            reserve0:
+                              type: string
+                            totalShares:
+                              type: string
+                      reserve1:
+                        type: array
+                        items:
+                          type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: tickIndex
+          in: path
+          required: true
+          type: string
+          format: int64
+        - name: pairId
+          in: query
+          required: false
+          type: string
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/token_map:
+    get:
+      summary: Queries a list of TokenMap items.
+      operationId: NicholasdotsolDualityDexTokenMapAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              tokenMap:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                    index:
+                      type: string
+                      format: int64
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/NicholasDotSol/duality/dex/token_map/{address}':
+    get:
+      summary: Queries a TokenMap by index.
+      operationId: NicholasdotsolDualityDexTokenMap
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              tokenMap:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  index:
+                    type: string
+                    format: int64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: address
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/tokens:
+    get:
+      summary: Queries a list of Tokens items.
+      operationId: NicholasdotsolDualityDexTokensAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              Tokens:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uint64
+                    address:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  '/NicholasDotSol/duality/dex/tokens/{id}':
+    get:
+      summary: Queries a Tokens by id.
+      operationId: NicholasdotsolDualityDexTokens
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              Tokens:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uint64
+                  address:
+                    type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: id
           in: path
           required: true
           type: string
@@ -51508,6 +52905,621 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
+  nicholasdotsol.duality.dex.AdjanceyMatrix:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+      edgeRow:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+          edge:
+            type: boolean
+  nicholasdotsol.duality.dex.EdgeRow:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+      edge:
+        type: boolean
+  nicholasdotsol.duality.dex.FeeList:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+      fee:
+        type: string
+        format: int64
+  nicholasdotsol.duality.dex.MsgDepositResponse:
+    type: object
+  nicholasdotsol.duality.dex.MsgSwapResponse:
+    type: object
+  nicholasdotsol.duality.dex.MsgWithdrawlResponse:
+    type: object
+  nicholasdotsol.duality.dex.PairMap:
+    type: object
+    properties:
+      pairId:
+        type: string
+      tokenPair:
+        type: object
+        properties:
+          currentTick0To1:
+            type: string
+            format: int64
+          currentTick1To0:
+            type: string
+            format: int64
+      pairCount:
+        type: string
+        format: int64
+  nicholasdotsol.duality.dex.Params:
+    type: object
+    description: Params defines the parameters for the module.
+  nicholasdotsol.duality.dex.QueryAllAdjanceyMatrixResponse:
+    type: object
+    properties:
+      AdjanceyMatrix:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uint64
+            edgeRow:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uint64
+                edge:
+                  type: boolean
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  nicholasdotsol.duality.dex.QueryAllEdgeRowResponse:
+    type: object
+    properties:
+      EdgeRow:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uint64
+            edge:
+              type: boolean
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  nicholasdotsol.duality.dex.QueryAllFeeListResponse:
+    type: object
+    properties:
+      FeeList:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uint64
+            fee:
+              type: string
+              format: int64
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  nicholasdotsol.duality.dex.QueryAllPairMapResponse:
+    type: object
+    properties:
+      pairMap:
+        type: array
+        items:
+          type: object
+          properties:
+            pairId:
+              type: string
+            tokenPair:
+              type: object
+              properties:
+                currentTick0To1:
+                  type: string
+                  format: int64
+                currentTick1To0:
+                  type: string
+                  format: int64
+            pairCount:
+              type: string
+              format: int64
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  nicholasdotsol.duality.dex.QueryAllSharesResponse:
+    type: object
+    properties:
+      shares:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            pairId:
+              type: string
+            tickIndex:
+              type: string
+              format: int64
+            feeIndex:
+              type: string
+              format: uint64
+            sharesOwned:
+              type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  nicholasdotsol.duality.dex.QueryAllTickMapResponse:
+    type: object
+    properties:
+      tickMap:
+        type: array
+        items:
+          type: object
+          properties:
+            tickIndex:
+              type: string
+              format: int64
+            tickData:
+              type: object
+              properties:
+                reserve0AndShares:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      reserve0:
+                        type: string
+                      totalShares:
+                        type: string
+                reserve1:
+                  type: array
+                  items:
+                    type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  nicholasdotsol.duality.dex.QueryAllTokenMapResponse:
+    type: object
+    properties:
+      tokenMap:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            index:
+              type: string
+              format: int64
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  nicholasdotsol.duality.dex.QueryAllTokensResponse:
+    type: object
+    properties:
+      Tokens:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uint64
+            address:
+              type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  nicholasdotsol.duality.dex.QueryGetAdjanceyMatrixResponse:
+    type: object
+    properties:
+      AdjanceyMatrix:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+          edgeRow:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uint64
+              edge:
+                type: boolean
+  nicholasdotsol.duality.dex.QueryGetEdgeRowResponse:
+    type: object
+    properties:
+      EdgeRow:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+          edge:
+            type: boolean
+  nicholasdotsol.duality.dex.QueryGetFeeListResponse:
+    type: object
+    properties:
+      FeeList:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+          fee:
+            type: string
+            format: int64
+  nicholasdotsol.duality.dex.QueryGetPairMapResponse:
+    type: object
+    properties:
+      pairMap:
+        type: object
+        properties:
+          pairId:
+            type: string
+          tokenPair:
+            type: object
+            properties:
+              currentTick0To1:
+                type: string
+                format: int64
+              currentTick1To0:
+                type: string
+                format: int64
+          pairCount:
+            type: string
+            format: int64
+  nicholasdotsol.duality.dex.QueryGetSharesResponse:
+    type: object
+    properties:
+      shares:
+        type: object
+        properties:
+          address:
+            type: string
+          pairId:
+            type: string
+          tickIndex:
+            type: string
+            format: int64
+          feeIndex:
+            type: string
+            format: uint64
+          sharesOwned:
+            type: string
+  nicholasdotsol.duality.dex.QueryGetTickMapResponse:
+    type: object
+    properties:
+      tickMap:
+        type: object
+        properties:
+          tickIndex:
+            type: string
+            format: int64
+          tickData:
+            type: object
+            properties:
+              reserve0AndShares:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    reserve0:
+                      type: string
+                    totalShares:
+                      type: string
+              reserve1:
+                type: array
+                items:
+                  type: string
+  nicholasdotsol.duality.dex.QueryGetTokenMapResponse:
+    type: object
+    properties:
+      tokenMap:
+        type: object
+        properties:
+          address:
+            type: string
+          index:
+            type: string
+            format: int64
+  nicholasdotsol.duality.dex.QueryGetTokensResponse:
+    type: object
+    properties:
+      Tokens:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+          address:
+            type: string
+  nicholasdotsol.duality.dex.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params holds all the parameters of this module.
+        type: object
+    description: QueryParamsResponse is response type for the Query/Params RPC method.
+  nicholasdotsol.duality.dex.Reserve0AndSharesType:
+    type: object
+    properties:
+      reserve0:
+        type: string
+      totalShares:
+        type: string
+  nicholasdotsol.duality.dex.Shares:
+    type: object
+    properties:
+      address:
+        type: string
+      pairId:
+        type: string
+      tickIndex:
+        type: string
+        format: int64
+      feeIndex:
+        type: string
+        format: uint64
+      sharesOwned:
+        type: string
+  nicholasdotsol.duality.dex.TickDataType:
+    type: object
+    properties:
+      reserve0AndShares:
+        type: array
+        items:
+          type: object
+          properties:
+            reserve0:
+              type: string
+            totalShares:
+              type: string
+      reserve1:
+        type: array
+        items:
+          type: string
+  nicholasdotsol.duality.dex.TickMap:
+    type: object
+    properties:
+      tickIndex:
+        type: string
+        format: int64
+      tickData:
+        type: object
+        properties:
+          reserve0AndShares:
+            type: array
+            items:
+              type: object
+              properties:
+                reserve0:
+                  type: string
+                totalShares:
+                  type: string
+          reserve1:
+            type: array
+            items:
+              type: string
+  nicholasdotsol.duality.dex.TokenMap:
+    type: object
+    properties:
+      address:
+        type: string
+      index:
+        type: string
+        format: int64
+  nicholasdotsol.duality.dex.TokenPairType:
+    type: object
+    properties:
+      currentTick0To1:
+        type: string
+        format: int64
+      currentTick1To0:
+        type: string
+        format: int64
+  nicholasdotsol.duality.dex.Tokens:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+      address:
+        type: string
   tendermint.spn.claim.ClaimRecord:
     type: object
     properties:
