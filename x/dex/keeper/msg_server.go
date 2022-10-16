@@ -70,6 +70,8 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	if msg.TokenIn == token0 {
 		amount_out, err = k.Swap0to1(goCtx, msg, token0, token1, createrAddr)
 
+		fmt.Println(msg.TokenIn)
+		fmt.Println(amount_out)
 		if err != nil {
 			return nil, err
 		}
