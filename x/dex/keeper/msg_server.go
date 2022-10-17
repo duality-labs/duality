@@ -149,13 +149,13 @@ func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLim
 func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.MsgWithdrawFilledLimitOrder) (*types.MsgWithdrawFilledLimitOrderResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, createrAddr, err := k.WithdrawLimitOrderVerification(goCtx, *msg)
+	token0, token1, createrAddr, receiverAddr, err := k.WithdrawLimitOrderVerification(goCtx, *msg)
 
 	if err != nil {
 		return &types.MsgWithdrawFilledLimitOrderResponse{}, err
 	}
 
-	err = k.WithdrawWithdrawnLimitOrderCore(goCtx, msg, token0, token1, createrAddr)
+	err = k.WithdrawWithdrawnLimitOrderCore(goCtx, msg, token0, token1, createrAddr, receiverAddr)
 
 	if err != nil {
 		return &types.MsgWithdrawFilledLimitOrderResponse{}, err

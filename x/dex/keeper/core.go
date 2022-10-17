@@ -1165,7 +1165,6 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	TotalSharesMap.TotalShares = TotalSharesMap.TotalShares.Add(newShares)
 
 	// Set Fill, Reserve, UserShares, and TotalShares maps in KVStore
-	fmt.Println(ReserveMap)
 	k.SetLimitOrderPoolFillMap(ctx, FillMap)
 	k.SetLimitOrderPoolReserveMap(ctx, ReserveMap)
 	k.SetLimitOrderPoolUserShareMap(ctx, UserShareMap)
@@ -1204,7 +1203,7 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	return nil
 }
 
-func (k Keeper) WithdrawWithdrawnLimitOrderCore(goCtx context.Context, msg *types.MsgWithdrawFilledLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress) error {
+func (k Keeper) WithdrawWithdrawnLimitOrderCore(goCtx context.Context, msg *types.MsgWithdrawFilledLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// PairId for token0, token1 ("token0/token1")
@@ -1224,12 +1223,23 @@ func (k Keeper) WithdrawWithdrawnLimitOrderCore(goCtx context.Context, msg *type
 	// Retrives LimitOrderUserSharesMap object from KVStore for the specified key and keyToken
 	UserShareMap, UserShareMapFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
 	// Retrives LimitOrderUserSharesWithdrawnMap object from KVStore for the specified key and keyToken
-	UserSharesWithdrawnMap, UserSharesFillFound := k.GetLimitOrderPoolUserSharesWithdrawn(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
+	UserSharesWithdrawnMap, UserSharesWithdrawnFound := k.GetLimitOrderPoolUserSharesWithdrawn(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
 	// Retrives LimitOrderTotalSharesMap object from KVStore for the specified key and keyToken
 	TotalSharesMap, TotalShareMapFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 
+	if !UserSharesWithdrawnFound {
+		UserSharesWithdrawnMap = types.LimitOrderPoolUserSharesWithdrawn{
+			PairId:          pairId,
+			TickIndex:       msg.TickIndex,
+			Token:           msg.KeyToken,
+			Count:           msg.Key,
+			Address:         msg.Creator,
+			SharesWithdrawn: sdk.ZeroDec(),
+		}
+	}
+
 	// If any of these maps are not found, then a valid withdraw option will not exist, and thus error
-	if !FillMapFound || !UserShareMapFound || !TotalShareMapFound || !ReserveMapFound || !UserSharesFillFound {
+	if !FillMapFound || !UserShareMapFound || !TotalShareMapFound || !ReserveMapFound {
 		return sdkerrors.Wrapf(types.ErrValidLimitOrderMapsNotFound, "Valid mappings for limit order withdraw not found")
 	}
 
@@ -1239,6 +1249,8 @@ func (k Keeper) WithdrawWithdrawnLimitOrderCore(goCtx context.Context, msg *type
 	}
 	// Calculates the sharesOut based on the UserShares withdrawn  compared to sharesLeft compared to remaining liquidity in reserves
 	sharesOut := ((FillMap.Fill.Mul(UserSharesWithdrawnMap.SharesWithdrawn.Add(UserShareMap.SharesOwned))).Quo(FillMap.Fill.Add(ReserveMap.Reserves))).Sub(UserSharesWithdrawnMap.SharesWithdrawn)
+
+	amountOut := (sharesOut.Mul(FillMap.Fill)).Quo(TotalSharesMap.TotalShares)
 	// Calculates amount to subtract from fillMap object given sharesOut
 	FillMap.Fill = FillMap.Fill.Sub(sharesOut.Mul(FillMap.Fill).Quo(TotalSharesMap.TotalShares))
 	// Updates useSharesWithdrawMap to include sharesOut
@@ -1247,9 +1259,9 @@ func (k Keeper) WithdrawWithdrawnLimitOrderCore(goCtx context.Context, msg *type
 	UserShareMap.SharesOwned = UserShareMap.SharesOwned.Sub(sharesOut)
 	// Removes sharesOut from TotalSharesMap
 	// TODO: this wasn't in the spec but I assumed this is needed?
-	TotalSharesMap.TotalShares = TotalSharesMap.TotalShares.Sub(sharesOut)
 	// calculate amountOout given sharesOut
-	amountOut := (sharesOut.Mul(FillMap.Fill)).Quo(TotalSharesMap.TotalShares)
+
+	//TotalSharesMap.TotalShares = TotalSharesMap.TotalShares.Sub(sharesOut)
 
 	// Updates changed LimitOrder Mappings in KVstore
 	k.SetLimitOrderPoolFillMap(ctx, FillMap)
@@ -1266,10 +1278,11 @@ func (k Keeper) WithdrawWithdrawnLimitOrderCore(goCtx context.Context, msg *type
 		tokenOut = token0
 	}
 
+	fmt.Println("Amount out: ", amountOut)
 	// Sends amountOut from module address to msg.Receiver account address
 	if amountOut.GT(sdk.ZeroDec()) {
 		coinOut := sdk.NewCoin(tokenOut, sdk.NewIntFromBigInt(amountOut.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(msg.Receiver), sdk.Coins{coinOut}); err != nil {
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
 	} else {
