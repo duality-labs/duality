@@ -98,8 +98,8 @@ func (suite *IntegrationTestSuite) TestBasicMultiHopRoute() {
 		TokenA:      "JUNO",
 		TokenB:      "STARS",
 		AmountsA:    []sdk.Dec{sdk.ZeroDec()},
-		AmountsB:    []sdk.Dec{sdk.NewDec(5)},
-		TickIndexes: []int64{-1},
+		AmountsB:    []sdk.Dec{sdk.NewDec(5), sdk.NewDec(5)},
+		TickIndexes: []int64{-1, -2},
 		FeeIndexes:  []uint64{0},
 		Receiver:    lp.String(),
 	})
