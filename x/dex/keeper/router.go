@@ -140,25 +140,24 @@ func (k Keeper) updateRoutePrice(ctx sdk.Context, route Route) (sdk.Dec, error) 
 				// Multiply price according to tick
 				if route.path[i] == token0 {
 					// Checks if there are active ticks
-					// TODO: THIS DOES NOT WORK B/C IT DOESN"T CHECK IF THERE ARE NO TICKS ON ONE SIDE
-					if pair.PairCount > 0 {
-						tickPrice, err := k.Calc_price(pair.TokenPair.CurrentTick0To1)
-						if err != nil {
-							return sdk.ZeroDec(), err
-						}
-						price = price.Mul(tickPrice)
+					// If no liquidity at tick, then nothing exists
+					// if k.GetTotalReservesAtTick(pairId, pair.TokenPair.CurrentTick0To1, true) > 0 {
+					tickPrice, err := k.Calc_price(pair.TokenPair.CurrentTick0To1)
+					if err != nil {
+						return sdk.ZeroDec(), err
 					}
+					price = price.Mul(tickPrice)
 
 				} else {
 					// Checks if there are active ticks
 					// TODO: THIS DOES NOT WORK B/C IT DOESN"T CHECK IF THERE ARE NO TICKS ON ONE SIDE
-					if pair.PairCount > 0 {
-						tickPrice, err := k.Calc_price(pair.TokenPair.CurrentTick1To0)
-						if err != nil {
-							return sdk.ZeroDec(), err
-						}
-						price = price.Mul(tickPrice)
+					// if pair.PairCount > 0 {
+					tickPrice, err := k.Calc_price(pair.TokenPair.CurrentTick1To0)
+					if err != nil {
+						return sdk.ZeroDec(), err
 					}
+					price = price.Mul(tickPrice)
+					// }
 				}
 			}
 		}
