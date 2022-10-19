@@ -155,7 +155,6 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 			TotalShares: sharesMinted,
 		}
 
-		fmt.Println(NewReserve0andShares)
 		upperTick.TickData.Reserve0AndShares[feeIndex] = NewReserve0andShares
 
 		lowerTick.TickData.Reserve1[feeIndex] = trueAmount1
