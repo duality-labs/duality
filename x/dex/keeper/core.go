@@ -1198,7 +1198,68 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	return nil
 }
 
-func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancelLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress) error {
+func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancelLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// PairId for token0, token1 ("token0/token1")
+	pairId := k.CreatePairId(token0, token1)
+	// Retrives TickMap object from KVStore
+	_, tickFound := k.GetTickMap(ctx, pairId, msg.TickIndex)
+
+	// If tick does not exist, then there is no liqudity to withdraw and thus error
+	if !tickFound {
+		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Valid tick not found ")
+	}
+
+	// Retrives LimitOrderUserSharesMap object from KVStore for the specified key and keyToken
+	UserShareMap, UserShareMapFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
+	// Retrives LimitOrderReserevMap object from KVStore for the specified key and keyToken
+	ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
+	// Retrives LimitOrderTotalSharesMap object from KVStore for the specified key and keyToken
+	TotalSharesMap, TotalShareMapFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
+
+	// If the UserShareMap does not exists, error (no shares exists for this user)
+	// If ReserveMapFound or TotalShares is not found then this must not be a valid limit order to begin with
+	if !UserShareMapFound || !ReserveMapFound || !TotalShareMapFound {
+		return sdkerrors.Wrapf(types.ErrValidLimitOrderMapsNotFound, "UserShareMap not found")
+	}
+
+	if msg.SharesOut.GT(UserShareMap.SharesOwned) {
+		return sdkerrors.Wrapf(types.ErrCannotWithdrawLimitOrder, "sharesOut is larger than shares Owned at the specified tick")
+	}
+
+	// Calculate the value of the shares (in terms of the reserves) of the limit order to cancel
+	amountOut := msg.SharesOut.Mul(ReserveMap.Reserves).Quo(TotalSharesMap.TotalShares)
+
+	// Subtract shares canceled from the user mapping
+	UserShareMap.SharesOwned = UserShareMap.SharesOwned.Sub(msg.SharesOut)
+	// Subtract the value of shares (amountOut) from the overall reserveMap
+	ReserveMap.Reserves = ReserveMap.Reserves.Sub(amountOut)
+	// Subtract sharesCancled from the totalShares mapping
+	TotalSharesMap.TotalShares = TotalSharesMap.TotalShares.Sub(msg.SharesOut)
+
+	// Updates mappings in the KVStore
+	k.SetLimitOrderPoolUserShareMap(ctx, UserShareMap)
+	k.SetLimitOrderPoolReserveMap(ctx, ReserveMap)
+	k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesMap)
+
+	fmt.Println("Cancel amountOut", amountOut)
+	fmt.Println("Cancel userShares SharesOwned", UserShareMap.SharesOwned)
+	// Sends amountOut from module address to msg.Receiver account address
+	if amountOut.GT(sdk.ZeroDec()) {
+		coinOut := sdk.NewCoin(msg.KeyToken, sdk.NewIntFromBigInt(amountOut.BigInt()))
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
+			return err
+		}
+	} else {
+		return sdkerrors.Wrapf(types.ErrCannotWithdrawLimitOrder, "Cannot cancel liqudity from this limit order at this time")
+	}
+
+	// emit CancelLimitOrderEvent
+	ctx.EventManager().EmitEvent(types.CancelLimitOrderEvent(msg.Creator, msg.Receiver,
+		token0, token1, msg.KeyToken, strconv.Itoa(int(msg.Key)), amountOut.String(),
+	))
 
 	return nil
 }
@@ -1278,7 +1339,6 @@ func (k Keeper) WithdrawWithdrawnLimitOrderCore(goCtx context.Context, msg *type
 		tokenOut = token0
 	}
 
-	fmt.Println("Amount out: ", amountOut)
 	// Sends amountOut from module address to msg.Receiver account address
 	if amountOut.GT(sdk.ZeroDec()) {
 		coinOut := sdk.NewCoin(tokenOut, sdk.NewIntFromBigInt(amountOut.BigInt()))

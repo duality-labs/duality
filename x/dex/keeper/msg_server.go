@@ -169,13 +169,13 @@ func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.Ms
 func (k msgServer) CancelLimitOrder(goCtx context.Context, msg *types.MsgCancelLimitOrder) (*types.MsgCancelLimitOrderResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, createrAddr, err := k.CancelLimitOrderVerification(goCtx, *msg)
+	token0, token1, createrAddr, receiverAddr, err := k.CancelLimitOrderVerification(goCtx, *msg)
 
 	if err != nil {
 		return &types.MsgCancelLimitOrderResponse{}, err
 	}
 
-	err = k.CancelLimitOrderCore(goCtx, msg, token0, token1, createrAddr)
+	err = k.CancelLimitOrderCore(goCtx, msg, token0, token1, createrAddr, receiverAddr)
 
 	if err != nil {
 		return &types.MsgCancelLimitOrderResponse{}, err

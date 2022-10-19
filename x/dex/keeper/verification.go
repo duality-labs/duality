@@ -254,27 +254,27 @@ func (k Keeper) WithdrawLimitOrderVerification(goCtx context.Context, msg types.
 	return token0, token1, callerAddr, ReceiverAddr, nil
 }
 
-func (k Keeper) CancelLimitOrderVerification(goCtx context.Context, msg types.MsgCancelLimitOrder) (string, string, sdk.AccAddress, error) {
+func (k Keeper) CancelLimitOrderVerification(goCtx context.Context, msg types.MsgCancelLimitOrder) (string, string, sdk.AccAddress, sdk.AccAddress, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
 
 	if err != nil {
-		return "", "", nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
 	}
 
 	// Converts input address (string) to sdk.AccAddress
 	callerAddr, err := sdk.AccAddressFromBech32(msg.Creator)
 	// Error checking for the calling address
 	if err != nil {
-		return "", "", nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	_, err = sdk.AccAddressFromBech32(msg.Receiver)
+	receiverAddr, err := sdk.AccAddressFromBech32(msg.Receiver)
 	// Error Checking for receiver address
 	// Note we do not actually need to save the sdk.AccAddress here but we do want the address to be checked to determine if it valid
 	if err != nil {
-		return "", "", nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
 	pairId := k.CreatePairId(token0, token1)
@@ -282,15 +282,13 @@ func (k Keeper) CancelLimitOrderVerification(goCtx context.Context, msg types.Ms
 	shares, sharesFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
 
 	if !sharesFound {
-		return "", "", nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
+		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
 	}
 
 	if shares.SharesOwned.LTE(sdk.ZeroDec()) {
-		return "", "", nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
+		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
 	}
 
 	_ = ctx
-
-	_ = ctx
-	return token0, token1, callerAddr, nil
+	return token0, token1, callerAddr, receiverAddr, nil
 }

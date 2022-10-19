@@ -315,6 +315,17 @@ const (
 )
 
 const (
+	CancelLimitOrderEventKey           = "NewWithdraw"
+	CancelLimitOrderEventCreator       = "Creator"
+	CancelLimitOrderEventReceiver      = "Receiver"
+	CancelLimitOrderEventToken0        = "Token0"
+	CancelLimitOrderEventToken1        = "Token1"
+	CancelLimitOrderEventTokenKey      = "TokenKey"
+	CancelLimitOrderEventLimitOrderKey = "LimitOrderKey"
+	CancelLimitOrderEventAmountOut     = "AmountOut"
+)
+
+const (
 	FeeListKey      = "FeeList-value-"
 	FeeListCountKey = "FeeList-count-"
 )

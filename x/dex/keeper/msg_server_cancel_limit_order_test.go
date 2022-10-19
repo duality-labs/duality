@@ -9,9 +9,9 @@ import (
 	//authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
-func (suite *IntegrationTestSuite) TestMultiTickLimitOrder1to0_Withdraw() {
+func (suite *IntegrationTestSuite) TestCancelLimitOrderSingle() {
 
-	fmt.Println("Limit Order Withdraw Tests 1 to 0")
+	fmt.Println("Limit Order Cancel Test 1")
 	app, ctx := suite.app, suite.ctx
 	//holderAcc := authtypes.NewEmptyModuleAccount("holder")
 	alice := sdk.AccAddress([]byte("alice"))
@@ -61,21 +61,102 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder1to0_Withdraw() {
 
 	_ = orderResponse1
 
-	orderResponse2, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
+	cancelResponse1, err := suite.msgServer.CancelLimitOrder(goCtx, &types.MsgCancelLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
 		TokenA:    "TokenA",
 		TokenB:    "TokenB",
-		TickIndex: -1,
-		TokenIn:   "TokenB",
-		AmountIn:  newDec("25"),
+		TickIndex: 0,
+		KeyToken:  "TokenB",
+		Key:       0,
+		SharesOut: newDec("25"),
 	})
 
 	suite.Require().Nil(err)
 
-	_ = orderResponse2
-
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
+	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000001"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("0"))))
+
+	_ = cancelResponse1
+
+}
+
+func (suite *IntegrationTestSuite) TestCancelLimitOrder_2() {
+
+	fmt.Println("Limit Order Cancel Tests 2")
+	app, ctx := suite.app, suite.ctx
+	//holderAcc := authtypes.NewEmptyModuleAccount("holder")
+	alice := sdk.AccAddress([]byte("alice"))
+	bob := sdk.AccAddress([]byte("bob"))
+
+	accAlice := app.AccountKeeper.NewAccountWithAddress(ctx, alice)
+	app.AccountKeeper.SetAccount(ctx, accAlice)
+	accBob := app.AccountKeeper.NewAccountWithAddress(ctx, bob)
+	app.AccountKeeper.SetAccount(ctx, accBob)
+
+	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000000")), newBCoin(convInt("500000000000000000000")))
+	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
+
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
+	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
+	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000001"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+
+	goCtx := sdk.WrapSDKContext(ctx)
+
+	// Set Fee List
+
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{0, 1})
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{1, 2})
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{2, 3})
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{3, 4})
+
+	//fmt.Println("FeeList")
+	feeList := app.DexKeeper.GetAllFeeList(ctx)
+	fmt.Println(feeList)
+
+	orderResponse1, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
+		Creator:   alice.String(),
+		Receiver:  alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		TickIndex: 0,
+		TokenIn:   "TokenB",
+		AmountIn:  newDec("40"),
+	})
+
+	suite.Require().Nil(err)
+
+	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("460000000000000000001"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("40000000000000000000"))))
+
+	_ = orderResponse1
+
+	cancelResponse1, err := suite.msgServer.CancelLimitOrder(goCtx, &types.MsgCancelLimitOrder{
+		Creator:   alice.String(),
+		Receiver:  alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		TickIndex: 0,
+		KeyToken:  "TokenB",
+		Key:       0,
+		SharesOut: newDec("15"),
+	})
+
+	suite.Require().Nil(err)
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("475000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("25000000000000000000"))))
+	_ = cancelResponse1
 
 	swapResponse, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator:  bob.String(),
@@ -84,19 +165,16 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder1to0_Withdraw() {
 		TokenB:   "TokenB",
 		TokenIn:  "TokenA",
 		AmountIn: newDec("40"),
-		MinOut:   newDec("30"),
+		MinOut:   newDec("14"),
 	})
 
 	suite.Require().Nil(err)
 
-	suite.Require().False(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("60000000000000000001"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("60000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("239000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("0"))))
 
 	_ = swapResponse
 
-	withdrawResponse, err := suite.msgServer.WithdrawFilledLimitOrder(goCtx, &types.MsgWithdrawFilledLimitOrder{
-
+	cancelResponse2, err := suite.msgServer.CancelLimitOrder(goCtx, &types.MsgCancelLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
 		TokenA:    "TokenA",
@@ -104,36 +182,18 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder1to0_Withdraw() {
 		TickIndex: 0,
 		KeyToken:  "TokenB",
 		Key:       0,
+		SharesOut: newDec("15"),
 	})
 
-	suite.Require().Nil(err)
+	suite.Require().Error(err)
 
-	_ = withdrawResponse
-
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100025000000000000000000"))))
-
-	withdrawResponse2, err := suite.msgServer.WithdrawFilledLimitOrder(goCtx, &types.MsgWithdrawFilledLimitOrder{
-
-		Creator:   alice.String(),
-		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: -1,
-		KeyToken:  "TokenB",
-		Key:       0,
-	})
-
-	suite.Require().Nil(err)
-
-	_ = withdrawResponse2
-
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100033900000000000000000"))))
+	_ = cancelResponse2
 
 }
 
-func (suite *IntegrationTestSuite) TestMultiTickLimitOrder0to1_Withdraw() {
+func (suite *IntegrationTestSuite) TestCancelLimitOrder_3() {
 
-	fmt.Println("Limit Order Withdraw Tests 1 to 0")
+	fmt.Println("Limit Order Cancel Tests 2")
 	app, ctx := suite.app, suite.ctx
 	//holderAcc := authtypes.NewEmptyModuleAccount("holder")
 	alice := sdk.AccAddress([]byte("alice"))
@@ -175,125 +235,35 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder0to1_Withdraw() {
 		TokenA:    "TokenA",
 		TokenB:    "TokenB",
 		TickIndex: 0,
-		TokenIn:   "TokenA",
-		AmountIn:  newDec("25"),
+		TokenIn:   "TokenB",
+		AmountIn:  newDec("40"),
 	})
 
 	suite.Require().Nil(err)
+
+	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("460000000000000000001"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("40000000000000000000"))))
 
 	_ = orderResponse1
 
-	orderResponse2, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
-		Creator:   alice.String(),
-		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 1,
-		TokenIn:   "TokenA",
-		AmountIn:  newDec("25"),
-	})
-
-	suite.Require().Nil(err)
-
-	_ = orderResponse2
-
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
-
-	swapResponse, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
-		Creator:  bob.String(),
-		Receiver: bob.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
-		TokenIn:  "TokenB",
-		AmountIn: newDec("40"),
-		MinOut:   newDec("30"),
-	})
-
-	suite.Require().Nil(err)
-
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("139000000000000000000"))))
-
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("160000000000000000000"))))
-
-	_ = swapResponse
-
-	withdrawResponse, err := suite.msgServer.WithdrawFilledLimitOrder(goCtx, &types.MsgWithdrawFilledLimitOrder{
-
+	cancelResponse1, err := suite.msgServer.CancelLimitOrder(goCtx, &types.MsgCancelLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
 		TokenA:    "TokenA",
 		TokenB:    "TokenB",
 		TickIndex: 0,
-		KeyToken:  "TokenA",
+		KeyToken:  "TokenB",
 		Key:       0,
+		SharesOut: newDec("15"),
 	})
-
 	suite.Require().Nil(err)
-
-	_ = withdrawResponse
-
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("525000000000000000000"))))
-
-	withdrawResponse2, err := suite.msgServer.WithdrawFilledLimitOrder(goCtx, &types.MsgWithdrawFilledLimitOrder{
-
-		Creator:   alice.String(),
-		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 1,
-		KeyToken:  "TokenA",
-		Key:       0,
-	})
-
-	suite.Require().Nil(err)
-
-	_ = withdrawResponse2
-
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("533900000000000000000"))))
-
-}
-
-func (suite *IntegrationTestSuite) ErrorCasesWithdrawLimitOrder() {
-
-	fmt.Println("Limit Order Withdraw Tests 1 to 0")
-	app, ctx := suite.app, suite.ctx
-	//holderAcc := authtypes.NewEmptyModuleAccount("holder")
-	alice := sdk.AccAddress([]byte("alice"))
-	bob := sdk.AccAddress([]byte("bob"))
-
-	accAlice := app.AccountKeeper.NewAccountWithAddress(ctx, alice)
-	app.AccountKeeper.SetAccount(ctx, accAlice)
-	accBob := app.AccountKeeper.NewAccountWithAddress(ctx, bob)
-	app.AccountKeeper.SetAccount(ctx, accBob)
-
-	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000000")), newBCoin(convInt("500000000000000000000")))
-	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
-
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, bob, balanceBob))
 
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
-	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000001"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("475000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("25000000000000000000"))))
+	_ = cancelResponse1
 
-	goCtx := sdk.WrapSDKContext(ctx)
-
-	// Set Fee List
-
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{0, 1})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{1, 2})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{2, 3})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{3, 4})
-
-	//fmt.Println("FeeList")
-	feeList := app.DexKeeper.GetAllFeeList(ctx)
-	fmt.Println(feeList)
-
-	// errors because order at this tick does not exists
-	withdrawResponse, err := suite.msgServer.WithdrawFilledLimitOrder(goCtx, &types.MsgWithdrawFilledLimitOrder{
-
+	cancelResponse2, err := suite.msgServer.CancelLimitOrder(goCtx, &types.MsgCancelLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
 		TokenA:    "TokenA",
@@ -301,86 +271,28 @@ func (suite *IntegrationTestSuite) ErrorCasesWithdrawLimitOrder() {
 		TickIndex: 0,
 		KeyToken:  "TokenB",
 		Key:       0,
-	})
-
-	suite.Require().Error(err)
-
-	_ = withdrawResponse
-
-	orderResponse1, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
-		Creator:   alice.String(),
-		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
-		TokenIn:   "TokenA",
-		AmountIn:  newDec("25"),
-	})
-
-	_ = orderResponse1
-
-	// errors because called by not the owner
-	withdrawResponse2, err := suite.msgServer.WithdrawFilledLimitOrder(goCtx, &types.MsgWithdrawFilledLimitOrder{
-
-		Creator:   bob.String(),
-		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
-		KeyToken:  "TokenB",
-		Key:       0,
-	})
-
-	suite.Require().Error(err)
-
-	_ = withdrawResponse2
-
-	// Errors because of wrong KeyToken
-	withdrawResponse3, err := suite.msgServer.WithdrawFilledLimitOrder(goCtx, &types.MsgWithdrawFilledLimitOrder{
-
-		Creator:   alice.String(),
-		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
-		KeyToken:  "TokenA",
-		Key:       0,
-	})
-
-	suite.Require().Error(err)
-
-	_ = withdrawResponse3
-
-	// errors because of wrong key
-	withdrawResponse4, err := suite.msgServer.WithdrawFilledLimitOrder(goCtx, &types.MsgWithdrawFilledLimitOrder{
-
-		Creator:   alice.String(),
-		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
-		KeyToken:  "TokenB",
-		Key:       1,
-	})
-
-	suite.Require().Error(err)
-
-	_ = withdrawResponse4
-
-	withdrawResponse5, err := suite.msgServer.WithdrawFilledLimitOrder(goCtx, &types.MsgWithdrawFilledLimitOrder{
-
-		Creator:   alice.String(),
-		Receiver:  bob.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
-		KeyToken:  "TokenB",
-		Key:       1,
+		SharesOut: newDec("15"),
 	})
 
 	suite.Require().Nil(err)
 
-	_ = withdrawResponse5
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("490000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("10000000000000000000"))))
+	_ = cancelResponse2
 
-	_ = ctx
+	cancelResponse3, err := suite.msgServer.CancelLimitOrder(goCtx, &types.MsgCancelLimitOrder{
+		Creator:   alice.String(),
+		Receiver:  alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		TickIndex: 0,
+		KeyToken:  "TokenB",
+		Key:       0,
+		SharesOut: newDec("15"),
+	})
+
+	suite.Require().Error(err)
+
+	_ = cancelResponse3
 }

@@ -152,3 +152,31 @@ func WithdrawFilledLimitOrderEvent(creator string, receiver string, token0 strin
 		amountOut,
 	)
 }
+
+func cancelLimitOrderEvent(creator string, receiver string, token0 string, token1 string, tokenKey string, key string, amountOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+	attrs := []sdk.Attribute{
+		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
+		sdk.NewAttribute(sdk.AttributeKeyAction, WithdrawFilledLimitOrderEventKey),
+		sdk.NewAttribute(WithdrawFilledLimitOrderEventCreator, creator),
+		sdk.NewAttribute(WithdrawFilledLimitOrderEventReceiver, receiver),
+		sdk.NewAttribute(WithdrawFilledLimitOrderEventToken0, token0),
+		sdk.NewAttribute(WithdrawFilledLimitOrderEventToken1, token1),
+		sdk.NewAttribute(WithdrawFilledLimitOrderEventTokenKey, tokenKey),
+		sdk.NewAttribute(WithdrawFilledLimitOrderEventLimitOrderKey, key),
+		sdk.NewAttribute(WithdrawFilledLimitOrderEventAmountOut, amountOut),
+	}
+	attrs = append(attrs, otherAttrs...)
+	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
+}
+
+func CancelLimitOrderEvent(creator string, receiver string, token0 string, token1 string, tokenKey string, key string, amountOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+	return withdrawFilledLimitOrderEvent(
+		creator,
+		receiver,
+		token0,
+		token1,
+		tokenKey,
+		key,
+		amountOut,
+	)
+}
