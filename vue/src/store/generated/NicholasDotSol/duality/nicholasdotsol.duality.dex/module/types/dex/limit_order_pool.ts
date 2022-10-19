@@ -5,27 +5,19 @@ import { util, configure, Writer, Reader } from "protobufjs/minimal";
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
 export interface LimitOrderPool {
-  pairId: string;
   count: number;
   currentLimitOrderKey: number;
 }
 
-const baseLimitOrderPool: object = {
-  pairId: "",
-  count: 0,
-  currentLimitOrderKey: 0,
-};
+const baseLimitOrderPool: object = { count: 0, currentLimitOrderKey: 0 };
 
 export const LimitOrderPool = {
   encode(message: LimitOrderPool, writer: Writer = Writer.create()): Writer {
-    if (message.pairId !== "") {
-      writer.uint32(10).string(message.pairId);
-    }
     if (message.count !== 0) {
-      writer.uint32(16).uint64(message.count);
+      writer.uint32(8).uint64(message.count);
     }
     if (message.currentLimitOrderKey !== 0) {
-      writer.uint32(24).uint64(message.currentLimitOrderKey);
+      writer.uint32(16).uint64(message.currentLimitOrderKey);
     }
     return writer;
   },
@@ -38,12 +30,9 @@ export const LimitOrderPool = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.pairId = reader.string();
-          break;
-        case 2:
           message.count = longToNumber(reader.uint64() as Long);
           break;
-        case 3:
+        case 2:
           message.currentLimitOrderKey = longToNumber(reader.uint64() as Long);
           break;
         default:
@@ -56,11 +45,6 @@ export const LimitOrderPool = {
 
   fromJSON(object: any): LimitOrderPool {
     const message = { ...baseLimitOrderPool } as LimitOrderPool;
-    if (object.pairId !== undefined && object.pairId !== null) {
-      message.pairId = String(object.pairId);
-    } else {
-      message.pairId = "";
-    }
     if (object.count !== undefined && object.count !== null) {
       message.count = Number(object.count);
     } else {
@@ -79,7 +63,6 @@ export const LimitOrderPool = {
 
   toJSON(message: LimitOrderPool): unknown {
     const obj: any = {};
-    message.pairId !== undefined && (obj.pairId = message.pairId);
     message.count !== undefined && (obj.count = message.count);
     message.currentLimitOrderKey !== undefined &&
       (obj.currentLimitOrderKey = message.currentLimitOrderKey);
@@ -88,11 +71,6 @@ export const LimitOrderPool = {
 
   fromPartial(object: DeepPartial<LimitOrderPool>): LimitOrderPool {
     const message = { ...baseLimitOrderPool } as LimitOrderPool;
-    if (object.pairId !== undefined && object.pairId !== null) {
-      message.pairId = object.pairId;
-    } else {
-      message.pairId = "";
-    }
     if (object.count !== undefined && object.count !== null) {
       message.count = object.count;
     } else {
