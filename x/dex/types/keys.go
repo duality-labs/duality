@@ -59,6 +59,7 @@ func TokenMapKey(address string) []byte {
 	return key
 }
 
+// TickMapKey returns the store key to retrieve a tick object from the index fields
 func TickMapKey(pairId string, tickIndex int64) []byte {
 	var key []byte
 
@@ -73,6 +74,7 @@ func TickMapKey(pairId string, tickIndex int64) []byte {
 	return key
 }
 
+// PairMapKey returns the store key to retrieve a Pair object from the index fields
 func PairMapKey(pairId string) []byte {
 	var key []byte
 
@@ -83,7 +85,7 @@ func PairMapKey(pairId string) []byte {
 	return key
 }
 
-// SharesKey returns the store key to retrieve a Shares from the index fields
+// SharesKey returns the store key to retrieve a Shares object from the index fields
 func SharesKey(address string, pairId string, tickIndex int64, feeIndex uint64) []byte {
 	var key []byte
 
@@ -203,6 +205,7 @@ func LimitOrderPoolTotalSharesMapKey(pairId string, tickIndex int64, token strin
 	return key
 }
 
+// LimitOrderPoolReserveMapKey returns the store key to retrieve a LimitOrderPoolReservesMap from the index fields
 func LimitOrderPoolReserveMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
 	var key []byte
 
@@ -225,6 +228,7 @@ func LimitOrderPoolReserveMapKey(pairId string, tickIndex int64, token string, c
 	return key
 }
 
+// LimitOrderPoolFillMapKey returns the store key to retrieve a LimitOrderPoolFillMap from the index fields
 func LimitOrderPoolFillMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
 	var key []byte
 
@@ -279,6 +283,7 @@ const (
 	WithdrawEventSharesRemoved = "SharesRemoved"
 )
 
+// Swap Event Attributes
 const (
 	SwapEventKey      = "NewSwap"
 	SwapEventCreator  = "Creator"
@@ -291,6 +296,7 @@ const (
 	SwapEventAmoutOut = "AmountOut"
 )
 
+// PlaceLimitOrder Event Attributes
 const (
 	PlaceLimitOrderEventKey        = "NewPlaceLimitOrder"
 	PlaceLimitOrderEventCreator    = "Creator"
@@ -303,6 +309,7 @@ const (
 	PlaceLimitOrderEventCurrentKey = "CurrentLimitOrderKey"
 )
 
+// WithdrawFilled Event Attributes
 const (
 	WithdrawFilledLimitOrderEventKey           = "NewWithdraw"
 	WithdrawFilledLimitOrderEventCreator       = "Creator"
@@ -314,6 +321,7 @@ const (
 	WithdrawFilledLimitOrderEventAmountOut     = "AmountOut"
 )
 
+// CancelLimitOrder Event Attributes
 const (
 	CancelLimitOrderEventKey           = "NewWithdraw"
 	CancelLimitOrderEventCreator       = "Creator"
