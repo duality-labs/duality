@@ -240,7 +240,9 @@ func (k Keeper) SwapDynamicRouter(goCtx context.Context, callerAddress sdk.AccAd
 	return totalAmountOut, nil
 }
 
-func (k Keeper) calculatePriceForRoute(goCtx context.Context, callerAddress sdk.AccAddress, bestRoute Route, amountIn sdk.Dec, minOut sdk.Dec) (amountFromSwap sdk.Dec, err error) {
+func (k Keeper) simulateSwap(goCtx context.Context, callerAddress sdk.AccAddress, bestRoute Route, amountIn sdk.Dec, minOut sdk.Dec, numChunks uint64) (amountFromSwap sdk.Dec, err error) {
+	chunkPrices := make([]sdk.Dec, numChunks)
+	_ = chunkPrices
 	return
 }
 
@@ -290,7 +292,11 @@ GHOST FUNCTIONS
 
 // Swap0to1 with No State Changes (Simulation Fn.)
 // Outputs an array benchmarking every 1/Xth of the amountIn
-func (k Keeper) Swap0to1NoStateChange(goCtx context.Context, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, minOut sdk.Dec) (amountLeft sdk.Dec, amountOut sdk.Dec, response error) {
+// Note: We don't care about minOut, just gives array
+func (k Keeper) SimulateSwap0to1(goCtx context.Context, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, numChunks int64) ([]sdk.Dec, error) {
+
+	// Store price of each chunk
+	chunkPrices := make([]sdk.Dec, numChunks)
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -305,15 +311,16 @@ func (k Keeper) Swap0to1NoStateChange(goCtx context.Context, token0 string, toke
 
 	// If tokenPair does not exists a swap cannot be made through it, error
 	if !pairFound {
-		return amountIn, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
+		return nil, sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 
 	// Counts how many ticks we have iterated through, compare to initialized ticks in the pair
 	// @Note Heuristic to remove unnecessary looping
 	count := 0
 
+	numChunksSoFar := int64(0)
 	//amount_left is the amount left to deposit
-	amount_left := amountIn
+	amount_left := amountIn.QuoInt64(numChunks)
 	// amount to return to receiver
 	amount_out := sdk.ZeroDec()
 
@@ -323,7 +330,6 @@ func (k Keeper) Swap0to1NoStateChange(goCtx context.Context, token0 string, toke
 		// Tick data for tick that holds information about reserve1
 		Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1)
 
-		fmt.Println("Printing count here", count)
 		if !Current1Found {
 			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 - 1
 			continue
@@ -351,12 +357,7 @@ func (k Keeper) Swap0to1NoStateChange(goCtx context.Context, token0 string, toke
 			price, err := k.Calc_price(pair.TokenPair.CurrentTick0To1, false)
 
 			if err != nil {
-				return amount_left, amount_out, err
-			}
-
-			// price * amout_left + amount_out < minOut, error we cannot meet minOut threshold
-			if price.Mul(amount_left).Add(amount_out).LT(minOut) {
-				return amount_left, amount_out, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
+				return chunkPrices, err
 			}
 
 			// price * r1 < amount_left
@@ -369,25 +370,44 @@ func (k Keeper) Swap0to1NoStateChange(goCtx context.Context, token0 string, toke
 				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Add(price.Mul(Current1Data.TickData.Reserve1[i]))
 				// sets reserve1 to 0
 				Current1Data.TickData.Reserve1[i] = sdk.ZeroDec()
+				//updates feeIndex
+				i++
 
 			} else {
-				// amountOut += amount_left * price
-				amount_out = amount_out.Add(amount_left.Mul(price))
-				// increment reserve0 with amountLeft
-				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Add(amount_left)
-				// decrement reserve1 with amount_left * price
-				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Sub(amount_left.Mul(price))
-				// set amountLeft to 0
-				amount_left = sdk.ZeroDec()
+				if numChunksSoFar < numChunks-1 {
+					// amountOut += amount_left * price
+					amount_out = amount_out.Add(amount_left.Mul(price))
+					// increment reserve0 with amountLeft
+					Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Add(amount_left)
+					// decrement reserve1 with amount_left * price
+					Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Sub(amount_left.Mul(price))
+
+					// Store price of each chunk
+					chunkPrices[numChunksSoFar] = (amount_out.Quo(amountIn.QuoInt64(numChunks)))
+
+					// reset amountLeft to size of a chunk
+					amount_left = amountIn.QuoInt64(numChunks)
+					// reset amountOut for chunk to 0
+					amount_out = sdk.ZeroDec()
+
+					numChunksSoFar++
+				} else {
+					amount_out = amount_out.Add(amount_left.Mul(price))
+					chunkPrices[numChunksSoFar] = (amount_out.Quo(amountIn.QuoInt64(numChunks)))
+					numChunksSoFar++
+				}
+
 			}
 
-			//updates feeIndex
-			i++
-
 			//Make updates to tickMap containing reserve0/1 data to the KVStore
-			k.SetTickMap(ctx, pairId, Current0Data)
-			k.SetTickMap(ctx, pairId, Current1Data)
+
+			// DO NOT UPDATE STATE WHEN SIMULATING
+			// // Changes inside of the loop
+			// k.SetTickMap(ctx, pairId, Current0Data)
 		}
+		// DO NOT UPDATE STATE WHEN SIMULATING
+		// // Current1Data updates here
+		// k.SetTickMap(ctx, pairId, Current1Data)
 
 		// if feeIndex is equal to the largest index in feeList
 		if i == feeSize {
@@ -399,19 +419,18 @@ func (k Keeper) Swap0to1NoStateChange(goCtx context.Context, token0 string, toke
 	// DO NOT UPDATE PAIR MAP IN THIS FUNCTION
 	// k.SetPairMap(ctx, pair)
 
-	// Check to see if amount_out meets the threshold of minOut
-	if amount_out.LT(minOut) {
-		return amount_left, amount_out, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
-	}
-
 	// Returns amount_out to keeper/msg.server: Swap
 	// @Dev token transfers happen in keeper/msg.server: Swap
-	return amount_left, amount_out, nil
+	return chunkPrices, nil
 }
 
 // Swap0to1 with No State Changes (Simulation Fn.)
 // Outputs an array benchmarking every 1/Xth of the amountIn
-func (k Keeper) Swap1to0NoStateChanges(goCtx context.Context, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, minOut sdk.Dec) (amountLeft sdk.Dec, amountOut sdk.Dec, response error) {
+// Note: We don't care about minOut, just gives array
+func (k Keeper) SimulateSwap1to0(goCtx context.Context, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, numChunks int64) ([]sdk.Dec, error) {
+
+	// Store price of each chunk
+	chunkPrices := make([]sdk.Dec, numChunks)
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -425,17 +444,20 @@ func (k Keeper) Swap1to0NoStateChanges(goCtx context.Context, token0 string, tok
 	pair, pairFound := k.GetPairMap(ctx, pairId)
 
 	if !pairFound {
-		return amountIn, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
+		return nil, sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 
 	// Counts how many ticks we have iterated through, compare to initialized ticks in the pair
 	// @Note Heuristic to remove unecessary looping
 	count := 0
 
-	//amount_left is the amount left to deposit
-	amount_left := amountIn
+	// How many chunks of the entire amount we've fulfilled
+	numChunksSoFar := int64(0)
 
-	// amount to return to receiver
+	//amount_left is the size of the chunk (will be reset every time we fill a chunk)
+	amount_left := amountIn.QuoInt64(numChunks)
+
+	//amount_out is the output of a chunk (will be reset every time we fill a chunk)
 	amount_out := sdk.ZeroDec()
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
@@ -474,12 +496,7 @@ func (k Keeper) Swap1to0NoStateChanges(goCtx context.Context, token0 string, tok
 			price, err := k.Calc_price(pair.TokenPair.CurrentTick1To0, true)
 
 			if err != nil {
-				return amount_left, amount_out, err
-			}
-
-			// price * amout_left + amount_out < minOut, error we cannot meet minOut threshold
-			if price.Mul(amount_left).Add(amount_out).LT(minOut) {
-				return amount_left, amount_out, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
+				return chunkPrices, err
 			}
 
 			// price * r1 < amount_left
@@ -492,25 +509,42 @@ func (k Keeper) Swap1to0NoStateChanges(goCtx context.Context, token0 string, tok
 				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Add(price.Mul(Current0Data.TickData.Reserve0AndShares[i].Reserve0))
 				// sets reserve0 to 0
 				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = sdk.ZeroDec()
+				//updates feeIndex
+				i++
 
 			} else {
-				// amountOut += amount_left * price
-				amount_out = amount_out.Add(amount_left.Mul(price))
-				// increment reserve1 with amountLeft
-				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Add(amount_left)
-				// decrement reserve0 with amount_left * price
-				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Sub(amount_left.Mul(price))
-				// set amountLeft to 0
-				amount_left = sdk.ZeroDec()
+				if numChunksSoFar < numChunks-1 {
+					// amountOut += amount_left * price
+					amount_out = amount_out.Add(amount_left.Mul(price))
+					// increment reserve1 with amountLeft
+					Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Add(amount_left)
+					// decrement reserve0 with amount_left * price
+					Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Sub(amount_left.Mul(price))
+
+					// Store price of each chunk
+					chunkPrices[numChunksSoFar] = (amount_out.Quo(amountIn.QuoInt64(numChunks)))
+
+					// reset amountLeft to size of a chunk
+					amount_left = amountIn.QuoInt64(numChunks)
+					// reset amountOut for chunk to 0
+					amount_out = sdk.ZeroDec()
+
+					numChunksSoFar++
+				} else {
+					amount_out = amount_out.Add(amount_left.Mul(price))
+					chunkPrices[numChunksSoFar] = (amount_out.Quo(amountIn.QuoInt64(numChunks)))
+					numChunksSoFar++
+				}
 			}
 
-			//updates feeIndex
-			i++
-
 			//Make updates to tickMap containing reserve0/1 data to the KVStore
-			k.SetTickMap(ctx, pairId, Current0Data)
-			k.SetTickMap(ctx, pairId, Current1Data)
+			// DO NOT UPDATE STATE WHEN SIMULATING
+			// // Changes inside of the loop
+			// k.SetTickMap(ctx, pairId, Current1Data)
 		}
+		// DO NOT UPDATE STATE WHEN SIMULATING
+		// // Current1Data updates here
+		// k.SetTickMap(ctx, pairId, Current0Data)
 
 		// if feeIndex is equal to the largest index in feeList
 		if i == feeSize {
@@ -524,11 +558,6 @@ func (k Keeper) Swap1to0NoStateChanges(goCtx context.Context, token0 string, tok
 
 	// k.SetPairMap(ctx, pair)
 
-	if amount_out.LT(minOut) {
-		return amount_left, amount_out, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
-	}
-
 	// Returns amount_out to keeper/msg.server: Swap
 	// @Dev token transfers happen in keeper/msg.server: Swap
-	return amount_left, amount_out, nil
-}
+	return chunkPrices, nil
