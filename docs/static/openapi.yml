@@ -31344,7 +31344,7 @@ paths:
                         currentTick1To0:
                           type: string
                           format: int64
-                    pairCount:
+                    totalTickCount:
                       type: string
                       format: int64
               pagination:
@@ -31475,7 +31475,7 @@ paths:
                       currentTick1To0:
                         type: string
                         format: int64
-                  pairCount:
+                  totalTickCount:
                     type: string
                     format: int64
         default:
@@ -54161,7 +54161,7 @@ definitions:
           currentTick1To0:
             type: string
             format: int64
-      pairCount:
+      totalTickCount:
         type: string
         format: int64
   nicholasdotsol.duality.dex.Params:
@@ -54536,7 +54536,7 @@ definitions:
                 currentTick1To0:
                   type: string
                   format: int64
-            pairCount:
+            totalTickCount:
               type: string
               format: int64
       pagination:
@@ -54908,7 +54908,7 @@ definitions:
               currentTick1To0:
                 type: string
                 format: int64
-          pairCount:
+          totalTickCount:
             type: string
             format: int64
   nicholasdotsol.duality.dex.QueryGetSharesResponse:
