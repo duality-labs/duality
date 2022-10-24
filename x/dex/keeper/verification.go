@@ -199,6 +199,7 @@ func (k Keeper) PlaceLimitOrderVerification(goCtx context.Context, msg types.Msg
 		return "", "", nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
+	//NOTE: We do not use the sdk.AccAddress of Receiver in PlaceLimitOrder and thus do not need to save it
 	_, err = sdk.AccAddressFromBech32(msg.Receiver)
 	// Error Checking for receiver address
 	// Note we do not actually need to save the sdk.AccAddress here but we do want the address to be checked to determine if it valid
