@@ -44,13 +44,13 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*types.MsgWithdrawlResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, createrAddr, err := k.WithdrawlVerification(goCtx, *msg)
+	token0, token1, createrAddr, receiverAddr, err := k.WithdrawlVerification(goCtx, *msg)
 
 	if err != nil {
 		return nil, err
 	}
 
-	err = k.WithdrawCore(goCtx, msg, token0, token1, createrAddr)
+	err = k.WithdrawCore(goCtx, msg, token0, token1, createrAddr, receiverAddr)
 	_ = ctx
 
 	return &types.MsgWithdrawlResponse{}, nil
@@ -169,13 +169,13 @@ func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.Ms
 func (k msgServer) CancelLimitOrder(goCtx context.Context, msg *types.MsgCancelLimitOrder) (*types.MsgCancelLimitOrderResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, createrAddr, err := k.CancelLimitOrderVerification(goCtx, *msg)
+	token0, token1, createrAddr, receiverAddr, err := k.CancelLimitOrderVerification(goCtx, *msg)
 
 	if err != nil {
 		return &types.MsgCancelLimitOrderResponse{}, err
 	}
 
-	err = k.CancelLimitOrderCore(goCtx, msg, token0, token1, createrAddr)
+	err = k.CancelLimitOrderCore(goCtx, msg, token0, token1, createrAddr, receiverAddr)
 
 	if err != nil {
 		return &types.MsgCancelLimitOrderResponse{}, err
