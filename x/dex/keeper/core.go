@@ -766,19 +766,11 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 
 	// Gets Reserve, Fill map for the specified CurrentLimitOrderKey
 	ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
-	FillMap, FillMapFound := k.GetLimitOrderPoolFillMap(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+	FillMap, _ := k.GetLimitOrderPoolFillMap(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
 
 	// errors if ReserveMapFound is not found
 	if !ReserveMapFound {
 		return amount_left, amount_out, nil
-	}
-
-	// if no tokens have been filled at this key value, initialize to 0
-	if !FillMapFound {
-		FillMap.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey
-		FillMap.TickIndex = CurrentTick1to0
-		FillMap.PairId = pairId
-		FillMap.Fill = sdk.ZeroDec()
 	}
 
 	// If there isn't enough liqudity to end trade handle updates this way
@@ -878,26 +870,12 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 		return amount_left, amount_out, nil
 	}
 
-	fmt.Println("Mapping gettng paramters")
-	fmt.Println(tick.LimitOrderPool0To1)
-	fmt.Println(tokenIn)
-	fmt.Println(CurrentTick0to1)
-	fmt.Println(pairId)
-
 	ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
-	FillMap, FillMapFound := k.GetLimitOrderPoolFillMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
+	FillMap, _ := k.GetLimitOrderPoolFillMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
 
 	// errors if ReserveMapFound is not found
 	if !ReserveMapFound {
 		return amount_left, amount_out, nil
-	}
-
-	// if no tokens have been filled at this key value, initialize to 0
-	if !FillMapFound {
-		FillMap.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey
-		FillMap.TickIndex = CurrentTick0to1
-		FillMap.PairId = pairId
-		FillMap.Fill = sdk.ZeroDec()
 	}
 
 	// If there isn't enough liqudity to end trade handle updates this way
@@ -1171,7 +1149,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesMap)
 	k.SetTickMap(ctx, pairId, tick)
 
-	// If a new tick has been placed that tigtens the range between currentTick0to1 and currentTick0to1 update CurrentTicks to the tighest ticks
+	// If a new tick has been placed that tigtens the spread between currentTick0to1 and currentTick0to1 update CurrentTicks to the tighest ticks
 	// @Dev assumes that msg.amountIn > 0
 	if msg.TokenIn == token0 && ((msg.TickIndex > pair.TokenPair.CurrentTick0To1) && (msg.TickIndex < pair.TokenPair.CurrentTick1To0)) {
 		pair.TokenPair.CurrentTick1To0 = msg.TickIndex
