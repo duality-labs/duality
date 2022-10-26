@@ -1106,13 +1106,13 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		// Handles creating a limit order given the current limit order is already partially filled
 	} else if LimitOrderCount == currentLimitOrderKey && FillMap.FilledReserves.GT(sdk.ZeroDec()) {
 		// increments currentLimitOrderKey
-		currentLimitOrderKey = currentLimitOrderKey + 1
+		LimitOrderCount = LimitOrderCount + 1
 
 		// Updates Pool0t01 / Pool1to0 accordingly
 		if msg.TokenIn == token0 {
-			tick.LimitOrderPool0To1.CurrentLimitOrderKey = currentLimitOrderKey
+			tick.LimitOrderPool0To1.Count = LimitOrderCount
 		} else {
-			tick.LimitOrderPool1To0.CurrentLimitOrderKey = currentLimitOrderKey
+			tick.LimitOrderPool1To0.Count = LimitOrderCount
 		}
 	}
 
