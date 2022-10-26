@@ -764,7 +764,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 		return amount_left, amount_out, nil
 	}
 
-	// Gets Reserve, Fill map for the specified CurrentLimitOrderKey
+	// Gets Reserve, FilledReservesmap for the specified CurrentLimitOrderKey
 	ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
 	FillMap, _ := k.GetLimitOrderPoolFillMap(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
 
@@ -780,7 +780,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 		// Subtracts reserves from amount_left
 		amount_left = amount_left.Sub(ReserveMap.Reserves)
 		// adds price * reserves to the filledMap
-		FillMap.Fill = FillMap.Fill.Add(price.Mul(ReserveMap.Reserves))
+		FillMap.FilledReserves = FillMap.FilledReserves.Add(price.Mul(ReserveMap.Reserves))
 		// sets reserves to 0
 		ReserveMap.Reserves = sdk.ZeroDec()
 
@@ -796,7 +796,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 			FillMapNextKey.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey
 			FillMapNextKey.TickIndex = CurrentTick1to0
 			FillMapNextKey.PairId = pairId
-			FillMapNextKey.Fill = sdk.ZeroDec()
+			FillMapNextKey.FilledReserves = sdk.ZeroDec()
 		}
 
 		// If there is still not enough liquidity to end trade handle update this way
@@ -806,7 +806,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 			// Subtracts reserves from amount_left
 			amount_left = amount_left.Sub(ReserveMapNextKey.Reserves)
 			// adds price * reserves to the filledMap
-			FillMapNextKey.Fill = FillMapNextKey.Fill.Add(price.Mul(ReserveMapNextKey.Reserves))
+			FillMapNextKey.FilledReserves = FillMapNextKey.FilledReserves.Add(price.Mul(ReserveMapNextKey.Reserves))
 			// sets reserve to 0
 			ReserveMapNextKey.Reserves = sdk.ZeroDec()
 
@@ -817,8 +817,8 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 		} else if ReserveMapNextKeyFound && price.Mul(ReserveMapNextKey.Reserves).GT(amount_left) {
 			// calculate anmout to output (will be a portion of reserves)
 			amount_out = amount_out.Add(amount_left.Mul(price))
-			// Add the amount_left to the amount flled in the fill mapping
-			FillMapNextKey.Fill = FillMapNextKey.Fill.Add(amount_left)
+			// Add the amount_left to the amount flled in the filledReservesmapping
+			FillMapNextKey.FilledReserves = FillMapNextKey.FilledReserves.Add(amount_left)
 			// subtract amount_left * price to the ReserveMapping
 			ReserveMapNextKey.Reserves = ReserveMapNextKey.Reserves.Sub(amount_left.Mul(price))
 			// set amount_left to 0
@@ -834,8 +834,8 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 	} else {
 		// calculate anmout to output (will be a portion of reserves)
 		amount_out = amount_out.Add(amount_left.Mul(price))
-		// Add the amount_left to the amount flled in the fill mapping
-		FillMap.Fill = FillMap.Fill.Add(amount_left)
+		// Add the amount_left to the amount flled in the filledReservesmapping
+		FillMap.FilledReserves = FillMap.FilledReserves.Add(amount_left)
 		// subtract amount_left * price to the ReserveMapping
 		ReserveMap.Reserves = ReserveMap.Reserves.Sub(amount_left.Mul(price))
 		// set amount_left to 0
@@ -885,7 +885,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 		// Subtracts reserves from amount_left
 		amount_left = amount_left.Sub(ReserveMap.Reserves)
 		// adds price * reserves to the filledMap
-		FillMap.Fill = FillMap.Fill.Add(price.Mul(ReserveMap.Reserves))
+		FillMap.FilledReserves = FillMap.FilledReserves.Add(price.Mul(ReserveMap.Reserves))
 		// sets reserves to 0
 		ReserveMap.Reserves = sdk.ZeroDec()
 
@@ -901,7 +901,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 			FillMapNextKey.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey
 			FillMapNextKey.TickIndex = CurrentTick0to1
 			FillMapNextKey.PairId = pairId
-			FillMapNextKey.Fill = sdk.ZeroDec()
+			FillMapNextKey.FilledReserves = sdk.ZeroDec()
 		}
 
 		if ReserveMapNextKeyFound && price.Mul(ReserveMapNextKey.Reserves).LT(amount_left) {
@@ -910,7 +910,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 			// Subtracts reserves from amount_left
 			amount_left = amount_left.Sub(ReserveMapNextKey.Reserves)
 			// adds price * reserves to the filledMap
-			FillMapNextKey.Fill = FillMapNextKey.Fill.Add(price.Mul(ReserveMapNextKey.Reserves))
+			FillMapNextKey.FilledReserves = FillMapNextKey.FilledReserves.Add(price.Mul(ReserveMapNextKey.Reserves))
 			// sets reserve to 0
 			ReserveMapNextKey.Reserves = sdk.ZeroDec()
 
@@ -920,8 +920,8 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 		} else if ReserveMapNextKeyFound && price.Mul(ReserveMapNextKey.Reserves).GT(amount_left) {
 			// calculate anmout to output (will be a portion of reserves)
 			amount_out = amount_out.Add(amount_left.Mul(price))
-			// Add the amount_left to the amount flled in the fill mapping
-			FillMapNextKey.Fill = FillMapNextKey.Fill.Add(amount_left)
+			// Add the amount_left to the amount flled in the filledReservesmapping
+			FillMapNextKey.FilledReserves = FillMapNextKey.FilledReserves.Add(amount_left)
 			// subtract amount_left * price to the ReserveMapping
 			ReserveMapNextKey.Reserves = ReserveMapNextKey.Reserves.Sub(amount_left.Mul(price))
 			// set amount_left to 0
@@ -937,8 +937,8 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 	} else {
 		// calculate anmout to output (will be a portion of reserves)
 		amount_out = amount_out.Add(amount_left.Mul(price))
-		// Add the amount_left to the amount flled in the fill mapping
-		FillMap.Fill = FillMap.Fill.Add(amount_left)
+		// Add the amount_left to the amount flled in the filledReservesmapping
+		FillMap.FilledReserves = FillMap.FilledReserves.Add(amount_left)
 		// subtract amount_left * price to the ReserveMapping
 		ReserveMap.Reserves = ReserveMap.Reserves.Sub(amount_left.Mul(price))
 		// set amount_left to 0
@@ -1101,10 +1101,10 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		FillMap.TickIndex = msg.TickIndex
 		FillMap.Token = msg.TokenIn
 		FillMap.Count = currentLimitOrderKey
-		FillMap.Fill = sdk.ZeroDec()
+		FillMap.FilledReserves = sdk.ZeroDec()
 
 		// Handles creating a limit order given the current limit order is already partially filled
-	} else if LimitOrderCount == currentLimitOrderKey && FillMap.Fill.GT(sdk.ZeroDec()) {
+	} else if LimitOrderCount == currentLimitOrderKey && FillMap.FilledReserves.GT(sdk.ZeroDec()) {
 		// increments currentLimitOrderKey
 		currentLimitOrderKey = currentLimitOrderKey + 1
 
@@ -1221,16 +1221,16 @@ func (k Keeper) WithdrawWithdrawnLimitOrderCore(goCtx context.Context, msg *type
 		return sdkerrors.Wrapf(types.ErrValidLimitOrderMapsNotFound, "Valid mappings for limit order withdraw not found")
 	}
 
-	if FillMap.Fill.Quo(FillMap.Fill.Add(ReserveMap.Reserves)).LTE(UserSharesWithdrawnMap.SharesWithdrawn.Quo(UserSharesWithdrawnMap.SharesWithdrawn.Add(UserShareMap.SharesOwned))) {
+	if FillMap.FilledReserves.Quo(FillMap.FilledReserves.Add(ReserveMap.Reserves)).LTE(UserSharesWithdrawnMap.SharesWithdrawn.Quo(UserSharesWithdrawnMap.SharesWithdrawn.Add(UserShareMap.SharesOwned))) {
 		return sdkerrors.Wrapf(types.ErrCannotWithdrawLimitOrder, "Cannot withdraw additional liqudity from this limit order at this time")
 
 	}
 	// Calculates the sharesOut based on the UserShares withdrawn  compared to sharesLeft compared to remaining liquidity in reserves
-	sharesOut := ((FillMap.Fill.Mul(UserSharesWithdrawnMap.SharesWithdrawn.Add(UserShareMap.SharesOwned))).Quo(FillMap.Fill.Add(ReserveMap.Reserves))).Sub(UserSharesWithdrawnMap.SharesWithdrawn)
+	sharesOut := ((FillMap.FilledReserves.Mul(UserSharesWithdrawnMap.SharesWithdrawn.Add(UserShareMap.SharesOwned))).Quo(FillMap.FilledReserves.Add(ReserveMap.Reserves))).Sub(UserSharesWithdrawnMap.SharesWithdrawn)
 
-	amountOut := (sharesOut.Mul(FillMap.Fill)).Quo(TotalSharesMap.TotalShares)
+	amountOut := (sharesOut.Mul(FillMap.FilledReserves)).Quo(TotalSharesMap.TotalShares)
 	// Calculates amount to subtract from fillMap object given sharesOut
-	FillMap.Fill = FillMap.Fill.Sub(sharesOut.Mul(FillMap.Fill).Quo(TotalSharesMap.TotalShares))
+	FillMap.FilledReserves = FillMap.FilledReserves.Sub(sharesOut.Mul(FillMap.FilledReserves).Quo(TotalSharesMap.TotalShares))
 	// Updates useSharesWithdrawMap to include sharesOut
 	UserSharesWithdrawnMap.SharesWithdrawn = UserSharesWithdrawnMap.SharesWithdrawn.Add(sharesOut)
 	// Remove sharesOut from UserSharesMap

@@ -9,7 +9,7 @@ export interface LimitOrderPoolFillMap {
   token: string;
   tickIndex: number;
   count: number;
-  fill: string;
+  filledReserves: string;
 }
 
 const baseLimitOrderPoolFillMap: object = {
@@ -17,7 +17,7 @@ const baseLimitOrderPoolFillMap: object = {
   token: "",
   tickIndex: 0,
   count: 0,
-  fill: "",
+  filledReserves: "",
 };
 
 export const LimitOrderPoolFillMap = {
@@ -37,8 +37,8 @@ export const LimitOrderPoolFillMap = {
     if (message.count !== 0) {
       writer.uint32(32).uint64(message.count);
     }
-    if (message.fill !== "") {
-      writer.uint32(42).string(message.fill);
+    if (message.filledReserves !== "") {
+      writer.uint32(42).string(message.filledReserves);
     }
     return writer;
   },
@@ -63,7 +63,7 @@ export const LimitOrderPoolFillMap = {
           message.count = longToNumber(reader.uint64() as Long);
           break;
         case 5:
-          message.fill = reader.string();
+          message.filledReserves = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -95,10 +95,10 @@ export const LimitOrderPoolFillMap = {
     } else {
       message.count = 0;
     }
-    if (object.fill !== undefined && object.fill !== null) {
-      message.fill = String(object.fill);
+    if (object.filledReserves !== undefined && object.filledReserves !== null) {
+      message.filledReserves = String(object.filledReserves);
     } else {
-      message.fill = "";
+      message.filledReserves = "";
     }
     return message;
   },
@@ -109,7 +109,8 @@ export const LimitOrderPoolFillMap = {
     message.token !== undefined && (obj.token = message.token);
     message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
     message.count !== undefined && (obj.count = message.count);
-    message.fill !== undefined && (obj.fill = message.fill);
+    message.filledReserves !== undefined &&
+      (obj.filledReserves = message.filledReserves);
     return obj;
   },
 
@@ -137,10 +138,10 @@ export const LimitOrderPoolFillMap = {
     } else {
       message.count = 0;
     }
-    if (object.fill !== undefined && object.fill !== null) {
-      message.fill = object.fill;
+    if (object.filledReserves !== undefined && object.filledReserves !== null) {
+      message.filledReserves = object.filledReserves;
     } else {
-      message.fill = "";
+      message.filledReserves = "";
     }
     return message;
   },
