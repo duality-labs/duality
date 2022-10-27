@@ -19,4 +19,5 @@ var (
 	ErrValidFeeIndexNotFound = sdkerrors.Register(ModuleName, 1108, "Valid FeeIndex not found: %s ")
 	ErrUnbalancedTxArray     = sdkerrors.Register(ModuleName, 1110, "Transaction Input Arrays are not of the same length")
 	ErrNoValidRoutes         = sdkerrors.Register(ModuleName, 1111, "No Spendable Coins found: %s")
+	ErrInvalidNumChunks      = sdkerrors.Register(ModuleName, 1112, "Invalid Number of Chunks (Router): %s")
 )

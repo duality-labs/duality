@@ -289,7 +289,8 @@ SIMULATE SWAP ALGORITHM
 */
 
 func (k Keeper) SimulateSwap(goCtx context.Context, callerAddress sdk.AccAddress, tokenIn string, tokenOut string, amountIn sdk.Dec, minOut sdk.Dec, numChunks int64) (sdk.Dec, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
+	// Unnecessary for now!
+	// ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Confirm that numChunks > 0
 	if numChunks < 1 {
