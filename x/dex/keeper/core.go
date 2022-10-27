@@ -504,7 +504,6 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	//amount_left is the amount left to deposit
 	amount_left := msg.AmountIn
 
-	fmt.Println(amount_left)
 	// amount to return to receiver
 	amount_out := sdk.ZeroDec()
 
@@ -586,9 +585,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			// assigns a new variable err to handle err not being initialized in this conditional
 			var err error
 			// runs swaps for any limitOrders at the specified tick, updating amount_left, amount_out accordingly
-			fmt.Println("PreSwap", amount_left, amount_out)
 			amount_left, amount_out, err = k.SwapLimitOrder1to0(goCtx, pairId, token1, amount_out, amount_left, pair.TokenPair.CurrentTick0To1)
-			fmt.Println("Post Swap", amount_left, amount_out)
 
 			if err != nil {
 				return sdk.ZeroDec(), err
@@ -772,86 +769,86 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 	}
 
 	// Gets Reserve, FilledReservesmap for the specified CurrentLimitOrderKey
-	ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
-	FillMap, _ := k.GetLimitOrderPoolFillMap(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+	FillData, _ := k.GetLimitOrderPoolFillMap(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
 
-	// errors if ReserveMapFound is not found
-	if !ReserveMapFound {
+	// errors if ReserveDataFound is not found
+	if !ReserveDataFound {
 		return amount_left, amount_out, nil
 	}
 
 	// If there isn't enough liqudity to end trade handle updates this way
-	if price.Mul(ReserveMap.Reserves).LT(amount_left) {
+	if price.Mul(ReserveData.Reserves).LT(amount_left) {
 		// Adds remaining reserves to amount_out
-		amount_out = amount_out.Add(ReserveMap.Reserves)
+		amount_out = amount_out.Add(ReserveData.Reserves)
 		// Subtracts reserves from amount_left
-		amount_left = amount_left.Sub(price.Mul(ReserveMap.Reserves))
+		amount_left = amount_left.Sub(price.Mul(ReserveData.Reserves))
 		// adds price * reserves to the filledMap
-		FillMap.FilledReserves = FillMap.FilledReserves.Add(price.Mul(ReserveMap.Reserves))
+		FillData.FilledReserves = FillData.FilledReserves.Add(price.Mul(ReserveData.Reserves))
 		// sets reserves to 0
-		ReserveMap.Reserves = sdk.ZeroDec()
+		ReserveData.Reserves = sdk.ZeroDec()
 
 		// increments the limitOrderkey as previous tick has been completely filled
 		tick.LimitOrderPool1To0.CurrentLimitOrderKey++
 
 		// checks the next currentLimitOrderKey
-		ReserveMapNextKey, ReserveMapNextKeyFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
-		FillMapNextKey, FillMapNextKeyFound := k.GetLimitOrderPoolFillMap(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+		ReserveDataNextKey, ReserveDataNextKeyFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+		FillDataNextKey, FillDataNextKeyFound := k.GetLimitOrderPoolFillMap(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
 
 		// if no tokens have been filled at this key value, initialize to 0
-		if !FillMapNextKeyFound {
-			FillMapNextKey.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey
-			FillMapNextKey.TickIndex = CurrentTick1to0
-			FillMapNextKey.PairId = pairId
-			FillMapNextKey.FilledReserves = sdk.ZeroDec()
+		if !FillDataNextKeyFound {
+			FillDataNextKey.Count = tick.LimitOrderPool1To0.CurrentLimitOrderKey
+			FillDataNextKey.TickIndex = CurrentTick1to0
+			FillDataNextKey.PairId = pairId
+			FillDataNextKey.FilledReserves = sdk.ZeroDec()
 		}
 
 		// If there is still not enough liquidity to end trade handle update this way
-		if ReserveMapNextKeyFound && price.Mul(ReserveMapNextKey.Reserves).LT(amount_left) {
+		if ReserveDataNextKeyFound && price.Mul(ReserveDataNextKey.Reserves).LT(amount_left) {
 			// Adds remaining reserves to amount_out
-			amount_out = amount_out.Add(ReserveMapNextKey.Reserves)
+			amount_out = amount_out.Add(ReserveDataNextKey.Reserves)
 			// Subtracts reserves from amount_left
-			amount_left = amount_left.Sub(price.Mul(ReserveMapNextKey.Reserves))
+			amount_left = amount_left.Sub(price.Mul(ReserveDataNextKey.Reserves))
 			// adds price * reserves to the filledMap
-			FillMapNextKey.FilledReserves = FillMapNextKey.FilledReserves.Add(price.Mul(ReserveMapNextKey.Reserves))
+			FillDataNextKey.FilledReserves = FillDataNextKey.FilledReserves.Add(price.Mul(ReserveDataNextKey.Reserves))
 			// sets reserve to 0
-			ReserveMapNextKey.Reserves = sdk.ZeroDec()
+			ReserveDataNextKey.Reserves = sdk.ZeroDec()
 
 			// increments the limitOrderKey
 			tick.LimitOrderPool1To0.CurrentLimitOrderKey++
 
 			// If there IS enough liqudity to end trade handle update this way
-		} else if ReserveMapNextKeyFound && price.Mul(ReserveMapNextKey.Reserves).GT(amount_left) {
+		} else if ReserveDataNextKeyFound && price.Mul(ReserveDataNextKey.Reserves).GT(amount_left) {
 			// calculate anmout to output (will be a portion of reserves)
 			amount_out = amount_out.Add(amount_left.Mul(price))
 			// Add the amount_left to the amount flled in the filledReservesmapping
-			FillMapNextKey.FilledReserves = FillMapNextKey.FilledReserves.Add(amount_left)
+			FillDataNextKey.FilledReserves = FillDataNextKey.FilledReserves.Add(amount_left)
 			// subtract amount_left * price to the ReserveMapping
-			ReserveMapNextKey.Reserves = ReserveMapNextKey.Reserves.Sub(amount_left.Mul(price))
+			ReserveDataNextKey.Reserves = ReserveDataNextKey.Reserves.Sub(amount_left.Mul(price))
 			// set amount_left to 0
 			amount_left = sdk.ZeroDec()
 		}
 
 		// Updates mapping for the original limit order key + 1 (next key)
 		// @dev we set mappings within the conditionnal, as the tick mappings have not been initialized outside of it
-		k.SetLimitOrderPoolFillMap(ctx, FillMapNextKey)
-		k.SetLimitOrderPoolReserveMap(ctx, ReserveMapNextKey)
+		k.SetLimitOrderPoolFillMap(ctx, FillDataNextKey)
+		k.SetLimitOrderPoolReserveMap(ctx, ReserveDataNextKey)
 
 		// If there IS enough liqudity to end trade handle update this way
 	} else {
 		// calculate anmout to output (will be a portion of reserves)
 		amount_out = amount_out.Add(amount_left.Mul(price))
 		// Add the amount_left to the amount flled in the filledReservesmapping
-		FillMap.FilledReserves = FillMap.FilledReserves.Add(amount_left)
+		FillData.FilledReserves = FillData.FilledReserves.Add(amount_left)
 		// subtract amount_left * price to the ReserveMapping
-		ReserveMap.Reserves = ReserveMap.Reserves.Sub(amount_left.Mul(price))
+		ReserveData.Reserves = ReserveData.Reserves.Sub(amount_left.Mul(price))
 		// set amount_left to 0
 		amount_left = sdk.ZeroDec()
 	}
 
 	// Updates mappings of reserve and filledReserves based on the original limitOrderCurrentKey to the KVStore
-	k.SetLimitOrderPoolReserveMap(ctx, ReserveMap)
-	k.SetLimitOrderPoolFillMap(ctx, FillMap)
+	k.SetLimitOrderPoolReserveMap(ctx, ReserveData)
+	k.SetLimitOrderPoolFillMap(ctx, FillData)
 
 	//Updates limitOrderCurrentKey based on if any limitOrders were completely filled.
 	k.SetTickMap(ctx, pairId, tick)
@@ -880,84 +877,84 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 		return amount_left, amount_out, nil
 	}
 
-	ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
-	FillMap, _ := k.GetLimitOrderPoolFillMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
+	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
+	FillData, _ := k.GetLimitOrderPoolFillMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
 
-	// errors if ReserveMapFound is not found
-	if !ReserveMapFound {
+	// errors if ReserveDataFound is not found
+	if !ReserveDataFound {
 		return amount_left, amount_out, nil
 	}
 
 	// If there isn't enough liqudity to end trade handle updates this way
-	if price.Mul(ReserveMap.Reserves).LT(amount_left) {
+	if price.Mul(ReserveData.Reserves).LT(amount_left) {
 		// Adds remaining reserves to amount_out
-		amount_out = amount_out.Add(ReserveMap.Reserves)
+		amount_out = amount_out.Add(ReserveData.Reserves)
 		// Subtracts reserves from amount_left
-		amount_left = amount_left.Sub(price.Mul(ReserveMap.Reserves))
+		amount_left = amount_left.Sub(price.Mul(ReserveData.Reserves))
 		// adds price * reserves to the filledMap
-		FillMap.FilledReserves = FillMap.FilledReserves.Add(price.Mul(ReserveMap.Reserves))
+		FillData.FilledReserves = FillData.FilledReserves.Add(price.Mul(ReserveData.Reserves))
 		// sets reserves to 0
-		ReserveMap.Reserves = sdk.ZeroDec()
+		ReserveData.Reserves = sdk.ZeroDec()
 
 		// increments the limitOrderkey as previous tick has been completely filled
 		tick.LimitOrderPool0To1.CurrentLimitOrderKey++
 
 		// checks the next currentLimitOrderKey
-		ReserveMapNextKey, ReserveMapNextKeyFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
-		FillMapNextKey, FillMapNextKeyFound := k.GetLimitOrderPoolFillMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
+		ReserveDataNextKey, ReserveDataNextKeyFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
+		FillDataNextKey, FillMapNextKeyFound := k.GetLimitOrderPoolFillMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
 
 		// if no tokens have been filled at this key value, initialize to 0
 		if !FillMapNextKeyFound {
-			FillMapNextKey.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey
-			FillMapNextKey.TickIndex = CurrentTick0to1
-			FillMapNextKey.PairId = pairId
-			FillMapNextKey.FilledReserves = sdk.ZeroDec()
+			FillDataNextKey.Count = tick.LimitOrderPool0To1.CurrentLimitOrderKey
+			FillDataNextKey.TickIndex = CurrentTick0to1
+			FillDataNextKey.PairId = pairId
+			FillDataNextKey.FilledReserves = sdk.ZeroDec()
 		}
 
-		if ReserveMapNextKeyFound && price.Mul(ReserveMapNextKey.Reserves).LT(amount_left) {
+		if ReserveDataNextKeyFound && price.Mul(ReserveDataNextKey.Reserves).LT(amount_left) {
 			// Adds remaining reserves to amount_out
-			amount_out = amount_out.Add(ReserveMapNextKey.Reserves)
+			amount_out = amount_out.Add(ReserveDataNextKey.Reserves)
 			// Subtracts reserves from amount_left
-			amount_left = amount_left.Sub(price.Mul(ReserveMapNextKey.Reserves))
+			amount_left = amount_left.Sub(price.Mul(ReserveDataNextKey.Reserves))
 			// adds price * reserves to the filledMap
-			FillMapNextKey.FilledReserves = FillMapNextKey.FilledReserves.Add(price.Mul(ReserveMapNextKey.Reserves))
+			FillDataNextKey.FilledReserves = FillDataNextKey.FilledReserves.Add(price.Mul(ReserveDataNextKey.Reserves))
 			// sets reserve to 0
-			ReserveMapNextKey.Reserves = sdk.ZeroDec()
+			ReserveDataNextKey.Reserves = sdk.ZeroDec()
 
 			// increments the limitOrderKey
 			tick.LimitOrderPool0To1.CurrentLimitOrderKey++
 
-		} else if ReserveMapNextKeyFound && price.Mul(ReserveMapNextKey.Reserves).GT(amount_left) {
+		} else if ReserveDataNextKeyFound && price.Mul(ReserveDataNextKey.Reserves).GT(amount_left) {
 			// calculate anmout to output (will be a portion of reserves)
 			amount_out = amount_out.Add(amount_left.Mul(price))
 			// Add the amount_left to the amount flled in the filledReservesmapping
-			FillMapNextKey.FilledReserves = FillMapNextKey.FilledReserves.Add(amount_left)
+			FillDataNextKey.FilledReserves = FillDataNextKey.FilledReserves.Add(amount_left)
 			// subtract amount_left * price to the ReserveMapping
-			ReserveMapNextKey.Reserves = ReserveMapNextKey.Reserves.Sub(amount_left.Mul(price))
+			ReserveDataNextKey.Reserves = ReserveDataNextKey.Reserves.Sub(amount_left.Mul(price))
 			// set amount_left to 0
 			amount_left = sdk.ZeroDec()
 		}
 
 		// Updates mapping for the original limit order key + 1 (next key)
 		// @dev we set mappings within the conditionnal, as the tick mappings have not been initialized outside of it
-		k.SetLimitOrderPoolFillMap(ctx, FillMapNextKey)
-		k.SetLimitOrderPoolReserveMap(ctx, ReserveMapNextKey)
+		k.SetLimitOrderPoolFillMap(ctx, FillDataNextKey)
+		k.SetLimitOrderPoolReserveMap(ctx, ReserveDataNextKey)
 
 		// If there IS enough liqudity to end trade handle update this way
 	} else {
 		// calculate anmout to output (will be a portion of reserves)
 		amount_out = amount_out.Add(amount_left.Mul(price))
 		// Add the amount_left to the amount flled in the filledReservesmapping
-		FillMap.FilledReserves = FillMap.FilledReserves.Add(amount_left)
+		FillData.FilledReserves = FillData.FilledReserves.Add(amount_left)
 		// subtract amount_left * price to the ReserveMapping
-		ReserveMap.Reserves = ReserveMap.Reserves.Sub(amount_left.Mul(price))
+		ReserveData.Reserves = ReserveData.Reserves.Sub(amount_left.Mul(price))
 		// set amount_left to 0
 		amount_left = sdk.ZeroDec()
 	}
 
 	// Updates mappings of reserve and filledReserves based on the original limitOrderCurrentKey to the KVStore
-	k.SetLimitOrderPoolReserveMap(ctx, ReserveMap)
-	k.SetLimitOrderPoolFillMap(ctx, FillMap)
+	k.SetLimitOrderPoolReserveMap(ctx, ReserveData)
+	k.SetLimitOrderPoolFillMap(ctx, FillData)
 
 	//Updates limitOrderCurrentKey based on if any limitOrders were completely filled.
 	k.SetTickMap(ctx, pairId, tick)
@@ -1016,44 +1013,44 @@ func (k Keeper) PlaceLimitOrderMappingHelper(goCtx context.Context, pairId strin
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// Retrieves ReserveMap Object from KVStore
-	ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
+	// Retrieves ReserveData Object from KVStore
+	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
 	// Retrieves UserShareMap object from KVStore
-	UserShareMap, UserShareMapFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
+	UserShareData, UserShareDataFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
 	// Retrives TotalSharesMap object from KVStore
-	TotalSharesMap, TotalShareMapFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
+	TotalSharesData, TotalSharesDataFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
 
-	// If ReserveMap object not found initialize it accordingly
-	if !ReserveMapFound {
-		ReserveMap.Count = currentLimitOrderKey
-		ReserveMap.Reserves = sdk.ZeroDec()
-		ReserveMap.TickIndex = tickIndex
-		ReserveMap.Token = tokenIn
-		ReserveMap.PairId = pairId
+	// If ReserveData object not found initialize it accordingly
+	if !ReserveDataFound {
+		ReserveData.Count = currentLimitOrderKey
+		ReserveData.Reserves = sdk.ZeroDec()
+		ReserveData.TickIndex = tickIndex
+		ReserveData.Token = tokenIn
+		ReserveData.PairId = pairId
 	}
 
-	// If UserShareMap object is not found initialize it accordingly
-	if !UserShareMapFound {
-		UserShareMap.Count = currentLimitOrderKey
-		UserShareMap.Address = receiver
-		UserShareMap.SharesOwned = sdk.ZeroDec()
-		UserShareMap.TickIndex = tickIndex
-		UserShareMap.Token = tokenIn
-		UserShareMap.PairId = pairId
+	// If UserShareData object is not found initialize it accordingly
+	if !UserShareDataFound {
+		UserShareData.Count = currentLimitOrderKey
+		UserShareData.Address = receiver
+		UserShareData.SharesOwned = sdk.ZeroDec()
+		UserShareData.TickIndex = tickIndex
+		UserShareData.Token = tokenIn
+		UserShareData.PairId = pairId
 	}
 
-	// If TotalSharesMap object is nout found initialize it accordingly
-	if !TotalShareMapFound {
-		TotalSharesMap.Count = currentLimitOrderKey
-		TotalSharesMap.TotalShares = sdk.ZeroDec()
-		TotalSharesMap.TickIndex = tickIndex
-		TotalSharesMap.Token = tokenIn
-		TotalSharesMap.PairId = pairId
+	// If TotalSharesData object is nout found initialize it accordingly
+	if !TotalSharesDataFound {
+		TotalSharesData.Count = currentLimitOrderKey
+		TotalSharesData.TotalShares = sdk.ZeroDec()
+		TotalSharesData.TickIndex = tickIndex
+		TotalSharesData.Token = tokenIn
+		TotalSharesData.PairId = pairId
 	}
 
 	_ = ctx
 
-	return ReserveMap, UserShareMap, TotalSharesMap
+	return ReserveData, UserShareData, TotalSharesData
 }
 
 // Handles MsgPlaceLimitOrder, initializing (tick, pair) data structures if needed, calculating and storing information for a new limit order at a specific tick
@@ -1107,18 +1104,18 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	}
 
 	// Retrives FillMap object from FillMapping KVSTore
-	FillMap, FillMapFound := k.GetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.TokenIn, currentLimitOrderKey)
+	FillData, FillDataFound := k.GetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.TokenIn, currentLimitOrderKey)
 
 	// inits FillMap object if not found
-	if !FillMapFound {
-		FillMap.PairId = pairId
-		FillMap.TickIndex = msg.TickIndex
-		FillMap.Token = msg.TokenIn
-		FillMap.Count = currentLimitOrderKey
-		FillMap.FilledReserves = sdk.ZeroDec()
+	if !FillDataFound {
+		FillData.PairId = pairId
+		FillData.TickIndex = msg.TickIndex
+		FillData.Token = msg.TokenIn
+		FillData.Count = currentLimitOrderKey
+		FillData.FilledReserves = sdk.ZeroDec()
 
 		// Handles creating a limit order given the current limit order is already partially filled
-	} else if LimitOrderCount == currentLimitOrderKey && FillMap.FilledReserves.GT(sdk.ZeroDec()) {
+	} else if LimitOrderCount == currentLimitOrderKey && FillData.FilledReserves.GT(sdk.ZeroDec()) {
 		// increments currentLimitOrderKey
 		LimitOrderCount = LimitOrderCount + 1
 
@@ -1131,10 +1128,10 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	}
 
 	// Returns Map object for Reserve, UserShares, and TotalShares mapping
-	ReserveMap, UserShareMap, TotalSharesMap := k.PlaceLimitOrderMappingHelper(goCtx, pairId, msg.TickIndex, msg.TokenIn, currentLimitOrderKey, msg.Receiver)
+	ReserveData, UserShareData, TotalSharesData := k.PlaceLimitOrderMappingHelper(goCtx, pairId, msg.TickIndex, msg.TokenIn, currentLimitOrderKey, msg.Receiver)
 
-	// Adds amountIn to ReserveMap
-	ReserveMap.Reserves = ReserveMap.Reserves.Add(msg.AmountIn)
+	// Adds amountIn to ReserveData
+	ReserveData.Reserves = ReserveData.Reserves.Add(msg.AmountIn)
 
 	if msg.TokenIn == token0 {
 		// calculates NewShares given amountIn in terms of token0
@@ -1152,15 +1149,15 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	}
 
 	// Adds newShares to User's shares owned
-	UserShareMap.SharesOwned = UserShareMap.SharesOwned.Add(newShares)
+	UserShareData.SharesOwned = UserShareData.SharesOwned.Add(newShares)
 	// Adds newShares to totalShares
-	TotalSharesMap.TotalShares = TotalSharesMap.TotalShares.Add(newShares)
+	TotalSharesData.TotalShares = TotalSharesData.TotalShares.Add(newShares)
 
 	// Set Fill, Reserve, UserShares, and TotalShares maps in KVStore
-	k.SetLimitOrderPoolFillMap(ctx, FillMap)
-	k.SetLimitOrderPoolReserveMap(ctx, ReserveMap)
-	k.SetLimitOrderPoolUserShareMap(ctx, UserShareMap)
-	k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesMap)
+	k.SetLimitOrderPoolFillMap(ctx, FillData)
+	k.SetLimitOrderPoolReserveMap(ctx, ReserveData)
+	k.SetLimitOrderPoolUserShareMap(ctx, UserShareData)
+	k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesData)
 	k.SetTickMap(ctx, pairId, tick)
 
 	// If a new tick has been placed that tigtens the spread between currentTick0to1 and currentTick0to1 update CurrentTicks to the tighest ticks
@@ -1211,18 +1208,18 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 	}
 
 	// Retrives LimitOrderFillMap object from KVStore for the specified key and keyToken
-	FillMap, FillMapFound := k.GetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
+	FillData, FillDataFound := k.GetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 	// Retrives LimitOrderReserevMap object from KVStore for the specified key and keyToken
-	ReserveMap, ReserveMapFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
+	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 	// Retrives LimitOrderUserSharesMap object from KVStore for the specified key and keyToken
-	UserShareMap, UserShareMapFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
+	UserShareData, UserShareDataFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
 	// Retrives LimitOrderUserSharesWithdrawnMap object from KVStore for the specified key and keyToken
-	UserSharesWithdrawnMap, UserSharesWithdrawnFound := k.GetLimitOrderPoolUserSharesWithdrawn(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
+	UserSharesWithdrawnData, UserSharesWithdrawnDataFound := k.GetLimitOrderPoolUserSharesWithdrawn(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
 	// Retrives LimitOrderTotalSharesMap object from KVStore for the specified key and keyToken
-	TotalSharesMap, TotalShareMapFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
+	TotalSharesData, TotalSharesDataFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 
-	if !UserSharesWithdrawnFound {
-		UserSharesWithdrawnMap = types.LimitOrderPoolUserSharesWithdrawn{
+	if !UserSharesWithdrawnDataFound {
+		UserSharesWithdrawnData = types.LimitOrderPoolUserSharesWithdrawn{
 			PairId:          pairId,
 			TickIndex:       msg.TickIndex,
 			Token:           msg.KeyToken,
@@ -1232,36 +1229,35 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 		}
 	}
 
-	// If any of these maps are not found, then a valid withdraw option will not exist, and thus error
-	if !FillMapFound || !UserShareMapFound || !TotalShareMapFound || !ReserveMapFound {
+	// If any of these map objects are not found, then a valid withdraw option will not exist, and thus error
+	if !FillDataFound || !UserShareDataFound || !TotalSharesDataFound || !ReserveDataFound {
 		return sdkerrors.Wrapf(types.ErrValidLimitOrderMapsNotFound, "Valid mappings for limit order withdraw not found")
 	}
 
-	if FillMap.FilledReserves.Quo(FillMap.FilledReserves.Add(ReserveMap.Reserves)).LTE(UserSharesWithdrawnMap.SharesWithdrawn.Quo(UserSharesWithdrawnMap.SharesWithdrawn.Add(UserShareMap.SharesOwned))) {
+	if FillData.FilledReserves.Quo(FillData.FilledReserves.Add(ReserveData.Reserves)).LTE(UserSharesWithdrawnData.SharesWithdrawn.Quo(UserSharesWithdrawnData.SharesWithdrawn.Add(UserShareData.SharesOwned))) {
 		return sdkerrors.Wrapf(types.ErrCannotWithdrawLimitOrder, "Cannot withdraw additional liqudity from this limit order at this time")
 
 	}
 	// Calculates the sharesOut based on the UserShares withdrawn  compared to sharesLeft compared to remaining liquidity in reserves
-	sharesOut := ((FillMap.FilledReserves.Mul(UserSharesWithdrawnMap.SharesWithdrawn.Add(UserShareMap.SharesOwned))).Quo(FillMap.FilledReserves.Add(ReserveMap.Reserves))).Sub(UserSharesWithdrawnMap.SharesWithdrawn)
+	sharesOut := ((FillData.FilledReserves.Mul(UserSharesWithdrawnData.SharesWithdrawn.Add(UserShareData.SharesOwned))).Quo(FillData.FilledReserves.Add(ReserveData.Reserves))).Sub(UserSharesWithdrawnData.SharesWithdrawn)
 
-	amountOut := (sharesOut.Mul(FillMap.FilledReserves)).Quo(TotalSharesMap.TotalShares)
+	amountOut := (sharesOut.Mul(FillData.FilledReserves)).Quo(TotalSharesData.TotalShares)
 	// Calculates amount to subtract from fillMap object given sharesOut
-	FillMap.FilledReserves = FillMap.FilledReserves.Sub(sharesOut.Mul(FillMap.FilledReserves).Quo(TotalSharesMap.TotalShares))
+	FillData.FilledReserves = FillData.FilledReserves.Sub(sharesOut.Mul(FillData.FilledReserves).Quo(TotalSharesData.TotalShares))
 	// Updates useSharesWithdrawMap to include sharesOut
-	UserSharesWithdrawnMap.SharesWithdrawn = UserSharesWithdrawnMap.SharesWithdrawn.Add(sharesOut)
+	UserSharesWithdrawnData.SharesWithdrawn = UserSharesWithdrawnData.SharesWithdrawn.Add(sharesOut)
 	// Remove sharesOut from UserSharesMap
-	UserShareMap.SharesOwned = UserShareMap.SharesOwned.Sub(sharesOut)
+	UserShareData.SharesOwned = UserShareData.SharesOwned.Sub(sharesOut)
 	// Removes sharesOut from TotalSharesMap
-	// TODO: this wasn't in the spec but I assumed this is needed?
 	// calculate amountOout given sharesOut
 
 	//TotalSharesMap.TotalShares = TotalSharesMap.TotalShares.Sub(sharesOut)
 
 	// Updates changed LimitOrder Mappings in KVstore
-	k.SetLimitOrderPoolFillMap(ctx, FillMap)
-	k.SetLimitOrderPoolUserShareMap(ctx, UserShareMap)
-	k.SetLimitOrderPoolUserSharesWithdrawn(ctx, UserSharesWithdrawnMap)
-	k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesMap)
+	k.SetLimitOrderPoolFillMap(ctx, FillData)
+	k.SetLimitOrderPoolUserShareMap(ctx, UserShareData)
+	k.SetLimitOrderPoolUserSharesWithdrawn(ctx, UserSharesWithdrawnData)
+	k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesData)
 
 	var tokenOut string
 
@@ -1272,7 +1268,6 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 		tokenOut = token0
 	}
 
-	fmt.Println("Amount out: ", amountOut)
 	// Sends amountOut from module address to msg.Receiver account address
 	if amountOut.GT(sdk.ZeroDec()) {
 		coinOut := sdk.NewCoin(tokenOut, sdk.NewIntFromBigInt(amountOut.BigInt()))
