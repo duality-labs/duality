@@ -47,7 +47,10 @@ else
     echo "Contacting network..."
 
     # find an RPC address to check the live chain with
-    rpc_address="$( jq -r .apis.rpc[0].address networks/duality-1/chain.json )"
+    default_rpc_address="$( jq -r .apis.rpc[0].address networks/duality-1/chain.json )"
+    rpc_address="${RPC_ADDRESS:-$default_rpc_address}"
+
+    echo "RPC ADDRESS: $rpc_address"
 
     # check if we can get information from the current network
     abci_info_json=$( wget --tries 30 -q -O - $rpc_address/abci_info )
