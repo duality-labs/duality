@@ -63,7 +63,10 @@ else
     echo "Contacting network..."
 
     # find an RPC address to check the live chain with
-    rpc_address="$( jq -r .apis.rpc[0].address networks/$NETWORK/chain.json )"
+    default_rpc_address="$( jq -r .apis.rpc[0].address networks/$NETWORK/chain.json )"
+    rpc_address="${RPC_ADDRESS:-$default_rpc_address}"
+
+    echo "RPC ADDRESS: $rpc_address"
 
     # check if we can get information from the current network
     node_status_json=$( wget --tries 30 -q -O - $rpc_address/status )
