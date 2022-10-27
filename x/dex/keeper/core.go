@@ -11,6 +11,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+// Handles initializing a new pair (token0/token1) if not found, adds token0, token1 to global list of tokens active on the dex
 func (k Keeper) PairInit(goCtx context.Context, token0 string, token1 string, tick_index int64, fee int64) (string, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -252,6 +253,7 @@ func (k Keeper) Min(a, b sdk.Dec) sdk.Dec {
 	return b
 }
 
+// Handles core logic for MsgDeposit, checking and initializing data structures (tick, pair), calculating shares based on amount deposited, and sending funds to moduleAddress
 func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0 string, token1 string, callerAddr sdk.AccAddress, amounts0 []sdk.Dec, amounts1 []sdk.Dec) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -342,6 +344,8 @@ func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0
 	return nil
 }
 
+// Handles core logic for MsgWithdrawl; calculating and withdrawing reserve0,reserve1 from a specified tick given a specfied number of shares to remove.
+// Calculates the amount of reserve0, reserve1 to withdraw based on the percetange of the desired number of shares to remove compared to the total number of shares at the given tick
 func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -472,6 +476,8 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 }
 
 ////// Swap Functions
+
+// Handles core logic for the asset 0 to asset1 direction of MsgSwap; faciliates swapping amount0 for some amount of amount1, given a specified pair (token0, token1)
 
 func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress) (sdk.Dec, error) {
 
@@ -609,6 +615,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	return amount_out, nil
 }
 
+// Handles core logic for the asset 1 to asset 0 direction of MsgSwap; faciliates swapping amount1 for some amount of amount0, given a specified pair (token0, token1)
 func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress) (sdk.Dec, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -639,8 +646,6 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	// verify that amount left is not zero and that there are additional valid ticks to check
 
 	for !amount_left.Equal(sdk.ZeroDec()) && (count < int(pair.TotalTickCount)) {
-		fmt.Println("Amount left", amount_left)
-		fmt.Println("Count", count)
 
 		Current0Data, Current0Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick1To0)
 		//Current0Datam := Current0Data.TickData.Reserve1[i]
@@ -719,7 +724,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			// assigns a new variable err to handle err not being initialized in this conditional
 			var err error
 			// runs swaps for any limitOrders at the specified tick, updating amount_left, amount_out accordingly
-			amount_left, amount_out, err = k.SwapLimitOrder1to0(goCtx, pairId, token0, amount_out, amount_left, pair.TokenPair.CurrentTick1To0)
+			amount_left, amount_out, err = k.SwapLimitOrder0to1(goCtx, pairId, token0, amount_out, amount_left, pair.TokenPair.CurrentTick1To0)
 
 			if err != nil {
 				return sdk.ZeroDec(), err
@@ -745,7 +750,9 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	return amount_out, nil
 }
 
-// Swaps through Limit Orders
+// Swap Limit Orders
+
+// Handles swapping asset 0 for asset 1 through any active limit orders at a specified tick
 // Returns amount_out, amount_left, error
 func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn string, amount_out sdk.Dec, amount_left sdk.Dec, CurrentTick1to0 int64) (sdk.Dec, sdk.Dec, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -778,7 +785,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 		// Adds remaining reserves to amount_out
 		amount_out = amount_out.Add(ReserveMap.Reserves)
 		// Subtracts reserves from amount_left
-		amount_left = amount_left.Sub(ReserveMap.Reserves)
+		amount_left = amount_left.Sub(price.Mul(ReserveMap.Reserves))
 		// adds price * reserves to the filledMap
 		FillMap.FilledReserves = FillMap.FilledReserves.Add(price.Mul(ReserveMap.Reserves))
 		// sets reserves to 0
@@ -804,7 +811,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 			// Adds remaining reserves to amount_out
 			amount_out = amount_out.Add(ReserveMapNextKey.Reserves)
 			// Subtracts reserves from amount_left
-			amount_left = amount_left.Sub(ReserveMapNextKey.Reserves)
+			amount_left = amount_left.Sub(price.Mul(ReserveMapNextKey.Reserves))
 			// adds price * reserves to the filledMap
 			FillMapNextKey.FilledReserves = FillMapNextKey.FilledReserves.Add(price.Mul(ReserveMapNextKey.Reserves))
 			// sets reserve to 0
@@ -854,6 +861,9 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 	return amount_left, amount_out, nil
 }
 
+// Handles swapping asset 1 for asset 0 through any active limit orders at a specified tick
+// Returns amount_out, amount_left, error
+
 func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn string, amount_out sdk.Dec, amount_left sdk.Dec, CurrentTick0to1 int64) (sdk.Dec, sdk.Dec, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -883,7 +893,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 		// Adds remaining reserves to amount_out
 		amount_out = amount_out.Add(ReserveMap.Reserves)
 		// Subtracts reserves from amount_left
-		amount_left = amount_left.Sub(ReserveMap.Reserves)
+		amount_left = amount_left.Sub(price.Mul(ReserveMap.Reserves))
 		// adds price * reserves to the filledMap
 		FillMap.FilledReserves = FillMap.FilledReserves.Add(price.Mul(ReserveMap.Reserves))
 		// sets reserves to 0
@@ -908,7 +918,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 			// Adds remaining reserves to amount_out
 			amount_out = amount_out.Add(ReserveMapNextKey.Reserves)
 			// Subtracts reserves from amount_left
-			amount_left = amount_left.Sub(ReserveMapNextKey.Reserves)
+			amount_left = amount_left.Sub(price.Mul(ReserveMapNextKey.Reserves))
 			// adds price * reserves to the filledMap
 			FillMapNextKey.FilledReserves = FillMapNextKey.FilledReserves.Add(price.Mul(ReserveMapNextKey.Reserves))
 			// sets reserve to 0
@@ -959,6 +969,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 
 ///// Limit Order Functions
 
+// Helper Function for PlaceLimitOrder handling initializing a new tick
 func (k Keeper) PlaceLimitOrderHelper(goCtx context.Context, pairId string, tickIndex int64) types.TickMap {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -999,6 +1010,8 @@ func (k Keeper) PlaceLimitOrderHelper(goCtx context.Context, pairId string, tick
 
 }
 
+// Helper function for Place Limit order retrieving and or initializing mapppings used for keeping track of limit orders
+// Note: FillMap initialization is handled seperately in placeLimitOrder as it needed prior to this function being called.
 func (k Keeper) PlaceLimitOrderMappingHelper(goCtx context.Context, pairId string, tickIndex int64, tokenIn string, currentLimitOrderKey uint64, receiver string) (types.LimitOrderPoolReserveMap, types.LimitOrderPoolUserShareMap, types.LimitOrderPoolTotalSharesMap) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -1043,6 +1056,7 @@ func (k Keeper) PlaceLimitOrderMappingHelper(goCtx context.Context, pairId strin
 	return ReserveMap, UserShareMap, TotalSharesMap
 }
 
+// Handles MsgPlaceLimitOrder, initializing (tick, pair) data structures if needed, calculating and storing information for a new limit order at a specific tick
 func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -1176,11 +1190,13 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	return nil
 }
 
+// Handles MsgCancelLimitOrder, removing a specifed number of shares from a limit order and returning the respective amount in terms of the reserve to the user
 func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancelLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
 
 	return nil
 }
 
+// Handles MsgWithdrawFilledLimitOrder, calculates and sends filled liqudity from module to user for a limit order based on amount wished to receive.
 func (k Keeper) WithdrawWithdrawnLimitOrderCore(goCtx context.Context, msg *types.MsgWithdrawFilledLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
