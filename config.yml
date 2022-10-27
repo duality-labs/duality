@@ -34,3 +34,10 @@ init:
       # - https://github.com/tendermint/tendermint/issues/5911
       create_empty_blocks: false # default is true
       create_empty_blocks_interval: 7s # default is 0s
+host:
+  rpc: ":26657"
+  p2p: ":26656"
+  prof: ":6060"
+  grpc: ":9090"
+  grpc-web: ":9091"
+  api: ":1317"

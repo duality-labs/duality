@@ -56,12 +56,18 @@ COPY testnet/config/config.toml /root/.duality/config/config.toml
 
 # see docs for exposed ports:
 #   https://docs.ignite.com/kb/config.html#host
-EXPOSE 26658
+
+# rpc
 EXPOSE 26657
+# p2p
 EXPOSE 26656
+# prof
 EXPOSE 6060
+# grpc
 EXPOSE 9090
+# grpc-web
 EXPOSE 9091
+# api
 EXPOSE 1317
 
 # add startup scripts and their dependencies
