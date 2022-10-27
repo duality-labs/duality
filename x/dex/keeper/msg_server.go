@@ -155,7 +155,7 @@ func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.Ms
 		return &types.MsgWithdrawFilledLimitOrderResponse{}, err
 	}
 
-	err = k.WithdrawWithdrawnLimitOrderCore(goCtx, msg, token0, token1, createrAddr, receiverAddr)
+	err = k.WithdrawFilledLimitOrderCore(goCtx, msg, token0, token1, createrAddr, receiverAddr)
 
 	if err != nil {
 		return &types.MsgWithdrawFilledLimitOrderResponse{}, err
