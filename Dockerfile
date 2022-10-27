@@ -66,13 +66,18 @@ COPY docker/fullnode/app.toml /root/.duality/config/app.toml
 COPY docker/fullnode/client.toml /root/.duality/config/client.toml
 COPY docker/fullnode/config.toml /root/.duality/config/config.toml
 
-# expose all used ports
-EXPOSE 26658
+# expose ports
+# rpc
 EXPOSE 26657
+# p2p
 EXPOSE 26656
+# grpc-web
 EXPOSE 9091
+# grpc
 EXPOSE 9090
+# prof
 EXPOSE 6060
+# api
 EXPOSE 1317
 
 # add startup scripts and their dependencies
