@@ -1197,7 +1197,7 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 }
 
 // Handles MsgWithdrawFilledLimitOrder, calculates and sends filled liqudity from module to user for a limit order based on amount wished to receive.
-func (k Keeper) WithdrawWithdrawnLimitOrderCore(goCtx context.Context, msg *types.MsgWithdrawFilledLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
+func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.MsgWithdrawFilledLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// PairId for token0, token1 ("token0/token1")
