@@ -73,6 +73,7 @@ export interface MsgCancelLimitOrder {
   tickIndex: number;
   keyToken: string;
   key: number;
+  sharesOut: string;
 }
 
 export interface MsgCancelLimitOrderResponse {}
@@ -1248,6 +1249,7 @@ const baseMsgCancelLimitOrder: object = {
   tickIndex: 0,
   keyToken: "",
   key: 0,
+  sharesOut: "",
 };
 
 export const MsgCancelLimitOrder = {
@@ -1275,6 +1277,9 @@ export const MsgCancelLimitOrder = {
     }
     if (message.key !== 0) {
       writer.uint32(56).uint64(message.key);
+    }
+    if (message.sharesOut !== "") {
+      writer.uint32(66).string(message.sharesOut);
     }
     return writer;
   },
@@ -1306,6 +1311,9 @@ export const MsgCancelLimitOrder = {
           break;
         case 7:
           message.key = longToNumber(reader.uint64() as Long);
+          break;
+        case 8:
+          message.sharesOut = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1352,6 +1360,11 @@ export const MsgCancelLimitOrder = {
     } else {
       message.key = 0;
     }
+    if (object.sharesOut !== undefined && object.sharesOut !== null) {
+      message.sharesOut = String(object.sharesOut);
+    } else {
+      message.sharesOut = "";
+    }
     return message;
   },
 
@@ -1364,6 +1377,7 @@ export const MsgCancelLimitOrder = {
     message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
     message.keyToken !== undefined && (obj.keyToken = message.keyToken);
     message.key !== undefined && (obj.key = message.key);
+    message.sharesOut !== undefined && (obj.sharesOut = message.sharesOut);
     return obj;
   },
 
@@ -1403,6 +1417,11 @@ export const MsgCancelLimitOrder = {
       message.key = object.key;
     } else {
       message.key = 0;
+    }
+    if (object.sharesOut !== undefined && object.sharesOut !== null) {
+      message.sharesOut = object.sharesOut;
+    } else {
+      message.sharesOut = "";
     }
     return message;
   },

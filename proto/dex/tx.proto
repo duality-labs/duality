@@ -123,6 +123,12 @@ message MsgCancelLimitOrder {
   int64 tickIndex = 5;
   string keyToken = 6;
   uint64 key = 7;
+  string sharesOut = 8 [
+      (gogoproto.moretags)   = "yaml:\"sharesOut\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "sharesOut"
+  ]; 
 }
 
 message MsgCancelLimitOrderResponse {
