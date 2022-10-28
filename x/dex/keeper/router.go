@@ -4,14 +4,13 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"sort"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// Decide if we want to keep struct
+// Route struct
 type Route struct {
 	// string of tokens
 	path  []string
@@ -38,6 +37,7 @@ func getIntermediaryPaths() []Route {
 	}
 }
 
+// Temporary setting of intermediary paths
 // Uses intermediary paths to create potential routes
 func getRoutes(tokenIn string, tokenOut string) []Route {
 	allRoutes := []Route{}
@@ -45,6 +45,7 @@ func getRoutes(tokenIn string, tokenOut string) []Route {
 		path: []string{tokenIn, tokenOut},
 	}
 	allRoutes = append(allRoutes, baseRoute)
+	// TODO: Source from KV store for active pairs
 	intermediaryPaths := getIntermediaryPaths()
 	for _, route := range intermediaryPaths {
 		// Create path: tokenIn -> intermediaryPath -> tokenOut
@@ -108,137 +109,6 @@ func (k Keeper) getValidRoutes(goCtx context.Context, tokenIn string, tokenOut s
 		}
 	}
 	return validRoutes, nil
-}
-
-// Updates the prices across all routes passed in
-// Assumes all routes passed in are valid
-func (k Keeper) updatePrices(goCtx context.Context, tokenIn string, tokenOut string, routes []Route) ([]Route, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	newRoutes := []Route{}
-	for _, route := range routes {
-		// No err from route price
-		price, _ := k.updateRoutePrice(ctx, route)
-		if price.GT(sdk.ZeroDec()) {
-			newRoutes = append(newRoutes, Route{route.path, price})
-		}
-	}
-	return newRoutes, nil
-}
-
-// Updates price for a specific route
-// TODO: Check that route has liquidity!
-// Return 0 if route has no liquidity
-func (k Keeper) updateRoutePrice(ctx sdk.Context, route Route) (sdk.Dec, error) {
-	price := sdk.NewDec(1)
-	for i := 0; i < len(route.path)-1; i++ {
-		// Gets each pair sequentially
-		token0, token1, err := k.SortTokens(route.path[i], route.path[i+1])
-		if err == nil {
-			pairId := k.CreatePairId(token0, token1)
-			pair, pairFound := k.GetPairMap(ctx, pairId)
-
-			if pairFound {
-				// Multiply price according to tick
-				if route.path[i] == token0 {
-					// Checks if there are active ticks
-					// If no liquidity at tick, then nothing exists
-					// if k.GetTotalReservesAtTick(pairId, pair.TokenPair.CurrentTick0To1, true) > 0 {
-					tickPrice, err := k.Calc_price(pair.TokenPair.CurrentTick0To1, false)
-					if err != nil {
-						return sdk.ZeroDec(), err
-					}
-					price = price.Mul(tickPrice)
-
-				} else {
-					// Checks if there are active ticks
-					// TODO: THIS DOES NOT WORK B/C IT DOESN"T CHECK IF THERE ARE NO TICKS ON ONE SIDE
-					// if pair.PairCount > 0 {
-					tickPrice, err := k.Calc_price(pair.TokenPair.CurrentTick1To0, true)
-					if err != nil {
-						return sdk.ZeroDec(), err
-					}
-					price = price.Mul(tickPrice)
-					// }
-				}
-			}
-		}
-	}
-	return price, nil
-}
-
-/* TODO: Need to figure out how to compare against updated prices of all routes
-// Working theory: Not an issue because we save the price in a variable
-DUMMY ALGO
-*/
-func (k Keeper) SwapDynamicRouter(goCtx context.Context, callerAddress sdk.AccAddress, tokenIn string, tokenOut string, amountIn sdk.Dec, minOut sdk.Dec) (sdk.Dec, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	routes, err := k.getValidRoutes(goCtx, tokenIn, tokenOut, getRoutes(tokenIn, tokenOut))
-	// No valid routes found! Cannot perform swap
-	if len(routes) == 0 {
-		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNoValidRoutes, "No valid routes found")
-	}
-
-	// Valid routes failure
-	if err != nil {
-		return sdk.ZeroDec(), err
-	}
-
-	amountLeft := amountIn
-	totalAmountOut := sdk.ZeroDec()
-	// Swap while there is still amountIn
-	for amountLeft.GT(sdk.ZeroDec()) {
-		// TODO: Check this works, sort routes by price
-		sort.SliceStable(routes, func(i, j int) bool {
-			return routes[j].price.GT(routes[i].price)
-		})
-		fmt.Println("Sorted routes: ", routes)
-		// Get the best route & the second best price
-		bestRoute := routes[0]
-		secondBestPrice := sdk.ZeroDec()
-		if len(routes) > 1 {
-			secondBestPrice = routes[1].price
-		}
-
-		// ((bestRoute.price*amountLeft)+totalAmountOut) < minOut
-		// If the price is no longer good enough (at best) to reach minOut, return
-		if (bestRoute.price.Mul(amountLeft).Add(totalAmountOut)).LT(minOut) {
-			return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
-		}
-
-		amountToSwap := sdk.MinDec(amountIn.QuoInt64(20), amountLeft)
-		minOutToSwitchRoutes := secondBestPrice.Mul(amountLeft).Add(totalAmountOut)
-
-		fmt.Println("BestRoute:  ", bestRoute, "AmountToSwap: ", amountToSwap)
-		// Swap the 5% chunk and see what amountOutFromSwap is
-		amountOutFromSwap, err := k.swapAcrossRoute(goCtx, callerAddress, bestRoute, amountToSwap, minOutToSwitchRoutes)
-
-		if err != nil {
-			return sdk.ZeroDec(), err
-		}
-		// Subtract amountToSwap from amountLeft
-		amountLeft = amountLeft.Sub(amountToSwap)
-
-		// Add amountOutFromSwap to totalAmountOut
-		totalAmountOut = totalAmountOut.Add(amountOutFromSwap)
-		fmt.Println("totalAmountOut: ", totalAmountOut)
-
-		// Update the route price for the best route
-		updatedPrice, err := k.updateRoutePrice(ctx, bestRoute)
-		if err != nil {
-			return sdk.ZeroDec(), err
-		}
-		bestRoute.price = updatedPrice
-
-		routes, err = k.updatePrices(goCtx, tokenIn, tokenOut, routes)
-
-		// Prices failed to Update
-		if err != nil {
-			return sdk.ZeroDec(), err
-		}
-	}
-
-	return totalAmountOut, nil
 }
 
 // ORDERED LIST OF ROUTES, AMOUNT YOU WANT TO SWAP THROUGH THEM
@@ -330,7 +200,7 @@ func (k Keeper) SimulateSwap(goCtx context.Context, callerAddress sdk.AccAddress
 	amountOut := sdk.ZeroDec()
 	amountLeft := amountIn
 	for i = 0; i < numChunks; i++ {
-		routeAmountIn := sdk.ZeroDec()
+		var routeAmountIn sdk.Dec
 		if i == numChunks-1 {
 			routeAmountIn = amountLeft
 		} else {
