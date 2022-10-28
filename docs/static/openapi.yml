@@ -30322,7 +30322,7 @@ paths:
                     count:
                       type: string
                       format: uint64
-                    fill:
+                    filledReserves:
                       type: string
               pagination:
                 type: object
@@ -30441,7 +30441,7 @@ paths:
                   count:
                     type: string
                     format: uint64
-                  fill:
+                  filledReserves:
                     type: string
         default:
           description: An unexpected error response.
@@ -31264,7 +31264,7 @@ paths:
                         currentTick1To0:
                           type: string
                           format: int64
-                    pairCount:
+                    totalTickCount:
                       type: string
                       format: int64
               pagination:
@@ -31385,7 +31385,7 @@ paths:
                       currentTick1To0:
                         type: string
                         format: int64
-                  pairCount:
+                  totalTickCount:
                     type: string
                     format: int64
         default:
@@ -53939,7 +53939,7 @@ definitions:
       count:
         type: string
         format: uint64
-      fill:
+      filledReserves:
         type: string
   nicholasdotsol.duality.dex.LimitOrderPoolReserveMap:
     type: object
@@ -54031,7 +54031,7 @@ definitions:
           currentTick1To0:
             type: string
             format: int64
-      pairCount:
+      totalTickCount:
         type: string
         format: int64
   nicholasdotsol.duality.dex.Params:
@@ -54176,7 +54176,7 @@ definitions:
             count:
               type: string
               format: uint64
-            fill:
+            filledReserves:
               type: string
       pagination:
         type: object
@@ -54406,7 +54406,7 @@ definitions:
                 currentTick1To0:
                   type: string
                   format: int64
-            pairCount:
+            totalTickCount:
               type: string
               format: int64
       pagination:
@@ -54683,7 +54683,7 @@ definitions:
           count:
             type: string
             format: uint64
-          fill:
+          filledReserves:
             type: string
   nicholasdotsol.duality.dex.QueryGetLimitOrderPoolReserveMapResponse:
     type: object
@@ -54778,7 +54778,7 @@ definitions:
               currentTick1To0:
                 type: string
                 format: int64
-          pairCount:
+          totalTickCount:
             type: string
             format: int64
   nicholasdotsol.duality.dex.QueryGetSharesResponse:

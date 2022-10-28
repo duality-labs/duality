@@ -46,7 +46,7 @@ export interface DexLimitOrderPoolFillMap {
 
   /** @format uint64 */
   count?: string;
-  fill?: string;
+  filledReserves?: string;
 }
 
 export interface DexLimitOrderPoolReserveMap {
@@ -116,7 +116,7 @@ export interface DexPairMap {
   tokenPair?: DexTokenPairType;
 
   /** @format int64 */
-  pairCount?: string;
+  totalTickCount?: string;
 }
 
 /**

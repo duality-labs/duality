@@ -4,6 +4,7 @@ import { StdFee } from "@cosmjs/launchpad";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Registry, OfflineSigner, EncodeObject, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Api } from "./rest";
+
 import { MsgDeposit } from "./types/dex/tx";
 import { MsgCancelLimitOrder } from "./types/dex/tx";
 import { MsgWithdrawFilledLimitOrder } from "./types/dex/tx";
@@ -57,6 +58,7 @@ const txClient = async (wallet: OfflineSigner, { addr: addr }: TxClientOptions =
     msgSwap: (data: MsgSwap): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgSwap", value: MsgSwap.fromPartial( data ) }),
     msgWithdrawl: (data: MsgWithdrawl): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgWithdrawl", value: MsgWithdrawl.fromPartial( data ) }),
     msgPlaceLimitOrder: (data: MsgPlaceLimitOrder): EncodeObject => ({ typeUrl: "/nicholasdotsol.duality.dex.MsgPlaceLimitOrder", value: MsgPlaceLimitOrder.fromPartial( data ) }),
+
     
   };
 };
