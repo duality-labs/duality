@@ -63,10 +63,23 @@ else
     echo "Contacting network..."
 
     # find an RPC address to check the live chain with
-    default_rpc_address="$( jq -r .apis.rpc[0].address networks/$NETWORK/chain.json )"
-    rpc_address="${RPC_ADDRESS:-$default_rpc_address}"
+    rpc_address=$RPC_ADDRESS
+    genesis_ip=$(echo $RPC_ADDRESS | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b")
+
+    if [[ ! $rpc_address ]]; then
+        echo "Must provide ENV variable RPC_ADDRESS"
+        exit 1
+    fi
 
     echo "RPC ADDRESS: $rpc_address"
+
+    if $(wget -O - $rpc_address/genesis | jq .result.genesis > /root/.duality/config/genesis.json); then
+        echo "Loaded genesis.json"
+    else
+        echo "Cannot load genesis.json from original chain"
+        exit 1
+    fi
+
 
     # check if we can get information from the current network
     node_status_json=$( wget --tries 30 -q -O - $rpc_address/status )
@@ -80,12 +93,20 @@ else
     fi
 
     # read out peers from chain.json
-    persistent_peers_array="$( jq .peers.persistent_peers networks/$NETWORK/chain.json )"
-    persistent_peers="$( echo $persistent_peers_array | jq -r 'map(.id + "@" + .address) | join(",")' )"
+    # TODO: ideally this should parse listen_addr to get the port
+    genesis_peer=$( wget -q -O - $rpc_address/status \
+                       | jq -r --arg ip $genesis_ip '.result.node_info.id + "@" + $ip + ":26656"' )
+
+    persistent_peers=$( wget -q -O - $rpc_address/net_info \
+                            | jq -r '.result.peers | map("\(.node_info.id)@\(.remote_ip):26656") | join(",")' )
+
+    all_peers="${genesis_peer},${persistent_peers}"
+
+    echo "All peers: $all_peers"
 
     # set chain settings
-    sed -i 's#persistent_peers = ""#persistent_peers = "'"$persistent_peers"'"#' /root/.duality/config/config.toml
-    mv networks/$NETWORK/genesis.json /root/.duality/config/genesis.json
+    sed -i 's#persistent_peers = ""#persistent_peers = "'"$all_peers"'"#' /root/.duality/config/config.toml
+    # mv networks/$NETWORK/genesis.json /root/.duality/config/genesis.json
 
     # check if this node intends to become a validator
     if [[ "$STARTUP_MODE" == "validator" && ! -z "$MNEMONIC" ]]
