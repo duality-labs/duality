@@ -1,0 +1,84 @@
+{
+    "containerDefinitions": [
+        {
+        "name": "testnet-node",
+        "image": "137158674376.dkr.ecr.us-west-2.amazonaws.com/testnet:latest",
+        "cpu": 0,
+        "links": [],
+        "portMappings": [
+            {
+            "containerPort": 9091,
+            "hostPort": 9091,
+            "protocol": "tcp"
+        },
+            {
+            "containerPort": 1318,
+            "hostPort": 1318,
+            "protocol": "tcp"
+        },
+            {
+            "containerPort": 26659,
+            "hostPort": 26659,
+            "protocol": "tcp"
+        },
+            {
+            "containerPort": 26658,
+            "hostPort": 26658,
+            "protocol": "tcp"
+        },
+            {
+            "containerPort": 6061,
+            "hostPort": 6061,
+            "protocol": "tcp"
+        }
+        ],
+        "essential": true,
+        "entryPoint": [],
+        "command": [],
+        "environment": [
+            {
+            "name": "MODE",
+            "value": "fullnode"},
+            {
+            "name": "RPC_ADDRESS",
+            "value": "http://52.89.22.140:26657"
+        }
+        ],
+        "environmentFiles": [],
+        "mountPoints": [],
+        "volumesFrom": [],
+        "secrets": [],
+        "dnsServers": [],
+        "dnsSearchDomains": [],
+        "extraHosts": [],
+        "dockerSecurityOptions": [],
+        "dockerLabels": {},
+        "ulimits": [],
+        "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+                "awslogs-create-group": "true",
+                "awslogs-group": "/ecs/testnet-task",
+                "awslogs-region": "us-west-2",
+                "awslogs-stream-prefix": "ecs"
+            },
+            "secretOptions": []
+        },
+        "systemControls": []
+    }
+    ],
+    "family": "testnet-node",
+    "executionRoleArn": "arn:aws:iam::137158674376:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "volumes": [],
+    "placementConstraints": [],
+    "cpu": "1024",
+    "memory": "8192",
+    "ephemeralStorage": {
+        "sizeInGiB": 50
+    },
+    "runtimePlatform": {
+        "cpuArchitecture": "ARM64",
+        "operatingSystemFamily": "LINUX"
+    },
+}
