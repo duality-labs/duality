@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -70,8 +69,6 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	if msg.TokenIn == token0 {
 		amount_out, err = k.Swap0to1(goCtx, msg, token0, token1, createrAddr)
 
-		fmt.Println(msg.TokenIn)
-		fmt.Println(amount_out)
 		if err != nil {
 			return nil, err
 		}
@@ -109,7 +106,6 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 			return &types.MsgSwapResponse{}, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
 		}
 
-		fmt.Println("swap amount out:", amount_out)
 		if amount_out.GT(sdk.ZeroDec()) {
 
 			coinOut := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
@@ -117,7 +113,6 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 				return &types.MsgSwapResponse{}, err
 			}
 
-			fmt.Println(coinOut)
 		}
 
 	}

@@ -11,6 +11,46 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+// caclulates totalReserves for token0 and token1 for all fee tiers of a given tick.
+func (k Keeper) GetTotalReservesAtTick(goCtx context.Context, pairId string, tick_index_ int64, swap0to1 bool) (sdk.Dec, sdk.Dec, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	feelist := k.GetAllFeeList(ctx)
+
+	// inits totalReserve of 0 and 1 for all feeTiers
+	var totalReserve0 = sdk.ZeroDec()
+	var totalReserve1 = sdk.ZeroDec()
+
+	// retrivies tick from tickMaping
+	tick, tickFound := k.GetTickMap(ctx, pairId, tick_index_)
+
+	// verifies that tick at the given tick index exists
+	if !tickFound {
+		return sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidTickNotFound, "No tick found at index %d", tick_index_)
+	}
+
+	// When we init a pair we init reserve0, reserve1 to 0 for all feetiers and thus we can iterate over the fee tiers without worrying about nil values.
+	for i, _ := range feelist {
+
+		if swap0to1 {
+			// Given a tickIndex of reserve0 calculate the totalReserves for the tick composted of reserve0 and the related reserve1
+			totalReserve0 = totalReserve0.Add(tick.TickData.Reserve0AndShares[i].Reserve0)
+			feeValue := feelist[i].Fee
+			totalReserve1 = totalReserve1.Add(tick.TickData.Reserve1[i-int(feeValue)])
+		} else {
+			// Given a tickIndex of reserve1 calculate the totalReserves for the tick composted of reserve0 and the related reserve0
+			totalReserve1 = totalReserve1.Add(tick.TickData.Reserve1[i])
+			feeValue := feelist[i].Fee
+			totalReserve0 = totalReserve0.Add(tick.TickData.Reserve0AndShares[i+int(feeValue)].Reserve0)
+
+		}
+
+	}
+
+	return totalReserve0, totalReserve1, nil
+
+}
+
 // Handles initializing a new pair (token0/token1) if not found, adds token0, token1 to global list of tokens active on the dex
 func (k Keeper) PairInit(goCtx context.Context, token0 string, token1 string, tick_index int64, fee int64) (string, error) {
 
