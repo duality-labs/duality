@@ -2,23 +2,42 @@
 import * as Long from "long";
 import { util, configure, Writer, Reader } from "protobufjs/minimal";
 import { TickDataType } from "../dex/tick_data_type";
+import { LimitOrderPool } from "../dex/limit_order_pool";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
 export interface TickMap {
+  pairId: string;
   tickIndex: number;
   tickData: TickDataType | undefined;
+  LimitOrderPool0to1: LimitOrderPool | undefined;
+  LimitOrderPool1to0: LimitOrderPool | undefined;
 }
 
-const baseTickMap: object = { tickIndex: 0 };
+const baseTickMap: object = { pairId: "", tickIndex: 0 };
 
 export const TickMap = {
   encode(message: TickMap, writer: Writer = Writer.create()): Writer {
+    if (message.pairId !== "") {
+      writer.uint32(10).string(message.pairId);
+    }
     if (message.tickIndex !== 0) {
-      writer.uint32(8).int64(message.tickIndex);
+      writer.uint32(16).int64(message.tickIndex);
     }
     if (message.tickData !== undefined) {
-      TickDataType.encode(message.tickData, writer.uint32(18).fork()).ldelim();
+      TickDataType.encode(message.tickData, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.LimitOrderPool0to1 !== undefined) {
+      LimitOrderPool.encode(
+        message.LimitOrderPool0to1,
+        writer.uint32(34).fork()
+      ).ldelim();
+    }
+    if (message.LimitOrderPool1to0 !== undefined) {
+      LimitOrderPool.encode(
+        message.LimitOrderPool1to0,
+        writer.uint32(42).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -31,10 +50,25 @@ export const TickMap = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.tickIndex = longToNumber(reader.int64() as Long);
+          message.pairId = reader.string();
           break;
         case 2:
+          message.tickIndex = longToNumber(reader.int64() as Long);
+          break;
+        case 3:
           message.tickData = TickDataType.decode(reader, reader.uint32());
+          break;
+        case 4:
+          message.LimitOrderPool0to1 = LimitOrderPool.decode(
+            reader,
+            reader.uint32()
+          );
+          break;
+        case 5:
+          message.LimitOrderPool1to0 = LimitOrderPool.decode(
+            reader,
+            reader.uint32()
+          );
           break;
         default:
           reader.skipType(tag & 7);
@@ -46,6 +80,11 @@ export const TickMap = {
 
   fromJSON(object: any): TickMap {
     const message = { ...baseTickMap } as TickMap;
+    if (object.pairId !== undefined && object.pairId !== null) {
+      message.pairId = String(object.pairId);
+    } else {
+      message.pairId = "";
+    }
     if (object.tickIndex !== undefined && object.tickIndex !== null) {
       message.tickIndex = Number(object.tickIndex);
     } else {
@@ -56,21 +95,55 @@ export const TickMap = {
     } else {
       message.tickData = undefined;
     }
+    if (
+      object.LimitOrderPool0to1 !== undefined &&
+      object.LimitOrderPool0to1 !== null
+    ) {
+      message.LimitOrderPool0to1 = LimitOrderPool.fromJSON(
+        object.LimitOrderPool0to1
+      );
+    } else {
+      message.LimitOrderPool0to1 = undefined;
+    }
+    if (
+      object.LimitOrderPool1to0 !== undefined &&
+      object.LimitOrderPool1to0 !== null
+    ) {
+      message.LimitOrderPool1to0 = LimitOrderPool.fromJSON(
+        object.LimitOrderPool1to0
+      );
+    } else {
+      message.LimitOrderPool1to0 = undefined;
+    }
     return message;
   },
 
   toJSON(message: TickMap): unknown {
     const obj: any = {};
+    message.pairId !== undefined && (obj.pairId = message.pairId);
     message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
     message.tickData !== undefined &&
       (obj.tickData = message.tickData
         ? TickDataType.toJSON(message.tickData)
+        : undefined);
+    message.LimitOrderPool0to1 !== undefined &&
+      (obj.LimitOrderPool0to1 = message.LimitOrderPool0to1
+        ? LimitOrderPool.toJSON(message.LimitOrderPool0to1)
+        : undefined);
+    message.LimitOrderPool1to0 !== undefined &&
+      (obj.LimitOrderPool1to0 = message.LimitOrderPool1to0
+        ? LimitOrderPool.toJSON(message.LimitOrderPool1to0)
         : undefined);
     return obj;
   },
 
   fromPartial(object: DeepPartial<TickMap>): TickMap {
     const message = { ...baseTickMap } as TickMap;
+    if (object.pairId !== undefined && object.pairId !== null) {
+      message.pairId = object.pairId;
+    } else {
+      message.pairId = "";
+    }
     if (object.tickIndex !== undefined && object.tickIndex !== null) {
       message.tickIndex = object.tickIndex;
     } else {
@@ -80,6 +153,26 @@ export const TickMap = {
       message.tickData = TickDataType.fromPartial(object.tickData);
     } else {
       message.tickData = undefined;
+    }
+    if (
+      object.LimitOrderPool0to1 !== undefined &&
+      object.LimitOrderPool0to1 !== null
+    ) {
+      message.LimitOrderPool0to1 = LimitOrderPool.fromPartial(
+        object.LimitOrderPool0to1
+      );
+    } else {
+      message.LimitOrderPool0to1 = undefined;
+    }
+    if (
+      object.LimitOrderPool1to0 !== undefined &&
+      object.LimitOrderPool1to0 !== null
+    ) {
+      message.LimitOrderPool1to0 = LimitOrderPool.fromPartial(
+        object.LimitOrderPool1to0
+      );
+    } else {
+      message.LimitOrderPool1to0 = undefined;
     }
     return message;
   },

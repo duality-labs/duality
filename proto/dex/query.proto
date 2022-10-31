@@ -13,6 +13,11 @@ import "dex/shares.proto";
 import "dex/fee_list.proto";
 import "dex/edge_row.proto";
 import "dex/adjancey_matrix.proto";
+import "dex/limit_order_pool_user_share_map.proto";
+import "dex/limit_order_pool_user_shares_withdrawn.proto";
+import "dex/limit_order_pool_total_shares_map.proto";
+import "dex/limit_order_pool_reserve_map.proto";
+import "dex/limit_order_pool_fill_map.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -25,7 +30,7 @@ service Query {
   }
   // Queries a TickMap by index.
 	rpc TickMap(QueryGetTickMapRequest) returns (QueryGetTickMapResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick_map/{tickIndex}";
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick_map/{pairId}/{tickIndex}";
 	}
 
 	// Queries a list of TickMap items.
@@ -101,6 +106,56 @@ service Query {
 	// Queries a list of AdjanceyMatrix items.
 	rpc AdjanceyMatrixAll(QueryAllAdjanceyMatrixRequest) returns (QueryAllAdjanceyMatrixResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/adjancey_matrix";
+	}
+
+// Queries a LimitOrderPoolUserShareMap by index.
+	rpc LimitOrderPoolUserShareMap(QueryGetLimitOrderPoolUserShareMapRequest) returns (QueryGetLimitOrderPoolUserShareMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_share_map/{pairId}/{token}/{tickIndex}/{count}/{address}";
+	}
+
+	// Queries a list of LimitOrderPoolUserShareMap items.
+	rpc LimitOrderPoolUserShareMapAll(QueryAllLimitOrderPoolUserShareMapRequest) returns (QueryAllLimitOrderPoolUserShareMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_share_map";
+	}
+
+// Queries a LimitOrderPoolUserSharesWithdrawn by index.
+	rpc LimitOrderPoolUserSharesWithdrawn(QueryGetLimitOrderPoolUserSharesWithdrawnRequest) returns (QueryGetLimitOrderPoolUserSharesWithdrawnResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn/{pairId}/{token}/{tickIndex}/{count}/{address}";
+	}
+
+	// Queries a list of LimitOrderPoolUserSharesWithdrawn items.
+	rpc LimitOrderPoolUserSharesWithdrawnAll(QueryAllLimitOrderPoolUserSharesWithdrawnRequest) returns (QueryAllLimitOrderPoolUserSharesWithdrawnResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn";
+	}
+
+// Queries a LimitOrderPoolTotalSharesMap by index.
+	rpc LimitOrderPoolTotalSharesMap(QueryGetLimitOrderPoolTotalSharesMapRequest) returns (QueryGetLimitOrderPoolTotalSharesMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map/{pairId}/{token}/{tickIndex}/{count}";
+	}
+
+	// Queries a list of LimitOrderPoolTotalSharesMap items.
+	rpc LimitOrderPoolTotalSharesMapAll(QueryAllLimitOrderPoolTotalSharesMapRequest) returns (QueryAllLimitOrderPoolTotalSharesMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map";
+	}
+
+// Queries a LimitOrderPoolReserveMap by index.
+	rpc LimitOrderPoolReserveMap(QueryGetLimitOrderPoolReserveMapRequest) returns (QueryGetLimitOrderPoolReserveMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_reserve_map/{pairId}/{token}/{tickIndex}/{count}";
+	}
+
+	// Queries a list of LimitOrderPoolReserveMap items.
+	rpc LimitOrderPoolReserveMapAll(QueryAllLimitOrderPoolReserveMapRequest) returns (QueryAllLimitOrderPoolReserveMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_reserve_map";
+	}
+
+// Queries a LimitOrderPoolFillMap by index.
+	rpc LimitOrderPoolFillMap(QueryGetLimitOrderPoolFillMapRequest) returns (QueryGetLimitOrderPoolFillMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_fill_map/{pairId}/{token}/{tickIndex}/{count}";
+	}
+
+	// Queries a list of LimitOrderPoolFillMap items.
+	rpc LimitOrderPoolFillMapAll(QueryAllLimitOrderPoolFillMapRequest) returns (QueryAllLimitOrderPoolFillMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_fill_map";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -257,6 +312,112 @@ message QueryAllAdjanceyMatrixRequest {
 
 message QueryAllAdjanceyMatrixResponse {
 	repeated AdjanceyMatrix AdjanceyMatrix = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetLimitOrderPoolUserShareMapRequest {
+  string pairId = 1;
+  int64 tickIndex =2;
+  string token = 3;
+    uint64 count = 4;
+  string address = 5;
+
+}
+
+message QueryGetLimitOrderPoolUserShareMapResponse {
+	LimitOrderPoolUserShareMap limitOrderPoolUserShareMap = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllLimitOrderPoolUserShareMapRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllLimitOrderPoolUserShareMapResponse {
+	repeated LimitOrderPoolUserShareMap limitOrderPoolUserShareMap = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetLimitOrderPoolUserSharesWithdrawnRequest {
+string pairId = 1;
+  int64 tickIndex =2;
+  string token = 3;
+    uint64 count = 4;
+  string address = 5;
+}
+
+message QueryGetLimitOrderPoolUserSharesWithdrawnResponse {
+	LimitOrderPoolUserSharesWithdrawn limitOrderPoolUserSharesWithdrawn = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllLimitOrderPoolUserSharesWithdrawnRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllLimitOrderPoolUserSharesWithdrawnResponse {
+	repeated LimitOrderPoolUserSharesWithdrawn limitOrderPoolUserSharesWithdrawn = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetLimitOrderPoolTotalSharesMapRequest {
+	  string pairId = 1;
+  int64 tickIndex =2;
+  string token = 3;
+    uint64 count = 4;
+
+}
+
+message QueryGetLimitOrderPoolTotalSharesMapResponse {
+	LimitOrderPoolTotalSharesMap limitOrderPoolTotalSharesMap = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllLimitOrderPoolTotalSharesMapRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllLimitOrderPoolTotalSharesMapResponse {
+	repeated LimitOrderPoolTotalSharesMap limitOrderPoolTotalSharesMap = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetLimitOrderPoolReserveMapRequest {
+	  string pairId = 1;
+  int64 tickIndex =2;
+  string token = 3;
+    uint64 count = 4;
+
+}
+
+message QueryGetLimitOrderPoolReserveMapResponse {
+	LimitOrderPoolReserveMap limitOrderPoolReserveMap = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllLimitOrderPoolReserveMapRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllLimitOrderPoolReserveMapResponse {
+	repeated LimitOrderPoolReserveMap limitOrderPoolReserveMap = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetLimitOrderPoolFillMapRequest {
+	  string pairId = 1;
+  int64 tickIndex =2;
+  string token = 3;
+    uint64 count = 4;
+
+}
+
+message QueryGetLimitOrderPoolFillMapResponse {
+	LimitOrderPoolFillMap limitOrderPoolFillMap = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllLimitOrderPoolFillMapRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllLimitOrderPoolFillMapResponse {
+	repeated LimitOrderPoolFillMap limitOrderPoolFillMap = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

@@ -18,8 +18,8 @@ export interface MsgDeposit {
 export interface MsgDepositResponse {}
 
 export interface MsgWithdrawl {
-  receiver: string;
   creator: string;
+  receiver: string;
   tokenA: string;
   tokenB: string;
   sharesToRemove: string[];
@@ -40,6 +40,43 @@ export interface MsgSwap {
 }
 
 export interface MsgSwapResponse {}
+
+export interface MsgPlaceLimitOrder {
+  creator: string;
+  receiver: string;
+  tokenA: string;
+  tokenB: string;
+  tickIndex: number;
+  tokenIn: string;
+  amountIn: string;
+}
+
+export interface MsgPlaceLimitOrderResponse {}
+
+export interface MsgWithdrawFilledLimitOrder {
+  creator: string;
+  receiver: string;
+  tokenA: string;
+  tokenB: string;
+  tickIndex: number;
+  keyToken: string;
+  key: number;
+}
+
+export interface MsgWithdrawFilledLimitOrderResponse {}
+
+export interface MsgCancelLimitOrder {
+  creator: string;
+  receiver: string;
+  tokenA: string;
+  tokenB: string;
+  tickIndex: number;
+  keyToken: string;
+  key: number;
+  sharesOut: string;
+}
+
+export interface MsgCancelLimitOrderResponse {}
 
 const baseMsgDeposit: object = {
   creator: "",
@@ -309,8 +346,8 @@ export const MsgDepositResponse = {
 };
 
 const baseMsgWithdrawl: object = {
-  receiver: "",
   creator: "",
+  receiver: "",
   tokenA: "",
   tokenB: "",
   sharesToRemove: "",
@@ -320,11 +357,11 @@ const baseMsgWithdrawl: object = {
 
 export const MsgWithdrawl = {
   encode(message: MsgWithdrawl, writer: Writer = Writer.create()): Writer {
-    if (message.receiver !== "") {
-      writer.uint32(10).string(message.receiver);
-    }
     if (message.creator !== "") {
-      writer.uint32(18).string(message.creator);
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.receiver !== "") {
+      writer.uint32(18).string(message.receiver);
     }
     if (message.tokenA !== "") {
       writer.uint32(26).string(message.tokenA);
@@ -359,10 +396,10 @@ export const MsgWithdrawl = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.receiver = reader.string();
+          message.creator = reader.string();
           break;
         case 2:
-          message.creator = reader.string();
+          message.receiver = reader.string();
           break;
         case 3:
           message.tokenA = reader.string();
@@ -406,15 +443,15 @@ export const MsgWithdrawl = {
     message.sharesToRemove = [];
     message.tickIndexes = [];
     message.feeIndexes = [];
-    if (object.receiver !== undefined && object.receiver !== null) {
-      message.receiver = String(object.receiver);
-    } else {
-      message.receiver = "";
-    }
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = String(object.creator);
     } else {
       message.creator = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = String(object.receiver);
+    } else {
+      message.receiver = "";
     }
     if (object.tokenA !== undefined && object.tokenA !== null) {
       message.tokenA = String(object.tokenA);
@@ -446,8 +483,8 @@ export const MsgWithdrawl = {
 
   toJSON(message: MsgWithdrawl): unknown {
     const obj: any = {};
-    message.receiver !== undefined && (obj.receiver = message.receiver);
     message.creator !== undefined && (obj.creator = message.creator);
+    message.receiver !== undefined && (obj.receiver = message.receiver);
     message.tokenA !== undefined && (obj.tokenA = message.tokenA);
     message.tokenB !== undefined && (obj.tokenB = message.tokenB);
     if (message.sharesToRemove) {
@@ -473,15 +510,15 @@ export const MsgWithdrawl = {
     message.sharesToRemove = [];
     message.tickIndexes = [];
     message.feeIndexes = [];
-    if (object.receiver !== undefined && object.receiver !== null) {
-      message.receiver = object.receiver;
-    } else {
-      message.receiver = "";
-    }
     if (object.creator !== undefined && object.creator !== null) {
       message.creator = object.creator;
     } else {
       message.creator = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = object.receiver;
+    } else {
+      message.receiver = "";
     }
     if (object.tokenA !== undefined && object.tokenA !== null) {
       message.tokenA = object.tokenA;
@@ -753,12 +790,710 @@ export const MsgSwapResponse = {
   },
 };
 
+const baseMsgPlaceLimitOrder: object = {
+  creator: "",
+  receiver: "",
+  tokenA: "",
+  tokenB: "",
+  tickIndex: 0,
+  tokenIn: "",
+  amountIn: "",
+};
+
+export const MsgPlaceLimitOrder = {
+  encode(
+    message: MsgPlaceLimitOrder,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.receiver !== "") {
+      writer.uint32(18).string(message.receiver);
+    }
+    if (message.tokenA !== "") {
+      writer.uint32(26).string(message.tokenA);
+    }
+    if (message.tokenB !== "") {
+      writer.uint32(34).string(message.tokenB);
+    }
+    if (message.tickIndex !== 0) {
+      writer.uint32(40).int64(message.tickIndex);
+    }
+    if (message.tokenIn !== "") {
+      writer.uint32(50).string(message.tokenIn);
+    }
+    if (message.amountIn !== "") {
+      writer.uint32(58).string(message.amountIn);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgPlaceLimitOrder {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgPlaceLimitOrder } as MsgPlaceLimitOrder;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.receiver = reader.string();
+          break;
+        case 3:
+          message.tokenA = reader.string();
+          break;
+        case 4:
+          message.tokenB = reader.string();
+          break;
+        case 5:
+          message.tickIndex = longToNumber(reader.int64() as Long);
+          break;
+        case 6:
+          message.tokenIn = reader.string();
+          break;
+        case 7:
+          message.amountIn = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgPlaceLimitOrder {
+    const message = { ...baseMsgPlaceLimitOrder } as MsgPlaceLimitOrder;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = String(object.receiver);
+    } else {
+      message.receiver = "";
+    }
+    if (object.tokenA !== undefined && object.tokenA !== null) {
+      message.tokenA = String(object.tokenA);
+    } else {
+      message.tokenA = "";
+    }
+    if (object.tokenB !== undefined && object.tokenB !== null) {
+      message.tokenB = String(object.tokenB);
+    } else {
+      message.tokenB = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = Number(object.tickIndex);
+    } else {
+      message.tickIndex = 0;
+    }
+    if (object.tokenIn !== undefined && object.tokenIn !== null) {
+      message.tokenIn = String(object.tokenIn);
+    } else {
+      message.tokenIn = "";
+    }
+    if (object.amountIn !== undefined && object.amountIn !== null) {
+      message.amountIn = String(object.amountIn);
+    } else {
+      message.amountIn = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgPlaceLimitOrder): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.receiver !== undefined && (obj.receiver = message.receiver);
+    message.tokenA !== undefined && (obj.tokenA = message.tokenA);
+    message.tokenB !== undefined && (obj.tokenB = message.tokenB);
+    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
+    message.tokenIn !== undefined && (obj.tokenIn = message.tokenIn);
+    message.amountIn !== undefined && (obj.amountIn = message.amountIn);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgPlaceLimitOrder>): MsgPlaceLimitOrder {
+    const message = { ...baseMsgPlaceLimitOrder } as MsgPlaceLimitOrder;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = object.receiver;
+    } else {
+      message.receiver = "";
+    }
+    if (object.tokenA !== undefined && object.tokenA !== null) {
+      message.tokenA = object.tokenA;
+    } else {
+      message.tokenA = "";
+    }
+    if (object.tokenB !== undefined && object.tokenB !== null) {
+      message.tokenB = object.tokenB;
+    } else {
+      message.tokenB = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = object.tickIndex;
+    } else {
+      message.tickIndex = 0;
+    }
+    if (object.tokenIn !== undefined && object.tokenIn !== null) {
+      message.tokenIn = object.tokenIn;
+    } else {
+      message.tokenIn = "";
+    }
+    if (object.amountIn !== undefined && object.amountIn !== null) {
+      message.amountIn = object.amountIn;
+    } else {
+      message.amountIn = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgPlaceLimitOrderResponse: object = {};
+
+export const MsgPlaceLimitOrderResponse = {
+  encode(
+    _: MsgPlaceLimitOrderResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgPlaceLimitOrderResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgPlaceLimitOrderResponse,
+    } as MsgPlaceLimitOrderResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgPlaceLimitOrderResponse {
+    const message = {
+      ...baseMsgPlaceLimitOrderResponse,
+    } as MsgPlaceLimitOrderResponse;
+    return message;
+  },
+
+  toJSON(_: MsgPlaceLimitOrderResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(
+    _: DeepPartial<MsgPlaceLimitOrderResponse>
+  ): MsgPlaceLimitOrderResponse {
+    const message = {
+      ...baseMsgPlaceLimitOrderResponse,
+    } as MsgPlaceLimitOrderResponse;
+    return message;
+  },
+};
+
+const baseMsgWithdrawFilledLimitOrder: object = {
+  creator: "",
+  receiver: "",
+  tokenA: "",
+  tokenB: "",
+  tickIndex: 0,
+  keyToken: "",
+  key: 0,
+};
+
+export const MsgWithdrawFilledLimitOrder = {
+  encode(
+    message: MsgWithdrawFilledLimitOrder,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.receiver !== "") {
+      writer.uint32(18).string(message.receiver);
+    }
+    if (message.tokenA !== "") {
+      writer.uint32(26).string(message.tokenA);
+    }
+    if (message.tokenB !== "") {
+      writer.uint32(34).string(message.tokenB);
+    }
+    if (message.tickIndex !== 0) {
+      writer.uint32(40).int64(message.tickIndex);
+    }
+    if (message.keyToken !== "") {
+      writer.uint32(50).string(message.keyToken);
+    }
+    if (message.key !== 0) {
+      writer.uint32(56).uint64(message.key);
+    }
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgWithdrawFilledLimitOrder {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgWithdrawFilledLimitOrder,
+    } as MsgWithdrawFilledLimitOrder;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.receiver = reader.string();
+          break;
+        case 3:
+          message.tokenA = reader.string();
+          break;
+        case 4:
+          message.tokenB = reader.string();
+          break;
+        case 5:
+          message.tickIndex = longToNumber(reader.int64() as Long);
+          break;
+        case 6:
+          message.keyToken = reader.string();
+          break;
+        case 7:
+          message.key = longToNumber(reader.uint64() as Long);
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgWithdrawFilledLimitOrder {
+    const message = {
+      ...baseMsgWithdrawFilledLimitOrder,
+    } as MsgWithdrawFilledLimitOrder;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = String(object.receiver);
+    } else {
+      message.receiver = "";
+    }
+    if (object.tokenA !== undefined && object.tokenA !== null) {
+      message.tokenA = String(object.tokenA);
+    } else {
+      message.tokenA = "";
+    }
+    if (object.tokenB !== undefined && object.tokenB !== null) {
+      message.tokenB = String(object.tokenB);
+    } else {
+      message.tokenB = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = Number(object.tickIndex);
+    } else {
+      message.tickIndex = 0;
+    }
+    if (object.keyToken !== undefined && object.keyToken !== null) {
+      message.keyToken = String(object.keyToken);
+    } else {
+      message.keyToken = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = Number(object.key);
+    } else {
+      message.key = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: MsgWithdrawFilledLimitOrder): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.receiver !== undefined && (obj.receiver = message.receiver);
+    message.tokenA !== undefined && (obj.tokenA = message.tokenA);
+    message.tokenB !== undefined && (obj.tokenB = message.tokenB);
+    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
+    message.keyToken !== undefined && (obj.keyToken = message.keyToken);
+    message.key !== undefined && (obj.key = message.key);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<MsgWithdrawFilledLimitOrder>
+  ): MsgWithdrawFilledLimitOrder {
+    const message = {
+      ...baseMsgWithdrawFilledLimitOrder,
+    } as MsgWithdrawFilledLimitOrder;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = object.receiver;
+    } else {
+      message.receiver = "";
+    }
+    if (object.tokenA !== undefined && object.tokenA !== null) {
+      message.tokenA = object.tokenA;
+    } else {
+      message.tokenA = "";
+    }
+    if (object.tokenB !== undefined && object.tokenB !== null) {
+      message.tokenB = object.tokenB;
+    } else {
+      message.tokenB = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = object.tickIndex;
+    } else {
+      message.tickIndex = 0;
+    }
+    if (object.keyToken !== undefined && object.keyToken !== null) {
+      message.keyToken = object.keyToken;
+    } else {
+      message.keyToken = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = 0;
+    }
+    return message;
+  },
+};
+
+const baseMsgWithdrawFilledLimitOrderResponse: object = {};
+
+export const MsgWithdrawFilledLimitOrderResponse = {
+  encode(
+    _: MsgWithdrawFilledLimitOrderResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgWithdrawFilledLimitOrderResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgWithdrawFilledLimitOrderResponse,
+    } as MsgWithdrawFilledLimitOrderResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgWithdrawFilledLimitOrderResponse {
+    const message = {
+      ...baseMsgWithdrawFilledLimitOrderResponse,
+    } as MsgWithdrawFilledLimitOrderResponse;
+    return message;
+  },
+
+  toJSON(_: MsgWithdrawFilledLimitOrderResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(
+    _: DeepPartial<MsgWithdrawFilledLimitOrderResponse>
+  ): MsgWithdrawFilledLimitOrderResponse {
+    const message = {
+      ...baseMsgWithdrawFilledLimitOrderResponse,
+    } as MsgWithdrawFilledLimitOrderResponse;
+    return message;
+  },
+};
+
+const baseMsgCancelLimitOrder: object = {
+  creator: "",
+  receiver: "",
+  tokenA: "",
+  tokenB: "",
+  tickIndex: 0,
+  keyToken: "",
+  key: 0,
+  sharesOut: "",
+};
+
+export const MsgCancelLimitOrder = {
+  encode(
+    message: MsgCancelLimitOrder,
+    writer: Writer = Writer.create()
+  ): Writer {
+    if (message.creator !== "") {
+      writer.uint32(10).string(message.creator);
+    }
+    if (message.receiver !== "") {
+      writer.uint32(18).string(message.receiver);
+    }
+    if (message.tokenA !== "") {
+      writer.uint32(26).string(message.tokenA);
+    }
+    if (message.tokenB !== "") {
+      writer.uint32(34).string(message.tokenB);
+    }
+    if (message.tickIndex !== 0) {
+      writer.uint32(40).int64(message.tickIndex);
+    }
+    if (message.keyToken !== "") {
+      writer.uint32(50).string(message.keyToken);
+    }
+    if (message.key !== 0) {
+      writer.uint32(56).uint64(message.key);
+    }
+    if (message.sharesOut !== "") {
+      writer.uint32(66).string(message.sharesOut);
+    }
+    return writer;
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgCancelLimitOrder {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseMsgCancelLimitOrder } as MsgCancelLimitOrder;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string();
+          break;
+        case 2:
+          message.receiver = reader.string();
+          break;
+        case 3:
+          message.tokenA = reader.string();
+          break;
+        case 4:
+          message.tokenB = reader.string();
+          break;
+        case 5:
+          message.tickIndex = longToNumber(reader.int64() as Long);
+          break;
+        case 6:
+          message.keyToken = reader.string();
+          break;
+        case 7:
+          message.key = longToNumber(reader.uint64() as Long);
+          break;
+        case 8:
+          message.sharesOut = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgCancelLimitOrder {
+    const message = { ...baseMsgCancelLimitOrder } as MsgCancelLimitOrder;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator);
+    } else {
+      message.creator = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = String(object.receiver);
+    } else {
+      message.receiver = "";
+    }
+    if (object.tokenA !== undefined && object.tokenA !== null) {
+      message.tokenA = String(object.tokenA);
+    } else {
+      message.tokenA = "";
+    }
+    if (object.tokenB !== undefined && object.tokenB !== null) {
+      message.tokenB = String(object.tokenB);
+    } else {
+      message.tokenB = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = Number(object.tickIndex);
+    } else {
+      message.tickIndex = 0;
+    }
+    if (object.keyToken !== undefined && object.keyToken !== null) {
+      message.keyToken = String(object.keyToken);
+    } else {
+      message.keyToken = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = Number(object.key);
+    } else {
+      message.key = 0;
+    }
+    if (object.sharesOut !== undefined && object.sharesOut !== null) {
+      message.sharesOut = String(object.sharesOut);
+    } else {
+      message.sharesOut = "";
+    }
+    return message;
+  },
+
+  toJSON(message: MsgCancelLimitOrder): unknown {
+    const obj: any = {};
+    message.creator !== undefined && (obj.creator = message.creator);
+    message.receiver !== undefined && (obj.receiver = message.receiver);
+    message.tokenA !== undefined && (obj.tokenA = message.tokenA);
+    message.tokenB !== undefined && (obj.tokenB = message.tokenB);
+    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
+    message.keyToken !== undefined && (obj.keyToken = message.keyToken);
+    message.key !== undefined && (obj.key = message.key);
+    message.sharesOut !== undefined && (obj.sharesOut = message.sharesOut);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<MsgCancelLimitOrder>): MsgCancelLimitOrder {
+    const message = { ...baseMsgCancelLimitOrder } as MsgCancelLimitOrder;
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator;
+    } else {
+      message.creator = "";
+    }
+    if (object.receiver !== undefined && object.receiver !== null) {
+      message.receiver = object.receiver;
+    } else {
+      message.receiver = "";
+    }
+    if (object.tokenA !== undefined && object.tokenA !== null) {
+      message.tokenA = object.tokenA;
+    } else {
+      message.tokenA = "";
+    }
+    if (object.tokenB !== undefined && object.tokenB !== null) {
+      message.tokenB = object.tokenB;
+    } else {
+      message.tokenB = "";
+    }
+    if (object.tickIndex !== undefined && object.tickIndex !== null) {
+      message.tickIndex = object.tickIndex;
+    } else {
+      message.tickIndex = 0;
+    }
+    if (object.keyToken !== undefined && object.keyToken !== null) {
+      message.keyToken = object.keyToken;
+    } else {
+      message.keyToken = "";
+    }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = 0;
+    }
+    if (object.sharesOut !== undefined && object.sharesOut !== null) {
+      message.sharesOut = object.sharesOut;
+    } else {
+      message.sharesOut = "";
+    }
+    return message;
+  },
+};
+
+const baseMsgCancelLimitOrderResponse: object = {};
+
+export const MsgCancelLimitOrderResponse = {
+  encode(
+    _: MsgCancelLimitOrderResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    return writer;
+  },
+
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): MsgCancelLimitOrderResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input;
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseMsgCancelLimitOrderResponse,
+    } as MsgCancelLimitOrderResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgCancelLimitOrderResponse {
+    const message = {
+      ...baseMsgCancelLimitOrderResponse,
+    } as MsgCancelLimitOrderResponse;
+    return message;
+  },
+
+  toJSON(_: MsgCancelLimitOrderResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(
+    _: DeepPartial<MsgCancelLimitOrderResponse>
+  ): MsgCancelLimitOrderResponse {
+    const message = {
+      ...baseMsgCancelLimitOrderResponse,
+    } as MsgCancelLimitOrderResponse;
+    return message;
+  },
+};
+
 /** Msg defines the Msg service. */
 export interface Msg {
   Deposit(request: MsgDeposit): Promise<MsgDepositResponse>;
   Withdrawl(request: MsgWithdrawl): Promise<MsgWithdrawlResponse>;
-  /** this line is used by starport scaffolding # proto/tx/rpc */
   Swap(request: MsgSwap): Promise<MsgSwapResponse>;
+  PlaceLimitOrder(
+    request: MsgPlaceLimitOrder
+  ): Promise<MsgPlaceLimitOrderResponse>;
+  WithdrawFilledLimitOrder(
+    request: MsgWithdrawFilledLimitOrder
+  ): Promise<MsgWithdrawFilledLimitOrderResponse>;
+  /** this line is used by starport scaffolding # proto/tx/rpc */
+  CancelLimitOrder(
+    request: MsgCancelLimitOrder
+  ): Promise<MsgCancelLimitOrderResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -796,6 +1531,48 @@ export class MsgClientImpl implements Msg {
       data
     );
     return promise.then((data) => MsgSwapResponse.decode(new Reader(data)));
+  }
+
+  PlaceLimitOrder(
+    request: MsgPlaceLimitOrder
+  ): Promise<MsgPlaceLimitOrderResponse> {
+    const data = MsgPlaceLimitOrder.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Msg",
+      "PlaceLimitOrder",
+      data
+    );
+    return promise.then((data) =>
+      MsgPlaceLimitOrderResponse.decode(new Reader(data))
+    );
+  }
+
+  WithdrawFilledLimitOrder(
+    request: MsgWithdrawFilledLimitOrder
+  ): Promise<MsgWithdrawFilledLimitOrderResponse> {
+    const data = MsgWithdrawFilledLimitOrder.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Msg",
+      "WithdrawFilledLimitOrder",
+      data
+    );
+    return promise.then((data) =>
+      MsgWithdrawFilledLimitOrderResponse.decode(new Reader(data))
+    );
+  }
+
+  CancelLimitOrder(
+    request: MsgCancelLimitOrder
+  ): Promise<MsgCancelLimitOrderResponse> {
+    const data = MsgCancelLimitOrder.encode(request).finish();
+    const promise = this.rpc.request(
+      "nicholasdotsol.duality.dex.Msg",
+      "CancelLimitOrder",
+      data
+    );
+    return promise.then((data) =>
+      MsgCancelLimitOrderResponse.decode(new Reader(data))
+    );
   }
 }
 

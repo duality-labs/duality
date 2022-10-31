@@ -10,6 +10,9 @@ service Msg {
   rpc Deposit(MsgDeposit) returns (MsgDepositResponse);
   rpc Withdrawl(MsgWithdrawl) returns (MsgWithdrawlResponse);
   rpc Swap(MsgSwap) returns (MsgSwapResponse);
+  rpc PlaceLimitOrder(MsgPlaceLimitOrder) returns (MsgPlaceLimitOrderResponse);
+  rpc WithdrawFilledLimitOrder(MsgWithdrawFilledLimitOrder) returns (MsgWithdrawFilledLimitOrderResponse);
+  rpc CancelLimitOrder(MsgCancelLimitOrder) returns (MsgCancelLimitOrderResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -39,8 +42,8 @@ message MsgDepositResponse {
 }
 
 message MsgWithdrawl {
-  string receiver = 1;
-  string creator = 2;
+  string creator = 1;
+  string receiver = 2;
   string tokenA = 3;
   string tokenB = 4;
   repeated string sharesToRemove = 5  [
@@ -79,6 +82,56 @@ message MsgSwap {
 }
 
 message MsgSwapResponse {
+}
+
+message MsgPlaceLimitOrder {
+  string creator = 1;
+  string receiver = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  int64 tickIndex = 5;
+  string tokenIn = 6;
+  string amountIn = 7 [
+      (gogoproto.moretags)   = "yaml:\"amountIn\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "amountIn"
+  ]; 
+}
+
+message MsgPlaceLimitOrderResponse {
+}
+
+message MsgWithdrawFilledLimitOrder {
+  string creator = 1;
+  string receiver = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  int64 tickIndex = 5;
+  string keyToken = 6;
+  uint64 key = 7;
+}
+
+message MsgWithdrawFilledLimitOrderResponse {
+}
+
+message MsgCancelLimitOrder {
+  string creator = 1;
+  string receiver = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  int64 tickIndex = 5;
+  string keyToken = 6;
+  uint64 key = 7;
+  string sharesOut = 8 [
+      (gogoproto.moretags)   = "yaml:\"sharesOut\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "sharesOut"
+  ]; 
+}
+
+message MsgCancelLimitOrderResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message

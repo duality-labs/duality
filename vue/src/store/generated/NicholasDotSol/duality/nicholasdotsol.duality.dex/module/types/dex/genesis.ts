@@ -10,6 +10,11 @@ import { Shares } from "../dex/shares";
 import { FeeList } from "../dex/fee_list";
 import { EdgeRow } from "../dex/edge_row";
 import { AdjanceyMatrix } from "../dex/adjancey_matrix";
+import { LimitOrderPoolUserShareMap } from "../dex/limit_order_pool_user_share_map";
+import { LimitOrderPoolUserSharesWithdrawn } from "../dex/limit_order_pool_user_shares_withdrawn";
+import { LimitOrderPoolTotalSharesMap } from "../dex/limit_order_pool_total_shares_map";
+import { LimitOrderPoolReserveMap } from "../dex/limit_order_pool_reserve_map";
+import { LimitOrderPoolFillMap } from "../dex/limit_order_pool_fill_map";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -27,8 +32,13 @@ export interface GenesisState {
   edgeRowList: EdgeRow[];
   edgeRowCount: number;
   adjanceyMatrixList: AdjanceyMatrix[];
-  /** this line is used by starport scaffolding # genesis/proto/state */
   adjanceyMatrixCount: number;
+  limitOrderPoolUserShareMapList: LimitOrderPoolUserShareMap[];
+  limitOrderPoolUserSharesWithdrawnList: LimitOrderPoolUserSharesWithdrawn[];
+  limitOrderPoolTotalSharesMapList: LimitOrderPoolTotalSharesMap[];
+  limitOrderPoolReserveMapList: LimitOrderPoolReserveMap[];
+  /** this line is used by starport scaffolding # genesis/proto/state */
+  limitOrderPoolFillMapList: LimitOrderPoolFillMap[];
 }
 
 const baseGenesisState: object = {
@@ -79,6 +89,27 @@ export const GenesisState = {
     if (message.adjanceyMatrixCount !== 0) {
       writer.uint32(104).uint64(message.adjanceyMatrixCount);
     }
+    for (const v of message.limitOrderPoolUserShareMapList) {
+      LimitOrderPoolUserShareMap.encode(v!, writer.uint32(114).fork()).ldelim();
+    }
+    for (const v of message.limitOrderPoolUserSharesWithdrawnList) {
+      LimitOrderPoolUserSharesWithdrawn.encode(
+        v!,
+        writer.uint32(122).fork()
+      ).ldelim();
+    }
+    for (const v of message.limitOrderPoolTotalSharesMapList) {
+      LimitOrderPoolTotalSharesMap.encode(
+        v!,
+        writer.uint32(130).fork()
+      ).ldelim();
+    }
+    for (const v of message.limitOrderPoolReserveMapList) {
+      LimitOrderPoolReserveMap.encode(v!, writer.uint32(138).fork()).ldelim();
+    }
+    for (const v of message.limitOrderPoolFillMapList) {
+      LimitOrderPoolFillMap.encode(v!, writer.uint32(146).fork()).ldelim();
+    }
     return writer;
   },
 
@@ -94,6 +125,11 @@ export const GenesisState = {
     message.feeListList = [];
     message.edgeRowList = [];
     message.adjanceyMatrixList = [];
+    message.limitOrderPoolUserShareMapList = [];
+    message.limitOrderPoolUserSharesWithdrawnList = [];
+    message.limitOrderPoolTotalSharesMapList = [];
+    message.limitOrderPoolReserveMapList = [];
+    message.limitOrderPoolFillMapList = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -138,6 +174,31 @@ export const GenesisState = {
         case 13:
           message.adjanceyMatrixCount = longToNumber(reader.uint64() as Long);
           break;
+        case 14:
+          message.limitOrderPoolUserShareMapList.push(
+            LimitOrderPoolUserShareMap.decode(reader, reader.uint32())
+          );
+          break;
+        case 15:
+          message.limitOrderPoolUserSharesWithdrawnList.push(
+            LimitOrderPoolUserSharesWithdrawn.decode(reader, reader.uint32())
+          );
+          break;
+        case 16:
+          message.limitOrderPoolTotalSharesMapList.push(
+            LimitOrderPoolTotalSharesMap.decode(reader, reader.uint32())
+          );
+          break;
+        case 17:
+          message.limitOrderPoolReserveMapList.push(
+            LimitOrderPoolReserveMap.decode(reader, reader.uint32())
+          );
+          break;
+        case 18:
+          message.limitOrderPoolFillMapList.push(
+            LimitOrderPoolFillMap.decode(reader, reader.uint32())
+          );
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -156,6 +217,11 @@ export const GenesisState = {
     message.feeListList = [];
     message.edgeRowList = [];
     message.adjanceyMatrixList = [];
+    message.limitOrderPoolUserShareMapList = [];
+    message.limitOrderPoolUserSharesWithdrawnList = [];
+    message.limitOrderPoolTotalSharesMapList = [];
+    message.limitOrderPoolReserveMapList = [];
+    message.limitOrderPoolFillMapList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromJSON(object.params);
     } else {
@@ -226,6 +292,56 @@ export const GenesisState = {
       message.adjanceyMatrixCount = Number(object.adjanceyMatrixCount);
     } else {
       message.adjanceyMatrixCount = 0;
+    }
+    if (
+      object.limitOrderPoolUserShareMapList !== undefined &&
+      object.limitOrderPoolUserShareMapList !== null
+    ) {
+      for (const e of object.limitOrderPoolUserShareMapList) {
+        message.limitOrderPoolUserShareMapList.push(
+          LimitOrderPoolUserShareMap.fromJSON(e)
+        );
+      }
+    }
+    if (
+      object.limitOrderPoolUserSharesWithdrawnList !== undefined &&
+      object.limitOrderPoolUserSharesWithdrawnList !== null
+    ) {
+      for (const e of object.limitOrderPoolUserSharesWithdrawnList) {
+        message.limitOrderPoolUserSharesWithdrawnList.push(
+          LimitOrderPoolUserSharesWithdrawn.fromJSON(e)
+        );
+      }
+    }
+    if (
+      object.limitOrderPoolTotalSharesMapList !== undefined &&
+      object.limitOrderPoolTotalSharesMapList !== null
+    ) {
+      for (const e of object.limitOrderPoolTotalSharesMapList) {
+        message.limitOrderPoolTotalSharesMapList.push(
+          LimitOrderPoolTotalSharesMap.fromJSON(e)
+        );
+      }
+    }
+    if (
+      object.limitOrderPoolReserveMapList !== undefined &&
+      object.limitOrderPoolReserveMapList !== null
+    ) {
+      for (const e of object.limitOrderPoolReserveMapList) {
+        message.limitOrderPoolReserveMapList.push(
+          LimitOrderPoolReserveMap.fromJSON(e)
+        );
+      }
+    }
+    if (
+      object.limitOrderPoolFillMapList !== undefined &&
+      object.limitOrderPoolFillMapList !== null
+    ) {
+      for (const e of object.limitOrderPoolFillMapList) {
+        message.limitOrderPoolFillMapList.push(
+          LimitOrderPoolFillMap.fromJSON(e)
+        );
+      }
     }
     return message;
   },
@@ -298,6 +414,41 @@ export const GenesisState = {
     }
     message.adjanceyMatrixCount !== undefined &&
       (obj.adjanceyMatrixCount = message.adjanceyMatrixCount);
+    if (message.limitOrderPoolUserShareMapList) {
+      obj.limitOrderPoolUserShareMapList = message.limitOrderPoolUserShareMapList.map(
+        (e) => (e ? LimitOrderPoolUserShareMap.toJSON(e) : undefined)
+      );
+    } else {
+      obj.limitOrderPoolUserShareMapList = [];
+    }
+    if (message.limitOrderPoolUserSharesWithdrawnList) {
+      obj.limitOrderPoolUserSharesWithdrawnList = message.limitOrderPoolUserSharesWithdrawnList.map(
+        (e) => (e ? LimitOrderPoolUserSharesWithdrawn.toJSON(e) : undefined)
+      );
+    } else {
+      obj.limitOrderPoolUserSharesWithdrawnList = [];
+    }
+    if (message.limitOrderPoolTotalSharesMapList) {
+      obj.limitOrderPoolTotalSharesMapList = message.limitOrderPoolTotalSharesMapList.map(
+        (e) => (e ? LimitOrderPoolTotalSharesMap.toJSON(e) : undefined)
+      );
+    } else {
+      obj.limitOrderPoolTotalSharesMapList = [];
+    }
+    if (message.limitOrderPoolReserveMapList) {
+      obj.limitOrderPoolReserveMapList = message.limitOrderPoolReserveMapList.map(
+        (e) => (e ? LimitOrderPoolReserveMap.toJSON(e) : undefined)
+      );
+    } else {
+      obj.limitOrderPoolReserveMapList = [];
+    }
+    if (message.limitOrderPoolFillMapList) {
+      obj.limitOrderPoolFillMapList = message.limitOrderPoolFillMapList.map(
+        (e) => (e ? LimitOrderPoolFillMap.toJSON(e) : undefined)
+      );
+    } else {
+      obj.limitOrderPoolFillMapList = [];
+    }
     return obj;
   },
 
@@ -311,6 +462,11 @@ export const GenesisState = {
     message.feeListList = [];
     message.edgeRowList = [];
     message.adjanceyMatrixList = [];
+    message.limitOrderPoolUserShareMapList = [];
+    message.limitOrderPoolUserSharesWithdrawnList = [];
+    message.limitOrderPoolTotalSharesMapList = [];
+    message.limitOrderPoolReserveMapList = [];
+    message.limitOrderPoolFillMapList = [];
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromPartial(object.params);
     } else {
@@ -381,6 +537,56 @@ export const GenesisState = {
       message.adjanceyMatrixCount = object.adjanceyMatrixCount;
     } else {
       message.adjanceyMatrixCount = 0;
+    }
+    if (
+      object.limitOrderPoolUserShareMapList !== undefined &&
+      object.limitOrderPoolUserShareMapList !== null
+    ) {
+      for (const e of object.limitOrderPoolUserShareMapList) {
+        message.limitOrderPoolUserShareMapList.push(
+          LimitOrderPoolUserShareMap.fromPartial(e)
+        );
+      }
+    }
+    if (
+      object.limitOrderPoolUserSharesWithdrawnList !== undefined &&
+      object.limitOrderPoolUserSharesWithdrawnList !== null
+    ) {
+      for (const e of object.limitOrderPoolUserSharesWithdrawnList) {
+        message.limitOrderPoolUserSharesWithdrawnList.push(
+          LimitOrderPoolUserSharesWithdrawn.fromPartial(e)
+        );
+      }
+    }
+    if (
+      object.limitOrderPoolTotalSharesMapList !== undefined &&
+      object.limitOrderPoolTotalSharesMapList !== null
+    ) {
+      for (const e of object.limitOrderPoolTotalSharesMapList) {
+        message.limitOrderPoolTotalSharesMapList.push(
+          LimitOrderPoolTotalSharesMap.fromPartial(e)
+        );
+      }
+    }
+    if (
+      object.limitOrderPoolReserveMapList !== undefined &&
+      object.limitOrderPoolReserveMapList !== null
+    ) {
+      for (const e of object.limitOrderPoolReserveMapList) {
+        message.limitOrderPoolReserveMapList.push(
+          LimitOrderPoolReserveMap.fromPartial(e)
+        );
+      }
+    }
+    if (
+      object.limitOrderPoolFillMapList !== undefined &&
+      object.limitOrderPoolFillMapList !== null
+    ) {
+      for (const e of object.limitOrderPoolFillMapList) {
+        message.limitOrderPoolFillMapList.push(
+          LimitOrderPoolFillMap.fromPartial(e)
+        );
+      }
     }
     return message;
   },

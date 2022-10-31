@@ -152,8 +152,8 @@ func (m *MsgDepositResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgDepositResponse proto.InternalMessageInfo
 
 type MsgWithdrawl struct {
-	Receiver       string                                   `protobuf:"bytes,1,opt,name=receiver,proto3" json:"receiver,omitempty"`
-	Creator        string                                   `protobuf:"bytes,2,opt,name=creator,proto3" json:"creator,omitempty"`
+	Creator        string                                   `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Receiver       string                                   `protobuf:"bytes,2,opt,name=receiver,proto3" json:"receiver,omitempty"`
 	TokenA         string                                   `protobuf:"bytes,3,opt,name=tokenA,proto3" json:"tokenA,omitempty"`
 	TokenB         string                                   `protobuf:"bytes,4,opt,name=tokenB,proto3" json:"tokenB,omitempty"`
 	SharesToRemove []github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,5,rep,name=sharesToRemove,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"sharesToRemove" yaml:"sharesToRemove"`
@@ -194,16 +194,16 @@ func (m *MsgWithdrawl) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgWithdrawl proto.InternalMessageInfo
 
-func (m *MsgWithdrawl) GetReceiver() string {
+func (m *MsgWithdrawl) GetCreator() string {
 	if m != nil {
-		return m.Receiver
+		return m.Creator
 	}
 	return ""
 }
 
-func (m *MsgWithdrawl) GetCreator() string {
+func (m *MsgWithdrawl) GetReceiver() string {
 	if m != nil {
-		return m.Creator
+		return m.Receiver
 	}
 	return ""
 }
@@ -386,6 +386,384 @@ func (m *MsgSwapResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgSwapResponse proto.InternalMessageInfo
 
+type MsgPlaceLimitOrder struct {
+	Creator   string                                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Receiver  string                                 `protobuf:"bytes,2,opt,name=receiver,proto3" json:"receiver,omitempty"`
+	TokenA    string                                 `protobuf:"bytes,3,opt,name=tokenA,proto3" json:"tokenA,omitempty"`
+	TokenB    string                                 `protobuf:"bytes,4,opt,name=tokenB,proto3" json:"tokenB,omitempty"`
+	TickIndex int64                                  `protobuf:"varint,5,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
+	TokenIn   string                                 `protobuf:"bytes,6,opt,name=tokenIn,proto3" json:"tokenIn,omitempty"`
+	AmountIn  github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,7,opt,name=amountIn,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"amountIn" yaml:"amountIn"`
+}
+
+func (m *MsgPlaceLimitOrder) Reset()         { *m = MsgPlaceLimitOrder{} }
+func (m *MsgPlaceLimitOrder) String() string { return proto.CompactTextString(m) }
+func (*MsgPlaceLimitOrder) ProtoMessage()    {}
+func (*MsgPlaceLimitOrder) Descriptor() ([]byte, []int) {
+	return fileDescriptor_463701e671e5a5e0, []int{6}
+}
+func (m *MsgPlaceLimitOrder) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgPlaceLimitOrder) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgPlaceLimitOrder.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgPlaceLimitOrder) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgPlaceLimitOrder.Merge(m, src)
+}
+func (m *MsgPlaceLimitOrder) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgPlaceLimitOrder) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgPlaceLimitOrder.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgPlaceLimitOrder proto.InternalMessageInfo
+
+func (m *MsgPlaceLimitOrder) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgPlaceLimitOrder) GetReceiver() string {
+	if m != nil {
+		return m.Receiver
+	}
+	return ""
+}
+
+func (m *MsgPlaceLimitOrder) GetTokenA() string {
+	if m != nil {
+		return m.TokenA
+	}
+	return ""
+}
+
+func (m *MsgPlaceLimitOrder) GetTokenB() string {
+	if m != nil {
+		return m.TokenB
+	}
+	return ""
+}
+
+func (m *MsgPlaceLimitOrder) GetTickIndex() int64 {
+	if m != nil {
+		return m.TickIndex
+	}
+	return 0
+}
+
+func (m *MsgPlaceLimitOrder) GetTokenIn() string {
+	if m != nil {
+		return m.TokenIn
+	}
+	return ""
+}
+
+type MsgPlaceLimitOrderResponse struct {
+}
+
+func (m *MsgPlaceLimitOrderResponse) Reset()         { *m = MsgPlaceLimitOrderResponse{} }
+func (m *MsgPlaceLimitOrderResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgPlaceLimitOrderResponse) ProtoMessage()    {}
+func (*MsgPlaceLimitOrderResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_463701e671e5a5e0, []int{7}
+}
+func (m *MsgPlaceLimitOrderResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgPlaceLimitOrderResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgPlaceLimitOrderResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgPlaceLimitOrderResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgPlaceLimitOrderResponse.Merge(m, src)
+}
+func (m *MsgPlaceLimitOrderResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgPlaceLimitOrderResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgPlaceLimitOrderResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgPlaceLimitOrderResponse proto.InternalMessageInfo
+
+type MsgWithdrawFilledLimitOrder struct {
+	Creator   string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Receiver  string `protobuf:"bytes,2,opt,name=receiver,proto3" json:"receiver,omitempty"`
+	TokenA    string `protobuf:"bytes,3,opt,name=tokenA,proto3" json:"tokenA,omitempty"`
+	TokenB    string `protobuf:"bytes,4,opt,name=tokenB,proto3" json:"tokenB,omitempty"`
+	TickIndex int64  `protobuf:"varint,5,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
+	KeyToken  string `protobuf:"bytes,6,opt,name=keyToken,proto3" json:"keyToken,omitempty"`
+	Key       uint64 `protobuf:"varint,7,opt,name=key,proto3" json:"key,omitempty"`
+}
+
+func (m *MsgWithdrawFilledLimitOrder) Reset()         { *m = MsgWithdrawFilledLimitOrder{} }
+func (m *MsgWithdrawFilledLimitOrder) String() string { return proto.CompactTextString(m) }
+func (*MsgWithdrawFilledLimitOrder) ProtoMessage()    {}
+func (*MsgWithdrawFilledLimitOrder) Descriptor() ([]byte, []int) {
+	return fileDescriptor_463701e671e5a5e0, []int{8}
+}
+func (m *MsgWithdrawFilledLimitOrder) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgWithdrawFilledLimitOrder) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgWithdrawFilledLimitOrder.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgWithdrawFilledLimitOrder) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgWithdrawFilledLimitOrder.Merge(m, src)
+}
+func (m *MsgWithdrawFilledLimitOrder) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgWithdrawFilledLimitOrder) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgWithdrawFilledLimitOrder.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgWithdrawFilledLimitOrder proto.InternalMessageInfo
+
+func (m *MsgWithdrawFilledLimitOrder) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgWithdrawFilledLimitOrder) GetReceiver() string {
+	if m != nil {
+		return m.Receiver
+	}
+	return ""
+}
+
+func (m *MsgWithdrawFilledLimitOrder) GetTokenA() string {
+	if m != nil {
+		return m.TokenA
+	}
+	return ""
+}
+
+func (m *MsgWithdrawFilledLimitOrder) GetTokenB() string {
+	if m != nil {
+		return m.TokenB
+	}
+	return ""
+}
+
+func (m *MsgWithdrawFilledLimitOrder) GetTickIndex() int64 {
+	if m != nil {
+		return m.TickIndex
+	}
+	return 0
+}
+
+func (m *MsgWithdrawFilledLimitOrder) GetKeyToken() string {
+	if m != nil {
+		return m.KeyToken
+	}
+	return ""
+}
+
+func (m *MsgWithdrawFilledLimitOrder) GetKey() uint64 {
+	if m != nil {
+		return m.Key
+	}
+	return 0
+}
+
+type MsgWithdrawFilledLimitOrderResponse struct {
+}
+
+func (m *MsgWithdrawFilledLimitOrderResponse) Reset()         { *m = MsgWithdrawFilledLimitOrderResponse{} }
+func (m *MsgWithdrawFilledLimitOrderResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgWithdrawFilledLimitOrderResponse) ProtoMessage()    {}
+func (*MsgWithdrawFilledLimitOrderResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_463701e671e5a5e0, []int{9}
+}
+func (m *MsgWithdrawFilledLimitOrderResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgWithdrawFilledLimitOrderResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgWithdrawFilledLimitOrderResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgWithdrawFilledLimitOrderResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgWithdrawFilledLimitOrderResponse.Merge(m, src)
+}
+func (m *MsgWithdrawFilledLimitOrderResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgWithdrawFilledLimitOrderResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgWithdrawFilledLimitOrderResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgWithdrawFilledLimitOrderResponse proto.InternalMessageInfo
+
+type MsgCancelLimitOrder struct {
+	Creator   string                                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Receiver  string                                 `protobuf:"bytes,2,opt,name=receiver,proto3" json:"receiver,omitempty"`
+	TokenA    string                                 `protobuf:"bytes,3,opt,name=tokenA,proto3" json:"tokenA,omitempty"`
+	TokenB    string                                 `protobuf:"bytes,4,opt,name=tokenB,proto3" json:"tokenB,omitempty"`
+	TickIndex int64                                  `protobuf:"varint,5,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
+	KeyToken  string                                 `protobuf:"bytes,6,opt,name=keyToken,proto3" json:"keyToken,omitempty"`
+	Key       uint64                                 `protobuf:"varint,7,opt,name=key,proto3" json:"key,omitempty"`
+	SharesOut github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,8,opt,name=sharesOut,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"sharesOut" yaml:"sharesOut"`
+}
+
+func (m *MsgCancelLimitOrder) Reset()         { *m = MsgCancelLimitOrder{} }
+func (m *MsgCancelLimitOrder) String() string { return proto.CompactTextString(m) }
+func (*MsgCancelLimitOrder) ProtoMessage()    {}
+func (*MsgCancelLimitOrder) Descriptor() ([]byte, []int) {
+	return fileDescriptor_463701e671e5a5e0, []int{10}
+}
+func (m *MsgCancelLimitOrder) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCancelLimitOrder) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCancelLimitOrder.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCancelLimitOrder) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCancelLimitOrder.Merge(m, src)
+}
+func (m *MsgCancelLimitOrder) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCancelLimitOrder) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCancelLimitOrder.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCancelLimitOrder proto.InternalMessageInfo
+
+func (m *MsgCancelLimitOrder) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgCancelLimitOrder) GetReceiver() string {
+	if m != nil {
+		return m.Receiver
+	}
+	return ""
+}
+
+func (m *MsgCancelLimitOrder) GetTokenA() string {
+	if m != nil {
+		return m.TokenA
+	}
+	return ""
+}
+
+func (m *MsgCancelLimitOrder) GetTokenB() string {
+	if m != nil {
+		return m.TokenB
+	}
+	return ""
+}
+
+func (m *MsgCancelLimitOrder) GetTickIndex() int64 {
+	if m != nil {
+		return m.TickIndex
+	}
+	return 0
+}
+
+func (m *MsgCancelLimitOrder) GetKeyToken() string {
+	if m != nil {
+		return m.KeyToken
+	}
+	return ""
+}
+
+func (m *MsgCancelLimitOrder) GetKey() uint64 {
+	if m != nil {
+		return m.Key
+	}
+	return 0
+}
+
+type MsgCancelLimitOrderResponse struct {
+}
+
+func (m *MsgCancelLimitOrderResponse) Reset()         { *m = MsgCancelLimitOrderResponse{} }
+func (m *MsgCancelLimitOrderResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgCancelLimitOrderResponse) ProtoMessage()    {}
+func (*MsgCancelLimitOrderResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_463701e671e5a5e0, []int{11}
+}
+func (m *MsgCancelLimitOrderResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCancelLimitOrderResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCancelLimitOrderResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCancelLimitOrderResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCancelLimitOrderResponse.Merge(m, src)
+}
+func (m *MsgCancelLimitOrderResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCancelLimitOrderResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCancelLimitOrderResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCancelLimitOrderResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgDeposit)(nil), "nicholasdotsol.duality.dex.MsgDeposit")
 	proto.RegisterType((*MsgDepositResponse)(nil), "nicholasdotsol.duality.dex.MsgDepositResponse")
@@ -393,50 +771,68 @@ func init() {
 	proto.RegisterType((*MsgWithdrawlResponse)(nil), "nicholasdotsol.duality.dex.MsgWithdrawlResponse")
 	proto.RegisterType((*MsgSwap)(nil), "nicholasdotsol.duality.dex.MsgSwap")
 	proto.RegisterType((*MsgSwapResponse)(nil), "nicholasdotsol.duality.dex.MsgSwapResponse")
+	proto.RegisterType((*MsgPlaceLimitOrder)(nil), "nicholasdotsol.duality.dex.MsgPlaceLimitOrder")
+	proto.RegisterType((*MsgPlaceLimitOrderResponse)(nil), "nicholasdotsol.duality.dex.MsgPlaceLimitOrderResponse")
+	proto.RegisterType((*MsgWithdrawFilledLimitOrder)(nil), "nicholasdotsol.duality.dex.MsgWithdrawFilledLimitOrder")
+	proto.RegisterType((*MsgWithdrawFilledLimitOrderResponse)(nil), "nicholasdotsol.duality.dex.MsgWithdrawFilledLimitOrderResponse")
+	proto.RegisterType((*MsgCancelLimitOrder)(nil), "nicholasdotsol.duality.dex.MsgCancelLimitOrder")
+	proto.RegisterType((*MsgCancelLimitOrderResponse)(nil), "nicholasdotsol.duality.dex.MsgCancelLimitOrderResponse")
 }
 
 func init() { proto.RegisterFile("dex/tx.proto", fileDescriptor_463701e671e5a5e0) }
 
 var fileDescriptor_463701e671e5a5e0 = []byte{
-	// 593 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x55, 0xcf, 0x8a, 0xd3, 0x5e,
-	0x14, 0x6e, 0x9a, 0x4e, 0xd2, 0xde, 0xdf, 0xfc, 0x66, 0xf0, 0x52, 0x87, 0x4b, 0x16, 0x49, 0x89,
-	0x30, 0x14, 0x64, 0x12, 0xd1, 0x9d, 0xbb, 0x86, 0x82, 0x04, 0xa9, 0x42, 0x46, 0xf0, 0xcf, 0x2e,
-	0x93, 0x5c, 0xd3, 0xd0, 0x24, 0xb7, 0xe4, 0xde, 0xce, 0xb4, 0x4b, 0x37, 0xae, 0x7d, 0x0f, 0xdf,
-	0xc0, 0x27, 0x98, 0xe5, 0xec, 0x14, 0x17, 0x41, 0xda, 0x9d, 0xcb, 0x3e, 0x81, 0x34, 0xff, 0x9a,
-	0x56, 0xa4, 0x2d, 0x82, 0xab, 0xf6, 0x9c, 0xf3, 0x9d, 0xf3, 0xdd, 0x7c, 0xdf, 0xc9, 0x0d, 0x38,
-	0x76, 0xf1, 0x54, 0x67, 0x53, 0x6d, 0x1c, 0x13, 0x46, 0xa0, 0x14, 0xf9, 0xce, 0x90, 0x04, 0x36,
-	0x75, 0x09, 0xa3, 0x24, 0xd0, 0xdc, 0x89, 0x1d, 0xf8, 0x6c, 0xa6, 0xb9, 0x78, 0x2a, 0xb5, 0x3d,
-	0xe2, 0x91, 0x14, 0xa6, 0xaf, 0xfe, 0x65, 0x1d, 0xea, 0x47, 0x1e, 0x80, 0x01, 0xf5, 0xfa, 0x78,
-	0x4c, 0xa8, 0xcf, 0x20, 0x02, 0xa2, 0x13, 0x63, 0x9b, 0x91, 0x18, 0x71, 0x1d, 0xae, 0xdb, 0xb2,
-	0x8a, 0x10, 0x4a, 0xa0, 0x19, 0x63, 0x07, 0xfb, 0xd7, 0x38, 0x46, 0xf5, 0xb4, 0x54, 0xc6, 0xf0,
-	0x0c, 0x08, 0x8c, 0x8c, 0x70, 0xd4, 0x43, 0x7c, 0x5a, 0xc9, 0xa3, 0x32, 0x6f, 0xa0, 0x46, 0x25,
-	0x6f, 0x40, 0x0f, 0x34, 0xed, 0x90, 0x4c, 0x22, 0x46, 0x7b, 0xe8, 0xa8, 0xc3, 0x77, 0x5b, 0xc6,
-	0xf3, 0xdb, 0x44, 0xa9, 0x7d, 0x4f, 0x94, 0x73, 0xcf, 0x67, 0xc3, 0xc9, 0x95, 0xe6, 0x90, 0x50,
-	0x77, 0x08, 0x0d, 0x09, 0xcd, 0x7f, 0x2e, 0xa8, 0x3b, 0xd2, 0xd9, 0x6c, 0x8c, 0xa9, 0xd6, 0xc7,
-	0xce, 0xcf, 0x44, 0x11, 0xb3, 0x09, 0xbd, 0x65, 0xa2, 0x9c, 0xcc, 0xec, 0x30, 0x78, 0xaa, 0xe6,
-	0x09, 0xd5, 0x2a, 0x87, 0x57, 0x88, 0x0c, 0x24, 0xfc, 0x1d, 0x91, 0xb1, 0x4d, 0x64, 0xac, 0x89,
-	0x0c, 0xd8, 0x01, 0xff, 0x31, 0xdf, 0x19, 0x99, 0x91, 0x8b, 0xa7, 0x98, 0x22, 0xb1, 0xc3, 0x77,
-	0x79, 0xab, 0x9a, 0x82, 0x32, 0x00, 0xef, 0x31, 0x2e, 0x00, 0xcd, 0x0e, 0xdf, 0x6d, 0x58, 0x95,
-	0x8c, 0xda, 0x06, 0x70, 0xed, 0x83, 0x85, 0xe9, 0x98, 0x44, 0x14, 0xab, 0x5f, 0xea, 0xe0, 0x78,
-	0x40, 0xbd, 0xd7, 0x3e, 0x1b, 0xba, 0xb1, 0x7d, 0x13, 0x6c, 0xd8, 0xc0, 0x6d, 0xd9, 0x50, 0x31,
-	0xaf, 0xbe, 0x69, 0xde, 0xa1, 0x06, 0x7d, 0xe0, 0xc0, 0x09, 0x1d, 0xda, 0x31, 0xa6, 0xaf, 0x88,
-	0x85, 0x43, 0x72, 0x8d, 0x73, 0x9f, 0xde, 0x1e, 0x2c, 0xdf, 0xd6, 0x9c, 0x65, 0xa2, 0xdc, 0xcf,
-	0x54, 0xdc, 0xcc, 0xab, 0xd6, 0x16, 0x70, 0x5b, 0x52, 0x61, 0x97, 0xa4, 0xe2, 0x6f, 0x92, 0x9e,
-	0x81, 0x76, 0x55, 0xbb, 0x52, 0xd4, 0xaf, 0x75, 0x20, 0x0e, 0xa8, 0x77, 0x79, 0x63, 0x8f, 0xff,
-	0xd1, 0xc2, 0xfb, 0xc5, 0x1e, 0x9a, 0x11, 0x3a, 0x5a, 0x55, 0x8c, 0xc1, 0xc1, 0x42, 0x96, 0x13,
-	0x96, 0x89, 0x72, 0x5a, 0x5d, 0x44, 0x33, 0x2a, 0x37, 0xd1, 0x8c, 0x56, 0x0f, 0x94, 0x92, 0x9a,
-	0x11, 0x12, 0xb2, 0x07, 0xca, 0x43, 0x68, 0x03, 0x21, 0xf4, 0xa3, 0x97, 0x13, 0x86, 0xc4, 0xf4,
-	0x08, 0xe6, 0xc1, 0x47, 0xc8, 0xfb, 0x97, 0x89, 0xf2, 0x7f, 0x76, 0x80, 0x2c, 0x56, 0xad, 0xbc,
-	0xa0, 0xde, 0x03, 0xa7, 0xb9, 0xb0, 0x85, 0xd8, 0x8f, 0x3f, 0xd7, 0x01, 0x3f, 0xa0, 0x1e, 0xb4,
-	0x81, 0x58, 0x5c, 0x32, 0xe7, 0xda, 0x9f, 0xaf, 0x29, 0x6d, 0xfd, 0x12, 0x48, 0xda, 0x7e, 0xb8,
-	0x82, 0x0a, 0x7a, 0xa0, 0xb5, 0x7e, 0x51, 0xba, 0x3b, 0x9a, 0x4b, 0xa4, 0xf4, 0x68, 0x5f, 0x64,
-	0x49, 0xf4, 0x06, 0x34, 0xd2, 0xe5, 0x79, 0xb0, 0xa3, 0x73, 0x05, 0x92, 0x1e, 0xee, 0x01, 0x2a,
-	0x26, 0x1b, 0xcf, 0x6e, 0xe7, 0x32, 0x77, 0x37, 0x97, 0xb9, 0x1f, 0x73, 0x99, 0xfb, 0xb4, 0x90,
-	0x6b, 0x77, 0x0b, 0xb9, 0xf6, 0x6d, 0x21, 0xd7, 0xde, 0x5d, 0x54, 0x5c, 0x7a, 0x91, 0x0f, 0xec,
-	0x13, 0x76, 0x49, 0x02, 0x3d, 0x1f, 0xa8, 0x4f, 0xf5, 0xf4, 0x63, 0xb0, 0x32, 0xec, 0x4a, 0x48,
-	0xaf, 0xf7, 0x27, 0xbf, 0x02, 0x00, 0x00, 0xff, 0xff, 0x19, 0x50, 0x15, 0xb8, 0x20, 0x06, 0x00,
-	0x00,
+	// 786 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x96, 0x3f, 0x6f, 0xdb, 0x46,
+	0x14, 0xc0, 0x45, 0x51, 0x16, 0xa5, 0x57, 0xd7, 0x76, 0x59, 0xd7, 0x20, 0x58, 0x57, 0x14, 0x68,
+	0xd4, 0x10, 0x50, 0x98, 0x2c, 0x5a, 0xa0, 0x06, 0xba, 0x14, 0x66, 0x8d, 0x16, 0x42, 0xa2, 0x38,
+	0xa0, 0x0d, 0xe4, 0xcf, 0x46, 0x93, 0x17, 0x8a, 0x10, 0xc9, 0x13, 0x78, 0x94, 0x2d, 0x01, 0x59,
+	0xb2, 0x64, 0xce, 0x90, 0x35, 0x5f, 0x23, 0x43, 0xf2, 0x05, 0xbc, 0xc5, 0x5b, 0x82, 0x0c, 0x44,
+	0x60, 0x6f, 0x19, 0xf5, 0x09, 0x02, 0x52, 0xd4, 0x89, 0xa1, 0x61, 0x4b, 0x4a, 0x10, 0x23, 0x99,
+	0xc8, 0xf7, 0xee, 0xfd, 0xb9, 0xfb, 0xdd, 0x7b, 0x77, 0x07, 0x8b, 0x16, 0xea, 0xab, 0x61, 0x5f,
+	0xe9, 0x06, 0x38, 0xc4, 0xbc, 0xe8, 0x3b, 0x66, 0x1b, 0xbb, 0x06, 0xb1, 0x70, 0x48, 0xb0, 0xab,
+	0x58, 0x3d, 0xc3, 0x75, 0xc2, 0x81, 0x62, 0xa1, 0xbe, 0xb8, 0x6a, 0x63, 0x1b, 0x27, 0x66, 0x6a,
+	0xfc, 0x37, 0xf2, 0x90, 0x1f, 0xb3, 0x00, 0x2d, 0x62, 0xef, 0xa2, 0x2e, 0x26, 0x4e, 0xc8, 0x0b,
+	0xc0, 0x99, 0x01, 0x32, 0x42, 0x1c, 0x08, 0x4c, 0x9d, 0x69, 0x54, 0xf5, 0xb1, 0xc8, 0x8b, 0x50,
+	0x09, 0x90, 0x89, 0x9c, 0x23, 0x14, 0x08, 0xc5, 0x64, 0x88, 0xca, 0xfc, 0x1a, 0x94, 0x43, 0xdc,
+	0x41, 0xfe, 0x8e, 0xc0, 0x26, 0x23, 0xa9, 0x44, 0xf5, 0x9a, 0x50, 0xca, 0xe8, 0x35, 0xde, 0x86,
+	0x8a, 0xe1, 0xe1, 0x9e, 0x1f, 0x92, 0x1d, 0x61, 0xa1, 0xce, 0x36, 0xaa, 0xda, 0x8d, 0x93, 0x48,
+	0x2a, 0xbc, 0x8d, 0xa4, 0x4d, 0xdb, 0x09, 0xdb, 0xbd, 0x43, 0xc5, 0xc4, 0x9e, 0x6a, 0x62, 0xe2,
+	0x61, 0x92, 0x7e, 0xb6, 0x88, 0xd5, 0x51, 0xc3, 0x41, 0x17, 0x11, 0x65, 0x17, 0x99, 0xef, 0x23,
+	0x89, 0x1b, 0x45, 0xd8, 0x19, 0x46, 0xd2, 0xd2, 0xc0, 0xf0, 0xdc, 0xbf, 0xe5, 0x54, 0x21, 0xeb,
+	0x34, 0x78, 0x26, 0x91, 0x26, 0x94, 0x3f, 0x2f, 0x91, 0x96, 0x4f, 0xa4, 0x4d, 0x12, 0x69, 0x7c,
+	0x1d, 0xbe, 0x0b, 0x1d, 0xb3, 0xd3, 0xf4, 0x2d, 0xd4, 0x47, 0x44, 0xe0, 0xea, 0x6c, 0x83, 0xd5,
+	0xb3, 0x2a, 0xbe, 0x06, 0xf0, 0x00, 0xa1, 0xb1, 0x41, 0xa5, 0xce, 0x36, 0x4a, 0x7a, 0x46, 0x23,
+	0xaf, 0x02, 0x3f, 0xd9, 0x07, 0x1d, 0x91, 0x2e, 0xf6, 0x09, 0x92, 0x5f, 0x14, 0x61, 0xb1, 0x45,
+	0xec, 0x3b, 0x4e, 0xd8, 0xb6, 0x02, 0xe3, 0xd8, 0xbd, 0xa6, 0x0d, 0x7a, 0xc4, 0xc0, 0x12, 0x69,
+	0x1b, 0x01, 0x22, 0x07, 0x58, 0x47, 0x1e, 0x3e, 0x42, 0xe9, 0x3e, 0xdd, 0x9b, 0x1b, 0x5f, 0x2e,
+	0xce, 0x30, 0x92, 0x7e, 0x1a, 0x51, 0xfc, 0x58, 0x2f, 0xeb, 0x39, 0xc3, 0x3c, 0xd2, 0xf2, 0x34,
+	0xa4, 0xdc, 0x05, 0xa4, 0x6b, 0xb0, 0x9a, 0x65, 0x47, 0xa1, 0xbe, 0x2e, 0x02, 0xd7, 0x22, 0xf6,
+	0xfe, 0xb1, 0xd1, 0xbd, 0x26, 0x9e, 0xce, 0xb8, 0x0e, 0x9b, 0xbe, 0xb0, 0x10, 0x8f, 0x68, 0xad,
+	0xb9, 0x41, 0xd2, 0x08, 0xc3, 0x48, 0x5a, 0xce, 0x16, 0x62, 0xd3, 0xa7, 0x95, 0xd8, 0xf4, 0xe3,
+	0x05, 0x25, 0x49, 0x9b, 0xbe, 0x50, 0x1e, 0x2d, 0x28, 0x15, 0x79, 0x03, 0xca, 0x9e, 0xe3, 0xef,
+	0xf5, 0x42, 0x81, 0x4b, 0xa6, 0xd0, 0x9c, 0x7b, 0x0a, 0xa9, 0xff, 0x30, 0x92, 0xbe, 0x1f, 0x4d,
+	0x60, 0x24, 0xcb, 0x7a, 0x3a, 0x20, 0xff, 0x00, 0xcb, 0x29, 0x58, 0x0a, 0xfb, 0x59, 0x31, 0x29,
+	0xec, 0xdb, 0xae, 0x61, 0xa2, 0x9b, 0x8e, 0xe7, 0x84, 0x7b, 0x81, 0x85, 0x82, 0x6b, 0xe2, 0xbe,
+	0x0e, 0x55, 0x5a, 0x30, 0x09, 0x78, 0x56, 0x9f, 0x28, 0xae, 0x40, 0x95, 0xdd, 0x2f, 0xee, 0x8b,
+	0xee, 0x97, 0xbc, 0x0e, 0xe2, 0x45, 0x3c, 0x94, 0xde, 0x2b, 0x06, 0x7e, 0xce, 0xd4, 0xf0, 0x7f,
+	0x8e, 0xeb, 0x22, 0xeb, 0x2b, 0xc3, 0x28, 0x42, 0xa5, 0x83, 0x06, 0x07, 0xb1, 0x69, 0xca, 0x91,
+	0xca, 0xfc, 0x0a, 0xb0, 0x1d, 0x34, 0x48, 0x18, 0x96, 0xf4, 0xf8, 0x57, 0xfe, 0x15, 0x36, 0xae,
+	0x58, 0x10, 0x5d, 0xf8, 0xf3, 0x22, 0xfc, 0xd8, 0x22, 0xf6, 0xbf, 0x86, 0x6f, 0x22, 0xf7, 0x5b,
+	0x5e, 0x30, 0xef, 0x41, 0x75, 0x74, 0xb2, 0xc5, 0x9d, 0x57, 0x49, 0x8a, 0x69, 0x6f, 0xee, 0x62,
+	0x9a, 0x84, 0x18, 0x46, 0xd2, 0x4a, 0xf6, 0x00, 0x4d, 0xfa, 0x6f, 0x32, 0x2c, 0xff, 0x92, 0x14,
+	0x4c, 0x9e, 0xdb, 0x98, 0xeb, 0x1f, 0x2f, 0x17, 0x80, 0x6d, 0x11, 0x9b, 0x37, 0x80, 0x1b, 0xdf,
+	0xf9, 0x9b, 0xca, 0xe5, 0xaf, 0x06, 0x65, 0x72, 0x27, 0x89, 0xca, 0x6c, 0x76, 0xe3, 0x54, 0xbc,
+	0x0d, 0xd5, 0xc9, 0xbd, 0xd5, 0x98, 0xe2, 0x4c, 0x2d, 0xc5, 0xdf, 0x67, 0xb5, 0xa4, 0x89, 0xee,
+	0x42, 0x29, 0x39, 0xcb, 0x37, 0xa6, 0x78, 0xc6, 0x46, 0xe2, 0x6f, 0x33, 0x18, 0xd1, 0xc8, 0x03,
+	0x58, 0xce, 0x1f, 0x5c, 0xd3, 0x28, 0xe4, 0xec, 0xc5, 0xbf, 0xe6, 0xb3, 0xa7, 0xa9, 0x9f, 0x32,
+	0x20, 0x5c, 0xda, 0xf6, 0xdb, 0x33, 0x32, 0xca, 0x3b, 0x8a, 0xff, 0x7c, 0xa2, 0x23, 0x9d, 0xd6,
+	0x43, 0x58, 0xb9, 0xd0, 0x93, 0xea, 0x94, 0xa0, 0x79, 0x07, 0x71, 0x7b, 0x4e, 0x87, 0x71, 0x76,
+	0xed, 0xff, 0x93, 0xb3, 0x1a, 0x73, 0x7a, 0x56, 0x63, 0xde, 0x9d, 0xd5, 0x98, 0x27, 0xe7, 0xb5,
+	0xc2, 0xe9, 0x79, 0xad, 0xf0, 0xe6, 0xbc, 0x56, 0xb8, 0xbf, 0x95, 0x69, 0xa5, 0x5b, 0x69, 0xf0,
+	0x5d, 0x1c, 0xee, 0x63, 0x57, 0x4d, 0x83, 0xab, 0x7d, 0x35, 0x79, 0x2b, 0xc7, 0x5d, 0x75, 0x58,
+	0x4e, 0x5e, 0xbf, 0x7f, 0x7e, 0x08, 0x00, 0x00, 0xff, 0xff, 0x89, 0xd4, 0xd7, 0xc2, 0x3f, 0x0b,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -454,6 +850,9 @@ type MsgClient interface {
 	Deposit(ctx context.Context, in *MsgDeposit, opts ...grpc.CallOption) (*MsgDepositResponse, error)
 	Withdrawl(ctx context.Context, in *MsgWithdrawl, opts ...grpc.CallOption) (*MsgWithdrawlResponse, error)
 	Swap(ctx context.Context, in *MsgSwap, opts ...grpc.CallOption) (*MsgSwapResponse, error)
+	PlaceLimitOrder(ctx context.Context, in *MsgPlaceLimitOrder, opts ...grpc.CallOption) (*MsgPlaceLimitOrderResponse, error)
+	WithdrawFilledLimitOrder(ctx context.Context, in *MsgWithdrawFilledLimitOrder, opts ...grpc.CallOption) (*MsgWithdrawFilledLimitOrderResponse, error)
+	CancelLimitOrder(ctx context.Context, in *MsgCancelLimitOrder, opts ...grpc.CallOption) (*MsgCancelLimitOrderResponse, error)
 }
 
 type msgClient struct {
@@ -491,11 +890,41 @@ func (c *msgClient) Swap(ctx context.Context, in *MsgSwap, opts ...grpc.CallOpti
 	return out, nil
 }
 
+func (c *msgClient) PlaceLimitOrder(ctx context.Context, in *MsgPlaceLimitOrder, opts ...grpc.CallOption) (*MsgPlaceLimitOrderResponse, error) {
+	out := new(MsgPlaceLimitOrderResponse)
+	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Msg/PlaceLimitOrder", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) WithdrawFilledLimitOrder(ctx context.Context, in *MsgWithdrawFilledLimitOrder, opts ...grpc.CallOption) (*MsgWithdrawFilledLimitOrderResponse, error) {
+	out := new(MsgWithdrawFilledLimitOrderResponse)
+	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Msg/WithdrawFilledLimitOrder", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) CancelLimitOrder(ctx context.Context, in *MsgCancelLimitOrder, opts ...grpc.CallOption) (*MsgCancelLimitOrderResponse, error) {
+	out := new(MsgCancelLimitOrderResponse)
+	err := c.cc.Invoke(ctx, "/nicholasdotsol.duality.dex.Msg/CancelLimitOrder", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	Deposit(context.Context, *MsgDeposit) (*MsgDepositResponse, error)
 	Withdrawl(context.Context, *MsgWithdrawl) (*MsgWithdrawlResponse, error)
 	Swap(context.Context, *MsgSwap) (*MsgSwapResponse, error)
+	PlaceLimitOrder(context.Context, *MsgPlaceLimitOrder) (*MsgPlaceLimitOrderResponse, error)
+	WithdrawFilledLimitOrder(context.Context, *MsgWithdrawFilledLimitOrder) (*MsgWithdrawFilledLimitOrderResponse, error)
+	CancelLimitOrder(context.Context, *MsgCancelLimitOrder) (*MsgCancelLimitOrderResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -510,6 +939,15 @@ func (*UnimplementedMsgServer) Withdrawl(ctx context.Context, req *MsgWithdrawl)
 }
 func (*UnimplementedMsgServer) Swap(ctx context.Context, req *MsgSwap) (*MsgSwapResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Swap not implemented")
+}
+func (*UnimplementedMsgServer) PlaceLimitOrder(ctx context.Context, req *MsgPlaceLimitOrder) (*MsgPlaceLimitOrderResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PlaceLimitOrder not implemented")
+}
+func (*UnimplementedMsgServer) WithdrawFilledLimitOrder(ctx context.Context, req *MsgWithdrawFilledLimitOrder) (*MsgWithdrawFilledLimitOrderResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method WithdrawFilledLimitOrder not implemented")
+}
+func (*UnimplementedMsgServer) CancelLimitOrder(ctx context.Context, req *MsgCancelLimitOrder) (*MsgCancelLimitOrderResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CancelLimitOrder not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -570,6 +1008,60 @@ func _Msg_Swap_Handler(srv interface{}, ctx context.Context, dec func(interface{
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_PlaceLimitOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgPlaceLimitOrder)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).PlaceLimitOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/nicholasdotsol.duality.dex.Msg/PlaceLimitOrder",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).PlaceLimitOrder(ctx, req.(*MsgPlaceLimitOrder))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_WithdrawFilledLimitOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgWithdrawFilledLimitOrder)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).WithdrawFilledLimitOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/nicholasdotsol.duality.dex.Msg/WithdrawFilledLimitOrder",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).WithdrawFilledLimitOrder(ctx, req.(*MsgWithdrawFilledLimitOrder))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_CancelLimitOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCancelLimitOrder)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CancelLimitOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/nicholasdotsol.duality.dex.Msg/CancelLimitOrder",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CancelLimitOrder(ctx, req.(*MsgCancelLimitOrder))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "nicholasdotsol.duality.dex.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -585,6 +1077,18 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Swap",
 			Handler:    _Msg_Swap_Handler,
+		},
+		{
+			MethodName: "PlaceLimitOrder",
+			Handler:    _Msg_PlaceLimitOrder_Handler,
+		},
+		{
+			MethodName: "WithdrawFilledLimitOrder",
+			Handler:    _Msg_WithdrawFilledLimitOrder_Handler,
+		},
+		{
+			MethodName: "CancelLimitOrder",
+			Handler:    _Msg_CancelLimitOrder_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -815,17 +1319,17 @@ func (m *MsgWithdrawl) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.Creator) > 0 {
-		i -= len(m.Creator)
-		copy(dAtA[i:], m.Creator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
-		i--
-		dAtA[i] = 0x12
-	}
 	if len(m.Receiver) > 0 {
 		i -= len(m.Receiver)
 		copy(dAtA[i:], m.Receiver)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Receiver)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -956,6 +1460,294 @@ func (m *MsgSwapResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgPlaceLimitOrder) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgPlaceLimitOrder) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgPlaceLimitOrder) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.AmountIn.Size()
+		i -= size
+		if _, err := m.AmountIn.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x3a
+	if len(m.TokenIn) > 0 {
+		i -= len(m.TokenIn)
+		copy(dAtA[i:], m.TokenIn)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TokenIn)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if m.TickIndex != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.TickIndex))
+		i--
+		dAtA[i] = 0x28
+	}
+	if len(m.TokenB) > 0 {
+		i -= len(m.TokenB)
+		copy(dAtA[i:], m.TokenB)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TokenB)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.TokenA) > 0 {
+		i -= len(m.TokenA)
+		copy(dAtA[i:], m.TokenA)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TokenA)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Receiver) > 0 {
+		i -= len(m.Receiver)
+		copy(dAtA[i:], m.Receiver)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Receiver)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgPlaceLimitOrderResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgPlaceLimitOrderResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgPlaceLimitOrderResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgWithdrawFilledLimitOrder) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgWithdrawFilledLimitOrder) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgWithdrawFilledLimitOrder) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Key != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Key))
+		i--
+		dAtA[i] = 0x38
+	}
+	if len(m.KeyToken) > 0 {
+		i -= len(m.KeyToken)
+		copy(dAtA[i:], m.KeyToken)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.KeyToken)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if m.TickIndex != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.TickIndex))
+		i--
+		dAtA[i] = 0x28
+	}
+	if len(m.TokenB) > 0 {
+		i -= len(m.TokenB)
+		copy(dAtA[i:], m.TokenB)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TokenB)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.TokenA) > 0 {
+		i -= len(m.TokenA)
+		copy(dAtA[i:], m.TokenA)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TokenA)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Receiver) > 0 {
+		i -= len(m.Receiver)
+		copy(dAtA[i:], m.Receiver)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Receiver)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgWithdrawFilledLimitOrderResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgWithdrawFilledLimitOrderResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgWithdrawFilledLimitOrderResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgCancelLimitOrder) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCancelLimitOrder) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCancelLimitOrder) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	{
+		size := m.SharesOut.Size()
+		i -= size
+		if _, err := m.SharesOut.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintTx(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x42
+	if m.Key != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Key))
+		i--
+		dAtA[i] = 0x38
+	}
+	if len(m.KeyToken) > 0 {
+		i -= len(m.KeyToken)
+		copy(dAtA[i:], m.KeyToken)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.KeyToken)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if m.TickIndex != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.TickIndex))
+		i--
+		dAtA[i] = 0x28
+	}
+	if len(m.TokenB) > 0 {
+		i -= len(m.TokenB)
+		copy(dAtA[i:], m.TokenB)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TokenB)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.TokenA) > 0 {
+		i -= len(m.TokenA)
+		copy(dAtA[i:], m.TokenA)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TokenA)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Receiver) > 0 {
+		i -= len(m.Receiver)
+		copy(dAtA[i:], m.Receiver)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Receiver)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgCancelLimitOrderResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCancelLimitOrderResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCancelLimitOrderResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -1033,11 +1825,11 @@ func (m *MsgWithdrawl) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Receiver)
+	l = len(m.Creator)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.Creator)
+	l = len(m.Receiver)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -1115,6 +1907,139 @@ func (m *MsgSwap) Size() (n int) {
 }
 
 func (m *MsgSwapResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgPlaceLimitOrder) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Receiver)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.TokenA)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.TokenB)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.TickIndex != 0 {
+		n += 1 + sovTx(uint64(m.TickIndex))
+	}
+	l = len(m.TokenIn)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = m.AmountIn.Size()
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
+func (m *MsgPlaceLimitOrderResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgWithdrawFilledLimitOrder) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Receiver)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.TokenA)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.TokenB)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.TickIndex != 0 {
+		n += 1 + sovTx(uint64(m.TickIndex))
+	}
+	l = len(m.KeyToken)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Key != 0 {
+		n += 1 + sovTx(uint64(m.Key))
+	}
+	return n
+}
+
+func (m *MsgWithdrawFilledLimitOrderResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgCancelLimitOrder) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Receiver)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.TokenA)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.TokenB)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.TickIndex != 0 {
+		n += 1 + sovTx(uint64(m.TickIndex))
+	}
+	l = len(m.KeyToken)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Key != 0 {
+		n += 1 + sovTx(uint64(m.Key))
+	}
+	l = m.SharesOut.Size()
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+
+func (m *MsgCancelLimitOrderResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1612,38 +2537,6 @@ func (m *MsgWithdrawl) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Receiver", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Receiver = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
 			}
 			var stringLen uint64
@@ -1673,6 +2566,38 @@ func (m *MsgWithdrawl) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Receiver", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Receiver = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -2302,6 +3227,949 @@ func (m *MsgSwapResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgSwapResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgPlaceLimitOrder) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgPlaceLimitOrder: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgPlaceLimitOrder: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Receiver", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Receiver = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenA", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TokenA = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenB", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TokenB = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TickIndex", wireType)
+			}
+			m.TickIndex = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.TickIndex |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenIn", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TokenIn = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountIn", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.AmountIn.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgPlaceLimitOrderResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgPlaceLimitOrderResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgPlaceLimitOrderResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgWithdrawFilledLimitOrder) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgWithdrawFilledLimitOrder: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgWithdrawFilledLimitOrder: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Receiver", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Receiver = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenA", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TokenA = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenB", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TokenB = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TickIndex", wireType)
+			}
+			m.TickIndex = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.TickIndex |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field KeyToken", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.KeyToken = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			m.Key = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Key |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgWithdrawFilledLimitOrderResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgWithdrawFilledLimitOrderResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgWithdrawFilledLimitOrderResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCancelLimitOrder) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCancelLimitOrder: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCancelLimitOrder: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Receiver", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Receiver = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenA", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TokenA = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TokenB", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TokenB = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TickIndex", wireType)
+			}
+			m.TickIndex = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.TickIndex |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field KeyToken", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.KeyToken = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			m.Key = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Key |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SharesOut", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.SharesOut.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCancelLimitOrderResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCancelLimitOrderResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCancelLimitOrderResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

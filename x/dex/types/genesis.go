@@ -10,14 +10,19 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		TickMapList:        []TickMap{},
-		PairMapList:        []PairMap{},
-		TokensList:         []Tokens{},
-		TokenMapList:       []TokenMap{},
-		SharesList:         []Shares{},
-		FeeListList:        []FeeList{},
-		EdgeRowList:        []EdgeRow{},
-		AdjanceyMatrixList: []AdjanceyMatrix{},
+		TickMapList:                           []TickMap{},
+		PairMapList:                           []PairMap{},
+		TokensList:                            []Tokens{},
+		TokenMapList:                          []TokenMap{},
+		SharesList:                            []Shares{},
+		FeeListList:                           []FeeList{},
+		EdgeRowList:                           []EdgeRow{},
+		AdjanceyMatrixList:                    []AdjanceyMatrix{},
+		LimitOrderPoolUserShareMapList:        []LimitOrderPoolUserShareMap{},
+		LimitOrderPoolUserSharesWithdrawnList: []LimitOrderPoolUserSharesWithdrawn{},
+		LimitOrderPoolTotalSharesMapList:      []LimitOrderPoolTotalSharesMap{},
+		LimitOrderPoolReserveMapList:          []LimitOrderPoolReserveMap{},
+		LimitOrderPoolFillMapList:             []LimitOrderPoolFillMap{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -30,7 +35,7 @@ func (gs GenesisState) Validate() error {
 	tickMapIndexMap := make(map[string]struct{})
 
 	for _, elem := range gs.TickMapList {
-		index := string(TickMapKey(elem.TickIndex))
+		index := string(TickMapKey(elem.PairId, elem.TickIndex))
 		if _, ok := tickMapIndexMap[index]; ok {
 			return fmt.Errorf("duplicated index for tickMap")
 		}
@@ -113,6 +118,56 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("adjanceyMatrix id should be lower or equal than the last id")
 		}
 		adjanceyMatrixIdMap[elem.Id] = true
+	}
+	// Check for duplicated index in limitOrderPoolUserShareMap
+	limitOrderPoolUserShareMapIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.LimitOrderPoolUserShareMapList {
+		index := string(LimitOrderPoolUserShareMapKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count, elem.Address))
+		if _, ok := limitOrderPoolUserShareMapIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for limitOrderPoolUserShareMap")
+		}
+		limitOrderPoolUserShareMapIndexMap[index] = struct{}{}
+	}
+	// Check for duplicated index in limitOrderPoolUserSharesWithdrawn
+	limitOrderPoolUserSharesWithdrawnIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.LimitOrderPoolUserSharesWithdrawnList {
+		index := string(LimitOrderPoolUserSharesWithdrawnKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count, elem.Address))
+		if _, ok := limitOrderPoolUserSharesWithdrawnIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for limitOrderPoolUserSharesWithdrawn")
+		}
+		limitOrderPoolUserSharesWithdrawnIndexMap[index] = struct{}{}
+	}
+	// Check for duplicated index in limitOrderPoolTotalSharesMap
+	limitOrderPoolTotalSharesMapIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.LimitOrderPoolTotalSharesMapList {
+		index := string(LimitOrderPoolTotalSharesMapKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count))
+		if _, ok := limitOrderPoolTotalSharesMapIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for limitOrderPoolTotalSharesMap")
+		}
+		limitOrderPoolTotalSharesMapIndexMap[index] = struct{}{}
+	}
+	// Check for duplicated index in limitOrderPoolReserveMap
+	limitOrderPoolReserveMapIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.LimitOrderPoolReserveMapList {
+		index := string(LimitOrderPoolReserveMapKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count))
+		if _, ok := limitOrderPoolReserveMapIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for limitOrderPoolReserveMap")
+		}
+		limitOrderPoolReserveMapIndexMap[index] = struct{}{}
+	}
+	// Check for duplicated index in limitOrderPoolFillMap
+	limitOrderPoolFillMapIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.LimitOrderPoolFillMapList {
+		index := string(LimitOrderPoolFillMapKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count))
+		if _, ok := limitOrderPoolFillMapIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for limitOrderPoolFillMap")
+		}
+		limitOrderPoolFillMapIndexMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 

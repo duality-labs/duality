@@ -17,6 +17,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		for _, elem2 := range genState.TickMapList {
 			k.SetTickMap(ctx, elem.PairId, elem2)
 		}
+
 	}
 	// Set all the tokens
 	for _, elem := range genState.TokensList {
@@ -54,6 +55,26 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 
 	// Set adjanceyMatrix count
 	k.SetAdjanceyMatrixCount(ctx, genState.AdjanceyMatrixCount)
+	// Set all the limitOrderPoolUserShareMap
+	for _, elem := range genState.LimitOrderPoolUserShareMapList {
+		k.SetLimitOrderPoolUserShareMap(ctx, elem)
+	}
+	// Set all the limitOrderPoolUserSharesWithdrawn
+	for _, elem := range genState.LimitOrderPoolUserSharesWithdrawnList {
+		k.SetLimitOrderPoolUserSharesWithdrawn(ctx, elem)
+	}
+	// Set all the limitOrderPoolTotalSharesMap
+	for _, elem := range genState.LimitOrderPoolTotalSharesMapList {
+		k.SetLimitOrderPoolTotalSharesMap(ctx, elem)
+	}
+	// Set all the limitOrderPoolReserveMap
+	for _, elem := range genState.LimitOrderPoolReserveMapList {
+		k.SetLimitOrderPoolReserveMap(ctx, elem)
+	}
+	// Set all the limitOrderPoolFillMap
+	for _, elem := range genState.LimitOrderPoolFillMapList {
+		k.SetLimitOrderPoolFillMap(ctx, elem)
+	}
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
 }
@@ -75,6 +96,11 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.EdgeRowCount = k.GetEdgeRowCount(ctx)
 	genesis.AdjanceyMatrixList = k.GetAllAdjanceyMatrix(ctx)
 	genesis.AdjanceyMatrixCount = k.GetAdjanceyMatrixCount(ctx)
+	genesis.LimitOrderPoolUserShareMapList = k.GetAllLimitOrderPoolUserShareMap(ctx)
+	genesis.LimitOrderPoolUserSharesWithdrawnList = k.GetAllLimitOrderPoolUserSharesWithdrawn(ctx)
+	genesis.LimitOrderPoolTotalSharesMapList = k.GetAllLimitOrderPoolTotalSharesMap(ctx)
+	genesis.LimitOrderPoolReserveMapList = k.GetAllLimitOrderPoolReserveMap(ctx)
+	genesis.LimitOrderPoolFillMapList = k.GetAllLimitOrderPoolFillMap(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis

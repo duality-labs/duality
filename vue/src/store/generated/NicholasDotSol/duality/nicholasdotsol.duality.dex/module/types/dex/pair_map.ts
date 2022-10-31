@@ -8,10 +8,10 @@ export const protobufPackage = "nicholasdotsol.duality.dex";
 export interface PairMap {
   pairId: string;
   tokenPair: TokenPairType | undefined;
-  pairCount: number;
+  totalTickCount: number;
 }
 
-const basePairMap: object = { pairId: "", pairCount: 0 };
+const basePairMap: object = { pairId: "", totalTickCount: 0 };
 
 export const PairMap = {
   encode(message: PairMap, writer: Writer = Writer.create()): Writer {
@@ -24,8 +24,8 @@ export const PairMap = {
         writer.uint32(18).fork()
       ).ldelim();
     }
-    if (message.pairCount !== 0) {
-      writer.uint32(24).int64(message.pairCount);
+    if (message.totalTickCount !== 0) {
+      writer.uint32(24).int64(message.totalTickCount);
     }
     return writer;
   },
@@ -44,7 +44,7 @@ export const PairMap = {
           message.tokenPair = TokenPairType.decode(reader, reader.uint32());
           break;
         case 3:
-          message.pairCount = longToNumber(reader.int64() as Long);
+          message.totalTickCount = longToNumber(reader.int64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -66,10 +66,10 @@ export const PairMap = {
     } else {
       message.tokenPair = undefined;
     }
-    if (object.pairCount !== undefined && object.pairCount !== null) {
-      message.pairCount = Number(object.pairCount);
+    if (object.totalTickCount !== undefined && object.totalTickCount !== null) {
+      message.totalTickCount = Number(object.totalTickCount);
     } else {
-      message.pairCount = 0;
+      message.totalTickCount = 0;
     }
     return message;
   },
@@ -81,7 +81,8 @@ export const PairMap = {
       (obj.tokenPair = message.tokenPair
         ? TokenPairType.toJSON(message.tokenPair)
         : undefined);
-    message.pairCount !== undefined && (obj.pairCount = message.pairCount);
+    message.totalTickCount !== undefined &&
+      (obj.totalTickCount = message.totalTickCount);
     return obj;
   },
 
@@ -97,10 +98,10 @@ export const PairMap = {
     } else {
       message.tokenPair = undefined;
     }
-    if (object.pairCount !== undefined && object.pairCount !== null) {
-      message.pairCount = object.pairCount;
+    if (object.totalTickCount !== undefined && object.totalTickCount !== null) {
+      message.totalTickCount = object.totalTickCount;
     } else {
-      message.pairCount = 0;
+      message.totalTickCount = 0;
     }
     return message;
   },
