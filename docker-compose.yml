@@ -52,7 +52,7 @@ services:
 
         # start as full node
         echo "starting as full node";
-        dualityd start --log_level ${LOG_LEVEL:-info} --moniker testnode & \
+        dualityd start --log_level ${LOG_LEVEL:-warn} --moniker testnode & \
 
         # wait a bit more to prove we are transitioning to a full node
         sleep 10;
@@ -83,7 +83,7 @@ services:
       '
     environment:
       - DEBUG=1
-      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_LEVEL=${LOG_LEVEL:-warn}
     cap_add:
       - SYS_PTRACE
     security_opt:
@@ -106,12 +106,12 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 0
-    command: dualityd --home /testnet/dualityd start --moniker "node0" --log_level ${LOG_LEVEL:-info}
+    command: dualityd --home /testnet/dualityd start --moniker "node0" --log_level ${LOG_LEVEL:-warn}
     environment:
       - DEBUG=1
       - ID=0
       - LOG=${LOG:-simd.log}
-      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_LEVEL=${LOG_LEVEL:-warn}
     cap_add:
       - SYS_PTRACE
     security_opt:
@@ -134,12 +134,12 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 1
-    command: dualityd --home /testnet/dualityd start --moniker "node1" --log_level ${LOG_LEVEL:-info}
+    command: dualityd --home /testnet/dualityd start --moniker "node1" --log_level ${LOG_LEVEL:-warn}
     environment:
       - DEBUG=0
       - ID=1
       - LOG=${LOG:-simd.log}
-      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_LEVEL=${LOG_LEVEL:-warn}
     cap_add:
       - SYS_PTRACE
     security_opt:
@@ -162,12 +162,12 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 2
-    command: dualityd --home /testnet/dualityd start --moniker "node2" --log_level ${LOG_LEVEL:-info}
+    command: dualityd --home /testnet/dualityd start --moniker "node2" --log_level ${LOG_LEVEL:-warn}
     environment:
       - DEBUG=0
       - ID=2
       - LOG=${LOG:-simd.log}
-      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_LEVEL=${LOG_LEVEL:-warn}
     cap_add:
       - SYS_PTRACE
     security_opt:
@@ -190,12 +190,12 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 3
-    command: dualityd --home /testnet/dualityd start --moniker "node3" --log_level ${LOG_LEVEL:-info}
+    command: dualityd --home /testnet/dualityd start --moniker "node3" --log_level ${LOG_LEVEL:-warn}
     environment:
       - DEBUG=0
       - ID=3
       - LOG=${LOG:-simd.log}
-      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_LEVEL=${LOG_LEVEL:-warn}
     cap_add:
       - SYS_PTRACE
     security_opt:
