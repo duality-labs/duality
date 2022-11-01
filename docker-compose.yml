@@ -31,7 +31,10 @@ services:
       dockerfile: Dockerfile-testnet
       target: testnode
     command: >
-      /bin/sh -c '
+      /bin/bash -c '
+        #!/bin/bash
+        set -e
+
         # check if we can get information from the testnet
         bash /root/.duality/scripts/check_testnet_status.sh
 
