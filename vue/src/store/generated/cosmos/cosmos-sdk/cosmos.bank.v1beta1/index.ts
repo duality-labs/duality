@@ -51,7 +51,6 @@ const getDefaultState = () => {
 	return {
 				Balance: {},
 				AllBalances: {},
-				SpendableBalances: {},
 				TotalSupply: {},
 				SupplyOf: {},
 				Params: {},
@@ -107,12 +106,6 @@ export default {
 						(<any> params).query=null
 					}
 			return state.AllBalances[JSON.stringify(params)] ?? {}
-		},
-				getSpendableBalances: (state) => (params = { params: {}}) => {
-					if (!(<any> params).query) {
-						(<any> params).query=null
-					}
-			return state.SpendableBalances[JSON.stringify(params)] ?? {}
 		},
 				getTotalSupply: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
@@ -225,32 +218,6 @@ export default {
 				return getters['getAllBalances']( { params: {...key}, query}) ?? {}
 			} catch (e) {
 				throw new Error('QueryClient:QueryAllBalances API Node Unavailable. Could not perform query: ' + e.message)
-				
-			}
-		},
-		
-		
-		
-		
-		 		
-		
-		
-		async QuerySpendableBalances({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
-			try {
-				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.querySpendableBalances( key.address, query)).data
-				
-					
-				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.querySpendableBalances( key.address, {...query, 'pagination.key':(<any> value).pagination.next_key})).data
-					value = mergeResults(value, next_values);
-				}
-				commit('QUERY', { query: 'SpendableBalances', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QuerySpendableBalances', payload: { options: { all }, params: {...key},query }})
-				return getters['getSpendableBalances']( { params: {...key}, query}) ?? {}
-			} catch (e) {
-				throw new Error('QueryClient:QuerySpendableBalances API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -374,21 +341,6 @@ export default {
 		},
 		
 		
-		async sendMsgSend({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgSend(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSend:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgSend:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
 		async sendMsgMultiSend({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -404,20 +356,22 @@ export default {
 				}
 			}
 		},
-		
-		async MsgSend({ rootGetters }, { value }) {
+		async sendMsgSend({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
 				const msg = await txClient.msgSend(value)
-				return msg
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
 					throw new Error('TxClient:MsgSend:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgSend:Create Could not create message: ' + e.message)
+				}else{
+					throw new Error('TxClient:MsgSend:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
+		
 		async MsgMultiSend({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -426,8 +380,21 @@ export default {
 			} catch (e) {
 				if (e == MissingWalletError) {
 					throw new Error('TxClient:MsgMultiSend:Init Could not initialize signing client. Wallet is required.')
-				} else{
+				}else{
 					throw new Error('TxClient:MsgMultiSend:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgSend({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgSend(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgSend:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgSend:Create Could not create message: ' + e.message)
 				}
 			}
 		},

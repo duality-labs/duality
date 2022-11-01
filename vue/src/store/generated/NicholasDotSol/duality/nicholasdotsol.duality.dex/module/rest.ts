@@ -105,8 +105,6 @@ export type DexMsgDepositResponse = object;
 
 export type DexMsgPlaceLimitOrderResponse = object;
 
-export type DexMsgRouteResponse = object;
-
 export type DexMsgSwapResponse = object;
 
 export type DexMsgWithdrawFilledLimitOrderResponse = object;

@@ -543,15 +543,7 @@ export interface V1Beta1GetLatestValidatorSetResponse {
   block_height?: string;
   validators?: Tendermintv1Beta1Validator[];
 
-  /**
-   * PageResponse is to be embedded in gRPC response messages where the
-   * corresponding request message has used PageRequest.
-   *
-   *  message SomeResponse {
-   *          repeated Bar results = 1;
-   *          PageResponse page = 2;
-   *  }
-   */
+  /** pagination defines an pagination for the response. */
   pagination?: V1Beta1PageResponse;
 }
 
@@ -580,15 +572,7 @@ export interface V1Beta1GetValidatorSetByHeightResponse {
   block_height?: string;
   validators?: Tendermintv1Beta1Validator[];
 
-  /**
-   * PageResponse is to be embedded in gRPC response messages where the
-   * corresponding request message has used PageRequest.
-   *
-   *  message SomeResponse {
-   *          repeated Bar results = 1;
-   *          PageResponse page = 2;
-   *  }
-   */
+  /** pagination defines an pagination for the response. */
   pagination?: V1Beta1PageResponse;
 }
 
