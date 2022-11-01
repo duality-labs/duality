@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 test_name="dex: can make deposit"
 
