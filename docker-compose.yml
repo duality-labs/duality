@@ -46,7 +46,7 @@ services:
 
         # complete stress test suite
         echo "running stress test suite...";
-        bash /root/.duality/scripts/stress_tests.sh
+        bash /root/.duality/scripts/wait_for_tests_to_finish.sh
         echo "finished stress test suite...";
 
         # wait a bit to prove we are catching up
@@ -109,7 +109,21 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 0
-    command: dualityd --home /testnet/dualityd start --moniker "node0" --log_level ${LOG_LEVEL:-warn}
+    command: >
+      /bin/bash -c '
+        #!/bin/bash
+        set -e
+
+        dualityd --home /testnet/dualityd start --moniker "node$$ID" --log_level ${LOG_LEVEL:-warn} & \
+        # wait a while for chain to be ready
+        sleep 10;
+
+        # run tests for this node
+        bash /root/.duality/scripts/run_tests_of_indexes.sh;
+
+        # keep container running
+        tail -f /dev/null;
+      '
     environment:
       - DEBUG=1
       - ID=0
@@ -137,7 +151,21 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 1
-    command: dualityd --home /testnet/dualityd start --moniker "node1" --log_level ${LOG_LEVEL:-warn}
+    command: >
+      /bin/bash -c '
+        #!/bin/bash
+        set -e
+
+        dualityd --home /testnet/dualityd start --moniker "node$$ID" --log_level ${LOG_LEVEL:-warn} & \
+        # wait a while for chain to be ready
+        sleep 10;
+
+        # run tests for this node
+        bash /root/.duality/scripts/run_tests_of_indexes.sh;
+
+        # keep container running
+        tail -f /dev/null;
+      '
     environment:
       - DEBUG=0
       - ID=1
@@ -165,7 +193,21 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 2
-    command: dualityd --home /testnet/dualityd start --moniker "node2" --log_level ${LOG_LEVEL:-warn}
+    command: >
+      /bin/bash -c '
+        #!/bin/bash
+        set -e
+
+        dualityd --home /testnet/dualityd start --moniker "node$$ID" --log_level ${LOG_LEVEL:-warn} & \
+        # wait a while for chain to be ready
+        sleep 10;
+
+        # run tests for this node
+        bash /root/.duality/scripts/run_tests_of_indexes.sh;
+
+        # keep container running
+        tail -f /dev/null;
+      '
     environment:
       - DEBUG=0
       - ID=2
@@ -193,7 +235,21 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 3
-    command: dualityd --home /testnet/dualityd start --moniker "node3" --log_level ${LOG_LEVEL:-warn}
+    command: >
+      /bin/bash -c '
+        #!/bin/bash
+        set -e
+
+        dualityd --home /testnet/dualityd start --moniker "node$$ID" --log_level ${LOG_LEVEL:-warn} & \
+        # wait a while for chain to be ready
+        sleep 10;
+
+        # run tests for this node
+        bash /root/.duality/scripts/run_tests_of_indexes.sh;
+
+        # keep container running
+        tail -f /dev/null;
+      '
     environment:
       - DEBUG=0
       - ID=3

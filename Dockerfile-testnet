@@ -138,6 +138,10 @@ COPY --from=testnetconfig /root/.testnet/node$NODE_ID /testnet/
 # overwrite genesis file that will be used
 RUN cp /root/combined-genesis.json /testnet/dualityd/config/genesis.json
 
+# add scripts and tests to run
+COPY testnet/scripts /root/.duality/scripts
+COPY testnet/tests /root/.duality/tests
+
 # modify node configuration files
 RUN sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /testnet/dualityd/config/config.toml;
 # overwrite CORS rules to allow browser testing and development with frontend local builds
