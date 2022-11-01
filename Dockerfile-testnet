@@ -89,8 +89,10 @@ COPY --from=testnetconfig /root/.testnet /root/.testnet
 
 # merge genesis files together:
 # take initial state of "auth", "bank", and "genutil" (the genesis txs) from the testnets configuration only
-RUN jq -s '.[0] * { app_state: { auth: { accounts: [ .[0].app_state.auth.accounts[], .[1].app_state.auth.accounts[] ] }, bank: { balances: [ .[0].app_state.bank.balances[], .[1].app_state.bank.balances[] ] }, genutil: .[1].app_state.genutil } }' \
-    /root/.duality/config/genesis.json /root/.testnet/node0/dualityd/config/genesis.json \
+# and add genesis state for the Dex module
+RUN echo '{ "app_state": { "dex": { "tokensList": [{ "id": 0, "address": "token" }, { "id": 1, "address": "stake" }], "tokensCount": 2, "feeListList": [{ "id": 0, "fee": 1 }, { "id": 1, "fee": 5 }, { "id": 2, "fee": 30 }, { "id": 3, "fee": 100 }], "feeListCount": 4 } } }' > /root/dex-genesis.json
+RUN jq -s '.[0] * { app_state: { auth: { accounts: [ .[0].app_state.auth.accounts[], .[1].app_state.auth.accounts[] ] }, bank: { balances: [ .[0].app_state.bank.balances[], .[1].app_state.bank.balances[] ] }, dex: ( .[0].app_state.dex + .[2].app_state.dex ), genutil: .[1].app_state.genutil } }' \
+    /root/.duality/config/genesis.json /root/.testnet/node0/dualityd/config/genesis.json /root/dex-genesis.json \
     > /root/combined-genesis.json
 
 # see docs for exposed ports:
