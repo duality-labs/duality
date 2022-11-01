@@ -68,7 +68,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	var amount_out sdk.Dec
 
 	if msg.TokenIn == token0 {
-		amount_out, err = k.Swap0to1(goCtx, token0, token1, createrAddr, msg.AmountIn, msg.MinOut)
+		amount_out, err = k.Swap0to1(goCtx, msg, token0, token1, createrAddr)
 
 		if err != nil {
 			return nil, err
@@ -96,7 +96,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		))
 
 	} else {
-		amount_out, err = k.Swap1to0(goCtx, token0, token1, createrAddr, msg.AmountIn, msg.MinOut)
+		amount_out, err = k.Swap1to0(goCtx, msg, token0, token1, createrAddr)
 
 		if err != nil {
 			return nil, err
@@ -133,7 +133,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 func (k msgServer) Route(goCtx context.Context, msg *types.MsgRoute) (*types.MsgRouteResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	createrAddr, receiverAddr, amountIn, minOut, err := k.routeVerification(goCtx, *msg)
+	createrAddr, receiverAddr, amountIn, err := k.routeVerification(goCtx, *msg)
 	// Nil for now
 	_ = receiverAddr
 
@@ -146,7 +146,7 @@ func (k msgServer) Route(goCtx context.Context, msg *types.MsgRoute) (*types.Msg
 	// Number of potential chunks in route
 	// TODO: Add this as argument to MsgRoute?
 	var numChunks int64 = 10
-	amount_out, err = k.DynamicRouteSwap(goCtx, createrAddr, msg.TokenIn, msg.TokenOut, amountIn, minOut, numChunks)
+	amount_out, err = k.DynamicRouteSwap(goCtx, createrAddr, receiverAddr, msg.TokenIn, msg.TokenOut, amountIn, msg.MinOut, numChunks)
 
 	if err != nil {
 		return nil, err
