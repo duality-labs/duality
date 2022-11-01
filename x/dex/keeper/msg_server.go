@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -141,7 +142,10 @@ func (k msgServer) Route(goCtx context.Context, msg *types.MsgRoute) (*types.Msg
 
 	var amount_out sdk.Dec
 
-	amount_out, err = k.SwapDynamicRouter(goCtx, createrAddr, msg.TokenIn, msg.TokenOut, amountIn, minOut)
+	// Number of potential chunks in route
+	// TODO: Add this as argument to MsgRoute?
+	var numChunks int64 = 10
+	amount_out, err = k.DynamicRouteSwap(goCtx, createrAddr, msg.TokenIn, msg.TokenOut, amountIn, minOut, numChunks)
 
 	if err != nil {
 		return nil, err
@@ -165,6 +169,6 @@ func (k msgServer) Route(goCtx context.Context, msg *types.MsgRoute) (*types.Msg
 	}
 
 	_ = ctx
-
+	fmt.Println("Amount Out from Swap", amount_out)
 	return &types.MsgRouteResponse{}, nil
 }

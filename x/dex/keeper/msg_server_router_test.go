@@ -108,7 +108,7 @@ func (suite *IntegrationTestSuite) TestBasicMultiHopRoute() {
 
 	_ = createResponse3
 
-	// fmt.Println("Making it to route")
+	fmt.Println("Making it to route")
 	swapResponse, err := suite.msgServer.Route(goCtx, &types.MsgRoute{
 		Creator:  alice.String(),
 		TokenIn:  "JUNO",
@@ -117,7 +117,7 @@ func (suite *IntegrationTestSuite) TestBasicMultiHopRoute() {
 		MinOut:   sdk.NewDec(0),
 		Receiver: alice.String(),
 	})
-	// fmt.Println("Post Route")
+	fmt.Println("Post Route", swapResponse)
 
 	_ = swapResponse
 	// TODO: Figure out way to determine correct amount out

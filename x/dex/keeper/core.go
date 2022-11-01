@@ -571,7 +571,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, token0 string, token1 string, ca
 		// Tick data for tick that holds information about reserve1
 		Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1)
 
-		fmt.Println("Printing count here", count)
+		// fmt.Println("Printing count here", count)
 		if !Current1Found {
 			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 - 1
 			continue

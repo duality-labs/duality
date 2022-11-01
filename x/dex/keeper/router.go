@@ -122,7 +122,7 @@ func (k Keeper) swapAcrossRoute(goCtx context.Context, callerAddress sdk.AccAddr
 	for i := 0; i < len(bestRoute.path)-1; i++ {
 		// Gets each pair sequentially
 		token0, token1, _ := k.SortTokens(bestRoute.path[i], bestRoute.path[i+1])
-		fmt.Println("Token0: ", token0, "Token1: ", token1)
+		// fmt.Println("Token0: ", token0, "Token1: ", token1)
 		if token0 == bestRoute.path[i] {
 			// TODO: Slippage check for the route
 			// minAmountOut
@@ -158,10 +158,11 @@ SIMULATE SWAP ALGORITHM
 
 */
 
-func (k Keeper) SimulateSwap(goCtx context.Context, callerAddress sdk.AccAddress, tokenIn string, tokenOut string, amountIn sdk.Dec, minOut sdk.Dec, numChunks int64) (sdk.Dec, error) {
+func (k Keeper) DynamicRouteSwap(goCtx context.Context, callerAddress sdk.AccAddress, tokenIn string, tokenOut string, amountIn sdk.Dec, minOut sdk.Dec, numChunks int64) (sdk.Dec, error) {
 	// Unnecessary for now!
 	// ctx := sdk.UnwrapSDKContext(goCtx)
 
+	// fmt.Println("In Dynamic Route Swap")
 	// Confirm that numChunks > 0
 	if numChunks < 1 {
 		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrInvalidNumChunks, "Number of chunks must be greater than 0")
@@ -178,7 +179,7 @@ func (k Keeper) SimulateSwap(goCtx context.Context, callerAddress sdk.AccAddress
 		// Set ith row of priceMatrix to chunkPrices
 		priceMatrix[i] = chunkPrices
 	}
-
+	// fmt.Println("Price Matrix: ", priceMatrix)
 	chunkToRoute := make([]Route, numChunks)
 
 	// SELECTING THE BEST COMBINATION OF CHUNKS
@@ -238,6 +239,8 @@ func (k Keeper) CalculateChunkPrices(goCtx context.Context, callerAddress sdk.Ac
 
 	// Tracks chunk prices (needed for non-direct routes)
 	currentChunkPrices := make([]sdk.Dec, numChunks)
+	// fmt.Println("In Calculate Chunk Prices")
+	// fmt.Println("CALCULATING PRICES FOR: ", route.path)
 	for i := 0; i < len(route.path)-1; i++ {
 		// Gets each pair sequentially
 		token0, token1, _ := k.SortTokens(route.path[i], route.path[i+1])
@@ -250,6 +253,7 @@ func (k Keeper) CalculateChunkPrices(goCtx context.Context, callerAddress sdk.Ac
 		} else {
 			chunkPrices, amountOut, err = k.SimulateSwap1to0(goCtx, token0, token1, callerAddress, amountToSwap, numChunks)
 		}
+		// print("Chunk Prices:", len(chunkPrices))
 		if err != nil {
 			return nil, err
 		}
@@ -260,6 +264,7 @@ func (k Keeper) CalculateChunkPrices(goCtx context.Context, callerAddress sdk.Ac
 			// Element-wise multiplication of each chunk's prices, to reflect accurate prices for each chunk
 			// Multiplying prices of each pair in the route
 			for j := 0; j < len(currentChunkPrices); j++ {
+				// fmt.Println("Inside Loop: ", j, chunkPrices[j])
 				currentChunkPrices[j] = currentChunkPrices[j].Mul(chunkPrices[j])
 			}
 		}
@@ -282,6 +287,7 @@ GHOST FUNCTIONS
 // Note: We don't care about minOut, just gives array
 func (k Keeper) SimulateSwap0to1(goCtx context.Context, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, numChunks int64) ([]sdk.Dec, sdk.Dec, error) {
 
+	fmt.Println("0to1")
 	// Store price of each chunk
 	chunkPrices := make([]sdk.Dec, numChunks)
 
@@ -315,7 +321,7 @@ func (k Keeper) SimulateSwap0to1(goCtx context.Context, token0 string, token1 st
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
 	for !amount_left.Equal(sdk.ZeroDec()) && (count < int(pair.PairCount)) {
-
+		// fmt.Println("Num Chunks So Far: ", numChunksSoFar)
 		// Tick data for tick that holds information about reserve1
 		Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1)
 
@@ -332,6 +338,7 @@ func (k Keeper) SimulateSwap0to1(goCtx context.Context, token0 string, token1 st
 		// iterator for feeList
 		i = 0
 		for i < feeSize && !amount_left.Equal(sdk.ZeroDec()) {
+			// fmt.Println("iteration", numChunksSoFar)
 			// gets fee for given feeIndex
 			fee := feelist[i].Fee
 			Current0Data, Current0Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1+2*fee)
@@ -346,6 +353,7 @@ func (k Keeper) SimulateSwap0to1(goCtx context.Context, token0 string, token1 st
 			price, err := k.Calc_price(pair.TokenPair.CurrentTick0To1, false)
 
 			if err != nil {
+				// fmt.Println("Calculate price failed")
 				return chunkPrices, total_amount_out, err
 			}
 
@@ -418,6 +426,7 @@ func (k Keeper) SimulateSwap0to1(goCtx context.Context, token0 string, token1 st
 // Note: We don't care about minOut, just gives array
 func (k Keeper) SimulateSwap1to0(goCtx context.Context, token0 string, token1 string, callerAddr sdk.AccAddress, amountIn sdk.Dec, numChunks int64) ([]sdk.Dec, sdk.Dec, error) {
 
+	fmt.Println("1to0")
 	// Store price of each chunk
 	chunkPrices := make([]sdk.Dec, numChunks)
 
@@ -472,6 +481,7 @@ func (k Keeper) SimulateSwap1to0(goCtx context.Context, token0 string, token1 st
 		// iterator for feeList
 		i = 0
 		for i < feeSize && !amount_left.Equal(sdk.ZeroDec()) {
+			// fmt.Println("iteration", numChunksSoFar)
 			// gets fee for given feeIndex
 			fee := feelist[i].Fee
 
@@ -487,11 +497,13 @@ func (k Keeper) SimulateSwap1to0(goCtx context.Context, token0 string, token1 st
 			price, err := k.Calc_price(pair.TokenPair.CurrentTick1To0, true)
 
 			if err != nil {
+				fmt.Println("Calculate price failed")
 				return chunkPrices, total_amount_out, err
 			}
 
 			// price * r1 < amount_left
 			if price.Mul(Current0Data.TickData.Reserve0AndShares[i].Reserve0).LT(amount_left) {
+				fmt.Println("not enough in reserves")
 				// amountOut += amount_left * price
 				amount_out = amount_out.Add(Current0Data.TickData.Reserve0AndShares[i].Reserve0)
 				// decrement amount_left by price * reserve0
@@ -504,7 +516,7 @@ func (k Keeper) SimulateSwap1to0(goCtx context.Context, token0 string, token1 st
 				i++
 
 			} else {
-				if numChunksSoFar < numChunks-1 {
+				if numChunksSoFar < numChunks {
 					// amountOut += amount_left * price
 					amount_out = amount_out.Add(amount_left.Mul(price))
 					// increment reserve1 with amountLeft
