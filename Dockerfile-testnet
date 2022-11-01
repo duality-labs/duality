@@ -80,6 +80,9 @@ RUN dualityd add-genesis-account $(dualityd keys show alice -a) 1000000000token,
 # bob
 RUN dualityd keys add bob --output json > /root/.duality/testkeys/bob.json
 RUN dualityd add-genesis-account $(dualityd keys show bob -a) 1000000000token,1000000000stake
+# fred (faucet)
+RUN dualityd keys add fred --output json > /root/.duality/testkeys/fred.json
+RUN B=1000000000 && dualityd add-genesis-account $(dualityd keys show fred -a) "${B}tokenA,${B}tokenB,${B}tokenC,${B}tokenD,${B}tokenE,${B}tokenF,${B}tokenG,${B}tokenH,${B}tokenI,${B}tokenJ,${B}tokenK,${B}tokenL,${B}tokenM,${B}tokenN,${B}tokenO,${B}tokenP,${B}tokenQ,${B}tokenR,${B}tokenS,${B}tokenT,${B}tokenU,${B}tokenV,${B}tokenW,${B}tokenX,${B}tokenY,${B}tokenZ"
 
 # Add gentxs to the genesis file
 RUN dualityd gentx alice 1000000stake --chain-id duality
@@ -137,6 +140,9 @@ COPY --from=testnetconfig /root/.testnet/node$NODE_ID /testnet/
 
 # overwrite genesis file that will be used
 RUN cp /root/combined-genesis.json /testnet/dualityd/config/genesis.json
+
+# copy account keys over (to use fred as a faucet)
+RUN cp -r /root/.duality/keyring-test/* /testnet/dualityd/keyring-test
 
 # add scripts and tests to run
 COPY testnet/scripts /root/.duality/scripts
