@@ -18,7 +18,7 @@ tx_result=$(dualityd tx dex deposit $(dualityd keys show $person --output json |
 tx_code=$(echo $tx_result | jq -r .code)
 if [[ "$tx_code" != "0" ]]
 then
-    echo "$test_name error $tx_code at $test_name"
+    echo "$test_name error ($tx_code) at $(echo $tx_result | jq -r .txhash): $(echo $tx_result | jq -r .raw_log)"
     exit $tx_code
 fi
 
