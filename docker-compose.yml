@@ -62,7 +62,20 @@ services:
 
         # request to be a validator
         echo "requesting test full node to become a validator";
-        dualityd tx staking create-validator --node tcp://dualitynode1:26657 --moniker testnode --node-id `dualityd tendermint show-node-id` --pubkey `dualityd tendermint show-validator` --commission-rate="1.0" --commission-max-rate="1.0" --commission-max-change-rate="1.0" --min-self-delegation="1" --gas="auto" --amount 100000000stake --fees 1000token --from alice -y
+        dualityd tx staking create-validator \
+          --node tcp://dualitynode1:26657 \
+          --moniker testnode \
+          --node-id `dualityd tendermint show-node-id` \
+          --pubkey `dualityd tendermint show-validator` \
+          --commission-rate="1.0" \
+          --commission-max-rate="1.0" \
+          --commission-max-change-rate="1.0" \
+          --min-self-delegation="1" \
+          --gas="auto" \
+          --amount 100000000stake \
+          --fees 1000token \
+          --from alice \
+          -y
 
         bash /root/.duality/scripts/check_validator_status.sh
       '
