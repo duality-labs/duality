@@ -75,7 +75,9 @@ services:
           --amount 100000000stake \
           --fees 1000token \
           --from alice \
-          -y
+          -y \
+          --output json \
+          | echo "validator exit code: $$(jq -r .code)"
 
         bash /root/.duality/scripts/check_validator_status.sh
       '
