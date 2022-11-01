@@ -114,7 +114,7 @@ func (k Keeper) getValidRoutes(goCtx context.Context, tokenIn string, tokenOut s
 // ORDERED LIST OF ROUTES, AMOUNT YOU WANT TO SWAP THROUGH THEM
 // Core function, can use any arbitrary SwapDynamicRouter
 // i.e. Optimal Routing from Bain, BF, etc.
-func (k Keeper) swapAcrossRoute(goCtx context.Context, callerAddress sdk.AccAddress, bestRoute Route, amountIn sdk.Dec, minOut sdk.Dec) (amountFromSwap sdk.Dec, err error) {
+func (k Keeper) swapAcrossRoute(goCtx context.Context, callerAddress sdk.AccAddress, receiverAddress sdk.AccAddress, bestRoute Route, amountIn sdk.Dec, minOut sdk.Dec) (amountFromSwap sdk.Dec, err error) {
 	amountToSwap := amountIn
 	amountLeft := sdk.ZeroDec()
 	// Passes in the amountOut from the previous pair into the next pair until we swap to the end of route
@@ -123,13 +123,22 @@ func (k Keeper) swapAcrossRoute(goCtx context.Context, callerAddress sdk.AccAddr
 		// Gets each pair sequentially
 		token0, token1, _ := k.SortTokens(bestRoute.path[i], bestRoute.path[i+1])
 		// fmt.Println("Token0: ", token0, "Token1: ", token1)
+
+		msgSwap := &types.MsgSwap{
+			Creator:  string(callerAddress),
+			Receiver: string(receiverAddress),
+			TokenA:   token0,
+			TokenB:   token1,
+			AmountIn: amountToSwap,
+			TokenIn:  bestRoute.path[i],
+		}
 		if token0 == bestRoute.path[i] {
 			// TODO: Slippage check for the route
 			// minAmountOut
-
 			// Use sdk.ZeroDec() for minOut as we can set a tighter bound later
 			// amountToSwap is the nextAmountOut that we want to use
-			amountLeft, amountOut, err = k.Swap0to1(goCtx, token0, token1, callerAddress, amountToSwap, sdk.ZeroDec())
+
+			amountOut, err = k.Swap0to1(goCtx, msgSwap, token0, token1, callerAddress)
 			if err != nil {
 				return sdk.ZeroDec(), err
 			}
@@ -139,7 +148,7 @@ func (k Keeper) swapAcrossRoute(goCtx context.Context, callerAddress sdk.AccAddr
 			// minAmountOut
 
 			// Use sdk.ZeroDec() for minOut as we can set a tighter bound later
-			amountLeft, amountOut, err = k.Swap1to0(goCtx, token0, token1, callerAddress, amountToSwap, sdk.ZeroDec())
+			amountOut, err = k.Swap1to0(goCtx, msgSwap, token0, token1, callerAddress)
 			if err != nil {
 				return sdk.ZeroDec(), err
 			}
@@ -158,7 +167,7 @@ SIMULATE SWAP ALGORITHM
 
 */
 
-func (k Keeper) DynamicRouteSwap(goCtx context.Context, callerAddress sdk.AccAddress, tokenIn string, tokenOut string, amountIn sdk.Dec, minOut sdk.Dec, numChunks int64) (sdk.Dec, error) {
+func (k Keeper) DynamicRouteSwap(goCtx context.Context, callerAddress sdk.AccAddress, receiverAddress sdk.AccAddress, tokenIn string, tokenOut string, amountIn sdk.Dec, minOut sdk.Dec, numChunks int64) (sdk.Dec, error) {
 	// Unnecessary for now!
 	// ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -209,7 +218,7 @@ func (k Keeper) DynamicRouteSwap(goCtx context.Context, callerAddress sdk.AccAdd
 		}
 
 		// TODO: Temporarily setting minOut to sdk.ZeroDec()
-		routeAmountOut, err := k.swapAcrossRoute(goCtx, callerAddress, chunkToRoute[i], amountLeft, sdk.ZeroDec())
+		routeAmountOut, err := k.swapAcrossRoute(goCtx, callerAddress, receiverAddress, chunkToRoute[i], amountLeft, sdk.ZeroDec())
 		if err != nil {
 			return sdk.ZeroDec(), err
 		}
@@ -320,7 +329,7 @@ func (k Keeper) SimulateSwap0to1(goCtx context.Context, token0 string, token1 st
 	total_amount_out := sdk.ZeroDec()
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
-	for !amount_left.Equal(sdk.ZeroDec()) && (count < int(pair.PairCount)) {
+	for !amount_left.Equal(sdk.ZeroDec()) {
 		// fmt.Println("Num Chunks So Far: ", numChunksSoFar)
 		// Tick data for tick that holds information about reserve1
 		Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1)
@@ -461,7 +470,7 @@ func (k Keeper) SimulateSwap1to0(goCtx context.Context, token0 string, token1 st
 	total_amount_out := sdk.ZeroDec()
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
-	for !amount_left.Equal(sdk.ZeroDec()) && (count < int(pair.PairCount)) {
+	for !amount_left.Equal(sdk.ZeroDec()) {
 
 		Current0Data, Current0Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick1To0)
 		//Current0Datam := Current0Data.TickData.Reserve1[i]
