@@ -52,7 +52,7 @@ services:
 
         # start as full node
         echo "starting as full node";
-        dualityd start --log_level $LOG_LEVEL --moniker testnode & \
+        dualityd start --log_level ${LOG_LEVEL:-info} --moniker testnode & \
 
         # wait a bit more to prove we are transitioning to a full node
         sleep 10;
@@ -106,7 +106,7 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 0
-    command: dualityd --home /testnet/dualityd start --moniker "node0" --log_level $LOG_LEVEL
+    command: dualityd --home /testnet/dualityd start --moniker "node0" --log_level ${LOG_LEVEL:-info}
     environment:
       - DEBUG=1
       - ID=0
@@ -134,7 +134,7 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 1
-    command: dualityd --home /testnet/dualityd start --moniker "node1" --log_level $LOG_LEVEL
+    command: dualityd --home /testnet/dualityd start --moniker "node1" --log_level ${LOG_LEVEL:-info}
     environment:
       - DEBUG=0
       - ID=1
@@ -162,7 +162,7 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 2
-    command: dualityd --home /testnet/dualityd start --moniker "node2" --log_level $LOG_LEVEL
+    command: dualityd --home /testnet/dualityd start --moniker "node2" --log_level ${LOG_LEVEL:-info}
     environment:
       - DEBUG=0
       - ID=2
@@ -190,7 +190,7 @@ services:
       dockerfile: Dockerfile-testnet
       args:
         NODE_ID: 3
-    command: dualityd --home /testnet/dualityd start --moniker "node3" --log_level $LOG_LEVEL
+    command: dualityd --home /testnet/dualityd start --moniker "node3" --log_level ${LOG_LEVEL:-info}
     environment:
       - DEBUG=0
       - ID=3
