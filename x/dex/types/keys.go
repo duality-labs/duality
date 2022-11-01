@@ -89,11 +89,11 @@ func SharesKey(address string, pairId string, tickIndex int64, feeIndex uint64) 
 	key = append(key, pairIdBytes...)
 	key = append(key, []byte("/")...)
 
-	tickIndexBytes := []byte(string(tickIndex))
+	tickIndexBytes := []byte(string(rune(tickIndex)))
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
-	feeBytes := []byte(string(feeIndex))
+	feeBytes := []byte(string(rune(feeIndex)))
 	key = append(key, feeBytes...)
 	key = append(key, []byte("/")...)
 

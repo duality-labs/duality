@@ -108,7 +108,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						TickIndex: 0,
 					},
 					{
-						TickIndex: 1,
+						TickIndex: 0,
 					},
 				},
 			},
