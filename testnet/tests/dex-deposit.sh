@@ -8,7 +8,7 @@ test_name="dex: can make deposit"
 
 # deposit tokens
 # wait for tx to be processed and return an exit code
-tx_result=$(dualityd tx dex deposit --node tcp://dualitynode0:26657 $(dualityd keys show alice --output json | jq -r .address) token stake 0.0000000001 0.0000000001 1 0 --from alice --yes --output json --broadcast-mode block)
+tx_result=$(dualityd tx dex deposit --node tcp://dualitynode0:26657 $(dualityd keys show "node$ID" --output json | jq -r .address) token stake 0.0000000001 0.0000000001 1 0 --from "node$ID" --yes --output json --broadcast-mode block)
 tx_code=$(echo $tx_result | jq -r .code)
 if [[ "$tx_code" != "0" ]]
 then
