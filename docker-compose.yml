@@ -32,16 +32,24 @@ services:
       target: testnode
     command: >
       /bin/sh -c '
-        # print out test keys before running test node
-        echo "test keys:";
-        jq -s . /root/.duality/testkeys/*;
-
         # check if we can get information from the testnet
         bash /root/.duality/scripts/check_testnet_status.sh
 
         # wait a bit to prove we are catching up
+        echo "waiting for testnet to progress in height a little so we can make requests as alice or bob";
+        # if height is not sufficient this error may appear: Error: rpc error: code = NotFound desc = rpc error: code = NotFound desc = account [address] not found: key not found
+        #(wait at least one block height)
+        sleep 10;
+
+        # complete stress test suite
+        echo "running stress test suite...";
+        bash /root/.duality/scripts/stress_tests.sh
+        echo "finished stress test suite...";
+
+        # wait a bit to prove we are catching up
         echo "waiting for testnet to progress in height a little...";
         sleep 10;
+
         # start as full node
         echo "starting as full node";
         dualityd start --log_level $LOG_LEVEL --moniker testnode & \

@@ -112,6 +112,7 @@ RUN cp /root/combined-genesis.json /root/.duality/config/genesis.json
 
 # add scripts to run
 COPY testnet/scripts /root/.duality/scripts
+COPY testnet/tests /root/.duality/tests
 
 # modify node configuration files
 # prevent 'local network address' warning from showing
