@@ -14,6 +14,7 @@ do
     echo "start test number: $index"
 
     # todo call the test file by its index number here
+    # go test $(find /root/.duality/tests | grep .*\.sh$ --index $index) # this is psuedocode
 
     # here is a fake call instead which should be removed
     bash /root/.duality/tests/dex-deposit.sh
