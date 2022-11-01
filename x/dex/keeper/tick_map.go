@@ -8,9 +8,10 @@ import (
 
 // SetTickMap set a specific tickMap in the store from its index
 func (k Keeper) SetTickMap(ctx sdk.Context, pairId string, tickMap types.TickMap) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TickPrefix(pairId))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickMapKeyPrefix))
 	b := k.cdc.MustMarshal(&tickMap)
 	store.Set(types.TickMapKey(
+		pairId,
 		tickMap.TickIndex,
 	), b)
 }
@@ -22,9 +23,10 @@ func (k Keeper) GetTickMap(
 	tickIndex int64,
 
 ) (val types.TickMap, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TickPrefix(pairId))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickMapKeyPrefix))
 
 	b := store.Get(types.TickMapKey(
+		pairId,
 		tickIndex,
 	))
 	if b == nil {
@@ -42,8 +44,9 @@ func (k Keeper) RemoveTickMap(
 	tickIndex int64,
 
 ) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TickPrefix(pairId))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickMapKeyPrefix))
 	store.Delete(types.TickMapKey(
+		pairId,
 		tickIndex,
 	))
 }

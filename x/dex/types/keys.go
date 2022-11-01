@@ -22,7 +22,9 @@ const (
 )
 
 func KeyPrefix(p string) []byte {
-	return []byte(p)
+	key := []byte(p)
+	key = append(key, []byte("/")...)
+	return key
 }
 
 const (
@@ -30,16 +32,16 @@ const (
 	TokensCountKey = "Tokens-count-"
 
 	// TokenMapKeyPrefix is the prefix to retrieve all TokenMap
-	TokenMapKeyPrefix = "TokenMap/value/"
+	TokenMapKeyPrefix = "TokenMap/value"
 
 	// TickMapKeyPrefix is the prefix to retrieve all TickMap
-	BaseTickMapKeyPrefix = "TickMap/value/"
+	BaseTickMapKeyPrefix = "TickMap/value"
 
 	// PairMapKeyPrefix is the prefix to retrieve all PairMap
-	PairMapKeyPrefix = "PairMap/value/"
+	PairMapKeyPrefix = "PairMap/value"
 
 	// SharesKeyPrefix is the prefix to retrieve all Shares
-	SharesKeyPrefix = "Shares/value/"
+	SharesKeyPrefix = "Shares/value"
 )
 
 func TickPrefix(pairId string) []byte {
@@ -57,8 +59,12 @@ func TokenMapKey(address string) []byte {
 	return key
 }
 
-func TickMapKey(tickIndex int64) []byte {
+func TickMapKey(pairId string, tickIndex int64) []byte {
 	var key []byte
+
+	pairIdBytes := []byte(pairId)
+	key = append(key, pairIdBytes...)
+	key = append(key, []byte("/")...)
 
 	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
 	key = append(key, tickIndexBytes...)
@@ -95,6 +101,147 @@ func SharesKey(address string, pairId string, tickIndex int64, feeIndex uint64) 
 
 	feeBytes := []byte(string(feeIndex))
 	key = append(key, feeBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+// Limit Order Pool Mappings and Keys
+const (
+	BaseLimitOrderPrefix = "LimitOrderPool/value"
+
+	// LimitOrderPoolUserSharesWithdrawnKeyPrefix is the prefix to retrieve all LimitOrderPoolUserSharesWithdrawn
+	LimitOrderPoolUserSharesWithdrawnKeyPrefix = "LimitOrderPoolUserSharesWithdrawn/value"
+
+	// LimitOrderPoolUserShareMapKeyPrefix is the prefix to retrieve all LimitOrderPoolUserShareMap
+	LimitOrderPoolUserShareMapKeyPrefix = "LimitOrderPoolUserShareMap/value"
+
+	// LimitOrderPoolTotalSharesMapKeyPrefix is the prefix to retrieve all LimitOrderPoolTotalSharesMap
+	LimitOrderPoolTotalSharesMapKeyPrefix = "LimitOrderPoolTotalSharesMap/value"
+
+	// LimitOrderPoolReserveMapKeyPrefix is the prefix to retrieve all LimitOrderPoolReserveMap
+	LimitOrderPoolReserveMapKeyPrefix = "LimitOrderPoolReserveMap/value"
+
+	// LimitOrderPoolFillMapKeyPrefix is the prefix to retrieve all LimitOrderPoolFillMap
+	LimitOrderPoolFillMapKeyPrefix = "LimitOrderPoolFillMap/value"
+)
+
+// LimitOrderPoolUserSharesWithdrawnKey returns the store key to retrieve a LimitOrderPoolUserSharesWithdrawn from the index fields
+func LimitOrderPoolUserSharesWithdrawnKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
+	var key []byte
+
+	pairIdBytes := []byte(pairId)
+	key = append(key, pairIdBytes...)
+	key = append(key, []byte("/")...)
+
+	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
+	key = append(key, tickIndexBytes...)
+	key = append(key, []byte("/")...)
+
+	tokenBytes := []byte(token)
+	key = append(key, tokenBytes...)
+	key = append(key, []byte("/")...)
+
+	countBytes := []byte(strconv.Itoa(int(count)))
+	key = append(key, countBytes...)
+	key = append(key, []byte("/")...)
+
+	addressBytes := []byte(address)
+	key = append(key, addressBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+// LimitOrderPoolUserShareMapKey returns the store key to retrieve a LimitOrderPoolUserShareMap from the index fields
+func LimitOrderPoolUserShareMapKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
+	var key []byte
+
+	pairIdBytes := []byte(pairId)
+	key = append(key, pairIdBytes...)
+	key = append(key, []byte("/")...)
+
+	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
+	key = append(key, tickIndexBytes...)
+	key = append(key, []byte("/")...)
+
+	tokenBytes := []byte(token)
+	key = append(key, tokenBytes...)
+	key = append(key, []byte("/")...)
+
+	countBytes := []byte(strconv.Itoa(int(count)))
+	key = append(key, countBytes...)
+	key = append(key, []byte("/")...)
+
+	addressBytes := []byte(address)
+	key = append(key, addressBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+// LimitOrderPoolTotalSharesMapKey returns the store key to retrieve a LimitOrderPoolTotalSharesMap from the index fields
+func LimitOrderPoolTotalSharesMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
+	var key []byte
+
+	pairIdBytes := []byte(pairId)
+	key = append(key, pairIdBytes...)
+	key = append(key, []byte("/")...)
+
+	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
+	key = append(key, tickIndexBytes...)
+	key = append(key, []byte("/")...)
+
+	tokenBytes := []byte(token)
+	key = append(key, tokenBytes...)
+	key = append(key, []byte("/")...)
+
+	countBytes := []byte(strconv.Itoa(int(count)))
+	key = append(key, countBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+func LimitOrderPoolReserveMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
+	var key []byte
+
+	pairIdBytes := []byte(pairId)
+	key = append(key, pairIdBytes...)
+	key = append(key, []byte("/")...)
+
+	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
+	key = append(key, tickIndexBytes...)
+	key = append(key, []byte("/")...)
+
+	tokenBytes := []byte(token)
+	key = append(key, tokenBytes...)
+	key = append(key, []byte("/")...)
+
+	countBytes := []byte(strconv.Itoa(int(count)))
+	key = append(key, countBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+func LimitOrderPoolFillMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
+	var key []byte
+
+	pairIdBytes := []byte(pairId)
+	key = append(key, pairIdBytes...)
+	key = append(key, []byte("/")...)
+
+	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
+	key = append(key, tickIndexBytes...)
+	key = append(key, []byte("/")...)
+
+	tokenBytes := []byte(token)
+	key = append(key, tokenBytes...)
+	key = append(key, []byte("/")...)
+
+	countBytes := []byte(strconv.Itoa(int(count)))
+	key = append(key, countBytes...)
 	key = append(key, []byte("/")...)
 
 	return key
@@ -155,6 +302,40 @@ const (
 	RouteEventAmountIn = "AmountIn"
 	RouteEventMinOut   = "MinOut"
 	RouteEventAmoutOut = "AmountOut"
+)
+
+const (
+	PlaceLimitOrderEventKey        = "NewPlaceLimitOrder"
+	PlaceLimitOrderEventCreator    = "Creator"
+	PlaceLimitOrderEventReceiver   = "Receiver"
+	PlaceLimitOrderEventToken0     = "Token0"
+	PlaceLimitOrderEventToken1     = "Token1"
+	PlaceLimitOrderEventTokenIn    = "TokenIn"
+	PlaceLimitOrderEventAmountIn   = "AmountIn"
+	PlaceLimitOrderEventShares     = "Shares"
+	PlaceLimitOrderEventCurrentKey = "CurrentLimitOrderKey"
+)
+
+const (
+	WithdrawFilledLimitOrderEventKey           = "NewWithdraw"
+	WithdrawFilledLimitOrderEventCreator       = "Creator"
+	WithdrawFilledLimitOrderEventReceiver      = "Receiver"
+	WithdrawFilledLimitOrderEventToken0        = "Token0"
+	WithdrawFilledLimitOrderEventToken1        = "Token1"
+	WithdrawFilledLimitOrderEventTokenKey      = "TokenKey"
+	WithdrawFilledLimitOrderEventLimitOrderKey = "LimitOrderKey"
+	WithdrawFilledLimitOrderEventAmountOut     = "AmountOut"
+)
+
+const (
+	CancelLimitOrderEventKey           = "NewWithdraw"
+	CancelLimitOrderEventCreator       = "Creator"
+	CancelLimitOrderEventReceiver      = "Receiver"
+	CancelLimitOrderEventToken0        = "Token0"
+	CancelLimitOrderEventToken1        = "Token1"
+	CancelLimitOrderEventTokenKey      = "TokenKey"
+	CancelLimitOrderEventLimitOrderKey = "LimitOrderKey"
+	CancelLimitOrderEventAmountOut     = "AmountOut"
 )
 
 const (

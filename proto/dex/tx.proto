@@ -11,6 +11,9 @@ service Msg {
   rpc Withdrawl(MsgWithdrawl) returns (MsgWithdrawlResponse);
   rpc Swap(MsgSwap) returns (MsgSwapResponse);
   rpc Route(MsgRoute) returns (MsgRouteResponse);
+  rpc PlaceLimitOrder(MsgPlaceLimitOrder) returns (MsgPlaceLimitOrderResponse);
+  rpc WithdrawFilledLimitOrder(MsgWithdrawFilledLimitOrder) returns (MsgWithdrawFilledLimitOrderResponse);
+  rpc CancelLimitOrder(MsgCancelLimitOrder) returns (MsgCancelLimitOrderResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -40,8 +43,8 @@ message MsgDepositResponse {
 }
 
 message MsgWithdrawl {
-  string receiver = 1;
-  string creator = 2;
+  string creator = 1;
+  string receiver = 2;
   string tokenA = 3;
   string tokenB = 4;
   repeated string sharesToRemove = 5  [
@@ -88,20 +91,64 @@ message MsgRoute {
   string tokenIn = 3;
   string tokenOut = 4;
   string amountIn = 5 [
+    (gogoproto.moretags)   = "yaml:\"amountIn\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "amountIn"
+  ]; 
+}
+
+message MsgRouteResponse {
+}
+
+message MsgPlaceLimitOrder {
+  string creator = 1;
+  string receiver = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  int64 tickIndex = 5;
+  string tokenIn = 6;
+  string amountIn = 7 [
       (gogoproto.moretags)   = "yaml:\"amountIn\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountIn"
   ]; 
-  string minOut = 7 [
-      (gogoproto.moretags)   = "yaml:\"minOut\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-      (gogoproto.nullable)   = false,
-      (gogoproto.jsontag) = "minOut"
-  ];
 }
 
-message MsgRouteResponse {
+message MsgPlaceLimitOrderResponse {
+}
+
+message MsgWithdrawFilledLimitOrder {
+  string creator = 1;
+  string receiver = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  int64 tickIndex = 5;
+  string keyToken = 6;
+  uint64 key = 7;
+}
+
+message MsgWithdrawFilledLimitOrderResponse {
+}
+
+message MsgCancelLimitOrder {
+  string creator = 1;
+  string receiver = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  int64 tickIndex = 5;
+  string keyToken = 6;
+  uint64 key = 7;
+  string sharesOut = 8 [
+      (gogoproto.moretags)   = "yaml:\"sharesOut\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "sharesOut"
+  ]; 
+}
+
+message MsgCancelLimitOrderResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message
