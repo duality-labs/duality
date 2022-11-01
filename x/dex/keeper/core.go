@@ -575,7 +575,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 	// If toknePair does not exists, a swap cannot be made through it; error
 	if !pairFound {
-		return amountIn, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
+		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 
 	// Counts how many ticks we have iterated through, compare to initialized ticks in the pair
@@ -594,7 +594,6 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		// Tick data for tick that holds information about reserve1
 		Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1)
 
-		// fmt.Println("Printing count here", count)
 		// If a tick at Current0to1 is not found, decrement CurrentTick0to1 (to the next tick that is supposed to contain reserve1) and check again
 		if !Current1Found {
 			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 - 1
@@ -625,12 +624,12 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			price, err := k.Calc_price(pair.TokenPair.CurrentTick0To1, false)
 
 			if err != nil {
-				return amount_left, amount_out, err
+				return sdk.ZeroDec(), err
 			}
 
 			// price * amout_left + amount_out < minOut, error we cannot meet minOut threshold
-			if price.Mul(amount_left).Add(amount_out).LT(minOut) {
-				return amount_left, amount_out, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
+			if price.Mul(amount_left).Add(amount_out).LT(msg.MinOut) {
+				return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 			}
 
 			// price * r1 < amount_left
@@ -687,13 +686,17 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	k.SetPairMap(ctx, pair)
 
 	// Check to see if amount_out meets the threshold of minOut
-	if amount_out.LT(minOut) {
-		return amount_left, amount_out, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
+	if amount_out.LT(msg.MinOut) {
+		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 	}
+
+	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
+		token0, token1, msg.TokenIn, msg.AmountIn.String(), amount_out.String(), msg.MinOut.String(),
+	))
 
 	// Returns amount_out to keeper/msg.server: Swap
 	// @Dev token transfers happen in keeper/msg.server: Swap
-	return amount_left, amount_out, nil
+	return amount_out, nil
 }
 
 // Handles core logic for the asset 1 to asset 0 direction of MsgSwap; faciliates swapping amount1 for some amount of amount0, given a specified pair (token0, token1)
@@ -712,7 +715,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 	// If toknePair does not exists, a swap cannot be made through it; error
 	if !pairFound {
-		return amountIn, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
+		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 
 	// Counts how many ticks we have iterated through, compare to initialized ticks in the pair
@@ -720,7 +723,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	count := 0
 
 	//amount_left is the amount left to deposit
-	amount_left := amountIn
+	amount_left := msg.AmountIn
 
 	// amount to return to receiver
 	amount_out := sdk.ZeroDec()
@@ -764,12 +767,12 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			price, err := k.Calc_price(pair.TokenPair.CurrentTick1To0, true)
 
 			if err != nil {
-				return amount_left, amount_out, err
+				return sdk.ZeroDec(), err
 			}
 
 			// price * amout_left + amount_out < minOut, error we cannot meet minOut threshold
-			if price.Mul(amount_left).Add(amount_out).LT(minOut) {
-				return amount_left, amount_out, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
+			if price.Mul(amount_left).Add(amount_out).LT(msg.MinOut) {
+				return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 			}
 
 			// price * r1 < amount_left
@@ -824,13 +827,17 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	// Check to see if amount_out meets the threshold of minOut
 	k.SetPairMap(ctx, pair)
 
-	if amount_out.LT(minOut) {
-		return amount_left, amount_out, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
+	if amount_out.LT(msg.MinOut) {
+		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 	}
+
+	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
+		token0, token1, msg.TokenIn, msg.AmountIn.String(), amount_out.String(), msg.MinOut.String(),
+	))
 
 	// Returns amount_out to keeper/msg.server: Swap
 	// @Dev token transfers happen in keeper/msg.server: Swap
-	return amount_left, amount_out, nil
+	return amount_out, nil
 }
 
 // Swap Limit Orders
