@@ -139,10 +139,10 @@ func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 
 	return token0, token1, callerAddr, receiverAddr, nil
 }
-func (k Keeper) routeVerification(goCtx context.Context, msg types.MsgRoute) (sdk.AccAddress, sdk.AccAddress, sdk.Dec, sdk.Dec, error) {
+func (k Keeper) routeVerification(goCtx context.Context, msg types.MsgRoute) (sdk.AccAddress, sdk.AccAddress, sdk.Dec, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	return k.tradeVerification(ctx, msg.Creator, msg.Receiver, msg.AmountIn, msg.TokenIn, msg.MinOut)
+	return k.tradeVerification(ctx, msg.Creator, msg.Receiver, msg.AmountIn, msg.TokenIn)
 
 }
 func (k Keeper) SwapVerification(goCtx context.Context, msg types.MsgSwap) (string, string, sdk.AccAddress, sdk.AccAddress, error) {
@@ -159,33 +159,33 @@ func (k Keeper) SwapVerification(goCtx context.Context, msg types.MsgSwap) (stri
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	callerAddr, receiverAddr, _, _, err := k.tradeVerification(ctx, msg.Creator, msg.Receiver, msg.AmountIn, msg.TokenIn, msg.MinOut)
+	callerAddr, receiverAddr, _, err := k.tradeVerification(ctx, msg.Creator, msg.Receiver, msg.AmountIn, msg.TokenIn)
 	return token0, token1, callerAddr, receiverAddr, err
 }
 
-func (k Keeper) tradeVerification(ctx sdk.Context, Creator string, Receiver string, UncheckedAmountIn sdk.Dec, TokenIn string, UncheckedMinOut sdk.Dec) (sdk.AccAddress, sdk.AccAddress, sdk.Dec, sdk.Dec, error) {
+func (k Keeper) tradeVerification(ctx sdk.Context, Creator string, Receiver string, UncheckedAmountIn sdk.Dec, TokenIn string) (sdk.AccAddress, sdk.AccAddress, sdk.Dec, error) {
 
 	// Converts input address (string) to sdk.AccAddress
 	callerAddr, err := sdk.AccAddressFromBech32(Creator)
 	// Error checking for the calling address
 	if err != nil {
-		return nil, nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return nil, nil, sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
 	receiverAddr, err := sdk.AccAddressFromBech32(Receiver)
 	// Error Checking for receiver address
 	if err != nil {
-		return nil, nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+		return nil, nil, sdk.ZeroDec(), sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
 	AccountsAmountInBalance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, TokenIn).Amount)
 
 	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 	if AccountsAmountInBalance.LT(UncheckedAmountIn) {
-		return nil, nil, sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
+		return nil, nil, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
-	return callerAddr, receiverAddr, UncheckedAmountIn, UncheckedMinOut, nil
+	return callerAddr, receiverAddr, UncheckedAmountIn, nil
 }
 
 func (k Keeper) PlaceLimitOrderVerification(goCtx context.Context, msg types.MsgPlaceLimitOrder) (string, string, sdk.AccAddress, error) {
