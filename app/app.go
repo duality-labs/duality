@@ -102,6 +102,9 @@ import (
 	dexmodule "github.com/NicholasDotSol/duality/x/dex"
 	dexmodulekeeper "github.com/NicholasDotSol/duality/x/dex/keeper"
 	dexmoduletypes "github.com/NicholasDotSol/duality/x/dex/types"
+	faucetmodule "github.com/NicholasDotSol/duality/x/faucet"
+	faucetmodulekeeper "github.com/NicholasDotSol/duality/x/faucet/keeper"
+	faucetmoduletypes "github.com/NicholasDotSol/duality/x/faucet/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -157,6 +160,7 @@ var (
 		vesting.AppModuleBasic{},
 		monitoringp.AppModuleBasic{},
 		dexmodule.AppModuleBasic{},
+		faucetmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -170,6 +174,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		dexmoduletypes.ModuleName:      {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+		faucetmoduletypes.ModuleName: {authtypes.Minter},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -232,6 +237,7 @@ type App struct {
 
 	DexKeeper dexmodulekeeper.Keeper
 
+	FaucetKeeper faucetmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -295,6 +301,7 @@ func NewApp(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey, monitoringptypes.StoreKey,
 		dexmoduletypes.StoreKey,
+		faucetmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -426,6 +433,15 @@ func NewApp(
 	)
 	dexModule := dexmodule.NewAppModule(appCodec, app.DexKeeper, app.AccountKeeper, app.BankKeeper)
 
+	app.FaucetKeeper = *faucetmodulekeeper.NewKeeper(
+		appCodec,
+		keys[faucetmoduletypes.StoreKey],
+		keys[faucetmoduletypes.MemStoreKey],
+		app.GetSubspace(faucetmoduletypes.ModuleName),
+		app.BankKeeper,
+	)
+	faucetModule := faucetmodule.NewAppModule(appCodec, app.FaucetKeeper, app.AccountKeeper, app.BankKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create static IBC router, add transfer route, then set and seal it
@@ -468,6 +484,7 @@ func NewApp(
 		transferModule,
 		monitoringModule,
 		dexModule,
+		faucetModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -497,6 +514,7 @@ func NewApp(
 		monitoringptypes.ModuleName,
 		dexmoduletypes.ModuleName,
 
+		faucetmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -522,6 +540,7 @@ func NewApp(
 		monitoringptypes.ModuleName,
 		dexmoduletypes.ModuleName,
 
+		faucetmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -552,6 +571,7 @@ func NewApp(
 		monitoringptypes.ModuleName,
 		dexmoduletypes.ModuleName,
 
+		faucetmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -578,6 +598,7 @@ func NewApp(
 		monitoringModule,
 		dexModule,
 
+		faucetModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 	app.sm.RegisterStoreDecoders()
@@ -768,6 +789,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(monitoringptypes.ModuleName)
 	paramsKeeper.Subspace(dexmoduletypes.ModuleName)
+	paramsKeeper.Subspace(faucetmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper

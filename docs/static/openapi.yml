@@ -29927,6 +29927,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/adjancey_matrix/{id}':
@@ -30091,6 +30101,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/edge_row/{id}':
@@ -30247,6 +30267,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -30418,6 +30448,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/pair_map/{pairId}':
@@ -30483,8 +30523,8 @@ paths:
             type: object
             properties:
               params:
-                description: params holds all the parameters of this module.
                 type: object
+                description: Params defines the parameters for the module.
             description: >-
               QueryParamsResponse is response type for the Query/Params RPC
               method.
@@ -30624,6 +30664,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -30819,6 +30869,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/tick_map/{tickIndex}':
@@ -30995,6 +31055,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/token_map/{address}':
@@ -31152,6 +31222,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/tokens/{id}':
@@ -31196,6 +31276,42 @@ paths:
           required: true
           type: string
           format: uint64
+      tags:
+        - Query
+  /NicholasDotSol/duality/faucet/params:
+    get:
+      summary: Parameters queries the parameters of the module.
+      operationId: NicholasdotsolDualityFaucetParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                type: object
+                description: Params defines the parameters for the module.
+            description: >-
+              QueryParamsResponse is response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
       tags:
         - Query
   /tendermint/spn/claim/airdrop_supply:
@@ -53432,8 +53548,8 @@ definitions:
     type: object
     properties:
       params:
-        description: params holds all the parameters of this module.
         type: object
+        description: Params defines the parameters for the module.
     description: QueryParamsResponse is response type for the Query/Params RPC method.
   nicholasdotsol.duality.dex.Reserve0AndSharesType:
     type: object
@@ -53520,6 +53636,21 @@ definitions:
         format: uint64
       address:
         type: string
+  nicholasdotsol.duality.faucet.MsgEmitResponse:
+    type: object
+    properties:
+      success:
+        type: boolean
+  nicholasdotsol.duality.faucet.Params:
+    type: object
+    description: Params defines the parameters for the module.
+  nicholasdotsol.duality.faucet.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        type: object
+        description: Params defines the parameters for the module.
+    description: QueryParamsResponse is response type for the Query/Params RPC method.
   tendermint.spn.claim.ClaimRecord:
     type: object
     properties:

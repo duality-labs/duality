@@ -1,0 +1,22 @@
+syntax = "proto3";
+package nicholasdotsol.duality.faucet;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/NicholasDotSol/duality/x/faucet/types";
+
+// Msg defines the Msg service.
+service Msg {
+      rpc Emit(MsgEmit) returns (MsgEmitResponse);
+// this line is used by starport scaffolding # proto/tx/rpc
+}
+
+message MsgEmit {
+  string creator = 1;
+}
+
+message MsgEmitResponse {
+  bool success = 1;
+}
+
+// this line is used by starport scaffolding # proto/tx/message
