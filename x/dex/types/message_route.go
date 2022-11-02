@@ -16,7 +16,6 @@ func NewMsgRoute(creator string, receiver string, tokenIn string, tokenOut strin
 		TokenIn:  tokenIn,
 		TokenOut: tokenOut,
 		AmountIn: amountIn,
-		MinOut:   minOut,
 	}
 }
 
