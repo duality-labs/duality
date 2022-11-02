@@ -95,7 +95,13 @@ message MsgRoute {
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountIn"
-  ]; 
+  ];
+  string minOut = 6 [
+      (gogoproto.moretags)   = "yaml:\"minOut\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "minOut"
+  ];  
 }
 
 message MsgRouteResponse {
