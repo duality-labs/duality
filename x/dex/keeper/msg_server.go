@@ -164,7 +164,7 @@ func (k msgServer) Route(goCtx context.Context, msg *types.MsgRoute) (*types.Msg
 	if amount_out.GT(sdk.ZeroDec()) {
 
 		coinOut := sdk.NewCoin(msg.TokenOut, sdk.NewIntFromBigInt(amount_out.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(msg.Receiver), sdk.Coins{coinOut}); err != nil {
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 			return &types.MsgRouteResponse{}, err
 		}
 	}
