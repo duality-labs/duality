@@ -141,8 +141,12 @@ func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 }
 func (k Keeper) routeVerification(goCtx context.Context, msg types.MsgRoute) (sdk.AccAddress, sdk.AccAddress, sdk.Dec, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+	if msg.MinOut.IsNil() {
+		// Malformed Input
+		return nil, nil, sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNoSpendableCoins, "MinOut cannot be nil")
+	}
 
-	return k.tradeVerification(ctx, msg.Creator, msg.Receiver, msg.AmountIn, msg.TokenIn)
+	return k.tradeVerification(ctx, msg.Creator, msg.Receiver, msg.AmountIn, msg.TokenIn, msg.AmountIn)
 
 }
 func (k Keeper) SwapVerification(goCtx context.Context, msg types.MsgSwap) (string, string, sdk.AccAddress, sdk.AccAddress, error) {
@@ -159,11 +163,11 @@ func (k Keeper) SwapVerification(goCtx context.Context, msg types.MsgSwap) (stri
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	callerAddr, receiverAddr, _, err := k.tradeVerification(ctx, msg.Creator, msg.Receiver, msg.AmountIn, msg.TokenIn)
+	callerAddr, receiverAddr, _, err := k.tradeVerification(ctx, msg.Creator, msg.Receiver, msg.AmountIn, msg.TokenIn, msg.AmountIn)
 	return token0, token1, callerAddr, receiverAddr, err
 }
 
-func (k Keeper) tradeVerification(ctx sdk.Context, Creator string, Receiver string, UncheckedAmountIn sdk.Dec, TokenIn string) (sdk.AccAddress, sdk.AccAddress, sdk.Dec, error) {
+func (k Keeper) tradeVerification(ctx sdk.Context, Creator string, Receiver string, UncheckedAmountIn sdk.Dec, TokenIn string, amountIn sdk.Dec) (sdk.AccAddress, sdk.AccAddress, sdk.Dec, error) {
 
 	// Converts input address (string) to sdk.AccAddress
 	callerAddr, err := sdk.AccAddressFromBech32(Creator)

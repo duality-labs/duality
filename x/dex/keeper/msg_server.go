@@ -130,6 +130,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	return &types.MsgSwapResponse{}, nil
 }
 
+// TODO: ADD CHECKS THAT ALL PARAMETERS ARE PASSED IN
 func (k msgServer) Route(goCtx context.Context, msg *types.MsgRoute) (*types.MsgRouteResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 

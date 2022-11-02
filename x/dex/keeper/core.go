@@ -627,7 +627,8 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				return sdk.ZeroDec(), err
 			}
 
-			// price * amout_left + amount_out < minOut, error we cannot meet minOut threshold
+			// price * amount_left + amount_out < minOut, error we cannot meet minOut threshold
+			// fmt.Println(amount_left, amount_out, msg.MinOut)
 			if price.Mul(amount_left).Add(amount_out).LT(msg.MinOut) {
 				return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 			}

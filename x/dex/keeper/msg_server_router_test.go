@@ -115,6 +115,7 @@ func (suite *IntegrationTestSuite) TestBasicMultiHopRoute() {
 		TokenOut: "STARS",
 		AmountIn: sdk.NewDec(10),
 		Receiver: alice.String(),
+		MinOut:   sdk.NewDec(0),
 	})
 	fmt.Println("Post Route", swapResponse)
 

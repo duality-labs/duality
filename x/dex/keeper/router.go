@@ -131,6 +131,7 @@ func (k Keeper) swapAcrossRoute(goCtx context.Context, callerAddress sdk.AccAddr
 			TokenB:   token1,
 			AmountIn: amountToSwap,
 			TokenIn:  bestRoute.path[i],
+			MinOut:   minOut,
 		}
 		if token0 == bestRoute.path[i] {
 			// TODO: Slippage check for the route
@@ -168,6 +169,8 @@ SIMULATE SWAP ALGORITHM
 */
 
 func (k Keeper) DynamicRouteSwap(goCtx context.Context, callerAddress sdk.AccAddress, receiverAddress sdk.AccAddress, tokenIn string, tokenOut string, amountIn sdk.Dec, minOut sdk.Dec, numChunks int64) (sdk.Dec, error) {
+	//TODO: Add checks that all arguments are passed in!
+
 	// Unnecessary for now!
 	// ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -228,7 +231,6 @@ func (k Keeper) DynamicRouteSwap(goCtx context.Context, callerAddress sdk.AccAdd
 		amountOut = amountOut.Add(routeAmountOut)
 	}
 
-	// Confirm amountOut routed through is greater than minOut
 	if amountOut.LT(minOut) {
 		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
 	}
@@ -273,7 +275,8 @@ func (k Keeper) CalculateChunkPrices(goCtx context.Context, callerAddress sdk.Ac
 			// Element-wise multiplication of each chunk's prices, to reflect accurate prices for each chunk
 			// Multiplying prices of each pair in the route
 			for j := 0; j < len(currentChunkPrices); j++ {
-				// fmt.Println("Inside Loop: ", j, chunkPrices[j])
+				fmt.Println("Inside Loop: ", j, chunkPrices[j])
+
 				currentChunkPrices[j] = currentChunkPrices[j].Mul(chunkPrices[j])
 			}
 		}
@@ -330,24 +333,29 @@ func (k Keeper) SimulateSwap0to1(goCtx context.Context, token0 string, token1 st
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
 	for !amount_left.Equal(sdk.ZeroDec()) {
+
 		// fmt.Println("Num Chunks So Far: ", numChunksSoFar)
 		// Tick data for tick that holds information about reserve1
 		Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1)
 
+		// TODO: Exit after certain # of ticks
 		if !Current1Found {
+			// iterate count
+			count += 1
+			if count > int(pair.TotalTickCount) {
+				break
+			}
 			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 - 1
 			continue
 		}
 
-		// iterate count
-		count++
+		count = 0
 
 		var i uint64
 
 		// iterator for feeList
 		i = 0
 		for i < feeSize && !amount_left.Equal(sdk.ZeroDec()) {
-			// fmt.Println("iteration", numChunksSoFar)
 			// gets fee for given feeIndex
 			fee := feelist[i].Fee
 			Current0Data, Current0Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1+2*fee)
@@ -365,7 +373,7 @@ func (k Keeper) SimulateSwap0to1(goCtx context.Context, token0 string, token1 st
 				// fmt.Println("Calculate price failed")
 				return chunkPrices, total_amount_out, err
 			}
-
+			// fmt.Println("Fee Tick ", i)
 			// price * r1 < amount_left
 			if price.Mul(Current1Data.TickData.Reserve1[i]).LT(amount_left) {
 				// amount_out += r1 (adds as all of reserve1 to amount_out)
@@ -404,6 +412,7 @@ func (k Keeper) SimulateSwap0to1(goCtx context.Context, token0 string, token1 st
 				}
 				numChunksSoFar++
 			}
+			// fmt.Println("Reached end of loop ")
 
 			//Make updates to tickMap containing reserve0/1 data to the KVStore
 
@@ -477,13 +486,19 @@ func (k Keeper) SimulateSwap1to0(goCtx context.Context, token0 string, token1 st
 
 		// If tick/feeIndex pair is not found continue
 
+		// TODO: Exit after certain # of ticks
 		if !Current0Found {
+			// iterate count
+			count += 1
+			if count > int(pair.TotalTickCount) {
+				break
+			}
 			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick1To0 + 1
 			continue
 		}
 
 		// iterate count
-		count++
+		count = 0
 
 		var i uint64
 
@@ -506,13 +521,13 @@ func (k Keeper) SimulateSwap1to0(goCtx context.Context, token0 string, token1 st
 			price, err := k.Calc_price(pair.TokenPair.CurrentTick1To0, true)
 
 			if err != nil {
-				fmt.Println("Calculate price failed")
+				// fmt.Println("Calculate price failed")
 				return chunkPrices, total_amount_out, err
 			}
 
 			// price * r1 < amount_left
 			if price.Mul(Current0Data.TickData.Reserve0AndShares[i].Reserve0).LT(amount_left) {
-				fmt.Println("not enough in reserves")
+				// fmt.Println("not enough in reserves")
 				// amountOut += amount_left * price
 				amount_out = amount_out.Add(Current0Data.TickData.Reserve0AndShares[i].Reserve0)
 				// decrement amount_left by price * reserve0
