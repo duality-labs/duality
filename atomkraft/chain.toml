@@ -1,13 +1,13 @@
-chain_id = "duality-1"
+chain_id = "cosmoshub-4"
 validators = 3
 accounts = 2
-binary = "dualityd"
-hrp_prefix = "duality"
+binary = "./cosmos-sdk/build/simd"
+hrp_prefix = "cosmos"
 denom = "stake"
 coin_type = 118
 
 [config_node.app]
-minimum-gas-prices = "0.000001stake"
+minimum-gas-prices = "0stake"
 api = { enable = true, swagger = true, enabled-unsafe-cors = true }
 rosetta = { enable = false }
 

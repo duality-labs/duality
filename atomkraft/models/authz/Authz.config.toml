@@ -1,0 +1,34 @@
+[Model]
+init = "Init"
+next = "Next"
+# invariants = []
+examples = ["NotExpireRevokeFailure"]
+
+[Constants]
+Accounts = "instance_Accounts"
+Validators = "instance_Validators"
+Coins = "instance_Coins"
+NoMaxCoins = "instance_NoMaxCoins"
+
+[Config]
+# location for the generated trace files
+# traces_dir = "traces"
+
+[Apalache]
+# the name of an operator that initializes CONSTANTS, default: None
+# cinit = "CInit"
+
+# configuration file in TLC format
+config = "Authz_MC.cfg"
+
+# maximal number of Next steps; default: 10
+length = 10
+
+# do not stop on first error, but produce up to a given number of counterexamples (fine tune with --view), default: 1
+max_error = 5
+
+# do not check for deadlocks; default: false
+no_deadlock = true
+
+# the state view to use with --max-error=n, default: transition index
+# view = "View"

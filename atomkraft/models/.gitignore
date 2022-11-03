@@ -1,0 +1,6 @@
+# Apalache
+_apalache-out/
+*_TTrace_*.tla
+
+# TLC
+*/states/
