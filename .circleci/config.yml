@@ -1,9 +1,9 @@
 version: 2.1
 jobs:
-  build:
+  go-test:
     working_directory: ~/repo
     docker:
-      - image: cimg/go:1.15.10
+      - image: cimg/go:1.19.3
     steps:
       - checkout
       - restore_cache:
@@ -12,13 +12,16 @@ jobs:
       - run:
           name: Install Dependencies
           command: go get ./...
-      - run:
-          name: Install Ignite
-          command: curl https://get.ignite.com/cli! | bash && mv ignite /usr/local/bin/
       - save_cache:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
       - run:
           name: Run tests
-          command: go test ./x/... -v
+          command: go test ./x/dex/keeper... -v
+    docker-tests:
+      working_directory: ~/repo
+      machine: true
+      steps:
+        - checkout
+        - run: LOG_LEVEL=warn docker-compose up --abort-on-container-exit -d
