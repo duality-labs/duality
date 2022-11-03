@@ -1,7 +1,7 @@
-chain_id = "cosmoshub-4"
+chain_id = "duality-1"
 validators = 3
 accounts = 2
-binary = "./cosmos-sdk/build/simd"
+binary = "dualityd"
 hrp_prefix = "cosmos"
 denom = "stake"
 coin_type = 118
