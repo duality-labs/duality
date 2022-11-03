@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  go-test:
+  go-tests:
     working_directory: ~/repo
     docker:
       - image: cimg/go:1.19.3
@@ -19,9 +19,17 @@ jobs:
       - run:
           name: Run tests
           command: go test ./x/dex/keeper... -v
-    docker-tests:
-      working_directory: ~/repo
-      machine: true
-      steps:
-        - checkout
-        - run: LOG_LEVEL=warn docker-compose up --abort-on-container-exit -d
+  docker-tests:
+    working_directory: ~/repo
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: Start docker-compose
+          command: LOG_LEVEL=warn docker-compose up --abort-on-container-exit -d
+workflows:
+  version: 1
+  run_all_tests:
+    jobs:
+      - go-tests
+      - docker-tests
