@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	//authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
@@ -24,8 +23,8 @@ func (suite *IntegrationTestSuite) TestPlaceLimitOrder() {
 	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("500000000000000000000")))
 	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
 
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, bob, balanceBob))
 
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
