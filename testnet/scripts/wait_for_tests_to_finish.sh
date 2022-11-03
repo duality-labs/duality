@@ -7,9 +7,12 @@ then
     exit 0
 fi
 
+# set total wait time in seconds
+total_wait_time_all_tests=180
+
 # check for desired state
 total_test_files=$(find /root/.duality/tests | grep .*\.sh$ --count)
-expected_tests="${1-$total_test_files}" timeout 120 bash -s -c -- '
+expected_tests="${1-$total_test_files}" timeout $total_wait_time_all_tests bash -s -c -- '
 
     echo "waiting for B: node$ID: $expected_tests"
 
