@@ -26,7 +26,7 @@ jobs:
       - checkout
       - run:
           name: Start docker-compose
-          command: LOG_LEVEL=warn docker-compose up --abort-on-container-exit -d
+          command: LOG_LEVEL=warn docker-compose up --abort-on-container-exit
 workflows:
   version: 1
   run_all_tests:
