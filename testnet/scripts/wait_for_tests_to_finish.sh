@@ -8,10 +8,11 @@ then
 fi
 
 # check for desired state
-timeout 30 bash -c -- '
+total_test_files=$(find /root/.duality/tests | grep .*\.sh$ --count)
+expected_tests="${1-$total_test_files}" timeout 120 bash -s -c -- '
 
-    total_test_files=$(find /root/.duality/tests | grep .*\.sh$ --count)
-    expected_tests="${1-$total_test_files}"
+    echo "waiting for B: node$ID: $expected_tests"
+
     echo "expected_tests: $expected_tests"
 
     echo " --- Waiting for $expected_tests tests to have finished --- ";
