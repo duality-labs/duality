@@ -12,6 +12,9 @@ jobs:
       - run:
           name: Install Dependencies
           command: go get ./...
+      - run:
+          name: Install Ignite
+          command: curl https://get.ignite.com/cli! | bash && mv ignite /usr/local/bin/
       - save_cache:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
