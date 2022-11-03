@@ -22,7 +22,7 @@ RUN go mod download
 # rename the generated token names
 RUN sed -i 's/"testtoken"/"token"/g' simapp/simd/cmd/testnet.go;
 
-RUN make build-linux
+RUN make build
 
 RUN echo $(ls ./)
 
