@@ -24,6 +24,8 @@ RUN sed -i 's/"testtoken"/"token"/g' simapp/simd/cmd/testnet.go;
 
 RUN make build-linux
 
+RUN echo $(ls ./)
+
 # generate base chain testnet configurations /root/.testnet
 RUN build/simd testnet init-files \
     --v 4 \
