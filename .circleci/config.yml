@@ -21,7 +21,8 @@ jobs:
           command: go test ./x/dex/keeper... -v
   docker-tests:
     working_directory: ~/repo
-    machine: true
+    machine:
+      image: ubuntu-2204:2022.10.1
     steps:
       - checkout
       - run:
