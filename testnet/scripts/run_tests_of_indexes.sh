@@ -19,6 +19,10 @@ do
     # here is a fake call instead which should be removed
     bash /root/.duality/tests/dex-deposit.sh
 
+    # note: attempting to record the processing time of any transaction in this way is difficult/impossible
+    # as the logic for the transaction is not evoked immediately, it will be called and finished within
+    # Tendermint's own process time on the current leading validator
+
     # this transaction send a memo of "completed-test-x" which all nodes may listen to to find test completion progress
     dualityd tx bank send $(dualityd keys show fred --output json | jq -r .address) $(dualityd keys show fred --output json | jq -r .address) 1token -y --broadcast-mode block --output json --note "completed-test-$index"
 
