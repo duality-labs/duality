@@ -24,12 +24,5 @@ fi
 
 echo "$test_name: Deposited coins to ticks"
 
-# todo: time the above function, it is a rough calculation of round trip processing time of the function
-
-# todo: somehow time how long it takes just the function to be processed
-# we could use --broadcast-mode async to send just the transaction and then time the response time
-# this could be quite inaccurate due to the chain may be waiting for other Msgs to appear before finalizing the transaction.
-# bash /root/.duality/scripts/wait_for_transaction_to_equal_code.sh $txhash 0
-
 # todo: check state after? (requires tests to be done in series)
 # bash /root/.duality/scripts/expect_state_value_length_to_be.sh ".app_state.dex.sharesList" 1
