@@ -29,8 +29,12 @@ jobs:
           name: Start docker-compose
           command: LOG_LEVEL=warn docker-compose up --abort-on-container-exit
 workflows:
-  version: 1
-  run_all_tests:
+  version: 2
+  full_test_suite:
     jobs:
       - go-tests
-      - docker-tests
+      - docker-tests:
+          filters:
+            tags:
+              only: e2e-test
+
