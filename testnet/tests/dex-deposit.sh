@@ -16,12 +16,9 @@ echo "$test_name: start test"
 # wait for tx to be processed and return an exit code
 # (amounts 0.0000000000000001 are measured in token main denom, whereas when using the bank send function (1000) that is in the small denom which is 1e18x smaller)
 tx_result=$(dualityd tx dex deposit $(dualityd keys show $person --output json | jq -r .address) tokenA tokenB 0.0000000000000001 0.0000000000000001 1 0 --from "$person" --yes --output json --broadcast-mode block)
-tx_code=$(echo $tx_result | jq -r .code)
-if [[ "$tx_code" != "0" ]]
-then
-    echo "$test_name error ($tx_code) at $(echo $tx_result | jq -r .txhash): $(echo $tx_result | jq -r .raw_log)"
-    exit $tx_code
-fi
+
+# assert that result has no errors
+bash /root/.duality/scripts/test_helpers.sh throwOnTxError "$test_name" "$tx_result"
 
 echo "$test_name: Deposited coins to ticks"
 
