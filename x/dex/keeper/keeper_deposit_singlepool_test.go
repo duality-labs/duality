@@ -21,8 +21,9 @@ import (
 
 // TODO: better name
 type CosmostTestEnv struct {
-	app              *dualityapp.App
-	msgServer        types.MsgServer
+	app       *dualityapp.App
+	msgServer types.MsgServer
+	// TODO: keeping ctx in struct is bad practice: https://pkg.go.dev/context#pkg-overview
 	ctx              sdk.Context
 	queryClient      types.QueryClient
 	dexModuleAddress string
@@ -105,29 +106,103 @@ func singlePoolSetup(t *testing.T, cosmos CosmostTestEnv) TestEnv {
 	}
 }
 
-func calculateShares() sdk.Coin {
+// Helpers for calculating the amount of shares that should be minted
+// These are here for the sake of more concise unit tests and the corresponding code in core.go
+// should eventually be refactored so that core.go is modularized for easier unit testing and readability
+
+func calculateSharesEmpty(amount0 sdk.Dec, amount1 sdk.Dec, price sdk.Dec) sdk.Dec {
+	return amount0.Add(amount1.Mul(price))
+}
+
+func calculateSharesNonEmpty(amount sdk.Dec, reserve sdk.Dec, totalShares sdk.Dec) sdk.Dec {
+	return amount.Quo(reserve).Mul(totalShares)
+}
+
+func calculateSharesPure(
+	amount0 sdk.Dec,
+	trueAmount0 sdk.Dec,
+	amount1 sdk.Dec,
+	trueAmount1 sdk.Dec,
+	price sdk.Dec,
+	feeIndex uint64,
+	lowerTickFound bool,
+	lowerReserve1 sdk.Dec,
+	upperTickFound bool,
+	upperReserve0 sdk.Dec,
+	upperTotalShares sdk.Dec,
+) sdk.Dec {
 	// calculating shares minted in DepositHelper
-	// TODO: comment what this corresponds to
-	// if !lowerTickFound || !upperTickFound || upperTick.TickData.Reserve0AndShares[feeIndex].TotalShares.Equal(sdk.ZeroDec()) {
-	// sharesMinted = amount0.Add(amount1.Mul(price))
-	// } else {
-	// // If a new tick has been placed that tigtens the range between currentTick0to1 and currentTick0to1 update CurrentTicks to the tighest ticks
-	// if trueAmount0.GT(sdk.ZeroDec()) && ((tickIndex+fee > pair.TokenPair.CurrentTick0To1) && (tickIndex+fee < pair.TokenPair.CurrentTick1To0)) {
-	// pair.TokenPair.CurrentTick1To0 = tickIndex + fee
-	// }
-	// if trueAmount1.GT(sdk.ZeroDec()) && ((tickIndex-fee > pair.TokenPair.CurrentTick0To1) && (tickIndex-fee < pair.TokenPair.CurrentTick1To0)) {
-	// pair.TokenPair.CurrentTick0To1 = tickIndex - fee
-	// }
-	// }
-	i, _ := sdk.NewIntFromString("1")
-	return sdk.NewCoin("TickShares", i)
+	if !lowerTickFound || !upperTickFound || upperTotalShares.Equal(sdk.ZeroDec()) {
+		// this case corresponds to lines 129-132 in function DepositHelper of core.go
+		return calculateSharesEmpty(amount0, amount1, price)
+	} else {
+		// these cases correspond to lines 228-234 in function DepositHelper of core.go
+		if trueAmount0.GT(sdk.ZeroDec()) {
+			return calculateSharesNonEmpty(trueAmount0, upperReserve0, upperTotalShares)
+		} else {
+			return calculateSharesNonEmpty(trueAmount1, lowerReserve1, upperTotalShares)
+		}
+	}
+}
+
+func calculateShares(amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex int64, feeIndex uint64, t *testing.T, env *TestEnv) sdk.Dec {
+	k, ctx := env.cosmos.app.DexKeeper, env.cosmos.ctx
+
+	price, err := k.Calc_price(tickIndex, false)
+	if err != nil {
+		t.Errorf("TODO: calc price error format")
+	}
+
+	feelist := k.GetAllFeeList(ctx)
+	fee := feelist[feeIndex].Fee
+
+	lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, tickIndex-fee)
+	upperTick, upperTickFound := k.GetTickMap(ctx, pairId, tickIndex+fee)
+	lowerReserve1 := lowerTick.TickData.Reserve1[feeIndex]
+	upperReserve0, upperTotalShares := upperTick.TickData.Reserve0AndShares[feeIndex].Reserve0, upperTick.TickData.Reserve0AndShares[feeIndex].TotalShares
+
+	trueAmount0, trueAmount1 := amount0, amount1
+	if upperReserve0.GT(sdk.ZeroDec()) {
+		// this corresponds to lines 217-221  in function DepositHelper of core.go
+		trueAmount1 = k.Min(amount1, lowerReserve1.Mul(amount0).Quo(upperReserve0))
+	}
+	if lowerReserve1.GT(sdk.ZeroDec()) {
+		// this corresponds to lines 223-226 in function DepositHelper of core.go
+		trueAmount0 = k.Min(amount0, upperReserve0.Mul(amount1).Quo(lowerReserve1))
+	}
+
+	return calculateSharesPure(
+		amount0,
+		trueAmount0,
+		amount1,
+		trueAmount1,
+		price,
+		feeIndex,
+		lowerTickFound,
+		lowerReserve1,
+		upperTickFound,
+		upperReserve0,
+		upperTotalShares,
+	)
+}
+
+func makePairId(coinA sdk.Coin, coinB sdk.Coin, tickIndex int64, feeIndex uint64, t *testing.T, env *TestEnv) string {
+	// TODO: this really needs to be cleaned up
+	app, ctx, goCtx, k := env.cosmos.app, env.cosmos.ctx, sdk.WrapSDKContext(env.cosmos.ctx), env.cosmos.app.DexKeeper
+	token0, token1, err := k.SortTokens(ctx, coinA.Denom, coinB.Denom)
+	if err != nil {
+		t.Errorf("TODO: token sort error")
+	}
+	feelist := k.GetAllFeeList(ctx)
+	pairId, err := app.DexKeeper.PairInit(goCtx, token0, token1, tickIndex, feelist[feeIndex].Fee)
+	if err != nil {
+		t.Errorf("TODO: pairId error format")
+	}
+	return pairId
 }
 
 func testSingleDeposit(t *testing.T, coinA sdk.Coin, coinB sdk.Coin, acc sdk.AccAddress, tickIndexes []int64, feeTiers []uint64, env *TestEnv) {
-	// TODO
-	// - take in pair of Coins to allow for initializing a pair or using existing pair (use Coin.Denom when calling Deposit)
-	// - take in receiver instead of hardcoding alice
-	// - modify this for len(tickIndexes) > 1
+	// TODO: modify this for len(tickIndexes) > 1
 	app, ctx := env.cosmos.app, env.cosmos.ctx
 	goCtx := sdk.WrapSDKContext(ctx)
 
@@ -146,13 +221,13 @@ func testSingleDeposit(t *testing.T, coinA sdk.Coin, coinB sdk.Coin, acc sdk.Acc
 	// get amount of shares before depositing
 
 	// WHEN depositing the specified amounts coinA and coinB
-	// (discard message response because we don't need it)
-	_, err := env.cosmos.msgServer.Deposit(goCtx, &types.MsgDeposit{
+	amount0, amount1 := sdk.NewDecFromIntWithPrec(coinA.Amount, 18), sdk.NewDecFromIntWithPrec(coinB.Amount, 18)
+	_, err := env.cosmos.msgServer.Deposit(goCtx, &types.MsgDeposit{ // (discard message response because we don't need it)
 		Creator:     acc.String(),
 		TokenA:      coinA.Denom,
 		TokenB:      coinB.Denom,
-		AmountsA:    []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, // Coin is already denominated in 1e18
-		AmountsB:    []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)},
+		AmountsA:    []sdk.Dec{amount0}, // Coin is already denominated in 1e18
+		AmountsB:    []sdk.Dec{amount1},
 		TickIndexes: tickIndexes, // single deposit
 		FeeIndexes:  feeTiers,
 		Receiver:    acc.String(),
@@ -184,11 +259,15 @@ func testSingleDeposit(t *testing.T, coinA sdk.Coin, coinB sdk.Coin, acc sdk.Acc
 	}
 
 	// verify shares minted for alice
-	// accShares, _ := calculateShares()
-	// pairId := "0"
-	// mintedShares, found := app.DexKeeper.GetShares(ctx, acc.String(), pairId, tickIndexes[0], feeTiers[0])
-	// suite.Require().True(found)
-	// suite.Require().True(mintedShares.SharesOwned.Equal(accShares))
+	pairId := makePairId(coinA, coinB, tickIndexes[0], feeTiers[0], t, env)
+	accShares := calculateShares(amount0, amount1, pairId, tickIndexes[0], feeTiers[0], t, env)
+	mintedShares, found := app.DexKeeper.GetShares(ctx, acc.String(), pairId, tickIndexes[0], feeTiers[0])
+	if !found {
+		t.Errorf("Shares resulting from deposit by %s have not been minted (not found by getter).", acc)
+	}
+	if !(mintedShares.SharesOwned.Equal(accShares)) {
+		t.Errorf("Incorrect amount of shares minted after deposit by %s of %s, %s. Needed %s, minted %s", acc, coinA, coinB, accShares, mintedShares.SharesOwned)
+	}
 }
 
 func TestMinFeeTier(t *testing.T) {
