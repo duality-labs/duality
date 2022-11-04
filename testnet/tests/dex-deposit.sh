@@ -7,9 +7,9 @@ test_name="dex: can make deposit"
 # bash /root/.duality/scripts/expect_state_value_length_to_be.sh ".app_state.dex.sharesList" 0
 
 echo "$test_name: setup"
-person=$(openssl rand -hex 12)
-dualityd keys add $person <<< $'asdfasdf\nn'
-dualityd tx bank send $(dualityd keys show fred --output json | jq -r .address) $(dualityd keys show $person --output json | jq -r .address) 1000tokenA,1000tokenB -y --broadcast-mode block --output json
+
+# create new person with funds
+person=$(bash /root/.duality/scripts/test_helpers.sh createAndFundUser 1000tokenA,1000tokenB)
 
 echo "$test_name: start test"
 # deposit tokens
