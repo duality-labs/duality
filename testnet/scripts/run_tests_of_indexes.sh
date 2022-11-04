@@ -13,11 +13,8 @@ while [ $index -le $test_count_end ]
 do
     echo "start test number: $index"
 
-    # todo call the test file by its index number here
-    # go test $(find /root/.duality/tests | grep .*\.sh$ --index $index) # this is psuedocode
-
-    # here is a fake call instead which should be removed
-    bash /root/.duality/tests/dex-deposit.sh
+    # call test files by index number
+    bash "$(find /root/.duality/tests | grep .*\.sh$ | head -$index | tail -1)"
 
     # note: attempting to record the processing time of any transaction in this way is difficult/impossible
     # as the logic for the transaction is not evoked immediately, it will be called and finished within
