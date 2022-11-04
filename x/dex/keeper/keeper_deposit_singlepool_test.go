@@ -73,10 +73,10 @@ func singlePoolSetup(t *testing.T, cosmos CosmostTestEnv) TestEnv {
 	balancesBob := sdk.NewCoins(newACoin(convInt("10000000000000000000")), newBCoin(convInt("10000000000000000000")))
 	// TODO: don't use simapp
 	if err := (simapp.FundAccount(app.BankKeeper, ctx, alice, balancesAlice)); err != nil {
-		t.Logf("Failed to fund %s with %s", alice, balancesAlice)
+		t.Errorf("Failed to fund %s with %s", alice, balancesAlice)
 	}
 	if err := (simapp.FundAccount(app.BankKeeper, ctx, bob, balancesBob)); err != nil {
-		t.Logf("Failed to fund %s with %s", bob, balancesBob)
+		t.Errorf("Failed to fund %s with %s", bob, balancesBob)
 	}
 
 	// add the fee tiers of 1, 3, 5 ticks
@@ -135,10 +135,10 @@ func testSingleDeposit(t *testing.T, coinA sdk.Coin, coinB sdk.Coin, acc sdk.Acc
 	accBalanceAInitial, accBalanceBInitial := newACoin(env.balances[acc.String()].AmountOf(coinA.Denom)), newBCoin(env.balances[acc.String()].AmountOf(coinB.Denom))
 	// verify acc has exactly the balance passed in from env
 	if !(app.BankKeeper.GetBalance(ctx, acc, coinA.Denom).IsEqual(accBalanceAInitial)) {
-		t.Logf("%s's initial balance of %s does not match env", acc, coinA.Denom)
+		t.Errorf("%s's initial balance of %s does not match env: %s", acc, coinA, accBalanceAInitial)
 	}
 	if !(app.BankKeeper.GetBalance(ctx, acc, coinB.Denom).IsEqual(accBalanceBInitial)) {
-		t.Logf("%s's initial balance of %s does not match env", acc, coinB.Denom)
+		t.Errorf("%s's initial balance of %s does not match env: %s", acc, coinB, accBalanceBInitial)
 	}
 	// get bank initial balance
 	dexAllCoinsInitial := app.BankKeeper.GetAllBalances(ctx, app.AccountKeeper.GetModuleAddress("dex"))
@@ -151,8 +151,8 @@ func testSingleDeposit(t *testing.T, coinA sdk.Coin, coinB sdk.Coin, acc sdk.Acc
 		Creator:     acc.String(),
 		TokenA:      coinA.Denom,
 		TokenB:      coinB.Denom,
-		AmountsA:    []sdk.Dec{coinA.Amount.ToDec()},
-		AmountsB:    []sdk.Dec{coinB.Amount.ToDec()},
+		AmountsA:    []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, // Coin is already denominated in 1e18
+		AmountsB:    []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)},
 		TickIndexes: tickIndexes, // single deposit
 		FeeIndexes:  feeTiers,
 		Receiver:    acc.String(),
@@ -161,26 +161,26 @@ func testSingleDeposit(t *testing.T, coinA sdk.Coin, coinB sdk.Coin, acc sdk.Acc
 	// THEN no error, alice's balances changed only by the amount depoisited, funds transfered to dex module, and position minted with appropriate fee tier
 	// verify no error
 	if err != nil {
-		t.Logf("Deposit of %s, %s by %s failed: %s", coinA, coinB, acc, err)
+		t.Errorf("Deposit of %s, %s by %s failed: %s", coinA, coinB, acc, err)
 	}
 
 	// verify alice's resulting balances is aliceBalanceInitial - depositCoin
 	accBalanceAFinal, accBalanceBFinal := accBalanceAInitial.Sub(coinA), accBalanceBInitial.Sub(coinB)
 	if !(app.BankKeeper.GetBalance(ctx, acc, coinA.Denom).IsEqual(accBalanceAFinal)) {
-		t.Logf("%s's final balance of %s does not reflect deposit", acc, coinA.Denom)
+		t.Errorf("%s's final balance of %s does not reflect deposit", acc, coinA)
 	}
 	if !(app.BankKeeper.GetBalance(ctx, acc, coinB.Denom).IsEqual(accBalanceBFinal)) {
-		t.Logf("%s's final balance of %s does not reflect deposit", acc, coinB.Denom)
+		t.Errorf("%s's final balance of %s does not reflect deposit", acc, coinB)
 	}
 
 	// verify dex's resulting balances is dexBalanceInitial + depositCoin
 	dexAllCoinsFinal := app.BankKeeper.GetAllBalances(ctx, app.AccountKeeper.GetModuleAddress("dex"))
 	dexBalanceAFinal, dexBalanceBFinal := dexBalanceAInitial.Add(coinA), dexBalanceBInitial.Add(coinB)
 	if !(newACoin(dexAllCoinsFinal.AmountOf(coinA.Denom)).IsEqual(dexBalanceAFinal)) {
-		t.Logf("Dex module's final balance of %s does not reflect deposit", coinA.Denom)
+		t.Errorf("Dex module's final balance of %s does not reflect deposit", coinA.Denom)
 	}
 	if !(newBCoin(dexAllCoinsFinal.AmountOf(coinB.Denom)).IsEqual(dexBalanceBFinal)) {
-		t.Logf("Dex module's final balance of %s does not reflect deposit", coinB.Denom)
+		t.Errorf("Dex module's final balance of %s does not reflect deposit", coinB.Denom)
 	}
 
 	// verify shares minted for alice
@@ -192,15 +192,12 @@ func testSingleDeposit(t *testing.T, coinA sdk.Coin, coinB sdk.Coin, acc sdk.Acc
 }
 
 func TestMinFeeTier(t *testing.T) {
-	fmt.Println("[ UnitTests|Keeper| ] Starting test: SinglePool/MinFeeTier")
+	fmt.Println("[ UnitTests|Keeper ] Starting test: SinglePool/MinFeeTier")
 	env := singlePoolSetup(t, cosmosEnvSetup())
 
 	// prep deposit args
 	acc := env.addrs[0]
-	fmt.Printf("acc balances: %s\n\n", env.balances[acc.String()])
 	coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
-	fmt.Println("got balances")
-	env.balances[acc.String()][0] = coinA.Add(coinA)
 
 	// deposit with min fee tier
 	tickIndex := []int64{0}
@@ -211,7 +208,7 @@ func TestMinFeeTier(t *testing.T) {
 }
 
 func TestMaxFeeTier(t *testing.T) {
-	fmt.Println("[UnitTests|Keeper|SinglePool|MaxFeeTier] Starting test.")
+	fmt.Println("[ UnitTests|Keeper ] Starting test: SinglePool/MaxFeeTier")
 	env := singlePoolSetup(t, cosmosEnvSetup())
 
 	// prep deposit args
