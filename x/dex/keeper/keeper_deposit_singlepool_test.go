@@ -110,14 +110,18 @@ func singlePoolSetup(t *testing.T, cosmos CosmostTestEnv) TestEnv {
 // These are here for the sake of more concise unit tests and the corresponding code in core.go
 // should eventually be refactored so that core.go is modularized for easier unit testing and readability
 
+// Calculation of shares when depositing the initial amount (no reserves)
 func calculateSharesEmpty(amount0 sdk.Dec, amount1 sdk.Dec, price sdk.Dec) sdk.Dec {
 	return amount0.Add(amount1.Mul(price))
 }
 
+// Calculation of shares when there are pre-existing reserves
 func calculateSharesNonEmpty(amount sdk.Dec, reserve sdk.Dec, totalShares sdk.Dec) sdk.Dec {
 	return amount.Quo(reserve).Mul(totalShares)
 }
 
+// Pure func that takes all the parameters requires to compute the amount of minted shares and handles the different cases accordingly.
+// This is probably excessive as keeping only the calculation pure is reasonable enough, but it's here for posterity.
 func calculateSharesPure(
 	amount0 sdk.Dec,
 	trueAmount0 sdk.Dec,
@@ -145,6 +149,7 @@ func calculateSharesPure(
 	}
 }
 
+// Impure function that pulls all the state variables required for calculating the amount of shares to mint.
 func calculateShares(amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex int64, feeIndex uint64, t *testing.T, env *TestEnv) sdk.Dec {
 	k, ctx := env.cosmos.app.DexKeeper, env.cosmos.ctx
 
@@ -158,12 +163,13 @@ func calculateShares(amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex 
 
 	lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, tickIndex-fee)
 	upperTick, upperTickFound := k.GetTickMap(ctx, pairId, tickIndex+fee)
+	// TODO: this won't work if not found
 	lowerReserve1 := lowerTick.TickData.Reserve1[feeIndex]
 	upperReserve0, upperTotalShares := upperTick.TickData.Reserve0AndShares[feeIndex].Reserve0, upperTick.TickData.Reserve0AndShares[feeIndex].TotalShares
 
 	trueAmount0, trueAmount1 := amount0, amount1
 	if upperReserve0.GT(sdk.ZeroDec()) {
-		// this corresponds to lines 217-221  in function DepositHelper of core.go
+		// this corresponds to lines 217-221 in function DepositHelper of core.go
 		trueAmount1 = k.Min(amount1, lowerReserve1.Mul(amount0).Quo(upperReserve0))
 	}
 	if lowerReserve1.GT(sdk.ZeroDec()) {
@@ -186,23 +192,30 @@ func calculateShares(amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex 
 	)
 }
 
+// Helper for getting a pair id
 func makePairId(coinA sdk.Coin, coinB sdk.Coin, tickIndex int64, feeIndex uint64, t *testing.T, env *TestEnv) string {
-	// TODO: this really needs to be cleaned up
+	// TODO: this really should be cleaned up
 	app, ctx, goCtx, k := env.cosmos.app, env.cosmos.ctx, sdk.WrapSDKContext(env.cosmos.ctx), env.cosmos.app.DexKeeper
 	token0, token1, err := k.SortTokens(ctx, coinA.Denom, coinB.Denom)
 	if err != nil {
 		t.Errorf("TODO: token sort error")
 	}
+
+	// this corresponds to line 16 in function DepositVerification of verification.go
 	feelist := k.GetAllFeeList(ctx)
+
+	// this corresponds to line 304 in function DepositCore of core.go
 	pairId, err := app.DexKeeper.PairInit(goCtx, token0, token1, tickIndex, feelist[feeIndex].Fee)
 	if err != nil {
 		t.Errorf("TODO: pairId error format")
 	}
+
 	return pairId
 }
 
+// Template function for
 func testSingleDeposit(t *testing.T, coinA sdk.Coin, coinB sdk.Coin, acc sdk.AccAddress, tickIndexes []int64, feeTiers []uint64, env *TestEnv) {
-	// TODO: modify this for len(tickIndexes) > 1
+	// TODO: modify this for len(tickIndexes) > 1, i.e. testMultipleDeposits
 	app, ctx := env.cosmos.app, env.cosmos.ctx
 	goCtx := sdk.WrapSDKContext(ctx)
 
@@ -219,6 +232,8 @@ func testSingleDeposit(t *testing.T, coinA sdk.Coin, coinB sdk.Coin, acc sdk.Acc
 	dexAllCoinsInitial := app.BankKeeper.GetAllBalances(ctx, app.AccountKeeper.GetModuleAddress("dex"))
 	dexBalanceAInitial, dexBalanceBInitial := newACoin(dexAllCoinsInitial.AmountOf(coinA.Denom)), newBCoin(dexAllCoinsInitial.AmountOf(coinB.Denom))
 	// get amount of shares before depositing
+	pairId := makePairId(coinA, coinB, tickIndexes[0], feeTiers[0], t, env)
+	initialShares, initialSharesFound := app.DexKeeper.GetShares(ctx, acc.String(), pairId, tickIndexes[0], feeTiers[0])
 
 	// WHEN depositing the specified amounts coinA and coinB
 	amount0, amount1 := sdk.NewDecFromIntWithPrec(coinA.Amount, 18), sdk.NewDecFromIntWithPrec(coinB.Amount, 18)
@@ -259,14 +274,16 @@ func testSingleDeposit(t *testing.T, coinA sdk.Coin, coinB sdk.Coin, acc sdk.Acc
 	}
 
 	// verify shares minted for alice
-	pairId := makePairId(coinA, coinB, tickIndexes[0], feeTiers[0], t, env)
-	accShares := calculateShares(amount0, amount1, pairId, tickIndexes[0], feeTiers[0], t, env)
-	mintedShares, found := app.DexKeeper.GetShares(ctx, acc.String(), pairId, tickIndexes[0], feeTiers[0])
+	accSharesCalc := calculateShares(amount0, amount1, pairId, tickIndexes[0], feeTiers[0], t, env)
+	finalShares, found := app.DexKeeper.GetShares(ctx, acc.String(), pairId, tickIndexes[0], feeTiers[0])
 	if !found {
 		t.Errorf("Shares resulting from deposit by %s have not been minted (not found by getter).", acc)
-	}
-	if !(mintedShares.SharesOwned.Equal(accShares)) {
-		t.Errorf("Incorrect amount of shares minted after deposit by %s of %s, %s. Needed %s, minted %s", acc, coinA, coinB, accShares, mintedShares.SharesOwned)
+	} else if !initialSharesFound && !(finalShares.SharesOwned.Equal(accSharesCalc)) {
+		// Handle the case when no shares held by account initially but mintedShares != accSharesCalc
+		t.Errorf("Incorrect amount of shares minted after deposit by %s of %s, %s. Needed %s, final %s", acc, coinA, coinB, accSharesCalc, finalShares.SharesOwned)
+	} else if initialSharesFound && !finalShares.SharesOwned.Equal(initialShares.SharesOwned.Add(accSharesCalc)) {
+		// Handle the case when account had an initial balance of shares but finalShares != initalShares + accSharesCalc
+		t.Errorf("Incorrect amount of shares minted after deposit by %s of %s, %s. Needed %s, final %s", acc, coinA, coinB, initialShares.SharesOwned.Add(accSharesCalc), finalShares.SharesOwned)
 	}
 }
 
