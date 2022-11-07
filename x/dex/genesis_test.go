@@ -63,7 +63,7 @@ func TestGenesis(t *testing.T) {
 		},
 		FeeListCount: 2,
 
-		LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
+		LimitOrderPoolUserShareObjectList: []types.LimitOrderPoolUserShareObject{
 			{
 				Count:   0,
 				Address: "0",
@@ -83,7 +83,7 @@ func TestGenesis(t *testing.T) {
 				Address: "1",
 			},
 		},
-		LimitOrderPoolTotalSharesMapList: []types.LimitOrderPoolTotalSharesMap{
+		LimitOrderPoolTotalSharesObjectList: []types.LimitOrderPoolTotalSharesObject{
 			{
 				Count: 0,
 			},
@@ -125,9 +125,9 @@ func TestGenesis(t *testing.T) {
 	require.ElementsMatch(t, genesisState.SharesList, got.SharesList)
 	require.ElementsMatch(t, genesisState.FeeListList, got.FeeListList)
 	require.Equal(t, genesisState.FeeListCount, got.FeeListCount)
-	require.ElementsMatch(t, genesisState.LimitOrderPoolUserShareMapList, got.LimitOrderPoolUserShareMapList)
+	require.ElementsMatch(t, genesisState.LimitOrderPoolUserShareObjectList, got.LimitOrderPoolUserShareObjectList)
 	require.ElementsMatch(t, genesisState.LimitOrderPoolUserSharesWithdrawnList, got.LimitOrderPoolUserSharesWithdrawnList)
-	require.ElementsMatch(t, genesisState.LimitOrderPoolTotalSharesMapList, got.LimitOrderPoolTotalSharesMapList)
+	require.ElementsMatch(t, genesisState.LimitOrderPoolTotalSharesObjectList, got.LimitOrderPoolTotalSharesObjectList)
 	require.ElementsMatch(t, genesisState.LimitOrderPoolReserveObjectList, got.LimitOrderPoolReserveObjectList)
 	require.ElementsMatch(t, genesisState.LimitOrderPoolFillObjectList, got.LimitOrderPoolFillObjectList)
 	// this line is used by starport scaffolding # genesis/test/assert

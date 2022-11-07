@@ -473,8 +473,8 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			// handles pairCount management in the best case scenario that all liqudity has been depleted and that a limit order does not exists at this tick.
 			// @Dev, pairCount (number of active ticks for a specfied pair) is a heuristic to reduce unecessary iterations when swapping assets, pairCount does not need to decrement, but in cases where we can it doing so can improve runtime.
 
-			Pool0to1, Pool0to1Found := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, upperTick.TickIndex, token0, 0)
-			Pool1to0, Pool1to0Found := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, upperTick.TickIndex, token1, 0)
+			Pool0to1, Pool0to1Found := k.GetLimitOrderPoolTotalSharesObject(ctx, pairId, upperTick.TickIndex, token0, 0)
+			Pool1to0, Pool1to0Found := k.GetLimitOrderPoolTotalSharesObject(ctx, pairId, upperTick.TickIndex, token1, 0)
 
 			if (!Pool0to1Found || Pool0to1.TotalShares.Equal(sdk.ZeroDec())) && (!Pool1to0Found || Pool1to0.TotalShares.Equal(sdk.ZeroDec())) {
 				pair.TotalTickCount = pair.TotalTickCount - 1
@@ -1102,16 +1102,16 @@ func (k Keeper) PlaceLimitOrderHelper(goCtx context.Context, pairId string, tick
 
 // Helper function for Place Limit order retrieving and or initializing mapppings used for keeping track of limit orders
 // Note: FillMap initialization is handled seperately in placeLimitOrder as it needed prior to this function being called.
-func (k Keeper) PlaceLimitOrderMappingHelper(goCtx context.Context, pairId string, tickIndex int64, tokenIn string, currentLimitOrderKey uint64, receiver string) (types.LimitOrderPoolReserveObject, types.LimitOrderPoolUserShareMap, types.LimitOrderPoolTotalSharesMap) {
+func (k Keeper) PlaceLimitOrderMappingHelper(goCtx context.Context, pairId string, tickIndex int64, tokenIn string, currentLimitOrderKey uint64, receiver string) (types.LimitOrderPoolReserveObject, types.LimitOrderPoolUserShareObject, types.LimitOrderPoolTotalSharesObject) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Retrieves ReserveData Object from KVStore
 	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveObject(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
 	// Retrieves UserShareMap object from KVStore
-	UserShareData, UserShareDataFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
+	UserShareData, UserShareDataFound := k.GetLimitOrderPoolUserShareObject(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
 	// Retrives TotalSharesMap object from KVStore
-	TotalSharesData, TotalSharesDataFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
+	TotalSharesData, TotalSharesDataFound := k.GetLimitOrderPoolTotalSharesObject(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
 
 	// If ReserveData object not found initialize it accordingly
 	if !ReserveDataFound {
@@ -1249,8 +1249,8 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	// Set Fill, Reserve, UserShares, and TotalShares maps in KVStore
 	k.SetLimitOrderPoolFillObject(ctx, FillData)
 	k.SetLimitOrderPoolReserveObject(ctx, ReserveData)
-	k.SetLimitOrderPoolUserShareMap(ctx, UserShareData)
-	k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesData)
+	k.SetLimitOrderPoolUserShareObject(ctx, UserShareData)
+	k.SetLimitOrderPoolTotalSharesObject(ctx, TotalSharesData)
 	k.SetTickObject(ctx, pairId, tick)
 
 	// If a new tick has been placed that tigtens the spread between currentTick0to1 and currentTick0to1 update CurrentTicks to the tighest ticks
@@ -1296,11 +1296,11 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	}
 
 	// Retrieves LimitOrderUserSharesMap object from KVStore for the specified key and keyToken
-	UserSharesData, UserSharesDataFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
+	UserSharesData, UserSharesDataFound := k.GetLimitOrderPoolUserShareObject(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
 	// Retrieves LimitOrderReserevMap object from KVStore for the specified key and keyToken
 	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveObject(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 	// Retrieves LimitOrderTotalSharesMap object from KVStore for the specified key and keyToken
-	TotalSharesData, TotalShareDataFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
+	TotalSharesData, TotalShareDataFound := k.GetLimitOrderPoolTotalSharesObject(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 
 	// If the UserShareMap does not exists, error (no shares exists for this user)
 	// If ReserveDataFound or TotalSharesData is not found then this must not be a valid limit order to begin with
@@ -1324,9 +1324,9 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	TotalSharesData.TotalShares = TotalSharesData.TotalShares.Sub(msg.SharesOut)
 
 	// Updates changes to mappings in the KVStore
-	k.SetLimitOrderPoolUserShareMap(ctx, UserSharesData)
+	k.SetLimitOrderPoolUserShareObject(ctx, UserSharesData)
 	k.SetLimitOrderPoolReserveObject(ctx, ReserveData)
-	k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesData)
+	k.SetLimitOrderPoolTotalSharesObject(ctx, TotalSharesData)
 
 	// Sends amountOut from module address to msg.Receiver account address
 	if amountOut.GT(sdk.ZeroDec()) {
@@ -1365,11 +1365,11 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 	// Retrives LimitOrderReserevMap object from KVStore for the specified key and keyToken
 	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveObject(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 	// Retrives LimitOrderUserSharesMap object from KVStore for the specified key and keyToken
-	UserShareData, UserShareDataFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
+	UserShareData, UserShareDataFound := k.GetLimitOrderPoolUserShareObject(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
 	// Retrives LimitOrderUserSharesWithdrawnMap object from KVStore for the specified key and keyToken
 	UserSharesWithdrawnData, UserSharesWithdrawnDataFound := k.GetLimitOrderPoolUserSharesWithdrawn(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
 	// Retrives LimitOrderTotalSharesMap object from KVStore for the specified key and keyToken
-	TotalSharesData, TotalSharesDataFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
+	TotalSharesData, TotalSharesDataFound := k.GetLimitOrderPoolTotalSharesObject(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 
 	// default initialize UserSharesWithdrawn (keeps track of liqudity withdrawn) if not initialized.
 	if !UserSharesWithdrawnDataFound {
@@ -1410,9 +1410,9 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 
 	// Updates changed LimitOrder Mappings in KVstore
 	k.SetLimitOrderPoolFillObject(ctx, FillData)
-	k.SetLimitOrderPoolUserShareMap(ctx, UserShareData)
+	k.SetLimitOrderPoolUserShareObject(ctx, UserShareData)
 	k.SetLimitOrderPoolUserSharesWithdrawn(ctx, UserSharesWithdrawnData)
-	k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesData)
+	k.SetLimitOrderPoolTotalSharesObject(ctx, TotalSharesData)
 
 	var tokenOut string
 

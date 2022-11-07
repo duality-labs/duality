@@ -113,11 +113,11 @@ const (
 	// LimitOrderPoolUserSharesWithdrawnKeyPrefix is the prefix to retrieve all LimitOrderPoolUserSharesWithdrawn
 	LimitOrderPoolUserSharesWithdrawnKeyPrefix = "LimitOrderPoolUserSharesWithdrawn/value"
 
-	// LimitOrderPoolUserShareMapKeyPrefix is the prefix to retrieve all LimitOrderPoolUserShareMap
-	LimitOrderPoolUserShareMapKeyPrefix = "LimitOrderPoolUserShareMap/value"
+	// LimitOrderPoolUserShareObjectKeyPrefix is the prefix to retrieve all LimitOrderPoolUserShareObject
+	LimitOrderPoolUserShareObjectKeyPrefix = "LimitOrderPoolUserShareObject/value"
 
-	// LimitOrderPoolTotalSharesMapKeyPrefix is the prefix to retrieve all LimitOrderPoolTotalSharesMap
-	LimitOrderPoolTotalSharesMapKeyPrefix = "LimitOrderPoolTotalSharesMap/value"
+	// LimitOrderPoolTotalSharesObjectKeyPrefix is the prefix to retrieve all LimitOrderPoolTotalSharesObject
+	LimitOrderPoolTotalSharesObjectKeyPrefix = "LimitOrderPoolTotalSharesObject/value"
 
 	// LimitOrderPoolReserveObjectKeyPrefix is the prefix to retrieve all LimitOrderPoolReserveObject
 	LimitOrderPoolReserveObjectKeyPrefix = "LimitOrderPoolReserveObject/value"
@@ -153,8 +153,8 @@ func LimitOrderPoolUserSharesWithdrawnKey(pairId string, tickIndex int64, token 
 	return key
 }
 
-// LimitOrderPoolUserShareMapKey returns the store key to retrieve a LimitOrderPoolUserShareMap from the index fields
-func LimitOrderPoolUserShareMapKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
+// LimitOrderPoolUserShareObjectKey returns the store key to retrieve a LimitOrderPoolUserShareObject from the index fields
+func LimitOrderPoolUserShareObjectKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)
@@ -180,8 +180,8 @@ func LimitOrderPoolUserShareMapKey(pairId string, tickIndex int64, token string,
 	return key
 }
 
-// LimitOrderPoolTotalSharesMapKey returns the store key to retrieve a LimitOrderPoolTotalSharesMap from the index fields
-func LimitOrderPoolTotalSharesMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
+// LimitOrderPoolTotalSharesObjectKey returns the store key to retrieve a LimitOrderPoolTotalSharesObject from the index fields
+func LimitOrderPoolTotalSharesObjectKey(pairId string, tickIndex int64, token string, count uint64) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)

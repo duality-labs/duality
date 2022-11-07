@@ -30371,15 +30371,15 @@ paths:
         - Query
   /NicholasDotSol/duality/dex/limit_order_pool_total_shares_map:
     get:
-      summary: Queries a list of LimitOrderPoolTotalSharesMap items.
-      operationId: NicholasdotsolDualityDexLimitOrderPoolTotalSharesMapAll
+      summary: Queries a list of LimitOrderPoolTotalSharesObject items.
+      operationId: NicholasdotsolDualityDexLimitOrderPoolTotalSharesObjectAll
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              limitOrderPoolTotalSharesMap:
+              limitOrderPoolTotalSharesObject:
                 type: array
                 items:
                   type: object
@@ -30502,15 +30502,15 @@ paths:
         - Query
   '/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map/{pairId}/{token}/{tickIndex}/{count}':
     get:
-      summary: Queries a LimitOrderPoolTotalSharesMap by index.
-      operationId: NicholasdotsolDualityDexLimitOrderPoolTotalSharesMap
+      summary: Queries a LimitOrderPoolTotalSharesObject by index.
+      operationId: NicholasdotsolDualityDexLimitOrderPoolTotalSharesObject
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              limitOrderPoolTotalSharesMap:
+              limitOrderPoolTotalSharesObject:
                 type: object
                 properties:
                   pairId:
@@ -30566,15 +30566,15 @@ paths:
         - Query
   /NicholasDotSol/duality/dex/limit_order_pool_user_share_map:
     get:
-      summary: Queries a list of LimitOrderPoolUserShareMap items.
-      operationId: NicholasdotsolDualityDexLimitOrderPoolUserShareMapAll
+      summary: Queries a list of LimitOrderPoolUserShareObject items.
+      operationId: NicholasdotsolDualityDexLimitOrderPoolUserShareObjectAll
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              limitOrderPoolUserShareMap:
+              limitOrderPoolUserShareObject:
                 type: array
                 items:
                   type: object
@@ -30699,15 +30699,15 @@ paths:
         - Query
   '/NicholasDotSol/duality/dex/limit_order_pool_user_share_map/{pairId}/{token}/{tickIndex}/{count}/{address}':
     get:
-      summary: Queries a LimitOrderPoolUserShareMap by index.
-      operationId: NicholasdotsolDualityDexLimitOrderPoolUserShareMap
+      summary: Queries a LimitOrderPoolUserShareObject by index.
+      operationId: NicholasdotsolDualityDexLimitOrderPoolUserShareObject
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              limitOrderPoolUserShareMap:
+              limitOrderPoolUserShareObject:
                 type: object
                 properties:
                   pairId:
@@ -53716,7 +53716,7 @@ definitions:
         format: uint64
       reserves:
         type: string
-  nicholasdotsol.duality.dex.LimitOrderPoolTotalSharesMap:
+  nicholasdotsol.duality.dex.LimitOrderPoolTotalSharesObject:
     type: object
     properties:
       pairId:
@@ -53731,7 +53731,7 @@ definitions:
         format: uint64
       totalShares:
         type: string
-  nicholasdotsol.duality.dex.LimitOrderPoolUserShareMap:
+  nicholasdotsol.duality.dex.LimitOrderPoolUserShareObject:
     type: object
     properties:
       pairId:
@@ -53939,10 +53939,10 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  nicholasdotsol.duality.dex.QueryAllLimitOrderPoolTotalSharesMapResponse:
+  nicholasdotsol.duality.dex.QueryAllLimitOrderPoolTotalSharesObjectResponse:
     type: object
     properties:
-      limitOrderPoolTotalSharesMap:
+      limitOrderPoolTotalSharesObject:
         type: array
         items:
           type: object
@@ -53984,10 +53984,10 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  nicholasdotsol.duality.dex.QueryAllLimitOrderPoolUserShareMapResponse:
+  nicholasdotsol.duality.dex.QueryAllLimitOrderPoolUserShareObjectResponse:
     type: object
     properties:
-      limitOrderPoolUserShareMap:
+      limitOrderPoolUserShareObject:
         type: array
         items:
           type: object
@@ -54366,10 +54366,10 @@ definitions:
             format: uint64
           reserves:
             type: string
-  nicholasdotsol.duality.dex.QueryGetLimitOrderPoolTotalSharesMapResponse:
+  nicholasdotsol.duality.dex.QueryGetLimitOrderPoolTotalSharesObjectResponse:
     type: object
     properties:
-      limitOrderPoolTotalSharesMap:
+      limitOrderPoolTotalSharesObject:
         type: object
         properties:
           pairId:
@@ -54384,10 +54384,10 @@ definitions:
             format: uint64
           totalShares:
             type: string
-  nicholasdotsol.duality.dex.QueryGetLimitOrderPoolUserShareMapResponse:
+  nicholasdotsol.duality.dex.QueryGetLimitOrderPoolUserShareObjectResponse:
     type: object
     properties:
-      limitOrderPoolUserShareMap:
+      limitOrderPoolUserShareObject:
         type: object
         properties:
           pairId:

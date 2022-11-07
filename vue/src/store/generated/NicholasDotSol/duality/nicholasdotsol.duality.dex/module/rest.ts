@@ -49,7 +49,7 @@ export interface DexLimitOrderPoolReserveObject {
   reserves?: string;
 }
 
-export interface DexLimitOrderPoolTotalSharesMap {
+export interface DexLimitOrderPoolTotalSharesObject {
   pairId?: string;
   token?: string;
 
@@ -61,7 +61,7 @@ export interface DexLimitOrderPoolTotalSharesMap {
   totalShares?: string;
 }
 
-export interface DexLimitOrderPoolUserShareMap {
+export interface DexLimitOrderPoolUserShareObject {
   pairId?: string;
   token?: string;
 
@@ -165,8 +165,8 @@ export interface DexQueryAllLimitOrderPoolReserveObjectResponse {
   pagination?: V1Beta1PageResponse;
 }
 
-export interface DexQueryAllLimitOrderPoolTotalSharesMapResponse {
-  limitOrderPoolTotalSharesMap?: DexLimitOrderPoolTotalSharesMap[];
+export interface DexQueryAllLimitOrderPoolTotalSharesObjectResponse {
+  limitOrderPoolTotalSharesObject?: DexLimitOrderPoolTotalSharesObject[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -180,8 +180,8 @@ export interface DexQueryAllLimitOrderPoolTotalSharesMapResponse {
   pagination?: V1Beta1PageResponse;
 }
 
-export interface DexQueryAllLimitOrderPoolUserShareMapResponse {
-  limitOrderPoolUserShareMap?: DexLimitOrderPoolUserShareMap[];
+export interface DexQueryAllLimitOrderPoolUserShareObjectResponse {
+  limitOrderPoolUserShareObject?: DexLimitOrderPoolUserShareObject[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -297,12 +297,12 @@ export interface DexQueryGetLimitOrderPoolReserveObjectResponse {
   limitOrderPoolReserveObject?: DexLimitOrderPoolReserveObject;
 }
 
-export interface DexQueryGetLimitOrderPoolTotalSharesMapResponse {
-  limitOrderPoolTotalSharesMap?: DexLimitOrderPoolTotalSharesMap;
+export interface DexQueryGetLimitOrderPoolTotalSharesObjectResponse {
+  limitOrderPoolTotalSharesObject?: DexLimitOrderPoolTotalSharesObject;
 }
 
-export interface DexQueryGetLimitOrderPoolUserShareMapResponse {
-  limitOrderPoolUserShareMap?: DexLimitOrderPoolUserShareMap;
+export interface DexQueryGetLimitOrderPoolUserShareObjectResponse {
+  limitOrderPoolUserShareObject?: DexLimitOrderPoolUserShareObject;
 }
 
 export interface DexQueryGetLimitOrderPoolUserSharesWithdrawnResponse {
@@ -813,11 +813,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryLimitOrderPoolTotalSharesMapAll
-   * @summary Queries a list of LimitOrderPoolTotalSharesMap items.
+   * @name QueryLimitOrderPoolTotalSharesObjectAll
+   * @summary Queries a list of LimitOrderPoolTotalSharesObject items.
    * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map
    */
-  queryLimitOrderPoolTotalSharesMapAll = (
+  queryLimitOrderPoolTotalSharesObjectAll = (
     query?: {
       "pagination.key"?: string;
       "pagination.offset"?: string;
@@ -827,7 +827,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     },
     params: RequestParams = {},
   ) =>
-    this.request<DexQueryAllLimitOrderPoolTotalSharesMapResponse, RpcStatus>({
+    this.request<DexQueryAllLimitOrderPoolTotalSharesObjectResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map`,
       method: "GET",
       query: query,
@@ -839,18 +839,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryLimitOrderPoolTotalSharesMap
-   * @summary Queries a LimitOrderPoolTotalSharesMap by index.
+   * @name QueryLimitOrderPoolTotalSharesObject
+   * @summary Queries a LimitOrderPoolTotalSharesObject by index.
    * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map/{pairId}/{token}/{tickIndex}/{count}
    */
-  queryLimitOrderPoolTotalSharesMap = (
+  queryLimitOrderPoolTotalSharesObject = (
     pairId: string,
     token: string,
     tickIndex: string,
     count: string,
     params: RequestParams = {},
   ) =>
-    this.request<DexQueryGetLimitOrderPoolTotalSharesMapResponse, RpcStatus>({
+    this.request<DexQueryGetLimitOrderPoolTotalSharesObjectResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map/${pairId}/${token}/${tickIndex}/${count}`,
       method: "GET",
       format: "json",
@@ -861,11 +861,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryLimitOrderPoolUserShareMapAll
-   * @summary Queries a list of LimitOrderPoolUserShareMap items.
+   * @name QueryLimitOrderPoolUserShareObjectAll
+   * @summary Queries a list of LimitOrderPoolUserShareObject items.
    * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_user_share_map
    */
-  queryLimitOrderPoolUserShareMapAll = (
+  queryLimitOrderPoolUserShareObjectAll = (
     query?: {
       "pagination.key"?: string;
       "pagination.offset"?: string;
@@ -875,7 +875,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     },
     params: RequestParams = {},
   ) =>
-    this.request<DexQueryAllLimitOrderPoolUserShareMapResponse, RpcStatus>({
+    this.request<DexQueryAllLimitOrderPoolUserShareObjectResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/limit_order_pool_user_share_map`,
       method: "GET",
       query: query,
@@ -887,11 +887,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryLimitOrderPoolUserShareMap
-   * @summary Queries a LimitOrderPoolUserShareMap by index.
+   * @name QueryLimitOrderPoolUserShareObject
+   * @summary Queries a LimitOrderPoolUserShareObject by index.
    * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_user_share_map/{pairId}/{token}/{tickIndex}/{count}/{address}
    */
-  queryLimitOrderPoolUserShareMap = (
+  queryLimitOrderPoolUserShareObject = (
     pairId: string,
     token: string,
     tickIndex: string,
@@ -899,7 +899,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     address: string,
     params: RequestParams = {},
   ) =>
-    this.request<DexQueryGetLimitOrderPoolUserShareMapResponse, RpcStatus>({
+    this.request<DexQueryGetLimitOrderPoolUserShareObjectResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/limit_order_pool_user_share_map/${pairId}/${token}/${tickIndex}/${count}/${address}`,
       method: "GET",
       format: "json",

@@ -43,17 +43,17 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	k.SetFeeListCount(ctx, genState.FeeListCount)
 	// Set all the edgeRow
 
-	// Set all the limitOrderPoolUserShareMap
-	for _, elem := range genState.LimitOrderPoolUserShareMapList {
-		k.SetLimitOrderPoolUserShareMap(ctx, elem)
+	// Set all the limitOrderPoolUserShareObject
+	for _, elem := range genState.LimitOrderPoolUserShareObjectList {
+		k.SetLimitOrderPoolUserShareObject(ctx, elem)
 	}
 	// Set all the limitOrderPoolUserSharesWithdrawn
 	for _, elem := range genState.LimitOrderPoolUserSharesWithdrawnList {
 		k.SetLimitOrderPoolUserSharesWithdrawn(ctx, elem)
 	}
-	// Set all the limitOrderPoolTotalSharesMap
-	for _, elem := range genState.LimitOrderPoolTotalSharesMapList {
-		k.SetLimitOrderPoolTotalSharesMap(ctx, elem)
+	// Set all the limitOrderPoolTotalSharesObject
+	for _, elem := range genState.LimitOrderPoolTotalSharesObjectList {
+		k.SetLimitOrderPoolTotalSharesObject(ctx, elem)
 	}
 	// Set all the limitOrderPoolReserveObject
 	for _, elem := range genState.LimitOrderPoolReserveObjectList {
@@ -80,9 +80,9 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.SharesList = k.GetAllShares(ctx)
 	genesis.FeeListList = k.GetAllFeeList(ctx)
 	genesis.FeeListCount = k.GetFeeListCount(ctx)
-	genesis.LimitOrderPoolUserShareMapList = k.GetAllLimitOrderPoolUserShareMap(ctx)
+	genesis.LimitOrderPoolUserShareObjectList = k.GetAllLimitOrderPoolUserShareObject(ctx)
 	genesis.LimitOrderPoolUserSharesWithdrawnList = k.GetAllLimitOrderPoolUserSharesWithdrawn(ctx)
-	genesis.LimitOrderPoolTotalSharesMapList = k.GetAllLimitOrderPoolTotalSharesMap(ctx)
+	genesis.LimitOrderPoolTotalSharesObjectList = k.GetAllLimitOrderPoolTotalSharesObject(ctx)
 	genesis.LimitOrderPoolReserveObjectList = k.GetAllLimitOrderPoolReserveObject(ctx)
 	genesis.LimitOrderPoolFillObjectList = k.GetAllLimitOrderPoolFillObject(ctx)
 	// this line is used by starport scaffolding # genesis/module/export

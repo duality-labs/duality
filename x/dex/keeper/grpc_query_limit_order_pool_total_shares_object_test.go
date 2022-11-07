@@ -18,39 +18,39 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func TestLimitOrderPoolTotalSharesMapQuerySingle(t *testing.T) {
+func TestLimitOrderPoolTotalSharesObjectQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolTotalSharesMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 2)
+	msgs := createNLimitOrderPoolTotalSharesObject(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 2)
 	for _, tc := range []struct {
 		desc     string
-		request  *types.QueryGetLimitOrderPoolTotalSharesMapRequest
-		response *types.QueryGetLimitOrderPoolTotalSharesMapResponse
+		request  *types.QueryGetLimitOrderPoolTotalSharesObjectRequest
+		response *types.QueryGetLimitOrderPoolTotalSharesObjectResponse
 		err      error
 	}{
 		{
 			desc: "First",
-			request: &types.QueryGetLimitOrderPoolTotalSharesMapRequest{
+			request: &types.QueryGetLimitOrderPoolTotalSharesObjectRequest{
 				PairId:    "TokenA/TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
 				Count:     msgs[0].Count,
 			},
-			response: &types.QueryGetLimitOrderPoolTotalSharesMapResponse{LimitOrderPoolTotalSharesMap: msgs[0]},
+			response: &types.QueryGetLimitOrderPoolTotalSharesObjectResponse{LimitOrderPoolTotalSharesObject: msgs[0]},
 		},
 		{
 			desc: "Second",
-			request: &types.QueryGetLimitOrderPoolTotalSharesMapRequest{
+			request: &types.QueryGetLimitOrderPoolTotalSharesObjectRequest{
 				PairId:    "TokenA/TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
 				Count:     msgs[1].Count,
 			},
-			response: &types.QueryGetLimitOrderPoolTotalSharesMapResponse{LimitOrderPoolTotalSharesMap: msgs[1]},
+			response: &types.QueryGetLimitOrderPoolTotalSharesObjectResponse{LimitOrderPoolTotalSharesObject: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
-			request: &types.QueryGetLimitOrderPoolTotalSharesMapRequest{
+			request: &types.QueryGetLimitOrderPoolTotalSharesObjectRequest{
 				PairId:    "TokenA/TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
@@ -64,7 +64,7 @@ func TestLimitOrderPoolTotalSharesMapQuerySingle(t *testing.T) {
 		},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
-			response, err := keeper.LimitOrderPoolTotalSharesMap(wctx, tc.request)
+			response, err := keeper.LimitOrderPoolTotalSharesObject(wctx, tc.request)
 			if tc.err != nil {
 				require.ErrorIs(t, err, tc.err)
 			} else {
@@ -78,13 +78,13 @@ func TestLimitOrderPoolTotalSharesMapQuerySingle(t *testing.T) {
 	}
 }
 
-func TestLimitOrderPoolTotalSharesMapQueryPaginated(t *testing.T) {
+func TestLimitOrderPoolTotalSharesObjectQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolTotalSharesMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 5)
+	msgs := createNLimitOrderPoolTotalSharesObject(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 5)
 
-	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderPoolTotalSharesMapRequest {
-		return &types.QueryAllLimitOrderPoolTotalSharesMapRequest{
+	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderPoolTotalSharesObjectRequest {
+		return &types.QueryAllLimitOrderPoolTotalSharesObjectRequest{
 			Pagination: &query.PageRequest{
 				Key:        next,
 				Offset:     offset,
@@ -96,12 +96,12 @@ func TestLimitOrderPoolTotalSharesMapQueryPaginated(t *testing.T) {
 	t.Run("ByOffset", func(t *testing.T) {
 		step := 2
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.LimitOrderPoolTotalSharesMapAll(wctx, request(nil, uint64(i), uint64(step), false))
+			resp, err := keeper.LimitOrderPoolTotalSharesObjectAll(wctx, request(nil, uint64(i), uint64(step), false))
 			require.NoError(t, err)
-			require.LessOrEqual(t, len(resp.LimitOrderPoolTotalSharesMap), step)
+			require.LessOrEqual(t, len(resp.LimitOrderPoolTotalSharesObject), step)
 			require.Subset(t,
 				nullify.Fill(msgs),
-				nullify.Fill(resp.LimitOrderPoolTotalSharesMap),
+				nullify.Fill(resp.LimitOrderPoolTotalSharesObject),
 			)
 		}
 	})
@@ -109,27 +109,27 @@ func TestLimitOrderPoolTotalSharesMapQueryPaginated(t *testing.T) {
 		step := 2
 		var next []byte
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.LimitOrderPoolTotalSharesMapAll(wctx, request(next, 0, uint64(step), false))
+			resp, err := keeper.LimitOrderPoolTotalSharesObjectAll(wctx, request(next, 0, uint64(step), false))
 			require.NoError(t, err)
-			require.LessOrEqual(t, len(resp.LimitOrderPoolTotalSharesMap), step)
+			require.LessOrEqual(t, len(resp.LimitOrderPoolTotalSharesObject), step)
 			require.Subset(t,
 				nullify.Fill(msgs),
-				nullify.Fill(resp.LimitOrderPoolTotalSharesMap),
+				nullify.Fill(resp.LimitOrderPoolTotalSharesObject),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
-		resp, err := keeper.LimitOrderPoolTotalSharesMapAll(wctx, request(nil, 0, 0, true))
+		resp, err := keeper.LimitOrderPoolTotalSharesObjectAll(wctx, request(nil, 0, 0, true))
 		require.NoError(t, err)
 		require.Equal(t, len(msgs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(msgs),
-			nullify.Fill(resp.LimitOrderPoolTotalSharesMap),
+			nullify.Fill(resp.LimitOrderPoolTotalSharesObject),
 		)
 	})
 	t.Run("InvalidRequest", func(t *testing.T) {
-		_, err := keeper.LimitOrderPoolTotalSharesMapAll(wctx, nil)
+		_, err := keeper.LimitOrderPoolTotalSharesObjectAll(wctx, nil)
 		require.ErrorIs(t, err, status.Error(codes.InvalidArgument, "invalid request"))
 	})
 }

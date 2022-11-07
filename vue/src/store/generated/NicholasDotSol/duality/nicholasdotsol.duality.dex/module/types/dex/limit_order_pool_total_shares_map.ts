@@ -4,7 +4,7 @@ import { util, configure, Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
-export interface LimitOrderPoolTotalSharesMap {
+export interface LimitOrderPoolTotalSharesObject {
   pairId: string;
   token: string;
   tickIndex: number;
@@ -12,7 +12,7 @@ export interface LimitOrderPoolTotalSharesMap {
   totalShares: string;
 }
 
-const baseLimitOrderPoolTotalSharesMap: object = {
+const baseLimitOrderPoolTotalSharesObject: object = {
   pairId: "",
   token: "",
   tickIndex: 0,
@@ -20,9 +20,9 @@ const baseLimitOrderPoolTotalSharesMap: object = {
   totalShares: "",
 };
 
-export const LimitOrderPoolTotalSharesMap = {
+export const LimitOrderPoolTotalSharesObject = {
   encode(
-    message: LimitOrderPoolTotalSharesMap,
+    message: LimitOrderPoolTotalSharesObject,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.pairId !== "") {
@@ -46,12 +46,12 @@ export const LimitOrderPoolTotalSharesMap = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): LimitOrderPoolTotalSharesMap {
+  ): LimitOrderPoolTotalSharesObject {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseLimitOrderPoolTotalSharesMap,
-    } as LimitOrderPoolTotalSharesMap;
+      ...baseLimitOrderPoolTotalSharesObject,
+    } as LimitOrderPoolTotalSharesObject;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -78,10 +78,10 @@ export const LimitOrderPoolTotalSharesMap = {
     return message;
   },
 
-  fromJSON(object: any): LimitOrderPoolTotalSharesMap {
+  fromJSON(object: any): LimitOrderPoolTotalSharesObject {
     const message = {
-      ...baseLimitOrderPoolTotalSharesMap,
-    } as LimitOrderPoolTotalSharesMap;
+      ...baseLimitOrderPoolTotalSharesObject,
+    } as LimitOrderPoolTotalSharesObject;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = String(object.pairId);
     } else {
@@ -110,7 +110,7 @@ export const LimitOrderPoolTotalSharesMap = {
     return message;
   },
 
-  toJSON(message: LimitOrderPoolTotalSharesMap): unknown {
+  toJSON(message: LimitOrderPoolTotalSharesObject): unknown {
     const obj: any = {};
     message.pairId !== undefined && (obj.pairId = message.pairId);
     message.token !== undefined && (obj.token = message.token);
@@ -122,11 +122,11 @@ export const LimitOrderPoolTotalSharesMap = {
   },
 
   fromPartial(
-    object: DeepPartial<LimitOrderPoolTotalSharesMap>
-  ): LimitOrderPoolTotalSharesMap {
+    object: DeepPartial<LimitOrderPoolTotalSharesObject>
+  ): LimitOrderPoolTotalSharesObject {
     const message = {
-      ...baseLimitOrderPoolTotalSharesMap,
-    } as LimitOrderPoolTotalSharesMap;
+      ...baseLimitOrderPoolTotalSharesObject,
+    } as LimitOrderPoolTotalSharesObject;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = object.pairId;
     } else {

@@ -16,9 +16,9 @@ func DefaultGenesis() *GenesisState {
 		TokenObjectList:                       []TokenObject{},
 		SharesList:                            []Shares{},
 		FeeListList:                           []FeeList{},
-		LimitOrderPoolUserShareMapList:        []LimitOrderPoolUserShareMap{},
+		LimitOrderPoolUserShareObjectList:     []LimitOrderPoolUserShareObject{},
 		LimitOrderPoolUserSharesWithdrawnList: []LimitOrderPoolUserSharesWithdrawn{},
-		LimitOrderPoolTotalSharesMapList:      []LimitOrderPoolTotalSharesMap{},
+		LimitOrderPoolTotalSharesObjectList:   []LimitOrderPoolTotalSharesObject{},
 		LimitOrderPoolReserveObjectList:       []LimitOrderPoolReserveObject{},
 		LimitOrderPoolFillObjectList:          []LimitOrderPoolFillObject{},
 		// this line is used by starport scaffolding # genesis/types/default
@@ -93,15 +93,15 @@ func (gs GenesisState) Validate() error {
 		}
 		feeListIdMap[elem.Id] = true
 	}
-	// Check for duplicated index in limitOrderPoolUserShareMap
-	limitOrderPoolUserShareMapIndexMap := make(map[string]struct{})
+	// Check for duplicated index in limitOrderPoolUserShareObject
+	limitOrderPoolUserShareObjectIndexMap := make(map[string]struct{})
 
-	for _, elem := range gs.LimitOrderPoolUserShareMapList {
-		index := string(LimitOrderPoolUserShareMapKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count, elem.Address))
-		if _, ok := limitOrderPoolUserShareMapIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for limitOrderPoolUserShareMap")
+	for _, elem := range gs.LimitOrderPoolUserShareObjectList {
+		index := string(LimitOrderPoolUserShareObjectKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count, elem.Address))
+		if _, ok := limitOrderPoolUserShareObjectIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for limitOrderPoolUserShareObject")
 		}
-		limitOrderPoolUserShareMapIndexMap[index] = struct{}{}
+		limitOrderPoolUserShareObjectIndexMap[index] = struct{}{}
 	}
 	// Check for duplicated index in limitOrderPoolUserSharesWithdrawn
 	limitOrderPoolUserSharesWithdrawnIndexMap := make(map[string]struct{})
@@ -113,15 +113,15 @@ func (gs GenesisState) Validate() error {
 		}
 		limitOrderPoolUserSharesWithdrawnIndexMap[index] = struct{}{}
 	}
-	// Check for duplicated index in limitOrderPoolTotalSharesMap
-	limitOrderPoolTotalSharesMapIndexMap := make(map[string]struct{})
+	// Check for duplicated index in limitOrderPoolTotalSharesObject
+	limitOrderPoolTotalSharesObjectIndexMap := make(map[string]struct{})
 
-	for _, elem := range gs.LimitOrderPoolTotalSharesMapList {
-		index := string(LimitOrderPoolTotalSharesMapKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count))
-		if _, ok := limitOrderPoolTotalSharesMapIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for limitOrderPoolTotalSharesMap")
+	for _, elem := range gs.LimitOrderPoolTotalSharesObjectList {
+		index := string(LimitOrderPoolTotalSharesObjectKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count))
+		if _, ok := limitOrderPoolTotalSharesObjectIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for limitOrderPoolTotalSharesObject")
 		}
-		limitOrderPoolTotalSharesMapIndexMap[index] = struct{}{}
+		limitOrderPoolTotalSharesObjectIndexMap[index] = struct{}{}
 	}
 	// Check for duplicated index in limitOrderPoolReserveObject
 	limitOrderPoolReserveObjectIndexMap := make(map[string]struct{})

@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListLimitOrderPoolUserShareMap() *cobra.Command {
+func CmdListLimitOrderPoolUserShareObject() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-limit-order-pool-user-share-map",
-		Short: "list all LimitOrderPoolUserShareMap",
+		Short: "list all LimitOrderPoolUserShareObject",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -24,11 +24,11 @@ func CmdListLimitOrderPoolUserShareMap() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllLimitOrderPoolUserShareMapRequest{
+			params := &types.QueryAllLimitOrderPoolUserShareObjectRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.LimitOrderPoolUserShareMapAll(context.Background(), params)
+			res, err := queryClient.LimitOrderPoolUserShareObjectAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -43,10 +43,10 @@ func CmdListLimitOrderPoolUserShareMap() *cobra.Command {
 	return cmd
 }
 
-func CmdShowLimitOrderPoolUserShareMap() *cobra.Command {
+func CmdShowLimitOrderPoolUserShareObject() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "show-limit-order-pool-user-share-map [count] [address]",
-		Short: "shows a LimitOrderPoolUserShareMap",
+		Short: "shows a LimitOrderPoolUserShareObject",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -63,12 +63,12 @@ func CmdShowLimitOrderPoolUserShareMap() *cobra.Command {
 
 			argAddress := args[1]
 
-			params := &types.QueryGetLimitOrderPoolUserShareMapRequest{
+			params := &types.QueryGetLimitOrderPoolUserShareObjectRequest{
 				Count:   uint64(argCount),
 				Address: argAddress,
 			}
 
-			res, err := queryClient.LimitOrderPoolUserShareMap(context.Background(), params)
+			res, err := queryClient.LimitOrderPoolUserShareObject(context.Background(), params)
 			if err != nil {
 				return err
 			}

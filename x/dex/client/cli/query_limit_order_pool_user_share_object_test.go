@@ -21,50 +21,54 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func networkWithLimitOrderPoolTotalSharesMapObjects(t *testing.T, n int) (*network.Network, []types.LimitOrderPoolTotalSharesMap) {
+func networkWithLimitOrderPoolUserShareObjectObjects(t *testing.T, n int) (*network.Network, []types.LimitOrderPoolUserShareObject) {
 	t.Helper()
 	cfg := network.DefaultConfig()
 	state := types.GenesisState{}
 	require.NoError(t, cfg.Codec.UnmarshalJSON(cfg.GenesisState[types.ModuleName], &state))
 
 	for i := 0; i < n; i++ {
-		limitOrderPoolTotalSharesMap := types.LimitOrderPoolTotalSharesMap{
-			Count: uint64(i),
+		limitOrderPoolUserShareObject := types.LimitOrderPoolUserShareObject{
+			Count:   uint64(i),
+			Address: strconv.Itoa(i),
 		}
-		nullify.Fill(&limitOrderPoolTotalSharesMap)
-		state.LimitOrderPoolTotalSharesMapList = append(state.LimitOrderPoolTotalSharesMapList, limitOrderPoolTotalSharesMap)
+		nullify.Fill(&limitOrderPoolUserShareObject)
+		state.LimitOrderPoolUserShareObjectList = append(state.LimitOrderPoolUserShareObjectList, limitOrderPoolUserShareObject)
 	}
 	buf, err := cfg.Codec.MarshalJSON(&state)
 	require.NoError(t, err)
 	cfg.GenesisState[types.ModuleName] = buf
-	return network.New(t, cfg), state.LimitOrderPoolTotalSharesMapList
+	return network.New(t, cfg), state.LimitOrderPoolUserShareObjectList
 }
 
-func TestShowLimitOrderPoolTotalSharesMap(t *testing.T) {
-	net, objs := networkWithLimitOrderPoolTotalSharesMapObjects(t, 2)
+func TestShowLimitOrderPoolUserShareObject(t *testing.T) {
+	net, objs := networkWithLimitOrderPoolUserShareObjectObjects(t, 2)
 
 	ctx := net.Validators[0].ClientCtx
 	common := []string{
 		fmt.Sprintf("--%s=json", tmcli.OutputFlag),
 	}
 	for _, tc := range []struct {
-		desc    string
-		idCount uint64
+		desc      string
+		idCount   uint64
+		idAddress string
 
 		args []string
 		err  error
-		obj  types.LimitOrderPoolTotalSharesMap
+		obj  types.LimitOrderPoolUserShareObject
 	}{
 		{
-			desc:    "found",
-			idCount: objs[0].Count,
+			desc:      "found",
+			idCount:   objs[0].Count,
+			idAddress: objs[0].Address,
 
 			args: common,
 			obj:  objs[0],
 		},
 		{
-			desc:    "not found",
-			idCount: 100000,
+			desc:      "not found",
+			idCount:   100000,
+			idAddress: strconv.Itoa(100000),
 
 			args: common,
 			err:  status.Error(codes.NotFound, "not found"),
@@ -73,29 +77,30 @@ func TestShowLimitOrderPoolTotalSharesMap(t *testing.T) {
 		t.Run(tc.desc, func(t *testing.T) {
 			args := []string{
 				strconv.Itoa(int(tc.idCount)),
+				tc.idAddress,
 			}
 			args = append(args, tc.args...)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowLimitOrderPoolTotalSharesMap(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowLimitOrderPoolUserShareObject(), args)
 			if tc.err != nil {
 				stat, ok := status.FromError(tc.err)
 				require.True(t, ok)
 				require.ErrorIs(t, stat.Err(), tc.err)
 			} else {
 				require.NoError(t, err)
-				var resp types.QueryGetLimitOrderPoolTotalSharesMapResponse
+				var resp types.QueryGetLimitOrderPoolUserShareObjectResponse
 				require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-				require.NotNil(t, resp.LimitOrderPoolTotalSharesMap)
+				require.NotNil(t, resp.LimitOrderPoolUserShareObject)
 				require.Equal(t,
 					nullify.Fill(&tc.obj),
-					nullify.Fill(&resp.LimitOrderPoolTotalSharesMap),
+					nullify.Fill(&resp.LimitOrderPoolUserShareObject),
 				)
 			}
 		})
 	}
 }
 
-func TestListLimitOrderPoolTotalSharesMap(t *testing.T) {
-	net, objs := networkWithLimitOrderPoolTotalSharesMapObjects(t, 5)
+func TestListLimitOrderPoolUserShareObject(t *testing.T) {
+	net, objs := networkWithLimitOrderPoolUserShareObjectObjects(t, 5)
 
 	ctx := net.Validators[0].ClientCtx
 	request := func(next []byte, offset, limit uint64, total bool) []string {
@@ -117,14 +122,14 @@ func TestListLimitOrderPoolTotalSharesMap(t *testing.T) {
 		step := 2
 		for i := 0; i < len(objs); i += step {
 			args := request(nil, uint64(i), uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolTotalSharesMap(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUserShareObject(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllLimitOrderPoolTotalSharesMapResponse
+			var resp types.QueryAllLimitOrderPoolUserShareObjectResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.LimitOrderPoolTotalSharesMap), step)
+			require.LessOrEqual(t, len(resp.LimitOrderPoolUserShareObject), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.LimitOrderPoolTotalSharesMap),
+				nullify.Fill(resp.LimitOrderPoolUserShareObject),
 			)
 		}
 	})
@@ -133,29 +138,29 @@ func TestListLimitOrderPoolTotalSharesMap(t *testing.T) {
 		var next []byte
 		for i := 0; i < len(objs); i += step {
 			args := request(next, 0, uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolTotalSharesMap(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUserShareObject(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllLimitOrderPoolTotalSharesMapResponse
+			var resp types.QueryAllLimitOrderPoolUserShareObjectResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.LimitOrderPoolTotalSharesMap), step)
+			require.LessOrEqual(t, len(resp.LimitOrderPoolUserShareObject), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.LimitOrderPoolTotalSharesMap),
+				nullify.Fill(resp.LimitOrderPoolUserShareObject),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
 		args := request(nil, 0, uint64(len(objs)), true)
-		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolTotalSharesMap(), args)
+		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUserShareObject(), args)
 		require.NoError(t, err)
-		var resp types.QueryAllLimitOrderPoolTotalSharesMapResponse
+		var resp types.QueryAllLimitOrderPoolUserShareObjectResponse
 		require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 		require.NoError(t, err)
 		require.Equal(t, len(objs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(objs),
-			nullify.Fill(resp.LimitOrderPoolTotalSharesMap),
+			nullify.Fill(resp.LimitOrderPoolUserShareObject),
 		)
 	})
 }

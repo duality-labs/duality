@@ -79,7 +79,7 @@ func TestGenesisState_Validate(t *testing.T) {
 				},
 				FeeListCount: 2,
 
-				LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
+				LimitOrderPoolUserShareObjectList: []types.LimitOrderPoolUserShareObject{
 					{
 						Count:   0,
 						Address: "0",
@@ -99,7 +99,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						Address: "1",
 					},
 				},
-				LimitOrderPoolTotalSharesMapList: []types.LimitOrderPoolTotalSharesMap{
+				LimitOrderPoolTotalSharesObjectList: []types.LimitOrderPoolTotalSharesObject{
 					{
 						Count: 0,
 					},
@@ -243,9 +243,9 @@ func TestGenesisState_Validate(t *testing.T) {
 		},
 
 		{
-			desc: "duplicated limitOrderPoolUserShareMap",
+			desc: "duplicated limitOrderPoolUserShareObject",
 			genState: &types.GenesisState{
-				LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
+				LimitOrderPoolUserShareObjectList: []types.LimitOrderPoolUserShareObject{
 					{
 						Count:   0,
 						Address: "0",
@@ -275,9 +275,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated limitOrderPoolTotalSharesMap",
+			desc: "duplicated limitOrderPoolTotalSharesObject",
 			genState: &types.GenesisState{
-				LimitOrderPoolTotalSharesMapList: []types.LimitOrderPoolTotalSharesMap{
+				LimitOrderPoolTotalSharesObjectList: []types.LimitOrderPoolTotalSharesObject{
 					{
 						Count: 0,
 					},
