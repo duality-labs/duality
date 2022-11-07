@@ -18,39 +18,39 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func TestLimitOrderPoolFillMapQuerySingle(t *testing.T) {
+func TestLimitOrderPoolFillObjectQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolFillMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 2)
+	msgs := createNLimitOrderPoolFillObject(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 2)
 	for _, tc := range []struct {
 		desc     string
-		request  *types.QueryGetLimitOrderPoolFillMapRequest
-		response *types.QueryGetLimitOrderPoolFillMapResponse
+		request  *types.QueryGetLimitOrderPoolFillObjectRequest
+		response *types.QueryGetLimitOrderPoolFillObjectResponse
 		err      error
 	}{
 		{
 			desc: "First",
-			request: &types.QueryGetLimitOrderPoolFillMapRequest{
+			request: &types.QueryGetLimitOrderPoolFillObjectRequest{
 				PairId:    "TokenA/TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
 				Count:     msgs[0].Count,
 			},
-			response: &types.QueryGetLimitOrderPoolFillMapResponse{LimitOrderPoolFillMap: msgs[0]},
+			response: &types.QueryGetLimitOrderPoolFillObjectResponse{LimitOrderPoolFillObject: msgs[0]},
 		},
 		{
 			desc: "Second",
-			request: &types.QueryGetLimitOrderPoolFillMapRequest{
+			request: &types.QueryGetLimitOrderPoolFillObjectRequest{
 				PairId:    "TokenA/TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
 				Count:     msgs[1].Count,
 			},
-			response: &types.QueryGetLimitOrderPoolFillMapResponse{LimitOrderPoolFillMap: msgs[1]},
+			response: &types.QueryGetLimitOrderPoolFillObjectResponse{LimitOrderPoolFillObject: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
-			request: &types.QueryGetLimitOrderPoolFillMapRequest{
+			request: &types.QueryGetLimitOrderPoolFillObjectRequest{
 				PairId:    "TokenA/TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
@@ -64,7 +64,7 @@ func TestLimitOrderPoolFillMapQuerySingle(t *testing.T) {
 		},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
-			response, err := keeper.LimitOrderPoolFillMap(wctx, tc.request)
+			response, err := keeper.LimitOrderPoolFillObject(wctx, tc.request)
 			if tc.err != nil {
 				require.ErrorIs(t, err, tc.err)
 			} else {
@@ -78,13 +78,13 @@ func TestLimitOrderPoolFillMapQuerySingle(t *testing.T) {
 	}
 }
 
-func TestLimitOrderPoolFillMapQueryPaginated(t *testing.T) {
+func TestLimitOrderPoolFillObjectQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolFillMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 5)
+	msgs := createNLimitOrderPoolFillObject(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 5)
 
-	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderPoolFillMapRequest {
-		return &types.QueryAllLimitOrderPoolFillMapRequest{
+	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderPoolFillObjectRequest {
+		return &types.QueryAllLimitOrderPoolFillObjectRequest{
 			Pagination: &query.PageRequest{
 				Key:        next,
 				Offset:     offset,
@@ -96,12 +96,12 @@ func TestLimitOrderPoolFillMapQueryPaginated(t *testing.T) {
 	t.Run("ByOffset", func(t *testing.T) {
 		step := 2
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.LimitOrderPoolFillMapAll(wctx, request(nil, uint64(i), uint64(step), false))
+			resp, err := keeper.LimitOrderPoolFillObjectAll(wctx, request(nil, uint64(i), uint64(step), false))
 			require.NoError(t, err)
-			require.LessOrEqual(t, len(resp.LimitOrderPoolFillMap), step)
+			require.LessOrEqual(t, len(resp.LimitOrderPoolFillObject), step)
 			require.Subset(t,
 				nullify.Fill(msgs),
-				nullify.Fill(resp.LimitOrderPoolFillMap),
+				nullify.Fill(resp.LimitOrderPoolFillObject),
 			)
 		}
 	})
@@ -109,27 +109,27 @@ func TestLimitOrderPoolFillMapQueryPaginated(t *testing.T) {
 		step := 2
 		var next []byte
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.LimitOrderPoolFillMapAll(wctx, request(next, 0, uint64(step), false))
+			resp, err := keeper.LimitOrderPoolFillObjectAll(wctx, request(next, 0, uint64(step), false))
 			require.NoError(t, err)
-			require.LessOrEqual(t, len(resp.LimitOrderPoolFillMap), step)
+			require.LessOrEqual(t, len(resp.LimitOrderPoolFillObject), step)
 			require.Subset(t,
 				nullify.Fill(msgs),
-				nullify.Fill(resp.LimitOrderPoolFillMap),
+				nullify.Fill(resp.LimitOrderPoolFillObject),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
-		resp, err := keeper.LimitOrderPoolFillMapAll(wctx, request(nil, 0, 0, true))
+		resp, err := keeper.LimitOrderPoolFillObjectAll(wctx, request(nil, 0, 0, true))
 		require.NoError(t, err)
 		require.Equal(t, len(msgs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(msgs),
-			nullify.Fill(resp.LimitOrderPoolFillMap),
+			nullify.Fill(resp.LimitOrderPoolFillObject),
 		)
 	})
 	t.Run("InvalidRequest", func(t *testing.T) {
-		_, err := keeper.LimitOrderPoolFillMapAll(wctx, nil)
+		_, err := keeper.LimitOrderPoolFillObjectAll(wctx, nil)
 		require.ErrorIs(t, err, status.Error(codes.InvalidArgument, "invalid request"))
 	})
 }

@@ -21,27 +21,27 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func networkWithLimitOrderPoolFillMapObjects(t *testing.T, n int) (*network.Network, []types.LimitOrderPoolFillMap) {
+func networkWithLimitOrderPoolFillObjectObjects(t *testing.T, n int) (*network.Network, []types.LimitOrderPoolFillObject) {
 	t.Helper()
 	cfg := network.DefaultConfig()
 	state := types.GenesisState{}
 	require.NoError(t, cfg.Codec.UnmarshalJSON(cfg.GenesisState[types.ModuleName], &state))
 
 	for i := 0; i < n; i++ {
-		limitOrderPoolFillMap := types.LimitOrderPoolFillMap{
+		limitOrderPoolFillObject := types.LimitOrderPoolFillObject{
 			Count: uint64(i),
 		}
-		nullify.Fill(&limitOrderPoolFillMap)
-		state.LimitOrderPoolFillMapList = append(state.LimitOrderPoolFillMapList, limitOrderPoolFillMap)
+		nullify.Fill(&limitOrderPoolFillObject)
+		state.LimitOrderPoolFillObjectList = append(state.LimitOrderPoolFillObjectList, limitOrderPoolFillObject)
 	}
 	buf, err := cfg.Codec.MarshalJSON(&state)
 	require.NoError(t, err)
 	cfg.GenesisState[types.ModuleName] = buf
-	return network.New(t, cfg), state.LimitOrderPoolFillMapList
+	return network.New(t, cfg), state.LimitOrderPoolFillObjectList
 }
 
-func TestShowLimitOrderPoolFillMap(t *testing.T) {
-	net, objs := networkWithLimitOrderPoolFillMapObjects(t, 2)
+func TestShowLimitOrderPoolFillObject(t *testing.T) {
+	net, objs := networkWithLimitOrderPoolFillObjectObjects(t, 2)
 
 	ctx := net.Validators[0].ClientCtx
 	common := []string{
@@ -53,7 +53,7 @@ func TestShowLimitOrderPoolFillMap(t *testing.T) {
 
 		args []string
 		err  error
-		obj  types.LimitOrderPoolFillMap
+		obj  types.LimitOrderPoolFillObject
 	}{
 		{
 			desc:    "found",
@@ -75,27 +75,27 @@ func TestShowLimitOrderPoolFillMap(t *testing.T) {
 				strconv.Itoa(int(tc.idCount)),
 			}
 			args = append(args, tc.args...)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowLimitOrderPoolFillMap(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowLimitOrderPoolFillObject(), args)
 			if tc.err != nil {
 				stat, ok := status.FromError(tc.err)
 				require.True(t, ok)
 				require.ErrorIs(t, stat.Err(), tc.err)
 			} else {
 				require.NoError(t, err)
-				var resp types.QueryGetLimitOrderPoolFillMapResponse
+				var resp types.QueryGetLimitOrderPoolFillObjectResponse
 				require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-				require.NotNil(t, resp.LimitOrderPoolFillMap)
+				require.NotNil(t, resp.LimitOrderPoolFillObject)
 				require.Equal(t,
 					nullify.Fill(&tc.obj),
-					nullify.Fill(&resp.LimitOrderPoolFillMap),
+					nullify.Fill(&resp.LimitOrderPoolFillObject),
 				)
 			}
 		})
 	}
 }
 
-func TestListLimitOrderPoolFillMap(t *testing.T) {
-	net, objs := networkWithLimitOrderPoolFillMapObjects(t, 5)
+func TestListLimitOrderPoolFillObject(t *testing.T) {
+	net, objs := networkWithLimitOrderPoolFillObjectObjects(t, 5)
 
 	ctx := net.Validators[0].ClientCtx
 	request := func(next []byte, offset, limit uint64, total bool) []string {
@@ -117,14 +117,14 @@ func TestListLimitOrderPoolFillMap(t *testing.T) {
 		step := 2
 		for i := 0; i < len(objs); i += step {
 			args := request(nil, uint64(i), uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolFillMap(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolFillObject(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllLimitOrderPoolFillMapResponse
+			var resp types.QueryAllLimitOrderPoolFillObjectResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.LimitOrderPoolFillMap), step)
+			require.LessOrEqual(t, len(resp.LimitOrderPoolFillObject), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.LimitOrderPoolFillMap),
+				nullify.Fill(resp.LimitOrderPoolFillObject),
 			)
 		}
 	})
@@ -133,29 +133,29 @@ func TestListLimitOrderPoolFillMap(t *testing.T) {
 		var next []byte
 		for i := 0; i < len(objs); i += step {
 			args := request(next, 0, uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolFillMap(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolFillObject(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllLimitOrderPoolFillMapResponse
+			var resp types.QueryAllLimitOrderPoolFillObjectResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.LimitOrderPoolFillMap), step)
+			require.LessOrEqual(t, len(resp.LimitOrderPoolFillObject), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.LimitOrderPoolFillMap),
+				nullify.Fill(resp.LimitOrderPoolFillObject),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
 		args := request(nil, 0, uint64(len(objs)), true)
-		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolFillMap(), args)
+		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolFillObject(), args)
 		require.NoError(t, err)
-		var resp types.QueryAllLimitOrderPoolFillMapResponse
+		var resp types.QueryAllLimitOrderPoolFillObjectResponse
 		require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 		require.NoError(t, err)
 		require.Equal(t, len(objs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(objs),
-			nullify.Fill(resp.LimitOrderPoolFillMap),
+			nullify.Fill(resp.LimitOrderPoolFillObject),
 		)
 	})
 }

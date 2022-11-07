@@ -15,7 +15,7 @@ import "dex/limit_order_pool_user_share_map.proto";
 import "dex/limit_order_pool_user_shares_withdrawn.proto";
 import "dex/limit_order_pool_total_shares_map.proto";
 import "dex/limit_order_pool_reserve_map.proto";
-import "dex/limit_order_pool_fill_map.proto";
+import "dex/limit_order_pool_fill_object.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -126,13 +126,13 @@ service Query {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_reserve_map";
 	}
 
-// Queries a LimitOrderPoolFillMap by index.
-	rpc LimitOrderPoolFillMap(QueryGetLimitOrderPoolFillMapRequest) returns (QueryGetLimitOrderPoolFillMapResponse) {
+// Queries a LimitOrderPoolFillObject by index.
+	rpc LimitOrderPoolFillObject(QueryGetLimitOrderPoolFillObjectRequest) returns (QueryGetLimitOrderPoolFillObjectResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_fill_map/{pairId}/{token}/{tickIndex}/{count}";
 	}
 
-	// Queries a list of LimitOrderPoolFillMap items.
-	rpc LimitOrderPoolFillMapAll(QueryAllLimitOrderPoolFillMapRequest) returns (QueryAllLimitOrderPoolFillMapResponse) {
+	// Queries a list of LimitOrderPoolFillObject items.
+	rpc LimitOrderPoolFillObjectAll(QueryAllLimitOrderPoolFillObjectRequest) returns (QueryAllLimitOrderPoolFillObjectResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_fill_map";
 	}
 
@@ -345,7 +345,7 @@ message QueryAllLimitOrderPoolReserveMapResponse {
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-message QueryGetLimitOrderPoolFillMapRequest {
+message QueryGetLimitOrderPoolFillObjectRequest {
 	  string pairId = 1;
   int64 tickIndex =2;
   string token = 3;
@@ -353,16 +353,16 @@ message QueryGetLimitOrderPoolFillMapRequest {
 
 }
 
-message QueryGetLimitOrderPoolFillMapResponse {
-	LimitOrderPoolFillMap limitOrderPoolFillMap = 1 [(gogoproto.nullable) = false];
+message QueryGetLimitOrderPoolFillObjectResponse {
+	LimitOrderPoolFillObject limitOrderPoolFillObject = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryAllLimitOrderPoolFillMapRequest {
+message QueryAllLimitOrderPoolFillObjectRequest {
 	cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-message QueryAllLimitOrderPoolFillMapResponse {
-	repeated LimitOrderPoolFillMap limitOrderPoolFillMap = 1 [(gogoproto.nullable) = false];
+message QueryAllLimitOrderPoolFillObjectResponse {
+	repeated LimitOrderPoolFillObject limitOrderPoolFillObject = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

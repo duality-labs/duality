@@ -15,24 +15,24 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNLimitOrderPoolFillMap(keeper *keeper.Keeper, ctx sdk.Context, pairId string, tickIndex int64, token string, n int) []types.LimitOrderPoolFillMap {
-	items := make([]types.LimitOrderPoolFillMap, n)
+func createNLimitOrderPoolFillObject(keeper *keeper.Keeper, ctx sdk.Context, pairId string, tickIndex int64, token string, n int) []types.LimitOrderPoolFillObject {
+	items := make([]types.LimitOrderPoolFillObject, n)
 	for i := range items {
 		items[i].Count = uint64(i)
 		items[i].PairId = pairId
 		items[i].TickIndex = tickIndex
 		items[i].Token = token
 		items[i].FilledReserves = sdk.ZeroDec()
-		keeper.SetLimitOrderPoolFillMap(ctx, items[i])
+		keeper.SetLimitOrderPoolFillObject(ctx, items[i])
 	}
 	return items
 }
 
-func TestLimitOrderPoolFillMapGet(t *testing.T) {
+func TestLimitOrderPoolFillObjectGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolFillMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolFillObject(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
 	for _, item := range items {
-		rst, found := keeper.GetLimitOrderPoolFillMap(ctx,
+		rst, found := keeper.GetLimitOrderPoolFillObject(ctx,
 			"TokenA/TokenB",
 			0,
 			"TokenA",
@@ -45,17 +45,17 @@ func TestLimitOrderPoolFillMapGet(t *testing.T) {
 		)
 	}
 }
-func TestLimitOrderPoolFillMapRemove(t *testing.T) {
+func TestLimitOrderPoolFillObjectRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolFillMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolFillObject(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
 	for _, item := range items {
-		keeper.RemoveLimitOrderPoolFillMap(ctx,
+		keeper.RemoveLimitOrderPoolFillObject(ctx,
 			"TokenA/TokenB",
 			0,
 			"TokenA",
 			item.Count,
 		)
-		_, found := keeper.GetLimitOrderPoolFillMap(ctx,
+		_, found := keeper.GetLimitOrderPoolFillObject(ctx,
 			"TokenA/TokenB",
 			0,
 			"TokenA",

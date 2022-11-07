@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListLimitOrderPoolFillMap() *cobra.Command {
+func CmdListLimitOrderPoolFillObject() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-limit-order-pool-fill-map",
-		Short: "list all LimitOrderPoolFillMap",
+		Short: "list all LimitOrderPoolFillObject",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -24,11 +24,11 @@ func CmdListLimitOrderPoolFillMap() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllLimitOrderPoolFillMapRequest{
+			params := &types.QueryAllLimitOrderPoolFillObjectRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.LimitOrderPoolFillMapAll(context.Background(), params)
+			res, err := queryClient.LimitOrderPoolFillObjectAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -43,10 +43,10 @@ func CmdListLimitOrderPoolFillMap() *cobra.Command {
 	return cmd
 }
 
-func CmdShowLimitOrderPoolFillMap() *cobra.Command {
+func CmdShowLimitOrderPoolFillObject() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "show-limit-order-pool-fill-map [count]",
-		Short: "shows a LimitOrderPoolFillMap",
+		Short: "shows a LimitOrderPoolFillObject",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -61,11 +61,11 @@ func CmdShowLimitOrderPoolFillMap() *cobra.Command {
 				return err
 			}
 
-			params := &types.QueryGetLimitOrderPoolFillMapRequest{
+			params := &types.QueryGetLimitOrderPoolFillObjectRequest{
 				Count: uint64(argCount),
 			}
 
-			res, err := queryClient.LimitOrderPoolFillMap(context.Background(), params)
+			res, err := queryClient.LimitOrderPoolFillObject(context.Background(), params)
 			if err != nil {
 				return err
 			}

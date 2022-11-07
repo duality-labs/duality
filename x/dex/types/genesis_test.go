@@ -115,7 +115,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						Count: 1,
 					},
 				},
-				LimitOrderPoolFillMapList: []types.LimitOrderPoolFillMap{
+				LimitOrderPoolFillObjectList: []types.LimitOrderPoolFillObject{
 					{
 						Count: 0,
 					},
@@ -303,9 +303,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated limitOrderPoolFillMap",
+			desc: "duplicated limitOrderPoolFillObject",
 			genState: &types.GenesisState{
-				LimitOrderPoolFillMapList: []types.LimitOrderPoolFillMap{
+				LimitOrderPoolFillObjectList: []types.LimitOrderPoolFillObject{
 					{
 						Count: 0,
 					},
