@@ -58,10 +58,11 @@ COPY docker/fullnode/app.toml /root/.duality/config/app.toml
 COPY docker/fullnode/client.toml /root/.duality/config/client.toml
 COPY docker/fullnode/config.toml /root/.duality/config/config.toml
 
-# see docs for exposed ports:
-#   https://docs.ignite.com/kb/config.html#host
+# expose all used ports
+EXPOSE 26658
 EXPOSE 26657
 EXPOSE 26656
+EXPOSE 9091
 EXPOSE 9090
 EXPOSE 6060
 EXPOSE 1317
