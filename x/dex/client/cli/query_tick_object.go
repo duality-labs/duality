@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListTickMap() *cobra.Command {
+func CmdListTickObject() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-tick-map",
-		Short: "list all TickMap",
+		Short: "list all TickObject",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -24,11 +24,11 @@ func CmdListTickMap() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllTickMapRequest{
+			params := &types.QueryAllTickObjectRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.TickMapAll(context.Background(), params)
+			res, err := queryClient.TickObjectAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -43,10 +43,10 @@ func CmdListTickMap() *cobra.Command {
 	return cmd
 }
 
-func CmdShowTickMap() *cobra.Command {
+func CmdShowTickObject() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "show-tick-map [tick-index]",
-		Short: "shows a TickMap",
+		Short: "shows a TickObject",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -56,11 +56,11 @@ func CmdShowTickMap() *cobra.Command {
 			argTickIndex := args[0]
 
 			tmpTickIndex, _ := strconv.Atoi(argTickIndex)
-			params := &types.QueryGetTickMapRequest{
+			params := &types.QueryGetTickObjectRequest{
 				TickIndex: int64(tmpTickIndex),
 			}
 
-			res, err := queryClient.TickMap(context.Background(), params)
+			res, err := queryClient.TickObject(context.Background(), params)
 			if err != nil {
 				return err
 			}

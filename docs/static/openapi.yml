@@ -31388,15 +31388,15 @@ paths:
         - Query
   /NicholasDotSol/duality/dex/tick_map:
     get:
-      summary: Queries a list of TickMap items.
-      operationId: NicholasdotsolDualityDexTickMapAll
+      summary: Queries a list of TickObject items.
+      operationId: NicholasdotsolDualityDexTickObjectAll
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              tickMap:
+              tickObject:
                 type: array
                 items:
                   type: object
@@ -31546,15 +31546,15 @@ paths:
         - Query
   '/NicholasDotSol/duality/dex/tick_map/{pairId}/{tickIndex}':
     get:
-      summary: Queries a TickMap by index.
-      operationId: NicholasdotsolDualityDexTickMap
+      summary: Queries a TickObject by index.
+      operationId: NicholasdotsolDualityDexTickObject
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              tickMap:
+              tickObject:
                 type: object
                 properties:
                   pairId:
@@ -54170,10 +54170,10 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  nicholasdotsol.duality.dex.QueryAllTickMapResponse:
+  nicholasdotsol.duality.dex.QueryAllTickObjectResponse:
     type: object
     properties:
-      tickMap:
+      tickObject:
         type: array
         items:
           type: object
@@ -54462,10 +54462,10 @@ definitions:
             format: uint64
           sharesOwned:
             type: string
-  nicholasdotsol.duality.dex.QueryGetTickMapResponse:
+  nicholasdotsol.duality.dex.QueryGetTickObjectResponse:
     type: object
     properties:
-      tickMap:
+      tickObject:
         type: object
         properties:
           pairId:
@@ -54574,7 +54574,7 @@ definitions:
         type: array
         items:
           type: string
-  nicholasdotsol.duality.dex.TickMap:
+  nicholasdotsol.duality.dex.TickObject:
     type: object
     properties:
       pairId:

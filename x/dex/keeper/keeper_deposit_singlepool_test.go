@@ -161,8 +161,8 @@ func calculateShares(amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex 
 	feelist := k.GetAllFeeList(ctx)
 	fee := feelist[feeIndex].Fee
 
-	lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, tickIndex-fee)
-	upperTick, upperTickFound := k.GetTickMap(ctx, pairId, tickIndex+fee)
+	lowerTick, lowerTickFound := k.GetTickObject(ctx, pairId, tickIndex-fee)
+	upperTick, upperTickFound := k.GetTickObject(ctx, pairId, tickIndex+fee)
 	// TODO: this won't work if not found
 	lowerReserve1 := lowerTick.TickData.Reserve1[feeIndex]
 	upperReserve0, upperTotalShares := upperTick.TickData.Reserve0AndShares[feeIndex].Reserve0, upperTick.TickData.Reserve0AndShares[feeIndex].TotalShares

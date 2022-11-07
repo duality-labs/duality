@@ -240,8 +240,8 @@ export interface DexQueryAllSharesResponse {
   pagination?: V1Beta1PageResponse;
 }
 
-export interface DexQueryAllTickMapResponse {
-  tickMap?: DexTickMap[];
+export interface DexQueryAllTickObjectResponse {
+  tickObject?: DexTickObject[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -317,8 +317,8 @@ export interface DexQueryGetSharesResponse {
   shares?: DexShares;
 }
 
-export interface DexQueryGetTickMapResponse {
-  tickMap?: DexTickMap;
+export interface DexQueryGetTickObjectResponse {
+  tickObject?: DexTickObject;
 }
 
 export interface DexQueryGetTokenMapResponse {
@@ -359,7 +359,7 @@ export interface DexTickDataType {
   reserve1?: string[];
 }
 
-export interface DexTickMap {
+export interface DexTickObject {
   pairId?: string;
 
   /** @format int64 */
@@ -1059,11 +1059,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryTickMapAll
-   * @summary Queries a list of TickMap items.
+   * @name QueryTickObjectAll
+   * @summary Queries a list of TickObject items.
    * @request GET:/NicholasDotSol/duality/dex/tick_map
    */
-  queryTickMapAll = (
+  queryTickObjectAll = (
     query?: {
       "pagination.key"?: string;
       "pagination.offset"?: string;
@@ -1073,7 +1073,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     },
     params: RequestParams = {},
   ) =>
-    this.request<DexQueryAllTickMapResponse, RpcStatus>({
+    this.request<DexQueryAllTickObjectResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/tick_map`,
       method: "GET",
       query: query,
@@ -1085,12 +1085,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryTickMap
-   * @summary Queries a TickMap by index.
+   * @name QueryTickObject
+   * @summary Queries a TickObject by index.
    * @request GET:/NicholasDotSol/duality/dex/tick_map/{pairId}/{tickIndex}
    */
-  queryTickMap = (pairId: string, tickIndex: string, params: RequestParams = {}) =>
-    this.request<DexQueryGetTickMapResponse, RpcStatus>({
+  queryTickObject = (pairId: string, tickIndex: string, params: RequestParams = {}) =>
+    this.request<DexQueryGetTickObjectResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/tick_map/${pairId}/${tickIndex}`,
       method: "GET",
       format: "json",

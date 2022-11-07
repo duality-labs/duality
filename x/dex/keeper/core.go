@@ -21,8 +21,8 @@ func (k Keeper) GetTotalReservesAtTick(goCtx context.Context, pairId string, tic
 	var totalReserve0 = sdk.ZeroDec()
 	var totalReserve1 = sdk.ZeroDec()
 
-	// retrivies tick from tickMaping
-	tick, tickFound := k.GetTickMap(ctx, pairId, tick_index_)
+	// retrivies tick from tickObjecting
+	tick, tickFound := k.GetTickObject(ctx, pairId, tick_index_)
 
 	// verifies that tick at the given tick index exists
 	if !tickFound {
@@ -110,8 +110,8 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Getter functions for the tick that corresponds to reserve0 and shares (upper tick), and reserve1 (lower tick)
-	lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, tickIndex-int64(fee))
-	upperTick, upperTickFound := k.GetTickMap(ctx, pairId, tickIndex+int64(fee))
+	lowerTick, lowerTickFound := k.GetTickObject(ctx, pairId, tickIndex-int64(fee))
+	upperTick, upperTickFound := k.GetTickObject(ctx, pairId, tickIndex+int64(fee))
 
 	// Default sets trueAmounts0/1 to amount0/1
 	trueAmount0 := amount0
@@ -142,7 +142,7 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 
 			// Creates an tick object of the speciied size and then iterates over each sub struct filling it with 0 values.
 
-			lowerTick = types.TickMap{
+			lowerTick = types.TickObject{
 				TickIndex: tickIndex - fee,
 				TickData: &types.TickDataType{
 					Reserve0AndShares: make([]*types.Reserve0AndSharesType, feeSize),
@@ -167,7 +167,7 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 
 			// Creates an tick object of the specied size and then iterates over each sub struct filling it with 0 values.
 
-			upperTick = types.TickMap{
+			upperTick = types.TickObject{
 				TickIndex: tickIndex + fee,
 				TickData: &types.TickDataType{
 					Reserve0AndShares: make([]*types.Reserve0AndSharesType, feeSize),
@@ -253,8 +253,8 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 
 	// Set pair, lower and upperTick KVStores
 	k.SetPairMap(ctx, pair)
-	k.SetTickMap(ctx, pairId, lowerTick)
-	k.SetTickMap(ctx, pairId, upperTick)
+	k.SetTickObject(ctx, pairId, lowerTick)
+	k.SetTickObject(ctx, pairId, upperTick)
 
 	return trueAmount0, trueAmount1, sharesMinted, upperTick.TickData.Reserve0AndShares[feeIndex].Reserve0, lowerTick.TickData.Reserve1[feeIndex], nil
 
@@ -421,8 +421,8 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 
 		// loads the related upper / lower tick for the specified fee
 		// @dev note we are hear using the specific feeValue not feeIndex
-		upperTick, upperTickFound := k.GetTickMap(ctx, pairId, msg.TickIndexes[i]+int64(fee))
-		lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, msg.TickIndexes[i]-int64(fee))
+		upperTick, upperTickFound := k.GetTickObject(ctx, pairId, msg.TickIndexes[i]+int64(fee))
+		lowerTick, lowerTickFound := k.GetTickObject(ctx, pairId, msg.TickIndexes[i]-int64(fee))
 
 		// If a tick is not found error
 		// Note both a upper and lower ticks are initialized on any given deposit; even given a singleSided deposit. Therefore if either the upper or lower tick was not initialized it would be consdiered unexpected conditions
@@ -491,7 +491,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 
 				c++
 				// checks for the next value tick containing amount0 (adding some constant)
-				_, tickFound = k.GetTickMap(ctx, pairId, (msg.TickIndexes[i] + fee + int64(c)))
+				_, tickFound = k.GetTickObject(ctx, pairId, (msg.TickIndexes[i] + fee + int64(c)))
 
 			}
 			// sets currentTick0to1 to new found tick
@@ -507,7 +507,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 
 				c++
 				// checks for the next value tick containing amount1 (subtracting some constant)
-				_, tickFound = k.GetTickMap(ctx, pairId, (msg.TickIndexes[i] - fee - int64(c)))
+				_, tickFound = k.GetTickObject(ctx, pairId, (msg.TickIndexes[i] - fee - int64(c)))
 
 			}
 			// sets currentTick1to0 to new found tick
@@ -520,8 +520,8 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 
 		// sets changes to tick mappings, and share mappings
 		k.SetShares(ctx, shareOwner)
-		k.SetTickMap(ctx, pairId, upperTick)
-		k.SetTickMap(ctx, pairId, lowerTick)
+		k.SetTickObject(ctx, pairId, upperTick)
+		k.SetTickObject(ctx, pairId, lowerTick)
 
 		// emits event for individiual withdrawl
 		ctx.EventManager().EmitEvent(types.CreateWithdrawEvent(msg.Creator, msg.Receiver,
@@ -589,7 +589,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	for !amount_left.Equal(sdk.ZeroDec()) && (count < int(pair.TotalTickCount)) {
 
 		// Tick data for tick that holds information about reserve1
-		Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1)
+		Current1Data, Current1Found := k.GetTickObject(ctx, pairId, pair.TokenPair.CurrentTick0To1)
 
 		// If a tick at Current0to1 is not found, decrement CurrentTick0to1 (to the next tick that is supposed to contain reserve1) and check again
 		if !Current1Found {
@@ -609,7 +609,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			fee := feelist[i].Fee
 
 			// @dev CurrentTick0to1 + 2 * fee finds the respective tickPair (containing totalShares, reserve0)
-			Current0Data, Current0Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1+2*fee)
+			Current0Data, Current0Found := k.GetTickObject(ctx, pairId, pair.TokenPair.CurrentTick0To1+2*fee)
 			//Current0Datam := Current0Data.TickData.Reserve1[i]
 
 			// If tick/feeIndex pair is not found continue
@@ -654,11 +654,11 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			//updates feeIndex
 			i++
 
-			//Make updates to tickMap containing reserve0/1 data to the KVStore
-			k.SetTickMap(ctx, pairId, Current0Data)
+			//Make updates to tickObject containing reserve0/1 data to the KVStore
+			k.SetTickObject(ctx, pairId, Current0Data)
 
 		}
-		k.SetTickMap(ctx, pairId, Current1Data)
+		k.SetTickObject(ctx, pairId, Current1Data)
 
 		// if feeIndex is equal to the largest index in feeList check for valid limit orders
 		if i == feeSize {
@@ -729,7 +729,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 	for !amount_left.Equal(sdk.ZeroDec()) && (count < int(pair.TotalTickCount)) {
 
-		Current0Data, Current0Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick1To0)
+		Current0Data, Current0Found := k.GetTickObject(ctx, pairId, pair.TokenPair.CurrentTick1To0)
 		//Current0Datam := Current0Data.TickData.Reserve1[i]
 
 		// If tick/feeIndex pair is not found continue
@@ -752,7 +752,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			fee := feelist[i].Fee
 
 			// @dev CurrentTick1to0 - 2 * fee finds the respective tickPair (reserve1)
-			Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick1To0-2*fee)
+			Current1Data, Current1Found := k.GetTickObject(ctx, pairId, pair.TokenPair.CurrentTick1To0-2*fee)
 
 			if !Current1Found {
 				i++
@@ -797,12 +797,12 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			//updates feeIndex
 			i++
 
-			//Make updates to tickMap containing reserve0/1 data to the KVStore
+			//Make updates to tickObject containing reserve0/1 data to the KVStore
 
-			k.SetTickMap(ctx, pairId, Current1Data)
+			k.SetTickObject(ctx, pairId, Current1Data)
 		}
 
-		k.SetTickMap(ctx, pairId, Current0Data)
+		k.SetTickObject(ctx, pairId, Current0Data)
 		// if feeIndex is equal to the largest index in feeList, check for valid limit orders at the specfied tick
 		if i == feeSize {
 
@@ -852,7 +852,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 	}
 
 	// Gets tick for specified tick at currentTick0to1
-	tick, tickFound := k.GetTickMap(ctx, pairId, CurrentTick1to0)
+	tick, tickFound := k.GetTickObject(ctx, pairId, CurrentTick1to0)
 
 	// Edge case: if tick specified by CurrentTick1to0 is not found, there does not exists any valid limit orders by construction, and thus return the same amount_left, amount_out as inputted
 	if !tickFound {
@@ -942,7 +942,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 	k.SetLimitOrderPoolFillMap(ctx, FillData)
 
 	//Updates limitOrderCurrentKey based on if any limitOrders were completely filled.
-	k.SetTickMap(ctx, pairId, tick)
+	k.SetTickObject(ctx, pairId, tick)
 
 	_ = ctx
 
@@ -962,7 +962,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 		return sdk.ZeroDec(), sdk.ZeroDec(), err
 	}
 
-	tick, tickFound := k.GetTickMap(ctx, pairId, CurrentTick0to1)
+	tick, tickFound := k.GetTickObject(ctx, pairId, CurrentTick0to1)
 
 	// Edge case: if tick specified by CurrentTick1to0 is not found, there does not exists any valid limit orders by construction, and thus return the same amount_left, amount_out as inputted
 	if !tickFound {
@@ -1049,7 +1049,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 	k.SetLimitOrderPoolFillMap(ctx, FillData)
 
 	//Updates limitOrderCurrentKey based on if any limitOrders were completely filled.
-	k.SetTickMap(ctx, pairId, tick)
+	k.SetTickObject(ctx, pairId, tick)
 
 	_ = ctx
 
@@ -1059,11 +1059,11 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 ///// Limit Order Functions
 
 // Helper Function for PlaceLimitOrder handling initializing a new tick
-func (k Keeper) PlaceLimitOrderHelper(goCtx context.Context, pairId string, tickIndex int64) types.TickMap {
+func (k Keeper) PlaceLimitOrderHelper(goCtx context.Context, pairId string, tickIndex int64) types.TickObject {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// returns tick object for tick specified by tickIndex
-	tick, tickFound := k.GetTickMap(ctx, pairId, tickIndex)
+	tick, tickFound := k.GetTickObject(ctx, pairId, tickIndex)
 
 	// size of the feeList
 	feeSize := k.GetFeeListCount(ctx)
@@ -1072,7 +1072,7 @@ func (k Keeper) PlaceLimitOrderHelper(goCtx context.Context, pairId string, tick
 
 		// If tick does not exists intialize it
 		// @Dev initialize reserves struct to avoid having to check for individual subtype existance between deposit and placeLimitOrder
-		tick = types.TickMap{
+		tick = types.TickObject{
 			PairId:    pairId,
 			TickIndex: tickIndex,
 			TickData: &types.TickDataType{
@@ -1158,7 +1158,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	}
 
 	//checks if tick is initialized and if not set count and currentLimitOrder key to 0
-	/// tick is an object of the tickMapping for the specified tickIndex and mapping
+	/// tick is an object of the tickObjectping for the specified tickIndex and mapping
 	tick := k.PlaceLimitOrderHelper(goCtx, pairId, msg.TickIndex)
 
 	// currentLimitOrder key for Pool0to1 or Pool0to1
@@ -1251,7 +1251,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	k.SetLimitOrderPoolReserveMap(ctx, ReserveData)
 	k.SetLimitOrderPoolUserShareMap(ctx, UserShareData)
 	k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesData)
-	k.SetTickMap(ctx, pairId, tick)
+	k.SetTickObject(ctx, pairId, tick)
 
 	// If a new tick has been placed that tigtens the spread between currentTick0to1 and currentTick0to1 update CurrentTicks to the tighest ticks
 	// @Dev assumes that msg.amountIn > 0
@@ -1287,8 +1287,8 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 
 	// PairId for token0, token1 ("token0/token1")
 	pairId := k.CreatePairId(token0, token1)
-	// Retrives TickMap object from KVStore
-	_, tickFound := k.GetTickMap(ctx, pairId, msg.TickIndex)
+	// Retrives TickObject object from KVStore
+	_, tickFound := k.GetTickObject(ctx, pairId, msg.TickIndex)
 
 	// If tick does not exist, then there is no liqudity to withdraw and thus error
 	if !tickFound {
@@ -1352,8 +1352,8 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 
 	// PairId for token0, token1 ("token0/token1")
 	pairId := k.CreatePairId(token0, token1)
-	// Retrives TickMap object from KVStore
-	_, tickFound := k.GetTickMap(ctx, pairId, msg.TickIndex)
+	// Retrives TickObject object from KVStore
+	_, tickFound := k.GetTickObject(ctx, pairId, msg.TickIndex)
 
 	// If tick does not exist, then there is no liqudity to withdraw and thus error
 	if !tickFound {

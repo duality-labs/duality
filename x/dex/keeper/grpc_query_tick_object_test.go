@@ -18,35 +18,35 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func TestTickMapQuerySingle(t *testing.T) {
+func TestTickObjectQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNTickMap(keeper, ctx, "TokenA/TokenB", 2)
+	msgs := createNTickObject(keeper, ctx, "TokenA/TokenB", 2)
 	for _, tc := range []struct {
 		desc     string
-		request  *types.QueryGetTickMapRequest
-		response *types.QueryGetTickMapResponse
+		request  *types.QueryGetTickObjectRequest
+		response *types.QueryGetTickObjectResponse
 		err      error
 	}{
 		{
 			desc: "First",
-			request: &types.QueryGetTickMapRequest{
+			request: &types.QueryGetTickObjectRequest{
 				TickIndex: msgs[0].TickIndex,
 				PairId:    "TokenA/TokenB",
 			},
-			response: &types.QueryGetTickMapResponse{TickMap: msgs[0]},
+			response: &types.QueryGetTickObjectResponse{TickObject: msgs[0]},
 		},
 		{
 			desc: "Second",
-			request: &types.QueryGetTickMapRequest{
+			request: &types.QueryGetTickObjectRequest{
 				TickIndex: msgs[1].TickIndex,
 				PairId:    "TokenA/TokenB",
 			},
-			response: &types.QueryGetTickMapResponse{TickMap: msgs[1]},
+			response: &types.QueryGetTickObjectResponse{TickObject: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
-			request: &types.QueryGetTickMapRequest{
+			request: &types.QueryGetTickObjectRequest{
 				TickIndex: 100000,
 			},
 			err: status.Error(codes.NotFound, "not found"),
@@ -57,7 +57,7 @@ func TestTickMapQuerySingle(t *testing.T) {
 		},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
-			response, err := keeper.TickMap(wctx, tc.request)
+			response, err := keeper.TickObject(wctx, tc.request)
 			if tc.err != nil {
 				require.ErrorIs(t, err, tc.err)
 			} else {
@@ -71,13 +71,13 @@ func TestTickMapQuerySingle(t *testing.T) {
 	}
 }
 
-func TestTickMapQueryPaginated(t *testing.T) {
+func TestTickObjectQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNTickMap(keeper, ctx, "TokenB/TokenA", 5)
+	msgs := createNTickObject(keeper, ctx, "TokenB/TokenA", 5)
 
-	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllTickMapRequest {
-		return &types.QueryAllTickMapRequest{
+	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllTickObjectRequest {
+		return &types.QueryAllTickObjectRequest{
 			Pagination: &query.PageRequest{
 				Key:        next,
 				Offset:     offset,
@@ -89,12 +89,12 @@ func TestTickMapQueryPaginated(t *testing.T) {
 	t.Run("ByOffset", func(t *testing.T) {
 		step := 2
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.TickMapAll(wctx, request(nil, uint64(i), uint64(step), false))
+			resp, err := keeper.TickObjectAll(wctx, request(nil, uint64(i), uint64(step), false))
 			require.NoError(t, err)
-			require.LessOrEqual(t, len(resp.TickMap), step)
+			require.LessOrEqual(t, len(resp.TickObject), step)
 			require.Subset(t,
 				nullify.Fill(msgs),
-				nullify.Fill(resp.TickMap),
+				nullify.Fill(resp.TickObject),
 			)
 		}
 	})
@@ -102,27 +102,27 @@ func TestTickMapQueryPaginated(t *testing.T) {
 		step := 2
 		var next []byte
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.TickMapAll(wctx, request(next, 0, uint64(step), false))
+			resp, err := keeper.TickObjectAll(wctx, request(next, 0, uint64(step), false))
 			require.NoError(t, err)
-			require.LessOrEqual(t, len(resp.TickMap), step)
+			require.LessOrEqual(t, len(resp.TickObject), step)
 			require.Subset(t,
 				nullify.Fill(msgs),
-				nullify.Fill(resp.TickMap),
+				nullify.Fill(resp.TickObject),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
-		resp, err := keeper.TickMapAll(wctx, request(nil, 0, 0, true))
+		resp, err := keeper.TickObjectAll(wctx, request(nil, 0, 0, true))
 		require.NoError(t, err)
 		require.Equal(t, len(msgs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(msgs),
-			nullify.Fill(resp.TickMap),
+			nullify.Fill(resp.TickObject),
 		)
 	})
 	t.Run("InvalidRequest", func(t *testing.T) {
-		_, err := keeper.TickMapAll(wctx, nil)
+		_, err := keeper.TickObjectAll(wctx, nil)
 		require.ErrorIs(t, err, status.Error(codes.InvalidArgument, "invalid request"))
 	})
 }

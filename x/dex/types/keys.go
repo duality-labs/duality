@@ -34,8 +34,8 @@ const (
 	// TokenMapKeyPrefix is the prefix to retrieve all TokenMap
 	TokenMapKeyPrefix = "TokenMap/value"
 
-	// TickMapKeyPrefix is the prefix to retrieve all TickMap
-	BaseTickMapKeyPrefix = "TickMap/value"
+	// TickObjectKeyPrefix is the prefix to retrieve all TickObject
+	BaseTickObjectKeyPrefix = "TickObject/value"
 
 	// PairMapKeyPrefix is the prefix to retrieve all PairMap
 	PairMapKeyPrefix = "PairMap/value"
@@ -45,7 +45,7 @@ const (
 )
 
 func TickPrefix(pairId string) []byte {
-	return append(KeyPrefix(BaseTickMapKeyPrefix), KeyPrefix(pairId)...)
+	return append(KeyPrefix(BaseTickObjectKeyPrefix), KeyPrefix(pairId)...)
 }
 
 // TokenMapKey returns the store key to retrieve a TokenMap from the index fields
@@ -59,7 +59,7 @@ func TokenMapKey(address string) []byte {
 	return key
 }
 
-func TickMapKey(pairId string, tickIndex int64) []byte {
+func TickObjectKey(pairId string, tickIndex int64) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)

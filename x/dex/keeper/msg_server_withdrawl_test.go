@@ -77,7 +77,7 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 
 	suite.Require().Nil(err)
 
-	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 1))
+	fmt.Println(app.DexKeeper.GetTickObject(ctx, "TokenA/TokenB", 1))
 	fmt.Println()
 
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("50000000000000000000"))))
@@ -125,8 +125,8 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		Receiver:    alice.String(),
 	})
 
-	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 2))
-	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", -2))
+	fmt.Println(app.DexKeeper.GetTickObject(ctx, "TokenA/TokenB", 2))
+	fmt.Println(app.DexKeeper.GetTickObject(ctx, "TokenA/TokenB", -2))
 
 	suite.Require().Nil(err)
 
@@ -142,8 +142,8 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 
 	_ = createResponse2
 
-	lowerTick, _ := app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", -2)
-	upperTick, _ := app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 2)
+	lowerTick, _ := app.DexKeeper.GetTickObject(ctx, "TokenA/TokenB", -2)
+	upperTick, _ := app.DexKeeper.GetTickObject(ctx, "TokenA/TokenB", 2)
 
 	fmt.Println("Upper tic", upperTick)
 	suite.Require().Equal(upperTick.TickData.Reserve0AndShares[1].Reserve0, sdk.ZeroDec())
@@ -186,8 +186,8 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		Receiver:    alice.String(),
 	})
 
-	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 2))
-	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", -2))
+	fmt.Println(app.DexKeeper.GetTickObject(ctx, "TokenA/TokenB", 2))
+	fmt.Println(app.DexKeeper.GetTickObject(ctx, "TokenA/TokenB", -2))
 
 	suite.Require().Nil(err)
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("50000000000000000000"))))
@@ -234,8 +234,8 @@ func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
 		Receiver:    alice.String(),
 	})
 
-	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 2))
-	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", -2))
+	fmt.Println(app.DexKeeper.GetTickObject(ctx, "TokenA/TokenB", 2))
+	fmt.Println(app.DexKeeper.GetTickObject(ctx, "TokenA/TokenB", -2))
 
 	suite.Require().Nil(err)
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("50000000000000000000"))))

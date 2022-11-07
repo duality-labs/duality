@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "dex/params.proto";
-import "dex/tick_map.proto";
+import "dex/tick_object.proto";
 import "dex/pair_map.proto";
 import "dex/tokens.proto";
 import "dex/token_map.proto";
@@ -26,13 +26,13 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/NicholasDotSol/duality/dex/params";
   }
-  // Queries a TickMap by index.
-	rpc TickMap(QueryGetTickMapRequest) returns (QueryGetTickMapResponse) {
+  // Queries a TickObject by index.
+	rpc TickObject(QueryGetTickObjectRequest) returns (QueryGetTickObjectResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick_map/{pairId}/{tickIndex}";
 	}
 
-	// Queries a list of TickMap items.
-	rpc TickMapAll(QueryAllTickMapRequest) returns (QueryAllTickMapResponse) {
+	// Queries a list of TickObject items.
+	rpc TickObjectAll(QueryAllTickObjectRequest) returns (QueryAllTickObjectResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick_map";
 	}
 
@@ -148,23 +148,23 @@ message QueryParamsResponse {
   Params params = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryGetTickMapRequest {
+message QueryGetTickObjectRequest {
 	  int64 tickIndex = 1;
 	  string pairId = 2;
 	  
 
 }
 
-message QueryGetTickMapResponse {
-	TickMap tickMap = 1 [(gogoproto.nullable) = false];
+message QueryGetTickObjectResponse {
+	TickObject tickObject = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryAllTickMapRequest {
+message QueryAllTickObjectRequest {
 	cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-message QueryAllTickMapResponse {
-	repeated TickMap tickMap = 1 [(gogoproto.nullable) = false];
+message QueryAllTickObjectResponse {
+	repeated TickObject tickObject = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

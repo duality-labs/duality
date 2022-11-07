@@ -22,7 +22,7 @@ func TestGenesisState_Validate(t *testing.T) {
 			desc: "valid genesis state",
 			genState: &types.GenesisState{
 
-				TickMapList: []types.TickMap{
+				TickObjectList: []types.TickObject{
 					{
 						TickIndex: 0,
 					},
@@ -128,9 +128,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: true,
 		},
 		{
-			desc: "duplicated tickMap",
+			desc: "duplicated tickObject",
 			genState: &types.GenesisState{
-				TickMapList: []types.TickMap{
+				TickObjectList: []types.TickObject{
 					{
 						TickIndex: 0,
 					},

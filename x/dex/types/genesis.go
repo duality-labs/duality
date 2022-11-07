@@ -10,7 +10,7 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		TickMapList:                           []TickMap{},
+		TickObjectList:                        []TickObject{},
 		PairMapList:                           []PairMap{},
 		TokensList:                            []Tokens{},
 		TokenMapList:                          []TokenMap{},
@@ -29,15 +29,15 @@ func DefaultGenesis() *GenesisState {
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	// Check for duplicated index in tickMap
-	tickMapIndexMap := make(map[string]struct{})
+	// Check for duplicated index in tickObject
+	tickObjectIndexMap := make(map[string]struct{})
 
-	for _, elem := range gs.TickMapList {
-		index := string(TickMapKey(elem.PairId, elem.TickIndex))
-		if _, ok := tickMapIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for tickMap")
+	for _, elem := range gs.TickObjectList {
+		index := string(TickObjectKey(elem.PairId, elem.TickIndex))
+		if _, ok := tickObjectIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for tickObject")
 		}
-		tickMapIndexMap[index] = struct{}{}
+		tickObjectIndexMap[index] = struct{}{}
 	}
 	// Check for duplicated index in pairMap
 	pairMapIndexMap := make(map[string]struct{})

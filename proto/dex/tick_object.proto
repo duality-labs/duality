@@ -6,7 +6,7 @@ option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 import "dex/tick_data_type.proto";
 import "dex/limit_order_pool.proto";
 
-message TickMap {
+message TickObject {
   string pairId = 1;
   int64 tickIndex = 2; 
   TickDataType tickData = 3; 

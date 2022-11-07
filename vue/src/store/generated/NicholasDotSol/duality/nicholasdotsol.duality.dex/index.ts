@@ -12,13 +12,13 @@ import { Params } from "./module/types/dex/params"
 import { Reserve0AndSharesType } from "./module/types/dex/reserve_0_and_shares_type"
 import { Shares } from "./module/types/dex/shares"
 import { TickDataType } from "./module/types/dex/tick_data_type"
-import { TickMap } from "./module/types/dex/tick_map"
+import { TickObject } from "./module/types/dex/tick_map"
 import { TokenMap } from "./module/types/dex/token_map"
 import { TokenPairType } from "./module/types/dex/token_pair_type"
 import { Tokens } from "./module/types/dex/tokens"
 
 
-export { FeeList, LimitOrderPool, LimitOrderPoolFillMap, LimitOrderPoolReserveMap, LimitOrderPoolTotalSharesMap, LimitOrderPoolUserShareMap, LimitOrderPoolUserSharesWithdrawn, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
+export { FeeList, LimitOrderPool, LimitOrderPoolFillMap, LimitOrderPoolReserveMap, LimitOrderPoolTotalSharesMap, LimitOrderPoolUserShareMap, LimitOrderPoolUserSharesWithdrawn, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickObject, TokenMap, TokenPairType, Tokens };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -57,8 +57,8 @@ function getStructure(template) {
 const getDefaultState = () => {
 	return {
 				Params: {},
-				TickMap: {},
-				TickMapAll: {},
+				TickObject: {},
+				TickObjectAll: {},
 				PairMap: {},
 				PairMapAll: {},
 				Tokens: {},
@@ -93,7 +93,7 @@ const getDefaultState = () => {
 						Reserve0AndSharesType: getStructure(Reserve0AndSharesType.fromPartial({})),
 						Shares: getStructure(Shares.fromPartial({})),
 						TickDataType: getStructure(TickDataType.fromPartial({})),
-						TickMap: getStructure(TickMap.fromPartial({})),
+						TickObject: getStructure(TickObject.fromPartial({})),
 						TokenMap: getStructure(TokenMap.fromPartial({})),
 						TokenPairType: getStructure(TokenPairType.fromPartial({})),
 						Tokens: getStructure(Tokens.fromPartial({})),
@@ -131,17 +131,17 @@ export default {
 					}
 			return state.Params[JSON.stringify(params)] ?? {}
 		},
-				getTickMap: (state) => (params = { params: {}}) => {
+				getTickObject: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.TickMap[JSON.stringify(params)] ?? {}
+			return state.TickObject[JSON.stringify(params)] ?? {}
 		},
-				getTickMapAll: (state) => (params = { params: {}}) => {
+				getTickObjectAll: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.TickMapAll[JSON.stringify(params)] ?? {}
+			return state.TickObjectAll[JSON.stringify(params)] ?? {}
 		},
 				getPairMap: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
@@ -324,18 +324,18 @@ export default {
 		 		
 		
 		
-		async QueryTickMap({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryTickObject({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryTickMap( key.pairId,  key.tickIndex)).data
+				let value= (await queryClient.queryTickObject( key.pairId,  key.tickIndex)).data
 				
 					
-				commit('QUERY', { query: 'TickMap', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTickMap', payload: { options: { all }, params: {...key},query }})
-				return getters['getTickMap']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'TickObject', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTickObject', payload: { options: { all }, params: {...key},query }})
+				return getters['getTickObject']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryTickMap API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryTickObject API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -346,22 +346,22 @@ export default {
 		 		
 		
 		
-		async QueryTickMapAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryTickObjectAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryTickMapAll(query)).data
+				let value= (await queryClient.queryTickObjectAll(query)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryTickMapAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await queryClient.queryTickObjectAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
 					value = mergeResults(value, next_values);
 				}
-				commit('QUERY', { query: 'TickMapAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTickMapAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getTickMapAll']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'TickObjectAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTickObjectAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getTickObjectAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryTickMapAll API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryTickObjectAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

@@ -6,7 +6,7 @@ import { LimitOrderPool } from "../dex/limit_order_pool";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
-export interface TickMap {
+export interface TickObject {
   pairId: string;
   tickIndex: number;
   tickData: TickDataType | undefined;
@@ -14,10 +14,10 @@ export interface TickMap {
   LimitOrderPool1to0: LimitOrderPool | undefined;
 }
 
-const baseTickMap: object = { pairId: "", tickIndex: 0 };
+const baseTickObject: object = { pairId: "", tickIndex: 0 };
 
-export const TickMap = {
-  encode(message: TickMap, writer: Writer = Writer.create()): Writer {
+export const TickObject = {
+  encode(message: TickObject, writer: Writer = Writer.create()): Writer {
     if (message.pairId !== "") {
       writer.uint32(10).string(message.pairId);
     }
@@ -42,10 +42,10 @@ export const TickMap = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): TickMap {
+  decode(input: Reader | Uint8Array, length?: number): TickObject {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseTickMap } as TickMap;
+    const message = { ...baseTickObject } as TickObject;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -78,8 +78,8 @@ export const TickMap = {
     return message;
   },
 
-  fromJSON(object: any): TickMap {
-    const message = { ...baseTickMap } as TickMap;
+  fromJSON(object: any): TickObject {
+    const message = { ...baseTickObject } as TickObject;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = String(object.pairId);
     } else {
@@ -118,7 +118,7 @@ export const TickMap = {
     return message;
   },
 
-  toJSON(message: TickMap): unknown {
+  toJSON(message: TickObject): unknown {
     const obj: any = {};
     message.pairId !== undefined && (obj.pairId = message.pairId);
     message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
@@ -137,8 +137,8 @@ export const TickMap = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<TickMap>): TickMap {
-    const message = { ...baseTickMap } as TickMap;
+  fromPartial(object: DeepPartial<TickObject>): TickObject {
+    const message = { ...baseTickObject } as TickObject;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = object.pairId;
     } else {

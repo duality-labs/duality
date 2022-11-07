@@ -13,9 +13,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	// Set all the pairMap
 	for _, elem := range genState.PairMapList {
 		k.SetPairMap(ctx, elem)
-		// Set all the tickMap
-		for _, elem2 := range genState.TickMapList {
-			k.SetTickMap(ctx, elem.PairId, elem2)
+		// Set all the tickObject
+		for _, elem2 := range genState.TickObjectList {
+			k.SetTickObject(ctx, elem.PairId, elem2)
 		}
 
 	}
@@ -72,7 +72,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
 	genesis.Params = k.GetParams(ctx)
 
-	genesis.TickMapList = k.GetAllTickMap(ctx)
+	genesis.TickObjectList = k.GetAllTickObject(ctx)
 	genesis.PairMapList = k.GetAllPairMap(ctx)
 	genesis.TokensList = k.GetAllTokens(ctx)
 	genesis.TokensCount = k.GetTokensCount(ctx)

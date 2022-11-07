@@ -15,8 +15,8 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNTickMap(keeper *keeper.Keeper, ctx sdk.Context, pairId string, n int) []types.TickMap {
-	items := make([]types.TickMap, n)
+func createNTickObject(keeper *keeper.Keeper, ctx sdk.Context, pairId string, n int) []types.TickObject {
+	items := make([]types.TickObject, n)
 	for i := range items {
 
 		items[i].TickData = &types.TickDataType{
@@ -29,24 +29,24 @@ func createNTickMap(keeper *keeper.Keeper, ctx sdk.Context, pairId string, n int
 
 		items[i].TickIndex = int64(i)
 
-		// testTickMap :=  &types.TickMap{0, &types.TickDataType{Reserve0AndShares: []*types.Reserve0AndSharesType{
+		// testTickObject :=  &types.TickObject{0, &types.TickDataType{Reserve0AndShares: []*types.Reserve0AndSharesType{
 		// 	{Reserve0: sdk.OneDec(),
 		// 	TotalShares: sdk.ZeroDec(),
 		// }},
 		// Reserve1: []sdk.Dec{sdk.ZeroDec()},
 		// }}
 
-		keeper.SetTickMap(ctx, pairId, items[i])
+		keeper.SetTickObject(ctx, pairId, items[i])
 	}
 
 	return items
 }
 
-func TestTickMapGet(t *testing.T) {
+func TestTickObjectGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNTickMap(keeper, ctx, "TokenB/TokenA", 10)
+	items := createNTickObject(keeper, ctx, "TokenB/TokenA", 10)
 	for _, item := range items {
-		rst, found := keeper.GetTickMap(ctx, "TokenB/TokenA",
+		rst, found := keeper.GetTickObject(ctx, "TokenB/TokenA",
 			item.TickIndex,
 		)
 		require.True(t, found)
@@ -56,15 +56,15 @@ func TestTickMapGet(t *testing.T) {
 		)
 	}
 }
-func TestTickMapRemove(t *testing.T) {
+func TestTickObjectRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNTickMap(keeper, ctx, "TokenB/TokenA", 10)
+	items := createNTickObject(keeper, ctx, "TokenB/TokenA", 10)
 	for _, item := range items {
-		keeper.RemoveTickMap(ctx,
+		keeper.RemoveTickObject(ctx,
 			"TokenB/TokenA",
 			item.TickIndex,
 		)
-		_, found := keeper.GetTickMap(ctx,
+		_, found := keeper.GetTickObject(ctx,
 			"TokenB/TokenA",
 			item.TickIndex,
 		)
@@ -72,11 +72,11 @@ func TestTickMapRemove(t *testing.T) {
 	}
 }
 
-func TestTickMapGetAll(t *testing.T) {
+func TestTickObjectGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNTickMap(keeper, ctx, "TokenB/TokenA", 10)
+	items := createNTickObject(keeper, ctx, "TokenB/TokenA", 10)
 	require.ElementsMatch(t,
 		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllTickMap(ctx)),
+		nullify.Fill(keeper.GetAllTickObject(ctx)),
 	)
 }
