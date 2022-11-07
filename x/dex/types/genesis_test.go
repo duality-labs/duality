@@ -47,7 +47,7 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 				TokensCount: 2,
-				TokenMapList: []types.TokenMap{
+				TokenObjectList: []types.TokenObject{
 					{
 						Address: "0",
 					},
@@ -182,9 +182,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated tokenMap",
+			desc: "duplicated tokenObject",
 			genState: &types.GenesisState{
-				TokenMapList: []types.TokenMap{
+				TokenObjectList: []types.TokenObject{
 					{
 						Address: "0",
 					},

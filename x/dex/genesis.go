@@ -26,9 +26,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 
 	// Set tokens count
 	k.SetTokensCount(ctx, genState.TokensCount)
-	// Set all the tokenMap
-	for _, elem := range genState.TokenMapList {
-		k.SetTokenMap(ctx, elem)
+	// Set all the tokenObject
+	for _, elem := range genState.TokenObjectList {
+		k.SetTokenObject(ctx, elem)
 	}
 	// Set all the shares
 	for _, elem := range genState.SharesList {
@@ -76,7 +76,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.PairMapList = k.GetAllPairMap(ctx)
 	genesis.TokensList = k.GetAllTokens(ctx)
 	genesis.TokensCount = k.GetTokensCount(ctx)
-	genesis.TokenMapList = k.GetAllTokenMap(ctx)
+	genesis.TokenObjectList = k.GetAllTokenObject(ctx)
 	genesis.SharesList = k.GetAllShares(ctx)
 	genesis.FeeListList = k.GetAllFeeList(ctx)
 	genesis.FeeListCount = k.GetFeeListCount(ctx)

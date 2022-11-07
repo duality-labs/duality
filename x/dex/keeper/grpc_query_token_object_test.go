@@ -18,33 +18,33 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func TestTokenMapQuerySingle(t *testing.T) {
+func TestTokenObjectQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNTokenMap(keeper, ctx, 2)
+	msgs := createNTokenObject(keeper, ctx, 2)
 	for _, tc := range []struct {
 		desc     string
-		request  *types.QueryGetTokenMapRequest
-		response *types.QueryGetTokenMapResponse
+		request  *types.QueryGetTokenObjectRequest
+		response *types.QueryGetTokenObjectResponse
 		err      error
 	}{
 		{
 			desc: "First",
-			request: &types.QueryGetTokenMapRequest{
+			request: &types.QueryGetTokenObjectRequest{
 				Address: msgs[0].Address,
 			},
-			response: &types.QueryGetTokenMapResponse{TokenMap: msgs[0]},
+			response: &types.QueryGetTokenObjectResponse{TokenObject: msgs[0]},
 		},
 		{
 			desc: "Second",
-			request: &types.QueryGetTokenMapRequest{
+			request: &types.QueryGetTokenObjectRequest{
 				Address: msgs[1].Address,
 			},
-			response: &types.QueryGetTokenMapResponse{TokenMap: msgs[1]},
+			response: &types.QueryGetTokenObjectResponse{TokenObject: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
-			request: &types.QueryGetTokenMapRequest{
+			request: &types.QueryGetTokenObjectRequest{
 				Address: strconv.Itoa(100000),
 			},
 			err: status.Error(codes.NotFound, "not found"),
@@ -55,7 +55,7 @@ func TestTokenMapQuerySingle(t *testing.T) {
 		},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
-			response, err := keeper.TokenMap(wctx, tc.request)
+			response, err := keeper.TokenObject(wctx, tc.request)
 			if tc.err != nil {
 				require.ErrorIs(t, err, tc.err)
 			} else {
@@ -69,13 +69,13 @@ func TestTokenMapQuerySingle(t *testing.T) {
 	}
 }
 
-func TestTokenMapQueryPaginated(t *testing.T) {
+func TestTokenObjectQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNTokenMap(keeper, ctx, 5)
+	msgs := createNTokenObject(keeper, ctx, 5)
 
-	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllTokenMapRequest {
-		return &types.QueryAllTokenMapRequest{
+	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllTokenObjectRequest {
+		return &types.QueryAllTokenObjectRequest{
 			Pagination: &query.PageRequest{
 				Key:        next,
 				Offset:     offset,
@@ -87,12 +87,12 @@ func TestTokenMapQueryPaginated(t *testing.T) {
 	t.Run("ByOffset", func(t *testing.T) {
 		step := 2
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.TokenMapAll(wctx, request(nil, uint64(i), uint64(step), false))
+			resp, err := keeper.TokenObjectAll(wctx, request(nil, uint64(i), uint64(step), false))
 			require.NoError(t, err)
-			require.LessOrEqual(t, len(resp.TokenMap), step)
+			require.LessOrEqual(t, len(resp.TokenObject), step)
 			require.Subset(t,
 				nullify.Fill(msgs),
-				nullify.Fill(resp.TokenMap),
+				nullify.Fill(resp.TokenObject),
 			)
 		}
 	})
@@ -100,27 +100,27 @@ func TestTokenMapQueryPaginated(t *testing.T) {
 		step := 2
 		var next []byte
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.TokenMapAll(wctx, request(next, 0, uint64(step), false))
+			resp, err := keeper.TokenObjectAll(wctx, request(next, 0, uint64(step), false))
 			require.NoError(t, err)
-			require.LessOrEqual(t, len(resp.TokenMap), step)
+			require.LessOrEqual(t, len(resp.TokenObject), step)
 			require.Subset(t,
 				nullify.Fill(msgs),
-				nullify.Fill(resp.TokenMap),
+				nullify.Fill(resp.TokenObject),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
-		resp, err := keeper.TokenMapAll(wctx, request(nil, 0, 0, true))
+		resp, err := keeper.TokenObjectAll(wctx, request(nil, 0, 0, true))
 		require.NoError(t, err)
 		require.Equal(t, len(msgs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(msgs),
-			nullify.Fill(resp.TokenMap),
+			nullify.Fill(resp.TokenObject),
 		)
 	})
 	t.Run("InvalidRequest", func(t *testing.T) {
-		_, err := keeper.TokenMapAll(wctx, nil)
+		_, err := keeper.TokenObjectAll(wctx, nil)
 		require.ErrorIs(t, err, status.Error(codes.InvalidArgument, "invalid request"))
 	})
 }

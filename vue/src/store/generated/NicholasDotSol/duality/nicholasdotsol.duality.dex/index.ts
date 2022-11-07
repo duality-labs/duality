@@ -13,12 +13,12 @@ import { Reserve0AndSharesType } from "./module/types/dex/reserve_0_and_shares_t
 import { Shares } from "./module/types/dex/shares"
 import { TickDataType } from "./module/types/dex/tick_data_type"
 import { TickObject } from "./module/types/dex/tick_map"
-import { TokenMap } from "./module/types/dex/token_map"
+import { TokenObject } from "./module/types/dex/token_map"
 import { TokenPairType } from "./module/types/dex/token_pair_type"
 import { Tokens } from "./module/types/dex/tokens"
 
 
-export { FeeList, LimitOrderPool, LimitOrderPoolFillMap, LimitOrderPoolReserveMap, LimitOrderPoolTotalSharesMap, LimitOrderPoolUserShareMap, LimitOrderPoolUserSharesWithdrawn, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickObject, TokenMap, TokenPairType, Tokens };
+export { FeeList, LimitOrderPool, LimitOrderPoolFillMap, LimitOrderPoolReserveMap, LimitOrderPoolTotalSharesMap, LimitOrderPoolUserShareMap, LimitOrderPoolUserSharesWithdrawn, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickObject, TokenObject, TokenPairType, Tokens };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -63,8 +63,8 @@ const getDefaultState = () => {
 				PairMapAll: {},
 				Tokens: {},
 				TokensAll: {},
-				TokenMap: {},
-				TokenMapAll: {},
+				TokenObject: {},
+				TokenObjectAll: {},
 				Shares: {},
 				SharesAll: {},
 				FeeList: {},
@@ -94,7 +94,7 @@ const getDefaultState = () => {
 						Shares: getStructure(Shares.fromPartial({})),
 						TickDataType: getStructure(TickDataType.fromPartial({})),
 						TickObject: getStructure(TickObject.fromPartial({})),
-						TokenMap: getStructure(TokenMap.fromPartial({})),
+						TokenObject: getStructure(TokenObject.fromPartial({})),
 						TokenPairType: getStructure(TokenPairType.fromPartial({})),
 						Tokens: getStructure(Tokens.fromPartial({})),
 						
@@ -167,17 +167,17 @@ export default {
 					}
 			return state.TokensAll[JSON.stringify(params)] ?? {}
 		},
-				getTokenMap: (state) => (params = { params: {}}) => {
+				getTokenObject: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.TokenMap[JSON.stringify(params)] ?? {}
+			return state.TokenObject[JSON.stringify(params)] ?? {}
 		},
-				getTokenMapAll: (state) => (params = { params: {}}) => {
+				getTokenObjectAll: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.TokenMapAll[JSON.stringify(params)] ?? {}
+			return state.TokenObjectAll[JSON.stringify(params)] ?? {}
 		},
 				getShares: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
@@ -468,18 +468,18 @@ export default {
 		 		
 		
 		
-		async QueryTokenMap({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryTokenObject({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryTokenMap( key.address)).data
+				let value= (await queryClient.queryTokenObject( key.address)).data
 				
 					
-				commit('QUERY', { query: 'TokenMap', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTokenMap', payload: { options: { all }, params: {...key},query }})
-				return getters['getTokenMap']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'TokenObject', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTokenObject', payload: { options: { all }, params: {...key},query }})
+				return getters['getTokenObject']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryTokenMap API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryTokenObject API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -490,22 +490,22 @@ export default {
 		 		
 		
 		
-		async QueryTokenMapAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryTokenObjectAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryTokenMapAll(query)).data
+				let value= (await queryClient.queryTokenObjectAll(query)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryTokenMapAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await queryClient.queryTokenObjectAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
 					value = mergeResults(value, next_values);
 				}
-				commit('QUERY', { query: 'TokenMapAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTokenMapAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getTokenMapAll']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'TokenObjectAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryTokenObjectAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getTokenObjectAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryTokenMapAll API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryTokenObjectAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

@@ -13,7 +13,7 @@ func DefaultGenesis() *GenesisState {
 		TickObjectList:                        []TickObject{},
 		PairMapList:                           []PairMap{},
 		TokensList:                            []Tokens{},
-		TokenMapList:                          []TokenMap{},
+		TokenObjectList:                       []TokenObject{},
 		SharesList:                            []Shares{},
 		FeeListList:                           []FeeList{},
 		LimitOrderPoolUserShareMapList:        []LimitOrderPoolUserShareMap{},
@@ -61,15 +61,15 @@ func (gs GenesisState) Validate() error {
 		}
 		tokensIdMap[elem.Id] = true
 	}
-	// Check for duplicated index in tokenMap
-	tokenMapIndexMap := make(map[string]struct{})
+	// Check for duplicated index in tokenObject
+	tokenObjectIndexMap := make(map[string]struct{})
 
-	for _, elem := range gs.TokenMapList {
-		index := string(TokenMapKey(elem.Address))
-		if _, ok := tokenMapIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for tokenMap")
+	for _, elem := range gs.TokenObjectList {
+		index := string(TokenObjectKey(elem.Address))
+		if _, ok := tokenObjectIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for tokenObject")
 		}
-		tokenMapIndexMap[index] = struct{}{}
+		tokenObjectIndexMap[index] = struct{}{}
 	}
 	// Check for duplicated index in shares
 	sharesIndexMap := make(map[string]struct{})

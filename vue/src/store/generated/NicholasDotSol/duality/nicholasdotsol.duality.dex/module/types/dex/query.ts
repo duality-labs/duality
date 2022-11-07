@@ -9,7 +9,7 @@ import {
 } from "../cosmos/base/query/v1beta1/pagination";
 import { PairMap } from "../dex/pair_map";
 import { Tokens } from "../dex/tokens";
-import { TokenMap } from "../dex/token_map";
+import { TokenObject } from "../dex/token_map";
 import { Shares } from "../dex/shares";
 import { FeeList } from "../dex/fee_list";
 import { LimitOrderPoolUserShareMap } from "../dex/limit_order_pool_user_share_map";
@@ -81,20 +81,20 @@ export interface QueryAllTokensResponse {
   pagination: PageResponse | undefined;
 }
 
-export interface QueryGetTokenMapRequest {
+export interface QueryGetTokenObjectRequest {
   address: string;
 }
 
-export interface QueryGetTokenMapResponse {
-  tokenMap: TokenMap | undefined;
+export interface QueryGetTokenObjectResponse {
+  tokenObject: TokenObject | undefined;
 }
 
-export interface QueryAllTokenMapRequest {
+export interface QueryAllTokenObjectRequest {
   pagination: PageRequest | undefined;
 }
 
-export interface QueryAllTokenMapResponse {
-  tokenMap: TokenMap[];
+export interface QueryAllTokenObjectResponse {
+  tokenObject: TokenObject[];
   pagination: PageResponse | undefined;
 }
 
@@ -1209,11 +1209,11 @@ export const QueryAllTokensResponse = {
   },
 };
 
-const baseQueryGetTokenMapRequest: object = { address: "" };
+const baseQueryGetTokenObjectRequest: object = { address: "" };
 
-export const QueryGetTokenMapRequest = {
+export const QueryGetTokenObjectRequest = {
   encode(
-    message: QueryGetTokenMapRequest,
+    message: QueryGetTokenObjectRequest,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.address !== "") {
@@ -1222,12 +1222,12 @@ export const QueryGetTokenMapRequest = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryGetTokenMapRequest {
+  decode(input: Reader | Uint8Array, length?: number): QueryGetTokenObjectRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryGetTokenMapRequest,
-    } as QueryGetTokenMapRequest;
+      ...baseQueryGetTokenObjectRequest,
+    } as QueryGetTokenObjectRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1242,10 +1242,10 @@ export const QueryGetTokenMapRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetTokenMapRequest {
+  fromJSON(object: any): QueryGetTokenObjectRequest {
     const message = {
-      ...baseQueryGetTokenMapRequest,
-    } as QueryGetTokenMapRequest;
+      ...baseQueryGetTokenObjectRequest,
+    } as QueryGetTokenObjectRequest;
     if (object.address !== undefined && object.address !== null) {
       message.address = String(object.address);
     } else {
@@ -1254,18 +1254,18 @@ export const QueryGetTokenMapRequest = {
     return message;
   },
 
-  toJSON(message: QueryGetTokenMapRequest): unknown {
+  toJSON(message: QueryGetTokenObjectRequest): unknown {
     const obj: any = {};
     message.address !== undefined && (obj.address = message.address);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetTokenMapRequest>
-  ): QueryGetTokenMapRequest {
+    object: DeepPartial<QueryGetTokenObjectRequest>
+  ): QueryGetTokenObjectRequest {
     const message = {
-      ...baseQueryGetTokenMapRequest,
-    } as QueryGetTokenMapRequest;
+      ...baseQueryGetTokenObjectRequest,
+    } as QueryGetTokenObjectRequest;
     if (object.address !== undefined && object.address !== null) {
       message.address = object.address;
     } else {
@@ -1275,15 +1275,15 @@ export const QueryGetTokenMapRequest = {
   },
 };
 
-const baseQueryGetTokenMapResponse: object = {};
+const baseQueryGetTokenObjectResponse: object = {};
 
-export const QueryGetTokenMapResponse = {
+export const QueryGetTokenObjectResponse = {
   encode(
-    message: QueryGetTokenMapResponse,
+    message: QueryGetTokenObjectResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.tokenMap !== undefined) {
-      TokenMap.encode(message.tokenMap, writer.uint32(10).fork()).ldelim();
+    if (message.tokenObject !== undefined) {
+      TokenObject.encode(message.tokenObject, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -1291,17 +1291,17 @@ export const QueryGetTokenMapResponse = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryGetTokenMapResponse {
+  ): QueryGetTokenObjectResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryGetTokenMapResponse,
-    } as QueryGetTokenMapResponse;
+      ...baseQueryGetTokenObjectResponse,
+    } as QueryGetTokenObjectResponse;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.tokenMap = TokenMap.decode(reader, reader.uint32());
+          message.tokenObject = TokenObject.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1311,47 +1311,47 @@ export const QueryGetTokenMapResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetTokenMapResponse {
+  fromJSON(object: any): QueryGetTokenObjectResponse {
     const message = {
-      ...baseQueryGetTokenMapResponse,
-    } as QueryGetTokenMapResponse;
-    if (object.tokenMap !== undefined && object.tokenMap !== null) {
-      message.tokenMap = TokenMap.fromJSON(object.tokenMap);
+      ...baseQueryGetTokenObjectResponse,
+    } as QueryGetTokenObjectResponse;
+    if (object.tokenObject !== undefined && object.tokenObject !== null) {
+      message.tokenObject = TokenObject.fromJSON(object.tokenObject);
     } else {
-      message.tokenMap = undefined;
+      message.tokenObject = undefined;
     }
     return message;
   },
 
-  toJSON(message: QueryGetTokenMapResponse): unknown {
+  toJSON(message: QueryGetTokenObjectResponse): unknown {
     const obj: any = {};
-    message.tokenMap !== undefined &&
-      (obj.tokenMap = message.tokenMap
-        ? TokenMap.toJSON(message.tokenMap)
+    message.tokenObject !== undefined &&
+      (obj.tokenObject = message.tokenObject
+        ? TokenObject.toJSON(message.tokenObject)
         : undefined);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetTokenMapResponse>
-  ): QueryGetTokenMapResponse {
+    object: DeepPartial<QueryGetTokenObjectResponse>
+  ): QueryGetTokenObjectResponse {
     const message = {
-      ...baseQueryGetTokenMapResponse,
-    } as QueryGetTokenMapResponse;
-    if (object.tokenMap !== undefined && object.tokenMap !== null) {
-      message.tokenMap = TokenMap.fromPartial(object.tokenMap);
+      ...baseQueryGetTokenObjectResponse,
+    } as QueryGetTokenObjectResponse;
+    if (object.tokenObject !== undefined && object.tokenObject !== null) {
+      message.tokenObject = TokenObject.fromPartial(object.tokenObject);
     } else {
-      message.tokenMap = undefined;
+      message.tokenObject = undefined;
     }
     return message;
   },
 };
 
-const baseQueryAllTokenMapRequest: object = {};
+const baseQueryAllTokenObjectRequest: object = {};
 
-export const QueryAllTokenMapRequest = {
+export const QueryAllTokenObjectRequest = {
   encode(
-    message: QueryAllTokenMapRequest,
+    message: QueryAllTokenObjectRequest,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.pagination !== undefined) {
@@ -1360,12 +1360,12 @@ export const QueryAllTokenMapRequest = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryAllTokenMapRequest {
+  decode(input: Reader | Uint8Array, length?: number): QueryAllTokenObjectRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryAllTokenMapRequest,
-    } as QueryAllTokenMapRequest;
+      ...baseQueryAllTokenObjectRequest,
+    } as QueryAllTokenObjectRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1380,10 +1380,10 @@ export const QueryAllTokenMapRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllTokenMapRequest {
+  fromJSON(object: any): QueryAllTokenObjectRequest {
     const message = {
-      ...baseQueryAllTokenMapRequest,
-    } as QueryAllTokenMapRequest;
+      ...baseQueryAllTokenObjectRequest,
+    } as QueryAllTokenObjectRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromJSON(object.pagination);
     } else {
@@ -1392,7 +1392,7 @@ export const QueryAllTokenMapRequest = {
     return message;
   },
 
-  toJSON(message: QueryAllTokenMapRequest): unknown {
+  toJSON(message: QueryAllTokenObjectRequest): unknown {
     const obj: any = {};
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -1402,11 +1402,11 @@ export const QueryAllTokenMapRequest = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryAllTokenMapRequest>
-  ): QueryAllTokenMapRequest {
+    object: DeepPartial<QueryAllTokenObjectRequest>
+  ): QueryAllTokenObjectRequest {
     const message = {
-      ...baseQueryAllTokenMapRequest,
-    } as QueryAllTokenMapRequest;
+      ...baseQueryAllTokenObjectRequest,
+    } as QueryAllTokenObjectRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromPartial(object.pagination);
     } else {
@@ -1416,15 +1416,15 @@ export const QueryAllTokenMapRequest = {
   },
 };
 
-const baseQueryAllTokenMapResponse: object = {};
+const baseQueryAllTokenObjectResponse: object = {};
 
-export const QueryAllTokenMapResponse = {
+export const QueryAllTokenObjectResponse = {
   encode(
-    message: QueryAllTokenMapResponse,
+    message: QueryAllTokenObjectResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    for (const v of message.tokenMap) {
-      TokenMap.encode(v!, writer.uint32(10).fork()).ldelim();
+    for (const v of message.tokenObject) {
+      TokenObject.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
       PageResponse.encode(
@@ -1438,18 +1438,18 @@ export const QueryAllTokenMapResponse = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryAllTokenMapResponse {
+  ): QueryAllTokenObjectResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryAllTokenMapResponse,
-    } as QueryAllTokenMapResponse;
-    message.tokenMap = [];
+      ...baseQueryAllTokenObjectResponse,
+    } as QueryAllTokenObjectResponse;
+    message.tokenObject = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.tokenMap.push(TokenMap.decode(reader, reader.uint32()));
+          message.tokenObject.push(TokenObject.decode(reader, reader.uint32()));
           break;
         case 2:
           message.pagination = PageResponse.decode(reader, reader.uint32());
@@ -1462,14 +1462,14 @@ export const QueryAllTokenMapResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllTokenMapResponse {
+  fromJSON(object: any): QueryAllTokenObjectResponse {
     const message = {
-      ...baseQueryAllTokenMapResponse,
-    } as QueryAllTokenMapResponse;
-    message.tokenMap = [];
-    if (object.tokenMap !== undefined && object.tokenMap !== null) {
-      for (const e of object.tokenMap) {
-        message.tokenMap.push(TokenMap.fromJSON(e));
+      ...baseQueryAllTokenObjectResponse,
+    } as QueryAllTokenObjectResponse;
+    message.tokenObject = [];
+    if (object.tokenObject !== undefined && object.tokenObject !== null) {
+      for (const e of object.tokenObject) {
+        message.tokenObject.push(TokenObject.fromJSON(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -1480,14 +1480,14 @@ export const QueryAllTokenMapResponse = {
     return message;
   },
 
-  toJSON(message: QueryAllTokenMapResponse): unknown {
+  toJSON(message: QueryAllTokenObjectResponse): unknown {
     const obj: any = {};
-    if (message.tokenMap) {
-      obj.tokenMap = message.tokenMap.map((e) =>
-        e ? TokenMap.toJSON(e) : undefined
+    if (message.tokenObject) {
+      obj.tokenObject = message.tokenObject.map((e) =>
+        e ? TokenObject.toJSON(e) : undefined
       );
     } else {
-      obj.tokenMap = [];
+      obj.tokenObject = [];
     }
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -1497,15 +1497,15 @@ export const QueryAllTokenMapResponse = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryAllTokenMapResponse>
-  ): QueryAllTokenMapResponse {
+    object: DeepPartial<QueryAllTokenObjectResponse>
+  ): QueryAllTokenObjectResponse {
     const message = {
-      ...baseQueryAllTokenMapResponse,
-    } as QueryAllTokenMapResponse;
-    message.tokenMap = [];
-    if (object.tokenMap !== undefined && object.tokenMap !== null) {
-      for (const e of object.tokenMap) {
-        message.tokenMap.push(TokenMap.fromPartial(e));
+      ...baseQueryAllTokenObjectResponse,
+    } as QueryAllTokenObjectResponse;
+    message.tokenObject = [];
+    if (object.tokenObject !== undefined && object.tokenObject !== null) {
+      for (const e of object.tokenObject) {
+        message.tokenObject.push(TokenObject.fromPartial(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -4189,12 +4189,12 @@ export interface Query {
   Tokens(request: QueryGetTokensRequest): Promise<QueryGetTokensResponse>;
   /** Queries a list of Tokens items. */
   TokensAll(request: QueryAllTokensRequest): Promise<QueryAllTokensResponse>;
-  /** Queries a TokenMap by index. */
-  TokenMap(request: QueryGetTokenMapRequest): Promise<QueryGetTokenMapResponse>;
-  /** Queries a list of TokenMap items. */
-  TokenMapAll(
-    request: QueryAllTokenMapRequest
-  ): Promise<QueryAllTokenMapResponse>;
+  /** Queries a TokenObject by index. */
+  TokenObject(request: QueryGetTokenObjectRequest): Promise<QueryGetTokenObjectResponse>;
+  /** Queries a list of TokenObject items. */
+  TokenObjectAll(
+    request: QueryAllTokenObjectRequest
+  ): Promise<QueryAllTokenObjectResponse>;
   /** Queries a Shares by index. */
   Shares(request: QueryGetSharesRequest): Promise<QueryGetSharesResponse>;
   /** Queries a list of Shares items. */
@@ -4336,31 +4336,31 @@ export class QueryClientImpl implements Query {
     );
   }
 
-  TokenMap(
-    request: QueryGetTokenMapRequest
-  ): Promise<QueryGetTokenMapResponse> {
-    const data = QueryGetTokenMapRequest.encode(request).finish();
+  TokenObject(
+    request: QueryGetTokenObjectRequest
+  ): Promise<QueryGetTokenObjectResponse> {
+    const data = QueryGetTokenObjectRequest.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
-      "TokenMap",
+      "TokenObject",
       data
     );
     return promise.then((data) =>
-      QueryGetTokenMapResponse.decode(new Reader(data))
+      QueryGetTokenObjectResponse.decode(new Reader(data))
     );
   }
 
-  TokenMapAll(
-    request: QueryAllTokenMapRequest
-  ): Promise<QueryAllTokenMapResponse> {
-    const data = QueryAllTokenMapRequest.encode(request).finish();
+  TokenObjectAll(
+    request: QueryAllTokenObjectRequest
+  ): Promise<QueryAllTokenObjectResponse> {
+    const data = QueryAllTokenObjectRequest.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
-      "TokenMapAll",
+      "TokenObjectAll",
       data
     );
     return promise.then((data) =>
-      QueryAllTokenMapResponse.decode(new Reader(data))
+      QueryAllTokenObjectResponse.decode(new Reader(data))
     );
   }
 

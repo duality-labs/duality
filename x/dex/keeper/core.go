@@ -57,12 +57,12 @@ func (k Keeper) PairInit(goCtx context.Context, token0 string, token1 string, ti
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Checks to see if the token0 is contained in the tokenLsit
-	token0Index, token0Found := k.GetTokenMap(ctx, token0)
+	token0Index, token0Found := k.GetTokenObject(ctx, token0)
 	tokenLength := k.GetTokensCount(ctx)
 
 	// If token0 is not found, add it to the list
 	if !token0Found {
-		k.SetTokenMap(ctx, types.TokenMap{Address: token0, Index: int64(tokenLength)})
+		k.SetTokenObject(ctx, types.TokenObject{Address: token0, Index: int64(tokenLength)})
 		newTokenLength := tokenLength + 1
 		token0Index.Index = int64(tokenLength)
 		k.SetTokensCount(ctx, newTokenLength)
@@ -70,11 +70,11 @@ func (k Keeper) PairInit(goCtx context.Context, token0 string, token1 string, ti
 	}
 
 	// Checks to see if the token1 is contained in the tokenLsit
-	token1Index, token1Found := k.GetTokenMap(ctx, token1)
+	token1Index, token1Found := k.GetTokenObject(ctx, token1)
 
 	// If token1 is not found, add it to the list
 	if !token1Found {
-		k.SetTokenMap(ctx, types.TokenMap{Address: token1, Index: int64(tokenLength)})
+		k.SetTokenObject(ctx, types.TokenObject{Address: token1, Index: int64(tokenLength)})
 		newTokenLength := tokenLength + 1
 		token1Index.Index = int64(tokenLength)
 		k.SetTokensCount(ctx, newTokenLength)

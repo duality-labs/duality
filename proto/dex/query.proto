@@ -8,7 +8,7 @@ import "dex/params.proto";
 import "dex/tick_object.proto";
 import "dex/pair_map.proto";
 import "dex/tokens.proto";
-import "dex/token_map.proto";
+import "dex/token_object.proto";
 import "dex/shares.proto";
 import "dex/fee_list.proto";
 import "dex/limit_order_pool_user_share_map.proto";
@@ -56,13 +56,13 @@ service Query {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/tokens";
 	}
 
-// Queries a TokenMap by index.
-	rpc TokenMap(QueryGetTokenMapRequest) returns (QueryGetTokenMapResponse) {
+// Queries a TokenObject by index.
+	rpc TokenObject(QueryGetTokenObjectRequest) returns (QueryGetTokenObjectResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/token_map/{address}";
 	}
 
-	// Queries a list of TokenMap items.
-	rpc TokenMapAll(QueryAllTokenMapRequest) returns (QueryAllTokenMapResponse) {
+	// Queries a list of TokenObject items.
+	rpc TokenObjectAll(QueryAllTokenObjectRequest) returns (QueryAllTokenObjectResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/token_map";
 	}
 
@@ -203,21 +203,21 @@ message QueryAllTokensResponse {
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-message QueryGetTokenMapRequest {
+message QueryGetTokenObjectRequest {
 	  string address = 1;
 
 }
 
-message QueryGetTokenMapResponse {
-	TokenMap tokenMap = 1 [(gogoproto.nullable) = false];
+message QueryGetTokenObjectResponse {
+	TokenObject tokenObject = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryAllTokenMapRequest {
+message QueryAllTokenObjectRequest {
 	cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-message QueryAllTokenMapResponse {
-	repeated TokenMap tokenMap = 1 [(gogoproto.nullable) = false];
+message QueryAllTokenObjectResponse {
+	repeated TokenObject tokenObject = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

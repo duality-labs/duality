@@ -5,7 +5,7 @@ import { Params } from "../dex/params";
 import { TickObject } from "../dex/tick_map";
 import { PairMap } from "../dex/pair_map";
 import { Tokens } from "../dex/tokens";
-import { TokenMap } from "../dex/token_map";
+import { TokenObject } from "../dex/token_map";
 import { Shares } from "../dex/shares";
 import { FeeList } from "../dex/fee_list";
 import { LimitOrderPoolUserShareMap } from "../dex/limit_order_pool_user_share_map";
@@ -23,7 +23,7 @@ export interface GenesisState {
   pairMapList: PairMap[];
   tokensList: Tokens[];
   tokensCount: number;
-  tokenMapList: TokenMap[];
+  tokenObjectList: TokenObject[];
   sharesList: Shares[];
   feeListList: FeeList[];
   feeListCount: number;
@@ -54,8 +54,8 @@ export const GenesisState = {
     if (message.tokensCount !== 0) {
       writer.uint32(40).uint64(message.tokensCount);
     }
-    for (const v of message.tokenMapList) {
-      TokenMap.encode(v!, writer.uint32(50).fork()).ldelim();
+    for (const v of message.tokenObjectList) {
+      TokenObject.encode(v!, writer.uint32(50).fork()).ldelim();
     }
     for (const v of message.sharesList) {
       Shares.encode(v!, writer.uint32(58).fork()).ldelim();
@@ -97,7 +97,7 @@ export const GenesisState = {
     message.tickObjectList = [];
     message.pairMapList = [];
     message.tokensList = [];
-    message.tokenMapList = [];
+    message.tokenObjectList = [];
     message.sharesList = [];
     message.feeListList = [];
     message.limitOrderPoolUserShareMapList = [];
@@ -124,7 +124,7 @@ export const GenesisState = {
           message.tokensCount = longToNumber(reader.uint64() as Long);
           break;
         case 6:
-          message.tokenMapList.push(TokenMap.decode(reader, reader.uint32()));
+          message.tokenObjectList.push(TokenObject.decode(reader, reader.uint32()));
           break;
         case 7:
           message.sharesList.push(Shares.decode(reader, reader.uint32()));
@@ -173,7 +173,7 @@ export const GenesisState = {
     message.tickObjectList = [];
     message.pairMapList = [];
     message.tokensList = [];
-    message.tokenMapList = [];
+    message.tokenObjectList = [];
     message.sharesList = [];
     message.feeListList = [];
     message.limitOrderPoolUserShareMapList = [];
@@ -206,9 +206,9 @@ export const GenesisState = {
     } else {
       message.tokensCount = 0;
     }
-    if (object.tokenMapList !== undefined && object.tokenMapList !== null) {
-      for (const e of object.tokenMapList) {
-        message.tokenMapList.push(TokenMap.fromJSON(e));
+    if (object.tokenObjectList !== undefined && object.tokenObjectList !== null) {
+      for (const e of object.tokenObjectList) {
+        message.tokenObjectList.push(TokenObject.fromJSON(e));
       }
     }
     if (object.sharesList !== undefined && object.sharesList !== null) {
@@ -306,12 +306,12 @@ export const GenesisState = {
     }
     message.tokensCount !== undefined &&
       (obj.tokensCount = message.tokensCount);
-    if (message.tokenMapList) {
-      obj.tokenMapList = message.tokenMapList.map((e) =>
-        e ? TokenMap.toJSON(e) : undefined
+    if (message.tokenObjectList) {
+      obj.tokenObjectList = message.tokenObjectList.map((e) =>
+        e ? TokenObject.toJSON(e) : undefined
       );
     } else {
-      obj.tokenMapList = [];
+      obj.tokenObjectList = [];
     }
     if (message.sharesList) {
       obj.sharesList = message.sharesList.map((e) =>
@@ -372,7 +372,7 @@ export const GenesisState = {
     message.tickObjectList = [];
     message.pairMapList = [];
     message.tokensList = [];
-    message.tokenMapList = [];
+    message.tokenObjectList = [];
     message.sharesList = [];
     message.feeListList = [];
     message.limitOrderPoolUserShareMapList = [];
@@ -405,9 +405,9 @@ export const GenesisState = {
     } else {
       message.tokensCount = 0;
     }
-    if (object.tokenMapList !== undefined && object.tokenMapList !== null) {
-      for (const e of object.tokenMapList) {
-        message.tokenMapList.push(TokenMap.fromPartial(e));
+    if (object.tokenObjectList !== undefined && object.tokenObjectList !== null) {
+      for (const e of object.tokenObjectList) {
+        message.tokenObjectList.push(TokenObject.fromPartial(e));
       }
     }
     if (object.sharesList !== undefined && object.sharesList !== null) {

@@ -6,7 +6,7 @@ import "dex/params.proto";
 import "dex/tick_object.proto";
 import "dex/pair_map.proto";
 import "dex/tokens.proto";
-import "dex/token_map.proto";
+import "dex/token_object.proto";
 import "dex/shares.proto";
 import "dex/fee_list.proto";
 import "dex/limit_order_pool_user_share_map.proto";
@@ -25,7 +25,7 @@ message GenesisState {
   repeated PairMap pairMapList = 3 [(gogoproto.nullable) = false];
   repeated Tokens tokensList = 4 [(gogoproto.nullable) = false];
   uint64 tokensCount = 5;
-  repeated TokenMap tokenMapList = 6 [(gogoproto.nullable) = false];
+  repeated TokenObject tokenObjectList = 6 [(gogoproto.nullable) = false];
   repeated Shares sharesList = 7 [(gogoproto.nullable) = false];
   repeated FeeList feeListList = 8 [(gogoproto.nullable) = false];
   uint64 feeListCount = 9;

@@ -9,10 +9,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListTokenMap() *cobra.Command {
+func CmdListTokenObject() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-token-map",
-		Short: "list all TokenMap",
+		Short: "list all TokenObject",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -23,11 +23,11 @@ func CmdListTokenMap() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllTokenMapRequest{
+			params := &types.QueryAllTokenObjectRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.TokenMapAll(context.Background(), params)
+			res, err := queryClient.TokenObjectAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -42,10 +42,10 @@ func CmdListTokenMap() *cobra.Command {
 	return cmd
 }
 
-func CmdShowTokenMap() *cobra.Command {
+func CmdShowTokenObject() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "show-token-map [address]",
-		Short: "shows a TokenMap",
+		Short: "shows a TokenObject",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -54,11 +54,11 @@ func CmdShowTokenMap() *cobra.Command {
 
 			argAddress := args[0]
 
-			params := &types.QueryGetTokenMapRequest{
+			params := &types.QueryGetTokenObjectRequest{
 				Address: argAddress,
 			}
 
-			res, err := queryClient.TokenMap(context.Background(), params)
+			res, err := queryClient.TokenObject(context.Background(), params)
 			if err != nil {
 				return err
 			}

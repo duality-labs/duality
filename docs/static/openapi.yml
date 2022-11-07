@@ -31628,15 +31628,15 @@ paths:
         - Query
   /NicholasDotSol/duality/dex/token_map:
     get:
-      summary: Queries a list of TokenMap items.
-      operationId: NicholasdotsolDualityDexTokenMapAll
+      summary: Queries a list of TokenObject items.
+      operationId: NicholasdotsolDualityDexTokenObjectAll
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              tokenMap:
+              tokenObject:
                 type: array
                 items:
                   type: object
@@ -31752,15 +31752,15 @@ paths:
         - Query
   '/NicholasDotSol/duality/dex/token_map/{address}':
     get:
-      summary: Queries a TokenMap by index.
-      operationId: NicholasdotsolDualityDexTokenMap
+      summary: Queries a TokenObject by index.
+      operationId: NicholasdotsolDualityDexTokenObject
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              tokenMap:
+              tokenObject:
                 type: object
                 properties:
                   address:
@@ -54242,10 +54242,10 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  nicholasdotsol.duality.dex.QueryAllTokenMapResponse:
+  nicholasdotsol.duality.dex.QueryAllTokenObjectResponse:
     type: object
     properties:
-      tokenMap:
+      tokenObject:
         type: array
         items:
           type: object
@@ -54507,10 +54507,10 @@ definitions:
               currentLimitOrderKey:
                 type: string
                 format: uint64
-  nicholasdotsol.duality.dex.QueryGetTokenMapResponse:
+  nicholasdotsol.duality.dex.QueryGetTokenObjectResponse:
     type: object
     properties:
-      tokenMap:
+      tokenObject:
         type: object
         properties:
           address:
@@ -54616,7 +54616,7 @@ definitions:
           currentLimitOrderKey:
             type: string
             format: uint64
-  nicholasdotsol.duality.dex.TokenMap:
+  nicholasdotsol.duality.dex.TokenObject:
     type: object
     properties:
       address:

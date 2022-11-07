@@ -4,15 +4,15 @@ import { util, configure, Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
-export interface TokenMap {
+export interface TokenObject {
   address: string;
   index: number;
 }
 
-const baseTokenMap: object = { address: "", index: 0 };
+const baseTokenObject: object = { address: "", index: 0 };
 
-export const TokenMap = {
-  encode(message: TokenMap, writer: Writer = Writer.create()): Writer {
+export const TokenObject = {
+  encode(message: TokenObject, writer: Writer = Writer.create()): Writer {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
     }
@@ -22,10 +22,10 @@ export const TokenMap = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): TokenMap {
+  decode(input: Reader | Uint8Array, length?: number): TokenObject {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseTokenMap } as TokenMap;
+    const message = { ...baseTokenObject } as TokenObject;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -43,8 +43,8 @@ export const TokenMap = {
     return message;
   },
 
-  fromJSON(object: any): TokenMap {
-    const message = { ...baseTokenMap } as TokenMap;
+  fromJSON(object: any): TokenObject {
+    const message = { ...baseTokenObject } as TokenObject;
     if (object.address !== undefined && object.address !== null) {
       message.address = String(object.address);
     } else {
@@ -58,15 +58,15 @@ export const TokenMap = {
     return message;
   },
 
-  toJSON(message: TokenMap): unknown {
+  toJSON(message: TokenObject): unknown {
     const obj: any = {};
     message.address !== undefined && (obj.address = message.address);
     message.index !== undefined && (obj.index = message.index);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<TokenMap>): TokenMap {
-    const message = { ...baseTokenMap } as TokenMap;
+  fromPartial(object: DeepPartial<TokenObject>): TokenObject {
+    const message = { ...baseTokenObject } as TokenObject;
     if (object.address !== undefined && object.address !== null) {
       message.address = object.address;
     } else {

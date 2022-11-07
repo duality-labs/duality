@@ -255,8 +255,8 @@ export interface DexQueryAllTickObjectResponse {
   pagination?: V1Beta1PageResponse;
 }
 
-export interface DexQueryAllTokenMapResponse {
-  tokenMap?: DexTokenMap[];
+export interface DexQueryAllTokenObjectResponse {
+  tokenObject?: DexTokenObject[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -321,8 +321,8 @@ export interface DexQueryGetTickObjectResponse {
   tickObject?: DexTickObject;
 }
 
-export interface DexQueryGetTokenMapResponse {
-  tokenMap?: DexTokenMap;
+export interface DexQueryGetTokenObjectResponse {
+  tokenObject?: DexTokenObject;
 }
 
 export interface DexQueryGetTokensResponse {
@@ -369,7 +369,7 @@ export interface DexTickObject {
   LimitOrderPool1to0?: DexLimitOrderPool;
 }
 
-export interface DexTokenMap {
+export interface DexTokenObject {
   address?: string;
 
   /** @format int64 */
@@ -1101,11 +1101,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryTokenMapAll
-   * @summary Queries a list of TokenMap items.
+   * @name QueryTokenObjectAll
+   * @summary Queries a list of TokenObject items.
    * @request GET:/NicholasDotSol/duality/dex/token_map
    */
-  queryTokenMapAll = (
+  queryTokenObjectAll = (
     query?: {
       "pagination.key"?: string;
       "pagination.offset"?: string;
@@ -1115,7 +1115,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     },
     params: RequestParams = {},
   ) =>
-    this.request<DexQueryAllTokenMapResponse, RpcStatus>({
+    this.request<DexQueryAllTokenObjectResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/token_map`,
       method: "GET",
       query: query,
@@ -1127,12 +1127,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryTokenMap
-   * @summary Queries a TokenMap by index.
+   * @name QueryTokenObject
+   * @summary Queries a TokenObject by index.
    * @request GET:/NicholasDotSol/duality/dex/token_map/{address}
    */
-  queryTokenMap = (address: string, params: RequestParams = {}) =>
-    this.request<DexQueryGetTokenMapResponse, RpcStatus>({
+  queryTokenObject = (address: string, params: RequestParams = {}) =>
+    this.request<DexQueryGetTokenObjectResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/token_map/${address}`,
       method: "GET",
       format: "json",

@@ -15,21 +15,21 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNTokenMap(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.TokenMap {
-	items := make([]types.TokenMap, n)
+func createNTokenObject(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.TokenObject {
+	items := make([]types.TokenObject, n)
 	for i := range items {
 		items[i].Address = strconv.Itoa(i)
 
-		keeper.SetTokenMap(ctx, items[i])
+		keeper.SetTokenObject(ctx, items[i])
 	}
 	return items
 }
 
-func TestTokenMapGet(t *testing.T) {
+func TestTokenObjectGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNTokenMap(keeper, ctx, 10)
+	items := createNTokenObject(keeper, ctx, 10)
 	for _, item := range items {
-		rst, found := keeper.GetTokenMap(ctx,
+		rst, found := keeper.GetTokenObject(ctx,
 			item.Address,
 		)
 		require.True(t, found)
@@ -39,25 +39,25 @@ func TestTokenMapGet(t *testing.T) {
 		)
 	}
 }
-func TestTokenMapRemove(t *testing.T) {
+func TestTokenObjectRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNTokenMap(keeper, ctx, 10)
+	items := createNTokenObject(keeper, ctx, 10)
 	for _, item := range items {
-		keeper.RemoveTokenMap(ctx,
+		keeper.RemoveTokenObject(ctx,
 			item.Address,
 		)
-		_, found := keeper.GetTokenMap(ctx,
+		_, found := keeper.GetTokenObject(ctx,
 			item.Address,
 		)
 		require.False(t, found)
 	}
 }
 
-func TestTokenMapGetAll(t *testing.T) {
+func TestTokenObjectGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNTokenMap(keeper, ctx, 10)
+	items := createNTokenObject(keeper, ctx, 10)
 	require.ElementsMatch(t,
 		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllTokenMap(ctx)),
+		nullify.Fill(keeper.GetAllTokenObject(ctx)),
 	)
 }
