@@ -1,6 +1,7 @@
-vue/node_modules
+node_modules/
 vue/dist
 release/
 .idea/
 .vscode/
 .DS_Store
+__pycache__/

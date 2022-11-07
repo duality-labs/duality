@@ -5,8 +5,9 @@ from contextlib import closing
 from atomkraft.chain import Testnet
 from atomkraft.chain.utils import TmEventSubscribe
 from modelator.pytest.decorators import step
-from terra_proto.cosmos.bank.v1beta1 import QueryStub
-from terra_sdk.core.bank import MsgMultiSend
+# from terra_sdk.core.bank.msgs import MsgMultiSend
+from reactors.proto.cosmos.bank.v1beta1 import QueryStub
+from reactors.proto.cosmos.bank.v1beta1 import MsgMultiSend
 
 
 @step("init")
@@ -35,7 +36,9 @@ def transfer(testnet: Testnet, action, balances, outcome):
     src = [{"address": sender_addr, "coins": coins_str}]
     dst = [{"address": receiver_addr, "coins": coins_str}]
 
-    msg = MsgMultiSend(inputs=src, outputs=dst)
+    msg = MsgMultiSend()
+    msg.inputs.extend(src)
+    msg.outputs.extend(dst)
 
     logging.info(f"\tSender:    {sender_id} ({sender_addr})")
     logging.info(f"\tReceiver:  {receiver_id} ({receiver_addr})")
