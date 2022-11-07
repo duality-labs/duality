@@ -16,13 +16,21 @@ WORKDIR /usr/src
 # Get Go dependencies
 COPY go.mod ./go.mod
 COPY go.sum ./go.sum
-RUN go mod download
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/root/go/pkg/mod \
+    go mod download
 
 # Copy rest of files
 COPY . .
 
 # compile dualityd to ARM64 architecture for final image
-RUN CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -o build/dualityd_arm64 ./cmd/dualityd
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/root/go/pkg/mod \
+    CGO_ENABLED=1 \
+    CC=aarch64-linux-gnu-gcc \
+    GOOS=linux \
+    GOARCH=arm64 \
+    go build -o build/dualityd_arm64 ./cmd/dualityd
 
 
 # Final image build on small stable release of ARM64 Linux
