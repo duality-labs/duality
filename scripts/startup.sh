@@ -54,8 +54,8 @@ else
     rpc_address="$( jq -r .apis.rpc[0].address networks/$NETWORK/chain.json )"
 
     # check if we can get information from the current network
-    abci_info_json=$( wget --tries 30 -q -O - $rpc_address/abci_info )
-    if [[ "$( echo $abci_info_json | jq -r ".result.response.data" )" == "duality" ]]
+    node_status_json=$( wget --tries 30 -q -O - $rpc_address/status )
+    if [[ "$( echo $node_status_json | jq -r ".result.node_info.network" )" == "$NETWORK" ]]
     then
         echo "Found Duality chain!"
     else
@@ -81,7 +81,7 @@ else
 
         # wait for node to finish catching up to the chain's current height
         sleep 5
-        chain_block_height=$(echo $abci_info_json | jq -r ".result.response.last_block_height")
+        chain_block_height=$(echo $node_status_json | jq -r ".result.sync_info.latest_block_height")
         node_status_json=$( dualityd status )
         while [[ $( echo $node_status_json | jq .SyncInfo.catching_up ) == true ]]
         do
