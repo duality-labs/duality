@@ -85,8 +85,7 @@ func (suite *IntegrationTestSuite) TestMultiLimitOrderTick0to1() {
 	swapResponse, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator:  bob.String(),
 		Receiver: bob.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
+		TokenOut: "TokenA",
 		TokenIn:  "TokenB",
 		AmountIn: newDec("40"),
 		MinOut:   newDec("30"),
@@ -171,9 +170,8 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder1to0() {
 	swapResponse, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator:  bob.String(),
 		Receiver: bob.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
 		TokenIn:  "TokenA",
+		TokenOut: "TokenB",
 		AmountIn: newDec("40"),
 		MinOut:   newDec("30"),
 	})
@@ -259,9 +257,8 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrderAndDeposit1to0() {
 	swapResponse, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator:  bob.String(),
 		Receiver: bob.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
 		TokenIn:  "TokenA",
+		TokenOut: "TokenB",
 		AmountIn: newDec("40"),
 		MinOut:   newDec("30"),
 	})
@@ -361,9 +358,8 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrderAndDeposit1to0_2() {
 	swapResponse, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator:  bob.String(),
 		Receiver: bob.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
 		TokenIn:  "TokenA",
+		TokenOut: "TokenB",
 		AmountIn: newDec("60"),
 		MinOut:   newDec("30"),
 	})

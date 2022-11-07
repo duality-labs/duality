@@ -64,16 +64,15 @@ message MsgWithdrawlResponse {
 message MsgSwap {
   string creator = 1;
   string receiver = 2;
-  string tokenA = 3;
-  string tokenB = 4;
+  string tokenIn = 3;
+  string tokenOut = 4;
   string amountIn = 5 [
       (gogoproto.moretags)   = "yaml:\"amountIn\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountIn"
   ]; 
-  string tokenIn = 6;
-  string minOut = 7 [
+  string minOut = 6 [
       (gogoproto.moretags)   = "yaml:\"minOut\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
       (gogoproto.nullable)   = false,

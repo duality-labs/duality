@@ -145,7 +145,7 @@ func (k Keeper) SwapVerification(goCtx context.Context, msg types.MsgSwap) (stri
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// lexographically sort token0, token1
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
+	token0, token1, err := k.SortTokens(ctx, msg.TokenIn, msg.TokenOut)
 
 	if err != nil {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")

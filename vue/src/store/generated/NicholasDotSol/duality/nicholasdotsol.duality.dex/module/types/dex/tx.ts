@@ -33,10 +33,9 @@ export interface MsgWithdrawlResponse {}
 export interface MsgSwap {
   creator: string;
   receiver: string;
-  tokenA: string;
-  tokenB: string;
-  amountIn: string;
   tokenIn: string;
+  tokenOut: string;
+  amountIn: string;
   minOut: string;
 }
 
@@ -593,10 +592,9 @@ export const MsgWithdrawlResponse = {
 const baseMsgSwap: object = {
   creator: "",
   receiver: "",
-  tokenA: "",
-  tokenB: "",
-  amountIn: "",
   tokenIn: "",
+  tokenOut: "",
+  amountIn: "",
   minOut: "",
 };
 
@@ -608,20 +606,17 @@ export const MsgSwap = {
     if (message.receiver !== "") {
       writer.uint32(18).string(message.receiver);
     }
-    if (message.tokenA !== "") {
-      writer.uint32(26).string(message.tokenA);
+    if (message.tokenIn !== "") {
+      writer.uint32(26).string(message.tokenIn);
     }
-    if (message.tokenB !== "") {
-      writer.uint32(34).string(message.tokenB);
+    if (message.tokenOut !== "") {
+      writer.uint32(34).string(message.tokenOut);
     }
     if (message.amountIn !== "") {
       writer.uint32(42).string(message.amountIn);
     }
-    if (message.tokenIn !== "") {
-      writer.uint32(50).string(message.tokenIn);
-    }
     if (message.minOut !== "") {
-      writer.uint32(58).string(message.minOut);
+      writer.uint32(50).string(message.minOut);
     }
     return writer;
   },
@@ -640,18 +635,15 @@ export const MsgSwap = {
           message.receiver = reader.string();
           break;
         case 3:
-          message.tokenA = reader.string();
+          message.tokenIn = reader.string();
           break;
         case 4:
-          message.tokenB = reader.string();
+          message.tokenOut = reader.string();
           break;
         case 5:
           message.amountIn = reader.string();
           break;
         case 6:
-          message.tokenIn = reader.string();
-          break;
-        case 7:
           message.minOut = reader.string();
           break;
         default:
@@ -674,25 +666,20 @@ export const MsgSwap = {
     } else {
       message.receiver = "";
     }
-    if (object.tokenA !== undefined && object.tokenA !== null) {
-      message.tokenA = String(object.tokenA);
+    if (object.tokenIn !== undefined && object.tokenIn !== null) {
+      message.tokenIn = String(object.tokenIn);
     } else {
-      message.tokenA = "";
+      message.tokenIn = "";
     }
-    if (object.tokenB !== undefined && object.tokenB !== null) {
-      message.tokenB = String(object.tokenB);
+    if (object.tokenOut !== undefined && object.tokenOut !== null) {
+      message.tokenOut = String(object.tokenOut);
     } else {
-      message.tokenB = "";
+      message.tokenOut = "";
     }
     if (object.amountIn !== undefined && object.amountIn !== null) {
       message.amountIn = String(object.amountIn);
     } else {
       message.amountIn = "";
-    }
-    if (object.tokenIn !== undefined && object.tokenIn !== null) {
-      message.tokenIn = String(object.tokenIn);
-    } else {
-      message.tokenIn = "";
     }
     if (object.minOut !== undefined && object.minOut !== null) {
       message.minOut = String(object.minOut);
@@ -706,10 +693,9 @@ export const MsgSwap = {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.receiver !== undefined && (obj.receiver = message.receiver);
-    message.tokenA !== undefined && (obj.tokenA = message.tokenA);
-    message.tokenB !== undefined && (obj.tokenB = message.tokenB);
-    message.amountIn !== undefined && (obj.amountIn = message.amountIn);
     message.tokenIn !== undefined && (obj.tokenIn = message.tokenIn);
+    message.tokenOut !== undefined && (obj.tokenOut = message.tokenOut);
+    message.amountIn !== undefined && (obj.amountIn = message.amountIn);
     message.minOut !== undefined && (obj.minOut = message.minOut);
     return obj;
   },
@@ -726,25 +712,20 @@ export const MsgSwap = {
     } else {
       message.receiver = "";
     }
-    if (object.tokenA !== undefined && object.tokenA !== null) {
-      message.tokenA = object.tokenA;
+    if (object.tokenIn !== undefined && object.tokenIn !== null) {
+      message.tokenIn = object.tokenIn;
     } else {
-      message.tokenA = "";
+      message.tokenIn = "";
     }
-    if (object.tokenB !== undefined && object.tokenB !== null) {
-      message.tokenB = object.tokenB;
+    if (object.tokenOut !== undefined && object.tokenOut !== null) {
+      message.tokenOut = object.tokenOut;
     } else {
-      message.tokenB = "";
+      message.tokenOut = "";
     }
     if (object.amountIn !== undefined && object.amountIn !== null) {
       message.amountIn = object.amountIn;
     } else {
       message.amountIn = "";
-    }
-    if (object.tokenIn !== undefined && object.tokenIn !== null) {
-      message.tokenIn = object.tokenIn;
-    } else {
-      message.tokenIn = "";
     }
     if (object.minOut !== undefined && object.minOut !== null) {
       message.minOut = object.minOut;

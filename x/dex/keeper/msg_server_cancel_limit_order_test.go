@@ -161,9 +161,8 @@ func (suite *IntegrationTestSuite) TestCancelLimitOrder_2() {
 	swapResponse, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator:  bob.String(),
 		Receiver: bob.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
 		TokenIn:  "TokenA",
+		TokenOut: "TokenB",
 		AmountIn: newDec("40"),
 		MinOut:   newDec("14"),
 	})

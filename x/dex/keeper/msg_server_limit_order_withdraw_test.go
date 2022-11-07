@@ -80,9 +80,8 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder1to0_Withdraw() {
 	swapResponse, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator:  bob.String(),
 		Receiver: bob.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
 		TokenIn:  "TokenA",
+		TokenOut: "TokenB",
 		AmountIn: newDec("40"),
 		MinOut:   newDec("30"),
 	})
@@ -202,8 +201,7 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder0to1_Withdraw() {
 	swapResponse, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator:  bob.String(),
 		Receiver: bob.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
+		TokenOut: "TokenA",
 		TokenIn:  "TokenB",
 		AmountIn: newDec("40"),
 		MinOut:   newDec("30"),

@@ -142,10 +142,9 @@ func (suite *IntegrationTestSuite) TestSwap() {
 
 	swapRepsone, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator:  alice.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
-		AmountIn: newDec("20"),
 		TokenIn:  "TokenB",
+		TokenOut: "TokenA",
+		AmountIn: newDec("20"),
 		MinOut:   newDec("10"),
 		Receiver: alice.String(),
 	})
@@ -226,10 +225,9 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection() {
 
 	swapRepsone, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator:  bob.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
-		AmountIn: newDec("49.99500"),
 		TokenIn:  "TokenB",
+		TokenOut: "TokenA",
+		AmountIn: newDec("49.99500"),
 		MinOut:   newDec("10"),
 		Receiver: bob.String(),
 	})
@@ -309,10 +307,9 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedWrongDirection() {
 
 	swapRepsone, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator:  bob.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
-		AmountIn: newDec("49.99500"),
 		TokenIn:  "TokenA",
+		TokenOut: "TokenB",
+		AmountIn: newDec("49.99500"),
 		MinOut:   newDec("10"),
 		Receiver: bob.String(),
 	})
@@ -416,10 +413,9 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection2() {
 
 	swapRepsone, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator:  bob.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
-		AmountIn: newDec("60"),
 		TokenIn:  "TokenB",
+		TokenOut: "TokenA",
+		AmountIn: newDec("60"),
 		MinOut:   newDec("10"),
 		Receiver: bob.String(),
 	})
@@ -508,9 +504,8 @@ func (suite *IntegrationTestSuite) TestMultiTick01to() {
 	swapResponse, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator:  bob.String(),
 		Receiver: bob.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
 		TokenIn:  "TokenB",
+		TokenOut: "TokenA",
 		AmountIn: newDec("40"),
 		MinOut:   newDec("30"),
 	})
@@ -596,9 +591,8 @@ func (suite *IntegrationTestSuite) TestMultiTick1to0() {
 	swapResponse, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator:  bob.String(),
 		Receiver: bob.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
 		TokenIn:  "TokenA",
+		TokenOut: "TokenB",
 		AmountIn: newDec("40"),
 		MinOut:   newDec("30"),
 	})
