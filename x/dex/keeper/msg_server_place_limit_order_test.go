@@ -45,10 +45,9 @@ func (suite *IntegrationTestSuite) TestPlaceLimitOrder() {
 	orderResponse1, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		TokenIn:   "TokenB",
+		TokenOut:  "TokenA",
+		TickIndex: 0,
 		AmountIn:  newDec("50"),
 	})
 
@@ -69,10 +68,9 @@ func (suite *IntegrationTestSuite) TestPlaceLimitOrder() {
 	orderResponse2, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		TokenIn:   "TokenB",
+		TokenOut:  "TokenA",
+		TickIndex: 0,
 		AmountIn:  newDec("50"),
 	})
 	suite.Require().Nil(err)
@@ -92,10 +90,9 @@ func (suite *IntegrationTestSuite) TestPlaceLimitOrder() {
 	orderResponse3, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   bob.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		TokenIn:   "TokenB",
+		TokenOut:  "TokenA",
+		TickIndex: 0,
 		AmountIn:  newDec("100"),
 	})
 
@@ -113,26 +110,12 @@ func (suite *IntegrationTestSuite) TestPlaceLimitOrder() {
 
 	_ = orderResponse3
 
-	orderResponse4, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
-		Creator:   bob.String(),
-		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
-		TokenIn:   "TokenC",
-		AmountIn:  newDec("100"),
-	})
-
-	suite.Require().Error(err)
-	_ = orderResponse4
-
 	orderResponse5, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   bob.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		TokenIn:   "TokenB",
+		TokenOut:  "TokenA",
+		TickIndex: 0,
 		AmountIn:  newDec("1000"),
 	})
 

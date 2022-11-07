@@ -50,10 +50,9 @@ func (suite *IntegrationTestSuite) TestCancelLimitOrderSingle() {
 	orderResponse1, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		TokenIn:   "TokenB",
+		TokenOut:  "TokenA",
+		TickIndex: 0,
 		AmountIn:  newDec("25"),
 	})
 
@@ -126,10 +125,9 @@ func (suite *IntegrationTestSuite) TestCancelLimitOrder_2() {
 	orderResponse1, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		TokenIn:   "TokenB",
+		TokenOut:  "TokenA",
+		TickIndex: 0,
 		AmountIn:  newDec("40"),
 	})
 
@@ -231,10 +229,9 @@ func (suite *IntegrationTestSuite) TestCancelLimitOrder_3() {
 	orderResponse1, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		TokenIn:   "TokenB",
+		TokenOut:  "TokenA",
+		TickIndex: 0,
 		AmountIn:  newDec("40"),
 	})
 

@@ -92,11 +92,10 @@ message MsgSwapResponse {
 message MsgPlaceLimitOrder {
   string creator = 1;
   string receiver = 2;
-  string tokenA = 3;
-  string tokenB = 4;
+  string tokenIn = 3;
+  string tokenOut = 4;
   int64 tickIndex = 5;
-  string tokenIn = 6;
-  string amountIn = 7 [
+  string amountIn = 6 [
       (gogoproto.moretags)   = "yaml:\"amountIn\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
       (gogoproto.nullable)   = false,

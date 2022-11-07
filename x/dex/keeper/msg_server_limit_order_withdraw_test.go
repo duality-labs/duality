@@ -50,10 +50,9 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder1to0_Withdraw() {
 	orderResponse1, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		TokenIn:   "TokenB",
+		TokenOut:  "TokenA",
+		TickIndex: 0,
 		AmountIn:  newDec("25"),
 	})
 
@@ -64,10 +63,9 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder1to0_Withdraw() {
 	orderResponse2, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: -1,
 		TokenIn:   "TokenB",
+		TokenOut:  "TokenA",
+		TickIndex: -1,
 		AmountIn:  newDec("25"),
 	})
 
@@ -171,10 +169,9 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder0to1_Withdraw() {
 	orderResponse1, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		TokenIn:   "TokenA",
+		TokenOut:  "TokenB",
+		TickIndex: 0,
 		AmountIn:  newDec("25"),
 	})
 
@@ -185,10 +182,9 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder0to1_Withdraw() {
 	orderResponse2, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 1,
 		TokenIn:   "TokenA",
+		TokenOut:  "TokenB",
+		TickIndex: 1,
 		AmountIn:  newDec("25"),
 	})
 
@@ -308,10 +304,9 @@ func (suite *IntegrationTestSuite) ErrorCasesWithdrawLimitOrder() {
 	orderResponse1, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		TokenIn:   "TokenA",
+		TokenOut:  "TokenB",
+		TickIndex: 0,
 		AmountIn:  newDec("25"),
 	})
 

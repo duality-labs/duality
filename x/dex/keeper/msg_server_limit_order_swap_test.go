@@ -50,10 +50,9 @@ func (suite *IntegrationTestSuite) TestMultiLimitOrderTick0to1() {
 	orderResponse1, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 1,
 		TokenIn:   "TokenA",
+		TokenOut:  "TokenB",
+		TickIndex: 1,
 		AmountIn:  newDec("25"),
 	})
 
@@ -64,10 +63,9 @@ func (suite *IntegrationTestSuite) TestMultiLimitOrderTick0to1() {
 	orderResponse2, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 2,
 		TokenIn:   "TokenA",
+		TokenOut:  "TokenB",
+		TickIndex: 2,
 		AmountIn:  newDec("25"),
 	})
 
@@ -140,10 +138,9 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder1to0() {
 	orderResponse1, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
+		TokenOut:  "TokenA",
 		TokenIn:   "TokenB",
+		TickIndex: 0,
 		AmountIn:  newDec("25"),
 	})
 
@@ -154,10 +151,9 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder1to0() {
 	orderResponse2, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: -1,
+		TokenOut:  "TokenA",
 		TokenIn:   "TokenB",
+		TickIndex: -1,
 		AmountIn:  newDec("25"),
 	})
 
@@ -226,10 +222,9 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrderAndDeposit1to0() {
 	orderResponse1, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: -1,
+		TokenOut:  "TokenA",
 		TokenIn:   "TokenB",
+		TickIndex: -1,
 		AmountIn:  newDec("25"),
 	})
 
@@ -313,10 +308,9 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrderAndDeposit1to0_2() {
 	orderResponse1, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
+		TokenOut:  "TokenA",
 		TokenIn:   "TokenB",
+		TickIndex: 0,
 		AmountIn:  newDec("25"),
 	})
 
@@ -327,10 +321,9 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrderAndDeposit1to0_2() {
 	orderResponse2, err := suite.msgServer.PlaceLimitOrder(goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: -1,
+		TokenOut:  "TokenA",
 		TokenIn:   "TokenB",
+		TickIndex: -1,
 		AmountIn:  newDec("25"),
 	})
 
