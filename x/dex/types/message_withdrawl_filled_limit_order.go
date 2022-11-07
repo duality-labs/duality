@@ -9,14 +9,13 @@ const TypeMsgWithdrawFilledLimitOrder = "withdrawl_withdrawn_limit_order"
 
 var _ sdk.Msg = &MsgWithdrawFilledLimitOrder{}
 
-func NewMsgWithdrawFilledLimitOrder(creator string, receiver string, tokenA string, tokenB string, tickIndex int64, keyToken string, key uint64) *MsgWithdrawFilledLimitOrder {
+func NewMsgWithdrawFilledLimitOrder(creator string, receiver string, keyToken string, tokenOut string, tickIndex int64, key uint64) *MsgWithdrawFilledLimitOrder {
 	return &MsgWithdrawFilledLimitOrder{
 		Creator:   creator,
 		Receiver:  receiver,
-		TokenA:    tokenA,
-		TokenB:    tokenB,
-		TickIndex: tickIndex,
 		KeyToken:  keyToken,
+		TokenOut:  tokenOut,
+		TickIndex: tickIndex,
 		Key:       key,
 	}
 }

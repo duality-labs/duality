@@ -19,8 +19,8 @@ func CmdWithdrawFilledLimitOrder() *cobra.Command {
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
-			argTokenA := args[1]
-			argTokenB := args[2]
+			argKeyToken := args[1]
+			argTokenOut := args[2]
 			argTickIndex := args[3]
 			argTickIndexInt, err := strconv.Atoi(argTickIndex)
 
@@ -28,8 +28,7 @@ func CmdWithdrawFilledLimitOrder() *cobra.Command {
 				return err
 			}
 
-			argKeyToken := args[4]
-			argKey := args[5]
+			argKey := args[4]
 
 			argKeyInt, err := strconv.Atoi(argKey)
 
@@ -45,10 +44,9 @@ func CmdWithdrawFilledLimitOrder() *cobra.Command {
 			msg := types.NewMsgWithdrawFilledLimitOrder(
 				clientCtx.GetFromAddress().String(),
 				argReceiver,
-				argTokenA,
-				argTokenB,
-				int64(argTickIndexInt),
 				argKeyToken,
+				argTokenOut,
+				int64(argTickIndexInt),
 				uint64(argKeyInt),
 			)
 			if err := msg.ValidateBasic(); err != nil {

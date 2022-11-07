@@ -228,7 +228,7 @@ func (k Keeper) PlaceLimitOrderVerification(goCtx context.Context, msg types.Msg
 func (k Keeper) WithdrawLimitOrderVerification(goCtx context.Context, msg types.MsgWithdrawFilledLimitOrder) (string, string, sdk.AccAddress, sdk.AccAddress, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
+	token0, token1, err := k.SortTokens(ctx, msg.KeyToken, msg.TokenOut)
 
 	if err != nil {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")

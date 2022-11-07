@@ -109,11 +109,10 @@ message MsgPlaceLimitOrderResponse {
 message MsgWithdrawFilledLimitOrder {
   string creator = 1;
   string receiver = 2;
-  string tokenA = 3;
-  string tokenB = 4;
+  string keyToken = 3;
+  string tokenOut = 4;
   int64 tickIndex = 5;
-  string keyToken = 6;
-  uint64 key = 7;
+  uint64 key = 6;
 }
 
 message MsgWithdrawFilledLimitOrderResponse {

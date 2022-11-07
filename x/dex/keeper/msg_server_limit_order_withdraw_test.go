@@ -96,10 +96,9 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder1to0_Withdraw() {
 
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		KeyToken:  "TokenB",
+		TokenOut:  "TokenA",
+		TickIndex: 0,
 		Key:       0,
 	})
 
@@ -113,10 +112,9 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder1to0_Withdraw() {
 
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: -1,
 		KeyToken:  "TokenB",
+		TokenOut:  "TokenA",
+		TickIndex: -1,
 		Key:       0,
 	})
 
@@ -215,10 +213,9 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder0to1_Withdraw() {
 
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		KeyToken:  "TokenA",
+		TokenOut:  "TokenB",
+		TickIndex: 0,
 		Key:       0,
 	})
 
@@ -232,10 +229,9 @@ func (suite *IntegrationTestSuite) TestMultiTickLimitOrder0to1_Withdraw() {
 
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 1,
 		KeyToken:  "TokenA",
+		TokenOut:  "TokenB",
+		TickIndex: 1,
 		Key:       0,
 	})
 
@@ -290,10 +286,9 @@ func (suite *IntegrationTestSuite) ErrorCasesWithdrawLimitOrder() {
 
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		KeyToken:  "TokenB",
+		TokenOut:  "TokenA",
+		TickIndex: 0,
 		Key:       0,
 	})
 
@@ -317,10 +312,9 @@ func (suite *IntegrationTestSuite) ErrorCasesWithdrawLimitOrder() {
 
 		Creator:   bob.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		KeyToken:  "TokenB",
+		TokenOut:  "TokenA",
+		TickIndex: 0,
 		Key:       0,
 	})
 
@@ -333,10 +327,9 @@ func (suite *IntegrationTestSuite) ErrorCasesWithdrawLimitOrder() {
 
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		KeyToken:  "TokenA",
+		TokenOut:  "TokenB",
+		TickIndex: 0,
 		Key:       0,
 	})
 
@@ -349,10 +342,9 @@ func (suite *IntegrationTestSuite) ErrorCasesWithdrawLimitOrder() {
 
 		Creator:   alice.String(),
 		Receiver:  alice.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		KeyToken:  "TokenB",
+		TokenOut:  "TokenA",
+		TickIndex: 0,
 		Key:       1,
 	})
 
@@ -364,10 +356,9 @@ func (suite *IntegrationTestSuite) ErrorCasesWithdrawLimitOrder() {
 
 		Creator:   alice.String(),
 		Receiver:  bob.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: 0,
 		KeyToken:  "TokenB",
+		TokenOut:  "TokenA",
+		TickIndex: 0,
 		Key:       1,
 	})
 
