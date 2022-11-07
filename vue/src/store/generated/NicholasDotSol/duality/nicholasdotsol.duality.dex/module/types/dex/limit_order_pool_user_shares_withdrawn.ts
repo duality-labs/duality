@@ -4,7 +4,7 @@ import { util, configure, Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
-export interface LimitOrderPoolUserSharesWithdrawn {
+export interface LimitOrderPoolUserSharesWithdrawnObject {
   pairId: string;
   token: string;
   tickIndex: number;
@@ -13,7 +13,7 @@ export interface LimitOrderPoolUserSharesWithdrawn {
   sharesWithdrawn: string;
 }
 
-const baseLimitOrderPoolUserSharesWithdrawn: object = {
+const baseLimitOrderPoolUserSharesWithdrawnObject: object = {
   pairId: "",
   token: "",
   tickIndex: 0,
@@ -22,9 +22,9 @@ const baseLimitOrderPoolUserSharesWithdrawn: object = {
   sharesWithdrawn: "",
 };
 
-export const LimitOrderPoolUserSharesWithdrawn = {
+export const LimitOrderPoolUserSharesWithdrawnObject = {
   encode(
-    message: LimitOrderPoolUserSharesWithdrawn,
+    message: LimitOrderPoolUserSharesWithdrawnObject,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.pairId !== "") {
@@ -51,12 +51,12 @@ export const LimitOrderPoolUserSharesWithdrawn = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): LimitOrderPoolUserSharesWithdrawn {
+  ): LimitOrderPoolUserSharesWithdrawnObject {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseLimitOrderPoolUserSharesWithdrawn,
-    } as LimitOrderPoolUserSharesWithdrawn;
+      ...baseLimitOrderPoolUserSharesWithdrawnObject,
+    } as LimitOrderPoolUserSharesWithdrawnObject;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -86,10 +86,10 @@ export const LimitOrderPoolUserSharesWithdrawn = {
     return message;
   },
 
-  fromJSON(object: any): LimitOrderPoolUserSharesWithdrawn {
+  fromJSON(object: any): LimitOrderPoolUserSharesWithdrawnObject {
     const message = {
-      ...baseLimitOrderPoolUserSharesWithdrawn,
-    } as LimitOrderPoolUserSharesWithdrawn;
+      ...baseLimitOrderPoolUserSharesWithdrawnObject,
+    } as LimitOrderPoolUserSharesWithdrawnObject;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = String(object.pairId);
     } else {
@@ -126,7 +126,7 @@ export const LimitOrderPoolUserSharesWithdrawn = {
     return message;
   },
 
-  toJSON(message: LimitOrderPoolUserSharesWithdrawn): unknown {
+  toJSON(message: LimitOrderPoolUserSharesWithdrawnObject): unknown {
     const obj: any = {};
     message.pairId !== undefined && (obj.pairId = message.pairId);
     message.token !== undefined && (obj.token = message.token);
@@ -139,11 +139,11 @@ export const LimitOrderPoolUserSharesWithdrawn = {
   },
 
   fromPartial(
-    object: DeepPartial<LimitOrderPoolUserSharesWithdrawn>
-  ): LimitOrderPoolUserSharesWithdrawn {
+    object: DeepPartial<LimitOrderPoolUserSharesWithdrawnObject>
+  ): LimitOrderPoolUserSharesWithdrawnObject {
     const message = {
-      ...baseLimitOrderPoolUserSharesWithdrawn,
-    } as LimitOrderPoolUserSharesWithdrawn;
+      ...baseLimitOrderPoolUserSharesWithdrawnObject,
+    } as LimitOrderPoolUserSharesWithdrawnObject;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = object.pairId;
     } else {

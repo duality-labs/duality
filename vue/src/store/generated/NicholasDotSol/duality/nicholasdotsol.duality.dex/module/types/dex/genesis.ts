@@ -9,7 +9,7 @@ import { TokenObject } from "../dex/token_map";
 import { Shares } from "../dex/shares";
 import { FeeList } from "../dex/fee_list";
 import { LimitOrderPoolUserShareObject } from "../dex/limit_order_pool_user_share_map";
-import { LimitOrderPoolUserSharesWithdrawn } from "../dex/limit_order_pool_user_shares_withdrawn";
+import { LimitOrderPoolUserSharesWithdrawnObject } from "../dex/limit_order_pool_user_shares_withdrawn";
 import { LimitOrderPoolTotalSharesObject } from "../dex/limit_order_pool_total_shares_map";
 import { LimitOrderPoolReserveObject } from "../dex/limit_order_pool_reserve_map";
 import { LimitOrderPoolFillObject } from "../dex/limit_order_pool_fill_map";
@@ -28,7 +28,7 @@ export interface GenesisState {
   feeListList: FeeList[];
   feeListCount: number;
   limitOrderPoolUserShareObjectList: LimitOrderPoolUserShareObject[];
-  limitOrderPoolUserSharesWithdrawnList: LimitOrderPoolUserSharesWithdrawn[];
+  limitOrderPoolUserSharesWithdrawnObjectList: LimitOrderPoolUserSharesWithdrawnObject[];
   limitOrderPoolTotalSharesObjectList: LimitOrderPoolTotalSharesObject[];
   limitOrderPoolReserveObjectList: LimitOrderPoolReserveObject[];
   /** this line is used by starport scaffolding # genesis/proto/state */
@@ -69,8 +69,8 @@ export const GenesisState = {
     for (const v of message.limitOrderPoolUserShareObjectList) {
       LimitOrderPoolUserShareObject.encode(v!, writer.uint32(114).fork()).ldelim();
     }
-    for (const v of message.limitOrderPoolUserSharesWithdrawnList) {
-      LimitOrderPoolUserSharesWithdrawn.encode(
+    for (const v of message.limitOrderPoolUserSharesWithdrawnObjectList) {
+      LimitOrderPoolUserSharesWithdrawnObject.encode(
         v!,
         writer.uint32(122).fork()
       ).ldelim();
@@ -101,7 +101,7 @@ export const GenesisState = {
     message.sharesList = [];
     message.feeListList = [];
     message.limitOrderPoolUserShareObjectList = [];
-    message.limitOrderPoolUserSharesWithdrawnList = [];
+    message.limitOrderPoolUserSharesWithdrawnObjectList = [];
     message.limitOrderPoolTotalSharesObjectList = [];
     message.limitOrderPoolReserveObjectList = [];
     message.limitOrderPoolFillObjectList = [];
@@ -141,8 +141,8 @@ export const GenesisState = {
           );
           break;
         case 15:
-          message.limitOrderPoolUserSharesWithdrawnList.push(
-            LimitOrderPoolUserSharesWithdrawn.decode(reader, reader.uint32())
+          message.limitOrderPoolUserSharesWithdrawnObjectList.push(
+            LimitOrderPoolUserSharesWithdrawnObject.decode(reader, reader.uint32())
           );
           break;
         case 16:
@@ -177,7 +177,7 @@ export const GenesisState = {
     message.sharesList = [];
     message.feeListList = [];
     message.limitOrderPoolUserShareObjectList = [];
-    message.limitOrderPoolUserSharesWithdrawnList = [];
+    message.limitOrderPoolUserSharesWithdrawnObjectList = [];
     message.limitOrderPoolTotalSharesObjectList = [];
     message.limitOrderPoolReserveObjectList = [];
     message.limitOrderPoolFillObjectList = [];
@@ -237,12 +237,12 @@ export const GenesisState = {
       }
     }
     if (
-      object.limitOrderPoolUserSharesWithdrawnList !== undefined &&
-      object.limitOrderPoolUserSharesWithdrawnList !== null
+      object.limitOrderPoolUserSharesWithdrawnObjectList !== undefined &&
+      object.limitOrderPoolUserSharesWithdrawnObjectList !== null
     ) {
-      for (const e of object.limitOrderPoolUserSharesWithdrawnList) {
-        message.limitOrderPoolUserSharesWithdrawnList.push(
-          LimitOrderPoolUserSharesWithdrawn.fromJSON(e)
+      for (const e of object.limitOrderPoolUserSharesWithdrawnObjectList) {
+        message.limitOrderPoolUserSharesWithdrawnObjectList.push(
+          LimitOrderPoolUserSharesWithdrawnObject.fromJSON(e)
         );
       }
     }
@@ -336,12 +336,12 @@ export const GenesisState = {
     } else {
       obj.limitOrderPoolUserShareObjectList = [];
     }
-    if (message.limitOrderPoolUserSharesWithdrawnList) {
-      obj.limitOrderPoolUserSharesWithdrawnList = message.limitOrderPoolUserSharesWithdrawnList.map(
-        (e) => (e ? LimitOrderPoolUserSharesWithdrawn.toJSON(e) : undefined)
+    if (message.limitOrderPoolUserSharesWithdrawnObjectList) {
+      obj.limitOrderPoolUserSharesWithdrawnObjectList = message.limitOrderPoolUserSharesWithdrawnObjectList.map(
+        (e) => (e ? LimitOrderPoolUserSharesWithdrawnObject.toJSON(e) : undefined)
       );
     } else {
-      obj.limitOrderPoolUserSharesWithdrawnList = [];
+      obj.limitOrderPoolUserSharesWithdrawnObjectList = [];
     }
     if (message.limitOrderPoolTotalSharesObjectList) {
       obj.limitOrderPoolTotalSharesObjectList = message.limitOrderPoolTotalSharesObjectList.map(
@@ -376,7 +376,7 @@ export const GenesisState = {
     message.sharesList = [];
     message.feeListList = [];
     message.limitOrderPoolUserShareObjectList = [];
-    message.limitOrderPoolUserSharesWithdrawnList = [];
+    message.limitOrderPoolUserSharesWithdrawnObjectList = [];
     message.limitOrderPoolTotalSharesObjectList = [];
     message.limitOrderPoolReserveObjectList = [];
     message.limitOrderPoolFillObjectList = [];
@@ -436,12 +436,12 @@ export const GenesisState = {
       }
     }
     if (
-      object.limitOrderPoolUserSharesWithdrawnList !== undefined &&
-      object.limitOrderPoolUserSharesWithdrawnList !== null
+      object.limitOrderPoolUserSharesWithdrawnObjectList !== undefined &&
+      object.limitOrderPoolUserSharesWithdrawnObjectList !== null
     ) {
-      for (const e of object.limitOrderPoolUserSharesWithdrawnList) {
-        message.limitOrderPoolUserSharesWithdrawnList.push(
-          LimitOrderPoolUserSharesWithdrawn.fromPartial(e)
+      for (const e of object.limitOrderPoolUserSharesWithdrawnObjectList) {
+        message.limitOrderPoolUserSharesWithdrawnObjectList.push(
+          LimitOrderPoolUserSharesWithdrawnObject.fromPartial(e)
         );
       }
     }

@@ -1367,13 +1367,13 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 	// Retrives LimitOrderUserSharesMap object from KVStore for the specified key and keyToken
 	UserShareData, UserShareDataFound := k.GetLimitOrderPoolUserShareObject(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
 	// Retrives LimitOrderUserSharesWithdrawnMap object from KVStore for the specified key and keyToken
-	UserSharesWithdrawnData, UserSharesWithdrawnDataFound := k.GetLimitOrderPoolUserSharesWithdrawn(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
+	UserSharesWithdrawnData, UserSharesWithdrawnDataFound := k.GetLimitOrderPoolUserSharesWithdrawnObject(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
 	// Retrives LimitOrderTotalSharesMap object from KVStore for the specified key and keyToken
 	TotalSharesData, TotalSharesDataFound := k.GetLimitOrderPoolTotalSharesObject(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 
 	// default initialize UserSharesWithdrawn (keeps track of liqudity withdrawn) if not initialized.
 	if !UserSharesWithdrawnDataFound {
-		UserSharesWithdrawnData = types.LimitOrderPoolUserSharesWithdrawn{
+		UserSharesWithdrawnData = types.LimitOrderPoolUserSharesWithdrawnObject{
 			PairId:          pairId,
 			TickIndex:       msg.TickIndex,
 			Token:           msg.KeyToken,
@@ -1411,7 +1411,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 	// Updates changed LimitOrder Mappings in KVstore
 	k.SetLimitOrderPoolFillObject(ctx, FillData)
 	k.SetLimitOrderPoolUserShareObject(ctx, UserShareData)
-	k.SetLimitOrderPoolUserSharesWithdrawn(ctx, UserSharesWithdrawnData)
+	k.SetLimitOrderPoolUserSharesWithdrawnObject(ctx, UserSharesWithdrawnData)
 	k.SetLimitOrderPoolTotalSharesObject(ctx, TotalSharesData)
 
 	var tokenOut string

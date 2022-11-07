@@ -73,7 +73,7 @@ func TestGenesis(t *testing.T) {
 				Address: "1",
 			},
 		},
-		LimitOrderPoolUserSharesWithdrawnList: []types.LimitOrderPoolUserSharesWithdrawn{
+		LimitOrderPoolUserSharesWithdrawnObjectList: []types.LimitOrderPoolUserSharesWithdrawnObject{
 			{
 				Count:   0,
 				Address: "0",
@@ -126,7 +126,7 @@ func TestGenesis(t *testing.T) {
 	require.ElementsMatch(t, genesisState.FeeListList, got.FeeListList)
 	require.Equal(t, genesisState.FeeListCount, got.FeeListCount)
 	require.ElementsMatch(t, genesisState.LimitOrderPoolUserShareObjectList, got.LimitOrderPoolUserShareObjectList)
-	require.ElementsMatch(t, genesisState.LimitOrderPoolUserSharesWithdrawnList, got.LimitOrderPoolUserSharesWithdrawnList)
+	require.ElementsMatch(t, genesisState.LimitOrderPoolUserSharesWithdrawnObjectList, got.LimitOrderPoolUserSharesWithdrawnObjectList)
 	require.ElementsMatch(t, genesisState.LimitOrderPoolTotalSharesObjectList, got.LimitOrderPoolTotalSharesObjectList)
 	require.ElementsMatch(t, genesisState.LimitOrderPoolReserveObjectList, got.LimitOrderPoolReserveObjectList)
 	require.ElementsMatch(t, genesisState.LimitOrderPoolFillObjectList, got.LimitOrderPoolFillObjectList)

@@ -12,7 +12,7 @@ import "dex/token_object.proto";
 import "dex/shares.proto";
 import "dex/fee_list.proto";
 import "dex/limit_order_pool_user_share_object.proto";
-import "dex/limit_order_pool_user_shares_withdrawn.proto";
+import "dex/limit_order_pool_user_shares_withdrawn_object.proto";
 import "dex/limit_order_pool_total_shares_object.proto";
 import "dex/limit_order_pool_reserve_object.proto";
 import "dex/limit_order_pool_fill_object.proto";
@@ -96,13 +96,13 @@ service Query {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_share_map";
 	}
 
-// Queries a LimitOrderPoolUserSharesWithdrawn by index.
-	rpc LimitOrderPoolUserSharesWithdrawn(QueryGetLimitOrderPoolUserSharesWithdrawnRequest) returns (QueryGetLimitOrderPoolUserSharesWithdrawnResponse) {
+// Queries a LimitOrderPoolUserSharesWithdrawnObject by index.
+	rpc LimitOrderPoolUserSharesWithdrawnObject(QueryGetLimitOrderPoolUserSharesWithdrawnObjectRequest) returns (QueryGetLimitOrderPoolUserSharesWithdrawnObjectResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn/{pairId}/{token}/{tickIndex}/{count}/{address}";
 	}
 
-	// Queries a list of LimitOrderPoolUserSharesWithdrawn items.
-	rpc LimitOrderPoolUserSharesWithdrawnAll(QueryAllLimitOrderPoolUserSharesWithdrawnRequest) returns (QueryAllLimitOrderPoolUserSharesWithdrawnResponse) {
+	// Queries a list of LimitOrderPoolUserSharesWithdrawnObject items.
+	rpc LimitOrderPoolUserSharesWithdrawnObjectAll(QueryAllLimitOrderPoolUserSharesWithdrawnObjectRequest) returns (QueryAllLimitOrderPoolUserSharesWithdrawnObjectResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn";
 	}
 
@@ -282,7 +282,7 @@ message QueryAllLimitOrderPoolUserShareObjectResponse {
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-message QueryGetLimitOrderPoolUserSharesWithdrawnRequest {
+message QueryGetLimitOrderPoolUserSharesWithdrawnObjectRequest {
 string pairId = 1;
   int64 tickIndex =2;
   string token = 3;
@@ -290,16 +290,16 @@ string pairId = 1;
   string address = 5;
 }
 
-message QueryGetLimitOrderPoolUserSharesWithdrawnResponse {
-	LimitOrderPoolUserSharesWithdrawn limitOrderPoolUserSharesWithdrawn = 1 [(gogoproto.nullable) = false];
+message QueryGetLimitOrderPoolUserSharesWithdrawnObjectResponse {
+	LimitOrderPoolUserSharesWithdrawnObject limitOrderPoolUserSharesWithdrawnObject = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryAllLimitOrderPoolUserSharesWithdrawnRequest {
+message QueryAllLimitOrderPoolUserSharesWithdrawnObjectRequest {
 	cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-message QueryAllLimitOrderPoolUserSharesWithdrawnResponse {
-	repeated LimitOrderPoolUserSharesWithdrawn limitOrderPoolUserSharesWithdrawn = 1 [(gogoproto.nullable) = false];
+message QueryAllLimitOrderPoolUserSharesWithdrawnObjectResponse {
+	repeated LimitOrderPoolUserSharesWithdrawnObject limitOrderPoolUserSharesWithdrawnObject = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

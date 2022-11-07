@@ -4,21 +4,21 @@ import { util, configure, Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
-export interface LimitOrderPoolUserSharesWithdrawn {
+export interface LimitOrderPoolUserSharesWithdrawnObject {
   count: number;
   address: string;
   sharesWithdrawn: string;
 }
 
-const baseLimitOrderPoolUserSharesWithdrawn: object = {
+const baseLimitOrderPoolUserSharesWithdrawnObject: object = {
   count: 0,
   address: "",
   sharesWithdrawn: "",
 };
 
-export const LimitOrderPoolUserSharesWithdrawn = {
+export const LimitOrderPoolUserSharesWithdrawnObject = {
   encode(
-    message: LimitOrderPoolUserSharesWithdrawn,
+    message: LimitOrderPoolUserSharesWithdrawnObject,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.count !== 0) {
@@ -36,12 +36,12 @@ export const LimitOrderPoolUserSharesWithdrawn = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): LimitOrderPoolUserSharesWithdrawn {
+  ): LimitOrderPoolUserSharesWithdrawnObject {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseLimitOrderPoolUserSharesWithdrawn,
-    } as LimitOrderPoolUserSharesWithdrawn;
+      ...baseLimitOrderPoolUserSharesWithdrawnObject,
+    } as LimitOrderPoolUserSharesWithdrawnObject;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -62,10 +62,10 @@ export const LimitOrderPoolUserSharesWithdrawn = {
     return message;
   },
 
-  fromJSON(object: any): LimitOrderPoolUserSharesWithdrawn {
+  fromJSON(object: any): LimitOrderPoolUserSharesWithdrawnObject {
     const message = {
-      ...baseLimitOrderPoolUserSharesWithdrawn,
-    } as LimitOrderPoolUserSharesWithdrawn;
+      ...baseLimitOrderPoolUserSharesWithdrawnObject,
+    } as LimitOrderPoolUserSharesWithdrawnObject;
     if (object.count !== undefined && object.count !== null) {
       message.count = Number(object.count);
     } else {
@@ -84,7 +84,7 @@ export const LimitOrderPoolUserSharesWithdrawn = {
     return message;
   },
 
-  toJSON(message: LimitOrderPoolUserSharesWithdrawn): unknown {
+  toJSON(message: LimitOrderPoolUserSharesWithdrawnObject): unknown {
     const obj: any = {};
     message.count !== undefined && (obj.count = message.count);
     message.address !== undefined && (obj.address = message.address);
@@ -94,11 +94,11 @@ export const LimitOrderPoolUserSharesWithdrawn = {
   },
 
   fromPartial(
-    object: DeepPartial<LimitOrderPoolUserSharesWithdrawn>
-  ): LimitOrderPoolUserSharesWithdrawn {
+    object: DeepPartial<LimitOrderPoolUserSharesWithdrawnObject>
+  ): LimitOrderPoolUserSharesWithdrawnObject {
     const message = {
-      ...baseLimitOrderPoolUserSharesWithdrawn,
-    } as LimitOrderPoolUserSharesWithdrawn;
+      ...baseLimitOrderPoolUserSharesWithdrawnObject,
+    } as LimitOrderPoolUserSharesWithdrawnObject;
     if (object.count !== undefined && object.count !== null) {
       message.count = object.count;
     } else {

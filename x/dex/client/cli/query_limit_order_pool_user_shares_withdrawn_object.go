@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListLimitOrderPoolUserSharesWithdrawn() *cobra.Command {
+func CmdListLimitOrderPoolUserSharesWithdrawnObject() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-limit-order-pool-user-shares-withdrawn",
-		Short: "list all LimitOrderPoolUserSharesWithdrawn",
+		Short: "list all LimitOrderPoolUserSharesWithdrawnObject",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -24,11 +24,11 @@ func CmdListLimitOrderPoolUserSharesWithdrawn() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllLimitOrderPoolUserSharesWithdrawnRequest{
+			params := &types.QueryAllLimitOrderPoolUserSharesWithdrawnObjectRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.LimitOrderPoolUserSharesWithdrawnAll(context.Background(), params)
+			res, err := queryClient.LimitOrderPoolUserSharesWithdrawnObjectAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -43,10 +43,10 @@ func CmdListLimitOrderPoolUserSharesWithdrawn() *cobra.Command {
 	return cmd
 }
 
-func CmdShowLimitOrderPoolUserSharesWithdrawn() *cobra.Command {
+func CmdShowLimitOrderPoolUserSharesWithdrawnObject() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "show-limit-order-pool-user-shares-withdrawn [count] [address]",
-		Short: "shows a LimitOrderPoolUserSharesWithdrawn",
+		Short: "shows a LimitOrderPoolUserSharesWithdrawnObject",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -62,12 +62,12 @@ func CmdShowLimitOrderPoolUserSharesWithdrawn() *cobra.Command {
 			}
 			argAddress := args[1]
 
-			params := &types.QueryGetLimitOrderPoolUserSharesWithdrawnRequest{
+			params := &types.QueryGetLimitOrderPoolUserSharesWithdrawnObjectRequest{
 				Count:   uint64(argCount),
 				Address: argAddress,
 			}
 
-			res, err := queryClient.LimitOrderPoolUserSharesWithdrawn(context.Background(), params)
+			res, err := queryClient.LimitOrderPoolUserSharesWithdrawnObject(context.Background(), params)
 			if err != nil {
 				return err
 			}

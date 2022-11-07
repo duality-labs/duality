@@ -110,8 +110,8 @@ func SharesKey(address string, pairId string, tickIndex int64, feeIndex uint64) 
 const (
 	BaseLimitOrderPrefix = "LimitOrderPool/value"
 
-	// LimitOrderPoolUserSharesWithdrawnKeyPrefix is the prefix to retrieve all LimitOrderPoolUserSharesWithdrawn
-	LimitOrderPoolUserSharesWithdrawnKeyPrefix = "LimitOrderPoolUserSharesWithdrawn/value"
+	// LimitOrderPoolUserSharesWithdrawnObjectKeyPrefix is the prefix to retrieve all LimitOrderPoolUserSharesWithdrawnObject
+	LimitOrderPoolUserSharesWithdrawnObjectKeyPrefix = "LimitOrderPoolUserSharesWithdrawnObject/value"
 
 	// LimitOrderPoolUserShareObjectKeyPrefix is the prefix to retrieve all LimitOrderPoolUserShareObject
 	LimitOrderPoolUserShareObjectKeyPrefix = "LimitOrderPoolUserShareObject/value"
@@ -126,8 +126,8 @@ const (
 	LimitOrderPoolFillObjectKeyPrefix = "LimitOrderPoolFillObject/value"
 )
 
-// LimitOrderPoolUserSharesWithdrawnKey returns the store key to retrieve a LimitOrderPoolUserSharesWithdrawn from the index fields
-func LimitOrderPoolUserSharesWithdrawnKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
+// LimitOrderPoolUserSharesWithdrawnObjectKey returns the store key to retrieve a LimitOrderPoolUserSharesWithdrawnObject from the index fields
+func LimitOrderPoolUserSharesWithdrawnObjectKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)

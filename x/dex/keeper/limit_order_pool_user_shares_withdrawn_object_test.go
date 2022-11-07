@@ -15,8 +15,8 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNLimitOrderPoolUserSharesWithdrawn(keeper *keeper.Keeper, ctx sdk.Context, pairId string, tickIndex int64, token string, n int) []types.LimitOrderPoolUserSharesWithdrawn {
-	items := make([]types.LimitOrderPoolUserSharesWithdrawn, n)
+func createNLimitOrderPoolUserSharesWithdrawnObject(keeper *keeper.Keeper, ctx sdk.Context, pairId string, tickIndex int64, token string, n int) []types.LimitOrderPoolUserSharesWithdrawnObject {
+	items := make([]types.LimitOrderPoolUserSharesWithdrawnObject, n)
 	for i := range items {
 		items[i].Count = uint64(i)
 		items[i].Address = strconv.Itoa(i)
@@ -25,16 +25,16 @@ func createNLimitOrderPoolUserSharesWithdrawn(keeper *keeper.Keeper, ctx sdk.Con
 		items[i].Token = token
 		items[i].SharesWithdrawn = sdk.ZeroDec()
 
-		keeper.SetLimitOrderPoolUserSharesWithdrawn(ctx, items[i])
+		keeper.SetLimitOrderPoolUserSharesWithdrawnObject(ctx, items[i])
 	}
 	return items
 }
 
-func TestLimitOrderPoolUserSharesWithdrawnGet(t *testing.T) {
+func TestLimitOrderPoolUserSharesWithdrawnObjectGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUserSharesWithdrawn(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolUserSharesWithdrawnObject(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
 	for _, item := range items {
-		rst, found := keeper.GetLimitOrderPoolUserSharesWithdrawn(ctx,
+		rst, found := keeper.GetLimitOrderPoolUserSharesWithdrawnObject(ctx,
 			"TokenA/TokenB",
 			0,
 			"TokenA",
@@ -48,18 +48,18 @@ func TestLimitOrderPoolUserSharesWithdrawnGet(t *testing.T) {
 		)
 	}
 }
-func TestLimitOrderPoolUserSharesWithdrawnRemove(t *testing.T) {
+func TestLimitOrderPoolUserSharesWithdrawnObjectRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUserSharesWithdrawn(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolUserSharesWithdrawnObject(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
 	for _, item := range items {
-		keeper.RemoveLimitOrderPoolUserSharesWithdrawn(ctx,
+		keeper.RemoveLimitOrderPoolUserSharesWithdrawnObject(ctx,
 			"TokenA/TokenB",
 			0,
 			"TokenA",
 			item.Count,
 			item.Address,
 		)
-		_, found := keeper.GetLimitOrderPoolUserSharesWithdrawn(ctx,
+		_, found := keeper.GetLimitOrderPoolUserSharesWithdrawnObject(ctx,
 			"TokenA/TokenB",
 			0,
 			"TokenA",
@@ -70,11 +70,11 @@ func TestLimitOrderPoolUserSharesWithdrawnRemove(t *testing.T) {
 	}
 }
 
-func TestLimitOrderPoolUserSharesWithdrawnGetAll(t *testing.T) {
+func TestLimitOrderPoolUserSharesWithdrawnObjectGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUserSharesWithdrawn(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolUserSharesWithdrawnObject(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
 	require.ElementsMatch(t,
 		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllLimitOrderPoolUserSharesWithdrawn(ctx)),
+		nullify.Fill(keeper.GetAllLimitOrderPoolUserSharesWithdrawnObject(ctx)),
 	)
 }

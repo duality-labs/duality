@@ -30769,15 +30769,15 @@ paths:
         - Query
   /NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn:
     get:
-      summary: Queries a list of LimitOrderPoolUserSharesWithdrawn items.
-      operationId: NicholasdotsolDualityDexLimitOrderPoolUserSharesWithdrawnAll
+      summary: Queries a list of LimitOrderPoolUserSharesWithdrawnObject items.
+      operationId: NicholasdotsolDualityDexLimitOrderPoolUserSharesWithdrawnObjectAll
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              limitOrderPoolUserSharesWithdrawn:
+              limitOrderPoolUserSharesWithdrawnObject:
                 type: array
                 items:
                   type: object
@@ -30902,15 +30902,15 @@ paths:
         - Query
   '/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn/{pairId}/{token}/{tickIndex}/{count}/{address}':
     get:
-      summary: Queries a LimitOrderPoolUserSharesWithdrawn by index.
-      operationId: NicholasdotsolDualityDexLimitOrderPoolUserSharesWithdrawn
+      summary: Queries a LimitOrderPoolUserSharesWithdrawnObject by index.
+      operationId: NicholasdotsolDualityDexLimitOrderPoolUserSharesWithdrawnObject
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              limitOrderPoolUserSharesWithdrawn:
+              limitOrderPoolUserSharesWithdrawnObject:
                 type: object
                 properties:
                   pairId:
@@ -53748,7 +53748,7 @@ definitions:
         type: string
       sharesOwned:
         type: string
-  nicholasdotsol.duality.dex.LimitOrderPoolUserSharesWithdrawn:
+  nicholasdotsol.duality.dex.LimitOrderPoolUserSharesWithdrawnObject:
     type: object
     properties:
       pairId:
@@ -54031,10 +54031,10 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  nicholasdotsol.duality.dex.QueryAllLimitOrderPoolUserSharesWithdrawnResponse:
+  nicholasdotsol.duality.dex.QueryAllLimitOrderPoolUserSharesWithdrawnObjectResponse:
     type: object
     properties:
-      limitOrderPoolUserSharesWithdrawn:
+      limitOrderPoolUserSharesWithdrawnObject:
         type: array
         items:
           type: object
@@ -54404,10 +54404,10 @@ definitions:
             type: string
           sharesOwned:
             type: string
-  nicholasdotsol.duality.dex.QueryGetLimitOrderPoolUserSharesWithdrawnResponse:
+  nicholasdotsol.duality.dex.QueryGetLimitOrderPoolUserSharesWithdrawnObjectResponse:
     type: object
     properties:
-      limitOrderPoolUserSharesWithdrawn:
+      limitOrderPoolUserSharesWithdrawnObject:
         type: object
         properties:
           pairId:
