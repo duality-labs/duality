@@ -1,0 +1,10 @@
+{
+  "name": "types",
+  "version": "1.0.0",
+  "license": "MIT",
+  "dependencies": {
+    "@protobufs/gogoproto": "^0.0.10",
+    "@protobufs/google": "^0.0.10",
+    "@protobufs/osmosis": "^0.2.0"
+  }
+}
