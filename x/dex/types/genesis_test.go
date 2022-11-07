@@ -78,24 +78,7 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 				FeeListCount: 2,
-				EdgeRowList: []types.EdgeRow{
-					{
-						Id: 0,
-					},
-					{
-						Id: 1,
-					},
-				},
-				EdgeRowCount: 2,
-				AdjanceyMatrixList: []types.AdjanceyMatrix{
-					{
-						Id: 0,
-					},
-					{
-						Id: 1,
-					},
-				},
-				AdjanceyMatrixCount: 2,
+
 				LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
 					{
 						Count:   0,
@@ -258,58 +241,7 @@ func TestGenesisState_Validate(t *testing.T) {
 			},
 			valid: false,
 		},
-		{
-			desc: "duplicated edgeRow",
-			genState: &types.GenesisState{
-				EdgeRowList: []types.EdgeRow{
-					{
-						Id: 0,
-					},
-					{
-						Id: 0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "invalid edgeRow count",
-			genState: &types.GenesisState{
-				EdgeRowList: []types.EdgeRow{
-					{
-						Id: 1,
-					},
-				},
-				EdgeRowCount: 0,
-			},
-			valid: false,
-		},
-		{
-			desc: "duplicated adjanceyMatrix",
-			genState: &types.GenesisState{
-				AdjanceyMatrixList: []types.AdjanceyMatrix{
-					{
-						Id: 0,
-					},
-					{
-						Id: 0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "invalid adjanceyMatrix count",
-			genState: &types.GenesisState{
-				AdjanceyMatrixList: []types.AdjanceyMatrix{
-					{
-						Id: 1,
-					},
-				},
-				AdjanceyMatrixCount: 0,
-			},
-			valid: false,
-		},
+
 		{
 			desc: "duplicated limitOrderPoolUserShareMap",
 			genState: &types.GenesisState{

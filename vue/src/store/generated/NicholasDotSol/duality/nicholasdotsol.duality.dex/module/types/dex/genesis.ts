@@ -8,8 +8,6 @@ import { Tokens } from "../dex/tokens";
 import { TokenMap } from "../dex/token_map";
 import { Shares } from "../dex/shares";
 import { FeeList } from "../dex/fee_list";
-import { EdgeRow } from "../dex/edge_row";
-import { AdjanceyMatrix } from "../dex/adjancey_matrix";
 import { LimitOrderPoolUserShareMap } from "../dex/limit_order_pool_user_share_map";
 import { LimitOrderPoolUserSharesWithdrawn } from "../dex/limit_order_pool_user_shares_withdrawn";
 import { LimitOrderPoolTotalSharesMap } from "../dex/limit_order_pool_total_shares_map";
@@ -29,10 +27,6 @@ export interface GenesisState {
   sharesList: Shares[];
   feeListList: FeeList[];
   feeListCount: number;
-  edgeRowList: EdgeRow[];
-  edgeRowCount: number;
-  adjanceyMatrixList: AdjanceyMatrix[];
-  adjanceyMatrixCount: number;
   limitOrderPoolUserShareMapList: LimitOrderPoolUserShareMap[];
   limitOrderPoolUserSharesWithdrawnList: LimitOrderPoolUserSharesWithdrawn[];
   limitOrderPoolTotalSharesMapList: LimitOrderPoolTotalSharesMap[];
@@ -41,12 +35,7 @@ export interface GenesisState {
   limitOrderPoolFillMapList: LimitOrderPoolFillMap[];
 }
 
-const baseGenesisState: object = {
-  tokensCount: 0,
-  feeListCount: 0,
-  edgeRowCount: 0,
-  adjanceyMatrixCount: 0,
-};
+const baseGenesisState: object = { tokensCount: 0, feeListCount: 0 };
 
 export const GenesisState = {
   encode(message: GenesisState, writer: Writer = Writer.create()): Writer {
@@ -76,18 +65,6 @@ export const GenesisState = {
     }
     if (message.feeListCount !== 0) {
       writer.uint32(72).uint64(message.feeListCount);
-    }
-    for (const v of message.edgeRowList) {
-      EdgeRow.encode(v!, writer.uint32(82).fork()).ldelim();
-    }
-    if (message.edgeRowCount !== 0) {
-      writer.uint32(88).uint64(message.edgeRowCount);
-    }
-    for (const v of message.adjanceyMatrixList) {
-      AdjanceyMatrix.encode(v!, writer.uint32(98).fork()).ldelim();
-    }
-    if (message.adjanceyMatrixCount !== 0) {
-      writer.uint32(104).uint64(message.adjanceyMatrixCount);
     }
     for (const v of message.limitOrderPoolUserShareMapList) {
       LimitOrderPoolUserShareMap.encode(v!, writer.uint32(114).fork()).ldelim();
@@ -123,8 +100,6 @@ export const GenesisState = {
     message.tokenMapList = [];
     message.sharesList = [];
     message.feeListList = [];
-    message.edgeRowList = [];
-    message.adjanceyMatrixList = [];
     message.limitOrderPoolUserShareMapList = [];
     message.limitOrderPoolUserSharesWithdrawnList = [];
     message.limitOrderPoolTotalSharesMapList = [];
@@ -159,20 +134,6 @@ export const GenesisState = {
           break;
         case 9:
           message.feeListCount = longToNumber(reader.uint64() as Long);
-          break;
-        case 10:
-          message.edgeRowList.push(EdgeRow.decode(reader, reader.uint32()));
-          break;
-        case 11:
-          message.edgeRowCount = longToNumber(reader.uint64() as Long);
-          break;
-        case 12:
-          message.adjanceyMatrixList.push(
-            AdjanceyMatrix.decode(reader, reader.uint32())
-          );
-          break;
-        case 13:
-          message.adjanceyMatrixCount = longToNumber(reader.uint64() as Long);
           break;
         case 14:
           message.limitOrderPoolUserShareMapList.push(
@@ -215,8 +176,6 @@ export const GenesisState = {
     message.tokenMapList = [];
     message.sharesList = [];
     message.feeListList = [];
-    message.edgeRowList = [];
-    message.adjanceyMatrixList = [];
     message.limitOrderPoolUserShareMapList = [];
     message.limitOrderPoolUserSharesWithdrawnList = [];
     message.limitOrderPoolTotalSharesMapList = [];
@@ -266,32 +225,6 @@ export const GenesisState = {
       message.feeListCount = Number(object.feeListCount);
     } else {
       message.feeListCount = 0;
-    }
-    if (object.edgeRowList !== undefined && object.edgeRowList !== null) {
-      for (const e of object.edgeRowList) {
-        message.edgeRowList.push(EdgeRow.fromJSON(e));
-      }
-    }
-    if (object.edgeRowCount !== undefined && object.edgeRowCount !== null) {
-      message.edgeRowCount = Number(object.edgeRowCount);
-    } else {
-      message.edgeRowCount = 0;
-    }
-    if (
-      object.adjanceyMatrixList !== undefined &&
-      object.adjanceyMatrixList !== null
-    ) {
-      for (const e of object.adjanceyMatrixList) {
-        message.adjanceyMatrixList.push(AdjanceyMatrix.fromJSON(e));
-      }
-    }
-    if (
-      object.adjanceyMatrixCount !== undefined &&
-      object.adjanceyMatrixCount !== null
-    ) {
-      message.adjanceyMatrixCount = Number(object.adjanceyMatrixCount);
-    } else {
-      message.adjanceyMatrixCount = 0;
     }
     if (
       object.limitOrderPoolUserShareMapList !== undefined &&
@@ -396,24 +329,6 @@ export const GenesisState = {
     }
     message.feeListCount !== undefined &&
       (obj.feeListCount = message.feeListCount);
-    if (message.edgeRowList) {
-      obj.edgeRowList = message.edgeRowList.map((e) =>
-        e ? EdgeRow.toJSON(e) : undefined
-      );
-    } else {
-      obj.edgeRowList = [];
-    }
-    message.edgeRowCount !== undefined &&
-      (obj.edgeRowCount = message.edgeRowCount);
-    if (message.adjanceyMatrixList) {
-      obj.adjanceyMatrixList = message.adjanceyMatrixList.map((e) =>
-        e ? AdjanceyMatrix.toJSON(e) : undefined
-      );
-    } else {
-      obj.adjanceyMatrixList = [];
-    }
-    message.adjanceyMatrixCount !== undefined &&
-      (obj.adjanceyMatrixCount = message.adjanceyMatrixCount);
     if (message.limitOrderPoolUserShareMapList) {
       obj.limitOrderPoolUserShareMapList = message.limitOrderPoolUserShareMapList.map(
         (e) => (e ? LimitOrderPoolUserShareMap.toJSON(e) : undefined)
@@ -460,8 +375,6 @@ export const GenesisState = {
     message.tokenMapList = [];
     message.sharesList = [];
     message.feeListList = [];
-    message.edgeRowList = [];
-    message.adjanceyMatrixList = [];
     message.limitOrderPoolUserShareMapList = [];
     message.limitOrderPoolUserSharesWithdrawnList = [];
     message.limitOrderPoolTotalSharesMapList = [];
@@ -511,32 +424,6 @@ export const GenesisState = {
       message.feeListCount = object.feeListCount;
     } else {
       message.feeListCount = 0;
-    }
-    if (object.edgeRowList !== undefined && object.edgeRowList !== null) {
-      for (const e of object.edgeRowList) {
-        message.edgeRowList.push(EdgeRow.fromPartial(e));
-      }
-    }
-    if (object.edgeRowCount !== undefined && object.edgeRowCount !== null) {
-      message.edgeRowCount = object.edgeRowCount;
-    } else {
-      message.edgeRowCount = 0;
-    }
-    if (
-      object.adjanceyMatrixList !== undefined &&
-      object.adjanceyMatrixList !== null
-    ) {
-      for (const e of object.adjanceyMatrixList) {
-        message.adjanceyMatrixList.push(AdjanceyMatrix.fromPartial(e));
-      }
-    }
-    if (
-      object.adjanceyMatrixCount !== undefined &&
-      object.adjanceyMatrixCount !== null
-    ) {
-      message.adjanceyMatrixCount = object.adjanceyMatrixCount;
-    } else {
-      message.adjanceyMatrixCount = 0;
     }
     if (
       object.limitOrderPoolUserShareMapList !== undefined &&

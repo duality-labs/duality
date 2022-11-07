@@ -1,7 +1,5 @@
 import { txClient, queryClient, MissingWalletError , registry} from './module'
 
-import { AdjanceyMatrix } from "./module/types/dex/adjancey_matrix"
-import { EdgeRow } from "./module/types/dex/edge_row"
 import { FeeList } from "./module/types/dex/fee_list"
 import { LimitOrderPool } from "./module/types/dex/limit_order_pool"
 import { LimitOrderPoolFillMap } from "./module/types/dex/limit_order_pool_fill_map"
@@ -20,7 +18,7 @@ import { TokenPairType } from "./module/types/dex/token_pair_type"
 import { Tokens } from "./module/types/dex/tokens"
 
 
-export { AdjanceyMatrix, EdgeRow, FeeList, LimitOrderPool, LimitOrderPoolFillMap, LimitOrderPoolReserveMap, LimitOrderPoolTotalSharesMap, LimitOrderPoolUserShareMap, LimitOrderPoolUserSharesWithdrawn, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
+export { FeeList, LimitOrderPool, LimitOrderPoolFillMap, LimitOrderPoolReserveMap, LimitOrderPoolTotalSharesMap, LimitOrderPoolUserShareMap, LimitOrderPoolUserSharesWithdrawn, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -71,10 +69,6 @@ const getDefaultState = () => {
 				SharesAll: {},
 				FeeList: {},
 				FeeListAll: {},
-				EdgeRow: {},
-				EdgeRowAll: {},
-				AdjanceyMatrix: {},
-				AdjanceyMatrixAll: {},
 				LimitOrderPoolUserShareMap: {},
 				LimitOrderPoolUserShareMapAll: {},
 				LimitOrderPoolUserSharesWithdrawn: {},
@@ -87,8 +81,6 @@ const getDefaultState = () => {
 				LimitOrderPoolFillMapAll: {},
 				
 				_Structure: {
-						AdjanceyMatrix: getStructure(AdjanceyMatrix.fromPartial({})),
-						EdgeRow: getStructure(EdgeRow.fromPartial({})),
 						FeeList: getStructure(FeeList.fromPartial({})),
 						LimitOrderPool: getStructure(LimitOrderPool.fromPartial({})),
 						LimitOrderPoolFillMap: getStructure(LimitOrderPoolFillMap.fromPartial({})),
@@ -210,30 +202,6 @@ export default {
 						(<any> params).query=null
 					}
 			return state.FeeListAll[JSON.stringify(params)] ?? {}
-		},
-				getEdgeRow: (state) => (params = { params: {}}) => {
-					if (!(<any> params).query) {
-						(<any> params).query=null
-					}
-			return state.EdgeRow[JSON.stringify(params)] ?? {}
-		},
-				getEdgeRowAll: (state) => (params = { params: {}}) => {
-					if (!(<any> params).query) {
-						(<any> params).query=null
-					}
-			return state.EdgeRowAll[JSON.stringify(params)] ?? {}
-		},
-				getAdjanceyMatrix: (state) => (params = { params: {}}) => {
-					if (!(<any> params).query) {
-						(<any> params).query=null
-					}
-			return state.AdjanceyMatrix[JSON.stringify(params)] ?? {}
-		},
-				getAdjanceyMatrixAll: (state) => (params = { params: {}}) => {
-					if (!(<any> params).query) {
-						(<any> params).query=null
-					}
-			return state.AdjanceyMatrixAll[JSON.stringify(params)] ?? {}
 		},
 				getLimitOrderPoolUserShareMap: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
@@ -644,102 +612,6 @@ export default {
 		 		
 		
 		
-		async QueryEdgeRow({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
-			try {
-				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryEdgeRow( key.id)).data
-				
-					
-				commit('QUERY', { query: 'EdgeRow', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryEdgeRow', payload: { options: { all }, params: {...key},query }})
-				return getters['getEdgeRow']( { params: {...key}, query}) ?? {}
-			} catch (e) {
-				throw new Error('QueryClient:QueryEdgeRow API Node Unavailable. Could not perform query: ' + e.message)
-				
-			}
-		},
-		
-		
-		
-		
-		 		
-		
-		
-		async QueryEdgeRowAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
-			try {
-				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryEdgeRowAll(query)).data
-				
-					
-				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryEdgeRowAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
-					value = mergeResults(value, next_values);
-				}
-				commit('QUERY', { query: 'EdgeRowAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryEdgeRowAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getEdgeRowAll']( { params: {...key}, query}) ?? {}
-			} catch (e) {
-				throw new Error('QueryClient:QueryEdgeRowAll API Node Unavailable. Could not perform query: ' + e.message)
-				
-			}
-		},
-		
-		
-		
-		
-		 		
-		
-		
-		async QueryAdjanceyMatrix({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
-			try {
-				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryAdjanceyMatrix( key.id)).data
-				
-					
-				commit('QUERY', { query: 'AdjanceyMatrix', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryAdjanceyMatrix', payload: { options: { all }, params: {...key},query }})
-				return getters['getAdjanceyMatrix']( { params: {...key}, query}) ?? {}
-			} catch (e) {
-				throw new Error('QueryClient:QueryAdjanceyMatrix API Node Unavailable. Could not perform query: ' + e.message)
-				
-			}
-		},
-		
-		
-		
-		
-		 		
-		
-		
-		async QueryAdjanceyMatrixAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
-			try {
-				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryAdjanceyMatrixAll(query)).data
-				
-					
-				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryAdjanceyMatrixAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
-					value = mergeResults(value, next_values);
-				}
-				commit('QUERY', { query: 'AdjanceyMatrixAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryAdjanceyMatrixAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getAdjanceyMatrixAll']( { params: {...key}, query}) ?? {}
-			} catch (e) {
-				throw new Error('QueryClient:QueryAdjanceyMatrixAll API Node Unavailable. Could not perform query: ' + e.message)
-				
-			}
-		},
-		
-		
-		
-		
-		 		
-		
-		
 		async QueryLimitOrderPoolUserShareMap({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
@@ -990,6 +862,36 @@ export default {
 				}
 			}
 		},
+		async sendMsgCancelLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgCancelLimitOrder(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgCancelLimitOrder:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgWithdrawl({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgWithdrawl(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgWithdrawl:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgWithdrawl:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
 		async sendMsgSwap({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -1035,36 +937,6 @@ export default {
 				}
 			}
 		},
-		async sendMsgWithdrawl({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgWithdrawl(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgWithdrawl:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgWithdrawl:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgCancelLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgCancelLimitOrder(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgCancelLimitOrder:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
 		
 		async MsgDeposit({ rootGetters }, { value }) {
 			try {
@@ -1076,6 +948,32 @@ export default {
 					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgDeposit:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgCancelLimitOrder({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgCancelLimitOrder(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgCancelLimitOrder:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgWithdrawl({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgWithdrawl(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgWithdrawl:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgWithdrawl:Create Could not create message: ' + e.message)
 				}
 			}
 		},
@@ -1115,32 +1013,6 @@ export default {
 					throw new Error('TxClient:MsgPlaceLimitOrder:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgPlaceLimitOrder:Create Could not create message: ' + e.message)
-				}
-			}
-		},
-		async MsgWithdrawl({ rootGetters }, { value }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgWithdrawl(value)
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgWithdrawl:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgWithdrawl:Create Could not create message: ' + e.message)
-				}
-			}
-		},
-		async MsgCancelLimitOrder({ rootGetters }, { value }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgCancelLimitOrder(value)
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgCancelLimitOrder:Create Could not create message: ' + e.message)
 				}
 			}
 		},

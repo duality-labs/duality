@@ -62,24 +62,7 @@ func TestGenesis(t *testing.T) {
 			},
 		},
 		FeeListCount: 2,
-		EdgeRowList: []types.EdgeRow{
-			{
-				Id: 0,
-			},
-			{
-				Id: 1,
-			},
-		},
-		EdgeRowCount: 2,
-		AdjanceyMatrixList: []types.AdjanceyMatrix{
-			{
-				Id: 0,
-			},
-			{
-				Id: 1,
-			},
-		},
-		AdjanceyMatrixCount: 2,
+
 		LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
 			{
 				Count:   0,
@@ -142,10 +125,6 @@ func TestGenesis(t *testing.T) {
 	require.ElementsMatch(t, genesisState.SharesList, got.SharesList)
 	require.ElementsMatch(t, genesisState.FeeListList, got.FeeListList)
 	require.Equal(t, genesisState.FeeListCount, got.FeeListCount)
-	require.ElementsMatch(t, genesisState.EdgeRowList, got.EdgeRowList)
-	require.Equal(t, genesisState.EdgeRowCount, got.EdgeRowCount)
-	require.ElementsMatch(t, genesisState.AdjanceyMatrixList, got.AdjanceyMatrixList)
-	require.Equal(t, genesisState.AdjanceyMatrixCount, got.AdjanceyMatrixCount)
 	require.ElementsMatch(t, genesisState.LimitOrderPoolUserShareMapList, got.LimitOrderPoolUserShareMapList)
 	require.ElementsMatch(t, genesisState.LimitOrderPoolUserSharesWithdrawnList, got.LimitOrderPoolUserSharesWithdrawnList)
 	require.ElementsMatch(t, genesisState.LimitOrderPoolTotalSharesMapList, got.LimitOrderPoolTotalSharesMapList)

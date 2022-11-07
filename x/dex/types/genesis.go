@@ -16,8 +16,6 @@ func DefaultGenesis() *GenesisState {
 		TokenMapList:                          []TokenMap{},
 		SharesList:                            []Shares{},
 		FeeListList:                           []FeeList{},
-		EdgeRowList:                           []EdgeRow{},
-		AdjanceyMatrixList:                    []AdjanceyMatrix{},
 		LimitOrderPoolUserShareMapList:        []LimitOrderPoolUserShareMap{},
 		LimitOrderPoolUserSharesWithdrawnList: []LimitOrderPoolUserSharesWithdrawn{},
 		LimitOrderPoolTotalSharesMapList:      []LimitOrderPoolTotalSharesMap{},
@@ -94,30 +92,6 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("feeList id should be lower or equal than the last id")
 		}
 		feeListIdMap[elem.Id] = true
-	}
-	// Check for duplicated ID in edgeRow
-	edgeRowIdMap := make(map[uint64]bool)
-	edgeRowCount := gs.GetEdgeRowCount()
-	for _, elem := range gs.EdgeRowList {
-		if _, ok := edgeRowIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for edgeRow")
-		}
-		if elem.Id >= edgeRowCount {
-			return fmt.Errorf("edgeRow id should be lower or equal than the last id")
-		}
-		edgeRowIdMap[elem.Id] = true
-	}
-	// Check for duplicated ID in adjanceyMatrix
-	adjanceyMatrixIdMap := make(map[uint64]bool)
-	adjanceyMatrixCount := gs.GetAdjanceyMatrixCount()
-	for _, elem := range gs.AdjanceyMatrixList {
-		if _, ok := adjanceyMatrixIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for adjanceyMatrix")
-		}
-		if elem.Id >= adjanceyMatrixCount {
-			return fmt.Errorf("adjanceyMatrix id should be lower or equal than the last id")
-		}
-		adjanceyMatrixIdMap[elem.Id] = true
 	}
 	// Check for duplicated index in limitOrderPoolUserShareMap
 	limitOrderPoolUserShareMapIndexMap := make(map[string]struct{})

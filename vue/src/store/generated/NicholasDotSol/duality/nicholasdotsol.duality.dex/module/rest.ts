@@ -9,18 +9,6 @@
  * ---------------------------------------------------------------
  */
 
-export interface DexAdjanceyMatrix {
-  /** @format uint64 */
-  id?: string;
-  edgeRow?: DexEdgeRow;
-}
-
-export interface DexEdgeRow {
-  /** @format uint64 */
-  id?: string;
-  edge?: boolean;
-}
-
 export interface DexFeeList {
   /** @format uint64 */
   id?: string;
@@ -131,36 +119,6 @@ export interface DexPairMap {
  * Params defines the parameters for the module.
  */
 export type DexParams = object;
-
-export interface DexQueryAllAdjanceyMatrixResponse {
-  AdjanceyMatrix?: DexAdjanceyMatrix[];
-
-  /**
-   * PageResponse is to be embedded in gRPC response messages where the
-   * corresponding request message has used PageRequest.
-   *
-   *  message SomeResponse {
-   *          repeated Bar results = 1;
-   *          PageResponse page = 2;
-   *  }
-   */
-  pagination?: V1Beta1PageResponse;
-}
-
-export interface DexQueryAllEdgeRowResponse {
-  EdgeRow?: DexEdgeRow[];
-
-  /**
-   * PageResponse is to be embedded in gRPC response messages where the
-   * corresponding request message has used PageRequest.
-   *
-   *  message SomeResponse {
-   *          repeated Bar results = 1;
-   *          PageResponse page = 2;
-   *  }
-   */
-  pagination?: V1Beta1PageResponse;
-}
 
 export interface DexQueryAllFeeListResponse {
   FeeList?: DexFeeList[];
@@ -325,14 +283,6 @@ export interface DexQueryAllTokensResponse {
    *  }
    */
   pagination?: V1Beta1PageResponse;
-}
-
-export interface DexQueryGetAdjanceyMatrixResponse {
-  AdjanceyMatrix?: DexAdjanceyMatrix;
-}
-
-export interface DexQueryGetEdgeRowResponse {
-  EdgeRow?: DexEdgeRow;
 }
 
 export interface DexQueryGetFeeListResponse {
@@ -710,92 +660,10 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title dex/adjancey_matrix.proto
+ * @title dex/fee_list.proto
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryAdjanceyMatrixAll
-   * @summary Queries a list of AdjanceyMatrix items.
-   * @request GET:/NicholasDotSol/duality/dex/adjancey_matrix
-   */
-  queryAdjanceyMatrixAll = (
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<DexQueryAllAdjanceyMatrixResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/adjancey_matrix`,
-      method: "GET",
-      query: query,
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryAdjanceyMatrix
-   * @summary Queries a AdjanceyMatrix by id.
-   * @request GET:/NicholasDotSol/duality/dex/adjancey_matrix/{id}
-   */
-  queryAdjanceyMatrix = (id: string, params: RequestParams = {}) =>
-    this.request<DexQueryGetAdjanceyMatrixResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/adjancey_matrix/${id}`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryEdgeRowAll
-   * @summary Queries a list of EdgeRow items.
-   * @request GET:/NicholasDotSol/duality/dex/edge_row
-   */
-  queryEdgeRowAll = (
-    query?: {
-      "pagination.key"?: string;
-      "pagination.offset"?: string;
-      "pagination.limit"?: string;
-      "pagination.count_total"?: boolean;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<DexQueryAllEdgeRowResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/edge_row`,
-      method: "GET",
-      query: query,
-      format: "json",
-      ...params,
-    });
-
-  /**
-   * No description
-   *
-   * @tags Query
-   * @name QueryEdgeRow
-   * @summary Queries a EdgeRow by id.
-   * @request GET:/NicholasDotSol/duality/dex/edge_row/{id}
-   */
-  queryEdgeRow = (id: string, params: RequestParams = {}) =>
-    this.request<DexQueryGetEdgeRowResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/edge_row/${id}`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-
   /**
    * No description
    *

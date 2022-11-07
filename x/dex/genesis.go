@@ -42,19 +42,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	// Set feeList count
 	k.SetFeeListCount(ctx, genState.FeeListCount)
 	// Set all the edgeRow
-	for _, elem := range genState.EdgeRowList {
-		k.SetEdgeRow(ctx, elem)
-	}
 
-	// Set edgeRow count
-	k.SetEdgeRowCount(ctx, genState.EdgeRowCount)
-	// Set all the adjanceyMatrix
-	for _, elem := range genState.AdjanceyMatrixList {
-		k.SetAdjanceyMatrix(ctx, elem)
-	}
-
-	// Set adjanceyMatrix count
-	k.SetAdjanceyMatrixCount(ctx, genState.AdjanceyMatrixCount)
 	// Set all the limitOrderPoolUserShareMap
 	for _, elem := range genState.LimitOrderPoolUserShareMapList {
 		k.SetLimitOrderPoolUserShareMap(ctx, elem)
@@ -92,10 +80,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.SharesList = k.GetAllShares(ctx)
 	genesis.FeeListList = k.GetAllFeeList(ctx)
 	genesis.FeeListCount = k.GetFeeListCount(ctx)
-	genesis.EdgeRowList = k.GetAllEdgeRow(ctx)
-	genesis.EdgeRowCount = k.GetEdgeRowCount(ctx)
-	genesis.AdjanceyMatrixList = k.GetAllAdjanceyMatrix(ctx)
-	genesis.AdjanceyMatrixCount = k.GetAdjanceyMatrixCount(ctx)
 	genesis.LimitOrderPoolUserShareMapList = k.GetAllLimitOrderPoolUserShareMap(ctx)
 	genesis.LimitOrderPoolUserSharesWithdrawnList = k.GetAllLimitOrderPoolUserSharesWithdrawn(ctx)
 	genesis.LimitOrderPoolTotalSharesMapList = k.GetAllLimitOrderPoolTotalSharesMap(ctx)
