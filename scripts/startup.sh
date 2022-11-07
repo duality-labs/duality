@@ -1,7 +1,8 @@
 #!/bin/sh
 
 # set variable defaults
-NETWORK="${NETWORK:-duality-1}"
+MAINNET="duality-1"
+NETWORK="${NETWORK:-$MAINNET}"
 STARTUP_MODE="${MODE:-fullnode}"
 NODE_MONIKER="${MONIKER:-$( head /dev/urandom | tr -dc 0-9a-f | head -c12 )}"
 
@@ -20,7 +21,18 @@ dualityd init --chain-id $NETWORK duality
 sed -i 's#moniker = ".*"#moniker = "'"$NODE_MONIKER"'"#' /root/.duality/config/config.toml
 
 # start or join a chain
-if [ $STARTUP_MODE == "new" ]
+# start mainnet from crafted genesis.json
+if [[ $STARTUP_MODE == "new" && "$NETWORK" == "$MAINNET" ]]
+then
+
+    # use predefined genesis
+    mv networks/$NETWORK/genesis.json /root/.duality/config/genesis.json
+    echo "Starting new chain..."
+    dualityd --log_level ${LOG_LEVEL:-info} start
+    exit
+
+# start testnet
+elif [ $STARTUP_MODE == "new" ]
 then
 
     # enable Swagger API page
@@ -41,7 +53,7 @@ then
     dualityd gentx alice 1000000stake --chain-id $NETWORK --keyring-backend test
     dualityd collect-gentxs
 
-    echo "Starting new chain..."
+    echo "Starting new testnet chain..."
     dualityd --log_level ${LOG_LEVEL:-info} start
     exit
 
