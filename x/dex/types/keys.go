@@ -37,8 +37,8 @@ const (
 	// TickObjectKeyPrefix is the prefix to retrieve all TickObject
 	BaseTickObjectKeyPrefix = "TickObject/value"
 
-	// PairMapKeyPrefix is the prefix to retrieve all PairMap
-	PairMapKeyPrefix = "PairMap/value"
+	// PairObjectKeyPrefix is the prefix to retrieve all PairObject
+	PairObjectKeyPrefix = "PairObject/value"
 
 	// SharesKeyPrefix is the prefix to retrieve all Shares
 	SharesKeyPrefix = "Shares/value"
@@ -73,7 +73,7 @@ func TickObjectKey(pairId string, tickIndex int64) []byte {
 	return key
 }
 
-func PairMapKey(pairId string) []byte {
+func PairObjectKey(pairId string) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)

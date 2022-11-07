@@ -15,21 +15,21 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNPairMap(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.PairMap {
-	items := make([]types.PairMap, n)
+func createNPairObject(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.PairObject {
+	items := make([]types.PairObject, n)
 	for i := range items {
 		items[i].PairId = strconv.Itoa(i)
 
-		keeper.SetPairMap(ctx, items[i])
+		keeper.SetPairObject(ctx, items[i])
 	}
 	return items
 }
 
-func TestPairMapGet(t *testing.T) {
+func TestPairObjectGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNPairMap(keeper, ctx, 10)
+	items := createNPairObject(keeper, ctx, 10)
 	for _, item := range items {
-		rst, found := keeper.GetPairMap(ctx,
+		rst, found := keeper.GetPairObject(ctx,
 			item.PairId,
 		)
 		require.True(t, found)
@@ -39,25 +39,25 @@ func TestPairMapGet(t *testing.T) {
 		)
 	}
 }
-func TestPairMapRemove(t *testing.T) {
+func TestPairObjectRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNPairMap(keeper, ctx, 10)
+	items := createNPairObject(keeper, ctx, 10)
 	for _, item := range items {
-		keeper.RemovePairMap(ctx,
+		keeper.RemovePairObject(ctx,
 			item.PairId,
 		)
-		_, found := keeper.GetPairMap(ctx,
+		_, found := keeper.GetPairObject(ctx,
 			item.PairId,
 		)
 		require.False(t, found)
 	}
 }
 
-func TestPairMapGetAll(t *testing.T) {
+func TestPairObjectGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNPairMap(keeper, ctx, 10)
+	items := createNPairObject(keeper, ctx, 10)
 	require.ElementsMatch(t,
 		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllPairMap(ctx)),
+		nullify.Fill(keeper.GetAllPairObject(ctx)),
 	)
 }

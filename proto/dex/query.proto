@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "dex/params.proto";
 import "dex/tick_object.proto";
-import "dex/pair_map.proto";
+import "dex/pair_object.proto";
 import "dex/tokens.proto";
 import "dex/token_object.proto";
 import "dex/shares.proto";
@@ -36,13 +36,13 @@ service Query {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick_map";
 	}
 
-// Queries a PairMap by index.
-	rpc PairMap(QueryGetPairMapRequest) returns (QueryGetPairMapResponse) {
+// Queries a PairObject by index.
+	rpc PairObject(QueryGetPairObjectRequest) returns (QueryGetPairObjectResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/pair_map/{pairId}";
 	}
 
-	// Queries a list of PairMap items.
-	rpc PairMapAll(QueryAllPairMapRequest) returns (QueryAllPairMapResponse) {
+	// Queries a list of PairObject items.
+	rpc PairObjectAll(QueryAllPairObjectRequest) returns (QueryAllPairObjectResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/pair_map";
 	}
 
@@ -168,21 +168,21 @@ message QueryAllTickObjectResponse {
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-message QueryGetPairMapRequest {
+message QueryGetPairObjectRequest {
 	  string pairId = 1;
 
 }
 
-message QueryGetPairMapResponse {
-	PairMap pairMap = 1 [(gogoproto.nullable) = false];
+message QueryGetPairObjectResponse {
+	PairObject pairObject = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryAllPairMapRequest {
+message QueryAllPairObjectRequest {
 	cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-message QueryAllPairMapResponse {
-	repeated PairMap pairMap = 1 [(gogoproto.nullable) = false];
+message QueryAllPairObjectResponse {
+	repeated PairObject pairObject = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

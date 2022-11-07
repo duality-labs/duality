@@ -3,7 +3,7 @@ import * as Long from "long";
 import { util, configure, Writer, Reader } from "protobufjs/minimal";
 import { Params } from "../dex/params";
 import { TickObject } from "../dex/tick_map";
-import { PairMap } from "../dex/pair_map";
+import { PairObject } from "../dex/pair_map";
 import { Tokens } from "../dex/tokens";
 import { TokenObject } from "../dex/token_map";
 import { Shares } from "../dex/shares";
@@ -20,7 +20,7 @@ export const protobufPackage = "nicholasdotsol.duality.dex";
 export interface GenesisState {
   params: Params | undefined;
   tickObjectList: TickObject[];
-  pairMapList: PairMap[];
+  pairObjectList: PairObject[];
   tokensList: Tokens[];
   tokensCount: number;
   tokenObjectList: TokenObject[];
@@ -45,8 +45,8 @@ export const GenesisState = {
     for (const v of message.tickObjectList) {
       TickObject.encode(v!, writer.uint32(18).fork()).ldelim();
     }
-    for (const v of message.pairMapList) {
-      PairMap.encode(v!, writer.uint32(26).fork()).ldelim();
+    for (const v of message.pairObjectList) {
+      PairObject.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     for (const v of message.tokensList) {
       Tokens.encode(v!, writer.uint32(34).fork()).ldelim();
@@ -95,7 +95,7 @@ export const GenesisState = {
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseGenesisState } as GenesisState;
     message.tickObjectList = [];
-    message.pairMapList = [];
+    message.pairObjectList = [];
     message.tokensList = [];
     message.tokenObjectList = [];
     message.sharesList = [];
@@ -115,7 +115,7 @@ export const GenesisState = {
           message.tickObjectList.push(TickObject.decode(reader, reader.uint32()));
           break;
         case 3:
-          message.pairMapList.push(PairMap.decode(reader, reader.uint32()));
+          message.pairObjectList.push(PairObject.decode(reader, reader.uint32()));
           break;
         case 4:
           message.tokensList.push(Tokens.decode(reader, reader.uint32()));
@@ -171,7 +171,7 @@ export const GenesisState = {
   fromJSON(object: any): GenesisState {
     const message = { ...baseGenesisState } as GenesisState;
     message.tickObjectList = [];
-    message.pairMapList = [];
+    message.pairObjectList = [];
     message.tokensList = [];
     message.tokenObjectList = [];
     message.sharesList = [];
@@ -191,9 +191,9 @@ export const GenesisState = {
         message.tickObjectList.push(TickObject.fromJSON(e));
       }
     }
-    if (object.pairMapList !== undefined && object.pairMapList !== null) {
-      for (const e of object.pairMapList) {
-        message.pairMapList.push(PairMap.fromJSON(e));
+    if (object.pairObjectList !== undefined && object.pairObjectList !== null) {
+      for (const e of object.pairObjectList) {
+        message.pairObjectList.push(PairObject.fromJSON(e));
       }
     }
     if (object.tokensList !== undefined && object.tokensList !== null) {
@@ -290,12 +290,12 @@ export const GenesisState = {
     } else {
       obj.tickObjectList = [];
     }
-    if (message.pairMapList) {
-      obj.pairMapList = message.pairMapList.map((e) =>
-        e ? PairMap.toJSON(e) : undefined
+    if (message.pairObjectList) {
+      obj.pairObjectList = message.pairObjectList.map((e) =>
+        e ? PairObject.toJSON(e) : undefined
       );
     } else {
-      obj.pairMapList = [];
+      obj.pairObjectList = [];
     }
     if (message.tokensList) {
       obj.tokensList = message.tokensList.map((e) =>
@@ -370,7 +370,7 @@ export const GenesisState = {
   fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = { ...baseGenesisState } as GenesisState;
     message.tickObjectList = [];
-    message.pairMapList = [];
+    message.pairObjectList = [];
     message.tokensList = [];
     message.tokenObjectList = [];
     message.sharesList = [];
@@ -390,9 +390,9 @@ export const GenesisState = {
         message.tickObjectList.push(TickObject.fromPartial(e));
       }
     }
-    if (object.pairMapList !== undefined && object.pairMapList !== null) {
-      for (const e of object.pairMapList) {
-        message.pairMapList.push(PairMap.fromPartial(e));
+    if (object.pairObjectList !== undefined && object.pairObjectList !== null) {
+      for (const e of object.pairObjectList) {
+        message.pairObjectList.push(PairObject.fromPartial(e));
       }
     }
     if (object.tokensList !== undefined && object.tokensList !== null) {

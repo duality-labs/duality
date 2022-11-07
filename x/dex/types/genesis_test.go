@@ -30,7 +30,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						TickIndex: 1,
 					},
 				},
-				PairMapList: []types.PairMap{
+				PairObjectList: []types.PairObject{
 					{
 						PairId: "0",
 					},
@@ -142,9 +142,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated pairMap",
+			desc: "duplicated pairObject",
 			genState: &types.GenesisState{
-				PairMapList: []types.PairMap{
+				PairObjectList: []types.PairObject{
 					{
 						PairId: "0",
 					},

@@ -7,7 +7,7 @@ import { LimitOrderPoolReserveMap } from "./module/types/dex/limit_order_pool_re
 import { LimitOrderPoolTotalSharesMap } from "./module/types/dex/limit_order_pool_total_shares_map"
 import { LimitOrderPoolUserShareMap } from "./module/types/dex/limit_order_pool_user_share_map"
 import { LimitOrderPoolUserSharesWithdrawn } from "./module/types/dex/limit_order_pool_user_shares_withdrawn"
-import { PairMap } from "./module/types/dex/pair_map"
+import { PairObject } from "./module/types/dex/pair_map"
 import { Params } from "./module/types/dex/params"
 import { Reserve0AndSharesType } from "./module/types/dex/reserve_0_and_shares_type"
 import { Shares } from "./module/types/dex/shares"
@@ -18,7 +18,7 @@ import { TokenPairType } from "./module/types/dex/token_pair_type"
 import { Tokens } from "./module/types/dex/tokens"
 
 
-export { FeeList, LimitOrderPool, LimitOrderPoolFillMap, LimitOrderPoolReserveMap, LimitOrderPoolTotalSharesMap, LimitOrderPoolUserShareMap, LimitOrderPoolUserSharesWithdrawn, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickObject, TokenObject, TokenPairType, Tokens };
+export { FeeList, LimitOrderPool, LimitOrderPoolFillMap, LimitOrderPoolReserveMap, LimitOrderPoolTotalSharesMap, LimitOrderPoolUserShareMap, LimitOrderPoolUserSharesWithdrawn, PairObject, Params, Reserve0AndSharesType, Shares, TickDataType, TickObject, TokenObject, TokenPairType, Tokens };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -59,8 +59,8 @@ const getDefaultState = () => {
 				Params: {},
 				TickObject: {},
 				TickObjectAll: {},
-				PairMap: {},
-				PairMapAll: {},
+				PairObject: {},
+				PairObjectAll: {},
 				Tokens: {},
 				TokensAll: {},
 				TokenObject: {},
@@ -88,7 +88,7 @@ const getDefaultState = () => {
 						LimitOrderPoolTotalSharesMap: getStructure(LimitOrderPoolTotalSharesMap.fromPartial({})),
 						LimitOrderPoolUserShareMap: getStructure(LimitOrderPoolUserShareMap.fromPartial({})),
 						LimitOrderPoolUserSharesWithdrawn: getStructure(LimitOrderPoolUserSharesWithdrawn.fromPartial({})),
-						PairMap: getStructure(PairMap.fromPartial({})),
+						PairObject: getStructure(PairObject.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						Reserve0AndSharesType: getStructure(Reserve0AndSharesType.fromPartial({})),
 						Shares: getStructure(Shares.fromPartial({})),
@@ -143,17 +143,17 @@ export default {
 					}
 			return state.TickObjectAll[JSON.stringify(params)] ?? {}
 		},
-				getPairMap: (state) => (params = { params: {}}) => {
+				getPairObject: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.PairMap[JSON.stringify(params)] ?? {}
+			return state.PairObject[JSON.stringify(params)] ?? {}
 		},
-				getPairMapAll: (state) => (params = { params: {}}) => {
+				getPairObjectAll: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.PairMapAll[JSON.stringify(params)] ?? {}
+			return state.PairObjectAll[JSON.stringify(params)] ?? {}
 		},
 				getTokens: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
@@ -372,18 +372,18 @@ export default {
 		 		
 		
 		
-		async QueryPairMap({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryPairObject({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryPairMap( key.pairId)).data
+				let value= (await queryClient.queryPairObject( key.pairId)).data
 				
 					
-				commit('QUERY', { query: 'PairMap', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryPairMap', payload: { options: { all }, params: {...key},query }})
-				return getters['getPairMap']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'PairObject', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryPairObject', payload: { options: { all }, params: {...key},query }})
+				return getters['getPairObject']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryPairMap API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryPairObject API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -394,22 +394,22 @@ export default {
 		 		
 		
 		
-		async QueryPairMapAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryPairObjectAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryPairMapAll(query)).data
+				let value= (await queryClient.queryPairObjectAll(query)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryPairMapAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await queryClient.queryPairObjectAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
 					value = mergeResults(value, next_values);
 				}
-				commit('QUERY', { query: 'PairMapAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryPairMapAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getPairMapAll']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'PairObjectAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryPairObjectAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getPairObjectAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryPairMapAll API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryPairObjectAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

@@ -138,7 +138,7 @@ func (suite *IntegrationTestSuite) TestSwap() {
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("100000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("100000000000000000000"))))
 
-	//fmt.Println(app.DexKeeper.GetAllPairMap(ctx))
+	//fmt.Println(app.DexKeeper.GetAllPairObject(ctx))
 
 	swapRepsone, err := suite.msgServer.Swap(goCtx, &types.MsgSwap{
 		Creator:  alice.String(),

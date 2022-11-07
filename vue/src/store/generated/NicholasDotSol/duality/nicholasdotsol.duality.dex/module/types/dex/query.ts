@@ -7,7 +7,7 @@ import {
   PageRequest,
   PageResponse,
 } from "../cosmos/base/query/v1beta1/pagination";
-import { PairMap } from "../dex/pair_map";
+import { PairObject } from "../dex/pair_map";
 import { Tokens } from "../dex/tokens";
 import { TokenObject } from "../dex/token_map";
 import { Shares } from "../dex/shares";
@@ -47,20 +47,20 @@ export interface QueryAllTickObjectResponse {
   pagination: PageResponse | undefined;
 }
 
-export interface QueryGetPairMapRequest {
+export interface QueryGetPairObjectRequest {
   pairId: string;
 }
 
-export interface QueryGetPairMapResponse {
-  pairMap: PairMap | undefined;
+export interface QueryGetPairObjectResponse {
+  pairObject: PairObject | undefined;
 }
 
-export interface QueryAllPairMapRequest {
+export interface QueryAllPairObjectRequest {
   pagination: PageRequest | undefined;
 }
 
-export interface QueryAllPairMapResponse {
-  pairMap: PairMap[];
+export interface QueryAllPairObjectResponse {
+  pairObject: PairObject[];
   pagination: PageResponse | undefined;
 }
 
@@ -643,11 +643,11 @@ export const QueryAllTickObjectResponse = {
   },
 };
 
-const baseQueryGetPairMapRequest: object = { pairId: "" };
+const baseQueryGetPairObjectRequest: object = { pairId: "" };
 
-export const QueryGetPairMapRequest = {
+export const QueryGetPairObjectRequest = {
   encode(
-    message: QueryGetPairMapRequest,
+    message: QueryGetPairObjectRequest,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.pairId !== "") {
@@ -656,10 +656,10 @@ export const QueryGetPairMapRequest = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryGetPairMapRequest {
+  decode(input: Reader | Uint8Array, length?: number): QueryGetPairObjectRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseQueryGetPairMapRequest } as QueryGetPairMapRequest;
+    const message = { ...baseQueryGetPairObjectRequest } as QueryGetPairObjectRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -674,8 +674,8 @@ export const QueryGetPairMapRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetPairMapRequest {
-    const message = { ...baseQueryGetPairMapRequest } as QueryGetPairMapRequest;
+  fromJSON(object: any): QueryGetPairObjectRequest {
+    const message = { ...baseQueryGetPairObjectRequest } as QueryGetPairObjectRequest;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = String(object.pairId);
     } else {
@@ -684,16 +684,16 @@ export const QueryGetPairMapRequest = {
     return message;
   },
 
-  toJSON(message: QueryGetPairMapRequest): unknown {
+  toJSON(message: QueryGetPairObjectRequest): unknown {
     const obj: any = {};
     message.pairId !== undefined && (obj.pairId = message.pairId);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetPairMapRequest>
-  ): QueryGetPairMapRequest {
-    const message = { ...baseQueryGetPairMapRequest } as QueryGetPairMapRequest;
+    object: DeepPartial<QueryGetPairObjectRequest>
+  ): QueryGetPairObjectRequest {
+    const message = { ...baseQueryGetPairObjectRequest } as QueryGetPairObjectRequest;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = object.pairId;
     } else {
@@ -703,30 +703,30 @@ export const QueryGetPairMapRequest = {
   },
 };
 
-const baseQueryGetPairMapResponse: object = {};
+const baseQueryGetPairObjectResponse: object = {};
 
-export const QueryGetPairMapResponse = {
+export const QueryGetPairObjectResponse = {
   encode(
-    message: QueryGetPairMapResponse,
+    message: QueryGetPairObjectResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.pairMap !== undefined) {
-      PairMap.encode(message.pairMap, writer.uint32(10).fork()).ldelim();
+    if (message.pairObject !== undefined) {
+      PairObject.encode(message.pairObject, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryGetPairMapResponse {
+  decode(input: Reader | Uint8Array, length?: number): QueryGetPairObjectResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryGetPairMapResponse,
-    } as QueryGetPairMapResponse;
+      ...baseQueryGetPairObjectResponse,
+    } as QueryGetPairObjectResponse;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.pairMap = PairMap.decode(reader, reader.uint32());
+          message.pairObject = PairObject.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -736,47 +736,47 @@ export const QueryGetPairMapResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetPairMapResponse {
+  fromJSON(object: any): QueryGetPairObjectResponse {
     const message = {
-      ...baseQueryGetPairMapResponse,
-    } as QueryGetPairMapResponse;
-    if (object.pairMap !== undefined && object.pairMap !== null) {
-      message.pairMap = PairMap.fromJSON(object.pairMap);
+      ...baseQueryGetPairObjectResponse,
+    } as QueryGetPairObjectResponse;
+    if (object.pairObject !== undefined && object.pairObject !== null) {
+      message.pairObject = PairObject.fromJSON(object.pairObject);
     } else {
-      message.pairMap = undefined;
+      message.pairObject = undefined;
     }
     return message;
   },
 
-  toJSON(message: QueryGetPairMapResponse): unknown {
+  toJSON(message: QueryGetPairObjectResponse): unknown {
     const obj: any = {};
-    message.pairMap !== undefined &&
-      (obj.pairMap = message.pairMap
-        ? PairMap.toJSON(message.pairMap)
+    message.pairObject !== undefined &&
+      (obj.pairObject = message.pairObject
+        ? PairObject.toJSON(message.pairObject)
         : undefined);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetPairMapResponse>
-  ): QueryGetPairMapResponse {
+    object: DeepPartial<QueryGetPairObjectResponse>
+  ): QueryGetPairObjectResponse {
     const message = {
-      ...baseQueryGetPairMapResponse,
-    } as QueryGetPairMapResponse;
-    if (object.pairMap !== undefined && object.pairMap !== null) {
-      message.pairMap = PairMap.fromPartial(object.pairMap);
+      ...baseQueryGetPairObjectResponse,
+    } as QueryGetPairObjectResponse;
+    if (object.pairObject !== undefined && object.pairObject !== null) {
+      message.pairObject = PairObject.fromPartial(object.pairObject);
     } else {
-      message.pairMap = undefined;
+      message.pairObject = undefined;
     }
     return message;
   },
 };
 
-const baseQueryAllPairMapRequest: object = {};
+const baseQueryAllPairObjectRequest: object = {};
 
-export const QueryAllPairMapRequest = {
+export const QueryAllPairObjectRequest = {
   encode(
-    message: QueryAllPairMapRequest,
+    message: QueryAllPairObjectRequest,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.pagination !== undefined) {
@@ -785,10 +785,10 @@ export const QueryAllPairMapRequest = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryAllPairMapRequest {
+  decode(input: Reader | Uint8Array, length?: number): QueryAllPairObjectRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseQueryAllPairMapRequest } as QueryAllPairMapRequest;
+    const message = { ...baseQueryAllPairObjectRequest } as QueryAllPairObjectRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -803,8 +803,8 @@ export const QueryAllPairMapRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllPairMapRequest {
-    const message = { ...baseQueryAllPairMapRequest } as QueryAllPairMapRequest;
+  fromJSON(object: any): QueryAllPairObjectRequest {
+    const message = { ...baseQueryAllPairObjectRequest } as QueryAllPairObjectRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromJSON(object.pagination);
     } else {
@@ -813,7 +813,7 @@ export const QueryAllPairMapRequest = {
     return message;
   },
 
-  toJSON(message: QueryAllPairMapRequest): unknown {
+  toJSON(message: QueryAllPairObjectRequest): unknown {
     const obj: any = {};
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -823,9 +823,9 @@ export const QueryAllPairMapRequest = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryAllPairMapRequest>
-  ): QueryAllPairMapRequest {
-    const message = { ...baseQueryAllPairMapRequest } as QueryAllPairMapRequest;
+    object: DeepPartial<QueryAllPairObjectRequest>
+  ): QueryAllPairObjectRequest {
+    const message = { ...baseQueryAllPairObjectRequest } as QueryAllPairObjectRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromPartial(object.pagination);
     } else {
@@ -835,15 +835,15 @@ export const QueryAllPairMapRequest = {
   },
 };
 
-const baseQueryAllPairMapResponse: object = {};
+const baseQueryAllPairObjectResponse: object = {};
 
-export const QueryAllPairMapResponse = {
+export const QueryAllPairObjectResponse = {
   encode(
-    message: QueryAllPairMapResponse,
+    message: QueryAllPairObjectResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    for (const v of message.pairMap) {
-      PairMap.encode(v!, writer.uint32(10).fork()).ldelim();
+    for (const v of message.pairObject) {
+      PairObject.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
       PageResponse.encode(
@@ -854,18 +854,18 @@ export const QueryAllPairMapResponse = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryAllPairMapResponse {
+  decode(input: Reader | Uint8Array, length?: number): QueryAllPairObjectResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryAllPairMapResponse,
-    } as QueryAllPairMapResponse;
-    message.pairMap = [];
+      ...baseQueryAllPairObjectResponse,
+    } as QueryAllPairObjectResponse;
+    message.pairObject = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.pairMap.push(PairMap.decode(reader, reader.uint32()));
+          message.pairObject.push(PairObject.decode(reader, reader.uint32()));
           break;
         case 2:
           message.pagination = PageResponse.decode(reader, reader.uint32());
@@ -878,14 +878,14 @@ export const QueryAllPairMapResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllPairMapResponse {
+  fromJSON(object: any): QueryAllPairObjectResponse {
     const message = {
-      ...baseQueryAllPairMapResponse,
-    } as QueryAllPairMapResponse;
-    message.pairMap = [];
-    if (object.pairMap !== undefined && object.pairMap !== null) {
-      for (const e of object.pairMap) {
-        message.pairMap.push(PairMap.fromJSON(e));
+      ...baseQueryAllPairObjectResponse,
+    } as QueryAllPairObjectResponse;
+    message.pairObject = [];
+    if (object.pairObject !== undefined && object.pairObject !== null) {
+      for (const e of object.pairObject) {
+        message.pairObject.push(PairObject.fromJSON(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -896,14 +896,14 @@ export const QueryAllPairMapResponse = {
     return message;
   },
 
-  toJSON(message: QueryAllPairMapResponse): unknown {
+  toJSON(message: QueryAllPairObjectResponse): unknown {
     const obj: any = {};
-    if (message.pairMap) {
-      obj.pairMap = message.pairMap.map((e) =>
-        e ? PairMap.toJSON(e) : undefined
+    if (message.pairObject) {
+      obj.pairObject = message.pairObject.map((e) =>
+        e ? PairObject.toJSON(e) : undefined
       );
     } else {
-      obj.pairMap = [];
+      obj.pairObject = [];
     }
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -913,15 +913,15 @@ export const QueryAllPairMapResponse = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryAllPairMapResponse>
-  ): QueryAllPairMapResponse {
+    object: DeepPartial<QueryAllPairObjectResponse>
+  ): QueryAllPairObjectResponse {
     const message = {
-      ...baseQueryAllPairMapResponse,
-    } as QueryAllPairMapResponse;
-    message.pairMap = [];
-    if (object.pairMap !== undefined && object.pairMap !== null) {
-      for (const e of object.pairMap) {
-        message.pairMap.push(PairMap.fromPartial(e));
+      ...baseQueryAllPairObjectResponse,
+    } as QueryAllPairObjectResponse;
+    message.pairObject = [];
+    if (object.pairObject !== undefined && object.pairObject !== null) {
+      for (const e of object.pairObject) {
+        message.pairObject.push(PairObject.fromPartial(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -4181,10 +4181,10 @@ export interface Query {
   TickObject(request: QueryGetTickObjectRequest): Promise<QueryGetTickObjectResponse>;
   /** Queries a list of TickObject items. */
   TickObjectAll(request: QueryAllTickObjectRequest): Promise<QueryAllTickObjectResponse>;
-  /** Queries a PairMap by index. */
-  PairMap(request: QueryGetPairMapRequest): Promise<QueryGetPairMapResponse>;
-  /** Queries a list of PairMap items. */
-  PairMapAll(request: QueryAllPairMapRequest): Promise<QueryAllPairMapResponse>;
+  /** Queries a PairObject by index. */
+  PairObject(request: QueryGetPairObjectRequest): Promise<QueryGetPairObjectResponse>;
+  /** Queries a list of PairObject items. */
+  PairObjectAll(request: QueryAllPairObjectRequest): Promise<QueryAllPairObjectResponse>;
   /** Queries a Tokens by id. */
   Tokens(request: QueryGetTokensRequest): Promise<QueryGetTokensResponse>;
   /** Queries a list of Tokens items. */
@@ -4286,29 +4286,29 @@ export class QueryClientImpl implements Query {
     );
   }
 
-  PairMap(request: QueryGetPairMapRequest): Promise<QueryGetPairMapResponse> {
-    const data = QueryGetPairMapRequest.encode(request).finish();
+  PairObject(request: QueryGetPairObjectRequest): Promise<QueryGetPairObjectResponse> {
+    const data = QueryGetPairObjectRequest.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
-      "PairMap",
+      "PairObject",
       data
     );
     return promise.then((data) =>
-      QueryGetPairMapResponse.decode(new Reader(data))
+      QueryGetPairObjectResponse.decode(new Reader(data))
     );
   }
 
-  PairMapAll(
-    request: QueryAllPairMapRequest
-  ): Promise<QueryAllPairMapResponse> {
-    const data = QueryAllPairMapRequest.encode(request).finish();
+  PairObjectAll(
+    request: QueryAllPairObjectRequest
+  ): Promise<QueryAllPairObjectResponse> {
+    const data = QueryAllPairObjectRequest.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
-      "PairMapAll",
+      "PairObjectAll",
       data
     );
     return promise.then((data) =>
-      QueryAllPairMapResponse.decode(new Reader(data))
+      QueryAllPairObjectResponse.decode(new Reader(data))
     );
   }
 

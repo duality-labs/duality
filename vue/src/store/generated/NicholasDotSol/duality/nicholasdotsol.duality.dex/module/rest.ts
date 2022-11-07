@@ -107,7 +107,7 @@ export type DexMsgWithdrawFilledLimitOrderResponse = object;
 
 export type DexMsgWithdrawlResponse = object;
 
-export interface DexPairMap {
+export interface DexPairObject {
   pairId?: string;
   tokenPair?: DexTokenPairType;
 
@@ -210,8 +210,8 @@ export interface DexQueryAllLimitOrderPoolUserSharesWithdrawnResponse {
   pagination?: V1Beta1PageResponse;
 }
 
-export interface DexQueryAllPairMapResponse {
-  pairMap?: DexPairMap[];
+export interface DexQueryAllPairObjectResponse {
+  pairObject?: DexPairObject[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -309,8 +309,8 @@ export interface DexQueryGetLimitOrderPoolUserSharesWithdrawnResponse {
   limitOrderPoolUserSharesWithdrawn?: DexLimitOrderPoolUserSharesWithdrawn;
 }
 
-export interface DexQueryGetPairMapResponse {
-  pairMap?: DexPairMap;
+export interface DexQueryGetPairObjectResponse {
+  pairObject?: DexPairObject;
 }
 
 export interface DexQueryGetSharesResponse {
@@ -959,11 +959,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryPairMapAll
-   * @summary Queries a list of PairMap items.
+   * @name QueryPairObjectAll
+   * @summary Queries a list of PairObject items.
    * @request GET:/NicholasDotSol/duality/dex/pair_map
    */
-  queryPairMapAll = (
+  queryPairObjectAll = (
     query?: {
       "pagination.key"?: string;
       "pagination.offset"?: string;
@@ -973,7 +973,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     },
     params: RequestParams = {},
   ) =>
-    this.request<DexQueryAllPairMapResponse, RpcStatus>({
+    this.request<DexQueryAllPairObjectResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/pair_map`,
       method: "GET",
       query: query,
@@ -985,12 +985,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryPairMap
-   * @summary Queries a PairMap by index.
+   * @name QueryPairObject
+   * @summary Queries a PairObject by index.
    * @request GET:/NicholasDotSol/duality/dex/pair_map/{pairId}
    */
-  queryPairMap = (pairId: string, params: RequestParams = {}) =>
-    this.request<DexQueryGetPairMapResponse, RpcStatus>({
+  queryPairObject = (pairId: string, params: RequestParams = {}) =>
+    this.request<DexQueryGetPairObjectResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/pair_map/${pairId}`,
       method: "GET",
       format: "json",

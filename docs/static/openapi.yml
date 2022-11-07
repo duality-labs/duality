@@ -30972,15 +30972,15 @@ paths:
         - Query
   /NicholasDotSol/duality/dex/pair_map:
     get:
-      summary: Queries a list of PairMap items.
-      operationId: NicholasdotsolDualityDexPairMapAll
+      summary: Queries a list of PairObject items.
+      operationId: NicholasdotsolDualityDexPairObjectAll
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              pairMap:
+              pairObject:
                 type: array
                 items:
                   type: object
@@ -31105,15 +31105,15 @@ paths:
         - Query
   '/NicholasDotSol/duality/dex/pair_map/{pairId}':
     get:
-      summary: Queries a PairMap by index.
-      operationId: NicholasdotsolDualityDexPairMap
+      summary: Queries a PairObject by index.
+      operationId: NicholasdotsolDualityDexPairObject
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              pairMap:
+              pairObject:
                 type: object
                 properties:
                   pairId:
@@ -53790,7 +53790,7 @@ definitions:
     type: object
   nicholasdotsol.duality.dex.MsgWithdrawlResponse:
     type: object
-  nicholasdotsol.duality.dex.PairMap:
+  nicholasdotsol.duality.dex.PairObject:
     type: object
     properties:
       pairId:
@@ -54078,10 +54078,10 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  nicholasdotsol.duality.dex.QueryAllPairMapResponse:
+  nicholasdotsol.duality.dex.QueryAllPairObjectResponse:
     type: object
     properties:
-      pairMap:
+      pairObject:
         type: array
         items:
           type: object
@@ -54424,10 +54424,10 @@ definitions:
             type: string
           sharesWithdrawn:
             type: string
-  nicholasdotsol.duality.dex.QueryGetPairMapResponse:
+  nicholasdotsol.duality.dex.QueryGetPairObjectResponse:
     type: object
     properties:
-      pairMap:
+      pairObject:
         type: object
         properties:
           pairId:

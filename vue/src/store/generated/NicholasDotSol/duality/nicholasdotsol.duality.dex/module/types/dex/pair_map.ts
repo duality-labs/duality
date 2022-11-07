@@ -5,16 +5,16 @@ import { TokenPairType } from "../dex/token_pair_type";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
-export interface PairMap {
+export interface PairObject {
   pairId: string;
   tokenPair: TokenPairType | undefined;
   totalTickCount: number;
 }
 
-const basePairMap: object = { pairId: "", totalTickCount: 0 };
+const basePairObject: object = { pairId: "", totalTickCount: 0 };
 
-export const PairMap = {
-  encode(message: PairMap, writer: Writer = Writer.create()): Writer {
+export const PairObject = {
+  encode(message: PairObject, writer: Writer = Writer.create()): Writer {
     if (message.pairId !== "") {
       writer.uint32(10).string(message.pairId);
     }
@@ -30,10 +30,10 @@ export const PairMap = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): PairMap {
+  decode(input: Reader | Uint8Array, length?: number): PairObject {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...basePairMap } as PairMap;
+    const message = { ...basePairObject } as PairObject;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -54,8 +54,8 @@ export const PairMap = {
     return message;
   },
 
-  fromJSON(object: any): PairMap {
-    const message = { ...basePairMap } as PairMap;
+  fromJSON(object: any): PairObject {
+    const message = { ...basePairObject } as PairObject;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = String(object.pairId);
     } else {
@@ -74,7 +74,7 @@ export const PairMap = {
     return message;
   },
 
-  toJSON(message: PairMap): unknown {
+  toJSON(message: PairObject): unknown {
     const obj: any = {};
     message.pairId !== undefined && (obj.pairId = message.pairId);
     message.tokenPair !== undefined &&
@@ -86,8 +86,8 @@ export const PairMap = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<PairMap>): PairMap {
-    const message = { ...basePairMap } as PairMap;
+  fromPartial(object: DeepPartial<PairObject>): PairObject {
+    const message = { ...basePairObject } as PairObject;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = object.pairId;
     } else {

@@ -83,13 +83,13 @@ func (k Keeper) PairInit(goCtx context.Context, token0 string, token1 string, ti
 
 	pairId := k.CreatePairId(token0, token1)
 	// Check for pair existance, if it does not exist, initialize it.
-	_, PairFound := k.GetPairMap(ctx, pairId)
+	_, PairFound := k.GetPairObject(ctx, pairId)
 
 	if !PairFound {
 
 		// Initializes a new pair object in mapping.
 		// Note this is only one when nno ticks currently exists, and thus we set currentTick0to1 and currentTick1to0 to be tick_index +- fee
-		k.SetPairMap(ctx, types.PairMap{
+		k.SetPairObject(ctx, types.PairObject{
 			PairId: pairId,
 			TokenPair: &types.TokenPairType{
 				CurrentTick0To1: tick_index - fee,
@@ -105,7 +105,7 @@ func (k Keeper) PairInit(goCtx context.Context, token0 string, token1 string, ti
 
 }
 
-func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.PairMap, tickIndex int64, amount0 sdk.Dec, amount1 sdk.Dec, fee int64, feeIndex uint64) (sdk.Dec, sdk.Dec, sdk.Dec, sdk.Dec, sdk.Dec, error) {
+func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.PairObject, tickIndex int64, amount0 sdk.Dec, amount1 sdk.Dec, fee int64, feeIndex uint64) (sdk.Dec, sdk.Dec, sdk.Dec, sdk.Dec, sdk.Dec, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -252,7 +252,7 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 	}
 
 	// Set pair, lower and upperTick KVStores
-	k.SetPairMap(ctx, pair)
+	k.SetPairObject(ctx, pair)
 	k.SetTickObject(ctx, pairId, lowerTick)
 	k.SetTickObject(ctx, pairId, upperTick)
 
@@ -300,15 +300,15 @@ func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0
 	// returns list of all valid fee tiers (global variable for all pairs)
 	feelist := k.GetAllFeeList(ctx)
 
-	//Checks to see if given pair has been initialied, if not intializes, and returns pairId and pairMap
+	//Checks to see if given pair has been initialied, if not intializes, and returns pairId and pairObject
 	pairId, err := k.PairInit(goCtx, token0, token1, msg.TickIndexes[0], feelist[msg.FeeIndexes[0]].Fee)
 
 	if err != nil {
 		return err
 	}
 
-	// returns pair object from pairMap given pairId
-	pair, _ := k.GetPairMap(ctx, pairId)
+	// returns pair object from pairObject given pairId
+	pair, _ := k.GetPairObject(ctx, pairId)
 
 	// default to 0
 	totalAmountReserve0 := sdk.ZeroDec()
@@ -400,7 +400,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 	pairId := k.CreatePairId(token0, token1)
 
 	// loads pair from mapping
-	pair, pairFound := k.GetPairMap(ctx, pairId)
+	pair, pairFound := k.GetPairObject(ctx, pairId)
 
 	// if a pair does not exist, neither do any ticks, and thus a withdraw can not be made
 	if !pairFound {
@@ -531,7 +531,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 	}
 
 	//Sets changes to pair mapping
-	k.SetPairMap(ctx, pair)
+	k.SetPairObject(ctx, pair)
 
 	// sends totalReserve0ToRemove to msg.Receiver
 	if totalReserve0ToRemove.GT(sdk.ZeroDec()) {
@@ -567,8 +567,8 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	// size of the feeList
 	feeSize := k.GetFeeListCount(ctx)
 	feelist := k.GetAllFeeList(ctx)
-	// gets the PairMap from the KVstore given pairId
-	pair, pairFound := k.GetPairMap(ctx, pairId)
+	// gets the PairObject from the KVstore given pairId
+	pair, pairFound := k.GetPairObject(ctx, pairId)
 
 	// If toknePair does not exists, a swap cannot be made through it; error
 	if !pairFound {
@@ -679,8 +679,8 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		}
 	}
 
-	// Make updates to pairMap containing updates CurrentTick0to1 to the KVStore
-	k.SetPairMap(ctx, pair)
+	// Make updates to pairObject containing updates CurrentTick0to1 to the KVStore
+	k.SetPairObject(ctx, pair)
 
 	// Check to see if amount_out meets the threshold of minOut
 	if amount_out.LT(msg.MinOut) {
@@ -707,8 +707,8 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	// size of the feeList
 	feeSize := k.GetFeeListCount(ctx)
 	feelist := k.GetAllFeeList(ctx)
-	// geets the PairMap from the KVstore given pairId
-	pair, pairFound := k.GetPairMap(ctx, pairId)
+	// geets the PairObject from the KVstore given pairId
+	pair, pairFound := k.GetPairObject(ctx, pairId)
 
 	// If toknePair does not exists, a swap cannot be made through it; error
 	if !pairFound {
@@ -822,7 +822,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	}
 
 	// Check to see if amount_out meets the threshold of minOut
-	k.SetPairMap(ctx, pair)
+	k.SetPairObject(ctx, pair)
 
 	if amount_out.LT(msg.MinOut) {
 		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed")
@@ -1169,7 +1169,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	var newShares sdk.Dec
 
 	// get pair map after checking if it is initialized in PairInit
-	pair, _ := k.GetPairMap(ctx, pairId)
+	pair, _ := k.GetPairObject(ctx, pairId)
 
 	if tick.LimitOrderPool0To1.CurrentLimitOrderKey == 0 && tick.LimitOrderPool1To0.CurrentLimitOrderKey == 0 {
 		pair.TotalTickCount = pair.TotalTickCount + 1
@@ -1263,7 +1263,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 
 	// updates currentTick1to0/0To1 given the conditionals above
 
-	k.SetPairMap(ctx, pair)
+	k.SetPairObject(ctx, pair)
 
 	// Sends AmountIn from Address to Module
 	if msg.AmountIn.GT(sdk.ZeroDec()) {
