@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # set variable defaults
+NETWORK="${NETWORK:-duality-1}"
 STARTUP_MODE="${MODE:-fullnode}"
 NODE_MONIKER="${MONIKER:-$( head /dev/urandom | tr -dc 0-9a-f | head -c12 )}"
 
@@ -13,7 +14,7 @@ fi
 echo "Startup mode: $STARTUP_MODE"
 
 echo "Initializing chain..."
-dualityd init duality
+dualityd init --chain-id $NETWORK duality
 
 # replace moniker in the config
 sed -i 's#moniker = ".*"#moniker = "'"$NODE_MONIKER"'"#' /root/.duality/config/config.toml
@@ -37,7 +38,7 @@ then
     dualityd add-genesis-account $(dualityd keys show bob -a --keyring-backend test) 1000000000token,1000000000stake --keyring-backend test
 
     # Add gentxs to the genesis file
-    dualityd gentx alice 1000000stake --chain-id duality --keyring-backend test
+    dualityd gentx alice 1000000stake --chain-id $NETWORK --keyring-backend test
     dualityd collect-gentxs
 
     echo "Starting new chain..."
@@ -50,7 +51,7 @@ else
     echo "Contacting network..."
 
     # find an RPC address to check the live chain with
-    rpc_address="$( jq -r .apis.rpc[0].address networks/duality-testnet-1/chain.json )"
+    rpc_address="$( jq -r .apis.rpc[0].address networks/$NETWORK/chain.json )"
 
     # check if we can get information from the current network
     abci_info_json=$( wget --tries 30 -q -O - $rpc_address/abci_info )
@@ -64,12 +65,12 @@ else
     fi
 
     # read out peers from chain.json
-    persistent_peers_array="$( jq .peers.persistent_peers networks/duality-testnet-1/chain.json )"
+    persistent_peers_array="$( jq .peers.persistent_peers networks/$NETWORK/chain.json )"
     persistent_peers="$( echo $persistent_peers_array | jq -r 'map(.id + "@" + .address) | join(",")' )"
 
     # set chain settings
     sed -i 's#persistent_peers = ""#persistent_peers = "'"$persistent_peers"'"#' /root/.duality/config/config.toml
-    mv networks/duality-testnet-1/genesis.json /root/.duality/config/genesis.json
+    mv networks/$NETWORK/genesis.json /root/.duality/config/genesis.json
 
     # check if this node intends to become a validator
     if [[ "$STARTUP_MODE" == "validator" && ! -z "$MNEMONIC" ]]
@@ -97,6 +98,7 @@ else
         # sent request to become a validator (to the first RPC address defined)
         dualityd tx staking create-validator \
             --node-id `dualityd tendermint show-node-id` \
+            --chain-id $NETWORK \
             --pubkey `dualityd tendermint show-validator` \
             --commission-rate="${VALIDATOR_COMMISSION_RATE:-1.0}" \
             --commission-max-rate="${VALIDATOR_COMMISSION_MAX_RATE:-1.0}" \
