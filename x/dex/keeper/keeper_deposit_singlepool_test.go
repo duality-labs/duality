@@ -61,15 +61,11 @@ type TestEnv struct {
 }
 
 // handle checking for intentional failure of test
-func (env *TestEnv) checkIntentionalFail(t *testing.T, condition bool) bool {
-	if condition && !env.intentionalFail {
-		return true
-	} else if env.intentionalFail {
-		// TODO: this is probabl not ideal. should be fixed once core is refactored to be more testable
-		t.SkipNow()
-		return false
+func (env *TestEnv) handleIntentionalFail(t *testing.T, format string, args ...interface{}) {
+	if !env.intentionalFail {
+		t.Errorf(format, args...)
 	} else {
-		return condition
+		t.Skipf("Test intentionally failed, skipping rest of execution. Error: "+format, args)
 	}
 }
 
@@ -168,8 +164,8 @@ func calculateShares(amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex 
 	k, ctx := env.cosmos.app.DexKeeper, env.cosmos.ctx
 
 	price, err := k.Calc_price(tickIndex, false)
-	if env.checkIntentionalFail(t, err != nil) {
-		t.Errorf("TODO: calc price error format")
+	if err != nil {
+		env.handleIntentionalFail(t, "TODO: calc price error format")
 	}
 
 	feelist := k.GetAllFeeList(ctx)
@@ -211,22 +207,22 @@ func makePairId(coinA sdk.Coin, coinB sdk.Coin, tickIndex int64, feeIndex uint64
 	// TODO: this really should be cleaned up
 	app, ctx, goCtx, k := env.cosmos.app, env.cosmos.ctx, sdk.WrapSDKContext(env.cosmos.ctx), env.cosmos.app.DexKeeper
 	token0, token1, err := k.SortTokens(ctx, coinA.Denom, coinB.Denom)
-	if env.checkIntentionalFail(t, err != nil) {
-		t.Errorf("TODO: token sort error")
+	if err != nil {
+		env.handleIntentionalFail(t, "TODO: token sort error")
 	}
 
 	// this corresponds to line 16 in function DepositVerification of verification.go
 	feelist := k.GetAllFeeList(ctx)
 	// handle invalid fee index
-	if env.checkIntentionalFail(t, feeIndex > uint64(len(feelist))) {
-		t.Errorf("Fee index (%d) > fee tier count (%d)", feeIndex, len(feelist))
+	if feeIndex >= uint64(len(feelist)) {
+		env.handleIntentionalFail(t, "Fee index (%d) > fee tier count (%d)", feeIndex, len(feelist))
 	}
 
 	// this corresponds to line 304 in function DepositCore of core.go
 	// TODO: this might be wrong?
 	pairId, err := app.DexKeeper.PairInit(goCtx, token0, token1, tickIndex, feelist[feeIndex].Fee)
-	if env.checkIntentionalFail(t, err != nil) {
-		t.Errorf("TODO: pairId error format")
+	if err != nil {
+		env.handleIntentionalFail(t, "TODO: pairId error format")
 	}
 
 	return pairId
@@ -239,13 +235,13 @@ func testSingleDeposit(t *testing.T, coinA sdk.Coin, coinB sdk.Coin, acc sdk.Acc
 	goCtx := sdk.WrapSDKContext(ctx)
 
 	// GIVEN inital balances
-	accBalanceAInitial, accBalanceBInitial := newACoin(env.balances[acc.String()].AmountOf(coinA.Denom)), newBCoin(env.balances[acc.String()].AmountOf(coinB.Denom))
-	// verify acc has exactly the balance passed in from env
-	if env.checkIntentionalFail(t, !(app.BankKeeper.GetBalance(ctx, acc, coinA.Denom).IsEqual(accBalanceAInitial))) {
-		t.Errorf("%s's initial balance of %s does not match env: %s", acc, coinA, accBalanceAInitial)
+	accBalanceAInitial, accBalanceBInitial := app.BankKeeper.GetBalance(ctx, acc, coinA.Denom), app.BankKeeper.GetBalance(ctx, acc, coinB.Denom)
+	// verify acc has sufficient balances in env
+	if !(accBalanceAInitial.IsGTE(coinA)) {
+		env.handleIntentionalFail(t, "%s has insufficient balance. Has %s, expected at most %s", acc, coinA, accBalanceAInitial)
 	}
-	if env.checkIntentionalFail(t, !(app.BankKeeper.GetBalance(ctx, acc, coinB.Denom).IsEqual(accBalanceBInitial))) {
-		t.Errorf("%s's initial balance of %s does not match env: %s", acc, coinB, accBalanceBInitial)
+	if !(accBalanceBInitial.IsGTE(coinB)) {
+		env.handleIntentionalFail(t, "%s has insufficient balance. Has %s, expected at most %s", acc, coinB, accBalanceBInitial)
 	}
 	// get Dex initial balance
 	dexAllCoinsInitial := app.BankKeeper.GetAllBalances(ctx, app.AccountKeeper.GetModuleAddress("dex"))
@@ -270,53 +266,53 @@ func testSingleDeposit(t *testing.T, coinA sdk.Coin, coinB sdk.Coin, acc sdk.Acc
 
 	// THEN no error, alice's balances changed only by the amount depoisited, funds transfered to dex module, and position minted with appropriate fee tier
 	// verify no error
-	if env.checkIntentionalFail(t, err != nil) {
-		t.Errorf("Deposit of %s, %s by %s failed: %s", coinA, coinB, acc, err)
+	if err != nil {
+		env.handleIntentionalFail(t, "Deposit of %s, %s by %s failed: %s", coinA, coinB, acc, err)
 	}
 
 	// verify alice's resulting balances is aliceBalanceInitial - depositCoin
 	accBalanceAFinal, accBalanceBFinal := accBalanceAInitial.Sub(coinA), accBalanceBInitial.Sub(coinB)
-	if env.checkIntentionalFail(t, !(app.BankKeeper.GetBalance(ctx, acc, coinA.Denom).IsEqual(accBalanceAFinal))) {
-		t.Errorf("%s's final balance of %s does not reflect deposit", acc, coinA)
+	if !(app.BankKeeper.GetBalance(ctx, acc, coinA.Denom).IsEqual(accBalanceAFinal)) {
+		env.handleIntentionalFail(t, "%s's final balance of %s does not reflect deposit", acc, coinA)
 	}
-	if env.checkIntentionalFail(t, !(app.BankKeeper.GetBalance(ctx, acc, coinB.Denom).IsEqual(accBalanceBFinal))) {
-		t.Errorf("%s's final balance of %s does not reflect deposit", acc, coinB)
+	if !(app.BankKeeper.GetBalance(ctx, acc, coinB.Denom).IsEqual(accBalanceBFinal)) {
+		env.handleIntentionalFail(t, "%s's final balance of %s does not reflect deposit", acc, coinB)
 	}
 
 	// verify dex's resulting balances is dexBalanceInitial + depositCoin
 	dexAllCoinsFinal := app.BankKeeper.GetAllBalances(ctx, app.AccountKeeper.GetModuleAddress("dex"))
 	dexBalanceAFinal, dexBalanceBFinal := dexBalanceAInitial.Add(coinA), dexBalanceBInitial.Add(coinB)
-	if env.checkIntentionalFail(t, !(newACoin(dexAllCoinsFinal.AmountOf(coinA.Denom)).IsEqual(dexBalanceAFinal))) {
-		t.Errorf("Dex module's final balance of %s does not reflect deposit", coinA.Denom)
+	if !(newACoin(dexAllCoinsFinal.AmountOf(coinA.Denom)).IsEqual(dexBalanceAFinal)) {
+		env.handleIntentionalFail(t, "Dex module's final balance of %s does not reflect deposit", coinA.Denom)
 	}
-	if env.checkIntentionalFail(t, !(newBCoin(dexAllCoinsFinal.AmountOf(coinB.Denom)).IsEqual(dexBalanceBFinal))) {
-		t.Errorf("Dex module's final balance of %s does not reflect deposit", coinB.Denom)
+	if !(newBCoin(dexAllCoinsFinal.AmountOf(coinB.Denom)).IsEqual(dexBalanceBFinal)) {
+		env.handleIntentionalFail(t, "Dex module's final balance of %s does not reflect deposit", coinB.Denom)
 	}
 
 	// verify amount of shares minted for alice
 	accSharesCalc := calculateShares(amount0, amount1, pairId, tickIndexes[0], feeTiers[0], t, env)
 	finalShares, found := app.DexKeeper.GetShares(ctx, acc.String(), pairId, tickIndexes[0], feeTiers[0])
-	if env.checkIntentionalFail(t, !found) {
-		t.Errorf("Shares resulting from deposit by %s have not been minted (not found by getter).", acc)
-	} else if env.checkIntentionalFail(t, !initialSharesFound && !(finalShares.SharesOwned.Equal(accSharesCalc))) {
+	if !found {
+		env.handleIntentionalFail(t, "Shares resulting from deposit by %s have not been minted (not found by getter).", acc)
+	} else if !initialSharesFound && !(finalShares.SharesOwned.Equal(accSharesCalc)) {
 		// Handle the case when no shares held by account initially but mintedShares != accSharesCalc
-		t.Errorf("Incorrect amount of shares minted after deposit by %s of %s, %s. Needed %s, final %s", acc, coinA, coinB, accSharesCalc, finalShares.SharesOwned)
-	} else if env.checkIntentionalFail(t, initialSharesFound && !finalShares.SharesOwned.Equal(initialShares.SharesOwned.Add(accSharesCalc))) {
+		env.handleIntentionalFail(t, "Incorrect amount of shares minted after deposit by %s of %s, %s. Needed %s, final %s", acc, coinA, coinB, accSharesCalc, finalShares.SharesOwned)
+	} else if initialSharesFound && !finalShares.SharesOwned.Equal(initialShares.SharesOwned.Add(accSharesCalc)) {
 		// Handle the case when account had an initial balance of shares but finalShares != initalShares + accSharesCalc
-		t.Errorf("Incorrect amount of shares minted after deposit by %s of %s, %s. Needed %s, final %s", acc, coinA, coinB, initialShares.SharesOwned.Add(accSharesCalc), finalShares.SharesOwned)
+		env.handleIntentionalFail(t, "Incorrect amount of shares minted after deposit by %s of %s, %s. Needed %s, final %s", acc, coinA, coinB, initialShares.SharesOwned.Add(accSharesCalc), finalShares.SharesOwned)
 	}
 
 	// verify fee tier of minted shares
-	if env.checkIntentionalFail(t, finalShares.FeeIndex != feeTiers[0]) {
-		t.Errorf("Shares minted in the wrong fee tier. Needed %d, final %d", feeTiers[0], finalShares.FeeIndex)
+	if finalShares.FeeIndex != feeTiers[0] {
+		env.handleIntentionalFail(t, "Shares minted in the wrong fee tier. Needed %d, final %d", feeTiers[0], finalShares.FeeIndex)
 	}
 }
 
-func testFeeTier(t *testing.T, name string, tier uint64, intentionalFail bool) {
-	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/%s", name)
+func TestMinFeeTier(t *testing.T) {
+	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/MinFee")
 
 	// GIVEN initial balances and fee tiers from the setup
-	env := singlePoolSetup(t, cosmosEnvSetup(), intentionalFail)
+	env := singlePoolSetup(t, cosmosEnvSetup(), false)
 
 	// WHEN alice deposits her setup balance of tokenA and tokenB into the minimal fee tier
 	// prep deposit args
@@ -325,95 +321,134 @@ func testFeeTier(t *testing.T, name string, tier uint64, intentionalFail bool) {
 
 	// deposit with invalid fee tier: maxFeeTier + 1 > maxFeeTier, i.e. invalid
 	tickIndex := []int64{0}
-	invalidFeeTier := []uint64{tier}
+	minFeeTier := []uint64{0}
 
-	testSingleDeposit(t, coinA, coinB, acc, tickIndex, invalidFeeTier, &env)
+	testSingleDeposit(t, coinA, coinB, acc, tickIndex, minFeeTier, &env)
 
 	// THEN the transaction should execute successfully
 	// validity assertions are done inside testSingleDeposit
 }
 
-func TestFeeTiers(t *testing.T) {
-	tests := []struct {
-		name            string
-		tier            uint64
-		intentionalFail bool
-	}{
-		{"Min Tier", 0, false},
-		{"Max Tier", 2, false},    // amount of tiers added in setupDepositTest (line 92)
-		{"Invalid Tier", 3, true}, // Max Tier + 1
-	}
-	for _, tt := range tests {
-		// run individual test cases
-		t.Run(tt.name, func(t *testing.T) {
-			testFeeTier(t, tt.name, tt.tier, tt.intentionalFail)
-		})
-	}
+func TestMaxFeeTier(t *testing.T) {
+	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/MaxFee")
+
+	// GIVEN initial balances and fee tiers from the setup
+	env := singlePoolSetup(t, cosmosEnvSetup(), false)
+
+	// WHEN alice deposits her setup balance of tokenA and tokenB into the minimal fee tier
+	// prep deposit args
+	acc := env.addrs[0]
+	coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
+
+	// deposit with invalid fee tier: maxFeeTier + 1 > maxFeeTier, i.e. invalid
+	tickIndex := []int64{0}
+	maxFeeTier := []uint64{uint64(len(env.feeTiers) - 1)}
+
+	testSingleDeposit(t, coinA, coinB, acc, tickIndex, maxFeeTier, &env)
+
+	// THEN the transaction should execute successfully
+	// validity assertions are done inside testSingleDeposit
+}
+
+func TestInvalidFeeTier(t *testing.T) {
+	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/Invalid Fee Tier")
+
+	// GIVEN initial balances and fee tiers from the setup
+	env := singlePoolSetup(t, cosmosEnvSetup(), true)
+
+	// WHEN alice deposits her setup balance of tokenA and tokenB into the minimal fee tier
+	// prep deposit args
+	acc := env.addrs[0]
+	coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
+
+	// deposit with invalid fee tier: maxFeeTier + 1 > maxFeeTier, i.e. invalid
+	tickIndex := []int64{0}
+	invalidFeeTier := []uint64{uint64(len(env.feeTiers))}
+
+	testSingleDeposit(t, coinA, coinB, acc, tickIndex, invalidFeeTier, &env)
+
+	// THEN the transaction should fail midway (SkipNow)
 }
 
 func TestInitPair(t *testing.T) {
-	// fmt.Println("[ UnitTests|Keeper ] Starting test: SinglePool/InitPair")
+	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/InitPair")
 
-	// GIVEN initial balances and fee tiers from the setup, i.e. no liquidity has been deposited
-	// env := singlePoolSetup(t, cosmosEnvSetup())
-	// // grab list of pairs for comparison
+	// GIVEN initial balances and fee tiers from the setup
+	env := singlePoolSetup(t, cosmosEnvSetup(), false)
 
-	// // WHEN alice deposits her setup balance of tokenA and tokenB into some fee tier (shouldn't matter)
-	// // prep deposit args
-	// acc := env.addrs[0]
-	// coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
-	// tickIndex := []int64{0}
-	// maxFeeTier := []uint64{uint64(env.feeTiers[len(env.feeTiers)-1].Id)}
+	// WHEN alice deposits her setup balance of tokenA and tokenB into the minimal fee tier
+	// prep deposit args
+	acc := env.addrs[0]
+	coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
 
-	// testSingleDeposit(t, coinA, coinB, acc, tickIndex, maxFeeTier, &env)
+	// deposit at tick 0 in fee tier 0
+	tickIndex := []int64{0}
+	feeTier := []uint64{0}
 
-	// THEN the transaction should execute successfully, i.e. the new pair has liquidity
-	// verify new pair added
+	testSingleDeposit(t, coinA, coinB, acc, tickIndex, feeTier, &env)
+
+	// THEN the transaction should execute successfully
+	// validity assertions are done inside testSingleDeposit
 }
 
 func TestInitTick(t *testing.T) {
-	// fmt.Println("[ UnitTests|Keeper ] Starting test: SinglePool/InitTick")
+	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/InitTick")
 
-	// // GIVEN initial balances and fee tiers from the setup, i.e. no liquidity has been deposited
-	// env := singlePoolSetup(t, cosmosEnvSetup())
-	// // grab list of ticks for pair
+	// GIVEN initial balances and fee tiers from the setup, and pair already has liquidity at tick 0 fee tier 0
+	env := singlePoolSetup(t, cosmosEnvSetup(), false)
+	acc := env.addrs[0]
+	// fifth of acc's balance of each coin
+	coinA, coinB := newACoin(env.balances[acc.String()][0].Amount.Quo(convInt("5"))), newBCoin(env.balances[acc.String()][1].Amount.Quo(convInt("5")))
 
-	// // WHEN alice deposits her setup balance of tokenA and tokenB into some fee tier (shouldn't matter)
-	// // prep deposit args
-	// acc := env.addrs[0]
-	// coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
-	// maxFeeTier := []uint64{uint64(env.feeTiers[len(env.feeTiers)-1].Id)}
+	// deposit at tick 0 in fee tier 0
+	tickIndex := []int64{0}
+	feeTier := []uint64{0}
+	testSingleDeposit(t, coinA, coinB, acc, tickIndex, feeTier, &env)
 
-	// // deposit into new tick
-	// // TODO
-	// tickIndex := []int64{0}
+	// WHEN alice deposits at tick 1 in fee tier 0
+	newTickIndex := []int64{1}
+	testSingleDeposit(t, coinA, coinB, acc, newTickIndex, feeTier, &env)
 
-	// testSingleDeposit(t, coinA, coinB, acc, tickIndex, maxFeeTier, &env)
-
-	// THEN the transaction should execute successfully, i.e. the pair has liquidity in the new tick
-	// verify new tick added
-	// verify tick balance
+	// THEN the transaction should execute successfully
 }
 
 func TestInitFeeTier(t *testing.T) {
-	// fmt.Println("[ UnitTests|Keeper ] Starting test: SinglePool/InitFeeTier")
+	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/InitFeeTier")
 
-	// // GIVEN initial balances and fee tiers from the setup, i.e. no liquidity has been deposited
-	// env := singlePoolSetup(t, cosmosEnvSetup())
-	// // grab list of fee tiers for pair
+	// GIVEN initial balances and fee tiers from the setup, and pair already has liquidity at tick 0 fee tier 0
+	env := singlePoolSetup(t, cosmosEnvSetup(), false)
+	acc := env.addrs[0]
+	// fifth of acc's balance of each coin
+	coinA, coinB := newACoin(env.balances[acc.String()][0].Amount.Quo(convInt("5"))), newBCoin(env.balances[acc.String()][1].Amount.Quo(convInt("5")))
 
-	// // WHEN alice deposits her setup balance of tokenA and tokenB into a new fee tier
-	// // prep deposit args
-	// acc := env.addrs[0]
-	// coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
+	// deposit at tick 0 in fee tier 0
+	tickIndex := []int64{0}
+	feeTier := []uint64{0}
+	testSingleDeposit(t, coinA, coinB, acc, tickIndex, feeTier, &env)
 
-	// // deposit with min fee tier
-	// tickIndex := []int64{0}
-	// maxFeeTier := []uint64{uint64(env.feeTiers[len(env.feeTiers)-1].Id)}
+	// WHEN alice deposits at tick 0 in fee tier 1
+	newFeeTier := []uint64{1}
+	testSingleDeposit(t, coinA, coinB, acc, tickIndex, newFeeTier, &env)
 
-	// testSingleDeposit(t, coinA, coinB, acc, tickIndex, maxFeeTier, &env)
+	// THEN the transaction should execute successfully
+}
 
-	// THEN the transaction should execute successfully, i.e. the pair has liquidity in the new fee tier
-	// verify new fee tier added
-	// verify liquidity at tick corresponding to fee tier
+func TestExistingPair(t *testing.T) {
+	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/ExistingPair")
+
+	// GIVEN initial balances and fee tiers from the setup, and pair already has liquidity at tick 0 fee tier 0
+	env := singlePoolSetup(t, cosmosEnvSetup(), false)
+	acc := env.addrs[0]
+	// fifth of acc's balance of each coin
+	coinA, coinB := newACoin(env.balances[acc.String()][0].Amount.Quo(convInt("5"))), newBCoin(env.balances[acc.String()][1].Amount.Quo(convInt("5")))
+
+	// deposit at tick 0 in fee tier 0
+	tickIndex := []int64{0}
+	feeTier := []uint64{0}
+	testSingleDeposit(t, coinA, coinB, acc, tickIndex, feeTier, &env)
+
+	// WHEN deposit in the same pair, tick and fee tier again
+	testSingleDeposit(t, coinA, coinB, acc, tickIndex, feeTier, &env)
+
+	// THEN the transaction should execute successfully
 }
