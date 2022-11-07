@@ -55,9 +55,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, elem := range genState.LimitOrderPoolTotalSharesMapList {
 		k.SetLimitOrderPoolTotalSharesMap(ctx, elem)
 	}
-	// Set all the limitOrderPoolReserveMap
-	for _, elem := range genState.LimitOrderPoolReserveMapList {
-		k.SetLimitOrderPoolReserveMap(ctx, elem)
+	// Set all the limitOrderPoolReserveObject
+	for _, elem := range genState.LimitOrderPoolReserveObjectList {
+		k.SetLimitOrderPoolReserveObject(ctx, elem)
 	}
 	// Set all the limitOrderPoolFillObject
 	for _, elem := range genState.LimitOrderPoolFillObjectList {
@@ -83,7 +83,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.LimitOrderPoolUserShareMapList = k.GetAllLimitOrderPoolUserShareMap(ctx)
 	genesis.LimitOrderPoolUserSharesWithdrawnList = k.GetAllLimitOrderPoolUserSharesWithdrawn(ctx)
 	genesis.LimitOrderPoolTotalSharesMapList = k.GetAllLimitOrderPoolTotalSharesMap(ctx)
-	genesis.LimitOrderPoolReserveMapList = k.GetAllLimitOrderPoolReserveMap(ctx)
+	genesis.LimitOrderPoolReserveObjectList = k.GetAllLimitOrderPoolReserveObject(ctx)
 	genesis.LimitOrderPoolFillObjectList = k.GetAllLimitOrderPoolFillObject(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 

@@ -30176,15 +30176,15 @@ paths:
         - Query
   /NicholasDotSol/duality/dex/limit_order_pool_reserve_map:
     get:
-      summary: Queries a list of LimitOrderPoolReserveMap items.
-      operationId: NicholasdotsolDualityDexLimitOrderPoolReserveMapAll
+      summary: Queries a list of LimitOrderPoolReserveObject items.
+      operationId: NicholasdotsolDualityDexLimitOrderPoolReserveObjectAll
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              limitOrderPoolReserveMap:
+              limitOrderPoolReserveObject:
                 type: array
                 items:
                   type: object
@@ -30307,15 +30307,15 @@ paths:
         - Query
   '/NicholasDotSol/duality/dex/limit_order_pool_reserve_map/{pairId}/{token}/{tickIndex}/{count}':
     get:
-      summary: Queries a LimitOrderPoolReserveMap by index.
-      operationId: NicholasdotsolDualityDexLimitOrderPoolReserveMap
+      summary: Queries a LimitOrderPoolReserveObject by index.
+      operationId: NicholasdotsolDualityDexLimitOrderPoolReserveObject
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              limitOrderPoolReserveMap:
+              limitOrderPoolReserveObject:
                 type: object
                 properties:
                   pairId:
@@ -53701,7 +53701,7 @@ definitions:
         format: uint64
       filledReserves:
         type: string
-  nicholasdotsol.duality.dex.LimitOrderPoolReserveMap:
+  nicholasdotsol.duality.dex.LimitOrderPoolReserveObject:
     type: object
     properties:
       pairId:
@@ -53894,10 +53894,10 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  nicholasdotsol.duality.dex.QueryAllLimitOrderPoolReserveMapResponse:
+  nicholasdotsol.duality.dex.QueryAllLimitOrderPoolReserveObjectResponse:
     type: object
     properties:
-      limitOrderPoolReserveMap:
+      limitOrderPoolReserveObject:
         type: array
         items:
           type: object
@@ -54348,10 +54348,10 @@ definitions:
             format: uint64
           filledReserves:
             type: string
-  nicholasdotsol.duality.dex.QueryGetLimitOrderPoolReserveMapResponse:
+  nicholasdotsol.duality.dex.QueryGetLimitOrderPoolReserveObjectResponse:
     type: object
     properties:
-      limitOrderPoolReserveMap:
+      limitOrderPoolReserveObject:
         type: object
         properties:
           pairId:

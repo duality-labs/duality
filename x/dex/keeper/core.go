@@ -860,7 +860,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 	}
 
 	// Gets Reserve, FilledReservesmap for the specified CurrentLimitOrderKey
-	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveObject(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
 	FillData, _ := k.GetLimitOrderPoolFillObject(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
 
 	// errors if ReserveDataFound is not found
@@ -883,7 +883,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 		tick.LimitOrderPool1To0.CurrentLimitOrderKey++
 
 		// checks the next currentLimitOrderKey
-		ReserveDataNextKey, ReserveDataNextKeyFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+		ReserveDataNextKey, ReserveDataNextKeyFound := k.GetLimitOrderPoolReserveObject(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
 		FillDataNextKey, FillDataNextKeyFound := k.GetLimitOrderPoolFillObject(ctx, pairId, CurrentTick1to0, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
 
 		// if no tokens have been filled at this key value, initialize to 0
@@ -923,7 +923,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 		// Updates mapping for the original limit order key + 1 (next key)
 		// @dev we set mappings within the conditionnal, as the tick mappings have not been initialized outside of it
 		k.SetLimitOrderPoolFillObject(ctx, FillDataNextKey)
-		k.SetLimitOrderPoolReserveMap(ctx, ReserveDataNextKey)
+		k.SetLimitOrderPoolReserveObject(ctx, ReserveDataNextKey)
 
 		// If there IS enough liqudity to end trade handle update this way
 	} else {
@@ -938,7 +938,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 	}
 
 	// Updates mappings of reserve and filledReserves based on the original limitOrderCurrentKey to the KVStore
-	k.SetLimitOrderPoolReserveMap(ctx, ReserveData)
+	k.SetLimitOrderPoolReserveObject(ctx, ReserveData)
 	k.SetLimitOrderPoolFillObject(ctx, FillData)
 
 	//Updates limitOrderCurrentKey based on if any limitOrders were completely filled.
@@ -969,7 +969,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 		return amount_left, amount_out, nil
 	}
 
-	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
+	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveObject(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
 	FillData, _ := k.GetLimitOrderPoolFillObject(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
 
 	// errors if ReserveDataFound is not found
@@ -992,7 +992,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 		tick.LimitOrderPool0To1.CurrentLimitOrderKey++
 
 		// checks the next currentLimitOrderKey
-		ReserveDataNextKey, ReserveDataNextKeyFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
+		ReserveDataNextKey, ReserveDataNextKeyFound := k.GetLimitOrderPoolReserveObject(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
 		FillDataNextKey, FillMapNextKeyFound := k.GetLimitOrderPoolFillObject(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool0To1.CurrentLimitOrderKey)
 
 		// if no tokens have been filled at this key value, initialize to 0
@@ -1030,7 +1030,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 		// Updates mapping for the original limit order key + 1 (next key)
 		// @dev we set mappings within the conditionnal, as the tick mappings have not been initialized outside of it
 		k.SetLimitOrderPoolFillObject(ctx, FillDataNextKey)
-		k.SetLimitOrderPoolReserveMap(ctx, ReserveDataNextKey)
+		k.SetLimitOrderPoolReserveObject(ctx, ReserveDataNextKey)
 
 		// If there IS enough liqudity to end trade handle update this way
 	} else {
@@ -1045,7 +1045,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 	}
 
 	// Updates mappings of reserve and filledReserves based on the original limitOrderCurrentKey to the KVStore
-	k.SetLimitOrderPoolReserveMap(ctx, ReserveData)
+	k.SetLimitOrderPoolReserveObject(ctx, ReserveData)
 	k.SetLimitOrderPoolFillObject(ctx, FillData)
 
 	//Updates limitOrderCurrentKey based on if any limitOrders were completely filled.
@@ -1102,12 +1102,12 @@ func (k Keeper) PlaceLimitOrderHelper(goCtx context.Context, pairId string, tick
 
 // Helper function for Place Limit order retrieving and or initializing mapppings used for keeping track of limit orders
 // Note: FillMap initialization is handled seperately in placeLimitOrder as it needed prior to this function being called.
-func (k Keeper) PlaceLimitOrderMappingHelper(goCtx context.Context, pairId string, tickIndex int64, tokenIn string, currentLimitOrderKey uint64, receiver string) (types.LimitOrderPoolReserveMap, types.LimitOrderPoolUserShareMap, types.LimitOrderPoolTotalSharesMap) {
+func (k Keeper) PlaceLimitOrderMappingHelper(goCtx context.Context, pairId string, tickIndex int64, tokenIn string, currentLimitOrderKey uint64, receiver string) (types.LimitOrderPoolReserveObject, types.LimitOrderPoolUserShareMap, types.LimitOrderPoolTotalSharesMap) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Retrieves ReserveData Object from KVStore
-	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
+	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveObject(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
 	// Retrieves UserShareMap object from KVStore
 	UserShareData, UserShareDataFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
 	// Retrives TotalSharesMap object from KVStore
@@ -1248,7 +1248,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 
 	// Set Fill, Reserve, UserShares, and TotalShares maps in KVStore
 	k.SetLimitOrderPoolFillObject(ctx, FillData)
-	k.SetLimitOrderPoolReserveMap(ctx, ReserveData)
+	k.SetLimitOrderPoolReserveObject(ctx, ReserveData)
 	k.SetLimitOrderPoolUserShareMap(ctx, UserShareData)
 	k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesData)
 	k.SetTickObject(ctx, pairId, tick)
@@ -1298,7 +1298,7 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	// Retrieves LimitOrderUserSharesMap object from KVStore for the specified key and keyToken
 	UserSharesData, UserSharesDataFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
 	// Retrieves LimitOrderReserevMap object from KVStore for the specified key and keyToken
-	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
+	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveObject(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 	// Retrieves LimitOrderTotalSharesMap object from KVStore for the specified key and keyToken
 	TotalSharesData, TotalShareDataFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 
@@ -1325,7 +1325,7 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 
 	// Updates changes to mappings in the KVStore
 	k.SetLimitOrderPoolUserShareMap(ctx, UserSharesData)
-	k.SetLimitOrderPoolReserveMap(ctx, ReserveData)
+	k.SetLimitOrderPoolReserveObject(ctx, ReserveData)
 	k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesData)
 
 	// Sends amountOut from module address to msg.Receiver account address
@@ -1363,7 +1363,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 	// Retrives LimitOrderFillMap object from KVStore for the specified key and keyToken
 	FillData, FillDataFound := k.GetLimitOrderPoolFillObject(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 	// Retrives LimitOrderReserevMap object from KVStore for the specified key and keyToken
-	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
+	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveObject(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 	// Retrives LimitOrderUserSharesMap object from KVStore for the specified key and keyToken
 	UserShareData, UserShareDataFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
 	// Retrives LimitOrderUserSharesWithdrawnMap object from KVStore for the specified key and keyToken

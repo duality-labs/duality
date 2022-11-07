@@ -4,7 +4,7 @@ import { util, configure, Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
-export interface LimitOrderPoolReserveMap {
+export interface LimitOrderPoolReserveObject {
   pairId: string;
   token: string;
   tickIndex: number;
@@ -12,7 +12,7 @@ export interface LimitOrderPoolReserveMap {
   reserves: string;
 }
 
-const baseLimitOrderPoolReserveMap: object = {
+const baseLimitOrderPoolReserveObject: object = {
   pairId: "",
   token: "",
   tickIndex: 0,
@@ -20,9 +20,9 @@ const baseLimitOrderPoolReserveMap: object = {
   reserves: "",
 };
 
-export const LimitOrderPoolReserveMap = {
+export const LimitOrderPoolReserveObject = {
   encode(
-    message: LimitOrderPoolReserveMap,
+    message: LimitOrderPoolReserveObject,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.pairId !== "") {
@@ -46,12 +46,12 @@ export const LimitOrderPoolReserveMap = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): LimitOrderPoolReserveMap {
+  ): LimitOrderPoolReserveObject {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseLimitOrderPoolReserveMap,
-    } as LimitOrderPoolReserveMap;
+      ...baseLimitOrderPoolReserveObject,
+    } as LimitOrderPoolReserveObject;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -78,10 +78,10 @@ export const LimitOrderPoolReserveMap = {
     return message;
   },
 
-  fromJSON(object: any): LimitOrderPoolReserveMap {
+  fromJSON(object: any): LimitOrderPoolReserveObject {
     const message = {
-      ...baseLimitOrderPoolReserveMap,
-    } as LimitOrderPoolReserveMap;
+      ...baseLimitOrderPoolReserveObject,
+    } as LimitOrderPoolReserveObject;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = String(object.pairId);
     } else {
@@ -110,7 +110,7 @@ export const LimitOrderPoolReserveMap = {
     return message;
   },
 
-  toJSON(message: LimitOrderPoolReserveMap): unknown {
+  toJSON(message: LimitOrderPoolReserveObject): unknown {
     const obj: any = {};
     message.pairId !== undefined && (obj.pairId = message.pairId);
     message.token !== undefined && (obj.token = message.token);
@@ -121,11 +121,11 @@ export const LimitOrderPoolReserveMap = {
   },
 
   fromPartial(
-    object: DeepPartial<LimitOrderPoolReserveMap>
-  ): LimitOrderPoolReserveMap {
+    object: DeepPartial<LimitOrderPoolReserveObject>
+  ): LimitOrderPoolReserveObject {
     const message = {
-      ...baseLimitOrderPoolReserveMap,
-    } as LimitOrderPoolReserveMap;
+      ...baseLimitOrderPoolReserveObject,
+    } as LimitOrderPoolReserveObject;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = object.pairId;
     } else {

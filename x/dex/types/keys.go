@@ -119,8 +119,8 @@ const (
 	// LimitOrderPoolTotalSharesMapKeyPrefix is the prefix to retrieve all LimitOrderPoolTotalSharesMap
 	LimitOrderPoolTotalSharesMapKeyPrefix = "LimitOrderPoolTotalSharesMap/value"
 
-	// LimitOrderPoolReserveMapKeyPrefix is the prefix to retrieve all LimitOrderPoolReserveMap
-	LimitOrderPoolReserveMapKeyPrefix = "LimitOrderPoolReserveMap/value"
+	// LimitOrderPoolReserveObjectKeyPrefix is the prefix to retrieve all LimitOrderPoolReserveObject
+	LimitOrderPoolReserveObjectKeyPrefix = "LimitOrderPoolReserveObject/value"
 
 	// LimitOrderPoolFillObjectKeyPrefix is the prefix to retrieve all LimitOrderPoolFillObject
 	LimitOrderPoolFillObjectKeyPrefix = "LimitOrderPoolFillObject/value"
@@ -203,7 +203,7 @@ func LimitOrderPoolTotalSharesMapKey(pairId string, tickIndex int64, token strin
 	return key
 }
 
-func LimitOrderPoolReserveMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
+func LimitOrderPoolReserveObjectKey(pairId string, tickIndex int64, token string, count uint64) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)

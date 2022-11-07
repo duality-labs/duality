@@ -3,7 +3,7 @@ import { txClient, queryClient, MissingWalletError , registry} from './module'
 import { FeeList } from "./module/types/dex/fee_list"
 import { LimitOrderPool } from "./module/types/dex/limit_order_pool"
 import { LimitOrderPoolFillObject } from "./module/types/dex/limit_order_pool_fill_map"
-import { LimitOrderPoolReserveMap } from "./module/types/dex/limit_order_pool_reserve_map"
+import { LimitOrderPoolReserveObject } from "./module/types/dex/limit_order_pool_reserve_map"
 import { LimitOrderPoolTotalSharesMap } from "./module/types/dex/limit_order_pool_total_shares_map"
 import { LimitOrderPoolUserShareMap } from "./module/types/dex/limit_order_pool_user_share_map"
 import { LimitOrderPoolUserSharesWithdrawn } from "./module/types/dex/limit_order_pool_user_shares_withdrawn"
@@ -18,7 +18,7 @@ import { TokenPairType } from "./module/types/dex/token_pair_type"
 import { Tokens } from "./module/types/dex/tokens"
 
 
-export { FeeList, LimitOrderPool, LimitOrderPoolFillObject, LimitOrderPoolReserveMap, LimitOrderPoolTotalSharesMap, LimitOrderPoolUserShareMap, LimitOrderPoolUserSharesWithdrawn, PairObject, Params, Reserve0AndSharesType, Shares, TickDataType, TickObject, TokenObject, TokenPairType, Tokens };
+export { FeeList, LimitOrderPool, LimitOrderPoolFillObject, LimitOrderPoolReserveObject, LimitOrderPoolTotalSharesMap, LimitOrderPoolUserShareMap, LimitOrderPoolUserSharesWithdrawn, PairObject, Params, Reserve0AndSharesType, Shares, TickDataType, TickObject, TokenObject, TokenPairType, Tokens };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -75,8 +75,8 @@ const getDefaultState = () => {
 				LimitOrderPoolUserSharesWithdrawnAll: {},
 				LimitOrderPoolTotalSharesMap: {},
 				LimitOrderPoolTotalSharesMapAll: {},
-				LimitOrderPoolReserveMap: {},
-				LimitOrderPoolReserveMapAll: {},
+				LimitOrderPoolReserveObject: {},
+				LimitOrderPoolReserveObjectAll: {},
 				LimitOrderPoolFillObject: {},
 				LimitOrderPoolFillObjectAll: {},
 				
@@ -84,7 +84,7 @@ const getDefaultState = () => {
 						FeeList: getStructure(FeeList.fromPartial({})),
 						LimitOrderPool: getStructure(LimitOrderPool.fromPartial({})),
 						LimitOrderPoolFillObject: getStructure(LimitOrderPoolFillObject.fromPartial({})),
-						LimitOrderPoolReserveMap: getStructure(LimitOrderPoolReserveMap.fromPartial({})),
+						LimitOrderPoolReserveObject: getStructure(LimitOrderPoolReserveObject.fromPartial({})),
 						LimitOrderPoolTotalSharesMap: getStructure(LimitOrderPoolTotalSharesMap.fromPartial({})),
 						LimitOrderPoolUserShareMap: getStructure(LimitOrderPoolUserShareMap.fromPartial({})),
 						LimitOrderPoolUserSharesWithdrawn: getStructure(LimitOrderPoolUserSharesWithdrawn.fromPartial({})),
@@ -239,17 +239,17 @@ export default {
 					}
 			return state.LimitOrderPoolTotalSharesMapAll[JSON.stringify(params)] ?? {}
 		},
-				getLimitOrderPoolReserveMap: (state) => (params = { params: {}}) => {
+				getLimitOrderPoolReserveObject: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.LimitOrderPoolReserveMap[JSON.stringify(params)] ?? {}
+			return state.LimitOrderPoolReserveObject[JSON.stringify(params)] ?? {}
 		},
-				getLimitOrderPoolReserveMapAll: (state) => (params = { params: {}}) => {
+				getLimitOrderPoolReserveObjectAll: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.LimitOrderPoolReserveMapAll[JSON.stringify(params)] ?? {}
+			return state.LimitOrderPoolReserveObjectAll[JSON.stringify(params)] ?? {}
 		},
 				getLimitOrderPoolFillObject: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
@@ -756,18 +756,18 @@ export default {
 		 		
 		
 		
-		async QueryLimitOrderPoolReserveMap({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryLimitOrderPoolReserveObject({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolReserveMap( key.pairId,  key.token,  key.tickIndex,  key.count)).data
+				let value= (await queryClient.queryLimitOrderPoolReserveObject( key.pairId,  key.token,  key.tickIndex,  key.count)).data
 				
 					
-				commit('QUERY', { query: 'LimitOrderPoolReserveMap', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolReserveMap', payload: { options: { all }, params: {...key},query }})
-				return getters['getLimitOrderPoolReserveMap']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'LimitOrderPoolReserveObject', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolReserveObject', payload: { options: { all }, params: {...key},query }})
+				return getters['getLimitOrderPoolReserveObject']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryLimitOrderPoolReserveMap API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryLimitOrderPoolReserveObject API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -778,22 +778,22 @@ export default {
 		 		
 		
 		
-		async QueryLimitOrderPoolReserveMapAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryLimitOrderPoolReserveObjectAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolReserveMapAll(query)).data
+				let value= (await queryClient.queryLimitOrderPoolReserveObjectAll(query)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryLimitOrderPoolReserveMapAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await queryClient.queryLimitOrderPoolReserveObjectAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
 					value = mergeResults(value, next_values);
 				}
-				commit('QUERY', { query: 'LimitOrderPoolReserveMapAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolReserveMapAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getLimitOrderPoolReserveMapAll']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'LimitOrderPoolReserveObjectAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolReserveObjectAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getLimitOrderPoolReserveObjectAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryLimitOrderPoolReserveMapAll API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryLimitOrderPoolReserveObjectAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

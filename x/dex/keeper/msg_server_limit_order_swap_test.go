@@ -71,9 +71,9 @@ func (suite *IntegrationTestSuite) TestMultiLimitOrderTick0to1() {
 
 	suite.Require().Nil(err)
 
-	fmt.Println(app.DexKeeper.GetAllLimitOrderPoolReserveMap(ctx))
-	fmt.Println(app.DexKeeper.GetLimitOrderPoolReserveMap(ctx, "TokenA/TokenB", 1, "TokenB", 0))
-	fmt.Println(app.DexKeeper.GetLimitOrderPoolReserveMap(ctx, "TokenA/TokenB", 2, "TokenB", 0))
+	fmt.Println(app.DexKeeper.GetAllLimitOrderPoolReserveObject(ctx))
+	fmt.Println(app.DexKeeper.GetLimitOrderPoolReserveObject(ctx, "TokenA/TokenB", 1, "TokenB", 0))
+	fmt.Println(app.DexKeeper.GetLimitOrderPoolReserveObject(ctx, "TokenA/TokenB", 2, "TokenB", 0))
 	fmt.Println(app.DexKeeper.GetAllTickObject(ctx))
 
 	_ = orderResponse2

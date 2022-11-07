@@ -15,8 +15,8 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNLimitOrderPoolReserveMap(keeper *keeper.Keeper, ctx sdk.Context, pairId string, tickIndex int64, token string, n int) []types.LimitOrderPoolReserveMap {
-	items := make([]types.LimitOrderPoolReserveMap, n)
+func createNLimitOrderPoolReserveObject(keeper *keeper.Keeper, ctx sdk.Context, pairId string, tickIndex int64, token string, n int) []types.LimitOrderPoolReserveObject {
+	items := make([]types.LimitOrderPoolReserveObject, n)
 	for i := range items {
 		items[i].Count = uint64(i)
 		items[i].TickIndex = tickIndex
@@ -24,16 +24,16 @@ func createNLimitOrderPoolReserveMap(keeper *keeper.Keeper, ctx sdk.Context, pai
 		items[i].PairId = pairId
 		items[i].Reserves = sdk.ZeroDec()
 
-		keeper.SetLimitOrderPoolReserveMap(ctx, items[i])
+		keeper.SetLimitOrderPoolReserveObject(ctx, items[i])
 	}
 	return items
 }
 
-func TestLimitOrderPoolReserveMapGet(t *testing.T) {
+func TestLimitOrderPoolReserveObjectGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolReserveMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolReserveObject(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
 	for _, item := range items {
-		rst, found := keeper.GetLimitOrderPoolReserveMap(ctx,
+		rst, found := keeper.GetLimitOrderPoolReserveObject(ctx,
 			"TokenA/TokenB",
 			0,
 			"TokenA",
@@ -46,17 +46,17 @@ func TestLimitOrderPoolReserveMapGet(t *testing.T) {
 		)
 	}
 }
-func TestLimitOrderPoolReserveMapRemove(t *testing.T) {
+func TestLimitOrderPoolReserveObjectRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolReserveMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolReserveObject(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
 	for _, item := range items {
-		keeper.RemoveLimitOrderPoolReserveMap(ctx,
+		keeper.RemoveLimitOrderPoolReserveObject(ctx,
 			"TokenA/TokenB",
 			0,
 			"TokenA",
 			item.Count,
 		)
-		_, found := keeper.GetLimitOrderPoolReserveMap(ctx,
+		_, found := keeper.GetLimitOrderPoolReserveObject(ctx,
 			"TokenA/TokenB",
 			0,
 			"TokenA",

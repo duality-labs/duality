@@ -37,7 +37,7 @@ export interface DexLimitOrderPoolFillObject {
   filledReserves?: string;
 }
 
-export interface DexLimitOrderPoolReserveMap {
+export interface DexLimitOrderPoolReserveObject {
   pairId?: string;
   token?: string;
 
@@ -150,8 +150,8 @@ export interface DexQueryAllLimitOrderPoolFillObjectResponse {
   pagination?: V1Beta1PageResponse;
 }
 
-export interface DexQueryAllLimitOrderPoolReserveMapResponse {
-  limitOrderPoolReserveMap?: DexLimitOrderPoolReserveMap[];
+export interface DexQueryAllLimitOrderPoolReserveObjectResponse {
+  limitOrderPoolReserveObject?: DexLimitOrderPoolReserveObject[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -293,8 +293,8 @@ export interface DexQueryGetLimitOrderPoolFillObjectResponse {
   limitOrderPoolFillObject?: DexLimitOrderPoolFillObject;
 }
 
-export interface DexQueryGetLimitOrderPoolReserveMapResponse {
-  limitOrderPoolReserveMap?: DexLimitOrderPoolReserveMap;
+export interface DexQueryGetLimitOrderPoolReserveObjectResponse {
+  limitOrderPoolReserveObject?: DexLimitOrderPoolReserveObject;
 }
 
 export interface DexQueryGetLimitOrderPoolTotalSharesMapResponse {
@@ -765,11 +765,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryLimitOrderPoolReserveMapAll
-   * @summary Queries a list of LimitOrderPoolReserveMap items.
+   * @name QueryLimitOrderPoolReserveObjectAll
+   * @summary Queries a list of LimitOrderPoolReserveObject items.
    * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_reserve_map
    */
-  queryLimitOrderPoolReserveMapAll = (
+  queryLimitOrderPoolReserveObjectAll = (
     query?: {
       "pagination.key"?: string;
       "pagination.offset"?: string;
@@ -779,7 +779,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     },
     params: RequestParams = {},
   ) =>
-    this.request<DexQueryAllLimitOrderPoolReserveMapResponse, RpcStatus>({
+    this.request<DexQueryAllLimitOrderPoolReserveObjectResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/limit_order_pool_reserve_map`,
       method: "GET",
       query: query,
@@ -791,18 +791,18 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryLimitOrderPoolReserveMap
-   * @summary Queries a LimitOrderPoolReserveMap by index.
+   * @name QueryLimitOrderPoolReserveObject
+   * @summary Queries a LimitOrderPoolReserveObject by index.
    * @request GET:/NicholasDotSol/duality/dex/limit_order_pool_reserve_map/{pairId}/{token}/{tickIndex}/{count}
    */
-  queryLimitOrderPoolReserveMap = (
+  queryLimitOrderPoolReserveObject = (
     pairId: string,
     token: string,
     tickIndex: string,
     count: string,
     params: RequestParams = {},
   ) =>
-    this.request<DexQueryGetLimitOrderPoolReserveMapResponse, RpcStatus>({
+    this.request<DexQueryGetLimitOrderPoolReserveObjectResponse, RpcStatus>({
       path: `/NicholasDotSol/duality/dex/limit_order_pool_reserve_map/${pairId}/${token}/${tickIndex}/${count}`,
       method: "GET",
       format: "json",
