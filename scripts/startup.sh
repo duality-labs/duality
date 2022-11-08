@@ -38,6 +38,14 @@ then
     # enable Swagger API page
     dasel put bool -f /root/.duality/config/app.toml ".api.enable" "true"
 
+    # duplicate genesis for easier merging and recovery
+    cp /root/.duality/config/genesis.json /root/.duality/config/genesis-init.json
+
+    # add genesis state for the Dex module
+    RUN jq -s '.[0] * { app_state: { dex: ( .[0].app_state.dex + .[1].app_state.dex ) } }' \
+        /root/.duality/config/genesis-original.json networks/$NETWORK/pregenesis/dex.json \
+        > /root/.duality/genesis.json
+
     # add new test accounts
     echo "Creating test accounts..."
     mkdir /root/.duality/testkeys
