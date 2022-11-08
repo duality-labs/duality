@@ -63,8 +63,8 @@ then
     # add new test accounts
     echo "Creating test accounts..."
     mkdir /root/.duality/testkeys
-    # define a billion, billion, Carl Sagan's worth of minimum denomination to save space
-    B=1000000000000000000000000000
+    # define a million, billion, Carl Sagan's worth of minimum denomination to save space
+    B=1000000000000000000000000
 
     # alice
     dualityd keys add alice --keyring-backend test
