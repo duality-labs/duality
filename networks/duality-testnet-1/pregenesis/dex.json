@@ -1,0 +1,36 @@
+{
+  "app_state": {
+    "dex": {
+      "tokensList": [
+        {
+          "id": 0,
+          "address": "token"
+        },
+        {
+          "id": 1,
+          "address": "stake"
+        }
+      ],
+      "tokensCount": 2,
+      "feeListList": [
+        {
+          "id": 0,
+          "fee": 1
+        },
+        {
+          "id": 1,
+          "fee": 5
+        },
+        {
+          "id": 2,
+          "fee": 30
+        },
+        {
+          "id": 3,
+          "fee": 100
+        }
+      ],
+      "feeListCount": 4
+    }
+  }
+}
