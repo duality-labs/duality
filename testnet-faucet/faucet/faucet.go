@@ -18,12 +18,13 @@ import (
 var(
 	Port = "9000"
 	AppCli = "dualityd"
-	FaucetAccount = "cosmos14uvkkly5s79gh6sqgz9yxcw55x058qf27reerl"
+	FaucetAccount = ""
 	AmountToSend = 1000
 	DenomsToSend = []string{"token", "stake"}
 	TxTimeoutInt = 1
 	TxTimeout = time.Duration(TxTimeoutInt)*time.Second
 	MaxTxRetry = 10
+	NodeAddress = "tcp://localhost:26657"
 )
 
 
@@ -38,9 +39,9 @@ type response struct {
 func newChainCmdRunner()(cr chaincmdrunner.Runner, err error){
 	ccoptions := []chaincmd.Option{
 		// chaincmd.WithKeyringPassword(keyringPassword),
-		// chaincmd.WithKeyringBackend(configKeyringBackend),
+		chaincmd.WithKeyringBackend(chaincmd.KeyringBackendTest),
 		chaincmd.WithAutoChainIDDetection(),
-		// chaincmd.WithNodeAddress(nodeAddress),
+		chaincmd.WithNodeAddress(NodeAddress),
 	}
 
 	cr, err = chaincmdrunner.New(context.Background(), chaincmd.New(AppCli, ccoptions...))
@@ -81,6 +82,13 @@ func sendAllTokens(address string)(error){
 	}
 
 	return nil
+
+}
+
+func ensureAccountUnfunded(address)(error){
+	resp, err := http.Get("/cosmos/bank/v1beta1/balances/cosmos1qp8k48906gnvsdmpkr88qf37zj38hksg62klns")
+
+
 
 }
 
@@ -139,6 +147,7 @@ func main() {
 	// Handle flags
 	flag.StringVar(&FaucetAccount, "faucet-account", FaucetAccount, "Account to use for faucet")
 	flag.StringVar(&Port, "port", Port, "Port to listen on")
+	flag.StringVar(&NodeAddress, "node", NodeAddress, "<host>:<port> to tendermint rpc interface for this chain")
 	flag.IntVar(&AmountToSend, "token-amount", AmountToSend, "Amount of token to send")
 	denomsToSendStr := flag.String("denoms", strings.Join(DenomsToSend, ","), "Denoms to send")
 	flag.Parse()
@@ -154,6 +163,7 @@ func main() {
 		"DenomsToSend": DenomsToSend,
 		"TxTimeoutInt": TxTimeoutInt,
 		"MaxTxRetry": MaxTxRetry,
+		"Node": NodeAddress,
 	}
 	prettyConfig, _ := json.MarshalIndent(config, "", "  ")
 	log.Printf("Starting faucet with config:\n %s", prettyConfig)
