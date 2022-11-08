@@ -230,7 +230,6 @@ func calculateShares(amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex 
 func calculateNewCurrentTicksPure(amount0 sdk.Dec, amount1 sdk.Dec, tickIndex int64, fee int64, curr0to1 int64, curr1to0 int64) (int64, int64) {
 	// this corresponds to lines 245-253 in function DepositHelper of core.go
 	// If a new tick has been placed that tigtens the range between currentTick0to1 and currentTick0to1 update CurrentTicks to the tighest ticks
-	// fmt.Println(tickIndex, fee, curr0to1, curr1to0)
 	new0to1, new1to0 := curr0to1, curr1to0
 	if amount0.GT(sdk.ZeroDec()) && ((tickIndex+fee > curr0to1) && (tickIndex+fee < curr1to0)) {
 		new1to0 = tickIndex + fee
@@ -513,6 +512,28 @@ func TestExistingPair(t *testing.T) {
 
 	// WHEN deposit in the same pair, tick and fee tier again
 	testSingleDeposit(t, coinA, coinB, acc, tickIndex, feeTier, &env)
+
+	// THEN the transaction should execute successfully
+}
+
+func TestBehindEnemyLines(t *testing.T) {
+	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/BehindEnemyLines")
+
+	// GIVEN initial balances and fee tiers from the setup, and pair already has liquidity at tick 0 fee tier 0
+	env := singlePoolSetup(t, cosmosEnvSetup(), false)
+	acc := env.addrs[0]
+	// fifth of acc's balance of each coin
+	coinA, coinB := newACoin(env.balances[acc.String()][0].Amount.Quo(convInt("5"))), newBCoin(env.balances[acc.String()][1].Amount.Quo(convInt("5")))
+
+	// deposit at tick 0 in fee tier 0
+	tickIndex := []int64{0}
+	feeTier := []uint64{0}
+	testSingleDeposit(t, coinA, coinB, acc, tickIndex, feeTier, &env)
+
+	// WHEN alice deposits at tick 0 in fee tier 1
+	newTickIndex := []int64{-3}
+	newFeeTier := []uint64{1}
+	testSingleDeposit(t, coinA, coinB, acc, newTickIndex, newFeeTier, &env)
 
 	// THEN the transaction should execute successfully
 }
