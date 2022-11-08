@@ -37,6 +37,17 @@ RUN apk add --update \
     # required for HTTPS to connect properly
     ca-certificates
 
+# Install testnet utils when not on production chain
+ARG NETWORK=duality-1
+RUN if [ "$NETWORK" != "duality-1" ]; \
+    then \
+        # install TOML editing tool dasel for complicated TOML edits \
+        wget https://github.com/TomWright/dasel/releases/download/v1.27.3/dasel_linux_arm64.gz; \
+        gzip -d dasel_linux_arm64.gz; \
+        chmod 755 dasel_linux_arm64; \
+        mv ./dasel_linux_arm64 /usr/local/bin/dasel; \
+    fi
+
 WORKDIR /usr/src
 
 # Copy over binaries from the build-env
