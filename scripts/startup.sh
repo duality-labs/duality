@@ -6,6 +6,9 @@ NETWORK="${NETWORK:-$MAINNET}"
 STARTUP_MODE="${MODE:-fullnode}"
 NODE_MONIKER="${MONIKER:-$( head /dev/urandom | tr -dc 0-9a-f | head -c12 )}"
 
+# Add our configuration settings depending on network name (eg. duality-1, duality-13 are production chains)
+IS_MAINNET=$([[ "$NETWORK" =~ "^duality-\d+$" ]] && echo "true" || echo "")
+
 # check current working directorys
 if [[ ! -e scripts/startup.sh ]]; then
     echo >&2 "Please run this script from the base repo directory"
@@ -35,9 +38,17 @@ then
 elif [ $STARTUP_MODE == "new" ]
 then
 
-    # enable API on any page in developent
-    dasel put bool -f /root/.duality/config/app.toml ".api.enabled-unsafe-cors" "true"
-    dasel put string -f /root/.duality/config/config.toml ".rpc.cors_allowed_origins" "*"
+    # enable API to be served on any browser page when in developent, but only production web-app in production
+    dasel put bool   -f /root/.duality/config/app.toml    ".api.enable" "true";
+    dasel put bool   -f /root/.duality/config/app.toml    ".api.enabled-unsafe-cors" "$([[ $IS_MAINNET ]] && echo "false" || echo "true")"
+    dasel put string -f /root/.duality/config/config.toml ".rpc.cors_allowed_origins" "$([[ $IS_MAINNET ]] && echo "app.duality.xyz" || echo "*")"
+    # add Prometheus telemetry
+    dasel put bool   -f /root/.duality/config/app.toml    ".telemetry.enable" "true";
+    dasel put int    -f /root/.duality/config/app.toml    ".telemetry.prometheus-retention-time" "60";
+    # todo: the following line has an error
+    # dasel put document -f /root/.duality/config/app.toml -r json -w toml ".telemetry.global-labels" '[["chain_id", "duality"]]';
+    # ensure listening to the RPC port doesn't block outgoing RPC connections
+    dasel put string -f /root/.duality/config/config.toml ".rpc.laddr" "tcp://0.0.0.0:26657";
 
     # duplicate genesis for easier merging and recovery
     cp /root/.duality/config/genesis.json /root/.duality/config/genesis-init.json

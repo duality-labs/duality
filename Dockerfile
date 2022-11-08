@@ -61,11 +61,6 @@ WORKDIR /usr/src
 # Copy over binaries from the build-env
 COPY --from=build-env /usr/src/build/dualityd_arm64 /usr/bin/dualityd
 
-# Copy our configuration settings
-COPY docker/fullnode/app.toml /root/.duality/config/app.toml
-COPY docker/fullnode/client.toml /root/.duality/config/client.toml
-COPY docker/fullnode/config.toml /root/.duality/config/config.toml
-
 # expose ports
 # rpc
 EXPOSE 26657
