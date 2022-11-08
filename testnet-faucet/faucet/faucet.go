@@ -85,13 +85,6 @@ func sendAllTokens(address string)(error){
 
 }
 
-func ensureAccountUnfunded(address)(error){
-	resp, err := http.Get("/cosmos/bank/v1beta1/balances/cosmos1qp8k48906gnvsdmpkr88qf37zj38hksg62klns")
-
-
-
-}
-
 func faucetHandler(w http.ResponseWriter, r *http.Request){
 
 
