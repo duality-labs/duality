@@ -109,11 +109,12 @@ else
 
     # check we are on the correct network and can get information from the current network
     node_status_json=$( wget --tries 30 -q -O - $rpc_address/status )
-    if [[ "$( echo $node_status_json | jq -r ".result.node_info.network" )" == "$NETWORK" ]]
+    found_network=$( echo $node_status_json | jq -r ".result.node_info.network" )
+    if [[ "$found_network" == "$NETWORK" ]]
     then
         echo "Found Duality chain!"
     else
-        echo "Could not establish connection to Duality chain"
+        echo "Could not establish connection to Duality chain, found network: ${found_network-none}"
         echo "Exiting..."
         exit 1
     fi
