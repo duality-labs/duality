@@ -22,6 +22,13 @@ sed -i 's#moniker = ".*"#moniker = "'"$NODE_MONIKER"'"#' /root/.duality/config/c
 if [ $STARTUP_MODE == "new" ]
 then
 
+    # enable Swagger API page
+    # todo: this block could probably be reduced to one line
+    api_block_start=$(cat /root/.duality/config/app.toml | grep "\[api\]" -n | cut -d : -f 1)
+    api_block_end=$(( api_block_start + $(cat /root/.duality/config/app.toml | tail +$(( api_block_start + 1 )) | grep "\[.*\]" -n | head -1 | cut -d : -f 1 ) ))
+    api_enable_line=$(sed -n "$api_block_start,$api_block_end {/enable = .*/=}" /root/.duality/config/app.toml)
+    sed -i $api_enable_line's/enable = .*/enable = true/' /root/.duality/config/app.toml
+
     # add new test accounts
     echo "Creating test accounts..."
     mkdir /root/.duality/testkeys
