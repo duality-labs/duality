@@ -41,10 +41,23 @@ then
     # duplicate genesis for easier merging and recovery
     cp /root/.duality/config/genesis.json /root/.duality/config/genesis-init.json
 
-    # add genesis state for the Dex module
-    RUN jq -s '.[0] * { app_state: { dex: ( .[0].app_state.dex + .[1].app_state.dex ) } }' \
-        /root/.duality/config/genesis-original.json networks/$NETWORK/pregenesis/dex.json \
-        > /root/.duality/genesis.json
+    # add genesis state of modules into genensis
+    # combine initial genesis data with all found pregenesis parts
+    # deepmerge from https://stackoverflow.com/questions/53661930/jq-recursively-merge-objects-and-concatenate-arrays#68362041
+    jq -s 'def deepmerge(a;b):
+        reduce b[] as $item (a;
+            reduce ($item | keys_unsorted[]) as $key (.;
+            $item[$key] as $val | ($val | type) as $type | .[$key] = if ($type == "object") then
+                deepmerge({}; [if .[$key] == null then {} else .[$key] end, $val])
+            elif ($type == "array") then
+                (.[$key] + $val | unique)
+            else
+                $val
+            end)
+            );
+        deepmerge({}; .)' \
+        /root/.duality/config/genesis-init.json $(find networks/$NETWORK/pregenesis | grep .*\.json$) \
+        > /root/.duality/config/genesis.json
 
     # add new test accounts
     echo "Creating test accounts..."
