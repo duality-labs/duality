@@ -143,6 +143,7 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 			// Creates an tick object of the speciied size and then iterates over each sub struct filling it with 0 values.
 
 			lowerTick = types.TickObject{
+				PairId:    pairId,
 				TickIndex: tickIndex - fee,
 				TickData: &types.TickDataType{
 					Reserve0AndShares: make([]*types.Reserve0AndSharesType, feeSize),
@@ -168,6 +169,7 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 			// Creates an tick object of the specied size and then iterates over each sub struct filling it with 0 values.
 
 			upperTick = types.TickObject{
+				PairId:    pairId,
 				TickIndex: tickIndex + fee,
 				TickData: &types.TickDataType{
 					Reserve0AndShares: make([]*types.Reserve0AndSharesType, feeSize),
