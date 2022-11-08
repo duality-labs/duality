@@ -81,7 +81,6 @@ func singlePoolSetup(t *testing.T, cosmos CosmostTestEnv, intentionalFail bool) 
 	// init balances & fund the accounts
 	balancesAlice := sdk.NewCoins(newACoin(convInt("10000000000000000000")), newBCoin(convInt("10000000000000000000")))
 	balancesBob := sdk.NewCoins(newACoin(convInt("10000000000000000000")), newBCoin(convInt("10000000000000000000")))
-	// TODO: don't use simapp
 	if err := (FundAccount(app.BankKeeper, ctx, alice, balancesAlice)); err != nil {
 		t.Errorf("Failed to fund %s with %s", alice, balancesAlice)
 	}
@@ -159,6 +158,40 @@ func calculateSharesPure(
 	}
 }
 
+// TODO: this was taken from core.go, lines 287-294. should be moved to utils somewhere
+func min(a, b sdk.Dec) sdk.Dec {
+	if a.LT(b) {
+		return a
+	}
+	return b
+}
+
+// Helper to convert coins into sorted amount0, amount1
+func (env *TestEnv) sortCoins(t *testing.T, coinA sdk.Coin, coinB sdk.Coin) (sdk.Dec, sdk.Dec) {
+	app, ctx := env.cosmos.app, env.cosmos.ctx
+	denom0, denom1, err := app.DexKeeper.SortTokens(ctx, coinA.Denom, coinB.Denom)
+	if err != nil {
+		t.Errorf("Failed to sort coins %s, %s", coinA, coinB)
+	}
+	coins := sdk.NewCoins(coinA, coinB)
+	return sdk.NewDecFromIntWithPrec(coins.AmountOf(denom0), 18), sdk.NewDecFromIntWithPrec(coins.AmountOf(denom1), 18)
+
+}
+
+// Helper function to balance amounts to pool ratio
+func trueAmounts(amount0 sdk.Dec, amount1 sdk.Dec, lowerReserve1 sdk.Dec, upperReserve0 sdk.Dec) (sdk.Dec, sdk.Dec) {
+	trueAmount0, trueAmount1 := amount0, amount1
+	if upperReserve0.GT(sdk.ZeroDec()) {
+		// this corresponds to lines 217-221 in function DepositHelper of core.go
+		trueAmount1 = min(amount1, lowerReserve1.Mul(amount0).Quo(upperReserve0))
+	}
+	if lowerReserve1.GT(sdk.ZeroDec()) {
+		// this corresponds to lines 223-226 in function DepositHelper of core.go
+		trueAmount0 = min(amount0, upperReserve0.Mul(amount1).Quo(lowerReserve1))
+	}
+	return trueAmount0, trueAmount1
+}
+
 // Impure function that pulls all the state variables required for calculating the amount of shares to mint.
 func calculateShares(amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex int64, feeIndex uint64, t *testing.T, env *TestEnv) sdk.Dec {
 	k, ctx := env.cosmos.app.DexKeeper, env.cosmos.ctx
@@ -173,19 +206,10 @@ func calculateShares(amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex 
 
 	lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, tickIndex-fee)
 	upperTick, upperTickFound := k.GetTickMap(ctx, pairId, tickIndex+fee)
-	// TODO: this won't work if not found
 	lowerReserve1 := lowerTick.TickData.Reserve1[feeIndex]
 	upperReserve0, upperTotalShares := upperTick.TickData.Reserve0AndShares[feeIndex].Reserve0, upperTick.TickData.Reserve0AndShares[feeIndex].TotalShares
 
-	trueAmount0, trueAmount1 := amount0, amount1
-	if upperReserve0.GT(sdk.ZeroDec()) {
-		// this corresponds to lines 217-221 in function DepositHelper of core.go
-		trueAmount1 = k.Min(amount1, lowerReserve1.Mul(amount0).Quo(upperReserve0))
-	}
-	if lowerReserve1.GT(sdk.ZeroDec()) {
-		// this corresponds to lines 223-226 in function DepositHelper of core.go
-		trueAmount0 = k.Min(amount0, upperReserve0.Mul(amount1).Quo(lowerReserve1))
-	}
+	trueAmount0, trueAmount1 := trueAmounts(amount0, amount1, lowerReserve1, upperReserve0)
 
 	return calculateSharesPure(
 		amount0,
@@ -200,6 +224,28 @@ func calculateShares(amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex 
 		upperReserve0,
 		upperTotalShares,
 	)
+}
+
+// Helper function to calculate if current ticks change
+func calculateNewCurrentTicksPure(amount0 sdk.Dec, amount1 sdk.Dec, tickIndex int64, fee int64, curr0to1 int64, curr1to0 int64) (int64, int64) {
+	// this corresponds to lines 245-253 in function DepositHelper of core.go
+	// If a new tick has been placed that tigtens the range between currentTick0to1 and currentTick0to1 update CurrentTicks to the tighest ticks
+	// fmt.Println(tickIndex, fee, curr0to1, curr1to0)
+	new0to1, new1to0 := curr0to1, curr1to0
+	if amount0.GT(sdk.ZeroDec()) && ((tickIndex+fee > curr0to1) && (tickIndex+fee < curr1to0)) {
+		new1to0 = tickIndex + fee
+	}
+	if amount1.GT(sdk.ZeroDec()) && ((tickIndex-fee > curr0to1) && (tickIndex-fee < curr1to0)) {
+		new0to1 = tickIndex - fee
+	}
+	return new0to1, new1to0
+}
+
+func (env *TestEnv) calculateNewCurrentTicks(amount0 sdk.Dec, amount1 sdk.Dec, tickIndex int64, feeIndex uint64, pair types.PairMap) (new0to1 int64, new1to0 int64) {
+	k, ctx := env.cosmos.app.DexKeeper, env.cosmos.ctx
+	feelist := k.GetAllFeeList(ctx)
+	fee := feelist[feeIndex].Fee
+	return calculateNewCurrentTicksPure(amount0, amount1, tickIndex, fee, pair.TokenPair.CurrentTick0To1, pair.TokenPair.CurrentTick1To0)
 }
 
 // Helper for getting a pair id
@@ -250,9 +296,14 @@ func testSingleDeposit(t *testing.T, coinA sdk.Coin, coinB sdk.Coin, acc sdk.Acc
 	pairId := makePairId(coinA, coinB, tickIndexes[0], feeTiers[0], t, env)
 	initialShares, initialSharesFound := app.DexKeeper.GetShares(ctx, acc.String(), pairId, tickIndexes[0], feeTiers[0])
 
+	// get initial pair info for 0to1 and 1to0 ticks
+	pairInitial, pairInitialFound := app.DexKeeper.GetPairMap(ctx, pairId)
+	if !pairInitialFound {
+		env.handleIntentionalFail(t, "TODO: handle pairInitial not found")
+	}
+
 	// WHEN depositing the specified amounts coinA and coinB
-	// TODO: need to sort coinA, coinB
-	amount0, amount1 := sdk.NewDecFromIntWithPrec(coinA.Amount, 18), sdk.NewDecFromIntWithPrec(coinB.Amount, 18)
+	amount0, amount1 := env.sortCoins(t, coinA, coinB)
 	_, err := env.cosmos.msgServer.Deposit(goCtx, &types.MsgDeposit{ // (discard message response because we don't need it)
 		Creator:     acc.String(),
 		TokenA:      coinA.Denom,
@@ -305,6 +356,19 @@ func testSingleDeposit(t *testing.T, coinA sdk.Coin, coinB sdk.Coin, acc sdk.Acc
 	// verify fee tier of minted shares
 	if finalShares.FeeIndex != feeTiers[0] {
 		env.handleIntentionalFail(t, "Shares minted in the wrong fee tier. Needed %d, final %d", feeTiers[0], finalShares.FeeIndex)
+	}
+
+	// verify current ticks set properly
+	tick0to1Calc, tick1to0Calc := env.calculateNewCurrentTicks(amount0, amount1, tickIndexes[0], feeTiers[0], pairInitial)
+	pairFinal, pairInitialFound := app.DexKeeper.GetPairMap(ctx, pairId)
+	if !pairInitialFound {
+		env.handleIntentionalFail(t, "TODO: handle pairFinal not found")
+	}
+	if pairFinal.TokenPair.CurrentTick0To1 != tick0to1Calc {
+		env.handleIntentionalFail(t, "Invalid CurrentTick0To1 resulted from deposit. Needed %d, final %d", tick0to1Calc, pairFinal.TokenPair.CurrentTick0To1)
+	}
+	if pairFinal.TokenPair.CurrentTick1To0 != tick1to0Calc {
+		env.handleIntentionalFail(t, "Invalid CurrentTick1To0 resulted from deposit. Needed %d, final %d", tick1to0Calc, pairFinal.TokenPair.CurrentTick1To0)
 	}
 }
 
