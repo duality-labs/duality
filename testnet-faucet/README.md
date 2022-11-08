@@ -28,3 +28,16 @@ When running the startup script the following ENV variables can be set:
 * `TOKEN_AMOUNT`:  see `-token-amount` above
 * `RPC_NODE`: See `-node` above
 * `PORT`: See `-port` above
+
+# Usage
+
+Once running the faucet can be used by making a POST request to the faucet server nad passing in `address` as an argument:
+```
+curl -X POST -d '{"address": "[WALLET ADDRESS]"}' [FAUCET-ADDRESS]:[PORT]
+```
+ie. 
+```
+curl -X POST -d '{"address": "cosmos1xd2vqcglcp5l8epssskd7tjkwe34rh5tna2ttl"}' 44.234.34.140:9000
+```
+
+`
