@@ -35,8 +35,9 @@ then
 elif [ $STARTUP_MODE == "new" ]
 then
 
-    # enable Swagger API page
-    dasel put bool -f /root/.duality/config/app.toml ".api.enable" "true"
+    # enable API on any page in developent
+    dasel put bool -f /root/.duality/config/app.toml ".api.enabled-unsafe-cors" "true"
+    dasel put string -f /root/.duality/config/config.toml ".rpc.cors_allowed_origins" "*"
 
     # duplicate genesis for easier merging and recovery
     cp /root/.duality/config/genesis.json /root/.duality/config/genesis-init.json
