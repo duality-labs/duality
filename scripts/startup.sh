@@ -47,13 +47,9 @@ then
     dasel put bool   -f /root/.duality/config/app.toml    ".api.enable" "true";
     dasel put bool   -f /root/.duality/config/app.toml    ".api.enabled-unsafe-cors" "$([[ $IS_MAINNET ]] && echo "false" || echo "true")"
     dasel put string -f /root/.duality/config/config.toml ".rpc.cors_allowed_origins" "$([[ $IS_MAINNET ]] && echo "app.duality.xyz" || echo "*")"
-    # add Prometheus telemetry
-    dasel put bool   -f /root/.duality/config/app.toml    ".telemetry.enable" "true";
-    dasel put int    -f /root/.duality/config/app.toml    ".telemetry.prometheus-retention-time" "60";
-    # todo: the following line has an error
-    # dasel put document -f /root/.duality/config/app.toml -r json -w toml ".telemetry.global-labels" '[["chain_id", "duality"]]';
     # ensure listening to the RPC port doesn't block outgoing RPC connections
     dasel put string -f /root/.duality/config/config.toml ".rpc.laddr" "tcp://0.0.0.0:26657";
+    # todo: add Prometheus telemetry
 
     # duplicate genesis for easier merging and recovery
     cp /root/.duality/config/genesis.json /root/.duality/config/genesis-init.json
