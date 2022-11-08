@@ -170,11 +170,12 @@ else
         echo "Node has caught up to chain height"
 
         # add validator key (--no-backup ensures the terminal from seeing/logging the MNEMONIC value)
-        echo $MNEMONIC | dualityd keys add validator --recover --no-backup
+        echo $MNEMONIC | dualityd keys add validator --recover --no-backup --keyring-backend test
 
         # sent request to become a validator (to the first RPC address defined)
         dualityd tx staking create-validator \
             --node-id `dualityd tendermint show-node-id` \
+            --chain-id $NETWORK \
             --pubkey `dualityd tendermint show-validator` \
             --commission-rate="${VALIDATOR_COMMISSION_RATE:-1.0}" \
             --commission-max-rate="${VALIDATOR_COMMISSION_MAX_RATE:-1.0}" \
@@ -183,7 +184,8 @@ else
             --gas="${VALIDATOR_GAS:-auto}" \
             --amount "${VALIDATOR_AMOUNT:-1000000stake}" \
             --fees "${VALIDATOR_FEES:-0token}" \
-            --from validator -y
+            --from validator -y \
+            --keyring-backend test
 
         # wait to check the node's validator status
         voting_power=0
