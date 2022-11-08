@@ -23,7 +23,7 @@ func TestMinFeeTier(t *testing.T) {
 	acc := env.addrs[0]
 	coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
 	denomA, denomB := coinA.Denom, coinB.Denom
-	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromInt(coinA.Amount)}, []sdk.Dec{sdk.NewDecFromInt(coinB.Amount)}
+	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
 
 	// deposit with invalid fee tier: maxFeeTier + 1 > maxFeeTier, i.e. invalid
 	tickIndex := []int64{0}
@@ -46,7 +46,7 @@ func TestMaxFeeTier(t *testing.T) {
 	acc := env.addrs[0]
 	coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
 	denomA, denomB := coinA.Denom, coinB.Denom
-	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromInt(coinA.Amount)}, []sdk.Dec{sdk.NewDecFromInt(coinB.Amount)}
+	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
 
 	// deposit with invalid fee tier: maxFeeTier + 1 > maxFeeTier, i.e. invalid
 	tickIndex := []int64{0}
@@ -69,7 +69,7 @@ func TestInvalidFeeTier(t *testing.T) {
 	acc := env.addrs[0]
 	coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
 	denomA, denomB := coinA.Denom, coinB.Denom
-	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromInt(coinA.Amount)}, []sdk.Dec{sdk.NewDecFromInt(coinB.Amount)}
+	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
 
 	// deposit with invalid fee tier: maxFeeTier + 1 > maxFeeTier, i.e. invalid
 	tickIndex := []int64{0}
@@ -91,7 +91,7 @@ func TestInitPair(t *testing.T) {
 	acc := env.addrs[0]
 	coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
 	denomA, denomB := coinA.Denom, coinB.Denom
-	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromInt(coinA.Amount)}, []sdk.Dec{sdk.NewDecFromInt(coinB.Amount)}
+	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
 
 	// deposit at tick 0 in fee tier 0
 	tickIndex := []int64{0}
@@ -112,7 +112,7 @@ func TestInitTick(t *testing.T) {
 	// fifth of acc's balance of each coin
 	coinA, coinB := newACoin(env.balances[acc.String()][0].Amount.Quo(convInt("5"))), newBCoin(env.balances[acc.String()][1].Amount.Quo(convInt("5")))
 	denomA, denomB := coinA.Denom, coinB.Denom
-	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromInt(coinA.Amount)}, []sdk.Dec{sdk.NewDecFromInt(coinB.Amount)}
+	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
 
 	// deposit at tick 0 in fee tier 0
 	tickIndex := []int64{0}
@@ -135,7 +135,7 @@ func TestInitFeeTier(t *testing.T) {
 	// fifth of acc's balance of each coin
 	coinA, coinB := newACoin(env.balances[acc.String()][0].Amount.Quo(convInt("5"))), newBCoin(env.balances[acc.String()][1].Amount.Quo(convInt("5")))
 	denomA, denomB := coinA.Denom, coinB.Denom
-	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromInt(coinA.Amount)}, []sdk.Dec{sdk.NewDecFromInt(coinB.Amount)}
+	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
 
 	// deposit at tick 0 in fee tier 0
 	tickIndex := []int64{0}
@@ -158,7 +158,7 @@ func TestExistingPair(t *testing.T) {
 	// fifth of acc's balance of each coin
 	coinA, coinB := newACoin(env.balances[acc.String()][0].Amount.Quo(convInt("5"))), newBCoin(env.balances[acc.String()][1].Amount.Quo(convInt("5")))
 	denomA, denomB := coinA.Denom, coinB.Denom
-	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromInt(coinA.Amount)}, []sdk.Dec{sdk.NewDecFromInt(coinB.Amount)}
+	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
 
 	// deposit at tick 0 in fee tier 0
 	tickIndex := []int64{0}
@@ -180,7 +180,7 @@ func TestBehindEnemyLines(t *testing.T) {
 	// fifth of acc's balance of each coin
 	coinA, coinB := newACoin(env.balances[acc.String()][0].Amount.Quo(convInt("5"))), newBCoin(env.balances[acc.String()][1].Amount.Quo(convInt("5")))
 	denomA, denomB := coinA.Denom, coinB.Denom
-	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromInt(coinA.Amount)}, []sdk.Dec{sdk.NewDecFromInt(coinB.Amount)}
+	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
 
 	// deposit at tick 0 in fee tier 0
 	tickIndex := []int64{0}

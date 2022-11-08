@@ -20,7 +20,6 @@ func (env *TestEnv) TestDeposit(t *testing.T, denomA string, denomB string, amou
 	pairId := app.DexKeeper.CreatePairId(denom0, denom1)
 
 	// calculate total trade amounts
-	accBalance0Initial, accBalance1Initial := app.BankKeeper.GetBalance(ctx, acc, denom0).Amount.ToDec(), app.BankKeeper.GetBalance(ctx, acc, denom1).Amount.ToDec()
 	totalAmount0, totalAmount1 := sdk.NewDecFromInt(convInt("0")), sdk.NewDecFromInt(convInt("0"))
 	for i := range amounts0 {
 		totalAmount0 = totalAmount0.Add(amounts0[i])
@@ -28,6 +27,7 @@ func (env *TestEnv) TestDeposit(t *testing.T, denomA string, denomB string, amou
 	}
 
 	// verify acc has sufficient balances in env
+	accBalance0Initial, accBalance1Initial := sdk.NewDecFromIntWithPrec(app.BankKeeper.GetBalance(ctx, acc, denom0).Amount, 18), sdk.NewDecFromIntWithPrec(app.BankKeeper.GetBalance(ctx, acc, denom1).Amount, 18)
 	if !(accBalance0Initial.GTE(totalAmount0)) {
 		t.Errorf("%s has insufficient balance of %s. Has %s, expected at least %s.", acc, denomA, accBalance0Initial, totalAmount0)
 	}
@@ -37,7 +37,7 @@ func (env *TestEnv) TestDeposit(t *testing.T, denomA string, denomB string, amou
 
 	// get Dex initial balance
 	dexAllCoinsInitial := app.BankKeeper.GetAllBalances(ctx, app.AccountKeeper.GetModuleAddress("dex"))
-	dexBalanceAInitial, dexBalanceBInitial := dexAllCoinsInitial.AmountOf(denomA).ToDec(), dexAllCoinsInitial.AmountOf(denomB).ToDec()
+	dexBalance0Initial, dexBalance1Initial := sdk.NewDecFromIntWithPrec(dexAllCoinsInitial.AmountOf(denom0), 18), sdk.NewDecFromIntWithPrec(dexAllCoinsInitial.AmountOf(denom1), 18)
 
 	// get amount of shares before depositing
 	initialShares, initialSharesFound := env.getShares(acc, pairId, tickIndexes, feeTiers)
@@ -66,22 +66,21 @@ func (env *TestEnv) TestDeposit(t *testing.T, denomA string, denomB string, amou
 
 	// verify alice's resulting balances is aliceBalanceInitial - depositCoin
 	accBalance0Final, accBalance1Final := accBalance0Initial.Sub(totalAmount0), accBalance1Initial.Sub(totalAmount1)
-	t.Log(accBalance0Final, accBalance1Final)
-	if balance := app.BankKeeper.GetBalance(ctx, acc, denom0).Amount.ToDec(); !(balance.Equal(accBalance0Final)) {
+	if balance := sdk.NewDecFromIntWithPrec(app.BankKeeper.GetBalance(ctx, acc, denom0).Amount, 18); !(balance.Equal(accBalance0Final)) {
 		env.handleIntentionalFail(t, "%s's final balance of %s (%s) does not reflect deposit", acc, denom0, balance)
 	}
-	if balance := app.BankKeeper.GetBalance(ctx, acc, denom1).Amount.ToDec(); !(balance.Equal(accBalance1Final)) {
+	if balance := sdk.NewDecFromIntWithPrec(app.BankKeeper.GetBalance(ctx, acc, denom1).Amount, 18); !(balance.Equal(accBalance1Final)) {
 		env.handleIntentionalFail(t, "%s's final balance of %s (%s) does not reflect deposit", acc, denom1, balance)
 	}
 
 	// verify dex's resulting balances is dexBalanceInitial + depositCoin
 	dexAllCoinsFinal := app.BankKeeper.GetAllBalances(ctx, app.AccountKeeper.GetModuleAddress("dex"))
-	dexBalance0Final, dexBalance1Final := dexBalanceAInitial.Add(totalAmount0), dexBalanceBInitial.Add(totalAmount1)
-	if balance := newACoin(dexAllCoinsFinal.AmountOf(denom0)).Amount.ToDec(); !(balance.Equal(dexBalance0Final)) {
-		env.handleIntentionalFail(t, "%s's final balance of %s (%s) does not reflect deposit", acc, denom0, balance)
+	dexBalance0Final, dexBalance1Final := dexBalance0Initial.Add(totalAmount0), dexBalance1Initial.Add(totalAmount1)
+	if balance := sdk.NewDecFromIntWithPrec(dexAllCoinsFinal.AmountOf(denom0), 18); !(balance.Equal(dexBalance0Final)) {
+		env.handleIntentionalFail(t, "Dex module's final balance of %s (%s) does not reflect deposit", denom0, balance)
 	}
-	if balance := newBCoin(dexAllCoinsFinal.AmountOf(denom1)).Amount.ToDec(); !(balance.Equal(dexBalance1Final)) {
-		env.handleIntentionalFail(t, "%s's final balance of %s (%s) does not reflect deposit", acc, denom1, balance)
+	if balance := sdk.NewDecFromIntWithPrec(dexAllCoinsFinal.AmountOf(denom1), 18); !(balance.Equal(dexBalance1Final)) {
+		env.handleIntentionalFail(t, "Dex module's final balance of %s (%s) does not reflect deposit", denom1, balance)
 	}
 
 	for i := 0; i < len(amounts0); i++ {
