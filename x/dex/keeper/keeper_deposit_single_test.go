@@ -12,7 +12,7 @@ import (
 	// "github.com/NicholasDotSol/duality/x/dex/types"
 )
 
-func TestMinFeeTier(t *testing.T) {
+func TestSingleMinFeeTier(t *testing.T) {
 	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/MinFee")
 
 	// GIVEN initial balances and fee tiers from the setup
@@ -35,7 +35,7 @@ func TestMinFeeTier(t *testing.T) {
 	// validity assertions are done inside testSingleDeposit
 }
 
-func TestMaxFeeTier(t *testing.T) {
+func TestSingleMaxFeeTier(t *testing.T) {
 	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/MaxFee")
 
 	// GIVEN initial balances and fee tiers from the setup
@@ -58,7 +58,7 @@ func TestMaxFeeTier(t *testing.T) {
 	// validity assertions are done inside testSingleDeposit
 }
 
-func TestInvalidFeeTier(t *testing.T) {
+func TestSingleInvalidFeeTier(t *testing.T) {
 	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/Invalid Fee Tier")
 
 	// GIVEN initial balances and fee tiers from the setup
@@ -80,7 +80,7 @@ func TestInvalidFeeTier(t *testing.T) {
 	// THEN the transaction should fail midway (SkipNow)
 }
 
-func TestInitPair(t *testing.T) {
+func TestSingleInitPair(t *testing.T) {
 	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/InitPair")
 
 	// GIVEN initial balances and fee tiers from the setup
@@ -103,7 +103,7 @@ func TestInitPair(t *testing.T) {
 	// validity assertions are done inside testSingleDeposit
 }
 
-func TestInitTick(t *testing.T) {
+func TestSingleInitTick(t *testing.T) {
 	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/InitTick")
 
 	// GIVEN initial balances and fee tiers from the setup, and pair already has liquidity at tick 0 fee tier 0
@@ -126,7 +126,7 @@ func TestInitTick(t *testing.T) {
 	// THEN the transaction should execute successfully
 }
 
-func TestInitFeeTier(t *testing.T) {
+func TestSingleInitFeeTier(t *testing.T) {
 	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/InitFeeTier")
 
 	// GIVEN initial balances and fee tiers from the setup, and pair already has liquidity at tick 0 fee tier 0
@@ -149,7 +149,7 @@ func TestInitFeeTier(t *testing.T) {
 	// THEN the transaction should execute successfully
 }
 
-func TestExistingPair(t *testing.T) {
+func TestSingleExistingPair(t *testing.T) {
 	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/ExistingPair")
 
 	// GIVEN initial balances and fee tiers from the setup, and pair already has liquidity at tick 0 fee tier 0
@@ -171,7 +171,7 @@ func TestExistingPair(t *testing.T) {
 	// THEN the transaction should execute successfully
 }
 
-func TestBehindEnemyLines(t *testing.T) {
+func TestSingleBehindEnemyLines(t *testing.T) {
 	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/BehindEnemyLines")
 
 	// GIVEN initial balances and fee tiers from the setup, and pair already has liquidity at tick 0 fee tier 0
