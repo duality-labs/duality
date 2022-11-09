@@ -127,8 +127,8 @@ func TestMultiInitTick(t *testing.T) {
 	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(amountAA, 18), sdk.NewDecFromIntWithPrec(amountAB, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(amountBA, 18), sdk.NewDecFromIntWithPrec(amountBB, 18)}
 
 	// deposit at tick 0 feeIndex 0, tick 3 feeIndex 0
-	tickIndexes := []int64{0, 3}
-	feeTiers := []uint64{0, 0}
+	tickIndexes := []int64{0, 2}
+	feeTiers := []uint64{2, 0}
 
 	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers)
 

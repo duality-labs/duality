@@ -104,10 +104,10 @@ func (env *TestEnv) TestDeposit(t *testing.T, denomA string, denomB string, amou
 
 		// move expected current ticks
 		tick0to1Calc, tick1to0Calc := env.calculateNewCurrentTicks(amounts0[i], amounts1[i], tickIndexes[i], feeTiers[i], pairInitial)
-		if tick0to1Calc < expectedTick0to1 {
+		if tick0to1Calc > expectedTick0to1 {
 			expectedTick0to1 = tick0to1Calc
 		}
-		if tick1to0Calc > expectedTick1to0 {
+		if tick1to0Calc < expectedTick1to0 {
 			expectedTick1to0 = tick1to0Calc
 		}
 
