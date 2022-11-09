@@ -17,6 +17,7 @@ func (env *TestEnv) TestDeposit(t *testing.T, denomA string, denomB string, amou
 		t.Errorf("Need equal lengths of coinsA and coinsB for multi-deposit")
 	}
 	denom0, denom1, amounts0, amounts1 := env.sortCoins(t, denomA, denomB, amountsA, amountsB)
+	// TODO: create trueamounts
 	pairId := app.DexKeeper.CreatePairId(denom0, denom1)
 
 	// calculate total trade amounts
@@ -40,11 +41,10 @@ func (env *TestEnv) TestDeposit(t *testing.T, denomA string, denomB string, amou
 	dexBalance0Initial, dexBalance1Initial := sdk.NewDecFromIntWithPrec(dexAllCoinsInitial.AmountOf(denom0), 18), sdk.NewDecFromIntWithPrec(dexAllCoinsInitial.AmountOf(denom1), 18)
 
 	// get amount of shares before depositing
-	initialShares, initialSharesFound := env.getShares(acc, pairId, tickIndexes, feeTiers)
+	initialShares, initialSharesFound := env.makeShares(acc, pairId, tickIndexes, feeTiers)
 
-	// TODO: this should be array
 	// get initial pair info for 0to1 and 1to0 ticks
-	pairsInitial := env.makePairs(t, pairId, tickIndexes, feeTiers)
+	pairInitial := env.makePair(t, pairId, tickIndexes[0], feeTiers[0])
 
 	// WHEN depositing the specified amounts0, amounts1 and given fee tiers
 	_, err := env.cosmos.msgServer.Deposit(goCtx, &types.MsgDeposit{ // (discard message response because we don't need it)
@@ -83,36 +83,65 @@ func (env *TestEnv) TestDeposit(t *testing.T, denomA string, denomB string, amou
 		env.handleIntentionalFail(t, "Dex module's final balance of %s (%s) does not reflect deposit", denom1, balance)
 	}
 
-	for i := 0; i < len(amounts0); i++ {
-		// verify amount of shares minted for acc
+	// accumulate shares and calculate final CurrentTicks
+	sharesCalcAccum := make(map[int64]map[uint64]sdk.Dec) // map from tickIndex->feeTier->sharesCalc
+	expectedTick0to1, expectedTick1to0 := pairInitial.TokenPair.CurrentTick0To1, pairInitial.TokenPair.CurrentTick1To0
+	for i := range amounts0 {
+		// get expected amount of minted shares and increase accum on both sides of spread
 		accSharesCalc := env.calculateShares(t, amounts0[i], amounts1[i], pairId, tickIndexes[i], feeTiers[i])
+		// accumulate minted shares
+		if shares, ok := sharesCalcAccum[tickIndexes[i]][feeTiers[i]]; ok {
+			// if already exists, add to previous value
+			sharesCalcAccum[tickIndexes[i]][feeTiers[i]] = shares.Add(accSharesCalc)
+		} else {
+			// if inner map hasn't been initialized, init
+			if _, ok := sharesCalcAccum[tickIndexes[i]]; !ok {
+				sharesCalcAccum[tickIndexes[i]] = make(map[uint64]sdk.Dec)
+			}
+			// else add value to map
+			sharesCalcAccum[tickIndexes[i]][feeTiers[i]] = accSharesCalc
+		}
+
+		// move expected current ticks
+		tick0to1Calc, tick1to0Calc := env.calculateNewCurrentTicks(amounts0[i], amounts1[i], tickIndexes[i], feeTiers[i], pairInitial)
+		if tick0to1Calc < expectedTick0to1 {
+			expectedTick0to1 = tick0to1Calc
+		}
+		if tick1to0Calc > expectedTick1to0 {
+			expectedTick1to0 = tick1to0Calc
+		}
+
+	}
+
+	for i := range amounts0 {
+		expectedShares := sharesCalcAccum[tickIndexes[i]][feeTiers[i]]
+		// verify amount of shares minted for acc
 		finalShares, finalSharesFound := app.DexKeeper.GetShares(ctx, acc.String(), pairId, tickIndexes[i], feeTiers[i])
 		if !finalSharesFound {
 			env.handleIntentionalFail(t, "Shares resulting from deposit by %s have not been minted (not found by getter).", acc)
-		} else if !initialSharesFound[i] && !(finalShares.SharesOwned.Equal(accSharesCalc)) {
+		} else if !initialSharesFound[i] && !(finalShares.SharesOwned.Equal(expectedShares)) {
 			// Handle the case when no shares held by account initially but mintedShares != accSharesCalc
-			env.handleIntentionalFail(t, "Incorrect amount of shares minted after deposit by %s of %s (%v), %s (%v). Needed %s, final %s.", acc, denom0, amounts0[i], denom1, amounts1[i], accSharesCalc, finalShares.SharesOwned)
-		} else if initialSharesFound[i] && !finalShares.SharesOwned.Equal(initialShares[i].SharesOwned.Add(accSharesCalc)) {
+			env.handleIntentionalFail(t, "Incorrect amount of shares minted after deposit (no current shares) by %s of %s (%v), %s (%v). Needed %s, final %s.", acc, denom0, amounts0[i], denom1, amounts1[i], expectedShares, finalShares.SharesOwned)
+		} else if initialSharesFound[i] && !finalShares.SharesOwned.Equal(initialShares[i].SharesOwned.Add(expectedShares)) {
 			// Handle the case when account had an initial balance of shares but finalShares != initalShares + accSharesCalc
-			env.handleIntentionalFail(t, "Incorrect amount of shares minted after deposit by %s of %s (%v), %s (%v). Needed %s, final %s.", acc, denom0, amounts0[i], denom1, amounts1[i], accSharesCalc, finalShares.SharesOwned)
+			env.handleIntentionalFail(t, "Incorrect amount of shares minted after deposit (current shares exist) by %s of %s (%v), %s (%v). Needed %s, final %s.", acc, denom0, amounts0[i], denom1, amounts1[i], expectedShares, finalShares.SharesOwned)
 		}
 
 		// verify fee tier of minted shares
 		if finalShares.FeeIndex != feeTiers[i] {
 			env.handleIntentionalFail(t, "Shares minted in the wrong fee tier. Needed %d, final %d", feeTiers[i], finalShares.FeeIndex)
 		}
+	}
 
-		// verify current ticks set properly
-		tick0to1Calc, tick1to0Calc := env.calculateNewCurrentTicks(amounts0[i], amounts1[i], tickIndexes[i], feeTiers[i], pairsInitial[i])
-		pairFinal, pairFinalFound := app.DexKeeper.GetPairMap(ctx, pairId)
-		if !pairFinalFound {
-			env.handleIntentionalFail(t, "TODO: handle pairFinal not found")
-		}
-		if pairFinal.TokenPair.CurrentTick0To1 != tick0to1Calc {
-			env.handleIntentionalFail(t, "Invalid CurrentTick0To1 resulted from deposit. Needed %d, final %d", tick0to1Calc, pairFinal.TokenPair.CurrentTick0To1)
-		}
-		if pairFinal.TokenPair.CurrentTick1To0 != tick1to0Calc {
-			env.handleIntentionalFail(t, "Invalid CurrentTick1To0 resulted from deposit. Needed %d, final %d", tick1to0Calc, pairFinal.TokenPair.CurrentTick1To0)
-		}
+	// verify current ticks set properly
+	pairFinal, pairFinalFound := app.DexKeeper.GetPairMap(ctx, pairId)
+	if !pairFinalFound {
+		env.handleIntentionalFail(t, "TODO: handle pairFinal not found")
+	}
+	if pairFinal.TokenPair.CurrentTick0To1 != expectedTick0to1 {
+		env.handleIntentionalFail(t, "Invalid CurrentTick0To1 resulted from deposit. Needed %d, final %d", expectedTick0to1, pairFinal.TokenPair.CurrentTick0To1)
+	}
+	if pairFinal.TokenPair.CurrentTick1To0 != expectedTick1to0 {
+		env.handleIntentionalFail(t, "Invalid CurrentTick1To0 resulted from deposit. Needed %d, final %d", expectedTick1to0, pairFinal.TokenPair.CurrentTick1To0)
 	}
 }

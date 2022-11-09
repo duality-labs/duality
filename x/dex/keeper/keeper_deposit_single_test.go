@@ -25,14 +25,14 @@ func TestSingleMinFeeTier(t *testing.T) {
 	denomA, denomB := coinA.Denom, coinB.Denom
 	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
 
-	// deposit with invalid fee tier: maxFeeTier + 1 > maxFeeTier, i.e. invalid
+	// deposit with min fee tier: 0
 	tickIndex := []int64{0}
 	minFeeTier := []uint64{0}
 
 	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndex, minFeeTier)
 
 	// THEN the transaction should execute successfully
-	// validity assertions are done inside testSingleDeposit
+	// validity assertions are done inside env.TestDeposit
 }
 
 func TestSingleMaxFeeTier(t *testing.T) {
@@ -48,14 +48,14 @@ func TestSingleMaxFeeTier(t *testing.T) {
 	denomA, denomB := coinA.Denom, coinB.Denom
 	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
 
-	// deposit with invalid fee tier: maxFeeTier + 1 > maxFeeTier, i.e. invalid
+	// deposit with max fee tier
 	tickIndex := []int64{0}
 	maxFeeTier := []uint64{uint64(len(env.feeTiers) - 1)}
 
 	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndex, maxFeeTier)
 
 	// THEN the transaction should execute successfully
-	// validity assertions are done inside testSingleDeposit
+	// validity assertions are done inside env.TestDeposit
 }
 
 func TestSingleInvalidFeeTier(t *testing.T) {
@@ -78,6 +78,7 @@ func TestSingleInvalidFeeTier(t *testing.T) {
 	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndex, invalidFeeTier)
 
 	// THEN the transaction should fail midway (SkipNow)
+	// (in)validity assertions are done inside env.TestDeposit
 }
 
 func TestSingleInitPair(t *testing.T) {
@@ -100,7 +101,7 @@ func TestSingleInitPair(t *testing.T) {
 	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndex, feeTier)
 
 	// THEN the transaction should execute successfully
-	// validity assertions are done inside testSingleDeposit
+	// validity assertions are done inside env.TestDeposit
 }
 
 func TestSingleInitTick(t *testing.T) {
@@ -124,6 +125,7 @@ func TestSingleInitTick(t *testing.T) {
 	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, newTickIndex, feeTier)
 
 	// THEN the transaction should execute successfully
+	// validity assertions are done inside env.TestDeposit
 }
 
 func TestSingleInitFeeTier(t *testing.T) {
@@ -193,4 +195,5 @@ func TestSingleBehindEnemyLines(t *testing.T) {
 	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, newTickIndex, newFeeTier)
 
 	// THEN the transaction should execute successfully
+	// validity assertions are done inside env.TestDeposit
 }

@@ -13,6 +13,14 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
+func newCCoin(amt sdk.Int) sdk.Coin {
+	return sdk.NewCoin("TokenC", amt)
+}
+
+func newDCoin(amt sdk.Int) sdk.Coin {
+	return sdk.NewCoin("TokenD", amt)
+}
+
 // TODO: better name
 type CosmosTestEnv struct {
 	app       *dualityapp.App
@@ -65,8 +73,8 @@ func EnvSetup(t *testing.T, intentionalFail bool) TestEnv {
 	app.AccountKeeper.SetAccount(ctx, accBob)
 
 	// init balances & fund the accounts
-	balancesAlice := sdk.NewCoins(newACoin(convInt("10000000000000000000")), newBCoin(convInt("20000000000000000000")))
-	balancesBob := sdk.NewCoins(newACoin(convInt("10000000000000000000")), newBCoin(convInt("20000000000000000000")))
+	balancesAlice := sdk.NewCoins(newACoin(convInt("10000000000000000000")), newBCoin(convInt("20000000000000000000")), newCCoin(convInt("30000000000000000000")), newDCoin(convInt("40000000000000000000")))
+	balancesBob := sdk.NewCoins(newACoin(convInt("10000000000000000000")), newBCoin(convInt("20000000000000000000")), newCCoin(convInt("30000000000000000000")), newDCoin(convInt("40000000000000000000")))
 	if err := (FundAccount(app.BankKeeper, ctx, alice, balancesAlice)); err != nil {
 		t.Errorf("Failed to fund %s with %s", alice, balancesAlice)
 	}

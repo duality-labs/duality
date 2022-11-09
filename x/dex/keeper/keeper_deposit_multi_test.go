@@ -13,7 +13,7 @@ import (
 )
 
 func TestMultiMinFeeTier(t *testing.T) {
-	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/MinFee")
+	t.Logf("[ UnitTests|Keeper ] Starting test: MultiPool/MinFee")
 
 	// GIVEN initial balances and fee tiers from the setup
 	env := EnvSetup(t, false)
@@ -21,22 +21,24 @@ func TestMultiMinFeeTier(t *testing.T) {
 	// WHEN alice deposits her setup balance of tokenA and tokenB into the minimal fee tier
 	// prep deposit args
 	acc := env.addrs[0]
+	// AA = 1/5 * balanceA, AB = 1/5 * balanceB, BA = 1/3 * balanceA, BB = 1/3 * balanceB
 	coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
+	amountAA, amountAB, amountBA, amountBB := coinA.Amount.Quo(convInt("5")), coinA.Amount.Quo(convInt("5")), coinB.Amount.Quo(convInt("3")), coinB.Amount.Quo(convInt("3"))
 	denomA, denomB := coinA.Denom, coinB.Denom
-	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
+	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(amountAA, 18), sdk.NewDecFromIntWithPrec(amountAB, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(amountBA, 18), sdk.NewDecFromIntWithPrec(amountBB, 18)}
 
-	// deposit with invalid fee tier: maxFeeTier + 1 > maxFeeTier, i.e. invalid
-	tickIndex := []int64{0}
-	minFeeTier := []uint64{0}
+	// deposit with min fee tier:
+	tickIndexes := []int64{0, 0}
+	minFeeTiers := []uint64{0, 0}
 
-	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndex, minFeeTier)
+	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndexes, minFeeTiers)
 
 	// THEN the transaction should execute successfully
-	// validity assertions are done inside testSingleDeposit
+	// validity assertions are done inside env.TestDeposit
 }
 
 func TestMultiMaxFeeTier(t *testing.T) {
-	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/MaxFee")
+	t.Logf("[ UnitTests|Keeper ] Starting test: MultiPool/MaxFee")
 
 	// GIVEN initial balances and fee tiers from the setup
 	env := EnvSetup(t, false)
@@ -44,22 +46,24 @@ func TestMultiMaxFeeTier(t *testing.T) {
 	// WHEN alice deposits her setup balance of tokenA and tokenB into the minimal fee tier
 	// prep deposit args
 	acc := env.addrs[0]
+	// AA = 1/5 * balanceA, AB = 1/5 * balanceA, BA = 1/3 * balanceB, BB = 1/3 * balanceB
 	coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
+	amountAA, amountAB, amountBA, amountBB := coinA.Amount.Quo(convInt("5")), coinA.Amount.Quo(convInt("5")), coinB.Amount.Quo(convInt("3")), coinB.Amount.Quo(convInt("3"))
 	denomA, denomB := coinA.Denom, coinB.Denom
-	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
+	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(amountAA, 18), sdk.NewDecFromIntWithPrec(amountAB, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(amountBA, 18), sdk.NewDecFromIntWithPrec(amountBB, 18)}
 
-	// deposit with invalid fee tier: maxFeeTier + 1 > maxFeeTier, i.e. invalid
-	tickIndex := []int64{0}
-	maxFeeTier := []uint64{uint64(len(env.feeTiers) - 1)}
+	// deposit with max fee tier
+	tickIndexes := []int64{0, 0}
+	maxFeeTiers := []uint64{uint64(len(env.feeTiers) - 1), uint64(len(env.feeTiers) - 1)}
 
-	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndex, maxFeeTier)
+	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndexes, maxFeeTiers)
 
 	// THEN the transaction should execute successfully
-	// validity assertions are done inside testSingleDeposit
+	// validity assertions are done inside env.TestDeposit
 }
 
 func TestMultiInvalidFeeTier(t *testing.T) {
-	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/Invalid Fee Tier")
+	t.Logf("[ UnitTests|Keeper ] Starting test: MultiPool/Invalid Fee Tier")
 
 	// GIVEN initial balances and fee tiers from the setup
 	env := EnvSetup(t, true)
@@ -67,21 +71,23 @@ func TestMultiInvalidFeeTier(t *testing.T) {
 	// WHEN alice deposits her setup balance of tokenA and tokenB into the minimal fee tier
 	// prep deposit args
 	acc := env.addrs[0]
+	// AA = 1/5 * balanceA, AB = 1/5 * balanceA, BA = 1/3 * balanceB, BB = 1/3 * balanceB
 	coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
+	amountAA, amountAB, amountBA, amountBB := coinA.Amount.Quo(convInt("5")), coinA.Amount.Quo(convInt("5")), coinB.Amount.Quo(convInt("3")), coinB.Amount.Quo(convInt("3"))
 	denomA, denomB := coinA.Denom, coinB.Denom
-	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
+	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(amountAA, 18), sdk.NewDecFromIntWithPrec(amountAB, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(amountBA, 18), sdk.NewDecFromIntWithPrec(amountBB, 18)}
 
 	// deposit with invalid fee tier: maxFeeTier + 1 > maxFeeTier, i.e. invalid
-	tickIndex := []int64{0}
-	invalidFeeTier := []uint64{uint64(len(env.feeTiers))}
+	tickIndexes := []int64{0, 0}
+	invalidFeeTiers := []uint64{uint64(len(env.feeTiers)), uint64(len(env.feeTiers))}
 
-	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndex, invalidFeeTier)
+	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndexes, invalidFeeTiers)
 
-	// THEN the transaction should fail midway (SkipNow)
+	// THEN the transaction should fail midway (using SkipNow)
 }
 
 func TestMultiInitPair(t *testing.T) {
-	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/InitPair")
+	t.Logf("[ UnitTests|Keeper ] Starting test: MultiPool/InitPair")
 
 	// GIVEN initial balances and fee tiers from the setup
 	env := EnvSetup(t, false)
@@ -89,90 +95,96 @@ func TestMultiInitPair(t *testing.T) {
 	// WHEN alice deposits her setup balance of tokenA and tokenB into the minimal fee tier
 	// prep deposit args
 	acc := env.addrs[0]
+	// AA = 1/5 * balanceA, AB = 1/5 * balanceB, BA = 1/3 * balanceA, BB = 1/3 * balanceB
 	coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
+	amountAA, amountAB, amountBA, amountBB := coinA.Amount.Quo(convInt("5")), coinB.Amount.Quo(convInt("5")), coinA.Amount.Quo(convInt("3")), coinB.Amount.Quo(convInt("3"))
 	denomA, denomB := coinA.Denom, coinB.Denom
-	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
+	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(amountAA, 18), sdk.NewDecFromIntWithPrec(amountAB, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(amountBA, 18), sdk.NewDecFromIntWithPrec(amountBB, 18)}
 
-	// deposit at tick 0 in fee tier 0
-	tickIndex := []int64{0}
-	feeTier := []uint64{0}
+	// deposit at tick 0, feeIndex 0 and tick 0 feeIndex 2
+	tickIndexes := []int64{0, 0}
+	feeTiers := []uint64{0, 2}
 
-	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndex, feeTier)
+	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers)
 
 	// THEN the transaction should execute successfully
-	// validity assertions are done inside testSingleDeposit
+	// validity assertions are done inside env.TestDeposit
 }
 
 func TestMultiInitTick(t *testing.T) {
-	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/InitTick")
+	t.Logf("[ UnitTests|Keeper ] Starting test: MultiPool/InitTick")
 
-	// GIVEN initial balances and fee tiers from the setup, and pair already has liquidity at tick 0 fee tier 0
+	// GIVEN initial balances and fee tiers from the setup
 	env := EnvSetup(t, false)
+
+	// WHEN alice deposits her setup balance of tokenA and tokenB into the minimal fee tier
+	// prep deposit args
 	acc := env.addrs[0]
-	// fifth of acc's balance of each coin
-	coinA, coinB := newACoin(env.balances[acc.String()][0].Amount.Quo(convInt("5"))), newBCoin(env.balances[acc.String()][1].Amount.Quo(convInt("5")))
+	// AA = 1/5 * balanceA, AB = 1/5 * balanceB, BA = 1/3 * balanceA, BB = 1/3 * balanceB
+	coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
+	amountAA, amountAB, amountBA, amountBB := coinA.Amount.Quo(convInt("5")), coinB.Amount.Quo(convInt("5")), coinA.Amount.Quo(convInt("3")), coinB.Amount.Quo(convInt("3"))
 	denomA, denomB := coinA.Denom, coinB.Denom
-	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
+	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(amountAA, 18), sdk.NewDecFromIntWithPrec(amountAB, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(amountBA, 18), sdk.NewDecFromIntWithPrec(amountBB, 18)}
 
-	// deposit at tick 0 in fee tier 0
-	tickIndex := []int64{0}
-	feeTier := []uint64{0}
-	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndex, feeTier)
+	// deposit at tick 0 feeIndex 0, tick 3 feeIndex 0
+	tickIndexes := []int64{0, 3}
+	feeTiers := []uint64{0, 0}
 
-	// WHEN alice deposits at tick 1 in fee tier 0
-	newTickIndex := []int64{1}
-	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, newTickIndex, feeTier)
+	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers)
 
 	// THEN the transaction should execute successfully
 }
 
 func TestMultiInitFeeTier(t *testing.T) {
-	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/InitFeeTier")
+	t.Logf("[ UnitTests|Keeper ] Starting test: MultiPool/InitFeeTier")
 
-	// GIVEN initial balances and fee tiers from the setup, and pair already has liquidity at tick 0 fee tier 0
+	// GIVEN initial balances and fee tiers from the setup
 	env := EnvSetup(t, false)
+
+	// WHEN alice deposits her setup balance of tokenA and tokenB into the minimal fee tier
+	// prep deposit args
 	acc := env.addrs[0]
-	// fifth of acc's balance of each coin
-	coinA, coinB := newACoin(env.balances[acc.String()][0].Amount.Quo(convInt("5"))), newBCoin(env.balances[acc.String()][1].Amount.Quo(convInt("5")))
+	// AA = 1/5 * balanceA, AB = 1/5 * balanceA, BA = 1/3 * balanceB, BB = 1/3 * balanceB
+	coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
+	amountAA, amountAB, amountBA, amountBB := coinA.Amount.Quo(convInt("5")), coinA.Amount.Quo(convInt("5")), coinB.Amount.Quo(convInt("3")), coinB.Amount.Quo(convInt("3"))
 	denomA, denomB := coinA.Denom, coinB.Denom
-	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
+	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(amountAA, 18), sdk.NewDecFromIntWithPrec(amountAB, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(amountBA, 18), sdk.NewDecFromIntWithPrec(amountBB, 18)}
 
-	// deposit at tick 0 in fee tier 0
-	tickIndex := []int64{0}
-	feeTier := []uint64{0}
-	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndex, feeTier)
+	// deposit at tick 0 fee, tick 0 feeIndex 2
+	tickIndexes := []int64{0, 0}
+	feeTiers := []uint64{0, 2}
 
-	// WHEN alice deposits at tick 0 in fee tier 1
-	newFeeTier := []uint64{1}
-	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndex, newFeeTier)
+	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers)
 
 	// THEN the transaction should execute successfully
 }
 
 func TestMultiExistingPair(t *testing.T) {
-	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/ExistingPair")
+	t.Logf("[ UnitTests|Keeper ] Starting test: MultiPool/ExistingPair")
 
-	// GIVEN initial balances and fee tiers from the setup, and pair already has liquidity at tick 0 fee tier 0
+	// GIVEN initial balances and fee tiers from the setup
 	env := EnvSetup(t, false)
+
+	// WHEN alice deposits her setup balance of tokenA and tokenB into the minimal fee tier
+	// prep deposit args
 	acc := env.addrs[0]
-	// fifth of acc's balance of each coin
-	coinA, coinB := newACoin(env.balances[acc.String()][0].Amount.Quo(convInt("5"))), newBCoin(env.balances[acc.String()][1].Amount.Quo(convInt("5")))
+	// AA = 1/5 * balanceA, AB = 1/5 * balanceA, BA = 1/3 * balanceB, BB = 1/3 * balanceB
+	coinA, coinB := env.balances[acc.String()][0], env.balances[acc.String()][1]
+	amountAA, amountAB, amountBA, amountBB := coinA.Amount.Quo(convInt("5")), coinA.Amount.Quo(convInt("5")), coinB.Amount.Quo(convInt("3")), coinB.Amount.Quo(convInt("3"))
 	denomA, denomB := coinA.Denom, coinB.Denom
-	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
+	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(amountAA, 18), sdk.NewDecFromIntWithPrec(amountAB, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(amountBA, 18), sdk.NewDecFromIntWithPrec(amountBB, 18)}
 
-	// deposit at tick 0 in fee tier 0
-	tickIndex := []int64{0}
-	feeTier := []uint64{0}
-	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndex, feeTier)
+	// deposit with invalid fee tier: maxFeeTier + 1 > maxFeeTier, i.e. invalid
+	tickIndexes := []int64{0, 0}
+	feeTiers := []uint64{0, 2}
 
-	// WHEN deposit in the same pair, tick and fee tier again
-	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndex, feeTier)
+	env.TestDeposit(t, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers)
 
 	// THEN the transaction should execute successfully
 }
 
 func TestMultiBehindEnemyLines(t *testing.T) {
-	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/BehindEnemyLines")
+	t.Logf("[ UnitTests|Keeper ] Starting test: MultiPool/BehindEnemyLines")
 
 	// GIVEN initial balances and fee tiers from the setup, and pair already has liquidity at tick 0 fee tier 0
 	env := EnvSetup(t, false)

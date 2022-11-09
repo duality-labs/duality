@@ -50,20 +50,6 @@ func calculateSharesPure(
 	}
 }
 
-// Pure helper function to balance amounts to pool ratio
-func trueAmounts(amount0 sdk.Dec, amount1 sdk.Dec, lowerReserve1 sdk.Dec, upperReserve0 sdk.Dec) (sdk.Dec, sdk.Dec) {
-	trueAmount0, trueAmount1 := amount0, amount1
-	if upperReserve0.GT(sdk.ZeroDec()) {
-		// this corresponds to lines 217-221 in function DepositHelper of core.go
-		trueAmount1 = min(amount1, lowerReserve1.Mul(amount0).Quo(upperReserve0))
-	}
-	if lowerReserve1.GT(sdk.ZeroDec()) {
-		// this corresponds to lines 223-226 in function DepositHelper of core.go
-		trueAmount0 = min(amount0, upperReserve0.Mul(amount1).Quo(lowerReserve1))
-	}
-	return trueAmount0, trueAmount1
-}
-
 // Impure function that pulls all the state variables required for calculating the amount of shares to mint.
 func (env *TestEnv) calculateShares(t *testing.T, amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex int64, feeIndex uint64) sdk.Dec {
 	k, ctx := env.cosmos.app.DexKeeper, env.cosmos.ctx
@@ -98,6 +84,20 @@ func (env *TestEnv) calculateShares(t *testing.T, amount0 sdk.Dec, amount1 sdk.D
 	)
 }
 
+// Pure helper function to balance amounts to pool ratio
+func trueAmounts(amount0 sdk.Dec, amount1 sdk.Dec, lowerReserve1 sdk.Dec, upperReserve0 sdk.Dec) (sdk.Dec, sdk.Dec) {
+	trueAmount0, trueAmount1 := amount0, amount1
+	if upperReserve0.GT(sdk.ZeroDec()) {
+		// this corresponds to lines 217-221 in function DepositHelper of core.go
+		trueAmount1 = min(amount1, lowerReserve1.Mul(amount0).Quo(upperReserve0))
+	}
+	if lowerReserve1.GT(sdk.ZeroDec()) {
+		// this corresponds to lines 223-226 in function DepositHelper of core.go
+		trueAmount0 = min(amount0, upperReserve0.Mul(amount1).Quo(lowerReserve1))
+	}
+	return trueAmount0, trueAmount1
+}
+
 // Helper function to calculate if current ticks change
 func calculateNewCurrentTicksPure(amount0 sdk.Dec, amount1 sdk.Dec, tickIndex int64, fee int64, curr0to1 int64, curr1to0 int64) (int64, int64) {
 	// this corresponds to lines 245-253 in function DepositHelper of core.go
@@ -119,45 +119,40 @@ func (env *TestEnv) calculateNewCurrentTicks(amount0 sdk.Dec, amount1 sdk.Dec, t
 	return calculateNewCurrentTicksPure(amount0, amount1, tickIndex, fee, pair.TokenPair.CurrentTick0To1, pair.TokenPair.CurrentTick1To0)
 }
 
-// Helper for getting a pair id
-func (env *TestEnv) makePairs(t *testing.T, pairId string, tickIndexes []int64, feeTiers []uint64) []types.PairMap {
+// Helper for getting a pair id. If pair hasn't been initialized, defaults to pair with tickIndex and feeTier for CurrentTick
+func (env *TestEnv) makePair(t *testing.T, pairId string, tickIndex int64, feeTier uint64) types.PairMap {
 	// TODO: this really should be cleaned up
 	app, ctx, k := env.cosmos.app, env.cosmos.ctx, env.cosmos.app.DexKeeper
 
 	// this corresponds to line 16 in function DepositVerification of verification.go
 	feeList := k.GetAllFeeList(ctx)
 
-	var pairs []types.PairMap
-
-	for i, _ := range feeTiers {
-		// handle invalid fee index
-		if feeTiers[i] >= uint64(len(feeList)) {
-			env.handleIntentionalFail(t, "Fee index (%d) > fee tier count (%d)", feeTiers[i], len(feeList))
-		}
-
-		pair, pairFound := app.DexKeeper.GetPairMap(ctx, pairId)
-		if !pairFound {
-			pair = types.PairMap{
-				PairId: pairId,
-				TokenPair: &types.TokenPairType{
-					CurrentTick0To1: tickIndexes[i] - feeList[feeTiers[i]].Fee,
-					CurrentTick1To0: tickIndexes[i] + feeList[feeTiers[i]].Fee,
-				},
-				TotalTickCount: 0,
-			}
-		}
-		pairs = append(pairs, pair)
+	// handle invalid fee index
+	if feeTier >= uint64(len(feeList)) {
+		env.handleIntentionalFail(t, "Fee index (%d) > fee tier count (%d)", feeTier, len(feeList))
 	}
 
-	return pairs
+	pair, pairFound := app.DexKeeper.GetPairMap(ctx, pairId)
+	if !pairFound {
+		pair = types.PairMap{
+			PairId: pairId,
+			TokenPair: &types.TokenPairType{
+				CurrentTick0To1: tickIndex - feeList[feeTier].Fee,
+				CurrentTick1To0: tickIndex + feeList[feeTier].Fee,
+			},
+			TotalTickCount: 0,
+		}
+	}
+
+	return pair
 }
 
 // Helper for getting shares. If no shares object exists, marks it as not found and fills in with an empty object. Must handle using the "found" bools.
-func (env *TestEnv) getShares(acc sdk.AccAddress, pairId string, tickIndexes []int64, feeTiers []uint64) ([]types.Shares, []bool) {
+func (env *TestEnv) makeShares(acc sdk.AccAddress, pairId string, tickIndexes []int64, feeTiers []uint64) ([]types.Shares, []bool) {
 	app, ctx := env.cosmos.app, env.cosmos.ctx
 	var sharesSlice []types.Shares
 	var sharesFoundSlice []bool
-	for i, _ := range tickIndexes {
+	for i := range tickIndexes {
 		shares, sharesFound := app.DexKeeper.GetShares(ctx, acc.String(), pairId, tickIndexes[i], feeTiers[i])
 		if !sharesFound {
 			// if shares not found verification will handle, so add empty object that will be ignored (to maintain length)
