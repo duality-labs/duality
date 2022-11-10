@@ -19,7 +19,7 @@ func createDepositEvent(creator string, receiver string, token0 string, token1 s
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateDepositEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, tokenDirection string, oldReserve0 string, oldReserve1 string, newReserve0 string, newReserve1 string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreateDepositEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, oldReserve0 string, oldReserve1 string, newReserve0 string, newReserve1 string, otherAttrs ...sdk.Attribute) sdk.Event {
 	return createDepositEvent(
 		creator,
 		receiver,
