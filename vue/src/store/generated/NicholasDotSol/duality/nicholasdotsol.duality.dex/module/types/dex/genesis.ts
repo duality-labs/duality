@@ -2,17 +2,17 @@
 import * as Long from "long";
 import { util, configure, Writer, Reader } from "protobufjs/minimal";
 import { Params } from "../dex/params";
-import { TickObject } from "../dex/tick_map";
-import { PairObject } from "../dex/pair_map";
+import { TickObject } from "../dex/tick_object";
+import { PairObject } from "../dex/pair_object";
 import { Tokens } from "../dex/tokens";
-import { TokenObject } from "../dex/token_map";
+import { TokenObject } from "../dex/token_object";
 import { Shares } from "../dex/shares";
 import { FeeList } from "../dex/fee_list";
-import { LimitOrderPoolUserShareObject } from "../dex/limit_order_pool_user_share_map";
-import { LimitOrderPoolUserSharesWithdrawnObject } from "../dex/limit_order_pool_user_shares_withdrawn";
-import { LimitOrderPoolTotalSharesObject } from "../dex/limit_order_pool_total_shares_map";
-import { LimitOrderPoolReserveObject } from "../dex/limit_order_pool_reserve_map";
-import { LimitOrderPoolFillObject } from "../dex/limit_order_pool_fill_map";
+import { LimitOrderPoolUserShareObject } from "../dex/limit_order_pool_user_share_object";
+import { LimitOrderPoolUserSharesWithdrawnObject } from "../dex/limit_order_pool_user_shares_withdrawn_object";
+import { LimitOrderPoolTotalSharesObject } from "../dex/limit_order_pool_total_shares_object";
+import { LimitOrderPoolReserveObject } from "../dex/limit_order_pool_reserve_object";
+import { LimitOrderPoolFillObject } from "../dex/limit_order_pool_fill_object";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -67,7 +67,10 @@ export const GenesisState = {
       writer.uint32(72).uint64(message.feeListCount);
     }
     for (const v of message.limitOrderPoolUserShareObjectList) {
-      LimitOrderPoolUserShareObject.encode(v!, writer.uint32(114).fork()).ldelim();
+      LimitOrderPoolUserShareObject.encode(
+        v!,
+        writer.uint32(114).fork()
+      ).ldelim();
     }
     for (const v of message.limitOrderPoolUserSharesWithdrawnObjectList) {
       LimitOrderPoolUserSharesWithdrawnObject.encode(
@@ -82,7 +85,10 @@ export const GenesisState = {
       ).ldelim();
     }
     for (const v of message.limitOrderPoolReserveObjectList) {
-      LimitOrderPoolReserveObject.encode(v!, writer.uint32(138).fork()).ldelim();
+      LimitOrderPoolReserveObject.encode(
+        v!,
+        writer.uint32(138).fork()
+      ).ldelim();
     }
     for (const v of message.limitOrderPoolFillObjectList) {
       LimitOrderPoolFillObject.encode(v!, writer.uint32(146).fork()).ldelim();
@@ -112,10 +118,14 @@ export const GenesisState = {
           message.params = Params.decode(reader, reader.uint32());
           break;
         case 2:
-          message.tickObjectList.push(TickObject.decode(reader, reader.uint32()));
+          message.tickObjectList.push(
+            TickObject.decode(reader, reader.uint32())
+          );
           break;
         case 3:
-          message.pairObjectList.push(PairObject.decode(reader, reader.uint32()));
+          message.pairObjectList.push(
+            PairObject.decode(reader, reader.uint32())
+          );
           break;
         case 4:
           message.tokensList.push(Tokens.decode(reader, reader.uint32()));
@@ -124,7 +134,9 @@ export const GenesisState = {
           message.tokensCount = longToNumber(reader.uint64() as Long);
           break;
         case 6:
-          message.tokenObjectList.push(TokenObject.decode(reader, reader.uint32()));
+          message.tokenObjectList.push(
+            TokenObject.decode(reader, reader.uint32())
+          );
           break;
         case 7:
           message.sharesList.push(Shares.decode(reader, reader.uint32()));
@@ -142,7 +154,10 @@ export const GenesisState = {
           break;
         case 15:
           message.limitOrderPoolUserSharesWithdrawnObjectList.push(
-            LimitOrderPoolUserSharesWithdrawnObject.decode(reader, reader.uint32())
+            LimitOrderPoolUserSharesWithdrawnObject.decode(
+              reader,
+              reader.uint32()
+            )
           );
           break;
         case 16:
@@ -206,7 +221,10 @@ export const GenesisState = {
     } else {
       message.tokensCount = 0;
     }
-    if (object.tokenObjectList !== undefined && object.tokenObjectList !== null) {
+    if (
+      object.tokenObjectList !== undefined &&
+      object.tokenObjectList !== null
+    ) {
       for (const e of object.tokenObjectList) {
         message.tokenObjectList.push(TokenObject.fromJSON(e));
       }
@@ -338,7 +356,8 @@ export const GenesisState = {
     }
     if (message.limitOrderPoolUserSharesWithdrawnObjectList) {
       obj.limitOrderPoolUserSharesWithdrawnObjectList = message.limitOrderPoolUserSharesWithdrawnObjectList.map(
-        (e) => (e ? LimitOrderPoolUserSharesWithdrawnObject.toJSON(e) : undefined)
+        (e) =>
+          e ? LimitOrderPoolUserSharesWithdrawnObject.toJSON(e) : undefined
       );
     } else {
       obj.limitOrderPoolUserSharesWithdrawnObjectList = [];
@@ -405,7 +424,10 @@ export const GenesisState = {
     } else {
       message.tokensCount = 0;
     }
-    if (object.tokenObjectList !== undefined && object.tokenObjectList !== null) {
+    if (
+      object.tokenObjectList !== undefined &&
+      object.tokenObjectList !== null
+    ) {
       for (const e of object.tokenObjectList) {
         message.tokenObjectList.push(TokenObject.fromPartial(e));
       }

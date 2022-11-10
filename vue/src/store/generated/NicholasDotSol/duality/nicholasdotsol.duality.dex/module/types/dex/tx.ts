@@ -46,10 +46,9 @@ export interface MsgSwapResponse {
 export interface MsgPlaceLimitOrder {
   creator: string;
   receiver: string;
-  tokenA: string;
-  tokenB: string;
-  tickIndex: number;
   tokenIn: string;
+  tokenOut: string;
+  tickIndex: number;
   amountIn: string;
 }
 
@@ -58,10 +57,9 @@ export interface MsgPlaceLimitOrderResponse {}
 export interface MsgWithdrawFilledLimitOrder {
   creator: string;
   receiver: string;
-  tokenA: string;
-  tokenB: string;
-  tickIndex: number;
   keyToken: string;
+  tokenOut: string;
+  tickIndex: number;
   key: number;
 }
 
@@ -797,10 +795,9 @@ export const MsgSwapResponse = {
 const baseMsgPlaceLimitOrder: object = {
   creator: "",
   receiver: "",
-  tokenA: "",
-  tokenB: "",
-  tickIndex: 0,
   tokenIn: "",
+  tokenOut: "",
+  tickIndex: 0,
   amountIn: "",
 };
 
@@ -815,20 +812,17 @@ export const MsgPlaceLimitOrder = {
     if (message.receiver !== "") {
       writer.uint32(18).string(message.receiver);
     }
-    if (message.tokenA !== "") {
-      writer.uint32(26).string(message.tokenA);
+    if (message.tokenIn !== "") {
+      writer.uint32(26).string(message.tokenIn);
     }
-    if (message.tokenB !== "") {
-      writer.uint32(34).string(message.tokenB);
+    if (message.tokenOut !== "") {
+      writer.uint32(34).string(message.tokenOut);
     }
     if (message.tickIndex !== 0) {
       writer.uint32(40).int64(message.tickIndex);
     }
-    if (message.tokenIn !== "") {
-      writer.uint32(50).string(message.tokenIn);
-    }
     if (message.amountIn !== "") {
-      writer.uint32(58).string(message.amountIn);
+      writer.uint32(50).string(message.amountIn);
     }
     return writer;
   },
@@ -847,18 +841,15 @@ export const MsgPlaceLimitOrder = {
           message.receiver = reader.string();
           break;
         case 3:
-          message.tokenA = reader.string();
+          message.tokenIn = reader.string();
           break;
         case 4:
-          message.tokenB = reader.string();
+          message.tokenOut = reader.string();
           break;
         case 5:
           message.tickIndex = longToNumber(reader.int64() as Long);
           break;
         case 6:
-          message.tokenIn = reader.string();
-          break;
-        case 7:
           message.amountIn = reader.string();
           break;
         default:
@@ -881,25 +872,20 @@ export const MsgPlaceLimitOrder = {
     } else {
       message.receiver = "";
     }
-    if (object.tokenA !== undefined && object.tokenA !== null) {
-      message.tokenA = String(object.tokenA);
+    if (object.tokenIn !== undefined && object.tokenIn !== null) {
+      message.tokenIn = String(object.tokenIn);
     } else {
-      message.tokenA = "";
+      message.tokenIn = "";
     }
-    if (object.tokenB !== undefined && object.tokenB !== null) {
-      message.tokenB = String(object.tokenB);
+    if (object.tokenOut !== undefined && object.tokenOut !== null) {
+      message.tokenOut = String(object.tokenOut);
     } else {
-      message.tokenB = "";
+      message.tokenOut = "";
     }
     if (object.tickIndex !== undefined && object.tickIndex !== null) {
       message.tickIndex = Number(object.tickIndex);
     } else {
       message.tickIndex = 0;
-    }
-    if (object.tokenIn !== undefined && object.tokenIn !== null) {
-      message.tokenIn = String(object.tokenIn);
-    } else {
-      message.tokenIn = "";
     }
     if (object.amountIn !== undefined && object.amountIn !== null) {
       message.amountIn = String(object.amountIn);
@@ -913,10 +899,9 @@ export const MsgPlaceLimitOrder = {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.receiver !== undefined && (obj.receiver = message.receiver);
-    message.tokenA !== undefined && (obj.tokenA = message.tokenA);
-    message.tokenB !== undefined && (obj.tokenB = message.tokenB);
-    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
     message.tokenIn !== undefined && (obj.tokenIn = message.tokenIn);
+    message.tokenOut !== undefined && (obj.tokenOut = message.tokenOut);
+    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
     message.amountIn !== undefined && (obj.amountIn = message.amountIn);
     return obj;
   },
@@ -933,25 +918,20 @@ export const MsgPlaceLimitOrder = {
     } else {
       message.receiver = "";
     }
-    if (object.tokenA !== undefined && object.tokenA !== null) {
-      message.tokenA = object.tokenA;
+    if (object.tokenIn !== undefined && object.tokenIn !== null) {
+      message.tokenIn = object.tokenIn;
     } else {
-      message.tokenA = "";
+      message.tokenIn = "";
     }
-    if (object.tokenB !== undefined && object.tokenB !== null) {
-      message.tokenB = object.tokenB;
+    if (object.tokenOut !== undefined && object.tokenOut !== null) {
+      message.tokenOut = object.tokenOut;
     } else {
-      message.tokenB = "";
+      message.tokenOut = "";
     }
     if (object.tickIndex !== undefined && object.tickIndex !== null) {
       message.tickIndex = object.tickIndex;
     } else {
       message.tickIndex = 0;
-    }
-    if (object.tokenIn !== undefined && object.tokenIn !== null) {
-      message.tokenIn = object.tokenIn;
-    } else {
-      message.tokenIn = "";
     }
     if (object.amountIn !== undefined && object.amountIn !== null) {
       message.amountIn = object.amountIn;
@@ -1017,10 +997,9 @@ export const MsgPlaceLimitOrderResponse = {
 const baseMsgWithdrawFilledLimitOrder: object = {
   creator: "",
   receiver: "",
-  tokenA: "",
-  tokenB: "",
-  tickIndex: 0,
   keyToken: "",
+  tokenOut: "",
+  tickIndex: 0,
   key: 0,
 };
 
@@ -1035,20 +1014,17 @@ export const MsgWithdrawFilledLimitOrder = {
     if (message.receiver !== "") {
       writer.uint32(18).string(message.receiver);
     }
-    if (message.tokenA !== "") {
-      writer.uint32(26).string(message.tokenA);
+    if (message.keyToken !== "") {
+      writer.uint32(26).string(message.keyToken);
     }
-    if (message.tokenB !== "") {
-      writer.uint32(34).string(message.tokenB);
+    if (message.tokenOut !== "") {
+      writer.uint32(34).string(message.tokenOut);
     }
     if (message.tickIndex !== 0) {
       writer.uint32(40).int64(message.tickIndex);
     }
-    if (message.keyToken !== "") {
-      writer.uint32(50).string(message.keyToken);
-    }
     if (message.key !== 0) {
-      writer.uint32(56).uint64(message.key);
+      writer.uint32(48).uint64(message.key);
     }
     return writer;
   },
@@ -1072,18 +1048,15 @@ export const MsgWithdrawFilledLimitOrder = {
           message.receiver = reader.string();
           break;
         case 3:
-          message.tokenA = reader.string();
+          message.keyToken = reader.string();
           break;
         case 4:
-          message.tokenB = reader.string();
+          message.tokenOut = reader.string();
           break;
         case 5:
           message.tickIndex = longToNumber(reader.int64() as Long);
           break;
         case 6:
-          message.keyToken = reader.string();
-          break;
-        case 7:
           message.key = longToNumber(reader.uint64() as Long);
           break;
         default:
@@ -1108,25 +1081,20 @@ export const MsgWithdrawFilledLimitOrder = {
     } else {
       message.receiver = "";
     }
-    if (object.tokenA !== undefined && object.tokenA !== null) {
-      message.tokenA = String(object.tokenA);
+    if (object.keyToken !== undefined && object.keyToken !== null) {
+      message.keyToken = String(object.keyToken);
     } else {
-      message.tokenA = "";
+      message.keyToken = "";
     }
-    if (object.tokenB !== undefined && object.tokenB !== null) {
-      message.tokenB = String(object.tokenB);
+    if (object.tokenOut !== undefined && object.tokenOut !== null) {
+      message.tokenOut = String(object.tokenOut);
     } else {
-      message.tokenB = "";
+      message.tokenOut = "";
     }
     if (object.tickIndex !== undefined && object.tickIndex !== null) {
       message.tickIndex = Number(object.tickIndex);
     } else {
       message.tickIndex = 0;
-    }
-    if (object.keyToken !== undefined && object.keyToken !== null) {
-      message.keyToken = String(object.keyToken);
-    } else {
-      message.keyToken = "";
     }
     if (object.key !== undefined && object.key !== null) {
       message.key = Number(object.key);
@@ -1140,10 +1108,9 @@ export const MsgWithdrawFilledLimitOrder = {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.receiver !== undefined && (obj.receiver = message.receiver);
-    message.tokenA !== undefined && (obj.tokenA = message.tokenA);
-    message.tokenB !== undefined && (obj.tokenB = message.tokenB);
-    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
     message.keyToken !== undefined && (obj.keyToken = message.keyToken);
+    message.tokenOut !== undefined && (obj.tokenOut = message.tokenOut);
+    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
     message.key !== undefined && (obj.key = message.key);
     return obj;
   },
@@ -1164,25 +1131,20 @@ export const MsgWithdrawFilledLimitOrder = {
     } else {
       message.receiver = "";
     }
-    if (object.tokenA !== undefined && object.tokenA !== null) {
-      message.tokenA = object.tokenA;
+    if (object.keyToken !== undefined && object.keyToken !== null) {
+      message.keyToken = object.keyToken;
     } else {
-      message.tokenA = "";
+      message.keyToken = "";
     }
-    if (object.tokenB !== undefined && object.tokenB !== null) {
-      message.tokenB = object.tokenB;
+    if (object.tokenOut !== undefined && object.tokenOut !== null) {
+      message.tokenOut = object.tokenOut;
     } else {
-      message.tokenB = "";
+      message.tokenOut = "";
     }
     if (object.tickIndex !== undefined && object.tickIndex !== null) {
       message.tickIndex = object.tickIndex;
     } else {
       message.tickIndex = 0;
-    }
-    if (object.keyToken !== undefined && object.keyToken !== null) {
-      message.keyToken = object.keyToken;
-    } else {
-      message.keyToken = "";
     }
     if (object.key !== undefined && object.key !== null) {
       message.key = object.key;

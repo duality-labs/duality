@@ -2,21 +2,21 @@
 import { Reader, util, configure, Writer } from "protobufjs/minimal";
 import * as Long from "long";
 import { Params } from "../dex/params";
-import { TickObject } from "../dex/tick_map";
+import { TickObject } from "../dex/tick_object";
 import {
   PageRequest,
   PageResponse,
 } from "../cosmos/base/query/v1beta1/pagination";
-import { PairObject } from "../dex/pair_map";
+import { PairObject } from "../dex/pair_object";
 import { Tokens } from "../dex/tokens";
-import { TokenObject } from "../dex/token_map";
+import { TokenObject } from "../dex/token_object";
 import { Shares } from "../dex/shares";
 import { FeeList } from "../dex/fee_list";
-import { LimitOrderPoolUserShareObject } from "../dex/limit_order_pool_user_share_map";
-import { LimitOrderPoolUserSharesWithdrawnObject } from "../dex/limit_order_pool_user_shares_withdrawn";
-import { LimitOrderPoolTotalSharesObject } from "../dex/limit_order_pool_total_shares_map";
-import { LimitOrderPoolReserveObject } from "../dex/limit_order_pool_reserve_map";
-import { LimitOrderPoolFillObject } from "../dex/limit_order_pool_fill_map";
+import { LimitOrderPoolUserShareObject } from "../dex/limit_order_pool_user_share_object";
+import { LimitOrderPoolUserSharesWithdrawnObject } from "../dex/limit_order_pool_user_shares_withdrawn_object";
+import { LimitOrderPoolTotalSharesObject } from "../dex/limit_order_pool_total_shares_object";
+import { LimitOrderPoolReserveObject } from "../dex/limit_order_pool_reserve_object";
+import { LimitOrderPoolFillObject } from "../dex/limit_order_pool_fill_object";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -352,10 +352,15 @@ export const QueryGetTickObjectRequest = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryGetTickObjectRequest {
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryGetTickObjectRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseQueryGetTickObjectRequest } as QueryGetTickObjectRequest;
+    const message = {
+      ...baseQueryGetTickObjectRequest,
+    } as QueryGetTickObjectRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -374,7 +379,9 @@ export const QueryGetTickObjectRequest = {
   },
 
   fromJSON(object: any): QueryGetTickObjectRequest {
-    const message = { ...baseQueryGetTickObjectRequest } as QueryGetTickObjectRequest;
+    const message = {
+      ...baseQueryGetTickObjectRequest,
+    } as QueryGetTickObjectRequest;
     if (object.tickIndex !== undefined && object.tickIndex !== null) {
       message.tickIndex = Number(object.tickIndex);
     } else {
@@ -398,7 +405,9 @@ export const QueryGetTickObjectRequest = {
   fromPartial(
     object: DeepPartial<QueryGetTickObjectRequest>
   ): QueryGetTickObjectRequest {
-    const message = { ...baseQueryGetTickObjectRequest } as QueryGetTickObjectRequest;
+    const message = {
+      ...baseQueryGetTickObjectRequest,
+    } as QueryGetTickObjectRequest;
     if (object.tickIndex !== undefined && object.tickIndex !== null) {
       message.tickIndex = object.tickIndex;
     } else {
@@ -426,7 +435,10 @@ export const QueryGetTickObjectResponse = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryGetTickObjectResponse {
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryGetTickObjectResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
@@ -495,10 +507,15 @@ export const QueryAllTickObjectRequest = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryAllTickObjectRequest {
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryAllTickObjectRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseQueryAllTickObjectRequest } as QueryAllTickObjectRequest;
+    const message = {
+      ...baseQueryAllTickObjectRequest,
+    } as QueryAllTickObjectRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -514,7 +531,9 @@ export const QueryAllTickObjectRequest = {
   },
 
   fromJSON(object: any): QueryAllTickObjectRequest {
-    const message = { ...baseQueryAllTickObjectRequest } as QueryAllTickObjectRequest;
+    const message = {
+      ...baseQueryAllTickObjectRequest,
+    } as QueryAllTickObjectRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromJSON(object.pagination);
     } else {
@@ -535,7 +554,9 @@ export const QueryAllTickObjectRequest = {
   fromPartial(
     object: DeepPartial<QueryAllTickObjectRequest>
   ): QueryAllTickObjectRequest {
-    const message = { ...baseQueryAllTickObjectRequest } as QueryAllTickObjectRequest;
+    const message = {
+      ...baseQueryAllTickObjectRequest,
+    } as QueryAllTickObjectRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromPartial(object.pagination);
     } else {
@@ -564,7 +585,10 @@ export const QueryAllTickObjectResponse = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryAllTickObjectResponse {
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryAllTickObjectResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
@@ -656,10 +680,15 @@ export const QueryGetPairObjectRequest = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryGetPairObjectRequest {
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryGetPairObjectRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseQueryGetPairObjectRequest } as QueryGetPairObjectRequest;
+    const message = {
+      ...baseQueryGetPairObjectRequest,
+    } as QueryGetPairObjectRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -675,7 +704,9 @@ export const QueryGetPairObjectRequest = {
   },
 
   fromJSON(object: any): QueryGetPairObjectRequest {
-    const message = { ...baseQueryGetPairObjectRequest } as QueryGetPairObjectRequest;
+    const message = {
+      ...baseQueryGetPairObjectRequest,
+    } as QueryGetPairObjectRequest;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = String(object.pairId);
     } else {
@@ -693,7 +724,9 @@ export const QueryGetPairObjectRequest = {
   fromPartial(
     object: DeepPartial<QueryGetPairObjectRequest>
   ): QueryGetPairObjectRequest {
-    const message = { ...baseQueryGetPairObjectRequest } as QueryGetPairObjectRequest;
+    const message = {
+      ...baseQueryGetPairObjectRequest,
+    } as QueryGetPairObjectRequest;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = object.pairId;
     } else {
@@ -716,7 +749,10 @@ export const QueryGetPairObjectResponse = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryGetPairObjectResponse {
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryGetPairObjectResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
@@ -785,10 +821,15 @@ export const QueryAllPairObjectRequest = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryAllPairObjectRequest {
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryAllPairObjectRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseQueryAllPairObjectRequest } as QueryAllPairObjectRequest;
+    const message = {
+      ...baseQueryAllPairObjectRequest,
+    } as QueryAllPairObjectRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -804,7 +845,9 @@ export const QueryAllPairObjectRequest = {
   },
 
   fromJSON(object: any): QueryAllPairObjectRequest {
-    const message = { ...baseQueryAllPairObjectRequest } as QueryAllPairObjectRequest;
+    const message = {
+      ...baseQueryAllPairObjectRequest,
+    } as QueryAllPairObjectRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromJSON(object.pagination);
     } else {
@@ -825,7 +868,9 @@ export const QueryAllPairObjectRequest = {
   fromPartial(
     object: DeepPartial<QueryAllPairObjectRequest>
   ): QueryAllPairObjectRequest {
-    const message = { ...baseQueryAllPairObjectRequest } as QueryAllPairObjectRequest;
+    const message = {
+      ...baseQueryAllPairObjectRequest,
+    } as QueryAllPairObjectRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromPartial(object.pagination);
     } else {
@@ -854,7 +899,10 @@ export const QueryAllPairObjectResponse = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryAllPairObjectResponse {
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryAllPairObjectResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
@@ -1222,7 +1270,10 @@ export const QueryGetTokenObjectRequest = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryGetTokenObjectRequest {
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryGetTokenObjectRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
@@ -1283,7 +1334,10 @@ export const QueryGetTokenObjectResponse = {
     writer: Writer = Writer.create()
   ): Writer {
     if (message.tokenObject !== undefined) {
-      TokenObject.encode(message.tokenObject, writer.uint32(10).fork()).ldelim();
+      TokenObject.encode(
+        message.tokenObject,
+        writer.uint32(10).fork()
+      ).ldelim();
     }
     return writer;
   },
@@ -1360,7 +1414,10 @@ export const QueryAllTokenObjectRequest = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryAllTokenObjectRequest {
+  decode(
+    input: Reader | Uint8Array,
+    length?: number
+  ): QueryAllTokenObjectRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
@@ -2345,7 +2402,9 @@ export const QueryGetLimitOrderPoolUserShareObjectResponse = {
     const obj: any = {};
     message.limitOrderPoolUserShareObject !== undefined &&
       (obj.limitOrderPoolUserShareObject = message.limitOrderPoolUserShareObject
-        ? LimitOrderPoolUserShareObject.toJSON(message.limitOrderPoolUserShareObject)
+        ? LimitOrderPoolUserShareObject.toJSON(
+            message.limitOrderPoolUserShareObject
+          )
         : undefined);
     return obj;
   },
@@ -2450,7 +2509,10 @@ export const QueryAllLimitOrderPoolUserShareObjectResponse = {
     writer: Writer = Writer.create()
   ): Writer {
     for (const v of message.limitOrderPoolUserShareObject) {
-      LimitOrderPoolUserShareObject.encode(v!, writer.uint32(10).fork()).ldelim();
+      LimitOrderPoolUserShareObject.encode(
+        v!,
+        writer.uint32(10).fork()
+      ).ldelim();
     }
     if (message.pagination !== undefined) {
       PageResponse.encode(
@@ -2621,7 +2683,9 @@ export const QueryGetLimitOrderPoolUserSharesWithdrawnObjectRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetLimitOrderPoolUserSharesWithdrawnObjectRequest {
+  fromJSON(
+    object: any
+  ): QueryGetLimitOrderPoolUserSharesWithdrawnObjectRequest {
     const message = {
       ...baseQueryGetLimitOrderPoolUserSharesWithdrawnObjectRequest,
     } as QueryGetLimitOrderPoolUserSharesWithdrawnObjectRequest;
@@ -2653,7 +2717,9 @@ export const QueryGetLimitOrderPoolUserSharesWithdrawnObjectRequest = {
     return message;
   },
 
-  toJSON(message: QueryGetLimitOrderPoolUserSharesWithdrawnObjectRequest): unknown {
+  toJSON(
+    message: QueryGetLimitOrderPoolUserSharesWithdrawnObjectRequest
+  ): unknown {
     const obj: any = {};
     message.pairId !== undefined && (obj.pairId = message.pairId);
     message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
@@ -2740,7 +2806,9 @@ export const QueryGetLimitOrderPoolUserSharesWithdrawnObjectResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetLimitOrderPoolUserSharesWithdrawnObjectResponse {
+  fromJSON(
+    object: any
+  ): QueryGetLimitOrderPoolUserSharesWithdrawnObjectResponse {
     const message = {
       ...baseQueryGetLimitOrderPoolUserSharesWithdrawnObjectResponse,
     } as QueryGetLimitOrderPoolUserSharesWithdrawnObjectResponse;
@@ -2757,7 +2825,9 @@ export const QueryGetLimitOrderPoolUserSharesWithdrawnObjectResponse = {
     return message;
   },
 
-  toJSON(message: QueryGetLimitOrderPoolUserSharesWithdrawnObjectResponse): unknown {
+  toJSON(
+    message: QueryGetLimitOrderPoolUserSharesWithdrawnObjectResponse
+  ): unknown {
     const obj: any = {};
     message.limitOrderPoolUserSharesWithdrawnObject !== undefined &&
       (obj.limitOrderPoolUserSharesWithdrawnObject = message.limitOrderPoolUserSharesWithdrawnObject
@@ -2824,7 +2894,9 @@ export const QueryAllLimitOrderPoolUserSharesWithdrawnObjectRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllLimitOrderPoolUserSharesWithdrawnObjectRequest {
+  fromJSON(
+    object: any
+  ): QueryAllLimitOrderPoolUserSharesWithdrawnObjectRequest {
     const message = {
       ...baseQueryAllLimitOrderPoolUserSharesWithdrawnObjectRequest,
     } as QueryAllLimitOrderPoolUserSharesWithdrawnObjectRequest;
@@ -2836,7 +2908,9 @@ export const QueryAllLimitOrderPoolUserSharesWithdrawnObjectRequest = {
     return message;
   },
 
-  toJSON(message: QueryAllLimitOrderPoolUserSharesWithdrawnObjectRequest): unknown {
+  toJSON(
+    message: QueryAllLimitOrderPoolUserSharesWithdrawnObjectRequest
+  ): unknown {
     const obj: any = {};
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -2897,7 +2971,10 @@ export const QueryAllLimitOrderPoolUserSharesWithdrawnObjectResponse = {
       switch (tag >>> 3) {
         case 1:
           message.limitOrderPoolUserSharesWithdrawnObject.push(
-            LimitOrderPoolUserSharesWithdrawnObject.decode(reader, reader.uint32())
+            LimitOrderPoolUserSharesWithdrawnObject.decode(
+              reader,
+              reader.uint32()
+            )
           );
           break;
         case 2:
@@ -2911,7 +2988,9 @@ export const QueryAllLimitOrderPoolUserSharesWithdrawnObjectResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllLimitOrderPoolUserSharesWithdrawnObjectResponse {
+  fromJSON(
+    object: any
+  ): QueryAllLimitOrderPoolUserSharesWithdrawnObjectResponse {
     const message = {
       ...baseQueryAllLimitOrderPoolUserSharesWithdrawnObjectResponse,
     } as QueryAllLimitOrderPoolUserSharesWithdrawnObjectResponse;
@@ -2934,11 +3013,14 @@ export const QueryAllLimitOrderPoolUserSharesWithdrawnObjectResponse = {
     return message;
   },
 
-  toJSON(message: QueryAllLimitOrderPoolUserSharesWithdrawnObjectResponse): unknown {
+  toJSON(
+    message: QueryAllLimitOrderPoolUserSharesWithdrawnObjectResponse
+  ): unknown {
     const obj: any = {};
     if (message.limitOrderPoolUserSharesWithdrawnObject) {
       obj.limitOrderPoolUserSharesWithdrawnObject = message.limitOrderPoolUserSharesWithdrawnObject.map(
-        (e) => (e ? LimitOrderPoolUserSharesWithdrawnObject.toJSON(e) : undefined)
+        (e) =>
+          e ? LimitOrderPoolUserSharesWithdrawnObject.toJSON(e) : undefined
       );
     } else {
       obj.limitOrderPoolUserSharesWithdrawnObject = [];
@@ -3567,7 +3649,9 @@ export const QueryGetLimitOrderPoolReserveObjectResponse = {
     const obj: any = {};
     message.limitOrderPoolReserveObject !== undefined &&
       (obj.limitOrderPoolReserveObject = message.limitOrderPoolReserveObject
-        ? LimitOrderPoolReserveObject.toJSON(message.limitOrderPoolReserveObject)
+        ? LimitOrderPoolReserveObject.toJSON(
+            message.limitOrderPoolReserveObject
+          )
         : undefined);
     return obj;
   },
@@ -3738,8 +3822,8 @@ export const QueryAllLimitOrderPoolReserveObjectResponse = {
   toJSON(message: QueryAllLimitOrderPoolReserveObjectResponse): unknown {
     const obj: any = {};
     if (message.limitOrderPoolReserveObject) {
-      obj.limitOrderPoolReserveObject = message.limitOrderPoolReserveObject.map((e) =>
-        e ? LimitOrderPoolReserveObject.toJSON(e) : undefined
+      obj.limitOrderPoolReserveObject = message.limitOrderPoolReserveObject.map(
+        (e) => (e ? LimitOrderPoolReserveObject.toJSON(e) : undefined)
       );
     } else {
       obj.limitOrderPoolReserveObject = [];
@@ -4120,7 +4204,9 @@ export const QueryAllLimitOrderPoolFillObjectResponse = {
       object.limitOrderPoolFillObject !== null
     ) {
       for (const e of object.limitOrderPoolFillObject) {
-        message.limitOrderPoolFillObject.push(LimitOrderPoolFillObject.fromJSON(e));
+        message.limitOrderPoolFillObject.push(
+          LimitOrderPoolFillObject.fromJSON(e)
+        );
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -4178,19 +4264,29 @@ export interface Query {
   /** Parameters queries the parameters of the module. */
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
   /** Queries a TickObject by index. */
-  TickObject(request: QueryGetTickObjectRequest): Promise<QueryGetTickObjectResponse>;
+  TickObject(
+    request: QueryGetTickObjectRequest
+  ): Promise<QueryGetTickObjectResponse>;
   /** Queries a list of TickObject items. */
-  TickObjectAll(request: QueryAllTickObjectRequest): Promise<QueryAllTickObjectResponse>;
+  TickObjectAll(
+    request: QueryAllTickObjectRequest
+  ): Promise<QueryAllTickObjectResponse>;
   /** Queries a PairObject by index. */
-  PairObject(request: QueryGetPairObjectRequest): Promise<QueryGetPairObjectResponse>;
+  PairObject(
+    request: QueryGetPairObjectRequest
+  ): Promise<QueryGetPairObjectResponse>;
   /** Queries a list of PairObject items. */
-  PairObjectAll(request: QueryAllPairObjectRequest): Promise<QueryAllPairObjectResponse>;
+  PairObjectAll(
+    request: QueryAllPairObjectRequest
+  ): Promise<QueryAllPairObjectResponse>;
   /** Queries a Tokens by id. */
   Tokens(request: QueryGetTokensRequest): Promise<QueryGetTokensResponse>;
   /** Queries a list of Tokens items. */
   TokensAll(request: QueryAllTokensRequest): Promise<QueryAllTokensResponse>;
   /** Queries a TokenObject by index. */
-  TokenObject(request: QueryGetTokenObjectRequest): Promise<QueryGetTokenObjectResponse>;
+  TokenObject(
+    request: QueryGetTokenObjectRequest
+  ): Promise<QueryGetTokenObjectResponse>;
   /** Queries a list of TokenObject items. */
   TokenObjectAll(
     request: QueryAllTokenObjectRequest
@@ -4260,7 +4356,9 @@ export class QueryClientImpl implements Query {
     return promise.then((data) => QueryParamsResponse.decode(new Reader(data)));
   }
 
-  TickObject(request: QueryGetTickObjectRequest): Promise<QueryGetTickObjectResponse> {
+  TickObject(
+    request: QueryGetTickObjectRequest
+  ): Promise<QueryGetTickObjectResponse> {
     const data = QueryGetTickObjectRequest.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
@@ -4286,7 +4384,9 @@ export class QueryClientImpl implements Query {
     );
   }
 
-  PairObject(request: QueryGetPairObjectRequest): Promise<QueryGetPairObjectResponse> {
+  PairObject(
+    request: QueryGetPairObjectRequest
+  ): Promise<QueryGetPairObjectResponse> {
     const data = QueryGetPairObjectRequest.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
@@ -4458,7 +4558,9 @@ export class QueryClientImpl implements Query {
       data
     );
     return promise.then((data) =>
-      QueryGetLimitOrderPoolUserSharesWithdrawnObjectResponse.decode(new Reader(data))
+      QueryGetLimitOrderPoolUserSharesWithdrawnObjectResponse.decode(
+        new Reader(data)
+      )
     );
   }
 
@@ -4474,7 +4576,9 @@ export class QueryClientImpl implements Query {
       data
     );
     return promise.then((data) =>
-      QueryAllLimitOrderPoolUserSharesWithdrawnObjectResponse.decode(new Reader(data))
+      QueryAllLimitOrderPoolUserSharesWithdrawnObjectResponse.decode(
+        new Reader(data)
+      )
     );
   }
 
@@ -4545,7 +4649,9 @@ export class QueryClientImpl implements Query {
   LimitOrderPoolFillObject(
     request: QueryGetLimitOrderPoolFillObjectRequest
   ): Promise<QueryGetLimitOrderPoolFillObjectResponse> {
-    const data = QueryGetLimitOrderPoolFillObjectRequest.encode(request).finish();
+    const data = QueryGetLimitOrderPoolFillObjectRequest.encode(
+      request
+    ).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
       "LimitOrderPoolFillObject",
@@ -4559,7 +4665,9 @@ export class QueryClientImpl implements Query {
   LimitOrderPoolFillObjectAll(
     request: QueryAllLimitOrderPoolFillObjectRequest
   ): Promise<QueryAllLimitOrderPoolFillObjectResponse> {
-    const data = QueryAllLimitOrderPoolFillObjectRequest.encode(request).finish();
+    const data = QueryAllLimitOrderPoolFillObjectRequest.encode(
+      request
+    ).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
       "LimitOrderPoolFillObjectAll",

@@ -2,18 +2,18 @@ import { txClient, queryClient, MissingWalletError , registry} from './module'
 
 import { FeeList } from "./module/types/dex/fee_list"
 import { LimitOrderPool } from "./module/types/dex/limit_order_pool"
-import { LimitOrderPoolFillObject } from "./module/types/dex/limit_order_pool_fill_map"
-import { LimitOrderPoolReserveObject } from "./module/types/dex/limit_order_pool_reserve_map"
-import { LimitOrderPoolTotalSharesObject } from "./module/types/dex/limit_order_pool_total_shares_map"
-import { LimitOrderPoolUserShareObject } from "./module/types/dex/limit_order_pool_user_share_map"
-import { LimitOrderPoolUserSharesWithdrawnObject } from "./module/types/dex/limit_order_pool_user_shares_withdrawn"
-import { PairObject } from "./module/types/dex/pair_map"
+import { LimitOrderPoolFillObject } from "./module/types/dex/limit_order_pool_fill_object"
+import { LimitOrderPoolReserveObject } from "./module/types/dex/limit_order_pool_reserve_object"
+import { LimitOrderPoolTotalSharesObject } from "./module/types/dex/limit_order_pool_total_shares_object"
+import { LimitOrderPoolUserShareObject } from "./module/types/dex/limit_order_pool_user_share_object"
+import { LimitOrderPoolUserSharesWithdrawnObject } from "./module/types/dex/limit_order_pool_user_shares_withdrawn_object"
+import { PairObject } from "./module/types/dex/pair_object"
 import { Params } from "./module/types/dex/params"
 import { Reserve0AndSharesType } from "./module/types/dex/reserve_0_and_shares_type"
 import { Shares } from "./module/types/dex/shares"
 import { TickDataType } from "./module/types/dex/tick_data_type"
-import { TickObject } from "./module/types/dex/tick_map"
-import { TokenObject } from "./module/types/dex/token_map"
+import { TickObject } from "./module/types/dex/tick_object"
+import { TokenObject } from "./module/types/dex/token_object"
 import { TokenPairType } from "./module/types/dex/token_pair_type"
 import { Tokens } from "./module/types/dex/tokens"
 
@@ -862,33 +862,18 @@ export default {
 				}
 			}
 		},
-		async sendMsgDeposit({ rootGetters }, { value, fee = [], memo = '' }) {
+		async sendMsgSwap({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgDeposit(value)
+				const msg = await txClient.msgSwap(value)
 				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
 	gas: "200000" }, memo})
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgSwap:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgDeposit:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgCancelLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgCancelLimitOrder(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgCancelLimitOrder:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgSwap:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -907,6 +892,21 @@ export default {
 				}
 			}
 		},
+		async sendMsgCancelLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgCancelLimitOrder(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgCancelLimitOrder:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
 		async sendMsgWithdrawFilledLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -922,18 +922,18 @@ export default {
 				}
 			}
 		},
-		async sendMsgSwap({ rootGetters }, { value, fee = [], memo = '' }) {
+		async sendMsgDeposit({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgSwap(value)
+				const msg = await txClient.msgDeposit(value)
 				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
 	gas: "200000" }, memo})
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSwap:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgSwap:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgDeposit:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -951,29 +951,16 @@ export default {
 				}
 			}
 		},
-		async MsgDeposit({ rootGetters }, { value }) {
+		async MsgSwap({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgDeposit(value)
+				const msg = await txClient.msgSwap(value)
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgSwap:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgDeposit:Create Could not create message: ' + e.message)
-				}
-			}
-		},
-		async MsgCancelLimitOrder({ rootGetters }, { value }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgCancelLimitOrder(value)
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgCancelLimitOrder:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgSwap:Create Could not create message: ' + e.message)
 				}
 			}
 		},
@@ -990,6 +977,19 @@ export default {
 				}
 			}
 		},
+		async MsgCancelLimitOrder({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgCancelLimitOrder(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgCancelLimitOrder:Create Could not create message: ' + e.message)
+				}
+			}
+		},
 		async MsgWithdrawFilledLimitOrder({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -1003,16 +1003,16 @@ export default {
 				}
 			}
 		},
-		async MsgSwap({ rootGetters }, { value }) {
+		async MsgDeposit({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgSwap(value)
+				const msg = await txClient.msgDeposit(value)
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSwap:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgSwap:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgDeposit:Create Could not create message: ' + e.message)
 				}
 			}
 		},
