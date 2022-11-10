@@ -113,6 +113,7 @@ func (env *TestEnv) TestDeposit(t *testing.T, denomA string, denomB string, amou
 
 	}
 
+	// verify correct amount of shares in every tick
 	for i := range amounts0 {
 		expectedShares := sharesCalcAccum[tickIndexes[i]][feeTiers[i]]
 		// verify amount of shares minted for acc

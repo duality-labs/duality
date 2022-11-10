@@ -98,7 +98,7 @@ func trueAmounts(amount0 sdk.Dec, amount1 sdk.Dec, lowerReserve1 sdk.Dec, upperR
 	return trueAmount0, trueAmount1
 }
 
-// Helper function to calculate if current ticks change
+// Pure helper function for calculateNewCurrentTicks
 func calculateNewCurrentTicksPure(amount0 sdk.Dec, amount1 sdk.Dec, tickIndex int64, fee int64, curr0to1 int64, curr1to0 int64) (int64, int64) {
 	// this corresponds to lines 245-253 in function DepositHelper of core.go
 	// If a new tick has been placed that tigtens the range between currentTick0to1 and currentTick0to1 update CurrentTicks to the tighest ticks
@@ -112,6 +112,7 @@ func calculateNewCurrentTicksPure(amount0 sdk.Dec, amount1 sdk.Dec, tickIndex in
 	return new0to1, new1to0
 }
 
+// Helper function to calculate if current ticks change
 func (env *TestEnv) calculateNewCurrentTicks(amount0 sdk.Dec, amount1 sdk.Dec, tickIndex int64, feeIndex uint64, pair types.PairMap) (new0to1 int64, new1to0 int64) {
 	k, ctx := env.cosmos.app.DexKeeper, env.cosmos.ctx
 	feelist := k.GetAllFeeList(ctx)
