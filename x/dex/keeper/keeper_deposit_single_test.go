@@ -1,191 +1,136 @@
 package keeper_test
 
 import (
-	// stdlib
-
-	// cosmos SDK
-	"testing"
-
 	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (s *MsgServerTestSuite) TestSingleDeposit() {
+func (s *MsgServerTestSuite) TestSingleDepositMinFee() {
+	acc := s.alice
+	denomA, denomB := "TokenA", "TokenB"
+	s.fundAliceBalances(10, 10)
+	amountsA, amountsB := []sdk.Dec{NewDec(10)}, []sdk.Dec{NewDec(10)}
+	tickIndexes := []int64{0}
+	feeTiers := []uint64{0}
+	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, nil)
+
+}
+
+func (s *MsgServerTestSuite) TestSingleDepositMaxFee() {
+	acc := s.alice
+	denomA, denomB := "TokenA", "TokenB"
+	s.fundAliceBalances(10, 10)
+	amountsA, amountsB := []sdk.Dec{NewDec(10)}, []sdk.Dec{NewDec(10)}
+	tickIndexes := []int64{0}
+	feeTiers := []uint64{uint64(len(s.feeTiers) - 1)}
+	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, nil)
+
+}
+
+func (s *MsgServerTestSuite) TestSingleDepositInvalidFee() {
+	acc := s.alice
+	denomA, denomB := "TokenA", "TokenB"
+	s.fundAliceBalances(10, 10)
+	amountsA, amountsB := []sdk.Dec{NewDec(10)}, []sdk.Dec{NewDec(10)}
+	tickIndexes := []int64{0}
+	feeTiers := []uint64{uint64(len(s.feeTiers))}
+	expectedTxErr := types.ErrValidFeeIndexNotFound
+	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, expectedTxErr)
+
+}
+
+func (s *MsgServerTestSuite) TestSingleDepositInitPair() {
+	acc := s.alice
+	denomA, denomB := "TokenA", "TokenB"
+	s.fundAliceBalances(10, 10)
+	amountsA, amountsB := []sdk.Dec{NewDec(10)}, []sdk.Dec{NewDec(10)}
+	tickIndexes := []int64{0}
+	feeTiers := []uint64{0}
+	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, nil)
+
+}
+
+func (s *MsgServerTestSuite) TestSingleDepositInitTick() {
+	acc := s.alice
+	denomA, denomB := "TokenA", "TokenB"
+	s.fundAliceBalances(10, 10)
+	amountsA, amountsB := []sdk.Dec{NewDec(5)}, []sdk.Dec{NewDec(5)}
+	tickIndexes := []int64{0}
+	feeTiers := []uint64{0}
+	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, nil)
+
+	newTickIndexes := []int64{1}
+	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, newTickIndexes, feeTiers, nil)
+
+}
+
+func (s *MsgServerTestSuite) TestSingleDepositInitFeeTier() {
+	acc := s.alice
+	denomA, denomB := "TokenA", "TokenB"
+	s.fundAliceBalances(10, 10)
+	amountsA, amountsB := []sdk.Dec{NewDec(5)}, []sdk.Dec{NewDec(5)}
+	tickIndexes := []int64{0}
+	feeTiers := []uint64{0}
+	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, nil)
+
+	newFeeTiers := []uint64{1}
+	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, newFeeTiers, nil)
+
+}
+
+func (s *MsgServerTestSuite) TestSingleDepositExistingPair() {
+	acc := s.alice
+	denomA, denomB := "TokenA", "TokenB"
+	s.fundAliceBalances(10, 10)
+	amountsA, amountsB := []sdk.Dec{NewDec(5)}, []sdk.Dec{NewDec(5)}
+	tickIndexes := []int64{0}
+	feeTiers := []uint64{0}
+	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, nil)
+	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, nil)
+}
+
+func (s *MsgServerTestSuite) TestSingleDepositBehindEnemyLines() {
+	acc := s.alice
+	denomA, denomB := "TokenA", "TokenB"
+	s.fundAliceBalances(10, 10)
+	amountsA, amountsB := []sdk.Dec{NewDec(5)}, []sdk.Dec{NewDec(5)}
+	tickIndexes := []int64{0}
+	feeTiers := []uint64{0}
+	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, nil)
+	newTickIndexes := []int64{-3}
+	newFeeTiers := []uint64{1}
+	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, newTickIndexes, newFeeTiers, nil)
+
+}
+
+// table driven test. can't work with testify because setup isn't run before each s.T().Run()
+/* func (s *MsgServerTestSuite) TestSingleDepositExistingLiquidity() {
 	acc := s.alice
 	denomA, denomB := "TokenA", "TokenB"
 	tests := map[string]struct {
 		// acc sdk.AccAddress
-		denomA        string
-		denomB        string
-		amountsA      []sdk.Dec
-		amountsB      []sdk.Dec
-		tickIndexes   []int64
-		feeTiers      []uint64
-		expectedTxErr error
+		initialBalanceA int64
+		initialBalanceB int64
+		denomA          string
+		denomB          string
+		amountsA        []sdk.Dec
+		amountsB        []sdk.Dec
+		tickIndexes     []int64
+		feeTiers        []uint64
+		expectedTxErr   []error
 	}{
-		"MinFee":     {denomA, denomB, []sdk.Dec{NewDec(10)}, []sdk.Dec{NewDec(10)}, []int64{0}, []uint64{0}, nil},
-		"MaxFee":     {denomA, denomB, []sdk.Dec{NewDec(10)}, []sdk.Dec{NewDec(10)}, []int64{0}, []uint64{uint64(len(s.feeTiers)) - 1}, nil},
-		"InvalidFee": {denomA, denomB, []sdk.Dec{NewDec(10)}, []sdk.Dec{NewDec(10)}, []int64{0}, []uint64{uint64(len(s.feeTiers))}, types.ErrValidFeeIndexNotFound},
+		"InitTick":         {10, 10, denomA, denomB, []sdk.Dec{NewDec(5), NewDec(3)}, []sdk.Dec{NewDec(5), NewDec(3)}, []int64{0, 1}, []uint64{0, 0}, []error{nil, nil}},
+		"InitFeeTier":      {10, 10, denomA, denomB, []sdk.Dec{NewDec(5), NewDec(3)}, []sdk.Dec{NewDec(5), NewDec(3)}, []int64{0, 0}, []uint64{0, 1}, []error{nil, nil}},
+		"ExistingPair":     {10, 10, denomA, denomB, []sdk.Dec{NewDec(5), NewDec(3)}, []sdk.Dec{NewDec(5), NewDec(3)}, []int64{0, 0}, []uint64{0, 0}, []error{nil, nil}},
+		"BehindEnemyLines": {initialBalanceA: 10, initialBalanceB: 10, denomA: denomA, denomB: denomB, amountsA: []sdk.Dec{NewDec(5), NewDec(3)}, amountsB: []sdk.Dec{NewDec(5), NewDec(3)}, tickIndexes: []int64{0, -3}, feeTiers: []uint64{0, 1}, expectedTxErr: []error{nil, nil}},
 	}
 	for name, tc := range tests {
-		success := s.T().Run(name, func(t *testing.T) {
-			s.fundAliceBalances(10, 10)
-			DepositTemplate(s, tc.denomA, tc.denomB, tc.amountsA, tc.amountsB, acc, tc.tickIndexes, tc.feeTiers, tc.expectedTxErr)
+		s.T().Log(name)
+		s.T().Run(name, func(t *testing.T) {
+			s.fundAliceBalances(int(tc.initialBalanceA), int(tc.initialBalanceB))
+			DepositTemplate(s, tc.denomA, tc.denomB, tc.amountsA[:1], tc.amountsB[:1], acc, tc.tickIndexes[:1], tc.feeTiers[:1], tc.expectedTxErr[0])
+			DepositTemplate(s, tc.denomA, tc.denomB, tc.amountsA[1:], tc.amountsB[1:], acc, tc.tickIndexes[1:], tc.feeTiers[1:], tc.expectedTxErr[1])
 		})
-		s.Require().True(success == (tc.expectedTxErr != nil))
 	}
-}
-
-// func (s *MsgServerTestSuite) TestSingleMinFeeTier() {
-// 	// prep deposit args
-// 	acc := s.alice
-// 	s.fundAccountBalances(acc, 10, 10)
-// 	denomA, denomB := "TokenA", "TokenB"
-// 	amountsA, amountsB := []sdk.Dec{s.getBalance(acc, denomA)}, []sdk.Dec{s.getBalance(acc, denomB)}
-
-// 	// deposit with min fee tier: 0
-// 	tickIndex := []int64{0}
-// 	minFeeTier := []uint64{uint64(s.feeTiers[0].Fee)}
-
-// 	s.Deposit(denomA, denomB, amountsA, amountsB, acc, tickIndex, minFeeTier, nil)
-// }
-
-// func (s *MsgServerTestSuite) TestSingleMaxFeeTier() {
-// 	// prep deposit args
-// 	acc := s.alice
-// 	s.fundAccountBalances(acc, 10, 10)
-// 	denomA, denomB := "TokenA", "TokenB"
-// 	amountsA, amountsB := []sdk.Dec{s.getBalance(acc, denomA)}, []sdk.Dec{s.getBalance(acc, denomB)}
-
-// 	// deposit with max fee tier
-// 	tickIndex := []int64{0}
-// 	maxFeeTier := []uint64{uint64(len(s.feeTiers) - 1)}
-
-// 	s.Deposit(denomA, denomB, amountsA, amountsB, acc, tickIndex, maxFeeTier, nil)
-// 	// validity assertions are done inside env.TestDeposit
-// }
-
-// func (s *MsgServerTestSuite) TestSingleInvalidFeeTier() {
-// 	// prep deposit args
-// 	acc := s.alice
-// 	s.fundAccountBalances(acc, 10, 10)
-// 	denomA, denomB := "TokenA", "TokenB"
-// 	amountsA, amountsB := []sdk.Dec{s.getBalance(acc, denomA)}, []sdk.Dec{s.getBalance(acc, denomB)}
-
-// 	// deposit with invalid fee tier: maxFeeTier + 1 > maxFeeTier, i.e. invalid
-// 	tickIndex := []int64{0}
-// 	invalidFeeTier := []uint64{uint64(len(s.feeTiers))}
-
-// 	// (in)validity assertions are done inside env.TestDeposit
-// 	s.Deposit(denomA, denomB, amountsA, amountsB, acc, tickIndex, invalidFeeTier, types.ErrValidFeeIndexNotFound)
-// }
-
-// func (s *MsgServerTestSuite) TestSingleInitPair() {
-// 	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/InitPair")
-
-// 	// prep deposit args
-// 	acc := s.alice
-// 	s.fundAccountBalances(acc, 10, 10)
-// 	denomA, denomB := "TokenA", "TokenB"
-// 	amountsA, amountsB := []sdk.Dec{s.getBalance(acc, denomA)}, []sdk.Dec{s.getBalance(acc, denomB)}
-
-// 	// deposit at tick 0 in fee tier 0
-// 	tickIndex := []int64{0}
-// 	feeTier := []uint64{0}
-
-// 	s.Deposit(denomA, denomB, amountsA, amountsB, acc, tickIndex, feeTier, nil)
-// 	// validity assertions are done inside env.TestDeposit
-// }
-
-// func (s *MsgServerTestSuite) TestSingleInitTick() {
-// 	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/InitTick")
-
-// 	// prep deposit args
-// 	acc := env.addrs[0]
-// 	// fifth of acc's balance of each coin
-// 	coinA, coinB := newACoin(env.balances[acc.String()][0].Amount.Quo(convInt("5"))), newBCoin(env.balances[acc.String()][1].Amount.Quo(convInt("5")))
-// 	denomA, denomB := coinA.Denom, coinB.Denom
-// 	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
-// 	acc := s.alice
-// 	s.fundAccountBalances(acc, 10, 10)
-// 	denomA, denomB := "TokenA", "TokenB"
-// 	amountsA, amountsB := []sdk.Dec{s.getBalance(acc, denomA)}, []sdk.Dec{s.getBalance(acc, denomB)}
-
-// 	// deposit at tick 0 in fee tier 0
-// 	tickIndex := []int64{0}
-// 	feeTier := []uint64{0}
-// 	s.Deposit(denomA, denomB, amountsA, amountsB, acc, tickIndex, feeTier)
-
-// 	newTickIndex := []int64{1}
-// 	s.Deposit(denomA, denomB, amountsA, amountsB, acc, newTickIndex, feeTier)
-// 	// validity assertions are done inside env.TestDeposit
-// }
-
-// func (s *MsgServerTestSuite) TestSingleInitFeeTier() {
-// 	// fifth of acc's balance of each coin
-// 	acc := s.alice
-// 	s.fundAccountBalances(acc, 10, 10)
-// 	denomA, denomB := "TokenA", "TokenB"
-// 	amountsA, amountsB := []sdk.Dec{s.getBalance(acc, denomA)}, []sdk.Dec{s.getBalance(acc, denomB)}
-
-// 	// deposit at tick 0 in fee tier 0
-// 	tickIndex := []int64{0}
-// 	feeTier := []uint64{0}
-// 	s.Deposit(denomA, denomB, amountsA, amountsB, acc, tickIndex, feeTier)
-// 	// validity assertions are done inside env.TestDeposit
-
-// 	newFeeTier := []uint64{1}
-// 	s.Deposit(denomA, denomB, amountsA, amountsB, acc, tickIndex, newFeeTier)
-// 	// validity assertions are done inside env.TestDeposit
-
-// }
-
-// func (s *MsgServerTestSuite) TestSingleExistingPair() {
-// 	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/ExistingPair")
-
-// 	// GIVEN initial balances and fee tiers from the setup, and pair already has liquidity at tick 0 fee tier 0
-// 	acc := s.alice
-// 	s.fundAccountBalances(acc, 10, 10)
-// 	denomA, denomB := "TokenA", "TokenB"
-// 	amountsA, amountsB := []sdk.Dec{s.getBalance(acc, denomA)}, []sdk.Dec{s.getBalance(acc, denomB)}
-// 	acc := env.addrs[0]
-// 	// fifth of acc's balance of each coin
-// 	coinA, coinB := newACoin(env.balances[acc.String()][0].Amount.Quo(convInt("5"))), newBCoin(env.balances[acc.String()][1].Amount.Quo(convInt("5")))
-// 	denomA, denomB := coinA.Denom, coinB.Denom
-// 	amountsA, amountsB := []sdk.Dec{sdk.NewDecFromIntWithPrec(coinA.Amount, 18)}, []sdk.Dec{sdk.NewDecFromIntWithPrec(coinB.Amount, 18)}
-
-// 	// deposit at tick 0 in fee tier 0
-// 	tickIndex := []int64{0}
-// 	feeTier := []uint64{0}
-// 	s.Deposit(denomA, denomB, amountsA, amountsB, acc, tickIndex, feeTier)
-
-// 	// WHEN deposit in the same pair, tick and fee tier again
-// 	s.Deposit(denomA, denomB, amountsA, amountsB, acc, tickIndex, feeTier)
-
-// 	// THEN the transaction should execute successfully
-// }
-
-// func (s *MsgServerTestSuite) TestSingleBehindEnemyLines() {
-// 	t.Logf("[ UnitTests|Keeper ] Starting test: SinglePool/BehindEnemyLines")
-
-// 	// GIVEN initial balances and fee tiers from the setup, and pair already has liquidity at tick 0 fee tier 0
-// 	acc := s.alice
-// 	s.fundAccountBalances(acc, 10, 10)
-// 	denomA, denomB := "TokenA", "TokenB"
-// 	// fifth of acc's balance of each coin
-// 	amountsA, amountsB := []sdk.Dec{s.getBalance(acc, denomA).Quo(5)}, []sdk.Dec{s.getBalance(acc, denomB).Quo(5)}
-
-// 	// deposit at tick 0 in fee tier 0
-// 	tickIndex := []int64{0}
-// 	feeTier := []uint64{0}
-// 	s.Deposit(denomA, denomB, amountsA, amountsB, acc, tickIndex, feeTier)
-
-// 	// WHEN alice deposits at tick 0 in fee tier 1
-// 	newTickIndex := []int64{-3}
-// 	newFeeTier := []uint64{1}
-// 	s.Deposit(denomA, denomB, amountsA, amountsB, acc, newTickIndex, newFeeTier)
-
-// 	// THEN the transaction should execute successfully
-// 	// validity assertions are done inside env.TestDeposit
-// }
+} */
