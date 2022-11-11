@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"strings"
+
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -44,7 +46,7 @@ func DepositTemplate(s *MsgServerTestSuite, denomA string, denomB string, amount
 
 	// verify no error
 	if expectedTxErr != nil {
-		s.Require().NotNil(err)
+		s.Require().True(strings.Contains(err.Error(), expectedTxErr.Error()))
 		return
 	} else {
 		s.Require().Nil(err)
