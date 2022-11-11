@@ -54,7 +54,7 @@ func (s *MsgServerLimitTestSuite) TestMultiple() {
 		TokenIn:   "TokenB",
 		AmountIn:  NewDec(100),
 	})
-	s.Require().Nil(err)
+	s.Assert().Nil(err)
 
 	s.assertAliceBalances(100, 400)
 	s.assertBobBalances(100, 100)
@@ -74,7 +74,7 @@ func (s *MsgServerLimitTestSuite) TestDifferentReceiverAndCreator() {
 		TokenIn:   "TokenB",
 		AmountIn:  NewDec(100),
 	})
-	s.Require().Nil(err)
+	s.Assert().Nil(err)
 
 	s.assertAliceBalances(100, 500)
 	s.assertBobBalances(100, 100)
@@ -94,7 +94,7 @@ func (s *MsgServerLimitTestSuite) TestFailUnrecognizedToken() {
 		TokenIn:   "TokenC",
 		AmountIn:  NewDec(100),
 	})
-	s.Require().Error(err)
+	s.Assert().Error(err)
 }
 
 func (s *MsgServerLimitTestSuite) TestFailInsufficientBalance() {
@@ -110,7 +110,7 @@ func (s *MsgServerLimitTestSuite) TestFailInsufficientBalance() {
 		TokenIn:   "TokenB",
 		AmountIn:  NewDec(1000),
 	})
-	s.Require().Error(err)
+	s.Assert().Error(err)
 }
 
 func (s *MsgServerLimitTestSuite) TestMultiTickLimitOrder1to0WithWithdraw() {
@@ -174,7 +174,7 @@ func (s *MsgServerLimitTestSuite) TestWithdrawFailsWhenNothingToWithdraw() {
 		KeyToken:  "TokenB",
 		Key:       0,
 	})
-	s.Require().Error(err)
+	s.Assert().Error(err)
 }
 
 func (s *MsgServerLimitTestSuite) TestFailsWhenWithdrawNotCalledByOwner() {
@@ -192,7 +192,7 @@ func (s *MsgServerLimitTestSuite) TestFailsWhenWithdrawNotCalledByOwner() {
 		KeyToken:  "TokenB",
 		Key:       0,
 	})
-	s.Require().Error(err)
+	s.Assert().Error(err)
 }
 
 func (s *MsgServerLimitTestSuite) TestFailsWhenWrongKeyToken() {
@@ -211,7 +211,7 @@ func (s *MsgServerLimitTestSuite) TestFailsWhenWrongKeyToken() {
 		KeyToken:  "TokenA",
 		Key:       0,
 	})
-	s.Require().Error(err)
+	s.Assert().Error(err)
 }
 
 func (s *MsgServerLimitTestSuite) TestFailsWhenWrongKey() {
@@ -230,7 +230,7 @@ func (s *MsgServerLimitTestSuite) TestFailsWhenWrongKey() {
 		KeyToken:  "TokenB",
 		Key:       1,
 	})
-	s.Require().Error(err)
+	s.Assert().Error(err)
 }
 
 func (s *MsgServerLimitTestSuite) TestCancelSingle() {
@@ -349,7 +349,7 @@ func (s *MsgServerLimitTestSuite) fundAccountBalancesDec(account sdk.AccAddress,
 	bBalanceInt := sdk.NewIntFromBigInt(bBalance.BigInt())
 	balances := sdk.NewCoins(NewACoin(aBalanceInt), NewBCoin(bBalanceInt))
 	err := simapp.FundAccount(s.app.BankKeeper, s.ctx, account, balances)
-	s.Require().NoError(err)
+	s.Assert().NoError(err)
 	s.assertAccountBalancesDec(account, aBalance, bBalance)
 }
 
@@ -384,11 +384,11 @@ func (s *MsgServerLimitTestSuite) assertAccountBalancesDec(
 ) {
 	aActual := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenA")
 	aDec := sdk.NewDecFromBigIntWithPrec(aActual.Amount.BigInt(), 18)
-	s.Require().Equal(aBalance, aDec)
+	s.Assert().Equal(aBalance, aDec)
 
 	bActual := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenB")
 	bDec := sdk.NewDecFromBigIntWithPrec(bActual.Amount.BigInt(), 18)
-	s.Require().Equal(bBalance, bDec)
+	s.Assert().Equal(bBalance, bDec)
 }
 
 func (s *MsgServerLimitTestSuite) assertAliceBalances(a int, b int) {
@@ -436,7 +436,7 @@ func (s *MsgServerLimitTestSuite) placeLimitOrder(account sdk.AccAddress, wantsT
 		TokenIn:   tokenIn,
 		AmountIn:  amountInDec,
 	})
-	s.Require().Nil(err)
+	s.Assert().Nil(err)
 }
 
 type Deposit struct {
@@ -485,7 +485,7 @@ func (s *MsgServerLimitTestSuite) deposits(account sdk.AccAddress, deposits ...*
 		TickIndexes: tickIndicies,
 		FeeIndexes:  feeIndexes,
 	})
-	s.Require().Nil(err)
+	s.Assert().Nil(err)
 }
 
 func (s *MsgServerLimitTestSuite) aliceCancelsLimitOrder(keyToken string, tick int, key int, sharesOut int) {
@@ -504,7 +504,7 @@ func (s *MsgServerLimitTestSuite) cancelsLimitOrder(account sdk.AccAddress, keyT
 		Key:       uint64(key),
 		SharesOut: sharesOutDec,
 	})
-	s.Require().Nil(err)
+	s.Assert().Nil(err)
 }
 
 func (s *MsgServerLimitTestSuite) bobPlacesSwapOrder(wantsToken string, amountIn int, minOut int) {
@@ -529,7 +529,7 @@ func (s *MsgServerLimitTestSuite) placesSwapOrder(account sdk.AccAddress, wantsT
 		AmountIn: amountInDec,
 		MinOut:   minOutDec,
 	})
-	s.Require().Nil(err)
+	s.Assert().Nil(err)
 }
 
 func (s *MsgServerLimitTestSuite) aliceWithdrawsFilledLimitOrder(withdrawToken string, tick int) {
@@ -546,7 +546,7 @@ func (s *MsgServerLimitTestSuite) withdrawsFilledLimitOrder(account sdk.AccAddre
 		KeyToken:  withdrawToken,
 		Key:       0,
 	})
-	s.Require().Nil(err)
+	s.Assert().Nil(err)
 }
 
 func (s *MsgServerLimitTestSuite) traceBalances() {
