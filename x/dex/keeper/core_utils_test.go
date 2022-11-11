@@ -1,8 +1,6 @@
 package keeper_test
 
 import (
-	"testing"
-
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -45,25 +43,23 @@ func calculateNewCurrentTicksPure(amount0 sdk.Dec, amount1 sdk.Dec, tickIndex in
 }
 
 // Helper function to calculate if current ticks change
-func (env *TestEnv) calculateNewCurrentTicks(amount0 sdk.Dec, amount1 sdk.Dec, tickIndex int64, feeIndex uint64, pair types.PairMap) (new0to1 int64, new1to0 int64) {
-	k, ctx := env.cosmos.app.DexKeeper, env.cosmos.ctx
+func calculateNewCurrentTicks(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, tickIndex int64, feeIndex uint64, pair types.PairMap) (new0to1 int64, new1to0 int64) {
+	k, ctx := s.app.DexKeeper, s.ctx
 	feelist := k.GetAllFeeList(ctx)
 	fee := feelist[feeIndex].Fee
 	return calculateNewCurrentTicksPure(amount0, amount1, tickIndex, fee, pair.TokenPair.CurrentTick0To1, pair.TokenPair.CurrentTick1To0)
 }
 
 // Helper for getting a pair id. If pair hasn't been initialized, defaults to pair with tickIndex and feeTier for CurrentTick
-func (env *TestEnv) makePair(t *testing.T, pairId string, tickIndex int64, feeTier uint64) types.PairMap {
+func makePair(s *MsgServerTestSuite, pairId string, tickIndex int64, feeTier uint64, expectedTxErr error) types.PairMap {
 	// TODO: this really should be cleaned up
-	app, ctx, k := env.cosmos.app, env.cosmos.ctx, env.cosmos.app.DexKeeper
+	app, ctx, k := s.app, s.ctx, s.app.DexKeeper
 
 	// this corresponds to line 16 in function DepositVerification of verification.go
 	feeList := k.GetAllFeeList(ctx)
 
 	// handle invalid fee index
-	if feeTier >= uint64(len(feeList)) {
-		env.handleIntentionalFail(t, "Fee index (%d) > fee tier count (%d)", feeTier, len(feeList))
-	}
+	s.Assert().True(feeTier >= uint64(len(feeList)) && expectedTxErr == types.ErrValidFeeIndexNotFound)
 
 	pair, pairFound := app.DexKeeper.GetPairMap(ctx, pairId)
 	if !pairFound {
@@ -124,13 +120,11 @@ func calculateSharesPure(
 }
 
 // Impure function that pulls all the state variables required for calculating the amount of shares to mint.
-func (env *TestEnv) calculateShares(t *testing.T, amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex int64, feeIndex uint64) sdk.Dec {
-	k, ctx := env.cosmos.app.DexKeeper, env.cosmos.ctx
+func calculateShares(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex int64, feeIndex uint64) sdk.Dec {
+	k, ctx := s.app.DexKeeper, s.ctx
 
 	price, err := k.Calc_price(tickIndex, false)
-	if err != nil {
-		env.handleIntentionalFail(t, "TODO: calc price error format")
-	}
+	s.Require().NotNil(err)
 
 	feelist := k.GetAllFeeList(ctx)
 	fee := feelist[feeIndex].Fee
@@ -158,8 +152,8 @@ func (env *TestEnv) calculateShares(t *testing.T, amount0 sdk.Dec, amount1 sdk.D
 }
 
 // Helper for getting shares. If no shares object exists, marks it as not found and fills in with an empty object. Must handle using the "found" bools.
-func (env *TestEnv) makeShares(acc sdk.AccAddress, pairId string, tickIndexes []int64, feeTiers []uint64) ([]types.Shares, []bool) {
-	app, ctx := env.cosmos.app, env.cosmos.ctx
+func makeShares(s *MsgServerTestSuite, acc sdk.AccAddress, pairId string, tickIndexes []int64, feeTiers []uint64) ([]types.Shares, []bool) {
+	app, ctx := s.app, s.ctx
 	var sharesSlice []types.Shares
 	var sharesFoundSlice []bool
 	for i := range tickIndexes {
@@ -177,11 +171,11 @@ func (env *TestEnv) makeShares(acc sdk.AccAddress, pairId string, tickIndexes []
 
 type SharesMap = map[int64]map[uint64]sdk.Dec
 
-func (env *TestEnv) calculateFinalShares(t *testing.T, pairId string, amounts0 []sdk.Dec, amounts1 []sdk.Dec, tickIndexes []int64, feeTiers []uint64) SharesMap {
+func calculateFinalShares(s *MsgServerTestSuite, pairId string, amounts0 []sdk.Dec, amounts1 []sdk.Dec, tickIndexes []int64, feeTiers []uint64) SharesMap {
 	accum := make(map[int64]map[uint64]sdk.Dec) // map from tickIndex->feeTier->sharesCalc
 	for i := range amounts0 {
 		// get expected amount of minted shares and increase accum on both sides of spread
-		accSharesCalc := env.calculateShares(t, amounts0[i], amounts1[i], pairId, tickIndexes[i], feeTiers[i])
+		accSharesCalc := calculateShares(s, amounts0[i], amounts1[i], pairId, tickIndexes[i], feeTiers[i])
 		// accumulate minted shares
 		if shares, ok := accum[tickIndexes[i]][feeTiers[i]]; ok {
 			// if already exists, add to previous value
@@ -198,11 +192,11 @@ func (env *TestEnv) calculateFinalShares(t *testing.T, pairId string, amounts0 [
 	return accum
 }
 
-func (env *TestEnv) calculateFinalTicks(pair types.PairMap, amounts0 []sdk.Dec, amounts1 []sdk.Dec, tickIndexes []int64, feeTiers []uint64) (int64, int64) {
+func calculateFinalTicks(s *MsgServerTestSuite, pair types.PairMap, amounts0 []sdk.Dec, amounts1 []sdk.Dec, tickIndexes []int64, feeTiers []uint64) (int64, int64) {
 	expectedTick0to1, expectedTick1to0 := pair.TokenPair.CurrentTick0To1, pair.TokenPair.CurrentTick1To0
 	for i := range amounts0 {
 		// move expected current ticks
-		tick0to1Calc, tick1to0Calc := env.calculateNewCurrentTicks(amounts0[i], amounts1[i], tickIndexes[i], feeTiers[i], pair)
+		tick0to1Calc, tick1to0Calc := calculateNewCurrentTicks(s, amounts0[i], amounts1[i], tickIndexes[i], feeTiers[i], pair)
 		if tick0to1Calc > expectedTick0to1 {
 			expectedTick0to1 = tick0to1Calc
 		}
