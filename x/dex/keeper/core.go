@@ -320,13 +320,13 @@ func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0
 		// Can only deposit amount0 at a tick greater than or equal to CurrentTick0to1 (the highest tick containing reserve1)
 		// Errors if depositing amount0 at a tick less than CurrentTick0to1
 		if amounts0[i].GT(sdk.ZeroDec()) && ((msg.TickIndexes[i] + feelist[msg.FeeIndexes[i]].Fee) < pair.TokenPair.CurrentTick0To1) {
-			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick less than the CurrentTick1to0")
+			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsosit amount_0 at a tick less than the CurrentTick0to1")
 		}
 
 		// Can only deposit amount1 at a tick less than or equal to CurrentTick1to0 (the  lowest tick containing reserve0)
 		// Errors if depositing amount1 at a tick greater than  CurrentTick1to0
 		if amounts1[i].GT(sdk.ZeroDec()) && ((msg.TickIndexes[i] - feelist[msg.FeeIndexes[i]].Fee) > pair.TokenPair.CurrentTick1To0) {
-			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick greater than the CurrentTick0to1")
+			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit amount_1 at a tick greater than the CurrentTick1to0")
 		}
 
 		// Calls k.DepositHelper which calculates the true amounts of token0, token1, and sets the corresponding pair and tick maps
@@ -1184,7 +1184,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 
 		// Errors if place a limit order in amount0 at a tick less than CurrentTick0to1
 		if msg.TickIndex < pair.TokenPair.CurrentTick0To1 {
-			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick less than the CurrentTick1to0")
+			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsosit amount_0 at a tick less than the CurrentTick0to1")
 		}
 
 		// If tokenIn == token1 set count and key to values of LimitOrderPool1to0
@@ -1194,7 +1194,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 
 		// Errors if placing a limit order in amoount1 at a tick greater than Current1To0
 		if msg.TickIndex > pair.TokenPair.CurrentTick1To0 {
-			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick greater than the CurrentTick0to1")
+			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit amount_1 at a tick greater than the CurrentTick1to0")
 		}
 	}
 
