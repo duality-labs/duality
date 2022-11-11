@@ -26,11 +26,13 @@ type MsgServerTestSuite struct {
 	queryClient types.QueryClient
 	alice       sdk.AccAddress
 	bob         sdk.AccAddress
+	carol       sdk.AccAddress
+	dan         sdk.AccAddress
 	goCtx       context.Context
 	feeTiers    []types.FeeList
 }
 
-func TestMsgServerLimitTestSuite(t *testing.T) {
+func TestMsgServerTestSuite(t *testing.T) {
 	suite.Run(t, new(MsgServerTestSuite))
 }
 
@@ -49,6 +51,10 @@ func (s *MsgServerTestSuite) SetupTest() {
 	app.AccountKeeper.SetAccount(ctx, accAlice)
 	accBob := app.AccountKeeper.NewAccountWithAddress(ctx, s.bob)
 	app.AccountKeeper.SetAccount(ctx, accBob)
+	accCarol := app.AccountKeeper.NewAccountWithAddress(ctx, s.carol)
+	app.AccountKeeper.SetAccount(ctx, accCarol)
+	accDan := app.AccountKeeper.NewAccountWithAddress(ctx, s.dan)
+	app.AccountKeeper.SetAccount(ctx, accDan)
 
 	// add the fee tiers of 1, 3, 5, 10 ticks
 	feeTiers := []types.FeeList{
@@ -71,7 +77,8 @@ func (s *MsgServerTestSuite) SetupTest() {
 	s.queryClient = queryClient
 	s.alice = sdk.AccAddress([]byte("alice"))
 	s.bob = sdk.AccAddress([]byte("bob"))
-	s.feeTiers = feeTiers
+	s.carol = sdk.AccAddress([]byte("carol"))
+	s.dan = sdk.AccAddress([]byte("dan"))
 }
 
 func (s *MsgServerTestSuite) fundAccountBalancesDec(account sdk.AccAddress, aBalance sdk.Dec, bBalance sdk.Dec) {
@@ -103,6 +110,22 @@ func (s *MsgServerTestSuite) fundBobBalancesDec(a sdk.Dec, b sdk.Dec) {
 	s.fundAccountBalancesDec(s.bob, a, b)
 }
 
+func (s *MsgServerTestSuite) fundCarolBalances(a int, b int) {
+	s.fundAccountBalances(s.carol, a, b)
+}
+
+func (s *MsgServerTestSuite) fundCarolBalancesDec(a sdk.Dec, b sdk.Dec) {
+	s.fundAccountBalancesDec(s.carol, a, b)
+}
+
+func (s *MsgServerTestSuite) fundDanBalances(a int, b int) {
+	s.fundAccountBalances(s.dan, a, b)
+}
+
+func (s *MsgServerTestSuite) fundDanBalancesDec(a sdk.Dec, b sdk.Dec) {
+	s.fundAccountBalancesDec(s.dan, a, b)
+}
+
 func (s *MsgServerTestSuite) assertAccountBalances(account sdk.AccAddress, aBalance int, bBalance int) {
 	s.assertAccountBalancesDec(account, NewDec(aBalance), NewDec(bBalance))
 }
@@ -125,16 +148,32 @@ func (s *MsgServerTestSuite) assertAliceBalances(a int, b int) {
 	s.assertAccountBalances(s.alice, a, b)
 }
 
-func (s *MsgServerTestSuite) assertBobBalances(a int, b int) {
-	s.assertAccountBalances(s.bob, a, b)
-}
-
 func (s *MsgServerTestSuite) assertAliceBalancesDec(a sdk.Dec, b sdk.Dec) {
 	s.assertAccountBalancesDec(s.alice, a, b)
 }
 
+func (s *MsgServerTestSuite) assertBobBalances(a int, b int) {
+	s.assertAccountBalances(s.bob, a, b)
+}
+
 func (s *MsgServerTestSuite) assertBobBalancesDec(a sdk.Dec, b sdk.Dec) {
 	s.assertAccountBalancesDec(s.bob, a, b)
+}
+
+func (s *MsgServerTestSuite) assertCarolBalances(a int, b int) {
+	s.assertAccountBalances(s.carol, a, b)
+}
+
+func (s *MsgServerTestSuite) assertCarolBalancesDec(a sdk.Dec, b sdk.Dec) {
+	s.assertAccountBalancesDec(s.carol, a, b)
+}
+
+func (s *MsgServerTestSuite) assertDanBalances(a int, b int) {
+	s.assertAccountBalances(s.dan, a, b)
+}
+
+func (s *MsgServerTestSuite) assertDanBalancesDec(a sdk.Dec, b sdk.Dec) {
+	s.assertAccountBalancesDec(s.dan, a, b)
 }
 
 func (s *MsgServerTestSuite) assertDexBalances(a int, b int) {
@@ -147,6 +186,14 @@ func (s *MsgServerTestSuite) alicePlacesLimitOrder(wantsToken string, tick int, 
 
 func (s *MsgServerTestSuite) bobPlacesLimitOrder(wantsToken string, tick int, amountIn int) {
 	s.placesLimitOrder(s.bob, wantsToken, tick, amountIn)
+}
+
+func (s *MsgServerTestSuite) carolPlacesLimitOrder(wantsToken string, tick int, amountIn int) {
+	s.placesLimitOrder(s.carol, wantsToken, tick, amountIn)
+}
+
+func (s *MsgServerTestSuite) danPlacesLimitOrder(wantsToken string, tick int, amountIn int) {
+	s.placesLimitOrder(s.dan, wantsToken, tick, amountIn)
 }
 
 func (s *MsgServerTestSuite) placesLimitOrder(account sdk.AccAddress, wantsToken string, tick int, amountIn int) {
@@ -193,6 +240,14 @@ func (s *MsgServerTestSuite) bobDeposits(deposits ...*Deposit) {
 	s.deposits(s.bob, deposits...)
 }
 
+func (s *MsgServerTestSuite) carolDeposits(deposits ...*Deposit) {
+	s.deposits(s.carol, deposits...)
+}
+
+func (s *MsgServerTestSuite) danDeposits(deposits ...*Deposit) {
+	s.deposits(s.dan, deposits...)
+}
+
 func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits ...*Deposit) {
 	amountsA := make([]sdk.Dec, len(deposits))
 	amountsB := make([]sdk.Dec, len(deposits))
@@ -222,6 +277,18 @@ func (s *MsgServerTestSuite) aliceCancelsLimitOrder(keyToken string, tick int, k
 	s.cancelsLimitOrder(s.alice, keyToken, tick, key, sharesOut)
 }
 
+func (s *MsgServerTestSuite) bobCancelsLimitOrder(keyToken string, tick int, key int, sharesOut int) {
+	s.cancelsLimitOrder(s.bob, keyToken, tick, key, sharesOut)
+}
+
+func (s *MsgServerTestSuite) carolCancelsLimitOrder(keyToken string, tick int, key int, sharesOut int) {
+	s.cancelsLimitOrder(s.carol, keyToken, tick, key, sharesOut)
+}
+
+func (s *MsgServerTestSuite) danCancelsLimitOrder(keyToken string, tick int, key int, sharesOut int) {
+	s.cancelsLimitOrder(s.dan, keyToken, tick, key, sharesOut)
+}
+
 func (s *MsgServerTestSuite) cancelsLimitOrder(account sdk.AccAddress, keyToken string, tick int, key int, sharesOut int) {
 	sharesOutDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(sharesOut)))
 	_, err := s.msgServer.CancelLimitOrder(s.goCtx, &types.MsgCancelLimitOrder{
@@ -237,7 +304,19 @@ func (s *MsgServerTestSuite) cancelsLimitOrder(account sdk.AccAddress, keyToken 
 	s.Assert().Nil(err)
 }
 
+func (s *MsgServerTestSuite) alicePlacesSwapOrder(wantsToken string, amountIn int, minOut int) {
+	s.placesSwapOrder(s.alice, wantsToken, amountIn, minOut)
+}
+
 func (s *MsgServerTestSuite) bobPlacesSwapOrder(wantsToken string, amountIn int, minOut int) {
+	s.placesSwapOrder(s.bob, wantsToken, amountIn, minOut)
+}
+
+func (s *MsgServerTestSuite) carolPlacesSwapOrder(wantsToken string, amountIn int, minOut int) {
+	s.placesSwapOrder(s.bob, wantsToken, amountIn, minOut)
+}
+
+func (s *MsgServerTestSuite) danPlacesSwapOrder(wantsToken string, amountIn int, minOut int) {
 	s.placesSwapOrder(s.bob, wantsToken, amountIn, minOut)
 }
 
@@ -266,6 +345,18 @@ func (s *MsgServerTestSuite) aliceWithdrawsFilledLimitOrder(withdrawToken string
 	s.withdrawsFilledLimitOrder(s.alice, withdrawToken, tick)
 }
 
+func (s *MsgServerTestSuite) bobWithdrawsFilledLimitOrder(withdrawToken string, tick int) {
+	s.withdrawsFilledLimitOrder(s.bob, withdrawToken, tick)
+}
+
+func (s *MsgServerTestSuite) carolWithdrawsFilledLimitOrder(withdrawToken string, tick int) {
+	s.withdrawsFilledLimitOrder(s.carol, withdrawToken, tick)
+}
+
+func (s *MsgServerTestSuite) danWithdrawsFilledLimitOrder(withdrawToken string, tick int) {
+	s.withdrawsFilledLimitOrder(s.dan, withdrawToken, tick)
+}
+
 func (s *MsgServerTestSuite) withdrawsFilledLimitOrder(account sdk.AccAddress, withdrawToken string, tick int) {
 	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
 		Creator:   account.String(),
@@ -284,5 +375,15 @@ func (s *MsgServerTestSuite) traceBalances() {
 	aliceB := s.app.BankKeeper.GetBalance(s.ctx, s.alice, "TokenB")
 	bobA := s.app.BankKeeper.GetBalance(s.ctx, s.bob, "TokenA")
 	bobB := s.app.BankKeeper.GetBalance(s.ctx, s.bob, "TokenB")
-	fmt.Printf("Alice: %+v %+v, Bob: %+v %+v", aliceA, aliceB, bobA, bobB)
+	carolA := s.app.BankKeeper.GetBalance(s.ctx, s.carol, "TokenA")
+	carolB := s.app.BankKeeper.GetBalance(s.ctx, s.carol, "TokenB")
+	danA := s.app.BankKeeper.GetBalance(s.ctx, s.dan, "TokenA")
+	danB := s.app.BankKeeper.GetBalance(s.ctx, s.dan, "TokenB")
+	fmt.Printf(
+		"Alice: %+v %+v\nBob: %+v %+v\nCarol: %+v %+v\nDan: %+v %+v",
+		aliceA, aliceB,
+		bobA, bobB,
+		carolA, carolB,
+		danA, danB,
+	)
 }

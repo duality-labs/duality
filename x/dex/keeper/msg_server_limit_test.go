@@ -139,14 +139,7 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 
 	s.aliceWithdrawsFilledLimitOrder("TokenA", 1)
 
-	// TODO: Figure out if this is correct... maybe fees are involved?
-	// One would expect the output to be 539.99850015
-	// 525 + (15 / 1.0001) = 539.99850015
-	// Which gives an effective price of 1.66656666667
-	// 15 / (534.000540032401944116 - 525) = 1.66656666667
-	// not an integer tick!
-	// log(1.66656666667) / log(1.0001) = 5107.91159823
-	s.assertAliceBalancesDec(NewDec(99950), sdk.MustNewDecFromStr("534.000540032401944116"))
+	s.assertAliceBalancesDec(NewDec(99950), sdk.MustNewDecFromStr("539.99850015"))
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFailsWhenNothingToWithdraw() {
