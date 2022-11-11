@@ -10,7 +10,6 @@ import (
 	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -79,13 +78,14 @@ func (s *MsgServerTestSuite) SetupTest() {
 	s.bob = sdk.AccAddress([]byte("bob"))
 	s.carol = sdk.AccAddress([]byte("carol"))
 	s.dan = sdk.AccAddress([]byte("dan"))
+	s.feeTiers = feeTiers
 }
 
 func (s *MsgServerTestSuite) fundAccountBalancesDec(account sdk.AccAddress, aBalance sdk.Dec, bBalance sdk.Dec) {
 	aBalanceInt := sdk.NewIntFromBigInt(aBalance.BigInt())
 	bBalanceInt := sdk.NewIntFromBigInt(bBalance.BigInt())
 	balances := sdk.NewCoins(NewACoin(aBalanceInt), NewBCoin(bBalanceInt))
-	err := simapp.FundAccount(s.app.BankKeeper, s.ctx, account, balances)
+	err := FundAccount(s.app.BankKeeper, s.ctx, account, balances)
 	s.Assert().NoError(err)
 	s.assertAccountBalancesDec(account, aBalance, bBalance)
 }

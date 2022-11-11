@@ -58,16 +58,22 @@ func makePair(s *MsgServerTestSuite, pairId string, tickIndex int64, feeTier uin
 	// this corresponds to line 16 in function DepositVerification of verification.go
 	feeList := k.GetAllFeeList(ctx)
 
+	var fee int64
 	// handle invalid fee index
-	s.Assert().True(feeTier >= uint64(len(feeList)) && expectedTxErr == types.ErrValidFeeIndexNotFound)
+	if feeTier >= uint64(len(feeList)) {
+		s.Assert().True(expectedTxErr == types.ErrValidFeeIndexNotFound)
+		fee = 0
+	} else {
+		fee = feeList[feeTier].Fee
+	}
 
 	pair, pairFound := app.DexKeeper.GetPairMap(ctx, pairId)
 	if !pairFound {
 		pair = types.PairMap{
 			PairId: pairId,
 			TokenPair: &types.TokenPairType{
-				CurrentTick0To1: tickIndex - feeList[feeTier].Fee,
-				CurrentTick1To0: tickIndex + feeList[feeTier].Fee,
+				CurrentTick0To1: tickIndex - fee,
+				CurrentTick1To0: tickIndex + fee,
 			},
 			TotalTickCount: 0,
 		}
@@ -124,7 +130,7 @@ func calculateShares(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, pa
 	k, ctx := s.app.DexKeeper, s.ctx
 
 	price, err := k.Calc_price(tickIndex, false)
-	s.Require().NotNil(err)
+	s.Require().Nil(err)
 
 	feelist := k.GetAllFeeList(ctx)
 	fee := feelist[feeIndex].Fee
