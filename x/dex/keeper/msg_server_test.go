@@ -27,6 +27,7 @@ type MsgServerTestSuite struct {
 	alice       sdk.AccAddress
 	bob         sdk.AccAddress
 	goCtx       context.Context
+	feeTiers    []types.FeeList
 }
 
 func TestMsgServerLimitTestSuite(t *testing.T) {
@@ -49,11 +50,19 @@ func (s *MsgServerTestSuite) SetupTest() {
 	accBob := app.AccountKeeper.NewAccountWithAddress(ctx, s.bob)
 	app.AccountKeeper.SetAccount(ctx, accBob)
 
+	// add the fee tiers of 1, 3, 5, 10 ticks
+	feeTiers := []types.FeeList{
+		{Id: 0, Fee: 1},
+		{Id: 1, Fee: 3},
+		{Id: 2, Fee: 5},
+		{Id: 3, Fee: 10},
+	}
+
 	// Set Fee List
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{0, 1})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{1, 2})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{2, 3})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{3, 4})
+	app.DexKeeper.AppendFeeList(ctx, feeTiers[0])
+	app.DexKeeper.AppendFeeList(ctx, feeTiers[1])
+	app.DexKeeper.AppendFeeList(ctx, feeTiers[2])
+	app.DexKeeper.AppendFeeList(ctx, feeTiers[3])
 
 	s.app = app
 	s.msgServer = keeper.NewMsgServerImpl(app.DexKeeper)
@@ -62,6 +71,7 @@ func (s *MsgServerTestSuite) SetupTest() {
 	s.queryClient = queryClient
 	s.alice = sdk.AccAddress([]byte("alice"))
 	s.bob = sdk.AccAddress([]byte("bob"))
+	s.feeTiers = feeTiers
 }
 
 func (s *MsgServerTestSuite) fundAccountBalancesDec(account sdk.AccAddress, aBalance sdk.Dec, bBalance sdk.Dec) {
