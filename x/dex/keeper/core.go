@@ -458,8 +458,9 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		shareOwner.SharesOwned = shareOwner.SharesOwned.Sub(msg.SharesToRemove[i])
 
 		// checks to see if after withdraw any fees tiers exist with non-empty liqudiity in the specified tick
-		isTickEmpty := true
+		isTickEmpty := false
 		if upperTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].TotalShares.Equal(sdk.ZeroDec()) {
+			isTickEmpty = true
 			for _, s := range upperTick.TickData.Reserve0AndShares {
 				if s.TotalShares.GT(sdk.ZeroDec()) {
 					isTickEmpty = false
@@ -476,7 +477,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			Pool0to1, Pool0to1Found := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, upperTick.TickIndex, token0, 0)
 			Pool1to0, Pool1to0Found := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, upperTick.TickIndex, token1, 0)
 
-			if (!Pool0to1Found || Pool0to1.TotalShares.Equal(sdk.ZeroDec())) && (!Pool1to0Found || Pool1to0.TotalShares.Equal(sdk.ZeroDec())) {
+			if (!Pool0to1Found || Pool0to1.TotalShares.Equal(sdk.ZeroDec())) && (!Pool1to0Found || Pool1to0.TotalShares.Equal(sdk.ZeroDec())) && pair.TotalTickCount > 0 {
 				pair.TotalTickCount = pair.TotalTickCount - 1
 			}
 
