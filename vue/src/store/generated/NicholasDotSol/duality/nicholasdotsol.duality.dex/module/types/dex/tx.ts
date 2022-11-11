@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { Reader, util, configure, Writer } from "protobufjs/minimal";
 import * as Long from "long";
+import { Coin } from "../cosmos/base/v1beta1/coin";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -39,7 +40,9 @@ export interface MsgSwap {
   minOut: string;
 }
 
-export interface MsgSwapResponse {}
+export interface MsgSwapResponse {
+  coinOut: Coin | undefined;
+}
 
 export interface MsgPlaceLimitOrder {
   creator: string;
@@ -755,7 +758,10 @@ export const MsgSwap = {
 const baseMsgSwapResponse: object = {};
 
 export const MsgSwapResponse = {
-  encode(_: MsgSwapResponse, writer: Writer = Writer.create()): Writer {
+  encode(message: MsgSwapResponse, writer: Writer = Writer.create()): Writer {
+    if (message.coinOut !== undefined) {
+      Coin.encode(message.coinOut, writer.uint32(10).fork()).ldelim();
+    }
     return writer;
   },
 
@@ -766,6 +772,9 @@ export const MsgSwapResponse = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          message.coinOut = Coin.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -774,18 +783,32 @@ export const MsgSwapResponse = {
     return message;
   },
 
-  fromJSON(_: any): MsgSwapResponse {
+  fromJSON(object: any): MsgSwapResponse {
     const message = { ...baseMsgSwapResponse } as MsgSwapResponse;
+    if (object.coinOut !== undefined && object.coinOut !== null) {
+      message.coinOut = Coin.fromJSON(object.coinOut);
+    } else {
+      message.coinOut = undefined;
+    }
     return message;
   },
 
-  toJSON(_: MsgSwapResponse): unknown {
+  toJSON(message: MsgSwapResponse): unknown {
     const obj: any = {};
+    message.coinOut !== undefined &&
+      (obj.coinOut = message.coinOut
+        ? Coin.toJSON(message.coinOut)
+        : undefined);
     return obj;
   },
 
-  fromPartial(_: DeepPartial<MsgSwapResponse>): MsgSwapResponse {
+  fromPartial(object: DeepPartial<MsgSwapResponse>): MsgSwapResponse {
     const message = { ...baseMsgSwapResponse } as MsgSwapResponse;
+    if (object.coinOut !== undefined && object.coinOut !== null) {
+      message.coinOut = Coin.fromPartial(object.coinOut);
+    } else {
+      message.coinOut = undefined;
+    }
     return message;
   },
 };

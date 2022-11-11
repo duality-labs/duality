@@ -65,7 +65,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	}
 
 	var amount_out sdk.Dec
-
+	var coinOut sdk.Coin
 	if msg.TokenIn == token0 {
 		amount_out, err = k.Swap0to1(goCtx, msg, token0, token1, createrAddr)
 
@@ -84,7 +84,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 		if amount_out.GT(sdk.ZeroDec()) {
 
-			coinOut := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount_out.BigInt()))
+			coinOut = sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount_out.BigInt()))
 			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 				return &types.MsgSwapResponse{}, err
 			}
@@ -108,7 +108,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 		if amount_out.GT(sdk.ZeroDec()) {
 
-			coinOut := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
+			coinOut = sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
 			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 				return &types.MsgSwapResponse{}, err
 			}
@@ -119,7 +119,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 	_ = ctx
 
-	return &types.MsgSwapResponse{}, nil
+	return &types.MsgSwapResponse{coinOut}, nil
 }
 
 func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLimitOrder) (*types.MsgPlaceLimitOrderResponse, error) {
