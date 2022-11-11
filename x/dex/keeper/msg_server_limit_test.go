@@ -412,6 +412,14 @@ func (s *MsgServerLimitTestSuite) assertDexBalances(a int, b int) {
 }
 
 func (s *MsgServerLimitTestSuite) alicePlacesLimitOrder(wantsToken string, tick int, amountIn int) {
+	s.placeLimitOrder(s.alice, wantsToken, tick, amountIn)
+}
+
+func (s *MsgServerLimitTestSuite) bobPlacesLimitOrder(wantsToken string, tick int, amountIn int) {
+	s.placeLimitOrder(s.bob, wantsToken, tick, amountIn)
+}
+
+func (s *MsgServerLimitTestSuite) placeLimitOrder(account sdk.AccAddress, wantsToken string, tick int, amountIn int) {
 	var tokenIn string
 	if wantsToken == "TokenA" {
 		tokenIn = "TokenB"
@@ -420,8 +428,8 @@ func (s *MsgServerLimitTestSuite) alicePlacesLimitOrder(wantsToken string, tick 
 	}
 	amountInDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(amountIn)))
 	_, err := s.msgServer.PlaceLimitOrder(s.goCtx, &types.MsgPlaceLimitOrder{
-		Creator:   s.alice.String(),
-		Receiver:  s.alice.String(),
+		Creator:   account.String(),
+		Receiver:  account.String(),
 		TokenA:    "TokenA",
 		TokenB:    "TokenB",
 		TickIndex: int64(tick),
@@ -448,6 +456,14 @@ func NewDeposit(amountA int, amountB int, tickIndex int, feeIndex int) *Deposit 
 }
 
 func (s *MsgServerLimitTestSuite) aliceDeposits(deposits ...*Deposit) {
+	s.deposits(s.alice, deposits...)
+}
+
+func (s *MsgServerLimitTestSuite) bobDeposits(deposits ...*Deposit) {
+	s.deposits(s.bob, deposits...)
+}
+
+func (s *MsgServerLimitTestSuite) deposits(account sdk.AccAddress, deposits ...*Deposit) {
 	amountsA := make([]sdk.Dec, len(deposits))
 	amountsB := make([]sdk.Dec, len(deposits))
 	tickIndicies := make([]int64, len(deposits))
@@ -460,8 +476,8 @@ func (s *MsgServerLimitTestSuite) aliceDeposits(deposits ...*Deposit) {
 	}
 
 	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
-		Creator:     s.alice.String(),
-		Receiver:    s.alice.String(),
+		Creator:     account.String(),
+		Receiver:    account.String(),
 		TokenA:      "TokenA",
 		TokenB:      "TokenB",
 		AmountsA:    amountsA,
@@ -473,10 +489,14 @@ func (s *MsgServerLimitTestSuite) aliceDeposits(deposits ...*Deposit) {
 }
 
 func (s *MsgServerLimitTestSuite) aliceCancelsLimitOrder(keyToken string, tick int, key int, sharesOut int) {
+	s.cancelsLimitOrder(s.alice, keyToken, tick, key, sharesOut)
+}
+
+func (s *MsgServerLimitTestSuite) cancelsLimitOrder(account sdk.AccAddress, keyToken string, tick int, key int, sharesOut int) {
 	sharesOutDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(sharesOut)))
 	_, err := s.msgServer.CancelLimitOrder(s.goCtx, &types.MsgCancelLimitOrder{
-		Creator:   s.alice.String(),
-		Receiver:  s.alice.String(),
+		Creator:   account.String(),
+		Receiver:  account.String(),
 		TokenA:    "TokenA",
 		TokenB:    "TokenB",
 		TickIndex: int64(tick),
@@ -488,6 +508,10 @@ func (s *MsgServerLimitTestSuite) aliceCancelsLimitOrder(keyToken string, tick i
 }
 
 func (s *MsgServerLimitTestSuite) bobPlacesSwapOrder(wantsToken string, amountIn int, minOut int) {
+	s.placesSwapOrder(s.bob, wantsToken, amountIn, minOut)
+}
+
+func (s *MsgServerLimitTestSuite) placesSwapOrder(account sdk.AccAddress, wantsToken string, amountIn int, minOut int) {
 	var tokenIn string
 	if wantsToken == "TokenA" {
 		tokenIn = "TokenB"
@@ -497,8 +521,8 @@ func (s *MsgServerLimitTestSuite) bobPlacesSwapOrder(wantsToken string, amountIn
 	amountInDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(amountIn)))
 	minOutDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(minOut)))
 	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
-		Creator:  s.bob.String(),
-		Receiver: s.bob.String(),
+		Creator:  account.String(),
+		Receiver: account.String(),
 		TokenA:   "TokenA",
 		TokenB:   "TokenB",
 		TokenIn:  tokenIn,
@@ -509,9 +533,13 @@ func (s *MsgServerLimitTestSuite) bobPlacesSwapOrder(wantsToken string, amountIn
 }
 
 func (s *MsgServerLimitTestSuite) aliceWithdrawsFilledLimitOrder(withdrawToken string, tick int) {
+	s.withdrawsFilledLimitOrder(s.alice, withdrawToken, tick)
+}
+
+func (s *MsgServerLimitTestSuite) withdrawsFilledLimitOrder(account sdk.AccAddress, withdrawToken string, tick int) {
 	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
-		Creator:   s.alice.String(),
-		Receiver:  s.alice.String(),
+		Creator:   account.String(),
+		Receiver:  account.String(),
 		TokenA:    "TokenA",
 		TokenB:    "TokenB",
 		TickIndex: int64(tick),
