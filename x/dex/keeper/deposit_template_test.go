@@ -17,34 +17,29 @@ func (env *TestEnv) TestDeposit(t *testing.T, denomA string, denomB string, amou
 		t.Errorf("Need equal lengths of coinsA and coinsB for multi-deposit")
 	}
 	denom0, denom1, amounts0, amounts1 := env.sortCoins(t, denomA, denomB, amountsA, amountsB)
-	// TODO: create trueamounts
+	// TODO: create trueAmounts (the amounts passed aren't necessarily the amounts deposited)
 	pairId := app.DexKeeper.CreatePairId(denom0, denom1)
 
-	// calculate total trade amounts
-	totalAmount0, totalAmount1 := sdk.NewDecFromInt(convInt("0")), sdk.NewDecFromInt(convInt("0"))
-	for i := range amounts0 {
-		totalAmount0 = totalAmount0.Add(amounts0[i])
-		totalAmount1 = totalAmount1.Add(amounts1[i])
-	}
+	accBalance0Initial, accBalance1Initial := env.getBalance(acc, denom0), env.getBalance(acc, denom1)
+	totalAmount0, totalAmount1 := getTotalAmount(amounts0), getTotalAmount(amounts1)
 
 	// verify acc has sufficient balances in env
-	accBalance0Initial, accBalance1Initial := sdk.NewDecFromIntWithPrec(app.BankKeeper.GetBalance(ctx, acc, denom0).Amount, 18), sdk.NewDecFromIntWithPrec(app.BankKeeper.GetBalance(ctx, acc, denom1).Amount, 18)
-	if !(accBalance0Initial.GTE(totalAmount0)) {
-		t.Errorf("%s has insufficient balance of %s. Has %s, expected at least %s.", acc, denomA, accBalance0Initial, totalAmount0)
+	if accBalance0Initial.GTE(totalAmount0) {
+		t.Errorf("%s has insufficient balance of %s. Has %s, expected at least %s.", acc, denom0, accBalance0Initial, totalAmount0)
 	}
-	if !(accBalance1Initial.GTE(totalAmount1)) {
-		t.Errorf("%s has insufficient balance of %s. Has %s, expected at least %s.", acc, denomB, accBalance1Initial, totalAmount1)
+	if accBalance1Initial.GTE(totalAmount1) {
+		t.Errorf("%s has insufficient balance of %s. Has %s, expected at least %s.", acc, denom1, accBalance1Initial, totalAmount1)
 	}
 
 	// get Dex initial balance
-	dexAllCoinsInitial := app.BankKeeper.GetAllBalances(ctx, app.AccountKeeper.GetModuleAddress("dex"))
-	dexBalance0Initial, dexBalance1Initial := sdk.NewDecFromIntWithPrec(dexAllCoinsInitial.AmountOf(denom0), 18), sdk.NewDecFromIntWithPrec(dexAllCoinsInitial.AmountOf(denom1), 18)
-
+	dexBalance0Initial, dexBalance1Initial := env.getDexBalance(denom0), env.getDexBalance(denom1)
 	// get amount of shares before depositing
 	initialShares, initialSharesFound := env.makeShares(acc, pairId, tickIndexes, feeTiers)
-
 	// get initial pair info for 0to1 and 1to0 ticks
 	pairInitial := env.makePair(t, pairId, tickIndexes[0], feeTiers[0])
+	// accumulate shares and calculate final CurrentTicks
+	expectedTick0to1, expectedTick1to0 := env.calculateFinalTicks(pairInitial, amounts0, amounts1, tickIndexes, feeTiers)
+	sharesCalcAccum := env.calculateFinalShares(t, pairId, amounts0, amounts1, tickIndexes, feeTiers)
 
 	// WHEN depositing the specified amounts0, amounts1 and given fee tiers
 	_, err := env.cosmos.msgServer.Deposit(goCtx, &types.MsgDeposit{ // (discard message response because we don't need it)
@@ -66,51 +61,20 @@ func (env *TestEnv) TestDeposit(t *testing.T, denomA string, denomB string, amou
 
 	// verify alice's resulting balances is aliceBalanceInitial - depositCoin
 	accBalance0Final, accBalance1Final := accBalance0Initial.Sub(totalAmount0), accBalance1Initial.Sub(totalAmount1)
-	if balance := sdk.NewDecFromIntWithPrec(app.BankKeeper.GetBalance(ctx, acc, denom0).Amount, 18); !(balance.Equal(accBalance0Final)) {
-		env.handleIntentionalFail(t, "%s's final balance of %s (%s) does not reflect deposit", acc, denom0, balance)
+	if balance := env.getBalance(acc, denom0); !balance.Equal(accBalance0Final) {
+		env.handleIntentionalFail(t, "%s's final balance of %s does not reflect deposit", acc, denom0)
 	}
-	if balance := sdk.NewDecFromIntWithPrec(app.BankKeeper.GetBalance(ctx, acc, denom1).Amount, 18); !(balance.Equal(accBalance1Final)) {
-		env.handleIntentionalFail(t, "%s's final balance of %s (%s) does not reflect deposit", acc, denom1, balance)
+	if balance := env.getBalance(acc, denom1); !balance.Equal(accBalance1Final) {
+		env.handleIntentionalFail(t, "%s's final balance of %s does not reflect deposit", acc, denom1)
 	}
 
 	// verify dex's resulting balances is dexBalanceInitial + depositCoin
-	dexAllCoinsFinal := app.BankKeeper.GetAllBalances(ctx, app.AccountKeeper.GetModuleAddress("dex"))
 	dexBalance0Final, dexBalance1Final := dexBalance0Initial.Add(totalAmount0), dexBalance1Initial.Add(totalAmount1)
-	if balance := sdk.NewDecFromIntWithPrec(dexAllCoinsFinal.AmountOf(denom0), 18); !(balance.Equal(dexBalance0Final)) {
+	if balance := env.getDexBalance(denom0); !(balance.Equal(dexBalance0Final)) {
 		env.handleIntentionalFail(t, "Dex module's final balance of %s (%s) does not reflect deposit", denom0, balance)
 	}
-	if balance := sdk.NewDecFromIntWithPrec(dexAllCoinsFinal.AmountOf(denom1), 18); !(balance.Equal(dexBalance1Final)) {
+	if balance := env.getDexBalance(denom1); !(balance.Equal(dexBalance1Final)) {
 		env.handleIntentionalFail(t, "Dex module's final balance of %s (%s) does not reflect deposit", denom1, balance)
-	}
-
-	// accumulate shares and calculate final CurrentTicks
-	sharesCalcAccum := make(map[int64]map[uint64]sdk.Dec) // map from tickIndex->feeTier->sharesCalc
-	expectedTick0to1, expectedTick1to0 := pairInitial.TokenPair.CurrentTick0To1, pairInitial.TokenPair.CurrentTick1To0
-	for i := range amounts0 {
-		// get expected amount of minted shares and increase accum on both sides of spread
-		accSharesCalc := env.calculateShares(t, amounts0[i], amounts1[i], pairId, tickIndexes[i], feeTiers[i])
-		// accumulate minted shares
-		if shares, ok := sharesCalcAccum[tickIndexes[i]][feeTiers[i]]; ok {
-			// if already exists, add to previous value
-			sharesCalcAccum[tickIndexes[i]][feeTiers[i]] = shares.Add(accSharesCalc)
-		} else {
-			// if inner map hasn't been initialized, init
-			if _, ok := sharesCalcAccum[tickIndexes[i]]; !ok {
-				sharesCalcAccum[tickIndexes[i]] = make(map[uint64]sdk.Dec)
-			}
-			// else add value to map
-			sharesCalcAccum[tickIndexes[i]][feeTiers[i]] = accSharesCalc
-		}
-
-		// move expected current ticks
-		tick0to1Calc, tick1to0Calc := env.calculateNewCurrentTicks(amounts0[i], amounts1[i], tickIndexes[i], feeTiers[i], pairInitial)
-		if tick0to1Calc > expectedTick0to1 {
-			expectedTick0to1 = tick0to1Calc
-		}
-		if tick1to0Calc < expectedTick1to0 {
-			expectedTick1to0 = tick1to0Calc
-		}
-
 	}
 
 	// verify correct amount of shares in every tick

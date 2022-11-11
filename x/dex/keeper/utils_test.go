@@ -118,6 +118,16 @@ func (env *TestEnv) handleIntentionalFail(t *testing.T, format string, args ...i
 	}
 }
 
+func (env *TestEnv) getBalance(acc sdk.AccAddress, denom string) sdk.Dec {
+	app, ctx := env.cosmos.app, env.cosmos.ctx
+	return sdk.NewDecFromIntWithPrec(app.BankKeeper.GetBalance(ctx, acc, denom).Amount, 18)
+}
+
+func (env *TestEnv) getDexBalance(denom string) sdk.Dec {
+	app, ctx := env.cosmos.app, env.cosmos.ctx
+	return sdk.NewDecFromIntWithPrec(app.BankKeeper.GetAllBalances(ctx, app.AccountKeeper.GetModuleAddress("dex")).AmountOf(denom), 18)
+}
+
 // Helper to convert coins into sorted amount0, amount1
 func (env *TestEnv) sortCoins(t *testing.T, denomA string, denomB string, amountsA []sdk.Dec, amountsB []sdk.Dec) (string, string, []sdk.Dec, []sdk.Dec) {
 	app, ctx := env.cosmos.app, env.cosmos.ctx
