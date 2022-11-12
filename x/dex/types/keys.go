@@ -291,7 +291,7 @@ const (
 	WithdrawEventFee           = "FeeIndex"
 	WithdrawEventReceiver      = "Receiver"
 	WithdrawEventOldReserve0   = "OldReserve0"
-	WithdrawEventOldReserve1   = "OldReserve0"
+	WithdrawEventOldReserve1   = "OldReserve1"
 	WithdrawEventNewReserve0   = "NewReserve0"
 	WithdrawEventNewReserve1   = "NewReserve1"
 	WithdrawEventSharesRemoved = "SharesRemoved"
