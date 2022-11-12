@@ -394,7 +394,7 @@ type Withdrawl struct {
 	Shares    sdk.Dec
 }
 
-func newWithdrawl(tick int64, fee uint64, shares int64) *Withdrawl {
+func NewWithdrawl(shares int64, tick int64, fee uint64) *Withdrawl {
 	return &Withdrawl{
 		Shares:    sdk.NewDec(shares),
 		FeeIndex:  fee,

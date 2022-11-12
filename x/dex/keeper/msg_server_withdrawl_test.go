@@ -13,7 +13,7 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlFull() {
 	s.aliceDeposits(NewDeposit(100, 50, 0, 0))
 
 	// WHEN Alice withdraws her entire position (150 Shares)
-	err := s.aliceWithdraws(newWithdrawl(0, 0, 150))
+	err := s.aliceWithdraws(NewWithdrawl(150, 0, 0))
 	s.Assert().NoError(err)
 
 	// THEN assert alice gets 100TokenA & 150TokenB; Dex retains no balance; No active Ticks
@@ -30,7 +30,7 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlPartial() {
 	s.aliceDeposits(NewDeposit(100, 50, 0, 0))
 
 	// WHEN Alice withdraws her half her position (75 Shares)
-	err := s.aliceWithdraws(newWithdrawl(0, 0, 75))
+	err := s.aliceWithdraws(NewWithdrawl(75, 0, 0))
 	s.Assert().NoError(err)
 
 	// THEN Alice gets half her deposit back; Dex retains half
@@ -50,7 +50,7 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlMaxFee() {
 	s.aliceDeposits(NewDeposit(100, 0, 0, 3))
 
 	// WHEN Alice withdraws her half her position
-	s.aliceWithdraws(newWithdrawl(0, 3, 50))
+	s.aliceWithdraws(NewWithdrawl(50, 0, 3))
 
 	// THEN Alice gets 50 TokenA back and Dex retains balance of 50
 	s.assertAliceShares(0, 3, sdk.NewDec(50))
@@ -65,7 +65,7 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlSingleSide() {
 	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
 
 	// WHEN Alice withdraws her entire position
-	s.aliceWithdraws(newWithdrawl(0, 0, 100))
+	s.aliceWithdraws(NewWithdrawl(100, 0, 0))
 
 	// THEN Alice gets 100TokenA back; Dex retains no balance; No Active Ticks
 	s.assertAliceShares(0, 0, sdk.NewDec(0))
@@ -87,7 +87,7 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlShiftsTickRight() {
 	s.assertCurrentTicks(1, 2)
 
 	// WHEN Alice withdraws her shares from Tick 1
-	s.aliceWithdraws(newWithdrawl(1, 0, 100))
+	s.aliceWithdraws(NewWithdrawl(100, 1, 0))
 
 	// THEN currentTick1To0 = 3
 	//TODO: this is currently failling because of TickCount bug
@@ -106,7 +106,7 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlShiftsTickLeft() {
 	s.assertCurrentTicks(1, 2)
 
 	// WHEN Alice withdraws her shares from Tick 2
-	s.aliceWithdraws(newWithdrawl(2, 0, 100))
+	s.aliceWithdraws(NewWithdrawl(100, 2, 0))
 
 	// THEN currentTick0To1 = 0
 	//TODO: this is currently failling because of TickCount bug
@@ -127,8 +127,8 @@ func (s *MsgServerTestSuite) TestMultiWithdrawlShiftsTickLeft() {
 
 	// WHEN Alice withdraws all her shares from Tick 1 & 2
 	s.aliceWithdraws(
-		newWithdrawl(1, 0, 100),
-		newWithdrawl(2, 0, 100))
+		NewWithdrawl(100, 1, 0),
+		NewWithdrawl(100, 2, 0))
 
 	// THEN currentTick1To0 = 4
 	//TODO: this is currently failling because of TickCount bug
@@ -157,10 +157,10 @@ func (s *MsgServerTestSuite) TestFailsWhenNotEnoughShares() {
 	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
 
 	// WHEN Alice tries to withdraw 200
-	err := s.aliceWithdraws(newWithdrawl(0, 0, 200))
+	err := s.aliceWithdraws(NewWithdrawl(200, 0, 0))
 
 	// THEN ensure error is thrown and Alice and Dex balances remain unchanged
-	s.Assert().Error(err)
+	s.Assert().ErrorIs(err, types.ErrNotEnoughShares)
 	s.assertAliceShares(0, 0, sdk.NewDec(100))
 	s.assertAliceBalances(0, 0)
 }
@@ -173,13 +173,13 @@ func (s *MsgServerTestSuite) TestFailsWhenNotEnoughSharesMulti() {
 
 	// WHEN Alice does multiple withdrawals > 100
 	err := s.aliceWithdraws(
-		newWithdrawl(0, 0, 50),
-		newWithdrawl(0, 0, 50),
-		newWithdrawl(0, 0, 50),
+		NewWithdrawl(50, 0, 0),
+		NewWithdrawl(50, 0, 0),
+		NewWithdrawl(50, 0, 0),
 	)
 
 	// THEN an error is thrown and Alice and Dex balances remain unchanged
-	s.Assert().Error(err)
+	s.Assert().ErrorIs(err, types.ErrNotEnoughShares)
 
 	// TODO: this is currently failing in testing,
 	// may be a bug may just be an issue with how state is retracted on failure in test framework
@@ -204,21 +204,24 @@ func (s *MsgServerTestSuite) TestFailsWithNonExistentPair() {
 		FeeIndexes:     []uint64{0},
 	})
 
-	// THEN ensure error is throw
-	// TODO: Not sure how to trigger this failure case because we hit the insufficient shares check first
-	s.Assert().Error(err)
+	// NOTE: As code is currently written we hit not enough shares check
+	// before validating pair existence. This is correct from a
+	// UX perspective --users should not care whether tick is initialized
+	s.Assert().ErrorIs(err, types.ErrNotEnoughShares)
 }
 
 func (s *MsgServerTestSuite) TestFailsWithInvalidTick() {
 	s.fundAliceBalances(100, 0)
 
+
 	// IF Alice Deposists 100
 	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
 
 	// WHEN Alice tries to withdraw from an invalid tick
-	err := s.aliceWithdraws(newWithdrawl(10, 0, 50))
+	err := s.aliceWithdraws(NewWithdrawl(50, 10, 0))
 
-	s.Assert().Error(err)
+	// NOTE: See above NOTE on error condition from TestFailsWithNonExistentPair
+	s.Assert().ErrorIs(err, types.ErrNotEnoughShares)
 	s.assertAliceShares(0, 0, sdk.NewDec(100))
 	s.assertDexBalances(100, 0)
 }
@@ -229,29 +232,30 @@ func (s *MsgServerTestSuite) TestFailsWithInvalidTickMulti() {
 	// IF Alice Deposists 100
 	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
 
-	// WHEN Alice tries to withdraw from a mix of valid and invalid tickss
+	// WHEN Alice tries to withdraw from a mix of valid and invalid ticks
 	err := s.aliceWithdraws(
 		// INVALID
-		newWithdrawl(10, 0, 50),
+		NewWithdrawl(50, 10, 0),
 		// VALID
-		newWithdrawl(0, 0, 50),
+		NewWithdrawl(50, 0, 0),
 	)
 
-	s.Assert().Error(err)
+	// NOTE: See above NOTE on error condition from TestFailsWithNonExistentPair
+	s.Assert().ErrorIs(err, types.ErrNotEnoughShares)
 	s.assertAliceShares(0, 0, sdk.NewDec(100))
 	s.assertDexBalances(100, 0)
 }
 
-func (s *MsgServerTestSuite) TestFailsWithInvalidFeeTick() {
+func (s *MsgServerTestSuite) TestFailsWithInvalidFee() {
 	s.fundAliceBalances(100, 0)
 
 	// IF Alice Deposists 100
 	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
 
 	// WHEN Alice tries to withdraw from an invalid tick
-	err := s.aliceWithdraws(newWithdrawl(10, 0, 50))
+	err := s.aliceWithdraws(NewWithdrawl(100, 0, 99))
 
-	s.Assert().Error(err)
+	s.Assert().ErrorIs(err, types.ErrValidFeeIndexNotFound)
 	s.assertAliceShares(0, 0, sdk.NewDec(100))
 	s.assertDexBalances(100, 0)
 }
@@ -265,13 +269,13 @@ func (s *MsgServerTestSuite) TestFailsWithInvalidFeeMulti() {
 	// WHEN Alice tries to withdraw from a mix of valid and invalid FeeTiers
 	err := s.aliceWithdraws(
 		// INVALID
-		newWithdrawl(0, 10, 50),
+		NewWithdrawl(50, 0, 10),
 		// VALID
-		newWithdrawl(0, 0, 50),
+		NewWithdrawl(50, 0, 0),
 	)
 
 	// THEN ensure error is thrown and Alice and Dex balances remain unchanged
-	s.Assert().Error(err)
+	s.Assert().ErrorIs(err, types.ErrValidFeeIndexNotFound)
 	s.assertAliceShares(0, 0, sdk.NewDec(100))
 	s.assertDexBalances(100, 0)
 }
