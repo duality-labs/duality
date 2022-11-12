@@ -1,13 +1,22 @@
 package app
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 
-	swap "github.com/NicholasDotSol/duality/x/ibc-swap"
-	swaptypes "github.com/NicholasDotSol/duality/x/ibc-swap/types"
+	adminmodulemodule "github.com/cosmos/admin-module/x/adminmodule"
+	adminmodulecli "github.com/cosmos/admin-module/x/adminmodule/client/cli"
+	adminmodulemodulekeeper "github.com/cosmos/admin-module/x/adminmodule/keeper"
+	adminmodulemoduletypes "github.com/cosmos/admin-module/x/adminmodule/types"
+	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	paramsrest "github.com/cosmos/cosmos-sdk/x/params/client/rest"
+	proposaltypes "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
+	upgraderest "github.com/cosmos/cosmos-sdk/x/upgrade/client/rest"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
@@ -42,38 +51,19 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	crisiskeeper "github.com/cosmos/cosmos-sdk/x/crisis/keeper"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	distrclient "github.com/cosmos/cosmos-sdk/x/distribution/client"
-	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
-	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/cosmos/cosmos-sdk/x/evidence"
 	evidencekeeper "github.com/cosmos/cosmos-sdk/x/evidence/keeper"
 	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
 	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
 	feegrantmodule "github.com/cosmos/cosmos-sdk/x/feegrant/module"
-	"github.com/cosmos/cosmos-sdk/x/genutil"
-	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
-	"github.com/cosmos/cosmos-sdk/x/gov"
-	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
-	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	"github.com/cosmos/cosmos-sdk/x/mint"
-	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
-	"github.com/cosmos/cosmos-sdk/x/staking"
-	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
-	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
@@ -81,25 +71,32 @@ import (
 	ibctransfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v3/modules/core"
 	ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client"
-	ibcclientclient "github.com/cosmos/ibc-go/v3/modules/core/02-client/client"
 	ibcclienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
 	ibcporttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
+	"github.com/gorilla/mux"
+	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
 	"github.com/tendermint/spm/cosmoscmd"
-	"github.com/tendermint/spm/openapiconsole"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/NicholasDotSol/duality/docs"
+	ccvconsumer "github.com/cosmos/interchain-security/x/ccv/consumer"
+	ccvconsumerkeeper "github.com/cosmos/interchain-security/x/ccv/consumer/keeper"
+	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
+
 	dexmodule "github.com/NicholasDotSol/duality/x/dex"
 	dexmodulekeeper "github.com/NicholasDotSol/duality/x/dex/keeper"
 	dexmoduletypes "github.com/NicholasDotSol/duality/x/dex/types"
-	swapkeeper "github.com/NicholasDotSol/duality/x/ibc-swap/keeper"
+
+	// unnamed import of statik for swagger UI support
+	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
+
+	"github.com/cosmos/interchain-security/testutil/e2e"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -109,23 +106,6 @@ const (
 )
 
 // this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
-
-func getGovProposalHandlers() []govclient.ProposalHandler {
-	var govProposalHandlers []govclient.ProposalHandler
-	// this line is used by starport scaffolding # stargate/app/govProposalHandlers
-
-	govProposalHandlers = append(govProposalHandlers,
-		paramsclient.ProposalHandler,
-		distrclient.ProposalHandler,
-		upgradeclient.ProposalHandler,
-		upgradeclient.CancelProposalHandler,
-		ibcclientclient.UpdateClientProposalHandler,
-		ibcclientclient.UpgradeProposalHandler,
-		// this line is used by starport scaffolding # stargate/app/govProposalHandler
-	)
-
-	return govProposalHandlers
-}
 
 var (
 	// DefaultNodeHome default home directories for the application daemon
@@ -137,13 +117,8 @@ var (
 	ModuleBasics = module.NewBasicManager(
 		auth.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
-		genutil.AppModuleBasic{},
 		bank.AppModuleBasic{},
 		capability.AppModuleBasic{},
-		staking.AppModuleBasic{},
-		mint.AppModuleBasic{},
-		distr.AppModuleBasic{},
-		gov.NewAppModuleBasic(getGovProposalHandlers()...),
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
@@ -153,22 +128,32 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+		ccvconsumer.AppModuleBasic{},
+		adminmodulemodule.NewAppModuleBasic(
+			govclient.NewProposalHandler(
+				adminmodulecli.NewSubmitParamChangeProposalTxCmd,
+				paramsrest.ProposalRESTHandler,
+			),
+			govclient.NewProposalHandler(
+				adminmodulecli.NewCmdSubmitUpgradeProposal,
+				upgraderest.ProposalRESTHandler,
+			),
+			govclient.NewProposalHandler(
+				adminmodulecli.NewCmdSubmitCancelUpgradeProposal,
+				upgraderest.ProposalCancelRESTHandler,
+			),
+		),
 		dexmodule.AppModuleBasic{},
-		swap.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
 	// module account permissions
 	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:     nil,
-		distrtypes.ModuleName:          nil,
-		minttypes.ModuleName:           {authtypes.Minter},
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		govtypes.ModuleName:            {authtypes.Burner},
-		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		dexmoduletypes.ModuleName:      {authtypes.Minter, authtypes.Burner, authtypes.Staking},
-		swaptypes.ModuleName:           nil,
+		authtypes.FeeCollectorName:                    nil,
+		ibctransfertypes.ModuleName:                   {authtypes.Minter, authtypes.Burner},
+		dexmoduletypes.ModuleName:                     {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+		ccvconsumertypes.ConsumerRedistributeName:     nil,
+		ccvconsumertypes.ConsumerToSendToProviderName: nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -206,28 +191,25 @@ type App struct {
 	memKeys map[string]*sdk.MemoryStoreKey
 
 	// keepers
-	AccountKeeper        authkeeper.AccountKeeper
-	AuthzKeeper          authzkeeper.Keeper
-	BankKeeper           bankkeeper.Keeper
-	CapabilityKeeper     *capabilitykeeper.Keeper
-	StakingKeeper        stakingkeeper.Keeper
-	SlashingKeeper       slashingkeeper.Keeper
-	MintKeeper           mintkeeper.Keeper
-	DistrKeeper          distrkeeper.Keeper
-	GovKeeper            govkeeper.Keeper
-	CrisisKeeper         crisiskeeper.Keeper
-	UpgradeKeeper        upgradekeeper.Keeper
-	ParamsKeeper         paramskeeper.Keeper
-	IBCKeeper            *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	EvidenceKeeper       evidencekeeper.Keeper
-	TransferKeeper       ibctransferkeeper.Keeper
-	FeeGrantKeeper       feegrantkeeper.Keeper
-	SwapMiddlewareKeeper swapkeeper.Keeper
+	AccountKeeper     authkeeper.AccountKeeper
+	AuthzKeeper       authzkeeper.Keeper
+	BankKeeper        bankkeeper.Keeper
+	CapabilityKeeper  *capabilitykeeper.Keeper
+	SlashingKeeper    slashingkeeper.Keeper
+	CrisisKeeper      crisiskeeper.Keeper
+	UpgradeKeeper     upgradekeeper.Keeper
+	ParamsKeeper      paramskeeper.Keeper
+	IBCKeeper         *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	EvidenceKeeper    evidencekeeper.Keeper
+	TransferKeeper    ibctransferkeeper.Keeper
+	FeeGrantKeeper    feegrantkeeper.Keeper
+	ConsumerKeeper    ccvconsumerkeeper.Keeper
+	AdminmoduleKeeper adminmodulemodulekeeper.Keeper
 
 	// make scoped keepers public for test purposes
-	ScopedIBCKeeper        capabilitykeeper.ScopedKeeper
-	ScopedTransferKeeper   capabilitykeeper.ScopedKeeper
-	ScopedMonitoringKeeper capabilitykeeper.ScopedKeeper
+	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
+	ScopedTransferKeeper    capabilitykeeper.ScopedKeeper
+	ScopedCCVConsumerKeeper capabilitykeeper.ScopedKeeper
 
 	DexKeeper dexmodulekeeper.Keeper
 
@@ -289,10 +271,10 @@ func NewApp(
 	bApp.SetInterfaceRegistry(interfaceRegistry)
 
 	keys := sdk.NewKVStoreKeys(
-		authtypes.StoreKey, authz.ModuleName, banktypes.StoreKey, stakingtypes.StoreKey,
-		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
-		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
-		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey, dexmoduletypes.StoreKey,
+		authtypes.StoreKey, authz.ModuleName, banktypes.StoreKey,
+		slashingtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
+		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
+		dexmoduletypes.StoreKey, ccvconsumertypes.StoreKey, adminmodulemoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -320,6 +302,8 @@ func NewApp(
 	// grant capabilities for the ibc and ibc-transfer modules
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+	scopedCCVConsumerKeeper := app.CapabilityKeeper.ScopeToModule(ccvconsumertypes.ModuleName)
+	app.CapabilityKeeper.Seal()
 	// this line is used by starport scaffolding # stargate/app/scopedKeeper
 
 	// add keepers
@@ -334,19 +318,8 @@ func NewApp(
 	app.BankKeeper = bankkeeper.NewBaseKeeper(
 		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.GetSubspace(banktypes.ModuleName), app.ModuleAccountAddrs(),
 	)
-	stakingKeeper := stakingkeeper.NewKeeper(
-		appCodec, keys[stakingtypes.StoreKey], app.AccountKeeper, app.BankKeeper, app.GetSubspace(stakingtypes.ModuleName),
-	)
-	app.MintKeeper = mintkeeper.NewKeeper(
-		appCodec, keys[minttypes.StoreKey], app.GetSubspace(minttypes.ModuleName), &stakingKeeper,
-		app.AccountKeeper, app.BankKeeper, authtypes.FeeCollectorName,
-	)
-	app.DistrKeeper = distrkeeper.NewKeeper(
-		appCodec, keys[distrtypes.StoreKey], app.GetSubspace(distrtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
-		&stakingKeeper, authtypes.FeeCollectorName, app.ModuleAccountAddrs(),
-	)
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
-		appCodec, keys[slashingtypes.StoreKey], &stakingKeeper, app.GetSubspace(slashingtypes.ModuleName),
+		appCodec, keys[slashingtypes.StoreKey], &app.ConsumerKeeper, app.GetSubspace(slashingtypes.ModuleName),
 	)
 	app.CrisisKeeper = crisiskeeper.NewKeeper(
 		app.GetSubspace(crisistypes.ModuleName), invCheckPeriod, app.BankKeeper, authtypes.FeeCollectorName,
@@ -355,26 +328,12 @@ func NewApp(
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
 
-	// register the staking hooks
-	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
-	app.StakingKeeper = *stakingKeeper.SetHooks(
-		stakingtypes.NewMultiStakingHooks(app.DistrKeeper.Hooks(), app.SlashingKeeper.Hooks()),
-	)
-
 	// ... other modules keepers
 
 	// Create IBC Keeper
 	app.IBCKeeper = ibckeeper.NewKeeper(
-		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), app.StakingKeeper, app.UpgradeKeeper, scopedIBCKeeper,
+		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), &app.ConsumerKeeper, app.UpgradeKeeper, scopedIBCKeeper,
 	)
-
-	// register the proposal types
-	govRouter := govtypes.NewRouter()
-	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
-		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
-		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
-		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
 
 	// Create Transfer Keepers
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
@@ -382,23 +341,52 @@ func NewApp(
 		app.IBCKeeper.ChannelKeeper, app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 	)
-	transferModule := transfer.NewAppModule(app.TransferKeeper)
-	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
-
-	// TODO delete this after wiring in the packet forward middleware
-	_ = transferIBCModule
+	var (
+		transferModule    = transfer.NewAppModule(app.TransferKeeper)
+		transferIBCModule = transfer.NewIBCModule(app.TransferKeeper)
+	)
 
 	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
-		appCodec, keys[evidencetypes.StoreKey], &app.StakingKeeper, app.SlashingKeeper,
+		appCodec, keys[evidencetypes.StoreKey], &app.ConsumerKeeper, app.SlashingKeeper,
 	)
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.GovKeeper = govkeeper.NewKeeper(
-		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
-		&stakingKeeper, govRouter,
+	app.ConsumerKeeper = ccvconsumerkeeper.NewKeeper(
+		appCodec,
+		keys[ccvconsumertypes.StoreKey],
+		app.GetSubspace(ccvconsumertypes.ModuleName),
+		scopedCCVConsumerKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.IBCKeeper.ConnectionKeeper,
+		app.IBCKeeper.ClientKeeper,
+		app.SlashingKeeper,
+		app.BankKeeper,
+		app.AccountKeeper,
+		&app.TransferKeeper,
+		app.IBCKeeper,
+		authtypes.FeeCollectorName,
 	)
+
+	app.ConsumerKeeper = *app.ConsumerKeeper.SetHooks(app.SlashingKeeper.Hooks())
+	consumerModule := ccvconsumer.NewAppModule(app.ConsumerKeeper)
+
+	adminRouter := govtypes.NewRouter()
+	adminRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
+		AddRoute(proposaltypes.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
+		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
+
+	app.AdminmoduleKeeper = *adminmodulemodulekeeper.NewKeeper(
+		appCodec,
+		keys[adminmodulemoduletypes.StoreKey],
+		keys[adminmodulemoduletypes.MemStoreKey],
+		adminRouter,
+		IsProposalWhitelisted,
+	)
+	adminModule := adminmodulemodule.NewAppModule(appCodec, app.AdminmoduleKeeper)
 
 	app.DexKeeper = *dexmodulekeeper.NewKeeper(
 		appCodec,
@@ -412,35 +400,10 @@ func NewApp(
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
-	// TODO wire up the middleware stack here such that when incoming packets come in, we first try to swap
-	// then try to forward, and then call into the transfer module.
-	//
-	// the IBC stack from top to bottom will look like this:
-	// -- channel.OnRecvPacket
-	// -- swap.OnRecvPacket
-	// -- forward.OnRecvPacket
-	// -- transfer.OnRecvPacket
-	// see: https://github.com/cosmos/ibc-go/blob/main/docs/middleware/ics29-fee/integration.md#configuring-an-application-stack-with-fee-middleware
-
-	// Initialize the swap middleware keeper and wire it up with the forward middleware such that the
-	// swap middlewares underlying app becomes the forward middleware.
-	app.SwapMiddlewareKeeper = swapkeeper.NewKeeper(
-		appCodec,
-		app.GetSubspace(swaptypes.ModuleName),
-		app.MsgServiceRouter(),
-		app.IBCKeeper.ChannelKeeper, // TODO I believe this will be replaced with the forward middleware
-		app.IBCKeeper.ChannelKeeper,
-		&app.IBCKeeper.PortKeeper,
-	)
-
-	// Create our IBC stack from bottom to top
-	var ibcStack ibcporttypes.IBCModule
-	ibcStack = transfer.NewIBCModule(app.TransferKeeper)
-	ibcStack = swap.NewIBCMiddleware(ibcStack, app.SwapMiddlewareKeeper)
-
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, ibcStack)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
+	ibcRouter.AddRoute(ccvconsumertypes.ModuleName, consumerModule)
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -454,10 +417,6 @@ func NewApp(
 	// must be passed by reference here.
 
 	app.mm = module.NewManager(
-		genutil.NewAppModule(
-			app.AccountKeeper, app.StakingKeeper, app.BaseApp.DeliverTx,
-			encodingConfig.TxConfig,
-		),
 		auth.NewAppModule(appCodec, app.AccountKeeper, nil),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		vesting.NewAppModule(app.AccountKeeper, app.BankKeeper),
@@ -465,18 +424,15 @@ func NewApp(
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		crisis.NewAppModule(&app.CrisisKeeper, skipGenesisInvariants),
-		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper),
-		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper),
-		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
-		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
-		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
+		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.ConsumerKeeper),
 		upgrade.NewAppModule(app.UpgradeKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
+		consumerModule,
+		adminModule,
 		dexModule,
-		swap.NewAppModule(app.SwapMiddlewareKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -487,49 +443,41 @@ func NewApp(
 	app.mm.SetOrderBeginBlockers(
 		upgradetypes.ModuleName,
 		capabilitytypes.ModuleName,
-		minttypes.ModuleName,
-		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
-		stakingtypes.ModuleName,
 		vestingtypes.ModuleName,
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
 		authtypes.ModuleName,
 		authz.ModuleName,
 		banktypes.ModuleName,
-		govtypes.ModuleName,
 		crisistypes.ModuleName,
-		genutiltypes.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
+		ccvconsumertypes.ModuleName,
+		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
-		swaptypes.ModuleName,
 
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName,
-		govtypes.ModuleName,
-		stakingtypes.ModuleName,
 		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		authz.ModuleName,
 		banktypes.ModuleName,
-		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
 		vestingtypes.ModuleName,
-		minttypes.ModuleName,
-		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
+		ccvconsumertypes.ModuleName,
+		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
-		swaptypes.ModuleName,
 
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
@@ -541,25 +489,21 @@ func NewApp(
 	// can do so safely.
 	app.mm.SetOrderInitGenesis(
 		capabilitytypes.ModuleName,
+		ibctransfertypes.ModuleName,
 		authtypes.ModuleName,
 		authz.ModuleName,
 		banktypes.ModuleName,
-		distrtypes.ModuleName,
-		stakingtypes.ModuleName,
 		vestingtypes.ModuleName,
 		slashingtypes.ModuleName,
-		govtypes.ModuleName,
-		minttypes.ModuleName,
 		crisistypes.ModuleName,
 		ibchost.ModuleName,
-		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
-		ibctransfertypes.ModuleName,
 		feegrant.ModuleName,
+		ccvconsumertypes.ModuleName,
+		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
-		swaptypes.ModuleName,
 
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
@@ -575,11 +519,7 @@ func NewApp(
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
-		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper),
-		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper),
-		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
-		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
-		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
+		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.ConsumerKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
@@ -595,23 +535,26 @@ func NewApp(
 	app.MountTransientStores(tkeys)
 	app.MountMemoryStores(memKeys)
 
-	// initialize BaseApp
-	app.SetInitChainer(app.InitChainer)
-	app.SetBeginBlocker(app.BeginBlocker)
-
-	anteHandler, err := ante.NewAnteHandler(
-		ante.HandlerOptions{
-			AccountKeeper:   app.AccountKeeper,
-			BankKeeper:      app.BankKeeper,
-			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-			FeegrantKeeper:  app.FeeGrantKeeper,
-			SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
+	anteHandler, err := NewAnteHandler(
+		HandlerOptions{
+			HandlerOptions: ante.HandlerOptions{
+				AccountKeeper:   app.AccountKeeper,
+				BankKeeper:      app.BankKeeper,
+				FeegrantKeeper:  app.FeeGrantKeeper,
+				SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
+				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
+			},
+			IBCKeeper:      app.IBCKeeper,
+			ConsumerKeeper: app.ConsumerKeeper,
 		},
 	)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("failed to create AnteHandler: %s", err))
 	}
 
+	// initialize BaseApp
+	app.SetInitChainer(app.InitChainer)
+	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetAnteHandler(anteHandler)
 	app.SetEndBlocker(app.EndBlocker)
 
@@ -623,6 +566,7 @@ func NewApp(
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
+	app.ScopedCCVConsumerKeeper = scopedCCVConsumerKeeper
 	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
 
 	return app
@@ -735,9 +679,10 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
-	// register app's OpenAPI routes.
-	apiSvr.Router.Handle("/static/openapi.yml", http.FileServer(http.FS(docs.Docs)))
-	apiSvr.Router.HandleFunc("/", openapiconsole.Handler(Name, "/static/openapi.yml"))
+	// register swagger API from root so that other applications can override easily
+	if apiConfig.Swagger {
+		RegisterSwaggerAPI(apiSvr.Router)
+	}
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
@@ -748,6 +693,17 @@ func (app *App) RegisterTxService(clientCtx client.Context) {
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
 func (app *App) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
+}
+
+// RegisterSwaggerAPI registers swagger route with API Server
+func RegisterSwaggerAPI(rtr *mux.Router) {
+	statikFS, err := fs.New()
+	if err != nil {
+		panic(err)
+	}
+
+	staticServer := http.FileServer(statikFS)
+	rtr.PathPrefix("/swagger/").Handler(http.StripPrefix("/swagger/", staticServer))
 }
 
 // GetMaccPerms returns a copy of the module account permissions
@@ -765,14 +721,11 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 
 	paramsKeeper.Subspace(authtypes.ModuleName)
 	paramsKeeper.Subspace(banktypes.ModuleName)
-	paramsKeeper.Subspace(stakingtypes.ModuleName)
-	paramsKeeper.Subspace(minttypes.ModuleName)
-	paramsKeeper.Subspace(distrtypes.ModuleName)
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
-	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govtypes.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
+	paramsKeeper.Subspace(ccvconsumertypes.ModuleName)
 	paramsKeeper.Subspace(dexmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
@@ -782,4 +735,51 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 // SimulationManager implements the SimulationApp interface
 func (app *App) SimulationManager() *module.SimulationManager {
 	return app.sm
+}
+
+// ConsumerApp interface implementations for e2e tests
+
+// GetTxConfig implements the TestingApp interface.
+func (app *App) GetTxConfig() client.TxConfig {
+	return cosmoscmd.MakeEncodingConfig(ModuleBasics).TxConfig
+}
+
+// GetIBCKeeper implements the TestingApp interface.
+func (app *App) GetIBCKeeper() *ibckeeper.Keeper {
+	return app.IBCKeeper
+}
+
+// GetStakingKeeper implements the TestingApp interface.
+func (app *App) GetStakingKeeper() ibcclienttypes.StakingKeeper {
+	return app.ConsumerKeeper
+}
+
+// GetScopedIBCKeeper implements the TestingApp interface.
+func (app *App) GetScopedIBCKeeper() capabilitykeeper.ScopedKeeper {
+	return app.ScopedIBCKeeper
+}
+
+// GetConsumerKeeper implements the ConsumerApp interface.
+func (app *App) GetConsumerKeeper() ccvconsumerkeeper.Keeper {
+	return app.ConsumerKeeper
+}
+
+// GetE2eBankKeeper implements the ConsumerApp interface.
+func (app *App) GetE2eBankKeeper() e2e.E2eBankKeeper {
+	return app.BankKeeper
+}
+
+// GetE2eAccountKeeper implements the ConsumerApp interface.
+func (app *App) GetE2eAccountKeeper() e2e.E2eAccountKeeper {
+	return app.AccountKeeper
+}
+
+// GetE2eSlashingKeeper implements the ConsumerApp interface.
+func (app *App) GetE2eSlashingKeeper() e2e.E2eSlashingKeeper {
+	return app.SlashingKeeper
+}
+
+// GetE2eEvidenceKeeper implements the ConsumerApp interface.
+func (app *App) GetE2eEvidenceKeeper() e2e.E2eEvidenceKeeper {
+	return app.EvidenceKeeper
 }

@@ -7,9 +7,11 @@ import (
 	"github.com/NicholasDotSol/duality/x/dex/types"
 
 	dualityapp "github.com/NicholasDotSol/duality/app"
+	dexmoduletypes "github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/stretchr/testify/suite"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
@@ -57,4 +59,12 @@ func (suite *IntegrationTestSuite) SetupTest() {
 	suite.msgServer = keeper.NewMsgServerImpl(app.DexKeeper)
 	suite.ctx = ctx
 	suite.queryClient = queryClient
+}
+
+func FundAccount(bankKeeper bankkeeper.Keeper, ctx sdk.Context, addr sdk.AccAddress, amounts sdk.Coins) error {
+	if err := bankKeeper.MintCoins(ctx, dexmoduletypes.ModuleName, amounts); err != nil {
+		return err
+	}
+
+	return bankKeeper.SendCoinsFromModuleToAccount(ctx, dexmoduletypes.ModuleName, addr, amounts)
 }
