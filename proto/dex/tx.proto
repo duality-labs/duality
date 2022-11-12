@@ -5,6 +5,7 @@ package nicholasdotsol.duality.dex;
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
 // Msg defines the Msg service.
 service Msg {
   rpc Deposit(MsgDeposit) returns (MsgDepositResponse);
@@ -82,6 +83,11 @@ message MsgSwap {
 }
 
 message MsgSwapResponse {
+   cosmos.base.v1beta1.Coin coinOut = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+    (gogoproto.jsontag) = "coinOut"
+  ];
 }
 
 message MsgPlaceLimitOrder {
