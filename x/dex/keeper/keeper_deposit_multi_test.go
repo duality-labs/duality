@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"errors"
+
 	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -75,4 +77,16 @@ func (s *MsgServerTestSuite) TestMultiDepositBehindEnemyLines() {
 	tickIndexes := []int64{0, -3}
 	feeTiers := []uint64{0, 1}
 	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, nil)
+}
+
+func (s *MsgServerTestSuite) TestMultiDepositInvalidOneSidedDeposit() {
+	// one sided deposit, then attempt to deposit on the other side
+	acc := s.alice
+	denomA, denomB := "TokenA", "TokenB"
+	s.fundAliceBalances(10, 10)
+	amountsA, amountsB := []sdk.Dec{NewDec(5), NewDec(0)}, []sdk.Dec{NewDec(0), NewDec(5)}
+	tickIndexes := []int64{0, 0}
+	feeTiers := []uint64{0, 1}
+	// TODO: need to add error for this
+	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, errors.New(""))
 }
