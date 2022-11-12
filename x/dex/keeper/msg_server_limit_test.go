@@ -129,17 +129,28 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 
 	s.alicePlacesLimitOrder("TokenB", 0, 25)
 	s.alicePlacesLimitOrder("TokenB", 1, 25)
+
+	s.assertAliceBalances(99950, 500)
+	s.assertBobBalances(100, 200)
+	s.assertDexBalances(50, 0)
+
 	s.bobPlacesSwapOrder("TokenA", 40, 30)
 
-	s.assertBobBalancesDec(sdk.MustNewDecFromStr("140.001500000000000000"), NewDec(160))
+	s.assertAliceBalances(99950, 500)
+	s.assertBobBalancesDec(sdk.MustNewDecFromStr("139.99850015"), NewDec(160))
+	s.assertDexBalancesDec(sdk.MustNewDecFromStr("10.00149985"), NewDec(40))
 
 	s.aliceWithdrawsFilledLimitOrder("TokenA", 0)
 
 	s.assertAliceBalances(99950, 525)
+	s.assertBobBalancesDec(sdk.MustNewDecFromStr("139.99850015"), NewDec(160))
+	s.assertDexBalancesDec(sdk.MustNewDecFromStr("10.00149985"), NewDec(15))
 
 	s.aliceWithdrawsFilledLimitOrder("TokenA", 1)
 
-	s.assertAliceBalancesDec(NewDec(99950), sdk.MustNewDecFromStr("539.99850015"))
+	s.assertAliceBalances(99950, 540)
+	s.assertBobBalancesDec(sdk.MustNewDecFromStr("139.99850015"), NewDec(160))
+	s.assertDexBalancesDec(sdk.MustNewDecFromStr("10.00149985"), NewDec(0))
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFailsWhenNothingToWithdraw() {

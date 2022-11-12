@@ -170,6 +170,10 @@ func (s *MsgServerTestSuite) assertDexBalances(a int, b int) {
 	s.assertAccountBalances(s.app.AccountKeeper.GetModuleAddress("dex"), a, b)
 }
 
+func (s *MsgServerTestSuite) assertDexBalancesDec(a sdk.Dec, b sdk.Dec) {
+	s.assertAccountBalancesDec(s.app.AccountKeeper.GetModuleAddress("dex"), a, b)
+}
+
 func (s *MsgServerTestSuite) alicePlacesLimitOrder(wantsToken string, tick int, amountIn int) {
 	s.placesLimitOrder(s.alice, wantsToken, tick, amountIn)
 }
