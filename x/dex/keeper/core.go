@@ -1394,6 +1394,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 	userSharesWithdrawn := UserSharesWithdrawnData.SharesWithdrawn
 	userSharesNotWithdrawn := UserShareData.SharesOwned
 	sharesTotal := TotalSharesData.TotalShares
+
 	fmt.Printf("filled %+v\nnotFilled %+v\nuserWithdrawn %+v\nuserNotWithdrawn %+v\nsharesTotal %+v\n\n",
 		reservesFilled, reservesNotFilled, userSharesWithdrawn, userSharesNotWithdrawn, sharesTotal)
 
@@ -1414,10 +1415,10 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 	sharesFilled := reservesFilled.Mul(price)
 
 	// Calculates the sharesOut based on the UserShares withdrawn  compared to sharesLeft compared to remaining liquidity in reserves
-	amountOut := sharesFilled.Mul(userSharesTotal).Quo(sharesFilled.Add(reservesNotFilled)).Sub(userSharesWithdrawn)
+	sharesOut := sharesFilled.Mul(userSharesTotal).Quo(sharesFilled.Add(reservesNotFilled)).Sub(userSharesWithdrawn)
 
 	// calculate amountOut given sharesOut
-	amountOut := (sharesOut.Mul(FillData.FilledReserves)).Quo(TotalSharesData.TotalShares)
+	amountOut := sharesOut.Mul(price)
 	// Calculates amount to subtract from fillMap object given sharesOut
 	FillData.FilledReserves = FillData.FilledReserves.Sub(sharesOut.Mul(FillData.FilledReserves).Quo(TotalSharesData.TotalShares))
 	// Updates useSharesWithdrawMap to include sharesOut
