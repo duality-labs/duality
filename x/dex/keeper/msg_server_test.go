@@ -402,7 +402,7 @@ func newWithdrawl(tick int64, fee uint64, shares int64) *Withdrawl {
 	}
 }
 
-func (s *MsgServerTestSuite) aliceWithdraws(withdrawls ...*Withdrawl)(error) {
+func (s *MsgServerTestSuite) aliceWithdraws(withdrawls ...*Withdrawl) error {
 	sharesToRemove := make([]sdk.Dec, len(withdrawls))
 	tickIndicies := make([]int64, len(withdrawls))
 	feeIndexes := make([]uint64, len(withdrawls))
@@ -425,8 +425,6 @@ func (s *MsgServerTestSuite) aliceWithdraws(withdrawls ...*Withdrawl)(error) {
 	return err
 }
 
-
-
 func (s *MsgServerTestSuite) getShares(
 	account sdk.AccAddress,
 	pairId string,
@@ -435,11 +433,8 @@ func (s *MsgServerTestSuite) getShares(
 ) (shares sdk.Dec) {
 
 	sharesData, sharesFound := s.app.DexKeeper.GetShares(s.ctx, account.String(), pairId, tick, fee)
-
 	s.Assert().True(sharesFound)
-
 	return sharesData.SharesOwned
-
 }
 
 func (s *MsgServerTestSuite) assertAccountShares(
@@ -449,7 +444,6 @@ func (s *MsgServerTestSuite) assertAccountShares(
 	fee uint64,
 	sharesExpected sdk.Dec,
 ) {
-
 	sharesOwned := s.getShares(account, pairId, tick, fee)
 	s.Assert().Equal(sharesExpected, sharesOwned)
 }
@@ -465,22 +459,20 @@ func (s *MsgServerTestSuite) assertAliceShares(
 func (s *MsgServerTestSuite) assertCurrentTicks(
 	expected0To1 int64,
 	expected1To0 int64,
-){
+) {
 	tickMap, found := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA/TokenB")
 	s.Assert().NotNil(found)
 	s.Assert().Equal(expected0To1, tickMap.TokenPair.CurrentTick0To1)
 	s.Assert().Equal(expected1To0, tickMap.TokenPair.CurrentTick1To0)
 }
 
-
-func (s *MsgServerTestSuite) assertTickCount(tickCount int64){
+func (s *MsgServerTestSuite) assertTickCount(tickCount int64) {
 	tickMap, found := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA/TokenB")
 	s.Assert().NotNil(found)
 	s.Assert().Equal(tickCount, tickMap.TotalTickCount)
 }
 
-
-func (s *MsgServerTestSuite) printTicks(){
+func (s *MsgServerTestSuite) printTicks() {
 	tickMap, _ := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA/TokenB")
 	fmt.Printf("\nTick0To1: %v, Tick1To0: %v", tickMap.TokenPair.CurrentTick0To1, tickMap.TokenPair.CurrentTick1To0)
 }
