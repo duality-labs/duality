@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"fmt"
-	"math"
 	"strconv"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
@@ -265,21 +264,14 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 // tickIndex refers to the index of a specified tick for a given pool
 // StartingToken determines the ratio of our price, price when false, 1/price when true.
 func (k Keeper) Calc_price(tick_Index int64, startingToken bool) (sdk.Dec, error) {
-	floatPrice := math.Pow(1.0001, float64(tick_Index))
-	sPrice := fmt.Sprintf("%f", floatPrice)
+	base := BasePrice()
+	price := Pow(base, tick_Index)
 
-	price, err := sdk.NewDecFromStr(sPrice)
-
-	if err != nil {
-		return sdk.ZeroDec(), err
+	if startingToken {
+		price = sdk.OneDec().Quo(price)
+		return price, nil
 	} else {
-		if startingToken {
-			price = sdk.OneDec().Quo(price)
-			return price, nil
-		} else {
-			return price, nil
-		}
-
+		return price, nil
 	}
 
 }
