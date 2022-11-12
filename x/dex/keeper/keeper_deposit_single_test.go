@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"errors"
+
 	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -14,9 +16,7 @@ func (s *MsgServerTestSuite) TestSingleDepositMinFee() {
 	tickIndexes := []int64{0}
 	feeTiers := []uint64{0}
 	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, nil)
-
 }
-
 func (s *MsgServerTestSuite) TestSingleDepositMaxFee() {
 	acc := s.alice
 	denomA, denomB := "TokenA", "TokenB"
@@ -25,7 +25,6 @@ func (s *MsgServerTestSuite) TestSingleDepositMaxFee() {
 	tickIndexes := []int64{0}
 	feeTiers := []uint64{uint64(len(s.feeTiers) - 1)}
 	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, nil)
-
 }
 
 func (s *MsgServerTestSuite) TestSingleDepositInvalidFee() {
@@ -37,7 +36,6 @@ func (s *MsgServerTestSuite) TestSingleDepositInvalidFee() {
 	feeTiers := []uint64{uint64(len(s.feeTiers))}
 	expectedTxErr := types.ErrValidFeeIndexNotFound
 	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, expectedTxErr)
-
 }
 
 func (s *MsgServerTestSuite) TestSingleDepositInitPair() {
@@ -48,7 +46,6 @@ func (s *MsgServerTestSuite) TestSingleDepositInitPair() {
 	tickIndexes := []int64{0}
 	feeTiers := []uint64{0}
 	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, nil)
-
 }
 
 func (s *MsgServerTestSuite) TestSingleDepositInitTick() {
@@ -62,7 +59,6 @@ func (s *MsgServerTestSuite) TestSingleDepositInitTick() {
 
 	newTickIndexes := []int64{1}
 	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, newTickIndexes, feeTiers, nil)
-
 }
 
 func (s *MsgServerTestSuite) TestSingleDepositInitFeeTier() {
@@ -76,7 +72,6 @@ func (s *MsgServerTestSuite) TestSingleDepositInitFeeTier() {
 
 	newFeeTiers := []uint64{1}
 	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, newFeeTiers, nil)
-
 }
 
 func (s *MsgServerTestSuite) TestSingleDepositExistingPair() {
@@ -87,6 +82,29 @@ func (s *MsgServerTestSuite) TestSingleDepositExistingPair() {
 	tickIndexes := []int64{0}
 	feeTiers := []uint64{0}
 	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, nil)
+	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, nil)
+}
+func (s *MsgServerTestSuite) TestSingleDepositInvalidExistingLiquidityOppositeSide() {
+	acc := s.alice
+	denomA, denomB := "TokenA", "TokenB"
+	s.fundAliceBalances(10, 10)
+	amountsA, amountsB := []sdk.Dec{NewDec(10)}, []sdk.Dec{NewDec(0)}
+	tickIndexes := []int64{0}
+	feeTiers := []uint64{0}
+	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, nil)
+
+	amountsA2, amountsB2 := []sdk.Dec{NewDec(0)}, []sdk.Dec{NewDec(10)}
+	// TODO: need to add error case here
+	DepositTemplate(s, denomA, denomB, amountsA2, amountsB2, acc, tickIndexes, feeTiers, errors.New(""))
+}
+
+func (s *MsgServerTestSuite) TestSingleDepositOneSided() {
+	acc := s.alice
+	denomA, denomB := "TokenA", "TokenB"
+	s.fundAliceBalances(10, 10)
+	amountsA, amountsB := []sdk.Dec{NewDec(10)}, []sdk.Dec{NewDec(0)}
+	tickIndexes := []int64{0}
+	feeTiers := []uint64{0}
 	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, tickIndexes, feeTiers, nil)
 }
 
@@ -103,34 +121,3 @@ func (s *MsgServerTestSuite) TestSingleDepositBehindEnemyLines() {
 	DepositTemplate(s, denomA, denomB, amountsA, amountsB, acc, newTickIndexes, newFeeTiers, nil)
 
 }
-
-// table driven test. can't work with testify because setup isn't run before each s.T().Run()
-/* func (s *MsgServerTestSuite) TestSingleDepositExistingLiquidity() {
-	acc := s.alice
-	denomA, denomB := "TokenA", "TokenB"
-	tests := map[string]struct {
-		// acc sdk.AccAddress
-		initialBalanceA int64
-		initialBalanceB int64
-		denomA          string
-		denomB          string
-		amountsA        []sdk.Dec
-		amountsB        []sdk.Dec
-		tickIndexes     []int64
-		feeTiers        []uint64
-		expectedTxErr   []error
-	}{
-		"InitTick":         {10, 10, denomA, denomB, []sdk.Dec{NewDec(5), NewDec(3)}, []sdk.Dec{NewDec(5), NewDec(3)}, []int64{0, 1}, []uint64{0, 0}, []error{nil, nil}},
-		"InitFeeTier":      {10, 10, denomA, denomB, []sdk.Dec{NewDec(5), NewDec(3)}, []sdk.Dec{NewDec(5), NewDec(3)}, []int64{0, 0}, []uint64{0, 1}, []error{nil, nil}},
-		"ExistingPair":     {10, 10, denomA, denomB, []sdk.Dec{NewDec(5), NewDec(3)}, []sdk.Dec{NewDec(5), NewDec(3)}, []int64{0, 0}, []uint64{0, 0}, []error{nil, nil}},
-		"BehindEnemyLines": {initialBalanceA: 10, initialBalanceB: 10, denomA: denomA, denomB: denomB, amountsA: []sdk.Dec{NewDec(5), NewDec(3)}, amountsB: []sdk.Dec{NewDec(5), NewDec(3)}, tickIndexes: []int64{0, -3}, feeTiers: []uint64{0, 1}, expectedTxErr: []error{nil, nil}},
-	}
-	for name, tc := range tests {
-		s.T().Log(name)
-		s.T().Run(name, func(t *testing.T) {
-			s.fundAliceBalances(int(tc.initialBalanceA), int(tc.initialBalanceB))
-			DepositTemplate(s, tc.denomA, tc.denomB, tc.amountsA[:1], tc.amountsB[:1], acc, tc.tickIndexes[:1], tc.feeTiers[:1], tc.expectedTxErr[0])
-			DepositTemplate(s, tc.denomA, tc.denomB, tc.amountsA[1:], tc.amountsB[1:], acc, tc.tickIndexes[1:], tc.feeTiers[1:], tc.expectedTxErr[1])
-		})
-	}
-} */
