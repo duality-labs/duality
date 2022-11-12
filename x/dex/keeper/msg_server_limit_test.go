@@ -10,7 +10,7 @@ func (s *MsgServerTestSuite) TestSingle() {
 	s.fundAliceBalances(100, 500)
 	s.fundBobBalances(100, 200)
 
-	s.alicePlacesLimitOrder("TokenA", 0, 50)
+	s.alicePlacesLimitBuyOrder("TokenA", 0, 50)
 
 	s.assertAliceBalances(100, 450)
 	s.assertBobBalances(100, 200)
@@ -21,13 +21,13 @@ func (s *MsgServerTestSuite) TestMultiple() {
 	s.fundAliceBalances(100, 500)
 	s.fundBobBalances(100, 200)
 
-	s.alicePlacesLimitOrder("TokenA", 0, 50)
+	s.alicePlacesLimitBuyOrder("TokenA", 0, 50)
 
 	s.assertAliceBalances(100, 450)
 	s.assertBobBalances(100, 200)
 	s.assertDexBalances(0, 50)
 
-	s.alicePlacesLimitOrder("TokenA", 0, 50)
+	s.alicePlacesLimitBuyOrder("TokenA", 0, 50)
 
 	s.assertAliceBalances(100, 400)
 	s.assertBobBalances(100, 200)
@@ -105,8 +105,8 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder1to0WithWithdraw() {
 	s.fundAliceBalances(100, 500)
 	s.fundBobBalances(100, 200)
 
-	s.alicePlacesLimitOrder("TokenA", 0, 25)
-	s.alicePlacesLimitOrder("TokenA", -1, 25)
+	s.alicePlacesLimitBuyOrder("TokenA", 0, 25)
+	s.alicePlacesLimitBuyOrder("TokenA", -1, 25)
 	s.bobPlacesSwapOrder("TokenB", 40, 30)
 
 	s.assertAliceBalances(100, 450)
@@ -127,8 +127,8 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	s.fundAliceBalances(100000, 500)
 	s.fundBobBalances(100, 200)
 
-	s.alicePlacesLimitOrder("TokenB", 0, 25)
-	s.alicePlacesLimitOrder("TokenB", 1, 25)
+	s.alicePlacesLimitBuyOrder("TokenB", 0, 25)
+	s.alicePlacesLimitBuyOrder("TokenB", 1, 25)
 
 	s.assertAliceBalances(99950, 500)
 	s.assertBobBalances(100, 200)
@@ -173,7 +173,7 @@ func (s *MsgServerTestSuite) TestFailsWhenWithdrawNotCalledByOwner() {
 	s.fundAliceBalances(100000, 500)
 	s.fundBobBalances(100, 200)
 
-	s.alicePlacesLimitOrder("TokenB", 0, 25)
+	s.alicePlacesLimitBuyOrder("TokenB", 0, 25)
 
 	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
 		Creator:   s.bob.String(),
@@ -191,7 +191,7 @@ func (s *MsgServerTestSuite) TestFailsWhenWrongKeyToken() {
 	s.fundAliceBalances(100000, 500)
 	s.fundBobBalances(100, 200)
 
-	s.alicePlacesLimitOrder("TokenB", 0, 25)
+	s.alicePlacesLimitBuyOrder("TokenB", 0, 25)
 
 	// Errors because of wrong KeyToken
 	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
@@ -210,7 +210,7 @@ func (s *MsgServerTestSuite) TestFailsWhenWrongKey() {
 	s.fundAliceBalances(100000, 500)
 	s.fundBobBalances(100, 200)
 
-	s.alicePlacesLimitOrder("TokenB", 0, 25)
+	s.alicePlacesLimitBuyOrder("TokenB", 0, 25)
 
 	// errors because of wrong key
 	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
@@ -230,7 +230,7 @@ func (s *MsgServerTestSuite) TestCancelSingle() {
 
 	s.assertDexBalances(0, 0)
 
-	s.alicePlacesLimitOrder("TokenA", 0, 50)
+	s.alicePlacesLimitBuyOrder("TokenA", 0, 50)
 
 	s.assertAliceBalances(100, 450)
 	s.assertDexBalances(0, 50)
@@ -246,7 +246,7 @@ func (s *MsgServerTestSuite) TestCancelPartial() {
 
 	s.assertDexBalances(0, 0)
 
-	s.alicePlacesLimitOrder("TokenA", 0, 50)
+	s.alicePlacesLimitBuyOrder("TokenA", 0, 50)
 
 	s.assertAliceBalances(100, 450)
 	s.assertDexBalances(0, 50)
@@ -267,7 +267,7 @@ func (s *MsgServerTestSuite) TestProgressiveLimitOrderFill() {
 	s.fundBobBalances(100, 200)
 
 	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
-	s.alicePlacesLimitOrder("TokenA", 0, 50)
+	s.alicePlacesLimitBuyOrder("TokenA", 0, 50)
 
 	s.assertAliceBalances(100, 440)
 	s.assertBobBalances(100, 200)
