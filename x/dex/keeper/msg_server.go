@@ -50,6 +50,11 @@ func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*t
 	}
 
 	err = k.WithdrawCore(goCtx, msg, token0, token1, createrAddr, receiverAddr)
+
+	if err != nil {
+		return nil, err
+	}
+
 	_ = ctx
 
 	return &types.MsgWithdrawlResponse{}, nil
