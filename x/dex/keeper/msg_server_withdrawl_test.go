@@ -1,253 +1,281 @@
 package keeper_test
 
 import (
-	"fmt"
-
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	//authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
-func (suite *IntegrationTestSuite) TestHasBalance2() {
-	app, ctx := suite.app, suite.ctx
-	addr := sdk.AccAddress([]byte("addr1_______________"))
+// ** CORE TESTS **
+func (s *MsgServerTestSuite) TestSingleWithdrawlFull() {
+	s.fundAliceBalances(100, 50)
 
-	acc := app.AccountKeeper.NewAccountWithAddress(ctx, addr)
-	app.AccountKeeper.SetAccount(ctx, acc)
+	// IF Alice deposits 100TokenA & 100TokenB into tick 0 @ feeTier 0
+	s.aliceDeposits(NewDeposit(100, 50, 0, 0))
 
-	balances := sdk.NewCoins(newACoin(sdk.NewInt(100)))
+	// WHEN Alice withdraws her entire position (150 Shares)
+	err := s.aliceWithdraws(NewWithdrawl(150, 0, 0))
+	s.Assert().NoError(err)
 
-	suite.Require().False(app.BankKeeper.HasBalance(ctx, addr, newACoin(sdk.NewInt(99))))
-
-	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, addr, balances))
-	suite.Require().False(app.BankKeeper.HasBalance(ctx, addr, newACoin(sdk.NewInt(101))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, addr, newACoin(sdk.NewInt(100))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, addr, newACoin(sdk.NewInt(1))))
+	// THEN assert alice gets 100TokenA & 150TokenB; Dex retains no balance; No active Ticks
+	s.assertAliceShares(0, 0, sdk.NewDec(0))
+	s.assertAliceBalances(100, 50)
+	s.assertDexBalances(0, 0)
+	s.assertTickCount(0)
 }
 
-func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
-	fmt.Println("Testing TestSingleWithdrawl")
-	app, ctx := suite.app, suite.ctx
-	//holderAcc := authtypes.NewEmptyModuleAccount("holder")
-	alice := sdk.AccAddress([]byte("alice"))
-	bob := sdk.AccAddress([]byte("bob"))
+func (s *MsgServerTestSuite) TestSingleWithdrawlPartial() {
+	s.fundAliceBalances(100, 50)
 
-	accAlice := app.AccountKeeper.NewAccountWithAddress(ctx, alice)
-	app.AccountKeeper.SetAccount(ctx, accAlice)
-	accBob := app.AccountKeeper.NewAccountWithAddress(ctx, bob)
-	app.AccountKeeper.SetAccount(ctx, accBob)
+	// IF Alice deposits 100 TokenA into tick 0 @ feeTier 0
+	s.aliceDeposits(NewDeposit(100, 50, 0, 0))
 
-	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("500000000000000000000")))
-	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
+	// WHEN Alice withdraws her half her position (75 Shares)
+	err := s.aliceWithdraws(NewWithdrawl(75, 0, 0))
+	s.Assert().NoError(err)
 
-	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
-	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+	// THEN Alice gets half her deposit back; Dex retains half
+	s.assertAliceShares(0, 0, sdk.NewDec(75))
+	s.assertAliceBalances(50, 25)
+	s.assertDexBalances(50, 25)
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
-	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("1000000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+	// CurrentTick values remain unchanged
+	s.assertTickCount(1)
+	s.assertCurrentTicks(-1, 1)
+}
 
-	goCtx := sdk.WrapSDKContext(ctx)
+func (s *MsgServerTestSuite) TestSingleWithdrawlMaxFee() {
+	s.fundAliceBalances(100, 0)
 
-	// Set Fee List
+	// IF Alice deposits 100 TokenA into tick 0 @ feeTier 3
+	s.aliceDeposits(NewDeposit(100, 0, 0, 3))
 
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{0, 1})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{1, 2})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{2, 3})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{3, 4})
+	// WHEN Alice withdraws her half her position
+	s.aliceWithdraws(NewWithdrawl(50, 0, 3))
 
-	fmt.Println("FeeList")
-	feeList := app.DexKeeper.GetAllFeeList(ctx)
-	fmt.Println(feeList)
+	// THEN Alice gets 50 TokenA back and Dex retains balance of 50
+	s.assertAliceShares(0, 3, sdk.NewDec(50))
+	s.assertAliceBalances(50, 0)
+	s.assertDexBalances(50, 0)
+}
 
-	fiftyDec, _ := sdk.NewDecFromStr("50")
-	createResponse, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:     alice.String(),
-		TokenA:      "TokenA",
-		TokenB:      "TokenB",
-		AmountsA:    []sdk.Dec{fiftyDec},
-		AmountsB:    []sdk.Dec{sdk.ZeroDec()},
-		TickIndexes: []int64{0},
-		FeeIndexes:  []uint64{0},
-		Receiver:    alice.String(),
-	})
+func (s *MsgServerTestSuite) TestSingleWithdrawlSingleSide() {
+	s.fundAliceBalances(100, 0)
 
-	suite.Require().Nil(err)
+	// IF Alice deposits 100 TokenA into tick 0 @ feeTier 0
+	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
 
-	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 1))
-	fmt.Println()
+	// WHEN Alice withdraws her entire position
+	s.aliceWithdraws(NewWithdrawl(100, 0, 0))
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("50000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
-	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000001"))))
+	// THEN Alice gets 100TokenA back; Dex retains no balance; No Active Ticks
+	s.assertAliceShares(0, 0, sdk.NewDec(0))
+	s.assertAliceBalances(100, 0)
+	s.assertDexBalances(0, 0)
+	s.assertTickCount(0)
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+}
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("0"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("50000000000000000000"))))
+func (s *MsgServerTestSuite) TestSingleWithdrawlShiftsTickRight() {
+	s.fundAliceBalances(200, 0)
 
-	_ = createResponse
+	// IF Alice deposits 100TokenA into ticks 1 & 2
+	s.aliceDeposits(
+		NewDeposit(100, 0, 2, 0),
+		NewDeposit(100, 0, 1, 0),
+	)
+	// currentTick1To0 = 2
+	s.assertCurrentTicks(1, 2)
 
-	pairId := app.DexKeeper.CreatePairId("TokenA", "TokenB")
-	fmt.Println(app.DexKeeper.GetShares(ctx, alice.String(), pairId, 0, 0))
+	// WHEN Alice withdraws her shares from Tick 1
+	s.aliceWithdraws(NewWithdrawl(100, 1, 0))
 
-	sharesToRemove, _ := sdk.NewDecFromStr("50")
+	// THEN currentTick1To0 = 3
+	//TODO: this is currently failling because of TickCount bug
+	s.assertCurrentTicks(1, 3)
+}
 
-	withdrawlResponse, err := suite.msgServer.Withdrawl(goCtx, &types.MsgWithdrawl{
-		Creator:        alice.String(),
-		Receiver:       alice.String(),
-		TokenA:         "TokenA",
-		TokenB:         "TokenB",
-		SharesToRemove: []sdk.Dec{sharesToRemove},
+func (s *MsgServerTestSuite) TestSingleWithdrawlShiftsTickLeft() {
+	s.fundAliceBalances(0, 200)
+
+	// IF Alice deposits 100TokenA into ticks 1 & 2
+	s.aliceDeposits(
+		NewDeposit(0, 100, 1, 0),
+		NewDeposit(0, 100, 2, 0),
+	)
+	// currentTick0To1 = 1
+	s.assertCurrentTicks(1, 2)
+
+	// WHEN Alice withdraws her shares from Tick 2
+	s.aliceWithdraws(NewWithdrawl(100, 2, 0))
+
+	// THEN currentTick0To1 = 0
+	//TODO: this is currently failling because of TickCount bug
+	s.assertCurrentTicks(0, 2)
+}
+
+func (s *MsgServerTestSuite) TestMultiWithdrawlShiftsTickLeft() {
+	s.fundAliceBalances(300, 0)
+
+	// IF Alice deposits 100TokenA into ticks 1, 2 & 3
+	s.aliceDeposits(
+		NewDeposit(100, 0, 3, 0),
+		NewDeposit(100, 0, 2, 0),
+		NewDeposit(100, 0, 1, 0),
+	)
+	// currentTick1To0 = 2
+	s.assertCurrentTicks(2, 3)
+
+	// WHEN Alice withdraws all her shares from Tick 1 & 2
+	s.aliceWithdraws(
+		NewWithdrawl(100, 1, 0),
+		NewWithdrawl(100, 2, 0))
+
+	// THEN currentTick1To0 = 4
+	//TODO: this is currently failling because of TickCount bug
+	s.assertCurrentTicks(2, 4)
+}
+
+// TODO: more test to write
+
+// TestMultiWithdrawlShiftsTickRight
+
+//TestSingleWithdrawTiersShiftsTickRight
+//TestSingleWithdrawTiersShiftsTickLeft
+//TestMultiWithdrawTiersShiftsTickRight
+//TestMultiWithdrawTiersShiftsTickLeft
+
+// d 100 t1 d 100 d 100 t3 t2 [w100 t3 w 50 t2] 100 t2 => currentTick1To0 = 3
+
+// d 100 t1 d 100 d 100 t3 t2 [w100 t2 w100 t3] 100 t2 => currentTick1To0 =
+
+// ** EDGE CASE FAILURE TESTS **
+
+func (s *MsgServerTestSuite) TestFailsWhenNotEnoughShares() {
+	s.fundAliceBalances(100, 0)
+
+	// IF  Alice deposits 100
+	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
+
+	// WHEN Alice tries to withdraw 200
+	err := s.aliceWithdraws(NewWithdrawl(200, 0, 0))
+
+	// THEN ensure error is thrown and Alice and Dex balances remain unchanged
+	s.Assert().ErrorIs(err, types.ErrNotEnoughShares)
+	s.assertAliceShares(0, 0, sdk.NewDec(100))
+	s.assertAliceBalances(0, 0)
+}
+
+func (s *MsgServerTestSuite) TestFailsWhenNotEnoughSharesMulti() {
+	s.fundAliceBalances(100, 0)
+
+	// IF Alice Deposists 100
+	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
+
+	// WHEN Alice does multiple withdrawals > 100
+	err := s.aliceWithdraws(
+		NewWithdrawl(50, 0, 0),
+		NewWithdrawl(50, 0, 0),
+		NewWithdrawl(50, 0, 0),
+	)
+
+	// THEN an error is thrown and Alice and Dex balances remain unchanged
+	s.Assert().ErrorIs(err, types.ErrNotEnoughShares)
+
+	// TODO: this is currently failing in testing,
+	// may be a bug may just be an issue with how state is retracted on failure in test framework
+	s.assertAliceShares(0, 0, sdk.NewDec(100))
+	s.assertDexBalances(100, 0)
+}
+
+func (s *MsgServerTestSuite) TestFailsWithNonExistentPair() {
+	s.fundAliceBalances(100, 0)
+
+	// IF Alice Deposists 100
+	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
+
+	// WHEN Alice tries to withdraw from a nonexistent tokenPair
+	_, err := s.msgServer.Withdrawl(s.goCtx, &types.MsgWithdrawl{
+		Creator:        s.alice.String(),
+		Receiver:       s.alice.String(),
+		TokenA:         "TokenX",
+		TokenB:         "TokenZ",
+		SharesToRemove: []sdk.Dec{sdk.NewDec(10)},
 		TickIndexes:    []int64{0},
 		FeeIndexes:     []uint64{0},
 	})
 
-	suite.Require().Nil(err)
-	fmt.Println("Post Withdrawl")
-	fmt.Println(app.DexKeeper.GetShares(ctx, alice.String(), pairId, 0, 0))
+	// NOTE: As code is currently written we hit not enough shares check
+	// before validating pair existence. This is correct from a
+	// UX perspective --users should not care whether tick is initialized
+	s.Assert().ErrorIs(err, types.ErrNotEnoughShares)
+}
 
-	_ = withdrawlResponse
-	_ = goCtx
+func (s *MsgServerTestSuite) TestFailsWithInvalidTick() {
+	s.fundAliceBalances(100, 0)
 
-	createResponse2, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:     alice.String(),
-		TokenA:      "TokenA",
-		TokenB:      "TokenB",
-		AmountsA:    []sdk.Dec{sdk.ZeroDec()},
-		AmountsB:    []sdk.Dec{fiftyDec},
-		TickIndexes: []int64{0},
-		FeeIndexes:  []uint64{1},
-		Receiver:    alice.String(),
-	})
 
-	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 2))
-	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", -2))
+	// IF Alice Deposists 100
+	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
 
-	suite.Require().Nil(err)
+	// WHEN Alice tries to withdraw from an invalid tick
+	err := s.aliceWithdraws(NewWithdrawl(50, 10, 0))
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("450000000000000000000"))))
-	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("450000000000000000001"))))
+	// NOTE: See above NOTE on error condition from TestFailsWithNonExistentPair
+	s.Assert().ErrorIs(err, types.ErrNotEnoughShares)
+	s.assertAliceShares(0, 0, sdk.NewDec(100))
+	s.assertDexBalances(100, 0)
+}
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+func (s *MsgServerTestSuite) TestFailsWithInvalidTickMulti() {
+	s.fundAliceBalances(100, 0)
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("50000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("0"))))
+	// IF Alice Deposists 100
+	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
 
-	_ = createResponse2
+	// WHEN Alice tries to withdraw from a mix of valid and invalid ticks
+	err := s.aliceWithdraws(
+		// INVALID
+		NewWithdrawl(50, 10, 0),
+		// VALID
+		NewWithdrawl(50, 0, 0),
+	)
 
-	lowerTick, _ := app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", -2)
-	upperTick, _ := app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 2)
+	// NOTE: See above NOTE on error condition from TestFailsWithNonExistentPair
+	s.Assert().ErrorIs(err, types.ErrNotEnoughShares)
+	s.assertAliceShares(0, 0, sdk.NewDec(100))
+	s.assertDexBalances(100, 0)
+}
 
-	fmt.Println("Upper tic", upperTick)
-	suite.Require().Equal(upperTick.TickData.Reserve0AndShares[1].Reserve0, sdk.ZeroDec())
-	suite.Require().Equal(upperTick.TickData.Reserve0AndShares[1].TotalShares, sdk.NewDec(50))
+func (s *MsgServerTestSuite) TestFailsWithInvalidFee() {
+	s.fundAliceBalances(100, 0)
 
-	suite.Require().Equal(lowerTick.TickData.Reserve1[1], sdk.NewDec(50))
+	// IF Alice Deposists 100
+	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
 
-	createResponse3, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:     alice.String(),
-		TokenA:      "TokenA",
-		TokenB:      "TokenB",
-		AmountsA:    []sdk.Dec{fiftyDec},
-		AmountsB:    []sdk.Dec{sdk.ZeroDec()},
-		TickIndexes: []int64{1},
-		FeeIndexes:  []uint64{1},
-		Receiver:    alice.String(),
-	})
+	// WHEN Alice tries to withdraw from an invalid tick
+	err := s.aliceWithdraws(NewWithdrawl(100, 0, 99))
 
-	suite.Require().Nil(err)
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("50000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("450000000000000000000"))))
-	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("450000000000000000001"))))
+	s.Assert().ErrorIs(err, types.ErrValidFeeIndexNotFound)
+	s.assertAliceShares(0, 0, sdk.NewDec(100))
+	s.assertDexBalances(100, 0)
+}
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+func (s *MsgServerTestSuite) TestFailsWithInvalidFeeMulti() {
+	s.fundAliceBalances(100, 0)
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("50000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("50000000000000000000"))))
+	// IF Alice Deposists 100
+	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
 
-	_ = createResponse3
+	// WHEN Alice tries to withdraw from a mix of valid and invalid FeeTiers
+	err := s.aliceWithdraws(
+		// INVALID
+		NewWithdrawl(50, 0, 10),
+		// VALID
+		NewWithdrawl(50, 0, 0),
+	)
 
-	createResponse4, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:     alice.String(),
-		TokenA:      "TokenA",
-		TokenB:      "TokenB",
-		AmountsA:    []sdk.Dec{sdk.ZeroDec()},
-		AmountsB:    []sdk.Dec{fiftyDec},
-		TickIndexes: []int64{0},
-		FeeIndexes:  []uint64{1},
-		Receiver:    alice.String(),
-	})
-
-	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 2))
-	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", -2))
-
-	suite.Require().Nil(err)
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("50000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("400000000000000000000"))))
-	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("4000000000000000000001"))))
-
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
-
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("100000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("50000000000000000000"))))
-
-	_ = createResponse3
-	_ = createResponse4
-
-	sharesToRemove, _ = sdk.NewDecFromStr("50")
-
-	withdrawlResponse2, err := suite.msgServer.Withdrawl(goCtx, &types.MsgWithdrawl{
-		Creator:        alice.String(),
-		TokenA:         "TokenA",
-		TokenB:         "TokenB",
-		SharesToRemove: []sdk.Dec{sharesToRemove},
-		TickIndexes:    []int64{0},
-		FeeIndexes:     []uint64{1},
-		Receiver:       alice.String(),
-	})
-
-	fmt.Println("test here")
-	suite.Require().Nil(err)
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("50000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("450000000000000000000"))))
-
-	fmt.Println(app.DexKeeper.GetShares(ctx, alice.String(), pairId, 0, 1))
-	_ = withdrawlResponse2
-
-	createResponse5, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:     alice.String(),
-		TokenA:      "TokenA",
-		TokenB:      "TokenB",
-		AmountsA:    []sdk.Dec{sdk.ZeroDec()},
-		AmountsB:    []sdk.Dec{fiftyDec},
-		TickIndexes: []int64{0},
-		FeeIndexes:  []uint64{1},
-		Receiver:    alice.String(),
-	})
-
-	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", 2))
-	fmt.Println(app.DexKeeper.GetTickMap(ctx, "TokenA/TokenB", -2))
-
-	suite.Require().Nil(err)
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("50000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("400000000000000000000"))))
-	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("4000000000000000000001"))))
-
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
-
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("100000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("50000000000000000000"))))
-
-	_ = createResponse5
-
-	fmt.Println("Withdrawl Tests complete")
+	// THEN ensure error is thrown and Alice and Dex balances remain unchanged
+	s.Assert().ErrorIs(err, types.ErrValidFeeIndexNotFound)
+	s.assertAliceShares(0, 0, sdk.NewDec(100))
+	s.assertDexBalances(100, 0)
 }
