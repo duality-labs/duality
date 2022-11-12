@@ -1,6 +1,9 @@
 package types
 
-import "strconv"
+import (
+	fmt "fmt"
+	"strconv"
+)
 
 const (
 	// ModuleName defines the module name
@@ -95,11 +98,11 @@ func SharesKey(address string, pairId string, tickIndex int64, feeIndex uint64) 
 	key = append(key, pairIdBytes...)
 	key = append(key, []byte("/")...)
 
-	tickIndexBytes := []byte(string(tickIndex))
+	tickIndexBytes := []byte(fmt.Sprint(tickIndex))
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
-	feeBytes := []byte(string(feeIndex))
+	feeBytes := []byte(fmt.Sprint(feeIndex))
 	key = append(key, feeBytes...)
 	key = append(key, []byte("/")...)
 
