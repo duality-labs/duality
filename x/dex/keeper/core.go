@@ -489,8 +489,9 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		shareOwner.SharesOwned = shareOwner.SharesOwned.Sub(msg.SharesToRemove[i])
 
 		// checks to see if after withdraw any fees tiers exist with non-empty liqudiity in the specified tick
-		isTickEmpty := true
+		isTickEmpty := false
 		if upperTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].TotalShares.Equal(sdk.ZeroDec()) {
+			isTickEmpty = true
 			for _, s := range upperTick.TickData.Reserve0AndShares {
 				if s.TotalShares.GT(sdk.ZeroDec()) {
 					isTickEmpty = false
@@ -507,7 +508,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			Pool0to1, Pool0to1Found := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, upperTick.TickIndex, token0, 0)
 			Pool1to0, Pool1to0Found := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, upperTick.TickIndex, token1, 0)
 
-			if (!Pool0to1Found || Pool0to1.TotalShares.Equal(sdk.ZeroDec())) && (!Pool1to0Found || Pool1to0.TotalShares.Equal(sdk.ZeroDec())) {
+			if (!Pool0to1Found || Pool0to1.TotalShares.Equal(sdk.ZeroDec())) && (!Pool1to0Found || Pool1to0.TotalShares.Equal(sdk.ZeroDec())) && pair.TotalTickCount > 0 {
 				pair.TotalTickCount = pair.TotalTickCount - 1
 			}
 
@@ -705,6 +706,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 			// runs swaps for any limitOrders at the specified tick, updating amount_left, amount_out accordingly
 			// passes in the outToken (token1), as this is the direction of the limit order for which we check
+
 			amount_left, amount_out, err = k.SwapLimitOrder0to1(goCtx, pairId, token1, amount_out, amount_left, pair.TokenPair.CurrentTick0To1)
 
 			if err != nil {
@@ -1007,7 +1009,9 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// returns price for the given tick and specified direction (0 -> 1)
+
 	price_1to0, err := k.Calc_price_1to0(CurrentTick1to0)
+
 
 	if err != nil {
 		return sdk.ZeroDec(), sdk.ZeroDec(), err
@@ -1486,12 +1490,14 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 	}
 
 
+
 	sharesFilled := reservesFilled.Quo(price)
 
 	// Calculates the sharesOut based on the UserShares withdrawn  compared to sharesLeft compared to remaining liquidity in reserves
 	sharesOut := sharesFilled.Mul(userSharesTotal).Quo(sharesFilled.Add(reservesNotFilled)).Sub(userSharesWithdrawn)
 	fmt.Println("Shares Out: ", sharesOut)
 	// calculate amountOut given sharesOut
+  
 	fmt.Println("price: ", price)
 	// amountOutSwap = amountInSwap * price
 	// amountOutswap = limitAmountIn
@@ -1502,6 +1508,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 	fmt.Println("Amount Out: ", amountOut)
 	// Subtracts amountOut from FilledReserves
 	FillData.FilledReserves = FillData.FilledReserves.Sub(amountOut)
+
 	// Updates useSharesWithdrawMap to include sharesOut
 	UserSharesWithdrawnData.SharesWithdrawn = UserSharesWithdrawnData.SharesWithdrawn.Add(sharesOut)
 	// Remove sharesOut from UserSharesMap

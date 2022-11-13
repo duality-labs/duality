@@ -149,12 +149,14 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	s.assertBobBalancesDec(sdk.MustNewDecFromStr("140.002499750024997500"), NewDec(160))
 	s.assertDexBalancesDec(sdk.MustNewDecFromStr("9.9975002499750025"), NewDec(40))
 
+
 	s.aliceWithdrawsFilledLimitOrder("TokenA", 1)
 
 	s.assertAliceBalancesDec(NewDec(99950), sdk.MustNewDecFromStr("524.997500249975002500"))
 	s.assertBobBalancesDec(sdk.MustNewDecFromStr("140.002499750024997500"), NewDec(160))
 	//40 - 24.997500249975002500 = 15.0024997500249975
 	s.assertDexBalancesDec(sdk.MustNewDecFromStr("9.9975002499750025"), sdk.MustNewDecFromStr("15.0024997500249975"))
+
 
 	s.aliceWithdrawsFilledLimitOrder("TokenA", 0)
 
