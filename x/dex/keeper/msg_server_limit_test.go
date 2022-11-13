@@ -127,6 +127,8 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	s.fundAliceBalances(100000, 500)
 	s.fundBobBalances(100, 200)
 
+	//Alices balance for TokenA should be 100000 - 25 - 25 = 99950
+	//Alices limit orders can be traded through at a price_1to0, 1 and 1.0001
 	s.alicePlacesLimitOrder("TokenB", 0, 25)
 	s.alicePlacesLimitOrder("TokenB", 1, 25)
 
@@ -134,6 +136,9 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	s.assertBobBalances(100, 200)
 	s.assertDexBalances(50, 0)
 
+	//Bobs balance for TokenB should be 200 - 40 = 160
+	//Bobs balance for TokenA should be (1 * 25) + (1 / 1.0001 * 15) + 100 = 139.99850015
+	//DEX Balance should be 50 - (1 * 25) - (1 / 1.0001 * 15) = 10.00149985
 	s.bobPlacesSwapOrder("TokenA", 40, 30)
 
 	s.assertAliceBalances(99950, 500)

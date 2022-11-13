@@ -10,7 +10,6 @@ import (
 	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -29,6 +28,7 @@ type MsgServerTestSuite struct {
 	carol       sdk.AccAddress
 	dan         sdk.AccAddress
 	goCtx       context.Context
+	feeTiers    []types.FeeList
 }
 
 func TestMsgServerTestSuite(t *testing.T) {
@@ -55,10 +55,19 @@ func (s *MsgServerTestSuite) SetupTest() {
 	accDan := app.AccountKeeper.NewAccountWithAddress(ctx, s.dan)
 	app.AccountKeeper.SetAccount(ctx, accDan)
 
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{0, 1})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{1, 2})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{2, 3})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{3, 4})
+	// add the fee tiers of 1, 3, 5, 10 ticks
+	feeTiers := []types.FeeList{
+		{Id: 0, Fee: 1},
+		{Id: 1, Fee: 3},
+		{Id: 2, Fee: 5},
+		{Id: 3, Fee: 10},
+	}
+
+	// Set Fee List
+	app.DexKeeper.AppendFeeList(ctx, feeTiers[0])
+	app.DexKeeper.AppendFeeList(ctx, feeTiers[1])
+	app.DexKeeper.AppendFeeList(ctx, feeTiers[2])
+	app.DexKeeper.AppendFeeList(ctx, feeTiers[3])
 
 	s.app = app
 	s.msgServer = keeper.NewMsgServerImpl(app.DexKeeper)
@@ -69,13 +78,14 @@ func (s *MsgServerTestSuite) SetupTest() {
 	s.bob = sdk.AccAddress([]byte("bob"))
 	s.carol = sdk.AccAddress([]byte("carol"))
 	s.dan = sdk.AccAddress([]byte("dan"))
+	s.feeTiers = feeTiers
 }
 
 func (s *MsgServerTestSuite) fundAccountBalancesDec(account sdk.AccAddress, aBalance sdk.Dec, bBalance sdk.Dec) {
 	aBalanceInt := sdk.NewIntFromBigInt(aBalance.BigInt())
 	bBalanceInt := sdk.NewIntFromBigInt(bBalance.BigInt())
 	balances := sdk.NewCoins(NewACoin(aBalanceInt), NewBCoin(bBalanceInt))
-	err := simapp.FundAccount(s.app.BankKeeper, s.ctx, account, balances)
+	err := FundAccount(s.app.BankKeeper, s.ctx, account, balances)
 	s.Assert().NoError(err)
 	s.assertAccountBalancesDec(account, aBalance, bBalance)
 }
