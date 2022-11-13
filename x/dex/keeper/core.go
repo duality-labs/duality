@@ -258,11 +258,11 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 
 	// If a new tick has been placed that tightens the range between currentTick1to0 and currentTick0to1 then update CurrentTicks to the tighest ticks
 	// TODO: the 3rd condition should be handled by BEL
-	if trueAmount0.GT(sdk.ZeroDec()) && ((tickIndex-fee > pair.TokenPair.CurrentTick1To0) && (tickIndex-fee < pair.TokenPair.CurrentTick0To1)) {
+	if trueAmount0.GT(sdk.ZeroDec()) && (tickIndex-fee > pair.TokenPair.CurrentTick1To0) {
 		pair.TokenPair.CurrentTick1To0 = tickIndex + fee
 	}
 	// TODO: the 3rd condition should be handled by BEL
-	if trueAmount1.GT(sdk.ZeroDec()) && ((tickIndex+fee < pair.TokenPair.CurrentTick0To1) && (tickIndex+fee > pair.TokenPair.CurrentTick1To0)) {
+	if trueAmount1.GT(sdk.ZeroDec()) && (tickIndex+fee < pair.TokenPair.CurrentTick0To1) {
 		pair.TokenPair.CurrentTick0To1 = tickIndex - fee
 	}
 
@@ -338,13 +338,13 @@ func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0
 	for i, _ := range amounts0 {
 		// Can only deposit amount0 at a tick greater than or equal to CurrentTick0to1 (the highest tick containing reserve1)
 		// Errors if depositing amount0 at a tick less than CurrentTick0to1
-		if amounts0[i].GT(sdk.ZeroDec()) && ((msg.TickIndexes[i] + feelist[msg.FeeIndexes[i]].Fee) < pair.TokenPair.CurrentTick0To1) {
+		if amounts0[i].GT(sdk.ZeroDec()) && ((msg.TickIndexes[i] - feelist[msg.FeeIndexes[i]].Fee) > pair.TokenPair.CurrentTick0To1) {
 			return nil, nil, sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsosit amount_0 at a tick less than the CurrentTick0to1")
 		}
 
 		// Can only deposit amount1 at a tick less than or equal to CurrentTick1to0 (the  lowest tick containing reserve0)
 		// Errors if depositing amount1 at a tick greater than  CurrentTick1to0
-		if amounts1[i].GT(sdk.ZeroDec()) && ((msg.TickIndexes[i] - feelist[msg.FeeIndexes[i]].Fee) > pair.TokenPair.CurrentTick1To0) {
+		if amounts1[i].GT(sdk.ZeroDec()) && ((msg.TickIndexes[i] + feelist[msg.FeeIndexes[i]].Fee) < pair.TokenPair.CurrentTick1To0) {
 			return nil, nil, sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit amount_1 at a tick greater than the CurrentTick1to0")
 		}
 
@@ -360,22 +360,20 @@ func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0
 		Amounts0Deposited[i] = trueAmount0
 		Amounts1Deposited[i] = trueAmount1
 
+		// if trueAmount0 == 0 && trueAmount1 == 0 then newReserves are unchanged, So emit partial fail event.
 		if trueAmount0.Equal(sdk.ZeroDec()) && trueAmount1.Equal(sdk.ZeroDec()) {
-
-			//NewReserve0, NewReserve1 are the old reserves as trueAmount0 and trueAmount1 are 0
 			ctx.EventManager().EmitEvent(types.CreateDepositFailedEvent(msg.Creator, msg.Receiver,
 				token0, token1, fmt.Sprint(msg.TickIndexes[i]), fmt.Sprint(msg.FeeIndexes[i]),
 				newReserve0.String(), newReserve1.String(), amounts0[i].String(), amounts1[i].String()),
 			)
-
 			continue
 		}
 
+		// else, count as successful deposit
 		passedDeposit++
-		// Retreives share object for the specified, tick fee pair for the receiver address
 
+		// Retreives receiver's share object for the specified tick fee pair
 		shares, sharesFound := k.GetShares(ctx, msg.Receiver, pairId, msg.TickIndexes[i], msg.FeeIndexes[i])
-
 		// Initializes a new share object if sharesFound does not exists
 		if !sharesFound {
 			shares = types.Shares{
@@ -386,7 +384,6 @@ func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0
 				SharesOwned: sharesMinted,
 			}
 		} else {
-			//Updates shares.SharesOwned with with additional shares Minted
 			shares.SharesOwned = shares.SharesOwned.Add(sharesMinted)
 		}
 
@@ -397,7 +394,7 @@ func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0
 		totalAmountReserve0 = totalAmountReserve0.Add(trueAmount0)
 		totalAmountReserve1 = totalAmountReserve1.Add(trueAmount1)
 
-		// Event is defined in types/Events.go
+		// emit successful deposit event
 		ctx.EventManager().EmitEvent(types.CreateDepositEvent(msg.Creator, msg.Receiver,
 			token0, token1, fmt.Sprint(msg.TickIndexes[i]), fmt.Sprint(msg.FeeIndexes[i]),
 			newReserve0.Sub(trueAmount0).String(), newReserve1.Sub(trueAmount1).String(), newReserve0.String(), newReserve1.String(),
@@ -406,7 +403,7 @@ func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0
 	}
 
 	if passedDeposit == 0 {
-		return nil, nil, sdkerrors.Wrapf(types.ErrAllDepositsFailed, "All Ticks deposited fail")
+		return nil, nil, sdkerrors.Wrapf(types.ErrAllDepositsFailed, "All deposits failed")
 	}
 
 	// Send TrueAmount0 to Module
