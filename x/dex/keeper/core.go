@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"fmt"
-	"math"
 	"strconv"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
@@ -282,21 +281,14 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 // tickIndex refers to the index of a specified tick for a given pool
 // StartingToken determines the ratio of our price, price when false, 1/price when true.
 func (k Keeper) Calc_price(tick_Index int64, startingToken bool) (sdk.Dec, error) {
-	floatPrice := math.Pow(1.0001, float64(tick_Index))
-	sPrice := fmt.Sprintf("%f", floatPrice)
+	base := BasePrice()
+	price := Pow(base, tick_Index)
 
-	price, err := sdk.NewDecFromStr(sPrice)
-
-	if err != nil {
-		return sdk.ZeroDec(), err
+	if startingToken {
+		price = sdk.OneDec().Quo(price)
+		return price, nil
 	} else {
-		if startingToken {
-			price = sdk.OneDec().Quo(price)
-			return price, nil
-		} else {
-			return price, nil
-		}
-
+		return price, nil
 	}
 
 }
@@ -709,7 +701,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			// runs swaps for any limitOrders at the specified tick, updating amount_left, amount_out accordingly
 			// passes in the outToken (token1), as this is the direction of the limit order for which we check
 
-			amount_left, amount_out, err = k.SwapLimitOrder1to0(goCtx, pairId, token1, amount_out, amount_left, pair.TokenPair.CurrentTick0To1)
+			amount_left, amount_out, err = k.SwapLimitOrder0to1(goCtx, pairId, token1, amount_out, amount_left, pair.TokenPair.CurrentTick0To1)
 
 			if err != nil {
 				return sdk.ZeroDec(), err
@@ -906,6 +898,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 
 	// errors if ReserveDataFound is not found
 	if !ReserveDataFound {
+		// TODO: Should there be an error here?
 		return amount_left, amount_out, nil
 	}
 
@@ -997,7 +990,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// returns price for the given tick and specified direction (0 -> 1)
-	price, err := k.Calc_price(CurrentTick0to1, false)
+	price, err := k.Calc_price(CurrentTick0to1, true)
 
 	if err != nil {
 		return sdk.ZeroDec(), sdk.ZeroDec(), err
@@ -1394,7 +1387,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 	// PairId for token0, token1 ("token0/token1")
 	pairId := k.CreatePairId(token0, token1)
 	// Retrives TickMap object from KVStore
-	_, tickFound := k.GetTickMap(ctx, pairId, msg.TickIndex)
+	tick, tickFound := k.GetTickMap(ctx, pairId, msg.TickIndex)
 
 	// If tick does not exist, then there is no liqudity to withdraw and thus error
 	if !tickFound {
@@ -1429,15 +1422,36 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 		return sdkerrors.Wrapf(types.ErrValidLimitOrderMapsNotFound, "Valid mappings for limit order withdraw not found")
 	}
 
-	if FillData.FilledReserves.Quo(FillData.FilledReserves.Add(ReserveData.Reserves)).LTE(UserSharesWithdrawnData.SharesWithdrawn.Quo(UserSharesWithdrawnData.SharesWithdrawn.Add(UserShareData.SharesOwned))) {
-		return sdkerrors.Wrapf(types.ErrCannotWithdrawLimitOrder, "Cannot withdraw additional liqudity from this limit order at this time")
+	reservesFilled := FillData.FilledReserves
+	reservesNotFilled := ReserveData.Reserves
+	userSharesWithdrawn := UserSharesWithdrawnData.SharesWithdrawn
+	userSharesNotWithdrawn := UserShareData.SharesOwned
+	sharesTotal := TotalSharesData.TotalShares
 
+	fmt.Printf("filled %+v\nnotFilled %+v\nuserWithdrawn %+v\nuserNotWithdrawn %+v\nsharesTotal %+v\n\n",
+		reservesFilled, reservesNotFilled, userSharesWithdrawn, userSharesNotWithdrawn, sharesTotal)
+
+	reservesTotal := reservesFilled.Add(reservesNotFilled)
+	userSharesTotal := userSharesWithdrawn.Add(userSharesNotWithdrawn)
+
+	// if (filledReserves / (filledReserves + unfilledReserves)) < (sharesWithdrawn / (sharesWithdrawn + sharesNotWithdrawn))
+	if userSharesWithdrawn.Quo(userSharesTotal).GT(reservesFilled.Quo(reservesTotal)) {
+		return sdkerrors.Wrapf(types.ErrCannotWithdrawLimitOrder, "Cannot withdraw additional liqudity from this limit order at this time")
 	}
+
+	price, err := k.Calc_price(tick.TickIndex, msg.KeyToken == token0)
+	if err != nil {
+		// TODO: Remove error possibility
+		return err
+	}
+
+	sharesFilled := reservesFilled.Mul(price)
+
 	// Calculates the sharesOut based on the UserShares withdrawn  compared to sharesLeft compared to remaining liquidity in reserves
-	sharesOut := ((FillData.FilledReserves.Mul(UserSharesWithdrawnData.SharesWithdrawn.Add(UserShareData.SharesOwned))).Quo(FillData.FilledReserves.Add(ReserveData.Reserves))).Sub(UserSharesWithdrawnData.SharesWithdrawn)
+	sharesOut := sharesFilled.Mul(userSharesTotal).Quo(sharesFilled.Add(reservesNotFilled)).Sub(userSharesWithdrawn)
 
 	// calculate amountOut given sharesOut
-	amountOut := (sharesOut.Mul(FillData.FilledReserves)).Quo(TotalSharesData.TotalShares)
+	amountOut := sharesOut.Mul(price)
 	// Calculates amount to subtract from fillMap object given sharesOut
 	FillData.FilledReserves = FillData.FilledReserves.Sub(sharesOut.Mul(FillData.FilledReserves).Quo(TotalSharesData.TotalShares))
 	// Updates useSharesWithdrawMap to include sharesOut
