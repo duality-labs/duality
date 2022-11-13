@@ -71,11 +71,12 @@ func makePair(s *MsgServerTestSuite, pairId string, tickIndex int64, feeTier uin
 	if !pairFound {
 		pair = types.PairMap{
 			PairId: pairId,
+			MinTick: tickIndex - fee,
+			MaxTick: tickIndex + fee,
 			TokenPair: &types.TokenPairType{
 				CurrentTick0To1: tickIndex - fee,
 				CurrentTick1To0: tickIndex + fee,
 			},
-			TotalTickCount: 0,
 		}
 	}
 

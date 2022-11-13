@@ -91,11 +91,12 @@ func (k Keeper) PairInit(goCtx context.Context, token0 string, token1 string, ti
 		// Note this is only one when nno ticks currently exists, and thus we set currentTick0to1 and currentTick1to0 to be tick_index +- fee
 		k.SetPairMap(ctx, types.PairMap{
 			PairId: pairId,
+			MinTick: tick_index - fee,
+			MaxTick: tick_index + fee,
 			TokenPair: &types.TokenPairType{
 				CurrentTick0To1: tick_index - fee,
 				CurrentTick1To0: tick_index + fee,
 			},
-			TotalTickCount: 0,
 		})
 
 	}
@@ -103,6 +104,64 @@ func (k Keeper) PairInit(goCtx context.Context, token0 string, token1 string, ti
 	// returns pairId (token0/token1)
 	return pairId, nil
 
+}
+
+
+func (k Keeper) FindNextTick1To0(goCtx context.Context, pairMap types.PairMap)(found bool, tickIdx int64){
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// If MaxTick == MinInt64 it is unset
+	// There is no Token0 in the pool
+	if pairMap.MaxTick == math.MinInt64{
+		return false, math.MinInt64
+	}
+	// Start scanning from CurrentTick1To0 + 1
+	tickIdx = pairMap.TokenPair.CurrentTick1To0 + 1
+
+	// Scan through all tick to the right until we hit maxTick
+	for int64(tickIdx) <= pairMap.MaxTick {
+		// Checks for the next value tick containing amount0
+		tick, tickFound := k.GetTickMap(ctx, pairMap.PairId, tickIdx)
+		if tickFound && tick.TickData.HasToken0(){
+			//Return the new tickIdx
+			return true, tickIdx
+		}
+
+		tickIdx++
+	}
+
+	// If no tick found return false
+	return false, math.MinInt64
+}
+
+
+func (k Keeper) FindNextTick0To1(goCtx context.Context, pairMap types.PairMap)(found bool, tickIdx int64){
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// If MinTick == MaxInt64 it is unset
+	// There is no Token1 in the pool
+	if pairMap.MinTick == math.MaxInt64{
+		return false, math.MaxInt64
+	}
+	// Start scanning from CurrentTick0To1 + 1
+	tickIdx = pairMap.TokenPair.CurrentTick0To1 - 1
+
+	// Scan through all tick to the left until we hit minTick
+	for int64(tickIdx) >= pairMap.MinTick {
+		// Checks for the next value tick containing amount1
+		tick, tickFound := k.GetTickMap(ctx, pairMap.PairId, tickIdx)
+		if tickFound && tick.TickData.HasToken1(){
+			// Returns the new tickIdx
+			return true, tickIdx
+		}
+
+		tickIdx--
+	}
+
+	// If no tick found return false
+	return false, math.MaxInt64
 }
 
 func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.PairMap, tickIndex int64, amount0 sdk.Dec, amount1 sdk.Dec, fee int64, feeIndex uint64) (sdk.Dec, sdk.Dec, sdk.Dec, sdk.Dec, sdk.Dec, error) {
@@ -133,10 +192,7 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 
 		// Gets feeSize for feelist
 		feeSize := k.GetFeeListCount(ctx)
-		// if either of the lower or upper tick is not found we enumerate totalTickCount
-		if !lowerTickFound || !upperTickFound {
-			pair.TotalTickCount = pair.TotalTickCount + 1
-		}
+
 		// initialize lowerTick if not found
 		if !lowerTickFound {
 
@@ -247,9 +303,21 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 		pair.TokenPair.CurrentTick1To0 = tickIndex + fee
 	}
 
+	// If liquidity is deposited above current MaxTick reset it to new value
+	if trueAmount0.GT(sdk.ZeroDec()) &&  tickIndex+fee > pair.MaxTick{
+		pair.MaxTick = tickIndex + fee
+	}
+
+
 	if trueAmount1.GT(sdk.ZeroDec()) && ((tickIndex-fee > pair.TokenPair.CurrentTick0To1) && (tickIndex-fee < pair.TokenPair.CurrentTick1To0)) {
 		pair.TokenPair.CurrentTick0To1 = tickIndex - fee
 	}
+
+	// If liquidity is deposited below current MinTick reset it to new value
+	if trueAmount1.GT(sdk.ZeroDec()) && tickIndex-fee < pair.MinTick{
+		pair.MinTick = tickIndex - fee
+	}
+
 
 	// Set pair, lower and upperTick KVStores
 	k.SetPairMap(ctx, pair)
@@ -376,6 +444,7 @@ func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
 			return err
 		}
+
 	}
 
 	// Send TrueAmount1 to Module
@@ -457,62 +526,42 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		// subtracts sahresToRemove from the User's personl number of sharesOwned.
 		shareOwner.SharesOwned = shareOwner.SharesOwned.Sub(msg.SharesToRemove[i])
 
-		// checks to see if after withdraw any fees tiers exist with non-empty liqudiity in the specified tick
-		isTickEmpty := false
-		if upperTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].TotalShares.Equal(sdk.ZeroDec()) {
-			isTickEmpty = true
-			for _, s := range upperTick.TickData.Reserve0AndShares {
-				if s.TotalShares.GT(sdk.ZeroDec()) {
-					isTickEmpty = false
-				}
-			}
-		}
+		isTickEmpty := !upperTick.TickData.HasShares()
 
-		// if all fee tiers at the specied tick are empty and no limit order exists at the given tick we subtract pairCount (the number of ticks active in a specific pair)
-		if isTickEmpty && upperTick.LimitOrderPool0To1.CurrentLimitOrderKey == 0 && upperTick.LimitOrderPool1To0.CurrentLimitOrderKey == 0 {
-
-			// handles pairCount management in the best case scenario that all liqudity has been depleted and that a limit order does not exists at this tick.
-			// @Dev, pairCount (number of active ticks for a specfied pair) is a heuristic to reduce unecessary iterations when swapping assets, pairCount does not need to decrement, but in cases where we can it doing so can improve runtime.
-
-			Pool0to1, Pool0to1Found := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, upperTick.TickIndex, token0, 0)
-			Pool1to0, Pool1to0Found := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, upperTick.TickIndex, token1, 0)
-
-			if (!Pool0to1Found || Pool0to1.TotalShares.Equal(sdk.ZeroDec())) && (!Pool1to0Found || Pool1to0.TotalShares.Equal(sdk.ZeroDec())) && pair.TotalTickCount > 0 {
-				pair.TotalTickCount = pair.TotalTickCount - 1
-			}
-
-		}
-		// if the tick is empty recalcualtes CurrentTick1to0
+		// if the tick is empty and was CurrentTick1To0 recalculate CurrentTick1To0
 		if isTickEmpty && (msg.TickIndexes[i]+int64(fee) == pair.TokenPair.CurrentTick1To0) {
 
-			tickFound := false
-			c := 0
-			// finds the next active tick
-			for tickFound != true && pair.TotalTickCount < int64(c) {
+			found, tickIdx := k.FindNextTick1To0(goCtx, pair)
 
-				c++
-				// checks for the next value tick containing amount0 (adding some constant)
-				_, tickFound = k.GetTickMap(ctx, pairId, (msg.TickIndexes[i] + fee + int64(c)))
-
+			if found {
+				// If we found a new tick set it as CurrentTick1To0
+				pair.TokenPair.CurrentTick1To0 = tickIdx
 			}
-			// sets currentTick0to1 to new found tick
-			pair.TokenPair.CurrentTick1To0 = (msg.TickIndexes[i] + fee + int64(c))
 		}
-		// if the tick is empty recalcualtes CurrentTick0to1
+
+		// If the upper tick has no Token0 and was MaxTick decrement new MaxTick
+		if !upperTick.TickData.HasToken0() && msg.TickIndexes[i]+int64(fee) == pair.MaxTick{
+			// TODO: this isn't perfect because it doesn't guarantee that MaxTick has liquidity
+			// but it ensures that MaxTick is an upper bound
+			pair.MaxTick--
+		}
+
+		// If the lower tick has no Token1 and was MinTick increment new MinTick
+		if !lowerTick.TickData.HasToken0() && msg.TickIndexes[i]-int64(fee) == pair.MinTick{
+			// TODO: this isn't perfect because it doesn't guarantee that MinTick has liquidity
+			// but it ensures that MinTick is a lower bound
+			pair.MaxTick++
+		}
+
+		// if the tick is empty and was CurrentTick0To1 recalculate CurrentTick0To1
 		if isTickEmpty && (msg.TickIndexes[i]-int64(fee) == pair.TokenPair.CurrentTick0To1) {
 
-			tickFound := false
-			c := 0
-			// finds the next active tick
-			for tickFound != true && pair.TotalTickCount < int64(c) {
+			found, tickIdx := k.FindNextTick1To0(goCtx, pair)
 
-				c++
-				// checks for the next value tick containing amount1 (subtracting some constant)
-				_, tickFound = k.GetTickMap(ctx, pairId, (msg.TickIndexes[i] - fee - int64(c)))
-
+			if found {
+				// If we found a new tick set it as CurrentTick0To1
+				pair.TokenPair.CurrentTick0To1 = tickIdx
 			}
-			// sets currentTick1to0 to new found tick
-			pair.TokenPair.CurrentTick1To0 = (msg.TickIndexes[i] - fee - int64(c))
 		}
 
 		// adds reserve0ToRemove/reserve1ToRemove to totals
@@ -576,10 +625,6 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 
-	// Counts how many ticks we have iterated through, compare to initialized ticks in the pair
-	// @Note Heuristic to remove unecessary looping
-	count := 0
-
 	//amount_left is the amount left to deposit
 	amount_left := msg.AmountIn
 
@@ -587,7 +632,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	amount_out := sdk.ZeroDec()
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
-	for !amount_left.Equal(sdk.ZeroDec()) && (count < int(pair.TotalTickCount)) {
+	for !amount_left.Equal(sdk.ZeroDec()) && pair.TokenPair.CurrentTick0To1 >= pair.MinTick {
 
 		// Tick data for tick that holds information about reserve1
 		Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1)
@@ -597,9 +642,6 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 - 1
 			continue
 		}
-
-		// iterate count
-		count++
 
 		var i uint64
 
@@ -658,7 +700,12 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			//Make updates to tickMap containing reserve0/1 data to the KVStore
 			k.SetTickMap(ctx, pairId, Current0Data)
 
+			//If Current0 gets funded and Current0 > MaxTick, Set MaxTick to Current0
+			if Current0Data.TickData.HasToken0() && Current0Data.TickIndex >= pair.MaxTick {
+				pair.MaxTick = Current0Data.TickIndex
+			}
 		}
+
 		k.SetTickMap(ctx, pairId, Current1Data)
 
 		// if feeIndex is equal to the largest index in feeList check for valid limit orders
@@ -677,6 +724,13 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 			// decrements CurrentTick0to1 to the next tick containing reserve1
 			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 - 1
+
+		}
+
+		// If we drain Current1 and it was MinTick we have exhausted all Token1 in the pair
+		// Therefore we need to unset MinTick ie. (ie MinTick = MaxInt64)
+		if !Current1Data.TickData.HasToken1() && Current1Data.TickIndex == pair.MinTick {
+			pair.MinTick = math.MaxInt64
 		}
 	}
 
@@ -716,11 +770,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		return sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 
-	// Counts how many ticks we have iterated through, compare to initialized ticks in the pair
-	// @Note Heuristic to remove unecessary looping
-	count := 0
-
-	//amount_left is the amount left to deposit
+		//amount_left is the amount left to deposit
 	amount_left := msg.AmountIn
 
 	// amount to return to receiver
@@ -728,7 +778,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
 
-	for !amount_left.Equal(sdk.ZeroDec()) && (count < int(pair.TotalTickCount)) {
+	for !amount_left.Equal(sdk.ZeroDec()) && pair.TokenPair.CurrentTick1To0 <= pair.MaxTick {
 
 		Current0Data, Current0Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick1To0)
 		//Current0Datam := Current0Data.TickData.Reserve1[i]
@@ -740,9 +790,6 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			pair.TokenPair.CurrentTick1To0 = pair.TokenPair.CurrentTick1To0 + 1
 			continue
 		}
-
-		// iterate count
-		count++
 
 		var i uint64
 
@@ -801,6 +848,11 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			//Make updates to tickMap containing reserve0/1 data to the KVStore
 
 			k.SetTickMap(ctx, pairId, Current1Data)
+
+			if Current1Data.TickData.HasToken1() && Current1Data.TickIndex <= pair.MinTick {
+				pair.MinTick = Current1Data.TickIndex
+			}
+
 		}
 
 		k.SetTickMap(ctx, pairId, Current0Data)
@@ -818,7 +870,14 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				return sdk.ZeroDec(), err
 			}
 
+
 			pair.TokenPair.CurrentTick1To0 = pair.TokenPair.CurrentTick1To0 + 1
+		}
+
+			// If we drain Current0 and it was MaxTick we have exhausted all Token0 in the pair
+			// Therefore we need to unset MaxTick ie. (ie MaxTick = MinInt64)
+			if !Current0Data.TickData.HasToken0() && Current0Data.TickIndex == pair.MaxTick {
+				pair.MaxTick = math.MinInt64
 		}
 	}
 
@@ -1173,8 +1232,14 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	// get pair map after checking if it is initialized in PairInit
 	pair, _ := k.GetPairMap(ctx, pairId)
 
-	if tick.LimitOrderPool0To1.CurrentLimitOrderKey == 0 && tick.LimitOrderPool1To0.CurrentLimitOrderKey == 0 {
-		pair.TotalTickCount = pair.TotalTickCount + 1
+	// If we are placing limit order above current MaxTick update MaxTick
+	if msg.TokenIn == token0 && msg.TickIndex > pair.MaxTick {
+		pair.MaxTick = msg.TickIndex
+	}
+
+	// If we are placing limit order below current MinTick update MinTick
+	if msg.TokenIn == token1 && msg.TickIndex < pair.MinTick {
+		pair.MinTick = msg.TickIndex
 	}
 
 	// If TokenIn == token0 set count and key to values of LimitOrderPool0to1
