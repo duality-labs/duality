@@ -9,6 +9,27 @@ import (
 	//authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
+func newACoin(amt sdk.Int) sdk.Coin {
+	return sdk.NewCoin("TokenA", amt)
+}
+
+func newBCoin(amt sdk.Int) sdk.Coin {
+	return sdk.NewCoin("TokenB", amt)
+}
+
+func convInt(amt string) sdk.Int {
+	IntAmt, err := sdk.NewIntFromString(amt)
+
+	_ = err
+	return IntAmt
+}
+
+func newDec(amt string) sdk.Dec {
+	decAmt, _ := sdk.NewDecFromStr(amt)
+
+	return decAmt
+}
+
 func (suite *IntegrationTestSuite) TestHasBalance3() {
 	app, ctx := suite.app, suite.ctx
 	addr := sdk.AccAddress([]byte("addr1_______________"))

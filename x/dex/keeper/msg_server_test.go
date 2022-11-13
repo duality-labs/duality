@@ -287,6 +287,22 @@ func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits ...*Depos
 	s.Assert().Nil(err)
 }
 
+func (s *MsgServerTestSuite) assertDepositReponse(depositResponse DepositReponse, expectedDepositResponse DepositReponse) {
+
+	for i, _ := range expectedDepositResponse.amountsA {
+		s.Assert().Equal(depositResponse.amountsA[i], expectedDepositResponse.amountsA[i])
+	}
+
+	for i, _ := range expectedDepositResponse.amountsB {
+		s.Assert().Equal(depositResponse.amountsB[i], expectedDepositResponse.amountsB[i])
+	}
+}
+
+type DepositReponse struct {
+	amountsA []sdk.Dec
+	amountsB []sdk.Dec
+}
+
 type Withdrawl struct {
 	TickIndex      int64
 	FeeIndex       uint64
