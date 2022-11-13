@@ -1493,6 +1493,11 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 	fmt.Println("Shares Out: ", sharesOut)
 	// calculate amountOut given sharesOut
 	fmt.Println("price: ", price)
+	// amountOutSwap = amountInSwap * price
+	// amountOutswap = limitAmountIn
+	// amountInSwap = limitAmountOut
+	// limitAmountIn = limitAmountOut * price
+	// limitAmountOut = limitAmountIn / price
 	amountOut := sharesOut.Quo(price)
 	fmt.Println("Amount Out: ", amountOut)
 	// Subtracts amountOut from FilledReserves
