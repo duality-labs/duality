@@ -137,26 +137,30 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	s.assertDexBalances(50, 0)
 
 	//Bobs balance for TokenB should be 200 - 40 = 160
-	//Bobs balance for TokenA should be (1 * 9.997500249975002500) + (1.0001 * 24.997500249975002500) + 100 = 134.99750024997500250025
+	//Tick 1 should be a swap of 25 / 1.0001 TokenB (1) for 25 of TokenA (0) exhausting all the liquidity
+	// => This means the amount of LO filled at tick 1 is 25 / 1.0001 = 24.997500249975
+	//Tick 0 should be a swap of the remaining ~15.002499750024999 of TokenB for ~15.002499750024999
+	// This is because the price is 1
+	//Bobs balance for TokenA should be (1 * 15.002499750024999) + (1.0001 * 24.997500249975) + 100 = 140.002499750024997500
 	//DEX Balance should be 50 - (1 * 9.997500249975002500) - (1.0001 * 24.997500249975002500) = 9.997500249975002500
 	s.bobPlacesSwapOrder("TokenA", 40, 30)
 
 	s.assertAliceBalances(99950, 500)
-	s.assertBobBalancesDec(sdk.MustNewDecFromStr("134.9975002499750025"), NewDec(160))
-	s.assertDexBalancesDec(sdk.MustNewDecFromStr("15.002499750025g="), NewDec(40))
+	s.assertBobBalancesDec(sdk.MustNewDecFromStr("140.002499750024997500"), NewDec(160))
+	s.assertDexBalancesDec(sdk.MustNewDecFromStr("9.9975002499750025"), NewDec(40))
 
 	s.aliceWithdrawsFilledLimitOrder("TokenA", 1)
 
-	//(1/ 1.0001 * 25) = 9.997500249975002500
-	s.assertAliceBalancesDec(NewDec(99950), sdk.MustNewDecFromStr("525.0025"))
-	s.assertBobBalancesDec(sdk.MustNewDecFromStr("134.99750024997500250025"), NewDec(160))
-	s.assertDexBalancesDec(sdk.MustNewDecFromStr("15.00249975002499749975"), NewDec(40))
+	s.assertAliceBalancesDec(NewDec(99950), sdk.MustNewDecFromStr("524.997500249975002500"))
+	s.assertBobBalancesDec(sdk.MustNewDecFromStr("140.002499750024997500"), NewDec(160))
+	//40 - 24.997500249975002500 = 15.0024997500249975
+	s.assertDexBalancesDec(sdk.MustNewDecFromStr("9.9975002499750025"), sdk.MustNewDecFromStr("15.0024997500249975"))
 
 	s.aliceWithdrawsFilledLimitOrder("TokenA", 0)
 
 	s.assertAliceBalancesDec(NewDec(99950), sdk.MustNewDecFromStr("540")) 
-	s.assertBobBalancesDec(sdk.MustNewDecFromStr("134.99750024997500250025"), NewDec(160))
-	s.assertDexBalancesDec(sdk.MustNewDecFromStr("15.00249975002499749975"), NewDec(40))
+	s.assertBobBalancesDec(sdk.MustNewDecFromStr("140.002499750024997500"), NewDec(160))
+	s.assertDexBalancesDec(sdk.MustNewDecFromStr("9.9975002499750025"), NewDec(0))
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFailsWhenNothingToWithdraw() {
