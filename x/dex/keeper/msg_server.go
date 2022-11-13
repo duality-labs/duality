@@ -29,7 +29,7 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 		return nil, err
 	}
 
-	err = k.DepositCore(goCtx, msg, token0, token1, createrAddr, amount0, amount1)
+	Amounts0Deposit, Amounts1Deposit, err := k.DepositCore(goCtx, msg, token0, token1, createrAddr, amount0, amount1)
 
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 
 	_ = ctx
 
-	return &types.MsgDepositResponse{}, nil
+	return &types.MsgDepositResponse{Amounts0Deposit, Amounts1Deposit}, nil
 }
 
 func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*types.MsgWithdrawlResponse, error) {
