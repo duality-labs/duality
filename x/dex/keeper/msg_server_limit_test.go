@@ -161,7 +161,7 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	s.assertAliceBalancesDec(NewDec(99950), sdk.MustNewDecFromStr("540")) 
 	s.assertBobBalancesDec(sdk.MustNewDecFromStr("140.002499750024997500"), NewDec(160))
 	s.assertDexBalancesDec(sdk.MustNewDecFromStr("9.9975002499750025"), NewDec(0))
-}
+
 
 func (s *MsgServerTestSuite) TestWithdrawFailsWhenNothingToWithdraw() {
 	s.fundAliceBalances(100000, 500)
