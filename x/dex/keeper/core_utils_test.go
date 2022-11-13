@@ -129,7 +129,8 @@ func calculateSharesPure(
 func calculateShares(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex int64, feeIndex uint64) sdk.Dec {
 	k, ctx := s.app.DexKeeper, s.ctx
 
-	price, err := k.Calc_price(tickIndex, false)
+	price_1to0, err := k.Calc_price_1to0(tickIndex)
+
 	s.Require().Nil(err)
 
 	feelist := k.GetAllFeeList(ctx)
@@ -147,7 +148,7 @@ func calculateShares(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, pa
 		trueAmount0,
 		amount1,
 		trueAmount1,
-		price,
+		price_1to0,
 		feeIndex,
 		lowerTickFound,
 		lowerReserve1,
