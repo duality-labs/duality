@@ -513,7 +513,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 
 		}
 		// if the tick is empty recalculates CurrentTick1to0
-		if isTickEmpty && (msg.TickIndexes[i] + int64(fee) == pair.TokenPair.CurrentTick1To0) {
+		if isTickEmpty && (msg.TickIndexes[i] - int64(fee) == pair.TokenPair.CurrentTick1To0) {
 
 			tickFound := false
 			c := 0
