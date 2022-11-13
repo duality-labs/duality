@@ -184,22 +184,6 @@ func (s *MsgServerTestSuite) assertDexBalancesDec(a sdk.Dec, b sdk.Dec) {
 	s.assertAccountBalancesDec(s.app.AccountKeeper.GetModuleAddress("dex"), a, b)
 }
 
-func (s *MsgServerTestSuite) aliceLimitBuys(buying string, tick int, amountIn int) {
-	s.limitBuys(s.alice, buying, tick, amountIn)
-}
-
-func (s *MsgServerTestSuite) bobLimitBuys(buying string, tick int, amountIn int) {
-	s.limitBuys(s.bob, buying, tick, amountIn)
-}
-
-func (s *MsgServerTestSuite) carolLimitBuys(buying string, tick int, amountIn int) {
-	s.limitBuys(s.carol, buying, tick, amountIn)
-}
-
-func (s *MsgServerTestSuite) danLimitBuys(buying string, tick int, amountIn int) {
-	s.limitBuys(s.dan, buying, tick, amountIn)
-}
-
 func (s *MsgServerTestSuite) aliceLimitSells(selling string, tick int, amountIn int) {
 	s.limitSells(s.alice, selling, tick, amountIn)
 }
@@ -214,16 +198,6 @@ func (s *MsgServerTestSuite) carolLimitSells(selling string, tick int, amountIn 
 
 func (s *MsgServerTestSuite) danLimitSells(selling string, tick int, amountIn int) {
 	s.limitSells(s.dan, selling, tick, amountIn)
-}
-
-func (s *MsgServerTestSuite) limitBuys(account sdk.AccAddress, tokenOut string, tick int, amountIn int) {
-	var tokenIn string
-	if tokenOut == "TokenA" {
-		tokenIn = "TokenB"
-	} else {
-		tokenIn = "TokenA"
-	}
-	s.limitSells(account, tokenIn, tick, amountIn)
 }
 
 func (s *MsgServerTestSuite) limitSells(account sdk.AccAddress, tokenIn string, tick int, amountIn int) {
@@ -314,22 +288,22 @@ type DepositReponse struct {
 }
 
 func (s *MsgServerTestSuite) withdraws(account sdk.AccAddress, withdrawls ...*Withdrawl) error {
-	sharesToRemove := make([]sdk.Dec, len(withdrawls))
-	tickIndicies := make([]int64, len(withdrawls))
+	tickIndexes := make([]int64, len(withdrawls))
 	feeIndexes := make([]uint64, len(withdrawls))
+	sharesToRemove := make([]sdk.Dec, len(withdrawls))
 	for i, e := range withdrawls {
-		sharesToRemove[i] = e.Shares
-		tickIndicies[i] = e.TickIndex
+		tickIndexes[i] = e.TickIndex
 		feeIndexes[i] = e.FeeIndex
+		sharesToRemove[i] = e.Shares
 	}
 
 	_, err := s.msgServer.Withdrawl(s.goCtx, &types.MsgWithdrawl{
-		Creator:        s.alice.String(),
-		Receiver:       s.alice.String(),
+		Creator:        account.String(),
+		Receiver:       account.String(),
 		TokenA:         "TokenA",
 		TokenB:         "TokenB",
 		SharesToRemove: sharesToRemove,
-		TickIndexes:    tickIndicies,
+		TickIndexes:    tickIndexes,
 		FeeIndexes:     feeIndexes,
 	})
 
@@ -383,48 +357,6 @@ func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling st
 	s.Assert().Nil(err)
 }
 
-func (s *MsgServerTestSuite) cancelsLimitBuy(account sdk.AccAddress, buying string, tick int, key int, sharesOut int) {
-	var selling string
-	if buying == "TokenA" {
-		selling = "TokenB"
-	} else {
-		selling = "TokenA"
-	}
-	s.cancelsLimitSell(account, selling, tick, key, sharesOut)
-}
-
-func (s *MsgServerTestSuite) aliceCancelsLimitBuy(buying string, tick int, key int, sharesOut int) {
-	s.cancelsLimitBuy(s.alice, buying, tick, key, sharesOut)
-}
-
-func (s *MsgServerTestSuite) bobCancelsLimitBuy(buying string, tick int, key int, sharesOut int) {
-	s.cancelsLimitBuy(s.bob, buying, tick, key, sharesOut)
-}
-
-func (s *MsgServerTestSuite) carolCancelsLimitBuy(buying string, tick int, key int, sharesOut int) {
-	s.cancelsLimitBuy(s.carol, buying, tick, key, sharesOut)
-}
-
-func (s *MsgServerTestSuite) danCancelsLimitBuy(buying string, tick int, key int, sharesOut int) {
-	s.cancelsLimitBuy(s.dan, buying, tick, key, sharesOut)
-}
-
-func (s *MsgServerTestSuite) aliceBuys(buying string, amountIn int, minOut int) {
-	s.buys(s.alice, buying, amountIn, minOut)
-}
-
-func (s *MsgServerTestSuite) bobBuys(buying string, amountIn int, minOut int) {
-	s.buys(s.bob, buying, amountIn, minOut)
-}
-
-func (s *MsgServerTestSuite) carolBuys(buying string, amountIn int, minOut int) {
-	s.buys(s.bob, buying, amountIn, minOut)
-}
-
-func (s *MsgServerTestSuite) danBuys(buying string, amountIn int, minOut int) {
-	s.buys(s.bob, buying, amountIn, minOut)
-}
-
 func (s *MsgServerTestSuite) aliceSells(selling string, amountIn int, minOut int) {
 	s.sells(s.alice, selling, amountIn, minOut)
 }
@@ -441,16 +373,6 @@ func (s *MsgServerTestSuite) danSells(selling string, amountIn int, minOut int) 
 	s.sells(s.bob, selling, amountIn, minOut)
 }
 
-func (s *MsgServerTestSuite) buys(account sdk.AccAddress, buying string, amountIn int, minOut int) {
-	var selling string
-	if buying == "TokenA" {
-		selling = "TokenB"
-	} else {
-		selling = "TokenA"
-	}
-	s.sells(account, selling, amountIn, minOut)
-}
-
 func (s *MsgServerTestSuite) sells(account sdk.AccAddress, selling string, amountIn int, minOut int) {
 	amountInDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(amountIn)))
 	minOutDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(minOut)))
@@ -464,6 +386,16 @@ func (s *MsgServerTestSuite) sells(account sdk.AccAddress, selling string, amoun
 		MinOut:   minOutDec,
 	})
 	s.Assert().Nil(err)
+}
+
+func (s *MsgServerTestSuite) withdrawsLimitBuy(account sdk.AccAddress, buying string, tick int) {
+	var selling string
+	if buying == "TokenA" {
+		selling = "TokenB"
+	} else {
+		selling = "TokenA"
+	}
+	s.withdrawsLimitSell(account, selling, tick)
 }
 
 func (s *MsgServerTestSuite) aliceWithdrawsLimitBuy(buying string, tick int) {
@@ -482,6 +414,19 @@ func (s *MsgServerTestSuite) danWithdrawsLimitBuy(buying string, tick int) {
 	s.withdrawsLimitBuy(s.dan, buying, tick)
 }
 
+func (s *MsgServerTestSuite) withdrawsLimitSell(account sdk.AccAddress, selling string, tick int) {
+	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
+		Creator:   account.String(),
+		Receiver:  account.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		TickIndex: int64(tick),
+		KeyToken:  selling,
+		Key:       0,
+	})
+	s.Assert().Nil(err)
+}
+
 func (s *MsgServerTestSuite) aliceWithdrawsLimitSell(selling string, tick int) {
 	s.withdrawsLimitSell(s.alice, selling, tick)
 }
@@ -496,29 +441,6 @@ func (s *MsgServerTestSuite) carolWithdrawsLimitSell(selling string, tick int) {
 
 func (s *MsgServerTestSuite) danWithdrawsLimitSell(selling string, tick int) {
 	s.withdrawsLimitSell(s.dan, selling, tick)
-}
-
-func (s *MsgServerTestSuite) withdrawsLimitSell(account sdk.AccAddress, selling string, tick int) {
-	var buying string
-	if selling == "TokenA" {
-		buying = "TokenB"
-	} else {
-		buying = "TokenA"
-	}
-	s.withdrawsLimitBuy(account, buying, tick)
-}
-
-func (s *MsgServerTestSuite) withdrawsLimitBuy(account sdk.AccAddress, buying string, tick int) {
-	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
-		Creator:   account.String(),
-		Receiver:  account.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: int64(tick),
-		KeyToken:  buying,
-		Key:       0,
-	})
-	s.Assert().Nil(err)
 }
 
 func (s *MsgServerTestSuite) traceBalances() {
