@@ -137,25 +137,26 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	s.assertDexBalances(50, 0)
 
 	//Bobs balance for TokenB should be 200 - 40 = 160
-	//Bobs balance for TokenA should be (1 * 25) + (1 / 1.0001 * 15) + 100 = 139.99850015
-	//DEX Balance should be 50 - (1 * 25) - (1 / 1.0001 * 15) = 10.00149985
+	//Bobs balance for TokenA should be (1 * 9.997500249975002500) + (1.0001 * 24.997500249975002500) + 100 = 134.99750024997500250025
+	//DEX Balance should be 50 - (1 * 9.997500249975002500) - (1.0001 * 24.997500249975002500) = 9.997500249975002500
 	s.bobPlacesSwapOrder("TokenA", 40, 30)
 
 	s.assertAliceBalances(99950, 500)
-	s.assertBobBalancesDec(sdk.MustNewDecFromStr("139.99850015"), NewDec(160))
-	s.assertDexBalancesDec(sdk.MustNewDecFromStr("10.00149985"), NewDec(40))
-
-	s.aliceWithdrawsFilledLimitOrder("TokenA", 0)
-
-	s.assertAliceBalances(99950, 525)
-	s.assertBobBalancesDec(sdk.MustNewDecFromStr("139.99850015"), NewDec(160))
-	s.assertDexBalancesDec(sdk.MustNewDecFromStr("10.00149985"), NewDec(15))
+	s.assertBobBalancesDec(sdk.MustNewDecFromStr("134.9975002499750025"), NewDec(160))
+	s.assertDexBalancesDec(sdk.MustNewDecFromStr("15.002499750025g="), NewDec(40))
 
 	s.aliceWithdrawsFilledLimitOrder("TokenA", 1)
 
-	s.assertAliceBalances(99950, 540)
-	s.assertBobBalancesDec(sdk.MustNewDecFromStr("139.99850015"), NewDec(160))
-	s.assertDexBalancesDec(sdk.MustNewDecFromStr("10.00149985"), NewDec(0))
+	//(1/ 1.0001 * 25) = 9.997500249975002500
+	s.assertAliceBalancesDec(NewDec(99950), sdk.MustNewDecFromStr("525.0025"))
+	s.assertBobBalancesDec(sdk.MustNewDecFromStr("134.99750024997500250025"), NewDec(160))
+	s.assertDexBalancesDec(sdk.MustNewDecFromStr("15.00249975002499749975"), NewDec(40))
+
+	s.aliceWithdrawsFilledLimitOrder("TokenA", 0)
+
+	s.assertAliceBalancesDec(NewDec(99950), sdk.MustNewDecFromStr("540")) 
+	s.assertBobBalancesDec(sdk.MustNewDecFromStr("134.99750024997500250025"), NewDec(160))
+	s.assertDexBalancesDec(sdk.MustNewDecFromStr("15.00249975002499749975"), NewDec(40))
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFailsWhenNothingToWithdraw() {
