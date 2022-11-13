@@ -38,13 +38,62 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlPartial() {
 	s.assertAliceBalances(50, 25)
 	s.assertDexBalances(50, 25)
 
-	// CurrentTick values remain unchanged
-	s.assertTickCount(1)
-	s.assertCurrentTicks(-1, 1)
+
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, addr, balances))
+	suite.Require().False(app.BankKeeper.HasBalance(ctx, addr, newACoin(sdk.NewInt(101))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, addr, newACoin(sdk.NewInt(100))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, addr, newACoin(sdk.NewInt(1))))
 }
 
-func (s *MsgServerTestSuite) TestSingleWithdrawlMaxFee() {
-	s.fundAliceBalances(100, 0)
+func (suite *IntegrationTestSuite) TestSingleWithdrawl() {
+	fmt.Println("Testing TestSingleWithdrawl")
+	app, ctx := suite.app, suite.ctx
+	//holderAcc := authtypes.NewEmptyModuleAccount("holder")
+	alice := sdk.AccAddress([]byte("alice"))
+	bob := sdk.AccAddress([]byte("bob"))
+
+	accAlice := app.AccountKeeper.NewAccountWithAddress(ctx, alice)
+	app.AccountKeeper.SetAccount(ctx, accAlice)
+	accBob := app.AccountKeeper.NewAccountWithAddress(ctx, bob)
+	app.AccountKeeper.SetAccount(ctx, accBob)
+
+	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("500000000000000000000")))
+	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
+
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
+	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("1000000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
+	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+
+	goCtx := sdk.WrapSDKContext(ctx)
+
+	// Set Fee List
+
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{0, 1})
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{1, 2})
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{2, 3})
+	app.DexKeeper.AppendFeeList(ctx, types.FeeList{3, 4})
+
+	fmt.Println("FeeList")
+	feeList := app.DexKeeper.GetAllFeeList(ctx)
+	fmt.Println(feeList)
+
+	fiftyDec, _ := sdk.NewDecFromStr("50")
+	createResponse, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
+		Creator:     alice.String(),
+		TokenA:      "TokenA",
+		TokenB:      "TokenB",
+		AmountsA:    []sdk.Dec{fiftyDec},
+		AmountsB:    []sdk.Dec{sdk.ZeroDec()},
+		TickIndexes: []int64{0},
+		FeeIndexes:  []uint64{0},
+		Receiver:    alice.String(),
+	})
+
 
 	// IF Alice deposits 100 TokenA into tick 0 @ feeTier 3
 	s.aliceDeposits(NewDeposit(100, 0, 0, 3))
