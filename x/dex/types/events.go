@@ -82,7 +82,7 @@ func createWithdrawEvent(creator string, receiver string, token0 string, token1 
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateWithdrawEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, oldReserve0 string, oldReserve1 string, newReserve0 string, newReserve1 string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreateWithdrawEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, oldReserve0 string, oldReserve1 string, newReserve0 string, newReserve1 string, sharesRemoved string, otherAttrs ...sdk.Attribute) sdk.Event {
 	return createWithdrawEvent(
 		creator,
 		receiver,
@@ -94,6 +94,7 @@ func CreateWithdrawEvent(creator string, receiver string, token0 string, token1 
 		sdk.NewAttribute(WithdrawEventOldReserves1, oldReserve1),
 		sdk.NewAttribute(WithdrawEventNewReserves0, newReserve0),
 		sdk.NewAttribute(WithdrawEventNewReserves1, newReserve1),
+		sdk.NewAttribute(WithdrawEventSharesRemoved, sharesRemoved),
 	)
 }
 

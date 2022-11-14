@@ -270,6 +270,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			upperTickFeeReserve1.Add(reserve1ToRemove).String(),
 			lowerTickFeeReserve0.String(),
 			upperTickFeeReserve1.String(),
+			sharesToRemove.String(),
 		))
 	}
 
