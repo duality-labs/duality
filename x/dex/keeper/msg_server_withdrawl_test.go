@@ -20,7 +20,6 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlFull() {
 	s.assertAliceShares(0, 0, sdk.NewDec(0))
 	s.assertAliceBalances(100, 50)
 	s.assertDexBalances(0, 0)
-	s.assertTickCount(0)
 }
 
 func (s *MsgServerTestSuite) TestSingleWithdrawlPartial() {
@@ -39,7 +38,6 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlPartial() {
 	s.assertDexBalances(50, 25)
 
 	// CurrentTick values remain unchanged
-	s.assertTickCount(1)
 	s.assertCurrentTicks(-1, 1)
 }
 
@@ -71,7 +69,6 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlSingleSide() {
 	s.assertAliceShares(0, 0, sdk.NewDec(0))
 	s.assertAliceBalances(100, 0)
 	s.assertDexBalances(0, 0)
-	s.assertTickCount(0)
 
 }
 
