@@ -139,7 +139,7 @@ func (s *MsgServerTestSuite) TestMultiDepositSingleFail() {
 
 }
 
-func (s *MsgServerTestSuite) TestMultiDepositAllSuceed() {
+func (s *MsgServerTestSuite) TestMultiDepositAllSucceed() {
 	s.fundAliceBalances(25, 25)
 	s.fundBobBalances(25, 25)
 
