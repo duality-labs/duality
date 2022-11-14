@@ -142,10 +142,10 @@ func (k Keeper) DepositCore(
 			fmt.Sprint(msg.TickIndexes[i]),
 			fmt.Sprint(msg.FeeIndexes[i]),
 			lowerReserve0.Sub(trueAmount0).String(),
-			lowerReserve0.Sub(trueAmount0).String(),
 			upperReserve1.Sub(trueAmount1).String(),
 			lowerReserve0.String(),
 			upperReserve1.String(),
+			sharesMinted.String(),
 		),
 		)
 	}
