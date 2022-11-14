@@ -89,10 +89,10 @@ func CreateWithdrawEvent(creator string, receiver string, token0 string, token1 
 		token1,
 		tickIndex,
 		feeIndex,
-		sdk.NewAttribute(WithdrawEventOldReserve0, oldReserve0),
-		sdk.NewAttribute(WithdrawEventOldReserve1, oldReserve1),
-		sdk.NewAttribute(WithdrawEventNewReserve0, newReserve0),
-		sdk.NewAttribute(WithdrawEventNewReserve1, newReserve1),
+		sdk.NewAttribute(WithdrawEventOldReserves0, oldReserve0),
+		sdk.NewAttribute(WithdrawEventOldReserves1, oldReserve1),
+		sdk.NewAttribute(WithdrawEventNewReserves0, newReserve0),
+		sdk.NewAttribute(WithdrawEventNewReserves1, newReserve1),
 	)
 }
 
