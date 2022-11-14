@@ -20,6 +20,9 @@ echo "Startup mode: $STARTUP_MODE"
 echo "Initializing chain..."
 dualityd init --chain-id $NETWORK duality
 
+# Add consumer section to the ICS chain
+dualityd add-consumer-section
+
 # replace moniker in the config
 if [ ! -z $NODE_MONIKER ]
 then
@@ -94,9 +97,9 @@ then
     dualityd keys add fred --keyring-backend test
     dualityd add-genesis-account $(dualityd keys show fred -a --keyring-backend test) "${B}tokenA,${B}tokenB,${B}tokenC,${B}tokenD,${B}tokenE,${B}tokenF,${B}tokenG,${B}tokenH,${B}tokenI,${B}tokenJ,${B}tokenK,${B}tokenL,${B}tokenM,${B}tokenN,${B}tokenO,${B}tokenP,${B}tokenQ,${B}tokenR,${B}tokenS,${B}tokenT,${B}tokenU,${B}tokenV,${B}tokenW,${B}tokenX,${B}tokenY,${B}tokenZ" --keyring-backend test
 
-    # Add gentxs to the genesis file
-    dualityd gentx alice 1000000stake --chain-id $NETWORK --keyring-backend test
-    dualityd collect-gentxs
+    # do not add a validator gentx here as there is already a leading ICS validator
+    # eg. dualityd gentx alice 1000000stake --chain-id $NETWORK --keyring-backend test
+    # eg. dualityd collect-gentxs
 
     echo "Starting new testnet chain..."
     dualityd --log_level ${LOG_LEVEL:-info} start
