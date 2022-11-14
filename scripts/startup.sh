@@ -25,7 +25,7 @@ sed -i 's#moniker = ".*"#moniker = "'"$NODE_MONIKER"'"#' /root/.duality/config/c
 
 # start or join a chain
 # start mainnet from crafted genesis.json
-if [[ $STARTUP_MODE == "new" && "$NETWORK" == "$MAINNET" ]]
+if [[ $STARTUP_MODE == "new" && "$IS_MAINNET" ]]
 then
 
     # use predefined genesis
