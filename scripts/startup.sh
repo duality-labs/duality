@@ -72,6 +72,12 @@ then
     # bob
     dualityd keys add bob --keyring-backend test
     dualityd add-genesis-account $(dualityd keys show bob -a --keyring-backend test) ${B}token,${B}stake --keyring-backend test
+    # custom account
+    if [[ ! -z "$MNEMONIC" ]]
+    then
+        echo $MNEMONIC | dualityd keys add custom-user --recover --keyring-backend test
+        dualityd add-genesis-account $(dualityd keys show custom-user -a --keyring-backend test) ${B}token,${B}stake --keyring-backend test
+    fi
     # fred (faucet)
     dualityd keys add fred --keyring-backend test
     dualityd add-genesis-account $(dualityd keys show fred -a --keyring-backend test) "${B}tokenA,${B}tokenB,${B}tokenC,${B}tokenD,${B}tokenE,${B}tokenF,${B}tokenG,${B}tokenH,${B}tokenI,${B}tokenJ,${B}tokenK,${B}tokenL,${B}tokenM,${B}tokenN,${B}tokenO,${B}tokenP,${B}tokenQ,${B}tokenR,${B}tokenS,${B}tokenT,${B}tokenU,${B}tokenV,${B}tokenW,${B}tokenX,${B}tokenY,${B}tokenZ" --keyring-backend test
