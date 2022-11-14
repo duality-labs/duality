@@ -10,7 +10,6 @@ import (
 	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -29,6 +28,7 @@ type MsgServerTestSuite struct {
 	carol       sdk.AccAddress
 	dan         sdk.AccAddress
 	goCtx       context.Context
+	feeTiers    []types.FeeList
 }
 
 func TestMsgServerTestSuite(t *testing.T) {
@@ -55,10 +55,19 @@ func (s *MsgServerTestSuite) SetupTest() {
 	accDan := app.AccountKeeper.NewAccountWithAddress(ctx, s.dan)
 	app.AccountKeeper.SetAccount(ctx, accDan)
 
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{0, 1})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{1, 2})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{2, 3})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{3, 4})
+	// add the fee tiers of 1, 3, 5, 10 ticks
+	feeTiers := []types.FeeList{
+		{Id: 0, Fee: 1},
+		{Id: 1, Fee: 3},
+		{Id: 2, Fee: 5},
+		{Id: 3, Fee: 10},
+	}
+
+	// Set Fee List
+	app.DexKeeper.AppendFeeList(ctx, feeTiers[0])
+	app.DexKeeper.AppendFeeList(ctx, feeTiers[1])
+	app.DexKeeper.AppendFeeList(ctx, feeTiers[2])
+	app.DexKeeper.AppendFeeList(ctx, feeTiers[3])
 
 	s.app = app
 	s.msgServer = keeper.NewMsgServerImpl(app.DexKeeper)
@@ -69,13 +78,14 @@ func (s *MsgServerTestSuite) SetupTest() {
 	s.bob = sdk.AccAddress([]byte("bob"))
 	s.carol = sdk.AccAddress([]byte("carol"))
 	s.dan = sdk.AccAddress([]byte("dan"))
+	s.feeTiers = feeTiers
 }
 
 func (s *MsgServerTestSuite) fundAccountBalancesDec(account sdk.AccAddress, aBalance sdk.Dec, bBalance sdk.Dec) {
 	aBalanceInt := sdk.NewIntFromBigInt(aBalance.BigInt())
 	bBalanceInt := sdk.NewIntFromBigInt(bBalance.BigInt())
 	balances := sdk.NewCoins(NewACoin(aBalanceInt), NewBCoin(bBalanceInt))
-	err := simapp.FundAccount(s.app.BankKeeper, s.ctx, account, balances)
+	err := FundAccount(s.app.BankKeeper, s.ctx, account, balances)
 	s.Assert().NoError(err)
 	s.assertAccountBalancesDec(account, aBalance, bBalance)
 }
@@ -303,56 +313,43 @@ type DepositReponse struct {
 	amountsB []sdk.Dec
 }
 
-type Withdrawl struct {
-	TickIndex      int64
-	FeeIndex       uint64
-	SharesToRemove sdk.Dec
-}
-
-func NewWithdrawl(tickIndex int, feeIndex int, sharesToRemove int) *Withdrawl {
-	return &Withdrawl{
-		TickIndex:      int64(tickIndex),
-		FeeIndex:       uint64(feeIndex),
-		SharesToRemove: sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(sharesToRemove))),
-	}
-}
-
-func (s *MsgServerTestSuite) withdraws(account sdk.AccAddress, withdrawls ...*Withdrawl) {
-	tickIndexes := make([]int64, len(withdrawls))
-	feeIndexes := make([]uint64, len(withdrawls))
+func (s *MsgServerTestSuite) withdraws(account sdk.AccAddress, withdrawls ...*Withdrawl) error {
 	sharesToRemove := make([]sdk.Dec, len(withdrawls))
+	tickIndicies := make([]int64, len(withdrawls))
+	feeIndexes := make([]uint64, len(withdrawls))
 	for i, e := range withdrawls {
-		tickIndexes[i] = e.TickIndex
+		sharesToRemove[i] = e.Shares
+		tickIndicies[i] = e.TickIndex
 		feeIndexes[i] = e.FeeIndex
-		sharesToRemove[i] = e.SharesToRemove
 	}
 
 	_, err := s.msgServer.Withdrawl(s.goCtx, &types.MsgWithdrawl{
-		Creator:        account.String(),
-		Receiver:       account.String(),
+		Creator:        s.alice.String(),
+		Receiver:       s.alice.String(),
 		TokenA:         "TokenA",
 		TokenB:         "TokenB",
 		SharesToRemove: sharesToRemove,
-		TickIndexes:    tickIndexes,
+		TickIndexes:    tickIndicies,
 		FeeIndexes:     feeIndexes,
 	})
-	s.Assert().Nil(err)
+
+	return err
 }
 
-func (s *MsgServerTestSuite) aliceWithdraws(withdrawals ...*Withdrawl) {
-	s.withdraws(s.alice, withdrawals...)
+func (s *MsgServerTestSuite) aliceWithdraws(withdrawals ...*Withdrawl) error {
+	return s.withdraws(s.alice, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) bobWithdraws(withdrawals ...*Withdrawl) {
-	s.withdraws(s.bob, withdrawals...)
+func (s *MsgServerTestSuite) bobWithdraws(withdrawals ...*Withdrawl) error {
+	return s.withdraws(s.bob, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) carolWithdraws(withdrawals ...*Withdrawl) {
-	s.withdraws(s.carol, withdrawals...)
+func (s *MsgServerTestSuite) carolWithdraws(withdrawals ...*Withdrawl) error {
+	return s.withdraws(s.carol, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) danWithdraws(withdrawals ...*Withdrawl) {
-	s.withdraws(s.dan, withdrawals...)
+func (s *MsgServerTestSuite) danWithdraws(withdrawals ...*Withdrawl) error {
+	return s.withdraws(s.dan, withdrawals...)
 }
 
 func (s *MsgServerTestSuite) aliceCancelsLimitSell(keyToken string, tick int, key int, sharesOut int) {
@@ -540,4 +537,64 @@ func (s *MsgServerTestSuite) traceBalances() {
 		carolA, carolB,
 		danA, danB,
 	)
+}
+
+type Withdrawl struct {
+	TickIndex int64
+	FeeIndex  uint64
+	Shares    sdk.Dec
+}
+
+func NewWithdrawl(shares int64, tick int64, fee uint64) *Withdrawl {
+	return &Withdrawl{
+		Shares:    sdk.NewDec(shares),
+		FeeIndex:  fee,
+		TickIndex: tick,
+	}
+}
+
+func (s *MsgServerTestSuite) getShares(
+	account sdk.AccAddress,
+	pairId string,
+	tick int64,
+	fee uint64,
+) (shares sdk.Dec) {
+
+	sharesData, sharesFound := s.app.DexKeeper.GetShares(s.ctx, account.String(), pairId, tick, fee)
+	s.Assert().True(sharesFound)
+	return sharesData.SharesOwned
+}
+
+func (s *MsgServerTestSuite) assertAccountShares(
+	account sdk.AccAddress,
+	pairId string,
+	tick int64,
+	fee uint64,
+	sharesExpected sdk.Dec,
+) {
+	sharesOwned := s.getShares(account, pairId, tick, fee)
+	s.Assert().Equal(sharesExpected, sharesOwned)
+}
+
+func (s *MsgServerTestSuite) assertAliceShares(
+	tick int64,
+	fee uint64,
+	sharesExpected sdk.Dec) {
+
+	s.assertAccountShares(s.alice, "TokenA/TokenB", tick, fee, sharesExpected)
+}
+
+func (s *MsgServerTestSuite) assertCurrentTicks(
+	expected0To1 int64,
+	expected1To0 int64,
+) {
+	tickMap, found := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA/TokenB")
+	s.Assert().NotNil(found)
+	s.Assert().Equal(expected0To1, tickMap.TokenPair.CurrentTick0To1)
+	s.Assert().Equal(expected1To0, tickMap.TokenPair.CurrentTick1To0)
+}
+
+func (s *MsgServerTestSuite) printTicks() {
+	tickMap, _ := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA/TokenB")
+	fmt.Printf("\nTick0To1: %v, Tick1To0: %v", tickMap.TokenPair.CurrentTick0To1, tickMap.TokenPair.CurrentTick1To0)
 }
