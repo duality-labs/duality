@@ -4,7 +4,7 @@
 MAINNET="duality-1"
 NETWORK="${NETWORK:-$MAINNET}"
 STARTUP_MODE="${MODE:-fullnode}"
-NODE_MONIKER="${MONIKER:-$( head /dev/urandom | tr -dc 0-9a-f | head -c12 )}"
+NODE_MONIKER="${MONIKER}"
 
 # Add our configuration settings depending on network name (eg. duality-1, duality-13 are production chains)
 IS_MAINNET=$([[ "$NETWORK" =~ "^duality-\d+$" ]] && echo "true" || echo "")
@@ -21,7 +21,12 @@ echo "Initializing chain..."
 dualityd init --chain-id $NETWORK duality
 
 # replace moniker in the config
-sed -i 's#moniker = ".*"#moniker = "'"$NODE_MONIKER"'"#' /root/.duality/config/config.toml
+if [ ! -z $NODE_MONIKER ]
+then
+    sed -i 's#moniker = ".*"#moniker = "'"$NODE_MONIKER"'"#' /root/.duality/config/config.toml
+    # alternative below if using dasel
+    # eg. dasel put string -f /root/.duality/config/config.toml ".moniker" "$NODE_MONIKER";
+fi
 
 # start or join a chain
 # start mainnet from crafted genesis.json
