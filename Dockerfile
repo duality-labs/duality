@@ -47,6 +47,10 @@ RUN apk add --update \
 
 # Install testnet utils when not on a production chain
 ARG NETWORK=duality-1
+
+# Make NETWORK and IS_MAINNET available as an ENV variable for the running proccess
+ENV NETWORK=$NETWORK
+
 RUN if [[ ! "$NETWORK" =~ "^duality-\d+$" ]]; \
     then \
         # install TOML editing tool dasel for complicated TOML edits \
