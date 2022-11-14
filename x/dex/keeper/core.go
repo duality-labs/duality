@@ -1019,7 +1019,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 			// increments the limitOrderKey
 			tick.LimitOrderPool0To1.CurrentLimitOrderKey++
 
-		} else if ReserveDataNextKeyFound && price.Mul(ReserveDataNextKey.Reserves).GTE(amount_left) {
+		} else if ReserveDataNextKeyFound {
 			// calculate anmout to output (will be a portion of reserves)
 			amount_out = amount_out.Add(amount_left.Mul(price))
 			// Add the amount_left to the amount flled in the filledReservesmapping
