@@ -470,12 +470,6 @@ func (s *MsgServerTestSuite) assertCurrentTicks(
 	s.Assert().Equal(expected1To0, tickMap.TokenPair.CurrentTick1To0)
 }
 
-func (s *MsgServerTestSuite) assertTickCount(tickCount int64) {
-	tickMap, found := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA/TokenB")
-	s.Assert().NotNil(found)
-	s.Assert().Equal(tickCount, tickMap.TotalTickCount)
-}
-
 func (s *MsgServerTestSuite) printTicks() {
 	tickMap, _ := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA/TokenB")
 	fmt.Printf("\nTick0To1: %v, Tick1To0: %v", tickMap.TokenPair.CurrentTick0To1, tickMap.TokenPair.CurrentTick1To0)
