@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	//authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
@@ -41,7 +40,7 @@ func (suite *IntegrationTestSuite) TestHasBalance3() {
 
 	suite.Require().False(app.BankKeeper.HasBalance(ctx, addr, newACoin(sdk.NewInt(99))))
 
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, addr, balances))
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, addr, balances))
 	suite.Require().False(app.BankKeeper.HasBalance(ctx, addr, newACoin(sdk.NewInt(101))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, addr, newACoin(sdk.NewInt(100))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, addr, newACoin(sdk.NewInt(1))))
@@ -62,8 +61,8 @@ func (suite *IntegrationTestSuite) TestSwap() {
 	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000000")), newBCoin(convInt("500000000000000000000")))
 	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
 
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, bob, balanceBob))
 
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
@@ -196,8 +195,8 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection() {
 	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000000")), newBCoin(convInt("500000000000000000000")))
 	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
 
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, bob, balanceBob))
 
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
@@ -279,8 +278,8 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedWrongDirection() {
 	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000000")), newBCoin(convInt("500000000000000000000")))
 	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
 
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, bob, balanceBob))
 
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
@@ -362,8 +361,8 @@ func (suite *IntegrationTestSuite) TestSwapSingleSidedRightDirection2() {
 	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000000")), newBCoin(convInt("500000000000000000000")))
 	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
 
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, bob, balanceBob))
 
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
@@ -472,8 +471,8 @@ func (suite *IntegrationTestSuite) TestMultiTick01to() {
 	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000000")), newBCoin(convInt("500000000000000000000")))
 	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
 
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, bob, balanceBob))
 
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
@@ -560,8 +559,8 @@ func (suite *IntegrationTestSuite) TestMultiTick1to0() {
 	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000000")), newBCoin(convInt("500000000000000000000")))
 	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
 
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
-	suite.Require().NoError(simapp.FundAccount(app.BankKeeper, ctx, bob, balanceBob))
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
+	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, bob, balanceBob))
 
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000000"))))
 	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
