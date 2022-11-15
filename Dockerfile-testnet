@@ -93,6 +93,15 @@ RUN jq -s '.[0] * { app_state: { auth: { accounts: [ .[0].app_state.auth.account
     /root/.duality/config/genesis.json /root/.testnet/node0/dualityd/config/genesis.json \
     > /root/combined-genesis.json
 
+# see docs for exposed ports:
+#   https://docs.ignite.com/kb/config.html#host
+EXPOSE 26657
+EXPOSE 26656
+EXPOSE 6060
+EXPOSE 9090
+EXPOSE 1317
+
+
 # build the test node's settings
 FROM commonconfig as testnode
 
@@ -109,14 +118,6 @@ RUN echo '\n\n[rpc]\ncors_allowed_origins = ["*"]' >> /root/.duality/config/app.
 
 # copy over peer address as made by simd onto the base testnet config
 RUN sed -i "s/persistent_peers = \".*\"/$(cat /root/.testnet/node0/dualityd/config/config.toml | grep 'persistent_peers = \"*\"')/g" /root/.duality/config/config.toml
-
-# see docs for exposed ports:
-#   https://docs.ignite.com/kb/config.html#host
-EXPOSE 26657
-EXPOSE 26656
-EXPOSE 6060
-EXPOSE 9090
-EXPOSE 1317
 
 CMD ["dualityd", "start", "--moniker", "testnode"]
 
@@ -137,14 +138,6 @@ RUN sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /testnet/duali
 RUN sed -i 's/enabled-unsafe-cors = false/enabled-unsafe-cors = true/g' /testnet/dualityd/config/app.toml;
 RUN sed -i 's/cors_allowed_origins = \[\]/cors_allowed_origins = ["*", ]/g' /testnet/dualityd/config/config.toml;
 RUN echo '\n\n[rpc]\ncors_allowed_origins = ["*"]' >> /testnet/dualityd/config/app.toml
-
-# see docs for exposed ports:
-#   https://docs.ignite.com/kb/config.html#host
-EXPOSE 26657
-EXPOSE 26656
-EXPOSE 6060
-EXPOSE 9090
-EXPOSE 1317
 
 # default to serving the chain with the modified testnet data
 CMD ["dualityd", "--home", "/testnet/dualityd", "start", "--moniker", "dualitynode$NODE_ID"]
