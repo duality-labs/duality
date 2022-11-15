@@ -186,25 +186,31 @@ func (k Keeper) FindNextTick0To1(goCtx context.Context, pairMap types.PairMap) (
 	return false, math.MinInt64
 }
 
-func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.PairMap, tickIndex int64, amount0 sdk.Dec, amount1 sdk.Dec, fee int64, feeIndex uint64) (sdk.Dec, sdk.Dec, sdk.Dec, sdk.Dec, sdk.Dec, error) {
-
+func (k Keeper) DepositHelper(
+	goCtx context.Context,
+	pairId string,
+	pair types.PairMap,
+	tickIndex int64,
+	amount0 sdk.Dec,
+	amount1 sdk.Dec,
+	fee int64,
+	feeIndex uint64,
+) (trueAmount0 sdk.Dec, trueAmount1 sdk.Dec, sharesMinted sdk.Dec, reserve0 sdk.Dec, reserve1 sdk.Dec, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// Getter functions for the tick that corresponds to reserve0 and shares (upper tick), and reserve1 (lower tick)
-	lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, tickIndex-int64(fee))
-	upperTick, upperTickFound := k.GetTickMap(ctx, pairId, tickIndex+int64(fee))
-	// declarations for clarity
-	lowerReserve0, upperReserve1 := lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0, upperTick.TickData.Reserve1[feeIndex]
+	lowerTickIndex := tickIndex - fee
+	upperTickIndex := tickIndex + fee
+	lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, lowerTickIndex)
+	upperTick, upperTickFound := k.GetTickMap(ctx, pairId, upperTickIndex)
+	lowerReserve0 := lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
+	upperReserve1 := upperTick.TickData.Reserve1[feeIndex]
 	lowerTotalShares := lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
 
 	// Default sets trueAmounts0/1 to amount0/1
-	trueAmount0 := amount0
-	trueAmount1 := amount1
-	var sharesMinted sdk.Dec
+	trueAmount0 = amount0
+	trueAmount1 = amount1
 
 	price_1to0, err := k.Calc_price_1to0(tickIndex)
-
-	// Error check that price was calculated without error
 	if err != nil {
 		return sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec(), err
 	}
@@ -212,143 +218,71 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 	// In the case that the lower, upper tick is not found, or that the specified fee tier of the tick is empty,
 	// we default calculate shares (no reblancing, and setting initial share amounts)
 	if !lowerTickFound || !upperTickFound || lowerTotalShares.Equal(sdk.ZeroDec()) {
-
 		// a0 + a1 * price; this gets the shares in units of token0
 		sharesMinted = amount0.Add(amount1.Mul(price_1to0))
-
-		// Gets feeSize for feelist
 		feeSize := k.GetFeeListCount(ctx)
 
-		// initialize lowerTick if not found
 		if !lowerTickFound {
-			// Creates an tick object of the speciied size and then iterates over each sub struct filling it with 0 values.
-			lowerTick = types.TickMap{
-				PairId:    pairId,
-				TickIndex: tickIndex - fee,
-				TickData: &types.TickDataType{
-					Reserve0AndShares: make([]*types.Reserve0AndSharesType, feeSize),
-					Reserve1:          make([]sdk.Dec, feeSize),
-				},
-				LimitOrderPool0To1: &types.LimitOrderPool{0, 0},
-				LimitOrderPool1To0: &types.LimitOrderPool{0, 0},
-			}
-
-			for i, _ := range lowerTick.TickData.Reserve0AndShares {
-				lowerTick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}
-
-			}
-			for i, _ := range lowerTick.TickData.Reserve1 {
-				lowerTick.TickData.Reserve1[i] = sdk.ZeroDec()
-			}
-
+			lowerTick = NewTick(pairId, lowerTickIndex, feeSize)
 		}
 
-		// intialize uppertick
 		if !upperTickFound {
-			// Creates an tick object of the specied size and then iterates over each sub struct filling it with 0 values.
-			upperTick = types.TickMap{
-				PairId:    pairId,
-				TickIndex: tickIndex + fee,
-				TickData: &types.TickDataType{
-					Reserve0AndShares: make([]*types.Reserve0AndSharesType, feeSize),
-					Reserve1:          make([]sdk.Dec, feeSize),
-				},
-				LimitOrderPool0To1: &types.LimitOrderPool{0, 0},
-				LimitOrderPool1To0: &types.LimitOrderPool{0, 0},
-			}
-
-			for i, _ := range upperTick.TickData.Reserve0AndShares {
-				upperTick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}
-
-			}
-			for i, _ := range upperTick.TickData.Reserve1 {
-				upperTick.TickData.Reserve1[i] = sdk.ZeroDec()
-			}
-
-		}
-
-		// No rebalancing is needed set trueamount0/1 to amount0/1
-		trueAmount0 = amount0
-		trueAmount1 = amount1
-		// Sets the specifed tick/fee index in the array with the calculated value
-		NewReserve0andShares := &types.Reserve0AndSharesType{
-			Reserve0:    trueAmount0,
-			TotalShares: sharesMinted,
+			upperTick = NewTick(pairId, upperTickIndex, feeSize)
 		}
 
 		upperTick.TickData.Reserve1[feeIndex] = trueAmount1
-
-		lowerTick.TickData.Reserve0AndShares[feeIndex] = NewReserve0andShares
-
+		lowerTick.TickData.Reserve0AndShares[feeIndex] = &types.Reserve0AndSharesType{
+			Reserve0:    trueAmount0,
+			TotalShares: sharesMinted,
+		}
 	} else {
+		// TODO(julian/teddy): This logic seems like it should be encapsulated
 		// If feeList has been updated via a governance proposal updates future ticks to support this fee tier.
 		if uint64(len(upperTick.TickData.Reserve1)) < k.GetFeeListCount(ctx) {
 			upperTick.TickData.Reserve1 = append(upperTick.TickData.Reserve1, sdk.ZeroDec())
 			upperTick.TickData.Reserve0AndShares = append(upperTick.TickData.Reserve0AndShares, &types.Reserve0AndSharesType{})
 		}
 
+		// TODO(julian/teddy): This logic seems like it should be encapsulated
 		// If feeList has been updated via a governance proposal updates future ticks to support this fee tier.
 		if uint64(len(lowerTick.TickData.Reserve1)) < k.GetFeeListCount(ctx) {
 			lowerTick.TickData.Reserve1 = append(lowerTick.TickData.Reserve1, sdk.ZeroDec())
 			lowerTick.TickData.Reserve0AndShares = append(lowerTick.TickData.Reserve0AndShares, &types.Reserve0AndSharesType{})
 		}
 
-		// Balance trueAmount1 to the pool ratio
-		if lowerReserve0.GT(sdk.ZeroDec()) {
-			// trueAmount1 = min(amt1 , (upperReserve1 / lowerReserve0) * amt0 )
-			trueAmount1 = k.Min(amount1, upperReserve1.Quo(lowerReserve0).Mul(amount0))
+		trueAmount0, trueAmount1, sharesMinted, err := CalcTrueAmounts(lowerReserve0, upperReserve1, lowerTotalShares, amount0, amount1)
+		if err != nil {
+			return sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec(), lowerReserve0, upperReserve1, err
 		}
 
-		// Balance trueAmount0 to the pool ratio
-		if upperReserve1.GT(sdk.ZeroDec()) {
-			// trueAmount0 = min(amt0, (lowerReserve0 / upperReserve1) * amt1)
-			trueAmount0 = k.Min(amount0, lowerReserve0.Quo(upperReserve1).Mul(amount1))
-		}
-
-		if trueAmount0.GT(sdk.ZeroDec()) {
-			// if trueAmount0 > 0 then sharesMinted = (trueAmount0/lowerReserve0) * totalShares
-			sharesMinted = (trueAmount0.Quo(lowerReserve0).Mul(lowerTotalShares))
-		} else if trueAmount1.GT(sdk.ZeroDec()) {
-			// else if trueAmount1 > 0 then sharesMinted = (trueAmount1/upperReserve1) * totalShares
-			sharesMinted = (trueAmount1.Quo(upperReserve1).Mul(lowerTotalShares))
-		} else {
-			// else (both = 0) then sharesMinted = 0
-			sharesMinted = sdk.ZeroDec()
-		}
-
-		// if reserve1 in the pool is non-zero and we want to deposit zero of the asset1, return 0 for amounts, shares and emit DepositFailEvent in DepositCore
-		if !(upperReserve1.Equal(sdk.ZeroDec())) && trueAmount1.Equal(sdk.ZeroDec()) {
-			return sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec(), lowerReserve0, upperReserve1, nil
-		}
-		// if reserve0 in the pool is non-zero and we want to deposit zero of the asset0, return 0 for amounts,shares and emit DepositFailEvent in DepositCore
-		if !(lowerReserve0.Equal(sdk.ZeroDec())) && trueAmount0.Equal(sdk.ZeroDec()) {
-			return sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec(), lowerReserve0, upperReserve1, nil
-		}
-
-		// Adds trueAmount0 and sharesMinted to lowerTick
+		// Add liquidity
 		lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0 = lowerReserve0.Add(trueAmount0)
 		lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares = lowerTotalShares.Add(sharesMinted)
-
-		// Adds trueAmount1 to upperTick
 		upperTick.TickData.Reserve1[feeIndex] = upperReserve1.Add(trueAmount1)
-
 	}
 
 	// If a new tick has been placed that tightens the range between currentTick1to0 and currentTick0to1 then update CurrentTicks to the tighest ticks
-	if trueAmount0.GT(sdk.ZeroDec()) && (tickIndex-fee > pair.TokenPair.CurrentTick1To0) {
-		pair.TokenPair.CurrentTick1To0 = tickIndex - fee
+	if trueAmount0.GT(sdk.ZeroDec()) {
+		// pair.MinTick is set to the max value to indicate that there is no liquidity for token0
+		// at any tick. When this is the case, we leave CurrentTick1To0 where it is to mark the last
+		// traded price, but this makes it so that when liquidity ever returns for token0, we must
+		// force CurrentTick1To0 to reset wherever that liquidity is deposited, even if it is below
+		// where it was before.
+		if pair.MinTick == math.MaxInt64 {
+			pair.TokenPair.CurrentTick1To0 = lowerTickIndex
+		} else {
+			pair.TokenPair.CurrentTick1To0 = MaxInt64(pair.TokenPair.CurrentTick1To0, lowerTickIndex)
+		}
+		pair.MinTick = MinInt64(pair.MinTick, lowerTickIndex)
 	}
 
-	if trueAmount1.GT(sdk.ZeroDec()) && (tickIndex+fee < pair.TokenPair.CurrentTick0To1) {
-		pair.TokenPair.CurrentTick0To1 = tickIndex + fee
-	}
-
-	if trueAmount0.GT(sdk.ZeroDec()) && tickIndex-fee < pair.MinTick {
-		pair.MinTick = tickIndex - fee
-	}
-
-	if trueAmount1.GT(sdk.ZeroDec()) && tickIndex+fee > pair.MaxTick {
-		pair.MaxTick = tickIndex + fee
+	if trueAmount1.GT(sdk.ZeroDec()) {
+		if pair.MaxTick == math.MinInt64 {
+			pair.TokenPair.CurrentTick0To1 = upperTickIndex
+		} else {
+			pair.TokenPair.CurrentTick0To1 = MinInt64(pair.TokenPair.CurrentTick0To1, upperTickIndex)
+		}
+		pair.MaxTick = MaxInt64(pair.MaxTick, upperTickIndex)
 	}
 
 	// Set pair, lower and upperTick KVStores
@@ -356,9 +290,86 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 	k.SetTickMap(ctx, pairId, lowerTick)
 	k.SetTickMap(ctx, pairId, upperTick)
 
-	// Note: must return values from maps since they were assigned to
 	return trueAmount0, trueAmount1, sharesMinted, lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0, upperTick.TickData.Reserve1[feeIndex], nil
 
+}
+
+func MaxInt64(a, b int64) int64 {
+	if a < b {
+		return b
+	} else {
+		return a
+	}
+}
+
+func MinInt64(a, b int64) int64 {
+	if a < b {
+		return a
+	} else {
+		return b
+	}
+}
+
+func CalcTrueAmounts(
+	lowerReserve0 sdk.Dec,
+	upperReserve1 sdk.Dec,
+	lowerTotalShares sdk.Dec,
+	amount0 sdk.Dec,
+	amount1 sdk.Dec,
+) (trueAmount0 sdk.Dec, trueAmount1 sdk.Dec, sharesMinted sdk.Dec, err error) {
+	// Balance trueAmount1 to the pool ratio
+	if lowerReserve0.GT(sdk.ZeroDec()) {
+		// trueAmount1 = min(amt1 , (upperReserve1 / lowerReserve0) * amt0 )
+		trueAmount1 = Min(amount1, upperReserve1.Quo(lowerReserve0).Mul(amount0))
+	}
+
+	// Balance trueAmount0 to the pool ratio
+	if upperReserve1.GT(sdk.ZeroDec()) {
+		// trueAmount0 = min(amt0, (lowerReserve0 / upperReserve1) * amt1)
+		trueAmount0 = Min(amount0, lowerReserve0.Quo(upperReserve1).Mul(amount1))
+	}
+
+	if trueAmount0.GT(sdk.ZeroDec()) {
+		// if trueAmount0 > 0 then sharesMinted = (trueAmount0/lowerReserve0) * totalShares
+		sharesMinted = (trueAmount0.Quo(lowerReserve0).Mul(lowerTotalShares))
+	} else if trueAmount1.GT(sdk.ZeroDec()) {
+		// else if trueAmount1 > 0 then sharesMinted = (trueAmount1/upperReserve1) * totalShares
+		sharesMinted = (trueAmount1.Quo(upperReserve1).Mul(lowerTotalShares))
+	} else {
+		// else (both = 0) then sharesMinted = 0
+		sharesMinted = sdk.ZeroDec()
+	}
+
+	if !lowerReserve0.Equal(sdk.ZeroDec()) && trueAmount0.Equal(sdk.ZeroDec()) {
+		err = sdkerrors.Wrapf(types.ErrNoSpendableCoins, "Need a non-zero amount of token0 to make this deposit")
+	}
+
+	if !upperReserve1.Equal(sdk.ZeroDec()) && trueAmount1.Equal(sdk.ZeroDec()) {
+		err = sdkerrors.Wrapf(types.ErrNoSpendableCoins, "Need a non-zero amount of token1 to make this deposit")
+	}
+
+	return
+}
+
+func NewTick(pairId string, tickIndex int64, numFees uint64) types.TickMap {
+	tick := types.TickMap{
+		PairId:    pairId,
+		TickIndex: tickIndex,
+		TickData: &types.TickDataType{
+			Reserve0AndShares: make([]*types.Reserve0AndSharesType, numFees),
+			Reserve1:          make([]sdk.Dec, numFees),
+		},
+		LimitOrderPool0To1: &types.LimitOrderPool{0, 0},
+		LimitOrderPool1To0: &types.LimitOrderPool{0, 0},
+	}
+	for i, _ := range tick.TickData.Reserve0AndShares {
+		tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}
+
+	}
+	for i, _ := range tick.TickData.Reserve1 {
+		tick.TickData.Reserve1[i] = sdk.ZeroDec()
+	}
+	return tick
 }
 
 // Calculates the price for a swap from token 0 to token 1 given a tick
@@ -395,7 +406,7 @@ func (k Keeper) Calc_price_1to0(tick_Index int64) (sdk.Dec, error) {
 }
 
 // Returns the smaller of two sdk.Decs
-func (k Keeper) Min(a, b sdk.Dec) sdk.Dec {
+func Min(a, b sdk.Dec) sdk.Dec {
 	if a.LT(b) {
 		return a
 	}
@@ -411,7 +422,15 @@ func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0
 	feelist := k.GetAllFeeList(ctx)
 
 	//Checks to see if given pair has been initialied, if not intializes, and returns pairId and pairMap
-	pairId, err := k.PairInit(goCtx, token0, token1, msg.TickIndexes[0], feelist[msg.FeeIndexes[0]].Fee, false, false)
+	pairId, err := k.PairInit(
+		goCtx,
+		token0,
+		token1,
+		msg.TickIndexes[0],
+		feelist[msg.FeeIndexes[0]].Fee,
+		false,
+		false,
+	)
 
 	if err != nil {
 		return nil, nil, err
@@ -430,17 +449,20 @@ func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0
 	Amounts1Deposited := make([]sdk.Dec, len(amounts1))
 
 	for i, _ := range amounts0 {
-		// Can only deposit amount0 at a tick greater than or equal to CurrentTick0to1 (the highest tick containing reserve1)
-		// Errors if depositing amount0 at a tick less than CurrentTick0to1
-		if amounts0[i].GT(sdk.ZeroDec()) &&
-			((msg.TickIndexes[i] - feelist[msg.FeeIndexes[i]].Fee) > pair.TokenPair.CurrentTick0To1) {
+		tickIndex := msg.TickIndexes[i]
+		feeIndex := msg.FeeIndexes[i]
+		fee := feelist[feeIndex].Fee
+		curTick0to1 := pair.TokenPair.CurrentTick0To1
+		curTick1to0 := pair.TokenPair.CurrentTick1To0
+		lowerTickIndex := tickIndex - fee
+		upperTickIndex := tickIndex + fee
+		// TODO: Allow user to deposit "behind enemy lines"
+		if amounts0[i].GT(sdk.ZeroDec()) && curTick0to1 <= lowerTickIndex {
 			return nil, nil, sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsosit amount_0 at a tick less than the CurrentTick0to1")
 		}
 
-		// Can only deposit amount1 at a tick less than or equal to CurrentTick1to0 (the  lowest tick containing reserve0)
-		// Errors if depositing amount1 at a tick greater than  CurrentTick1to0
-		if amounts1[i].GT(sdk.ZeroDec()) &&
-			((msg.TickIndexes[i] + feelist[msg.FeeIndexes[i]].Fee) < pair.TokenPair.CurrentTick1To0) {
+		// TODO: Allow user to deposit "behind enemy lines"
+		if amounts1[i].GT(sdk.ZeroDec()) && upperTickIndex <= curTick1to0 {
 			return nil, nil, sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit amount_1 at a tick greater than the CurrentTick1to0")
 		}
 
@@ -594,7 +616,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 				if found {
 					pair.TokenPair.CurrentTick1To0 = tickIdx
 				} else {
-                    // we leave it because otherwise we'd lose the last traded price
+					// we leave it because otherwise we'd lose the last traded price
 				}
 			}
 
@@ -609,7 +631,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 				if found {
 					pair.TokenPair.CurrentTick0To1 = tickIdx
 				} else {
-                    // we leave it because otherwise we'd lose the last traded price
+					// we leave it because otherwise we'd lose the last traded price
 				}
 			}
 
