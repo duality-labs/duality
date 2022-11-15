@@ -202,22 +202,20 @@ func (k Keeper) DepositHelper(
 	upperTickIndex := tickIndex + fee
 	lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, lowerTickIndex)
 	upperTick, upperTickFound := k.GetTickMap(ctx, pairId, upperTickIndex)
-	lowerReserve0 := lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
-	upperReserve1 := upperTick.TickData.Reserve1[feeIndex]
-	lowerTotalShares := lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
 
-	// Default sets trueAmounts0/1 to amount0/1
-	trueAmount0 = amount0
-	trueAmount1 = amount1
+	// if we move the reference in the third subcondition out into a variable we lose the short-circuiting logic
+	// and we get a segfault
+	if !lowerTickFound || !upperTickFound || lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares.Equal(sdk.ZeroDec()) {
 
-	price_1to0, err := k.Calc_price_1to0(tickIndex)
-	if err != nil {
-		return sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec(), err
-	}
+		// Default sets trueAmounts0/1 to amount0/1
+		trueAmount0 = amount0
+		trueAmount1 = amount1
 
-	// In the case that the lower, upper tick is not found, or that the specified fee tier of the tick is empty,
-	// we default calculate shares (no reblancing, and setting initial share amounts)
-	if !lowerTickFound || !upperTickFound || lowerTotalShares.Equal(sdk.ZeroDec()) {
+		price_1to0, err := k.Calc_price_1to0(tickIndex)
+		if err != nil {
+			return sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec(), err
+		}
+
 		// a0 + a1 * price; this gets the shares in units of token0
 		sharesMinted = amount0.Add(amount1.Mul(price_1to0))
 		feeSize := k.GetFeeListCount(ctx)
@@ -236,6 +234,10 @@ func (k Keeper) DepositHelper(
 			TotalShares: sharesMinted,
 		}
 	} else {
+		lowerReserve0 := lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
+		upperReserve1 := upperTick.TickData.Reserve1[feeIndex]
+		lowerTotalShares := lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
+
 		// TODO(julian/teddy): This logic seems like it should be encapsulated
 		// If feeList has been updated via a governance proposal updates future ticks to support this fee tier.
 		if uint64(len(upperTick.TickData.Reserve1)) < k.GetFeeListCount(ctx) {
@@ -250,7 +252,7 @@ func (k Keeper) DepositHelper(
 			lowerTick.TickData.Reserve0AndShares = append(lowerTick.TickData.Reserve0AndShares, &types.Reserve0AndSharesType{})
 		}
 
-		trueAmount0, trueAmount1, sharesMinted, err := CalcTrueAmounts(lowerReserve0, upperReserve1, lowerTotalShares, amount0, amount1)
+		trueAmount0, trueAmount1, sharesMinted, err = CalcTrueAmounts(lowerReserve0, upperReserve1, lowerTotalShares, amount0, amount1)
 		if err != nil {
 			return sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec(), lowerReserve0, upperReserve1, err
 		}
@@ -321,12 +323,16 @@ func CalcTrueAmounts(
 	if lowerReserve0.GT(sdk.ZeroDec()) {
 		// trueAmount1 = min(amt1 , (upperReserve1 / lowerReserve0) * amt0 )
 		trueAmount1 = Min(amount1, upperReserve1.Quo(lowerReserve0).Mul(amount0))
+	} else {
+		trueAmount1 = sdk.ZeroDec()
 	}
 
 	// Balance trueAmount0 to the pool ratio
 	if upperReserve1.GT(sdk.ZeroDec()) {
 		// trueAmount0 = min(amt0, (lowerReserve0 / upperReserve1) * amt1)
 		trueAmount0 = Min(amount0, lowerReserve0.Quo(upperReserve1).Mul(amount1))
+	} else {
+		trueAmount0 = sdk.ZeroDec()
 	}
 
 	if trueAmount0.GT(sdk.ZeroDec()) {
@@ -414,7 +420,15 @@ func Min(a, b sdk.Dec) sdk.Dec {
 }
 
 // Handles core logic for MsgDeposit, checking and initializing data structures (tick, pair), calculating shares based on amount deposited, and sending funds to moduleAddress
-func (k Keeper) DepositCore(goCtx context.Context, msg *types.MsgDeposit, token0 string, token1 string, callerAddr sdk.AccAddress, amounts0 []sdk.Dec, amounts1 []sdk.Dec) ([]sdk.Dec, []sdk.Dec, error) {
+func (k Keeper) DepositCore(
+	goCtx context.Context,
+	msg *types.MsgDeposit,
+	token0 string,
+	token1 string,
+	callerAddr sdk.AccAddress,
+	amounts0 []sdk.Dec,
+	amounts1 []sdk.Dec,
+) (amounts0Deposit []sdk.Dec, amounts1Deposit []sdk.Dec, err error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
