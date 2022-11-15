@@ -15,9 +15,9 @@ services:
   # to open a terminal inside the test node use the command:
   #   $ docker-compose exec dualitytester /bin/bash
   # from there you can use commands with the test keys such as when sending a Msg to dualitynode0:
-  #   $ dualityd tx dex single-deposit --from alice --keyring-backend test --node tcp://dualitynode0:26657 [...args]
+  #   $ dualityd tx dex single-deposit --from alice --node tcp://dualitynode0:26657 [...args]
   # and an example with arguments (note that the token amounts are specified in tokens not μtokens):
-  #   $ dualityd tx dex single-deposit --from alice --keyring-backend test --node tcp://dualitynode0:26657 token stake 2000 0.01 0.0000000000000001 0.0000000000000001 cosmos1ja2nyfhyyyxam5qhll8g7wwy5km0stuwrl949a
+  #   $ dualityd tx dex single-deposit --from alice --node tcp://dualitynode0:26657 token stake 2000 0.01 0.0000000000000001 0.0000000000000001 cosmos1ja2nyfhyyyxam5qhll8g7wwy5km0stuwrl949a
   # you can check that this transaction has synced across the nodes by querying another node before and after the Msg
   #   $ dualityd query tx --node tcp://dualitynode1:26657 [txhash]
   # you can also add the test accounts (created in Dockerfile-testnets) into your Keplr wallet

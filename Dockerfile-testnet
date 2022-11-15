@@ -71,15 +71,18 @@ RUN dualityd init duality
 
 # add test accounts
 RUN mkdir /root/.duality/testkeys
+# set default keyring type
+RUN sed -i 's/keyring-backend = ".*"/keyring-backend = "test"/g' /root/.duality/config/client.toml
+
 # alice
-RUN dualityd keys add alice --keyring-backend test --output json > /root/.duality/testkeys/alice.json
-RUN dualityd add-genesis-account $(dualityd keys show alice -a --keyring-backend test) 1000000token,1000000stake --keyring-backend test
+RUN dualityd keys add alice --output json > /root/.duality/testkeys/alice.json
+RUN dualityd add-genesis-account $(dualityd keys show alice -a) 1000000token,1000000stake
 # bob
-RUN dualityd keys add bob --keyring-backend test --output json > /root/.duality/testkeys/bob.json
-RUN dualityd add-genesis-account $(dualityd keys show bob -a --keyring-backend test) 1000000token,1000000stake --keyring-backend test
+RUN dualityd keys add bob --output json > /root/.duality/testkeys/bob.json
+RUN dualityd add-genesis-account $(dualityd keys show bob -a) 1000000token,1000000stake
 
 # Add gentxs to the genesis file
-RUN dualityd gentx alice 1000000stake --chain-id duality --keyring-backend test
+RUN dualityd gentx alice 1000000stake --chain-id duality
 RUN dualityd collect-gentxs
 
 # build each nodes settings
