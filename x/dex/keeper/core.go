@@ -594,12 +594,12 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 				if found {
 					pair.TokenPair.CurrentTick1To0 = tickIdx
 				} else {
-					// TODO: Do what?
+                    // we leave it because otherwise we'd lose the last traded price
 				}
 			}
 
 			if msg.TickIndexes[i]-int64(fee) == pair.MinTick {
-				pair.MinTick = k.FindNextMinTick(goCtx, pair)
+				pair.MinTick++
 			}
 		}
 
@@ -609,12 +609,12 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 				if found {
 					pair.TokenPair.CurrentTick0To1 = tickIdx
 				} else {
-					// TODO: Do what?
+                    // we leave it because otherwise we'd lose the last traded price
 				}
 			}
 
 			if msg.TickIndexes[i]+int64(fee) == pair.MaxTick {
-				pair.MaxTick = k.FindNextMaxTick(goCtx, pair)
+				pair.MaxTick--
 			}
 		}
 
