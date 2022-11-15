@@ -1227,8 +1227,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 		amount_left = sdk.ZeroDec()
 		fmt.Println("AMOUNT OUT TEMP:", amountOutTemp)
 	}
-	fmt.Println("CHECK")
-	fmt.Println(amount_out)
+	fmt.Println("AMOUNT OUT, GETS HERE: ", amount_out)
 
 	// Updates mappings of reserve and filledReserves based on the original limitOrderCurrentKey to the KVStore
 	k.SetLimitOrderPoolReserveMap(ctx, ReserveData)
