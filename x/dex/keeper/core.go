@@ -193,9 +193,6 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 	// Getter functions for the tick that corresponds to reserve0 and shares (upper tick), and reserve1 (lower tick)
 	lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, tickIndex-int64(fee))
 	upperTick, upperTickFound := k.GetTickMap(ctx, pairId, tickIndex+int64(fee))
-	// declarations for clarity
-	lowerReserve0, upperReserve1 := lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0, upperTick.TickData.Reserve1[feeIndex]
-	lowerTotalShares := lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
 
 	// Default sets trueAmounts0/1 to amount0/1
 	trueAmount0 := amount0
@@ -211,7 +208,7 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 
 	// In the case that the lower, upper tick is not found, or that the specified fee tier of the tick is empty,
 	// we default calculate shares (no reblancing, and setting initial share amounts)
-	if !lowerTickFound || !upperTickFound || lowerTotalShares.Equal(sdk.ZeroDec()) {
+	if !lowerTickFound || !upperTickFound || lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares.Equal(sdk.ZeroDec()) {
 
 		// a0 + a1 * price; this gets the shares in units of token0
 		sharesMinted = amount0.Add(amount1.Mul(price_1to0))
@@ -281,6 +278,10 @@ func (k Keeper) DepositHelper(goCtx context.Context, pairId string, pair types.P
 		lowerTick.TickData.Reserve0AndShares[feeIndex] = NewReserve0andShares
 
 	} else {
+		// declarations for clarity
+		lowerReserve0, upperReserve1 := lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0, upperTick.TickData.Reserve1[feeIndex]
+		lowerTotalShares := lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
+
 		// If feeList has been updated via a governance proposal updates future ticks to support this fee tier.
 		if uint64(len(upperTick.TickData.Reserve1)) < k.GetFeeListCount(ctx) {
 			upperTick.TickData.Reserve1 = append(upperTick.TickData.Reserve1, sdk.ZeroDec())
