@@ -582,23 +582,36 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 	totalReserve1ToRemove := sdk.ZeroDec()
 
 	//Iterate through the list of all sharesToRemove, calculating the amounttoWithdraw for specified each tick
-	for i, _ := range msg.SharesToRemove {
-		// Fee Value for the specifed feeIndex
-		// @note i refers to array of the input feeIndexes array, each value in that array refers to a specified feeIndex in our global feeList
-		feeValue, _ := k.GetFeeList(ctx, uint64(msg.FeeIndexes[i]))
-		// FeeValue for the specified feeIndex in the global fee list
+	for i, feeIndex := range msg.FeeIndexes {
+		sharesToRemove := msg.SharesToRemove[i]
+		tickIndex := msg.TickIndexes[i]
+
+		// loads UserShares type from mapping
+		shareOwner, shareOwnerFound := k.GetShares(
+			ctx,
+			msg.Creator,
+			pairId,
+			tickIndex,
+			feeIndex,
+		)
+		if !shareOwnerFound {
+			return sdkerrors.Wrapf(types.ErrValidShareNotFound, "No valid share owner fonnd")
+		}
+
+		feeValue, _ := k.GetFeeList(ctx, feeIndex)
 		fee := feeValue.Fee
 
-		// loads the related upper / lower tick for the specified fee
-		// @dev note we are hear using the specific feeValue not feeIndex
-		upperTick, upperTickFound := k.GetTickMap(ctx, pairId, msg.TickIndexes[i]+int64(fee))
-		lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, msg.TickIndexes[i]-int64(fee))
-
-		// If a tick is not found error
-		// Note both a upper and lower ticks are initialized on any given deposit; even given a singleSided deposit. Therefore if either the upper or lower tick was not initialized it would be consdiered unexpected conditions
-		if !upperTickFound || !lowerTickFound {
+		lowerTickIndex := tickIndex - fee
+		upperTickIndex := tickIndex + fee
+		lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, upperTickIndex)
+		upperTick, upperTickFound := k.GetTickMap(ctx, pairId, lowerTickIndex)
+		if !lowerTickFound || !upperTickFound {
 			return sdkerrors.Wrapf(types.ErrValidTickNotFound, "No tick found at the requested index")
 		}
+
+		lowerTickFeeTotalShares := &lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
+		lowerTickFeeReserve0 := &lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
+		upperTickFeeReserve1 := &upperTick.TickData.Reserve1[feeIndex]
 
 		// Checks to see if there are some totalShares to withdraw
 		// In keeper/verification.go we check this condition for the msg.Creator, thus we know that they also has a valid position in the tick.
@@ -607,49 +620,51 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		}
 
 		// calculates the amount to withdraw of each token based on a ratio of the amountToRemove to totalShares multiplied by the amount of the respective asset
-		reserve0ToRemove := (msg.SharesToRemove[i].Quo(lowerTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].TotalShares)).Mul(lowerTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].Reserve0)
-		reserve1ToRemove := (msg.SharesToRemove[i].Quo(lowerTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].TotalShares)).Mul(upperTick.TickData.Reserve1[msg.FeeIndexes[i]])
+		reserve0ToRemove := lowerTickFeeReserve0.Mul(sharesToRemove.Quo(*lowerTickFeeTotalShares))
+		reserve1ToRemove := (sharesToRemove.Quo(*lowerTickFeeTotalShares)).Mul(*upperTickFeeReserve1)
 
 		//Updates upper/lowerTick based on subtracting the calculated amount from the previous reserve0 and reserve1
-		lowerTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].Reserve0 = lowerTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].Reserve0.Sub(reserve0ToRemove)
-		upperTick.TickData.Reserve1[msg.FeeIndexes[i]] = upperTick.TickData.Reserve1[msg.FeeIndexes[i]].Sub(reserve1ToRemove)
-		lowerTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].TotalShares = lowerTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].TotalShares.Sub(msg.SharesToRemove[i])
-
-		// loads UserShares type from mapping
-		shareOwner, shareOwnerFound := k.GetShares(ctx, msg.Creator, pairId, msg.TickIndexes[i], msg.FeeIndexes[i])
-		if !shareOwnerFound {
-			return sdkerrors.Wrapf(types.ErrValidShareNotFound, "No valid share owner fonnd")
-		}
+		*lowerTickFeeReserve0 = lowerTickFeeReserve0.Sub(reserve0ToRemove)
+		*upperTickFeeReserve1 = upperTickFeeReserve1.Sub(reserve1ToRemove)
+		*lowerTickFeeTotalShares = lowerTickFeeTotalShares.Sub(msg.SharesToRemove[i])
 
 		// subtracts sahresToRemove from the User's personl number of sharesOwned.
 		shareOwner.SharesOwned = shareOwner.SharesOwned.Sub(msg.SharesToRemove[i])
 
 		if !lowerTick.TickData.HasToken0() {
-			if msg.TickIndexes[i]-int64(fee) == pair.TokenPair.CurrentTick1To0 {
+			if pair.TokenPair.CurrentTick1To0 == lowerTickIndex {
 				found, tickIdx := k.FindNextTick1To0(goCtx, pair)
 				if found {
 					pair.TokenPair.CurrentTick1To0 = tickIdx
 				} else {
-					// we leave it because otherwise we'd lose the last traded price
+					// We leave the tick where it is so the state reflects the last price
+					// before liquidity was exhausted.
 				}
 			}
 
-			if msg.TickIndexes[i]-int64(fee) == pair.MinTick {
+			if pair.MinTick == lowerTickIndex {
+				// This opens up a vulnerability where someone forces the
+				// chain to iterate down to a low minTick if they exhaust all
+				// other liquidity, causing the chain to hang.
 				pair.MinTick++
 			}
 		}
 
 		if !upperTick.TickData.HasToken1() {
-			if msg.TickIndexes[i]+int64(fee) == pair.TokenPair.CurrentTick0To1 {
+			if pair.TokenPair.CurrentTick0To1 == upperTickIndex {
 				found, tickIdx := k.FindNextTick0To1(goCtx, pair)
 				if found {
 					pair.TokenPair.CurrentTick0To1 = tickIdx
 				} else {
-					// we leave it because otherwise we'd lose the last traded price
+					// We leave the tick where it is so the state reflects the last price
+					// before liquidity was exhausted.
 				}
 			}
 
-			if msg.TickIndexes[i]+int64(fee) == pair.MaxTick {
+			if upperTickIndex == pair.MaxTick {
+				// This opens up a vulnerability where someone forces the
+				// chain to iterate up to a high maxTick if they exhaust all
+				// other liquidity, causing the chain to hang.
 				pair.MaxTick--
 			}
 		}
@@ -671,10 +686,10 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			token1,
 			fmt.Sprint(msg.TickIndexes),
 			fmt.Sprint(msg.FeeIndexes),
-			lowerTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].Reserve0.Add(reserve0ToRemove).String(),
-			upperTick.TickData.Reserve1[msg.FeeIndexes[i]].Add(reserve1ToRemove).String(),
-			lowerTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].Reserve0.String(),
-			upperTick.TickData.Reserve1[msg.FeeIndexes[i]].String(),
+			lowerTickFeeReserve0.Add(reserve0ToRemove).String(),
+			upperTickFeeReserve1.Add(reserve1ToRemove).String(),
+			lowerTickFeeReserve0.String(),
+			upperTickFeeReserve1.String(),
 		))
 	}
 
@@ -684,7 +699,13 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 	// sends totalReserve0ToRemove to msg.Receiver
 	if totalReserve0ToRemove.GT(sdk.ZeroDec()) {
 		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(totalReserve0ToRemove.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coin0}); err != nil {
+		err := k.bankKeeper.SendCoinsFromModuleToAccount(
+			ctx,
+			types.ModuleName,
+			receiverAddr,
+			sdk.Coins{coin0},
+		)
+		if err != nil {
 			return err
 		}
 	}
@@ -692,7 +713,13 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 	// sends totalReserve1ToRemove to msg.Receiver
 	if totalReserve1ToRemove.GT(sdk.ZeroDec()) {
 		coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(totalReserve1ToRemove.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coin1}); err != nil {
+		err := k.bankKeeper.SendCoinsFromModuleToAccount(
+			ctx,
+			types.ModuleName,
+			receiverAddr,
+			sdk.Coins{coin1},
+		)
+		if err != nil {
 			return err
 		}
 	}
