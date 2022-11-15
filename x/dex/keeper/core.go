@@ -1542,7 +1542,7 @@ func (k Keeper) UpdateTickPointersPostRemoveToken0(goCtx context.Context, pair *
 			*minTick++
 			*cur1To0 = MaxInt64(*cur1To0, *minTick)
 		} else if tickIndex == *cur1To0 { // we also know that *cur1To0 != *minTick here
-			found, next1To0 := k.FindNextTick1To0(goCtx, *pair)
+			next1To0, found := k.FindNextTick1To0(goCtx, *pair)
 			if !found {
 				*minTick = math.MaxInt64
 				// we leave cur1To0 where it is because otherwise we lose the last traded price
@@ -1574,7 +1574,7 @@ func (k Keeper) UpdateTickPointersPostRemoveToken1(goCtx context.Context, pair *
 			*maxTick--
 			*cur0To1 = MaxInt64(*cur0To1, *maxTick)
 		} else if tickIndex == *cur0To1 { // we also know that *cur0To1 != *maxTick here
-			found, next0To1 := k.FindNextTick0To1(goCtx, *pair)
+			next0To1, found := k.FindNextTick0To1(goCtx, *pair)
 			if !found {
 				*maxTick = math.MinInt64
 				// we leave cur0To1 where it is because otherwise we lose the last traded price
