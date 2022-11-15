@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"strings"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -470,14 +471,15 @@ func (k Keeper) DepositCore(
 		curTick1to0 := pair.TokenPair.CurrentTick1To0
 		lowerTickIndex := tickIndex - fee
 		upperTickIndex := tickIndex + fee
+
 		// TODO: Allow user to deposit "behind enemy lines"
 		if amounts0[i].GT(sdk.ZeroDec()) && curTick0to1 <= lowerTickIndex {
-			return nil, nil, sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsosit amount_0 at a tick less than the CurrentTick0to1")
+			return nil, nil, sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsosit amount_0 at tick greater than or equal to the CurrentTick0to1")
 		}
 
 		// TODO: Allow user to deposit "behind enemy lines"
 		if amounts1[i].GT(sdk.ZeroDec()) && upperTickIndex <= curTick1to0 {
-			return nil, nil, sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit amount_1 at a tick greater than the CurrentTick1to0")
+			return nil, nil, sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit amount_1 at tick less than or equal to the CurrentTick1to0")
 		}
 
 		// Calls k.DepositHelper which calculates the true amounts of token0, token1, and sets the corresponding pair and tick maps
@@ -598,7 +600,10 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			return sdkerrors.Wrapf(types.ErrValidShareNotFound, "No valid share owner fonnd")
 		}
 
-		feeValue, _ := k.GetFeeList(ctx, feeIndex)
+		feeValue, found := k.GetFeeList(ctx, feeIndex)
+		if !found {
+			return sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", feeIndex)
+		}
 		fee := feeValue.Fee
 
 		lowerTickIndex := tickIndex - fee
@@ -768,10 +773,8 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			continue
 		}
 
-		var i uint64
-
 		// iterator for feeList
-		i = 0
+		var i uint64 = 0
 		for i < feeSize && !amount_left.Equal(sdk.ZeroDec()) {
 			// gets fee for given feeIndex
 			fee := feelist[i].Fee
@@ -848,7 +851,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			// runs swaps for any limitOrders at the specified tick, updating amount_left, amount_out accordingly
 			// passes in the outToken (token1), as this is the direction of the limit order for which we check
 
-			amount_left, amount_out, err = k.SwapLimitOrder1to0(goCtx, pairId, token1, amount_out, amount_left, pair.TokenPair.CurrentTick0To1)
+			amount_left, amount_out, err = k.SwapLimitOrder0to1(goCtx, pairId, token1, amount_out, amount_left, pair.TokenPair.CurrentTick0To1)
 
 			if err != nil {
 				return sdk.ZeroDec(), err
@@ -1047,20 +1050,28 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 
 	// Gets tick for specified tick at currentTick0to1
 	tick, tickFound := k.GetTickMap(ctx, pairId, CurrentTick0to1)
-
-	// Edge case: if tick specified by CurrentTick1to0 is not found, there does not exists any valid limit orders by construction, and thus return the same amount_left, amount_out as inputted
 	if !tickFound {
 		return amount_left, amount_out, nil
 	}
 
 	// Gets Reserve, FilledReservesmap for the specified CurrentLimitOrderKey
-	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
-	FillData, _ := k.GetLimitOrderPoolFillMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
-
-	// errors if ReserveDataFound is not found
-	if !ReserveDataFound {
+	ReserveData, found := k.GetLimitOrderPoolReserveMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+	if !found {
 		return amount_left, amount_out, nil
 	}
+
+	FillData, found := k.GetLimitOrderPoolFillMap(ctx, pairId, CurrentTick0to1, tokenIn, tick.LimitOrderPool1To0.CurrentLimitOrderKey)
+	if !found {
+		FillData = types.LimitOrderPoolFillMap{
+			PairId:         pairId,
+			Token:          tokenIn,
+			TickIndex:      tick.TickIndex,
+			Count:          tick.LimitOrderPool1To0.CurrentLimitOrderKey,
+			FilledReserves: sdk.ZeroDec(),
+		}
+	}
+
+	// errors if ReserveDataFound is not found
 
 	// If the amount of reserves is not enough to finish the swap
 
@@ -1095,7 +1106,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 		}
 
 		// If there is still not enough liquidity to end trade handle update this way
-		if ReserveDataNextKeyFound && price_0to1.Mul(ReserveDataNextKey.Reserves).LT(amount_left) {
+		if ReserveDataNextKeyFound && ReserveDataNextKey.Reserves.LT(amount_left.Mul(price_0to1)) {
 			// Adds remaining reserves to amount_out
 			amount_out = amount_out.Add(ReserveDataNextKey.Reserves)
 
@@ -1268,22 +1279,31 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 
 ///// Limit Order Functions
 
-// Helper Function for PlaceLimitOrder handling initializing a new tick
-func (k Keeper) PlaceLimitOrderHelper(goCtx context.Context, pairId string, tickIndex int64) types.TickMap {
+func (k Keeper) GetOrInitTickTrancheFillMap(goCtx context.Context, pairId string, tickIndex int64, trancheIndex uint64, token string) types.LimitOrderPoolFillMap {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	tickTranchFillMap, found := k.GetLimitOrderPoolFillMap(ctx, pairId, tickIndex, token, trancheIndex)
+	if !found {
+		tickTranchFillMap = types.LimitOrderPoolFillMap{
+			PairId:         pairId,
+			TickIndex:      tickIndex,
+			Token:          token,
+			Count:          trancheIndex,
+			FilledReserves: sdk.ZeroDec(),
+		}
+		k.SetLimitOrderPoolFillMap(ctx, tickTranchFillMap)
+	}
+	return tickTranchFillMap
+}
+
+func (k Keeper) GetOrInitTickMap(goCtx context.Context, pair types.PairMap, tickIndex int64) types.TickMap {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// returns tick object for tick specified by tickIndex
-	tick, tickFound := k.GetTickMap(ctx, pairId, tickIndex)
-
-	// size of the feeList
-	feeSize := k.GetFeeListCount(ctx)
-
+	tick, tickFound := k.GetTickMap(ctx, pair.PairId, tickIndex)
 	if !tickFound {
+		feeSize := k.GetFeeListCount(ctx)
 
-		// If tick does not exists intialize it
-		// @Dev initialize reserves struct to avoid having to check for individual subtype existance between deposit and placeLimitOrder
 		tick = types.TickMap{
-			PairId:    pairId,
+			PairId:    pair.PairId,
 			TickIndex: tickIndex,
 			TickData: &types.TickDataType{
 				Reserve0AndShares: make([]*types.Reserve0AndSharesType, feeSize),
@@ -1293,21 +1313,18 @@ func (k Keeper) PlaceLimitOrderHelper(goCtx context.Context, pairId string, tick
 			LimitOrderPool1To0: &types.LimitOrderPool{0, 0},
 		}
 
-		// Sets Reserve0AShares to 0
-		// Eliminates us having to check that each fee tier is nil or 0 when calling deposit
-		for i, _ := range tick.TickData.Reserve0AndShares {
+		for i := 0; i < int(feeSize); i++ {
 			tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}
-
-		}
-		// Sets Reserve1 to 0
-		// Eliminates us having to check that each fee tier is nil or 0 when calling deposit
-		for i, _ := range tick.TickData.Reserve1 {
 			tick.TickData.Reserve1[i] = sdk.ZeroDec()
 		}
+
+		tokens := strings.Split(pair.PairId, "/")
+		token0 := tokens[0]
+		token1 := tokens[1]
+		k.GetOrInitTickTrancheFillMap(goCtx, pair.PairId, tickIndex, 0, token0)
+		k.GetOrInitTickTrancheFillMap(goCtx, pair.PairId, tickIndex, 0, token1)
 	}
-
 	return tick
-
 }
 
 // Helper function for Place Limit order retrieving and or initializing mapppings used for keeping track of limit orders
@@ -1367,93 +1384,46 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 
 	// checks if pair is initialized, if not intialize it and return pairId
 	pairId, err := k.PairInit(goCtx, token0, token1, msg.TickIndex, 0, true, is_0to1)
-
 	if err != nil {
 		return err
 	}
-
-	//checks if tick is initialized and if not set count and currentLimitOrder key to 0
-	/// tick is an object of the tickMapping for the specified tickIndex and mapping
-	tick := k.PlaceLimitOrderHelper(goCtx, pairId, msg.TickIndex)
-
-	// currentLimitOrder key for Pool0to1 or Pool0to1
-	var currentLimitOrderKey uint64
-	// currentLimitOrder count for Pool0to1 or Pool0to1
-	var LimitOrderCount uint64
-	// Shares Minted
-	var newShares sdk.Dec
-
-	// get pair map after checking if it is initialized in PairInit
 	pair, _ := k.GetPairMap(ctx, pairId)
+	tick := k.GetOrInitTickMap(goCtx, pair, msg.TickIndex)
 
-	// If we are placing limit order above current MaxTick update MaxTick
-	if msg.TokenIn == token1 && msg.TickIndex > pair.MaxTick {
-		pair.MaxTick = msg.TickIndex
-	}
+	var curTrancheIndex *uint64
+	var maxTrancheIndex *uint64
 
-	// If we are placing limit order below current MinTick update MinTick
-	if msg.TokenIn == token0 && msg.TickIndex < pair.MinTick {
-		pair.MinTick = msg.TickIndex
-	}
-
-	// If TokenIn == token0 set count and key to values of LimitOrderPool0to1
 	if msg.TokenIn == token0 {
-		currentLimitOrderKey = tick.LimitOrderPool0To1.CurrentLimitOrderKey
-		LimitOrderCount = tick.LimitOrderPool0To1.Count
-
-		// Errors if place a limit order in amount0 at a tick greater than CurrentTick0to1
 		if msg.TickIndex > pair.TokenPair.CurrentTick0To1 {
 			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick greater than the CurrentTick0to1")
 		}
-
-		// If tokenIn == token1 set count and key to values of LimitOrderPool1to0
+		curTrancheIndex = &tick.LimitOrderPool0To1.CurrentLimitOrderKey
+		maxTrancheIndex = &tick.LimitOrderPool0To1.Count
 	} else {
-		currentLimitOrderKey = tick.LimitOrderPool1To0.CurrentLimitOrderKey
-		LimitOrderCount = tick.LimitOrderPool1To0.Count
-
-		// Errors if placing a limit order in amoount1 at a tick less than Current1To0
 		if msg.TickIndex < pair.TokenPair.CurrentTick1To0 {
 			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 1 at a tick less than the CurrentTick0to1")
 		}
+		curTrancheIndex = &tick.LimitOrderPool1To0.CurrentLimitOrderKey
+		maxTrancheIndex = &tick.LimitOrderPool1To0.Count
 	}
 
-	// Retrives FillMap object from FillMapping KVSTore
-	FillData, FillDataFound := k.GetLimitOrderPoolFillMap(ctx, pairId, msg.TickIndex, msg.TokenIn, currentLimitOrderKey)
-
-	// inits FillMap object if not found
-	if !FillDataFound {
-		FillData.PairId = pairId
-		FillData.TickIndex = msg.TickIndex
-		FillData.Token = msg.TokenIn
-		FillData.Count = currentLimitOrderKey
-		FillData.FilledReserves = sdk.ZeroDec()
-
-		// Handles creating a limit order given the current limit order is already partially filled
-	} else if LimitOrderCount == currentLimitOrderKey && FillData.FilledReserves.GT(sdk.ZeroDec()) {
-		// increments currentLimitOrderKey
-		LimitOrderCount = LimitOrderCount + 1
-
-		// Updates Pool0t01 / Pool1to0 accordingly
-		if msg.TokenIn == token0 {
-			tick.LimitOrderPool0To1.Count = LimitOrderCount
-		} else {
-			tick.LimitOrderPool1To0.Count = LimitOrderCount
-		}
+	FillData := k.GetOrInitTickTrancheFillMap(goCtx, pairId, msg.TickIndex, *curTrancheIndex, msg.TokenIn)
+	if maxTrancheIndex == curTrancheIndex && FillData.FilledReserves.GT(sdk.ZeroDec()) {
+		*maxTrancheIndex++
+		*curTrancheIndex++
+		k.GetOrInitTickTrancheFillMap(goCtx, pairId, msg.TickIndex, *curTrancheIndex, msg.TokenIn)
 	}
 
 	// Returns Map object for Reserve, UserShares, and TotalShares mapping
-	ReserveData, UserShareData, TotalSharesData := k.PlaceLimitOrderMappingHelper(goCtx, pairId, msg.TickIndex, msg.TokenIn, currentLimitOrderKey, msg.Receiver)
+	ReserveData, UserShareData, TotalSharesData := k.PlaceLimitOrderMappingHelper(goCtx, pairId, msg.TickIndex, msg.TokenIn, *curTrancheIndex, msg.Receiver)
 
 	// Adds amountIn to ReserveData
 	ReserveData.Reserves = ReserveData.Reserves.Add(msg.AmountIn)
 
-	// newShares is equivalent to AmountIn
-	newShares = msg.AmountIn
-
 	// Adds newShares to User's shares owned
-	UserShareData.SharesOwned = UserShareData.SharesOwned.Add(newShares)
+	UserShareData.SharesOwned = UserShareData.SharesOwned.Add(msg.AmountIn)
 	// Adds newShares to totalShares
-	TotalSharesData.TotalShares = TotalSharesData.TotalShares.Add(newShares)
+	TotalSharesData.TotalShares = TotalSharesData.TotalShares.Add(msg.AmountIn)
 
 	// Set Fill, Reserve, UserShares, and TotalShares maps in KVStore
 	k.SetLimitOrderPoolFillMap(ctx, FillData)
@@ -1464,10 +1434,12 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 
 	// If a new tick has been placed that tigtens the spread between currentTick0to1 and currentTick0to1 update CurrentTicks to the tighest ticks
 	// @Dev assumes that msg.amountIn > 0
-	if msg.TokenIn == token0 && ((msg.TickIndex < pair.TokenPair.CurrentTick0To1) && (msg.TickIndex > pair.TokenPair.CurrentTick1To0)) {
-		pair.TokenPair.CurrentTick1To0 = msg.TickIndex
-	} else if (msg.TickIndex < pair.TokenPair.CurrentTick0To1) && (msg.TickIndex > pair.TokenPair.CurrentTick1To0) {
-		pair.TokenPair.CurrentTick0To1 = msg.TickIndex
+	if msg.TokenIn == token0 {
+		pair.TokenPair.CurrentTick1To0 = MaxInt64(pair.TokenPair.CurrentTick1To0, msg.TickIndex)
+		pair.MinTick = MinInt64(pair.MinTick, msg.TickIndex)
+	} else if msg.TokenIn == token1 {
+		pair.TokenPair.CurrentTick0To1 = MinInt64(pair.TokenPair.CurrentTick0To1, msg.TickIndex)
+		pair.MaxTick = MaxInt64(pair.MaxTick, msg.TickIndex)
 	}
 
 	// updates currentTick1to0/0To1 given the conditionals above
@@ -1483,7 +1455,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	}
 
 	ctx.EventManager().EmitEvent(types.CreatePlaceLimitOrderEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.TokenIn, msg.AmountIn.String(), newShares.String(), strconv.Itoa(int(currentLimitOrderKey)),
+		token0, token1, msg.TokenIn, msg.AmountIn.String(), msg.AmountIn.String(), strconv.Itoa(int(*curTrancheIndex)),
 	))
 
 	return nil
