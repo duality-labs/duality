@@ -831,10 +831,8 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			//Make updates to tickMap containing reserve0/1 data to the KVStore
 			k.SetTickMap(ctx, pairId, Current0Data)
 
-			//If Current0 gets funded and Current0 < MinTick, Set MinTick to Current0
-			if Current0Data.TickData.HasToken0() && Current0Data.TickIndex < pair.MinTick {
-				pair.MaxTick = Current0Data.TickIndex
-			}
+			pair.MinTick = MinInt64(Current0Data.TickIndex, pair.MinTick)
+			pair.TokenPair.CurrentTick1To0 = MaxInt64(Current0Data.TickIndex, pair.TokenPair.CurrentTick1To0)
 		}
 
 		k.SetTickMap(ctx, pairId, Current1Data)
@@ -983,10 +981,8 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 			k.SetTickMap(ctx, pairId, Current1Data)
 
-			//If Current1 gets funded and Current1 > MaxTick, Set MaxTick to Current1
-			if Current1Data.TickData.HasToken1() && Current1Data.TickIndex > pair.MaxTick {
-				pair.MaxTick = Current1Data.TickIndex
-			}
+			pair.MaxTick = MaxInt64(Current1Data.TickIndex, pair.MaxTick)
+			pair.TokenPair.CurrentTick0To1 = MinInt64(Current0Data.TickIndex, pair.TokenPair.CurrentTick0To1)
 
 		}
 
