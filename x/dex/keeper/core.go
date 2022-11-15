@@ -952,7 +952,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			}
 
 			// If there is not enough to complete the trade
-			if Current0Data.TickData.Reserve0AndShares[i].Reserve0.LT(amount_left.Mul(price_1to0)) {
+			if Current0Data.TickData.Reserve0AndShares[i].Reserve0.LTE(amount_left.Mul(price_1to0)) {
 				// Add the reserves to the amount out
 				amount_out = amount_out.Add(Current0Data.TickData.Reserve0AndShares[i].Reserve0)
 
@@ -1095,7 +1095,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 		}
 
 		// If there is still not enough liquidity to end trade handle update this way
-		if ReserveDataNextKeyFound && price_0to1.Mul(ReserveDataNextKey.Reserves).LT(amount_left) {
+		if ReserveDataNextKeyFound && price_0to1.Mul(ReserveDataNextKey.Reserves).LTE(amount_left) {
 			// Adds remaining reserves to amount_out
 			amount_out = amount_out.Add(ReserveDataNextKey.Reserves)
 
