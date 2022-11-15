@@ -123,8 +123,7 @@ func (s *MsgServerTestSuite) TestMultiDepositSingleFail() {
 		TickIndexes: []int64{0, 1},
 		FeeIndexes:  []uint64{0, 0},
 	})
-
-	s.Assert().Nil(err)
+	s.Require().Nil(err)
 
 	s.assertDepositReponse(DepositReponse{
 		amountsA: depositResponse.Reserve0Deposited,
@@ -169,7 +168,7 @@ func (s *MsgServerTestSuite) TestMultiDepositAllSucceed() {
 		FeeIndexes:  []uint64{0, 0},
 	})
 
-	s.Assert().Nil(err)
+	s.Require().Nil(err)
 
 	s.assertDepositReponse(DepositReponse{
 		amountsA: depositResponse.Reserve0Deposited,
