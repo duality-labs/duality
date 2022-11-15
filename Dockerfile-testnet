@@ -127,21 +127,17 @@ FROM commonconfig
 
 # get testnet config files
 ARG NODE_ID
-COPY --from=testnetconfig /root/.testnet/node$NODE_ID/dualityd /root/testnet-state
-COPY --from=testnode /root/.duality /root/testnode-state
+COPY --from=testnetconfig /root/.testnet/node$NODE_ID /testnet/
 
-# pick files that will be used
-RUN rm -rf /root/.duality/
-# base state from testnet config
-RUN cp -r /root/testnet-state /root/.duality/
-# genesis and specific config files from our test node setup
-RUN cp /root/testnode-state/config/genesis.json /root/.duality/config/genesis.json; \
-    cp /root/testnode-state/config/config.toml /root/.duality/config/config.toml; \
-    cp /root/testnode-state/config/client.toml /root/.duality/config/client.toml; \
-    cp /root/testnode-state/config/app.toml /root/.duality/config/app.toml;
+# overwrite genesis file that will be used
+RUN cp /root/combined-genesis.json /testnet/dualityd/config/genesis.json
 
-# overwrite testnode peers with testnet peers
-RUN sed -i "s/persistent_peers = \".*\"/$(cat /root/testnet-state/config/config.toml | grep 'persistent_peers = \"*\"')/g" /root/.duality/config/config.toml
+# modify node configuration files
+RUN sed -i 's/addr_book_strict = true/addr_book_strict = false/g' /testnet/dualityd/config/config.toml;
+# overwrite CORS rules to allow browser testing and development with frontend local builds
+RUN sed -i 's/enabled-unsafe-cors = false/enabled-unsafe-cors = true/g' /testnet/dualityd/config/app.toml;
+RUN sed -i 's/cors_allowed_origins = \[\]/cors_allowed_origins = ["*", ]/g' /testnet/dualityd/config/config.toml;
+RUN echo '\n\n[rpc]\ncors_allowed_origins = ["*"]' >> /testnet/dualityd/config/app.toml
 
 # default to serving the chain with the modified testnet data
-CMD ["dualityd", "start", "--moniker", "dualitynode$NODE_ID"]
+CMD ["dualityd", "--home", "/testnet/dualityd", "start", "--moniker", "dualitynode$NODE_ID"]
