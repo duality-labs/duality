@@ -10,6 +10,9 @@ version: "3"
 # to remove testnet
 #   $ docker-compose down
 
+# one-liner to bring everything up and down again:
+#   $ docker-compose up --build --abort-on-container-exit || true && docker-compose down
+
 services:
 
   # to open a terminal inside the test node use the command:
