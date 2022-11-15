@@ -599,7 +599,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			}
 
 			if msg.TickIndexes[i]-int64(fee) == pair.MinTick {
-				pair.MinTick = k.FindNextMinTick(goCtx, pair)
+				pair.MinTick++
 			}
 		}
 
@@ -614,7 +614,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			}
 
 			if msg.TickIndexes[i]+int64(fee) == pair.MaxTick {
-				pair.MaxTick = k.FindNextMaxTick(goCtx, pair)
+				pair.MaxTick--
 			}
 		}
 
