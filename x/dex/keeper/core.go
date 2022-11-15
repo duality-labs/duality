@@ -130,14 +130,14 @@ func (k Keeper) PairInit(goCtx context.Context, token0 string, token1 string, ti
 
 }
 
-func (k Keeper) FindNextTick1To0(goCtx context.Context, pairMap types.PairMap) (found bool, tickIdx int64) {
+func (k Keeper) FindNextTick1To0(goCtx context.Context, pairMap types.PairMap) (tickIdx int64, found bool) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// If MinTick == MaxInt64 it is unset
 	// ie. There is no Token0 in the pool
 	if pairMap.MinTick == math.MaxInt64 {
-		return false, math.MaxInt64
+		return math.MaxInt64, false
 	}
 	// Start scanning from CurrentTick1To0 - 1
 	tickIdx = pairMap.TokenPair.CurrentTick1To0 - 1
@@ -148,24 +148,24 @@ func (k Keeper) FindNextTick1To0(goCtx context.Context, pairMap types.PairMap) (
 		tick, tickFound := k.GetTickMap(ctx, pairMap.PairId, tickIdx)
 		if tickFound && tick.TickData.HasToken0() {
 			//Return the new tickIdx
-			return true, tickIdx
+			return tickIdx, true
 		}
 
 		tickIdx--
 	}
 
 	// If no tick found return false
-	return false, math.MaxInt64
+	return math.MaxInt64, false
 }
 
-func (k Keeper) FindNextTick0To1(goCtx context.Context, pairMap types.PairMap) (found bool, tickIdx int64) {
+func (k Keeper) FindNextTick0To1(goCtx context.Context, pairMap types.PairMap) (tickIdx int64, found bool) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// If MaxTick == MinInt64 it is unset
 	// There is no Token1 in the pool
 	if pairMap.MaxTick == math.MinInt64 {
-		return false, math.MinInt64
+		return math.MinInt64, false
 	}
 	// Start scanning from CurrentTick0To1 + 1
 	tickIdx = pairMap.TokenPair.CurrentTick0To1 + 1
@@ -176,14 +176,14 @@ func (k Keeper) FindNextTick0To1(goCtx context.Context, pairMap types.PairMap) (
 		tick, tickFound := k.GetTickMap(ctx, pairMap.PairId, tickIdx)
 		if tickFound && tick.TickData.HasToken1() {
 			// Returns the new tickIdx
-			return true, tickIdx
+			return tickIdx, true
 		}
 
 		tickIdx++
 	}
 
 	// If no tick found return false
-	return false, math.MinInt64
+	return math.MinInt64, false
 }
 
 func (k Keeper) DepositHelper(
@@ -633,7 +633,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 
 		if !lowerTick.TickData.HasToken0() {
 			if pair.TokenPair.CurrentTick1To0 == lowerTickIndex {
-				found, tickIdx := k.FindNextTick1To0(goCtx, pair)
+				tickIdx, found := k.FindNextTick1To0(goCtx, pair)
 				if found {
 					pair.TokenPair.CurrentTick1To0 = tickIdx
 				} else {
@@ -652,7 +652,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 
 		if !upperTick.TickData.HasToken1() {
 			if pair.TokenPair.CurrentTick0To1 == upperTickIndex {
-				found, tickIdx := k.FindNextTick0To1(goCtx, pair)
+				tickIdx, found := k.FindNextTick0To1(goCtx, pair)
 				if found {
 					pair.TokenPair.CurrentTick0To1 = tickIdx
 				} else {
