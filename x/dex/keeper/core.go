@@ -1158,13 +1158,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 	// amountOut = R1 = amountInTemp * p1to0
 	// => amountInTemp = R1 / p1to0
 	if ReserveData.Reserves.LT(amount_left.Mul(price_1to0)) {
-		fmt.Println("--- FIRST ITERATION ---")
-		fmt.Println("price_1to0: ", price_1to0)
-		fmt.Println("amount_left: ", amount_left)
-		fmt.Println("ReserveData.Reserves: ", ReserveData.Reserves)
-		fmt.Println("ReserveData.Reserves.Quo(price_1to0): ", ReserveData.Reserves.Quo(price_1to0))
 		amountInTemp := ReserveData.Reserves.Quo(price_1to0)
-		fmt.Println("amountInTemp: ", amountInTemp)
 		// Adds remaining reserves to amount_out
 		amount_out = amount_out.Add(ReserveData.Reserves)
 		// Subtracts reserves from amount_left
@@ -1222,8 +1216,6 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 
 		// If there IS enough liqudity to end trade handle update this way
 	} else {
-		fmt.Println("price_1to0: ", price_1to0)
-		fmt.Println("amount_left: ", amount_left)
 		amountOutTemp := amount_left.Mul(price_1to0)
 		// calculate anmout to output (will be a portion of reserves)
 		amount_out = amount_out.Add(amountOutTemp)
@@ -1233,10 +1225,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 		ReserveData.Reserves = ReserveData.Reserves.Sub(amountOutTemp)
 		// set amount_left to 0
 		amount_left = sdk.ZeroDec()
-		fmt.Println("AMOUNT OUT TEMP:", amountOutTemp)
 	}
-	fmt.Println("CHECK")
-	fmt.Println(amount_out)
 
 	// Updates mappings of reserve and filledReserves based on the original limitOrderCurrentKey to the KVStore
 	k.SetLimitOrderPoolReserveMap(ctx, ReserveData)
@@ -1387,7 +1376,6 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 
 		// Errors if place a limit order in amount0 at a tick greater than CurrentTick0to1
 		if msg.TickIndex > pair.TokenPair.CurrentTick0To1 {
-			fmt.Println(pair.TokenPair.CurrentTick0To1)
 			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot depsoit amount 0 at a tick greater than the CurrentTick0to1")
 		}
 
@@ -1607,17 +1595,8 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 
 	// Calculates the sharesOut based on the UserShares withdrawn  compared to sharesLeft compared to remaining liquidity in reserves
 	sharesOut := sharesFilled.Mul(UserShareData.SharesOwned.Add(UserSharesWithdrawnData.SharesWithdrawn)).Quo(sharesFilled.Add(ReserveData.Reserves)).Sub(UserSharesWithdrawnData.SharesWithdrawn)
-	fmt.Println("Shares Out: ", sharesOut)
 	// calculate amountOut given sharesOut
-
-	fmt.Println("price: ", price)
-	// amountOutSwap = amountInSwap * price
-	// amountOutswap = limitAmountIn
-	// amountInSwap = limitAmountOut
-	// limitAmountIn = limitAmountOut * price
-	// limitAmountOut = limitAmountIn / price
 	amountOut := sharesOut.Quo(price)
-	fmt.Println("Amount Out: ", amountOut)
 	// Subtracts amountOut from FilledReserves
 	FillData.FilledReserves = FillData.FilledReserves.Sub(amountOut)
 
