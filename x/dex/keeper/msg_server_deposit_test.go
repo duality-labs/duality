@@ -180,5 +180,4 @@ func (s *MsgServerTestSuite) TestMultiDepositAllSucceed() {
 
 	s.assertAliceBalances(5, 25)
 	s.assertDexBalances(20, 0)
-
 }
