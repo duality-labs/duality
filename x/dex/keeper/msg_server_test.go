@@ -458,6 +458,36 @@ func (s *MsgServerTestSuite) marketSells(account sdk.AccAddress, selling string,
 	s.Assert().Nil(err)
 }
 
+func (s *MsgServerTestSuite) aliceMarketSellFails(err error, selling string, amountIn int, minOut int) {
+	s.marketSellFails(s.alice, err, selling, amountIn, minOut)
+}
+
+func (s *MsgServerTestSuite) bobMarketSellFails(err error, selling string, amountIn int, minOut int) {
+	s.marketSellFails(s.bob, err, selling, amountIn, minOut)
+}
+
+func (s *MsgServerTestSuite) carolMarketSellFails(err error, selling string, amountIn int, minOut int) {
+	s.marketSellFails(s.bob, err, selling, amountIn, minOut)
+}
+
+func (s *MsgServerTestSuite) danMarketSellFails(err error, selling string, amountIn int, minOut int) {
+	s.marketSellFails(s.bob, err, selling, amountIn, minOut)
+}
+func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr error, selling string, amountIn int, minOut int) {
+	amountInDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(amountIn)))
+	minOutDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(minOut)))
+	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
+		Creator:  account.String(),
+		Receiver: account.String(),
+		TokenA:   "TokenA",
+		TokenB:   "TokenB",
+		TokenIn:  selling,
+		AmountIn: amountInDec,
+		MinOut:   minOutDec,
+	})
+	s.Assert().ErrorIs(expectedErr, err)
+}
+
 func (s *MsgServerTestSuite) withdrawsLimitBuy(account sdk.AccAddress, buying string, tick int) {
 	var selling string
 	if buying == "TokenA" {
@@ -676,4 +706,68 @@ func (s *MsgServerTestSuite) assertNoLiquidityAtTick(tickIndex int64, feeIndex u
 	amtB := NewDec(0)
 	liquidityB := upperTick.TickData.Reserve1[feeIndex]
 	s.Assert().Equal(amtB, liquidityB)
+}
+
+func (s *MsgServerTestSuite) calculateSingleSwapNoLOAToB(tick int64, tickLiqudity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
+	price, _ := s.app.DexKeeper.Calc_price_0to1(tick)
+
+	return calculateSingleSwapNoLO(price, tickLiqudity, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateSingleSwapOnlyLOAToB(tick int64, tickLimitOrderLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
+	price, _ := s.app.DexKeeper.Calc_price_0to1(tick)
+
+	return calculateSingleSwapOnlyLO(price, tickLimitOrderLiquidity, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateSingleSwapAToB(tick int64, tickLiqudidty sdk.Dec, tickLimitOrderLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
+	price, _ := s.app.DexKeeper.Calc_price_0to1(tick)
+
+	return calculateSingleSwap(price, tickLiqudidty, tickLimitOrderLiquidity, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateSingleSwapNoLOBToA(tick int64, tickLiqudity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
+	price, _ := s.app.DexKeeper.Calc_price_1to0(tick)
+
+	return calculateSingleSwapNoLO(price, tickLiqudity, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateSingleSwapOnlyLOBToA(tick int64, tickLimitOrderLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
+	price, _ := s.app.DexKeeper.Calc_price_1to0(tick)
+
+	return calculateSingleSwapOnlyLO(price, tickLimitOrderLiquidity, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateSingleSwapBToA(tick int64, tickLiqudidty sdk.Dec, tickLimitOrderLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
+	price, _ := s.app.DexKeeper.Calc_price_1to0(tick)
+
+	return calculateSingleSwap(price, tickLiqudidty, tickLimitOrderLiquidity, amountIn)
+}
+
+func calculateSingleSwapNoLO(price sdk.Dec, tickLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
+	return calculateSingleSwap(price, tickLiquidity, sdk.ZeroDec(), amountIn)
+}
+
+func calculateSingleSwapOnlyLO(price sdk.Dec, tickLimitOrderLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
+	return calculateSingleSwap(price, sdk.ZeroDec(), tickLimitOrderLiquidity, amountIn)
+}
+
+func calculateSingleSwap(price sdk.Dec, tickLiquidity sdk.Dec, tickLimitOrderLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
+	amountRemaining, amountOut := calculateSwap(price, tickLiquidity, amountIn)
+
+	// Swap not completely filled by liquidity
+	if amountRemaining.GT(sdk.ZeroDec()) {
+		tmpAmountRemaining, tmpAmountOut := calculateSwap(price, tickLimitOrderLiquidity, amountRemaining)
+		amountRemaining = amountRemaining.Sub(tmpAmountRemaining)
+		amountOut = amountOut.Add(tmpAmountOut)
+	}
+	return amountRemaining, amountOut
+}
+
+func calculateSwap(price sdk.Dec, liquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
+	if tmpAmountOut := price.Mul(amountIn); tmpAmountOut.LT(liquidity) {
+		return sdk.ZeroDec(), tmpAmountOut
+	} else {
+		return amountIn.Sub(liquidity), liquidity
+	}
 }
