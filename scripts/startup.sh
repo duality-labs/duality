@@ -207,7 +207,7 @@ else
         echo "Node has caught up to chain height"
 
         # add validator key (--no-backup ensures the terminal from seeing/logging the MNEMONIC value)
-        echo -n "$MNEMONIC" | dualityd keys add validator --recover --no-backup
+        echo -n "$MNEMONIC" | dualityd keys add validator --recover --no-backup --keyring-backend test
 
         # sent request to become a validator (to the first RPC address defined)
         dualityd tx staking create-validator \
@@ -221,6 +221,7 @@ else
             --gas="${VALIDATOR_GAS:-auto}" \
             --amount "${VALIDATOR_AMOUNT:-1000000stake}" \
             --fees "${VALIDATOR_FEES:-0token}" \
+            --keyring-backend test \
             --from validator -y
 
         # wait to check the node's validator status
