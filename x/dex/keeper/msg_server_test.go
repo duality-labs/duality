@@ -214,6 +214,36 @@ func (s *MsgServerTestSuite) limitSells(account sdk.AccAddress, tokenIn string, 
 	s.Assert().Nil(err)
 }
 
+func (s *MsgServerTestSuite) assertAliceLimitSellFails(err error, selling string, tick int, amountIn int) {
+	s.assertLimitSellFails(s.alice, err, selling, tick, amountIn)
+}
+
+func (s *MsgServerTestSuite) assertBobLimitSellFails(err error, selling string, tick int, amountIn int) {
+	s.assertLimitSellFails(s.bob, err, selling, tick, amountIn)
+}
+
+func (s *MsgServerTestSuite) assertCarolLimitSellFails(err error, selling string, tick int, amountIn int) {
+	s.assertLimitSellFails(s.carol, err, selling, tick, amountIn)
+}
+
+func (s *MsgServerTestSuite) assertDanLimitSellFails(err error, selling string, tick int, amountIn int) {
+	s.assertLimitSellFails(s.dan, err, selling, tick, amountIn)
+}
+
+func (s *MsgServerTestSuite) assertLimitSellFails(account sdk.AccAddress, expectedErr error, tokenIn string, tick int, amountIn int) {
+	amountInDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(amountIn)))
+	_, err := s.msgServer.PlaceLimitOrder(s.goCtx, &types.MsgPlaceLimitOrder{
+		Creator:   account.String(),
+		Receiver:  account.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		TickIndex: int64(tick),
+		TokenIn:   tokenIn,
+		AmountIn:  amountInDec,
+	})
+	s.Assert().ErrorIs(expectedErr, err)
+}
+
 type Deposit struct {
 	AmountA   sdk.Dec
 	AmountB   sdk.Dec
@@ -269,6 +299,46 @@ func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits ...*Depos
 		FeeIndexes:  feeIndexes,
 	})
 	s.Assert().Nil(err)
+}
+
+func (s *MsgServerTestSuite) assertAliceDepositFails(err error, deposits ...*Deposit) {
+	s.assertDepositsFail(s.alice, err, deposits...)
+}
+
+func (s *MsgServerTestSuite) assertBobDepositFails(err error, deposits ...*Deposit) {
+	s.assertDepositsFail(s.bob, err, deposits...)
+}
+
+func (s *MsgServerTestSuite) assertCarolDepositFails(err error, deposits ...*Deposit) {
+	s.assertDepositsFail(s.carol, err, deposits...)
+}
+
+func (s *MsgServerTestSuite) assertDanDepositFails(err error, deposits ...*Deposit) {
+	s.assertDepositsFail(s.dan, err, deposits...)
+}
+func (s *MsgServerTestSuite) assertDepositsFail(account sdk.AccAddress, expectedErr error, deposits ...*Deposit) {
+	amountsA := make([]sdk.Dec, len(deposits))
+	amountsB := make([]sdk.Dec, len(deposits))
+	tickIndexes := make([]int64, len(deposits))
+	feeIndexes := make([]uint64, len(deposits))
+	for i, e := range deposits {
+		amountsA[i] = e.AmountA
+		amountsB[i] = e.AmountB
+		tickIndexes[i] = e.TickIndex
+		feeIndexes[i] = e.FeeIndex
+	}
+
+	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
+		Creator:     account.String(),
+		Receiver:    account.String(),
+		TokenA:      "TokenA",
+		TokenB:      "TokenB",
+		AmountsA:    amountsA,
+		AmountsB:    amountsB,
+		TickIndexes: tickIndexes,
+		FeeIndexes:  feeIndexes,
+	})
+	s.Assert().ErrorIs(expectedErr, err)
 }
 
 func (s *MsgServerTestSuite) assertDepositReponse(depositResponse DepositReponse, expectedDepositResponse DepositReponse) {
@@ -516,7 +586,94 @@ func (s *MsgServerTestSuite) assertCurrentTicks(
 	s.Assert().Equal(expected1To0, tickMap.TokenPair.CurrentTick1To0)
 }
 
+func (s *MsgServerTestSuite) assertCurr0To1(curr0To1Expected int64) {
+	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
+	pair, pairFound := s.app.DexKeeper.GetPairMap(s.ctx, pairId)
+	if !pairFound {
+		s.Require().Fail("Invalid GetPair in assertCurr0to1")
+	}
+
+	curr0To1Actual := pair.TokenPair.CurrentTick0To1
+	s.Assert().Equal(curr0To1Expected, curr0To1Actual)
+}
+
+func (s *MsgServerTestSuite) assertCurr1To0(curr1To0Expected int64) {
+	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
+	pair, pairFound := s.app.DexKeeper.GetPairMap(s.ctx, pairId)
+	if !pairFound {
+		s.Require().Fail("Invalid GetPair in assertCurr0to1")
+	}
+
+	curr1to0Actual := pair.TokenPair.CurrentTick1To0
+	s.Assert().Equal(curr1To0Expected, curr1to0Actual)
+}
+
+func (s *MsgServerTestSuite) assertMinTick(minTickExpected int64) {
+	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
+	pair, pairFound := s.app.DexKeeper.GetPairMap(s.ctx, pairId)
+	if !pairFound {
+		s.Require().Fail("Invalid GetPair in assertCurr0to1")
+	}
+
+	minTickActual := pair.MinTick
+	s.Assert().Equal(minTickExpected, minTickActual)
+}
+
+func (s *MsgServerTestSuite) assertMaxTick(maxTickExpected int64) {
+	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
+	pair, pairFound := s.app.DexKeeper.GetPairMap(s.ctx, pairId)
+	if !pairFound {
+		s.Require().Fail("Invalid GetPair in assertCurr0to1")
+	}
+
+	maxTickActual := pair.MaxTick
+	s.Assert().Equal(maxTickExpected, maxTickActual)
+}
+
 func (s *MsgServerTestSuite) printTicks() {
 	tickMap, _ := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA/TokenB")
 	fmt.Printf("\nTick0To1: %v, Tick1To0: %v", tickMap.TokenPair.CurrentTick0To1, tickMap.TokenPair.CurrentTick1To0)
+}
+
+func (s *MsgServerTestSuite) assertLiquidityAtTick(amountA int, amountB int, tickIndex int64, feeIndex uint64) {
+	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
+	fee := s.feeTiers[feeIndex].Fee
+	lowerTick, lowerTickFound := s.app.DexKeeper.GetTickMap(s.ctx, pairId, tickIndex-fee)
+	if !lowerTickFound {
+		s.Require().Fail("Invalid tick %d and fee %d", tickIndex, fee)
+	}
+	upperTick, upperTickFound := s.app.DexKeeper.GetTickMap(s.ctx, pairId, tickIndex+fee)
+	if !upperTickFound {
+		s.Require().Fail("Invalid tick %d and fee %d", tickIndex, fee)
+	}
+
+	amtA, amtB := NewDec(amountA), NewDec(amountB)
+	liquidityA, liquidityB := lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0, upperTick.TickData.Reserve1[feeIndex]
+	s.Assert().Equal(amtA, liquidityA)
+	s.Assert().Equal(amtB, liquidityB)
+}
+
+func (s *MsgServerTestSuite) assertNoLiquidityAtTick(tickIndex int64, feeIndex uint64) {
+	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
+	fee := s.feeTiers[feeIndex].Fee
+
+	lowerTick, lowerTickFound := s.app.DexKeeper.GetTickMap(s.ctx, pairId, tickIndex-fee)
+	if !lowerTickFound {
+		s.Assert().True(!lowerTickFound)
+		return
+	}
+	// in case tick was initialized, assert no liquidity in it
+	amtA := NewDec(0)
+	liquidityA := lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
+	s.Assert().Equal(amtA, liquidityA)
+
+	upperTick, upperTickFound := s.app.DexKeeper.GetTickMap(s.ctx, pairId, tickIndex+fee)
+	if !upperTickFound {
+		s.Assert().True(!upperTickFound)
+		return
+	}
+	// in case tick was initialized, assert no liquidity in it
+	amtB := NewDec(0)
+	liquidityB := upperTick.TickData.Reserve1[feeIndex]
+	s.Assert().Equal(amtB, liquidityB)
 }
