@@ -1,6 +1,10 @@
 package keeper_test
 
-import "github.com/NicholasDotSol/duality/x/dex/types"
+import (
+	"math"
+
+	"github.com/NicholasDotSol/duality/x/dex/types"
+)
 
 func (s *MsgServerTestSuite) TestSingleSidedDepositInSpread1To0() {
 	s.fundAliceBalances(50, 50)
@@ -212,6 +216,36 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositOutOfSpreadMaxNotAdjusted() {
 	s.assertMaxTick(5)
 }
 
+func (s *MsgServerTestSuite) TestSingleSidedDepositExistingLiquidityA() {
+	s.fundAliceBalances(50, 50)
+
+	// GIVEN
+	// deposit 10 of token B at tick 1 fee 0
+	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
+	s.assertAliceBalances(40, 50)
+	s.assertDexBalances(10, 0)
+	s.assertLiquidityAtTick(10, 0, 0, 0)
+	s.assertCurr1To0(-1)
+	s.assertCurr0To1(math.MinInt64)
+	s.assertMinTick(-1)
+	s.assertMaxTick(math.MinInt64)
+
+	// WHEN
+	// deposit in spread (10 of B at tick 3)
+	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
+
+	// THEN
+	// assert 20 of token B deposited at tick 1 fee 0 and ticks unchanged
+	s.assertAliceBalances(40, 50)
+	s.assertDexBalances(10, 0)
+	s.assertLiquidityAtTick(10, 0, 0, 0)
+	s.assertCurr1To0(-1)
+	s.assertCurr0To1(math.MinInt64)
+	s.assertMinTick(-1)
+	s.assertMaxTick(math.MinInt64)
+	s.Require().Fail("TODO: this fails because PairInit doesn't account for single sided liquidity")
+}
+
 func (s *MsgServerTestSuite) TestSingleSidedDepositExistingLiquidityB() {
 	s.fundAliceBalances(50, 50)
 
@@ -221,16 +255,25 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositExistingLiquidityB() {
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
 	s.assertLiquidityAtTick(0, 10, 0, 0)
+	s.assertCurr1To0(math.MaxInt64)
+	s.assertCurr0To1(1)
+	s.assertMinTick(math.MaxInt64)
+	s.assertMaxTick(1)
 
 	// WHEN
 	// deposit in spread (10 of B at tick 3)
 	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
-	s.assertAliceBalances(50, 30)
-	s.assertDexBalances(0, 20)
 
 	// THEN
-	// assert 20 of token B deposited at tick 1 fee 0
+	// assert 20 of token B deposited at tick 1 fee 0 and ticks unchanged
 	s.assertLiquidityAtTick(0, 20, 0, 0)
+	s.assertAliceBalances(50, 30)
+	s.assertDexBalances(0, 20)
+	s.assertCurr1To0(math.MaxInt64)
+	s.assertCurr0To1(1)
+	s.assertMinTick(math.MaxInt64)
+	s.assertMaxTick(1)
+	s.Require().Fail("TODO: this fails because PairInit doesn't account for single sided liquidity")
 }
 
 func (s *MsgServerTestSuite) TestSingleSidedDepositBelowEnemyLines() {
@@ -277,4 +320,72 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositAboveEnemyLines() {
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
 	s.assertNoLiquidityAtTick(-5, 0)
+}
+
+func (s *MsgServerTestSuite) TestSingleSidedDepositMultiA() {
+	s.fundAliceBalances(50, 50)
+
+	// GIVEN
+	// deposit 10 of token B at tick 1 fee 0
+	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
+	s.assertAliceBalances(40, 50)
+	s.assertDexBalances(10, 0)
+	s.assertLiquidityAtTick(10, 0, 0, 0)
+	s.assertCurr1To0(-1)
+	s.assertCurr0To1(math.MinInt64)
+	s.assertMinTick(-1)
+	s.assertMaxTick(math.MinInt64)
+
+	// WHEN
+	// multi deposit at
+	s.aliceDeposits(
+		NewDeposit(10, 0, 0, 0),
+		NewDeposit(10, 0, 0, 1),
+	)
+
+	// THEN
+	// assert 20 of token B deposited at tick 1 fee 0 and ticks unchanged
+	s.assertAliceBalances(30, 50)
+	s.assertDexBalances(20, 0)
+	s.assertLiquidityAtTick(20, 0, 0, 0)
+	s.assertLiquidityAtTick(10, 0, 0, 1)
+	s.assertCurr1To0(-3)
+	s.assertCurr0To1(math.MinInt64)
+	s.assertMinTick(-3)
+	s.assertMaxTick(math.MinInt64)
+	s.Require().Fail("TODO: this fails because PairInit doesn't account for single sided liquidity")
+}
+
+func (s *MsgServerTestSuite) TestSingleSidedDepositMultiB() {
+	s.fundAliceBalances(50, 50)
+
+	// GIVEN
+	// deposit 10 of token B at tick 1 fee 0
+	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
+	s.assertAliceBalances(50, 40)
+	s.assertDexBalances(0, 10)
+	s.assertLiquidityAtTick(0, 10, 0, 0)
+	s.assertCurr1To0(math.MaxInt64)
+	s.assertCurr0To1(1)
+	s.assertMinTick(math.MaxInt64)
+	s.assertMaxTick(1)
+
+	// WHEN
+	// multi deposit at
+	s.aliceDeposits(
+		NewDeposit(0, 10, 0, 0),
+		NewDeposit(0, 10, 0, 1),
+	)
+
+	// THEN
+	// assert 20 of token B deposited at tick 1 fee 0 and ticks unchanged
+	s.assertAliceBalances(50, 30)
+	s.assertDexBalances(0, 20)
+	s.assertLiquidityAtTick(0, 20, 0, 0)
+	s.assertLiquidityAtTick(0, 10, 0, 1)
+	s.assertCurr1To0(math.MaxInt64)
+	s.assertCurr0To1(3)
+	s.assertMinTick(math.MaxInt64)
+	s.assertMaxTick(3)
+	s.Require().Fail("TODO: this fails because PairInit doesn't account for single sided liquidity")
 }
