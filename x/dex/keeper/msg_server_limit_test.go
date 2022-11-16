@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	testing_scripts "github.com/NicholasDotSol/duality/testing_scripts"
 	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -123,6 +124,7 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder1to0WithWithdraw() {
 	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("239.9985"))
 }
 
+//
 func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	s.fundAliceBalances(100000, 500)
 	s.fundBobBalances(100, 200)
@@ -135,6 +137,8 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	s.assertAliceBalances(99950, 500)
 	s.assertBobBalances(100, 200)
 	s.assertDexBalances(50, 0)
+
+	testing_scripts.MultipleLimitOrderFills([]sdk.Dec{sdk.NewDec(25), sdk.NewDec(25)}, []sdk.Dec{sdk.MustNewDecFromStr("1.0001"), sdk.NewDec(1)}, sdk.NewDec(40))
 
 	//Bobs balance for TokenB should be 200 - 40 = 160
 	//Tick 1 should be a swap of 25 / 1.0001 TokenB (1) for 25 of TokenA (0) exhausting all the liquidity

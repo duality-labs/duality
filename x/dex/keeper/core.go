@@ -652,7 +652,6 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			//Make updates to tickMap containing reserve0/1 data to the KVStore
 			k.SetTickMap(ctx, pairId, Current0Data)
 
-
 			k.UpdateTickPointersPostAddToken0(goCtx, &pair, &Current0Data)
 
 		}
@@ -1298,7 +1297,7 @@ func (k Keeper) UpdateTickPointersPostAddToken0(goCtx context.Context, pair *typ
 		*cur1To0 = MaxInt64(*cur1To0, tickIndex)
 		*minTick = MinInt64(*minTick, tickIndex)
 	}
-  
+
 	k.SetPairMap(ctx, *pair)
 }
 
@@ -1319,7 +1318,7 @@ func (k Keeper) UpdateTickPointersPostAddToken1(goCtx context.Context, pair *typ
 		*cur0To1 = MinInt64(*cur0To1, tickIndex)
 		*maxTick = MaxInt64(*maxTick, tickIndex)
 	}
-  
+
 	k.SetPairMap(ctx, *pair)
 }
 
