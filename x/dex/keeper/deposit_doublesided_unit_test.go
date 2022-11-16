@@ -255,7 +255,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedAboveEnemyLines() {
 	s.assertLiquidityAtTick(0, 10, 0, 0)
 
 	// WHEN
-	// depositing above enemy lines at tick -5
+	// depositing above enemy lines at tick 5
 	// THEN
 	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
 
