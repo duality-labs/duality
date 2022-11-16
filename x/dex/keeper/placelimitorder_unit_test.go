@@ -289,7 +289,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderBelowEnemyLines() {
 	// WHEN
 	// place limit order for token A below enemy lines at tick -5
 	// THEN
-	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
+	// deposit should fail with BEL error
 
 	err := types.ErrValidPairNotFound // TODO: this needs to be changed to a more specific error type
 	s.assertAliceLimitSellFails(err, "TokenB", -5, 10)
@@ -308,7 +308,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderAboveEnemyLines() {
 	// WHEN
 	// place limit order for token B above enemy lines at tick 5
 	// THEN
-	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
+	// deposit should fail with BEL error
 
 	err := types.ErrValidPairNotFound // TODO: this needs to be changed to a more specific error type
 	s.assertAliceLimitSellFails(err, "TokenA", 5, 10)
