@@ -250,5 +250,8 @@ else
     fi
 
     # keep container running
-    tail -f /dev/null;
+    if [ "$KEEP_RUNNING" != "false" ]
+    then
+        tail -f /dev/null;
+    fi
 fi
