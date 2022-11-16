@@ -242,12 +242,13 @@ else
         done
         echo "Validator node setup complete."
 
-        # keep container running
-        tail -f /dev/null;
-
     else
         # start as not a validator
         echo "Starting fullnode..."
-        dualityd --log_level ${LOG_LEVEL:-info} start
+        dualityd --log_level ${LOG_LEVEL:-info} start & :
+        echo "Started fullnode"
     fi
+
+    # keep container running
+    tail -f /dev/null;
 fi
