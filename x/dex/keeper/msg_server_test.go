@@ -137,11 +137,11 @@ func (s *MsgServerTestSuite) assertAccountBalancesDec(
 ) {
 	aActual := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenA")
 	aDec := sdk.NewDecFromBigIntWithPrec(aActual.Amount.BigInt(), 18)
-	s.Assert().Equal(aBalance, aDec)
+	s.Assert().True(aBalance.Equal(aDec), "%s != %s", aBalance, aDec)
 
 	bActual := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenB")
 	bDec := sdk.NewDecFromBigIntWithPrec(bActual.Amount.BigInt(), 18)
-	s.Assert().Equal(bBalance, bDec)
+	s.Assert().True(bBalance.Equal(bDec), "%s != %s", bBalance, bDec)
 }
 
 func (s *MsgServerTestSuite) assertAliceBalances(a int, b int) {
@@ -753,12 +753,14 @@ func calculateSingleSwapOnlyLO(price sdk.Dec, tickLimitOrderLiquidity sdk.Dec, a
 }
 
 func calculateSingleSwap(price sdk.Dec, tickLiquidity sdk.Dec, tickLimitOrderLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
+	// swap against CSMM liquidity
 	amountRemaining, amountOut := calculateSwap(price, tickLiquidity, amountIn)
 
-	// Swap not completely filled by liquidity
+	// swap against limit orders
 	if amountRemaining.GT(sdk.ZeroDec()) {
+		// fmt.Printf("remaining %s out %s limit order liq %s\n", amountRemaining, amountOut, tickLimitOrderLiquidity)
 		tmpAmountRemaining, tmpAmountOut := calculateSwap(price, tickLimitOrderLiquidity, amountRemaining)
-		amountRemaining = amountRemaining.Sub(tmpAmountRemaining)
+		amountRemaining = tmpAmountRemaining
 		amountOut = amountOut.Add(tmpAmountOut)
 	}
 	return amountRemaining, amountOut
@@ -766,8 +768,13 @@ func calculateSingleSwap(price sdk.Dec, tickLiquidity sdk.Dec, tickLimitOrderLiq
 
 func calculateSwap(price sdk.Dec, liquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
 	if tmpAmountOut := price.Mul(amountIn); tmpAmountOut.LT(liquidity) {
+		// fmt.Printf("sufficieddnt liq: price %s, liq %s, in %s, tmpOut %s\n", price, liquidity, amountIn, tmpAmountOut)
+		// sufficient liquidity
 		return sdk.ZeroDec(), tmpAmountOut
 	} else {
-		return amountIn.Sub(liquidity), liquidity
+		// fmt.Printf("insufficient liq: price %s, liq %s, in %s, tmpOut %s\n", price, liquidity, amountIn, tmpAmountOut)
+		// only sufficient for part of amountIn
+		tmpAmountIn := liquidity.Quo(price)
+		return amountIn.Sub(tmpAmountIn), liquidity
 	}
 }

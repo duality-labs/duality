@@ -24,17 +24,16 @@ func (s *MsgServerTestSuite) TestSwapNoLONoLiqudity() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 50)
 	// GIVEN
-	// no liqudity of token A
+	// no liqudity of token A (deposit only token B at tick 0 fee 1)
 	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
 	s.assertAliceBalances(50, 40)
+
 	// WHEN
 	// swap 5 of tokenB
-
 	// THEN
 	// swap should fail with Error Not enough coins
 	err := types.ErrNotEnoughCoins
 	s.bobMarketSellFails(err, "TokenB", 5, 0)
-
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledMaxReachedSlippageToleranceReached() {
@@ -47,12 +46,10 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledMaxReachedSlippageTolera
 
 	// WHEN
 	// swap 20 of tokenA with minOut 15
-
 	// THEN
 	// swap should fail with ErrNotEnoughCoins error
 	err := types.ErrNotEnoughCoins
 	s.bobMarketSellFails(err, "TokenA", 20, 15)
-
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledMaxReachedSlippageToleranceNotReached() {
@@ -63,16 +60,18 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledMaxReachedSlippageTolera
 	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
-
+	s.assertLiquidityAtTick(0, 10, 0, 0)
+	//
 	// WHEN
 	// swap 20 of tokenA at
-	s.bobMarketSells("TokenA", 20, 5)
+	amountIn, amountInDec := 20, NewDec(20)
+	s.bobMarketSells("TokenA", amountIn, 5)
 
 	// THEN
-	// swap should fail with ErrNotEnoughCoins error
-	expectedAmountIn, expectedAmountOut := s.calculateSingleSwapNoLOAToB(1, NewDec(10), NewDec(20))
-
-	s.assertBobBalancesDec(expectedAmountOut)
+	// swap should update
+	expectedAmountInRemaining, expectedAmountOut := s.calculateSingleSwapNoLOAToB(1, NewDec(10), amountInDec)
+	expectedAmountIn := amountInDec.Sub(expectedAmountInRemaining)
+	s.assertBobBalancesDec(NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
 	s.assertDexBalancesDec(expectedAmountIn, NewDec(10).Sub(expectedAmountOut))
-
+	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
 }
