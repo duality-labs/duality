@@ -46,14 +46,6 @@ then
 elif [ $STARTUP_MODE == "new" ]
 then
 
-    # enable API to be served on any browser page when in developent, but only production web-app in production
-    dasel put bool   -f /root/.duality/config/app.toml    ".api.enable" "true";
-    dasel put bool   -f /root/.duality/config/app.toml    ".api.enabled-unsafe-cors" "$([[ $IS_MAINNET ]] && echo "false" || echo "true")"
-    dasel put string -f /root/.duality/config/config.toml ".rpc.cors_allowed_origins" "$([[ $IS_MAINNET ]] && echo "app.duality.xyz" || echo "*")"
-    # ensure listening to the RPC port doesn't block outgoing RPC connections
-    dasel put string -f /root/.duality/config/config.toml ".rpc.laddr" "tcp://0.0.0.0:26657";
-    # todo: add Prometheus telemetry
-
     # duplicate genesis for easier merging and recovery
     cp /root/.duality/config/genesis.json /root/.duality/config/genesis-init.json
 
