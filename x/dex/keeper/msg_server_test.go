@@ -427,23 +427,23 @@ func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling st
 	s.Assert().Nil(err)
 }
 
-func (s *MsgServerTestSuite) aliceSells(selling string, amountIn int, minOut int) {
-	s.sells(s.alice, selling, amountIn, minOut)
+func (s *MsgServerTestSuite) aliceMarketSells(selling string, amountIn int, minOut int) {
+	s.marketSells(s.alice, selling, amountIn, minOut)
 }
 
-func (s *MsgServerTestSuite) bobSells(selling string, amountIn int, minOut int) {
-	s.sells(s.bob, selling, amountIn, minOut)
+func (s *MsgServerTestSuite) bobMarketSells(selling string, amountIn int, minOut int) {
+	s.marketSells(s.bob, selling, amountIn, minOut)
 }
 
-func (s *MsgServerTestSuite) carolSells(selling string, amountIn int, minOut int) {
-	s.sells(s.bob, selling, amountIn, minOut)
+func (s *MsgServerTestSuite) carolMarketSells(selling string, amountIn int, minOut int) {
+	s.marketSells(s.bob, selling, amountIn, minOut)
 }
 
-func (s *MsgServerTestSuite) danSells(selling string, amountIn int, minOut int) {
-	s.sells(s.bob, selling, amountIn, minOut)
+func (s *MsgServerTestSuite) danMarketSells(selling string, amountIn int, minOut int) {
+	s.marketSells(s.bob, selling, amountIn, minOut)
 }
 
-func (s *MsgServerTestSuite) sells(account sdk.AccAddress, selling string, amountIn int, minOut int) {
+func (s *MsgServerTestSuite) marketSells(account sdk.AccAddress, selling string, amountIn int, minOut int) {
 	amountInDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(amountIn)))
 	minOutDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(minOut)))
 	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
