@@ -46,6 +46,7 @@ func DepositTemplate(s *MsgServerTestSuite, denomA string, denomB string, amount
 
 	// verify no error
 	if expectedTxErr != nil {
+		s.Require().NotNil(err)
 		s.Require().True(strings.Contains(err.Error(), expectedTxErr.Error()))
 		return
 	} else {
