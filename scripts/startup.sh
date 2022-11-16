@@ -106,7 +106,7 @@ then
     else
         dualityd keys add fred --keyring-backend test
     fi
-    dualityd add-genesis-account $(dualityd keys show fred -a --keyring-backend test) "${B}tokenA,${B}tokenB,${B}tokenC,${B}tokenD,${B}tokenE,${B}tokenF,${B}tokenG,${B}tokenH,${B}tokenI,${B}tokenJ,${B}tokenK,${B}tokenL,${B}tokenM,${B}tokenN,${B}tokenO,${B}tokenP,${B}tokenQ,${B}tokenR,${B}tokenS,${B}tokenT,${B}tokenU,${B}tokenV,${B}tokenW,${B}tokenX,${B}tokenY,${B}tokenZ" --keyring-backend test
+    dualityd add-genesis-account $(dualityd keys show fred -a --keyring-backend test) "${B}token,${B}stake,${B}tokenA,${B}tokenB,${B}tokenC,${B}tokenD,${B}tokenE,${B}tokenF,${B}tokenG,${B}tokenH,${B}tokenI,${B}tokenJ,${B}tokenK,${B}tokenL,${B}tokenM,${B}tokenN,${B}tokenO,${B}tokenP,${B}tokenQ,${B}tokenR,${B}tokenS,${B}tokenT,${B}tokenU,${B}tokenV,${B}tokenW,${B}tokenX,${B}tokenY,${B}tokenZ" --keyring-backend test
 
     # do not add a validator gentx here as there is already a leading ICS validator
     # eg. dualityd gentx alice 1000000stake --chain-id $NETWORK --keyring-backend test
