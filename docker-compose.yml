@@ -63,26 +63,28 @@ services:
         # todo: maybe add a `bash /root/.duality/scripts/check_fullnode_status.sh
         # to check is the node is known by its peers
 
-        # request to be a validator
-        echo "requesting test full node to become a validator";
-        dualityd tx staking create-validator \
-          --node tcp://dualitynode1:26657 \
-          --moniker testnode \
-          --node-id `dualityd tendermint show-node-id` \
-          --pubkey `dualityd tendermint show-validator` \
-          --commission-rate="1.0" \
-          --commission-max-rate="1.0" \
-          --commission-max-change-rate="1.0" \
-          --min-self-delegation="1" \
-          --gas="auto" \
-          --amount 100000000stake \
-          --fees 1000token \
-          --from alice \
-          -y \
-          --output json \
-          | echo "validator exit code: $$(jq -r .code)"
+        # todo: add validator startup check
 
-        bash /root/.duality/scripts/check_validator_status.sh
+        # # request to be a validator
+        # echo "requesting test full node to become a validator";
+        # dualityd tx staking create-validator \
+        #   --node tcp://dualitynode1:26657 \
+        #   --moniker testnode \
+        #   --node-id `dualityd tendermint show-node-id` \
+        #   --pubkey `dualityd tendermint show-validator` \
+        #   --commission-rate="1.0" \
+        #   --commission-max-rate="1.0" \
+        #   --commission-max-change-rate="1.0" \
+        #   --min-self-delegation="1" \
+        #   --gas="auto" \
+        #   --amount 100000000stake \
+        #   --fees 1000token \
+        #   --from alice \
+        #   -y \
+        #   --output json \
+        #   | echo "validator exit code: $$(jq -r .code)"
+
+        # bash /root/.duality/scripts/check_validator_status.sh
       '
     environment:
       - DEBUG=1
@@ -149,7 +151,7 @@ services:
     environment:
       - DEBUG=1
       - NODE_MONIKER=node0
-      - MODE=validator
+      - MODE=fullnode
       - RPC_ADDRESS=http://192.168.10.100:26657
       - ID=0
       - LOG=${LOG:-simd.log}
@@ -182,7 +184,7 @@ services:
     environment:
       - DEBUG=0
       - NODE_MONIKER=node1
-      - MODE=validator
+      - MODE=fullnode
       - RPC_ADDRESS=http://192.168.10.100:26657
       - ID=1
       - LOG=${LOG:-simd.log}
@@ -215,7 +217,7 @@ services:
     environment:
       - DEBUG=0
       - NODE_MONIKER=node2
-      - MODE=validator
+      - MODE=fullnode
       - RPC_ADDRESS=http://192.168.10.100:26657
       - ID=2
       - LOG=${LOG:-simd.log}
@@ -248,7 +250,7 @@ services:
     environment:
       - DEBUG=0
       - NODE_MONIKER=node3
-      - MODE=validator
+      - MODE=fullnode
       - RPC_ADDRESS=http://192.168.10.100:26657
       - ID=3
       - LOG=${LOG:-simd.log}
