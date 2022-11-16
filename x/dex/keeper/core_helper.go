@@ -11,8 +11,19 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+
 ///////////////////////////////////////////////////////////////////////////////
-//                           Getters & Initializers                          //
+//                                   UTILS                                   //
+///////////////////////////////////////////////////////////////////////////////
+
+func PairToTokens(pairId string) (token0 string, token1 string){
+	tokens := strings.Split(pairId, "/")
+
+	return tokens[0], tokens[1]
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//                           GETTERS & INITIALIZERS                          //
 ///////////////////////////////////////////////////////////////////////////////
 
 func (k Keeper) TokenInit(ctx sdk.Context, address string) {
@@ -49,6 +60,22 @@ func (k Keeper) GetOrInitPair(goCtx context.Context, token0 string, token1 strin
 	return pair
 }
 
+func (k Keeper) GetOrInitTickTrancheFillMap(goCtx context.Context, pairId string, tickIndex int64, trancheIndex uint64, token string) types.LimitOrderPoolFillMap {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	tickTranchFillMap, found := k.GetLimitOrderPoolFillMap(ctx, pairId, tickIndex, token, trancheIndex)
+	if !found {
+		tickTranchFillMap = types.LimitOrderPoolFillMap{
+			PairId:         pairId,
+			TickIndex:      tickIndex,
+			Token:          token,
+			Count:          trancheIndex,
+			FilledReserves: sdk.ZeroDec(),
+		}
+		k.SetLimitOrderPoolFillMap(ctx, tickTranchFillMap)
+	}
+	return tickTranchFillMap
+}
+
 func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex int64) types.TickMap {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -71,45 +98,24 @@ func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex in
 		}
 		k.SetTickMap(ctx, pairId, tick)
 
-		tokens := strings.Split(pairId, "/")
-		token0 := tokens[0]
-		token1 := tokens[1]
+		token0, token1 := PairToTokens(pairId)
 		k.GetOrInitTickTrancheFillMap(goCtx, pairId, tickIndex, 0, token0)
 		k.GetOrInitTickTrancheFillMap(goCtx, pairId, tickIndex, 0, token1)
 	}
 	return tick
 }
 
-func (k Keeper) GetOrInitTickTrancheFillMap(goCtx context.Context, pairId string, tickIndex int64, trancheIndex uint64, token string) types.LimitOrderPoolFillMap {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	tickTranchFillMap, found := k.GetLimitOrderPoolFillMap(ctx, pairId, tickIndex, token, trancheIndex)
-	if !found {
-		tickTranchFillMap = types.LimitOrderPoolFillMap{
-			PairId:         pairId,
-			TickIndex:      tickIndex,
-			Token:          token,
-			Count:          trancheIndex,
-			FilledReserves: sdk.ZeroDec(),
-		}
-		k.SetLimitOrderPoolFillMap(ctx, tickTranchFillMap)
-	}
-	return tickTranchFillMap
-}
-
-// Helper function for Place Limit order retrieving and or initializing mapppings used for keeping track of limit orders
-// Note: FillMap initialization is handled seperately in placeLimitOrder as it needed prior to this function being called.
-func (k Keeper) PlaceLimitOrderMappingHelper(goCtx context.Context, pairId string, tickIndex int64, tokenIn string, currentLimitOrderKey uint64, receiver string) (types.LimitOrderPoolReserveMap, types.LimitOrderPoolUserShareMap, types.LimitOrderPoolTotalSharesMap) {
-
+func (k Keeper) GetOrInitReserveData(
+	goCtx context.Context,
+	pairId string,
+	tickIndex int64,
+	tokenIn string,
+	currentLimitOrderKey uint64,
+) (types.LimitOrderPoolReserveMap){
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// Retrieves ReserveData Object from KVStore
 	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
-	// Retrieves UserShareMap object from KVStore
-	UserShareData, UserShareDataFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
-	// Retrives TotalSharesMap object from KVStore
-	TotalSharesData, TotalSharesDataFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
 
-	// If ReserveData object not found initialize it accordingly
 	if !ReserveDataFound {
 		ReserveData.Count = currentLimitOrderKey
 		ReserveData.Reserves = sdk.ZeroDec()
@@ -117,6 +123,22 @@ func (k Keeper) PlaceLimitOrderMappingHelper(goCtx context.Context, pairId strin
 		ReserveData.Token = tokenIn
 		ReserveData.PairId = pairId
 	}
+
+	return ReserveData
+}
+
+
+func (k Keeper) GetOrInitUserShareData(
+	goCtx context.Context,
+	pairId string,
+	tickIndex int64,
+	tokenIn string,
+	currentLimitOrderKey uint64,
+	receiver string,
+) (types.LimitOrderPoolUserShareMap){
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	UserShareData, UserShareDataFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
 
 	// If UserShareData object is not found initialize it accordingly
 	if !UserShareDataFound {
@@ -128,6 +150,20 @@ func (k Keeper) PlaceLimitOrderMappingHelper(goCtx context.Context, pairId strin
 		UserShareData.PairId = pairId
 	}
 
+	return UserShareData
+}
+
+func (k Keeper) GetOrInitOrderPoolTotalShares(
+	goCtx context.Context,
+	pairId string,
+	tickIndex int64,
+	tokenIn string,
+	currentLimitOrderKey uint64,
+) (types.LimitOrderPoolTotalSharesMap){
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	TotalSharesData, TotalSharesDataFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
+
 	// If TotalSharesData object is nout found initialize it accordingly
 	if !TotalSharesDataFound {
 		TotalSharesData.Count = currentLimitOrderKey
@@ -137,13 +173,34 @@ func (k Keeper) PlaceLimitOrderMappingHelper(goCtx context.Context, pairId strin
 		TotalSharesData.PairId = pairId
 	}
 
-	_ = ctx
+	return TotalSharesData
+}
+
+
+
+// Helper function for Place Limit order retrieving and or initializing mapppings used for keeping track of limit orders
+// Note: FillMap initialization is handled seperately in placeLimitOrder as it needed prior to this function being called.
+func (k Keeper) GetOrInitLimitOrderMaps(
+	goCtx context.Context,
+	pairId string,
+	tickIndex int64,
+	tokenIn string,
+	currentLimitOrderKey uint64,
+	receiver string,
+) (types.LimitOrderPoolReserveMap, types.LimitOrderPoolUserShareMap, types.LimitOrderPoolTotalSharesMap) {
+
+
+	ReserveData := k.GetOrInitReserveData(goCtx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
+	UserShareData := k.GetOrInitUserShareData(goCtx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
+	TotalSharesData := k.GetOrInitOrderPoolTotalShares(goCtx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
 
 	return ReserveData, UserShareData, TotalSharesData
 }
 
+
+
 ///////////////////////////////////////////////////////////////////////////////
-//                                  State Calculations                       //
+//                          STATE CALCULATIONS                               //
 ///////////////////////////////////////////////////////////////////////////////
 
 func (k Keeper) FindNextTick1To0(goCtx context.Context, pairMap types.PairMap) (tickIdx int64, found bool) {
@@ -278,8 +335,7 @@ func (k Keeper) HasToken0(ctx sdk.Context, tick *types.TickMap) bool {
 		}
 	}
 
-	tokens := strings.Split(tick.PairId, "/")
-	token0 := tokens[0]
+	token0, _ := PairToTokens(tick.PairId)
 	reserve, reserveFound := k.GetLimitOrderPoolReserveMap(
 		ctx,
 		tick.PairId,
@@ -298,8 +354,8 @@ func (k Keeper) HasToken1(ctx sdk.Context, tick *types.TickMap) bool {
 			return true
 		}
 	}
-	tokens := strings.Split(tick.PairId, "/")
-	token1 := tokens[1]
+
+	_, token1 := PairToTokens(tick.PairId)
 	reserve, reserveFound := k.GetLimitOrderPoolReserveMap(
 		ctx,
 		tick.PairId,
@@ -348,7 +404,6 @@ func (k Keeper) GetTotalReservesAtTick(goCtx context.Context, pairId string, tic
 	}
 
 	return totalReserve0, totalReserve1, nil
-
 }
 
 

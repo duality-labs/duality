@@ -854,7 +854,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	}
 
 	// Returns Map object for Reserve, UserShares, and TotalShares mapping
-	ReserveData, UserShareData, TotalSharesData := k.PlaceLimitOrderMappingHelper(goCtx, pairId, msg.TickIndex, msg.TokenIn, *curTrancheIndex, msg.Receiver)
+	ReserveData, UserShareData, TotalSharesData := k.GetOrInitLimitOrderMaps(goCtx, pairId, msg.TickIndex, msg.TokenIn, *curTrancheIndex, msg.Receiver)
 
 	// Adds amountIn to ReserveData
 	ReserveData.Reserves = ReserveData.Reserves.Add(msg.AmountIn)
