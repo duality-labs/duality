@@ -41,3 +41,33 @@ func Pow(x sdk.Dec, n int64) sdk.Dec {
 
 	return x.Mul(y)
 }
+
+func MaxInt64(a, b int64) int64 {
+	if a < b {
+		return b
+	} else {
+		return a
+	}
+}
+
+func MinInt64(a, b int64) int64 {
+	if a < b {
+		return a
+	} else {
+		return b
+	}
+}
+
+func MinDec(a, b sdk.Dec) sdk.Dec {
+	if a.LT(b) {
+		return a
+	}
+	return b
+}
+
+func MaxDec(a, b sdk.Dec) sdk.Dec {
+	if a.GT(b) {
+		return a
+	}
+	return b
+}
