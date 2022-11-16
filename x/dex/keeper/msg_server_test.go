@@ -467,10 +467,10 @@ type Withdrawl struct {
 	Shares    sdk.Dec
 }
 
-func NewWithdrawl(shares int64, tick int64, fee uint64) *Withdrawl {
+func NewWithdrawl(shares int64, tick int64, feeIndex uint64) *Withdrawl {
 	return &Withdrawl{
 		Shares:    sdk.NewDec(shares),
-		FeeIndex:  fee,
+		FeeIndex:  feeIndex,
 		TickIndex: tick,
 	}
 }
@@ -501,8 +501,8 @@ func (s *MsgServerTestSuite) assertAccountShares(
 func (s *MsgServerTestSuite) assertAliceShares(
 	tick int64,
 	fee uint64,
-	sharesExpected sdk.Dec) {
-
+	sharesExpected sdk.Dec,
+) {
 	s.assertAccountShares(s.alice, "TokenA/TokenB", tick, fee, sharesExpected)
 }
 
