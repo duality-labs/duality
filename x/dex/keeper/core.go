@@ -199,7 +199,7 @@ func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex in
 	tick, tickFound := k.GetTickMap(ctx, pairId, tickIndex)
 	if !tickFound {
 		numFees := k.GetFeeListCount(ctx)
-		tick := types.TickMap{
+		tick = types.TickMap{
 			PairId:    pairId,
 			TickIndex: tickIndex,
 			TickData: &types.TickDataType{
@@ -425,36 +425,26 @@ func (k Keeper) DepositCore(
 // Calculates the amount of reserve0, reserve1 to withdraw based on the percetange of the desired number of shares to remove compared to the total number of shares at the given tick
 func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	//loads pairId for the gven token0/token1 pair
 	pairId := k.CreatePairId(token0, token1)
-
-	// loads pair from mapping
-	pair, pairFound := k.GetPairMap(ctx, pairId)
-
-	// if a pair does not exist, neither do any ticks, and thus a withdraw can not be made
-	if !pairFound {
+	pair, found := k.GetPairMap(ctx, pairId)
+	if !found {
 		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
-
-	//init totalamountToWIthdraw of both assets to zero
 	totalReserve0ToRemove := sdk.ZeroDec()
 	totalReserve1ToRemove := sdk.ZeroDec()
 
-	//Iterate through the list of all sharesToRemove, calculating the amounttoWithdraw for specified each tick
 	for i, feeIndex := range msg.FeeIndexes {
 		sharesToRemove := msg.SharesToRemove[i]
 		tickIndex := msg.TickIndexes[i]
 
-		// loads UserShares type from mapping
-		shareOwner, shareOwnerFound := k.GetShares(
+		shareOwner, found := k.GetShares(
 			ctx,
 			msg.Creator,
 			pairId,
 			tickIndex,
 			feeIndex,
 		)
-		if !shareOwnerFound {
+		if !found {
 			return sdkerrors.Wrapf(types.ErrValidShareNotFound, "No valid share owner fonnd")
 		}
 
@@ -463,11 +453,10 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			return sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", feeIndex)
 		}
 		fee := feeValue.Fee
-
 		lowerTickIndex := tickIndex - fee
 		upperTickIndex := tickIndex + fee
-		lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, upperTickIndex)
-		upperTick, upperTickFound := k.GetTickMap(ctx, pairId, lowerTickIndex)
+		lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, lowerTickIndex)
+		upperTick, upperTickFound := k.GetTickMap(ctx, pairId, upperTickIndex)
 		if !lowerTickFound || !upperTickFound {
 			return sdkerrors.Wrapf(types.ErrValidTickNotFound, "No tick found at the requested index")
 		}
@@ -478,7 +467,8 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 
 		// Checks to see if there are some totalShares to withdraw
 		// In keeper/verification.go we check this condition for the msg.Creator, thus we know that they also has a valid position in the tick.
-		if lowerTick.TickData.Reserve0AndShares[msg.FeeIndexes[i]].TotalShares.Equal(sdk.ZeroDec()) {
+
+		if lowerTickFeeTotalShares.Equal(sdk.ZeroDec()) {
 			return sdkerrors.Wrapf(types.ErrValidTickNotFound, "No tick found at the requested index")
 		}
 
@@ -594,7 +584,6 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 ////// Swap Functions
 
 // Handles core logic for the asset 0 to asset1 direction of MsgSwap; faciliates swapping amount0 for some amount of amount1, given a specified pair (token0, token1)
-
 func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress) (sdk.Dec, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -853,24 +842,15 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			if Current0Data.TickData.Reserve0AndShares[i].Reserve0.LT(amount_left.Mul(price_1to0)) {
 				// Add the reserves to the amount out
 				amount_out = amount_out.Add(Current0Data.TickData.Reserve0AndShares[i].Reserve0)
-
 				amountInTemp := Current0Data.TickData.Reserve0AndShares[i].Reserve0.Quo(price_1to0)
-
 				amount_left = amount_left.Sub(amountInTemp)
-
 				Current1Data.TickData.Reserve1[i] = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Add(amountInTemp)
-
 				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = sdk.ZeroDec()
-
 			} else {
 				amountOutTemp := amount_left.Mul(price_1to0)
-
 				amount_out = amount_out.Add(amountOutTemp)
-
 				Current1Data.TickData.Reserve1[i] = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Add(amount_left)
-
 				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current1Data.TickData.Reserve1[i].Sub(amountOutTemp)
-
 				amount_left = sdk.ZeroDec()
 			}
 
@@ -1326,9 +1306,14 @@ func (k Keeper) UpdateTickPointersPostAddToken0(goCtx context.Context, pair *typ
 	tickIndex := tick.TickIndex
 	minTick := &pair.MinTick
 	cur1To0 := &pair.TokenPair.CurrentTick1To0
+	if *minTick == math.MaxInt64 {
+		*minTick = tickIndex
+		*cur1To0 = tickIndex
+	} else {
+		*cur1To0 = MaxInt64(*cur1To0, tickIndex)
+		*minTick = MinInt64(*minTick, tickIndex)
+	}
 
-	*cur1To0 = MaxInt64(*cur1To0, tickIndex)
-	*minTick = MinInt64(*minTick, tickIndex)
 	k.SetPairMap(ctx, *pair)
 }
 
@@ -1342,9 +1327,14 @@ func (k Keeper) UpdateTickPointersPostAddToken1(goCtx context.Context, pair *typ
 	tickIndex := tick.TickIndex
 	cur0To1 := &pair.TokenPair.CurrentTick0To1
 	maxTick := &pair.MaxTick
+	if *maxTick == math.MinInt64 {
+		*maxTick = tickIndex
+		*cur0To1 = tickIndex
+	} else {
+		*cur0To1 = MinInt64(*cur0To1, tickIndex)
+		*maxTick = MaxInt64(*maxTick, tickIndex)
+	}
 
-	*cur0To1 = MinInt64(*cur0To1, tickIndex)
-	*maxTick = MaxInt64(*maxTick, tickIndex)
 	k.SetPairMap(ctx, *pair)
 }
 

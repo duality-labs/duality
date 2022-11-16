@@ -175,7 +175,7 @@ func (s *MsgServerTestSuite) TestFailsWhenNotEnoughSharesMulti() {
 	)
 
 	// THEN an error is thrown and Alice and Dex balances remain unchanged
-	s.Assert().ErrorIs(err, types.ErrNotEnoughShares)
+	s.Require().ErrorIs(err, types.ErrNotEnoughShares)
 
 	// TODO: this is currently failing in testing,
 	// may be a bug may just be an issue with how state is retracted on failure in test framework
