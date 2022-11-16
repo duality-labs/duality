@@ -11,7 +11,9 @@ import (
 // takes as input the amount that was placed for the limit order (amount_placed), the price the
 // trader pays when filling it (price_filled_at) and the amount that they are swapping (amount_to_swap).
 // The format of the return statement is (amount_in, amount_out).
-func SingleLimitOrderFill(amount_placed sdk.Dec, price_filled_at sdk.Dec, amount_to_swap sdk.Dec) (sdk.Dec, sdk.Dec) {
+func SingleLimitOrderFill(amount_placed sdk.Dec, 
+	price_filled_at sdk.Dec, 
+	amount_to_swap sdk.Dec) (sdk.Dec, sdk.Dec) {
 
 	amount_out, amount_in := sdk.ZeroDec(), sdk.ZeroDec()
 
@@ -27,6 +29,23 @@ func SingleLimitOrderFill(amount_placed sdk.Dec, price_filled_at sdk.Dec, amount
 	fmt.Println("Amount Out: ", amount_out)
 	fmt.Println("Amount In: ", amount_in)
 	return amount_in, amount_out
+}
+
+// Calls SingleLimitOrderFill() and updates the filled and unfilled reserves. 
+// Returns the unfilled reserves (unfilled_reserves), filled reserves (filled_reserves) and the amount left to swap 
+// (amount_to_swap_remaining)
+func SingleLimitOrderFillAndUpdate(amount_placed sdk.Dec, 
+	price_filled_at sdk.Dec, 
+	amount_to_swap sdk.Dec,
+	unfilled_reserves sdk.Dec) (sdk.Dec, sdk.Dec, sdk.Dec) {
+
+		amount_in, amount_out := SingleLimitOrderFill(amount_placed, price_filled_at, amount_to_swap)
+
+		unfilled_reserves = unfilled_reserves.Sub(amount_out)
+		filled_reserves := amount_placed.Add(amount_in)
+		amount_to_swap_remaining := amount_to_swap.Sub(amount_in)
+
+		return unfilled_reserves, filled_reserves, amount_to_swap_remaining
 }
 
 // MultipleLimitOrderFills() simulates the fill of multiple consecutive limit orders and returns the
@@ -158,3 +177,4 @@ func MultiplePoolSwapAndUpdate(amounts_liquidity []sdk.Dec,
 
 	return resulting_reserves_in_token, resulting_reserves_out_token, amount_remaining, amount_out_total
 }
+

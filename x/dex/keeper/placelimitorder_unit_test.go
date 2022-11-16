@@ -6,7 +6,7 @@ import (
 	"github.com/NicholasDotSol/duality/x/dex/types"
 )
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedInSpread1To0() {
+func (s *MsgServerTestSuite) TestPlaceLimitOrderInSpread1To0() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -18,8 +18,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedInSpread1To0() {
 	s.assertCurr0To1(5)
 
 	// WHEN
-	// deposit in spread (10 of A at tick 0 fee 1)
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
+	// place limit order for B at tick -1
+	s.aliceLimitSells("TokenA", -1, 10)
 	s.assertAliceBalances(30, 40)
 	s.assertDexBalances(20, 10)
 
@@ -27,7 +27,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedInSpread1To0() {
 	// assert currentTick1To0 moved
 	s.assertCurr1To0(-1)
 }
-func (s *MsgServerTestSuite) TestDepositSingleSidedInSpread0To1() {
+func (s *MsgServerTestSuite) TestPlaceLimitOrderInSpread0To1() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -39,8 +39,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedInSpread0To1() {
 	s.assertCurr0To1(5)
 
 	// WHEN
-	// deposit in spread (10 of B at tick 0 fee 1)
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
+	// place limit order for A at tick 1
+	s.aliceLimitSells("TokenB", 1, 10)
 	s.assertAliceBalances(40, 30)
 	s.assertDexBalances(10, 20)
 
@@ -49,7 +49,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedInSpread0To1() {
 	s.assertCurr0To1(1)
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedInSpreadMinMaxNotAdjusted() {
+func (s *MsgServerTestSuite) TestPlaceLimitOrderInSpreadMinMaxNotAdjusted() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -61,8 +61,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedInSpreadMinMaxNotAdjusted() {
 	s.assertMaxTick(5)
 
 	// WHEN
-	// deposit in spread (10 of A at tick 0 fee 1)
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
+	// place limit order for B at tick -1
+	s.aliceLimitSells("TokenA", -1, 10)
 	s.assertAliceBalances(30, 40)
 	s.assertDexBalances(20, 10)
 
@@ -72,7 +72,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedInSpreadMinMaxNotAdjusted() {
 	s.assertMaxTick(5)
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpread0To1NotAdjusted() {
+func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpread0To1NotAdjusted() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -84,8 +84,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpread0To1NotAdjusted() 
 	s.assertCurr0To1(1)
 
 	// WHEN
-	// deposit out of spread (10 of B at tick 0 fee 3)
-	s.aliceDeposits(NewDeposit(0, 10, 0, 1))
+	// place limit order out of spread (for A at tick 3)
+	s.aliceLimitSells("TokenB", 3, 10)
 	s.assertAliceBalances(40, 30)
 	s.assertDexBalances(10, 20)
 
@@ -94,7 +94,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpread0To1NotAdjusted() 
 	s.assertCurr0To1(1)
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpread1To0NotAdjusted() {
+func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpread1To0NotAdjusted() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -106,8 +106,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpread1To0NotAdjusted() 
 	s.assertCurr0To1(1)
 
 	// WHEN
-	// deposit out of spread (10 of A at tick 0 fee 3)
-	s.aliceDeposits(NewDeposit(10, 0, 0, 1))
+	// place limit order out of spread (for B at tick -3)
+	s.aliceLimitSells("TokenA", -3, 10)
 	s.assertAliceBalances(30, 40)
 	s.assertDexBalances(20, 10)
 
@@ -116,7 +116,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpread1To0NotAdjusted() 
 	s.assertCurr1To0(-1)
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMinAdjusted() {
+func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMinAdjusted() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -128,8 +128,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMinAdjusted() {
 	s.assertCurr0To1(1)
 
 	// WHEN
-	// deposit out of spread (10 of A at tick 0 fee 3)
-	s.aliceDeposits(NewDeposit(10, 0, 0, 1))
+	// place limit order out of spread (for B at tick -3)
+	s.aliceLimitSells("TokenA", -3, 10)
 	s.assertAliceBalances(30, 40)
 	s.assertDexBalances(20, 10)
 
@@ -138,7 +138,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMinAdjusted() {
 	s.assertMinTick(-3)
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMaxAdjusted() {
+func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMaxAdjusted() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -150,8 +150,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMaxAdjusted() {
 	s.assertCurr0To1(1)
 
 	// WHEN
-	// deposit out of spread (10 of B at tick 0 fee 3)
-	s.aliceDeposits(NewDeposit(0, 10, 0, 1))
+	// place limit order out of spread (for A at tick 3)
+	s.aliceLimitSells("TokenB", 3, 10)
 	s.assertAliceBalances(40, 30)
 	s.assertDexBalances(10, 20)
 
@@ -160,7 +160,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMaxAdjusted() {
 	s.assertMaxTick(3)
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMinNotAdjusted() {
+func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMinNotAdjusted() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -178,8 +178,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMinNotAdjusted() {
 	s.assertMaxTick(1)
 
 	// WHEN
-	// deposit in spread (10 of A at tick 0 fee 3)
-	s.aliceDeposits(NewDeposit(10, 0, 0, 1))
+	// place limit order in spread (for B at tick -3)
+	s.aliceLimitSells("TokenA", -3, 10)
 	s.assertAliceBalances(20, 40)
 	s.assertDexBalances(30, 10)
 
@@ -188,7 +188,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMinNotAdjusted() {
 	s.assertMinTick(-5)
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMaxNotAdjusted() {
+func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMaxNotAdjusted() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -206,8 +206,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMaxNotAdjusted() {
 	s.assertMaxTick(5)
 
 	// WHEN
-	// deposit out of spread (10 of B at tick 0 fee 3)
-	s.aliceDeposits(NewDeposit(0, 10, 0, 1))
+	// place limit order in spread (for A at tick 3)
+	s.aliceLimitSells("TokenB", 3, 10)
 	s.assertAliceBalances(40, 20)
 	s.assertDexBalances(10, 30)
 
@@ -216,7 +216,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMaxNotAdjusted() {
 	s.assertMaxTick(5)
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityA() {
+func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityA() {
 	//TODO: this fails because PairInit doesn't account for single sided liquidity
 	s.fundAliceBalances(50, 50)
 
@@ -232,8 +232,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityA() {
 	s.assertMaxTick(math.MinInt64)
 
 	// WHEN
-	// deposit 10 of token A on the same tick
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
+	// place limit order on same tick (for B at tick -1)
+	s.aliceLimitSells("TokenA", -1, 10)
 
 	// THEN
 	// assert 20 of token A deposited at tick 0 fee 0 and ticks unchanged
@@ -246,7 +246,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityA() {
 	s.assertMaxTick(math.MinInt64)
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityB() {
+func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityB() {
 	// TODO: this fails because PairInit doesn't account for single sided liquidity
 	s.fundAliceBalances(50, 50)
 
@@ -262,8 +262,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityB() {
 	s.assertMaxTick(1)
 
 	// WHEN
-	// deposit 10 of token B on the same tick
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
+	// place limit order on same tick (for A at tick 1)
+	s.aliceLimitSells("TokenB", 1, 10)
 
 	// THEN
 	// assert 20 of token B deposited at tick 0 fee 0 and ticks unchanged
@@ -276,7 +276,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityB() {
 	s.assertMaxTick(1)
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedBelowEnemyLines() {
+func (s *MsgServerTestSuite) TestPlaceLimitOrderBelowEnemyLines() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -287,15 +287,15 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedBelowEnemyLines() {
 	s.assertLiquidityAtTick(0, 10, 0, 0)
 
 	// WHEN
-	// depositing below enemy lines at tick -5
+	// place limit order for token A below enemy lines at tick -5
 	// THEN
 	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
 
 	err := types.ErrValidPairNotFound // TODO: this needs to be changed to a more specific error type
-	s.assertAliceDepositFails(err, NewDeposit(0, 10, -5, 0))
+	s.assertAliceLimitSellFails(err, "TokenB", -5, 10)
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedAboveEnemyLines() {
+func (s *MsgServerTestSuite) TestPlaceLimitOrderAboveEnemyLines() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -306,77 +306,10 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedAboveEnemyLines() {
 	s.assertLiquidityAtTick(10, 0, 0, 0)
 
 	// WHEN
-	// depositing above enemy lines at tick 5	// THEN
+	// place limit order for token B above enemy lines at tick 5
+	// THEN
 	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
 
 	err := types.ErrValidPairNotFound // TODO: this needs to be changed to a more specific error type
-	s.assertAliceDepositFails(err, NewDeposit(10, 0, 5, 0))
-}
-
-func (s *MsgServerTestSuite) TestDepositSingleSidedMultiA() {
-	// TODO: this fails because PairInit doesn't account for single sided liquidity
-	s.fundAliceBalances(50, 50)
-
-	// GIVEN
-	// deposit 10 of token A at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
-	s.assertAliceBalances(40, 50)
-	s.assertDexBalances(10, 0)
-	s.assertLiquidityAtTick(10, 0, 0, 0)
-	s.assertCurr1To0(-1)
-	s.assertCurr0To1(math.MinInt64)
-	s.assertMinTick(-1)
-	s.assertMaxTick(math.MinInt64)
-
-	// WHEN
-	// multi deposit
-	s.aliceDeposits(
-		NewDeposit(10, 0, 0, 0),
-		NewDeposit(10, 0, 0, 1),
-	)
-
-	// THEN
-	// assert 20 of token B deposited at tick 1 fee 0 and ticks unchanged
-	s.assertAliceBalances(30, 50)
-	s.assertDexBalances(20, 0)
-	s.assertLiquidityAtTick(20, 0, 0, 0)
-	s.assertLiquidityAtTick(10, 0, 0, 1)
-	s.assertCurr1To0(-3)
-	s.assertCurr0To1(math.MinInt64)
-	s.assertMinTick(-3)
-	s.assertMaxTick(math.MinInt64)
-}
-
-func (s *MsgServerTestSuite) TestDepositSingleSidedMultiB() {
-	// TODO: this fails because PairInit doesn't account for single sided liquidity
-	s.fundAliceBalances(50, 50)
-
-	// GIVEN
-	// deposit 10 of token B at tick 1 fee 0
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
-	s.assertAliceBalances(50, 40)
-	s.assertDexBalances(0, 10)
-	s.assertLiquidityAtTick(0, 10, 0, 0)
-	s.assertCurr1To0(math.MaxInt64)
-	s.assertCurr0To1(1)
-	s.assertMinTick(math.MaxInt64)
-	s.assertMaxTick(1)
-
-	// WHEN
-	// multi deposit at
-	s.aliceDeposits(
-		NewDeposit(0, 10, 0, 0),
-		NewDeposit(0, 10, 0, 1),
-	)
-
-	// THEN
-	// assert 20 of token B deposited at tick 1 fee 0 and ticks unchanged
-	s.assertAliceBalances(50, 30)
-	s.assertDexBalances(0, 20)
-	s.assertLiquidityAtTick(0, 20, 0, 0)
-	s.assertLiquidityAtTick(0, 10, 0, 1)
-	s.assertCurr1To0(math.MaxInt64)
-	s.assertCurr0To1(3)
-	s.assertMinTick(math.MaxInt64)
-	s.assertMaxTick(3)
+	s.assertAliceLimitSellFails(err, "TokenA", 5, 10)
 }

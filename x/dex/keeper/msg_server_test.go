@@ -184,28 +184,6 @@ func (s *MsgServerTestSuite) assertDexBalancesDec(a sdk.Dec, b sdk.Dec) {
 	s.assertAccountBalancesDec(s.app.AccountKeeper.GetModuleAddress("dex"), a, b)
 }
 
-func (s *MsgServerTestSuite) assertMinTick(minTickExpected int64) {
-	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
-	pair, pairFound := s.app.DexKeeper.GetPairMap(s.ctx, pairId)
-	if !pairFound {
-		s.Require().Fail("Invalid GetPair in assertCurr0to1")
-	}
-
-	minTickActual := pair.MinTick
-	s.Assert().Equal(minTickExpected, minTickActual)
-}
-
-func (s *MsgServerTestSuite) assertMaxTick(maxTickExpected int64) {
-	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
-	pair, pairFound := s.app.DexKeeper.GetPairMap(s.ctx, pairId)
-	if !pairFound {
-		s.Require().Fail("Invalid GetPair in assertCurr0to1")
-	}
-
-	maxTickActual := pair.MaxTick
-	s.Assert().Equal(maxTickExpected, maxTickActual)
-}
-
 func (s *MsgServerTestSuite) aliceLimitSells(selling string, tick int, amountIn int) {
 	s.limitSells(s.alice, selling, tick, amountIn)
 }
@@ -234,6 +212,36 @@ func (s *MsgServerTestSuite) limitSells(account sdk.AccAddress, tokenIn string, 
 		AmountIn:  amountInDec,
 	})
 	s.Assert().Nil(err)
+}
+
+func (s *MsgServerTestSuite) assertAliceLimitSellFails(err error, selling string, tick int, amountIn int) {
+	s.assertLimitSellFails(s.alice, err, selling, tick, amountIn)
+}
+
+func (s *MsgServerTestSuite) assertBobLimitSellFails(err error, selling string, tick int, amountIn int) {
+	s.assertLimitSellFails(s.bob, err, selling, tick, amountIn)
+}
+
+func (s *MsgServerTestSuite) assertCarolLimitSellFails(err error, selling string, tick int, amountIn int) {
+	s.assertLimitSellFails(s.carol, err, selling, tick, amountIn)
+}
+
+func (s *MsgServerTestSuite) assertDanLimitSellFails(err error, selling string, tick int, amountIn int) {
+	s.assertLimitSellFails(s.dan, err, selling, tick, amountIn)
+}
+
+func (s *MsgServerTestSuite) assertLimitSellFails(account sdk.AccAddress, expectedErr error, tokenIn string, tick int, amountIn int) {
+	amountInDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(amountIn)))
+	_, err := s.msgServer.PlaceLimitOrder(s.goCtx, &types.MsgPlaceLimitOrder{
+		Creator:   account.String(),
+		Receiver:  account.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		TickIndex: int64(tick),
+		TokenIn:   tokenIn,
+		AmountIn:  amountInDec,
+	})
+	s.Assert().ErrorIs(expectedErr, err)
 }
 
 type Deposit struct {
@@ -598,6 +606,28 @@ func (s *MsgServerTestSuite) assertCurr1To0(curr1To0Expected int64) {
 
 	curr1to0Actual := pair.TokenPair.CurrentTick1To0
 	s.Assert().Equal(curr1To0Expected, curr1to0Actual)
+}
+
+func (s *MsgServerTestSuite) assertMinTick(minTickExpected int64) {
+	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
+	pair, pairFound := s.app.DexKeeper.GetPairMap(s.ctx, pairId)
+	if !pairFound {
+		s.Require().Fail("Invalid GetPair in assertCurr0to1")
+	}
+
+	minTickActual := pair.MinTick
+	s.Assert().Equal(minTickExpected, minTickActual)
+}
+
+func (s *MsgServerTestSuite) assertMaxTick(maxTickExpected int64) {
+	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
+	pair, pairFound := s.app.DexKeeper.GetPairMap(s.ctx, pairId)
+	if !pairFound {
+		s.Require().Fail("Invalid GetPair in assertCurr0to1")
+	}
+
+	maxTickActual := pair.MaxTick
+	s.Assert().Equal(maxTickExpected, maxTickActual)
 }
 
 func (s *MsgServerTestSuite) printTicks() {
