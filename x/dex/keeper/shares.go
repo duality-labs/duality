@@ -25,7 +25,6 @@ func (k Keeper) GetShares(
 	pairId string,
 	tickIndex int64,
 	feeIndex uint64,
-
 ) (val types.Shares, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.SharesKeyPrefix))
 
