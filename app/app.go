@@ -92,6 +92,9 @@ import (
 	dexmodule "github.com/NicholasDotSol/duality/x/dex"
 	dexmodulekeeper "github.com/NicholasDotSol/duality/x/dex/keeper"
 	dexmoduletypes "github.com/NicholasDotSol/duality/x/dex/types"
+	swap "github.com/NicholasDotSol/duality/x/ibc-swap"
+	swapkeeper "github.com/NicholasDotSol/duality/x/ibc-swap/keeper"
+	swaptypes "github.com/NicholasDotSol/duality/x/ibc-swap/types"
 
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
@@ -144,6 +147,7 @@ var (
 			),
 		),
 		dexmodule.AppModuleBasic{},
+		swap.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -154,6 +158,7 @@ var (
 		dexmoduletypes.ModuleName:                     {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		ccvconsumertypes.ConsumerRedistributeName:     nil,
 		ccvconsumertypes.ConsumerToSendToProviderName: nil,
+		swaptypes.ModuleName:                          nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -211,7 +216,8 @@ type App struct {
 	ScopedTransferKeeper    capabilitykeeper.ScopedKeeper
 	ScopedCCVConsumerKeeper capabilitykeeper.ScopedKeeper
 
-	DexKeeper dexmodulekeeper.Keeper
+	DexKeeper            dexmodulekeeper.Keeper
+	SwapMiddlewareKeeper swapkeeper.Keeper
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
@@ -341,10 +347,10 @@ func NewApp(
 		app.IBCKeeper.ChannelKeeper, app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 	)
-	var (
-		transferModule    = transfer.NewAppModule(app.TransferKeeper)
-		transferIBCModule = transfer.NewIBCModule(app.TransferKeeper)
-	)
+	transferModule := transfer.NewAppModule(app.TransferKeeper)
+	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
+
+	_ = transferIBCModule // TODO remove this after adding forward middleware into stack
 
 	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
@@ -400,9 +406,35 @@ func NewApp(
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
+	// TODO wire up the middleware stack here such that when incoming packets come in, we first try to swap
+	// then try to forward, and then call into the transfer module.
+	//
+	// the IBC stack from top to bottom will look like this:
+	// -- channel.OnRecvPacket
+	// -- swap.OnRecvPacket
+	// -- forward.OnRecvPacket
+	// -- transfer.OnRecvPacket
+	// see: https://github.com/cosmos/ibc-go/blob/main/docs/middleware/ics29-fee/integration.md#configuring-an-application-stack-with-fee-middleware
+
+	// Initialize the swap middleware keeper and wire it up with the forward middleware such that the
+	// swap middlewares underlying app becomes the forward middleware.
+	app.SwapMiddlewareKeeper = swapkeeper.NewKeeper(
+		appCodec,
+		app.GetSubspace(swaptypes.ModuleName),
+		app.MsgServiceRouter(),
+		app.IBCKeeper.ChannelKeeper, // TODO I believe this will be replaced with the forward middleware
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+	)
+
+	// Create our IBC stack from bottom to top
+	var ibcStack ibcporttypes.IBCModule
+	ibcStack = transfer.NewIBCModule(app.TransferKeeper)
+	ibcStack = swap.NewIBCMiddleware(ibcStack, app.SwapMiddlewareKeeper)
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, ibcStack)
 	ibcRouter.AddRoute(ccvconsumertypes.ModuleName, consumerModule)
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
@@ -433,6 +465,7 @@ func NewApp(
 		consumerModule,
 		adminModule,
 		dexModule,
+		swap.NewAppModule(app.SwapMiddlewareKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -457,6 +490,7 @@ func NewApp(
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
+		swaptypes.ModuleName,
 
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
@@ -478,6 +512,7 @@ func NewApp(
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
+		swaptypes.ModuleName,
 
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
@@ -504,6 +539,7 @@ func NewApp(
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
+		swaptypes.ModuleName,
 
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
