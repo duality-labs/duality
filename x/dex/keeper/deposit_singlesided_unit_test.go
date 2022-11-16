@@ -6,7 +6,7 @@ import (
 	"github.com/NicholasDotSol/duality/x/dex/types"
 )
 
-func (s *MsgServerTestSuite) TestSingleSidedDepositInSpread1To0() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedInSpread1To0() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -27,7 +27,7 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositInSpread1To0() {
 	// assert currentTick1To0 moved
 	s.assertCurr1To0(-1)
 }
-func (s *MsgServerTestSuite) TestSingleSidedDepositInSpread0To1() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedInSpread0To1() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -49,7 +49,7 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositInSpread0To1() {
 	s.assertCurr0To1(1)
 }
 
-func (s *MsgServerTestSuite) TestSingleSidedDepositInSpreadMinMaxNotAdjusted() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedInSpreadMinMaxNotAdjusted() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -72,7 +72,7 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositInSpreadMinMaxNotAdjusted() {
 	s.assertMaxTick(5)
 }
 
-func (s *MsgServerTestSuite) TestSingleSidedDepositOutOfSpread0To1NotAdjusted() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpread0To1NotAdjusted() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -94,7 +94,7 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositOutOfSpread0To1NotAdjusted() 
 	s.assertCurr0To1(1)
 }
 
-func (s *MsgServerTestSuite) TestSingleSidedDepositOutOfSpread1To0NotAdjusted() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpread1To0NotAdjusted() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -116,7 +116,7 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositOutOfSpread1To0NotAdjusted() 
 	s.assertCurr1To0(-1)
 }
 
-func (s *MsgServerTestSuite) TestSingleSidedDepositOutOfSpreadMinAdjusted() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMinAdjusted() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -138,7 +138,7 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositOutOfSpreadMinAdjusted() {
 	s.assertMinTick(-3)
 }
 
-func (s *MsgServerTestSuite) TestSingleSidedDepositOutOfSpreadMaxAdjusted() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMaxAdjusted() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -160,7 +160,7 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositOutOfSpreadMaxAdjusted() {
 	s.assertMaxTick(3)
 }
 
-func (s *MsgServerTestSuite) TestSingleSidedDepositOutOfSpreadMinNotAdjusted() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMinNotAdjusted() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -188,7 +188,7 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositOutOfSpreadMinNotAdjusted() {
 	s.assertMinTick(-5)
 }
 
-func (s *MsgServerTestSuite) TestSingleSidedDepositOutOfSpreadMaxNotAdjusted() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMaxNotAdjusted() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -216,7 +216,7 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositOutOfSpreadMaxNotAdjusted() {
 	s.assertMaxTick(5)
 }
 
-func (s *MsgServerTestSuite) TestSingleSidedDepositExistingLiquidityA() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityA() {
 	//TODO: this fails because PairInit doesn't account for single sided liquidity
 	s.fundAliceBalances(50, 50)
 
@@ -246,7 +246,7 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositExistingLiquidityA() {
 	s.assertMaxTick(math.MinInt64)
 }
 
-func (s *MsgServerTestSuite) TestSingleSidedDepositExistingLiquidityB() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityB() {
 	// TODO: this fails because PairInit doesn't account for single sided liquidity
 	s.fundAliceBalances(50, 50)
 
@@ -276,7 +276,7 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositExistingLiquidityB() {
 	s.assertMaxTick(1)
 }
 
-func (s *MsgServerTestSuite) TestSingleSidedDepositBelowEnemyLines() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedBelowEnemyLines() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -295,7 +295,7 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositBelowEnemyLines() {
 	s.assertAliceDepositFails(err, NewDeposit(0, 10, -5, 0))
 }
 
-func (s *MsgServerTestSuite) TestSingleSidedDepositAboveEnemyLines() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedAboveEnemyLines() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -314,7 +314,7 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositAboveEnemyLines() {
 	s.assertAliceDepositFails(err, NewDeposit(10, 0, 5, 0))
 }
 
-func (s *MsgServerTestSuite) TestSingleSidedDepositMultiA() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedMultiA() {
 	// TODO: this fails because PairInit doesn't account for single sided liquidity
 	s.fundAliceBalances(50, 50)
 
@@ -337,8 +337,7 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositMultiA() {
 	)
 
 	// THEN
-	// assert 20 of token A deposited at tick 0 fee 0, 10 of token A at tick 0 fee 1,
-	// curr 1to0 and min moved to -3
+	// assert 20 of token B deposited at tick 1 fee 0 and ticks unchanged
 	s.assertAliceBalances(30, 50)
 	s.assertDexBalances(20, 0)
 	s.assertLiquidityAtTick(20, 0, 0, 0)
@@ -349,12 +348,12 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositMultiA() {
 	s.assertMaxTick(math.MinInt64)
 }
 
-func (s *MsgServerTestSuite) TestSingleSidedDepositMultiB() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedMultiB() {
 	// TODO: this fails because PairInit doesn't account for single sided liquidity
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
-	// deposit 10 of token B at tick 0 fee 1
+	// deposit 10 of token B at tick 1 fee 0
 	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
@@ -372,8 +371,7 @@ func (s *MsgServerTestSuite) TestSingleSidedDepositMultiB() {
 	)
 
 	// THEN
-	// assert 20 of token B deposited at tick 0 fee 0, 10 of token B at tick 0 fee 1,
-	// curr0to1, max moved to 3
+	// assert 20 of token B deposited at tick 1 fee 0 and ticks unchanged
 	s.assertAliceBalances(50, 30)
 	s.assertDexBalances(0, 20)
 	s.assertLiquidityAtTick(0, 20, 0, 0)
