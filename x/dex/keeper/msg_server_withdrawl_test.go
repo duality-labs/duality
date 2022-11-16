@@ -20,7 +20,6 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlFull() {
 	s.assertAliceShares(0, 0, sdk.NewDec(0))
 	s.assertAliceBalances(100, 50)
 	s.assertDexBalances(0, 0)
-	s.assertTickCount(0)
 }
 
 func (s *MsgServerTestSuite) TestSingleWithdrawlPartial() {
@@ -37,9 +36,7 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlPartial() {
 	s.assertAliceShares(0, 0, sdk.NewDec(75))
 	s.assertAliceBalances(50, 25)
 	s.assertDexBalances(50, 25)
-
 	// CurrentTick values remain unchanged
-	s.assertTickCount(1)
 	s.assertCurrentTicks(-1, 1)
 }
 
@@ -71,7 +68,6 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlSingleSide() {
 	s.assertAliceShares(0, 0, sdk.NewDec(0))
 	s.assertAliceBalances(100, 0)
 	s.assertDexBalances(0, 0)
-	s.assertTickCount(0)
 
 }
 
@@ -179,7 +175,7 @@ func (s *MsgServerTestSuite) TestFailsWhenNotEnoughSharesMulti() {
 	)
 
 	// THEN an error is thrown and Alice and Dex balances remain unchanged
-	s.Assert().ErrorIs(err, types.ErrNotEnoughShares)
+	s.Require().ErrorIs(err, types.ErrNotEnoughShares)
 
 	// TODO: this is currently failing in testing,
 	// may be a bug may just be an issue with how state is retracted on failure in test framework
@@ -212,7 +208,6 @@ func (s *MsgServerTestSuite) TestFailsWithNonExistentPair() {
 
 func (s *MsgServerTestSuite) TestFailsWithInvalidTick() {
 	s.fundAliceBalances(100, 0)
-
 
 	// IF Alice Deposists 100
 	s.aliceDeposits(NewDeposit(100, 0, 0, 0))

@@ -35,6 +35,37 @@ func CreateDepositEvent(creator string, receiver string, token0 string, token1 s
 	)
 }
 
+func createDepositFailedEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, otherAttrs ...sdk.Attribute) sdk.Event {
+	attrs := []sdk.Attribute{
+		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
+		sdk.NewAttribute(sdk.AttributeKeyAction, DepositFailEventKey),
+		sdk.NewAttribute(DepositFailEventCreator, creator),
+		sdk.NewAttribute(DepositFailEventReceiver, receiver),
+		sdk.NewAttribute(DepositFailEventToken0, token0),
+		sdk.NewAttribute(DepositFailEventToken1, token1),
+		sdk.NewAttribute(DepositFailEventPrice, tickIndex),
+		sdk.NewAttribute(DepositFailEventFeeIndex, feeIndex),
+	}
+	attrs = append(attrs, otherAttrs...)
+	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
+}
+
+func CreateDepositFailedEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, oldReserve0 string, oldReserve1 string, amount0 string, amount1 string, otherAttrs ...sdk.Attribute) sdk.Event {
+	return createDepositEvent(
+		creator,
+		receiver,
+		token0,
+		token1,
+		tickIndex,
+		feeIndex,
+
+		sdk.NewAttribute(DepositEventOldReserves0, oldReserve0),
+		sdk.NewAttribute(DepositEventOldReserves1, oldReserve1),
+		sdk.NewAttribute(DepositFailAmountToDeposit0, amount0),
+		sdk.NewAttribute(DepositFailAmountToDeposit1, amount1),
+	)
+}
+
 func createWithdrawEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, otherAttrs ...sdk.Attribute) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),

@@ -11,7 +11,11 @@ func BasePrice() sdk.Dec {
 // Iterative implementation of exponentiation by squaring algorithm, taken from Wikipedia (https://en.wikipedia.org/wiki/Exponentiation_by_squaring#With_constant_auxiliary_memory)
 // Note: sdk.Dec will panic on overflow
 func Pow(x sdk.Dec, n int64) sdk.Dec {
+<<<<<<< HEAD
 	if n == 0 {
+=======
+	if n == 1 {
+>>>>>>> 0e04c6116ac6266be7db14df216757f8976f77f8
 		return sdk.OneDec()
 	}
 

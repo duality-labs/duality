@@ -21,7 +21,6 @@ func (k Keeper) GetTickMap(
 	ctx sdk.Context,
 	pairId string,
 	tickIndex int64,
-
 ) (val types.TickMap, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickMapKeyPrefix))
 
