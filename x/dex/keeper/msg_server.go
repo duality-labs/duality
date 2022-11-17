@@ -89,7 +89,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 		amountToDeposit := msg.AmountIn.Sub(amount_left)
 		if amountToDeposit.GT(sdk.ZeroDec()) {
-			coinIn := sdk.NewCoin(token0, sdk.NewIntFromBigInt(msg.AmountIn.BigInt()))
+			coinIn := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amountToDeposit.BigInt()))
 			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
 				return &types.MsgSwapResponse{}, err
 			}
@@ -114,7 +114,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 		amountToDeposit := msg.AmountIn.Sub(amount_left)
 		if amountToDeposit.GT(sdk.ZeroDec()) {
-			coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(msg.AmountIn.BigInt()))
+			coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountToDeposit.BigInt()))
 			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
 				return &types.MsgSwapResponse{}, err
 			}
