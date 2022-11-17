@@ -291,137 +291,137 @@ func (s *MsgServerTestSuite) TestFindNextTick0To1WithMinLiq(){
 
 // CalcTrueAmounts ////////////////////////////////////////////////////////////
 
-func (s *MsgServerTestSuite) TestCalcTrueAmountsEmptyPoolBothSides(){
-	// WHEN deposit into an empty pool
-	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(1), sdk.NewDec(0), sdk.NewDec(0), sdk.NewDec(50), sdk.NewDec(20))
+// func (s *MsgServerTestSuite) TestCalcTrueAmountsEmptyPoolBothSides(){
+// 	// WHEN deposit into an empty pool
+// 	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(1), sdk.NewDec(0), sdk.NewDec(0), sdk.NewDec(50), sdk.NewDec(20))
 
-	// THEN both amounts are used fully
+// 	// THEN both amounts are used fully
 
-	s.Assert().Equal(sdk.NewDec(50), amount0)
-	s.Assert().Equal(sdk.NewDec(20), amount1)
-	s.Assert().Equal(sdk.NewDec(70), sharesMinted)
-}
+// 	s.Assert().Equal(sdk.NewDec(50), amount0)
+// 	s.Assert().Equal(sdk.NewDec(20), amount1)
+// 	s.Assert().Equal(sdk.NewDec(70), sharesMinted)
+// }
 
-func (s *MsgServerTestSuite) TestCalcTrueAmountsEmptyPoolToken0(){
-	// WHEN deposit only Token0 into an empty pool
-	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(2), sdk.NewDec(0), sdk.NewDec(0), sdk.NewDec(50), sdk.NewDec(0))
+// func (s *MsgServerTestSuite) TestCalcTrueAmountsEmptyPoolToken0(){
+// 	// WHEN deposit only Token0 into an empty pool
+// 	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(2), sdk.NewDec(0), sdk.NewDec(0), sdk.NewDec(50), sdk.NewDec(0))
 
-	// THEN all of Token0 is used
+// 	// THEN all of Token0 is used
 
-	s.Assert().Equal(sdk.NewDec(50), amount0)
-	s.Assert().Equal(sdk.NewDec(0), amount1)
-	s.Assert().Equal(sdk.NewDec(50), sharesMinted)
-}
+// 	s.Assert().Equal(sdk.NewDec(50), amount0)
+// 	s.Assert().Equal(sdk.NewDec(0), amount1)
+// 	s.Assert().Equal(sdk.NewDec(50), sharesMinted)
+// }
 
-func (s *MsgServerTestSuite) TestCalcTrueAmountsEmptyPoolToken1(){
-	// WHEN deposit only Token1 into an empty pool
-	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(2), sdk.NewDec(0), sdk.NewDec(0), sdk.NewDec(0), sdk.NewDec(50))
+// func (s *MsgServerTestSuite) TestCalcTrueAmountsEmptyPoolToken1(){
+// 	// WHEN deposit only Token1 into an empty pool
+// 	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(2), sdk.NewDec(0), sdk.NewDec(0), sdk.NewDec(0), sdk.NewDec(50))
 
-	// THEN all of Token1 is used
+// 	// THEN all of Token1 is used
 
-	s.Assert().Equal(sdk.NewDec(0), amount0)
-	s.Assert().Equal(sdk.NewDec(50), amount1)
-	s.Assert().Equal(sdk.NewDec(100), sharesMinted)
-}
+// 	s.Assert().Equal(sdk.NewDec(0), amount0)
+// 	s.Assert().Equal(sdk.NewDec(50), amount1)
+// 	s.Assert().Equal(sdk.NewDec(100), sharesMinted)
+// }
 
-func (s *MsgServerTestSuite) TestCalcTrueAmounts2SidedPoolBothSidesRightRatio(){
-	// WHEN deposit into a pool with a ratio of 2:5 with the same ratio all of the tokens are used
-	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(2), sdk.NewDec(20), sdk.NewDec(50), sdk.NewDec(4), sdk.NewDec(10))
+// func (s *MsgServerTestSuite) TestCalcTrueAmounts2SidedPoolBothSidesRightRatio(){
+// 	// WHEN deposit into a pool with a ratio of 2:5 with the same ratio all of the tokens are used
+// 	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(2), sdk.NewDec(20), sdk.NewDec(50), sdk.NewDec(4), sdk.NewDec(10))
 
-	// THEN both amounts are fully user
+// 	// THEN both amounts are fully user
 
-	s.Assert().Equal(sdk.NewDec(4), amount0)
-	s.Assert().Equal(sdk.NewDec(10), amount1)
-	s.Assert().Equal(sdk.NewDec(24), sharesMinted)
-}
+// 	s.Assert().Equal(sdk.NewDec(4), amount0)
+// 	s.Assert().Equal(sdk.NewDec(10), amount1)
+// 	s.Assert().Equal(sdk.NewDec(24), sharesMinted)
+// }
 
-func (s *MsgServerTestSuite) TestCalcTrueAmounts2SidedPoolBothSidesWrongRatio(){
-	// WHEN deposit into a pool with a ratio of 3:2 with a ratio of 2:1
-	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(3), sdk.NewDec(3), sdk.NewDec(2), sdk.NewDec(20), sdk.NewDec(10))
+// func (s *MsgServerTestSuite) TestCalcTrueAmounts2SidedPoolBothSidesWrongRatio(){
+// 	// WHEN deposit into a pool with a ratio of 3:2 with a ratio of 2:1
+// 	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(3), sdk.NewDec(3), sdk.NewDec(2), sdk.NewDec(20), sdk.NewDec(10))
 
-	// THEN all of Token1 is used and 3/4 of token0 is used
+// 	// THEN all of Token1 is used and 3/4 of token0 is used
 
-	s.Assert().Equal(sdk.NewDec(15), amount0)
-	s.Assert().Equal(sdk.NewDec(10), amount1)
-	s.Assert().Equal(sdk.NewDec(45), sharesMinted)
-}
+// 	s.Assert().Equal(sdk.NewDec(15), amount0)
+// 	s.Assert().Equal(sdk.NewDec(10), amount1)
+// 	s.Assert().Equal(sdk.NewDec(45), sharesMinted)
+// }
 
-func (s *MsgServerTestSuite) TestCalcTrueAmounts2SidedPoolBothSidesWrongRatio2(){
-	// IF deposit into a pool with a ratio of 2:3 with a ratio of 1:2
-	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(3), sdk.NewDec(2), sdk.NewDec(3), sdk.NewDec(10), sdk.NewDec(20))
+// func (s *MsgServerTestSuite) TestCalcTrueAmounts2SidedPoolBothSidesWrongRatio2(){
+// 	// IF deposit into a pool with a ratio of 2:3 with a ratio of 1:2
+// 	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(3), sdk.NewDec(2), sdk.NewDec(3), sdk.NewDec(10), sdk.NewDec(20))
 
-	// THEN all of Token0 is used and 3/4 of token1 is used
+// 	// THEN all of Token0 is used and 3/4 of token1 is used
 
-	s.Assert().Equal(sdk.NewDec(10), amount0)
-	s.Assert().Equal(sdk.NewDec(15), amount1)
-	s.Assert().Equal(sdk.NewDec(55), sharesMinted)
-}
+// 	s.Assert().Equal(sdk.NewDec(10), amount0)
+// 	s.Assert().Equal(sdk.NewDec(15), amount1)
+// 	s.Assert().Equal(sdk.NewDec(55), sharesMinted)
+// }
 
-func (s *MsgServerTestSuite) TestCalcTrueAmounts1SidedPoolBothSides(){
-	// WHEN deposit Token0 and Token1 into a pool with only Token0
-	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(3), sdk.NewDec(10), sdk.NewDec(0), sdk.NewDec(10), sdk.NewDec(10))
+// func (s *MsgServerTestSuite) TestCalcTrueAmounts1SidedPoolBothSides(){
+// 	// WHEN deposit Token0 and Token1 into a pool with only Token0
+// 	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(3), sdk.NewDec(10), sdk.NewDec(0), sdk.NewDec(10), sdk.NewDec(10))
 
-	// THEN only Token0 is used
+// 	// THEN only Token0 is used
 
-	s.Assert().Equal(sdk.NewDec(10), amount0)
-	s.Assert().Equal(sdk.NewDec(0), amount1)
-	s.Assert().Equal(sdk.NewDec(10), sharesMinted)
-}
+// 	s.Assert().Equal(sdk.NewDec(10), amount0)
+// 	s.Assert().Equal(sdk.NewDec(0), amount1)
+// 	s.Assert().Equal(sdk.NewDec(10), sharesMinted)
+// }
 
-func (s *MsgServerTestSuite) TestCalcTrueAmounts1SidedPoolBothSides2(){
-	// WHEN deposit Token0 and Token1 into a pool with only Token1
-	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(3), sdk.NewDec(0), sdk.NewDec(10), sdk.NewDec(10), sdk.NewDec(10))
+// func (s *MsgServerTestSuite) TestCalcTrueAmounts1SidedPoolBothSides2(){
+// 	// WHEN deposit Token0 and Token1 into a pool with only Token1
+// 	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(3), sdk.NewDec(0), sdk.NewDec(10), sdk.NewDec(10), sdk.NewDec(10))
 
-	// THEN only Token1 is used
+// 	// THEN only Token1 is used
 
-	s.Assert().Equal(sdk.NewDec(0), amount0)
-	s.Assert().Equal(sdk.NewDec(10), amount1)
-	s.Assert().Equal(sdk.NewDec(30), sharesMinted)
-}
+// 	s.Assert().Equal(sdk.NewDec(0), amount0)
+// 	s.Assert().Equal(sdk.NewDec(10), amount1)
+// 	s.Assert().Equal(sdk.NewDec(30), sharesMinted)
+// }
 
-func (s *MsgServerTestSuite) TestCalcTrueAmounts1SidedPool1SidedToken0(){
-	// WHEN deposit Token0 into a pool with only Token1
-	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(3), sdk.NewDec(0), sdk.NewDec(10), sdk.NewDec(10), sdk.NewDec(0))
+// func (s *MsgServerTestSuite) TestCalcTrueAmounts1SidedPool1SidedToken0(){
+// 	// WHEN deposit Token0 into a pool with only Token1
+// 	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(3), sdk.NewDec(0), sdk.NewDec(10), sdk.NewDec(10), sdk.NewDec(0))
 
-	// THEN no amounts are used
+// 	// THEN no amounts are used
 
-	s.Assert().Equal(sdk.NewDec(0), amount0)
-	s.Assert().Equal(sdk.NewDec(0), amount1)
-	s.Assert().Equal(sdk.NewDec(0), sharesMinted)
-}
+// 	s.Assert().Equal(sdk.NewDec(0), amount0)
+// 	s.Assert().Equal(sdk.NewDec(0), amount1)
+// 	s.Assert().Equal(sdk.NewDec(0), sharesMinted)
+// }
 
-func (s *MsgServerTestSuite) TestCalcTrueAmounts1SidedPool1SidedToken0B(){
-	// WHEN deposit Token0 into a pool with only Token0
-	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(3), sdk.NewDec(10), sdk.NewDec(0), sdk.NewDec(10), sdk.NewDec(0))
+// func (s *MsgServerTestSuite) TestCalcTrueAmounts1SidedPool1SidedToken0B(){
+// 	// WHEN deposit Token0 into a pool with only Token0
+// 	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(3), sdk.NewDec(10), sdk.NewDec(0), sdk.NewDec(10), sdk.NewDec(0))
 
-	// THEN all of Token0 is used
+// 	// THEN all of Token0 is used
 
-	s.Assert().Equal(sdk.NewDec(10), amount0)
-	s.Assert().Equal(sdk.NewDec(0), amount1)
-	s.Assert().Equal(sdk.NewDec(10), sharesMinted)
-}
+// 	s.Assert().Equal(sdk.NewDec(10), amount0)
+// 	s.Assert().Equal(sdk.NewDec(0), amount1)
+// 	s.Assert().Equal(sdk.NewDec(10), sharesMinted)
+// }
 
-func (s *MsgServerTestSuite) TestCalcTrueAmounts1SidedPool1SidedToken1(){
-	// WHEN deposit Token1 into a pool with only Token0
-	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(3), sdk.NewDec(10), sdk.NewDec(0), sdk.NewDec(0), sdk.NewDec(1))
+// func (s *MsgServerTestSuite) TestCalcTrueAmounts1SidedPool1SidedToken1(){
+// 	// WHEN deposit Token1 into a pool with only Token0
+// 	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(3), sdk.NewDec(10), sdk.NewDec(0), sdk.NewDec(0), sdk.NewDec(1))
 
-	// THEN no amounts are used
+// 	// THEN no amounts are used
 
-	s.Assert().Equal(sdk.NewDec(0), amount0)
-	s.Assert().Equal(sdk.NewDec(0), amount1)
-	s.Assert().Equal(sdk.NewDec(0), sharesMinted)
-}
+// 	s.Assert().Equal(sdk.NewDec(0), amount0)
+// 	s.Assert().Equal(sdk.NewDec(0), amount1)
+// 	s.Assert().Equal(sdk.NewDec(0), sharesMinted)
+// }
 
-func (s *MsgServerTestSuite) TestCalcTrueAmounts1SidedPool1SidedToken1B(){
-	// WHEN deposit Token1 into a pool with only Token1
-	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(4), sdk.NewDec(0), sdk.NewDec(10), sdk.NewDec(0), sdk.NewDec(10))
+// func (s *MsgServerTestSuite) TestCalcTrueAmounts1SidedPool1SidedToken1B(){
+// 	// WHEN deposit Token1 into a pool with only Token1
+// 	amount0, amount1, sharesMinted := keeper.CalcTrueAmounts(sdk.NewDec(4), sdk.NewDec(0), sdk.NewDec(10), sdk.NewDec(0), sdk.NewDec(10))
 
-	// THEN all of Token1 is used
+// 	// THEN all of Token1 is used
 
-	s.Assert().Equal(sdk.NewDec(0), amount0)
-	s.Assert().Equal(sdk.NewDec(10), amount1)
-	s.Assert().Equal(sdk.NewDec(40), sharesMinted)
-}
+// 	s.Assert().Equal(sdk.NewDec(0), amount0)
+// 	s.Assert().Equal(sdk.NewDec(10), amount1)
+// 	s.Assert().Equal(sdk.NewDec(40), sharesMinted)
+// }
 
 // Calc_price_0to1 ////////////////////////////////////////////////////////////
 
