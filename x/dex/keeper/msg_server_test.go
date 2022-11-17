@@ -338,17 +338,22 @@ func (s *MsgServerTestSuite) assertDepositsFail(account sdk.AccAddress, expected
 		TickIndexes: tickIndexes,
 		FeeIndexes:  feeIndexes,
 	})
-	s.Assert().ErrorIs(expectedErr, err)
+	s.Assert().ErrorIs(err, expectedErr)
 }
 
 func (s *MsgServerTestSuite) assertDepositReponse(depositResponse DepositReponse, expectedDepositResponse DepositReponse) {
 
 	for i, _ := range expectedDepositResponse.amountsA {
-		s.Assert().Equal(depositResponse.amountsA[i], expectedDepositResponse.amountsA[i])
-	}
-
-	for i, _ := range expectedDepositResponse.amountsB {
-		s.Assert().Equal(depositResponse.amountsB[i], expectedDepositResponse.amountsB[i])
+		s.Assert().Equal(
+			depositResponse.amountsA[i],
+			expectedDepositResponse.amountsA[i],
+			"Assertion failed for response.amountsA[%d]", i,
+		)
+		s.Assert().Equal(
+			depositResponse.amountsB[i],
+			expectedDepositResponse.amountsB[i],
+			"Assertion failed for response.amountsB[%d]", i,
+		)
 	}
 }
 
@@ -436,11 +441,11 @@ func (s *MsgServerTestSuite) bobMarketSells(selling string, amountIn int, minOut
 }
 
 func (s *MsgServerTestSuite) carolMarketSells(selling string, amountIn int, minOut int) {
-	s.marketSells(s.bob, selling, amountIn, minOut)
+	s.marketSells(s.carol, selling, amountIn, minOut)
 }
 
 func (s *MsgServerTestSuite) danMarketSells(selling string, amountIn int, minOut int) {
-	s.marketSells(s.bob, selling, amountIn, minOut)
+	s.marketSells(s.dan, selling, amountIn, minOut)
 }
 
 func (s *MsgServerTestSuite) marketSells(account sdk.AccAddress, selling string, amountIn int, minOut int) {
@@ -488,33 +493,7 @@ func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr
 	s.Assert().ErrorIs(expectedErr, err)
 }
 
-func (s *MsgServerTestSuite) withdrawsLimitBuy(account sdk.AccAddress, buying string, tick int) {
-	var selling string
-	if buying == "TokenA" {
-		selling = "TokenB"
-	} else {
-		selling = "TokenA"
-	}
-	s.withdrawsLimitSell(account, selling, tick)
-}
-
-func (s *MsgServerTestSuite) aliceWithdrawsLimitBuy(buying string, tick int) {
-	s.withdrawsLimitBuy(s.alice, buying, tick)
-}
-
-func (s *MsgServerTestSuite) bobWithdrawsLimitBuy(buying string, tick int) {
-	s.withdrawsLimitBuy(s.bob, buying, tick)
-}
-
-func (s *MsgServerTestSuite) carolWithdrawsLimitBuy(buying string, tick int) {
-	s.withdrawsLimitBuy(s.carol, buying, tick)
-}
-
-func (s *MsgServerTestSuite) danWithdrawsLimitBuy(buying string, tick int) {
-	s.withdrawsLimitBuy(s.dan, buying, tick)
-}
-
-func (s *MsgServerTestSuite) withdrawsLimitSell(account sdk.AccAddress, selling string, tick int) {
+func (s *MsgServerTestSuite) withdrawsLimitSell(account sdk.AccAddress, selling string, tick int, tranche int) {
 	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
 		Creator:   account.String(),
 		Receiver:  account.String(),
@@ -522,25 +501,25 @@ func (s *MsgServerTestSuite) withdrawsLimitSell(account sdk.AccAddress, selling 
 		TokenB:    "TokenB",
 		TickIndex: int64(tick),
 		KeyToken:  selling,
-		Key:       0,
+		Key:       uint64(tranche),
 	})
 	s.Assert().Nil(err)
 }
 
-func (s *MsgServerTestSuite) aliceWithdrawsLimitSell(selling string, tick int) {
-	s.withdrawsLimitSell(s.alice, selling, tick)
+func (s *MsgServerTestSuite) aliceWithdrawsLimitSell(selling string, tick int, tranche int) {
+	s.withdrawsLimitSell(s.alice, selling, tick, tranche)
 }
 
-func (s *MsgServerTestSuite) bobWithdrawsLimitSell(selling string, tick int) {
-	s.withdrawsLimitSell(s.bob, selling, tick)
+func (s *MsgServerTestSuite) bobWithdrawsLimitSell(selling string, tick int, tranche int) {
+	s.withdrawsLimitSell(s.bob, selling, tick, tranche)
 }
 
-func (s *MsgServerTestSuite) carolWithdrawsLimitSell(selling string, tick int) {
-	s.withdrawsLimitSell(s.carol, selling, tick)
+func (s *MsgServerTestSuite) carolWithdrawsLimitSell(selling string, tick int, tranche int) {
+	s.withdrawsLimitSell(s.carol, selling, tick, tranche)
 }
 
-func (s *MsgServerTestSuite) danWithdrawsLimitSell(selling string, tick int) {
-	s.withdrawsLimitSell(s.dan, selling, tick)
+func (s *MsgServerTestSuite) danWithdrawsLimitSell(selling string, tick int, tranche int) {
+	s.withdrawsLimitSell(s.dan, selling, tick, tranche)
 }
 
 func (s *MsgServerTestSuite) traceBalances() {
@@ -607,13 +586,13 @@ func (s *MsgServerTestSuite) assertAliceShares(
 }
 
 func (s *MsgServerTestSuite) assertCurrentTicks(
-	expected0To1 int64,
 	expected1To0 int64,
+	expected0To1 int64,
 ) {
 	tickMap, found := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA/TokenB")
 	s.Assert().NotNil(found)
-	s.Assert().Equal(expected0To1, tickMap.TokenPair.CurrentTick0To1)
 	s.Assert().Equal(expected1To0, tickMap.TokenPair.CurrentTick1To0)
+	s.Assert().Equal(expected0To1, tickMap.TokenPair.CurrentTick0To1)
 }
 
 func (s *MsgServerTestSuite) assertCurr0To1(curr0To1Expected int64) {
@@ -709,37 +688,37 @@ func (s *MsgServerTestSuite) assertNoLiquidityAtTick(tickIndex int64, feeIndex u
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapNoLOAToB(tick int64, tickLiqudity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
-	price := s.app.DexKeeper.Calc_price_0to1(tick)
+	price := s.app.DexKeeper.CalcPrice0To1(tick)
 
 	return calculateSingleSwapNoLO(price, tickLiqudity, amountIn)
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapOnlyLOAToB(tick int64, tickLimitOrderLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
-	price := s.app.DexKeeper.Calc_price_0to1(tick)
+	price := s.app.DexKeeper.CalcPrice0To1(tick)
 
 	return calculateSingleSwapOnlyLO(price, tickLimitOrderLiquidity, amountIn)
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapAToB(tick int64, tickLiqudidty sdk.Dec, tickLimitOrderLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
-	price := s.app.DexKeeper.Calc_price_0to1(tick)
+	price := s.app.DexKeeper.CalcPrice0To1(tick)
 
 	return calculateSingleSwap(price, tickLiqudidty, tickLimitOrderLiquidity, amountIn)
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapNoLOBToA(tick int64, tickLiqudity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
-	price := s.app.DexKeeper.Calc_price_1to0(tick)
+	price := s.app.DexKeeper.CalcPrice1To0(tick)
 
 	return calculateSingleSwapNoLO(price, tickLiqudity, amountIn)
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapOnlyLOBToA(tick int64, tickLimitOrderLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
-	price := s.app.DexKeeper.Calc_price_1to0(tick)
+	price := s.app.DexKeeper.CalcPrice1To0(tick)
 
 	return calculateSingleSwapOnlyLO(price, tickLimitOrderLiquidity, amountIn)
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapBToA(tick int64, tickLiqudidty sdk.Dec, tickLimitOrderLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
-	price := s.app.DexKeeper.Calc_price_1to0(tick)
+	price := s.app.DexKeeper.CalcPrice1To0(tick)
 
 	return calculateSingleSwap(price, tickLiqudidty, tickLimitOrderLiquidity, amountIn)
 }

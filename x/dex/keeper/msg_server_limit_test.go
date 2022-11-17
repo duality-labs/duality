@@ -106,22 +106,74 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder1to0WithWithdraw() {
 	s.fundAliceBalances(100, 500)
 	s.fundBobBalances(100, 200)
 
+	s.aliceLimitSells("TokenB", 1, 25)
 	s.aliceLimitSells("TokenB", 0, 25)
 	s.aliceLimitSells("TokenB", -1, 25)
 	s.bobMarketSells("TokenA", 40, 30)
 
 	s.assertAliceBalances(100, 450)
-	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("239.9985"))
+	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("239.998500149985001500"))
 
-	s.aliceWithdrawsLimitBuy("TokenB", 0)
+	s.aliceWithdrawsLimitSell("TokenB", 0, 0)
 
 	s.assertAliceBalances(125, 450)
-	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("239.9985"))
+	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("239.998500149985001500"))
 
-	s.aliceWithdrawsLimitBuy("TokenB", -1)
+	s.aliceWithdrawsLimitSell("TokenB", 1, 0)
 
-	s.assertAliceBalancesDec(sdk.MustNewDecFromStr("140.0015"), NewDec(450))
-	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("239.9985"))
+	s.assertAliceBalancesDec(NewDec(140), NewDec(450))
+	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("239.998500149985001500"))
+}
+
+func (s *MsgServerTestSuite) TestLimitOrderOverdraw() {
+	s.fundAliceBalances(100, 100)
+	s.fundBobBalances(100, 100)
+	s.fundCarolBalances(100, 100)
+
+	s.aliceLimitSells("TokenB", 0, 20)
+	s.bobLimitSells("TokenB", 0, 20)
+
+	s.assertAliceBalances(100, 80)
+	s.assertBobBalances(100, 80)
+	s.assertCarolBalances(100, 100)
+	s.assertDexBalances(0, 40)
+
+	s.carolMarketSells("TokenA", 20, 20)
+
+	s.assertAliceBalances(100, 80)
+	s.assertBobBalances(100, 80)
+	s.assertCarolBalances(80, 120)
+	s.assertDexBalances(20, 20)
+
+	s.aliceWithdrawsLimitSell("TokenB", 0, 0)
+
+	s.assertAliceBalances(110, 80)
+	s.assertBobBalances(100, 80)
+	s.assertCarolBalances(80, 120)
+	s.assertDexBalances(10, 20)
+
+	s.bobWithdrawsLimitSell("TokenB", 0, 0)
+
+	s.assertAliceBalances(110, 80)
+	s.assertBobBalances(110, 80)
+	s.assertCarolBalances(80, 120)
+	s.assertDexBalances(0, 20)
+
+	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
+		Creator:   s.alice.String(),
+		Receiver:  s.alice.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		TickIndex: int64(0),
+		KeyToken:  "TokenB",
+		Key:       uint64(0),
+	})
+	s.Assert().NotEmpty(err)
+
+	s.assertAliceBalances(110, 80)
+	s.assertBobBalances(110, 80)
+	s.assertCarolBalances(80, 120)
+	s.assertDexBalances(0, 20)
 }
 
 func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
@@ -152,14 +204,14 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	s.assertBobBalancesDec(sdk.MustNewDecFromStr("140.002499750024997500"), NewDec(160))
 	s.assertDexBalancesDec(sdk.MustNewDecFromStr("9.9975002499750025"), NewDec(40))
 
-	s.aliceWithdrawsLimitBuy("TokenA", 1)
+	s.aliceWithdrawsLimitSell("TokenA", 1, 0)
 
 	s.assertAliceBalancesDec(NewDec(99950), sdk.MustNewDecFromStr("524.997500249975002500"))
 	s.assertBobBalancesDec(sdk.MustNewDecFromStr("140.002499750024997500"), NewDec(160))
 	//40 - 24.997500249975002500 = 15.0024997500249975
 	s.assertDexBalancesDec(sdk.MustNewDecFromStr("9.9975002499750025"), sdk.MustNewDecFromStr("15.0024997500249975"))
 
-	s.aliceWithdrawsLimitSell("TokenA", 0)
+	s.aliceWithdrawsLimitSell("TokenA", 0, 0)
 
 	s.assertAliceBalancesDec(NewDec(99950), sdk.MustNewDecFromStr("540"))
 	s.assertBobBalancesDec(sdk.MustNewDecFromStr("140.002499750024997500"), NewDec(160))
@@ -292,7 +344,7 @@ func (s *MsgServerTestSuite) TestProgressiveLimitOrderFill() {
 	s.assertBobBalances(90, 210)
 	s.assertDexBalances(10, 50)
 
-	s.aliceWithdrawsLimitBuy("TokenB", 0)
+	s.aliceWithdrawsLimitSell("TokenB", 0, 0)
 
 	// Limit order is filled progressively
 	s.assertAliceBalances(102, 440)
