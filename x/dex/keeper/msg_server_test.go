@@ -727,7 +727,7 @@ func (s *MsgServerTestSuite) calculateSingleSwapAToB(tick int64, tickLiqudidty s
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapNoLOBToA(tick int64, tickLiqudity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
-	price, _ := s.app.DexKeeper.Calc_price_1to0(tick)
+	price, _ := s.app.DexKeeper.Calc_price_1to0(-1 * tick)
 
 	return calculateSingleSwapNoLO(price, tickLiqudity, amountIn)
 }
@@ -754,27 +754,27 @@ func calculateSingleSwapOnlyLO(price sdk.Dec, tickLimitOrderLiquidity sdk.Dec, a
 
 func calculateSingleSwap(price sdk.Dec, tickLiquidity sdk.Dec, tickLimitOrderLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
 	// swap against CSMM liquidity
-	amountRemaining, amountOut := calculateSwap(price, tickLiquidity, amountIn)
+	amountLeft, amountOut := calculateSwap(price, tickLiquidity, amountIn)
+	// fmt.Printf("left %s out %s\n", amountLeft, amountOut)
 
 	// swap against limit orders
-	if amountRemaining.GT(sdk.ZeroDec()) {
-		// fmt.Printf("remaining %s out %s limit order liq %s\n", amountRemaining, amountOut, tickLimitOrderLiquidity)
-		tmpAmountRemaining, tmpAmountOut := calculateSwap(price, tickLimitOrderLiquidity, amountRemaining)
-		amountRemaining = tmpAmountRemaining
+	if amountLeft.GT(sdk.ZeroDec()) {
+		tmpAmountLeft, tmpAmountOut := calculateSwap(price, tickLimitOrderLiquidity, amountLeft)
+		amountLeft = tmpAmountLeft
 		amountOut = amountOut.Add(tmpAmountOut)
 	}
-	return amountRemaining, amountOut
+	return amountLeft, amountOut
 }
 
 func calculateSwap(price sdk.Dec, liquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
 	if tmpAmountOut := price.Mul(amountIn); tmpAmountOut.LT(liquidity) {
-		// fmt.Printf("sufficieddnt liq: price %s, liq %s, in %s, tmpOut %s\n", price, liquidity, amountIn, tmpAmountOut)
+		// fmt.Printf("sufficient tmpOut %s\n", tmpAmountOut)
 		// sufficient liquidity
 		return sdk.ZeroDec(), tmpAmountOut
 	} else {
-		// fmt.Printf("insufficient liq: price %s, liq %s, in %s, tmpOut %s\n", price, liquidity, amountIn, tmpAmountOut)
 		// only sufficient for part of amountIn
 		tmpAmountIn := liquidity.Quo(price)
+		// fmt.Printf("insufficient tmpIn %s\n", tmpAmountIn)
 		return amountIn.Sub(tmpAmountIn), liquidity
 	}
 }
