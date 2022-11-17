@@ -38,7 +38,8 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	anteDecorators := []sdk.AnteDecorator{
 		ante.NewSetUpContextDecorator(),
 		ante.NewRejectExtensionOptionsDecorator(),
-		consumerante.NewMsgFilterDecorator(options.ConsumerKeeper),
+		// temporarily disabled so that chain can be tested locally without the provider chain running
+		//consumerante.NewMsgFilterDecorator(options.ConsumerKeeper),
 		consumerante.NewDisabledModulesDecorator("/cosmos.evidence", "/cosmos.slashing"),
 		ante.NewMempoolFeeDecorator(),
 		ante.NewValidateBasicDecorator(),

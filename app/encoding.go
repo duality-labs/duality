@@ -3,7 +3,7 @@ package app
 import (
 	appparams "github.com/NicholasDotSol/duality/app/params"
 	"github.com/cosmos/cosmos-sdk/std"
-	"github.com/tendermint/spm/cosmoscmd"
+	"github.com/ignite-hq/cli/ignite/pkg/cosmoscmd"
 )
 
 // MakeTestEncodingConfig creates an EncodingConfig for testing.

@@ -71,7 +71,7 @@ func TestShowTickMap(t *testing.T) {
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
 			args := []string{
-				string(tc.idTickIndex),
+				fmt.Sprint(tc.idTickIndex),
 			}
 			args = append(args, tc.args...)
 			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowTickMap(), args)

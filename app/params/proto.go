@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
-	"github.com/tendermint/spm/cosmoscmd"
+	"github.com/ignite-hq/cli/ignite/pkg/cosmoscmd"
 )
 
 // MakeTestEncodingConfig creates an EncodingConfig for a non-amino based test configuration.

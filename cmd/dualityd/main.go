@@ -5,7 +5,7 @@ import (
 
 	"github.com/NicholasDotSol/duality/app"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
-	"github.com/tendermint/spm/cosmoscmd"
+	"github.com/ignite-hq/cli/ignite/pkg/cosmoscmd"
 )
 
 func main() {
@@ -18,6 +18,9 @@ func main() {
 		app.New,
 		// this line is used by starport scaffolding # root/arguments
 	)
+
+	rootCmd.AddCommand(AddConsumerSectionCmd(app.DefaultNodeHome))
+
 	if err := svrcmd.Execute(rootCmd, app.DefaultNodeHome); err != nil {
 		os.Exit(1)
 	}
