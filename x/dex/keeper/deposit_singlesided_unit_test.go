@@ -227,8 +227,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityA() {
 	s.assertDexBalances(10, 0)
 	s.assertLiquidityAtTick(10, 0, 0, 0)
 	s.assertCurr1To0(-1)
-	s.assertCurr0To1(math.MinInt64)
 	s.assertMinTick(-1)
+	s.assertCurr0To1(0)
 	s.assertMaxTick(math.MinInt64)
 
 	// WHEN
@@ -241,8 +241,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityA() {
 	s.assertDexBalances(20, 0)
 	s.assertLiquidityAtTick(20, 0, 0, 0)
 	s.assertCurr1To0(-1)
-	s.assertCurr0To1(math.MinInt64)
 	s.assertMinTick(-1)
+	s.assertCurr0To1(0)
 	s.assertMaxTick(math.MinInt64)
 }
 
@@ -256,7 +256,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityB() {
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
 	s.assertLiquidityAtTick(0, 10, 0, 0)
-	s.assertCurr1To0(math.MaxInt64)
+	s.assertCurr1To0(0)
 	s.assertCurr0To1(1)
 	s.assertMinTick(math.MaxInt64)
 	s.assertMaxTick(1)
@@ -270,7 +270,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityB() {
 	s.assertLiquidityAtTick(0, 20, 0, 0)
 	s.assertAliceBalances(50, 30)
 	s.assertDexBalances(0, 20)
-	s.assertCurr1To0(math.MaxInt64)
+	s.assertCurr1To0(0)
 	s.assertCurr0To1(1)
 	s.assertMinTick(math.MaxInt64)
 	s.assertMaxTick(1)
@@ -323,9 +323,9 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiA() {
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
 	s.assertLiquidityAtTick(10, 0, 0, 0)
-	s.assertCurr1To0(-1)
-	s.assertCurr0To1(math.MinInt64)
 	s.assertMinTick(-1)
+	s.assertCurr1To0(-1)
+	s.assertCurr0To1(0)
 	s.assertMaxTick(math.MinInt64)
 
 	// WHEN
@@ -337,13 +337,13 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiA() {
 
 	// THEN
 	// assert 20 of token B deposited at tick 1 fee 0 and ticks unchanged
-	s.assertAliceBalances(30, 50)
-	s.assertDexBalances(20, 0)
+	s.assertAliceBalances(20, 50)
+	s.assertDexBalances(30, 0)
 	s.assertLiquidityAtTick(20, 0, 0, 0)
 	s.assertLiquidityAtTick(10, 0, 0, 1)
-	s.assertCurr1To0(-3)
-	s.assertCurr0To1(math.MinInt64)
 	s.assertMinTick(-3)
+	s.assertCurr1To0(-1)
+	s.assertCurr0To1(0)
 	s.assertMaxTick(math.MinInt64)
 }
 
@@ -357,9 +357,9 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiB() {
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
 	s.assertLiquidityAtTick(0, 10, 0, 0)
-	s.assertCurr1To0(math.MaxInt64)
-	s.assertCurr0To1(1)
 	s.assertMinTick(math.MaxInt64)
+	s.assertCurr0To1(1)
+	s.assertCurr1To0(0)
 	s.assertMaxTick(1)
 
 	// WHEN
@@ -371,12 +371,12 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiB() {
 
 	// THEN
 	// assert 20 of token B deposited at tick 1 fee 0 and ticks unchanged
-	s.assertAliceBalances(50, 30)
-	s.assertDexBalances(0, 20)
+	s.assertAliceBalances(50, 20)
+	s.assertDexBalances(0, 30)
 	s.assertLiquidityAtTick(0, 20, 0, 0)
 	s.assertLiquidityAtTick(0, 10, 0, 1)
-	s.assertCurr1To0(math.MaxInt64)
-	s.assertCurr0To1(3)
 	s.assertMinTick(math.MaxInt64)
+	s.assertCurr1To0(0)
+	s.assertCurr0To1(1)
 	s.assertMaxTick(3)
 }

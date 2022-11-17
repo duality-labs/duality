@@ -78,6 +78,7 @@ func (k Keeper) DepositCore(
 			*upperReserve1,
 			amount0,
 			amount1,
+			*lowerTotalShares,
 		)
 
 		if trueAmount0.Equal(sdk.ZeroDec()) && trueAmount1.Equal(sdk.ZeroDec()) {
@@ -201,6 +202,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		if !found {
 			return sdkerrors.Wrapf(types.ErrValidShareNotFound, "No valid share owner fonnd")
 		}
+		userSharesOwned := &shareOwner.SharesOwned
 
 		feeValue, found := k.GetFeeList(ctx, feeIndex)
 		if !found {
@@ -228,21 +230,16 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 
 		// calculates the amount to withdraw of each token based on a ratio of the amountToRemove to
 		// totalShares multiplied by the amount of the respective asset
-		price1To0 := k.CalcPrice1To0(tickIndex)
-		sharesToken1 := upperTickFeeReserve1.Mul(price1To0)
-		sharesToken0 := lowerTickFeeTotalShares.Sub(sharesToken1)
-		sharesToRemoveRatio := sharesToRemove.Quo(*lowerTickFeeTotalShares)
-		reserve0ToRemove := sharesToRemoveRatio.Mul(sharesToken0)
-		// Dividing by opposite price to reverse numerical errors exactly
-		reserve1ToRemove := sharesToRemoveRatio.Mul(sharesToken1).Quo(price1To0)
+		sharesToRemove = MinDec(sharesToRemove, *userSharesOwned)
+		ownershipRatio := sharesToRemove.Quo(*lowerTickFeeTotalShares)
+		reserve1ToRemove := ownershipRatio.Mul(*upperTickFeeReserve1)
+		reserve0ToRemove := ownershipRatio.Mul(*lowerTickFeeReserve0)
 
-		//Updates upper/lowerTick based on subtracting the calculated amount from the previous reserve0 and reserve1
+		// Updates upper/lowerTick based on subtracting the calculated amount from the previous reserve0 and reserve1
 		*lowerTickFeeReserve0 = lowerTickFeeReserve0.Sub(reserve0ToRemove)
 		*upperTickFeeReserve1 = upperTickFeeReserve1.Sub(reserve1ToRemove)
-		*lowerTickFeeTotalShares = lowerTickFeeTotalShares.Sub(msg.SharesToRemove[i])
-
-		// subtracts sahresToRemove from the User's personl number of sharesOwned.
-		shareOwner.SharesOwned = shareOwner.SharesOwned.Sub(msg.SharesToRemove[i])
+		*lowerTickFeeTotalShares = lowerTickFeeTotalShares.Sub(sharesToRemove)
+		*userSharesOwned = userSharesOwned.Sub(sharesToRemove)
 
 		// adds reserve0ToRemove/reserve1ToRemove to totals
 		totalReserve0ToRemove = totalReserve0ToRemove.Add(reserve0ToRemove)
@@ -345,7 +342,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 		// If a tick at Current0to1 is not found, decrement CurrentTick0to1 (to the next tick that is supposed to contain reserve1) and check again
 		if !Current1Found {
-			pair.TokenPair.CurrentTick0To1 = pair.TokenPair.CurrentTick0To1 + 1
+			pair.TokenPair.CurrentTick0To1++
 			continue
 		}
 
@@ -511,7 +508,6 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 			// If there is not enough to complete the trade
 			if Current0Data.TickData.Reserve0AndShares[i].Reserve0.LT(amount_left.Mul(price_1to0)) {
-				// Add the reserves to the amount out
 				amount_out = amount_out.Add(Current0Data.TickData.Reserve0AndShares[i].Reserve0)
 				amountInTemp := Current0Data.TickData.Reserve0AndShares[i].Reserve0.Quo(price_1to0)
 				amount_left = amount_left.Sub(amountInTemp)
@@ -520,8 +516,8 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			} else {
 				amountOutTemp := amount_left.Mul(price_1to0)
 				amount_out = amount_out.Add(amountOutTemp)
-				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Add(amount_left)
 				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Sub(amountOutTemp)
+				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Add(amount_left)
 				amount_left = sdk.ZeroDec()
 			}
 

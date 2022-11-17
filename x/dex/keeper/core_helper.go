@@ -252,11 +252,12 @@ func (k Keeper) FindNextTick0To1(goCtx context.Context, pairMap types.PairMap) (
 
 // Balance trueAmount1 to the pool ratio
 func CalcTrueAmounts(
-	price1To0 sdk.Dec,
+	centerTickPrice1To0 sdk.Dec,
 	lowerReserve0 sdk.Dec,
 	upperReserve1 sdk.Dec,
 	amount0 sdk.Dec,
 	amount1 sdk.Dec,
+	totalShares sdk.Dec,
 ) (trueAmount0 sdk.Dec, trueAmount1 sdk.Dec, sharesMinted sdk.Dec) {
 	if lowerReserve0.GT(sdk.ZeroDec()) && upperReserve1.GT(sdk.ZeroDec()) {
 		ratio0 := amount0.Quo(lowerReserve0)
@@ -268,19 +269,22 @@ func CalcTrueAmounts(
 			trueAmount0 = ratio1.Mul(lowerReserve0)
 			trueAmount1 = amount1
 		}
-		sharesMinted = trueAmount1.Mul(price1To0).Add(trueAmount0)
 	} else if lowerReserve0.GT(sdk.ZeroDec()) { // && upperReserve1 == 0
 		trueAmount0 = amount0
 		trueAmount1 = sdk.ZeroDec()
-		sharesMinted = amount0
 	} else if upperReserve1.GT(sdk.ZeroDec()) { // && lowerReserve0 == 0
 		trueAmount0 = sdk.ZeroDec()
 		trueAmount1 = amount1
-		sharesMinted = amount1.Mul(price1To0)
 	} else {
 		trueAmount0 = amount0
 		trueAmount1 = amount1
-		sharesMinted = trueAmount1.Mul(price1To0).Add(trueAmount0)
+	}
+	valueMintedToken0 := trueAmount1.Mul(centerTickPrice1To0).Add(trueAmount0)
+	valueExistingToken0 := upperReserve1.Mul(centerTickPrice1To0).Add(lowerReserve0)
+	if valueExistingToken0.GT(sdk.ZeroDec()) {
+		sharesMinted = valueMintedToken0.Quo(valueExistingToken0).Mul(totalShares)
+	} else {
+		sharesMinted = valueMintedToken0
 	}
 	return
 }

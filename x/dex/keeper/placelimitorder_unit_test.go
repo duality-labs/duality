@@ -226,9 +226,9 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityA() {
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
 	s.assertLiquidityAtTick(10, 0, 0, 0)
-	s.assertCurr1To0(-1)
-	s.assertCurr0To1(math.MinInt64)
 	s.assertMinTick(-1)
+	s.assertCurr1To0(-1)
+	s.assertCurr0To1(0)
 	s.assertMaxTick(math.MinInt64)
 
 	// WHEN
@@ -240,9 +240,9 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityA() {
 	s.assertAliceBalances(30, 50)
 	s.assertDexBalances(20, 0)
 	s.assertLiquidityAtTick(20, 0, 0, 0)
-	s.assertCurr1To0(-1)
-	s.assertCurr0To1(math.MinInt64)
 	s.assertMinTick(-1)
+	s.assertCurr1To0(-1)
+	s.assertCurr0To1(0)
 	s.assertMaxTick(math.MinInt64)
 }
 

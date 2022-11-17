@@ -105,7 +105,9 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlShiftsTickLeft() {
 	s.aliceWithdraws(NewWithdrawl(100, 1, 0))
 
 	// THEN currentTick0To1 = 0
-	//TODO: this is currently failling because of TickCount bug
+	// TODO: this is currently failling because of precision bug
+	// basically our deposit and withdraw are not perfect computational inversions
+	// (they are perfect mathematical inversions)
 	s.assertCurrentTicks(0, 3)
 }
 

@@ -138,7 +138,7 @@ func (s *MsgServerTestSuite) TestLimitOrderOverdraw() {
 	s.assertCarolBalances(100, 100)
 	s.assertDexBalances(0, 40)
 
-	s.carolSells("TokenA", 20, 20)
+	s.carolMarketSells("TokenA", 20, 20)
 
 	s.assertAliceBalances(100, 80)
 	s.assertBobBalances(100, 80)
