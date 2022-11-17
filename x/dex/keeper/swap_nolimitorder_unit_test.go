@@ -267,7 +267,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOMoves1To0() {
 
 func (s *MsgServerTestSuite) TestSwapNoLOMoves0to1() {
 	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(0, 50)
+	s.fundBobBalances(50, 0)
 	// GIVEN
 	// deposit 10 of token B at tick 0 fee 1
 	s.aliceDeposits(
