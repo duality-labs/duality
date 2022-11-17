@@ -1,108 +1,183 @@
 package keeper_test
 
 import (
-	"fmt"
-
+	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	//authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func newACoin(amt sdk.Int) sdk.Coin {
-	return sdk.NewCoin("TokenA", amt)
-}
+func (s *MsgServerTestSuite) TestSingleDepositDepositAmountZero() {
+	s.fundAliceBalances(25, 25)
+	s.fundBobBalances(25, 25)
 
-func newBCoin(amt sdk.Int) sdk.Coin {
-	return sdk.NewCoin("TokenB", amt)
-}
-
-func convInt(amt string) sdk.Int {
-	IntAmt, err := sdk.NewIntFromString(amt)
-
-	_ = err
-	return IntAmt
-}
-
-func newDec(amt string) sdk.Dec {
-	decAmt, _ := sdk.NewDecFromStr(amt)
-
-	return decAmt
-}
-func (suite *IntegrationTestSuite) TestHasBalance() {
-	app, ctx := suite.app, suite.ctx
-	addr := sdk.AccAddress([]byte("addr1_______________"))
-
-	acc := app.AccountKeeper.NewAccountWithAddress(ctx, addr)
-	app.AccountKeeper.SetAccount(ctx, acc)
-
-	balances := sdk.NewCoins(newACoin(sdk.NewInt(100)))
-
-	suite.Require().False(app.BankKeeper.HasBalance(ctx, addr, newACoin(sdk.NewInt(99))))
-
-	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, addr, balances))
-	suite.Require().False(app.BankKeeper.HasBalance(ctx, addr, newACoin(sdk.NewInt(101))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, addr, newACoin(sdk.NewInt(100))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, addr, newACoin(sdk.NewInt(1))))
-}
-
-func (suite *IntegrationTestSuite) TestSingleDeposit() {
-	fmt.Println("Testing TestSingleDeposit")
-	app, ctx := suite.app, suite.ctx
-	//holderAcc := authtypes.NewEmptyModuleAccount("holder")
-	alice := sdk.AccAddress([]byte("alice"))
-	bob := sdk.AccAddress([]byte("bob"))
-
-	accAlice := app.AccountKeeper.NewAccountWithAddress(ctx, alice)
-	app.AccountKeeper.SetAccount(ctx, accAlice)
-	accBob := app.AccountKeeper.NewAccountWithAddress(ctx, bob)
-	app.AccountKeeper.SetAccount(ctx, accBob)
-
-	balanceAlice := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("500000000000000000000")))
-	balanceBob := sdk.NewCoins(newACoin(convInt("100000000000000000000")), newBCoin(convInt("200000000000000000000")))
-
-	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, alice, balanceAlice))
-	suite.Require().NoError(FundAccount(app.BankKeeper, ctx, bob, balanceBob))
-
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
-	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("1000000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("500000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
-
-	goCtx := sdk.WrapSDKContext(ctx)
-
-	// Set Fee List
-
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{0, 1})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{1, 2})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{2, 3})
-	app.DexKeeper.AppendFeeList(ctx, types.FeeList{3, 4})
-
-	fiftyDec, _ := sdk.NewDecFromStr("50")
-	createResponse, err := suite.msgServer.Deposit(goCtx, &types.MsgDeposit{
-		Creator:     alice.String(),
+	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
+		Creator:     s.alice.String(),
+		Receiver:    s.alice.String(),
 		TokenA:      "TokenA",
 		TokenB:      "TokenB",
-		AmountsA:    []sdk.Dec{sdk.ZeroDec()},
-		AmountsB:    []sdk.Dec{fiftyDec},
+		AmountsA:    []sdk.Dec{NewDec(0)},
+		AmountsB:    []sdk.Dec{NewDec(0)},
 		TickIndexes: []int64{0},
-		FeeIndexes:  []uint64{0},
-		Receiver:    alice.String(),
+		FeeIndexes:  []uint64{1},
+	})
+	s.Assert().ErrorIs(err, sdkerrors.ErrInvalidType)
+
+	s.assertAliceBalances(25, 25)
+	s.assertDexBalances(0, 0)
+
+}
+
+func (s *MsgServerTestSuite) TestSingleDepositDepositFail() {
+	s.fundAliceBalances(25, 25)
+	s.fundBobBalances(25, 25)
+
+	s.aliceDeposits(&Deposit{
+		AmountA:   NewDec(5),
+		AmountB:   NewDec(0),
+		TickIndex: 0,
+		FeeIndex:  0,
 	})
 
-	suite.Require().Nil(err)
+	s.assertAliceBalances(20, 25)
+	s.assertDexBalances(5, 0)
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newACoin(convInt("100000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("450000000000000000000"))))
-	suite.Require().False(app.BankKeeper.HasBalance(ctx, alice, newBCoin(convInt("450000000000000000001"))))
+	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
+		Creator:     s.alice.String(),
+		Receiver:    s.alice.String(),
+		TokenA:      "TokenA",
+		TokenB:      "TokenB",
+		AmountsA:    []sdk.Dec{NewDec(0)},
+		AmountsB:    []sdk.Dec{NewDec(5)},
+		TickIndexes: []int64{0},
+		FeeIndexes:  []uint64{0},
+	})
+	s.Assert().ErrorIs(err, types.ErrAllDepositsFailed)
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newACoin(convInt("100000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, bob, newBCoin(convInt("200000000000000000000"))))
+	s.assertAliceBalances(20, 25)
+	s.assertDexBalances(5, 0)
 
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newBCoin(convInt("50000000000000000000"))))
-	suite.Require().True(app.BankKeeper.HasBalance(ctx, app.AccountKeeper.GetModuleAddress("dex"), newACoin(convInt("0"))))
+}
 
-	_ = createResponse
+func (s *MsgServerTestSuite) TestMultiDepositDepositFail() {
+	s.fundAliceBalances(25, 25)
+	s.fundBobBalances(25, 25)
 
-	_ = goCtx
+	s.aliceDeposits(&Deposit{
+		AmountA:   NewDec(5),
+		AmountB:   NewDec(0),
+		TickIndex: 0,
+		FeeIndex:  0,
+	}, &Deposit{
+		AmountA:   NewDec(5),
+		AmountB:   NewDec(0),
+		TickIndex: 1,
+		FeeIndex:  0,
+	})
+
+	s.assertAliceBalances(15, 25)
+	s.assertDexBalances(10, 0)
+
+	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
+		Creator:     s.alice.String(),
+		Receiver:    s.alice.String(),
+		TokenA:      "TokenA",
+		TokenB:      "TokenB",
+		AmountsA:    []sdk.Dec{NewDec(0), NewDec(0)},
+		AmountsB:    []sdk.Dec{NewDec(5), NewDec(5)},
+		TickIndexes: []int64{0, 1},
+		FeeIndexes:  []uint64{0, 0},
+	})
+	s.Assert().ErrorIs(err, types.ErrAllDepositsFailed)
+	s.assertAliceBalances(15, 25)
+	s.assertDexBalances(10, 0)
+
+}
+
+func (s *MsgServerTestSuite) TestMultiDepositSingleFail() {
+	s.fundAliceBalances(25, 25)
+	s.fundBobBalances(25, 25)
+
+	s.aliceDeposits(&Deposit{
+		AmountA:   NewDec(5),
+		AmountB:   NewDec(0),
+		TickIndex: 0,
+		FeeIndex:  0,
+	}, &Deposit{
+		AmountA:   NewDec(5),
+		AmountB:   NewDec(0),
+		TickIndex: 1,
+		FeeIndex:  0,
+	})
+
+	s.assertAliceBalances(15, 25)
+	s.assertDexBalances(10, 0)
+
+	depositResponse, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
+		Creator:     s.alice.String(),
+		Receiver:    s.alice.String(),
+		TokenA:      "TokenA",
+		TokenB:      "TokenB",
+		AmountsA:    []sdk.Dec{NewDec(0), NewDec(5)},
+		AmountsB:    []sdk.Dec{NewDec(5), NewDec(0)},
+		TickIndexes: []int64{0, 1},
+		FeeIndexes:  []uint64{0, 0},
+	})
+	s.Require().Nil(err)
+
+	s.assertDepositReponse(DepositReponse{
+		amountsA: depositResponse.Reserve0Deposited,
+		amountsB: depositResponse.Reserve1Deposited,
+	}, DepositReponse{
+		amountsA: []sdk.Dec{sdk.ZeroDec(), NewDec(5)},
+		amountsB: []sdk.Dec{sdk.ZeroDec(), sdk.ZeroDec()},
+	})
+
+	s.assertAliceBalances(10, 25)
+	s.assertDexBalances(15, 0)
+
+}
+
+func (s *MsgServerTestSuite) TestMultiDepositAllSucceed() {
+	s.fundAliceBalances(25, 25)
+	s.fundBobBalances(25, 25)
+
+	s.aliceDeposits(&Deposit{
+		AmountA:   NewDec(5),
+		AmountB:   NewDec(0),
+		TickIndex: 0,
+		FeeIndex:  0,
+	}, &Deposit{
+		AmountA:   NewDec(5),
+		AmountB:   NewDec(0),
+		TickIndex: 1,
+		FeeIndex:  0,
+	})
+
+	s.assertAliceBalances(15, 25)
+	s.assertDexBalances(10, 0)
+
+	depositResponse, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
+		Creator:     s.alice.String(),
+		Receiver:    s.alice.String(),
+		TokenA:      "TokenA",
+		TokenB:      "TokenB",
+		AmountsA:    []sdk.Dec{NewDec(5), NewDec(5)},
+		AmountsB:    []sdk.Dec{NewDec(0), NewDec(0)},
+		TickIndexes: []int64{0, 1},
+		FeeIndexes:  []uint64{0, 0},
+	})
+
+	s.Require().Nil(err)
+
+	s.assertDepositReponse(DepositReponse{
+		amountsA: depositResponse.Reserve0Deposited,
+		amountsB: depositResponse.Reserve1Deposited,
+	}, DepositReponse{
+		amountsA: []sdk.Dec{NewDec(5), NewDec(5)},
+		amountsB: []sdk.Dec{sdk.ZeroDec(), sdk.ZeroDec()},
+	})
+
+	s.assertAliceBalances(5, 25)
+	s.assertDexBalances(20, 0)
 }
