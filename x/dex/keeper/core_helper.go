@@ -1,22 +1,20 @@
 package keeper
 
 import (
-	"strings"
 	"context"
 	"math"
-	"fmt"
+	"strings"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-
 ///////////////////////////////////////////////////////////////////////////////
 //                                   UTILS                                   //
 ///////////////////////////////////////////////////////////////////////////////
 
-func PairToTokens(pairId string) (token0 string, token1 string){
+func PairToTokens(pairId string) (token0 string, token1 string) {
 	tokens := strings.Split(pairId, "/")
 
 	return tokens[0], tokens[1]
@@ -111,7 +109,7 @@ func (k Keeper) GetOrInitReserveData(
 	tickIndex int64,
 	tokenIn string,
 	currentLimitOrderKey uint64,
-) (types.LimitOrderPoolReserveMap){
+) types.LimitOrderPoolReserveMap {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
@@ -127,7 +125,6 @@ func (k Keeper) GetOrInitReserveData(
 	return ReserveData
 }
 
-
 func (k Keeper) GetOrInitUserShareData(
 	goCtx context.Context,
 	pairId string,
@@ -135,7 +132,7 @@ func (k Keeper) GetOrInitUserShareData(
 	tokenIn string,
 	currentLimitOrderKey uint64,
 	receiver string,
-) (types.LimitOrderPoolUserShareMap){
+) types.LimitOrderPoolUserShareMap {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	UserShareData, UserShareDataFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
@@ -159,7 +156,7 @@ func (k Keeper) GetOrInitOrderPoolTotalShares(
 	tickIndex int64,
 	tokenIn string,
 	currentLimitOrderKey uint64,
-) (types.LimitOrderPoolTotalSharesMap){
+) types.LimitOrderPoolTotalSharesMap {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	TotalSharesData, TotalSharesDataFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
@@ -176,8 +173,6 @@ func (k Keeper) GetOrInitOrderPoolTotalShares(
 	return TotalSharesData
 }
 
-
-
 // Helper function for Place Limit order retrieving and or initializing mapppings used for keeping track of limit orders
 // Note: FillMap initialization is handled seperately in placeLimitOrder as it needed prior to this function being called.
 func (k Keeper) GetOrInitLimitOrderMaps(
@@ -189,15 +184,12 @@ func (k Keeper) GetOrInitLimitOrderMaps(
 	receiver string,
 ) (types.LimitOrderPoolReserveMap, types.LimitOrderPoolUserShareMap, types.LimitOrderPoolTotalSharesMap) {
 
-
 	ReserveData := k.GetOrInitReserveData(goCtx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
 	UserShareData := k.GetOrInitUserShareData(goCtx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
 	TotalSharesData := k.GetOrInitOrderPoolTotalShares(goCtx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
 
 	return ReserveData, UserShareData, TotalSharesData
 }
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //                          STATE CALCULATIONS                               //
@@ -296,35 +288,15 @@ func CalcTrueAmounts(
 
 // Calculates the price for a swap from token 0 to token 1 given a tick
 // tickIndex refers to the index of a specified tick
-func (k Keeper) Calc_price_0to1(tick_Index int64) (sdk.Dec, error) {
-	floatPrice := math.Pow(1.0001, float64(tick_Index))
-	sPrice := fmt.Sprintf("%f", floatPrice)
-
-	price, err := sdk.NewDecFromStr(sPrice)
-
-	if err != nil {
-		return sdk.ZeroDec(), err
-	} else {
-		//if startingToken {
-		price = sdk.OneDec().Quo(price)
-		//return price, nil
-		return price, nil
-	}
+func (k Keeper) Calc_price_0to1(tick_Index int64) sdk.Dec {
+	price := Pow(BasePrice(), tick_Index)
+	return sdk.OneDec().Quo(price)
 }
 
 // Calculates the price for a swap from token 1 to token 0 given a tick
 // tickIndex refers to the index of a specified tick
-func (k Keeper) Calc_price_1to0(tick_Index int64) (sdk.Dec, error) {
-	floatPrice := math.Pow(1.0001, float64(tick_Index))
-	sPrice := fmt.Sprintf("%f", floatPrice)
-
-	price, err := sdk.NewDecFromStr(sPrice)
-
-	if err != nil {
-		return sdk.ZeroDec(), err
-	} else {
-		return price, nil
-	}
+func (k Keeper) Calc_price_1to0(tick_Index int64) sdk.Dec {
+	return Pow(BasePrice(), tick_Index)
 }
 
 // Checks if a tick has reserves0 at any fee tier
@@ -406,11 +378,9 @@ func (k Keeper) GetTotalReservesAtTick(goCtx context.Context, pairId string, tic
 	return totalReserve0, totalReserve1, nil
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 //                                TICK UPDATES                               //
 ///////////////////////////////////////////////////////////////////////////////
-
 
 // should be called for every pair, tick for which token1 is added
 func (k Keeper) UpdateTickPointersPostAddToken0(goCtx context.Context, pair *types.PairMap, tick *types.TickMap) {

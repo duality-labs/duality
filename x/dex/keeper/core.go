@@ -39,7 +39,7 @@ func (k Keeper) DepositCore(
 	for i, amount0 := range amounts0 {
 		amount1 := amounts1[i]
 		tickIndex := msg.TickIndexes[i]
-		price1To0, _ := k.Calc_price_1to0(tickIndex)
+		price1To0 := k.Calc_price_1to0(tickIndex)
 		feeIndex := msg.FeeIndexes[i]
 		fee := feelist[feeIndex].Fee
 		curTick0to1 := pair.TokenPair.CurrentTick0To1
@@ -354,11 +354,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			}
 
 			// calculate currentPrice
-			price_0to1, err := k.Calc_price_0to1(pair.TokenPair.CurrentTick0To1)
-
-			if err != nil {
-				return sdk.ZeroDec(), err
-			}
+			price_0to1 := k.Calc_price_0to1(pair.TokenPair.CurrentTick0To1)
 
 			// price * amout_left + amount_out < minOut, error we cannot meet minOut threshold
 			if price_0to1.Mul(amount_left).Add(amount_out).LT(msg.MinOut) {
@@ -496,11 +492,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			//Current0Datam := Current0Data.TickData.Reserve1[i]
 
 			// calculate currentPrice and inverts
-			price_1to0, err := k.Calc_price_1to0(pair.TokenPair.CurrentTick1To0)
-
-			if err != nil {
-				return sdk.ZeroDec(), err
-			}
+			price_1to0 := k.Calc_price_1to0(pair.TokenPair.CurrentTick1To0)
 
 			// price * amout_left + amount_out < minOut, error we cannot meet minOut threshold
 			if price_1to0.Mul(amount_left).Add(amount_out).LT(msg.MinOut) {
@@ -568,6 +560,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	// @Dev token transfers happen in keeper/msg.server: Swap
 	return amount_out, nil
 }
+
 // Swap Limit Orders
 
 // Handles swapping asset 0 for asset 1 through any active limit orders at a specified tick
@@ -576,11 +569,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenIn
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// returns price for the given tick and specified direction (0 -> 1)
-	price_0to1, err := k.Calc_price_0to1(CurrentTick0to1)
-
-	if err != nil {
-		return sdk.ZeroDec(), sdk.ZeroDec(), err
-	}
+	price_0to1 := k.Calc_price_0to1(CurrentTick0to1)
 
 	// Gets tick for specified tick at currentTick0to1
 	tick, tickFound := k.GetTickMap(ctx, pairId, CurrentTick0to1)
@@ -707,11 +696,7 @@ func (k Keeper) SwapLimitOrder1to0(goCtx context.Context, pairId string, tokenIn
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// returns price for the given tick and specified direction (0 -> 1)
-	price_1to0, err := k.Calc_price_1to0(CurrentTick1to0)
-
-	if err != nil {
-		return sdk.ZeroDec(), sdk.ZeroDec(), err
-	}
+	price_1to0 := k.Calc_price_1to0(CurrentTick1to0)
 
 	tick, tickFound := k.GetTickMap(ctx, pairId, CurrentTick1to0)
 
@@ -1015,17 +1000,9 @@ func (k Keeper) WithdrawFilledLimitOrderCore(goCtx context.Context, msg *types.M
 	// So it is filled in a swap from token 1 to token 0 (since this adds token 1 into the limit order pool and removes 0)
 	price := sdk.ZeroDec()
 	if msg.KeyToken == token0 {
-		p, err := k.Calc_price_1to0(tick.TickIndex)
-		if err != nil {
-			// TODO
-		}
-		price = p
+		price = k.Calc_price_1to0(tick.TickIndex)
 	} else {
-		p, err := k.Calc_price_0to1(tick.TickIndex)
-		if err != nil {
-			// TODO
-		}
-		price = p
+		price = k.Calc_price_0to1(tick.TickIndex)
 	}
 
 	sharesFilled := FillData.FilledReserves.Quo(price)
