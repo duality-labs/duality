@@ -338,15 +338,13 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		}
 
 		// iterator for feeList
-		var i uint64 = 0
-		for i < feeSize && !amount_left.Equal(sdk.ZeroDec()) {
+		for i := uint64(0); i < feeSize && !amount_left.Equal(sdk.ZeroDec()); i++ {
 			// gets fee for given feeIndex
 			fee := feelist[i].Fee
 
 			// @dev CurrentTick0to1 - 2 * fee finds the respective tickPair (containing totalShares, reserve0)
 			Current0Data, Current0Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1-2*fee)
 			//Current0Datam := Current0Data.TickData.Reserve1[i]
-
 			// If tick/feeIndex pair is not found continue
 			if !Current0Found {
 				i++
@@ -389,14 +387,9 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				amount_left = sdk.ZeroDec()
 			}
 
-			//updates feeIndex
-			i++
-
 			//Make updates to tickMap containing reserve0/1 data to the KVStore
 			k.SetTickMap(ctx, pairId, Current0Data)
-
 			k.UpdateTickPointersPostAddToken0(goCtx, &pair, &Current0Data)
-
 		}
 
 		k.SetTickMap(ctx, pairId, Current1Data)

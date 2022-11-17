@@ -52,7 +52,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReac
 	s.bobMarketSells("TokenA", amountIn, 5)
 
 	// THEN
-	// swap should update
+	// swap should have in out
 	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOAToB(1, NewDec(10), amountInDec)
 	expectedAmountIn := amountInDec.Sub(expectedAmountInLeft)
 	s.assertBobBalancesDec(NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
