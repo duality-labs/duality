@@ -369,7 +369,6 @@ func (k Keeper) GetTotalReservesAtTick(goCtx context.Context, pairId string, tic
 
 	// When we init a pair we init reserve0, reserve1 to 0 for all feetiers and thus we can iterate over the fee tiers without worrying about nil values.
 	for i, _ := range feelist {
-
 		if swap0to1 {
 			// Given a tickIndex of reserve0 calculate the totalReserves for the tick composted of reserve0 and the related reserve1
 			totalReserve0 = totalReserve0.Add(tick.TickData.Reserve0AndShares[i].Reserve0)
@@ -382,7 +381,6 @@ func (k Keeper) GetTotalReservesAtTick(goCtx context.Context, pairId string, tic
 			totalReserve0 = totalReserve0.Add(tick.TickData.Reserve0AndShares[i+int(feeValue)].Reserve0)
 
 		}
-
 	}
 
 	return totalReserve0, totalReserve1, nil
