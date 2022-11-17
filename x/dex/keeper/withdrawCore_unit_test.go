@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"fmt"
 	"math"
 	//. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	//"github.com/NicholasDotSol/duality/x/dex/types"
@@ -24,6 +25,7 @@ func (s *MsgServerTestSuite) TestPartialWithdrawOnlyA() {
 	s.assertCurr0To1(math.MinInt64)
 
 	s.aliceWithdraws(NewWithdrawl(5, 0, 0))
+	fmt.Println("here")
 
 	s.assertAliceBalances(45, 50)
 	s.assertDexBalances(5, 0)

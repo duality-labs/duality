@@ -47,8 +47,8 @@ func (k Keeper) GetOrInitPair(goCtx context.Context, token0 string, token1 strin
 		pair = types.PairMap{
 			PairId: pairId,
 			TokenPair: &types.TokenPairType{
-				CurrentTick0To1: 0,
-				CurrentTick1To0: 0,
+				CurrentTick0To1: math.MinInt64,
+				CurrentTick1To0: math.MaxInt64,
 			},
 			MinTick: math.MaxInt64,
 			MaxTick: math.MinInt64,
