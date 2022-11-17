@@ -354,7 +354,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			}
 
 			// calculate currentPrice
-			price_0to1 := k.Calc_price_0to1(pair.TokenPair.CurrentTick0To1)
+			price_0to1 := k.Calc_price_0to1(pair.TokenPair.CurrentTick1To0)
 
 			// price * amout_left + amount_out < minOut, error we cannot meet minOut threshold
 			if price_0to1.Mul(amount_left).Add(amount_out).LT(msg.MinOut) {
@@ -492,7 +492,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			//Current0Datam := Current0Data.TickData.Reserve1[i]
 
 			// calculate currentPrice and inverts
-			price_1to0 := k.Calc_price_1to0(pair.TokenPair.CurrentTick1To0)
+			price_1to0 := k.Calc_price_1to0(pair.TokenPair.CurrentTick0To1)
 
 			// price * amout_left + amount_out < minOut, error we cannot meet minOut threshold
 			if price_1to0.Mul(amount_left).Add(amount_out).LT(msg.MinOut) {
