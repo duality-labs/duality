@@ -727,7 +727,7 @@ func (s *MsgServerTestSuite) calculateSingleSwapAToB(tick int64, tickLiqudidty s
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapNoLOBToA(tick int64, tickLiqudity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
-	price := s.app.DexKeeper.Calc_price_1to0(-1 * tick)
+	price := s.app.DexKeeper.Calc_price_1to0(tick)
 
 	return calculateSingleSwapNoLO(price, tickLiqudity, amountIn)
 }

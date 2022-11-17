@@ -208,3 +208,79 @@ func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionSomeFeeTiers() {
 	s.assertBobBalancesDec(NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
 	s.assertDexBalancesDec(expectedAmountIn, NewDec(20).Sub(expectedAmountOut))
 }
+
+func (s *MsgServerTestSuite) TestSwapNoLODoesntMove1to0() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(0, 50)
+	// GIVEN
+	// deposit 10 of token A at tick 0 fee 1
+	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
+	s.assertCurr1To0(-1)
+
+	// WHEN
+	// swap 5 of token B for A with minOut 4
+	s.bobMarketSells("TokenB", 5, 4)
+
+	// THEN
+	// current1To0 unchanged
+	s.assertCurr1To0(-1)
+}
+
+func (s *MsgServerTestSuite) TestSwapNoLODoesntMove0to1() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 0)
+	// GIVEN
+	// deposit 10 of token B at tick 0 fee 1
+	s.aliceDeposits(
+		NewDeposit(0, 10, 0, 0),
+	)
+	s.assertCurr0To1(1)
+
+	// WHEN
+	// swap 5 of token A for B with minOut 4
+	s.bobMarketSells("TokenA", 5, 4)
+
+	// THEN
+	// current0To1 unchanged
+	s.assertCurr0To1(1)
+}
+
+func (s *MsgServerTestSuite) TestSwapNoLOMoves1To0() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(0, 50)
+	// GIVEN
+	// deposit 10 of token B at tick 0 fee 1
+	s.aliceDeposits(
+		NewDeposit(10, 0, 0, 0),
+		NewDeposit(10, 0, 0, 1),
+	)
+	s.assertCurr1To0(-1)
+
+	// WHEN
+	// swap 15 of token B for A with minOut 14
+	s.bobMarketSells("TokenB", 15, 14)
+
+	// THEN
+	// current 1to0 unchanged
+	s.assertCurr1To0(-3)
+}
+
+func (s *MsgServerTestSuite) TestSwapNoLOMoves0to1() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(0, 50)
+	// GIVEN
+	// deposit 10 of token B at tick 0 fee 1
+	s.aliceDeposits(
+		NewDeposit(0, 10, 0, 0),
+		NewDeposit(0, 10, 0, 1),
+	)
+	s.assertCurr0To1(1)
+
+	// WHEN
+	// swap 15 of token A for B with minOut 14
+	s.bobMarketSells("TokenA", 15, 14)
+
+	// THEN
+	// current 1to0 unchanged
+	s.assertCurr0To1(3)
+}

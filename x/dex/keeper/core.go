@@ -337,8 +337,10 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			continue
 		}
 
+		var i uint64 = 0
+
 		// iterator for feeList
-		for i := uint64(0); i < feeSize && !amount_left.Equal(sdk.ZeroDec()); i++ {
+		for i < feeSize && !amount_left.Equal(sdk.ZeroDec()) {
 			// gets fee for given feeIndex
 			fee := feelist[i].Fee
 
@@ -386,6 +388,9 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				// set amountLeft to 0
 				amount_left = sdk.ZeroDec()
 			}
+
+			//updates feeIndex
+			i++
 
 			//Make updates to tickMap containing reserve0/1 data to the KVStore
 			k.SetTickMap(ctx, pairId, Current0Data)
