@@ -352,7 +352,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			}
 
 			// calculate currentPrice
-			price_0to1 := k.Calc_price_0to1(pair.TokenPair.CurrentTick1To0)
+			price_0to1 := k.Calc_price_0to1(pair.TokenPair.CurrentTick0To1)
 
 			// price * amout_left + amount_out < minOut, error we cannot meet minOut threshold
 			if price_0to1.Mul(amount_left).Add(amount_out).LT(msg.MinOut) {
@@ -485,7 +485,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			//Current0Datam := Current0Data.TickData.Reserve1[i]
 
 			// calculate currentPrice and inverts
-			price_1to0 := k.Calc_price_1to0(pair.TokenPair.CurrentTick0To1)
+			price_1to0 := k.Calc_price_1to0(pair.TokenPair.CurrentTick1To0)
 
 			// price * amout_left + amount_out < minOut, error we cannot meet minOut threshold
 			if price_1to0.Mul(amount_left).Add(amount_out).LT(msg.MinOut) {
@@ -498,13 +498,13 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				amount_out = amount_out.Add(Current0Data.TickData.Reserve0AndShares[i].Reserve0)
 				amountInTemp := Current0Data.TickData.Reserve0AndShares[i].Reserve0.Quo(price_1to0)
 				amount_left = amount_left.Sub(amountInTemp)
-				Current1Data.TickData.Reserve1[i] = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Add(amountInTemp)
+				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Add(amountInTemp)
 				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = sdk.ZeroDec()
 			} else {
 				amountOutTemp := amount_left.Mul(price_1to0)
 				amount_out = amount_out.Add(amountOutTemp)
-				Current1Data.TickData.Reserve1[i] = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Add(amount_left)
-				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current1Data.TickData.Reserve1[i].Sub(amountOutTemp)
+				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Add(amount_left)
+				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Sub(amountOutTemp)
 				amount_left = sdk.ZeroDec()
 			}
 
