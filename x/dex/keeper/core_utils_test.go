@@ -70,7 +70,7 @@ func makePair(s *MsgServerTestSuite, pairId string, tickIndex int64, feeTier uin
 	pair, pairFound := app.DexKeeper.GetPairMap(ctx, pairId)
 	if !pairFound {
 		pair = types.PairMap{
-			PairId: pairId,
+			PairId:  pairId,
 			MinTick: tickIndex - fee,
 			MaxTick: tickIndex + fee,
 			TokenPair: &types.TokenPairType{
@@ -130,9 +130,7 @@ func calculateSharesPure(
 func calculateShares(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex int64, feeIndex uint64) sdk.Dec {
 	k, ctx := s.app.DexKeeper, s.ctx
 
-	price_1to0, err := k.Calc_price_1to0(tickIndex)
-
-	s.Require().Nil(err)
+	price_1to0 := k.Calc_price_1to0(tickIndex)
 
 	feelist := k.GetAllFeeList(ctx)
 	fee := feelist[feeIndex].Fee
