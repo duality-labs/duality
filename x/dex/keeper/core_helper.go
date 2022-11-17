@@ -289,14 +289,14 @@ func CalcTrueAmounts(
 // Calculates the price for a swap from token 0 to token 1 given a tick
 // tickIndex refers to the index of a specified tick
 func (k Keeper) Calc_price_0to1(tick_Index int64) sdk.Dec {
-	price := Pow(BasePrice(), tick_Index)
-	return sdk.OneDec().Quo(price)
+	return Pow(BasePrice(), tick_Index)
 }
 
 // Calculates the price for a swap from token 1 to token 0 given a tick
 // tickIndex refers to the index of a specified tick
 func (k Keeper) Calc_price_1to0(tick_Index int64) sdk.Dec {
-	return Pow(BasePrice(), tick_Index)
+	price := Pow(BasePrice(), tick_Index)
+	return sdk.OneDec().Quo(price)
 }
 
 // Checks if a tick has reserves0 at any fee tier

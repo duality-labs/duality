@@ -108,7 +108,7 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder1to0WithWithdraw() {
 
 	s.aliceLimitSells("TokenB", 0, 25)
 	s.aliceLimitSells("TokenB", -1, 25)
-	s.bobSells("TokenA", 40, 30)
+	s.bobMarketSells("TokenA", 40, 30)
 
 	s.assertAliceBalances(100, 450)
 	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("239.9985"))
@@ -124,7 +124,6 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder1to0WithWithdraw() {
 	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("239.9985"))
 }
 
-//
 func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	s.fundAliceBalances(100000, 500)
 	s.fundBobBalances(100, 200)
@@ -147,7 +146,7 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	// This is because the price is 1
 	//Bobs balance for TokenA should be (1 * 15.002499750024999) + (1.0001 * 24.997500249975) + 100 = 140.002499750024997500
 	//DEX Balance should be 50 - (1 * 9.997500249975002500) - (1.0001 * 24.997500249975002500) = 9.997500249975002500
-	s.bobSells("TokenB", 40, 30)
+	s.bobMarketSells("TokenB", 40, 30)
 
 	s.assertAliceBalances(99950, 500)
 	s.assertBobBalancesDec(sdk.MustNewDecFromStr("140.002499750024997500"), NewDec(160))
@@ -287,7 +286,7 @@ func (s *MsgServerTestSuite) TestProgressiveLimitOrderFill() {
 	s.assertBobBalances(100, 200)
 	s.assertDexBalances(0, 60)
 
-	s.aliceSells("TokenA", 10, 10)
+	s.aliceMarketSells("TokenA", 10, 10)
 
 	s.assertAliceBalances(100, 440)
 	s.assertBobBalances(90, 210)
