@@ -1,8 +1,6 @@
 package keeper_test
 
 import (
-	"fmt"
-
 	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 )
@@ -140,7 +138,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceReached
 	s.bobMarketSellFails(err, "TokenA", 20, 15)
 }
 
-func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecution() {
+func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMinFeeTier() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
 	// GIVEN
@@ -160,5 +158,53 @@ func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecution() {
 	expectedAmountIn := amountInDec.Sub(expectedAmountInLeft)
 	s.assertBobBalancesDec(NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
 	s.assertDexBalancesDec(expectedAmountIn, NewDec(10).Sub(expectedAmountOut))
-	fmt.Println(expectedAmountIn, expectedAmountOut)
+}
+
+func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMaxFeeTier() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 0)
+	// GIVEN
+	// deposit 10 of token B at tick 0 fee 10
+	s.aliceDeposits(NewDeposit(0, 10, 0, len(s.feeTiers)-1))
+	s.assertAliceBalances(50, 40)
+	s.assertDexBalances(0, 10)
+
+	// WHEN
+	// swap 5 of token A for B with minOut 4
+	amountIn, amountInDec := 5, NewDec(5)
+	s.bobMarketSells("TokenA", amountIn, 4)
+
+	// THEN
+	// swap should have in out
+	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOAToB(10, NewDec(10), amountInDec)
+	expectedAmountIn := amountInDec.Sub(expectedAmountInLeft)
+	s.assertBobBalancesDec(NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
+	s.assertDexBalancesDec(expectedAmountIn, NewDec(10).Sub(expectedAmountOut))
+}
+
+func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionSomeFeeTiers() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 0)
+	// GIVEN
+	// deposit 10 of token B at tick 0 fee 1 and 10 of token B at tick 0 fee 3
+	s.aliceDeposits(
+		NewDeposit(0, 10, 0, 0),
+		NewDeposit(0, 10, 0, 1),
+	)
+	s.assertAliceBalances(50, 30)
+	s.assertDexBalances(0, 20)
+
+	// WHEN
+	// swap 5 of token A for B with minOut 4
+	amountIn, amountInDec := 15, NewDec(15)
+	s.bobMarketSells("TokenA", amountIn, 14)
+
+	// THEN
+	// swap should have in out
+	amountInLeftTick1, expectedAmountOutTick1 := s.calculateSingleSwapNoLOAToB(1, NewDec(10), amountInDec)
+	amountInLeftTick3, expectedAmountOutTick3 := s.calculateSingleSwapNoLOAToB(3, NewDec(10), amountInLeftTick1)
+	expectedAmountIn := amountInDec.Sub(amountInLeftTick3)
+	expectedAmountOut := expectedAmountOutTick1.Add(expectedAmountOutTick3)
+	s.assertBobBalancesDec(NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
+	s.assertDexBalancesDec(expectedAmountIn, NewDec(20).Sub(expectedAmountOut))
 }
