@@ -11,8 +11,8 @@ import (
 // takes as input the amount that was placed for the limit order (amount_placed), the price the
 // trader pays when filling it (price_filled_at) and the amount that they are swapping (amount_to_swap).
 // The format of the return statement is (amount_in, amount_out).
-func SingleLimitOrderFill(amount_placed sdk.Dec, 
-	price_filled_at sdk.Dec, 
+func SingleLimitOrderFill(amount_placed sdk.Dec,
+	price_filled_at sdk.Dec,
 	amount_to_swap sdk.Dec) (sdk.Dec, sdk.Dec) {
 
 	amount_out, amount_in := sdk.ZeroDec(), sdk.ZeroDec()
@@ -31,21 +31,21 @@ func SingleLimitOrderFill(amount_placed sdk.Dec,
 	return amount_in, amount_out
 }
 
-// Calls SingleLimitOrderFill() and updates the filled and unfilled reserves. 
-// Returns the unfilled reserves (unfilled_reserves), filled reserves (filled_reserves) and the amount left to swap 
+// Calls SingleLimitOrderFill() and updates the filled and unfilled reserves.
+// Returns the unfilled reserves (unfilled_reserves), filled reserves (filled_reserves) and the amount left to swap
 // (amount_to_swap_remaining)
-func SingleLimitOrderFillAndUpdate(amount_placed sdk.Dec, 
-	price_filled_at sdk.Dec, 
+func SingleLimitOrderFillAndUpdate(amount_placed sdk.Dec,
+	price_filled_at sdk.Dec,
 	amount_to_swap sdk.Dec,
 	unfilled_reserves sdk.Dec) (sdk.Dec, sdk.Dec, sdk.Dec) {
 
-		amount_in, amount_out := SingleLimitOrderFill(amount_placed, price_filled_at, amount_to_swap)
+	amount_in, amount_out := SingleLimitOrderFill(amount_placed, price_filled_at, amount_to_swap)
 
-		unfilled_reserves = unfilled_reserves.Sub(amount_out)
-		filled_reserves := amount_placed.Add(amount_in)
-		amount_to_swap_remaining := amount_to_swap.Sub(amount_in)
+	unfilled_reserves = unfilled_reserves.Sub(amount_out)
+	filled_reserves := amount_placed.Add(amount_in)
+	amount_to_swap_remaining := amount_to_swap.Sub(amount_in)
 
-		return unfilled_reserves, filled_reserves, amount_to_swap_remaining
+	return unfilled_reserves, filled_reserves, amount_to_swap_remaining
 }
 
 // MultipleLimitOrderFills() simulates the fill of multiple consecutive limit orders and returns the
@@ -112,10 +112,10 @@ func SinglePoolSwapAndUpdate(amount_liquidity sdk.Dec,
 }
 
 // SinglePoolSwapAndUpdateDirection() simulates swapping through a single liquidity pool and updates that pool's
-// liquidity and specifies whether the in and out tokens are 0 or 1. Takes in all of the same inputs as 
+// liquidity and specifies whether the in and out tokens are 0 or 1. Takes in all of the same inputs as
 // SinglePoolSwapAndUpdate(): amount_liquidity, price_swapped_at, amount_to_swap, reservesOfToken0 sdk.Dec,
-// reservesOfToken1 but has an additional input inToken which is a bool indicating whether 0 or 1 is swapped into 
-// the pool. It returns the updated amounts for the reservesOfInToken and the reservesOfOutToken, in the format 
+// reservesOfToken1 but has an additional input inToken which is a bool indicating whether 0 or 1 is swapped into
+// the pool. It returns the updated amounts for the reservesOfInToken and the reservesOfOutToken, in the format
 // of (reservesOfInToken,reservesOfOutToken).
 func SinglePoolSwapAndUpdateDirectional(amount_liquidity sdk.Dec,
 	price_swapped_at sdk.Dec,
@@ -125,7 +125,7 @@ func SinglePoolSwapAndUpdateDirectional(amount_liquidity sdk.Dec,
 	inToken bool) (sdk.Dec, sdk.Dec) {
 
 	resultingReservesOfToken0, resultingReservesOfToken1 := sdk.ZeroDec(), sdk.ZeroDec()
-	
+
 	if inToken {
 		resultingReservesOfToken1, resultingReservesOfToken0, _, _ = SinglePoolSwapAndUpdate(amount_liquidity,
 			price_swapped_at,
@@ -143,33 +143,32 @@ func SinglePoolSwapAndUpdateDirectional(amount_liquidity sdk.Dec,
 	return resultingReservesOfToken0, resultingReservesOfToken1
 }
 
-
 // MultiplePoolSwapAndUpdate() simulates swapping through multiple liquidity pools and updates that pool's
 // liquidity. Takes in similar inputs to SinglePoolSwapAndUpdate(): amount_liquidity, price_swapped_at,
 // and amount_to_swap, reservesOfInToken, reservesOfOutToken; But they are held in arrays the size of how many
-// pools are being swapped through. It returns the updated amounts for the reservesOfInToken and the 
+// pools are being swapped through. It returns the updated amounts for the reservesOfInToken and the
 // reservesOfOutToken, in the format of (reservesOfInToken,reservesOfOutToken)
 func MultiplePoolSwapAndUpdate(amounts_liquidity []sdk.Dec,
 	prices_swapped_at []sdk.Dec,
 	amount_to_swap sdk.Dec,
 	reserves_in_token_array []sdk.Dec,
 	reserves_out_token_array []sdk.Dec) ([]sdk.Dec, []sdk.Dec, sdk.Dec, sdk.Dec) {
-	
+
 	num_pools := len(amounts_liquidity)
 	amount_remaining := amount_to_swap
 	amount_out_total, amount_out_temp, amount_in := sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec()
-	resulting_reserves_in_token :=  make([]sdk.Dec, num_pools, num_pools)
+	resulting_reserves_in_token := make([]sdk.Dec, num_pools, num_pools)
 	resulting_reserves_out_token := make([]sdk.Dec, num_pools, num_pools)
-	
+
 	for i := 0; i < num_pools; i++ {
 		resulting_reserves_in_token[i], resulting_reserves_out_token[i], amount_in, amount_out_temp = SinglePoolSwapAndUpdate(amounts_liquidity[i],
 			prices_swapped_at[i],
 			amount_to_swap,
 			reserves_in_token_array[i],
 			reserves_out_token_array[i])
-		
+
 		amount_out_total = amount_out_total.Add(amount_out_temp)
-		amount_remaining = amount_remaining.Sub(amount_in) 
+		amount_remaining = amount_remaining.Sub(amount_in)
 
 		i++
 
@@ -177,4 +176,3 @@ func MultiplePoolSwapAndUpdate(amounts_liquidity []sdk.Dec,
 
 	return resulting_reserves_in_token, resulting_reserves_out_token, amount_remaining, amount_out_total
 }
-

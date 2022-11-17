@@ -183,7 +183,6 @@ func (k Keeper) GetOrInitLimitOrderMaps(
 	currentLimitOrderKey uint64,
 	receiver string,
 ) (types.LimitOrderPoolReserveMap, types.LimitOrderPoolUserShareMap, types.LimitOrderPoolTotalSharesMap) {
-
 	ReserveData := k.GetOrInitReserveData(goCtx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
 	UserShareData := k.GetOrInitUserShareData(goCtx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
 	TotalSharesData := k.GetOrInitOrderPoolTotalShares(goCtx, pairId, tickIndex, tokenIn, currentLimitOrderKey)
@@ -288,15 +287,14 @@ func CalcTrueAmounts(
 
 // Calculates the price for a swap from token 0 to token 1 given a tick
 // tickIndex refers to the index of a specified tick
-func (k Keeper) Calc_price_0to1(tick_Index int64) sdk.Dec {
-	return Pow(BasePrice(), tick_Index)
+func (k Keeper) CalcPrice0To1(tickIndex int64) sdk.Dec {
+	return Pow(BasePrice(), -1*tickIndex)
 }
 
 // Calculates the price for a swap from token 1 to token 0 given a tick
 // tickIndex refers to the index of a specified tick
-func (k Keeper) Calc_price_1to0(tick_Index int64) sdk.Dec {
-	price := Pow(BasePrice(), tick_Index)
-	return sdk.OneDec().Quo(price)
+func (k Keeper) CalcPrice1To0(tick_Index int64) sdk.Dec {
+	return Pow(BasePrice(), tick_Index)
 }
 
 // Checks if a tick has reserves0 at any fee tier
