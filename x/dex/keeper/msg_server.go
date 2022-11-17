@@ -29,7 +29,15 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 		return nil, err
 	}
 
-	err = k.DepositCore(goCtx, msg, token0, token1, createrAddr, amount0, amount1)
+	Amounts0Deposit, Amounts1Deposit, err := k.DepositCore(
+		goCtx,
+		msg,
+		token0,
+		token1,
+		createrAddr,
+		amount0,
+		amount1,
+	)
 
 	if err != nil {
 		return nil, err
@@ -37,7 +45,7 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 
 	_ = ctx
 
-	return &types.MsgDepositResponse{}, nil
+	return &types.MsgDepositResponse{Amounts0Deposit, Amounts1Deposit}, nil
 }
 
 func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*types.MsgWithdrawlResponse, error) {
@@ -70,16 +78,18 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	}
 
 	var amount_out sdk.Dec
+	var amount_left sdk.Dec
 	var coinOut sdk.Coin
 	if msg.TokenIn == token0 {
-		amount_out, err = k.Swap0to1(goCtx, msg, token0, token1, createrAddr)
+		amount_out, amount_left, err = k.Swap0to1(goCtx, msg, token0, token1, createrAddr)
 
 		if err != nil {
 			return nil, err
 		}
 
-		if msg.AmountIn.GT(sdk.ZeroDec()) {
-			coinIn := sdk.NewCoin(token0, sdk.NewIntFromBigInt(msg.AmountIn.BigInt()))
+		amountToDeposit := msg.AmountIn.Sub(amount_left)
+		if amountToDeposit.GT(sdk.ZeroDec()) {
+			coinIn := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amountToDeposit.BigInt()))
 			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
 				return &types.MsgSwapResponse{}, err
 			}
@@ -96,14 +106,15 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		}
 
 	} else {
-		amount_out, err = k.Swap1to0(goCtx, msg, token0, token1, createrAddr)
+		amount_out, amount_left, err = k.Swap1to0(goCtx, msg, token0, token1, createrAddr)
 
 		if err != nil {
 			return nil, err
 		}
 
-		if msg.AmountIn.GT(sdk.ZeroDec()) {
-			coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(msg.AmountIn.BigInt()))
+		amountToDeposit := msg.AmountIn.Sub(amount_left)
+		if amountToDeposit.GT(sdk.ZeroDec()) {
+			coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountToDeposit.BigInt()))
 			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
 				return &types.MsgSwapResponse{}, err
 			}

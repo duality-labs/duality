@@ -52,6 +52,8 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 		amounts1 = tmp
 	}
 
+	totalAmount0ToDeposit := sdk.ZeroDec()
+	totalAmount1ToDeposit := sdk.ZeroDec()
 	// checks that amount0, amount1 are both not zero, and that the user has the balances they wish to deposit
 	for i, _ := range amounts0 {
 		// Error checking for valid sdk.Dec
@@ -59,20 +61,24 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 			return "", "", nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid amount: %s", err)
 		}
 
-		AccountsToken0Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, token0).Amount)
+		totalAmount0ToDeposit = totalAmount0ToDeposit.Add(amounts0[i])
+		totalAmount1ToDeposit = totalAmount1ToDeposit.Add(amounts1[i])
+	}
 
-		// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
-		if AccountsToken0Balance.LT(amounts0[i]) {
-			return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
-		}
+	AccountToken0Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, token0).Amount)
 
-		AccountsToken1Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, token1).Amount)
+	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 
-		// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
-		if AccountsToken1Balance.LT(amounts1[i]) {
-			return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
-		}
+	if AccountToken0Balance.LT(totalAmount0ToDeposit) {
+		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
+	}
 
+	AccountsToken1Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, token1).Amount)
+
+	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
+
+	if AccountsToken1Balance.LT(totalAmount1ToDeposit) {
+		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
 	return token0, token1, callerAddr, amounts0, amounts1, nil
@@ -250,8 +256,7 @@ func (k Keeper) WithdrawLimitOrderVerification(goCtx context.Context, msg types.
 
 	pairId := k.CreatePairId(token0, token1)
 
-	shares, sharesFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
-
+	shares, sharesFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Receiver)
 	if !sharesFound {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
 	}
