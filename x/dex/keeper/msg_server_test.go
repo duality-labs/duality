@@ -757,3 +757,24 @@ func calculateSwap(price sdk.Dec, liquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec,
 		return amountIn.Sub(tmpAmountIn), liquidity
 	}
 }
+
+func (s *MsgServerTestSuite) addTickWithFee0Tokens(tickIndex int64, amountA int, amountB int) types.TickMap {
+
+	tick := types.TickMap{
+		PairId:    "TokenA/TokenB",
+		TickIndex: tickIndex,
+		TickData: &types.TickDataType{
+			Reserve0AndShares: make([]*types.Reserve0AndSharesType, 1),
+			Reserve1:          make([]sdk.Dec, 1),
+		},
+		LimitOrderPool0To1: &types.LimitOrderPool{0, 0},
+		LimitOrderPool1To0: &types.LimitOrderPool{0, 0},
+	}
+
+
+	tick.TickData.Reserve0AndShares[0] = &types.Reserve0AndSharesType{NewDec(amountA), NewDec(amountA)}
+	tick.TickData.Reserve1[0] = NewDec(amountB)
+
+	s.app.DexKeeper.SetTickMap(s.ctx, "TokenA/TokenB", tick)
+	return tick
+}
