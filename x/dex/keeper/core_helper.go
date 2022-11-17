@@ -383,10 +383,10 @@ func (k Keeper) GetTotalReservesAtTick(goCtx context.Context, pairId string, tic
 ///////////////////////////////////////////////////////////////////////////////
 
 // should be called for every pair, tick for which token1 is added
-func (k Keeper) UpdateTickPointersPostAddToken0(goCtx context.Context, pair *types.PairMap, tick *types.TickMap) {
+func (k Keeper) CalcTickPointersPostAddToken0(goCtx context.Context, pair *types.PairMap, tick *types.TickMap) *types.PairMap {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	if !k.HasToken0(ctx, tick) {
-		return
+		return nil
 	}
 
 	tickIndex := tick.TickIndex
@@ -400,14 +400,22 @@ func (k Keeper) UpdateTickPointersPostAddToken0(goCtx context.Context, pair *typ
 		*minTick = MinInt64(*minTick, tickIndex)
 	}
 
-	k.SetPairMap(ctx, *pair)
+	return pair
+}
+
+func (k Keeper) UpdateTickPointersPostAddToken0(goCtx context.Context, pair *types.PairMap, tick *types.TickMap) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	newPair := k.CalcTickPointersPostAddToken0(goCtx, pair, tick)
+	if newPair != nil {
+		k.SetPairMap(ctx, *newPair)
+	}
 }
 
 // should be called for every pair, tick for which token1 is added
-func (k Keeper) UpdateTickPointersPostAddToken1(goCtx context.Context, pair *types.PairMap, tick *types.TickMap) {
+func (k Keeper) CalcTickPointersPostAddToken1(goCtx context.Context, pair *types.PairMap, tick *types.TickMap) *types.PairMap{
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	if !k.HasToken1(ctx, tick) {
-		return
+		return nil
 	}
 
 	tickIndex := tick.TickIndex
@@ -421,69 +429,101 @@ func (k Keeper) UpdateTickPointersPostAddToken1(goCtx context.Context, pair *typ
 		*maxTick = MaxInt64(*maxTick, tickIndex)
 	}
 
-	k.SetPairMap(ctx, *pair)
+	return pair
+}
+
+func (k Keeper) UpdateTickPointersPostAddToken1(goCtx context.Context, pair *types.PairMap, tick *types.TickMap) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	newPair := k.CalcTickPointersPostAddToken1(goCtx, pair, tick)
+	if newPair != nil {
+		k.SetPairMap(ctx, *newPair)
+	}
 }
 
 // Should be called for every pair, tick for which token0 liquidity is removed
-func (k Keeper) UpdateTickPointersPostRemoveToken0(goCtx context.Context, pair *types.PairMap, tick *types.TickMap) {
+func (k Keeper) CalcTickPointersPostRemoveToken0(goCtx context.Context, pair *types.PairMap, tick *types.TickMap) *types.PairMap {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	tickIndex := tick.TickIndex
 	minTick := &pair.MinTick
 	cur1To0 := &pair.TokenPair.CurrentTick1To0
 
 	// return when we're removing liquidity between the bounds
-	if *minTick < tickIndex && tickIndex < *cur1To0 {
-		return
+	// Or liquidity is not drained
+	if *minTick < tickIndex && tickIndex < *cur1To0 || k.HasToken0(ctx, tick){
+		//Do Nothing
+		return nil
 	}
 
 	// only need to act when the token is exhausted at one of the bounds
-	if !k.HasToken0(ctx, tick) {
-		if tickIndex == *minTick {
-			// TODO: We should really search for the next minTick but this introduces a
-			// vulnerability unless we have a dedicated data structure for avoiding.
-			*minTick++
-			*cur1To0 = MaxInt64(*cur1To0, *minTick)
-		} else if tickIndex == *cur1To0 { // we also know that *cur1To0 != *minTick here
-			next1To0, found := k.FindNextTick1To0(goCtx, *pair)
-			if !found {
-				*minTick = math.MaxInt64
-				// we leave cur1To0 where it is because otherwise we lose the last traded price
-			} else {
-				*cur1To0 = next1To0
-			}
+
+	// We have removed all of Token0 from the pool
+	if tickIndex == *minTick && tickIndex == *cur1To0{
+		*minTick = math.MaxInt64
+		// we leave cur1To0 where it is because otherwise we lose the last traded price
+	} else if tickIndex == *minTick {
+		// TODO: We should really search for the next minTick but this introduces a
+		// vulnerability unless we have a dedicated data structure for avoiding.
+		*minTick++
+		// we are removing liquidity below the current1To0, no need to update that
+	} else if tickIndex == *cur1To0 {
+		next1To0, found := k.FindNextTick1To0(goCtx, *pair)
+		if !found {
+			// This case should be impossible if MinTick is tracked correctly
+			*minTick = math.MaxInt64
+		} else {
+			*cur1To0 = next1To0
 		}
 	}
-	k.SetPairMap(ctx, *pair)
+	return pair
+}
+
+func (k Keeper) UpdateTickPointersPostRemoveToken0(goCtx context.Context, pair *types.PairMap, tick *types.TickMap) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	newPair := k.CalcTickPointersPostRemoveToken0(goCtx, pair, tick)
+	if newPair != nil {
+		k.SetPairMap(ctx, *newPair)
+	}
 }
 
 // Should be called for every pair, tick for which token1 liquidity is removed
-func (k Keeper) UpdateTickPointersPostRemoveToken1(goCtx context.Context, pair *types.PairMap, tick *types.TickMap) {
+func (k Keeper) CalcTickPointersPostRemoveToken1(goCtx context.Context, pair *types.PairMap, tick *types.TickMap) *types.PairMap{
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	tickIndex := tick.TickIndex
 	maxTick := &pair.MaxTick
 	cur0To1 := &pair.TokenPair.CurrentTick0To1
 
 	// return when we're removing liquidity between the bounds
-	if *cur0To1 < tickIndex && tickIndex < *maxTick {
-		return
+	// OR Liquididity is not drained
+	if *cur0To1 < tickIndex && tickIndex < *maxTick || k.HasToken1(ctx, tick) {
+		// Do nothing
+		return nil
 	}
 
 	// only need to act when the token is exhausted at one of the bounds
-	if !k.HasToken1(ctx, tick) {
-		if tickIndex == *maxTick {
-			// TODO: We should really search for the next maxTick but this introduces a
-			// vulnerability unless we have a dedicated data structure for avoiding.
-			*maxTick--
-			*cur0To1 = MaxInt64(*cur0To1, *maxTick)
-		} else if tickIndex == *cur0To1 { // we also know that *cur0To1 != *maxTick here
-			next0To1, found := k.FindNextTick0To1(goCtx, *pair)
-			if !found {
-				*maxTick = math.MinInt64
-				// we leave cur0To1 where it is because otherwise we lose the last traded price
-			} else {
-				*cur0To1 = next0To1
-			}
+	if tickIndex == *maxTick && tickIndex == *cur0To1{
+		*maxTick = math.MinInt64
+		// we leave cur0To1 where it is because otherwise we lose the last traded price
+	} else if tickIndex == *maxTick{
+		// TODO: We should really search for the next maxTick but this introduces a
+		// vulnerability unless we have a dedicated data structure for avoiding.
+		*maxTick--
+		// we are removing liquidity above the current0to1, no need to update that
+	} else if tickIndex == *cur0To1 {
+		next0To1, found := k.FindNextTick0To1(goCtx, *pair)
+		if !found {
+			*maxTick = math.MinInt64
+			// This case should be impossible if MinTick is tracked correctly
+		} else {
+			*cur0To1 = next0To1
 		}
 	}
-	k.SetPairMap(ctx, *pair)
+	return pair
+}
+
+func (k Keeper) UpdateTickPointersPostRemoveToken1(goCtx context.Context, pair *types.PairMap, tick *types.TickMap) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	newPair := k.CalcTickPointersPostRemoveToken1(goCtx, pair, tick)
+	if newPair != nil {
+		k.SetPairMap(ctx, *newPair)
+	}
 }
