@@ -4,8 +4,7 @@ import sdk "github.com/cosmos/cosmos-sdk/types"
 
 // Return the base value for price, 1.0001
 func BasePrice() sdk.Dec {
-	prec := sdk.NewDecFromIntWithPrec(sdk.NewIntFromUint64(1), 14)
-	return sdk.OneDec().Add(prec)
+	return sdk.MustNewDecFromStr("1.0001")
 }
 
 // Iterative implementation of exponentiation by squaring algorithm, taken from Wikipedia (https://en.wikipedia.org/wiki/Exponentiation_by_squaring#With_constant_auxiliary_memory)
