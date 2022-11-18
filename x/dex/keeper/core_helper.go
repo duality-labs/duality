@@ -468,10 +468,8 @@ func (k Keeper) CalcTickPointersPostRemoveToken0(goCtx context.Context, pair *ty
 	if tickIndex == *minTick && tickIndex == *cur1To0 {
 		*minTick = math.MaxInt64
 		*cur1To0 = math.MaxInt64
-<<<<<<< HEAD
-=======
+
 		// we leave cur1To0 where it is because otherwise we lose the last traded price
->>>>>>> 49392b75cc11b4e9c0b85683485cf3bdee2d39fc
 	} else if tickIndex == *minTick {
 		// TODO: We should really search for the next minTick but this introduces a
 		// vulnerability unless we have a dedicated data structure for avoiding.
