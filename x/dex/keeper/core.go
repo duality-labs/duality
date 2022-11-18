@@ -52,7 +52,6 @@ func (k Keeper) DepositCore(
 		upperTickIndex := tickIndex + fee
 
 		// TODO: Allow user to deposit "behind enemy lines"
-		fmt.Println(amount0, curTick0to1, lowerTickIndex)
 		if amount0.GT(sdk.ZeroDec()) && curTick0to1 <= lowerTickIndex {
 			return nil, nil, types.ErrDepositBehindPairLiquidity
 		}

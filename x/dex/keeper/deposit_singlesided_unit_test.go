@@ -291,8 +291,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedBelowEnemyLines() {
 	// THEN
 	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
 
-	err := types.ErrValidPairNotFound // TODO: this needs to be changed to a more specific error type
-	s.assertAliceDepositFails(err, NewDeposit(0, 10, -5, 0))
+	err := types.ErrDepositBehindPairLiquidity // TODO: this needs to be changed to a more specific error type
+	s.assertAliceDepositFails(err, NewDeposit(10, 0, 2, 0))
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedAboveEnemyLines() {
@@ -304,13 +304,14 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedAboveEnemyLines() {
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
 	s.assertLiquidityAtTick(10, 0, 0, 0)
+	s.assertCurr1To0(-1)
 
 	// WHEN
 	// depositing above enemy lines at tick 5	// THEN
 	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
 
-	err := types.ErrValidPairNotFound // TODO: this needs to be changed to a more specific error type
-	s.assertAliceDepositFails(err, NewDeposit(10, 0, 5, 0))
+	err := types.ErrDepositBehindPairLiquidity // TODO: this needs to be changed to a more specific error type
+	s.assertAliceDepositFails(err, NewDeposit(0, 10, -2, 0))
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedMultiA() {
