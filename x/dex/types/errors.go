@@ -22,4 +22,5 @@ var (
 	ErrCannotWithdrawLimitOrder    = sdkerrors.Register(ModuleName, 1112, "Cannot withdraw additional liqudity from this limit order at this time")
 	ErrAllDepositsFailed           = sdkerrors.Register(ModuleName, 1113, "MsgDeposit Failed: All inputted deposits fail to complete")
 	ErrNoLiquidity                 = sdkerrors.Register(ModuleName, 1114, "There is no liquidity to complete this transaction")
+	ErrDepositBehindPairLiquidity  = sdkerrors.Register(ModuleName, 1115, "Depositing behind the opposite token pair's liquidity is currently not allowed")
 )

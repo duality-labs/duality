@@ -52,13 +52,14 @@ func (k Keeper) DepositCore(
 		upperTickIndex := tickIndex + fee
 
 		// TODO: Allow user to deposit "behind enemy lines"
-		if amounts0[i].GT(sdk.ZeroDec()) && curTick0to1 <= lowerTickIndex && curTick0to1 == math.MaxInt64 {
-			return nil, nil, sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit amount_0 at tick greater than or equal to the CurrentTick0to1")
+		fmt.Println(amount0, curTick0to1, lowerTickIndex)
+		if amount0.GT(sdk.ZeroDec()) && curTick0to1 <= lowerTickIndex {
+			return nil, nil, types.ErrDepositBehindPairLiquidity
 		}
 
 		// TODO: Allow user to deposit "behind enemy lines"
-		if amounts1[i].GT(sdk.ZeroDec()) && upperTickIndex <= curTick1to0 && curTick1to0 == math.MinInt64 {
-			return nil, nil, sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit amount_1 at tick less than or equal to the CurrentTick1to0")
+		if amount1.GT(sdk.ZeroDec()) && upperTickIndex <= curTick1to0 {
+			return nil, nil, types.ErrDepositBehindPairLiquidity
 		}
 
 		lowerTick := k.GetOrInitTick(goCtx, pairId, lowerTickIndex)
