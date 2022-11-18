@@ -1,0 +1,68 @@
+package keeper
+
+import sdk "github.com/cosmos/cosmos-sdk/types"
+
+// Return the base value for price, 1.0001
+func BasePrice() sdk.Dec {
+	return sdk.MustNewDecFromStr("1.0001")
+}
+
+// Iterative implementation of exponentiation by squaring algorithm, taken from Wikipedia (https://en.wikipedia.org/wiki/Exponentiation_by_squaring#With_constant_auxiliary_memory)
+// Note: sdk.Dec will panic on overflow
+func Pow(x sdk.Dec, n int64) sdk.Dec {
+	if n == 0 {
+		return sdk.OneDec()
+	}
+
+	// convert n to nonnegative exponent
+	var exp uint64
+	if n < 0 {
+		exp = uint64(-1 * n)
+		x = sdk.OneDec().QuoInt(sdk.NewIntFromUint64(exp))
+	} else {
+		exp = uint64(n)
+	}
+	y := sdk.OneDec()
+	for exp > 1 {
+		if exp%2 == 0 {
+			x = x.Mul(x)
+			exp /= 2
+		} else {
+			y = x.Mul(y)
+			x = x.Mul(x)
+			exp = (exp - 1) / 2
+		}
+	}
+
+	return x.Mul(y)
+}
+
+func MaxInt64(a, b int64) int64 {
+	if a < b {
+		return b
+	} else {
+		return a
+	}
+}
+
+func MinInt64(a, b int64) int64 {
+	if a < b {
+		return a
+	} else {
+		return b
+	}
+}
+
+func MinDec(a, b sdk.Dec) sdk.Dec {
+	if a.LT(b) {
+		return a
+	}
+	return b
+}
+
+func MaxDec(a, b sdk.Dec) sdk.Dec {
+	if a.GT(b) {
+		return a
+	}
+	return b
+}

@@ -266,6 +266,21 @@ const (
 	DepositEventSharesMinted = "SharesMinted"
 )
 
+// DepositFailed Event Attributes
+const (
+	DepositFailEventKey          = "NewDeposit"
+	DepositFailEventCreator      = "Creator"
+	DepositFailEventToken0       = "Token0"
+	DepositFailEventToken1       = "Token1"
+	DepositFailEventPrice        = "TickIndex"
+	DepositFailEventFeeIndex     = "FeeIndex"
+	DepositFailEventReceiver     = "Receiver"
+	DepositFailEventOldReserves0 = "OldReserves0"
+	DepositFailEventOldReserves1 = "OldReserves1"
+	DepositFailAmountToDeposit0  = "AmountToDeposit0"
+	DepositFailAmountToDeposit1  = "AmountToDeposit1"
+)
+
 // Withdraw Event Attributes
 const (
 	WithdrawEventKey           = "NewWithdraw"

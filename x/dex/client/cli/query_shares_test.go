@@ -86,8 +86,8 @@ func TestShowShares(t *testing.T) {
 			args := []string{
 				tc.idAddress,
 				tc.idPairId,
-				string(tc.idTickIndex),
-				string(tc.idFee),
+				fmt.Sprint(tc.idTickIndex),
+				fmt.Sprint(tc.idFee),
 			}
 			args = append(args, tc.args...)
 			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowShares(), args)

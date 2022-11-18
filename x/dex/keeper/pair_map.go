@@ -19,7 +19,6 @@ func (k Keeper) SetPairMap(ctx sdk.Context, pairMap types.PairMap) {
 func (k Keeper) GetPairMap(
 	ctx sdk.Context,
 	pairId string,
-
 ) (val types.PairMap, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PairMapKeyPrefix))
 

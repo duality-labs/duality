@@ -6,6 +6,24 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+func NewTick(pairId string, tickIndex int64, numFees uint64) types.TickMap {
+	tick := types.TickMap{
+		PairId:    pairId,
+		TickIndex: tickIndex,
+		TickData: &types.TickDataType{
+			Reserve0AndShares: make([]*types.Reserve0AndSharesType, numFees),
+			Reserve1:          make([]sdk.Dec, numFees),
+		},
+		LimitOrderPool0To1: &types.LimitOrderPool{0, 0},
+		LimitOrderPool1To0: &types.LimitOrderPool{0, 0},
+	}
+	for i := 0; i < int(numFees); i++ {
+		tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}
+		tick.TickData.Reserve1[i] = sdk.ZeroDec()
+	}
+	return tick
+}
+
 // SetTickMap set a specific tickMap in the store from its index
 func (k Keeper) SetTickMap(ctx sdk.Context, pairId string, tickMap types.TickMap) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickMapKeyPrefix))
@@ -21,7 +39,6 @@ func (k Keeper) GetTickMap(
 	ctx sdk.Context,
 	pairId string,
 	tickIndex int64,
-
 ) (val types.TickMap, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickMapKeyPrefix))
 
