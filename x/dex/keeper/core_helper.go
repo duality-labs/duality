@@ -47,8 +47,8 @@ func (k Keeper) GetOrInitPair(goCtx context.Context, token0 string, token1 strin
 		pair = types.PairMap{
 			PairId: pairId,
 			TokenPair: &types.TokenPairType{
-				CurrentTick0To1: 0,
-				CurrentTick1To0: 0,
+				CurrentTick0To1: math.MinInt64,
+				CurrentTick1To0: math.MaxInt64,
 			},
 			MinTick: math.MaxInt64,
 			MaxTick: math.MinInt64,
@@ -292,13 +292,21 @@ func CalcTrueAmounts(
 // Calculates the price for a swap from token 0 to token 1 given a tick
 // tickIndex refers to the index of a specified tick
 func (k Keeper) CalcPrice0To1(tickIndex int64) sdk.Dec {
-	return Pow(BasePrice(), -1*tickIndex)
+	if 0 <= tickIndex {
+		return sdk.OneDec().Quo(Pow(BasePrice(), uint64(tickIndex)))
+	} else {
+		return Pow(BasePrice(), uint64(-1*tickIndex))
+	}
 }
 
 // Calculates the price for a swap from token 1 to token 0 given a tick
 // tickIndex refers to the index of a specified tick
-func (k Keeper) CalcPrice1To0(tick_Index int64) sdk.Dec {
-	return Pow(BasePrice(), tick_Index)
+func (k Keeper) CalcPrice1To0(tickIndex int64) sdk.Dec {
+	if 0 <= tickIndex {
+		return Pow(BasePrice(), uint64(tickIndex))
+	} else {
+		return sdk.OneDec().Quo(Pow(BasePrice(), uint64(-1*tickIndex)))
+	}
 }
 
 // Checks if a tick has reserves0 at any fee tier
@@ -361,7 +369,6 @@ func (k Keeper) GetTotalReservesAtTick(goCtx context.Context, pairId string, tic
 
 	// When we init a pair we init reserve0, reserve1 to 0 for all feetiers and thus we can iterate over the fee tiers without worrying about nil values.
 	for i, _ := range feelist {
-
 		if swap0to1 {
 			// Given a tickIndex of reserve0 calculate the totalReserves for the tick composted of reserve0 and the related reserve1
 			totalReserve0 = totalReserve0.Add(tick.TickData.Reserve0AndShares[i].Reserve0)
@@ -374,7 +381,6 @@ func (k Keeper) GetTotalReservesAtTick(goCtx context.Context, pairId string, tic
 			totalReserve0 = totalReserve0.Add(tick.TickData.Reserve0AndShares[i+int(feeValue)].Reserve0)
 
 		}
-
 	}
 
 	return totalReserve0, totalReserve1, nil
