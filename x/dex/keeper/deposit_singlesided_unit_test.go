@@ -228,7 +228,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityA() {
 	s.assertLiquidityAtTick(10, 0, 0, 0)
 	s.assertCurr1To0(-1)
 	s.assertMinTick(-1)
-	s.assertCurr0To1(math.MinInt64)
+	s.assertCurr0To1(0)
 	s.assertMaxTick(math.MinInt64)
 
 	// WHEN
@@ -242,7 +242,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityA() {
 	s.assertLiquidityAtTick(20, 0, 0, 0)
 	s.assertCurr1To0(-1)
 	s.assertMinTick(-1)
-	s.assertCurr0To1(math.MinInt64)
+	s.assertCurr0To1(0)
 	s.assertMaxTick(math.MinInt64)
 }
 
@@ -256,7 +256,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityB() {
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
 	s.assertLiquidityAtTick(0, 10, 0, 0)
-	s.assertCurr1To0(math.MaxInt64)
+	s.assertCurr1To0(0)
 	s.assertCurr0To1(1)
 	s.assertMinTick(math.MaxInt64)
 	s.assertMaxTick(1)
@@ -270,7 +270,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityB() {
 	s.assertLiquidityAtTick(0, 20, 0, 0)
 	s.assertAliceBalances(50, 30)
 	s.assertDexBalances(0, 20)
-	s.assertCurr1To0(math.MaxInt64)
+	s.assertCurr1To0(0)
 	s.assertCurr0To1(1)
 	s.assertMinTick(math.MaxInt64)
 	s.assertMaxTick(1)
@@ -325,7 +325,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiA() {
 	s.assertLiquidityAtTick(10, 0, 0, 0)
 	s.assertMinTick(-1)
 	s.assertCurr1To0(-1)
-	s.assertCurr0To1(math.MinInt64)
+	s.assertCurr0To1(0)
 	s.assertMaxTick(math.MinInt64)
 
 	// WHEN
@@ -343,7 +343,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiA() {
 	s.assertLiquidityAtTick(10, 0, 0, 1)
 	s.assertMinTick(-3)
 	s.assertCurr1To0(-1)
-	s.assertCurr0To1(math.MinInt64)
+	s.assertCurr0To1(0)
 	s.assertMaxTick(math.MinInt64)
 }
 
@@ -358,8 +358,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiB() {
 	s.assertDexBalances(0, 10)
 	s.assertLiquidityAtTick(0, 10, 0, 0)
 	s.assertMinTick(math.MaxInt64)
-	s.assertCurr1To0(math.MaxInt64)
 	s.assertCurr0To1(1)
+	s.assertCurr1To0(0)
 	s.assertMaxTick(1)
 
 	// WHEN
@@ -376,7 +376,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiB() {
 	s.assertLiquidityAtTick(0, 20, 0, 0)
 	s.assertLiquidityAtTick(0, 10, 0, 1)
 	s.assertMinTick(math.MaxInt64)
-	s.assertCurr1To0(math.MaxInt64)
+	s.assertCurr1To0(0)
 	s.assertCurr0To1(1)
 	s.assertMaxTick(3)
 }
