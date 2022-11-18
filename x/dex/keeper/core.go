@@ -136,10 +136,10 @@ func (k Keeper) DepositCore(
 			fmt.Sprint(msg.TickIndexes[i]),
 			fmt.Sprint(msg.FeeIndexes[i]),
 			lowerReserve0.Sub(trueAmount0).String(),
-			lowerReserve0.Sub(trueAmount0).String(),
 			upperReserve1.Sub(trueAmount1).String(),
 			lowerReserve0.String(),
 			upperReserve1.String(),
+			sharesMinted.String(),
 		),
 		)
 	}
@@ -245,12 +245,13 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			msg.Receiver,
 			token0,
 			token1,
-			fmt.Sprint(msg.TickIndexes),
-			fmt.Sprint(msg.FeeIndexes),
+			fmt.Sprint(msg.TickIndexes[i]),
+			fmt.Sprint(msg.FeeIndexes[i]),
 			lowerTickFeeReserve0.Add(reserve0ToRemove).String(),
 			upperTickFeeReserve1.Add(reserve1ToRemove).String(),
 			lowerTickFeeReserve0.String(),
 			upperTickFeeReserve1.String(),
+			sharesToRemove.String(),
 		))
 	}
 	k.SetPairMap(ctx, pair)
