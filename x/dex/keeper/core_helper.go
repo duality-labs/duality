@@ -394,8 +394,6 @@ func (k Keeper) GetTotalReservesAtTick(goCtx context.Context, pairId string, tic
 func (k Keeper) CalcTickPointersPostAddToken0(goCtx context.Context, pair *types.PairMap, tick *types.TickMap) *types.PairMap {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	if !k.HasToken0(ctx, tick) {
-		cts := sdk.UnwrapSDKContext(goCtx)
-		k.Logger(cts).Error("CALC TICK POINTERS TOKEN0 - K NOT HAS TOKEN0", "tick", tick)
 		return nil
 	}
 
