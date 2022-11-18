@@ -467,6 +467,7 @@ func (k Keeper) CalcTickPointersPostRemoveToken0(goCtx context.Context, pair *ty
 	// We have removed all of Token0 from the pool
 	if tickIndex == *minTick && tickIndex == *cur1To0 {
 		*minTick = math.MaxInt64
+		*cur1To0 = math.MaxInt64
 		// we leave cur1To0 where it is because otherwise we lose the last traded price
 	} else if tickIndex == *minTick {
 		// TODO: We should really search for the next minTick but this introduces a
@@ -510,6 +511,7 @@ func (k Keeper) CalcTickPointersPostRemoveToken1(goCtx context.Context, pair *ty
 	// only need to act when the token is exhausted at one of the bounds
 	if tickIndex == *maxTick && tickIndex == *cur0To1 {
 		*maxTick = math.MinInt64
+		*cur0To1 = math.MinInt64
 		// we leave cur0To1 where it is because otherwise we lose the last traded price
 	} else if tickIndex == *maxTick {
 		// TODO: We should really search for the next maxTick but this introduces a
