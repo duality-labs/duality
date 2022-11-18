@@ -5,6 +5,7 @@ import (
 
 	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func (s *MsgServerTestSuite) TestSwapNoLONoLiqudityPairNotFound() {
@@ -203,10 +204,12 @@ func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionSomeFeeTiers() {
 
 	// THEN
 	// swap should have in out
-	amountInLeftTick1, expectedAmountOutTick1 := s.calculateSingleSwapNoLOAToB(1, NewDec(10), amountInDec)
-	amountInLeftTick3, expectedAmountOutTick3 := s.calculateSingleSwapNoLOAToB(3, NewDec(10), amountInLeftTick1)
-	expectedAmountIn := amountInDec.Sub(amountInLeftTick3)
-	expectedAmountOut := expectedAmountOutTick1.Add(expectedAmountOutTick3)
+	expectedAmountLeft, expectedAmountOut := s.calculateMultipleSwapsNoLOAToB(
+		[]int64{1, 3},
+		[]sdk.Dec{NewDec(10), NewDec(10)},
+		amountInDec,
+	)
+	expectedAmountIn := amountInDec.Sub(expectedAmountLeft)
 	s.assertBobBalancesDec(NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
 	s.assertDexBalancesDec(expectedAmountIn, NewDec(20).Sub(expectedAmountOut))
 }
