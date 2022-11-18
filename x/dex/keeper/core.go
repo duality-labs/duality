@@ -652,14 +652,14 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	var placeTrancheIndex *uint64
 
 	if msg.TokenIn == token0 {
-		if msg.TickIndex > pair.TokenPair.CurrentTick0To1 && pair.MaxTick != math.MinInt64 {
-			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit amount 0 at a tick greater than the CurrentTick0to1")
+		if msg.TickIndex > pair.TokenPair.CurrentTick0To1 {
+			return types.ErrPlaceLimitOrderBehindPairLiquidity
 		}
 		fillTrancheIndex = &tick.LimitOrderPool0To1.CurrentLimitOrderKey
 		placeTrancheIndex = &tick.LimitOrderPool0To1.Count
 	} else {
-		if msg.TickIndex < pair.TokenPair.CurrentTick1To0 && pair.MinTick != math.MaxInt64 {
-			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit amount 1 at a tick less than the CurrentTick0to1")
+		if msg.TickIndex < pair.TokenPair.CurrentTick1To0 {
+			return types.ErrPlaceLimitOrderBehindPairLiquidity
 		}
 		fillTrancheIndex = &tick.LimitOrderPool1To0.CurrentLimitOrderKey
 		placeTrancheIndex = &tick.LimitOrderPool1To0.Count

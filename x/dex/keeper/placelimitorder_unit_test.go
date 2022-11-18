@@ -291,8 +291,8 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderBelowEnemyLines() {
 	// THEN
 	// deposit should fail with BEL error
 
-	err := types.ErrValidPairNotFound // TODO: this needs to be changed to a more specific error type
-	s.assertAliceLimitSellFails(err, "TokenB", -5, 10)
+	err := types.ErrPlaceLimitOrderBehindPairLiquidity // TODO: this needs to be changed to a more specific error type
+	s.assertAliceLimitSellFails(err, "TokenA", 5, 10)
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderAboveEnemyLines() {
@@ -310,6 +310,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderAboveEnemyLines() {
 	// THEN
 	// deposit should fail with BEL error
 
-	err := types.ErrValidPairNotFound // TODO: this needs to be changed to a more specific error type
-	s.assertAliceLimitSellFails(err, "TokenA", 5, 10)
+	err := types.ErrPlaceLimitOrderBehindPairLiquidity // TODO: this needs to be changed to a more specific error type
+	s.assertAliceLimitSellFails(err, "TokenB", -5, 10)
 }
