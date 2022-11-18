@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"github.com/NicholasDotSol/duality/x/dex/keeper"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -130,7 +131,7 @@ func calculateSharesPure(
 func calculateShares(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex int64, feeIndex uint64) sdk.Dec {
 	k, ctx := s.app.DexKeeper, s.ctx
 
-	price1To0 := k.CalcPrice1To0(tickIndex)
+	price1To0 := keeper.CalcPrice1To0(tickIndex)
 
 	feelist := k.GetAllFeeList(ctx)
 	fee := feelist[feeIndex].Fee

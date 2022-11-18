@@ -1,6 +1,10 @@
 package keeper
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
+import (
+	"fmt"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
 
 // Return the base value for price, 1.0001
 func BasePrice() sdk.Dec {
@@ -8,7 +12,9 @@ func BasePrice() sdk.Dec {
 }
 
 func Pow(a sdk.Dec, n uint64) sdk.Dec {
+	fmt.Println(a, n)
 	if n == 0 {
+		fmt.Println()
 		return sdk.OneDec()
 	}
 	if n&1 == 0 {
