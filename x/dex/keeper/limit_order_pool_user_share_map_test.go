@@ -33,10 +33,10 @@ func createNLimitOrderPoolUserShareMap(keeper *keeper.Keeper, ctx sdk.Context, p
 
 func TestLimitOrderPoolUserShareMapGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUserShareMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolUserShareMap(keeper, ctx, "TokenA;TokenB", 0, "TokenA", 10)
 	for _, item := range items {
 		rst, found := keeper.GetLimitOrderPoolUserShareMap(ctx,
-			"TokenA/TokenB",
+			"TokenA;TokenB",
 			0,
 			"TokenA",
 			item.Count,
@@ -51,17 +51,17 @@ func TestLimitOrderPoolUserShareMapGet(t *testing.T) {
 }
 func TestLimitOrderPoolUserShareMapRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUserShareMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolUserShareMap(keeper, ctx, "TokenA;TokenB", 0, "TokenA", 10)
 	for _, item := range items {
 		keeper.RemoveLimitOrderPoolUserShareMap(ctx,
-			"TokenA/TokenB",
+			"TokenA;TokenB",
 			0,
 			"TokenA",
 			item.Count,
 			item.Address,
 		)
 		_, found := keeper.GetLimitOrderPoolUserShareMap(ctx,
-			"TokenA/TokenB",
+			"TokenA;TokenB",
 			0,
 			"TokenA",
 			item.Count,
