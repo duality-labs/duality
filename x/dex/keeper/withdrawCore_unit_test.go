@@ -164,7 +164,7 @@ func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterDoubleSidedThenSingleSid
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
 	s.assertCurr1To0(-1)
-	s.assertCurr0To1(math.MinInt64)
+	s.assertCurr0To1(math.MaxInt64)
 	s.assertMinTick(-1)
-	s.assertMaxTick(math.MaxInt64)
+	s.assertMaxTick(math.MinInt64)
 }
