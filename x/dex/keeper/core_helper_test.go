@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"math"
+
 	"github.com/NicholasDotSol/duality/x/dex/keeper"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -202,15 +203,18 @@ func (s *MsgServerTestSuite) TestFindNextTick1To0WithLiq() {
 	s.setLPAtFee0Pool(-1, 10, 0)
 	s.setLPAtFee0Pool(0, 10, 0)
 	s.setLPAtFee0Pool(1, 0, 0)
+
+	// tick -2: (10, 0)
+	// tick -1: (10, 0)
 	pair.TokenPair.CurrentTick1To0 = 1
-	pair.MinTick = -1
+	pair.MinTick = -2
 	s.app.DexKeeper.SetPairMap(s.ctx, pair)
 
 	// THEN FindNextTick1To0 finds the tick at 0
 
 	tickIdx, found := s.app.DexKeeper.FindNextTick1To0(s.goCtx, pair)
 	s.Require().True(found)
-	s.Assert().Equal(int64(0), tickIdx)
+	s.Assert().Equal(int64(-1), tickIdx)
 
 }
 
@@ -219,15 +223,17 @@ func (s *MsgServerTestSuite) TestFindNextTick1To0WithMinLiq() {
 	pair := s.app.DexKeeper.GetOrInitPair(s.goCtx, "TokenA", "TokenB")
 	s.setLPAtFee0Pool(-1, 10, 0)
 	s.setLPAtFee0Pool(1, 0, 0)
+
+	// tick -2: (10, 0)
 	pair.TokenPair.CurrentTick1To0 = 1
-	pair.MinTick = -1
+	pair.MinTick = -2
 	s.app.DexKeeper.SetPairMap(s.ctx, pair)
 
 	// THEN FindNextTick1To0 finds the tick at -1
 
 	tickIdx, found := s.app.DexKeeper.FindNextTick1To0(s.goCtx, pair)
 	s.Require().True(found)
-	s.Assert().Equal(int64(-1), tickIdx)
+	s.Assert().Equal(int64(-2), tickIdx)
 
 }
 
@@ -253,23 +259,13 @@ func (s *MsgServerTestSuite) TestFindNextTick0To1WithLiq() {
 	s.setLPAtFee0Pool(-1, 10, 0)
 	s.setLPAtFee0Pool(0, 0, 10)
 	s.setLPAtFee0Pool(1, 0, 10)
-	pair.TokenPair.CurrentTick0To1 = -1
-	pair.MaxTick = 1
-	s.app.DexKeeper.SetPairMap(s.ctx, pair)
 
-	// THEN FindNextTick0To1 finds the tick at 0
+	// tick -2: (10,  0)
+	// tick -1: ( 0,  0)
+	// tick  0: ( 0,  0)
+	// tick  1: ( 0, 10)
+	// tick  2: ( 0, 10)
 
-	tickIdx, found := s.app.DexKeeper.FindNextTick0To1(s.goCtx, pair)
-	s.Require().True(found)
-	s.Assert().Equal(int64(0), tickIdx)
-
-}
-
-func (s *MsgServerTestSuite) TestFindNextTick0To1WithMinLiq() {
-	// WHEN tick with token1 @ index 1 & MaxTick = 1
-	pair := s.app.DexKeeper.GetOrInitPair(s.goCtx, "TokenA", "TokenB")
-	s.setLPAtFee0Pool(-1, 0, 0)
-	s.setLPAtFee0Pool(1, 0, 10)
 	pair.TokenPair.CurrentTick0To1 = -1
 	pair.MaxTick = 1
 	s.app.DexKeeper.SetPairMap(s.ctx, pair)
@@ -279,6 +275,24 @@ func (s *MsgServerTestSuite) TestFindNextTick0To1WithMinLiq() {
 	tickIdx, found := s.app.DexKeeper.FindNextTick0To1(s.goCtx, pair)
 	s.Require().True(found)
 	s.Assert().Equal(int64(1), tickIdx)
+}
+
+func (s *MsgServerTestSuite) TestFindNextTick0To1WithMinLiq() {
+	// WHEN tick with token1 @ index 1 & MaxTick = 1
+	pair := s.app.DexKeeper.GetOrInitPair(s.goCtx, "TokenA", "TokenB")
+	s.setLPAtFee0Pool(-1, 0, 0)
+	s.setLPAtFee0Pool(1, 0, 10)
+
+	// tick 2: (0, 10)
+	pair.TokenPair.CurrentTick0To1 = -1
+	pair.MaxTick = 2
+	s.app.DexKeeper.SetPairMap(s.ctx, pair)
+
+	// THEN FindNextTick0To1 finds the tick at 1
+
+	tickIdx, found := s.app.DexKeeper.FindNextTick0To1(s.goCtx, pair)
+	s.Require().True(found)
+	s.Assert().Equal(int64(2), tickIdx)
 }
 
 // CalcTrueAmounts ////////////////////////////////////////////////////////////

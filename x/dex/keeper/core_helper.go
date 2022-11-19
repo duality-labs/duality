@@ -404,8 +404,8 @@ func (k Keeper) CalcTickPointersPostAddToken0(goCtx context.Context, pair *types
 	tickIndex := tick.TickIndex
 	minTick := &pair.MinTick
 	cur1To0 := &pair.TokenPair.CurrentTick1To0
-	*minTick = tickIndex
-	*cur1To0 = tickIndex
+	*minTick = MinInt64(*minTick, tickIndex)
+	*cur1To0 = MaxInt64(*cur1To0, tickIndex)
 	return pair
 }
 
@@ -429,7 +429,6 @@ func (k Keeper) CalcTickPointersPostAddToken1(goCtx context.Context, pair *types
 	maxTick := &pair.MaxTick
 	*cur0To1 = MinInt64(*cur0To1, tickIndex)
 	*maxTick = MaxInt64(*maxTick, tickIndex)
-
 	return pair
 }
 
