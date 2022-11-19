@@ -23,6 +23,9 @@ func (s *MsgServerTestSuite) TestPartialWithdrawOnlyA() {
 	s.assertDexBalances(10, 0)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(math.MinInt64)
+	s.assertMinTick(-1)
+	s.assertMaxTick(math.MinInt64)
+
 
 	s.aliceWithdraws(NewWithdrawl(5, 0, 0))
 	fmt.Println("here")
@@ -31,6 +34,8 @@ func (s *MsgServerTestSuite) TestPartialWithdrawOnlyA() {
 	s.assertDexBalances(5, 0)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(math.MinInt64)
+	s.assertMinTick(-1)
+	s.assertMaxTick(math.MinInt64)
 
 }
 
@@ -50,6 +55,8 @@ func (s *MsgServerTestSuite) TestPartialWithdrawOnlyB() {
 	s.assertDexBalances(0, 10)
 	s.assertCurr1To0(math.MaxInt64)
 	s.assertCurr0To1(1)
+	s.assertMinTick(math.MaxInt64)
+	s.assertMaxTick(1)
 
 	s.aliceWithdraws(NewWithdrawl(5, 0, 0))
 
@@ -57,6 +64,8 @@ func (s *MsgServerTestSuite) TestPartialWithdrawOnlyB() {
 	s.assertDexBalances(0, 5)
 	s.assertCurr1To0(math.MaxInt64)
 	s.assertCurr0To1(1)
+	s.assertMinTick(math.MaxInt64)
+	s.assertMaxTick(1)
 }
 
 func (s *MsgServerTestSuite) TestFullWithdrawOnlyB() {
@@ -75,6 +84,8 @@ func (s *MsgServerTestSuite) TestFullWithdrawOnlyB() {
 	s.assertDexBalances(0, 10)
 	s.assertCurr1To0(math.MaxInt64)
 	s.assertCurr0To1(1)
+	s.assertMinTick(math.MaxInt64)
+	s.assertMaxTick(1)
 
 	s.aliceWithdraws(NewWithdrawl(10, 0, 0))
 
@@ -82,14 +93,16 @@ func (s *MsgServerTestSuite) TestFullWithdrawOnlyB() {
 	s.assertDexBalances(0, 0)
 	s.assertCurr1To0(math.MaxInt64)
 	s.assertCurr0To1(math.MinInt64)
+	s.assertMinTick(math.MaxInt64)
+	s.assertMaxTick(math.MinInt64)
 }
 
-func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterOneSidedDeposit() {
+func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterDoubleSidedThenSingleSidedDepositAndPartialWithdrawal() {
 	s.fundAliceBalances(50, 50)
 	// CASE
 	// Alice deposits 10 of A and B with a spread (fee) of +- 3 ticks
 	// Alice then deposits 10 A with a spread (fee) of -1 ticks
-	// Since there is no B in Alice's second deposit, the current tick shouldn't update
+	// Finally Alice withdraws from the first pool they deposited to
 
 	s.aliceDeposits(NewDeposit(10, 10, 0, 1))
 
@@ -97,6 +110,8 @@ func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterOneSidedDeposit() {
 	s.assertDexBalances(10, 10)
 	s.assertCurr1To0(-3)
 	s.assertCurr0To1(3)
+	s.assertMinTick(-3)
+	s.assertMaxTick(3)
 
 	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
 
@@ -104,4 +119,52 @@ func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterOneSidedDeposit() {
 	s.assertDexBalances(20, 10)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(3)
+	s.assertMinTick(-3)
+	s.assertMaxTick(3)
+
+	//DEBUG
+	s.aliceWithdraws(NewWithdrawl(10, 0, 1))
+
+	s.assertAliceBalances(35, 45)
+	s.assertDexBalances(15, 5)
+	s.assertCurr1To0(-1)
+	s.assertCurr0To1(3)
+	s.assertMinTick(-3)
+	s.assertMaxTick(3)
+}
+
+func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterDoubleSidedThenSingleSidedDepositAndFulllWithdrawal() {
+	s.fundAliceBalances(50, 50)
+	// CASE
+	// Alice deposits 10 of A and B with a spread (fee) of +- 3 ticks
+	// Alice then deposits 10 A with a spread (fee) of -1 ticks
+	// Finally Alice withdraws from the first pool they deposited to
+
+	s.aliceDeposits(NewDeposit(10, 10, 0, 1))
+
+	s.assertAliceBalances(40, 40)
+	s.assertDexBalances(10, 10)
+	s.assertCurr1To0(-3)
+	s.assertCurr0To1(3)
+	s.assertMinTick(-3)
+	s.assertMaxTick(3)
+
+	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
+
+	s.assertAliceBalances(30, 40)
+	s.assertDexBalances(20, 10)
+	s.assertCurr1To0(-1)
+	s.assertCurr0To1(3)
+	s.assertMinTick(-3)
+	s.assertMaxTick(3)
+
+	//DEBUG
+	s.aliceWithdraws(NewWithdrawl(20, 0, 1))
+
+	s.assertAliceBalances(40, 50)
+	s.assertDexBalances(10, 0)
+	s.assertCurr1To0(-1)
+	s.assertCurr0To1(math.MinInt64)
+	s.assertMinTick(-1)
+	s.assertMaxTick(math.MaxInt64)
 }
