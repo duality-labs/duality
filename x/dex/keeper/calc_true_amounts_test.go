@@ -1,4 +1,4 @@
-package keeper_test
+xpackage keeper_test
 
 import (
 	"testing"
