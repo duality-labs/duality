@@ -1,6 +1,10 @@
 package keeper_test
 
 import (
+	"math"
+
+	"github.com/NicholasDotSol/duality/x/dex/keeper"
+	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -37,7 +41,7 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlPartial() {
 	s.assertAliceBalances(50, 25)
 	s.assertDexBalances(50, 25)
 	// CurrentTick values remain unchanged
-	s.assertCurrentTicks(1, -1)
+	s.assertCurrentTicks(-1, 1)
 }
 
 func (s *MsgServerTestSuite) TestSingleWithdrawlMaxFee() {
@@ -80,14 +84,14 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlShiftsTickRight() {
 		NewDeposit(100, 0, 1, 0),
 	)
 	// currentTick1To0 = 2
-	s.assertCurrentTicks(3, 1)
+	s.assertCurrentTicks(1, math.MaxInt64)
 
 	// WHEN Alice withdraws her shares from Tick 1
-	s.aliceWithdraws(NewWithdrawl(100, 1, 0))
+	s.aliceWithdraws(NewWithdrawl(100, 2, 0))
 
 	// THEN currentTick1To0 = 3
 	//TODO: this is currently failling because of TickCount bug
-	s.assertCurrentTicks(3, 1)
+	s.assertCurrentTicks(0, math.MaxInt64)
 }
 
 func (s *MsgServerTestSuite) TestSingleWithdrawlShiftsTickLeft() {
@@ -99,16 +103,18 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlShiftsTickLeft() {
 		NewDeposit(0, 100, 2, 0),
 	)
 	// currentTick0To1 = 1
-	s.assertCurrentTicks(0, 2)
+	s.assertCurrentTicks(math.MinInt64, 2)
 
 	// WHEN Alice withdraws her shares from Tick 1
-	s.aliceWithdraws(NewWithdrawl(100, 1, 0))
+	sharesToWithdraw := keeper.CalcShares(
+		NewDec(0),
+		NewDec(100),
+		keeper.CalcPrice1To0(1),
+	)
+	s.aliceWithdraws(NewWithdrawlDec(sharesToWithdraw, 1, 0))
 
 	// THEN currentTick0To1 = 0
-	// TODO: this is currently failling because of precision bug
-	// basically our deposit and withdraw are not perfect computational inversions
-	// (they are perfect mathematical inversions)
-	s.assertCurrentTicks(0, 3)
+	s.assertCurrentTicks(math.MinInt64, 3)
 }
 
 func (s *MsgServerTestSuite) TestMultiWithdrawlShiftsTickLeft() {
@@ -121,14 +127,14 @@ func (s *MsgServerTestSuite) TestMultiWithdrawlShiftsTickLeft() {
 		NewDeposit(100, 0, 1, 0),
 	)
 	// currentTick1To0 = 2
-	s.assertCurrentTicks(2, 0)
+	s.assertCurrentTicks(2, math.MaxInt64)
 
 	// WHEN Alice withdraws all her shares from Tick 2 & 3
 	s.aliceWithdraws(
 		NewWithdrawl(100, 2, 0),
 		NewWithdrawl(100, 3, 0))
 
-	s.assertCurrentTicks(0, 0)
+	s.assertCurrentTicks(0, math.MaxInt64)
 }
 
 // TODO: more test to write

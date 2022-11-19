@@ -64,7 +64,6 @@ func MultipleLimitOrderFills(amounts_placed []sdk.Dec, prices []sdk.Dec, amount_
 		amount_remaining = amount_remaining.Sub(amount_in)
 		total_out = total_out.Add(amount_out)
 	}
-	fmt.Println("Total Out: ", total_out)
 	return total_out
 }
 
@@ -87,8 +86,6 @@ func SinglePoolSwap(amount_liquidity sdk.Dec, price_swapped_at sdk.Dec, amount_t
 		amount_out = amount_in.Mul(price_swapped_at)
 	}
 
-	fmt.Println("Amount Out: ", amount_out)
-	fmt.Println("Amount In: ", amount_in)
 	return amount_in, amount_out
 }
 
