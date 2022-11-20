@@ -31,7 +31,7 @@ func (s *MsgServerTestSuite) TestPairToTokensIBCis0() {
 	s.Assert().Equal("TokenB", token1)
 }
 
-func (s *MsgServerTestSuite) TestPairToTokensICS20is1() {
+func (s *MsgServerTestSuite) TestPairToTokensIBCis1() {
 
 	token0, token1 := keeper.PairToTokens("TokenA;ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2")
 
@@ -39,7 +39,7 @@ func (s *MsgServerTestSuite) TestPairToTokensICS20is1() {
 	s.Assert().Equal("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", token1)
 
 }
-func (s *MsgServerTestSuite) TestPairToTokensICS20isBoth() {
+func (s *MsgServerTestSuite) TestPairToTokensIBCisBoth() {
 
 	token0, token1 :=
 		keeper.PairToTokens("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2;ibc/94644FB092D9ACDA56123C74F36E4234926001AA44A9CA97EA622B25F41E5223")
