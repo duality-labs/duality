@@ -24,8 +24,9 @@ require (
 )
 
 replace (
-	github.com/cosmos/admin-module => github.com/Ethernal-Tech/admin-module v0.0.0-20221102105340-e693f4d379c3
-	github.com/cosmos/ibc-go/v3 => github.com/informalsystems/ibc-go/v3 v3.0.0-beta1.0.20220816140824-aba9c2f2b943
+	github.com/cosmos/admin-module => github.com/jtieri/admin-module v0.0.0-20221116191954-1d63d5fc9608
+	github.com/cosmos/ibc-go/v3 => github.com/jtieri/ibc-go/v3 v3.0.0-beta1.0.20221116191630-01c53c7f66f3
+	github.com/cosmos/interchain-security v0.0.0-20221102103028-d7f8d448be65 => github.com/jtieri/interchain-security v0.0.0-20221116194529-59bf07eb134f
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/keybase/go-keychain => github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2

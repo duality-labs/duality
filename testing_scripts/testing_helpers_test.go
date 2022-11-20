@@ -1,10 +1,9 @@
 package testing_scripts
 
 import (
-	"testing"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"testing"
 )
-
 
 func TestSingleLimitOrderFill(t *testing.T) {
 	amount_placed := sdk.NewDec(10)
