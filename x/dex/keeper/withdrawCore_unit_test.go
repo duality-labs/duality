@@ -157,10 +157,10 @@ func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterDoubleSidedThenSingleSid
 	s.assertCurr0To1(3)
 	s.assertMinTick(-3)
 	s.assertMaxTick(3)
-
+	
 	//DEBUG
 	s.aliceWithdraws(NewWithdrawl(20, 0, 1))
-
+	
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
 	s.assertCurr1To0(-1)
