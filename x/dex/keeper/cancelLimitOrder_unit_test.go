@@ -17,7 +17,7 @@ func (s *MsgServerTestSuite) TestCancelEntireLimitOrderAOneExists() {
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
 	s.assertCurr1To0(0)
-	s.assertCurr0To1(math.MinInt64)
+	s.assertCurr0To1(math.MaxInt64)
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(0)
 
@@ -25,8 +25,8 @@ func (s *MsgServerTestSuite) TestCancelEntireLimitOrderAOneExists() {
 
 	s.assertAliceBalances(50, 50)
 	s.assertDexBalances(0, 0)
-	s.assertCurr1To0(math.MaxInt64)
-	s.assertCurr0To1(math.MinInt64)
+	s.assertCurr1To0(math.MinInt64)
+	s.assertCurr0To1(math.MaxInt64)
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(math.MaxInt64)
 }
@@ -40,7 +40,7 @@ func (s *MsgServerTestSuite) TestCancelEntireLimitOrderBOneExists() {
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
-	s.assertCurr1To0(math.MaxInt64)
+	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(0)
 	s.assertMaxTick(0)
 	s.assertMinTick(math.MaxInt64)
@@ -49,8 +49,8 @@ func (s *MsgServerTestSuite) TestCancelEntireLimitOrderBOneExists() {
 
 	s.assertAliceBalances(50, 50)
 	s.assertDexBalances(0, 0)
-	s.assertCurr1To0(math.MaxInt64)
-	s.assertCurr0To1(math.MinInt64)
+	s.assertCurr1To0(math.MinInt64)
+	s.assertCurr0To1(math.MaxInt64)
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(math.MaxInt64)
 }
@@ -66,7 +66,7 @@ func (s *MsgServerTestSuite) TestCancelHigherEntireLimitOrderATwoExistDiffTicksS
 	s.assertAliceBalances(30, 50)
 	s.assertDexBalances(20, 0)
 	s.assertCurr1To0(0)
-	s.assertCurr0To1(math.MinInt64)
+	s.assertCurr0To1(math.MaxInt64)
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(-1)
 
@@ -75,7 +75,7 @@ func (s *MsgServerTestSuite) TestCancelHigherEntireLimitOrderATwoExistDiffTicksS
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
 	s.assertCurr1To0(-1)
-	s.assertCurr0To1(math.MinInt64)
+	s.assertCurr0To1(math.MaxInt64)
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(-1)
 }
@@ -91,7 +91,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderATwoExistDiffTicksSa
 	s.assertAliceBalances(30, 50)
 	s.assertDexBalances(20, 0)
 	s.assertCurr1To0(0)
-	s.assertCurr0To1(math.MinInt64)
+	s.assertCurr0To1(math.MaxInt64)
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(-1)
 
@@ -100,7 +100,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderATwoExistDiffTicksSa
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
 	s.assertCurr1To0(0)
-	s.assertCurr0To1(math.MinInt64)
+	s.assertCurr0To1(math.MaxInt64)
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(0)
 }
@@ -124,7 +124,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderATwoExistDiffTicksDi
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
-	s.assertCurr1To0(math.MaxInt64)
+	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
 	s.assertMaxTick(1)
 	s.assertMinTick(math.MaxInt64)
@@ -140,7 +140,7 @@ func (s *MsgServerTestSuite) TestCancelHigherEntireLimitOrderBTwoExistDiffTicksS
 
 	s.assertAliceBalances(50, 30)
 	s.assertDexBalances(0, 20)
-	s.assertCurr1To0(math.MaxInt64)
+	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(-1)
 	s.assertMaxTick(0)
 	s.assertMinTick(math.MaxInt64)
@@ -149,7 +149,7 @@ func (s *MsgServerTestSuite) TestCancelHigherEntireLimitOrderBTwoExistDiffTicksS
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
-	s.assertCurr1To0(math.MaxInt64)
+	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(-1)
 	s.assertMaxTick(-1)
 	s.assertMinTick(math.MaxInt64)
@@ -165,7 +165,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderBTwoExistDiffTicksSa
 
 	s.assertAliceBalances(50, 30)
 	s.assertDexBalances(0, 20)
-	s.assertCurr1To0(math.MaxInt64)
+	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(-1)
 	s.assertMaxTick(0)
 	s.assertMinTick(math.MaxInt64)
@@ -174,7 +174,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderBTwoExistDiffTicksSa
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
-	s.assertCurr1To0(math.MaxInt64)
+	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(0)
 	s.assertMaxTick(0)
 	s.assertMinTick(math.MaxInt64)

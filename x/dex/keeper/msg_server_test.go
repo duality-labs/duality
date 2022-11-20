@@ -555,6 +555,14 @@ func NewWithdrawl(shares int64, tick int64, feeIndex uint64) *Withdrawl {
 	}
 }
 
+func NewWithdrawlDec(shares sdk.Dec, tick int64, feeIndex uint64) *Withdrawl {
+	return &Withdrawl{
+		Shares:    shares,
+		FeeIndex:  feeIndex,
+		TickIndex: tick,
+	}
+}
+
 func (s *MsgServerTestSuite) getShares(
 	account sdk.AccAddress,
 	pairId string,
@@ -658,7 +666,8 @@ func (s *MsgServerTestSuite) assertLiquidityAtTick(amountA int, amountB int, tic
 	}
 
 	amtA, amtB := NewDec(amountA), NewDec(amountB)
-	liquidityA, liquidityB := lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0, upperTick.TickData.Reserve1[feeIndex]
+	liquidityA := lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
+	liquidityB := upperTick.TickData.Reserve1[feeIndex]
 	s.Assert().Equal(amtA, liquidityA)
 	s.Assert().Equal(amtB, liquidityB)
 }

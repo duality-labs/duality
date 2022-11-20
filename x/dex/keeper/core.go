@@ -52,13 +52,13 @@ func (k Keeper) DepositCore(
 		upperTickIndex := tickIndex + fee
 
 		// TODO: Allow user to deposit "behind enemy lines"
-		if amounts0[i].GT(sdk.ZeroDec()) && curTick0to1 <= lowerTickIndex && curTick0to1 == math.MaxInt64 {
-			return nil, nil, sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit amount_0 at tick greater than or equal to the CurrentTick0to1")
+		if amount0.GT(sdk.ZeroDec()) && curTick0to1 <= lowerTickIndex {
+			return nil, nil, types.ErrDepositBehindPairLiquidity
 		}
 
 		// TODO: Allow user to deposit "behind enemy lines"
-		if amounts1[i].GT(sdk.ZeroDec()) && upperTickIndex <= curTick1to0 && curTick1to0 == math.MinInt64 {
-			return nil, nil, sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit amount_1 at tick less than or equal to the CurrentTick1to0")
+		if amount1.GT(sdk.ZeroDec()) && upperTickIndex <= curTick1to0 {
+			return nil, nil, types.ErrDepositBehindPairLiquidity
 		}
 
 		lowerTick := k.GetOrInitTick(goCtx, pairId, lowerTickIndex)
@@ -167,11 +167,12 @@ func (k Keeper) DepositCore(
 // Handles core logic for MsgWithdrawl; calculating and withdrawing reserve0,reserve1 from a specified tick given a specfied number of shares to remove.
 // Calculates the amount of reserve0, reserve1 to withdraw based on the percetange of the desired number of shares to remove compared to the total number of shares at the given tick
 func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
+	
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId := k.CreatePairId(token0, token1)
 	pair, found := k.GetPairMap(ctx, pairId)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
+		return types.ErrValidPairNotFound
 	}
 	totalReserve0ToRemove := sdk.ZeroDec()
 	totalReserve1ToRemove := sdk.ZeroDec()
@@ -188,13 +189,13 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			feeIndex,
 		)
 		if !found {
-			return sdkerrors.Wrapf(types.ErrValidShareNotFound, "No valid share owner fonnd")
+			return types.ErrValidShareNotFound
 		}
 		userSharesOwned := &shareOwner.SharesOwned
 
 		feeValue, found := k.GetFeeList(ctx, feeIndex)
 		if !found {
-			return sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", feeIndex)
+			return types.ErrValidFeeIndexNotFound
 		}
 		fee := feeValue.Fee
 		lowerTickIndex := tickIndex - fee
@@ -202,15 +203,14 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, lowerTickIndex)
 		upperTick, upperTickFound := k.GetTickMap(ctx, pairId, upperTickIndex)
 		if !lowerTickFound || !upperTickFound {
-			return sdkerrors.Wrapf(types.ErrValidTickNotFound, "No tick found at the requested index")
+			return types.ErrValidTickNotFound
 		}
 
 		lowerTickFeeTotalShares := &lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
 		lowerTickFeeReserve0 := &lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
 		upperTickFeeReserve1 := &upperTick.TickData.Reserve1[feeIndex]
-
 		if lowerTickFeeTotalShares.Equal(sdk.ZeroDec()) {
-			return sdkerrors.Wrapf(types.ErrValidTickNotFound, "No tick found at the requested index")
+			return types.ErrNotEnoughShares
 		}
 
 		sharesToRemove = MinDec(sharesToRemove, *userSharesOwned)
@@ -294,7 +294,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		return sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 	if pair.TokenPair.CurrentTick0To1 == math.MaxInt64 {
-		return sdk.ZeroDec(), sdk.ZeroDec(), types.ErrNoLiquidity
+		return sdk.ZeroDec(), sdk.ZeroDec(), types.ErrNotEnoughLiquidity
 	}
 
 	amount_left := msg.AmountIn
@@ -321,7 +321,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			price_0to1 := CalcPrice0To1(pair.TokenPair.CurrentTick0To1)
 
 			if price_0to1.Mul(amount_left).Add(amount_out).LT(msg.MinOut) {
-				return sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed1")
+				return sdk.ZeroDec(), sdk.ZeroDec(), types.ErrNotEnoughLiquidity
 			}
 
 			if Current1Data.TickData.Reserve1[i].LT(amount_left.Mul(price_0to1)) {
@@ -343,26 +343,26 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 			//Make updates to tickMap containing reserve0/1 data to the KVStore
 			k.SetTickMap(ctx, pairId, Current0Data)
+			// TODO: Return to this, maybe is receiving the wrong tick
 			k.UpdateTickPointersPostAddToken0(goCtx, &pair, &Current0Data)
 		}
 
 		k.SetTickMap(ctx, pairId, Current1Data)
-		k.UpdateTickPointersPostRemoveToken1(goCtx, &pair, &Current1Data)
-		if i == feeSize {
+		if i == feeSize && amount_left.GT(sdk.ZeroDec()) {
 			var err error
 			amount_left, amount_out, err = k.SwapLimitOrder0to1(goCtx, pairId, token1, amount_out, amount_left, pair.TokenPair.CurrentTick0To1)
-
 			if err != nil {
 				return sdk.ZeroDec(), sdk.ZeroDec(), err
 			}
 		}
+		k.UpdateTickPointersPostRemoveToken1(goCtx, &pair, &Current1Data)
 	}
 
 	k.SetPairMap(ctx, pair)
 
 	// Check to see if amount_out meets the threshold of minOut
 	if amount_out.LT(msg.MinOut) {
-		return sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed2")
+		return sdk.ZeroDec(), sdk.ZeroDec(), types.ErrNotEnoughLiquidity
 	}
 
 	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
@@ -385,7 +385,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		return sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 	if pair.TokenPair.CurrentTick1To0 == math.MinInt64 {
-		return sdk.ZeroDec(), sdk.ZeroDec(), types.ErrNoLiquidity
+		return sdk.ZeroDec(), sdk.ZeroDec(), types.ErrNotEnoughLiquidity
 	}
 
 	amount_left := msg.AmountIn
@@ -410,7 +410,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 			price_1to0 := CalcPrice1To0(pair.TokenPair.CurrentTick1To0)
 			if price_1to0.Mul(amount_left).Add(amount_out).LT(msg.MinOut) {
-				return sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed3")
+				return sdk.ZeroDec(), sdk.ZeroDec(), types.ErrNotEnoughLiquidity
 			}
 
 			// If there is not enough to complete the trade
@@ -436,8 +436,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 		k.SetTickMap(ctx, pairId, Current0Data)
 
-		k.UpdateTickPointersPostRemoveToken0(goCtx, &pair, &Current0Data)
-		if i == feeSize {
+		if i == feeSize && amount_left.GT(sdk.ZeroDec()) {
 			var err error
 			amount_left, amount_out, err = k.SwapLimitOrder1to0(goCtx, pairId, token0, amount_out, amount_left, pair.TokenPair.CurrentTick1To0)
 
@@ -445,12 +444,13 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				return sdk.ZeroDec(), sdk.ZeroDec(), err
 			}
 		}
+		k.UpdateTickPointersPostRemoveToken0(goCtx, &pair, &Current0Data)
 	}
 
 	k.SetPairMap(ctx, pair)
 
 	if amount_out.LT(msg.MinOut) {
-		return sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Amount Out is less than minium amount out specified: swap failed4")
+		return sdk.ZeroDec(), sdk.ZeroDec(), types.ErrNotEnoughLiquidity
 	}
 
 	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
@@ -466,6 +466,7 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenOu
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	priceInToOut := CalcPrice0To1(tickIndex)
+	// TODO: check this out
 	priceOutToIn := sdk.OneDec().Quo(priceInToOut)
 
 	tick, tickFound := k.GetTickMap(ctx, pairId, tickIndex)
@@ -534,8 +535,8 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenOu
 	} else {
 		amountFilledTokenOut := amountRemainingTokenIn.Mul(priceInToOut)
 		amountOut = amountOut.Add(amountFilledTokenOut)
-		fillData.FilledReserves = fillData.FilledReserves.Add(amountRemainingTokenIn)
-		reserveData.Reserves = reserveData.Reserves.Sub(amountFilledTokenOut)
+		*fillTokenIn = fillTokenIn.Add(amountRemainingTokenIn)
+		*reservesTokenOut = reservesTokenOut.Sub(amountFilledTokenOut)
 		amountRemainingTokenIn = sdk.ZeroDec()
 		k.SetLimitOrderPoolReserveMap(ctx, reserveData)
 		k.SetLimitOrderPoolFillMap(ctx, fillData)
@@ -653,14 +654,14 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	var placeTrancheIndex *uint64
 
 	if msg.TokenIn == token0 {
-		if msg.TickIndex > pair.TokenPair.CurrentTick0To1 && pair.MaxTick != math.MinInt64 {
-			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit amount 0 at a tick greater than the CurrentTick0to1")
+		if msg.TickIndex > pair.TokenPair.CurrentTick0To1 {
+			return types.ErrPlaceLimitOrderBehindPairLiquidity
 		}
 		fillTrancheIndex = &tick.LimitOrderPool0To1.CurrentLimitOrderKey
 		placeTrancheIndex = &tick.LimitOrderPool0To1.Count
 	} else {
-		if msg.TickIndex < pair.TokenPair.CurrentTick1To0 && pair.MinTick != math.MaxInt64 {
-			return sdkerrors.Wrapf(types.ErrValidPairNotFound, "Cannot deposit amount 1 at a tick less than the CurrentTick0to1")
+		if msg.TickIndex < pair.TokenPair.CurrentTick1To0 {
+			return types.ErrPlaceLimitOrderBehindPairLiquidity
 		}
 		fillTrancheIndex = &tick.LimitOrderPool1To0.CurrentLimitOrderKey
 		placeTrancheIndex = &tick.LimitOrderPool1To0.Count
@@ -695,7 +696,8 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 
 	if msg.AmountIn.GT(sdk.ZeroDec()) {
 		coin0 := sdk.NewCoin(msg.TokenIn, sdk.NewIntFromBigInt(msg.AmountIn.BigInt()))
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
+		err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0})
+		if err != nil {
 			return err
 		}
 	}

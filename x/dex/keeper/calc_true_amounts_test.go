@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/NicholasDotSol/duality/x/dex/keeper"
+	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -17,80 +19,80 @@ func TestCalcTrueAmountsTestSuite(t *testing.T) {
 
 func (s *CalcTrueAmountsTestSuite) TestBothReservesNonZero() {
 	trueAmount0, trueAmount1, sharesMinted := keeper.CalcTrueAmounts(
-		newDec("0.25"),
-		newDec("10"),
-		newDec("40"), // value 20
-		newDec("100"),
-		newDec("100"), // effectively (25, 100), value 50
-		newDec("50"),
+		sdk.MustNewDecFromStr("0.25"),
+		NewDec(10),
+		NewDec(40), // value 20
+		NewDec(100),
+		NewDec(100), // effectively (25, 100), value 50
+		NewDec(50),
 	)
-	s.Assert().Equal(newDec("25"), trueAmount0)
-	s.Assert().Equal(newDec("100"), trueAmount1)
-	s.Assert().Equal(newDec("125"), sharesMinted)
+	s.Assert().Equal(NewDec(25), trueAmount0)
+	s.Assert().Equal(NewDec(100), trueAmount1)
+	s.Assert().Equal(NewDec(125), sharesMinted)
 }
 
 func (s *CalcTrueAmountsTestSuite) TestBothReservesZero() {
 	trueAmount0, trueAmount1, sharesMinted := keeper.CalcTrueAmounts(
-		newDec("0.25"),
-		newDec("0"),
-		newDec("0"),
-		newDec("100"),
-		newDec("100"),
-		newDec("50"),
+		sdk.MustNewDecFromStr("0.25"),
+		NewDec(0),
+		NewDec(0),
+		NewDec(100),
+		NewDec(100),
+		NewDec(50),
 	)
-	s.Assert().Equal(newDec("100"), trueAmount0)
-	s.Assert().Equal(newDec("100"), trueAmount1)
-	s.Assert().Equal(newDec("125"), sharesMinted)
+	s.Assert().Equal(NewDec(100), trueAmount0)
+	s.Assert().Equal(NewDec(100), trueAmount1)
+	s.Assert().Equal(NewDec(125), sharesMinted)
 }
 
 func (s *CalcTrueAmountsTestSuite) TestWrongCoinDeposited() {
 	trueAmount0, trueAmount1, sharesMinted := keeper.CalcTrueAmounts(
-		newDec("0.25"),
-		newDec("100"),
-		newDec("0"),
-		newDec("0"),
-		newDec("100"),
-		newDec("50"),
+		sdk.MustNewDecFromStr("0.25"),
+		NewDec(100),
+		NewDec(0),
+		NewDec(0),
+		NewDec(100),
+		NewDec(50),
 	)
-	s.Assert().Equal(newDec("0"), trueAmount0)
-	s.Assert().Equal(newDec("0"), trueAmount1)
-	s.Assert().Equal(newDec("0"), sharesMinted)
+	s.Assert().Equal(NewDec(0), trueAmount0)
+	s.Assert().Equal(NewDec(0), trueAmount1)
+	s.Assert().Equal(NewDec(0), sharesMinted)
 
 	trueAmount0, trueAmount1, sharesMinted = keeper.CalcTrueAmounts(
-		newDec("0.25"),
-		newDec("0"),
-		newDec("100"),
-		newDec("100"),
-		newDec("0"),
-		newDec("50"),
+		sdk.MustNewDecFromStr("0.25"),
+		NewDec(0),
+		NewDec(100),
+		NewDec(100),
+		NewDec(0),
+		NewDec(50),
 	)
-	s.Assert().Equal(newDec("0"), trueAmount0)
-	s.Assert().Equal(newDec("0"), trueAmount1)
-	s.Assert().Equal(newDec("0"), sharesMinted)
+	s.Assert().Equal(NewDec(0), trueAmount0)
+	s.Assert().Equal(NewDec(0), trueAmount1)
+	s.Assert().Equal(NewDec(0), sharesMinted)
 }
 
 func (s *CalcTrueAmountsTestSuite) TestOneReserveZero() {
 	trueAmount0, trueAmount1, sharesMinted := keeper.CalcTrueAmounts(
-		newDec("0.25"),
-		newDec("100"),
-		newDec("0"), // value 100
-		newDec("100"),
-		newDec("100"), // effective (100, 0), value 100
-		newDec("50"),  // value went down
+		sdk.MustNewDecFromStr("0.25"),
+		NewDec(100),
+		NewDec(0), // value 100
+		NewDec(100),
+		NewDec(100), // effective (100, 0), value 100
+		NewDec(50),  // value went down
 	)
-	s.Assert().Equal(newDec("100"), trueAmount0)
-	s.Assert().Equal(newDec("0"), trueAmount1)
-	s.Assert().Equal(newDec("50"), sharesMinted)
+	s.Assert().Equal(NewDec(100), trueAmount0)
+	s.Assert().Equal(NewDec(0), trueAmount1)
+	s.Assert().Equal(NewDec(50), sharesMinted)
 
 	trueAmount0, trueAmount1, sharesMinted = keeper.CalcTrueAmounts(
-		newDec("0.25"),
-		newDec("0"),
-		newDec("100"), // value 25
-		newDec("100"),
-		newDec("100"), // effective (0, 100), value 25
-		newDec("50"),  // value went up
+		sdk.MustNewDecFromStr("0.25"),
+		NewDec(0),
+		NewDec(100), // value 25
+		NewDec(100),
+		NewDec(100), // effective (0, 100), value 25
+		NewDec(50),  // value went up
 	)
-	s.Assert().Equal(newDec("0"), trueAmount0)
-	s.Assert().Equal(newDec("100"), trueAmount1)
-	s.Assert().Equal(newDec("50"), sharesMinted)
+	s.Assert().Equal(NewDec(0), trueAmount0)
+	s.Assert().Equal(NewDec(100), trueAmount1)
+	s.Assert().Equal(NewDec(50), sharesMinted)
 }

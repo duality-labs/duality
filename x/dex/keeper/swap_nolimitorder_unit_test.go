@@ -34,7 +34,7 @@ func (s *MsgServerTestSuite) TestSwapNoLONoLiqudity() {
 	// swap 5 of tokenB
 	// THEN
 	// swap should fail with Error Not enough coins
-	err := types.ErrNotEnoughCoins
+	err := types.ErrNotEnoughLiquidity
 	s.bobMarketSellFails(err, "TokenB", 5, 0)
 }
 
@@ -50,7 +50,8 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReac
 	//
 	// WHEN
 	// swap 20 of tokenA at
-	amountIn, amountInDec := 20, NewDec(20)
+	amountIn := 20
+	amountInDec := NewDec(20)
 	s.bobMarketSells("TokenA", amountIn, 5)
 
 	// THEN
@@ -102,7 +103,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOSlippageToleranceReached() {
 	// swap 20 of token A for B with minOut 15
 	// THEN
 	// swap should fail with ErrNotEnoughCoins error
-	err := types.ErrNotEnoughCoins
+	err := types.ErrNotEnoughLiquidity
 	s.bobMarketSellFails(err, "TokenA", 20, 19)
 }
 
@@ -136,7 +137,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceReached
 	// swap 20 of token A for B with minOut 15
 	// THEN
 	// swap should fail with ErrNotEnoughCoins error
-	err := types.ErrNotEnoughCoins
+	err := types.ErrNotEnoughLiquidity
 	s.bobMarketSellFails(err, "TokenA", 20, 15)
 }
 
