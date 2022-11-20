@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	//"fmt"
+	"fmt"
 	"math"
 	//. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	//"github.com/NicholasDotSol/duality/x/dex/types"
@@ -93,13 +93,13 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 
 	s.assertAliceBalances(30, 60)
 	s.assertBobBalances(70, 30)
-	s.assertDexBalances(0, 0)
+	s.assertDexBalances(0, 10)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(math.MaxInt64)
 
-	s.aliceWithdrawsLimitSell("TokenA", 0, 0)
+	s.aliceWithdrawsLimitSell("TokenA", 0, 1)
 
 	s.assertAliceBalances(30, 70)
 	s.assertBobBalances(70, 30)
