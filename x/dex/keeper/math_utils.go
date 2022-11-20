@@ -1,23 +1,29 @@
 package keeper
 
 import (
+	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// Return the base value for price, 1.0001
+const MaxTickExp uint64 = 1048575
+
 func BasePrice() sdk.Dec {
 	return sdk.MustNewDecFromStr("1.0001")
 }
 
-func Pow(a sdk.Dec, n uint64) sdk.Dec {
-	if n == 0 {
-		return sdk.OneDec()
+func Pow(a sdk.Dec, n uint64) (sdk.Dec, error) {
+	if n > MaxTickExp {
+		return sdk.ZeroDec(), types.ErrTickAbsValTooHigh
 	}
-	if n&1 == 0 {
-		return Pow(a.Mul(a), n>>1)
-	} else {
-		return a.Mul(Pow(a.Mul(a), n>>1))
+	sum := sdk.OneDec()
+	for n > 0 {
+		if n&1 == 1 {
+			sum = sum.Mul(a)
+		}
+		a = a.Mul(a)
+		n >>= 1
 	}
+	return sum, nil
 }
 
 func MaxInt64(a, b int64) int64 {

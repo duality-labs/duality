@@ -295,9 +295,13 @@ func CalcTrueAmounts(
 
 // Calculates the price for a swap from token 0 to token 1 given a tick
 // tickIndex refers to the index of a specified tick
-func CalcPrice0To1(tickIndex int64) sdk.Dec {
+func CalcPrice0To1(tickIndex int64) (sdk.Dec, error) {
 	if 0 <= tickIndex {
-		return sdk.OneDec().Quo(Pow(BasePrice(), uint64(tickIndex)))
+		out, err := Pow(BasePrice(), uint64(tickIndex))
+		if err != nil {
+			return sdk.ZeroDec(), err
+		}
+		return sdk.OneDec().Quo(out), nil
 	} else {
 		return Pow(BasePrice(), uint64(-1*tickIndex))
 	}
@@ -305,11 +309,15 @@ func CalcPrice0To1(tickIndex int64) sdk.Dec {
 
 // Calculates the price for a swap from token 1 to token 0 given a tick
 // tickIndex refers to the index of a specified tick
-func CalcPrice1To0(tickIndex int64) sdk.Dec {
+func CalcPrice1To0(tickIndex int64) (sdk.Dec, error) {
 	if 0 <= tickIndex {
 		return Pow(BasePrice(), uint64(tickIndex))
 	} else {
-		return sdk.OneDec().Quo(Pow(BasePrice(), uint64(-1*tickIndex)))
+		out, err := Pow(BasePrice(), uint64(-1*tickIndex))
+		if err != nil {
+			return sdk.ZeroDec(), err
+		}
+		return sdk.OneDec().Quo(out), nil
 	}
 }
 

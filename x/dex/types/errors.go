@@ -24,4 +24,5 @@ var (
 	ErrNotEnoughLiquidity                 = sdkerrors.Register(ModuleName, 1114, "There is no liquidity to complete this transaction")
 	ErrDepositBehindPairLiquidity         = sdkerrors.Register(ModuleName, 1115, "Depositing behind the opposite token pair's liquidity is currently not allowed")
 	ErrPlaceLimitOrderBehindPairLiquidity = sdkerrors.Register(ModuleName, 1116, "Placing a limit order behind the opposite token pair's liquidity is currently not allowed")
+	ErrTickAbsValTooHigh                  = sdkerrors.Register(ModuleName, 1117, "Tick is not allowed to be greater than 1048575 or less than -1048575")
 )

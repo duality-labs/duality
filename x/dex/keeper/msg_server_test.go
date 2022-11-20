@@ -698,37 +698,55 @@ func (s *MsgServerTestSuite) assertNoLiquidityAtTick(tickIndex int64, feeIndex u
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapNoLOAToB(tick int64, tickLiqudity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
-	price := keeper.CalcPrice0To1(tick)
+	price, err := keeper.CalcPrice0To1(tick)
+	if err != nil {
+		panic(err)
+	}
 
 	return calculateSingleSwapNoLO(price, tickLiqudity, amountIn)
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapOnlyLOAToB(tick int64, tickLimitOrderLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
-	price := keeper.CalcPrice0To1(tick)
+	price, err := keeper.CalcPrice0To1(tick)
+	if err != nil {
+		panic(err)
+	}
 
 	return calculateSingleSwapOnlyLO(price, tickLimitOrderLiquidity, amountIn)
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapAToB(tick int64, tickLiqudidty sdk.Dec, tickLimitOrderLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
-	price := keeper.CalcPrice0To1(tick)
+	price, err := keeper.CalcPrice0To1(tick)
+	if err != nil {
+		panic(err)
+	}
 
 	return calculateSingleSwap(price, tickLiqudidty, tickLimitOrderLiquidity, amountIn)
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapNoLOBToA(tick int64, tickLiqudity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
-	price := keeper.CalcPrice1To0(tick)
+	price, err := keeper.CalcPrice1To0(tick)
+	if err != nil {
+		panic(err)
+	}
 
 	return calculateSingleSwapNoLO(price, tickLiqudity, amountIn)
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapOnlyLOBToA(tick int64, tickLimitOrderLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
-	price := keeper.CalcPrice1To0(tick)
+	price, err := keeper.CalcPrice1To0(tick)
+	if err != nil {
+		panic(err)
+	}
 
 	return calculateSingleSwapOnlyLO(price, tickLimitOrderLiquidity, amountIn)
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapBToA(tick int64, tickLiqudidty sdk.Dec, tickLimitOrderLiquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
-	price := keeper.CalcPrice1To0(tick)
+	price, err := keeper.CalcPrice1To0(tick)
+	if err != nil {
+		panic(err)
+	}
 
 	return calculateSingleSwap(price, tickLiqudidty, tickLimitOrderLiquidity, amountIn)
 }
@@ -772,7 +790,11 @@ func (s *MsgServerTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amoun
 	pairId := "TokenA/TokenB"
 	lowerTick = s.app.DexKeeper.GetOrInitTick(s.goCtx, pairId, tickIndex-1)
 	upperTick = s.app.DexKeeper.GetOrInitTick(s.goCtx, pairId, tickIndex+1)
-	priceCenter1To0 := keeper.CalcPrice0To1(tickIndex)
+	priceCenter1To0, err := keeper.CalcPrice0To1(tickIndex)
+	if err != nil {
+		panic(err)
+	}
+
 	amountADec := NewDec(amountA)
 	amountBDec := NewDec(amountB)
 	lowerTick.TickData.Reserve0AndShares[0].Reserve0 = amountADec

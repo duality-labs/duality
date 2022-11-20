@@ -106,10 +106,14 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlShiftsTickLeft() {
 	s.assertCurrentTicks(math.MinInt64, 2)
 
 	// WHEN Alice withdraws her shares from Tick 1
+	price1To0, err := keeper.CalcPrice1To0(1)
+	if err != nil {
+		panic(err)
+	}
 	sharesToWithdraw := keeper.CalcShares(
 		NewDec(0),
 		NewDec(100),
-		keeper.CalcPrice1To0(1),
+		price1To0,
 	)
 	s.aliceWithdraws(NewWithdrawlDec(sharesToWithdraw, 1, 0))
 
