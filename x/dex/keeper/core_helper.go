@@ -270,7 +270,7 @@ func (k Keeper) FindNewMaxTick(goCtx context.Context, pairMap types.PairMap) (Ma
 	}
 
 	// If no tick found return false
-	return math.MaxInt64, false
+	return math.MinInt64, false
 }
 
 func (k Keeper) FindNextTick0To1(goCtx context.Context, pairMap types.PairMap) (tickIdx int64, found bool) {
