@@ -2,10 +2,10 @@ package cli
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
@@ -15,9 +15,6 @@ var _ = strconv.Itoa(0)
 
 func CmdWithdrawl() *cobra.Command {
 
-	var sharesToRemove []string
-	var TicksIndexes []string
-	var FeesIndexes []string
 	cmd := &cobra.Command{
 		Use:   "withdrawl [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fee indexes] ",
 		Short: "Broadcast message withdrawl",
@@ -26,11 +23,14 @@ func CmdWithdrawl() *cobra.Command {
 			argReceiver := args[0]
 			argTokenA := args[1]
 			argTokenB := args[2]
+			argSharesToRemove := strings.Split(args[3], ",")
+			argTickIndexes := strings.Split(args[5], ",")
+			argFeesIndexes := strings.Split(args[6], ",")
 
 			var sharesToRemoveDec []sdk.Dec
 			var TicksIndexesInt []int64
 			var FeeIndexesUint []uint64
-			for _, s := range sharesToRemove {
+			for _, s := range argSharesToRemove {
 				sharesDec, err := sdk.NewDecFromStr(s)
 
 				if err != nil {
@@ -40,7 +40,7 @@ func CmdWithdrawl() *cobra.Command {
 				sharesToRemoveDec = append(sharesToRemoveDec, sharesDec)
 			}
 
-			for _, s := range TicksIndexes {
+			for _, s := range argTickIndexes {
 				TickIndexInt, err := strconv.Atoi(s)
 
 				if err != nil {
@@ -51,7 +51,7 @@ func CmdWithdrawl() *cobra.Command {
 
 			}
 
-			for _, s := range FeesIndexes {
+			for _, s := range argFeesIndexes {
 				FeeIndexInt, err := strconv.Atoi(s)
 
 				if err != nil {
@@ -81,11 +81,6 @@ func CmdWithdrawl() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
-
-	flags.AddTxFlagsToCmd(cmd)
-	cmd.Flags().StringArrayVarP(&sharesToRemove, "sharesToRemove", "", []string{}, "")
-	cmd.Flags().StringArrayVarP(&TicksIndexes, "ticksIndices", "t", []string{}, "")
-	cmd.Flags().StringArrayVarP(&FeesIndexes, "feeIndices", "f", []string{}, "")
 
 	return cmd
 }

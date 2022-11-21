@@ -6,7 +6,6 @@ import (
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
@@ -15,15 +14,11 @@ import (
 var _ = strconv.Itoa(0)
 
 func CmdDeposit() *cobra.Command {
-	var argAmountsA []string
-	var argAmountsB []string
-	var argTicksIndexes []string
-	var argFeesIndexes []string
 
 	cmd := &cobra.Command{
 		Use:   "deposit [receiver] [token-a] [token-b] [list of amount-0] [list of amount-1] [list of tick-index] [list of fee] ",
 		Short: "Broadcast message deposit",
-		Args:  cobra.MinimumNArgs(7),
+		Args:  cobra.ExactArgs(7),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
 			argTokenA := args[1]
@@ -100,13 +95,6 @@ func CmdDeposit() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
-
-	flags.AddTxFlagsToCmd(cmd)
-
-	cmd.Flags().StringArrayVarP(&argAmountsA, "amountsA", "", []string{}, "")
-	cmd.Flags().StringArrayVarP(&argAmountsB, "amountsB", "", []string{}, "")
-	cmd.Flags().StringArrayVarP(&argTicksIndexes, "tickIndexes", "t", []string{}, "")
-	cmd.Flags().StringArrayVarP(&argFeesIndexes, "feeIndexes", "f", []string{}, "")
 
 	return cmd
 }
