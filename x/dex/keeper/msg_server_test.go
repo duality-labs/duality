@@ -658,11 +658,11 @@ func (s *MsgServerTestSuite) assertLiquidityAtTick(amountA int, amountB int, tic
 	fee := s.feeTiers[feeIndex].Fee
 	lowerTick, lowerTickFound := s.app.DexKeeper.GetTickMap(s.ctx, pairId, tickIndex-fee)
 	if !lowerTickFound {
-		s.Require().Fail("Invalid tick %d and fee %d", tickIndex, fee)
+		s.Require().Fail("Invalid tick %s and fee %s", tickIndex, fee)
 	}
 	upperTick, upperTickFound := s.app.DexKeeper.GetTickMap(s.ctx, pairId, tickIndex+fee)
 	if !upperTickFound {
-		s.Require().Fail("Invalid tick %d and fee %d", tickIndex, fee)
+		s.Require().Fail("Invalid tick %s and fee %s", tickIndex, fee)
 	}
 
 	amtA, amtB := NewDec(amountA), NewDec(amountB)
@@ -907,7 +907,7 @@ func calculateSwap(price sdk.Dec, liquidity sdk.Dec, amountIn sdk.Dec) (sdk.Dec,
 func (s *MsgServerTestSuite) calculateMultipleSwapsAToB(tickIndexes []int64, tickLiquidities []sdk.Dec, tickLimitOrderLiquidities []sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
 	prices := make([]sdk.Dec, len(tickIndexes))
 	for i := range prices {
-		prices[i] = s.app.DexKeeper.CalcPrice0To1(tickIndexes[i])
+		prices[i] = keeper.CalcPrice0To1(tickIndexes[i])
 	}
 	return s.calculateMultipleSwaps(prices, tickLiquidities, tickLimitOrderLiquidities, amountIn)
 }
@@ -915,7 +915,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsAToB(tickIndexes []int64, tic
 func (s *MsgServerTestSuite) calculateMultipleSwapsNoLOAToB(tickIndexes []int64, tickLiquidities []sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
 	prices := make([]sdk.Dec, len(tickIndexes))
 	for i := range prices {
-		prices[i] = s.app.DexKeeper.CalcPrice0To1(tickIndexes[i])
+		prices[i] = keeper.CalcPrice0To1(tickIndexes[i])
 	}
 	return s.calculateMultipleSwapsNoLO(prices, tickLiquidities, amountIn)
 }
@@ -923,7 +923,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsNoLOAToB(tickIndexes []int64,
 func (s *MsgServerTestSuite) calculateMultipleSwapsOnlyLOAToB(tickIndexes []int64, tickLimitOrderLiquidities []sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
 	prices := make([]sdk.Dec, len(tickIndexes))
 	for i := range prices {
-		prices[i] = s.app.DexKeeper.CalcPrice0To1(tickIndexes[i])
+		prices[i] = keeper.CalcPrice0To1(tickIndexes[i])
 	}
 	return s.calculateMultipleSwapsOnlyLO(prices, tickLimitOrderLiquidities, amountIn)
 }
@@ -931,7 +931,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsOnlyLOAToB(tickIndexes []int6
 func (s *MsgServerTestSuite) calculateMultipleSwapsBToA(tickIndexes []int64, tickLiquidities []sdk.Dec, tickLimitOrderLiquidities []sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
 	prices := make([]sdk.Dec, len(tickIndexes))
 	for i := range prices {
-		prices[i] = s.app.DexKeeper.CalcPrice1To0(tickIndexes[i])
+		prices[i] = keeper.CalcPrice1To0(tickIndexes[i])
 	}
 	return s.calculateMultipleSwaps(prices, tickLiquidities, tickLimitOrderLiquidities, amountIn)
 }
@@ -939,7 +939,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsBToA(tickIndexes []int64, tic
 func (s *MsgServerTestSuite) calculateMultipleSwapsNoLOBToA(tickIndexes []int64, tickLiquidities []sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
 	prices := make([]sdk.Dec, len(tickIndexes))
 	for i := range prices {
-		prices[i] = s.app.DexKeeper.CalcPrice1To0(tickIndexes[i])
+		prices[i] = keeper.CalcPrice1To0(tickIndexes[i])
 	}
 	return s.calculateMultipleSwapsNoLO(prices, tickLiquidities, amountIn)
 }
@@ -947,7 +947,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsNoLOBToA(tickIndexes []int64,
 func (s *MsgServerTestSuite) calculateMultipleSwapsOnlyLOBToA(tickIndexes []int64, tickLimitOrderLiquidities []sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
 	prices := make([]sdk.Dec, len(tickIndexes))
 	for i := range prices {
-		prices[i] = s.app.DexKeeper.CalcPrice1To0(tickIndexes[i])
+		prices[i] = keeper.CalcPrice1To0(tickIndexes[i])
 	}
 	return s.calculateMultipleSwapsOnlyLO(prices, tickLimitOrderLiquidities, amountIn)
 }
