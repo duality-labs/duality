@@ -2,13 +2,14 @@ package keeper_test
 
 import (
 	"github.com/NicholasDotSol/duality/x/dex/keeper"
+	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func getTotalAmount(amounts []sdk.Dec) sdk.Dec {
 	// calculate total trade amounts
-	totalAmount := sdk.NewDecFromInt(convInt("0"))
+	totalAmount := NewDec(0)
 	for i := range amounts {
 		totalAmount = totalAmount.Add(amounts[i])
 	}

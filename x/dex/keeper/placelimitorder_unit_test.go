@@ -228,7 +228,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityA() {
 	s.assertLiquidityAtTick(10, 0, 0, 0)
 	s.assertMinTick(-1)
 	s.assertCurr1To0(-1)
-	s.assertCurr0To1(math.MinInt64)
+	s.assertCurr0To1(math.MaxInt64)
 	s.assertMaxTick(math.MinInt64)
 
 	// WHEN
@@ -238,11 +238,11 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityA() {
 	// THEN
 	// assert 20 of token A deposited at tick 0 fee 0 and ticks unchanged
 	s.assertAliceBalances(30, 50)
+	s.assertLiquidityAtTick(10, 0, 0, 0)
 	s.assertDexBalances(20, 0)
-	s.assertLiquidityAtTick(20, 0, 0, 0)
 	s.assertMinTick(-1)
 	s.assertCurr1To0(-1)
-	s.assertCurr0To1(math.MinInt64)
+	s.assertCurr0To1(math.MaxInt64)
 	s.assertMaxTick(math.MinInt64)
 }
 
@@ -256,9 +256,9 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityB() {
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
 	s.assertLiquidityAtTick(0, 10, 0, 0)
-	s.assertCurr1To0(math.MaxInt64)
-	s.assertCurr0To1(1)
 	s.assertMinTick(math.MaxInt64)
+	s.assertCurr1To0(math.MinInt64)
+	s.assertCurr0To1(1)
 	s.assertMaxTick(1)
 
 	// WHEN
@@ -267,12 +267,12 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityB() {
 
 	// THEN
 	// assert 20 of token B deposited at tick 0 fee 0 and ticks unchanged
-	s.assertLiquidityAtTick(0, 20, 0, 0)
+	s.assertLiquidityAtTick(0, 10, 0, 0)
 	s.assertAliceBalances(50, 30)
 	s.assertDexBalances(0, 20)
-	s.assertCurr1To0(math.MaxInt64)
-	s.assertCurr0To1(1)
 	s.assertMinTick(math.MaxInt64)
+	s.assertCurr1To0(math.MinInt64)
+	s.assertCurr0To1(1)
 	s.assertMaxTick(1)
 }
 
@@ -291,8 +291,8 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderBelowEnemyLines() {
 	// THEN
 	// deposit should fail with BEL error
 
-	err := types.ErrValidPairNotFound // TODO: this needs to be changed to a more specific error type
-	s.assertAliceLimitSellFails(err, "TokenB", -5, 10)
+	err := types.ErrPlaceLimitOrderBehindPairLiquidity // TODO: this needs to be changed to a more specific error type
+	s.assertAliceLimitSellFails(err, "TokenA", 5, 10)
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderAboveEnemyLines() {
@@ -310,6 +310,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderAboveEnemyLines() {
 	// THEN
 	// deposit should fail with BEL error
 
-	err := types.ErrValidPairNotFound // TODO: this needs to be changed to a more specific error type
-	s.assertAliceLimitSellFails(err, "TokenA", 5, 10)
+	err := types.ErrPlaceLimitOrderBehindPairLiquidity // TODO: this needs to be changed to a more specific error type
+	s.assertAliceLimitSellFails(err, "TokenB", -5, 10)
 }
