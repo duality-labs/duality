@@ -5,6 +5,7 @@ import (
 
 	dualityapp "github.com/NicholasDotSol/duality/app"
 	"github.com/NicholasDotSol/duality/x/dex/keeper"
+	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
@@ -34,7 +35,7 @@ func (s *TickTestSuite) TestLimitHasToken0() {
 		Token:     "TokenA",
 		TickIndex: tick.TickIndex,
 		Count:     0,
-		Reserves:  newDec("5"),
+		Reserves:  NewDec(5),
 	})
 	s.Equal(true, s.app.DexKeeper.HasToken0(s.ctx, &tick))
 }
@@ -47,7 +48,7 @@ func (s *TickTestSuite) TestEmptyHasToken0() {
 		Token:     "TokenA",
 		TickIndex: tick.TickIndex,
 		Count:     0,
-		Reserves:  newDec("0"),
+		Reserves:  NewDec(0),
 	})
 	s.Equal(false, s.app.DexKeeper.HasToken0(s.ctx, &tick))
 }
@@ -55,15 +56,15 @@ func (s *TickTestSuite) TestEmptyHasToken0() {
 func (s *TickTestSuite) TestLiquidityHasToken0() {
 	pairId := "TokenA/TokenB"
 	tick := keeper.NewTick("TokenA/TokenB", 0, 6)
-	tick.TickData.Reserve0AndShares[0].Reserve0 = newDec("100")
-	tick.TickData.Reserve0AndShares[0].TotalShares = newDec("100")
-	tick.TickData.Reserve1[0] = newDec("20")
+	tick.TickData.Reserve0AndShares[0].Reserve0 = NewDec(100)
+	tick.TickData.Reserve0AndShares[0].TotalShares = NewDec(100)
+	tick.TickData.Reserve1[0] = NewDec(20)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, types.LimitOrderPoolReserveMap{
 		PairId:    pairId,
 		Token:     "TokenA",
 		TickIndex: tick.TickIndex,
 		Count:     0,
-		Reserves:  newDec("0"),
+		Reserves:  NewDec(0),
 	})
 	s.Equal(true, s.app.DexKeeper.HasToken0(s.ctx, &tick))
 }
@@ -71,15 +72,15 @@ func (s *TickTestSuite) TestLiquidityHasToken0() {
 func (s *TickTestSuite) TestLiquidityHighFeeHasToken0() {
 	pairId := "TokenA/TokenB"
 	tick := keeper.NewTick("TokenA/TokenB", 0, 6)
-	tick.TickData.Reserve0AndShares[4].Reserve0 = newDec("100")
-	tick.TickData.Reserve0AndShares[4].TotalShares = newDec("100")
-	tick.TickData.Reserve1[4] = newDec("20")
+	tick.TickData.Reserve0AndShares[4].Reserve0 = NewDec(100)
+	tick.TickData.Reserve0AndShares[4].TotalShares = NewDec(100)
+	tick.TickData.Reserve1[4] = NewDec(20)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, types.LimitOrderPoolReserveMap{
 		PairId:    pairId,
 		Token:     "TokenA",
 		TickIndex: tick.TickIndex,
 		Count:     0,
-		Reserves:  newDec("0"),
+		Reserves:  NewDec(0),
 	})
 	s.Equal(true, s.app.DexKeeper.HasToken0(s.ctx, &tick))
 }
@@ -87,15 +88,15 @@ func (s *TickTestSuite) TestLiquidityHighFeeHasToken0() {
 func (s *TickTestSuite) TestNoLiquidityOnOneSideHasToken0() {
 	pairId := "TokenA/TokenB"
 	tick := keeper.NewTick("TokenA/TokenB", 0, 6)
-	tick.TickData.Reserve0AndShares[4].Reserve0 = newDec("0")
-	tick.TickData.Reserve0AndShares[4].TotalShares = newDec("10")
-	tick.TickData.Reserve1[4] = newDec("20")
+	tick.TickData.Reserve0AndShares[4].Reserve0 = NewDec(0)
+	tick.TickData.Reserve0AndShares[4].TotalShares = NewDec(10)
+	tick.TickData.Reserve1[4] = NewDec(20)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, types.LimitOrderPoolReserveMap{
 		PairId:    pairId,
 		Token:     "TokenA",
 		TickIndex: tick.TickIndex,
 		Count:     0,
-		Reserves:  newDec("0"),
+		Reserves:  NewDec(0),
 	})
 	s.Equal(false, s.app.DexKeeper.HasToken0(s.ctx, &tick))
 }
@@ -108,7 +109,7 @@ func (s *TickTestSuite) TestLimitHasToken1() {
 		Token:     "TokenB",
 		TickIndex: tick.TickIndex,
 		Count:     0,
-		Reserves:  newDec("5"),
+		Reserves:  NewDec(5),
 	})
 	s.Equal(true, s.app.DexKeeper.HasToken1(s.ctx, &tick))
 }
@@ -121,7 +122,7 @@ func (s *TickTestSuite) TestEmptyHasToken1() {
 		Token:     "TokenB",
 		TickIndex: tick.TickIndex,
 		Count:     0,
-		Reserves:  newDec("0"),
+		Reserves:  NewDec(0),
 	})
 	s.Equal(false, s.app.DexKeeper.HasToken1(s.ctx, &tick))
 }
@@ -129,15 +130,15 @@ func (s *TickTestSuite) TestEmptyHasToken1() {
 func (s *TickTestSuite) TestLiquidityHasToken1() {
 	pairId := "TokenA/TokenB"
 	tick := keeper.NewTick("TokenA/TokenB", 0, 6)
-	tick.TickData.Reserve0AndShares[0].Reserve0 = newDec("100")
-	tick.TickData.Reserve0AndShares[0].TotalShares = newDec("100")
-	tick.TickData.Reserve1[0] = newDec("20")
+	tick.TickData.Reserve0AndShares[0].Reserve0 = NewDec(100)
+	tick.TickData.Reserve0AndShares[0].TotalShares = NewDec(100)
+	tick.TickData.Reserve1[0] = NewDec(20)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, types.LimitOrderPoolReserveMap{
 		PairId:    pairId,
 		Token:     "TokenB",
 		TickIndex: tick.TickIndex,
 		Count:     0,
-		Reserves:  newDec("0"),
+		Reserves:  NewDec(0),
 	})
 	s.Equal(true, s.app.DexKeeper.HasToken1(s.ctx, &tick))
 }
@@ -145,15 +146,15 @@ func (s *TickTestSuite) TestLiquidityHasToken1() {
 func (s *TickTestSuite) TestLiquidityHighFeeHasToken1() {
 	pairId := "TokenA/TokenB"
 	tick := keeper.NewTick("TokenA/TokenB", 0, 6)
-	tick.TickData.Reserve0AndShares[4].Reserve0 = newDec("100")
-	tick.TickData.Reserve0AndShares[4].TotalShares = newDec("100")
-	tick.TickData.Reserve1[4] = newDec("20")
+	tick.TickData.Reserve0AndShares[4].Reserve0 = NewDec(100)
+	tick.TickData.Reserve0AndShares[4].TotalShares = NewDec(100)
+	tick.TickData.Reserve1[4] = NewDec(20)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, types.LimitOrderPoolReserveMap{
 		PairId:    pairId,
 		Token:     "TokenB",
 		TickIndex: tick.TickIndex,
 		Count:     0,
-		Reserves:  newDec("0"),
+		Reserves:  NewDec(0),
 	})
 	s.Equal(true, s.app.DexKeeper.HasToken1(s.ctx, &tick))
 }
@@ -161,15 +162,15 @@ func (s *TickTestSuite) TestLiquidityHighFeeHasToken1() {
 func (s *TickTestSuite) TestNoLiquidityOnOneSideHasToken1() {
 	pairId := "TokenA/TokenB"
 	tick := keeper.NewTick("TokenA/TokenB", 0, 6)
-	tick.TickData.Reserve0AndShares[4].Reserve0 = newDec("100")
-	tick.TickData.Reserve0AndShares[4].TotalShares = newDec("10")
-	tick.TickData.Reserve1[4] = newDec("0")
+	tick.TickData.Reserve0AndShares[4].Reserve0 = NewDec(100)
+	tick.TickData.Reserve0AndShares[4].TotalShares = NewDec(10)
+	tick.TickData.Reserve1[4] = NewDec(0)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, types.LimitOrderPoolReserveMap{
 		PairId:    pairId,
 		Token:     "TokenB",
 		TickIndex: tick.TickIndex,
 		Count:     0,
-		Reserves:  newDec("0"),
+		Reserves:  NewDec(0),
 	})
 	s.Equal(false, s.app.DexKeeper.HasToken1(s.ctx, &tick))
 }

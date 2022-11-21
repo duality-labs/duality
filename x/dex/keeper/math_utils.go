@@ -1,6 +1,8 @@
 package keeper
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
 
 // Return the base value for price, 1.0001
 func BasePrice() sdk.Dec {

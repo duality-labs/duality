@@ -290,10 +290,10 @@ const (
 	WithdrawEventPrice         = "TickIndex"
 	WithdrawEventFee           = "FeeIndex"
 	WithdrawEventReceiver      = "Receiver"
-	WithdrawEventOldReserve0   = "OldReserve0"
-	WithdrawEventOldReserve1   = "OldReserve0"
-	WithdrawEventNewReserve0   = "NewReserve0"
-	WithdrawEventNewReserve1   = "NewReserve1"
+	WithdrawEventOldReserves0  = "OldReserves0"
+	WithdrawEventOldReserves1  = "OldReserves1"
+	WithdrawEventNewReserves0  = "NewReserves0"
+	WithdrawEventNewReserves1  = "NewReserves1"
 	WithdrawEventSharesRemoved = "SharesRemoved"
 )
 

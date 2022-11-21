@@ -19,7 +19,7 @@ func createDepositEvent(creator string, receiver string, token0 string, token1 s
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateDepositEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, tokenDirection string, oldReserve0 string, oldReserve1 string, newReserve0 string, newReserve1 string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreateDepositEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, oldReserve0 string, oldReserve1 string, newReserve0 string, newReserve1 string, sharesMinted string, otherAttrs ...sdk.Attribute) sdk.Event {
 	return createDepositEvent(
 		creator,
 		receiver,
@@ -32,6 +32,7 @@ func CreateDepositEvent(creator string, receiver string, token0 string, token1 s
 		sdk.NewAttribute(DepositEventNewReserves0, newReserve0),
 		sdk.NewAttribute(DepositEventOldReserves1, oldReserve1),
 		sdk.NewAttribute(DepositEventNewReserves1, newReserve1),
+		sdk.NewAttribute(DepositEventSharesMinted, sharesMinted),
 	)
 }
 
@@ -81,7 +82,7 @@ func createWithdrawEvent(creator string, receiver string, token0 string, token1 
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateWithdrawEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, oldReserve0 string, oldReserve1 string, newReserve0 string, newReserve1 string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreateWithdrawEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, oldReserve0 string, oldReserve1 string, newReserve0 string, newReserve1 string, sharesRemoved string, otherAttrs ...sdk.Attribute) sdk.Event {
 	return createWithdrawEvent(
 		creator,
 		receiver,
@@ -89,10 +90,11 @@ func CreateWithdrawEvent(creator string, receiver string, token0 string, token1 
 		token1,
 		tickIndex,
 		feeIndex,
-		sdk.NewAttribute(WithdrawEventOldReserve0, oldReserve0),
-		sdk.NewAttribute(WithdrawEventOldReserve1, oldReserve1),
-		sdk.NewAttribute(WithdrawEventNewReserve0, newReserve0),
-		sdk.NewAttribute(WithdrawEventNewReserve1, newReserve1),
+		sdk.NewAttribute(WithdrawEventOldReserves0, oldReserve0),
+		sdk.NewAttribute(WithdrawEventOldReserves1, oldReserve1),
+		sdk.NewAttribute(WithdrawEventNewReserves0, newReserve0),
+		sdk.NewAttribute(WithdrawEventNewReserves1, newReserve1),
+		sdk.NewAttribute(WithdrawEventSharesRemoved, sharesRemoved),
 	)
 }
 
