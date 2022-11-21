@@ -23,7 +23,7 @@ func CmdDeposit() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "deposit [receiver] [token-a] [token-b] [list of amount-0] [list of amount-1] [list of tick-index] [list of fee] ",
 		Short: "Broadcast message deposit",
-		Args:  cobra.ExactArgs(7),
+		Args:  cobra.MinimumNArgs(7),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
 			argTokenA := args[1]

@@ -21,7 +21,7 @@ func CmdWithdrawl() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "withdrawl [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fee indexes] ",
 		Short: "Broadcast message withdrawl",
-		Args:  cobra.ExactArgs(6),
+		Args:  cobra.MinimumNArgs(7),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
 			argTokenA := args[1]
@@ -83,9 +83,9 @@ func CmdWithdrawl() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-	cmd.Flags().StringArrayVarP(&sharesToRemove, "sharesToRemove", "r", []string{}, "")
-	cmd.Flags().StringArrayVarP(&TicksIndexes, "ticksIndexes", "t", []string{}, "")
-	cmd.Flags().StringArrayVarP(&FeesIndexes, "feeIndexes", "f", []string{}, "")
+	cmd.Flags().StringArrayVarP(&sharesToRemove, "sharesToRemove", "", []string{}, "")
+	cmd.Flags().StringArrayVarP(&TicksIndexes, "ticksIndices", "t", []string{}, "")
+	cmd.Flags().StringArrayVarP(&FeesIndexes, "feeIndices", "f", []string{}, "")
 
 	return cmd
 }
