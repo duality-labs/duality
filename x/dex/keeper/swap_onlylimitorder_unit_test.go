@@ -386,12 +386,11 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilled1to0DoesntMove1to0() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(0, 50)
 	// GIVEN
-	// place LO selling 10 of token B at tick 1
+	// place LO selling 10 of token A at tick -1
 	s.aliceLimitSells("TokenA", -1, 10)
-
-	// Partially fill the LO, will have some token B remaining to fill
+	// Partially fill the LO, will have some token A remaining to fill
 	s.bobMarketSells("TokenB", 5, 4)
-	// place another LO selling 10 of token B at tick 1
+	// place another LO selling 10 of token A at tick -1
 	s.aliceLimitSells("TokenA", -1, 10)
 	s.assertCurr1To0(-1)
 
@@ -402,4 +401,100 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilled1to0DoesntMove1to0() {
 	// THEN
 	// curr0to1 unchanged
 	s.assertCurr1To0(-1)
+}
+
+func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace0to1Moves0to1() {
+	// TODO: this fails due to fill and place key bug
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 0)
+	// GIVEN
+	// place LO selling 10 of token B at tick -10
+	s.aliceLimitSells("TokenB", 10, 10)
+	// place LO selling 10 of token B at tick 1
+	s.aliceLimitSells("TokenB", 1, 10)
+	// Partially fill the LO, will have some token B remaining to fill
+	s.bobMarketSells("TokenA", 5, 4)
+	// place another LO selling 10 of token A at tick -1
+	s.aliceLimitSells("TokenB", 1, 10)
+	s.assertCurr0To1(1)
+
+	// WHEN
+	// swap 20 of token A for B with minOut 0
+	s.bobMarketSells("TokenA", 20, 0)
+
+	// THEN
+	// curr0to1 moved to 10
+	s.assertCurr0To1(10)
+}
+
+func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace0to1ExhaustMax() {
+	// TODO: this fails due to fill and place key bug
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 0)
+	// GIVEN
+	// place LO selling 10 of token B at tick 1
+	s.aliceLimitSells("TokenB", 1, 10)
+	// Partially fill the LO, will have some token B remaining to fill
+	s.bobMarketSells("TokenA", 5, 4)
+	// place another LO selling 10 of token A at tick -1
+	s.aliceLimitSells("TokenB", 1, 10)
+	s.assertCurr0To1(1)
+	s.assertMaxTick(1)
+
+	// WHEN
+	// swap 20 of token A for B with minOut 0
+	s.bobMarketSells("TokenA", 20, 0)
+
+	// THEN
+	// curr0to1 and max set to null values
+	s.assertCurr0To1(math.MaxInt64)
+	s.assertMaxTick(math.MinInt64)
+}
+
+func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace1to0Moves1to0() {
+	// TODO: this fails due to fill and place key bug
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(0, 50)
+	// GIVEN
+	// place LO selling 10 of token A at tick -10
+	s.aliceLimitSells("TokenA", -10, 10)
+	// place LO selling 10 of token B at tick 1
+	s.aliceLimitSells("TokenA", -1, 10)
+	// Partially fill the LO, will have some token B remaining to fill
+	s.bobMarketSells("TokenB", 5, 4)
+	// place another LO selling 10 of token A at tick -1
+	s.aliceLimitSells("TokenA", -1, 10)
+	s.assertCurr1To0(-1)
+
+	// WHEN
+	// swap 20 of token B for A with minOut 0
+	s.bobMarketSells("TokenB", 20, 0)
+
+	// THEN
+	// curr0to1 unchanged
+	s.assertCurr1To0(-10)
+}
+
+func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace1to0ExhaustMin() {
+	// TODO: this fails due to fill and place key bug
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(0, 50)
+	// GIVEN
+	// place LO selling 10 of token A at tick -1
+	s.aliceLimitSells("TokenA", -1, 10)
+	// Partially fill the LO, will have some token A remaining to fill
+	s.bobMarketSells("TokenB", 5, 4)
+	// place another LO selling 10 of token A at tick -1
+	s.aliceLimitSells("TokenA", -1, 10)
+	s.assertCurr1To0(-1)
+	s.assertMinTick(-1)
+
+	// WHEN
+	// swap 20 of token A for B with minOut 0
+	s.bobMarketSells("TokenA", 20, 0)
+
+	// THEN
+	// curr0to1 and max set to null values
+	s.assertCurr1To0(math.MinInt64)
+	s.assertMinTick(math.MaxInt64)
 }
