@@ -105,7 +105,7 @@ func CmdDeposit() *cobra.Command {
 
 	cmd.Flags().StringArrayVarP(&argAmountsA, "amountsA", "", []string{}, "")
 	cmd.Flags().StringArrayVarP(&argAmountsB, "amountsB", "", []string{}, "")
-	cmd.Flags().StringArrayVarP(&argTicksIndexes, "ticksIndexes", "t", []string{}, "")
+	cmd.Flags().StringArrayVarP(&argTicksIndexes, "tickIndexes", "t", []string{}, "")
 	cmd.Flags().StringArrayVarP(&argFeesIndexes, "feeIndexes", "f", []string{}, "")
 
 	return cmd
