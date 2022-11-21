@@ -658,11 +658,11 @@ func (s *MsgServerTestSuite) assertLiquidityAtTick(amountA int, amountB int, tic
 	fee := s.feeTiers[feeIndex].Fee
 	lowerTick, lowerTickFound := s.app.DexKeeper.GetTickMap(s.ctx, pairId, tickIndex-fee)
 	if !lowerTickFound {
-		s.Require().Fail("Invalid tick %s and fee %s", tickIndex, fee)
+		s.Require().Fail("Invalid tick and fee\n")
 	}
 	upperTick, upperTickFound := s.app.DexKeeper.GetTickMap(s.ctx, pairId, tickIndex+fee)
 	if !upperTickFound {
-		s.Require().Fail("Invalid tick %s and fee %s", tickIndex, fee)
+		s.Require().Fail("Invalid tick and fee\n")
 	}
 
 	amtA, amtB := NewDec(amountA), NewDec(amountB)
@@ -741,19 +741,31 @@ func (s *MsgServerTestSuite) assertAccountLimitLiquidityAtTick(account sdk.AccAd
 }
 
 func (s *MsgServerTestSuite) assertAccountLimitLiquidityAtTickDec(account sdk.AccAddress, selling string, amount sdk.Dec, tickIndex int64) {
+	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
+
+	// get tick liquidity
+	fillTranche, placeTranche := s.getFillAndPlaceTrancheKeys(selling, pairId, tickIndex)
+	// get liquidity from fill
+	liquidity := s.getLimitLiquidityAtTickAtKey(selling, tickIndex, fillTranche)
+	// if fill == place - 1, get liquidity from place
+	if fillTranche == placeTranche-1 {
+		liquidity = liquidity.Add(s.getLimitLiquidityAtTickAtKey(selling, tickIndex, placeTranche))
+	}
+	// get user liquidity
 	userShares, totalShares := s.getLimitUserSharesAtTick(account, selling, tickIndex), s.getLimitTotalSharesAtTick(selling, tickIndex)
 	userRatio := userShares.Quo(totalShares)
 	// assert enough liq
-	userLiquidity := amount.Mul(userRatio)
-	s.assertLimitLiquidityAtTickDec(selling, userLiquidity, tickIndex)
+	userLiquidity := liquidity.Mul(userRatio)
+
+	s.Assert().True(amount.Equal(userLiquidity))
 }
 
 func (s *MsgServerTestSuite) assertLimitLiquidityAtTick(selling string, tickIndex int64, amount int) {
 	amt := NewDec(amount)
-	s.assertLimitLiquidityAtTickDec(selling, amt, tickIndex)
+	s.assertLimitLiquidityAtTickDec(selling, tickIndex, amt)
 }
 
-func (s *MsgServerTestSuite) assertLimitLiquidityAtTickDec(selling string, amount sdk.Dec, tickIndex int64) {
+func (s *MsgServerTestSuite) assertLimitLiquidityAtTickDec(selling string, tickIndex int64, amount sdk.Dec) {
 	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
 	fillTranche, placeTranche := s.getFillAndPlaceTrancheKeys(selling, pairId, tickIndex)
 	// get liquidity from fill
