@@ -225,7 +225,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityA() {
 	s.aliceLimitSells("TokenA", -1, 10)
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
-	s.assertLimitLiquidityAtTick("TokenA", 10, -1)
+	s.assertLimitLiquidityAtTick("TokenA", -1, 10)
 	s.assertAliceLimitLiquidityAtTick("TokenA", 10, -1)
 	s.assertMinTick(-1)
 	s.assertCurr1To0(-1)
@@ -238,7 +238,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityA() {
 
 	// THEN
 	// assert 20 of token A deposited at tick 0 fee 0 and ticks unchanged
-	s.assertLimitLiquidityAtTick("TokenA", 20, -1)
+	s.assertLimitLiquidityAtTick("TokenA", -1, 20)
 	s.assertAliceLimitLiquidityAtTick("TokenA", 20, -1)
 	s.assertAliceBalances(30, 50)
 	s.assertDexBalances(20, 0)
@@ -257,7 +257,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityB() {
 	s.aliceLimitSells("TokenB", 1, 10)
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
-	s.assertLimitLiquidityAtTick("TokenB", 10, 1)
+	s.assertLimitLiquidityAtTick("TokenB", 1, 10)
 	s.assertAliceLimitLiquidityAtTick("TokenB", 10, 1)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertMinTick(math.MaxInt64)
@@ -270,7 +270,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityB() {
 
 	// THEN
 	// assert 20 of token B deposited at tick 0 fee 0 and ticks unchanged
-	s.assertLimitLiquidityAtTick("TokenB", 20, 1)
+	s.assertLimitLiquidityAtTick("TokenB", 1, 20)
 	s.assertAliceLimitLiquidityAtTick("TokenB", 20, 1)
 	s.assertAliceBalances(50, 30)
 	s.assertDexBalances(0, 20)

@@ -748,7 +748,7 @@ func (s *MsgServerTestSuite) assertAccountLimitLiquidityAtTickDec(account sdk.Ac
 	s.assertLimitLiquidityAtTickDec(selling, userLiquidity, tickIndex)
 }
 
-func (s *MsgServerTestSuite) assertLimitLiquidityAtTick(selling string, amount int, tickIndex int64) {
+func (s *MsgServerTestSuite) assertLimitLiquidityAtTick(selling string, tickIndex int64, amount int) {
 	amt := NewDec(amount)
 	s.assertLimitLiquidityAtTickDec(selling, amt, tickIndex)
 }
