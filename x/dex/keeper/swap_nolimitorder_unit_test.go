@@ -237,8 +237,42 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0MovesCurr1to0() {
 	s.assertCurr1To0(-3)
 }
 
-// TODO: 1to0 doesn't move curr0to1
-// TODO: 1to0 moves curr0to1
+func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveCurr0to1() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(0, 50)
+	// GIVEN
+	// deposit 10 of both token A and B at tick 0 fee 1
+	s.aliceDeposits(NewDeposit(10, 10, 0, 0))
+	s.assertCurr0To1(1)
+
+	// WHEN
+	// swap 5 of token B for A with minOut 4
+	s.bobMarketSells("TokenB", 5, 4)
+
+	// THEN
+	// current 0to1 unchanged
+	s.assertCurr0To1(1)
+}
+
+func (s *MsgServerTestSuite) TestSwapNoLO1to0MovesCurr0to1() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(0, 50)
+	// GIVEN
+	// deposit 10 of token A at tick 0 fee 1 and 10 of both token A and B at tick 0 fee 3
+	s.aliceDeposits(
+		NewDeposit(10, 0, 0, 0),
+		NewDeposit(10, 10, 0, 1),
+	)
+	s.assertCurr0To1(3)
+
+	// WHEN
+	// swap 5 of token B for A with minOut 4
+	s.bobMarketSells("TokenB", 5, 4)
+
+	// THEN
+	// current 0to1 moves down to 1
+	s.assertCurr0To1(1)
+}
 
 func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveMin() {
 	s.fundAliceBalances(50, 50)
@@ -316,8 +350,43 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1MovesCurr0to1() {
 	s.assertCurr0To1(3)
 }
 
-// TODO: 0to1 moves curr1to0
-// TODO: 0to1 doesn't move curr1to0
+func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveCurr1to0() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 0)
+	// GIVEN
+	// deposit 10 of both token A and B at tick 0 fee 1
+	s.aliceDeposits(NewDeposit(10, 10, 0, 0))
+	s.assertCurr1To0(-1)
+
+	// WHEN
+	// swap 5 of token A for B with minOut 4
+	s.bobMarketSells("TokenA", 5, 4)
+
+	// THEN
+	// current 1to0 unchanged
+	s.assertCurr1To0(-1)
+}
+
+func (s *MsgServerTestSuite) TestSwapNoLO0to1MovesCurr1to0() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 0)
+	// GIVEN
+	// deposit 10 of token B at tick 0 fee 1 and 10 of both token A and B at tick 0 fee 3
+	// to create spread of -3, 1
+	s.aliceDeposits(
+		NewDeposit(0, 10, 0, 0),
+		NewDeposit(10, 10, 0, 1),
+	)
+	s.assertCurr1To0(-3)
+
+	// WHEN
+	// swap 5 of token B for A with minOut 4
+	s.bobMarketSells("TokenA", 5, 4)
+
+	// THEN
+	// current 0to1 moves down to 1
+	s.assertCurr1To0(-1)
+}
 
 func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveMax() {
 	s.fundAliceBalances(50, 50)
