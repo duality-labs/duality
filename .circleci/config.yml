@@ -24,7 +24,7 @@ jobs:
           # NOTE: For now we only run the tests in the keeper directory
           command: |
             go test ./x/dex/keeper... -coverprofile=c.out -v
-            go tool cover -html=c.out -o coverage.html
+            go tool cover -html=c.out -o /tmp/artifacts/coverage.html
       - store_artifacts:
           path: /tmp/artifacts
 
