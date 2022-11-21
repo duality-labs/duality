@@ -200,7 +200,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionSomeFeeTiers() {
 	s.assertDexBalancesDec(expectedAmountIn, NewDec(20).Sub(expectedAmountOut))
 }
 
-func (s *MsgServerTestSuite) TestSwapNoLODoesntMove1to0() {
+func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveCurr1to0() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(0, 50)
 	// GIVEN
@@ -217,26 +217,7 @@ func (s *MsgServerTestSuite) TestSwapNoLODoesntMove1to0() {
 	s.assertCurr1To0(-1)
 }
 
-func (s *MsgServerTestSuite) TestSwapNoLODoesntMove0to1() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 0)
-	// GIVEN
-	// deposit 10 of token B at tick 0 fee 1
-	s.aliceDeposits(
-		NewDeposit(0, 10, 0, 0),
-	)
-	s.assertCurr0To1(1)
-
-	// WHEN
-	// swap 5 of token A for B with minOut 4
-	s.bobMarketSells("TokenA", 5, 4)
-
-	// THEN
-	// current0To1 unchanged
-	s.assertCurr0To1(1)
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLOMoves1To0() {
+func (s *MsgServerTestSuite) TestSwapNoLO1to0MovesCurr1to0() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(0, 50)
 	// GIVEN
@@ -256,7 +237,66 @@ func (s *MsgServerTestSuite) TestSwapNoLOMoves1To0() {
 	s.assertCurr1To0(-3)
 }
 
-func (s *MsgServerTestSuite) TestSwapNoLOMoves0to1() {
+// TODO: 1to0 doesn't move curr0to1
+// TODO: 1to0 moves curr0to1
+
+func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveMin() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(0, 50)
+	// GIVEN
+	// deposit 10 of token A at tick 0 fee 1
+	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
+	s.assertMinTick(-1)
+
+	// WHEN
+	// swap 5 of token B for A with minOut 4
+	s.bobMarketSells("TokenB", 5, 4)
+
+	// THEN
+	// current1To0 unchanged
+	s.assertMinTick(-1)
+}
+
+func (s *MsgServerTestSuite) TestSwapNoLO1to0ExhaustMin() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(0, 50)
+	// GIVEN
+	// deposit 10 of token A at tick 0 fee 1
+	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
+	s.assertMinTick(-1)
+
+	// WHEN
+	// swap 5 of token B for A with minOut 4
+	s.bobMarketSells("TokenB", 15, 10)
+
+	// THEN
+	// current1To0 unchanged
+	s.assertMinTick(math.MaxInt64)
+}
+
+// TODO: 1to0 moves max down
+// TODO: 1to0 doesn't move max
+
+func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveCurr0to1() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 0)
+	// GIVEN
+	// deposit 10 of token B at tick 0 fee 1
+	s.aliceDeposits(
+		NewDeposit(0, 10, 0, 0),
+	)
+	s.assertCurr0To1(1)
+
+	// WHEN
+	// swap 5 of token A for B with minOut 4
+	s.bobMarketSells("TokenA", 5, 4)
+
+	// THEN
+	// current0To1 unchanged
+	s.assertCurr0To1(1)
+}
+
+func (s *MsgServerTestSuite) TestSwapNoLO0to1MovesCurr0to1() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
 	// GIVEN
@@ -276,24 +316,10 @@ func (s *MsgServerTestSuite) TestSwapNoLOMoves0to1() {
 	s.assertCurr0To1(3)
 }
 
-func (s *MsgServerTestSuite) TestSwapNoLODoesntMoveMin() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(0, 50)
-	// GIVEN
-	// deposit 10 of token A at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
-	s.assertMinTick(-1)
+// TODO: 0to1 moves curr1to0
+// TODO: 0to1 doesn't move curr1to0
 
-	// WHEN
-	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 5, 4)
-
-	// THEN
-	// current1To0 unchanged
-	s.assertMinTick(-1)
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLODoesntMoveMax() {
+func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveMax() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
 	// GIVEN
@@ -310,24 +336,7 @@ func (s *MsgServerTestSuite) TestSwapNoLODoesntMoveMax() {
 	s.assertMaxTick(1)
 }
 
-func (s *MsgServerTestSuite) TestSwapNoLOExhaustMin() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(0, 50)
-	// GIVEN
-	// deposit 10 of token A at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
-	s.assertMinTick(-1)
-
-	// WHEN
-	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 15, 10)
-
-	// THEN
-	// current1To0 unchanged
-	s.assertMinTick(math.MaxInt64)
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLOExhaustMax() {
+func (s *MsgServerTestSuite) TestSwapNoLO0to1ExhaustMax() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
 	// GIVEN
@@ -343,3 +352,6 @@ func (s *MsgServerTestSuite) TestSwapNoLOExhaustMax() {
 	// current0To1 unchanged
 	s.assertMaxTick(math.MinInt64)
 }
+
+// TODO: 0to1 moves min up
+// TODO: 0to1 doesn't move min up
