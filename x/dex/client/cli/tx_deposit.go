@@ -103,8 +103,8 @@ func CmdDeposit() *cobra.Command {
 
 	flags.AddTxFlagsToCmd(cmd)
 
-	cmd.Flags().StringArrayVarP(&argAmountsA, "amountA", "0", []string{}, "")
-	cmd.Flags().StringArrayVarP(&argAmountsB, "amountB", "1", []string{}, "")
+	cmd.Flags().StringArrayVarP(&argAmountsA, "amountsA", "", []string{}, "")
+	cmd.Flags().StringArrayVarP(&argAmountsB, "amountsB", "", []string{}, "")
 	cmd.Flags().StringArrayVarP(&argTicksIndexes, "ticksIndexes", "t", []string{}, "")
 	cmd.Flags().StringArrayVarP(&argFeesIndexes, "feeIndexes", "f", []string{}, "")
 
