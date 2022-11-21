@@ -33,3 +33,5 @@ workflows:
   full_test_suite:
     jobs:
       - go-tests
+
+      
