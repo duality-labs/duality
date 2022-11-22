@@ -137,11 +137,11 @@ func (s *MsgServerTestSuite) assertAccountBalancesDec(
 ) {
 	aActual := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenA")
 	aDec := sdk.NewDecFromBigIntWithPrec(aActual.Amount.BigInt(), 18)
-	s.Assert().True(aBalance.Equal(aDec), "%s != %s", aBalance, aDec)
+	s.Assert().True(aBalance.Equal(aDec), "expected %s != actual %s", aBalance, aDec)
 
 	bActual := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenB")
 	bDec := sdk.NewDecFromBigIntWithPrec(bActual.Amount.BigInt(), 18)
-	s.Assert().True(bBalance.Equal(bDec), "%s != %s", bBalance, bDec)
+	s.Assert().True(bBalance.Equal(bDec), "expected %s != actual %s", bBalance, bDec)
 }
 
 func (s *MsgServerTestSuite) assertAliceBalances(a int, b int) {
@@ -402,20 +402,20 @@ func (s *MsgServerTestSuite) danWithdraws(withdrawals ...*Withdrawl) error {
 	return s.withdraws(s.dan, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) aliceCancelsLimitSell(keyToken string, tick int, key int, sharesOut int) {
-	s.cancelsLimitSell(s.alice, keyToken, tick, key, sharesOut)
+func (s *MsgServerTestSuite) aliceCancelsLimitSell(keyToken string, tick int, key int, amountOut int) {
+	s.cancelsLimitSell(s.alice, keyToken, tick, key, amountOut)
 }
 
-func (s *MsgServerTestSuite) bobCancelsLimitSell(keyToken string, tick int, key int, sharesOut int) {
-	s.cancelsLimitSell(s.bob, keyToken, tick, key, sharesOut)
+func (s *MsgServerTestSuite) bobCancelsLimitSell(keyToken string, tick int, key int, amountOut int) {
+	s.cancelsLimitSell(s.bob, keyToken, tick, key, amountOut)
 }
 
-func (s *MsgServerTestSuite) carolCancelsLimitSell(keyToken string, tick int, key int, sharesOut int) {
-	s.cancelsLimitSell(s.carol, keyToken, tick, key, sharesOut)
+func (s *MsgServerTestSuite) carolCancelsLimitSell(keyToken string, tick int, key int, amountOut int) {
+	s.cancelsLimitSell(s.carol, keyToken, tick, key, amountOut)
 }
 
-func (s *MsgServerTestSuite) danCancelsLimitSell(keyToken string, tick int, key int, sharesOut int) {
-	s.cancelsLimitSell(s.dan, keyToken, tick, key, sharesOut)
+func (s *MsgServerTestSuite) danCancelsLimitSell(keyToken string, tick int, key int, amountOut int) {
+	s.cancelsLimitSell(s.dan, keyToken, tick, key, amountOut)
 }
 
 func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling string, tick int, key int, sharesOut int) {

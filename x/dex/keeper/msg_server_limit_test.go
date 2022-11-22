@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"math"
+
 	testing_scripts "github.com/NicholasDotSol/duality/testing_scripts"
 	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
@@ -354,4 +356,61 @@ func (s *MsgServerTestSuite) TestProgressiveLimitOrderFill() {
 	s.assertDexBalances(0, 50)
 
 	// TODO: How to verify current tick?
+}
+
+func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
+	s.fundAliceBalances(100, 100)
+	s.fundBobBalances(100, 100)
+	s.assertDexBalances(0, 0)
+
+	s.aliceLimitSells("TokenB", 0, 50)
+
+	s.assertAliceBalances(100, 50)
+	s.assertBobBalances(100, 100)
+	s.assertDexBalances(0, 50)
+
+	s.bobMarketSells("TokenA", 10, 10)
+
+	s.assertAliceBalances(100, 50)
+	s.assertBobBalances(90, 110)
+	s.assertDexBalances(10, 40)
+
+	s.aliceLimitSells("TokenB", 0, 50)
+
+	s.assertAliceBalances(100, 0)
+	s.assertBobBalances(90, 110)
+	s.assertDexBalances(10, 90)
+	s.assertCurrentTicks(math.MinInt64, 0)
+
+	s.aliceCancelsLimitSell("TokenB", 0, 0, 50)
+
+	s.assertAliceBalances(100, 40)
+	s.assertBobBalances(90, 110)
+	s.assertDexBalances(10, 50)
+	s.assertCurrentTicks(math.MinInt64, 0)
+
+	// might fail?
+	s.bobMarketSells("TokenA", 10, 10)
+
+	// s.assertAliceBalances(100, 40)
+	// s.assertBobBalances(80, 120)
+	// s.assertDexBalances(20, 40)
+
+	// s.aliceCancelsLimitSell("TokenB", 0, 1, 40)
+
+	// s.assertAliceBalances(100, 80)
+	// s.assertBobBalances(80, 120)
+	// s.assertDexBalances(20, 0)
+
+	// s.aliceWithdrawsLimitSell("TokenB", 0, 0)
+
+	// s.assertAliceBalances(110, 80)
+	// s.assertBobBalances(80, 120)
+	// s.assertDexBalances(10, 0)
+
+	// s.aliceWithdrawsLimitSell("TokenB", 0, 1)
+
+	// s.assertAliceBalances(120, 80)
+	// s.assertBobBalances(80, 120)
+	// s.assertDexBalances(0, 0)
 }
