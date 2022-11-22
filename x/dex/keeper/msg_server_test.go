@@ -588,14 +588,14 @@ func (s *MsgServerTestSuite) assertAliceShares(
 	fee uint64,
 	sharesExpected sdk.Dec,
 ) {
-	s.assertAccountShares(s.alice, "TokenA<>TokenB", tick, fee, sharesExpected)
+	s.assertAccountShares(s.alice, "TokenA/TokenB", tick, fee, sharesExpected)
 }
 
 func (s *MsgServerTestSuite) assertCurrentTicks(
 	expected1To0 int64,
 	expected0To1 int64,
 ) {
-	tickMap, found := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA<>TokenB")
+	tickMap, found := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA/TokenB")
 	s.Assert().NotNil(found)
 	s.Assert().Equal(expected1To0, tickMap.TokenPair.CurrentTick1To0)
 	s.Assert().Equal(expected0To1, tickMap.TokenPair.CurrentTick0To1)
@@ -646,7 +646,7 @@ func (s *MsgServerTestSuite) assertMaxTick(maxTickExpected int64) {
 }
 
 func (s *MsgServerTestSuite) printTicks() {
-	tickMap, _ := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA<>TokenB")
+	tickMap, _ := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA/TokenB")
 	fmt.Printf("\nTick0To1: %v, Tick1To0: %v", tickMap.TokenPair.CurrentTick0To1, tickMap.TokenPair.CurrentTick1To0)
 }
 
@@ -1016,7 +1016,7 @@ func (s *MsgServerTestSuite) addTickWithFee0Tokens(tickIndex int64, amountA int,
 }
 
 func (s *MsgServerTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amountB int) (lowerTick types.TickMap, upperTick types.TickMap) {
-	pairId := "TokenA<>TokenB"
+	pairId := "TokenA/TokenB"
 	lowerTick = s.app.DexKeeper.GetOrInitTick(s.goCtx, pairId, tickIndex-1)
 	upperTick = s.app.DexKeeper.GetOrInitTick(s.goCtx, pairId, tickIndex+1)
 	priceCenter1To0 := keeper.CalcPrice0To1(tickIndex)

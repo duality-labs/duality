@@ -8,11 +8,10 @@ export const protobufPackage = "nicholasdotsol.duality.dex";
 export interface PairMap {
   pairId: string;
   tokenPair: TokenPairType | undefined;
-  maxTick: number;
-  minTick: number;
+  totalTickCount: number;
 }
 
-const basePairMap: object = { pairId: "", maxTick: 0, minTick: 0 };
+const basePairMap: object = { pairId: "", totalTickCount: 0 };
 
 export const PairMap = {
   encode(message: PairMap, writer: Writer = Writer.create()): Writer {
@@ -25,11 +24,8 @@ export const PairMap = {
         writer.uint32(18).fork()
       ).ldelim();
     }
-    if (message.maxTick !== 0) {
-      writer.uint32(24).int64(message.maxTick);
-    }
-    if (message.minTick !== 0) {
-      writer.uint32(32).int64(message.minTick);
+    if (message.totalTickCount !== 0) {
+      writer.uint32(24).int64(message.totalTickCount);
     }
     return writer;
   },
@@ -48,10 +44,7 @@ export const PairMap = {
           message.tokenPair = TokenPairType.decode(reader, reader.uint32());
           break;
         case 3:
-          message.maxTick = longToNumber(reader.int64() as Long);
-          break;
-        case 4:
-          message.minTick = longToNumber(reader.int64() as Long);
+          message.totalTickCount = longToNumber(reader.int64() as Long);
           break;
         default:
           reader.skipType(tag & 7);
@@ -73,15 +66,10 @@ export const PairMap = {
     } else {
       message.tokenPair = undefined;
     }
-    if (object.maxTick !== undefined && object.maxTick !== null) {
-      message.maxTick = Number(object.maxTick);
+    if (object.totalTickCount !== undefined && object.totalTickCount !== null) {
+      message.totalTickCount = Number(object.totalTickCount);
     } else {
-      message.maxTick = 0;
-    }
-    if (object.minTick !== undefined && object.minTick !== null) {
-      message.minTick = Number(object.minTick);
-    } else {
-      message.minTick = 0;
+      message.totalTickCount = 0;
     }
     return message;
   },
@@ -93,8 +81,8 @@ export const PairMap = {
       (obj.tokenPair = message.tokenPair
         ? TokenPairType.toJSON(message.tokenPair)
         : undefined);
-    message.maxTick !== undefined && (obj.maxTick = message.maxTick);
-    message.minTick !== undefined && (obj.minTick = message.minTick);
+    message.totalTickCount !== undefined &&
+      (obj.totalTickCount = message.totalTickCount);
     return obj;
   },
 
@@ -110,15 +98,10 @@ export const PairMap = {
     } else {
       message.tokenPair = undefined;
     }
-    if (object.maxTick !== undefined && object.maxTick !== null) {
-      message.maxTick = object.maxTick;
+    if (object.totalTickCount !== undefined && object.totalTickCount !== null) {
+      message.totalTickCount = object.totalTickCount;
     } else {
-      message.maxTick = 0;
-    }
-    if (object.minTick !== undefined && object.minTick !== null) {
-      message.minTick = object.minTick;
-    } else {
-      message.minTick = 0;
+      message.totalTickCount = 0;
     }
     return message;
   },

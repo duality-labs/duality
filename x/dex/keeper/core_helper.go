@@ -16,7 +16,7 @@ import (
 ///////////////////////////////////////////////////////////////////////////////
 
 func PairToTokens(pairId string) (token0 string, token1 string) {
-	tokens := strings.Split(pairId, "<>")
+	tokens := strings.Split(pairId, "/")
 
 	return tokens[0], tokens[1]
 }
