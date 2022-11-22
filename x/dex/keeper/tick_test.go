@@ -28,8 +28,8 @@ func (s *TickTestSuite) SetupTest() {
 }
 
 func (s *TickTestSuite) TestLimitHasToken0() {
-	pairId := "TokenA;TokenB"
-	tick := keeper.NewTick("TokenA;TokenB", 0, 6)
+	pairId := "TokenA<>TokenB"
+	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, types.LimitOrderPoolReserveMap{
 		PairId:    pairId,
 		Token:     "TokenA",
@@ -41,8 +41,8 @@ func (s *TickTestSuite) TestLimitHasToken0() {
 }
 
 func (s *TickTestSuite) TestEmptyHasToken0() {
-	pairId := "TokenA;TokenB"
-	tick := keeper.NewTick("TokenA;TokenB", 0, 6)
+	pairId := "TokenA<>TokenB"
+	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, types.LimitOrderPoolReserveMap{
 		PairId:    pairId,
 		Token:     "TokenA",
@@ -54,8 +54,8 @@ func (s *TickTestSuite) TestEmptyHasToken0() {
 }
 
 func (s *TickTestSuite) TestLiquidityHasToken0() {
-	pairId := "TokenA;TokenB"
-	tick := keeper.NewTick("TokenA;TokenB", 0, 6)
+	pairId := "TokenA<>TokenB"
+	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	tick.TickData.Reserve0AndShares[0].Reserve0 = NewDec(100)
 	tick.TickData.Reserve0AndShares[0].TotalShares = NewDec(100)
 	tick.TickData.Reserve1[0] = NewDec(20)
@@ -70,8 +70,8 @@ func (s *TickTestSuite) TestLiquidityHasToken0() {
 }
 
 func (s *TickTestSuite) TestLiquidityHighFeeHasToken0() {
-	pairId := "TokenA;TokenB"
-	tick := keeper.NewTick("TokenA;TokenB", 0, 6)
+	pairId := "TokenA<>TokenB"
+	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	tick.TickData.Reserve0AndShares[4].Reserve0 = NewDec(100)
 	tick.TickData.Reserve0AndShares[4].TotalShares = NewDec(100)
 	tick.TickData.Reserve1[4] = NewDec(20)
@@ -86,8 +86,8 @@ func (s *TickTestSuite) TestLiquidityHighFeeHasToken0() {
 }
 
 func (s *TickTestSuite) TestNoLiquidityOnOneSideHasToken0() {
-	pairId := "TokenA;TokenB"
-	tick := keeper.NewTick("TokenA;TokenB", 0, 6)
+	pairId := "TokenA<>TokenB"
+	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	tick.TickData.Reserve0AndShares[4].Reserve0 = NewDec(0)
 	tick.TickData.Reserve0AndShares[4].TotalShares = NewDec(10)
 	tick.TickData.Reserve1[4] = NewDec(20)
@@ -102,8 +102,8 @@ func (s *TickTestSuite) TestNoLiquidityOnOneSideHasToken0() {
 }
 
 func (s *TickTestSuite) TestLimitHasToken1() {
-	pairId := "TokenA;TokenB"
-	tick := keeper.NewTick("TokenA;TokenB", 0, 6)
+	pairId := "TokenA<>TokenB"
+	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, types.LimitOrderPoolReserveMap{
 		PairId:    pairId,
 		Token:     "TokenB",
@@ -115,8 +115,8 @@ func (s *TickTestSuite) TestLimitHasToken1() {
 }
 
 func (s *TickTestSuite) TestEmptyHasToken1() {
-	pairId := "TokenA;TokenB"
-	tick := keeper.NewTick("TokenA;TokenB", 0, 6)
+	pairId := "TokenA<>TokenB"
+	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, types.LimitOrderPoolReserveMap{
 		PairId:    pairId,
 		Token:     "TokenB",
@@ -128,8 +128,8 @@ func (s *TickTestSuite) TestEmptyHasToken1() {
 }
 
 func (s *TickTestSuite) TestLiquidityHasToken1() {
-	pairId := "TokenA;TokenB"
-	tick := keeper.NewTick("TokenA;TokenB", 0, 6)
+	pairId := "TokenA<>TokenB"
+	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	tick.TickData.Reserve0AndShares[0].Reserve0 = NewDec(100)
 	tick.TickData.Reserve0AndShares[0].TotalShares = NewDec(100)
 	tick.TickData.Reserve1[0] = NewDec(20)
@@ -144,8 +144,8 @@ func (s *TickTestSuite) TestLiquidityHasToken1() {
 }
 
 func (s *TickTestSuite) TestLiquidityHighFeeHasToken1() {
-	pairId := "TokenA;TokenB"
-	tick := keeper.NewTick("TokenA;TokenB", 0, 6)
+	pairId := "TokenA<>TokenB"
+	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	tick.TickData.Reserve0AndShares[4].Reserve0 = NewDec(100)
 	tick.TickData.Reserve0AndShares[4].TotalShares = NewDec(100)
 	tick.TickData.Reserve1[4] = NewDec(20)
@@ -160,8 +160,8 @@ func (s *TickTestSuite) TestLiquidityHighFeeHasToken1() {
 }
 
 func (s *TickTestSuite) TestNoLiquidityOnOneSideHasToken1() {
-	pairId := "TokenA;TokenB"
-	tick := keeper.NewTick("TokenA;TokenB", 0, 6)
+	pairId := "TokenA<>TokenB"
+	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	tick.TickData.Reserve0AndShares[4].Reserve0 = NewDec(100)
 	tick.TickData.Reserve0AndShares[4].TotalShares = NewDec(10)
 	tick.TickData.Reserve1[4] = NewDec(0)

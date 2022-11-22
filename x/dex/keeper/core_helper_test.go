@@ -16,7 +16,7 @@ const (
 
 func (s *MsgServerTestSuite) TestPairToTokens() {
 
-	token0, token1 := keeper.PairToTokens("TokenA;TokenB")
+	token0, token1 := keeper.PairToTokens("TokenA<>TokenB")
 
 	s.Assert().Equal("TokenA", token0)
 	s.Assert().Equal("TokenB", token1)
@@ -25,7 +25,7 @@ func (s *MsgServerTestSuite) TestPairToTokens() {
 
 func (s *MsgServerTestSuite) TestPairToTokensIBCis0() {
 
-	token0, token1 := keeper.PairToTokens("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2;TokenB")
+	token0, token1 := keeper.PairToTokens("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2<>TokenB")
 
 	s.Assert().Equal("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", token0)
 	s.Assert().Equal("TokenB", token1)
@@ -33,7 +33,7 @@ func (s *MsgServerTestSuite) TestPairToTokensIBCis0() {
 
 func (s *MsgServerTestSuite) TestPairToTokensIBCis1() {
 
-	token0, token1 := keeper.PairToTokens("TokenA;ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2")
+	token0, token1 := keeper.PairToTokens("TokenA<>ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2")
 
 	s.Assert().Equal("TokenA", token0)
 	s.Assert().Equal("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", token1)
@@ -42,7 +42,7 @@ func (s *MsgServerTestSuite) TestPairToTokensIBCis1() {
 func (s *MsgServerTestSuite) TestPairToTokensIBCisBoth() {
 
 	token0, token1 :=
-		keeper.PairToTokens("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2;ibc/94644FB092D9ACDA56123C74F36E4234926001AA44A9CA97EA622B25F41E5223")
+		keeper.PairToTokens("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2<>ibc/94644FB092D9ACDA56123C74F36E4234926001AA44A9CA97EA622B25F41E5223")
 
 	s.Assert().Equal("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", token0)
 	s.Assert().Equal("ibc/94644FB092D9ACDA56123C74F36E4234926001AA44A9CA97EA622B25F41E5223", token1)
@@ -86,11 +86,11 @@ func (s *MsgServerTestSuite) TestGetOrInitPairNew() {
 	pairCount := len(s.app.DexKeeper.GetAllPairMap(s.ctx))
 	s.Assert().Equal(1, pairCount)
 
-	pair, foundPair := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA;TokenB")
+	pair, foundPair := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA<>TokenB")
 
 	s.Require().True(foundPair)
 
-	s.Assert().Equal(pair.PairId, "TokenA;TokenB")
+	s.Assert().Equal(pair.PairId, "TokenA<>TokenB")
 	s.Assert().Equal(
 		&types.TokenPairType{
 			CurrentTick0To1: math.MaxInt64,
@@ -108,7 +108,7 @@ func (s *MsgServerTestSuite) TestGetOrInitPairExisting() {
 	s.app.DexKeeper.GetOrInitPair(s.goCtx, "TokenA", "TokenB")
 
 	// WHEN we update values on that pair
-	pair, _ := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA;TokenB")
+	pair, _ := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA<>TokenB")
 	pair.MinTick = 20
 	s.app.DexKeeper.SetPairMap(s.ctx, pair)
 
@@ -125,18 +125,18 @@ func (s *MsgServerTestSuite) TestGetOrInitPairExisting() {
 
 func (s *MsgServerTestSuite) TestGetOrInitTickNew() {
 	// GIVEN we initialize a new tick
-	s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA;TokenB", 0)
+	s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
 
 	// THEN 1 tick is initialized with the correct values
 
 	tickCount := len(s.app.DexKeeper.GetAllTickMap(s.ctx))
 	s.Assert().Equal(1, tickCount)
 
-	tick, found := s.app.DexKeeper.GetTickMap(s.ctx, "TokenA;TokenB", 0)
+	tick, found := s.app.DexKeeper.GetTickMap(s.ctx, "TokenA<>TokenB", 0)
 
 	s.Require().True(found)
 
-	s.Assert().Equal(tick.PairId, "TokenA;TokenB")
+	s.Assert().Equal(tick.PairId, "TokenA<>TokenB")
 	s.Assert().Equal(tick.TickIndex, int64(0))
 	s.Assert().Equal(feeCount, len(tick.TickData.Reserve0AndShares))
 	s.Assert().Equal(
@@ -160,8 +160,8 @@ func (s *MsgServerTestSuite) TestGetOrInitTickNew() {
 	)
 
 	//AND tranche fill maps are initialized
-	_, fill0Found := s.app.DexKeeper.GetLimitOrderPoolFillMap(s.ctx, "TokenA;TokenB", 0, "TokenA", 0)
-	_, fill1Found := s.app.DexKeeper.GetLimitOrderPoolFillMap(s.ctx, "TokenA;TokenB", 0, "TokenB", 0)
+	_, fill0Found := s.app.DexKeeper.GetLimitOrderPoolFillMap(s.ctx, "TokenA<>TokenB", 0, "TokenA", 0)
+	_, fill1Found := s.app.DexKeeper.GetLimitOrderPoolFillMap(s.ctx, "TokenA<>TokenB", 0, "TokenB", 0)
 
 	s.Assert().True(fill0Found)
 	s.Assert().True(fill1Found)
@@ -170,15 +170,15 @@ func (s *MsgServerTestSuite) TestGetOrInitTickNew() {
 func (s *MsgServerTestSuite) TestGetOrInitTickExisting() {
 
 	// GIVEN we initialize a tick
-	s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA;TokenB", 0)
+	s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
 
 	// WHEN we update values on that tick
-	tick, _ := s.app.DexKeeper.GetTickMap(s.ctx, "TokenA;TokenB", 0)
+	tick, _ := s.app.DexKeeper.GetTickMap(s.ctx, "TokenA<>TokenB", 0)
 	tick.TickData.Reserve0AndShares[0] = &types.Reserve0AndSharesType{sdk.NewDec(10), sdk.NewDec(10)}
-	s.app.DexKeeper.SetTickMap(s.ctx, "TokenA;TokenB", tick)
+	s.app.DexKeeper.SetTickMap(s.ctx, "TokenA<>TokenB", tick)
 
 	// AND try to initialize the same tick again
-	newTick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA;TokenB", 0)
+	newTick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
 
 	// THEN there is still only 1 tick and it retains the values we set
 	tickCount := len(s.app.DexKeeper.GetAllTickMap(s.ctx))
@@ -490,11 +490,11 @@ func (s *MsgServerTestSuite) TestFindNextTick0To1WithMinLiq() {
 func (s *MsgServerTestSuite) TestHasToken0Empty() {
 
 	// WHEN tick only has limit orders and reserves of Token1
-	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA;TokenB", 0)
+	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
 	tick.TickData.Reserve1[0] = sdk.NewDec(10)
 
 	tick.LimitOrderPool0To1.CurrentLimitOrderKey = 0
-	reserveData := s.app.DexKeeper.GetOrInitReserveData(s.goCtx, "TokenA;TokenB", 0, "TokenB", 0)
+	reserveData := s.app.DexKeeper.GetOrInitReserveData(s.goCtx, "TokenA<>TokenB", 0, "TokenB", 0)
 	reserveData.Reserves = sdk.NewDec(100)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, reserveData)
 
@@ -504,7 +504,7 @@ func (s *MsgServerTestSuite) TestHasToken0Empty() {
 func (s *MsgServerTestSuite) TestHasToken0HasReserves() {
 
 	// WHEN tick has Reserves0
-	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA;TokenB", 0)
+	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
 	tick.TickData.Reserve0AndShares[3].Reserve0 = sdk.NewDec(10)
 
 	s.Assert().True(s.app.DexKeeper.HasToken0(s.ctx, &tick))
@@ -513,9 +513,9 @@ func (s *MsgServerTestSuite) TestHasToken0HasReserves() {
 func (s *MsgServerTestSuite) TestHasToken0HasLimitOrders() {
 
 	// WHEN there are limit orders at the tick
-	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA;TokenB", 0)
+	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
 	tick.LimitOrderPool0To1.CurrentLimitOrderKey = 0
-	reserveData := s.app.DexKeeper.GetOrInitReserveData(s.goCtx, "TokenA;TokenB", 0, "TokenA", 0)
+	reserveData := s.app.DexKeeper.GetOrInitReserveData(s.goCtx, "TokenA<>TokenB", 0, "TokenA", 0)
 	reserveData.Reserves = sdk.NewDec(100)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, reserveData)
 
@@ -527,11 +527,11 @@ func (s *MsgServerTestSuite) TestHasToken0HasLimitOrders() {
 func (s *MsgServerTestSuite) TestHasToken1Empty() {
 
 	// WHEN tick only has limit orders and reserves of Token0
-	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA;TokenB", 0)
+	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
 	tick.TickData.Reserve0AndShares[0].Reserve0 = sdk.NewDec(10)
 
 	tick.LimitOrderPool0To1.CurrentLimitOrderKey = 0
-	reserveData := s.app.DexKeeper.GetOrInitReserveData(s.goCtx, "TokenA;TokenB", 0, "TokenA", 0)
+	reserveData := s.app.DexKeeper.GetOrInitReserveData(s.goCtx, "TokenA<>TokenB", 0, "TokenA", 0)
 	reserveData.Reserves = sdk.NewDec(100)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, reserveData)
 
@@ -541,7 +541,7 @@ func (s *MsgServerTestSuite) TestHasToken1Empty() {
 func (s *MsgServerTestSuite) TestHasToken1HasReserves() {
 
 	// WHEN tick has Reserves0
-	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA;TokenB", 0)
+	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
 	tick.TickData.Reserve1[0] = sdk.NewDec(10)
 
 	// THEN HasToken1() = true
@@ -551,9 +551,9 @@ func (s *MsgServerTestSuite) TestHasToken1HasReserves() {
 func (s *MsgServerTestSuite) TestHasToken1HasLimitOrders() {
 
 	// WHEN there are limit orders at the tick
-	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA;TokenB", 0)
+	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
 	tick.LimitOrderPool0To1.CurrentLimitOrderKey = 0
-	reserveData := s.app.DexKeeper.GetOrInitReserveData(s.goCtx, "TokenA;TokenB", 0, "TokenB", 0)
+	reserveData := s.app.DexKeeper.GetOrInitReserveData(s.goCtx, "TokenA<>TokenB", 0, "TokenB", 0)
 	reserveData.Reserves = sdk.NewDec(100)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, reserveData)
 

@@ -31,10 +31,10 @@ func createNLimitOrderPoolTotalSharesMap(keeper *keeper.Keeper, ctx sdk.Context,
 
 func TestLimitOrderPoolTotalSharesMapGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolTotalSharesMap(keeper, ctx, "TokenA;TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolTotalSharesMap(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
 	for _, item := range items {
 		rst, found := keeper.GetLimitOrderPoolTotalSharesMap(ctx,
-			"TokenA;TokenB",
+			"TokenA<>TokenB",
 			0,
 			"TokenA",
 			item.Count,
@@ -48,16 +48,16 @@ func TestLimitOrderPoolTotalSharesMapGet(t *testing.T) {
 }
 func TestLimitOrderPoolTotalSharesMapRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolTotalSharesMap(keeper, ctx, "TokenA;TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolTotalSharesMap(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
 	for _, item := range items {
 		keeper.RemoveLimitOrderPoolTotalSharesMap(ctx,
-			"TokenA;TokenB",
+			"TokenA<>TokenB",
 			0,
 			"TokenA",
 			item.Count,
 		)
 		_, found := keeper.GetLimitOrderPoolTotalSharesMap(ctx,
-			"TokenA;TokenB",
+			"TokenA<>TokenB",
 			0,
 			"TokenA",
 			item.Count,
@@ -68,7 +68,7 @@ func TestLimitOrderPoolTotalSharesMapRemove(t *testing.T) {
 
 func TestLimitOrderPoolTotalSharesMapGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolTotalSharesMap(keeper, ctx, "TokenA;TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolTotalSharesMap(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
 	require.ElementsMatch(t,
 		nullify.Fill(items),
 		nullify.Fill(keeper.GetAllLimitOrderPoolTotalSharesMap(ctx)),
