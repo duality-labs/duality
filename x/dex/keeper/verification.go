@@ -85,7 +85,6 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 
 	if AccountsToken1Balance.LT(totalAmount1ToDeposit) {
-		fmt.Println("Fail ")
 		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
