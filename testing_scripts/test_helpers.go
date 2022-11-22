@@ -1,7 +1,8 @@
 package testing_scripts
 
 import (
-	"fmt"
+	//"fmt"
+	"github.com/NicholasDotSol/duality/x/dex/keeper"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -26,8 +27,6 @@ func SingleLimitOrderFill(amount_placed sdk.Dec,
 		amount_out = amount_in.Mul(price_filled_at)
 	}
 
-	fmt.Println("Amount Out: ", amount_out)
-	fmt.Println("Amount In: ", amount_in)
 	return amount_in, amount_out
 }
 
@@ -58,7 +57,6 @@ func MultipleLimitOrderFills(amounts_placed []sdk.Dec, prices []sdk.Dec, amount_
 
 	// Loops through all of the limit orders that need to be filled
 	for i := 0; i < len(amounts_placed); i++ {
-		fmt.Println("\nRound: ", i)
 		amount_in, amount_out := SingleLimitOrderFill(amounts_placed[i], prices[i], amount_remaining)
 
 		amount_remaining = amount_remaining.Sub(amount_in)
@@ -172,4 +170,20 @@ func MultiplePoolSwapAndUpdate(amounts_liquidity []sdk.Dec,
 	}
 
 	return resulting_reserves_in_token, resulting_reserves_out_token, amount_remaining, amount_out_total
+}
+
+
+func SharesOnDeposit(existing_shares sdk.Dec, existing_amount0 sdk.Dec, existing_amount1 sdk.Dec, new_amount0 sdk.Dec, new_amount1 sdk.Dec, tickIndex int64) (shares_minted sdk.Dec) {
+	price1To0 := keeper.CalcPrice1To0(tickIndex)
+	
+	new_value := new_amount0.Add( price1To0.Mul( new_amount1 ) )
+
+	if existing_amount0.Add(existing_amount1).GT(sdk.ZeroDec()) {
+		existing_value := existing_amount0.Add( price1To0.Mul( existing_amount1 ) )
+		shares_minted = shares_minted.Mul( new_value.Quo( existing_value ) )
+	} else {
+		shares_minted = new_value
+	}
+
+	return shares_minted
 }
