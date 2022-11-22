@@ -32,7 +32,7 @@ func (s *MsgServerTestSuite) TestDepositVerificationInvalidCreatorAddress() {
 
 	// Case
 	// deposit 10 of token A at tick 0 fee 1
-	// Errors as TokenA and TokenB are the same token
+	// Errors as creator is an invalid address
 	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
 		Creator:     "",
 		Receiver:    s.alice.String(),
@@ -52,7 +52,7 @@ func (s *MsgServerTestSuite) TestDepositVerificationInvalidReceiverAddress() {
 
 	// Case
 	// deposit 10 of token A at tick 0 fee 1
-	// Errors as length of feeTier is out of range of valid feeIndices
+	// Errors as receiver is an invalid Address
 	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
 		Creator:     s.alice.String(),
 		Receiver:    "",

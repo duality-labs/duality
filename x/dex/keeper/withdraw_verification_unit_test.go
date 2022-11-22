@@ -31,7 +31,7 @@ func (s *MsgServerTestSuite) TestWithdrawVerificationInvalidCreatorAddress() {
 
 	// Case
 	// withdraw 10 of token A at tick 0 fee 1
-	// Errors as TokenA and TokenB are the same token
+	// Errors as creator address is an invalid address
 	_, err := s.msgServer.Withdrawl(s.goCtx, &types.MsgWithdrawl{
 		Creator:        "",
 		Receiver:       s.alice.String(),
@@ -50,7 +50,7 @@ func (s *MsgServerTestSuite) TestWithdrawVerificationInvalidReceiverAddress() {
 
 	// Case
 	// withdraw 10 of token A at tick 0 fee 1
-	// Errors as length of feeTier is out of range of valid feeIndices
+	// Errors as receiver address is an invalid address
 	_, err := s.msgServer.Withdrawl(s.goCtx, &types.MsgWithdrawl{
 		Creator:        s.alice.String(),
 		Receiver:       "",

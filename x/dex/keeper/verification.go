@@ -130,11 +130,6 @@ func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
-	// Error checking for valid sdk.Dec
-	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
-	}
-
 	pairId := k.CreatePairId(token0, token1)
 
 	// checks that the user has the specified number of shares they wish to withdraw
@@ -179,10 +174,6 @@ func (k Keeper) SwapVerification(goCtx context.Context, msg types.MsgSwap) (stri
 
 	if msg.TokenIn != token0 && msg.TokenIn != token1 {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
-	}
-	// Error checking for valid sdk.Dec
-	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
 	AccountsAmountInBalance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, msg.TokenIn).Amount)
