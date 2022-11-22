@@ -382,7 +382,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustLOCorrectExecution() {
 	// place another LO selling 10 of token B at tick 1
 	s.aliceLimitSells("TokenB", 1, 10)
 	limitLiquiditySetup := sdk.NewDec(20).Sub(amountOutSetup)
-	// TODO: uncomment, has bug with fill and place tranche keys
 	s.assertLimitLiquidityAtTickDec("TokenB", limitLiquiditySetup, 1)
 	bobBalanceSetupB := sdk.NewDec(50).Sub(amountInSetup)
 	s.assertBobBalancesDec(bobBalanceSetupB, amountOutSetup)
@@ -398,7 +397,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustLOCorrectExecution() {
 	expectedAmountIn := amountInDec.Sub(expectedAmountLeft)
 	s.assertBobBalancesDec(bobBalanceSetupB.Sub(expectedAmountIn), amountOutSetup.Add(expectedAmountOut))
 	s.assertDexBalancesDec(expectedAmountIn.Add(amountInSetup), limitLiquiditySetup.Sub(expectedAmountOut))
-	// TODO: uncomment
 	s.assertLimitLiquidityAtTickDec("TokenB", sdk.NewDec(20).Sub(amountOutSetup).Sub(expectedAmountOut), 1)
 }
 
