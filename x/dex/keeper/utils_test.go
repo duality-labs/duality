@@ -33,8 +33,8 @@ func getDexBalance(s *MsgServerTestSuite, denom string) sdk.Dec {
 
 // Helper to convert coins into sorted amount0, amount1
 func sortCoins(s *MsgServerTestSuite, denomA string, denomB string, amountsA []sdk.Dec, amountsB []sdk.Dec) (string, string, []sdk.Dec, []sdk.Dec) {
-	app, ctx := s.app, s.ctx
-	denom0, denom1, err := app.DexKeeper.SortTokens(ctx, denomA, denomB)
+	app := s.app
+	denom0, denom1, err := app.DexKeeper.SortTokens(denomA, denomB)
 	s.Require().Nil(err)
 	// this corresponds to lines 45-54 of verification.go
 	amounts0, amounts1 := amountsA, amountsB

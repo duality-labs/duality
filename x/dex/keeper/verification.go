@@ -2,54 +2,92 @@ package keeper
 
 import (
 	"context"
-
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit) (string, string, sdk.AccAddress, []sdk.Dec, []sdk.Dec, error) {
+type Message interface {
+	GetTokenA() string
+	GetTokenB() string
+	GetCreator() string
+	GetReceiver() string
+}
 
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
+func (k Keeper) ValidateTokens(tokenA string, tokenB string) (string, string, error){
 	// lexographically sort token0, token1
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
-
+	token0, token1, err := k.SortTokens(tokenA, tokenB)
 	if err != nil {
-		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+		return "", "", err
 	}
+	return token0, token1, nil
+}
 
+func (k Keeper) ValidateAddress(address string, addrType string)(sdk.AccAddress, error){
 	// Converts input address (string) to sdk.AccAddress
-	callerAddr, err := sdk.AccAddressFromBech32(msg.Creator)
-	// Error checking for the calling address
+	addr, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
-		return "", "", nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return nil,  sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid %s address (%s)", addrType, err)
 	}
+	return addr, nil
+}
 
-	_, err = sdk.AccAddressFromBech32(msg.Receiver)
-	// Error Checking for receiver address
-	// Note we do not actually need to save the sdk.AccAddress here but we do want the address to be checked to determine if it valid
-	if err != nil {
-		return "", "", nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
-	}
+func (k Keeper) ValidateFees(ctx sdk.Context, feeIndexes []uint64) error{
 
 	feeCount := k.GetFeeListCount(ctx)
 
 	// make sure that all feeIndexes (fee list index) is a valid index of the fee tier
-	for i, _ := range msg.FeeIndexes {
-		if msg.FeeIndexes[i] >= feeCount {
-			return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", msg.FeeIndexes[i])
+	for _, feeIndex := range feeIndexes {
+		if feeIndex >= feeCount {
+			return  sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", feeIndex)
 		}
+	}
+	return nil
+}
+
+func (k Keeper) ValidateCore(msg Message)(tokenA string, tokenB string, callerAddre sdk.AccAddress, receiverAddr sdk.AccAddress, err error){
+
+
+	token0, token1, err := k.ValidateTokens(msg.GetTokenA(), msg.GetTokenB())
+	if err != nil {
+		return "", "", nil, nil, err
+	}
+
+	// NOTE: technically I don't think we have to handle an error here since it will be caught upstream by ValidateBasic
+	callerAddr, err := k.ValidateAddress(msg.GetCreator(), "creator")
+	if err != nil {
+		return "", "", nil, nil, err
+	}
+
+	receiverAddr, err = k.ValidateAddress(msg.GetReceiver(), "receiver")
+	if err != nil {
+		return "", "", nil, nil, err
+	}
+
+
+	return token0, token1, callerAddr, receiverAddr, nil
+}
+
+
+func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit) (string, string, sdk.AccAddress, []sdk.Dec, []sdk.Dec, error) {
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	token0, token1, callerAddr, _, err := k.ValidateCore(&msg)
+	if err != nil {
+		return "", "", nil, nil, nil, err
+	}
+
+	err = k.ValidateFees(ctx, msg.FeeIndexes)
+	if err != nil {
+		return "", "", nil, nil, nil, err
 	}
 
 	amounts0 := msg.AmountsA
 	amounts1 := msg.AmountsB
 
-	// sort amount0, amount1 based on the sorting of token0/token1
 	if token0 != msg.TokenA {
-		tmp := msg.AmountsA
-		amounts0 = msg.AmountsB
-		amounts1 = tmp
+		amounts0, amounts1 = msg.AmountsB, msg.AmountsA
 	}
 
 	totalAmount0ToDeposit := sdk.ZeroDec()
@@ -88,44 +126,19 @@ func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// lexographically sort token0, token1
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
-
+	token0, token1, callerAddr, receiverAddr, err := k.ValidateCore(&msg)
 	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+		return "", "", nil, nil, err
 	}
-
-	// gets total number of fee tiers
-	feeCount := k.GetFeeListCount(ctx)
 
 	// makes sure that there is the same number of sharesToRemove as ticks specfied
 	if len(msg.SharesToRemove) != len(msg.TickIndexes) || len(msg.SharesToRemove) != len(msg.FeeIndexes) {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrUnbalancedTxArray, "Input Arrays are not of the same length")
 	}
 
-	// make sure that all feeIndexes (fee list index) is a valid index of the fee tier
-	for i, _ := range msg.FeeIndexes {
-		if msg.FeeIndexes[i] >= feeCount {
-			return "", "", nil, nil, sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", msg.FeeIndexes[i])
-		}
-	}
-
-	// Converts input address (string) to sdk.AccAddress
-	callerAddr, err := sdk.AccAddressFromBech32(msg.Creator)
-	// Error checking for the calling address
+	err = k.ValidateFees(ctx, msg.FeeIndexes)
 	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
-
-	receiverAddr, err := sdk.AccAddressFromBech32(msg.Receiver)
-	// Error Checking for receiver address
-	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
-	}
-
-	// Error checking for valid sdk.Dec
-	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
+		return "", "", nil, nil, err
 	}
 
 	pairId := k.CreatePairId(token0, token1)
@@ -150,32 +163,13 @@ func (k Keeper) SwapVerification(goCtx context.Context, msg types.MsgSwap) (stri
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// lexographically sort token0, token1
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
-
+	token0, token1, callerAddr, receiverAddr, err := k.ValidateCore(&msg)
 	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
-	}
-
-	// Converts input address (string) to sdk.AccAddress
-	callerAddr, err := sdk.AccAddressFromBech32(msg.Creator)
-	// Error checking for the calling address
-	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
-
-	receiverAddr, err := sdk.AccAddressFromBech32(msg.Receiver)
-	// Error Checking for receiver address
-	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+		return "", "", nil, nil, err
 	}
 
 	if msg.TokenIn != token0 && msg.TokenIn != token1 {
-		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
-	}
-	// Error checking for valid sdk.Dec
-	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
+		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Token0 or Token1")
 	}
 
 	AccountsAmountInBalance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, msg.TokenIn).Amount)
@@ -191,34 +185,14 @@ func (k Keeper) SwapVerification(goCtx context.Context, msg types.MsgSwap) (stri
 func (k Keeper) PlaceLimitOrderVerification(goCtx context.Context, msg types.MsgPlaceLimitOrder) (string, string, sdk.AccAddress, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// lexographically sort token0, token1
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
 
+	token0, token1, callerAddr, _, err := k.ValidateCore(&msg)
 	if err != nil {
-		return "", "", nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
-	}
-
-	// Converts input address (string) to sdk.AccAddress
-	callerAddr, err := sdk.AccAddressFromBech32(msg.Creator)
-	// Error checking for the calling address
-	if err != nil {
-		return "", "", nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
-
-	//NOTE: We do not use the sdk.AccAddress of Receiver in PlaceLimitOrder and thus do not need to save it
-	_, err = sdk.AccAddressFromBech32(msg.Receiver)
-	// Error Checking for receiver address
-	// Note we do not actually need to save the sdk.AccAddress here but we do want the address to be checked to determine if it valid
-	if err != nil {
-		return "", "", nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+		return "", "", nil, err
 	}
 
 	if msg.TokenIn != token0 && msg.TokenIn != token1 {
 		return "", "", nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
-	}
-	// Error checking for valid sdk.Dec
-	if err != nil {
-		return "", "", nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
 	AccountsAmountInBalance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, msg.TokenIn).Amount)
@@ -234,24 +208,10 @@ func (k Keeper) PlaceLimitOrderVerification(goCtx context.Context, msg types.Msg
 func (k Keeper) WithdrawLimitOrderVerification(goCtx context.Context, msg types.MsgWithdrawFilledLimitOrder) (string, string, sdk.AccAddress, sdk.AccAddress, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
 
+	token0, token1, callerAddr, receiverAddr, err := k.ValidateCore(&msg)
 	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
-	}
-
-	// Converts input address (string) to sdk.AccAddress
-	callerAddr, err := sdk.AccAddressFromBech32(msg.Creator)
-	// Error checking for the calling address
-	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
-
-	ReceiverAddr, err := sdk.AccAddressFromBech32(msg.Receiver)
-	// Error Checking for receiver address
-	// Note we do not actually need to save the sdk.AccAddress here but we do want the address to be checked to determine if it valid
-	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+		return "", "", nil, nil, err
 	}
 
 	pairId := k.CreatePairId(token0, token1)
@@ -267,31 +227,15 @@ func (k Keeper) WithdrawLimitOrderVerification(goCtx context.Context, msg types.
 	}
 
 	_ = ctx
-	return token0, token1, callerAddr, ReceiverAddr, nil
+	return token0, token1, callerAddr, receiverAddr, nil
 }
 
 func (k Keeper) CancelLimitOrderVerification(goCtx context.Context, msg types.MsgCancelLimitOrder) (string, string, sdk.AccAddress, sdk.AccAddress, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// lexographically sort token0, token1
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
-
+	token0, token1, callerAddr, receiverAddr, err := k.ValidateCore(&msg)
 	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
-	}
-
-	// Converts input address (string) to sdk.AccAddress
-	callerAddr, err := sdk.AccAddressFromBech32(msg.Creator)
-	// Error checking for the calling address
-	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
-
-	receiverAddr, err := sdk.AccAddressFromBech32(msg.Receiver)
-	// Error Checking for receiver address
-	// Note we do not actually need to save the sdk.AccAddress here but we do want the address to be checked to determine if it valid
-	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+		return "", "", nil, nil, err
 	}
 
 	// createPairId (token0/ token1)
