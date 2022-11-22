@@ -649,23 +649,26 @@ func (s *MsgServerTestSuite) printTicks() {
 	fmt.Printf("\nTick0To1: %v, Tick1To0: %v", tickMap.TokenPair.CurrentTick0To1, tickMap.TokenPair.CurrentTick1To0)
 }
 
-func (s *MsgServerTestSuite) assertLiquidityAtTick(amountA int, amountB int, tickIndex int64, feeIndex uint64) {
+func (s *MsgServerTestSuite) assertLiquidityAtTick(amountA int64, amountB int64, tickIndex int64, feeIndex uint64) {
+	amtA, amtB := sdk.NewDec(amountA), sdk.NewDec(amountB)
+	s.assertLiquidityAtTickDec(amtA, amtB, tickIndex, feeIndex)
+}
+func (s *MsgServerTestSuite) assertLiquidityAtTickDec(amountA sdk.Dec, amountB sdk.Dec, tickIndex int64, feeIndex uint64) {
 	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
 	fee := s.feeTiers[feeIndex].Fee
 	lowerTick, lowerTickFound := s.app.DexKeeper.GetTickMap(s.ctx, pairId, tickIndex-fee)
 	if !lowerTickFound {
-		s.Require().Fail("Invalid tick %s and fee %s", tickIndex, fee)
+		s.Require().Fail("Invalid tick %d and fee %d", tickIndex, fee)
 	}
 	upperTick, upperTickFound := s.app.DexKeeper.GetTickMap(s.ctx, pairId, tickIndex+fee)
 	if !upperTickFound {
-		s.Require().Fail("Invalid tick %s and fee %s", tickIndex, fee)
+		s.Require().Fail("Invalid tick %d and fee %d", tickIndex, fee)
 	}
 
-	amtA, amtB := NewDec(amountA), NewDec(amountB)
 	liquidityA := lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
 	liquidityB := upperTick.TickData.Reserve1[feeIndex]
-	s.Assert().Equal(amtA, liquidityA)
-	s.Assert().Equal(amtB, liquidityB)
+	s.Assert().Equal(amountA, liquidityA)
+	s.Assert().Equal(amountB, liquidityB)
 }
 
 func (s *MsgServerTestSuite) assertNoLiquidityAtTick(tickIndex int64, feeIndex uint64) {
@@ -770,7 +773,7 @@ func (s *MsgServerTestSuite) assertLimitLiquidityAtTickDec(selling string, amoun
 		liquidity = liquidity.Add(s.getLimitReservesAtTickAtKey(selling, tickIndex, placeTranche))
 	}
 
-	s.Assert().True(amount.Equal(liquidity), "Incorrect liquidity: %s", liquidity.String())
+	s.Assert().True(amount.Equal(liquidity), "Incorrect liquidity: expected %s, have %s", amount.String(), liquidity.String())
 }
 
 func (s *MsgServerTestSuite) assertFillAndPlaceTrancheKeys(selling string, tickIndex int64, expectedFill uint64, expectedPlace uint64) {
