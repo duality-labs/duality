@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -42,6 +43,11 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 		}
 	}
 
+	// makes sure that there is the same number of sharesToRemove as ticks and fees
+	if len(msg.AmountsA) != len(msg.AmountsB) || len(msg.AmountsA) != len(msg.TickIndexes) || len(msg.AmountsA) != len(msg.FeeIndexes) {
+		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrUnbalancedTxArray, "Input Arrays are not of the same length")
+	}
+
 	amounts0 := msg.AmountsA
 	amounts1 := msg.AmountsB
 
@@ -70,6 +76,7 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 
 	if AccountToken0Balance.LT(totalAmount0ToDeposit) {
+		fmt.Println("Fail")
 		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
@@ -78,6 +85,7 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 
 	if AccountsToken1Balance.LT(totalAmount1ToDeposit) {
+		fmt.Println("Fail ")
 		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
@@ -98,7 +106,7 @@ func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 	// gets total number of fee tiers
 	feeCount := k.GetFeeListCount(ctx)
 
-	// makes sure that there is the same number of sharesToRemove as ticks specfied
+	// makes sure that there is the same number of sharesToRemove as ticks and fees
 	if len(msg.SharesToRemove) != len(msg.TickIndexes) || len(msg.SharesToRemove) != len(msg.FeeIndexes) {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrUnbalancedTxArray, "Input Arrays are not of the same length")
 	}

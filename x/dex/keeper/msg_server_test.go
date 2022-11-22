@@ -85,6 +85,7 @@ func (s *MsgServerTestSuite) fundAccountBalancesDec(account sdk.AccAddress, aBal
 	aBalanceInt := sdk.NewIntFromBigInt(aBalance.BigInt())
 	bBalanceInt := sdk.NewIntFromBigInt(bBalance.BigInt())
 	balances := sdk.NewCoins(NewACoin(aBalanceInt), NewBCoin(bBalanceInt))
+
 	err := FundAccount(s.app.BankKeeper, s.ctx, account, balances)
 	s.Assert().NoError(err)
 	s.assertAccountBalancesDec(account, aBalance, bBalance)
@@ -124,6 +125,26 @@ func (s *MsgServerTestSuite) fundDanBalances(a int, b int) {
 
 func (s *MsgServerTestSuite) fundDanBalancesDec(a sdk.Dec, b sdk.Dec) {
 	s.fundAccountBalancesDec(s.dan, a, b)
+}
+
+func (s *MsgServerTestSuite) getBalanceDec(account sdk.AccAddress, denom string) sdk.Dec {
+	return sdk.NewDecFromInt(s.app.BankKeeper.GetBalance(s.ctx, account, denom).Amount)
+}
+
+func (s *MsgServerTestSuite) aliceGetBalanceDec(denom string) sdk.Dec {
+	return s.getBalanceDec(s.alice, denom)
+}
+
+func (s *MsgServerTestSuite) bobGetBalanceDec(denom string) sdk.Dec {
+	return s.getBalanceDec(s.bob, denom)
+}
+
+func (s *MsgServerTestSuite) carolGetBalanceDec(denom string) sdk.Dec {
+	return s.getBalanceDec(s.carol, denom)
+}
+
+func (s *MsgServerTestSuite) danGetBalanceDec(denom string) sdk.Dec {
+	return s.getBalanceDec(s.dan, denom)
 }
 
 func (s *MsgServerTestSuite) assertAccountBalances(account sdk.AccAddress, aBalance int, bBalance int) {
