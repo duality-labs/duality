@@ -288,6 +288,10 @@ func (k Keeper) CancelLimitOrderVerification(goCtx context.Context, msg types.Ms
 		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
+	if msg.KeyToken != token0 && msg.KeyToken != token1 {
+		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
+	}
+
 	// createPairId (token0/ token1)
 	pairId := k.CreatePairId(token0, token1)
 
@@ -298,7 +302,7 @@ func (k Keeper) CancelLimitOrderVerification(goCtx context.Context, msg types.Ms
 	}
 
 	// checks that the user has some number of limit order shares wished to withdraw
-	if shares.SharesOwned.LTE(sdk.ZeroDec()) {
+	if shares.SharesOwned.LT(msg.SharesOut) {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
 	}
 
