@@ -528,7 +528,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace1to0ExhaustMin() {
 
 	// WHEN
 	// swap 20 of token A for B with minOut 0
-	s.bobMarketSells("TokenA", 20, 0)
+	s.bobMarketSells("TokenB", 20, 0)
 
 	// THEN
 	// curr0to1 and max set to null values
