@@ -548,12 +548,9 @@ type Withdrawl struct {
 }
 
 func NewWithdrawl(shares int64, tick int64, feeIndex uint64) *Withdrawl {
-	return &Withdrawl{
-		Shares:    sdk.NewDec(shares),
-		FeeIndex:  feeIndex,
-		TickIndex: tick,
-	}
+	return NewWithdrawlDec(sdk.NewDec(shares), tick, feeIndex)
 }
+
 
 func NewWithdrawlDec(shares sdk.Dec, tick int64, feeIndex uint64) *Withdrawl {
 	return &Withdrawl{

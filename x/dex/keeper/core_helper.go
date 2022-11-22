@@ -258,7 +258,7 @@ func (k Keeper) FindNewMaxTick(goCtx context.Context, pairMap types.PairMap) (Ma
 	MaxTickIdx = pairMap.MaxTick - 1
 
 	// Scan through all tick to the left until we hit CurrentTick0To1
-	for MaxTickIdx <= pairMap.TokenPair.CurrentTick0To1 {
+	for MaxTickIdx >= pairMap.TokenPair.CurrentTick0To1 {
 		// Checks for the next value tick containing amount1
 		tick, tickFound := k.GetTickMap(ctx, pairMap.PairId, MaxTickIdx)
 		if tickFound && k.HasToken1(ctx, &tick) {
@@ -268,7 +268,6 @@ func (k Keeper) FindNewMaxTick(goCtx context.Context, pairMap types.PairMap) (Ma
 
 		MaxTickIdx--
 	}
-
 	// If no tick found return false
 	return math.MinInt64, false
 }
