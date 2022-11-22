@@ -231,8 +231,8 @@ func (k Keeper) FindNewMinTick(goCtx context.Context, pairMap types.PairMap) (Mi
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// Start scanning from pairMap.MinTick + 1
-	MinTickIdx = pairMap.MinTick + 1
+	// Start scanning from pairMap.MinTick
+	MinTickIdx = pairMap.MinTick
 
 	// Scan through all tick to the left until we hit CurrentTick1To0
 	for MinTickIdx <= pairMap.TokenPair.CurrentTick1To0 {
@@ -254,8 +254,8 @@ func (k Keeper) FindNewMaxTick(goCtx context.Context, pairMap types.PairMap) (Ma
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// Start scanning from pairMap.MaxTick - 1
-	MaxTickIdx = pairMap.MaxTick - 1
+	// Start scanning from pairMap.MaxTick
+	MaxTickIdx = pairMap.MaxTick
 
 	// Scan through all tick to the left until we hit CurrentTick0To1
 	for MaxTickIdx >= pairMap.TokenPair.CurrentTick0To1 {
