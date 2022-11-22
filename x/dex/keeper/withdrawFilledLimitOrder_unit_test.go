@@ -2,6 +2,8 @@ package keeper_test
 
 import (
 	"math"
+
+	"github.com/NicholasDotSol/duality/x/dex/types"
 	//. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 )
 
@@ -322,4 +324,77 @@ func (s *MsgServerTestSuite) TestWithdrawFilledLOMultiDifferentTranchesFullyFill
 	s.assertAliceBalances(30, 70)
 	s.assertBobBalances(80, 20)
 	s.assertDexBalances(0, 0)
+}
+
+func (s *MsgServerTestSuite) TestWithdrawFilledLOInvalidPair() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 50)
+
+	//Case
+	// Alice withdraws from a tick on a pairId that does not exists
+
+	// GIVEN
+	//THEN
+	err := types.ErrNotEnoughShares
+	s.aliceWithdrawsLimitSellFails(err, "TokenA", 0, 0)
+
+}
+
+func (s *MsgServerTestSuite) TestWithdrawFilledLOInvalidTick() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 50)
+
+	//Case
+	// Alice withdraws from a tick on a tick that does not exists
+
+	//GIVEN
+	s.aliceLimitSells("TokenA", 0, 10)
+	s.assertAliceBalances(40, 50)
+	s.assertDexBalances(10, 0)
+
+	// THEN
+	err := types.ErrNotEnoughShares
+	s.aliceWithdrawsLimitSellFails(err, "TokenA", 1, 0)
+
+}
+
+func (s *MsgServerTestSuite) TestWithdrawFilledLONoLiqudityAtTick() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 50)
+	s.fundCarolBalances(50, 50)
+
+	//Case
+	// Alice attempts to withdraw at a tick
+
+	//GIVEN
+	s.aliceLimitSells("TokenA", 0, 10)
+	s.assertAliceBalances(40, 50)
+	s.assertDexBalances(10, 0)
+
+	s.carolLimitSells("TokenA", 1, 10)
+	s.assertCarolBalances(40, 50)
+	s.assertDexBalances(20, 0)
+
+	// THEN
+	err := types.ErrNotEnoughShares
+	s.aliceWithdrawsLimitSellFails(err, "TokenA", 1, 0)
+
+}
+
+func (s *MsgServerTestSuite) TestWithdrawFilledLONotFilled() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 50)
+
+	//Case
+	// Alice withdraws from a tick on a tick that does not exists
+
+	//GIVEN
+	s.aliceLimitSells("TokenA", 0, 10)
+	s.assertAliceBalances(40, 50)
+	s.assertDexBalances(10, 0)
+
+	// THEN
+	err := types.ErrCannotWithdrawLimitOrder
+	s.aliceWithdrawsLimitSellFails(err, "TokenA", 0, 0)
+
 }
