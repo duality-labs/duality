@@ -146,9 +146,6 @@ func (s *MsgServerTestSuite) TestMultiWithdrawlShiftsTickLeft() {
 //TestMultiWithdrawTiersShiftsTickRight
 //TestMultiWithdrawTiersShiftsTickLeft
 
-// d 100 t1 d 100 d 100 t3 t2 [w100 t3 w 50 t2] 100 t2 => currentTick1To0 = 3
-
-// d 100 t1 d 100 d 100 t3 t2 [w100 t2 w100 t3] 100 t2 => currentTick1To0 =
 
 // ** EDGE CASE FAILURE TESTS **
 
@@ -274,4 +271,19 @@ func (s *MsgServerTestSuite) TestWithdrawalFailsWithInvalidFeeMulti() {
 	s.Assert().ErrorIs(err, types.ErrValidFeeIndexNotFound)
 	s.assertAliceShares(0, 0, sdk.NewDec(100))
 	s.assertDexBalances(100, 0)
+}
+
+func (s *MsgServerTestSuite) TestWithdrawlUnbalancedArrs() {
+	s.fundAliceBalances(25, 25)
+
+	_, err := s.msgServer.Withdrawl(s.goCtx, &types.MsgWithdrawl{
+		Creator:     s.alice.String(),
+		Receiver:    s.alice.String(),
+		TokenA:      "TokenA",
+		TokenB:      "TokenB",
+		SharesToRemove:    []sdk.Dec{NewDec(10)},
+		TickIndexes: []int64{0, 1},
+		FeeIndexes:  []uint64{1},
+	})
+	s.Assert().ErrorIs(err, types.ErrUnbalancedTxArray)
 }

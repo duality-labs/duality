@@ -116,10 +116,10 @@ func (s *MsgServerTestSuite) TestMultiDepositSingleFail() {
 	depositResponse, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
 		Creator:     s.alice.String(),
 		Receiver:    s.alice.String(),
-		TokenA:      "TokenA",
-		TokenB:      "TokenB",
-		AmountsA:    []sdk.Dec{NewDec(0), NewDec(5)},
-		AmountsB:    []sdk.Dec{NewDec(5), NewDec(0)},
+		TokenA:      "TokenB",
+		TokenB:      "TokenA",
+		AmountsA:    []sdk.Dec{NewDec(5), NewDec(0)},
+		AmountsB:    []sdk.Dec{NewDec(0), NewDec(5)},
 		TickIndexes: []int64{0, 1},
 		FeeIndexes:  []uint64{0, 0},
 	})
@@ -180,4 +180,85 @@ func (s *MsgServerTestSuite) TestMultiDepositAllSucceed() {
 
 	s.assertAliceBalances(5, 25)
 	s.assertDexBalances(20, 0)
+}
+
+func (s *MsgServerTestSuite) TestSingleDepositInvalidTokens() {
+	s.fundAliceBalances(25, 25)
+	s.fundBobBalances(25, 25)
+
+	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
+		Creator:     s.alice.String(),
+		Receiver:    s.alice.String(),
+		TokenA:      "TokenA",
+		TokenB:      "TokenA",
+		AmountsA:    []sdk.Dec{NewDec(10)},
+		AmountsB:    []sdk.Dec{NewDec(10)},
+		TickIndexes: []int64{0},
+		FeeIndexes:  []uint64{1},
+	})
+	s.Assert().ErrorIs(err, types.ErrInvalidTokenPair)
+}
+
+func (s *MsgServerTestSuite) TestSingleDepositInvalidFees() {
+	s.fundAliceBalances(25, 25)
+
+	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
+		Creator:     s.alice.String(),
+		Receiver:    s.alice.String(),
+		TokenA:      "TokenA",
+		TokenB:      "TokenB",
+		AmountsA:    []sdk.Dec{NewDec(10)},
+		AmountsB:    []sdk.Dec{NewDec(10)},
+		TickIndexes: []int64{0},
+		FeeIndexes:  []uint64{20},
+	})
+	s.Assert().ErrorIs(err, types.ErrValidFeeIndexNotFound)
+}
+
+func (s *MsgServerTestSuite) TestSingleDepositInsufficientFunds0() {
+	s.fundAliceBalances(1, 25)
+
+	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
+		Creator:     s.alice.String(),
+		Receiver:    s.alice.String(),
+		TokenA:      "TokenA",
+		TokenB:      "TokenB",
+		AmountsA:    []sdk.Dec{NewDec(2500000000000000000)},
+		AmountsB:    []sdk.Dec{NewDec(0)},
+		TickIndexes: []int64{0},
+		FeeIndexes:  []uint64{1},
+	})
+	s.Assert().ErrorIs(err, types.ErrNotEnoughCoins)
+}
+
+func (s *MsgServerTestSuite) TestSingleDepositInsufficientFunds1() {
+	s.fundAliceBalances(1, 1)
+
+	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
+		Creator:     s.alice.String(),
+		Receiver:    s.alice.String(),
+		TokenA:      "TokenA",
+		TokenB:      "TokenB",
+		AmountsA:    []sdk.Dec{NewDec(0)},
+		AmountsB:    []sdk.Dec{NewDec(2500000000000000000)},
+		TickIndexes: []int64{0},
+		FeeIndexes:  []uint64{1},
+	})
+	s.Assert().ErrorIs(err, types.ErrNotEnoughCoins)
+}
+
+func (s *MsgServerTestSuite) TestSingleDepositUnbalancedArrs() {
+	s.fundAliceBalances(25, 25)
+
+	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
+		Creator:     s.alice.String(),
+		Receiver:    s.alice.String(),
+		TokenA:      "TokenA",
+		TokenB:      "TokenB",
+		AmountsA:    []sdk.Dec{NewDec(10)},
+		AmountsB:    []sdk.Dec{NewDec(10)},
+		TickIndexes: []int64{0, 1},
+		FeeIndexes:  []uint64{1},
+	})
+	s.Assert().ErrorIs(err, types.ErrUnbalancedTxArray)
 }

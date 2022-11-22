@@ -313,3 +313,11 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderAboveEnemyLines() {
 	err := types.ErrPlaceLimitOrderBehindPairLiquidity // TODO: this needs to be changed to a more specific error type
 	s.assertAliceLimitSellFails(err, "TokenB", -5, 10)
 }
+
+func (s *MsgServerTestSuite) TestPlaceLimitInsufficientBalance() {
+	s.fundAliceBalances(1, 50)
+
+
+	err := types.ErrNotEnoughCoins
+	s.assertAliceLimitSellFails(err, "TokenA", -5, NewDec(10))
+}

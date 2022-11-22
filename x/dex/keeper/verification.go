@@ -90,6 +90,9 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 		amounts0, amounts1 = msg.AmountsB, msg.AmountsA
 	}
 
+	if len(msg.AmountsA) != len(msg.TickIndexes) || len(msg.AmountsA) != len(msg.AmountsB) || len(msg.AmountsA) != len(msg.FeeIndexes) {
+		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrUnbalancedTxArray, "Input Arrays are not of the same length")
+	}
 	totalAmount0ToDeposit := sdk.ZeroDec()
 	totalAmount1ToDeposit := sdk.ZeroDec()
 	// checks that amount0, amount1 are both not zero, and that the user has the balances they wish to deposit
@@ -116,7 +119,7 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 
 	if AccountsToken1Balance.LT(totalAmount1ToDeposit) {
-		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
+		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 1", callerAddr)
 	}
 
 	return token0, token1, callerAddr, amounts0, amounts1, nil

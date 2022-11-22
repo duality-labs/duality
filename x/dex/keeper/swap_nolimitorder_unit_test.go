@@ -38,6 +38,21 @@ func (s *MsgServerTestSuite) TestSwapNoLONoLiqudity() {
 	s.bobMarketSellFails(err, "TokenB", 5, 0)
 }
 
+func (s *MsgServerTestSuite) TestSwapNoWrongTokenIn() {
+	s.fundAliceBalances(50, 50)
+
+	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
+		Creator:     s.alice.String(),
+		Receiver:    s.alice.String(),
+		AmountIn:    NewDec(20),
+		TokenA:      "TokenA",
+		TokenB:      "TokenB",
+		TokenIn:     "TokenZ",
+		MinOut:      NewDec(10),
+	})
+	s.Assert().ErrorIs(err, types.ErrInvalidTokenPair)
+}
+
 func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReachedMaxReached() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
