@@ -22,6 +22,7 @@ func (s *MsgServerTestSuite) TestSwapNoLiqudityPairNotFound() {
 }
 
 func (s *MsgServerTestSuite) TestSwapExhaustFeeTiersAndLimitOrder() {
+
 	// TODO: this fails due to fill and place key bug
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)

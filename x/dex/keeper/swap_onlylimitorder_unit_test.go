@@ -377,9 +377,9 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustLOCorrectExecution() {
 
 	// place another LO selling 10 of token B at tick 1
 	s.aliceLimitSells("TokenB", 1, 10)
-	// TODO: uncomment, has bug with fill and place tranche keys
 	limitLiquiditySetup := sdk.NewDec(20).Sub(amountOutSetup)
-	// s.assertLimitLiquidityAtTickDec("TokenB", 1, limitLiquiditySetup)
+	// TODO: uncomment, has bug with fill and place tranche keys
+	s.assertLimitLiquidityAtTickDec("TokenB", 1, limitLiquiditySetup)
 	bobBalanceSetupB := sdk.NewDec(50).Sub(amountInSetup)
 	s.assertBobBalancesDec(bobBalanceSetupB, amountOutSetup)
 
@@ -393,7 +393,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustLOCorrectExecution() {
 	expectedAmountLeft, expectedAmountOut := s.calculateSingleSwapOnlyLOAToB(1, limitLiquiditySetup, amountInDec)
 	expectedAmountIn := amountInDec.Sub(expectedAmountLeft)
 	s.assertBobBalancesDec(bobBalanceSetupB.Sub(expectedAmountIn), amountOutSetup.Add(expectedAmountOut))
-	s.assertDexBalancesDec(expectedAmountIn.Add(amountInSetup), sdk.NewDec(20).Sub(amountOutSetup).Sub(expectedAmountOut))
+	s.assertDexBalancesDec(expectedAmountIn.Add(amountInSetup), limitLiquiditySetup.Sub(expectedAmountOut))
 	// TODO: uncomment
 	// s.assertLimitLiquidityAtTickDec("TokenB", 1, sdk.NewDec(20).Sub(amountOutSetup).Sub(expectedAmountOut))
 }
@@ -466,7 +466,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace0to1Moves0to1() {
 }
 
 func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace0to1ExhaustMax() {
-	// TODO: this fails due to fill and place key bug
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
 	// GIVEN
@@ -490,7 +489,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace0to1ExhaustMax() {
 }
 
 func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace1to0Moves1to0() {
-	// TODO: this fails due to fill and place key bug
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(0, 50)
 	// GIVEN
@@ -514,7 +512,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace1to0Moves1to0() {
 }
 
 func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace1to0ExhaustMin() {
-	// TODO: this fails due to fill and place key bug
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(0, 50)
 	// GIVEN
@@ -535,4 +532,42 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace1to0ExhaustMin() {
 	// curr0to1 and max set to null values
 	s.assertCurr1To0(math.MinInt64)
 	s.assertMinTick(math.MaxInt64)
+}
+
+func (s *MsgServerTestSuite) TestSwapOnlyLOUnfilledLOSwapIncrementsPlaceKey() {
+	// TODO: this fails due to fill and place key bug
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(0, 50)
+	// GIVEN
+	// place LO selling 10 of token A at tick -1
+	s.aliceLimitSells("TokenA", -1, 10)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
+
+	// WHEN
+	// swap 20 of token A for B with minOut 0
+	s.bobMarketSells("TokenB", 5, 0)
+
+	// THEN
+	// place increased
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
+}
+
+func (s *MsgServerTestSuite) TestSwapOnlyLOFilledLOSwapIncrementsPlaceKey() {
+	// TODO: this fails due to fill and place key bug
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(0, 50)
+	// GIVEN
+	// place LO selling 10 of token A at tick -1
+	s.aliceLimitSells("TokenA", -1, 10)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
+	s.bobMarketSells("TokenB", 10, 0)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 1, 1)
+
+	// WHEN
+	// swap 20 of token A for B with minOut 0
+	s.bobMarketSells("TokenB", 5, 0)
+
+	// THEN
+	// place increased
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 1, 2)
 }

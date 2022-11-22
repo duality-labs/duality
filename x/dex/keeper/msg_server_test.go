@@ -775,7 +775,7 @@ func (s *MsgServerTestSuite) assertLimitLiquidityAtTickDec(selling string, tickI
 		liquidity = liquidity.Add(s.getLimitReservesAtTickAtKey(selling, tickIndex, placeTranche))
 	}
 
-	s.Assert().True(amount.Equal(liquidity))
+	s.Assert().True(amount.Equal(liquidity), "Incorrect liquidity: %s", liquidity.String())
 }
 
 func (s *MsgServerTestSuite) assertFillAndPlaceTrancheKeys(selling string, tickIndex int64, expectedFill uint64, expectedPlace uint64) {
