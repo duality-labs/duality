@@ -3,7 +3,6 @@ package keeper_test
 import (
 	"math"
 
-	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -37,15 +36,15 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReac
 	// WHEN
 	// swap 20 of tokenA at
 	amountIn := 20
-	amountInDec := NewDec(20)
+	amountInDec := sdk.NewDec(20)
 	s.bobMarketSells("TokenA", amountIn, 5)
 
 	// THEN
 	// swap should have in out
-	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOAToB(1, NewDec(10), amountInDec)
+	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOAToB(1, sdk.NewDec(10), amountInDec)
 	expectedAmountIn := amountInDec.Sub(expectedAmountInLeft)
-	s.assertBobBalancesDec(NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
-	s.assertDexBalancesDec(expectedAmountIn, NewDec(10).Sub(expectedAmountOut))
+	s.assertBobBalancesDec(sdk.NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
+	s.assertDexBalancesDec(expectedAmountIn, sdk.NewDec(10).Sub(expectedAmountOut))
 	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
 }
 
@@ -61,15 +60,15 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReac
 	//
 	// WHEN
 	// swap 20 of token A for B
-	amountIn, amountInDec := 20, NewDec(20)
+	amountIn, amountInDec := 20, sdk.NewDec(20)
 	s.bobMarketSells("TokenB", amountIn, 5)
 
 	// THEN
 	// swap should have in 9.9990000000000000000 out 10.001000000000000000
-	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOBToA(-1, NewDec(10), amountInDec)
+	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOBToA(-1, sdk.NewDec(10), amountInDec)
 	expectedAmountIn := amountInDec.Sub(expectedAmountInLeft)
-	s.assertBobBalancesDec(expectedAmountOut, NewDec(50).Sub(expectedAmountIn))
-	s.assertDexBalancesDec(NewDec(10).Sub(expectedAmountOut), expectedAmountIn)
+	s.assertBobBalancesDec(expectedAmountOut, sdk.NewDec(50).Sub(expectedAmountIn))
+	s.assertDexBalancesDec(sdk.NewDec(10).Sub(expectedAmountOut), expectedAmountIn)
 	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
 }
 
@@ -138,15 +137,15 @@ func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMinFeeTier() {
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
-	amountIn, amountInDec := 5, NewDec(5)
+	amountIn, amountInDec := 5, sdk.NewDec(5)
 	s.bobMarketSells("TokenA", amountIn, 4)
 
 	// THEN
 	// swap should have in 5.000000000000000000 out 4.999500049995000500
-	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOAToB(1, NewDec(10), amountInDec)
+	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOAToB(1, sdk.NewDec(10), amountInDec)
 	expectedAmountIn := amountInDec.Sub(expectedAmountInLeft)
-	s.assertBobBalancesDec(NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
-	s.assertDexBalancesDec(expectedAmountIn, NewDec(10).Sub(expectedAmountOut))
+	s.assertBobBalancesDec(sdk.NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
+	s.assertDexBalancesDec(expectedAmountIn, sdk.NewDec(10).Sub(expectedAmountOut))
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMaxFeeTier() {
@@ -160,15 +159,15 @@ func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMaxFeeTier() {
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
-	amountIn, amountInDec := 5, NewDec(5)
+	amountIn, amountInDec := 5, sdk.NewDec(5)
 	s.bobMarketSells("TokenA", amountIn, 4)
 
 	// THEN
 	// swap should have in out
-	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOAToB(10, NewDec(10), amountInDec)
+	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOAToB(10, sdk.NewDec(10), amountInDec)
 	expectedAmountIn := amountInDec.Sub(expectedAmountInLeft)
-	s.assertBobBalancesDec(NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
-	s.assertDexBalancesDec(expectedAmountIn, NewDec(10).Sub(expectedAmountOut))
+	s.assertBobBalancesDec(sdk.NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
+	s.assertDexBalancesDec(expectedAmountIn, sdk.NewDec(10).Sub(expectedAmountOut))
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionSomeFeeTiers() {
@@ -185,19 +184,19 @@ func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionSomeFeeTiers() {
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
-	amountIn, amountInDec := 15, NewDec(15)
+	amountIn, amountInDec := 15, sdk.NewDec(15)
 	s.bobMarketSells("TokenA", amountIn, 14)
 
 	// THEN
 	// swap should have in out
 	expectedAmountLeft, expectedAmountOut := s.calculateMultipleSwapsNoLOAToB(
 		[]int64{1, 3},
-		[]sdk.Dec{NewDec(10), NewDec(10)},
+		[]sdk.Dec{sdk.NewDec(10), sdk.NewDec(10)},
 		amountInDec,
 	)
 	expectedAmountIn := amountInDec.Sub(expectedAmountLeft)
-	s.assertBobBalancesDec(NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
-	s.assertDexBalancesDec(expectedAmountIn, NewDec(20).Sub(expectedAmountOut))
+	s.assertBobBalancesDec(sdk.NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
+	s.assertDexBalancesDec(expectedAmountIn, sdk.NewDec(20).Sub(expectedAmountOut))
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveCurr1to0() {
@@ -485,9 +484,6 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1MovedMinDown() {
 	// max tick moved up to 3
 	s.assertMinTick(-3)
 }
-
-// TODO: 0to1 moves min up
-// TODO: 0to1 doesn't move min up
 
 func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveMinDown() {
 	s.fundAliceBalances(50, 50)
