@@ -15,7 +15,7 @@ import (
 ///////////////////////////////////////////////////////////////////////////////
 
 func PairToTokens(pairId string) (token0 string, token1 string) {
-	tokens := strings.Split(pairId, "/")
+	tokens := strings.Split(pairId, "<>")
 
 	return tokens[0], tokens[1]
 }
@@ -227,6 +227,51 @@ func (k Keeper) FindNextTick1To0(goCtx context.Context, pairMap types.PairMap) (
 
 	// If no tick found return false
 	return math.MaxInt64, false
+}
+
+func (k Keeper) FindNewMinTick(goCtx context.Context, pairMap types.PairMap) (minTickIdx int64) {
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Start scanning from pairMap.MinTick
+	minTickIdx = pairMap.MinTick
+
+	// Scan through all tick to the left until we hit CurrentTick1To0
+	for minTickIdx <= pairMap.TokenPair.CurrentTick1To0 {
+		// Checks for the next value tick containing amount0
+		tick, tickFound := k.GetTickMap(ctx, pairMap.PairId, minTickIdx)
+		if tickFound && k.TickHasToken0(ctx, &tick) {
+			//Return the new MinTickIdx
+			return minTickIdx
+		}
+
+		minTickIdx++
+	}
+
+	// If no tick found return false
+	return math.MaxInt64
+}
+
+func (k Keeper) FindNewMaxTick(goCtx context.Context, pairMap types.PairMap) (maxTickIdx int64) {
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Start scanning from pairMap.MaxTick
+	maxTickIdx = pairMap.MaxTick
+
+	// Scan through all tick to the left until we hit CurrentTick0To1
+	for maxTickIdx >= pairMap.TokenPair.CurrentTick0To1 {
+		// Checks for the next value tick containing amount1
+		tick, tickFound := k.GetTickMap(ctx, pairMap.PairId, maxTickIdx)
+		if tickFound && k.TickHasToken1(ctx, &tick) {
+			//Return the new tickIdx
+			return maxTickIdx
+		}
+
+		maxTickIdx--
+	}
+	// If no tick found return false
+	return math.MinInt64
 }
 
 func (k Keeper) FindNextTick0To1(goCtx context.Context, pairMap types.PairMap) (tickIdx int64, found bool) {
@@ -519,9 +564,10 @@ func (k Keeper) CalcTickPointersPostRemoveToken0(goCtx context.Context, pair *ty
 		*cur1To0 = math.MinInt64
 		// we leave cur1To0 where it is because otherwise we lose the last traded price
 	} else if tickIndex == *minTick {
-		// TODO: We should really search for the next minTick but this introduces a
-		// vulnerability unless we have a dedicated data structure for avoiding.
-		*minTick++
+		// Finds the new minTick
+		nexMinTick := k.FindNewMinTick(goCtx, *pair)
+		*minTick = nexMinTick
+
 		// we are removing liquidity below the current1To0, no need to update that
 	} else if tickIndex == *cur1To0 {
 		next1To0, found := k.FindNextTick1To0(goCtx, *pair)
@@ -533,6 +579,7 @@ func (k Keeper) CalcTickPointersPostRemoveToken0(goCtx context.Context, pair *ty
 			*cur1To0 = next1To0
 		}
 	}
+
 	return pair
 }
 
@@ -564,9 +611,9 @@ func (k Keeper) CalcTickPointersPostRemoveToken1(goCtx context.Context, pair *ty
 		*cur0To1 = math.MaxInt64
 		// we leave cur0To1 where it is because otherwise we lose the last traded price
 	} else if tickIndex == *maxTick {
-		// TODO: We should really search for the next maxTick but this introduces a
-		// vulnerability unless we have a dedicated data structure for avoiding.
-		*maxTick--
+		// Finds the new max tick
+		nexMaxTick := k.FindNewMaxTick(goCtx, *pair)
+		*maxTick = nexMaxTick
 		// we are removing liquidity above the current0to1, no need to update that
 	} else if tickIndex == *cur0To1 {
 		next0To1, found := k.FindNextTick0To1(goCtx, *pair)
@@ -578,6 +625,7 @@ func (k Keeper) CalcTickPointersPostRemoveToken1(goCtx context.Context, pair *ty
 			*cur0To1 = next0To1
 		}
 	}
+
 	return pair
 }
 

@@ -21,7 +21,7 @@ var _ = strconv.IntSize
 func TestLimitOrderPoolUserQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolUser(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 2)
+	msgs := createNLimitOrderPoolUser(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetLimitOrderPoolUserRequest
@@ -31,7 +31,7 @@ func TestLimitOrderPoolUserQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetLimitOrderPoolUserRequest{
-				PairId:    "TokenA/TokenB",
+				PairId:    "TokenA<>TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
 				Count:     msgs[0].Count,
@@ -42,7 +42,7 @@ func TestLimitOrderPoolUserQuerySingle(t *testing.T) {
 		{
 			desc: "Second",
 			request: &types.QueryGetLimitOrderPoolUserRequest{
-				PairId:    "TokenA/TokenB",
+				PairId:    "TokenA<>TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
 				Count:     msgs[1].Count,
@@ -53,7 +53,7 @@ func TestLimitOrderPoolUserQuerySingle(t *testing.T) {
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetLimitOrderPoolUserRequest{
-				PairId:    "TokenA/TokenB",
+				PairId:    "TokenA<>TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
 				Count:     100000,
@@ -84,7 +84,7 @@ func TestLimitOrderPoolUserQuerySingle(t *testing.T) {
 func TestLimitOrderPoolUserQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolUser(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 5)
+	msgs := createNLimitOrderPoolUser(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 5)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderPoolUserRequest {
 		return &types.QueryAllLimitOrderPoolUserRequest{

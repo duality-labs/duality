@@ -35,10 +35,10 @@ func createNLimitOrderPoolUser(keeper *keeper.Keeper, ctx sdk.Context, pairId st
 
 func TestLimitOrderPoolUserGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUser(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolUser(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
 	for _, item := range items {
 		rst, found := keeper.GetLimitOrderPoolUser(ctx,
-			"TokenA/TokenB",
+			"TokenA<>TokenB",
 			0,
 			"TokenA",
 			item.Count,
@@ -53,17 +53,17 @@ func TestLimitOrderPoolUserGet(t *testing.T) {
 }
 func TestLimitOrderPoolUserRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUser(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolUser(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
 	for _, item := range items {
 		keeper.RemoveLimitOrderPoolUser(ctx,
-			"TokenA/TokenB",
+			"TokenA<>TokenB",
 			0,
 			"TokenA",
 			item.Count,
 			item.Address,
 		)
 		_, found := keeper.GetLimitOrderPoolUser(ctx,
-			"TokenA/TokenB",
+			"TokenA<>TokenB",
 			0,
 			"TokenA",
 			item.Count,

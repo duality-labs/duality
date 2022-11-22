@@ -432,17 +432,21 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveMax() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
 	// GIVEN
-	// deposit 10 of token B at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
-	s.assertMaxTick(1)
+	// deposit 10 of token B at tick 0 fee 1 and 10 of both token A and B at tick 0 fee 3
+	// to create spread of -3, 1
+	s.aliceDeposits(
+		NewDeposit(0, 10, 0, 0),
+		NewDeposit(10, 10, 0, 1),
+	)
+	s.assertCurr1To0(-3)
 
 	// WHEN
-	// swap 5 of token A for B with minOut 4
+	// swap 5 of token B for A with minOut 4
 	s.bobMarketSells("TokenA", 5, 4)
 
 	// THEN
-	// current0To1 unchanged
-	s.assertMaxTick(1)
+	// current 0to1 moves down to 1
+	s.assertCurr1To0(-1)
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLO0to1ExhaustMax() {
@@ -507,3 +511,6 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveMinDown() {
 	// min unchanged
 	s.assertMinTick(-5)
 }
+
+// TODO: 0to1 moves min up
+// TODO: 0to1 doesn't move min up

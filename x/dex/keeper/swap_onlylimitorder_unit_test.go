@@ -168,6 +168,8 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO1to0MovesCurr1To0() {
 	s.assertCurr1To0(-3)
 }
 
+// TODO: 1to0 doesn't move curr0to1
+
 func (s *MsgServerTestSuite) TestSwapOnlyLO1to0DoesntMoveMin() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(0, 50)
@@ -203,6 +205,8 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO1to0ExhaustMin() {
 	// min set to null value
 	s.assertMinTick(math.MaxInt64)
 }
+
+// TODO: 1to0 doesn't move max
 
 func (s *MsgServerTestSuite) TestSwapOnlyLO0to1DoesntMoveCurr0to1() {
 	s.fundAliceBalances(50, 50)
@@ -336,7 +340,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilledCorrectExecution() {
 	// in 5.000499950004999500, out 4.999500049995000500
 	expectedAmountLeftSetup, amountOutSetup := s.calculateSingleSwapOnlyLOAToB(1, NewDec(10), NewDec(5))
 	amountInSetup := NewDec(5).Sub(expectedAmountLeftSetup)
-	s.assertLimitLiquidityAtTickDec("TokenB", 1, NewDec(10).Sub(amountOutSetup))
+	s.assertLimitLiquidityAtTickDec("TokenB", NewDec(10).Sub(amountOutSetup), 1)
 
 	// place another LO selling 10 of token B at tick 1
 	s.aliceLimitSells("TokenB", 1, 10)
