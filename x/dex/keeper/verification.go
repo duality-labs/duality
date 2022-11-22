@@ -248,6 +248,10 @@ func (k Keeper) WithdrawLimitOrderVerification(goCtx context.Context, msg types.
 		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
+	if msg.KeyToken != token0 && msg.KeyToken != token1 {
+		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
+	}
+
 	pairId := k.CreatePairId(token0, token1)
 
 	shares, sharesFound := k.GetLimitOrderPoolUser(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Receiver)
