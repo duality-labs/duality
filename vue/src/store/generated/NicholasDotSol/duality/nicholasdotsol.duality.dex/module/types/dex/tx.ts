@@ -16,7 +16,10 @@ export interface MsgDeposit {
   feeIndexes: number[];
 }
 
-export interface MsgDepositResponse {}
+export interface MsgDepositResponse {
+  Reserve0Deposited: string[];
+  Reserve1Deposited: string[];
+}
 
 export interface MsgWithdrawl {
   creator: string;
@@ -310,10 +313,22 @@ export const MsgDeposit = {
   },
 };
 
-const baseMsgDepositResponse: object = {};
+const baseMsgDepositResponse: object = {
+  Reserve0Deposited: "",
+  Reserve1Deposited: "",
+};
 
 export const MsgDepositResponse = {
-  encode(_: MsgDepositResponse, writer: Writer = Writer.create()): Writer {
+  encode(
+    message: MsgDepositResponse,
+    writer: Writer = Writer.create()
+  ): Writer {
+    for (const v of message.Reserve0Deposited) {
+      writer.uint32(10).string(v!);
+    }
+    for (const v of message.Reserve1Deposited) {
+      writer.uint32(18).string(v!);
+    }
     return writer;
   },
 
@@ -321,9 +336,17 @@ export const MsgDepositResponse = {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseMsgDepositResponse } as MsgDepositResponse;
+    message.Reserve0Deposited = [];
+    message.Reserve1Deposited = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          message.Reserve0Deposited.push(reader.string());
+          break;
+        case 2:
+          message.Reserve1Deposited.push(reader.string());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -332,18 +355,64 @@ export const MsgDepositResponse = {
     return message;
   },
 
-  fromJSON(_: any): MsgDepositResponse {
+  fromJSON(object: any): MsgDepositResponse {
     const message = { ...baseMsgDepositResponse } as MsgDepositResponse;
+    message.Reserve0Deposited = [];
+    message.Reserve1Deposited = [];
+    if (
+      object.Reserve0Deposited !== undefined &&
+      object.Reserve0Deposited !== null
+    ) {
+      for (const e of object.Reserve0Deposited) {
+        message.Reserve0Deposited.push(String(e));
+      }
+    }
+    if (
+      object.Reserve1Deposited !== undefined &&
+      object.Reserve1Deposited !== null
+    ) {
+      for (const e of object.Reserve1Deposited) {
+        message.Reserve1Deposited.push(String(e));
+      }
+    }
     return message;
   },
 
-  toJSON(_: MsgDepositResponse): unknown {
+  toJSON(message: MsgDepositResponse): unknown {
     const obj: any = {};
+    if (message.Reserve0Deposited) {
+      obj.Reserve0Deposited = message.Reserve0Deposited.map((e) => e);
+    } else {
+      obj.Reserve0Deposited = [];
+    }
+    if (message.Reserve1Deposited) {
+      obj.Reserve1Deposited = message.Reserve1Deposited.map((e) => e);
+    } else {
+      obj.Reserve1Deposited = [];
+    }
     return obj;
   },
 
-  fromPartial(_: DeepPartial<MsgDepositResponse>): MsgDepositResponse {
+  fromPartial(object: DeepPartial<MsgDepositResponse>): MsgDepositResponse {
     const message = { ...baseMsgDepositResponse } as MsgDepositResponse;
+    message.Reserve0Deposited = [];
+    message.Reserve1Deposited = [];
+    if (
+      object.Reserve0Deposited !== undefined &&
+      object.Reserve0Deposited !== null
+    ) {
+      for (const e of object.Reserve0Deposited) {
+        message.Reserve0Deposited.push(e);
+      }
+    }
+    if (
+      object.Reserve1Deposited !== undefined &&
+      object.Reserve1Deposited !== null
+    ) {
+      for (const e of object.Reserve1Deposited) {
+        message.Reserve1Deposited.push(e);
+      }
+    }
     return message;
   },
 };

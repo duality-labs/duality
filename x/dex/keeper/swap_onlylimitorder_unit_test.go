@@ -168,6 +168,8 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO1to0MovesCurr1To0() {
 	s.assertCurr1To0(-3)
 }
 
+// TODO: 1to0 doesn't move curr0to1
+
 func (s *MsgServerTestSuite) TestSwapOnlyLO1to0DoesntMoveMin() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(0, 50)
@@ -203,6 +205,8 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO1to0ExhaustMin() {
 	// min set to null value
 	s.assertMinTick(math.MaxInt64)
 }
+
+// TODO: 1to0 doesn't move max
 
 func (s *MsgServerTestSuite) TestSwapOnlyLO0to1DoesntMoveCurr0to1() {
 	s.fundAliceBalances(50, 50)
@@ -280,258 +284,35 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO0to1ExhaustMax() {
 	s.assertMaxTick(math.MinInt64)
 }
 
-func (s *MsgServerTestSuite) TestSwapOnlyLOCorrectExecution1to0() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(0, 50)
-	// GIVEN
-	// place LO selling 10 of token A at tick 1
-	s.aliceLimitSells("TokenA", 1, 10)
-	s.assertAliceBalances(40, 50)
-	s.assertDexBalances(10, 0)
+// TODO: 0to1 doesn't move min up
 
-	// WHEN
-	// swap 5 of token B for A with minOut 4
-	amountIn, amountInDec := 5, NewDec(5)
-	s.bobMarketSells("TokenB", amountIn, 4)
-
-	// THEN
-	// swap should have in out
-	expectedAmountLeft, expectedAmountOut := s.calculateSingleSwapOnlyLOBToA(1, NewDec(10), amountInDec)
-	expectedAmountIn := amountInDec.Sub(expectedAmountLeft)
-	s.assertBobBalancesDec(expectedAmountOut, NewDec(50).Sub(expectedAmountIn))
-	s.assertDexBalancesDec(NewDec(10).Sub(expectedAmountOut), expectedAmountIn)
-}
-
-func (s *MsgServerTestSuite) TestSwapOnlyLOCorrectExecution0to1() {
+/*
+func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionSomeFeeTiers() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
 	// GIVEN
-	// place LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
-	s.assertAliceBalances(50, 40)
-	s.assertDexBalances(0, 10)
+	// deposit 10 of token B at tick 0 fee 1 and 10 of token B at tick 0 fee 3
+	s.aliceDeposits(
+		NewDeposit(0, 10, 0, 0),
+		NewDeposit(0, 10, 0, 1),
+	)
+	s.assertAliceBalances(50, 30)
+	s.assertDexBalances(0, 20)
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
-	amountIn, amountInDec := 5, NewDec(5)
-	s.bobMarketSells("TokenA", amountIn, 4)
+	amountIn, amountInDec := 15, NewDec(15)
+	s.bobMarketSells("TokenA", amountIn, 14)
 
 	// THEN
 	// swap should have in out
-	expectedAmountLeft, expectedAmountOut := s.calculateSingleSwapOnlyLOAToB(1, NewDec(10), amountInDec)
+	expectedAmountLeft, expectedAmountOut := s.calculateMultipleSwapsNoLOAToB(
+		[]int64{1, 3},
+		[]sdk.Dec{NewDec(10), NewDec(10)},
+		amountInDec,
+	)
 	expectedAmountIn := amountInDec.Sub(expectedAmountLeft)
 	s.assertBobBalancesDec(NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
-	s.assertDexBalancesDec(expectedAmountIn, NewDec(10).Sub(expectedAmountOut))
+	s.assertDexBalancesDec(expectedAmountIn, NewDec(20).Sub(expectedAmountOut))
 }
-
-func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilledCorrectExecution() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 0)
-	// GIVEN
-	// place LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
-
-	// Partially fill the LO, will have some token B remaining to fill
-	s.bobMarketSells("TokenA", 5, 4)
-	// in 5.000499950004999500, out 4.999500049995000500
-	expectedAmountLeftSetup, amountOutSetup := s.calculateSingleSwapOnlyLOAToB(1, NewDec(10), NewDec(5))
-	amountInSetup := NewDec(5).Sub(expectedAmountLeftSetup)
-	s.assertLimitLiquidityAtTickDec("TokenB", 1, NewDec(10).Sub(amountOutSetup))
-
-	// place another LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
-	// TODO: uncomment
-	// s.assertLimitLiquidityAtTickDec("TokenB", 1, NewDec(20).Sub(amountOutSetup))
-	bobBalanceSetupB := NewDec(50).Sub(amountInSetup)
-	s.assertBobBalancesDec(bobBalanceSetupB, amountOutSetup)
-
-	// WHEN
-	// swap 5 of token A for B with minOut 4
-	amountIn, amountInDec := 5, NewDec(5)
-	s.bobMarketSells("TokenA", amountIn, 4)
-
-	// THEN
-	// swap should have in out
-	expectedAmountLeft, expectedAmountOut := s.calculateSingleSwapOnlyLOAToB(1, NewDec(10), amountInDec)
-	expectedAmountIn := amountInDec.Sub(expectedAmountLeft)
-	s.assertBobBalancesDec(bobBalanceSetupB.Sub(expectedAmountIn), amountOutSetup.Add(expectedAmountOut))
-	s.assertDexBalancesDec(expectedAmountIn.Add(amountInSetup), NewDec(20).Sub(amountOutSetup).Sub(expectedAmountOut))
-	// TODO: uncomment
-	// s.assertLimitLiquidityAtTickDec("TokenB", 1, NewDec(20).Sub(amountOutSetup).Sub(expectedAmountOut))
-}
-
-func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustLOCorrectExecution() {
-	// TODO: this fails due to fill and place key bug
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 0)
-	// GIVEN
-	// place LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
-
-	// Partially fill the LO, will have some token B remaining to fill
-	s.bobMarketSells("TokenA", 5, 4)
-	// in 5.000499950004999500, out 4.999500049995000500
-	expectedAmountLeftSetup, amountOutSetup := s.calculateSingleSwapOnlyLOAToB(1, NewDec(10), NewDec(5))
-	amountInSetup := NewDec(5).Sub(expectedAmountLeftSetup)
-	s.assertLimitLiquidityAtTickDec("TokenB", 1, NewDec(10).Sub(amountOutSetup))
-
-	// place another LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
-	// TODO: uncomment
-	// s.assertLimitLiquidityAtTickDec("TokenB", 1, NewDec(20).Sub(amountOutSetup))
-	bobBalanceSetupB := NewDec(50).Sub(amountInSetup)
-	s.assertBobBalancesDec(bobBalanceSetupB, amountOutSetup)
-
-	// WHEN
-	// swap 5 of token A for B with minOut 4
-	amountIn, amountInDec := 20, NewDec(20)
-	s.bobMarketSells("TokenA", amountIn, 0)
-
-	// THEN
-	// swap should have in out
-	expectedAmountLeft, expectedAmountOut := s.calculateSingleSwapOnlyLOAToB(1, NewDec(10), amountInDec)
-	expectedAmountIn := amountInDec.Sub(expectedAmountLeft)
-	s.assertBobBalancesDec(bobBalanceSetupB.Sub(expectedAmountIn), amountOutSetup.Add(expectedAmountOut))
-	s.assertDexBalancesDec(expectedAmountIn.Add(amountInSetup), NewDec(20).Sub(amountOutSetup).Sub(expectedAmountOut))
-	// TODO: uncomment
-	// s.assertLimitLiquidityAtTickDec("TokenB", 1, NewDec(20).Sub(amountOutSetup).Sub(expectedAmountOut))
-}
-
-func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilled0to1DoesntMove0to1() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 0)
-	// GIVEN
-	// place LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
-
-	// Partially fill the LO, will have some token B remaining to fill
-	s.bobMarketSells("TokenA", 5, 4)
-	// place another LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
-	s.assertCurr0To1(1)
-
-	// WHEN
-	// swap 5 of token A for B with minOut 4
-	s.bobMarketSells("TokenA", 5, 4)
-
-	// THEN
-	// curr0to1 unchanged
-	s.assertCurr0To1(1)
-}
-
-func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilled1to0DoesntMove1to0() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(0, 50)
-	// GIVEN
-	// place LO selling 10 of token A at tick -1
-	s.aliceLimitSells("TokenA", -1, 10)
-	// Partially fill the LO, will have some token A remaining to fill
-	s.bobMarketSells("TokenB", 5, 4)
-	// place another LO selling 10 of token A at tick -1
-	s.aliceLimitSells("TokenA", -1, 10)
-	s.assertCurr1To0(-1)
-
-	// WHEN
-	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 5, 4)
-
-	// THEN
-	// curr0to1 unchanged
-	s.assertCurr1To0(-1)
-}
-
-func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace0to1Moves0to1() {
-	// TODO: this fails due to fill and place key bug
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 0)
-	// GIVEN
-	// place LO selling 10 of token B at tick -10
-	s.aliceLimitSells("TokenB", 10, 10)
-	// place LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
-	// Partially fill the LO, will have some token B remaining to fill
-	s.bobMarketSells("TokenA", 5, 4)
-	// place another LO selling 10 of token A at tick -1
-	s.aliceLimitSells("TokenB", 1, 10)
-	s.assertCurr0To1(1)
-
-	// WHEN
-	// swap 20 of token A for B with minOut 0
-	s.bobMarketSells("TokenA", 20, 0)
-
-	// THEN
-	// curr0to1 moved to 10
-	s.assertCurr0To1(10)
-}
-
-func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace0to1ExhaustMax() {
-	// TODO: this fails due to fill and place key bug
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 0)
-	// GIVEN
-	// place LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
-	// Partially fill the LO, will have some token B remaining to fill
-	s.bobMarketSells("TokenA", 5, 4)
-	// place another LO selling 10 of token A at tick -1
-	s.aliceLimitSells("TokenB", 1, 10)
-	s.assertCurr0To1(1)
-	s.assertMaxTick(1)
-
-	// WHEN
-	// swap 20 of token A for B with minOut 0
-	s.bobMarketSells("TokenA", 20, 0)
-
-	// THEN
-	// curr0to1 and max set to null values
-	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
-}
-
-func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace1to0Moves1to0() {
-	// TODO: this fails due to fill and place key bug
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(0, 50)
-	// GIVEN
-	// place LO selling 10 of token A at tick -10
-	s.aliceLimitSells("TokenA", -10, 10)
-	// place LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenA", -1, 10)
-	// Partially fill the LO, will have some token B remaining to fill
-	s.bobMarketSells("TokenB", 5, 4)
-	// place another LO selling 10 of token A at tick -1
-	s.aliceLimitSells("TokenA", -1, 10)
-	s.assertCurr1To0(-1)
-
-	// WHEN
-	// swap 20 of token B for A with minOut 0
-	s.bobMarketSells("TokenB", 20, 0)
-
-	// THEN
-	// curr0to1 unchanged
-	s.assertCurr1To0(-10)
-}
-
-func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace1to0ExhaustMin() {
-	// TODO: this fails due to fill and place key bug
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(0, 50)
-	// GIVEN
-	// place LO selling 10 of token A at tick -1
-	s.aliceLimitSells("TokenA", -1, 10)
-	// Partially fill the LO, will have some token A remaining to fill
-	s.bobMarketSells("TokenB", 5, 4)
-	// place another LO selling 10 of token A at tick -1
-	s.aliceLimitSells("TokenA", -1, 10)
-	s.assertCurr1To0(-1)
-	s.assertMinTick(-1)
-
-	// WHEN
-	// swap 20 of token A for B with minOut 0
-	s.bobMarketSells("TokenA", 20, 0)
-
-	// THEN
-	// curr0to1 and max set to null values
-	s.assertCurr1To0(math.MinInt64)
-	s.assertMinTick(math.MaxInt64)
-}
+*/
