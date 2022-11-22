@@ -214,10 +214,6 @@ func (k Keeper) PlaceLimitOrderVerification(goCtx context.Context, msg types.Msg
 	if msg.TokenIn != token0 && msg.TokenIn != token1 {
 		return "", "", nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
 	}
-	// Error checking for valid sdk.Dec
-	if err != nil {
-		return "", "", nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
-	}
 
 	AccountsAmountInBalance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, msg.TokenIn).Amount)
 
