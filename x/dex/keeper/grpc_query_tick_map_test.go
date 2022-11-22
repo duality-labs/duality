@@ -21,7 +21,7 @@ var _ = strconv.IntSize
 func TestTickMapQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNTickMap(keeper, ctx, "TokenA/TokenB", 2)
+	msgs := createNTickMap(keeper, ctx, "TokenA<>TokenB", 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetTickMapRequest
@@ -32,7 +32,7 @@ func TestTickMapQuerySingle(t *testing.T) {
 			desc: "First",
 			request: &types.QueryGetTickMapRequest{
 				TickIndex: msgs[0].TickIndex,
-				PairId:    "TokenA/TokenB",
+				PairId:    "TokenA<>TokenB",
 			},
 			response: &types.QueryGetTickMapResponse{TickMap: msgs[0]},
 		},
@@ -40,7 +40,7 @@ func TestTickMapQuerySingle(t *testing.T) {
 			desc: "Second",
 			request: &types.QueryGetTickMapRequest{
 				TickIndex: msgs[1].TickIndex,
-				PairId:    "TokenA/TokenB",
+				PairId:    "TokenA<>TokenB",
 			},
 			response: &types.QueryGetTickMapResponse{TickMap: msgs[1]},
 		},

@@ -111,18 +111,20 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder1to0WithWithdraw() {
 	s.aliceLimitSells("TokenB", -1, 25)
 	s.bobMarketSells("TokenA", 40, 30)
 
-	s.assertAliceBalances(100, 450)
-	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("239.998500149985001500"))
+	// limit order at -1: (25 * 1.0001^-1) A<=>B 25
+	// limit order at 0: (40 - (25 * 1.0001^-1)) A<=>B (40 - (25 * 1.0001^-1)) * 1.0001^0
+	s.assertAliceBalances(100, 425)
+	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("240.0024997500249975"))
 
 	s.aliceWithdrawsLimitSell("TokenB", 0, 0)
 
-	s.assertAliceBalances(125, 450)
-	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("239.998500149985001500"))
+	s.assertAliceBalancesDec(sdk.MustNewDecFromStr("115.0024997500249975"), NewDec(425))
+	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("240.0024997500249975"))
 
-	s.aliceWithdrawsLimitSell("TokenB", 1, 0)
+	s.aliceWithdrawsLimitSell("TokenB", -1, 0)
 
-	s.assertAliceBalancesDec(NewDec(140), NewDec(450))
-	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("239.998500149985001500"))
+	s.assertAliceBalancesDec(NewDec(140), NewDec(425))
+	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("240.0024997500249975"))
 }
 
 func (s *MsgServerTestSuite) TestLimitOrderOverdraw() {
@@ -338,7 +340,7 @@ func (s *MsgServerTestSuite) TestProgressiveLimitOrderFill() {
 	s.assertBobBalances(100, 200)
 	s.assertDexBalances(0, 60)
 
-	s.aliceMarketSells("TokenA", 10, 10)
+	s.bobMarketSells("TokenA", 10, 10)
 
 	s.assertAliceBalances(100, 440)
 	s.assertBobBalances(90, 210)
@@ -347,9 +349,9 @@ func (s *MsgServerTestSuite) TestProgressiveLimitOrderFill() {
 	s.aliceWithdrawsLimitSell("TokenB", 0, 0)
 
 	// Limit order is filled progressively
-	s.assertAliceBalances(102, 440)
+	s.assertAliceBalances(110, 440)
 	s.assertBobBalances(90, 210)
-	s.assertDexBalances(8, 50)
+	s.assertDexBalances(0, 50)
 
 	// TODO: How to verify current tick?
 }
