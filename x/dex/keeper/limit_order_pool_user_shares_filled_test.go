@@ -32,10 +32,10 @@ func createNLimitOrderPoolUserSharesWithdrawn(keeper *keeper.Keeper, ctx sdk.Con
 
 func TestLimitOrderPoolUserSharesWithdrawnGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUserSharesWithdrawn(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolUserSharesWithdrawn(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
 	for _, item := range items {
 		rst, found := keeper.GetLimitOrderPoolUserSharesWithdrawn(ctx,
-			"TokenA/TokenB",
+			"TokenA<>TokenB",
 			0,
 			"TokenA",
 			item.Count,
@@ -50,17 +50,17 @@ func TestLimitOrderPoolUserSharesWithdrawnGet(t *testing.T) {
 }
 func TestLimitOrderPoolUserSharesWithdrawnRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUserSharesWithdrawn(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolUserSharesWithdrawn(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
 	for _, item := range items {
 		keeper.RemoveLimitOrderPoolUserSharesWithdrawn(ctx,
-			"TokenA/TokenB",
+			"TokenA<>TokenB",
 			0,
 			"TokenA",
 			item.Count,
 			item.Address,
 		)
 		_, found := keeper.GetLimitOrderPoolUserSharesWithdrawn(ctx,
-			"TokenA/TokenB",
+			"TokenA<>TokenB",
 			0,
 			"TokenA",
 			item.Count,
@@ -72,7 +72,7 @@ func TestLimitOrderPoolUserSharesWithdrawnRemove(t *testing.T) {
 
 func TestLimitOrderPoolUserSharesWithdrawnGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUserSharesWithdrawn(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolUserSharesWithdrawn(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
 	require.ElementsMatch(t,
 		nullify.Fill(items),
 		nullify.Fill(keeper.GetAllLimitOrderPoolUserSharesWithdrawn(ctx)),

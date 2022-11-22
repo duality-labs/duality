@@ -21,7 +21,7 @@ var _ = strconv.IntSize
 func TestLimitOrderPoolTotalSharesMapQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolTotalSharesMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 2)
+	msgs := createNLimitOrderPoolTotalSharesMap(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetLimitOrderPoolTotalSharesMapRequest
@@ -31,7 +31,7 @@ func TestLimitOrderPoolTotalSharesMapQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetLimitOrderPoolTotalSharesMapRequest{
-				PairId:    "TokenA/TokenB",
+				PairId:    "TokenA<>TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
 				Count:     msgs[0].Count,
@@ -41,7 +41,7 @@ func TestLimitOrderPoolTotalSharesMapQuerySingle(t *testing.T) {
 		{
 			desc: "Second",
 			request: &types.QueryGetLimitOrderPoolTotalSharesMapRequest{
-				PairId:    "TokenA/TokenB",
+				PairId:    "TokenA<>TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
 				Count:     msgs[1].Count,
@@ -51,7 +51,7 @@ func TestLimitOrderPoolTotalSharesMapQuerySingle(t *testing.T) {
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetLimitOrderPoolTotalSharesMapRequest{
-				PairId:    "TokenA/TokenB",
+				PairId:    "TokenA<>TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
 				Count:     100000,
@@ -81,7 +81,7 @@ func TestLimitOrderPoolTotalSharesMapQuerySingle(t *testing.T) {
 func TestLimitOrderPoolTotalSharesMapQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolTotalSharesMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 5)
+	msgs := createNLimitOrderPoolTotalSharesMap(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 5)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderPoolTotalSharesMapRequest {
 		return &types.QueryAllLimitOrderPoolTotalSharesMapRequest{
