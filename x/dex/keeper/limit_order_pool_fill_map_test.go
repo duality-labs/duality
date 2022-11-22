@@ -30,10 +30,10 @@ func createNLimitOrderPoolFillMap(keeper *keeper.Keeper, ctx sdk.Context, pairId
 
 func TestLimitOrderPoolFillMapGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolFillMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolFillMap(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
 	for _, item := range items {
 		rst, found := keeper.GetLimitOrderPoolFillMap(ctx,
-			"TokenA/TokenB",
+			"TokenA<>TokenB",
 			0,
 			"TokenA",
 			item.Count,
@@ -47,16 +47,16 @@ func TestLimitOrderPoolFillMapGet(t *testing.T) {
 }
 func TestLimitOrderPoolFillMapRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolFillMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolFillMap(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
 	for _, item := range items {
 		keeper.RemoveLimitOrderPoolFillMap(ctx,
-			"TokenA/TokenB",
+			"TokenA<>TokenB",
 			0,
 			"TokenA",
 			item.Count,
 		)
 		_, found := keeper.GetLimitOrderPoolFillMap(ctx,
-			"TokenA/TokenB",
+			"TokenA<>TokenB",
 			0,
 			"TokenA",
 			item.Count,
