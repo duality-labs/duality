@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"context"
-	//"fmt"
+	"fmt"
 	"math"
 	"strings"
 
@@ -368,14 +368,29 @@ func (k Keeper) HasToken0(ctx sdk.Context, tick *types.TickMap) bool {
 	}
 
 	token0, _ := PairToTokens(tick.PairId)
-	reserve, reserveFound := k.GetLimitOrderPoolReserveMap(
+	fillReserve, fillReserveFound := k.GetLimitOrderPoolReserveMap(
 		ctx,
 		tick.PairId,
 		tick.TickIndex,
 		token0,
 		tick.LimitOrderPool0To1.CurrentLimitOrderKey,
 	)
-	return reserveFound && reserve.Reserves.GT(sdk.ZeroDec())
+	if fillReserveFound && fillReserve.Reserves.GT(sdk.ZeroDec()) {
+		return true
+	}
+
+	placeReserve, placeReserveFound := k.GetLimitOrderPoolReserveMap(
+		ctx,
+		tick.PairId,
+		tick.TickIndex,
+		token0,
+		tick.LimitOrderPool0To1.Count,
+	)
+	if placeReserveFound && placeReserve.Reserves.GT(sdk.ZeroDec()) {
+		return true
+	}
+
+	return false
 }
 
 // Checks if a tick has reserve1 at any fee tier
@@ -388,14 +403,29 @@ func (k Keeper) HasToken1(ctx sdk.Context, tick *types.TickMap) bool {
 	}
 
 	_, token1 := PairToTokens(tick.PairId)
-	reserve, reserveFound := k.GetLimitOrderPoolReserveMap(
+	fillReserve, fillReserveFound := k.GetLimitOrderPoolReserveMap(
 		ctx,
 		tick.PairId,
 		tick.TickIndex,
 		token1,
 		tick.LimitOrderPool1To0.CurrentLimitOrderKey,
 	)
-	return reserveFound && reserve.Reserves.GT(sdk.ZeroDec())
+	if fillReserveFound && fillReserve.Reserves.GT(sdk.ZeroDec()) {
+		return true
+	}
+
+	placeReserve, placeReserveFound := k.GetLimitOrderPoolReserveMap(
+		ctx,
+		tick.PairId,
+		tick.TickIndex,
+		token1,
+		tick.LimitOrderPool1To0.Count,
+	)
+	if placeReserveFound && placeReserve.Reserves.GT(sdk.ZeroDec()) {
+		return true
+	}
+
+	return false
 }
 
 // Currently Unused
@@ -577,6 +607,7 @@ func (k Keeper) CalcTickPointersPostRemoveToken1(goCtx context.Context, pair *ty
 func (k Keeper) UpdateTickPointersPostRemoveToken1(goCtx context.Context, pair *types.PairMap, tick *types.TickMap) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	newPair := k.CalcTickPointersPostRemoveToken1(goCtx, pair, tick)
+	fmt.Println(newPair)
 	if newPair != nil {
 		k.SetPairMap(ctx, *newPair)
 	}
