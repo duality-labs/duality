@@ -42,24 +42,31 @@ func (s *MsgServerTestSuite) TestSwapExhaustFeeTiersAndLimitOrder() {
 
 	// deposit 10 of token B at tick 0 fee 1
 	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
-
-	// TODO: uncomment
-	// s.assertLimitLiquidityAtTickDec("TokenB", 1, sdk.NewDec(20).Sub(amountOutSetup))
+	lpLiquiditySetup := sdk.NewDec(10)
+	limitLiquiditySetup := sdk.NewDec(20).Sub(amountOutSetup)
+	totalLiquiditySetup := lpLiquiditySetup.Add(limitLiquiditySetup)
+	s.assertLimitLiquidityAtTickDec("TokenB", limitLiquiditySetup, 1)
 	s.assertLiquidityAtTick(0, 10, 0, 0)
 	bobBalanceSetupB := sdk.NewDec(50).Sub(amountInSetup)
 	s.assertBobBalancesDec(bobBalanceSetupB, amountOutSetup)
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
-	amountIn, amountInDec := 20, sdk.NewDec(20)
+	amountIn, amountInDec := 30, sdk.NewDec(30)
 	s.bobMarketSells("TokenA", amountIn, 0)
 
 	// THEN
 	// swap should have in out
-	expectedAmountLeft, expectedAmountOut := s.calculateSingleSwapAToB(1, sdk.NewDec(10), sdk.NewDec(10), amountInDec)
-	expectedAmountIn := amountInDec.Sub(expectedAmountLeft)
-	s.assertBobBalancesDec(bobBalanceSetupB.Sub(expectedAmountIn), amountOutSetup.Add(expectedAmountOut))
-	s.assertDexBalancesDec(expectedAmountIn.Add(amountInSetup), sdk.NewDec(20).Sub(amountOutSetup).Sub(expectedAmountOut))
-	// TODO: uncomment
-	// s.assertLimitLiquidityAtTickDec("TokenB", 1, sdk.NewDec(20).Sub(amountOutSetup).Sub(expectedAmountOut))
+	// swap effect on balances
+	expectedTotalAmountLeft, expectedTotalAmountOut := s.calculateSingleSwapAToB(1, lpLiquiditySetup, limitLiquiditySetup, amountInDec)
+	expectedAmountIn := amountInDec.Sub(expectedTotalAmountLeft)
+	s.assertBobBalancesDec(bobBalanceSetupB.Sub(expectedAmountIn), amountOutSetup.Add(expectedTotalAmountOut))
+	s.assertDexBalancesDec(expectedAmountIn.Add(amountInSetup), totalLiquiditySetup.Sub(expectedTotalAmountOut))
+
+	// calculate amount traded against LPs (i.e. which gets swapped into fee tier)
+	expectedAmountLeftAfterLP, _ := s.calculateSingleSwapNoLOAToB(1, lpLiquiditySetup, amountInDec)
+	lpAmountIn := amountInDec.Sub(expectedAmountLeftAfterLP)
+	s.assertLiquidityAtTickDec(lpAmountIn, sdk.ZeroDec(), 0, 0)
+	// limit orders exhausted
+	s.assertLimitLiquidityAtTickDec("TokenB", sdk.ZeroDec(), 1)
 }
