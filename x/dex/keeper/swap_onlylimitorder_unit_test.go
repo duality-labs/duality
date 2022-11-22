@@ -340,7 +340,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilledCorrectExecution() {
 	// in 5.000499950004999500, out 4.999500049995000500
 	expectedAmountLeftSetup, amountOutSetup := s.calculateSingleSwapOnlyLOAToB(1, sdk.NewDec(10), sdk.NewDec(5))
 	amountInSetup := sdk.NewDec(5).Sub(expectedAmountLeftSetup)
-	s.assertLimitLiquidityAtTickDec("TokenB", 1, sdk.NewDec(10).Sub(amountOutSetup))
+	s.assertLimitLiquidityAtTickDec("TokenB", sdk.NewDec(10).Sub(amountOutSetup), 1)
 
 	// place another LO selling 10 of token B at tick 1
 	s.aliceLimitSells("TokenB", 1, 10)
@@ -377,13 +377,13 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustLOCorrectExecution() {
 	// in 5.000499950004999500, out 4.999500049995000500
 	expectedAmountLeftSetup, amountOutSetup := s.calculateSingleSwapOnlyLOAToB(1, sdk.NewDec(10), sdk.NewDec(5))
 	amountInSetup := sdk.NewDec(5).Sub(expectedAmountLeftSetup)
-	s.assertLimitLiquidityAtTickDec("TokenB", 1, sdk.NewDec(10).Sub(amountOutSetup))
+	s.assertLimitLiquidityAtTickDec("TokenB", sdk.NewDec(10).Sub(amountOutSetup), 1)
 
 	// place another LO selling 10 of token B at tick 1
 	s.aliceLimitSells("TokenB", 1, 10)
 	limitLiquiditySetup := sdk.NewDec(20).Sub(amountOutSetup)
 	// TODO: uncomment, has bug with fill and place tranche keys
-	s.assertLimitLiquidityAtTickDec("TokenB", 1, limitLiquiditySetup)
+	s.assertLimitLiquidityAtTickDec("TokenB", limitLiquiditySetup, 1)
 	bobBalanceSetupB := sdk.NewDec(50).Sub(amountInSetup)
 	s.assertBobBalancesDec(bobBalanceSetupB, amountOutSetup)
 

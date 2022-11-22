@@ -35,7 +35,7 @@ func (s *MsgServerTestSuite) TestSwapExhaustFeeTiersAndLimitOrder() {
 	// in 5.000499950004999500, out 4.999500049995000500
 	expectedAmountLeftSetup, amountOutSetup := s.calculateSingleSwapOnlyLOAToB(1, NewDec(10), NewDec(5))
 	amountInSetup := sdk.NewDec(5).Sub(expectedAmountLeftSetup)
-	s.assertLimitLiquidityAtTickDec("TokenB", 1, sdk.NewDec(10).Sub(amountOutSetup))
+	s.assertLimitLiquidityAtTickDec("TokenB", sdk.NewDec(10).Sub(amountOutSetup), 1)
 
 	// place another LO selling 10 of token B at tick 1
 	s.aliceLimitSells("TokenB", 1, 10)
