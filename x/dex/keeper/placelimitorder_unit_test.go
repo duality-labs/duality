@@ -317,3 +317,78 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderAboveEnemyLines() {
 	err := types.ErrPlaceLimitOrderBehindPairLiquidity // TODO: this needs to be changed to a more specific error type
 	s.assertAliceLimitSellFails(err, "TokenB", -5, 10)
 }
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderNoLOPlaceLODoesntIncrementPlaceTrancheKey() {
+	s.fundAliceBalances(50, 50)
+
+	// GIVEN
+	// no previous LO on existing tick
+	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
+	s.assertLiquidityAtTick(10, 0, 0, 0)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
+
+	// WHEN
+	// placing order on same tick
+	s.aliceLimitSells("TokenA", -1, 10)
+
+	// THEN
+	// fill and place tranche keys don't change
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderUnfilledLOPlaceLODoesntIncrementPlaceTrancheKey() {
+	s.fundAliceBalances(50, 50)
+
+	// GIVEN
+	// unfilled limit order exists on tick -1
+	s.aliceLimitSells("TokenA", -1, 10)
+	s.assertLimitLiquidityAtTick("TokenA", -1, 10)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
+
+	// WHEN
+	// placing order on same tick
+	s.aliceLimitSells("TokenA", -1, 10)
+
+	// THEN
+	// fill and place tranche keys don't change
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderPartiallyFilledLOPlaceLOIncrementsPlaceTrancheKey() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 50)
+
+	// GIVEN
+	// partially filled limit order exists on tick -1
+	s.aliceLimitSells("TokenA", -1, 10)
+	s.bobMarketSells("TokenB", 5, 0)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
+
+	// WHEN
+	// placing order on same tick
+	s.aliceLimitSells("TokenA", -1, 10)
+
+	// THEN
+	// place tranche key changes
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderFilledLOPlaceLODoesntIncrementsPlaceTrancheKey() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 50)
+
+	// GIVEN
+	// filled LO with partially filled place tranche
+	s.aliceLimitSells("TokenA", -1, 10)
+	s.bobMarketSells("TokenB", 10, 0)
+	s.aliceLimitSells("TokenA", -1, 10)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 1, 1)
+
+	// WHEN
+	// placing order on same tick
+	s.aliceLimitSells("TokenA", -1, 5)
+
+	// THEN
+	// fill and place tranche keys don't change
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 1, 1)
+}
