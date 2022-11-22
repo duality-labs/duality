@@ -294,7 +294,6 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		return sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 	if pair.TokenPair.CurrentTick0To1 == math.MaxInt64 {
-		fmt.Println("HELLO")
 		return sdk.ZeroDec(), sdk.ZeroDec(), types.ErrNotEnoughLiquidity
 	}
 
@@ -473,7 +472,6 @@ func (k Keeper) SwapLimitOrder0to1(
 	tickIndex int64,
 ) (newAmountRemainingTokenIn sdk.Dec, newAmountOut sdk.Dec, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	fmt.Println("loop")
 
 	priceInToOut := CalcPrice0To1(tickIndex)
 	priceOutToIn := sdk.OneDec().Quo(priceInToOut)

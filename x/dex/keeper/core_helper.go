@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 	"math"
 	"strings"
 
@@ -633,7 +632,6 @@ func (k Keeper) CalcTickPointersPostRemoveToken1(goCtx context.Context, pair *ty
 func (k Keeper) UpdateTickPointersPostRemoveToken1(goCtx context.Context, pair *types.PairMap, tick *types.TickMap) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	newPair := k.CalcTickPointersPostRemoveToken1(goCtx, pair, tick)
-	fmt.Println(newPair)
 	if newPair != nil {
 		k.SetPairMap(ctx, *newPair)
 	}
