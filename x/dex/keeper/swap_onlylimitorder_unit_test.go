@@ -399,7 +399,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustLOCorrectExecution() {
 	s.assertBobBalancesDec(bobBalanceSetupB.Sub(expectedAmountIn), amountOutSetup.Add(expectedAmountOut))
 	s.assertDexBalancesDec(expectedAmountIn.Add(amountInSetup), limitLiquiditySetup.Sub(expectedAmountOut))
 	// TODO: uncomment
-	// s.assertLimitLiquidityAtTickDec("TokenB", 1, sdk.NewDec(20).Sub(amountOutSetup).Sub(expectedAmountOut))
+	s.assertLimitLiquidityAtTickDec("TokenB", sdk.NewDec(20).Sub(amountOutSetup).Sub(expectedAmountOut), 1)
 }
 
 func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilled0to1DoesntMove0to1() {
