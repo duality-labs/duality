@@ -17,7 +17,7 @@ func (s *MsgServerTestSuite) TestSwapNoLiqudityPairNotFound() {
 	// THEN
 	// swap should fail with PairNotFound error
 	err := types.ErrValidPairNotFound
-	s.bobMarketSellFails(err, "TokenA", 5, 0)
+	s.assertBobMarketSellFails(err, "TokenA", 5, 0)
 
 }
 

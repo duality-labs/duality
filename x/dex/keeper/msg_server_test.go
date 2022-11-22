@@ -338,7 +338,6 @@ func (s *MsgServerTestSuite) assertDepositFails(account sdk.AccAddress, expected
 		TickIndexes: tickIndexes,
 		FeeIndexes:  feeIndexes,
 	})
-	s.Assert().NotNil(err)
 	s.Assert().ErrorIs(err, expectedErr)
 }
 
@@ -361,6 +360,22 @@ func (s *MsgServerTestSuite) assertDepositReponse(depositResponse DepositReponse
 type DepositReponse struct {
 	amountsA []sdk.Dec
 	amountsB []sdk.Dec
+}
+
+func (s *MsgServerTestSuite) aliceWithdraws(withdrawals ...*Withdrawl) error {
+	return s.withdraws(s.alice, withdrawals...)
+}
+
+func (s *MsgServerTestSuite) bobWithdraws(withdrawals ...*Withdrawl) error {
+	return s.withdraws(s.bob, withdrawals...)
+}
+
+func (s *MsgServerTestSuite) carolWithdraws(withdrawals ...*Withdrawl) error {
+	return s.withdraws(s.carol, withdrawals...)
+}
+
+func (s *MsgServerTestSuite) danWithdraws(withdrawals ...*Withdrawl) error {
+	return s.withdraws(s.dan, withdrawals...)
 }
 
 func (s *MsgServerTestSuite) withdraws(account sdk.AccAddress, withdrawls ...*Withdrawl) error {
@@ -386,36 +401,58 @@ func (s *MsgServerTestSuite) withdraws(account sdk.AccAddress, withdrawls ...*Wi
 	return err
 }
 
-func (s *MsgServerTestSuite) aliceWithdraws(withdrawals ...*Withdrawl) error {
-	return s.withdraws(s.alice, withdrawals...)
+func (s *MsgServerTestSuite) assertAliceWithdrawFails(expectedErr error, withdrawals ...*Withdrawl) {
+	s.assertWithdrawFails(s.alice, expectedErr, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) bobWithdraws(withdrawals ...*Withdrawl) error {
-	return s.withdraws(s.bob, withdrawals...)
+func (s *MsgServerTestSuite) assertBobWithdrawFails(expectedErr error, withdrawals ...*Withdrawl) {
+	s.assertWithdrawFails(s.bob, expectedErr, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) carolWithdraws(withdrawals ...*Withdrawl) error {
-	return s.withdraws(s.carol, withdrawals...)
+func (s *MsgServerTestSuite) assertCarolWithdrawFails(expectedErr error, withdrawals ...*Withdrawl) {
+	s.assertWithdrawFails(s.carol, expectedErr, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) danWithdraws(withdrawals ...*Withdrawl) error {
-	return s.withdraws(s.dan, withdrawals...)
+func (s *MsgServerTestSuite) assertDanWithdrawFails(expectedErr error, withdrawals ...*Withdrawl) {
+	s.assertWithdrawFails(s.dan, expectedErr, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) aliceCancelsLimitSell(keyToken string, tick int, key int, amountOut int) {
-	s.cancelsLimitSell(s.alice, keyToken, tick, key, amountOut)
+func (s *MsgServerTestSuite) assertWithdrawFails(account sdk.AccAddress, expectedErr error, withdrawls ...*Withdrawl) {
+	tickIndexes := make([]int64, len(withdrawls))
+	feeIndexes := make([]uint64, len(withdrawls))
+	sharesToRemove := make([]sdk.Dec, len(withdrawls))
+	for i, e := range withdrawls {
+		tickIndexes[i] = e.TickIndex
+		feeIndexes[i] = e.FeeIndex
+		sharesToRemove[i] = e.Shares
+	}
+
+	_, err := s.msgServer.Withdrawl(s.goCtx, &types.MsgWithdrawl{
+		Creator:        account.String(),
+		Receiver:       account.String(),
+		TokenA:         "TokenA",
+		TokenB:         "TokenB",
+		SharesToRemove: sharesToRemove,
+		TickIndexes:    tickIndexes,
+		FeeIndexes:     feeIndexes,
+	})
+	s.Assert().ErrorIs(expectedErr, err)
 }
 
-func (s *MsgServerTestSuite) bobCancelsLimitSell(keyToken string, tick int, key int, amountOut int) {
-	s.cancelsLimitSell(s.bob, keyToken, tick, key, amountOut)
+func (s *MsgServerTestSuite) aliceCancelsLimitSell(selling string, tick int, key int, amountOut int) {
+	s.cancelsLimitSell(s.alice, selling, tick, key, amountOut)
 }
 
-func (s *MsgServerTestSuite) carolCancelsLimitSell(keyToken string, tick int, key int, amountOut int) {
-	s.cancelsLimitSell(s.carol, keyToken, tick, key, amountOut)
+func (s *MsgServerTestSuite) bobCancelsLimitSell(selling string, tick int, key int, amountOut int) {
+	s.cancelsLimitSell(s.bob, selling, tick, key, amountOut)
 }
 
-func (s *MsgServerTestSuite) danCancelsLimitSell(keyToken string, tick int, key int, amountOut int) {
-	s.cancelsLimitSell(s.dan, keyToken, tick, key, amountOut)
+func (s *MsgServerTestSuite) carolCancelsLimitSell(selling string, tick int, key int, amountOut int) {
+	s.cancelsLimitSell(s.carol, selling, tick, key, amountOut)
+}
+
+func (s *MsgServerTestSuite) danCancelsLimitSell(selling string, tick int, key int, amountOut int) {
+	s.cancelsLimitSell(s.dan, selling, tick, key, amountOut)
 }
 
 func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling string, tick int, key int, sharesOut int) {
@@ -431,6 +468,37 @@ func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling st
 		SharesOut: sharesOutDec,
 	})
 	s.Assert().Nil(err)
+}
+
+func (s *MsgServerTestSuite) assertAliceCancelLimitSellFails(selling string, expectedErr error, tick int, key int, amountOut int) {
+	s.assertCancelLimitSellFails(s.alice, expectedErr, selling, tick, key, amountOut)
+}
+
+func (s *MsgServerTestSuite) assertBobCancelLimitSellFails(selling string, expectedErr error, tick int, key int, amountOut int) {
+	s.assertCancelLimitSellFails(s.bob, expectedErr, selling, tick, key, amountOut)
+}
+
+func (s *MsgServerTestSuite) assertCarolCancelLimitSellFails(selling string, expectedErr error, tick int, key int, amountOut int) {
+	s.assertCancelLimitSellFails(s.carol, expectedErr, selling, tick, key, amountOut)
+}
+
+func (s *MsgServerTestSuite) assertDanCancelLimitSellFails(selling string, expectedErr error, tick int, key int, amountOut int) {
+	s.assertCancelLimitSellFails(s.dan, expectedErr, selling, tick, key, amountOut)
+}
+
+func (s *MsgServerTestSuite) assertCancelLimitSellFails(account sdk.AccAddress, expectedErr error, selling string, tick int, key int, sharesOut int) {
+	sharesOutDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(sharesOut)))
+	_, err := s.msgServer.CancelLimitOrder(s.goCtx, &types.MsgCancelLimitOrder{
+		Creator:   account.String(),
+		Receiver:  account.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		TickIndex: int64(tick),
+		KeyToken:  selling,
+		Key:       uint64(key),
+		SharesOut: sharesOutDec,
+	})
+	s.Assert().ErrorIs(expectedErr, err)
 }
 
 func (s *MsgServerTestSuite) aliceMarketSells(selling string, amountIn int, minOut int) {
@@ -464,22 +532,23 @@ func (s *MsgServerTestSuite) marketSells(account sdk.AccAddress, selling string,
 	s.Assert().Nil(err)
 }
 
-func (s *MsgServerTestSuite) aliceMarketSellFails(err error, selling string, amountIn int, minOut int) {
-	s.marketSellFails(s.alice, err, selling, amountIn, minOut)
+func (s *MsgServerTestSuite) assertAliceMarketSellFails(err error, selling string, amountIn int, minOut int) {
+	s.assertMarketSellFails(s.alice, err, selling, amountIn, minOut)
 }
 
-func (s *MsgServerTestSuite) bobMarketSellFails(err error, selling string, amountIn int, minOut int) {
-	s.marketSellFails(s.bob, err, selling, amountIn, minOut)
+func (s *MsgServerTestSuite) assertBobMarketSellFails(err error, selling string, amountIn int, minOut int) {
+	s.assertMarketSellFails(s.bob, err, selling, amountIn, minOut)
 }
 
-func (s *MsgServerTestSuite) carolMarketSellFails(err error, selling string, amountIn int, minOut int) {
-	s.marketSellFails(s.bob, err, selling, amountIn, minOut)
+func (s *MsgServerTestSuite) assertCarolMarketSellFails(err error, selling string, amountIn int, minOut int) {
+	s.assertMarketSellFails(s.carol, err, selling, amountIn, minOut)
 }
 
-func (s *MsgServerTestSuite) danMarketSellFails(err error, selling string, amountIn int, minOut int) {
-	s.marketSellFails(s.bob, err, selling, amountIn, minOut)
+func (s *MsgServerTestSuite) assertDanMarketSellFails(err error, selling string, amountIn int, minOut int) {
+	s.assertMarketSellFails(s.dan, err, selling, amountIn, minOut)
 }
-func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr error, selling string, amountIn int, minOut int) {
+
+func (s *MsgServerTestSuite) assertMarketSellFails(account sdk.AccAddress, expectedErr error, selling string, amountIn int, minOut int) {
 	amountInDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(amountIn)))
 	minOutDec := sdk.NewDecFromInt(sdk.NewIntFromUint64(uint64(minOut)))
 	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
@@ -492,19 +561,6 @@ func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr
 		MinOut:   minOutDec,
 	})
 	s.Assert().ErrorIs(expectedErr, err)
-}
-
-func (s *MsgServerTestSuite) withdrawsLimitSell(account sdk.AccAddress, selling string, tick int, tranche int) {
-	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
-		Creator:   account.String(),
-		Receiver:  account.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: int64(tick),
-		KeyToken:  selling,
-		Key:       uint64(tranche),
-	})
-	s.Assert().Nil(err)
 }
 
 func (s *MsgServerTestSuite) aliceWithdrawsLimitSell(selling string, tick int, tranche int) {
@@ -521,6 +577,48 @@ func (s *MsgServerTestSuite) carolWithdrawsLimitSell(selling string, tick int, t
 
 func (s *MsgServerTestSuite) danWithdrawsLimitSell(selling string, tick int, tranche int) {
 	s.withdrawsLimitSell(s.dan, selling, tick, tranche)
+}
+
+func (s *MsgServerTestSuite) withdrawsLimitSell(account sdk.AccAddress, selling string, tick int, tranche int) {
+	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
+		Creator:   account.String(),
+		Receiver:  account.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		TickIndex: int64(tick),
+		KeyToken:  selling,
+		Key:       uint64(tranche),
+	})
+	s.Assert().Nil(err)
+}
+
+func (s *MsgServerTestSuite) assertAliceWithdrawLimitSellFails(err error, selling string, amountIn int, minOut int) {
+	s.assertWithdrawLimitSellFails(s.alice, err, selling, amountIn, minOut)
+}
+
+func (s *MsgServerTestSuite) assertBobWithdrawLimitSellFails(err error, selling string, amountIn int, minOut int) {
+	s.assertWithdrawLimitSellFails(s.bob, err, selling, amountIn, minOut)
+}
+
+func (s *MsgServerTestSuite) assertCarolWithdrawLimitSellFails(err error, selling string, amountIn int, minOut int) {
+	s.assertWithdrawLimitSellFails(s.carol, err, selling, amountIn, minOut)
+}
+
+func (s *MsgServerTestSuite) assertDanWithdrawLimitSellFails(err error, selling string, amountIn int, minOut int) {
+	s.assertWithdrawLimitSellFails(s.dan, err, selling, amountIn, minOut)
+}
+
+func (s *MsgServerTestSuite) assertWithdrawLimitSellFails(account sdk.AccAddress, expectedErr error, selling string, tick int, tranche int) {
+	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
+		Creator:   account.String(),
+		Receiver:  account.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		TickIndex: int64(tick),
+		KeyToken:  selling,
+		Key:       uint64(tranche),
+	})
+	s.Assert().ErrorIs(expectedErr, err)
 }
 
 func (s *MsgServerTestSuite) traceBalances() {
