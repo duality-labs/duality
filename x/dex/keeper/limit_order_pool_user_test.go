@@ -15,8 +15,8 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNLimitOrderPoolUserShareMap(keeper *keeper.Keeper, ctx sdk.Context, pairId string, tickIndex int64, token string, n int) []types.LimitOrderPoolUserShareMap {
-	items := make([]types.LimitOrderPoolUserShareMap, n)
+func createNLimitOrderPoolUser(keeper *keeper.Keeper, ctx sdk.Context, pairId string, tickIndex int64, token string, n int) []types.LimitOrderPoolUser {
+	items := make([]types.LimitOrderPoolUser, n)
 	for i := range items {
 		items[i].Count = uint64(i)
 		items[i].Address = strconv.Itoa(i)
@@ -24,18 +24,20 @@ func createNLimitOrderPoolUserShareMap(keeper *keeper.Keeper, ctx sdk.Context, p
 		items[i].Token = token
 		items[i].TickIndex = tickIndex
 
-		keeper.SetLimitOrderPoolUserShareMap(ctx, items[i])
+		keeper.SetLimitOrderPoolUser(ctx, items[i])
 		items[i].SharesOwned = sdk.ZeroDec()
+		items[i].SharesWithdrawn = sdk.ZeroDec()
+		items[i].SharesCancelled = sdk.ZeroDec()
 
 	}
 	return items
 }
 
-func TestLimitOrderPoolUserShareMapGet(t *testing.T) {
+func TestLimitOrderPoolUserGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUserShareMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolUser(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
 	for _, item := range items {
-		rst, found := keeper.GetLimitOrderPoolUserShareMap(ctx,
+		rst, found := keeper.GetLimitOrderPoolUser(ctx,
 			"TokenA/TokenB",
 			0,
 			"TokenA",
@@ -49,18 +51,18 @@ func TestLimitOrderPoolUserShareMapGet(t *testing.T) {
 		)
 	}
 }
-func TestLimitOrderPoolUserShareMapRemove(t *testing.T) {
+func TestLimitOrderPoolUserRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUserShareMap(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderPoolUser(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 10)
 	for _, item := range items {
-		keeper.RemoveLimitOrderPoolUserShareMap(ctx,
+		keeper.RemoveLimitOrderPoolUser(ctx,
 			"TokenA/TokenB",
 			0,
 			"TokenA",
 			item.Count,
 			item.Address,
 		)
-		_, found := keeper.GetLimitOrderPoolUserShareMap(ctx,
+		_, found := keeper.GetLimitOrderPoolUser(ctx,
 			"TokenA/TokenB",
 			0,
 			"TokenA",

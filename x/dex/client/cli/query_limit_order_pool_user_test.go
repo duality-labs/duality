@@ -21,28 +21,28 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func networkWithLimitOrderPoolUserSharesWithdrawnObjects(t *testing.T, n int) (*network.Network, []types.LimitOrderPoolUserSharesWithdrawn) {
+func networkWithLimitOrderPoolUserObjects(t *testing.T, n int) (*network.Network, []types.LimitOrderPoolUser) {
 	t.Helper()
 	cfg := network.DefaultConfig()
 	state := types.GenesisState{}
 	require.NoError(t, cfg.Codec.UnmarshalJSON(cfg.GenesisState[types.ModuleName], &state))
 
 	for i := 0; i < n; i++ {
-		limitOrderPoolUserSharesWithdrawn := types.LimitOrderPoolUserSharesWithdrawn{
+		LimitOrderPoolUser := types.LimitOrderPoolUser{
 			Count:   uint64(i),
 			Address: strconv.Itoa(i),
 		}
-		nullify.Fill(&limitOrderPoolUserSharesWithdrawn)
-		state.LimitOrderPoolUserSharesWithdrawnList = append(state.LimitOrderPoolUserSharesWithdrawnList, limitOrderPoolUserSharesWithdrawn)
+		nullify.Fill(&LimitOrderPoolUser)
+		state.LimitOrderPoolUserList = append(state.LimitOrderPoolUserList, LimitOrderPoolUser)
 	}
 	buf, err := cfg.Codec.MarshalJSON(&state)
 	require.NoError(t, err)
 	cfg.GenesisState[types.ModuleName] = buf
-	return network.New(t, cfg), state.LimitOrderPoolUserSharesWithdrawnList
+	return network.New(t, cfg), state.LimitOrderPoolUserList
 }
 
-func TestShowLimitOrderPoolUserSharesWithdrawn(t *testing.T) {
-	net, objs := networkWithLimitOrderPoolUserSharesWithdrawnObjects(t, 2)
+func TestShowLimitOrderPoolUser(t *testing.T) {
+	net, objs := networkWithLimitOrderPoolUserObjects(t, 2)
 
 	ctx := net.Validators[0].ClientCtx
 	common := []string{
@@ -55,7 +55,7 @@ func TestShowLimitOrderPoolUserSharesWithdrawn(t *testing.T) {
 
 		args []string
 		err  error
-		obj  types.LimitOrderPoolUserSharesWithdrawn
+		obj  types.LimitOrderPoolUser
 	}{
 		{
 			desc:      "found",
@@ -80,27 +80,27 @@ func TestShowLimitOrderPoolUserSharesWithdrawn(t *testing.T) {
 				tc.idAddress,
 			}
 			args = append(args, tc.args...)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowLimitOrderPoolUserSharesWithdrawn(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowLimitOrderPoolUser(), args)
 			if tc.err != nil {
 				stat, ok := status.FromError(tc.err)
 				require.True(t, ok)
 				require.ErrorIs(t, stat.Err(), tc.err)
 			} else {
 				require.NoError(t, err)
-				var resp types.QueryGetLimitOrderPoolUserSharesWithdrawnResponse
+				var resp types.QueryGetLimitOrderPoolUserResponse
 				require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-				require.NotNil(t, resp.LimitOrderPoolUserSharesWithdrawn)
+				require.NotNil(t, resp.LimitOrderPoolUser)
 				require.Equal(t,
 					nullify.Fill(&tc.obj),
-					nullify.Fill(&resp.LimitOrderPoolUserSharesWithdrawn),
+					nullify.Fill(&resp.LimitOrderPoolUser),
 				)
 			}
 		})
 	}
 }
 
-func TestListLimitOrderPoolUserSharesWithdrawn(t *testing.T) {
-	net, objs := networkWithLimitOrderPoolUserSharesWithdrawnObjects(t, 5)
+func TestListLimitOrderPoolUser(t *testing.T) {
+	net, objs := networkWithLimitOrderPoolUserObjects(t, 5)
 
 	ctx := net.Validators[0].ClientCtx
 	request := func(next []byte, offset, limit uint64, total bool) []string {
@@ -122,14 +122,14 @@ func TestListLimitOrderPoolUserSharesWithdrawn(t *testing.T) {
 		step := 2
 		for i := 0; i < len(objs); i += step {
 			args := request(nil, uint64(i), uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUserSharesWithdrawn(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUser(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllLimitOrderPoolUserSharesWithdrawnResponse
+			var resp types.QueryAllLimitOrderPoolUserResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.LimitOrderPoolUserSharesWithdrawn), step)
+			require.LessOrEqual(t, len(resp.LimitOrderPoolUser), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.LimitOrderPoolUserSharesWithdrawn),
+				nullify.Fill(resp.LimitOrderPoolUser),
 			)
 		}
 	})
@@ -138,29 +138,29 @@ func TestListLimitOrderPoolUserSharesWithdrawn(t *testing.T) {
 		var next []byte
 		for i := 0; i < len(objs); i += step {
 			args := request(next, 0, uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUserSharesWithdrawn(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUser(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllLimitOrderPoolUserSharesWithdrawnResponse
+			var resp types.QueryAllLimitOrderPoolUserResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.LimitOrderPoolUserSharesWithdrawn), step)
+			require.LessOrEqual(t, len(resp.LimitOrderPoolUser), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.LimitOrderPoolUserSharesWithdrawn),
+				nullify.Fill(resp.LimitOrderPoolUser),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
 		args := request(nil, 0, uint64(len(objs)), true)
-		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUserSharesWithdrawn(), args)
+		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUser(), args)
 		require.NoError(t, err)
-		var resp types.QueryAllLimitOrderPoolUserSharesWithdrawnResponse
+		var resp types.QueryAllLimitOrderPoolUserResponse
 		require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 		require.NoError(t, err)
 		require.Equal(t, len(objs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(objs),
-			nullify.Fill(resp.LimitOrderPoolUserSharesWithdrawn),
+			nullify.Fill(resp.LimitOrderPoolUser),
 		)
 	})
 }

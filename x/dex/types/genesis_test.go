@@ -96,7 +96,7 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 				AdjanceyMatrixCount: 2,
-				LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
+				LimitOrderPoolUserList: []types.LimitOrderPoolUser{
 					{
 						Count:   0,
 						Address: "0",
@@ -311,9 +311,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated limitOrderPoolUserShareMap",
+			desc: "duplicated LimitOrderPoolUser",
 			genState: &types.GenesisState{
-				LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
+				LimitOrderPoolUserList: []types.LimitOrderPoolUser{
 					{
 						Count:   0,
 						Address: "0",

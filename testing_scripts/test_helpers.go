@@ -1,8 +1,6 @@
 package testing_scripts
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -26,8 +24,6 @@ func SingleLimitOrderFill(amount_placed sdk.Dec,
 		amount_out = amount_in.Mul(price_filled_at)
 	}
 
-	fmt.Println("Amount Out: ", amount_out)
-	fmt.Println("Amount In: ", amount_in)
 	return amount_in, amount_out
 }
 
@@ -58,7 +54,6 @@ func MultipleLimitOrderFills(amounts_placed []sdk.Dec, prices []sdk.Dec, amount_
 
 	// Loops through all of the limit orders that need to be filled
 	for i := 0; i < len(amounts_placed); i++ {
-		fmt.Println("\nRound: ", i)
 		amount_in, amount_out := SingleLimitOrderFill(amounts_placed[i], prices[i], amount_remaining)
 
 		amount_remaining = amount_remaining.Sub(amount_in)

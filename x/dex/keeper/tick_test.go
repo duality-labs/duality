@@ -37,7 +37,7 @@ func (s *TickTestSuite) TestLimitHasToken0() {
 		Count:     0,
 		Reserves:  NewDec(5),
 	})
-	s.Equal(true, s.app.DexKeeper.HasToken0(s.ctx, &tick))
+	s.Equal(true, s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
 }
 
 func (s *TickTestSuite) TestEmptyHasToken0() {
@@ -50,7 +50,7 @@ func (s *TickTestSuite) TestEmptyHasToken0() {
 		Count:     0,
 		Reserves:  NewDec(0),
 	})
-	s.Equal(false, s.app.DexKeeper.HasToken0(s.ctx, &tick))
+	s.Equal(false, s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
 }
 
 func (s *TickTestSuite) TestLiquidityHasToken0() {
@@ -66,7 +66,7 @@ func (s *TickTestSuite) TestLiquidityHasToken0() {
 		Count:     0,
 		Reserves:  NewDec(0),
 	})
-	s.Equal(true, s.app.DexKeeper.HasToken0(s.ctx, &tick))
+	s.Equal(true, s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
 }
 
 func (s *TickTestSuite) TestLiquidityHighFeeHasToken0() {
@@ -82,7 +82,7 @@ func (s *TickTestSuite) TestLiquidityHighFeeHasToken0() {
 		Count:     0,
 		Reserves:  NewDec(0),
 	})
-	s.Equal(true, s.app.DexKeeper.HasToken0(s.ctx, &tick))
+	s.Equal(true, s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
 }
 
 func (s *TickTestSuite) TestNoLiquidityOnOneSideHasToken0() {
@@ -98,7 +98,7 @@ func (s *TickTestSuite) TestNoLiquidityOnOneSideHasToken0() {
 		Count:     0,
 		Reserves:  NewDec(0),
 	})
-	s.Equal(false, s.app.DexKeeper.HasToken0(s.ctx, &tick))
+	s.Equal(false, s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
 }
 
 func (s *TickTestSuite) TestLimitHasToken1() {
@@ -111,7 +111,7 @@ func (s *TickTestSuite) TestLimitHasToken1() {
 		Count:     0,
 		Reserves:  NewDec(5),
 	})
-	s.Equal(true, s.app.DexKeeper.HasToken1(s.ctx, &tick))
+	s.Equal(true, s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
 }
 
 func (s *TickTestSuite) TestEmptyHasToken1() {
@@ -124,7 +124,7 @@ func (s *TickTestSuite) TestEmptyHasToken1() {
 		Count:     0,
 		Reserves:  NewDec(0),
 	})
-	s.Equal(false, s.app.DexKeeper.HasToken1(s.ctx, &tick))
+	s.Equal(false, s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
 }
 
 func (s *TickTestSuite) TestLiquidityHasToken1() {
@@ -140,7 +140,7 @@ func (s *TickTestSuite) TestLiquidityHasToken1() {
 		Count:     0,
 		Reserves:  NewDec(0),
 	})
-	s.Equal(true, s.app.DexKeeper.HasToken1(s.ctx, &tick))
+	s.Equal(true, s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
 }
 
 func (s *TickTestSuite) TestLiquidityHighFeeHasToken1() {
@@ -156,7 +156,7 @@ func (s *TickTestSuite) TestLiquidityHighFeeHasToken1() {
 		Count:     0,
 		Reserves:  NewDec(0),
 	})
-	s.Equal(true, s.app.DexKeeper.HasToken1(s.ctx, &tick))
+	s.Equal(true, s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
 }
 
 func (s *TickTestSuite) TestNoLiquidityOnOneSideHasToken1() {
@@ -172,5 +172,5 @@ func (s *TickTestSuite) TestNoLiquidityOnOneSideHasToken1() {
 		Count:     0,
 		Reserves:  NewDec(0),
 	})
-	s.Equal(false, s.app.DexKeeper.HasToken1(s.ctx, &tick))
+	s.Equal(false, s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
 }

@@ -293,6 +293,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		return sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
 	if pair.TokenPair.CurrentTick0To1 == math.MaxInt64 {
+		fmt.Println("HELLO")
 		return sdk.ZeroDec(), sdk.ZeroDec(), types.ErrNotEnoughLiquidity
 	}
 
@@ -300,6 +301,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	amount_out := sdk.ZeroDec()
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
+	// for !amount_left.Equal(sdk.ZeroDec()) && pair.TokenPair.CurrentTick0To1 <= pair.MaxTick {
 	for !amount_left.Equal(sdk.ZeroDec()) && pair.TokenPair.CurrentTick0To1 <= pair.MaxTick {
 		Current1Data, Current1Found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1)
 		if !Current1Found {
@@ -329,7 +331,6 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				amount_left = amount_left.Sub(amountInTemp)
 				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Add(amountInTemp)
 				Current1Data.TickData.Reserve1[i] = sdk.ZeroDec()
-
 			} else {
 				amountOutTemp := amount_left.Mul(price_0to1)
 				amount_out = amount_out.Add(amountOutTemp)
@@ -350,6 +351,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		if i == feeSize && amount_left.GT(sdk.ZeroDec()) {
 			var err error
 			amount_left, amount_out, err = k.SwapLimitOrder0to1(goCtx, pairId, token1, amount_out, amount_left, pair.TokenPair.CurrentTick0To1)
+			// err = fmt.Errorf("dummy error for testing")
 			if err != nil {
 				return sdk.ZeroDec(), sdk.ZeroDec(), err
 			}
@@ -461,11 +463,17 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 // Handles swapping asset 0 for asset 1 through any active limit orders at a specified tick
 // Returns amount_out, amount_left, error
-func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenOut string, amountOut sdk.Dec, amountRemainingTokenIn sdk.Dec, tickIndex int64) (sdk.Dec, sdk.Dec, error) {
+func (k Keeper) SwapLimitOrder0to1(
+	goCtx context.Context,
+	pairId string,
+	tokenOut string,
+	amountOut sdk.Dec,
+	amountRemainingTokenIn sdk.Dec,
+	tickIndex int64,
+) (newAmountRemainingTokenIn sdk.Dec, newAmountOut sdk.Dec, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	priceInToOut := CalcPrice0To1(tickIndex)
-	// TODO: check this out
 	priceOutToIn := sdk.OneDec().Quo(priceInToOut)
 
 	tick, tickFound := k.GetTickMap(ctx, pairId, tickIndex)
@@ -476,73 +484,46 @@ func (k Keeper) SwapLimitOrder0to1(goCtx context.Context, pairId string, tokenOu
 	fillTranche := &tick.LimitOrderPool1To0.CurrentLimitOrderKey
 	placeTranche := &tick.LimitOrderPool1To0.Count
 
-	reserveData, found := k.GetLimitOrderPoolReserveMap(ctx, pairId, tickIndex, tokenOut, *fillTranche)
-	if !found || reserveData.Reserves.Equal(sdk.ZeroDec()) {
-		return amountRemainingTokenIn, amountOut, nil
-	}
-	reservesTokenOut := &reserveData.Reserves
-
-	fillData, found := k.GetLimitOrderPoolFillMap(
-		ctx,
-		pairId,
-		tickIndex,
-		tokenOut,
-		*fillTranche,
-	)
-	if !found {
-		return sdk.ZeroDec(), sdk.ZeroDec(), fmt.Errorf("should not happen1")
-	}
-	fillTokenIn := &fillData.FilledReserves
-
-	if reservesTokenOut.LTE(amountRemainingTokenIn.Mul(priceInToOut)) {
-		amountOut = amountOut.Add(*reservesTokenOut)
-		amountFilledTokenIn := reservesTokenOut.Mul(priceOutToIn)
-		amountRemainingTokenIn = amountRemainingTokenIn.Sub(amountFilledTokenIn)
-		*reservesTokenOut = sdk.ZeroDec()
-		*fillTokenIn = fillTokenIn.Add(amountFilledTokenIn)
-		k.SetLimitOrderPoolReserveMap(ctx, reserveData)
-		k.SetLimitOrderPoolFillMap(ctx, fillData)
-
-		if *fillTranche != *placeTranche {
+	for amountRemainingTokenIn.GT(sdk.ZeroDec()) && *fillTranche < *placeTranche {
+		amountRemainingTokenIn, amountOut, err = k.SwapLimitOrderTranche(
+			goCtx,
+			pairId,
+			tokenOut,
+			amountOut,
+			amountRemainingTokenIn,
+			tickIndex,
+			*fillTranche,
+			priceInToOut,
+			priceOutToIn,
+		)
+		if err != nil {
+			return sdk.ZeroDec(), sdk.ZeroDec(), err
+		}
+		if !k.TickTrancheHasToken0(ctx, &tick, *fillTranche) {
 			*fillTranche++
 			k.SetTickMap(ctx, pairId, tick)
-
-			reserveData, found = k.GetLimitOrderPoolReserveMap(ctx, pairId, tickIndex, tokenOut, *fillTranche)
-			fillData, _ = k.GetLimitOrderPoolFillMap(ctx, pairId, tickIndex, tokenOut, *fillTranche)
-			if !found {
-				return sdk.ZeroDec(), sdk.ZeroDec(), fmt.Errorf("should not happen2")
-			}
-			reservesTokenOut = &reserveData.Reserves
-			fillTokenIn = &fillData.FilledReserves
-
-			if reservesTokenOut.LTE(amountRemainingTokenIn.Mul(priceInToOut)) {
-				amountOut = amountOut.Add(*reservesTokenOut)
-				amountFilledTokenIn := reservesTokenOut.Mul(priceOutToIn)
-				amountRemainingTokenIn = amountRemainingTokenIn.Sub(amountFilledTokenIn)
-				*reservesTokenOut = sdk.ZeroDec()
-				*fillTokenIn = fillTokenIn.Add(amountFilledTokenIn)
-			} else {
-				amountFilledTokenOut := amountRemainingTokenIn.Mul(priceInToOut)
-				amountOut = amountOut.Add(amountFilledTokenOut)
-				*fillTokenIn = fillTokenIn.Add(amountRemainingTokenIn)
-				*reservesTokenOut = reservesTokenOut.Sub(amountFilledTokenOut)
-				amountRemainingTokenIn = sdk.ZeroDec()
-			}
-			k.SetLimitOrderPoolReserveMap(ctx, reserveData)
-			k.SetLimitOrderPoolFillMap(ctx, fillData)
 		}
-	} else {
-		amountFilledTokenOut := amountRemainingTokenIn.Mul(priceInToOut)
-		amountOut = amountOut.Add(amountFilledTokenOut)
-		*fillTokenIn = fillTokenIn.Add(amountRemainingTokenIn)
-		*reservesTokenOut = reservesTokenOut.Sub(amountFilledTokenOut)
-		amountRemainingTokenIn = sdk.ZeroDec()
-		k.SetLimitOrderPoolReserveMap(ctx, reserveData)
-		k.SetLimitOrderPoolFillMap(ctx, fillData)
+	}
+
+	if amountRemainingTokenIn.GT(sdk.ZeroDec()) {
+		amountRemainingTokenIn, amountOut, err = k.SwapLimitOrderTranche(
+			goCtx,
+			pairId,
+			tokenOut,
+			amountOut,
+			amountRemainingTokenIn,
+			tickIndex,
+			*fillTranche,
+			priceInToOut,
+			priceOutToIn,
+		)
+		if err != nil {
+			return sdk.ZeroDec(), sdk.ZeroDec(), err
+		}
 	}
 
 	pair, _ := k.GetPairMap(ctx, pairId)
-	k.UpdateTickPointersPostRemoveToken1(goCtx, &pair, &tick)
+	k.UpdateTickPointersPostRemoveToken0(goCtx, &pair, &tick)
 
 	return amountRemainingTokenIn, amountOut, nil
 }
@@ -556,7 +537,7 @@ func (k Keeper) SwapLimitOrder1to0(
 	amountOut sdk.Dec,
 	amountRemainingTokenIn sdk.Dec,
 	tickIndex int64,
-) (sdk.Dec, sdk.Dec, error) {
+) (newAmountRemainingTokenIn sdk.Dec, newAmountOut sdk.Dec, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	priceInToOut := CalcPrice1To0(tickIndex)
@@ -570,22 +551,69 @@ func (k Keeper) SwapLimitOrder1to0(
 	fillTranche := &tick.LimitOrderPool0To1.CurrentLimitOrderKey
 	placeTranche := &tick.LimitOrderPool0To1.Count
 
-	reserveData, found := k.GetLimitOrderPoolReserveMap(ctx, pairId, tickIndex, tokenOut, *fillTranche)
-	if !found || reserveData.Reserves.Equal(sdk.ZeroDec()) {
+	for amountRemainingTokenIn.GT(sdk.ZeroDec()) && *fillTranche < *placeTranche {
+		amountRemainingTokenIn, amountOut, err = k.SwapLimitOrderTranche(
+			goCtx,
+			pairId,
+			tokenOut,
+			amountOut,
+			amountRemainingTokenIn,
+			tickIndex,
+			*fillTranche,
+			priceInToOut,
+			priceOutToIn,
+		)
+		if err != nil {
+			return sdk.ZeroDec(), sdk.ZeroDec(), err
+		}
+		if !k.TickTrancheHasToken1(ctx, &tick, *fillTranche) {
+			*fillTranche++
+			k.SetTickMap(ctx, pairId, tick)
+		}
+	}
+
+	if amountRemainingTokenIn.GT(sdk.ZeroDec()) {
+		amountRemainingTokenIn, amountOut, err = k.SwapLimitOrderTranche(
+			goCtx,
+			pairId,
+			tokenOut,
+			amountOut,
+			amountRemainingTokenIn,
+			tickIndex,
+			*fillTranche,
+			priceInToOut,
+			priceOutToIn,
+		)
+		if err != nil {
+			return sdk.ZeroDec(), sdk.ZeroDec(), err
+		}
+	}
+
+	pair, _ := k.GetPairMap(ctx, pairId)
+	k.UpdateTickPointersPostRemoveToken0(goCtx, &pair, &tick)
+
+	return amountRemainingTokenIn, amountOut, nil
+}
+
+func (k Keeper) SwapLimitOrderTranche(
+	goCtx context.Context,
+	pairId string,
+	tokenOut string,
+	amountOut sdk.Dec,
+	amountRemainingTokenIn sdk.Dec,
+	tickIndex int64,
+	trancheIndex uint64,
+	priceInToOut sdk.Dec,
+	priceOutToIn sdk.Dec,
+) (newAmountRemainingTokenIn sdk.Dec, newAmountOut sdk.Dec, error error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	reserveData, found := k.GetLimitOrderPoolReserveMap(ctx, pairId, tickIndex, tokenOut, trancheIndex)
+	fillData, _ := k.GetLimitOrderPoolFillMap(ctx, pairId, tickIndex, tokenOut, trancheIndex)
+	if !found {
 		return amountRemainingTokenIn, amountOut, nil
 	}
 	reservesTokenOut := &reserveData.Reserves
-
-	fillData, found := k.GetLimitOrderPoolFillMap(
-		ctx,
-		pairId,
-		tickIndex,
-		tokenOut,
-		*fillTranche,
-	)
-	if !found {
-		return sdk.ZeroDec(), sdk.ZeroDec(), fmt.Errorf("should not happen3")
-	}
 	fillTokenIn := &fillData.FilledReserves
 
 	if reservesTokenOut.LTE(amountRemainingTokenIn.Mul(priceInToOut)) {
@@ -594,49 +622,15 @@ func (k Keeper) SwapLimitOrder1to0(
 		amountRemainingTokenIn = amountRemainingTokenIn.Sub(amountFilledTokenIn)
 		*reservesTokenOut = sdk.ZeroDec()
 		*fillTokenIn = fillTokenIn.Add(amountFilledTokenIn)
-		k.SetLimitOrderPoolReserveMap(ctx, reserveData)
-		k.SetLimitOrderPoolFillMap(ctx, fillData)
-
-		if *fillTranche != *placeTranche {
-			*fillTranche++
-			k.SetTickMap(ctx, pairId, tick)
-
-			reserveData, found = k.GetLimitOrderPoolReserveMap(ctx, pairId, tickIndex, tokenOut, *fillTranche)
-			fillData, _ = k.GetLimitOrderPoolFillMap(ctx, pairId, tickIndex, tokenOut, *fillTranche)
-			if !found {
-				return sdk.ZeroDec(), sdk.ZeroDec(), fmt.Errorf("should not happen4")
-			}
-			reservesTokenOut = &reserveData.Reserves
-			fillTokenIn = &fillData.FilledReserves
-
-			if reservesTokenOut.LTE(amountRemainingTokenIn.Mul(priceInToOut)) {
-				amountOut = amountOut.Add(*reservesTokenOut)
-				amountFilledTokenIn := reservesTokenOut.Mul(priceOutToIn)
-				amountRemainingTokenIn = amountRemainingTokenIn.Sub(amountFilledTokenIn)
-				*reservesTokenOut = sdk.ZeroDec()
-				*fillTokenIn = fillTokenIn.Add(amountFilledTokenIn)
-			} else {
-				amountFilledTokenOut := amountRemainingTokenIn.Mul(priceInToOut)
-				amountOut = amountOut.Add(amountFilledTokenOut)
-				*fillTokenIn = fillTokenIn.Add(amountRemainingTokenIn)
-				*reservesTokenOut = reservesTokenOut.Sub(amountFilledTokenOut)
-				amountRemainingTokenIn = sdk.ZeroDec()
-			}
-			k.SetLimitOrderPoolReserveMap(ctx, reserveData)
-			k.SetLimitOrderPoolFillMap(ctx, fillData)
-		}
 	} else {
 		amountFilledTokenOut := amountRemainingTokenIn.Mul(priceInToOut)
 		amountOut = amountOut.Add(amountFilledTokenOut)
-		fillData.FilledReserves = fillData.FilledReserves.Add(amountRemainingTokenIn)
-		reserveData.Reserves = reserveData.Reserves.Sub(amountFilledTokenOut)
+		*fillTokenIn = fillTokenIn.Add(amountRemainingTokenIn)
+		*reservesTokenOut = reservesTokenOut.Sub(amountFilledTokenOut)
 		amountRemainingTokenIn = sdk.ZeroDec()
-		k.SetLimitOrderPoolReserveMap(ctx, reserveData)
-		k.SetLimitOrderPoolFillMap(ctx, fillData)
 	}
-
-	pair, _ := k.GetPairMap(ctx, pairId)
-	k.UpdateTickPointersPostRemoveToken0(goCtx, &pair, &tick)
+	k.SetLimitOrderPoolReserveMap(ctx, reserveData)
+	k.SetLimitOrderPoolFillMap(ctx, fillData)
 
 	return amountRemainingTokenIn, amountOut, nil
 }
@@ -648,6 +642,10 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	pair := k.GetOrInitPair(goCtx, token0, token1)
 	pairId := pair.PairId
 	tick := k.GetOrInitTick(goCtx, pair.PairId, msg.TickIndex)
+
+	tickIndex := msg.TickIndex
+	tokenIn := msg.TokenIn
+	receiver := msg.Receiver
 
 	var fillTrancheIndex *uint64
 	var placeTrancheIndex *uint64
@@ -667,15 +665,16 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	}
 
 	FillData := k.GetOrInitTickTrancheFillMap(goCtx, pairId, msg.TickIndex, *placeTrancheIndex, msg.TokenIn)
-	ReserveData, UserShareData, TotalSharesData := k.GetOrInitLimitOrderMaps(goCtx, pairId, msg.TickIndex, msg.TokenIn, *fillTrancheIndex, msg.Receiver)
-	if FillData.FilledReserves.GT(sdk.ZeroDec()) {
+	ReserveData := k.GetOrInitReserveData(goCtx, pairId, tickIndex, tokenIn, *placeTrancheIndex)
+	UserShareData := k.GetOrInitLimitOrderPoolUser(goCtx, pairId, tickIndex, tokenIn, *placeTrancheIndex, receiver)
+	TotalSharesData := k.GetOrInitOrderPoolTotalShares(goCtx, pairId, tickIndex, tokenIn, *placeTrancheIndex)
+	if ReserveData.Reserves.LT(TotalSharesData.TotalShares) {
 		*placeTrancheIndex++
-		if FillData.FilledReserves.Equal(TotalSharesData.TotalShares) {
-			*fillTrancheIndex++
-		}
 		k.SetTickMap(ctx, pairId, tick)
 		FillData = k.GetOrInitTickTrancheFillMap(goCtx, pairId, msg.TickIndex, *placeTrancheIndex, msg.TokenIn)
-		ReserveData, UserShareData, TotalSharesData = k.GetOrInitLimitOrderMaps(goCtx, pairId, msg.TickIndex, msg.TokenIn, *fillTrancheIndex, msg.Receiver)
+		ReserveData = k.GetOrInitReserveData(goCtx, pairId, tickIndex, tokenIn, *placeTrancheIndex)
+		UserShareData = k.GetOrInitLimitOrderPoolUser(goCtx, pairId, tickIndex, tokenIn, *placeTrancheIndex, receiver)
+		TotalSharesData = k.GetOrInitOrderPoolTotalShares(goCtx, pairId, tickIndex, tokenIn, *placeTrancheIndex)
 	}
 	ReserveData.Reserves = ReserveData.Reserves.Add(msg.AmountIn)
 	UserShareData.SharesOwned = UserShareData.SharesOwned.Add(msg.AmountIn)
@@ -683,7 +682,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 
 	k.SetLimitOrderPoolFillMap(ctx, FillData)
 	k.SetLimitOrderPoolReserveMap(ctx, ReserveData)
-	k.SetLimitOrderPoolUserShareMap(ctx, UserShareData)
+	k.SetLimitOrderPoolUser(ctx, UserShareData)
 	k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesData)
 	k.SetPairMap(ctx, pair)
 
@@ -711,36 +710,49 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 // Handles MsgCancelLimitOrder, removing a specifed number of shares from a limit order and returning the respective amount in terms of the reserve to the user
 func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancelLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	attemptedSharesOut := msg.SharesOut
 	pairId := k.CreatePairId(token0, token1)
+
 	tick, tickFound := k.GetTickMap(ctx, pairId, msg.TickIndex)
 	if !tickFound {
 		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Valid tick not found ")
 	}
 
-	UserSharesData, UserSharesDataFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
-	ReserveData, ReserveDataFound := k.GetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
-	TotalSharesData, TotalShareDataFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
-
-	if !UserSharesDataFound || !ReserveDataFound || !TotalShareDataFound {
-		return sdkerrors.Wrapf(types.ErrValidLimitOrderMapsNotFound, "UserShareMap not found")
+	poolUser, found := k.GetLimitOrderPoolUser(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
+	if !found {
+		return types.ErrValidLimitOrderMapsNotFound
 	}
 
-	if msg.SharesOut.GT(UserSharesData.SharesOwned) {
+	ReserveData, found := k.GetLimitOrderPoolReserveMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
+	if !found {
+		return types.ErrValidLimitOrderMapsNotFound
+	}
+	reserves := ReserveData.Reserves
+
+	TotalSharesData, found := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
+	if !found {
+		return types.ErrValidLimitOrderMapsNotFound
+	}
+	totalShares := TotalSharesData.TotalShares
+
+	ratioNotFilled := reserves.Quo(totalShares)
+	maxUserAllowedToCancel := poolUser.SharesOwned.Mul(ratioNotFilled)
+	totalUserAttemptingToCancel := poolUser.SharesCancelled.Add(attemptedSharesOut)
+
+	if totalUserAttemptingToCancel.GT(maxUserAllowedToCancel) {
 		return sdkerrors.Wrapf(types.ErrCannotWithdrawLimitOrder, "sharesOut is larger than shares Owned at the specified tick")
 	}
 
-	amountOut := msg.SharesOut.Mul(ReserveData.Reserves).Quo(TotalSharesData.TotalShares)
+	if totalUserAttemptingToCancel.Add(poolUser.SharesWithdrawn).GT(poolUser.SharesOwned) {
+		return sdkerrors.Wrapf(types.ErrCannotWithdrawLimitOrder, "sharesOut is larger than shares Owned at the specified tick")
+	}
 
-	UserSharesData.SharesOwned = UserSharesData.SharesOwned.Sub(msg.SharesOut)
-	ReserveData.Reserves = ReserveData.Reserves.Sub(amountOut)
-	TotalSharesData.TotalShares = TotalSharesData.TotalShares.Sub(msg.SharesOut)
+	poolUser.SharesCancelled = poolUser.SharesCancelled.Add(attemptedSharesOut)
+	k.SetLimitOrderPoolUser(ctx, poolUser)
 
-	k.SetLimitOrderPoolUserShareMap(ctx, UserSharesData)
-	k.SetLimitOrderPoolReserveMap(ctx, ReserveData)
-	k.SetLimitOrderPoolTotalSharesMap(ctx, TotalSharesData)
-
-	if amountOut.GT(sdk.ZeroDec()) {
-		coinOut := sdk.NewCoin(msg.KeyToken, sdk.NewIntFromBigInt(amountOut.BigInt()))
+	if attemptedSharesOut.GT(sdk.ZeroDec()) {
+		coinOut := sdk.NewCoin(msg.KeyToken, sdk.NewIntFromBigInt(attemptedSharesOut.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
@@ -749,7 +761,7 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	}
 
 	ctx.EventManager().EmitEvent(types.CancelLimitOrderEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.KeyToken, strconv.Itoa(int(msg.Key)), amountOut.String(),
+		token0, token1, msg.KeyToken, strconv.Itoa(int(msg.Key)), attemptedSharesOut.String(),
 	))
 
 	pair, _ := k.GetPairMap(ctx, pairId)
@@ -773,10 +785,6 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 ) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId := k.CreatePairId(token0, token1)
-	tick, found := k.GetTickMap(ctx, pairId, msg.TickIndex)
-	if !found {
-		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Valid tick not found ")
-	}
 
 	orderTokenIn := msg.KeyToken
 	var orderTokenOut string
@@ -788,17 +796,19 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	trancheIndex := msg.Key
 	tickIndex := msg.TickIndex
 
-	FillData, FillDataFound := k.GetLimitOrderPoolFillMap(ctx, pairId, tickIndex, orderTokenIn, trancheIndex)
-	UserShareData, UserShareDataFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, tickIndex, orderTokenIn, trancheIndex, msg.Creator)
-	TotalSharesData, TotalSharesDataFound := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, tickIndex, orderTokenIn, trancheIndex)
-	if !FillDataFound || !UserShareDataFound || !TotalSharesDataFound {
-		return sdkerrors.Wrapf(types.ErrValidLimitOrderMapsNotFound, "Valid mappings for limit order withdraw not found")
+	ReservesData, found := k.GetLimitOrderPoolReserveMap(ctx, pairId, tickIndex, orderTokenIn, trancheIndex)
+	if !found {
+		return types.ErrValidLimitOrderMapsNotFound
 	}
-	amountFilledLimitTokenOut := FillData.FilledReserves
-	userSharesLimitTokenIn := &UserShareData.SharesOwned
+	amountReservesLimitTokenIn := ReservesData.Reserves
+
+	TotalSharesData, found := k.GetLimitOrderPoolTotalSharesMap(ctx, pairId, tickIndex, orderTokenIn, trancheIndex)
+	if !found {
+		return types.ErrValidLimitOrderMapsNotFound
+	}
 	totalSharesLimitTokenIn := TotalSharesData.TotalShares
 
-	UserSharesWithdrawnData, UserSharesWithdrawnDataFound := k.GetLimitOrderPoolUserSharesWithdrawn(
+	poolUser, found := k.GetLimitOrderPoolUser(
 		ctx,
 		pairId,
 		tickIndex,
@@ -806,36 +816,35 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		trancheIndex,
 		msg.Creator,
 	)
-	if !UserSharesWithdrawnDataFound {
-		UserSharesWithdrawnData = types.LimitOrderPoolUserSharesWithdrawn{
-			PairId:          pairId,
-			TickIndex:       msg.TickIndex,
-			Token:           msg.KeyToken,
-			Count:           msg.Key,
-			Address:         msg.Creator,
-			SharesWithdrawn: sdk.ZeroDec(),
-		}
+	if !found {
+		return types.ErrValidLimitOrderMapsNotFound
 	}
-	userSharesWithdrawnLimitTokenIn := &UserSharesWithdrawnData.SharesWithdrawn
 
+	ratioFilled := totalSharesLimitTokenIn.Sub(amountReservesLimitTokenIn).Quo(totalSharesLimitTokenIn)
+	maxAllowedToWithdraw := MinDec(
+		poolUser.SharesOwned.Mul(ratioFilled),              // cannot withdraw more than what's been filled
+		poolUser.SharesOwned.Sub(poolUser.SharesCancelled), // cannot withdraw more than what you own
+	)
+	amountOutTokenIn := maxAllowedToWithdraw.Sub(poolUser.SharesWithdrawn)
+
+	tick, found := k.GetTickMap(ctx, pairId, msg.TickIndex)
+	if !found {
+		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Valid tick not found ")
+	}
 	var priceLimitInToOut sdk.Dec
 	if orderTokenIn == token0 {
 		priceLimitInToOut = CalcPrice0To1(tick.TickIndex)
 	} else {
 		priceLimitInToOut = CalcPrice1To0(tick.TickIndex)
 	}
-	priceLimitOutToIn := sdk.OneDec().Quo(priceLimitInToOut)
-	amountFilledLimitTokenIn := amountFilledLimitTokenOut.Mul(priceLimitOutToIn)
-	ratioFilledTokenIn := amountFilledLimitTokenIn.Quo(totalSharesLimitTokenIn)
-	sharesFilledTokenIn := userSharesLimitTokenIn.Mul(ratioFilledTokenIn)
-	sharesToRemoveTokenIn := sharesFilledTokenIn.Sub(*userSharesWithdrawnLimitTokenIn)
-	amountOut := sharesToRemoveTokenIn.Mul(priceLimitInToOut)
 
-	*userSharesWithdrawnLimitTokenIn = userSharesWithdrawnLimitTokenIn.Add(sharesToRemoveTokenIn)
-	k.SetLimitOrderPoolUserSharesWithdrawn(ctx, UserSharesWithdrawnData)
+	amountOutTokenOut := amountOutTokenIn.Mul(priceLimitInToOut)
 
-	if amountOut.GT(sdk.ZeroDec()) {
-		coinOut := sdk.NewCoin(orderTokenOut, sdk.NewIntFromBigInt(amountOut.BigInt()))
+	poolUser.SharesWithdrawn = maxAllowedToWithdraw
+	k.SetLimitOrderPoolUser(ctx, poolUser)
+
+	if amountOutTokenOut.GT(sdk.ZeroDec()) {
+		coinOut := sdk.NewCoin(orderTokenOut, sdk.NewIntFromBigInt(amountOutTokenOut.BigInt()))
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
@@ -844,7 +853,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	}
 
 	ctx.EventManager().EmitEvent(types.WithdrawFilledLimitOrderEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.KeyToken, strconv.Itoa(int(msg.Key)), amountOut.String(),
+		token0, token1, msg.KeyToken, strconv.Itoa(int(msg.Key)), amountOutTokenOut.String(),
 	))
 
 	return nil

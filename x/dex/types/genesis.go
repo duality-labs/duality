@@ -10,19 +10,18 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		TickMapList:                           []TickMap{},
-		PairMapList:                           []PairMap{},
-		TokensList:                            []Tokens{},
-		TokenMapList:                          []TokenMap{},
-		SharesList:                            []Shares{},
-		FeeListList:                           []FeeList{},
-		EdgeRowList:                           []EdgeRow{},
-		AdjanceyMatrixList:                    []AdjanceyMatrix{},
-		LimitOrderPoolUserShareMapList:        []LimitOrderPoolUserShareMap{},
-		LimitOrderPoolUserSharesWithdrawnList: []LimitOrderPoolUserSharesWithdrawn{},
-		LimitOrderPoolTotalSharesMapList:      []LimitOrderPoolTotalSharesMap{},
-		LimitOrderPoolReserveMapList:          []LimitOrderPoolReserveMap{},
-		LimitOrderPoolFillMapList:             []LimitOrderPoolFillMap{},
+		TickMapList:                      []TickMap{},
+		PairMapList:                      []PairMap{},
+		TokensList:                       []Tokens{},
+		TokenMapList:                     []TokenMap{},
+		SharesList:                       []Shares{},
+		FeeListList:                      []FeeList{},
+		EdgeRowList:                      []EdgeRow{},
+		AdjanceyMatrixList:               []AdjanceyMatrix{},
+		LimitOrderPoolUserList:           []LimitOrderPoolUser{},
+		LimitOrderPoolTotalSharesMapList: []LimitOrderPoolTotalSharesMap{},
+		LimitOrderPoolReserveMapList:     []LimitOrderPoolReserveMap{},
+		LimitOrderPoolFillMapList:        []LimitOrderPoolFillMap{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -119,25 +118,15 @@ func (gs GenesisState) Validate() error {
 		}
 		adjanceyMatrixIdMap[elem.Id] = true
 	}
-	// Check for duplicated index in limitOrderPoolUserShareMap
-	limitOrderPoolUserShareMapIndexMap := make(map[string]struct{})
+	// Check for duplicated index in LimitOrderPoolUser
+	LimitOrderPoolUserIndexMap := make(map[string]struct{})
 
-	for _, elem := range gs.LimitOrderPoolUserShareMapList {
-		index := string(LimitOrderPoolUserShareMapKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count, elem.Address))
-		if _, ok := limitOrderPoolUserShareMapIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for limitOrderPoolUserShareMap")
+	for _, elem := range gs.LimitOrderPoolUserList {
+		index := string(LimitOrderPoolUserKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count, elem.Address))
+		if _, ok := LimitOrderPoolUserIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for LimitOrderPoolUser")
 		}
-		limitOrderPoolUserShareMapIndexMap[index] = struct{}{}
-	}
-	// Check for duplicated index in limitOrderPoolUserSharesWithdrawn
-	limitOrderPoolUserSharesWithdrawnIndexMap := make(map[string]struct{})
-
-	for _, elem := range gs.LimitOrderPoolUserSharesWithdrawnList {
-		index := string(LimitOrderPoolUserSharesWithdrawnKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count, elem.Address))
-		if _, ok := limitOrderPoolUserSharesWithdrawnIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for limitOrderPoolUserSharesWithdrawn")
-		}
-		limitOrderPoolUserSharesWithdrawnIndexMap[index] = struct{}{}
+		LimitOrderPoolUserIndexMap[index] = struct{}{}
 	}
 	// Check for duplicated index in limitOrderPoolTotalSharesMap
 	limitOrderPoolTotalSharesMapIndexMap := make(map[string]struct{})

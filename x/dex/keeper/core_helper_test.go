@@ -473,7 +473,7 @@ func (s *MsgServerTestSuite) TestHasToken0Empty() {
 	reserveData.Reserves = sdk.NewDec(100)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, reserveData)
 
-	s.Assert().False(s.app.DexKeeper.HasToken0(s.ctx, &tick))
+	s.Assert().False(s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
 }
 
 func (s *MsgServerTestSuite) TestHasToken0HasReserves() {
@@ -482,7 +482,7 @@ func (s *MsgServerTestSuite) TestHasToken0HasReserves() {
 	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA/TokenB", 0)
 	tick.TickData.Reserve0AndShares[3].Reserve0 = sdk.NewDec(10)
 
-	s.Assert().True(s.app.DexKeeper.HasToken0(s.ctx, &tick))
+	s.Assert().True(s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
 }
 
 func (s *MsgServerTestSuite) TestHasToken0HasLimitOrders() {
@@ -494,7 +494,7 @@ func (s *MsgServerTestSuite) TestHasToken0HasLimitOrders() {
 	reserveData.Reserves = sdk.NewDec(100)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, reserveData)
 
-	s.Assert().True(s.app.DexKeeper.HasToken0(s.ctx, &tick))
+	s.Assert().True(s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
 }
 
 // HasToken1 //////////////////////////////////////////////////////////////////
@@ -510,7 +510,7 @@ func (s *MsgServerTestSuite) TestHasToken1Empty() {
 	reserveData.Reserves = sdk.NewDec(100)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, reserveData)
 
-	s.Assert().False(s.app.DexKeeper.HasToken1(s.ctx, &tick))
+	s.Assert().False(s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
 }
 
 func (s *MsgServerTestSuite) TestHasToken1HasReserves() {
@@ -520,7 +520,7 @@ func (s *MsgServerTestSuite) TestHasToken1HasReserves() {
 	tick.TickData.Reserve1[0] = sdk.NewDec(10)
 
 	// THEN HasToken1() = true
-	s.Assert().True(s.app.DexKeeper.HasToken1(s.ctx, &tick))
+	s.Assert().True(s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
 }
 
 func (s *MsgServerTestSuite) TestHasToken1HasLimitOrders() {
@@ -532,7 +532,7 @@ func (s *MsgServerTestSuite) TestHasToken1HasLimitOrders() {
 	reserveData.Reserves = sdk.NewDec(100)
 	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, reserveData)
 
-	s.Assert().True(s.app.DexKeeper.HasToken1(s.ctx, &tick))
+	s.Assert().True(s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
 }
 
 // CalcTickPointersPostAddToken0 //////////////////////////////////////////////

@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListLimitOrderPoolUserShareMap() *cobra.Command {
+func CmdListLimitOrderPoolUser() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-limit-order-pool-user-share-map",
-		Short: "list all LimitOrderPoolUserShareMap",
+		Short: "list all LimitOrderPoolUser",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -24,11 +24,11 @@ func CmdListLimitOrderPoolUserShareMap() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllLimitOrderPoolUserShareMapRequest{
+			params := &types.QueryAllLimitOrderPoolUserRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.LimitOrderPoolUserShareMapAll(context.Background(), params)
+			res, err := queryClient.LimitOrderPoolUserAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -43,10 +43,10 @@ func CmdListLimitOrderPoolUserShareMap() *cobra.Command {
 	return cmd
 }
 
-func CmdShowLimitOrderPoolUserShareMap() *cobra.Command {
+func CmdShowLimitOrderPoolUser() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "show-limit-order-pool-user-share-map [count] [address]",
-		Short: "shows a LimitOrderPoolUserShareMap",
+		Short: "shows a LimitOrderPoolUser",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -63,12 +63,12 @@ func CmdShowLimitOrderPoolUserShareMap() *cobra.Command {
 
 			argAddress := args[1]
 
-			params := &types.QueryGetLimitOrderPoolUserShareMapRequest{
+			params := &types.QueryGetLimitOrderPoolUserRequest{
 				Count:   uint64(argCount),
 				Address: argAddress,
 			}
 
-			res, err := queryClient.LimitOrderPoolUserShareMap(context.Background(), params)
+			res, err := queryClient.LimitOrderPoolUser(context.Background(), params)
 			if err != nil {
 				return err
 			}

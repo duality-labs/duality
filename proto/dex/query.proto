@@ -13,8 +13,7 @@ import "dex/shares.proto";
 import "dex/fee_list.proto";
 import "dex/edge_row.proto";
 import "dex/adjancey_matrix.proto";
-import "dex/limit_order_pool_user_share_map.proto";
-import "dex/limit_order_pool_user_shares_withdrawn.proto";
+import "dex/limit_order_pool_user.proto";
 import "dex/limit_order_pool_total_shares_map.proto";
 import "dex/limit_order_pool_reserve_map.proto";
 import "dex/limit_order_pool_fill_map.proto";
@@ -108,27 +107,17 @@ service Query {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/adjancey_matrix";
 	}
 
-// Queries a LimitOrderPoolUserShareMap by index.
-	rpc LimitOrderPoolUserShareMap(QueryGetLimitOrderPoolUserShareMapRequest) returns (QueryGetLimitOrderPoolUserShareMapResponse) {
+  // Queries a LimitOrderPoolUser by index.
+	rpc LimitOrderPoolUser(QueryGetLimitOrderPoolUserRequest) returns (QueryGetLimitOrderPoolUserResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_share_map/{pairId}/{token}/{tickIndex}/{count}/{address}";
 	}
 
-	// Queries a list of LimitOrderPoolUserShareMap items.
-	rpc LimitOrderPoolUserShareMapAll(QueryAllLimitOrderPoolUserShareMapRequest) returns (QueryAllLimitOrderPoolUserShareMapResponse) {
+	// Queries a list of LimitOrderPoolMap items.
+	rpc LimitOrderPoolUserAll(QueryAllLimitOrderPoolUserRequest) returns (QueryAllLimitOrderPoolUserResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_share_map";
 	}
 
-// Queries a LimitOrderPoolUserSharesWithdrawn by index.
-	rpc LimitOrderPoolUserSharesWithdrawn(QueryGetLimitOrderPoolUserSharesWithdrawnRequest) returns (QueryGetLimitOrderPoolUserSharesWithdrawnResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn/{pairId}/{token}/{tickIndex}/{count}/{address}";
-	}
-
-	// Queries a list of LimitOrderPoolUserSharesWithdrawn items.
-	rpc LimitOrderPoolUserSharesWithdrawnAll(QueryAllLimitOrderPoolUserSharesWithdrawnRequest) returns (QueryAllLimitOrderPoolUserSharesWithdrawnResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_user_shares_withdrawn";
-	}
-
-// Queries a LimitOrderPoolTotalSharesMap by index.
+  // Queries a LimitOrderPoolTotalSharesMap by index.
 	rpc LimitOrderPoolTotalSharesMap(QueryGetLimitOrderPoolTotalSharesMapRequest) returns (QueryGetLimitOrderPoolTotalSharesMapResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_pool_total_shares_map/{pairId}/{token}/{tickIndex}/{count}";
 	}
@@ -315,7 +304,7 @@ message QueryAllAdjanceyMatrixResponse {
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-message QueryGetLimitOrderPoolUserShareMapRequest {
+message QueryGetLimitOrderPoolUserRequest {
   string pairId = 1;
   int64 tickIndex =2;
   string token = 3;
@@ -324,37 +313,16 @@ message QueryGetLimitOrderPoolUserShareMapRequest {
 
 }
 
-message QueryGetLimitOrderPoolUserShareMapResponse {
-	LimitOrderPoolUserShareMap limitOrderPoolUserShareMap = 1 [(gogoproto.nullable) = false];
+message QueryGetLimitOrderPoolUserResponse {
+	LimitOrderPoolUser limitOrderPoolUser = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryAllLimitOrderPoolUserShareMapRequest {
+message QueryAllLimitOrderPoolUserRequest {
 	cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-message QueryAllLimitOrderPoolUserShareMapResponse {
-	repeated LimitOrderPoolUserShareMap limitOrderPoolUserShareMap = 1 [(gogoproto.nullable) = false];
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
-}
-
-message QueryGetLimitOrderPoolUserSharesWithdrawnRequest {
-string pairId = 1;
-  int64 tickIndex =2;
-  string token = 3;
-    uint64 count = 4;
-  string address = 5;
-}
-
-message QueryGetLimitOrderPoolUserSharesWithdrawnResponse {
-	LimitOrderPoolUserSharesWithdrawn limitOrderPoolUserSharesWithdrawn = 1 [(gogoproto.nullable) = false];
-}
-
-message QueryAllLimitOrderPoolUserSharesWithdrawnRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
-}
-
-message QueryAllLimitOrderPoolUserSharesWithdrawnResponse {
-	repeated LimitOrderPoolUserSharesWithdrawn limitOrderPoolUserSharesWithdrawn = 1 [(gogoproto.nullable) = false];
+message QueryAllLimitOrderPoolUserResponse {
+	repeated LimitOrderPoolUser limitOrderPoolUser = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

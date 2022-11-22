@@ -61,7 +61,7 @@ func (k Keeper) RemoveLimitOrderPoolTotalSharesMap(
 	))
 }
 
-// GetAllLimitOrderPoolTotalSharesMap returns all limitOrderPoolUserShareMap
+// GetAllLimitOrderPoolTotalSharesMap returns all LimitOrderPoolUser
 func (k Keeper) GetAllLimitOrderPoolTotalSharesMap(ctx sdk.Context) (list []types.LimitOrderPoolTotalSharesMap) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderPoolTotalSharesMapKeyPrefix))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
