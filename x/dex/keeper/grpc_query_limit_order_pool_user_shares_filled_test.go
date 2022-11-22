@@ -21,7 +21,7 @@ var _ = strconv.IntSize
 func TestLimitOrderPoolUserSharesWithdrawnQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolUserSharesWithdrawn(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 2)
+	msgs := createNLimitOrderPoolUserSharesWithdrawn(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetLimitOrderPoolUserSharesWithdrawnRequest
@@ -31,7 +31,7 @@ func TestLimitOrderPoolUserSharesWithdrawnQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetLimitOrderPoolUserSharesWithdrawnRequest{
-				PairId:    "TokenA/TokenB",
+				PairId:    "TokenA<>TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
 				Count:     msgs[0].Count,
@@ -42,7 +42,7 @@ func TestLimitOrderPoolUserSharesWithdrawnQuerySingle(t *testing.T) {
 		{
 			desc: "Second",
 			request: &types.QueryGetLimitOrderPoolUserSharesWithdrawnRequest{
-				PairId:    "TokenA/TokenB",
+				PairId:    "TokenA<>TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
 				Count:     msgs[1].Count,
@@ -53,7 +53,7 @@ func TestLimitOrderPoolUserSharesWithdrawnQuerySingle(t *testing.T) {
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetLimitOrderPoolUserSharesWithdrawnRequest{
-				PairId:    "TokenA/TokenB",
+				PairId:    "TokenA<>TokenB",
 				TickIndex: 0,
 				Token:     "TokenA",
 				Count:     100000,
@@ -84,7 +84,7 @@ func TestLimitOrderPoolUserSharesWithdrawnQuerySingle(t *testing.T) {
 func TestLimitOrderPoolUserSharesWithdrawnQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderPoolUserSharesWithdrawn(keeper, ctx, "TokenA/TokenB", 0, "TokenA", 5)
+	msgs := createNLimitOrderPoolUserSharesWithdrawn(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 5)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderPoolUserSharesWithdrawnRequest {
 		return &types.QueryAllLimitOrderPoolUserSharesWithdrawnRequest{
