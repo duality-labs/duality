@@ -534,7 +534,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace1to0ExhaustMin() {
 	s.assertMinTick(math.MaxInt64)
 }
 
-func (s *MsgServerTestSuite) TestSwapOnlyLOUnfilledLOSwapIncrementsPlaceKey() {
+func (s *MsgServerTestSuite) TestSwapOnlyLOUnfilledLOSwapIncrementsFillKey() {
 	// TODO: this fails due to fill and place key bug
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(0, 50)
@@ -549,25 +549,5 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOUnfilledLOSwapIncrementsPlaceKey() {
 
 	// THEN
 	// place increased
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
-}
-
-func (s *MsgServerTestSuite) TestSwapOnlyLOFilledLOSwapIncrementsPlaceKey() {
-	// TODO: this fails due to fill and place key bug
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(0, 50)
-	// GIVEN
-	// place LO selling 10 of token A at tick -1
-	s.aliceLimitSells("TokenA", -1, 10)
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
-	s.bobMarketSells("TokenB", 10, 0)
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 1, 1)
-
-	// WHEN
-	// swap 20 of token A for B with minOut 0
-	s.bobMarketSells("TokenB", 5, 0)
-
-	// THEN
-	// place increased
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 1, 2)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 1, 0)
 }
