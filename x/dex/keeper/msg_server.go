@@ -25,6 +25,8 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 
 	token0, token1, createrAddr, amount0, amount1, err := k.DepositVerification(goCtx, *msg)
 
+	k.Logger(ctx).Error("AFTER DEPOSITY VERIFY in msgserver.Deposit", "err", err, "token0", token0, "token1", token1)
+
 	if err != nil {
 		return nil, err
 	}
@@ -38,6 +40,8 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 		amount0,
 		amount1,
 	)
+
+	k.Logger(ctx).Error("AFTER DEPOSITCORE in msgserver.Deposit", "err", err, "deposit0", Amounts0Deposit, "deposit1", Amounts1Deposit)
 
 	if err != nil {
 		return nil, err

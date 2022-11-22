@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"strings"
 
@@ -42,6 +43,7 @@ func (k Keeper) GetOrInitPair(goCtx context.Context, token0 string, token1 strin
 	k.TokenInit(ctx, token0)
 	k.TokenInit(ctx, token1)
 	pairId := k.CreatePairId(token0, token1)
+	k.Logger(ctx).Error("GetorInitPair", "pairID", fmt.Sprintf("%q", pairId))
 	pair, found := k.GetPairMap(ctx, pairId)
 	if !found {
 		pair = types.PairMap{
@@ -492,7 +494,6 @@ func (k Keeper) CalcTickPointersPostRemoveToken0(goCtx context.Context, pair *ty
 	minTick := &pair.MinTick
 	cur1To0 := &pair.TokenPair.CurrentTick1To0
 
-
 	// return when we're removing liquidity between the bounds
 	// Or liquidity is not drained
 	if *minTick < tickIndex && tickIndex < *cur1To0 || k.HasToken0(ctx, tick) {
@@ -511,7 +512,7 @@ func (k Keeper) CalcTickPointersPostRemoveToken0(goCtx context.Context, pair *ty
 		// Finds the new minTick
 		nexMinTick := k.FindNewMinTick(goCtx, *pair)
 		*minTick = nexMinTick
-		
+
 		// we are removing liquidity below the current1To0, no need to update that
 	} else if tickIndex == *cur1To0 {
 		next1To0, found := k.FindNextTick1To0(goCtx, *pair)

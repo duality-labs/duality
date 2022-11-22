@@ -103,6 +103,9 @@ func (k Keeper) DepositCore(
 		k.Logger(ctx).Error("AFTER SET PAIR AND TICK MAP")
 
 		k.UpdateTickPointersPostAddToken0(goCtx, &pair, &lowerTick)
+
+		k.Logger(ctx).Error("AFTER UPDATE TICK POINTERS TOKEN0")
+
 		k.UpdateTickPointersPostAddToken1(goCtx, &pair, &upperTick)
 
 		k.Logger(ctx).Error("AFTER UPDATE TICK POINTERS")
@@ -170,7 +173,7 @@ func (k Keeper) DepositCore(
 // Handles core logic for MsgWithdrawl; calculating and withdrawing reserve0,reserve1 from a specified tick given a specfied number of shares to remove.
 // Calculates the amount of reserve0, reserve1 to withdraw based on the percetange of the desired number of shares to remove compared to the total number of shares at the given tick
 func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
-	
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId := k.CreatePairId(token0, token1)
 	pair, found := k.GetPairMap(ctx, pairId)
