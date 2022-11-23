@@ -24,7 +24,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type LimitOrderPoolReserveMap struct {
+type LimitOrderTrancheReserveMap struct {
 	PairId    string                                 `protobuf:"bytes,1,opt,name=pairId,proto3" json:"pairId,omitempty"`
 	Token     string                                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
 	TickIndex int64                                  `protobuf:"varint,3,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
@@ -32,18 +32,18 @@ type LimitOrderPoolReserveMap struct {
 	Reserves  github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,5,opt,name=reserves,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"reserves" yaml:"reserves"`
 }
 
-func (m *LimitOrderPoolReserveMap) Reset()         { *m = LimitOrderPoolReserveMap{} }
-func (m *LimitOrderPoolReserveMap) String() string { return proto.CompactTextString(m) }
-func (*LimitOrderPoolReserveMap) ProtoMessage()    {}
-func (*LimitOrderPoolReserveMap) Descriptor() ([]byte, []int) {
+func (m *LimitOrderTrancheReserveMap) Reset()         { *m = LimitOrderTrancheReserveMap{} }
+func (m *LimitOrderTrancheReserveMap) String() string { return proto.CompactTextString(m) }
+func (*LimitOrderTrancheReserveMap) ProtoMessage()    {}
+func (*LimitOrderTrancheReserveMap) Descriptor() ([]byte, []int) {
 	return fileDescriptor_9c0f8247f33ec8ae, []int{0}
 }
-func (m *LimitOrderPoolReserveMap) XXX_Unmarshal(b []byte) error {
+func (m *LimitOrderTrancheReserveMap) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *LimitOrderPoolReserveMap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *LimitOrderTrancheReserveMap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_LimitOrderPoolReserveMap.Marshal(b, m, deterministic)
+		return xxx_messageInfo_LimitOrderTrancheReserveMap.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -53,40 +53,40 @@ func (m *LimitOrderPoolReserveMap) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-func (m *LimitOrderPoolReserveMap) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_LimitOrderPoolReserveMap.Merge(m, src)
+func (m *LimitOrderTrancheReserveMap) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_LimitOrderTrancheReserveMap.Merge(m, src)
 }
-func (m *LimitOrderPoolReserveMap) XXX_Size() int {
+func (m *LimitOrderTrancheReserveMap) XXX_Size() int {
 	return m.Size()
 }
-func (m *LimitOrderPoolReserveMap) XXX_DiscardUnknown() {
-	xxx_messageInfo_LimitOrderPoolReserveMap.DiscardUnknown(m)
+func (m *LimitOrderTrancheReserveMap) XXX_DiscardUnknown() {
+	xxx_messageInfo_LimitOrderTrancheReserveMap.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_LimitOrderPoolReserveMap proto.InternalMessageInfo
+var xxx_messageInfo_LimitOrderTrancheReserveMap proto.InternalMessageInfo
 
-func (m *LimitOrderPoolReserveMap) GetPairId() string {
+func (m *LimitOrderTrancheReserveMap) GetPairId() string {
 	if m != nil {
 		return m.PairId
 	}
 	return ""
 }
 
-func (m *LimitOrderPoolReserveMap) GetToken() string {
+func (m *LimitOrderTrancheReserveMap) GetToken() string {
 	if m != nil {
 		return m.Token
 	}
 	return ""
 }
 
-func (m *LimitOrderPoolReserveMap) GetTickIndex() int64 {
+func (m *LimitOrderTrancheReserveMap) GetTickIndex() int64 {
 	if m != nil {
 		return m.TickIndex
 	}
 	return 0
 }
 
-func (m *LimitOrderPoolReserveMap) GetCount() uint64 {
+func (m *LimitOrderTrancheReserveMap) GetCount() uint64 {
 	if m != nil {
 		return m.Count
 	}
@@ -94,7 +94,7 @@ func (m *LimitOrderPoolReserveMap) GetCount() uint64 {
 }
 
 func init() {
-	proto.RegisterType((*LimitOrderPoolReserveMap)(nil), "nicholasdotsol.duality.dex.LimitOrderPoolReserveMap")
+	proto.RegisterType((*LimitOrderTrancheReserveMap)(nil), "nicholasdotsol.duality.dex.LimitOrderTrancheReserveMap")
 }
 
 func init() {
@@ -126,7 +126,7 @@ var fileDescriptor_9c0f8247f33ec8ae = []byte{
 	0x01, 0x00, 0x00,
 }
 
-func (m *LimitOrderPoolReserveMap) Marshal() (dAtA []byte, err error) {
+func (m *LimitOrderTrancheReserveMap) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -136,12 +136,12 @@ func (m *LimitOrderPoolReserveMap) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *LimitOrderPoolReserveMap) MarshalTo(dAtA []byte) (int, error) {
+func (m *LimitOrderTrancheReserveMap) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *LimitOrderPoolReserveMap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *LimitOrderTrancheReserveMap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -152,39 +152,39 @@ func (m *LimitOrderPoolReserveMap) MarshalToSizedBuffer(dAtA []byte) (int, error
 		if _, err := m.Reserves.MarshalTo(dAtA[i:]); err != nil {
 			return 0, err
 		}
-		i = encodeVarintLimitOrderPoolReserveMap(dAtA, i, uint64(size))
+		i = encodeVarintLimitOrderTrancheReserveMap(dAtA, i, uint64(size))
 	}
 	i--
 	dAtA[i] = 0x2a
 	if m.Count != 0 {
-		i = encodeVarintLimitOrderPoolReserveMap(dAtA, i, uint64(m.Count))
+		i = encodeVarintLimitOrderTrancheReserveMap(dAtA, i, uint64(m.Count))
 		i--
 		dAtA[i] = 0x20
 	}
 	if m.TickIndex != 0 {
-		i = encodeVarintLimitOrderPoolReserveMap(dAtA, i, uint64(m.TickIndex))
+		i = encodeVarintLimitOrderTrancheReserveMap(dAtA, i, uint64(m.TickIndex))
 		i--
 		dAtA[i] = 0x18
 	}
 	if len(m.Token) > 0 {
 		i -= len(m.Token)
 		copy(dAtA[i:], m.Token)
-		i = encodeVarintLimitOrderPoolReserveMap(dAtA, i, uint64(len(m.Token)))
+		i = encodeVarintLimitOrderTrancheReserveMap(dAtA, i, uint64(len(m.Token)))
 		i--
 		dAtA[i] = 0x12
 	}
 	if len(m.PairId) > 0 {
 		i -= len(m.PairId)
 		copy(dAtA[i:], m.PairId)
-		i = encodeVarintLimitOrderPoolReserveMap(dAtA, i, uint64(len(m.PairId)))
+		i = encodeVarintLimitOrderTrancheReserveMap(dAtA, i, uint64(len(m.PairId)))
 		i--
 		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
 
-func encodeVarintLimitOrderPoolReserveMap(dAtA []byte, offset int, v uint64) int {
-	offset -= sovLimitOrderPoolReserveMap(v)
+func encodeVarintLimitOrderTrancheReserveMap(dAtA []byte, offset int, v uint64) int {
+	offset -= sovLimitOrderTrancheReserveMap(v)
 	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
@@ -194,7 +194,7 @@ func encodeVarintLimitOrderPoolReserveMap(dAtA []byte, offset int, v uint64) int
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *LimitOrderPoolReserveMap) Size() (n int) {
+func (m *LimitOrderTrancheReserveMap) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -202,30 +202,30 @@ func (m *LimitOrderPoolReserveMap) Size() (n int) {
 	_ = l
 	l = len(m.PairId)
 	if l > 0 {
-		n += 1 + l + sovLimitOrderPoolReserveMap(uint64(l))
+		n += 1 + l + sovLimitOrderTrancheReserveMap(uint64(l))
 	}
 	l = len(m.Token)
 	if l > 0 {
-		n += 1 + l + sovLimitOrderPoolReserveMap(uint64(l))
+		n += 1 + l + sovLimitOrderTrancheReserveMap(uint64(l))
 	}
 	if m.TickIndex != 0 {
-		n += 1 + sovLimitOrderPoolReserveMap(uint64(m.TickIndex))
+		n += 1 + sovLimitOrderTrancheReserveMap(uint64(m.TickIndex))
 	}
 	if m.Count != 0 {
-		n += 1 + sovLimitOrderPoolReserveMap(uint64(m.Count))
+		n += 1 + sovLimitOrderTrancheReserveMap(uint64(m.Count))
 	}
 	l = m.Reserves.Size()
-	n += 1 + l + sovLimitOrderPoolReserveMap(uint64(l))
+	n += 1 + l + sovLimitOrderTrancheReserveMap(uint64(l))
 	return n
 }
 
-func sovLimitOrderPoolReserveMap(x uint64) (n int) {
+func sovLimitOrderTrancheReserveMap(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
-func sozLimitOrderPoolReserveMap(x uint64) (n int) {
-	return sovLimitOrderPoolReserveMap(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+func sozLimitOrderTrancheReserveMap(x uint64) (n int) {
+	return sovLimitOrderTrancheReserveMap(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *LimitOrderPoolReserveMap) Unmarshal(dAtA []byte) error {
+func (m *LimitOrderTrancheReserveMap) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -233,7 +233,7 @@ func (m *LimitOrderPoolReserveMap) Unmarshal(dAtA []byte) error {
 		var wire uint64
 		for shift := uint(0); ; shift += 7 {
 			if shift >= 64 {
-				return ErrIntOverflowLimitOrderPoolReserveMap
+				return ErrIntOverflowLimitOrderTrancheReserveMap
 			}
 			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
@@ -248,10 +248,10 @@ func (m *LimitOrderPoolReserveMap) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: LimitOrderPoolReserveMap: wiretype end group for non-group")
+			return fmt.Errorf("proto: LimitOrderTrancheReserveMap: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: LimitOrderPoolReserveMap: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: LimitOrderTrancheReserveMap: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -261,7 +261,7 @@ func (m *LimitOrderPoolReserveMap) Unmarshal(dAtA []byte) error {
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return ErrIntOverflowLimitOrderPoolReserveMap
+					return ErrIntOverflowLimitOrderTrancheReserveMap
 				}
 				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
@@ -275,11 +275,11 @@ func (m *LimitOrderPoolReserveMap) Unmarshal(dAtA []byte) error {
 			}
 			intStringLen := int(stringLen)
 			if intStringLen < 0 {
-				return ErrInvalidLengthLimitOrderPoolReserveMap
+				return ErrInvalidLengthLimitOrderTrancheReserveMap
 			}
 			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
-				return ErrInvalidLengthLimitOrderPoolReserveMap
+				return ErrInvalidLengthLimitOrderTrancheReserveMap
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
@@ -293,7 +293,7 @@ func (m *LimitOrderPoolReserveMap) Unmarshal(dAtA []byte) error {
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return ErrIntOverflowLimitOrderPoolReserveMap
+					return ErrIntOverflowLimitOrderTrancheReserveMap
 				}
 				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
@@ -307,11 +307,11 @@ func (m *LimitOrderPoolReserveMap) Unmarshal(dAtA []byte) error {
 			}
 			intStringLen := int(stringLen)
 			if intStringLen < 0 {
-				return ErrInvalidLengthLimitOrderPoolReserveMap
+				return ErrInvalidLengthLimitOrderTrancheReserveMap
 			}
 			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
-				return ErrInvalidLengthLimitOrderPoolReserveMap
+				return ErrInvalidLengthLimitOrderTrancheReserveMap
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
@@ -325,7 +325,7 @@ func (m *LimitOrderPoolReserveMap) Unmarshal(dAtA []byte) error {
 			m.TickIndex = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return ErrIntOverflowLimitOrderPoolReserveMap
+					return ErrIntOverflowLimitOrderTrancheReserveMap
 				}
 				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
@@ -344,7 +344,7 @@ func (m *LimitOrderPoolReserveMap) Unmarshal(dAtA []byte) error {
 			m.Count = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return ErrIntOverflowLimitOrderPoolReserveMap
+					return ErrIntOverflowLimitOrderTrancheReserveMap
 				}
 				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
@@ -363,7 +363,7 @@ func (m *LimitOrderPoolReserveMap) Unmarshal(dAtA []byte) error {
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return ErrIntOverflowLimitOrderPoolReserveMap
+					return ErrIntOverflowLimitOrderTrancheReserveMap
 				}
 				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
@@ -377,11 +377,11 @@ func (m *LimitOrderPoolReserveMap) Unmarshal(dAtA []byte) error {
 			}
 			intStringLen := int(stringLen)
 			if intStringLen < 0 {
-				return ErrInvalidLengthLimitOrderPoolReserveMap
+				return ErrInvalidLengthLimitOrderTrancheReserveMap
 			}
 			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
-				return ErrInvalidLengthLimitOrderPoolReserveMap
+				return ErrInvalidLengthLimitOrderTrancheReserveMap
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
@@ -392,12 +392,12 @@ func (m *LimitOrderPoolReserveMap) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
-			skippy, err := skipLimitOrderPoolReserveMap(dAtA[iNdEx:])
+			skippy, err := skipLimitOrderTrancheReserveMap(dAtA[iNdEx:])
 			if err != nil {
 				return err
 			}
 			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthLimitOrderPoolReserveMap
+				return ErrInvalidLengthLimitOrderTrancheReserveMap
 			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
@@ -411,7 +411,7 @@ func (m *LimitOrderPoolReserveMap) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func skipLimitOrderPoolReserveMap(dAtA []byte) (n int, err error) {
+func skipLimitOrderTrancheReserveMap(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
 	depth := 0
@@ -419,7 +419,7 @@ func skipLimitOrderPoolReserveMap(dAtA []byte) (n int, err error) {
 		var wire uint64
 		for shift := uint(0); ; shift += 7 {
 			if shift >= 64 {
-				return 0, ErrIntOverflowLimitOrderPoolReserveMap
+				return 0, ErrIntOverflowLimitOrderTrancheReserveMap
 			}
 			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
@@ -436,7 +436,7 @@ func skipLimitOrderPoolReserveMap(dAtA []byte) (n int, err error) {
 		case 0:
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return 0, ErrIntOverflowLimitOrderPoolReserveMap
+					return 0, ErrIntOverflowLimitOrderTrancheReserveMap
 				}
 				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
@@ -452,7 +452,7 @@ func skipLimitOrderPoolReserveMap(dAtA []byte) (n int, err error) {
 			var length int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return 0, ErrIntOverflowLimitOrderPoolReserveMap
+					return 0, ErrIntOverflowLimitOrderTrancheReserveMap
 				}
 				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
@@ -465,14 +465,14 @@ func skipLimitOrderPoolReserveMap(dAtA []byte) (n int, err error) {
 				}
 			}
 			if length < 0 {
-				return 0, ErrInvalidLengthLimitOrderPoolReserveMap
+				return 0, ErrInvalidLengthLimitOrderTrancheReserveMap
 			}
 			iNdEx += length
 		case 3:
 			depth++
 		case 4:
 			if depth == 0 {
-				return 0, ErrUnexpectedEndOfGroupLimitOrderPoolReserveMap
+				return 0, ErrUnexpectedEndOfGroupLimitOrderTrancheReserveMap
 			}
 			depth--
 		case 5:
@@ -481,7 +481,7 @@ func skipLimitOrderPoolReserveMap(dAtA []byte) (n int, err error) {
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
 		}
 		if iNdEx < 0 {
-			return 0, ErrInvalidLengthLimitOrderPoolReserveMap
+			return 0, ErrInvalidLengthLimitOrderTrancheReserveMap
 		}
 		if depth == 0 {
 			return iNdEx, nil
@@ -491,7 +491,7 @@ func skipLimitOrderPoolReserveMap(dAtA []byte) (n int, err error) {
 }
 
 var (
-	ErrInvalidLengthLimitOrderPoolReserveMap        = fmt.Errorf("proto: negative length found during unmarshaling")
-	ErrIntOverflowLimitOrderPoolReserveMap          = fmt.Errorf("proto: integer overflow")
-	ErrUnexpectedEndOfGroupLimitOrderPoolReserveMap = fmt.Errorf("proto: unexpected end of group")
+	ErrInvalidLengthLimitOrderTrancheReserveMap        = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowLimitOrderTrancheReserveMap          = fmt.Errorf("proto: integer overflow")
+	ErrUnexpectedEndOfGroupLimitOrderTrancheReserveMap = fmt.Errorf("proto: unexpected end of group")
 )

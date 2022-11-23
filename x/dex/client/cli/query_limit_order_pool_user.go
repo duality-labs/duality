@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListLimitOrderPoolTotalSharesMap() *cobra.Command {
+func CmdListLimitOrderTrancheUser() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-limit-order-pool-total-shares-map",
-		Short: "list all LimitOrderPoolTotalSharesMap",
+		Use:   "list-limit-order-pool-user-share-map",
+		Short: "list all LimitOrderTrancheUser",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -24,11 +24,11 @@ func CmdListLimitOrderPoolTotalSharesMap() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllLimitOrderPoolTotalSharesMapRequest{
+			params := &types.QueryAllLimitOrderTrancheUserRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.LimitOrderPoolTotalSharesMapAll(context.Background(), params)
+			res, err := queryClient.LimitOrderTrancheUserAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -43,11 +43,11 @@ func CmdListLimitOrderPoolTotalSharesMap() *cobra.Command {
 	return cmd
 }
 
-func CmdShowLimitOrderPoolTotalSharesMap() *cobra.Command {
+func CmdShowLimitOrderTrancheUser() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-limit-order-pool-total-shares-map [count]",
-		Short: "shows a LimitOrderPoolTotalSharesMap",
-		Args:  cobra.ExactArgs(1),
+		Use:   "show-limit-order-pool-user-share-map [count] [address]",
+		Short: "shows a LimitOrderTrancheUser",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -61,11 +61,14 @@ func CmdShowLimitOrderPoolTotalSharesMap() *cobra.Command {
 				return err
 			}
 
-			params := &types.QueryGetLimitOrderPoolTotalSharesMapRequest{
-				Count: uint64(argCount),
+			argAddress := args[1]
+
+			params := &types.QueryGetLimitOrderTrancheUserRequest{
+				Count:   uint64(argCount),
+				Address: argAddress,
 			}
 
-			res, err := queryClient.LimitOrderPoolTotalSharesMap(context.Background(), params)
+			res, err := queryClient.LimitOrderTrancheUser(context.Background(), params)
 			if err != nil {
 				return err
 			}

@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
 // SingleLimitOrderFill() simulates the fill of a single limit order and returns the amount
 // swapped into it, filling some of it (amount_in) and the amount swapped out (amount_out). It
 // takes as input the amount that was placed for the limit order (amount_placed), the price the
@@ -39,6 +40,7 @@ func SingleLimitOrderFillAndUpdate(amount_placed sdk.Dec,
 	amount_to_swap_remaining := amount_to_swap.Sub(amount_in)
 	return unfilled_reserves, filled_reserves, amount_to_swap_remaining
 }
+
 // MultipleLimitOrderFills() simulates the fill of multiple consecutive limit orders and returns the
 // total amount filled. It takes as input the amounts that were placed for the limit
 // order (amount_placed), the pricesthe trader pays when filling the orders (price_filled_at)
@@ -48,7 +50,6 @@ func MultipleLimitOrderFills(amounts_placed []sdk.Dec, prices []sdk.Dec, amount_
 
 	// Loops through all of the limit orders that need to be filled
 	for i := 0; i < len(amounts_placed); i++ {
-
 		amount_in, amount_out := SingleLimitOrderFill(amounts_placed[i], prices[i], amount_remaining)
 
 		amount_remaining = amount_remaining.Sub(amount_in)
@@ -56,6 +57,7 @@ func MultipleLimitOrderFills(amounts_placed []sdk.Dec, prices []sdk.Dec, amount_
 	}
 	return total_out
 }
+
 // SinglePoolSwap() simulates swapping through a single liquidity pool and returns the amount
 // swapped into it (amount_in) and the amount swapped out, received by the swapper (amount_out). It
 // takes as input the amount of liquidity in the pool (amount_liquidity), the price the
@@ -74,6 +76,7 @@ func SinglePoolSwap(amount_liquidity sdk.Dec, price_swapped_at sdk.Dec, amount_t
 	}
 	return amount_in, amount_out
 }
+
 // SinglePoolSwapAndUpdate() simulates swapping through a single liquidity pool and updates that pool's
 // liquidity. Takes in all of the same inputs as SinglePoolSwap(): amount_liquidity, price_swapped_at,
 // and amount_to_swap; but has additional inputs, reservesOfInToken, reservesOfOutToken. It returns the
@@ -89,6 +92,7 @@ func SinglePoolSwapAndUpdate(amount_liquidity sdk.Dec,
 	resulting_reserves_out_token := reservesOfOutToken.Add(amount_out)
 	return resulting_reserves_in_token, resulting_reserves_out_token, amount_in, amount_out
 }
+
 // SinglePoolSwapAndUpdateDirection() simulates swapping through a single liquidity pool and updates that pool's
 // liquidity and specifies whether the in and out tokens are 0 or 1. Takes in all of the same inputs as
 // SinglePoolSwapAndUpdate(): amount_liquidity, price_swapped_at, amount_to_swap, reservesOfToken0 sdk.Dec,
@@ -117,6 +121,7 @@ func SinglePoolSwapAndUpdateDirectional(amount_liquidity sdk.Dec,
 	}
 	return resultingReservesOfToken0, resultingReservesOfToken1
 }
+
 // MultiplePoolSwapAndUpdate() simulates swapping through multiple liquidity pools and updates that pool's
 // liquidity. Takes in similar inputs to SinglePoolSwapAndUpdate(): amount_liquidity, price_swapped_at,
 // and amount_to_swap, reservesOfInToken, reservesOfOutToken; But they are held in arrays the size of how many
@@ -146,15 +151,14 @@ func MultiplePoolSwapAndUpdate(amounts_liquidity []sdk.Dec,
 	return resulting_reserves_in_token, resulting_reserves_out_token, amount_remaining, amount_out_total
 }
 
-
 func SharesOnDeposit(existing_shares sdk.Dec, existing_amount0 sdk.Dec, existing_amount1 sdk.Dec, new_amount0 sdk.Dec, new_amount1 sdk.Dec, tickIndex int64) (shares_minted sdk.Dec) {
 	price1To0 := keeper.CalcPrice1To0(tickIndex)
 
-	new_value := new_amount0.Add( price1To0.Mul( new_amount1 ) )
+	new_value := new_amount0.Add(price1To0.Mul(new_amount1))
 
 	if existing_amount0.Add(existing_amount1).GT(sdk.ZeroDec()) {
-		existing_value := existing_amount0.Add( price1To0.Mul( existing_amount1 ) )
-		shares_minted = shares_minted.Mul( new_value.Quo( existing_value ) )
+		existing_value := existing_amount0.Add(price1To0.Mul(existing_amount1))
+		shares_minted = shares_minted.Mul(new_value.Quo(existing_value))
 	} else {
 		shares_minted = new_value
 	}

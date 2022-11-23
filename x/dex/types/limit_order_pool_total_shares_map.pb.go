@@ -24,7 +24,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type LimitOrderPoolTotalSharesMap struct {
+type LimitOrderTrancheTotalSharesMap struct {
 	PairId      string                                 `protobuf:"bytes,1,opt,name=pairId,proto3" json:"pairId,omitempty"`
 	Token       string                                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
 	TickIndex   int64                                  `protobuf:"varint,3,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
@@ -32,18 +32,18 @@ type LimitOrderPoolTotalSharesMap struct {
 	TotalShares github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,5,opt,name=totalShares,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"totalShares" yaml:"totalShares"`
 }
 
-func (m *LimitOrderPoolTotalSharesMap) Reset()         { *m = LimitOrderPoolTotalSharesMap{} }
-func (m *LimitOrderPoolTotalSharesMap) String() string { return proto.CompactTextString(m) }
-func (*LimitOrderPoolTotalSharesMap) ProtoMessage()    {}
-func (*LimitOrderPoolTotalSharesMap) Descriptor() ([]byte, []int) {
+func (m *LimitOrderTrancheTotalSharesMap) Reset()         { *m = LimitOrderTrancheTotalSharesMap{} }
+func (m *LimitOrderTrancheTotalSharesMap) String() string { return proto.CompactTextString(m) }
+func (*LimitOrderTrancheTotalSharesMap) ProtoMessage()    {}
+func (*LimitOrderTrancheTotalSharesMap) Descriptor() ([]byte, []int) {
 	return fileDescriptor_da0d15e5c08e1bd4, []int{0}
 }
-func (m *LimitOrderPoolTotalSharesMap) XXX_Unmarshal(b []byte) error {
+func (m *LimitOrderTrancheTotalSharesMap) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *LimitOrderPoolTotalSharesMap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *LimitOrderTrancheTotalSharesMap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_LimitOrderPoolTotalSharesMap.Marshal(b, m, deterministic)
+		return xxx_messageInfo_LimitOrderTrancheTotalSharesMap.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -53,40 +53,40 @@ func (m *LimitOrderPoolTotalSharesMap) XXX_Marshal(b []byte, deterministic bool)
 		return b[:n], nil
 	}
 }
-func (m *LimitOrderPoolTotalSharesMap) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_LimitOrderPoolTotalSharesMap.Merge(m, src)
+func (m *LimitOrderTrancheTotalSharesMap) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_LimitOrderTrancheTotalSharesMap.Merge(m, src)
 }
-func (m *LimitOrderPoolTotalSharesMap) XXX_Size() int {
+func (m *LimitOrderTrancheTotalSharesMap) XXX_Size() int {
 	return m.Size()
 }
-func (m *LimitOrderPoolTotalSharesMap) XXX_DiscardUnknown() {
-	xxx_messageInfo_LimitOrderPoolTotalSharesMap.DiscardUnknown(m)
+func (m *LimitOrderTrancheTotalSharesMap) XXX_DiscardUnknown() {
+	xxx_messageInfo_LimitOrderTrancheTotalSharesMap.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_LimitOrderPoolTotalSharesMap proto.InternalMessageInfo
+var xxx_messageInfo_LimitOrderTrancheTotalSharesMap proto.InternalMessageInfo
 
-func (m *LimitOrderPoolTotalSharesMap) GetPairId() string {
+func (m *LimitOrderTrancheTotalSharesMap) GetPairId() string {
 	if m != nil {
 		return m.PairId
 	}
 	return ""
 }
 
-func (m *LimitOrderPoolTotalSharesMap) GetToken() string {
+func (m *LimitOrderTrancheTotalSharesMap) GetToken() string {
 	if m != nil {
 		return m.Token
 	}
 	return ""
 }
 
-func (m *LimitOrderPoolTotalSharesMap) GetTickIndex() int64 {
+func (m *LimitOrderTrancheTotalSharesMap) GetTickIndex() int64 {
 	if m != nil {
 		return m.TickIndex
 	}
 	return 0
 }
 
-func (m *LimitOrderPoolTotalSharesMap) GetCount() uint64 {
+func (m *LimitOrderTrancheTotalSharesMap) GetCount() uint64 {
 	if m != nil {
 		return m.Count
 	}
@@ -94,7 +94,7 @@ func (m *LimitOrderPoolTotalSharesMap) GetCount() uint64 {
 }
 
 func init() {
-	proto.RegisterType((*LimitOrderPoolTotalSharesMap)(nil), "nicholasdotsol.duality.dex.LimitOrderPoolTotalSharesMap")
+	proto.RegisterType((*LimitOrderTrancheTotalSharesMap)(nil), "nicholasdotsol.duality.dex.LimitOrderTrancheTotalSharesMap")
 }
 
 func init() {
@@ -126,7 +126,7 @@ var fileDescriptor_da0d15e5c08e1bd4 = []byte{
 	0x2b, 0x30, 0x26, 0xeb, 0xaa, 0x01, 0x00, 0x00,
 }
 
-func (m *LimitOrderPoolTotalSharesMap) Marshal() (dAtA []byte, err error) {
+func (m *LimitOrderTrancheTotalSharesMap) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -136,12 +136,12 @@ func (m *LimitOrderPoolTotalSharesMap) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *LimitOrderPoolTotalSharesMap) MarshalTo(dAtA []byte) (int, error) {
+func (m *LimitOrderTrancheTotalSharesMap) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *LimitOrderPoolTotalSharesMap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *LimitOrderTrancheTotalSharesMap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -152,39 +152,39 @@ func (m *LimitOrderPoolTotalSharesMap) MarshalToSizedBuffer(dAtA []byte) (int, e
 		if _, err := m.TotalShares.MarshalTo(dAtA[i:]); err != nil {
 			return 0, err
 		}
-		i = encodeVarintLimitOrderPoolTotalSharesMap(dAtA, i, uint64(size))
+		i = encodeVarintLimitOrderTrancheTotalSharesMap(dAtA, i, uint64(size))
 	}
 	i--
 	dAtA[i] = 0x2a
 	if m.Count != 0 {
-		i = encodeVarintLimitOrderPoolTotalSharesMap(dAtA, i, uint64(m.Count))
+		i = encodeVarintLimitOrderTrancheTotalSharesMap(dAtA, i, uint64(m.Count))
 		i--
 		dAtA[i] = 0x20
 	}
 	if m.TickIndex != 0 {
-		i = encodeVarintLimitOrderPoolTotalSharesMap(dAtA, i, uint64(m.TickIndex))
+		i = encodeVarintLimitOrderTrancheTotalSharesMap(dAtA, i, uint64(m.TickIndex))
 		i--
 		dAtA[i] = 0x18
 	}
 	if len(m.Token) > 0 {
 		i -= len(m.Token)
 		copy(dAtA[i:], m.Token)
-		i = encodeVarintLimitOrderPoolTotalSharesMap(dAtA, i, uint64(len(m.Token)))
+		i = encodeVarintLimitOrderTrancheTotalSharesMap(dAtA, i, uint64(len(m.Token)))
 		i--
 		dAtA[i] = 0x12
 	}
 	if len(m.PairId) > 0 {
 		i -= len(m.PairId)
 		copy(dAtA[i:], m.PairId)
-		i = encodeVarintLimitOrderPoolTotalSharesMap(dAtA, i, uint64(len(m.PairId)))
+		i = encodeVarintLimitOrderTrancheTotalSharesMap(dAtA, i, uint64(len(m.PairId)))
 		i--
 		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
 
-func encodeVarintLimitOrderPoolTotalSharesMap(dAtA []byte, offset int, v uint64) int {
-	offset -= sovLimitOrderPoolTotalSharesMap(v)
+func encodeVarintLimitOrderTrancheTotalSharesMap(dAtA []byte, offset int, v uint64) int {
+	offset -= sovLimitOrderTrancheTotalSharesMap(v)
 	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
@@ -194,7 +194,7 @@ func encodeVarintLimitOrderPoolTotalSharesMap(dAtA []byte, offset int, v uint64)
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *LimitOrderPoolTotalSharesMap) Size() (n int) {
+func (m *LimitOrderTrancheTotalSharesMap) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -202,30 +202,30 @@ func (m *LimitOrderPoolTotalSharesMap) Size() (n int) {
 	_ = l
 	l = len(m.PairId)
 	if l > 0 {
-		n += 1 + l + sovLimitOrderPoolTotalSharesMap(uint64(l))
+		n += 1 + l + sovLimitOrderTrancheTotalSharesMap(uint64(l))
 	}
 	l = len(m.Token)
 	if l > 0 {
-		n += 1 + l + sovLimitOrderPoolTotalSharesMap(uint64(l))
+		n += 1 + l + sovLimitOrderTrancheTotalSharesMap(uint64(l))
 	}
 	if m.TickIndex != 0 {
-		n += 1 + sovLimitOrderPoolTotalSharesMap(uint64(m.TickIndex))
+		n += 1 + sovLimitOrderTrancheTotalSharesMap(uint64(m.TickIndex))
 	}
 	if m.Count != 0 {
-		n += 1 + sovLimitOrderPoolTotalSharesMap(uint64(m.Count))
+		n += 1 + sovLimitOrderTrancheTotalSharesMap(uint64(m.Count))
 	}
 	l = m.TotalShares.Size()
-	n += 1 + l + sovLimitOrderPoolTotalSharesMap(uint64(l))
+	n += 1 + l + sovLimitOrderTrancheTotalSharesMap(uint64(l))
 	return n
 }
 
-func sovLimitOrderPoolTotalSharesMap(x uint64) (n int) {
+func sovLimitOrderTrancheTotalSharesMap(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
-func sozLimitOrderPoolTotalSharesMap(x uint64) (n int) {
-	return sovLimitOrderPoolTotalSharesMap(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+func sozLimitOrderTrancheTotalSharesMap(x uint64) (n int) {
+	return sovLimitOrderTrancheTotalSharesMap(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *LimitOrderPoolTotalSharesMap) Unmarshal(dAtA []byte) error {
+func (m *LimitOrderTrancheTotalSharesMap) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -233,7 +233,7 @@ func (m *LimitOrderPoolTotalSharesMap) Unmarshal(dAtA []byte) error {
 		var wire uint64
 		for shift := uint(0); ; shift += 7 {
 			if shift >= 64 {
-				return ErrIntOverflowLimitOrderPoolTotalSharesMap
+				return ErrIntOverflowLimitOrderTrancheTotalSharesMap
 			}
 			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
@@ -248,10 +248,10 @@ func (m *LimitOrderPoolTotalSharesMap) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: LimitOrderPoolTotalSharesMap: wiretype end group for non-group")
+			return fmt.Errorf("proto: LimitOrderTrancheTotalSharesMap: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: LimitOrderPoolTotalSharesMap: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: LimitOrderTrancheTotalSharesMap: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -261,7 +261,7 @@ func (m *LimitOrderPoolTotalSharesMap) Unmarshal(dAtA []byte) error {
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return ErrIntOverflowLimitOrderPoolTotalSharesMap
+					return ErrIntOverflowLimitOrderTrancheTotalSharesMap
 				}
 				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
@@ -275,11 +275,11 @@ func (m *LimitOrderPoolTotalSharesMap) Unmarshal(dAtA []byte) error {
 			}
 			intStringLen := int(stringLen)
 			if intStringLen < 0 {
-				return ErrInvalidLengthLimitOrderPoolTotalSharesMap
+				return ErrInvalidLengthLimitOrderTrancheTotalSharesMap
 			}
 			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
-				return ErrInvalidLengthLimitOrderPoolTotalSharesMap
+				return ErrInvalidLengthLimitOrderTrancheTotalSharesMap
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
@@ -293,7 +293,7 @@ func (m *LimitOrderPoolTotalSharesMap) Unmarshal(dAtA []byte) error {
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return ErrIntOverflowLimitOrderPoolTotalSharesMap
+					return ErrIntOverflowLimitOrderTrancheTotalSharesMap
 				}
 				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
@@ -307,11 +307,11 @@ func (m *LimitOrderPoolTotalSharesMap) Unmarshal(dAtA []byte) error {
 			}
 			intStringLen := int(stringLen)
 			if intStringLen < 0 {
-				return ErrInvalidLengthLimitOrderPoolTotalSharesMap
+				return ErrInvalidLengthLimitOrderTrancheTotalSharesMap
 			}
 			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
-				return ErrInvalidLengthLimitOrderPoolTotalSharesMap
+				return ErrInvalidLengthLimitOrderTrancheTotalSharesMap
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
@@ -325,7 +325,7 @@ func (m *LimitOrderPoolTotalSharesMap) Unmarshal(dAtA []byte) error {
 			m.TickIndex = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return ErrIntOverflowLimitOrderPoolTotalSharesMap
+					return ErrIntOverflowLimitOrderTrancheTotalSharesMap
 				}
 				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
@@ -344,7 +344,7 @@ func (m *LimitOrderPoolTotalSharesMap) Unmarshal(dAtA []byte) error {
 			m.Count = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return ErrIntOverflowLimitOrderPoolTotalSharesMap
+					return ErrIntOverflowLimitOrderTrancheTotalSharesMap
 				}
 				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
@@ -363,7 +363,7 @@ func (m *LimitOrderPoolTotalSharesMap) Unmarshal(dAtA []byte) error {
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return ErrIntOverflowLimitOrderPoolTotalSharesMap
+					return ErrIntOverflowLimitOrderTrancheTotalSharesMap
 				}
 				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
@@ -377,11 +377,11 @@ func (m *LimitOrderPoolTotalSharesMap) Unmarshal(dAtA []byte) error {
 			}
 			intStringLen := int(stringLen)
 			if intStringLen < 0 {
-				return ErrInvalidLengthLimitOrderPoolTotalSharesMap
+				return ErrInvalidLengthLimitOrderTrancheTotalSharesMap
 			}
 			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
-				return ErrInvalidLengthLimitOrderPoolTotalSharesMap
+				return ErrInvalidLengthLimitOrderTrancheTotalSharesMap
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
@@ -392,12 +392,12 @@ func (m *LimitOrderPoolTotalSharesMap) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
-			skippy, err := skipLimitOrderPoolTotalSharesMap(dAtA[iNdEx:])
+			skippy, err := skipLimitOrderTrancheTotalSharesMap(dAtA[iNdEx:])
 			if err != nil {
 				return err
 			}
 			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthLimitOrderPoolTotalSharesMap
+				return ErrInvalidLengthLimitOrderTrancheTotalSharesMap
 			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
@@ -411,7 +411,7 @@ func (m *LimitOrderPoolTotalSharesMap) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func skipLimitOrderPoolTotalSharesMap(dAtA []byte) (n int, err error) {
+func skipLimitOrderTrancheTotalSharesMap(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
 	depth := 0
@@ -419,7 +419,7 @@ func skipLimitOrderPoolTotalSharesMap(dAtA []byte) (n int, err error) {
 		var wire uint64
 		for shift := uint(0); ; shift += 7 {
 			if shift >= 64 {
-				return 0, ErrIntOverflowLimitOrderPoolTotalSharesMap
+				return 0, ErrIntOverflowLimitOrderTrancheTotalSharesMap
 			}
 			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
@@ -436,7 +436,7 @@ func skipLimitOrderPoolTotalSharesMap(dAtA []byte) (n int, err error) {
 		case 0:
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return 0, ErrIntOverflowLimitOrderPoolTotalSharesMap
+					return 0, ErrIntOverflowLimitOrderTrancheTotalSharesMap
 				}
 				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
@@ -452,7 +452,7 @@ func skipLimitOrderPoolTotalSharesMap(dAtA []byte) (n int, err error) {
 			var length int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return 0, ErrIntOverflowLimitOrderPoolTotalSharesMap
+					return 0, ErrIntOverflowLimitOrderTrancheTotalSharesMap
 				}
 				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
@@ -465,14 +465,14 @@ func skipLimitOrderPoolTotalSharesMap(dAtA []byte) (n int, err error) {
 				}
 			}
 			if length < 0 {
-				return 0, ErrInvalidLengthLimitOrderPoolTotalSharesMap
+				return 0, ErrInvalidLengthLimitOrderTrancheTotalSharesMap
 			}
 			iNdEx += length
 		case 3:
 			depth++
 		case 4:
 			if depth == 0 {
-				return 0, ErrUnexpectedEndOfGroupLimitOrderPoolTotalSharesMap
+				return 0, ErrUnexpectedEndOfGroupLimitOrderTrancheTotalSharesMap
 			}
 			depth--
 		case 5:
@@ -481,7 +481,7 @@ func skipLimitOrderPoolTotalSharesMap(dAtA []byte) (n int, err error) {
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
 		}
 		if iNdEx < 0 {
-			return 0, ErrInvalidLengthLimitOrderPoolTotalSharesMap
+			return 0, ErrInvalidLengthLimitOrderTrancheTotalSharesMap
 		}
 		if depth == 0 {
 			return iNdEx, nil
@@ -491,7 +491,7 @@ func skipLimitOrderPoolTotalSharesMap(dAtA []byte) (n int, err error) {
 }
 
 var (
-	ErrInvalidLengthLimitOrderPoolTotalSharesMap        = fmt.Errorf("proto: negative length found during unmarshaling")
-	ErrIntOverflowLimitOrderPoolTotalSharesMap          = fmt.Errorf("proto: integer overflow")
-	ErrUnexpectedEndOfGroupLimitOrderPoolTotalSharesMap = fmt.Errorf("proto: unexpected end of group")
+	ErrInvalidLengthLimitOrderTrancheTotalSharesMap        = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowLimitOrderTrancheTotalSharesMap          = fmt.Errorf("proto: integer overflow")
+	ErrUnexpectedEndOfGroupLimitOrderTrancheTotalSharesMap = fmt.Errorf("proto: unexpected end of group")
 )

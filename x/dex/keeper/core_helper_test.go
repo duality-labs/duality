@@ -160,8 +160,8 @@ func (s *MsgServerTestSuite) TestGetOrInitTickNew() {
 	)
 
 	//AND tranche fill maps are initialized
-	_, fill0Found := s.app.DexKeeper.GetLimitOrderPoolFillMap(s.ctx, "TokenA<>TokenB", 0, "TokenA", 0)
-	_, fill1Found := s.app.DexKeeper.GetLimitOrderPoolFillMap(s.ctx, "TokenA<>TokenB", 0, "TokenB", 0)
+	_, fill0Found := s.app.DexKeeper.GetLimitOrderTranche(s.ctx, "TokenA<>TokenB", 0, "TokenA", 0)
+	_, fill1Found := s.app.DexKeeper.GetLimitOrderTranche(s.ctx, "TokenA<>TokenB", 0, "TokenB", 0)
 
 	s.Assert().True(fill0Found)
 	s.Assert().True(fill1Found)
@@ -493,12 +493,12 @@ func (s *MsgServerTestSuite) TestHasToken0Empty() {
 	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
 	tick.TickData.Reserve1[0] = sdk.NewDec(10)
 
-	tick.LimitOrderPool0To1.CurrentLimitOrderKey = 0
-	reserveData := s.app.DexKeeper.GetOrInitReserveData(s.goCtx, "TokenA<>TokenB", 0, "TokenB", 0)
-	reserveData.Reserves = sdk.NewDec(100)
-	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, reserveData)
+	tick.LimitOrderTranche0To1.FillTrancheIndex = 0
+	tranche := s.app.DexKeeper.GetOrInitLimitOrderTranche(s.ctx, "TokenA<>TokenB", 0, "TokenB", 0)
+	tranche.ReservesTokenIn = sdk.NewDec(100)
+	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, tranche)
 
-	s.Assert().False(s.app.DexKeeper.HasToken0(s.ctx, &tick))
+	s.Assert().False(s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
 }
 
 func (s *MsgServerTestSuite) TestHasToken0HasReserves() {
@@ -507,19 +507,19 @@ func (s *MsgServerTestSuite) TestHasToken0HasReserves() {
 	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
 	tick.TickData.Reserve0AndShares[3].Reserve0 = sdk.NewDec(10)
 
-	s.Assert().True(s.app.DexKeeper.HasToken0(s.ctx, &tick))
+	s.Assert().True(s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
 }
 
 func (s *MsgServerTestSuite) TestHasToken0HasLimitOrders() {
 
 	// WHEN there are limit orders at the tick
 	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
-	tick.LimitOrderPool0To1.CurrentLimitOrderKey = 0
-	reserveData := s.app.DexKeeper.GetOrInitReserveData(s.goCtx, "TokenA<>TokenB", 0, "TokenA", 0)
-	reserveData.Reserves = sdk.NewDec(100)
-	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, reserveData)
+	tick.LimitOrderTranche0To1.FillTrancheIndex = 0
+	tranche := s.app.DexKeeper.GetOrInitLimitOrderTranche(s.ctx, "TokenA<>TokenB", 0, "TokenA", 0)
+	tranche.ReservesTokenIn = sdk.NewDec(100)
+	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, tranche)
 
-	s.Assert().True(s.app.DexKeeper.HasToken0(s.ctx, &tick))
+	s.Assert().True(s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
 }
 
 // HasToken1 //////////////////////////////////////////////////////////////////
@@ -530,12 +530,12 @@ func (s *MsgServerTestSuite) TestHasToken1Empty() {
 	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
 	tick.TickData.Reserve0AndShares[0].Reserve0 = sdk.NewDec(10)
 
-	tick.LimitOrderPool0To1.CurrentLimitOrderKey = 0
-	reserveData := s.app.DexKeeper.GetOrInitReserveData(s.goCtx, "TokenA<>TokenB", 0, "TokenA", 0)
-	reserveData.Reserves = sdk.NewDec(100)
-	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, reserveData)
+	tick.LimitOrderTranche0To1.FillTrancheIndex = 0
+	tranche := s.app.DexKeeper.GetOrInitLimitOrderTranche(s.ctx, "TokenA<>TokenB", 0, "TokenA", 0)
+	tranche.ReservesTokenIn = sdk.NewDec(100)
+	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, tranche)
 
-	s.Assert().False(s.app.DexKeeper.HasToken1(s.ctx, &tick))
+	s.Assert().False(s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
 }
 
 func (s *MsgServerTestSuite) TestHasToken1HasReserves() {
@@ -545,19 +545,19 @@ func (s *MsgServerTestSuite) TestHasToken1HasReserves() {
 	tick.TickData.Reserve1[0] = sdk.NewDec(10)
 
 	// THEN HasToken1() = true
-	s.Assert().True(s.app.DexKeeper.HasToken1(s.ctx, &tick))
+	s.Assert().True(s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
 }
 
 func (s *MsgServerTestSuite) TestHasToken1HasLimitOrders() {
 
 	// WHEN there are limit orders at the tick
 	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
-	tick.LimitOrderPool0To1.CurrentLimitOrderKey = 0
-	reserveData := s.app.DexKeeper.GetOrInitReserveData(s.goCtx, "TokenA<>TokenB", 0, "TokenB", 0)
-	reserveData.Reserves = sdk.NewDec(100)
-	s.app.DexKeeper.SetLimitOrderPoolReserveMap(s.ctx, reserveData)
+	tick.LimitOrderTranche0To1.FillTrancheIndex = 0
+	tranche := s.app.DexKeeper.GetOrInitLimitOrderTranche(s.ctx, "TokenA<>TokenB", 0, "TokenB", 0)
+	tranche.ReservesTokenIn = sdk.NewDec(100)
+	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, tranche)
 
-	s.Assert().True(s.app.DexKeeper.HasToken1(s.ctx, &tick))
+	s.Assert().True(s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
 }
 
 // CalcTickPointersPostAddToken0 //////////////////////////////////////////////

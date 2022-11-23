@@ -11,11 +11,8 @@ import "dex/shares.proto";
 import "dex/fee_list.proto";
 import "dex/edge_row.proto";
 import "dex/adjancey_matrix.proto";
-import "dex/limit_order_pool_user_share_map.proto";
-import "dex/limit_order_pool_user_shares_withdrawn.proto";
-import "dex/limit_order_pool_total_shares_map.proto";
-import "dex/limit_order_pool_reserve_map.proto";
-import "dex/limit_order_pool_fill_map.proto";
+import "dex/limit_order_tranche_user.proto";
+import "dex/limit_order_tranche.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -35,10 +32,7 @@ message GenesisState {
   uint64 edgeRowCount = 11;
   repeated AdjanceyMatrix adjanceyMatrixList = 12 [(gogoproto.nullable) = false];
   uint64 adjanceyMatrixCount = 13;
-  repeated LimitOrderPoolUserShareMap limitOrderPoolUserShareMapList = 14 [(gogoproto.nullable) = false];
-  repeated LimitOrderPoolUserSharesWithdrawn limitOrderPoolUserSharesWithdrawnList = 15 [(gogoproto.nullable) = false];
-  repeated LimitOrderPoolTotalSharesMap limitOrderPoolTotalSharesMapList = 16 [(gogoproto.nullable) = false];
-  repeated LimitOrderPoolReserveMap limitOrderPoolReserveMapList = 17 [(gogoproto.nullable) = false];
-  repeated LimitOrderPoolFillMap limitOrderPoolFillMapList = 18 [(gogoproto.nullable) = false];
+  repeated LimitOrderTrancheUser LimitOrderTrancheUserList = 14 [(gogoproto.nullable) = false];
+  repeated LimitOrderTranche LimitOrderTrancheList = 15 [(gogoproto.nullable) = false];
   // this line is used by starport scaffolding # genesis/proto/state
 }

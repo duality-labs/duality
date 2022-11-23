@@ -256,7 +256,7 @@ func (k Keeper) WithdrawLimitOrderVerification(goCtx context.Context, msg types.
 
 	pairId := k.CreatePairId(token0, token1)
 
-	shares, sharesFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Receiver)
+	shares, sharesFound := k.GetLimitOrderTrancheUser(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Receiver)
 	if !sharesFound {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
 	}
@@ -297,7 +297,7 @@ func (k Keeper) CancelLimitOrderVerification(goCtx context.Context, msg types.Ms
 	// createPairId (token0/ token1)
 	pairId := k.CreatePairId(token0, token1)
 
-	shares, sharesFound := k.GetLimitOrderPoolUserShareMap(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
+	shares, sharesFound := k.GetLimitOrderTrancheUser(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
 
 	if !sharesFound {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
