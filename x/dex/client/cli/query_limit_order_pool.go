@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListLimitOrderPoolTotalSharesMap() *cobra.Command {
+func CmdListLimitOrderTranche() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-limit-order-pool-total-shares-map",
-		Short: "list all LimitOrderPoolTotalSharesMap",
+		Short: "list all LimitOrderTranche",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -24,11 +24,11 @@ func CmdListLimitOrderPoolTotalSharesMap() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllLimitOrderPoolTotalSharesMapRequest{
+			params := &types.QueryAllLimitOrderTrancheRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.LimitOrderPoolTotalSharesMapAll(context.Background(), params)
+			res, err := queryClient.LimitOrderTrancheAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -43,10 +43,10 @@ func CmdListLimitOrderPoolTotalSharesMap() *cobra.Command {
 	return cmd
 }
 
-func CmdShowLimitOrderPoolTotalSharesMap() *cobra.Command {
+func CmdShowLimitOrderTranche() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "show-limit-order-pool-total-shares-map [count]",
-		Short: "shows a LimitOrderPoolTotalSharesMap",
+		Short: "shows a LimitOrderTranche",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -61,11 +61,11 @@ func CmdShowLimitOrderPoolTotalSharesMap() *cobra.Command {
 				return err
 			}
 
-			params := &types.QueryGetLimitOrderPoolTotalSharesMapRequest{
+			params := &types.QueryGetLimitOrderTrancheRequest{
 				Count: uint64(argCount),
 			}
 
-			res, err := queryClient.LimitOrderPoolTotalSharesMap(context.Background(), params)
+			res, err := queryClient.LimitOrderTranche(context.Background(), params)
 			if err != nil {
 				return err
 			}

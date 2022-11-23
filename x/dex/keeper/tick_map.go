@@ -14,8 +14,8 @@ func NewTick(pairId string, tickIndex int64, numFees uint64) types.TickMap {
 			Reserve0AndShares: make([]*types.Reserve0AndSharesType, numFees),
 			Reserve1:          make([]sdk.Dec, numFees),
 		},
-		LimitOrderPool0To1: &types.LimitOrderPool{0, 0},
-		LimitOrderPool1To0: &types.LimitOrderPool{0, 0},
+		LimitOrderTranche0To1: &types.LimitOrderTrancheTrancheIndexes{0, 0},
+		LimitOrderTranche1To0: &types.LimitOrderTrancheTrancheIndexes{0, 0},
 	}
 	for i := 0; i < int(numFees); i++ {
 		tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}

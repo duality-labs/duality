@@ -3,8 +3,7 @@ package nicholasdotsol.duality.dex;
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 
-message LimitOrderPool {
-
-  uint64 count = 1; 
-  uint64 currentLimitOrderKey = 2; 
+message LimitOrderTrancheTrancheIndexes {
+  uint64 fillTrancheIndex = 1; 
+  uint64 placeTrancheIndex = 2; 
 }

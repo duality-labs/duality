@@ -551,5 +551,5 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOUnfilledLOSwapIncrementsFillKey() {
 
 	// THEN
 	// place increased
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 1, 0)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
 }

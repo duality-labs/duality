@@ -311,23 +311,23 @@ func (s *MsgServerTestSuite) TestCancelSingle() {
 }
 
 func (s *MsgServerTestSuite) TestCancelPartial() {
-	s.fundAliceBalances(100, 500)
+	s.fundAliceBalances(100, 100)
 
 	s.assertDexBalances(0, 0)
 
 	s.aliceLimitSells("TokenB", 0, 50)
 
-	s.assertAliceBalances(100, 450)
+	s.assertAliceBalances(100, 50)
 	s.assertDexBalances(0, 50)
 
 	s.aliceCancelsLimitSell("TokenB", 0, 0, 25)
 
-	s.assertAliceBalances(100, 475)
+	s.assertAliceBalances(100, 75)
 	s.assertDexBalances(0, 25)
 
 	s.aliceCancelsLimitSell("TokenB", 0, 0, 25)
 
-	s.assertAliceBalances(100, 500)
+	s.assertAliceBalances(100, 100)
 	s.assertDexBalances(0, 0)
 }
 
@@ -413,13 +413,13 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 
 	s.aliceWithdrawsLimitSell("TokenB", 0, 0)
 
-	// s.assertAliceBalances(110, 80)
-	// s.assertBobBalances(80, 120)
-	// s.assertDexBalances(10, 0)
+	s.assertAliceBalances(110, 80)
+	s.assertBobBalances(80, 120)
+	s.assertDexBalances(10, 0)
 
-	// s.aliceWithdrawsLimitSell("TokenB", 0, 1)
+	s.aliceWithdrawsLimitSell("TokenB", 0, 1)
 
-	// s.assertAliceBalances(120, 80)
-	// s.assertBobBalances(80, 120)
-	// s.assertDexBalances(0, 0)
+	s.assertAliceBalances(120, 80)
+	s.assertBobBalances(80, 120)
+	s.assertDexBalances(0, 0)
 }

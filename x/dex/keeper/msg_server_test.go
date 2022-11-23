@@ -790,9 +790,9 @@ func (s *MsgServerTestSuite) getFillAndPlaceTrancheKeys(selling string, pairId s
 
 	// handle correct limit order pool
 	if selling == "TokenA" {
-		return tick.LimitOrderPool0To1.CurrentLimitOrderKey, tick.LimitOrderPool0To1.Count
+		return tick.LimitOrderTranche0To1.FillTrancheIndex, tick.LimitOrderTranche0To1.PlaceTrancheIndex
 	} else {
-		return tick.LimitOrderPool1To0.CurrentLimitOrderKey, tick.LimitOrderPool1To0.Count
+		return tick.LimitOrderTranche1To0.FillTrancheIndex, tick.LimitOrderTranche1To0.PlaceTrancheIndex
 	}
 }
 
@@ -810,7 +810,7 @@ func (s *MsgServerTestSuite) getLimitUserSharesAtTick(account sdk.AccAddress, se
 func (s *MsgServerTestSuite) getLimitUserSharesAtTickAtKey(account sdk.AccAddress, selling string, tickIndex int64, key uint64) sdk.Dec {
 	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
 	// grab fill tranche reserves and shares
-	userShares, userSharesFound := s.app.DexKeeper.GetLimitOrderPoolUser(s.ctx, pairId, tickIndex, selling, key, account.String())
+	userShares, userSharesFound := s.app.DexKeeper.GetLimitOrderTrancheUser(s.ctx, pairId, tickIndex, selling, key, account.String())
 	s.Assert().True(userSharesFound, "Failed to get limit order user shares for key %s", key)
 	return userShares.SharesOwned
 }
@@ -829,25 +829,25 @@ func (s *MsgServerTestSuite) getLimitTotalSharesAtTick(selling string, tickIndex
 func (s *MsgServerTestSuite) getLimitTotalSharesAtTickAtKey(selling string, tickIndex int64, key uint64) sdk.Dec {
 	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
 	// grab fill tranche reserves and shares
-	totalShares, totalSharesFound := s.app.DexKeeper.GetLimitOrderPoolTotalSharesMap(s.ctx, pairId, tickIndex, selling, key)
-	s.Assert().True(totalSharesFound, "Failed to get limit order total shares for key %s", key)
-	return totalShares.TotalShares
+	tranche, found := s.app.DexKeeper.GetLimitOrderTranche(s.ctx, pairId, tickIndex, selling, key)
+	s.Assert().True(found, "Failed to get limit order total shares for key %s", key)
+	return tranche.TotalTokenIn
 }
 
 func (s *MsgServerTestSuite) getLimitFilledLiquidityAtTickAtKey(selling string, tickIndex int64, key uint64) sdk.Dec {
 	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
 	// grab fill tranche reserves and shares
-	filledReserved, filledReservesFound := s.app.DexKeeper.GetLimitOrderPoolFillMap(s.ctx, pairId, tickIndex, selling, key)
-	s.Assert().True(filledReservesFound, "Failed to get limit order filled reserves for key %s", key)
-	return filledReserved.FilledReserves
+	tranche, found := s.app.DexKeeper.GetLimitOrderTranche(s.ctx, pairId, tickIndex, selling, key)
+	s.Assert().True(found, "Failed to get limit order filled reserves for key %s", key)
+	return tranche.ReservesTokenOut
 }
 
 func (s *MsgServerTestSuite) getLimitReservesAtTickAtKey(selling string, tickIndex int64, key uint64) sdk.Dec {
 	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
 	// grab fill tranche reserves and shares
-	reserveData, reserveDataFound := s.app.DexKeeper.GetLimitOrderPoolReserveMap(s.ctx, pairId, tickIndex, selling, key)
-	s.Assert().True(reserveDataFound, "Failed to get limit order reserves for key %s", key)
-	return reserveData.Reserves
+	tranche, found := s.app.DexKeeper.GetLimitOrderTranche(s.ctx, pairId, tickIndex, selling, key)
+	s.Assert().True(found, "Failed to get limit order reserves for key %s", key)
+	return tranche.ReservesTokenIn
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapNoLOAToB(tick int64, tickLiqudity sdk.Dec, amountIn sdk.Dec) (sdk.Dec, sdk.Dec) {
@@ -1005,8 +1005,8 @@ func (s *MsgServerTestSuite) addTickWithFee0Tokens(tickIndex int64, amountA int,
 			Reserve0AndShares: make([]*types.Reserve0AndSharesType, 1),
 			Reserve1:          make([]sdk.Dec, 1),
 		},
-		LimitOrderPool0To1: &types.LimitOrderPool{0, 0},
-		LimitOrderPool1To0: &types.LimitOrderPool{0, 0},
+		LimitOrderTranche0To1: &types.LimitOrderTrancheTrancheIndexes{0, 0},
+		LimitOrderTranche1To0: &types.LimitOrderTrancheTrancheIndexes{0, 0},
 	}
 
 	tick.TickData.Reserve0AndShares[0] = &types.Reserve0AndSharesType{NewDec(amountA), NewDec(amountA)}

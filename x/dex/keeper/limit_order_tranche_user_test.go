@@ -15,8 +15,8 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNLimitOrderPoolUser(keeper *keeper.Keeper, ctx sdk.Context, pairId string, tickIndex int64, token string, n int) []types.LimitOrderPoolUser {
-	items := make([]types.LimitOrderPoolUser, n)
+func createNLimitOrderTrancheUser(keeper *keeper.Keeper, ctx sdk.Context, pairId string, tickIndex int64, token string, n int) []types.LimitOrderTrancheUser {
+	items := make([]types.LimitOrderTrancheUser, n)
 	for i := range items {
 		items[i].Count = uint64(i)
 		items[i].Address = strconv.Itoa(i)
@@ -24,7 +24,7 @@ func createNLimitOrderPoolUser(keeper *keeper.Keeper, ctx sdk.Context, pairId st
 		items[i].Token = token
 		items[i].TickIndex = tickIndex
 
-		keeper.SetLimitOrderPoolUser(ctx, items[i])
+		keeper.SetLimitOrderTrancheUser(ctx, items[i])
 		items[i].SharesOwned = sdk.ZeroDec()
 		items[i].SharesWithdrawn = sdk.ZeroDec()
 		items[i].SharesCancelled = sdk.ZeroDec()
@@ -33,11 +33,11 @@ func createNLimitOrderPoolUser(keeper *keeper.Keeper, ctx sdk.Context, pairId st
 	return items
 }
 
-func TestLimitOrderPoolUserGet(t *testing.T) {
+func TestLimitOrderTrancheUserGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUser(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderTrancheUser(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
 	for _, item := range items {
-		rst, found := keeper.GetLimitOrderPoolUser(ctx,
+		rst, found := keeper.GetLimitOrderTrancheUser(ctx,
 			"TokenA<>TokenB",
 			0,
 			"TokenA",
@@ -51,18 +51,18 @@ func TestLimitOrderPoolUserGet(t *testing.T) {
 		)
 	}
 }
-func TestLimitOrderPoolUserRemove(t *testing.T) {
+func TestLimitOrderTrancheUserRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderPoolUser(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderTrancheUser(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
 	for _, item := range items {
-		keeper.RemoveLimitOrderPoolUser(ctx,
+		keeper.RemoveLimitOrderTrancheUser(ctx,
 			"TokenA<>TokenB",
 			0,
 			"TokenA",
 			item.Count,
 			item.Address,
 		)
-		_, found := keeper.GetLimitOrderPoolUser(ctx,
+		_, found := keeper.GetLimitOrderTrancheUser(ctx,
 			"TokenA<>TokenB",
 			0,
 			"TokenA",

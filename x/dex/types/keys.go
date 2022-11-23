@@ -111,26 +111,26 @@ func SharesKey(address string, pairId string, tickIndex int64, feeIndex uint64) 
 
 // Limit Order Pool Mappings and Keys
 const (
-	BaseLimitOrderPrefix = "LimitOrderPool/value"
+	BaseLimitOrderPrefix = "LimitOrderTranche/value"
 
-	// LimitOrderPoolUserSharesWithdrawnKeyPrefix is the prefix to retrieve all LimitOrderPoolUserSharesWithdrawn
-	LimitOrderPoolUserSharesWithdrawnKeyPrefix = "LimitOrderPoolUserSharesWithdrawn/value"
+	// LimitOrderTrancheUserSharesWithdrawnKeyPrefix is the prefix to retrieve all LimitOrderTrancheUserSharesWithdrawn
+	LimitOrderTrancheUserSharesWithdrawnKeyPrefix = "LimitOrderTrancheUserSharesWithdrawn/value"
 
-	// LimitOrderPoolUserKeyPrefix is the prefix to retrieve all LimitOrderPoolUser
-	LimitOrderPoolUserKeyPrefix = "LimitOrderPoolUser/value"
+	// LimitOrderTrancheUserKeyPrefix is the prefix to retrieve all LimitOrderTrancheUser
+	LimitOrderTrancheUserKeyPrefix = "LimitOrderTrancheUser/value"
 
-	// LimitOrderPoolTotalSharesMapKeyPrefix is the prefix to retrieve all LimitOrderPoolTotalSharesMap
-	LimitOrderPoolTotalSharesMapKeyPrefix = "LimitOrderPoolTotalSharesMap/value"
+	// LimitOrderTrancheKeyPrefix is the prefix to retrieve all LimitOrderTranche
+	LimitOrderTrancheKeyPrefix = "LimitOrderTranche/value"
 
-	// LimitOrderPoolReserveMapKeyPrefix is the prefix to retrieve all LimitOrderPoolReserveMap
-	LimitOrderPoolReserveMapKeyPrefix = "LimitOrderPoolReserveMap/value"
+	// LimitOrderTrancheReserveMapKeyPrefix is the prefix to retrieve all LimitOrderTrancheReserveMap
+	LimitOrderTrancheReserveMapKeyPrefix = "LimitOrderTrancheReserveMap/value"
 
-	// LimitOrderPoolFillMapKeyPrefix is the prefix to retrieve all LimitOrderPoolFillMap
-	LimitOrderPoolFillMapKeyPrefix = "LimitOrderPoolFillMap/value"
+	// LimitOrderTrancheFillMapKeyPrefix is the prefix to retrieve all LimitOrderTrancheFillMap
+	LimitOrderTrancheFillMapKeyPrefix = "LimitOrderTrancheFillMap/value"
 )
 
-// LimitOrderPoolUserSharesWithdrawnKey returns the store key to retrieve a LimitOrderPoolUserSharesWithdrawn from the index fields
-func LimitOrderPoolUserSharesWithdrawnKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
+// LimitOrderTrancheUserSharesWithdrawnKey returns the store key to retrieve a LimitOrderTrancheUserSharesWithdrawn from the index fields
+func LimitOrderTrancheUserSharesWithdrawnKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)
@@ -156,8 +156,8 @@ func LimitOrderPoolUserSharesWithdrawnKey(pairId string, tickIndex int64, token 
 	return key
 }
 
-// LimitOrderPoolUserKey returns the store key to retrieve a LimitOrderPoolUser from the index fields
-func LimitOrderPoolUserKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
+// LimitOrderTrancheUserKey returns the store key to retrieve a LimitOrderTrancheUser from the index fields
+func LimitOrderTrancheUserKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)
@@ -183,8 +183,8 @@ func LimitOrderPoolUserKey(pairId string, tickIndex int64, token string, count u
 	return key
 }
 
-// LimitOrderPoolTotalSharesMapKey returns the store key to retrieve a LimitOrderPoolTotalSharesMap from the index fields
-func LimitOrderPoolTotalSharesMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
+// LimitOrderTrancheKey returns the store key to retrieve a LimitOrderTranche from the index fields
+func LimitOrderTrancheKey(pairId string, tickIndex int64, token string, count uint64) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)
@@ -206,7 +206,7 @@ func LimitOrderPoolTotalSharesMapKey(pairId string, tickIndex int64, token strin
 	return key
 }
 
-func LimitOrderPoolReserveMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
+func LimitOrderTrancheReserveMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)
@@ -228,7 +228,7 @@ func LimitOrderPoolReserveMapKey(pairId string, tickIndex int64, token string, c
 	return key
 }
 
-func LimitOrderPoolFillMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
+func LimitOrderTrancheFillMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)

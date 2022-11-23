@@ -382,7 +382,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFilledLOPlaceLODoesntIncrementsP
 	s.aliceLimitSells("TokenA", -1, 10)
 	s.bobMarketSells("TokenB", 10, 0)
 	s.aliceLimitSells("TokenA", -1, 10)
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 1, 1)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
 
 	// WHEN
 	// placing order on same tick
@@ -390,5 +390,5 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFilledLOPlaceLODoesntIncrementsP
 
 	// THEN
 	// fill and place tranche keys don't change
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 1, 1)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
 }

@@ -4,13 +4,13 @@ package nicholasdotsol.duality.dex;
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 
 import "dex/tick_data_type.proto";
-import "dex/limit_order_pool.proto";
+import "dex/limit_order_pool_tranche_indexes.proto";
 
 message TickMap {
   string pairId = 1;
   int64 tickIndex = 2; 
   TickDataType tickData = 3; 
-  LimitOrderPool LimitOrderPool0to1 =4;
-  LimitOrderPool LimitOrderPool1to0 =5;
+  LimitOrderTrancheTrancheIndexes LimitOrderTranche0to1 = 4;
+  LimitOrderTrancheTrancheIndexes LimitOrderTranche1to0 = 5;
 }
 

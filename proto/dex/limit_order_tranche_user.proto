@@ -4,7 +4,7 @@ package nicholasdotsol.duality.dex;
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 import "gogoproto/gogo.proto";
 
-message LimitOrderPoolUser {
+message LimitOrderTrancheUser {
   string pairId = 1;
   string token = 2;
   int64 tickIndex = 3;

@@ -21,28 +21,28 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func networkWithLimitOrderPoolUserObjects(t *testing.T, n int) (*network.Network, []types.LimitOrderPoolUser) {
+func networkWithLimitOrderTrancheUserObjects(t *testing.T, n int) (*network.Network, []types.LimitOrderTrancheUser) {
 	t.Helper()
 	cfg := network.DefaultConfig()
 	state := types.GenesisState{}
 	require.NoError(t, cfg.Codec.UnmarshalJSON(cfg.GenesisState[types.ModuleName], &state))
 
 	for i := 0; i < n; i++ {
-		LimitOrderPoolUser := types.LimitOrderPoolUser{
+		LimitOrderTrancheUser := types.LimitOrderTrancheUser{
 			Count:   uint64(i),
 			Address: strconv.Itoa(i),
 		}
-		nullify.Fill(&LimitOrderPoolUser)
-		state.LimitOrderPoolUserList = append(state.LimitOrderPoolUserList, LimitOrderPoolUser)
+		nullify.Fill(&LimitOrderTrancheUser)
+		state.LimitOrderTrancheUserList = append(state.LimitOrderTrancheUserList, LimitOrderTrancheUser)
 	}
 	buf, err := cfg.Codec.MarshalJSON(&state)
 	require.NoError(t, err)
 	cfg.GenesisState[types.ModuleName] = buf
-	return network.New(t, cfg), state.LimitOrderPoolUserList
+	return network.New(t, cfg), state.LimitOrderTrancheUserList
 }
 
-func TestShowLimitOrderPoolUser(t *testing.T) {
-	net, objs := networkWithLimitOrderPoolUserObjects(t, 2)
+func TestShowLimitOrderTrancheUser(t *testing.T) {
+	net, objs := networkWithLimitOrderTrancheUserObjects(t, 2)
 
 	ctx := net.Validators[0].ClientCtx
 	common := []string{
@@ -55,7 +55,7 @@ func TestShowLimitOrderPoolUser(t *testing.T) {
 
 		args []string
 		err  error
-		obj  types.LimitOrderPoolUser
+		obj  types.LimitOrderTrancheUser
 	}{
 		{
 			desc:      "found",
@@ -80,27 +80,27 @@ func TestShowLimitOrderPoolUser(t *testing.T) {
 				tc.idAddress,
 			}
 			args = append(args, tc.args...)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowLimitOrderPoolUser(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowLimitOrderTrancheUser(), args)
 			if tc.err != nil {
 				stat, ok := status.FromError(tc.err)
 				require.True(t, ok)
 				require.ErrorIs(t, stat.Err(), tc.err)
 			} else {
 				require.NoError(t, err)
-				var resp types.QueryGetLimitOrderPoolUserResponse
+				var resp types.QueryGetLimitOrderTrancheUserResponse
 				require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-				require.NotNil(t, resp.LimitOrderPoolUser)
+				require.NotNil(t, resp.LimitOrderTrancheUser)
 				require.Equal(t,
 					nullify.Fill(&tc.obj),
-					nullify.Fill(&resp.LimitOrderPoolUser),
+					nullify.Fill(&resp.LimitOrderTrancheUser),
 				)
 			}
 		})
 	}
 }
 
-func TestListLimitOrderPoolUser(t *testing.T) {
-	net, objs := networkWithLimitOrderPoolUserObjects(t, 5)
+func TestListLimitOrderTrancheUser(t *testing.T) {
+	net, objs := networkWithLimitOrderTrancheUserObjects(t, 5)
 
 	ctx := net.Validators[0].ClientCtx
 	request := func(next []byte, offset, limit uint64, total bool) []string {
@@ -122,14 +122,14 @@ func TestListLimitOrderPoolUser(t *testing.T) {
 		step := 2
 		for i := 0; i < len(objs); i += step {
 			args := request(nil, uint64(i), uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUser(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderTrancheUser(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllLimitOrderPoolUserResponse
+			var resp types.QueryAllLimitOrderTrancheUserResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.LimitOrderPoolUser), step)
+			require.LessOrEqual(t, len(resp.LimitOrderTrancheUser), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.LimitOrderPoolUser),
+				nullify.Fill(resp.LimitOrderTrancheUser),
 			)
 		}
 	})
@@ -138,29 +138,29 @@ func TestListLimitOrderPoolUser(t *testing.T) {
 		var next []byte
 		for i := 0; i < len(objs); i += step {
 			args := request(next, 0, uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUser(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderTrancheUser(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllLimitOrderPoolUserResponse
+			var resp types.QueryAllLimitOrderTrancheUserResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.LimitOrderPoolUser), step)
+			require.LessOrEqual(t, len(resp.LimitOrderTrancheUser), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.LimitOrderPoolUser),
+				nullify.Fill(resp.LimitOrderTrancheUser),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
 		args := request(nil, 0, uint64(len(objs)), true)
-		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderPoolUser(), args)
+		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLimitOrderTrancheUser(), args)
 		require.NoError(t, err)
-		var resp types.QueryAllLimitOrderPoolUserResponse
+		var resp types.QueryAllLimitOrderTrancheUserResponse
 		require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 		require.NoError(t, err)
 		require.Equal(t, len(objs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(objs),
-			nullify.Fill(resp.LimitOrderPoolUser),
+			nullify.Fill(resp.LimitOrderTrancheUser),
 		)
 	})
 }
