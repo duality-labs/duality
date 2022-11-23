@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -42,6 +43,11 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 		}
 	}
 
+	// makes sure that there is the same number of sharesToRemove as ticks and fees
+	if len(msg.AmountsA) != len(msg.AmountsB) || len(msg.AmountsA) != len(msg.TickIndexes) || len(msg.AmountsA) != len(msg.FeeIndexes) {
+		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrUnbalancedTxArray, "Input Arrays are not of the same length")
+	}
+
 	amounts0 := msg.AmountsA
 	amounts1 := msg.AmountsB
 
@@ -70,6 +76,7 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 
 	if AccountToken0Balance.LT(totalAmount0ToDeposit) {
+		fmt.Println("Fail")
 		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
@@ -98,7 +105,7 @@ func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 	// gets total number of fee tiers
 	feeCount := k.GetFeeListCount(ctx)
 
-	// makes sure that there is the same number of sharesToRemove as ticks specfied
+	// makes sure that there is the same number of sharesToRemove as ticks and fees
 	if len(msg.SharesToRemove) != len(msg.TickIndexes) || len(msg.SharesToRemove) != len(msg.FeeIndexes) {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrUnbalancedTxArray, "Input Arrays are not of the same length")
 	}
@@ -121,11 +128,6 @@ func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 	// Error Checking for receiver address
 	if err != nil {
 		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
-	}
-
-	// Error checking for valid sdk.Dec
-	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
 	pairId := k.CreatePairId(token0, token1)
@@ -173,10 +175,6 @@ func (k Keeper) SwapVerification(goCtx context.Context, msg types.MsgSwap) (stri
 	if msg.TokenIn != token0 && msg.TokenIn != token1 {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
 	}
-	// Error checking for valid sdk.Dec
-	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
-	}
 
 	AccountsAmountInBalance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, msg.TokenIn).Amount)
 
@@ -216,10 +214,6 @@ func (k Keeper) PlaceLimitOrderVerification(goCtx context.Context, msg types.Msg
 	if msg.TokenIn != token0 && msg.TokenIn != token1 {
 		return "", "", nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
 	}
-	// Error checking for valid sdk.Dec
-	if err != nil {
-		return "", "", nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
-	}
 
 	AccountsAmountInBalance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, msg.TokenIn).Amount)
 
@@ -252,6 +246,10 @@ func (k Keeper) WithdrawLimitOrderVerification(goCtx context.Context, msg types.
 	// Note we do not actually need to save the sdk.AccAddress here but we do want the address to be checked to determine if it valid
 	if err != nil {
 		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+	}
+
+	if msg.KeyToken != token0 && msg.KeyToken != token1 {
+		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
 	}
 
 	pairId := k.CreatePairId(token0, token1)
@@ -294,6 +292,10 @@ func (k Keeper) CancelLimitOrderVerification(goCtx context.Context, msg types.Ms
 		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
+	if msg.KeyToken != token0 && msg.KeyToken != token1 {
+		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
+	}
+
 	// createPairId (token0/ token1)
 	pairId := k.CreatePairId(token0, token1)
 
@@ -304,7 +306,7 @@ func (k Keeper) CancelLimitOrderVerification(goCtx context.Context, msg types.Ms
 	}
 
 	// checks that the user has some number of limit order shares wished to withdraw
-	if shares.SharesOwned.LTE(sdk.ZeroDec()) {
+	if shares.SharesOwned.LT(msg.SharesOut) {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
 	}
 
