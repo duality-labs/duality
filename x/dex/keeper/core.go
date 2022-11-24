@@ -147,14 +147,14 @@ func (k Keeper) DepositCore(
 	}
 
 	if totalAmountReserve0.GT(sdk.ZeroDec()) {
-		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(totalAmountReserve0.BigInt()))
+		coin0 := sdk.NewCoin(token0, totalAmountReserve0.RoundInt())
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
 			return nil, nil, err
 		}
 	}
 
 	if totalAmountReserve1.GT(sdk.ZeroDec()) {
-		coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(totalAmountReserve1.BigInt()))
+		coin1 := sdk.NewCoin(token1, totalAmountReserve1.RoundInt())
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
 			return nil, nil, err
 		}
@@ -254,7 +254,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 	}
 	k.SetPairMap(ctx, pair)
 	if totalReserve0ToRemove.GT(sdk.ZeroDec()) {
-		coin0 := sdk.NewCoin(token0, sdk.NewIntFromBigInt(totalReserve0ToRemove.BigInt()))
+		coin0 := sdk.NewCoin(token0, totalReserve0ToRemove.RoundInt())
 		err := k.bankKeeper.SendCoinsFromModuleToAccount(
 			ctx,
 			types.ModuleName,
@@ -268,7 +268,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 
 	// sends totalReserve1ToRemove to msg.Receiver
 	if totalReserve1ToRemove.GT(sdk.ZeroDec()) {
-		coin1 := sdk.NewCoin(token1, sdk.NewIntFromBigInt(totalReserve1ToRemove.BigInt()))
+		coin1 := sdk.NewCoin(token1, totalReserve1ToRemove.RoundInt())
 		err := k.bankKeeper.SendCoinsFromModuleToAccount(
 			ctx,
 			types.ModuleName,
@@ -688,7 +688,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	}
 
 	if msg.AmountIn.GT(sdk.ZeroDec()) {
-		coin0 := sdk.NewCoin(msg.TokenIn, sdk.NewIntFromBigInt(msg.AmountIn.BigInt()))
+		coin0 := sdk.NewCoin(msg.TokenIn, msg.AmountIn.RoundInt())
 		err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0})
 		if err != nil {
 			return err
@@ -750,7 +750,7 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	k.SetLimitOrderTranche(ctx, tranche)
 
 	if attemptedSharesOut.GT(sdk.ZeroDec()) {
-		coinOut := sdk.NewCoin(msg.KeyToken, sdk.NewIntFromBigInt(attemptedSharesOut.BigInt()))
+		coinOut := sdk.NewCoin(msg.KeyToken, attemptedSharesOut.RoundInt())
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
@@ -841,7 +841,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	k.SetLimitOrderTranche(ctx, tranche)
 
 	if amountOutTokenOut.GT(sdk.ZeroDec()) {
-		coinOut := sdk.NewCoin(orderTokenOut, sdk.NewIntFromBigInt(amountOutTokenOut.BigInt()))
+		coinOut := sdk.NewCoin(orderTokenOut, amountOutTokenOut.RoundInt())
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
