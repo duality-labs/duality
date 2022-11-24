@@ -45,10 +45,10 @@ RUN apk add --update \
     # required for HTTPS to connect properly
     ca-certificates
 
-# Install testnet utils when not on a production chain
+# Define network settings to be used (defined under top-level folder networks/)
 ARG NETWORK=duality-1
 
-# Make NETWORK and IS_MAINNET available as an ENV variable for the running proccess
+# Make NETWORK available as an ENV variable for the running proccess
 ENV NETWORK=$NETWORK
 
 WORKDIR /usr/src
@@ -83,7 +83,10 @@ RUN wget https://github.com/TomWright/dasel/releases/download/v1.27.3/dasel_linu
 RUN dualityd init --chain-id "$NETWORK" duality
 
 # edit config files
-RUN IS_MAINNET=$([[ "$NETWORK" =~ "^duality-\d+$" ]] && echo "true" || echo ""); \
+# determine some settings by either being a mainnet or testnet
+ARG IS_MAINNET
+# default testnet settings depending on network name (eg. duality-1, duality-13 are production chains)
+RUN IS_MAINNET=${IS_MAINNET-$([[ "$NETWORK" =~ "^duality-\d+$" ]] && echo "true" || echo "")}; \
     # enable API to be served on any browser page when in developent, but only production web-app in production
     dasel put bool   -f /root/.duality/config/app.toml    ".api.enable" "true"; \
     dasel put bool   -f /root/.duality/config/app.toml    ".api.enabled-unsafe-cors" "$([[ $IS_MAINNET ]] && echo "false" || echo "true")"; \

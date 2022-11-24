@@ -6,9 +6,6 @@ NETWORK="${NETWORK:-$MAINNET}"
 STARTUP_MODE="${MODE:-fullnode}"
 NODE_MONIKER="${MONIKER}"
 
-# Add our configuration settings depending on network name (eg. duality-1, duality-13 are production chains)
-IS_MAINNET=$([[ "$NETWORK" =~ "^duality-\d+$" ]] && echo "true" || echo "")
-
 # check current working directorys
 if [[ ! -e scripts/startup.sh ]]; then
     echo >&2 "Please run this script from the base repo directory"
@@ -32,18 +29,9 @@ then
 fi
 
 # start or join a chain
-# start mainnet from crafted genesis.json
-if [[ $STARTUP_MODE == "new" && "$IS_MAINNET" ]]
-then
-
-    # use predefined genesis
-    mv networks/$NETWORK/genesis.json /root/.duality/config/genesis.json
-    echo "Starting new chain..."
-    dualityd --log_level ${LOG_LEVEL:-info} start
-    exit
-
-# start testnet
-elif [ $STARTUP_MODE == "new" ]
+# note: "new" should not be used for mainnet chains
+# for mainnets a custom genesis file should be curated outside of these scripts
+if [ $STARTUP_MODE == "new" ]
 then
 
     # duplicate genesis for easier merging and recovery
@@ -112,7 +100,7 @@ then
     # eg. dualityd gentx alice 1000000stake --chain-id $NETWORK --keyring-backend test
     # eg. dualityd collect-gentxs
 
-    echo "Starting new testnet chain..."
+    echo "Starting new chain..."
     dualityd --log_level ${LOG_LEVEL:-info} start
     exit
 
