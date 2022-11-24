@@ -81,70 +81,49 @@ func (s *MsgServerTestSuite) SetupTest() {
 	s.feeTiers = feeTiers
 }
 
-func (s *MsgServerTestSuite) fundAccountBalancesDec(account sdk.AccAddress, aBalance sdk.Dec, bBalance sdk.Dec) {
-	aBalanceInt := sdk.NewIntFromBigInt(aBalance.BigInt())
-	bBalanceInt := sdk.NewIntFromBigInt(bBalance.BigInt())
+func (s *MsgServerTestSuite) fundAccountBalances(account sdk.AccAddress, aBalance int64, bBalance int64) {
+	aBalanceInt := sdk.NewInt(aBalance)
+	bBalanceInt := sdk.NewInt(bBalance)
 	balances := sdk.NewCoins(NewACoin(aBalanceInt), NewBCoin(bBalanceInt))
 	err := FundAccount(s.app.BankKeeper, s.ctx, account, balances)
 	s.Assert().NoError(err)
-	s.assertAccountBalancesDec(account, aBalance, bBalance)
+	s.assertAccountBalances(account, aBalance, bBalance)
 }
 
-func (s *MsgServerTestSuite) fundAccountBalances(account sdk.AccAddress, aBalance int, bBalance int) {
-	s.fundAccountBalancesDec(account, NewDec(aBalance), NewDec(bBalance))
-}
-
-func (s *MsgServerTestSuite) fundAliceBalances(a int, b int) {
+func (s *MsgServerTestSuite) fundAliceBalances(a int64, b int64) {
 	s.fundAccountBalances(s.alice, a, b)
 }
 
-func (s *MsgServerTestSuite) fundAliceBalancesDec(a sdk.Dec, b sdk.Dec) {
-	s.fundAccountBalancesDec(s.alice, a, b)
-}
-
-func (s *MsgServerTestSuite) fundBobBalances(a int, b int) {
+func (s *MsgServerTestSuite) fundBobBalances(a int64, b int64) {
 	s.fundAccountBalances(s.bob, a, b)
 }
 
-func (s *MsgServerTestSuite) fundBobBalancesDec(a sdk.Dec, b sdk.Dec) {
-	s.fundAccountBalancesDec(s.bob, a, b)
-}
-
-func (s *MsgServerTestSuite) fundCarolBalances(a int, b int) {
+func (s *MsgServerTestSuite) fundCarolBalances(a int64, b int64) {
 	s.fundAccountBalances(s.carol, a, b)
 }
 
-func (s *MsgServerTestSuite) fundCarolBalancesDec(a sdk.Dec, b sdk.Dec) {
-	s.fundAccountBalancesDec(s.carol, a, b)
-}
-
-func (s *MsgServerTestSuite) fundDanBalances(a int, b int) {
+func (s *MsgServerTestSuite) fundDanBalances(a int64, b int64) {
 	s.fundAccountBalances(s.dan, a, b)
 }
 
-func (s *MsgServerTestSuite) fundDanBalancesDec(a sdk.Dec, b sdk.Dec) {
-	s.fundAccountBalancesDec(s.dan, a, b)
+func (s *MsgServerTestSuite) assertAccountBalancesDec(account sdk.AccAddress, aBalance sdk.Dec, bBalance sdk.Dec) {
+	s.assertAccountBalances(account, aBalance.RoundInt64(), bBalance.RoundInt64())
 }
 
-func (s *MsgServerTestSuite) assertAccountBalances(account sdk.AccAddress, aBalance int, bBalance int) {
-	s.assertAccountBalancesDec(account, NewDec(aBalance), NewDec(bBalance))
-}
-
-func (s *MsgServerTestSuite) assertAccountBalancesDec(
+func (s *MsgServerTestSuite) assertAccountBalances(
 	account sdk.AccAddress,
-	aBalance sdk.Dec,
-	bBalance sdk.Dec,
+	aBalance int64,
+	bBalance int64,
 ) {
-	aActual := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenA")
-	aDec := sdk.NewDecFromBigIntWithPrec(aActual.Amount.BigInt(), 18)
-	s.Assert().True(aBalance.Equal(aDec), "expected %s != actual %s", aBalance, aDec)
+	aActual := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenA").Amount.Int64()
 
-	bActual := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenB")
-	bDec := sdk.NewDecFromBigIntWithPrec(bActual.Amount.BigInt(), 18)
-	s.Assert().True(bBalance.Equal(bDec), "expected %s != actual %s", bBalance, bDec)
+	s.Assert().Equal(aActual, aBalance, "expected %s != actual %s", aBalance, aBalance)
+
+	bActual := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenB").Amount.Int64()
+	s.Assert().Equal(bActual, bBalance, "expected %s != actual %s", bBalance, bBalance)
 }
 
-func (s *MsgServerTestSuite) assertAliceBalances(a int, b int) {
+func (s *MsgServerTestSuite) assertAliceBalances(a int64, b int64) {
 	s.assertAccountBalances(s.alice, a, b)
 }
 
@@ -152,7 +131,7 @@ func (s *MsgServerTestSuite) assertAliceBalancesDec(a sdk.Dec, b sdk.Dec) {
 	s.assertAccountBalancesDec(s.alice, a, b)
 }
 
-func (s *MsgServerTestSuite) assertBobBalances(a int, b int) {
+func (s *MsgServerTestSuite) assertBobBalances(a int64, b int64) {
 	s.assertAccountBalances(s.bob, a, b)
 }
 
@@ -160,7 +139,7 @@ func (s *MsgServerTestSuite) assertBobBalancesDec(a sdk.Dec, b sdk.Dec) {
 	s.assertAccountBalancesDec(s.bob, a, b)
 }
 
-func (s *MsgServerTestSuite) assertCarolBalances(a int, b int) {
+func (s *MsgServerTestSuite) assertCarolBalances(a int64, b int64) {
 	s.assertAccountBalances(s.carol, a, b)
 }
 
@@ -168,7 +147,7 @@ func (s *MsgServerTestSuite) assertCarolBalancesDec(a sdk.Dec, b sdk.Dec) {
 	s.assertAccountBalancesDec(s.carol, a, b)
 }
 
-func (s *MsgServerTestSuite) assertDanBalances(a int, b int) {
+func (s *MsgServerTestSuite) assertDanBalances(a int64, b int64) {
 	s.assertAccountBalances(s.dan, a, b)
 }
 
@@ -176,7 +155,7 @@ func (s *MsgServerTestSuite) assertDanBalancesDec(a sdk.Dec, b sdk.Dec) {
 	s.assertAccountBalancesDec(s.dan, a, b)
 }
 
-func (s *MsgServerTestSuite) assertDexBalances(a int, b int) {
+func (s *MsgServerTestSuite) assertDexBalances(a int64, b int64) {
 	s.assertAccountBalances(s.app.AccountKeeper.GetModuleAddress("dex"), a, b)
 }
 
