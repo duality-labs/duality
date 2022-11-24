@@ -62,7 +62,7 @@ func CmdShowLimitOrderTranche() *cobra.Command {
 			}
 
 			params := &types.QueryGetLimitOrderTrancheRequest{
-				Count: uint64(argCount),
+				TrancheIndex: uint64(argCount),
 			}
 
 			res, err := queryClient.LimitOrderTranche(context.Background(), params)

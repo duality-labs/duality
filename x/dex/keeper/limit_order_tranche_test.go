@@ -19,10 +19,10 @@ func createNLimitOrderTranche(keeper *keeper.Keeper, ctx sdk.Context, pairId str
 	items := make([]types.LimitOrderTranche, n)
 	for i := range items {
 		items[i] = types.LimitOrderTranche{
-			Count:            uint64(i),
+			TrancheIndex:     uint64(i),
 			PairId:           pairId,
 			TickIndex:        tickIndex,
-			Token:            token,
+			TokenIn:          token,
 			ReservesTokenIn:  sdk.ZeroDec(),
 			ReservesTokenOut: sdk.ZeroDec(),
 			TotalTokenIn:     sdk.ZeroDec(),
@@ -41,7 +41,7 @@ func TestLimitOrderTrancheGet(t *testing.T) {
 			"TokenA<>TokenB",
 			0,
 			"TokenA",
-			item.Count,
+			item.TrancheIndex,
 		)
 		require.True(t, found)
 		require.Equal(t,
@@ -58,13 +58,13 @@ func TestLimitOrderTrancheRemove(t *testing.T) {
 			"TokenA<>TokenB",
 			0,
 			"TokenA",
-			item.Count,
+			item.TrancheIndex,
 		)
 		_, found := keeper.GetLimitOrderTranche(ctx,
 			"TokenA<>TokenB",
 			0,
 			"TokenA",
-			item.Count,
+			item.TrancheIndex,
 		)
 		require.False(t, found)
 	}
