@@ -32,9 +32,9 @@ func (s *TickTestSuite) TestLimitHasToken0() {
 	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
-		Token:           "TokenA",
+		TokenIn:         "TokenA",
 		TickIndex:       tick.TickIndex,
-		Count:           0,
+		TrancheIndex:    0,
 		ReservesTokenIn: NewDec(5),
 	})
 	s.Equal(true, s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
@@ -45,9 +45,9 @@ func (s *TickTestSuite) TestEmptyHasToken0() {
 	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
-		Token:           "TokenA",
+		TokenIn:         "TokenA",
 		TickIndex:       tick.TickIndex,
-		Count:           0,
+		TrancheIndex:    0,
 		ReservesTokenIn: NewDec(0),
 	})
 	s.Equal(false, s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
@@ -61,9 +61,9 @@ func (s *TickTestSuite) TestLiquidityHasToken0() {
 	tick.TickData.Reserve1[0] = NewDec(20)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
-		Token:           "TokenA",
+		TokenIn:         "TokenA",
 		TickIndex:       tick.TickIndex,
-		Count:           0,
+		TrancheIndex:    0,
 		ReservesTokenIn: NewDec(0),
 	})
 	s.Equal(true, s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
@@ -77,9 +77,9 @@ func (s *TickTestSuite) TestLiquidityHighFeeHasToken0() {
 	tick.TickData.Reserve1[4] = NewDec(20)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
-		Token:           "TokenA",
+		TokenIn:         "TokenA",
 		TickIndex:       tick.TickIndex,
-		Count:           0,
+		TrancheIndex:    0,
 		ReservesTokenIn: NewDec(0),
 	})
 	s.Equal(true, s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
@@ -93,9 +93,9 @@ func (s *TickTestSuite) TestNoLiquidityOnOneSideHasToken0() {
 	tick.TickData.Reserve1[4] = NewDec(20)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
-		Token:           "TokenA",
+		TokenIn:         "TokenA",
 		TickIndex:       tick.TickIndex,
-		Count:           0,
+		TrancheIndex:    0,
 		ReservesTokenIn: NewDec(0),
 	})
 	s.Equal(false, s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
@@ -106,9 +106,9 @@ func (s *TickTestSuite) TestLimitHasToken1() {
 	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
-		Token:           "TokenB",
+		TokenIn:         "TokenB",
 		TickIndex:       tick.TickIndex,
-		Count:           0,
+		TrancheIndex:    0,
 		ReservesTokenIn: NewDec(5),
 	})
 	s.Equal(true, s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
@@ -119,9 +119,9 @@ func (s *TickTestSuite) TestEmptyHasToken1() {
 	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
-		Token:           "TokenB",
+		TokenIn:         "TokenB",
 		TickIndex:       tick.TickIndex,
-		Count:           0,
+		TrancheIndex:    0,
 		ReservesTokenIn: NewDec(0),
 	})
 	s.Equal(false, s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
@@ -135,9 +135,9 @@ func (s *TickTestSuite) TestLiquidityHasToken1() {
 	tick.TickData.Reserve1[0] = NewDec(20)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
-		Token:           "TokenB",
+		TokenIn:         "TokenB",
 		TickIndex:       tick.TickIndex,
-		Count:           0,
+		TrancheIndex:    0,
 		ReservesTokenIn: NewDec(0),
 	})
 	s.Equal(true, s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
@@ -151,9 +151,9 @@ func (s *TickTestSuite) TestLiquidityHighFeeHasToken1() {
 	tick.TickData.Reserve1[4] = NewDec(20)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
-		Token:           "TokenB",
+		TokenIn:         "TokenB",
 		TickIndex:       tick.TickIndex,
-		Count:           0,
+		TrancheIndex:    0,
 		ReservesTokenIn: NewDec(0),
 	})
 	s.Equal(true, s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
@@ -167,9 +167,9 @@ func (s *TickTestSuite) TestNoLiquidityOnOneSideHasToken1() {
 	tick.TickData.Reserve1[4] = NewDec(0)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
-		Token:           "TokenB",
+		TokenIn:         "TokenB",
 		TickIndex:       tick.TickIndex,
-		Count:           0,
+		TrancheIndex:    0,
 		ReservesTokenIn: NewDec(0),
 	})
 	s.Equal(false, s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
