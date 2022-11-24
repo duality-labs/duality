@@ -16,9 +16,9 @@ func (k Keeper) GetOrInitLimitOrderTranche(
 	tranche, found := k.GetLimitOrderTranche(ctx, pairId, tickIndex, tokenIn, trancheIndex)
 	if !found {
 		tranche = types.LimitOrderTranche{
-			Count:            trancheIndex,
+			TrancheIndex:     trancheIndex,
 			TickIndex:        tickIndex,
-			Token:            tokenIn,
+			TokenIn:          tokenIn,
 			PairId:           pairId,
 			ReservesTokenIn:  sdk.ZeroDec(),
 			ReservesTokenOut: sdk.ZeroDec(),
@@ -38,8 +38,8 @@ func (k Keeper) SetLimitOrderTranche(ctx sdk.Context, LimitOrderTranche types.Li
 	store.Set(types.LimitOrderTrancheKey(
 		LimitOrderTranche.PairId,
 		LimitOrderTranche.TickIndex,
-		LimitOrderTranche.Token,
-		LimitOrderTranche.Count,
+		LimitOrderTranche.TokenIn,
+		LimitOrderTranche.TrancheIndex,
 	), b)
 }
 
