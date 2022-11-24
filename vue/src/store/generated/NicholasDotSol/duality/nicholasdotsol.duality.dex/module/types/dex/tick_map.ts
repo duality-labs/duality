@@ -2,7 +2,7 @@
 import * as Long from "long";
 import { util, configure, Writer, Reader } from "protobufjs/minimal";
 import { TickDataType } from "../dex/tick_data_type";
-import { LimitOrderPool } from "../dex/limit_order_pool";
+import { LimitOrderTrancheTrancheIndexes } from "../dex/limit_order_pool_tranche_indexes";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -10,8 +10,8 @@ export interface TickMap {
   pairId: string;
   tickIndex: number;
   tickData: TickDataType | undefined;
-  LimitOrderPool0to1: LimitOrderPool | undefined;
-  LimitOrderPool1to0: LimitOrderPool | undefined;
+  LimitOrderTranche0to1: LimitOrderTrancheTrancheIndexes | undefined;
+  LimitOrderTranche1to0: LimitOrderTrancheTrancheIndexes | undefined;
 }
 
 const baseTickMap: object = { pairId: "", tickIndex: 0 };
@@ -27,15 +27,15 @@ export const TickMap = {
     if (message.tickData !== undefined) {
       TickDataType.encode(message.tickData, writer.uint32(26).fork()).ldelim();
     }
-    if (message.LimitOrderPool0to1 !== undefined) {
-      LimitOrderPool.encode(
-        message.LimitOrderPool0to1,
+    if (message.LimitOrderTranche0to1 !== undefined) {
+      LimitOrderTrancheTrancheIndexes.encode(
+        message.LimitOrderTranche0to1,
         writer.uint32(34).fork()
       ).ldelim();
     }
-    if (message.LimitOrderPool1to0 !== undefined) {
-      LimitOrderPool.encode(
-        message.LimitOrderPool1to0,
+    if (message.LimitOrderTranche1to0 !== undefined) {
+      LimitOrderTrancheTrancheIndexes.encode(
+        message.LimitOrderTranche1to0,
         writer.uint32(42).fork()
       ).ldelim();
     }
@@ -59,13 +59,13 @@ export const TickMap = {
           message.tickData = TickDataType.decode(reader, reader.uint32());
           break;
         case 4:
-          message.LimitOrderPool0to1 = LimitOrderPool.decode(
+          message.LimitOrderTranche0to1 = LimitOrderTrancheTrancheIndexes.decode(
             reader,
             reader.uint32()
           );
           break;
         case 5:
-          message.LimitOrderPool1to0 = LimitOrderPool.decode(
+          message.LimitOrderTranche1to0 = LimitOrderTrancheTrancheIndexes.decode(
             reader,
             reader.uint32()
           );
@@ -96,24 +96,24 @@ export const TickMap = {
       message.tickData = undefined;
     }
     if (
-      object.LimitOrderPool0to1 !== undefined &&
-      object.LimitOrderPool0to1 !== null
+      object.LimitOrderTranche0to1 !== undefined &&
+      object.LimitOrderTranche0to1 !== null
     ) {
-      message.LimitOrderPool0to1 = LimitOrderPool.fromJSON(
-        object.LimitOrderPool0to1
+      message.LimitOrderTranche0to1 = LimitOrderTrancheTrancheIndexes.fromJSON(
+        object.LimitOrderTranche0to1
       );
     } else {
-      message.LimitOrderPool0to1 = undefined;
+      message.LimitOrderTranche0to1 = undefined;
     }
     if (
-      object.LimitOrderPool1to0 !== undefined &&
-      object.LimitOrderPool1to0 !== null
+      object.LimitOrderTranche1to0 !== undefined &&
+      object.LimitOrderTranche1to0 !== null
     ) {
-      message.LimitOrderPool1to0 = LimitOrderPool.fromJSON(
-        object.LimitOrderPool1to0
+      message.LimitOrderTranche1to0 = LimitOrderTrancheTrancheIndexes.fromJSON(
+        object.LimitOrderTranche1to0
       );
     } else {
-      message.LimitOrderPool1to0 = undefined;
+      message.LimitOrderTranche1to0 = undefined;
     }
     return message;
   },
@@ -126,13 +126,13 @@ export const TickMap = {
       (obj.tickData = message.tickData
         ? TickDataType.toJSON(message.tickData)
         : undefined);
-    message.LimitOrderPool0to1 !== undefined &&
-      (obj.LimitOrderPool0to1 = message.LimitOrderPool0to1
-        ? LimitOrderPool.toJSON(message.LimitOrderPool0to1)
+    message.LimitOrderTranche0to1 !== undefined &&
+      (obj.LimitOrderTranche0to1 = message.LimitOrderTranche0to1
+        ? LimitOrderTrancheTrancheIndexes.toJSON(message.LimitOrderTranche0to1)
         : undefined);
-    message.LimitOrderPool1to0 !== undefined &&
-      (obj.LimitOrderPool1to0 = message.LimitOrderPool1to0
-        ? LimitOrderPool.toJSON(message.LimitOrderPool1to0)
+    message.LimitOrderTranche1to0 !== undefined &&
+      (obj.LimitOrderTranche1to0 = message.LimitOrderTranche1to0
+        ? LimitOrderTrancheTrancheIndexes.toJSON(message.LimitOrderTranche1to0)
         : undefined);
     return obj;
   },
@@ -155,24 +155,24 @@ export const TickMap = {
       message.tickData = undefined;
     }
     if (
-      object.LimitOrderPool0to1 !== undefined &&
-      object.LimitOrderPool0to1 !== null
+      object.LimitOrderTranche0to1 !== undefined &&
+      object.LimitOrderTranche0to1 !== null
     ) {
-      message.LimitOrderPool0to1 = LimitOrderPool.fromPartial(
-        object.LimitOrderPool0to1
+      message.LimitOrderTranche0to1 = LimitOrderTrancheTrancheIndexes.fromPartial(
+        object.LimitOrderTranche0to1
       );
     } else {
-      message.LimitOrderPool0to1 = undefined;
+      message.LimitOrderTranche0to1 = undefined;
     }
     if (
-      object.LimitOrderPool1to0 !== undefined &&
-      object.LimitOrderPool1to0 !== null
+      object.LimitOrderTranche1to0 !== undefined &&
+      object.LimitOrderTranche1to0 !== null
     ) {
-      message.LimitOrderPool1to0 = LimitOrderPool.fromPartial(
-        object.LimitOrderPool1to0
+      message.LimitOrderTranche1to0 = LimitOrderTrancheTrancheIndexes.fromPartial(
+        object.LimitOrderTranche1to0
       );
     } else {
-      message.LimitOrderPool1to0 = undefined;
+      message.LimitOrderTranche1to0 = undefined;
     }
     return message;
   },

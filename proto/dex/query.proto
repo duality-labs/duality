@@ -117,7 +117,7 @@ service Query {
 
   // Queries a LimitOrderTranche by index.
 	rpc LimitOrderTranche(QueryGetLimitOrderTrancheRequest) returns (QueryGetLimitOrderTrancheResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_tranche/{pairId}/{token}/{tickIndex}/{count}";
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_tranche/{pairId}/{token}/{tickIndex}/{trancheIndex}";
 	}
 
 	// Queries a list of LimitOrderTranche items.
@@ -308,7 +308,7 @@ message QueryGetLimitOrderTrancheRequest {
 	  string pairId = 1;
   int64 tickIndex =2;
   string token = 3;
-    uint64 count = 4;
+    uint64 trancheIndex = 4;
 
 }
 
