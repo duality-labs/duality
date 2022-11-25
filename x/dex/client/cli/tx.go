@@ -9,7 +9,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	// "github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/NicholasDotSol/duality/x/dex/types"
-	"runtime"
 )
 
 var (
@@ -31,9 +30,6 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	// TEMP: Temporary warning until CLI commands have been fully tested
-	PrintCLIWarning()
-
 	cmd.AddCommand(CmdDeposit())
 	cmd.AddCommand(CmdWithdrawl())
 	cmd.AddCommand(CmdSwap())
@@ -43,13 +39,4 @@ func GetTxCmd() *cobra.Command {
 	// this line is used by starport scaffolding # 1
 
 	return cmd
-}
-
-func PrintCLIWarning(){
-	colorChar := "\033[31m"
-	colorEnd := "\033[0m"
-	if runtime.GOOS == "windows" {
-		colorChar, colorEnd = "", ""
-	}
-	fmt.Printf(colorChar + "\n!! WARNING CLI COMMANDS ARE STILL IN EARLY BETA !! \nNOT ALL FUNCTIONALITY HAS BEEN TESTED\n" + colorEnd)
 }
