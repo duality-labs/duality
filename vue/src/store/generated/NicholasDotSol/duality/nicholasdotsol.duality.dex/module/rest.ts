@@ -796,17 +796,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @tags Query
    * @name QueryLimitOrderTranche
    * @summary Queries a LimitOrderTranche by index.
-   * @request GET:/NicholasDotSol/duality/dex/limit_order_tranche/{pairId}/{token}/{tickIndex}/{count}
+   * @request GET:/NicholasDotSol/duality/dex/limit_order_tranche/{pairId}/{token}/{tickIndex}/{trancheIndex}
    */
   queryLimitOrderTranche = (
     pairId: string,
     token: string,
     tickIndex: string,
-    count: string,
+    trancheIndex: string,
     params: RequestParams = {},
   ) =>
     this.request<DexQueryGetLimitOrderTrancheResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/limit_order_tranche/${pairId}/${token}/${tickIndex}/${count}`,
+      path: `/NicholasDotSol/duality/dex/limit_order_tranche/${pairId}/${token}/${tickIndex}/${trancheIndex}`,
       method: "GET",
       format: "json",
       ...params,

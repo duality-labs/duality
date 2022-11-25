@@ -22810,7 +22810,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/limit_order_tranche/{pairId}/{token}/{tickIndex}/{count}':
+  '/NicholasDotSol/duality/dex/limit_order_tranche/{pairId}/{token}/{tickIndex}/{trancheIndex}':
     get:
       summary: Queries a LimitOrderTranche by index.
       operationId: NicholasdotsolDualityDexLimitOrderTranche
@@ -22873,7 +22873,7 @@ paths:
           required: true
           type: string
           format: int64
-        - name: count
+        - name: trancheIndex
           in: path
           required: true
           type: string
