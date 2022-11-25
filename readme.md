@@ -5,6 +5,6 @@ Duality is a decentralized exchange optimized for capital efficiency and composa
 Build Steps:
 
 1. [Install the Ignite CLI](https://docs.ignite.com/guide/install)
-1. To build for your local machine run `ignite chain build`. You can customize the build target like so: `ignite chain build -t linux:arm64`. The binary will output to $GOPATH/bin/dualityd.
+1. To build for your local machine run `ignite chain build`. You can customize the build target like so: `ignite chain build -t linux:amd64`. The binary will output to $GOPATH/bin/dualityd.
 
 For more on duality's functionality and design read our [documentation](https://duality.gitbook.io/duality-documentation/concepts)
