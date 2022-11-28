@@ -1,34 +1,26 @@
-import { txClient, queryClient, MissingWalletError , registry} from './module'
+import { Client, registry, MissingWalletError } from 'NicholasDotSol-duality-client-ts'
 
-import { AdjanceyMatrix } from "./module/types/dex/adjancey_matrix"
-import { EdgeRow } from "./module/types/dex/edge_row"
-import { FeeList } from "./module/types/dex/fee_list"
-import { LimitOrderTrancheTrancheIndexes } from "./module/types/dex/limit_order_pool_tranche_indexes"
-import { LimitOrderTranche } from "./module/types/dex/limit_order_tranche"
-import { LimitOrderTrancheUser } from "./module/types/dex/limit_order_tranche_user"
-import { PairMap } from "./module/types/dex/pair_map"
-import { Params } from "./module/types/dex/params"
-import { Reserve0AndSharesType } from "./module/types/dex/reserve_0_and_shares_type"
-import { Shares } from "./module/types/dex/shares"
-import { TickDataType } from "./module/types/dex/tick_data_type"
-import { TickMap } from "./module/types/dex/tick_map"
-import { TokenMap } from "./module/types/dex/token_map"
-import { TokenPairType } from "./module/types/dex/token_pair_type"
-import { Tokens } from "./module/types/dex/tokens"
+import { AdjanceyMatrix } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
+import { EdgeRow } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
+import { FeeList } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
+import { LimitOrderTrancheTrancheIndexes } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
+import { LimitOrderTranche } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
+import { LimitOrderTrancheUser } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
+import { PairMap } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
+import { Params } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
+import { Reserve0AndSharesType } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
+import { Shares } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
+import { TickDataType } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
+import { TickMap } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
+import { TokenMap } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
+import { TokenPairType } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
+import { Tokens } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
 
 
 export { AdjanceyMatrix, EdgeRow, FeeList, LimitOrderTrancheTrancheIndexes, LimitOrderTranche, LimitOrderTrancheUser, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
 
-async function initTxClient(vuexGetters) {
-	return await txClient(vuexGetters['common/wallet/signer'], {
-		addr: vuexGetters['common/env/apiTendermint']
-	})
-}
-
-async function initQueryClient(vuexGetters) {
-	return await queryClient({
-		addr: vuexGetters['common/env/apiCosmos']
-	})
+function initClient(vuexGetters) {
+	return new Client(vuexGetters['common/env/getEnv'], vuexGetters['common/wallet/signer'])
 }
 
 function mergeResults(value, next_values) {
@@ -42,17 +34,18 @@ function mergeResults(value, next_values) {
 	return value
 }
 
+type Field = {
+	name: string;
+	type: unknown;
+}
 function getStructure(template) {
-	let structure = { fields: [] }
+	let structure: {fields: Field[]} = { fields: [] }
 	for (const [key, value] of Object.entries(template)) {
-		let field: any = {}
-		field.name = key
-		field.type = typeof value
+		let field = { name: key, type: typeof value }
 		structure.fields.push(field)
 	}
 	return structure
 }
-
 const getDefaultState = () => {
 	return {
 				Params: {},
@@ -289,8 +282,8 @@ export default {
 		async QueryParams({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryParams()).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryParams()).data
 				
 					
 				commit('QUERY', { query: 'Params', key: { params: {...key}, query}, value })
@@ -311,8 +304,8 @@ export default {
 		async QueryTickMap({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryTickMap( key.pairId,  key.tickIndex)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryTickMap( key.pairId,  key.tickIndex)).data
 				
 					
 				commit('QUERY', { query: 'TickMap', key: { params: {...key}, query}, value })
@@ -333,12 +326,12 @@ export default {
 		async QueryTickMapAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryTickMapAll(query)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryTickMapAll(query ?? undefined)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryTickMapAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await client.NicholasdotsolDualityDex.query.queryTickMapAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
 					value = mergeResults(value, next_values);
 				}
 				commit('QUERY', { query: 'TickMapAll', key: { params: {...key}, query}, value })
@@ -359,8 +352,8 @@ export default {
 		async QueryPairMap({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryPairMap( key.pairId)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryPairMap( key.pairId)).data
 				
 					
 				commit('QUERY', { query: 'PairMap', key: { params: {...key}, query}, value })
@@ -381,12 +374,12 @@ export default {
 		async QueryPairMapAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryPairMapAll(query)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryPairMapAll(query ?? undefined)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryPairMapAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await client.NicholasdotsolDualityDex.query.queryPairMapAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
 					value = mergeResults(value, next_values);
 				}
 				commit('QUERY', { query: 'PairMapAll', key: { params: {...key}, query}, value })
@@ -407,8 +400,8 @@ export default {
 		async QueryTokens({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryTokens( key.id)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryTokens( key.id)).data
 				
 					
 				commit('QUERY', { query: 'Tokens', key: { params: {...key}, query}, value })
@@ -429,12 +422,12 @@ export default {
 		async QueryTokensAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryTokensAll(query)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryTokensAll(query ?? undefined)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryTokensAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await client.NicholasdotsolDualityDex.query.queryTokensAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
 					value = mergeResults(value, next_values);
 				}
 				commit('QUERY', { query: 'TokensAll', key: { params: {...key}, query}, value })
@@ -455,8 +448,8 @@ export default {
 		async QueryTokenMap({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryTokenMap( key.address)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryTokenMap( key.address)).data
 				
 					
 				commit('QUERY', { query: 'TokenMap', key: { params: {...key}, query}, value })
@@ -477,12 +470,12 @@ export default {
 		async QueryTokenMapAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryTokenMapAll(query)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryTokenMapAll(query ?? undefined)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryTokenMapAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await client.NicholasdotsolDualityDex.query.queryTokenMapAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
 					value = mergeResults(value, next_values);
 				}
 				commit('QUERY', { query: 'TokenMapAll', key: { params: {...key}, query}, value })
@@ -503,8 +496,8 @@ export default {
 		async QueryShares({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryShares( key.address,  key.pairId,  key.tickIndex,  key.fee)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryShares( key.address,  key.pairId,  key.tickIndex,  key.fee)).data
 				
 					
 				commit('QUERY', { query: 'Shares', key: { params: {...key}, query}, value })
@@ -525,12 +518,12 @@ export default {
 		async QuerySharesAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.querySharesAll(query)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.querySharesAll(query ?? undefined)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.querySharesAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await client.NicholasdotsolDualityDex.query.querySharesAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
 					value = mergeResults(value, next_values);
 				}
 				commit('QUERY', { query: 'SharesAll', key: { params: {...key}, query}, value })
@@ -551,8 +544,8 @@ export default {
 		async QueryFeeList({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryFeeList( key.id)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryFeeList( key.id)).data
 				
 					
 				commit('QUERY', { query: 'FeeList', key: { params: {...key}, query}, value })
@@ -573,12 +566,12 @@ export default {
 		async QueryFeeListAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryFeeListAll(query)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryFeeListAll(query ?? undefined)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryFeeListAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await client.NicholasdotsolDualityDex.query.queryFeeListAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
 					value = mergeResults(value, next_values);
 				}
 				commit('QUERY', { query: 'FeeListAll', key: { params: {...key}, query}, value })
@@ -599,8 +592,8 @@ export default {
 		async QueryEdgeRow({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryEdgeRow( key.id)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryEdgeRow( key.id)).data
 				
 					
 				commit('QUERY', { query: 'EdgeRow', key: { params: {...key}, query}, value })
@@ -621,12 +614,12 @@ export default {
 		async QueryEdgeRowAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryEdgeRowAll(query)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryEdgeRowAll(query ?? undefined)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryEdgeRowAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await client.NicholasdotsolDualityDex.query.queryEdgeRowAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
 					value = mergeResults(value, next_values);
 				}
 				commit('QUERY', { query: 'EdgeRowAll', key: { params: {...key}, query}, value })
@@ -647,8 +640,8 @@ export default {
 		async QueryAdjanceyMatrix({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryAdjanceyMatrix( key.id)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryAdjanceyMatrix( key.id)).data
 				
 					
 				commit('QUERY', { query: 'AdjanceyMatrix', key: { params: {...key}, query}, value })
@@ -669,12 +662,12 @@ export default {
 		async QueryAdjanceyMatrixAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryAdjanceyMatrixAll(query)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryAdjanceyMatrixAll(query ?? undefined)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryAdjanceyMatrixAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await client.NicholasdotsolDualityDex.query.queryAdjanceyMatrixAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
 					value = mergeResults(value, next_values);
 				}
 				commit('QUERY', { query: 'AdjanceyMatrixAll', key: { params: {...key}, query}, value })
@@ -695,8 +688,8 @@ export default {
 		async QueryLimitOrderTrancheUser({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderTrancheUser( key.pairId,  key.token,  key.tickIndex,  key.count,  key.address)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryLimitOrderTrancheUser( key.pairId,  key.token,  key.tickIndex,  key.count,  key.address)).data
 				
 					
 				commit('QUERY', { query: 'LimitOrderTrancheUser', key: { params: {...key}, query}, value })
@@ -717,12 +710,12 @@ export default {
 		async QueryLimitOrderTrancheUserAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderTrancheUserAll(query)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryLimitOrderTrancheUserAll(query ?? undefined)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryLimitOrderTrancheUserAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await client.NicholasdotsolDualityDex.query.queryLimitOrderTrancheUserAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
 					value = mergeResults(value, next_values);
 				}
 				commit('QUERY', { query: 'LimitOrderTrancheUserAll', key: { params: {...key}, query}, value })
@@ -743,8 +736,8 @@ export default {
 		async QueryLimitOrderTranche({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderTranche( key.pairId,  key.token,  key.tickIndex,  key.count)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryLimitOrderTranche( key.pairId,  key.token,  key.tickIndex,  key.trancheIndex)).data
 				
 					
 				commit('QUERY', { query: 'LimitOrderTranche', key: { params: {...key}, query}, value })
@@ -765,12 +758,12 @@ export default {
 		async QueryLimitOrderTrancheAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderTrancheAll(query)).data
+				const client = initClient(rootGetters);
+				let value= (await client.NicholasdotsolDualityDex.query.queryLimitOrderTrancheAll(query ?? undefined)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryLimitOrderTrancheAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await client.NicholasdotsolDualityDex.query.queryLimitOrderTrancheAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
 					value = mergeResults(value, next_values);
 				}
 				commit('QUERY', { query: 'LimitOrderTrancheAll', key: { params: {...key}, query}, value })
@@ -785,10 +778,8 @@ export default {
 		
 		async sendMsgWithdrawFilledLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgWithdrawFilledLimitOrder(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
+				const client=await initClient(rootGetters)
+				const result = await client.NicholasdotsolDualityDex.tx.sendMsgWithdrawFilledLimitOrder({ value, fee: {amount: fee, gas: "200000"}, memo })
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
@@ -798,72 +789,10 @@ export default {
 				}
 			}
 		},
-		async sendMsgSwap({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgSwap(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSwap:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgSwap:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgPlaceLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgPlaceLimitOrder(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgPlaceLimitOrder:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgPlaceLimitOrder:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgWithdrawl({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgWithdrawl(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgWithdrawl:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgWithdrawl:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgDeposit({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgDeposit(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgDeposit:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
 		async sendMsgCancelLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgCancelLimitOrder(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
+				const client=await initClient(rootGetters)
+				const result = await client.NicholasdotsolDualityDex.tx.sendMsgCancelLimitOrder({ value, fee: {amount: fee, gas: "200000"}, memo })
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
@@ -873,11 +802,63 @@ export default {
 				}
 			}
 		},
+		async sendMsgPlaceLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const client=await initClient(rootGetters)
+				const result = await client.NicholasdotsolDualityDex.tx.sendMsgPlaceLimitOrder({ value, fee: {amount: fee, gas: "200000"}, memo })
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgPlaceLimitOrder:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgPlaceLimitOrder:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgSwap({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const client=await initClient(rootGetters)
+				const result = await client.NicholasdotsolDualityDex.tx.sendMsgSwap({ value, fee: {amount: fee, gas: "200000"}, memo })
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgSwap:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgSwap:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgDeposit({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const client=await initClient(rootGetters)
+				const result = await client.NicholasdotsolDualityDex.tx.sendMsgDeposit({ value, fee: {amount: fee, gas: "200000"}, memo })
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgDeposit:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgWithdrawl({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const client=await initClient(rootGetters)
+				const result = await client.NicholasdotsolDualityDex.tx.sendMsgWithdrawl({ value, fee: {amount: fee, gas: "200000"}, memo })
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgWithdrawl:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgWithdrawl:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
 		
 		async MsgWithdrawFilledLimitOrder({ rootGetters }, { value }) {
 			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgWithdrawFilledLimitOrder(value)
+				const client=initClient(rootGetters)
+				const msg = await client.NicholasdotsolDualityDex.tx.msgWithdrawFilledLimitOrder({value})
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
@@ -887,23 +868,23 @@ export default {
 				}
 			}
 		},
-		async MsgSwap({ rootGetters }, { value }) {
+		async MsgCancelLimitOrder({ rootGetters }, { value }) {
 			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgSwap(value)
+				const client=initClient(rootGetters)
+				const msg = await client.NicholasdotsolDualityDex.tx.msgCancelLimitOrder({value})
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSwap:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgSwap:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgCancelLimitOrder:Create Could not create message: ' + e.message)
 				}
 			}
 		},
 		async MsgPlaceLimitOrder({ rootGetters }, { value }) {
 			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgPlaceLimitOrder(value)
+				const client=initClient(rootGetters)
+				const msg = await client.NicholasdotsolDualityDex.tx.msgPlaceLimitOrder({value})
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
@@ -913,23 +894,23 @@ export default {
 				}
 			}
 		},
-		async MsgWithdrawl({ rootGetters }, { value }) {
+		async MsgSwap({ rootGetters }, { value }) {
 			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgWithdrawl(value)
+				const client=initClient(rootGetters)
+				const msg = await client.NicholasdotsolDualityDex.tx.msgSwap({value})
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgWithdrawl:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgSwap:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgWithdrawl:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgSwap:Create Could not create message: ' + e.message)
 				}
 			}
 		},
 		async MsgDeposit({ rootGetters }, { value }) {
 			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgDeposit(value)
+				const client=initClient(rootGetters)
+				const msg = await client.NicholasdotsolDualityDex.tx.msgDeposit({value})
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
@@ -939,16 +920,16 @@ export default {
 				}
 			}
 		},
-		async MsgCancelLimitOrder({ rootGetters }, { value }) {
+		async MsgWithdrawl({ rootGetters }, { value }) {
 			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgCancelLimitOrder(value)
+				const client=initClient(rootGetters)
+				const msg = await client.NicholasdotsolDualityDex.tx.msgWithdrawl({value})
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgWithdrawl:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgCancelLimitOrder:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgWithdrawl:Create Could not create message: ' + e.message)
 				}
 			}
 		},

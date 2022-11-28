@@ -93,7 +93,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 		amountToDeposit := msg.AmountIn.Sub(amount_left)
 		if amountToDeposit.GT(sdk.ZeroDec()) {
-			coinIn := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amountToDeposit.BigInt()))
+			coinIn := sdk.NewCoin(token0, amountToDeposit.RoundInt())
 			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
 				return &types.MsgSwapResponse{}, err
 			}
@@ -103,7 +103,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 		if amount_out.GT(sdk.ZeroDec()) {
 
-			coinOut = sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount_out.BigInt()))
+			coinOut = sdk.NewCoin(token1, amount_out.RoundInt())
 			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 				return &types.MsgSwapResponse{}, err
 			}
@@ -118,7 +118,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 		amountToDeposit := msg.AmountIn.Sub(amount_left)
 		if amountToDeposit.GT(sdk.ZeroDec()) {
-			coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountToDeposit.BigInt()))
+			coinIn := sdk.NewCoin(token1, amountToDeposit.RoundInt())
 			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
 				return &types.MsgSwapResponse{}, err
 			}
@@ -128,7 +128,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 		if amount_out.GT(sdk.ZeroDec()) {
 
-			coinOut = sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
+			coinOut = sdk.NewCoin(token0, amount_out.RoundInt())
 			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 				return &types.MsgSwapResponse{}, err
 			}

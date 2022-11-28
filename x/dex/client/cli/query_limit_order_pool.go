@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListLimitOrderPoolUserShareMap() *cobra.Command {
+func CmdListLimitOrderTranche() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-limit-order-pool-user-share-map",
-		Short: "list all LimitOrderPoolUserShareMap",
+		Use:   "list-limit-order-pool-total-shares-map",
+		Short: "list all LimitOrderTranche",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -24,11 +24,11 @@ func CmdListLimitOrderPoolUserShareMap() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllLimitOrderPoolUserShareMapRequest{
+			params := &types.QueryAllLimitOrderTrancheRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.LimitOrderPoolUserShareMapAll(context.Background(), params)
+			res, err := queryClient.LimitOrderTrancheAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -43,11 +43,11 @@ func CmdListLimitOrderPoolUserShareMap() *cobra.Command {
 	return cmd
 }
 
-func CmdShowLimitOrderPoolUserShareMap() *cobra.Command {
+func CmdShowLimitOrderTranche() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-limit-order-pool-user-share-map [count] [address]",
-		Short: "shows a LimitOrderPoolUserShareMap",
-		Args:  cobra.ExactArgs(2),
+		Use:   "show-limit-order-pool-total-shares-map [count]",
+		Short: "shows a LimitOrderTranche",
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -61,14 +61,11 @@ func CmdShowLimitOrderPoolUserShareMap() *cobra.Command {
 				return err
 			}
 
-			argAddress := args[1]
-
-			params := &types.QueryGetLimitOrderPoolUserShareMapRequest{
-				Count:   uint64(argCount),
-				Address: argAddress,
+			params := &types.QueryGetLimitOrderTrancheRequest{
+				TrancheIndex: uint64(argCount),
 			}
 
-			res, err := queryClient.LimitOrderPoolUserShareMap(context.Background(), params)
+			res, err := queryClient.LimitOrderTranche(context.Background(), params)
 			if err != nil {
 				return err
 			}

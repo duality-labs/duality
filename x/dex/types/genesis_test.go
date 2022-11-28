@@ -96,7 +96,7 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 				},
 				AdjanceyMatrixCount: 2,
-				LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
+				LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
 					{
 						Count:   0,
 						Address: "0",
@@ -106,33 +106,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						Address: "1",
 					},
 				},
-				LimitOrderPoolUserSharesWithdrawnList: []types.LimitOrderPoolUserSharesWithdrawn{
-					{
-						Count:   0,
-						Address: "0",
-					},
-					{
-						Count:   1,
-						Address: "1",
-					},
-				},
-				LimitOrderPoolTotalSharesMapList: []types.LimitOrderPoolTotalSharesMap{
-					{
-						Count: 0,
-					},
-					{
-						Count: 1,
-					},
-				},
-				LimitOrderPoolReserveMapList: []types.LimitOrderPoolReserveMap{
-					{
-						Count: 0,
-					},
-					{
-						Count: 1,
-					},
-				},
-				LimitOrderPoolFillMapList: []types.LimitOrderPoolFillMap{
+				LimitOrderTrancheList: []types.LimitOrderTranche{
 					{
 						Count: 0,
 					},
@@ -311,9 +285,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated limitOrderPoolUserShareMap",
+			desc: "duplicated LimitOrderTrancheUser",
 			genState: &types.GenesisState{
-				LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
+				LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
 					{
 						Count:   0,
 						Address: "0",
@@ -327,9 +301,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated limitOrderPoolUserSharesWithdrawn",
+			desc: "duplicated LimitOrderTrancheUserSharesWithdrawn",
 			genState: &types.GenesisState{
-				LimitOrderPoolUserSharesWithdrawnList: []types.LimitOrderPoolUserSharesWithdrawn{
+				LimitOrderTrancheUserSharesWithdrawnList: []types.LimitOrderTrancheUserSharesWithdrawn{
 					{
 						Count:   0,
 						Address: "0",
@@ -343,37 +317,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated limitOrderPoolTotalSharesMap",
+			desc: "duplicated LimitOrderTranche",
 			genState: &types.GenesisState{
-				LimitOrderPoolTotalSharesMapList: []types.LimitOrderPoolTotalSharesMap{
-					{
-						Count: 0,
-					},
-					{
-						Count: 0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "duplicated limitOrderPoolReserveMap",
-			genState: &types.GenesisState{
-				LimitOrderPoolReserveMapList: []types.LimitOrderPoolReserveMap{
-					{
-						Count: 0,
-					},
-					{
-						Count: 0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "duplicated limitOrderPoolFillMap",
-			genState: &types.GenesisState{
-				LimitOrderPoolFillMapList: []types.LimitOrderPoolFillMap{
+				LimitOrderTrancheList: []types.LimitOrderTranche{
 					{
 						Count: 0,
 					},
