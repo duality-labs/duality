@@ -122,6 +122,11 @@ func (im IBCMiddleware) OnRecvPacket(
 		return channeltypes.NewErrorAcknowledgement(swapErr.Error())
 	}
 
+	// If there is no next field set in the metadata call into the underlying app
+	if metadata.Next == "" {
+		return ack
+	}
+
 	// Set the new packet data to include the token denom and amount that was received from the swap.
 	data.Denom = res.CoinOut.Denom
 	data.Amount = res.CoinOut.Amount.String()
