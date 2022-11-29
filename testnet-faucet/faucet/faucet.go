@@ -87,17 +87,10 @@ func sendAllTokens(address string)(error){
 
 func faucetHandler(w http.ResponseWriter, r *http.Request){
 
-
-	decoder := json.NewDecoder(r.Body)
-	var reqArgs request
-	err := decoder.Decode(&reqArgs)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 
-	address := reqArgs.Address
+	address := r.URL.Query().Get("address")
+
 
 	// Ensure that an address is passed in
 	if address == "" {
@@ -126,7 +119,8 @@ func faucetHandler(w http.ResponseWriter, r *http.Request){
 
 
 
-	log.Printf("Sent tokens to: %s", reqArgs.Address)
+	log.Printf("Sent tokens to: %s", address)
+
 }
 
 func startServer(){
