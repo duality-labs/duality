@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	dextypes "github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/NicholasDotSol/duality/x/ibc-swap/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -64,7 +66,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 func (k Keeper) Swap(ctx sdk.Context, msg *dextypes.MsgSwap) (*dextypes.MsgSwapResponse, error) {
 	swapHandler := k.msgServiceRouter.Handler(msg)
 	if swapHandler == nil {
-		return nil, sdkerrors.Wrap(types.ErrMsgHandlerInvalid, "could not find the handler for MsgSwap")
+		return nil, sdkerrors.Wrap(types.ErrMsgHandlerInvalid, fmt.Sprintf("could not find the handler for %T", dextypes.MsgSwap{}))
 	}
 
 	res, err := swapHandler(ctx, msg)
