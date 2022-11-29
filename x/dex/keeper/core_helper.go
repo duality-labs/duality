@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 	"math"
 	"strings"
 
@@ -42,7 +41,6 @@ func (k Keeper) GetOrInitPair(goCtx context.Context, token0 string, token1 strin
 	k.TokenInit(ctx, token0)
 	k.TokenInit(ctx, token1)
 	pairId := k.CreatePairId(token0, token1)
-	k.Logger(ctx).Error("GetorInitPair", "pairID", fmt.Sprintf("%q", pairId))
 	pair, found := k.GetPairMap(ctx, pairId)
 	if !found {
 		pair = types.PairMap{

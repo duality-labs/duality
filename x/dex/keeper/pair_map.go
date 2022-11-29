@@ -10,7 +10,6 @@ import (
 func (k Keeper) SetPairMap(ctx sdk.Context, pairMap types.PairMap) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PairMapKeyPrefix))
 	b := k.cdc.MustMarshal(&pairMap)
-	k.Logger(ctx).Error("SetPairMap", "pairMap", pairMap)
 	store.Set(types.PairMapKey(
 		pairMap.PairId,
 	), b)

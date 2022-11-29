@@ -100,15 +100,8 @@ func (k Keeper) DepositCore(
 		k.SetTickMap(ctx, pairId, lowerTick)
 		k.SetTickMap(ctx, pairId, upperTick)
 
-		k.Logger(ctx).Error("AFTER SET PAIR AND TICK MAP")
-
 		k.UpdateTickPointersPostAddToken0(goCtx, &pair, &lowerTick)
-
-		k.Logger(ctx).Error("AFTER UPDATE TICK POINTERS TOKEN0")
-
 		k.UpdateTickPointersPostAddToken1(goCtx, &pair, &upperTick)
-
-		k.Logger(ctx).Error("AFTER UPDATE TICK POINTERS")
 
 		amounts0Deposited[i] = trueAmount0
 		amounts1Deposited[i] = trueAmount1
