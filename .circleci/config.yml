@@ -42,9 +42,13 @@ jobs:
       - run:
           name: Build chain binary
           command: ignite chain build -o /tmp/artifacts
+      - run:
+          name: Ensure ignite has not generated changes which have not been commited to VC
+          command: |
+            CHANGES=$(git ls-files -m)
+            [[ -n "$CHANGES" ]] && { echo "Untracked files created by ignite: $CHANGES" ; exit 1; }
       - store_artifacts:
           path: /tmp/artifacts
-
 workflows:
   version: 2
   full_test_suite:
