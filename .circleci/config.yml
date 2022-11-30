@@ -43,7 +43,8 @@ jobs:
           name: Ensure ignite has not generated changes which have not been commited to VC
           command: |
             CHANGES=$(git ls-files -m)
-            [[ -n "$CHANGES" ]] && { echo "Untracked files created by ignite:\n$CHANGES" ; exit 1; }
+            [[ -n "$CHANGES" ]] && { echo "Untracked files created by ignite:\n$CHANGES" ; exit 1; }\
+            || { echo "No new files detected" ; exit 0; }
       - store_artifacts:
           path: /tmp/artifacts
   binary-release-build:
