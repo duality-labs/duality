@@ -47,8 +47,8 @@ func calculateNewCurrentTicksPure(amount0 sdk.Dec, amount1 sdk.Dec, tickIndex in
 // Helper function to calculate if current ticks change
 func calculateNewCurrentTicks(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, tickIndex int64, feeIndex uint64, pair types.PairMap) (new0to1 int64, new1to0 int64) {
 	k, ctx := s.app.DexKeeper, s.ctx
-	feelist := k.GetAllFeeList(ctx)
-	fee := feelist[feeIndex].Fee
+	FeeTier := k.GetAllFeeTier(ctx)
+	fee := FeeTier[feeIndex].Fee
 	return calculateNewCurrentTicksPure(amount0, amount1, tickIndex, fee, pair.TokenPair.CurrentTick0To1, pair.TokenPair.CurrentTick1To0)
 }
 
@@ -58,15 +58,15 @@ func makePair(s *MsgServerTestSuite, pairId string, tickIndex int64, feeTier uin
 	app, ctx, k := s.app, s.ctx, s.app.DexKeeper
 
 	// this corresponds to line 16 in function DepositVerification of verification.go
-	feeList := k.GetAllFeeList(ctx)
+	FeeTier := k.GetAllFeeTier(ctx)
 
 	var fee int64
 	// handle invalid fee index
-	if feeTier >= uint64(len(feeList)) {
+	if feeTier >= uint64(len(FeeTier)) {
 		s.Assert().True(expectedTxErr == types.ErrValidFeeIndexNotFound)
 		fee = 0
 	} else {
-		fee = feeList[feeTier].Fee
+		fee = FeeTier[feeTier].Fee
 	}
 
 	pair, pairFound := app.DexKeeper.GetPairMap(ctx, pairId)
@@ -134,8 +134,8 @@ func calculateShares(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, pa
 
 	price1To0 := keeper.CalcPrice1To0(tickIndex)
 
-	feelist := k.GetAllFeeList(ctx)
-	fee := feelist[feeIndex].Fee
+	FeeTier := k.GetAllFeeTier(ctx)
+	fee := FeeTier[feeIndex].Fee
 
 	lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, tickIndex-fee)
 	upperTick, upperTickFound := k.GetTickMap(ctx, pairId, tickIndex+fee)
