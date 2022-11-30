@@ -4,15 +4,15 @@ import { util, configure, Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
-export interface FeeList {
+export interface FeeTier {
   id: number;
   fee: number;
 }
 
-const baseFeeList: object = { id: 0, fee: 0 };
+const baseFeeTier: object = { id: 0, fee: 0 };
 
-export const FeeList = {
-  encode(message: FeeList, writer: Writer = Writer.create()): Writer {
+export const FeeTier = {
+  encode(message: FeeTier, writer: Writer = Writer.create()): Writer {
     if (message.id !== 0) {
       writer.uint32(8).uint64(message.id);
     }
@@ -22,10 +22,10 @@ export const FeeList = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): FeeList {
+  decode(input: Reader | Uint8Array, length?: number): FeeTier {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseFeeList } as FeeList;
+    const message = { ...baseFeeTier } as FeeTier;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -43,8 +43,8 @@ export const FeeList = {
     return message;
   },
 
-  fromJSON(object: any): FeeList {
-    const message = { ...baseFeeList } as FeeList;
+  fromJSON(object: any): FeeTier {
+    const message = { ...baseFeeTier } as FeeTier;
     if (object.id !== undefined && object.id !== null) {
       message.id = Number(object.id);
     } else {
@@ -58,15 +58,15 @@ export const FeeList = {
     return message;
   },
 
-  toJSON(message: FeeList): unknown {
+  toJSON(message: FeeTier): unknown {
     const obj: any = {};
     message.id !== undefined && (obj.id = message.id);
     message.fee !== undefined && (obj.fee = message.fee);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<FeeList>): FeeList {
-    const message = { ...baseFeeList } as FeeList;
+  fromPartial(object: DeepPartial<FeeTier>): FeeTier {
+    const message = { ...baseFeeTier } as FeeTier;
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
     } else {

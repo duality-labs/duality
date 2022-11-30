@@ -15,7 +15,7 @@ func DefaultGenesis() *GenesisState {
 		TokensList:                []Tokens{},
 		TokenMapList:              []TokenMap{},
 		SharesList:                []Shares{},
-		FeeListList:               []FeeList{},
+		FeeTierList:               []FeeTier{},
 		EdgeRowList:               []EdgeRow{},
 		AdjanceyMatrixList:        []AdjanceyMatrix{},
 		LimitOrderTrancheUserList: []LimitOrderTrancheUser{},
@@ -80,17 +80,17 @@ func (gs GenesisState) Validate() error {
 		}
 		sharesIndexMap[index] = struct{}{}
 	}
-	// Check for duplicated ID in feeList
-	feeListIdMap := make(map[uint64]bool)
-	feeListCount := gs.GetFeeListCount()
-	for _, elem := range gs.FeeListList {
-		if _, ok := feeListIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for feeList")
+	// Check for duplicated ID in FeeTier
+	FeeTierIdMap := make(map[uint64]bool)
+	FeeTierCount := gs.GetFeeTierCount()
+	for _, elem := range gs.FeeTierList {
+		if _, ok := FeeTierIdMap[elem.Id]; ok {
+			return fmt.Errorf("duplicated id for FeeTier")
 		}
-		if elem.Id >= feeListCount {
-			return fmt.Errorf("feeList id should be lower or equal than the last id")
+		if elem.Id >= FeeTierCount {
+			return fmt.Errorf("FeeTier id should be lower or equal than the last id")
 		}
-		feeListIdMap[elem.Id] = true
+		FeeTierIdMap[elem.Id] = true
 	}
 	// Check for duplicated ID in edgeRow
 	edgeRowIdMap := make(map[uint64]bool)

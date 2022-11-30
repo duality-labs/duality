@@ -28,7 +28,7 @@ type MsgServerTestSuite struct {
 	carol       sdk.AccAddress
 	dan         sdk.AccAddress
 	goCtx       context.Context
-	feeTiers    []types.FeeList
+	feeTiers    []types.FeeTier
 }
 
 func TestMsgServerTestSuite(t *testing.T) {
@@ -56,7 +56,7 @@ func (s *MsgServerTestSuite) SetupTest() {
 	app.AccountKeeper.SetAccount(ctx, accDan)
 
 	// add the fee tiers of 1, 3, 5, 10 ticks
-	feeTiers := []types.FeeList{
+	feeTiers := []types.FeeTier{
 		{Id: 0, Fee: 1},
 		{Id: 1, Fee: 3},
 		{Id: 2, Fee: 5},
@@ -64,10 +64,10 @@ func (s *MsgServerTestSuite) SetupTest() {
 	}
 
 	// Set Fee List
-	app.DexKeeper.AppendFeeList(ctx, feeTiers[0])
-	app.DexKeeper.AppendFeeList(ctx, feeTiers[1])
-	app.DexKeeper.AppendFeeList(ctx, feeTiers[2])
-	app.DexKeeper.AppendFeeList(ctx, feeTiers[3])
+	app.DexKeeper.AppendFeeTier(ctx, feeTiers[0])
+	app.DexKeeper.AppendFeeTier(ctx, feeTiers[1])
+	app.DexKeeper.AppendFeeTier(ctx, feeTiers[2])
+	app.DexKeeper.AppendFeeTier(ctx, feeTiers[3])
 
 	s.app = app
 	s.msgServer = keeper.NewMsgServerImpl(app.DexKeeper)

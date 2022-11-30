@@ -2,7 +2,7 @@ import { Client, registry, MissingWalletError } from 'NicholasDotSol-duality-cli
 
 import { AdjanceyMatrix } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
 import { EdgeRow } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
-import { FeeList } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
+import { FeeTier } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
 import { LimitOrderTrancheTrancheIndexes } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
 import { LimitOrderTranche } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
 import { LimitOrderTrancheUser } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
@@ -17,7 +17,7 @@ import { TokenPairType } from "NicholasDotSol-duality-client-ts/nicholasdotsol.d
 import { Tokens } from "NicholasDotSol-duality-client-ts/nicholasdotsol.duality.dex/types"
 
 
-export { AdjanceyMatrix, EdgeRow, FeeList, LimitOrderTrancheTrancheIndexes, LimitOrderTranche, LimitOrderTrancheUser, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
+export { AdjanceyMatrix, EdgeRow, FeeTier, LimitOrderTrancheTrancheIndexes, LimitOrderTranche, LimitOrderTrancheUser, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
 
 function initClient(vuexGetters) {
 	return new Client(vuexGetters['common/env/getEnv'], vuexGetters['common/wallet/signer'])
@@ -59,8 +59,8 @@ const getDefaultState = () => {
 				TokenMapAll: {},
 				Shares: {},
 				SharesAll: {},
-				FeeList: {},
-				FeeListAll: {},
+				FeeTier: {},
+				FeeTierAll: {},
 				EdgeRow: {},
 				EdgeRowAll: {},
 				AdjanceyMatrix: {},
@@ -73,7 +73,7 @@ const getDefaultState = () => {
 				_Structure: {
 						AdjanceyMatrix: getStructure(AdjanceyMatrix.fromPartial({})),
 						EdgeRow: getStructure(EdgeRow.fromPartial({})),
-						FeeList: getStructure(FeeList.fromPartial({})),
+						FeeTier: getStructure(FeeTier.fromPartial({})),
 						LimitOrderTrancheTrancheIndexes: getStructure(LimitOrderTrancheTrancheIndexes.fromPartial({})),
 						LimitOrderTranche: getStructure(LimitOrderTranche.fromPartial({})),
 						LimitOrderTrancheUser: getStructure(LimitOrderTrancheUser.fromPartial({})),
@@ -180,17 +180,17 @@ export default {
 					}
 			return state.SharesAll[JSON.stringify(params)] ?? {}
 		},
-				getFeeList: (state) => (params = { params: {}}) => {
+				getFeeTier: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.FeeList[JSON.stringify(params)] ?? {}
+			return state.FeeTier[JSON.stringify(params)] ?? {}
 		},
-				getFeeListAll: (state) => (params = { params: {}}) => {
+				getFeeTierAll: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.FeeListAll[JSON.stringify(params)] ?? {}
+			return state.FeeTierAll[JSON.stringify(params)] ?? {}
 		},
 				getEdgeRow: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
@@ -541,18 +541,18 @@ export default {
 		 		
 		
 		
-		async QueryFeeList({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryFeeTier({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const client = initClient(rootGetters);
-				let value= (await client.NicholasdotsolDualityDex.query.queryFeeList( key.id)).data
+				let value= (await client.NicholasdotsolDualityDex.query.queryFeeTier( key.id)).data
 				
 					
-				commit('QUERY', { query: 'FeeList', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryFeeList', payload: { options: { all }, params: {...key},query }})
-				return getters['getFeeList']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'FeeTier', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryFeeTier', payload: { options: { all }, params: {...key},query }})
+				return getters['getFeeTier']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryFeeList API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryFeeTier API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -563,22 +563,22 @@ export default {
 		 		
 		
 		
-		async QueryFeeListAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryFeeTierAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const client = initClient(rootGetters);
-				let value= (await client.NicholasdotsolDualityDex.query.queryFeeListAll(query ?? undefined)).data
+				let value= (await client.NicholasdotsolDualityDex.query.queryFeeTierAll(query ?? undefined)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await client.NicholasdotsolDualityDex.query.queryFeeListAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
+					let next_values=(await client.NicholasdotsolDualityDex.query.queryFeeTierAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
 					value = mergeResults(value, next_values);
 				}
-				commit('QUERY', { query: 'FeeListAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryFeeListAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getFeeListAll']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'FeeTierAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryFeeTierAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getFeeTierAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryFeeListAll API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryFeeTierAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -776,42 +776,16 @@ export default {
 		},
 		
 		
-		async sendMsgWithdrawFilledLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
+		async sendMsgDeposit({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
-				const result = await client.NicholasdotsolDualityDex.tx.sendMsgWithdrawFilledLimitOrder({ value, fee: {amount: fee, gas: "200000"}, memo })
+				const result = await client.NicholasdotsolDualityDex.tx.sendMsgDeposit({ value, fee: {amount: fee, gas: "200000"}, memo })
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgCancelLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const client=await initClient(rootGetters)
-				const result = await client.NicholasdotsolDualityDex.tx.sendMsgCancelLimitOrder({ value, fee: {amount: fee, gas: "200000"}, memo })
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgCancelLimitOrder:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgPlaceLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const client=await initClient(rootGetters)
-				const result = await client.NicholasdotsolDualityDex.tx.sendMsgPlaceLimitOrder({ value, fee: {amount: fee, gas: "200000"}, memo })
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgPlaceLimitOrder:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgPlaceLimitOrder:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgDeposit:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -828,16 +802,29 @@ export default {
 				}
 			}
 		},
-		async sendMsgDeposit({ rootGetters }, { value, fee = [], memo = '' }) {
+		async sendMsgPlaceLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
-				const result = await client.NicholasdotsolDualityDex.tx.sendMsgDeposit({ value, fee: {amount: fee, gas: "200000"}, memo })
+				const result = await client.NicholasdotsolDualityDex.tx.sendMsgPlaceLimitOrder({ value, fee: {amount: fee, gas: "200000"}, memo })
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgPlaceLimitOrder:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgDeposit:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgPlaceLimitOrder:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgCancelLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const client=await initClient(rootGetters)
+				const result = await client.NicholasdotsolDualityDex.tx.sendMsgCancelLimitOrder({ value, fee: {amount: fee, gas: "200000"}, memo })
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgCancelLimitOrder:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -854,43 +841,30 @@ export default {
 				}
 			}
 		},
-		
-		async MsgWithdrawFilledLimitOrder({ rootGetters }, { value }) {
+		async sendMsgWithdrawFilledLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
-				const client=initClient(rootGetters)
-				const msg = await client.NicholasdotsolDualityDex.tx.msgWithdrawFilledLimitOrder({value})
-				return msg
+				const client=await initClient(rootGetters)
+				const result = await client.NicholasdotsolDualityDex.tx.sendMsgWithdrawFilledLimitOrder({ value, fee: {amount: fee, gas: "200000"}, memo })
+				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
 					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Create Could not create message: ' + e.message)
+				}else{
+					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
-		async MsgCancelLimitOrder({ rootGetters }, { value }) {
+		
+		async MsgDeposit({ rootGetters }, { value }) {
 			try {
 				const client=initClient(rootGetters)
-				const msg = await client.NicholasdotsolDualityDex.tx.msgCancelLimitOrder({value})
+				const msg = await client.NicholasdotsolDualityDex.tx.msgDeposit({value})
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgCancelLimitOrder:Create Could not create message: ' + e.message)
-				}
-			}
-		},
-		async MsgPlaceLimitOrder({ rootGetters }, { value }) {
-			try {
-				const client=initClient(rootGetters)
-				const msg = await client.NicholasdotsolDualityDex.tx.msgPlaceLimitOrder({value})
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgPlaceLimitOrder:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgPlaceLimitOrder:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgDeposit:Create Could not create message: ' + e.message)
 				}
 			}
 		},
@@ -907,16 +881,29 @@ export default {
 				}
 			}
 		},
-		async MsgDeposit({ rootGetters }, { value }) {
+		async MsgPlaceLimitOrder({ rootGetters }, { value }) {
 			try {
 				const client=initClient(rootGetters)
-				const msg = await client.NicholasdotsolDualityDex.tx.msgDeposit({value})
+				const msg = await client.NicholasdotsolDualityDex.tx.msgPlaceLimitOrder({value})
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgPlaceLimitOrder:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgDeposit:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgPlaceLimitOrder:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgCancelLimitOrder({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.NicholasdotsolDualityDex.tx.msgCancelLimitOrder({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgCancelLimitOrder:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgCancelLimitOrder:Create Could not create message: ' + e.message)
 				}
 			}
 		},
@@ -930,6 +917,19 @@ export default {
 					throw new Error('TxClient:MsgWithdrawl:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgWithdrawl:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgWithdrawFilledLimitOrder({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.NicholasdotsolDualityDex.tx.msgWithdrawFilledLimitOrder({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Create Could not create message: ' + e.message)
 				}
 			}
 		},

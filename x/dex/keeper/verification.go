@@ -33,7 +33,7 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 		return "", "", nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
-	feeCount := k.GetFeeListCount(ctx)
+	feeCount := k.GetFeeTierCount(ctx)
 
 	// make sure that all feeIndexes (fee list index) is a valid index of the fee tier
 	for i, _ := range msg.FeeIndexes {
@@ -96,7 +96,7 @@ func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 	}
 
 	// gets total number of fee tiers
-	feeCount := k.GetFeeListCount(ctx)
+	feeCount := k.GetFeeTierCount(ctx)
 
 	// makes sure that there is the same number of sharesToRemove as ticks specfied
 	if len(msg.SharesToRemove) != len(msg.TickIndexes) || len(msg.SharesToRemove) != len(msg.FeeIndexes) {
