@@ -45,7 +45,7 @@ func calculateNewCurrentTicksPure(amount0 sdk.Dec, amount1 sdk.Dec, tickIndex in
 }
 
 // Helper function to calculate if current ticks change
-func calculateNewCurrentTicks(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, tickIndex int64, feeIndex uint64, pair types.PairMap) (new0to1 int64, new1to0 int64) {
+func calculateNewCurrentTicks(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, tickIndex int64, feeIndex uint64, pair types.TradingPair) (new0to1 int64, new1to0 int64) {
 	k, ctx := s.app.DexKeeper, s.ctx
 	FeeTier := k.GetAllFeeTier(ctx)
 	fee := FeeTier[feeIndex].Fee
@@ -53,7 +53,7 @@ func calculateNewCurrentTicks(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sd
 }
 
 // Helper for getting a pair id. If pair hasn't been initialized, defaults to pair with tickIndex and feeTier for CurrentTick
-func makePair(s *MsgServerTestSuite, pairId string, tickIndex int64, feeTier uint64, expectedTxErr error) types.PairMap {
+func makePair(s *MsgServerTestSuite, pairId string, tickIndex int64, feeTier uint64, expectedTxErr error) types.TradingPair {
 	// TODO: this really should be cleaned up
 	app, ctx, k := s.app, s.ctx, s.app.DexKeeper
 
@@ -69,9 +69,9 @@ func makePair(s *MsgServerTestSuite, pairId string, tickIndex int64, feeTier uin
 		fee = FeeTier[feeTier].Fee
 	}
 
-	pair, pairFound := app.DexKeeper.GetPairMap(ctx, pairId)
+	pair, pairFound := app.DexKeeper.GetTradingPair(ctx, pairId)
 	if !pairFound {
-		pair = types.PairMap{
+		pair = types.TradingPair{
 			PairId:  pairId,
 			MinTick: tickIndex - fee,
 			MaxTick: tickIndex + fee,
@@ -201,7 +201,7 @@ func calculateFinalShares(s *MsgServerTestSuite, pairId string, amounts0 []sdk.D
 	return accum
 }
 
-func calculateFinalTicks(s *MsgServerTestSuite, pair types.PairMap, amounts0 []sdk.Dec, amounts1 []sdk.Dec, tickIndexes []int64, feeTiers []uint64) (int64, int64) {
+func calculateFinalTicks(s *MsgServerTestSuite, pair types.TradingPair, amounts0 []sdk.Dec, amounts1 []sdk.Dec, tickIndexes []int64, feeTiers []uint64) (int64, int64) {
 	expectedTick0to1, expectedTick1to0 := pair.TokenPair.CurrentTick0To1, pair.TokenPair.CurrentTick1To0
 	for i := range amounts0 {
 		// move expected current ticks

@@ -83,10 +83,10 @@ func (s *MsgServerTestSuite) TestGetOrInitPairNew() {
 	s.Assert().True(found1)
 
 	// AND 1 pair is initialized with the correct default values
-	pairCount := len(s.app.DexKeeper.GetAllPairMap(s.ctx))
+	pairCount := len(s.app.DexKeeper.GetAllTradingPair(s.ctx))
 	s.Assert().Equal(1, pairCount)
 
-	pair, foundPair := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA<>TokenB")
+	pair, foundPair := s.app.DexKeeper.GetTradingPair(s.ctx, "TokenA<>TokenB")
 
 	s.Require().True(foundPair)
 
@@ -108,15 +108,15 @@ func (s *MsgServerTestSuite) TestGetOrInitPairExisting() {
 	s.app.DexKeeper.GetOrInitPair(s.goCtx, "TokenA", "TokenB")
 
 	// WHEN we update values on that pair
-	pair, _ := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA<>TokenB")
+	pair, _ := s.app.DexKeeper.GetTradingPair(s.ctx, "TokenA<>TokenB")
 	pair.MinTick = 20
-	s.app.DexKeeper.SetPairMap(s.ctx, pair)
+	s.app.DexKeeper.SetTradingPair(s.ctx, pair)
 
 	// AND try to initialize the same pair again
 	newPair := s.app.DexKeeper.GetOrInitPair(s.goCtx, "TokenA", "TokenB")
 
 	// THEN there is still only 1 pair and it retains the values we set
-	pairCount := len(s.app.DexKeeper.GetAllPairMap(s.ctx))
+	pairCount := len(s.app.DexKeeper.GetAllTradingPair(s.ctx))
 	s.Assert().Equal(1, pairCount)
 	s.Assert().Equal(int64(20), newPair.MinTick)
 }
@@ -233,7 +233,7 @@ func (s *MsgServerTestSuite) TestFindNextTick1To0WithLiq() {
 	// tick -1: (10, 0)
 	pair.TokenPair.CurrentTick1To0 = 1
 	pair.MinTick = -2
-	s.app.DexKeeper.SetPairMap(s.ctx, pair)
+	s.app.DexKeeper.SetTradingPair(s.ctx, pair)
 
 	// THEN FindNextTick1To0 finds the tick at 0
 
@@ -252,7 +252,7 @@ func (s *MsgServerTestSuite) TestFindNextTick1To0WithMinLiq() {
 	// tick -2: (10, 0)
 	pair.TokenPair.CurrentTick1To0 = 1
 	pair.MinTick = -2
-	s.app.DexKeeper.SetPairMap(s.ctx, pair)
+	s.app.DexKeeper.SetTradingPair(s.ctx, pair)
 
 	// THEN FindNextTick1To0 finds the tick at -1
 
@@ -293,7 +293,7 @@ func (s *MsgServerTestSuite) TestFindNextTick0To1WithLiq() {
 
 	pair.TokenPair.CurrentTick0To1 = -1
 	pair.MaxTick = 1
-	s.app.DexKeeper.SetPairMap(s.ctx, pair)
+	s.app.DexKeeper.SetTradingPair(s.ctx, pair)
 
 	// THEN FindNextTick0To1 finds the tick at 1
 
@@ -311,7 +311,7 @@ func (s *MsgServerTestSuite) TestFindNextTick0To1WithMinLiq() {
 	// tick 2: (0, 10)
 	pair.TokenPair.CurrentTick0To1 = -1
 	pair.MaxTick = 2
-	s.app.DexKeeper.SetPairMap(s.ctx, pair)
+	s.app.DexKeeper.SetTradingPair(s.ctx, pair)
 
 	// THEN FindNextTick0To1 finds the tick at 1
 

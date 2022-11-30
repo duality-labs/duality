@@ -573,7 +573,7 @@ func (s *MsgServerTestSuite) assertCurrentTicks(
 	expected1To0 int64,
 	expected0To1 int64,
 ) {
-	tickMap, found := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA<>TokenB")
+	tickMap, found := s.app.DexKeeper.GetTradingPair(s.ctx, "TokenA<>TokenB")
 	s.Assert().NotNil(found)
 	s.Assert().Equal(expected1To0, tickMap.TokenPair.CurrentTick1To0)
 	s.Assert().Equal(expected0To1, tickMap.TokenPair.CurrentTick0To1)
@@ -581,7 +581,7 @@ func (s *MsgServerTestSuite) assertCurrentTicks(
 
 func (s *MsgServerTestSuite) assertCurr0To1(curr0To1Expected int64) {
 	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
-	pair, pairFound := s.app.DexKeeper.GetPairMap(s.ctx, pairId)
+	pair, pairFound := s.app.DexKeeper.GetTradingPair(s.ctx, pairId)
 	if !pairFound {
 		s.Require().Fail("Invalid GetPair in assertCurr0to1")
 	}
@@ -592,7 +592,7 @@ func (s *MsgServerTestSuite) assertCurr0To1(curr0To1Expected int64) {
 
 func (s *MsgServerTestSuite) assertCurr1To0(curr1To0Expected int64) {
 	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
-	pair, pairFound := s.app.DexKeeper.GetPairMap(s.ctx, pairId)
+	pair, pairFound := s.app.DexKeeper.GetTradingPair(s.ctx, pairId)
 	if !pairFound {
 		s.Require().Fail("Invalid GetPair in assertCurr0to1")
 	}
@@ -603,7 +603,7 @@ func (s *MsgServerTestSuite) assertCurr1To0(curr1To0Expected int64) {
 
 func (s *MsgServerTestSuite) assertMinTick(minTickExpected int64) {
 	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
-	pair, pairFound := s.app.DexKeeper.GetPairMap(s.ctx, pairId)
+	pair, pairFound := s.app.DexKeeper.GetTradingPair(s.ctx, pairId)
 	if !pairFound {
 		s.Require().Fail("Invalid GetPair in assertCurr0to1")
 	}
@@ -614,7 +614,7 @@ func (s *MsgServerTestSuite) assertMinTick(minTickExpected int64) {
 
 func (s *MsgServerTestSuite) assertMaxTick(maxTickExpected int64) {
 	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
-	pair, pairFound := s.app.DexKeeper.GetPairMap(s.ctx, pairId)
+	pair, pairFound := s.app.DexKeeper.GetTradingPair(s.ctx, pairId)
 	if !pairFound {
 		s.Require().Fail("Invalid GetPair in assertCurr0to1")
 	}
@@ -624,7 +624,7 @@ func (s *MsgServerTestSuite) assertMaxTick(maxTickExpected int64) {
 }
 
 func (s *MsgServerTestSuite) printTicks() {
-	tickMap, _ := s.app.DexKeeper.GetPairMap(s.ctx, "TokenA<>TokenB")
+	tickMap, _ := s.app.DexKeeper.GetTradingPair(s.ctx, "TokenA<>TokenB")
 	fmt.Printf("\nTick0To1: %v, Tick1To0: %v", tickMap.TokenPair.CurrentTick0To1, tickMap.TokenPair.CurrentTick1To0)
 }
 

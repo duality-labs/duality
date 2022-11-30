@@ -21,27 +21,27 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func networkWithPairMapObjects(t *testing.T, n int) (*network.Network, []types.PairMap) {
+func networkWithTradingPairObjects(t *testing.T, n int) (*network.Network, []types.TradingPair) {
 	t.Helper()
 	cfg := network.DefaultConfig()
 	state := types.GenesisState{}
 	require.NoError(t, cfg.Codec.UnmarshalJSON(cfg.GenesisState[types.ModuleName], &state))
 
 	for i := 0; i < n; i++ {
-		pairMap := types.PairMap{
+		TradingPair := types.TradingPair{
 			PairId: strconv.Itoa(i),
 		}
-		nullify.Fill(&pairMap)
-		state.PairMapList = append(state.PairMapList, pairMap)
+		nullify.Fill(&TradingPair)
+		state.TradingPairList = append(state.TradingPairList, TradingPair)
 	}
 	buf, err := cfg.Codec.MarshalJSON(&state)
 	require.NoError(t, err)
 	cfg.GenesisState[types.ModuleName] = buf
-	return network.New(t, cfg), state.PairMapList
+	return network.New(t, cfg), state.TradingPairList
 }
 
-func TestShowPairMap(t *testing.T) {
-	net, objs := networkWithPairMapObjects(t, 2)
+func TestShowTradingPair(t *testing.T) {
+	net, objs := networkWithTradingPairObjects(t, 2)
 
 	ctx := net.Validators[0].ClientCtx
 	common := []string{
@@ -53,7 +53,7 @@ func TestShowPairMap(t *testing.T) {
 
 		args []string
 		err  error
-		obj  types.PairMap
+		obj  types.TradingPair
 	}{
 		{
 			desc:     "found",
@@ -75,27 +75,27 @@ func TestShowPairMap(t *testing.T) {
 				tc.idPairId,
 			}
 			args = append(args, tc.args...)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowPairMap(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowTradingPair(), args)
 			if tc.err != nil {
 				stat, ok := status.FromError(tc.err)
 				require.True(t, ok)
 				require.ErrorIs(t, stat.Err(), tc.err)
 			} else {
 				require.NoError(t, err)
-				var resp types.QueryGetPairMapResponse
+				var resp types.QueryGetTradingPairResponse
 				require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-				require.NotNil(t, resp.PairMap)
+				require.NotNil(t, resp.TradingPair)
 				require.Equal(t,
 					nullify.Fill(&tc.obj),
-					nullify.Fill(&resp.PairMap),
+					nullify.Fill(&resp.TradingPair),
 				)
 			}
 		})
 	}
 }
 
-func TestListPairMap(t *testing.T) {
-	net, objs := networkWithPairMapObjects(t, 5)
+func TestListTradingPair(t *testing.T) {
+	net, objs := networkWithTradingPairObjects(t, 5)
 
 	ctx := net.Validators[0].ClientCtx
 	request := func(next []byte, offset, limit uint64, total bool) []string {
@@ -117,14 +117,14 @@ func TestListPairMap(t *testing.T) {
 		step := 2
 		for i := 0; i < len(objs); i += step {
 			args := request(nil, uint64(i), uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListPairMap(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListTradingPair(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllPairMapResponse
+			var resp types.QueryAllTradingPairResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.PairMap), step)
+			require.LessOrEqual(t, len(resp.TradingPair), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.PairMap),
+				nullify.Fill(resp.TradingPair),
 			)
 		}
 	})
@@ -133,29 +133,29 @@ func TestListPairMap(t *testing.T) {
 		var next []byte
 		for i := 0; i < len(objs); i += step {
 			args := request(next, 0, uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListPairMap(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListTradingPair(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllPairMapResponse
+			var resp types.QueryAllTradingPairResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.PairMap), step)
+			require.LessOrEqual(t, len(resp.TradingPair), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.PairMap),
+				nullify.Fill(resp.TradingPair),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
 		args := request(nil, 0, uint64(len(objs)), true)
-		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListPairMap(), args)
+		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListTradingPair(), args)
 		require.NoError(t, err)
-		var resp types.QueryAllPairMapResponse
+		var resp types.QueryAllTradingPairResponse
 		require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 		require.NoError(t, err)
 		require.Equal(t, len(objs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(objs),
-			nullify.Fill(resp.PairMap),
+			nullify.Fill(resp.TradingPair),
 		)
 	})
 }

@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "dex/params.proto";
 import "dex/tick_map.proto";
-import "dex/pair_map.proto";
+import "dex/trading_pair.proto";
 import "dex/tokens.proto";
 import "dex/token_map.proto";
 import "dex/shares.proto";
@@ -35,14 +35,14 @@ service Query {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick_map";
 	}
 
-// Queries a PairMap by index.
-	rpc PairMap(QueryGetPairMapRequest) returns (QueryGetPairMapResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/pair_map/{pairId}";
+// Queries a TradingPair by index.
+	rpc TradingPair(QueryGetTradingPairRequest) returns (QueryGetTradingPairResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/trading_pair/{pairId}";
 	}
 
-	// Queries a list of PairMap items.
-	rpc PairMapAll(QueryAllPairMapRequest) returns (QueryAllPairMapResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/pair_map";
+	// Queries a list of TradingPair items.
+	rpc TradingPairAll(QueryAllTradingPairRequest) returns (QueryAllTradingPairResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/trading_pair";
 	}
 
 // Queries a Tokens by id.
@@ -157,21 +157,21 @@ message QueryAllTickMapResponse {
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-message QueryGetPairMapRequest {
+message QueryGetTradingPairRequest {
 	  string pairId = 1;
 
 }
 
-message QueryGetPairMapResponse {
-	PairMap pairMap = 1 [(gogoproto.nullable) = false];
+message QueryGetTradingPairResponse {
+	TradingPair TradingPair = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryAllPairMapRequest {
+message QueryAllTradingPairRequest {
 	cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-message QueryAllPairMapResponse {
-	repeated PairMap pairMap = 1 [(gogoproto.nullable) = false];
+message QueryAllTradingPairResponse {
+	repeated TradingPair TradingPair = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
