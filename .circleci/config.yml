@@ -33,7 +33,7 @@ jobs:
       # For now we will always try to build on latet ignite CLI release
       # This likely will cause breakage as local CLI versions will likely be behind
       # But I think this is the correct point to target and identify those breakages
-      - image: ignitehq/cli:latest
+      - image: ignitehq/cli:0.25.2
     steps:
       - checkout
       - run:
