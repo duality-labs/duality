@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListFeeList() *cobra.Command {
+func CmdListFeeTier() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-fee-list",
-		Short: "list all feeList",
+		Short: "list all FeeTier",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -24,11 +24,11 @@ func CmdListFeeList() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllFeeListRequest{
+			params := &types.QueryAllFeeTierRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.FeeListAll(context.Background(), params)
+			res, err := queryClient.FeeTierAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -43,10 +43,10 @@ func CmdListFeeList() *cobra.Command {
 	return cmd
 }
 
-func CmdShowFeeList() *cobra.Command {
+func CmdShowFeeTier() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "show-fee-list [id]",
-		Short: "shows a feeList",
+		Short: "shows a FeeTier",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -58,11 +58,11 @@ func CmdShowFeeList() *cobra.Command {
 				return err
 			}
 
-			params := &types.QueryGetFeeListRequest{
+			params := &types.QueryGetFeeTierRequest{
 				Id: id,
 			}
 
-			res, err := queryClient.FeeList(context.Background(), params)
+			res, err := queryClient.FeeTier(context.Background(), params)
 			if err != nil {
 				return err
 			}

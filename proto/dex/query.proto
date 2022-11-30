@@ -10,7 +10,7 @@ import "dex/pair_map.proto";
 import "dex/tokens.proto";
 import "dex/token_map.proto";
 import "dex/shares.proto";
-import "dex/fee_list.proto";
+import "dex/fee_tier.proto";
 import "dex/edge_row.proto";
 import "dex/adjancey_matrix.proto";
 import "dex/limit_order_tranche_user.proto";
@@ -75,14 +75,14 @@ service Query {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/shares";
 	}
 
-// Queries a FeeList by id.
-	rpc FeeList(QueryGetFeeListRequest) returns (QueryGetFeeListResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/fee_list/{id}";
+// Queries a FeeTier by id.
+	rpc FeeTier(QueryGetFeeTierRequest) returns (QueryGetFeeTierResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/fee_tier/{id}";
 	}
 
-	// Queries a list of FeeList items.
-	rpc FeeListAll(QueryAllFeeListRequest) returns (QueryAllFeeListResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/fee_list";
+	// Queries a list of FeeTier items.
+	rpc FeeTierAll(QueryAllFeeTierRequest) returns (QueryAllFeeTierResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/fee_tier";
 	}
 
 // Queries a EdgeRow by id.
@@ -231,20 +231,20 @@ message QueryAllSharesResponse {
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-message QueryGetFeeListRequest {
+message QueryGetFeeTierRequest {
 	uint64 id = 1;
 }
 
-message QueryGetFeeListResponse {
-	FeeList FeeList = 1 [(gogoproto.nullable) = false];
+message QueryGetFeeTierResponse {
+	FeeTier FeeTier = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryAllFeeListRequest {
+message QueryAllFeeTierRequest {
 	cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-message QueryAllFeeListResponse {
-	repeated FeeList FeeList = 1 [(gogoproto.nullable) = false];
+message QueryAllFeeTierResponse {
+	repeated FeeTier FeeTier = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

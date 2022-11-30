@@ -12,24 +12,24 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) FeeListAll(c context.Context, req *types.QueryAllFeeListRequest) (*types.QueryAllFeeListResponse, error) {
+func (k Keeper) FeeTierAll(c context.Context, req *types.QueryAllFeeTierRequest) (*types.QueryAllFeeTierResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	var feeLists []types.FeeList
+	var FeeTiers []types.FeeTier
 	ctx := sdk.UnwrapSDKContext(c)
 
 	store := ctx.KVStore(k.storeKey)
-	feeListStore := prefix.NewStore(store, types.KeyPrefix(types.FeeListKey))
+	FeeTierStore := prefix.NewStore(store, types.KeyPrefix(types.FeeTierKey))
 
-	pageRes, err := query.Paginate(feeListStore, req.Pagination, func(key []byte, value []byte) error {
-		var feeList types.FeeList
-		if err := k.cdc.Unmarshal(value, &feeList); err != nil {
+	pageRes, err := query.Paginate(FeeTierStore, req.Pagination, func(key []byte, value []byte) error {
+		var FeeTier types.FeeTier
+		if err := k.cdc.Unmarshal(value, &FeeTier); err != nil {
 			return err
 		}
 
-		feeLists = append(feeLists, feeList)
+		FeeTiers = append(FeeTiers, FeeTier)
 		return nil
 	})
 
@@ -37,19 +37,19 @@ func (k Keeper) FeeListAll(c context.Context, req *types.QueryAllFeeListRequest)
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryAllFeeListResponse{FeeList: feeLists, Pagination: pageRes}, nil
+	return &types.QueryAllFeeTierResponse{FeeTier: FeeTiers, Pagination: pageRes}, nil
 }
 
-func (k Keeper) FeeList(c context.Context, req *types.QueryGetFeeListRequest) (*types.QueryGetFeeListResponse, error) {
+func (k Keeper) FeeTier(c context.Context, req *types.QueryGetFeeTierRequest) (*types.QueryGetFeeTierResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	feeList, found := k.GetFeeList(ctx, req.Id)
+	FeeTier, found := k.GetFeeTier(ctx, req.Id)
 	if !found {
 		return nil, sdkerrors.ErrKeyNotFound
 	}
 
-	return &types.QueryGetFeeListResponse{FeeList: feeList}, nil
+	return &types.QueryGetFeeTierResponse{FeeTier: FeeTier}, nil
 }

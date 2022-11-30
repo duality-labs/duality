@@ -34,13 +34,13 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, elem := range genState.SharesList {
 		k.SetShares(ctx, elem)
 	}
-	// Set all the feeList
-	for _, elem := range genState.FeeListList {
-		k.SetFeeList(ctx, elem)
+	// Set all the FeeTier
+	for _, elem := range genState.FeeTierList {
+		k.SetFeeTier(ctx, elem)
 	}
 
-	// Set feeList count
-	k.SetFeeListCount(ctx, genState.FeeListCount)
+	// Set FeeTier count
+	k.SetFeeTierCount(ctx, genState.FeeTierCount)
 	// Set all the edgeRow
 	for _, elem := range genState.EdgeRowList {
 		k.SetEdgeRow(ctx, elem)
@@ -78,8 +78,8 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.TokensCount = k.GetTokensCount(ctx)
 	genesis.TokenMapList = k.GetAllTokenMap(ctx)
 	genesis.SharesList = k.GetAllShares(ctx)
-	genesis.FeeListList = k.GetAllFeeList(ctx)
-	genesis.FeeListCount = k.GetFeeListCount(ctx)
+	genesis.FeeTierList = k.GetAllFeeTier(ctx)
+	genesis.FeeTierCount = k.GetFeeTierCount(ctx)
 	genesis.EdgeRowList = k.GetAllEdgeRow(ctx)
 	genesis.EdgeRowCount = k.GetEdgeRowCount(ctx)
 	genesis.AdjanceyMatrixList = k.GetAllAdjanceyMatrix(ctx)

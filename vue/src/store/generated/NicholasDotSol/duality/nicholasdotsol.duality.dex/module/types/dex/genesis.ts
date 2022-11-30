@@ -7,7 +7,7 @@ import { PairMap } from "../dex/pair_map";
 import { Tokens } from "../dex/tokens";
 import { TokenMap } from "../dex/token_map";
 import { Shares } from "../dex/shares";
-import { FeeList } from "../dex/fee_list";
+import { FeeTier } from "../dex/fee_tier";
 import { EdgeRow } from "../dex/edge_row";
 import { AdjanceyMatrix } from "../dex/adjancey_matrix";
 import { LimitOrderTrancheUser } from "../dex/limit_order_tranche_user";
@@ -24,8 +24,8 @@ export interface GenesisState {
   tokensCount: number;
   tokenMapList: TokenMap[];
   sharesList: Shares[];
-  feeListList: FeeList[];
-  feeListCount: number;
+  FeeTierList: FeeTier[];
+  FeeTierCount: number;
   edgeRowList: EdgeRow[];
   edgeRowCount: number;
   adjanceyMatrixList: AdjanceyMatrix[];
@@ -37,7 +37,7 @@ export interface GenesisState {
 
 const baseGenesisState: object = {
   tokensCount: 0,
-  feeListCount: 0,
+  FeeTierCount: 0,
   edgeRowCount: 0,
   adjanceyMatrixCount: 0,
 };
@@ -65,11 +65,11 @@ export const GenesisState = {
     for (const v of message.sharesList) {
       Shares.encode(v!, writer.uint32(58).fork()).ldelim();
     }
-    for (const v of message.feeListList) {
-      FeeList.encode(v!, writer.uint32(66).fork()).ldelim();
+    for (const v of message.FeeTierList) {
+      FeeTier.encode(v!, writer.uint32(66).fork()).ldelim();
     }
-    if (message.feeListCount !== 0) {
-      writer.uint32(72).uint64(message.feeListCount);
+    if (message.FeeTierCount !== 0) {
+      writer.uint32(72).uint64(message.FeeTierCount);
     }
     for (const v of message.edgeRowList) {
       EdgeRow.encode(v!, writer.uint32(82).fork()).ldelim();
@@ -101,7 +101,7 @@ export const GenesisState = {
     message.tokensList = [];
     message.tokenMapList = [];
     message.sharesList = [];
-    message.feeListList = [];
+    message.FeeTierList = [];
     message.edgeRowList = [];
     message.adjanceyMatrixList = [];
     message.LimitOrderTrancheUserList = [];
@@ -131,10 +131,10 @@ export const GenesisState = {
           message.sharesList.push(Shares.decode(reader, reader.uint32()));
           break;
         case 8:
-          message.feeListList.push(FeeList.decode(reader, reader.uint32()));
+          message.FeeTierList.push(FeeTier.decode(reader, reader.uint32()));
           break;
         case 9:
-          message.feeListCount = longToNumber(reader.uint64() as Long);
+          message.FeeTierCount = longToNumber(reader.uint64() as Long);
           break;
         case 10:
           message.edgeRowList.push(EdgeRow.decode(reader, reader.uint32()));
@@ -175,7 +175,7 @@ export const GenesisState = {
     message.tokensList = [];
     message.tokenMapList = [];
     message.sharesList = [];
-    message.feeListList = [];
+    message.FeeTierList = [];
     message.edgeRowList = [];
     message.adjanceyMatrixList = [];
     message.LimitOrderTrancheUserList = [];
@@ -215,15 +215,15 @@ export const GenesisState = {
         message.sharesList.push(Shares.fromJSON(e));
       }
     }
-    if (object.feeListList !== undefined && object.feeListList !== null) {
-      for (const e of object.feeListList) {
-        message.feeListList.push(FeeList.fromJSON(e));
+    if (object.FeeTierList !== undefined && object.FeeTierList !== null) {
+      for (const e of object.FeeTierList) {
+        message.FeeTierList.push(FeeTier.fromJSON(e));
       }
     }
-    if (object.feeListCount !== undefined && object.feeListCount !== null) {
-      message.feeListCount = Number(object.feeListCount);
+    if (object.FeeTierCount !== undefined && object.FeeTierCount !== null) {
+      message.FeeTierCount = Number(object.FeeTierCount);
     } else {
-      message.feeListCount = 0;
+      message.FeeTierCount = 0;
     }
     if (object.edgeRowList !== undefined && object.edgeRowList !== null) {
       for (const e of object.edgeRowList) {
@@ -313,15 +313,15 @@ export const GenesisState = {
     } else {
       obj.sharesList = [];
     }
-    if (message.feeListList) {
-      obj.feeListList = message.feeListList.map((e) =>
-        e ? FeeList.toJSON(e) : undefined
+    if (message.FeeTierList) {
+      obj.FeeTierList = message.FeeTierList.map((e) =>
+        e ? FeeTier.toJSON(e) : undefined
       );
     } else {
-      obj.feeListList = [];
+      obj.FeeTierList = [];
     }
-    message.feeListCount !== undefined &&
-      (obj.feeListCount = message.feeListCount);
+    message.FeeTierCount !== undefined &&
+      (obj.FeeTierCount = message.FeeTierCount);
     if (message.edgeRowList) {
       obj.edgeRowList = message.edgeRowList.map((e) =>
         e ? EdgeRow.toJSON(e) : undefined
@@ -364,7 +364,7 @@ export const GenesisState = {
     message.tokensList = [];
     message.tokenMapList = [];
     message.sharesList = [];
-    message.feeListList = [];
+    message.FeeTierList = [];
     message.edgeRowList = [];
     message.adjanceyMatrixList = [];
     message.LimitOrderTrancheUserList = [];
@@ -404,15 +404,15 @@ export const GenesisState = {
         message.sharesList.push(Shares.fromPartial(e));
       }
     }
-    if (object.feeListList !== undefined && object.feeListList !== null) {
-      for (const e of object.feeListList) {
-        message.feeListList.push(FeeList.fromPartial(e));
+    if (object.FeeTierList !== undefined && object.FeeTierList !== null) {
+      for (const e of object.FeeTierList) {
+        message.FeeTierList.push(FeeTier.fromPartial(e));
       }
     }
-    if (object.feeListCount !== undefined && object.feeListCount !== null) {
-      message.feeListCount = object.feeListCount;
+    if (object.FeeTierCount !== undefined && object.FeeTierCount !== null) {
+      message.FeeTierCount = object.FeeTierCount;
     } else {
-      message.feeListCount = 0;
+      message.FeeTierCount = 0;
     }
     if (object.edgeRowList !== undefined && object.edgeRowList !== null) {
       for (const e of object.edgeRowList) {
