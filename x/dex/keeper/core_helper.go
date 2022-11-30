@@ -70,8 +70,8 @@ func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex in
 				Reserve0AndShares: make([]*types.Reserve0AndSharesType, numFees),
 				Reserve1:          make([]sdk.Dec, numFees),
 			},
-			LimitOrderTranche0To1: &types.LimitOrderTrancheTrancheIndexes{0, 0},
-			LimitOrderTranche1To0: &types.LimitOrderTrancheTrancheIndexes{0, 0},
+			LimitOrderTranche0To1: &types.LimitTrancheIndexes{0, 0},
+			LimitOrderTranche1To0: &types.LimitTrancheIndexes{0, 0},
 		}
 		for i := 0; i < int(numFees); i++ {
 			tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}
