@@ -27,9 +27,27 @@ jobs:
             go tool cover -html=c.out -o /tmp/artifacts/coverage.html
       - store_artifacts:
           path: /tmp/artifacts
+  binary-build:
+    working_directory: ~/repo
+    docker:
+      # For now we will always try to build on latet ignite CLI release
+      # This likely will cause breakage as local CLI versions will likely be behind
+      # But I think this is the correct point to target and identify those breakages
+      - image: ignitehq/cli:latest
+    steps:
+      - checkout
+      - run:
+          name: Create a temp directory for artifacts
+          command: mkdir -p /tmp/artifacts
+      - run:
+          name: Build chain binary
+          command: ignite chain build -o /tmp/artifacts
+      - store_artifacts:
+          path: /tmp/artifacts
 
 workflows:
   version: 2
   full_test_suite:
     jobs:
       - go-tests
+      - binary-build
