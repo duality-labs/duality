@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -15,10 +16,6 @@ import (
 var _ = strconv.Itoa(0)
 
 func CmdDeposit() *cobra.Command {
-	var argAmountsA []string
-	var argAmountsB []string
-	var argTicksIndexes []string
-	var argFeesIndexes []string
 
 	cmd := &cobra.Command{
 		Use:   "deposit [receiver] [token-a] [token-b] [list of amount-0] [list of amount-1] [list of tick-index] [list of fee] ",
@@ -26,6 +23,7 @@ func CmdDeposit() *cobra.Command {
 		Args:  cobra.ExactArgs(7),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
+
 			argTokenA := args[1]
 			argTokenB := args[2]
 			argAmountsA := strings.Split(args[3], ",")
@@ -95,18 +93,15 @@ func CmdDeposit() *cobra.Command {
 				FeesIndexesUint,
 			)
 			if err := msg.ValidateBasic(); err != nil {
+				fmt.Println(err)
 				return err
 			}
+			fmt.Println(msg)
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
-	cmd.Flags().StringArrayVarP(&argAmountsA, "amountA", "0", []string{}, "")
-	cmd.Flags().StringArrayVarP(&argAmountsB, "amountB", "1", []string{}, "")
-	cmd.Flags().StringArrayVarP(&argTicksIndexes, "ticksIndexes", "t", []string{}, "")
-	cmd.Flags().StringArrayVarP(&argFeesIndexes, "feeIndexes", "f", []string{}, "")
 
 	return cmd
 }

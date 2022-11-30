@@ -28,9 +28,7 @@ func networkWithLimitOrderTrancheObjects(t *testing.T, n int) (*network.Network,
 	require.NoError(t, cfg.Codec.UnmarshalJSON(cfg.GenesisState[types.ModuleName], &state))
 
 	for i := 0; i < n; i++ {
-		LimitOrderTranche := types.LimitOrderTranche{
-			Count: uint64(i),
-		}
+		LimitOrderTranche := types.LimitOrderTranche{}
 		nullify.Fill(&LimitOrderTranche)
 		state.LimitOrderTrancheList = append(state.LimitOrderTrancheList, LimitOrderTranche)
 	}
@@ -56,8 +54,7 @@ func TestShowLimitOrderTranche(t *testing.T) {
 		obj  types.LimitOrderTranche
 	}{
 		{
-			desc:    "found",
-			idCount: objs[0].Count,
+			desc: "found",
 
 			args: common,
 			obj:  objs[0],
