@@ -5,7 +5,7 @@ option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 
 import "dex/token_pair_type.proto";
 
-message PairMap {
+message TradingPair {
   string pairId = 1;
   TokenPairType tokenPair = 2;
   int64 maxTick = 3;

@@ -30,7 +30,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						TickIndex: 1,
 					},
 				},
-				PairMapList: []types.PairMap{
+				TradingPairList: []types.TradingPair{
 					{
 						PairId: "0",
 					},
@@ -133,9 +133,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated pairMap",
+			desc: "duplicated TradingPair",
 			genState: &types.GenesisState{
-				PairMapList: []types.PairMap{
+				TradingPairList: []types.TradingPair{
 					{
 						PairId: "0",
 					},

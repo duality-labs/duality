@@ -9,10 +9,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListPairMap() *cobra.Command {
+func CmdListTradingPair() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-pair-map",
-		Short: "list all PairMap",
+		Short: "list all TradingPair",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -23,11 +23,11 @@ func CmdListPairMap() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllPairMapRequest{
+			params := &types.QueryAllTradingPairRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.PairMapAll(context.Background(), params)
+			res, err := queryClient.TradingPairAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -42,10 +42,10 @@ func CmdListPairMap() *cobra.Command {
 	return cmd
 }
 
-func CmdShowPairMap() *cobra.Command {
+func CmdShowTradingPair() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "show-pair-map [pair-id]",
-		Short: "shows a PairMap",
+		Short: "shows a TradingPair",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -54,11 +54,11 @@ func CmdShowPairMap() *cobra.Command {
 
 			argPairId := args[0]
 
-			params := &types.QueryGetPairMapRequest{
+			params := &types.QueryGetTradingPairRequest{
 				PairId: argPairId,
 			}
 
-			res, err := queryClient.PairMap(context.Background(), params)
+			res, err := queryClient.TradingPair(context.Background(), params)
 			if err != nil {
 				return err
 			}

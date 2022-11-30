@@ -11,7 +11,7 @@ const DefaultIndex uint64 = 1
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		TickMapList:               []TickMap{},
-		PairMapList:               []PairMap{},
+		TradingPairList:           []TradingPair{},
 		TokensList:                []Tokens{},
 		TokenMapList:              []TokenMap{},
 		SharesList:                []Shares{},
@@ -38,15 +38,15 @@ func (gs GenesisState) Validate() error {
 		}
 		tickMapIndexMap[index] = struct{}{}
 	}
-	// Check for duplicated index in pairMap
-	pairMapIndexMap := make(map[string]struct{})
+	// Check for duplicated index in TradingPair
+	TradingPairIndexMap := make(map[string]struct{})
 
-	for _, elem := range gs.PairMapList {
-		index := string(PairMapKey(elem.PairId))
-		if _, ok := pairMapIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for pairMap")
+	for _, elem := range gs.TradingPairList {
+		index := string(TradingPairKey(elem.PairId))
+		if _, ok := TradingPairIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for TradingPair")
 		}
-		pairMapIndexMap[index] = struct{}{}
+		TradingPairIndexMap[index] = struct{}{}
 	}
 	// Check for duplicated ID in tokens
 	tokensIdMap := make(map[uint64]bool)
