@@ -6,8 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func NewTick(pairId string, tickIndex int64, numFees uint64) types.TickMap {
-	tick := types.TickMap{
+func NewTick(pairId string, tickIndex int64, numFees uint64) types.Tick {
+	tick := types.Tick{
 		PairId:    pairId,
 		TickIndex: tickIndex,
 		TickData: &types.TickDataType{
@@ -24,25 +24,25 @@ func NewTick(pairId string, tickIndex int64, numFees uint64) types.TickMap {
 	return tick
 }
 
-// SetTickMap set a specific tickMap in the store from its index
-func (k Keeper) SetTickMap(ctx sdk.Context, pairId string, tickMap types.TickMap) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickMapKeyPrefix))
-	b := k.cdc.MustMarshal(&tickMap)
-	store.Set(types.TickMapKey(
+// SetTick set a specific Tick in the store from its index
+func (k Keeper) SetTick(ctx sdk.Context, pairId string, Tick types.Tick) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickKeyPrefix))
+	b := k.cdc.MustMarshal(&Tick)
+	store.Set(types.TickKey(
 		pairId,
-		tickMap.TickIndex,
+		Tick.TickIndex,
 	), b)
 }
 
-// GetTickMap returns a tickMap from its index
-func (k Keeper) GetTickMap(
+// GetTick returns a Tick from its index
+func (k Keeper) GetTick(
 	ctx sdk.Context,
 	pairId string,
 	tickIndex int64,
-) (val types.TickMap, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickMapKeyPrefix))
+) (val types.Tick, found bool) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickKeyPrefix))
 
-	b := store.Get(types.TickMapKey(
+	b := store.Get(types.TickKey(
 		pairId,
 		tickIndex,
 	))
@@ -54,29 +54,29 @@ func (k Keeper) GetTickMap(
 	return val, true
 }
 
-// RemoveTickMap removes a tickMap from the store
-func (k Keeper) RemoveTickMap(
+// RemoveTick removes a Tick from the store
+func (k Keeper) RemoveTick(
 	ctx sdk.Context,
 	pairId string,
 	tickIndex int64,
 
 ) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickMapKeyPrefix))
-	store.Delete(types.TickMapKey(
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickKeyPrefix))
+	store.Delete(types.TickKey(
 		pairId,
 		tickIndex,
 	))
 }
 
-// GetAllTickMap returns all tickMap
-func (k Keeper) GetAllTickMap(ctx sdk.Context) (list []types.TickMap) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickMapKeyPrefix))
+// GetAllTick returns all Tick
+func (k Keeper) GetAllTick(ctx sdk.Context) (list []types.Tick) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickKeyPrefix))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var val types.TickMap
+		var val types.Tick
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
 		list = append(list, val)
 	}
@@ -84,15 +84,15 @@ func (k Keeper) GetAllTickMap(ctx sdk.Context) (list []types.TickMap) {
 	return
 }
 
-// GetAllTickMap returns all tickMap
-func (k Keeper) GetAllTickMapByPair(ctx sdk.Context, pairId string) (list []types.TickMap) {
+// GetAllTick returns all Tick
+func (k Keeper) GetAllTickByPair(ctx sdk.Context, pairId string) (list []types.Tick) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TickPrefix(pairId))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var val types.TickMap
+		var val types.Tick
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
 		list = append(list, val)
 	}

@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "dex/params.proto";
-import "dex/tick_map.proto";
+import "dex/tick.proto";
 import "dex/trading_pair.proto";
 import "dex/tokens.proto";
 import "dex/token_map.proto";
@@ -25,14 +25,14 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/NicholasDotSol/duality/dex/params";
   }
-  // Queries a TickMap by index.
-	rpc TickMap(QueryGetTickMapRequest) returns (QueryGetTickMapResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick_map/{pairId}/{tickIndex}";
+  // Queries a Tick by index.
+	rpc Tick(QueryGetTickRequest) returns (QueryGetTickResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick/{pairId}/{tickIndex}";
 	}
 
-	// Queries a list of TickMap items.
-	rpc TickMapAll(QueryAllTickMapRequest) returns (QueryAllTickMapResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick_map";
+	// Queries a list of Tick items.
+	rpc TickAll(QueryAllTickRequest) returns (QueryAllTickResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick";
 	}
 
 // Queries a TradingPair by index.
@@ -137,23 +137,23 @@ message QueryParamsResponse {
   Params params = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryGetTickMapRequest {
+message QueryGetTickRequest {
 	  int64 tickIndex = 1;
 	  string pairId = 2;
 	  
 
 }
 
-message QueryGetTickMapResponse {
-	TickMap tickMap = 1 [(gogoproto.nullable) = false];
+message QueryGetTickResponse {
+	Tick Tick = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryAllTickMapRequest {
+message QueryAllTickRequest {
 	cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-message QueryAllTickMapResponse {
-	repeated TickMap tickMap = 1 [(gogoproto.nullable) = false];
+message QueryAllTickResponse {
+	repeated Tick Tick = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

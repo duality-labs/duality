@@ -129,10 +129,10 @@ func (s *MsgServerTestSuite) TestGetOrInitTickNew() {
 
 	// THEN 1 tick is initialized with the correct values
 
-	tickCount := len(s.app.DexKeeper.GetAllTickMap(s.ctx))
+	tickCount := len(s.app.DexKeeper.GetAllTick(s.ctx))
 	s.Assert().Equal(1, tickCount)
 
-	tick, found := s.app.DexKeeper.GetTickMap(s.ctx, "TokenA<>TokenB", 0)
+	tick, found := s.app.DexKeeper.GetTick(s.ctx, "TokenA<>TokenB", 0)
 
 	s.Require().True(found)
 
@@ -173,15 +173,15 @@ func (s *MsgServerTestSuite) TestGetOrInitTickExisting() {
 	s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
 
 	// WHEN we update values on that tick
-	tick, _ := s.app.DexKeeper.GetTickMap(s.ctx, "TokenA<>TokenB", 0)
+	tick, _ := s.app.DexKeeper.GetTick(s.ctx, "TokenA<>TokenB", 0)
 	tick.TickData.Reserve0AndShares[0] = &types.Reserve0AndSharesType{sdk.NewDec(10), sdk.NewDec(10)}
-	s.app.DexKeeper.SetTickMap(s.ctx, "TokenA<>TokenB", tick)
+	s.app.DexKeeper.SetTick(s.ctx, "TokenA<>TokenB", tick)
 
 	// AND try to initialize the same tick again
 	newTick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
 
 	// THEN there is still only 1 tick and it retains the values we set
-	tickCount := len(s.app.DexKeeper.GetAllTickMap(s.ctx))
+	tickCount := len(s.app.DexKeeper.GetAllTick(s.ctx))
 	s.Assert().Equal(1, tickCount)
 	s.Assert().Equal(sdk.NewDec(10), newTick.TickData.Reserve0AndShares[0].Reserve0)
 }

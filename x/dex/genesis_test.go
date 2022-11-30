@@ -14,7 +14,7 @@ func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
 
-		TickMapList: []types.TickMap{
+		TickList: []types.Tick{
 			{
 				TickIndex: 0,
 			},
@@ -109,7 +109,7 @@ func TestGenesis(t *testing.T) {
 	nullify.Fill(&genesisState)
 	nullify.Fill(got)
 
-	require.ElementsMatch(t, genesisState.TickMapList, got.TickMapList)
+	require.ElementsMatch(t, genesisState.TickList, got.TickList)
 	require.ElementsMatch(t, genesisState.TradingPairList, got.TradingPairList)
 	require.ElementsMatch(t, genesisState.TokensList, got.TokensList)
 	require.Equal(t, genesisState.TokensCount, got.TokensCount)

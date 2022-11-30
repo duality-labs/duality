@@ -573,10 +573,10 @@ func (s *MsgServerTestSuite) assertCurrentTicks(
 	expected1To0 int64,
 	expected0To1 int64,
 ) {
-	tickMap, found := s.app.DexKeeper.GetTradingPair(s.ctx, "TokenA<>TokenB")
+	Tick, found := s.app.DexKeeper.GetTradingPair(s.ctx, "TokenA<>TokenB")
 	s.Assert().NotNil(found)
-	s.Assert().Equal(expected1To0, tickMap.TokenPair.CurrentTick1To0)
-	s.Assert().Equal(expected0To1, tickMap.TokenPair.CurrentTick0To1)
+	s.Assert().Equal(expected1To0, Tick.TokenPair.CurrentTick1To0)
+	s.Assert().Equal(expected0To1, Tick.TokenPair.CurrentTick0To1)
 }
 
 func (s *MsgServerTestSuite) assertCurr0To1(curr0To1Expected int64) {
@@ -624,8 +624,8 @@ func (s *MsgServerTestSuite) assertMaxTick(maxTickExpected int64) {
 }
 
 func (s *MsgServerTestSuite) printTicks() {
-	tickMap, _ := s.app.DexKeeper.GetTradingPair(s.ctx, "TokenA<>TokenB")
-	fmt.Printf("\nTick0To1: %v, Tick1To0: %v", tickMap.TokenPair.CurrentTick0To1, tickMap.TokenPair.CurrentTick1To0)
+	Tick, _ := s.app.DexKeeper.GetTradingPair(s.ctx, "TokenA<>TokenB")
+	fmt.Printf("\nTick0To1: %v, Tick1To0: %v", Tick.TokenPair.CurrentTick0To1, Tick.TokenPair.CurrentTick1To0)
 }
 
 func (s *MsgServerTestSuite) assertLiquidityAtTick(amountA int64, amountB int64, tickIndex int64, feeIndex uint64) {
@@ -635,11 +635,11 @@ func (s *MsgServerTestSuite) assertLiquidityAtTick(amountA int64, amountB int64,
 func (s *MsgServerTestSuite) assertLiquidityAtTickDec(amountA sdk.Dec, amountB sdk.Dec, tickIndex int64, feeIndex uint64) {
 	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
 	fee := s.feeTiers[feeIndex].Fee
-	lowerTick, lowerTickFound := s.app.DexKeeper.GetTickMap(s.ctx, pairId, tickIndex-fee)
+	lowerTick, lowerTickFound := s.app.DexKeeper.GetTick(s.ctx, pairId, tickIndex-fee)
 	if !lowerTickFound {
 		s.Require().Fail("Invalid tick %d and fee %d", tickIndex, fee)
 	}
-	upperTick, upperTickFound := s.app.DexKeeper.GetTickMap(s.ctx, pairId, tickIndex+fee)
+	upperTick, upperTickFound := s.app.DexKeeper.GetTick(s.ctx, pairId, tickIndex+fee)
 	if !upperTickFound {
 		s.Require().Fail("Invalid tick %d and fee %d", tickIndex, fee)
 	}
@@ -654,7 +654,7 @@ func (s *MsgServerTestSuite) assertNoLiquidityAtTick(tickIndex int64, feeIndex u
 	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
 	fee := s.feeTiers[feeIndex].Fee
 
-	lowerTick, lowerTickFound := s.app.DexKeeper.GetTickMap(s.ctx, pairId, tickIndex-fee)
+	lowerTick, lowerTickFound := s.app.DexKeeper.GetTick(s.ctx, pairId, tickIndex-fee)
 	if !lowerTickFound {
 		s.Assert().True(!lowerTickFound)
 		return
@@ -664,7 +664,7 @@ func (s *MsgServerTestSuite) assertNoLiquidityAtTick(tickIndex int64, feeIndex u
 	liquidityA := lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
 	s.Assert().Equal(amtA, liquidityA)
 
-	upperTick, upperTickFound := s.app.DexKeeper.GetTickMap(s.ctx, pairId, tickIndex+fee)
+	upperTick, upperTickFound := s.app.DexKeeper.GetTick(s.ctx, pairId, tickIndex+fee)
 	if !upperTickFound {
 		s.Assert().True(!upperTickFound)
 		return
@@ -764,7 +764,7 @@ func (s *MsgServerTestSuite) assertFillAndPlaceTrancheKeys(selling string, tickI
 
 func (s *MsgServerTestSuite) getFillAndPlaceTrancheKeys(selling string, pairId string, tickIndex int64) (uint64, uint64) {
 	// grab current fill and place tranches
-	tick, tickFound := s.app.DexKeeper.GetTickMap(s.ctx, pairId, tickIndex)
+	tick, tickFound := s.app.DexKeeper.GetTick(s.ctx, pairId, tickIndex)
 	s.Assert().True(tickFound, "Invalid tickIndex for pair %s", pairId)
 
 	// handle correct limit order pool
@@ -975,9 +975,9 @@ func (s *MsgServerTestSuite) calculateMultipleSwaps(prices []sdk.Dec, tickLiquid
 	return amountLeft, amountOut
 }
 
-func (s *MsgServerTestSuite) addTickWithFee0Tokens(tickIndex int64, amountA int, amountB int) types.TickMap {
+func (s *MsgServerTestSuite) addTickWithFee0Tokens(tickIndex int64, amountA int, amountB int) types.Tick {
 
-	tick := types.TickMap{
+	tick := types.Tick{
 		PairId:    "TokenA/TokenB",
 		TickIndex: tickIndex,
 		TickData: &types.TickDataType{
@@ -991,11 +991,11 @@ func (s *MsgServerTestSuite) addTickWithFee0Tokens(tickIndex int64, amountA int,
 	tick.TickData.Reserve0AndShares[0] = &types.Reserve0AndSharesType{NewDec(amountA), NewDec(amountA)}
 	tick.TickData.Reserve1[0] = NewDec(amountB)
 
-	s.app.DexKeeper.SetTickMap(s.ctx, "TokenA/TokenB", tick)
+	s.app.DexKeeper.SetTick(s.ctx, "TokenA/TokenB", tick)
 	return tick
 }
 
-func (s *MsgServerTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amountB int) (lowerTick types.TickMap, upperTick types.TickMap) {
+func (s *MsgServerTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amountB int) (lowerTick types.Tick, upperTick types.Tick) {
 	pairId := "TokenA<>TokenB"
 	lowerTick = s.app.DexKeeper.GetOrInitTick(s.goCtx, pairId, tickIndex-1)
 	upperTick = s.app.DexKeeper.GetOrInitTick(s.goCtx, pairId, tickIndex+1)
@@ -1005,7 +1005,7 @@ func (s *MsgServerTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amoun
 	lowerTick.TickData.Reserve0AndShares[0].Reserve0 = amountADec
 	lowerTick.TickData.Reserve0AndShares[0].TotalShares = keeper.CalcShares(amountADec, amountBDec, priceCenter1To0)
 	upperTick.TickData.Reserve1[0] = amountBDec
-	s.app.DexKeeper.SetTickMap(s.ctx, pairId, lowerTick)
-	s.app.DexKeeper.SetTickMap(s.ctx, pairId, upperTick)
+	s.app.DexKeeper.SetTick(s.ctx, pairId, lowerTick)
+	s.app.DexKeeper.SetTick(s.ctx, pairId, upperTick)
 	return lowerTick, upperTick
 }
