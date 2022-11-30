@@ -23811,6 +23811,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /NicholasDotSol/duality/dex/adjancey_matrix/{id}:
@@ -23975,6 +23985,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /NicholasDotSol/duality/dex/edge_row/{id}:
@@ -24131,6 +24151,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -24303,6 +24333,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -24500,6 +24540,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -24734,6 +24784,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /NicholasDotSol/duality/dex/shares/{address}/{pairId}/{tickIndex}/{fee}:
@@ -24946,6 +25006,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /NicholasDotSol/duality/dex/tick_map/{pairId}/{tickIndex}:
@@ -25142,6 +25212,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /NicholasDotSol/duality/dex/token_map/{address}:
@@ -25296,6 +25376,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -25466,6 +25556,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -45124,15 +45224,6 @@ definitions:
         type: string
       totalTokenOut:
         type: string
-  nicholasdotsol.duality.dex.LimitOrderTrancheTrancheIndexes:
-    type: object
-    properties:
-      fillTrancheIndex:
-        type: string
-        format: uint64
-      placeTrancheIndex:
-        type: string
-        format: uint64
   nicholasdotsol.duality.dex.LimitOrderTrancheUser:
     type: object
     properties:
@@ -45154,6 +45245,15 @@ definitions:
         type: string
       sharesCancelled:
         type: string
+  nicholasdotsol.duality.dex.LimitTrancheIndexes:
+    type: object
+    properties:
+      fillTrancheIndex:
+        type: string
+        format: uint64
+      placeTrancheIndex:
+        type: string
+        format: uint64
   nicholasdotsol.duality.dex.MsgCancelLimitOrderResponse:
     type: object
   nicholasdotsol.duality.dex.MsgDepositResponse:

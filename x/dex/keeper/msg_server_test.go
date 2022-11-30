@@ -984,8 +984,8 @@ func (s *MsgServerTestSuite) addTickWithFee0Tokens(tickIndex int64, amountA int,
 			Reserve0AndShares: make([]*types.Reserve0AndSharesType, 1),
 			Reserve1:          make([]sdk.Dec, 1),
 		},
-		LimitOrderTranche0To1: &types.LimitOrderTrancheTrancheIndexes{0, 0},
-		LimitOrderTranche1To0: &types.LimitOrderTrancheTrancheIndexes{0, 0},
+		LimitOrderTranche0To1: &types.LimitTrancheIndexes{0, 0},
+		LimitOrderTranche1To0: &types.LimitTrancheIndexes{0, 0},
 	}
 
 	tick.TickData.Reserve0AndShares[0] = &types.Reserve0AndSharesType{NewDec(amountA), NewDec(amountA)}

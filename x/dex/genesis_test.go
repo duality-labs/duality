@@ -90,7 +90,7 @@ func TestGenesis(t *testing.T) {
 				Address: "1",
 			},
 		},
-		LimitOrderTrancheList: []types.LimitOrderTrancheTrancheIndexes{
+		LimitOrderTrancheList: []types.LimitTrancheIndexes{
 			{
 				Count: 0,
 			},
