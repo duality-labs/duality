@@ -30,9 +30,6 @@ jobs:
   binary-build:
     working_directory: ~/repo
     docker:
-      # For now we will always try to build on latet ignite CLI release
-      # This likely will cause breakage as local CLI versions will likely be behind
-      # But I think this is the correct point to target and identify those breakages
       - image: ignitehq/cli:0.25.2
     steps:
       - checkout
@@ -45,13 +42,53 @@ jobs:
       - run:
           name: Ensure ignite has not generated changes which have not been commited to VC
           command: |
+            echo $(git diff)
+            ignite version
             CHANGES=$(git ls-files -m)
-            [[ -n "$CHANGES" ]] && { echo "Untracked files created by ignite: $CHANGES" ; exit 1; }
+            if [[ -n "$CHANGES" ]] && { echo "Untracked files created by ignite:\n$CHANGES" ; exit 1; }
       - store_artifacts:
           path: /tmp/artifacts
+  binary-release-build:
+    working_directory: ~/repo
+    docker:
+      - image: ignitehq/cli:0.25.2
+    steps:
+      - checkout
+      - run:
+          name: Create a temp directory for artifacts
+          command: mkdir -p /tmp/artifacts
+      - run:
+          name: Build chain binary
+          command: ignite chain build  --release -t linux:amd64 -t darwin:amd64 -o ./tmp/artifacts/release
+      - store_artifacts:
+          path: /tmp/artifacts/release
+  publish-github-release:
+    docker:
+      - image: circleci/golang:1.8
+    steps:
+      - attach_workspace:
+          at: ./tmp/artifacts/release
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            go get github.com/tcnksm/ghr
+            VERSION=$(dualityd version)
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./tmp/artifacts/
+
 workflows:
   version: 2
   full_test_suite:
     jobs:
       - go-tests
       - binary-build
+  publish-release-maybe:
+    jobs:
+      - binary-release-build:
+          filters:
+            tags:
+              only: /^\d+\.\d+\.\d+$/
+      - publish-github-release:
+          requires:
+            - binary-release-build
+
+
