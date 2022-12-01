@@ -63,7 +63,7 @@ jobs:
           path: /tmp/artifacts/release
   publish-github-release:
     docker:
-      - image: circleci/golang:1.8
+      - image: cimg/go:1.19.3
     steps:
       - attach_workspace:
           at: ./tmp/artifacts/release
@@ -84,6 +84,8 @@ workflows:
     jobs:
       - binary-release-build:
           filters:
+            branches:
+              ignore: /.*/
             tags:
               only: /^\d+\.\d+\.\d+$/
       - publish-github-release:
