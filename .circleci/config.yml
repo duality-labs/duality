@@ -23,7 +23,7 @@ jobs:
           name: Run tests
           # NOTE: For now we only run the tests in the keeper directory
           command: |
-            go test ./x/dex/keeper... -coverprofile=c.out -v
+            go test ./... -coverprofile=c.out -v
             go tool cover -html=c.out -o /tmp/artifacts/coverage.html
       - store_artifacts:
           path: /tmp/artifacts
@@ -51,7 +51,6 @@ jobs:
     working_directory: ~/repo
     docker:
       - image: ignitehq/cli:0.25.2
-        GITHUB_CREDS
     steps:
       - checkout
       - run:
