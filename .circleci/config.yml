@@ -84,13 +84,10 @@ workflows:
     jobs:
       - binary-release-build:
           filters:
-            branches:
-              ignore: /.*/
             tags:
               only: /^\d+\.\d+\.\d+$/
+            branches:
+              ignore: /.*/
       - publish-github-release:
           requires:
             - binary-release-build
-            
-
-
