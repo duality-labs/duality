@@ -64,16 +64,16 @@ jobs:
           paths:
             - release
   publish-github-release:
-    working_directory: ~/repo
     docker:
       - image: cimg/go:1.19.3
+    working_directory: ~/repo
     steps:
-      - attach_workspace:
-          at: ./tmp/artifacts
       - checkout
       - restore_cache:
           keys:
             - go-mod-v4-{{ checksum "go.sum" }}
+      - attach_workspace:
+          at: ./tmp/artifacts
       - run:
           name: "Publish Release on GitHub"
           command: |
