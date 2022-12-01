@@ -3,7 +3,7 @@ package nicholasdotsol.duality.dex;
 
 import "gogoproto/gogo.proto";
 import "dex/params.proto";
-import "dex/tick_map.proto";
+import "dex/tick.proto";
 import "dex/trading_pair.proto";
 import "dex/tokens.proto";
 import "dex/token_map.proto";
@@ -20,7 +20,7 @@ option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 // GenesisState defines the dex module's genesis state.
 message GenesisState {
   Params params = 1 [(gogoproto.nullable) = false];
-  repeated TickMap tickMapList = 2 [(gogoproto.nullable) = false];
+  repeated Tick TickList = 2 [(gogoproto.nullable) = false];
   repeated TradingPair TradingPairList = 3 [(gogoproto.nullable) = false];
   repeated Tokens tokensList = 4 [(gogoproto.nullable) = false];
   uint64 tokensCount = 5;

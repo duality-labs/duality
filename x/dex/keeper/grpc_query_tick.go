@@ -11,24 +11,24 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) TickMapAll(c context.Context, req *types.QueryAllTickMapRequest) (*types.QueryAllTickMapResponse, error) {
+func (k Keeper) TickAll(c context.Context, req *types.QueryAllTickRequest) (*types.QueryAllTickResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	var tickMaps []types.TickMap
+	var Ticks []types.Tick
 	ctx := sdk.UnwrapSDKContext(c)
 
 	store := ctx.KVStore(k.storeKey)
-	tickMapStore := prefix.NewStore(store, types.KeyPrefix(types.BaseTickMapKeyPrefix))
+	TickStore := prefix.NewStore(store, types.KeyPrefix(types.BaseTickKeyPrefix))
 
-	pageRes, err := query.Paginate(tickMapStore, req.Pagination, func(key []byte, value []byte) error {
-		var tickMap types.TickMap
-		if err := k.cdc.Unmarshal(value, &tickMap); err != nil {
+	pageRes, err := query.Paginate(TickStore, req.Pagination, func(key []byte, value []byte) error {
+		var Tick types.Tick
+		if err := k.cdc.Unmarshal(value, &Tick); err != nil {
 			return err
 		}
 
-		tickMaps = append(tickMaps, tickMap)
+		Ticks = append(Ticks, Tick)
 		return nil
 	})
 
@@ -36,16 +36,16 @@ func (k Keeper) TickMapAll(c context.Context, req *types.QueryAllTickMapRequest)
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryAllTickMapResponse{TickMap: tickMaps, Pagination: pageRes}, nil
+	return &types.QueryAllTickResponse{Tick: Ticks, Pagination: pageRes}, nil
 }
 
-func (k Keeper) TickMap(c context.Context, req *types.QueryGetTickMapRequest) (*types.QueryGetTickMapResponse, error) {
+func (k Keeper) Tick(c context.Context, req *types.QueryGetTickRequest) (*types.QueryGetTickResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(c)
 
-	val, found := k.GetTickMap(
+	val, found := k.GetTick(
 		ctx,
 		req.PairId,
 		req.TickIndex,
@@ -54,5 +54,5 @@ func (k Keeper) TickMap(c context.Context, req *types.QueryGetTickMapRequest) (*
 		return nil, status.Error(codes.NotFound, "not found")
 	}
 
-	return &types.QueryGetTickMapResponse{TickMap: val}, nil
+	return &types.QueryGetTickResponse{Tick: val}, nil
 }

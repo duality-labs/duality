@@ -57,13 +57,13 @@ func (k Keeper) GetOrInitPair(goCtx context.Context, token0 string, token1 strin
 	return pair
 }
 
-func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex int64) types.TickMap {
+func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex int64) types.Tick {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	tick, tickFound := k.GetTickMap(ctx, pairId, tickIndex)
+	tick, tickFound := k.GetTick(ctx, pairId, tickIndex)
 	if !tickFound {
 		numFees := k.GetFeeTierCount(ctx)
-		tick = types.TickMap{
+		tick = types.Tick{
 			PairId:    pairId,
 			TickIndex: tickIndex,
 			TickData: &types.TickDataType{
@@ -77,7 +77,7 @@ func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex in
 			tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}
 			tick.TickData.Reserve1[i] = sdk.ZeroDec()
 		}
-		k.SetTickMap(ctx, pairId, tick)
+		k.SetTick(ctx, pairId, tick)
 
 		token0, token1 := PairToTokens(pairId)
 		k.GetOrInitLimitOrderTranche(ctx, pairId, tickIndex, token0, 0)
@@ -137,7 +137,7 @@ func (k Keeper) FindNextTick1To0(goCtx context.Context, TradingPair types.Tradin
 	// Scan through all tick to the left until we hit MinTick
 	for tickIdx >= TradingPair.MinTick {
 		// Checks for the next value tick containing amount0
-		tick, tickFound := k.GetTickMap(ctx, TradingPair.PairId, tickIdx)
+		tick, tickFound := k.GetTick(ctx, TradingPair.PairId, tickIdx)
 		if tickFound && k.TickHasToken0(ctx, &tick) {
 			//Return the new tickIdx
 			return tickIdx, true
@@ -160,7 +160,7 @@ func (k Keeper) FindNewMinTick(goCtx context.Context, TradingPair types.TradingP
 	// Scan through all tick to the left until we hit CurrentTick1To0
 	for minTickIdx <= TradingPair.TokenPair.CurrentTick1To0 {
 		// Checks for the next value tick containing amount0
-		tick, tickFound := k.GetTickMap(ctx, TradingPair.PairId, minTickIdx)
+		tick, tickFound := k.GetTick(ctx, TradingPair.PairId, minTickIdx)
 		if tickFound && k.TickHasToken0(ctx, &tick) {
 			//Return the new MinTickIdx
 			return minTickIdx
@@ -183,7 +183,7 @@ func (k Keeper) FindNewMaxTick(goCtx context.Context, TradingPair types.TradingP
 	// Scan through all tick to the left until we hit CurrentTick0To1
 	for maxTickIdx >= TradingPair.TokenPair.CurrentTick0To1 {
 		// Checks for the next value tick containing amount1
-		tick, tickFound := k.GetTickMap(ctx, TradingPair.PairId, maxTickIdx)
+		tick, tickFound := k.GetTick(ctx, TradingPair.PairId, maxTickIdx)
 		if tickFound && k.TickHasToken1(ctx, &tick) {
 			//Return the new tickIdx
 			return maxTickIdx
@@ -210,7 +210,7 @@ func (k Keeper) FindNextTick0To1(goCtx context.Context, TradingPair types.Tradin
 	// Scan through all tick to the right until we hit MaxTick
 	for int64(tickIdx) <= TradingPair.MaxTick {
 		// Checks for the next value tick containing amount1
-		tick, tickFound := k.GetTickMap(ctx, TradingPair.PairId, tickIdx)
+		tick, tickFound := k.GetTick(ctx, TradingPair.PairId, tickIdx)
 		if tickFound && k.TickHasToken1(ctx, &tick) {
 			// Returns the new tickIdx
 			return tickIdx, true
@@ -283,7 +283,7 @@ func CalcPrice1To0(tickIndex int64) sdk.Dec {
 }
 
 // Checks if a tick has reserves0 at any fee tier
-func (k Keeper) TickHasToken0(ctx sdk.Context, tick *types.TickMap) bool {
+func (k Keeper) TickHasToken0(ctx sdk.Context, tick *types.Tick) bool {
 	for _, s := range tick.TickData.Reserve0AndShares {
 		if s.Reserve0.GT(sdk.ZeroDec()) {
 			return true
@@ -299,7 +299,7 @@ func (k Keeper) TickHasToken0(ctx sdk.Context, tick *types.TickMap) bool {
 	return false
 }
 
-func (k Keeper) TickTrancheHasToken0(ctx sdk.Context, tick *types.TickMap, trancheIndex uint64) bool {
+func (k Keeper) TickTrancheHasToken0(ctx sdk.Context, tick *types.Tick, trancheIndex uint64) bool {
 	token0, _ := PairToTokens(tick.PairId)
 	tranche, found := k.GetLimitOrderTranche(
 		ctx,
@@ -312,7 +312,7 @@ func (k Keeper) TickTrancheHasToken0(ctx sdk.Context, tick *types.TickMap, tranc
 }
 
 // Checks if a tick has reserve1 at any fee tier
-func (k Keeper) TickHasToken1(ctx sdk.Context, tick *types.TickMap) bool {
+func (k Keeper) TickHasToken1(ctx sdk.Context, tick *types.Tick) bool {
 	for _, s := range tick.TickData.Reserve1 {
 		if s.GT(sdk.ZeroDec()) {
 			return true
@@ -328,7 +328,7 @@ func (k Keeper) TickHasToken1(ctx sdk.Context, tick *types.TickMap) bool {
 	return false
 }
 
-func (k Keeper) TickTrancheHasToken1(ctx sdk.Context, tick *types.TickMap, trancheIndex uint64) bool {
+func (k Keeper) TickTrancheHasToken1(ctx sdk.Context, tick *types.Tick, trancheIndex uint64) bool {
 	_, token1 := PairToTokens(tick.PairId)
 	tranche, found := k.GetLimitOrderTranche(
 		ctx,
@@ -345,7 +345,7 @@ func (k Keeper) TickTrancheHasToken1(ctx sdk.Context, tick *types.TickMap, tranc
 ///////////////////////////////////////////////////////////////////////////////
 
 // should be called for every pair, tick for which token1 is added
-func (k Keeper) CalcTickPointersPostAddToken0(goCtx context.Context, pair *types.TradingPair, tick *types.TickMap) *types.TradingPair {
+func (k Keeper) CalcTickPointersPostAddToken0(goCtx context.Context, pair *types.TradingPair, tick *types.Tick) *types.TradingPair {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	if !k.TickHasToken0(ctx, tick) {
 		return nil
@@ -359,7 +359,7 @@ func (k Keeper) CalcTickPointersPostAddToken0(goCtx context.Context, pair *types
 	return pair
 }
 
-func (k Keeper) UpdateTickPointersPostAddToken0(goCtx context.Context, pair *types.TradingPair, tick *types.TickMap) {
+func (k Keeper) UpdateTickPointersPostAddToken0(goCtx context.Context, pair *types.TradingPair, tick *types.Tick) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	newPair := k.CalcTickPointersPostAddToken0(goCtx, pair, tick)
 	if newPair != nil {
@@ -368,7 +368,7 @@ func (k Keeper) UpdateTickPointersPostAddToken0(goCtx context.Context, pair *typ
 }
 
 // should be called for every pair, tick for which token1 is added
-func (k Keeper) CalcTickPointersPostAddToken1(goCtx context.Context, pair *types.TradingPair, tick *types.TickMap) *types.TradingPair {
+func (k Keeper) CalcTickPointersPostAddToken1(goCtx context.Context, pair *types.TradingPair, tick *types.Tick) *types.TradingPair {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	if !k.TickHasToken1(ctx, tick) {
 		return nil
@@ -382,7 +382,7 @@ func (k Keeper) CalcTickPointersPostAddToken1(goCtx context.Context, pair *types
 	return pair
 }
 
-func (k Keeper) UpdateTickPointersPostAddToken1(goCtx context.Context, pair *types.TradingPair, tick *types.TickMap) {
+func (k Keeper) UpdateTickPointersPostAddToken1(goCtx context.Context, pair *types.TradingPair, tick *types.Tick) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	newPair := k.CalcTickPointersPostAddToken1(goCtx, pair, tick)
 	if newPair != nil {
@@ -391,7 +391,7 @@ func (k Keeper) UpdateTickPointersPostAddToken1(goCtx context.Context, pair *typ
 }
 
 // Should be called for every pair, tick for which token0 liquidity is removed
-func (k Keeper) CalcTickPointersPostRemoveToken0(goCtx context.Context, pair *types.TradingPair, tick *types.TickMap) *types.TradingPair {
+func (k Keeper) CalcTickPointersPostRemoveToken0(goCtx context.Context, pair *types.TradingPair, tick *types.Tick) *types.TradingPair {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	tickIndex := tick.TickIndex
 	minTick := &pair.MinTick
@@ -431,7 +431,7 @@ func (k Keeper) CalcTickPointersPostRemoveToken0(goCtx context.Context, pair *ty
 	return pair
 }
 
-func (k Keeper) UpdateTickPointersPostRemoveToken0(goCtx context.Context, pair *types.TradingPair, tick *types.TickMap) {
+func (k Keeper) UpdateTickPointersPostRemoveToken0(goCtx context.Context, pair *types.TradingPair, tick *types.Tick) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	newPair := k.CalcTickPointersPostRemoveToken0(goCtx, pair, tick)
 	if newPair != nil {
@@ -440,7 +440,7 @@ func (k Keeper) UpdateTickPointersPostRemoveToken0(goCtx context.Context, pair *
 }
 
 // Should be called for every pair, tick for which token1 liquidity is removed
-func (k Keeper) CalcTickPointersPostRemoveToken1(goCtx context.Context, pair *types.TradingPair, tick *types.TickMap) *types.TradingPair {
+func (k Keeper) CalcTickPointersPostRemoveToken1(goCtx context.Context, pair *types.TradingPair, tick *types.Tick) *types.TradingPair {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	tickIndex := tick.TickIndex
 	maxTick := &pair.MaxTick
@@ -477,7 +477,7 @@ func (k Keeper) CalcTickPointersPostRemoveToken1(goCtx context.Context, pair *ty
 	return pair
 }
 
-func (k Keeper) UpdateTickPointersPostRemoveToken1(goCtx context.Context, pair *types.TradingPair, tick *types.TickMap) {
+func (k Keeper) UpdateTickPointersPostRemoveToken1(goCtx context.Context, pair *types.TradingPair, tick *types.Tick) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	newPair := k.CalcTickPointersPostRemoveToken1(goCtx, pair, tick)
 	if newPair != nil {

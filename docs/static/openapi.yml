@@ -24860,17 +24860,17 @@ paths:
           format: uint64
       tags:
         - Query
-  /NicholasDotSol/duality/dex/tick_map:
+  /NicholasDotSol/duality/dex/tick:
     get:
-      summary: Queries a list of TickMap items.
-      operationId: NicholasdotsolDualityDexTickMapAll
+      summary: Queries a list of Tick items.
+      operationId: NicholasdotsolDualityDexTickAll
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              tickMap:
+              Tick:
                 type: array
                 items:
                   type: object
@@ -25018,17 +25018,17 @@ paths:
           type: boolean
       tags:
         - Query
-  /NicholasDotSol/duality/dex/tick_map/{pairId}/{tickIndex}:
+  /NicholasDotSol/duality/dex/tick/{pairId}/{tickIndex}:
     get:
-      summary: Queries a TickMap by index.
-      operationId: NicholasdotsolDualityDexTickMap
+      summary: Queries a Tick by index.
+      operationId: NicholasdotsolDualityDexTick
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              tickMap:
+              Tick:
                 type: object
                 properties:
                   pairId:
@@ -45559,10 +45559,10 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  nicholasdotsol.duality.dex.QueryAllTickMapResponse:
+  nicholasdotsol.duality.dex.QueryAllTickResponse:
     type: object
     properties:
-      tickMap:
+      Tick:
         type: array
         items:
           type: object
@@ -45863,10 +45863,10 @@ definitions:
             format: uint64
           sharesOwned:
             type: string
-  nicholasdotsol.duality.dex.QueryGetTickMapResponse:
+  nicholasdotsol.duality.dex.QueryGetTickResponse:
     type: object
     properties:
-      tickMap:
+      Tick:
         type: object
         properties:
           pairId:
@@ -45982,23 +45982,7 @@ definitions:
         format: uint64
       sharesOwned:
         type: string
-  nicholasdotsol.duality.dex.TickDataType:
-    type: object
-    properties:
-      reserve0AndShares:
-        type: array
-        items:
-          type: object
-          properties:
-            reserve0:
-              type: string
-            totalShares:
-              type: string
-      reserve1:
-        type: array
-        items:
-          type: string
-  nicholasdotsol.duality.dex.TickMap:
+  nicholasdotsol.duality.dex.Tick:
     type: object
     properties:
       pairId:
@@ -46040,6 +46024,22 @@ definitions:
           placeTrancheIndex:
             type: string
             format: uint64
+  nicholasdotsol.duality.dex.TickDataType:
+    type: object
+    properties:
+      reserve0AndShares:
+        type: array
+        items:
+          type: object
+          properties:
+            reserve0:
+              type: string
+            totalShares:
+              type: string
+      reserve1:
+        type: array
+        items:
+          type: string
   nicholasdotsol.duality.dex.TokenMap:
     type: object
     properties:
