@@ -70,6 +70,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ./tmp/artifacts
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v4-{{ checksum "go.sum" }}
       - run:
           name: "Publish Release on GitHub"
           command: |
