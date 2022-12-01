@@ -108,10 +108,10 @@ func TestGenesisState_Validate(t *testing.T) {
 				},
 				LimitOrderTrancheList: []types.LimitOrderTranche{
 					{
-						Count: 0,
+						TickIndex: 0,
 					},
 					{
-						Count: 1,
+						TickIndex: 1,
 					},
 				},
 				// this line is used by starport scaffolding # types/genesis/validField
@@ -126,7 +126,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						TickIndex: 0,
 					},
 					{
-						TickIndex: 1,
+						TickIndex: 0,
 					},
 				},
 			},
@@ -301,30 +301,14 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated LimitOrderTrancheUserSharesWithdrawn",
-			genState: &types.GenesisState{
-				LimitOrderTrancheUserSharesWithdrawnList: []types.LimitOrderTrancheUserSharesWithdrawn{
-					{
-						Count:   0,
-						Address: "0",
-					},
-					{
-						Count:   0,
-						Address: "0",
-					},
-				},
-			},
-			valid: false,
-		},
-		{
 			desc: "duplicated LimitOrderTranche",
 			genState: &types.GenesisState{
 				LimitOrderTrancheList: []types.LimitOrderTranche{
 					{
-						Count: 0,
+						TickIndex: 0,
 					},
 					{
-						Count: 0,
+						TickIndex: 0,
 					},
 				},
 			},

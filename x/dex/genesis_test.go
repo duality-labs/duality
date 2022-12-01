@@ -90,12 +90,12 @@ func TestGenesis(t *testing.T) {
 				Address: "1",
 			},
 		},
-		LimitOrderTrancheList: []types.LimitTrancheIndexes{
+		LimitOrderTrancheList: []types.LimitOrderTranche{
 			{
-				Count: 0,
+				TickIndex: 0,
 			},
 			{
-				Count: 1,
+				TickIndex: 1,
 			},
 		},
 		// this line is used by starport scaffolding # genesis/test/state
