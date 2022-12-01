@@ -51,6 +51,7 @@ jobs:
     working_directory: ~/repo
     docker:
       - image: ignitehq/cli:0.25.2
+        GITHUB_CREDS
     steps:
       - checkout
       - run:
@@ -78,7 +79,7 @@ jobs:
           name: "Publish Release on GitHub"
           command: |
             go install github.com/tcnksm/ghr@v0.16.0
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} ./tmp/artifacts/release
+            ghr -t "${GITHUB_TOKEN}" -u "${CIRCLE_PROJECT_USERNAME}" -r "${CIRCLE_PROJECT_REPONAME}" -c "${CIRCLE_SHA1}" -delete "${CIRCLE_TAG}" ${CIRCLE_TAG} ./tmp/artifacts/release
 
 workflows:
   version: 2
@@ -106,5 +107,7 @@ workflows:
               only: /^\d+\.\d+\.\d+$/
             branches:
               ignore: /.*/
+          context:
+            - GITHUB_CREDS
           requires:
             - binary-release-build
