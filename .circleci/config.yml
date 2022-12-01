@@ -55,18 +55,18 @@ jobs:
       - checkout
       - run:
           name: Create a temp directory for artifacts
-          command: mkdir -p /tmp/artifacts/release
+          command: mkdir -p ./tmp/artifacts/release
       - run:
           name: Build chain binary
-          command: ignite chain build  --release -t linux:amd64 -t darwin:amd64 -o /tmp/artifacts/release
+          command: ignite chain build  --release -t linux:amd64 -t darwin:amd64 -o ./tmp/artifacts/release
       - store_artifacts:
-          path: /tmp/artifacts/release
+          path: ./tmp/artifacts/release
   publish-github-release:
     docker:
       - image: cimg/go:1.19.3
     steps:
       - attach_workspace:
-          at: /tmp/artifacts/release
+          at: ./tmp/artifacts/release
       - run:
           name: "Publish Release on GitHub"
           command: |
