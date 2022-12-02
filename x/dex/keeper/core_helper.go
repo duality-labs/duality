@@ -85,7 +85,9 @@ func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex in
 }
 
 func CalcShares(amount0 sdk.Int, amount1 sdk.Int, priceCenter1To0 sdk.Dec) sdk.Dec {
-	return amount0.ToDec().Add(priceCenter1To0.MulInt(amount0))
+	amount0Dec := amount0.ToDec()
+	amount1Dec := amount1.ToDec()
+	return amount0Dec.Mul(amount1Dec.Mul(priceCenter1To0))
 }
 
 func (k Keeper) GetOrInitLimitOrderTrancheUser(
@@ -230,20 +232,24 @@ func CalcTrueAmounts(
 	amount1 sdk.Int,
 	totalShares sdk.Dec,
 ) (trueAmount0 sdk.Int, trueAmount1 sdk.Int, sharesMinted sdk.Dec) {
-	if lowerReserve0.GT(sdk.ZeroInt()) && upperReserve1.GT(sdk.ZeroInt()) {
-		ratio0 := amount0.Quo(lowerReserve0)
-		ratio1 := amount1.Quo(upperReserve1)
+	lowerReserve0Dec := lowerReserve0.ToDec()
+	upperReserve1Dec := upperReserve1.ToDec()
+	amount0Dec := amount0.ToDec()
+	amount1Dec := amount1.ToDec()
+	if lowerReserve0Dec.GT(sdk.ZeroDec()) && upperReserve1Dec.GT(sdk.ZeroDec()) {
+		ratio0 := amount0Dec.Quo(lowerReserve0Dec)
+		ratio1 := amount1Dec.Quo(upperReserve1Dec)
 		if ratio0.LT(ratio1) {
 			trueAmount0 = amount0
-			trueAmount1 = ratio0.Mul(upperReserve1)
+			trueAmount1 = ratio0.Mul(upperReserve1Dec).TruncateInt()
 		} else {
-			trueAmount0 = ratio1.Mul(lowerReserve0)
+			trueAmount0 = ratio1.Mul(lowerReserve0Dec).TruncateInt()
 			trueAmount1 = amount1
 		}
-	} else if lowerReserve0.GT(sdk.ZeroInt()) { // && upperReserve1 == 0
+	} else if lowerReserve0Dec.GT(sdk.ZeroDec()) { // && upperReserve1Dec == 0
 		trueAmount0 = amount0
 		trueAmount1 = sdk.ZeroInt()
-	} else if upperReserve1.GT(sdk.ZeroInt()) { // && lowerReserve0 == 0
+	} else if upperReserve1Dec.GT(sdk.ZeroDec()) { // && lowerReserve0Dec == 0
 		trueAmount0 = sdk.ZeroInt()
 		trueAmount1 = amount1
 	} else {
