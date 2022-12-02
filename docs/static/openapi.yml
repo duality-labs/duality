@@ -25158,15 +25158,12 @@ paths:
                   properties:
                     pairId:
                       type: string
-                    tokenPair:
-                      type: object
-                      properties:
-                        currentTick0To1:
-                          type: string
-                          format: int64
-                        currentTick1To0:
-                          type: string
-                          format: int64
+                    currentTick0To1:
+                      type: string
+                      format: int64
+                    currentTick1To0:
+                      type: string
+                      format: int64
                     maxTick:
                       type: string
                       format: int64
@@ -25292,15 +25289,12 @@ paths:
                 properties:
                   pairId:
                     type: string
-                  tokenPair:
-                    type: object
-                    properties:
-                      currentTick0To1:
-                        type: string
-                        format: int64
-                      currentTick1To0:
-                        type: string
-                        format: int64
+                  currentTick0To1:
+                    type: string
+                    format: int64
+                  currentTick1To0:
+                    type: string
+                    format: int64
                   maxTick:
                     type: string
                     format: int64
@@ -45488,15 +45482,12 @@ definitions:
           properties:
             pairId:
               type: string
-            tokenPair:
-              type: object
-              properties:
-                currentTick0To1:
-                  type: string
-                  format: int64
-                currentTick1To0:
-                  type: string
-                  format: int64
+            currentTick0To1:
+              type: string
+              format: int64
+            currentTick1To0:
+              type: string
+              format: int64
             maxTick:
               type: string
               format: int64
@@ -45681,15 +45672,12 @@ definitions:
         properties:
           pairId:
             type: string
-          tokenPair:
-            type: object
-            properties:
-              currentTick0To1:
-                type: string
-                format: int64
-              currentTick1To0:
-                type: string
-                format: int64
+          currentTick0To1:
+            type: string
+            format: int64
+          currentTick1To0:
+            type: string
+            format: int64
           maxTick:
             type: string
             format: int64
@@ -45791,15 +45779,6 @@ definitions:
       index:
         type: string
         format: int64
-  nicholasdotsol.duality.dex.TokenPairType:
-    type: object
-    properties:
-      currentTick0To1:
-        type: string
-        format: int64
-      currentTick1To0:
-        type: string
-        format: int64
   nicholasdotsol.duality.dex.Tokens:
     type: object
     properties:
@@ -45813,15 +45792,12 @@ definitions:
     properties:
       pairId:
         type: string
-      tokenPair:
-        type: object
-        properties:
-          currentTick0To1:
-            type: string
-            format: int64
-          currentTick1To0:
-            type: string
-            format: int64
+      currentTick0To1:
+        type: string
+        format: int64
+      currentTick1To0:
+        type: string
+        format: int64
       maxTick:
         type: string
         format: int64

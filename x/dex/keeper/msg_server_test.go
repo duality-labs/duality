@@ -573,10 +573,10 @@ func (s *MsgServerTestSuite) assertCurrentTicks(
 	expected1To0 int64,
 	expected0To1 int64,
 ) {
-	Tick, found := s.app.DexKeeper.GetTradingPair(s.ctx, "TokenA<>TokenB")
+	tick, found := s.app.DexKeeper.GetTradingPair(s.ctx, "TokenA<>TokenB")
 	s.Assert().NotNil(found)
-	s.Assert().Equal(expected1To0, Tick.TokenPair.CurrentTick1To0)
-	s.Assert().Equal(expected0To1, Tick.TokenPair.CurrentTick0To1)
+	s.Assert().Equal(expected1To0, tick.CurrentTick1To0)
+	s.Assert().Equal(expected0To1, tick.CurrentTick0To1)
 }
 
 func (s *MsgServerTestSuite) assertCurr0To1(curr0To1Expected int64) {
@@ -586,7 +586,7 @@ func (s *MsgServerTestSuite) assertCurr0To1(curr0To1Expected int64) {
 		s.Require().Fail("Invalid GetPair in assertCurr0to1")
 	}
 
-	curr0To1Actual := pair.TokenPair.CurrentTick0To1
+	curr0To1Actual := pair.CurrentTick0To1
 	s.Assert().Equal(curr0To1Expected, curr0To1Actual)
 }
 
@@ -597,7 +597,7 @@ func (s *MsgServerTestSuite) assertCurr1To0(curr1To0Expected int64) {
 		s.Require().Fail("Invalid GetPair in assertCurr0to1")
 	}
 
-	curr1to0Actual := pair.TokenPair.CurrentTick1To0
+	curr1to0Actual := pair.CurrentTick1To0
 	s.Assert().Equal(curr1To0Expected, curr1to0Actual)
 }
 
@@ -624,8 +624,8 @@ func (s *MsgServerTestSuite) assertMaxTick(maxTickExpected int64) {
 }
 
 func (s *MsgServerTestSuite) printTicks() {
-	Tick, _ := s.app.DexKeeper.GetTradingPair(s.ctx, "TokenA<>TokenB")
-	fmt.Printf("\nTick0To1: %v, Tick1To0: %v", Tick.TokenPair.CurrentTick0To1, Tick.TokenPair.CurrentTick1To0)
+	tickMap, _ := s.app.DexKeeper.GetTradingPair(s.ctx, "TokenA<>TokenB")
+	fmt.Printf("\nTick0To1: %v, Tick1To0: %v", tickMap.CurrentTick0To1, tickMap.CurrentTick1To0)
 }
 
 func (s *MsgServerTestSuite) assertLiquidityAtTick(amountA int64, amountB int64, tickIndex int64, feeIndex uint64) {

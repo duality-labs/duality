@@ -38,7 +38,7 @@ jobs:
           command: mkdir -p /tmp/artifacts
       - run:
           name: Build chain binary
-          command: ignite chain build -o /tmp/artifacts
+          command: ignite chain build -o /tmp/artifacts --clear-cache
       - run:
           name: Ensure ignite has not generated changes which have not been commited to VC
           command: |
@@ -58,7 +58,7 @@ jobs:
           command: mkdir -p ./tmp/artifacts/release
       - run:
           name: Build chain binary
-          command: ignite chain build  --release -t linux:amd64 -t darwin:amd64 -o ./tmp/artifacts/release
+          command: ignite chain build  --release -t linux:amd64 -t darwin:amd64 -o ./tmp/artifacts/release --clear-cache
       - persist_to_workspace:
           root: ./tmp/artifacts
           paths:
