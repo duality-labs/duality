@@ -8,7 +8,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit) (string, string, sdk.AccAddress, []sdk.Dec, []sdk.Dec, error) {
+func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit) (string, string, sdk.AccAddress, []sdk.Int, []sdk.Int, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -52,12 +52,12 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 		amounts1 = tmp
 	}
 
-	totalAmount0ToDeposit := sdk.ZeroDec()
-	totalAmount1ToDeposit := sdk.ZeroDec()
+	totalAmount0ToDeposit := sdk.ZeroInt()
+	totalAmount1ToDeposit := sdk.ZeroInt()
 	// checks that amount0, amount1 are both not zero, and that the user has the balances they wish to deposit
 	for i, _ := range amounts0 {
-		// Error checking for valid sdk.Dec
-		if err != nil || (amounts0[i].Equal(sdk.ZeroDec()) && amounts1[i].Equal(sdk.ZeroDec())) {
+		// Error checking for valid sdk.Int
+		if err != nil || (amounts0[i].Equal(sdk.ZeroInt()) && amounts1[i].Equal(sdk.ZeroInt())) {
 			return "", "", nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid amount: %s", err)
 		}
 
@@ -65,7 +65,7 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 		totalAmount1ToDeposit = totalAmount1ToDeposit.Add(amounts1[i])
 	}
 
-	AccountToken0Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, token0).Amount)
+	AccountToken0Balance := k.bankKeeper.GetBalance(ctx, callerAddr, token0).Amount
 
 	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 
@@ -73,7 +73,7 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
-	AccountsToken1Balance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, token1).Amount)
+	AccountsToken1Balance := k.bankKeeper.GetBalance(ctx, callerAddr, token1).Amount
 
 	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 
@@ -123,7 +123,7 @@ func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
-	// Error checking for valid sdk.Dec
+	// Error checking for valid sdk.Int
 	if err != nil {
 		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
@@ -173,12 +173,12 @@ func (k Keeper) SwapVerification(goCtx context.Context, msg types.MsgSwap) (stri
 	if msg.TokenIn != token0 && msg.TokenIn != token1 {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
 	}
-	// Error checking for valid sdk.Dec
+	// Error checking for valid sdk.Int
 	if err != nil {
 		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
-	AccountsAmountInBalance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, msg.TokenIn).Amount)
+	AccountsAmountInBalance := k.bankKeeper.GetBalance(ctx, callerAddr, msg.TokenIn).Amount
 
 	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 	if AccountsAmountInBalance.LT(msg.AmountIn) {
@@ -216,12 +216,12 @@ func (k Keeper) PlaceLimitOrderVerification(goCtx context.Context, msg types.Msg
 	if msg.TokenIn != token0 && msg.TokenIn != token1 {
 		return "", "", nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
 	}
-	// Error checking for valid sdk.Dec
+	// Error checking for valid sdk.Int
 	if err != nil {
 		return "", "", nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
-	AccountsAmountInBalance := sdk.NewDecFromInt(k.bankKeeper.GetBalance(ctx, callerAddr, msg.TokenIn).Amount)
+	AccountsAmountInBalance := k.bankKeeper.GetBalance(ctx, callerAddr, msg.TokenIn).Amount
 
 	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 	if AccountsAmountInBalance.LT(msg.AmountIn) {

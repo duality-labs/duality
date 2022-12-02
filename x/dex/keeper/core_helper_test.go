@@ -135,22 +135,22 @@ func (s *MsgServerTestSuite) TestGetOrInitTickNew() {
 	s.Assert().Equal(tick.TickIndex, int64(0))
 	s.Assert().Equal(feeCount, len(tick.TickData.Reserve0AndShares))
 	s.Assert().Equal(
-		&types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()},
+		&types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroDec()},
 		tick.TickData.Reserve0AndShares[0],
 	)
 
 	s.Assert().Equal(
-		&types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()},
+		&types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroDec()},
 		tick.TickData.Reserve0AndShares[feeCount-1],
 	)
 
 	s.Assert().Equal(
-		sdk.ZeroDec(),
+		sdk.ZeroInt(),
 		tick.TickData.Reserve1[0],
 	)
 
 	s.Assert().Equal(
-		sdk.ZeroDec(),
+		sdk.ZeroInt(),
 		tick.TickData.Reserve1[feeCount-1],
 	)
 
@@ -169,7 +169,7 @@ func (s *MsgServerTestSuite) TestGetOrInitTickExisting() {
 
 	// WHEN we update values on that tick
 	tick, _ := s.app.DexKeeper.GetTick(s.ctx, "TokenA<>TokenB", 0)
-	tick.TickData.Reserve0AndShares[0] = &types.Reserve0AndSharesType{sdk.NewDec(10), sdk.NewDec(10)}
+	tick.TickData.Reserve0AndShares[0] = &types.Reserve0AndSharesType{sdk.NewInt(10), sdk.NewDec(10)}
 	s.app.DexKeeper.SetTick(s.ctx, "TokenA<>TokenB", tick)
 
 	// AND try to initialize the same tick again
@@ -178,7 +178,7 @@ func (s *MsgServerTestSuite) TestGetOrInitTickExisting() {
 	// THEN there is still only 1 tick and it retains the values we set
 	tickCount := len(s.app.DexKeeper.GetAllTick(s.ctx))
 	s.Assert().Equal(1, tickCount)
-	s.Assert().Equal(sdk.NewDec(10), newTick.TickData.Reserve0AndShares[0].Reserve0)
+	s.Assert().Equal(sdk.NewInt(10), newTick.TickData.Reserve0AndShares[0].Reserve0)
 }
 
 // GetOrInitTickTrancheFillMap ////////////////////////////////////////////////
@@ -486,11 +486,11 @@ func (s *MsgServerTestSuite) TestHasToken0Empty() {
 
 	// WHEN tick only has limit orders and reserves of Token1
 	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
-	tick.TickData.Reserve1[0] = sdk.NewDec(10)
+	tick.TickData.Reserve1[0] = sdk.NewInt(10)
 
 	tick.LimitOrderTranche0To1.FillTrancheIndex = 0
 	tranche := s.app.DexKeeper.GetOrInitLimitOrderTranche(s.ctx, "TokenA<>TokenB", 0, "TokenB", 0)
-	tranche.ReservesTokenIn = sdk.NewDec(100)
+	tranche.ReservesTokenIn = sdk.NewInt(100)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, tranche)
 
 	s.Assert().False(s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
@@ -500,7 +500,7 @@ func (s *MsgServerTestSuite) TestHasToken0HasReserves() {
 
 	// WHEN tick has Reserves0
 	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
-	tick.TickData.Reserve0AndShares[3].Reserve0 = sdk.NewDec(10)
+	tick.TickData.Reserve0AndShares[3].Reserve0 = sdk.NewInt(10)
 
 	s.Assert().True(s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
 }
@@ -511,7 +511,7 @@ func (s *MsgServerTestSuite) TestHasToken0HasLimitOrders() {
 	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
 	tick.LimitOrderTranche0To1.FillTrancheIndex = 0
 	tranche := s.app.DexKeeper.GetOrInitLimitOrderTranche(s.ctx, "TokenA<>TokenB", 0, "TokenA", 0)
-	tranche.ReservesTokenIn = sdk.NewDec(100)
+	tranche.ReservesTokenIn = sdk.NewInt(100)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, tranche)
 
 	s.Assert().True(s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
@@ -523,11 +523,11 @@ func (s *MsgServerTestSuite) TestHasToken1Empty() {
 
 	// WHEN tick only has limit orders and reserves of Token0
 	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
-	tick.TickData.Reserve0AndShares[0].Reserve0 = sdk.NewDec(10)
+	tick.TickData.Reserve0AndShares[0].Reserve0 = sdk.NewInt(10)
 
 	tick.LimitOrderTranche0To1.FillTrancheIndex = 0
 	tranche := s.app.DexKeeper.GetOrInitLimitOrderTranche(s.ctx, "TokenA<>TokenB", 0, "TokenA", 0)
-	tranche.ReservesTokenIn = sdk.NewDec(100)
+	tranche.ReservesTokenIn = sdk.NewInt(100)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, tranche)
 
 	s.Assert().False(s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
@@ -537,7 +537,7 @@ func (s *MsgServerTestSuite) TestHasToken1HasReserves() {
 
 	// WHEN tick has Reserves0
 	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
-	tick.TickData.Reserve1[0] = sdk.NewDec(10)
+	tick.TickData.Reserve1[0] = sdk.NewInt(10)
 
 	// THEN HasToken1() = true
 	s.Assert().True(s.app.DexKeeper.TickHasToken1(s.ctx, &tick))
@@ -549,7 +549,7 @@ func (s *MsgServerTestSuite) TestHasToken1HasLimitOrders() {
 	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
 	tick.LimitOrderTranche0To1.FillTrancheIndex = 0
 	tranche := s.app.DexKeeper.GetOrInitLimitOrderTranche(s.ctx, "TokenA<>TokenB", 0, "TokenB", 0)
-	tranche.ReservesTokenIn = sdk.NewDec(100)
+	tranche.ReservesTokenIn = sdk.NewInt(100)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, tranche)
 
 	s.Assert().True(s.app.DexKeeper.TickHasToken1(s.ctx, &tick))

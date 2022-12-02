@@ -43,7 +43,7 @@ func (s *MsgServerTestSuite) TestMultiple() {
 		TokenB:    "TokenB",
 		TickIndex: 0,
 		TokenIn:   "TokenB",
-		AmountIn:  NewDec(100),
+		AmountIn:  sdk.NewInt(100),
 	})
 	s.Assert().Nil(err)
 
@@ -63,7 +63,7 @@ func (s *MsgServerTestSuite) TestDifferentReceiverAndCreator() {
 		TokenB:    "TokenB",
 		TickIndex: 0,
 		TokenIn:   "TokenB",
-		AmountIn:  NewDec(100),
+		AmountIn:  sdk.NewInt(100),
 	})
 	s.Assert().Nil(err)
 
@@ -83,7 +83,7 @@ func (s *MsgServerTestSuite) TestFailUnrecognizedToken() {
 		TokenB:    "TokenB",
 		TickIndex: 0,
 		TokenIn:   "TokenC",
-		AmountIn:  NewDec(100),
+		AmountIn:  sdk.NewInt(100),
 	})
 	s.Assert().Error(err)
 }
@@ -99,7 +99,7 @@ func (s *MsgServerTestSuite) TestFailInsufficientBalance() {
 		TokenB:    "TokenB",
 		TickIndex: 0,
 		TokenIn:   "TokenB",
-		AmountIn:  NewDec(1000),
+		AmountIn:  sdk.NewInt(1000),
 	})
 	s.Assert().Error(err)
 }
@@ -116,17 +116,18 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder1to0WithWithdraw() {
 	// limit order at -1: (25 * 1.0001^-1) A<=>B 25
 	// limit order at 0: (40 - (25 * 1.0001^-1)) A<=>B (40 - (25 * 1.0001^-1)) * 1.0001^0
 	s.assertAliceBalances(100, 425)
-	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("240.0024997500249975"))
+	// TODO: this needs to be fiexed 
+	s.assertBobBalances(60, 240)
 
 	s.aliceWithdrawsLimitSell("TokenB", 0, 0)
-
-	s.assertAliceBalancesDec(sdk.MustNewDecFromStr("115.0024997500249975"), NewDec(425))
-	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("240.0024997500249975"))
+	// TODO: this needs to be fiexed 
+	s.assertAliceBalances(115, 425)
+	s.assertBobBalances(60, 240)
 
 	s.aliceWithdrawsLimitSell("TokenB", -1, 0)
 
-	s.assertAliceBalancesDec(NewDec(140), NewDec(425))
-	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("240.0024997500249975"))
+	s.assertAliceBalances(140, 425)
+	s.assertBobBalances(60, 240)
 }
 
 func (s *MsgServerTestSuite) TestLimitOrderOverdraw() {
@@ -193,7 +194,7 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	s.assertBobBalances(100, 200)
 	s.assertDexBalances(50, 0)
 
-	testing_scripts.MultipleLimitOrderFills([]sdk.Dec{sdk.NewDec(25), sdk.NewDec(25)}, []sdk.Dec{sdk.MustNewDecFromStr("1.0001"), sdk.NewDec(1)}, sdk.NewDec(40))
+	testing_scripts.MultipleLimitOrderFills([]sdk.Int{sdk.NewInt(25), sdk.NewInt(25)}, []sdk.Dec{sdk.MustNewDecFromStr("1.0001"), sdk.NewDec(1)}, sdk.NewInt(40))
 
 	//Bobs balance for TokenB should be 200 - 40 = 160
 	//Tick 1 should be a swap of 25 / 1.0001 TokenB (1) for 25 of TokenA (0) exhausting all the liquidity
@@ -205,21 +206,21 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	s.bobMarketSells("TokenB", 40, 30)
 
 	s.assertAliceBalances(99950, 500)
-	s.assertBobBalancesDec(sdk.MustNewDecFromStr("140.002499750024997500"), NewDec(160))
-	s.assertDexBalancesDec(sdk.MustNewDecFromStr("9.9975002499750025"), NewDec(40))
+	s.assertBobBalances(140,160)
+	s.assertDexBalances(9, 40)
 
 	s.aliceWithdrawsLimitSell("TokenA", 1, 0)
 
-	s.assertAliceBalancesDec(NewDec(99950), sdk.MustNewDecFromStr("524.997500249975002500"))
-	s.assertBobBalancesDec(sdk.MustNewDecFromStr("140.002499750024997500"), NewDec(160))
+	s.assertAliceBalances(99950, 524)
+	s.assertBobBalances(140,160)
 	//40 - 24.997500249975002500 = 15.0024997500249975
-	s.assertDexBalancesDec(sdk.MustNewDecFromStr("9.9975002499750025"), sdk.MustNewDecFromStr("15.0024997500249975"))
+	s.assertDexBalances(9, 15)
 
 	s.aliceWithdrawsLimitSell("TokenA", 0, 0)
 
-	s.assertAliceBalancesDec(NewDec(99950), sdk.MustNewDecFromStr("540"))
-	s.assertBobBalancesDec(sdk.MustNewDecFromStr("140.002499750024997500"), NewDec(160))
-	s.assertDexBalancesDec(sdk.MustNewDecFromStr("9.9975002499750025"), NewDec(0))
+	s.assertAliceBalances(99950, 540)
+	s.assertBobBalances(140, 160)
+	s.assertDexBalances(9, 0)
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFailsWhenNothingToWithdraw() {
