@@ -62,24 +62,6 @@ func TestGenesis(t *testing.T) {
 			},
 		},
 		FeeTierCount: 2,
-		EdgeRowList: []types.EdgeRow{
-			{
-				Id: 0,
-			},
-			{
-				Id: 1,
-			},
-		},
-		EdgeRowCount: 2,
-		AdjanceyMatrixList: []types.AdjanceyMatrix{
-			{
-				Id: 0,
-			},
-			{
-				Id: 1,
-			},
-		},
-		AdjanceyMatrixCount: 2,
 		LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
 			{
 				Count:   0,
@@ -116,10 +98,6 @@ func TestGenesis(t *testing.T) {
 	require.ElementsMatch(t, genesisState.SharesList, got.SharesList)
 	require.ElementsMatch(t, genesisState.FeeTierList, got.FeeTierList)
 	require.Equal(t, genesisState.FeeTierCount, got.FeeTierCount)
-	require.ElementsMatch(t, genesisState.EdgeRowList, got.EdgeRowList)
-	require.Equal(t, genesisState.EdgeRowCount, got.EdgeRowCount)
-	require.ElementsMatch(t, genesisState.AdjanceyMatrixList, got.AdjanceyMatrixList)
-	require.Equal(t, genesisState.AdjanceyMatrixCount, got.AdjanceyMatrixCount)
 	require.ElementsMatch(t, genesisState.LimitOrderTrancheUserList, got.LimitOrderTrancheUserList)
 	require.ElementsMatch(t, genesisState.LimitOrderTrancheList, got.LimitOrderTrancheList)
 	// this line is used by starport scaffolding # genesis/test/assert

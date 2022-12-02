@@ -9,8 +9,6 @@ import "dex/tokens.proto";
 import "dex/token_map.proto";
 import "dex/shares.proto";
 import "dex/fee_tier.proto";
-import "dex/edge_row.proto";
-import "dex/adjancey_matrix.proto";
 import "dex/limit_order_tranche_user.proto";
 import "dex/limit_order_tranche.proto";
 // this line is used by starport scaffolding # genesis/proto/import
@@ -28,10 +26,6 @@ message GenesisState {
   repeated Shares sharesList = 7 [(gogoproto.nullable) = false];
   repeated FeeTier FeeTierList = 8 [(gogoproto.nullable) = false];
   uint64 FeeTierCount = 9;
-  repeated EdgeRow edgeRowList = 10 [(gogoproto.nullable) = false];
-  uint64 edgeRowCount = 11;
-  repeated AdjanceyMatrix adjanceyMatrixList = 12 [(gogoproto.nullable) = false];
-  uint64 adjanceyMatrixCount = 13;
   repeated LimitOrderTrancheUser LimitOrderTrancheUserList = 14 [(gogoproto.nullable) = false];
   repeated LimitOrderTranche LimitOrderTrancheList = 15 [(gogoproto.nullable) = false];
   // this line is used by starport scaffolding # genesis/proto/state
