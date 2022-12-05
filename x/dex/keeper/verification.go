@@ -16,7 +16,7 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
 
 	if err != nil {
-		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrInvalidTradingPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
 	}
 
 	// Converts input address (string) to sdk.AccAddress
@@ -92,7 +92,7 @@ func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
 
 	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTradingPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
 	}
 
 	// gets total number of fee tiers
@@ -154,7 +154,7 @@ func (k Keeper) SwapVerification(goCtx context.Context, msg types.MsgSwap) (stri
 	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
 
 	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTradingPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
 	}
 
 	// Converts input address (string) to sdk.AccAddress
@@ -171,7 +171,7 @@ func (k Keeper) SwapVerification(goCtx context.Context, msg types.MsgSwap) (stri
 	}
 
 	if msg.TokenIn != token0 && msg.TokenIn != token1 {
-		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
+		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTradingPair, "TokenIn must be either Tokne0 or Token1")
 	}
 	// Error checking for valid sdk.Int
 	if err != nil {
@@ -195,7 +195,7 @@ func (k Keeper) PlaceLimitOrderVerification(goCtx context.Context, msg types.Msg
 	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
 
 	if err != nil {
-		return "", "", nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+		return "", "", nil, sdkerrors.Wrapf(types.ErrInvalidTradingPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
 	}
 
 	// Converts input address (string) to sdk.AccAddress
@@ -214,7 +214,7 @@ func (k Keeper) PlaceLimitOrderVerification(goCtx context.Context, msg types.Msg
 	}
 
 	if msg.TokenIn != token0 && msg.TokenIn != token1 {
-		return "", "", nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "TokenIn must be either Tokne0 or Token1")
+		return "", "", nil, sdkerrors.Wrapf(types.ErrInvalidTradingPair, "TokenIn must be either Tokne0 or Token1")
 	}
 	// Error checking for valid sdk.Int
 	if err != nil {
@@ -237,7 +237,7 @@ func (k Keeper) WithdrawLimitOrderVerification(goCtx context.Context, msg types.
 	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
 
 	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTradingPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
 	}
 
 	// Converts input address (string) to sdk.AccAddress
@@ -277,7 +277,7 @@ func (k Keeper) CancelLimitOrderVerification(goCtx context.Context, msg types.Ms
 	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
 
 	if err != nil {
-		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTokenPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTradingPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
 	}
 
 	// Converts input address (string) to sdk.AccAddress
