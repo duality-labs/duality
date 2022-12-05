@@ -37,18 +37,18 @@ const (
 	// TokenMapKeyPrefix is the prefix to retrieve all TokenMap
 	TokenMapKeyPrefix = "TokenMap/value"
 
-	// TickMapKeyPrefix is the prefix to retrieve all TickMap
-	BaseTickMapKeyPrefix = "TickMap/value"
+	// TickKeyPrefix is the prefix to retrieve all Tick
+	BaseTickKeyPrefix = "Tick/value"
 
-	// PairMapKeyPrefix is the prefix to retrieve all PairMap
-	PairMapKeyPrefix = "PairMap/value"
+	// TradingPairKeyPrefix is the prefix to retrieve all TradingPair
+	TradingPairKeyPrefix = "TradingPair/value"
 
 	// SharesKeyPrefix is the prefix to retrieve all Shares
 	SharesKeyPrefix = "Shares/value"
 )
 
 func TickPrefix(pairId string) []byte {
-	return append(KeyPrefix(BaseTickMapKeyPrefix), KeyPrefix(pairId)...)
+	return append(KeyPrefix(BaseTickKeyPrefix), KeyPrefix(pairId)...)
 }
 
 // TokenMapKey returns the store key to retrieve a TokenMap from the index fields
@@ -62,7 +62,7 @@ func TokenMapKey(address string) []byte {
 	return key
 }
 
-func TickMapKey(pairId string, tickIndex int64) []byte {
+func TickKey(pairId string, tickIndex int64) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)
@@ -76,7 +76,7 @@ func TickMapKey(pairId string, tickIndex int64) []byte {
 	return key
 }
 
-func PairMapKey(pairId string) []byte {
+func TradingPairKey(pairId string) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)
@@ -344,16 +344,6 @@ const (
 )
 
 const (
-	FeeListKey      = "FeeList-value-"
-	FeeListCountKey = "FeeList-count-"
-)
-
-const (
-	EdgeRowKey      = "EdgeRow-value-"
-	EdgeRowCountKey = "EdgeRow-count-"
-)
-
-const (
-	AdjanceyMatrixKey      = "AdjanceyMatrix-value-"
-	AdjanceyMatrixCountKey = "AdjanceyMatrix-count-"
+	FeeTierKey      = "FeeTier-value-"
+	FeeTierCountKey = "FeeTier-count-"
 )

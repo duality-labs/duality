@@ -22,7 +22,7 @@ func TestGenesisState_Validate(t *testing.T) {
 			desc: "valid genesis state",
 			genState: &types.GenesisState{
 
-				TickMapList: []types.TickMap{
+				TickList: []types.Tick{
 					{
 						TickIndex: 0,
 					},
@@ -30,7 +30,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						TickIndex: 1,
 					},
 				},
-				PairMapList: []types.PairMap{
+				TradingPairList: []types.TradingPair{
 					{
 						PairId: "0",
 					},
@@ -69,7 +69,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						FeeIndex:  1,
 					},
 				},
-				FeeListList: []types.FeeList{
+				FeeTierList: []types.FeeTier{
 					{
 						Id: 0,
 					},
@@ -77,25 +77,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						Id: 1,
 					},
 				},
-				FeeListCount: 2,
-				EdgeRowList: []types.EdgeRow{
-					{
-						Id: 0,
-					},
-					{
-						Id: 1,
-					},
-				},
-				EdgeRowCount: 2,
-				AdjanceyMatrixList: []types.AdjanceyMatrix{
-					{
-						Id: 0,
-					},
-					{
-						Id: 1,
-					},
-				},
-				AdjanceyMatrixCount: 2,
+				FeeTierCount: 2,
 				LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
 					{
 						Count:   0,
@@ -108,10 +90,10 @@ func TestGenesisState_Validate(t *testing.T) {
 				},
 				LimitOrderTrancheList: []types.LimitOrderTranche{
 					{
-						Count: 0,
+						TickIndex: 0,
 					},
 					{
-						Count: 1,
+						TickIndex: 1,
 					},
 				},
 				// this line is used by starport scaffolding # types/genesis/validField
@@ -119,23 +101,23 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: true,
 		},
 		{
-			desc: "duplicated tickMap",
+			desc: "duplicated Tick",
 			genState: &types.GenesisState{
-				TickMapList: []types.TickMap{
+				TickList: []types.Tick{
 					{
 						TickIndex: 0,
 					},
 					{
-						TickIndex: 1,
+						TickIndex: 0,
 					},
 				},
 			},
 			valid: false,
 		},
 		{
-			desc: "duplicated pairMap",
+			desc: "duplicated TradingPair",
 			genState: &types.GenesisState{
-				PairMapList: []types.PairMap{
+				TradingPairList: []types.TradingPair{
 					{
 						PairId: "0",
 					},
@@ -207,9 +189,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated feeList",
+			desc: "duplicated FeeTier",
 			genState: &types.GenesisState{
-				FeeListList: []types.FeeList{
+				FeeTierList: []types.FeeTier{
 					{
 						Id: 0,
 					},
@@ -221,66 +203,14 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "invalid feeList count",
+			desc: "invalid FeeTier count",
 			genState: &types.GenesisState{
-				FeeListList: []types.FeeList{
+				FeeTierList: []types.FeeTier{
 					{
 						Id: 1,
 					},
 				},
-				FeeListCount: 0,
-			},
-			valid: false,
-		},
-		{
-			desc: "duplicated edgeRow",
-			genState: &types.GenesisState{
-				EdgeRowList: []types.EdgeRow{
-					{
-						Id: 0,
-					},
-					{
-						Id: 0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "invalid edgeRow count",
-			genState: &types.GenesisState{
-				EdgeRowList: []types.EdgeRow{
-					{
-						Id: 1,
-					},
-				},
-				EdgeRowCount: 0,
-			},
-			valid: false,
-		},
-		{
-			desc: "duplicated adjanceyMatrix",
-			genState: &types.GenesisState{
-				AdjanceyMatrixList: []types.AdjanceyMatrix{
-					{
-						Id: 0,
-					},
-					{
-						Id: 0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "invalid adjanceyMatrix count",
-			genState: &types.GenesisState{
-				AdjanceyMatrixList: []types.AdjanceyMatrix{
-					{
-						Id: 1,
-					},
-				},
-				AdjanceyMatrixCount: 0,
+				FeeTierCount: 0,
 			},
 			valid: false,
 		},
@@ -301,30 +231,14 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated LimitOrderTrancheUserSharesWithdrawn",
-			genState: &types.GenesisState{
-				LimitOrderTrancheUserSharesWithdrawnList: []types.LimitOrderTrancheUserSharesWithdrawn{
-					{
-						Count:   0,
-						Address: "0",
-					},
-					{
-						Count:   0,
-						Address: "0",
-					},
-				},
-			},
-			valid: false,
-		},
-		{
 			desc: "duplicated LimitOrderTranche",
 			genState: &types.GenesisState{
 				LimitOrderTrancheList: []types.LimitOrderTranche{
 					{
-						Count: 0,
+						TickIndex: 0,
 					},
 					{
-						Count: 0,
+						TickIndex: 0,
 					},
 				},
 			},

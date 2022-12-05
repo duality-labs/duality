@@ -1,0 +1,10 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+
+message FeeTier {
+  uint64 id = 1;
+  int64 fee = 2; 
+  
+}

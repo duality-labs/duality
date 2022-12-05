@@ -45,40 +45,38 @@ func calculateNewCurrentTicksPure(amount0 sdk.Dec, amount1 sdk.Dec, tickIndex in
 }
 
 // Helper function to calculate if current ticks change
-func calculateNewCurrentTicks(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, tickIndex int64, feeIndex uint64, pair types.PairMap) (new0to1 int64, new1to0 int64) {
+func calculateNewCurrentTicks(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, tickIndex int64, feeIndex uint64, pair types.TradingPair) (new0to1 int64, new1to0 int64) {
 	k, ctx := s.app.DexKeeper, s.ctx
-	feelist := k.GetAllFeeList(ctx)
-	fee := feelist[feeIndex].Fee
-	return calculateNewCurrentTicksPure(amount0, amount1, tickIndex, fee, pair.TokenPair.CurrentTick0To1, pair.TokenPair.CurrentTick1To0)
+	FeeTier := k.GetAllFeeTier(ctx)
+	fee := FeeTier[feeIndex].Fee
+	return calculateNewCurrentTicksPure(amount0, amount1, tickIndex, fee, pair.CurrentTick0To1, pair.CurrentTick1To0)
 }
 
 // Helper for getting a pair id. If pair hasn't been initialized, defaults to pair with tickIndex and feeTier for CurrentTick
-func makePair(s *MsgServerTestSuite, pairId string, tickIndex int64, feeTier uint64, expectedTxErr error) types.PairMap {
+func makePair(s *MsgServerTestSuite, pairId string, tickIndex int64, feeTier uint64, expectedTxErr error) types.TradingPair {
 	// TODO: this really should be cleaned up
 	app, ctx, k := s.app, s.ctx, s.app.DexKeeper
 
 	// this corresponds to line 16 in function DepositVerification of verification.go
-	feeList := k.GetAllFeeList(ctx)
+	FeeTier := k.GetAllFeeTier(ctx)
 
 	var fee int64
 	// handle invalid fee index
-	if feeTier >= uint64(len(feeList)) {
+	if feeTier >= uint64(len(FeeTier)) {
 		s.Assert().True(expectedTxErr == types.ErrValidFeeIndexNotFound)
 		fee = 0
 	} else {
-		fee = feeList[feeTier].Fee
+		fee = FeeTier[feeTier].Fee
 	}
 
-	pair, pairFound := app.DexKeeper.GetPairMap(ctx, pairId)
+	pair, pairFound := app.DexKeeper.GetTradingPair(ctx, pairId)
 	if !pairFound {
-		pair = types.PairMap{
-			PairId:  pairId,
-			MinTick: tickIndex - fee,
-			MaxTick: tickIndex + fee,
-			TokenPair: &types.TokenPairType{
-				CurrentTick0To1: tickIndex - fee,
-				CurrentTick1To0: tickIndex + fee,
-			},
+		pair = types.TradingPair{
+			PairId:          pairId,
+			MinTick:         tickIndex - fee,
+			MaxTick:         tickIndex + fee,
+			CurrentTick0To1: tickIndex - fee,
+			CurrentTick1To0: tickIndex + fee,
 		}
 	}
 
@@ -134,11 +132,11 @@ func calculateShares(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, pa
 
 	price1To0 := keeper.CalcPrice1To0(tickIndex)
 
-	feelist := k.GetAllFeeList(ctx)
-	fee := feelist[feeIndex].Fee
+	FeeTier := k.GetAllFeeTier(ctx)
+	fee := FeeTier[feeIndex].Fee
 
-	lowerTick, lowerTickFound := k.GetTickMap(ctx, pairId, tickIndex-fee)
-	upperTick, upperTickFound := k.GetTickMap(ctx, pairId, tickIndex+fee)
+	lowerTick, lowerTickFound := k.GetTick(ctx, pairId, tickIndex-fee)
+	upperTick, upperTickFound := k.GetTick(ctx, pairId, tickIndex+fee)
 	lowerReserve1 := lowerTick.TickData.Reserve1[feeIndex]
 	upperReserve0, upperTotalShares := upperTick.TickData.Reserve0AndShares[feeIndex].Reserve0, upperTick.TickData.Reserve0AndShares[feeIndex].TotalShares
 
@@ -201,8 +199,8 @@ func calculateFinalShares(s *MsgServerTestSuite, pairId string, amounts0 []sdk.D
 	return accum
 }
 
-func calculateFinalTicks(s *MsgServerTestSuite, pair types.PairMap, amounts0 []sdk.Dec, amounts1 []sdk.Dec, tickIndexes []int64, feeTiers []uint64) (int64, int64) {
-	expectedTick0to1, expectedTick1to0 := pair.TokenPair.CurrentTick0To1, pair.TokenPair.CurrentTick1To0
+func calculateFinalTicks(s *MsgServerTestSuite, pair types.TradingPair, amounts0 []sdk.Dec, amounts1 []sdk.Dec, tickIndexes []int64, feeTiers []uint64) (int64, int64) {
+	expectedTick0to1, expectedTick1to0 := pair.CurrentTick0To1, pair.CurrentTick1To0
 	for i := range amounts0 {
 		// move expected current ticks
 		tick0to1Calc, tick1to0Calc := calculateNewCurrentTicks(s, amounts0[i], amounts1[i], tickIndexes[i], feeTiers[i], pair)
