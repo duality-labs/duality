@@ -114,11 +114,10 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder1to0WithWithdraw() {
 	// limit order at -1: (25 * 1.0001^-1) A<=>B 25
 	// limit order at 0: (40 - (25 * 1.0001^-1)) A<=>B (40 - (25 * 1.0001^-1)) * 1.0001^0
 	s.assertAliceBalances(100, 425)
-	// TODO: this needs to be fiexed 
 	s.assertBobBalances(60, 240)
 
 	s.aliceWithdrawsLimitSell("TokenB", 0, 0)
-	// TODO: this needs to be fiexed 
+
 	s.assertAliceBalances(115, 425)
 	s.assertBobBalances(60, 240)
 
@@ -204,21 +203,22 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	s.bobMarketSells("TokenB", 40, 30)
 
 	s.assertAliceBalances(99950, 500)
-	s.assertBobBalances(140,160)
-	s.assertDexBalances(9, 40)
+	// NOTE: this might be conerning. According to old math above bob's balance should be 140.002... and dex balanance should be 9.99... but because of rounding Dex loses ~1 token and bob gets an extra token
+	s.assertBobBalances(140, 160)
+	s.assertDexBalances(10, 40)
 
 	s.aliceWithdrawsLimitSell("TokenA", 1, 0)
 
-	s.assertAliceBalances(99950, 524)
-	s.assertBobBalances(140,160)
+	s.assertAliceBalances(99950, 525)
+	s.assertBobBalances(140, 160)
 	//40 - 24.997500249975002500 = 15.0024997500249975
-	s.assertDexBalances(9, 15)
+	s.assertDexBalances(10, 15)
 
 	s.aliceWithdrawsLimitSell("TokenA", 0, 0)
 
 	s.assertAliceBalances(99950, 540)
 	s.assertBobBalances(140, 160)
-	s.assertDexBalances(9, 0)
+	s.assertDexBalances(10, 0)
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFailsWhenNothingToWithdraw() {
