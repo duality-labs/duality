@@ -215,8 +215,8 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 
 		sharesToRemove = MinDec(sharesToRemove, *userSharesOwned)
 		ownershipRatio := sharesToRemove.Quo(*lowerTickFeeTotalShares)
-		reserve1ToRemove := ownershipRatio.MulInt(*upperTickFeeReserve1).TruncateInt()
-		reserve0ToRemove := ownershipRatio.MulInt(*lowerTickFeeReserve0).TruncateInt()
+		reserve1ToRemove := ownershipRatio.MulInt(*upperTickFeeReserve1).RoundInt()
+		reserve0ToRemove := ownershipRatio.MulInt(*lowerTickFeeReserve0).RoundInt()
 
 		*lowerTickFeeReserve0 = lowerTickFeeReserve0.Sub(reserve0ToRemove)
 		*upperTickFeeReserve1 = upperTickFeeReserve1.Sub(reserve1ToRemove)
@@ -322,11 +322,10 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			price_0to1 := CalcPrice0To1(pair.CurrentTick0To1)
 			currentReserve0 := Current0Data.TickData.Reserve0AndShares[i].Reserve0
 			currentReserve1 := Current1Data.TickData.Reserve1[i]
-			amountOutTemp := price_0to1.MulInt(amount_left).TruncateInt()
-			amountInTemp := currentReserve1.ToDec().Quo(price_0to1).TruncateInt()
+			amountOutTemp := price_0to1.MulInt(amount_left).RoundInt()
+			amountInTemp := currentReserve1.ToDec().Quo(price_0to1).RoundInt()
 
-
-			if amountOutTemp.Add(amount_left).LT(msg.MinOut) {
+			if amountOutTemp.Add(amount_out).LT(msg.MinOut) {
 				return sdk.ZeroInt(), sdk.ZeroInt(), types.ErrNotEnoughLiquidity
 			}
 
@@ -417,8 +416,8 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			price_1to0 := CalcPrice1To0(pair.CurrentTick1To0)
 			currentReserve0 := Current0Data.TickData.Reserve0AndShares[i].Reserve0
 			currentReserve1 := Current1Data.TickData.Reserve1[i]
-			amountOutTemp := price_1to0.MulInt(amount_left).TruncateInt()
-			amountInTemp := currentReserve0.ToDec().Quo(price_1to0).TruncateInt()
+			amountOutTemp := price_1to0.MulInt(amount_left).RoundInt()
+			amountInTemp := currentReserve0.ToDec().Quo(price_1to0).RoundInt()
 
 			if amountOutTemp.Add(amount_out).LT(msg.MinOut) {
 				return sdk.ZeroInt(), sdk.ZeroInt(), types.ErrNotEnoughLiquidity
@@ -623,10 +622,10 @@ func (k Keeper) SwapLimitOrderTranche(
 	reservesTokenOut := &tranche.ReservesTokenIn
 	fillTokenIn := &tranche.ReservesTokenOut
 	totalTokenIn := &tranche.TotalTokenOut
-	amountFilledTokenOut := priceInToOut.MulInt(amountRemainingTokenIn).TruncateInt()
+	amountFilledTokenOut := priceInToOut.MulInt(amountRemainingTokenIn).RoundInt()
 	if reservesTokenOut.LTE(amountFilledTokenOut) {
 		amountOut = amountOut.Add(*reservesTokenOut)
-		amountFilledTokenIn := priceOutToIn.MulInt(*reservesTokenOut).TruncateInt()
+		amountFilledTokenIn := priceOutToIn.MulInt(*reservesTokenOut).RoundInt()
 		amountRemainingTokenIn = amountRemainingTokenIn.Sub(amountFilledTokenIn)
 		*reservesTokenOut = sdk.ZeroInt()
 		*fillTokenIn = fillTokenIn.Add(amountFilledTokenIn)
@@ -739,8 +738,8 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	}
 	totalTokenInDec := sdk.NewDecFromInt(tranche.TotalTokenIn)
 	totalTokenOutDec := sdk.NewDecFromInt(tranche.TotalTokenOut)
-	filledAmount := priceLimitOutToIn.MulInt(tranche.ReservesTokenOut)
-	ratioNotFilled := totalTokenInDec.Sub(filledAmount).Quo(totalTokenOutDec)
+	filledAmount := priceLimitOutToIn.Mul(totalTokenOutDec)
+	ratioNotFilled := totalTokenInDec.Sub(filledAmount).Quo(totalTokenInDec)
 	maxUserAllowedToCancel := trancheUser.SharesOwned.Mul(ratioNotFilled)
 	totalUserAttemptingToCancel := trancheUser.SharesCancelled.Add(attemptedSharesOut)
 
@@ -755,7 +754,7 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	trancheUser.SharesCancelled = trancheUser.SharesCancelled.Add(attemptedSharesOut)
 	k.SetLimitOrderTrancheUser(ctx, trancheUser)
 
-	tranche.ReservesTokenIn = tranche.ReservesTokenIn.Sub(attemptedSharesOut.TruncateInt())
+	tranche.ReservesTokenIn = tranche.ReservesTokenIn.Sub(attemptedSharesOut.RoundInt())
 	k.SetLimitOrderTranche(ctx, tranche)
 
 	if attemptedSharesOut.GT(sdk.ZeroDec()) {
@@ -834,9 +833,10 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	}
 	priceLimitOutToIn = sdk.OneDec().Quo(priceLimitInToOut)
 
+	totalTokenOutDec := sdk.NewDecFromInt(tranche.TotalTokenOut)
 	totalTokenInDec := sdk.NewDecFromInt(tranche.TotalTokenIn)
 	reservesTokenOutDec := sdk.NewDecFromInt(tranche.ReservesTokenOut)
-	amountFilled := priceLimitOutToIn.Mul(totalTokenInDec)
+	amountFilled := priceLimitOutToIn.Mul(totalTokenOutDec)
 	ratioFilled := amountFilled.Quo(totalTokenInDec)
 	maxAllowedToWithdraw := MinDec(
 		trancheUser.SharesOwned.Mul(ratioFilled),                 // cannot withdraw more than what's been filled
@@ -849,7 +849,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	trancheUser.SharesWithdrawn = maxAllowedToWithdraw
 	k.SetLimitOrderTrancheUser(ctx, trancheUser)
 
-	tranche.ReservesTokenOut = reservesTokenOutDec.Sub(amountOutTokenOut).TruncateInt()
+	tranche.ReservesTokenOut = reservesTokenOutDec.Sub(amountOutTokenOut).RoundInt()
 	k.SetLimitOrderTranche(ctx, tranche)
 
 	if amountOutTokenOut.GT(sdk.ZeroDec()) {

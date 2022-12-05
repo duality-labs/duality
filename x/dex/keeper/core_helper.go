@@ -241,9 +241,9 @@ func CalcTrueAmounts(
 		ratio1 := amount1Dec.Quo(upperReserve1Dec)
 		if ratio0.LT(ratio1) {
 			trueAmount0 = amount0
-			trueAmount1 = ratio0.Mul(upperReserve1Dec).TruncateInt()
+			trueAmount1 = ratio0.Mul(upperReserve1Dec).RoundInt()
 		} else {
-			trueAmount0 = ratio1.Mul(lowerReserve0Dec).TruncateInt()
+			trueAmount0 = ratio1.Mul(lowerReserve0Dec).RoundInt()
 			trueAmount1 = amount1
 		}
 	} else if lowerReserve0Dec.GT(sdk.ZeroDec()) { // && upperReserve1Dec == 0

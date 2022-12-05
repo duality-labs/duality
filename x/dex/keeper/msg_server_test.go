@@ -113,11 +113,10 @@ func (s *MsgServerTestSuite) assertAccountBalancesInt(
 	bBalance sdk.Int,
 ) {
 	aActual := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenA").Amount
-
-	s.Assert().Equal(aActual, aBalance, "expected %s != actual %s", aBalance, aActual)
+	s.Assert().True(aBalance.Equal(aActual), "expected %s != actual %s", aBalance, aActual)
 
 	bActual := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenB").Amount
-	s.Assert().Equal(bActual, bBalance, "expected %s != actual %s", bBalance, bActual)
+	s.Assert().True(bBalance.Equal(bActual), "expected %s != actual %s", bBalance, bActual)
 }
 
 func (s *MsgServerTestSuite) assertAccountBalances(
@@ -730,7 +729,7 @@ func (s *MsgServerTestSuite) assertAccountLimitLiquidityAtTick(account sdk.AccAd
 	userShares, totalShares := s.getLimitUserSharesAtTick(account, selling, tickIndex), s.getLimitTotalSharesAtTick(selling, tickIndex)
 	userRatio := userShares.QuoInt(totalShares)
 	// assert enough liq
-	userLiquidity := userRatio.MulInt64(int64(amount)).TruncateInt()
+	userLiquidity := userRatio.MulInt64(int64(amount)).RoundInt()
 	s.assertLimitLiquidityAtTick(selling, tickIndex, userLiquidity.Int64())
 }
 
@@ -887,13 +886,13 @@ func calculateSingleSwap(price sdk.Dec, tickLiquidity int64, tickLimitOrderLiqui
 func calculateSwap(price sdk.Dec, liquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
 	amountInInt := sdk.NewInt(amountIn)
 	liquidityInt := sdk.NewInt(liquidity)
-	if tmpAmountOut := price.MulInt(amountInInt).TruncateInt(); tmpAmountOut.LT(liquidityInt) {
+	if tmpAmountOut := price.MulInt(amountInInt).RoundInt(); tmpAmountOut.LT(liquidityInt) {
 		// fmt.Printf("sufficient tmpOut %s\n", tmpAmountOut)
 		// sufficient liquidity
 		return sdk.ZeroInt(), tmpAmountOut
 	} else {
 		// only sufficient for part of amountIn
-		tmpAmountIn := liquidityInt.ToDec().Quo(price).TruncateInt()
+		tmpAmountIn := liquidityInt.ToDec().Quo(price).RoundInt()
 		// fmt.Printf("insufficient tmpIn %s\n", tmpAmountIn)
 		return amountInInt.Sub(tmpAmountIn), liquidityInt
 	}

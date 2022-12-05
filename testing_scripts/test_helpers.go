@@ -16,14 +16,14 @@ func SingleLimitOrderFill(amount_placed sdk.Int,
 	amount_to_swap sdk.Int) (sdk.Int, sdk.Int) {
 	amount_out, amount_in := sdk.ZeroInt(), sdk.ZeroInt()
 	amountPlacedDec := amount_placed.ToDec()
-	amountPlacedForPrice := amountPlacedDec.Quo(price_filled_at).TruncateInt()
+	amountPlacedForPrice := amountPlacedDec.Quo(price_filled_at).RoundInt()
 	// Checks if the swap will deplete the entire limit order and simulates the trade accordingly
 	if amount_to_swap.GT(amountPlacedForPrice) {
 		amount_out = amount_placed
 		amount_in = amountPlacedForPrice
 	} else {
 		amount_in = amount_to_swap
-		amount_out = amount_in.ToDec().Mul(price_filled_at).TruncateInt()
+		amount_out = amount_in.ToDec().Mul(price_filled_at).RoundInt()
 	}
 
 	return amount_in, amount_out
@@ -68,14 +68,14 @@ func MultipleLimitOrderFills(amounts_placed []sdk.Int, prices []sdk.Dec, amount_
 // Same thing as SingleLimitOrderFill() except in naming.
 func SinglePoolSwap(amount_liquidity sdk.Int, price_swapped_at sdk.Dec, amount_to_swap sdk.Int) (sdk.Int, sdk.Int) {
 	amount_out, amount_in := sdk.ZeroInt(), sdk.ZeroInt()
-	liquidityAtPrice := amount_liquidity.ToDec().Quo(price_swapped_at).TruncateInt()
+	liquidityAtPrice := amount_liquidity.ToDec().Quo(price_swapped_at).RoundInt()
 	// Checks if the swap will deplete the entire limit order and simulates the trade accordingly
 	if amount_to_swap.GT(liquidityAtPrice) {
 		amount_out = amount_liquidity
 		amount_in = liquidityAtPrice
 	} else {
 		amount_in = amount_to_swap
-		amount_out = amount_in.ToDec().Mul(price_swapped_at).TruncateInt()
+		amount_out = amount_in.ToDec().Mul(price_swapped_at).RoundInt()
 	}
 	return amount_in, amount_out
 }
@@ -162,7 +162,7 @@ func SharesOnDeposit(existing_shares sdk.Dec, existing_amount0 sdk.Int, existing
 	new_value := newAmount0Dec.Add(price1To0.MulInt(new_amount1))
 
 	if existing_amount0.Add(existing_amount1).GT(sdk.ZeroInt()) {
-		existing_value := existing_amount0.Add(price1To0.MulInt(existing_amount1).TruncateInt())
+		existing_value := existing_amount0.Add(price1To0.MulInt(existing_amount1).RoundInt())
 		shares_minted = shares_minted.Mul(new_value.QuoInt(existing_value))
 	} else {
 		shares_minted = new_value
