@@ -4,7 +4,6 @@ import (
 	"math"
 
 	"github.com/NicholasDotSol/duality/x/dex/keeper"
-	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
