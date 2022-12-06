@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -16,8 +15,8 @@ func (s *MsgServerTestSuite) TestSingleDepositDepositAmountZero() {
 		Receiver:    s.alice.String(),
 		TokenA:      "TokenA",
 		TokenB:      "TokenB",
-		AmountsA:    []sdk.Dec{NewDec(0)},
-		AmountsB:    []sdk.Dec{NewDec(0)},
+		AmountsA:    []sdk.Int{sdk.NewInt(0)},
+		AmountsB:    []sdk.Int{sdk.NewInt(0)},
 		TickIndexes: []int64{0},
 		FeeIndexes:  []uint64{1},
 	})
@@ -33,8 +32,8 @@ func (s *MsgServerTestSuite) TestSingleDepositDepositFail() {
 	s.fundBobBalances(25, 25)
 
 	s.aliceDeposits(&Deposit{
-		AmountA:   NewDec(5),
-		AmountB:   NewDec(0),
+		AmountA:   sdk.NewInt(5),
+		AmountB:   sdk.NewInt(0),
 		TickIndex: 0,
 		FeeIndex:  0,
 	})
@@ -47,8 +46,8 @@ func (s *MsgServerTestSuite) TestSingleDepositDepositFail() {
 		Receiver:    s.alice.String(),
 		TokenA:      "TokenA",
 		TokenB:      "TokenB",
-		AmountsA:    []sdk.Dec{NewDec(0)},
-		AmountsB:    []sdk.Dec{NewDec(5)},
+		AmountsA:    []sdk.Int{sdk.NewInt(0)},
+		AmountsB:    []sdk.Int{sdk.NewInt(5)},
 		TickIndexes: []int64{0},
 		FeeIndexes:  []uint64{0},
 	})
@@ -64,13 +63,13 @@ func (s *MsgServerTestSuite) TestMultiDepositDepositFail() {
 	s.fundBobBalances(25, 25)
 
 	s.aliceDeposits(&Deposit{
-		AmountA:   NewDec(5),
-		AmountB:   NewDec(0),
+		AmountA:   sdk.NewInt(5),
+		AmountB:   sdk.NewInt(0),
 		TickIndex: 0,
 		FeeIndex:  0,
 	}, &Deposit{
-		AmountA:   NewDec(5),
-		AmountB:   NewDec(0),
+		AmountA:   sdk.NewInt(5),
+		AmountB:   sdk.NewInt(0),
 		TickIndex: 1,
 		FeeIndex:  0,
 	})
@@ -83,8 +82,8 @@ func (s *MsgServerTestSuite) TestMultiDepositDepositFail() {
 		Receiver:    s.alice.String(),
 		TokenA:      "TokenA",
 		TokenB:      "TokenB",
-		AmountsA:    []sdk.Dec{NewDec(0), NewDec(0)},
-		AmountsB:    []sdk.Dec{NewDec(5), NewDec(5)},
+		AmountsA:    []sdk.Int{sdk.NewInt(0), sdk.NewInt(0)},
+		AmountsB:    []sdk.Int{sdk.NewInt(5), sdk.NewInt(5)},
 		TickIndexes: []int64{0, 1},
 		FeeIndexes:  []uint64{0, 0},
 	})
@@ -99,13 +98,13 @@ func (s *MsgServerTestSuite) TestMultiDepositSingleFail() {
 	s.fundBobBalances(25, 25)
 
 	s.aliceDeposits(&Deposit{
-		AmountA:   NewDec(5),
-		AmountB:   NewDec(0),
+		AmountA:   sdk.NewInt(5),
+		AmountB:   sdk.NewInt(0),
 		TickIndex: 0,
 		FeeIndex:  0,
 	}, &Deposit{
-		AmountA:   NewDec(5),
-		AmountB:   NewDec(0),
+		AmountA:   sdk.NewInt(5),
+		AmountB:   sdk.NewInt(0),
 		TickIndex: 1,
 		FeeIndex:  0,
 	})
@@ -118,8 +117,8 @@ func (s *MsgServerTestSuite) TestMultiDepositSingleFail() {
 		Receiver:    s.alice.String(),
 		TokenA:      "TokenA",
 		TokenB:      "TokenB",
-		AmountsA:    []sdk.Dec{NewDec(0), NewDec(5)},
-		AmountsB:    []sdk.Dec{NewDec(5), NewDec(0)},
+		AmountsA:    []sdk.Int{sdk.NewInt(0), sdk.NewInt(5)},
+		AmountsB:    []sdk.Int{sdk.NewInt(5), sdk.NewInt(0)},
 		TickIndexes: []int64{0, 1},
 		FeeIndexes:  []uint64{0, 0},
 	})
@@ -129,8 +128,8 @@ func (s *MsgServerTestSuite) TestMultiDepositSingleFail() {
 		amountsA: depositResponse.Reserve0Deposited,
 		amountsB: depositResponse.Reserve1Deposited,
 	}, DepositReponse{
-		amountsA: []sdk.Dec{sdk.ZeroDec(), NewDec(5)},
-		amountsB: []sdk.Dec{sdk.ZeroDec(), sdk.ZeroDec()},
+		amountsA: []sdk.Int{sdk.ZeroInt(), sdk.NewInt(5)},
+		amountsB: []sdk.Int{sdk.ZeroInt(), sdk.ZeroInt()},
 	})
 
 	s.assertAliceBalances(10, 25)
@@ -143,13 +142,13 @@ func (s *MsgServerTestSuite) TestMultiDepositAllSucceed() {
 	s.fundBobBalances(25, 25)
 
 	s.aliceDeposits(&Deposit{
-		AmountA:   NewDec(5),
-		AmountB:   NewDec(0),
+		AmountA:   sdk.NewInt(5),
+		AmountB:   sdk.NewInt(0),
 		TickIndex: 0,
 		FeeIndex:  0,
 	}, &Deposit{
-		AmountA:   NewDec(5),
-		AmountB:   NewDec(0),
+		AmountA:   sdk.NewInt(5),
+		AmountB:   sdk.NewInt(0),
 		TickIndex: 1,
 		FeeIndex:  0,
 	})
@@ -162,8 +161,8 @@ func (s *MsgServerTestSuite) TestMultiDepositAllSucceed() {
 		Receiver:    s.alice.String(),
 		TokenA:      "TokenA",
 		TokenB:      "TokenB",
-		AmountsA:    []sdk.Dec{NewDec(5), NewDec(5)},
-		AmountsB:    []sdk.Dec{NewDec(0), NewDec(0)},
+		AmountsA:    []sdk.Int{sdk.NewInt(5), sdk.NewInt(5)},
+		AmountsB:    []sdk.Int{sdk.NewInt(0), sdk.NewInt(0)},
 		TickIndexes: []int64{0, 1},
 		FeeIndexes:  []uint64{0, 0},
 	})
@@ -174,8 +173,8 @@ func (s *MsgServerTestSuite) TestMultiDepositAllSucceed() {
 		amountsA: depositResponse.Reserve0Deposited,
 		amountsB: depositResponse.Reserve1Deposited,
 	}, DepositReponse{
-		amountsA: []sdk.Dec{NewDec(5), NewDec(5)},
-		amountsB: []sdk.Dec{sdk.ZeroDec(), sdk.ZeroDec()},
+		amountsA: []sdk.Int{sdk.NewInt(5), sdk.NewInt(5)},
+		amountsB: []sdk.Int{sdk.ZeroInt(), sdk.ZeroInt()},
 	})
 
 	s.assertAliceBalances(5, 25)

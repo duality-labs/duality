@@ -66,14 +66,14 @@ func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex in
 			TickIndex: tickIndex,
 			TickData: &types.TickDataType{
 				Reserve0AndShares: make([]*types.Reserve0AndSharesType, numFees),
-				Reserve1:          make([]sdk.Dec, numFees),
+				Reserve1:          make([]sdk.Int, numFees),
 			},
 			LimitOrderTranche0To1: &types.LimitTrancheIndexes{0, 0},
 			LimitOrderTranche1To0: &types.LimitTrancheIndexes{0, 0},
 		}
 		for i := 0; i < int(numFees); i++ {
-			tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}
-			tick.TickData.Reserve1[i] = sdk.ZeroDec()
+			tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroDec()}
+			tick.TickData.Reserve1[i] = sdk.ZeroInt()
 		}
 		k.SetTick(ctx, pairId, tick)
 
@@ -84,8 +84,10 @@ func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex in
 	return tick
 }
 
-func CalcShares(amount0 sdk.Dec, amount1 sdk.Dec, priceCenter1To0 sdk.Dec) sdk.Dec {
-	return amount0.Add(amount1.Mul(priceCenter1To0))
+func CalcShares(amount0 sdk.Int, amount1 sdk.Int, priceCenter1To0 sdk.Dec) sdk.Dec {
+	amount0Dec := amount0.ToDec()
+	amount1Dec := amount1.ToDec()
+	return amount0Dec.Add(amount1Dec.Mul(priceCenter1To0))
 }
 
 func (k Keeper) GetOrInitLimitOrderTrancheUser(
@@ -224,27 +226,31 @@ func (k Keeper) FindNextTick0To1(goCtx context.Context, TradingPair types.Tradin
 // Balance trueAmount1 to the pool ratio
 func CalcTrueAmounts(
 	centerTickPrice1To0 sdk.Dec,
-	lowerReserve0 sdk.Dec,
-	upperReserve1 sdk.Dec,
-	amount0 sdk.Dec,
-	amount1 sdk.Dec,
+	lowerReserve0 sdk.Int,
+	upperReserve1 sdk.Int,
+	amount0 sdk.Int,
+	amount1 sdk.Int,
 	totalShares sdk.Dec,
-) (trueAmount0 sdk.Dec, trueAmount1 sdk.Dec, sharesMinted sdk.Dec) {
-	if lowerReserve0.GT(sdk.ZeroDec()) && upperReserve1.GT(sdk.ZeroDec()) {
-		ratio0 := amount0.Quo(lowerReserve0)
-		ratio1 := amount1.Quo(upperReserve1)
+) (trueAmount0 sdk.Int, trueAmount1 sdk.Int, sharesMinted sdk.Dec) {
+	lowerReserve0Dec := lowerReserve0.ToDec()
+	upperReserve1Dec := upperReserve1.ToDec()
+	amount0Dec := amount0.ToDec()
+	amount1Dec := amount1.ToDec()
+	if lowerReserve0Dec.GT(sdk.ZeroDec()) && upperReserve1Dec.GT(sdk.ZeroDec()) {
+		ratio0 := amount0Dec.Quo(lowerReserve0Dec)
+		ratio1 := amount1Dec.Quo(upperReserve1Dec)
 		if ratio0.LT(ratio1) {
 			trueAmount0 = amount0
-			trueAmount1 = ratio0.Mul(upperReserve1)
+			trueAmount1 = ratio0.Mul(upperReserve1Dec).TruncateInt()
 		} else {
-			trueAmount0 = ratio1.Mul(lowerReserve0)
+			trueAmount0 = ratio1.Mul(lowerReserve0Dec).TruncateInt()
 			trueAmount1 = amount1
 		}
-	} else if lowerReserve0.GT(sdk.ZeroDec()) { // && upperReserve1 == 0
+	} else if lowerReserve0Dec.GT(sdk.ZeroDec()) { // && upperReserve1Dec == 0
 		trueAmount0 = amount0
-		trueAmount1 = sdk.ZeroDec()
-	} else if upperReserve1.GT(sdk.ZeroDec()) { // && lowerReserve0 == 0
-		trueAmount0 = sdk.ZeroDec()
+		trueAmount1 = sdk.ZeroInt()
+	} else if upperReserve1Dec.GT(sdk.ZeroDec()) { // && lowerReserve0Dec == 0
+		trueAmount0 = sdk.ZeroInt()
 		trueAmount1 = amount1
 	} else {
 		trueAmount0 = amount0
@@ -283,7 +289,7 @@ func CalcPrice1To0(tickIndex int64) sdk.Dec {
 // Checks if a tick has reserves0 at any fee tier
 func (k Keeper) TickHasToken0(ctx sdk.Context, tick *types.Tick) bool {
 	for _, s := range tick.TickData.Reserve0AndShares {
-		if s.Reserve0.GT(sdk.ZeroDec()) {
+		if s.Reserve0.GT(sdk.ZeroInt()) {
 			return true
 		}
 	}
@@ -306,13 +312,13 @@ func (k Keeper) TickTrancheHasToken0(ctx sdk.Context, tick *types.Tick, trancheI
 		token0,
 		trancheIndex,
 	)
-	return found && tranche.ReservesTokenIn.GT(sdk.ZeroDec())
+	return found && tranche.ReservesTokenIn.GT(sdk.ZeroInt())
 }
 
 // Checks if a tick has reserve1 at any fee tier
 func (k Keeper) TickHasToken1(ctx sdk.Context, tick *types.Tick) bool {
 	for _, s := range tick.TickData.Reserve1 {
-		if s.GT(sdk.ZeroDec()) {
+		if s.GT(sdk.ZeroInt()) {
 			return true
 		}
 	}
@@ -335,7 +341,7 @@ func (k Keeper) TickTrancheHasToken1(ctx sdk.Context, tick *types.Tick, trancheI
 		token1,
 		trancheIndex,
 	)
-	return found && tranche.ReservesTokenIn.GT(sdk.ZeroDec())
+	return found && tranche.ReservesTokenIn.GT(sdk.ZeroInt())
 }
 
 ///////////////////////////////////////////////////////////////////////////////

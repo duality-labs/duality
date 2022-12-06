@@ -29,29 +29,29 @@ func CmdDeposit() *cobra.Command {
 			argTicksIndexes := strings.Split(args[5], ",")
 			argFeesIndexes := strings.Split(args[6], ",")
 
-			var AmountsADec []sdk.Dec
-			var AmountsBDec []sdk.Dec
+			var AmountsA []sdk.Int
+			var AmountsB []sdk.Int
 			var TicksIndexesInt []int64
 			var FeesIndexesUint []uint64
 
 			for _, s := range argAmountsA {
-				amountA, err := sdk.NewDecFromStr(s)
-
+				amountAInt, err := strconv.Atoi(s)
 				if err != nil {
 					return err
 				}
+				amountA := sdk.NewInt(int64(amountAInt))
 
-				AmountsADec = append(AmountsADec, amountA)
+				AmountsA = append(AmountsA, amountA)
 			}
 
 			for _, s := range argAmountsB {
-				amountB, err := sdk.NewDecFromStr(s)
-
+				amountBInt, err := strconv.Atoi(s)
 				if err != nil {
 					return err
 				}
+				amountB := sdk.NewInt(int64(amountBInt))
 
-				AmountsBDec = append(AmountsBDec, amountB)
+				AmountsB = append(AmountsB, amountB)
 			}
 
 			for _, s := range argTicksIndexes {
@@ -85,8 +85,8 @@ func CmdDeposit() *cobra.Command {
 				argReceiver,
 				argTokenA,
 				argTokenB,
-				AmountsADec,
-				AmountsBDec,
+				AmountsA,
+				AmountsB,
 				TicksIndexesInt,
 				FeesIndexesUint,
 			)

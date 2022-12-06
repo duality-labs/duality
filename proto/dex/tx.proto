@@ -24,13 +24,13 @@ message MsgDeposit {
   string tokenB = 4;
   repeated string amountsA = 5  [
       (gogoproto.moretags)   = "yaml:\"amountA\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountA"
   ]; 
    repeated string amountsB = 6  [
       (gogoproto.moretags)   = "yaml:\"amountB\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountB"
   ]; 
@@ -42,13 +42,13 @@ message MsgDeposit {
 message MsgDepositResponse {
    repeated string Reserve0Deposited = 1 [
       (gogoproto.moretags)   = "yaml:\"Reserve0Deposited\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "Reserve1Deposited"
   ]; 
   repeated string Reserve1Deposited = 2[
       (gogoproto.moretags)   = "yaml:\"Reserve1Deposited\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "Reserve1Deposited"
   ]; 
@@ -80,14 +80,14 @@ message MsgSwap {
   string tokenB = 4;
   string amountIn = 5 [
       (gogoproto.moretags)   = "yaml:\"amountIn\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountIn"
   ]; 
   string tokenIn = 6;
   string minOut = 7 [
       (gogoproto.moretags)   = "yaml:\"minOut\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "minOut"
   ]; 
@@ -111,7 +111,7 @@ message MsgPlaceLimitOrder {
   string tokenIn = 6;
   string amountIn = 7 [
       (gogoproto.moretags)   = "yaml:\"amountIn\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountIn"
   ]; 
