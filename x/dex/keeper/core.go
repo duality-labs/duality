@@ -11,6 +11,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+// NOTE: Currently we are using RoundInt in multiple places for converting Decs back into sdk.Ints. This may create some accounting anomalies but seems preferable to TruncateInt which would skew accounting heavily in one direction based on specific code implementation.
+
 // Handles core logic for MsgDeposit, checking and initializing data structures (tick, pair), calculating shares based on amount deposited, and sending funds to moduleAddress
 func (k Keeper) DepositCore(
 	goCtx context.Context,
@@ -215,6 +217,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 
 		sharesToRemove = MinDec(sharesToRemove, *userSharesOwned)
 		ownershipRatio := sharesToRemove.Quo(*lowerTickFeeTotalShares)
+		// See top NOTE on rounding
 		reserve1ToRemove := ownershipRatio.MulInt(*upperTickFeeReserve1).RoundInt()
 		reserve0ToRemove := ownershipRatio.MulInt(*lowerTickFeeReserve0).RoundInt()
 
@@ -322,6 +325,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			price_0to1 := CalcPrice0To1(pair.CurrentTick0To1)
 			currentReserve0 := Current0Data.TickData.Reserve0AndShares[i].Reserve0
 			currentReserve1 := Current1Data.TickData.Reserve1[i]
+			// See top NOTE on rounding
 			amountOutTemp := price_0to1.MulInt(amount_left).RoundInt()
 			amountInTemp := currentReserve1.ToDec().Quo(price_0to1).RoundInt()
 
@@ -416,6 +420,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			price_1to0 := CalcPrice1To0(pair.CurrentTick1To0)
 			currentReserve0 := Current0Data.TickData.Reserve0AndShares[i].Reserve0
 			currentReserve1 := Current1Data.TickData.Reserve1[i]
+			// See top NOTE on rounding
 			amountOutTemp := price_1to0.MulInt(amount_left).RoundInt()
 			amountInTemp := currentReserve0.ToDec().Quo(price_1to0).RoundInt()
 
@@ -622,6 +627,7 @@ func (k Keeper) SwapLimitOrderTranche(
 	reservesTokenOut := &tranche.ReservesTokenIn
 	fillTokenIn := &tranche.ReservesTokenOut
 	totalTokenIn := &tranche.TotalTokenOut
+	// See top NOTE on rounding
 	amountFilledTokenOut := priceInToOut.MulInt(amountRemainingTokenIn).RoundInt()
 	if reservesTokenOut.LTE(amountFilledTokenOut) {
 		amountOut = amountOut.Add(*reservesTokenOut)
@@ -754,10 +760,12 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	trancheUser.SharesCancelled = trancheUser.SharesCancelled.Add(attemptedSharesOut)
 	k.SetLimitOrderTrancheUser(ctx, trancheUser)
 
+	// See top NOTE on rounding
 	tranche.ReservesTokenIn = tranche.ReservesTokenIn.Sub(attemptedSharesOut.RoundInt())
 	k.SetLimitOrderTranche(ctx, tranche)
 
 	if attemptedSharesOut.GT(sdk.ZeroDec()) {
+		// See top NOTE on rounding
 		coinOut := sdk.NewCoin(msg.KeyToken, attemptedSharesOut.RoundInt())
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 			return err
@@ -849,6 +857,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	trancheUser.SharesWithdrawn = maxAllowedToWithdraw
 	k.SetLimitOrderTrancheUser(ctx, trancheUser)
 
+	// See top NOTE on rounding
 	tranche.ReservesTokenOut = reservesTokenOutDec.Sub(amountOutTokenOut).RoundInt()
 	k.SetLimitOrderTranche(ctx, tranche)
 
