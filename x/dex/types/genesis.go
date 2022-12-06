@@ -16,8 +16,6 @@ func DefaultGenesis() *GenesisState {
 		TokenMapList:              []TokenMap{},
 		SharesList:                []Shares{},
 		FeeTierList:               []FeeTier{},
-		EdgeRowList:               []EdgeRow{},
-		AdjanceyMatrixList:        []AdjanceyMatrix{},
 		LimitOrderTrancheUserList: []LimitOrderTrancheUser{},
 		LimitOrderTrancheList:     []LimitOrderTranche{},
 		// this line is used by starport scaffolding # genesis/types/default
@@ -91,30 +89,6 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("FeeTier id should be lower or equal than the last id")
 		}
 		FeeTierIdMap[elem.Id] = true
-	}
-	// Check for duplicated ID in edgeRow
-	edgeRowIdMap := make(map[uint64]bool)
-	edgeRowCount := gs.GetEdgeRowCount()
-	for _, elem := range gs.EdgeRowList {
-		if _, ok := edgeRowIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for edgeRow")
-		}
-		if elem.Id >= edgeRowCount {
-			return fmt.Errorf("edgeRow id should be lower or equal than the last id")
-		}
-		edgeRowIdMap[elem.Id] = true
-	}
-	// Check for duplicated ID in adjanceyMatrix
-	adjanceyMatrixIdMap := make(map[uint64]bool)
-	adjanceyMatrixCount := gs.GetAdjanceyMatrixCount()
-	for _, elem := range gs.AdjanceyMatrixList {
-		if _, ok := adjanceyMatrixIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for adjanceyMatrix")
-		}
-		if elem.Id >= adjanceyMatrixCount {
-			return fmt.Errorf("adjanceyMatrix id should be lower or equal than the last id")
-		}
-		adjanceyMatrixIdMap[elem.Id] = true
 	}
 	// Check for duplicated index in LimitOrderTrancheUser
 	LimitOrderTrancheUserIndexMap := make(map[string]struct{})

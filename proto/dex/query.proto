@@ -11,8 +11,6 @@ import "dex/tokens.proto";
 import "dex/token_map.proto";
 import "dex/shares.proto";
 import "dex/fee_tier.proto";
-import "dex/edge_row.proto";
-import "dex/adjancey_matrix.proto";
 import "dex/limit_order_tranche_user.proto";
 import "dex/limit_order_tranche.proto";
 // this line is used by starport scaffolding # 1
@@ -83,26 +81,6 @@ service Query {
 	// Queries a list of FeeTier items.
 	rpc FeeTierAll(QueryAllFeeTierRequest) returns (QueryAllFeeTierResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/fee_tier";
-	}
-
-// Queries a EdgeRow by id.
-	rpc EdgeRow(QueryGetEdgeRowRequest) returns (QueryGetEdgeRowResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/edge_row/{id}";
-	}
-
-	// Queries a list of EdgeRow items.
-	rpc EdgeRowAll(QueryAllEdgeRowRequest) returns (QueryAllEdgeRowResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/edge_row";
-	}
-
-// Queries a AdjanceyMatrix by id.
-	rpc AdjanceyMatrix(QueryGetAdjanceyMatrixRequest) returns (QueryGetAdjanceyMatrixResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/adjancey_matrix/{id}";
-	}
-
-	// Queries a list of AdjanceyMatrix items.
-	rpc AdjanceyMatrixAll(QueryAllAdjanceyMatrixRequest) returns (QueryAllAdjanceyMatrixResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/adjancey_matrix";
 	}
 
   // Queries a LimitOrderTrancheUser by index.
@@ -245,40 +223,6 @@ message QueryAllFeeTierRequest {
 
 message QueryAllFeeTierResponse {
 	repeated FeeTier FeeTier = 1 [(gogoproto.nullable) = false];
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
-}
-
-message QueryGetEdgeRowRequest {
-	uint64 id = 1;
-}
-
-message QueryGetEdgeRowResponse {
-	EdgeRow EdgeRow = 1 [(gogoproto.nullable) = false];
-}
-
-message QueryAllEdgeRowRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
-}
-
-message QueryAllEdgeRowResponse {
-	repeated EdgeRow EdgeRow = 1 [(gogoproto.nullable) = false];
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
-}
-
-message QueryGetAdjanceyMatrixRequest {
-	uint64 id = 1;
-}
-
-message QueryGetAdjanceyMatrixResponse {
-	AdjanceyMatrix AdjanceyMatrix = 1 [(gogoproto.nullable) = false];
-}
-
-message QueryAllAdjanceyMatrixRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
-}
-
-message QueryAllAdjanceyMatrixResponse {
-	repeated AdjanceyMatrix AdjanceyMatrix = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

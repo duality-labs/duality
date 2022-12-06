@@ -49,7 +49,7 @@ func calculateNewCurrentTicks(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sd
 	k, ctx := s.app.DexKeeper, s.ctx
 	FeeTier := k.GetAllFeeTier(ctx)
 	fee := FeeTier[feeIndex].Fee
-	return calculateNewCurrentTicksPure(amount0, amount1, tickIndex, fee, pair.TokenPair.CurrentTick0To1, pair.TokenPair.CurrentTick1To0)
+	return calculateNewCurrentTicksPure(amount0, amount1, tickIndex, fee, pair.CurrentTick0To1, pair.CurrentTick1To0)
 }
 
 // Helper for getting a pair id. If pair hasn't been initialized, defaults to pair with tickIndex and feeTier for CurrentTick
@@ -72,13 +72,11 @@ func makePair(s *MsgServerTestSuite, pairId string, tickIndex int64, feeTier uin
 	pair, pairFound := app.DexKeeper.GetTradingPair(ctx, pairId)
 	if !pairFound {
 		pair = types.TradingPair{
-			PairId:  pairId,
-			MinTick: tickIndex - fee,
-			MaxTick: tickIndex + fee,
-			TokenPair: &types.TokenPairType{
-				CurrentTick0To1: tickIndex - fee,
-				CurrentTick1To0: tickIndex + fee,
-			},
+			PairId:          pairId,
+			MinTick:         tickIndex - fee,
+			MaxTick:         tickIndex + fee,
+			CurrentTick0To1: tickIndex - fee,
+			CurrentTick1To0: tickIndex + fee,
 		}
 	}
 
@@ -202,7 +200,7 @@ func calculateFinalShares(s *MsgServerTestSuite, pairId string, amounts0 []sdk.D
 }
 
 func calculateFinalTicks(s *MsgServerTestSuite, pair types.TradingPair, amounts0 []sdk.Dec, amounts1 []sdk.Dec, tickIndexes []int64, feeTiers []uint64) (int64, int64) {
-	expectedTick0to1, expectedTick1to0 := pair.TokenPair.CurrentTick0To1, pair.TokenPair.CurrentTick1To0
+	expectedTick0to1, expectedTick1to0 := pair.CurrentTick0To1, pair.CurrentTick1To0
 	for i := range amounts0 {
 		// move expected current ticks
 		tick0to1Calc, tick1to0Calc := calculateNewCurrentTicks(s, amounts0[i], amounts1[i], tickIndexes[i], feeTiers[i], pair)

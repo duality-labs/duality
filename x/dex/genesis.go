@@ -41,24 +41,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 
 	// Set FeeTier count
 	k.SetFeeTierCount(ctx, genState.FeeTierCount)
-	// Set all the edgeRow
-	for _, elem := range genState.EdgeRowList {
-		k.SetEdgeRow(ctx, elem)
-	}
 
-	// Set edgeRow count
-	k.SetEdgeRowCount(ctx, genState.EdgeRowCount)
-	// Set all the adjanceyMatrix
-	for _, elem := range genState.AdjanceyMatrixList {
-		k.SetAdjanceyMatrix(ctx, elem)
-	}
-
-	// Set adjanceyMatrix count
-	k.SetAdjanceyMatrixCount(ctx, genState.AdjanceyMatrixCount)
-	// Set all the LimitOrderTrancheUser
-	for _, elem := range genState.LimitOrderTrancheUserList {
-		k.SetLimitOrderTrancheUser(ctx, elem)
-	}
 	// Set all the LimitOrderTranche
 	for _, elem := range genState.LimitOrderTrancheList {
 		k.SetLimitOrderTranche(ctx, elem)
@@ -80,10 +63,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.SharesList = k.GetAllShares(ctx)
 	genesis.FeeTierList = k.GetAllFeeTier(ctx)
 	genesis.FeeTierCount = k.GetFeeTierCount(ctx)
-	genesis.EdgeRowList = k.GetAllEdgeRow(ctx)
-	genesis.EdgeRowCount = k.GetEdgeRowCount(ctx)
-	genesis.AdjanceyMatrixList = k.GetAllAdjanceyMatrix(ctx)
-	genesis.AdjanceyMatrixCount = k.GetAdjanceyMatrixCount(ctx)
 	genesis.LimitOrderTrancheUserList = k.GetAllLimitOrderTrancheUser(ctx)
 	genesis.LimitOrderTrancheList = k.GetAllLimitOrderTranche(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
