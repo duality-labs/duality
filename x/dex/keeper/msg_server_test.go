@@ -107,6 +107,49 @@ func (s *MsgServerTestSuite) fundDanBalances(a int64, b int64) {
 }
 
 
+func (s *MsgServerTestSuite) assertAccountBalancesEpsilon(
+	account sdk.AccAddress,
+	aBalance sdk.Int,
+	bBalance sdk.Int,
+) {
+	// Checks that user account balances are within 1 of arithmetically calculated amount
+	// and are strictly less that expected amount
+	allowableError := sdk.NewInt(1)
+	aActual := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenA").Amount
+
+	aBalanceDelta := aBalance.Sub(aActual)
+
+	s.Assert().True(aBalanceDelta.Abs().LTE(allowableError), "expected %s != actual %s", aBalance, aActual)
+	s.Assert().True(aActual.LTE(aBalance), "Actual balance A (%s), is greater than expected balance (%s)", aActual, aBalance)
+
+	bActual := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenB").Amount
+	bBalanceDelta := bBalance.Sub(bActual)
+
+	s.Assert().True(bBalanceDelta.Abs().LTE(allowableError), "expected %s != actual %s", bBalance, bActual)
+	s.Assert().True(bActual.LTE(bBalance), "Actual balance A (%s), is greater than expected balance (%s)", bActual, bBalance)
+}
+
+func (s *MsgServerTestSuite) assertDexBalancesEpsilon(
+	aBalance sdk.Int,
+	bBalance sdk.Int,
+) {
+	// Checks that Dex account balances are within 1 of arithmetically calculated amount
+	// and are strictly greater that expected amount
+	allowableError := sdk.NewInt(1)
+	aActual := s.app.BankKeeper.GetBalance(s.ctx, s.app.AccountKeeper.GetModuleAddress("dex"), "TokenA").Amount
+
+	aBalanceDelta := aBalance.Sub(aActual)
+
+	s.Assert().True(aBalanceDelta.Abs().LTE(allowableError), "expected %s != actual %s", aBalance, aActual)
+	s.Assert().True(aActual.GTE(aBalance), "Actual balance A (%s), is greater than expected balance (%s)", aActual, aBalance)
+
+	bActual := s.app.BankKeeper.GetBalance(s.ctx, s.app.AccountKeeper.GetModuleAddress("dex"), "TokenB").Amount
+	bBalanceDelta := bBalance.Sub(bActual)
+
+	s.Assert().True(bBalanceDelta.Abs().LTE(allowableError), "expected %s != actual %s", bBalance, bActual)
+	s.Assert().True(bActual.GTE(bBalance), "Actual balance A (%s), is less than expected balance (%s)", bActual, bBalance)
+}
+
 func (s *MsgServerTestSuite) assertAccountBalancesInt(
 	account sdk.AccAddress,
 	aBalance sdk.Int,
@@ -136,9 +179,16 @@ func (s *MsgServerTestSuite) assertAliceBalancesInt(a sdk.Int, b sdk.Int) {
 	s.assertAccountBalancesInt(s.alice, a, b)
 }
 
+func (s *MsgServerTestSuite) assertAliceBalancesEpsilon(a sdk.Int, b sdk.Int) {
+	s.assertAccountBalancesEpsilon(s.alice, a, b)
+}
 
 func (s *MsgServerTestSuite) assertBobBalances(a int64, b int64) {
 	s.assertAccountBalances(s.bob, a, b)
+}
+
+func (s *MsgServerTestSuite) assertBobBalancesEpsilon(a sdk.Int, b sdk.Int) {
+	s.assertAccountBalancesEpsilon(s.bob, a, b)
 }
 
 func (s *MsgServerTestSuite) assertBobBalancesInt(a sdk.Int, b sdk.Int) {
@@ -153,6 +203,10 @@ func (s *MsgServerTestSuite) assertCarolBalancesInt(a sdk.Int, b sdk.Int) {
 	s.assertAccountBalancesInt(s.carol, a, b)
 }
 
+func (s *MsgServerTestSuite) assertCarolBalancesEpsilon(a sdk.Int, b sdk.Int) {
+	s.assertAccountBalancesEpsilon(s.carol, a, b)
+}
+
 func (s *MsgServerTestSuite) assertDanBalances(a int64, b int64) {
 	s.assertAccountBalances(s.dan, a, b)
 }
@@ -160,6 +214,11 @@ func (s *MsgServerTestSuite) assertDanBalances(a int64, b int64) {
 func (s *MsgServerTestSuite) assertDanBalancesInt(a sdk.Int, b sdk.Int) {
 	s.assertAccountBalancesInt(s.dan, a, b)
 }
+
+func (s *MsgServerTestSuite) assertDanBalancesEpsilon(a sdk.Int, b sdk.Int) {
+	s.assertAccountBalancesEpsilon(s.dan, a, b)
+}
+
 
 func (s *MsgServerTestSuite) assertDexBalances(a int64, b int64) {
 	s.assertAccountBalances(s.app.AccountKeeper.GetModuleAddress("dex"), a, b)
@@ -886,10 +945,10 @@ func calculateSingleSwap(price sdk.Dec, tickLiquidity int64, tickLimitOrderLiqui
 func calculateSwap(price sdk.Dec, liquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
 	amountInInt := sdk.NewInt(amountIn)
 	liquidityInt := sdk.NewInt(liquidity)
-	if tmpAmountOut := price.MulInt(amountInInt).TruncateInt(); tmpAmountOut.LT(liquidityInt) {
+	if tmpAmountOut := price.MulInt(amountInInt); tmpAmountOut.LT(liquidityInt.ToDec()) {
 		// fmt.Printf("sufficient tmpOut %s\n", tmpAmountOut)
 		// sufficient liquidity
-		return sdk.ZeroInt(), tmpAmountOut
+		return sdk.ZeroInt(), tmpAmountOut.TruncateInt()
 	} else {
 		// only sufficient for part of amountIn
 		tmpAmountIn := liquidityInt.ToDec().Quo(price).TruncateInt()

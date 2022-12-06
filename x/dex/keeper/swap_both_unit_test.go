@@ -59,8 +59,8 @@ func (s *MsgServerTestSuite) TestSwapExhaustFeeTiersAndLimitOrder() {
 	// swap effect on balances
 	expectedTotalAmountLeft, expectedTotalAmountOut := s.calculateSingleSwapAToB(1, lpLiquiditySetup.Int64(), limitLiquiditySetup.Int64(), amountIn.Int64())
 	expectedAmountIn := amountIn.Sub(expectedTotalAmountLeft)
-	s.assertBobBalancesInt(bobBalanceSetupB.Sub(expectedAmountIn), amountOutSetup.Add(expectedTotalAmountOut))
-	s.assertDexBalancesInt(expectedAmountIn.Add(amountInSetup), totalLiquiditySetup.Sub(expectedTotalAmountOut))
+	s.assertBobBalancesEpsilon(bobBalanceSetupB.Sub(expectedAmountIn), amountOutSetup.Add(expectedTotalAmountOut))
+	s.assertDexBalancesEpsilon(expectedAmountIn.Add(amountInSetup), totalLiquiditySetup.Sub(expectedTotalAmountOut))
 
 	// calculate amount traded against LPs (i.e. which gets swapped into fee tier)
 	expectedAmountLeftAfterLP, _ := s.calculateSingleSwapNoLOAToB(1, lpLiquiditySetup.Int64(), amountIn.Int64())

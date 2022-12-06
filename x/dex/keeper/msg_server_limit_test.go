@@ -123,7 +123,7 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder1to0WithWithdraw() {
 
 	s.aliceWithdrawsLimitSell("TokenB", -1, 0)
 
-	s.assertAliceBalances(140, 425)
+	s.assertAliceBalancesEpsilon(sdk.NewInt(140), sdk.NewInt(425))
 	s.assertBobBalances(60, 240)
 }
 
@@ -209,16 +209,16 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 
 	s.aliceWithdrawsLimitSell("TokenA", 1, 0)
 
-	s.assertAliceBalances(99950, 525)
+	s.assertAliceBalancesEpsilon(sdk.NewInt(99950), sdk.NewInt(525))
 	s.assertBobBalances(140, 160)
 	//40 - 24.997500249975002500 = 15.0024997500249975
-	s.assertDexBalances(10, 15)
+	s.assertDexBalancesEpsilon(sdk.NewInt(10), sdk.NewInt(15))
 
 	s.aliceWithdrawsLimitSell("TokenA", 0, 0)
 
-	s.assertAliceBalances(99950, 540)
-	s.assertBobBalances(140, 160)
-	s.assertDexBalances(10, 0)
+	s.assertAliceBalancesEpsilon(sdk.NewInt(99950), sdk.NewInt(540))
+	s.assertBobBalancesEpsilon(sdk.NewInt(140), sdk.NewInt(160))
+	s.assertDexBalancesEpsilon(sdk.NewInt(10), sdk.NewInt(0))
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFailsWhenNothingToWithdraw() {
