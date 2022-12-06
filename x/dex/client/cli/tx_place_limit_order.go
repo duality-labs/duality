@@ -32,12 +32,13 @@ func CmdPlaceLimitOrder() *cobra.Command {
 
 			argTokenIn := args[4]
 			argAmountIn := args[5]
-
-			argAmountInDec, err := sdk.NewDecFromStr(argAmountIn)
-
+			amountInInt, err := strconv.Atoi(argAmountIn)
 			if err != nil {
 				return err
 			}
+			amountIn := sdk.NewInt(int64(amountInInt))
+
+
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -51,7 +52,7 @@ func CmdPlaceLimitOrder() *cobra.Command {
 				argTokenB,
 				int64(argTickIndexInt),
 				argTokenIn,
-				argAmountInDec,
+				amountIn,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

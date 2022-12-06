@@ -25,24 +25,17 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // GenesisState defines the dex module's genesis state.
 type GenesisState struct {
-	Params                                Params                              `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
-	TickMapList                           []TickMap                           `protobuf:"bytes,2,rep,name=tickMapList,proto3" json:"tickMapList"`
-	PairMapList                           []PairMap                           `protobuf:"bytes,3,rep,name=pairMapList,proto3" json:"pairMapList"`
-	TokensList                            []Tokens                            `protobuf:"bytes,4,rep,name=tokensList,proto3" json:"tokensList"`
-	TokensCount                           uint64                              `protobuf:"varint,5,opt,name=tokensCount,proto3" json:"tokensCount,omitempty"`
-	TokenMapList                          []TokenMap                          `protobuf:"bytes,6,rep,name=tokenMapList,proto3" json:"tokenMapList"`
-	SharesList                            []Shares                            `protobuf:"bytes,7,rep,name=sharesList,proto3" json:"sharesList"`
-	FeeListList                           []FeeList                           `protobuf:"bytes,8,rep,name=feeListList,proto3" json:"feeListList"`
-	FeeListCount                          uint64                              `protobuf:"varint,9,opt,name=feeListCount,proto3" json:"feeListCount,omitempty"`
-	EdgeRowList                           []EdgeRow                           `protobuf:"bytes,10,rep,name=edgeRowList,proto3" json:"edgeRowList"`
-	EdgeRowCount                          uint64                              `protobuf:"varint,11,opt,name=edgeRowCount,proto3" json:"edgeRowCount,omitempty"`
-	AdjanceyMatrixList                    []AdjanceyMatrix                    `protobuf:"bytes,12,rep,name=adjanceyMatrixList,proto3" json:"adjanceyMatrixList"`
-	AdjanceyMatrixCount                   uint64                              `protobuf:"varint,13,opt,name=adjanceyMatrixCount,proto3" json:"adjanceyMatrixCount,omitempty"`
-	LimitOrderPoolUserShareMapList        []LimitOrderPoolUserShareMap        `protobuf:"bytes,14,rep,name=limitOrderPoolUserShareMapList,proto3" json:"limitOrderPoolUserShareMapList"`
-	LimitOrderPoolUserSharesWithdrawnList []LimitOrderPoolUserSharesWithdrawn `protobuf:"bytes,15,rep,name=limitOrderPoolUserSharesWithdrawnList,proto3" json:"limitOrderPoolUserSharesWithdrawnList"`
-	LimitOrderPoolTotalSharesMapList      []LimitOrderPoolTotalSharesMap      `protobuf:"bytes,16,rep,name=limitOrderPoolTotalSharesMapList,proto3" json:"limitOrderPoolTotalSharesMapList"`
-	LimitOrderPoolReserveMapList          []LimitOrderPoolReserveMap          `protobuf:"bytes,17,rep,name=limitOrderPoolReserveMapList,proto3" json:"limitOrderPoolReserveMapList"`
-	LimitOrderPoolFillMapList             []LimitOrderPoolFillMap             `protobuf:"bytes,18,rep,name=limitOrderPoolFillMapList,proto3" json:"limitOrderPoolFillMapList"`
+	Params                    Params                  `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
+	TickList                  []Tick                  `protobuf:"bytes,2,rep,name=TickList,proto3" json:"TickList"`
+	TradingPairList           []TradingPair           `protobuf:"bytes,3,rep,name=TradingPairList,proto3" json:"TradingPairList"`
+	TokensList                []Tokens                `protobuf:"bytes,4,rep,name=tokensList,proto3" json:"tokensList"`
+	TokensCount               uint64                  `protobuf:"varint,5,opt,name=tokensCount,proto3" json:"tokensCount,omitempty"`
+	TokenMapList              []TokenMap              `protobuf:"bytes,6,rep,name=tokenMapList,proto3" json:"tokenMapList"`
+	SharesList                []Shares                `protobuf:"bytes,7,rep,name=sharesList,proto3" json:"sharesList"`
+	FeeTierList               []FeeTier               `protobuf:"bytes,8,rep,name=FeeTierList,proto3" json:"FeeTierList"`
+	FeeTierCount              uint64                  `protobuf:"varint,9,opt,name=FeeTierCount,proto3" json:"FeeTierCount,omitempty"`
+	LimitOrderTrancheUserList []LimitOrderTrancheUser `protobuf:"bytes,14,rep,name=LimitOrderTrancheUserList,proto3" json:"LimitOrderTrancheUserList"`
+	LimitOrderTrancheList     []LimitOrderTranche     `protobuf:"bytes,15,rep,name=LimitOrderTrancheList,proto3" json:"LimitOrderTrancheList"`
 }
 
 func (m *GenesisState) Reset()         { *m = GenesisState{} }
@@ -85,16 +78,16 @@ func (m *GenesisState) GetParams() Params {
 	return Params{}
 }
 
-func (m *GenesisState) GetTickMapList() []TickMap {
+func (m *GenesisState) GetTickList() []Tick {
 	if m != nil {
-		return m.TickMapList
+		return m.TickList
 	}
 	return nil
 }
 
-func (m *GenesisState) GetPairMapList() []PairMap {
+func (m *GenesisState) GetTradingPairList() []TradingPair {
 	if m != nil {
-		return m.PairMapList
+		return m.TradingPairList
 	}
 	return nil
 }
@@ -127,79 +120,30 @@ func (m *GenesisState) GetSharesList() []Shares {
 	return nil
 }
 
-func (m *GenesisState) GetFeeListList() []FeeList {
+func (m *GenesisState) GetFeeTierList() []FeeTier {
 	if m != nil {
-		return m.FeeListList
+		return m.FeeTierList
 	}
 	return nil
 }
 
-func (m *GenesisState) GetFeeListCount() uint64 {
+func (m *GenesisState) GetFeeTierCount() uint64 {
 	if m != nil {
-		return m.FeeListCount
+		return m.FeeTierCount
 	}
 	return 0
 }
 
-func (m *GenesisState) GetEdgeRowList() []EdgeRow {
+func (m *GenesisState) GetLimitOrderTrancheUserList() []LimitOrderTrancheUser {
 	if m != nil {
-		return m.EdgeRowList
+		return m.LimitOrderTrancheUserList
 	}
 	return nil
 }
 
-func (m *GenesisState) GetEdgeRowCount() uint64 {
+func (m *GenesisState) GetLimitOrderTrancheList() []LimitOrderTranche {
 	if m != nil {
-		return m.EdgeRowCount
-	}
-	return 0
-}
-
-func (m *GenesisState) GetAdjanceyMatrixList() []AdjanceyMatrix {
-	if m != nil {
-		return m.AdjanceyMatrixList
-	}
-	return nil
-}
-
-func (m *GenesisState) GetAdjanceyMatrixCount() uint64 {
-	if m != nil {
-		return m.AdjanceyMatrixCount
-	}
-	return 0
-}
-
-func (m *GenesisState) GetLimitOrderPoolUserShareMapList() []LimitOrderPoolUserShareMap {
-	if m != nil {
-		return m.LimitOrderPoolUserShareMapList
-	}
-	return nil
-}
-
-func (m *GenesisState) GetLimitOrderPoolUserSharesWithdrawnList() []LimitOrderPoolUserSharesWithdrawn {
-	if m != nil {
-		return m.LimitOrderPoolUserSharesWithdrawnList
-	}
-	return nil
-}
-
-func (m *GenesisState) GetLimitOrderPoolTotalSharesMapList() []LimitOrderPoolTotalSharesMap {
-	if m != nil {
-		return m.LimitOrderPoolTotalSharesMapList
-	}
-	return nil
-}
-
-func (m *GenesisState) GetLimitOrderPoolReserveMapList() []LimitOrderPoolReserveMap {
-	if m != nil {
-		return m.LimitOrderPoolReserveMapList
-	}
-	return nil
-}
-
-func (m *GenesisState) GetLimitOrderPoolFillMapList() []LimitOrderPoolFillMap {
-	if m != nil {
-		return m.LimitOrderPoolFillMapList
+		return m.LimitOrderTrancheList
 	}
 	return nil
 }
@@ -211,51 +155,39 @@ func init() {
 func init() { proto.RegisterFile("dex/genesis.proto", fileDescriptor_a803aaabd08db59d) }
 
 var fileDescriptor_a803aaabd08db59d = []byte{
-	// 693 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x55, 0xcf, 0x4f, 0x13, 0x4b,
-	0x1c, 0xef, 0x3e, 0x78, 0xbc, 0xf7, 0xa6, 0x7d, 0x0a, 0x83, 0x07, 0x68, 0xcc, 0xda, 0x80, 0x1a,
-	0xd4, 0xd8, 0x22, 0x1a, 0xe3, 0xc5, 0x44, 0x51, 0xc1, 0x44, 0x40, 0x52, 0x30, 0x26, 0x5e, 0xd6,
-	0xa1, 0x3b, 0xb4, 0x23, 0xd3, 0xce, 0x66, 0x66, 0x6a, 0xcb, 0xc5, 0x93, 0x27, 0x13, 0x13, 0xaf,
-	0xfe, 0x47, 0x1c, 0x39, 0x7a, 0x32, 0x06, 0xfe, 0x11, 0x33, 0xdf, 0x99, 0xb1, 0xbb, 0xa6, 0xed,
-	0x36, 0xde, 0x3a, 0x9f, 0xf9, 0xfc, 0xea, 0xfc, 0x5a, 0x34, 0x17, 0xd3, 0x7e, 0xad, 0x49, 0x3b,
-	0x54, 0x31, 0x55, 0x4d, 0xa4, 0xd0, 0x02, 0x97, 0x3b, 0xac, 0xd1, 0x12, 0x9c, 0xa8, 0x58, 0x68,
-	0x25, 0x78, 0x35, 0xee, 0x12, 0xce, 0xf4, 0x71, 0x35, 0xa6, 0xfd, 0xf2, 0xa5, 0xa6, 0x68, 0x0a,
-	0xa0, 0xd5, 0xcc, 0x2f, 0xab, 0x28, 0xcf, 0x1a, 0x93, 0x84, 0x48, 0xd2, 0x76, 0x1e, 0x65, 0x6c,
-	0x10, 0xcd, 0x1a, 0x47, 0x51, 0x9b, 0x24, 0x69, 0x2c, 0x21, 0x4c, 0xa6, 0x30, 0x50, 0x6a, 0x71,
-	0x44, 0x3b, 0x5e, 0x39, 0xff, 0x0b, 0xf9, 0x9d, 0xa6, 0x5a, 0x44, 0xd2, 0x4c, 0xc0, 0x21, 0xa5,
-	0x11, 0x67, 0x4a, 0xa7, 0x31, 0x1a, 0x37, 0x69, 0x24, 0x45, 0xcf, 0x61, 0x8b, 0x06, 0x23, 0xf1,
-	0x3b, 0xd2, 0x69, 0xd0, 0xe3, 0xa8, 0x4d, 0xb4, 0x64, 0x7d, 0x37, 0x75, 0xc3, 0x4c, 0x71, 0xd6,
-	0x66, 0x3a, 0x12, 0x32, 0xa6, 0x32, 0x4a, 0x84, 0xe0, 0x51, 0x57, 0x51, 0x19, 0x41, 0x54, 0x2a,
-	0x7f, 0x35, 0x87, 0xaa, 0xa2, 0x1e, 0xd3, 0xad, 0x58, 0x92, 0x5e, 0xc7, 0x29, 0x6e, 0x0d, 0x55,
-	0x68, 0xa1, 0x09, 0xf7, 0x92, 0x81, 0xfd, 0xf5, 0xa1, 0x64, 0x49, 0x15, 0x95, 0xef, 0xd3, 0x35,
-	0x96, 0x87, 0xf2, 0x0e, 0x19, 0xe7, 0x03, 0xd2, 0xd2, 0xe7, 0x12, 0x2a, 0x6d, 0xda, 0x0d, 0xdd,
-	0xd3, 0x44, 0x53, 0xfc, 0x08, 0xcd, 0xd8, 0xbd, 0x59, 0x08, 0x2a, 0xc1, 0x4a, 0x71, 0x6d, 0xa9,
-	0x3a, 0x7a, 0x83, 0xab, 0xbb, 0xc0, 0x5c, 0x9f, 0x3e, 0xf9, 0x7e, 0xa5, 0x50, 0x77, 0x3a, 0xfc,
-	0x02, 0x15, 0xcd, 0x5e, 0x6e, 0x93, 0x64, 0x8b, 0x29, 0xbd, 0xf0, 0x57, 0x65, 0x6a, 0xa5, 0xb8,
-	0xb6, 0x3c, 0xce, 0x66, 0xdf, 0xd2, 0x9d, 0x4f, 0x5a, 0x6d, 0xcc, 0xcc, 0x21, 0xf0, 0x66, 0x53,
-	0xf9, 0x66, 0xbb, 0x96, 0xee, 0xcd, 0x52, 0x6a, 0xfc, 0x1c, 0x21, 0x7b, 0x7a, 0xc0, 0x6b, 0x1a,
-	0xbc, 0xc6, 0xfe, 0xbf, 0x7d, 0x60, 0x3b, 0xab, 0x94, 0x16, 0x57, 0x50, 0xd1, 0x8e, 0x9e, 0x88,
-	0x6e, 0x47, 0x2f, 0xfc, 0x5d, 0x09, 0x56, 0xa6, 0xeb, 0x69, 0x08, 0xef, 0xa0, 0x12, 0x0c, 0x7d,
-	0xf3, 0x19, 0x48, 0xbb, 0x9a, 0x9b, 0x36, 0xa8, 0x9e, 0xd1, 0x9b, 0xee, 0xf6, 0x24, 0x80, 0xdb,
-	0x3f, 0xf9, 0xdd, 0xf7, 0x80, 0xed, 0xbb, 0x0f, 0xb4, 0x66, 0x49, 0x0f, 0x29, 0x35, 0x3f, 0xc1,
-	0xea, 0xdf, 0xfc, 0x25, 0xdd, 0xb0, 0x74, 0xbf, 0xa4, 0x29, 0x35, 0x5e, 0x42, 0x25, 0x37, 0xb4,
-	0x2b, 0xf1, 0x1f, 0xac, 0x44, 0x06, 0x33, 0x81, 0xe6, 0x9e, 0xd5, 0x45, 0x0f, 0x02, 0x51, 0x7e,
-	0xe0, 0x33, 0x4b, 0xf7, 0x81, 0x29, 0xb5, 0x09, 0x74, 0x43, 0x1b, 0x58, 0xb4, 0x81, 0x69, 0x0c,
-	0xbf, 0x45, 0xd8, 0x5f, 0xe2, 0x6d, 0xb8, 0xc3, 0x90, 0x5b, 0x82, 0xdc, 0x9b, 0xe3, 0x72, 0x1f,
-	0x67, 0x54, 0x2e, 0x7e, 0x88, 0x17, 0x5e, 0x45, 0xf3, 0x59, 0xd4, 0x96, 0xf9, 0x1f, 0xca, 0x0c,
-	0x9b, 0xc2, 0x1f, 0x03, 0x14, 0xc2, 0x65, 0x7c, 0x69, 0xee, 0xe2, 0xae, 0x10, 0xfc, 0x95, 0xa2,
-	0x12, 0x36, 0xc9, 0x1f, 0x91, 0x0b, 0x50, 0xf0, 0xfe, 0xb8, 0x82, 0x5b, 0x23, 0x1d, 0x5c, 0xd9,
-	0x9c, 0x0c, 0xfc, 0x35, 0x40, 0xd7, 0x46, 0x50, 0xd4, 0x6b, 0xff, 0x2a, 0x41, 0x9b, 0x8b, 0xd0,
-	0xe6, 0xe1, 0x1f, 0xb4, 0x19, 0x18, 0xb9, 0x52, 0x93, 0x25, 0xe2, 0x4f, 0x01, 0xaa, 0x64, 0x99,
-	0xfb, 0xe6, 0x05, 0xb4, 0x54, 0xbf, 0x48, 0xb3, 0x50, 0xeb, 0xc1, 0xe4, 0xb5, 0xb2, 0x1e, 0xae,
-	0x51, 0x6e, 0x0e, 0xfe, 0x80, 0x2e, 0x67, 0x39, 0x75, 0xfb, 0xc0, 0xfa, 0x1e, 0x73, 0xd0, 0xe3,
-	0xde, 0xe4, 0x3d, 0x06, 0x7a, 0xd7, 0x61, 0xac, 0x3f, 0xee, 0xa2, 0xc5, 0xec, 0xfc, 0x06, 0xe3,
-	0xdc, 0x87, 0x63, 0x08, 0xbf, 0x33, 0x79, 0xb8, 0x13, 0xbb, 0xe4, 0xd1, 0xce, 0xeb, 0x9b, 0x27,
-	0x67, 0x61, 0x70, 0x7a, 0x16, 0x06, 0x3f, 0xce, 0xc2, 0xe0, 0xcb, 0x79, 0x58, 0x38, 0x3d, 0x0f,
-	0x0b, 0xdf, 0xce, 0xc3, 0xc2, 0x9b, 0xdb, 0x4d, 0xa6, 0x5b, 0xdd, 0x83, 0x6a, 0x43, 0xb4, 0x6b,
-	0x3b, 0x2e, 0xf7, 0xa9, 0xd0, 0x7b, 0x82, 0xd7, 0x5c, 0x6e, 0xad, 0x5f, 0x83, 0xcf, 0xf1, 0x71,
-	0x42, 0xd5, 0xc1, 0x0c, 0x7c, 0x5f, 0xee, 0xfe, 0x0c, 0x00, 0x00, 0xff, 0xff, 0xb7, 0xb9, 0xc4,
-	0x7c, 0x33, 0x08, 0x00, 0x00,
+	// 501 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x94, 0xdf, 0x6e, 0xd3, 0x30,
+	0x14, 0xc6, 0x1b, 0x56, 0xca, 0x70, 0xab, 0x0d, 0xcc, 0x1f, 0x95, 0x4a, 0x84, 0xa8, 0x20, 0xd1,
+	0x9b, 0x25, 0x62, 0xbc, 0x00, 0x2a, 0x88, 0x21, 0xb1, 0x8d, 0x69, 0x0d, 0x42, 0xe2, 0x26, 0xf2,
+	0x12, 0x93, 0x5a, 0x4d, 0xe3, 0xc8, 0x76, 0xa4, 0xee, 0x2d, 0x78, 0x2a, 0xb4, 0xcb, 0x5d, 0x72,
+	0x85, 0x50, 0xfb, 0x22, 0xc8, 0xc7, 0x6e, 0x97, 0xc1, 0x9a, 0x8a, 0xbb, 0x9e, 0x93, 0xef, 0xfb,
+	0x7d, 0x27, 0x47, 0xa7, 0x41, 0xf7, 0x13, 0x3a, 0x0b, 0x52, 0x9a, 0x53, 0xc9, 0xa4, 0x5f, 0x08,
+	0xae, 0x38, 0xee, 0xe5, 0x2c, 0x1e, 0xf3, 0x8c, 0xc8, 0x84, 0x2b, 0xc9, 0x33, 0x3f, 0x29, 0x49,
+	0xc6, 0xd4, 0xb9, 0x9f, 0xd0, 0x59, 0xef, 0x61, 0xca, 0x53, 0x0e, 0xb2, 0x40, 0xff, 0x32, 0x8e,
+	0xde, 0x3d, 0x0d, 0x29, 0x88, 0x20, 0x53, 0xcb, 0xe8, 0xed, 0xe8, 0x8e, 0x62, 0xf1, 0xc4, 0xd6,
+	0x8f, 0xa1, 0x16, 0x24, 0x61, 0x79, 0x1a, 0x15, 0x84, 0x89, 0xaa, 0x53, 0xf1, 0x09, 0xcd, 0x97,
+	0xce, 0x07, 0xab, 0x4e, 0x34, 0x25, 0x45, 0x55, 0x26, 0xc7, 0x44, 0xd0, 0xa5, 0x0c, 0xeb, 0xce,
+	0x37, 0x4a, 0x23, 0xc5, 0xe8, 0x12, 0xd6, 0xd7, 0xbd, 0x8c, 0x4d, 0x99, 0x8a, 0xb8, 0x48, 0xa8,
+	0x88, 0x94, 0x20, 0x79, 0x3c, 0xa6, 0x51, 0x29, 0x57, 0x9a, 0xa7, 0x6b, 0x34, 0xe6, 0x71, 0xff,
+	0x47, 0x0b, 0x75, 0x0e, 0xcc, 0x36, 0x46, 0x8a, 0x28, 0x8a, 0xdf, 0xa0, 0x96, 0x79, 0xb1, 0xae,
+	0xe3, 0x39, 0x83, 0xf6, 0x7e, 0xdf, 0x5f, 0xbf, 0x1d, 0xff, 0x04, 0x94, 0xc3, 0xe6, 0xc5, 0xaf,
+	0x67, 0x8d, 0x53, 0xeb, 0xc3, 0x43, 0xb4, 0x1d, 0xb2, 0x78, 0x72, 0xc8, 0xa4, 0xea, 0xde, 0xf2,
+	0xb6, 0x06, 0xed, 0x7d, 0xaf, 0x8e, 0xa1, 0xb5, 0x96, 0xb0, 0xf2, 0xe1, 0x2f, 0x68, 0x37, 0x34,
+	0xcb, 0x3b, 0x21, 0x4c, 0x00, 0x6a, 0x0b, 0x50, 0x2f, 0x6b, 0x51, 0x57, 0x16, 0x4b, 0xfc, 0x9b,
+	0x82, 0x3f, 0x20, 0x64, 0xb6, 0x0f, 0xcc, 0x26, 0x30, 0x6b, 0x5f, 0x31, 0x04, 0xb5, 0xc5, 0x55,
+	0xbc, 0xd8, 0x43, 0x6d, 0x53, 0xbd, 0xe5, 0x65, 0xae, 0xba, 0xb7, 0x3d, 0x67, 0xd0, 0x3c, 0xad,
+	0xb6, 0xf0, 0x31, 0xea, 0x40, 0x79, 0x44, 0x0a, 0x48, 0x6b, 0x41, 0xda, 0x8b, 0x8d, 0x69, 0x47,
+	0xa4, 0xb0, 0x79, 0xd7, 0xfc, 0x7a, 0x76, 0x73, 0x12, 0x40, 0xbb, 0xb3, 0x79, 0xf6, 0x11, 0xa8,
+	0x97, 0xb3, 0x5f, 0x79, 0xf1, 0x47, 0xd4, 0x7e, 0x4f, 0x69, 0xc8, 0xa8, 0x59, 0xed, 0x36, 0xa0,
+	0x9e, 0xd7, 0xa1, 0xac, 0xdc, 0xb2, 0xaa, 0x6e, 0xdc, 0x47, 0x1d, 0x5b, 0x9a, 0x4d, 0xdc, 0x85,
+	0x4d, 0x5c, 0xeb, 0xe1, 0x12, 0x3d, 0x39, 0xd4, 0x37, 0xf8, 0x49, 0x9f, 0x60, 0x68, 0x2e, 0xf0,
+	0xb3, 0xb4, 0xf1, 0x3b, 0x10, 0xff, 0xaa, 0x2e, 0xfe, 0x46, 0xb3, 0x1d, 0x66, 0x3d, 0x19, 0x33,
+	0xf4, 0xe8, 0x9f, 0x87, 0x10, 0xb9, 0x0b, 0x91, 0x7b, 0xff, 0x15, 0x69, 0xe3, 0x6e, 0x26, 0x0e,
+	0x0f, 0x2e, 0xe6, 0xae, 0x73, 0x39, 0x77, 0x9d, 0xdf, 0x73, 0xd7, 0xf9, 0xbe, 0x70, 0x1b, 0x97,
+	0x0b, 0xb7, 0xf1, 0x73, 0xe1, 0x36, 0xbe, 0xee, 0xa5, 0x4c, 0x8d, 0xcb, 0x33, 0x3f, 0xe6, 0xd3,
+	0xe0, 0xd8, 0xe6, 0xbd, 0xe3, 0x6a, 0xc4, 0xb3, 0xc0, 0xe6, 0x05, 0xb3, 0x00, 0x3e, 0x02, 0xe7,
+	0x05, 0x95, 0x67, 0x2d, 0xf8, 0x63, 0xbe, 0xfe, 0x13, 0x00, 0x00, 0xff, 0xff, 0xf5, 0x7a, 0x4c,
+	0x6b, 0xa9, 0x04, 0x00, 0x00,
 }
 
 func (m *GenesisState) Marshal() (dAtA []byte, err error) {
@@ -278,58 +210,10 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.LimitOrderPoolFillMapList) > 0 {
-		for iNdEx := len(m.LimitOrderPoolFillMapList) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.LimitOrderTrancheList) > 0 {
+		for iNdEx := len(m.LimitOrderTrancheList) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.LimitOrderPoolFillMapList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintGenesis(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x1
-			i--
-			dAtA[i] = 0x92
-		}
-	}
-	if len(m.LimitOrderPoolReserveMapList) > 0 {
-		for iNdEx := len(m.LimitOrderPoolReserveMapList) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.LimitOrderPoolReserveMapList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintGenesis(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x1
-			i--
-			dAtA[i] = 0x8a
-		}
-	}
-	if len(m.LimitOrderPoolTotalSharesMapList) > 0 {
-		for iNdEx := len(m.LimitOrderPoolTotalSharesMapList) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.LimitOrderPoolTotalSharesMapList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintGenesis(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x1
-			i--
-			dAtA[i] = 0x82
-		}
-	}
-	if len(m.LimitOrderPoolUserSharesWithdrawnList) > 0 {
-		for iNdEx := len(m.LimitOrderPoolUserSharesWithdrawnList) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.LimitOrderPoolUserSharesWithdrawnList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.LimitOrderTrancheList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -340,10 +224,10 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x7a
 		}
 	}
-	if len(m.LimitOrderPoolUserShareMapList) > 0 {
-		for iNdEx := len(m.LimitOrderPoolUserShareMapList) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.LimitOrderTrancheUserList) > 0 {
+		for iNdEx := len(m.LimitOrderTrancheUserList) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.LimitOrderPoolUserShareMapList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.LimitOrderTrancheUserList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -354,53 +238,15 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x72
 		}
 	}
-	if m.AdjanceyMatrixCount != 0 {
-		i = encodeVarintGenesis(dAtA, i, uint64(m.AdjanceyMatrixCount))
-		i--
-		dAtA[i] = 0x68
-	}
-	if len(m.AdjanceyMatrixList) > 0 {
-		for iNdEx := len(m.AdjanceyMatrixList) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.AdjanceyMatrixList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintGenesis(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x62
-		}
-	}
-	if m.EdgeRowCount != 0 {
-		i = encodeVarintGenesis(dAtA, i, uint64(m.EdgeRowCount))
-		i--
-		dAtA[i] = 0x58
-	}
-	if len(m.EdgeRowList) > 0 {
-		for iNdEx := len(m.EdgeRowList) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.EdgeRowList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintGenesis(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x52
-		}
-	}
-	if m.FeeListCount != 0 {
-		i = encodeVarintGenesis(dAtA, i, uint64(m.FeeListCount))
+	if m.FeeTierCount != 0 {
+		i = encodeVarintGenesis(dAtA, i, uint64(m.FeeTierCount))
 		i--
 		dAtA[i] = 0x48
 	}
-	if len(m.FeeListList) > 0 {
-		for iNdEx := len(m.FeeListList) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.FeeTierList) > 0 {
+		for iNdEx := len(m.FeeTierList) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.FeeListList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.FeeTierList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -458,10 +304,10 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x22
 		}
 	}
-	if len(m.PairMapList) > 0 {
-		for iNdEx := len(m.PairMapList) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TradingPairList) > 0 {
+		for iNdEx := len(m.TradingPairList) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.PairMapList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TradingPairList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -472,10 +318,10 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x1a
 		}
 	}
-	if len(m.TickMapList) > 0 {
-		for iNdEx := len(m.TickMapList) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.TickList) > 0 {
+		for iNdEx := len(m.TickList) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.TickMapList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.TickList[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -518,14 +364,14 @@ func (m *GenesisState) Size() (n int) {
 	_ = l
 	l = m.Params.Size()
 	n += 1 + l + sovGenesis(uint64(l))
-	if len(m.TickMapList) > 0 {
-		for _, e := range m.TickMapList {
+	if len(m.TickList) > 0 {
+		for _, e := range m.TickList {
 			l = e.Size()
 			n += 1 + l + sovGenesis(uint64(l))
 		}
 	}
-	if len(m.PairMapList) > 0 {
-		for _, e := range m.PairMapList {
+	if len(m.TradingPairList) > 0 {
+		for _, e := range m.TradingPairList {
 			l = e.Size()
 			n += 1 + l + sovGenesis(uint64(l))
 		}
@@ -551,61 +397,25 @@ func (m *GenesisState) Size() (n int) {
 			n += 1 + l + sovGenesis(uint64(l))
 		}
 	}
-	if len(m.FeeListList) > 0 {
-		for _, e := range m.FeeListList {
+	if len(m.FeeTierList) > 0 {
+		for _, e := range m.FeeTierList {
 			l = e.Size()
 			n += 1 + l + sovGenesis(uint64(l))
 		}
 	}
-	if m.FeeListCount != 0 {
-		n += 1 + sovGenesis(uint64(m.FeeListCount))
+	if m.FeeTierCount != 0 {
+		n += 1 + sovGenesis(uint64(m.FeeTierCount))
 	}
-	if len(m.EdgeRowList) > 0 {
-		for _, e := range m.EdgeRowList {
+	if len(m.LimitOrderTrancheUserList) > 0 {
+		for _, e := range m.LimitOrderTrancheUserList {
 			l = e.Size()
 			n += 1 + l + sovGenesis(uint64(l))
 		}
 	}
-	if m.EdgeRowCount != 0 {
-		n += 1 + sovGenesis(uint64(m.EdgeRowCount))
-	}
-	if len(m.AdjanceyMatrixList) > 0 {
-		for _, e := range m.AdjanceyMatrixList {
+	if len(m.LimitOrderTrancheList) > 0 {
+		for _, e := range m.LimitOrderTrancheList {
 			l = e.Size()
 			n += 1 + l + sovGenesis(uint64(l))
-		}
-	}
-	if m.AdjanceyMatrixCount != 0 {
-		n += 1 + sovGenesis(uint64(m.AdjanceyMatrixCount))
-	}
-	if len(m.LimitOrderPoolUserShareMapList) > 0 {
-		for _, e := range m.LimitOrderPoolUserShareMapList {
-			l = e.Size()
-			n += 1 + l + sovGenesis(uint64(l))
-		}
-	}
-	if len(m.LimitOrderPoolUserSharesWithdrawnList) > 0 {
-		for _, e := range m.LimitOrderPoolUserSharesWithdrawnList {
-			l = e.Size()
-			n += 1 + l + sovGenesis(uint64(l))
-		}
-	}
-	if len(m.LimitOrderPoolTotalSharesMapList) > 0 {
-		for _, e := range m.LimitOrderPoolTotalSharesMapList {
-			l = e.Size()
-			n += 2 + l + sovGenesis(uint64(l))
-		}
-	}
-	if len(m.LimitOrderPoolReserveMapList) > 0 {
-		for _, e := range m.LimitOrderPoolReserveMapList {
-			l = e.Size()
-			n += 2 + l + sovGenesis(uint64(l))
-		}
-	}
-	if len(m.LimitOrderPoolFillMapList) > 0 {
-		for _, e := range m.LimitOrderPoolFillMapList {
-			l = e.Size()
-			n += 2 + l + sovGenesis(uint64(l))
 		}
 	}
 	return n
@@ -681,7 +491,7 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TickMapList", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TickList", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -708,14 +518,14 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TickMapList = append(m.TickMapList, TickMap{})
-			if err := m.TickMapList[len(m.TickMapList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TickList = append(m.TickList, Tick{})
+			if err := m.TickList[len(m.TickList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PairMapList", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TradingPairList", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -742,8 +552,8 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PairMapList = append(m.PairMapList, PairMap{})
-			if err := m.PairMapList[len(m.PairMapList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.TradingPairList = append(m.TradingPairList, TradingPair{})
+			if err := m.TradingPairList[len(m.TradingPairList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -870,7 +680,7 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FeeListList", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field FeeTierList", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -897,16 +707,16 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.FeeListList = append(m.FeeListList, FeeList{})
-			if err := m.FeeListList[len(m.FeeListList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.FeeTierList = append(m.FeeTierList, FeeTier{})
+			if err := m.FeeTierList[len(m.FeeTierList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 9:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FeeListCount", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field FeeTierCount", wireType)
 			}
-			m.FeeListCount = 0
+			m.FeeTierCount = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGenesis
@@ -916,120 +726,14 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.FeeListCount |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EdgeRowList", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenesis
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.EdgeRowList = append(m.EdgeRowList, EdgeRow{})
-			if err := m.EdgeRowList[len(m.EdgeRowList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 11:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EdgeRowCount", wireType)
-			}
-			m.EdgeRowCount = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenesis
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.EdgeRowCount |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 12:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AdjanceyMatrixList", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenesis
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.AdjanceyMatrixList = append(m.AdjanceyMatrixList, AdjanceyMatrix{})
-			if err := m.AdjanceyMatrixList[len(m.AdjanceyMatrixList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 13:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AdjanceyMatrixCount", wireType)
-			}
-			m.AdjanceyMatrixCount = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenesis
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.AdjanceyMatrixCount |= uint64(b&0x7F) << shift
+				m.FeeTierCount |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 14:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LimitOrderPoolUserShareMapList", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LimitOrderTrancheUserList", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1056,14 +760,14 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.LimitOrderPoolUserShareMapList = append(m.LimitOrderPoolUserShareMapList, LimitOrderPoolUserShareMap{})
-			if err := m.LimitOrderPoolUserShareMapList[len(m.LimitOrderPoolUserShareMapList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.LimitOrderTrancheUserList = append(m.LimitOrderTrancheUserList, LimitOrderTrancheUser{})
+			if err := m.LimitOrderTrancheUserList[len(m.LimitOrderTrancheUserList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 15:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LimitOrderPoolUserSharesWithdrawnList", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field LimitOrderTrancheList", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1090,110 +794,8 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.LimitOrderPoolUserSharesWithdrawnList = append(m.LimitOrderPoolUserSharesWithdrawnList, LimitOrderPoolUserSharesWithdrawn{})
-			if err := m.LimitOrderPoolUserSharesWithdrawnList[len(m.LimitOrderPoolUserSharesWithdrawnList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 16:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LimitOrderPoolTotalSharesMapList", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenesis
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.LimitOrderPoolTotalSharesMapList = append(m.LimitOrderPoolTotalSharesMapList, LimitOrderPoolTotalSharesMap{})
-			if err := m.LimitOrderPoolTotalSharesMapList[len(m.LimitOrderPoolTotalSharesMapList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 17:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LimitOrderPoolReserveMapList", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenesis
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.LimitOrderPoolReserveMapList = append(m.LimitOrderPoolReserveMapList, LimitOrderPoolReserveMap{})
-			if err := m.LimitOrderPoolReserveMapList[len(m.LimitOrderPoolReserveMapList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 18:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LimitOrderPoolFillMapList", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenesis
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.LimitOrderPoolFillMapList = append(m.LimitOrderPoolFillMapList, LimitOrderPoolFillMap{})
-			if err := m.LimitOrderPoolFillMapList[len(m.LimitOrderPoolFillMapList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.LimitOrderTrancheList = append(m.LimitOrderTrancheList, LimitOrderTranche{})
+			if err := m.LimitOrderTrancheList[len(m.LimitOrderTrancheList)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

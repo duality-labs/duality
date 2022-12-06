@@ -1,0 +1,13 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+
+message TradingPair {
+  string pairId = 1;
+  int64 currentTick0To1 = 2; 
+  int64 currentTick1To0 = 3; 
+  int64 maxTick = 4;
+  int64 minTick = 5;
+}
+

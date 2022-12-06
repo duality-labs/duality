@@ -1,0 +1,37 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+import "gogoproto/gogo.proto";
+
+message LimitOrderTranche {
+  string pairId = 1;
+  string tokenIn = 2;
+  int64 tickIndex = 3;
+  uint64 trancheIndex = 4; 
+  string reservesTokenIn = 5  [
+      (gogoproto.moretags)   = "yaml:\"reserves\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "reservesTokenIn"
+  ]; 
+  string reservesTokenOut = 6  [
+      (gogoproto.moretags)   = "yaml:\"fill\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "reservesTokenOut"
+  ];  
+  string totalTokenIn = 7  [
+      (gogoproto.moretags)   = "yaml:\"totalShares\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "totalTokenIn"
+  ];  
+  string totalTokenOut = 8  [
+      (gogoproto.moretags)   = "yaml:\"totalShares\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "totalTokenOut"
+  ];  
+}
+

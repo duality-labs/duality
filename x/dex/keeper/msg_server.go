@@ -77,8 +77,8 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		return nil, err
 	}
 
-	var amount_out sdk.Dec
-	var amount_left sdk.Dec
+	var amount_out sdk.Int
+	var amount_left sdk.Int
 	var coinOut sdk.Coin
 	if msg.TokenIn == token0 {
 		amount_out, amount_left, err = k.Swap0to1(goCtx, msg, token0, token1, createrAddr)
@@ -88,8 +88,8 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		}
 
 		amountToDeposit := msg.AmountIn.Sub(amount_left)
-		if amountToDeposit.GT(sdk.ZeroDec()) {
-			coinIn := sdk.NewCoin(token0, sdk.NewIntFromBigInt(amountToDeposit.BigInt()))
+		if amountToDeposit.GT(sdk.ZeroInt()) {
+			coinIn := sdk.NewCoin(token0, amountToDeposit)
 			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
 				return &types.MsgSwapResponse{}, err
 			}
@@ -97,9 +97,9 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 			return &types.MsgSwapResponse{}, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
 		}
 
-		if amount_out.GT(sdk.ZeroDec()) {
+		if amount_out.GT(sdk.ZeroInt()) {
 
-			coinOut = sdk.NewCoin(token1, sdk.NewIntFromBigInt(amount_out.BigInt()))
+			coinOut = sdk.NewCoin(token1, amount_out)
 			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 				return &types.MsgSwapResponse{}, err
 			}
@@ -113,8 +113,8 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		}
 
 		amountToDeposit := msg.AmountIn.Sub(amount_left)
-		if amountToDeposit.GT(sdk.ZeroDec()) {
-			coinIn := sdk.NewCoin(token1, sdk.NewIntFromBigInt(amountToDeposit.BigInt()))
+		if amountToDeposit.GT(sdk.ZeroInt()) {
+			coinIn := sdk.NewCoin(token1, amountToDeposit)
 			if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, createrAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
 				return &types.MsgSwapResponse{}, err
 			}
@@ -122,9 +122,9 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 			return &types.MsgSwapResponse{}, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
 		}
 
-		if amount_out.GT(sdk.ZeroDec()) {
+		if amount_out.GT(sdk.ZeroInt()) {
 
-			coinOut = sdk.NewCoin(token0, sdk.NewIntFromBigInt(amount_out.BigInt()))
+			coinOut = sdk.NewCoin(token0, amount_out)
 			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 				return &types.MsgSwapResponse{}, err
 			}

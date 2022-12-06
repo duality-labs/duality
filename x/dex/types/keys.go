@@ -37,18 +37,18 @@ const (
 	// TokenMapKeyPrefix is the prefix to retrieve all TokenMap
 	TokenMapKeyPrefix = "TokenMap/value"
 
-	// TickMapKeyPrefix is the prefix to retrieve all TickMap
-	BaseTickMapKeyPrefix = "TickMap/value"
+	// TickKeyPrefix is the prefix to retrieve all Tick
+	BaseTickKeyPrefix = "Tick/value"
 
-	// PairMapKeyPrefix is the prefix to retrieve all PairMap
-	PairMapKeyPrefix = "PairMap/value"
+	// TradingPairKeyPrefix is the prefix to retrieve all TradingPair
+	TradingPairKeyPrefix = "TradingPair/value"
 
 	// SharesKeyPrefix is the prefix to retrieve all Shares
 	SharesKeyPrefix = "Shares/value"
 )
 
 func TickPrefix(pairId string) []byte {
-	return append(KeyPrefix(BaseTickMapKeyPrefix), KeyPrefix(pairId)...)
+	return append(KeyPrefix(BaseTickKeyPrefix), KeyPrefix(pairId)...)
 }
 
 // TokenMapKey returns the store key to retrieve a TokenMap from the index fields
@@ -62,7 +62,7 @@ func TokenMapKey(address string) []byte {
 	return key
 }
 
-func TickMapKey(pairId string, tickIndex int64) []byte {
+func TickKey(pairId string, tickIndex int64) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)
@@ -76,7 +76,7 @@ func TickMapKey(pairId string, tickIndex int64) []byte {
 	return key
 }
 
-func PairMapKey(pairId string) []byte {
+func TradingPairKey(pairId string) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)
@@ -111,26 +111,26 @@ func SharesKey(address string, pairId string, tickIndex int64, feeIndex uint64) 
 
 // Limit Order Pool Mappings and Keys
 const (
-	BaseLimitOrderPrefix = "LimitOrderPool/value"
+	BaseLimitOrderPrefix = "LimitOrderTranche/value"
 
-	// LimitOrderPoolUserSharesWithdrawnKeyPrefix is the prefix to retrieve all LimitOrderPoolUserSharesWithdrawn
-	LimitOrderPoolUserSharesWithdrawnKeyPrefix = "LimitOrderPoolUserSharesWithdrawn/value"
+	// LimitOrderTrancheUserSharesWithdrawnKeyPrefix is the prefix to retrieve all LimitOrderTrancheUserSharesWithdrawn
+	LimitOrderTrancheUserSharesWithdrawnKeyPrefix = "LimitOrderTrancheUserSharesWithdrawn/value"
 
-	// LimitOrderPoolUserShareMapKeyPrefix is the prefix to retrieve all LimitOrderPoolUserShareMap
-	LimitOrderPoolUserShareMapKeyPrefix = "LimitOrderPoolUserShareMap/value"
+	// LimitOrderTrancheUserKeyPrefix is the prefix to retrieve all LimitOrderTrancheUser
+	LimitOrderTrancheUserKeyPrefix = "LimitOrderTrancheUser/value"
 
-	// LimitOrderPoolTotalSharesMapKeyPrefix is the prefix to retrieve all LimitOrderPoolTotalSharesMap
-	LimitOrderPoolTotalSharesMapKeyPrefix = "LimitOrderPoolTotalSharesMap/value"
+	// LimitOrderTrancheKeyPrefix is the prefix to retrieve all LimitOrderTranche
+	LimitOrderTrancheKeyPrefix = "LimitOrderTranche/value"
 
-	// LimitOrderPoolReserveMapKeyPrefix is the prefix to retrieve all LimitOrderPoolReserveMap
-	LimitOrderPoolReserveMapKeyPrefix = "LimitOrderPoolReserveMap/value"
+	// LimitOrderTrancheReserveMapKeyPrefix is the prefix to retrieve all LimitOrderTrancheReserveMap
+	LimitOrderTrancheReserveMapKeyPrefix = "LimitOrderTrancheReserveMap/value"
 
-	// LimitOrderPoolFillMapKeyPrefix is the prefix to retrieve all LimitOrderPoolFillMap
-	LimitOrderPoolFillMapKeyPrefix = "LimitOrderPoolFillMap/value"
+	// LimitOrderTrancheFillMapKeyPrefix is the prefix to retrieve all LimitOrderTrancheFillMap
+	LimitOrderTrancheFillMapKeyPrefix = "LimitOrderTrancheFillMap/value"
 )
 
-// LimitOrderPoolUserSharesWithdrawnKey returns the store key to retrieve a LimitOrderPoolUserSharesWithdrawn from the index fields
-func LimitOrderPoolUserSharesWithdrawnKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
+// LimitOrderTrancheUserSharesWithdrawnKey returns the store key to retrieve a LimitOrderTrancheUserSharesWithdrawn from the index fields
+func LimitOrderTrancheUserSharesWithdrawnKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)
@@ -156,8 +156,8 @@ func LimitOrderPoolUserSharesWithdrawnKey(pairId string, tickIndex int64, token 
 	return key
 }
 
-// LimitOrderPoolUserShareMapKey returns the store key to retrieve a LimitOrderPoolUserShareMap from the index fields
-func LimitOrderPoolUserShareMapKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
+// LimitOrderTrancheUserKey returns the store key to retrieve a LimitOrderTrancheUser from the index fields
+func LimitOrderTrancheUserKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)
@@ -183,8 +183,8 @@ func LimitOrderPoolUserShareMapKey(pairId string, tickIndex int64, token string,
 	return key
 }
 
-// LimitOrderPoolTotalSharesMapKey returns the store key to retrieve a LimitOrderPoolTotalSharesMap from the index fields
-func LimitOrderPoolTotalSharesMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
+// LimitOrderTrancheKey returns the store key to retrieve a LimitOrderTranche from the index fields
+func LimitOrderTrancheKey(pairId string, tickIndex int64, token string, count uint64) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)
@@ -206,7 +206,7 @@ func LimitOrderPoolTotalSharesMapKey(pairId string, tickIndex int64, token strin
 	return key
 }
 
-func LimitOrderPoolReserveMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
+func LimitOrderTrancheReserveMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)
@@ -228,7 +228,7 @@ func LimitOrderPoolReserveMapKey(pairId string, tickIndex int64, token string, c
 	return key
 }
 
-func LimitOrderPoolFillMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
+func LimitOrderTrancheFillMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)
@@ -344,16 +344,6 @@ const (
 )
 
 const (
-	FeeListKey      = "FeeList-value-"
-	FeeListCountKey = "FeeList-count-"
-)
-
-const (
-	EdgeRowKey      = "EdgeRow-value-"
-	EdgeRowCountKey = "EdgeRow-count-"
-)
-
-const (
-	AdjanceyMatrixKey      = "AdjanceyMatrix-value-"
-	AdjanceyMatrixCountKey = "AdjanceyMatrix-count-"
+	FeeTierKey      = "FeeTier-value-"
+	FeeTierCountKey = "FeeTier-count-"
 )

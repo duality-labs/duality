@@ -22,7 +22,7 @@ func TestGenesisState_Validate(t *testing.T) {
 			desc: "valid genesis state",
 			genState: &types.GenesisState{
 
-				TickMapList: []types.TickMap{
+				TickList: []types.Tick{
 					{
 						TickIndex: 0,
 					},
@@ -30,7 +30,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						TickIndex: 1,
 					},
 				},
-				PairMapList: []types.PairMap{
+				TradingPairList: []types.TradingPair{
 					{
 						PairId: "0",
 					},
@@ -69,7 +69,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						FeeIndex:  1,
 					},
 				},
-				FeeListList: []types.FeeList{
+				FeeTierList: []types.FeeTier{
 					{
 						Id: 0,
 					},
@@ -77,26 +77,8 @@ func TestGenesisState_Validate(t *testing.T) {
 						Id: 1,
 					},
 				},
-				FeeListCount: 2,
-				EdgeRowList: []types.EdgeRow{
-					{
-						Id: 0,
-					},
-					{
-						Id: 1,
-					},
-				},
-				EdgeRowCount: 2,
-				AdjanceyMatrixList: []types.AdjanceyMatrix{
-					{
-						Id: 0,
-					},
-					{
-						Id: 1,
-					},
-				},
-				AdjanceyMatrixCount: 2,
-				LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
+				FeeTierCount: 2,
+				LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
 					{
 						Count:   0,
 						Address: "0",
@@ -106,48 +88,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						Address: "1",
 					},
 				},
-				LimitOrderPoolUserSharesWithdrawnList: []types.LimitOrderPoolUserSharesWithdrawn{
-					{
-						Count:   0,
-						Address: "0",
-					},
-					{
-						Count:   1,
-						Address: "1",
-					},
-				},
-				LimitOrderPoolTotalSharesMapList: []types.LimitOrderPoolTotalSharesMap{
-					{
-						Count: 0,
-					},
-					{
-						Count: 1,
-					},
-				},
-				LimitOrderPoolReserveMapList: []types.LimitOrderPoolReserveMap{
-					{
-						Count: 0,
-					},
-					{
-						Count: 1,
-					},
-				},
-				LimitOrderPoolFillMapList: []types.LimitOrderPoolFillMap{
-					{
-						Count: 0,
-					},
-					{
-						Count: 1,
-					},
-				},
-				// this line is used by starport scaffolding # types/genesis/validField
-			},
-			valid: true,
-		},
-		{
-			desc: "duplicated tickMap",
-			genState: &types.GenesisState{
-				TickMapList: []types.TickMap{
+				LimitOrderTrancheList: []types.LimitOrderTranche{
 					{
 						TickIndex: 0,
 					},
@@ -155,13 +96,28 @@ func TestGenesisState_Validate(t *testing.T) {
 						TickIndex: 1,
 					},
 				},
+				// this line is used by starport scaffolding # types/genesis/validField
+			},
+			valid: true,
+		},
+		{
+			desc: "duplicated Tick",
+			genState: &types.GenesisState{
+				TickList: []types.Tick{
+					{
+						TickIndex: 0,
+					},
+					{
+						TickIndex: 0,
+					},
+				},
 			},
 			valid: false,
 		},
 		{
-			desc: "duplicated pairMap",
+			desc: "duplicated TradingPair",
 			genState: &types.GenesisState{
-				PairMapList: []types.PairMap{
+				TradingPairList: []types.TradingPair{
 					{
 						PairId: "0",
 					},
@@ -233,9 +189,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated feeList",
+			desc: "duplicated FeeTier",
 			genState: &types.GenesisState{
-				FeeListList: []types.FeeList{
+				FeeTierList: []types.FeeTier{
 					{
 						Id: 0,
 					},
@@ -247,73 +203,21 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "invalid feeList count",
+			desc: "invalid FeeTier count",
 			genState: &types.GenesisState{
-				FeeListList: []types.FeeList{
+				FeeTierList: []types.FeeTier{
 					{
 						Id: 1,
 					},
 				},
-				FeeListCount: 0,
+				FeeTierCount: 0,
 			},
 			valid: false,
 		},
 		{
-			desc: "duplicated edgeRow",
+			desc: "duplicated LimitOrderTrancheUser",
 			genState: &types.GenesisState{
-				EdgeRowList: []types.EdgeRow{
-					{
-						Id: 0,
-					},
-					{
-						Id: 0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "invalid edgeRow count",
-			genState: &types.GenesisState{
-				EdgeRowList: []types.EdgeRow{
-					{
-						Id: 1,
-					},
-				},
-				EdgeRowCount: 0,
-			},
-			valid: false,
-		},
-		{
-			desc: "duplicated adjanceyMatrix",
-			genState: &types.GenesisState{
-				AdjanceyMatrixList: []types.AdjanceyMatrix{
-					{
-						Id: 0,
-					},
-					{
-						Id: 0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "invalid adjanceyMatrix count",
-			genState: &types.GenesisState{
-				AdjanceyMatrixList: []types.AdjanceyMatrix{
-					{
-						Id: 1,
-					},
-				},
-				AdjanceyMatrixCount: 0,
-			},
-			valid: false,
-		},
-		{
-			desc: "duplicated limitOrderPoolUserShareMap",
-			genState: &types.GenesisState{
-				LimitOrderPoolUserShareMapList: []types.LimitOrderPoolUserShareMap{
+				LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
 					{
 						Count:   0,
 						Address: "0",
@@ -327,58 +231,14 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated limitOrderPoolUserSharesWithdrawn",
+			desc: "duplicated LimitOrderTranche",
 			genState: &types.GenesisState{
-				LimitOrderPoolUserSharesWithdrawnList: []types.LimitOrderPoolUserSharesWithdrawn{
+				LimitOrderTrancheList: []types.LimitOrderTranche{
 					{
-						Count:   0,
-						Address: "0",
+						TickIndex: 0,
 					},
 					{
-						Count:   0,
-						Address: "0",
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "duplicated limitOrderPoolTotalSharesMap",
-			genState: &types.GenesisState{
-				LimitOrderPoolTotalSharesMapList: []types.LimitOrderPoolTotalSharesMap{
-					{
-						Count: 0,
-					},
-					{
-						Count: 0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "duplicated limitOrderPoolReserveMap",
-			genState: &types.GenesisState{
-				LimitOrderPoolReserveMapList: []types.LimitOrderPoolReserveMap{
-					{
-						Count: 0,
-					},
-					{
-						Count: 0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "duplicated limitOrderPoolFillMap",
-			genState: &types.GenesisState{
-				LimitOrderPoolFillMapList: []types.LimitOrderPoolFillMap{
-					{
-						Count: 0,
-					},
-					{
-						Count: 0,
+						TickIndex: 0,
 					},
 				},
 			},
