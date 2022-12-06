@@ -1,0 +1,140 @@
+{
+  "app_state": {
+    "dex": {
+      "tokensList": [
+        {
+          "id": 0,
+          "address": "tokenA"
+        },
+        {
+          "id": 1,
+          "address": "tokenB"
+        },
+        {
+          "id": 2,
+          "address": "tokenC"
+        },
+        {
+          "id": 3,
+          "address": "tokenD"
+        },
+        {
+          "id": 4,
+          "address": "tokenE"
+        },
+        {
+          "id": 5,
+          "address": "tokenF"
+        },
+        {
+          "id": 6,
+          "address": "tokenG"
+        },
+        {
+          "id": 7,
+          "address": "tokenH"
+        },
+        {
+          "id": 8,
+          "address": "tokenI"
+        },
+        {
+          "id": 9,
+          "address": "tokenJ"
+        },
+        {
+          "id": 10,
+          "address": "tokenK"
+        },
+        {
+          "id": 11,
+          "address": "tokenL"
+        },
+        {
+          "id": 12,
+          "address": "tokenM"
+        },
+        {
+          "id": 13,
+          "address": "tokenN"
+        },
+        {
+          "id": 14,
+          "address": "tokenO"
+        },
+        {
+          "id": 15,
+          "address": "tokenP"
+        },
+        {
+          "id": 16,
+          "address": "tokenQ"
+        },
+        {
+          "id": 17,
+          "address": "tokenR"
+        },
+        {
+          "id": 18,
+          "address": "tokenS"
+        },
+        {
+          "id": 19,
+          "address": "tokenT"
+        },
+        {
+          "id": 20,
+          "address": "tokenU"
+        },
+        {
+          "id": 21,
+          "address": "tokenV"
+        },
+        {
+          "id": 22,
+          "address": "tokenW"
+        },
+        {
+          "id": 23,
+          "address": "tokenX"
+        },
+        {
+          "id": 24,
+          "address": "tokenY"
+        },
+        {
+          "id": 25,
+          "address": "tokenZ"
+        },
+        {
+          "id": 26,
+          "address": "token"
+        },
+        {
+          "id": 27,
+          "address": "stake"
+        }
+      ],
+      "tokensCount": 28,
+      "feeListList": [
+        {
+          "id": 0,
+          "fee": 1
+        },
+        {
+          "id": 1,
+          "fee": 5
+        },
+        {
+          "id": 2,
+          "fee": 30
+        },
+        {
+          "id": 3,
+          "fee": 100
+        }
+      ],
+      "feeListCount": 4
+    }
+  }
+}
