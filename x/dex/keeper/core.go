@@ -11,9 +11,12 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// NOTE: Currently we are using TruncateInt in multiple places for converting Decs back into sdk.Ints. This may create some accounting anomalies but seems preferable to other alternatives. See full ADR here: https://www.notion.so/dualityxyz/A-Modest-Proposal-For-Truncating-696a919d59254876a617f82fb9567895
+// NOTE: Currently we are using TruncateInt in multiple places for converting Decs back into sdk.Ints.
+// This may create some accounting anomalies but seems preferable to other alternatives.
+// See full ADR here: https://www.notion.so/dualityxyz/A-Modest-Proposal-For-Truncating-696a919d59254876a617f82fb9567895
 
-// Handles core logic for MsgDeposit, checking and initializing data structures (tick, pair), calculating shares based on amount deposited, and sending funds to moduleAddress
+// Handles core logic for MsgDeposit, checking and initializing data structures (tick, pair), calculating
+// shares based on amount deposited, and sending funds to moduleAddress
 func (k Keeper) DepositCore(
 	goCtx context.Context,
 	msg *types.MsgDeposit,
@@ -45,7 +48,6 @@ func (k Keeper) DepositCore(
 	for i, amount0 := range amounts0 {
 		amount1 := amounts1[i]
 		tickIndex := msg.TickIndexes[i]
-		price1To0 := CalcPrice1To0(tickIndex)
 		feeIndex := msg.FeeIndexes[i]
 		fee := FeeTier[feeIndex].Fee
 		curTick0to1 := pair.CurrentTick0To1
@@ -65,21 +67,20 @@ func (k Keeper) DepositCore(
 
 		lowerTick := k.GetOrInitTick(goCtx, pairId, lowerTickIndex)
 		upperTick := k.GetOrInitTick(goCtx, pairId, upperTickIndex)
-
-		lowerReserve0 := &lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
-		lowerTotalShares := &lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
-		upperReserve1 := &upperTick.TickData.Reserve1[feeIndex]
-
-		trueAmount0, trueAmount1, sharesMinted := CalcTrueAmounts(
-			price1To0,
-			*lowerReserve0,
-			*upperReserve1,
-			amount0,
-			amount1,
-			*lowerTotalShares,
+		pool := NewPool(
+			pairId,
+			tickIndex,
+			feeIndex,
+			&lowerTick,
+			&upperTick,
 		)
+		oldReserve0 := pool.GetLowerReserve0()
+		oldReserve1 := pool.GetUpperReserve1()
 
-		if trueAmount0.Equal(sdk.ZeroInt()) && trueAmount1.Equal(sdk.ZeroInt()) {
+		inAmount0, inAmount1, outShares := pool.Deposit(amount0, amount1)
+		pool.Save(goCtx, k)
+
+		if inAmount0.Equal(sdk.ZeroInt()) && inAmount1.Equal(sdk.ZeroInt()) {
 			ctx.EventManager().EmitEvent(types.CreateDepositFailedEvent(
 				msg.Creator,
 				msg.Receiver,
@@ -87,26 +88,23 @@ func (k Keeper) DepositCore(
 				token1,
 				fmt.Sprint(tickIndex),
 				fmt.Sprint(tickIndex),
-				lowerReserve0.String(),
-				upperReserve1.String(),
+				oldReserve0.String(),
+				oldReserve1.String(),
 				amount0.String(),
 				amount1.String(),
 			))
 			continue
 		}
 
-		*lowerReserve0 = lowerReserve0.Add(trueAmount0)
-		*lowerTotalShares = lowerTotalShares.Add(sharesMinted)
-		*upperReserve1 = upperReserve1.Add(trueAmount1)
 		k.SetTradingPair(ctx, pair)
-		k.SetTick(ctx, pairId, lowerTick)
-		k.SetTick(ctx, pairId, upperTick)
 
 		k.UpdateTickPointersPostAddToken0(goCtx, &pair, &lowerTick)
 		k.UpdateTickPointersPostAddToken1(goCtx, &pair, &upperTick)
 
-		amounts0Deposited[i] = trueAmount0
-		amounts1Deposited[i] = trueAmount1
+		amounts0Deposited[i] = inAmount0
+		amounts1Deposited[i] = inAmount1
+		totalAmountReserve0 = totalAmountReserve0.Add(inAmount0)
+		totalAmountReserve1 = totalAmountReserve1.Add(inAmount1)
 
 		passedDeposit++
 
@@ -117,16 +115,13 @@ func (k Keeper) DepositCore(
 				PairId:      pairId,
 				TickIndex:   tickIndex,
 				FeeIndex:    feeIndex,
-				SharesOwned: sharesMinted,
+				SharesOwned: outShares,
 			}
 		} else {
-			shares.SharesOwned = shares.SharesOwned.Add(sharesMinted)
+			shares.SharesOwned = shares.SharesOwned.Add(outShares)
 		}
 
 		k.SetShares(ctx, shares)
-
-		totalAmountReserve0 = totalAmountReserve0.Add(trueAmount0)
-		totalAmountReserve1 = totalAmountReserve1.Add(trueAmount1)
 
 		ctx.EventManager().EmitEvent(types.CreateDepositEvent(
 			msg.Creator,
@@ -135,13 +130,12 @@ func (k Keeper) DepositCore(
 			token1,
 			fmt.Sprint(msg.TickIndexes[i]),
 			fmt.Sprint(msg.FeeIndexes[i]),
-			lowerReserve0.Sub(trueAmount0).String(),
-			upperReserve1.Sub(trueAmount1).String(),
-			lowerReserve0.String(),
-			upperReserve1.String(),
-			sharesMinted.String(),
-		),
-		)
+			pool.GetLowerReserve0().Sub(inAmount0).String(),
+			pool.GetUpperReserve1().Sub(inAmount1).String(),
+			pool.GetLowerReserve0().String(),
+			pool.GetUpperReserve1().String(),
+			outShares.String(),
+		))
 	}
 
 	if passedDeposit == 0 {
@@ -194,6 +188,9 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			return types.ErrValidShareNotFound
 		}
 		userSharesOwned := &shareOwner.SharesOwned
+		if userSharesOwned.LT(sharesToRemove) {
+			return types.ErrNotEnoughShares
+		}
 
 		feeValue, found := k.GetFeeTier(ctx, feeIndex)
 		if !found {
@@ -208,36 +205,30 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			return types.ErrValidTickNotFound
 		}
 
-		lowerTickFeeTotalShares := &lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
-		lowerTickFeeReserve0 := &lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
-		upperTickFeeReserve1 := &upperTick.TickData.Reserve1[feeIndex]
-		if lowerTickFeeTotalShares.Equal(sdk.ZeroInt()) {
-			return types.ErrNotEnoughShares
+		pool := NewPool(
+			pairId,
+			tickIndex,
+			feeIndex,
+			&lowerTick,
+			&upperTick,
+		)
+		outAmount0, outAmount1, err := pool.Withdraw(sharesToRemove)
+		if err != nil {
+			return err
 		}
+		pool.Save(goCtx, k)
 
-		sharesToRemoveDec := sdk.MinInt(sharesToRemove, *userSharesOwned).ToDec()
-		ownershipRatio := sharesToRemoveDec.Quo(lowerTickFeeTotalShares.ToDec())
-		// See top NOTE on rounding
-		reserve1ToRemove := ownershipRatio.MulInt(*upperTickFeeReserve1).TruncateInt()
-		reserve0ToRemove := ownershipRatio.MulInt(*lowerTickFeeReserve0).TruncateInt()
-
-		*lowerTickFeeReserve0 = lowerTickFeeReserve0.Sub(reserve0ToRemove)
-		*upperTickFeeReserve1 = upperTickFeeReserve1.Sub(reserve1ToRemove)
-		*lowerTickFeeTotalShares = lowerTickFeeTotalShares.Sub(sharesToRemove)
 		*userSharesOwned = userSharesOwned.Sub(sharesToRemove)
-
-		totalReserve0ToRemove = totalReserve0ToRemove.Add(reserve0ToRemove)
-		totalReserve1ToRemove = totalReserve1ToRemove.Add(reserve1ToRemove)
-
 		k.SetShares(ctx, shareOwner)
-		k.SetTick(ctx, pairId, upperTick)
-		k.SetTick(ctx, pairId, lowerTick)
 
-		if totalReserve0ToRemove.GT(sdk.ZeroInt()) {
+		totalReserve0ToRemove = totalReserve0ToRemove.Add(outAmount0)
+		totalReserve1ToRemove = totalReserve1ToRemove.Add(outAmount1)
+
+		if outAmount0.GT(sdk.ZeroInt()) {
 			k.UpdateTickPointersPostRemoveToken0(goCtx, &pair, &lowerTick)
 		}
 
-		if totalReserve1ToRemove.GT(sdk.ZeroInt()) {
+		if outAmount1.GT(sdk.ZeroInt()) {
 			k.UpdateTickPointersPostRemoveToken1(goCtx, &pair, &upperTick)
 		}
 
@@ -248,10 +239,10 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			token1,
 			fmt.Sprint(msg.TickIndexes[i]),
 			fmt.Sprint(msg.FeeIndexes[i]),
-			lowerTickFeeReserve0.Add(reserve0ToRemove).String(),
-			upperTickFeeReserve1.Add(reserve1ToRemove).String(),
-			lowerTickFeeReserve0.String(),
-			upperTickFeeReserve1.String(),
+			pool.LowerTick0.TickData.Reserve0AndShares[feeIndex].Reserve0.Add(outAmount0).String(),
+			pool.UpperTick1.TickData.Reserve1[feeIndex].Add(outAmount1).String(),
+			pool.LowerTick0.TickData.Reserve0AndShares[feeIndex].Reserve0.String(),
+			pool.UpperTick1.TickData.Reserve1[feeIndex].String(),
 			sharesToRemove.String(),
 		))
 	}
@@ -300,12 +291,12 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		return sdk.ZeroInt(), sdk.ZeroInt(), types.ErrNotEnoughLiquidity
 	}
 
-	amount_left := msg.AmountIn.ToDec()
-	amount_out := sdk.ZeroInt()
+	remainingInAmount0 := msg.AmountIn.ToDec()
+	totalOutAmount1 := sdk.ZeroInt()
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
 	// for !amount_left.Equal(sdk.ZeroInt()) && pair.TokenPair.CurrentTick0To1 <= pair.MaxTick {
-	for !amount_left.Equal(sdk.ZeroDec()) && pair.CurrentTick0To1 <= pair.MaxTick {
+	for !remainingInAmount0.Equal(sdk.ZeroDec()) && pair.CurrentTick0To1 <= pair.MaxTick {
 		Current1Data, Current1Found := k.GetTick(ctx, pairId, pair.CurrentTick0To1)
 		if !Current1Found {
 			pair.CurrentTick0To1++
@@ -314,7 +305,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 		var i uint64 = 0
 
-		for i < feeSize && !amount_left.Equal(sdk.ZeroDec()) {
+		for i < feeSize && remainingInAmount0.GT(sdk.ZeroDec()) {
 			fee := FeeTier[i].Fee
 			Current0Data, found := k.GetTick(ctx, pairId, pair.CurrentTick0To1-2*fee)
 			if !found {
@@ -322,44 +313,31 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				continue
 			}
 
-			price_0to1 := CalcPrice0To1(pair.CurrentTick0To1)
-			currentReserve0 := Current0Data.TickData.Reserve0AndShares[i].Reserve0
-			currentReserve1 := Current1Data.TickData.Reserve1[i]
-			// See top NOTE on rounding
-			amountOutTemp := price_0to1.Mul(amount_left).TruncateInt()
-			amountInTemp := currentReserve1.ToDec().Quo(price_0to1).TruncateInt()
-
-			if amountOutTemp.Add(amount_out).LT(msg.MinOut) {
-				return sdk.ZeroInt(), sdk.ZeroInt(), types.ErrNotEnoughLiquidity
-			}
-
-			if currentReserve1.LT(amountOutTemp) {
-				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = currentReserve0.Add(amountInTemp)
-				Current1Data.TickData.Reserve1[i] = sdk.ZeroInt()
-				amount_out = amount_out.Add(currentReserve1)
-				amount_left = amount_left.Sub(amountInTemp.ToDec())
-
-			} else {
-
-				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = currentReserve0.Add(amount_left.TruncateInt())
-				Current1Data.TickData.Reserve1[i] = currentReserve1.Sub(amountOutTemp)
-				amount_out = amount_out.Add(amountOutTemp)
-				amount_left = sdk.ZeroDec()
-			}
-
-			i++
-
-			//Make updates to Tick containing reserve0/1 data to the KVStore
-			k.SetTick(ctx, pairId, Current0Data)
-			// TODO: Return to this, maybe is receiving the wrong tick
+			pool := NewPool(
+				pairId,
+				pair.CurrentTick0To1-fee,
+				i,
+				&Current0Data,
+				&Current1Data,
+			)
+			inAmount0, outAmount1 := pool.Swap0To1(remainingInAmount0)
+			remainingInAmount0 = remainingInAmount0.Sub(inAmount0)
+			totalOutAmount1 = totalOutAmount1.Add(outAmount1)
+			pool.Save(goCtx, k)
 			k.UpdateTickPointersPostAddToken0(goCtx, &pair, &Current0Data)
+			i++
 		}
 
-		k.SetTick(ctx, pairId, Current1Data)
-		if i == feeSize && amount_left.GT(sdk.ZeroDec()) {
+		if i == feeSize && remainingInAmount0.GT(sdk.ZeroDec()) {
 			var err error
-			amount_left, amount_out, err = k.SwapLimitOrder0to1(goCtx, pairId, token1, amount_out, amount_left, pair.CurrentTick0To1)
-			// err = fmt.Errorf("dummy error for testing")
+			remainingInAmount0, totalOutAmount1, err = k.SwapLimitOrder0to1(
+				goCtx,
+				pairId,
+				token1,
+				totalOutAmount1,
+				remainingInAmount0,
+				pair.CurrentTick0To1,
+			)
 			if err != nil {
 				return sdk.ZeroInt(), sdk.ZeroInt(), err
 			}
@@ -370,17 +348,17 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	k.SetTradingPair(ctx, pair)
 
 	// Check to see if amount_out meets the threshold of minOut
-	if amount_out.LT(msg.MinOut) {
+	if totalOutAmount1.LT(msg.MinOut) {
 		return sdk.ZeroInt(), sdk.ZeroInt(), types.ErrNotEnoughLiquidity
 	}
 
 	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.TokenIn, msg.AmountIn.String(), amount_out.String(), msg.MinOut.String(),
+		token0, token1, msg.TokenIn, msg.AmountIn.String(), totalOutAmount1.String(), msg.MinOut.String(),
 	))
 
 	// Returns amount_out to keeper/msg.server: Swap
 	// @Dev token transfers happen in keeper/msg.server: Swap
-	return amount_out, amount_left.TruncateInt(), nil
+	return totalOutAmount1, remainingInAmount0.TruncateInt(), nil
 }
 
 // Handles core logic for the asset 1 to asset 0 direction of MsgSwap; faciliates swapping amount1 for some amount of amount0, given a specified pair (token0, token1)
@@ -397,9 +375,9 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		return sdk.ZeroInt(), sdk.ZeroInt(), types.ErrNotEnoughLiquidity
 	}
 
-	amount_left := msg.AmountIn.ToDec()
-	amount_out := sdk.ZeroInt()
-	for !amount_left.Equal(sdk.ZeroDec()) && pair.CurrentTick1To0 >= pair.MinTick {
+	remainingInAmount1 := msg.AmountIn.ToDec()
+	totalOutAmount0 := sdk.ZeroInt()
+	for !remainingInAmount1.Equal(sdk.ZeroDec()) && pair.CurrentTick1To0 >= pair.MinTick {
 
 		Current0Data, Current0Found := k.GetTick(ctx, pairId, pair.CurrentTick1To0)
 		if !Current0Found {
@@ -408,50 +386,35 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		}
 
 		var i uint64 = 0
-		for i < feeSize && !amount_left.Equal(sdk.ZeroDec()) {
-			fee := FeeTier[i].Fee
 
+		for i < feeSize && remainingInAmount1.GT(sdk.ZeroDec()) {
+			fee := FeeTier[i].Fee
 			Current1Data, found := k.GetTick(ctx, pairId, pair.CurrentTick1To0+2*fee)
 			if !found {
 				i++
 				continue
 			}
 
-			price_1to0 := CalcPrice1To0(pair.CurrentTick1To0)
-			currentReserve0 := Current0Data.TickData.Reserve0AndShares[i].Reserve0
-			currentReserve1 := Current1Data.TickData.Reserve1[i]
-			// See top NOTE on rounding
-			amountOutTemp := price_1to0.Mul(amount_left).TruncateInt()
-			amountInTemp := currentReserve0.ToDec().Quo(price_1to0).TruncateInt()
-
-			if amountOutTemp.Add(amount_out).LT(msg.MinOut) {
-				return sdk.ZeroInt(), sdk.ZeroInt(), types.ErrNotEnoughLiquidity
-			}
-
-			// If there is not enough to complete the trade
-			if currentReserve0.LT(amountOutTemp) {
-				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = sdk.ZeroInt()
-				Current1Data.TickData.Reserve1[i] = currentReserve1.Add(amountInTemp)
-				amount_out = amount_out.Add(currentReserve0)
-				amount_left = amount_left.Sub(amountInTemp.ToDec())
-			} else {
-				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = currentReserve0.Sub(amountOutTemp)
-				Current1Data.TickData.Reserve1[i] = currentReserve1.Add(amount_left.TruncateInt())
-				amount_out = amount_out.Add(amountOutTemp)
-				amount_left = sdk.ZeroDec()
-			}
-
+			pool := NewPool(
+				pairId,
+				pair.CurrentTick1To0+fee,
+				i,
+				&Current0Data,
+				&Current1Data,
+			)
+			inAmount1, outAmount0 := pool.Swap1To0(remainingInAmount1)
+			remainingInAmount1 = remainingInAmount1.Sub(inAmount1)
+			totalOutAmount0 = totalOutAmount0.Add(outAmount0)
+			pool.Save(goCtx, k)
+			k.UpdateTickPointersPostAddToken1(goCtx, &pair, &Current0Data)
 			i++
-
-			k.SetTick(ctx, pairId, Current1Data)
-			k.UpdateTickPointersPostAddToken1(goCtx, &pair, &Current1Data)
 		}
 
 		k.SetTick(ctx, pairId, Current0Data)
 
-		if i == feeSize && amount_left.GT(sdk.ZeroDec()) {
+		if i == feeSize && remainingInAmount1.GT(sdk.ZeroDec()) {
 			var err error
-			amount_left, amount_out, err = k.SwapLimitOrder1to0(goCtx, pairId, token0, amount_out, amount_left, pair.CurrentTick1To0)
+			remainingInAmount1, totalOutAmount0, err = k.SwapLimitOrder1to0(goCtx, pairId, token0, totalOutAmount0, remainingInAmount1, pair.CurrentTick1To0)
 
 			if err != nil {
 				return sdk.ZeroInt(), sdk.ZeroInt(), err
@@ -462,15 +425,15 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 	k.SetTradingPair(ctx, pair)
 
-	if amount_out.LT(msg.MinOut) {
+	if totalOutAmount0.LT(msg.MinOut) {
 		return sdk.ZeroInt(), sdk.ZeroInt(), types.ErrNotEnoughLiquidity
 	}
 
 	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.TokenIn, msg.AmountIn.String(), amount_out.String(), msg.MinOut.String(),
+		token0, token1, msg.TokenIn, msg.AmountIn.String(), totalOutAmount0.String(), msg.MinOut.String(),
 	))
 
-	return amount_out, amount_left.TruncateInt(), nil
+	return totalOutAmount0, remainingInAmount1.TruncateInt(), nil
 }
 
 // Handles swapping asset 0 for asset 1 through any active limit orders at a specified tick
@@ -847,7 +810,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	ratioFilled := amountFilled.QuoInt(tranche.TotalTokenIn)
 	maxAllowedToWithdraw := sdk.MinInt(
 		ratioFilled.MulInt(trancheUser.SharesOwned).TruncateInt(), // cannot withdraw more than what's been filled
-		trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled), // cannot withdraw more than what you own
+		trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled),  // cannot withdraw more than what you own
 	)
 	amountOutTokenIn := maxAllowedToWithdraw.Sub(trancheUser.SharesWithdrawn)
 

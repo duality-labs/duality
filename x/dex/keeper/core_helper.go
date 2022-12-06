@@ -84,12 +84,6 @@ func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex in
 	return tick
 }
 
-func CalcShares(amount0 sdk.Int, amount1 sdk.Int, priceCenter1To0 sdk.Dec) sdk.Dec {
-	amount0Dec := amount0.ToDec()
-	amount1Dec := amount1.ToDec()
-	return amount0Dec.Add(amount1Dec.Mul(priceCenter1To0))
-}
-
 func (k Keeper) GetOrInitLimitOrderTrancheUser(
 	goCtx context.Context,
 	pairId string,
