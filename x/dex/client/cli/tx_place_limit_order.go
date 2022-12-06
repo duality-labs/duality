@@ -17,7 +17,7 @@ func CmdPlaceLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "place-limit-order [receiver] [token-a] [token-b] [tick-index] [token-in] [amount-in]",
 		Short: "Broadcast message PlaceLimitOrder",
-		Args:  cobra.ExactArgs(5),
+		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
 			argTokenA := args[1]

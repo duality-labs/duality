@@ -2,6 +2,7 @@ package cli
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -15,9 +16,6 @@ var _ = strconv.Itoa(0)
 
 func CmdWithdrawl() *cobra.Command {
 
-	var sharesToRemove []string
-	var TicksIndexes []string
-	var FeesIndexes []string
 	cmd := &cobra.Command{
 		Use:   "withdrawl [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fee indexes] ",
 		Short: "Broadcast message withdrawl",
@@ -27,20 +25,24 @@ func CmdWithdrawl() *cobra.Command {
 			argTokenA := args[1]
 			argTokenB := args[2]
 
-			var sharesToRemoveDec []sdk.Dec
+			argSharesToRemove := strings.Split(args[3], ",")
+			argTickIndexes := strings.Split(args[4], ",")
+			argFeeIndexes := strings.Split(args[5], ",")
+
+			var SharesToRemoveDec []sdk.Dec
 			var TicksIndexesInt []int64
 			var FeeIndexesUint []uint64
-			for _, s := range sharesToRemove {
+			for _, s := range argSharesToRemove {
 				sharesDec, err := sdk.NewDecFromStr(s)
 
 				if err != nil {
 					return err
 				}
 
-				sharesToRemoveDec = append(sharesToRemoveDec, sharesDec)
+				SharesToRemoveDec = append(SharesToRemoveDec, sharesDec)
 			}
 
-			for _, s := range TicksIndexes {
+			for _, s := range argTickIndexes {
 				TickIndexInt, err := strconv.Atoi(s)
 
 				if err != nil {
@@ -51,7 +53,7 @@ func CmdWithdrawl() *cobra.Command {
 
 			}
 
-			for _, s := range FeesIndexes {
+			for _, s := range argFeeIndexes {
 				FeeIndexInt, err := strconv.Atoi(s)
 
 				if err != nil {
@@ -71,7 +73,7 @@ func CmdWithdrawl() *cobra.Command {
 				argReceiver,
 				argTokenA,
 				argTokenB,
-				sharesToRemoveDec,
+				SharesToRemoveDec,
 				TicksIndexesInt,
 				FeeIndexesUint,
 			)
@@ -83,9 +85,6 @@ func CmdWithdrawl() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-	cmd.Flags().StringArrayVarP(&sharesToRemove, "sharesToRemove", "r", []string{}, "")
-	cmd.Flags().StringArrayVarP(&TicksIndexes, "ticksIndexes", "t", []string{}, "")
-	cmd.Flags().StringArrayVarP(&FeesIndexes, "feeIndexes", "f", []string{}, "")
 
 	return cmd
 }

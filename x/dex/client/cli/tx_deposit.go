@@ -15,10 +15,6 @@ import (
 var _ = strconv.Itoa(0)
 
 func CmdDeposit() *cobra.Command {
-	var argAmountsA []string
-	var argAmountsB []string
-	var argTicksIndexes []string
-	var argFeesIndexes []string
 
 	cmd := &cobra.Command{
 		Use:   "deposit [receiver] [token-a] [token-b] [list of amount-0] [list of amount-1] [list of tick-index] [list of fee] ",
@@ -102,11 +98,6 @@ func CmdDeposit() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
-	cmd.Flags().StringArrayVarP(&argAmountsA, "amountA", "0", []string{}, "")
-	cmd.Flags().StringArrayVarP(&argAmountsB, "amountB", "1", []string{}, "")
-	cmd.Flags().StringArrayVarP(&argTicksIndexes, "ticksIndexes", "t", []string{}, "")
-	cmd.Flags().StringArrayVarP(&argFeesIndexes, "feeIndexes", "f", []string{}, "")
 
 	return cmd
 }

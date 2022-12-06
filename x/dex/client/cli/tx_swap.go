@@ -15,9 +15,9 @@ var _ = strconv.Itoa(0)
 
 func CmdSwap() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "swap [receiver] [amount-in] [tokenA] [tokenB] [token-in] [slippage-tolerance] [minOut] ",
+		Use:   "swap [receiver] [amount-in] [tokenA] [tokenB] [token-in] [minOut] ",
 		Short: "Broadcast message swap",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
 			argAmountIn := args[1]
