@@ -23,10 +23,10 @@ func createNLimitOrderTranche(keeper *keeper.Keeper, ctx sdk.Context, pairId str
 			PairId:           pairId,
 			TickIndex:        tickIndex,
 			TokenIn:          token,
-			ReservesTokenIn:  sdk.ZeroDec(),
-			ReservesTokenOut: sdk.ZeroDec(),
-			TotalTokenIn:     sdk.ZeroDec(),
-			TotalTokenOut:    sdk.ZeroDec(),
+			ReservesTokenIn:  sdk.ZeroInt(),
+			ReservesTokenOut: sdk.ZeroInt(),
+			TotalTokenIn:     sdk.ZeroInt(),
+			TotalTokenOut:    sdk.ZeroInt(),
 		}
 		keeper.SetLimitOrderTranche(ctx, items[i])
 	}

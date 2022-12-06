@@ -46,7 +46,7 @@ func sortCoins(s *MsgServerTestSuite, denomA string, denomB string, amountsA []s
 }
 
 // TODO: this was taken from core.go, lines 287-294. should be moved to utils somewhere
-func min(a, b sdk.Dec) sdk.Dec {
+func min(a, b sdk.Int) sdk.Int {
 	if a.LT(b) {
 		return a
 	}

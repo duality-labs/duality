@@ -20,10 +20,10 @@ func (k Keeper) GetOrInitLimitOrderTranche(
 			TickIndex:        tickIndex,
 			TokenIn:          tokenIn,
 			PairId:           pairId,
-			ReservesTokenIn:  sdk.ZeroDec(),
-			ReservesTokenOut: sdk.ZeroDec(),
-			TotalTokenIn:     sdk.ZeroDec(),
-			TotalTokenOut:    sdk.ZeroDec(),
+			ReservesTokenIn:  sdk.ZeroInt(),
+			ReservesTokenOut: sdk.ZeroInt(),
+			TotalTokenIn:     sdk.ZeroInt(),
+			TotalTokenOut:    sdk.ZeroInt(),
 		}
 		k.SetLimitOrderTranche(ctx, tranche)
 	}

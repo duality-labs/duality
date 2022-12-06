@@ -22,22 +22,23 @@ func CmdSwap() *cobra.Command {
 			argReceiver := args[0]
 			argAmountIn := args[1]
 
-			argAmountInDec, err := sdk.NewDecFromStr(argAmountIn)
-
+			amountInInt, err := strconv.Atoi(argAmountIn)
 			if err != nil {
 				return err
 			}
+
+			amountIn := sdk.NewInt(int64(amountInInt))
 
 			argTokenA := args[2]
 			argTokenB := args[3]
 			argTokenIn := args[4]
-			argminOut := args[5]
+			argMinOut := args[5]
 
-			argminOutDec, err := sdk.NewDecFromStr(argminOut)
-
+			minOutInt, err := strconv.Atoi(argMinOut)
 			if err != nil {
 				return err
 			}
+			minOut := sdk.NewInt(int64(minOutInt))
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -48,9 +49,9 @@ func CmdSwap() *cobra.Command {
 				clientCtx.GetFromAddress().String(),
 				argTokenA,
 				argTokenB,
-				argAmountInDec,
+				amountIn,
 				argTokenIn,
-				argminOutDec,
+				minOut,
 				argReceiver,
 			)
 			if err := msg.ValidateBasic(); err != nil {
