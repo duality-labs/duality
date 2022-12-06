@@ -102,7 +102,7 @@
         "tokensList": [],
         "tokensCount": "0",
         "tokenMapList": [],
-        "inactiveLimitOrderTrancheList": [],
+        "inactiveLimitOrderTrancheList": []
     },
     "distribution": {
       "params": {
