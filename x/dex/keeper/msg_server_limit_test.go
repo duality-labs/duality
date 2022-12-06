@@ -103,28 +103,28 @@ func (s *MsgServerTestSuite) TestFailInsufficientBalance() {
 }
 
 func (s *MsgServerTestSuite) TestMultiTickLimitOrder1to0WithWithdraw() {
-	s.fundAliceBalances(100, 500)
-	s.fundBobBalances(100, 200)
+	s.fundAliceBalances(100000, 500000)
+	s.fundBobBalances(100000, 200000)
 
-	s.aliceLimitSells("TokenB", 1, 25)
-	s.aliceLimitSells("TokenB", 0, 25)
-	s.aliceLimitSells("TokenB", -1, 25)
-	s.bobMarketSells("TokenA", 40, 30)
+	s.aliceLimitSells("TokenB", 1, 25000)
+	s.aliceLimitSells("TokenB", 0, 25000)
+	s.aliceLimitSells("TokenB", -1, 25000)
+	s.bobMarketSells("TokenA", 40000, 30000)
 
-	// limit order at -1: (25 * 1.0001^-1) A<=>B 25
-	// limit order at 0: (40 - (25 * 1.0001^-1)) A<=>B (40 - (25 * 1.0001^-1)) * 1.0001^0
-	s.assertAliceBalances(100, 425)
-	s.assertBobBalances(60, 240)
+	// limit order at -1: (25000 * 1.0001^-1) A<=>B 25000
+	// limit order at 0: (40000 - (25000 * 1.0001^-1)) A<=>B (40000 - (25000 * 1.0001^-1)) * 1.0001^0
+	s.assertAliceBalances(100000, 425000)
+	s.assertBobBalancesInt(sdk.NewInt(60000), sdk.NewInt(240002))
 
 	s.aliceWithdrawsLimitSell("TokenB", 0, 0)
 
-	s.assertAliceBalances(115, 425)
-	s.assertBobBalances(60, 240)
+	s.assertAliceBalancesInt(sdk.NewInt(115002), sdk.NewInt(425000))
+	s.assertBobBalancesInt(sdk.NewInt(60000), sdk.NewInt(240002))
 
 	s.aliceWithdrawsLimitSell("TokenB", -1, 0)
 
-	s.assertAliceBalancesEpsilon(sdk.NewInt(140), sdk.NewInt(425))
-	s.assertBobBalances(60, 240)
+	s.assertAliceBalancesEpsilon(sdk.NewInt(140000), sdk.NewInt(425000))
+	s.assertBobBalancesInt(sdk.NewInt(60000), sdk.NewInt(240002))
 }
 
 func (s *MsgServerTestSuite) TestLimitOrderOverdraw() {
@@ -179,19 +179,19 @@ func (s *MsgServerTestSuite) TestLimitOrderOverdraw() {
 }
 
 func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
-	s.fundAliceBalances(100000, 500)
-	s.fundBobBalances(100, 200)
+	s.fundAliceBalances(100000000, 500000)
+	s.fundBobBalances(100000, 200000)
 
 	//Alices balance for TokenA should be 100000 - 25 - 25 = 99950
 	//Alices limit orders can be traded through at a price_1to0, 1 and 1.0001
-	s.aliceLimitSells("TokenA", 0, 25)
-	s.aliceLimitSells("TokenA", 1, 25)
+	s.aliceLimitSells("TokenA", 0, 25000)
+	s.aliceLimitSells("TokenA", 1, 25000)
 
-	s.assertAliceBalances(99950, 500)
-	s.assertBobBalances(100, 200)
-	s.assertDexBalances(50, 0)
+	s.assertAliceBalances(99950000, 500000)
+	s.assertBobBalances(100000, 200000)
+	s.assertDexBalances(50000, 0)
 
-	testing_scripts.MultipleLimitOrderFills([]sdk.Int{sdk.NewInt(25), sdk.NewInt(25)}, []sdk.Dec{sdk.MustNewDecFromStr("1.0001"), sdk.NewDec(1)}, sdk.NewInt(40))
+	testing_scripts.MultipleLimitOrderFills([]sdk.Int{sdk.NewInt(25000), sdk.NewInt(25000)}, []sdk.Dec{sdk.MustNewDecFromStr("1.0001"), sdk.NewDec(1)}, sdk.NewInt(40000))
 
 	//Bobs balance for TokenB should be 200 - 40 = 160
 	//Tick 1 should be a swap of 25 / 1.0001 TokenB (1) for 25 of TokenA (0) exhausting all the liquidity
@@ -200,25 +200,24 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	// This is because the price is 1
 	//Bobs balance for TokenA should be (1 * 15.002499750024999) + (1.0001 * 24.997500249975) + 100 = 140.002499750024997500
 	//DEX Balance should be 50 - (1 * 9.997500249975002500) - (1.0001 * 24.997500249975002500) = 9.997500249975002500
-	s.bobMarketSells("TokenB", 40, 30)
+	s.bobMarketSells("TokenB", 40000, 30000)
 
-	s.assertAliceBalances(99950, 500)
-	// NOTE: this might be conerning. According to old math above bob's balance should be 140.002... and dex balanance should be 9.99... but because of rounding Dex loses ~1 token and bob gets an extra token
-	s.assertBobBalances(140, 160)
-	s.assertDexBalances(10, 40)
+	s.assertAliceBalances(99950000, 500000)
+	s.assertBobBalancesInt(sdk.NewInt(140002), sdk.NewInt(160000))
+	s.assertDexBalancesEpsilon(sdk.NewInt(9997), sdk.NewInt(40000))
 
 	s.aliceWithdrawsLimitSell("TokenA", 1, 0)
 
-	s.assertAliceBalancesEpsilon(sdk.NewInt(99950), sdk.NewInt(525))
-	s.assertBobBalances(140, 160)
+	s.assertAliceBalancesInt(sdk.NewInt(99950000), sdk.NewInt(524997))
+	s.assertBobBalancesInt(sdk.NewInt(140002), sdk.NewInt(160000))
 	//40 - 24.997500249975002500 = 15.0024997500249975
-	s.assertDexBalancesEpsilon(sdk.NewInt(10), sdk.NewInt(15))
+	s.assertDexBalancesEpsilon(sdk.NewInt(9997), sdk.NewInt(15002))
 
 	s.aliceWithdrawsLimitSell("TokenA", 0, 0)
 
-	s.assertAliceBalancesEpsilon(sdk.NewInt(99950), sdk.NewInt(540))
-	s.assertBobBalancesEpsilon(sdk.NewInt(140), sdk.NewInt(160))
-	s.assertDexBalancesEpsilon(sdk.NewInt(10), sdk.NewInt(0))
+	s.assertAliceBalancesEpsilon(sdk.NewInt(99950000), sdk.NewInt(540000))
+	s.assertBobBalancesInt(sdk.NewInt(140002), sdk.NewInt(160000))
+	s.assertDexBalancesEpsilon(sdk.NewInt(9997), sdk.NewInt(0))
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFailsWhenNothingToWithdraw() {
