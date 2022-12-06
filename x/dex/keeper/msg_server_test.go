@@ -729,7 +729,7 @@ func (s *MsgServerTestSuite) assertAccountLimitLiquidityAtTick(account sdk.AccAd
 	userShares, totalShares := s.getLimitUserSharesAtTick(account, selling, tickIndex), s.getLimitTotalSharesAtTick(selling, tickIndex)
 	userRatio := userShares.QuoInt(totalShares)
 	// assert enough liq
-	userLiquidity := userRatio.MulInt64(int64(amount)).RoundInt()
+	userLiquidity := userRatio.MulInt64(int64(amount)).TruncateInt()
 	s.assertLimitLiquidityAtTick(selling, tickIndex, userLiquidity.Int64())
 }
 
@@ -886,13 +886,13 @@ func calculateSingleSwap(price sdk.Dec, tickLiquidity int64, tickLimitOrderLiqui
 func calculateSwap(price sdk.Dec, liquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
 	amountInInt := sdk.NewInt(amountIn)
 	liquidityInt := sdk.NewInt(liquidity)
-	if tmpAmountOut := price.MulInt(amountInInt).RoundInt(); tmpAmountOut.LT(liquidityInt) {
+	if tmpAmountOut := price.MulInt(amountInInt).TruncateInt(); tmpAmountOut.LT(liquidityInt) {
 		// fmt.Printf("sufficient tmpOut %s\n", tmpAmountOut)
 		// sufficient liquidity
 		return sdk.ZeroInt(), tmpAmountOut
 	} else {
 		// only sufficient for part of amountIn
-		tmpAmountIn := liquidityInt.ToDec().Quo(price).RoundInt()
+		tmpAmountIn := liquidityInt.ToDec().Quo(price).TruncateInt()
 		// fmt.Printf("insufficient tmpIn %s\n", tmpAmountIn)
 		return amountInInt.Sub(tmpAmountIn), liquidityInt
 	}

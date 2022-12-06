@@ -218,8 +218,8 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		sharesToRemove = MinDec(sharesToRemove, *userSharesOwned)
 		ownershipRatio := sharesToRemove.Quo(*lowerTickFeeTotalShares)
 		// See top NOTE on rounding
-		reserve1ToRemove := ownershipRatio.MulInt(*upperTickFeeReserve1).RoundInt()
-		reserve0ToRemove := ownershipRatio.MulInt(*lowerTickFeeReserve0).RoundInt()
+		reserve1ToRemove := ownershipRatio.MulInt(*upperTickFeeReserve1).TruncateInt()
+		reserve0ToRemove := ownershipRatio.MulInt(*lowerTickFeeReserve0).TruncateInt()
 
 		*lowerTickFeeReserve0 = lowerTickFeeReserve0.Sub(reserve0ToRemove)
 		*upperTickFeeReserve1 = upperTickFeeReserve1.Sub(reserve1ToRemove)
@@ -326,8 +326,8 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			currentReserve0 := Current0Data.TickData.Reserve0AndShares[i].Reserve0
 			currentReserve1 := Current1Data.TickData.Reserve1[i]
 			// See top NOTE on rounding
-			amountOutTemp := price_0to1.MulInt(amount_left).RoundInt()
-			amountInTemp := currentReserve1.ToDec().Quo(price_0to1).RoundInt()
+			amountOutTemp := price_0to1.MulInt(amount_left).TruncateInt()
+			amountInTemp := currentReserve1.ToDec().Quo(price_0to1).TruncateInt()
 
 			if amountOutTemp.Add(amount_out).LT(msg.MinOut) {
 				return sdk.ZeroInt(), sdk.ZeroInt(), types.ErrNotEnoughLiquidity
@@ -421,8 +421,8 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			currentReserve0 := Current0Data.TickData.Reserve0AndShares[i].Reserve0
 			currentReserve1 := Current1Data.TickData.Reserve1[i]
 			// See top NOTE on rounding
-			amountOutTemp := price_1to0.MulInt(amount_left).RoundInt()
-			amountInTemp := currentReserve0.ToDec().Quo(price_1to0).RoundInt()
+			amountOutTemp := price_1to0.MulInt(amount_left).TruncateInt()
+			amountInTemp := currentReserve0.ToDec().Quo(price_1to0).TruncateInt()
 
 			if amountOutTemp.Add(amount_out).LT(msg.MinOut) {
 				return sdk.ZeroInt(), sdk.ZeroInt(), types.ErrNotEnoughLiquidity
@@ -628,10 +628,10 @@ func (k Keeper) SwapLimitOrderTranche(
 	fillTokenIn := &tranche.ReservesTokenOut
 	totalTokenIn := &tranche.TotalTokenOut
 	// See top NOTE on rounding
-	amountFilledTokenOut := priceInToOut.MulInt(amountRemainingTokenIn).RoundInt()
+	amountFilledTokenOut := priceInToOut.MulInt(amountRemainingTokenIn).TruncateInt()
 	if reservesTokenOut.LTE(amountFilledTokenOut) {
 		amountOut = amountOut.Add(*reservesTokenOut)
-		amountFilledTokenIn := priceOutToIn.MulInt(*reservesTokenOut).RoundInt()
+		amountFilledTokenIn := priceOutToIn.MulInt(*reservesTokenOut).TruncateInt()
 		amountRemainingTokenIn = amountRemainingTokenIn.Sub(amountFilledTokenIn)
 		*reservesTokenOut = sdk.ZeroInt()
 		*fillTokenIn = fillTokenIn.Add(amountFilledTokenIn)
@@ -761,12 +761,13 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	k.SetLimitOrderTrancheUser(ctx, trancheUser)
 
 	// See top NOTE on rounding
-	tranche.ReservesTokenIn = tranche.ReservesTokenIn.Sub(attemptedSharesOut.RoundInt())
+	attemptedSharesOutInt := attemptedSharesOut.TruncateInt()
+	tranche.ReservesTokenIn = tranche.ReservesTokenIn.Sub(attemptedSharesOutInt)
 	k.SetLimitOrderTranche(ctx, tranche)
 
 	if attemptedSharesOut.GT(sdk.ZeroDec()) {
 		// See top NOTE on rounding
-		coinOut := sdk.NewCoin(msg.KeyToken, attemptedSharesOut.RoundInt())
+		coinOut := sdk.NewCoin(msg.KeyToken, attemptedSharesOutInt)
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
@@ -858,11 +859,11 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	k.SetLimitOrderTrancheUser(ctx, trancheUser)
 
 	// See top NOTE on rounding
-	tranche.ReservesTokenOut = reservesTokenOutDec.Sub(amountOutTokenOut).RoundInt()
+	tranche.ReservesTokenOut = reservesTokenOutDec.Sub(amountOutTokenOut).TruncateInt()
 	k.SetLimitOrderTranche(ctx, tranche)
 
 	if amountOutTokenOut.GT(sdk.ZeroDec()) {
-		coinOut := sdk.NewCoin(orderTokenOut, amountOutTokenOut.RoundInt())
+		coinOut := sdk.NewCoin(orderTokenOut, amountOutTokenOut.TruncateInt())
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
