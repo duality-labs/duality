@@ -1,0 +1,77 @@
+{
+    "$schema": "../chain.schema.json",
+    "chain_name": "duality-testnet",
+    "status": "upcoming",
+    "website": "https://duality.xyz/",
+    "network_type": "testnet",
+    "pretty_name": "Duality",
+    "chain_id": "duality-testnet-1",
+    "bech32_prefix": "duality",
+    "daemon_name": "dualityd",
+    "node_home": "/root/.dualityd",
+    "genesis": {
+        "genesis_url": "https://raw.githubusercontent.com/duality-labs/duality/main/networks/duality-testnet-1/genesis.json"
+    },
+    "key_algos": [
+        "secp256k1"
+    ],
+    "slip44": 118,
+    "fees": {
+        "fee_tokens": [
+            {
+                "denom": "token",
+                "fixed_min_gas_price": 0,
+                "low_gas_price": 0,
+                "average_gas_price": 0.025,
+                "high_gas_price": 0.04
+            }
+        ]
+    },
+    "staking": {
+        "staking_tokens": [
+            {
+                "denom": "stake"
+            }
+        ]
+    },
+    "codebase": {
+        "git_repo": "https://github.com/duality-labs/duality",
+        "recommended_version": "v0.0.1",
+        "compatible_versions": [
+            "v0.0.1"
+        ],
+        "binaries": {},
+        "cosmos_sdk_version": "0.45.4",
+        "tendermint_version": "0.34.19",
+        "cosmwasm_enabled": false
+    },
+    "peers": {
+        "seeds": [],
+        "persistent_peers": [
+            {
+                "id": "744733f7c98193f06a942b5acdb2120442388946",
+                "address": "54.213.155.190:26656",
+                "provider": "duality-dev"
+            }
+        ]
+    },
+    "apis": {
+        "rpc": [
+            {
+                "address": "https://rpc.dev.duality.xyz",
+                "provider": "duality-dev"
+            }
+        ],
+        "rest": [
+            {
+                "address": "https://lcd.dev.duality.xyz",
+                "provider": "duality-dev"
+            }
+        ]
+    },
+    "explorers": [],
+    "logo_URIs": {},
+    "keywords": [
+        "duality"
+    ]
+}
