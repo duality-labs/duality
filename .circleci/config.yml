@@ -42,7 +42,8 @@ jobs:
       - run:
           name: Ensure ignite has not generated changes which have not been commited to VC
           command: |
-            CHANGES=$(git ls-files -m)
+            # NOTE: we are excluding openapi.yml from the new file check since it does not get generated predictably
+            CHANGES=$(git ls-files -m | grep -v "docs/static/openapi.yml")
             [[ -n "$CHANGES" ]] && { echo "Untracked files created by ignite:\n$CHANGES" ; exit 1; }\
             || { echo "No new files detected" ; exit 0; }
       - store_artifacts:
