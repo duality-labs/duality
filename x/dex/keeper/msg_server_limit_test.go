@@ -208,7 +208,7 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 
 	s.aliceWithdrawsLimitSell("TokenA", 1, 0)
 
-	s.assertAliceBalancesInt(sdk.NewInt(99950000), sdk.NewInt(524997))
+	s.assertAliceBalancesEpsilon(sdk.NewInt(99950000), sdk.NewInt(524997))
 	s.assertBobBalancesInt(sdk.NewInt(140002), sdk.NewInt(160000))
 	//40 - 24.997500249975002500 = 15.0024997500249975
 	s.assertDexBalancesEpsilon(sdk.NewInt(9997), sdk.NewInt(15002))

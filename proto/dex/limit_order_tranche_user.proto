@@ -12,19 +12,19 @@ message LimitOrderTrancheUser {
   string address = 5; 
   string sharesOwned = 6  [
       (gogoproto.moretags)   = "yaml:\"sharesOwned\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "sharesOwned"
   ];  
   string sharesWithdrawn = 7  [
       (gogoproto.moretags)   = "yaml:\"sharesWithdrawn\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "sharesWithdrawn"
   ]; 
   string sharesCancelled = 8  [
       (gogoproto.moretags)   = "yaml:\"sharesCancelled\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "sharesCancelled"
   ]; 

@@ -72,7 +72,7 @@ func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex in
 			LimitOrderTranche1To0: &types.LimitTrancheIndexes{0, 0},
 		}
 		for i := 0; i < int(numFees); i++ {
-			tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroDec()}
+			tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroInt()}
 			tick.TickData.Reserve1[i] = sdk.ZeroInt()
 		}
 		k.SetTick(ctx, pairId, tick)
@@ -106,9 +106,9 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 		return types.LimitOrderTrancheUser{
 			Count:           currentLimitOrderKey,
 			Address:         receiver,
-			SharesOwned:     sdk.ZeroDec(),
-			SharesWithdrawn: sdk.ZeroDec(),
-			SharesCancelled: sdk.ZeroDec(),
+			SharesOwned:     sdk.ZeroInt(),
+			SharesWithdrawn: sdk.ZeroInt(),
+			SharesCancelled: sdk.ZeroInt(),
 			TickIndex:       tickIndex,
 			Token:           tokenIn,
 			PairId:          pairId,
@@ -230,8 +230,8 @@ func CalcTrueAmounts(
 	upperReserve1 sdk.Int,
 	amount0 sdk.Int,
 	amount1 sdk.Int,
-	totalShares sdk.Dec,
-) (trueAmount0 sdk.Int, trueAmount1 sdk.Int, sharesMinted sdk.Dec) {
+	totalShares sdk.Int,
+) (trueAmount0 sdk.Int, trueAmount1 sdk.Int, sharesMinted sdk.Int) {
 	lowerReserve0Dec := lowerReserve0.ToDec()
 	upperReserve1Dec := upperReserve1.ToDec()
 	amount0Dec := amount0.ToDec()
@@ -257,9 +257,9 @@ func CalcTrueAmounts(
 	valueMintedToken0 := CalcShares(trueAmount0, trueAmount1, centerTickPrice1To0)
 	valueExistingToken0 := CalcShares(lowerReserve0, upperReserve1, centerTickPrice1To0)
 	if valueExistingToken0.GT(sdk.ZeroDec()) {
-		sharesMinted = valueMintedToken0.Quo(valueExistingToken0).Mul(totalShares)
+		sharesMinted = valueMintedToken0.Quo(valueExistingToken0).MulInt(totalShares).TruncateInt()
 	} else {
-		sharesMinted = valueMintedToken0
+		sharesMinted = valueMintedToken0.TruncateInt()
 	}
 	return
 }

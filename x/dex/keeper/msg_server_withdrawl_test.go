@@ -20,7 +20,7 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlFull() {
 	s.Assert().NoError(err)
 
 	// THEN assert alice gets 100TokenA & 150TokenB; Dex retains no balance; No active Ticks
-	s.assertAliceShares(0, 0, sdk.NewDec(0))
+	s.assertAliceShares(0, 0, sdk.NewInt(0))
 	s.assertAliceBalances(100, 50)
 	s.assertDexBalances(0, 0)
 }
@@ -36,7 +36,7 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlPartial() {
 	s.Assert().NoError(err)
 
 	// THEN Alice gets half her deposit back; Dex retains half
-	s.assertAliceShares(0, 0, sdk.NewDec(75))
+	s.assertAliceShares(0, 0, sdk.NewInt(75))
 	s.assertAliceBalances(50, 25)
 	s.assertDexBalances(50, 25)
 	// CurrentTick values remain unchanged
@@ -53,7 +53,7 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlMaxFee() {
 	s.aliceWithdraws(NewWithdrawl(50, 0, 3))
 
 	// THEN Alice gets 50 TokenA back and Dex retains balance of 50
-	s.assertAliceShares(0, 3, sdk.NewDec(50))
+	s.assertAliceShares(0, 3, sdk.NewInt(50))
 	s.assertAliceBalances(50, 0)
 	s.assertDexBalances(50, 0)
 }
@@ -68,7 +68,7 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlSingleSide() {
 	s.aliceWithdraws(NewWithdrawl(100, 0, 0))
 
 	// THEN Alice gets 100TokenA back; Dex retains no balance; No Active Ticks
-	s.assertAliceShares(0, 0, sdk.NewDec(0))
+	s.assertAliceShares(0, 0, sdk.NewInt(0))
 	s.assertAliceBalances(100, 0)
 	s.assertDexBalances(0, 0)
 
@@ -109,8 +109,8 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlShiftsTickLeft() {
 		sdk.NewInt(0),
 		sdk.NewInt(100),
 		keeper.CalcPrice1To0(1),
-	)
-	s.aliceWithdraws(NewWithdrawlDec(sharesToWithdraw, 1, 0))
+	).TruncateInt()
+	s.aliceWithdraws(NewWithdrawlInt(sharesToWithdraw, 1, 0))
 
 	// THEN currentTick0To1 = 0
 	s.assertCurrentTicks(math.MinInt64, 3)
@@ -162,7 +162,7 @@ func (s *MsgServerTestSuite) TestWithdrawalFailsWhenNotEnoughShares() {
 
 	// THEN ensure error is thrown and Alice and Dex balances remain unchanged
 	s.Assert().ErrorIs(err, types.ErrNotEnoughShares)
-	s.assertAliceShares(0, 0, sdk.NewDec(100))
+	s.assertAliceShares(0, 0, sdk.NewInt(100))
 	s.assertAliceBalances(0, 0)
 }
 
@@ -195,7 +195,7 @@ func (s *MsgServerTestSuite) TestWithdrawalFailsWithNonExistentPair() {
 		Receiver:       s.alice.String(),
 		TokenA:         "TokenX",
 		TokenB:         "TokenZ",
-		SharesToRemove: []sdk.Dec{sdk.NewDec(10)},
+		SharesToRemove: []sdk.Int{sdk.NewInt(10)},
 		TickIndexes:    []int64{0},
 		FeeIndexes:     []uint64{0},
 	})
@@ -217,7 +217,7 @@ func (s *MsgServerTestSuite) TestWithdrawalFailsWithInvalidTick() {
 
 	// NOTE: See above NOTE on error condition from TestFailsWithNonExistentPair
 	s.Assert().ErrorIs(err, types.ErrNotEnoughShares)
-	s.assertAliceShares(0, 0, sdk.NewDec(100))
+	s.assertAliceShares(0, 0, sdk.NewInt(100))
 	s.assertDexBalances(100, 0)
 }
 
@@ -237,7 +237,7 @@ func (s *MsgServerTestSuite) TestWithdrawalFailsWithInvalidTickMulti() {
 
 	// NOTE: See above NOTE on error condition from TestFailsWithNonExistentPair
 	s.Assert().ErrorIs(err, types.ErrNotEnoughShares)
-	s.assertAliceShares(0, 0, sdk.NewDec(100))
+	s.assertAliceShares(0, 0, sdk.NewInt(100))
 	s.assertDexBalances(100, 0)
 }
 
@@ -251,7 +251,7 @@ func (s *MsgServerTestSuite) TestWithdrawalFailsWithInvalidFee() {
 	err := s.aliceWithdraws(NewWithdrawl(100, 0, 99))
 
 	s.Assert().ErrorIs(err, types.ErrValidFeeIndexNotFound)
-	s.assertAliceShares(0, 0, sdk.NewDec(100))
+	s.assertAliceShares(0, 0, sdk.NewInt(100))
 	s.assertDexBalances(100, 0)
 }
 
@@ -271,6 +271,6 @@ func (s *MsgServerTestSuite) TestWithdrawalFailsWithInvalidFeeMulti() {
 
 	// THEN ensure error is thrown and Alice and Dex balances remain unchanged
 	s.Assert().ErrorIs(err, types.ErrValidFeeIndexNotFound)
-	s.assertAliceShares(0, 0, sdk.NewDec(100))
+	s.assertAliceShares(0, 0, sdk.NewInt(100))
 	s.assertDexBalances(100, 0)
 }

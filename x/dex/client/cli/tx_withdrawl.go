@@ -27,17 +27,17 @@ func CmdWithdrawl() *cobra.Command {
 			argTokenA := args[1]
 			argTokenB := args[2]
 
-			var sharesToRemoveDec []sdk.Dec
+			var sharesToRemoveInt []sdk.Int
 			var TicksIndexesInt []int64
 			var FeeIndexesUint []uint64
 			for _, s := range sharesToRemove {
-				sharesDec, err := sdk.NewDecFromStr(s)
-
+				sharesInt, err := strconv.Atoi(s)
 				if err != nil {
 					return err
 				}
+				shares := sdk.NewInt(int64(sharesInt))
 
-				sharesToRemoveDec = append(sharesToRemoveDec, sharesDec)
+				sharesToRemoveInt = append(sharesToRemoveInt, shares)
 			}
 
 			for _, s := range TicksIndexes {
@@ -71,7 +71,7 @@ func CmdWithdrawl() *cobra.Command {
 				argReceiver,
 				argTokenA,
 				argTokenB,
-				sharesToRemoveDec,
+				sharesToRemoveInt,
 				TicksIndexesInt,
 				FeeIndexesUint,
 			)

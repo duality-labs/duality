@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/NicholasDotSol/duality/x/dex/keeper"
-	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 )
@@ -24,11 +23,11 @@ func (s *CalcTrueAmountsTestSuite) TestBothReservesNonZero() {
 		sdk.NewInt(40), // value 20
 		sdk.NewInt(100),
 		sdk.NewInt(100), // effectively (25, 100), value 50
-		NewDec(50),
+		sdk.NewInt(50),
 	)
 	s.Assert().Equal(sdk.NewInt(25), trueAmount0)
 	s.Assert().Equal(sdk.NewInt(100), trueAmount1)
-	s.Assert().Equal(NewDec(125), sharesMinted)
+	s.Assert().Equal(sdk.NewInt(125), sharesMinted)
 }
 
 func (s *CalcTrueAmountsTestSuite) TestBothReservesZero() {
@@ -38,11 +37,11 @@ func (s *CalcTrueAmountsTestSuite) TestBothReservesZero() {
 		sdk.NewInt(0),
 		sdk.NewInt(100),
 		sdk.NewInt(100),
-		NewDec(50),
+		sdk.NewInt(50),
 	)
 	s.Assert().Equal(sdk.NewInt(100), trueAmount0)
 	s.Assert().Equal(sdk.NewInt(100), trueAmount1)
-	s.Assert().Equal(NewDec(125), sharesMinted)
+	s.Assert().Equal(sdk.NewInt(125), sharesMinted)
 }
 
 func (s *CalcTrueAmountsTestSuite) TestWrongCoinDeposited() {
@@ -52,11 +51,11 @@ func (s *CalcTrueAmountsTestSuite) TestWrongCoinDeposited() {
 		sdk.NewInt(0),
 		sdk.NewInt(0),
 		sdk.NewInt(100),
-		NewDec(50),
+		sdk.NewInt(50),
 	)
 	s.Assert().Equal(sdk.NewInt(0), trueAmount0)
 	s.Assert().Equal(sdk.NewInt(0), trueAmount1)
-	s.Assert().Equal(NewDec(0), sharesMinted)
+	s.Assert().Equal(sdk.NewInt(0), sharesMinted)
 
 	trueAmount0, trueAmount1, sharesMinted = keeper.CalcTrueAmounts(
 		sdk.MustNewDecFromStr("0.25"),
@@ -64,11 +63,11 @@ func (s *CalcTrueAmountsTestSuite) TestWrongCoinDeposited() {
 		sdk.NewInt(100),
 		sdk.NewInt(100),
 		sdk.NewInt(0),
-		NewDec(50),
+		sdk.NewInt(50),
 	)
 	s.Assert().Equal(sdk.NewInt(0), trueAmount0)
 	s.Assert().Equal(sdk.NewInt(0), trueAmount1)
-	s.Assert().Equal(NewDec(0), sharesMinted)
+	s.Assert().Equal(sdk.NewInt(0), sharesMinted)
 }
 
 func (s *CalcTrueAmountsTestSuite) TestOneReserveZero() {
@@ -78,11 +77,11 @@ func (s *CalcTrueAmountsTestSuite) TestOneReserveZero() {
 		sdk.NewInt(0), // value 100
 		sdk.NewInt(100),
 		sdk.NewInt(100), // effective (100, 0), value 100
-		NewDec(50),  // value went down
+		sdk.NewInt(50),  // value went down
 	)
 	s.Assert().Equal(sdk.NewInt(100), trueAmount0)
 	s.Assert().Equal(sdk.NewInt(0), trueAmount1)
-	s.Assert().Equal(NewDec(50), sharesMinted)
+	s.Assert().Equal(sdk.NewInt(50), sharesMinted)
 
 	trueAmount0, trueAmount1, sharesMinted = keeper.CalcTrueAmounts(
 		sdk.MustNewDecFromStr("0.25"),
@@ -90,9 +89,9 @@ func (s *CalcTrueAmountsTestSuite) TestOneReserveZero() {
 		sdk.NewInt(100), // value 25
 		sdk.NewInt(100),
 		sdk.NewInt(100), // effective (0, 100), value 25
-		NewDec(50),  // value went up
+		sdk.NewInt(50),  // value went up
 	)
 	s.Assert().Equal(sdk.NewInt(0), trueAmount0)
 	s.Assert().Equal(sdk.NewInt(100), trueAmount1)
-	s.Assert().Equal(NewDec(50), sharesMinted)
+	s.Assert().Equal(sdk.NewInt(50), sharesMinted)
 }

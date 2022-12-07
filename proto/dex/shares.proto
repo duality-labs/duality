@@ -11,7 +11,7 @@ message Shares {
   uint64 feeIndex = 4; 
   string sharesOwned = 5  [
       (gogoproto.moretags)   = "yaml:\"sharesOwned\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "sharesOwned"
   ]; 
