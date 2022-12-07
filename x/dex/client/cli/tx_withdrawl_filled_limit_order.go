@@ -14,7 +14,7 @@ var _ = strconv.Itoa(0)
 
 func CmdWithdrawFilledLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "withdraw-fillled-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [key]",
+		Use:   "withdraw-filled-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [key]",
 		Short: "Broadcast message WithdrawFilledLimitOrder",
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
