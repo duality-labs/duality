@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -40,9 +41,9 @@ func CmdCancelLimitOrder() *cobra.Command {
 				return err
 			}
 
-			argSharesOutDec, err := sdk.NewDecFromStr(argSharesOut)
-			if err != nil {
-				return err
+			argSharesOutInt, ok := sdk.NewIntFromString(argSharesOut)
+			if ok != true {
+				return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for sharesOut")
 			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -58,7 +59,7 @@ func CmdCancelLimitOrder() *cobra.Command {
 				int64(argTickIndexInt),
 				argKeyToken,
 				uint64(argKeyInt),
-				argSharesOutDec,
+				argSharesOutInt,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

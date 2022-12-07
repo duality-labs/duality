@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -35,21 +36,19 @@ func CmdDeposit() *cobra.Command {
 			var FeesIndexesUint []uint64
 
 			for _, s := range argAmountsA {
-				amountAInt, err := strconv.Atoi(s)
-				if err != nil {
-					return err
+				amountA, ok := sdk.NewIntFromString(s)
+				if ok != true {
+					return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for amountsA")
 				}
-				amountA := sdk.NewInt(int64(amountAInt))
 
 				AmountsA = append(AmountsA, amountA)
 			}
 
 			for _, s := range argAmountsB {
-				amountBInt, err := strconv.Atoi(s)
-				if err != nil {
-					return err
+				amountB, ok := sdk.NewIntFromString(s)
+				if ok != true {
+					return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for amountsB")
 				}
-				amountB := sdk.NewInt(int64(amountBInt))
 
 				AmountsB = append(AmountsB, amountB)
 			}

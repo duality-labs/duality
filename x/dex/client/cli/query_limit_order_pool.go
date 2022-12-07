@@ -47,7 +47,7 @@ func CmdShowLimitOrderTranche() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "show-limit-order-pool-total-shares-map [pairId] [tickIndex] [tokenIn] [TrancheIndex]",
 		Short: "shows a LimitOrderTranche",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 

@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -29,17 +30,17 @@ func CmdWithdrawl() *cobra.Command {
 			argTickIndexes := strings.Split(args[4], ",")
 			argFeeIndexes := strings.Split(args[5], ",")
 
-			var SharesToRemoveDec []sdk.Dec
+			var SharesToRemoveInt []sdk.Int
 			var TicksIndexesInt []int64
 			var FeeIndexesUint []uint64
 			for _, s := range argSharesToRemove {
-				sharesDec, err := sdk.NewDecFromStr(s)
+				sharesToRemoveInt, ok := sdk.NewIntFromString(s)
 
-				if err != nil {
-					return err
+				if ok != true {
+					return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer Overflow for shares-to-remove")
 				}
 
-				SharesToRemoveDec = append(SharesToRemoveDec, sharesDec)
+				SharesToRemoveInt = append(SharesToRemoveInt, sharesToRemoveInt)
 			}
 
 			for _, s := range argTickIndexes {
@@ -73,7 +74,7 @@ func CmdWithdrawl() *cobra.Command {
 				argReceiver,
 				argTokenA,
 				argTokenB,
-				SharesToRemoveDec,
+				SharesToRemoveInt,
 				TicksIndexesInt,
 				FeeIndexesUint,
 			)

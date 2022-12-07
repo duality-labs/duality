@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -22,23 +23,20 @@ func CmdSwap() *cobra.Command {
 			argReceiver := args[0]
 			argAmountIn := args[1]
 
-			amountInInt, err := strconv.Atoi(argAmountIn)
-			if err != nil {
-				return err
+			amountInInt, ok := sdk.NewIntFromString(argAmountIn)
+			if ok != true {
+				return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for amount-in")
 			}
-
-			amountIn := sdk.NewInt(int64(amountInInt))
 
 			argTokenA := args[2]
 			argTokenB := args[3]
 			argTokenIn := args[4]
 			argMinOut := args[5]
 
-			minOutInt, err := strconv.Atoi(argMinOut)
-			if err != nil {
-				return err
+			minOutInt, ok := sdk.NewIntFromString(argMinOut)
+			if ok != true {
+				return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for minOut")
 			}
-			minOut := sdk.NewInt(int64(minOutInt))
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -49,9 +47,9 @@ func CmdSwap() *cobra.Command {
 				clientCtx.GetFromAddress().String(),
 				argTokenA,
 				argTokenB,
-				amountIn,
+				amountInInt,
 				argTokenIn,
-				minOut,
+				minOutInt,
 				argReceiver,
 			)
 			if err := msg.ValidateBasic(); err != nil {
