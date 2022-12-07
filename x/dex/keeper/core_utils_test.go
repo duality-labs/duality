@@ -137,8 +137,8 @@ func calculateShares(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, pa
 
 	lowerTick, lowerTickFound := k.GetTick(ctx, pairId, tickIndex-fee)
 	upperTick, upperTickFound := k.GetTick(ctx, pairId, tickIndex+fee)
-	lowerReserve1 := lowerTick.TickData.Reserve1[feeIndex]
-	upperReserve0, upperTotalShares := upperTick.TickData.Reserve0AndShares[feeIndex].Reserve0, upperTick.TickData.Reserve0AndShares[feeIndex].TotalShares
+	lowerReserve1 := lowerTick.tickFeeTiers.Reserve1[feeIndex]
+	upperReserve0, upperTotalShares := upperTick.tickFeeTiers.Reserve0AndShares[feeIndex].Reserve0, upperTick.tickFeeTiers.Reserve0AndShares[feeIndex].TotalShares
 
 	trueAmount0, trueAmount1 := trueAmounts(amount0, amount1, lowerReserve1, upperReserve0)
 

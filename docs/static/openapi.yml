@@ -24586,7 +24586,7 @@ paths:
                     tickIndex:
                       type: string
                       format: int64
-                    tickData:
+                    tickFeeTiers:
                       type: object
                       properties:
                         reserve0AndShares:
@@ -24602,7 +24602,7 @@ paths:
                           type: array
                           items:
                             type: string
-                    LimitOrderTranche0to1:
+                    limitOrderTranche0to1:
                       type: object
                       properties:
                         fillTrancheIndex:
@@ -24611,7 +24611,7 @@ paths:
                         placeTrancheIndex:
                           type: string
                           format: uint64
-                    LimitOrderTranche1to0:
+                    limitOrderTranche1to0:
                       type: object
                       properties:
                         fillTrancheIndex:
@@ -24742,7 +24742,7 @@ paths:
                   tickIndex:
                     type: string
                     format: int64
-                  tickData:
+                  tickFeeTiers:
                     type: object
                     properties:
                       reserve0AndShares:
@@ -24758,7 +24758,7 @@ paths:
                         type: array
                         items:
                           type: string
-                  LimitOrderTranche0to1:
+                  limitOrderTranche0to1:
                     type: object
                     properties:
                       fillTrancheIndex:
@@ -24767,7 +24767,7 @@ paths:
                       placeTrancheIndex:
                         type: string
                         format: uint64
-                  LimitOrderTranche1to0:
+                  limitOrderTranche1to0:
                     type: object
                     properties:
                       fillTrancheIndex:
@@ -45092,7 +45092,7 @@ definitions:
         type: string
       sharesCancelled:
         type: string
-  nicholasdotsol.duality.dex.LimitTrancheIndexes:
+  nicholasdotsol.duality.dex.LimitOrderBook:
     type: object
     properties:
       fillTrancheIndex:
@@ -45337,7 +45337,7 @@ definitions:
             tickIndex:
               type: string
               format: int64
-            tickData:
+            tickFeeTiers:
               type: object
               properties:
                 reserve0AndShares:
@@ -45353,7 +45353,7 @@ definitions:
                   type: array
                   items:
                     type: string
-            LimitOrderTranche0to1:
+            limitOrderTranche0to1:
               type: object
               properties:
                 fillTrancheIndex:
@@ -45362,7 +45362,7 @@ definitions:
                 placeTrancheIndex:
                   type: string
                   format: uint64
-            LimitOrderTranche1to0:
+            limitOrderTranche1to0:
               type: object
               properties:
                 fillTrancheIndex:
@@ -45608,7 +45608,7 @@ definitions:
           tickIndex:
             type: string
             format: int64
-          tickData:
+          tickFeeTiers:
             type: object
             properties:
               reserve0AndShares:
@@ -45624,7 +45624,7 @@ definitions:
                 type: array
                 items:
                   type: string
-          LimitOrderTranche0to1:
+          limitOrderTranche0to1:
             type: object
             properties:
               fillTrancheIndex:
@@ -45633,7 +45633,7 @@ definitions:
               placeTrancheIndex:
                 type: string
                 format: uint64
-          LimitOrderTranche1to0:
+          limitOrderTranche1to0:
             type: object
             properties:
               fillTrancheIndex:
@@ -45721,7 +45721,7 @@ definitions:
       tickIndex:
         type: string
         format: int64
-      tickData:
+      tickFeeTiers:
         type: object
         properties:
           reserve0AndShares:
@@ -45737,7 +45737,7 @@ definitions:
             type: array
             items:
               type: string
-      LimitOrderTranche0to1:
+      limitOrderTranche0to1:
         type: object
         properties:
           fillTrancheIndex:
@@ -45746,7 +45746,7 @@ definitions:
           placeTrancheIndex:
             type: string
             format: uint64
-      LimitOrderTranche1to0:
+      limitOrderTranche1to0:
         type: object
         properties:
           fillTrancheIndex:
@@ -45755,7 +45755,7 @@ definitions:
           placeTrancheIndex:
             type: string
             format: uint64
-  nicholasdotsol.duality.dex.TickDataType:
+  nicholasdotsol.duality.dex.TickFeeTier:
     type: object
     properties:
       reserve0AndShares:

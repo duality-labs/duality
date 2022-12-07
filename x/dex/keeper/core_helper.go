@@ -55,35 +55,6 @@ func (k Keeper) GetOrInitPair(goCtx context.Context, token0 string, token1 strin
 	return pair
 }
 
-func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex int64) types.Tick {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	tick, tickFound := k.GetTick(ctx, pairId, tickIndex)
-	if !tickFound {
-		numFees := k.GetFeeTierCount(ctx)
-		tick = types.Tick{
-			PairId:    pairId,
-			TickIndex: tickIndex,
-			TickData: &types.TickDataType{
-				Reserve0AndShares: make([]*types.Reserve0AndSharesType, numFees),
-				Reserve1:          make([]sdk.Dec, numFees),
-			},
-			LimitOrderTranche0To1: &types.LimitTrancheIndexes{0, 0},
-			LimitOrderTranche1To0: &types.LimitTrancheIndexes{0, 0},
-		}
-		for i := 0; i < int(numFees); i++ {
-			tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}
-			tick.TickData.Reserve1[i] = sdk.ZeroDec()
-		}
-		k.SetTick(ctx, pairId, tick)
-
-		token0, token1 := PairToTokens(pairId)
-		k.GetOrInitLimitOrderTranche(ctx, pairId, tickIndex, token0, 0)
-		k.GetOrInitLimitOrderTranche(ctx, pairId, tickIndex, token1, 0)
-	}
-	return tick
-}
-
 func CalcShares(amount0 sdk.Dec, amount1 sdk.Dec, priceCenter1To0 sdk.Dec) sdk.Dec {
 	return amount0.Add(amount1.Mul(priceCenter1To0))
 }
@@ -282,13 +253,13 @@ func CalcPrice1To0(tickIndex int64) sdk.Dec {
 
 // Checks if a tick has reserves0 at any fee tier
 func (k Keeper) TickHasToken0(ctx sdk.Context, tick *types.Tick) bool {
-	for _, s := range tick.TickData.Reserve0AndShares {
+	for _, s := range tick.tickFeeTiers.Reserve0AndShares {
 		if s.Reserve0.GT(sdk.ZeroDec()) {
 			return true
 		}
 	}
 
-	for i := tick.LimitOrderTranche0To1.FillTrancheIndex; i <= tick.LimitOrderTranche0To1.PlaceTrancheIndex; i++ {
+	for i := tick.limitOrderTranche0to1.FillTrancheIndex; i <= tick.limitOrderTranche0to1.PlaceTrancheIndex; i++ {
 		if k.TickTrancheHasToken0(ctx, tick, i) {
 			return true
 		}
@@ -311,13 +282,13 @@ func (k Keeper) TickTrancheHasToken0(ctx sdk.Context, tick *types.Tick, trancheI
 
 // Checks if a tick has reserve1 at any fee tier
 func (k Keeper) TickHasToken1(ctx sdk.Context, tick *types.Tick) bool {
-	for _, s := range tick.TickData.Reserve1 {
+	for _, s := range tick.tickFeeTiers.Reserve1 {
 		if s.GT(sdk.ZeroDec()) {
 			return true
 		}
 	}
 
-	for i := tick.LimitOrderTranche1To0.FillTrancheIndex; i <= tick.LimitOrderTranche1To0.PlaceTrancheIndex; i++ {
+	for i := tick.limitOrderTranche1to0.FillTrancheIndex; i <= tick.limitOrderTranche1to0.PlaceTrancheIndex; i++ {
 		if k.TickTrancheHasToken1(ctx, tick, i) {
 			return true
 		}

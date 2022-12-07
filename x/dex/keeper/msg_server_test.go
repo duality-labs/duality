@@ -644,8 +644,8 @@ func (s *MsgServerTestSuite) assertLiquidityAtTickDec(amountA sdk.Dec, amountB s
 		s.Require().Fail("Invalid tick %d and fee %d", tickIndex, fee)
 	}
 
-	liquidityA := lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
-	liquidityB := upperTick.TickData.Reserve1[feeIndex]
+	liquidityA := lowerTick.tickFeeTiers.Reserve0AndShares[feeIndex].Reserve0
+	liquidityB := upperTick.tickFeeTiers.Reserve1[feeIndex]
 	s.Assert().Equal(amountA, liquidityA)
 	s.Assert().Equal(amountB, liquidityB)
 }
@@ -661,7 +661,7 @@ func (s *MsgServerTestSuite) assertNoLiquidityAtTick(tickIndex int64, feeIndex u
 	}
 	// in case tick was initialized, assert no liquidity in it
 	amtA := NewDec(0)
-	liquidityA := lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
+	liquidityA := lowerTick.tickFeeTiers.Reserve0AndShares[feeIndex].Reserve0
 	s.Assert().Equal(amtA, liquidityA)
 
 	upperTick, upperTickFound := s.app.DexKeeper.GetTick(s.ctx, pairId, tickIndex+fee)
@@ -671,7 +671,7 @@ func (s *MsgServerTestSuite) assertNoLiquidityAtTick(tickIndex int64, feeIndex u
 	}
 	// in case tick was initialized, assert no liquidity in it
 	amtB := NewDec(0)
-	liquidityB := upperTick.TickData.Reserve1[feeIndex]
+	liquidityB := upperTick.tickFeeTiers.Reserve1[feeIndex]
 	s.Assert().Equal(amtB, liquidityB)
 }
 
@@ -769,9 +769,9 @@ func (s *MsgServerTestSuite) getFillAndPlaceTrancheKeys(selling string, pairId s
 
 	// handle correct limit order pool
 	if selling == "TokenA" {
-		return tick.LimitOrderTranche0To1.FillTrancheIndex, tick.LimitOrderTranche0To1.PlaceTrancheIndex
+		return tick.limitOrderTranche0to1.FillTrancheIndex, tick.limitOrderTranche0to1.PlaceTrancheIndex
 	} else {
-		return tick.LimitOrderTranche1To0.FillTrancheIndex, tick.LimitOrderTranche1To0.PlaceTrancheIndex
+		return tick.limitOrderTranche1to0.FillTrancheIndex, tick.limitOrderTranche1to0.PlaceTrancheIndex
 	}
 }
 
@@ -980,16 +980,16 @@ func (s *MsgServerTestSuite) addTickWithFee0Tokens(tickIndex int64, amountA int,
 	tick := types.Tick{
 		PairId:    "TokenA/TokenB",
 		TickIndex: tickIndex,
-		TickData: &types.TickDataType{
+		tickFeeTiers: &types.TickFeeTier{
 			Reserve0AndShares: make([]*types.Reserve0AndSharesType, 1),
 			Reserve1:          make([]sdk.Dec, 1),
 		},
-		LimitOrderTranche0To1: &types.LimitTrancheIndexes{0, 0},
-		LimitOrderTranche1To0: &types.LimitTrancheIndexes{0, 0},
+		limitOrderTranche0to1: &types.LimitOrderBook{0, 0},
+		limitOrderTranche1to0: &types.LimitOrderBook{0, 0},
 	}
 
-	tick.TickData.Reserve0AndShares[0] = &types.Reserve0AndSharesType{NewDec(amountA), NewDec(amountA)}
-	tick.TickData.Reserve1[0] = NewDec(amountB)
+	tick.tickFeeTiers.Reserve0AndShares[0] = &types.Reserve0AndSharesType{NewDec(amountA), NewDec(amountA)}
+	tick.tickFeeTiers.Reserve1[0] = NewDec(amountB)
 
 	s.app.DexKeeper.SetTick(s.ctx, "TokenA/TokenB", tick)
 	return tick
@@ -1002,9 +1002,9 @@ func (s *MsgServerTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amoun
 	priceCenter1To0 := keeper.CalcPrice0To1(tickIndex)
 	amountADec := NewDec(amountA)
 	amountBDec := NewDec(amountB)
-	lowerTick.TickData.Reserve0AndShares[0].Reserve0 = amountADec
-	lowerTick.TickData.Reserve0AndShares[0].TotalShares = keeper.CalcShares(amountADec, amountBDec, priceCenter1To0)
-	upperTick.TickData.Reserve1[0] = amountBDec
+	lowerTick.tickFeeTiers.Reserve0AndShares[0].Reserve0 = amountADec
+	lowerTick.tickFeeTiers.Reserve0AndShares[0].TotalShares = keeper.CalcShares(amountADec, amountBDec, priceCenter1To0)
+	upperTick.tickFeeTiers.Reserve1[0] = amountBDec
 	s.app.DexKeeper.SetTick(s.ctx, pairId, lowerTick)
 	s.app.DexKeeper.SetTick(s.ctx, pairId, upperTick)
 	return lowerTick, upperTick

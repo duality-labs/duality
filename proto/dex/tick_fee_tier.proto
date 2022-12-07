@@ -2,11 +2,10 @@ syntax = "proto3";
 package nicholasdotsol.duality.dex;
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+
 import "gogoproto/gogo.proto";
 
-
-message Reserve0AndSharesType {
-  
+message TickFeeTier {
   string reserve0 = 1 [
       (gogoproto.moretags)   = "yaml:\"reserve0\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
@@ -19,4 +18,10 @@ message Reserve0AndSharesType {
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "totalShares"
   ];  
+  string reserve1 = 3 [
+      (gogoproto.moretags)   = "yaml:\"reserve1\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "reserve1"
+  ]; 
 }

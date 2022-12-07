@@ -1,25 +1,62 @@
 package keeper
 
 import (
+	"context"
+
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex int64) types.Tick {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	tick, tickFound := k.GetTick(ctx, pairId, tickIndex)
+	if !tickFound {
+		numFees := k.GetFeeTierCount(ctx)
+		tick := NewTick(pairId, tickIndex, numFees)
+		k.SetTick(ctx, pairId, tick)
+	}
+	return tick
+}
+
+func NewLimitOrderTranche() *types.LimitOrderTranche {
+	return &types.LimitOrderTranche{
+		ReservesTokenIn:  sdk.ZeroDec(),
+		ReservesTokenOut: sdk.ZeroDec(),
+		TotalTokenIn:     sdk.ZeroDec(),
+		TotalTokenOut:    sdk.ZeroDec(),
+	}
+}
+
 func NewTick(pairId string, tickIndex int64, numFees uint64) types.Tick {
 	tick := types.Tick{
-		PairId:    pairId,
-		TickIndex: tickIndex,
-		TickData: &types.TickDataType{
-			Reserve0AndShares: make([]*types.Reserve0AndSharesType, numFees),
-			Reserve1:          make([]sdk.Dec, numFees),
+		PairId:       pairId,
+		TickIndex:    tickIndex,
+		TickFeeTiers: make([]*types.TickFeeTier, numFees),
+		LimitOrderBook0To1: &types.LimitOrderBook{
+			FillTrancheIndex:  0,
+			PlaceTrancheIndex: 0,
+			Tranches:          []*types.LimitOrderTranche{},
 		},
-		LimitOrderTranche0To1: &types.LimitTrancheIndexes{0, 0},
-		LimitOrderTranche1To0: &types.LimitTrancheIndexes{0, 0},
+		LimitOrderBook1To0: &types.LimitOrderBook{
+			FillTrancheIndex:  0,
+			PlaceTrancheIndex: 0,
+			Tranches: []*types.LimitOrderTranche{
+				{
+					ReservesTokenIn:  sdk.ZeroDec(),
+					ReservesTokenOut: sdk.ZeroDec(),
+					TotalTokenIn:     sdk.ZeroDec(),
+					TotalTokenOut:    sdk.ZeroDec(),
+				},
+			},
+		},
 	}
 	for i := 0; i < int(numFees); i++ {
-		tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroDec(), sdk.ZeroDec()}
-		tick.TickData.Reserve1[i] = sdk.ZeroDec()
+		tick.TickFeeTiers[i] = &types.TickFeeTier{
+			Reserve0:    sdk.ZeroDec(),
+			TotalShares: sdk.ZeroDec(),
+			Reserve1:    sdk.ZeroDec(),
+		}
 	}
 	return tick
 }

@@ -60,9 +60,9 @@ func (s *TickTestSuite) TestEmptyHasToken0() {
 func (s *TickTestSuite) TestLiquidityHasToken0() {
 	pairId := "TokenA<>TokenB"
 	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
-	tick.TickData.Reserve0AndShares[0].Reserve0 = NewDec(100)
-	tick.TickData.Reserve0AndShares[0].TotalShares = NewDec(100)
-	tick.TickData.Reserve1[0] = NewDec(20)
+	tick.tickFeeTiers.Reserve0AndShares[0].Reserve0 = NewDec(100)
+	tick.tickFeeTiers.Reserve0AndShares[0].TotalShares = NewDec(100)
+	tick.tickFeeTiers.Reserve1[0] = NewDec(20)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
 		TokenIn:         "TokenA",
@@ -76,9 +76,9 @@ func (s *TickTestSuite) TestLiquidityHasToken0() {
 func (s *TickTestSuite) TestLiquidityHighFeeHasToken0() {
 	pairId := "TokenA<>TokenB"
 	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
-	tick.TickData.Reserve0AndShares[4].Reserve0 = NewDec(100)
-	tick.TickData.Reserve0AndShares[4].TotalShares = NewDec(100)
-	tick.TickData.Reserve1[4] = NewDec(20)
+	tick.tickFeeTiers.Reserve0AndShares[4].Reserve0 = NewDec(100)
+	tick.tickFeeTiers.Reserve0AndShares[4].TotalShares = NewDec(100)
+	tick.tickFeeTiers.Reserve1[4] = NewDec(20)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
 		TokenIn:         "TokenA",
@@ -92,9 +92,9 @@ func (s *TickTestSuite) TestLiquidityHighFeeHasToken0() {
 func (s *TickTestSuite) TestNoLiquidityOnOneSideHasToken0() {
 	pairId := "TokenA<>TokenB"
 	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
-	tick.TickData.Reserve0AndShares[4].Reserve0 = NewDec(0)
-	tick.TickData.Reserve0AndShares[4].TotalShares = NewDec(10)
-	tick.TickData.Reserve1[4] = NewDec(20)
+	tick.tickFeeTiers.Reserve0AndShares[4].Reserve0 = NewDec(0)
+	tick.tickFeeTiers.Reserve0AndShares[4].TotalShares = NewDec(10)
+	tick.tickFeeTiers.Reserve1[4] = NewDec(20)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
 		TokenIn:         "TokenA",
@@ -134,9 +134,9 @@ func (s *TickTestSuite) TestEmptyHasToken1() {
 func (s *TickTestSuite) TestLiquidityHasToken1() {
 	pairId := "TokenA<>TokenB"
 	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
-	tick.TickData.Reserve0AndShares[0].Reserve0 = NewDec(100)
-	tick.TickData.Reserve0AndShares[0].TotalShares = NewDec(100)
-	tick.TickData.Reserve1[0] = NewDec(20)
+	tick.tickFeeTiers.Reserve0AndShares[0].Reserve0 = NewDec(100)
+	tick.tickFeeTiers.Reserve0AndShares[0].TotalShares = NewDec(100)
+	tick.tickFeeTiers.Reserve1[0] = NewDec(20)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
 		TokenIn:         "TokenB",
@@ -150,9 +150,9 @@ func (s *TickTestSuite) TestLiquidityHasToken1() {
 func (s *TickTestSuite) TestLiquidityHighFeeHasToken1() {
 	pairId := "TokenA<>TokenB"
 	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
-	tick.TickData.Reserve0AndShares[4].Reserve0 = NewDec(100)
-	tick.TickData.Reserve0AndShares[4].TotalShares = NewDec(100)
-	tick.TickData.Reserve1[4] = NewDec(20)
+	tick.tickFeeTiers.Reserve0AndShares[4].Reserve0 = NewDec(100)
+	tick.tickFeeTiers.Reserve0AndShares[4].TotalShares = NewDec(100)
+	tick.tickFeeTiers.Reserve1[4] = NewDec(20)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
 		TokenIn:         "TokenB",
@@ -166,9 +166,9 @@ func (s *TickTestSuite) TestLiquidityHighFeeHasToken1() {
 func (s *TickTestSuite) TestNoLiquidityOnOneSideHasToken1() {
 	pairId := "TokenA<>TokenB"
 	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
-	tick.TickData.Reserve0AndShares[4].Reserve0 = NewDec(100)
-	tick.TickData.Reserve0AndShares[4].TotalShares = NewDec(10)
-	tick.TickData.Reserve1[4] = NewDec(0)
+	tick.tickFeeTiers.Reserve0AndShares[4].Reserve0 = NewDec(100)
+	tick.tickFeeTiers.Reserve0AndShares[4].TotalShares = NewDec(10)
+	tick.tickFeeTiers.Reserve1[4] = NewDec(0)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
 		TokenIn:         "TokenB",
@@ -186,7 +186,7 @@ func createNTick(keeper *keeper.Keeper, ctx sdk.Context, pairId string, n int) [
 	items := make([]types.Tick, n)
 	for i := range items {
 
-		items[i].TickData = &types.TickDataType{
+		items[i].tickFeeTiers = &types.TickFeeTier{
 			Reserve0AndShares: []*types.Reserve0AndSharesType{
 				{Reserve0: sdk.OneDec(),
 					TotalShares: sdk.ZeroDec(),
@@ -196,7 +196,7 @@ func createNTick(keeper *keeper.Keeper, ctx sdk.Context, pairId string, n int) [
 
 		items[i].TickIndex = int64(i)
 
-		// testTick :=  &types.Tick{0, &types.TickDataType{Reserve0AndShares: []*types.Reserve0AndSharesType{
+		// testTick :=  &types.Tick{0, &types.TickFeeTier{Reserve0AndShares: []*types.Reserve0AndSharesType{
 		// 	{Reserve0: sdk.OneDec(),
 		// 	TotalShares: sdk.ZeroDec(),
 		// }},

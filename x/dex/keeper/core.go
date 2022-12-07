@@ -64,9 +64,9 @@ func (k Keeper) DepositCore(
 		lowerTick := k.GetOrInitTick(goCtx, pairId, lowerTickIndex)
 		upperTick := k.GetOrInitTick(goCtx, pairId, upperTickIndex)
 
-		lowerReserve0 := &lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
-		lowerTotalShares := &lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
-		upperReserve1 := &upperTick.TickData.Reserve1[feeIndex]
+		lowerReserve0 := &lowerTick.TickFeeTiers[feeIndex].Reserve0
+		lowerTotalShares := &lowerTick.TickFeeTiers[feeIndex].TotalShares
+		upperReserve1 := &upperTick.TickFeeTiers[feeIndex].Reserve1
 
 		trueAmount0, trueAmount1, sharesMinted := CalcTrueAmounts(
 			price1To0,
@@ -206,9 +206,9 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			return types.ErrValidTickNotFound
 		}
 
-		lowerTickFeeTotalShares := &lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
-		lowerTickFeeReserve0 := &lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
-		upperTickFeeReserve1 := &upperTick.TickData.Reserve1[feeIndex]
+		lowerTickFeeTotalShares := &lowerTick.TickFeeTiers[feeIndex].TotalShares
+		lowerTickFeeReserve0 := &lowerTick.TickFeeTiers[feeIndex].Reserve0
+		upperTickFeeReserve1 := &upperTick.TickFeeTiers[feeIndex].Reserve1
 		if lowerTickFeeTotalShares.Equal(sdk.ZeroDec()) {
 			return types.ErrNotEnoughShares
 		}
@@ -325,17 +325,17 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				return sdk.ZeroDec(), sdk.ZeroDec(), types.ErrNotEnoughLiquidity
 			}
 
-			if Current1Data.TickData.Reserve1[i].LT(amount_left.Mul(price_0to1)) {
-				amount_out = amount_out.Add(Current1Data.TickData.Reserve1[i])
-				amountInTemp := Current1Data.TickData.Reserve1[i].Quo(price_0to1)
+			if Current1Data.TickFeeTiers[i].Reserve1.LT(amount_left.Mul(price_0to1)) {
+				amount_out = amount_out.Add(Current1Data.TickFeeTiers[i].Reserve1)
+				amountInTemp := Current1Data.TickFeeTiers[i].Reserve1.Quo(price_0to1)
 				amount_left = amount_left.Sub(amountInTemp)
-				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Add(amountInTemp)
-				Current1Data.TickData.Reserve1[i] = sdk.ZeroDec()
+				Current0Data.TickFeeTiers[i].Reserve0 = Current0Data.TickFeeTiers[i].Reserve0.Add(amountInTemp)
+				Current1Data.TickFeeTiers[i].Reserve1 = sdk.ZeroDec()
 			} else {
 				amountOutTemp := amount_left.Mul(price_0to1)
 				amount_out = amount_out.Add(amountOutTemp)
-				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Add(amount_left)
-				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Sub(amountOutTemp)
+				Current0Data.TickFeeTiers[i].Reserve0 = Current0Data.TickFeeTiers[i].Reserve0.Add(amount_left)
+				Current1Data.TickFeeTiers[i].Reserve1 = Current1Data.TickFeeTiers[i].Reserve1.Sub(amountOutTemp)
 				amount_left = sdk.ZeroDec()
 			}
 
@@ -415,17 +415,17 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 			}
 
 			// If there is not enough to complete the trade
-			if Current0Data.TickData.Reserve0AndShares[i].Reserve0.LT(amount_left.Mul(price_1to0)) {
-				amount_out = amount_out.Add(Current0Data.TickData.Reserve0AndShares[i].Reserve0)
-				amountInTemp := Current0Data.TickData.Reserve0AndShares[i].Reserve0.Quo(price_1to0)
+			if Current0Data.TickFeeTiers[i].Reserve0.LT(amount_left.Mul(price_1to0)) {
+				amount_out = amount_out.Add(Current0Data.TickFeeTiers[i].Reserve0)
+				amountInTemp := Current0Data.TickFeeTiers[i].Reserve0.Quo(price_1to0)
 				amount_left = amount_left.Sub(amountInTemp)
-				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Add(amountInTemp)
-				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = sdk.ZeroDec()
+				Current1Data.TickFeeTiers[i].Reserve1 = Current1Data.TickFeeTiers[i].Reserve1.Add(amountInTemp)
+				Current0Data.TickFeeTiers[i].Reserve0 = sdk.ZeroDec()
 			} else {
 				amountOutTemp := amount_left.Mul(price_1to0)
 				amount_out = amount_out.Add(amountOutTemp)
-				Current0Data.TickData.Reserve0AndShares[i].Reserve0 = Current0Data.TickData.Reserve0AndShares[i].Reserve0.Sub(amountOutTemp)
-				Current1Data.TickData.Reserve1[i] = Current1Data.TickData.Reserve1[i].Add(amount_left)
+				Current0Data.TickFeeTiers[i].Reserve0 = Current0Data.TickFeeTiers[i].Reserve0.Sub(amountOutTemp)
+				Current1Data.TickFeeTiers[i].Reserve1 = Current1Data.TickFeeTiers[i].Reserve1.Add(amount_left)
 				amount_left = sdk.ZeroDec()
 			}
 
@@ -481,10 +481,14 @@ func (k Keeper) SwapLimitOrder0to1(
 		return amountRemainingTokenIn, amountOut, nil
 	}
 
-	fillTranche := &tick.LimitOrderTranche1To0.FillTrancheIndex
-	placeTranche := &tick.LimitOrderTranche1To0.PlaceTrancheIndex
+	limitOrderBook := tick.LimitOrderBook1To0
+	fillTranche := &limitOrderBook.FillTrancheIndex
+	placeTranche := &limitOrderBook.PlaceTrancheIndex
 
 	for amountRemainingTokenIn.GT(sdk.ZeroDec()) && *fillTranche < *placeTranche {
+		if *fillTranche >= tick.LimitOrderBook0To1.Tranches {
+			return amountRemainingTokenIn, amountOut, nil
+		}
 		amountRemainingTokenIn, amountOut, err = k.SwapLimitOrderTranche(
 			goCtx,
 			pairId,
@@ -495,10 +499,13 @@ func (k Keeper) SwapLimitOrder0to1(
 			*fillTranche,
 			priceInToOut,
 			priceOutToIn,
+			tranche,
 		)
 		if err != nil {
 			return sdk.ZeroDec(), sdk.ZeroDec(), err
 		}
+		k.SetLimitOrderTranche(ctx, tranche)
+
 		if !k.TickTrancheHasToken0(ctx, &tick, *fillTranche) {
 			*fillTranche++
 			k.SetTick(ctx, pairId, tick)
@@ -548,8 +555,8 @@ func (k Keeper) SwapLimitOrder1to0(
 		return amountRemainingTokenIn, amountOut, nil
 	}
 
-	fillTranche := &tick.LimitOrderTranche0To1.FillTrancheIndex
-	placeTranche := &tick.LimitOrderTranche0To1.PlaceTrancheIndex
+	fillTranche := &tick.LimitOrderBook0To1.FillTrancheIndex
+	placeTranche := &tick.LimitOrderBook0To1.PlaceTrancheIndex
 
 	for amountRemainingTokenIn.GT(sdk.ZeroDec()) && *fillTranche < *placeTranche {
 		amountRemainingTokenIn, amountOut, err = k.SwapLimitOrderTranche(
@@ -605,13 +612,10 @@ func (k Keeper) SwapLimitOrderTranche(
 	trancheIndex uint64,
 	priceInToOut sdk.Dec,
 	priceOutToIn sdk.Dec,
+	tranche *types.LimitOrderTranche,
 ) (newAmountRemainingTokenIn sdk.Dec, newAmountOut sdk.Dec, error error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	tranche, found := k.GetLimitOrderTranche(ctx, pairId, tickIndex, tokenOut, trancheIndex)
-	if !found {
-		return amountRemainingTokenIn, amountOut, nil
-	}
 	reservesTokenOut := &tranche.ReservesTokenIn
 	fillTokenIn := &tranche.ReservesTokenOut
 	totalTokenIn := &tranche.TotalTokenOut
@@ -631,7 +635,6 @@ func (k Keeper) SwapLimitOrderTranche(
 		*reservesTokenOut = reservesTokenOut.Sub(amountFilledTokenOut)
 		amountRemainingTokenIn = sdk.ZeroDec()
 	}
-	k.SetLimitOrderTranche(ctx, tranche)
 
 	return amountRemainingTokenIn, amountOut, nil
 }
@@ -648,29 +651,33 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	tokenIn := msg.TokenIn
 	receiver := msg.Receiver
 
-	var fillTrancheIndex *uint64
-	var placeTrancheIndex *uint64
-
+	var limitOrderBook *types.LimitOrderBook
 	if msg.TokenIn == token0 {
 		if msg.TickIndex > pair.CurrentTick0To1 {
 			return types.ErrPlaceLimitOrderBehindPairLiquidity
 		}
-		fillTrancheIndex = &tick.LimitOrderTranche0To1.FillTrancheIndex
-		placeTrancheIndex = &tick.LimitOrderTranche0To1.PlaceTrancheIndex
+		limitOrderBook = tick.LimitOrderBook0To1
 	} else {
 		if msg.TickIndex < pair.CurrentTick1To0 {
 			return types.ErrPlaceLimitOrderBehindPairLiquidity
 		}
-		fillTrancheIndex = &tick.LimitOrderTranche1To0.FillTrancheIndex
-		placeTrancheIndex = &tick.LimitOrderTranche1To0.PlaceTrancheIndex
+		limitOrderBook = tick.LimitOrderBook1To0
 	}
-
-	tranche := k.GetOrInitLimitOrderTranche(ctx, pairId, tickIndex, tokenIn, *placeTrancheIndex)
+	fillTrancheIndex := &limitOrderBook.FillTrancheIndex
+	placeTrancheIndex := &limitOrderBook.PlaceTrancheIndex
+	tranches := limitOrderBook.Tranches
+	if int(*placeTrancheIndex) > len(tranches) {
+		tranches = append(tranches, NewLimitOrderTranche())
+	}
+	tranche := tranches[*placeTrancheIndex]
 	trancheUser := k.GetOrInitLimitOrderTrancheUser(goCtx, pairId, tickIndex, tokenIn, *placeTrancheIndex, receiver)
 	if tranche.ReservesTokenIn.LT(tranche.TotalTokenIn) {
 		*placeTrancheIndex++
 		k.SetTick(ctx, pairId, tick)
-		tranche = k.GetOrInitLimitOrderTranche(ctx, pairId, tickIndex, tokenIn, *placeTrancheIndex)
+		if int(*placeTrancheIndex) > len(tranches) {
+			tranches = append(tranches, NewLimitOrderTranche())
+		}
+		tranche = tranches[*placeTrancheIndex]
 		trancheUser = k.GetOrInitLimitOrderTrancheUser(goCtx, pairId, tickIndex, tokenIn, *placeTrancheIndex, receiver)
 	}
 	tranche.ReservesTokenIn = tranche.ReservesTokenIn.Add(msg.AmountIn)
