@@ -43,6 +43,21 @@ func (s *MsgServerTestSuite) TestSingleWithdrawlPartial() {
 	s.assertCurrentTicks(-1, 1)
 }
 
+func (s *MsgServerTestSuite) TestSingleWithdrawlHighTick() {
+	s.fundAliceBalances(2, 50000)
+	s.fundBobBalances(100, 50000)
+
+	s.aliceDeposits(NewDeposit(2, 50000, -1048575, 0))
+	s.bobDeposits(NewDeposit(2, 40000, -1048575, 0))
+
+	s.assertBobBalances(99, 10000)
+	s.assertAliceShares(-1048575, 0, sdk.NewInt(2))
+	s.assertLiquidityAtTick(3, 90000, -1048575, 0)
+	s.assertBobShares(-1048575, 0, sdk.NewInt(1))
+	s.aliceWithdraws(NewWithdrawl(2, -1048575, 0))
+	s.assertAliceBalances(2, 5000) // Fails, actual balance 90000
+}
+
 func (s *MsgServerTestSuite) TestSingleWithdrawlMaxFee() {
 	s.fundAliceBalances(100, 0)
 

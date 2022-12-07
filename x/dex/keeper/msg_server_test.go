@@ -625,6 +625,14 @@ func (s *MsgServerTestSuite) assertAliceShares(
 	s.assertAccountShares(s.alice, "TokenA<>TokenB", tick, fee, sharesExpected)
 }
 
+func (s *MsgServerTestSuite) assertBobShares(
+	tick int64,
+	fee uint64,
+	sharesExpected sdk.Int,
+) {
+	s.assertAccountShares(s.bob, "TokenA<>TokenB", tick, fee, sharesExpected)
+}
+
 func (s *MsgServerTestSuite) assertCurrentTicks(
 	expected1To0 int64,
 	expected0To1 int64,
