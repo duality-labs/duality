@@ -135,12 +135,12 @@ func (s *MsgServerTestSuite) TestGetOrInitTickNew() {
 	s.Assert().Equal(tick.TickIndex, int64(0))
 	s.Assert().Equal(feeCount, len(tick.TickData.Reserve0AndShares))
 	s.Assert().Equal(
-		&types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroDec()},
+		&types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroInt()},
 		tick.TickData.Reserve0AndShares[0],
 	)
 
 	s.Assert().Equal(
-		&types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroDec()},
+		&types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroInt()},
 		tick.TickData.Reserve0AndShares[feeCount-1],
 	)
 
@@ -169,7 +169,7 @@ func (s *MsgServerTestSuite) TestGetOrInitTickExisting() {
 
 	// WHEN we update values on that tick
 	tick, _ := s.app.DexKeeper.GetTick(s.ctx, "TokenA<>TokenB", 0)
-	tick.TickData.Reserve0AndShares[0] = &types.Reserve0AndSharesType{sdk.NewInt(10), sdk.NewDec(10)}
+	tick.TickData.Reserve0AndShares[0] = &types.Reserve0AndSharesType{sdk.NewInt(10), sdk.NewInt(10)}
 	s.app.DexKeeper.SetTick(s.ctx, "TokenA<>TokenB", tick)
 
 	// AND try to initialize the same tick again

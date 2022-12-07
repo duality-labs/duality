@@ -18,7 +18,7 @@ func NewTick(pairId string, tickIndex int64, numFees uint64) types.Tick {
 		LimitOrderTranche1To0: &types.LimitTrancheIndexes{0, 0},
 	}
 	for i := 0; i < int(numFees); i++ {
-		tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroDec()}
+		tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroInt()}
 		tick.TickData.Reserve1[i] = sdk.ZeroInt()
 	}
 	return tick

@@ -157,16 +157,16 @@ func MultiplePoolSwapAndUpdate(amounts_liquidity []sdk.Int,
 }
 
 
-func SharesOnDeposit(existing_shares sdk.Dec, existing_amount0 sdk.Int, existing_amount1 sdk.Int, new_amount0 sdk.Int, new_amount1 sdk.Int, tickIndex int64) (shares_minted sdk.Dec) {
+func SharesOnDeposit(existing_shares sdk.Dec, existing_amount0 sdk.Int, existing_amount1 sdk.Int, new_amount0 sdk.Int, new_amount1 sdk.Int, tickIndex int64) (shares_minted sdk.Int) {
 	price1To0 := keeper.CalcPrice1To0(tickIndex)
 	newAmount0Dec := sdk.NewDecFromInt(new_amount0)
 	new_value := newAmount0Dec.Add(price1To0.MulInt(new_amount1))
 
 	if existing_amount0.Add(existing_amount1).GT(sdk.ZeroInt()) {
 		existing_value := existing_amount0.ToDec().Add(price1To0.MulInt(existing_amount1))
-		shares_minted = shares_minted.Mul(new_value.Quo(existing_value))
+		shares_minted = shares_minted.ToDec().Mul(new_value.Quo(existing_value)).TruncateInt()
 	} else {
-		shares_minted = new_value
+		shares_minted = new_value.TruncateInt()
 	}
 
 	return shares_minted

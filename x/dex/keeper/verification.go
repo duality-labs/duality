@@ -262,7 +262,7 @@ func (k Keeper) WithdrawLimitOrderVerification(goCtx context.Context, msg types.
 	}
 
 	// checks that the user has some number of limit order shares wished to withdraw
-	if shares.SharesOwned.LTE(sdk.ZeroDec()) {
+	if shares.SharesOwned.LTE(sdk.ZeroInt()) {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
 	}
 
@@ -304,7 +304,7 @@ func (k Keeper) CancelLimitOrderVerification(goCtx context.Context, msg types.Ms
 	}
 
 	// checks that the user has some number of limit order shares wished to withdraw
-	if shares.SharesOwned.LTE(sdk.ZeroDec()) {
+	if shares.SharesOwned.LTE(sdk.ZeroInt()) {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
 	}
 

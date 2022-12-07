@@ -72,7 +72,7 @@ func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex in
 			LimitOrderTranche1To0: &types.LimitTrancheIndexes{0, 0},
 		}
 		for i := 0; i < int(numFees); i++ {
-			tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroDec()}
+			tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroInt()}
 			tick.TickData.Reserve1[i] = sdk.ZeroInt()
 		}
 		k.SetTick(ctx, pairId, tick)
@@ -106,9 +106,9 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 		return types.LimitOrderTrancheUser{
 			Count:           currentLimitOrderKey,
 			Address:         receiver,
-			SharesOwned:     sdk.ZeroDec(),
-			SharesWithdrawn: sdk.ZeroDec(),
-			SharesCancelled: sdk.ZeroDec(),
+			SharesOwned:     sdk.ZeroInt(),
+			SharesWithdrawn: sdk.ZeroInt(),
+			SharesCancelled: sdk.ZeroInt(),
 			TickIndex:       tickIndex,
 			Token:           tokenIn,
 			PairId:          pairId,
@@ -230,38 +230,36 @@ func CalcTrueAmounts(
 	upperReserve1 sdk.Int,
 	amount0 sdk.Int,
 	amount1 sdk.Int,
-	totalShares sdk.Dec,
-) (trueAmount0 sdk.Int, trueAmount1 sdk.Int, sharesMinted sdk.Dec) {
+	totalShares sdk.Int,
+) (trueAmount0 sdk.Int, trueAmount1 sdk.Int, sharesMinted sdk.Int) {
 	lowerReserve0Dec := lowerReserve0.ToDec()
 	upperReserve1Dec := upperReserve1.ToDec()
 	amount0Dec := amount0.ToDec()
 	amount1Dec := amount1.ToDec()
-	if lowerReserve0Dec.GT(sdk.ZeroDec()) && upperReserve1Dec.GT(sdk.ZeroDec()) {
-		ratio0 := amount0Dec.Quo(lowerReserve0Dec)
-		ratio1 := amount1Dec.Quo(upperReserve1Dec)
-		if ratio0.LT(ratio1) {
-			trueAmount0 = amount0
-			trueAmount1 = ratio0.Mul(upperReserve1Dec).TruncateInt()
-		} else {
-			trueAmount0 = ratio1.Mul(lowerReserve0Dec).TruncateInt()
-			trueAmount1 = amount1
-		}
-	} else if lowerReserve0Dec.GT(sdk.ZeroDec()) { // && upperReserve1Dec == 0
-		trueAmount0 = amount0
-		trueAmount1 = sdk.ZeroInt()
-	} else if upperReserve1Dec.GT(sdk.ZeroDec()) { // && lowerReserve0Dec == 0
-		trueAmount0 = sdk.ZeroInt()
-		trueAmount1 = amount1
+
+	// See spec: https://www.notion.so/dualityxyz/Autoswap-Spec-e856fa7b2438403c95147010d479b98c
+	if upperReserve1Dec.GT(sdk.ZeroDec()) {
+		trueAmount0 = sdk.MinDec(
+			amount0Dec,
+			amount1Dec.Mul(lowerReserve0Dec).Quo(upperReserve1Dec)).TruncateInt()
 	} else {
 		trueAmount0 = amount0
+	}
+
+	if lowerReserve0Dec.GT(sdk.ZeroDec()) {
+		trueAmount1 = sdk.MinDec(
+			amount1Dec,
+			amount0Dec.Mul(upperReserve1Dec).Quo(lowerReserve0Dec)).TruncateInt()
+	} else {
 		trueAmount1 = amount1
 	}
+
 	valueMintedToken0 := CalcShares(trueAmount0, trueAmount1, centerTickPrice1To0)
 	valueExistingToken0 := CalcShares(lowerReserve0, upperReserve1, centerTickPrice1To0)
 	if valueExistingToken0.GT(sdk.ZeroDec()) {
-		sharesMinted = valueMintedToken0.Quo(valueExistingToken0).Mul(totalShares)
+		sharesMinted = valueMintedToken0.Quo(valueExistingToken0).MulInt(totalShares).TruncateInt()
 	} else {
-		sharesMinted = valueMintedToken0
+		sharesMinted = valueMintedToken0.TruncateInt()
 	}
 	return
 }

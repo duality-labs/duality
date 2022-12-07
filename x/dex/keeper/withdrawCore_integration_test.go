@@ -296,7 +296,7 @@ func (s *MsgServerTestSuite) TestFullWithdrawalFindNewMaxTickDoS() {
 	s.assertMaxTick(100001)
 
 	sharesToWithdraw := testing_scripts.SharesOnDeposit(sdk.ZeroDec(), sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt(), sdk.NewInt(10), 100000)
-	s.aliceWithdraws(NewWithdrawlDec(sharesToWithdraw, 100000, 0))
+	s.aliceWithdraws(NewWithdrawlInt(sharesToWithdraw, 100000, 0))
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)

@@ -25,9 +25,9 @@ func createNLimitOrderTrancheUser(keeper *keeper.Keeper, ctx sdk.Context, pairId
 		items[i].TickIndex = tickIndex
 
 		keeper.SetLimitOrderTrancheUser(ctx, items[i])
-		items[i].SharesOwned = sdk.ZeroDec()
-		items[i].SharesWithdrawn = sdk.ZeroDec()
-		items[i].SharesCancelled = sdk.ZeroDec()
+		items[i].SharesOwned = sdk.ZeroInt()
+		items[i].SharesWithdrawn = sdk.ZeroInt()
+		items[i].SharesCancelled = sdk.ZeroInt()
 
 	}
 	return items
