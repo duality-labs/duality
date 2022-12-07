@@ -87,13 +87,14 @@ func makePair(s *MsgServerTestSuite, pairId string, tickIndex int64, feeTier uin
 // should eventually be refactored so that core.go is modularized for easier unit testing and readability
 
 // Calculation of shares when depositing the initial amount (no reserves)
-func calculateSharesEmpty(amount0 sdk.Int, amount1 sdk.Int, price sdk.Dec) sdk.Dec {
-	return price.MulInt(amount1).Add(amount0.ToDec())
+func calculateSharesEmpty(amount0 sdk.Int, amount1 sdk.Int, price sdk.Dec) sdk.Int {
+	return price.MulInt(amount1).Add(amount0.ToDec()).TruncateInt()
 }
 
 // Calculation of shares when there are pre-existing reserves
-func calculateSharesNonEmpty(amount sdk.Int, reserve sdk.Int, totalShares sdk.Dec) sdk.Dec {
-	return amount.ToDec().QuoInt(reserve).Mul(totalShares)
+func calculateSharesNonEmpty(amount sdk.Int, reserve sdk.Int, totalShares sdk.Int) sdk.Int {
+	return amount.ToDec().QuoInt(reserve).MulInt(totalShares).TruncateInt()
+
 }
 
 // Pure func that takes all the parameters requires to compute the amount of minted shares and handles the different cases accordingly.
@@ -109,10 +110,10 @@ func calculateSharesPure(
 	lowerReserve1 sdk.Int,
 	upperTickFound bool,
 	upperReserve0 sdk.Int,
-	upperTotalShares sdk.Dec,
-) sdk.Dec {
+	upperTotalShares sdk.Int,
+) sdk.Int {
 	// calculating shares minted in DepositHelper
-	if !lowerTickFound || !upperTickFound || upperTotalShares.Equal(sdk.ZeroDec()) {
+	if !lowerTickFound || !upperTickFound || upperTotalShares.Equal(sdk.ZeroInt()) {
 		// this case corresponds to lines 129-132 in function DepositHelper of core.go
 		return calculateSharesEmpty(amount0, amount1, price)
 	} else {
@@ -126,7 +127,7 @@ func calculateSharesPure(
 }
 
 // Impure function that pulls all the state variables required for calculating the amount of shares to mint.
-func calculateShares(s *MsgServerTestSuite, amount0 sdk.Int, amount1 sdk.Int, pairId string, tickIndex int64, feeIndex uint64) sdk.Dec {
+func calculateShares(s *MsgServerTestSuite, amount0 sdk.Int, amount1 sdk.Int, pairId string, tickIndex int64, feeIndex uint64) sdk.Int {
 	k, ctx := s.app.DexKeeper, s.ctx
 
 	price1To0 := keeper.CalcPrice1To0(tickIndex)
@@ -175,10 +176,10 @@ func makeShares(s *MsgServerTestSuite, acc sdk.AccAddress, pairId string, tickIn
 	return sharesSlice, sharesFoundSlice
 }
 
-type SharesMap = map[int64]map[uint64]sdk.Dec
+type SharesMap = map[int64]map[uint64]sdk.Int
 
 func calculateFinalShares(s *MsgServerTestSuite, pairId string, amounts0 []sdk.Int, amounts1 []sdk.Int, tickIndexes []int64, feeTiers []uint64) SharesMap {
-	accum := make(map[int64]map[uint64]sdk.Dec) // map from tickIndex->feeTier->sharesCalc
+	accum := make(map[int64]map[uint64]sdk.Int) // map from tickIndex->feeTier->sharesCalc
 	for i := range amounts0 {
 		// get expected amount of minted shares and increase accum on both sides of spread
 		accSharesCalc := calculateShares(s, amounts0[i], amounts1[i], pairId, tickIndexes[i], feeTiers[i])
@@ -189,7 +190,7 @@ func calculateFinalShares(s *MsgServerTestSuite, pairId string, amounts0 []sdk.I
 		} else {
 			// if inner map hasn't been initialized, init
 			if _, ok := accum[tickIndexes[i]]; !ok {
-				accum[tickIndexes[i]] = make(map[uint64]sdk.Dec)
+				accum[tickIndexes[i]] = make(map[uint64]sdk.Int)
 			}
 			// else add value to map
 			accum[tickIndexes[i]][feeTiers[i]] = accSharesCalc

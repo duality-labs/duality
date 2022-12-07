@@ -211,12 +211,12 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		lowerTickFeeTotalShares := &lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
 		lowerTickFeeReserve0 := &lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
 		upperTickFeeReserve1 := &upperTick.TickData.Reserve1[feeIndex]
-		if lowerTickFeeTotalShares.Equal(sdk.ZeroDec()) {
+		if lowerTickFeeTotalShares.Equal(sdk.ZeroInt()) {
 			return types.ErrNotEnoughShares
 		}
 
-		sharesToRemove = MinDec(sharesToRemove, *userSharesOwned)
-		ownershipRatio := sharesToRemove.Quo(*lowerTickFeeTotalShares)
+		sharesToRemoveDec := sdk.MinInt(sharesToRemove, *userSharesOwned).ToDec()
+		ownershipRatio := sharesToRemoveDec.Quo(lowerTickFeeTotalShares.ToDec())
 		// See top NOTE on rounding
 		reserve1ToRemove := ownershipRatio.MulInt(*upperTickFeeReserve1).TruncateInt()
 		reserve0ToRemove := ownershipRatio.MulInt(*lowerTickFeeReserve0).TruncateInt()
@@ -688,7 +688,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	}
 	tranche.ReservesTokenIn = tranche.ReservesTokenIn.Add(msg.AmountIn)
 	tranche.TotalTokenIn = tranche.TotalTokenIn.Add(msg.AmountIn)
-	trancheUser.SharesOwned = trancheUser.SharesOwned.Add(msg.AmountIn.ToDec())
+	trancheUser.SharesOwned = trancheUser.SharesOwned.Add(msg.AmountIn)
 
 	k.SetLimitOrderTrancheUser(ctx, trancheUser)
 	k.SetLimitOrderTranche(ctx, tranche)
@@ -747,7 +747,7 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	totalTokenOutDec := sdk.NewDecFromInt(tranche.TotalTokenOut)
 	filledAmount := priceLimitOutToIn.Mul(totalTokenOutDec)
 	ratioNotFilled := totalTokenInDec.Sub(filledAmount).Quo(totalTokenInDec)
-	maxUserAllowedToCancel := trancheUser.SharesOwned.Mul(ratioNotFilled)
+	maxUserAllowedToCancel := trancheUser.SharesOwned.ToDec().Mul(ratioNotFilled).TruncateInt()
 	totalUserAttemptingToCancel := trancheUser.SharesCancelled.Add(attemptedSharesOut)
 
 	if totalUserAttemptingToCancel.GT(maxUserAllowedToCancel) {
@@ -762,13 +762,12 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	k.SetLimitOrderTrancheUser(ctx, trancheUser)
 
 	// See top NOTE on rounding
-	attemptedSharesOutInt := attemptedSharesOut.TruncateInt()
-	tranche.ReservesTokenIn = tranche.ReservesTokenIn.Sub(attemptedSharesOutInt)
+	tranche.ReservesTokenIn = tranche.ReservesTokenIn.Sub(attemptedSharesOut)
 	k.SetLimitOrderTranche(ctx, tranche)
 
-	if attemptedSharesOut.GT(sdk.ZeroDec()) {
+	if attemptedSharesOut.GT(sdk.ZeroInt()) {
 		// See top NOTE on rounding
-		coinOut := sdk.NewCoin(msg.KeyToken, attemptedSharesOutInt)
+		coinOut := sdk.NewCoin(msg.KeyToken, attemptedSharesOut)
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
@@ -843,18 +842,16 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	}
 	priceLimitOutToIn = sdk.OneDec().Quo(priceLimitInToOut)
 
-	totalTokenOutDec := sdk.NewDecFromInt(tranche.TotalTokenOut)
-	totalTokenInDec := sdk.NewDecFromInt(tranche.TotalTokenIn)
 	reservesTokenOutDec := sdk.NewDecFromInt(tranche.ReservesTokenOut)
-	amountFilled := priceLimitOutToIn.Mul(totalTokenOutDec)
-	ratioFilled := amountFilled.Quo(totalTokenInDec)
-	maxAllowedToWithdraw := MinDec(
-		trancheUser.SharesOwned.Mul(ratioFilled),                 // cannot withdraw more than what's been filled
+	amountFilled := priceLimitOutToIn.MulInt(tranche.TotalTokenOut)
+	ratioFilled := amountFilled.QuoInt(tranche.TotalTokenIn)
+	maxAllowedToWithdraw := sdk.MinInt(
+		ratioFilled.MulInt(trancheUser.SharesOwned).TruncateInt(), // cannot withdraw more than what's been filled
 		trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled), // cannot withdraw more than what you own
 	)
 	amountOutTokenIn := maxAllowedToWithdraw.Sub(trancheUser.SharesWithdrawn)
 
-	amountOutTokenOut := amountOutTokenIn.Mul(priceLimitInToOut)
+	amountOutTokenOut := priceLimitInToOut.MulInt(amountOutTokenIn)
 
 	trancheUser.SharesWithdrawn = maxAllowedToWithdraw
 	k.SetLimitOrderTrancheUser(ctx, trancheUser)

@@ -8,7 +8,6 @@ import (
 	keepertest "github.com/NicholasDotSol/duality/testutil/keeper"
 	"github.com/NicholasDotSol/duality/testutil/nullify"
 	"github.com/NicholasDotSol/duality/x/dex/keeper"
-	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
@@ -61,7 +60,7 @@ func (s *TickTestSuite) TestLiquidityHasToken0() {
 	pairId := "TokenA<>TokenB"
 	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	tick.TickData.Reserve0AndShares[0].Reserve0 = sdk.NewInt(100)
-	tick.TickData.Reserve0AndShares[0].TotalShares = NewDec(100)
+	tick.TickData.Reserve0AndShares[0].TotalShares = sdk.NewInt(100)
 	tick.TickData.Reserve1[0] = sdk.NewInt(20)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
@@ -77,7 +76,7 @@ func (s *TickTestSuite) TestLiquidityHighFeeHasToken0() {
 	pairId := "TokenA<>TokenB"
 	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	tick.TickData.Reserve0AndShares[4].Reserve0 = sdk.NewInt(100)
-	tick.TickData.Reserve0AndShares[4].TotalShares = NewDec(100)
+	tick.TickData.Reserve0AndShares[4].TotalShares = sdk.NewInt(100)
 	tick.TickData.Reserve1[4] = sdk.NewInt(20)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
@@ -93,7 +92,7 @@ func (s *TickTestSuite) TestNoLiquidityOnOneSideHasToken0() {
 	pairId := "TokenA<>TokenB"
 	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	tick.TickData.Reserve0AndShares[4].Reserve0 = sdk.NewInt(0)
-	tick.TickData.Reserve0AndShares[4].TotalShares = NewDec(10)
+	tick.TickData.Reserve0AndShares[4].TotalShares = sdk.NewInt(10)
 	tick.TickData.Reserve1[4] = sdk.NewInt(20)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
@@ -135,7 +134,7 @@ func (s *TickTestSuite) TestLiquidityHasToken1() {
 	pairId := "TokenA<>TokenB"
 	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	tick.TickData.Reserve0AndShares[0].Reserve0 = sdk.NewInt(100)
-	tick.TickData.Reserve0AndShares[0].TotalShares = NewDec(100)
+	tick.TickData.Reserve0AndShares[0].TotalShares = sdk.NewInt(100)
 	tick.TickData.Reserve1[0] = sdk.NewInt(20)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
@@ -151,7 +150,7 @@ func (s *TickTestSuite) TestLiquidityHighFeeHasToken1() {
 	pairId := "TokenA<>TokenB"
 	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	tick.TickData.Reserve0AndShares[4].Reserve0 = sdk.NewInt(100)
-	tick.TickData.Reserve0AndShares[4].TotalShares = NewDec(100)
+	tick.TickData.Reserve0AndShares[4].TotalShares = sdk.NewInt(100)
 	tick.TickData.Reserve1[4] = sdk.NewInt(20)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
@@ -167,7 +166,7 @@ func (s *TickTestSuite) TestNoLiquidityOnOneSideHasToken1() {
 	pairId := "TokenA<>TokenB"
 	tick := keeper.NewTick("TokenA<>TokenB", 0, 6)
 	tick.TickData.Reserve0AndShares[4].Reserve0 = sdk.NewInt(100)
-	tick.TickData.Reserve0AndShares[4].TotalShares = NewDec(10)
+	tick.TickData.Reserve0AndShares[4].TotalShares = sdk.NewInt(10)
 	tick.TickData.Reserve1[4] = sdk.NewInt(0)
 	s.app.DexKeeper.SetLimitOrderTranche(s.ctx, types.LimitOrderTranche{
 		PairId:          pairId,
@@ -189,7 +188,7 @@ func createNTick(keeper *keeper.Keeper, ctx sdk.Context, pairId string, n int) [
 		items[i].TickData = &types.TickDataType{
 			Reserve0AndShares: []*types.Reserve0AndSharesType{
 				{Reserve0: sdk.OneInt(),
-					TotalShares: sdk.ZeroDec(),
+					TotalShares: sdk.ZeroInt(),
 				}},
 			Reserve1: []sdk.Int{sdk.ZeroInt()},
 		}
