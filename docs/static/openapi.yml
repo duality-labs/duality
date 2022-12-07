@@ -1112,7 +1112,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/auth/v1beta1/accounts/{address}:
+  '/cosmos/auth/v1beta1/accounts/{address}':
     get:
       summary: Account returns account details based on address.
       operationId: CosmosAuthV1Beta1Account
@@ -1708,7 +1708,7 @@ paths:
         - Query
   /cosmos/authz/v1beta1/grants:
     get:
-      summary: Returns list of `Authorization`, granted to the grantee by the granter.
+      summary: 'Returns list of `Authorization`, granted to the grantee by the granter.'
       operationId: CosmosAuthzV1Beta1Grants
       responses:
         '200':
@@ -2185,7 +2185,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/authz/v1beta1/grants/grantee/{grantee}:
+  '/cosmos/authz/v1beta1/grants/grantee/{grantee}':
     get:
       summary: GranteeGrants returns a list of `GrantAuthorization` by grantee.
       description: 'Since: cosmos-sdk 0.45.2'
@@ -2659,9 +2659,9 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/authz/v1beta1/grants/granter/{granter}:
+  '/cosmos/authz/v1beta1/grants/granter/{granter}':
     get:
-      summary: GranterGrants returns list of `GrantAuthorization`, granted by granter.
+      summary: 'GranterGrants returns list of `GrantAuthorization`, granted by granter.'
       description: 'Since: cosmos-sdk 0.45.2'
       operationId: CosmosAuthzV1Beta1GranterGrants
       responses:
@@ -3133,7 +3133,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/bank/v1beta1/balances/{address}:
+  '/cosmos/bank/v1beta1/balances/{address}':
     get:
       summary: AllBalances queries the balance of all coins for a single account.
       operationId: CosmosBankV1Beta1AllBalances
@@ -3266,7 +3266,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/bank/v1beta1/balances/{address}/by_denom:
+  '/cosmos/bank/v1beta1/balances/{address}/by_denom':
     get:
       summary: Balance queries the balance of a single coin for a single account.
       operationId: CosmosBankV1Beta1Balance
@@ -3513,7 +3513,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/bank/v1beta1/denoms_metadata/{denom}:
+  '/cosmos/bank/v1beta1/denoms_metadata/{denom}':
     get:
       summary: DenomsMetadata queries the client metadata of a given coin denomination.
       operationId: CosmosBankV1Beta1DenomMetadata
@@ -3678,7 +3678,7 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  /cosmos/bank/v1beta1/spendable_balances/{address}:
+  '/cosmos/bank/v1beta1/spendable_balances/{address}':
     get:
       summary: |-
         SpendableBalances queries the spenable balance of all coins for a single
@@ -3944,7 +3944,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/bank/v1beta1/supply/{denom}:
+  '/cosmos/bank/v1beta1/supply/{denom}':
     get:
       summary: SupplyOf queries the supply of a single coin.
       operationId: CosmosBankV1Beta1SupplyOf
@@ -4778,7 +4778,7 @@ paths:
                         }
       tags:
         - Service
-  /cosmos/base/tendermint/v1beta1/blocks/{height}:
+  '/cosmos/base/tendermint/v1beta1/blocks/{height}':
     get:
       summary: GetBlockByHeight queries block for given height.
       operationId: CosmosBaseTendermintV1Beta1GetBlockByHeight
@@ -6502,7 +6502,7 @@ paths:
           type: boolean
       tags:
         - Service
-  /cosmos/base/tendermint/v1beta1/validatorsets/{height}:
+  '/cosmos/base/tendermint/v1beta1/validatorsets/{height}':
     get:
       summary: GetValidatorSetByHeight queries validator-set at a given height.
       operationId: CosmosBaseTendermintV1Beta1GetValidatorSetByHeight
@@ -7427,7 +7427,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/evidence/v1beta1/evidence/{evidence_hash}:
+  '/cosmos/evidence/v1beta1/evidence/{evidence_hash}':
     get:
       summary: Evidence queries evidence based on evidence hash.
       operationId: CosmosEvidenceV1Beta1Evidence
@@ -7803,7 +7803,7 @@ paths:
           format: byte
       tags:
         - Query
-  /cosmos/feegrant/v1beta1/allowance/{granter}/{grantee}:
+  '/cosmos/feegrant/v1beta1/allowance/{granter}/{grantee}':
     get:
       summary: Allowance returns fee granted to the grantee by the granter.
       operationId: CosmosFeegrantV1Beta1Allowance
@@ -8098,7 +8098,7 @@ paths:
           type: string
       tags:
         - Query
-  /cosmos/feegrant/v1beta1/allowances/{grantee}:
+  '/cosmos/feegrant/v1beta1/allowances/{grantee}':
     get:
       summary: Allowances returns all the grants for address.
       operationId: CosmosFeegrantV1Beta1Allowances
@@ -8461,7 +8461,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/feegrant/v1beta1/issued/{granter}:
+  '/cosmos/feegrant/v1beta1/issued/{granter}':
     get:
       summary: |-
         AllowancesByGranter returns all the grants given by an address
@@ -9107,7 +9107,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/slashing/v1beta1/signing_infos/{cons_address}:
+  '/cosmos/slashing/v1beta1/signing_infos/{cons_address}':
     get:
       summary: SigningInfo queries the signing info of given cons address
       operationId: CosmosSlashingV1Beta1SigningInfo
@@ -9781,7 +9781,7 @@ paths:
                     description: Response code.
                   data:
                     type: string
-                    description: Result bytes, if any.
+                    description: 'Result bytes, if any.'
                   raw_log:
                     type: string
                     description: >-
@@ -10313,7 +10313,7 @@ paths:
               RPC method.
       tags:
         - Service
-  /cosmos/tx/v1beta1/txs/block/{height}:
+  '/cosmos/tx/v1beta1/txs/block/{height}':
     get:
       summary: GetBlockWithTxs fetches a block with decoded txs.
       description: 'Since: cosmos-sdk 0.45.2'
@@ -10573,7 +10573,7 @@ paths:
           type: boolean
       tags:
         - Service
-  /cosmos/tx/v1beta1/txs/{hash}:
+  '/cosmos/tx/v1beta1/txs/{hash}':
     get:
       summary: GetTx fetches a tx by hash.
       operationId: CosmosTxV1Beta1GetTx
@@ -10769,13 +10769,13 @@ paths:
                         }
       parameters:
         - name: hash
-          description: hash is the tx hash to query, encoded as a hex string.
+          description: 'hash is the tx hash to query, encoded as a hex string.'
           in: path
           required: true
           type: string
       tags:
         - Service
-  /cosmos/upgrade/v1beta1/applied_plan/{name}:
+  '/cosmos/upgrade/v1beta1/applied_plan/{name}':
     get:
       summary: AppliedPlan queries a previously applied upgrade plan by its name.
       operationId: CosmosUpgradeV1Beta1AppliedPlan
@@ -11646,7 +11646,7 @@ paths:
           type: string
       tags:
         - Query
-  /cosmos/upgrade/v1beta1/upgraded_consensus_state/{last_height}:
+  '/cosmos/upgrade/v1beta1/upgraded_consensus_state/{last_height}':
     get:
       summary: >-
         UpgradedConsensusState queries the consensus state that will serve
@@ -11961,7 +11961,7 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  /ibc/apps/transfer/v1/denom_hashes/{trace}:
+  '/ibc/apps/transfer/v1/denom_hashes/{trace}':
     get:
       summary: DenomHash queries a denomination hash information.
       operationId: IbcApplicationsTransferV1DenomHash
@@ -12166,7 +12166,7 @@ paths:
                         }
       parameters:
         - name: trace
-          description: The denomination trace ([port_id]/[channel_id])+/[denom]
+          description: 'The denomination trace ([port_id]/[channel_id])+/[denom]'
           in: path
           required: true
           type: string
@@ -12460,7 +12460,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /ibc/apps/transfer/v1/denom_traces/{hash}:
+  '/ibc/apps/transfer/v1/denom_traces/{hash}':
     get:
       summary: DenomTrace queries a denomination trace information.
       operationId: IbcApplicationsTransferV1DenomTrace
@@ -13288,7 +13288,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}':
     get:
       summary: Channel queries an IBC Channel.
       operationId: IbcCoreChannelV1Channel
@@ -13611,7 +13611,7 @@ paths:
           type: string
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/client_state:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/client_state':
     get:
       summary: >-
         ChannelClientState queries for the client state for the channel
@@ -14045,7 +14045,7 @@ paths:
           type: string
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/consensus_state/revision/{revision_number}/height/{revision_height}:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/consensus_state/revision/{revision_number}/height/{revision_height}':
     get:
       summary: |-
         ChannelConsensusState queries for the consensus state for the channel
@@ -14476,7 +14476,7 @@ paths:
           format: uint64
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/next_sequence:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/next_sequence':
     get:
       summary: >-
         NextSequenceReceive returns the next receive sequence for a given
@@ -14726,7 +14726,7 @@ paths:
           type: string
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acknowledgements:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acknowledgements':
     get:
       summary: >-
         PacketAcknowledgements returns all the packet acknowledgements
@@ -15082,7 +15082,7 @@ paths:
           collectionFormat: multi
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acks/{sequence}:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acks/{sequence}':
     get:
       summary: PacketAcknowledgement queries a stored packet acknowledgement hash.
       operationId: IbcCoreChannelV1PacketAcknowledgement
@@ -15340,7 +15340,7 @@ paths:
           format: uint64
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments':
     get:
       summary: |-
         PacketCommitments returns all the packet commitments hashes associated
@@ -15685,7 +15685,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_ack_sequences}/unreceived_acks:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_ack_sequences}/unreceived_acks':
     get:
       summary: >-
         UnreceivedAcks returns all the unreceived IBC acknowledgements
@@ -15945,7 +15945,7 @@ paths:
           minItems: 1
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_commitment_sequences}/unreceived_packets:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_commitment_sequences}/unreceived_packets':
     get:
       summary: >-
         UnreceivedPackets returns all the unreceived IBC packets associated with
@@ -16205,7 +16205,7 @@ paths:
           minItems: 1
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{sequence}:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{sequence}':
     get:
       summary: PacketCommitment queries a stored packet commitment hash.
       operationId: IbcCoreChannelV1PacketCommitment
@@ -16464,7 +16464,7 @@ paths:
           format: uint64
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_receipts/{sequence}:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_receipts/{sequence}':
     get:
       summary: >-
         PacketReceipt queries if a given packet sequence has been received on
@@ -16726,7 +16726,7 @@ paths:
           format: uint64
       tags:
         - Query
-  /ibc/core/channel/v1/connections/{connection}/channels:
+  '/ibc/core/channel/v1/connections/{connection}/channels':
     get:
       summary: |-
         ConnectionChannels queries all the channels associated with a connection
@@ -17797,7 +17797,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /ibc/core/client/v1/client_states/{client_id}:
+  '/ibc/core/client/v1/client_states/{client_id}':
     get:
       summary: ClientState queries an IBC light client.
       operationId: IbcCoreClientV1ClientState
@@ -18211,7 +18211,7 @@ paths:
           type: string
       tags:
         - Query
-  /ibc/core/client/v1/client_status/{client_id}:
+  '/ibc/core/client/v1/client_status/{client_id}':
     get:
       summary: Status queries the status of an IBC client.
       operationId: IbcCoreClientV1ClientStatus
@@ -18421,7 +18421,7 @@ paths:
           type: string
       tags:
         - Query
-  /ibc/core/client/v1/consensus_states/{client_id}:
+  '/ibc/core/client/v1/consensus_states/{client_id}':
     get:
       summary: |-
         ConsensusStates queries all the consensus state associated with a given
@@ -18919,7 +18919,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /ibc/core/client/v1/consensus_states/{client_id}/revision/{revision_number}/height/{revision_height}:
+  '/ibc/core/client/v1/consensus_states/{client_id}/revision/{revision_number}/height/{revision_height}':
     get:
       summary: >-
         ConsensusState queries a consensus state associated with a client state
@@ -20097,7 +20097,7 @@ paths:
                         }
       tags:
         - Query
-  /ibc/core/connection/v1/client_connections/{client_id}:
+  '/ibc/core/connection/v1/client_connections/{client_id}':
     get:
       summary: |-
         ClientConnections queries the connection paths associated with a client
@@ -20736,7 +20736,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /ibc/core/connection/v1/connections/{connection_id}:
+  '/ibc/core/connection/v1/connections/{connection_id}':
     get:
       summary: Connection queries an IBC connection end.
       operationId: IbcCoreConnectionV1Connection
@@ -21073,7 +21073,7 @@ paths:
           type: string
       tags:
         - Query
-  /ibc/core/connection/v1/connections/{connection_id}/client_state:
+  '/ibc/core/connection/v1/connections/{connection_id}/client_state':
     get:
       summary: |-
         ConnectionClientState queries the client state associated with the
@@ -21500,7 +21500,7 @@ paths:
           type: string
       tags:
         - Query
-  /ibc/core/connection/v1/connections/{connection_id}/consensus_state/revision/{revision_number}/height/{revision_height}:
+  '/ibc/core/connection/v1/connections/{connection_id}/consensus_state/revision/{revision_number}/height/{revision_height}':
     get:
       summary: |-
         ConnectionConsensusState queries the consensus state associated with the
@@ -23747,6 +23747,354 @@ paths:
           type: string
       tags:
         - Query
+  /NicholasDotSol/duality/dex/adjancey_matrix:
+    get:
+      summary: Queries a list of AdjanceyMatrix items.
+      operationId: NicholasdotsolDualityDexAdjanceyMatrixAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              AdjanceyMatrix:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uint64
+                    edgeRow:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uint64
+                        edge:
+                          type: boolean
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/adjancey_matrix/{id}:
+    get:
+      summary: Queries a AdjanceyMatrix by id.
+      operationId: NicholasdotsolDualityDexAdjanceyMatrix
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              AdjanceyMatrix:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uint64
+                  edgeRow:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uint64
+                      edge:
+                        type: boolean
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/edge_row:
+    get:
+      summary: Queries a list of EdgeRow items.
+      operationId: NicholasdotsolDualityDexEdgeRowAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              EdgeRow:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uint64
+                    edge:
+                      type: boolean
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/edge_row/{id}:
+    get:
+      summary: Queries a EdgeRow by id.
+      operationId: NicholasdotsolDualityDexEdgeRow
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              EdgeRow:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uint64
+                  edge:
+                    type: boolean
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
   /NicholasDotSol/duality/dex/fee_tier:
     get:
       summary: Queries a list of FeeTier items.
@@ -23872,7 +24220,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /NicholasDotSol/duality/dex/fee_tier/{id}:
+  '/NicholasDotSol/duality/dex/fee_tier/{id}':
     get:
       summary: Queries a FeeTier by id.
       operationId: NicholasdotsolDualityDexFeeTier
@@ -24054,7 +24402,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /NicholasDotSol/duality/dex/limit_order_tranche/{pairId}/{token}/{tickIndex}/{trancheIndex}:
+  '/NicholasDotSol/duality/dex/limit_order_tranche/{pairId}/{token}/{tickIndex}/{trancheIndex}':
     get:
       summary: Queries a LimitOrderTranche by index.
       operationId: NicholasdotsolDualityDexLimitOrderTranche
@@ -24261,7 +24609,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /NicholasDotSol/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{count}/{address}:
+  '/NicholasDotSol/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{count}/{address}':
     get:
       summary: Queries a LimitOrderTrancheUser by index.
       operationId: NicholasdotsolDualityDexLimitOrderTrancheUser
@@ -24502,7 +24850,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /NicholasDotSol/duality/dex/shares/{address}/{pairId}/{tickIndex}/{fee}:
+  '/NicholasDotSol/duality/dex/shares/{address}/{pairId}/{tickIndex}/{fee}':
     get:
       summary: Queries a Shares by index.
       operationId: NicholasdotsolDualityDexShares
@@ -24724,7 +25072,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /NicholasDotSol/duality/dex/tick/{pairId}/{tickIndex}:
+  '/NicholasDotSol/duality/dex/tick/{pairId}/{tickIndex}':
     get:
       summary: Queries a Tick by index.
       operationId: NicholasdotsolDualityDexTick
@@ -24930,7 +25278,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /NicholasDotSol/duality/dex/token_map/{address}:
+  '/NicholasDotSol/duality/dex/token_map/{address}':
     get:
       summary: Queries a TokenMap by index.
       operationId: NicholasdotsolDualityDexTokenMap
@@ -25097,7 +25445,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /NicholasDotSol/duality/dex/tokens/{id}:
+  '/NicholasDotSol/duality/dex/tokens/{id}':
     get:
       summary: Queries a Tokens by id.
       operationId: NicholasdotsolDualityDexTokens
@@ -25274,7 +25622,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /NicholasDotSol/duality/dex/trading_pair/{pairId}:
+  '/NicholasDotSol/duality/dex/trading_pair/{pairId}':
     get:
       summary: Queries a TradingPair by index.
       operationId: NicholasdotsolDualityDexTradingPair
@@ -33644,7 +33992,7 @@ definitions:
         description: Response code.
       data:
         type: string
-        description: Result bytes, if any.
+        description: 'Result bytes, if any.'
       raw_log:
         type: string
         description: |-
@@ -34121,7 +34469,7 @@ definitions:
             description: Response code.
           data:
             type: string
-            description: Result bytes, if any.
+            description: 'Result bytes, if any.'
           raw_log:
             type: string
             description: |-
@@ -35093,7 +35441,7 @@ definitions:
             description: Response code.
           data:
             type: string
-            description: Result bytes, if any.
+            description: 'Result bytes, if any.'
           raw_log:
             type: string
             description: |-
@@ -35412,7 +35760,7 @@ definitions:
               description: Response code.
             data:
               type: string
-              description: Result bytes, if any.
+              description: 'Result bytes, if any.'
             raw_log:
               type: string
               description: |-
@@ -37282,7 +37630,6 @@ definitions:
               format: byte
             index:
               type: boolean
-              title: nondeterministic
           description: EventAttribute is a single key-value pair, associated with an event.
     description: >-
       Event allows application developers to attach additional information to
@@ -37302,7 +37649,6 @@ definitions:
         format: byte
       index:
         type: boolean
-        title: nondeterministic
     description: EventAttribute is a single key-value pair, associated with an event.
   cosmos.upgrade.v1beta1.ModuleVersion:
     type: object
@@ -38087,7 +38433,7 @@ definitions:
           this channel will travel
       version:
         type: string
-        title: opaque channel version, which is agreed upon during the handshake
+        title: 'opaque channel version, which is agreed upon during the handshake'
     description: |-
       Channel defines pipeline for exactly-once packet delivery between specific
       modules on separate blockchains, which has at least one end capable of
@@ -38162,7 +38508,7 @@ definitions:
           this channel will travel
       version:
         type: string
-        title: opaque channel version, which is agreed upon during the handshake
+        title: 'opaque channel version, which is agreed upon during the handshake'
       port_id:
         type: string
         title: port identifier
@@ -38847,7 +39193,7 @@ definitions:
               this channel will travel
           version:
             type: string
-            title: opaque channel version, which is agreed upon during the handshake
+            title: 'opaque channel version, which is agreed upon during the handshake'
         description: >-
           Channel defines pipeline for exactly-once packet delivery between
           specific
@@ -45041,6 +45387,28 @@ definitions:
         type: string
         format: int64
     title: ValidatorUpdate
+  nicholasdotsol.duality.dex.AdjanceyMatrix:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+      edgeRow:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+          edge:
+            type: boolean
+  nicholasdotsol.duality.dex.EdgeRow:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+      edge:
+        type: boolean
   nicholasdotsol.duality.dex.FeeTier:
     type: object
     properties:

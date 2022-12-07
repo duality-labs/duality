@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +18,7 @@ func CmdPlaceLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "place-limit-order [receiver] [token-a] [token-b] [tick-index] [token-in] [amount-in]",
 		Short: "Broadcast message PlaceLimitOrder",
-		Args:  cobra.ExactArgs(5),
+		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
 			argTokenA := args[1]
@@ -32,13 +33,11 @@ func CmdPlaceLimitOrder() *cobra.Command {
 
 			argTokenIn := args[4]
 			argAmountIn := args[5]
-			amountInInt, err := strconv.Atoi(argAmountIn)
-			if err != nil {
-				return err
+
+			amountInInt, ok := sdk.NewIntFromString(argAmountIn)
+			if ok != true {
+				return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for amount-in")
 			}
-			amountIn := sdk.NewInt(int64(amountInInt))
-
-
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -52,7 +51,7 @@ func CmdPlaceLimitOrder() *cobra.Command {
 				argTokenB,
 				int64(argTickIndexInt),
 				argTokenIn,
-				amountIn,
+				amountInInt,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
