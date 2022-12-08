@@ -45116,6 +45116,8 @@ definitions:
           type: string
   nicholasdotsol.duality.dex.MsgPlaceLimitOrderResponse:
     type: object
+  nicholasdotsol.duality.dex.MsgSetDenomMetadataResponse:
+    type: object
   nicholasdotsol.duality.dex.MsgSwapResponse:
     type: object
     properties:

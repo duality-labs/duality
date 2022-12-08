@@ -195,3 +195,31 @@ func (k msgServer) CancelLimitOrder(goCtx context.Context, msg *types.MsgCancelL
 
 	return &types.MsgCancelLimitOrderResponse{}, nil
 }
+
+func (k msgServer) SetDenomMetadata(goCtx context.Context, msg *types.MsgSetDenomMetadata) (*types.MsgSetDenomMetadataResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	err := msg.Metadata.Validate()
+	if err != nil {
+		return &types.MsgSetDenomMetadataResponse{}, err
+	}
+
+	denomMetadata, found := k.Keeper.bankKeeper.GetDenomMetaData(ctx, msg.Metadata.Base)
+
+	if found {
+		return &types.MsgSetDenomMetadataResponse{}, sdkerrors.Wrapf(types.ErrDenomAlreadyExists, "Existing denom: %s", denomMetadata.String())
+	}
+
+	// NOTE: eventually we probably want to do further validation here or charge the user a fee for adding a new Denom
+	k.Keeper.bankKeeper.SetDenomMetaData(ctx, msg.Metadata)
+
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.TypeMsgSetDenomMetadata,
+			sdk.NewAttribute(types.DenomBase, msg.Metadata.Base),
+			sdk.NewAttribute(types.DenomMetadata, msg.Metadata.String()),
+		),
+	})
+
+	return &types.MsgSetDenomMetadataResponse{}, nil
+}

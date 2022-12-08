@@ -3,13 +3,17 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
-const TypeMsgSetDenomMetadata = "set_denom_metadata"
+const (TypeMsgSetDenomMetadata = "set_denom_metadata"
+	DenomBase = "denom_base"
+	DenomMetadata = "denom_metadata"
+)
 
 var _ sdk.Msg = &MsgSetDenomMetadata{}
 
-func NewMsgSetDenomMetadata(creator string, metadata string) *MsgSetDenomMetadata {
+func NewMsgSetDenomMetadata(creator string, metadata banktypes.Metadata) *MsgSetDenomMetadata {
 	return &MsgSetDenomMetadata{
 		Creator:  creator,
 		Metadata: metadata,
