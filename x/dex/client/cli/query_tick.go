@@ -45,19 +45,21 @@ func CmdListTick() *cobra.Command {
 
 func CmdShowTick() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-tick-map [tick-index]",
+		Use:   "show-tick-map [tick-index] [pairId]",
 		Short: "shows a Tick",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			queryClient := types.NewQueryClient(clientCtx)
 
 			argTickIndex := args[0]
+			argPairId := args[1]
 
 			tmpTickIndex, _ := strconv.Atoi(argTickIndex)
 			params := &types.QueryGetTickRequest{
 				TickIndex: int64(tmpTickIndex),
+				PairId:    argPairId,
 			}
 
 			res, err := queryClient.Tick(context.Background(), params)

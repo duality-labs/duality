@@ -11,7 +11,7 @@ message TickDataType {
   repeated Reserve0AndSharesType reserve0AndShares = 1; 
   repeated string reserve1 = 2 [
       (gogoproto.moretags)   = "yaml:\"reserve1\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "reserve1"
   ]; 

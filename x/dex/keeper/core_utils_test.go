@@ -2,14 +2,13 @@ package keeper_test
 
 import (
 	"github.com/NicholasDotSol/duality/x/dex/keeper"
-	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func getTotalAmount(amounts []sdk.Dec) sdk.Dec {
+func getTotalAmount(amounts []sdk.Int) sdk.Int {
 	// calculate total trade amounts
-	totalAmount := NewDec(0)
+	totalAmount := sdk.NewInt(0)
 	for i := range amounts {
 		totalAmount = totalAmount.Add(amounts[i])
 	}
@@ -17,13 +16,13 @@ func getTotalAmount(amounts []sdk.Dec) sdk.Dec {
 }
 
 // Pure helper function to balance amounts to pool ratio
-func trueAmounts(amount0 sdk.Dec, amount1 sdk.Dec, lowerReserve1 sdk.Dec, upperReserve0 sdk.Dec) (sdk.Dec, sdk.Dec) {
+func trueAmounts(amount0 sdk.Int, amount1 sdk.Int, lowerReserve1 sdk.Int, upperReserve0 sdk.Int) (sdk.Int, sdk.Int) {
 	trueAmount0, trueAmount1 := amount0, amount1
-	if upperReserve0.GT(sdk.ZeroDec()) {
+	if upperReserve0.GT(sdk.ZeroInt()) {
 		// this corresponds to lines 217-221 in function DepositHelper of core.go
-		trueAmount1 = min(amount1, lowerReserve1.Mul(amount0).Quo(upperReserve0))
+		trueAmount1 = min(amount1, lowerReserve1.Mul(amount0).ToDec().Quo(upperReserve0.ToDec()).TruncateInt())
 	}
-	if lowerReserve1.GT(sdk.ZeroDec()) {
+	if lowerReserve1.GT(sdk.ZeroInt()) {
 		// this corresponds to lines 223-226 in function DepositHelper of core.go
 		trueAmount0 = min(amount0, upperReserve0.Mul(amount1).Quo(lowerReserve1))
 	}
@@ -31,21 +30,21 @@ func trueAmounts(amount0 sdk.Dec, amount1 sdk.Dec, lowerReserve1 sdk.Dec, upperR
 }
 
 // Pure helper function for calculateNewCurrentTicks
-func calculateNewCurrentTicksPure(amount0 sdk.Dec, amount1 sdk.Dec, tickIndex int64, fee int64, curr0to1 int64, curr1to0 int64) (int64, int64) {
+func calculateNewCurrentTicksPure(amount0 sdk.Int, amount1 sdk.Int, tickIndex int64, fee int64, curr0to1 int64, curr1to0 int64) (int64, int64) {
 	// this corresponds to lines 245-253 in function DepositHelper of core.go
 	// If a new tick has been placed that tigtens the range between currentTick0to1 and currentTick0to1 update CurrentTicks to the tighest ticks
 	new0to1, new1to0 := curr0to1, curr1to0
-	if amount0.GT(sdk.ZeroDec()) && ((tickIndex+fee > curr0to1) && (tickIndex+fee < curr1to0)) {
+	if amount0.GT(sdk.ZeroInt()) && ((tickIndex+fee > curr0to1) && (tickIndex+fee < curr1to0)) {
 		new1to0 = tickIndex + fee
 	}
-	if amount1.GT(sdk.ZeroDec()) && ((tickIndex-fee > curr0to1) && (tickIndex-fee < curr1to0)) {
+	if amount1.GT(sdk.ZeroInt()) && ((tickIndex-fee > curr0to1) && (tickIndex-fee < curr1to0)) {
 		new0to1 = tickIndex - fee
 	}
 	return new0to1, new1to0
 }
 
 // Helper function to calculate if current ticks change
-func calculateNewCurrentTicks(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, tickIndex int64, feeIndex uint64, pair types.TradingPair) (new0to1 int64, new1to0 int64) {
+func calculateNewCurrentTicks(s *MsgServerTestSuite, amount0 sdk.Int, amount1 sdk.Int, tickIndex int64, feeIndex uint64, pair types.TradingPair) (new0to1 int64, new1to0 int64) {
 	k, ctx := s.app.DexKeeper, s.ctx
 	FeeTier := k.GetAllFeeTier(ctx)
 	fee := FeeTier[feeIndex].Fee
@@ -88,37 +87,38 @@ func makePair(s *MsgServerTestSuite, pairId string, tickIndex int64, feeTier uin
 // should eventually be refactored so that core.go is modularized for easier unit testing and readability
 
 // Calculation of shares when depositing the initial amount (no reserves)
-func calculateSharesEmpty(amount0 sdk.Dec, amount1 sdk.Dec, price sdk.Dec) sdk.Dec {
-	return amount0.Add(amount1.Mul(price))
+func calculateSharesEmpty(amount0 sdk.Int, amount1 sdk.Int, price sdk.Dec) sdk.Int {
+	return price.MulInt(amount1).Add(amount0.ToDec()).TruncateInt()
 }
 
 // Calculation of shares when there are pre-existing reserves
-func calculateSharesNonEmpty(amount sdk.Dec, reserve sdk.Dec, totalShares sdk.Dec) sdk.Dec {
-	return amount.Quo(reserve).Mul(totalShares)
+func calculateSharesNonEmpty(amount sdk.Int, reserve sdk.Int, totalShares sdk.Int) sdk.Int {
+	return amount.ToDec().QuoInt(reserve).MulInt(totalShares).TruncateInt()
+
 }
 
 // Pure func that takes all the parameters requires to compute the amount of minted shares and handles the different cases accordingly.
 // This is probably excessive as keeping only the calculation pure is reasonable enough, but it's here for posterity.
 func calculateSharesPure(
-	amount0 sdk.Dec,
-	trueAmount0 sdk.Dec,
-	amount1 sdk.Dec,
-	trueAmount1 sdk.Dec,
+	amount0 sdk.Int,
+	trueAmount0 sdk.Int,
+	amount1 sdk.Int,
+	trueAmount1 sdk.Int,
 	price sdk.Dec,
 	feeIndex uint64,
 	lowerTickFound bool,
-	lowerReserve1 sdk.Dec,
+	lowerReserve1 sdk.Int,
 	upperTickFound bool,
-	upperReserve0 sdk.Dec,
-	upperTotalShares sdk.Dec,
-) sdk.Dec {
+	upperReserve0 sdk.Int,
+	upperTotalShares sdk.Int,
+) sdk.Int {
 	// calculating shares minted in DepositHelper
-	if !lowerTickFound || !upperTickFound || upperTotalShares.Equal(sdk.ZeroDec()) {
+	if !lowerTickFound || !upperTickFound || upperTotalShares.Equal(sdk.ZeroInt()) {
 		// this case corresponds to lines 129-132 in function DepositHelper of core.go
 		return calculateSharesEmpty(amount0, amount1, price)
 	} else {
 		// these cases correspond to lines 228-234 in function DepositHelper of core.go
-		if trueAmount0.GT(sdk.ZeroDec()) {
+		if trueAmount0.GT(sdk.ZeroInt()) {
 			return calculateSharesNonEmpty(trueAmount0, upperReserve0, upperTotalShares)
 		} else {
 			return calculateSharesNonEmpty(trueAmount1, lowerReserve1, upperTotalShares)
@@ -127,7 +127,7 @@ func calculateSharesPure(
 }
 
 // Impure function that pulls all the state variables required for calculating the amount of shares to mint.
-func calculateShares(s *MsgServerTestSuite, amount0 sdk.Dec, amount1 sdk.Dec, pairId string, tickIndex int64, feeIndex uint64) sdk.Dec {
+func calculateShares(s *MsgServerTestSuite, amount0 sdk.Int, amount1 sdk.Int, pairId string, tickIndex int64, feeIndex uint64) sdk.Int {
 	k, ctx := s.app.DexKeeper, s.ctx
 
 	price1To0 := keeper.CalcPrice1To0(tickIndex)
@@ -176,10 +176,10 @@ func makeShares(s *MsgServerTestSuite, acc sdk.AccAddress, pairId string, tickIn
 	return sharesSlice, sharesFoundSlice
 }
 
-type SharesMap = map[int64]map[uint64]sdk.Dec
+type SharesMap = map[int64]map[uint64]sdk.Int
 
-func calculateFinalShares(s *MsgServerTestSuite, pairId string, amounts0 []sdk.Dec, amounts1 []sdk.Dec, tickIndexes []int64, feeTiers []uint64) SharesMap {
-	accum := make(map[int64]map[uint64]sdk.Dec) // map from tickIndex->feeTier->sharesCalc
+func calculateFinalShares(s *MsgServerTestSuite, pairId string, amounts0 []sdk.Int, amounts1 []sdk.Int, tickIndexes []int64, feeTiers []uint64) SharesMap {
+	accum := make(map[int64]map[uint64]sdk.Int) // map from tickIndex->feeTier->sharesCalc
 	for i := range amounts0 {
 		// get expected amount of minted shares and increase accum on both sides of spread
 		accSharesCalc := calculateShares(s, amounts0[i], amounts1[i], pairId, tickIndexes[i], feeTiers[i])
@@ -190,7 +190,7 @@ func calculateFinalShares(s *MsgServerTestSuite, pairId string, amounts0 []sdk.D
 		} else {
 			// if inner map hasn't been initialized, init
 			if _, ok := accum[tickIndexes[i]]; !ok {
-				accum[tickIndexes[i]] = make(map[uint64]sdk.Dec)
+				accum[tickIndexes[i]] = make(map[uint64]sdk.Int)
 			}
 			// else add value to map
 			accum[tickIndexes[i]][feeTiers[i]] = accSharesCalc
@@ -199,7 +199,7 @@ func calculateFinalShares(s *MsgServerTestSuite, pairId string, amounts0 []sdk.D
 	return accum
 }
 
-func calculateFinalTicks(s *MsgServerTestSuite, pair types.TradingPair, amounts0 []sdk.Dec, amounts1 []sdk.Dec, tickIndexes []int64, feeTiers []uint64) (int64, int64) {
+func calculateFinalTicks(s *MsgServerTestSuite, pair types.TradingPair, amounts0 []sdk.Int, amounts1 []sdk.Int, tickIndexes []int64, feeTiers []uint64) (int64, int64) {
 	expectedTick0to1, expectedTick1to0 := pair.CurrentTick0To1, pair.CurrentTick1To0
 	for i := range amounts0 {
 		// move expected current ticks

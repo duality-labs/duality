@@ -18,7 +18,7 @@ var _ = strconv.IntSize
 func createNShares(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.Shares {
 	items := make([]types.Shares, n)
 	for i := range items {
-		items[i].SharesOwned = sdk.ZeroDec()
+		items[i].SharesOwned = sdk.ZeroInt()
 		items[i].Address = strconv.Itoa(i)
 		items[i].PairId = strconv.Itoa(i)
 		items[i].TickIndex = int64(i)
