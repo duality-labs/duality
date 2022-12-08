@@ -6,7 +6,6 @@ package nicholasdotsol.duality.dex;
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
-import "cosmos/bank/v1beta1/bank.proto";
 
 // Msg defines the Msg service.
 service Msg {
@@ -157,10 +156,12 @@ message MsgCancelLimitOrderResponse {
 
 message MsgSetDenomMetadata {
   string creator = 1;
-  cosmos.bank.v1beta1.Metadata metadata = 2 [
-                                             (gogoproto.moretags) = "yaml:\"metadata\"",
-                                             (gogoproto.nullable) = false
-                                             ];
+  string metadata = 2 [
+                       (gogoproto.moretags) = "yaml:\"metadata\"",
+                       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/x/bank/types.Metadata",
+                       (gogoproto.nullable) = false,
+                       (gogoproto.jsontag) = "metadata"
+                       ];
 }
 
 message MsgSetDenomMetadataResponse {
