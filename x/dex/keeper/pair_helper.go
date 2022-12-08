@@ -3,6 +3,8 @@ package keeper
 import (
 
 	//"strings"
+	"fmt"
+
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -24,4 +26,8 @@ func (k Keeper) SortTokens(ctx sdk.Context, tokenA string, tokenB string) (strin
 
 func (k Keeper) CreatePairId(token0 string, token1 string) (pairId string) {
 	return (token0 + "<>" + token1)
+}
+
+func CreateSharesId(denom0 string, denom1 string, tickIndex int64, feeIndex uint64) (denom string) {
+	return fmt.Sprintf("%s%s%d%d", denom0, denom1, tickIndex, feeIndex)
 }

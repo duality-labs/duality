@@ -66,8 +66,12 @@ func (k Keeper) DepositCore(
 		lowerTick := k.GetOrInitTick(goCtx, pairId, lowerTickIndex)
 		upperTick := k.GetOrInitTick(goCtx, pairId, upperTickIndex)
 
+		sharesId := CreateSharesId(token0, token1, tickIndex, feeIndex)
+		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
+
+		// TODO: replace with bank keeper and change protos to match reserve1
 		lowerReserve0 := &lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
-		lowerTotalShares := &lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
+		// totalShares := &lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
 		upperReserve1 := &upperTick.TickData.Reserve1[feeIndex]
 
 		trueAmount0, trueAmount1, sharesMinted := CalcTrueAmounts(
@@ -76,7 +80,7 @@ func (k Keeper) DepositCore(
 			*upperReserve1,
 			amount0,
 			amount1,
-			*lowerTotalShares,
+			totalShares,
 		)
 
 		if trueAmount0.Equal(sdk.ZeroInt()) && trueAmount1.Equal(sdk.ZeroInt()) {
@@ -96,7 +100,8 @@ func (k Keeper) DepositCore(
 		}
 
 		*lowerReserve0 = lowerReserve0.Add(trueAmount0)
-		*lowerTotalShares = lowerTotalShares.Add(sharesMinted)
+		// TODO: don't need to do total shares accounting
+		// *totalShares = totalShares.Add(sharesMinted)
 		*upperReserve1 = upperReserve1.Add(trueAmount1)
 		k.SetTradingPair(ctx, pair)
 		k.SetTick(ctx, pairId, lowerTick)
@@ -110,20 +115,26 @@ func (k Keeper) DepositCore(
 
 		passedDeposit++
 
-		shares, sharesFound := k.GetShares(ctx, msg.Receiver, pairId, tickIndex, feeIndex)
-		if !sharesFound {
-			shares = types.Shares{
-				Address:     msg.Receiver,
-				PairId:      pairId,
-				TickIndex:   tickIndex,
-				FeeIndex:    feeIndex,
-				SharesOwned: sharesMinted,
+		// TODO: replace with call to bank keeper
+		if sharesMinted.GT(sdk.ZeroInt()) {
+			if err := k.MintShares(ctx, callerAddr, sharesMinted, sharesId); err != nil {
+				return nil, nil, err
 			}
-		} else {
-			shares.SharesOwned = shares.SharesOwned.Add(sharesMinted)
 		}
+		// shares, sharesFound := k.GetShares(ctx, msg.Receiver, pairId, tickIndex, feeIndex)
+		// if !sharesFound {
+		// shares = types.Shares{
+		// Address:     msg.Receiver,
+		// PairId:      pairId,
+		// TickIndex:   tickIndex,
+		// FeeIndex:    feeIndex,
+		// SharesOwned: sharesMinted,
+		// }
+		// } else {
+		// shares.SharesOwned = shares.SharesOwned.Add(sharesMinted)
+		// }
 
-		k.SetShares(ctx, shares)
+		// k.SetShares(ctx, shares)
 
 		totalAmountReserve0 = totalAmountReserve0.Add(trueAmount0)
 		totalAmountReserve1 = totalAmountReserve1.Add(trueAmount1)
@@ -183,17 +194,20 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		sharesToRemove := msg.SharesToRemove[i]
 		tickIndex := msg.TickIndexes[i]
 
-		shareOwner, found := k.GetShares(
-			ctx,
-			msg.Creator,
-			pairId,
-			tickIndex,
-			feeIndex,
-		)
-		if !found {
-			return types.ErrValidShareNotFound
-		}
-		userSharesOwned := &shareOwner.SharesOwned
+		// TODO: replace with get balance call to bank keeper
+		// shareOwner, found := k.GetShares(
+		// 	ctx,
+		// 	msg.Creator,
+		// 	pairId,
+		// 	tickIndex,
+		// 	feeIndex,
+		// )
+		// if !found {
+		// 	return types.ErrValidShareNotFound
+		// }
+		// userShares := &shareOwner.SharesOwned
+		sharesId := CreateSharesId(token0, token1, tickIndex, feeIndex)
+		userShares := k.bankKeeper.GetBalance(ctx, callerAddr, sharesId).Amount
 
 		feeValue, found := k.GetFeeTier(ctx, feeIndex)
 		if !found {
@@ -208,28 +222,39 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			return types.ErrValidTickNotFound
 		}
 
-		lowerTickFeeTotalShares := &lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
+		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
+
+		// TODO: replace with get supply call to bank keeper
+		// lowerTickFeeTotalShares := &lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
 		lowerTickFeeReserve0 := &lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
 		upperTickFeeReserve1 := &upperTick.TickData.Reserve1[feeIndex]
-		if lowerTickFeeTotalShares.Equal(sdk.ZeroInt()) {
-			return types.ErrNotEnoughShares
-		}
+		// TODO: redundant, dealt with in verification
+		// if lowerTickFeeTotalShares.Equal(sdk.ZeroInt()) {
+		// 	return types.ErrNotEnoughShares
+		// }
 
-		sharesToRemoveDec := sdk.MinInt(sharesToRemove, *userSharesOwned).ToDec()
-		ownershipRatio := sharesToRemoveDec.Quo(lowerTickFeeTotalShares.ToDec())
+		sharesToRemoveDec := sdk.MinInt(sharesToRemove, userShares).ToDec()
+		ownershipRatio := sharesToRemoveDec.Quo(totalShares.ToDec())
 		// See top NOTE on rounding
 		reserve1ToRemove := ownershipRatio.MulInt(*upperTickFeeReserve1).TruncateInt()
 		reserve0ToRemove := ownershipRatio.MulInt(*lowerTickFeeReserve0).TruncateInt()
 
 		*lowerTickFeeReserve0 = lowerTickFeeReserve0.Sub(reserve0ToRemove)
 		*upperTickFeeReserve1 = upperTickFeeReserve1.Sub(reserve1ToRemove)
-		*lowerTickFeeTotalShares = lowerTickFeeTotalShares.Sub(sharesToRemove)
-		*userSharesOwned = userSharesOwned.Sub(sharesToRemove)
+		// TODO: replace with burn call to bank keeper
+		// *lowerTickFeeTotalShares = lowerTickFeeTotalShares.Sub(sharesToRemove)
+		// *userShares = userShares.Sub(sharesToRemove)
 
 		totalReserve0ToRemove = totalReserve0ToRemove.Add(reserve0ToRemove)
 		totalReserve1ToRemove = totalReserve1ToRemove.Add(reserve1ToRemove)
 
-		k.SetShares(ctx, shareOwner)
+		if sharesToRemove.GT(sdk.ZeroInt()) {
+			if err := k.BurnShares(ctx, callerAddr, sharesToRemove, sharesId); err != nil {
+				return err
+			}
+		}
+		// TODO: replace with burn call to bank keeper
+		// k.SetShares(ctx, shareOwner)
 		k.SetTick(ctx, pairId, upperTick)
 		k.SetTick(ctx, pairId, lowerTick)
 
@@ -847,7 +872,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	ratioFilled := amountFilled.QuoInt(tranche.TotalTokenIn)
 	maxAllowedToWithdraw := sdk.MinInt(
 		ratioFilled.MulInt(trancheUser.SharesOwned).TruncateInt(), // cannot withdraw more than what's been filled
-		trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled), // cannot withdraw more than what you own
+		trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled),  // cannot withdraw more than what you own
 	)
 	amountOutTokenIn := maxAllowedToWithdraw.Sub(trancheUser.SharesWithdrawn)
 
