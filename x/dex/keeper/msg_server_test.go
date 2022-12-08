@@ -711,16 +711,21 @@ func (s *MsgServerTestSuite) assertLiquidityAtTickInt(amountA sdk.Int, amountB s
 	pairId := s.app.DexKeeper.CreatePairId("TokenA", "TokenB")
 	fee := s.feeTiers[feeIndex].Fee
 	lowerTick, lowerTickFound := s.app.DexKeeper.GetTick(s.ctx, pairId, tickIndex-fee)
-	if !lowerTickFound {
-		s.Require().Fail("Invalid tick %d and fee %d", tickIndex, fee)
+	liquidityA, liquidityB := sdk.ZeroInt(), sdk.ZeroInt()
+	if lowerTickFound {
+		liquidityA = lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
+	} else {
+		// noop, since liquidity was set to 0 already
+		// s.Require().Fail("Invalid tick %d and fee %d", tickIndex, fee)
 	}
 	upperTick, upperTickFound := s.app.DexKeeper.GetTick(s.ctx, pairId, tickIndex+fee)
-	if !upperTickFound {
-		s.Require().Fail("Invalid tick %d and fee %d", tickIndex, fee)
+	if upperTickFound {
+		liquidityB = upperTick.TickData.Reserve1[feeIndex]
+	} else {
+		// noop, since liquidity was set to 0 already
+		// s.Require().Fail("Invalid tick %d and fee %d", tickIndex, fee)
 	}
 
-	liquidityA := lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
-	liquidityB := upperTick.TickData.Reserve1[feeIndex]
 	s.Assert().Equal(amountA, liquidityA)
 	s.Assert().Equal(amountB, liquidityB)
 }
