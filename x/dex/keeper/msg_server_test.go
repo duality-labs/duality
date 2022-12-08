@@ -632,7 +632,7 @@ func (s *MsgServerTestSuite) assertAccountShares(
 ) {
 	sharesExpectedInt := sdk.NewIntFromUint64(sharesExpected)
 	sharesOwned := s.getAccountShares(account, "TokenA", "TokenB", tick, fee)
-	s.Assert().Equal(sharesExpectedInt, sharesOwned)
+	s.Assert().Equal(sharesExpectedInt, sharesOwned, "expected %s != actual %s", sharesExpected, sharesOwned)
 }
 
 func (s *MsgServerTestSuite) assertAliceShares(tick int64, fee uint64, sharesExpected uint64) {
