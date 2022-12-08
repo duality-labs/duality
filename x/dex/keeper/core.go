@@ -69,9 +69,7 @@ func (k Keeper) DepositCore(
 		sharesId := k.CreateSharesId(token0, token1, tickIndex, feeIndex)
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
-		// TODO: replace with bank keeper and change protos to match reserve1
 		lowerReserve0 := &lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
-		// totalShares := &lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
 		upperReserve1 := &upperTick.TickData.Reserve1[feeIndex]
 
 		trueAmount0, trueAmount1, sharesMinted := CalcTrueAmounts(
@@ -100,8 +98,6 @@ func (k Keeper) DepositCore(
 		}
 
 		*lowerReserve0 = lowerReserve0.Add(trueAmount0)
-		// TODO: don't need to do total shares accounting
-		// *totalShares = totalShares.Add(sharesMinted)
 		*upperReserve1 = upperReserve1.Add(trueAmount1)
 		k.SetTradingPair(ctx, pair)
 		k.SetTick(ctx, pairId, lowerTick)
@@ -115,26 +111,11 @@ func (k Keeper) DepositCore(
 
 		passedDeposit++
 
-		// TODO: replace with call to bank keeper
 		if sharesMinted.GT(sdk.ZeroInt()) {
 			if err := k.MintShares(ctx, callerAddr, sharesMinted, sharesId); err != nil {
 				return nil, nil, err
 			}
 		}
-		// shares, sharesFound := k.GetShares(ctx, msg.Receiver, pairId, tickIndex, feeIndex)
-		// if !sharesFound {
-		// shares = types.Shares{
-		// Address:     msg.Receiver,
-		// PairId:      pairId,
-		// TickIndex:   tickIndex,
-		// FeeIndex:    feeIndex,
-		// SharesOwned: sharesMinted,
-		// }
-		// } else {
-		// shares.SharesOwned = shares.SharesOwned.Add(sharesMinted)
-		// }
-
-		// k.SetShares(ctx, shares)
 
 		totalAmountReserve0 = totalAmountReserve0.Add(trueAmount0)
 		totalAmountReserve1 = totalAmountReserve1.Add(trueAmount1)
@@ -194,18 +175,6 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		sharesToRemove := msg.SharesToRemove[i]
 		tickIndex := msg.TickIndexes[i]
 
-		// TODO: replace with get balance call to bank keeper
-		// shareOwner, found := k.GetShares(
-		// 	ctx,
-		// 	msg.Creator,
-		// 	pairId,
-		// 	tickIndex,
-		// 	feeIndex,
-		// )
-		// if !found {
-		// 	return types.ErrValidShareNotFound
-		// }
-		// userShares := &shareOwner.SharesOwned
 		sharesId := k.CreateSharesId(token0, token1, tickIndex, feeIndex)
 		userShares := k.bankKeeper.GetBalance(ctx, callerAddr, sharesId).Amount
 
@@ -224,14 +193,8 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
-		// TODO: replace with get supply call to bank keeper
-		// lowerTickFeeTotalShares := &lowerTick.TickData.Reserve0AndShares[feeIndex].TotalShares
 		lowerTickFeeReserve0 := &lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
 		upperTickFeeReserve1 := &upperTick.TickData.Reserve1[feeIndex]
-		// TODO: redundant, dealt with in verification
-		// if lowerTickFeeTotalShares.Equal(sdk.ZeroInt()) {
-		// 	return types.ErrNotEnoughShares
-		// }
 
 		sharesToRemoveDec := sdk.MinInt(sharesToRemove, userShares).ToDec()
 		ownershipRatio := sharesToRemoveDec.Quo(totalShares.ToDec())
@@ -241,9 +204,6 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 
 		*lowerTickFeeReserve0 = lowerTickFeeReserve0.Sub(reserve0ToRemove)
 		*upperTickFeeReserve1 = upperTickFeeReserve1.Sub(reserve1ToRemove)
-		// TODO: replace with burn call to bank keeper
-		// *lowerTickFeeTotalShares = lowerTickFeeTotalShares.Sub(sharesToRemove)
-		// *userShares = userShares.Sub(sharesToRemove)
 
 		totalReserve0ToRemove = totalReserve0ToRemove.Add(reserve0ToRemove)
 		totalReserve1ToRemove = totalReserve1ToRemove.Add(reserve1ToRemove)
@@ -253,8 +213,6 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 				return err
 			}
 		}
-		// TODO: replace with burn call to bank keeper
-		// k.SetShares(ctx, shareOwner)
 		k.SetTick(ctx, pairId, upperTick)
 		k.SetTick(ctx, pairId, lowerTick)
 

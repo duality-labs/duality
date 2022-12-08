@@ -128,21 +128,6 @@ func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
-	// pairId := k.CreatePairId(token0, token1)
-
-	// TODO: need to accumulate shares by type then check sufficient balances
-	// checks that the user has the specified number of shares they wish to withdraw
-	// for i, shareToRemove := range msg.SharesToRemove {
-	// shares, sharesFound := k.GetShares(ctx, msg.Creator, pairId, msg.TickIndexes[i], msg.FeeIndexes[i])
-	//
-	// if !sharesFound {
-	// return "", "", nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
-	// }
-	//
-	// if shares.SharesOwned.LT(shareToRemove) {
-	// return "", "", nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
-	// }
-	// }
 	// count total shares to remove from each pair:tickIndex,feeIndex
 	totalSharesIn := make(map[string]sdk.Int)
 	for i, sharesToRemove := range msg.SharesToRemove {
@@ -155,13 +140,11 @@ func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 	}
 
 	// verify sufficient shares for each
-	i := 0
 	for sharesDenom, amountToRemove := range totalSharesIn {
 		sharesBalance := k.bankKeeper.GetBalance(ctx, callerAddr, sharesDenom)
 		if sharesBalance.Amount.LT(amountToRemove) {
 			return "", "", nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
 		}
-		i++
 	}
 
 	return token0, token1, callerAddr, receiverAddr, nil
