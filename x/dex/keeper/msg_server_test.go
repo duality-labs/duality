@@ -581,7 +581,6 @@ type Withdrawl struct {
 	Shares    sdk.Int
 }
 
-
 func NewWithdrawlInt(shares sdk.Int, tick int64, feeIndex uint64) *Withdrawl {
 	return &Withdrawl{
 		Shares:    shares,
@@ -596,33 +595,36 @@ func NewWithdrawl(shares int64, tick int64, feeIndex uint64) *Withdrawl {
 
 func (s *MsgServerTestSuite) getShares(
 	account sdk.AccAddress,
-	pairId string,
+	token0 string,
+	token1 string,
 	tick int64,
 	fee uint64,
 ) (shares sdk.Int) {
-
-	sharesData, sharesFound := s.app.DexKeeper.GetShares(s.ctx, account.String(), pairId, tick, fee)
-	s.Assert().True(sharesFound)
-	return sharesData.SharesOwned
+	sharesId := s.app.DexKeeper.CreateSharesId(token0, token1, tick, fee)
+	return s.app.BankKeeper.GetBalance(s.ctx, account, sharesId).Amount
 }
 
 func (s *MsgServerTestSuite) assertAccountShares(
 	account sdk.AccAddress,
-	pairId string,
 	tick int64,
 	fee uint64,
 	sharesExpected sdk.Int,
 ) {
-	sharesOwned := s.getShares(account, pairId, tick, fee)
+	sharesOwned := s.getShares(account, "TokenA", "TokenB", tick, fee)
 	s.Assert().Equal(sharesExpected, sharesOwned)
 }
 
-func (s *MsgServerTestSuite) assertAliceShares(
-	tick int64,
-	fee uint64,
-	sharesExpected sdk.Int,
-) {
-	s.assertAccountShares(s.alice, "TokenA<>TokenB", tick, fee, sharesExpected)
+func (s *MsgServerTestSuite) assertAliceShares(tick int64, fee uint64, sharesExpected sdk.Int) {
+	s.assertAccountShares(s.alice, tick, fee, sharesExpected)
+}
+func (s *MsgServerTestSuite) assertBobShares(tick int64, fee uint64, sharesExpected sdk.Int) {
+	s.assertAccountShares(s.bob, tick, fee, sharesExpected)
+}
+func (s *MsgServerTestSuite) assertCarolShares(tick int64, fee uint64, sharesExpected sdk.Int) {
+	s.assertAccountShares(s.carol, tick, fee, sharesExpected)
+}
+func (s *MsgServerTestSuite) assertDanShares(tick int64, fee uint64, sharesExpected sdk.Int) {
+	s.assertAccountShares(s.dan, tick, fee, sharesExpected)
 }
 
 func (s *MsgServerTestSuite) assertCurrentTicks(

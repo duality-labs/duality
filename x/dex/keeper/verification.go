@@ -146,7 +146,7 @@ func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 	// count total shares to remove from each pair:tickIndex,feeIndex
 	totalSharesIn := make(map[string]sdk.Int)
 	for i, sharesToRemove := range msg.SharesToRemove {
-		sharesId := CreateSharesId(token0, token1, msg.TickIndexes[i], msg.FeeIndexes[i])
+		sharesId := k.CreateSharesId(token0, token1, msg.TickIndexes[i], msg.FeeIndexes[i])
 		if accum, ok := totalSharesIn[sharesId]; !ok {
 			totalSharesIn[sharesId] = sharesToRemove
 		} else {

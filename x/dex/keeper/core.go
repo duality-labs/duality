@@ -66,7 +66,7 @@ func (k Keeper) DepositCore(
 		lowerTick := k.GetOrInitTick(goCtx, pairId, lowerTickIndex)
 		upperTick := k.GetOrInitTick(goCtx, pairId, upperTickIndex)
 
-		sharesId := CreateSharesId(token0, token1, tickIndex, feeIndex)
+		sharesId := k.CreateSharesId(token0, token1, tickIndex, feeIndex)
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
 		// TODO: replace with bank keeper and change protos to match reserve1
@@ -206,7 +206,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		// 	return types.ErrValidShareNotFound
 		// }
 		// userShares := &shareOwner.SharesOwned
-		sharesId := CreateSharesId(token0, token1, tickIndex, feeIndex)
+		sharesId := k.CreateSharesId(token0, token1, tickIndex, feeIndex)
 		userShares := k.bankKeeper.GetBalance(ctx, callerAddr, sharesId).Amount
 
 		feeValue, found := k.GetFeeTier(ctx, feeIndex)
