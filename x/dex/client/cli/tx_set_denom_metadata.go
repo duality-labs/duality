@@ -16,16 +16,17 @@ var _ = strconv.Itoa(0)
 
 func CmdSetDenomMetadata() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-denom-metadata [description] [DenomUnits (unit1:exponent1,unit2:exponent2...)] [Display] [Name] [Symbol] [Base]",
+		Use:   "set-denom-metadata [Name] [description] [DenomUnits (unit1:exponent1,unit2:exponent2...)] [Display-Denom] [Base-Denom] [Symbol]",
 		Short: "Broadcast message setDenomMetadata",
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argDescription := args[0]
-			argDenomUnits := strings.Split(args[1], ",")
-			argDisplay := args[2]
-			argName := args[3]
-			argSymbol := args[4]
-			argBase := args[5]
+			argName := args[0]
+			argDescription := args[1]
+			argDenomUnits := strings.Split(args[2], ",")
+			argDisplay := args[3]
+			argBase := args[4]
+			argSymbol := args[5]
+
 
 			var denomUnits []*banktypes.DenomUnit
 
@@ -47,10 +48,10 @@ func CmdSetDenomMetadata() *cobra.Command {
 			metadata := banktypes.Metadata{
 				Description: argDescription,
 				Display: argDisplay,
+				Base: argBase,
 				Name: argName,
 				Symbol: argSymbol,
 				DenomUnits: denomUnits,
-				Base: argBase,
 			}
 
 
