@@ -287,6 +287,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedFirstSharesMintedUser() {
 	// empty pool
 	s.assertAliceShares(0, 0, 0)
 	s.assertPoolLiquidity(0, 0, 0, 0)
+	s.assertAliceShares(0, 0, 0)
 
 	// WHEN
 	// depositing 10, 5 at tick 0 fee 1
@@ -321,6 +322,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedExistingSharesMintedUser() {
 	// GIVEN
 	// tick 0 fee 1 has existing liquidity of 10 tokenA and 5 tokenB, shares are 15
 	s.aliceDeposits(NewDeposit(10, 5, 0, 0))
+	s.assertAliceShares(0, 0, 15)
 	s.assertPoolShares(0, 0, 15)
 	s.assertPoolLiquidity(10, 5, 0, 0)
 

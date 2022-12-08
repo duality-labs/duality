@@ -195,8 +195,6 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 
 		lowerTickFeeReserve0 := &lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
 		upperTickFeeReserve1 := &upperTick.TickData.Reserve1[feeIndex]
-		fmt.Println("r0", lowerTickFeeReserve0)
-		fmt.Println("r1", upperTickFeeReserve1)
 
 		sharesToRemoveDec := sdk.MinInt(sharesToRemove, userShares).ToDec()
 		ownershipRatio := sharesToRemoveDec.Quo(totalShares.ToDec())
@@ -210,10 +208,6 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		totalReserve0ToRemove = totalReserve0ToRemove.Add(reserve0ToRemove)
 		totalReserve1ToRemove = totalReserve1ToRemove.Add(reserve1ToRemove)
 
-		fmt.Println("s", sharesToRemove)
-		fmt.Println("total s", totalShares)
-		fmt.Println("out0", reserve0ToRemove)
-		fmt.Println("out1", reserve1ToRemove)
 		if sharesToRemove.GT(sdk.ZeroInt()) {
 			if err := k.BurnShares(ctx, callerAddr, sharesToRemove, sharesId); err != nil {
 				return err
