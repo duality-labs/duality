@@ -51,40 +51,96 @@
       "authorization": []
     },
     "bank": {
-      "params": {
-        "send_enabled": [],
-        "default_send_enabled": true
-      },
-      "balances": [
-        {
-          "address": "cosmos1jv7rsdfxm7eaqmqfzy7kw75mekdmv0uv885nns",
-          "coins": [
+        "params": {
+            "send_enabled": [],
+            "default_send_enabled": true
+        },
+        "balances": [
             {
-              "denom": "stake",
-              "amount": "1000000000"
+                "address": "cosmos1jv7rsdfxm7eaqmqfzy7kw75mekdmv0uv885nns",
+                "coins": [
+                    {
+                        "denom": "stake",
+                        "amount": "1000000000"
+                    },
+                    {
+                        "denom": "token",
+                        "amount": "1000000000"
+                    }
+                ]
             },
             {
-              "denom": "token",
-              "amount": "1000000000"
+                "address": "cosmos1a7dd045aes5y7m0s70fe4cnk7j7p6lzfmqjx4z",
+                "coins": [
+                    {
+                        "denom": "stake",
+                        "amount": "1000000000"
+                    },
+                    {
+                        "denom": "token",
+                        "amount": "1000000000"
+                    }
+                ]
             }
-          ]
+        ],
+        "supply": [],
+        "denom_metadata": [
+        {
+          "description": "The native staking token of the Cosmos Hub.",
+          "denom_units": [
+            {
+              "denom": "uatom",
+              "exponent": 0,
+              "aliases": [
+                "microatom"
+              ]
+            },
+            {
+              "denom": "matom",
+              "exponent": 3,
+              "aliases": [
+                "milliatom"
+              ]
+            },
+            {
+              "denom": "atom",
+              "exponent": 6
+            }
+          ],
+          "base": "uatom",
+          "display": "atom"
         },
         {
-          "address": "cosmos1a7dd045aes5y7m0s70fe4cnk7j7p6lzfmqjx4z",
-          "coins": [
+          "description": "Cronos Chain - Get Instant DApp Portability with EVM Support",
+          "denom_units": [
             {
-              "denom": "stake",
-              "amount": "1000000000"
+              "denom": "basecro",
+              "exponent": 0
             },
             {
-              "denom": "token",
-              "amount": "1000000000"
+              "denom": "cro",
+              "exponent": 18
             }
-          ]
+          ],
+          "base": "basecro",
+          "display": "cro"
+        },
+        {
+          "description": "The native staking and governance token of Kava",
+          "denom_units": [
+            {
+              "denom": "ukava",
+              "exponent": 0
+            },
+            {
+              "denom": "kava",
+              "exponent": 6
+            }
+          ],
+          "base": "ukava",
+          "display": "kava"
         }
-      ],
-      "supply": [],
-      "denom_metadata": []
+      ]
     },
     "capability": {
       "index": "1",
@@ -97,19 +153,17 @@
       }
     },
     "dex": {
-      "params": {},
-      "tickMapList": [],
-      "pairMapList": [],
-      "tokensList": [],
-      "tokensCount": "0",
-      "tokenMapList": [],
-      "sharesList": [],
-      "feeListList": [],
-      "feeListCount": "0",
-      "edgeRowList": [],
-      "edgeRowCount": "0",
-      "adjanceyMatrixList": [],
-      "adjanceyMatrixCount": "0"
+        "params": {},
+        "TickList": [],
+        "TradingPairList": [],
+        "tokensList": [],
+        "tokensCount": "0",
+        "tokenMapList": [],
+        "sharesList": [],
+        "FeeTierList": [],
+        "FeeTierCount": "0",
+        "LimitOrderTrancheUserList": [],
+        "LimitOrderTrancheList": []
     },
     "distribution": {
       "params": {
