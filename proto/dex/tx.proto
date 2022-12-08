@@ -14,6 +14,7 @@ service Msg {
   rpc PlaceLimitOrder(MsgPlaceLimitOrder) returns (MsgPlaceLimitOrderResponse);
   rpc WithdrawFilledLimitOrder(MsgWithdrawFilledLimitOrder) returns (MsgWithdrawFilledLimitOrderResponse);
   rpc CancelLimitOrder(MsgCancelLimitOrder) returns (MsgCancelLimitOrderResponse);
+  rpc SetDenomMetadata(MsgSetDenomMetadata) returns (MsgSetDenomMetadataResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -150,6 +151,14 @@ message MsgCancelLimitOrder {
 }
 
 message MsgCancelLimitOrderResponse {
+}
+
+message MsgSetDenomMetadata {
+  string creator = 1;
+  string metadata = 2;
+}
+
+message MsgSetDenomMetadataResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message

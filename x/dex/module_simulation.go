@@ -48,6 +48,10 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgCancelLimitOrder int = 100
 
+	opWeightMsgSetDenomMetadata = "op_weight_msg_set_denom_metadata"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgSetDenomMetadata int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -146,6 +150,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgCancelLimitOrder,
 		dexsimulation.SimulateMsgCancelLimitOrder(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgSetDenomMetadata int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgSetDenomMetadata, &weightMsgSetDenomMetadata, nil,
+		func(_ *rand.Rand) {
+			weightMsgSetDenomMetadata = defaultWeightMsgSetDenomMetadata
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgSetDenomMetadata,
+		dexsimulation.SimulateMsgSetDenomMetadata(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation
