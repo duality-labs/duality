@@ -288,7 +288,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderBelowEnemyLines() {
 	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
-	s.assertLiquidityAtTick(0, 10, 0, 0)
+	s.assertPoolLiquidity(0, 10, 0, 0)
 
 	// WHEN
 	// place limit order for token A below enemy lines at tick -5
@@ -307,7 +307,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderAboveEnemyLines() {
 	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
-	s.assertLiquidityAtTick(10, 0, 0, 0)
+	s.assertPoolLiquidity(10, 0, 0, 0)
 
 	// WHEN
 	// place limit order for token B above enemy lines at tick 5
@@ -324,7 +324,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderNoLOPlaceLODoesntIncrementPlaceT
 	// GIVEN
 	// no previous LO on existing tick
 	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
-	s.assertLiquidityAtTick(10, 0, 0, 0)
+	s.assertPoolLiquidity(10, 0, 0, 0)
 	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
 
 	// WHEN

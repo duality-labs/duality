@@ -593,7 +593,27 @@ func NewWithdrawl(shares int64, tick int64, feeIndex uint64) *Withdrawl {
 	return NewWithdrawlInt(sdk.NewInt(shares), tick, feeIndex)
 }
 
-func (s *MsgServerTestSuite) getShares(
+func (s *MsgServerTestSuite) getPoolShares(
+	token0 string,
+	token1 string,
+	tick int64,
+	fee uint64,
+) (shares sdk.Int) {
+	sharesId := s.app.DexKeeper.CreateSharesId(token0, token1, tick, fee)
+	return s.app.BankKeeper.GetSupply(s.ctx, sharesId).Amount
+}
+
+func (s *MsgServerTestSuite) assertPoolShares(
+	tick int64,
+	fee uint64,
+	sharesExpected uint64,
+) {
+	sharesExpectedInt := sdk.NewIntFromUint64(sharesExpected)
+	sharesOwned := s.getPoolShares("TokenA", "TokenB", tick, fee)
+	s.Assert().Equal(sharesExpectedInt, sharesOwned)
+}
+
+func (s *MsgServerTestSuite) getAccountShares(
 	account sdk.AccAddress,
 	token0 string,
 	token1 string,
@@ -608,22 +628,23 @@ func (s *MsgServerTestSuite) assertAccountShares(
 	account sdk.AccAddress,
 	tick int64,
 	fee uint64,
-	sharesExpected sdk.Int,
+	sharesExpected uint64,
 ) {
-	sharesOwned := s.getShares(account, "TokenA", "TokenB", tick, fee)
-	s.Assert().Equal(sharesExpected, sharesOwned)
+	sharesExpectedInt := sdk.NewIntFromUint64(sharesExpected)
+	sharesOwned := s.getAccountShares(account, "TokenA", "TokenB", tick, fee)
+	s.Assert().Equal(sharesExpectedInt, sharesOwned)
 }
 
-func (s *MsgServerTestSuite) assertAliceShares(tick int64, fee uint64, sharesExpected sdk.Int) {
+func (s *MsgServerTestSuite) assertAliceShares(tick int64, fee uint64, sharesExpected uint64) {
 	s.assertAccountShares(s.alice, tick, fee, sharesExpected)
 }
-func (s *MsgServerTestSuite) assertBobShares(tick int64, fee uint64, sharesExpected sdk.Int) {
+func (s *MsgServerTestSuite) assertBobShares(tick int64, fee uint64, sharesExpected uint64) {
 	s.assertAccountShares(s.bob, tick, fee, sharesExpected)
 }
-func (s *MsgServerTestSuite) assertCarolShares(tick int64, fee uint64, sharesExpected sdk.Int) {
+func (s *MsgServerTestSuite) assertCarolShares(tick int64, fee uint64, sharesExpected uint64) {
 	s.assertAccountShares(s.carol, tick, fee, sharesExpected)
 }
-func (s *MsgServerTestSuite) assertDanShares(tick int64, fee uint64, sharesExpected sdk.Int) {
+func (s *MsgServerTestSuite) assertDanShares(tick int64, fee uint64, sharesExpected uint64) {
 	s.assertAccountShares(s.dan, tick, fee, sharesExpected)
 }
 
@@ -704,7 +725,7 @@ func (s *MsgServerTestSuite) assertLiquidityAtTickInt(amountA sdk.Int, amountB s
 	s.Assert().Equal(amountB, liquidityB)
 }
 
-func (s *MsgServerTestSuite) assertLiquidityAtTick(amountA int, amountB int, tickIndex int64, feeIndex uint64) {
+func (s *MsgServerTestSuite) assertPoolLiquidity(amountA int, amountB int, tickIndex int64, feeIndex uint64) {
 	s.assertLiquidityAtTickInt(sdk.NewInt(int64(amountA)), sdk.NewInt(int64(amountB)), tickIndex, feeIndex)
 }
 

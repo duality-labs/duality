@@ -45,7 +45,7 @@ func (s *MsgServerTestSuite) TestSwapExhaustFeeTiersAndLimitOrder() {
 	limitLiquiditySetup := sdk.NewInt(20).Sub(amountOutSetup)
 	totalLiquiditySetup := lpLiquiditySetup.Add(limitLiquiditySetup)
 	s.assertLimitLiquidityAtTick("TokenB", 1, limitLiquiditySetup.Int64())
-	s.assertLiquidityAtTick(0, 10, 0, 0)
+	s.assertPoolLiquidity(0, 10, 0, 0)
 	bobBalanceSetupB := sdk.NewInt(50).Sub(amountInSetup)
 	s.assertBobBalancesInt(bobBalanceSetupB, amountOutSetup)
 
