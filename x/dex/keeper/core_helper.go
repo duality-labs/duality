@@ -510,7 +510,7 @@ func (k Keeper) BurnShares(ctx sdk.Context, addr sdk.AccAddress, amount sdk.Int,
 		return err
 	}
 	// burn tokens
-	if err := k.bankKeeper.MintCoins(ctx, types.ModuleName, sharesCoins); err != nil {
+	if err := k.bankKeeper.BurnCoins(ctx, types.ModuleName, sharesCoins); err != nil {
 		return err
 	}
 	return nil
