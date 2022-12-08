@@ -82,7 +82,7 @@ jobs:
             ghr -t "${GITHUB_TOKEN}" -u "${CIRCLE_PROJECT_USERNAME}" -r "${CIRCLE_PROJECT_REPONAME}" -c "${CIRCLE_SHA1}" -delete ${CIRCLE_TAG} ./tmp/artifacts/release
   track-gas-metrics:
     docker:
-      - image: cimg/base:2022.12
+      - image: circleci/node:10.19.0
     steps:
       - run:
           name: "Publish gas usage metric"
