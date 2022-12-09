@@ -6,7 +6,6 @@ import (
 	//"github.com/NicholasDotSol/duality/x/dex/types"
 )
 
-
 func (s *MsgServerTestSuite) TestWithdrawFilledSimpleFull() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 50)
@@ -45,7 +44,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledSimpleFull() {
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(math.MaxInt64)
 }
-
 
 func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.fundAliceBalances(50, 50)

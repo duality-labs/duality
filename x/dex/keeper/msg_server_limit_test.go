@@ -1,10 +1,10 @@
 package keeper_test
 
 import (
-	"math"
 	testing_scripts "github.com/NicholasDotSol/duality/testing_scripts"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"math"
 )
 
 func (s *MsgServerTestSuite) TestSingle() {
