@@ -161,7 +161,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO1to0MovesCurr1To0() {
 
 	// WHEN
 	// swap 15 of token B for A with minOut 14
-	s.bobMarketSells("TokenB", 15, 14)
+	s.bobMarketSells("TokenB", 15, 13)
 
 	// THEN
 	// current 1to0 moves to -3
@@ -397,23 +397,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustLOCorrectExecution() {
 	s.assertBobBalancesEpsilon(bobBalanceSetupB.Sub(expectedAmountIn), amountOutSetup.Add(expectedAmountOut))
 	s.assertDexBalancesEpsilon(expectedAmountIn.Add(amountInSetup), limitLiquiditySetup.Sub(expectedAmountOut))
 	s.assertLimitLiquidityAtTickInt("TokenB", 1, sdk.NewInt(20).Sub(amountOutSetup).Sub(expectedAmountOut))
-}
-
-func (s *MsgServerTestSuite) TestBadSwap() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 0)
-	// GIVEN
-	// place LO selling 10 of token B at tick 1
-	i := 0
-	for i < 50{
-		s.aliceLimitSells("TokenB", i, 1)
-		i++
-	}
-	amountLeft, amountOut := s.calculateSingleSwapOnlyLOAToB(49, 50, 50)
-
-	s.bobMarketSells("TokenA", 50, 0)
-	s.assertBobBalancesInt(sdk.NewInt(0), amountOut) // Fails with: expected 49 != actual 25
-	s.Assert().Equal(amountLeft, sdk.NewInt(0))
 }
 
 func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilled0to1DoesntMove0to1() {

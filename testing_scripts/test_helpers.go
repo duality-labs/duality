@@ -80,8 +80,6 @@ func SinglePoolSwap(amount_liquidity sdk.Int, price_swapped_at sdk.Dec, amount_t
 	return amount_in, amount_out
 }
 
-
-
 // SinglePoolSwapAndUpdate() simulates swapping through a single liquidity pool and updates that pool's
 // liquidity. Takes in all of the same inputs as SinglePoolSwap(): amount_liquidity, price_swapped_at,
 // and amount_to_swap; but has additional inputs, reservesOfInToken, reservesOfOutToken. It returns the
@@ -156,9 +154,11 @@ func MultiplePoolSwapAndUpdate(amounts_liquidity []sdk.Int,
 	return resulting_reserves_in_token, resulting_reserves_out_token, amountRemainingDec, amount_out_total
 }
 
-
 func SharesOnDeposit(existing_shares sdk.Dec, existing_amount0 sdk.Int, existing_amount1 sdk.Int, new_amount0 sdk.Int, new_amount1 sdk.Int, tickIndex int64) (shares_minted sdk.Int) {
-	price1To0 := keeper.CalcPrice1To0(tickIndex)
+	price1To0, err := keeper.CalcPrice1To0(tickIndex)
+	if err != nil {
+		panic(err)
+	}
 	newAmount0Dec := sdk.NewDecFromInt(new_amount0)
 	new_value := newAmount0Dec.Add(price1To0.MulInt(new_amount1))
 

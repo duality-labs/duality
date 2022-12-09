@@ -9,16 +9,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
 )
 
 var _ = strconv.Itoa(0)
 
 func CmdDeposit() *cobra.Command {
-	var argAmountsA []string
-	var argAmountsB []string
-	var argTicksIndexes []string
-	var argFeesIndexes []string
 
 	cmd := &cobra.Command{
 		Use:   "deposit [receiver] [token-a] [token-b] [list of amount-0] [list of amount-1] [list of tick-index] [list of fee] ",
@@ -39,21 +36,19 @@ func CmdDeposit() *cobra.Command {
 			var FeesIndexesUint []uint64
 
 			for _, s := range argAmountsA {
-				amountAInt, err := strconv.Atoi(s)
-				if err != nil {
-					return err
+				amountA, ok := sdk.NewIntFromString(s)
+				if ok != true {
+					return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for amountsA")
 				}
-				amountA := sdk.NewInt(int64(amountAInt))
 
 				AmountsA = append(AmountsA, amountA)
 			}
 
 			for _, s := range argAmountsB {
-				amountBInt, err := strconv.Atoi(s)
-				if err != nil {
-					return err
+				amountB, ok := sdk.NewIntFromString(s)
+				if ok != true {
+					return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for amountsB")
 				}
-				amountB := sdk.NewInt(int64(amountBInt))
 
 				AmountsB = append(AmountsB, amountB)
 			}
@@ -102,11 +97,6 @@ func CmdDeposit() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-
-	cmd.Flags().StringArrayVarP(&argAmountsA, "amountA", "0", []string{}, "")
-	cmd.Flags().StringArrayVarP(&argAmountsB, "amountB", "1", []string{}, "")
-	cmd.Flags().StringArrayVarP(&argTicksIndexes, "ticksIndexes", "t", []string{}, "")
-	cmd.Flags().StringArrayVarP(&argFeesIndexes, "feeIndexes", "f", []string{}, "")
 
 	return cmd
 }
