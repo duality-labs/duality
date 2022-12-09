@@ -67,6 +67,10 @@ func (k Keeper) DepositCore(
 
 		lowerTick := k.GetOrInitTick(goCtx, pairId, lowerTickIndex)
 		upperTick := k.GetOrInitTick(goCtx, pairId, upperTickIndex)
+
+		sharesId := k.CreateSharesId(token0, token1, tickIndex, fee)
+		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
+
 		pool, err := NewPool(
 			pairId,
 			tickIndex,
@@ -81,8 +85,13 @@ func (k Keeper) DepositCore(
 		oldReserve0 := pool.GetLowerReserve0()
 		oldReserve1 := pool.GetUpperReserve1()
 
-		inAmount0, inAmount1, outShares := pool.Deposit(amount0, amount1)
+		inAmount0, inAmount1, outShares := pool.Deposit(amount0, amount1, totalShares)
 		pool.Save(goCtx, k)
+		if outShares.GT(sdk.ZeroInt()) { // update shares accounting
+			if err := k.MintShares(ctx, callerAddr, outShares, sharesId); err != nil {
+				return nil, nil, err
+			}
+		}
 
 		if inAmount0.Equal(sdk.ZeroInt()) && inAmount1.Equal(sdk.ZeroInt()) {
 			ctx.EventManager().EmitEvent(types.CreateDepositFailedEvent(
@@ -111,21 +120,6 @@ func (k Keeper) DepositCore(
 		totalAmountReserve1 = totalAmountReserve1.Add(inAmount1)
 
 		passedDeposit++
-
-		shares, sharesFound := k.GetShares(ctx, msg.Receiver, pairId, tickIndex, feeIndex)
-		if !sharesFound {
-			shares = types.Shares{
-				Address:     msg.Receiver,
-				PairId:      pairId,
-				TickIndex:   tickIndex,
-				FeeIndex:    feeIndex,
-				SharesOwned: outShares,
-			}
-		} else {
-			shares.SharesOwned = shares.SharesOwned.Add(outShares)
-		}
-
-		k.SetShares(ctx, shares)
 
 		ctx.EventManager().EmitEvent(types.CreateDepositEvent(
 			msg.Creator,
@@ -181,21 +175,6 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		sharesToRemove := msg.SharesToRemove[i]
 		tickIndex := msg.TickIndexes[i]
 
-		shareOwner, found := k.GetShares(
-			ctx,
-			msg.Creator,
-			pairId,
-			tickIndex,
-			feeIndex,
-		)
-		if !found {
-			return types.ErrValidShareNotFound
-		}
-		userSharesOwned := &shareOwner.SharesOwned
-		if userSharesOwned.LT(sharesToRemove) {
-			return types.ErrNotEnoughShares
-		}
-
 		feeValue, found := k.GetFeeTier(ctx, feeIndex)
 		if !found {
 			return types.ErrValidFeeIndexNotFound
@@ -209,6 +188,9 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			return types.ErrValidTickNotFound
 		}
 
+		sharesId := k.CreateSharesId(token0, token1, tickIndex, fee)
+		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
+
 		pool, err := NewPool(
 			pairId,
 			tickIndex,
@@ -220,14 +202,16 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		if err != nil {
 			return err
 		}
-		outAmount0, outAmount1, err := pool.Withdraw(sharesToRemove)
+		outAmount0, outAmount1, err := pool.Withdraw(sharesToRemove, totalShares)
 		if err != nil {
 			return err
 		}
 		pool.Save(goCtx, k)
-
-		*userSharesOwned = userSharesOwned.Sub(sharesToRemove)
-		k.SetShares(ctx, shareOwner)
+		if sharesToRemove.GT(sdk.ZeroInt()) { // update shares accounting
+			if err := k.BurnShares(ctx, callerAddr, sharesToRemove, sharesId); err != nil {
+				return err
+			}
+		}
 
 		totalReserve0ToRemove = totalReserve0ToRemove.Add(outAmount0)
 		totalReserve1ToRemove = totalReserve1ToRemove.Add(outAmount1)
@@ -247,9 +231,9 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			token1,
 			fmt.Sprint(msg.TickIndexes[i]),
 			fmt.Sprint(msg.FeeIndexes[i]),
-			pool.LowerTick0.TickData.Reserve0AndShares[feeIndex].Reserve0.Add(outAmount0).String(),
+			pool.LowerTick0.TickData.Reserve0[feeIndex].Add(outAmount0).String(),
 			pool.UpperTick1.TickData.Reserve1[feeIndex].Add(outAmount1).String(),
-			pool.LowerTick0.TickData.Reserve0AndShares[feeIndex].Reserve0.String(),
+			pool.LowerTick0.TickData.Reserve0[feeIndex].String(),
 			pool.UpperTick1.TickData.Reserve1[feeIndex].String(),
 			sharesToRemove.String(),
 		))

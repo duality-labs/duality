@@ -55,20 +55,6 @@ func TestGenesisState_Validate(t *testing.T) {
 						Address: "1",
 					},
 				},
-				SharesList: []types.Shares{
-					{
-						Address:   "0",
-						PairId:    "0",
-						TickIndex: 0,
-						FeeIndex:  0,
-					},
-					{
-						Address:   "1",
-						PairId:    "1",
-						TickIndex: 1,
-						FeeIndex:  1,
-					},
-				},
 				FeeTierList: []types.FeeTier{
 					{
 						Id: 0,
@@ -163,26 +149,6 @@ func TestGenesisState_Validate(t *testing.T) {
 					},
 					{
 						Address: "0",
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "duplicated shares",
-			genState: &types.GenesisState{
-				SharesList: []types.Shares{
-					{
-						Address:   "0",
-						PairId:    "0",
-						TickIndex: 0,
-						FeeIndex:  0,
-					},
-					{
-						Address:   "0",
-						PairId:    "0",
-						TickIndex: 0,
-						FeeIndex:  0,
 					},
 				},
 			},

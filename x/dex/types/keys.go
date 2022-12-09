@@ -1,7 +1,6 @@
 package types
 
 import (
-	fmt "fmt"
 	"strconv"
 )
 
@@ -42,9 +41,6 @@ const (
 
 	// TradingPairKeyPrefix is the prefix to retrieve all TradingPair
 	TradingPairKeyPrefix = "TradingPair/value"
-
-	// SharesKeyPrefix is the prefix to retrieve all Shares
-	SharesKeyPrefix = "Shares/value"
 )
 
 func TickPrefix(pairId string) []byte {
@@ -81,29 +77,6 @@ func TradingPairKey(pairId string) []byte {
 
 	pairIdBytes := []byte(pairId)
 	key = append(key, pairIdBytes...)
-	key = append(key, []byte("/")...)
-
-	return key
-}
-
-// SharesKey returns the store key to retrieve a Shares from the index fields
-func SharesKey(address string, pairId string, tickIndex int64, feeIndex uint64) []byte {
-	var key []byte
-
-	addressBytes := []byte(address)
-	key = append(key, addressBytes...)
-	key = append(key, []byte("/")...)
-
-	pairIdBytes := []byte(pairId)
-	key = append(key, pairIdBytes...)
-	key = append(key, []byte("/")...)
-
-	tickIndexBytes := []byte(fmt.Sprint(tickIndex))
-	key = append(key, tickIndexBytes...)
-	key = append(key, []byte("/")...)
-
-	feeBytes := []byte(fmt.Sprint(feeIndex))
-	key = append(key, feeBytes...)
 	key = append(key, []byte("/")...)
 
 	return key
