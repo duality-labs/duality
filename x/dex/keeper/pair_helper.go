@@ -1,9 +1,8 @@
 package keeper
 
 import (
-
-	//"strings"
 	"fmt"
+	"strings"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -29,5 +28,7 @@ func (k Keeper) CreatePairId(token0 string, token1 string) (pairId string) {
 }
 
 func (k Keeper) CreateSharesId(token0 string, token1 string, tickIndex int64, fee int64) (denom string) {
-	return fmt.Sprintf("%s-%s-t%d-f%d", token0, token1, tickIndex, fee)
+	t0 := strings.ReplaceAll(token0, "-", "")
+	t1 := strings.ReplaceAll(token1, "-", "")
+	return fmt.Sprintf("%s-%s-t%d-f%d", t0, t1, tickIndex, fee)
 }
