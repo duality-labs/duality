@@ -597,7 +597,7 @@ func (s *MsgServerTestSuite) getPoolShares(
 	token0 string,
 	token1 string,
 	tick int64,
-	fee uint64,
+	fee int64,
 ) (shares sdk.Int) {
 	sharesId := s.app.DexKeeper.CreateSharesId(token0, token1, tick, fee)
 	return s.app.BankKeeper.GetSupply(s.ctx, sharesId).Amount
@@ -605,9 +605,14 @@ func (s *MsgServerTestSuite) getPoolShares(
 
 func (s *MsgServerTestSuite) assertPoolShares(
 	tick int64,
-	fee uint64,
+	feeIndex uint64,
 	sharesExpected uint64,
 ) {
+	feeValue, found := s.app.DexKeeper.GetFeeTier(s.ctx, feeIndex)
+	if !found {
+		s.Require().Fail("Invalid fee index given")
+	}
+	fee := feeValue.Fee
 	sharesExpectedInt := sdk.NewIntFromUint64(sharesExpected)
 	sharesOwned := s.getPoolShares("TokenA", "TokenB", tick, fee)
 	s.Assert().Equal(sharesExpectedInt, sharesOwned)
@@ -618,8 +623,14 @@ func (s *MsgServerTestSuite) getAccountShares(
 	token0 string,
 	token1 string,
 	tick int64,
-	fee uint64,
+	feeIndex uint64,
 ) (shares sdk.Int) {
+	feeValue, found := s.app.DexKeeper.GetFeeTier(s.ctx, feeIndex)
+	if !found {
+		s.Require().Fail("Invalid fee index given")
+		return sdk.ZeroInt()
+	}
+	fee := feeValue.Fee
 	sharesId := s.app.DexKeeper.CreateSharesId(token0, token1, tick, fee)
 	return s.app.BankKeeper.GetBalance(s.ctx, account, sharesId).Amount
 }
@@ -627,16 +638,16 @@ func (s *MsgServerTestSuite) getAccountShares(
 func (s *MsgServerTestSuite) assertAccountShares(
 	account sdk.AccAddress,
 	tick int64,
-	fee uint64,
+	feeIndex uint64,
 	sharesExpected uint64,
 ) {
 	sharesExpectedInt := sdk.NewIntFromUint64(sharesExpected)
-	sharesOwned := s.getAccountShares(account, "TokenA", "TokenB", tick, fee)
+	sharesOwned := s.getAccountShares(account, "TokenA", "TokenB", tick, feeIndex)
 	s.Assert().Equal(sharesExpectedInt, sharesOwned, "expected %s != actual %s", sharesExpected, sharesOwned)
 }
 
-func (s *MsgServerTestSuite) assertAliceShares(tick int64, fee uint64, sharesExpected uint64) {
-	s.assertAccountShares(s.alice, tick, fee, sharesExpected)
+func (s *MsgServerTestSuite) assertAliceShares(tick int64, feeIndex uint64, sharesExpected uint64) {
+	s.assertAccountShares(s.alice, tick, feeIndex, sharesExpected)
 }
 func (s *MsgServerTestSuite) assertBobShares(tick int64, fee uint64, sharesExpected uint64) {
 	s.assertAccountShares(s.bob, tick, fee, sharesExpected)
@@ -713,7 +724,7 @@ func (s *MsgServerTestSuite) assertLiquidityAtTickInt(amountA sdk.Int, amountB s
 	lowerTick, lowerTickFound := s.app.DexKeeper.GetTick(s.ctx, pairId, tickIndex-fee)
 	liquidityA, liquidityB := sdk.ZeroInt(), sdk.ZeroInt()
 	if lowerTickFound {
-		liquidityA = lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
+		liquidityA = lowerTick.TickData.Reserve0[feeIndex]
 	} else {
 		// noop, since liquidity was set to 0 already
 		// s.Require().Fail("Invalid tick %d and fee %d", tickIndex, fee)
@@ -745,7 +756,7 @@ func (s *MsgServerTestSuite) assertNoLiquidityAtTick(tickIndex int64, feeIndex u
 	}
 	// in case tick was initialized, assert no liquidity in it
 	amtA := sdk.NewInt(0)
-	liquidityA := lowerTick.TickData.Reserve0AndShares[feeIndex].Reserve0
+	liquidityA := lowerTick.TickData.Reserve0[feeIndex]
 	s.Assert().Equal(amtA, liquidityA)
 
 	upperTick, upperTickFound := s.app.DexKeeper.GetTick(s.ctx, pairId, tickIndex+fee)
@@ -1103,14 +1114,14 @@ func (s *MsgServerTestSuite) addTickWithFee0Tokens(tickIndex int64, amountA int,
 		PairId:    "TokenA/TokenB",
 		TickIndex: tickIndex,
 		TickData: &types.TickDataType{
-			Reserve0AndShares: make([]*types.Reserve0AndSharesType, 1),
-			Reserve1:          make([]sdk.Int, 1),
+			Reserve0: make([]sdk.Int, 1),
+			Reserve1: make([]sdk.Int, 1),
 		},
 		LimitOrderTranche0To1: &types.LimitTrancheIndexes{0, 0},
 		LimitOrderTranche1To0: &types.LimitTrancheIndexes{0, 0},
 	}
 
-	tick.TickData.Reserve0AndShares[0] = &types.Reserve0AndSharesType{sdk.NewInt(int64(amountA)), sdk.NewInt(int64(amountA))}
+	tick.TickData.Reserve0[0] = sdk.NewInt(int64(amountA))
 	tick.TickData.Reserve1[0] = sdk.NewInt(int64(amountB))
 
 	s.app.DexKeeper.SetTick(s.ctx, "TokenA/TokenB", tick)
@@ -1119,6 +1130,8 @@ func (s *MsgServerTestSuite) addTickWithFee0Tokens(tickIndex int64, amountA int,
 
 func (s *MsgServerTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amountB int) (lowerTick types.Tick, upperTick types.Tick) {
 	pairId := "TokenA<>TokenB"
+	// sharesId := fmt.Sprintf("%s%st%df%d", "TokenA", "TokenB", tickIndex, 1)
+	sharesId := s.app.DexKeeper.CreateSharesId("TokenA", "TokenB", tickIndex, 1)
 	lowerTick = s.app.DexKeeper.GetOrInitTick(s.goCtx, pairId, tickIndex-1)
 	upperTick = s.app.DexKeeper.GetOrInitTick(s.goCtx, pairId, tickIndex+1)
 	priceCenter1To0, err := keeper.CalcPrice0To1(tickIndex)
@@ -1128,8 +1141,9 @@ func (s *MsgServerTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amoun
 
 	amountAInt := sdk.NewInt(int64(amountA))
 	amountBInt := sdk.NewInt(int64(amountB))
-	lowerTick.TickData.Reserve0AndShares[0].Reserve0 = amountAInt
-	lowerTick.TickData.Reserve0AndShares[0].TotalShares = keeper.CalcShares(amountAInt, amountBInt, priceCenter1To0).TruncateInt()
+	lowerTick.TickData.Reserve0[0] = amountAInt
+	totalShares := keeper.CalcShares(amountAInt, amountBInt, priceCenter1To0).TruncateInt()
+	s.app.DexKeeper.MintShares(s.ctx, s.alice, totalShares, sharesId)
 	upperTick.TickData.Reserve1[0] = amountBInt
 	s.app.DexKeeper.SetTick(s.ctx, pairId, lowerTick)
 	s.app.DexKeeper.SetTick(s.ctx, pairId, upperTick)

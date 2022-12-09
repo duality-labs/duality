@@ -128,10 +128,12 @@ func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
+	FeeTier := k.GetAllFeeTier(ctx)
 	// count total shares to remove from each pair:tickIndex,feeIndex
 	totalSharesIn := make(map[string]sdk.Int)
 	for i, sharesToRemove := range msg.SharesToRemove {
-		sharesId := k.CreateSharesId(token0, token1, msg.TickIndexes[i], msg.FeeIndexes[i])
+		fee := FeeTier[msg.FeeIndexes[i]].Fee
+		sharesId := k.CreateSharesId(token0, token1, msg.TickIndexes[i], fee)
 		if accum, ok := totalSharesIn[sharesId]; !ok {
 			totalSharesIn[sharesId] = sharesToRemove
 		} else {

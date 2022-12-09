@@ -52,7 +52,7 @@ func NewPool(
 }
 
 func (p *Pool) GetLowerReserve0() sdk.Int {
-	return p.LowerTick0.TickData.Reserve0AndShares[p.FeeIndex].Reserve0
+	return p.LowerTick0.TickData.Reserve0[p.FeeIndex]
 }
 
 func (p *Pool) GetUpperReserve1() sdk.Int {
@@ -62,7 +62,7 @@ func (p *Pool) GetUpperReserve1() sdk.Int {
 func (p *Pool) Swap0To1(maxAmount0 sdk.Int) (inAmount0 sdk.Int, outAmount1 sdk.Int) {
 	price1To0Upper := sdk.OneDec().Quo(p.price0To1Upper)
 	reserves1 := &p.UpperTick1.TickData.Reserve1[p.FeeIndex]
-	reserves0 := &p.LowerTick0.TickData.Reserve0AndShares[p.FeeIndex].Reserve0
+	reserves0 := &p.LowerTick0.TickData.Reserve0[p.FeeIndex]
 	maxAmount1 := maxAmount0.ToDec().Mul(p.price0To1Upper).TruncateInt()
 	if reserves1.LT(maxAmount1) {
 		outAmount1 = *reserves1
@@ -81,7 +81,7 @@ func (p *Pool) Swap0To1(maxAmount0 sdk.Int) (inAmount0 sdk.Int, outAmount1 sdk.I
 func (p *Pool) Swap1To0(maxAmount1 sdk.Int) (inAmount1 sdk.Int, outAmount0 sdk.Int) {
 	price0To1Lower := sdk.OneDec().Quo(p.price1To0Lower)
 	reserves1 := &p.UpperTick1.TickData.Reserve1[p.FeeIndex]
-	reserves0 := &p.LowerTick0.TickData.Reserve0AndShares[p.FeeIndex].Reserve0
+	reserves0 := &p.LowerTick0.TickData.Reserve0[p.FeeIndex]
 	maxAmount0 := maxAmount1.ToDec().Mul(p.price1To0Lower).TruncateInt()
 	if reserves0.LT(maxAmount0) {
 		outAmount0 = *reserves0
@@ -130,7 +130,7 @@ func CalcGreatestMatchingRatio(
 // Mutates the Pool object and returns relevant change variables. Deposit is not commited until
 // pool.save() is called or the underlying ticks are saved; this method does not use any keeper methods.
 func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.Int) (inAmount0 sdk.Int, inAmount1 sdk.Int, outShares sdk.Int) {
-	lowerReserve0 := &p.LowerTick0.TickData.Reserve0AndShares[p.FeeIndex].Reserve0
+	lowerReserve0 := &p.LowerTick0.TickData.Reserve0[p.FeeIndex]
 	upperReserve1 := &p.UpperTick1.TickData.Reserve1[p.FeeIndex]
 
 	inAmount0, inAmount1 = CalcGreatestMatchingRatio(
@@ -175,7 +175,7 @@ func (p *Pool) CalcSharesMinted(
 }
 
 func (p *Pool) Withdraw(sharesToRemove sdk.Int, totalShares sdk.Int) (outAmount0 sdk.Int, outAmount1 sdk.Int, err error) {
-	reserves0 := &p.LowerTick0.TickData.Reserve0AndShares[p.FeeIndex].Reserve0
+	reserves0 := &p.LowerTick0.TickData.Reserve0[p.FeeIndex]
 	reserves1 := &p.UpperTick1.TickData.Reserve1[p.FeeIndex]
 	ownershipRatio := sharesToRemove.ToDec().Quo(totalShares.ToDec())
 	outAmount1 = ownershipRatio.Mul(reserves1.ToDec()).TruncateInt()

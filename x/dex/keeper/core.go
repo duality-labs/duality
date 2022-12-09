@@ -68,7 +68,7 @@ func (k Keeper) DepositCore(
 		lowerTick := k.GetOrInitTick(goCtx, pairId, lowerTickIndex)
 		upperTick := k.GetOrInitTick(goCtx, pairId, upperTickIndex)
 
-		sharesId := k.CreateSharesId(token0, token1, tickIndex, feeIndex)
+		sharesId := k.CreateSharesId(token0, token1, tickIndex, fee)
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
 		pool, err := NewPool(
@@ -188,7 +188,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			return types.ErrValidTickNotFound
 		}
 
-		sharesId := k.CreateSharesId(token0, token1, tickIndex, feeIndex)
+		sharesId := k.CreateSharesId(token0, token1, tickIndex, fee)
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
 		pool, err := NewPool(
@@ -231,9 +231,9 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			token1,
 			fmt.Sprint(msg.TickIndexes[i]),
 			fmt.Sprint(msg.FeeIndexes[i]),
-			pool.LowerTick0.TickData.Reserve0AndShares[feeIndex].Reserve0.Add(outAmount0).String(),
+			pool.LowerTick0.TickData.Reserve0[feeIndex].Add(outAmount0).String(),
 			pool.UpperTick1.TickData.Reserve1[feeIndex].Add(outAmount1).String(),
-			pool.LowerTick0.TickData.Reserve0AndShares[feeIndex].Reserve0.String(),
+			pool.LowerTick0.TickData.Reserve0[feeIndex].String(),
 			pool.UpperTick1.TickData.Reserve1[feeIndex].String(),
 			sharesToRemove.String(),
 		))

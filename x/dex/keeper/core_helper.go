@@ -68,15 +68,15 @@ func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex in
 			TickIndex: tickIndex,
 			TickData: &types.TickDataType{
 				// TODO: clean up tickdata proto
-				Reserve0AndShares: make([]*types.Reserve0AndSharesType, numFees),
-				Reserve1:          make([]sdk.Int, numFees),
+				Reserve0: make([]sdk.Int, numFees),
+				Reserve1: make([]sdk.Int, numFees),
 			},
 			LimitOrderTranche0To1: &types.LimitTrancheIndexes{0, 0},
 			LimitOrderTranche1To0: &types.LimitTrancheIndexes{0, 0},
 		}
 		for i := 0; i < int(numFees); i++ {
 			// TODO: clean up tickdata proto
-			tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroInt()}
+			tick.TickData.Reserve0[i] = sdk.ZeroInt()
 			tick.TickData.Reserve1[i] = sdk.ZeroInt()
 		}
 		k.SetTick(ctx, pairId, tick)
@@ -295,8 +295,8 @@ func CalcPrice1To0(tickIndex int64) (sdk.Dec, error) {
 // Checks if a tick has reserves0 at any fee tier
 func (k Keeper) TickHasToken0(ctx sdk.Context, tick *types.Tick) bool {
 	// TODO: clean up tickdata proto
-	for _, s := range tick.TickData.Reserve0AndShares {
-		if s.Reserve0.GT(sdk.ZeroInt()) {
+	for _, r0 := range tick.TickData.Reserve0 {
+		if r0.GT(sdk.ZeroInt()) {
 			return true
 		}
 	}

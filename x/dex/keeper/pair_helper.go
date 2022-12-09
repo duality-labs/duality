@@ -28,6 +28,6 @@ func (k Keeper) CreatePairId(token0 string, token1 string) (pairId string) {
 	return (token0 + "<>" + token1)
 }
 
-func (k Keeper) CreateSharesId(token0 string, token1 string, tickIndex int64, feeIndex uint64) (denom string) {
-	return fmt.Sprintf("%s%st%df%d", token0, token1, tickIndex, feeIndex)
+func (k Keeper) CreateSharesId(token0 string, token1 string, tickIndex int64, fee int64) (denom string) {
+	return fmt.Sprintf("%s%st%df%d", token0, token1, tickIndex, fee)
 }

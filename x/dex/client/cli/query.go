@@ -33,8 +33,6 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	cmd.AddCommand(CmdShowTokens())
 	cmd.AddCommand(CmdListTokenMap())
 	cmd.AddCommand(CmdShowTokenMap())
-	cmd.AddCommand(CmdListShares())
-	cmd.AddCommand(CmdShowShares())
 	cmd.AddCommand(CmdListFeeTier())
 	cmd.AddCommand(CmdShowFeeTier())
 	cmd.AddCommand(CmdListLimitOrderTrancheUser())

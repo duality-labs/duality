@@ -9,7 +9,6 @@ import "dex/tick.proto";
 import "dex/trading_pair.proto";
 import "dex/tokens.proto";
 import "dex/token_map.proto";
-import "dex/shares.proto";
 import "dex/fee_tier.proto";
 import "dex/limit_order_tranche_user.proto";
 import "dex/limit_order_tranche.proto";
@@ -61,16 +60,6 @@ service Query {
 	// Queries a list of TokenMap items.
 	rpc TokenMapAll(QueryAllTokenMapRequest) returns (QueryAllTokenMapResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/token_map";
-	}
-
-// Queries a Shares by index.
-	rpc Shares(QueryGetSharesRequest) returns (QueryGetSharesResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/shares/{address}/{pairId}/{tickIndex}/{fee}";
-	}
-
-	// Queries a list of Shares items.
-	rpc SharesAll(QueryAllSharesRequest) returns (QueryAllSharesResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/shares";
 	}
 
 // Queries a FeeTier by id.
@@ -185,27 +174,6 @@ message QueryAllTokenMapRequest {
 
 message QueryAllTokenMapResponse {
 	repeated TokenMap tokenMap = 1 [(gogoproto.nullable) = false];
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
-}
-
-message QueryGetSharesRequest {
-	  string address = 1;
-  string pairId = 2;
-  int64 tickIndex = 3;
-  uint64 fee = 4;
-
-}
-
-message QueryGetSharesResponse {
-	Shares shares = 1 [(gogoproto.nullable) = false];
-}
-
-message QueryAllSharesRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
-}
-
-message QueryAllSharesResponse {
-	repeated Shares shares = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
