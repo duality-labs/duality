@@ -20,6 +20,13 @@ func Pow(a sdk.Dec, n uint64) sdk.Dec {
 	}
 }
 
+func Abs(x int64) uint64 {
+	if x < 0 {
+		return uint64(-x)
+	}
+	return uint64(x)
+}
+
 func MaxInt64(a, b int64) int64 {
 	if a < b {
 		return b

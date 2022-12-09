@@ -8,27 +8,47 @@ import (
 )
 
 type Pool struct {
-	PairId     string
-	TickIndex  int64
-	FeeIndex   uint64
-	LowerTick0 *types.Tick
-	UpperTick1 *types.Tick
+	PairId          string
+	TickIndex       int64
+	FeeIndex        uint64
+	LowerTick0      *types.Tick
+	UpperTick1      *types.Tick
+	price1To0Lower  sdk.Dec
+	price0To1Upper  sdk.Dec
+	price1To0Center sdk.Dec
 }
 
 func NewPool(
 	pairId string,
 	tickIndex int64,
 	feeIndex uint64,
+	fee int64,
 	lowerTick0 *types.Tick,
 	upperTick1 *types.Tick,
-) Pool {
-	return Pool{
-		PairId:     pairId,
-		TickIndex:  tickIndex,
-		FeeIndex:   feeIndex,
-		LowerTick0: lowerTick0,
-		UpperTick1: upperTick1,
+) (*Pool, error) {
+	price0To1Upper, err := CalcPrice0To1(tickIndex + fee)
+	if err != nil {
+		return nil, err
 	}
+	price1To0Lower, err := CalcPrice1To0(tickIndex - fee)
+	if err != nil {
+		return nil, err
+	}
+	price1To0Center, err := CalcPrice1To0(tickIndex)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Pool{
+		PairId:          pairId,
+		TickIndex:       tickIndex,
+		FeeIndex:        feeIndex,
+		LowerTick0:      lowerTick0,
+		UpperTick1:      upperTick1,
+		price0To1Upper:  price0To1Upper,
+		price1To0Lower:  price1To0Lower,
+		price1To0Center: price1To0Center,
+	}, nil
 }
 
 func (p *Pool) GetLowerReserve0() sdk.Int {
@@ -44,18 +64,17 @@ func (p *Pool) GetTotalShares() sdk.Int {
 }
 
 func (p *Pool) Swap0To1(maxAmount0 sdk.Int) (inAmount0 sdk.Int, outAmount1 sdk.Int) {
-	price0To1 := CalcPrice0To1(p.UpperTick1.TickIndex)
-	price1To0 := sdk.OneDec().Quo(price0To1)
+	price1To0Upper := sdk.OneDec().Quo(p.price0To1Upper)
 	reserves1 := &p.UpperTick1.TickData.Reserve1[p.FeeIndex]
 	reserves0 := &p.LowerTick0.TickData.Reserve0AndShares[p.FeeIndex].Reserve0
-	maxAmount1 := maxAmount0.ToDec().Mul(price0To1).TruncateInt()
+	maxAmount1 := maxAmount0.ToDec().Mul(p.price0To1Upper).TruncateInt()
 	if reserves1.LT(maxAmount1) {
 		outAmount1 = *reserves1
-		inAmount0 = reserves1.ToDec().Mul(price1To0).TruncateInt()
+		inAmount0 = reserves1.ToDec().Mul(price1To0Upper).TruncateInt()
 		*reserves0 = reserves0.Add(inAmount0)
 		*reserves1 = sdk.ZeroInt()
 	} else {
-		outAmount1 = maxAmount0.ToDec().Mul(price0To1).TruncateInt()
+		outAmount1 = maxAmount0.ToDec().Mul(p.price0To1Upper).TruncateInt()
 		*reserves0 = reserves0.Add(maxAmount0)
 		*reserves1 = reserves1.Sub(outAmount1)
 		inAmount0 = maxAmount0
@@ -64,18 +83,17 @@ func (p *Pool) Swap0To1(maxAmount0 sdk.Int) (inAmount0 sdk.Int, outAmount1 sdk.I
 }
 
 func (p *Pool) Swap1To0(maxAmount1 sdk.Int) (inAmount1 sdk.Int, outAmount0 sdk.Int) {
-	price1To0 := CalcPrice1To0(p.LowerTick0.TickIndex)
-	price0To1 := sdk.OneDec().Quo(price1To0)
+	price0To1Lower := sdk.OneDec().Quo(p.price1To0Lower)
 	reserves1 := &p.UpperTick1.TickData.Reserve1[p.FeeIndex]
 	reserves0 := &p.LowerTick0.TickData.Reserve0AndShares[p.FeeIndex].Reserve0
-	maxAmount0 := maxAmount1.ToDec().Mul(price1To0).TruncateInt()
+	maxAmount0 := maxAmount1.ToDec().Mul(p.price1To0Lower).TruncateInt()
 	if reserves0.LT(maxAmount0) {
 		outAmount0 = *reserves0
-		inAmount1 = reserves0.ToDec().Mul(price0To1).TruncateInt()
+		inAmount1 = reserves0.ToDec().Mul(price0To1Lower).TruncateInt()
 		*reserves1 = reserves1.Add(inAmount1)
 		*reserves0 = sdk.ZeroInt()
 	} else {
-		outAmount0 = maxAmount1.ToDec().Mul(price1To0).TruncateInt()
+		outAmount0 = maxAmount1.ToDec().Mul(p.price1To0Lower).TruncateInt()
 		*reserves1 = reserves1.Add(maxAmount1)
 		*reserves0 = reserves0.Sub(outAmount0)
 		inAmount1 = maxAmount1
@@ -152,9 +170,8 @@ func (p *Pool) CalcSharesMinted(
 	amount0 sdk.Int,
 	amount1 sdk.Int,
 ) (sharesMinted sdk.Int) {
-	price1To0 := CalcPrice1To0(p.TickIndex) // center tick
-	valueMintedToken0 := CalcShares(amount0, amount1, price1To0)
-	valueExistingToken0 := CalcShares(reserve0, reserve1, price1To0)
+	valueMintedToken0 := CalcShares(amount0, amount1, p.price1To0Center)
+	valueExistingToken0 := CalcShares(reserve0, reserve1, p.price1To0Center)
 	if valueExistingToken0.GT(sdk.ZeroDec()) {
 		sharesMinted = valueMintedToken0.Quo(valueExistingToken0).Mul(totalShares.ToDec()).TruncateInt()
 	} else {

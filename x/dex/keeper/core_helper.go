@@ -9,6 +9,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+const MaxTickExp uint64 = 1048575
+
 ///////////////////////////////////////////////////////////////////////////////
 //                                   UTILS                                   //
 ///////////////////////////////////////////////////////////////////////////////
@@ -260,21 +262,31 @@ func CalcTrueAmounts(
 
 // Calculates the price for a swap from token 0 to token 1 given a tick
 // tickIndex refers to the index of a specified tick
-func CalcPrice0To1(tickIndex int64) sdk.Dec {
+func CalcPrice0To1(tickIndex int64) (sdk.Dec, error) {
+	absTickIndex := Abs(tickIndex)
+	if absTickIndex > MaxTickExp {
+		return sdk.ZeroDec(), types.ErrTickOutsideRange
+	}
+
 	if 0 <= tickIndex {
-		return sdk.OneDec().Quo(Pow(BasePrice(), uint64(tickIndex)))
+		return sdk.OneDec().Quo(Pow(BasePrice(), uint64(tickIndex))), nil
 	} else {
-		return Pow(BasePrice(), uint64(-1*tickIndex))
+		return Pow(BasePrice(), uint64(-1*tickIndex)), nil
 	}
 }
 
 // Calculates the price for a swap from token 1 to token 0 given a tick
 // tickIndex refers to the index of a specified tick
-func CalcPrice1To0(tickIndex int64) sdk.Dec {
+func CalcPrice1To0(tickIndex int64) (sdk.Dec, error) {
+	absTickIndex := Abs(tickIndex)
+	if absTickIndex > MaxTickExp {
+		return sdk.ZeroDec(), types.ErrTickOutsideRange
+	}
+
 	if 0 <= tickIndex {
-		return Pow(BasePrice(), uint64(tickIndex))
+		return Pow(BasePrice(), uint64(tickIndex)), nil
 	} else {
-		return sdk.OneDec().Quo(Pow(BasePrice(), uint64(-1*tickIndex)))
+		return sdk.OneDec().Quo(Pow(BasePrice(), uint64(-1*tickIndex))), nil
 	}
 }
 
