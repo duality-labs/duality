@@ -130,7 +130,10 @@ func calculateSharesPure(
 func calculateShares(s *MsgServerTestSuite, amount0 sdk.Int, amount1 sdk.Int, pairId string, tickIndex int64, feeIndex uint64) sdk.Int {
 	k, ctx := s.app.DexKeeper, s.ctx
 
-	price1To0 := keeper.CalcPrice1To0(tickIndex)
+	price1To0, err := keeper.CalcPrice1To0(tickIndex)
+	if err != nil {
+		panic(err)
+	}
 
 	FeeTier := k.GetAllFeeTier(ctx)
 	fee := FeeTier[feeIndex].Fee
