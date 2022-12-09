@@ -41485,6 +41485,8 @@ definitions:
       minTick:
         type: string
         format: int64
+  nicholasdotsol.duality.mevdummy.MsgSendResponse:
+    type: object
   nicholasdotsol.duality.mevdummy.Params:
     type: object
     description: Params defines the parameters for the module.
