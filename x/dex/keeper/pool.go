@@ -129,7 +129,7 @@ func CalcGreatestMatchingRatio(
 
 // Mutates the Pool object and returns relevant change variables. Deposit is not commited until
 // pool.save() is called or the underlying ticks are saved; this method does not use any keeper methods.
-func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.Int) (inAmount0 sdk.Int, inAmount1 sdk.Int, outShares sdk.Int) {
+func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.Int, autoswap bool) (inAmount0 sdk.Int, inAmount1 sdk.Int, outShares sdk.Int) {
 	lowerReserve0 := &p.LowerTick0.TickData.Reserve0[p.FeeIndex]
 	upperReserve1 := &p.UpperTick1.TickData.Reserve1[p.FeeIndex]
 
@@ -139,6 +139,7 @@ func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.I
 		maxAmount0,
 		maxAmount1,
 	)
+
 
 	if inAmount0.Equal(sdk.ZeroInt()) && inAmount1.Equal(sdk.ZeroInt()) {
 		return sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt()
@@ -151,6 +152,23 @@ func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.I
 		inAmount0,
 		inAmount1,
 	)
+	
+	if autoswap {
+		residualAmount0 := maxAmount0.Sub(inAmount0)
+		residualAmount1 := maxAmount1.Sub(inAmount1)
+
+		// NOTE: Currently not doing anything with the error, but added error handling to all of the new functions for autoswap. 
+		// Open to changing it however.
+		residualShares, _ := p.CalcResidualSharesMinted(
+			*lowerReserve0,
+			*upperReserve1,
+			totalShares,
+			residualAmount0,
+			residualAmount1,
+		)
+		
+		outShares = outShares.Add(residualShares)
+	}
 
 	*lowerReserve0 = lowerReserve0.Add(inAmount0)
 	*upperReserve1 = upperReserve1.Add(inAmount1)
@@ -174,6 +192,27 @@ func (p *Pool) CalcSharesMinted(
 	return sharesMinted
 }
 
+func (p *Pool) CalcResidualSharesMinted(
+	reserve0 sdk.Int,
+	reserve1 sdk.Int,
+	totalShares sdk.Int,
+	residualAmount0 sdk.Int,
+	residualAmount1 sdk.Int,
+) (sharesMinted sdk.Int, err error) {
+	fee := CalcFee(p.UpperTick1.TickIndex, p.LowerTick0.TickIndex)
+	valueMintedToken0, err := CalcResidualValue(residualAmount0, residualAmount1, p.price1To0Lower, fee)
+	if err != nil {
+		return sdk.ZeroInt(), err
+	}
+	valueExistingToken0 := CalcShares(reserve0, reserve1, p.price1To0Center)
+	if valueExistingToken0.GT(sdk.ZeroDec()) {
+		sharesMinted = valueMintedToken0.Quo(valueExistingToken0).Mul(totalShares.ToDec()).TruncateInt()
+	} else {
+		sharesMinted = valueMintedToken0.TruncateInt()
+	}
+	return sharesMinted, nil
+}
+
 func (p *Pool) Withdraw(sharesToRemove sdk.Int, totalShares sdk.Int) (outAmount0 sdk.Int, outAmount1 sdk.Int, err error) {
 	reserves0 := &p.LowerTick0.TickData.Reserve0[p.FeeIndex]
 	reserves1 := &p.UpperTick1.TickData.Reserve1[p.FeeIndex]
@@ -189,6 +228,21 @@ func CalcShares(amount0 sdk.Int, amount1 sdk.Int, priceCenter1To0 sdk.Dec) sdk.D
 	amount0Dec := amount0.ToDec()
 	amount1Dec := amount1.ToDec()
 	return amount0Dec.Add(amount1Dec.Mul(priceCenter1To0))
+}
+
+func CalcResidualValue(amount0 sdk.Int, amount1 sdk.Int, priceLower1To0 sdk.Dec, fee int64) (sdk.Dec, error) {
+	amount0Dec := amount0.ToDec()
+	amount1Dec := amount1.ToDec()
+	// ResidualValue = Amount0 * (Price1to0Center / Price1to0Upper) + Amount1 * Price1to0Lower
+	amount0Discount, err := CalcPrice0To1(-fee)
+	if err != nil {
+		return sdk.ZeroDec(), err
+	}
+	return (amount0Dec.Mul(amount0Discount)).Add(amount1Dec.Mul(priceLower1To0)), nil
+}
+
+func CalcFee(upperTickIndex int64, lowerTickIndex int64) (int64) {
+	return (upperTickIndex - lowerTickIndex) / 2
 }
 
 func (p *Pool) Save(ctx context.Context, keeper Keeper) {

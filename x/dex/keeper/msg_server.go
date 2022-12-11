@@ -29,6 +29,7 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 		return nil, err
 	}
 
+	// TODO: DECIDE WHETHER WE SHOULD HAVE A SEPERATE MSG SERVER FUNCTION FOR DEPOSIT
 	Amounts0Deposit, Amounts1Deposit, err := k.DepositCore(
 		goCtx,
 		msg,
@@ -37,6 +38,7 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 		createrAddr,
 		amount0,
 		amount1,
+		false,
 	)
 
 	if err != nil {
