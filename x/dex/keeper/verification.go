@@ -8,7 +8,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit) (string, string, sdk.AccAddress, []sdk.Int, []sdk.Int, error) {
+func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit) (string, string, bool, sdk.AccAddress, []sdk.Int, []sdk.Int, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -16,21 +16,21 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
 
 	if err != nil {
-		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrInvalidTradingPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+		return "", "", false, nil, nil, nil, sdkerrors.Wrapf(types.ErrInvalidTradingPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
 	}
 
 	// Converts input address (string) to sdk.AccAddress
 	callerAddr, err := sdk.AccAddressFromBech32(msg.Creator)
 	// Error checking for the calling address
 	if err != nil {
-		return "", "", nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+		return "", "", false, nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
 	_, err = sdk.AccAddressFromBech32(msg.Receiver)
 	// Error Checking for receiver address
 	// Note we do not actually need to save the sdk.AccAddress here but we do want the address to be checked to determine if it valid
 	if err != nil {
-		return "", "", nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+		return "", "", false, nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
 	feeCount := k.GetFeeTierCount(ctx)
@@ -38,7 +38,7 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 	// make sure that all feeIndexes (fee list index) is a valid index of the fee tier
 	for i, _ := range msg.FeeIndexes {
 		if msg.FeeIndexes[i] >= feeCount {
-			return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", msg.FeeIndexes[i])
+			return "", "", false, nil, nil, nil, sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", msg.FeeIndexes[i])
 		}
 	}
 
@@ -58,7 +58,7 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 	for i, _ := range amounts0 {
 		// Error checking for valid sdk.Int
 		if err != nil || (amounts0[i].Equal(sdk.ZeroInt()) && amounts1[i].Equal(sdk.ZeroInt())) {
-			return "", "", nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid amount: %s", err)
+			return "", "", false, nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid amount: %s", err)
 		}
 
 		totalAmount0ToDeposit = totalAmount0ToDeposit.Add(amounts0[i])
@@ -70,7 +70,7 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 
 	if AccountToken0Balance.LT(totalAmount0ToDeposit) {
-		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
+		return "", "", false, nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
 	AccountsToken1Balance := k.bankKeeper.GetBalance(ctx, callerAddr, token1).Amount
@@ -78,10 +78,12 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
 
 	if AccountsToken1Balance.LT(totalAmount1ToDeposit) {
-		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
+		return "", "", false, nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
-	return token0, token1, callerAddr, amounts0, amounts1, nil
+	//autoswap := msg.Autoswap
+
+	return token0, token1, false, callerAddr, amounts0, amounts1, nil
 }
 
 func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdrawl) (string, string, sdk.AccAddress, sdk.AccAddress, error) {
