@@ -36,7 +36,7 @@ message MsgDeposit {
   ]; 
   repeated int64 tickIndexes = 7;
   repeated uint64 feeIndexes = 8;
-  
+  bool autoswap = 9;
 }
 
 message MsgDepositResponse {
