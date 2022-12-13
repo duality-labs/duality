@@ -81,6 +81,7 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 		return "", "", false, nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
 	}
 
+	// test commit
 	//autoswap := msg.Autoswap
 
 	return token0, token1, false, callerAddr, amounts0, amounts1, nil
