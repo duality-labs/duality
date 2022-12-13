@@ -168,6 +168,9 @@ func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.I
 		)
 		
 		outShares = outShares.Add(residualShares)
+
+		inAmount0 = maxAmount0
+		inAmount1 = maxAmount1
 	}
 
 	*lowerReserve0 = lowerReserve0.Add(inAmount0)

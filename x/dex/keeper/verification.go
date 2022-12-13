@@ -82,9 +82,9 @@ func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit)
 	}
 
 	// test commit
-	//autoswap := msg.Autoswap
+	autoswap := msg.Autoswap
 
-	return token0, token1, false, callerAddr, amounts0, amounts1, nil
+	return token0, token1, autoswap, callerAddr, amounts0, amounts1, nil
 }
 
 func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdrawl) (string, string, sdk.AccAddress, sdk.AccAddress, error) {
