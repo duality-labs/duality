@@ -627,6 +627,17 @@ func (k Keeper) SwapLimitOrderTranche(
 	}
 	k.SetLimitOrderTranche(ctx, tranche)
 
+	// TODO: finish tranche.swap and replace the above with the following
+	// tranche, err := NewLimitOrderTrancheFromKeeper(ctx, k, msg.KeyToken, token0, pairId, tick.TickIndex, msg.Key)
+	// if err == types.ErrValidLimitOrderMapsNotFound {
+	// return amountRemainingTokenIn, amountOut, nil
+	// } else if err != nil {
+	// return sdk.ZeroDec(), sdk.ZeroInt(), err
+	// }
+	//
+	// amountRemainingTokenIn, amountOut = tranche.Swap()
+	//
+	// tranche.Save(ctx, k)
 	return amountRemainingTokenIn, amountOut, nil
 }
 
@@ -751,6 +762,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	if !found {
 		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Valid tick not found ")
 	}
+
 	tranche, err := NewLimitOrderTrancheFromKeeper(ctx, k, msg.KeyToken, token0, pairId, tick.TickIndex, msg.Key)
 	if err != nil {
 		return err
