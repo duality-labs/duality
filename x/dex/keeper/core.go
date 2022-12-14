@@ -647,7 +647,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	if err != nil {
 		return err
 	}
-	trancheUser := k.GetUserShares(goCtx, tranche, msg.Receiver)
+	trancheUser := k.GetLimitOrderTrancheUserShares(goCtx, tranche, msg.Receiver)
 
 	tranche.PlaceLimitOrder(msg.AmountIn, &trancheUser)
 
@@ -689,12 +689,12 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Valid tick not found ")
 	}
 
-	// TODO: currently, msg.KeyToken == tokenOut in CancelLO but msg.KeyToken == tokenIn in PlaceLO. This should be standardized...
+	// TODO: currently, msg.KeyToken == tokenOut in CancelLO but msg.KeyToken == tokenIn in WithdrawFilledLO. This should be standardized...
 	tranche, err := NewLimitOrderTrancheFromKeeper(ctx, k, msg.KeyToken, token0, pairId, tick.TickIndex, msg.Key)
 	if err != nil {
 		return err
 	}
-	trancheUser := k.GetUserShares(goCtx, tranche, msg.Receiver)
+	trancheUser := k.GetLimitOrderTrancheUserShares(goCtx, tranche, msg.Receiver)
 
 	err = tranche.CancelLimitOrder(msg.SharesOut, &trancheUser)
 	if err != nil {
@@ -740,76 +740,30 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId := k.CreatePairId(token0, token1)
 
-	orderTokenIn := msg.KeyToken
 	var orderTokenOut string
 	if msg.KeyToken == token0 {
 		orderTokenOut = token1
 	} else {
 		orderTokenOut = token0
 	}
-	trancheIndex := msg.Key
-	tickIndex := msg.TickIndex
-
-	tranche, found := k.GetLimitOrderTranche(ctx, pairId, tickIndex, orderTokenIn, trancheIndex)
-	if !found {
-		return types.ErrValidLimitOrderMapsNotFound
-	}
-
-	trancheUser, found := k.GetLimitOrderTrancheUser(
-		ctx,
-		pairId,
-		tickIndex,
-		orderTokenIn,
-		trancheIndex,
-		msg.Creator,
-	)
-	if !found {
-		return types.ErrValidLimitOrderMapsNotFound
-	}
 
 	tick, found := k.GetTick(ctx, pairId, msg.TickIndex)
 	if !found {
 		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Valid tick not found ")
 	}
-
-	var priceLimitInToOut sdk.Dec
-	var priceLimitOutToIn sdk.Dec
-	var err error
-	if orderTokenIn == token0 {
-		priceLimitInToOut, err = CalcPrice0To1(tick.TickIndex)
-		if err != nil {
-			return err
-		}
-	} else {
-		priceLimitInToOut, err = CalcPrice1To0(tick.TickIndex)
-		if err != nil {
-			return err
-		}
+	tranche, err := NewLimitOrderTrancheFromKeeper(ctx, k, msg.KeyToken, token0, pairId, tick.TickIndex, msg.Key)
+	if err != nil {
+		return err
 	}
-	priceLimitOutToIn = sdk.OneDec().Quo(priceLimitInToOut)
+	trancheUser := k.GetLimitOrderTrancheUserShares(goCtx, tranche, msg.Receiver)
 
-	// TODO: move to lo object
-	reservesTokenOutDec := sdk.NewDecFromInt(tranche.ReservesTokenOut)
-	amountFilled := priceLimitOutToIn.MulInt(tranche.TotalTokenOut)
-	ratioFilled := amountFilled.QuoInt(tranche.TotalTokenIn)
-	maxAllowedToWithdraw := sdk.MinInt(
-		ratioFilled.MulInt(trancheUser.SharesOwned).TruncateInt(), // cannot withdraw more than what's been filled
-		trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled),  // cannot withdraw more than what you own
-	)
-	amountOutTokenIn := maxAllowedToWithdraw.Sub(trancheUser.SharesWithdrawn)
+	amountOutTokenOut := tranche.WithdrawFilledLimitOrder(&trancheUser)
 
-	amountOutTokenOut := priceLimitInToOut.MulInt(amountOutTokenIn)
+	tranche.Save(ctx, k)
+	trancheUser.Save(ctx, k)
 
-	trancheUser.SharesWithdrawn = maxAllowedToWithdraw
-	k.SetLimitOrderTrancheUser(ctx, trancheUser)
-
-	// See top NOTE on rounding
-	tranche.ReservesTokenOut = reservesTokenOutDec.Sub(amountOutTokenOut).TruncateInt()
-	k.SetLimitOrderTranche(ctx, tranche)
-	// end TODO
-
-	if amountOutTokenOut.GT(sdk.ZeroDec()) {
-		coinOut := sdk.NewCoin(orderTokenOut, amountOutTokenOut.TruncateInt())
+	if amountOutTokenOut.GT(sdk.ZeroInt()) {
+		coinOut := sdk.NewCoin(orderTokenOut, amountOutTokenOut)
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}

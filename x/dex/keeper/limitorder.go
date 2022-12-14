@@ -113,7 +113,7 @@ func (tranche *LimitOrderTranche) PartiallyFilled() bool {
 func (tranche *LimitOrderTranche) PlaceLimitOrder(amountIn sdk.Int, trancheUser *LimitOrderTrancheUser) {
 	tranche.ReservesTokenIn = tranche.ReservesTokenIn.Add(amountIn)
 	tranche.TotalTokenIn = tranche.TotalTokenIn.Add(amountIn)
-	trancheUser.PlaceLimitOrder(amountIn)
+	trancheUser.SharesOwned = trancheUser.SharesOwned.Add(amountIn)
 }
 
 func (tranche *LimitOrderTranche) CancelLimitOrder(sharesOut sdk.Int, trancheUser *LimitOrderTrancheUser) error {
@@ -138,24 +138,21 @@ func (tranche *LimitOrderTranche) CancelLimitOrder(sharesOut sdk.Int, trancheUse
 	return nil
 }
 
-func (tranche *LimitOrderTranche) WithdrawFilledLimitOrder() error {
-	// reservesTokenOutDec := sdk.NewDecFromInt(tranche.ReservesTokenOut)
-	// amountFilled := priceLimitOutToIn.MulInt(tranche.TotalTokenOut)
-	// ratioFilled := amountFilled.QuoInt(tranche.TotalTokenIn)
-	// maxAllowedToWithdraw := sdk.MinInt(
-	// ratioFilled.MulInt(trancheUser.SharesOwned).TruncateInt(), // cannot withdraw more than what's been filled
-	// trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled),  // cannot withdraw more than what you own
-	// )
-	// amountOutTokenIn := maxAllowedToWithdraw.Sub(trancheUser.SharesWithdrawn)
-	//
-	// amountOutTokenOut := priceLimitInToOut.MulInt(amountOutTokenIn)
-	//
-	// trancheUser.SharesWithdrawn = maxAllowedToWithdraw
-	// k.SetLimitOrderTrancheUser(ctx, trancheUser)
-	//
-	// tranche.ReservesTokenOut = reservesTokenOutDec.Sub(amountOutTokenOut).TruncateInt()
-	// k.SetLimitOrderTranche(ctx, tranche)
-	return nil
+func (tranche *LimitOrderTranche) WithdrawFilledLimitOrder(trancheUser *LimitOrderTrancheUser) sdk.Int {
+	amountFilled := tranche.priceOutToIn.MulInt(tranche.TotalTokenOut)
+	ratioFilled := amountFilled.QuoInt(tranche.TotalTokenIn)
+	maxAllowedToWithdraw := sdk.MinInt(
+		ratioFilled.MulInt(trancheUser.SharesOwned).TruncateInt(), // cannot withdraw more than what's been filled
+		trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled),  // cannot withdraw more than what you own
+	)
+	amountOutTokenIn := maxAllowedToWithdraw.Sub(trancheUser.SharesWithdrawn)
+
+	amountOutTokenOut := tranche.priceInToOut.MulInt(amountOutTokenIn).TruncateInt()
+
+	trancheUser.SharesWithdrawn = maxAllowedToWithdraw
+
+	tranche.ReservesTokenOut = tranche.ReservesTokenOut.Sub(amountOutTokenOut)
+	return amountOutTokenOut
 }
 
 func (tranche *LimitOrderTranche) Swap() error {
@@ -181,19 +178,16 @@ func (tranche *LimitOrderTranche) Swap() error {
 	return nil
 }
 
+// TODO: possibly move this into the tranche object?
 type LimitOrderTrancheUser struct {
 	types.LimitOrderTrancheUser
-}
-
-func (loUser *LimitOrderTrancheUser) PlaceLimitOrder(shares sdk.Int) {
-	loUser.SharesOwned = loUser.SharesOwned.Add(shares)
 }
 
 func (loUser *LimitOrderTrancheUser) Save(ctx sdk.Context, k Keeper) {
 	k.SetLimitOrderTrancheUser(ctx, loUser.LimitOrderTrancheUser)
 }
 
-func (k Keeper) GetUserShares(goCtx context.Context, lo *LimitOrderTranche, user string) LimitOrderTrancheUser {
+func (k Keeper) GetLimitOrderTrancheUserShares(goCtx context.Context, lo *LimitOrderTranche, user string) LimitOrderTrancheUser {
 	return LimitOrderTrancheUser{
 		k.GetOrInitLimitOrderTrancheUser(goCtx,
 			lo.LimitOrderTranche.PairId,
