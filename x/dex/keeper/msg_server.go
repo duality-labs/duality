@@ -23,13 +23,12 @@ var _ types.MsgServer = msgServer{}
 func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.MsgDepositResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, autoswap, createrAddr, amount0, amount1, err := k.DepositVerification(goCtx, *msg)
+	token0, token1, createrAddr, amount0, amount1, err := k.DepositVerification(goCtx, *msg)
 
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO: DECIDE WHETHER WE SHOULD HAVE A SEPERATE MSG SERVER FUNCTION FOR DEPOSIT
 	Amounts0Deposit, Amounts1Deposit, err := k.DepositCore(
 		goCtx,
 		msg,
@@ -38,7 +37,6 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 		createrAddr,
 		amount0,
 		amount1,
-		autoswap,
 	)
 
 	if err != nil {

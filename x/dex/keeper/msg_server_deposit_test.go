@@ -19,6 +19,7 @@ func (s *MsgServerTestSuite) TestSingleDepositDepositAmountZero() {
 		AmountsB:    []sdk.Int{sdk.NewInt(0)},
 		TickIndexes: []int64{0},
 		FeeIndexes:  []uint64{1},
+		Options: []*types.DepositOptions{&types.DepositOptions{false}},
 	})
 	s.Assert().ErrorIs(err, sdkerrors.ErrInvalidType)
 
@@ -50,6 +51,7 @@ func (s *MsgServerTestSuite) TestSingleDepositDepositFail() {
 		AmountsB:    []sdk.Int{sdk.NewInt(5)},
 		TickIndexes: []int64{0},
 		FeeIndexes:  []uint64{0},
+		Options: []*types.DepositOptions{&types.DepositOptions{false}},
 	})
 	s.Assert().ErrorIs(err, types.ErrAllDepositsFailed)
 
@@ -86,6 +88,10 @@ func (s *MsgServerTestSuite) TestMultiDepositDepositFail() {
 		AmountsB:    []sdk.Int{sdk.NewInt(5), sdk.NewInt(5)},
 		TickIndexes: []int64{0, 1},
 		FeeIndexes:  []uint64{0, 0},
+		Options: []*types.DepositOptions{
+			&types.DepositOptions{false}, 
+			&types.DepositOptions{false},
+		},
 	})
 	s.Assert().ErrorIs(err, types.ErrAllDepositsFailed)
 	s.assertAliceBalances(15, 25)
@@ -121,6 +127,10 @@ func (s *MsgServerTestSuite) TestMultiDepositSingleFail() {
 		AmountsB:    []sdk.Int{sdk.NewInt(5), sdk.NewInt(0)},
 		TickIndexes: []int64{0, 1},
 		FeeIndexes:  []uint64{0, 0},
+		Options: []*types.DepositOptions{
+			&types.DepositOptions{false}, 
+			&types.DepositOptions{false},
+		},
 	})
 	s.Require().Nil(err)
 
@@ -165,6 +175,10 @@ func (s *MsgServerTestSuite) TestMultiDepositAllSucceed() {
 		AmountsB:    []sdk.Int{sdk.NewInt(0), sdk.NewInt(0)},
 		TickIndexes: []int64{0, 1},
 		FeeIndexes:  []uint64{0, 0},
+		Options: []*types.DepositOptions{
+			&types.DepositOptions{false}, 
+			&types.DepositOptions{false},
+		},
 	})
 
 	s.Require().Nil(err)

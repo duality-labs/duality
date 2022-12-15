@@ -25,7 +25,6 @@ func (k Keeper) DepositCore(
 	callerAddr sdk.AccAddress,
 	amounts0 []sdk.Int,
 	amounts1 []sdk.Int,
-	autoswap bool,
 ) (amounts0Deposit []sdk.Int, amounts1Deposit []sdk.Int, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pair := k.GetOrInitPair(
@@ -50,6 +49,7 @@ func (k Keeper) DepositCore(
 		amount1 := amounts1[i]
 		tickIndex := msg.TickIndexes[i]
 		feeIndex := msg.FeeIndexes[i]
+		autoswap := msg.Options[i].Autoswap
 		fee := FeeTier[feeIndex].Fee
 		curTick0to1 := pair.CurrentTick0To1
 		curTick1to0 := pair.CurrentTick1To0

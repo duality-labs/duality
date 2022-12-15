@@ -290,6 +290,18 @@ type Deposit struct {
 	FeeIndex  uint64
 }
 
+type DepositOptions struct {
+	autoswap  bool
+}
+
+type DepositWithOptions struct {
+	AmountA   sdk.Int
+	AmountB   sdk.Int
+	TickIndex int64
+	FeeIndex  uint64
+	Options   DepositOptions
+}
+
 func NewDeposit(amountA int, amountB int, tickIndex int, feeIndex int) *Deposit {
 	return &Deposit{
 		AmountA:   sdk.NewInt(int64(amountA)),
@@ -302,6 +314,11 @@ func NewDeposit(amountA int, amountB int, tickIndex int, feeIndex int) *Deposit 
 func (s *MsgServerTestSuite) aliceDeposits(deposits ...*Deposit) {
 	s.deposits(s.alice, deposits...)
 }
+
+/* TODO
+func (s *MsgServerTestSuite) aliceDepositsWithOptions(deposits ...*DepositWithOptions) {
+	s.autoswapDeposits(s.alice, deposits...)
+}*/
 
 func (s *MsgServerTestSuite) bobDeposits(deposits ...*Deposit) {
 	s.deposits(s.bob, deposits...)
@@ -320,11 +337,13 @@ func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits ...*Depos
 	amountsB := make([]sdk.Int, len(deposits))
 	tickIndexes := make([]int64, len(deposits))
 	feeIndexes := make([]uint64, len(deposits))
+	options := make([]*types.DepositOptions, len(deposits))
 	for i, e := range deposits {
 		amountsA[i] = e.AmountA
 		amountsB[i] = e.AmountB
 		tickIndexes[i] = e.TickIndex
 		feeIndexes[i] = e.FeeIndex
+		options[i] = &types.DepositOptions{false}
 	}
 
 	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
@@ -336,6 +355,36 @@ func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits ...*Depos
 		AmountsB:    amountsB,
 		TickIndexes: tickIndexes,
 		FeeIndexes:  feeIndexes,
+		Options: options,
+	})
+	s.Assert().Nil(err)
+}
+
+
+func (s *MsgServerTestSuite) depositsWithOptions(account sdk.AccAddress, deposits ...*DepositWithOptions) {
+	amountsA := make([]sdk.Int, len(deposits))
+	amountsB := make([]sdk.Int, len(deposits))
+	tickIndexes := make([]int64, len(deposits))
+	feeIndexes := make([]uint64, len(deposits))
+	options := make([]*types.DepositOptions, len(deposits))
+	for i, e := range deposits {
+		amountsA[i] = e.AmountA
+		amountsB[i] = e.AmountB
+		tickIndexes[i] = e.TickIndex
+		feeIndexes[i] = e.FeeIndex
+		options[i] = &types.DepositOptions{e.Options.autoswap}
+	}
+
+	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
+		Creator:     account.String(),
+		Receiver:    account.String(),
+		TokenA:      "TokenA",
+		TokenB:      "TokenB",
+		AmountsA:    amountsA,
+		AmountsB:    amountsB,
+		TickIndexes: tickIndexes,
+		FeeIndexes:  feeIndexes,
+		Options: options,
 	})
 	s.Assert().Nil(err)
 }
@@ -360,11 +409,13 @@ func (s *MsgServerTestSuite) assertDepositFails(account sdk.AccAddress, expected
 	amountsB := make([]sdk.Int, len(deposits))
 	tickIndexes := make([]int64, len(deposits))
 	feeIndexes := make([]uint64, len(deposits))
+	options := make([]*types.DepositOptions, len(deposits))
 	for i, e := range deposits {
 		amountsA[i] = e.AmountA
 		amountsB[i] = e.AmountB
 		tickIndexes[i] = e.TickIndex
 		feeIndexes[i] = e.FeeIndex
+		options[i] = &types.DepositOptions{false}
 	}
 
 	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
@@ -376,6 +427,7 @@ func (s *MsgServerTestSuite) assertDepositFails(account sdk.AccAddress, expected
 		AmountsB:    amountsB,
 		TickIndexes: tickIndexes,
 		FeeIndexes:  feeIndexes,
+		Options: options,
 	})
 	s.Assert().NotNil(err)
 	s.Assert().ErrorIs(err, expectedErr)
