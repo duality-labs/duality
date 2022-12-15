@@ -6,14 +6,13 @@ import (
 
 	"github.com/NicholasDotSol/duality/app"
 	ibctesting "github.com/cosmos/ibc-go/v3/testing"
-	icssimapp "github.com/cosmos/interchain-security/testutil/simapp"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/libs/log"
 	tmdb "github.com/tendermint/tm-db"
 )
 
 func TestConsumerWhitelistingKeys(t *testing.T) {
-	chain := ibctesting.NewTestChain(t, icssimapp.NewBasicCoordinator(t), SetupTestingAppConsumer, "test")
+	chain := ibctesting.NewTestChain(t, ibctesting.NewCoordinator(t, 0), SetupTestingAppConsumer, "test")
 	paramKeeper := chain.App.(*app.App).ParamsKeeper
 	for paramKey := range app.WhitelistedParams {
 		ss, ok := paramKeeper.GetSubspace(paramKey.Subspace)

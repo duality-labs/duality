@@ -1487,6 +1487,380 @@ paths:
           type: string
       tags:
         - Query
+  /cosmos/auth/v1beta1/module_accounts/{name}:
+    get:
+      summary: ModuleAccountByName returns the module account info by module name
+      operationId: CosmosAuthV1Beta1ModuleAccountByName
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              account:
+                type: object
+                properties:
+                  '@type':
+                    type: string
+                    description: >-
+                      A URL/resource name that uniquely identifies the type of
+                      the serialized
+
+                      protocol buffer message. This string must contain at least
+
+                      one "/" character. The last segment of the URL's path must
+                      represent
+
+                      the fully qualified name of the type (as in
+
+                      `path/google.protobuf.Duration`). The name should be in a
+                      canonical form
+
+                      (e.g., leading "." is not accepted).
+
+
+                      In practice, teams usually precompile into the binary all
+                      types that they
+
+                      expect it to use in the context of Any. However, for URLs
+                      which use the
+
+                      scheme `http`, `https`, or no scheme, one can optionally
+                      set up a type
+
+                      server that maps type URLs to message definitions as
+                      follows:
+
+
+                      * If no scheme is provided, `https` is assumed.
+
+                      * An HTTP GET on the URL must yield a
+                      [google.protobuf.Type][]
+                        value in binary format, or produce an error.
+                      * Applications are allowed to cache lookup results based
+                      on the
+                        URL, or have them precompiled into a binary to avoid any
+                        lookup. Therefore, binary compatibility needs to be preserved
+                        on changes to types. (Use versioned type names to manage
+                        breaking changes.)
+
+                      Note: this functionality is not currently available in the
+                      official
+
+                      protobuf release, and it is not used for type URLs
+                      beginning with
+
+                      type.googleapis.com.
+
+
+                      Schemes other than `http`, `https` (or the empty scheme)
+                      might be
+
+                      used with implementation specific semantics.
+                additionalProperties: {}
+                description: >-
+                  `Any` contains an arbitrary serialized protocol buffer message
+                  along with a
+
+                  URL that describes the type of the serialized message.
+
+
+                  Protobuf library provides support to pack/unpack Any values in
+                  the form
+
+                  of utility functions or additional generated methods of the
+                  Any type.
+
+
+                  Example 1: Pack and unpack a message in C++.
+
+                      Foo foo = ...;
+                      Any any;
+                      any.PackFrom(foo);
+                      ...
+                      if (any.UnpackTo(&foo)) {
+                        ...
+                      }
+
+                  Example 2: Pack and unpack a message in Java.
+
+                      Foo foo = ...;
+                      Any any = Any.pack(foo);
+                      ...
+                      if (any.is(Foo.class)) {
+                        foo = any.unpack(Foo.class);
+                      }
+
+                   Example 3: Pack and unpack a message in Python.
+
+                      foo = Foo(...)
+                      any = Any()
+                      any.Pack(foo)
+                      ...
+                      if any.Is(Foo.DESCRIPTOR):
+                        any.Unpack(foo)
+                        ...
+
+                   Example 4: Pack and unpack a message in Go
+
+                       foo := &pb.Foo{...}
+                       any, err := anypb.New(foo)
+                       if err != nil {
+                         ...
+                       }
+                       ...
+                       foo := &pb.Foo{}
+                       if err := any.UnmarshalTo(foo); err != nil {
+                         ...
+                       }
+
+                  The pack methods provided by protobuf library will by default
+                  use
+
+                  'type.googleapis.com/full.type.name' as the type URL and the
+                  unpack
+
+                  methods only use the fully qualified type name after the last
+                  '/'
+
+                  in the type URL, for example "foo.bar.com/x/y.z" will yield
+                  type
+
+                  name "y.z".
+
+
+
+                  JSON
+
+                  ====
+
+                  The JSON representation of an `Any` value uses the regular
+
+                  representation of the deserialized, embedded message, with an
+
+                  additional field `@type` which contains the type URL. Example:
+
+                      package google.profile;
+                      message Person {
+                        string first_name = 1;
+                        string last_name = 2;
+                      }
+
+                      {
+                        "@type": "type.googleapis.com/google.profile.Person",
+                        "firstName": <string>,
+                        "lastName": <string>
+                      }
+
+                  If the embedded message type is well-known and has a custom
+                  JSON
+
+                  representation, that representation will be embedded adding a
+                  field
+
+                  `value` which holds the custom JSON in addition to the `@type`
+
+                  field. Example (for message [google.protobuf.Duration][]):
+
+                      {
+                        "@type": "type.googleapis.com/google.protobuf.Duration",
+                        "value": "1.212s"
+                      }
+            description: >-
+              QueryModuleAccountByNameResponse is the response type for the
+              Query/ModuleAccountByName RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                      description: >-
+                        A URL/resource name that uniquely identifies the type of
+                        the serialized
+
+                        protocol buffer message. This string must contain at
+                        least
+
+                        one "/" character. The last segment of the URL's path
+                        must represent
+
+                        the fully qualified name of the type (as in
+
+                        `path/google.protobuf.Duration`). The name should be in
+                        a canonical form
+
+                        (e.g., leading "." is not accepted).
+
+
+                        In practice, teams usually precompile into the binary
+                        all types that they
+
+                        expect it to use in the context of Any. However, for
+                        URLs which use the
+
+                        scheme `http`, `https`, or no scheme, one can optionally
+                        set up a type
+
+                        server that maps type URLs to message definitions as
+                        follows:
+
+
+                        * If no scheme is provided, `https` is assumed.
+
+                        * An HTTP GET on the URL must yield a
+                        [google.protobuf.Type][]
+                          value in binary format, or produce an error.
+                        * Applications are allowed to cache lookup results based
+                        on the
+                          URL, or have them precompiled into a binary to avoid any
+                          lookup. Therefore, binary compatibility needs to be preserved
+                          on changes to types. (Use versioned type names to manage
+                          breaking changes.)
+
+                        Note: this functionality is not currently available in
+                        the official
+
+                        protobuf release, and it is not used for type URLs
+                        beginning with
+
+                        type.googleapis.com.
+
+
+                        Schemes other than `http`, `https` (or the empty scheme)
+                        might be
+
+                        used with implementation specific semantics.
+                  additionalProperties: {}
+                  description: >-
+                    `Any` contains an arbitrary serialized protocol buffer
+                    message along with a
+
+                    URL that describes the type of the serialized message.
+
+
+                    Protobuf library provides support to pack/unpack Any values
+                    in the form
+
+                    of utility functions or additional generated methods of the
+                    Any type.
+
+
+                    Example 1: Pack and unpack a message in C++.
+
+                        Foo foo = ...;
+                        Any any;
+                        any.PackFrom(foo);
+                        ...
+                        if (any.UnpackTo(&foo)) {
+                          ...
+                        }
+
+                    Example 2: Pack and unpack a message in Java.
+
+                        Foo foo = ...;
+                        Any any = Any.pack(foo);
+                        ...
+                        if (any.is(Foo.class)) {
+                          foo = any.unpack(Foo.class);
+                        }
+
+                     Example 3: Pack and unpack a message in Python.
+
+                        foo = Foo(...)
+                        any = Any()
+                        any.Pack(foo)
+                        ...
+                        if any.Is(Foo.DESCRIPTOR):
+                          any.Unpack(foo)
+                          ...
+
+                     Example 4: Pack and unpack a message in Go
+
+                         foo := &pb.Foo{...}
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
+                         ...
+                         foo := &pb.Foo{}
+                         if err := any.UnmarshalTo(foo); err != nil {
+                           ...
+                         }
+
+                    The pack methods provided by protobuf library will by
+                    default use
+
+                    'type.googleapis.com/full.type.name' as the type URL and the
+                    unpack
+
+                    methods only use the fully qualified type name after the
+                    last '/'
+
+                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    type
+
+                    name "y.z".
+
+
+
+                    JSON
+
+                    ====
+
+                    The JSON representation of an `Any` value uses the regular
+
+                    representation of the deserialized, embedded message, with
+                    an
+
+                    additional field `@type` which contains the type URL.
+                    Example:
+
+                        package google.profile;
+                        message Person {
+                          string first_name = 1;
+                          string last_name = 2;
+                        }
+
+                        {
+                          "@type": "type.googleapis.com/google.profile.Person",
+                          "firstName": <string>,
+                          "lastName": <string>
+                        }
+
+                    If the embedded message type is well-known and has a custom
+                    JSON
+
+                    representation, that representation will be embedded adding
+                    a field
+
+                    `value` which holds the custom JSON in addition to the
+                    `@type`
+
+                    field. Example (for message [google.protobuf.Duration][]):
+
+                        {
+                          "@type": "type.googleapis.com/google.protobuf.Duration",
+                          "value": "1.212s"
+                        }
+      parameters:
+        - name: name
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
   /cosmos/auth/v1beta1/params:
     get:
       summary: Params queries all parameters.
@@ -22214,13 +22588,22 @@ paths:
                         genesis_hash:
                           type: string
                           format: byte
-                          description: genesis hash with no staking information included.
+                          description: >-
+                            The hash of the consumer chain genesis state without
+                            the consumer CCV module genesis params. 
+
+                            It is used for off-chain confirmation of
+                            genesis.json validity by validators and other
+                            parties.
                         binary_hash:
                           type: string
                           format: byte
                           description: >-
-                            binary hash is the hash of the binary that should be
-                            used by validators on chain initialization.
+                            The hash of the consumer chain binary that should be
+                            run by validators on chain initialization.
+
+                            It is used for off-chain confirmation of binary
+                            validity by validators and other parties.
                         spawn_time:
                           type: string
                           format: date-time
@@ -22231,17 +22614,58 @@ paths:
 
                             will be responsible for starting their consumer
                             chain validator node.
-                        lock_unbonding_on_timeout:
-                          type: boolean
+                        unbonding_period:
+                          type: string
                           description: >-
-                            Indicates whether the outstanding unbonding
-                            operations should be released
+                            Unbonding period for the consumer,
 
-                            in case of a channel time-outs. When set to true, a
-                            governance proposal
+                            which should be smaller than that of the provider in
+                            general.
+                        ccv_timeout_period:
+                          type: string
+                          title: >-
+                            Sent CCV related IBC packets will timeout after this
+                            duration
+                        transfer_timeout_period:
+                          type: string
+                          title: >-
+                            Sent transfer related IBC packets will timeout after
+                            this duration
+                        consumer_redistribution_fraction:
+                          type: string
+                          description: >-
+                            The fraction of tokens allocated to the consumer
+                            redistribution address
 
-                            on the provider chain would be necessary to release
-                            the locked funds.
+                            during distribution events. The fraction is a string
+                            representing a
+
+                            decimal number. For example "0.75" would represent
+                            75%.
+                        blocks_per_distribution_transmission:
+                          type: string
+                          format: int64
+                          description: >-
+                            BlocksPerDistributionTransmission is the number of
+                            blocks between ibc-token-transfers from the consumer
+                            chain to the provider chain.
+
+                            On sending transmission event,
+                            `consumer_redistribution_fraction` of the
+                            accumulated tokens are sent to the consumer
+                            redistribution address.
+                        historical_entries:
+                          type: string
+                          format: int64
+                          description: >-
+                            The number of historical info entries to persist in
+                            store.
+
+                            This param is a part of the cosmos sdk staking
+                            module. In the case of 
+
+                            a ccv enabled consumer chain, the ccv module acts as
+                            the staking module.
                       description: >-
                         ConsumerAdditionProposal is a governance proposal on the
                         provider chain to spawn a new consumer chain.
@@ -22484,9 +22908,7 @@ paths:
                         If it passes, all the consumer chain's state is removed
                         from the provider chain. The outstanding unbonding
 
-                        operation funds are released if the
-                        LockUnbondingOnTimeout parameter is set to false for the
-                        consumer chain ID.
+                        operation funds are released.
                     title: proposals waiting for stop_time to pass
                 description: >-
                   ConsumerRemovalProposals holds pending governance proposals on
@@ -22987,10 +23409,10 @@ paths:
                     title: Params defines the parameters for CCV consumer module
                   provider_client_id:
                     type: string
-                    title: empty for a completely new chain
+                    description: empty for a new chain, filled in on restart.
                   provider_channel_id:
                     type: string
-                    title: empty for a completely new chain
+                    description: empty for a new chain, filled in on restart.
                   new_chain:
                     type: boolean
                     description: true for new chain GenesisState, false for chain restart.
@@ -23419,7 +23841,7 @@ paths:
                         the
 
                         unbonding VSC packet
-                    description: MaturingPackets nil on new chain, filled on restart.
+                    description: MaturingPackets nil on new chain, filled in on restart.
                   initial_val_set:
                     type: array
                     items:
@@ -23459,7 +23881,7 @@ paths:
 
                         of each block height to a valset update id
                     description: >-
-                      HeightToValsetUpdateId nil on new chain, filled on
+                      HeightToValsetUpdateId nil on new chain, filled in on
                       restart.
                   outstanding_downtime_slashing:
                     type: array
@@ -23473,87 +23895,54 @@ paths:
                         each validator
 
                         flagged with an outstanding downtime slashing.
-                    description: OutstandingDowntimes nil on new chain, filled on restart.
-                  pending_slash_requests:
                     description: >-
-                      PendingSlashRequests filled in on new chain, nil on
+                      OutstandingDowntimes nil on new chain, filled  in on
+                      restart.
+                  pending_consumer_packets:
+                    description: >-
+                      PendingConsumerPackets nil on new chain, filled in on
                       restart.
                     type: object
                     properties:
-                      requests:
+                      list:
                         type: array
                         items:
                           type: object
                           properties:
-                            packet:
-                              type: object
-                              properties:
-                                validator:
-                                  type: object
-                                  properties:
-                                    address:
-                                      type: string
-                                      format: byte
-                                      title: The first 20 bytes of SHA256(public key)
-                                    power:
-                                      type: string
-                                      format: int64
-                                      description: The voting power
-                                      title: >-
-                                        PubKey pub_key = 2
-                                        [(gogoproto.nullable)=false];
-                                  title: Validator
-                                valset_update_id:
-                                  type: string
-                                  format: uint64
-                                  title: >-
-                                    map to the infraction block height on the
-                                    provider
-                                infraction:
-                                  title: >-
-                                    tell if the slashing is for a downtime or a
-                                    double-signing infraction
-                                  type: string
-                                  enum:
-                                    - INFRACTION_TYPE_UNSPECIFIED
-                                    - INFRACTION_TYPE_DOUBLE_SIGN
-                                    - INFRACTION_TYPE_DOWNTIME
-                                  default: INFRACTION_TYPE_UNSPECIFIED
-                                  description: >-
-                                    InfractionType indicates the infraction type
-                                    a validator commited.
-
-                                     - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
-                                     - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
-                                     - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
-                              description: >-
-                                This packet is sent from the consumer chain to
-                                the provider chain
-
-                                to request the slashing of a validator as a
-                                result of an infraction
-
-                                committed on the consumer chain.
-                            infraction:
+                            type:
                               type: string
                               enum:
-                                - INFRACTION_TYPE_UNSPECIFIED
-                                - INFRACTION_TYPE_DOUBLE_SIGN
-                                - INFRACTION_TYPE_DOWNTIME
-                              default: INFRACTION_TYPE_UNSPECIFIED
+                                - CONSUMER_PACKET_TYPE_UNSPECIFIED
+                                - CONSUMER_PACKET_TYPE_SLASH
+                                - CONSUMER_PACKET_TYPE_VSCM
+                              default: CONSUMER_PACKET_TYPE_UNSPECIFIED
                               description: >-
-                                InfractionType indicates the infraction type a
-                                validator commited.
+                                ConsumerPacketType indicates interchain security
+                                specific packet types.
 
-                                 - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
-                                 - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
-                                 - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
-                          title: >-
-                            SlashRequest defines a slashing request for CCV
-                            consumer module
+                                 - CONSUMER_PACKET_TYPE_UNSPECIFIED: UNSPECIFIED packet type
+                                 - CONSUMER_PACKET_TYPE_SLASH: Slash packet
+                                 - CONSUMER_PACKET_TYPE_VSCM: VSCMatured packet
+                            data:
+                              type: string
+                              format: byte
+                          description: >-
+                            ConsumerPacket contains raw packet bytes and packet
+                            type.
+                  last_transmission_block_height:
+                    description: >-
+                      LastTransmissionBlockHeight nil on new chain, filled in on
+                      restart.
+                    type: object
+                    properties:
+                      height:
+                        type: string
+                        format: int64
                     title: >-
-                      SlashRequests is a list of slash requests for CCV consumer
-                      module
+                      LastTransmissionBlockHeight is the last time validator
+                      holding
+
+                      pools were transmitted to the provider chain
                 title: GenesisState defines the CCV consumer chain genesis state
         default:
           description: An unexpected error response.
@@ -23747,6 +24136,432 @@ paths:
           type: string
       tags:
         - Query
+  /interchain_security/ccv/provider/validator_consumer_addr:
+    get:
+      summary: |-
+        QueryValidatorConsumerAddr queries the address
+        assigned by a validator for a consumer chain.
+      operationId: InterchainSecurityCcvProviderV1QueryValidatorConsumerAddr
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              consumer_address:
+                type: string
+                title: The address of the validator on the consumer chain
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                      description: >-
+                        A URL/resource name that uniquely identifies the type of
+                        the serialized
+
+                        protocol buffer message. This string must contain at
+                        least
+
+                        one "/" character. The last segment of the URL's path
+                        must represent
+
+                        the fully qualified name of the type (as in
+
+                        `path/google.protobuf.Duration`). The name should be in
+                        a canonical form
+
+                        (e.g., leading "." is not accepted).
+
+
+                        In practice, teams usually precompile into the binary
+                        all types that they
+
+                        expect it to use in the context of Any. However, for
+                        URLs which use the
+
+                        scheme `http`, `https`, or no scheme, one can optionally
+                        set up a type
+
+                        server that maps type URLs to message definitions as
+                        follows:
+
+
+                        * If no scheme is provided, `https` is assumed.
+
+                        * An HTTP GET on the URL must yield a
+                        [google.protobuf.Type][]
+                          value in binary format, or produce an error.
+                        * Applications are allowed to cache lookup results based
+                        on the
+                          URL, or have them precompiled into a binary to avoid any
+                          lookup. Therefore, binary compatibility needs to be preserved
+                          on changes to types. (Use versioned type names to manage
+                          breaking changes.)
+
+                        Note: this functionality is not currently available in
+                        the official
+
+                        protobuf release, and it is not used for type URLs
+                        beginning with
+
+                        type.googleapis.com.
+
+
+                        Schemes other than `http`, `https` (or the empty scheme)
+                        might be
+
+                        used with implementation specific semantics.
+                  additionalProperties: {}
+                  description: >-
+                    `Any` contains an arbitrary serialized protocol buffer
+                    message along with a
+
+                    URL that describes the type of the serialized message.
+
+
+                    Protobuf library provides support to pack/unpack Any values
+                    in the form
+
+                    of utility functions or additional generated methods of the
+                    Any type.
+
+
+                    Example 1: Pack and unpack a message in C++.
+
+                        Foo foo = ...;
+                        Any any;
+                        any.PackFrom(foo);
+                        ...
+                        if (any.UnpackTo(&foo)) {
+                          ...
+                        }
+
+                    Example 2: Pack and unpack a message in Java.
+
+                        Foo foo = ...;
+                        Any any = Any.pack(foo);
+                        ...
+                        if (any.is(Foo.class)) {
+                          foo = any.unpack(Foo.class);
+                        }
+
+                     Example 3: Pack and unpack a message in Python.
+
+                        foo = Foo(...)
+                        any = Any()
+                        any.Pack(foo)
+                        ...
+                        if any.Is(Foo.DESCRIPTOR):
+                          any.Unpack(foo)
+                          ...
+
+                     Example 4: Pack and unpack a message in Go
+
+                         foo := &pb.Foo{...}
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
+                         ...
+                         foo := &pb.Foo{}
+                         if err := any.UnmarshalTo(foo); err != nil {
+                           ...
+                         }
+
+                    The pack methods provided by protobuf library will by
+                    default use
+
+                    'type.googleapis.com/full.type.name' as the type URL and the
+                    unpack
+
+                    methods only use the fully qualified type name after the
+                    last '/'
+
+                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    type
+
+                    name "y.z".
+
+
+
+                    JSON
+
+                    ====
+
+                    The JSON representation of an `Any` value uses the regular
+
+                    representation of the deserialized, embedded message, with
+                    an
+
+                    additional field `@type` which contains the type URL.
+                    Example:
+
+                        package google.profile;
+                        message Person {
+                          string first_name = 1;
+                          string last_name = 2;
+                        }
+
+                        {
+                          "@type": "type.googleapis.com/google.profile.Person",
+                          "firstName": <string>,
+                          "lastName": <string>
+                        }
+
+                    If the embedded message type is well-known and has a custom
+                    JSON
+
+                    representation, that representation will be embedded adding
+                    a field
+
+                    `value` which holds the custom JSON in addition to the
+                    `@type`
+
+                    field. Example (for message [google.protobuf.Duration][]):
+
+                        {
+                          "@type": "type.googleapis.com/google.protobuf.Duration",
+                          "value": "1.212s"
+                        }
+      parameters:
+        - name: chain_id
+          description: The id of the consumer chain
+          in: query
+          required: false
+          type: string
+        - name: provider_address
+          description: The consensus address of the validator on the provider chain
+          in: query
+          required: false
+          type: string
+      tags:
+        - Query
+  /interchain_security/ccv/provider/validator_provider_addr:
+    get:
+      summary: |-
+        QueryProviderAddr returns the provider chain validator
+        given a consumer chain validator address
+      operationId: InterchainSecurityCcvProviderV1QueryValidatorProviderAddr
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              provider_address:
+                type: string
+                title: The address of the validator on the provider chain
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                      description: >-
+                        A URL/resource name that uniquely identifies the type of
+                        the serialized
+
+                        protocol buffer message. This string must contain at
+                        least
+
+                        one "/" character. The last segment of the URL's path
+                        must represent
+
+                        the fully qualified name of the type (as in
+
+                        `path/google.protobuf.Duration`). The name should be in
+                        a canonical form
+
+                        (e.g., leading "." is not accepted).
+
+
+                        In practice, teams usually precompile into the binary
+                        all types that they
+
+                        expect it to use in the context of Any. However, for
+                        URLs which use the
+
+                        scheme `http`, `https`, or no scheme, one can optionally
+                        set up a type
+
+                        server that maps type URLs to message definitions as
+                        follows:
+
+
+                        * If no scheme is provided, `https` is assumed.
+
+                        * An HTTP GET on the URL must yield a
+                        [google.protobuf.Type][]
+                          value in binary format, or produce an error.
+                        * Applications are allowed to cache lookup results based
+                        on the
+                          URL, or have them precompiled into a binary to avoid any
+                          lookup. Therefore, binary compatibility needs to be preserved
+                          on changes to types. (Use versioned type names to manage
+                          breaking changes.)
+
+                        Note: this functionality is not currently available in
+                        the official
+
+                        protobuf release, and it is not used for type URLs
+                        beginning with
+
+                        type.googleapis.com.
+
+
+                        Schemes other than `http`, `https` (or the empty scheme)
+                        might be
+
+                        used with implementation specific semantics.
+                  additionalProperties: {}
+                  description: >-
+                    `Any` contains an arbitrary serialized protocol buffer
+                    message along with a
+
+                    URL that describes the type of the serialized message.
+
+
+                    Protobuf library provides support to pack/unpack Any values
+                    in the form
+
+                    of utility functions or additional generated methods of the
+                    Any type.
+
+
+                    Example 1: Pack and unpack a message in C++.
+
+                        Foo foo = ...;
+                        Any any;
+                        any.PackFrom(foo);
+                        ...
+                        if (any.UnpackTo(&foo)) {
+                          ...
+                        }
+
+                    Example 2: Pack and unpack a message in Java.
+
+                        Foo foo = ...;
+                        Any any = Any.pack(foo);
+                        ...
+                        if (any.is(Foo.class)) {
+                          foo = any.unpack(Foo.class);
+                        }
+
+                     Example 3: Pack and unpack a message in Python.
+
+                        foo = Foo(...)
+                        any = Any()
+                        any.Pack(foo)
+                        ...
+                        if any.Is(Foo.DESCRIPTOR):
+                          any.Unpack(foo)
+                          ...
+
+                     Example 4: Pack and unpack a message in Go
+
+                         foo := &pb.Foo{...}
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
+                         ...
+                         foo := &pb.Foo{}
+                         if err := any.UnmarshalTo(foo); err != nil {
+                           ...
+                         }
+
+                    The pack methods provided by protobuf library will by
+                    default use
+
+                    'type.googleapis.com/full.type.name' as the type URL and the
+                    unpack
+
+                    methods only use the fully qualified type name after the
+                    last '/'
+
+                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    type
+
+                    name "y.z".
+
+
+
+                    JSON
+
+                    ====
+
+                    The JSON representation of an `Any` value uses the regular
+
+                    representation of the deserialized, embedded message, with
+                    an
+
+                    additional field `@type` which contains the type URL.
+                    Example:
+
+                        package google.profile;
+                        message Person {
+                          string first_name = 1;
+                          string last_name = 2;
+                        }
+
+                        {
+                          "@type": "type.googleapis.com/google.profile.Person",
+                          "firstName": <string>,
+                          "lastName": <string>
+                        }
+
+                    If the embedded message type is well-known and has a custom
+                    JSON
+
+                    representation, that representation will be embedded adding
+                    a field
+
+                    `value` which holds the custom JSON in addition to the
+                    `@type`
+
+                    field. Example (for message [google.protobuf.Duration][]):
+
+                        {
+                          "@type": "type.googleapis.com/google.protobuf.Duration",
+                          "value": "1.212s"
+                        }
+      parameters:
+        - name: chain_id
+          description: The id of the provider chain
+          in: query
+          required: false
+          type: string
+        - name: consumer_address
+          description: The consensus address of the validator on the consumer chain
+          in: query
+          required: false
+          type: string
+      tags:
+        - Query
   /NicholasDotSol/duality/dex/fee_tier:
     get:
       summary: Queries a list of FeeTier items.
@@ -23857,16 +24672,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -24039,16 +24844,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -24246,16 +25041,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -24512,16 +25297,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   /NicholasDotSol/duality/dex/tick/{pairId}/{tickIndex}:
@@ -24713,16 +25488,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   /NicholasDotSol/duality/dex/token_map/{address}:
@@ -24877,16 +25642,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -25054,16 +25809,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -26353,6 +27098,169 @@ definitions:
 
 
       Since: cosmos-sdk 0.43
+  cosmos.auth.v1beta1.QueryModuleAccountByNameResponse:
+    type: object
+    properties:
+      account:
+        type: object
+        properties:
+          '@type':
+            type: string
+            description: >-
+              A URL/resource name that uniquely identifies the type of the
+              serialized
+
+              protocol buffer message. This string must contain at least
+
+              one "/" character. The last segment of the URL's path must
+              represent
+
+              the fully qualified name of the type (as in
+
+              `path/google.protobuf.Duration`). The name should be in a
+              canonical form
+
+              (e.g., leading "." is not accepted).
+
+
+              In practice, teams usually precompile into the binary all types
+              that they
+
+              expect it to use in the context of Any. However, for URLs which
+              use the
+
+              scheme `http`, `https`, or no scheme, one can optionally set up a
+              type
+
+              server that maps type URLs to message definitions as follows:
+
+
+              * If no scheme is provided, `https` is assumed.
+
+              * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+                value in binary format, or produce an error.
+              * Applications are allowed to cache lookup results based on the
+                URL, or have them precompiled into a binary to avoid any
+                lookup. Therefore, binary compatibility needs to be preserved
+                on changes to types. (Use versioned type names to manage
+                breaking changes.)
+
+              Note: this functionality is not currently available in the
+              official
+
+              protobuf release, and it is not used for type URLs beginning with
+
+              type.googleapis.com.
+
+
+              Schemes other than `http`, `https` (or the empty scheme) might be
+
+              used with implementation specific semantics.
+        additionalProperties: {}
+        description: >-
+          `Any` contains an arbitrary serialized protocol buffer message along
+          with a
+
+          URL that describes the type of the serialized message.
+
+
+          Protobuf library provides support to pack/unpack Any values in the
+          form
+
+          of utility functions or additional generated methods of the Any type.
+
+
+          Example 1: Pack and unpack a message in C++.
+
+              Foo foo = ...;
+              Any any;
+              any.PackFrom(foo);
+              ...
+              if (any.UnpackTo(&foo)) {
+                ...
+              }
+
+          Example 2: Pack and unpack a message in Java.
+
+              Foo foo = ...;
+              Any any = Any.pack(foo);
+              ...
+              if (any.is(Foo.class)) {
+                foo = any.unpack(Foo.class);
+              }
+
+           Example 3: Pack and unpack a message in Python.
+
+              foo = Foo(...)
+              any = Any()
+              any.Pack(foo)
+              ...
+              if any.Is(Foo.DESCRIPTOR):
+                any.Unpack(foo)
+                ...
+
+           Example 4: Pack and unpack a message in Go
+
+               foo := &pb.Foo{...}
+               any, err := anypb.New(foo)
+               if err != nil {
+                 ...
+               }
+               ...
+               foo := &pb.Foo{}
+               if err := any.UnmarshalTo(foo); err != nil {
+                 ...
+               }
+
+          The pack methods provided by protobuf library will by default use
+
+          'type.googleapis.com/full.type.name' as the type URL and the unpack
+
+          methods only use the fully qualified type name after the last '/'
+
+          in the type URL, for example "foo.bar.com/x/y.z" will yield type
+
+          name "y.z".
+
+
+
+          JSON
+
+          ====
+
+          The JSON representation of an `Any` value uses the regular
+
+          representation of the deserialized, embedded message, with an
+
+          additional field `@type` which contains the type URL. Example:
+
+              package google.profile;
+              message Person {
+                string first_name = 1;
+                string last_name = 2;
+              }
+
+              {
+                "@type": "type.googleapis.com/google.profile.Person",
+                "firstName": <string>,
+                "lastName": <string>
+              }
+
+          If the embedded message type is well-known and has a custom JSON
+
+          representation, that representation will be embedded adding a field
+
+          `value` which holds the custom JSON in addition to the `@type`
+
+          field. Example (for message [google.protobuf.Duration][]):
+
+              {
+                "@type": "type.googleapis.com/google.protobuf.Duration",
+                "value": "1.212s"
+              }
+    description: >-
+      QueryModuleAccountByNameResponse is the response type for the
+      Query/ModuleAccountByName RPC method.
   cosmos.auth.v1beta1.QueryParamsResponse:
     type: object
     properties:
@@ -42073,19 +42981,6 @@ definitions:
         title: >-
           NextFeeDistributionEstimate holds information about next fee
           distribution
-  cosmos.staking.v1beta1.InfractionType:
-    type: string
-    enum:
-      - INFRACTION_TYPE_UNSPECIFIED
-      - INFRACTION_TYPE_DOUBLE_SIGN
-      - INFRACTION_TYPE_DOWNTIME
-    default: INFRACTION_TYPE_UNSPECIFIED
-    description: |-
-      InfractionType indicates the infraction type a validator commited.
-
-       - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
-       - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
-       - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
   ibc.core.commitment.v1.MerkleRoot:
     type: object
     properties:
@@ -42933,6 +43828,67 @@ definitions:
       We need this for proper security, requires client knows a priori what
 
       tree format server uses. But not in code, rather a configuration object.
+  interchain_security.ccv.consumer.v1.ConsumerPacket:
+    type: object
+    properties:
+      type:
+        type: string
+        enum:
+          - CONSUMER_PACKET_TYPE_UNSPECIFIED
+          - CONSUMER_PACKET_TYPE_SLASH
+          - CONSUMER_PACKET_TYPE_VSCM
+        default: CONSUMER_PACKET_TYPE_UNSPECIFIED
+        description: >-
+          ConsumerPacketType indicates interchain security specific packet
+          types.
+
+           - CONSUMER_PACKET_TYPE_UNSPECIFIED: UNSPECIFIED packet type
+           - CONSUMER_PACKET_TYPE_SLASH: Slash packet
+           - CONSUMER_PACKET_TYPE_VSCM: VSCMatured packet
+      data:
+        type: string
+        format: byte
+    description: ConsumerPacket contains raw packet bytes and packet type.
+  interchain_security.ccv.consumer.v1.ConsumerPacketType:
+    type: string
+    enum:
+      - CONSUMER_PACKET_TYPE_UNSPECIFIED
+      - CONSUMER_PACKET_TYPE_SLASH
+      - CONSUMER_PACKET_TYPE_VSCM
+    default: CONSUMER_PACKET_TYPE_UNSPECIFIED
+    description: |-
+      ConsumerPacketType indicates interchain security specific packet types.
+
+       - CONSUMER_PACKET_TYPE_UNSPECIFIED: UNSPECIFIED packet type
+       - CONSUMER_PACKET_TYPE_SLASH: Slash packet
+       - CONSUMER_PACKET_TYPE_VSCM: VSCMatured packet
+  interchain_security.ccv.consumer.v1.ConsumerPackets:
+    type: object
+    properties:
+      list:
+        type: array
+        items:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - CONSUMER_PACKET_TYPE_UNSPECIFIED
+                - CONSUMER_PACKET_TYPE_SLASH
+                - CONSUMER_PACKET_TYPE_VSCM
+              default: CONSUMER_PACKET_TYPE_UNSPECIFIED
+              description: >-
+                ConsumerPacketType indicates interchain security specific packet
+                types.
+
+                 - CONSUMER_PACKET_TYPE_UNSPECIFIED: UNSPECIFIED packet type
+                 - CONSUMER_PACKET_TYPE_SLASH: Slash packet
+                 - CONSUMER_PACKET_TYPE_VSCM: VSCMatured packet
+            data:
+              type: string
+              format: byte
+          description: ConsumerPacket contains raw packet bytes and packet type.
+    description: ConsumerPackets is a list of data packets.
   interchain_security.ccv.consumer.v1.GenesisState:
     type: object
     properties:
@@ -43009,10 +43965,10 @@ definitions:
         title: Params defines the parameters for CCV consumer module
       provider_client_id:
         type: string
-        title: empty for a completely new chain
+        description: empty for a new chain, filled in on restart.
       provider_channel_id:
         type: string
-        title: empty for a completely new chain
+        description: empty for a new chain, filled in on restart.
       new_chain:
         type: boolean
         description: true for new chain GenesisState, false for chain restart.
@@ -43419,7 +44375,7 @@ definitions:
           title: |-
             MaturingVSCPacket defines the genesis information for the
             unbonding VSC packet
-        description: MaturingPackets nil on new chain, filled on restart.
+        description: MaturingPackets nil on new chain, filled in on restart.
       initial_val_set:
         type: array
         items:
@@ -43458,7 +44414,7 @@ definitions:
             mapping 
 
             of each block height to a valset update id
-        description: HeightToValsetUpdateId nil on new chain, filled on restart.
+        description: HeightToValsetUpdateId nil on new chain, filled in on restart.
       outstanding_downtime_slashing:
         type: array
         items:
@@ -43471,77 +44427,44 @@ definitions:
             validator
 
             flagged with an outstanding downtime slashing.
-        description: OutstandingDowntimes nil on new chain, filled on restart.
-      pending_slash_requests:
-        description: PendingSlashRequests filled in on new chain, nil on restart.
+        description: OutstandingDowntimes nil on new chain, filled  in on restart.
+      pending_consumer_packets:
+        description: PendingConsumerPackets nil on new chain, filled in on restart.
         type: object
         properties:
-          requests:
+          list:
             type: array
             items:
               type: object
               properties:
-                packet:
-                  type: object
-                  properties:
-                    validator:
-                      type: object
-                      properties:
-                        address:
-                          type: string
-                          format: byte
-                          title: The first 20 bytes of SHA256(public key)
-                        power:
-                          type: string
-                          format: int64
-                          description: The voting power
-                          title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
-                      title: Validator
-                    valset_update_id:
-                      type: string
-                      format: uint64
-                      title: map to the infraction block height on the provider
-                    infraction:
-                      title: >-
-                        tell if the slashing is for a downtime or a
-                        double-signing infraction
-                      type: string
-                      enum:
-                        - INFRACTION_TYPE_UNSPECIFIED
-                        - INFRACTION_TYPE_DOUBLE_SIGN
-                        - INFRACTION_TYPE_DOWNTIME
-                      default: INFRACTION_TYPE_UNSPECIFIED
-                      description: >-
-                        InfractionType indicates the infraction type a validator
-                        commited.
-
-                         - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
-                         - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
-                         - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
-                  description: >-
-                    This packet is sent from the consumer chain to the provider
-                    chain
-
-                    to request the slashing of a validator as a result of an
-                    infraction
-
-                    committed on the consumer chain.
-                infraction:
+                type:
                   type: string
                   enum:
-                    - INFRACTION_TYPE_UNSPECIFIED
-                    - INFRACTION_TYPE_DOUBLE_SIGN
-                    - INFRACTION_TYPE_DOWNTIME
-                  default: INFRACTION_TYPE_UNSPECIFIED
+                    - CONSUMER_PACKET_TYPE_UNSPECIFIED
+                    - CONSUMER_PACKET_TYPE_SLASH
+                    - CONSUMER_PACKET_TYPE_VSCM
+                  default: CONSUMER_PACKET_TYPE_UNSPECIFIED
                   description: >-
-                    InfractionType indicates the infraction type a validator
-                    commited.
+                    ConsumerPacketType indicates interchain security specific
+                    packet types.
 
-                     - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
-                     - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
-                     - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
-              title: SlashRequest defines a slashing request for CCV consumer module
-        title: SlashRequests is a list of slash requests for CCV consumer module
+                     - CONSUMER_PACKET_TYPE_UNSPECIFIED: UNSPECIFIED packet type
+                     - CONSUMER_PACKET_TYPE_SLASH: Slash packet
+                     - CONSUMER_PACKET_TYPE_VSCM: VSCMatured packet
+                data:
+                  type: string
+                  format: byte
+              description: ConsumerPacket contains raw packet bytes and packet type.
+      last_transmission_block_height:
+        description: LastTransmissionBlockHeight nil on new chain, filled in on restart.
+        type: object
+        properties:
+          height:
+            type: string
+            format: int64
+        title: |-
+          LastTransmissionBlockHeight is the last time validator holding
+          pools were transmitted to the provider chain
     title: GenesisState defines the CCV consumer chain genesis state
   interchain_security.ccv.consumer.v1.HeightToValsetUpdateID:
     type: object
@@ -43555,6 +44478,15 @@ definitions:
     title: |-
       HeightValsetUpdateID defines the genesis information for the mapping 
       of each block height to a valset update id
+  interchain_security.ccv.consumer.v1.LastTransmissionBlockHeight:
+    type: object
+    properties:
+      height:
+        type: string
+        format: int64
+    title: |-
+      LastTransmissionBlockHeight is the last time validator holding
+      pools were transmitted to the provider chain
   interchain_security.ccv.consumer.v1.MaturingVSCPacket:
     type: object
     properties:
@@ -43641,132 +44573,6 @@ definitions:
           Unbonding period for the consumer,
           which should be smaller than that of the provider in general.
     title: Params defines the parameters for CCV consumer module
-  interchain_security.ccv.consumer.v1.SlashRequest:
-    type: object
-    properties:
-      packet:
-        type: object
-        properties:
-          validator:
-            type: object
-            properties:
-              address:
-                type: string
-                format: byte
-                title: The first 20 bytes of SHA256(public key)
-              power:
-                type: string
-                format: int64
-                description: The voting power
-                title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
-            title: Validator
-          valset_update_id:
-            type: string
-            format: uint64
-            title: map to the infraction block height on the provider
-          infraction:
-            title: >-
-              tell if the slashing is for a downtime or a double-signing
-              infraction
-            type: string
-            enum:
-              - INFRACTION_TYPE_UNSPECIFIED
-              - INFRACTION_TYPE_DOUBLE_SIGN
-              - INFRACTION_TYPE_DOWNTIME
-            default: INFRACTION_TYPE_UNSPECIFIED
-            description: |-
-              InfractionType indicates the infraction type a validator commited.
-
-               - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
-               - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
-               - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
-        description: |-
-          This packet is sent from the consumer chain to the provider chain
-          to request the slashing of a validator as a result of an infraction
-          committed on the consumer chain.
-      infraction:
-        type: string
-        enum:
-          - INFRACTION_TYPE_UNSPECIFIED
-          - INFRACTION_TYPE_DOUBLE_SIGN
-          - INFRACTION_TYPE_DOWNTIME
-        default: INFRACTION_TYPE_UNSPECIFIED
-        description: |-
-          InfractionType indicates the infraction type a validator commited.
-
-           - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
-           - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
-           - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
-    title: SlashRequest defines a slashing request for CCV consumer module
-  interchain_security.ccv.consumer.v1.SlashRequests:
-    type: object
-    properties:
-      requests:
-        type: array
-        items:
-          type: object
-          properties:
-            packet:
-              type: object
-              properties:
-                validator:
-                  type: object
-                  properties:
-                    address:
-                      type: string
-                      format: byte
-                      title: The first 20 bytes of SHA256(public key)
-                    power:
-                      type: string
-                      format: int64
-                      description: The voting power
-                      title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
-                  title: Validator
-                valset_update_id:
-                  type: string
-                  format: uint64
-                  title: map to the infraction block height on the provider
-                infraction:
-                  title: >-
-                    tell if the slashing is for a downtime or a double-signing
-                    infraction
-                  type: string
-                  enum:
-                    - INFRACTION_TYPE_UNSPECIFIED
-                    - INFRACTION_TYPE_DOUBLE_SIGN
-                    - INFRACTION_TYPE_DOWNTIME
-                  default: INFRACTION_TYPE_UNSPECIFIED
-                  description: >-
-                    InfractionType indicates the infraction type a validator
-                    commited.
-
-                     - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
-                     - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
-                     - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
-              description: >-
-                This packet is sent from the consumer chain to the provider
-                chain
-
-                to request the slashing of a validator as a result of an
-                infraction
-
-                committed on the consumer chain.
-            infraction:
-              type: string
-              enum:
-                - INFRACTION_TYPE_UNSPECIFIED
-                - INFRACTION_TYPE_DOUBLE_SIGN
-                - INFRACTION_TYPE_DOWNTIME
-              default: INFRACTION_TYPE_UNSPECIFIED
-              description: >-
-                InfractionType indicates the infraction type a validator
-                commited.
-
-                 - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
-                 - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
-                 - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
-          title: SlashRequest defines a slashing request for CCV consumer module
-    title: SlashRequests is a list of slash requests for CCV consumer module
   interchain_security.ccv.provider.v1.Chain:
     type: object
     properties:
@@ -43816,13 +44622,21 @@ definitions:
       genesis_hash:
         type: string
         format: byte
-        description: genesis hash with no staking information included.
+        description: >-
+          The hash of the consumer chain genesis state without the consumer CCV
+          module genesis params. 
+
+          It is used for off-chain confirmation of genesis.json validity by
+          validators and other parties.
       binary_hash:
         type: string
         format: byte
         description: >-
-          binary hash is the hash of the binary that should be used by
-          validators on chain initialization.
+          The hash of the consumer chain binary that should be run by validators
+          on chain initialization.
+
+          It is used for off-chain confirmation of binary validity by validators
+          and other parties.
       spawn_time:
         type: string
         format: date-time
@@ -43831,16 +44645,46 @@ definitions:
           chain genesis is finalized and all validators
 
           will be responsible for starting their consumer chain validator node.
-      lock_unbonding_on_timeout:
-        type: boolean
+      unbonding_period:
+        type: string
+        description: |-
+          Unbonding period for the consumer,
+          which should be smaller than that of the provider in general.
+      ccv_timeout_period:
+        type: string
+        title: Sent CCV related IBC packets will timeout after this duration
+      transfer_timeout_period:
+        type: string
+        title: Sent transfer related IBC packets will timeout after this duration
+      consumer_redistribution_fraction:
+        type: string
         description: >-
-          Indicates whether the outstanding unbonding operations should be
-          released
+          The fraction of tokens allocated to the consumer redistribution
+          address
 
-          in case of a channel time-outs. When set to true, a governance
-          proposal
+          during distribution events. The fraction is a string representing a
 
-          on the provider chain would be necessary to release the locked funds.
+          decimal number. For example "0.75" would represent 75%.
+      blocks_per_distribution_transmission:
+        type: string
+        format: int64
+        description: >-
+          BlocksPerDistributionTransmission is the number of blocks between
+          ibc-token-transfers from the consumer chain to the provider chain.
+
+          On sending transmission event, `consumer_redistribution_fraction` of
+          the accumulated tokens are sent to the consumer redistribution
+          address.
+      historical_entries:
+        type: string
+        format: int64
+        description: >-
+          The number of historical info entries to persist in store.
+
+          This param is a part of the cosmos sdk staking module. In the case of 
+
+          a ccv enabled consumer chain, the ccv module acts as the staking
+          module.
     description: >-
       ConsumerAdditionProposal is a governance proposal on the provider chain to
       spawn a new consumer chain.
@@ -43898,13 +44742,21 @@ definitions:
             genesis_hash:
               type: string
               format: byte
-              description: genesis hash with no staking information included.
+              description: >-
+                The hash of the consumer chain genesis state without the
+                consumer CCV module genesis params. 
+
+                It is used for off-chain confirmation of genesis.json validity
+                by validators and other parties.
             binary_hash:
               type: string
               format: byte
               description: >-
-                binary hash is the hash of the binary that should be used by
+                The hash of the consumer chain binary that should be run by
                 validators on chain initialization.
+
+                It is used for off-chain confirmation of binary validity by
+                validators and other parties.
             spawn_time:
               type: string
               format: date-time
@@ -43914,17 +44766,51 @@ definitions:
 
                 will be responsible for starting their consumer chain validator
                 node.
-            lock_unbonding_on_timeout:
-              type: boolean
+            unbonding_period:
+              type: string
+              description: |-
+                Unbonding period for the consumer,
+                which should be smaller than that of the provider in general.
+            ccv_timeout_period:
+              type: string
+              title: Sent CCV related IBC packets will timeout after this duration
+            transfer_timeout_period:
+              type: string
+              title: >-
+                Sent transfer related IBC packets will timeout after this
+                duration
+            consumer_redistribution_fraction:
+              type: string
               description: >-
-                Indicates whether the outstanding unbonding operations should be
-                released
+                The fraction of tokens allocated to the consumer redistribution
+                address
 
-                in case of a channel time-outs. When set to true, a governance
-                proposal
+                during distribution events. The fraction is a string
+                representing a
 
-                on the provider chain would be necessary to release the locked
-                funds.
+                decimal number. For example "0.75" would represent 75%.
+            blocks_per_distribution_transmission:
+              type: string
+              format: int64
+              description: >-
+                BlocksPerDistributionTransmission is the number of blocks
+                between ibc-token-transfers from the consumer chain to the
+                provider chain.
+
+                On sending transmission event,
+                `consumer_redistribution_fraction` of the accumulated tokens are
+                sent to the consumer redistribution address.
+            historical_entries:
+              type: string
+              format: int64
+              description: >-
+                The number of historical info entries to persist in store.
+
+                This param is a part of the cosmos sdk staking module. In the
+                case of 
+
+                a ccv enabled consumer chain, the ccv module acts as the staking
+                module.
           description: >-
             ConsumerAdditionProposal is a governance proposal on the provider
             chain to spawn a new consumer chain.
@@ -43963,8 +44849,7 @@ definitions:
       If it passes, all the consumer chain's state is removed from the provider
       chain. The outstanding unbonding
 
-      operation funds are released if the LockUnbondingOnTimeout parameter is
-      set to false for the consumer chain ID.
+      operation funds are released.
   interchain_security.ccv.provider.v1.ConsumerRemovalProposals:
     type: object
     properties:
@@ -43995,12 +44880,13 @@ definitions:
             If it passes, all the consumer chain's state is removed from the
             provider chain. The outstanding unbonding
 
-            operation funds are released if the LockUnbondingOnTimeout parameter
-            is set to false for the consumer chain ID.
+            operation funds are released.
         title: proposals waiting for stop_time to pass
     description: >-
       ConsumerRemovalProposals holds pending governance proposals on the
       provider chain to remove (and stop) a consumer chain.
+  interchain_security.ccv.provider.v1.MsgAssignConsumerKeyResponse:
+    type: object
   interchain_security.ccv.provider.v1.QueryConsumerChainStartProposalsResponse:
     type: object
     properties:
@@ -44052,13 +44938,21 @@ definitions:
                 genesis_hash:
                   type: string
                   format: byte
-                  description: genesis hash with no staking information included.
+                  description: >-
+                    The hash of the consumer chain genesis state without the
+                    consumer CCV module genesis params. 
+
+                    It is used for off-chain confirmation of genesis.json
+                    validity by validators and other parties.
                 binary_hash:
                   type: string
                   format: byte
                   description: >-
-                    binary hash is the hash of the binary that should be used by
+                    The hash of the consumer chain binary that should be run by
                     validators on chain initialization.
+
+                    It is used for off-chain confirmation of binary validity by
+                    validators and other parties.
                 spawn_time:
                   type: string
                   format: date-time
@@ -44068,17 +44962,55 @@ definitions:
 
                     will be responsible for starting their consumer chain
                     validator node.
-                lock_unbonding_on_timeout:
-                  type: boolean
+                unbonding_period:
+                  type: string
                   description: >-
-                    Indicates whether the outstanding unbonding operations
-                    should be released
+                    Unbonding period for the consumer,
 
-                    in case of a channel time-outs. When set to true, a
-                    governance proposal
+                    which should be smaller than that of the provider in
+                    general.
+                ccv_timeout_period:
+                  type: string
+                  title: >-
+                    Sent CCV related IBC packets will timeout after this
+                    duration
+                transfer_timeout_period:
+                  type: string
+                  title: >-
+                    Sent transfer related IBC packets will timeout after this
+                    duration
+                consumer_redistribution_fraction:
+                  type: string
+                  description: >-
+                    The fraction of tokens allocated to the consumer
+                    redistribution address
 
-                    on the provider chain would be necessary to release the
-                    locked funds.
+                    during distribution events. The fraction is a string
+                    representing a
+
+                    decimal number. For example "0.75" would represent 75%.
+                blocks_per_distribution_transmission:
+                  type: string
+                  format: int64
+                  description: >-
+                    BlocksPerDistributionTransmission is the number of blocks
+                    between ibc-token-transfers from the consumer chain to the
+                    provider chain.
+
+                    On sending transmission event,
+                    `consumer_redistribution_fraction` of the accumulated tokens
+                    are sent to the consumer redistribution address.
+                historical_entries:
+                  type: string
+                  format: int64
+                  description: >-
+                    The number of historical info entries to persist in store.
+
+                    This param is a part of the cosmos sdk staking module. In
+                    the case of 
+
+                    a ccv enabled consumer chain, the ccv module acts as the
+                    staking module.
               description: >-
                 ConsumerAdditionProposal is a governance proposal on the
                 provider chain to spawn a new consumer chain.
@@ -44125,8 +45057,7 @@ definitions:
                 If it passes, all the consumer chain's state is removed from the
                 provider chain. The outstanding unbonding
 
-                operation funds are released if the LockUnbondingOnTimeout
-                parameter is set to false for the consumer chain ID.
+                operation funds are released.
             title: proposals waiting for stop_time to pass
         description: >-
           ConsumerRemovalProposals holds pending governance proposals on the
@@ -44226,10 +45157,10 @@ definitions:
             title: Params defines the parameters for CCV consumer module
           provider_client_id:
             type: string
-            title: empty for a completely new chain
+            description: empty for a new chain, filled in on restart.
           provider_channel_id:
             type: string
-            title: empty for a completely new chain
+            description: empty for a new chain, filled in on restart.
           new_chain:
             type: boolean
             description: true for new chain GenesisState, false for chain restart.
@@ -44640,7 +45571,7 @@ definitions:
               title: |-
                 MaturingVSCPacket defines the genesis information for the
                 unbonding VSC packet
-            description: MaturingPackets nil on new chain, filled on restart.
+            description: MaturingPackets nil on new chain, filled in on restart.
           initial_val_set:
             type: array
             items:
@@ -44679,7 +45610,7 @@ definitions:
                 mapping 
 
                 of each block height to a valset update id
-            description: HeightToValsetUpdateId nil on new chain, filled on restart.
+            description: HeightToValsetUpdateId nil on new chain, filled in on restart.
           outstanding_downtime_slashing:
             type: array
             items:
@@ -44692,131 +45623,59 @@ definitions:
                 validator
 
                 flagged with an outstanding downtime slashing.
-            description: OutstandingDowntimes nil on new chain, filled on restart.
-          pending_slash_requests:
-            description: PendingSlashRequests filled in on new chain, nil on restart.
+            description: OutstandingDowntimes nil on new chain, filled  in on restart.
+          pending_consumer_packets:
+            description: PendingConsumerPackets nil on new chain, filled in on restart.
             type: object
             properties:
-              requests:
+              list:
                 type: array
                 items:
                   type: object
                   properties:
-                    packet:
-                      type: object
-                      properties:
-                        validator:
-                          type: object
-                          properties:
-                            address:
-                              type: string
-                              format: byte
-                              title: The first 20 bytes of SHA256(public key)
-                            power:
-                              type: string
-                              format: int64
-                              description: The voting power
-                              title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
-                          title: Validator
-                        valset_update_id:
-                          type: string
-                          format: uint64
-                          title: map to the infraction block height on the provider
-                        infraction:
-                          title: >-
-                            tell if the slashing is for a downtime or a
-                            double-signing infraction
-                          type: string
-                          enum:
-                            - INFRACTION_TYPE_UNSPECIFIED
-                            - INFRACTION_TYPE_DOUBLE_SIGN
-                            - INFRACTION_TYPE_DOWNTIME
-                          default: INFRACTION_TYPE_UNSPECIFIED
-                          description: >-
-                            InfractionType indicates the infraction type a
-                            validator commited.
-
-                             - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
-                             - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
-                             - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
-                      description: >-
-                        This packet is sent from the consumer chain to the
-                        provider chain
-
-                        to request the slashing of a validator as a result of an
-                        infraction
-
-                        committed on the consumer chain.
-                    infraction:
+                    type:
                       type: string
                       enum:
-                        - INFRACTION_TYPE_UNSPECIFIED
-                        - INFRACTION_TYPE_DOUBLE_SIGN
-                        - INFRACTION_TYPE_DOWNTIME
-                      default: INFRACTION_TYPE_UNSPECIFIED
+                        - CONSUMER_PACKET_TYPE_UNSPECIFIED
+                        - CONSUMER_PACKET_TYPE_SLASH
+                        - CONSUMER_PACKET_TYPE_VSCM
+                      default: CONSUMER_PACKET_TYPE_UNSPECIFIED
                       description: >-
-                        InfractionType indicates the infraction type a validator
-                        commited.
+                        ConsumerPacketType indicates interchain security
+                        specific packet types.
 
-                         - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
-                         - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
-                         - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
-                  title: >-
-                    SlashRequest defines a slashing request for CCV consumer
-                    module
-            title: SlashRequests is a list of slash requests for CCV consumer module
+                         - CONSUMER_PACKET_TYPE_UNSPECIFIED: UNSPECIFIED packet type
+                         - CONSUMER_PACKET_TYPE_SLASH: Slash packet
+                         - CONSUMER_PACKET_TYPE_VSCM: VSCMatured packet
+                    data:
+                      type: string
+                      format: byte
+                  description: ConsumerPacket contains raw packet bytes and packet type.
+          last_transmission_block_height:
+            description: >-
+              LastTransmissionBlockHeight nil on new chain, filled in on
+              restart.
+            type: object
+            properties:
+              height:
+                type: string
+                format: int64
+            title: |-
+              LastTransmissionBlockHeight is the last time validator holding
+              pools were transmitted to the provider chain
         title: GenesisState defines the CCV consumer chain genesis state
-  interchain_security.ccv.v1.SlashPacketData:
+  interchain_security.ccv.provider.v1.QueryValidatorConsumerAddrResponse:
     type: object
     properties:
-      validator:
-        type: object
-        properties:
-          address:
-            type: string
-            format: byte
-            title: The first 20 bytes of SHA256(public key)
-          power:
-            type: string
-            format: int64
-            description: The voting power
-            title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
-        title: Validator
-      valset_update_id:
+      consumer_address:
         type: string
-        format: uint64
-        title: map to the infraction block height on the provider
-      infraction:
-        title: tell if the slashing is for a downtime or a double-signing infraction
-        type: string
-        enum:
-          - INFRACTION_TYPE_UNSPECIFIED
-          - INFRACTION_TYPE_DOUBLE_SIGN
-          - INFRACTION_TYPE_DOWNTIME
-        default: INFRACTION_TYPE_UNSPECIFIED
-        description: |-
-          InfractionType indicates the infraction type a validator commited.
-
-           - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
-           - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
-           - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
-    description: |-
-      This packet is sent from the consumer chain to the provider chain
-      to request the slashing of a validator as a result of an infraction
-      committed on the consumer chain.
-  tendermint.abci.Validator:
+        title: The address of the validator on the consumer chain
+  interchain_security.ccv.provider.v1.QueryValidatorProviderAddrResponse:
     type: object
     properties:
-      address:
+      provider_address:
         type: string
-        format: byte
-        title: The first 20 bytes of SHA256(public key)
-      power:
-        type: string
-        format: int64
-        description: The voting power
-        title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
-    title: Validator
+        title: The address of the validator on the provider chain
   tendermint.abci.ValidatorUpdate:
     type: object
     properties:
