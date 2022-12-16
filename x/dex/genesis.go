@@ -30,10 +30,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, elem := range genState.TokenMapList {
 		k.SetTokenMap(ctx, elem)
 	}
-	// Set all the shares
-	for _, elem := range genState.SharesList {
-		k.SetShares(ctx, elem)
-	}
 	// Set all the FeeTier
 	for _, elem := range genState.FeeTierList {
 		k.SetFeeTier(ctx, elem)
@@ -60,7 +56,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.TokensList = k.GetAllTokens(ctx)
 	genesis.TokensCount = k.GetTokensCount(ctx)
 	genesis.TokenMapList = k.GetAllTokenMap(ctx)
-	genesis.SharesList = k.GetAllShares(ctx)
 	genesis.FeeTierList = k.GetAllFeeTier(ctx)
 	genesis.FeeTierCount = k.GetFeeTierCount(ctx)
 	genesis.LimitOrderTrancheUserList = k.GetAllLimitOrderTrancheUser(ctx)

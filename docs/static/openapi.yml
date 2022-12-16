@@ -22997,15 +22997,10 @@ paths:
                     tickData:
                       type: object
                       properties:
-                        reserve0AndShares:
+                        reserve0:
                           type: array
                           items:
-                            type: object
-                            properties:
-                              reserve0:
-                                type: string
-                              totalShares:
-                                type: string
+                            type: string
                         reserve1:
                           type: array
                           items:
@@ -23153,15 +23148,10 @@ paths:
                   tickData:
                     type: object
                     properties:
-                      reserve0AndShares:
+                      reserve0:
                         type: array
                         items:
-                          type: object
-                          properties:
-                            reserve0:
-                              type: string
-                            totalShares:
-                              type: string
+                          type: string
                       reserve1:
                         type: array
                         items:
@@ -40960,51 +40950,6 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  nicholasdotsol.duality.dex.QueryAllSharesResponse:
-    type: object
-    properties:
-      shares:
-        type: array
-        items:
-          type: object
-          properties:
-            address:
-              type: string
-            pairId:
-              type: string
-            tickIndex:
-              type: string
-              format: int64
-            feeIndex:
-              type: string
-              format: uint64
-            sharesOwned:
-              type: string
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
   nicholasdotsol.duality.dex.QueryAllTickResponse:
     type: object
     properties:
@@ -41021,15 +40966,10 @@ definitions:
             tickData:
               type: object
               properties:
-                reserve0AndShares:
+                reserve0:
                   type: array
                   items:
-                    type: object
-                    properties:
-                      reserve0:
-                        type: string
-                      totalShares:
-                        type: string
+                    type: string
                 reserve1:
                   type: array
                   items:
@@ -41260,24 +41200,6 @@ definitions:
             type: string
           sharesCancelled:
             type: string
-  nicholasdotsol.duality.dex.QueryGetSharesResponse:
-    type: object
-    properties:
-      shares:
-        type: object
-        properties:
-          address:
-            type: string
-          pairId:
-            type: string
-          tickIndex:
-            type: string
-            format: int64
-          feeIndex:
-            type: string
-            format: uint64
-          sharesOwned:
-            type: string
   nicholasdotsol.duality.dex.QueryGetTickResponse:
     type: object
     properties:
@@ -41292,15 +41214,10 @@ definitions:
           tickData:
             type: object
             properties:
-              reserve0AndShares:
+              reserve0:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    reserve0:
-                      type: string
-                    totalShares:
-                      type: string
+                  type: string
               reserve1:
                 type: array
                 items:
@@ -41372,28 +41289,6 @@ definitions:
         description: params holds all the parameters of this module.
         type: object
     description: QueryParamsResponse is response type for the Query/Params RPC method.
-  nicholasdotsol.duality.dex.Reserve0AndSharesType:
-    type: object
-    properties:
-      reserve0:
-        type: string
-      totalShares:
-        type: string
-  nicholasdotsol.duality.dex.Shares:
-    type: object
-    properties:
-      address:
-        type: string
-      pairId:
-        type: string
-      tickIndex:
-        type: string
-        format: int64
-      feeIndex:
-        type: string
-        format: uint64
-      sharesOwned:
-        type: string
   nicholasdotsol.duality.dex.Tick:
     type: object
     properties:
@@ -41405,15 +41300,10 @@ definitions:
       tickData:
         type: object
         properties:
-          reserve0AndShares:
+          reserve0:
             type: array
             items:
-              type: object
-              properties:
-                reserve0:
-                  type: string
-                totalShares:
-                  type: string
+              type: string
           reserve1:
             type: array
             items:
@@ -41439,15 +41329,10 @@ definitions:
   nicholasdotsol.duality.dex.TickDataType:
     type: object
     properties:
-      reserve0AndShares:
+      reserve0:
         type: array
         items:
-          type: object
-          properties:
-            reserve0:
-              type: string
-            totalShares:
-              type: string
+          type: string
       reserve1:
         type: array
         items:

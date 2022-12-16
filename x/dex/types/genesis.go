@@ -14,7 +14,6 @@ func DefaultGenesis() *GenesisState {
 		TradingPairList:           []TradingPair{},
 		TokensList:                []Tokens{},
 		TokenMapList:              []TokenMap{},
-		SharesList:                []Shares{},
 		FeeTierList:               []FeeTier{},
 		LimitOrderTrancheUserList: []LimitOrderTrancheUser{},
 		LimitOrderTrancheList:     []LimitOrderTranche{},
@@ -67,16 +66,6 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("duplicated index for tokenMap")
 		}
 		tokenMapIndexMap[index] = struct{}{}
-	}
-	// Check for duplicated index in shares
-	sharesIndexMap := make(map[string]struct{})
-
-	for _, elem := range gs.SharesList {
-		index := string(SharesKey(elem.Address, elem.PairId, elem.TickIndex, elem.FeeIndex))
-		if _, ok := sharesIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for shares")
-		}
-		sharesIndexMap[index] = struct{}{}
 	}
 	// Check for duplicated ID in FeeTier
 	FeeTierIdMap := make(map[uint64]bool)

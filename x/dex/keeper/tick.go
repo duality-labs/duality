@@ -11,14 +11,14 @@ func NewTick(pairId string, tickIndex int64, numFees uint64) types.Tick {
 		PairId:    pairId,
 		TickIndex: tickIndex,
 		TickData: &types.TickDataType{
-			Reserve0AndShares: make([]*types.Reserve0AndSharesType, numFees),
-			Reserve1:          make([]sdk.Int, numFees),
+			Reserve0: make([]sdk.Int, numFees),
+			Reserve1: make([]sdk.Int, numFees),
 		},
 		LimitOrderTranche0To1: &types.LimitTrancheIndexes{0, 0},
 		LimitOrderTranche1To0: &types.LimitTrancheIndexes{0, 0},
 	}
 	for i := 0; i < int(numFees); i++ {
-		tick.TickData.Reserve0AndShares[i] = &types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroInt()}
+		tick.TickData.Reserve0[i] = sdk.ZeroInt()
 		tick.TickData.Reserve1[i] = sdk.ZeroInt()
 	}
 	return tick

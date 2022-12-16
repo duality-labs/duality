@@ -39,20 +39,6 @@ func TestGenesis(t *testing.T) {
 			},
 		},
 		TokensCount: 2,
-		SharesList: []types.Shares{
-			{
-				Address:   "0",
-				PairId:    "0",
-				TickIndex: 0,
-				FeeIndex:  0,
-			},
-			{
-				Address:   "1",
-				PairId:    "1",
-				TickIndex: 1,
-				FeeIndex:  uint64(1),
-			},
-		},
 		FeeTierList: []types.FeeTier{
 			{
 				Id: 0,
@@ -95,7 +81,6 @@ func TestGenesis(t *testing.T) {
 	require.ElementsMatch(t, genesisState.TradingPairList, got.TradingPairList)
 	require.ElementsMatch(t, genesisState.TokensList, got.TokensList)
 	require.Equal(t, genesisState.TokensCount, got.TokensCount)
-	require.ElementsMatch(t, genesisState.SharesList, got.SharesList)
 	require.ElementsMatch(t, genesisState.FeeTierList, got.FeeTierList)
 	require.Equal(t, genesisState.FeeTierCount, got.FeeTierCount)
 	require.ElementsMatch(t, genesisState.LimitOrderTrancheUserList, got.LimitOrderTrancheUserList)

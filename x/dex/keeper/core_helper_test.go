@@ -4,7 +4,6 @@ import (
 	"math"
 
 	"github.com/NicholasDotSol/duality/x/dex/keeper"
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -133,15 +132,15 @@ func (s *MsgServerTestSuite) TestGetOrInitTickNew() {
 
 	s.Assert().Equal(tick.PairId, "TokenA<>TokenB")
 	s.Assert().Equal(tick.TickIndex, int64(0))
-	s.Assert().Equal(feeCount, len(tick.TickData.Reserve0AndShares))
+	s.Assert().Equal(feeCount, len(tick.TickData.Reserve0))
 	s.Assert().Equal(
-		&types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroInt()},
-		tick.TickData.Reserve0AndShares[0],
+		sdk.ZeroInt(),
+		tick.TickData.Reserve0[0],
 	)
 
 	s.Assert().Equal(
-		&types.Reserve0AndSharesType{sdk.ZeroInt(), sdk.ZeroInt()},
-		tick.TickData.Reserve0AndShares[feeCount-1],
+		sdk.ZeroInt(),
+		tick.TickData.Reserve0[feeCount-1],
 	)
 
 	s.Assert().Equal(
@@ -169,7 +168,7 @@ func (s *MsgServerTestSuite) TestGetOrInitTickExisting() {
 
 	// WHEN we update values on that tick
 	tick, _ := s.app.DexKeeper.GetTick(s.ctx, "TokenA<>TokenB", 0)
-	tick.TickData.Reserve0AndShares[0] = &types.Reserve0AndSharesType{sdk.NewInt(10), sdk.NewInt(10)}
+	tick.TickData.Reserve0[0] = sdk.NewInt(10)
 	s.app.DexKeeper.SetTick(s.ctx, "TokenA<>TokenB", tick)
 
 	// AND try to initialize the same tick again
@@ -178,7 +177,7 @@ func (s *MsgServerTestSuite) TestGetOrInitTickExisting() {
 	// THEN there is still only 1 tick and it retains the values we set
 	tickCount := len(s.app.DexKeeper.GetAllTick(s.ctx))
 	s.Assert().Equal(1, tickCount)
-	s.Assert().Equal(sdk.NewInt(10), newTick.TickData.Reserve0AndShares[0].Reserve0)
+	s.Assert().Equal(sdk.NewInt(10), newTick.TickData.Reserve0[0])
 }
 
 // GetOrInitTickTrancheFillMap ////////////////////////////////////////////////
@@ -500,7 +499,7 @@ func (s *MsgServerTestSuite) TestHasToken0HasReserves() {
 
 	// WHEN tick has Reserves0
 	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
-	tick.TickData.Reserve0AndShares[3].Reserve0 = sdk.NewInt(10)
+	tick.TickData.Reserve0[3] = sdk.NewInt(10)
 
 	s.Assert().True(s.app.DexKeeper.TickHasToken0(s.ctx, &tick))
 }
@@ -523,7 +522,7 @@ func (s *MsgServerTestSuite) TestHasToken1Empty() {
 
 	// WHEN tick only has limit orders and reserves of Token0
 	tick := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", 0)
-	tick.TickData.Reserve0AndShares[0].Reserve0 = sdk.NewInt(10)
+	tick.TickData.Reserve0[0] = sdk.NewInt(10)
 
 	tick.LimitOrderTranche0To1.FillTrancheIndex = 0
 	tranche := s.app.DexKeeper.GetOrInitLimitOrderTranche(s.ctx, "TokenA<>TokenB", 0, "TokenA", 0)
