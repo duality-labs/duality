@@ -8,7 +8,7 @@ import (
 	ibctesting "github.com/cosmos/ibc-go/v3/testing"
 	appProvider "github.com/cosmos/interchain-security/app/provider"
 	"github.com/cosmos/interchain-security/tests/e2e"
-	e2etestutil "github.com/cosmos/interchain-security/testutil/e2e"
+	icstestingutils "github.com/cosmos/interchain-security/testutil/ibc_testing"
 	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
@@ -17,19 +17,10 @@ import (
 // Executes the standard group of ccv tests against a consumer and provider app.go implementation.
 func TestCCVTestSuite(t *testing.T) {
 
-	ccvSuite := e2e.NewCCVTestSuite(
-		func(t *testing.T) (
-			*ibctesting.Coordinator,
-			*ibctesting.TestChain,
-			*ibctesting.TestChain,
-			e2etestutil.ProviderApp,
-			e2etestutil.ConsumerApp,
-		) {
-			// Here we pass the concrete types that must implement the necessary interfaces
-			// to be ran with e2e tests.
-			coord, prov, cons := NewProviderConsumerCoordinator(t)
-			return coord, prov, cons, prov.App.(*appProvider.App), cons.App.(*appConsumer.App)
-		},
+	ccvSuite := e2e.NewCCVTestSuite[*appProvider.App, *appConsumer.App](
+		icstestingutils.ProviderAppIniter,
+		icstestingutils.ConsumerAppIniter,
+		[]string{},
 	)
 	suite.Run(t, ccvSuite)
 }
@@ -38,7 +29,7 @@ func TestCCVTestSuite(t *testing.T) {
 func NewProviderConsumerCoordinator(t *testing.T) (*ibctesting.Coordinator, *ibctesting.TestChain, *ibctesting.TestChain) {
 	coordinator := ibctesting.NewCoordinator(t, 0)
 	chainID := ibctesting.GetChainID(1)
-	coordinator.Chains[chainID] = ibctesting.NewTestChain(t, coordinator, simapp.SetupTestingappProvider, chainID)
+	coordinator.Chains[chainID] = ibctesting.NewTestChain(t, coordinator, icstestingutils.ProviderAppIniter, chainID)
 	providerChain := coordinator.GetChain(chainID)
 	chainID = ibctesting.GetChainID(2)
 	coordinator.Chains[chainID] = ibctesting.NewTestChainWithValSet(t, coordinator,
