@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"math"
+
 	testing_scripts "github.com/NicholasDotSol/duality/testing_scripts"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -292,43 +293,6 @@ func (s *MsgServerTestSuite) TestFailsWhenWrongKey() {
 	s.Assert().Error(err)
 }
 
-func (s *MsgServerTestSuite) TestCancelSingle() {
-	s.fundAliceBalances(100, 500)
-
-	s.assertDexBalances(0, 0)
-
-	s.aliceLimitSells("TokenB", 0, 50)
-
-	s.assertAliceBalances(100, 450)
-	s.assertDexBalances(0, 50)
-
-	s.aliceCancelsLimitSell("TokenB", 0, 0, 50)
-
-	s.assertAliceBalances(100, 500)
-	s.assertDexBalances(0, 0)
-}
-
-func (s *MsgServerTestSuite) TestCancelPartial() {
-	s.fundAliceBalances(100, 100)
-
-	s.assertDexBalances(0, 0)
-
-	s.aliceLimitSells("TokenB", 0, 50)
-
-	s.assertAliceBalances(100, 50)
-	s.assertDexBalances(0, 50)
-
-	s.aliceCancelsLimitSell("TokenB", 0, 0, 25)
-
-	s.assertAliceBalances(100, 75)
-	s.assertDexBalances(0, 25)
-
-	s.aliceCancelsLimitSell("TokenB", 0, 0, 25)
-
-	s.assertAliceBalances(100, 100)
-	s.assertDexBalances(0, 0)
-}
-
 func (s *MsgServerTestSuite) TestProgressiveLimitOrderFill() {
 	s.fundAliceBalances(100, 500)
 	s.fundBobBalances(100, 200)
@@ -388,7 +352,7 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertMaxTick(0)
 	s.assertMinTick(math.MaxInt64)
 
-	s.aliceCancelsLimitSell("TokenB", 0, 0, 40)
+	s.aliceCancelsLimitSell("TokenB", 0, 0)
 
 	s.assertAliceBalances(100, 40)
 	s.assertBobBalances(90, 110)
@@ -403,7 +367,7 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertBobBalances(80, 120)
 	s.assertDexBalances(20, 40)
 
-	s.aliceCancelsLimitSell("TokenB", 0, 1, 40)
+	s.aliceCancelsLimitSell("TokenB", 0, 1)
 
 	s.assertAliceBalances(100, 80)
 	s.assertBobBalances(80, 120)
