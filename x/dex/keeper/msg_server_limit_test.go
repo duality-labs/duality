@@ -293,22 +293,6 @@ func (s *MsgServerTestSuite) TestFailsWhenWrongKey() {
 	s.Assert().Error(err)
 }
 
-func (s *MsgServerTestSuite) TestCancelSingle() {
-	s.fundAliceBalances(100, 500)
-
-	s.assertDexBalances(0, 0)
-
-	s.aliceLimitSells("TokenB", 0, 50)
-
-	s.assertAliceBalances(100, 450)
-	s.assertDexBalances(0, 50)
-
-	s.aliceCancelsLimitSell("TokenB", 0, 0)
-
-	s.assertAliceBalances(100, 500)
-	s.assertDexBalances(0, 0)
-}
-
 func (s *MsgServerTestSuite) TestProgressiveLimitOrderFill() {
 	s.fundAliceBalances(100, 500)
 	s.fundBobBalances(100, 200)
