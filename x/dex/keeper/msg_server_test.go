@@ -457,6 +457,22 @@ func (s *MsgServerTestSuite) danCancelsLimitSell(keyToken string, tick int, key 
 	s.cancelsLimitSell(s.dan, keyToken, tick, key)
 }
 
+func (s *MsgServerTestSuite) aliceCancelsLimitSellFails(keyToken string, tick int, key int, expectedErr error) {
+	s.cancelsLimitSellFails(s.alice, keyToken, tick, key, expectedErr)
+}
+
+func (s *MsgServerTestSuite) bobCancelsLimitSellFails(keyToken string, tick int, key int, expectedErr error) {
+	s.cancelsLimitSellFails(s.bob, keyToken, tick, key, expectedErr)
+}
+
+func (s *MsgServerTestSuite) carolCancelsLimitSellFails(keyToken string, tick int, key int, expectedErr error) {
+	s.cancelsLimitSellFails(s.carol, keyToken, tick, key, expectedErr)
+}
+
+func (s *MsgServerTestSuite) danCancelsLimitSellFails(keyToken string, tick int, key int, expectedErr error) {
+	s.cancelsLimitSellFails(s.dan, keyToken, tick, key, expectedErr)
+}
+
 func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling string, tick int, key int) {
 	_, err := s.msgServer.CancelLimitOrder(s.goCtx, &types.MsgCancelLimitOrder{
 		Creator:   account.String(),
@@ -468,6 +484,19 @@ func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling st
 		Key:       uint64(key),
 	})
 	s.Assert().Nil(err)
+}
+
+func (s *MsgServerTestSuite) cancelsLimitSellFails(account sdk.AccAddress, selling string, tick int, key int, expectedErr error) {
+	_, err := s.msgServer.CancelLimitOrder(s.goCtx, &types.MsgCancelLimitOrder{
+		Creator:   account.String(),
+		Receiver:  account.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		TickIndex: int64(tick),
+		KeyToken:  selling,
+		Key:       uint64(key),
+	})
+	s.Assert().ErrorIs(err, expectedErr)
 }
 
 func (s *MsgServerTestSuite) aliceMarketSells(selling string, amountIn int, minOut int) {

@@ -736,10 +736,6 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	ratioNotFilled := totalTokenInDec.Sub(filledAmount).Quo(totalTokenInDec)
 	amountToCancel := trancheUser.SharesOwned.ToDec().Mul(ratioNotFilled).TruncateInt()
 
-	if amountToCancel.Add(trancheUser.SharesWithdrawn).GT(trancheUser.SharesOwned) {
-		return sdkerrors.Wrapf(types.ErrCannotWithdrawLimitOrder, "sharesOut is larger than shares Owned at the specified tick")
-	}
-
 	trancheUser.SharesCancelled = trancheUser.SharesCancelled.Add(amountToCancel)
 	k.SetLimitOrderTrancheUser(ctx, trancheUser)
 
