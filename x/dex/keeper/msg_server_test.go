@@ -441,23 +441,23 @@ func (s *MsgServerTestSuite) danWithdraws(withdrawals ...*Withdrawl) error {
 	return s.withdraws(s.dan, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) aliceCancelsLimitSell(keyToken string, tick int, key int, amountOut int) {
-	s.cancelsLimitSell(s.alice, keyToken, tick, key, amountOut)
+func (s *MsgServerTestSuite) aliceCancelsLimitSell(keyToken string, tick int, key int) {
+	s.cancelsLimitSell(s.alice, keyToken, tick, key)
 }
 
-func (s *MsgServerTestSuite) bobCancelsLimitSell(keyToken string, tick int, key int, amountOut int) {
-	s.cancelsLimitSell(s.bob, keyToken, tick, key, amountOut)
+func (s *MsgServerTestSuite) bobCancelsLimitSell(keyToken string, tick int, key int) {
+	s.cancelsLimitSell(s.bob, keyToken, tick, key)
 }
 
-func (s *MsgServerTestSuite) carolCancelsLimitSell(keyToken string, tick int, key int, amountOut int) {
-	s.cancelsLimitSell(s.carol, keyToken, tick, key, amountOut)
+func (s *MsgServerTestSuite) carolCancelsLimitSell(keyToken string, tick int, key int) {
+	s.cancelsLimitSell(s.carol, keyToken, tick, key)
 }
 
-func (s *MsgServerTestSuite) danCancelsLimitSell(keyToken string, tick int, key int, amountOut int) {
-	s.cancelsLimitSell(s.dan, keyToken, tick, key, amountOut)
+func (s *MsgServerTestSuite) danCancelsLimitSell(keyToken string, tick int, key int) {
+	s.cancelsLimitSell(s.dan, keyToken, tick, key)
 }
 
-func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling string, tick int, key int, sharesOut int) {
+func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling string, tick int, key int) {
 	_, err := s.msgServer.CancelLimitOrder(s.goCtx, &types.MsgCancelLimitOrder{
 		Creator:   account.String(),
 		Receiver:  account.String(),
@@ -466,7 +466,6 @@ func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling st
 		TickIndex: int64(tick),
 		KeyToken:  selling,
 		Key:       uint64(key),
-		SharesOut: sdk.NewInt(int64(sharesOut)),
 	})
 	s.Assert().Nil(err)
 }

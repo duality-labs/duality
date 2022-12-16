@@ -700,7 +700,6 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancelLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	attemptedSharesOut := msg.SharesOut
 	pairId := k.CreatePairId(token0, token1)
 
 	tick, tickFound := k.GetTick(ctx, pairId, msg.TickIndex)
@@ -735,27 +734,22 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	totalTokenOutDec := sdk.NewDecFromInt(tranche.TotalTokenOut)
 	filledAmount := priceLimitOutToIn.Mul(totalTokenOutDec)
 	ratioNotFilled := totalTokenInDec.Sub(filledAmount).Quo(totalTokenInDec)
-	maxUserAllowedToCancel := trancheUser.SharesOwned.ToDec().Mul(ratioNotFilled).TruncateInt()
-	totalUserAttemptingToCancel := trancheUser.SharesCancelled.Add(attemptedSharesOut)
+	amountToCancel := trancheUser.SharesOwned.ToDec().Mul(ratioNotFilled).TruncateInt()
 
-	if totalUserAttemptingToCancel.GT(maxUserAllowedToCancel) {
+	if amountToCancel.Add(trancheUser.SharesWithdrawn).GT(trancheUser.SharesOwned) {
 		return sdkerrors.Wrapf(types.ErrCannotWithdrawLimitOrder, "sharesOut is larger than shares Owned at the specified tick")
 	}
 
-	if totalUserAttemptingToCancel.Add(trancheUser.SharesWithdrawn).GT(trancheUser.SharesOwned) {
-		return sdkerrors.Wrapf(types.ErrCannotWithdrawLimitOrder, "sharesOut is larger than shares Owned at the specified tick")
-	}
-
-	trancheUser.SharesCancelled = trancheUser.SharesCancelled.Add(attemptedSharesOut)
+	trancheUser.SharesCancelled = trancheUser.SharesCancelled.Add(amountToCancel)
 	k.SetLimitOrderTrancheUser(ctx, trancheUser)
 
 	// See top NOTE on rounding
-	tranche.ReservesTokenIn = tranche.ReservesTokenIn.Sub(attemptedSharesOut)
+	tranche.ReservesTokenIn = tranche.ReservesTokenIn.Sub(amountToCancel)
 	k.SetLimitOrderTranche(ctx, tranche)
 
-	if attemptedSharesOut.GT(sdk.ZeroInt()) {
+	if amountToCancel.GT(sdk.ZeroInt()) {
 		// See top NOTE on rounding
-		coinOut := sdk.NewCoin(msg.KeyToken, attemptedSharesOut)
+		coinOut := sdk.NewCoin(msg.KeyToken, amountToCancel)
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
@@ -764,7 +758,7 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	}
 
 	ctx.EventManager().EmitEvent(types.CancelLimitOrderEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.KeyToken, strconv.Itoa(int(msg.Key)), attemptedSharesOut.String(),
+		token0, token1, msg.KeyToken, strconv.Itoa(int(msg.Key)), amountToCancel.String(),
 	))
 
 	pair, _ := k.GetTradingPair(ctx, pairId)

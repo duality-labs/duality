@@ -21,7 +21,7 @@ func (s *MsgServerTestSuite) TestCancelEntireLimitOrderAOneExists() {
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(0)
 
-	s.aliceCancelsLimitSell("TokenA", 0, 0, 10)
+	s.aliceCancelsLimitSell("TokenA", 0, 0)
 
 	s.assertAliceBalances(50, 50)
 	s.assertDexBalances(0, 0)
@@ -45,7 +45,7 @@ func (s *MsgServerTestSuite) TestCancelEntireLimitOrderBOneExists() {
 	s.assertMaxTick(0)
 	s.assertMinTick(math.MaxInt64)
 
-	s.aliceCancelsLimitSell("TokenB", 0, 0, 10)
+	s.aliceCancelsLimitSell("TokenB", 0, 0)
 
 	s.assertAliceBalances(50, 50)
 	s.assertDexBalances(0, 0)
@@ -70,7 +70,7 @@ func (s *MsgServerTestSuite) TestCancelHigherEntireLimitOrderATwoExistDiffTicksS
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(-1)
 
-	s.aliceCancelsLimitSell("TokenA", 0, 0, 10)
+	s.aliceCancelsLimitSell("TokenA", 0, 0)
 
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
@@ -95,7 +95,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderATwoExistDiffTicksSa
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(-1)
 
-	s.aliceCancelsLimitSell("TokenA", -1, 0, 10)
+	s.aliceCancelsLimitSell("TokenA", -1, 0)
 
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
@@ -120,7 +120,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderATwoExistDiffTicksDi
 	s.assertMaxTick(1)
 	s.assertMinTick(0)
 
-	s.aliceCancelsLimitSell("TokenA", 0, 0, 10)
+	s.aliceCancelsLimitSell("TokenA", 0, 0)
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
@@ -145,7 +145,7 @@ func (s *MsgServerTestSuite) TestCancelHigherEntireLimitOrderBTwoExistDiffTicksS
 	s.assertMaxTick(0)
 	s.assertMinTick(math.MaxInt64)
 
-	s.aliceCancelsLimitSell("TokenB", 0, 0, 10)
+	s.aliceCancelsLimitSell("TokenB", 0, 0)
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
@@ -170,7 +170,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderBTwoExistDiffTicksSa
 	s.assertMaxTick(0)
 	s.assertMinTick(math.MaxInt64)
 
-	s.aliceCancelsLimitSell("TokenB", -1, 0, 10)
+	s.aliceCancelsLimitSell("TokenB", -1, 0)
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
