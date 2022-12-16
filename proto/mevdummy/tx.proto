@@ -9,6 +9,7 @@ import "gogoproto/gogo.proto";
 // Msg defines the Msg service.
 service Msg {
       rpc Send(MsgSend) returns (MsgSendResponse);
+  rpc WithdrawFunds(MsgWithdrawFunds) returns (MsgWithdrawFundsResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -24,6 +25,20 @@ message MsgSend {
 }
 
 message MsgSendResponse {
+}
+
+message MsgWithdrawFunds {
+  string creator = 1;
+   string amountOut = 2 [
+      (gogoproto.moretags)   = "yaml:\"amountOut\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "amountOut"
+  ]; 
+  string tokenOut = 3;
+}
+
+message MsgWithdrawFundsResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message

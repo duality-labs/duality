@@ -7,12 +7,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k msgServer) Send(goCtx context.Context, msg *types.MsgSend) (*types.MsgSendResponse, error) {
+func (k msgServer) WithdrawFunds(goCtx context.Context, msg *types.MsgWithdrawFunds) (*types.MsgWithdrawFundsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	amt := sdk.Coins{sdk.Coin{
-		Denom:  msg.TokenIn,
-		Amount: msg.AmountIn,
+		Denom:  msg.TokenOut,
+		Amount: msg.AmountOut,
 	}}
 
 	accAddressCreator, err := sdk.AccAddressFromBech32(msg.Creator)
@@ -21,12 +21,13 @@ func (k msgServer) Send(goCtx context.Context, msg *types.MsgSend) (*types.MsgSe
 		return nil, err
 	}
 
-	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, accAddressCreator, types.ModuleName, amt)
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, accAddressCreator, amt)
 
 	if err != nil {
 		return nil, err
 	}
 
 	_ = ctx
-	return &types.MsgSendResponse{}, nil
+
+	return &types.MsgWithdrawFundsResponse{}, nil
 }
