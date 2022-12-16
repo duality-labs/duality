@@ -28,7 +28,9 @@ replace (
 	github.com/cosmos/admin-module => github.com/Ethernal-Tech/admin-module v0.0.0-20221102105340-e693f4d379c3
 	github.com/cosmos/ibc-go/v3 => github.com/informalsystems/ibc-go/v3 v3.4.1-0.20221202165607-3dc5ba251371
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
-	// github.com/keybase/go-keychain => github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4
+	github.com/keybase/go-keychain v0.0.0-20190712205309-48d3d31d256d => github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 
 )
+
+exclude github.com/keybase/go-keychain v0.0.0-20190712205309-48d3d31d256d

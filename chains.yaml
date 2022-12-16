@@ -1,0 +1,11 @@
+# Duality
+- name: duality
+  github-organization: duality-labs
+  github-repo: duality
+  language: go
+  build-target: install
+  build-env:
+    - LEDGER_ENABLED=false
+    - BUILD_TAGS=muslc
+  binaries:
+    - /go/bin/dualityd

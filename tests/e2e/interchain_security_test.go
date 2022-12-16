@@ -9,7 +9,6 @@ import (
 	appProvider "github.com/cosmos/interchain-security/app/provider"
 	"github.com/cosmos/interchain-security/tests/e2e"
 	e2etestutil "github.com/cosmos/interchain-security/testutil/e2e"
-	"github.com/cosmos/interchain-security/testutil/simapp"
 	"github.com/stretchr/testify/suite"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
@@ -37,7 +36,7 @@ func TestCCVTestSuite(t *testing.T) {
 
 // NewCoordinator initializes Coordinator with interchain security dummy provider and duality consumer chain
 func NewProviderConsumerCoordinator(t *testing.T) (*ibctesting.Coordinator, *ibctesting.TestChain, *ibctesting.TestChain) {
-	coordinator := simapp.NewBasicCoordinator(t)
+	coordinator := ibctesting.NewCoordinator(t, 0)
 	chainID := ibctesting.GetChainID(1)
 	coordinator.Chains[chainID] = ibctesting.NewTestChain(t, coordinator, simapp.SetupTestingappProvider, chainID)
 	providerChain := coordinator.GetChain(chainID)
