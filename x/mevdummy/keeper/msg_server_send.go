@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/NicholasDotSol/duality/x/mevdummy/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -10,9 +11,27 @@ import (
 func (k msgServer) Send(goCtx context.Context, msg *types.MsgSend) (*types.MsgSendResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	k.bankKeeper.SendCoinsFromAccountToModule(ctx, sdk.AccAddress(msg.Creator), types.ModuleName, amt)
+	amt := sdk.Coins{sdk.Coin{
+		Denom:  msg.TokenIn,
+		Amount: msg.AmountIn,
+	}}
+
+	fmt.Printf("Amount In: %v \n", msg.AmountIn)
+	fmt.Printf("%v \n", amt)
+	fmt.Printf(" %v \n ", sdk.AccAddress(msg.Creator))
+
+	accAddressCreator, err := sdk.AccAddressFromBech32(msg.Creator)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, accAddressCreator, types.ModuleName, amt)
+
+	if err != nil {
+		return nil, err
+	}
 
 	_ = ctx
-
 	return &types.MsgSendResponse{}, nil
 }
