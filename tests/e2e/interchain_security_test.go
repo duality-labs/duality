@@ -19,7 +19,7 @@ func TestCCVTestSuite(t *testing.T) {
 
 	ccvSuite := e2e.NewCCVTestSuite[*appProvider.App, *appConsumer.App](
 		icstestingutils.ProviderAppIniter,
-		icstestingutils.ConsumerAppIniter,
+		SetupTestingAppConsumer,
 		[]string{},
 	)
 	suite.Run(t, ccvSuite)
