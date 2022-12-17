@@ -25,6 +25,6 @@ client:
     path: vue/src/store
   openapi:
     path: docs/static/openapi.yml
-validator:
-  name: alice
-  bonded: 100000000stake
+validators:
+- name: alice
+  bonded: 100000000stak
