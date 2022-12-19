@@ -496,6 +496,10 @@ func (k Keeper) UpdateTickPointersPostRemoveToken1(goCtx context.Context, pair *
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//                            TOKENIZER UTILS                                //
+///////////////////////////////////////////////////////////////////////////////
+
 func (k Keeper) MintShares(ctx sdk.Context, addr sdk.AccAddress, amount sdk.Int, sharesId string) error {
 	// mint share tokens
 	sharesCoins := sdk.Coins{sdk.NewCoin(sharesId, amount)}

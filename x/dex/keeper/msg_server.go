@@ -23,20 +23,28 @@ var _ types.MsgServer = msgServer{}
 func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.MsgDepositResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, createrAddr, amount0, amount1, err := k.DepositVerification(goCtx, *msg)
+	// validate msg
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+	callerAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
+	// lexographically sort token0, token1
+	token0, token1, err := SortTokens(ctx, msg.TokenA, msg.TokenB)
 	if err != nil {
 		return nil, err
 	}
+	// sort amounts
+	amounts0, amounts1 := SortAmounts(msg.TokenA, token0, msg.AmountsA, msg.AmountsB)
 
 	Amounts0Deposit, Amounts1Deposit, err := k.DepositCore(
 		goCtx,
 		msg,
 		token0,
 		token1,
-		createrAddr,
-		amount0,
-		amount1,
+		callerAddr,
+		amounts0,
+		amounts1,
 	)
 
 	if err != nil {

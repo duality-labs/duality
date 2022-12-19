@@ -9,8 +9,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k Keeper) SortTokens(ctx sdk.Context, tokenA string, tokenB string) (string, string, error) {
-
+func SortTokens(ctx sdk.Context, tokenA string, tokenB string) (string, string, error) {
 	relativeOrder := tokenA < tokenB
 
 	equalCheck := tokenA == tokenB
@@ -20,6 +19,14 @@ func (k Keeper) SortTokens(ctx sdk.Context, tokenA string, tokenB string) (strin
 		return tokenA, tokenB, nil
 	} else {
 		return tokenB, tokenA, nil
+	}
+}
+
+func SortAmounts(tokenA string, token0 string, amountsA []sdk.Int, amountsB []sdk.Int) ([]sdk.Int, []sdk.Int) {
+	if tokenA == token0 {
+		return amountsA, amountsB
+	} else {
+		return amountsB, amountsA
 	}
 }
 

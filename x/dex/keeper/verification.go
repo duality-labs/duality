@@ -8,88 +8,12 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit) (string, string, sdk.AccAddress, []sdk.Int, []sdk.Int, error) {
-
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	// lexographically sort token0, token1
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
-
-	if err != nil {
-		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrInvalidTradingPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
-	}
-
-	// Converts input address (string) to sdk.AccAddress
-	callerAddr, err := sdk.AccAddressFromBech32(msg.Creator)
-	// Error checking for the calling address
-	if err != nil {
-		return "", "", nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
-
-	_, err = sdk.AccAddressFromBech32(msg.Receiver)
-	// Error Checking for receiver address
-	// Note we do not actually need to save the sdk.AccAddress here but we do want the address to be checked to determine if it valid
-	if err != nil {
-		return "", "", nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
-	}
-
-	feeCount := k.GetFeeTierCount(ctx)
-
-	// make sure that all feeIndexes (fee list index) is a valid index of the fee tier
-	for i, _ := range msg.FeeIndexes {
-		if msg.FeeIndexes[i] >= feeCount {
-			return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", msg.FeeIndexes[i])
-		}
-	}
-
-	amounts0 := msg.AmountsA
-	amounts1 := msg.AmountsB
-
-	// sort amount0, amount1 based on the sorting of token0/token1
-	if token0 != msg.TokenA {
-		tmp := msg.AmountsA
-		amounts0 = msg.AmountsB
-		amounts1 = tmp
-	}
-
-	totalAmount0ToDeposit := sdk.ZeroInt()
-	totalAmount1ToDeposit := sdk.ZeroInt()
-	// checks that amount0, amount1 are both not zero, and that the user has the balances they wish to deposit
-	for i, _ := range amounts0 {
-		// Error checking for valid sdk.Int
-		if err != nil || (amounts0[i].Equal(sdk.ZeroInt()) && amounts1[i].Equal(sdk.ZeroInt())) {
-			return "", "", nil, nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid amount: %s", err)
-		}
-
-		totalAmount0ToDeposit = totalAmount0ToDeposit.Add(amounts0[i])
-		totalAmount1ToDeposit = totalAmount1ToDeposit.Add(amounts1[i])
-	}
-
-	AccountToken0Balance := k.bankKeeper.GetBalance(ctx, callerAddr, token0).Amount
-
-	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
-
-	if AccountToken0Balance.LT(totalAmount0ToDeposit) {
-		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
-	}
-
-	AccountsToken1Balance := k.bankKeeper.GetBalance(ctx, callerAddr, token1).Amount
-
-	// Error handling to verify the amount wished to deposit is NOT more then the msg.creator holds in their accounts
-
-	if AccountsToken1Balance.LT(totalAmount1ToDeposit) {
-		return "", "", nil, nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Address %s  does not have enough of token 0", callerAddr)
-	}
-
-	return token0, token1, callerAddr, amounts0, amounts1, nil
-}
-
 func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdrawl) (string, string, sdk.AccAddress, sdk.AccAddress, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// lexographically sort token0, token1
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
+	token0, token1, err := SortTokens(ctx, msg.TokenA, msg.TokenB)
 
 	if err != nil {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTradingPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
@@ -157,7 +81,7 @@ func (k Keeper) SwapVerification(goCtx context.Context, msg types.MsgSwap) (stri
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// lexographically sort token0, token1
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
+	token0, token1, err := SortTokens(ctx, msg.TokenA, msg.TokenB)
 
 	if err != nil {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTradingPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
@@ -198,7 +122,7 @@ func (k Keeper) PlaceLimitOrderVerification(goCtx context.Context, msg types.Msg
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// lexographically sort token0, token1
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
+	token0, token1, err := SortTokens(ctx, msg.TokenA, msg.TokenB)
 
 	if err != nil {
 		return "", "", nil, sdkerrors.Wrapf(types.ErrInvalidTradingPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
@@ -240,7 +164,7 @@ func (k Keeper) PlaceLimitOrderVerification(goCtx context.Context, msg types.Msg
 func (k Keeper) WithdrawLimitOrderVerification(goCtx context.Context, msg types.MsgWithdrawFilledLimitOrder) (string, string, sdk.AccAddress, sdk.AccAddress, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
+	token0, token1, err := SortTokens(ctx, msg.TokenA, msg.TokenB)
 
 	if err != nil {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTradingPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
@@ -280,7 +204,7 @@ func (k Keeper) CancelLimitOrderVerification(goCtx context.Context, msg types.Ms
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// lexographically sort token0, token1
-	token0, token1, err := k.SortTokens(ctx, msg.TokenA, msg.TokenB)
+	token0, token1, err := SortTokens(ctx, msg.TokenA, msg.TokenB)
 
 	if err != nil {
 		return "", "", nil, nil, sdkerrors.Wrapf(types.ErrInvalidTradingPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
