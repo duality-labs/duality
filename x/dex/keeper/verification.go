@@ -8,25 +8,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k Keeper) DepositVerification(goCtx context.Context, msg types.MsgDeposit) (string, string, sdk.AccAddress, []sdk.Int, []sdk.Int, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	// validate msg
-	if err := msg.ValidateBasic(); err != nil {
-		return "", "", nil, nil, nil, err
-	}
-	callerAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
-
-	// lexographically sort token0, token1
-	token0, token1, err := SortTokens(ctx, msg.TokenA, msg.TokenB)
-	if err != nil {
-		return "", "", nil, nil, nil, err
-	}
-	amounts0, amounts1 := SortAmounts(msg.TokenA, token0, msg.AmountsA, msg.AmountsB)
-
-	return token0, token1, callerAddr, amounts0, amounts1, nil
-}
-
 func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdrawl) (string, string, sdk.AccAddress, sdk.AccAddress, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
