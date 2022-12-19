@@ -44,7 +44,6 @@ func (msg *MsgDeposit) GetSignBytes() []byte {
 }
 
 func (msg *MsgDeposit) ValidateBasic() error {
-	// Converts input address (string) to sdk.AccAddress
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	// Error checking for the calling address
 	if err != nil {
