@@ -38,6 +38,50 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
+			name: "invalid fee indexes length",
+			msg: MsgDeposit{
+				Creator:     sample.AccAddress(),
+				Receiver:    sample.AccAddress(),
+				FeeIndexes:  []uint64{0},
+				TickIndexes: []int64{},
+				AmountsA:    []sdk.Int{},
+				AmountsB:    []sdk.Int{},
+			},
+			err: sdkerrors.ErrInvalidType,
+		}, {
+			name: "invalid tick indexes length",
+			msg: MsgDeposit{
+				Creator:     sample.AccAddress(),
+				Receiver:    sample.AccAddress(),
+				FeeIndexes:  []uint64{},
+				TickIndexes: []int64{0},
+				AmountsA:    []sdk.Int{},
+				AmountsB:    []sdk.Int{},
+			},
+			err: sdkerrors.ErrInvalidType,
+		}, {
+			name: "invalid amounts A length",
+			msg: MsgDeposit{
+				Creator:     sample.AccAddress(),
+				Receiver:    sample.AccAddress(),
+				FeeIndexes:  []uint64{},
+				TickIndexes: []int64{},
+				AmountsA:    []sdk.Int{sdk.OneInt()},
+				AmountsB:    []sdk.Int{},
+			},
+			err: sdkerrors.ErrInvalidType,
+		}, {
+			name: "invalid amounts B length",
+			msg: MsgDeposit{
+				Creator:     sample.AccAddress(),
+				Receiver:    sample.AccAddress(),
+				FeeIndexes:  []uint64{},
+				TickIndexes: []int64{},
+				AmountsA:    []sdk.Int{},
+				AmountsB:    []sdk.Int{sdk.OneInt()},
+			},
+			err: sdkerrors.ErrInvalidType,
+		}, {
 			name: "valid msg",
 			msg: MsgDeposit{
 				Creator:     sample.AccAddress(),
