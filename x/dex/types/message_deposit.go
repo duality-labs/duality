@@ -45,14 +45,11 @@ func (msg *MsgDeposit) GetSignBytes() []byte {
 
 func (msg *MsgDeposit) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
-	// Error checking for the calling address
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	// Note we do not actually need to save the sdk.AccAddress here but we do want the address to be checked to determine if it valid
 	_, err = sdk.AccAddressFromBech32(msg.Receiver)
-	// Error Checking for receiver address
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
