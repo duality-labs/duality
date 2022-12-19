@@ -51,9 +51,43 @@ func (k Keeper) DepositCore(
 		amount1 := amounts1[i]
 		tickIndex := msg.TickIndexes[i]
 		feeIndex := msg.FeeIndexes[i]
-		fee, lowerTickIndex, upperTickIndex, err := k.ValidateDeposit(ctx, callerAddr, feeTiers, feeIndex, &pair, tickIndex, amount0, amount1, balance0, balance1)
-		if err != nil {
-			return nil, nil, err
+
+		// check that feeIndex is a valid index of the fee tier
+		if feeIndex >= uint64(len(feeTiers)) {
+			return nil, nil, sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", feeIndex)
+		}
+		fee := feeTiers[feeIndex].Fee
+		lowerTickIndex := tickIndex - fee
+		upperTickIndex := tickIndex + fee
+
+		// make sure upper and lower ticks are within valid tick bounds
+		if Abs(lowerTickIndex) > MaxTickExp {
+			return nil, nil, sdkerrors.Wrapf(types.ErrTickOutsideRange, "lower tick (%d) outside valid tick range", lowerTickIndex)
+		} else if Abs(upperTickIndex) > MaxTickExp {
+			return nil, nil, sdkerrors.Wrapf(types.ErrTickOutsideRange, "upper tick (%d) outside valid tick range", upperTickIndex)
+		}
+
+		// behind enemy lines checks
+		// TODO: Allow user to deposit "behind enemy lines"
+		if amount0.GT(sdk.ZeroInt()) && pair.CurrentTick0To1 <= lowerTickIndex {
+			return nil, nil, types.ErrDepositBehindPairLiquidity
+		}
+		// TODO: Allow user to deposit "behind enemy lines"
+		if amount1.GT(sdk.ZeroInt()) && upperTickIndex <= pair.CurrentTick1To0 {
+			return nil, nil, types.ErrDepositBehindPairLiquidity
+		}
+
+		// check for non-zero deposit
+		if amount0.Equal(sdk.ZeroInt()) && amount1.Equal(sdk.ZeroInt()) {
+			return nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Cannot deposit 0,0")
+		}
+
+		// check sufficient balances
+		if amount0.GT(balance0) {
+			return nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Insufficient token 0 balance")
+		}
+		if amount1.GT(balance1) {
+			return nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Insufficient token 1 balance")
 		}
 
 		lowerTick := k.GetOrInitTick(goCtx, pairId, lowerTickIndex)

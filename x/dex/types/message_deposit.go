@@ -58,8 +58,6 @@ func (msg *MsgDeposit) ValidateBasic() error {
 	if len(msg.FeeIndexes) != len(msg.TickIndexes) ||
 		len(msg.AmountsA) != len(msg.AmountsB) ||
 		len(msg.AmountsA) != len(msg.TickIndexes) {
-		// TODO: fix error type (importing from types results in import cycle)
-		// return sdkerrors.Wrapf(types.ErrUnbalancedTxArray, "Input Arrays are not of the same length")
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Input Arrays are not of the same length")
 	}
 	return nil

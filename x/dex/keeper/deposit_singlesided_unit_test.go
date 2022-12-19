@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"math"
 
+	keeper "github.com/NicholasDotSol/duality/x/dex/keeper"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 )
 
@@ -380,4 +381,80 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiB() {
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
 	s.assertMaxTick(3)
+}
+
+func (s *MsgServerTestSuite) TestDepositSingleSidedInsufficientA() {
+	// GIVEN
+	// alice has no funds
+	s.assertAliceBalances(0, 0)
+
+	// WHEN
+	// depositing non-zero amount of token A
+	// THEN
+	// deposit should fail with NotEnoughCoins
+
+	err := types.ErrNotEnoughCoins
+	s.assertAliceDepositFails(err, NewDeposit(10, 0, 0, 0))
+}
+
+func (s *MsgServerTestSuite) TestDepositSingleSidedInsufficientB() {
+	// GIVEN
+	// alice has no funds
+	s.assertAliceBalances(0, 0)
+
+	// WHEN
+	// depositing non-zero amount of token B
+	// THEN
+	// deposit should fail with NotEnoughCoins
+
+	err := types.ErrNotEnoughCoins
+	s.assertAliceDepositFails(err, NewDeposit(0, 10, 0, 0))
+}
+
+func (s *MsgServerTestSuite) TestDepositSingleSidedLowerTickOutsideRange() {
+	s.fundAliceBalances(50, 50)
+
+	// GIVEN
+	// no existing liquidity
+
+	// WHEN
+	// depositing at the lower end of the acceptable range for ticks
+	// THEN
+	// deposit should fail with TickOutsideRange
+
+	tickIndex := -1 * int(keeper.MaxTickExp)
+	err := types.ErrTickOutsideRange
+	s.assertAliceDepositFails(err, NewDeposit(10, 0, tickIndex, 0))
+}
+
+func (s *MsgServerTestSuite) TestDepositSingleSidedUpperTickOutsideRange() {
+	s.fundAliceBalances(50, 50)
+
+	// GIVEN
+	// no existing liquidity
+
+	// WHEN
+	// depositing at the lower end of the acceptable range for ticks
+	// THEN
+	// deposit should fail with TickOutsideRange
+
+	tickIndex := int(keeper.MaxTickExp)
+	err := types.ErrTickOutsideRange
+	s.assertAliceDepositFails(err, NewDeposit(0, 10, tickIndex, 0))
+}
+
+func (s *MsgServerTestSuite) TestDepositSingleSidedInvalidFeeIndex() {
+	s.fundAliceBalances(50, 50)
+
+	// GIVEN
+	// no existing liquidity
+
+	// WHEN
+	// depositing at an invalid fee tier
+	// THEN
+	// deposit should fail with ValidFeeIndexNotFound
+
+	feeIndex := len(s.feeTiers)
+	err := types.ErrValidFeeIndexNotFound
+	s.assertAliceDepositFails(err, NewDeposit(0, 10, 0, feeIndex))
 }

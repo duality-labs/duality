@@ -7,7 +7,6 @@ import (
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 const MaxTickExp uint64 = 1048575
@@ -525,62 +524,4 @@ func (k Keeper) BurnShares(ctx sdk.Context, addr sdk.AccAddress, amount sdk.Int,
 		return err
 	}
 	return nil
-}
-
-///////////////////////////////////////////////////////////////////////////////
-//                            CORE VALIDATION                                //
-///////////////////////////////////////////////////////////////////////////////
-
-func (k Keeper) ValidateDeposit(
-	ctx sdk.Context,
-	callerAddr sdk.AccAddress,
-	feeTiers []types.FeeTier,
-	feeIndex uint64,
-	pair *types.TradingPair,
-	tickIndex int64,
-	amount0 sdk.Int,
-	amount1 sdk.Int,
-	balance0 sdk.Int,
-	balance1 sdk.Int,
-) (int64, int64, int64, error) {
-	// check that feeIndex is a valid index of the fee tier
-	if feeIndex >= uint64(len(feeTiers)) {
-		return 0, 0, 0, sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", feeIndex)
-	}
-	fee := feeTiers[feeIndex].Fee
-	lowerTickIndex := tickIndex - fee
-	upperTickIndex := tickIndex + fee
-
-	// make sure upper and lower ticks are within valid tick bounds
-	if Abs(lowerTickIndex) > MaxTickExp {
-		return 0, 0, 0, sdkerrors.Wrapf(types.ErrTickOutsideRange, "lower tick (%d) outside valid tick range", lowerTickIndex)
-	} else if Abs(upperTickIndex) > MaxTickExp {
-		return 0, 0, 0, sdkerrors.Wrapf(types.ErrTickOutsideRange, "lower tick (%d) outside valid tick range", lowerTickIndex)
-	}
-
-	// behind enemy lines checks
-	// TODO: Allow user to deposit "behind enemy lines"
-	if amount0.GT(sdk.ZeroInt()) && pair.CurrentTick0To1 <= lowerTickIndex {
-		return 0, 0, 0, types.ErrDepositBehindPairLiquidity
-	}
-	// TODO: Allow user to deposit "behind enemy lines"
-	if amount1.GT(sdk.ZeroInt()) && upperTickIndex <= pair.CurrentTick1To0 {
-		return 0, 0, 0, types.ErrDepositBehindPairLiquidity
-	}
-
-	// check for non-zero deposit
-	if amount0.Equal(sdk.ZeroInt()) && amount1.Equal(sdk.ZeroInt()) {
-		return 0, 0, 0, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Cannot deposit 0,0")
-	}
-
-	// check sufficient balances
-	if amount0.GT(balance0) {
-		return 0, 0, 0, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Insufficient token 0 balance")
-	}
-	if amount1.GT(balance1) {
-		return 0, 0, 0, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Insufficient token 1 balance")
-	}
-
-	// should return fee, lowerTickIndex, upperTickIndex
-	return fee, lowerTickIndex, upperTickIndex, nil
 }
