@@ -42,8 +42,6 @@ func (k Keeper) DepositCore(
 		amounts0Deposited[i] = sdk.ZeroInt()
 		amounts1Deposited[i] = sdk.ZeroInt()
 	}
-	balance0 := k.bankKeeper.SpendableCoins(ctx, callerAddr).AmountOf(token0)
-	balance1 := k.bankKeeper.SpendableCoins(ctx, callerAddr).AmountOf(token1)
 
 	feeTiers := k.GetAllFeeTier(ctx)
 
@@ -80,14 +78,6 @@ func (k Keeper) DepositCore(
 		// check for non-zero deposit
 		if amount0.Equal(sdk.ZeroInt()) && amount1.Equal(sdk.ZeroInt()) {
 			return nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Cannot deposit 0,0")
-		}
-
-		// check sufficient balances
-		if amount0.GT(balance0) {
-			return nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Insufficient token 0 balance")
-		}
-		if amount1.GT(balance1) {
-			return nil, nil, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "Insufficient token 1 balance")
 		}
 
 		lowerTick := k.GetOrInitTick(goCtx, pairId, lowerTickIndex)
@@ -143,8 +133,6 @@ func (k Keeper) DepositCore(
 		amounts1Deposited[i] = inAmount1
 		totalAmountReserve0 = totalAmountReserve0.Add(inAmount0)
 		totalAmountReserve1 = totalAmountReserve1.Add(inAmount1)
-		balance0 = balance0.Sub(inAmount0)
-		balance1 = balance1.Sub(inAmount1)
 
 		passedDeposit++
 
