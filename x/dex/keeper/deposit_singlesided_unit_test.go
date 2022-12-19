@@ -383,34 +383,6 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiB() {
 	s.assertMaxTick(3)
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedInsufficientA() {
-	// GIVEN
-	// alice has no funds
-	s.assertAliceBalances(0, 0)
-
-	// WHEN
-	// depositing non-zero amount of token A
-	// THEN
-	// deposit should fail with NotEnoughCoins
-
-	err := types.ErrNotEnoughCoins
-	s.assertAliceDepositFails(err, NewDeposit(10, 0, 0, 0))
-}
-
-func (s *MsgServerTestSuite) TestDepositSingleSidedInsufficientB() {
-	// GIVEN
-	// alice has no funds
-	s.assertAliceBalances(0, 0)
-
-	// WHEN
-	// depositing non-zero amount of token B
-	// THEN
-	// deposit should fail with NotEnoughCoins
-
-	err := types.ErrNotEnoughCoins
-	s.assertAliceDepositFails(err, NewDeposit(0, 10, 0, 0))
-}
-
 func (s *MsgServerTestSuite) TestDepositSingleSidedLowerTickOutsideRange() {
 	s.fundAliceBalances(50, 50)
 
