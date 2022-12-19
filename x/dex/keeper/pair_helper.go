@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
@@ -10,6 +9,7 @@ import (
 )
 
 func SortTokens(ctx sdk.Context, tokenA string, tokenB string) (string, string, error) {
+
 	relativeOrder := tokenA < tokenB
 
 	equalCheck := tokenA == tokenB
@@ -30,12 +30,12 @@ func SortAmounts(tokenA string, token0 string, amountsA []sdk.Int, amountsB []sd
 	}
 }
 
-func (k Keeper) CreatePairId(token0 string, token1 string) (pairId string) {
+func CreatePairId(token0 string, token1 string) (pairId string) {
 	return (token0 + "<>" + token1)
 }
 
-func (k Keeper) CreateSharesId(token0 string, token1 string, tickIndex int64, fee int64) (denom string) {
-	t0 := strings.ReplaceAll(token0, "-", "")
-	t1 := strings.ReplaceAll(token1, "-", "")
-	return fmt.Sprintf("%s-%s-t%d-f%d", t0, t1, tickIndex, fee)
+func PairToTokens(pairId string) (token0 string, token1 string) {
+	tokens := strings.Split(pairId, "<>")
+
+	return tokens[0], tokens[1]
 }
