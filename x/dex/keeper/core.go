@@ -42,27 +42,18 @@ func (k Keeper) DepositCore(
 		amounts0Deposited[i] = sdk.ZeroInt()
 		amounts1Deposited[i] = sdk.ZeroInt()
 	}
+	balance0 := k.bankKeeper.SpendableCoins(ctx, callerAddr).AmountOf(token0)
+	balance1 := k.bankKeeper.SpendableCoins(ctx, callerAddr).AmountOf(token1)
 
-	FeeTier := k.GetAllFeeTier(ctx)
+	feeTiers := k.GetAllFeeTier(ctx)
 
 	for i, amount0 := range amounts0 {
 		amount1 := amounts1[i]
 		tickIndex := msg.TickIndexes[i]
 		feeIndex := msg.FeeIndexes[i]
-		fee := FeeTier[feeIndex].Fee
-		curTick0to1 := pair.CurrentTick0To1
-		curTick1to0 := pair.CurrentTick1To0
-		lowerTickIndex := tickIndex - fee
-		upperTickIndex := tickIndex + fee
-
-		// TODO: Allow user to deposit "behind enemy lines"
-		if amount0.GT(sdk.ZeroInt()) && curTick0to1 <= lowerTickIndex {
-			return nil, nil, types.ErrDepositBehindPairLiquidity
-		}
-
-		// TODO: Allow user to deposit "behind enemy lines"
-		if amount1.GT(sdk.ZeroInt()) && upperTickIndex <= curTick1to0 {
-			return nil, nil, types.ErrDepositBehindPairLiquidity
+		fee, lowerTickIndex, upperTickIndex, err := k.ValidateDeposit(ctx, callerAddr, feeTiers, feeIndex, &pair, tickIndex, amount0, amount1, balance0, balance1)
+		if err != nil {
+			return nil, nil, err
 		}
 
 		lowerTick := k.GetOrInitTick(goCtx, pairId, lowerTickIndex)
@@ -118,6 +109,8 @@ func (k Keeper) DepositCore(
 		amounts1Deposited[i] = inAmount1
 		totalAmountReserve0 = totalAmountReserve0.Add(inAmount0)
 		totalAmountReserve1 = totalAmountReserve1.Add(inAmount1)
+		balance0 = balance0.Sub(inAmount0)
+		balance1 = balance1.Sub(inAmount1)
 
 		passedDeposit++
 

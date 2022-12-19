@@ -44,9 +44,27 @@ func (msg *MsgDeposit) GetSignBytes() []byte {
 }
 
 func (msg *MsgDeposit) ValidateBasic() error {
+	// Converts input address (string) to sdk.AccAddress
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	// Error checking for the calling address
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+
+	// Note we do not actually need to save the sdk.AccAddress here but we do want the address to be checked to determine if it valid
+	_, err = sdk.AccAddressFromBech32(msg.Receiver)
+	// Error Checking for receiver address
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+	}
+
+	// Verify that the lengths of TickIndexes, FeeIndexes, AmountsA, AmountsB are all equal
+	if len(msg.FeeIndexes) != len(msg.TickIndexes) ||
+		len(msg.AmountsA) != len(msg.AmountsB) ||
+		len(msg.AmountsA) != len(msg.TickIndexes) {
+		// TODO: fix error type (importing from types results in import cycle)
+		// return sdkerrors.Wrapf(types.ErrUnbalancedTxArray, "Input Arrays are not of the same length")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Input Arrays are not of the same length")
 	}
 	return nil
 }
