@@ -197,8 +197,9 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		lowerTickIndex := tickIndex - fee
 		upperTickIndex := tickIndex + fee
 		sharesId := CreateSharesId(token0, token1, tickIndex, feeIndex)
+		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
-		if sharesBalance := k.bankKeeper.GetBalance(ctx, callerAddr, sharesId).Amount; sharesBalance.LT(sharesToRemove) {
+		if totalShares.LT(sharesToRemove) {
 			return sdkerrors.Wrapf(types.ErrNotEnoughShares, "Insufficient shares %s", sharesId)
 		}
 
@@ -207,8 +208,6 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		if !lowerTickFound || !upperTickFound {
 			return types.ErrValidTickNotFound
 		}
-
-		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
 		pool := NewPool(
 			pairId,
