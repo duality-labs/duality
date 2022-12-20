@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"strings"
 
@@ -15,10 +16,10 @@ const MaxTickExp uint64 = 1048575
 //                                   UTILS                                   //
 ///////////////////////////////////////////////////////////////////////////////
 
-func PairToTokens(pairId string) (token0 string, token1 string) {
-	tokens := strings.Split(pairId, "<>")
-
-	return tokens[0], tokens[1]
+func CreateSharesId(token0 string, token1 string, tickIndex int64, feeIndex uint64) (denom string) {
+	t0 := strings.ReplaceAll(token0, "-", "")
+	t1 := strings.ReplaceAll(token1, "-", "")
+	return fmt.Sprintf("%s-%s-%s-t%d-f%d", types.DepositSharesPrefix, t0, t1, tickIndex, feeIndex)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -42,7 +43,7 @@ func (k Keeper) GetOrInitPair(goCtx context.Context, token0 string, token1 strin
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	k.TokenInit(ctx, token0)
 	k.TokenInit(ctx, token1)
-	pairId := k.CreatePairId(token0, token1)
+	pairId := CreatePairId(token0, token1)
 	pair, found := k.GetTradingPair(ctx, pairId)
 	if !found {
 		pair = types.TradingPair{
