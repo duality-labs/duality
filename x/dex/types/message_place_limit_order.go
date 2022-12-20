@@ -54,7 +54,7 @@ func (msg *MsgPlaceLimitOrder) ValidateBasic() error {
 	}
 
 	if msg.TokenIn != msg.TokenA && msg.TokenIn != msg.TokenB {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "TokenIn must be either Tokne0 or Token1")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "TokenIn must be either TokenA or TokenB")
 	}
 	return nil
 }
