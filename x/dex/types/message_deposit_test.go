@@ -47,7 +47,7 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 				AmountsA:    []sdk.Int{},
 				AmountsB:    []sdk.Int{},
 			},
-			err: sdkerrors.ErrInvalidType,
+			err: ErrUnbalancedTxArray,
 		}, {
 			name: "invalid tick indexes length",
 			msg: MsgDeposit{
@@ -58,7 +58,7 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 				AmountsA:    []sdk.Int{},
 				AmountsB:    []sdk.Int{},
 			},
-			err: sdkerrors.ErrInvalidType,
+			err: ErrUnbalancedTxArray,
 		}, {
 			name: "invalid amounts A length",
 			msg: MsgDeposit{
@@ -69,7 +69,7 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 				AmountsA:    []sdk.Int{sdk.OneInt()},
 				AmountsB:    []sdk.Int{},
 			},
-			err: sdkerrors.ErrInvalidType,
+			err: ErrUnbalancedTxArray,
 		}, {
 			name: "invalid amounts B length",
 			msg: MsgDeposit{
@@ -80,7 +80,7 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 				AmountsA:    []sdk.Int{},
 				AmountsB:    []sdk.Int{sdk.OneInt()},
 			},
-			err: sdkerrors.ErrInvalidType,
+			err: ErrUnbalancedTxArray,
 		}, {
 			name: "valid msg",
 			msg: MsgDeposit{
