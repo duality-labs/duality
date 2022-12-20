@@ -1159,8 +1159,10 @@ func (s *MsgServerTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amoun
 	pairId := "TokenA<>TokenB"
 	// sharesId := fmt.Sprintf("%s%st%df%d", "TokenA", "TokenB", tickIndex, 1)
 	sharesId := CreateSharesId("TokenA", "TokenB", tickIndex, 0)
-	lowerTick = s.app.DexKeeper.GetOrInitTick(s.goCtx, pairId, tickIndex-1)
-	upperTick = s.app.DexKeeper.GetOrInitTick(s.goCtx, pairId, tickIndex+1)
+	lowerTick, err := s.app.DexKeeper.GetOrInitTick(s.goCtx, pairId, tickIndex-1)
+	s.Assert().NoError(err)
+	upperTick, err = s.app.DexKeeper.GetOrInitTick(s.goCtx, pairId, tickIndex+1)
+	s.Assert().NoError(err)
 	priceCenter1To0, err := keeper.CalcPrice0To1(tickIndex)
 	if err != nil {
 		panic(err)
