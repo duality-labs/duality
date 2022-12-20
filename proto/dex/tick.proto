@@ -16,7 +16,7 @@ message Tick {
   string price0To1 = 6  [
                          (gogoproto.moretags)   = "yaml:\"price0To1\"",
                          (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-                         (gogoproto.nullable)   = false,
+                         (gogoproto.nullable)   = true,
                          (gogoproto.jsontag) = "price0To1"
                          ];
 
