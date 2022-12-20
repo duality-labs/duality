@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/NicholasDotSol/duality/testutil/sample"
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
@@ -45,7 +44,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 				TickIndexes:    []int64{0},
 				SharesToRemove: []sdk.Int{sdk.OneInt()},
 			},
-			err: sdkerrors.ErrInvalidType,
+			err: ErrUnbalancedTxArray,
 		}, {
 			name: "invalid tick indexes length",
 			msg: MsgWithdrawl{
@@ -55,7 +54,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 				TickIndexes:    []int64{},
 				SharesToRemove: []sdk.Int{sdk.OneInt()},
 			},
-			err: sdkerrors.ErrInvalidType,
+			err: ErrUnbalancedTxArray,
 		}, {
 			name: "invalid shares to remove length",
 			msg: MsgWithdrawl{
@@ -65,7 +64,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 				TickIndexes:    []int64{0},
 				SharesToRemove: []sdk.Int{},
 			},
-			err: types.ErrUnbalancedTxArray,
+			err: ErrUnbalancedTxArray,
 		}, {
 			name: "valid msg",
 			msg: MsgWithdrawl{
