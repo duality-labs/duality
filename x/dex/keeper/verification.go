@@ -116,7 +116,7 @@ func (k Keeper) WithdrawLimitOrderVerification(goCtx context.Context, msg types.
 		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
-	pairId := k.CreatePairId(token0, token1)
+	pairId := CreatePairId(token0, token1)
 
 	shares, sharesFound := k.GetLimitOrderTrancheUser(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Receiver)
 	if !sharesFound {
@@ -157,7 +157,7 @@ func (k Keeper) CancelLimitOrderVerification(goCtx context.Context, msg types.Ms
 	}
 
 	// createPairId (token0/ token1)
-	pairId := k.CreatePairId(token0, token1)
+	pairId := CreatePairId(token0, token1)
 
 	shares, sharesFound := k.GetLimitOrderTrancheUser(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
 

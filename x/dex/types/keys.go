@@ -23,6 +23,10 @@ const (
 	Separator = "/"
 )
 
+const (
+	DepositSharesPrefix = "DualityLPShares"
+)
+
 func KeyPrefix(p string) []byte {
 	key := []byte(p)
 	key = append(key, []byte("/")...)

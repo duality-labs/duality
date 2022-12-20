@@ -8,14 +8,13 @@ import (
 )
 
 type Pool struct {
-	PairId          string
-	TickIndex       int64
-	FeeIndex        uint64
-	LowerTick0      *types.Tick
-	UpperTick1      *types.Tick
-	price1To0Lower  sdk.Dec
-	price0To1Upper  sdk.Dec
-	price1To0Center sdk.Dec
+	PairId         string
+	TickIndex      int64
+	FeeIndex       uint64
+	LowerTick0     *types.Tick
+	UpperTick1     *types.Tick
+	price1To0Lower sdk.Dec
+	price0To1Upper sdk.Dec
 }
 
 func NewPool(
@@ -25,30 +24,16 @@ func NewPool(
 	fee int64,
 	lowerTick0 *types.Tick,
 	upperTick1 *types.Tick,
-) (*Pool, error) {
-	price0To1Upper, err := CalcPrice0To1(tickIndex + fee)
-	if err != nil {
-		return nil, err
-	}
-	price1To0Lower, err := CalcPrice1To0(tickIndex - fee)
-	if err != nil {
-		return nil, err
-	}
-	price1To0Center, err := CalcPrice1To0(tickIndex)
-	if err != nil {
-		return nil, err
-	}
-
+) *Pool {
 	return &Pool{
-		PairId:          pairId,
-		TickIndex:       tickIndex,
-		FeeIndex:        feeIndex,
-		LowerTick0:      lowerTick0,
-		UpperTick1:      upperTick1,
-		price0To1Upper:  price0To1Upper,
-		price1To0Lower:  price1To0Lower,
-		price1To0Center: price1To0Center,
-	}, nil
+		PairId:         pairId,
+		TickIndex:      tickIndex,
+		FeeIndex:       feeIndex,
+		LowerTick0:     lowerTick0,
+		UpperTick1:     upperTick1,
+		price0To1Upper: *upperTick1.Price0To1,
+		price1To0Lower: sdk.OneDec().Quo(*lowerTick0.Price0To1),
+	}
 }
 
 func (p *Pool) GetLowerReserve0() sdk.Int {
@@ -157,6 +142,11 @@ func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.I
 	return inAmount0, inAmount1, outShares
 }
 
+func (p *Pool) MustCalcPrice1To0Center() sdk.Dec {
+	// NOTE: We can safely call the error-less version of CalcPrice here because the pool object
+	// has already been initialized with an upper and lower tick which satisfy a check for IsTickOutOfRange
+	return MustCalcPrice1To0(p.TickIndex)
+}
 func (p *Pool) CalcSharesMinted(
 	reserve0 sdk.Int,
 	reserve1 sdk.Int,
@@ -164,8 +154,9 @@ func (p *Pool) CalcSharesMinted(
 	amount0 sdk.Int,
 	amount1 sdk.Int,
 ) (sharesMinted sdk.Int) {
-	valueMintedToken0 := CalcShares(amount0, amount1, p.price1To0Center)
-	valueExistingToken0 := CalcShares(reserve0, reserve1, p.price1To0Center)
+	price1To0Center := p.MustCalcPrice1To0Center()
+	valueMintedToken0 := CalcShares(amount0, amount1, price1To0Center)
+	valueExistingToken0 := CalcShares(reserve0, reserve1, price1To0Center)
 	if valueExistingToken0.GT(sdk.ZeroDec()) {
 		sharesMinted = valueMintedToken0.Quo(valueExistingToken0).Mul(totalShares.ToDec()).TruncateInt()
 	} else {
