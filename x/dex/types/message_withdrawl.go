@@ -56,7 +56,7 @@ func (msg *MsgWithdrawl) ValidateBasic() error {
 	// Verify that the lengths of TickIndexes, FeeIndexes, SharesToRemove are all equal
 	if len(msg.FeeIndexes) != len(msg.TickIndexes) ||
 		len(msg.SharesToRemove) != len(msg.TickIndexes) {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Input Arrays are not of the same length")
+		return sdkerrors.Wrapf(ErrUnbalancedTxArray, "Input Arrays are not of the same length")
 	}
 	return nil
 }

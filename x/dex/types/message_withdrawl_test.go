@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/NicholasDotSol/duality/testutil/sample"
+	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
@@ -64,7 +65,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 				TickIndexes:    []int64{0},
 				SharesToRemove: []sdk.Int{},
 			},
-			err: sdkerrors.ErrInvalidType,
+			err: types.ErrUnbalancedTxArray,
 		}, {
 			name: "valid msg",
 			msg: MsgWithdrawl{
