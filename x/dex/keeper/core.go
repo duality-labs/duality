@@ -185,25 +185,32 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 	}
 	totalReserve0ToRemove := sdk.ZeroInt()
 	totalReserve1ToRemove := sdk.ZeroInt()
+	feeTiers := k.GetAllFeeTier(ctx)
 
 	for i, feeIndex := range msg.FeeIndexes {
 		sharesToRemove := msg.SharesToRemove[i]
 		tickIndex := msg.TickIndexes[i]
 
-		feeValue, found := k.GetFeeTier(ctx, feeIndex)
-		if !found {
-			return types.ErrValidFeeIndexNotFound
+		// check that feeIndex is a valid index of the fee tier
+		if feeIndex >= uint64(len(feeTiers)) {
+			return sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "(%d) does not correspond to a valid fee", feeIndex)
 		}
-		fee := feeValue.Fee
+
+		fee := feeTiers[feeIndex].Fee
 		lowerTickIndex := tickIndex - fee
 		upperTickIndex := tickIndex + fee
+		sharesId := k.CreateSharesId(token0, token1, tickIndex, fee)
+
+		if sharesBalance := k.bankKeeper.GetBalance(ctx, callerAddr, sharesId).Amount; sharesBalance.LT(sharesToRemove) {
+			return sdkerrors.Wrapf(types.ErrNotEnoughShares, "Insufficient shares %s", sharesId)
+		}
+
 		lowerTick, lowerTickFound := k.GetTick(ctx, pairId, lowerTickIndex)
 		upperTick, upperTickFound := k.GetTick(ctx, pairId, upperTickIndex)
 		if !lowerTickFound || !upperTickFound {
 			return types.ErrValidTickNotFound
 		}
 
-		sharesId := k.CreateSharesId(token0, token1, tickIndex, fee)
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
 		pool, err := NewPool(

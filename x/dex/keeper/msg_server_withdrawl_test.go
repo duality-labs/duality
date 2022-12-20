@@ -207,7 +207,7 @@ func (s *MsgServerTestSuite) TestWithdrawalFailsWithNonExistentPair() {
 	// NOTE: As code is currently written we hit not enough shares check
 	// before validating pair existence. This is correct from a
 	// UX perspective --users should not care whether tick is initialized
-	s.Assert().ErrorIs(err, types.ErrNotEnoughShares)
+	s.Assert().ErrorIs(err, types.ErrValidPairNotFound)
 }
 
 func (s *MsgServerTestSuite) TestWithdrawalFailsWithInvalidTick() {
