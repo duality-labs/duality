@@ -58,13 +58,6 @@ func (k Keeper) DepositCore(
 		lowerTickIndex := tickIndex - fee
 		upperTickIndex := tickIndex + fee
 
-		// make sure upper and lower ticks are within valid tick bounds
-		if Abs(lowerTickIndex) > MaxTickExp {
-			return nil, nil, sdkerrors.Wrapf(types.ErrTickOutsideRange, "lower tick (%d) outside valid tick range", lowerTickIndex)
-		} else if Abs(upperTickIndex) > MaxTickExp {
-			return nil, nil, sdkerrors.Wrapf(types.ErrTickOutsideRange, "upper tick (%d) outside valid tick range", upperTickIndex)
-		}
-
 		// behind enemy lines checks
 		// TODO: Allow user to deposit "behind enemy lines"
 		if amount0.GT(sdk.ZeroInt()) && pair.CurrentTick0To1 <= lowerTickIndex {
@@ -80,13 +73,19 @@ func (k Keeper) DepositCore(
 			return nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Cannot deposit 0,0")
 		}
 
-		lowerTick := k.GetOrInitTick(goCtx, pairId, lowerTickIndex)
-		upperTick := k.GetOrInitTick(goCtx, pairId, upperTickIndex)
+		lowerTick, err := k.GetOrInitTick(goCtx, pairId, lowerTickIndex)
+		if err != nil {
+			return nil, nil, sdkerrors.Wrapf(err, "Invalid lower tick (%d)", lowerTickIndex)
+		}
+		upperTick, err := k.GetOrInitTick(goCtx, pairId, upperTickIndex)
+		if err != nil {
+			return nil, nil, sdkerrors.Wrapf(err, "Invalid upper tick (%d)", lowerTickIndex)
+		}
 
 		sharesId := k.CreateSharesId(token0, token1, tickIndex, fee)
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
-		pool, err := NewPool(
+		pool := NewPool(
 			pairId,
 			tickIndex,
 			feeIndex,
@@ -94,9 +93,7 @@ func (k Keeper) DepositCore(
 			&lowerTick,
 			&upperTick,
 		)
-		if err != nil {
-			return amounts0Deposited, amounts1Deposited, err
-		}
+
 		oldReserve0 := pool.GetLowerReserve0()
 		oldReserve1 := pool.GetUpperReserve1()
 
@@ -206,7 +203,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		sharesId := k.CreateSharesId(token0, token1, tickIndex, fee)
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
-		pool, err := NewPool(
+		pool := NewPool(
 			pairId,
 			tickIndex,
 			feeIndex,
@@ -214,9 +211,6 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			&lowerTick,
 			&upperTick,
 		)
-		if err != nil {
-			return err
-		}
 		outAmount0, outAmount1, err := pool.Withdraw(sharesToRemove, totalShares)
 		if err != nil {
 			return err
@@ -320,7 +314,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				continue
 			}
 
-			pool, err := NewPool(
+			pool := NewPool(
 				pairId,
 				pair.CurrentTick0To1-fee,
 				i,
@@ -328,9 +322,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				&Current0Data,
 				&Current1Data,
 			)
-			if err != nil {
-				return sdk.ZeroInt(), sdk.ZeroInt(), err
-			}
+
 			inAmount0, outAmount1 := pool.Swap0To1(remainingInAmount0)
 			remainingInAmount0 = remainingInAmount0.Sub(inAmount0)
 			totalOutAmount1 = totalOutAmount1.Add(outAmount1)
@@ -409,7 +401,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				continue
 			}
 
-			pool, err := NewPool(
+			pool := NewPool(
 				pairId,
 				pair.CurrentTick1To0+fee,
 				i,
@@ -417,9 +409,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 				&Current0Data,
 				&Current1Data,
 			)
-			if err != nil {
-				return sdk.ZeroInt(), sdk.ZeroInt(), err
-			}
+
 			inAmount1, outAmount0 := pool.Swap1To0(remainingInAmount1)
 			remainingInAmount1 = remainingInAmount1.Sub(inAmount1)
 			totalOutAmount0 = totalOutAmount0.Add(outAmount0)
@@ -475,16 +465,13 @@ func (k Keeper) SwapLimitOrder0to1(
 ) (newAmountRemainingTokenIn sdk.Dec, newAmountOut sdk.Int, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	priceInToOut, err := CalcPrice0To1(tickIndex)
-	if err != nil {
-		return sdk.ZeroDec(), sdk.ZeroInt(), err
-	}
-	priceOutToIn := sdk.OneDec().Quo(priceInToOut)
-
 	tick, tickFound := k.GetTick(ctx, pairId, tickIndex)
 	if !tickFound {
 		return amountRemainingTokenIn, amountOut, nil
 	}
+
+	priceInToOut := *tick.Price0To1
+	priceOutToIn := sdk.OneDec().Quo(priceInToOut)
 
 	fillTranche := &tick.LimitOrderTranche1To0.FillTrancheIndex
 	placeTranche := &tick.LimitOrderTranche1To0.PlaceTrancheIndex
@@ -545,16 +532,13 @@ func (k Keeper) SwapLimitOrder1to0(
 ) (newAmountRemainingTokenIn sdk.Dec, newAmountOut sdk.Int, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	priceInToOut, err := CalcPrice1To0(tickIndex)
-	if err != nil {
-		return sdk.ZeroDec(), sdk.ZeroInt(), err
-	}
-	priceOutToIn := sdk.OneDec().Quo(priceInToOut)
-
 	tick, tickFound := k.GetTick(ctx, pairId, tickIndex)
 	if !tickFound {
 		return amountRemainingTokenIn, amountOut, nil
 	}
+
+	priceOutToIn := *tick.Price0To1
+	priceInToOut := sdk.OneDec().Quo(priceOutToIn)
 
 	fillTranche := &tick.LimitOrderTranche0To1.FillTrancheIndex
 	placeTranche := &tick.LimitOrderTranche0To1.PlaceTrancheIndex
@@ -651,7 +635,10 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 
 	pair := k.GetOrInitPair(goCtx, token0, token1)
 	pairId := pair.PairId
-	tick := k.GetOrInitTick(goCtx, pair.PairId, msg.TickIndex)
+	tick, err := k.GetOrInitTick(goCtx, pair.PairId, msg.TickIndex)
+	if err != nil {
+		return err
+	}
 
 	tickIndex := msg.TickIndex
 	tokenIn := msg.TokenIn
@@ -733,17 +720,10 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	}
 
 	var priceLimitOutToIn sdk.Dec
-	var err error
 	if msg.KeyToken == token0 {
-		priceLimitOutToIn, err = CalcPrice1To0(msg.TickIndex)
-		if err != nil {
-			return err
-		}
+		priceLimitOutToIn = sdk.OneDec().Quo(*tick.Price0To1)
 	} else {
-		priceLimitOutToIn, err = CalcPrice0To1(msg.TickIndex)
-		if err != nil {
-			return err
-		}
+		priceLimitOutToIn = *tick.Price0To1
 	}
 	totalTokenInDec := sdk.NewDecFromInt(tranche.TotalTokenIn)
 	totalTokenOutDec := sdk.NewDecFromInt(tranche.TotalTokenOut)
@@ -828,17 +808,10 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 
 	var priceLimitInToOut sdk.Dec
 	var priceLimitOutToIn sdk.Dec
-	var err error
 	if orderTokenIn == token0 {
-		priceLimitInToOut, err = CalcPrice0To1(tick.TickIndex)
-		if err != nil {
-			return err
-		}
+		priceLimitInToOut = *tick.Price0To1
 	} else {
-		priceLimitInToOut, err = CalcPrice1To0(tick.TickIndex)
-		if err != nil {
-			return err
-		}
+		priceLimitInToOut = sdk.OneDec().Quo(*tick.Price0To1)
 	}
 	priceLimitOutToIn = sdk.OneDec().Quo(priceLimitInToOut)
 
