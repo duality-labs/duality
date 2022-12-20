@@ -149,17 +149,23 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLimitOrder) (*types.MsgPlaceLimitOrderResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, createrAddr, err := k.PlaceLimitOrderVerification(goCtx, *msg)
+	// validate msg
+	if err := msg.ValidateBasic(); err != nil {
+		return &types.MsgPlaceLimitOrderResponse{}, err
+	}
+	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 
+	// lexographically sort token0, token1
+	token0, token1, err := SortTokens(ctx, msg.TokenA, msg.TokenB)
 	if err != nil {
 		return &types.MsgPlaceLimitOrderResponse{}, err
 	}
 
-	err = k.PlaceLimitOrderCore(goCtx, msg, token0, token1, createrAddr)
-
+	err = k.PlaceLimitOrderCore(goCtx, msg, token0, token1, callerAddr)
 	if err != nil {
 		return &types.MsgPlaceLimitOrderResponse{}, err
 	}
+
 	_ = ctx
 
 	return &types.MsgPlaceLimitOrderResponse{}, nil

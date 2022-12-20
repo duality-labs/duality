@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderInSpread1To0() {
@@ -391,4 +392,18 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFilledLOPlaceLODoesntIncrementsP
 	// THEN
 	// fill and place tranche keys don't change
 	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderInsufficientFunds() {
+	// GIVEN
+	// alice has no funds
+	s.assertAliceBalances(0, 0)
+
+	// WHEN
+	// place limit order selling non zero amount of token A for token B
+	// THEN
+	// deposit should fail with InsufficientFunds error
+
+	err := sdkerrors.ErrInsufficientFunds
+	s.assertAliceLimitSellFails(err, "TokenA", 0, 10)
 }
