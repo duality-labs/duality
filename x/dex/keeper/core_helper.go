@@ -2,25 +2,13 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 	"math"
-	"strings"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const MaxTickExp uint64 = 1048575
-
-///////////////////////////////////////////////////////////////////////////////
-//                                   UTILS                                   //
-///////////////////////////////////////////////////////////////////////////////
-
-func CreateSharesId(token0 string, token1 string, tickIndex int64, feeIndex uint64) (denom string) {
-	t0 := strings.ReplaceAll(token0, "-", "")
-	t1 := strings.ReplaceAll(token1, "-", "")
-	return fmt.Sprintf("%s-%s-%s-t%d-f%d", types.DepositSharesPrefix, t0, t1, tickIndex, feeIndex)
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           GETTERS & INITIALIZERS                          //

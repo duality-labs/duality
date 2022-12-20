@@ -23860,16 +23860,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   /NicholasDotSol/duality/dex/fee_tier/{id}:
@@ -24039,16 +24029,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -24246,16 +24226,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -24514,16 +24484,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   /NicholasDotSol/duality/dex/tick/{pairId}/{tickIndex}:
@@ -24717,16 +24677,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   /NicholasDotSol/duality/dex/token_map/{address}:
@@ -24881,16 +24831,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -25061,16 +25001,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   /NicholasDotSol/duality/dex/trading_pair/{pairId}:
@@ -25120,6 +25050,202 @@ paths:
                   additionalProperties: {}
       parameters:
         - name: pairId
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/user/deposits/{address}:
+    get:
+      summary: Queries a list of UserDeposits items.
+      operationId: NicholasdotsolDualityDexUserDepositsAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              Deposits:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pairId:
+                      type: string
+                    sharesOwned:
+                      type: string
+                    centerTickIndex:
+                      type: string
+                      format: int64
+                    lowerTickIndex:
+                      type: string
+                      format: int64
+                    upperTickIndex:
+                      type: string
+                      format: int64
+                    feeIndex:
+                      type: string
+                      format: uint64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: address
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/user/limit_orders/{address}:
+    get:
+      summary: Queries a list of UserLimitOrders items.
+      operationId: NicholasdotsolDualityDexUserLimitOrdersAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              limitOrders:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pairId:
+                      type: string
+                    token:
+                      type: string
+                    tickIndex:
+                      type: string
+                      format: int64
+                    count:
+                      type: string
+                      format: uint64
+                    address:
+                      type: string
+                    sharesOwned:
+                      type: string
+                    sharesWithdrawn:
+                      type: string
+                    sharesCancelled:
+                      type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: address
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/user/positions/{address}:
+    get:
+      summary: Queries a list of GetUserPositions items.
+      operationId: NicholasdotsolDualityDexGetUserPositions
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              UserPositions:
+                type: object
+                properties:
+                  PoolDeposits:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        pairId:
+                          type: string
+                        sharesOwned:
+                          type: string
+                        centerTickIndex:
+                          type: string
+                          format: int64
+                        lowerTickIndex:
+                          type: string
+                          format: int64
+                        upperTickIndex:
+                          type: string
+                          format: int64
+                        feeIndex:
+                          type: string
+                          format: uint64
+                  LimitOrders:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        pairId:
+                          type: string
+                        token:
+                          type: string
+                        tickIndex:
+                          type: string
+                          format: int64
+                        count:
+                          type: string
+                          format: uint64
+                        address:
+                          type: string
+                        sharesOwned:
+                          type: string
+                        sharesWithdrawn:
+                          type: string
+                        sharesCancelled:
+                          type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: address
           in: path
           required: true
           type: string
@@ -44876,6 +45002,25 @@ definitions:
         type: string
         format: int64
     title: ValidatorUpdate
+  nicholasdotsol.duality.dex.DepositRecord:
+    type: object
+    properties:
+      pairId:
+        type: string
+      sharesOwned:
+        type: string
+      centerTickIndex:
+        type: string
+        format: int64
+      lowerTickIndex:
+        type: string
+        format: int64
+      upperTickIndex:
+        type: string
+        format: int64
+      feeIndex:
+        type: string
+        format: uint64
   nicholasdotsol.duality.dex.FeeTier:
     type: object
     properties:
@@ -45306,6 +45451,56 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
+  nicholasdotsol.duality.dex.QueryAllUserDepositsResponse:
+    type: object
+    properties:
+      Deposits:
+        type: array
+        items:
+          type: object
+          properties:
+            pairId:
+              type: string
+            sharesOwned:
+              type: string
+            centerTickIndex:
+              type: string
+              format: int64
+            lowerTickIndex:
+              type: string
+              format: int64
+            upperTickIndex:
+              type: string
+              format: int64
+            feeIndex:
+              type: string
+              format: uint64
+  nicholasdotsol.duality.dex.QueryAllUserLimitOrdersResponse:
+    type: object
+    properties:
+      limitOrders:
+        type: array
+        items:
+          type: object
+          properties:
+            pairId:
+              type: string
+            token:
+              type: string
+            tickIndex:
+              type: string
+              format: int64
+            count:
+              type: string
+              format: uint64
+            address:
+              type: string
+            sharesOwned:
+              type: string
+            sharesWithdrawn:
+              type: string
+            sharesCancelled:
+              type: string
   nicholasdotsol.duality.dex.QueryGetFeeTierResponse:
     type: object
     properties:
@@ -45450,6 +45645,56 @@ definitions:
           minTick:
             type: string
             format: int64
+  nicholasdotsol.duality.dex.QueryGetUserPositionsResponse:
+    type: object
+    properties:
+      UserPositions:
+        type: object
+        properties:
+          PoolDeposits:
+            type: array
+            items:
+              type: object
+              properties:
+                pairId:
+                  type: string
+                sharesOwned:
+                  type: string
+                centerTickIndex:
+                  type: string
+                  format: int64
+                lowerTickIndex:
+                  type: string
+                  format: int64
+                upperTickIndex:
+                  type: string
+                  format: int64
+                feeIndex:
+                  type: string
+                  format: uint64
+          LimitOrders:
+            type: array
+            items:
+              type: object
+              properties:
+                pairId:
+                  type: string
+                token:
+                  type: string
+                tickIndex:
+                  type: string
+                  format: int64
+                count:
+                  type: string
+                  format: uint64
+                address:
+                  type: string
+                sharesOwned:
+                  type: string
+                sharesWithdrawn:
+                  type: string
+                sharesCancelled:
+                  type: string
   nicholasdotsol.duality.dex.QueryParamsResponse:
     type: object
     properties:
@@ -45540,6 +45785,53 @@ definitions:
       minTick:
         type: string
         format: int64
+  nicholasdotsol.duality.dex.UserPositions:
+    type: object
+    properties:
+      PoolDeposits:
+        type: array
+        items:
+          type: object
+          properties:
+            pairId:
+              type: string
+            sharesOwned:
+              type: string
+            centerTickIndex:
+              type: string
+              format: int64
+            lowerTickIndex:
+              type: string
+              format: int64
+            upperTickIndex:
+              type: string
+              format: int64
+            feeIndex:
+              type: string
+              format: uint64
+      LimitOrders:
+        type: array
+        items:
+          type: object
+          properties:
+            pairId:
+              type: string
+            token:
+              type: string
+            tickIndex:
+              type: string
+              format: int64
+            count:
+              type: string
+              format: uint64
+            address:
+              type: string
+            sharesOwned:
+              type: string
+            sharesWithdrawn:
+              type: string
+            sharesCancelled:
+              type: string
   nicholasdotsol.duality.mev.MsgSendResponse:
     type: object
   nicholasdotsol.duality.mev.Params:
