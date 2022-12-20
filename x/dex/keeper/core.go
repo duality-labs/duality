@@ -83,7 +83,7 @@ func (k Keeper) DepositCore(
 		lowerTick := k.GetOrInitTick(goCtx, pairId, lowerTickIndex)
 		upperTick := k.GetOrInitTick(goCtx, pairId, upperTickIndex)
 
-		sharesId := k.CreateSharesId(token0, token1, tickIndex, fee)
+		sharesId := CreateSharesId(token0, token1, tickIndex, feeIndex)
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
 		pool, err := NewPool(
@@ -178,7 +178,7 @@ func (k Keeper) DepositCore(
 func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	pairId := k.CreatePairId(token0, token1)
+	pairId := CreatePairId(token0, token1)
 	pair, found := k.GetTradingPair(ctx, pairId)
 	if !found {
 		return types.ErrValidPairNotFound
@@ -203,7 +203,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			return types.ErrValidTickNotFound
 		}
 
-		sharesId := k.CreateSharesId(token0, token1, tickIndex, fee)
+		sharesId := CreateSharesId(token0, token1, tickIndex, feeIndex)
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
 		pool, err := NewPool(
@@ -287,7 +287,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 // Handles core logic for the asset 0 to asset1 direction of MsgSwap; faciliates swapping amount0 for some amount of amount1, given a specified pair (token0, token1)
 func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress) (sdk.Int, sdk.Int, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	pairId := k.CreatePairId(token0, token1)
+	pairId := CreatePairId(token0, token1)
 	feeSize := k.GetFeeTierCount(ctx)
 	FeeTier := k.GetAllFeeTier(ctx)
 	pair, pairFound := k.GetTradingPair(ctx, pairId)
@@ -378,7 +378,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 // Handles core logic for the asset 1 to asset 0 direction of MsgSwap; faciliates swapping amount1 for some amount of amount0, given a specified pair (token0, token1)
 func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress) (sdk.Int, sdk.Int, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	pairId := k.CreatePairId(token0, token1)
+	pairId := CreatePairId(token0, token1)
 	feeSize := k.GetFeeTierCount(ctx)
 	FeeTier := k.GetAllFeeTier(ctx)
 	pair, found := k.GetTradingPair(ctx, pairId)
@@ -715,7 +715,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancelLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	pairId := k.CreatePairId(token0, token1)
+	pairId := CreatePairId(token0, token1)
 
 	tick, tickFound := k.GetTick(ctx, pairId, msg.TickIndex)
 	if !tickFound {
@@ -792,7 +792,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	receiverAddr sdk.AccAddress,
 ) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	pairId := k.CreatePairId(token0, token1)
+	pairId := CreatePairId(token0, token1)
 
 	orderTokenIn := msg.KeyToken
 	var orderTokenOut string

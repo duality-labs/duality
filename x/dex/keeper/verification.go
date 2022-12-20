@@ -52,12 +52,10 @@ func (k Keeper) WithdrawlVerification(goCtx context.Context, msg types.MsgWithdr
 		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Not a valid decimal type: %s", err)
 	}
 
-	FeeTier := k.GetAllFeeTier(ctx)
 	// count total shares to remove from each pair:tickIndex,feeIndex
 	totalSharesIn := make(map[string]sdk.Int)
 	for i, sharesToRemove := range msg.SharesToRemove {
-		fee := FeeTier[msg.FeeIndexes[i]].Fee
-		sharesId := k.CreateSharesId(token0, token1, msg.TickIndexes[i], fee)
+		sharesId := CreateSharesId(token0, token1, msg.TickIndexes[i], msg.FeeIndexes[i])
 		if accum, ok := totalSharesIn[sharesId]; !ok {
 			totalSharesIn[sharesId] = sharesToRemove
 		} else {
@@ -184,7 +182,7 @@ func (k Keeper) WithdrawLimitOrderVerification(goCtx context.Context, msg types.
 		return "", "", nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
-	pairId := k.CreatePairId(token0, token1)
+	pairId := CreatePairId(token0, token1)
 
 	shares, sharesFound := k.GetLimitOrderTrancheUser(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Receiver)
 	if !sharesFound {
@@ -225,7 +223,7 @@ func (k Keeper) CancelLimitOrderVerification(goCtx context.Context, msg types.Ms
 	}
 
 	// createPairId (token0/ token1)
-	pairId := k.CreatePairId(token0, token1)
+	pairId := CreatePairId(token0, token1)
 
 	shares, sharesFound := k.GetLimitOrderTrancheUser(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
 
