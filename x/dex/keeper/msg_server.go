@@ -28,6 +28,7 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 		return nil, err
 	}
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
+	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
 	// lexographically sort token0, token1
 	token0, token1, err := SortTokens(ctx, msg.TokenA, msg.TokenB)
@@ -43,6 +44,7 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 		token0,
 		token1,
 		callerAddr,
+		receiverAddr,
 		amounts0,
 		amounts1,
 	)
