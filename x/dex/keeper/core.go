@@ -810,8 +810,10 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	if !found {
 		return types.ErrValidLimitOrderMapsNotFound
 	}
+	sharesToWithdraw := trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled)
+
 	// checks that the user has some number of limit order shares wished to withdraw
-	if trancheUser.SharesOwned.LTE(sdk.ZeroInt()) {
+	if sharesToWithdraw.LTE(sdk.ZeroInt()) {
 		return sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
 	}
 
@@ -833,8 +835,8 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	amountFilled := priceLimitOutToIn.MulInt(tranche.TotalTokenOut)
 	ratioFilled := amountFilled.QuoInt(tranche.TotalTokenIn)
 	maxAllowedToWithdraw := sdk.MinInt(
-		ratioFilled.MulInt(trancheUser.SharesOwned).TruncateInt(), // cannot withdraw more than what's been filled
-		trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled),  // cannot withdraw more than what you own
+		ratioFilled.MulInt(sharesToWithdraw).TruncateInt(), // cannot withdraw more than what's been filled
+		sharesToWithdraw, // cannot withdraw more than what you own
 	)
 	amountOutTokenIn := maxAllowedToWithdraw.Sub(trancheUser.SharesWithdrawn)
 
