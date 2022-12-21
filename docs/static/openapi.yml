@@ -24420,6 +24420,8 @@ paths:
                         placeTrancheIndex:
                           type: string
                           format: uint64
+                    price0To1:
+                      type: string
               pagination:
                 type: object
                 properties:
@@ -24571,6 +24573,8 @@ paths:
                       placeTrancheIndex:
                         type: string
                         format: uint64
+                  price0To1:
+                    type: string
         default:
           description: An unexpected error response.
           schema:
@@ -45116,6 +45120,8 @@ definitions:
                 placeTrancheIndex:
                   type: string
                   format: uint64
+            price0To1:
+              type: string
       pagination:
         type: object
         properties:
@@ -45364,6 +45370,8 @@ definitions:
               placeTrancheIndex:
                 type: string
                 format: uint64
+          price0To1:
+            type: string
   nicholasdotsol.duality.dex.QueryGetTokenMapResponse:
     type: object
     properties:
@@ -45450,6 +45458,8 @@ definitions:
           placeTrancheIndex:
             type: string
             format: uint64
+      price0To1:
+        type: string
   nicholasdotsol.duality.dex.TickDataType:
     type: object
     properties:
