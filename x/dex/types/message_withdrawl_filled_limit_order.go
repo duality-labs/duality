@@ -47,5 +47,15 @@ func (msg *MsgWithdrawFilledLimitOrder) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	_, err = sdk.AccAddressFromBech32(msg.Receiver)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+	}
+
+	if msg.KeyToken != msg.TokenA && msg.KeyToken != msg.TokenB {
+		return sdkerrors.Wrapf(ErrInvalidTradingPair, "KeyToken must be either TokenA or TokenB")
+	}
+
 	return nil
 }
