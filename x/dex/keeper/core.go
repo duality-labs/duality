@@ -719,6 +719,10 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	if !found {
 		return types.ErrValidLimitOrderMapsNotFound
 	}
+	// checks that the user has some number of limit order shares wished to withdraw
+	if trancheUser.SharesOwned.LTE(sdk.ZeroInt()) {
+		return sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
+	}
 
 	tranche, found := k.GetLimitOrderTranche(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 	if !found {
