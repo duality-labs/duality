@@ -174,13 +174,20 @@ func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLim
 func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.MsgWithdrawFilledLimitOrder) (*types.MsgWithdrawFilledLimitOrderResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, createrAddr, receiverAddr, err := k.WithdrawLimitOrderVerification(goCtx, *msg)
+	// validate msg
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
+	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
+	// lexographically sort token0, token1
+	token0, token1, err := SortTokens(ctx, msg.TokenA, msg.TokenB)
 	if err != nil {
-		return &types.MsgWithdrawFilledLimitOrderResponse{}, err
+		return nil, err
 	}
 
-	err = k.WithdrawFilledLimitOrderCore(goCtx, msg, token0, token1, createrAddr, receiverAddr)
+	err = k.WithdrawFilledLimitOrderCore(goCtx, msg, token0, token1, callerAddr, receiverAddr)
 
 	if err != nil {
 		return &types.MsgWithdrawFilledLimitOrderResponse{}, err

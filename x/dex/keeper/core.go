@@ -806,6 +806,10 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	if !found {
 		return types.ErrValidLimitOrderMapsNotFound
 	}
+	// checks that the user has some number of limit order shares wished to withdraw
+	if trancheUser.SharesOwned.LTE(sdk.ZeroInt()) {
+		return sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
+	}
 
 	tick, found := k.GetTick(ctx, pairId, msg.TickIndex)
 	if !found {
