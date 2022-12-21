@@ -50,7 +50,7 @@ func TestMsgPlaceLimitOrder_ValidateBasic(t *testing.T) {
 				TokenIn:   "TokenC",
 				AmountIn:  sdk.OneInt(),
 			},
-			err: sdkerrors.ErrInvalidType,
+			err: ErrInvalidTradingPair,
 		}, {
 			name: "valid msg",
 			msg: MsgPlaceLimitOrder{
