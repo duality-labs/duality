@@ -281,7 +281,7 @@ func (s *MsgServerTestSuite) assertLimitSellFails(account sdk.AccAddress, expect
 		TokenIn:   tokenIn,
 		AmountIn:  sdk.NewInt(int64(amountIn)),
 	})
-	s.Assert().ErrorIs(expectedErr, err)
+	s.Assert().ErrorIs(err, expectedErr)
 }
 
 type Deposit struct {
@@ -554,7 +554,7 @@ func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr
 		AmountIn: sdk.NewInt(int64(amountIn)),
 		MinOut:   sdk.NewInt(int64(minOut)),
 	})
-	s.Assert().ErrorIs(expectedErr, err)
+	s.Assert().ErrorIs(err, expectedErr)
 }
 
 func (s *MsgServerTestSuite) withdrawsLimitSell(account sdk.AccAddress, selling string, tick int, tranche int) {
@@ -596,7 +596,7 @@ func (s *MsgServerTestSuite) withdrawLimitSellFails(account sdk.AccAddress, expe
 		KeyToken:  selling,
 		Key:       uint64(tranche),
 	})
-	s.Assert().ErrorIs(expectedErr, err)
+	s.Assert().ErrorIs(err, expectedErr)
 }
 
 func (s *MsgServerTestSuite) aliceWithdrawLimitSellFails(expectedErr error, selling string, tick int, tranche int) {

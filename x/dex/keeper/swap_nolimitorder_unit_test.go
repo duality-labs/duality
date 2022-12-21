@@ -105,7 +105,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceReached
 	// swap 20 of token A for B with minOut 15
 	// THEN
 	// swap should fail with ErrNotEnoughCoins error
-	err := types.ErrNotEnoughCoins
+	err := types.ErrNotEnoughLiquidity
 	s.bobMarketSellFails(err, "TokenB", 20, 15)
 }
 
