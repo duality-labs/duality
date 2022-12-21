@@ -834,10 +834,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	reservesTokenOutDec := sdk.NewDecFromInt(tranche.ReservesTokenOut)
 	amountFilled := priceLimitOutToIn.MulInt(tranche.TotalTokenOut)
 	ratioFilled := amountFilled.QuoInt(tranche.TotalTokenIn)
-	maxAllowedToWithdraw := sdk.MinInt(
-		ratioFilled.MulInt(sharesToWithdraw).TruncateInt(), // cannot withdraw more than what's been filled
-		sharesToWithdraw, // cannot withdraw more than what you own
-	)
+	maxAllowedToWithdraw := ratioFilled.MulInt(sharesToWithdraw).TruncateInt()
 	amountOutTokenIn := maxAllowedToWithdraw.Sub(trancheUser.SharesWithdrawn)
 
 	amountOutTokenOut := priceLimitInToOut.MulInt(amountOutTokenIn)
