@@ -23,6 +23,7 @@ func (k Keeper) DepositCore(
 	token0 string,
 	token1 string,
 	callerAddr sdk.AccAddress,
+	receiverAddr sdk.AccAddress,
 	amounts0 []sdk.Int,
 	amounts1 []sdk.Int,
 ) (amounts0Deposit []sdk.Int, amounts1Deposit []sdk.Int, err error) {
@@ -100,7 +101,7 @@ func (k Keeper) DepositCore(
 		inAmount0, inAmount1, outShares := pool.Deposit(amount0, amount1, totalShares)
 		pool.Save(goCtx, k)
 		if outShares.GT(sdk.ZeroInt()) { // update shares accounting
-			if err := k.MintShares(ctx, callerAddr, outShares, sharesId); err != nil {
+			if err := k.MintShares(ctx, receiverAddr, outShares, sharesId); err != nil {
 				return nil, nil, err
 			}
 		}
