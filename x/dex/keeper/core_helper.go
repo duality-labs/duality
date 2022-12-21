@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"strings"
 
@@ -15,10 +16,10 @@ const MaxTickExp uint64 = 1048575
 //                                   UTILS                                   //
 ///////////////////////////////////////////////////////////////////////////////
 
-func PairToTokens(pairId string) (token0 string, token1 string) {
-	tokens := strings.Split(pairId, "<>")
-
-	return tokens[0], tokens[1]
+func CreateSharesId(token0 string, token1 string, tickIndex int64, feeIndex uint64) (denom string) {
+	t0 := strings.ReplaceAll(token0, "-", "")
+	t1 := strings.ReplaceAll(token1, "-", "")
+	return fmt.Sprintf("%s-%s-%s-t%d-f%d", types.DepositSharesPrefix, t0, t1, tickIndex, feeIndex)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -42,7 +43,7 @@ func (k Keeper) GetOrInitPair(goCtx context.Context, token0 string, token1 strin
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	k.TokenInit(ctx, token0)
 	k.TokenInit(ctx, token1)
-	pairId := k.CreatePairId(token0, token1)
+	pairId := CreatePairId(token0, token1)
 	pair, found := k.GetTradingPair(ctx, pairId)
 	if !found {
 		pair = types.TradingPair{
@@ -57,35 +58,47 @@ func (k Keeper) GetOrInitPair(goCtx context.Context, token0 string, token1 strin
 	return pair
 }
 
-func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex int64) types.Tick {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	tick, tickFound := k.GetTick(ctx, pairId, tickIndex)
-	if !tickFound {
-		numFees := k.GetFeeTierCount(ctx)
-		tick = types.Tick{
-			PairId:    pairId,
-			TickIndex: tickIndex,
-			TickData: &types.TickDataType{
-				// TODO: clean up tickdata proto
-				Reserve0: make([]sdk.Int, numFees),
-				Reserve1: make([]sdk.Int, numFees),
-			},
-			LimitOrderTranche0To1: &types.LimitTrancheIndexes{0, 0},
-			LimitOrderTranche1To0: &types.LimitTrancheIndexes{0, 0},
-		}
-		for i := 0; i < int(numFees); i++ {
-			// TODO: clean up tickdata proto
-			tick.TickData.Reserve0[i] = sdk.ZeroInt()
-			tick.TickData.Reserve1[i] = sdk.ZeroInt()
-		}
-		k.SetTick(ctx, pairId, tick)
-
-		token0, token1 := PairToTokens(pairId)
-		k.GetOrInitLimitOrderTranche(ctx, pairId, tickIndex, token0, 0)
-		k.GetOrInitLimitOrderTranche(ctx, pairId, tickIndex, token1, 0)
+func (k Keeper) InitTick(ctx sdk.Context, pairId string, tickIndex int64) (types.Tick, error) {
+	price0To1, err := CalcPrice0To1(tickIndex)
+	if err != nil {
+		return types.Tick{}, err
 	}
-	return tick
+
+	numFees := k.GetFeeTierCount(ctx)
+	tick := types.Tick{
+		PairId:    pairId,
+		TickIndex: tickIndex,
+		Price0To1: &price0To1,
+		TickData: &types.TickDataType{
+			// TODO: clean up tickdata proto
+			Reserve0: make([]sdk.Int, numFees),
+			Reserve1: make([]sdk.Int, numFees),
+		},
+		LimitOrderTranche0To1: &types.LimitTrancheIndexes{0, 0},
+		LimitOrderTranche1To0: &types.LimitTrancheIndexes{0, 0},
+	}
+	for i := 0; i < int(numFees); i++ {
+		// TODO: clean up tickdata proto
+		tick.TickData.Reserve0[i] = sdk.ZeroInt()
+		tick.TickData.Reserve1[i] = sdk.ZeroInt()
+	}
+	k.SetTick(ctx, pairId, tick)
+
+	token0, token1 := PairToTokens(pairId)
+	k.GetOrInitLimitOrderTranche(ctx, pairId, tickIndex, token0, 0)
+	k.GetOrInitLimitOrderTranche(ctx, pairId, tickIndex, token1, 0)
+
+	return tick, nil
+}
+
+func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex int64) (types.Tick, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	tick, tickFound := k.GetTick(ctx, pairId, tickIndex)
+	if tickFound {
+		return tick, nil
+	} else {
+		return k.InitTick(ctx, pairId, tickIndex)
+	}
 }
 
 func (k Keeper) GetOrInitLimitOrderTrancheUser(
@@ -261,12 +274,23 @@ func CalcTrueAmounts(
 	}
 	return
 }
+func IsTickOutOfRange(tickIndex int64) bool {
+	absTickIndex := Abs(tickIndex)
+	return absTickIndex > MaxTickExp
+}
+
+func MustCalcPrice0To1(tickIndex int64) sdk.Dec {
+	price, err := CalcPrice0To1(tickIndex)
+	if err != nil {
+		panic(err)
+	}
+	return price
+}
 
 // Calculates the price for a swap from token 0 to token 1 given a tick
 // tickIndex refers to the index of a specified tick
 func CalcPrice0To1(tickIndex int64) (sdk.Dec, error) {
-	absTickIndex := Abs(tickIndex)
-	if absTickIndex > MaxTickExp {
+	if IsTickOutOfRange(tickIndex) {
 		return sdk.ZeroDec(), types.ErrTickOutsideRange
 	}
 
@@ -277,11 +301,19 @@ func CalcPrice0To1(tickIndex int64) (sdk.Dec, error) {
 	}
 }
 
+func MustCalcPrice1To0(tickIndex int64) sdk.Dec {
+	price, err := CalcPrice1To0(tickIndex)
+	if err != nil {
+		panic(err)
+	}
+	return price
+}
+
 // Calculates the price for a swap from token 1 to token 0 given a tick
 // tickIndex refers to the index of a specified tick
 func CalcPrice1To0(tickIndex int64) (sdk.Dec, error) {
-	absTickIndex := Abs(tickIndex)
-	if absTickIndex > MaxTickExp {
+
+	if IsTickOutOfRange(tickIndex) {
 		return sdk.ZeroDec(), types.ErrTickOutsideRange
 	}
 
@@ -495,6 +527,10 @@ func (k Keeper) UpdateTickPointersPostRemoveToken1(goCtx context.Context, pair *
 		k.SetTradingPair(ctx, *newPair)
 	}
 }
+
+///////////////////////////////////////////////////////////////////////////////
+//                            TOKENIZER UTILS                                //
+///////////////////////////////////////////////////////////////////////////////
 
 func (k Keeper) MintShares(ctx sdk.Context, addr sdk.AccAddress, amount sdk.Int, sharesId string) error {
 	// mint share tokens
