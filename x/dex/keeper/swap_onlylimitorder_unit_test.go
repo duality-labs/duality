@@ -13,6 +13,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLONoLiquidity() {
 	// GIVEN
 	// no liqudity of token A (place LO only for token B at tick 0 fee 1)
 	s.aliceLimitSells("TokenB", 1, 10)
+
 	s.assertLimitLiquidityAtTick("TokenB", 1, 10)
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
@@ -549,5 +550,5 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOUnfilledLOSwapIncrementsFillKey() {
 
 	// THEN
 	// place increased
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
 }

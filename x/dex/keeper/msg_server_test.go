@@ -793,8 +793,8 @@ func (s *MsgServerTestSuite) assertLiquidityAtTickInt(amountA sdk.Int, amountB s
 		// s.Require().Fail("Invalid tick %d and fee %d", tickIndex, fee)
 	}
 
-	s.Assert().Equal(amountA, liquidityA)
-	s.Assert().Equal(amountB, liquidityB)
+	s.Assert().True(amountA.Equal(liquidityA), "liquidity A: actual %s, expected %s", liquidityA, amountA)
+	s.Assert().True(amountB.Equal(liquidityB), "liquidity B: actual %s, expected %s", liquidityB, amountB)
 }
 
 func (s *MsgServerTestSuite) assertPoolLiquidity(amountA int, amountB int, tickIndex int64, feeIndex uint64) {
