@@ -363,7 +363,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderPartiallyFilledLOPlaceLOIncremen
 	// partially filled limit order exists on tick -1
 	s.aliceLimitSells("TokenA", -1, 10)
 	s.bobMarketSells("TokenB", 5, 0)
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
 
 	// WHEN
 	// placing order on same tick

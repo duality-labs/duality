@@ -1112,7 +1112,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/auth/v1beta1/accounts/{address}':
+  /cosmos/auth/v1beta1/accounts/{address}:
     get:
       summary: Account returns account details based on address.
       operationId: CosmosAuthV1Beta1Account
@@ -1708,7 +1708,7 @@ paths:
         - Query
   /cosmos/authz/v1beta1/grants:
     get:
-      summary: 'Returns list of `Authorization`, granted to the grantee by the granter.'
+      summary: Returns list of `Authorization`, granted to the grantee by the granter.
       operationId: CosmosAuthzV1Beta1Grants
       responses:
         '200':
@@ -2185,7 +2185,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/authz/v1beta1/grants/grantee/{grantee}':
+  /cosmos/authz/v1beta1/grants/grantee/{grantee}:
     get:
       summary: GranteeGrants returns a list of `GrantAuthorization` by grantee.
       description: 'Since: cosmos-sdk 0.45.2'
@@ -2659,9 +2659,9 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/authz/v1beta1/grants/granter/{granter}':
+  /cosmos/authz/v1beta1/grants/granter/{granter}:
     get:
-      summary: 'GranterGrants returns list of `GrantAuthorization`, granted by granter.'
+      summary: GranterGrants returns list of `GrantAuthorization`, granted by granter.
       description: 'Since: cosmos-sdk 0.45.2'
       operationId: CosmosAuthzV1Beta1GranterGrants
       responses:
@@ -3133,7 +3133,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/bank/v1beta1/balances/{address}':
+  /cosmos/bank/v1beta1/balances/{address}:
     get:
       summary: AllBalances queries the balance of all coins for a single account.
       operationId: CosmosBankV1Beta1AllBalances
@@ -3266,7 +3266,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/bank/v1beta1/balances/{address}/by_denom':
+  /cosmos/bank/v1beta1/balances/{address}/by_denom:
     get:
       summary: Balance queries the balance of a single coin for a single account.
       operationId: CosmosBankV1Beta1Balance
@@ -3513,7 +3513,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/bank/v1beta1/denoms_metadata/{denom}':
+  /cosmos/bank/v1beta1/denoms_metadata/{denom}:
     get:
       summary: DenomsMetadata queries the client metadata of a given coin denomination.
       operationId: CosmosBankV1Beta1DenomMetadata
@@ -3678,7 +3678,7 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  '/cosmos/bank/v1beta1/spendable_balances/{address}':
+  /cosmos/bank/v1beta1/spendable_balances/{address}:
     get:
       summary: |-
         SpendableBalances queries the spenable balance of all coins for a single
@@ -3944,7 +3944,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/bank/v1beta1/supply/{denom}':
+  /cosmos/bank/v1beta1/supply/{denom}:
     get:
       summary: SupplyOf queries the supply of a single coin.
       operationId: CosmosBankV1Beta1SupplyOf
@@ -4778,7 +4778,7 @@ paths:
                         }
       tags:
         - Service
-  '/cosmos/base/tendermint/v1beta1/blocks/{height}':
+  /cosmos/base/tendermint/v1beta1/blocks/{height}:
     get:
       summary: GetBlockByHeight queries block for given height.
       operationId: CosmosBaseTendermintV1Beta1GetBlockByHeight
@@ -6502,7 +6502,7 @@ paths:
           type: boolean
       tags:
         - Service
-  '/cosmos/base/tendermint/v1beta1/validatorsets/{height}':
+  /cosmos/base/tendermint/v1beta1/validatorsets/{height}:
     get:
       summary: GetValidatorSetByHeight queries validator-set at a given height.
       operationId: CosmosBaseTendermintV1Beta1GetValidatorSetByHeight
@@ -7427,7 +7427,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/evidence/v1beta1/evidence/{evidence_hash}':
+  /cosmos/evidence/v1beta1/evidence/{evidence_hash}:
     get:
       summary: Evidence queries evidence based on evidence hash.
       operationId: CosmosEvidenceV1Beta1Evidence
@@ -7803,7 +7803,7 @@ paths:
           format: byte
       tags:
         - Query
-  '/cosmos/feegrant/v1beta1/allowance/{granter}/{grantee}':
+  /cosmos/feegrant/v1beta1/allowance/{granter}/{grantee}:
     get:
       summary: Allowance returns fee granted to the grantee by the granter.
       operationId: CosmosFeegrantV1Beta1Allowance
@@ -8098,7 +8098,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/feegrant/v1beta1/allowances/{grantee}':
+  /cosmos/feegrant/v1beta1/allowances/{grantee}:
     get:
       summary: Allowances returns all the grants for address.
       operationId: CosmosFeegrantV1Beta1Allowances
@@ -8461,7 +8461,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/feegrant/v1beta1/issued/{granter}':
+  /cosmos/feegrant/v1beta1/issued/{granter}:
     get:
       summary: |-
         AllowancesByGranter returns all the grants given by an address
@@ -9107,7 +9107,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/cosmos/slashing/v1beta1/signing_infos/{cons_address}':
+  /cosmos/slashing/v1beta1/signing_infos/{cons_address}:
     get:
       summary: SigningInfo queries the signing info of given cons address
       operationId: CosmosSlashingV1Beta1SigningInfo
@@ -9781,7 +9781,7 @@ paths:
                     description: Response code.
                   data:
                     type: string
-                    description: 'Result bytes, if any.'
+                    description: Result bytes, if any.
                   raw_log:
                     type: string
                     description: >-
@@ -10313,7 +10313,7 @@ paths:
               RPC method.
       tags:
         - Service
-  '/cosmos/tx/v1beta1/txs/block/{height}':
+  /cosmos/tx/v1beta1/txs/block/{height}:
     get:
       summary: GetBlockWithTxs fetches a block with decoded txs.
       description: 'Since: cosmos-sdk 0.45.2'
@@ -10573,7 +10573,7 @@ paths:
           type: boolean
       tags:
         - Service
-  '/cosmos/tx/v1beta1/txs/{hash}':
+  /cosmos/tx/v1beta1/txs/{hash}:
     get:
       summary: GetTx fetches a tx by hash.
       operationId: CosmosTxV1Beta1GetTx
@@ -10769,13 +10769,13 @@ paths:
                         }
       parameters:
         - name: hash
-          description: 'hash is the tx hash to query, encoded as a hex string.'
+          description: hash is the tx hash to query, encoded as a hex string.
           in: path
           required: true
           type: string
       tags:
         - Service
-  '/cosmos/upgrade/v1beta1/applied_plan/{name}':
+  /cosmos/upgrade/v1beta1/applied_plan/{name}:
     get:
       summary: AppliedPlan queries a previously applied upgrade plan by its name.
       operationId: CosmosUpgradeV1Beta1AppliedPlan
@@ -11646,7 +11646,7 @@ paths:
           type: string
       tags:
         - Query
-  '/cosmos/upgrade/v1beta1/upgraded_consensus_state/{last_height}':
+  /cosmos/upgrade/v1beta1/upgraded_consensus_state/{last_height}:
     get:
       summary: >-
         UpgradedConsensusState queries the consensus state that will serve
@@ -11961,7 +11961,7 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  '/ibc/apps/transfer/v1/denom_hashes/{trace}':
+  /ibc/apps/transfer/v1/denom_hashes/{trace}:
     get:
       summary: DenomHash queries a denomination hash information.
       operationId: IbcApplicationsTransferV1DenomHash
@@ -12166,7 +12166,7 @@ paths:
                         }
       parameters:
         - name: trace
-          description: 'The denomination trace ([port_id]/[channel_id])+/[denom]'
+          description: The denomination trace ([port_id]/[channel_id])+/[denom]
           in: path
           required: true
           type: string
@@ -12460,7 +12460,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/ibc/apps/transfer/v1/denom_traces/{hash}':
+  /ibc/apps/transfer/v1/denom_traces/{hash}:
     get:
       summary: DenomTrace queries a denomination trace information.
       operationId: IbcApplicationsTransferV1DenomTrace
@@ -13288,7 +13288,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}:
     get:
       summary: Channel queries an IBC Channel.
       operationId: IbcCoreChannelV1Channel
@@ -13611,7 +13611,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/client_state':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/client_state:
     get:
       summary: >-
         ChannelClientState queries for the client state for the channel
@@ -14045,7 +14045,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/consensus_state/revision/{revision_number}/height/{revision_height}':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/consensus_state/revision/{revision_number}/height/{revision_height}:
     get:
       summary: |-
         ChannelConsensusState queries for the consensus state for the channel
@@ -14476,7 +14476,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/next_sequence':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/next_sequence:
     get:
       summary: >-
         NextSequenceReceive returns the next receive sequence for a given
@@ -14726,7 +14726,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acknowledgements':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acknowledgements:
     get:
       summary: >-
         PacketAcknowledgements returns all the packet acknowledgements
@@ -15082,7 +15082,7 @@ paths:
           collectionFormat: multi
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acks/{sequence}':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acks/{sequence}:
     get:
       summary: PacketAcknowledgement queries a stored packet acknowledgement hash.
       operationId: IbcCoreChannelV1PacketAcknowledgement
@@ -15340,7 +15340,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments:
     get:
       summary: |-
         PacketCommitments returns all the packet commitments hashes associated
@@ -15685,7 +15685,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_ack_sequences}/unreceived_acks':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_ack_sequences}/unreceived_acks:
     get:
       summary: >-
         UnreceivedAcks returns all the unreceived IBC acknowledgements
@@ -15945,7 +15945,7 @@ paths:
           minItems: 1
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_commitment_sequences}/unreceived_packets':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_commitment_sequences}/unreceived_packets:
     get:
       summary: >-
         UnreceivedPackets returns all the unreceived IBC packets associated with
@@ -16205,7 +16205,7 @@ paths:
           minItems: 1
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{sequence}':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{sequence}:
     get:
       summary: PacketCommitment queries a stored packet commitment hash.
       operationId: IbcCoreChannelV1PacketCommitment
@@ -16464,7 +16464,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_receipts/{sequence}':
+  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_receipts/{sequence}:
     get:
       summary: >-
         PacketReceipt queries if a given packet sequence has been received on
@@ -16726,7 +16726,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/ibc/core/channel/v1/connections/{connection}/channels':
+  /ibc/core/channel/v1/connections/{connection}/channels:
     get:
       summary: |-
         ConnectionChannels queries all the channels associated with a connection
@@ -17797,7 +17797,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/ibc/core/client/v1/client_states/{client_id}':
+  /ibc/core/client/v1/client_states/{client_id}:
     get:
       summary: ClientState queries an IBC light client.
       operationId: IbcCoreClientV1ClientState
@@ -18211,7 +18211,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/client/v1/client_status/{client_id}':
+  /ibc/core/client/v1/client_status/{client_id}:
     get:
       summary: Status queries the status of an IBC client.
       operationId: IbcCoreClientV1ClientStatus
@@ -18421,7 +18421,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/client/v1/consensus_states/{client_id}':
+  /ibc/core/client/v1/consensus_states/{client_id}:
     get:
       summary: |-
         ConsensusStates queries all the consensus state associated with a given
@@ -18919,7 +18919,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/ibc/core/client/v1/consensus_states/{client_id}/revision/{revision_number}/height/{revision_height}':
+  /ibc/core/client/v1/consensus_states/{client_id}/revision/{revision_number}/height/{revision_height}:
     get:
       summary: >-
         ConsensusState queries a consensus state associated with a client state
@@ -20097,7 +20097,7 @@ paths:
                         }
       tags:
         - Query
-  '/ibc/core/connection/v1/client_connections/{client_id}':
+  /ibc/core/connection/v1/client_connections/{client_id}:
     get:
       summary: |-
         ClientConnections queries the connection paths associated with a client
@@ -20736,7 +20736,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/ibc/core/connection/v1/connections/{connection_id}':
+  /ibc/core/connection/v1/connections/{connection_id}:
     get:
       summary: Connection queries an IBC connection end.
       operationId: IbcCoreConnectionV1Connection
@@ -21073,7 +21073,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/connection/v1/connections/{connection_id}/client_state':
+  /ibc/core/connection/v1/connections/{connection_id}/client_state:
     get:
       summary: |-
         ConnectionClientState queries the client state associated with the
@@ -21500,7 +21500,7 @@ paths:
           type: string
       tags:
         - Query
-  '/ibc/core/connection/v1/connections/{connection_id}/consensus_state/revision/{revision_number}/height/{revision_height}':
+  /ibc/core/connection/v1/connections/{connection_id}/consensus_state/revision/{revision_number}/height/{revision_height}:
     get:
       summary: |-
         ConnectionConsensusState queries the consensus state associated with the
@@ -22155,6 +22155,1598 @@ paths:
                         }
       tags:
         - Query
+  /interchain_security/ccv/provider/consumer_chain_start_proposals:
+    get:
+      summary: QueryConsumerChainStarts queries consumer chain start proposals.
+      operationId: InterchainSecurityCcvProviderV1QueryConsumerChainStarts
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              proposals:
+                type: object
+                properties:
+                  pending:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                          title: the title of the proposal
+                        description:
+                          type: string
+                          title: the description of the proposal
+                        chain_id:
+                          type: string
+                          description: >-
+                            the proposed chain-id of the new consumer chain,
+                            must be different from all other consumer chain ids
+                            of the executing
+
+                            provider chain.
+                        initial_height:
+                          description: >-
+                            the proposed initial height of new consumer chain.
+
+                            For a completely new chain, this will be {0,1}.
+                            However, it may be different if this is a chain that
+                            is converting to a consumer chain.
+                          type: object
+                          properties:
+                            revision_number:
+                              type: string
+                              format: uint64
+                              title: the revision that the client is currently on
+                            revision_height:
+                              type: string
+                              format: uint64
+                              title: the height within the given revision
+                          title: >-
+                            Height is a monotonically increasing data type
+
+                            that can be compared against another Height for the
+                            purposes of updating and
+
+                            freezing clients
+                        genesis_hash:
+                          type: string
+                          format: byte
+                          description: genesis hash with no staking information included.
+                        binary_hash:
+                          type: string
+                          format: byte
+                          description: >-
+                            binary hash is the hash of the binary that should be
+                            used by validators on chain initialization.
+                        spawn_time:
+                          type: string
+                          format: date-time
+                          description: >-
+                            spawn time is the time on the provider chain at
+                            which the consumer chain genesis is finalized and
+                            all validators
+
+                            will be responsible for starting their consumer
+                            chain validator node.
+                        lock_unbonding_on_timeout:
+                          type: boolean
+                          description: >-
+                            Indicates whether the outstanding unbonding
+                            operations should be released
+
+                            in case of a channel time-outs. When set to true, a
+                            governance proposal
+
+                            on the provider chain would be necessary to release
+                            the locked funds.
+                      description: >-
+                        ConsumerAdditionProposal is a governance proposal on the
+                        provider chain to spawn a new consumer chain.
+
+                        If it passes, then all validators on the provider chain
+                        are expected to validate the consumer chain at spawn
+                        time
+
+                        or get slashed. It is recommended that spawn time occurs
+                        after the proposal end time.
+                    title: proposals waiting for spawn_time to pass
+                description: >-
+                  ConsumerAdditionProposals holds pending governance proposals
+                  on the provider chain to spawn a new chain.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                      description: >-
+                        A URL/resource name that uniquely identifies the type of
+                        the serialized
+
+                        protocol buffer message. This string must contain at
+                        least
+
+                        one "/" character. The last segment of the URL's path
+                        must represent
+
+                        the fully qualified name of the type (as in
+
+                        `path/google.protobuf.Duration`). The name should be in
+                        a canonical form
+
+                        (e.g., leading "." is not accepted).
+
+
+                        In practice, teams usually precompile into the binary
+                        all types that they
+
+                        expect it to use in the context of Any. However, for
+                        URLs which use the
+
+                        scheme `http`, `https`, or no scheme, one can optionally
+                        set up a type
+
+                        server that maps type URLs to message definitions as
+                        follows:
+
+
+                        * If no scheme is provided, `https` is assumed.
+
+                        * An HTTP GET on the URL must yield a
+                        [google.protobuf.Type][]
+                          value in binary format, or produce an error.
+                        * Applications are allowed to cache lookup results based
+                        on the
+                          URL, or have them precompiled into a binary to avoid any
+                          lookup. Therefore, binary compatibility needs to be preserved
+                          on changes to types. (Use versioned type names to manage
+                          breaking changes.)
+
+                        Note: this functionality is not currently available in
+                        the official
+
+                        protobuf release, and it is not used for type URLs
+                        beginning with
+
+                        type.googleapis.com.
+
+
+                        Schemes other than `http`, `https` (or the empty scheme)
+                        might be
+
+                        used with implementation specific semantics.
+                  additionalProperties: {}
+                  description: >-
+                    `Any` contains an arbitrary serialized protocol buffer
+                    message along with a
+
+                    URL that describes the type of the serialized message.
+
+
+                    Protobuf library provides support to pack/unpack Any values
+                    in the form
+
+                    of utility functions or additional generated methods of the
+                    Any type.
+
+
+                    Example 1: Pack and unpack a message in C++.
+
+                        Foo foo = ...;
+                        Any any;
+                        any.PackFrom(foo);
+                        ...
+                        if (any.UnpackTo(&foo)) {
+                          ...
+                        }
+
+                    Example 2: Pack and unpack a message in Java.
+
+                        Foo foo = ...;
+                        Any any = Any.pack(foo);
+                        ...
+                        if (any.is(Foo.class)) {
+                          foo = any.unpack(Foo.class);
+                        }
+
+                     Example 3: Pack and unpack a message in Python.
+
+                        foo = Foo(...)
+                        any = Any()
+                        any.Pack(foo)
+                        ...
+                        if any.Is(Foo.DESCRIPTOR):
+                          any.Unpack(foo)
+                          ...
+
+                     Example 4: Pack and unpack a message in Go
+
+                         foo := &pb.Foo{...}
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
+                         ...
+                         foo := &pb.Foo{}
+                         if err := any.UnmarshalTo(foo); err != nil {
+                           ...
+                         }
+
+                    The pack methods provided by protobuf library will by
+                    default use
+
+                    'type.googleapis.com/full.type.name' as the type URL and the
+                    unpack
+
+                    methods only use the fully qualified type name after the
+                    last '/'
+
+                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    type
+
+                    name "y.z".
+
+
+
+                    JSON
+
+                    ====
+
+                    The JSON representation of an `Any` value uses the regular
+
+                    representation of the deserialized, embedded message, with
+                    an
+
+                    additional field `@type` which contains the type URL.
+                    Example:
+
+                        package google.profile;
+                        message Person {
+                          string first_name = 1;
+                          string last_name = 2;
+                        }
+
+                        {
+                          "@type": "type.googleapis.com/google.profile.Person",
+                          "firstName": <string>,
+                          "lastName": <string>
+                        }
+
+                    If the embedded message type is well-known and has a custom
+                    JSON
+
+                    representation, that representation will be embedded adding
+                    a field
+
+                    `value` which holds the custom JSON in addition to the
+                    `@type`
+
+                    field. Example (for message [google.protobuf.Duration][]):
+
+                        {
+                          "@type": "type.googleapis.com/google.protobuf.Duration",
+                          "value": "1.212s"
+                        }
+      tags:
+        - Query
+  /interchain_security/ccv/provider/consumer_chain_stop_proposals:
+    get:
+      summary: QueryConsumerChainStops queries consumer chain stop proposals.
+      operationId: InterchainSecurityCcvProviderV1QueryConsumerChainStops
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              proposals:
+                type: object
+                properties:
+                  pending:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                          title: the title of the proposal
+                        description:
+                          type: string
+                          title: the description of the proposal
+                        chain_id:
+                          type: string
+                          title: the chain-id of the consumer chain to be stopped
+                        stop_time:
+                          type: string
+                          format: date-time
+                          title: >-
+                            the time on the provider chain at which all
+                            validators are responsible to stop their consumer
+                            chain validator node
+                      description: >-
+                        ConsumerRemovalProposal is a governance proposal on the
+                        provider chain to remove (and stop) a consumer chain.
+
+                        If it passes, all the consumer chain's state is removed
+                        from the provider chain. The outstanding unbonding
+
+                        operation funds are released if the
+                        LockUnbondingOnTimeout parameter is set to false for the
+                        consumer chain ID.
+                    title: proposals waiting for stop_time to pass
+                description: >-
+                  ConsumerRemovalProposals holds pending governance proposals on
+                  the provider chain to remove (and stop) a consumer chain.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                      description: >-
+                        A URL/resource name that uniquely identifies the type of
+                        the serialized
+
+                        protocol buffer message. This string must contain at
+                        least
+
+                        one "/" character. The last segment of the URL's path
+                        must represent
+
+                        the fully qualified name of the type (as in
+
+                        `path/google.protobuf.Duration`). The name should be in
+                        a canonical form
+
+                        (e.g., leading "." is not accepted).
+
+
+                        In practice, teams usually precompile into the binary
+                        all types that they
+
+                        expect it to use in the context of Any. However, for
+                        URLs which use the
+
+                        scheme `http`, `https`, or no scheme, one can optionally
+                        set up a type
+
+                        server that maps type URLs to message definitions as
+                        follows:
+
+
+                        * If no scheme is provided, `https` is assumed.
+
+                        * An HTTP GET on the URL must yield a
+                        [google.protobuf.Type][]
+                          value in binary format, or produce an error.
+                        * Applications are allowed to cache lookup results based
+                        on the
+                          URL, or have them precompiled into a binary to avoid any
+                          lookup. Therefore, binary compatibility needs to be preserved
+                          on changes to types. (Use versioned type names to manage
+                          breaking changes.)
+
+                        Note: this functionality is not currently available in
+                        the official
+
+                        protobuf release, and it is not used for type URLs
+                        beginning with
+
+                        type.googleapis.com.
+
+
+                        Schemes other than `http`, `https` (or the empty scheme)
+                        might be
+
+                        used with implementation specific semantics.
+                  additionalProperties: {}
+                  description: >-
+                    `Any` contains an arbitrary serialized protocol buffer
+                    message along with a
+
+                    URL that describes the type of the serialized message.
+
+
+                    Protobuf library provides support to pack/unpack Any values
+                    in the form
+
+                    of utility functions or additional generated methods of the
+                    Any type.
+
+
+                    Example 1: Pack and unpack a message in C++.
+
+                        Foo foo = ...;
+                        Any any;
+                        any.PackFrom(foo);
+                        ...
+                        if (any.UnpackTo(&foo)) {
+                          ...
+                        }
+
+                    Example 2: Pack and unpack a message in Java.
+
+                        Foo foo = ...;
+                        Any any = Any.pack(foo);
+                        ...
+                        if (any.is(Foo.class)) {
+                          foo = any.unpack(Foo.class);
+                        }
+
+                     Example 3: Pack and unpack a message in Python.
+
+                        foo = Foo(...)
+                        any = Any()
+                        any.Pack(foo)
+                        ...
+                        if any.Is(Foo.DESCRIPTOR):
+                          any.Unpack(foo)
+                          ...
+
+                     Example 4: Pack and unpack a message in Go
+
+                         foo := &pb.Foo{...}
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
+                         ...
+                         foo := &pb.Foo{}
+                         if err := any.UnmarshalTo(foo); err != nil {
+                           ...
+                         }
+
+                    The pack methods provided by protobuf library will by
+                    default use
+
+                    'type.googleapis.com/full.type.name' as the type URL and the
+                    unpack
+
+                    methods only use the fully qualified type name after the
+                    last '/'
+
+                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    type
+
+                    name "y.z".
+
+
+
+                    JSON
+
+                    ====
+
+                    The JSON representation of an `Any` value uses the regular
+
+                    representation of the deserialized, embedded message, with
+                    an
+
+                    additional field `@type` which contains the type URL.
+                    Example:
+
+                        package google.profile;
+                        message Person {
+                          string first_name = 1;
+                          string last_name = 2;
+                        }
+
+                        {
+                          "@type": "type.googleapis.com/google.profile.Person",
+                          "firstName": <string>,
+                          "lastName": <string>
+                        }
+
+                    If the embedded message type is well-known and has a custom
+                    JSON
+
+                    representation, that representation will be embedded adding
+                    a field
+
+                    `value` which holds the custom JSON in addition to the
+                    `@type`
+
+                    field. Example (for message [google.protobuf.Duration][]):
+
+                        {
+                          "@type": "type.googleapis.com/google.protobuf.Duration",
+                          "value": "1.212s"
+                        }
+      tags:
+        - Query
+  /interchain_security/ccv/provider/consumer_chains:
+    get:
+      summary: |-
+        ConsumerChains queries active consumer chains supported by the provider
+        chain
+      operationId: InterchainSecurityCcvProviderV1QueryConsumerChains
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              chains:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    chain_id:
+                      type: string
+                    client_id:
+                      type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                      description: >-
+                        A URL/resource name that uniquely identifies the type of
+                        the serialized
+
+                        protocol buffer message. This string must contain at
+                        least
+
+                        one "/" character. The last segment of the URL's path
+                        must represent
+
+                        the fully qualified name of the type (as in
+
+                        `path/google.protobuf.Duration`). The name should be in
+                        a canonical form
+
+                        (e.g., leading "." is not accepted).
+
+
+                        In practice, teams usually precompile into the binary
+                        all types that they
+
+                        expect it to use in the context of Any. However, for
+                        URLs which use the
+
+                        scheme `http`, `https`, or no scheme, one can optionally
+                        set up a type
+
+                        server that maps type URLs to message definitions as
+                        follows:
+
+
+                        * If no scheme is provided, `https` is assumed.
+
+                        * An HTTP GET on the URL must yield a
+                        [google.protobuf.Type][]
+                          value in binary format, or produce an error.
+                        * Applications are allowed to cache lookup results based
+                        on the
+                          URL, or have them precompiled into a binary to avoid any
+                          lookup. Therefore, binary compatibility needs to be preserved
+                          on changes to types. (Use versioned type names to manage
+                          breaking changes.)
+
+                        Note: this functionality is not currently available in
+                        the official
+
+                        protobuf release, and it is not used for type URLs
+                        beginning with
+
+                        type.googleapis.com.
+
+
+                        Schemes other than `http`, `https` (or the empty scheme)
+                        might be
+
+                        used with implementation specific semantics.
+                  additionalProperties: {}
+                  description: >-
+                    `Any` contains an arbitrary serialized protocol buffer
+                    message along with a
+
+                    URL that describes the type of the serialized message.
+
+
+                    Protobuf library provides support to pack/unpack Any values
+                    in the form
+
+                    of utility functions or additional generated methods of the
+                    Any type.
+
+
+                    Example 1: Pack and unpack a message in C++.
+
+                        Foo foo = ...;
+                        Any any;
+                        any.PackFrom(foo);
+                        ...
+                        if (any.UnpackTo(&foo)) {
+                          ...
+                        }
+
+                    Example 2: Pack and unpack a message in Java.
+
+                        Foo foo = ...;
+                        Any any = Any.pack(foo);
+                        ...
+                        if (any.is(Foo.class)) {
+                          foo = any.unpack(Foo.class);
+                        }
+
+                     Example 3: Pack and unpack a message in Python.
+
+                        foo = Foo(...)
+                        any = Any()
+                        any.Pack(foo)
+                        ...
+                        if any.Is(Foo.DESCRIPTOR):
+                          any.Unpack(foo)
+                          ...
+
+                     Example 4: Pack and unpack a message in Go
+
+                         foo := &pb.Foo{...}
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
+                         ...
+                         foo := &pb.Foo{}
+                         if err := any.UnmarshalTo(foo); err != nil {
+                           ...
+                         }
+
+                    The pack methods provided by protobuf library will by
+                    default use
+
+                    'type.googleapis.com/full.type.name' as the type URL and the
+                    unpack
+
+                    methods only use the fully qualified type name after the
+                    last '/'
+
+                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    type
+
+                    name "y.z".
+
+
+
+                    JSON
+
+                    ====
+
+                    The JSON representation of an `Any` value uses the regular
+
+                    representation of the deserialized, embedded message, with
+                    an
+
+                    additional field `@type` which contains the type URL.
+                    Example:
+
+                        package google.profile;
+                        message Person {
+                          string first_name = 1;
+                          string last_name = 2;
+                        }
+
+                        {
+                          "@type": "type.googleapis.com/google.profile.Person",
+                          "firstName": <string>,
+                          "lastName": <string>
+                        }
+
+                    If the embedded message type is well-known and has a custom
+                    JSON
+
+                    representation, that representation will be embedded adding
+                    a field
+
+                    `value` which holds the custom JSON in addition to the
+                    `@type`
+
+                    field. Example (for message [google.protobuf.Duration][]):
+
+                        {
+                          "@type": "type.googleapis.com/google.protobuf.Duration",
+                          "value": "1.212s"
+                        }
+      tags:
+        - Query
+  /interchain_security/ccv/provider/consumer_genesis/{chain_id}:
+    get:
+      summary: >-
+        ConsumerGenesis queries the genesis state needed to start a consumer
+        chain
+
+        whose proposal has been accepted
+      operationId: InterchainSecurityCcvProviderV1QueryConsumerGenesis
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              genesis_state:
+                type: object
+                properties:
+                  params:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                        title: >-
+                          TODO: Remove enabled flag and find a better way to
+                          setup e2e tests
+
+                          See:
+                          https://github.com/cosmos/interchain-security/issues/339
+                      blocks_per_distribution_transmission:
+                        type: string
+                        format: int64
+                        description: >-
+                          /////////////////////
+
+                          Distribution Params
+
+                          Number of blocks between ibc-token-transfers from the
+                          consumer chain to
+
+                          the provider chain. Note that at this transmission
+                          event a fraction of
+
+                          the accumulated tokens are divided and sent consumer
+                          redistribution
+
+                          address.
+                      distribution_transmission_channel:
+                        type: string
+                        description: >-
+                          Channel, and provider-chain receiving address to send
+                          distribution token
+
+                          transfers over. These parameters is auto-set during
+                          the consumer <->
+
+                          provider handshake procedure.
+                      provider_fee_pool_addr_str:
+                        type: string
+                      ccv_timeout_period:
+                        type: string
+                        title: >-
+                          Sent CCV related IBC packets will timeout after this
+                          duration
+                      transfer_timeout_period:
+                        type: string
+                        title: >-
+                          Sent transfer related IBC packets will timeout after
+                          this duration
+                      consumer_redistribution_fraction:
+                        type: string
+                        description: >-
+                          The fraction of tokens allocated to the consumer
+                          redistribution address
+
+                          during distribution events. The fraction is a string
+                          representing a
+
+                          decimal number. For example "0.75" would represent
+                          75%.
+                      historical_entries:
+                        type: string
+                        format: int64
+                        description: >-
+                          The number of historical info entries to persist in
+                          store.
+
+                          This param is a part of the cosmos sdk staking module.
+                          In the case of 
+
+                          a ccv enabled consumer chain, the ccv module acts as
+                          the staking module.
+                      unbonding_period:
+                        type: string
+                        description: >-
+                          Unbonding period for the consumer,
+
+                          which should be smaller than that of the provider in
+                          general.
+                    title: Params defines the parameters for CCV consumer module
+                  provider_client_id:
+                    type: string
+                    title: empty for a completely new chain
+                  provider_channel_id:
+                    type: string
+                    title: empty for a completely new chain
+                  new_chain:
+                    type: boolean
+                    description: true for new chain GenesisState, false for chain restart.
+                  provider_client_state:
+                    description: >-
+                      ProviderClientState filled in on new chain, nil on
+                      restart.
+                    type: object
+                    properties:
+                      chain_id:
+                        type: string
+                      trust_level:
+                        type: object
+                        properties:
+                          numerator:
+                            type: string
+                            format: uint64
+                          denominator:
+                            type: string
+                            format: uint64
+                        description: >-
+                          Fraction defines the protobuf message type for
+                          tmmath.Fraction that only
+
+                          supports positive values.
+                      trusting_period:
+                        type: string
+                        title: >-
+                          duration of the period since the LastestTimestamp
+                          during which the
+
+                          submitted headers are valid for upgrade
+                      unbonding_period:
+                        type: string
+                        title: duration of the staking unbonding period
+                      max_clock_drift:
+                        type: string
+                        description: >-
+                          defines how much new (untrusted) header's Time can
+                          drift into the future.
+                      frozen_height:
+                        title: >-
+                          Block height when the client was frozen due to a
+                          misbehaviour
+                        type: object
+                        properties:
+                          revision_number:
+                            type: string
+                            format: uint64
+                            title: the revision that the client is currently on
+                          revision_height:
+                            type: string
+                            format: uint64
+                            title: the height within the given revision
+                        description: >-
+                          Normally the RevisionHeight is incremented at each
+                          height while keeping
+
+                          RevisionNumber the same. However some consensus
+                          algorithms may choose to
+
+                          reset the height in certain conditions e.g. hard
+                          forks, state-machine
+
+                          breaking changes In these cases, the RevisionNumber is
+                          incremented so that
+
+                          height continues to be monitonically increasing even
+                          as the RevisionHeight
+
+                          gets reset
+                      latest_height:
+                        title: Latest height the client was updated to
+                        type: object
+                        properties:
+                          revision_number:
+                            type: string
+                            format: uint64
+                            title: the revision that the client is currently on
+                          revision_height:
+                            type: string
+                            format: uint64
+                            title: the height within the given revision
+                        description: >-
+                          Normally the RevisionHeight is incremented at each
+                          height while keeping
+
+                          RevisionNumber the same. However some consensus
+                          algorithms may choose to
+
+                          reset the height in certain conditions e.g. hard
+                          forks, state-machine
+
+                          breaking changes In these cases, the RevisionNumber is
+                          incremented so that
+
+                          height continues to be monitonically increasing even
+                          as the RevisionHeight
+
+                          gets reset
+                      proof_specs:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            leaf_spec:
+                              title: >-
+                                any field in the ExistenceProof must be the same
+                                as in this spec.
+
+                                except Prefix, which is just the first bytes of
+                                prefix (spec can be longer)
+                              type: object
+                              properties:
+                                hash:
+                                  type: string
+                                  enum:
+                                    - NO_HASH
+                                    - SHA256
+                                    - SHA512
+                                    - KECCAK
+                                    - RIPEMD160
+                                    - BITCOIN
+                                    - SHA512_256
+                                  default: NO_HASH
+                                  title: >-
+                                    - NO_HASH: NO_HASH is the default if no data
+                                    passed. Note this is an illegal argument
+                                    some places.
+                                     - BITCOIN: ripemd160(sha256(x))
+                                prehash_key:
+                                  type: string
+                                  enum:
+                                    - NO_HASH
+                                    - SHA256
+                                    - SHA512
+                                    - KECCAK
+                                    - RIPEMD160
+                                    - BITCOIN
+                                    - SHA512_256
+                                  default: NO_HASH
+                                  title: >-
+                                    - NO_HASH: NO_HASH is the default if no data
+                                    passed. Note this is an illegal argument
+                                    some places.
+                                     - BITCOIN: ripemd160(sha256(x))
+                                prehash_value:
+                                  type: string
+                                  enum:
+                                    - NO_HASH
+                                    - SHA256
+                                    - SHA512
+                                    - KECCAK
+                                    - RIPEMD160
+                                    - BITCOIN
+                                    - SHA512_256
+                                  default: NO_HASH
+                                  title: >-
+                                    - NO_HASH: NO_HASH is the default if no data
+                                    passed. Note this is an illegal argument
+                                    some places.
+                                     - BITCOIN: ripemd160(sha256(x))
+                                length:
+                                  type: string
+                                  enum:
+                                    - NO_PREFIX
+                                    - VAR_PROTO
+                                    - VAR_RLP
+                                    - FIXED32_BIG
+                                    - FIXED32_LITTLE
+                                    - FIXED64_BIG
+                                    - FIXED64_LITTLE
+                                    - REQUIRE_32_BYTES
+                                    - REQUIRE_64_BYTES
+                                  default: NO_PREFIX
+                                  description: >-
+                                    - NO_PREFIX: NO_PREFIX don't include any
+                                    length info
+                                     - VAR_PROTO: VAR_PROTO uses protobuf (and go-amino) varint encoding of the length
+                                     - VAR_RLP: VAR_RLP uses rlp int encoding of the length
+                                     - FIXED32_BIG: FIXED32_BIG uses big-endian encoding of the length as a 32 bit integer
+                                     - FIXED32_LITTLE: FIXED32_LITTLE uses little-endian encoding of the length as a 32 bit integer
+                                     - FIXED64_BIG: FIXED64_BIG uses big-endian encoding of the length as a 64 bit integer
+                                     - FIXED64_LITTLE: FIXED64_LITTLE uses little-endian encoding of the length as a 64 bit integer
+                                     - REQUIRE_32_BYTES: REQUIRE_32_BYTES is like NONE, but will fail if the input is not exactly 32 bytes (sha256 output)
+                                     - REQUIRE_64_BYTES: REQUIRE_64_BYTES is like NONE, but will fail if the input is not exactly 64 bytes (sha512 output)
+                                  title: >-
+                                    *
+
+                                    LengthOp defines how to process the key and
+                                    value of the LeafOp
+
+                                    to include length information. After
+                                    encoding the length with the given
+
+                                    algorithm, the length will be prepended to
+                                    the key and value bytes.
+
+                                    (Each one with it's own encoded length)
+                                prefix:
+                                  type: string
+                                  format: byte
+                                  description: >-
+                                    prefix is a fixed bytes that may optionally
+                                    be included at the beginning to
+                                    differentiate
+
+                                    a leaf node from an inner node.
+                              description: >-
+                                *
+
+                                LeafOp represents the raw key-value data we wish
+                                to prove, and
+
+                                must be flexible to represent the internal
+                                transformation from
+
+                                the original key-value pairs into the basis
+                                hash, for many existing
+
+                                merkle trees.
+
+
+                                key and value are passed in. So that the
+                                signature of this operation is:
+
+                                leafOp(key, value) -> output
+
+
+                                To process this, first prehash the keys and
+                                values if needed (ANY means no hash in this
+                                case):
+
+                                hkey = prehashKey(key)
+
+                                hvalue = prehashValue(value)
+
+
+                                Then combine the bytes, and hash it
+
+                                output = hash(prefix || length(hkey) || hkey ||
+                                length(hvalue) || hvalue)
+                            inner_spec:
+                              type: object
+                              properties:
+                                child_order:
+                                  type: array
+                                  items:
+                                    type: integer
+                                    format: int32
+                                  title: >-
+                                    Child order is the ordering of the children
+                                    node, must count from 0
+
+                                    iavl tree is [0, 1] (left then right)
+
+                                    merk is [0, 2, 1] (left, right, here)
+                                child_size:
+                                  type: integer
+                                  format: int32
+                                min_prefix_length:
+                                  type: integer
+                                  format: int32
+                                max_prefix_length:
+                                  type: integer
+                                  format: int32
+                                empty_child:
+                                  type: string
+                                  format: byte
+                                  title: >-
+                                    empty child is the prehash image that is
+                                    used when one child is nil (eg. 20 bytes of
+                                    0)
+                                hash:
+                                  type: string
+                                  enum:
+                                    - NO_HASH
+                                    - SHA256
+                                    - SHA512
+                                    - KECCAK
+                                    - RIPEMD160
+                                    - BITCOIN
+                                    - SHA512_256
+                                  default: NO_HASH
+                                  title: >-
+                                    - NO_HASH: NO_HASH is the default if no data
+                                    passed. Note this is an illegal argument
+                                    some places.
+                                     - BITCOIN: ripemd160(sha256(x))
+                              description: >-
+                                InnerSpec contains all store-specific structure
+                                info to determine if two proofs from a
+
+                                given store are neighbors.
+
+
+                                This enables:
+
+
+                                isLeftMost(spec: InnerSpec, op: InnerOp)
+
+                                isRightMost(spec: InnerSpec, op: InnerOp)
+
+                                isLeftNeighbor(spec: InnerSpec, left: InnerOp,
+                                right: InnerOp)
+                            max_depth:
+                              type: integer
+                              format: int32
+                              title: >-
+                                max_depth (if > 0) is the maximum number of
+                                InnerOps allowed (mainly for fixed-depth tries)
+                            min_depth:
+                              type: integer
+                              format: int32
+                              title: >-
+                                min_depth (if > 0) is the minimum number of
+                                InnerOps allowed (mainly for fixed-depth tries)
+                          description: >-
+                            *
+
+                            ProofSpec defines what the expected parameters are
+                            for a given proof type.
+
+                            This can be stored in the client and used to
+                            validate any incoming proofs.
+
+
+                            verify(ProofSpec, Proof) -> Proof | Error
+
+
+                            As demonstrated in tests, if we don't fix the
+                            algorithm used to calculate the
+
+                            LeafHash for a given tree, there are many possible
+                            key-value pairs that can
+
+                            generate a given hash (by interpretting the preimage
+                            differently).
+
+                            We need this for proper security, requires client
+                            knows a priori what
+
+                            tree format server uses. But not in code, rather a
+                            configuration object.
+                        title: >-
+                          Proof specifications used in verifying counterparty
+                          state
+                      upgrade_path:
+                        type: array
+                        items:
+                          type: string
+                        title: >-
+                          Path at which next upgraded client will be committed.
+
+                          Each element corresponds to the key for a single
+                          CommitmentProof in the
+
+                          chained proof. NOTE: ClientState must stored under
+
+                          `{upgradePath}/{upgradeHeight}/clientState`
+                          ConsensusState must be stored
+
+                          under `{upgradepath}/{upgradeHeight}/consensusState`
+                          For SDK chains using
+
+                          the default upgrade module, upgrade_path should be
+                          []string{"upgrade",
+
+                          "upgradedIBCState"}`
+                      allow_update_after_expiry:
+                        type: boolean
+                        title: >-
+                          This flag, when set to true, will allow governance to
+                          recover a client
+
+                          which has expired
+                      allow_update_after_misbehaviour:
+                        type: boolean
+                        title: >-
+                          This flag, when set to true, will allow governance to
+                          unfreeze a client
+
+                          whose chain has experienced a misbehaviour event
+                  provider_consensus_state:
+                    description: >-
+                      ProviderConsensusState filled in on new chain, nil on
+                      restart.
+                    type: object
+                    properties:
+                      timestamp:
+                        type: string
+                        format: date-time
+                        description: >-
+                          timestamp that corresponds to the block height in
+                          which the ConsensusState
+
+                          was stored.
+                      root:
+                        title: commitment root (i.e app hash)
+                        type: object
+                        properties:
+                          hash:
+                            type: string
+                            format: byte
+                        description: >-
+                          MerkleRoot defines a merkle root hash.
+
+                          In the Cosmos SDK, the AppHash of a block header
+                          becomes the root.
+                      next_validators_hash:
+                        type: string
+                        format: byte
+                  maturing_packets:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        vscId:
+                          type: string
+                          format: uint64
+                        maturity_time:
+                          type: string
+                          format: uint64
+                      title: >-
+                        MaturingVSCPacket defines the genesis information for
+                        the
+
+                        unbonding VSC packet
+                    description: MaturingPackets nil on new chain, filled on restart.
+                  initial_val_set:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        pub_key:
+                          type: object
+                          properties:
+                            ed25519:
+                              type: string
+                              format: byte
+                            secp256k1:
+                              type: string
+                              format: byte
+                          title: >-
+                            PublicKey defines the keys available for use with
+                            Tendermint Validators
+                        power:
+                          type: string
+                          format: int64
+                      title: ValidatorUpdate
+                    description: InitialValset filled in on new chain and on restart.
+                  height_to_valset_update_id:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        height:
+                          type: string
+                          format: uint64
+                        valset_update_id:
+                          type: string
+                          format: uint64
+                      title: >-
+                        HeightValsetUpdateID defines the genesis information for
+                        the mapping 
+
+                        of each block height to a valset update id
+                    description: >-
+                      HeightToValsetUpdateId nil on new chain, filled on
+                      restart.
+                  outstanding_downtime_slashing:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        validator_consensus_address:
+                          type: string
+                      description: >-
+                        OutstandingDowntime defines the genesis information for
+                        each validator
+
+                        flagged with an outstanding downtime slashing.
+                    description: OutstandingDowntimes nil on new chain, filled on restart.
+                  pending_slash_requests:
+                    description: >-
+                      PendingSlashRequests filled in on new chain, nil on
+                      restart.
+                    type: object
+                    properties:
+                      requests:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            packet:
+                              type: object
+                              properties:
+                                validator:
+                                  type: object
+                                  properties:
+                                    address:
+                                      type: string
+                                      format: byte
+                                      title: The first 20 bytes of SHA256(public key)
+                                    power:
+                                      type: string
+                                      format: int64
+                                      description: The voting power
+                                      title: >-
+                                        PubKey pub_key = 2
+                                        [(gogoproto.nullable)=false];
+                                  title: Validator
+                                valset_update_id:
+                                  type: string
+                                  format: uint64
+                                  title: >-
+                                    map to the infraction block height on the
+                                    provider
+                                infraction:
+                                  title: >-
+                                    tell if the slashing is for a downtime or a
+                                    double-signing infraction
+                                  type: string
+                                  enum:
+                                    - INFRACTION_TYPE_UNSPECIFIED
+                                    - INFRACTION_TYPE_DOUBLE_SIGN
+                                    - INFRACTION_TYPE_DOWNTIME
+                                  default: INFRACTION_TYPE_UNSPECIFIED
+                                  description: >-
+                                    InfractionType indicates the infraction type
+                                    a validator commited.
+
+                                     - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
+                                     - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
+                                     - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
+                              description: >-
+                                This packet is sent from the consumer chain to
+                                the provider chain
+
+                                to request the slashing of a validator as a
+                                result of an infraction
+
+                                committed on the consumer chain.
+                            infraction:
+                              type: string
+                              enum:
+                                - INFRACTION_TYPE_UNSPECIFIED
+                                - INFRACTION_TYPE_DOUBLE_SIGN
+                                - INFRACTION_TYPE_DOWNTIME
+                              default: INFRACTION_TYPE_UNSPECIFIED
+                              description: >-
+                                InfractionType indicates the infraction type a
+                                validator commited.
+
+                                 - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
+                                 - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
+                                 - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
+                          title: >-
+                            SlashRequest defines a slashing request for CCV
+                            consumer module
+                    title: >-
+                      SlashRequests is a list of slash requests for CCV consumer
+                      module
+                title: GenesisState defines the CCV consumer chain genesis state
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                      description: >-
+                        A URL/resource name that uniquely identifies the type of
+                        the serialized
+
+                        protocol buffer message. This string must contain at
+                        least
+
+                        one "/" character. The last segment of the URL's path
+                        must represent
+
+                        the fully qualified name of the type (as in
+
+                        `path/google.protobuf.Duration`). The name should be in
+                        a canonical form
+
+                        (e.g., leading "." is not accepted).
+
+
+                        In practice, teams usually precompile into the binary
+                        all types that they
+
+                        expect it to use in the context of Any. However, for
+                        URLs which use the
+
+                        scheme `http`, `https`, or no scheme, one can optionally
+                        set up a type
+
+                        server that maps type URLs to message definitions as
+                        follows:
+
+
+                        * If no scheme is provided, `https` is assumed.
+
+                        * An HTTP GET on the URL must yield a
+                        [google.protobuf.Type][]
+                          value in binary format, or produce an error.
+                        * Applications are allowed to cache lookup results based
+                        on the
+                          URL, or have them precompiled into a binary to avoid any
+                          lookup. Therefore, binary compatibility needs to be preserved
+                          on changes to types. (Use versioned type names to manage
+                          breaking changes.)
+
+                        Note: this functionality is not currently available in
+                        the official
+
+                        protobuf release, and it is not used for type URLs
+                        beginning with
+
+                        type.googleapis.com.
+
+
+                        Schemes other than `http`, `https` (or the empty scheme)
+                        might be
+
+                        used with implementation specific semantics.
+                  additionalProperties: {}
+                  description: >-
+                    `Any` contains an arbitrary serialized protocol buffer
+                    message along with a
+
+                    URL that describes the type of the serialized message.
+
+
+                    Protobuf library provides support to pack/unpack Any values
+                    in the form
+
+                    of utility functions or additional generated methods of the
+                    Any type.
+
+
+                    Example 1: Pack and unpack a message in C++.
+
+                        Foo foo = ...;
+                        Any any;
+                        any.PackFrom(foo);
+                        ...
+                        if (any.UnpackTo(&foo)) {
+                          ...
+                        }
+
+                    Example 2: Pack and unpack a message in Java.
+
+                        Foo foo = ...;
+                        Any any = Any.pack(foo);
+                        ...
+                        if (any.is(Foo.class)) {
+                          foo = any.unpack(Foo.class);
+                        }
+
+                     Example 3: Pack and unpack a message in Python.
+
+                        foo = Foo(...)
+                        any = Any()
+                        any.Pack(foo)
+                        ...
+                        if any.Is(Foo.DESCRIPTOR):
+                          any.Unpack(foo)
+                          ...
+
+                     Example 4: Pack and unpack a message in Go
+
+                         foo := &pb.Foo{...}
+                         any, err := anypb.New(foo)
+                         if err != nil {
+                           ...
+                         }
+                         ...
+                         foo := &pb.Foo{}
+                         if err := any.UnmarshalTo(foo); err != nil {
+                           ...
+                         }
+
+                    The pack methods provided by protobuf library will by
+                    default use
+
+                    'type.googleapis.com/full.type.name' as the type URL and the
+                    unpack
+
+                    methods only use the fully qualified type name after the
+                    last '/'
+
+                    in the type URL, for example "foo.bar.com/x/y.z" will yield
+                    type
+
+                    name "y.z".
+
+
+
+                    JSON
+
+                    ====
+
+                    The JSON representation of an `Any` value uses the regular
+
+                    representation of the deserialized, embedded message, with
+                    an
+
+                    additional field `@type` which contains the type URL.
+                    Example:
+
+                        package google.profile;
+                        message Person {
+                          string first_name = 1;
+                          string last_name = 2;
+                        }
+
+                        {
+                          "@type": "type.googleapis.com/google.profile.Person",
+                          "firstName": <string>,
+                          "lastName": <string>
+                        }
+
+                    If the embedded message type is well-known and has a custom
+                    JSON
+
+                    representation, that representation will be embedded adding
+                    a field
+
+                    `value` which holds the custom JSON in addition to the
+                    `@type`
+
+                    field. Example (for message [google.protobuf.Duration][]):
+
+                        {
+                          "@type": "type.googleapis.com/google.protobuf.Duration",
+                          "value": "1.212s"
+                        }
+      parameters:
+        - name: chain_id
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
   /NicholasDotSol/duality/dex/fee_tier:
     get:
       summary: Queries a list of FeeTier items.
@@ -22268,9 +23860,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/fee_tier/{id}':
+  /NicholasDotSol/duality/dex/fee_tier/{id}:
     get:
       summary: Queries a FeeTier by id.
       operationId: NicholasdotsolDualityDexFeeTier
@@ -22440,9 +24042,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/limit_order_tranche/{pairId}/{token}/{tickIndex}/{trancheIndex}':
+  /NicholasDotSol/duality/dex/limit_order_tranche/{pairId}/{token}/{tickIndex}/{trancheIndex}:
     get:
       summary: Queries a LimitOrderTranche by index.
       operationId: NicholasdotsolDualityDexLimitOrderTranche
@@ -22637,9 +24249,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{count}/{address}':
+  /NicholasDotSol/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{count}/{address}:
     get:
       summary: Queries a LimitOrderTrancheUser by index.
       operationId: NicholasdotsolDualityDexLimitOrderTrancheUser
@@ -22892,9 +24514,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/tick/{pairId}/{tickIndex}':
+  /NicholasDotSol/duality/dex/tick/{pairId}/{tickIndex}:
     get:
       summary: Queries a Tick by index.
       operationId: NicholasdotsolDualityDexTick
@@ -23085,9 +24717,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/token_map/{address}':
+  /NicholasDotSol/duality/dex/token_map/{address}:
     get:
       summary: Queries a TokenMap by index.
       operationId: NicholasdotsolDualityDexTokenMap
@@ -23242,9 +24884,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/tokens/{id}':
+  /NicholasDotSol/duality/dex/tokens/{id}:
     get:
       summary: Queries a Tokens by id.
       operationId: NicholasdotsolDualityDexTokens
@@ -23409,9 +25061,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  '/NicholasDotSol/duality/dex/trading_pair/{pairId}':
+  /NicholasDotSol/duality/dex/trading_pair/{pairId}:
     get:
       summary: Queries a TradingPair by index.
       operationId: NicholasdotsolDualityDexTradingPair
@@ -31817,7 +33479,7 @@ definitions:
         description: Response code.
       data:
         type: string
-        description: 'Result bytes, if any.'
+        description: Result bytes, if any.
       raw_log:
         type: string
         description: |-
@@ -32294,7 +33956,7 @@ definitions:
             description: Response code.
           data:
             type: string
-            description: 'Result bytes, if any.'
+            description: Result bytes, if any.
           raw_log:
             type: string
             description: |-
@@ -33266,7 +34928,7 @@ definitions:
             description: Response code.
           data:
             type: string
-            description: 'Result bytes, if any.'
+            description: Result bytes, if any.
           raw_log:
             type: string
             description: |-
@@ -33585,7 +35247,7 @@ definitions:
               description: Response code.
             data:
               type: string
-              description: 'Result bytes, if any.'
+              description: Result bytes, if any.
             raw_log:
               type: string
               description: |-
@@ -35456,7 +37118,7 @@ definitions:
             index:
               type: boolean
               title: nondeterministic
-          description: 'EventAttribute is a single key-value pair, associated with an event.'
+          description: EventAttribute is a single key-value pair, associated with an event.
     description: >-
       Event allows application developers to attach additional information to
 
@@ -35476,7 +37138,7 @@ definitions:
       index:
         type: boolean
         title: nondeterministic
-    description: 'EventAttribute is a single key-value pair, associated with an event.'
+    description: EventAttribute is a single key-value pair, associated with an event.
   cosmos.upgrade.v1beta1.ModuleVersion:
     type: object
     properties:
@@ -36260,7 +37922,7 @@ definitions:
           this channel will travel
       version:
         type: string
-        title: 'opaque channel version, which is agreed upon during the handshake'
+        title: opaque channel version, which is agreed upon during the handshake
     description: |-
       Channel defines pipeline for exactly-once packet delivery between specific
       modules on separate blockchains, which has at least one end capable of
@@ -36335,7 +37997,7 @@ definitions:
           this channel will travel
       version:
         type: string
-        title: 'opaque channel version, which is agreed upon during the handshake'
+        title: opaque channel version, which is agreed upon during the handshake
       port_id:
         type: string
         title: port identifier
@@ -37020,7 +38682,7 @@ definitions:
               this channel will travel
           version:
             type: string
-            title: 'opaque channel version, which is agreed upon during the handshake'
+            title: opaque channel version, which is agreed upon during the handshake
         description: >-
           Channel defines pipeline for exactly-once packet delivery between
           specific
@@ -40451,6 +42113,2769 @@ definitions:
         title: >-
           NextFeeDistributionEstimate holds information about next fee
           distribution
+  cosmos.staking.v1beta1.InfractionType:
+    type: string
+    enum:
+      - INFRACTION_TYPE_UNSPECIFIED
+      - INFRACTION_TYPE_DOUBLE_SIGN
+      - INFRACTION_TYPE_DOWNTIME
+    default: INFRACTION_TYPE_UNSPECIFIED
+    description: |-
+      InfractionType indicates the infraction type a validator commited.
+
+       - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
+       - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
+       - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
+  ibc.core.commitment.v1.MerkleRoot:
+    type: object
+    properties:
+      hash:
+        type: string
+        format: byte
+    description: |-
+      MerkleRoot defines a merkle root hash.
+      In the Cosmos SDK, the AppHash of a block header becomes the root.
+  ibc.lightclients.tendermint.v1.ClientState:
+    type: object
+    properties:
+      chain_id:
+        type: string
+      trust_level:
+        type: object
+        properties:
+          numerator:
+            type: string
+            format: uint64
+          denominator:
+            type: string
+            format: uint64
+        description: >-
+          Fraction defines the protobuf message type for tmmath.Fraction that
+          only
+
+          supports positive values.
+      trusting_period:
+        type: string
+        title: |-
+          duration of the period since the LastestTimestamp during which the
+          submitted headers are valid for upgrade
+      unbonding_period:
+        type: string
+        title: duration of the staking unbonding period
+      max_clock_drift:
+        type: string
+        description: >-
+          defines how much new (untrusted) header's Time can drift into the
+          future.
+      frozen_height:
+        title: Block height when the client was frozen due to a misbehaviour
+        type: object
+        properties:
+          revision_number:
+            type: string
+            format: uint64
+            title: the revision that the client is currently on
+          revision_height:
+            type: string
+            format: uint64
+            title: the height within the given revision
+        description: >-
+          Normally the RevisionHeight is incremented at each height while
+          keeping
+
+          RevisionNumber the same. However some consensus algorithms may choose
+          to
+
+          reset the height in certain conditions e.g. hard forks, state-machine
+
+          breaking changes In these cases, the RevisionNumber is incremented so
+          that
+
+          height continues to be monitonically increasing even as the
+          RevisionHeight
+
+          gets reset
+      latest_height:
+        title: Latest height the client was updated to
+        type: object
+        properties:
+          revision_number:
+            type: string
+            format: uint64
+            title: the revision that the client is currently on
+          revision_height:
+            type: string
+            format: uint64
+            title: the height within the given revision
+        description: >-
+          Normally the RevisionHeight is incremented at each height while
+          keeping
+
+          RevisionNumber the same. However some consensus algorithms may choose
+          to
+
+          reset the height in certain conditions e.g. hard forks, state-machine
+
+          breaking changes In these cases, the RevisionNumber is incremented so
+          that
+
+          height continues to be monitonically increasing even as the
+          RevisionHeight
+
+          gets reset
+      proof_specs:
+        type: array
+        items:
+          type: object
+          properties:
+            leaf_spec:
+              title: >-
+                any field in the ExistenceProof must be the same as in this
+                spec.
+
+                except Prefix, which is just the first bytes of prefix (spec can
+                be longer)
+              type: object
+              properties:
+                hash:
+                  type: string
+                  enum:
+                    - NO_HASH
+                    - SHA256
+                    - SHA512
+                    - KECCAK
+                    - RIPEMD160
+                    - BITCOIN
+                    - SHA512_256
+                  default: NO_HASH
+                  title: >-
+                    - NO_HASH: NO_HASH is the default if no data passed. Note
+                    this is an illegal argument some places.
+                     - BITCOIN: ripemd160(sha256(x))
+                prehash_key:
+                  type: string
+                  enum:
+                    - NO_HASH
+                    - SHA256
+                    - SHA512
+                    - KECCAK
+                    - RIPEMD160
+                    - BITCOIN
+                    - SHA512_256
+                  default: NO_HASH
+                  title: >-
+                    - NO_HASH: NO_HASH is the default if no data passed. Note
+                    this is an illegal argument some places.
+                     - BITCOIN: ripemd160(sha256(x))
+                prehash_value:
+                  type: string
+                  enum:
+                    - NO_HASH
+                    - SHA256
+                    - SHA512
+                    - KECCAK
+                    - RIPEMD160
+                    - BITCOIN
+                    - SHA512_256
+                  default: NO_HASH
+                  title: >-
+                    - NO_HASH: NO_HASH is the default if no data passed. Note
+                    this is an illegal argument some places.
+                     - BITCOIN: ripemd160(sha256(x))
+                length:
+                  type: string
+                  enum:
+                    - NO_PREFIX
+                    - VAR_PROTO
+                    - VAR_RLP
+                    - FIXED32_BIG
+                    - FIXED32_LITTLE
+                    - FIXED64_BIG
+                    - FIXED64_LITTLE
+                    - REQUIRE_32_BYTES
+                    - REQUIRE_64_BYTES
+                  default: NO_PREFIX
+                  description: |-
+                    - NO_PREFIX: NO_PREFIX don't include any length info
+                     - VAR_PROTO: VAR_PROTO uses protobuf (and go-amino) varint encoding of the length
+                     - VAR_RLP: VAR_RLP uses rlp int encoding of the length
+                     - FIXED32_BIG: FIXED32_BIG uses big-endian encoding of the length as a 32 bit integer
+                     - FIXED32_LITTLE: FIXED32_LITTLE uses little-endian encoding of the length as a 32 bit integer
+                     - FIXED64_BIG: FIXED64_BIG uses big-endian encoding of the length as a 64 bit integer
+                     - FIXED64_LITTLE: FIXED64_LITTLE uses little-endian encoding of the length as a 64 bit integer
+                     - REQUIRE_32_BYTES: REQUIRE_32_BYTES is like NONE, but will fail if the input is not exactly 32 bytes (sha256 output)
+                     - REQUIRE_64_BYTES: REQUIRE_64_BYTES is like NONE, but will fail if the input is not exactly 64 bytes (sha512 output)
+                  title: >-
+                    *
+
+                    LengthOp defines how to process the key and value of the
+                    LeafOp
+
+                    to include length information. After encoding the length
+                    with the given
+
+                    algorithm, the length will be prepended to the key and value
+                    bytes.
+
+                    (Each one with it's own encoded length)
+                prefix:
+                  type: string
+                  format: byte
+                  description: >-
+                    prefix is a fixed bytes that may optionally be included at
+                    the beginning to differentiate
+
+                    a leaf node from an inner node.
+              description: >-
+                *
+
+                LeafOp represents the raw key-value data we wish to prove, and
+
+                must be flexible to represent the internal transformation from
+
+                the original key-value pairs into the basis hash, for many
+                existing
+
+                merkle trees.
+
+
+                key and value are passed in. So that the signature of this
+                operation is:
+
+                leafOp(key, value) -> output
+
+
+                To process this, first prehash the keys and values if needed
+                (ANY means no hash in this case):
+
+                hkey = prehashKey(key)
+
+                hvalue = prehashValue(value)
+
+
+                Then combine the bytes, and hash it
+
+                output = hash(prefix || length(hkey) || hkey || length(hvalue)
+                || hvalue)
+            inner_spec:
+              type: object
+              properties:
+                child_order:
+                  type: array
+                  items:
+                    type: integer
+                    format: int32
+                  title: >-
+                    Child order is the ordering of the children node, must count
+                    from 0
+
+                    iavl tree is [0, 1] (left then right)
+
+                    merk is [0, 2, 1] (left, right, here)
+                child_size:
+                  type: integer
+                  format: int32
+                min_prefix_length:
+                  type: integer
+                  format: int32
+                max_prefix_length:
+                  type: integer
+                  format: int32
+                empty_child:
+                  type: string
+                  format: byte
+                  title: >-
+                    empty child is the prehash image that is used when one child
+                    is nil (eg. 20 bytes of 0)
+                hash:
+                  type: string
+                  enum:
+                    - NO_HASH
+                    - SHA256
+                    - SHA512
+                    - KECCAK
+                    - RIPEMD160
+                    - BITCOIN
+                    - SHA512_256
+                  default: NO_HASH
+                  title: >-
+                    - NO_HASH: NO_HASH is the default if no data passed. Note
+                    this is an illegal argument some places.
+                     - BITCOIN: ripemd160(sha256(x))
+              description: >-
+                InnerSpec contains all store-specific structure info to
+                determine if two proofs from a
+
+                given store are neighbors.
+
+
+                This enables:
+
+
+                isLeftMost(spec: InnerSpec, op: InnerOp)
+
+                isRightMost(spec: InnerSpec, op: InnerOp)
+
+                isLeftNeighbor(spec: InnerSpec, left: InnerOp, right: InnerOp)
+            max_depth:
+              type: integer
+              format: int32
+              title: >-
+                max_depth (if > 0) is the maximum number of InnerOps allowed
+                (mainly for fixed-depth tries)
+            min_depth:
+              type: integer
+              format: int32
+              title: >-
+                min_depth (if > 0) is the minimum number of InnerOps allowed
+                (mainly for fixed-depth tries)
+          description: >-
+            *
+
+            ProofSpec defines what the expected parameters are for a given proof
+            type.
+
+            This can be stored in the client and used to validate any incoming
+            proofs.
+
+
+            verify(ProofSpec, Proof) -> Proof | Error
+
+
+            As demonstrated in tests, if we don't fix the algorithm used to
+            calculate the
+
+            LeafHash for a given tree, there are many possible key-value pairs
+            that can
+
+            generate a given hash (by interpretting the preimage differently).
+
+            We need this for proper security, requires client knows a priori
+            what
+
+            tree format server uses. But not in code, rather a configuration
+            object.
+        title: Proof specifications used in verifying counterparty state
+      upgrade_path:
+        type: array
+        items:
+          type: string
+        title: >-
+          Path at which next upgraded client will be committed.
+
+          Each element corresponds to the key for a single CommitmentProof in
+          the
+
+          chained proof. NOTE: ClientState must stored under
+
+          `{upgradePath}/{upgradeHeight}/clientState` ConsensusState must be
+          stored
+
+          under `{upgradepath}/{upgradeHeight}/consensusState` For SDK chains
+          using
+
+          the default upgrade module, upgrade_path should be []string{"upgrade",
+
+          "upgradedIBCState"}`
+      allow_update_after_expiry:
+        type: boolean
+        title: |-
+          This flag, when set to true, will allow governance to recover a client
+          which has expired
+      allow_update_after_misbehaviour:
+        type: boolean
+        title: >-
+          This flag, when set to true, will allow governance to unfreeze a
+          client
+
+          whose chain has experienced a misbehaviour event
+    description: >-
+      ClientState from Tendermint tracks the current validator set, latest
+      height,
+
+      and a possible frozen height.
+  ibc.lightclients.tendermint.v1.ConsensusState:
+    type: object
+    properties:
+      timestamp:
+        type: string
+        format: date-time
+        description: >-
+          timestamp that corresponds to the block height in which the
+          ConsensusState
+
+          was stored.
+      root:
+        title: commitment root (i.e app hash)
+        type: object
+        properties:
+          hash:
+            type: string
+            format: byte
+        description: |-
+          MerkleRoot defines a merkle root hash.
+          In the Cosmos SDK, the AppHash of a block header becomes the root.
+      next_validators_hash:
+        type: string
+        format: byte
+    description: ConsensusState defines the consensus state from Tendermint.
+  ibc.lightclients.tendermint.v1.Fraction:
+    type: object
+    properties:
+      numerator:
+        type: string
+        format: uint64
+      denominator:
+        type: string
+        format: uint64
+    description: |-
+      Fraction defines the protobuf message type for tmmath.Fraction that only
+      supports positive values.
+  ics23.HashOp:
+    type: string
+    enum:
+      - NO_HASH
+      - SHA256
+      - SHA512
+      - KECCAK
+      - RIPEMD160
+      - BITCOIN
+      - SHA512_256
+    default: NO_HASH
+    title: >-
+      - NO_HASH: NO_HASH is the default if no data passed. Note this is an
+      illegal argument some places.
+       - BITCOIN: ripemd160(sha256(x))
+  ics23.InnerSpec:
+    type: object
+    properties:
+      child_order:
+        type: array
+        items:
+          type: integer
+          format: int32
+        title: |-
+          Child order is the ordering of the children node, must count from 0
+          iavl tree is [0, 1] (left then right)
+          merk is [0, 2, 1] (left, right, here)
+      child_size:
+        type: integer
+        format: int32
+      min_prefix_length:
+        type: integer
+        format: int32
+      max_prefix_length:
+        type: integer
+        format: int32
+      empty_child:
+        type: string
+        format: byte
+        title: >-
+          empty child is the prehash image that is used when one child is nil
+          (eg. 20 bytes of 0)
+      hash:
+        type: string
+        enum:
+          - NO_HASH
+          - SHA256
+          - SHA512
+          - KECCAK
+          - RIPEMD160
+          - BITCOIN
+          - SHA512_256
+        default: NO_HASH
+        title: >-
+          - NO_HASH: NO_HASH is the default if no data passed. Note this is an
+          illegal argument some places.
+           - BITCOIN: ripemd160(sha256(x))
+    description: >-
+      InnerSpec contains all store-specific structure info to determine if two
+      proofs from a
+
+      given store are neighbors.
+
+
+      This enables:
+
+
+      isLeftMost(spec: InnerSpec, op: InnerOp)
+
+      isRightMost(spec: InnerSpec, op: InnerOp)
+
+      isLeftNeighbor(spec: InnerSpec, left: InnerOp, right: InnerOp)
+  ics23.LeafOp:
+    type: object
+    properties:
+      hash:
+        type: string
+        enum:
+          - NO_HASH
+          - SHA256
+          - SHA512
+          - KECCAK
+          - RIPEMD160
+          - BITCOIN
+          - SHA512_256
+        default: NO_HASH
+        title: >-
+          - NO_HASH: NO_HASH is the default if no data passed. Note this is an
+          illegal argument some places.
+           - BITCOIN: ripemd160(sha256(x))
+      prehash_key:
+        type: string
+        enum:
+          - NO_HASH
+          - SHA256
+          - SHA512
+          - KECCAK
+          - RIPEMD160
+          - BITCOIN
+          - SHA512_256
+        default: NO_HASH
+        title: >-
+          - NO_HASH: NO_HASH is the default if no data passed. Note this is an
+          illegal argument some places.
+           - BITCOIN: ripemd160(sha256(x))
+      prehash_value:
+        type: string
+        enum:
+          - NO_HASH
+          - SHA256
+          - SHA512
+          - KECCAK
+          - RIPEMD160
+          - BITCOIN
+          - SHA512_256
+        default: NO_HASH
+        title: >-
+          - NO_HASH: NO_HASH is the default if no data passed. Note this is an
+          illegal argument some places.
+           - BITCOIN: ripemd160(sha256(x))
+      length:
+        type: string
+        enum:
+          - NO_PREFIX
+          - VAR_PROTO
+          - VAR_RLP
+          - FIXED32_BIG
+          - FIXED32_LITTLE
+          - FIXED64_BIG
+          - FIXED64_LITTLE
+          - REQUIRE_32_BYTES
+          - REQUIRE_64_BYTES
+        default: NO_PREFIX
+        description: |-
+          - NO_PREFIX: NO_PREFIX don't include any length info
+           - VAR_PROTO: VAR_PROTO uses protobuf (and go-amino) varint encoding of the length
+           - VAR_RLP: VAR_RLP uses rlp int encoding of the length
+           - FIXED32_BIG: FIXED32_BIG uses big-endian encoding of the length as a 32 bit integer
+           - FIXED32_LITTLE: FIXED32_LITTLE uses little-endian encoding of the length as a 32 bit integer
+           - FIXED64_BIG: FIXED64_BIG uses big-endian encoding of the length as a 64 bit integer
+           - FIXED64_LITTLE: FIXED64_LITTLE uses little-endian encoding of the length as a 64 bit integer
+           - REQUIRE_32_BYTES: REQUIRE_32_BYTES is like NONE, but will fail if the input is not exactly 32 bytes (sha256 output)
+           - REQUIRE_64_BYTES: REQUIRE_64_BYTES is like NONE, but will fail if the input is not exactly 64 bytes (sha512 output)
+        title: >-
+          *
+
+          LengthOp defines how to process the key and value of the LeafOp
+
+          to include length information. After encoding the length with the
+          given
+
+          algorithm, the length will be prepended to the key and value bytes.
+
+          (Each one with it's own encoded length)
+      prefix:
+        type: string
+        format: byte
+        description: >-
+          prefix is a fixed bytes that may optionally be included at the
+          beginning to differentiate
+
+          a leaf node from an inner node.
+    description: >-
+      *
+
+      LeafOp represents the raw key-value data we wish to prove, and
+
+      must be flexible to represent the internal transformation from
+
+      the original key-value pairs into the basis hash, for many existing
+
+      merkle trees.
+
+
+      key and value are passed in. So that the signature of this operation is:
+
+      leafOp(key, value) -> output
+
+
+      To process this, first prehash the keys and values if needed (ANY means no
+      hash in this case):
+
+      hkey = prehashKey(key)
+
+      hvalue = prehashValue(value)
+
+
+      Then combine the bytes, and hash it
+
+      output = hash(prefix || length(hkey) || hkey || length(hvalue) || hvalue)
+  ics23.LengthOp:
+    type: string
+    enum:
+      - NO_PREFIX
+      - VAR_PROTO
+      - VAR_RLP
+      - FIXED32_BIG
+      - FIXED32_LITTLE
+      - FIXED64_BIG
+      - FIXED64_LITTLE
+      - REQUIRE_32_BYTES
+      - REQUIRE_64_BYTES
+    default: NO_PREFIX
+    description: |-
+      - NO_PREFIX: NO_PREFIX don't include any length info
+       - VAR_PROTO: VAR_PROTO uses protobuf (and go-amino) varint encoding of the length
+       - VAR_RLP: VAR_RLP uses rlp int encoding of the length
+       - FIXED32_BIG: FIXED32_BIG uses big-endian encoding of the length as a 32 bit integer
+       - FIXED32_LITTLE: FIXED32_LITTLE uses little-endian encoding of the length as a 32 bit integer
+       - FIXED64_BIG: FIXED64_BIG uses big-endian encoding of the length as a 64 bit integer
+       - FIXED64_LITTLE: FIXED64_LITTLE uses little-endian encoding of the length as a 64 bit integer
+       - REQUIRE_32_BYTES: REQUIRE_32_BYTES is like NONE, but will fail if the input is not exactly 32 bytes (sha256 output)
+       - REQUIRE_64_BYTES: REQUIRE_64_BYTES is like NONE, but will fail if the input is not exactly 64 bytes (sha512 output)
+    title: |-
+      *
+      LengthOp defines how to process the key and value of the LeafOp
+      to include length information. After encoding the length with the given
+      algorithm, the length will be prepended to the key and value bytes.
+      (Each one with it's own encoded length)
+  ics23.ProofSpec:
+    type: object
+    properties:
+      leaf_spec:
+        title: >-
+          any field in the ExistenceProof must be the same as in this spec.
+
+          except Prefix, which is just the first bytes of prefix (spec can be
+          longer)
+        type: object
+        properties:
+          hash:
+            type: string
+            enum:
+              - NO_HASH
+              - SHA256
+              - SHA512
+              - KECCAK
+              - RIPEMD160
+              - BITCOIN
+              - SHA512_256
+            default: NO_HASH
+            title: >-
+              - NO_HASH: NO_HASH is the default if no data passed. Note this is
+              an illegal argument some places.
+               - BITCOIN: ripemd160(sha256(x))
+          prehash_key:
+            type: string
+            enum:
+              - NO_HASH
+              - SHA256
+              - SHA512
+              - KECCAK
+              - RIPEMD160
+              - BITCOIN
+              - SHA512_256
+            default: NO_HASH
+            title: >-
+              - NO_HASH: NO_HASH is the default if no data passed. Note this is
+              an illegal argument some places.
+               - BITCOIN: ripemd160(sha256(x))
+          prehash_value:
+            type: string
+            enum:
+              - NO_HASH
+              - SHA256
+              - SHA512
+              - KECCAK
+              - RIPEMD160
+              - BITCOIN
+              - SHA512_256
+            default: NO_HASH
+            title: >-
+              - NO_HASH: NO_HASH is the default if no data passed. Note this is
+              an illegal argument some places.
+               - BITCOIN: ripemd160(sha256(x))
+          length:
+            type: string
+            enum:
+              - NO_PREFIX
+              - VAR_PROTO
+              - VAR_RLP
+              - FIXED32_BIG
+              - FIXED32_LITTLE
+              - FIXED64_BIG
+              - FIXED64_LITTLE
+              - REQUIRE_32_BYTES
+              - REQUIRE_64_BYTES
+            default: NO_PREFIX
+            description: |-
+              - NO_PREFIX: NO_PREFIX don't include any length info
+               - VAR_PROTO: VAR_PROTO uses protobuf (and go-amino) varint encoding of the length
+               - VAR_RLP: VAR_RLP uses rlp int encoding of the length
+               - FIXED32_BIG: FIXED32_BIG uses big-endian encoding of the length as a 32 bit integer
+               - FIXED32_LITTLE: FIXED32_LITTLE uses little-endian encoding of the length as a 32 bit integer
+               - FIXED64_BIG: FIXED64_BIG uses big-endian encoding of the length as a 64 bit integer
+               - FIXED64_LITTLE: FIXED64_LITTLE uses little-endian encoding of the length as a 64 bit integer
+               - REQUIRE_32_BYTES: REQUIRE_32_BYTES is like NONE, but will fail if the input is not exactly 32 bytes (sha256 output)
+               - REQUIRE_64_BYTES: REQUIRE_64_BYTES is like NONE, but will fail if the input is not exactly 64 bytes (sha512 output)
+            title: >-
+              *
+
+              LengthOp defines how to process the key and value of the LeafOp
+
+              to include length information. After encoding the length with the
+              given
+
+              algorithm, the length will be prepended to the key and value
+              bytes.
+
+              (Each one with it's own encoded length)
+          prefix:
+            type: string
+            format: byte
+            description: >-
+              prefix is a fixed bytes that may optionally be included at the
+              beginning to differentiate
+
+              a leaf node from an inner node.
+        description: >-
+          *
+
+          LeafOp represents the raw key-value data we wish to prove, and
+
+          must be flexible to represent the internal transformation from
+
+          the original key-value pairs into the basis hash, for many existing
+
+          merkle trees.
+
+
+          key and value are passed in. So that the signature of this operation
+          is:
+
+          leafOp(key, value) -> output
+
+
+          To process this, first prehash the keys and values if needed (ANY
+          means no hash in this case):
+
+          hkey = prehashKey(key)
+
+          hvalue = prehashValue(value)
+
+
+          Then combine the bytes, and hash it
+
+          output = hash(prefix || length(hkey) || hkey || length(hvalue) ||
+          hvalue)
+      inner_spec:
+        type: object
+        properties:
+          child_order:
+            type: array
+            items:
+              type: integer
+              format: int32
+            title: >-
+              Child order is the ordering of the children node, must count from
+              0
+
+              iavl tree is [0, 1] (left then right)
+
+              merk is [0, 2, 1] (left, right, here)
+          child_size:
+            type: integer
+            format: int32
+          min_prefix_length:
+            type: integer
+            format: int32
+          max_prefix_length:
+            type: integer
+            format: int32
+          empty_child:
+            type: string
+            format: byte
+            title: >-
+              empty child is the prehash image that is used when one child is
+              nil (eg. 20 bytes of 0)
+          hash:
+            type: string
+            enum:
+              - NO_HASH
+              - SHA256
+              - SHA512
+              - KECCAK
+              - RIPEMD160
+              - BITCOIN
+              - SHA512_256
+            default: NO_HASH
+            title: >-
+              - NO_HASH: NO_HASH is the default if no data passed. Note this is
+              an illegal argument some places.
+               - BITCOIN: ripemd160(sha256(x))
+        description: >-
+          InnerSpec contains all store-specific structure info to determine if
+          two proofs from a
+
+          given store are neighbors.
+
+
+          This enables:
+
+
+          isLeftMost(spec: InnerSpec, op: InnerOp)
+
+          isRightMost(spec: InnerSpec, op: InnerOp)
+
+          isLeftNeighbor(spec: InnerSpec, left: InnerOp, right: InnerOp)
+      max_depth:
+        type: integer
+        format: int32
+        title: >-
+          max_depth (if > 0) is the maximum number of InnerOps allowed (mainly
+          for fixed-depth tries)
+      min_depth:
+        type: integer
+        format: int32
+        title: >-
+          min_depth (if > 0) is the minimum number of InnerOps allowed (mainly
+          for fixed-depth tries)
+    description: >-
+      *
+
+      ProofSpec defines what the expected parameters are for a given proof type.
+
+      This can be stored in the client and used to validate any incoming proofs.
+
+
+      verify(ProofSpec, Proof) -> Proof | Error
+
+
+      As demonstrated in tests, if we don't fix the algorithm used to calculate
+      the
+
+      LeafHash for a given tree, there are many possible key-value pairs that
+      can
+
+      generate a given hash (by interpretting the preimage differently).
+
+      We need this for proper security, requires client knows a priori what
+
+      tree format server uses. But not in code, rather a configuration object.
+  interchain_security.ccv.consumer.v1.GenesisState:
+    type: object
+    properties:
+      params:
+        type: object
+        properties:
+          enabled:
+            type: boolean
+            title: |-
+              TODO: Remove enabled flag and find a better way to setup e2e tests
+              See: https://github.com/cosmos/interchain-security/issues/339
+          blocks_per_distribution_transmission:
+            type: string
+            format: int64
+            description: >-
+              /////////////////////
+
+              Distribution Params
+
+              Number of blocks between ibc-token-transfers from the consumer
+              chain to
+
+              the provider chain. Note that at this transmission event a
+              fraction of
+
+              the accumulated tokens are divided and sent consumer
+              redistribution
+
+              address.
+          distribution_transmission_channel:
+            type: string
+            description: >-
+              Channel, and provider-chain receiving address to send distribution
+              token
+
+              transfers over. These parameters is auto-set during the consumer
+              <->
+
+              provider handshake procedure.
+          provider_fee_pool_addr_str:
+            type: string
+          ccv_timeout_period:
+            type: string
+            title: Sent CCV related IBC packets will timeout after this duration
+          transfer_timeout_period:
+            type: string
+            title: Sent transfer related IBC packets will timeout after this duration
+          consumer_redistribution_fraction:
+            type: string
+            description: >-
+              The fraction of tokens allocated to the consumer redistribution
+              address
+
+              during distribution events. The fraction is a string representing
+              a
+
+              decimal number. For example "0.75" would represent 75%.
+          historical_entries:
+            type: string
+            format: int64
+            description: >-
+              The number of historical info entries to persist in store.
+
+              This param is a part of the cosmos sdk staking module. In the case
+              of 
+
+              a ccv enabled consumer chain, the ccv module acts as the staking
+              module.
+          unbonding_period:
+            type: string
+            description: |-
+              Unbonding period for the consumer,
+              which should be smaller than that of the provider in general.
+        title: Params defines the parameters for CCV consumer module
+      provider_client_id:
+        type: string
+        title: empty for a completely new chain
+      provider_channel_id:
+        type: string
+        title: empty for a completely new chain
+      new_chain:
+        type: boolean
+        description: true for new chain GenesisState, false for chain restart.
+      provider_client_state:
+        description: ProviderClientState filled in on new chain, nil on restart.
+        type: object
+        properties:
+          chain_id:
+            type: string
+          trust_level:
+            type: object
+            properties:
+              numerator:
+                type: string
+                format: uint64
+              denominator:
+                type: string
+                format: uint64
+            description: >-
+              Fraction defines the protobuf message type for tmmath.Fraction
+              that only
+
+              supports positive values.
+          trusting_period:
+            type: string
+            title: |-
+              duration of the period since the LastestTimestamp during which the
+              submitted headers are valid for upgrade
+          unbonding_period:
+            type: string
+            title: duration of the staking unbonding period
+          max_clock_drift:
+            type: string
+            description: >-
+              defines how much new (untrusted) header's Time can drift into the
+              future.
+          frozen_height:
+            title: Block height when the client was frozen due to a misbehaviour
+            type: object
+            properties:
+              revision_number:
+                type: string
+                format: uint64
+                title: the revision that the client is currently on
+              revision_height:
+                type: string
+                format: uint64
+                title: the height within the given revision
+            description: >-
+              Normally the RevisionHeight is incremented at each height while
+              keeping
+
+              RevisionNumber the same. However some consensus algorithms may
+              choose to
+
+              reset the height in certain conditions e.g. hard forks,
+              state-machine
+
+              breaking changes In these cases, the RevisionNumber is incremented
+              so that
+
+              height continues to be monitonically increasing even as the
+              RevisionHeight
+
+              gets reset
+          latest_height:
+            title: Latest height the client was updated to
+            type: object
+            properties:
+              revision_number:
+                type: string
+                format: uint64
+                title: the revision that the client is currently on
+              revision_height:
+                type: string
+                format: uint64
+                title: the height within the given revision
+            description: >-
+              Normally the RevisionHeight is incremented at each height while
+              keeping
+
+              RevisionNumber the same. However some consensus algorithms may
+              choose to
+
+              reset the height in certain conditions e.g. hard forks,
+              state-machine
+
+              breaking changes In these cases, the RevisionNumber is incremented
+              so that
+
+              height continues to be monitonically increasing even as the
+              RevisionHeight
+
+              gets reset
+          proof_specs:
+            type: array
+            items:
+              type: object
+              properties:
+                leaf_spec:
+                  title: >-
+                    any field in the ExistenceProof must be the same as in this
+                    spec.
+
+                    except Prefix, which is just the first bytes of prefix (spec
+                    can be longer)
+                  type: object
+                  properties:
+                    hash:
+                      type: string
+                      enum:
+                        - NO_HASH
+                        - SHA256
+                        - SHA512
+                        - KECCAK
+                        - RIPEMD160
+                        - BITCOIN
+                        - SHA512_256
+                      default: NO_HASH
+                      title: >-
+                        - NO_HASH: NO_HASH is the default if no data passed.
+                        Note this is an illegal argument some places.
+                         - BITCOIN: ripemd160(sha256(x))
+                    prehash_key:
+                      type: string
+                      enum:
+                        - NO_HASH
+                        - SHA256
+                        - SHA512
+                        - KECCAK
+                        - RIPEMD160
+                        - BITCOIN
+                        - SHA512_256
+                      default: NO_HASH
+                      title: >-
+                        - NO_HASH: NO_HASH is the default if no data passed.
+                        Note this is an illegal argument some places.
+                         - BITCOIN: ripemd160(sha256(x))
+                    prehash_value:
+                      type: string
+                      enum:
+                        - NO_HASH
+                        - SHA256
+                        - SHA512
+                        - KECCAK
+                        - RIPEMD160
+                        - BITCOIN
+                        - SHA512_256
+                      default: NO_HASH
+                      title: >-
+                        - NO_HASH: NO_HASH is the default if no data passed.
+                        Note this is an illegal argument some places.
+                         - BITCOIN: ripemd160(sha256(x))
+                    length:
+                      type: string
+                      enum:
+                        - NO_PREFIX
+                        - VAR_PROTO
+                        - VAR_RLP
+                        - FIXED32_BIG
+                        - FIXED32_LITTLE
+                        - FIXED64_BIG
+                        - FIXED64_LITTLE
+                        - REQUIRE_32_BYTES
+                        - REQUIRE_64_BYTES
+                      default: NO_PREFIX
+                      description: |-
+                        - NO_PREFIX: NO_PREFIX don't include any length info
+                         - VAR_PROTO: VAR_PROTO uses protobuf (and go-amino) varint encoding of the length
+                         - VAR_RLP: VAR_RLP uses rlp int encoding of the length
+                         - FIXED32_BIG: FIXED32_BIG uses big-endian encoding of the length as a 32 bit integer
+                         - FIXED32_LITTLE: FIXED32_LITTLE uses little-endian encoding of the length as a 32 bit integer
+                         - FIXED64_BIG: FIXED64_BIG uses big-endian encoding of the length as a 64 bit integer
+                         - FIXED64_LITTLE: FIXED64_LITTLE uses little-endian encoding of the length as a 64 bit integer
+                         - REQUIRE_32_BYTES: REQUIRE_32_BYTES is like NONE, but will fail if the input is not exactly 32 bytes (sha256 output)
+                         - REQUIRE_64_BYTES: REQUIRE_64_BYTES is like NONE, but will fail if the input is not exactly 64 bytes (sha512 output)
+                      title: >-
+                        *
+
+                        LengthOp defines how to process the key and value of the
+                        LeafOp
+
+                        to include length information. After encoding the length
+                        with the given
+
+                        algorithm, the length will be prepended to the key and
+                        value bytes.
+
+                        (Each one with it's own encoded length)
+                    prefix:
+                      type: string
+                      format: byte
+                      description: >-
+                        prefix is a fixed bytes that may optionally be included
+                        at the beginning to differentiate
+
+                        a leaf node from an inner node.
+                  description: >-
+                    *
+
+                    LeafOp represents the raw key-value data we wish to prove,
+                    and
+
+                    must be flexible to represent the internal transformation
+                    from
+
+                    the original key-value pairs into the basis hash, for many
+                    existing
+
+                    merkle trees.
+
+
+                    key and value are passed in. So that the signature of this
+                    operation is:
+
+                    leafOp(key, value) -> output
+
+
+                    To process this, first prehash the keys and values if needed
+                    (ANY means no hash in this case):
+
+                    hkey = prehashKey(key)
+
+                    hvalue = prehashValue(value)
+
+
+                    Then combine the bytes, and hash it
+
+                    output = hash(prefix || length(hkey) || hkey ||
+                    length(hvalue) || hvalue)
+                inner_spec:
+                  type: object
+                  properties:
+                    child_order:
+                      type: array
+                      items:
+                        type: integer
+                        format: int32
+                      title: >-
+                        Child order is the ordering of the children node, must
+                        count from 0
+
+                        iavl tree is [0, 1] (left then right)
+
+                        merk is [0, 2, 1] (left, right, here)
+                    child_size:
+                      type: integer
+                      format: int32
+                    min_prefix_length:
+                      type: integer
+                      format: int32
+                    max_prefix_length:
+                      type: integer
+                      format: int32
+                    empty_child:
+                      type: string
+                      format: byte
+                      title: >-
+                        empty child is the prehash image that is used when one
+                        child is nil (eg. 20 bytes of 0)
+                    hash:
+                      type: string
+                      enum:
+                        - NO_HASH
+                        - SHA256
+                        - SHA512
+                        - KECCAK
+                        - RIPEMD160
+                        - BITCOIN
+                        - SHA512_256
+                      default: NO_HASH
+                      title: >-
+                        - NO_HASH: NO_HASH is the default if no data passed.
+                        Note this is an illegal argument some places.
+                         - BITCOIN: ripemd160(sha256(x))
+                  description: >-
+                    InnerSpec contains all store-specific structure info to
+                    determine if two proofs from a
+
+                    given store are neighbors.
+
+
+                    This enables:
+
+
+                    isLeftMost(spec: InnerSpec, op: InnerOp)
+
+                    isRightMost(spec: InnerSpec, op: InnerOp)
+
+                    isLeftNeighbor(spec: InnerSpec, left: InnerOp, right:
+                    InnerOp)
+                max_depth:
+                  type: integer
+                  format: int32
+                  title: >-
+                    max_depth (if > 0) is the maximum number of InnerOps allowed
+                    (mainly for fixed-depth tries)
+                min_depth:
+                  type: integer
+                  format: int32
+                  title: >-
+                    min_depth (if > 0) is the minimum number of InnerOps allowed
+                    (mainly for fixed-depth tries)
+              description: >-
+                *
+
+                ProofSpec defines what the expected parameters are for a given
+                proof type.
+
+                This can be stored in the client and used to validate any
+                incoming proofs.
+
+
+                verify(ProofSpec, Proof) -> Proof | Error
+
+
+                As demonstrated in tests, if we don't fix the algorithm used to
+                calculate the
+
+                LeafHash for a given tree, there are many possible key-value
+                pairs that can
+
+                generate a given hash (by interpretting the preimage
+                differently).
+
+                We need this for proper security, requires client knows a priori
+                what
+
+                tree format server uses. But not in code, rather a configuration
+                object.
+            title: Proof specifications used in verifying counterparty state
+          upgrade_path:
+            type: array
+            items:
+              type: string
+            title: >-
+              Path at which next upgraded client will be committed.
+
+              Each element corresponds to the key for a single CommitmentProof
+              in the
+
+              chained proof. NOTE: ClientState must stored under
+
+              `{upgradePath}/{upgradeHeight}/clientState` ConsensusState must be
+              stored
+
+              under `{upgradepath}/{upgradeHeight}/consensusState` For SDK
+              chains using
+
+              the default upgrade module, upgrade_path should be
+              []string{"upgrade",
+
+              "upgradedIBCState"}`
+          allow_update_after_expiry:
+            type: boolean
+            title: >-
+              This flag, when set to true, will allow governance to recover a
+              client
+
+              which has expired
+          allow_update_after_misbehaviour:
+            type: boolean
+            title: >-
+              This flag, when set to true, will allow governance to unfreeze a
+              client
+
+              whose chain has experienced a misbehaviour event
+      provider_consensus_state:
+        description: ProviderConsensusState filled in on new chain, nil on restart.
+        type: object
+        properties:
+          timestamp:
+            type: string
+            format: date-time
+            description: >-
+              timestamp that corresponds to the block height in which the
+              ConsensusState
+
+              was stored.
+          root:
+            title: commitment root (i.e app hash)
+            type: object
+            properties:
+              hash:
+                type: string
+                format: byte
+            description: |-
+              MerkleRoot defines a merkle root hash.
+              In the Cosmos SDK, the AppHash of a block header becomes the root.
+          next_validators_hash:
+            type: string
+            format: byte
+      maturing_packets:
+        type: array
+        items:
+          type: object
+          properties:
+            vscId:
+              type: string
+              format: uint64
+            maturity_time:
+              type: string
+              format: uint64
+          title: |-
+            MaturingVSCPacket defines the genesis information for the
+            unbonding VSC packet
+        description: MaturingPackets nil on new chain, filled on restart.
+      initial_val_set:
+        type: array
+        items:
+          type: object
+          properties:
+            pub_key:
+              type: object
+              properties:
+                ed25519:
+                  type: string
+                  format: byte
+                secp256k1:
+                  type: string
+                  format: byte
+              title: >-
+                PublicKey defines the keys available for use with Tendermint
+                Validators
+            power:
+              type: string
+              format: int64
+          title: ValidatorUpdate
+        description: InitialValset filled in on new chain and on restart.
+      height_to_valset_update_id:
+        type: array
+        items:
+          type: object
+          properties:
+            height:
+              type: string
+              format: uint64
+            valset_update_id:
+              type: string
+              format: uint64
+          title: >-
+            HeightValsetUpdateID defines the genesis information for the
+            mapping 
+
+            of each block height to a valset update id
+        description: HeightToValsetUpdateId nil on new chain, filled on restart.
+      outstanding_downtime_slashing:
+        type: array
+        items:
+          type: object
+          properties:
+            validator_consensus_address:
+              type: string
+          description: >-
+            OutstandingDowntime defines the genesis information for each
+            validator
+
+            flagged with an outstanding downtime slashing.
+        description: OutstandingDowntimes nil on new chain, filled on restart.
+      pending_slash_requests:
+        description: PendingSlashRequests filled in on new chain, nil on restart.
+        type: object
+        properties:
+          requests:
+            type: array
+            items:
+              type: object
+              properties:
+                packet:
+                  type: object
+                  properties:
+                    validator:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                          format: byte
+                          title: The first 20 bytes of SHA256(public key)
+                        power:
+                          type: string
+                          format: int64
+                          description: The voting power
+                          title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+                      title: Validator
+                    valset_update_id:
+                      type: string
+                      format: uint64
+                      title: map to the infraction block height on the provider
+                    infraction:
+                      title: >-
+                        tell if the slashing is for a downtime or a
+                        double-signing infraction
+                      type: string
+                      enum:
+                        - INFRACTION_TYPE_UNSPECIFIED
+                        - INFRACTION_TYPE_DOUBLE_SIGN
+                        - INFRACTION_TYPE_DOWNTIME
+                      default: INFRACTION_TYPE_UNSPECIFIED
+                      description: >-
+                        InfractionType indicates the infraction type a validator
+                        commited.
+
+                         - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
+                         - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
+                         - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
+                  description: >-
+                    This packet is sent from the consumer chain to the provider
+                    chain
+
+                    to request the slashing of a validator as a result of an
+                    infraction
+
+                    committed on the consumer chain.
+                infraction:
+                  type: string
+                  enum:
+                    - INFRACTION_TYPE_UNSPECIFIED
+                    - INFRACTION_TYPE_DOUBLE_SIGN
+                    - INFRACTION_TYPE_DOWNTIME
+                  default: INFRACTION_TYPE_UNSPECIFIED
+                  description: >-
+                    InfractionType indicates the infraction type a validator
+                    commited.
+
+                     - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
+                     - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
+                     - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
+              title: SlashRequest defines a slashing request for CCV consumer module
+        title: SlashRequests is a list of slash requests for CCV consumer module
+    title: GenesisState defines the CCV consumer chain genesis state
+  interchain_security.ccv.consumer.v1.HeightToValsetUpdateID:
+    type: object
+    properties:
+      height:
+        type: string
+        format: uint64
+      valset_update_id:
+        type: string
+        format: uint64
+    title: |-
+      HeightValsetUpdateID defines the genesis information for the mapping 
+      of each block height to a valset update id
+  interchain_security.ccv.consumer.v1.MaturingVSCPacket:
+    type: object
+    properties:
+      vscId:
+        type: string
+        format: uint64
+      maturity_time:
+        type: string
+        format: uint64
+    title: |-
+      MaturingVSCPacket defines the genesis information for the
+      unbonding VSC packet
+  interchain_security.ccv.consumer.v1.OutstandingDowntime:
+    type: object
+    properties:
+      validator_consensus_address:
+        type: string
+    description: |-
+      OutstandingDowntime defines the genesis information for each validator
+      flagged with an outstanding downtime slashing.
+  interchain_security.ccv.consumer.v1.Params:
+    type: object
+    properties:
+      enabled:
+        type: boolean
+        title: |-
+          TODO: Remove enabled flag and find a better way to setup e2e tests
+          See: https://github.com/cosmos/interchain-security/issues/339
+      blocks_per_distribution_transmission:
+        type: string
+        format: int64
+        description: >-
+          /////////////////////
+
+          Distribution Params
+
+          Number of blocks between ibc-token-transfers from the consumer chain
+          to
+
+          the provider chain. Note that at this transmission event a fraction of
+
+          the accumulated tokens are divided and sent consumer redistribution
+
+          address.
+      distribution_transmission_channel:
+        type: string
+        description: >-
+          Channel, and provider-chain receiving address to send distribution
+          token
+
+          transfers over. These parameters is auto-set during the consumer <->
+
+          provider handshake procedure.
+      provider_fee_pool_addr_str:
+        type: string
+      ccv_timeout_period:
+        type: string
+        title: Sent CCV related IBC packets will timeout after this duration
+      transfer_timeout_period:
+        type: string
+        title: Sent transfer related IBC packets will timeout after this duration
+      consumer_redistribution_fraction:
+        type: string
+        description: >-
+          The fraction of tokens allocated to the consumer redistribution
+          address
+
+          during distribution events. The fraction is a string representing a
+
+          decimal number. For example "0.75" would represent 75%.
+      historical_entries:
+        type: string
+        format: int64
+        description: >-
+          The number of historical info entries to persist in store.
+
+          This param is a part of the cosmos sdk staking module. In the case of 
+
+          a ccv enabled consumer chain, the ccv module acts as the staking
+          module.
+      unbonding_period:
+        type: string
+        description: |-
+          Unbonding period for the consumer,
+          which should be smaller than that of the provider in general.
+    title: Params defines the parameters for CCV consumer module
+  interchain_security.ccv.consumer.v1.SlashRequest:
+    type: object
+    properties:
+      packet:
+        type: object
+        properties:
+          validator:
+            type: object
+            properties:
+              address:
+                type: string
+                format: byte
+                title: The first 20 bytes of SHA256(public key)
+              power:
+                type: string
+                format: int64
+                description: The voting power
+                title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+            title: Validator
+          valset_update_id:
+            type: string
+            format: uint64
+            title: map to the infraction block height on the provider
+          infraction:
+            title: >-
+              tell if the slashing is for a downtime or a double-signing
+              infraction
+            type: string
+            enum:
+              - INFRACTION_TYPE_UNSPECIFIED
+              - INFRACTION_TYPE_DOUBLE_SIGN
+              - INFRACTION_TYPE_DOWNTIME
+            default: INFRACTION_TYPE_UNSPECIFIED
+            description: |-
+              InfractionType indicates the infraction type a validator commited.
+
+               - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
+               - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
+               - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
+        description: |-
+          This packet is sent from the consumer chain to the provider chain
+          to request the slashing of a validator as a result of an infraction
+          committed on the consumer chain.
+      infraction:
+        type: string
+        enum:
+          - INFRACTION_TYPE_UNSPECIFIED
+          - INFRACTION_TYPE_DOUBLE_SIGN
+          - INFRACTION_TYPE_DOWNTIME
+        default: INFRACTION_TYPE_UNSPECIFIED
+        description: |-
+          InfractionType indicates the infraction type a validator commited.
+
+           - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
+           - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
+           - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
+    title: SlashRequest defines a slashing request for CCV consumer module
+  interchain_security.ccv.consumer.v1.SlashRequests:
+    type: object
+    properties:
+      requests:
+        type: array
+        items:
+          type: object
+          properties:
+            packet:
+              type: object
+              properties:
+                validator:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                      format: byte
+                      title: The first 20 bytes of SHA256(public key)
+                    power:
+                      type: string
+                      format: int64
+                      description: The voting power
+                      title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+                  title: Validator
+                valset_update_id:
+                  type: string
+                  format: uint64
+                  title: map to the infraction block height on the provider
+                infraction:
+                  title: >-
+                    tell if the slashing is for a downtime or a double-signing
+                    infraction
+                  type: string
+                  enum:
+                    - INFRACTION_TYPE_UNSPECIFIED
+                    - INFRACTION_TYPE_DOUBLE_SIGN
+                    - INFRACTION_TYPE_DOWNTIME
+                  default: INFRACTION_TYPE_UNSPECIFIED
+                  description: >-
+                    InfractionType indicates the infraction type a validator
+                    commited.
+
+                     - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
+                     - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
+                     - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
+              description: >-
+                This packet is sent from the consumer chain to the provider
+                chain
+
+                to request the slashing of a validator as a result of an
+                infraction
+
+                committed on the consumer chain.
+            infraction:
+              type: string
+              enum:
+                - INFRACTION_TYPE_UNSPECIFIED
+                - INFRACTION_TYPE_DOUBLE_SIGN
+                - INFRACTION_TYPE_DOWNTIME
+              default: INFRACTION_TYPE_UNSPECIFIED
+              description: >-
+                InfractionType indicates the infraction type a validator
+                commited.
+
+                 - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
+                 - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
+                 - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
+          title: SlashRequest defines a slashing request for CCV consumer module
+    title: SlashRequests is a list of slash requests for CCV consumer module
+  interchain_security.ccv.provider.v1.Chain:
+    type: object
+    properties:
+      chain_id:
+        type: string
+      client_id:
+        type: string
+  interchain_security.ccv.provider.v1.ConsumerAdditionProposal:
+    type: object
+    properties:
+      title:
+        type: string
+        title: the title of the proposal
+      description:
+        type: string
+        title: the description of the proposal
+      chain_id:
+        type: string
+        description: >-
+          the proposed chain-id of the new consumer chain, must be different
+          from all other consumer chain ids of the executing
+
+          provider chain.
+      initial_height:
+        description: >-
+          the proposed initial height of new consumer chain.
+
+          For a completely new chain, this will be {0,1}. However, it may be
+          different if this is a chain that is converting to a consumer chain.
+        type: object
+        properties:
+          revision_number:
+            type: string
+            format: uint64
+            title: the revision that the client is currently on
+          revision_height:
+            type: string
+            format: uint64
+            title: the height within the given revision
+        title: >-
+          Height is a monotonically increasing data type
+
+          that can be compared against another Height for the purposes of
+          updating and
+
+          freezing clients
+      genesis_hash:
+        type: string
+        format: byte
+        description: genesis hash with no staking information included.
+      binary_hash:
+        type: string
+        format: byte
+        description: >-
+          binary hash is the hash of the binary that should be used by
+          validators on chain initialization.
+      spawn_time:
+        type: string
+        format: date-time
+        description: >-
+          spawn time is the time on the provider chain at which the consumer
+          chain genesis is finalized and all validators
+
+          will be responsible for starting their consumer chain validator node.
+      lock_unbonding_on_timeout:
+        type: boolean
+        description: >-
+          Indicates whether the outstanding unbonding operations should be
+          released
+
+          in case of a channel time-outs. When set to true, a governance
+          proposal
+
+          on the provider chain would be necessary to release the locked funds.
+    description: >-
+      ConsumerAdditionProposal is a governance proposal on the provider chain to
+      spawn a new consumer chain.
+
+      If it passes, then all validators on the provider chain are expected to
+      validate the consumer chain at spawn time
+
+      or get slashed. It is recommended that spawn time occurs after the
+      proposal end time.
+  interchain_security.ccv.provider.v1.ConsumerAdditionProposals:
+    type: object
+    properties:
+      pending:
+        type: array
+        items:
+          type: object
+          properties:
+            title:
+              type: string
+              title: the title of the proposal
+            description:
+              type: string
+              title: the description of the proposal
+            chain_id:
+              type: string
+              description: >-
+                the proposed chain-id of the new consumer chain, must be
+                different from all other consumer chain ids of the executing
+
+                provider chain.
+            initial_height:
+              description: >-
+                the proposed initial height of new consumer chain.
+
+                For a completely new chain, this will be {0,1}. However, it may
+                be different if this is a chain that is converting to a consumer
+                chain.
+              type: object
+              properties:
+                revision_number:
+                  type: string
+                  format: uint64
+                  title: the revision that the client is currently on
+                revision_height:
+                  type: string
+                  format: uint64
+                  title: the height within the given revision
+              title: >-
+                Height is a monotonically increasing data type
+
+                that can be compared against another Height for the purposes of
+                updating and
+
+                freezing clients
+            genesis_hash:
+              type: string
+              format: byte
+              description: genesis hash with no staking information included.
+            binary_hash:
+              type: string
+              format: byte
+              description: >-
+                binary hash is the hash of the binary that should be used by
+                validators on chain initialization.
+            spawn_time:
+              type: string
+              format: date-time
+              description: >-
+                spawn time is the time on the provider chain at which the
+                consumer chain genesis is finalized and all validators
+
+                will be responsible for starting their consumer chain validator
+                node.
+            lock_unbonding_on_timeout:
+              type: boolean
+              description: >-
+                Indicates whether the outstanding unbonding operations should be
+                released
+
+                in case of a channel time-outs. When set to true, a governance
+                proposal
+
+                on the provider chain would be necessary to release the locked
+                funds.
+          description: >-
+            ConsumerAdditionProposal is a governance proposal on the provider
+            chain to spawn a new consumer chain.
+
+            If it passes, then all validators on the provider chain are expected
+            to validate the consumer chain at spawn time
+
+            or get slashed. It is recommended that spawn time occurs after the
+            proposal end time.
+        title: proposals waiting for spawn_time to pass
+    description: >-
+      ConsumerAdditionProposals holds pending governance proposals on the
+      provider chain to spawn a new chain.
+  interchain_security.ccv.provider.v1.ConsumerRemovalProposal:
+    type: object
+    properties:
+      title:
+        type: string
+        title: the title of the proposal
+      description:
+        type: string
+        title: the description of the proposal
+      chain_id:
+        type: string
+        title: the chain-id of the consumer chain to be stopped
+      stop_time:
+        type: string
+        format: date-time
+        title: >-
+          the time on the provider chain at which all validators are responsible
+          to stop their consumer chain validator node
+    description: >-
+      ConsumerRemovalProposal is a governance proposal on the provider chain to
+      remove (and stop) a consumer chain.
+
+      If it passes, all the consumer chain's state is removed from the provider
+      chain. The outstanding unbonding
+
+      operation funds are released if the LockUnbondingOnTimeout parameter is
+      set to false for the consumer chain ID.
+  interchain_security.ccv.provider.v1.ConsumerRemovalProposals:
+    type: object
+    properties:
+      pending:
+        type: array
+        items:
+          type: object
+          properties:
+            title:
+              type: string
+              title: the title of the proposal
+            description:
+              type: string
+              title: the description of the proposal
+            chain_id:
+              type: string
+              title: the chain-id of the consumer chain to be stopped
+            stop_time:
+              type: string
+              format: date-time
+              title: >-
+                the time on the provider chain at which all validators are
+                responsible to stop their consumer chain validator node
+          description: >-
+            ConsumerRemovalProposal is a governance proposal on the provider
+            chain to remove (and stop) a consumer chain.
+
+            If it passes, all the consumer chain's state is removed from the
+            provider chain. The outstanding unbonding
+
+            operation funds are released if the LockUnbondingOnTimeout parameter
+            is set to false for the consumer chain ID.
+        title: proposals waiting for stop_time to pass
+    description: >-
+      ConsumerRemovalProposals holds pending governance proposals on the
+      provider chain to remove (and stop) a consumer chain.
+  interchain_security.ccv.provider.v1.QueryConsumerChainStartProposalsResponse:
+    type: object
+    properties:
+      proposals:
+        type: object
+        properties:
+          pending:
+            type: array
+            items:
+              type: object
+              properties:
+                title:
+                  type: string
+                  title: the title of the proposal
+                description:
+                  type: string
+                  title: the description of the proposal
+                chain_id:
+                  type: string
+                  description: >-
+                    the proposed chain-id of the new consumer chain, must be
+                    different from all other consumer chain ids of the executing
+
+                    provider chain.
+                initial_height:
+                  description: >-
+                    the proposed initial height of new consumer chain.
+
+                    For a completely new chain, this will be {0,1}. However, it
+                    may be different if this is a chain that is converting to a
+                    consumer chain.
+                  type: object
+                  properties:
+                    revision_number:
+                      type: string
+                      format: uint64
+                      title: the revision that the client is currently on
+                    revision_height:
+                      type: string
+                      format: uint64
+                      title: the height within the given revision
+                  title: >-
+                    Height is a monotonically increasing data type
+
+                    that can be compared against another Height for the purposes
+                    of updating and
+
+                    freezing clients
+                genesis_hash:
+                  type: string
+                  format: byte
+                  description: genesis hash with no staking information included.
+                binary_hash:
+                  type: string
+                  format: byte
+                  description: >-
+                    binary hash is the hash of the binary that should be used by
+                    validators on chain initialization.
+                spawn_time:
+                  type: string
+                  format: date-time
+                  description: >-
+                    spawn time is the time on the provider chain at which the
+                    consumer chain genesis is finalized and all validators
+
+                    will be responsible for starting their consumer chain
+                    validator node.
+                lock_unbonding_on_timeout:
+                  type: boolean
+                  description: >-
+                    Indicates whether the outstanding unbonding operations
+                    should be released
+
+                    in case of a channel time-outs. When set to true, a
+                    governance proposal
+
+                    on the provider chain would be necessary to release the
+                    locked funds.
+              description: >-
+                ConsumerAdditionProposal is a governance proposal on the
+                provider chain to spawn a new consumer chain.
+
+                If it passes, then all validators on the provider chain are
+                expected to validate the consumer chain at spawn time
+
+                or get slashed. It is recommended that spawn time occurs after
+                the proposal end time.
+            title: proposals waiting for spawn_time to pass
+        description: >-
+          ConsumerAdditionProposals holds pending governance proposals on the
+          provider chain to spawn a new chain.
+  interchain_security.ccv.provider.v1.QueryConsumerChainStopProposalsResponse:
+    type: object
+    properties:
+      proposals:
+        type: object
+        properties:
+          pending:
+            type: array
+            items:
+              type: object
+              properties:
+                title:
+                  type: string
+                  title: the title of the proposal
+                description:
+                  type: string
+                  title: the description of the proposal
+                chain_id:
+                  type: string
+                  title: the chain-id of the consumer chain to be stopped
+                stop_time:
+                  type: string
+                  format: date-time
+                  title: >-
+                    the time on the provider chain at which all validators are
+                    responsible to stop their consumer chain validator node
+              description: >-
+                ConsumerRemovalProposal is a governance proposal on the provider
+                chain to remove (and stop) a consumer chain.
+
+                If it passes, all the consumer chain's state is removed from the
+                provider chain. The outstanding unbonding
+
+                operation funds are released if the LockUnbondingOnTimeout
+                parameter is set to false for the consumer chain ID.
+            title: proposals waiting for stop_time to pass
+        description: >-
+          ConsumerRemovalProposals holds pending governance proposals on the
+          provider chain to remove (and stop) a consumer chain.
+  interchain_security.ccv.provider.v1.QueryConsumerChainsResponse:
+    type: object
+    properties:
+      chains:
+        type: array
+        items:
+          type: object
+          properties:
+            chain_id:
+              type: string
+            client_id:
+              type: string
+  interchain_security.ccv.provider.v1.QueryConsumerGenesisResponse:
+    type: object
+    properties:
+      genesis_state:
+        type: object
+        properties:
+          params:
+            type: object
+            properties:
+              enabled:
+                type: boolean
+                title: >-
+                  TODO: Remove enabled flag and find a better way to setup e2e
+                  tests
+
+                  See: https://github.com/cosmos/interchain-security/issues/339
+              blocks_per_distribution_transmission:
+                type: string
+                format: int64
+                description: >-
+                  /////////////////////
+
+                  Distribution Params
+
+                  Number of blocks between ibc-token-transfers from the consumer
+                  chain to
+
+                  the provider chain. Note that at this transmission event a
+                  fraction of
+
+                  the accumulated tokens are divided and sent consumer
+                  redistribution
+
+                  address.
+              distribution_transmission_channel:
+                type: string
+                description: >-
+                  Channel, and provider-chain receiving address to send
+                  distribution token
+
+                  transfers over. These parameters is auto-set during the
+                  consumer <->
+
+                  provider handshake procedure.
+              provider_fee_pool_addr_str:
+                type: string
+              ccv_timeout_period:
+                type: string
+                title: Sent CCV related IBC packets will timeout after this duration
+              transfer_timeout_period:
+                type: string
+                title: >-
+                  Sent transfer related IBC packets will timeout after this
+                  duration
+              consumer_redistribution_fraction:
+                type: string
+                description: >-
+                  The fraction of tokens allocated to the consumer
+                  redistribution address
+
+                  during distribution events. The fraction is a string
+                  representing a
+
+                  decimal number. For example "0.75" would represent 75%.
+              historical_entries:
+                type: string
+                format: int64
+                description: >-
+                  The number of historical info entries to persist in store.
+
+                  This param is a part of the cosmos sdk staking module. In the
+                  case of 
+
+                  a ccv enabled consumer chain, the ccv module acts as the
+                  staking module.
+              unbonding_period:
+                type: string
+                description: |-
+                  Unbonding period for the consumer,
+                  which should be smaller than that of the provider in general.
+            title: Params defines the parameters for CCV consumer module
+          provider_client_id:
+            type: string
+            title: empty for a completely new chain
+          provider_channel_id:
+            type: string
+            title: empty for a completely new chain
+          new_chain:
+            type: boolean
+            description: true for new chain GenesisState, false for chain restart.
+          provider_client_state:
+            description: ProviderClientState filled in on new chain, nil on restart.
+            type: object
+            properties:
+              chain_id:
+                type: string
+              trust_level:
+                type: object
+                properties:
+                  numerator:
+                    type: string
+                    format: uint64
+                  denominator:
+                    type: string
+                    format: uint64
+                description: >-
+                  Fraction defines the protobuf message type for tmmath.Fraction
+                  that only
+
+                  supports positive values.
+              trusting_period:
+                type: string
+                title: >-
+                  duration of the period since the LastestTimestamp during which
+                  the
+
+                  submitted headers are valid for upgrade
+              unbonding_period:
+                type: string
+                title: duration of the staking unbonding period
+              max_clock_drift:
+                type: string
+                description: >-
+                  defines how much new (untrusted) header's Time can drift into
+                  the future.
+              frozen_height:
+                title: Block height when the client was frozen due to a misbehaviour
+                type: object
+                properties:
+                  revision_number:
+                    type: string
+                    format: uint64
+                    title: the revision that the client is currently on
+                  revision_height:
+                    type: string
+                    format: uint64
+                    title: the height within the given revision
+                description: >-
+                  Normally the RevisionHeight is incremented at each height
+                  while keeping
+
+                  RevisionNumber the same. However some consensus algorithms may
+                  choose to
+
+                  reset the height in certain conditions e.g. hard forks,
+                  state-machine
+
+                  breaking changes In these cases, the RevisionNumber is
+                  incremented so that
+
+                  height continues to be monitonically increasing even as the
+                  RevisionHeight
+
+                  gets reset
+              latest_height:
+                title: Latest height the client was updated to
+                type: object
+                properties:
+                  revision_number:
+                    type: string
+                    format: uint64
+                    title: the revision that the client is currently on
+                  revision_height:
+                    type: string
+                    format: uint64
+                    title: the height within the given revision
+                description: >-
+                  Normally the RevisionHeight is incremented at each height
+                  while keeping
+
+                  RevisionNumber the same. However some consensus algorithms may
+                  choose to
+
+                  reset the height in certain conditions e.g. hard forks,
+                  state-machine
+
+                  breaking changes In these cases, the RevisionNumber is
+                  incremented so that
+
+                  height continues to be monitonically increasing even as the
+                  RevisionHeight
+
+                  gets reset
+              proof_specs:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    leaf_spec:
+                      title: >-
+                        any field in the ExistenceProof must be the same as in
+                        this spec.
+
+                        except Prefix, which is just the first bytes of prefix
+                        (spec can be longer)
+                      type: object
+                      properties:
+                        hash:
+                          type: string
+                          enum:
+                            - NO_HASH
+                            - SHA256
+                            - SHA512
+                            - KECCAK
+                            - RIPEMD160
+                            - BITCOIN
+                            - SHA512_256
+                          default: NO_HASH
+                          title: >-
+                            - NO_HASH: NO_HASH is the default if no data passed.
+                            Note this is an illegal argument some places.
+                             - BITCOIN: ripemd160(sha256(x))
+                        prehash_key:
+                          type: string
+                          enum:
+                            - NO_HASH
+                            - SHA256
+                            - SHA512
+                            - KECCAK
+                            - RIPEMD160
+                            - BITCOIN
+                            - SHA512_256
+                          default: NO_HASH
+                          title: >-
+                            - NO_HASH: NO_HASH is the default if no data passed.
+                            Note this is an illegal argument some places.
+                             - BITCOIN: ripemd160(sha256(x))
+                        prehash_value:
+                          type: string
+                          enum:
+                            - NO_HASH
+                            - SHA256
+                            - SHA512
+                            - KECCAK
+                            - RIPEMD160
+                            - BITCOIN
+                            - SHA512_256
+                          default: NO_HASH
+                          title: >-
+                            - NO_HASH: NO_HASH is the default if no data passed.
+                            Note this is an illegal argument some places.
+                             - BITCOIN: ripemd160(sha256(x))
+                        length:
+                          type: string
+                          enum:
+                            - NO_PREFIX
+                            - VAR_PROTO
+                            - VAR_RLP
+                            - FIXED32_BIG
+                            - FIXED32_LITTLE
+                            - FIXED64_BIG
+                            - FIXED64_LITTLE
+                            - REQUIRE_32_BYTES
+                            - REQUIRE_64_BYTES
+                          default: NO_PREFIX
+                          description: |-
+                            - NO_PREFIX: NO_PREFIX don't include any length info
+                             - VAR_PROTO: VAR_PROTO uses protobuf (and go-amino) varint encoding of the length
+                             - VAR_RLP: VAR_RLP uses rlp int encoding of the length
+                             - FIXED32_BIG: FIXED32_BIG uses big-endian encoding of the length as a 32 bit integer
+                             - FIXED32_LITTLE: FIXED32_LITTLE uses little-endian encoding of the length as a 32 bit integer
+                             - FIXED64_BIG: FIXED64_BIG uses big-endian encoding of the length as a 64 bit integer
+                             - FIXED64_LITTLE: FIXED64_LITTLE uses little-endian encoding of the length as a 64 bit integer
+                             - REQUIRE_32_BYTES: REQUIRE_32_BYTES is like NONE, but will fail if the input is not exactly 32 bytes (sha256 output)
+                             - REQUIRE_64_BYTES: REQUIRE_64_BYTES is like NONE, but will fail if the input is not exactly 64 bytes (sha512 output)
+                          title: >-
+                            *
+
+                            LengthOp defines how to process the key and value of
+                            the LeafOp
+
+                            to include length information. After encoding the
+                            length with the given
+
+                            algorithm, the length will be prepended to the key
+                            and value bytes.
+
+                            (Each one with it's own encoded length)
+                        prefix:
+                          type: string
+                          format: byte
+                          description: >-
+                            prefix is a fixed bytes that may optionally be
+                            included at the beginning to differentiate
+
+                            a leaf node from an inner node.
+                      description: >-
+                        *
+
+                        LeafOp represents the raw key-value data we wish to
+                        prove, and
+
+                        must be flexible to represent the internal
+                        transformation from
+
+                        the original key-value pairs into the basis hash, for
+                        many existing
+
+                        merkle trees.
+
+
+                        key and value are passed in. So that the signature of
+                        this operation is:
+
+                        leafOp(key, value) -> output
+
+
+                        To process this, first prehash the keys and values if
+                        needed (ANY means no hash in this case):
+
+                        hkey = prehashKey(key)
+
+                        hvalue = prehashValue(value)
+
+
+                        Then combine the bytes, and hash it
+
+                        output = hash(prefix || length(hkey) || hkey ||
+                        length(hvalue) || hvalue)
+                    inner_spec:
+                      type: object
+                      properties:
+                        child_order:
+                          type: array
+                          items:
+                            type: integer
+                            format: int32
+                          title: >-
+                            Child order is the ordering of the children node,
+                            must count from 0
+
+                            iavl tree is [0, 1] (left then right)
+
+                            merk is [0, 2, 1] (left, right, here)
+                        child_size:
+                          type: integer
+                          format: int32
+                        min_prefix_length:
+                          type: integer
+                          format: int32
+                        max_prefix_length:
+                          type: integer
+                          format: int32
+                        empty_child:
+                          type: string
+                          format: byte
+                          title: >-
+                            empty child is the prehash image that is used when
+                            one child is nil (eg. 20 bytes of 0)
+                        hash:
+                          type: string
+                          enum:
+                            - NO_HASH
+                            - SHA256
+                            - SHA512
+                            - KECCAK
+                            - RIPEMD160
+                            - BITCOIN
+                            - SHA512_256
+                          default: NO_HASH
+                          title: >-
+                            - NO_HASH: NO_HASH is the default if no data passed.
+                            Note this is an illegal argument some places.
+                             - BITCOIN: ripemd160(sha256(x))
+                      description: >-
+                        InnerSpec contains all store-specific structure info to
+                        determine if two proofs from a
+
+                        given store are neighbors.
+
+
+                        This enables:
+
+
+                        isLeftMost(spec: InnerSpec, op: InnerOp)
+
+                        isRightMost(spec: InnerSpec, op: InnerOp)
+
+                        isLeftNeighbor(spec: InnerSpec, left: InnerOp, right:
+                        InnerOp)
+                    max_depth:
+                      type: integer
+                      format: int32
+                      title: >-
+                        max_depth (if > 0) is the maximum number of InnerOps
+                        allowed (mainly for fixed-depth tries)
+                    min_depth:
+                      type: integer
+                      format: int32
+                      title: >-
+                        min_depth (if > 0) is the minimum number of InnerOps
+                        allowed (mainly for fixed-depth tries)
+                  description: >-
+                    *
+
+                    ProofSpec defines what the expected parameters are for a
+                    given proof type.
+
+                    This can be stored in the client and used to validate any
+                    incoming proofs.
+
+
+                    verify(ProofSpec, Proof) -> Proof | Error
+
+
+                    As demonstrated in tests, if we don't fix the algorithm used
+                    to calculate the
+
+                    LeafHash for a given tree, there are many possible key-value
+                    pairs that can
+
+                    generate a given hash (by interpretting the preimage
+                    differently).
+
+                    We need this for proper security, requires client knows a
+                    priori what
+
+                    tree format server uses. But not in code, rather a
+                    configuration object.
+                title: Proof specifications used in verifying counterparty state
+              upgrade_path:
+                type: array
+                items:
+                  type: string
+                title: >-
+                  Path at which next upgraded client will be committed.
+
+                  Each element corresponds to the key for a single
+                  CommitmentProof in the
+
+                  chained proof. NOTE: ClientState must stored under
+
+                  `{upgradePath}/{upgradeHeight}/clientState` ConsensusState
+                  must be stored
+
+                  under `{upgradepath}/{upgradeHeight}/consensusState` For SDK
+                  chains using
+
+                  the default upgrade module, upgrade_path should be
+                  []string{"upgrade",
+
+                  "upgradedIBCState"}`
+              allow_update_after_expiry:
+                type: boolean
+                title: >-
+                  This flag, when set to true, will allow governance to recover
+                  a client
+
+                  which has expired
+              allow_update_after_misbehaviour:
+                type: boolean
+                title: >-
+                  This flag, when set to true, will allow governance to unfreeze
+                  a client
+
+                  whose chain has experienced a misbehaviour event
+          provider_consensus_state:
+            description: ProviderConsensusState filled in on new chain, nil on restart.
+            type: object
+            properties:
+              timestamp:
+                type: string
+                format: date-time
+                description: >-
+                  timestamp that corresponds to the block height in which the
+                  ConsensusState
+
+                  was stored.
+              root:
+                title: commitment root (i.e app hash)
+                type: object
+                properties:
+                  hash:
+                    type: string
+                    format: byte
+                description: >-
+                  MerkleRoot defines a merkle root hash.
+
+                  In the Cosmos SDK, the AppHash of a block header becomes the
+                  root.
+              next_validators_hash:
+                type: string
+                format: byte
+          maturing_packets:
+            type: array
+            items:
+              type: object
+              properties:
+                vscId:
+                  type: string
+                  format: uint64
+                maturity_time:
+                  type: string
+                  format: uint64
+              title: |-
+                MaturingVSCPacket defines the genesis information for the
+                unbonding VSC packet
+            description: MaturingPackets nil on new chain, filled on restart.
+          initial_val_set:
+            type: array
+            items:
+              type: object
+              properties:
+                pub_key:
+                  type: object
+                  properties:
+                    ed25519:
+                      type: string
+                      format: byte
+                    secp256k1:
+                      type: string
+                      format: byte
+                  title: >-
+                    PublicKey defines the keys available for use with Tendermint
+                    Validators
+                power:
+                  type: string
+                  format: int64
+              title: ValidatorUpdate
+            description: InitialValset filled in on new chain and on restart.
+          height_to_valset_update_id:
+            type: array
+            items:
+              type: object
+              properties:
+                height:
+                  type: string
+                  format: uint64
+                valset_update_id:
+                  type: string
+                  format: uint64
+              title: >-
+                HeightValsetUpdateID defines the genesis information for the
+                mapping 
+
+                of each block height to a valset update id
+            description: HeightToValsetUpdateId nil on new chain, filled on restart.
+          outstanding_downtime_slashing:
+            type: array
+            items:
+              type: object
+              properties:
+                validator_consensus_address:
+                  type: string
+              description: >-
+                OutstandingDowntime defines the genesis information for each
+                validator
+
+                flagged with an outstanding downtime slashing.
+            description: OutstandingDowntimes nil on new chain, filled on restart.
+          pending_slash_requests:
+            description: PendingSlashRequests filled in on new chain, nil on restart.
+            type: object
+            properties:
+              requests:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    packet:
+                      type: object
+                      properties:
+                        validator:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                              format: byte
+                              title: The first 20 bytes of SHA256(public key)
+                            power:
+                              type: string
+                              format: int64
+                              description: The voting power
+                              title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+                          title: Validator
+                        valset_update_id:
+                          type: string
+                          format: uint64
+                          title: map to the infraction block height on the provider
+                        infraction:
+                          title: >-
+                            tell if the slashing is for a downtime or a
+                            double-signing infraction
+                          type: string
+                          enum:
+                            - INFRACTION_TYPE_UNSPECIFIED
+                            - INFRACTION_TYPE_DOUBLE_SIGN
+                            - INFRACTION_TYPE_DOWNTIME
+                          default: INFRACTION_TYPE_UNSPECIFIED
+                          description: >-
+                            InfractionType indicates the infraction type a
+                            validator commited.
+
+                             - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
+                             - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
+                             - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
+                      description: >-
+                        This packet is sent from the consumer chain to the
+                        provider chain
+
+                        to request the slashing of a validator as a result of an
+                        infraction
+
+                        committed on the consumer chain.
+                    infraction:
+                      type: string
+                      enum:
+                        - INFRACTION_TYPE_UNSPECIFIED
+                        - INFRACTION_TYPE_DOUBLE_SIGN
+                        - INFRACTION_TYPE_DOWNTIME
+                      default: INFRACTION_TYPE_UNSPECIFIED
+                      description: >-
+                        InfractionType indicates the infraction type a validator
+                        commited.
+
+                         - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
+                         - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
+                         - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
+                  title: >-
+                    SlashRequest defines a slashing request for CCV consumer
+                    module
+            title: SlashRequests is a list of slash requests for CCV consumer module
+        title: GenesisState defines the CCV consumer chain genesis state
+  interchain_security.ccv.v1.SlashPacketData:
+    type: object
+    properties:
+      validator:
+        type: object
+        properties:
+          address:
+            type: string
+            format: byte
+            title: The first 20 bytes of SHA256(public key)
+          power:
+            type: string
+            format: int64
+            description: The voting power
+            title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+        title: Validator
+      valset_update_id:
+        type: string
+        format: uint64
+        title: map to the infraction block height on the provider
+      infraction:
+        title: tell if the slashing is for a downtime or a double-signing infraction
+        type: string
+        enum:
+          - INFRACTION_TYPE_UNSPECIFIED
+          - INFRACTION_TYPE_DOUBLE_SIGN
+          - INFRACTION_TYPE_DOWNTIME
+        default: INFRACTION_TYPE_UNSPECIFIED
+        description: |-
+          InfractionType indicates the infraction type a validator commited.
+
+           - INFRACTION_TYPE_UNSPECIFIED: UNSPECIFIED defines an empty infraction type.
+           - INFRACTION_TYPE_DOUBLE_SIGN: DOUBLE_SIGN defines a validator that double-signs a block.
+           - INFRACTION_TYPE_DOWNTIME: DOWNTIME defines a validator that missed signing too many blocks.
+    description: |-
+      This packet is sent from the consumer chain to the provider chain
+      to request the slashing of a validator as a result of an infraction
+      committed on the consumer chain.
+  tendermint.abci.Validator:
+    type: object
+    properties:
+      address:
+        type: string
+        format: byte
+        title: The first 20 bytes of SHA256(public key)
+      power:
+        type: string
+        format: int64
+        description: The voting power
+        title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+    title: Validator
+  tendermint.abci.ValidatorUpdate:
+    type: object
+    properties:
+      pub_key:
+        type: object
+        properties:
+          ed25519:
+            type: string
+            format: byte
+          secp256k1:
+            type: string
+            format: byte
+        title: >-
+          PublicKey defines the keys available for use with Tendermint
+          Validators
+      power:
+        type: string
+        format: int64
+    title: ValidatorUpdate
   nicholasdotsol.duality.dex.FeeTier:
     type: object
     properties:
