@@ -1,0 +1,44 @@
+syntax = "proto3";
+package nicholasdotsol.duality.mev;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/NicholasDotSol/duality/x/mev/types";
+import "gogoproto/gogo.proto";
+
+// Msg defines the Msg service.
+service Msg {
+      rpc Send(MsgSend) returns (MsgSendResponse);
+  rpc WithdrawFunds(MsgWithdrawFunds) returns (MsgWithdrawFundsResponse);
+// this line is used by starport scaffolding # proto/tx/rpc
+}
+
+message MsgSend {
+  string creator = 1;
+  string amountIn = 2 [
+      (gogoproto.moretags)   = "yaml:\"amountIn\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "amountIn"
+  ]; 
+  string tokenIn = 3;
+}
+
+message MsgSendResponse {
+}
+
+message MsgWithdrawFunds {
+  string creator = 1;
+   string amountOut = 2 [
+      (gogoproto.moretags)   = "yaml:\"amountOut\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "amountOut"
+  ]; 
+  string tokenOut = 3;
+}
+
+message MsgWithdrawFundsResponse {
+}
+
+// this line is used by starport scaffolding # proto/tx/message

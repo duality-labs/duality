@@ -1,0 +1,12 @@
+syntax = "proto3";
+package nicholasdotsol.duality.mev;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/NicholasDotSol/duality/x/mev/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (gogoproto.goproto_stringer) = false;
+  
+}

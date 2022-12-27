@@ -23529,10 +23529,10 @@ paths:
           type: string
       tags:
         - Query
-  /NicholasDotSol/duality/mevdummy/params:
+  /NicholasDotSol/duality/mev/params:
     get:
       summary: Parameters queries the parameters of the module.
-      operationId: NicholasdotsolDualityMevdummyParams
+      operationId: NicholasdotsolDualityMevParams
       responses:
         '200':
           description: A successful response.
@@ -41175,14 +41175,14 @@ definitions:
       minTick:
         type: string
         format: int64
-  nicholasdotsol.duality.mevdummy.MsgSendResponse:
+  nicholasdotsol.duality.mev.MsgSendResponse:
     type: object
-  nicholasdotsol.duality.mevdummy.MsgWithdrawFundsResponse:
+  nicholasdotsol.duality.mev.MsgWithdrawFundsResponse:
     type: object
-  nicholasdotsol.duality.mevdummy.Params:
+  nicholasdotsol.duality.mev.Params:
     type: object
     description: Params defines the parameters for the module.
-  nicholasdotsol.duality.mevdummy.QueryParamsResponse:
+  nicholasdotsol.duality.mev.QueryParamsResponse:
     type: object
     properties:
       params:
