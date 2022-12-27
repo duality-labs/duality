@@ -3,8 +3,10 @@
 
 ALICE_ADDRESS=$(cat alice.txt | grep "address:" | awk '{print $2}')
 BOB_ADDRESS=$(cat bob.txt | grep "address:" | awk '{print $2}')
-AMOUNT=$((100))
-COIN=$((${AMOUNT} + stake ))
+AMOUNT=100
+COIN="${AMOUNT}stake"
+
+echo ${COIN}
 # Print the value of the ALICE_ADDRESS and BOB_ADDRESS variables
 echo "Alice's address: ${ALICE_ADDRESS}"
 echo "Bob's address: ${BOB_ADDRESS}"
