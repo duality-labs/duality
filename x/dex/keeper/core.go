@@ -23,6 +23,7 @@ func (k Keeper) DepositCore(
 	token0 string,
 	token1 string,
 	callerAddr sdk.AccAddress,
+	receiverAddr sdk.AccAddress,
 	amounts0 []sdk.Int,
 	amounts1 []sdk.Int,
 ) (amounts0Deposit []sdk.Int, amounts1Deposit []sdk.Int, err error) {
@@ -100,7 +101,7 @@ func (k Keeper) DepositCore(
 		inAmount0, inAmount1, outShares := pool.Deposit(amount0, amount1, totalShares)
 		pool.Save(goCtx, k)
 		if outShares.GT(sdk.ZeroInt()) { // update shares accounting
-			if err := k.MintShares(ctx, callerAddr, outShares, sharesId); err != nil {
+			if err := k.MintShares(ctx, receiverAddr, outShares, sharesId); err != nil {
 				return nil, nil, err
 			}
 		}
@@ -719,6 +720,10 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	if !found {
 		return types.ErrValidLimitOrderMapsNotFound
 	}
+	// checks that the user has some number of limit order shares wished to withdraw
+	if trancheUser.SharesOwned.LTE(sdk.ZeroInt()) {
+		return sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
+	}
 
 	tranche, found := k.GetLimitOrderTranche(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 	if !found {
@@ -806,6 +811,12 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	if !found {
 		return types.ErrValidLimitOrderMapsNotFound
 	}
+	sharesToWithdraw := trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled)
+
+	// checks that the user has some number of limit order shares wished to withdraw
+	if sharesToWithdraw.LTE(sdk.ZeroInt()) {
+		return sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
+	}
 
 	tick, found := k.GetTick(ctx, pairId, msg.TickIndex)
 	if !found {
@@ -826,7 +837,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	ratioFilled := amountFilled.QuoInt(tranche.TotalTokenIn)
 	maxAllowedToWithdraw := sdk.MinInt(
 		ratioFilled.MulInt(trancheUser.SharesOwned).TruncateInt(), // cannot withdraw more than what's been filled
-		trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled),  // cannot withdraw more than what you own
+		sharesToWithdraw,
 	)
 	amountOutTokenIn := maxAllowedToWithdraw.Sub(trancheUser.SharesWithdrawn)
 

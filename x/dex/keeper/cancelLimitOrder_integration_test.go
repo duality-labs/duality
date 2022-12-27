@@ -194,6 +194,6 @@ func (s *MsgServerTestSuite) TestCancelTwiceFails() {
 	s.assertAliceBalances(50, 50)
 	s.assertDexBalances(0, 0)
 
-	s.aliceCancelsLimitSellFails("TokenB", -1, 0, types.ErrNotEnoughShares)
+	s.aliceCancelsLimitSellFails("TokenB", -1, 0, types.ErrValidTickNotFound)
 
 }

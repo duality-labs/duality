@@ -3,8 +3,8 @@ package nicholasdotsol.duality.dex;
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 
-import "dex/tick_data_type.proto";
-import "dex/limit_tranche_indexes.proto";
+import "duality/dex/tick_data_type.proto";
+import "duality/dex/limit_tranche_indexes.proto";
 import "gogoproto/gogo.proto";
 
 message Tick {

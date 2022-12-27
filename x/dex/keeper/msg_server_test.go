@@ -281,7 +281,7 @@ func (s *MsgServerTestSuite) assertLimitSellFails(account sdk.AccAddress, expect
 		TokenIn:   tokenIn,
 		AmountIn:  sdk.NewInt(int64(amountIn)),
 	})
-	s.Assert().ErrorIs(expectedErr, err)
+	s.Assert().ErrorIs(err, expectedErr)
 }
 
 type Deposit struct {
@@ -554,7 +554,7 @@ func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr
 		AmountIn: sdk.NewInt(int64(amountIn)),
 		MinOut:   sdk.NewInt(int64(minOut)),
 	})
-	s.Assert().ErrorIs(expectedErr, err)
+	s.Assert().ErrorIs(err, expectedErr)
 }
 
 func (s *MsgServerTestSuite) withdrawsLimitSell(account sdk.AccAddress, selling string, tick int, tranche int) {
@@ -584,6 +584,35 @@ func (s *MsgServerTestSuite) carolWithdrawsLimitSell(selling string, tick int, t
 
 func (s *MsgServerTestSuite) danWithdrawsLimitSell(selling string, tick int, tranche int) {
 	s.withdrawsLimitSell(s.dan, selling, tick, tranche)
+}
+
+func (s *MsgServerTestSuite) withdrawLimitSellFails(account sdk.AccAddress, expectedErr error, selling string, tick int, tranche int) {
+	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
+		Creator:   account.String(),
+		Receiver:  account.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		TickIndex: int64(tick),
+		KeyToken:  selling,
+		Key:       uint64(tranche),
+	})
+	s.Assert().ErrorIs(err, expectedErr)
+}
+
+func (s *MsgServerTestSuite) aliceWithdrawLimitSellFails(expectedErr error, selling string, tick int, tranche int) {
+	s.withdrawLimitSellFails(s.alice, expectedErr, selling, tick, tranche)
+}
+
+func (s *MsgServerTestSuite) bobWithdrawLimitSellFails(expectedErr error, selling string, tick int, tranche int) {
+	s.withdrawLimitSellFails(s.bob, expectedErr, selling, tick, tranche)
+}
+
+func (s *MsgServerTestSuite) carolWithdrawLimitSellFails(expectedErr error, selling string, tick int, tranche int) {
+	s.withdrawLimitSellFails(s.carol, expectedErr, selling, tick, tranche)
+}
+
+func (s *MsgServerTestSuite) danWithdrawLimitSellFails(expectedErr error, selling string, tick int, tranche int) {
+	s.withdrawLimitSellFails(s.dan, expectedErr, selling, tick, tranche)
 }
 
 func (s *MsgServerTestSuite) traceBalances() {
