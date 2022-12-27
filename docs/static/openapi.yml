@@ -22268,16 +22268,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/fee_tier/{id}':
@@ -22447,16 +22437,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -22657,16 +22637,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{count}/{address}':
@@ -22779,201 +22749,6 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  /NicholasDotSol/duality/dex/shares:
-    get:
-      summary: Queries a list of Shares items.
-      operationId: NicholasdotsolDualityDexSharesAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              shares:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    address:
-                      type: string
-                    pairId:
-                      type: string
-                    tickIndex:
-                      type: string
-                      format: int64
-                    feeIndex:
-                      type: string
-                      format: uint64
-                    sharesOwned:
-                      type: string
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
-      tags:
-        - Query
-  '/NicholasDotSol/duality/dex/shares/{address}/{pairId}/{tickIndex}/{fee}':
-    get:
-      summary: Queries a Shares by index.
-      operationId: NicholasdotsolDualityDexShares
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              shares:
-                type: object
-                properties:
-                  address:
-                    type: string
-                  pairId:
-                    type: string
-                  tickIndex:
-                    type: string
-                    format: int64
-                  feeIndex:
-                    type: string
-                    format: uint64
-                  sharesOwned:
-                    type: string
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: address
-          in: path
-          required: true
-          type: string
-        - name: pairId
-          in: path
-          required: true
-          type: string
-        - name: tickIndex
-          in: path
-          required: true
-          type: string
-          format: int64
-        - name: fee
-          in: path
-          required: true
-          type: string
-          format: uint64
-      tags:
-        - Query
   /NicholasDotSol/duality/dex/tick:
     get:
       summary: Queries a list of Tick items.
@@ -23023,6 +22798,8 @@ paths:
                         placeTrancheIndex:
                           type: string
                           format: uint64
+                    price0To1:
+                      type: string
               pagination:
                 type: object
                 properties:
@@ -23112,16 +22889,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -23174,6 +22941,8 @@ paths:
                       placeTrancheIndex:
                         type: string
                         format: uint64
+                  price0To1:
+                    type: string
         default:
           description: An unexpected error response.
           schema:
@@ -23313,16 +23082,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -23480,16 +23239,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -23660,16 +23409,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/NicholasDotSol/duality/dex/trading_pair/{pairId}':
@@ -23724,10 +23463,10 @@ paths:
           type: string
       tags:
         - Query
-  /NicholasDotSol/duality/mevdummy/params:
+  /NicholasDotSol/duality/mev/params:
     get:
       summary: Parameters queries the parameters of the module.
-      operationId: NicholasdotsolDualityMevdummyParams
+      operationId: NicholasdotsolDualityMevParams
       responses:
         '200':
           description: A successful response.
@@ -40992,6 +40731,8 @@ definitions:
                 placeTrancheIndex:
                   type: string
                   format: uint64
+            price0To1:
+              type: string
       pagination:
         type: object
         properties:
@@ -41240,6 +40981,8 @@ definitions:
               placeTrancheIndex:
                 type: string
                 format: uint64
+          price0To1:
+            type: string
   nicholasdotsol.duality.dex.QueryGetTokenMapResponse:
     type: object
     properties:
@@ -41326,6 +41069,8 @@ definitions:
           placeTrancheIndex:
             type: string
             format: uint64
+      price0To1:
+        type: string
   nicholasdotsol.duality.dex.TickDataType:
     type: object
     properties:
@@ -41370,12 +41115,12 @@ definitions:
       minTick:
         type: string
         format: int64
-  nicholasdotsol.duality.mevdummy.MsgSendResponse:
+  nicholasdotsol.duality.mev.MsgSendResponse:
     type: object
-  nicholasdotsol.duality.mevdummy.Params:
+  nicholasdotsol.duality.mev.Params:
     type: object
     description: Params defines the parameters for the module.
-  nicholasdotsol.duality.mevdummy.QueryParamsResponse:
+  nicholasdotsol.duality.mev.QueryParamsResponse:
     type: object
     properties:
       params:

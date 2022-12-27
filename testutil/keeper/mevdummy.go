@@ -3,8 +3,8 @@ package keeper
 import (
 	"testing"
 
-	"github.com/NicholasDotSol/duality/x/mevdummy/keeper"
-	"github.com/NicholasDotSol/duality/x/mevdummy/types"
+	"github.com/NicholasDotSol/duality/x/mev/keeper"
+	"github.com/NicholasDotSol/duality/x/mev/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/store"
@@ -17,7 +17,7 @@ import (
 	tmdb "github.com/tendermint/tm-db"
 )
 
-func MevdummyKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
+func MevKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
 
@@ -34,7 +34,7 @@ func MevdummyKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 		types.Amino,
 		storeKey,
 		memStoreKey,
-		"MevdummyParams",
+		"MevParams",
 	)
 	k := keeper.NewKeeper(
 		cdc,

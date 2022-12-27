@@ -1,0 +1,6 @@
+- name: bob
+  type: local
+  address: cosmos1sl5vakxrtjv4nypr3k9p8hqtn825x7c9rd7sdr
+  pubkey: '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"AvaK+y8YIApdT8lJMD5zphBjy+viUxKShaSxTx/f0+o4"}'
+  mnemonic: ""
+
