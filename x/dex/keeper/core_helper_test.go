@@ -568,8 +568,8 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostAddToken0NoToken() {
 	pair := s.app.DexKeeper.GetOrInitPair(s.goCtx, "TokenA", "TokenB")
 	lower, _ := s.setLPAtFee0Pool(1, 0, 0)
 	// THEN no changes are made
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken0(s.goCtx, &pair, &lower)
-	s.Assert().Nil(updatedPair)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken0(s.goCtx, pair, &lower)
+	s.Assert().Equal(pair, updatedPair)
 }
 
 func (s *MsgServerTestSuite) TestCalcTickPointersPostAddToken0NoLiq() {
@@ -578,7 +578,7 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostAddToken0NoLiq() {
 	pair.MinTick = math.MaxInt64
 	lower, _ := s.setLPAtFee0Pool(2, 10, 0)
 	// THEN MinTick and cur1To0 are set to CurrentTick's index
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken0(s.goCtx, &pair, &lower)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken0(s.goCtx, pair, &lower)
 	s.Assert().Equal(int64(1), updatedPair.CurrentTick1To0)
 	s.Assert().Equal(int64(1), updatedPair.MinTick)
 }
@@ -590,7 +590,7 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostAddToken0New1To0() {
 	pair.CurrentTick1To0 = 1
 	lower, _ := s.setLPAtFee0Pool(3, 10, 0)
 	// THEN curTick1To0 is set to CurrentTick's index
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken0(s.goCtx, &pair, &lower)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken0(s.goCtx, pair, &lower)
 	s.Assert().Equal(int64(2), updatedPair.CurrentTick1To0)
 	s.Assert().Equal(int64(-10), updatedPair.MinTick)
 }
@@ -602,7 +602,7 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostAddToken0NewMinTick() {
 	pair.CurrentTick1To0 = 2
 	lower, _ := s.setLPAtFee0Pool(-11, 10, 0)
 	// THEN MinTick is set to CurrentTick's index
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken0(s.goCtx, &pair, &lower)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken0(s.goCtx, pair, &lower)
 	s.Assert().Equal(int64(2), updatedPair.CurrentTick1To0)
 	s.Assert().Equal(int64(-12), updatedPair.MinTick)
 }
@@ -614,7 +614,7 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostAddToken0NoChange() {
 	pair.CurrentTick1To0 = 2
 	lower, _ := s.setLPAtFee0Pool(1, 10, 0)
 	// THEN no changes are made to MinTick & Cur1To0
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken0(s.goCtx, &pair, &lower)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken0(s.goCtx, pair, &lower)
 	s.Assert().Equal(int64(2), updatedPair.CurrentTick1To0)
 	s.Assert().Equal(int64(-10), updatedPair.MinTick)
 }
@@ -626,8 +626,8 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostAddToken1NoToken() {
 	pair := s.app.DexKeeper.GetOrInitPair(s.goCtx, "TokenA", "TokenB")
 	lower, _ := s.setLPAtFee0Pool(1, 0, 0)
 	// THEN no changes are made
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken1(s.goCtx, &pair, &lower)
-	s.Assert().Nil(updatedPair)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken1(s.goCtx, pair, &lower)
+	s.Assert().Equal(pair, updatedPair)
 }
 
 func (s *MsgServerTestSuite) TestCalcTickPointersPostAddToken1NoLiq() {
@@ -636,7 +636,7 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostAddToken1NoLiq() {
 	pair.MaxTick = math.MinInt64
 	_, upper := s.setLPAtFee0Pool(1, 0, 10)
 	// THEN MinTick and cur0To1 are set to CurrentTick's index
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken1(s.goCtx, &pair, &upper)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken1(s.goCtx, pair, &upper)
 	s.Assert().Equal(int64(2), updatedPair.CurrentTick0To1)
 	s.Assert().Equal(int64(2), updatedPair.MaxTick)
 }
@@ -648,7 +648,7 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostAddToken1New1To0() {
 	pair.CurrentTick0To1 = 3
 	_, upper := s.setLPAtFee0Pool(1, 0, 10)
 	// THEN curTick1To0 is set to CurrentTick's index
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken1(s.goCtx, &pair, &upper)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken1(s.goCtx, pair, &upper)
 	s.Assert().Equal(int64(2), updatedPair.CurrentTick0To1)
 	s.Assert().Equal(int64(10), updatedPair.MaxTick)
 }
@@ -660,7 +660,7 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostAddToken1NewMaxTick() {
 	pair.CurrentTick0To1 = 2
 	_, upper := s.setLPAtFee0Pool(11, 0, 10)
 	// THEN  MaxTick is set to CurrentTick's index
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken1(s.goCtx, &pair, &upper)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken1(s.goCtx, pair, &upper)
 	s.Assert().Equal(int64(2), updatedPair.CurrentTick0To1)
 	s.Assert().Equal(int64(12), updatedPair.MaxTick)
 }
@@ -672,7 +672,7 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostAddToken1NoChange() {
 	pair.CurrentTick0To1 = 2
 	_, upper := s.setLPAtFee0Pool(3, 0, 10)
 	// THEN no changes are made to MinTick & Cur0To1
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken1(s.goCtx, &pair, &upper)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostAddToken1(s.goCtx, pair, &upper)
 	s.Assert().Equal(int64(2), updatedPair.CurrentTick0To1)
 	s.Assert().Equal(int64(5), updatedPair.MaxTick)
 }
@@ -686,8 +686,8 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostRemoveToken0NoChange() {
 	pair.CurrentTick1To0 = 1
 	lower, _ := s.setLPAtFee0Pool(0, 0, 0)
 	// THEN no changes are made
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken0(s.goCtx, &pair, &lower)
-	s.Assert().Nil(updatedPair)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken0(s.goCtx, pair, &lower)
+	s.Assert().Equal(pair, updatedPair)
 }
 
 func (s *MsgServerTestSuite) TestCalcTickPointersPostRemoveToken0NotDrained() {
@@ -697,8 +697,8 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostRemoveToken0NotDrained() {
 	pair.CurrentTick1To0 = -4
 	lower, _ := s.setLPAtFee0Pool(-10, 10, 0)
 	// THEN no changes are made
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken0(s.goCtx, &pair, &lower)
-	s.Assert().Nil(updatedPair)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken0(s.goCtx, pair, &lower)
+	s.Assert().Equal(pair, updatedPair)
 }
 
 func (s *MsgServerTestSuite) TestCalcTickPointersPostRemoveToken0DrainLiq() {
@@ -708,7 +708,7 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostRemoveToken0DrainLiq() {
 	pair.CurrentTick1To0 = -6
 	lower, _ := s.setLPAtFee0Pool(-5, 0, 0)
 	// THEN Current0to1 is set to MinInt && MaxTick tick is set to MaxInt64
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken0(s.goCtx, &pair, &lower)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken0(s.goCtx, pair, &lower)
 	s.Assert().Equal(math.MinInt64, int(updatedPair.CurrentTick1To0))
 	s.Assert().Equal(math.MaxInt64, int(updatedPair.MinTick))
 }
@@ -720,7 +720,7 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostRemoveToken0MinTick() {
 	pair.CurrentTick1To0 = 0
 	lower, _ := s.setLPAtFee0Pool(-4, 0, 0)
 	// THEN Current0to1 is unchanged && MinTick tick is increased
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken0(s.goCtx, &pair, &lower)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken0(s.goCtx, pair, &lower)
 	s.Assert().Equal(0, int(updatedPair.CurrentTick1To0))
 	s.Assert().Less(-5, int(updatedPair.MinTick))
 }
@@ -735,7 +735,7 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostRemoveToken0CurTick() {
 	lower, _ := s.setLPAtFee0Pool(1, 0, 0)
 
 	// THEN Current1to0 is changed to the next lowest tick (-2)
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken0(s.goCtx, &pair, &lower)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken0(s.goCtx, pair, &lower)
 	s.Assert().Equal(-2, int(updatedPair.CurrentTick1To0))
 	s.Assert().Equal(-3, int(updatedPair.MinTick))
 }
@@ -749,8 +749,8 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostRemoveToken1NoChange() {
 	pair.CurrentTick0To1 = 1
 	_, upper := s.setLPAtFee0Pool(3, 0, 0)
 	// THEN no changes are made
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken1(s.goCtx, &pair, &upper)
-	s.Assert().Nil(updatedPair)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken1(s.goCtx, pair, &upper)
+	s.Assert().Equal(pair, updatedPair)
 }
 
 func (s *MsgServerTestSuite) TestCalcTickPointersPostRemoveToken1NotDrained() {
@@ -760,8 +760,8 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostRemoveToken1NotDrained() {
 	pair.CurrentTick0To1 = 4
 	_, upper := s.setLPAtFee0Pool(5, 0, 10)
 	// THEN no changes are made
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken1(s.goCtx, &pair, &upper)
-	s.Assert().Nil(updatedPair)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken1(s.goCtx, pair, &upper)
+	s.Assert().Equal(pair, updatedPair)
 }
 
 func (s *MsgServerTestSuite) TestCalcTickPointersPostRemoveToken1DrainLiq() {
@@ -771,7 +771,7 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostRemoveToken1DrainLiq() {
 	pair.CurrentTick0To1 = 5
 	_, upper := s.setLPAtFee0Pool(4, 0, 0)
 	// THEN Current0to1 is set to MaxInt && MaxTick tick is set to MinInt
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken1(s.goCtx, &pair, &upper)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken1(s.goCtx, pair, &upper)
 	s.Assert().Equal(math.MaxInt64, int(updatedPair.CurrentTick0To1))
 	s.Assert().Equal(math.MinInt64, int(updatedPair.MaxTick))
 }
@@ -783,7 +783,7 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostRemoveToken1MaxTick() {
 	pair.CurrentTick0To1 = 0
 	_, upper := s.setLPAtFee0Pool(4, 0, 0)
 	// THEN Current0to1 is unchanged && MaxTick tick is decreased
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken1(s.goCtx, &pair, &upper)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken1(s.goCtx, pair, &upper)
 	s.Assert().Equal(0, int(updatedPair.CurrentTick0To1))
 	s.Assert().Greater(5, int(updatedPair.MaxTick))
 }
@@ -799,7 +799,7 @@ func (s *MsgServerTestSuite) TestCalcTickPointersPostRemoveToken1CurTick() {
 	_, upper := s.setLPAtFee0Pool(1, 0, 0)
 
 	// THEN Current0to1 is changed to the next lowest tick (3)
-	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken1(s.goCtx, &pair, &upper)
+	updatedPair := s.app.DexKeeper.CalcTickPointersPostRemoveToken1(s.goCtx, pair, &upper)
 	s.Assert().Equal(3, int(updatedPair.CurrentTick0To1))
 	s.Assert().Equal(4, int(updatedPair.MaxTick))
 }

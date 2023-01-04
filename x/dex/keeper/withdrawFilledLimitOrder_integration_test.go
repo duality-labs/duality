@@ -31,10 +31,10 @@ func (s *MsgServerTestSuite) TestWithdrawFilledSimpleFull() {
 	s.assertAliceBalances(40, 50)
 	s.assertBobBalances(60, 40)
 	s.assertDexBalances(0, 10)
+	s.assertMinTick(math.MaxInt64)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
 	s.assertMaxTick(math.MinInt64)
-	s.assertMinTick(math.MaxInt64)
 
 	s.aliceWithdrawsLimitSell("TokenA", 0, 0)
 
