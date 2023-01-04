@@ -2,6 +2,8 @@ package types
 
 import (
 	"strconv"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
@@ -62,6 +64,18 @@ func TokenMapKey(address string) []byte {
 	return key
 }
 
+func TickIndexToBytes(tickIndex int64) []byte {
+	key := make([]byte, 9)
+	if tickIndex < 0 {
+		copy(key[1:], sdk.Uint64ToBigEndian(uint64(tickIndex)))
+	} else {
+		copy(key[:1], []byte{0x01})
+		copy(key[1:], sdk.Uint64ToBigEndian(uint64(tickIndex)))
+	}
+
+	return key
+}
+
 func TickKey(pairId string, tickIndex int64) []byte {
 	var key []byte
 
@@ -69,7 +83,7 @@ func TickKey(pairId string, tickIndex int64) []byte {
 	key = append(key, pairIdBytes...)
 	key = append(key, []byte("/")...)
 
-	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
+	tickIndexBytes := TickIndexToBytes(tickIndex)
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
