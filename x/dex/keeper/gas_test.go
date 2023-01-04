@@ -1,3 +1,4 @@
+// TEMP: Just for testing speed differences. Will remove
 package keeper_test
 
 import "fmt"
@@ -29,7 +30,7 @@ func (s *MsgServerTestSuite) TestTickGas() {
 	s.bobMarketSells("TokenB", 20, 17)
 	SpentFinal := s.ctx.GasMeter().GasConsumed()
 	SpentTotal := SpentFinal - SpentUntilNow
-	fmt.Printf("Gas Spent ITER: %v\n", SpentTotal)
+	fmt.Printf("Gas Spent: %v\n", SpentTotal)
 
 }
 
@@ -57,6 +58,6 @@ func (s *MsgServerTestSuite) TestTickGas2() {
 	s.bobMarketSells("TokenA", 20, 17)
 	SpentFinal := s.ctx.GasMeter().GasConsumed()
 	SpentTotal := SpentFinal - SpentUntilNow
-	fmt.Printf("Gas Spent Old: %v\n", SpentTotal)
+	fmt.Printf("Gas Spent: %v\n", SpentTotal)
 
 }

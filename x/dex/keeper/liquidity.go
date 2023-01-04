@@ -138,7 +138,7 @@ func (s *LiquidityIterator1To0) getNext() Liquidity {
 	iter := s.keeper.makeKVTickIterator(sdkCtx, s.tradingPair.PairId, s.curTickIndex+1, false)
 	defer iter.Close()
 
-	for ; iter.Valid(); iter.Next() {
+	for ; iter.Valid() && s.curTickIndex >= s.minTick; iter.Next() {
 		var lowerTick types.Tick
 		s.keeper.cdc.MustUnmarshal(iter.Value(), &lowerTick)
 
