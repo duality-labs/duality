@@ -80,3 +80,30 @@ func (k Keeper) GetAllLimitOrderTrancheUser(ctx sdk.Context) (list []types.Limit
 
 	return
 }
+
+func LimitOrderTrancheUserAddressPrefix(address string) []byte {
+
+	key := types.KeyPrefix(types.LimitOrderTrancheUserKeyPrefix)
+	addressBytes := []byte(address)
+	key = append(key, addressBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+func (k Keeper) GetAllLimitOrderTrancheUserForAddress(ctx sdk.Context, address sdk.AccAddress) (list []types.LimitOrderTrancheUser) {
+
+	addressPrefix := LimitOrderTrancheUserAddressPrefix(address.String())
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), addressPrefix)
+	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var val types.LimitOrderTrancheUser
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
+		list = append(list, val)
+	}
+
+	return
+}

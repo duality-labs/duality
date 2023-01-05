@@ -24,7 +24,7 @@ const (
 )
 
 const (
-	DepositSharesPrefix = "DualityLPShares"
+	DepositSharesPrefix = "DualityPoolShares"
 )
 
 func KeyPrefix(p string) []byte {
@@ -137,6 +137,10 @@ func LimitOrderTrancheUserSharesWithdrawnKey(pairId string, tickIndex int64, tok
 func LimitOrderTrancheUserKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
 	var key []byte
 
+	addressBytes := []byte(address)
+	key = append(key, addressBytes...)
+	key = append(key, []byte("/")...)
+
 	pairIdBytes := []byte(pairId)
 	key = append(key, pairIdBytes...)
 	key = append(key, []byte("/")...)
@@ -151,10 +155,6 @@ func LimitOrderTrancheUserKey(pairId string, tickIndex int64, token string, coun
 
 	countBytes := []byte(strconv.Itoa(int(count)))
 	key = append(key, countBytes...)
-	key = append(key, []byte("/")...)
-
-	addressBytes := []byte(address)
-	key = append(key, addressBytes...)
 	key = append(key, []byte("/")...)
 
 	return key
