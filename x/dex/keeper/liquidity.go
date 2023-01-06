@@ -15,7 +15,9 @@ type Liquidity interface {
 
 type LiquidityIterator interface {
 	HasNext() bool
-	Next() *Liquidity
+	Next() Liquidity
+}
+
 func NewLiquidityIterator(
 	keeper Keeper,
 	ctx context.Context,

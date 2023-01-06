@@ -4,6 +4,7 @@ import (
 	"context"
 	"math"
 
+	. "github.com/NicholasDotSol/duality/utils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -262,6 +263,12 @@ func CalcPrice1To0(tickIndex int64) (sdk.Dec, error) {
 	}
 }
 
+func (k Keeper) ShouldDeinitAfterSwap(ctx sdk.Context, deinitedTick *types.Tick, is0To1 bool) bool {
+	return deinitedTick != nil &&
+		((is0To1 && !k.TickHasToken1(ctx, deinitedTick)) ||
+			(!is0To1 && !k.TickHasToken0(ctx, deinitedTick)))
+}
+
 // Checks if a tick has reserves0 at any fee tier
 func (k Keeper) TickHasToken0(ctx sdk.Context, tick *types.Tick) bool {
 	// TODO: clean up tickdata proto
@@ -326,92 +333,8 @@ func (k Keeper) TickTrancheHasToken1(ctx sdk.Context, tick *types.Tick, trancheI
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//                                TICK UPDATES                               //
-///////////////////////////////////////////////////////////////////////////////
-
-// Assumes that the token0 liquidity is non-empty at this tick
-
-// TODO: Get rid of this, ideally the core functions should save pointers only once.
-func (k Keeper) UpdateTickPointersPostAddToken0(goCtx context.Context, pair types.TradingPair, tick *types.Tick) types.TradingPair {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	newPair := k.CalcTickPointersPostAddToken0(goCtx, pair, tick)
-	k.SetTradingPair(ctx, newPair)
-	return newPair
-}
-
-// TODO: Get rid of this, ideally the core functions should save pointers only once.
-func (k Keeper) UpdateTickPointersPostAddToken1(goCtx context.Context, pair types.TradingPair, tick *types.Tick) types.TradingPair {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	newPair := k.CalcTickPointersPostAddToken1(goCtx, pair, tick)
-	k.SetTradingPair(ctx, newPair)
-	return newPair
-}
-
-// TODO: Get rid of this, ideally the core functions should save pointers only once.
-func (k Keeper) UpdateTickPointersPostRemoveToken0(goCtx context.Context, pair types.TradingPair, tick *types.Tick) types.TradingPair {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	newPair := k.CalcTickPointersPostRemoveToken0(goCtx, pair, tick)
-	k.SetTradingPair(ctx, newPair)
-	return newPair
-}
-
-// TODO: Get rid of this, ideally the core functions should save pointers only once.
-func (k Keeper) UpdateTickPointersPostRemoveToken1(goCtx context.Context, pair types.TradingPair, tick *types.Tick) types.TradingPair {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	newPair := k.CalcTickPointersPostRemoveToken1(goCtx, pair, tick)
-	k.SetTradingPair(ctx, newPair)
-	return newPair
-}
-
-///////////////////////////////////////////////////////////////////////////////
 //                            TOKENIZER UTILS                                //
 ///////////////////////////////////////////////////////////////////////////////
-
-// TODO: Get rid of this, ideally should know exactly when to (de)init
-//
-//	and should not have to have the check before.
-func (k Keeper) CalcTickPointersPostAddToken0(goCtx context.Context, pair types.TradingPair, tick *types.Tick) types.TradingPair {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	if !k.TickHasToken0(ctx, tick) {
-		return pair
-	}
-
-	return InitLiquidityToken0(pair, tick.TickIndex)
-}
-
-// TODO: Get rid of this, ideally should know exactly when to (de)init
-//
-//	and should not have to have the check before.
-func (k Keeper) CalcTickPointersPostAddToken1(goCtx context.Context, pair types.TradingPair, tick *types.Tick) types.TradingPair {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	if !k.TickHasToken1(ctx, tick) {
-		return pair
-	}
-
-	return InitLiquidityToken1(pair, tick.TickIndex)
-}
-
-// TODO: Get rid of this, ideally should know exactly when to (de)init
-//
-//	and should not have to have the check before.
-func (k Keeper) CalcTickPointersPostRemoveToken0(ctx context.Context, pair types.TradingPair, tick *types.Tick) types.TradingPair {
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	if k.TickHasToken0(sdkCtx, tick) {
-		return pair
-	}
-
-	return k.deinitLiquidityToken0(ctx, pair, tick.TickIndex)
-}
-
-// Should be called for every pair, tick for which token1 liquidity is removed
-func (k Keeper) CalcTickPointersPostRemoveToken1(ctx context.Context, pair types.TradingPair, tick *types.Tick) types.TradingPair {
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	if k.TickHasToken1(sdkCtx, tick) {
-		return pair
-	}
-
-	return k.deinitLiquidityToken1(ctx, pair, tick.TickIndex)
-}
 
 func (k Keeper) MintShares(ctx sdk.Context, addr sdk.AccAddress, amount sdk.Int, sharesId string) error {
 	// mint share tokens

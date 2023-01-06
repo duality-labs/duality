@@ -5,7 +5,6 @@ import (
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 type msgServer struct {
@@ -100,42 +99,12 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		return nil, err
 	}
 
-	var coinOut sdk.Coin
-	var coinIn sdk.Coin
-	var amountToDeposit sdk.Int
-	amount_out, amount_left, err := k.SwapCore(goCtx, msg, token0, token1, callerAddr)
+	coinOut, err := k.SwapCore(goCtx, msg, token0, token1, callerAddr, receiverAddr)
 	if err != nil {
 		return nil, err
 	}
-	if msg.TokenIn == token0 {
 
-		amountToDeposit = msg.AmountIn.Sub(amount_left)
-		coinIn = sdk.NewCoin(token0, amountToDeposit)
-		coinOut = sdk.NewCoin(token1, amount_out)
-
-	} else {
-
-		amountToDeposit = msg.AmountIn.Sub(amount_left)
-		coinIn = sdk.NewCoin(token1, amountToDeposit)
-		coinOut = sdk.NewCoin(token0, amount_out)
-	}
-
-	if amountToDeposit.GT(sdk.ZeroInt()) {
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
-			return &types.MsgSwapResponse{}, err
-		}
-	} else {
-		return &types.MsgSwapResponse{}, sdkerrors.Wrapf(types.ErrNotEnoughCoins, "AmountIn cannot be zero")
-	}
-
-	if amount_out.GT(sdk.ZeroInt()) {
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
-			return &types.MsgSwapResponse{}, err
-		}
-	}
-
-	_ = ctx
-
+	//TODO: Inconsistent that this is the only response that returns coins instead of ints
 	return &types.MsgSwapResponse{coinOut}, nil
 }
 
