@@ -100,26 +100,20 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		return nil, err
 	}
 
-	var amount_out sdk.Int
-	var amount_left sdk.Int
 	var coinOut sdk.Coin
 	var coinIn sdk.Coin
 	var amountToDeposit sdk.Int
+	amount_out, amount_left, err := k.SwapCore(goCtx, msg, token0, token1, callerAddr)
+	if err != nil {
+		return nil, err
+	}
 	if msg.TokenIn == token0 {
-		amount_out, amount_left, err = k.Swap0to1(goCtx, msg, token0, token1, callerAddr)
-		if err != nil {
-			return nil, err
-		}
 
 		amountToDeposit = msg.AmountIn.Sub(amount_left)
 		coinIn = sdk.NewCoin(token0, amountToDeposit)
 		coinOut = sdk.NewCoin(token1, amount_out)
 
 	} else {
-		amount_out, amount_left, err = k.Swap1to0(goCtx, msg, token0, token1, callerAddr)
-		if err != nil {
-			return nil, err
-		}
 
 		amountToDeposit = msg.AmountIn.Sub(amount_left)
 		coinIn = sdk.NewCoin(token1, amountToDeposit)

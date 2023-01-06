@@ -283,7 +283,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 }
 
 // Handles core logic for the asset 0 to asset1 direction of MsgSwap; faciliates swapping amount0 for some amount of amount1, given a specified pair (token0, token1)
-func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress) (sdk.Int, sdk.Int, error) {
+func (k Keeper) SwapCore(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress) (sdk.Int, sdk.Int, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId := CreatePairId(token0, token1)
 	feeTiers := k.GetAllFeeTier(ctx)
@@ -291,13 +291,13 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 	if !pairFound {
 		return sdk.ZeroInt(), sdk.ZeroInt(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
 	}
-
+	is0To1 := msg.TokenIn == token0
 	remainingIn := msg.AmountIn
 	totalOut := sdk.ZeroInt()
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
 	// for !amount_left.Equal(sdk.ZeroInt()) && pair.TokenPair.CurrentTick0To1 <= pair.MaxTick {
-	liqIter := NewLiquidityIterator0To1(k, goCtx, pair, feeTiers)
+	liqIter := NewLiquidityIterator(k, goCtx, pair, feeTiers, is0To1)
 	for liqIter.HasNext() && remainingIn.GT(sdk.ZeroInt()) {
 		liq := liqIter.Next()
 		// price only gets worse as we iterate, so we can greedily abort
@@ -314,10 +314,10 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		// Saving all the time
 		liq.Save(goCtx, k)
 		if initedTick != nil {
-			pair = InitLiquidityToken0(pair, initedTick.TickIndex)
+			pair.InitLiquidity(initedTick.TickIndex, is0To1)
 		}
 		if deinitedTick != nil && !k.TickHasToken1(ctx, deinitedTick) {
-			pair = k.deinitLiquidityToken1(goCtx, pair, deinitedTick.TickIndex)
+			pair.DeinitLiquidity(goCtx, k, initedTick.TickIndex, is0To1)
 		}
 	}
 	k.SetTradingPair(ctx, pair)

@@ -16,6 +16,19 @@ type Liquidity interface {
 type LiquidityIterator interface {
 	HasNext() bool
 	Next() *Liquidity
+func NewLiquidityIterator(
+	keeper Keeper,
+	ctx context.Context,
+	tradingPair types.TradingPair,
+	feeTiers []types.FeeTier,
+	is0To1 bool,
+) LiquidityIterator {
+
+	if is0To1 {
+		return NewLiquidityIterator0To1(keeper, ctx, tradingPair, feeTiers)
+	} else {
+		return NewLiquidityIterator1To0(keeper, ctx, &tradingPair, feeTiers)
+	}
 }
 
 type LiquidityIterator0To1 struct {
