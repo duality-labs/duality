@@ -122,57 +122,6 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 //                          STATE CALCULATIONS                               //
 ///////////////////////////////////////////////////////////////////////////////
 
-func (k Keeper) FindNextTick1To0(goCtx context.Context, tradingPair types.TradingPair) (tickIdx int64, found bool) {
-
-	// If MinTick == MaxInt64 it is unset
-	// ie. There is no Token0 in the pool
-	if tradingPair.MinTick == math.MaxInt64 {
-		return math.MaxInt64, false
-	}
-	// Start scanning from CurrentTick1To0 - 1
-	tickIdx = tradingPair.CurrentTick1To0 - 1
-
-	ti := k.NewTickIterator(goCtx, tickIdx, tradingPair.MinTick, tradingPair.PairId, true, true)
-
-	return ti.Next()
-}
-
-func (k Keeper) FindNewMinTick(goCtx context.Context, tradingPair types.TradingPair) (minTickIdx int64) {
-
-	ti := k.NewTickIterator(goCtx, tradingPair.MinTick, tradingPair.CurrentTick1To0, tradingPair.PairId, true, false)
-	idx, found := ti.Next()
-	if found {
-		return idx
-	} else {
-		return math.MaxInt64
-	}
-}
-
-func (k Keeper) FindNewMaxTick(goCtx context.Context, tradingPair types.TradingPair) (maxTickIdx int64) {
-
-	ti := k.NewTickIterator(goCtx, tradingPair.MaxTick, tradingPair.CurrentTick0To1, tradingPair.PairId, false, true)
-	idx, found := ti.Next()
-	if found {
-		return idx
-	} else {
-		return math.MinInt64
-	}
-}
-
-func (k Keeper) FindNextTick0To1(goCtx context.Context, tradingPair types.TradingPair) (tickIdx int64, found bool) {
-
-	// If MaxTick == MinInt64 it is unset
-	// There is no Token1 in the pool
-	if tradingPair.MaxTick == math.MinInt64 {
-		return math.MinInt64, false
-	}
-
-	// Start scanning from CurrentTick0To1 + 1
-	tickIdx = tradingPair.CurrentTick0To1 + 1
-	ti := k.NewTickIterator(goCtx, tickIdx, tradingPair.MaxTick, tradingPair.PairId, false, false)
-	return ti.Next()
-}
-
 // Balance trueAmount1 to the pool ratio
 func CalcTrueAmounts(
 	centerTickPrice1To0 sdk.Dec,

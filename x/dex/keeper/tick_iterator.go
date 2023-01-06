@@ -7,10 +7,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type TickIteratorI interface {
-	Next() (int64, bool)
-}
-
 type TickIterator struct {
 	start    int64
 	end      int64
@@ -27,7 +23,7 @@ func (k Keeper) NewTickIterator(ctx context.Context,
 	end int64,
 	pairId string,
 	findToken0 bool,
-	scanLeft bool) TickIterator {
+	scanLeft bool) types.TickIteratorI {
 	var hasToken func(sdk.Context, *types.Tick) bool
 	var nextTick func(tick int64) int64
 	var stop func(int64) bool

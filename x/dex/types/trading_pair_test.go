@@ -65,6 +65,8 @@ func (s *TradingPairTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amo
 	return lowerTick, upperTick
 }
 
+// CalcTickPointersPostAddToken0 //////////////////////////////////////////////
+
 func (s *TradingPairTestSuite) TestCalcTickPointersPostAddToken0NoToken() {
 	// GIVEN current tick still has 0 Token0
 	pair := s.app.DexKeeper.GetOrInitPair(s.goCtx, "TokenA", "TokenB")
@@ -308,4 +310,112 @@ func (s *TradingPairTestSuite) TestCalcTickPointersPostRemoveToken1CurTick() {
 	pair.UpdateTickPointersPostRemoveToken1(s.goCtx, s.app.DexKeeper, &upper)
 	s.Assert().Equal(3, int(pair.CurrentTick0To1))
 	s.Assert().Equal(4, int(pair.MaxTick))
+}
+
+// FindNextTick1To0 ///////////////////////////////////////////////////////////
+
+func (s *TradingPairTestSuite) TestFindNextTick1To0NoLiq() {
+	// GIVEN there is no ticks with token0 in the pool
+	pair := s.app.DexKeeper.GetOrInitPair(s.goCtx, "TokenA", "TokenB")
+	// NOTE: Actually adding/funding a tick isn't really neccesary but should make the test less
+	// dependent upon current implementation details
+	s.setLPAtFee0Pool(1, 0, 10)
+
+	// THEN FindNextTick1To0 doesn't find a tick
+
+	_, found := pair.FindNextTick1To0(s.goCtx, s.app.DexKeeper)
+	s.Assert().False(found)
+
+}
+
+func (s *TradingPairTestSuite) TestFindNextTick1To0WithLiq() {
+	// GIVEN tick with token0 @ index 0 & currentTick0To1 is 1
+	pair := s.app.DexKeeper.GetOrInitPair(s.goCtx, "TokenA", "TokenB")
+	s.setLPAtFee0Pool(-1, 10, 0)
+	s.setLPAtFee0Pool(0, 10, 0)
+	s.setLPAtFee0Pool(1, 0, 0)
+
+	// tick -2: (10, 0)
+	// tick -1: (10, 0)
+	pair.CurrentTick1To0 = 1
+	pair.MinTick = -2
+	s.app.DexKeeper.SetTradingPair(s.ctx, pair)
+
+	// THEN FindNextTick1To0 finds the tick at -1
+
+	tickIdx, found := pair.FindNextTick1To0(s.goCtx, s.app.DexKeeper)
+	s.Require().True(found)
+	s.Assert().Equal(int64(-1), tickIdx)
+
+}
+
+func (s *TradingPairTestSuite) TestFindNextTick1To0WithMinLiq() {
+	// GIVEN tick with token0 @ index -1 & MinTick = -1
+	pair := s.app.DexKeeper.GetOrInitPair(s.goCtx, "TokenA", "TokenB")
+	s.setLPAtFee0Pool(-1, 10, 0)
+	s.setLPAtFee0Pool(1, 0, 0)
+
+	// tick -2: (10, 0)
+	pair.CurrentTick1To0 = 1
+	pair.MinTick = -2
+	s.app.DexKeeper.SetTradingPair(s.ctx, pair)
+
+	// THEN FindNextTick1To0 finds the tick at -2
+
+	tickIdx, found := pair.FindNextTick1To0(s.goCtx, s.app.DexKeeper)
+	s.Require().True(found)
+	s.Assert().Equal(int64(-2), tickIdx)
+
+}
+
+// FindNextTick0To1 ///////////////////////////////////////////////////////////
+
+func (s *TradingPairTestSuite) TestFindNextTick0To1NoLiq() {
+	// GIVEN there are no tick with Token1 in the pool
+	pair := s.app.DexKeeper.GetOrInitPair(s.goCtx, "TokenA", "TokenB")
+	// NOTE: Actually adding/funding a tick isn't really neccesary but should make the test less
+	// dependent upon current implementation details
+	s.setLPAtFee0Pool(0, 10, 0)
+
+	// THEN FindNextTick0To1 doesn't find a tick
+
+	_, found := pair.FindNextTick0To1(s.goCtx, s.app.DexKeeper)
+	s.Assert().False(found)
+
+}
+
+func (s *TradingPairTestSuite) TestFindNextTick0To1WithLiq() {
+	// WHEN tick with token1 @ index 0 & currentTick0To1 is -1
+	pair := s.app.DexKeeper.GetOrInitPair(s.goCtx, "TokenA", "TokenB")
+	s.setLPAtFee0Pool(-1, 10, 0)
+	s.setLPAtFee0Pool(0, 0, 10)
+	s.setLPAtFee0Pool(1, 0, 10)
+
+	pair.CurrentTick0To1 = -1
+	pair.MaxTick = 1
+	s.app.DexKeeper.SetTradingPair(s.ctx, pair)
+
+	// THEN FindNextTick0To1 finds the tick at 1
+
+	tickIdx, found := pair.FindNextTick0To1(s.goCtx, s.app.DexKeeper)
+	s.Require().True(found)
+	s.Assert().Equal(int64(1), tickIdx)
+}
+
+func (s *TradingPairTestSuite) TestFindNextTick0To1WithMinLiq() {
+	// WHEN tick with token1 @ index 1 & MaxTick = 1
+	pair := s.app.DexKeeper.GetOrInitPair(s.goCtx, "TokenA", "TokenB")
+	s.setLPAtFee0Pool(-1, 0, 0)
+	s.setLPAtFee0Pool(1, 0, 10)
+
+	// tick 2: (0, 10)
+	pair.CurrentTick0To1 = -1
+	pair.MaxTick = 2
+	s.app.DexKeeper.SetTradingPair(s.ctx, pair)
+
+	// THEN FindNextTick0To1 finds the tick at 2
+
+	tickIdx, found := pair.FindNextTick0To1(s.goCtx, s.app.DexKeeper)
+	s.Require().True(found)
+	s.Assert().Equal(int64(2), tickIdx)
 }
