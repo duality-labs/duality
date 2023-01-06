@@ -11,7 +11,6 @@ import (
 type Keeper interface {
 	TickHasToken0(sdk.Context, *Tick) bool
 	TickHasToken1(sdk.Context, *Tick) bool
-	SetTradingPair(sdk.Context, TradingPair)
 	NewTickIterator(context.Context, int64, int64, string, bool, bool) TickIteratorI
 }
 
@@ -29,14 +28,6 @@ func (p *TradingPair) InitLiquidityToken1(tickIndex int64) {
 	curTick0To1 := &p.CurrentTick0To1
 	*maxTick = MaxInt64(*maxTick, tickIndex)
 	*curTick0To1 = MinInt64(*curTick0To1, tickIndex)
-}
-
-func (p *TradingPair) InitLiquidity(tickIndex int64, addingToken0 bool) {
-	if addingToken0 {
-		p.InitLiquidityToken0(tickIndex)
-	} else {
-		p.InitLiquidityToken1(tickIndex)
-	}
 }
 
 // Assumes that the token0 liquidity is empty at this tick
@@ -101,14 +92,6 @@ func (p *TradingPair) DeinitLiquidityToken1(ctx context.Context, k Keeper, tickI
 		} else {
 			*cur0To1 = next0To1
 		}
-	}
-}
-
-func (p *TradingPair) DeinitLiquidity(ctx context.Context, k Keeper, tickIndex int64, removingToken0 bool) {
-	if removingToken0 {
-		p.DeinitLiquidityToken0(ctx, k, tickIndex)
-	} else {
-		p.DeinitLiquidityToken1(ctx, k, tickIndex)
 	}
 }
 

@@ -84,8 +84,6 @@ func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*t
 }
 
 func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSwapResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
 	// validate msg
 	if err := msg.ValidateBasic(); err != nil {
 		return nil, err
@@ -93,13 +91,15 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
-	// lexographically sort token0, token1
-	token0, token1, err := SortTokens(ctx, msg.TokenA, msg.TokenB)
-	if err != nil {
-		return nil, err
+	// TODO: Should switch swap API to just take TokenIn and TokenOut
+	var tokenOut string
+	if msg.TokenIn == msg.TokenA {
+		tokenOut = msg.TokenB
+	} else {
+		tokenOut = msg.TokenA
 	}
 
-	coinOut, err := k.SwapCore(goCtx, msg, token0, token1, callerAddr, receiverAddr)
+	coinOut, err := k.SwapCore(goCtx, msg, msg.TokenIn, tokenOut, callerAddr, receiverAddr)
 	if err != nil {
 		return nil, err
 	}

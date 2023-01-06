@@ -21,15 +21,14 @@ type LiquidityIterator interface {
 func NewLiquidityIterator(
 	keeper Keeper,
 	ctx context.Context,
-	tradingPair types.TradingPair,
+	tradingPair types.DirectionalTradingPair,
 	feeTiers []types.FeeTier,
-	is0To1 bool,
 ) LiquidityIterator {
 
-	if is0To1 {
-		return NewLiquidityIterator0To1(keeper, ctx, tradingPair, feeTiers)
+	if tradingPair.IsTokenInToken0() {
+		return NewLiquidityIterator0To1(keeper, ctx, tradingPair.TradingPair, feeTiers)
 	} else {
-		return NewLiquidityIterator1To0(keeper, ctx, &tradingPair, feeTiers)
+		return NewLiquidityIterator1To0(keeper, ctx, tradingPair.TradingPair, feeTiers)
 	}
 }
 
@@ -196,13 +195,13 @@ func (s *LiquidityIterator1To0) getNext() Liquidity {
 	return nil
 }
 
-func NewLiquidityIterator1To0(keeper Keeper, ctx context.Context, tradingPair *types.TradingPair, feeTiers []types.FeeTier) *LiquidityIterator1To0 {
+func NewLiquidityIterator1To0(keeper Keeper, ctx context.Context, tradingPair types.TradingPair, feeTiers []types.FeeTier) *LiquidityIterator1To0 {
 	iter := &LiquidityIterator1To0{
 		curTickIndex: tradingPair.CurrentTick1To0,
 		curFeeIndex:  0,
 		keeper:       keeper,
 		ctx:          ctx,
-		TradingPair:  *tradingPair,
+		TradingPair:  tradingPair,
 		minTick:      tradingPair.MinTick,
 		feeTiers:     feeTiers,
 		nextLiq:      nil,

@@ -286,19 +286,17 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 // Handles core logic for the asset 0 to asset1 direction of MsgSwap; faciliates swapping amount0 for some amount of amount1, given a specified pair (token0, token1)
 func (k Keeper) SwapCore(goCtx context.Context,
 	msg *types.MsgSwap,
-	token0 string,
-	token1 string,
+	tokenIn string,
+	tokenOut string,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
 ) (sdk.Coin, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	pairId := CreatePairId(token0, token1)
 	feeTiers := k.GetAllFeeTier(ctx)
-	is0To1 := msg.TokenIn == token0
 
-	pair, pairFound := k.GetTradingPair(ctx, pairId)
-	if !pairFound {
-		return sdk.Coin{}, sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
+	pair, err := k.GetDirectionalTradingPair(ctx, tokenIn, tokenOut)
+	if err != nil {
+		return sdk.Coin{}, err
 	}
 
 	remainingIn := msg.AmountIn
@@ -306,7 +304,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
 	// for !amount_left.Equal(sdk.ZeroInt()) && pair.TokenPair.CurrentTick0To1 <= pair.MaxTick {
-	liqIter := NewLiquidityIterator(k, goCtx, pair, feeTiers, is0To1)
+	liqIter := NewLiquidityIterator(k, goCtx, pair, feeTiers)
 	for liqIter.HasNext() && remainingIn.GT(sdk.ZeroInt()) {
 		liq := liqIter.Next()
 		// price only gets worse as we iterate, so we can greedily abort
@@ -323,30 +321,20 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		// Saving all the time
 		liq.Save(goCtx, k)
 		if initedTick != nil {
-			pair.InitLiquidity(initedTick.TickIndex, is0To1)
+			pair.InitLiquidity(initedTick.TickIndex)
 		}
-		if k.ShouldDeinitAfterSwap(ctx, deinitedTick, is0To1) {
-			pair.DeinitLiquidity(goCtx, k, deinitedTick.TickIndex, !is0To1)
+		if k.ShouldDeinitAfterSwap(ctx, deinitedTick, pair) {
+			pair.DeinitLiquidity(goCtx, k, deinitedTick.TickIndex)
 		}
 
 	}
-	k.SetTradingPair(ctx, pair)
+	k.SetTradingPair(ctx, pair.TradingPair)
 
 	if totalOut.LT(msg.MinOut) || msg.AmountIn.Equal(remainingIn) {
 		return sdk.Coin{}, types.ErrNotEnoughLiquidity
 	}
 
 	// TODO: Move this to a separate ExecuteSwap function. Ditto for all other *Core fns
-	var tokenOut string
-	var tokenIn string
-	if is0To1 {
-		tokenOut = token1
-		tokenIn = token0
-	} else {
-		tokenOut = token0
-		tokenIn = token1
-	}
-
 	amountToDeposit := msg.AmountIn.Sub(remainingIn)
 	coinIn := sdk.NewCoin(tokenIn, amountToDeposit)
 	coinOut := sdk.NewCoin(tokenOut, totalOut)
@@ -366,7 +354,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		}
 	}
 	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.TokenIn, msg.AmountIn.String(), totalOut.String(), msg.MinOut.String(),
+		tokenIn, tokenOut, msg.AmountIn.String(), totalOut.String(), msg.MinOut.String(),
 	))
 
 	return coinOut, nil

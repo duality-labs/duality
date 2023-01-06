@@ -212,10 +212,19 @@ func CalcPrice1To0(tickIndex int64) (sdk.Dec, error) {
 	}
 }
 
-func (k Keeper) ShouldDeinitAfterSwap(ctx sdk.Context, deinitedTick *types.Tick, is0To1 bool) bool {
-	return deinitedTick != nil &&
-		((is0To1 && !k.TickHasToken1(ctx, deinitedTick)) ||
-			(!is0To1 && !k.TickHasToken0(ctx, deinitedTick)))
+func (k Keeper) ShouldDeinitAfterSwap(
+	ctx sdk.Context,
+	deinitedTick *types.Tick,
+	tradingPair types.DirectionalTradingPair) bool {
+
+	if deinitedTick == nil {
+		return false
+	}
+	if tradingPair.IsTokenOutToken0() {
+		return !k.TickHasToken0(ctx, deinitedTick)
+	} else {
+		return !k.TickHasToken1(ctx, deinitedTick)
+	}
 }
 
 // Checks if a tick has reserves0 at any fee tier

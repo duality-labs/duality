@@ -33,6 +33,30 @@ func (k Keeper) GetTradingPair(
 	return val, true
 }
 
+func (k Keeper) GetDirectionalTradingPair(
+	ctx sdk.Context,
+	tokenIn string,
+	tokenOut string,
+) (pair types.DirectionalTradingPair, err error) {
+	token0, token1, err := SortTokens(ctx, tokenIn, tokenOut)
+	if err != nil {
+		return pair, err
+	}
+	pairId := CreatePairId(token0, token1)
+	rawPair, found := k.GetTradingPair(ctx, pairId)
+	if !found {
+		return pair, types.ErrValidPairNotFound
+	} else {
+		dPair := types.DirectionalTradingPair{
+			TradingPair: rawPair,
+			TokenIn:     tokenIn,
+			TokenOut:    tokenOut,
+			Token0:      token0,
+		}
+		return dPair, nil
+	}
+}
+
 // RemoveTradingPair removes a TradingPair from the store
 func (k Keeper) RemoveTradingPair(
 	ctx sdk.Context,
