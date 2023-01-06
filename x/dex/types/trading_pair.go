@@ -3,6 +3,7 @@ package types
 import (
 	context "context"
 	math "math"
+	"strings"
 
 	. "github.com/NicholasDotSol/duality/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -181,4 +182,14 @@ func (p TradingPair) FindNextTick0To1(goCtx context.Context, k Keeper) (tickIdx 
 	tickIdx = p.CurrentTick0To1 + 1
 	ti := k.NewTickIterator(goCtx, tickIdx, p.MaxTick, p.PairId, false, false)
 	return ti.Next()
+}
+
+func PairIdToTokens(pairId string) (token0 string, token1 string) {
+	tokens := strings.Split(pairId, "<>")
+
+	return tokens[0], tokens[1]
+}
+
+func (p TradingPair) PairToTokens() (token0 string, token1 string) {
+	return PairIdToTokens(p.PairId)
 }

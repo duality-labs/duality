@@ -2,14 +2,7 @@ package types
 
 import (
 	context "context"
-	"strings"
 )
-
-func PairToTokens(pairId string) (token0 string, token1 string) {
-	tokens := strings.Split(pairId, "<>")
-
-	return tokens[0], tokens[1]
-}
 
 type DirectionalTradingPair struct {
 	TradingPair
@@ -19,7 +12,7 @@ type DirectionalTradingPair struct {
 }
 
 func NewDirectionalTradingPair(pair TradingPair, tokenIn string, tokenOut string) DirectionalTradingPair {
-	token0, _ := PairToTokens(pair.PairId)
+	token0, _ := pair.PairToTokens()
 	return DirectionalTradingPair{
 		TradingPair: pair,
 		TokenIn:     tokenIn,

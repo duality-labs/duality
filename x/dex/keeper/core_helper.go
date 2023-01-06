@@ -73,7 +73,7 @@ func (k Keeper) InitTick(ctx sdk.Context, pairId string, tickIndex int64) (types
 	}
 	k.SetTick(ctx, pairId, tick)
 
-	token0, token1 := PairToTokens(pairId)
+	token0, token1 := types.PairIdToTokens(pairId)
 	k.GetOrInitLimitOrderTranche(ctx, pairId, tickIndex, token0, 0)
 	k.GetOrInitLimitOrderTranche(ctx, pairId, tickIndex, token1, 0)
 
@@ -246,7 +246,7 @@ func (k Keeper) TickHasToken0(ctx sdk.Context, tick *types.Tick) bool {
 }
 
 func (k Keeper) TickTrancheHasToken0(ctx sdk.Context, tick *types.Tick, trancheIndex uint64) bool {
-	token0, _ := PairToTokens(tick.PairId)
+	token0, _ := types.PairIdToTokens(tick.PairId)
 	tranche, found := k.GetLimitOrderTranche(
 		ctx,
 		tick.PairId,
@@ -279,7 +279,7 @@ func (k Keeper) TickHasToken1(ctx sdk.Context, tick *types.Tick) bool {
 }
 
 func (k Keeper) TickTrancheHasToken1(ctx sdk.Context, tick *types.Tick, trancheIndex uint64) bool {
-	_, token1 := PairToTokens(tick.PairId)
+	_, token1 := types.PairIdToTokens(tick.PairId)
 	tranche, found := k.GetLimitOrderTranche(
 		ctx,
 		tick.PairId,

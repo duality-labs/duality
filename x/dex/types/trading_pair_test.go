@@ -419,3 +419,39 @@ func (s *TradingPairTestSuite) TestFindNextTick0To1WithMinLiq() {
 	s.Require().True(found)
 	s.Assert().Equal(int64(2), tickIdx)
 }
+
+// PairIdToTokens ///////////////////////////////////////////////////////////////
+
+func (s *TradingPairTestSuite) TestPairToTokens() {
+
+	token0, token1 := PairIdToTokens("TokenA<>TokenB")
+
+	s.Assert().Equal("TokenA", token0)
+	s.Assert().Equal("TokenB", token1)
+
+}
+
+func (s *TradingPairTestSuite) TestPairToTokensIBCis0() {
+
+	token0, token1 := PairIdToTokens("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2<>TokenB")
+
+	s.Assert().Equal("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", token0)
+	s.Assert().Equal("TokenB", token1)
+}
+
+func (s *TradingPairTestSuite) TestPairToTokensIBCis1() {
+
+	token0, token1 := PairIdToTokens("TokenA<>ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2")
+
+	s.Assert().Equal("TokenA", token0)
+	s.Assert().Equal("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", token1)
+
+}
+func (s *TradingPairTestSuite) TestPairToTokensIBCisBoth() {
+
+	token0, token1 :=
+		PairIdToTokens("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2<>ibc/94644FB092D9ACDA56123C74F36E4234926001AA44A9CA97EA622B25F41E5223")
+
+	s.Assert().Equal("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", token0)
+	s.Assert().Equal("ibc/94644FB092D9ACDA56123C74F36E4234926001AA44A9CA97EA622B25F41E5223", token1)
+}
