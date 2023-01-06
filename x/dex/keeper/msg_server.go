@@ -92,14 +92,9 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
 	// TODO: Should switch swap API to just take TokenIn and TokenOut
-	var tokenOut string
-	if msg.TokenIn == msg.TokenA {
-		tokenOut = msg.TokenB
-	} else {
-		tokenOut = msg.TokenA
-	}
+	tokenIn, tokenOut := GetInOutTokens(msg.TokenIn, msg.TokenA, msg.TokenB)
 
-	coinOut, err := k.SwapCore(goCtx, msg, msg.TokenIn, tokenOut, callerAddr, receiverAddr)
+	coinOut, err := k.SwapCore(goCtx, msg, tokenIn, tokenOut, callerAddr, receiverAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -117,13 +112,9 @@ func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLim
 	}
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 
-	// lexographically sort token0, token1
-	token0, token1, err := SortTokens(ctx, msg.TokenA, msg.TokenB)
-	if err != nil {
-		return &types.MsgPlaceLimitOrderResponse{}, err
-	}
+	tokenIn, tokenOut := GetInOutTokens(msg.TokenIn, msg.TokenA, msg.TokenB)
 
-	err = k.PlaceLimitOrderCore(goCtx, msg, token0, token1, callerAddr)
+	err := k.PlaceLimitOrderCore(goCtx, msg, tokenIn, tokenOut, callerAddr)
 	if err != nil {
 		return &types.MsgPlaceLimitOrderResponse{}, err
 	}

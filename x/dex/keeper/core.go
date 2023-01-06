@@ -323,7 +323,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		if initedTick != nil {
 			pair.InitLiquidity(initedTick.TickIndex)
 		}
-		if k.ShouldDeinitAfterSwap(ctx, deinitedTick, pair) {
+		if k.ShouldDeinit(ctx, deinitedTick, pair) {
 			pair.DeinitLiquidity(goCtx, k, deinitedTick.TickIndex)
 		}
 
@@ -361,10 +361,15 @@ func (k Keeper) SwapCore(goCtx context.Context,
 }
 
 // Handles MsgPlaceLimitOrder, initializing (tick, pair) data structures if needed, calculating and storing information for a new limit order at a specific tick
-func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress) error {
+func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLimitOrder, tokenIn string, tokenOut string, callerAddr sdk.AccAddress) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	pair := k.GetOrInitPair(goCtx, token0, token1)
+	token0, token1, err := SortTokens(ctx, tokenIn, tokenOut)
+	if err != nil {
+		return err
+	}
+	rawPair := k.GetOrInitPair(goCtx, token0, token1)
+	pair := types.NewDirectionalTradingPair(rawPair, tokenIn, tokenOut)
 	pairId := pair.PairId
 	tick, err := k.GetOrInitTick(goCtx, pair.PairId, msg.TickIndex)
 	if err != nil {
@@ -372,7 +377,6 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	}
 
 	tickIndex := msg.TickIndex
-	tokenIn := msg.TokenIn
 	receiver := msg.Receiver
 
 	var fillTrancheIndex *uint64
@@ -406,18 +410,12 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 
 	k.SetLimitOrderTrancheUser(ctx, trancheUser)
 	k.SetLimitOrderTranche(ctx, tranche)
-	k.SetTradingPair(ctx, pair)
-
-	if msg.TokenIn == token0 {
-		pair.UpdateTickPointersPostAddToken0(goCtx, k, &tick)
-	} else if msg.TokenIn == token1 {
-		pair.UpdateTickPointersPostAddToken1(goCtx, k, &tick)
-	}
-
-	k.SetTradingPair(ctx, pair)
 
 	if msg.AmountIn.GT(sdk.ZeroInt()) {
-		coin0 := sdk.NewCoin(msg.TokenIn, msg.AmountIn)
+		pair.InitLiquidity(tick.TickIndex)
+		k.SetTradingPair(ctx, pair.TradingPair)
+
+		coin0 := sdk.NewCoin(tokenIn, msg.AmountIn)
 		err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0})
 		if err != nil {
 			return err
@@ -499,14 +497,12 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 		token0, token1, msg.KeyToken, strconv.Itoa(int(msg.Key)), amountToCancel.String(),
 	))
 
-	pair, _ := k.GetTradingPair(ctx, pairId)
-	if msg.KeyToken == token0 {
-		pair.UpdateTickPointersPostRemoveToken0(goCtx, k, &tick)
-	} else {
-		pair.UpdateTickPointersPostRemoveToken1(goCtx, k, &tick)
+	tokenOut, tokenIn := GetInOutTokens(msg.KeyToken, token0, token1)
+	pair, _ := k.GetDirectionalTradingPair(ctx, tokenIn, tokenOut)
+	if k.ShouldDeinit(ctx, &tick, pair) {
+		pair.DeinitLiquidity(goCtx, k, tick.TickIndex)
+		k.SetTradingPair(ctx, pair.TradingPair)
 	}
-
-	k.SetTradingPair(ctx, pair)
 
 	return nil
 }

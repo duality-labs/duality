@@ -47,13 +47,7 @@ func (k Keeper) GetDirectionalTradingPair(
 	if !found {
 		return pair, types.ErrValidPairNotFound
 	} else {
-		dPair := types.DirectionalTradingPair{
-			TradingPair: rawPair,
-			TokenIn:     tokenIn,
-			TokenOut:    tokenOut,
-			Token0:      token0,
-		}
-		return dPair, nil
+		return types.NewDirectionalTradingPair(rawPair, tokenIn, tokenOut), nil
 	}
 }
 

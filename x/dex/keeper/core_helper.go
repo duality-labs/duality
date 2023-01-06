@@ -212,7 +212,7 @@ func CalcPrice1To0(tickIndex int64) (sdk.Dec, error) {
 	}
 }
 
-func (k Keeper) ShouldDeinitAfterSwap(
+func (k Keeper) ShouldDeinit(
 	ctx sdk.Context,
 	deinitedTick *types.Tick,
 	tradingPair types.DirectionalTradingPair) bool {

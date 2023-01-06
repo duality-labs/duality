@@ -39,3 +39,11 @@ func PairToTokens(pairId string) (token0 string, token1 string) {
 
 	return tokens[0], tokens[1]
 }
+
+func GetInOutTokens(tokenIn_ string, tokenA string, tokenB string) (tokenIn string, tokenOut string) {
+	if tokenIn_ == tokenA {
+		return tokenA, tokenB
+	} else {
+		return tokenB, tokenA
+	}
+}
