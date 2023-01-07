@@ -18,8 +18,7 @@ var _ = strconv.IntSize
 func createNTradingPair(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.TradingPair {
 	items := make([]types.TradingPair, n)
 	for i := range items {
-		items[i].PairId = strconv.Itoa(i)
-
+		items[i].PairId = &types.PairId{Token0: "TokenA", Token1: strconv.Itoa(i)}
 		keeper.SetTradingPair(ctx, items[i])
 	}
 	return items

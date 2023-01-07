@@ -10,7 +10,7 @@ import (
 type TickIterator struct {
 	start    int64
 	end      int64
-	pairId   string
+	pairId   *types.PairId
 	keeper   Keeper
 	ctx      sdk.Context
 	hasToken func(sdk.Context, *types.Tick) bool
@@ -21,7 +21,7 @@ type TickIterator struct {
 func (k Keeper) NewTickIterator(ctx context.Context,
 	start int64,
 	end int64,
-	pairId string,
+	pairId *types.PairId,
 	findToken0 bool,
 	scanLeft bool) types.TickIteratorI {
 	var hasToken func(sdk.Context, *types.Tick) bool

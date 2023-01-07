@@ -36,7 +36,7 @@ func (k Keeper) GetOrInitPair(goCtx context.Context, token0 string, token1 strin
 	pair, found := k.GetTradingPair(ctx, pairId)
 	if !found {
 		pair = types.TradingPair{
-			PairId:          pairId,
+			PairId:          &types.PairId{Token0: token0, Token1: token1},
 			CurrentTick0To1: math.MaxInt64,
 			CurrentTick1To0: math.MinInt64,
 			MinTick:         math.MaxInt64,
@@ -47,12 +47,11 @@ func (k Keeper) GetOrInitPair(goCtx context.Context, token0 string, token1 strin
 	return pair
 }
 
-func (k Keeper) InitTick(ctx sdk.Context, pairId string, tickIndex int64) (types.Tick, error) {
+func (k Keeper) InitTick(ctx sdk.Context, pairId *types.PairId, tickIndex int64) (types.Tick, error) {
 	price0To1, err := CalcPrice0To1(tickIndex)
 	if err != nil {
 		return types.Tick{}, err
 	}
-
 	numFees := k.GetFeeTierCount(ctx)
 	tick := types.Tick{
 		PairId:    pairId,
@@ -80,7 +79,7 @@ func (k Keeper) InitTick(ctx sdk.Context, pairId string, tickIndex int64) (types
 	return tick, nil
 }
 
-func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex int64) (types.Tick, error) {
+func (k Keeper) GetOrInitTick(goCtx context.Context, pairId *types.PairId, tickIndex int64) (types.Tick, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	tick, tickFound := k.GetTick(ctx, pairId, tickIndex)
 	if tickFound {
@@ -92,7 +91,7 @@ func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex in
 
 func (k Keeper) GetOrInitLimitOrderTrancheUser(
 	goCtx context.Context,
-	pairId string,
+	pairId *types.PairId,
 	tickIndex int64,
 	tokenIn string,
 	currentLimitOrderKey uint64,

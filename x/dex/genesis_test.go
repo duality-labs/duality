@@ -10,6 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var defaultPairId *types.PairId = &types.PairId{Token0: "TokenA", Token1: "TokenB"}
+
 func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
@@ -17,17 +19,19 @@ func TestGenesis(t *testing.T) {
 		TickList: []types.Tick{
 			{
 				TickIndex: 0,
+				PairId:    defaultPairId,
 			},
 			{
 				TickIndex: 1,
+				PairId:    defaultPairId,
 			},
 		},
 		TradingPairList: []types.TradingPair{
 			{
-				PairId: "0",
+				PairId: defaultPairId,
 			},
 			{
-				PairId: "1",
+				PairId: defaultPairId,
 			},
 		},
 		TokensList: []types.Tokens{
@@ -61,9 +65,11 @@ func TestGenesis(t *testing.T) {
 		LimitOrderTrancheList: []types.LimitOrderTranche{
 			{
 				TickIndex: 0,
+				PairId:    defaultPairId,
 			},
 			{
 				TickIndex: 1,
+				PairId:    defaultPairId,
 			},
 		},
 		// this line is used by starport scaffolding # genesis/test/state

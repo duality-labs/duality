@@ -18,7 +18,7 @@ func (k Keeper) SetTradingPair(ctx sdk.Context, TradingPair types.TradingPair) {
 // GetTradingPair returns a TradingPair from its index
 func (k Keeper) GetTradingPair(
 	ctx sdk.Context,
-	pairId string,
+	pairId *types.PairId,
 ) (val types.TradingPair, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TradingPairKeyPrefix))
 
@@ -54,7 +54,7 @@ func (k Keeper) GetDirectionalTradingPair(
 // RemoveTradingPair removes a TradingPair from the store
 func (k Keeper) RemoveTradingPair(
 	ctx sdk.Context,
-	pairId string,
+	pairId *types.PairId,
 
 ) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TradingPairKeyPrefix))

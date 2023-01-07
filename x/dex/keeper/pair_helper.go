@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"strings"
+
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -28,8 +30,11 @@ func SortAmounts(tokenA string, token0 string, amountsA []sdk.Int, amountsB []sd
 	}
 }
 
-func CreatePairId(token0 string, token1 string) (pairId string) {
-	return (token0 + "<>" + token1)
+func CreatePairId(token0 string, token1 string) (pairId *types.PairId) {
+	return &types.PairId{
+		Token0: token0,
+		Token1: token1,
+	}
 }
 
 func GetInOutTokens(tokenIn_ string, tokenA string, tokenB string) (tokenIn string, tokenOut string) {
@@ -37,5 +42,18 @@ func GetInOutTokens(tokenIn_ string, tokenA string, tokenB string) (tokenIn stri
 		return tokenA, tokenB
 	} else {
 		return tokenB, tokenA
+	}
+}
+
+func StringToPairId(pairIdStr string) (*types.PairId, error) {
+	tokens := strings.Split(pairIdStr, "<>")
+
+	if len(tokens) == 2 {
+		return &types.PairId{
+			Token0: tokens[0],
+			Token1: tokens[1],
+		}, nil
+	} else {
+		return &types.PairId{}, sdkerrors.Wrapf(types.ErrInvalidPairIdStr, pairIdStr)
 	}
 }

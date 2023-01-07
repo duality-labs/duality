@@ -31,21 +31,28 @@ func TestTradingPairQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetTradingPairRequest{
-				PairId: msgs[0].PairId,
+				PairId: msgs[0].PairId.Stringify(),
 			},
 			response: &types.QueryGetTradingPairResponse{TradingPair: msgs[0]},
 		},
 		{
 			desc: "Second",
 			request: &types.QueryGetTradingPairRequest{
-				PairId: msgs[1].PairId,
+				PairId: msgs[1].PairId.Stringify(),
 			},
 			response: &types.QueryGetTradingPairResponse{TradingPair: msgs[1]},
 		},
 		{
-			desc: "KeyNotFound",
+			desc: "Invalid key",
 			request: &types.QueryGetTradingPairRequest{
 				PairId: strconv.Itoa(100000),
+			},
+			err: types.ErrInvalidPairIdStr,
+		},
+		{
+			desc: "KeyNotFound",
+			request: &types.QueryGetTradingPairRequest{
+				PairId: "TokenA<>TokenZ",
 			},
 			err: status.Error(codes.NotFound, "not found"),
 		},

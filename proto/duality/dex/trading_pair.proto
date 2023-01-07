@@ -3,8 +3,10 @@ package nicholasdotsol.duality.dex;
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 
+import "duality/dex/pair_id.proto";
+
 message TradingPair {
-  string pairId = 1;
+  PairId pairId = 1;
   int64 currentTick0To1 = 2; 
   int64 currentTick1To0 = 3; 
   int64 maxTick = 4;
