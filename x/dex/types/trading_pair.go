@@ -190,6 +190,6 @@ func PairIdToTokens(pairId string) (token0 string, token1 string) {
 	return tokens[0], tokens[1]
 }
 
-func (p TradingPair) PairToTokens() (token0 string, token1 string) {
+func (p TradingPair) ToTokens() (token0 string, token1 string) {
 	return PairIdToTokens(p.PairId)
 }

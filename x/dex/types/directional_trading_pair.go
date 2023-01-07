@@ -12,7 +12,7 @@ type DirectionalTradingPair struct {
 }
 
 func NewDirectionalTradingPair(pair TradingPair, tokenIn string, tokenOut string) DirectionalTradingPair {
-	token0, _ := pair.PairToTokens()
+	token0, _ := pair.ToTokens()
 	return DirectionalTradingPair{
 		TradingPair: pair,
 		TokenIn:     tokenIn,
