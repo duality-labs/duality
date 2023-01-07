@@ -28,7 +28,7 @@ func (k Keeper) GetLimitOrderBook1To0(
 	fillIndex := tick.LimitOrderTranche1To0.FillTrancheIndex
 	placeIndex := tick.LimitOrderTranche1To0.PlaceTrancheIndex
 
-	_, token1 := PairToTokens(pair.PairId)
+	_, token1 := pair.ToTokens()
 	fillTrancheDTO, found := k.GetLimitOrderTranche(
 		sdkCtx,
 		pair.PairId,
@@ -89,7 +89,7 @@ func (k Keeper) GetLimitOrderBook0To1(
 	fillIndex := tick.LimitOrderTranche0To1.FillTrancheIndex
 	placeIndex := tick.LimitOrderTranche0To1.PlaceTrancheIndex
 
-	token0, _ := PairToTokens(pair.PairId)
+	token0, _ := pair.ToTokens()
 	fillTrancheDTO, found := k.GetLimitOrderTranche(
 		sdkCtx,
 		pair.PairId,
@@ -170,7 +170,7 @@ func NewLimitOrderBook0To1(
 }
 
 func (l *LimitOrderBook) NewTranche(trancheIndex uint64) *LimitOrderTranche {
-	token0, _ := PairToTokens(l.Pair.PairId)
+	token0, _ := l.Pair.ToTokens()
 	var priceMakerToTaker, priceTakerToMaker sdk.Dec
 	if l.TokenIn == token0 {
 		priceMakerToTaker = *l.Tick.Price0To1
