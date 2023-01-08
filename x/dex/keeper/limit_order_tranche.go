@@ -85,7 +85,7 @@ func (k Keeper) SetLimitOrderTranche(ctx sdk.Context, LimitOrderTranche types.Li
 
 func (k Keeper) GetOrInitLimitOrderTranche(
 	ctx sdk.Context,
-	pairId string,
+	pairId *types.PairId,
 	tickIndex int64,
 	tokenIn string,
 	trancheIndex uint64,
@@ -111,7 +111,7 @@ func (k Keeper) GetOrInitLimitOrderTranche(
 // GetLimitOrderTranche returns a LimitOrderTranche from its index
 func (k Keeper) GetLimitOrderTranche(
 	ctx sdk.Context,
-	pairId string,
+	pairId *types.PairId,
 	tickIndex int64,
 	token string,
 	tranchIndex uint64,
@@ -136,7 +136,7 @@ func (k Keeper) GetLimitOrderTranche(
 // RemoveLimitOrderTranche removes a LimitOrderTranche from the store
 func (k Keeper) RemoveLimitOrderTranche(
 	ctx sdk.Context,
-	pairId string,
+	pairId *types.PairId,
 	tickIndex int64,
 	token string,
 	trancheIndex uint64,

@@ -3,7 +3,6 @@ package types
 import (
 	context "context"
 	math "math"
-	"strings"
 
 	. "github.com/NicholasDotSol/duality/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -12,7 +11,7 @@ import (
 type Keeper interface {
 	TickHasToken0(sdk.Context, *Tick) bool
 	TickHasToken1(sdk.Context, *Tick) bool
-	NewTickIterator(context.Context, int64, int64, string, bool, bool) TickIteratorI
+	NewTickIterator(context.Context, int64, int64, *PairId, bool, bool) TickIteratorI
 }
 
 // Assumes that the token0 liquidity is non-empty at this tick
@@ -184,10 +183,9 @@ func (p TradingPair) FindNextTick0To1(goCtx context.Context, k Keeper) (tickIdx 
 	return ti.Next()
 }
 
-func PairIdToTokens(pairId string) (token0 string, token1 string) {
-	tokens := strings.Split(pairId, "<>")
+func PairIdToTokens(pairId *PairId) (token0 string, token1 string) {
 
-	return tokens[0], tokens[1]
+	return pairId.Token0, pairId.Token1
 }
 
 func (p TradingPair) ToTokens() (token0 string, token1 string) {

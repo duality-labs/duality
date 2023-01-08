@@ -14,9 +14,10 @@ import (
 
 type TradingPairTestSuite struct {
 	suite.Suite
-	app   *dualityapp.App
-	ctx   sdk.Context
-	goCtx context.Context
+	app           *dualityapp.App
+	ctx           sdk.Context
+	goCtx         context.Context
+	defaultPairId *PairId
 }
 
 func TestTradingPairTestSuite(t *testing.T) {
@@ -39,15 +40,14 @@ func (s *TradingPairTestSuite) SetupTest() {
 	s.app.DexKeeper.AppendFeeTier(s.ctx, feeTiers[1])
 	s.app.DexKeeper.AppendFeeTier(s.ctx, feeTiers[2])
 	s.app.DexKeeper.AppendFeeTier(s.ctx, feeTiers[3])
+	s.defaultPairId = &PairId{Token0: "TokenA", Token1: "TokenB"}
 }
 
 func (s *TradingPairTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amountB int) (lowerTick Tick, upperTick Tick) {
-	pairId := "TokenA<>TokenB"
-	// sharesId := fmt.Sprintf("%s%st%df%d", "TokenA", "TokenB", tickIndex, 1)
-	// sharesId := keeper.CreateSharesId("TokenA", "TokenB", tickIndex, 0)
-	lowerTick, err := s.app.DexKeeper.GetOrInitTick(s.goCtx, pairId, tickIndex-1)
+
+	lowerTick, err := s.app.DexKeeper.GetOrInitTick(s.goCtx, s.defaultPairId, tickIndex-1)
 	s.Assert().NoError(err)
-	upperTick, err = s.app.DexKeeper.GetOrInitTick(s.goCtx, pairId, tickIndex+1)
+	upperTick, err = s.app.DexKeeper.GetOrInitTick(s.goCtx, s.defaultPairId, tickIndex+1)
 	s.Assert().NoError(err)
 	// priceCenter1To0, err := keeper.CalcPrice0To1(tickIndex)
 	// if err != nil {
@@ -60,8 +60,8 @@ func (s *TradingPairTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amo
 	// totalShares := keeper.CalcShares(amountAInt, amountBInt, priceCenter1To0).TruncateInt()
 	// s.app.DexKeeper.MintShares(s.ctx, s.alice, totalShares, sharesId)
 	upperTick.TickData.Reserve1[0] = amountBInt
-	s.app.DexKeeper.SetTick(s.ctx, pairId, lowerTick)
-	s.app.DexKeeper.SetTick(s.ctx, pairId, upperTick)
+	s.app.DexKeeper.SetTick(s.ctx, s.defaultPairId, lowerTick)
+	s.app.DexKeeper.SetTick(s.ctx, s.defaultPairId, upperTick)
 	return lowerTick, upperTick
 }
 
@@ -424,7 +424,7 @@ func (s *TradingPairTestSuite) TestFindNextTick0To1WithMinLiq() {
 
 func (s *TradingPairTestSuite) TestPairToTokens() {
 
-	token0, token1 := PairIdToTokens("TokenA<>TokenB")
+	token0, token1 := PairIdToTokens(&PairId{Token0: "TokenA", Token1: "TokenB"})
 
 	s.Assert().Equal("TokenA", token0)
 	s.Assert().Equal("TokenB", token1)
@@ -433,7 +433,7 @@ func (s *TradingPairTestSuite) TestPairToTokens() {
 
 func (s *TradingPairTestSuite) TestPairToTokensIBCis0() {
 
-	token0, token1 := PairIdToTokens("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2<>TokenB")
+	token0, token1 := PairIdToTokens(&PairId{Token0: "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", Token1: "TokenB"})
 
 	s.Assert().Equal("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", token0)
 	s.Assert().Equal("TokenB", token1)
@@ -441,7 +441,7 @@ func (s *TradingPairTestSuite) TestPairToTokensIBCis0() {
 
 func (s *TradingPairTestSuite) TestPairToTokensIBCis1() {
 
-	token0, token1 := PairIdToTokens("TokenA<>ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2")
+	token0, token1 := PairIdToTokens(&PairId{Token0: "TokenA", Token1: "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2"})
 
 	s.Assert().Equal("TokenA", token0)
 	s.Assert().Equal("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", token1)
@@ -450,7 +450,10 @@ func (s *TradingPairTestSuite) TestPairToTokensIBCis1() {
 func (s *TradingPairTestSuite) TestPairToTokensIBCisBoth() {
 
 	token0, token1 :=
-		PairIdToTokens("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2<>ibc/94644FB092D9ACDA56123C74F36E4234926001AA44A9CA97EA622B25F41E5223")
+		PairIdToTokens(&PairId{
+			Token0: "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2",
+			Token1: "ibc/94644FB092D9ACDA56123C74F36E4234926001AA44A9CA97EA622B25F41E5223",
+		})
 
 	s.Assert().Equal("ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", token0)
 	s.Assert().Equal("ibc/94644FB092D9ACDA56123C74F36E4234926001AA44A9CA97EA622B25F41E5223", token1)
