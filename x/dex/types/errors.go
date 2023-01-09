@@ -26,4 +26,5 @@ var (
 	ErrPlaceLimitOrderBehindPairLiquidity = sdkerrors.Register(ModuleName, 1116, "Placing a limit order behind the opposite token pair's liquidity is currently not allowed")
 	ErrTickOutsideRange                   = sdkerrors.Register(ModuleName, 1117, "Supplying a tick outside the range of [-1048575, 1048575] is not allowed")
 	ErrInvalidDepositShares               = sdkerrors.Register(ModuleName, 1118, "Denom is not an instance of Duality Pool Shares")
+	ErrInvalidPairIdStr                   = sdkerrors.Register(ModuleName, 1119, "PairId does not conform to pattern [TokenA]<>[TokenB]: %s")
 )

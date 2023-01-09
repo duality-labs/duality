@@ -3,9 +3,10 @@ package nicholasdotsol.duality.dex;
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
 import "gogoproto/gogo.proto";
+import "duality/dex/pair_id.proto";
 
 message LimitOrderTranche {
-  string pairId = 1;
+  PairId pairId = 1;
   string tokenIn = 2;
   int64 tickIndex = 3;
   uint64 trancheIndex = 4; 
