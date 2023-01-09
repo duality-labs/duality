@@ -55,7 +55,6 @@ func CmdDeposit() *cobra.Command {
 
 			for _, s := range argTicksIndexes {
 				TickIndexInt, err := strconv.Atoi(s)
-
 				if err != nil {
 					return err
 				}

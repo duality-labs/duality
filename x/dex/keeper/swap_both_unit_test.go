@@ -9,7 +9,7 @@ func (s *MsgServerTestSuite) TestSwapNoLiqudityPairNotFound() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 50)
 	err := types.ErrValidPairNotFound
-	s.bobMarketSellFails(err, "TokenA", 5, 0)
+	s.bobMarketSellFails(err, "TokenA", 5, 0, sdk.ZeroDec())
 }
 
 func (s *MsgServerTestSuite) TestSwapExhaustFeeTiersAndLimitOrder() {
@@ -18,7 +18,7 @@ func (s *MsgServerTestSuite) TestSwapExhaustFeeTiersAndLimitOrder() {
 
 	s.aliceLimitSells("TokenB", 0, 10)
 
-	s.bobMarketSells("TokenA", 5, 5)
+	s.bobMarketSells("TokenA", 5, 5, sdk.ZeroDec())
 
 	s.assertLimitLiquidityAtTick("TokenB", 0, 5)
 
@@ -28,7 +28,7 @@ func (s *MsgServerTestSuite) TestSwapExhaustFeeTiersAndLimitOrder() {
 
 	s.assertBobBalances(45, 5)
 
-	s.bobMarketSells("TokenA", 30, 0)
+	s.bobMarketSells("TokenA", 30, 0, sdk.ZeroDec())
 
 	s.assertPoolLiquidity(10, 0, 0, 0)
 	s.assertLimitLiquidityAtTickInt("TokenB", 0, sdk.ZeroInt())

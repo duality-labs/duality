@@ -90,7 +90,13 @@ message MsgSwap {
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "minOut"
-  ]; 
+  ];
+  string tickLimit = 8 [
+      (gogoproto.moretags)   = "yaml:\"tickLimit\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "tickLimit"
+  ];
   
 }
 

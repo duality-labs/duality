@@ -500,59 +500,61 @@ func (s *MsgServerTestSuite) cancelsLimitSellFails(account sdk.AccAddress, selli
 	s.Assert().ErrorIs(err, expectedErr)
 }
 
-func (s *MsgServerTestSuite) aliceMarketSells(selling string, amountIn int, minOut int) {
-	s.marketSells(s.alice, selling, amountIn, minOut)
+func (s *MsgServerTestSuite) aliceMarketSells(selling string, amountIn int, minOut int, tickLimit sdk.Dec) {
+	s.marketSells(s.alice, selling, amountIn, minOut, tickLimit)
 }
 
-func (s *MsgServerTestSuite) bobMarketSells(selling string, amountIn int, minOut int) {
-	s.marketSells(s.bob, selling, amountIn, minOut)
+func (s *MsgServerTestSuite) bobMarketSells(selling string, amountIn int, minOut int, tickLimit sdk.Dec) {
+	s.marketSells(s.bob, selling, amountIn, minOut, tickLimit)
 }
 
-func (s *MsgServerTestSuite) carolMarketSells(selling string, amountIn int, minOut int) {
-	s.marketSells(s.carol, selling, amountIn, minOut)
+func (s *MsgServerTestSuite) carolMarketSells(selling string, amountIn int, minOut int, tickLimit sdk.Dec) {
+	s.marketSells(s.carol, selling, amountIn, minOut, tickLimit)
 }
 
-func (s *MsgServerTestSuite) danMarketSells(selling string, amountIn int, minOut int) {
-	s.marketSells(s.dan, selling, amountIn, minOut)
+func (s *MsgServerTestSuite) danMarketSells(selling string, amountIn int, minOut int, tickLimit sdk.Dec) {
+	s.marketSells(s.dan, selling, amountIn, minOut, tickLimit)
 }
 
-func (s *MsgServerTestSuite) marketSells(account sdk.AccAddress, selling string, amountIn int, minOut int) {
+func (s *MsgServerTestSuite) marketSells(account sdk.AccAddress, selling string, amountIn int, minOut int, tickLimit sdk.Dec) {
 	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
-		Creator:  account.String(),
-		Receiver: account.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
-		TokenIn:  selling,
-		AmountIn: sdk.NewInt(int64(amountIn)),
-		MinOut:   sdk.NewInt(int64(minOut)),
+		Creator:   account.String(),
+		Receiver:  account.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		TokenIn:   selling,
+		AmountIn:  sdk.NewInt(int64(amountIn)),
+		MinOut:    sdk.NewInt(int64(minOut)),
+		TickLimit: tickLimit,
 	})
 	s.Assert().Nil(err)
 }
 
-func (s *MsgServerTestSuite) aliceMarketSellFails(err error, selling string, amountIn int, minOut int) {
-	s.marketSellFails(s.alice, err, selling, amountIn, minOut)
+func (s *MsgServerTestSuite) aliceMarketSellFails(err error, selling string, amountIn int, minOut int, tickLimit sdk.Dec) {
+	s.marketSellFails(s.alice, err, selling, amountIn, minOut, tickLimit)
 }
 
-func (s *MsgServerTestSuite) bobMarketSellFails(err error, selling string, amountIn int, minOut int) {
-	s.marketSellFails(s.bob, err, selling, amountIn, minOut)
+func (s *MsgServerTestSuite) bobMarketSellFails(err error, selling string, amountIn int, minOut int, tickLimit sdk.Dec) {
+	s.marketSellFails(s.bob, err, selling, amountIn, minOut, tickLimit)
 }
 
-func (s *MsgServerTestSuite) carolMarketSellFails(err error, selling string, amountIn int, minOut int) {
-	s.marketSellFails(s.bob, err, selling, amountIn, minOut)
+func (s *MsgServerTestSuite) carolMarketSellFails(err error, selling string, amountIn int, minOut int, tickLimit sdk.Dec) {
+	s.marketSellFails(s.bob, err, selling, amountIn, minOut, tickLimit)
 }
 
-func (s *MsgServerTestSuite) danMarketSellFails(err error, selling string, amountIn int, minOut int) {
-	s.marketSellFails(s.bob, err, selling, amountIn, minOut)
+func (s *MsgServerTestSuite) danMarketSellFails(err error, selling string, amountIn int, minOut int, tickLimit sdk.Dec) {
+	s.marketSellFails(s.bob, err, selling, amountIn, minOut, tickLimit)
 }
-func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr error, selling string, amountIn int, minOut int) {
+func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr error, selling string, amountIn int, minOut int, tickLimit sdk.Dec) {
 	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
-		Creator:  account.String(),
-		Receiver: account.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
-		TokenIn:  selling,
-		AmountIn: sdk.NewInt(int64(amountIn)),
-		MinOut:   sdk.NewInt(int64(minOut)),
+		Creator:   account.String(),
+		Receiver:  account.String(),
+		TokenA:    "TokenA",
+		TokenB:    "TokenB",
+		TokenIn:   selling,
+		AmountIn:  sdk.NewInt(int64(amountIn)),
+		MinOut:    sdk.NewInt(int64(minOut)),
+		TickLimit: tickLimit,
 	})
 	s.Assert().ErrorIs(err, expectedErr)
 }

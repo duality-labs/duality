@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	//. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	//"github.com/NicholasDotSol/duality/x/dex/types"
 )
@@ -26,7 +27,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledSimpleFull() {
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(0)
 
-	s.bobMarketSells("TokenB", 10, 10)
+	s.bobMarketSells("TokenB", 10, 10, sdk.ZeroDec())
 
 	s.assertAliceBalances(40, 50)
 	s.assertBobBalances(60, 40)
@@ -67,7 +68,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(0)
 
-	s.bobMarketSells("TokenB", 10, 10)
+	s.bobMarketSells("TokenB", 10, 10, sdk.ZeroDec())
 
 	s.assertAliceBalances(40, 50)
 	s.assertBobBalances(60, 40)
@@ -88,7 +89,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(0)
 
-	s.bobMarketSells("TokenB", 10, 10)
+	s.bobMarketSells("TokenB", 10, 10, sdk.ZeroDec())
 
 	s.assertAliceBalances(30, 60)
 	s.assertBobBalances(70, 30)
@@ -129,7 +130,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullDifferentDirection() {
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(0)
 
-	s.bobMarketSells("TokenB", 10, 10)
+	s.bobMarketSells("TokenB", 10, 10, sdk.ZeroDec())
 
 	s.assertAliceBalances(40, 50)
 	s.assertBobBalances(60, 40)
@@ -150,7 +151,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullDifferentDirection() {
 	s.assertMaxTick(0)
 	s.assertMinTick(math.MaxInt64)
 
-	s.bobMarketSells("TokenA", 10, 10)
+	s.bobMarketSells("TokenA", 10, 10, sdk.ZeroDec())
 
 	s.assertAliceBalances(40, 50)
 	s.assertBobBalances(50, 50)
@@ -178,7 +179,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledInvalidKeyToken() {
 	// GIVEN
 	// existing limit order selling TokenA for TokenB that was filled
 	s.aliceLimitSells("TokenA", 0, 10)
-	s.bobMarketSells("TokenB", 10, 0)
+	s.bobMarketSells("TokenB", 10, 0, sdk.ZeroDec())
 
 	// WHEN
 	// withdrawing the sold tokens

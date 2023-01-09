@@ -307,6 +307,12 @@ func (k Keeper) SwapCore(goCtx context.Context,
 	liqIter := NewLiquidityIterator(k, goCtx, pair, feeTiers)
 	for liqIter.HasNext() && remainingIn.GT(sdk.ZeroInt()) {
 		liq := liqIter.Next()
+
+		// break as soon as we iterated past tickLimit
+		if !msg.TickLimit.Equal(sdk.ZeroDec()) && liq.Price().LT(msg.TickLimit) {
+			break
+		}
+
 		// price only gets worse as we iterate, so we can greedily abort
 		// when the price is too low for minOut to be reached.
 		idealOut := totalOut.Add(remainingIn.ToDec().Mul(liq.Price()).TruncateInt())
@@ -320,6 +326,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		totalOut = totalOut.Add(outAmount)
 		// Saving all the time
 		liq.Save(goCtx, k)
+
 		if initedTick != nil {
 			pair.InitLiquidity(initedTick.TickIndex)
 		}

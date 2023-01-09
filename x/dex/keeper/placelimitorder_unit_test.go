@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
@@ -362,7 +363,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderPartiallyFilledLOPlaceLOIncremen
 	// GIVEN
 	// partially filled limit order exists on tick -1
 	s.aliceLimitSells("TokenA", -1, 10)
-	s.bobMarketSells("TokenB", 5, 0)
+	s.bobMarketSells("TokenB", 5, 0, sdk.ZeroDec())
 	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
 
 	// WHEN
@@ -381,7 +382,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFilledLOPlaceLODoesntIncrementsP
 	// GIVEN
 	// filled LO with partially filled place tranche
 	s.aliceLimitSells("TokenA", -1, 10)
-	s.bobMarketSells("TokenB", 10, 0)
+	s.bobMarketSells("TokenB", 10, 0, sdk.ZeroDec())
 	s.aliceLimitSells("TokenA", -1, 10)
 	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
 
