@@ -15,15 +15,51 @@ func TestMsgWithdrawFilledLimitOrder_ValidateBasic(t *testing.T) {
 		err  error
 	}{
 		{
-			name: "invalid address",
+			name: "invalid creator",
 			msg: MsgWithdrawFilledLimitOrder{
-				Creator: "invalid_address",
+				Creator:   "invalid_address",
+				Receiver:  sample.AccAddress(),
+				TokenA:    "TokenA",
+				TokenB:    "TokenB",
+				TickIndex: 0,
+				KeyToken:  "TokenA",
+				Key:       0,
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
-			name: "valid address",
+			name: "invalid receiver",
 			msg: MsgWithdrawFilledLimitOrder{
-				Creator: sample.AccAddress(),
+				Creator:   sample.AccAddress(),
+				Receiver:  "invalid address",
+				TokenA:    "TokenA",
+				TokenB:    "TokenB",
+				TickIndex: 0,
+				KeyToken:  "TokenA",
+				Key:       0,
+			},
+			err: sdkerrors.ErrInvalidAddress,
+		}, {
+			name: "invalid key token",
+			msg: MsgWithdrawFilledLimitOrder{
+				Creator:   sample.AccAddress(),
+				Receiver:  sample.AccAddress(),
+				TokenA:    "TokenA",
+				TokenB:    "TokenB",
+				TickIndex: 0,
+				KeyToken:  "TokenC",
+				Key:       0,
+			},
+			err: ErrInvalidTradingPair,
+		}, {
+			name: "valid msg",
+			msg: MsgWithdrawFilledLimitOrder{
+				Creator:   sample.AccAddress(),
+				Receiver:  sample.AccAddress(),
+				TokenA:    "TokenA",
+				TokenB:    "TokenB",
+				TickIndex: 0,
+				KeyToken:  "TokenA",
+				Key:       0,
 			},
 		},
 	}

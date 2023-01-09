@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
@@ -9,7 +8,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-func (k Keeper) SortTokens(ctx sdk.Context, tokenA string, tokenB string) (string, string, error) {
+func SortTokens(ctx sdk.Context, tokenA string, tokenB string) (string, string, error) {
 
 	relativeOrder := tokenA < tokenB
 
@@ -23,12 +22,38 @@ func (k Keeper) SortTokens(ctx sdk.Context, tokenA string, tokenB string) (strin
 	}
 }
 
-func (k Keeper) CreatePairId(token0 string, token1 string) (pairId string) {
-	return (token0 + "<>" + token1)
+func SortAmounts(tokenA string, token0 string, amountsA []sdk.Int, amountsB []sdk.Int) ([]sdk.Int, []sdk.Int) {
+	if tokenA == token0 {
+		return amountsA, amountsB
+	} else {
+		return amountsB, amountsA
+	}
 }
 
-func (k Keeper) CreateSharesId(token0 string, token1 string, tickIndex int64, fee int64) (denom string) {
-	t0 := strings.ReplaceAll(token0, "-", "")
-	t1 := strings.ReplaceAll(token1, "-", "")
-	return fmt.Sprintf("%s-%s-t%d-f%d", t0, t1, tickIndex, fee)
+func CreatePairId(token0 string, token1 string) (pairId *types.PairId) {
+	return &types.PairId{
+		Token0: token0,
+		Token1: token1,
+	}
+}
+
+func GetInOutTokens(tokenIn_ string, tokenA string, tokenB string) (tokenIn string, tokenOut string) {
+	if tokenIn_ == tokenA {
+		return tokenA, tokenB
+	} else {
+		return tokenB, tokenA
+	}
+}
+
+func StringToPairId(pairIdStr string) (*types.PairId, error) {
+	tokens := strings.Split(pairIdStr, "<>")
+
+	if len(tokens) == 2 {
+		return &types.PairId{
+			Token0: tokens[0],
+			Token1: tokens[1],
+		}, nil
+	} else {
+		return &types.PairId{}, sdkerrors.Wrapf(types.ErrInvalidPairIdStr, pairIdStr)
+	}
 }

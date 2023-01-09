@@ -92,19 +92,19 @@ workflows:
       - go-tests:
           filters:
             tags:
-              only: /^\d+\.\d+\.\d+$/
+              only: /^v\d+\.\d+\.\d+$/
             branches:
               ignore: /.*/
       - binary-release-build:
           filters:
             tags:
-              only: /^\d+\.\d+\.\d+$/
+              only: /^v\d+\.\d+\.\d+$/
             branches:
               ignore: /.*/
       - publish-github-release:
           filters:
             tags:
-              only: /^\d+\.\d+\.\d+$/
+              only: /^v\d+\.\d+\.\d+$/
             branches:
               ignore: /.*/
           context:

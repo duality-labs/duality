@@ -47,5 +47,16 @@ func (msg *MsgWithdrawl) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	_, err = sdk.AccAddressFromBech32(msg.Receiver)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+	}
+
+	// Verify that the lengths of TickIndexes, FeeIndexes, SharesToRemove are all equal
+	if len(msg.FeeIndexes) != len(msg.TickIndexes) ||
+		len(msg.SharesToRemove) != len(msg.TickIndexes) {
+		return sdkerrors.Wrapf(ErrUnbalancedTxArray, "Input Arrays are not of the same length")
+	}
 	return nil
 }

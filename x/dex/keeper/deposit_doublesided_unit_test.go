@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"github.com/NicholasDotSol/duality/x/dex/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (s *MsgServerTestSuite) TestDepositDoubleSidedInSpreadCurrTickAdjusted() {
@@ -333,4 +334,19 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedExistingSharesMintedUser() {
 	// THEN
 	// 9 more shares are minted for alice for a total of 24
 	s.assertAliceShares(0, 0, 24)
+}
+
+func (s *MsgServerTestSuite) TestDepositDoubleSidedZeroDeposit() {
+	s.fundAliceBalances(50, 50)
+
+	// GIVEN
+	// empty pool
+
+	// WHEN
+	// depositing 0,0
+	// THEN
+	// deposit should fail with InvalidType error
+
+	err := sdkerrors.ErrInvalidType
+	s.assertAliceDepositFails(err, NewDeposit(0, 0, 0, 0))
 }

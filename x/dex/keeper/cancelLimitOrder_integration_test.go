@@ -1,10 +1,9 @@
 package keeper_test
 
 import (
-	//"fmt"
 	"math"
-	//. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
-	//"github.com/NicholasDotSol/duality/x/dex/types"
+
+	"github.com/NicholasDotSol/duality/x/dex/types"
 )
 
 func (s *MsgServerTestSuite) TestCancelEntireLimitOrderAOneExists() {
@@ -21,7 +20,7 @@ func (s *MsgServerTestSuite) TestCancelEntireLimitOrderAOneExists() {
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(0)
 
-	s.aliceCancelsLimitSell("TokenA", 0, 0, 10)
+	s.aliceCancelsLimitSell("TokenA", 0, 0)
 
 	s.assertAliceBalances(50, 50)
 	s.assertDexBalances(0, 0)
@@ -45,7 +44,7 @@ func (s *MsgServerTestSuite) TestCancelEntireLimitOrderBOneExists() {
 	s.assertMaxTick(0)
 	s.assertMinTick(math.MaxInt64)
 
-	s.aliceCancelsLimitSell("TokenB", 0, 0, 10)
+	s.aliceCancelsLimitSell("TokenB", 0, 0)
 
 	s.assertAliceBalances(50, 50)
 	s.assertDexBalances(0, 0)
@@ -70,7 +69,7 @@ func (s *MsgServerTestSuite) TestCancelHigherEntireLimitOrderATwoExistDiffTicksS
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(-1)
 
-	s.aliceCancelsLimitSell("TokenA", 0, 0, 10)
+	s.aliceCancelsLimitSell("TokenA", 0, 0)
 
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
@@ -95,7 +94,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderATwoExistDiffTicksSa
 	s.assertMaxTick(math.MinInt64)
 	s.assertMinTick(-1)
 
-	s.aliceCancelsLimitSell("TokenA", -1, 0, 10)
+	s.aliceCancelsLimitSell("TokenA", -1, 0)
 
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
@@ -120,7 +119,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderATwoExistDiffTicksDi
 	s.assertMaxTick(1)
 	s.assertMinTick(0)
 
-	s.aliceCancelsLimitSell("TokenA", 0, 0, 10)
+	s.aliceCancelsLimitSell("TokenA", 0, 0)
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
@@ -145,7 +144,7 @@ func (s *MsgServerTestSuite) TestCancelHigherEntireLimitOrderBTwoExistDiffTicksS
 	s.assertMaxTick(0)
 	s.assertMinTick(math.MaxInt64)
 
-	s.aliceCancelsLimitSell("TokenB", 0, 0, 10)
+	s.aliceCancelsLimitSell("TokenB", 0, 0)
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
@@ -170,7 +169,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderBTwoExistDiffTicksSa
 	s.assertMaxTick(0)
 	s.assertMinTick(math.MaxInt64)
 
-	s.aliceCancelsLimitSell("TokenB", -1, 0, 10)
+	s.aliceCancelsLimitSell("TokenB", -1, 0)
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
@@ -178,4 +177,23 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderBTwoExistDiffTicksSa
 	s.assertCurr0To1(0)
 	s.assertMaxTick(0)
 	s.assertMinTick(math.MaxInt64)
+}
+
+func (s *MsgServerTestSuite) TestCancelTwiceFails() {
+	s.fundAliceBalances(50, 50)
+	// CASE
+	// Alice tries to cancel the same limit order twice
+
+	s.aliceLimitSells("TokenB", 0, 10)
+
+	s.assertAliceBalances(50, 40)
+	s.assertDexBalances(0, 10)
+
+	s.aliceCancelsLimitSell("TokenB", 0, 0)
+
+	s.assertAliceBalances(50, 50)
+	s.assertDexBalances(0, 0)
+
+	s.aliceCancelsLimitSellFails("TokenB", -1, 0, types.ErrValidTickNotFound)
+
 }

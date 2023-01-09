@@ -15,12 +15,12 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNLimitOrderTranche(keeper *keeper.Keeper, ctx sdk.Context, pairId string, tickIndex int64, token string, n int) []types.LimitOrderTranche {
+func createNLimitOrderTranche(keeper *keeper.Keeper, ctx sdk.Context, tickIndex int64, token string, n int) []types.LimitOrderTranche {
 	items := make([]types.LimitOrderTranche, n)
 	for i := range items {
 		items[i] = types.LimitOrderTranche{
 			TrancheIndex:     uint64(i),
-			PairId:           pairId,
+			PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 			TickIndex:        tickIndex,
 			TokenIn:          token,
 			ReservesTokenIn:  sdk.ZeroInt(),
@@ -35,10 +35,10 @@ func createNLimitOrderTranche(keeper *keeper.Keeper, ctx sdk.Context, pairId str
 
 func TestLimitOrderTrancheGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderTranche(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderTranche(keeper, ctx, 0, "TokenA", 10)
 	for _, item := range items {
 		rst, found := keeper.GetLimitOrderTranche(ctx,
-			"TokenA<>TokenB",
+			&types.PairId{Token0: "TokenA", Token1: "TokenB"},
 			0,
 			"TokenA",
 			item.TrancheIndex,
@@ -52,16 +52,16 @@ func TestLimitOrderTrancheGet(t *testing.T) {
 }
 func TestLimitOrderTrancheRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderTranche(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderTranche(keeper, ctx, 0, "TokenA", 10)
 	for _, item := range items {
 		keeper.RemoveLimitOrderTranche(ctx,
-			"TokenA<>TokenB",
+			&types.PairId{Token0: "TokenA", Token1: "TokenB"},
 			0,
 			"TokenA",
 			item.TrancheIndex,
 		)
 		_, found := keeper.GetLimitOrderTranche(ctx,
-			"TokenA<>TokenB",
+			&types.PairId{Token0: "TokenA", Token1: "TokenB"},
 			0,
 			"TokenA",
 			item.TrancheIndex,
@@ -72,7 +72,7 @@ func TestLimitOrderTrancheRemove(t *testing.T) {
 
 func TestLimitOrderTrancheGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderTranche(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 10)
+	items := createNLimitOrderTranche(keeper, ctx, 0, "TokenA", 10)
 	require.ElementsMatch(t,
 		nullify.Fill(items),
 		nullify.Fill(keeper.GetAllLimitOrderTranche(ctx)),

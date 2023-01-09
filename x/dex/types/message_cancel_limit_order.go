@@ -9,7 +9,7 @@ const TypeMsgCancelLimitOrder = "cancel_limit_order"
 
 var _ sdk.Msg = &MsgCancelLimitOrder{}
 
-func NewMsgCancelLimitOrder(creator string, receiver string, tokenA string, tokenB string, tickIndex int64, keyToken string, key uint64, sharesOut sdk.Int) *MsgCancelLimitOrder {
+func NewMsgCancelLimitOrder(creator string, receiver string, tokenA string, tokenB string, tickIndex int64, keyToken string, key uint64) *MsgCancelLimitOrder {
 	return &MsgCancelLimitOrder{
 		Creator:   creator,
 		Receiver:  receiver,
@@ -18,7 +18,6 @@ func NewMsgCancelLimitOrder(creator string, receiver string, tokenA string, toke
 		TickIndex: tickIndex,
 		KeyToken:  keyToken,
 		Key:       key,
-		SharesOut: sharesOut,
 	}
 }
 
@@ -47,6 +46,15 @@ func (msg *MsgCancelLimitOrder) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+
+	_, err = sdk.AccAddressFromBech32(msg.Receiver)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+	}
+
+	if msg.KeyToken != msg.TokenA && msg.KeyToken != msg.TokenB {
+		return sdkerrors.Wrapf(ErrInvalidTradingPair, "KeyToken must be either TokenA or TokenB")
 	}
 	return nil
 }

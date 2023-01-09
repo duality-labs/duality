@@ -47,5 +47,14 @@ func (msg *MsgPlaceLimitOrder) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	_, err = sdk.AccAddressFromBech32(msg.Receiver)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+	}
+
+	if msg.TokenIn != msg.TokenA && msg.TokenIn != msg.TokenB {
+		return sdkerrors.Wrapf(ErrInvalidTradingPair, "TokenIn must be either TokenA or TokenB")
+	}
 	return nil
 }
