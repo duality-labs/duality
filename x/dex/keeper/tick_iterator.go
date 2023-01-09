@@ -4,53 +4,23 @@ import (
 	"context"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
+	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
-
-type TickIterator struct {
-	start    int64
-	end      int64
-	pairId   *types.PairId
-	keeper   Keeper
-	ctx      sdk.Context
-	hasToken func(sdk.Context, *types.Tick) bool
-	nextTick func(tick int64) int64
-	stop     func(int64) bool
-}
 
 func (k Keeper) NewTickIterator(ctx context.Context,
 	start int64,
 	end int64,
 	pairId *types.PairId,
-	findToken0 bool,
 	scanLeft bool) types.TickIteratorI {
-	var hasToken func(sdk.Context, *types.Tick) bool
-	var nextTick func(tick int64) int64
-	var stop func(int64) bool
-
-	if findToken0 {
-		hasToken = k.TickHasToken0
-	} else {
-		hasToken = k.TickHasToken1
-	}
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	prefixStore := prefix.NewStore(sdkCtx.KVStore(k.storeKey), types.TickPrefix(pairId))
+	startKey := types.TickIndexToBytes(startIndex)
 
 	if scanLeft {
-		nextTick = func(tick int64) int64 { tick--; return tick }
-		stop = func(idx int64) bool { return idx < end }
+		return prefixStore.Iterator(startKey, nil)
 	} else {
-		nextTick = func(tick int64) int64 { tick++; return tick }
-		stop = func(idx int64) bool { return idx > end }
-	}
-
-	return TickIterator{
-		start:    start,
-		end:      end,
-		pairId:   pairId,
-		keeper:   k,
-		hasToken: hasToken,
-		nextTick: nextTick,
-		stop:     stop,
-		ctx:      sdk.UnwrapSDKContext(ctx),
+		return prefixStore.ReverseIterator(nil, startKey)
 	}
 }
 
