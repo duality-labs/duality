@@ -447,13 +447,13 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace0to1Moves0to1() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
 	// GIVEN
-	// place LO selling 10 of token B at tick -10
+	// place LO selling 10 of token B at tick 10
 	s.aliceLimitSells("TokenB", 10, 10)
 	// place LO selling 10 of token B at tick 1
 	s.aliceLimitSells("TokenB", 1, 10)
 	// Partially fill the LO, will have some token B remaining to fill
 	s.bobMarketSells("TokenA", 5, 4)
-	// place another LO selling 10 of token A at tick -1
+	// place another LO selling 10 of token B at tick 1
 	s.aliceLimitSells("TokenB", 1, 10)
 	s.assertCurr0To1(1)
 
