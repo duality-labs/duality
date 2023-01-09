@@ -19,7 +19,7 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 	LOList := profile.GetAllLimitOrders(s.goCtx, s.app.DexKeeper)
 	s.Assert().Equal(2, len(LOList))
 	s.Assert().Equal(types.LimitOrderTrancheUser{
-		PairId:          "TokenA<>TokenB",
+		PairId:          defaultPairId,
 		Token:           "TokenA",
 		TickIndex:       0,
 		Count:           0,
@@ -31,7 +31,7 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 		LOList[0],
 	)
 	s.Assert().Equal(types.LimitOrderTrancheUser{
-		PairId:          "TokenA<>TokenB",
+		PairId:          defaultPairId,
 		Token:           "TokenB",
 		TickIndex:       0,
 		Count:           0,
@@ -79,7 +79,7 @@ func (s *MsgServerTestSuite) TestGetAllDeposits() {
 	depositList := profile.GetAllDeposits(s.goCtx, s.app.DexKeeper)
 	s.Assert().Equal(2, len(depositList))
 	s.Assert().Equal(types.DepositRecord{
-		PairId:          "TokenA<>TokenB",
+		PairId:          defaultPairId,
 		SharesOwned:     sdk.NewInt(10),
 		CenterTickIndex: 0,
 		LowerTickIndex:  -1,
@@ -89,7 +89,7 @@ func (s *MsgServerTestSuite) TestGetAllDeposits() {
 		depositList[0],
 	)
 	s.Assert().Equal(types.DepositRecord{
-		PairId:          "TokenA<>TokenB",
+		PairId:          defaultPairId,
 		SharesOwned:     sdk.NewInt(10),
 		CenterTickIndex: 2,
 		LowerTickIndex:  1,

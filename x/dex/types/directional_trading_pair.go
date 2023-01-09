@@ -8,21 +8,18 @@ type DirectionalTradingPair struct {
 	TradingPair
 	TokenIn  string
 	TokenOut string
-	Token0   string
 }
 
 func NewDirectionalTradingPair(pair TradingPair, tokenIn string, tokenOut string) DirectionalTradingPair {
-	token0, _ := pair.ToTokens()
 	return DirectionalTradingPair{
 		TradingPair: pair,
 		TokenIn:     tokenIn,
 		TokenOut:    tokenOut,
-		Token0:      token0,
 	}
 }
 
 func (dp DirectionalTradingPair) IsTokenInToken0() bool {
-	return dp.TokenIn == dp.Token0
+	return dp.TokenIn == dp.PairId.Token0
 }
 
 func (dp DirectionalTradingPair) IsTokenOutToken0() bool {

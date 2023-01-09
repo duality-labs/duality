@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"strconv"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -15,13 +14,10 @@ import (
 	"github.com/NicholasDotSol/duality/x/dex/types"
 )
 
-// Prevent strconv unused error
-var _ = strconv.IntSize
-
 func TestTickQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNTick(keeper, ctx, "TokenA<>TokenB", 2)
+	msgs := createNTick(keeper, ctx, defaultPairId, 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetTickRequest
@@ -45,11 +41,11 @@ func TestTickQuerySingle(t *testing.T) {
 			response: &types.QueryGetTickResponse{Tick: msgs[1]},
 		},
 		{
-			desc: "KeyNotFound",
+			desc: "Invalid Key",
 			request: &types.QueryGetTickRequest{
 				TickIndex: 100000,
 			},
-			err: status.Error(codes.NotFound, "not found"),
+			err: types.ErrInvalidPairIdStr,
 		},
 		{
 			desc: "InvalidRequest",
@@ -74,7 +70,7 @@ func TestTickQuerySingle(t *testing.T) {
 func TestTickQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNTick(keeper, ctx, "TokenB/TokenA", 5)
+	msgs := createNTick(keeper, ctx, defaultPairId, 5)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllTickRequest {
 		return &types.QueryAllTickRequest{
