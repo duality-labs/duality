@@ -37,8 +37,8 @@ func CmdSwap() *cobra.Command {
 				return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for minOut")
 			}
 
-			argTickLimit := args[6]
-			tickLimitDec, err := sdk.NewDecFromStr(argTickLimit)
+			argLimitPrice := args[6]
+			limitPriceDec, err := sdk.NewDecFromStr(argLimitPrice)
 			if err != nil {
 				return err
 			}
@@ -55,7 +55,7 @@ func CmdSwap() *cobra.Command {
 				amountInInt,
 				argTokenIn,
 				minOutInt,
-				tickLimitDec,
+				limitPriceDec,
 				argReceiver,
 			)
 			if err := msg.ValidateBasic(); err != nil {

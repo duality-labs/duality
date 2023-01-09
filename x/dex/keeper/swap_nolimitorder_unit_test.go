@@ -21,7 +21,7 @@ func (s *MsgServerTestSuite) TestSwapNoLONoLiquidity() {
 	// THEN
 	// swap should fail with Error Not enough coins
 	err := types.ErrNotEnoughLiquidity
-	s.bobMarketSellFails(err, "TokenB", 5, 0, sdk.ZeroDec())
+	s.bobMarketSellFails(err, "TokenB", 5, 0)
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReachedMaxReached() {
@@ -38,7 +38,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReac
 	// swap 20 of tokenA at
 	amountIn := 20
 	amountInInt := sdk.NewInt(20)
-	s.bobMarketSells("TokenA", amountIn, 5, sdk.ZeroDec())
+	s.bobMarketSells("TokenA", amountIn, 5)
 
 	// THEN
 	// swap should have in out
@@ -62,7 +62,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReac
 	// WHEN
 	// swap 20 of token A for B
 	amountIn, amountInInt := 20, sdk.NewInt(20)
-	s.bobMarketSells("TokenB", amountIn, 5, sdk.ZeroDec())
+	s.bobMarketSells("TokenB", amountIn, 5)
 
 	// THEN
 	// swap should have in 9.9990000000000000000 out 10.001000000000000000
@@ -90,7 +90,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOSlippageToleranceReached() {
 	// THEN
 	// swap should fail with ErrNotEnoughCoins error
 	err := types.ErrNotEnoughLiquidity
-	s.bobMarketSellFails(err, "TokenA", 20, 19, sdk.ZeroDec())
+	s.bobMarketSellFails(err, "TokenA", 20, 19)
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceReachedMinReached() {
@@ -107,7 +107,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceReached
 	// THEN
 	// swap should fail with ErrNotEnoughCoins error
 	err := types.ErrNotEnoughLiquidity
-	s.bobMarketSellFails(err, "TokenB", 20, 15, sdk.ZeroDec())
+	s.bobMarketSellFails(err, "TokenB", 20, 15)
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceReachedMaxReached() {
@@ -124,7 +124,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceReached
 	// THEN
 	// swap should fail with ErrNotEnoughCoins error
 	err := types.ErrNotEnoughLiquidity
-	s.bobMarketSellFails(err, "TokenA", 20, 15, sdk.ZeroDec())
+	s.bobMarketSellFails(err, "TokenA", 20, 15)
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMinFeeTier() {
@@ -139,7 +139,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMinFeeTier() {
 	// WHEN
 	// swap 5 of token A for B with minOut 4
 	amountIn, amountInInt := 5, sdk.NewInt(5)
-	s.bobMarketSells("TokenA", amountIn, 4, sdk.ZeroDec())
+	s.bobMarketSells("TokenA", amountIn, 4)
 
 	// THEN
 	// swap should have in 5.000000000000000000 out 4.999500049995000500
@@ -161,7 +161,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMaxFeeTier() {
 	// WHEN
 	// swap 5 of token A for B with minOut 4
 	amountIn, amountInInt := 5, sdk.NewInt(5)
-	s.bobMarketSells("TokenA", amountIn, 4, sdk.ZeroDec())
+	s.bobMarketSells("TokenA", amountIn, 4)
 
 	// THEN
 	// swap should have in out
@@ -186,7 +186,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionSomeFeeTiers() {
 	// WHEN
 	// swap 5 of token A for B with minOut 4
 	amountIn, amountInInt := 15, sdk.NewInt(15)
-	s.bobMarketSells("TokenA", amountIn, 14, sdk.ZeroDec())
+	s.bobMarketSells("TokenA", amountIn, 14)
 
 	// THEN
 	// swap should have in out
@@ -210,7 +210,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveCurr1to0() {
 
 	// WHEN
 	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 5, 4, sdk.ZeroDec())
+	s.bobMarketSells("TokenB", 5, 4)
 
 	// THEN
 	// current1To0 unchanged
@@ -230,7 +230,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0MovesCurr1to0() {
 
 	// WHEN
 	// swap 15 of token B for A with minOut 14
-	s.bobMarketSells("TokenB", 15, 14, sdk.ZeroDec())
+	s.bobMarketSells("TokenB", 15, 14)
 
 	// THEN
 	// current 1to0 moves to -3
@@ -247,7 +247,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveCurr0to1() {
 
 	// WHEN
 	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 5, 4, sdk.ZeroDec())
+	s.bobMarketSells("TokenB", 5, 4)
 
 	// THEN
 	// current 0to1 unchanged
@@ -267,7 +267,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0MovesCurr0to1() {
 
 	// WHEN
 	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 5, 4, sdk.ZeroDec())
+	s.bobMarketSells("TokenB", 5, 4)
 
 	// THEN
 	// current 0to1 moves down to 1
@@ -284,7 +284,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveMin() {
 
 	// WHEN
 	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 5, 4, sdk.ZeroDec())
+	s.bobMarketSells("TokenB", 5, 4)
 
 	// THEN
 	// current1To0 unchanged
@@ -301,7 +301,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0ExhaustMin() {
 
 	// WHEN
 	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 15, 10, sdk.ZeroDec())
+	s.bobMarketSells("TokenB", 15, 10)
 
 	// THEN
 	// current1To0 unchanged
@@ -321,7 +321,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0MovesMaxUp() {
 
 	// WHEN
 	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 5, 4, sdk.ZeroDec())
+	s.bobMarketSells("TokenB", 5, 4)
 
 	// THEN
 	// max tick moved up to 3
@@ -344,7 +344,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveMaxUp() {
 
 	// WHEN
 	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 5, 4, sdk.ZeroDec())
+	s.bobMarketSells("TokenB", 5, 4)
 
 	// THEN
 	// max unchanged
@@ -363,7 +363,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveCurr0to1() {
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
-	s.bobMarketSells("TokenA", 5, 4, sdk.ZeroDec())
+	s.bobMarketSells("TokenA", 5, 4)
 
 	// THEN
 	// current0To1 unchanged
@@ -383,7 +383,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1MovesCurr0to1() {
 
 	// WHEN
 	// swap 15 of token A for B with minOut 14
-	s.bobMarketSells("TokenA", 15, 14, sdk.ZeroDec())
+	s.bobMarketSells("TokenA", 15, 14)
 
 	// THEN
 	// current 0to1 moves to 3
@@ -400,7 +400,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveCurr1to0() {
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
-	s.bobMarketSells("TokenA", 5, 4, sdk.ZeroDec())
+	s.bobMarketSells("TokenA", 5, 4)
 
 	// THEN
 	// current 1to0 unchanged
@@ -421,7 +421,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1MovesCurr1to0() {
 
 	// WHEN
 	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenA", 5, 4, sdk.ZeroDec())
+	s.bobMarketSells("TokenA", 5, 4)
 
 	// THEN
 	// current 0to1 moves down to 1
@@ -442,7 +442,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveMax() {
 
 	// WHEN
 	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenA", 5, 4, sdk.ZeroDec())
+	s.bobMarketSells("TokenA", 5, 4)
 
 	// THEN
 	// current 0to1 moves down to 1
@@ -459,7 +459,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1ExhaustMax() {
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
-	s.bobMarketSells("TokenA", 15, 10, sdk.ZeroDec())
+	s.bobMarketSells("TokenA", 15, 10)
 
 	// THEN
 	// current0To1 unchanged
@@ -479,7 +479,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1MovedMinDown() {
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
-	s.bobMarketSells("TokenA", 5, 4, sdk.ZeroDec())
+	s.bobMarketSells("TokenA", 5, 4)
 
 	// THEN
 	// max tick moved up to 3
@@ -502,7 +502,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveMinDown() {
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
-	s.bobMarketSells("TokenA", 5, 4, sdk.ZeroDec())
+	s.bobMarketSells("TokenA", 5, 4)
 
 	// THEN
 	// min unchanged
@@ -527,10 +527,10 @@ func (s *MsgServerTestSuite) TestSwapNoLOMinLimitTickNotMet() {
 	amountIn := 10
 	amountInInt := sdk.NewInt(10)
 
-	limitTick, err := keeper.CalcPrice1To0(-10)
+	limitPrice, err := keeper.CalcPrice1To0(-10)
 	s.Assert().Nil(err)
 
-	s.bobMarketSells("TokenB", amountIn, 5, limitTick)
+	s.bobMarketSellsWithLimitPrice("TokenB", amountIn, 5, limitPrice)
 
 	// THEN
 	// swap should have in out
@@ -556,10 +556,10 @@ func (s *MsgServerTestSuite) TestSwapNoLOMaxLimitTickNotMet() {
 	amountIn := 10
 	amountInInt := sdk.NewInt(10)
 
-	limitTick, err := keeper.CalcPrice0To1(10)
+	limitPrice, err := keeper.CalcPrice0To1(10)
 	s.Assert().Nil(err)
 
-	s.bobMarketSells("TokenA", amountIn, 5, limitTick)
+	s.bobMarketSellsWithLimitPrice("TokenA", amountIn, 5, limitPrice)
 
 	// THEN
 	// swap should have in out
@@ -586,10 +586,10 @@ func (s *MsgServerTestSuite) TestSwapNoLOMaxLimitTickMet() {
 	amountIn := 10
 	amountInInt := sdk.NewInt(10)
 
-	limitTick, err := keeper.CalcPrice0To1(1)
+	limitPrice, err := keeper.CalcPrice0To1(1)
 	s.Assert().Nil(err)
 
-	s.bobMarketSells("TokenA", amountIn, 5, limitTick)
+	s.bobMarketSellsWithLimitPrice("TokenA", amountIn, 5, limitPrice)
 
 	// THEN
 	// swap should have in out
@@ -616,10 +616,10 @@ func (s *MsgServerTestSuite) TestSwapNoLOMinLimitTickMet() {
 	amountIn := 10
 	amountInInt := sdk.NewInt(10)
 
-	limitTick, err := keeper.CalcPrice1To0(-1)
+	limitPrice, err := keeper.CalcPrice1To0(-1)
 	s.Assert().Nil(err)
 
-	s.bobMarketSells("TokenB", amountIn, 5, limitTick)
+	s.bobMarketSellsWithLimitPrice("TokenB", amountIn, 5, limitPrice)
 
 	// THEN
 	// swap should have in out
@@ -646,10 +646,10 @@ func (s *MsgServerTestSuite) TestSwapNoLOMinLimitTickMetWithPrecisionPrice() {
 	amountIn := 10
 	amountInInt := sdk.NewInt(10)
 
-	limitTickOutsideTickPrecision, err := sdk.NewDecFromStr("0.999900000999000100")
+	limitPriceOutsideTickPrecision, err := sdk.NewDecFromStr("0.999900000999000100")
 	s.Assert().Nil(err)
 
-	s.bobMarketSells("TokenB", amountIn, 5, limitTickOutsideTickPrecision)
+	s.bobMarketSellsWithLimitPrice("TokenB", amountIn, 5, limitPriceOutsideTickPrecision)
 
 	// THEN
 	// swap should have in out
@@ -676,10 +676,10 @@ func (s *MsgServerTestSuite) TestSwapNoLOMaxLimitTickMetWithPrecisionPrice() {
 	amountIn := 10
 	amountInInt := sdk.NewInt(10)
 
-	limitTickOutsideTickPrecision, err := sdk.NewDecFromStr("0.999900000999000100")
+	limitPriceOutsideTickPrecision, err := sdk.NewDecFromStr("0.999900000999000100")
 	s.Assert().Nil(err)
 
-	s.bobMarketSells("TokenA", amountIn, 5, limitTickOutsideTickPrecision)
+	s.bobMarketSellsWithLimitPrice("TokenA", amountIn, 5, limitPriceOutsideTickPrecision)
 
 	// THEN
 	// swap should have in out

@@ -309,7 +309,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		liq := liqIter.Next()
 
 		// break as soon as we iterated past tickLimit
-		if liq.Price().LT(msg.TickLimit) {
+		if liq.Price().LT(msg.LimitPrice) {
 			break
 		}
 

@@ -110,7 +110,7 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder1to0WithWithdraw() {
 	s.aliceLimitSells("TokenB", -1, 25000)
 	s.aliceLimitSells("TokenB", 0, 25000)
 	s.aliceLimitSells("TokenB", 1, 25000)
-	s.bobMarketSells("TokenA", 40000, 30000, sdk.ZeroDec())
+	s.bobMarketSells("TokenA", 40000, 30000)
 
 	s.assertAliceBalances(100000, 425000)
 	// limit order at -1: (25000 * 1.0001^-1) A<=>B 25000
@@ -141,7 +141,7 @@ func (s *MsgServerTestSuite) TestLimitOrderOverdraw() {
 	s.assertCarolBalances(100, 100)
 	s.assertDexBalances(0, 40)
 
-	s.carolMarketSells("TokenA", 20, 20, sdk.ZeroDec())
+	s.carolMarketSells("TokenA", 20, 20)
 
 	s.assertAliceBalances(100, 80)
 	s.assertBobBalances(100, 80)
@@ -205,7 +205,7 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder0to1WithWithdraw() {
 	// This is because the price is 1
 	//Bobs balance for TokenA should be (1 * 15.002499750024999) + (1.0001 * 24.997500249975) + 100 = 140.002499750024997500
 	//DEX Balance should be 50 - (1 * 9.997500249975002500) - (1.0001 * 24.997500249975002500) = 9.997500249975002500
-	s.bobMarketSells("TokenB", 40000, 30000, sdk.ZeroDec())
+	s.bobMarketSells("TokenB", 40000, 30000)
 
 	s.assertAliceBalances(99950000, 500000)
 	s.assertBobBalancesInt(sdk.NewInt(140003), sdk.NewInt(160000))
@@ -309,7 +309,7 @@ func (s *MsgServerTestSuite) TestProgressiveLimitOrderFill() {
 	s.assertBobBalances(100, 200)
 	s.assertDexBalances(0, 60)
 
-	s.bobMarketSells("TokenA", 10, 10, sdk.ZeroDec())
+	s.bobMarketSells("TokenA", 10, 10)
 
 	s.assertAliceBalances(100, 440)
 	s.assertBobBalances(90, 210)
@@ -339,7 +339,7 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertMaxTick(0)
 	s.assertMinTick(math.MaxInt64)
 
-	s.bobMarketSells("TokenA", 10, 10, sdk.ZeroDec())
+	s.bobMarketSells("TokenA", 10, 10)
 
 	s.assertAliceBalances(100, 50)
 	s.assertBobBalances(90, 110)
@@ -366,7 +366,7 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertMaxTick(0)
 	s.assertMinTick(math.MaxInt64)
 
-	s.bobMarketSells("TokenA", 10, 10, sdk.ZeroDec())
+	s.bobMarketSells("TokenA", 10, 10)
 
 	s.assertAliceBalances(100, 40)
 	s.assertBobBalances(80, 120)
