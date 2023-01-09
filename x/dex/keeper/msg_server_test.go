@@ -520,13 +520,44 @@ func (s *MsgServerTestSuite) danMarketSells(selling string, amountIn int, minOut
 
 func (s *MsgServerTestSuite) marketSells(account sdk.AccAddress, selling string, amountIn int, minOut int) {
 	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
-		Creator:  account.String(),
-		Receiver: account.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
-		TokenIn:  selling,
-		AmountIn: sdk.NewInt(int64(amountIn)),
-		MinOut:   sdk.NewInt(int64(minOut)),
+		Creator:    account.String(),
+		Receiver:   account.String(),
+		TokenA:     "TokenA",
+		TokenB:     "TokenB",
+		TokenIn:    selling,
+		AmountIn:   sdk.NewInt(int64(amountIn)),
+		MinOut:     sdk.NewInt(int64(minOut)),
+		LimitPrice: sdk.ZeroDec(),
+	})
+	s.Assert().Nil(err)
+}
+
+func (s *MsgServerTestSuite) aliceMarketSellsWithLimitPrice(selling string, amountIn int, minOut int, limitPrice sdk.Dec) {
+	s.marketSellsWithLimitPrice(s.alice, selling, amountIn, minOut, limitPrice)
+}
+
+func (s *MsgServerTestSuite) bobMarketSellsWithLimitPrice(selling string, amountIn int, minOut int, limitPrice sdk.Dec) {
+	s.marketSellsWithLimitPrice(s.bob, selling, amountIn, minOut, limitPrice)
+}
+
+func (s *MsgServerTestSuite) carolMarketSellsWithLimitPrice(selling string, amountIn int, minOut int, limitPrice sdk.Dec) {
+	s.marketSellsWithLimitPrice(s.carol, selling, amountIn, minOut, limitPrice)
+}
+
+func (s *MsgServerTestSuite) danMarketSellsWithLimitPrice(selling string, amountIn int, minOut int, limitPrice sdk.Dec) {
+	s.marketSellsWithLimitPrice(s.dan, selling, amountIn, minOut, limitPrice)
+}
+
+func (s *MsgServerTestSuite) marketSellsWithLimitPrice(account sdk.AccAddress, selling string, amountIn int, minOut int, limitPrice sdk.Dec) {
+	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
+		Creator:    account.String(),
+		Receiver:   account.String(),
+		TokenA:     "TokenA",
+		TokenB:     "TokenB",
+		TokenIn:    selling,
+		AmountIn:   sdk.NewInt(int64(amountIn)),
+		MinOut:     sdk.NewInt(int64(minOut)),
+		LimitPrice: limitPrice,
 	})
 	s.Assert().Nil(err)
 }
@@ -548,13 +579,14 @@ func (s *MsgServerTestSuite) danMarketSellFails(err error, selling string, amoun
 }
 func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr error, selling string, amountIn int, minOut int) {
 	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
-		Creator:  account.String(),
-		Receiver: account.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
-		TokenIn:  selling,
-		AmountIn: sdk.NewInt(int64(amountIn)),
-		MinOut:   sdk.NewInt(int64(minOut)),
+		Creator:    account.String(),
+		Receiver:   account.String(),
+		TokenA:     "TokenA",
+		TokenB:     "TokenB",
+		TokenIn:    selling,
+		AmountIn:   sdk.NewInt(int64(amountIn)),
+		MinOut:     sdk.NewInt(int64(minOut)),
+		LimitPrice: sdk.ZeroDec(),
 	})
 	s.Assert().ErrorIs(err, expectedErr)
 }
