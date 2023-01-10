@@ -7,18 +7,20 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/NicholasDotSol/duality/docs"
+	dexmodule "github.com/NicholasDotSol/duality/x/dex"
+	dexmodulekeeper "github.com/NicholasDotSol/duality/x/dex/keeper"
+	dexmoduletypes "github.com/NicholasDotSol/duality/x/dex/types"
+	swapmiddleware "github.com/NicholasDotSol/duality/x/ibc-swap"
+	swapkeeper "github.com/NicholasDotSol/duality/x/ibc-swap/keeper"
+	swaptypes "github.com/NicholasDotSol/duality/x/ibc-swap/types"
 	adminmodulemodule "github.com/cosmos/admin-module/x/adminmodule"
 	adminmodulecli "github.com/cosmos/admin-module/x/adminmodule/client/cli"
 	adminmodulemodulekeeper "github.com/cosmos/admin-module/x/adminmodule/keeper"
 	adminmodulemoduletypes "github.com/cosmos/admin-module/x/adminmodule/types"
-	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	paramsrest "github.com/cosmos/cosmos-sdk/x/params/client/rest"
-	proposaltypes "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
-	upgraderest "github.com/cosmos/cosmos-sdk/x/upgrade/client/rest"
-
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
+	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -57,13 +59,18 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
 	feegrantmodule "github.com/cosmos/cosmos-sdk/x/feegrant/module"
+	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	paramsrest "github.com/cosmos/cosmos-sdk/x/params/client/rest"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	proposaltypes "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
+	upgraderest "github.com/cosmos/cosmos-sdk/x/upgrade/client/rest"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
@@ -75,33 +82,21 @@ import (
 	ibcporttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
+	"github.com/cosmos/interchain-security/testutil/e2e"
+	ccvconsumer "github.com/cosmos/interchain-security/x/ccv/consumer"
+	ccvconsumerkeeper "github.com/cosmos/interchain-security/x/ccv/consumer/keeper"
+	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
 	"github.com/ignite-hq/cli/ignite/pkg/cosmoscmd"
 	"github.com/ignite-hq/cli/ignite/pkg/openapiconsole"
 	"github.com/spf13/cast"
+	forwardmiddleware "github.com/strangelove-ventures/packet-forward-middleware/v3/router"
+	forwardkeeper "github.com/strangelove-ventures/packet-forward-middleware/v3/router/keeper"
+	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v3/router/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
-
-	ccvconsumer "github.com/cosmos/interchain-security/x/ccv/consumer"
-	ccvconsumerkeeper "github.com/cosmos/interchain-security/x/ccv/consumer/keeper"
-	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
-
-	"github.com/NicholasDotSol/duality/docs"
-	dexmodule "github.com/NicholasDotSol/duality/x/dex"
-	dexmodulekeeper "github.com/NicholasDotSol/duality/x/dex/keeper"
-	dexmoduletypes "github.com/NicholasDotSol/duality/x/dex/types"
-
-	swapmiddleware "github.com/NicholasDotSol/duality/x/ibc-swap"
-	swapkeeper "github.com/NicholasDotSol/duality/x/ibc-swap/keeper"
-	swaptypes "github.com/NicholasDotSol/duality/x/ibc-swap/types"
-
-	// unnamed import of statik for swagger UI support
-	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
-
-	"github.com/cosmos/interchain-security/testutil/e2e"
-	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
 const (
@@ -148,6 +143,7 @@ var (
 			),
 		),
 		dexmodule.AppModuleBasic{},
+		forwardmiddleware.AppModuleBasic{},
 		swapmiddleware.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
@@ -159,7 +155,6 @@ var (
 		dexmoduletypes.ModuleName:                     {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		ccvconsumertypes.ConsumerRedistributeName:     nil,
 		ccvconsumertypes.ConsumerToSendToProviderName: nil,
-		swaptypes.ModuleName:                          nil,
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -217,8 +212,9 @@ type App struct {
 	ScopedTransferKeeper    capabilitykeeper.ScopedKeeper
 	ScopedCCVConsumerKeeper capabilitykeeper.ScopedKeeper
 
-	DexKeeper            dexmodulekeeper.Keeper
-	SwapMiddlewareKeeper swapkeeper.Keeper
+	DexKeeper     dexmodulekeeper.Keeper
+	SwapKeeper    swapkeeper.Keeper
+	ForwardKeeper forwardkeeper.Keeper
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
@@ -281,7 +277,7 @@ func NewApp(
 		authtypes.StoreKey, authz.ModuleName, banktypes.StoreKey,
 		slashingtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		dexmoduletypes.StoreKey, ccvconsumertypes.StoreKey, adminmodulemoduletypes.StoreKey,
+		dexmoduletypes.StoreKey, ccvconsumertypes.StoreKey, adminmodulemoduletypes.StoreKey, forwardtypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -349,7 +345,6 @@ func NewApp(
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
-	transferIBCModule := transfer.NewIBCModule(app.TransferKeeper)
 
 	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
@@ -403,34 +398,48 @@ func NewApp(
 	)
 	dexModule := dexmodule.NewAppModule(appCodec, app.DexKeeper, app.AccountKeeper, app.BankKeeper)
 
+	app.ForwardKeeper = forwardkeeper.NewKeeper(
+		appCodec,
+		keys[forwardtypes.StoreKey],
+		app.GetSubspace(forwardtypes.ModuleName),
+		app.TransferKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&NoopDistributionKeeper{}, // Use a no-op implementation of the Distribution Keeper to avoid NPE
+		app.BankKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.IBCKeeper.ChannelKeeper,
+	)
+	forwardModule := forwardmiddleware.NewAppModule(app.ForwardKeeper)
+
+	app.SwapKeeper = swapkeeper.NewKeeper(
+		appCodec,
+		app.MsgServiceRouter(),
+		app.IBCKeeper.ChannelKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.BankKeeper,
+	)
+	swapModule := swapmiddleware.NewAppModule(app.SwapKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
-	_ = transferIBCModule // TODO delete this after wiring in the packet forward middleware
-
-	// the IBC transfer stack from top to bottom will look like this:
+	// Create our IBC middleware stack from bottom to top.
+	// The stack from top to bottom will look like this:
 	// -- channel.OnRecvPacket
 	// -- swap.OnRecvPacket
 	// -- forward.OnRecvPacket
 	// -- transfer.OnRecvPacket
 	// see: https://github.com/cosmos/ibc-go/blob/main/docs/middleware/ics29-fee/integration.md#configuring-an-application-stack-with-fee-middleware
-
-	// Initialize the swap middleware keeper and wire it up with the forward middleware such that the
-	// swap middlewares underlying app becomes the forward middleware.
-	app.SwapMiddlewareKeeper = swapkeeper.NewKeeper(
-		appCodec,
-		app.GetSubspace(swaptypes.ModuleName),
-		app.MsgServiceRouter(),
-		app.IBCKeeper.ChannelKeeper, // TODO this will be replaced with the forward middleware
-		app.IBCKeeper.ChannelKeeper,
-		&app.IBCKeeper.PortKeeper,
-	)
-	swapModule := swapmiddleware.NewAppModule(app.SwapMiddlewareKeeper)
-
-	// Create our IBC transfer stack from bottom to top
 	var ibcStack ibcporttypes.IBCModule
 	ibcStack = transfer.NewIBCModule(app.TransferKeeper)
-	ibcStack = swapmiddleware.NewIBCMiddleware(ibcStack, app.SwapMiddlewareKeeper)
-	// TODO wire up forward middleware in transfer stack here
+	ibcStack = forwardmiddleware.NewIBCMiddleware(
+		ibcStack,
+		app.ForwardKeeper,
+		0, // TODO explore changing default values for retries and timeouts
+		forwardkeeper.DefaultForwardTransferPacketTimeoutTimestamp,
+		forwardkeeper.DefaultRefundTransferPacketTimeoutTimestamp,
+	)
+	ibcStack = swapmiddleware.NewIBCMiddleware(ibcStack, app.SwapKeeper)
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
@@ -465,6 +474,7 @@ func NewApp(
 		consumerModule,
 		adminModule,
 		dexModule,
+		forwardModule,
 		swapModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
@@ -490,6 +500,7 @@ func NewApp(
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
+		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
@@ -511,6 +522,7 @@ func NewApp(
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
+		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
@@ -537,8 +549,8 @@ func NewApp(
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
+		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
-
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -559,8 +571,8 @@ func NewApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 		dexModule,
+		forwardModule,
 		swapModule,
-
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 	app.sm.RegisterStoreDecoders()
@@ -750,6 +762,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(ccvconsumertypes.ModuleName)
 	paramsKeeper.Subspace(dexmoduletypes.ModuleName)
+	paramsKeeper.Subspace(forwardtypes.ModuleName).WithKeyTable(forwardtypes.ParamKeyTable())
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
@@ -805,4 +818,18 @@ func (app *App) GetE2eSlashingKeeper() e2e.E2eSlashingKeeper {
 // GetE2eEvidenceKeeper implements the ConsumerApp interface.
 func (app *App) GetE2eEvidenceKeeper() e2e.E2eEvidenceKeeper {
 	return app.EvidenceKeeper
+}
+
+// NoopDistributionKeeper is replacement for the distribution keeper that results in a no-op when its methods are called.
+// This is needed because the forward middleware expects the distribution keeper for funding the community pool if
+// a tax is set greater than 0. We only use this to avoid a possible nil pointer exception.
+type NoopDistributionKeeper struct {
+	// TODO explore other ways of funding community pool for consumer chains and remove this NoopDistributionKeeper
+}
+
+// FundCommunityPool is a no-op function that returns nil and logs that it was invoked.
+// Realistically this should never be called.
+func (k NoopDistributionKeeper) FundCommunityPool(ctx sdk.Context, amount sdk.Coins, sender sdk.AccAddress) error {
+	ctx.Logger().Info("FundCommunityPool call was invoked from the no-op distribution keeper")
+	return nil
 }
