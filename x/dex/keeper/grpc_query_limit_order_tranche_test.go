@@ -21,7 +21,7 @@ var _ = strconv.IntSize
 func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderTranche(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 2)
+	msgs := createNLimitOrderTranche(keeper, ctx, 0, "TokenA", 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetLimitOrderTrancheRequest
@@ -81,7 +81,7 @@ func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 func TestLimitOrderTrancheQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderTranche(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 5)
+	msgs := createNLimitOrderTranche(keeper, ctx, 0, "TokenA", 5)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderTrancheRequest {
 		return &types.QueryAllLimitOrderTrancheRequest{

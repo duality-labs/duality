@@ -25,17 +25,19 @@ func TestGenesisState_Validate(t *testing.T) {
 				TickList: []types.Tick{
 					{
 						TickIndex: 0,
+						PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 					{
 						TickIndex: 1,
+						PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 				},
 				TradingPairList: []types.TradingPair{
 					{
-						PairId: "0",
+						PairId: &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 					{
-						PairId: "1",
+						PairId: &types.PairId{Token0: "TokenA", Token1: "TokenC"},
 					},
 				},
 				TokensList: []types.Tokens{
@@ -68,18 +70,22 @@ func TestGenesisState_Validate(t *testing.T) {
 					{
 						Count:   0,
 						Address: "0",
+						PairId:  &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 					{
 						Count:   1,
 						Address: "1",
+						PairId:  &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 				},
 				LimitOrderTrancheList: []types.LimitOrderTranche{
 					{
 						TickIndex: 0,
+						PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenC"},
 					},
 					{
 						TickIndex: 1,
+						PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenC"},
 					},
 				},
 				// this line is used by starport scaffolding # types/genesis/validField
@@ -92,9 +98,11 @@ func TestGenesisState_Validate(t *testing.T) {
 				TickList: []types.Tick{
 					{
 						TickIndex: 0,
+						PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 					{
 						TickIndex: 0,
+						PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 				},
 			},
@@ -105,10 +113,10 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				TradingPairList: []types.TradingPair{
 					{
-						PairId: "0",
+						PairId: &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 					{
-						PairId: "0",
+						PairId: &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 				},
 			},
@@ -187,10 +195,12 @@ func TestGenesisState_Validate(t *testing.T) {
 					{
 						Count:   0,
 						Address: "0",
+						PairId:  &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 					{
 						Count:   0,
 						Address: "0",
+						PairId:  &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 				},
 			},
@@ -202,9 +212,11 @@ func TestGenesisState_Validate(t *testing.T) {
 				LimitOrderTrancheList: []types.LimitOrderTranche{
 					{
 						TickIndex: 0,
+						PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 					{
 						TickIndex: 0,
+						PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 				},
 			},

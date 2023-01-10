@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func NewTick(pairId string, tickIndex int64, numFees uint64) types.Tick {
+func NewTick(pairId *types.PairId, tickIndex int64, numFees uint64) types.Tick {
 	tick := types.Tick{
 		PairId:    pairId,
 		TickIndex: tickIndex,
@@ -25,7 +25,7 @@ func NewTick(pairId string, tickIndex int64, numFees uint64) types.Tick {
 }
 
 // SetTick set a specific Tick in the store from its index
-func (k Keeper) SetTick(ctx sdk.Context, pairId string, Tick types.Tick) {
+func (k Keeper) SetTick(ctx sdk.Context, pairId *types.PairId, Tick types.Tick) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickKeyPrefix))
 	b := k.cdc.MustMarshal(&Tick)
 	store.Set(types.TickKey(
@@ -37,7 +37,7 @@ func (k Keeper) SetTick(ctx sdk.Context, pairId string, Tick types.Tick) {
 // GetTick returns a Tick from its index
 func (k Keeper) GetTick(
 	ctx sdk.Context,
-	pairId string,
+	pairId *types.PairId,
 	tickIndex int64,
 ) (val types.Tick, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.BaseTickKeyPrefix))
@@ -57,7 +57,7 @@ func (k Keeper) GetTick(
 // RemoveTick removes a Tick from the store
 func (k Keeper) RemoveTick(
 	ctx sdk.Context,
-	pairId string,
+	pairId *types.PairId,
 	tickIndex int64,
 
 ) {
@@ -85,7 +85,7 @@ func (k Keeper) GetAllTick(ctx sdk.Context) (list []types.Tick) {
 }
 
 // GetAllTick returns all Tick
-func (k Keeper) GetAllTickByPair(ctx sdk.Context, pairId string) (list []types.Tick) {
+func (k Keeper) GetAllTickByPair(ctx sdk.Context, pairId *types.PairId) (list []types.Tick) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.TickPrefix(pairId))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 

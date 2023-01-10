@@ -45,9 +45,13 @@ func (k Keeper) Tick(c context.Context, req *types.QueryGetTickRequest) (*types.
 	}
 	ctx := sdk.UnwrapSDKContext(c)
 
+	pairId, err := StringToPairId(req.PairId)
+	if err != nil {
+		return nil, err
+	}
 	val, found := k.GetTick(
 		ctx,
-		req.PairId,
+		pairId,
 		req.TickIndex,
 	)
 	if !found {

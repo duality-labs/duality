@@ -22,7 +22,7 @@ func (k Keeper) SetLimitOrderTrancheUser(ctx sdk.Context, LimitOrderTrancheUser 
 // GetLimitOrderTrancheUser returns a LimitOrderTrancheUser from its index
 func (k Keeper) GetLimitOrderTrancheUser(
 	ctx sdk.Context,
-	pairId string,
+	pairId *types.PairId,
 	tickIndex int64,
 	token string,
 	count uint64,
@@ -48,7 +48,7 @@ func (k Keeper) GetLimitOrderTrancheUser(
 // RemoveLimitOrderTrancheUser removes a LimitOrderTrancheUser from the store
 func (k Keeper) RemoveLimitOrderTrancheUser(
 	ctx sdk.Context,
-	pairId string,
+	pairId *types.PairId,
 	tickIndex int64,
 	token string,
 	count uint64,

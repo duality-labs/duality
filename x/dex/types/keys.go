@@ -47,8 +47,8 @@ const (
 	TradingPairKeyPrefix = "TradingPair/value"
 )
 
-func TickPrefix(pairId string) []byte {
-	return append(KeyPrefix(BaseTickKeyPrefix), KeyPrefix(pairId)...)
+func TickPrefix(pairId *PairId) []byte {
+	return append(KeyPrefix(BaseTickKeyPrefix), KeyPrefix(pairId.Stringify())...)
 }
 
 // TokenMapKey returns the store key to retrieve a TokenMap from the index fields
@@ -62,10 +62,10 @@ func TokenMapKey(address string) []byte {
 	return key
 }
 
-func TickKey(pairId string, tickIndex int64) []byte {
+func TickKey(pairId *PairId, tickIndex int64) []byte {
 	var key []byte
 
-	pairIdBytes := []byte(pairId)
+	pairIdBytes := []byte(pairId.Stringify())
 	key = append(key, pairIdBytes...)
 	key = append(key, []byte("/")...)
 
@@ -76,10 +76,10 @@ func TickKey(pairId string, tickIndex int64) []byte {
 	return key
 }
 
-func TradingPairKey(pairId string) []byte {
+func TradingPairKey(pairId *PairId) []byte {
 	var key []byte
 
-	pairIdBytes := []byte(pairId)
+	pairIdBytes := []byte(pairId.Stringify())
 	key = append(key, pairIdBytes...)
 	key = append(key, []byte("/")...)
 
@@ -107,10 +107,10 @@ const (
 )
 
 // LimitOrderTrancheUserSharesWithdrawnKey returns the store key to retrieve a LimitOrderTrancheUserSharesWithdrawn from the index fields
-func LimitOrderTrancheUserSharesWithdrawnKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
+func LimitOrderTrancheUserSharesWithdrawnKey(pairId PairId, tickIndex int64, token string, count uint64, address string) []byte {
 	var key []byte
 
-	pairIdBytes := []byte(pairId)
+	pairIdBytes := []byte(pairId.Stringify())
 	key = append(key, pairIdBytes...)
 	key = append(key, []byte("/")...)
 
@@ -134,14 +134,14 @@ func LimitOrderTrancheUserSharesWithdrawnKey(pairId string, tickIndex int64, tok
 }
 
 // LimitOrderTrancheUserKey returns the store key to retrieve a LimitOrderTrancheUser from the index fields
-func LimitOrderTrancheUserKey(pairId string, tickIndex int64, token string, count uint64, address string) []byte {
+func LimitOrderTrancheUserKey(pairId *PairId, tickIndex int64, token string, count uint64, address string) []byte {
 	var key []byte
 
 	addressBytes := []byte(address)
 	key = append(key, addressBytes...)
 	key = append(key, []byte("/")...)
 
-	pairIdBytes := []byte(pairId)
+	pairIdBytes := []byte(pairId.Stringify())
 	key = append(key, pairIdBytes...)
 	key = append(key, []byte("/")...)
 
@@ -161,10 +161,10 @@ func LimitOrderTrancheUserKey(pairId string, tickIndex int64, token string, coun
 }
 
 // LimitOrderTrancheKey returns the store key to retrieve a LimitOrderTranche from the index fields
-func LimitOrderTrancheKey(pairId string, tickIndex int64, token string, count uint64) []byte {
+func LimitOrderTrancheKey(pairId *PairId, tickIndex int64, token string, count uint64) []byte {
 	var key []byte
 
-	pairIdBytes := []byte(pairId)
+	pairIdBytes := []byte(pairId.Stringify())
 	key = append(key, pairIdBytes...)
 	key = append(key, []byte("/")...)
 
@@ -183,10 +183,10 @@ func LimitOrderTrancheKey(pairId string, tickIndex int64, token string, count ui
 	return key
 }
 
-func LimitOrderTrancheReserveMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
+func LimitOrderTrancheReserveMapKey(pairId *PairId, tickIndex int64, token string, count uint64) []byte {
 	var key []byte
 
-	pairIdBytes := []byte(pairId)
+	pairIdBytes := []byte(pairId.Stringify())
 	key = append(key, pairIdBytes...)
 	key = append(key, []byte("/")...)
 
@@ -205,10 +205,10 @@ func LimitOrderTrancheReserveMapKey(pairId string, tickIndex int64, token string
 	return key
 }
 
-func LimitOrderTrancheFillMapKey(pairId string, tickIndex int64, token string, count uint64) []byte {
+func LimitOrderTrancheFillMapKey(pairId *PairId, tickIndex int64, token string, count uint64) []byte {
 	var key []byte
 
-	pairIdBytes := []byte(pairId)
+	pairIdBytes := []byte(pairId.Stringify())
 	key = append(key, pairIdBytes...)
 	key = append(key, []byte("/")...)
 
@@ -278,9 +278,8 @@ const (
 	SwapEventKey      = "NewSwap"
 	SwapEventCreator  = "Creator"
 	SwapEventReceiver = "Receiver"
-	SwapEventToken0   = "Token0"
-	SwapEventToken1   = "Token1"
 	SwapEventTokenIn  = "TokenIn"
+	SwapEventTokenOut = "TokenOut"
 	SwapEventAmountIn = "AmountIn"
 	SwapEventMinOut   = "MinOut"
 	SwapEventAmoutOut = "AmountOut"

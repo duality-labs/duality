@@ -32,6 +32,8 @@ type MsgServerTestSuite struct {
 	feeTiers    []types.FeeTier
 }
 
+var defaultPairId *types.PairId = &types.PairId{Token0: "TokenA", Token1: "TokenB"}
+
 func TestMsgServerTestSuite(t *testing.T) {
 	suite.Run(t, new(MsgServerTestSuite))
 }
@@ -518,13 +520,44 @@ func (s *MsgServerTestSuite) danMarketSells(selling string, amountIn int, minOut
 
 func (s *MsgServerTestSuite) marketSells(account sdk.AccAddress, selling string, amountIn int, minOut int) {
 	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
-		Creator:  account.String(),
-		Receiver: account.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
-		TokenIn:  selling,
-		AmountIn: sdk.NewInt(int64(amountIn)),
-		MinOut:   sdk.NewInt(int64(minOut)),
+		Creator:    account.String(),
+		Receiver:   account.String(),
+		TokenA:     "TokenA",
+		TokenB:     "TokenB",
+		TokenIn:    selling,
+		AmountIn:   sdk.NewInt(int64(amountIn)),
+		MinOut:     sdk.NewInt(int64(minOut)),
+		LimitPrice: sdk.ZeroDec(),
+	})
+	s.Assert().Nil(err)
+}
+
+func (s *MsgServerTestSuite) aliceMarketSellsWithLimitPrice(selling string, amountIn int, minOut int, limitPrice sdk.Dec) {
+	s.marketSellsWithLimitPrice(s.alice, selling, amountIn, minOut, limitPrice)
+}
+
+func (s *MsgServerTestSuite) bobMarketSellsWithLimitPrice(selling string, amountIn int, minOut int, limitPrice sdk.Dec) {
+	s.marketSellsWithLimitPrice(s.bob, selling, amountIn, minOut, limitPrice)
+}
+
+func (s *MsgServerTestSuite) carolMarketSellsWithLimitPrice(selling string, amountIn int, minOut int, limitPrice sdk.Dec) {
+	s.marketSellsWithLimitPrice(s.carol, selling, amountIn, minOut, limitPrice)
+}
+
+func (s *MsgServerTestSuite) danMarketSellsWithLimitPrice(selling string, amountIn int, minOut int, limitPrice sdk.Dec) {
+	s.marketSellsWithLimitPrice(s.dan, selling, amountIn, minOut, limitPrice)
+}
+
+func (s *MsgServerTestSuite) marketSellsWithLimitPrice(account sdk.AccAddress, selling string, amountIn int, minOut int, limitPrice sdk.Dec) {
+	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
+		Creator:    account.String(),
+		Receiver:   account.String(),
+		TokenA:     "TokenA",
+		TokenB:     "TokenB",
+		TokenIn:    selling,
+		AmountIn:   sdk.NewInt(int64(amountIn)),
+		MinOut:     sdk.NewInt(int64(minOut)),
+		LimitPrice: limitPrice,
 	})
 	s.Assert().Nil(err)
 }
@@ -546,13 +579,14 @@ func (s *MsgServerTestSuite) danMarketSellFails(err error, selling string, amoun
 }
 func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr error, selling string, amountIn int, minOut int) {
 	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
-		Creator:  account.String(),
-		Receiver: account.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
-		TokenIn:  selling,
-		AmountIn: sdk.NewInt(int64(amountIn)),
-		MinOut:   sdk.NewInt(int64(minOut)),
+		Creator:    account.String(),
+		Receiver:   account.String(),
+		TokenA:     "TokenA",
+		TokenB:     "TokenB",
+		TokenIn:    selling,
+		AmountIn:   sdk.NewInt(int64(amountIn)),
+		MinOut:     sdk.NewInt(int64(minOut)),
+		LimitPrice: sdk.ZeroDec(),
 	})
 	s.Assert().ErrorIs(err, expectedErr)
 }
@@ -719,7 +753,7 @@ func (s *MsgServerTestSuite) assertCurrentTicks(
 	expected1To0 int64,
 	expected0To1 int64,
 ) {
-	tick, found := s.app.DexKeeper.GetTradingPair(s.ctx, "TokenA<>TokenB")
+	tick, found := s.app.DexKeeper.GetTradingPair(s.ctx, defaultPairId)
 	s.Assert().NotNil(found)
 	s.Assert().Equal(expected1To0, tick.CurrentTick1To0)
 	s.Assert().Equal(expected0To1, tick.CurrentTick0To1)
@@ -759,8 +793,7 @@ func (s *MsgServerTestSuite) assertMinTick(minTickExpected int64) {
 }
 
 func (s *MsgServerTestSuite) assertMaxTick(maxTickExpected int64) {
-	pairId := CreatePairId("TokenA", "TokenB")
-	pair, pairFound := s.app.DexKeeper.GetTradingPair(s.ctx, pairId)
+	pair, pairFound := s.app.DexKeeper.GetTradingPair(s.ctx, defaultPairId)
 	if !pairFound {
 		s.Require().Fail("Invalid GetPair in assertCurr0to1")
 	}
@@ -770,7 +803,7 @@ func (s *MsgServerTestSuite) assertMaxTick(maxTickExpected int64) {
 }
 
 func (s *MsgServerTestSuite) printTicks() {
-	tickMap, _ := s.app.DexKeeper.GetTradingPair(s.ctx, "TokenA<>TokenB")
+	tickMap, _ := s.app.DexKeeper.GetTradingPair(s.ctx, defaultPairId)
 	fmt.Printf("\nTick0To1: %v, Tick1To0: %v", tickMap.CurrentTick0To1, tickMap.CurrentTick1To0)
 }
 
@@ -907,7 +940,7 @@ func (s *MsgServerTestSuite) assertFillAndPlaceTrancheKeys(selling string, tickI
 	s.Assert().Equal(expectedPlace, place)
 }
 
-func (s *MsgServerTestSuite) getFillAndPlaceTrancheKeys(selling string, pairId string, tickIndex int64) (uint64, uint64) {
+func (s *MsgServerTestSuite) getFillAndPlaceTrancheKeys(selling string, pairId *types.PairId, tickIndex int64) (uint64, uint64) {
 	// grab current fill and place tranches
 	tick, tickFound := s.app.DexKeeper.GetTick(s.ctx, pairId, tickIndex)
 	s.Assert().True(tickFound, "Invalid tickIndex for pair %s", pairId)
@@ -1167,7 +1200,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwaps(prices []sdk.Dec, tickLiquid
 func (s *MsgServerTestSuite) addTickWithFee0Tokens(tickIndex int64, amountA int, amountB int) types.Tick {
 
 	tick := types.Tick{
-		PairId:    "TokenA/TokenB",
+		PairId:    defaultPairId,
 		TickIndex: tickIndex,
 		TickData: &types.TickDataType{
 			Reserve0: make([]sdk.Int, 1),
@@ -1180,17 +1213,16 @@ func (s *MsgServerTestSuite) addTickWithFee0Tokens(tickIndex int64, amountA int,
 	tick.TickData.Reserve0[0] = sdk.NewInt(int64(amountA))
 	tick.TickData.Reserve1[0] = sdk.NewInt(int64(amountB))
 
-	s.app.DexKeeper.SetTick(s.ctx, "TokenA/TokenB", tick)
+	s.app.DexKeeper.SetTick(s.ctx, defaultPairId, tick)
 	return tick
 }
 
 func (s *MsgServerTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amountB int) (lowerTick types.Tick, upperTick types.Tick) {
-	pairId := "TokenA<>TokenB"
 	// sharesId := fmt.Sprintf("%s%st%df%d", "TokenA", "TokenB", tickIndex, 1)
 	sharesId := CreateSharesId("TokenA", "TokenB", tickIndex, 0)
-	lowerTick, err := s.app.DexKeeper.GetOrInitTick(s.goCtx, pairId, tickIndex-1)
+	lowerTick, err := s.app.DexKeeper.GetOrInitTick(s.goCtx, defaultPairId, tickIndex-1)
 	s.Assert().NoError(err)
-	upperTick, err = s.app.DexKeeper.GetOrInitTick(s.goCtx, pairId, tickIndex+1)
+	upperTick, err = s.app.DexKeeper.GetOrInitTick(s.goCtx, defaultPairId, tickIndex+1)
 	s.Assert().NoError(err)
 	priceCenter1To0, err := keeper.CalcPrice0To1(tickIndex)
 	if err != nil {
@@ -1203,7 +1235,7 @@ func (s *MsgServerTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amoun
 	totalShares := keeper.CalcShares(amountAInt, amountBInt, priceCenter1To0).TruncateInt()
 	s.app.DexKeeper.MintShares(s.ctx, s.alice, totalShares, sharesId)
 	upperTick.TickData.Reserve1[0] = amountBInt
-	s.app.DexKeeper.SetTick(s.ctx, pairId, lowerTick)
-	s.app.DexKeeper.SetTick(s.ctx, pairId, upperTick)
+	s.app.DexKeeper.SetTick(s.ctx, defaultPairId, lowerTick)
+	s.app.DexKeeper.SetTick(s.ctx, defaultPairId, upperTick)
 	return lowerTick, upperTick
 }

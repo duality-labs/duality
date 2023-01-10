@@ -30,12 +30,30 @@ func SortAmounts(tokenA string, token0 string, amountsA []sdk.Int, amountsB []sd
 	}
 }
 
-func CreatePairId(token0 string, token1 string) (pairId string) {
-	return (token0 + "<>" + token1)
+func CreatePairId(token0 string, token1 string) (pairId *types.PairId) {
+	return &types.PairId{
+		Token0: token0,
+		Token1: token1,
+	}
 }
 
-func PairToTokens(pairId string) (token0 string, token1 string) {
-	tokens := strings.Split(pairId, "<>")
+func GetInOutTokens(tokenIn_ string, tokenA string, tokenB string) (tokenIn string, tokenOut string) {
+	if tokenIn_ == tokenA {
+		return tokenA, tokenB
+	} else {
+		return tokenB, tokenA
+	}
+}
 
-	return tokens[0], tokens[1]
+func StringToPairId(pairIdStr string) (*types.PairId, error) {
+	tokens := strings.Split(pairIdStr, "<>")
+
+	if len(tokens) == 2 {
+		return &types.PairId{
+			Token0: tokens[0],
+			Token1: tokens[1],
+		}, nil
+	} else {
+		return &types.PairId{}, sdkerrors.Wrapf(types.ErrInvalidPairIdStr, pairIdStr)
+	}
 }
