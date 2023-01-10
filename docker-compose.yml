@@ -10,8 +10,11 @@ version: "3"
 # to remove testnet
 #   $ docker-compose down
 
-# one-liner to bring everything up and down again:
+# one-liner to bring test suite up and down again when tests finish:
 #   $ docker-compose up --build --abort-on-container-exit || true && docker-compose down
+
+# one-liner to run a small testnet continuously (and remove containers after they are exited using ctrl+c):
+# docker-compose up --build --abort-on-container-exit dualityleader dualitynode0 || true && docker-compose down
 
 services:
 
