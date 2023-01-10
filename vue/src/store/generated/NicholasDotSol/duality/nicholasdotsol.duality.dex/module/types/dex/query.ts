@@ -11,7 +11,7 @@ import { PairMap } from "../dex/pair_map";
 import { Tokens } from "../dex/tokens";
 import { TokenMap } from "../dex/token_map";
 import { Shares } from "../dex/shares";
-import { FeeList } from "../dex/fee_list";
+import { FeeTier } from "../dex/fee_tier";
 import { EdgeRow } from "../dex/edge_row";
 import { AdjanceyMatrix } from "../dex/adjancey_matrix";
 import { LimitOrderTrancheUser } from "../dex/limit_order_tranche_user";
@@ -117,20 +117,20 @@ export interface QueryAllSharesResponse {
   pagination: PageResponse | undefined;
 }
 
-export interface QueryGetFeeListRequest {
+export interface QueryGetFeeTierRequest {
   id: number;
 }
 
-export interface QueryGetFeeListResponse {
-  FeeList: FeeList | undefined;
+export interface QueryGetFeeTierResponse {
+  FeeTier: FeeTier | undefined;
 }
 
-export interface QueryAllFeeListRequest {
+export interface QueryAllFeeTierRequest {
   pagination: PageRequest | undefined;
 }
 
-export interface QueryAllFeeListResponse {
-  FeeList: FeeList[];
+export interface QueryAllFeeTierResponse {
+  FeeTier: FeeTier[];
   pagination: PageResponse | undefined;
 }
 
@@ -1819,11 +1819,11 @@ export const QueryAllSharesResponse = {
   },
 };
 
-const baseQueryGetFeeListRequest: object = { id: 0 };
+const baseQueryGetFeeTierRequest: object = { id: 0 };
 
-export const QueryGetFeeListRequest = {
+export const QueryGetFeeTierRequest = {
   encode(
-    message: QueryGetFeeListRequest,
+    message: QueryGetFeeTierRequest,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.id !== 0) {
@@ -1832,10 +1832,10 @@ export const QueryGetFeeListRequest = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryGetFeeListRequest {
+  decode(input: Reader | Uint8Array, length?: number): QueryGetFeeTierRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseQueryGetFeeListRequest } as QueryGetFeeListRequest;
+    const message = { ...baseQueryGetFeeTierRequest } as QueryGetFeeTierRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1850,8 +1850,8 @@ export const QueryGetFeeListRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetFeeListRequest {
-    const message = { ...baseQueryGetFeeListRequest } as QueryGetFeeListRequest;
+  fromJSON(object: any): QueryGetFeeTierRequest {
+    const message = { ...baseQueryGetFeeTierRequest } as QueryGetFeeTierRequest;
     if (object.id !== undefined && object.id !== null) {
       message.id = Number(object.id);
     } else {
@@ -1860,16 +1860,16 @@ export const QueryGetFeeListRequest = {
     return message;
   },
 
-  toJSON(message: QueryGetFeeListRequest): unknown {
+  toJSON(message: QueryGetFeeTierRequest): unknown {
     const obj: any = {};
     message.id !== undefined && (obj.id = message.id);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetFeeListRequest>
-  ): QueryGetFeeListRequest {
-    const message = { ...baseQueryGetFeeListRequest } as QueryGetFeeListRequest;
+    object: DeepPartial<QueryGetFeeTierRequest>
+  ): QueryGetFeeTierRequest {
+    const message = { ...baseQueryGetFeeTierRequest } as QueryGetFeeTierRequest;
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id;
     } else {
@@ -1879,30 +1879,30 @@ export const QueryGetFeeListRequest = {
   },
 };
 
-const baseQueryGetFeeListResponse: object = {};
+const baseQueryGetFeeTierResponse: object = {};
 
-export const QueryGetFeeListResponse = {
+export const QueryGetFeeTierResponse = {
   encode(
-    message: QueryGetFeeListResponse,
+    message: QueryGetFeeTierResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.FeeList !== undefined) {
-      FeeList.encode(message.FeeList, writer.uint32(10).fork()).ldelim();
+    if (message.FeeTier !== undefined) {
+      FeeTier.encode(message.FeeTier, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryGetFeeListResponse {
+  decode(input: Reader | Uint8Array, length?: number): QueryGetFeeTierResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryGetFeeListResponse,
-    } as QueryGetFeeListResponse;
+      ...baseQueryGetFeeTierResponse,
+    } as QueryGetFeeTierResponse;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.FeeList = FeeList.decode(reader, reader.uint32());
+          message.FeeTier = FeeTier.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -1912,47 +1912,47 @@ export const QueryGetFeeListResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetFeeListResponse {
+  fromJSON(object: any): QueryGetFeeTierResponse {
     const message = {
-      ...baseQueryGetFeeListResponse,
-    } as QueryGetFeeListResponse;
-    if (object.FeeList !== undefined && object.FeeList !== null) {
-      message.FeeList = FeeList.fromJSON(object.FeeList);
+      ...baseQueryGetFeeTierResponse,
+    } as QueryGetFeeTierResponse;
+    if (object.FeeTier !== undefined && object.FeeTier !== null) {
+      message.FeeTier = FeeTier.fromJSON(object.FeeTier);
     } else {
-      message.FeeList = undefined;
+      message.FeeTier = undefined;
     }
     return message;
   },
 
-  toJSON(message: QueryGetFeeListResponse): unknown {
+  toJSON(message: QueryGetFeeTierResponse): unknown {
     const obj: any = {};
-    message.FeeList !== undefined &&
-      (obj.FeeList = message.FeeList
-        ? FeeList.toJSON(message.FeeList)
+    message.FeeTier !== undefined &&
+      (obj.FeeTier = message.FeeTier
+        ? FeeTier.toJSON(message.FeeTier)
         : undefined);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetFeeListResponse>
-  ): QueryGetFeeListResponse {
+    object: DeepPartial<QueryGetFeeTierResponse>
+  ): QueryGetFeeTierResponse {
     const message = {
-      ...baseQueryGetFeeListResponse,
-    } as QueryGetFeeListResponse;
-    if (object.FeeList !== undefined && object.FeeList !== null) {
-      message.FeeList = FeeList.fromPartial(object.FeeList);
+      ...baseQueryGetFeeTierResponse,
+    } as QueryGetFeeTierResponse;
+    if (object.FeeTier !== undefined && object.FeeTier !== null) {
+      message.FeeTier = FeeTier.fromPartial(object.FeeTier);
     } else {
-      message.FeeList = undefined;
+      message.FeeTier = undefined;
     }
     return message;
   },
 };
 
-const baseQueryAllFeeListRequest: object = {};
+const baseQueryAllFeeTierRequest: object = {};
 
-export const QueryAllFeeListRequest = {
+export const QueryAllFeeTierRequest = {
   encode(
-    message: QueryAllFeeListRequest,
+    message: QueryAllFeeTierRequest,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.pagination !== undefined) {
@@ -1961,10 +1961,10 @@ export const QueryAllFeeListRequest = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryAllFeeListRequest {
+  decode(input: Reader | Uint8Array, length?: number): QueryAllFeeTierRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseQueryAllFeeListRequest } as QueryAllFeeListRequest;
+    const message = { ...baseQueryAllFeeTierRequest } as QueryAllFeeTierRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1979,8 +1979,8 @@ export const QueryAllFeeListRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllFeeListRequest {
-    const message = { ...baseQueryAllFeeListRequest } as QueryAllFeeListRequest;
+  fromJSON(object: any): QueryAllFeeTierRequest {
+    const message = { ...baseQueryAllFeeTierRequest } as QueryAllFeeTierRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromJSON(object.pagination);
     } else {
@@ -1989,7 +1989,7 @@ export const QueryAllFeeListRequest = {
     return message;
   },
 
-  toJSON(message: QueryAllFeeListRequest): unknown {
+  toJSON(message: QueryAllFeeTierRequest): unknown {
     const obj: any = {};
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -1999,9 +1999,9 @@ export const QueryAllFeeListRequest = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryAllFeeListRequest>
-  ): QueryAllFeeListRequest {
-    const message = { ...baseQueryAllFeeListRequest } as QueryAllFeeListRequest;
+    object: DeepPartial<QueryAllFeeTierRequest>
+  ): QueryAllFeeTierRequest {
+    const message = { ...baseQueryAllFeeTierRequest } as QueryAllFeeTierRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromPartial(object.pagination);
     } else {
@@ -2011,15 +2011,15 @@ export const QueryAllFeeListRequest = {
   },
 };
 
-const baseQueryAllFeeListResponse: object = {};
+const baseQueryAllFeeTierResponse: object = {};
 
-export const QueryAllFeeListResponse = {
+export const QueryAllFeeTierResponse = {
   encode(
-    message: QueryAllFeeListResponse,
+    message: QueryAllFeeTierResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    for (const v of message.FeeList) {
-      FeeList.encode(v!, writer.uint32(10).fork()).ldelim();
+    for (const v of message.FeeTier) {
+      FeeTier.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
       PageResponse.encode(
@@ -2030,18 +2030,18 @@ export const QueryAllFeeListResponse = {
     return writer;
   },
 
-  decode(input: Reader | Uint8Array, length?: number): QueryAllFeeListResponse {
+  decode(input: Reader | Uint8Array, length?: number): QueryAllFeeTierResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryAllFeeListResponse,
-    } as QueryAllFeeListResponse;
-    message.FeeList = [];
+      ...baseQueryAllFeeTierResponse,
+    } as QueryAllFeeTierResponse;
+    message.FeeTier = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.FeeList.push(FeeList.decode(reader, reader.uint32()));
+          message.FeeTier.push(FeeTier.decode(reader, reader.uint32()));
           break;
         case 2:
           message.pagination = PageResponse.decode(reader, reader.uint32());
@@ -2054,14 +2054,14 @@ export const QueryAllFeeListResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllFeeListResponse {
+  fromJSON(object: any): QueryAllFeeTierResponse {
     const message = {
-      ...baseQueryAllFeeListResponse,
-    } as QueryAllFeeListResponse;
-    message.FeeList = [];
-    if (object.FeeList !== undefined && object.FeeList !== null) {
-      for (const e of object.FeeList) {
-        message.FeeList.push(FeeList.fromJSON(e));
+      ...baseQueryAllFeeTierResponse,
+    } as QueryAllFeeTierResponse;
+    message.FeeTier = [];
+    if (object.FeeTier !== undefined && object.FeeTier !== null) {
+      for (const e of object.FeeTier) {
+        message.FeeTier.push(FeeTier.fromJSON(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -2072,14 +2072,14 @@ export const QueryAllFeeListResponse = {
     return message;
   },
 
-  toJSON(message: QueryAllFeeListResponse): unknown {
+  toJSON(message: QueryAllFeeTierResponse): unknown {
     const obj: any = {};
-    if (message.FeeList) {
-      obj.FeeList = message.FeeList.map((e) =>
-        e ? FeeList.toJSON(e) : undefined
+    if (message.FeeTier) {
+      obj.FeeTier = message.FeeTier.map((e) =>
+        e ? FeeTier.toJSON(e) : undefined
       );
     } else {
-      obj.FeeList = [];
+      obj.FeeTier = [];
     }
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -2089,15 +2089,15 @@ export const QueryAllFeeListResponse = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryAllFeeListResponse>
-  ): QueryAllFeeListResponse {
+    object: DeepPartial<QueryAllFeeTierResponse>
+  ): QueryAllFeeTierResponse {
     const message = {
-      ...baseQueryAllFeeListResponse,
-    } as QueryAllFeeListResponse;
-    message.FeeList = [];
-    if (object.FeeList !== undefined && object.FeeList !== null) {
-      for (const e of object.FeeList) {
-        message.FeeList.push(FeeList.fromPartial(e));
+      ...baseQueryAllFeeTierResponse,
+    } as QueryAllFeeTierResponse;
+    message.FeeTier = [];
+    if (object.FeeTier !== undefined && object.FeeTier !== null) {
+      for (const e of object.FeeTier) {
+        message.FeeTier.push(FeeTier.fromPartial(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -3557,10 +3557,10 @@ export interface Query {
   Shares(request: QueryGetSharesRequest): Promise<QueryGetSharesResponse>;
   /** Queries a list of Shares items. */
   SharesAll(request: QueryAllSharesRequest): Promise<QueryAllSharesResponse>;
-  /** Queries a FeeList by id. */
-  FeeList(request: QueryGetFeeListRequest): Promise<QueryGetFeeListResponse>;
-  /** Queries a list of FeeList items. */
-  FeeListAll(request: QueryAllFeeListRequest): Promise<QueryAllFeeListResponse>;
+  /** Queries a FeeTier by id. */
+  FeeTier(request: QueryGetFeeTierRequest): Promise<QueryGetFeeTierResponse>;
+  /** Queries a list of FeeTier items. */
+  FeeTierAll(request: QueryAllFeeTierRequest): Promise<QueryAllFeeTierResponse>;
   /** Queries a EdgeRow by id. */
   EdgeRow(request: QueryGetEdgeRowRequest): Promise<QueryGetEdgeRowResponse>;
   /** Queries a list of EdgeRow items. */
@@ -3734,29 +3734,29 @@ export class QueryClientImpl implements Query {
     );
   }
 
-  FeeList(request: QueryGetFeeListRequest): Promise<QueryGetFeeListResponse> {
-    const data = QueryGetFeeListRequest.encode(request).finish();
+  FeeTier(request: QueryGetFeeTierRequest): Promise<QueryGetFeeTierResponse> {
+    const data = QueryGetFeeTierRequest.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
-      "FeeList",
+      "FeeTier",
       data
     );
     return promise.then((data) =>
-      QueryGetFeeListResponse.decode(new Reader(data))
+      QueryGetFeeTierResponse.decode(new Reader(data))
     );
   }
 
-  FeeListAll(
-    request: QueryAllFeeListRequest
-  ): Promise<QueryAllFeeListResponse> {
-    const data = QueryAllFeeListRequest.encode(request).finish();
+  FeeTierAll(
+    request: QueryAllFeeTierRequest
+  ): Promise<QueryAllFeeTierResponse> {
+    const data = QueryAllFeeTierRequest.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
-      "FeeListAll",
+      "FeeTierAll",
       data
     );
     return promise.then((data) =>
-      QueryAllFeeListResponse.decode(new Reader(data))
+      QueryAllFeeTierResponse.decode(new Reader(data))
     );
   }
 
