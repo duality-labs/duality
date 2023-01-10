@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderInSpread1To0() {
@@ -288,7 +289,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderBelowEnemyLines() {
 	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
-	s.assertLiquidityAtTick(0, 10, 0, 0)
+	s.assertPoolLiquidity(0, 10, 0, 0)
 
 	// WHEN
 	// place limit order for token A below enemy lines at tick -5
@@ -307,7 +308,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderAboveEnemyLines() {
 	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
-	s.assertLiquidityAtTick(10, 0, 0, 0)
+	s.assertPoolLiquidity(10, 0, 0, 0)
 
 	// WHEN
 	// place limit order for token B above enemy lines at tick 5
@@ -324,7 +325,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderNoLOPlaceLODoesntIncrementPlaceT
 	// GIVEN
 	// no previous LO on existing tick
 	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
-	s.assertLiquidityAtTick(10, 0, 0, 0)
+	s.assertPoolLiquidity(10, 0, 0, 0)
 	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
 
 	// WHEN
@@ -391,4 +392,18 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFilledLOPlaceLODoesntIncrementsP
 	// THEN
 	// fill and place tranche keys don't change
 	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderInsufficientFunds() {
+	// GIVEN
+	// alice has no funds
+	s.assertAliceBalances(0, 0)
+
+	// WHEN
+	// place limit order selling non zero amount of token A for token B
+	// THEN
+	// deposit should fail with InsufficientFunds error
+
+	err := sdkerrors.ErrInsufficientFunds
+	s.assertAliceLimitSellFails(err, "TokenA", 0, 10)
 }

@@ -9,7 +9,7 @@ const TypeMsgPlaceLimitOrder = "place_limit_order"
 
 var _ sdk.Msg = &MsgPlaceLimitOrder{}
 
-func NewMsgPlaceLimitOrder(creator string, receiver string, tokenA string, tokenB string, tickIndex int64, tokenIn string, amountIn sdk.Dec) *MsgPlaceLimitOrder {
+func NewMsgPlaceLimitOrder(creator string, receiver string, tokenA string, tokenB string, tickIndex int64, tokenIn string, amountIn sdk.Int) *MsgPlaceLimitOrder {
 	return &MsgPlaceLimitOrder{
 		Creator:   creator,
 		Receiver:  receiver,
@@ -46,6 +46,15 @@ func (msg *MsgPlaceLimitOrder) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+
+	_, err = sdk.AccAddressFromBech32(msg.Receiver)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+	}
+
+	if msg.TokenIn != msg.TokenA && msg.TokenIn != msg.TokenB {
+		return sdkerrors.Wrapf(ErrInvalidTradingPair, "TokenIn must be either TokenA or TokenB")
 	}
 	return nil
 }

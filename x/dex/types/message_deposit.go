@@ -9,7 +9,7 @@ const TypeMsgDeposit = "deposit"
 
 var _ sdk.Msg = &MsgDeposit{}
 
-func NewMsgDeposit(creator string, receiver string, tokenA string, tokenB string, amountsA []sdk.Dec, amountsB []sdk.Dec, tickIndexes []int64, feeIndexes []uint64) *MsgDeposit {
+func NewMsgDeposit(creator string, receiver string, tokenA string, tokenB string, amountsA []sdk.Int, amountsB []sdk.Int, tickIndexes []int64, feeIndexes []uint64) *MsgDeposit {
 	return &MsgDeposit{
 		Creator:     creator,
 		Receiver:    receiver,
@@ -47,6 +47,18 @@ func (msg *MsgDeposit) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+
+	_, err = sdk.AccAddressFromBech32(msg.Receiver)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+	}
+
+	// Verify that the lengths of TickIndexes, FeeIndexes, AmountsA, AmountsB are all equal
+	if len(msg.FeeIndexes) != len(msg.TickIndexes) ||
+		len(msg.AmountsA) != len(msg.AmountsB) ||
+		len(msg.AmountsA) != len(msg.TickIndexes) {
+		return sdkerrors.Wrapf(ErrUnbalancedTxArray, "Input Arrays are not of the same length")
 	}
 	return nil
 }

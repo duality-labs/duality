@@ -38,15 +38,15 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilledSlippageToleranceNotRe
 	// WHEN
 	// swap 20 of tokenA at
 	amountIn := 20
-	amountInDec := sdk.NewDec(20)
+	amountInInt := sdk.NewInt(20)
 	s.bobMarketSells("TokenA", amountIn, 5)
 
 	// THEN
 	// swap should have in 10 out
-	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOAToB(1, sdk.NewDec(10), amountInDec)
-	expectedAmountIn := amountInDec.Sub(expectedAmountInLeft)
-	s.assertBobBalancesDec(sdk.NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
-	s.assertDexBalancesDec(expectedAmountIn, sdk.NewDec(10).Sub(expectedAmountOut))
+	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOAToB(1, 10, int64(amountIn))
+	expectedAmountIn := amountInInt.Sub(expectedAmountInLeft)
+	s.assertBobBalancesEpsilon(sdk.NewInt(50).Sub(expectedAmountIn), expectedAmountOut)
+	s.assertDexBalancesEpsilon(expectedAmountIn, sdk.NewInt(10).Sub(expectedAmountOut))
 	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
 }
 
@@ -62,15 +62,15 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilledSlippageToleranceNotRe
 	//
 	// WHEN
 	// swap 20 of token A for B
-	amountIn, amountInDec := 20, sdk.NewDec(20)
+	amountIn, amountInInt := 20, sdk.NewInt(20)
 	s.bobMarketSells("TokenB", amountIn, 5)
 
 	// THEN
 	// swap should have in out
-	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOBToA(-1, sdk.NewDec(10), amountInDec)
-	expectedAmountIn := amountInDec.Sub(expectedAmountInLeft)
-	s.assertBobBalancesDec(expectedAmountOut, sdk.NewDec(50).Sub(expectedAmountIn))
-	s.assertDexBalancesDec(sdk.NewDec(10).Sub(expectedAmountOut), expectedAmountIn)
+	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOBToA(-1, 10, int64(amountIn))
+	expectedAmountIn := amountInInt.Sub(expectedAmountInLeft)
+	s.assertBobBalancesEpsilon(expectedAmountOut, sdk.NewInt(50).Sub(expectedAmountIn))
+	s.assertDexBalancesEpsilon(sdk.NewInt(10).Sub(expectedAmountOut), expectedAmountIn)
 	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
 }
 
@@ -108,7 +108,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilledSlippageToleranceReach
 	// swap 20 of token A for B with minOut 15
 	// THEN
 	// swap should fail with ErrNotEnoughCoins error
-	err := types.ErrNotEnoughCoins
+	err := types.ErrNotEnoughLiquidity
 	s.bobMarketSellFails(err, "TokenB", 20, 15)
 }
 
@@ -161,7 +161,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO1to0MovesCurr1To0() {
 
 	// WHEN
 	// swap 15 of token B for A with minOut 14
-	s.bobMarketSells("TokenB", 15, 14)
+	s.bobMarketSells("TokenB", 15, 13)
 
 	// THEN
 	// current 1to0 moves to -3
@@ -239,7 +239,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO0to1MovesCurr0to1() {
 
 	// WHEN
 	// swap 15 of token A for B with minOut 14
-	s.bobMarketSells("TokenA", 15, 14)
+	s.bobMarketSells("TokenA", 15, 13)
 
 	// THEN
 	// current 0to1 moves to 3
@@ -295,15 +295,15 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOCorrectExecution1to0() {
 
 	// WHEN
 	// swap 5 of token B for A with minOut 4
-	amountIn, amountInDec := 5, sdk.NewDec(5)
+	amountIn, amountInInt := 5, sdk.NewInt(5)
 	s.bobMarketSells("TokenB", amountIn, 4)
 
 	// THEN
 	// swap should have in out
-	expectedAmountLeft, expectedAmountOut := s.calculateSingleSwapOnlyLOBToA(1, sdk.NewDec(10), amountInDec)
-	expectedAmountIn := amountInDec.Sub(expectedAmountLeft)
-	s.assertBobBalancesDec(expectedAmountOut, sdk.NewDec(50).Sub(expectedAmountIn))
-	s.assertDexBalancesDec(sdk.NewDec(10).Sub(expectedAmountOut), expectedAmountIn)
+	expectedAmountLeft, expectedAmountOut := s.calculateSingleSwapOnlyLOBToA(1, 10, int64(amountIn))
+	expectedAmountIn := amountInInt.Sub(expectedAmountLeft)
+	s.assertBobBalancesEpsilon(expectedAmountOut, sdk.NewInt(50).Sub(expectedAmountIn))
+	s.assertDexBalancesEpsilon(sdk.NewInt(10).Sub(expectedAmountOut), expectedAmountIn)
 }
 
 func (s *MsgServerTestSuite) TestSwapOnlyLOCorrectExecution0to1() {
@@ -317,15 +317,15 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOCorrectExecution0to1() {
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
-	amountIn, amountInDec := 5, sdk.NewDec(5)
+	amountIn, amountInInt := 5, sdk.NewInt(5)
 	s.bobMarketSells("TokenA", amountIn, 4)
 
 	// THEN
 	// swap should have in out
-	expectedAmountLeft, expectedAmountOut := s.calculateSingleSwapOnlyLOAToB(1, sdk.NewDec(10), amountInDec)
-	expectedAmountIn := amountInDec.Sub(expectedAmountLeft)
-	s.assertBobBalancesDec(sdk.NewDec(50).Sub(expectedAmountIn), expectedAmountOut)
-	s.assertDexBalancesDec(expectedAmountIn, sdk.NewDec(10).Sub(expectedAmountOut))
+	expectedAmountLeft, expectedAmountOut := s.calculateSingleSwapOnlyLOAToB(1, 10, int64(amountIn))
+	expectedAmountIn := amountInInt.Sub(expectedAmountLeft)
+	s.assertBobBalancesInt(sdk.NewInt(50).Sub(expectedAmountIn), expectedAmountOut)
+	s.assertDexBalancesInt(expectedAmountIn, sdk.NewInt(10).Sub(expectedAmountOut))
 }
 
 func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilledCorrectExecution() {
@@ -338,34 +338,33 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilledCorrectExecution() {
 	// Partially fill the LO, will have some token B remaining to fill
 	s.bobMarketSells("TokenA", 5, 4)
 	// in 5.000499950004999500, out 4.999500049995000500
-	expectedAmountLeftSetup, amountOutSetup := s.calculateSingleSwapOnlyLOAToB(1, sdk.NewDec(10), sdk.NewDec(5))
-	amountInSetup := sdk.NewDec(5).Sub(expectedAmountLeftSetup)
-	s.assertLimitLiquidityAtTickDec("TokenB", sdk.NewDec(10).Sub(amountOutSetup), 1)
+	expectedAmountLeftSetup, amountOutSetup := s.calculateSingleSwapOnlyLOAToB(1, 10, 5)
+	amountInSetup := sdk.NewInt(5).Sub(expectedAmountLeftSetup)
+	s.assertLimitLiquidityAtTickInt("TokenB", 1, sdk.NewInt(10).Sub(amountOutSetup))
 
 	// place another LO selling 10 of token B at tick 1
 	s.aliceLimitSells("TokenB", 1, 10)
 	// TODO: uncomment
-	// s.assertLimitLiquidityAtTickDec("TokenB", 1, sdk.NewDec(20).Sub(amountOutSetup))
-	bobBalanceSetupB := sdk.NewDec(50).Sub(amountInSetup)
-	s.assertBobBalancesDec(bobBalanceSetupB, amountOutSetup)
+	// s.assertLimitLiquidityAtTickInt("TokenB", 1, sdk.NewInt(20).Sub(amountOutSetup))
+	bobBalanceSetupB := sdk.NewInt(50).Sub(amountInSetup)
+	s.assertBobBalancesInt(bobBalanceSetupB, amountOutSetup)
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
-	amountIn, amountInDec := 5, sdk.NewDec(5)
+	amountIn, amountInInt := 5, sdk.NewInt(5)
 	s.bobMarketSells("TokenA", amountIn, 4)
 
 	// THEN
 	// swap should have in out
-	expectedAmountLeft, expectedAmountOut := s.calculateSingleSwapOnlyLOAToB(1, sdk.NewDec(10), amountInDec)
-	expectedAmountIn := amountInDec.Sub(expectedAmountLeft)
-	s.assertBobBalancesDec(bobBalanceSetupB.Sub(expectedAmountIn), amountOutSetup.Add(expectedAmountOut))
-	s.assertDexBalancesDec(expectedAmountIn.Add(amountInSetup), sdk.NewDec(20).Sub(amountOutSetup).Sub(expectedAmountOut))
+	expectedAmountLeft, expectedAmountOut := s.calculateSingleSwapOnlyLOAToB(1, 10, int64(amountIn))
+	expectedAmountIn := amountInInt.Sub(expectedAmountLeft)
+	s.assertBobBalancesInt(bobBalanceSetupB.Sub(expectedAmountIn), amountOutSetup.Add(expectedAmountOut))
+	s.assertDexBalancesInt(expectedAmountIn.Add(amountInSetup), sdk.NewInt(20).Sub(amountOutSetup).Sub(expectedAmountOut))
 	// TODO: uncomment
-	// s.assertLimitLiquidityAtTickDec("TokenB", 1, sdk.NewDec(20).Sub(amountOutSetup).Sub(expectedAmountOut))
+	// s.assertLimitLiquidityAtTickInt("TokenB", 1, sdk.NewInt(20).Sub(amountOutSetup).Sub(expectedAmountOut))
 }
 
 func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustLOCorrectExecution() {
-	// TODO: this fails due to fill and place key bug
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
 	// GIVEN
@@ -375,29 +374,29 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustLOCorrectExecution() {
 	// Partially fill the LO, will have some token B remaining to fill
 	s.bobMarketSells("TokenA", 5, 4)
 	// in 5.000499950004999500, out 4.999500049995000500
-	expectedAmountLeftSetup, amountOutSetup := s.calculateSingleSwapOnlyLOAToB(1, sdk.NewDec(10), sdk.NewDec(5))
-	amountInSetup := sdk.NewDec(5).Sub(expectedAmountLeftSetup)
-	s.assertLimitLiquidityAtTickDec("TokenB", sdk.NewDec(10).Sub(amountOutSetup), 1)
+	expectedAmountLeftSetup, amountOutSetup := s.calculateSingleSwapOnlyLOAToB(1, 10, 5)
+	amountInSetup := sdk.NewInt(5).Sub(expectedAmountLeftSetup)
+	s.assertLimitLiquidityAtTickInt("TokenB", 1, sdk.NewInt(10).Sub(amountOutSetup))
 
 	// place another LO selling 10 of token B at tick 1
 	s.aliceLimitSells("TokenB", 1, 10)
-	limitLiquiditySetup := sdk.NewDec(20).Sub(amountOutSetup)
-	s.assertLimitLiquidityAtTickDec("TokenB", limitLiquiditySetup, 1)
-	bobBalanceSetupB := sdk.NewDec(50).Sub(amountInSetup)
-	s.assertBobBalancesDec(bobBalanceSetupB, amountOutSetup)
+	limitLiquiditySetup := sdk.NewInt(20).Sub(amountOutSetup)
+	s.assertLimitLiquidityAtTickInt("TokenB", 1, limitLiquiditySetup)
+	bobBalanceSetupB := sdk.NewInt(50).Sub(amountInSetup)
+	s.assertBobBalancesEpsilon(bobBalanceSetupB, amountOutSetup)
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
-	amountIn, amountInDec := 20, sdk.NewDec(20)
+	amountIn, amountInInt := 20, sdk.NewInt(20)
 	s.bobMarketSells("TokenA", amountIn, 0)
 
 	// THEN
 	// swap should have in out
-	expectedAmountLeft, expectedAmountOut := s.calculateSingleSwapOnlyLOAToB(1, limitLiquiditySetup, amountInDec)
-	expectedAmountIn := amountInDec.Sub(expectedAmountLeft)
-	s.assertBobBalancesDec(bobBalanceSetupB.Sub(expectedAmountIn), amountOutSetup.Add(expectedAmountOut))
-	s.assertDexBalancesDec(expectedAmountIn.Add(amountInSetup), limitLiquiditySetup.Sub(expectedAmountOut))
-	s.assertLimitLiquidityAtTickDec("TokenB", sdk.NewDec(20).Sub(amountOutSetup).Sub(expectedAmountOut), 1)
+	expectedAmountLeft, expectedAmountOut := s.calculateSingleSwapOnlyLOAToB(1, limitLiquiditySetup.Int64(), int64(amountIn))
+	expectedAmountIn := amountInInt.Sub(expectedAmountLeft)
+	s.assertBobBalancesEpsilon(bobBalanceSetupB.Sub(expectedAmountIn), amountOutSetup.Add(expectedAmountOut))
+	s.assertDexBalancesEpsilon(expectedAmountIn.Add(amountInSetup), limitLiquiditySetup.Sub(expectedAmountOut))
+	s.assertLimitLiquidityAtTickInt("TokenB", 1, sdk.NewInt(20).Sub(amountOutSetup).Sub(expectedAmountOut))
 }
 
 func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilled0to1DoesntMove0to1() {
@@ -444,7 +443,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilled1to0DoesntMove1to0() {
 }
 
 func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace0to1Moves0to1() {
-	// TODO: this fails due to fill and place key bug
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
 	// GIVEN

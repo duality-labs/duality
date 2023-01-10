@@ -1,0 +1,30 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+import "gogoproto/gogo.proto";
+import "duality/dex/params.proto";
+import "duality/dex/tick.proto";
+import "duality/dex/trading_pair.proto";
+import "duality/dex/tokens.proto";
+import "duality/dex/token_map.proto";
+import "duality/dex/fee_tier.proto";
+import "duality/dex/limit_order_tranche_user.proto";
+import "duality/dex/limit_order_tranche.proto";
+// this line is used by starport scaffolding # genesis/proto/import
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+
+// GenesisState defines the dex module's genesis state.
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+  repeated Tick TickList = 2 [(gogoproto.nullable) = false];
+  repeated TradingPair TradingPairList = 3 [(gogoproto.nullable) = false];
+  repeated Tokens tokensList = 4 [(gogoproto.nullable) = false];
+  uint64 tokensCount = 5;
+  repeated TokenMap tokenMapList = 6 [(gogoproto.nullable) = false];
+  repeated FeeTier FeeTierList = 8 [(gogoproto.nullable) = false];
+  uint64 FeeTierCount = 9;
+  repeated LimitOrderTrancheUser LimitOrderTrancheUserList = 14 [(gogoproto.nullable) = false];
+  repeated LimitOrderTranche LimitOrderTrancheList = 15 [(gogoproto.nullable) = false];
+  // this line is used by starport scaffolding # genesis/proto/state
+}

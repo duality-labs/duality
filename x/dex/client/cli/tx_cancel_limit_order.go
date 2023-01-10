@@ -16,7 +16,7 @@ func CmdCancelLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "cancel-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [key]",
 		Short: "Broadcast message CancelLimitOrder",
-		Args:  cobra.ExactArgs(5),
+		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
 			argTokenA := args[1]

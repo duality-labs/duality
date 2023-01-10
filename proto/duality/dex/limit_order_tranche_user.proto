@@ -1,0 +1,32 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+import "gogoproto/gogo.proto";
+
+message LimitOrderTrancheUser {
+  string pairId = 1;
+  string token = 2;
+  int64 tickIndex = 3;
+  uint64 count = 4; 
+  string address = 5; 
+  string sharesOwned = 6  [
+      (gogoproto.moretags)   = "yaml:\"sharesOwned\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "sharesOwned"
+  ];  
+  string sharesWithdrawn = 7  [
+      (gogoproto.moretags)   = "yaml:\"sharesWithdrawn\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "sharesWithdrawn"
+  ]; 
+  string sharesCancelled = 8  [
+      (gogoproto.moretags)   = "yaml:\"sharesCancelled\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "sharesCancelled"
+  ]; 
+}
+

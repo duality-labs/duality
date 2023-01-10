@@ -45,27 +45,38 @@ func CmdListLimitOrderTrancheUser() *cobra.Command {
 
 func CmdShowLimitOrderTrancheUser() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-limit-order-pool-user-share-map [count] [address]",
+		Use:   "show-limit-order-pool-user-share-map [pairId] [tickIndex] [tokenIn] [trancheIndex] [address]",
 		Short: "shows a LimitOrderTrancheUser",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			tmpargCount := args[0]
+			argPairId := args[0]
+			argTickIndex := args[1]
+			argTokenIn := args[2]
+			argTrancheIndex := args[3]
+			argAddress := args[4]
 
-			argCount, err := strconv.Atoi(tmpargCount)
+			argTickIndexInt, err := strconv.Atoi(argTickIndex)
 
 			if err != nil {
 				return err
 			}
 
-			argAddress := args[1]
+			argTrancheIndexInt, err := strconv.Atoi(argTrancheIndex)
+
+			if err != nil {
+				return err
+			}
 
 			params := &types.QueryGetLimitOrderTrancheUserRequest{
-				Count:   uint64(argCount),
-				Address: argAddress,
+				PairId:    argPairId,
+				TickIndex: int64(argTickIndexInt),
+				Token:     argTokenIn,
+				Count:     uint64(argTrancheIndexInt),
+				Address:   argAddress,
 			}
 
 			res, err := queryClient.LimitOrderTrancheUser(context.Background(), params)

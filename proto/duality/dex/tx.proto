@@ -1,0 +1,149 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+// Msg defines the Msg service.
+service Msg {
+  rpc Deposit(MsgDeposit) returns (MsgDepositResponse);
+  rpc Withdrawl(MsgWithdrawl) returns (MsgWithdrawlResponse);
+  rpc Swap(MsgSwap) returns (MsgSwapResponse);
+  rpc PlaceLimitOrder(MsgPlaceLimitOrder) returns (MsgPlaceLimitOrderResponse);
+  rpc WithdrawFilledLimitOrder(MsgWithdrawFilledLimitOrder) returns (MsgWithdrawFilledLimitOrderResponse);
+  rpc CancelLimitOrder(MsgCancelLimitOrder) returns (MsgCancelLimitOrderResponse);
+// this line is used by starport scaffolding # proto/tx/rpc
+}
+
+message MsgDeposit {
+  string creator = 1;
+  string receiver = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  repeated string amountsA = 5  [
+      (gogoproto.moretags)   = "yaml:\"amountA\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "amountA"
+  ]; 
+   repeated string amountsB = 6  [
+      (gogoproto.moretags)   = "yaml:\"amountB\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "amountB"
+  ]; 
+  repeated int64 tickIndexes = 7;
+  repeated uint64 feeIndexes = 8;
+  
+}
+
+message MsgDepositResponse {
+   repeated string Reserve0Deposited = 1 [
+      (gogoproto.moretags)   = "yaml:\"Reserve0Deposited\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "Reserve1Deposited"
+  ]; 
+  repeated string Reserve1Deposited = 2[
+      (gogoproto.moretags)   = "yaml:\"Reserve1Deposited\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "Reserve1Deposited"
+  ]; 
+}
+
+message MsgWithdrawl {
+  string creator = 1;
+  string receiver = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  repeated string sharesToRemove = 5  [
+      (gogoproto.moretags)   = "yaml:\"sharesToRemove\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "sharesToRemove"
+  ]; 
+  repeated int64 tickIndexes = 6;
+  repeated uint64 feeIndexes = 7;
+  
+}
+
+message MsgWithdrawlResponse {
+}
+
+message MsgSwap {
+  string creator = 1;
+  string receiver = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  string amountIn = 5 [
+      (gogoproto.moretags)   = "yaml:\"amountIn\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "amountIn"
+  ]; 
+  string tokenIn = 6;
+  string minOut = 7 [
+      (gogoproto.moretags)   = "yaml:\"minOut\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "minOut"
+  ]; 
+  
+}
+
+message MsgSwapResponse {
+   cosmos.base.v1beta1.Coin coinOut = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+    (gogoproto.jsontag) = "coinOut"
+  ];
+}
+
+message MsgPlaceLimitOrder {
+  string creator = 1;
+  string receiver = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  int64 tickIndex = 5;
+  string tokenIn = 6;
+  string amountIn = 7 [
+      (gogoproto.moretags)   = "yaml:\"amountIn\"",
+      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+      (gogoproto.nullable)   = false,
+      (gogoproto.jsontag) = "amountIn"
+  ]; 
+}
+
+message MsgPlaceLimitOrderResponse {
+}
+
+message MsgWithdrawFilledLimitOrder {
+  string creator = 1;
+  string receiver = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  int64 tickIndex = 5;
+  string keyToken = 6;
+  uint64 key = 7;
+}
+
+message MsgWithdrawFilledLimitOrderResponse {
+}
+
+message MsgCancelLimitOrder {
+  string creator = 1;
+  string receiver = 2;
+  string tokenA = 3;
+  string tokenB = 4;
+  int64 tickIndex = 5;
+  string keyToken = 6;
+  uint64 key = 7;
+}
+
+message MsgCancelLimitOrderResponse {
+}
+
+// this line is used by starport scaffolding # proto/tx/message

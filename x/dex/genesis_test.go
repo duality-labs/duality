@@ -14,7 +14,7 @@ func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
 
-		TickMapList: []types.TickMap{
+		TickList: []types.Tick{
 			{
 				TickIndex: 0,
 			},
@@ -22,7 +22,7 @@ func TestGenesis(t *testing.T) {
 				TickIndex: 1,
 			},
 		},
-		PairMapList: []types.PairMap{
+		TradingPairList: []types.TradingPair{
 			{
 				PairId: "0",
 			},
@@ -39,21 +39,7 @@ func TestGenesis(t *testing.T) {
 			},
 		},
 		TokensCount: 2,
-		SharesList: []types.Shares{
-			{
-				Address:   "0",
-				PairId:    "0",
-				TickIndex: 0,
-				FeeIndex:  0,
-			},
-			{
-				Address:   "1",
-				PairId:    "1",
-				TickIndex: 1,
-				FeeIndex:  uint64(1),
-			},
-		},
-		FeeListList: []types.FeeList{
+		FeeTierList: []types.FeeTier{
 			{
 				Id: 0,
 			},
@@ -61,25 +47,7 @@ func TestGenesis(t *testing.T) {
 				Id: 1,
 			},
 		},
-		FeeListCount: 2,
-		EdgeRowList: []types.EdgeRow{
-			{
-				Id: 0,
-			},
-			{
-				Id: 1,
-			},
-		},
-		EdgeRowCount: 2,
-		AdjanceyMatrixList: []types.AdjanceyMatrix{
-			{
-				Id: 0,
-			},
-			{
-				Id: 1,
-			},
-		},
-		AdjanceyMatrixCount: 2,
+		FeeTierCount: 2,
 		LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
 			{
 				Count:   0,
@@ -90,12 +58,12 @@ func TestGenesis(t *testing.T) {
 				Address: "1",
 			},
 		},
-		LimitOrderTrancheList: []types.LimitOrderTrancheTrancheIndexes{
+		LimitOrderTrancheList: []types.LimitOrderTranche{
 			{
-				Count: 0,
+				TickIndex: 0,
 			},
 			{
-				Count: 1,
+				TickIndex: 1,
 			},
 		},
 		// this line is used by starport scaffolding # genesis/test/state
@@ -109,17 +77,12 @@ func TestGenesis(t *testing.T) {
 	nullify.Fill(&genesisState)
 	nullify.Fill(got)
 
-	require.ElementsMatch(t, genesisState.TickMapList, got.TickMapList)
-	require.ElementsMatch(t, genesisState.PairMapList, got.PairMapList)
+	require.ElementsMatch(t, genesisState.TickList, got.TickList)
+	require.ElementsMatch(t, genesisState.TradingPairList, got.TradingPairList)
 	require.ElementsMatch(t, genesisState.TokensList, got.TokensList)
 	require.Equal(t, genesisState.TokensCount, got.TokensCount)
-	require.ElementsMatch(t, genesisState.SharesList, got.SharesList)
-	require.ElementsMatch(t, genesisState.FeeListList, got.FeeListList)
-	require.Equal(t, genesisState.FeeListCount, got.FeeListCount)
-	require.ElementsMatch(t, genesisState.EdgeRowList, got.EdgeRowList)
-	require.Equal(t, genesisState.EdgeRowCount, got.EdgeRowCount)
-	require.ElementsMatch(t, genesisState.AdjanceyMatrixList, got.AdjanceyMatrixList)
-	require.Equal(t, genesisState.AdjanceyMatrixCount, got.AdjanceyMatrixCount)
+	require.ElementsMatch(t, genesisState.FeeTierList, got.FeeTierList)
+	require.Equal(t, genesisState.FeeTierCount, got.FeeTierCount)
 	require.ElementsMatch(t, genesisState.LimitOrderTrancheUserList, got.LimitOrderTrancheUserList)
 	require.ElementsMatch(t, genesisState.LimitOrderTrancheList, got.LimitOrderTrancheList)
 	// this line is used by starport scaffolding # genesis/test/assert

@@ -4077,33 +4077,44 @@ paths:
                       last_commit_hash:
                         type: string
                         format: byte
+                        description: commit from validators from the last block
                         title: hashes of block data
                       data_hash:
                         type: string
                         format: byte
+                        title: transactions
                       validators_hash:
                         type: string
                         format: byte
+                        description: validators for the current block
                         title: hashes from the app output from the prev block
                       next_validators_hash:
                         type: string
                         format: byte
+                        title: validators for the next block
                       consensus_hash:
                         type: string
                         format: byte
+                        title: consensus params for current block
                       app_hash:
                         type: string
                         format: byte
+                        title: state after txs from the previous block
                       last_results_hash:
                         type: string
                         format: byte
+                        title: >-
+                          root hash of all results from the txs from the
+                          previous block
                       evidence_hash:
                         type: string
                         format: byte
+                        description: evidence included in the block
                         title: consensus info
                       proposer_address:
                         type: string
                         format: byte
+                        title: original proposer of the block
                     description: Header defines the structure of a Tendermint block header.
                   data:
                     type: object
@@ -4175,6 +4186,7 @@ paths:
                                               format: byte
                                           title: PartsetHeader
                                       title: BlockID
+                                      description: zero if vote is nil.
                                     timestamp:
                                       type: string
                                       format: date-time
@@ -4232,6 +4244,7 @@ paths:
                                               format: byte
                                           title: PartsetHeader
                                       title: BlockID
+                                      description: zero if vote is nil.
                                     timestamp:
                                       type: string
                                       format: date-time
@@ -4320,35 +4333,48 @@ paths:
                                             last_commit_hash:
                                               type: string
                                               format: byte
+                                              description: >-
+                                                commit from validators from the last
+                                                block
                                               title: hashes of block data
                                             data_hash:
                                               type: string
                                               format: byte
+                                              title: transactions
                                             validators_hash:
                                               type: string
                                               format: byte
+                                              description: validators for the current block
                                               title: >-
                                                 hashes from the app output from the prev
                                                 block
                                             next_validators_hash:
                                               type: string
                                               format: byte
+                                              title: validators for the next block
                                             consensus_hash:
                                               type: string
                                               format: byte
+                                              title: consensus params for current block
                                             app_hash:
                                               type: string
                                               format: byte
+                                              title: state after txs from the previous block
                                             last_results_hash:
                                               type: string
                                               format: byte
+                                              title: >-
+                                                root hash of all results from the txs
+                                                from the previous block
                                             evidence_hash:
                                               type: string
                                               format: byte
+                                              description: evidence included in the block
                                               title: consensus info
                                             proposer_address:
                                               type: string
                                               format: byte
+                                              title: original proposer of the block
                                           description: >-
                                             Header defines the structure of a
                                             Tendermint block header.
@@ -4831,33 +4857,44 @@ paths:
                       last_commit_hash:
                         type: string
                         format: byte
+                        description: commit from validators from the last block
                         title: hashes of block data
                       data_hash:
                         type: string
                         format: byte
+                        title: transactions
                       validators_hash:
                         type: string
                         format: byte
+                        description: validators for the current block
                         title: hashes from the app output from the prev block
                       next_validators_hash:
                         type: string
                         format: byte
+                        title: validators for the next block
                       consensus_hash:
                         type: string
                         format: byte
+                        title: consensus params for current block
                       app_hash:
                         type: string
                         format: byte
+                        title: state after txs from the previous block
                       last_results_hash:
                         type: string
                         format: byte
+                        title: >-
+                          root hash of all results from the txs from the
+                          previous block
                       evidence_hash:
                         type: string
                         format: byte
+                        description: evidence included in the block
                         title: consensus info
                       proposer_address:
                         type: string
                         format: byte
+                        title: original proposer of the block
                     description: Header defines the structure of a Tendermint block header.
                   data:
                     type: object
@@ -4929,6 +4966,7 @@ paths:
                                               format: byte
                                           title: PartsetHeader
                                       title: BlockID
+                                      description: zero if vote is nil.
                                     timestamp:
                                       type: string
                                       format: date-time
@@ -4986,6 +5024,7 @@ paths:
                                               format: byte
                                           title: PartsetHeader
                                       title: BlockID
+                                      description: zero if vote is nil.
                                     timestamp:
                                       type: string
                                       format: date-time
@@ -5074,35 +5113,48 @@ paths:
                                             last_commit_hash:
                                               type: string
                                               format: byte
+                                              description: >-
+                                                commit from validators from the last
+                                                block
                                               title: hashes of block data
                                             data_hash:
                                               type: string
                                               format: byte
+                                              title: transactions
                                             validators_hash:
                                               type: string
                                               format: byte
+                                              description: validators for the current block
                                               title: >-
                                                 hashes from the app output from the prev
                                                 block
                                             next_validators_hash:
                                               type: string
                                               format: byte
+                                              title: validators for the next block
                                             consensus_hash:
                                               type: string
                                               format: byte
+                                              title: consensus params for current block
                                             app_hash:
                                               type: string
                                               format: byte
+                                              title: state after txs from the previous block
                                             last_results_hash:
                                               type: string
                                               format: byte
+                                              title: >-
+                                                root hash of all results from the txs
+                                                from the previous block
                                             evidence_hash:
                                               type: string
                                               format: byte
+                                              description: evidence included in the block
                                               title: consensus info
                                             proposer_address:
                                               type: string
                                               format: byte
+                                              title: original proposer of the block
                                           description: >-
                                             Header defines the structure of a
                                             Tendermint block header.
@@ -9211,6 +9263,7 @@ paths:
                                 format: byte
                               index:
                                 type: boolean
+                                title: nondeterministic
                             description: >-
                               EventAttribute is a single key-value pair,
                               associated with an event.
@@ -9998,6 +10051,7 @@ paths:
                                 format: byte
                               index:
                                 type: boolean
+                                title: nondeterministic
                             description: >-
                               EventAttribute is a single key-value pair,
                               associated with an event.
@@ -23693,345 +23747,17 @@ paths:
           type: string
       tags:
         - Query
-  /NicholasDotSol/duality/dex/adjancey_matrix:
+  /NicholasDotSol/duality/dex/fee_tier:
     get:
-      summary: Queries a list of AdjanceyMatrix items.
-      operationId: NicholasdotsolDualityDexAdjanceyMatrixAll
+      summary: Queries a list of FeeTier items.
+      operationId: NicholasdotsolDualityDexFeeTierAll
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              AdjanceyMatrix:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      format: uint64
-                    edgeRow:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          format: uint64
-                        edge:
-                          type: boolean
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/adjancey_matrix/{id}:
-    get:
-      summary: Queries a AdjanceyMatrix by id.
-      operationId: NicholasdotsolDualityDexAdjanceyMatrix
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              AdjanceyMatrix:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    format: uint64
-                  edgeRow:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                        format: uint64
-                      edge:
-                        type: boolean
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: string
-          format: uint64
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/edge_row:
-    get:
-      summary: Queries a list of EdgeRow items.
-      operationId: NicholasdotsolDualityDexEdgeRowAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              EdgeRow:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      format: uint64
-                    edge:
-                      type: boolean
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/edge_row/{id}:
-    get:
-      summary: Queries a EdgeRow by id.
-      operationId: NicholasdotsolDualityDexEdgeRow
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              EdgeRow:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    format: uint64
-                  edge:
-                    type: boolean
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: string
-          format: uint64
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/fee_list:
-    get:
-      summary: Queries a list of FeeList items.
-      operationId: NicholasdotsolDualityDexFeeListAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              FeeList:
+              FeeTier:
                 type: array
                 items:
                   type: object
@@ -24136,17 +23862,17 @@ paths:
           type: boolean
       tags:
         - Query
-  /NicholasDotSol/duality/dex/fee_list/{id}:
+  /NicholasDotSol/duality/dex/fee_tier/{id}:
     get:
-      summary: Queries a FeeList by id.
-      operationId: NicholasdotsolDualityDexFeeList
+      summary: Queries a FeeTier by id.
+      operationId: NicholasdotsolDualityDexFeeTier
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              FeeList:
+              FeeTier:
                 type: object
                 properties:
                   id:
@@ -24579,187 +24305,6 @@ paths:
           type: string
       tags:
         - Query
-  /NicholasDotSol/duality/dex/pair_map:
-    get:
-      summary: Queries a list of PairMap items.
-      operationId: NicholasdotsolDualityDexPairMapAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              pairMap:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    pairId:
-                      type: string
-                    tokenPair:
-                      type: object
-                      properties:
-                        currentTick0To1:
-                          type: string
-                          format: int64
-                        currentTick1To0:
-                          type: string
-                          format: int64
-                    maxTick:
-                      type: string
-                      format: int64
-                    minTick:
-                      type: string
-                      format: int64
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/pair_map/{pairId}:
-    get:
-      summary: Queries a PairMap by index.
-      operationId: NicholasdotsolDualityDexPairMap
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              pairMap:
-                type: object
-                properties:
-                  pairId:
-                    type: string
-                  tokenPair:
-                    type: object
-                    properties:
-                      currentTick0To1:
-                        type: string
-                        format: int64
-                      currentTick1To0:
-                        type: string
-                        format: int64
-                  maxTick:
-                    type: string
-                    format: int64
-                  minTick:
-                    type: string
-                    format: int64
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pairId
-          in: path
-          required: true
-          type: string
-      tags:
-        - Query
   /NicholasDotSol/duality/dex/params:
     get:
       summary: Parameters queries the parameters of the module.
@@ -24796,202 +24341,17 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  /NicholasDotSol/duality/dex/shares:
+  /NicholasDotSol/duality/dex/tick:
     get:
-      summary: Queries a list of Shares items.
-      operationId: NicholasdotsolDualityDexSharesAll
+      summary: Queries a list of Tick items.
+      operationId: NicholasdotsolDualityDexTickAll
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              shares:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    address:
-                      type: string
-                    pairId:
-                      type: string
-                    tickIndex:
-                      type: string
-                      format: int64
-                    feeIndex:
-                      type: string
-                      format: uint64
-                    sharesOwned:
-                      type: string
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/shares/{address}/{pairId}/{tickIndex}/{fee}:
-    get:
-      summary: Queries a Shares by index.
-      operationId: NicholasdotsolDualityDexShares
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              shares:
-                type: object
-                properties:
-                  address:
-                    type: string
-                  pairId:
-                    type: string
-                  tickIndex:
-                    type: string
-                    format: int64
-                  feeIndex:
-                    type: string
-                    format: uint64
-                  sharesOwned:
-                    type: string
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: address
-          in: path
-          required: true
-          type: string
-        - name: pairId
-          in: path
-          required: true
-          type: string
-        - name: tickIndex
-          in: path
-          required: true
-          type: string
-          format: int64
-        - name: fee
-          in: path
-          required: true
-          type: string
-          format: uint64
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/tick_map:
-    get:
-      summary: Queries a list of TickMap items.
-      operationId: NicholasdotsolDualityDexTickMapAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              tickMap:
+              Tick:
                 type: array
                 items:
                   type: object
@@ -25004,15 +24364,10 @@ paths:
                     tickData:
                       type: object
                       properties:
-                        reserve0AndShares:
+                        reserve0:
                           type: array
                           items:
-                            type: object
-                            properties:
-                              reserve0:
-                                type: string
-                              totalShares:
-                                type: string
+                            type: string
                         reserve1:
                           type: array
                           items:
@@ -25035,6 +24390,8 @@ paths:
                         placeTrancheIndex:
                           type: string
                           format: uint64
+                    price0To1:
+                      type: string
               pagination:
                 type: object
                 properties:
@@ -25129,17 +24486,17 @@ paths:
           type: boolean
       tags:
         - Query
-  /NicholasDotSol/duality/dex/tick_map/{pairId}/{tickIndex}:
+  /NicholasDotSol/duality/dex/tick/{pairId}/{tickIndex}:
     get:
-      summary: Queries a TickMap by index.
-      operationId: NicholasdotsolDualityDexTickMap
+      summary: Queries a Tick by index.
+      operationId: NicholasdotsolDualityDexTick
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              tickMap:
+              Tick:
                 type: object
                 properties:
                   pairId:
@@ -25150,15 +24507,10 @@ paths:
                   tickData:
                     type: object
                     properties:
-                      reserve0AndShares:
+                      reserve0:
                         type: array
                         items:
-                          type: object
-                          properties:
-                            reserve0:
-                              type: string
-                            totalShares:
-                              type: string
+                          type: string
                       reserve1:
                         type: array
                         items:
@@ -25181,6 +24533,8 @@ paths:
                       placeTrancheIndex:
                         type: string
                         format: uint64
+                  price0To1:
+                    type: string
         default:
           description: An unexpected error response.
           schema:
@@ -25524,6 +24878,181 @@ paths:
           required: true
           type: string
           format: uint64
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/trading_pair:
+    get:
+      summary: Queries a list of TradingPair items.
+      operationId: NicholasdotsolDualityDexTradingPairAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              TradingPair:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pairId:
+                      type: string
+                    currentTick0To1:
+                      type: string
+                      format: int64
+                    currentTick1To0:
+                      type: string
+                      format: int64
+                    maxTick:
+                      type: string
+                      format: int64
+                    minTick:
+                      type: string
+                      format: int64
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /NicholasDotSol/duality/dex/trading_pair/{pairId}:
+    get:
+      summary: Queries a TradingPair by index.
+      operationId: NicholasdotsolDualityDexTradingPair
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              TradingPair:
+                type: object
+                properties:
+                  pairId:
+                    type: string
+                  currentTick0To1:
+                    type: string
+                    format: int64
+                  currentTick1To0:
+                    type: string
+                    format: int64
+                  maxTick:
+                    type: string
+                    format: int64
+                  minTick:
+                    type: string
+                    format: int64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pairId
+          in: path
+          required: true
+          type: string
       tags:
         - Query
 definitions:
@@ -28435,33 +27964,42 @@ definitions:
               last_commit_hash:
                 type: string
                 format: byte
+                description: commit from validators from the last block
                 title: hashes of block data
               data_hash:
                 type: string
                 format: byte
+                title: transactions
               validators_hash:
                 type: string
                 format: byte
+                description: validators for the current block
                 title: hashes from the app output from the prev block
               next_validators_hash:
                 type: string
                 format: byte
+                title: validators for the next block
               consensus_hash:
                 type: string
                 format: byte
+                title: consensus params for current block
               app_hash:
                 type: string
                 format: byte
+                title: state after txs from the previous block
               last_results_hash:
                 type: string
                 format: byte
+                title: root hash of all results from the txs from the previous block
               evidence_hash:
                 type: string
                 format: byte
+                description: evidence included in the block
                 title: consensus info
               proposer_address:
                 type: string
                 format: byte
+                title: original proposer of the block
             description: Header defines the structure of a Tendermint block header.
           data:
             type: object
@@ -28530,6 +28068,7 @@ definitions:
                                       format: byte
                                   title: PartsetHeader
                               title: BlockID
+                              description: zero if vote is nil.
                             timestamp:
                               type: string
                               format: date-time
@@ -28587,6 +28126,7 @@ definitions:
                                       format: byte
                                   title: PartsetHeader
                               title: BlockID
+                              description: zero if vote is nil.
                             timestamp:
                               type: string
                               format: date-time
@@ -28675,35 +28215,48 @@ definitions:
                                     last_commit_hash:
                                       type: string
                                       format: byte
+                                      description: >-
+                                        commit from validators from the last
+                                        block
                                       title: hashes of block data
                                     data_hash:
                                       type: string
                                       format: byte
+                                      title: transactions
                                     validators_hash:
                                       type: string
                                       format: byte
+                                      description: validators for the current block
                                       title: >-
                                         hashes from the app output from the prev
                                         block
                                     next_validators_hash:
                                       type: string
                                       format: byte
+                                      title: validators for the next block
                                     consensus_hash:
                                       type: string
                                       format: byte
+                                      title: consensus params for current block
                                     app_hash:
                                       type: string
                                       format: byte
+                                      title: state after txs from the previous block
                                     last_results_hash:
                                       type: string
                                       format: byte
+                                      title: >-
+                                        root hash of all results from the txs
+                                        from the previous block
                                     evidence_hash:
                                       type: string
                                       format: byte
+                                      description: evidence included in the block
                                       title: consensus info
                                     proposer_address:
                                       type: string
                                       format: byte
+                                      title: original proposer of the block
                                   description: >-
                                     Header defines the structure of a Tendermint
                                     block header.
@@ -28986,33 +28539,42 @@ definitions:
               last_commit_hash:
                 type: string
                 format: byte
+                description: commit from validators from the last block
                 title: hashes of block data
               data_hash:
                 type: string
                 format: byte
+                title: transactions
               validators_hash:
                 type: string
                 format: byte
+                description: validators for the current block
                 title: hashes from the app output from the prev block
               next_validators_hash:
                 type: string
                 format: byte
+                title: validators for the next block
               consensus_hash:
                 type: string
                 format: byte
+                title: consensus params for current block
               app_hash:
                 type: string
                 format: byte
+                title: state after txs from the previous block
               last_results_hash:
                 type: string
                 format: byte
+                title: root hash of all results from the txs from the previous block
               evidence_hash:
                 type: string
                 format: byte
+                description: evidence included in the block
                 title: consensus info
               proposer_address:
                 type: string
                 format: byte
+                title: original proposer of the block
             description: Header defines the structure of a Tendermint block header.
           data:
             type: object
@@ -29081,6 +28643,7 @@ definitions:
                                       format: byte
                                   title: PartsetHeader
                               title: BlockID
+                              description: zero if vote is nil.
                             timestamp:
                               type: string
                               format: date-time
@@ -29138,6 +28701,7 @@ definitions:
                                       format: byte
                                   title: PartsetHeader
                               title: BlockID
+                              description: zero if vote is nil.
                             timestamp:
                               type: string
                               format: date-time
@@ -29226,35 +28790,48 @@ definitions:
                                     last_commit_hash:
                                       type: string
                                       format: byte
+                                      description: >-
+                                        commit from validators from the last
+                                        block
                                       title: hashes of block data
                                     data_hash:
                                       type: string
                                       format: byte
+                                      title: transactions
                                     validators_hash:
                                       type: string
                                       format: byte
+                                      description: validators for the current block
                                       title: >-
                                         hashes from the app output from the prev
                                         block
                                     next_validators_hash:
                                       type: string
                                       format: byte
+                                      title: validators for the next block
                                     consensus_hash:
                                       type: string
                                       format: byte
+                                      title: consensus params for current block
                                     app_hash:
                                       type: string
                                       format: byte
+                                      title: state after txs from the previous block
                                     last_results_hash:
                                       type: string
                                       format: byte
+                                      title: >-
+                                        root hash of all results from the txs
+                                        from the previous block
                                     evidence_hash:
                                       type: string
                                       format: byte
+                                      description: evidence included in the block
                                       title: consensus info
                                     proposer_address:
                                       type: string
                                       format: byte
+                                      title: original proposer of the block
                                   description: >-
                                     Header defines the structure of a Tendermint
                                     block header.
@@ -30296,33 +29873,42 @@ definitions:
           last_commit_hash:
             type: string
             format: byte
+            description: commit from validators from the last block
             title: hashes of block data
           data_hash:
             type: string
             format: byte
+            title: transactions
           validators_hash:
             type: string
             format: byte
+            description: validators for the current block
             title: hashes from the app output from the prev block
           next_validators_hash:
             type: string
             format: byte
+            title: validators for the next block
           consensus_hash:
             type: string
             format: byte
+            title: consensus params for current block
           app_hash:
             type: string
             format: byte
+            title: state after txs from the previous block
           last_results_hash:
             type: string
             format: byte
+            title: root hash of all results from the txs from the previous block
           evidence_hash:
             type: string
             format: byte
+            description: evidence included in the block
             title: consensus info
           proposer_address:
             type: string
             format: byte
+            title: original proposer of the block
         description: Header defines the structure of a Tendermint block header.
       data:
         type: object
@@ -30391,6 +29977,7 @@ definitions:
                                   format: byte
                               title: PartsetHeader
                           title: BlockID
+                          description: zero if vote is nil.
                         timestamp:
                           type: string
                           format: date-time
@@ -30448,6 +30035,7 @@ definitions:
                                   format: byte
                               title: PartsetHeader
                           title: BlockID
+                          description: zero if vote is nil.
                         timestamp:
                           type: string
                           format: date-time
@@ -30535,35 +30123,46 @@ definitions:
                                 last_commit_hash:
                                   type: string
                                   format: byte
+                                  description: commit from validators from the last block
                                   title: hashes of block data
                                 data_hash:
                                   type: string
                                   format: byte
+                                  title: transactions
                                 validators_hash:
                                   type: string
                                   format: byte
+                                  description: validators for the current block
                                   title: >-
                                     hashes from the app output from the prev
                                     block
                                 next_validators_hash:
                                   type: string
                                   format: byte
+                                  title: validators for the next block
                                 consensus_hash:
                                   type: string
                                   format: byte
+                                  title: consensus params for current block
                                 app_hash:
                                   type: string
                                   format: byte
+                                  title: state after txs from the previous block
                                 last_results_hash:
                                   type: string
                                   format: byte
+                                  title: >-
+                                    root hash of all results from the txs from
+                                    the previous block
                                 evidence_hash:
                                   type: string
                                   format: byte
+                                  description: evidence included in the block
                                   title: consensus info
                                 proposer_address:
                                   type: string
                                   format: byte
+                                  title: original proposer of the block
                               description: >-
                                 Header defines the structure of a Tendermint
                                 block header.
@@ -30930,6 +30529,7 @@ definitions:
                     format: byte
                 title: PartsetHeader
             title: BlockID
+            description: zero if vote is nil.
           timestamp:
             type: string
             format: date-time
@@ -30986,6 +30586,7 @@ definitions:
                     format: byte
                 title: PartsetHeader
             title: BlockID
+            description: zero if vote is nil.
           timestamp:
             type: string
             format: date-time
@@ -31060,6 +30661,7 @@ definitions:
                         format: byte
                     title: PartsetHeader
                 title: BlockID
+                description: zero if vote is nil.
               timestamp:
                 type: string
                 format: date-time
@@ -31116,6 +30718,7 @@ definitions:
                         format: byte
                     title: PartsetHeader
                 title: BlockID
+                description: zero if vote is nil.
               timestamp:
                 type: string
                 format: date-time
@@ -31203,33 +30806,44 @@ definitions:
                       last_commit_hash:
                         type: string
                         format: byte
+                        description: commit from validators from the last block
                         title: hashes of block data
                       data_hash:
                         type: string
                         format: byte
+                        title: transactions
                       validators_hash:
                         type: string
                         format: byte
+                        description: validators for the current block
                         title: hashes from the app output from the prev block
                       next_validators_hash:
                         type: string
                         format: byte
+                        title: validators for the next block
                       consensus_hash:
                         type: string
                         format: byte
+                        title: consensus params for current block
                       app_hash:
                         type: string
                         format: byte
+                        title: state after txs from the previous block
                       last_results_hash:
                         type: string
                         format: byte
+                        title: >-
+                          root hash of all results from the txs from the
+                          previous block
                       evidence_hash:
                         type: string
                         format: byte
+                        description: evidence included in the block
                         title: consensus info
                       proposer_address:
                         type: string
                         format: byte
+                        title: original proposer of the block
                     description: Header defines the structure of a Tendermint block header.
                   commit:
                     type: object
@@ -31433,6 +31047,7 @@ definitions:
                               format: byte
                           title: PartsetHeader
                       title: BlockID
+                      description: zero if vote is nil.
                     timestamp:
                       type: string
                       format: date-time
@@ -31490,6 +31105,7 @@ definitions:
                               format: byte
                           title: PartsetHeader
                       title: BlockID
+                      description: zero if vote is nil.
                     timestamp:
                       type: string
                       format: date-time
@@ -31577,33 +31193,44 @@ definitions:
                             last_commit_hash:
                               type: string
                               format: byte
+                              description: commit from validators from the last block
                               title: hashes of block data
                             data_hash:
                               type: string
                               format: byte
+                              title: transactions
                             validators_hash:
                               type: string
                               format: byte
+                              description: validators for the current block
                               title: hashes from the app output from the prev block
                             next_validators_hash:
                               type: string
                               format: byte
+                              title: validators for the next block
                             consensus_hash:
                               type: string
                               format: byte
+                              title: consensus params for current block
                             app_hash:
                               type: string
                               format: byte
+                              title: state after txs from the previous block
                             last_results_hash:
                               type: string
                               format: byte
+                              title: >-
+                                root hash of all results from the txs from the
+                                previous block
                             evidence_hash:
                               type: string
                               format: byte
+                              description: evidence included in the block
                               title: consensus info
                             proposer_address:
                               type: string
                               format: byte
+                              title: original proposer of the block
                           description: >-
                             Header defines the structure of a Tendermint block
                             header.
@@ -31807,33 +31434,42 @@ definitions:
       last_commit_hash:
         type: string
         format: byte
+        description: commit from validators from the last block
         title: hashes of block data
       data_hash:
         type: string
         format: byte
+        title: transactions
       validators_hash:
         type: string
         format: byte
+        description: validators for the current block
         title: hashes from the app output from the prev block
       next_validators_hash:
         type: string
         format: byte
+        title: validators for the next block
       consensus_hash:
         type: string
         format: byte
+        title: consensus params for current block
       app_hash:
         type: string
         format: byte
+        title: state after txs from the previous block
       last_results_hash:
         type: string
         format: byte
+        title: root hash of all results from the txs from the previous block
       evidence_hash:
         type: string
         format: byte
+        description: evidence included in the block
         title: consensus info
       proposer_address:
         type: string
         format: byte
+        title: original proposer of the block
     description: Header defines the structure of a Tendermint block header.
   tendermint.types.LightBlock:
     type: object
@@ -31890,33 +31526,42 @@ definitions:
               last_commit_hash:
                 type: string
                 format: byte
+                description: commit from validators from the last block
                 title: hashes of block data
               data_hash:
                 type: string
                 format: byte
+                title: transactions
               validators_hash:
                 type: string
                 format: byte
+                description: validators for the current block
                 title: hashes from the app output from the prev block
               next_validators_hash:
                 type: string
                 format: byte
+                title: validators for the next block
               consensus_hash:
                 type: string
                 format: byte
+                title: consensus params for current block
               app_hash:
                 type: string
                 format: byte
+                title: state after txs from the previous block
               last_results_hash:
                 type: string
                 format: byte
+                title: root hash of all results from the txs from the previous block
               evidence_hash:
                 type: string
                 format: byte
+                description: evidence included in the block
                 title: consensus info
               proposer_address:
                 type: string
                 format: byte
+                title: original proposer of the block
             description: Header defines the structure of a Tendermint block header.
           commit:
             type: object
@@ -32085,33 +31730,44 @@ definitions:
                   last_commit_hash:
                     type: string
                     format: byte
+                    description: commit from validators from the last block
                     title: hashes of block data
                   data_hash:
                     type: string
                     format: byte
+                    title: transactions
                   validators_hash:
                     type: string
                     format: byte
+                    description: validators for the current block
                     title: hashes from the app output from the prev block
                   next_validators_hash:
                     type: string
                     format: byte
+                    title: validators for the next block
                   consensus_hash:
                     type: string
                     format: byte
+                    title: consensus params for current block
                   app_hash:
                     type: string
                     format: byte
+                    title: state after txs from the previous block
                   last_results_hash:
                     type: string
                     format: byte
+                    title: >-
+                      root hash of all results from the txs from the previous
+                      block
                   evidence_hash:
                     type: string
                     format: byte
+                    description: evidence included in the block
                     title: consensus info
                   proposer_address:
                     type: string
                     format: byte
+                    title: original proposer of the block
                 description: Header defines the structure of a Tendermint block header.
               commit:
                 type: object
@@ -32324,33 +31980,42 @@ definitions:
           last_commit_hash:
             type: string
             format: byte
+            description: commit from validators from the last block
             title: hashes of block data
           data_hash:
             type: string
             format: byte
+            title: transactions
           validators_hash:
             type: string
             format: byte
+            description: validators for the current block
             title: hashes from the app output from the prev block
           next_validators_hash:
             type: string
             format: byte
+            title: validators for the next block
           consensus_hash:
             type: string
             format: byte
+            title: consensus params for current block
           app_hash:
             type: string
             format: byte
+            title: state after txs from the previous block
           last_results_hash:
             type: string
             format: byte
+            title: root hash of all results from the txs from the previous block
           evidence_hash:
             type: string
             format: byte
+            description: evidence included in the block
             title: consensus info
           proposer_address:
             type: string
             format: byte
+            title: original proposer of the block
         description: Header defines the structure of a Tendermint block header.
       commit:
         type: object
@@ -32537,6 +32202,7 @@ definitions:
                 format: byte
             title: PartsetHeader
         title: BlockID
+        description: zero if vote is nil.
       timestamp:
         type: string
         format: date-time
@@ -33650,6 +33316,7 @@ definitions:
                     format: byte
                   index:
                     type: boolean
+                    title: nondeterministic
                 description: >-
                   EventAttribute is a single key-value pair, associated with an
                   event.
@@ -33957,6 +33624,7 @@ definitions:
                     format: byte
                   index:
                     type: boolean
+                    title: nondeterministic
                 description: >-
                   EventAttribute is a single key-value pair, associated with an
                   event.
@@ -34440,6 +34108,7 @@ definitions:
                         format: byte
                       index:
                         type: boolean
+                        title: nondeterministic
                     description: >-
                       EventAttribute is a single key-value pair, associated with
                       an event.
@@ -34604,33 +34273,42 @@ definitions:
               last_commit_hash:
                 type: string
                 format: byte
+                description: commit from validators from the last block
                 title: hashes of block data
               data_hash:
                 type: string
                 format: byte
+                title: transactions
               validators_hash:
                 type: string
                 format: byte
+                description: validators for the current block
                 title: hashes from the app output from the prev block
               next_validators_hash:
                 type: string
                 format: byte
+                title: validators for the next block
               consensus_hash:
                 type: string
                 format: byte
+                title: consensus params for current block
               app_hash:
                 type: string
                 format: byte
+                title: state after txs from the previous block
               last_results_hash:
                 type: string
                 format: byte
+                title: root hash of all results from the txs from the previous block
               evidence_hash:
                 type: string
                 format: byte
+                description: evidence included in the block
                 title: consensus info
               proposer_address:
                 type: string
                 format: byte
+                title: original proposer of the block
             description: Header defines the structure of a Tendermint block header.
           data:
             type: object
@@ -34699,6 +34377,7 @@ definitions:
                                       format: byte
                                   title: PartsetHeader
                               title: BlockID
+                              description: zero if vote is nil.
                             timestamp:
                               type: string
                               format: date-time
@@ -34756,6 +34435,7 @@ definitions:
                                       format: byte
                                   title: PartsetHeader
                               title: BlockID
+                              description: zero if vote is nil.
                             timestamp:
                               type: string
                               format: date-time
@@ -34844,35 +34524,48 @@ definitions:
                                     last_commit_hash:
                                       type: string
                                       format: byte
+                                      description: >-
+                                        commit from validators from the last
+                                        block
                                       title: hashes of block data
                                     data_hash:
                                       type: string
                                       format: byte
+                                      title: transactions
                                     validators_hash:
                                       type: string
                                       format: byte
+                                      description: validators for the current block
                                       title: >-
                                         hashes from the app output from the prev
                                         block
                                     next_validators_hash:
                                       type: string
                                       format: byte
+                                      title: validators for the next block
                                     consensus_hash:
                                       type: string
                                       format: byte
+                                      title: consensus params for current block
                                     app_hash:
                                       type: string
                                       format: byte
+                                      title: state after txs from the previous block
                                     last_results_hash:
                                       type: string
                                       format: byte
+                                      title: >-
+                                        root hash of all results from the txs
+                                        from the previous block
                                     evidence_hash:
                                       type: string
                                       format: byte
+                                      description: evidence included in the block
                                       title: consensus info
                                     proposer_address:
                                       type: string
                                       format: byte
+                                      title: original proposer of the block
                                   description: >-
                                     Header defines the structure of a Tendermint
                                     block header.
@@ -35387,6 +35080,7 @@ definitions:
                         format: byte
                       index:
                         type: boolean
+                        title: nondeterministic
                     description: >-
                       EventAttribute is a single key-value pair, associated with
                       an event.
@@ -35709,6 +35403,7 @@ definitions:
                           format: byte
                         index:
                           type: boolean
+                          title: nondeterministic
                       description: >-
                         EventAttribute is a single key-value pair, associated
                         with an event.
@@ -36157,6 +35852,7 @@ definitions:
                         format: byte
                       index:
                         type: boolean
+                        title: nondeterministic
                     description: >-
                       EventAttribute is a single key-value pair, associated with
                       an event.
@@ -37315,6 +37011,7 @@ definitions:
               format: byte
             index:
               type: boolean
+              title: nondeterministic
           description: EventAttribute is a single key-value pair, associated with an event.
     description: >-
       Event allows application developers to attach additional information to
@@ -37334,6 +37031,7 @@ definitions:
         format: byte
       index:
         type: boolean
+        title: nondeterministic
     description: EventAttribute is a single key-value pair, associated with an event.
   cosmos.upgrade.v1beta1.ModuleVersion:
     type: object
@@ -45072,29 +44770,7 @@ definitions:
         type: string
         format: int64
     title: ValidatorUpdate
-  nicholasdotsol.duality.dex.AdjanceyMatrix:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uint64
-      edgeRow:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uint64
-          edge:
-            type: boolean
-  nicholasdotsol.duality.dex.EdgeRow:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uint64
-      edge:
-        type: boolean
-  nicholasdotsol.duality.dex.FeeList:
+  nicholasdotsol.duality.dex.FeeTier:
     type: object
     properties:
       id:
@@ -45124,15 +44800,6 @@ definitions:
         type: string
       totalTokenOut:
         type: string
-  nicholasdotsol.duality.dex.LimitOrderTrancheTrancheIndexes:
-    type: object
-    properties:
-      fillTrancheIndex:
-        type: string
-        format: uint64
-      placeTrancheIndex:
-        type: string
-        format: uint64
   nicholasdotsol.duality.dex.LimitOrderTrancheUser:
     type: object
     properties:
@@ -45154,6 +44821,15 @@ definitions:
         type: string
       sharesCancelled:
         type: string
+  nicholasdotsol.duality.dex.LimitTrancheIndexes:
+    type: object
+    properties:
+      fillTrancheIndex:
+        type: string
+        format: uint64
+      placeTrancheIndex:
+        type: string
+        format: uint64
   nicholasdotsol.duality.dex.MsgCancelLimitOrderResponse:
     type: object
   nicholasdotsol.duality.dex.MsgDepositResponse:
@@ -45188,115 +44864,13 @@ definitions:
     type: object
   nicholasdotsol.duality.dex.MsgWithdrawlResponse:
     type: object
-  nicholasdotsol.duality.dex.PairMap:
-    type: object
-    properties:
-      pairId:
-        type: string
-      tokenPair:
-        type: object
-        properties:
-          currentTick0To1:
-            type: string
-            format: int64
-          currentTick1To0:
-            type: string
-            format: int64
-      maxTick:
-        type: string
-        format: int64
-      minTick:
-        type: string
-        format: int64
   nicholasdotsol.duality.dex.Params:
     type: object
     description: Params defines the parameters for the module.
-  nicholasdotsol.duality.dex.QueryAllAdjanceyMatrixResponse:
+  nicholasdotsol.duality.dex.QueryAllFeeTierResponse:
     type: object
     properties:
-      AdjanceyMatrix:
-        type: array
-        items:
-          type: object
-          properties:
-            id:
-              type: string
-              format: uint64
-            edgeRow:
-              type: object
-              properties:
-                id:
-                  type: string
-                  format: uint64
-                edge:
-                  type: boolean
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
-  nicholasdotsol.duality.dex.QueryAllEdgeRowResponse:
-    type: object
-    properties:
-      EdgeRow:
-        type: array
-        items:
-          type: object
-          properties:
-            id:
-              type: string
-              format: uint64
-            edge:
-              type: boolean
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
-  nicholasdotsol.duality.dex.QueryAllFeeListResponse:
-    type: object
-    properties:
-      FeeList:
+      FeeTier:
         type: array
         items:
           type: object
@@ -45434,105 +45008,10 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  nicholasdotsol.duality.dex.QueryAllPairMapResponse:
+  nicholasdotsol.duality.dex.QueryAllTickResponse:
     type: object
     properties:
-      pairMap:
-        type: array
-        items:
-          type: object
-          properties:
-            pairId:
-              type: string
-            tokenPair:
-              type: object
-              properties:
-                currentTick0To1:
-                  type: string
-                  format: int64
-                currentTick1To0:
-                  type: string
-                  format: int64
-            maxTick:
-              type: string
-              format: int64
-            minTick:
-              type: string
-              format: int64
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
-  nicholasdotsol.duality.dex.QueryAllSharesResponse:
-    type: object
-    properties:
-      shares:
-        type: array
-        items:
-          type: object
-          properties:
-            address:
-              type: string
-            pairId:
-              type: string
-            tickIndex:
-              type: string
-              format: int64
-            feeIndex:
-              type: string
-              format: uint64
-            sharesOwned:
-              type: string
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
-  nicholasdotsol.duality.dex.QueryAllTickMapResponse:
-    type: object
-    properties:
-      tickMap:
+      Tick:
         type: array
         items:
           type: object
@@ -45545,15 +45024,10 @@ definitions:
             tickData:
               type: object
               properties:
-                reserve0AndShares:
+                reserve0:
                   type: array
                   items:
-                    type: object
-                    properties:
-                      reserve0:
-                        type: string
-                      totalShares:
-                        type: string
+                    type: string
                 reserve1:
                   type: array
                   items:
@@ -45576,6 +45050,8 @@ definitions:
                 placeTrancheIndex:
                   type: string
                   format: uint64
+            price0To1:
+              type: string
       pagination:
         type: object
         properties:
@@ -45677,38 +45153,57 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  nicholasdotsol.duality.dex.QueryGetAdjanceyMatrixResponse:
+  nicholasdotsol.duality.dex.QueryAllTradingPairResponse:
     type: object
     properties:
-      AdjanceyMatrix:
+      TradingPair:
+        type: array
+        items:
+          type: object
+          properties:
+            pairId:
+              type: string
+            currentTick0To1:
+              type: string
+              format: int64
+            currentTick1To0:
+              type: string
+              format: int64
+            maxTick:
+              type: string
+              format: int64
+            minTick:
+              type: string
+              format: int64
+      pagination:
         type: object
         properties:
-          id:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
             type: string
             format: uint64
-          edgeRow:
-            type: object
-            properties:
-              id:
-                type: string
-                format: uint64
-              edge:
-                type: boolean
-  nicholasdotsol.duality.dex.QueryGetEdgeRowResponse:
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  nicholasdotsol.duality.dex.QueryGetFeeTierResponse:
     type: object
     properties:
-      EdgeRow:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uint64
-          edge:
-            type: boolean
-  nicholasdotsol.duality.dex.QueryGetFeeListResponse:
-    type: object
-    properties:
-      FeeList:
+      FeeTier:
         type: object
         properties:
           id:
@@ -45765,51 +45260,10 @@ definitions:
             type: string
           sharesCancelled:
             type: string
-  nicholasdotsol.duality.dex.QueryGetPairMapResponse:
+  nicholasdotsol.duality.dex.QueryGetTickResponse:
     type: object
     properties:
-      pairMap:
-        type: object
-        properties:
-          pairId:
-            type: string
-          tokenPair:
-            type: object
-            properties:
-              currentTick0To1:
-                type: string
-                format: int64
-              currentTick1To0:
-                type: string
-                format: int64
-          maxTick:
-            type: string
-            format: int64
-          minTick:
-            type: string
-            format: int64
-  nicholasdotsol.duality.dex.QueryGetSharesResponse:
-    type: object
-    properties:
-      shares:
-        type: object
-        properties:
-          address:
-            type: string
-          pairId:
-            type: string
-          tickIndex:
-            type: string
-            format: int64
-          feeIndex:
-            type: string
-            format: uint64
-          sharesOwned:
-            type: string
-  nicholasdotsol.duality.dex.QueryGetTickMapResponse:
-    type: object
-    properties:
-      tickMap:
+      Tick:
         type: object
         properties:
           pairId:
@@ -45820,15 +45274,10 @@ definitions:
           tickData:
             type: object
             properties:
-              reserve0AndShares:
+              reserve0:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    reserve0:
-                      type: string
-                    totalShares:
-                      type: string
+                  type: string
               reserve1:
                 type: array
                 items:
@@ -45851,6 +45300,8 @@ definitions:
               placeTrancheIndex:
                 type: string
                 format: uint64
+          price0To1:
+            type: string
   nicholasdotsol.duality.dex.QueryGetTokenMapResponse:
     type: object
     properties:
@@ -45873,6 +45324,26 @@ definitions:
             format: uint64
           address:
             type: string
+  nicholasdotsol.duality.dex.QueryGetTradingPairResponse:
+    type: object
+    properties:
+      TradingPair:
+        type: object
+        properties:
+          pairId:
+            type: string
+          currentTick0To1:
+            type: string
+            format: int64
+          currentTick1To0:
+            type: string
+            format: int64
+          maxTick:
+            type: string
+            format: int64
+          minTick:
+            type: string
+            format: int64
   nicholasdotsol.duality.dex.QueryParamsResponse:
     type: object
     properties:
@@ -45880,45 +45351,7 @@ definitions:
         description: params holds all the parameters of this module.
         type: object
     description: QueryParamsResponse is response type for the Query/Params RPC method.
-  nicholasdotsol.duality.dex.Reserve0AndSharesType:
-    type: object
-    properties:
-      reserve0:
-        type: string
-      totalShares:
-        type: string
-  nicholasdotsol.duality.dex.Shares:
-    type: object
-    properties:
-      address:
-        type: string
-      pairId:
-        type: string
-      tickIndex:
-        type: string
-        format: int64
-      feeIndex:
-        type: string
-        format: uint64
-      sharesOwned:
-        type: string
-  nicholasdotsol.duality.dex.TickDataType:
-    type: object
-    properties:
-      reserve0AndShares:
-        type: array
-        items:
-          type: object
-          properties:
-            reserve0:
-              type: string
-            totalShares:
-              type: string
-      reserve1:
-        type: array
-        items:
-          type: string
-  nicholasdotsol.duality.dex.TickMap:
+  nicholasdotsol.duality.dex.Tick:
     type: object
     properties:
       pairId:
@@ -45929,15 +45362,10 @@ definitions:
       tickData:
         type: object
         properties:
-          reserve0AndShares:
+          reserve0:
             type: array
             items:
-              type: object
-              properties:
-                reserve0:
-                  type: string
-                totalShares:
-                  type: string
+              type: string
           reserve1:
             type: array
             items:
@@ -45960,21 +45388,25 @@ definitions:
           placeTrancheIndex:
             type: string
             format: uint64
+      price0To1:
+        type: string
+  nicholasdotsol.duality.dex.TickDataType:
+    type: object
+    properties:
+      reserve0:
+        type: array
+        items:
+          type: string
+      reserve1:
+        type: array
+        items:
+          type: string
   nicholasdotsol.duality.dex.TokenMap:
     type: object
     properties:
       address:
         type: string
       index:
-        type: string
-        format: int64
-  nicholasdotsol.duality.dex.TokenPairType:
-    type: object
-    properties:
-      currentTick0To1:
-        type: string
-        format: int64
-      currentTick1To0:
         type: string
         format: int64
   nicholasdotsol.duality.dex.Tokens:
@@ -45985,3 +45417,20 @@ definitions:
         format: uint64
       address:
         type: string
+  nicholasdotsol.duality.dex.TradingPair:
+    type: object
+    properties:
+      pairId:
+        type: string
+      currentTick0To1:
+        type: string
+        format: int64
+      currentTick1To0:
+        type: string
+        format: int64
+      maxTick:
+        type: string
+        format: int64
+      minTick:
+        type: string
+        format: int64

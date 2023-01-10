@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/NicholasDotSol/duality/testutil/sample"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 )
@@ -15,15 +16,51 @@ func TestMsgPlaceLimitOrder_ValidateBasic(t *testing.T) {
 		err  error
 	}{
 		{
-			name: "invalid address",
+			name: "invalid creator",
 			msg: MsgPlaceLimitOrder{
-				Creator: "invalid_address",
+				Creator:   "invalid_address",
+				Receiver:  sample.AccAddress(),
+				TokenA:    "TokenA",
+				TokenB:    "TokenB",
+				TickIndex: 0,
+				TokenIn:   "TokenA",
+				AmountIn:  sdk.OneInt(),
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
-			name: "valid address",
+			name: "invalid receiver",
 			msg: MsgPlaceLimitOrder{
-				Creator: sample.AccAddress(),
+				Creator:   sample.AccAddress(),
+				Receiver:  "invalid_address",
+				TokenA:    "TokenA",
+				TokenB:    "TokenB",
+				TickIndex: 0,
+				TokenIn:   "TokenA",
+				AmountIn:  sdk.OneInt(),
+			},
+			err: sdkerrors.ErrInvalidAddress,
+		}, {
+			name: "invalid tokenIn",
+			msg: MsgPlaceLimitOrder{
+				Creator:   sample.AccAddress(),
+				Receiver:  sample.AccAddress(),
+				TokenA:    "TokenA",
+				TokenB:    "TokenB",
+				TickIndex: 0,
+				TokenIn:   "TokenC",
+				AmountIn:  sdk.OneInt(),
+			},
+			err: ErrInvalidTradingPair,
+		}, {
+			name: "valid msg",
+			msg: MsgPlaceLimitOrder{
+				Creator:   sample.AccAddress(),
+				Receiver:  sample.AccAddress(),
+				TokenA:    "TokenA",
+				TokenB:    "TokenB",
+				TickIndex: 0,
+				TokenIn:   "TokenA",
+				AmountIn:  sdk.OneInt(),
 			},
 		},
 	}

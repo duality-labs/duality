@@ -1,0 +1,240 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "duality/dex/params.proto";
+import "duality/dex/tick.proto";
+import "duality/dex/trading_pair.proto";
+import "duality/dex/tokens.proto";
+import "duality/dex/token_map.proto";
+import "duality/dex/fee_tier.proto";
+import "duality/dex/limit_order_tranche_user.proto";
+import "duality/dex/limit_order_tranche.proto";
+// this line is used by starport scaffolding # 1
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/NicholasDotSol/duality/dex/params";
+  }
+  // Queries a Tick by index.
+	rpc Tick(QueryGetTickRequest) returns (QueryGetTickResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick/{pairId}/{tickIndex}";
+	}
+
+	// Queries a list of Tick items.
+	rpc TickAll(QueryAllTickRequest) returns (QueryAllTickResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick";
+	}
+
+// Queries a TradingPair by index.
+	rpc TradingPair(QueryGetTradingPairRequest) returns (QueryGetTradingPairResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/trading_pair/{pairId}";
+	}
+
+	// Queries a list of TradingPair items.
+	rpc TradingPairAll(QueryAllTradingPairRequest) returns (QueryAllTradingPairResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/trading_pair";
+	}
+
+// Queries a Tokens by id.
+	rpc Tokens(QueryGetTokensRequest) returns (QueryGetTokensResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/tokens/{id}";
+	}
+
+	// Queries a list of Tokens items.
+	rpc TokensAll(QueryAllTokensRequest) returns (QueryAllTokensResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/tokens";
+	}
+
+// Queries a TokenMap by index.
+	rpc TokenMap(QueryGetTokenMapRequest) returns (QueryGetTokenMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/token_map/{address}";
+	}
+
+	// Queries a list of TokenMap items.
+	rpc TokenMapAll(QueryAllTokenMapRequest) returns (QueryAllTokenMapResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/token_map";
+	}
+
+// Queries a FeeTier by id.
+	rpc FeeTier(QueryGetFeeTierRequest) returns (QueryGetFeeTierResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/fee_tier/{id}";
+	}
+
+	// Queries a list of FeeTier items.
+	rpc FeeTierAll(QueryAllFeeTierRequest) returns (QueryAllFeeTierResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/fee_tier";
+	}
+
+  // Queries a LimitOrderTrancheUser by index.
+	rpc LimitOrderTrancheUser(QueryGetLimitOrderTrancheUserRequest) returns (QueryGetLimitOrderTrancheUserResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{count}/{address}";
+	}
+
+	// Queries a list of LimitOrderTrancheMap items.
+	rpc LimitOrderTrancheUserAll(QueryAllLimitOrderTrancheUserRequest) returns (QueryAllLimitOrderTrancheUserResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_tranche_user";
+	}
+
+  // Queries a LimitOrderTranche by index.
+	rpc LimitOrderTranche(QueryGetLimitOrderTrancheRequest) returns (QueryGetLimitOrderTrancheResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_tranche/{pairId}/{token}/{tickIndex}/{trancheIndex}";
+	}
+
+	// Queries a list of LimitOrderTranche items.
+	rpc LimitOrderTrancheAll(QueryAllLimitOrderTrancheRequest) returns (QueryAllLimitOrderTrancheResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_tranche";
+	}
+
+// this line is used by starport scaffolding # 2
+}
+
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryGetTickRequest {
+	  int64 tickIndex = 1;
+	  string pairId = 2;
+	  
+
+}
+
+message QueryGetTickResponse {
+	Tick Tick = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllTickRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllTickResponse {
+	repeated Tick Tick = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetTradingPairRequest {
+	  string pairId = 1;
+
+}
+
+message QueryGetTradingPairResponse {
+	TradingPair TradingPair = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllTradingPairRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllTradingPairResponse {
+	repeated TradingPair TradingPair = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetTokensRequest {
+	uint64 id = 1;
+}
+
+message QueryGetTokensResponse {
+	Tokens Tokens = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllTokensRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllTokensResponse {
+	repeated Tokens Tokens = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetTokenMapRequest {
+	  string address = 1;
+
+}
+
+message QueryGetTokenMapResponse {
+	TokenMap tokenMap = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllTokenMapRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllTokenMapResponse {
+	repeated TokenMap tokenMap = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetFeeTierRequest {
+	uint64 id = 1;
+}
+
+message QueryGetFeeTierResponse {
+	FeeTier FeeTier = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllFeeTierRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllFeeTierResponse {
+	repeated FeeTier FeeTier = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetLimitOrderTrancheUserRequest {
+  string pairId = 1;
+  int64 tickIndex =2;
+  string token = 3;
+    uint64 count = 4;
+  string address = 5;
+
+}
+
+message QueryGetLimitOrderTrancheUserResponse {
+	LimitOrderTrancheUser LimitOrderTrancheUser = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllLimitOrderTrancheUserRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllLimitOrderTrancheUserResponse {
+	repeated LimitOrderTrancheUser LimitOrderTrancheUser = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetLimitOrderTrancheRequest {
+	  string pairId = 1;
+  int64 tickIndex =2;
+  string token = 3;
+    uint64 trancheIndex = 4;
+
+}
+
+message QueryGetLimitOrderTrancheResponse {
+	LimitOrderTranche LimitOrderTranche = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllLimitOrderTrancheRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllLimitOrderTrancheResponse {
+	repeated LimitOrderTranche LimitOrderTranche = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// this line is used by starport scaffolding # 3

@@ -1,7 +1,6 @@
 package types
 
 import (
-	fmt "fmt"
 	"strconv"
 )
 
@@ -24,6 +23,10 @@ const (
 	Separator = "/"
 )
 
+const (
+	DepositSharesPrefix = "DualityLPShares"
+)
+
 func KeyPrefix(p string) []byte {
 	key := []byte(p)
 	key = append(key, []byte("/")...)
@@ -37,18 +40,15 @@ const (
 	// TokenMapKeyPrefix is the prefix to retrieve all TokenMap
 	TokenMapKeyPrefix = "TokenMap/value"
 
-	// TickMapKeyPrefix is the prefix to retrieve all TickMap
-	BaseTickMapKeyPrefix = "TickMap/value"
+	// TickKeyPrefix is the prefix to retrieve all Tick
+	BaseTickKeyPrefix = "Tick/value"
 
-	// PairMapKeyPrefix is the prefix to retrieve all PairMap
-	PairMapKeyPrefix = "PairMap/value"
-
-	// SharesKeyPrefix is the prefix to retrieve all Shares
-	SharesKeyPrefix = "Shares/value"
+	// TradingPairKeyPrefix is the prefix to retrieve all TradingPair
+	TradingPairKeyPrefix = "TradingPair/value"
 )
 
 func TickPrefix(pairId string) []byte {
-	return append(KeyPrefix(BaseTickMapKeyPrefix), KeyPrefix(pairId)...)
+	return append(KeyPrefix(BaseTickKeyPrefix), KeyPrefix(pairId)...)
 }
 
 // TokenMapKey returns the store key to retrieve a TokenMap from the index fields
@@ -62,7 +62,7 @@ func TokenMapKey(address string) []byte {
 	return key
 }
 
-func TickMapKey(pairId string, tickIndex int64) []byte {
+func TickKey(pairId string, tickIndex int64) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)
@@ -76,34 +76,11 @@ func TickMapKey(pairId string, tickIndex int64) []byte {
 	return key
 }
 
-func PairMapKey(pairId string) []byte {
+func TradingPairKey(pairId string) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId)
 	key = append(key, pairIdBytes...)
-	key = append(key, []byte("/")...)
-
-	return key
-}
-
-// SharesKey returns the store key to retrieve a Shares from the index fields
-func SharesKey(address string, pairId string, tickIndex int64, feeIndex uint64) []byte {
-	var key []byte
-
-	addressBytes := []byte(address)
-	key = append(key, addressBytes...)
-	key = append(key, []byte("/")...)
-
-	pairIdBytes := []byte(pairId)
-	key = append(key, pairIdBytes...)
-	key = append(key, []byte("/")...)
-
-	tickIndexBytes := []byte(fmt.Sprint(tickIndex))
-	key = append(key, tickIndexBytes...)
-	key = append(key, []byte("/")...)
-
-	feeBytes := []byte(fmt.Sprint(feeIndex))
-	key = append(key, feeBytes...)
 	key = append(key, []byte("/")...)
 
 	return key
@@ -344,16 +321,6 @@ const (
 )
 
 const (
-	FeeListKey      = "FeeList-value-"
-	FeeListCountKey = "FeeList-count-"
-)
-
-const (
-	EdgeRowKey      = "EdgeRow-value-"
-	EdgeRowCountKey = "EdgeRow-count-"
-)
-
-const (
-	AdjanceyMatrixKey      = "AdjanceyMatrix-value-"
-	AdjanceyMatrixCountKey = "AdjanceyMatrix-count-"
+	FeeTierKey      = "FeeTier-value-"
+	FeeTierCountKey = "FeeTier-count-"
 )

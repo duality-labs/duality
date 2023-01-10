@@ -10,7 +10,7 @@ import (
 var (
 	ErrNoSpendableCoins                   = sdkerrors.Register(ModuleName, 1100, "No Spendable Coins found: %s")
 	ErrNotEnoughCoins                     = sdkerrors.Register(ModuleName, 1101, "Not enough Spendable Coins found: %s")
-	ErrInvalidTokenPair                   = sdkerrors.Register(ModuleName, 1102, "Invalid Token Pair: (%s, %s)")
+	ErrInvalidTradingPair                 = sdkerrors.Register(ModuleName, 1102, "Invalid Token Pair: (%s, %s)")
 	ErrInvalidTokenListSize               = sdkerrors.Register(ModuleName, 1103, "Invalid Array: Array Tokens0 size does not equal Array Tokens1")
 	ErrNotEnoughShares                    = sdkerrors.Register(ModuleName, 1104, "Not enough shares are owned by:  %s")
 	ErrValidShareNotFound                 = sdkerrors.Register(ModuleName, 1105, "Valid share not found")
@@ -24,4 +24,5 @@ var (
 	ErrNotEnoughLiquidity                 = sdkerrors.Register(ModuleName, 1114, "There is no liquidity to complete this transaction")
 	ErrDepositBehindPairLiquidity         = sdkerrors.Register(ModuleName, 1115, "Depositing behind the opposite token pair's liquidity is currently not allowed")
 	ErrPlaceLimitOrderBehindPairLiquidity = sdkerrors.Register(ModuleName, 1116, "Placing a limit order behind the opposite token pair's liquidity is currently not allowed")
+	ErrTickOutsideRange                   = sdkerrors.Register(ModuleName, 1117, "Supplying a tick outside the range of [-1048575, 1048575] is not allowed")
 )

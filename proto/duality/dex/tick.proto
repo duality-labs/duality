@@ -1,0 +1,24 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+
+import "duality/dex/tick_data_type.proto";
+import "duality/dex/limit_tranche_indexes.proto";
+import "gogoproto/gogo.proto";
+
+message Tick {
+  string pairId = 1;
+  int64 tickIndex = 2; 
+  TickDataType tickData = 3; 
+  LimitTrancheIndexes LimitOrderTranche0to1 = 4;
+  LimitTrancheIndexes LimitOrderTranche1to0 = 5;
+  string price0To1 = 6  [
+                         (gogoproto.moretags)   = "yaml:\"price0To1\"",
+                         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+                         (gogoproto.nullable)   = true,
+                         (gogoproto.jsontag) = "price0To1"
+                         ];
+
+}
+

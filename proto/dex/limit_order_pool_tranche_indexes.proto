@@ -1,9 +1,0 @@
-syntax = "proto3";
-package nicholasdotsol.duality.dex;
-
-option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
-
-message LimitOrderTrancheTrancheIndexes {
-  uint64 fillTrancheIndex = 1; 
-  uint64 placeTrancheIndex = 2; 
-}

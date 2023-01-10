@@ -2,12 +2,14 @@ package cli
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -15,9 +17,6 @@ var _ = strconv.Itoa(0)
 
 func CmdWithdrawl() *cobra.Command {
 
-	var sharesToRemove []string
-	var TicksIndexes []string
-	var FeesIndexes []string
 	cmd := &cobra.Command{
 		Use:   "withdrawl [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fee indexes] ",
 		Short: "Broadcast message withdrawl",
@@ -27,20 +26,24 @@ func CmdWithdrawl() *cobra.Command {
 			argTokenA := args[1]
 			argTokenB := args[2]
 
-			var sharesToRemoveDec []sdk.Dec
+			argSharesToRemove := strings.Split(args[3], ",")
+			argTickIndexes := strings.Split(args[4], ",")
+			argFeeIndexes := strings.Split(args[5], ",")
+
+			var SharesToRemoveInt []sdk.Int
 			var TicksIndexesInt []int64
 			var FeeIndexesUint []uint64
-			for _, s := range sharesToRemove {
-				sharesDec, err := sdk.NewDecFromStr(s)
+			for _, s := range argSharesToRemove {
+				sharesToRemoveInt, ok := sdk.NewIntFromString(s)
 
-				if err != nil {
-					return err
+				if ok != true {
+					return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer Overflow for shares-to-remove")
 				}
 
-				sharesToRemoveDec = append(sharesToRemoveDec, sharesDec)
+				SharesToRemoveInt = append(SharesToRemoveInt, sharesToRemoveInt)
 			}
 
-			for _, s := range TicksIndexes {
+			for _, s := range argTickIndexes {
 				TickIndexInt, err := strconv.Atoi(s)
 
 				if err != nil {
@@ -51,7 +54,7 @@ func CmdWithdrawl() *cobra.Command {
 
 			}
 
-			for _, s := range FeesIndexes {
+			for _, s := range argFeeIndexes {
 				FeeIndexInt, err := strconv.Atoi(s)
 
 				if err != nil {
@@ -71,7 +74,7 @@ func CmdWithdrawl() *cobra.Command {
 				argReceiver,
 				argTokenA,
 				argTokenB,
-				sharesToRemoveDec,
+				SharesToRemoveInt,
 				TicksIndexesInt,
 				FeeIndexesUint,
 			)
@@ -83,9 +86,6 @@ func CmdWithdrawl() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
-	cmd.Flags().StringArrayVarP(&sharesToRemove, "sharesToRemove", "r", []string{}, "")
-	cmd.Flags().StringArrayVarP(&TicksIndexes, "ticksIndexes", "t", []string{}, "")
-	cmd.Flags().StringArrayVarP(&FeesIndexes, "feeIndexes", "f", []string{}, "")
 
 	return cmd
 }
