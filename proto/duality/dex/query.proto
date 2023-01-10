@@ -12,6 +12,8 @@ import "duality/dex/token_map.proto";
 import "duality/dex/fee_tier.proto";
 import "duality/dex/limit_order_tranche_user.proto";
 import "duality/dex/limit_order_tranche.proto";
+import "duality/dex/user_positions.proto";
+import "duality/dex/deposit_record.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
@@ -90,6 +92,21 @@ service Query {
 	// Queries a list of LimitOrderTranche items.
 	rpc LimitOrderTrancheAll(QueryAllLimitOrderTrancheRequest) returns (QueryAllLimitOrderTrancheResponse) {
 		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_tranche";
+	}
+
+// Queries a list of GetUserPositions items.
+	rpc GetUserPositions(QueryGetUserPositionsRequest) returns (QueryGetUserPositionsResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/user/positions/{address}";
+	}
+
+// Queries a list of UserDeposits items.
+	rpc UserDepositsAll(QueryAllUserDepositsRequest) returns (QueryAllUserDepositsResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/user/deposits/{address}";
+	}
+
+// Queries a list of UserLimitOrders items.
+	rpc UserLimitOrdersAll(QueryAllUserLimitOrdersRequest) returns (QueryAllUserLimitOrdersResponse) {
+		option (google.api.http).get = "/NicholasDotSol/duality/dex/user/limit_orders/{address}";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -236,5 +253,32 @@ message QueryAllLimitOrderTrancheResponse {
 	repeated LimitOrderTranche LimitOrderTranche = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
+
+message QueryGetUserPositionsRequest {
+  string address = 1;
+}
+
+message QueryGetUserPositionsResponse {
+  UserPositions UserPositions = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllUserDepositsRequest {
+  string address = 1;
+}
+
+message QueryAllUserDepositsResponse {
+  repeated DepositRecord Deposits = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllUserLimitOrdersRequest {
+  string address = 1;
+}
+
+message QueryAllUserLimitOrdersResponse {
+  repeated LimitOrderTrancheUser limitOrders = 1 [(gogoproto.nullable) = false];
+}
+
+
+
 
 // this line is used by starport scaffolding # 3
