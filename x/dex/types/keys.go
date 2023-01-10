@@ -344,8 +344,8 @@ const (
 )
 
 const (
-	FeeTierKey      = "FeeTier-value-"
-	FeeTierCountKey = "FeeTier-count-"
+	FeeListKey      = "FeeList-value-"
+	FeeListCountKey = "FeeList-count-"
 )
 
 const (

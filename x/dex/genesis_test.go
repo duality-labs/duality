@@ -53,7 +53,7 @@ func TestGenesis(t *testing.T) {
 				FeeIndex:  uint64(1),
 			},
 		},
-		FeeTierList: []types.FeeTier{
+		FeeListList: []types.FeeList{
 			{
 				Id: 0,
 			},
@@ -61,7 +61,7 @@ func TestGenesis(t *testing.T) {
 				Id: 1,
 			},
 		},
-		FeeTierCount: 2,
+		FeeListCount: 2,
 		EdgeRowList: []types.EdgeRow{
 			{
 				Id: 0,
@@ -114,8 +114,8 @@ func TestGenesis(t *testing.T) {
 	require.ElementsMatch(t, genesisState.TokensList, got.TokensList)
 	require.Equal(t, genesisState.TokensCount, got.TokensCount)
 	require.ElementsMatch(t, genesisState.SharesList, got.SharesList)
-	require.ElementsMatch(t, genesisState.FeeTierList, got.FeeTierList)
-	require.Equal(t, genesisState.FeeTierCount, got.FeeTierCount)
+	require.ElementsMatch(t, genesisState.FeeListList, got.FeeListList)
+	require.Equal(t, genesisState.FeeListCount, got.FeeListCount)
 	require.ElementsMatch(t, genesisState.EdgeRowList, got.EdgeRowList)
 	require.Equal(t, genesisState.EdgeRowCount, got.EdgeRowCount)
 	require.ElementsMatch(t, genesisState.AdjanceyMatrixList, got.AdjanceyMatrixList)

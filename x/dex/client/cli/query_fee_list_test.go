@@ -17,27 +17,27 @@ import (
 	"github.com/NicholasDotSol/duality/x/dex/types"
 )
 
-func networkWithFeeTierObjects(t *testing.T, n int) (*network.Network, []types.FeeTier) {
+func networkWithFeeListObjects(t *testing.T, n int) (*network.Network, []types.FeeList) {
 	t.Helper()
 	cfg := network.DefaultConfig()
 	state := types.GenesisState{}
 	require.NoError(t, cfg.Codec.UnmarshalJSON(cfg.GenesisState[types.ModuleName], &state))
 
 	for i := 0; i < n; i++ {
-		FeeTier := types.FeeTier{
+		feeList := types.FeeList{
 			Id: uint64(i),
 		}
-		nullify.Fill(&FeeTier)
-		state.FeeTierList = append(state.FeeTierList, FeeTier)
+		nullify.Fill(&feeList)
+		state.FeeListList = append(state.FeeListList, feeList)
 	}
 	buf, err := cfg.Codec.MarshalJSON(&state)
 	require.NoError(t, err)
 	cfg.GenesisState[types.ModuleName] = buf
-	return network.New(t, cfg), state.FeeTierList
+	return network.New(t, cfg), state.FeeListList
 }
 
-func TestShowFeeTier(t *testing.T) {
-	net, objs := networkWithFeeTierObjects(t, 2)
+func TestShowFeeList(t *testing.T) {
+	net, objs := networkWithFeeListObjects(t, 2)
 
 	ctx := net.Validators[0].ClientCtx
 	common := []string{
@@ -48,7 +48,7 @@ func TestShowFeeTier(t *testing.T) {
 		id   string
 		args []string
 		err  error
-		obj  types.FeeTier
+		obj  types.FeeList
 	}{
 		{
 			desc: "found",
@@ -67,27 +67,27 @@ func TestShowFeeTier(t *testing.T) {
 		t.Run(tc.desc, func(t *testing.T) {
 			args := []string{tc.id}
 			args = append(args, tc.args...)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowFeeTier(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowFeeList(), args)
 			if tc.err != nil {
 				stat, ok := status.FromError(tc.err)
 				require.True(t, ok)
 				require.ErrorIs(t, stat.Err(), tc.err)
 			} else {
 				require.NoError(t, err)
-				var resp types.QueryGetFeeTierResponse
+				var resp types.QueryGetFeeListResponse
 				require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-				require.NotNil(t, resp.FeeTier)
+				require.NotNil(t, resp.FeeList)
 				require.Equal(t,
 					nullify.Fill(&tc.obj),
-					nullify.Fill(&resp.FeeTier),
+					nullify.Fill(&resp.FeeList),
 				)
 			}
 		})
 	}
 }
 
-func TestListFeeTier(t *testing.T) {
-	net, objs := networkWithFeeTierObjects(t, 5)
+func TestListFeeList(t *testing.T) {
+	net, objs := networkWithFeeListObjects(t, 5)
 
 	ctx := net.Validators[0].ClientCtx
 	request := func(next []byte, offset, limit uint64, total bool) []string {
@@ -109,14 +109,14 @@ func TestListFeeTier(t *testing.T) {
 		step := 2
 		for i := 0; i < len(objs); i += step {
 			args := request(nil, uint64(i), uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListFeeTier(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListFeeList(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllFeeTierResponse
+			var resp types.QueryAllFeeListResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.FeeTier), step)
+			require.LessOrEqual(t, len(resp.FeeList), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.FeeTier),
+				nullify.Fill(resp.FeeList),
 			)
 		}
 	})
@@ -125,29 +125,29 @@ func TestListFeeTier(t *testing.T) {
 		var next []byte
 		for i := 0; i < len(objs); i += step {
 			args := request(next, 0, uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListFeeTier(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListFeeList(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllFeeTierResponse
+			var resp types.QueryAllFeeListResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.FeeTier), step)
+			require.LessOrEqual(t, len(resp.FeeList), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.FeeTier),
+				nullify.Fill(resp.FeeList),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
 		args := request(nil, 0, uint64(len(objs)), true)
-		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListFeeTier(), args)
+		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListFeeList(), args)
 		require.NoError(t, err)
-		var resp types.QueryAllFeeTierResponse
+		var resp types.QueryAllFeeListResponse
 		require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 		require.NoError(t, err)
 		require.Equal(t, len(objs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(objs),
-			nullify.Fill(resp.FeeTier),
+			nullify.Fill(resp.FeeList),
 		)
 	})
 }

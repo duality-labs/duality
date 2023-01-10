@@ -69,7 +69,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						FeeIndex:  1,
 					},
 				},
-				FeeTierList: []types.FeeTier{
+				FeeListList: []types.FeeList{
 					{
 						Id: 0,
 					},
@@ -77,7 +77,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						Id: 1,
 					},
 				},
-				FeeTierCount: 2,
+				FeeListCount: 2,
 				EdgeRowList: []types.EdgeRow{
 					{
 						Id: 0,
@@ -207,9 +207,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated FeeTier",
+			desc: "duplicated feeList",
 			genState: &types.GenesisState{
-				FeeTierList: []types.FeeTier{
+				FeeListList: []types.FeeList{
 					{
 						Id: 0,
 					},
@@ -221,14 +221,14 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "invalid FeeTier count",
+			desc: "invalid feeList count",
 			genState: &types.GenesisState{
-				FeeTierList: []types.FeeTier{
+				FeeListList: []types.FeeList{
 					{
 						Id: 1,
 					},
 				},
-				FeeTierCount: 0,
+				FeeListCount: 0,
 			},
 			valid: false,
 		},

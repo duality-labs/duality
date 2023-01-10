@@ -2,7 +2,7 @@ import { txClient, queryClient, MissingWalletError , registry} from './module'
 
 import { AdjanceyMatrix } from "./module/types/dex/adjancey_matrix"
 import { EdgeRow } from "./module/types/dex/edge_row"
-import { FeeTier } from "./module/types/dex/fee_tier"
+import { FeeList } from "./module/types/dex/fee_list"
 import { LimitOrderTrancheTrancheIndexes } from "./module/types/dex/limit_order_pool_tranche_indexes"
 import { LimitOrderTranche } from "./module/types/dex/limit_order_tranche"
 import { LimitOrderTrancheUser } from "./module/types/dex/limit_order_tranche_user"
@@ -17,7 +17,7 @@ import { TokenPairType } from "./module/types/dex/token_pair_type"
 import { Tokens } from "./module/types/dex/tokens"
 
 
-export { AdjanceyMatrix, EdgeRow, FeeTier, LimitOrderTrancheTrancheIndexes, LimitOrderTranche, LimitOrderTrancheUser, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
+export { AdjanceyMatrix, EdgeRow, FeeList, LimitOrderTrancheTrancheIndexes, LimitOrderTranche, LimitOrderTrancheUser, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -66,8 +66,8 @@ const getDefaultState = () => {
 				TokenMapAll: {},
 				Shares: {},
 				SharesAll: {},
-				FeeTier: {},
-				FeeTierAll: {},
+				FeeList: {},
+				FeeListAll: {},
 				EdgeRow: {},
 				EdgeRowAll: {},
 				AdjanceyMatrix: {},
@@ -80,7 +80,7 @@ const getDefaultState = () => {
 				_Structure: {
 						AdjanceyMatrix: getStructure(AdjanceyMatrix.fromPartial({})),
 						EdgeRow: getStructure(EdgeRow.fromPartial({})),
-						FeeTier: getStructure(FeeTier.fromPartial({})),
+						FeeList: getStructure(FeeList.fromPartial({})),
 						LimitOrderTrancheTrancheIndexes: getStructure(LimitOrderTrancheTrancheIndexes.fromPartial({})),
 						LimitOrderTranche: getStructure(LimitOrderTranche.fromPartial({})),
 						LimitOrderTrancheUser: getStructure(LimitOrderTrancheUser.fromPartial({})),
@@ -187,17 +187,17 @@ export default {
 					}
 			return state.SharesAll[JSON.stringify(params)] ?? {}
 		},
-				getFeeTier: (state) => (params = { params: {}}) => {
+				getFeeList: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.FeeTier[JSON.stringify(params)] ?? {}
+			return state.FeeList[JSON.stringify(params)] ?? {}
 		},
-				getFeeTierAll: (state) => (params = { params: {}}) => {
+				getFeeListAll: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.FeeTierAll[JSON.stringify(params)] ?? {}
+			return state.FeeListAll[JSON.stringify(params)] ?? {}
 		},
 				getEdgeRow: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
@@ -548,18 +548,18 @@ export default {
 		 		
 		
 		
-		async QueryFeeTier({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryFeeList({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryFeeTier( key.id)).data
+				let value= (await queryClient.queryFeeList( key.id)).data
 				
 					
-				commit('QUERY', { query: 'FeeTier', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryFeeTier', payload: { options: { all }, params: {...key},query }})
-				return getters['getFeeTier']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'FeeList', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryFeeList', payload: { options: { all }, params: {...key},query }})
+				return getters['getFeeList']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryFeeTier API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryFeeList API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -570,22 +570,22 @@ export default {
 		 		
 		
 		
-		async QueryFeeTierAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryFeeListAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryFeeTierAll(query)).data
+				let value= (await queryClient.queryFeeListAll(query)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryFeeTierAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await queryClient.queryFeeListAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
 					value = mergeResults(value, next_values);
 				}
-				commit('QUERY', { query: 'FeeTierAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryFeeTierAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getFeeTierAll']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'FeeListAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryFeeListAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getFeeListAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryFeeTierAll API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryFeeListAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},

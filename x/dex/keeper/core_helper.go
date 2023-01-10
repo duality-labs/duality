@@ -62,7 +62,7 @@ func (k Keeper) GetOrInitTick(goCtx context.Context, pairId string, tickIndex in
 
 	tick, tickFound := k.GetTickMap(ctx, pairId, tickIndex)
 	if !tickFound {
-		numFees := k.GetFeeTierCount(ctx)
+		numFees := k.GetFeeListCount(ctx)
 		tick = types.TickMap{
 			PairId:    pairId,
 			TickIndex: tickIndex,

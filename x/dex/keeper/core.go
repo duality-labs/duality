@@ -38,14 +38,14 @@ func (k Keeper) DepositCore(
 		amounts1Deposited[i] = sdk.ZeroDec()
 	}
 
-	FeeTier := k.GetAllFeeTier(ctx)
+	feelist := k.GetAllFeeList(ctx)
 
 	for i, amount0 := range amounts0 {
 		amount1 := amounts1[i]
 		tickIndex := msg.TickIndexes[i]
 		price1To0 := CalcPrice1To0(tickIndex)
 		feeIndex := msg.FeeIndexes[i]
-		fee := FeeTier[feeIndex].Fee
+		fee := feelist[feeIndex].Fee
 		curTick0to1 := pair.TokenPair.CurrentTick0To1
 		curTick1to0 := pair.TokenPair.CurrentTick1To0
 		lowerTickIndex := tickIndex - fee
@@ -193,7 +193,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		}
 		userSharesOwned := &shareOwner.SharesOwned
 
-		feeValue, found := k.GetFeeTier(ctx, feeIndex)
+		feeValue, found := k.GetFeeList(ctx, feeIndex)
 		if !found {
 			return types.ErrValidFeeIndexNotFound
 		}
@@ -287,8 +287,8 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress) (sdk.Dec, sdk.Dec, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId := k.CreatePairId(token0, token1)
-	feeSize := k.GetFeeTierCount(ctx)
-	FeeTier := k.GetAllFeeTier(ctx)
+	feeSize := k.GetFeeListCount(ctx)
+	feelist := k.GetAllFeeList(ctx)
 	pair, pairFound := k.GetPairMap(ctx, pairId)
 	if !pairFound {
 		return sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
@@ -312,7 +312,7 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 		var i uint64 = 0
 
 		for i < feeSize && !amount_left.Equal(sdk.ZeroDec()) {
-			fee := FeeTier[i].Fee
+			fee := feelist[i].Fee
 			Current0Data, found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick0To1-2*fee)
 			if !found {
 				i++
@@ -379,8 +379,8 @@ func (k Keeper) Swap0to1(goCtx context.Context, msg *types.MsgSwap, token0 strin
 func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 string, token1 string, callerAddr sdk.AccAddress) (sdk.Dec, sdk.Dec, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId := k.CreatePairId(token0, token1)
-	feeSize := k.GetFeeTierCount(ctx)
-	FeeTier := k.GetAllFeeTier(ctx)
+	feeSize := k.GetFeeListCount(ctx)
+	feelist := k.GetAllFeeList(ctx)
 	pair, found := k.GetPairMap(ctx, pairId)
 	if !found {
 		return sdk.ZeroDec(), sdk.ZeroDec(), sdkerrors.Wrapf(types.ErrValidPairNotFound, "Pair not found")
@@ -401,7 +401,7 @@ func (k Keeper) Swap1to0(goCtx context.Context, msg *types.MsgSwap, token0 strin
 
 		var i uint64 = 0
 		for i < feeSize && !amount_left.Equal(sdk.ZeroDec()) {
-			fee := FeeTier[i].Fee
+			fee := feelist[i].Fee
 
 			Current1Data, found := k.GetTickMap(ctx, pairId, pair.TokenPair.CurrentTick1To0+2*fee)
 			if !found {

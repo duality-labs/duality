@@ -24021,17 +24021,17 @@ paths:
           format: uint64
       tags:
         - Query
-  /NicholasDotSol/duality/dex/fee_tier:
+  /NicholasDotSol/duality/dex/fee_list:
     get:
-      summary: Queries a list of FeeTier items.
-      operationId: NicholasdotsolDualityDexFeeTierAll
+      summary: Queries a list of FeeList items.
+      operationId: NicholasdotsolDualityDexFeeListAll
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              FeeTier:
+              FeeList:
                 type: array
                 items:
                   type: object
@@ -24136,17 +24136,17 @@ paths:
           type: boolean
       tags:
         - Query
-  /NicholasDotSol/duality/dex/fee_tier/{id}:
+  /NicholasDotSol/duality/dex/fee_list/{id}:
     get:
-      summary: Queries a FeeTier by id.
-      operationId: NicholasdotsolDualityDexFeeTier
+      summary: Queries a FeeList by id.
+      operationId: NicholasdotsolDualityDexFeeList
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              FeeTier:
+              FeeList:
                 type: object
                 properties:
                   id:
@@ -45094,7 +45094,7 @@ definitions:
         format: uint64
       edge:
         type: boolean
-  nicholasdotsol.duality.dex.FeeTier:
+  nicholasdotsol.duality.dex.FeeList:
     type: object
     properties:
       id:
@@ -45293,10 +45293,10 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  nicholasdotsol.duality.dex.QueryAllFeeTierResponse:
+  nicholasdotsol.duality.dex.QueryAllFeeListResponse:
     type: object
     properties:
-      FeeTier:
+      FeeList:
         type: array
         items:
           type: object
@@ -45705,10 +45705,10 @@ definitions:
             format: uint64
           edge:
             type: boolean
-  nicholasdotsol.duality.dex.QueryGetFeeTierResponse:
+  nicholasdotsol.duality.dex.QueryGetFeeListResponse:
     type: object
     properties:
-      FeeTier:
+      FeeList:
         type: object
         properties:
           id:

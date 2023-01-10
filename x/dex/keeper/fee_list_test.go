@@ -11,19 +11,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createNFeeTier(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.FeeTier {
-	items := make([]types.FeeTier, n)
+func createNFeeList(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.FeeList {
+	items := make([]types.FeeList, n)
 	for i := range items {
-		items[i].Id = keeper.AppendFeeTier(ctx, items[i])
+		items[i].Id = keeper.AppendFeeList(ctx, items[i])
 	}
 	return items
 }
 
-func TestFeeTierGet(t *testing.T) {
+func TestFeeListGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNFeeTier(keeper, ctx, 10)
+	items := createNFeeList(keeper, ctx, 10)
 	for _, item := range items {
-		got, found := keeper.GetFeeTier(ctx, item.Id)
+		got, found := keeper.GetFeeList(ctx, item.Id)
 		require.True(t, found)
 		require.Equal(t,
 			nullify.Fill(&item),
@@ -32,28 +32,28 @@ func TestFeeTierGet(t *testing.T) {
 	}
 }
 
-func TestFeeTierRemove(t *testing.T) {
+func TestFeeListRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNFeeTier(keeper, ctx, 10)
+	items := createNFeeList(keeper, ctx, 10)
 	for _, item := range items {
-		keeper.RemoveFeeTier(ctx, item.Id)
-		_, found := keeper.GetFeeTier(ctx, item.Id)
+		keeper.RemoveFeeList(ctx, item.Id)
+		_, found := keeper.GetFeeList(ctx, item.Id)
 		require.False(t, found)
 	}
 }
 
-func TestFeeTierGetAll(t *testing.T) {
+func TestFeeListGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNFeeTier(keeper, ctx, 10)
+	items := createNFeeList(keeper, ctx, 10)
 	require.ElementsMatch(t,
 		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllFeeTier(ctx)),
+		nullify.Fill(keeper.GetAllFeeList(ctx)),
 	)
 }
 
-func TestFeeTierCount(t *testing.T) {
+func TestFeeListCount(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNFeeTier(keeper, ctx, 10)
+	items := createNFeeList(keeper, ctx, 10)
 	count := uint64(len(items))
-	require.Equal(t, count, keeper.GetFeeTierCount(ctx))
+	require.Equal(t, count, keeper.GetFeeListCount(ctx))
 }

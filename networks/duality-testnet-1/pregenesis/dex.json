@@ -116,7 +116,7 @@
         }
       ],
       "tokensCount": 28,
-      "FeeTierList": [
+      "feeListList": [
         {
           "id": 0,
           "fee": 1
@@ -134,7 +134,7 @@
           "fee": 100
         }
       ],
-      "FeeTierCount": 4
+      "feeListCount": 4
     }
   }
 }

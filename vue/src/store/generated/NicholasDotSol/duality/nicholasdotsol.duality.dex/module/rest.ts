@@ -21,7 +21,7 @@ export interface DexEdgeRow {
   edge?: boolean;
 }
 
-export interface DexFeeTier {
+export interface DexFeeList {
   /** @format uint64 */
   id?: string;
 
@@ -136,8 +136,8 @@ export interface DexQueryAllEdgeRowResponse {
   pagination?: V1Beta1PageResponse;
 }
 
-export interface DexQueryAllFeeTierResponse {
-  FeeTier?: DexFeeTier[];
+export interface DexQueryAllFeeListResponse {
+  FeeList?: DexFeeList[];
 
   /**
    * PageResponse is to be embedded in gRPC response messages where the
@@ -264,8 +264,8 @@ export interface DexQueryGetEdgeRowResponse {
   EdgeRow?: DexEdgeRow;
 }
 
-export interface DexQueryGetFeeTierResponse {
-  FeeTier?: DexFeeTier;
+export interface DexQueryGetFeeListResponse {
+  FeeList?: DexFeeList;
 }
 
 export interface DexQueryGetLimitOrderTrancheResponse {
@@ -726,11 +726,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryFeeTierAll
-   * @summary Queries a list of FeeTier items.
-   * @request GET:/NicholasDotSol/duality/dex/fee_tier
+   * @name QueryFeeListAll
+   * @summary Queries a list of FeeList items.
+   * @request GET:/NicholasDotSol/duality/dex/fee_list
    */
-  queryFeeTierAll = (
+  queryFeeListAll = (
     query?: {
       "pagination.key"?: string;
       "pagination.offset"?: string;
@@ -740,8 +740,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     },
     params: RequestParams = {},
   ) =>
-    this.request<DexQueryAllFeeTierResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/fee_tier`,
+    this.request<DexQueryAllFeeListResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/fee_list`,
       method: "GET",
       query: query,
       format: "json",
@@ -752,13 +752,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * No description
    *
    * @tags Query
-   * @name QueryFeeTier
-   * @summary Queries a FeeTier by id.
-   * @request GET:/NicholasDotSol/duality/dex/fee_tier/{id}
+   * @name QueryFeeList
+   * @summary Queries a FeeList by id.
+   * @request GET:/NicholasDotSol/duality/dex/fee_list/{id}
    */
-  queryFeeTier = (id: string, params: RequestParams = {}) =>
-    this.request<DexQueryGetFeeTierResponse, RpcStatus>({
-      path: `/NicholasDotSol/duality/dex/fee_tier/${id}`,
+  queryFeeList = (id: string, params: RequestParams = {}) =>
+    this.request<DexQueryGetFeeListResponse, RpcStatus>({
+      path: `/NicholasDotSol/duality/dex/fee_list/${id}`,
       method: "GET",
       format: "json",
       ...params,
