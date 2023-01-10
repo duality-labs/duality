@@ -14,11 +14,8 @@ import { Shares } from "../dex/shares";
 import { FeeList } from "../dex/fee_list";
 import { EdgeRow } from "../dex/edge_row";
 import { AdjanceyMatrix } from "../dex/adjancey_matrix";
-import { LimitOrderPoolUserShareMap } from "../dex/limit_order_pool_user_share_map";
-import { LimitOrderPoolUserSharesWithdrawn } from "../dex/limit_order_pool_user_shares_withdrawn";
-import { LimitOrderPoolTotalSharesMap } from "../dex/limit_order_pool_total_shares_map";
-import { LimitOrderPoolReserveMap } from "../dex/limit_order_pool_reserve_map";
-import { LimitOrderPoolFillMap } from "../dex/limit_order_pool_fill_map";
+import { LimitOrderTrancheUser } from "../dex/limit_order_tranche_user";
+import { LimitOrderTranche } from "../dex/limit_order_tranche";
 
 export const protobufPackage = "nicholasdotsol.duality.dex";
 
@@ -171,7 +168,7 @@ export interface QueryAllAdjanceyMatrixResponse {
   pagination: PageResponse | undefined;
 }
 
-export interface QueryGetLimitOrderPoolUserShareMapRequest {
+export interface QueryGetLimitOrderTrancheUserRequest {
   pairId: string;
   tickIndex: number;
   token: string;
@@ -179,99 +176,36 @@ export interface QueryGetLimitOrderPoolUserShareMapRequest {
   address: string;
 }
 
-export interface QueryGetLimitOrderPoolUserShareMapResponse {
-  limitOrderPoolUserShareMap: LimitOrderPoolUserShareMap | undefined;
+export interface QueryGetLimitOrderTrancheUserResponse {
+  LimitOrderTrancheUser: LimitOrderTrancheUser | undefined;
 }
 
-export interface QueryAllLimitOrderPoolUserShareMapRequest {
+export interface QueryAllLimitOrderTrancheUserRequest {
   pagination: PageRequest | undefined;
 }
 
-export interface QueryAllLimitOrderPoolUserShareMapResponse {
-  limitOrderPoolUserShareMap: LimitOrderPoolUserShareMap[];
+export interface QueryAllLimitOrderTrancheUserResponse {
+  LimitOrderTrancheUser: LimitOrderTrancheUser[];
   pagination: PageResponse | undefined;
 }
 
-export interface QueryGetLimitOrderPoolUserSharesWithdrawnRequest {
-  pairId: string;
-  tickIndex: number;
-  token: string;
-  count: number;
-  address: string;
-}
-
-export interface QueryGetLimitOrderPoolUserSharesWithdrawnResponse {
-  limitOrderPoolUserSharesWithdrawn:
-    | LimitOrderPoolUserSharesWithdrawn
-    | undefined;
-}
-
-export interface QueryAllLimitOrderPoolUserSharesWithdrawnRequest {
-  pagination: PageRequest | undefined;
-}
-
-export interface QueryAllLimitOrderPoolUserSharesWithdrawnResponse {
-  limitOrderPoolUserSharesWithdrawn: LimitOrderPoolUserSharesWithdrawn[];
-  pagination: PageResponse | undefined;
-}
-
-export interface QueryGetLimitOrderPoolTotalSharesMapRequest {
+export interface QueryGetLimitOrderTrancheRequest {
   pairId: string;
   tickIndex: number;
   token: string;
   count: number;
 }
 
-export interface QueryGetLimitOrderPoolTotalSharesMapResponse {
-  limitOrderPoolTotalSharesMap: LimitOrderPoolTotalSharesMap | undefined;
+export interface QueryGetLimitOrderTrancheResponse {
+  LimitOrderTranche: LimitOrderTranche | undefined;
 }
 
-export interface QueryAllLimitOrderPoolTotalSharesMapRequest {
+export interface QueryAllLimitOrderTrancheRequest {
   pagination: PageRequest | undefined;
 }
 
-export interface QueryAllLimitOrderPoolTotalSharesMapResponse {
-  limitOrderPoolTotalSharesMap: LimitOrderPoolTotalSharesMap[];
-  pagination: PageResponse | undefined;
-}
-
-export interface QueryGetLimitOrderPoolReserveMapRequest {
-  pairId: string;
-  tickIndex: number;
-  token: string;
-  count: number;
-}
-
-export interface QueryGetLimitOrderPoolReserveMapResponse {
-  limitOrderPoolReserveMap: LimitOrderPoolReserveMap | undefined;
-}
-
-export interface QueryAllLimitOrderPoolReserveMapRequest {
-  pagination: PageRequest | undefined;
-}
-
-export interface QueryAllLimitOrderPoolReserveMapResponse {
-  limitOrderPoolReserveMap: LimitOrderPoolReserveMap[];
-  pagination: PageResponse | undefined;
-}
-
-export interface QueryGetLimitOrderPoolFillMapRequest {
-  pairId: string;
-  tickIndex: number;
-  token: string;
-  count: number;
-}
-
-export interface QueryGetLimitOrderPoolFillMapResponse {
-  limitOrderPoolFillMap: LimitOrderPoolFillMap | undefined;
-}
-
-export interface QueryAllLimitOrderPoolFillMapRequest {
-  pagination: PageRequest | undefined;
-}
-
-export interface QueryAllLimitOrderPoolFillMapResponse {
-  limitOrderPoolFillMap: LimitOrderPoolFillMap[];
+export interface QueryAllLimitOrderTrancheResponse {
+  LimitOrderTranche: LimitOrderTranche[];
   pagination: PageResponse | undefined;
 }
 
@@ -2789,7 +2723,7 @@ export const QueryAllAdjanceyMatrixResponse = {
   },
 };
 
-const baseQueryGetLimitOrderPoolUserShareMapRequest: object = {
+const baseQueryGetLimitOrderTrancheUserRequest: object = {
   pairId: "",
   tickIndex: 0,
   token: "",
@@ -2797,9 +2731,9 @@ const baseQueryGetLimitOrderPoolUserShareMapRequest: object = {
   address: "",
 };
 
-export const QueryGetLimitOrderPoolUserShareMapRequest = {
+export const QueryGetLimitOrderTrancheUserRequest = {
   encode(
-    message: QueryGetLimitOrderPoolUserShareMapRequest,
+    message: QueryGetLimitOrderTrancheUserRequest,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.pairId !== "") {
@@ -2823,12 +2757,12 @@ export const QueryGetLimitOrderPoolUserShareMapRequest = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryGetLimitOrderPoolUserShareMapRequest {
+  ): QueryGetLimitOrderTrancheUserRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryGetLimitOrderPoolUserShareMapRequest,
-    } as QueryGetLimitOrderPoolUserShareMapRequest;
+      ...baseQueryGetLimitOrderTrancheUserRequest,
+    } as QueryGetLimitOrderTrancheUserRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -2855,10 +2789,10 @@ export const QueryGetLimitOrderPoolUserShareMapRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetLimitOrderPoolUserShareMapRequest {
+  fromJSON(object: any): QueryGetLimitOrderTrancheUserRequest {
     const message = {
-      ...baseQueryGetLimitOrderPoolUserShareMapRequest,
-    } as QueryGetLimitOrderPoolUserShareMapRequest;
+      ...baseQueryGetLimitOrderTrancheUserRequest,
+    } as QueryGetLimitOrderTrancheUserRequest;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = String(object.pairId);
     } else {
@@ -2887,7 +2821,7 @@ export const QueryGetLimitOrderPoolUserShareMapRequest = {
     return message;
   },
 
-  toJSON(message: QueryGetLimitOrderPoolUserShareMapRequest): unknown {
+  toJSON(message: QueryGetLimitOrderTrancheUserRequest): unknown {
     const obj: any = {};
     message.pairId !== undefined && (obj.pairId = message.pairId);
     message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
@@ -2898,11 +2832,11 @@ export const QueryGetLimitOrderPoolUserShareMapRequest = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetLimitOrderPoolUserShareMapRequest>
-  ): QueryGetLimitOrderPoolUserShareMapRequest {
+    object: DeepPartial<QueryGetLimitOrderTrancheUserRequest>
+  ): QueryGetLimitOrderTrancheUserRequest {
     const message = {
-      ...baseQueryGetLimitOrderPoolUserShareMapRequest,
-    } as QueryGetLimitOrderPoolUserShareMapRequest;
+      ...baseQueryGetLimitOrderTrancheUserRequest,
+    } as QueryGetLimitOrderTrancheUserRequest;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = object.pairId;
     } else {
@@ -2932,16 +2866,16 @@ export const QueryGetLimitOrderPoolUserShareMapRequest = {
   },
 };
 
-const baseQueryGetLimitOrderPoolUserShareMapResponse: object = {};
+const baseQueryGetLimitOrderTrancheUserResponse: object = {};
 
-export const QueryGetLimitOrderPoolUserShareMapResponse = {
+export const QueryGetLimitOrderTrancheUserResponse = {
   encode(
-    message: QueryGetLimitOrderPoolUserShareMapResponse,
+    message: QueryGetLimitOrderTrancheUserResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.limitOrderPoolUserShareMap !== undefined) {
-      LimitOrderPoolUserShareMap.encode(
-        message.limitOrderPoolUserShareMap,
+    if (message.LimitOrderTrancheUser !== undefined) {
+      LimitOrderTrancheUser.encode(
+        message.LimitOrderTrancheUser,
         writer.uint32(10).fork()
       ).ldelim();
     }
@@ -2951,17 +2885,17 @@ export const QueryGetLimitOrderPoolUserShareMapResponse = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryGetLimitOrderPoolUserShareMapResponse {
+  ): QueryGetLimitOrderTrancheUserResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryGetLimitOrderPoolUserShareMapResponse,
-    } as QueryGetLimitOrderPoolUserShareMapResponse;
+      ...baseQueryGetLimitOrderTrancheUserResponse,
+    } as QueryGetLimitOrderTrancheUserResponse;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.limitOrderPoolUserShareMap = LimitOrderPoolUserShareMap.decode(
+          message.LimitOrderTrancheUser = LimitOrderTrancheUser.decode(
             reader,
             reader.uint32()
           );
@@ -2974,57 +2908,57 @@ export const QueryGetLimitOrderPoolUserShareMapResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetLimitOrderPoolUserShareMapResponse {
+  fromJSON(object: any): QueryGetLimitOrderTrancheUserResponse {
     const message = {
-      ...baseQueryGetLimitOrderPoolUserShareMapResponse,
-    } as QueryGetLimitOrderPoolUserShareMapResponse;
+      ...baseQueryGetLimitOrderTrancheUserResponse,
+    } as QueryGetLimitOrderTrancheUserResponse;
     if (
-      object.limitOrderPoolUserShareMap !== undefined &&
-      object.limitOrderPoolUserShareMap !== null
+      object.LimitOrderTrancheUser !== undefined &&
+      object.LimitOrderTrancheUser !== null
     ) {
-      message.limitOrderPoolUserShareMap = LimitOrderPoolUserShareMap.fromJSON(
-        object.limitOrderPoolUserShareMap
+      message.LimitOrderTrancheUser = LimitOrderTrancheUser.fromJSON(
+        object.LimitOrderTrancheUser
       );
     } else {
-      message.limitOrderPoolUserShareMap = undefined;
+      message.LimitOrderTrancheUser = undefined;
     }
     return message;
   },
 
-  toJSON(message: QueryGetLimitOrderPoolUserShareMapResponse): unknown {
+  toJSON(message: QueryGetLimitOrderTrancheUserResponse): unknown {
     const obj: any = {};
-    message.limitOrderPoolUserShareMap !== undefined &&
-      (obj.limitOrderPoolUserShareMap = message.limitOrderPoolUserShareMap
-        ? LimitOrderPoolUserShareMap.toJSON(message.limitOrderPoolUserShareMap)
+    message.LimitOrderTrancheUser !== undefined &&
+      (obj.LimitOrderTrancheUser = message.LimitOrderTrancheUser
+        ? LimitOrderTrancheUser.toJSON(message.LimitOrderTrancheUser)
         : undefined);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetLimitOrderPoolUserShareMapResponse>
-  ): QueryGetLimitOrderPoolUserShareMapResponse {
+    object: DeepPartial<QueryGetLimitOrderTrancheUserResponse>
+  ): QueryGetLimitOrderTrancheUserResponse {
     const message = {
-      ...baseQueryGetLimitOrderPoolUserShareMapResponse,
-    } as QueryGetLimitOrderPoolUserShareMapResponse;
+      ...baseQueryGetLimitOrderTrancheUserResponse,
+    } as QueryGetLimitOrderTrancheUserResponse;
     if (
-      object.limitOrderPoolUserShareMap !== undefined &&
-      object.limitOrderPoolUserShareMap !== null
+      object.LimitOrderTrancheUser !== undefined &&
+      object.LimitOrderTrancheUser !== null
     ) {
-      message.limitOrderPoolUserShareMap = LimitOrderPoolUserShareMap.fromPartial(
-        object.limitOrderPoolUserShareMap
+      message.LimitOrderTrancheUser = LimitOrderTrancheUser.fromPartial(
+        object.LimitOrderTrancheUser
       );
     } else {
-      message.limitOrderPoolUserShareMap = undefined;
+      message.LimitOrderTrancheUser = undefined;
     }
     return message;
   },
 };
 
-const baseQueryAllLimitOrderPoolUserShareMapRequest: object = {};
+const baseQueryAllLimitOrderTrancheUserRequest: object = {};
 
-export const QueryAllLimitOrderPoolUserShareMapRequest = {
+export const QueryAllLimitOrderTrancheUserRequest = {
   encode(
-    message: QueryAllLimitOrderPoolUserShareMapRequest,
+    message: QueryAllLimitOrderTrancheUserRequest,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.pagination !== undefined) {
@@ -3036,12 +2970,12 @@ export const QueryAllLimitOrderPoolUserShareMapRequest = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryAllLimitOrderPoolUserShareMapRequest {
+  ): QueryAllLimitOrderTrancheUserRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryAllLimitOrderPoolUserShareMapRequest,
-    } as QueryAllLimitOrderPoolUserShareMapRequest;
+      ...baseQueryAllLimitOrderTrancheUserRequest,
+    } as QueryAllLimitOrderTrancheUserRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -3056,10 +2990,10 @@ export const QueryAllLimitOrderPoolUserShareMapRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllLimitOrderPoolUserShareMapRequest {
+  fromJSON(object: any): QueryAllLimitOrderTrancheUserRequest {
     const message = {
-      ...baseQueryAllLimitOrderPoolUserShareMapRequest,
-    } as QueryAllLimitOrderPoolUserShareMapRequest;
+      ...baseQueryAllLimitOrderTrancheUserRequest,
+    } as QueryAllLimitOrderTrancheUserRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromJSON(object.pagination);
     } else {
@@ -3068,7 +3002,7 @@ export const QueryAllLimitOrderPoolUserShareMapRequest = {
     return message;
   },
 
-  toJSON(message: QueryAllLimitOrderPoolUserShareMapRequest): unknown {
+  toJSON(message: QueryAllLimitOrderTrancheUserRequest): unknown {
     const obj: any = {};
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -3078,11 +3012,11 @@ export const QueryAllLimitOrderPoolUserShareMapRequest = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryAllLimitOrderPoolUserShareMapRequest>
-  ): QueryAllLimitOrderPoolUserShareMapRequest {
+    object: DeepPartial<QueryAllLimitOrderTrancheUserRequest>
+  ): QueryAllLimitOrderTrancheUserRequest {
     const message = {
-      ...baseQueryAllLimitOrderPoolUserShareMapRequest,
-    } as QueryAllLimitOrderPoolUserShareMapRequest;
+      ...baseQueryAllLimitOrderTrancheUserRequest,
+    } as QueryAllLimitOrderTrancheUserRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromPartial(object.pagination);
     } else {
@@ -3092,15 +3026,15 @@ export const QueryAllLimitOrderPoolUserShareMapRequest = {
   },
 };
 
-const baseQueryAllLimitOrderPoolUserShareMapResponse: object = {};
+const baseQueryAllLimitOrderTrancheUserResponse: object = {};
 
-export const QueryAllLimitOrderPoolUserShareMapResponse = {
+export const QueryAllLimitOrderTrancheUserResponse = {
   encode(
-    message: QueryAllLimitOrderPoolUserShareMapResponse,
+    message: QueryAllLimitOrderTrancheUserResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    for (const v of message.limitOrderPoolUserShareMap) {
-      LimitOrderPoolUserShareMap.encode(v!, writer.uint32(10).fork()).ldelim();
+    for (const v of message.LimitOrderTrancheUser) {
+      LimitOrderTrancheUser.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
       PageResponse.encode(
@@ -3114,19 +3048,19 @@ export const QueryAllLimitOrderPoolUserShareMapResponse = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryAllLimitOrderPoolUserShareMapResponse {
+  ): QueryAllLimitOrderTrancheUserResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryAllLimitOrderPoolUserShareMapResponse,
-    } as QueryAllLimitOrderPoolUserShareMapResponse;
-    message.limitOrderPoolUserShareMap = [];
+      ...baseQueryAllLimitOrderTrancheUserResponse,
+    } as QueryAllLimitOrderTrancheUserResponse;
+    message.LimitOrderTrancheUser = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.limitOrderPoolUserShareMap.push(
-            LimitOrderPoolUserShareMap.decode(reader, reader.uint32())
+          message.LimitOrderTrancheUser.push(
+            LimitOrderTrancheUser.decode(reader, reader.uint32())
           );
           break;
         case 2:
@@ -3140,19 +3074,17 @@ export const QueryAllLimitOrderPoolUserShareMapResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllLimitOrderPoolUserShareMapResponse {
+  fromJSON(object: any): QueryAllLimitOrderTrancheUserResponse {
     const message = {
-      ...baseQueryAllLimitOrderPoolUserShareMapResponse,
-    } as QueryAllLimitOrderPoolUserShareMapResponse;
-    message.limitOrderPoolUserShareMap = [];
+      ...baseQueryAllLimitOrderTrancheUserResponse,
+    } as QueryAllLimitOrderTrancheUserResponse;
+    message.LimitOrderTrancheUser = [];
     if (
-      object.limitOrderPoolUserShareMap !== undefined &&
-      object.limitOrderPoolUserShareMap !== null
+      object.LimitOrderTrancheUser !== undefined &&
+      object.LimitOrderTrancheUser !== null
     ) {
-      for (const e of object.limitOrderPoolUserShareMap) {
-        message.limitOrderPoolUserShareMap.push(
-          LimitOrderPoolUserShareMap.fromJSON(e)
-        );
+      for (const e of object.LimitOrderTrancheUser) {
+        message.LimitOrderTrancheUser.push(LimitOrderTrancheUser.fromJSON(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -3163,14 +3095,14 @@ export const QueryAllLimitOrderPoolUserShareMapResponse = {
     return message;
   },
 
-  toJSON(message: QueryAllLimitOrderPoolUserShareMapResponse): unknown {
+  toJSON(message: QueryAllLimitOrderTrancheUserResponse): unknown {
     const obj: any = {};
-    if (message.limitOrderPoolUserShareMap) {
-      obj.limitOrderPoolUserShareMap = message.limitOrderPoolUserShareMap.map(
-        (e) => (e ? LimitOrderPoolUserShareMap.toJSON(e) : undefined)
+    if (message.LimitOrderTrancheUser) {
+      obj.LimitOrderTrancheUser = message.LimitOrderTrancheUser.map((e) =>
+        e ? LimitOrderTrancheUser.toJSON(e) : undefined
       );
     } else {
-      obj.limitOrderPoolUserShareMap = [];
+      obj.LimitOrderTrancheUser = [];
     }
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -3180,19 +3112,19 @@ export const QueryAllLimitOrderPoolUserShareMapResponse = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryAllLimitOrderPoolUserShareMapResponse>
-  ): QueryAllLimitOrderPoolUserShareMapResponse {
+    object: DeepPartial<QueryAllLimitOrderTrancheUserResponse>
+  ): QueryAllLimitOrderTrancheUserResponse {
     const message = {
-      ...baseQueryAllLimitOrderPoolUserShareMapResponse,
-    } as QueryAllLimitOrderPoolUserShareMapResponse;
-    message.limitOrderPoolUserShareMap = [];
+      ...baseQueryAllLimitOrderTrancheUserResponse,
+    } as QueryAllLimitOrderTrancheUserResponse;
+    message.LimitOrderTrancheUser = [];
     if (
-      object.limitOrderPoolUserShareMap !== undefined &&
-      object.limitOrderPoolUserShareMap !== null
+      object.LimitOrderTrancheUser !== undefined &&
+      object.LimitOrderTrancheUser !== null
     ) {
-      for (const e of object.limitOrderPoolUserShareMap) {
-        message.limitOrderPoolUserShareMap.push(
-          LimitOrderPoolUserShareMap.fromPartial(e)
+      for (const e of object.LimitOrderTrancheUser) {
+        message.LimitOrderTrancheUser.push(
+          LimitOrderTrancheUser.fromPartial(e)
         );
       }
     }
@@ -3205,437 +3137,16 @@ export const QueryAllLimitOrderPoolUserShareMapResponse = {
   },
 };
 
-const baseQueryGetLimitOrderPoolUserSharesWithdrawnRequest: object = {
-  pairId: "",
-  tickIndex: 0,
-  token: "",
-  count: 0,
-  address: "",
-};
-
-export const QueryGetLimitOrderPoolUserSharesWithdrawnRequest = {
-  encode(
-    message: QueryGetLimitOrderPoolUserSharesWithdrawnRequest,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.pairId !== "") {
-      writer.uint32(10).string(message.pairId);
-    }
-    if (message.tickIndex !== 0) {
-      writer.uint32(16).int64(message.tickIndex);
-    }
-    if (message.token !== "") {
-      writer.uint32(26).string(message.token);
-    }
-    if (message.count !== 0) {
-      writer.uint32(32).uint64(message.count);
-    }
-    if (message.address !== "") {
-      writer.uint32(42).string(message.address);
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryGetLimitOrderPoolUserSharesWithdrawnRequest {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryGetLimitOrderPoolUserSharesWithdrawnRequest,
-    } as QueryGetLimitOrderPoolUserSharesWithdrawnRequest;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.pairId = reader.string();
-          break;
-        case 2:
-          message.tickIndex = longToNumber(reader.int64() as Long);
-          break;
-        case 3:
-          message.token = reader.string();
-          break;
-        case 4:
-          message.count = longToNumber(reader.uint64() as Long);
-          break;
-        case 5:
-          message.address = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryGetLimitOrderPoolUserSharesWithdrawnRequest {
-    const message = {
-      ...baseQueryGetLimitOrderPoolUserSharesWithdrawnRequest,
-    } as QueryGetLimitOrderPoolUserSharesWithdrawnRequest;
-    if (object.pairId !== undefined && object.pairId !== null) {
-      message.pairId = String(object.pairId);
-    } else {
-      message.pairId = "";
-    }
-    if (object.tickIndex !== undefined && object.tickIndex !== null) {
-      message.tickIndex = Number(object.tickIndex);
-    } else {
-      message.tickIndex = 0;
-    }
-    if (object.token !== undefined && object.token !== null) {
-      message.token = String(object.token);
-    } else {
-      message.token = "";
-    }
-    if (object.count !== undefined && object.count !== null) {
-      message.count = Number(object.count);
-    } else {
-      message.count = 0;
-    }
-    if (object.address !== undefined && object.address !== null) {
-      message.address = String(object.address);
-    } else {
-      message.address = "";
-    }
-    return message;
-  },
-
-  toJSON(message: QueryGetLimitOrderPoolUserSharesWithdrawnRequest): unknown {
-    const obj: any = {};
-    message.pairId !== undefined && (obj.pairId = message.pairId);
-    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
-    message.token !== undefined && (obj.token = message.token);
-    message.count !== undefined && (obj.count = message.count);
-    message.address !== undefined && (obj.address = message.address);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryGetLimitOrderPoolUserSharesWithdrawnRequest>
-  ): QueryGetLimitOrderPoolUserSharesWithdrawnRequest {
-    const message = {
-      ...baseQueryGetLimitOrderPoolUserSharesWithdrawnRequest,
-    } as QueryGetLimitOrderPoolUserSharesWithdrawnRequest;
-    if (object.pairId !== undefined && object.pairId !== null) {
-      message.pairId = object.pairId;
-    } else {
-      message.pairId = "";
-    }
-    if (object.tickIndex !== undefined && object.tickIndex !== null) {
-      message.tickIndex = object.tickIndex;
-    } else {
-      message.tickIndex = 0;
-    }
-    if (object.token !== undefined && object.token !== null) {
-      message.token = object.token;
-    } else {
-      message.token = "";
-    }
-    if (object.count !== undefined && object.count !== null) {
-      message.count = object.count;
-    } else {
-      message.count = 0;
-    }
-    if (object.address !== undefined && object.address !== null) {
-      message.address = object.address;
-    } else {
-      message.address = "";
-    }
-    return message;
-  },
-};
-
-const baseQueryGetLimitOrderPoolUserSharesWithdrawnResponse: object = {};
-
-export const QueryGetLimitOrderPoolUserSharesWithdrawnResponse = {
-  encode(
-    message: QueryGetLimitOrderPoolUserSharesWithdrawnResponse,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.limitOrderPoolUserSharesWithdrawn !== undefined) {
-      LimitOrderPoolUserSharesWithdrawn.encode(
-        message.limitOrderPoolUserSharesWithdrawn,
-        writer.uint32(10).fork()
-      ).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryGetLimitOrderPoolUserSharesWithdrawnResponse {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryGetLimitOrderPoolUserSharesWithdrawnResponse,
-    } as QueryGetLimitOrderPoolUserSharesWithdrawnResponse;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.limitOrderPoolUserSharesWithdrawn = LimitOrderPoolUserSharesWithdrawn.decode(
-            reader,
-            reader.uint32()
-          );
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryGetLimitOrderPoolUserSharesWithdrawnResponse {
-    const message = {
-      ...baseQueryGetLimitOrderPoolUserSharesWithdrawnResponse,
-    } as QueryGetLimitOrderPoolUserSharesWithdrawnResponse;
-    if (
-      object.limitOrderPoolUserSharesWithdrawn !== undefined &&
-      object.limitOrderPoolUserSharesWithdrawn !== null
-    ) {
-      message.limitOrderPoolUserSharesWithdrawn = LimitOrderPoolUserSharesWithdrawn.fromJSON(
-        object.limitOrderPoolUserSharesWithdrawn
-      );
-    } else {
-      message.limitOrderPoolUserSharesWithdrawn = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryGetLimitOrderPoolUserSharesWithdrawnResponse): unknown {
-    const obj: any = {};
-    message.limitOrderPoolUserSharesWithdrawn !== undefined &&
-      (obj.limitOrderPoolUserSharesWithdrawn = message.limitOrderPoolUserSharesWithdrawn
-        ? LimitOrderPoolUserSharesWithdrawn.toJSON(
-            message.limitOrderPoolUserSharesWithdrawn
-          )
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryGetLimitOrderPoolUserSharesWithdrawnResponse>
-  ): QueryGetLimitOrderPoolUserSharesWithdrawnResponse {
-    const message = {
-      ...baseQueryGetLimitOrderPoolUserSharesWithdrawnResponse,
-    } as QueryGetLimitOrderPoolUserSharesWithdrawnResponse;
-    if (
-      object.limitOrderPoolUserSharesWithdrawn !== undefined &&
-      object.limitOrderPoolUserSharesWithdrawn !== null
-    ) {
-      message.limitOrderPoolUserSharesWithdrawn = LimitOrderPoolUserSharesWithdrawn.fromPartial(
-        object.limitOrderPoolUserSharesWithdrawn
-      );
-    } else {
-      message.limitOrderPoolUserSharesWithdrawn = undefined;
-    }
-    return message;
-  },
-};
-
-const baseQueryAllLimitOrderPoolUserSharesWithdrawnRequest: object = {};
-
-export const QueryAllLimitOrderPoolUserSharesWithdrawnRequest = {
-  encode(
-    message: QueryAllLimitOrderPoolUserSharesWithdrawnRequest,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.pagination !== undefined) {
-      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryAllLimitOrderPoolUserSharesWithdrawnRequest {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryAllLimitOrderPoolUserSharesWithdrawnRequest,
-    } as QueryAllLimitOrderPoolUserSharesWithdrawnRequest;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.pagination = PageRequest.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryAllLimitOrderPoolUserSharesWithdrawnRequest {
-    const message = {
-      ...baseQueryAllLimitOrderPoolUserSharesWithdrawnRequest,
-    } as QueryAllLimitOrderPoolUserSharesWithdrawnRequest;
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromJSON(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryAllLimitOrderPoolUserSharesWithdrawnRequest): unknown {
-    const obj: any = {};
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination
-        ? PageRequest.toJSON(message.pagination)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryAllLimitOrderPoolUserSharesWithdrawnRequest>
-  ): QueryAllLimitOrderPoolUserSharesWithdrawnRequest {
-    const message = {
-      ...baseQueryAllLimitOrderPoolUserSharesWithdrawnRequest,
-    } as QueryAllLimitOrderPoolUserSharesWithdrawnRequest;
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromPartial(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-};
-
-const baseQueryAllLimitOrderPoolUserSharesWithdrawnResponse: object = {};
-
-export const QueryAllLimitOrderPoolUserSharesWithdrawnResponse = {
-  encode(
-    message: QueryAllLimitOrderPoolUserSharesWithdrawnResponse,
-    writer: Writer = Writer.create()
-  ): Writer {
-    for (const v of message.limitOrderPoolUserSharesWithdrawn) {
-      LimitOrderPoolUserSharesWithdrawn.encode(
-        v!,
-        writer.uint32(10).fork()
-      ).ldelim();
-    }
-    if (message.pagination !== undefined) {
-      PageResponse.encode(
-        message.pagination,
-        writer.uint32(18).fork()
-      ).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryAllLimitOrderPoolUserSharesWithdrawnResponse {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryAllLimitOrderPoolUserSharesWithdrawnResponse,
-    } as QueryAllLimitOrderPoolUserSharesWithdrawnResponse;
-    message.limitOrderPoolUserSharesWithdrawn = [];
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.limitOrderPoolUserSharesWithdrawn.push(
-            LimitOrderPoolUserSharesWithdrawn.decode(reader, reader.uint32())
-          );
-          break;
-        case 2:
-          message.pagination = PageResponse.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryAllLimitOrderPoolUserSharesWithdrawnResponse {
-    const message = {
-      ...baseQueryAllLimitOrderPoolUserSharesWithdrawnResponse,
-    } as QueryAllLimitOrderPoolUserSharesWithdrawnResponse;
-    message.limitOrderPoolUserSharesWithdrawn = [];
-    if (
-      object.limitOrderPoolUserSharesWithdrawn !== undefined &&
-      object.limitOrderPoolUserSharesWithdrawn !== null
-    ) {
-      for (const e of object.limitOrderPoolUserSharesWithdrawn) {
-        message.limitOrderPoolUserSharesWithdrawn.push(
-          LimitOrderPoolUserSharesWithdrawn.fromJSON(e)
-        );
-      }
-    }
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromJSON(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryAllLimitOrderPoolUserSharesWithdrawnResponse): unknown {
-    const obj: any = {};
-    if (message.limitOrderPoolUserSharesWithdrawn) {
-      obj.limitOrderPoolUserSharesWithdrawn = message.limitOrderPoolUserSharesWithdrawn.map(
-        (e) => (e ? LimitOrderPoolUserSharesWithdrawn.toJSON(e) : undefined)
-      );
-    } else {
-      obj.limitOrderPoolUserSharesWithdrawn = [];
-    }
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination
-        ? PageResponse.toJSON(message.pagination)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryAllLimitOrderPoolUserSharesWithdrawnResponse>
-  ): QueryAllLimitOrderPoolUserSharesWithdrawnResponse {
-    const message = {
-      ...baseQueryAllLimitOrderPoolUserSharesWithdrawnResponse,
-    } as QueryAllLimitOrderPoolUserSharesWithdrawnResponse;
-    message.limitOrderPoolUserSharesWithdrawn = [];
-    if (
-      object.limitOrderPoolUserSharesWithdrawn !== undefined &&
-      object.limitOrderPoolUserSharesWithdrawn !== null
-    ) {
-      for (const e of object.limitOrderPoolUserSharesWithdrawn) {
-        message.limitOrderPoolUserSharesWithdrawn.push(
-          LimitOrderPoolUserSharesWithdrawn.fromPartial(e)
-        );
-      }
-    }
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromPartial(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-};
-
-const baseQueryGetLimitOrderPoolTotalSharesMapRequest: object = {
+const baseQueryGetLimitOrderTrancheRequest: object = {
   pairId: "",
   tickIndex: 0,
   token: "",
   count: 0,
 };
 
-export const QueryGetLimitOrderPoolTotalSharesMapRequest = {
+export const QueryGetLimitOrderTrancheRequest = {
   encode(
-    message: QueryGetLimitOrderPoolTotalSharesMapRequest,
+    message: QueryGetLimitOrderTrancheRequest,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.pairId !== "") {
@@ -3656,12 +3167,12 @@ export const QueryGetLimitOrderPoolTotalSharesMapRequest = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryGetLimitOrderPoolTotalSharesMapRequest {
+  ): QueryGetLimitOrderTrancheRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryGetLimitOrderPoolTotalSharesMapRequest,
-    } as QueryGetLimitOrderPoolTotalSharesMapRequest;
+      ...baseQueryGetLimitOrderTrancheRequest,
+    } as QueryGetLimitOrderTrancheRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -3685,10 +3196,10 @@ export const QueryGetLimitOrderPoolTotalSharesMapRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetLimitOrderPoolTotalSharesMapRequest {
+  fromJSON(object: any): QueryGetLimitOrderTrancheRequest {
     const message = {
-      ...baseQueryGetLimitOrderPoolTotalSharesMapRequest,
-    } as QueryGetLimitOrderPoolTotalSharesMapRequest;
+      ...baseQueryGetLimitOrderTrancheRequest,
+    } as QueryGetLimitOrderTrancheRequest;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = String(object.pairId);
     } else {
@@ -3712,7 +3223,7 @@ export const QueryGetLimitOrderPoolTotalSharesMapRequest = {
     return message;
   },
 
-  toJSON(message: QueryGetLimitOrderPoolTotalSharesMapRequest): unknown {
+  toJSON(message: QueryGetLimitOrderTrancheRequest): unknown {
     const obj: any = {};
     message.pairId !== undefined && (obj.pairId = message.pairId);
     message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
@@ -3722,11 +3233,11 @@ export const QueryGetLimitOrderPoolTotalSharesMapRequest = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetLimitOrderPoolTotalSharesMapRequest>
-  ): QueryGetLimitOrderPoolTotalSharesMapRequest {
+    object: DeepPartial<QueryGetLimitOrderTrancheRequest>
+  ): QueryGetLimitOrderTrancheRequest {
     const message = {
-      ...baseQueryGetLimitOrderPoolTotalSharesMapRequest,
-    } as QueryGetLimitOrderPoolTotalSharesMapRequest;
+      ...baseQueryGetLimitOrderTrancheRequest,
+    } as QueryGetLimitOrderTrancheRequest;
     if (object.pairId !== undefined && object.pairId !== null) {
       message.pairId = object.pairId;
     } else {
@@ -3751,16 +3262,16 @@ export const QueryGetLimitOrderPoolTotalSharesMapRequest = {
   },
 };
 
-const baseQueryGetLimitOrderPoolTotalSharesMapResponse: object = {};
+const baseQueryGetLimitOrderTrancheResponse: object = {};
 
-export const QueryGetLimitOrderPoolTotalSharesMapResponse = {
+export const QueryGetLimitOrderTrancheResponse = {
   encode(
-    message: QueryGetLimitOrderPoolTotalSharesMapResponse,
+    message: QueryGetLimitOrderTrancheResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    if (message.limitOrderPoolTotalSharesMap !== undefined) {
-      LimitOrderPoolTotalSharesMap.encode(
-        message.limitOrderPoolTotalSharesMap,
+    if (message.LimitOrderTranche !== undefined) {
+      LimitOrderTranche.encode(
+        message.LimitOrderTranche,
         writer.uint32(10).fork()
       ).ldelim();
     }
@@ -3770,17 +3281,17 @@ export const QueryGetLimitOrderPoolTotalSharesMapResponse = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryGetLimitOrderPoolTotalSharesMapResponse {
+  ): QueryGetLimitOrderTrancheResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryGetLimitOrderPoolTotalSharesMapResponse,
-    } as QueryGetLimitOrderPoolTotalSharesMapResponse;
+      ...baseQueryGetLimitOrderTrancheResponse,
+    } as QueryGetLimitOrderTrancheResponse;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.limitOrderPoolTotalSharesMap = LimitOrderPoolTotalSharesMap.decode(
+          message.LimitOrderTranche = LimitOrderTranche.decode(
             reader,
             reader.uint32()
           );
@@ -3793,59 +3304,57 @@ export const QueryGetLimitOrderPoolTotalSharesMapResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetLimitOrderPoolTotalSharesMapResponse {
+  fromJSON(object: any): QueryGetLimitOrderTrancheResponse {
     const message = {
-      ...baseQueryGetLimitOrderPoolTotalSharesMapResponse,
-    } as QueryGetLimitOrderPoolTotalSharesMapResponse;
+      ...baseQueryGetLimitOrderTrancheResponse,
+    } as QueryGetLimitOrderTrancheResponse;
     if (
-      object.limitOrderPoolTotalSharesMap !== undefined &&
-      object.limitOrderPoolTotalSharesMap !== null
+      object.LimitOrderTranche !== undefined &&
+      object.LimitOrderTranche !== null
     ) {
-      message.limitOrderPoolTotalSharesMap = LimitOrderPoolTotalSharesMap.fromJSON(
-        object.limitOrderPoolTotalSharesMap
+      message.LimitOrderTranche = LimitOrderTranche.fromJSON(
+        object.LimitOrderTranche
       );
     } else {
-      message.limitOrderPoolTotalSharesMap = undefined;
+      message.LimitOrderTranche = undefined;
     }
     return message;
   },
 
-  toJSON(message: QueryGetLimitOrderPoolTotalSharesMapResponse): unknown {
+  toJSON(message: QueryGetLimitOrderTrancheResponse): unknown {
     const obj: any = {};
-    message.limitOrderPoolTotalSharesMap !== undefined &&
-      (obj.limitOrderPoolTotalSharesMap = message.limitOrderPoolTotalSharesMap
-        ? LimitOrderPoolTotalSharesMap.toJSON(
-            message.limitOrderPoolTotalSharesMap
-          )
+    message.LimitOrderTranche !== undefined &&
+      (obj.LimitOrderTranche = message.LimitOrderTranche
+        ? LimitOrderTranche.toJSON(message.LimitOrderTranche)
         : undefined);
     return obj;
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetLimitOrderPoolTotalSharesMapResponse>
-  ): QueryGetLimitOrderPoolTotalSharesMapResponse {
+    object: DeepPartial<QueryGetLimitOrderTrancheResponse>
+  ): QueryGetLimitOrderTrancheResponse {
     const message = {
-      ...baseQueryGetLimitOrderPoolTotalSharesMapResponse,
-    } as QueryGetLimitOrderPoolTotalSharesMapResponse;
+      ...baseQueryGetLimitOrderTrancheResponse,
+    } as QueryGetLimitOrderTrancheResponse;
     if (
-      object.limitOrderPoolTotalSharesMap !== undefined &&
-      object.limitOrderPoolTotalSharesMap !== null
+      object.LimitOrderTranche !== undefined &&
+      object.LimitOrderTranche !== null
     ) {
-      message.limitOrderPoolTotalSharesMap = LimitOrderPoolTotalSharesMap.fromPartial(
-        object.limitOrderPoolTotalSharesMap
+      message.LimitOrderTranche = LimitOrderTranche.fromPartial(
+        object.LimitOrderTranche
       );
     } else {
-      message.limitOrderPoolTotalSharesMap = undefined;
+      message.LimitOrderTranche = undefined;
     }
     return message;
   },
 };
 
-const baseQueryAllLimitOrderPoolTotalSharesMapRequest: object = {};
+const baseQueryAllLimitOrderTrancheRequest: object = {};
 
-export const QueryAllLimitOrderPoolTotalSharesMapRequest = {
+export const QueryAllLimitOrderTrancheRequest = {
   encode(
-    message: QueryAllLimitOrderPoolTotalSharesMapRequest,
+    message: QueryAllLimitOrderTrancheRequest,
     writer: Writer = Writer.create()
   ): Writer {
     if (message.pagination !== undefined) {
@@ -3857,12 +3366,12 @@ export const QueryAllLimitOrderPoolTotalSharesMapRequest = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryAllLimitOrderPoolTotalSharesMapRequest {
+  ): QueryAllLimitOrderTrancheRequest {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryAllLimitOrderPoolTotalSharesMapRequest,
-    } as QueryAllLimitOrderPoolTotalSharesMapRequest;
+      ...baseQueryAllLimitOrderTrancheRequest,
+    } as QueryAllLimitOrderTrancheRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -3877,10 +3386,10 @@ export const QueryAllLimitOrderPoolTotalSharesMapRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllLimitOrderPoolTotalSharesMapRequest {
+  fromJSON(object: any): QueryAllLimitOrderTrancheRequest {
     const message = {
-      ...baseQueryAllLimitOrderPoolTotalSharesMapRequest,
-    } as QueryAllLimitOrderPoolTotalSharesMapRequest;
+      ...baseQueryAllLimitOrderTrancheRequest,
+    } as QueryAllLimitOrderTrancheRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromJSON(object.pagination);
     } else {
@@ -3889,7 +3398,7 @@ export const QueryAllLimitOrderPoolTotalSharesMapRequest = {
     return message;
   },
 
-  toJSON(message: QueryAllLimitOrderPoolTotalSharesMapRequest): unknown {
+  toJSON(message: QueryAllLimitOrderTrancheRequest): unknown {
     const obj: any = {};
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -3899,11 +3408,11 @@ export const QueryAllLimitOrderPoolTotalSharesMapRequest = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryAllLimitOrderPoolTotalSharesMapRequest>
-  ): QueryAllLimitOrderPoolTotalSharesMapRequest {
+    object: DeepPartial<QueryAllLimitOrderTrancheRequest>
+  ): QueryAllLimitOrderTrancheRequest {
     const message = {
-      ...baseQueryAllLimitOrderPoolTotalSharesMapRequest,
-    } as QueryAllLimitOrderPoolTotalSharesMapRequest;
+      ...baseQueryAllLimitOrderTrancheRequest,
+    } as QueryAllLimitOrderTrancheRequest;
     if (object.pagination !== undefined && object.pagination !== null) {
       message.pagination = PageRequest.fromPartial(object.pagination);
     } else {
@@ -3913,18 +3422,15 @@ export const QueryAllLimitOrderPoolTotalSharesMapRequest = {
   },
 };
 
-const baseQueryAllLimitOrderPoolTotalSharesMapResponse: object = {};
+const baseQueryAllLimitOrderTrancheResponse: object = {};
 
-export const QueryAllLimitOrderPoolTotalSharesMapResponse = {
+export const QueryAllLimitOrderTrancheResponse = {
   encode(
-    message: QueryAllLimitOrderPoolTotalSharesMapResponse,
+    message: QueryAllLimitOrderTrancheResponse,
     writer: Writer = Writer.create()
   ): Writer {
-    for (const v of message.limitOrderPoolTotalSharesMap) {
-      LimitOrderPoolTotalSharesMap.encode(
-        v!,
-        writer.uint32(10).fork()
-      ).ldelim();
+    for (const v of message.LimitOrderTranche) {
+      LimitOrderTranche.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     if (message.pagination !== undefined) {
       PageResponse.encode(
@@ -3938,19 +3444,19 @@ export const QueryAllLimitOrderPoolTotalSharesMapResponse = {
   decode(
     input: Reader | Uint8Array,
     length?: number
-  ): QueryAllLimitOrderPoolTotalSharesMapResponse {
+  ): QueryAllLimitOrderTrancheResponse {
     const reader = input instanceof Uint8Array ? new Reader(input) : input;
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = {
-      ...baseQueryAllLimitOrderPoolTotalSharesMapResponse,
-    } as QueryAllLimitOrderPoolTotalSharesMapResponse;
-    message.limitOrderPoolTotalSharesMap = [];
+      ...baseQueryAllLimitOrderTrancheResponse,
+    } as QueryAllLimitOrderTrancheResponse;
+    message.LimitOrderTranche = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.limitOrderPoolTotalSharesMap.push(
-            LimitOrderPoolTotalSharesMap.decode(reader, reader.uint32())
+          message.LimitOrderTranche.push(
+            LimitOrderTranche.decode(reader, reader.uint32())
           );
           break;
         case 2:
@@ -3964,19 +3470,17 @@ export const QueryAllLimitOrderPoolTotalSharesMapResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryAllLimitOrderPoolTotalSharesMapResponse {
+  fromJSON(object: any): QueryAllLimitOrderTrancheResponse {
     const message = {
-      ...baseQueryAllLimitOrderPoolTotalSharesMapResponse,
-    } as QueryAllLimitOrderPoolTotalSharesMapResponse;
-    message.limitOrderPoolTotalSharesMap = [];
+      ...baseQueryAllLimitOrderTrancheResponse,
+    } as QueryAllLimitOrderTrancheResponse;
+    message.LimitOrderTranche = [];
     if (
-      object.limitOrderPoolTotalSharesMap !== undefined &&
-      object.limitOrderPoolTotalSharesMap !== null
+      object.LimitOrderTranche !== undefined &&
+      object.LimitOrderTranche !== null
     ) {
-      for (const e of object.limitOrderPoolTotalSharesMap) {
-        message.limitOrderPoolTotalSharesMap.push(
-          LimitOrderPoolTotalSharesMap.fromJSON(e)
-        );
+      for (const e of object.LimitOrderTranche) {
+        message.LimitOrderTranche.push(LimitOrderTranche.fromJSON(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -3987,14 +3491,14 @@ export const QueryAllLimitOrderPoolTotalSharesMapResponse = {
     return message;
   },
 
-  toJSON(message: QueryAllLimitOrderPoolTotalSharesMapResponse): unknown {
+  toJSON(message: QueryAllLimitOrderTrancheResponse): unknown {
     const obj: any = {};
-    if (message.limitOrderPoolTotalSharesMap) {
-      obj.limitOrderPoolTotalSharesMap = message.limitOrderPoolTotalSharesMap.map(
-        (e) => (e ? LimitOrderPoolTotalSharesMap.toJSON(e) : undefined)
+    if (message.LimitOrderTranche) {
+      obj.LimitOrderTranche = message.LimitOrderTranche.map((e) =>
+        e ? LimitOrderTranche.toJSON(e) : undefined
       );
     } else {
-      obj.limitOrderPoolTotalSharesMap = [];
+      obj.LimitOrderTranche = [];
     }
     message.pagination !== undefined &&
       (obj.pagination = message.pagination
@@ -4004,814 +3508,18 @@ export const QueryAllLimitOrderPoolTotalSharesMapResponse = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryAllLimitOrderPoolTotalSharesMapResponse>
-  ): QueryAllLimitOrderPoolTotalSharesMapResponse {
+    object: DeepPartial<QueryAllLimitOrderTrancheResponse>
+  ): QueryAllLimitOrderTrancheResponse {
     const message = {
-      ...baseQueryAllLimitOrderPoolTotalSharesMapResponse,
-    } as QueryAllLimitOrderPoolTotalSharesMapResponse;
-    message.limitOrderPoolTotalSharesMap = [];
+      ...baseQueryAllLimitOrderTrancheResponse,
+    } as QueryAllLimitOrderTrancheResponse;
+    message.LimitOrderTranche = [];
     if (
-      object.limitOrderPoolTotalSharesMap !== undefined &&
-      object.limitOrderPoolTotalSharesMap !== null
+      object.LimitOrderTranche !== undefined &&
+      object.LimitOrderTranche !== null
     ) {
-      for (const e of object.limitOrderPoolTotalSharesMap) {
-        message.limitOrderPoolTotalSharesMap.push(
-          LimitOrderPoolTotalSharesMap.fromPartial(e)
-        );
-      }
-    }
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromPartial(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-};
-
-const baseQueryGetLimitOrderPoolReserveMapRequest: object = {
-  pairId: "",
-  tickIndex: 0,
-  token: "",
-  count: 0,
-};
-
-export const QueryGetLimitOrderPoolReserveMapRequest = {
-  encode(
-    message: QueryGetLimitOrderPoolReserveMapRequest,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.pairId !== "") {
-      writer.uint32(10).string(message.pairId);
-    }
-    if (message.tickIndex !== 0) {
-      writer.uint32(16).int64(message.tickIndex);
-    }
-    if (message.token !== "") {
-      writer.uint32(26).string(message.token);
-    }
-    if (message.count !== 0) {
-      writer.uint32(32).uint64(message.count);
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryGetLimitOrderPoolReserveMapRequest {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryGetLimitOrderPoolReserveMapRequest,
-    } as QueryGetLimitOrderPoolReserveMapRequest;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.pairId = reader.string();
-          break;
-        case 2:
-          message.tickIndex = longToNumber(reader.int64() as Long);
-          break;
-        case 3:
-          message.token = reader.string();
-          break;
-        case 4:
-          message.count = longToNumber(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryGetLimitOrderPoolReserveMapRequest {
-    const message = {
-      ...baseQueryGetLimitOrderPoolReserveMapRequest,
-    } as QueryGetLimitOrderPoolReserveMapRequest;
-    if (object.pairId !== undefined && object.pairId !== null) {
-      message.pairId = String(object.pairId);
-    } else {
-      message.pairId = "";
-    }
-    if (object.tickIndex !== undefined && object.tickIndex !== null) {
-      message.tickIndex = Number(object.tickIndex);
-    } else {
-      message.tickIndex = 0;
-    }
-    if (object.token !== undefined && object.token !== null) {
-      message.token = String(object.token);
-    } else {
-      message.token = "";
-    }
-    if (object.count !== undefined && object.count !== null) {
-      message.count = Number(object.count);
-    } else {
-      message.count = 0;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryGetLimitOrderPoolReserveMapRequest): unknown {
-    const obj: any = {};
-    message.pairId !== undefined && (obj.pairId = message.pairId);
-    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
-    message.token !== undefined && (obj.token = message.token);
-    message.count !== undefined && (obj.count = message.count);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryGetLimitOrderPoolReserveMapRequest>
-  ): QueryGetLimitOrderPoolReserveMapRequest {
-    const message = {
-      ...baseQueryGetLimitOrderPoolReserveMapRequest,
-    } as QueryGetLimitOrderPoolReserveMapRequest;
-    if (object.pairId !== undefined && object.pairId !== null) {
-      message.pairId = object.pairId;
-    } else {
-      message.pairId = "";
-    }
-    if (object.tickIndex !== undefined && object.tickIndex !== null) {
-      message.tickIndex = object.tickIndex;
-    } else {
-      message.tickIndex = 0;
-    }
-    if (object.token !== undefined && object.token !== null) {
-      message.token = object.token;
-    } else {
-      message.token = "";
-    }
-    if (object.count !== undefined && object.count !== null) {
-      message.count = object.count;
-    } else {
-      message.count = 0;
-    }
-    return message;
-  },
-};
-
-const baseQueryGetLimitOrderPoolReserveMapResponse: object = {};
-
-export const QueryGetLimitOrderPoolReserveMapResponse = {
-  encode(
-    message: QueryGetLimitOrderPoolReserveMapResponse,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.limitOrderPoolReserveMap !== undefined) {
-      LimitOrderPoolReserveMap.encode(
-        message.limitOrderPoolReserveMap,
-        writer.uint32(10).fork()
-      ).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryGetLimitOrderPoolReserveMapResponse {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryGetLimitOrderPoolReserveMapResponse,
-    } as QueryGetLimitOrderPoolReserveMapResponse;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.limitOrderPoolReserveMap = LimitOrderPoolReserveMap.decode(
-            reader,
-            reader.uint32()
-          );
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryGetLimitOrderPoolReserveMapResponse {
-    const message = {
-      ...baseQueryGetLimitOrderPoolReserveMapResponse,
-    } as QueryGetLimitOrderPoolReserveMapResponse;
-    if (
-      object.limitOrderPoolReserveMap !== undefined &&
-      object.limitOrderPoolReserveMap !== null
-    ) {
-      message.limitOrderPoolReserveMap = LimitOrderPoolReserveMap.fromJSON(
-        object.limitOrderPoolReserveMap
-      );
-    } else {
-      message.limitOrderPoolReserveMap = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryGetLimitOrderPoolReserveMapResponse): unknown {
-    const obj: any = {};
-    message.limitOrderPoolReserveMap !== undefined &&
-      (obj.limitOrderPoolReserveMap = message.limitOrderPoolReserveMap
-        ? LimitOrderPoolReserveMap.toJSON(message.limitOrderPoolReserveMap)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryGetLimitOrderPoolReserveMapResponse>
-  ): QueryGetLimitOrderPoolReserveMapResponse {
-    const message = {
-      ...baseQueryGetLimitOrderPoolReserveMapResponse,
-    } as QueryGetLimitOrderPoolReserveMapResponse;
-    if (
-      object.limitOrderPoolReserveMap !== undefined &&
-      object.limitOrderPoolReserveMap !== null
-    ) {
-      message.limitOrderPoolReserveMap = LimitOrderPoolReserveMap.fromPartial(
-        object.limitOrderPoolReserveMap
-      );
-    } else {
-      message.limitOrderPoolReserveMap = undefined;
-    }
-    return message;
-  },
-};
-
-const baseQueryAllLimitOrderPoolReserveMapRequest: object = {};
-
-export const QueryAllLimitOrderPoolReserveMapRequest = {
-  encode(
-    message: QueryAllLimitOrderPoolReserveMapRequest,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.pagination !== undefined) {
-      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryAllLimitOrderPoolReserveMapRequest {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryAllLimitOrderPoolReserveMapRequest,
-    } as QueryAllLimitOrderPoolReserveMapRequest;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.pagination = PageRequest.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryAllLimitOrderPoolReserveMapRequest {
-    const message = {
-      ...baseQueryAllLimitOrderPoolReserveMapRequest,
-    } as QueryAllLimitOrderPoolReserveMapRequest;
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromJSON(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryAllLimitOrderPoolReserveMapRequest): unknown {
-    const obj: any = {};
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination
-        ? PageRequest.toJSON(message.pagination)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryAllLimitOrderPoolReserveMapRequest>
-  ): QueryAllLimitOrderPoolReserveMapRequest {
-    const message = {
-      ...baseQueryAllLimitOrderPoolReserveMapRequest,
-    } as QueryAllLimitOrderPoolReserveMapRequest;
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromPartial(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-};
-
-const baseQueryAllLimitOrderPoolReserveMapResponse: object = {};
-
-export const QueryAllLimitOrderPoolReserveMapResponse = {
-  encode(
-    message: QueryAllLimitOrderPoolReserveMapResponse,
-    writer: Writer = Writer.create()
-  ): Writer {
-    for (const v of message.limitOrderPoolReserveMap) {
-      LimitOrderPoolReserveMap.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.pagination !== undefined) {
-      PageResponse.encode(
-        message.pagination,
-        writer.uint32(18).fork()
-      ).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryAllLimitOrderPoolReserveMapResponse {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryAllLimitOrderPoolReserveMapResponse,
-    } as QueryAllLimitOrderPoolReserveMapResponse;
-    message.limitOrderPoolReserveMap = [];
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.limitOrderPoolReserveMap.push(
-            LimitOrderPoolReserveMap.decode(reader, reader.uint32())
-          );
-          break;
-        case 2:
-          message.pagination = PageResponse.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryAllLimitOrderPoolReserveMapResponse {
-    const message = {
-      ...baseQueryAllLimitOrderPoolReserveMapResponse,
-    } as QueryAllLimitOrderPoolReserveMapResponse;
-    message.limitOrderPoolReserveMap = [];
-    if (
-      object.limitOrderPoolReserveMap !== undefined &&
-      object.limitOrderPoolReserveMap !== null
-    ) {
-      for (const e of object.limitOrderPoolReserveMap) {
-        message.limitOrderPoolReserveMap.push(
-          LimitOrderPoolReserveMap.fromJSON(e)
-        );
-      }
-    }
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromJSON(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryAllLimitOrderPoolReserveMapResponse): unknown {
-    const obj: any = {};
-    if (message.limitOrderPoolReserveMap) {
-      obj.limitOrderPoolReserveMap = message.limitOrderPoolReserveMap.map((e) =>
-        e ? LimitOrderPoolReserveMap.toJSON(e) : undefined
-      );
-    } else {
-      obj.limitOrderPoolReserveMap = [];
-    }
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination
-        ? PageResponse.toJSON(message.pagination)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryAllLimitOrderPoolReserveMapResponse>
-  ): QueryAllLimitOrderPoolReserveMapResponse {
-    const message = {
-      ...baseQueryAllLimitOrderPoolReserveMapResponse,
-    } as QueryAllLimitOrderPoolReserveMapResponse;
-    message.limitOrderPoolReserveMap = [];
-    if (
-      object.limitOrderPoolReserveMap !== undefined &&
-      object.limitOrderPoolReserveMap !== null
-    ) {
-      for (const e of object.limitOrderPoolReserveMap) {
-        message.limitOrderPoolReserveMap.push(
-          LimitOrderPoolReserveMap.fromPartial(e)
-        );
-      }
-    }
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromPartial(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-};
-
-const baseQueryGetLimitOrderPoolFillMapRequest: object = {
-  pairId: "",
-  tickIndex: 0,
-  token: "",
-  count: 0,
-};
-
-export const QueryGetLimitOrderPoolFillMapRequest = {
-  encode(
-    message: QueryGetLimitOrderPoolFillMapRequest,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.pairId !== "") {
-      writer.uint32(10).string(message.pairId);
-    }
-    if (message.tickIndex !== 0) {
-      writer.uint32(16).int64(message.tickIndex);
-    }
-    if (message.token !== "") {
-      writer.uint32(26).string(message.token);
-    }
-    if (message.count !== 0) {
-      writer.uint32(32).uint64(message.count);
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryGetLimitOrderPoolFillMapRequest {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryGetLimitOrderPoolFillMapRequest,
-    } as QueryGetLimitOrderPoolFillMapRequest;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.pairId = reader.string();
-          break;
-        case 2:
-          message.tickIndex = longToNumber(reader.int64() as Long);
-          break;
-        case 3:
-          message.token = reader.string();
-          break;
-        case 4:
-          message.count = longToNumber(reader.uint64() as Long);
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryGetLimitOrderPoolFillMapRequest {
-    const message = {
-      ...baseQueryGetLimitOrderPoolFillMapRequest,
-    } as QueryGetLimitOrderPoolFillMapRequest;
-    if (object.pairId !== undefined && object.pairId !== null) {
-      message.pairId = String(object.pairId);
-    } else {
-      message.pairId = "";
-    }
-    if (object.tickIndex !== undefined && object.tickIndex !== null) {
-      message.tickIndex = Number(object.tickIndex);
-    } else {
-      message.tickIndex = 0;
-    }
-    if (object.token !== undefined && object.token !== null) {
-      message.token = String(object.token);
-    } else {
-      message.token = "";
-    }
-    if (object.count !== undefined && object.count !== null) {
-      message.count = Number(object.count);
-    } else {
-      message.count = 0;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryGetLimitOrderPoolFillMapRequest): unknown {
-    const obj: any = {};
-    message.pairId !== undefined && (obj.pairId = message.pairId);
-    message.tickIndex !== undefined && (obj.tickIndex = message.tickIndex);
-    message.token !== undefined && (obj.token = message.token);
-    message.count !== undefined && (obj.count = message.count);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryGetLimitOrderPoolFillMapRequest>
-  ): QueryGetLimitOrderPoolFillMapRequest {
-    const message = {
-      ...baseQueryGetLimitOrderPoolFillMapRequest,
-    } as QueryGetLimitOrderPoolFillMapRequest;
-    if (object.pairId !== undefined && object.pairId !== null) {
-      message.pairId = object.pairId;
-    } else {
-      message.pairId = "";
-    }
-    if (object.tickIndex !== undefined && object.tickIndex !== null) {
-      message.tickIndex = object.tickIndex;
-    } else {
-      message.tickIndex = 0;
-    }
-    if (object.token !== undefined && object.token !== null) {
-      message.token = object.token;
-    } else {
-      message.token = "";
-    }
-    if (object.count !== undefined && object.count !== null) {
-      message.count = object.count;
-    } else {
-      message.count = 0;
-    }
-    return message;
-  },
-};
-
-const baseQueryGetLimitOrderPoolFillMapResponse: object = {};
-
-export const QueryGetLimitOrderPoolFillMapResponse = {
-  encode(
-    message: QueryGetLimitOrderPoolFillMapResponse,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.limitOrderPoolFillMap !== undefined) {
-      LimitOrderPoolFillMap.encode(
-        message.limitOrderPoolFillMap,
-        writer.uint32(10).fork()
-      ).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryGetLimitOrderPoolFillMapResponse {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryGetLimitOrderPoolFillMapResponse,
-    } as QueryGetLimitOrderPoolFillMapResponse;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.limitOrderPoolFillMap = LimitOrderPoolFillMap.decode(
-            reader,
-            reader.uint32()
-          );
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryGetLimitOrderPoolFillMapResponse {
-    const message = {
-      ...baseQueryGetLimitOrderPoolFillMapResponse,
-    } as QueryGetLimitOrderPoolFillMapResponse;
-    if (
-      object.limitOrderPoolFillMap !== undefined &&
-      object.limitOrderPoolFillMap !== null
-    ) {
-      message.limitOrderPoolFillMap = LimitOrderPoolFillMap.fromJSON(
-        object.limitOrderPoolFillMap
-      );
-    } else {
-      message.limitOrderPoolFillMap = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryGetLimitOrderPoolFillMapResponse): unknown {
-    const obj: any = {};
-    message.limitOrderPoolFillMap !== undefined &&
-      (obj.limitOrderPoolFillMap = message.limitOrderPoolFillMap
-        ? LimitOrderPoolFillMap.toJSON(message.limitOrderPoolFillMap)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryGetLimitOrderPoolFillMapResponse>
-  ): QueryGetLimitOrderPoolFillMapResponse {
-    const message = {
-      ...baseQueryGetLimitOrderPoolFillMapResponse,
-    } as QueryGetLimitOrderPoolFillMapResponse;
-    if (
-      object.limitOrderPoolFillMap !== undefined &&
-      object.limitOrderPoolFillMap !== null
-    ) {
-      message.limitOrderPoolFillMap = LimitOrderPoolFillMap.fromPartial(
-        object.limitOrderPoolFillMap
-      );
-    } else {
-      message.limitOrderPoolFillMap = undefined;
-    }
-    return message;
-  },
-};
-
-const baseQueryAllLimitOrderPoolFillMapRequest: object = {};
-
-export const QueryAllLimitOrderPoolFillMapRequest = {
-  encode(
-    message: QueryAllLimitOrderPoolFillMapRequest,
-    writer: Writer = Writer.create()
-  ): Writer {
-    if (message.pagination !== undefined) {
-      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryAllLimitOrderPoolFillMapRequest {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryAllLimitOrderPoolFillMapRequest,
-    } as QueryAllLimitOrderPoolFillMapRequest;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.pagination = PageRequest.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryAllLimitOrderPoolFillMapRequest {
-    const message = {
-      ...baseQueryAllLimitOrderPoolFillMapRequest,
-    } as QueryAllLimitOrderPoolFillMapRequest;
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromJSON(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryAllLimitOrderPoolFillMapRequest): unknown {
-    const obj: any = {};
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination
-        ? PageRequest.toJSON(message.pagination)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryAllLimitOrderPoolFillMapRequest>
-  ): QueryAllLimitOrderPoolFillMapRequest {
-    const message = {
-      ...baseQueryAllLimitOrderPoolFillMapRequest,
-    } as QueryAllLimitOrderPoolFillMapRequest;
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromPartial(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-};
-
-const baseQueryAllLimitOrderPoolFillMapResponse: object = {};
-
-export const QueryAllLimitOrderPoolFillMapResponse = {
-  encode(
-    message: QueryAllLimitOrderPoolFillMapResponse,
-    writer: Writer = Writer.create()
-  ): Writer {
-    for (const v of message.limitOrderPoolFillMap) {
-      LimitOrderPoolFillMap.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    if (message.pagination !== undefined) {
-      PageResponse.encode(
-        message.pagination,
-        writer.uint32(18).fork()
-      ).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: Reader | Uint8Array,
-    length?: number
-  ): QueryAllLimitOrderPoolFillMapResponse {
-    const reader = input instanceof Uint8Array ? new Reader(input) : input;
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryAllLimitOrderPoolFillMapResponse,
-    } as QueryAllLimitOrderPoolFillMapResponse;
-    message.limitOrderPoolFillMap = [];
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.limitOrderPoolFillMap.push(
-            LimitOrderPoolFillMap.decode(reader, reader.uint32())
-          );
-          break;
-        case 2:
-          message.pagination = PageResponse.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryAllLimitOrderPoolFillMapResponse {
-    const message = {
-      ...baseQueryAllLimitOrderPoolFillMapResponse,
-    } as QueryAllLimitOrderPoolFillMapResponse;
-    message.limitOrderPoolFillMap = [];
-    if (
-      object.limitOrderPoolFillMap !== undefined &&
-      object.limitOrderPoolFillMap !== null
-    ) {
-      for (const e of object.limitOrderPoolFillMap) {
-        message.limitOrderPoolFillMap.push(LimitOrderPoolFillMap.fromJSON(e));
-      }
-    }
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromJSON(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryAllLimitOrderPoolFillMapResponse): unknown {
-    const obj: any = {};
-    if (message.limitOrderPoolFillMap) {
-      obj.limitOrderPoolFillMap = message.limitOrderPoolFillMap.map((e) =>
-        e ? LimitOrderPoolFillMap.toJSON(e) : undefined
-      );
-    } else {
-      obj.limitOrderPoolFillMap = [];
-    }
-    message.pagination !== undefined &&
-      (obj.pagination = message.pagination
-        ? PageResponse.toJSON(message.pagination)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryAllLimitOrderPoolFillMapResponse>
-  ): QueryAllLimitOrderPoolFillMapResponse {
-    const message = {
-      ...baseQueryAllLimitOrderPoolFillMapResponse,
-    } as QueryAllLimitOrderPoolFillMapResponse;
-    message.limitOrderPoolFillMap = [];
-    if (
-      object.limitOrderPoolFillMap !== undefined &&
-      object.limitOrderPoolFillMap !== null
-    ) {
-      for (const e of object.limitOrderPoolFillMap) {
-        message.limitOrderPoolFillMap.push(
-          LimitOrderPoolFillMap.fromPartial(e)
-        );
+      for (const e of object.LimitOrderTranche) {
+        message.LimitOrderTranche.push(LimitOrderTranche.fromPartial(e));
       }
     }
     if (object.pagination !== undefined && object.pagination !== null) {
@@ -4865,46 +3573,22 @@ export interface Query {
   AdjanceyMatrixAll(
     request: QueryAllAdjanceyMatrixRequest
   ): Promise<QueryAllAdjanceyMatrixResponse>;
-  /** Queries a LimitOrderPoolUserShareMap by index. */
-  LimitOrderPoolUserShareMap(
-    request: QueryGetLimitOrderPoolUserShareMapRequest
-  ): Promise<QueryGetLimitOrderPoolUserShareMapResponse>;
-  /** Queries a list of LimitOrderPoolUserShareMap items. */
-  LimitOrderPoolUserShareMapAll(
-    request: QueryAllLimitOrderPoolUserShareMapRequest
-  ): Promise<QueryAllLimitOrderPoolUserShareMapResponse>;
-  /** Queries a LimitOrderPoolUserSharesWithdrawn by index. */
-  LimitOrderPoolUserSharesWithdrawn(
-    request: QueryGetLimitOrderPoolUserSharesWithdrawnRequest
-  ): Promise<QueryGetLimitOrderPoolUserSharesWithdrawnResponse>;
-  /** Queries a list of LimitOrderPoolUserSharesWithdrawn items. */
-  LimitOrderPoolUserSharesWithdrawnAll(
-    request: QueryAllLimitOrderPoolUserSharesWithdrawnRequest
-  ): Promise<QueryAllLimitOrderPoolUserSharesWithdrawnResponse>;
-  /** Queries a LimitOrderPoolTotalSharesMap by index. */
-  LimitOrderPoolTotalSharesMap(
-    request: QueryGetLimitOrderPoolTotalSharesMapRequest
-  ): Promise<QueryGetLimitOrderPoolTotalSharesMapResponse>;
-  /** Queries a list of LimitOrderPoolTotalSharesMap items. */
-  LimitOrderPoolTotalSharesMapAll(
-    request: QueryAllLimitOrderPoolTotalSharesMapRequest
-  ): Promise<QueryAllLimitOrderPoolTotalSharesMapResponse>;
-  /** Queries a LimitOrderPoolReserveMap by index. */
-  LimitOrderPoolReserveMap(
-    request: QueryGetLimitOrderPoolReserveMapRequest
-  ): Promise<QueryGetLimitOrderPoolReserveMapResponse>;
-  /** Queries a list of LimitOrderPoolReserveMap items. */
-  LimitOrderPoolReserveMapAll(
-    request: QueryAllLimitOrderPoolReserveMapRequest
-  ): Promise<QueryAllLimitOrderPoolReserveMapResponse>;
-  /** Queries a LimitOrderPoolFillMap by index. */
-  LimitOrderPoolFillMap(
-    request: QueryGetLimitOrderPoolFillMapRequest
-  ): Promise<QueryGetLimitOrderPoolFillMapResponse>;
-  /** Queries a list of LimitOrderPoolFillMap items. */
-  LimitOrderPoolFillMapAll(
-    request: QueryAllLimitOrderPoolFillMapRequest
-  ): Promise<QueryAllLimitOrderPoolFillMapResponse>;
+  /** Queries a LimitOrderTrancheUser by index. */
+  LimitOrderTrancheUser(
+    request: QueryGetLimitOrderTrancheUserRequest
+  ): Promise<QueryGetLimitOrderTrancheUserResponse>;
+  /** Queries a list of LimitOrderTrancheMap items. */
+  LimitOrderTrancheUserAll(
+    request: QueryAllLimitOrderTrancheUserRequest
+  ): Promise<QueryAllLimitOrderTrancheUserResponse>;
+  /** Queries a LimitOrderTranche by index. */
+  LimitOrderTranche(
+    request: QueryGetLimitOrderTrancheRequest
+  ): Promise<QueryGetLimitOrderTrancheResponse>;
+  /** Queries a list of LimitOrderTranche items. */
+  LimitOrderTrancheAll(
+    request: QueryAllLimitOrderTrancheRequest
+  ): Promise<QueryAllLimitOrderTrancheResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -5130,159 +3814,59 @@ export class QueryClientImpl implements Query {
     );
   }
 
-  LimitOrderPoolUserShareMap(
-    request: QueryGetLimitOrderPoolUserShareMapRequest
-  ): Promise<QueryGetLimitOrderPoolUserShareMapResponse> {
-    const data = QueryGetLimitOrderPoolUserShareMapRequest.encode(
-      request
-    ).finish();
+  LimitOrderTrancheUser(
+    request: QueryGetLimitOrderTrancheUserRequest
+  ): Promise<QueryGetLimitOrderTrancheUserResponse> {
+    const data = QueryGetLimitOrderTrancheUserRequest.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
-      "LimitOrderPoolUserShareMap",
+      "LimitOrderTrancheUser",
       data
     );
     return promise.then((data) =>
-      QueryGetLimitOrderPoolUserShareMapResponse.decode(new Reader(data))
+      QueryGetLimitOrderTrancheUserResponse.decode(new Reader(data))
     );
   }
 
-  LimitOrderPoolUserShareMapAll(
-    request: QueryAllLimitOrderPoolUserShareMapRequest
-  ): Promise<QueryAllLimitOrderPoolUserShareMapResponse> {
-    const data = QueryAllLimitOrderPoolUserShareMapRequest.encode(
-      request
-    ).finish();
+  LimitOrderTrancheUserAll(
+    request: QueryAllLimitOrderTrancheUserRequest
+  ): Promise<QueryAllLimitOrderTrancheUserResponse> {
+    const data = QueryAllLimitOrderTrancheUserRequest.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
-      "LimitOrderPoolUserShareMapAll",
+      "LimitOrderTrancheUserAll",
       data
     );
     return promise.then((data) =>
-      QueryAllLimitOrderPoolUserShareMapResponse.decode(new Reader(data))
+      QueryAllLimitOrderTrancheUserResponse.decode(new Reader(data))
     );
   }
 
-  LimitOrderPoolUserSharesWithdrawn(
-    request: QueryGetLimitOrderPoolUserSharesWithdrawnRequest
-  ): Promise<QueryGetLimitOrderPoolUserSharesWithdrawnResponse> {
-    const data = QueryGetLimitOrderPoolUserSharesWithdrawnRequest.encode(
-      request
-    ).finish();
+  LimitOrderTranche(
+    request: QueryGetLimitOrderTrancheRequest
+  ): Promise<QueryGetLimitOrderTrancheResponse> {
+    const data = QueryGetLimitOrderTrancheRequest.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
-      "LimitOrderPoolUserSharesWithdrawn",
+      "LimitOrderTranche",
       data
     );
     return promise.then((data) =>
-      QueryGetLimitOrderPoolUserSharesWithdrawnResponse.decode(new Reader(data))
+      QueryGetLimitOrderTrancheResponse.decode(new Reader(data))
     );
   }
 
-  LimitOrderPoolUserSharesWithdrawnAll(
-    request: QueryAllLimitOrderPoolUserSharesWithdrawnRequest
-  ): Promise<QueryAllLimitOrderPoolUserSharesWithdrawnResponse> {
-    const data = QueryAllLimitOrderPoolUserSharesWithdrawnRequest.encode(
-      request
-    ).finish();
+  LimitOrderTrancheAll(
+    request: QueryAllLimitOrderTrancheRequest
+  ): Promise<QueryAllLimitOrderTrancheResponse> {
+    const data = QueryAllLimitOrderTrancheRequest.encode(request).finish();
     const promise = this.rpc.request(
       "nicholasdotsol.duality.dex.Query",
-      "LimitOrderPoolUserSharesWithdrawnAll",
+      "LimitOrderTrancheAll",
       data
     );
     return promise.then((data) =>
-      QueryAllLimitOrderPoolUserSharesWithdrawnResponse.decode(new Reader(data))
-    );
-  }
-
-  LimitOrderPoolTotalSharesMap(
-    request: QueryGetLimitOrderPoolTotalSharesMapRequest
-  ): Promise<QueryGetLimitOrderPoolTotalSharesMapResponse> {
-    const data = QueryGetLimitOrderPoolTotalSharesMapRequest.encode(
-      request
-    ).finish();
-    const promise = this.rpc.request(
-      "nicholasdotsol.duality.dex.Query",
-      "LimitOrderPoolTotalSharesMap",
-      data
-    );
-    return promise.then((data) =>
-      QueryGetLimitOrderPoolTotalSharesMapResponse.decode(new Reader(data))
-    );
-  }
-
-  LimitOrderPoolTotalSharesMapAll(
-    request: QueryAllLimitOrderPoolTotalSharesMapRequest
-  ): Promise<QueryAllLimitOrderPoolTotalSharesMapResponse> {
-    const data = QueryAllLimitOrderPoolTotalSharesMapRequest.encode(
-      request
-    ).finish();
-    const promise = this.rpc.request(
-      "nicholasdotsol.duality.dex.Query",
-      "LimitOrderPoolTotalSharesMapAll",
-      data
-    );
-    return promise.then((data) =>
-      QueryAllLimitOrderPoolTotalSharesMapResponse.decode(new Reader(data))
-    );
-  }
-
-  LimitOrderPoolReserveMap(
-    request: QueryGetLimitOrderPoolReserveMapRequest
-  ): Promise<QueryGetLimitOrderPoolReserveMapResponse> {
-    const data = QueryGetLimitOrderPoolReserveMapRequest.encode(
-      request
-    ).finish();
-    const promise = this.rpc.request(
-      "nicholasdotsol.duality.dex.Query",
-      "LimitOrderPoolReserveMap",
-      data
-    );
-    return promise.then((data) =>
-      QueryGetLimitOrderPoolReserveMapResponse.decode(new Reader(data))
-    );
-  }
-
-  LimitOrderPoolReserveMapAll(
-    request: QueryAllLimitOrderPoolReserveMapRequest
-  ): Promise<QueryAllLimitOrderPoolReserveMapResponse> {
-    const data = QueryAllLimitOrderPoolReserveMapRequest.encode(
-      request
-    ).finish();
-    const promise = this.rpc.request(
-      "nicholasdotsol.duality.dex.Query",
-      "LimitOrderPoolReserveMapAll",
-      data
-    );
-    return promise.then((data) =>
-      QueryAllLimitOrderPoolReserveMapResponse.decode(new Reader(data))
-    );
-  }
-
-  LimitOrderPoolFillMap(
-    request: QueryGetLimitOrderPoolFillMapRequest
-  ): Promise<QueryGetLimitOrderPoolFillMapResponse> {
-    const data = QueryGetLimitOrderPoolFillMapRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      "nicholasdotsol.duality.dex.Query",
-      "LimitOrderPoolFillMap",
-      data
-    );
-    return promise.then((data) =>
-      QueryGetLimitOrderPoolFillMapResponse.decode(new Reader(data))
-    );
-  }
-
-  LimitOrderPoolFillMapAll(
-    request: QueryAllLimitOrderPoolFillMapRequest
-  ): Promise<QueryAllLimitOrderPoolFillMapResponse> {
-    const data = QueryAllLimitOrderPoolFillMapRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      "nicholasdotsol.duality.dex.Query",
-      "LimitOrderPoolFillMapAll",
-      data
-    );
-    return promise.then((data) =>
-      QueryAllLimitOrderPoolFillMapResponse.decode(new Reader(data))
+      QueryAllLimitOrderTrancheResponse.decode(new Reader(data))
     );
   }
 }

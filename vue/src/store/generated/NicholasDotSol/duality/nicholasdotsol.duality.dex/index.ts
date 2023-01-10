@@ -3,12 +3,9 @@ import { txClient, queryClient, MissingWalletError , registry} from './module'
 import { AdjanceyMatrix } from "./module/types/dex/adjancey_matrix"
 import { EdgeRow } from "./module/types/dex/edge_row"
 import { FeeList } from "./module/types/dex/fee_list"
-import { LimitOrderPool } from "./module/types/dex/limit_order_pool"
-import { LimitOrderPoolFillMap } from "./module/types/dex/limit_order_pool_fill_map"
-import { LimitOrderPoolReserveMap } from "./module/types/dex/limit_order_pool_reserve_map"
-import { LimitOrderPoolTotalSharesMap } from "./module/types/dex/limit_order_pool_total_shares_map"
-import { LimitOrderPoolUserShareMap } from "./module/types/dex/limit_order_pool_user_share_map"
-import { LimitOrderPoolUserSharesWithdrawn } from "./module/types/dex/limit_order_pool_user_shares_withdrawn"
+import { LimitOrderTrancheTrancheIndexes } from "./module/types/dex/limit_order_pool_tranche_indexes"
+import { LimitOrderTranche } from "./module/types/dex/limit_order_tranche"
+import { LimitOrderTrancheUser } from "./module/types/dex/limit_order_tranche_user"
 import { PairMap } from "./module/types/dex/pair_map"
 import { Params } from "./module/types/dex/params"
 import { Reserve0AndSharesType } from "./module/types/dex/reserve_0_and_shares_type"
@@ -20,7 +17,7 @@ import { TokenPairType } from "./module/types/dex/token_pair_type"
 import { Tokens } from "./module/types/dex/tokens"
 
 
-export { AdjanceyMatrix, EdgeRow, FeeList, LimitOrderPool, LimitOrderPoolFillMap, LimitOrderPoolReserveMap, LimitOrderPoolTotalSharesMap, LimitOrderPoolUserShareMap, LimitOrderPoolUserSharesWithdrawn, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
+export { AdjanceyMatrix, EdgeRow, FeeList, LimitOrderTrancheTrancheIndexes, LimitOrderTranche, LimitOrderTrancheUser, PairMap, Params, Reserve0AndSharesType, Shares, TickDataType, TickMap, TokenMap, TokenPairType, Tokens };
 
 async function initTxClient(vuexGetters) {
 	return await txClient(vuexGetters['common/wallet/signer'], {
@@ -75,27 +72,18 @@ const getDefaultState = () => {
 				EdgeRowAll: {},
 				AdjanceyMatrix: {},
 				AdjanceyMatrixAll: {},
-				LimitOrderPoolUserShareMap: {},
-				LimitOrderPoolUserShareMapAll: {},
-				LimitOrderPoolUserSharesWithdrawn: {},
-				LimitOrderPoolUserSharesWithdrawnAll: {},
-				LimitOrderPoolTotalSharesMap: {},
-				LimitOrderPoolTotalSharesMapAll: {},
-				LimitOrderPoolReserveMap: {},
-				LimitOrderPoolReserveMapAll: {},
-				LimitOrderPoolFillMap: {},
-				LimitOrderPoolFillMapAll: {},
+				LimitOrderTrancheUser: {},
+				LimitOrderTrancheUserAll: {},
+				LimitOrderTranche: {},
+				LimitOrderTrancheAll: {},
 				
 				_Structure: {
 						AdjanceyMatrix: getStructure(AdjanceyMatrix.fromPartial({})),
 						EdgeRow: getStructure(EdgeRow.fromPartial({})),
 						FeeList: getStructure(FeeList.fromPartial({})),
-						LimitOrderPool: getStructure(LimitOrderPool.fromPartial({})),
-						LimitOrderPoolFillMap: getStructure(LimitOrderPoolFillMap.fromPartial({})),
-						LimitOrderPoolReserveMap: getStructure(LimitOrderPoolReserveMap.fromPartial({})),
-						LimitOrderPoolTotalSharesMap: getStructure(LimitOrderPoolTotalSharesMap.fromPartial({})),
-						LimitOrderPoolUserShareMap: getStructure(LimitOrderPoolUserShareMap.fromPartial({})),
-						LimitOrderPoolUserSharesWithdrawn: getStructure(LimitOrderPoolUserSharesWithdrawn.fromPartial({})),
+						LimitOrderTrancheTrancheIndexes: getStructure(LimitOrderTrancheTrancheIndexes.fromPartial({})),
+						LimitOrderTranche: getStructure(LimitOrderTranche.fromPartial({})),
+						LimitOrderTrancheUser: getStructure(LimitOrderTrancheUser.fromPartial({})),
 						PairMap: getStructure(PairMap.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						Reserve0AndSharesType: getStructure(Reserve0AndSharesType.fromPartial({})),
@@ -235,65 +223,29 @@ export default {
 					}
 			return state.AdjanceyMatrixAll[JSON.stringify(params)] ?? {}
 		},
-				getLimitOrderPoolUserShareMap: (state) => (params = { params: {}}) => {
+				getLimitOrderTrancheUser: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.LimitOrderPoolUserShareMap[JSON.stringify(params)] ?? {}
+			return state.LimitOrderTrancheUser[JSON.stringify(params)] ?? {}
 		},
-				getLimitOrderPoolUserShareMapAll: (state) => (params = { params: {}}) => {
+				getLimitOrderTrancheUserAll: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.LimitOrderPoolUserShareMapAll[JSON.stringify(params)] ?? {}
+			return state.LimitOrderTrancheUserAll[JSON.stringify(params)] ?? {}
 		},
-				getLimitOrderPoolUserSharesWithdrawn: (state) => (params = { params: {}}) => {
+				getLimitOrderTranche: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.LimitOrderPoolUserSharesWithdrawn[JSON.stringify(params)] ?? {}
+			return state.LimitOrderTranche[JSON.stringify(params)] ?? {}
 		},
-				getLimitOrderPoolUserSharesWithdrawnAll: (state) => (params = { params: {}}) => {
+				getLimitOrderTrancheAll: (state) => (params = { params: {}}) => {
 					if (!(<any> params).query) {
 						(<any> params).query=null
 					}
-			return state.LimitOrderPoolUserSharesWithdrawnAll[JSON.stringify(params)] ?? {}
-		},
-				getLimitOrderPoolTotalSharesMap: (state) => (params = { params: {}}) => {
-					if (!(<any> params).query) {
-						(<any> params).query=null
-					}
-			return state.LimitOrderPoolTotalSharesMap[JSON.stringify(params)] ?? {}
-		},
-				getLimitOrderPoolTotalSharesMapAll: (state) => (params = { params: {}}) => {
-					if (!(<any> params).query) {
-						(<any> params).query=null
-					}
-			return state.LimitOrderPoolTotalSharesMapAll[JSON.stringify(params)] ?? {}
-		},
-				getLimitOrderPoolReserveMap: (state) => (params = { params: {}}) => {
-					if (!(<any> params).query) {
-						(<any> params).query=null
-					}
-			return state.LimitOrderPoolReserveMap[JSON.stringify(params)] ?? {}
-		},
-				getLimitOrderPoolReserveMapAll: (state) => (params = { params: {}}) => {
-					if (!(<any> params).query) {
-						(<any> params).query=null
-					}
-			return state.LimitOrderPoolReserveMapAll[JSON.stringify(params)] ?? {}
-		},
-				getLimitOrderPoolFillMap: (state) => (params = { params: {}}) => {
-					if (!(<any> params).query) {
-						(<any> params).query=null
-					}
-			return state.LimitOrderPoolFillMap[JSON.stringify(params)] ?? {}
-		},
-				getLimitOrderPoolFillMapAll: (state) => (params = { params: {}}) => {
-					if (!(<any> params).query) {
-						(<any> params).query=null
-					}
-			return state.LimitOrderPoolFillMapAll[JSON.stringify(params)] ?? {}
+			return state.LimitOrderTrancheAll[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -740,18 +692,18 @@ export default {
 		 		
 		
 		
-		async QueryLimitOrderPoolUserShareMap({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryLimitOrderTrancheUser({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolUserShareMap( key.pairId,  key.token,  key.tickIndex,  key.count,  key.address)).data
+				let value= (await queryClient.queryLimitOrderTrancheUser( key.pairId,  key.token,  key.tickIndex,  key.count,  key.address)).data
 				
 					
-				commit('QUERY', { query: 'LimitOrderPoolUserShareMap', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolUserShareMap', payload: { options: { all }, params: {...key},query }})
-				return getters['getLimitOrderPoolUserShareMap']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'LimitOrderTrancheUser', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderTrancheUser', payload: { options: { all }, params: {...key},query }})
+				return getters['getLimitOrderTrancheUser']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryLimitOrderPoolUserShareMap API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryLimitOrderTrancheUser API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -762,22 +714,22 @@ export default {
 		 		
 		
 		
-		async QueryLimitOrderPoolUserShareMapAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryLimitOrderTrancheUserAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolUserShareMapAll(query)).data
+				let value= (await queryClient.queryLimitOrderTrancheUserAll(query)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryLimitOrderPoolUserShareMapAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await queryClient.queryLimitOrderTrancheUserAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
 					value = mergeResults(value, next_values);
 				}
-				commit('QUERY', { query: 'LimitOrderPoolUserShareMapAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolUserShareMapAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getLimitOrderPoolUserShareMapAll']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'LimitOrderTrancheUserAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderTrancheUserAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getLimitOrderTrancheUserAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryLimitOrderPoolUserShareMapAll API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryLimitOrderTrancheUserAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -788,18 +740,18 @@ export default {
 		 		
 		
 		
-		async QueryLimitOrderPoolUserSharesWithdrawn({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryLimitOrderTranche({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolUserSharesWithdrawn( key.pairId,  key.token,  key.tickIndex,  key.count,  key.address)).data
+				let value= (await queryClient.queryLimitOrderTranche( key.pairId,  key.token,  key.tickIndex,  key.count)).data
 				
 					
-				commit('QUERY', { query: 'LimitOrderPoolUserSharesWithdrawn', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolUserSharesWithdrawn', payload: { options: { all }, params: {...key},query }})
-				return getters['getLimitOrderPoolUserSharesWithdrawn']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'LimitOrderTranche', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderTranche', payload: { options: { all }, params: {...key},query }})
+				return getters['getLimitOrderTranche']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryLimitOrderPoolUserSharesWithdrawn API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryLimitOrderTranche API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
@@ -810,183 +762,39 @@ export default {
 		 		
 		
 		
-		async QueryLimitOrderPoolUserSharesWithdrawnAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
+		async QueryLimitOrderTrancheAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
 				const key = params ?? {};
 				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolUserSharesWithdrawnAll(query)).data
+				let value= (await queryClient.queryLimitOrderTrancheAll(query)).data
 				
 					
 				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryLimitOrderPoolUserSharesWithdrawnAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
+					let next_values=(await queryClient.queryLimitOrderTrancheAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
 					value = mergeResults(value, next_values);
 				}
-				commit('QUERY', { query: 'LimitOrderPoolUserSharesWithdrawnAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolUserSharesWithdrawnAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getLimitOrderPoolUserSharesWithdrawnAll']( { params: {...key}, query}) ?? {}
+				commit('QUERY', { query: 'LimitOrderTrancheAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderTrancheAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getLimitOrderTrancheAll']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				throw new Error('QueryClient:QueryLimitOrderPoolUserSharesWithdrawnAll API Node Unavailable. Could not perform query: ' + e.message)
+				throw new Error('QueryClient:QueryLimitOrderTrancheAll API Node Unavailable. Could not perform query: ' + e.message)
 				
 			}
 		},
 		
 		
-		
-		
-		 		
-		
-		
-		async QueryLimitOrderPoolTotalSharesMap({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
-			try {
-				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolTotalSharesMap( key.pairId,  key.token,  key.tickIndex,  key.count)).data
-				
-					
-				commit('QUERY', { query: 'LimitOrderPoolTotalSharesMap', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolTotalSharesMap', payload: { options: { all }, params: {...key},query }})
-				return getters['getLimitOrderPoolTotalSharesMap']( { params: {...key}, query}) ?? {}
-			} catch (e) {
-				throw new Error('QueryClient:QueryLimitOrderPoolTotalSharesMap API Node Unavailable. Could not perform query: ' + e.message)
-				
-			}
-		},
-		
-		
-		
-		
-		 		
-		
-		
-		async QueryLimitOrderPoolTotalSharesMapAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
-			try {
-				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolTotalSharesMapAll(query)).data
-				
-					
-				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryLimitOrderPoolTotalSharesMapAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
-					value = mergeResults(value, next_values);
-				}
-				commit('QUERY', { query: 'LimitOrderPoolTotalSharesMapAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolTotalSharesMapAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getLimitOrderPoolTotalSharesMapAll']( { params: {...key}, query}) ?? {}
-			} catch (e) {
-				throw new Error('QueryClient:QueryLimitOrderPoolTotalSharesMapAll API Node Unavailable. Could not perform query: ' + e.message)
-				
-			}
-		},
-		
-		
-		
-		
-		 		
-		
-		
-		async QueryLimitOrderPoolReserveMap({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
-			try {
-				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolReserveMap( key.pairId,  key.token,  key.tickIndex,  key.count)).data
-				
-					
-				commit('QUERY', { query: 'LimitOrderPoolReserveMap', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolReserveMap', payload: { options: { all }, params: {...key},query }})
-				return getters['getLimitOrderPoolReserveMap']( { params: {...key}, query}) ?? {}
-			} catch (e) {
-				throw new Error('QueryClient:QueryLimitOrderPoolReserveMap API Node Unavailable. Could not perform query: ' + e.message)
-				
-			}
-		},
-		
-		
-		
-		
-		 		
-		
-		
-		async QueryLimitOrderPoolReserveMapAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
-			try {
-				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolReserveMapAll(query)).data
-				
-					
-				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryLimitOrderPoolReserveMapAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
-					value = mergeResults(value, next_values);
-				}
-				commit('QUERY', { query: 'LimitOrderPoolReserveMapAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolReserveMapAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getLimitOrderPoolReserveMapAll']( { params: {...key}, query}) ?? {}
-			} catch (e) {
-				throw new Error('QueryClient:QueryLimitOrderPoolReserveMapAll API Node Unavailable. Could not perform query: ' + e.message)
-				
-			}
-		},
-		
-		
-		
-		
-		 		
-		
-		
-		async QueryLimitOrderPoolFillMap({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
-			try {
-				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolFillMap( key.pairId,  key.token,  key.tickIndex,  key.count)).data
-				
-					
-				commit('QUERY', { query: 'LimitOrderPoolFillMap', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolFillMap', payload: { options: { all }, params: {...key},query }})
-				return getters['getLimitOrderPoolFillMap']( { params: {...key}, query}) ?? {}
-			} catch (e) {
-				throw new Error('QueryClient:QueryLimitOrderPoolFillMap API Node Unavailable. Could not perform query: ' + e.message)
-				
-			}
-		},
-		
-		
-		
-		
-		 		
-		
-		
-		async QueryLimitOrderPoolFillMapAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
-			try {
-				const key = params ?? {};
-				const queryClient=await initQueryClient(rootGetters)
-				let value= (await queryClient.queryLimitOrderPoolFillMapAll(query)).data
-				
-					
-				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
-					let next_values=(await queryClient.queryLimitOrderPoolFillMapAll({...query, 'pagination.key':(<any> value).pagination.next_key})).data
-					value = mergeResults(value, next_values);
-				}
-				commit('QUERY', { query: 'LimitOrderPoolFillMapAll', key: { params: {...key}, query}, value })
-				if (subscribe) commit('SUBSCRIBE', { action: 'QueryLimitOrderPoolFillMapAll', payload: { options: { all }, params: {...key},query }})
-				return getters['getLimitOrderPoolFillMapAll']( { params: {...key}, query}) ?? {}
-			} catch (e) {
-				throw new Error('QueryClient:QueryLimitOrderPoolFillMapAll API Node Unavailable. Could not perform query: ' + e.message)
-				
-			}
-		},
-		
-		
-		async sendMsgDeposit({ rootGetters }, { value, fee = [], memo = '' }) {
+		async sendMsgWithdrawFilledLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgDeposit(value)
+				const msg = await txClient.msgWithdrawFilledLimitOrder(value)
 				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
 	gas: "200000" }, memo})
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgDeposit:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -1002,21 +810,6 @@ export default {
 					throw new Error('TxClient:MsgSwap:Init Could not initialize signing client. Wallet is required.')
 				}else{
 					throw new Error('TxClient:MsgSwap:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
-		async sendMsgWithdrawFilledLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgWithdrawFilledLimitOrder(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -1050,6 +843,21 @@ export default {
 				}
 			}
 		},
+		async sendMsgDeposit({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgDeposit(value)
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgDeposit:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
 		async sendMsgCancelLimitOrder({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -1066,16 +874,16 @@ export default {
 			}
 		},
 		
-		async MsgDeposit({ rootGetters }, { value }) {
+		async MsgWithdrawFilledLimitOrder({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgDeposit(value)
+				const msg = await txClient.msgWithdrawFilledLimitOrder(value)
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgDeposit:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Create Could not create message: ' + e.message)
 				}
 			}
 		},
@@ -1089,19 +897,6 @@ export default {
 					throw new Error('TxClient:MsgSwap:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgSwap:Create Could not create message: ' + e.message)
-				}
-			}
-		},
-		async MsgWithdrawFilledLimitOrder({ rootGetters }, { value }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgWithdrawFilledLimitOrder(value)
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgWithdrawFilledLimitOrder:Create Could not create message: ' + e.message)
 				}
 			}
 		},
@@ -1128,6 +923,19 @@ export default {
 					throw new Error('TxClient:MsgWithdrawl:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgWithdrawl:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgDeposit({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgDeposit(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgDeposit:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgDeposit:Create Could not create message: ' + e.message)
 				}
 			}
 		},

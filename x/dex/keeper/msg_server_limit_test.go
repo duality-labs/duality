@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"math"
+
 	testing_scripts "github.com/NicholasDotSol/duality/testing_scripts"
 	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	"github.com/NicholasDotSol/duality/x/dex/types"
@@ -111,18 +113,20 @@ func (s *MsgServerTestSuite) TestMultiTickLimitOrder1to0WithWithdraw() {
 	s.aliceLimitSells("TokenB", -1, 25)
 	s.bobMarketSells("TokenA", 40, 30)
 
-	s.assertAliceBalances(100, 450)
-	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("239.998500149985001500"))
+	// limit order at -1: (25 * 1.0001^-1) A<=>B 25
+	// limit order at 0: (40 - (25 * 1.0001^-1)) A<=>B (40 - (25 * 1.0001^-1)) * 1.0001^0
+	s.assertAliceBalances(100, 425)
+	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("240.0024997500249975"))
 
 	s.aliceWithdrawsLimitSell("TokenB", 0, 0)
 
-	s.assertAliceBalances(125, 450)
-	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("239.998500149985001500"))
+	s.assertAliceBalancesDec(sdk.MustNewDecFromStr("115.0024997500249975"), NewDec(425))
+	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("240.0024997500249975"))
 
-	s.aliceWithdrawsLimitSell("TokenB", 1, 0)
+	s.aliceWithdrawsLimitSell("TokenB", -1, 0)
 
-	s.assertAliceBalancesDec(NewDec(140), NewDec(450))
-	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("239.998500149985001500"))
+	s.assertAliceBalancesDec(NewDec(140), NewDec(425))
+	s.assertBobBalancesDec(NewDec(60), sdk.MustNewDecFromStr("240.0024997500249975"))
 }
 
 func (s *MsgServerTestSuite) TestLimitOrderOverdraw() {
@@ -307,23 +311,23 @@ func (s *MsgServerTestSuite) TestCancelSingle() {
 }
 
 func (s *MsgServerTestSuite) TestCancelPartial() {
-	s.fundAliceBalances(100, 500)
+	s.fundAliceBalances(100, 100)
 
 	s.assertDexBalances(0, 0)
 
 	s.aliceLimitSells("TokenB", 0, 50)
 
-	s.assertAliceBalances(100, 450)
+	s.assertAliceBalances(100, 50)
 	s.assertDexBalances(0, 50)
 
 	s.aliceCancelsLimitSell("TokenB", 0, 0, 25)
 
-	s.assertAliceBalances(100, 475)
+	s.assertAliceBalances(100, 75)
 	s.assertDexBalances(0, 25)
 
 	s.aliceCancelsLimitSell("TokenB", 0, 0, 25)
 
-	s.assertAliceBalances(100, 500)
+	s.assertAliceBalances(100, 100)
 	s.assertDexBalances(0, 0)
 }
 
@@ -338,7 +342,7 @@ func (s *MsgServerTestSuite) TestProgressiveLimitOrderFill() {
 	s.assertBobBalances(100, 200)
 	s.assertDexBalances(0, 60)
 
-	s.aliceMarketSells("TokenA", 10, 10)
+	s.bobMarketSells("TokenA", 10, 10)
 
 	s.assertAliceBalances(100, 440)
 	s.assertBobBalances(90, 210)
@@ -347,9 +351,75 @@ func (s *MsgServerTestSuite) TestProgressiveLimitOrderFill() {
 	s.aliceWithdrawsLimitSell("TokenB", 0, 0)
 
 	// Limit order is filled progressively
-	s.assertAliceBalances(102, 440)
+	s.assertAliceBalances(110, 440)
 	s.assertBobBalances(90, 210)
-	s.assertDexBalances(8, 50)
+	s.assertDexBalances(0, 50)
 
 	// TODO: How to verify current tick?
+}
+
+func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
+	s.fundAliceBalances(100, 100)
+	s.fundBobBalances(100, 100)
+	s.assertDexBalances(0, 0)
+
+	s.aliceLimitSells("TokenB", 0, 50)
+
+	s.assertAliceBalances(100, 50)
+	s.assertBobBalances(100, 100)
+	s.assertDexBalances(0, 50)
+	s.assertCurrentTicks(math.MinInt64, 0)
+	s.assertMaxTick(0)
+	s.assertMinTick(math.MaxInt64)
+
+	s.bobMarketSells("TokenA", 10, 10)
+
+	s.assertAliceBalances(100, 50)
+	s.assertBobBalances(90, 110)
+	s.assertDexBalances(10, 40)
+	s.assertCurrentTicks(math.MinInt64, 0)
+	s.assertMaxTick(0)
+	s.assertMinTick(math.MaxInt64)
+
+	s.aliceLimitSells("TokenB", 0, 50)
+
+	s.assertAliceBalances(100, 0)
+	s.assertBobBalances(90, 110)
+	s.assertDexBalances(10, 90)
+	s.assertCurrentTicks(math.MinInt64, 0)
+	s.assertMaxTick(0)
+	s.assertMinTick(math.MaxInt64)
+
+	s.aliceCancelsLimitSell("TokenB", 0, 0, 40)
+
+	s.assertAliceBalances(100, 40)
+	s.assertBobBalances(90, 110)
+	s.assertDexBalances(10, 50)
+	s.assertCurrentTicks(math.MinInt64, 0)
+	s.assertMaxTick(0)
+	s.assertMinTick(math.MaxInt64)
+
+	s.bobMarketSells("TokenA", 10, 10)
+
+	s.assertAliceBalances(100, 40)
+	s.assertBobBalances(80, 120)
+	s.assertDexBalances(20, 40)
+
+	s.aliceCancelsLimitSell("TokenB", 0, 1, 40)
+
+	s.assertAliceBalances(100, 80)
+	s.assertBobBalances(80, 120)
+	s.assertDexBalances(20, 0)
+
+	s.aliceWithdrawsLimitSell("TokenB", 0, 0)
+
+	s.assertAliceBalances(110, 80)
+	s.assertBobBalances(80, 120)
+	s.assertDexBalances(10, 0)
+
+	s.aliceWithdrawsLimitSell("TokenB", 0, 1)
+
+	s.assertAliceBalances(120, 80)
+	s.assertBobBalances(80, 120)
+	s.assertDexBalances(0, 0)
 }

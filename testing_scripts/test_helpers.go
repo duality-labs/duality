@@ -1,7 +1,7 @@
 package testing_scripts
 
 import (
-	"fmt"
+	"github.com/NicholasDotSol/duality/x/dex/keeper"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -14,9 +14,7 @@ import (
 func SingleLimitOrderFill(amount_placed sdk.Dec,
 	price_filled_at sdk.Dec,
 	amount_to_swap sdk.Dec) (sdk.Dec, sdk.Dec) {
-
 	amount_out, amount_in := sdk.ZeroDec(), sdk.ZeroDec()
-
 	// Checks if the swap will deplete the entire limit order and simulates the trade accordingly
 	if amount_to_swap.GT(amount_placed.Quo(price_filled_at)) {
 		amount_out = amount_placed
@@ -26,8 +24,6 @@ func SingleLimitOrderFill(amount_placed sdk.Dec,
 		amount_out = amount_in.Mul(price_filled_at)
 	}
 
-	fmt.Println("Amount Out: ", amount_out)
-	fmt.Println("Amount In: ", amount_in)
 	return amount_in, amount_out
 }
 
@@ -38,13 +34,10 @@ func SingleLimitOrderFillAndUpdate(amount_placed sdk.Dec,
 	price_filled_at sdk.Dec,
 	amount_to_swap sdk.Dec,
 	unfilled_reserves sdk.Dec) (sdk.Dec, sdk.Dec, sdk.Dec) {
-
 	amount_in, amount_out := SingleLimitOrderFill(amount_placed, price_filled_at, amount_to_swap)
-
 	unfilled_reserves = unfilled_reserves.Sub(amount_out)
 	filled_reserves := amount_placed.Add(amount_in)
 	amount_to_swap_remaining := amount_to_swap.Sub(amount_in)
-
 	return unfilled_reserves, filled_reserves, amount_to_swap_remaining
 }
 
@@ -53,18 +46,15 @@ func SingleLimitOrderFillAndUpdate(amount_placed sdk.Dec,
 // order (amount_placed), the pricesthe trader pays when filling the orders (price_filled_at)
 // and the amount that they are swapping (amount_to_swap).
 func MultipleLimitOrderFills(amounts_placed []sdk.Dec, prices []sdk.Dec, amount_to_swap sdk.Dec) sdk.Dec {
-
 	total_out, amount_remaining := sdk.ZeroDec(), amount_to_swap
 
 	// Loops through all of the limit orders that need to be filled
 	for i := 0; i < len(amounts_placed); i++ {
-		fmt.Println("\nRound: ", i)
 		amount_in, amount_out := SingleLimitOrderFill(amounts_placed[i], prices[i], amount_remaining)
 
 		amount_remaining = amount_remaining.Sub(amount_in)
 		total_out = total_out.Add(amount_out)
 	}
-	fmt.Println("Total Out: ", total_out)
 	return total_out
 }
 
@@ -75,9 +65,7 @@ func MultipleLimitOrderFills(amounts_placed []sdk.Dec, prices []sdk.Dec, amount_
 // swapping (amount_to_swap). The format of the return statement is (amount_in, amount_out).
 // Same thing as SingleLimitOrderFill() except in naming.
 func SinglePoolSwap(amount_liquidity sdk.Dec, price_swapped_at sdk.Dec, amount_to_swap sdk.Dec) (sdk.Dec, sdk.Dec) {
-
 	amount_out, amount_in := sdk.ZeroDec(), sdk.ZeroDec()
-
 	// Checks if the swap will deplete the entire limit order and simulates the trade accordingly
 	if amount_to_swap.GT(amount_liquidity.Quo(price_swapped_at)) {
 		amount_out = amount_liquidity
@@ -86,9 +74,6 @@ func SinglePoolSwap(amount_liquidity sdk.Dec, price_swapped_at sdk.Dec, amount_t
 		amount_in = amount_to_swap
 		amount_out = amount_in.Mul(price_swapped_at)
 	}
-
-	fmt.Println("Amount Out: ", amount_out)
-	fmt.Println("Amount In: ", amount_in)
 	return amount_in, amount_out
 }
 
@@ -102,12 +87,9 @@ func SinglePoolSwapAndUpdate(amount_liquidity sdk.Dec,
 	amount_to_swap sdk.Dec,
 	reservesOfInToken sdk.Dec,
 	reservesOfOutToken sdk.Dec) (sdk.Dec, sdk.Dec, sdk.Dec, sdk.Dec) {
-
 	amount_in, amount_out := SinglePoolSwap(amount_liquidity, price_swapped_at, amount_to_swap)
-
 	resulting_reserves_in_token := reservesOfInToken.Add(amount_in)
 	resulting_reserves_out_token := reservesOfOutToken.Add(amount_out)
-
 	return resulting_reserves_in_token, resulting_reserves_out_token, amount_in, amount_out
 }
 
@@ -123,9 +105,7 @@ func SinglePoolSwapAndUpdateDirectional(amount_liquidity sdk.Dec,
 	reservesOfToken0 sdk.Dec,
 	reservesOfToken1 sdk.Dec,
 	inToken bool) (sdk.Dec, sdk.Dec) {
-
 	resultingReservesOfToken0, resultingReservesOfToken1 := sdk.ZeroDec(), sdk.ZeroDec()
-
 	if inToken {
 		resultingReservesOfToken1, resultingReservesOfToken0, _, _ = SinglePoolSwapAndUpdate(amount_liquidity,
 			price_swapped_at,
@@ -139,7 +119,6 @@ func SinglePoolSwapAndUpdateDirectional(amount_liquidity sdk.Dec,
 			reservesOfToken0,
 			reservesOfToken1)
 	}
-
 	return resultingReservesOfToken0, resultingReservesOfToken1
 }
 
@@ -153,26 +132,36 @@ func MultiplePoolSwapAndUpdate(amounts_liquidity []sdk.Dec,
 	amount_to_swap sdk.Dec,
 	reserves_in_token_array []sdk.Dec,
 	reserves_out_token_array []sdk.Dec) ([]sdk.Dec, []sdk.Dec, sdk.Dec, sdk.Dec) {
-
 	num_pools := len(amounts_liquidity)
 	amount_remaining := amount_to_swap
 	amount_out_total, amount_out_temp, amount_in := sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec()
 	resulting_reserves_in_token := make([]sdk.Dec, num_pools, num_pools)
 	resulting_reserves_out_token := make([]sdk.Dec, num_pools, num_pools)
-
 	for i := 0; i < num_pools; i++ {
 		resulting_reserves_in_token[i], resulting_reserves_out_token[i], amount_in, amount_out_temp = SinglePoolSwapAndUpdate(amounts_liquidity[i],
 			prices_swapped_at[i],
 			amount_to_swap,
 			reserves_in_token_array[i],
 			reserves_out_token_array[i])
-
 		amount_out_total = amount_out_total.Add(amount_out_temp)
 		amount_remaining = amount_remaining.Sub(amount_in)
-
 		i++
-
 	}
 
 	return resulting_reserves_in_token, resulting_reserves_out_token, amount_remaining, amount_out_total
+}
+
+func SharesOnDeposit(existing_shares sdk.Dec, existing_amount0 sdk.Dec, existing_amount1 sdk.Dec, new_amount0 sdk.Dec, new_amount1 sdk.Dec, tickIndex int64) (shares_minted sdk.Dec) {
+	price1To0 := keeper.CalcPrice1To0(tickIndex)
+
+	new_value := new_amount0.Add(price1To0.Mul(new_amount1))
+
+	if existing_amount0.Add(existing_amount1).GT(sdk.ZeroDec()) {
+		existing_value := existing_amount0.Add(price1To0.Mul(existing_amount1))
+		shares_minted = shares_minted.Mul(new_value.Quo(existing_value))
+	} else {
+		shares_minted = new_value
+	}
+
+	return shares_minted
 }

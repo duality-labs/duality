@@ -228,7 +228,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityA() {
 	s.assertLiquidityAtTick(10, 0, 0, 0)
 	s.assertCurr1To0(-1)
 	s.assertMinTick(-1)
-	s.assertCurr0To1(0)
+	s.assertCurr0To1(math.MaxInt64)
 	s.assertMaxTick(math.MinInt64)
 
 	// WHEN
@@ -242,7 +242,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityA() {
 	s.assertLiquidityAtTick(20, 0, 0, 0)
 	s.assertCurr1To0(-1)
 	s.assertMinTick(-1)
-	s.assertCurr0To1(0)
+	s.assertCurr0To1(math.MaxInt64)
 	s.assertMaxTick(math.MinInt64)
 }
 
@@ -256,7 +256,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityB() {
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
 	s.assertLiquidityAtTick(0, 10, 0, 0)
-	s.assertCurr1To0(0)
+	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
 	s.assertMinTick(math.MaxInt64)
 	s.assertMaxTick(1)
@@ -270,7 +270,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityB() {
 	s.assertLiquidityAtTick(0, 20, 0, 0)
 	s.assertAliceBalances(50, 30)
 	s.assertDexBalances(0, 20)
-	s.assertCurr1To0(0)
+	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
 	s.assertMinTick(math.MaxInt64)
 	s.assertMaxTick(1)
@@ -291,8 +291,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedBelowEnemyLines() {
 	// THEN
 	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
 
-	err := types.ErrValidPairNotFound // TODO: this needs to be changed to a more specific error type
-	s.assertAliceDepositFails(err, NewDeposit(0, 10, -5, 0))
+	err := types.ErrDepositBehindPairLiquidity // TODO: this needs to be changed to a more specific error type
+	s.assertAliceDepositFails(err, NewDeposit(10, 0, 2, 0))
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedAboveEnemyLines() {
@@ -304,13 +304,14 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedAboveEnemyLines() {
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
 	s.assertLiquidityAtTick(10, 0, 0, 0)
+	s.assertCurr1To0(-1)
 
 	// WHEN
 	// depositing above enemy lines at tick 5	// THEN
 	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
 
-	err := types.ErrValidPairNotFound // TODO: this needs to be changed to a more specific error type
-	s.assertAliceDepositFails(err, NewDeposit(10, 0, 5, 0))
+	err := types.ErrDepositBehindPairLiquidity // TODO: this needs to be changed to a more specific error type
+	s.assertAliceDepositFails(err, NewDeposit(0, 10, -2, 0))
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedMultiA() {
@@ -325,7 +326,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiA() {
 	s.assertLiquidityAtTick(10, 0, 0, 0)
 	s.assertMinTick(-1)
 	s.assertCurr1To0(-1)
-	s.assertCurr0To1(0)
+	s.assertCurr0To1(math.MaxInt64)
 	s.assertMaxTick(math.MinInt64)
 
 	// WHEN
@@ -343,7 +344,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiA() {
 	s.assertLiquidityAtTick(10, 0, 0, 1)
 	s.assertMinTick(-3)
 	s.assertCurr1To0(-1)
-	s.assertCurr0To1(0)
+	s.assertCurr0To1(math.MaxInt64)
 	s.assertMaxTick(math.MinInt64)
 }
 
@@ -358,8 +359,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiB() {
 	s.assertDexBalances(0, 10)
 	s.assertLiquidityAtTick(0, 10, 0, 0)
 	s.assertMinTick(math.MaxInt64)
+	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
-	s.assertCurr1To0(0)
 	s.assertMaxTick(1)
 
 	// WHEN
@@ -376,7 +377,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiB() {
 	s.assertLiquidityAtTick(0, 20, 0, 0)
 	s.assertLiquidityAtTick(0, 10, 0, 1)
 	s.assertMinTick(math.MaxInt64)
-	s.assertCurr1To0(0)
+	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
 	s.assertMaxTick(3)
 }
