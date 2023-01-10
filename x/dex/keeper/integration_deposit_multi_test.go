@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (s *MsgServerTestSuite) TestDepositMultiPartialFailure() {
+func (s *MsgServerTestSuite) TestDepositMultiPartialFailureTrueAmounts() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -19,7 +19,8 @@ func (s *MsgServerTestSuite) TestDepositMultiPartialFailure() {
 	)
 
 	// THEN
-	// only the first deposit should go through
+	// second deposit's ratio is different than pool after the first, so amounts will be rounded to 0,0
+	// thus only the first deposit should have an effect
 	s.assertAliceBalances(45, 50)
 	s.assertLiquidityAtTickInt(sdk.NewInt(5), sdk.NewInt(0), 0, 0)
 	s.assertDexBalances(5, 0)
