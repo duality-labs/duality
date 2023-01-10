@@ -265,7 +265,7 @@ func (k Keeper) FindNextTick1To0(goCtx context.Context, pair types.TradingPair) 
 	// Start scanning from CurrentTick1To0 - 1
 	tickIdx = pair.CurrentTick1To0 - 1
 
-	ti := k.NewTickIterator(goCtx, tickIdx, pair.MinTick, pair.PairId, true, k.GetCdc())
+	ti := k.NewTickIterator(goCtx, tickIdx, pair.MinTick, pair.PairId, true)
 
 	defer ti.Close()
 	for ; ti.Valid(); ti.Next() {
@@ -288,7 +288,7 @@ func (k Keeper) FindNextTick0To1(goCtx context.Context, pair types.TradingPair) 
 
 	// Start scanning from CurrentTick0To1 + 1
 	tickIdx = pair.CurrentTick0To1 + 1
-	ti := k.NewTickIterator(goCtx, tickIdx, pair.MaxTick, pair.PairId, false, k.GetCdc())
+	ti := k.NewTickIterator(goCtx, tickIdx, pair.MaxTick, pair.PairId, false)
 	defer ti.Close()
 	for ; ti.Valid(); ti.Next() {
 		tick := ti.Value()
@@ -303,7 +303,7 @@ func (k Keeper) FindNextTick0To1(goCtx context.Context, pair types.TradingPair) 
 func (k Keeper) FindNewMinTick(goCtx context.Context, pair types.TradingPair) (minTickIdx int64) {
 	sdkCtx := sdk.UnwrapSDKContext(goCtx)
 
-	ti := k.NewTickIterator(goCtx, pair.MinTick, pair.CurrentTick1To0, pair.PairId, false, k.GetCdc())
+	ti := k.NewTickIterator(goCtx, pair.MinTick, pair.CurrentTick1To0, pair.PairId, false)
 	defer ti.Close()
 	for ; ti.Valid(); ti.Next() {
 		tick := ti.Value()
@@ -318,7 +318,7 @@ func (k Keeper) FindNewMinTick(goCtx context.Context, pair types.TradingPair) (m
 func (k Keeper) FindNewMaxTick(goCtx context.Context, pair types.TradingPair) (maxTickIdx int64) {
 	sdkCtx := sdk.UnwrapSDKContext(goCtx)
 
-	ti := k.NewTickIterator(goCtx, pair.MaxTick, pair.CurrentTick0To1, pair.PairId, true, k.GetCdc())
+	ti := k.NewTickIterator(goCtx, pair.MaxTick, pair.CurrentTick0To1, pair.PairId, true)
 	defer ti.Close()
 	for ; ti.Valid(); ti.Next() {
 		tick := ti.Value()

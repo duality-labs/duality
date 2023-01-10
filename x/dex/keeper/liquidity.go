@@ -57,7 +57,7 @@ func (s *LiquidityIterator0To1) Next() Liquidity {
 }
 
 func (s *LiquidityIterator0To1) getNext() Liquidity {
-	iter := s.keeper.NewTickIterator(s.ctx, s.curTickIndex, s.maxTick, s.tradingPair.PairId, false, s.keeper.cdc)
+	iter := s.keeper.NewTickIterator(s.ctx, s.curTickIndex, s.maxTick, s.tradingPair.PairId, false)
 	defer iter.Close()
 
 	for ; iter.Valid(); iter.Next() {
@@ -145,10 +145,7 @@ func (s *LiquidityIterator1To0) Next() Liquidity {
 }
 
 func (s *LiquidityIterator1To0) getNext() Liquidity {
-
-	// sdkCtx := sdk.UnwrapSDKContext(s.ctx)
-
-	iter := s.keeper.NewTickIterator(s.ctx, s.curTickIndex, s.minTick, s.tradingPair.PairId, true, s.keeper.cdc)
+	iter := s.keeper.NewTickIterator(s.ctx, s.curTickIndex, s.minTick, s.tradingPair.PairId, true)
 	defer iter.Close()
 
 	for ; iter.Valid(); iter.Next() {

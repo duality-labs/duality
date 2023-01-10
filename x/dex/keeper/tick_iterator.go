@@ -17,11 +17,10 @@ type TickIterator struct {
 func (k Keeper) NewTickIterator(
 	// NOTE: both start and end are inclusive
 	ctx context.Context,
-	start int64,
-	end int64,
+	startInclusive int64,
+	endInclusive int64,
 	pairId *types.PairId,
 	scanLeft bool,
-	cdc codec.BinaryCodec,
 ) types.TickIteratorI {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	prefixStore := prefix.NewStore(sdkCtx.KVStore(k.storeKey), types.TickPrefix(pairId))
@@ -29,16 +28,16 @@ func (k Keeper) NewTickIterator(
 	if scanLeft {
 		return TickIterator{
 			iter: prefixStore.ReverseIterator(
-				types.TickIndexToBytes(end),
-				types.TickIndexToBytes(start+1),
+				types.TickIndexToBytes(endInclusive),
+				types.TickIndexToBytes(startInclusive+1),
 			),
 			cdc: k.cdc,
 		}
 	} else {
 		return TickIterator{
 			iter: prefixStore.Iterator(
-				types.TickIndexToBytes(start),
-				types.TickIndexToBytes(end+1),
+				types.TickIndexToBytes(startInclusive),
+				types.TickIndexToBytes(endInclusive+1),
 			),
 			cdc: k.cdc,
 		}
