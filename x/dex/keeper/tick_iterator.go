@@ -4,39 +4,61 @@ import (
 	"context"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k Keeper) NewTickIterator(ctx context.Context,
+type TickIterator struct {
+	iter sdk.Iterator
+	cdc  codec.BinaryCodec
+}
+
+func (k Keeper) NewTickIterator(
+	// NOTE: both start and end are inclusive
+	ctx context.Context,
 	start int64,
 	end int64,
 	pairId *types.PairId,
-	scanLeft bool) types.TickIteratorI {
+	scanLeft bool,
+	cdc codec.BinaryCodec,
+) types.TickIteratorI {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	prefixStore := prefix.NewStore(sdkCtx.KVStore(k.storeKey), types.TickPrefix(pairId))
-	startKey := types.TickIndexToBytes(startIndex)
 
 	if scanLeft {
-		return prefixStore.Iterator(startKey, nil)
+		return TickIterator{
+			iter: prefixStore.ReverseIterator(
+				types.TickIndexToBytes(end),
+				types.TickIndexToBytes(start+1),
+			),
+			cdc: k.cdc,
+		}
 	} else {
-		return prefixStore.ReverseIterator(nil, startKey)
+		return TickIterator{
+			iter: prefixStore.Iterator(
+				types.TickIndexToBytes(start),
+				types.TickIndexToBytes(end+1),
+			),
+			cdc: k.cdc,
+		}
 	}
 }
 
-func (ti TickIterator) Next() (idx int64, found bool) {
+func (ti TickIterator) Valid() bool {
+	return ti.iter.Valid()
+}
 
-	curIdx := ti.start
+func (ti TickIterator) Close() error {
+	return ti.iter.Close()
+}
 
-	for !ti.stop(curIdx) {
-		// Checks for the next value tick containing liquidity
-		tick, tickFound := ti.keeper.GetTick(ti.ctx, ti.pairId, curIdx)
+func (ti TickIterator) Value() types.Tick {
+	var tick types.Tick
+	ti.cdc.MustUnmarshal(ti.iter.Value(), &tick)
+	return tick
+}
 
-		if tickFound && ti.hasToken(ti.ctx, &tick) {
-			return curIdx, true
-		}
-
-		curIdx = ti.nextTick(curIdx)
-	}
-	return 0, false
+func (ti TickIterator) Next() {
+	ti.iter.Next()
 }

@@ -5,13 +5,15 @@ import (
 	math "math"
 
 	. "github.com/NicholasDotSol/duality/utils"
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type Keeper interface {
 	TickHasToken0(sdk.Context, *Tick) bool
 	TickHasToken1(sdk.Context, *Tick) bool
-	NewTickIterator(context.Context, int64, int64, *PairId, bool, bool) TickIteratorI
+	NewTickIterator(context.Context, int64, int64, *PairId, bool, codec.BinaryCodec) TickIteratorI
+	GetCdc() codec.BinaryCodec
 }
 
 // Assumes that the token0 liquidity is non-empty at this tick
@@ -46,7 +48,6 @@ func (p *TradingPair) DeinitLiquidityToken0(ctx context.Context, k Keeper, tickI
 		*cur1To0 = math.MinInt64
 		// we leave cur1To0 where it is because otherwise we lose the last traded price
 	} else if tickIndex == *minTick {
-
 		nexMinTick := p.FindNewMinTick(ctx, k)
 		*minTick = nexMinTick
 
@@ -134,6 +135,7 @@ func (p *TradingPair) UpdateTickPointersPostRemoveToken1(goCtx context.Context, 
 
 func (p TradingPair) FindNextTick1To0(goCtx context.Context, k Keeper) (tickIdx int64, found bool) {
 
+	sdkCtx := sdk.UnwrapSDKContext(goCtx)
 	// If MinTick == MaxInt64 it is unset
 	// ie. There is no Token0 in the pool
 	if p.MinTick == math.MaxInt64 {
@@ -142,35 +144,50 @@ func (p TradingPair) FindNextTick1To0(goCtx context.Context, k Keeper) (tickIdx 
 	// Start scanning from CurrentTick1To0 - 1
 	tickIdx = p.CurrentTick1To0 - 1
 
-	ti := k.NewTickIterator(goCtx, tickIdx, p.MinTick, p.PairId, true, true)
+	ti := k.NewTickIterator(goCtx, tickIdx, p.MinTick, p.PairId, true, k.GetCdc())
 
-	return ti.Next()
+	defer ti.Close()
+	for ; ti.Valid(); ti.Next() {
+		tick := ti.Value()
+		if k.TickHasToken0(sdkCtx, &tick) {
+			return tick.TickIndex, true
+		}
+	}
+	return math.MinInt64, false
+
 }
 
 func (p TradingPair) FindNewMinTick(goCtx context.Context, k Keeper) (minTickIdx int64) {
+	sdkCtx := sdk.UnwrapSDKContext(goCtx)
 
-	ti := k.NewTickIterator(goCtx, p.MinTick, p.CurrentTick1To0, p.PairId, true, false)
-	idx, found := ti.Next()
-	if found {
-		return idx
-	} else {
-		return math.MaxInt64
+	ti := k.NewTickIterator(goCtx, p.MinTick, p.CurrentTick1To0, p.PairId, false, k.GetCdc())
+	defer ti.Close()
+	for ; ti.Valid(); ti.Next() {
+		tick := ti.Value()
+		if k.TickHasToken0(sdkCtx, &tick) {
+			return tick.TickIndex
+		}
 	}
+	return math.MaxInt64
+
 }
 
 func (p TradingPair) FindNewMaxTick(goCtx context.Context, k Keeper) (maxTickIdx int64) {
+	sdkCtx := sdk.UnwrapSDKContext(goCtx)
 
-	ti := k.NewTickIterator(goCtx, p.MaxTick, p.CurrentTick0To1, p.PairId, false, true)
-	idx, found := ti.Next()
-	if found {
-		return idx
-	} else {
-		return math.MinInt64
+	ti := k.NewTickIterator(goCtx, p.MaxTick, p.CurrentTick0To1, p.PairId, true, k.GetCdc())
+	defer ti.Close()
+	for ; ti.Valid(); ti.Next() {
+		tick := ti.Value()
+		if k.TickHasToken1(sdkCtx, &tick) {
+			return tick.TickIndex
+		}
 	}
+	return math.MinInt64
 }
 
 func (p TradingPair) FindNextTick0To1(goCtx context.Context, k Keeper) (tickIdx int64, found bool) {
-
+	sdkCtx := sdk.UnwrapSDKContext(goCtx)
 	// If MaxTick == MinInt64 it is unset
 	// There is no Token1 in the pool
 	if p.MaxTick == math.MinInt64 {
@@ -179,8 +196,16 @@ func (p TradingPair) FindNextTick0To1(goCtx context.Context, k Keeper) (tickIdx 
 
 	// Start scanning from CurrentTick0To1 + 1
 	tickIdx = p.CurrentTick0To1 + 1
-	ti := k.NewTickIterator(goCtx, tickIdx, p.MaxTick, p.PairId, false, false)
-	return ti.Next()
+	ti := k.NewTickIterator(goCtx, tickIdx, p.MaxTick, p.PairId, false, k.GetCdc())
+	defer ti.Close()
+	for ; ti.Valid(); ti.Next() {
+		tick := ti.Value()
+		if k.TickHasToken1(sdkCtx, &tick) {
+			return tick.TickIndex, true
+		}
+	}
+
+	return math.MinInt64, false
 }
 
 func PairIdToTokens(pairId *PairId) (token0 string, token1 string) {

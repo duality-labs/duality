@@ -1,7 +1,9 @@
 // TEMP: Just for testing speed differences. Will remove
 package keeper_test
 
-import "fmt"
+import (
+	"fmt"
+)
 
 const nTicks int = 10
 const spacing = 2
@@ -10,9 +12,9 @@ func (s *MsgServerTestSuite) TestTickGas() {
 
 	var i int = 0
 	for i > nTicks*-1 {
-		tick, _ := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", int64(i))
+		tick, _ := s.app.DexKeeper.GetOrInitTick(s.goCtx, defaultPairId, int64(i))
 		i = i - spacing
-		s.app.DexKeeper.SetTick(s.ctx, "TokenA<>TokenB", tick)
+		s.app.DexKeeper.SetTick(s.ctx, defaultPairId, tick)
 	}
 	s.fundAliceBalances(20, 0)
 	s.fundBobBalances(0, 20)
@@ -38,9 +40,9 @@ func (s *MsgServerTestSuite) TestTickGas2() {
 
 	var i int = 0
 	for i < nTicks {
-		tick, _ := s.app.DexKeeper.GetOrInitTick(s.goCtx, "TokenA<>TokenB", int64(i))
+		tick, _ := s.app.DexKeeper.GetOrInitTick(s.goCtx, defaultPairId, int64(i))
 		i = i + spacing
-		s.app.DexKeeper.SetTick(s.ctx, "TokenA<>TokenB", tick)
+		s.app.DexKeeper.SetTick(s.ctx, defaultPairId, tick)
 	}
 	s.fundAliceBalances(0, 20)
 	s.fundBobBalances(20, 0)

@@ -57,12 +57,11 @@ func (s *LiquidityIterator0To1) Next() Liquidity {
 }
 
 func (s *LiquidityIterator0To1) getNext() Liquidity {
-	sdkCtx := sdk.UnwrapSDKContext(s.ctx)
-	iter := s.keeper.makeKVTickIterator(sdkCtx, s.tradingPair.PairId, s.curTickIndex, true)
+	iter := s.keeper.NewTickIterator(s.ctx, s.curTickIndex, s.maxTick, s.tradingPair.PairId, false, s.keeper.cdc)
 	defer iter.Close()
-	for ; iter.Valid() && s.curTickIndex <= s.maxTick; iter.Next() {
-		var upperTick types.Tick
-		s.keeper.cdc.MustUnmarshal(iter.Value(), &upperTick)
+
+	for ; iter.Valid(); iter.Next() {
+		upperTick := iter.Value()
 		for int(s.curFeeIndex) < len(upperTick.TickData.Reserve1) {
 			if upperTick.TickData.Reserve1[s.curFeeIndex].Equal(sdk.ZeroInt()) {
 				s.curFeeIndex++
@@ -147,13 +146,13 @@ func (s *LiquidityIterator1To0) Next() Liquidity {
 
 func (s *LiquidityIterator1To0) getNext() Liquidity {
 
-	sdkCtx := sdk.UnwrapSDKContext(s.ctx)
-	iter := s.keeper.makeKVTickIterator(sdkCtx, s.tradingPair.PairId, s.curTickIndex+1, false)
+	// sdkCtx := sdk.UnwrapSDKContext(s.ctx)
+
+	iter := s.keeper.NewTickIterator(s.ctx, s.curTickIndex, s.minTick, s.tradingPair.PairId, true, s.keeper.cdc)
 	defer iter.Close()
 
-	for ; iter.Valid() && s.curTickIndex >= s.minTick; iter.Next() {
-		var lowerTick types.Tick
-		s.keeper.cdc.MustUnmarshal(iter.Value(), &lowerTick)
+	for ; iter.Valid(); iter.Next() {
+		lowerTick := iter.Value()
 
 		for int(s.curFeeIndex) < len(lowerTick.TickData.Reserve0) {
 			if lowerTick.TickData.Reserve0[s.curFeeIndex].Equal(sdk.ZeroInt()) {
@@ -192,10 +191,6 @@ func (s *LiquidityIterator1To0) getNext() Liquidity {
 	}
 
 	return nil
-}
-
-func (k Keeper) makeKVTickIterator(sdkCtx sdk.Context, pairId string, startIndex int64, is0To1 bool) sdk.Iterator {
-
 }
 
 func NewLiquidityIterator1To0(keeper Keeper, ctx context.Context, tradingPair types.TradingPair, feeTiers []types.FeeTier) *LiquidityIterator1To0 {
