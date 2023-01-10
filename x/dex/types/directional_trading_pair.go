@@ -1,9 +1,5 @@
 package types
 
-import (
-	context "context"
-)
-
 type DirectionalTradingPair struct {
 	TradingPair
 	TokenIn  string
@@ -24,20 +20,4 @@ func (dp DirectionalTradingPair) IsTokenInToken0() bool {
 
 func (dp DirectionalTradingPair) IsTokenOutToken0() bool {
 	return !dp.IsTokenInToken0()
-}
-
-func (dp *DirectionalTradingPair) InitLiquidity(tickIndex int64) {
-	if dp.IsTokenInToken0() {
-		dp.InitLiquidityToken0(tickIndex)
-	} else {
-		dp.InitLiquidityToken1(tickIndex)
-	}
-}
-
-func (dp *DirectionalTradingPair) DeinitLiquidity(ctx context.Context, k Keeper, tickIndex int64) {
-	if dp.IsTokenOutToken0() {
-		dp.DeinitLiquidityToken0(ctx, k, tickIndex)
-	} else {
-		dp.DeinitLiquidityToken1(ctx, k, tickIndex)
-	}
 }

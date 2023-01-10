@@ -120,8 +120,8 @@ func (k Keeper) DepositCore(
 			continue
 		}
 
-		pair.UpdateTickPointersPostAddToken0(goCtx, k, &lowerTick)
-		pair.UpdateTickPointersPostAddToken1(goCtx, k, &upperTick)
+		k.UpdateTickPointersPostAddToken0(goCtx, &pair, &lowerTick)
+		k.UpdateTickPointersPostAddToken1(goCtx, &pair, &upperTick)
 		k.SetTradingPair(ctx, pair)
 
 		amounts0Deposited[i] = inAmount0
@@ -229,11 +229,11 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		totalReserve1ToRemove = totalReserve1ToRemove.Add(outAmount1)
 
 		if outAmount0.GT(sdk.ZeroInt()) {
-			pair.UpdateTickPointersPostRemoveToken0(goCtx, k, &lowerTick)
+			k.UpdateTickPointersPostRemoveToken0(goCtx, &pair, &lowerTick)
 		}
 
 		if outAmount1.GT(sdk.ZeroInt()) {
-			pair.UpdateTickPointersPostRemoveToken1(goCtx, k, &upperTick)
+			k.UpdateTickPointersPostRemoveToken1(goCtx, &pair, &upperTick)
 		}
 
 		k.SetTradingPair(ctx, pair)
@@ -328,10 +328,10 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		liq.Save(goCtx, k)
 
 		if initedTick != nil {
-			pair.InitLiquidity(initedTick.TickIndex)
+			k.InitLiquidity(&pair, initedTick.TickIndex)
 		}
 		if k.ShouldDeinit(ctx, deinitedTick, pair) {
-			pair.DeinitLiquidity(goCtx, k, deinitedTick.TickIndex)
+			k.DeinitLiquidity(goCtx, &pair, deinitedTick.TickIndex)
 		}
 
 	}
@@ -419,7 +419,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	k.SetLimitOrderTranche(ctx, tranche)
 
 	if msg.AmountIn.GT(sdk.ZeroInt()) {
-		pair.InitLiquidity(tick.TickIndex)
+		k.InitLiquidity(&pair, tick.TickIndex)
 		k.SetTradingPair(ctx, pair.TradingPair)
 
 		coin0 := sdk.NewCoin(tokenIn, msg.AmountIn)
@@ -507,7 +507,7 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 	tokenOut, tokenIn := GetInOutTokens(msg.KeyToken, token0, token1)
 	pair, _ := k.GetDirectionalTradingPair(ctx, tokenIn, tokenOut)
 	if k.ShouldDeinit(ctx, &tick, pair) {
-		pair.DeinitLiquidity(goCtx, k, tick.TickIndex)
+		k.DeinitLiquidity(goCtx, &pair, tick.TickIndex)
 		k.SetTradingPair(ctx, pair.TradingPair)
 	}
 
