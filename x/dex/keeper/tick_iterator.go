@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"context"
-
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
@@ -15,32 +13,15 @@ type TickIterator struct {
 }
 
 func (k Keeper) NewTickIterator(
-	// NOTE: both start and end are inclusive
-	ctx context.Context,
-	startInclusive int64,
-	endInclusive int64,
+	ctx sdk.Context,
 	pairId *types.PairId,
-	scanLeft bool,
-) types.TickIteratorI {
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	prefixStore := prefix.NewStore(sdkCtx.KVStore(k.storeKey), types.TickPrefix(pairId))
+	tokenIn string,
+) TickIterator {
+	prefixStore := prefix.NewStore(ctx.KVStore(k.storeKey), types.TickLiquidityPrefix(pairId, tokenIn))
 
-	if scanLeft {
-		return TickIterator{
-			iter: prefixStore.ReverseIterator(
-				types.TickIndexToBytes(endInclusive),
-				types.TickIndexToBytes(startInclusive+1),
-			),
-			cdc: k.cdc,
-		}
-	} else {
-		return TickIterator{
-			iter: prefixStore.Iterator(
-				types.TickIndexToBytes(startInclusive),
-				types.TickIndexToBytes(endInclusive+1),
-			),
-			cdc: k.cdc,
-		}
+	return TickIterator{
+		iter: prefixStore.Iterator(nil, nil),
+		cdc:  k.cdc,
 	}
 }
 
@@ -52,8 +33,8 @@ func (ti TickIterator) Close() error {
 	return ti.iter.Close()
 }
 
-func (ti TickIterator) Value() types.Tick {
-	var tick types.Tick
+func (ti TickIterator) Value() types.TickLiquidity {
+	var tick types.TickLiquidity
 	ti.cdc.MustUnmarshal(ti.iter.Value(), &tick)
 	return tick
 }

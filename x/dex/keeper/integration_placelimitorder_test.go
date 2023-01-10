@@ -58,8 +58,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderInSpreadMinMaxNotAdjusted() {
 	s.aliceDeposits(NewDeposit(10, 10, 0, 2))
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
-	s.assertMinTick(-5)
-	s.assertMaxTick(5)
 
 	// WHEN
 	// place limit order for B at tick -1
@@ -69,8 +67,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderInSpreadMinMaxNotAdjusted() {
 
 	// THEN
 	// assert min, max not moved
-	s.assertMinTick(-5)
-	s.assertMaxTick(5)
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpread0To1NotAdjusted() {
@@ -136,7 +132,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMinAdjusted() {
 
 	// THEN
 	// assert min moved
-	s.assertMinTick(-3)
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMaxAdjusted() {
@@ -158,7 +153,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMaxAdjusted() {
 
 	// THEN
 	// assert max moved
-	s.assertMaxTick(3)
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMinNotAdjusted() {
@@ -175,8 +169,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMinNotAdjusted() {
 	s.aliceDeposits(NewDeposit(10, 0, 0, 2))
 	s.assertAliceBalances(30, 40)
 	s.assertDexBalances(20, 10)
-	s.assertMinTick(-5)
-	s.assertMaxTick(1)
 
 	// WHEN
 	// place limit order in spread (for B at tick -3)
@@ -186,7 +178,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMinNotAdjusted() {
 
 	// THEN
 	// assert min not moved
-	s.assertMinTick(-5)
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMaxNotAdjusted() {
@@ -203,8 +194,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMaxNotAdjusted() {
 	s.aliceDeposits(NewDeposit(0, 10, 0, 2))
 	s.assertAliceBalances(40, 30)
 	s.assertDexBalances(10, 20)
-	s.assertMinTick(-1)
-	s.assertMaxTick(5)
 
 	// WHEN
 	// place limit order in spread (for A at tick 3)
@@ -214,7 +203,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMaxNotAdjusted() {
 
 	// THEN
 	// assert max not moved
-	s.assertMaxTick(5)
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityA() {
@@ -228,10 +216,8 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityA() {
 	s.assertDexBalances(10, 0)
 	s.assertLimitLiquidityAtTick("TokenA", -1, 10)
 	s.assertAliceLimitLiquidityAtTick("TokenA", 10, -1)
-	s.assertMinTick(-1)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
 
 	// WHEN
 	// place limit order on same tick (for B at tick -1)
@@ -243,10 +229,8 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityA() {
 	s.assertAliceLimitLiquidityAtTick("TokenA", 20, -1)
 	s.assertAliceBalances(30, 50)
 	s.assertDexBalances(20, 0)
-	s.assertMinTick(-1)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityB() {
@@ -261,9 +245,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityB() {
 	s.assertLimitLiquidityAtTick("TokenB", 1, 10)
 	s.assertAliceLimitLiquidityAtTick("TokenB", 10, 1)
 	s.assertCurr1To0(math.MinInt64)
-	s.assertMinTick(math.MaxInt64)
 	s.assertCurr0To1(1)
-	s.assertMaxTick(1)
 
 	// WHEN
 	// place limit order on same tick (for A at tick 1)
@@ -275,10 +257,8 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityB() {
 	s.assertAliceLimitLiquidityAtTick("TokenB", 20, 1)
 	s.assertAliceBalances(50, 30)
 	s.assertDexBalances(0, 20)
-	s.assertMinTick(math.MaxInt64)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
-	s.assertMaxTick(1)
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderBelowEnemyLines() {
@@ -363,6 +343,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderPartiallyFilledLOPlaceLOIncremen
 	// partially filled limit order exists on tick -1
 	s.aliceLimitSells("TokenA", -1, 10)
 	s.bobMarketSells("TokenB", 5, 0)
+	s.aliceLimitSells("TokenA", -1, 10)
 	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
 
 	// WHEN
@@ -419,8 +400,6 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertBobBalances(100, 100)
 	s.assertDexBalances(0, 50)
 	s.assertCurrentTicks(math.MinInt64, 0)
-	s.assertMaxTick(0)
-	s.assertMinTick(math.MaxInt64)
 
 	s.bobMarketSells("TokenA", 10, 10)
 
@@ -428,8 +407,6 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertBobBalances(90, 110)
 	s.assertDexBalances(10, 40)
 	s.assertCurrentTicks(math.MinInt64, 0)
-	s.assertMaxTick(0)
-	s.assertMinTick(math.MaxInt64)
 
 	s.aliceLimitSells("TokenB", 0, 50)
 
@@ -437,8 +414,6 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertBobBalances(90, 110)
 	s.assertDexBalances(10, 90)
 	s.assertCurrentTicks(math.MinInt64, 0)
-	s.assertMaxTick(0)
-	s.assertMinTick(math.MaxInt64)
 
 	s.aliceCancelsLimitSell("TokenB", 0, 0)
 
@@ -446,8 +421,6 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertBobBalances(90, 110)
 	s.assertDexBalances(10, 50)
 	s.assertCurrentTicks(math.MinInt64, 0)
-	s.assertMaxTick(0)
-	s.assertMinTick(math.MaxInt64)
 
 	s.bobMarketSells("TokenA", 10, 10)
 

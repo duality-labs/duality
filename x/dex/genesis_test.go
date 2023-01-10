@@ -15,17 +15,6 @@ var defaultPairId *types.PairId = &types.PairId{Token0: "TokenA", Token1: "Token
 func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
-
-		TickList: []types.Tick{
-			{
-				TickIndex: 0,
-				PairId:    defaultPairId,
-			},
-			{
-				TickIndex: 1,
-				PairId:    defaultPairId,
-			},
-		},
 		TradingPairList: []types.TradingPair{
 			{
 				PairId: defaultPairId,
@@ -62,14 +51,34 @@ func TestGenesis(t *testing.T) {
 				Address: "1",
 			},
 		},
-		LimitOrderTrancheList: []types.LimitOrderTranche{
+		TickLiquidityList: []types.TickLiquidity{
 			{
-				TickIndex: 0,
-				PairId:    defaultPairId,
+				PairId:         &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				TokenIn:        "0",
+				TickIndex:      0,
+				LiquidityType:  "0",
+				LiquidityIndex: 0,
 			},
 			{
-				TickIndex: 1,
-				PairId:    defaultPairId,
+				PairId:         &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				TokenIn:        "1",
+				TickIndex:      1,
+				LiquidityType:  "1",
+				LiquidityIndex: 1,
+			},
+		},
+		FilledLimitOrderTrancheList: []types.FilledLimitOrderTranche{
+			{
+				PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				TokenIn:      "0",
+				TickIndex:    0,
+				TrancheIndex: 0,
+			},
+			{
+				PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				TokenIn:      "1",
+				TickIndex:    1,
+				TrancheIndex: 1,
 			},
 		},
 		// this line is used by starport scaffolding # genesis/test/state
@@ -83,13 +92,13 @@ func TestGenesis(t *testing.T) {
 	nullify.Fill(&genesisState)
 	nullify.Fill(got)
 
-	require.ElementsMatch(t, genesisState.TickList, got.TickList)
 	require.ElementsMatch(t, genesisState.TradingPairList, got.TradingPairList)
 	require.ElementsMatch(t, genesisState.TokensList, got.TokensList)
 	require.Equal(t, genesisState.TokensCount, got.TokensCount)
 	require.ElementsMatch(t, genesisState.FeeTierList, got.FeeTierList)
 	require.Equal(t, genesisState.FeeTierCount, got.FeeTierCount)
 	require.ElementsMatch(t, genesisState.LimitOrderTrancheUserList, got.LimitOrderTrancheUserList)
-	require.ElementsMatch(t, genesisState.LimitOrderTrancheList, got.LimitOrderTrancheList)
+	require.ElementsMatch(t, genesisState.TickLiquidityList, got.TickLiquidityList)
+	require.ElementsMatch(t, genesisState.FilledLimitOrderTrancheList, got.FilledLimitOrderTrancheList)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

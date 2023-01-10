@@ -12,16 +12,42 @@ import (
 
 	keepertest "github.com/NicholasDotSol/duality/testutil/keeper"
 	"github.com/NicholasDotSol/duality/testutil/nullify"
+	"github.com/NicholasDotSol/duality/x/dex/keeper"
 	"github.com/NicholasDotSol/duality/x/dex/types"
 )
 
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
+func createNLimitOrderTranches(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.LimitOrderTranche {
+	items := make([]types.LimitOrderTranche, n)
+	for i := range items {
+		tick := types.TickLiquidity{
+			PairId:         &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+			TokenIn:        "TokenA",
+			TickIndex:      int64(i),
+			LiquidityType:  types.LiquidityTypeLO,
+			LiquidityIndex: uint64(i),
+			LimitOrderTranche: &types.LimitOrderTranche{
+				TrancheIndex:     uint64(i),
+				TickIndex:        int64(i),
+				TokenIn:          "TokenA",
+				PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				ReservesTokenIn:  sdk.NewInt(10),
+				ReservesTokenOut: sdk.ZeroInt(),
+				TotalTokenIn:     sdk.NewInt(10),
+				TotalTokenOut:    sdk.ZeroInt(),
+			},
+		}
+		keeper.SetTickLiquidity(ctx, tick)
+		items[i] = *tick.LimitOrderTranche
+	}
+	return items
+}
 func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderTranche(keeper, ctx, 0, "TokenA", 2)
+	msgs := createNLimitOrderTranches(keeper, ctx, 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetLimitOrderTrancheRequest
@@ -32,8 +58,8 @@ func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 			desc: "First",
 			request: &types.QueryGetLimitOrderTrancheRequest{
 				PairId:       "TokenA<>TokenB",
-				TickIndex:    0,
-				Token:        "TokenA",
+				TickIndex:    msgs[0].TickIndex,
+				TokenIn:      "TokenA",
 				TrancheIndex: msgs[0].TrancheIndex,
 			},
 			response: &types.QueryGetLimitOrderTrancheResponse{LimitOrderTranche: msgs[0]},
@@ -42,8 +68,8 @@ func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 			desc: "Second",
 			request: &types.QueryGetLimitOrderTrancheRequest{
 				PairId:       "TokenA<>TokenB",
-				TickIndex:    0,
-				Token:        "TokenA",
+				TickIndex:    msgs[1].TickIndex,
+				TokenIn:      "TokenA",
 				TrancheIndex: msgs[1].TrancheIndex,
 			},
 			response: &types.QueryGetLimitOrderTrancheResponse{LimitOrderTranche: msgs[1]},
@@ -53,7 +79,7 @@ func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 			request: &types.QueryGetLimitOrderTrancheRequest{
 				PairId:       "TokenA<>TokenB",
 				TickIndex:    0,
-				Token:        "TokenA",
+				TokenIn:      "TokenA",
 				TrancheIndex: 100000,
 			},
 			err: status.Error(codes.NotFound, "not found"),
@@ -81,10 +107,12 @@ func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 func TestLimitOrderTrancheQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderTranche(keeper, ctx, 0, "TokenA", 5)
+	msgs := createNLimitOrderTranches(keeper, ctx, 2)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderTrancheRequest {
 		return &types.QueryAllLimitOrderTrancheRequest{
+			PairId:  "TokenA<>TokenB",
+			TokenIn: "TokenA",
 			Pagination: &query.PageRequest{
 				Key:        next,
 				Offset:     offset,

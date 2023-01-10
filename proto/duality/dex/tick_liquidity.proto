@@ -1,0 +1,25 @@
+syntax = "proto3";
+package nicholasdotsol.duality.dex;
+
+option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+import "gogoproto/gogo.proto";
+import "duality/dex/limit_order_tranche.proto";
+import "duality/dex/pair_id.proto";
+
+
+message TickLiquidity {
+  PairId pairId = 1; 
+  string tokenIn = 2; 
+  int64 tickIndex = 3; 
+  string liquidityType = 4; 
+  uint64 liquidityIndex = 5; 
+  string LPReserve = 6 [
+                          (gogoproto.moretags)   = "yaml:\"LPReserve\"",
+                          (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                          (gogoproto.jsontag) = "LPReserve",
+                          (gogoproto.nullable)  = true
+                          ];
+  LimitOrderTranche limitOrderTranche = 7;
+
+}
+
