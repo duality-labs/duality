@@ -215,7 +215,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledInvalidKeyToken() {
 	// THEN
 	// withdraw should fail with ErrInvalidTradingPair
 
-	err := types.ErrInvalidTradingPair
+	err := types.ErrInvalidKeyToken
 	s.aliceWithdrawLimitSellFails(err, "TokenC", 0, 0)
 }
 

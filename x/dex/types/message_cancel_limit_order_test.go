@@ -49,7 +49,7 @@ func TestMsgCancelLimitOrder_ValidateBasic(t *testing.T) {
 				KeyToken:  "TokenC",
 				Key:       0,
 			},
-			err: ErrInvalidTradingPair,
+			err: ErrInvalidKeyToken,
 		}, {
 			name: "valid msg",
 			msg: MsgCancelLimitOrder{

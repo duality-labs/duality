@@ -315,7 +315,7 @@ func (s *MsgServerTestSuite) TestWithdrawalFailsWhenNotEnoughShares() {
 
 	// WHEN Alice tries to withdraw 200
 	// THEN ensure error is thrown and Alice and Dex balances remain unchanged
-	err := types.ErrNotEnoughShares
+	err := types.ErrInsufficientShares
 	s.aliceWithdrawFails(err, NewWithdrawl(200, 0, 0))
 }
 
