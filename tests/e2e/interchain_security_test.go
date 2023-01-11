@@ -3,12 +3,11 @@ package e2e_test
 import (
 	"testing"
 
-	appConsumer "github.com/cosmos/interchain-security/app/consumer"
-	//appConsumerDemocracy "github.com/cosmos/interchain-security/app/consumer-democracy"
+	appConsumer "github.com/NicholasDotSol/duality/app"
 	appProvider "github.com/cosmos/interchain-security/app/provider"
 	"github.com/cosmos/interchain-security/tests/e2e"
 
-	//icstestingutils "github.com/cosmos/interchain-security/testutil/ibc_testing"
+	icsappiniters "github.com/cosmos/interchain-security/testutil/ibc_testing"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -24,7 +23,7 @@ func TestCCVTestSuite(t *testing.T) {
 	// Pass in concrete app types that implement the interfaces defined in /testutil/e2e/interfaces.go
 	ccvSuite := e2e.NewCCVTestSuite[*appProvider.App, *appConsumer.App](
 		// Pass in ibctesting.AppIniters for provider and consumer.
-		ProviderAppIniter, ConsumerAppIniter, []string{})
+		icsappiniters.ProviderAppIniter, DualityAppIniter, []string{})
 
 	// Run tests
 	suite.Run(t, ccvSuite)
