@@ -21,7 +21,7 @@ func CreateMinimalConsumerTestGenesis() *ccvconsumertypes.GenesisState {
 	genesisState.ProviderClientState = ccvprovidertypes.DefaultParams().TemplateClient
 	genesisState.ProviderClientState.ChainId = app.Name
 	genesisState.ProviderClientState.LatestHeight = ibctypes.Height{RevisionNumber: 0, RevisionHeight: 1}
-	genesisState.ProviderClientState.TrustingPeriod = genesisState.Params.UnbondingPeriod / ccvprovidertypes.DefaultTrustingPeriodFraction
+	genesisState.ProviderClientState.TrustingPeriod = genesisState.Params.UnbondingPeriod
 	genesisState.ProviderClientState.UnbondingPeriod = genesisState.Params.UnbondingPeriod
 	genesisState.ProviderClientState.MaxClockDrift = ccvprovidertypes.DefaultMaxClockDrift
 	genesisState.ProviderConsensusState = &ibctmtypes.ConsensusState{

@@ -75,9 +75,10 @@ import (
 	ibcporttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
-	"github.com/ignite-hq/cli/ignite/pkg/cosmoscmd"
+	ibctestingcore "github.com/cosmos/interchain-security/legacy_ibc_testing/core"
 	"github.com/ignite-hq/cli/ignite/pkg/openapiconsole"
 	"github.com/spf13/cast"
+	"github.com/tendermint/spm/cosmoscmd"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	"github.com/tendermint/tendermint/libs/log"
@@ -734,8 +735,12 @@ func (app *App) GetIBCKeeper() *ibckeeper.Keeper {
 	return app.IBCKeeper
 }
 
+// // GetStakingKeeper implements the TestingApp interface.
+// func (app *App) GetStakingKeeper() ibcclienttypes.StakingKeeper {
+// 	return app.ConsumerKeeper
+// }
 // GetStakingKeeper implements the TestingApp interface.
-func (app *App) GetStakingKeeper() ibcclienttypes.StakingKeeper {
+func (app *App) GetStakingKeeper() ibctestingcore.StakingKeeper {
 	return app.ConsumerKeeper
 }
 

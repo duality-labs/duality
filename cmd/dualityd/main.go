@@ -5,7 +5,7 @@ import (
 
 	"github.com/NicholasDotSol/duality/app"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
-	"github.com/ignite-hq/cli/ignite/pkg/cosmoscmd"
+	"github.com/tendermint/spm/cosmoscmd"
 )
 
 func main() {
