@@ -31,4 +31,5 @@ var (
 	ErrZeroTrueDeposit                    = sdkerrors.Register(ModuleName, 1121, "Cannot deposit double-sided liquidity in tick with one-sided liquidity")
 	ErrNotEnoughLimitOrderShares          = sdkerrors.Register(ModuleName, 1122, "Not enough limit order shares are owned by:  %s")
 	ErrValidLimitOrderTrancheUserNotFound = sdkerrors.Register(ModuleName, 1123, "Limit Order Trache User not found")
+	ErrWithdrawEmptyLimitOrder            = sdkerrors.Register(ModuleName, 1124, "Cannot withdraw additional liqudity from this limit order at this time")
 )

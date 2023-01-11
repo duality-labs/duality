@@ -230,7 +230,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledEmptyFilled() {
 	// order is unfilled, i.e. trachne.filled = 0
 	// THEN
 
-	err := types.ErrCancelEmptyLimitOrder
+	err := types.ErrWithdrawEmptyLimitOrder
 	s.aliceWithdrawLimitSellFails(err, "TokenA", 0, 0)
 }
 

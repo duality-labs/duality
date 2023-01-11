@@ -512,6 +512,11 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	trancheIndex := msg.Key
 	tickIndex := msg.TickIndex
 
+	tick, found := k.GetTick(ctx, pairId, msg.TickIndex)
+	if !found {
+		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Valid tick not found ")
+	}
+
 	tranche, found := k.GetLimitOrderTranche(ctx, pairId, tickIndex, orderTokenIn, trancheIndex)
 	if !found {
 		return types.ErrValidLimitOrderTrancheNotFound
@@ -528,16 +533,12 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	if !found {
 		return types.ErrValidLimitOrderTrancheUserNotFound
 	}
+
 	sharesToWithdraw := trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled)
 
 	// checks that the user has some number of limit order shares wished to withdraw
 	if sharesToWithdraw.LTE(sdk.ZeroInt()) {
-		return sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
-	}
-
-	tick, found := k.GetTick(ctx, pairId, msg.TickIndex)
-	if !found {
-		return sdkerrors.Wrapf(types.ErrValidTickNotFound, "Valid tick not found ")
+		return sdkerrors.Wrapf(types.ErrNotEnoughLimitOrderShares, "Not enough shares were found")
 	}
 
 	var priceLimitInToOut sdk.Dec
@@ -573,7 +574,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 			return err
 		}
 	} else {
-		return sdkerrors.Wrapf(types.ErrCancelEmptyLimitOrder, "Cannot withdraw additional liqudity from this limit order at this time")
+		return sdkerrors.Wrapf(types.ErrWithdrawEmptyLimitOrder, "Cannot withdraw additional liqudity from this limit order at this time")
 	}
 
 	ctx.EventManager().EmitEvent(types.WithdrawFilledLimitOrderEvent(msg.Creator, msg.Receiver,
