@@ -404,22 +404,63 @@ func (s *MsgServerTestSuite) depositsWithOptions(account sdk.AccAddress, deposit
 	s.Assert().Nil(err)
 }
 
-func (s *MsgServerTestSuite) calcAutoswapSharesMinted(centerTick int64, fee uint64, _residual0 int64, _residual1 int64, _balanced0 int64, _balanced1 int64, _totalShares int64, _valuePool int64) sdk.Int {
+func (s *MsgServerTestSuite) calcAutoswapSharesMinted(centerTick int64, feeIndex uint64, _residual0 int64, _residual1 int64, _balanced0 int64, _balanced1 int64, _totalShares int64, _valuePool int64) sdk.Int {
 	residual0, residual1, balanced0, balanced1, totalShares, valuePool := sdk.NewInt(_residual0), sdk.NewInt(_residual1), sdk.NewInt(_balanced0), sdk.NewInt(_balanced1), sdk.NewInt(_totalShares), sdk.NewInt(_valuePool)
 	
 	// residualValue = 1.0001^-f * residualAmount0 + 1.0001^{i-f} * residualAmount1
 	// balancedValue = balancedAmount0 + 1.0001^{i} * balancedAmount1
 	// value = residualValue + balancedValue
-	// shares minted = value * totalShares / valuePool 
+	// shares minted = value * totalShares / valuePool
+	fee := s.feeTiers[feeIndex].Fee
+
 	centerPrice, _ := keeper.CalcPrice1To0(centerTick)
-	leftPrice, _ := keeper.CalcPrice1To0(centerTick - int64(fee))
-	discountPrice, _ := keeper.CalcPrice1To0(- int64(fee))
+	leftPrice, _ := keeper.CalcPrice1To0(centerTick - fee)
+	discountPrice, _ := keeper.CalcPrice1To0(-fee)
 
 	balancedValue := balanced0.ToDec().Add(centerPrice.Mul(balanced1.ToDec())).TruncateInt()
 	residualValue := residual0.ToDec().Mul(discountPrice).Add(leftPrice.Mul(residual1.ToDec())).TruncateInt()
 	valueMint := balancedValue.Add(residualValue)
 
 	return valueMint.Mul(totalShares).Quo(valuePool)
+}
+
+func (s *MsgServerTestSuite) calcSharesMinted(centerTick int64, feeIndex uint64, _amount0 int64, _amount1 int64) sdk.Int {
+	amount0, amount1 := sdk.NewInt(_amount0), sdk.NewInt(_amount1)
+	centerPrice, _ := keeper.CalcPrice1To0(centerTick)
+
+	return amount0.ToDec().Add(centerPrice.Mul(amount1.ToDec())).TruncateInt()
+}
+
+func (s *MsgServerTestSuite) calcExpectedBalancesAfterWithdrawOnePool(sharesMinted sdk.Int, account sdk.AccAddress, tickIndex int64, feeIndex uint64) (sdk.Int, sdk.Int, sdk.Int, sdk.Int) {
+	dexCurrentBalance0 := s.app.BankKeeper.GetBalance(s.ctx, s.app.AccountKeeper.GetModuleAddress("dex"), "TokenA").Amount
+	dexCurrentBalance1 := s.app.BankKeeper.GetBalance(s.ctx, s.app.AccountKeeper.GetModuleAddress("dex"), "TokenB").Amount
+	currentBalance0 := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenA").Amount
+	currentBalance1 := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenB").Amount
+	amountPool0, amountPool1 := s.getLiquidityAtTick(tickIndex, feeIndex)
+	poolShares := s.getPoolShares("TokenA", "TokenB", tickIndex, feeIndex)
+
+	amountOut0 := amountPool0.Mul(sharesMinted).Quo(poolShares)
+	amountOut1 := amountPool1.Mul(sharesMinted).Quo(poolShares)
+
+	expectedBalance0 := currentBalance0.Add(amountOut0)
+	expectedBalance1 := currentBalance1.Add(amountOut1)
+	dexExpectedBalance0 := dexCurrentBalance0.Sub(amountOut0)
+	dexExpectedBalance1 := dexCurrentBalance1.Sub(amountOut1)
+
+	return expectedBalance0, expectedBalance1, dexExpectedBalance0, dexExpectedBalance1
+}
+
+func (s *MsgServerTestSuite) getLiquidityAtTick(tickIndex int64, feeIndex uint64) (sdk.Int, sdk.Int) {
+	pairId := CreatePairId("TokenA", "TokenB")
+	fee := s.feeTiers[feeIndex].Fee
+
+	lowerTick, _ := s.app.DexKeeper.GetTick(s.ctx, pairId, tickIndex-fee)
+	liquidityA := lowerTick.TickData.Reserve0[feeIndex]
+
+	upperTick, _ := s.app.DexKeeper.GetTick(s.ctx, pairId, tickIndex+fee)
+	liquidityB := upperTick.TickData.Reserve1[feeIndex]
+
+	return liquidityA, liquidityB
 }
 
 func (s *MsgServerTestSuite) assertAliceDepositFails(err error, deposits ...*Deposit) {
