@@ -5,7 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (s *MsgServerTestSuite) TestDepositMultiPartialFailureTrueAmounts() {
+func (s *MsgServerTestSuite) TestDepositMultiCompleteFailure() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -13,33 +13,12 @@ func (s *MsgServerTestSuite) TestDepositMultiPartialFailureTrueAmounts() {
 
 	// WHEN
 	// alice deposits 0 A, 5 B at tick 0 fee 0 and 5 A, 0 B at tick 0 fee 0
-	s.aliceDeposits(
-		NewDeposit(5, 0, 0, 0),
-		NewDeposit(0, 5, 0, 0),
-	)
-
 	// THEN
-	// second deposit's ratio is different than pool after the first, so amounts will be rounded to 0,0
-	// thus only the first deposit should have an effect
-	s.assertAliceBalances(45, 50)
-	s.assertLiquidityAtTickInt(sdk.NewInt(5), sdk.NewInt(0), 0, 0)
-	s.assertDexBalances(5, 0)
-}
+	// second deposit's ratio is different than pool after the first, so amounts will be rounded to 0,0 and tx will fail
 
-func (s *MsgServerTestSuite) TestDepositMultiCompleteFailure() {
-	s.fundAliceBalances(50, 50)
-
-	// GIVEN
-	// alice deposits 5 A, 5 B at tick 0 fee 0
-	s.aliceDeposits(NewDeposit(5, 5, 0, 0))
-
-	// WHEN
-	// alice deposits 0 A, 5 B at tick 0 fee 0 and 5 A, 0 B at tick 0 fee 0
-	// THEN
-	// deposit should fail with ErrAllDepositsFailed
-
-	err := types.ErrAllDepositsFailed
-	s.assertAliceDepositFails(err,
+	err := types.ErrZeroTrueDeposit
+	s.assertAliceDepositFails(
+		err,
 		NewDeposit(5, 0, 0, 0),
 		NewDeposit(0, 5, 0, 0),
 	)

@@ -430,3 +430,19 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedInvalidFeeIndex() {
 	err := types.ErrValidFeeIndexNotFound
 	s.assertAliceDepositFails(err, NewDeposit(0, 10, 0, feeIndex))
 }
+
+func (s *MsgServerTestSuite) TestDepositSingleSidedZeroTrueAmountsFail() {
+	s.fundAliceBalances(50, 50)
+
+	// GIVEN
+	// alice deposits 5 A, 0 B at tick 0 fee 0
+	s.aliceDeposits(NewDeposit(5, 0, 0, 0))
+
+	// WHEN
+	// alice deposits 0 A, 5 B at tick 0 fee 0
+	// THEN
+	// second deposit's ratio is different than pool after the first, so amounts will be rounded to 0,0 and tx will fail
+
+	err := types.ErrZeroTrueDeposit
+	s.assertAliceDepositFails(err, NewDeposit(0, 5, 0, 0))
+}

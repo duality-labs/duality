@@ -350,7 +350,7 @@ func (s *MsgServerTestSuite) TestWithdrawalFailsWithInvalidTick() {
 
 	// WHEN Alice tries to withdraw from an invalid tick
 	// NOTE: See above NOTE on error condition from TestFailsWithNonExistentPair
-	err := types.ErrNotEnoughShares
+	err := types.ErrValidTickNotFound
 	s.aliceWithdrawFails(err, NewWithdrawl(50, 10, 0))
 }
 

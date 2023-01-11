@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"github.com/NicholasDotSol/duality/x/dex/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (s *MsgServerTestSuite) TestDepositDoubleSidedInSpreadCurrTickAdjusted() {
@@ -347,6 +346,6 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedZeroDeposit() {
 	// THEN
 	// deposit should fail with InvalidType error
 
-	err := sdkerrors.ErrInvalidType
+	err := types.ErrZeroDeposit
 	s.assertAliceDepositFails(err, NewDeposit(0, 0, 0, 0))
 }
