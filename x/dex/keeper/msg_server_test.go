@@ -294,7 +294,7 @@ type Deposit struct {
 }
 
 type DepositOptions struct {
-	autoswap  bool
+	Autoswap  bool
 }
 
 type DepositWithOptions struct {
@@ -314,14 +314,24 @@ func NewDeposit(amountA int, amountB int, tickIndex int, feeIndex int) *Deposit 
 	}
 }
 
+func NewDepositWithOptions(amountA int, amountB int, tickIndex int, feeIndex int, options DepositOptions) *DepositWithOptions {
+	return &DepositWithOptions{
+		AmountA:   sdk.NewInt(int64(amountA)),
+		AmountB:   sdk.NewInt(int64(amountB)),
+		TickIndex: int64(tickIndex),
+		FeeIndex:  uint64(feeIndex),
+		Options: options,
+	}
+}
+
 func (s *MsgServerTestSuite) aliceDeposits(deposits ...*Deposit) {
 	s.deposits(s.alice, deposits...)
 }
 
-/* TODO
+
 func (s *MsgServerTestSuite) aliceDepositsWithOptions(deposits ...*DepositWithOptions) {
-	s.autoswapDeposits(s.alice, deposits...)
-}*/
+	s.depositsWithOptions(s.alice, deposits...)
+}
 
 func (s *MsgServerTestSuite) bobDeposits(deposits ...*Deposit) {
 	s.deposits(s.bob, deposits...)
@@ -375,7 +385,9 @@ func (s *MsgServerTestSuite) depositsWithOptions(account sdk.AccAddress, deposit
 		amountsB[i] = e.AmountB
 		tickIndexes[i] = e.TickIndex
 		feeIndexes[i] = e.FeeIndex
-		options[i] = &types.DepositOptions{e.Options.autoswap}
+		options[i] = &types.DepositOptions{
+			Autoswap : e.Options.Autoswap,
+		}
 	}
 
 	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
@@ -390,6 +402,24 @@ func (s *MsgServerTestSuite) depositsWithOptions(account sdk.AccAddress, deposit
 		Options: options,
 	})
 	s.Assert().Nil(err)
+}
+
+func (s *MsgServerTestSuite) calcAutoswapSharesMinted(centerTick int64, fee uint64, _residual0 int64, _residual1 int64, _balanced0 int64, _balanced1 int64, _totalShares int64, _valuePool int64) sdk.Int {
+	residual0, residual1, balanced0, balanced1, totalShares, valuePool := sdk.NewInt(_residual0), sdk.NewInt(_residual1), sdk.NewInt(_balanced0), sdk.NewInt(_balanced1), sdk.NewInt(_totalShares), sdk.NewInt(_valuePool)
+	
+	// residualValue = 1.0001^-f * residualAmount0 + 1.0001^{i-f} * residualAmount1
+	// balancedValue = balancedAmount0 + 1.0001^{i} * balancedAmount1
+	// value = residualValue + balancedValue
+	// shares minted = value * totalShares / valuePool 
+	centerPrice, _ := keeper.CalcPrice1To0(centerTick)
+	leftPrice, _ := keeper.CalcPrice1To0(centerTick - int64(fee))
+	discountPrice, _ := keeper.CalcPrice1To0(- int64(fee))
+
+	balancedValue := balanced0.ToDec().Add(centerPrice.Mul(balanced1.ToDec())).TruncateInt()
+	residualValue := residual0.ToDec().Mul(discountPrice).Add(leftPrice.Mul(residual1.ToDec())).TruncateInt()
+	valueMint := balancedValue.Add(residualValue)
+
+	return valueMint.Mul(totalShares).Quo(valuePool)
 }
 
 func (s *MsgServerTestSuite) assertAliceDepositFails(err error, deposits ...*Deposit) {

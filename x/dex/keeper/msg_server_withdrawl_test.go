@@ -135,7 +135,8 @@ func (s *MsgServerTestSuite) TestMultiWithdrawlShiftsTickLeft() {
 	// WHEN Alice withdraws all her shares from Tick 2 & 3
 	s.aliceWithdraws(
 		NewWithdrawl(100, 2, 0),
-		NewWithdrawl(100, 3, 0))
+		NewWithdrawl(100, 3, 0),
+	)
 
 	s.assertCurrentTicks(0, math.MaxInt64)
 }
