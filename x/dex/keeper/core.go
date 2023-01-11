@@ -35,7 +35,6 @@ func (k Keeper) DepositCore(
 	pairId := pair.PairId
 	totalAmountReserve0 := sdk.ZeroInt()
 	totalAmountReserve1 := sdk.ZeroInt()
-	passedDeposit := 0
 	amounts0Deposited := make([]sdk.Int, len(amounts0))
 	amounts1Deposited := make([]sdk.Int, len(amounts1))
 	for i := 0; i < len(amounts0); i++ {
@@ -70,7 +69,7 @@ func (k Keeper) DepositCore(
 
 		// check for non-zero deposit
 		if amount0.Equal(sdk.ZeroInt()) && amount1.Equal(sdk.ZeroInt()) {
-			return nil, nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidType, "Cannot deposit 0,0")
+			return nil, nil, sdkerrors.Wrapf(types.ErrZeroDeposit, "Cannot deposit 0,0")
 		}
 
 		lowerTick, err := k.GetOrInitTick(goCtx, pairId, lowerTickIndex)
@@ -93,9 +92,6 @@ func (k Keeper) DepositCore(
 			&upperTick,
 		)
 
-		oldReserve0 := pool.GetLowerReserve0()
-		oldReserve1 := pool.GetUpperReserve1()
-
 		inAmount0, inAmount1, outShares := pool.Deposit(amount0, amount1, totalShares)
 		pool.Save(goCtx, k)
 		if outShares.GT(sdk.ZeroInt()) { // update shares accounting
@@ -105,19 +101,7 @@ func (k Keeper) DepositCore(
 		}
 
 		if inAmount0.Equal(sdk.ZeroInt()) && inAmount1.Equal(sdk.ZeroInt()) {
-			ctx.EventManager().EmitEvent(types.CreateDepositFailedEvent(
-				msg.Creator,
-				msg.Receiver,
-				token0,
-				token1,
-				fmt.Sprint(tickIndex),
-				fmt.Sprint(tickIndex),
-				oldReserve0.String(),
-				oldReserve1.String(),
-				amount0.String(),
-				amount1.String(),
-			))
-			continue
+			return nil, nil, sdkerrors.Wrap(types.ErrZeroTrueDeposit, "True amounts cannot be 0,0 ")
 		}
 
 		k.UpdateTickPointersPostAddToken0(goCtx, &pair, &lowerTick)
@@ -128,8 +112,6 @@ func (k Keeper) DepositCore(
 		amounts1Deposited[i] = inAmount1
 		totalAmountReserve0 = totalAmountReserve0.Add(inAmount0)
 		totalAmountReserve1 = totalAmountReserve1.Add(inAmount1)
-
-		passedDeposit++
 
 		ctx.EventManager().EmitEvent(types.CreateDepositEvent(
 			msg.Creator,
@@ -144,10 +126,6 @@ func (k Keeper) DepositCore(
 			pool.GetUpperReserve1().String(),
 			outShares.String(),
 		))
-	}
-
-	if passedDeposit == 0 {
-		return nil, nil, sdkerrors.Wrapf(types.ErrAllDepositsFailed, "All deposits failed")
 	}
 
 	if totalAmountReserve0.GT(sdk.ZeroInt()) {
@@ -194,17 +172,18 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		fee := feeTiers[feeIndex].Fee
 		lowerTickIndex := tickIndex - fee
 		upperTickIndex := tickIndex + fee
-		sharesId := CreateSharesId(token0, token1, tickIndex, feeIndex)
-		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
-
-		if totalShares.LT(sharesToRemove) {
-			return sdkerrors.Wrapf(types.ErrNotEnoughShares, "Insufficient shares %s", sharesId)
-		}
 
 		lowerTick, lowerTickFound := k.GetTick(ctx, pairId, lowerTickIndex)
 		upperTick, upperTickFound := k.GetTick(ctx, pairId, upperTickIndex)
 		if !lowerTickFound || !upperTickFound {
 			return types.ErrValidTickNotFound
+		}
+
+		sharesId := CreateSharesId(token0, token1, tickIndex, feeIndex)
+		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
+
+		if totalShares.LT(sharesToRemove) {
+			return sdkerrors.Wrapf(types.ErrNotEnoughShares, "Insufficient shares %s", sharesId)
 		}
 
 		pool := NewPool(
@@ -214,10 +193,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			&lowerTick,
 			&upperTick,
 		)
-		outAmount0, outAmount1, err := pool.Withdraw(sharesToRemove, totalShares)
-		if err != nil {
-			return err
-		}
+		outAmount0, outAmount1 := pool.Withdraw(sharesToRemove, totalShares)
 		pool.Save(goCtx, k)
 		if sharesToRemove.GT(sdk.ZeroInt()) { // update shares accounting
 			if err := k.BurnShares(ctx, callerAddr, sharesToRemove, sharesId); err != nil {
@@ -317,7 +293,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		// when the price is too low for minOut to be reached.
 		idealOut := totalOut.Add(remainingIn.ToDec().Mul(liq.Price()).TruncateInt())
 		if idealOut.LT(msg.MinOut) {
-			return sdk.Coin{}, types.ErrNotEnoughLiquidity
+			return sdk.Coin{}, types.ErrSlippageLimitReached
 		}
 
 		inAmount, outAmount, initedTick, deinitedTick := liq.Swap(remainingIn)
@@ -338,7 +314,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 	k.SetTradingPair(ctx, pair.TradingPair)
 
 	if totalOut.LT(msg.MinOut) || msg.AmountIn.Equal(remainingIn) {
-		return sdk.Coin{}, types.ErrNotEnoughLiquidity
+		return sdk.Coin{}, types.ErrSlippageLimitReached
 	}
 
 	// TODO: Move this to a separate ExecuteSwap function. Ditto for all other *Core fns
@@ -449,16 +425,16 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 
 	trancheUser, found := k.GetLimitOrderTrancheUser(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
 	if !found {
-		return types.ErrValidLimitOrderMapsNotFound
+		return types.ErrIntOverflowLimitOrderTrancheUser
 	}
 	// checks that the user has some number of limit order shares wished to withdraw
 	if trancheUser.SharesOwned.LTE(sdk.ZeroInt()) {
-		return sdkerrors.Wrapf(types.ErrNotEnoughShares, "Not enough shares were found")
+		return sdkerrors.Wrapf(types.ErrNotEnoughLimitOrderShares, "Not enough shares were found")
 	}
 
 	tranche, found := k.GetLimitOrderTranche(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 	if !found {
-		return types.ErrValidLimitOrderMapsNotFound
+		return types.ErrValidLimitOrderTrancheNotFound
 	}
 
 	var priceLimitOutToIn sdk.Dec
@@ -485,7 +461,7 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 		limitTrancheIndexes.FillTrancheIndex++
 		tranche, found = k.GetLimitOrderTranche(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key)
 		if !found {
-			return types.ErrValidLimitOrderMapsNotFound
+			return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheNotFound, "Limit order place tranche %d not found", limitTrancheIndexes.PlaceTrancheIndex)
 		}
 	}
 	k.SetTick(ctx, pairId, tick)
@@ -497,7 +473,7 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 			return err
 		}
 	} else {
-		return sdkerrors.Wrapf(types.ErrCannotWithdrawLimitOrder, "Cannot cancel liqudity from this limit order at this time")
+		return sdkerrors.Wrapf(types.ErrCancelEmptyLimitOrder, "Cannot cancel non-positive limit order amount")
 	}
 
 	ctx.EventManager().EmitEvent(types.CancelLimitOrderEvent(msg.Creator, msg.Receiver,
@@ -538,7 +514,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 
 	tranche, found := k.GetLimitOrderTranche(ctx, pairId, tickIndex, orderTokenIn, trancheIndex)
 	if !found {
-		return types.ErrValidLimitOrderMapsNotFound
+		return types.ErrValidLimitOrderTrancheNotFound
 	}
 
 	trancheUser, found := k.GetLimitOrderTrancheUser(
@@ -550,7 +526,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		msg.Creator,
 	)
 	if !found {
-		return types.ErrValidLimitOrderMapsNotFound
+		return types.ErrValidLimitOrderTrancheUserNotFound
 	}
 	sharesToWithdraw := trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled)
 
@@ -597,7 +573,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 			return err
 		}
 	} else {
-		return sdkerrors.Wrapf(types.ErrCannotWithdrawLimitOrder, "Cannot withdraw additional liqudity from this limit order at this time")
+		return sdkerrors.Wrapf(types.ErrCancelEmptyLimitOrder, "Cannot withdraw additional liqudity from this limit order at this time")
 	}
 
 	ctx.EventManager().EmitEvent(types.WithdrawFilledLimitOrderEvent(msg.Creator, msg.Receiver,
