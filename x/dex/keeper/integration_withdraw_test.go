@@ -2,10 +2,11 @@ package keeper_test
 
 import (
 	"math"
+
 	//"time"
 	//. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	//"github.com/NicholasDotSol/duality/x/dex/types"
-	"github.com/NicholasDotSol/duality/testing_scripts"
+
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -296,8 +297,7 @@ func (s *MsgServerTestSuite) TestFullWithdrawalFindNewMaxTickDoS() {
 	s.assertMinTick(math.MaxInt64)
 	s.assertMaxTick(100001)
 
-	sharesToWithdraw := testing_scripts.SharesOnDeposit(sdk.ZeroDec(), sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt(), sdk.NewInt(10), 100000)
-	s.aliceWithdraws(NewWithdrawlInt(sharesToWithdraw, 100000, 0))
+	s.aliceWithdraws(NewWithdrawl(220154, 100000, 0))
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
