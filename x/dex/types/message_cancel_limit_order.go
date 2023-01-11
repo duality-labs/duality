@@ -54,7 +54,7 @@ func (msg *MsgCancelLimitOrder) ValidateBasic() error {
 	}
 
 	if msg.KeyToken != msg.TokenA && msg.KeyToken != msg.TokenB {
-		return sdkerrors.Wrapf(ErrInvalidTradingPair, "KeyToken must be either TokenA or TokenB")
+		return ErrInvalidKeyToken
 	}
 	return nil
 }
