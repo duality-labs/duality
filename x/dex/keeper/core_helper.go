@@ -121,6 +121,214 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 //                          STATE CALCULATIONS                               //
 ///////////////////////////////////////////////////////////////////////////////
 
+func (k Keeper) InitLiquidity(dp *types.DirectionalTradingPair, tickIndex int64) {
+	if dp.IsTokenInToken0() {
+		InitLiquidityToken0(&dp.TradingPair, tickIndex)
+	} else {
+		InitLiquidityToken1(&dp.TradingPair, tickIndex)
+	}
+}
+
+func (k Keeper) DeinitLiquidity(ctx context.Context, dp *types.DirectionalTradingPair, tickIndex int64) {
+	if dp.IsTokenOutToken0() {
+		k.DeinitLiquidityToken0(ctx, &dp.TradingPair, tickIndex)
+	} else {
+		k.DeinitLiquidityToken1(ctx, &dp.TradingPair, tickIndex)
+	}
+}
+
+// Assumes that the token0 liquidity is non-empty at this tick
+func InitLiquidityToken0(pair *types.TradingPair, tickIndex int64) {
+	minTick := &pair.MinTick
+	curTick1To0 := &pair.CurrentTick1To0
+	*minTick = MinInt64(*minTick, tickIndex)
+	*curTick1To0 = MaxInt64(*curTick1To0, tickIndex)
+}
+
+// Assumes that the token1 liquidity is non-empty at this tick
+func InitLiquidityToken1(pair *types.TradingPair, tickIndex int64) {
+	maxTick := &pair.MaxTick
+	curTick0To1 := &pair.CurrentTick0To1
+	*maxTick = MaxInt64(*maxTick, tickIndex)
+	*curTick0To1 = MinInt64(*curTick0To1, tickIndex)
+}
+
+// Assumes that the token0 liquidity is empty at this tick
+func (k Keeper) DeinitLiquidityToken0(ctx context.Context, pair *types.TradingPair, tickIndex int64) {
+	minTick := &pair.MinTick
+	cur1To0 := &pair.CurrentTick1To0
+
+	// Do nothing when liquidity is deinited between the current bounds.
+	if *minTick < tickIndex && tickIndex < *cur1To0 {
+		return
+	}
+
+	// We have removed all of Token0 from the pool
+	if tickIndex == *minTick && tickIndex == *cur1To0 {
+		*minTick = math.MaxInt64
+		*cur1To0 = math.MinInt64
+		// we leave cur1To0 where it is because otherwise we lose the last traded price
+	} else if tickIndex == *minTick {
+		nexMinTick := k.FindNewMinTick(ctx, *pair)
+		*minTick = nexMinTick
+
+		// we are removing liquidity below the current1To0, no need to update that
+	} else if tickIndex == *cur1To0 {
+		next1To0, found := k.FindNextTick1To0(ctx, *pair)
+		if !found {
+			// This case should be impossible if MinTick is tracked correctly
+			*minTick = math.MaxInt64
+			*cur1To0 = math.MinInt64
+		} else {
+			*cur1To0 = next1To0
+		}
+	}
+}
+
+// Assumes that the token1 liquidity is empty at this tick
+func (k Keeper) DeinitLiquidityToken1(ctx context.Context, pair *types.TradingPair, tickIndex int64) {
+	maxTick := &pair.MaxTick
+	cur0To1 := &pair.CurrentTick0To1
+
+	// Do nothing when liquidity is deinited between the current bounds.
+	if *cur0To1 < tickIndex && tickIndex < *maxTick {
+		return
+	}
+
+	// We have removed all of Token0 from the pool
+	if tickIndex == *cur0To1 && tickIndex == *maxTick {
+		*maxTick = math.MinInt64
+		*cur0To1 = math.MaxInt64
+		// we leave cur1To0 where it is because otherwise we lose the last traded price
+	} else if tickIndex == *maxTick {
+		nextMaxTick := k.FindNewMaxTick(ctx, *pair)
+		*maxTick = nextMaxTick
+
+		// we are removing liquidity below the current1To0, no need to update that
+	} else if tickIndex == *cur0To1 {
+		next0To1, found := k.FindNextTick0To1(ctx, *pair)
+		if !found {
+			// This case should be impossible if MinTick is tracked correctly
+			*maxTick = math.MinInt64
+			*cur0To1 = math.MaxInt64
+		} else {
+			*cur0To1 = next0To1
+		}
+	}
+}
+
+func (k Keeper) UpdateTickPointersPostAddToken0(goCtx context.Context, pair *types.TradingPair, tick *types.Tick) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	// TODO: Get rid of this, ideally should know exactly when to (de)init
+	// 	and should not have to have the check before.
+	if k.TickHasToken0(ctx, tick) {
+		InitLiquidityToken0(pair, tick.TickIndex)
+	}
+
+}
+
+func (k Keeper) UpdateTickPointersPostAddToken1(goCtx context.Context, pair *types.TradingPair, tick *types.Tick) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	// TODO: Get rid of this, ideally should know exactly when to (de)init
+	//	and should not have to have the check before.
+	if k.TickHasToken1(ctx, tick) {
+		InitLiquidityToken1(pair, tick.TickIndex)
+	}
+}
+
+func (k Keeper) UpdateTickPointersPostRemoveToken0(goCtx context.Context, pair *types.TradingPair, tick *types.Tick) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	// TODO: Get rid of this, ideally should know exactly when to (de)init
+	//	and should not have to have the check before.
+	if !k.TickHasToken0(ctx, tick) {
+		k.DeinitLiquidityToken0(goCtx, pair, tick.TickIndex)
+	}
+}
+
+func (k Keeper) UpdateTickPointersPostRemoveToken1(goCtx context.Context, pair *types.TradingPair, tick *types.Tick) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	// TODO: Get rid of this, ideally should know exactly when to (de)init
+	//	and should not have to have the check before.
+	if !k.TickHasToken1(ctx, tick) {
+		k.DeinitLiquidityToken1(goCtx, pair, tick.TickIndex)
+	}
+}
+
+func (k Keeper) FindNextTick1To0(goCtx context.Context, pair types.TradingPair) (tickIdx int64, found bool) {
+
+	sdkCtx := sdk.UnwrapSDKContext(goCtx)
+	// If MinTick == MaxInt64 it is unset
+	// ie. There is no Token0 in the pool
+	if pair.MinTick == math.MaxInt64 {
+		return math.MaxInt64, false
+	}
+	// Start scanning from CurrentTick1To0 - 1
+	tickIdx = pair.CurrentTick1To0 - 1
+
+	ti := k.NewTickIterator(goCtx, tickIdx, pair.MinTick, pair.PairId, true)
+
+	defer ti.Close()
+	for ; ti.Valid(); ti.Next() {
+		tick := ti.Value()
+		if k.TickHasToken0(sdkCtx, &tick) {
+			return tick.TickIndex, true
+		}
+	}
+	return math.MinInt64, false
+
+}
+
+func (k Keeper) FindNextTick0To1(goCtx context.Context, pair types.TradingPair) (tickIdx int64, found bool) {
+	sdkCtx := sdk.UnwrapSDKContext(goCtx)
+	// If MaxTick == MinInt64 it is unset
+	// There is no Token1 in the pool
+	if pair.MaxTick == math.MinInt64 {
+		return math.MinInt64, false
+	}
+
+	// Start scanning from CurrentTick0To1 + 1
+	tickIdx = pair.CurrentTick0To1 + 1
+	ti := k.NewTickIterator(goCtx, tickIdx, pair.MaxTick, pair.PairId, false)
+	defer ti.Close()
+	for ; ti.Valid(); ti.Next() {
+		tick := ti.Value()
+		if k.TickHasToken1(sdkCtx, &tick) {
+			return tick.TickIndex, true
+		}
+	}
+
+	return math.MinInt64, false
+}
+
+func (k Keeper) FindNewMinTick(goCtx context.Context, pair types.TradingPair) (minTickIdx int64) {
+	sdkCtx := sdk.UnwrapSDKContext(goCtx)
+
+	ti := k.NewTickIterator(goCtx, pair.MinTick, pair.CurrentTick1To0, pair.PairId, false)
+	defer ti.Close()
+	for ; ti.Valid(); ti.Next() {
+		tick := ti.Value()
+		if k.TickHasToken0(sdkCtx, &tick) {
+			return tick.TickIndex
+		}
+	}
+	return math.MaxInt64
+
+}
+
+func (k Keeper) FindNewMaxTick(goCtx context.Context, pair types.TradingPair) (maxTickIdx int64) {
+	sdkCtx := sdk.UnwrapSDKContext(goCtx)
+
+	ti := k.NewTickIterator(goCtx, pair.MaxTick, pair.CurrentTick0To1, pair.PairId, true)
+	defer ti.Close()
+	for ; ti.Valid(); ti.Next() {
+		tick := ti.Value()
+		if k.TickHasToken1(sdkCtx, &tick) {
+			return tick.TickIndex
+		}
+	}
+	return math.MinInt64
+}
+
 // Balance trueAmount1 to the pool ratio
 func CalcTrueAmounts(
 	centerTickPrice1To0 sdk.Dec,

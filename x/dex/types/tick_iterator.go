@@ -1,5 +1,8 @@
 package types
 
 type TickIteratorI interface {
-	Next() (int64, bool)
+	Next()
+	Valid() bool
+	Close() error
+	Value() Tick
 }

@@ -47,6 +47,36 @@ func (s *MsgServerTestSuite) TestWithdrawFilledSimpleFull() {
 	s.assertMinTick(math.MaxInt64)
 }
 
+func (s *MsgServerTestSuite) TestWithdrawFilledPartial() {
+	s.fundAliceBalances(100, 100)
+	s.fundBobBalances(100, 100)
+
+	// GIVEN
+	// alice limit sells 50 B at tick 0
+	s.aliceLimitSells("TokenB", 0, 50)
+	s.assertAliceLimitLiquidityAtTick("TokenB", 50, 0)
+	// bob market sells 10 A
+	s.bobMarketSells("TokenA", 10, 10)
+	// alice has 10 A filled
+	s.assertAliceLimitFilledAtTickAtKey("TokenB", 10, 0, 0)
+	// balances are 50, 100 for alice and 90, 100 for bob
+	s.assertAliceBalances(100, 50)
+	s.assertBobBalances(90, 110)
+
+	// WHEN
+	// alice withdraws filled limit order proceeds from tick 0 tranche 0
+	s.aliceWithdrawsLimitSell("TokenB", 0, 0)
+
+	// THEN
+	// limit order has been partially filled
+	s.assertAliceLimitLiquidityAtTick("TokenB", 40, 0)
+	// the filled reserved have been withdrawn from
+	s.assertAliceLimitFilledAtTickAtKey("TokenB", 0, 0, 0)
+	// balances are 110, 100 for alice and 90, 100 for bob
+	s.assertAliceBalances(110, 50)
+	s.assertBobBalances(90, 110)
+}
+
 func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 50)
@@ -187,4 +217,51 @@ func (s *MsgServerTestSuite) TestWithdrawFilledInvalidKeyToken() {
 
 	err := types.ErrInvalidTradingPair
 	s.aliceWithdrawLimitSellFails(err, "TokenC", 0, 0)
+}
+
+func (s *MsgServerTestSuite) TestWithdrawFilledEmptyFilled() {
+	s.fundAliceBalances(50, 50)
+
+	// GIVEN
+	// alice places limit order selling A for B at tick 0
+	s.aliceLimitSells("TokenA", 0, 10)
+
+	// WHEN
+	// order is unfilled, i.e. trachne.filled = 0
+	// THEN
+
+	err := types.ErrCannotWithdrawLimitOrder
+	s.aliceWithdrawLimitSellFails(err, "TokenA", 0, 0)
+}
+
+func (s *MsgServerTestSuite) TestWithdrawFilledNoExistingOrderByUser() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 50)
+
+	// GIVEN
+	// only alice has an existing order placed
+	s.aliceLimitSells("TokenA", 0, 10)
+
+	// WHEN
+	// bob tries to withdraw filled from tick 0 tranche 0
+	// THEN
+
+	err := types.ErrValidLimitOrderMapsNotFound
+	s.bobWithdrawLimitSellFails(err, "TokenA", 0, 0)
+}
+
+func (s *MsgServerTestSuite) TestWithdrawFilledTrancheKeyDoesntExist() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 50)
+
+	// GIVEN
+	// only alice has a single existing order placed
+	s.aliceLimitSells("TokenA", 0, 10)
+
+	// WHEN
+	// bob tries to withdraw filled from tick 0 tranche 5
+	// THEN
+
+	err := types.ErrValidLimitOrderMapsNotFound
+	s.bobWithdrawLimitSellFails(err, "TokenA", 0, 5)
 }

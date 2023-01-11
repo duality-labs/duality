@@ -35,8 +35,8 @@ func (s *MsgServerTestSuite) TestAutoswapperWithdraws() {
 
 	s.aliceWithdraws(NewWithdrawlInt(autoswapSharesMinted, int64(tickIndex), uint64(feeIndex)))
 
-	s.assertAliceBalancesEpsilon(aliceExpectedBalance0, aliceExpectedBalance1)
-	s.assertDexBalancesEpsilon(dexExpectedBalance0, dexExpectedBalance1)
+	s.assertAliceBalances(aliceExpectedBalance0.Int64(), aliceExpectedBalance1.Int64())
+	s.assertDexBalances(dexExpectedBalance0.Int64(), dexExpectedBalance1.Int64())
 }
 
 func (s *MsgServerTestSuite) TestAutoswapOtherDepositorWithdraws() {
@@ -67,8 +67,8 @@ func (s *MsgServerTestSuite) TestAutoswapOtherDepositorWithdraws() {
 
 	s.bobWithdraws(NewWithdrawl(bobSharesMinted.Int64(), int64(tickIndex), uint64(feeIndex)))
 
-	s.assertBobBalancesEpsilon(bobExpectedBalance0, bobExpectedBalance1)
-	s.assertDexBalancesEpsilon(dexExpectedBalance0, dexExpectedBalance1)
+	s.assertBobBalances(bobExpectedBalance0.Int64(), bobExpectedBalance1.Int64())
+	s.assertDexBalances(dexExpectedBalance0.Int64(), dexExpectedBalance1.Int64())
 
 }
 
@@ -102,8 +102,8 @@ func (s *MsgServerTestSuite) TestAutoswapBothWithdraws() {
 
 	s.bobWithdraws(NewWithdrawl(bobSharesMinted.Int64(), int64(tickIndex), uint64(feeIndex)))
 
-	s.assertBobBalancesEpsilon(bobExpectedBalance0, bobExpectedBalance1)
-	s.assertDexBalancesEpsilon(dexExpectedBalance0, dexExpectedBalance1)
+	s.assertBobBalances(bobExpectedBalance0.Int64(), bobExpectedBalance1.Int64())
+	s.assertDexBalances(dexExpectedBalance0.Int64(), dexExpectedBalance1.Int64())
 
 	aliceExpectedBalance0 := sdk.NewInt(0)
 	aliceExpectedBalance1 := sdk.NewInt(0)
@@ -111,6 +111,6 @@ func (s *MsgServerTestSuite) TestAutoswapBothWithdraws() {
 
 	s.aliceWithdraws(NewWithdrawlInt(autoswapSharesMinted, int64(tickIndex), uint64(feeIndex)))
 
-	s.assertAliceBalancesEpsilon(aliceExpectedBalance0, aliceExpectedBalance1)
-	s.assertDexBalancesEpsilon(dexExpectedBalance0, dexExpectedBalance1)
+	s.assertAliceBalances(aliceExpectedBalance0.Int64(), aliceExpectedBalance1.Int64())
+	s.assertDexBalances(dexExpectedBalance0.Int64(), dexExpectedBalance1.Int64())
 }
