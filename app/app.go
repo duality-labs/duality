@@ -820,7 +820,7 @@ func (app *App) GetE2eEvidenceKeeper() e2e.E2eEvidenceKeeper {
 	return app.EvidenceKeeper
 }
 
-// NoopDistributionKeeper is replacement for the distribution keeper that results in a no-op when its methods are called.
+// NoopDistributionKeeper is a replacement for the distribution keeper that results in a no-op when its methods are called.
 // This is needed because the forward middleware expects the distribution keeper for funding the community pool if
 // a tax is set greater than 0. We only use this to avoid a possible nil pointer exception.
 type NoopDistributionKeeper struct {
