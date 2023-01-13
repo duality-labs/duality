@@ -99,6 +99,10 @@ import (
 	mevmodule "github.com/NicholasDotSol/duality/x/mev"
 	mevmodulekeeper "github.com/NicholasDotSol/duality/x/mev/keeper"
 	mevmoduletypes "github.com/NicholasDotSol/duality/x/mev/types"
+
+	swapmiddleware "github.com/NicholasDotSol/duality/x/ibc-swap"
+	swapkeeper "github.com/NicholasDotSol/duality/x/ibc-swap/keeper"
+	swaptypes "github.com/NicholasDotSol/duality/x/ibc-swap/types"
 	"github.com/cosmos/interchain-security/testutil/e2e"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
