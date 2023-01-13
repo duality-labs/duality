@@ -48,5 +48,17 @@ func (msg *MsgDeposit) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	_, err = sdk.AccAddressFromBech32(msg.Receiver)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+	}
+
+	// Verify that the lengths of TickIndexes, FeeIndexes, AmountsA, AmountsB are all equal
+	if len(msg.FeeIndexes) != len(msg.TickIndexes) ||
+		len(msg.AmountsA) != len(msg.AmountsB) ||
+		len(msg.AmountsA) != len(msg.TickIndexes) {
+		return ErrUnbalancedTxArray
+	}
 	return nil
 }

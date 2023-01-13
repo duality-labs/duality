@@ -10,6 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var defaultPairId *types.PairId = &types.PairId{Token0: "TokenA", Token1: "TokenB"}
+
 func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
@@ -17,17 +19,19 @@ func TestGenesis(t *testing.T) {
 		TickList: []types.Tick{
 			{
 				TickIndex: 0,
+				PairId:    defaultPairId,
 			},
 			{
 				TickIndex: 1,
+				PairId:    defaultPairId,
 			},
 		},
 		TradingPairList: []types.TradingPair{
 			{
-				PairId: "0",
+				PairId: defaultPairId,
 			},
 			{
-				PairId: "1",
+				PairId: defaultPairId,
 			},
 		},
 		TokensList: []types.Tokens{
@@ -39,20 +43,6 @@ func TestGenesis(t *testing.T) {
 			},
 		},
 		TokensCount: 2,
-		SharesList: []types.Shares{
-			{
-				Address:   "0",
-				PairId:    "0",
-				TickIndex: 0,
-				FeeIndex:  0,
-			},
-			{
-				Address:   "1",
-				PairId:    "1",
-				TickIndex: 1,
-				FeeIndex:  uint64(1),
-			},
-		},
 		FeeTierList: []types.FeeTier{
 			{
 				Id: 0,
@@ -75,9 +65,11 @@ func TestGenesis(t *testing.T) {
 		LimitOrderTrancheList: []types.LimitOrderTranche{
 			{
 				TickIndex: 0,
+				PairId:    defaultPairId,
 			},
 			{
 				TickIndex: 1,
+				PairId:    defaultPairId,
 			},
 		},
 		// this line is used by starport scaffolding # genesis/test/state
@@ -95,7 +87,6 @@ func TestGenesis(t *testing.T) {
 	require.ElementsMatch(t, genesisState.TradingPairList, got.TradingPairList)
 	require.ElementsMatch(t, genesisState.TokensList, got.TokensList)
 	require.Equal(t, genesisState.TokensCount, got.TokensCount)
-	require.ElementsMatch(t, genesisState.SharesList, got.SharesList)
 	require.ElementsMatch(t, genesisState.FeeTierList, got.FeeTierList)
 	require.Equal(t, genesisState.FeeTierCount, got.FeeTierCount)
 	require.ElementsMatch(t, genesisState.LimitOrderTrancheUserList, got.LimitOrderTrancheUserList)

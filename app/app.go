@@ -7,20 +7,18 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/NicholasDotSol/duality/docs"
-	dexmodule "github.com/NicholasDotSol/duality/x/dex"
-	dexmodulekeeper "github.com/NicholasDotSol/duality/x/dex/keeper"
-	dexmoduletypes "github.com/NicholasDotSol/duality/x/dex/types"
-	swapmiddleware "github.com/NicholasDotSol/duality/x/ibc-swap"
-	swapkeeper "github.com/NicholasDotSol/duality/x/ibc-swap/keeper"
-	swaptypes "github.com/NicholasDotSol/duality/x/ibc-swap/types"
 	adminmodulemodule "github.com/cosmos/admin-module/x/adminmodule"
 	adminmodulecli "github.com/cosmos/admin-module/x/adminmodule/client/cli"
 	adminmodulemodulekeeper "github.com/cosmos/admin-module/x/adminmodule/keeper"
 	adminmodulemoduletypes "github.com/cosmos/admin-module/x/adminmodule/types"
+	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	paramsrest "github.com/cosmos/cosmos-sdk/x/params/client/rest"
+	proposaltypes "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
+	upgraderest "github.com/cosmos/cosmos-sdk/x/upgrade/client/rest"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
-	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -59,18 +57,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
 	feegrantmodule "github.com/cosmos/cosmos-sdk/x/feegrant/module"
-	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	paramsrest "github.com/cosmos/cosmos-sdk/x/params/client/rest"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	proposaltypes "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
-	upgraderest "github.com/cosmos/cosmos-sdk/x/upgrade/client/rest"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/cosmos/ibc-go/v3/modules/apps/transfer"
@@ -82,10 +75,6 @@ import (
 	ibcporttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
-	"github.com/cosmos/interchain-security/testutil/e2e"
-	ccvconsumer "github.com/cosmos/interchain-security/x/ccv/consumer"
-	ccvconsumerkeeper "github.com/cosmos/interchain-security/x/ccv/consumer/keeper"
-	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
 	"github.com/ignite-hq/cli/ignite/pkg/cosmoscmd"
 	"github.com/ignite-hq/cli/ignite/pkg/openapiconsole"
 	"github.com/spf13/cast"
@@ -97,6 +86,21 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
+
+	ccvconsumer "github.com/cosmos/interchain-security/x/ccv/consumer"
+	ccvconsumerkeeper "github.com/cosmos/interchain-security/x/ccv/consumer/keeper"
+	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
+
+	"github.com/NicholasDotSol/duality/docs"
+	dexmodule "github.com/NicholasDotSol/duality/x/dex"
+	dexmodulekeeper "github.com/NicholasDotSol/duality/x/dex/keeper"
+	dexmoduletypes "github.com/NicholasDotSol/duality/x/dex/types"
+
+	mevmodule "github.com/NicholasDotSol/duality/x/mev"
+	mevmodulekeeper "github.com/NicholasDotSol/duality/x/mev/keeper"
+	mevmoduletypes "github.com/NicholasDotSol/duality/x/mev/types"
+	"github.com/cosmos/interchain-security/testutil/e2e"
+	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
 const (
@@ -145,6 +149,7 @@ var (
 		dexmodule.AppModuleBasic{},
 		forwardmiddleware.AppModuleBasic{},
 		swapmiddleware.AppModuleBasic{},
+		mevmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -155,6 +160,7 @@ var (
 		dexmoduletypes.ModuleName:                     {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		ccvconsumertypes.ConsumerRedistributeName:     nil,
 		ccvconsumertypes.ConsumerToSendToProviderName: nil,
+		mevmoduletypes.ModuleName:                     {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -216,6 +222,7 @@ type App struct {
 	SwapKeeper    swapkeeper.Keeper
 	ForwardKeeper forwardkeeper.Keeper
 
+	MevKeeper mevmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -277,7 +284,8 @@ func NewApp(
 		authtypes.StoreKey, authz.ModuleName, banktypes.StoreKey,
 		slashingtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		dexmoduletypes.StoreKey, ccvconsumertypes.StoreKey, adminmodulemoduletypes.StoreKey, forwardtypes.StoreKey,
+		dexmoduletypes.StoreKey, ccvconsumertypes.StoreKey, adminmodulemoduletypes.StoreKey,
+		mevmoduletypes.StoreKey, forwardtypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -421,6 +429,16 @@ func NewApp(
 	)
 	swapModule := swapmiddleware.NewAppModule(app.SwapKeeper)
 
+	app.MevKeeper = *mevmodulekeeper.NewKeeper(
+		appCodec,
+		keys[mevmoduletypes.StoreKey],
+		keys[mevmoduletypes.MemStoreKey],
+		app.GetSubspace(mevmoduletypes.ModuleName),
+
+		app.BankKeeper,
+	)
+	mevModule := mevmodule.NewAppModule(appCodec, app.MevKeeper, app.AccountKeeper, app.BankKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create our IBC middleware stack from bottom to top.
@@ -474,6 +492,7 @@ func NewApp(
 		consumerModule,
 		adminModule,
 		dexModule,
+		mevModule,
 		forwardModule,
 		swapModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
@@ -500,6 +519,7 @@ func NewApp(
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
+		mevmoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
@@ -524,6 +544,7 @@ func NewApp(
 		dexmoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
+		mevmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -549,6 +570,7 @@ func NewApp(
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
+		mevmoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
@@ -573,6 +595,7 @@ func NewApp(
 		dexModule,
 		forwardModule,
 		swapModule,
+		mevModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 	app.sm.RegisterStoreDecoders()
@@ -763,6 +786,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ccvconsumertypes.ModuleName)
 	paramsKeeper.Subspace(dexmoduletypes.ModuleName)
 	paramsKeeper.Subspace(forwardtypes.ModuleName).WithKeyTable(forwardtypes.ParamKeyTable())
+	paramsKeeper.Subspace(mevmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
