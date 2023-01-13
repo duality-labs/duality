@@ -45,7 +45,6 @@ func CmdWithdrawl() *cobra.Command {
 
 			for _, s := range argTickIndexes {
 				TickIndexInt, err := strconv.Atoi(s)
-
 				if err != nil {
 					return err
 				}
@@ -56,7 +55,6 @@ func CmdWithdrawl() *cobra.Command {
 
 			for _, s := range argFeeIndexes {
 				FeeIndexInt, err := strconv.Atoi(s)
-
 				if err != nil {
 					return err
 				}

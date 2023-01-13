@@ -16,7 +16,7 @@ var _ = strconv.Itoa(0)
 
 func CmdSwap() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "swap [receiver] [amount-in] [tokenA] [tokenB] [token-in] [minOut] ",
+		Use:   "swap [receiver] [amount-in] [tokenA] [tokenB] [token-in] [minOut] [tickLimit]",
 		Short: "Broadcast message swap",
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -32,10 +32,15 @@ func CmdSwap() *cobra.Command {
 			argTokenB := args[3]
 			argTokenIn := args[4]
 			argMinOut := args[5]
-
 			minOutInt, ok := sdk.NewIntFromString(argMinOut)
 			if ok != true {
 				return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for minOut")
+			}
+
+			argLimitPrice := args[6]
+			limitPriceDec, err := sdk.NewDecFromStr(argLimitPrice)
+			if err != nil {
+				return err
 			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -50,6 +55,7 @@ func CmdSwap() *cobra.Command {
 				amountInInt,
 				argTokenIn,
 				minOutInt,
+				limitPriceDec,
 				argReceiver,
 			)
 			if err := msg.ValidateBasic(); err != nil {

@@ -45,9 +45,13 @@ func (k Keeper) TradingPair(c context.Context, req *types.QueryGetTradingPairReq
 	}
 	ctx := sdk.UnwrapSDKContext(c)
 
+	pairId, err := StringToPairId(req.PairId)
+	if err != nil {
+		return nil, err
+	}
 	val, found := k.GetTradingPair(
 		ctx,
-		req.PairId,
+		pairId,
 	)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")
