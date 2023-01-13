@@ -1,6 +1,7 @@
 package ibc_swap
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/NicholasDotSol/duality/x/ibc-swap/keeper"
@@ -12,6 +13,7 @@ import (
 	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
 	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v3/modules/core/exported"
+	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v3/router/types"
 )
 
 var _ porttypes.Middleware = &IBCMiddleware{}
@@ -96,6 +98,11 @@ func (im IBCMiddleware) OnRecvPacket(
 		return channeltypes.NewErrorAcknowledgement(err.Error())
 	}
 
+	ctxWithForwardFlags := context.WithValue(ctx.Context(), forwardtypes.ProcessedKey{}, true)
+	ctxWithForwardFlags = context.WithValue(ctxWithForwardFlags, forwardtypes.NonrefundableKey{}, true)
+	ctxWithForwardFlags = context.WithValue(ctxWithForwardFlags, forwardtypes.DisableDenomCompositionKey{}, true)
+	wrappedSdkCtx := ctx.WithContext(ctxWithForwardFlags)
+
 	m := &types.PacketMetadata{}
 	err := json.Unmarshal([]byte(data.Memo), m)
 	if err != nil || m.Swap == nil {
@@ -109,7 +116,7 @@ func (im IBCMiddleware) OnRecvPacket(
 	}
 
 	// Call into the underlying apps OnRecvPacket to get the funds on this end
-	ack := im.app.OnRecvPacket(ctx, packet, relayer)
+	ack := im.app.OnRecvPacket(wrappedSdkCtx, packet, relayer)
 	if ack == nil || !ack.Success() {
 		return ack
 	}
@@ -118,11 +125,18 @@ func (im IBCMiddleware) OnRecvPacket(
 	res, err := im.keeper.Swap(ctx, metadata.MsgSwap)
 	if err != nil {
 		swapErr := sdkerrors.Wrap(types.ErrSwapFailed, err.Error())
-		im.keeper.Logger(ctx).Error("swap failed", "err", swapErr, "swap", metadata.MsgSwap)
+
+		// We called into the transfer keepers OnRecvPacket callback to mint or unescrow the funds on this side
+		// so if the swap fails we need to explicitly refund to handle the bookkeeping properly
+		err = im.keeper.RefundPacketToken(ctx, packet, data)
+		if err != nil {
+			return channeltypes.NewErrorAcknowledgement(err.Error())
+		}
+
 		return channeltypes.NewErrorAcknowledgement(swapErr.Error())
 	}
 
-	// If there is no next field set in the metadata call into the underlying app
+	// If there is no next field set in the metadata return ack
 	if metadata.Next == "" {
 		return ack
 	}
@@ -138,16 +152,25 @@ func (im IBCMiddleware) OnRecvPacket(
 	data.Receiver = m.Swap.Receiver
 
 	// We need to reset the packets memo field so that the root key in the metadata is the
-	// next metadata from the current metadata.
+	// next field from the current metadata.
 	data.Memo = m.Swap.Next
-	dataBz, err := transfertypes.ModuleCdc.Marshal(&data)
+
+	dataBz, err := transfertypes.ModuleCdc.MarshalJSON(&data)
 	if err != nil {
-		return channeltypes.NewErrorAcknowledgement(err.Error())
+		return ack
 	}
 
 	packet.Data = dataBz
 
-	return im.app.OnRecvPacket(ctx, packet, relayer)
+	// The forward middleware should return a nil ack if the forward is initiated properly.
+	// If not an error occurred and we return the original ack.
+	newAck := im.app.OnRecvPacket(wrappedSdkCtx, packet, relayer)
+	if newAck != nil {
+		// if non-nil ack is returned that means something went wrong before forward could be initiated so return ack
+		return ack
+	}
+
+	return nil
 }
 
 // OnAcknowledgementPacket implements the IBCModule interface.
