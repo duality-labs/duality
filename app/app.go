@@ -313,9 +313,16 @@ func NewApp(
 		keys[authz.ModuleName], appCodec, app.MsgServiceRouter(),
 	)
 
+	// Remove the fee-pool from the group of blocked recipient addresses in bank
+	// this is required for the consumer chain to be able to send tokens to the provider chain
+	// RE: https://github.com/cosmos/interchain-security/blob/main/app/consumer/app.go#L272
+	bankBlockedAddrs := app.ModuleAccountAddrs()
+	delete(bankBlockedAddrs, authtypes.NewModuleAddress(
+		ccvconsumertypes.ConsumerToSendToProviderName).String())
 	app.BankKeeper = bankkeeper.NewBaseKeeper(
-		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.GetSubspace(banktypes.ModuleName), app.ModuleAccountAddrs(),
+		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.GetSubspace(banktypes.ModuleName), bankBlockedAddrs,
 	)
+
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
 		appCodec, keys[slashingtypes.StoreKey], &app.ConsumerKeeper, app.GetSubspace(slashingtypes.ModuleName),
 	)
