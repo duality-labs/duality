@@ -14,7 +14,7 @@ func SortTokens(ctx sdk.Context, tokenA string, tokenB string) (string, string, 
 
 	equalCheck := tokenA == tokenB
 	if equalCheck {
-		return "", "", sdkerrors.Wrapf(types.ErrInvalidTradingPair, "Not a valid Token Pair: tokenA and tokenB cannot be the same")
+		return "", "", sdkerrors.Wrapf(types.ErrInvalidTradingPair, "%s<>%s", tokenA, tokenB)
 	} else if relativeOrder {
 		return tokenA, tokenB, nil
 	} else {

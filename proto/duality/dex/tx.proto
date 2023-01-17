@@ -17,6 +17,10 @@ service Msg {
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
+message DepositOptions {
+  bool autoswap = 1; 
+}
+
 message MsgDeposit {
   string creator = 1;
   string receiver = 2;
@@ -36,7 +40,7 @@ message MsgDeposit {
   ]; 
   repeated int64 tickIndexes = 7;
   repeated uint64 feeIndexes = 8;
-  bool autoswap = 9;
+  repeated DepositOptions Options = 9;
 }
 
 message MsgDepositResponse {

@@ -9,7 +9,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-const MaxTickExp uint64 = 1048575
+// NOTE: -352,437 is the lowest possible tick at which price can be calculated with a < 1% error
+// when using 18 digit decimal precision (via sdk.Dec)
+const MaxTickExp uint64 = 352437
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           GETTERS & INITIALIZERS                          //

@@ -215,7 +215,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledInvalidKeyToken() {
 	// THEN
 	// withdraw should fail with ErrInvalidTradingPair
 
-	err := types.ErrInvalidTradingPair
+	err := types.ErrInvalidKeyToken
 	s.aliceWithdrawLimitSellFails(err, "TokenC", 0, 0)
 }
 
@@ -230,7 +230,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledEmptyFilled() {
 	// order is unfilled, i.e. trachne.filled = 0
 	// THEN
 
-	err := types.ErrCannotWithdrawLimitOrder
+	err := types.ErrWithdrawEmptyLimitOrder
 	s.aliceWithdrawLimitSellFails(err, "TokenA", 0, 0)
 }
 
@@ -246,7 +246,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledNoExistingOrderByUser() {
 	// bob tries to withdraw filled from tick 0 tranche 0
 	// THEN
 
-	err := types.ErrValidLimitOrderMapsNotFound
+	err := types.ErrValidLimitOrderTrancheUserNotFound
 	s.bobWithdrawLimitSellFails(err, "TokenA", 0, 0)
 }
 
@@ -262,6 +262,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTrancheKeyDoesntExist() {
 	// bob tries to withdraw filled from tick 0 tranche 5
 	// THEN
 
-	err := types.ErrValidLimitOrderMapsNotFound
+	err := types.ErrValidLimitOrderTrancheNotFound
 	s.bobWithdrawLimitSellFails(err, "TokenA", 0, 5)
 }

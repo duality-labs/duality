@@ -225,7 +225,7 @@ func (p *Pool) CalcResidualSharesMinted(
 	return sharesMinted, nil
 }
 
-func (p *Pool) Withdraw(sharesToRemove sdk.Int, totalShares sdk.Int) (outAmount0 sdk.Int, outAmount1 sdk.Int, err error) {
+func (p *Pool) Withdraw(sharesToRemove sdk.Int, totalShares sdk.Int) (outAmount0 sdk.Int, outAmount1 sdk.Int) {
 	reserves0 := &p.LowerTick0.TickData.Reserve0[p.FeeIndex]
 	reserves1 := &p.UpperTick1.TickData.Reserve1[p.FeeIndex]
 	ownershipRatio := sharesToRemove.ToDec().Quo(totalShares.ToDec())
@@ -233,7 +233,7 @@ func (p *Pool) Withdraw(sharesToRemove sdk.Int, totalShares sdk.Int) (outAmount0
 	outAmount0 = ownershipRatio.Mul(reserves0.ToDec()).TruncateInt()
 	*reserves0 = reserves0.Sub(outAmount0)
 	*reserves1 = reserves1.Sub(outAmount1)
-	return outAmount0, outAmount1, nil
+	return outAmount0, outAmount1
 }
 
 func CalcShares(amount0 sdk.Int, amount1 sdk.Int, priceCenter1To0 sdk.Dec) sdk.Dec {
