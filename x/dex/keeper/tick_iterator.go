@@ -4,69 +4,60 @@ import (
 	"context"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type TickIterator struct {
-	start    int64
-	end      int64
-	pairId   *types.PairId
-	keeper   Keeper
-	ctx      sdk.Context
-	hasToken func(sdk.Context, *types.Tick) bool
-	nextTick func(tick int64) int64
-	stop     func(int64) bool
+	iter sdk.Iterator
+	cdc  codec.BinaryCodec
 }
 
-func (k Keeper) NewTickIterator(ctx context.Context,
-	start int64,
-	end int64,
+func (k Keeper) NewTickIterator(
+	// NOTE: both start and end are inclusive
+	ctx context.Context,
+	startInclusive int64,
+	endInclusive int64,
 	pairId *types.PairId,
-	findToken0 bool,
-	scanLeft bool) types.TickIteratorI {
-	var hasToken func(sdk.Context, *types.Tick) bool
-	var nextTick func(tick int64) int64
-	var stop func(int64) bool
-
-	if findToken0 {
-		hasToken = k.TickHasToken0
-	} else {
-		hasToken = k.TickHasToken1
-	}
+	scanLeft bool,
+) types.TickIteratorI {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	prefixStore := prefix.NewStore(sdkCtx.KVStore(k.storeKey), types.TickPrefix(pairId))
 
 	if scanLeft {
-		nextTick = func(tick int64) int64 { tick--; return tick }
-		stop = func(idx int64) bool { return idx < end }
+		return TickIterator{
+			iter: prefixStore.ReverseIterator(
+				types.TickIndexToBytes(endInclusive),
+				types.TickIndexToBytes(startInclusive+1),
+			),
+			cdc: k.cdc,
+		}
 	} else {
-		nextTick = func(tick int64) int64 { tick++; return tick }
-		stop = func(idx int64) bool { return idx > end }
-	}
-
-	return TickIterator{
-		start:    start,
-		end:      end,
-		pairId:   pairId,
-		keeper:   k,
-		hasToken: hasToken,
-		nextTick: nextTick,
-		stop:     stop,
-		ctx:      sdk.UnwrapSDKContext(ctx),
+		return TickIterator{
+			iter: prefixStore.Iterator(
+				types.TickIndexToBytes(startInclusive),
+				types.TickIndexToBytes(endInclusive+1),
+			),
+			cdc: k.cdc,
+		}
 	}
 }
 
-func (ti TickIterator) Next() (idx int64, found bool) {
+func (ti TickIterator) Valid() bool {
+	return ti.iter.Valid()
+}
 
-	curIdx := ti.start
+func (ti TickIterator) Close() error {
+	return ti.iter.Close()
+}
 
-	for !ti.stop(curIdx) {
-		// Checks for the next value tick containing liquidity
-		tick, tickFound := ti.keeper.GetTick(ti.ctx, ti.pairId, curIdx)
+func (ti TickIterator) Value() types.Tick {
+	var tick types.Tick
+	ti.cdc.MustUnmarshal(ti.iter.Value(), &tick)
+	return tick
+}
 
-		if tickFound && ti.hasToken(ti.ctx, &tick) {
-			return curIdx, true
-		}
-
-		curIdx = ti.nextTick(curIdx)
-	}
-	return 0, false
+func (ti TickIterator) Next() {
+	ti.iter.Next()
 }

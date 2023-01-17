@@ -50,7 +50,7 @@ func TestMsgSwap_ValidateBasic(t *testing.T) {
 				TokenIn:  "TokenC",
 				MinOut:   sdk.ZeroInt(),
 			},
-			err: ErrInvalidTradingPair,
+			err: ErrInvalidTokenIn,
 		}, {
 			name: "valid msg",
 			msg: MsgSwap{

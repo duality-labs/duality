@@ -2,10 +2,12 @@ package keeper_test
 
 import (
 	"math"
+
 	//"time"
 	//. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
 	//"github.com/NicholasDotSol/duality/x/dex/types"
-	"github.com/NicholasDotSol/duality/testing_scripts"
+
+	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -295,8 +297,7 @@ func (s *MsgServerTestSuite) TestFullWithdrawalFindNewMaxTickDoS() {
 	s.assertMinTick(math.MaxInt64)
 	s.assertMaxTick(100001)
 
-	sharesToWithdraw := testing_scripts.SharesOnDeposit(sdk.ZeroDec(), sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt(), sdk.NewInt(10), 100000)
-	s.aliceWithdraws(NewWithdrawlInt(sharesToWithdraw, 100000, 0))
+	s.aliceWithdraws(NewWithdrawl(220154, 100000, 0))
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
@@ -304,4 +305,62 @@ func (s *MsgServerTestSuite) TestFullWithdrawalFindNewMaxTickDoS() {
 	s.assertCurr0To1(1)
 	s.assertMinTick(math.MaxInt64)
 	s.assertMaxTick(1)
+}
+
+func (s *MsgServerTestSuite) TestWithdrawalFailsWhenNotEnoughShares() {
+	s.fundAliceBalances(100, 0)
+
+	// IF  Alice deposits 100
+	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
+
+	// WHEN Alice tries to withdraw 200
+	// THEN ensure error is thrown and Alice and Dex balances remain unchanged
+	err := types.ErrInsufficientShares
+	s.aliceWithdrawFails(err, NewWithdrawl(200, 0, 0))
+}
+
+func (s *MsgServerTestSuite) TestWithdrawalFailsWithNonExistentPair() {
+	s.fundAliceBalances(100, 0)
+
+	// IF Alice Deposists 100
+	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
+
+	// WHEN Alice tries to withdraw from a nonexistent tokenPair
+	_, err := s.msgServer.Withdrawl(s.goCtx, &types.MsgWithdrawl{
+		Creator:        s.alice.String(),
+		Receiver:       s.alice.String(),
+		TokenA:         "TokenX",
+		TokenB:         "TokenZ",
+		SharesToRemove: []sdk.Int{sdk.NewInt(10)},
+		TickIndexes:    []int64{0},
+		FeeIndexes:     []uint64{0},
+	})
+
+	// NOTE: As code is currently written we hit not enough shares check
+	// before validating pair existence. This is correct from a
+	// UX perspective --users should not care whether tick is initialized
+	s.Assert().ErrorIs(err, types.ErrValidPairNotFound)
+}
+
+func (s *MsgServerTestSuite) TestWithdrawalFailsWithInvalidTick() {
+	s.fundAliceBalances(100, 0)
+
+	// IF Alice Deposists 100
+	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
+
+	// WHEN Alice tries to withdraw from an invalid tick
+	// NOTE: See above NOTE on error condition from TestFailsWithNonExistentPair
+	err := types.ErrValidTickNotFound
+	s.aliceWithdrawFails(err, NewWithdrawl(50, 10, 0))
+}
+
+func (s *MsgServerTestSuite) TestWithdrawalFailsWithInvalidFee() {
+	s.fundAliceBalances(100, 0)
+
+	// IF Alice Deposists 100
+	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
+
+	// WHEN Alice tries to withdraw from an invalid tick
+	err := types.ErrValidFeeIndexNotFound
+	s.aliceWithdrawFails(err, NewWithdrawl(100, 0, 99))
 }
