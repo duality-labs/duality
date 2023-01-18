@@ -5,6 +5,6 @@ option go_package = "github.com/duality-labs/duality/x/dex/types";
 
 message FeeTier {
   uint64 id = 1;
-  int64 fee = 2; 
-  
+  uint64 fee = 2; 
+
 }

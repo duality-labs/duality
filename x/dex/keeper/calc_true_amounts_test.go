@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/keeper"
 	"github.com/stretchr/testify/suite"
 )
@@ -315,12 +316,12 @@ func (s *CalcTrueAmountsTestSuite) TestCalcTrueAmounts1SidedPool1SidedToken1B() 
 // Calc_price_0to1 ////////////////////////////////////////////////////////////
 
 func (s *CalcTrueAmountsTestSuite) TestCalc_price_1to0() {
-	price := keeper.MustCalcPrice1To0(0)
+	price := utils.MustCalcPrice1To0(0)
 	expected, _ := sdk.NewDecFromStr("1.0")
 
 	s.Assert().Equal(expected, price)
 
-	price = keeper.MustCalcPrice1To0(1)
+	price = utils.MustCalcPrice1To0(1)
 	expected, _ = sdk.NewDecFromStr("1.0001")
 
 	s.Assert().Equal(expected, price)
@@ -329,12 +330,12 @@ func (s *CalcTrueAmountsTestSuite) TestCalc_price_1to0() {
 // Calc_price_1to0 ////////////////////////////////////////////////////////////
 
 func (s *CalcTrueAmountsTestSuite) TestCalc_price_0to1() {
-	price := keeper.MustCalcPrice0To1(0)
+	price := utils.MustCalcPrice0To1(0)
 	expected, _ := sdk.NewDecFromStr("1.0")
 
 	s.Assert().Equal(expected, price)
 
-	price = keeper.MustCalcPrice0To1(1)
+	price = utils.MustCalcPrice0To1(1)
 	expected, _ = sdk.NewDecFromStr("0.9999000099990001")
 
 	s.Assert().Equal(expected, price)

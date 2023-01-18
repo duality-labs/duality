@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"math"
 
-	keeper "github.com/duality-labs/duality/x/dex/keeper"
+	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
@@ -58,8 +58,6 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedInSpreadMinMaxNotAdjusted() {
 	s.aliceDeposits(NewDeposit(10, 10, 0, 2))
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
-	s.assertMinTick(-5)
-	s.assertMaxTick(5)
 
 	// WHEN
 	// deposit in spread (10 of A at tick 0 fee 1)
@@ -69,8 +67,6 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedInSpreadMinMaxNotAdjusted() {
 
 	// THEN
 	// assert min, max not moved
-	s.assertMinTick(-5)
-	s.assertMaxTick(5)
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpread0To1NotAdjusted() {
@@ -136,7 +132,6 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMinAdjusted() {
 
 	// THEN
 	// assert min moved
-	s.assertMinTick(-3)
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMaxAdjusted() {
@@ -158,7 +153,6 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMaxAdjusted() {
 
 	// THEN
 	// assert max moved
-	s.assertMaxTick(3)
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMinNotAdjusted() {
@@ -175,8 +169,6 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMinNotAdjusted() {
 	s.aliceDeposits(NewDeposit(10, 0, 0, 2))
 	s.assertAliceBalances(30, 40)
 	s.assertDexBalances(20, 10)
-	s.assertMinTick(-5)
-	s.assertMaxTick(1)
 
 	// WHEN
 	// deposit in spread (10 of A at tick 0 fee 3)
@@ -186,7 +178,6 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMinNotAdjusted() {
 
 	// THEN
 	// assert min not moved
-	s.assertMinTick(-5)
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMaxNotAdjusted() {
@@ -203,8 +194,6 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMaxNotAdjusted() {
 	s.aliceDeposits(NewDeposit(0, 10, 0, 2))
 	s.assertAliceBalances(40, 30)
 	s.assertDexBalances(10, 20)
-	s.assertMinTick(-1)
-	s.assertMaxTick(5)
 
 	// WHEN
 	// deposit out of spread (10 of B at tick 0 fee 3)
@@ -214,7 +203,6 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMaxNotAdjusted() {
 
 	// THEN
 	// assert max not moved
-	s.assertMaxTick(5)
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityA() {
@@ -228,9 +216,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityA() {
 	s.assertDexBalances(10, 0)
 	s.assertPoolLiquidity(10, 0, 0, 0)
 	s.assertCurr1To0(-1)
-	s.assertMinTick(-1)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
 
 	// WHEN
 	// deposit 10 of token A on the same tick
@@ -242,9 +228,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityA() {
 	s.assertDexBalances(20, 0)
 	s.assertPoolLiquidity(20, 0, 0, 0)
 	s.assertCurr1To0(-1)
-	s.assertMinTick(-1)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityB() {
@@ -259,8 +243,6 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityB() {
 	s.assertPoolLiquidity(0, 10, 0, 0)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
-	s.assertMinTick(math.MaxInt64)
-	s.assertMaxTick(1)
 
 	// WHEN
 	// deposit 10 of token B on the same tick
@@ -273,11 +255,9 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityB() {
 	s.assertDexBalances(0, 20)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
-	s.assertMinTick(math.MaxInt64)
-	s.assertMaxTick(1)
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedBelowEnemyLines() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedAboveEnemyLines() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -286,9 +266,10 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedBelowEnemyLines() {
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
 	s.assertPoolLiquidity(0, 10, 0, 0)
+	s.assertCurr0To1(1)
 
 	// WHEN
-	// depositing below enemy lines at tick -5
+	// depositing  above enemy lines at tick 1
 	// THEN
 	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
 
@@ -296,7 +277,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedBelowEnemyLines() {
 	s.assertAliceDepositFails(err, NewDeposit(10, 0, 2, 0))
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedAboveEnemyLines() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedBelowEnemyLines() {
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -308,7 +289,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedAboveEnemyLines() {
 	s.assertCurr1To0(-1)
 
 	// WHEN
-	// depositing above enemy lines at tick 5	// THEN
+	// depositing above enemy lines at tick -1
+	// THEN
 	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
 
 	err := types.ErrDepositBehindPairLiquidity // TODO: this needs to be changed to a more specific error type
@@ -325,10 +307,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiA() {
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
 	s.assertPoolLiquidity(10, 0, 0, 0)
-	s.assertMinTick(-1)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
 
 	// WHEN
 	// multi deposit
@@ -343,10 +323,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiA() {
 	s.assertDexBalances(30, 0)
 	s.assertPoolLiquidity(20, 0, 0, 0)
 	s.assertPoolLiquidity(10, 0, 0, 1)
-	s.assertMinTick(-3)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedMultiB() {
@@ -359,10 +337,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiB() {
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
 	s.assertPoolLiquidity(0, 10, 0, 0)
-	s.assertMinTick(math.MaxInt64)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
-	s.assertMaxTick(1)
 
 	// WHEN
 	// multi deposit at
@@ -377,10 +353,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiB() {
 	s.assertDexBalances(0, 30)
 	s.assertPoolLiquidity(0, 20, 0, 0)
 	s.assertPoolLiquidity(0, 10, 0, 1)
-	s.assertMinTick(math.MaxInt64)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
-	s.assertMaxTick(3)
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedLowerTickOutsideRange() {
@@ -394,7 +368,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedLowerTickOutsideRange() {
 	// THEN
 	// deposit should fail with TickOutsideRange
 
-	tickIndex := -1 * int(keeper.MaxTickExp)
+	tickIndex := -1 * int(utils.MaxTickExp)
 	err := types.ErrTickOutsideRange
 	s.assertAliceDepositFails(err, NewDeposit(10, 0, tickIndex, 0))
 }
@@ -410,7 +384,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedUpperTickOutsideRange() {
 	// THEN
 	// deposit should fail with TickOutsideRange
 
-	tickIndex := int(keeper.MaxTickExp)
+	tickIndex := int(utils.MaxTickExp)
 	err := types.ErrTickOutsideRange
 	s.assertAliceDepositFails(err, NewDeposit(0, 10, tickIndex, 0))
 }

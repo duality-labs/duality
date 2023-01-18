@@ -2,18 +2,18 @@ package cli
 
 import (
 	"context"
-	"strconv"
 
+	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/duality-labs/duality/x/dex/types"
+	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 )
 
-func CmdListLimitOrderTranche() *cobra.Command {
+func CmdListFilledLimitOrderTranche() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-limit-order-pool-total-shares-map",
-		Short: "list all LimitOrderTranche",
+		Use:   "list-filled-limit-order-tranche",
+		Short: "list all FilledLimitOrderTranche",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -24,11 +24,11 @@ func CmdListLimitOrderTranche() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllLimitOrderTrancheRequest{
+			params := &types.QueryAllFilledLimitOrderTrancheRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.LimitOrderTrancheAll(context.Background(), params)
+			res, err := queryClient.FilledLimitOrderTrancheAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -43,10 +43,10 @@ func CmdListLimitOrderTranche() *cobra.Command {
 	return cmd
 }
 
-func CmdShowLimitOrderTranche() *cobra.Command {
+func CmdShowFilledLimitOrderTranche() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-limit-order-pool-total-shares-map [pairId] [tickIndex] [tokenIn] [TrancheIndex]",
-		Short: "shows a LimitOrderTranche",
+		Use:   "show-filled-limit-order-tranche [pair-id] [token-in] [tick-index] [tranche-index]",
+		Short: "shows a FilledLimitOrderTranche",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -54,30 +54,24 @@ func CmdShowLimitOrderTranche() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			argPairId := args[0]
-			argTickIndex := args[1]
-			argTokenIn := args[2]
-			argTrancheIndex := args[3]
-
-			argTrancheIndexInt, err := strconv.Atoi(argTrancheIndex)
-
+			argTokenIn := args[1]
+			argTickIndex, err := cast.ToInt64E(args[2])
+			if err != nil {
+				return err
+			}
+			argTrancheIndex, err := cast.ToUint64E(args[3])
 			if err != nil {
 				return err
 			}
 
-			argTickIndexInt, err := strconv.Atoi(argTickIndex)
-
-			if err != nil {
-				return err
-			}
-
-			params := &types.QueryGetLimitOrderTrancheRequest{
+			params := &types.QueryGetFilledLimitOrderTrancheRequest{
 				PairId:       argPairId,
-				TickIndex:    int64(argTickIndexInt),
-				Token:        argTokenIn,
-				TrancheIndex: uint64(argTrancheIndexInt),
+				TokenIn:      argTokenIn,
+				TickIndex:    argTickIndex,
+				TrancheIndex: argTrancheIndex,
 			}
 
-			res, err := queryClient.LimitOrderTranche(context.Background(), params)
+			res, err := queryClient.FilledLimitOrderTranche(context.Background(), params)
 			if err != nil {
 				return err
 			}

@@ -40,6 +40,6 @@ func (s *MsgServerTestSuite) TestDepositMultiSuccess() {
 	// THEN
 	// both deposits should go through
 	s.assertAliceBalances(35, 35)
-	s.assertLiquidityAtTickInt(sdk.NewInt(15), sdk.NewInt(15), 0, 0)
+	s.assertLiquidityAtTick(sdk.NewInt(15), sdk.NewInt(15), 0, 0)
 	s.assertDexBalances(15, 15)
 }

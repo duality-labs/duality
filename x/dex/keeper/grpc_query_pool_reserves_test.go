@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"strconv"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -15,44 +14,43 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
-// Prevent strconv unused error
-var _ = strconv.IntSize
-
-func TestTradingPairQuerySingle(t *testing.T) {
+func TestPoolReservesQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNTradingPair(keeper, ctx, 2)
+	msgs := createNPoolReserves(keeper, ctx, 2)
 	for _, tc := range []struct {
 		desc     string
-		request  *types.QueryGetTradingPairRequest
-		response *types.QueryGetTradingPairResponse
+		request  *types.QueryGetPoolReservesRequest
+		response *types.QueryGetPoolReservesResponse
 		err      error
 	}{
 		{
 			desc: "First",
-			request: &types.QueryGetTradingPairRequest{
-				PairId: msgs[0].PairId.Stringify(),
+			request: &types.QueryGetPoolReservesRequest{
+				PairId:    "TokenA<>TokenB",
+				TickIndex: msgs[0].TickIndex,
+				TokenIn:   "TokenA",
+				Fee:       msgs[0].Fee,
 			},
-			response: &types.QueryGetTradingPairResponse{TradingPair: msgs[0]},
+			response: &types.QueryGetPoolReservesResponse{PoolReserves: msgs[0]},
 		},
 		{
 			desc: "Second",
-			request: &types.QueryGetTradingPairRequest{
-				PairId: msgs[1].PairId.Stringify(),
+			request: &types.QueryGetPoolReservesRequest{
+				PairId:    "TokenA<>TokenB",
+				TickIndex: msgs[1].TickIndex,
+				TokenIn:   "TokenA",
+				Fee:       msgs[1].Fee,
 			},
-			response: &types.QueryGetTradingPairResponse{TradingPair: msgs[1]},
-		},
-		{
-			desc: "Invalid key",
-			request: &types.QueryGetTradingPairRequest{
-				PairId: strconv.Itoa(100000),
-			},
-			err: types.ErrInvalidPairIdStr,
+			response: &types.QueryGetPoolReservesResponse{PoolReserves: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
-			request: &types.QueryGetTradingPairRequest{
-				PairId: "TokenA<>TokenZ",
+			request: &types.QueryGetPoolReservesRequest{
+				PairId:    "TokenA<>TokenB",
+				TickIndex: 0,
+				TokenIn:   "TokenA",
+				Fee:       100000,
 			},
 			err: status.Error(codes.NotFound, "not found"),
 		},
@@ -62,7 +60,7 @@ func TestTradingPairQuerySingle(t *testing.T) {
 		},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
-			response, err := keeper.TradingPair(wctx, tc.request)
+			response, err := keeper.PoolReserves(wctx, tc.request)
 			if tc.err != nil {
 				require.ErrorIs(t, err, tc.err)
 			} else {
@@ -76,13 +74,17 @@ func TestTradingPairQuerySingle(t *testing.T) {
 	}
 }
 
-func TestTradingPairQueryPaginated(t *testing.T) {
+func TestPoolReservesQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNTradingPair(keeper, ctx, 5)
+	msgs := createNPoolReserves(keeper, ctx, 2)
+	//Add more data to make sure only LO tranches are returned
+	createNLimitOrderTranches(keeper, ctx, 2)
 
-	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllTradingPairRequest {
-		return &types.QueryAllTradingPairRequest{
+	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllPoolReservesRequest {
+		return &types.QueryAllPoolReservesRequest{
+			PairId:  "TokenA<>TokenB",
+			TokenIn: "TokenA",
 			Pagination: &query.PageRequest{
 				Key:        next,
 				Offset:     offset,
@@ -94,12 +96,12 @@ func TestTradingPairQueryPaginated(t *testing.T) {
 	t.Run("ByOffset", func(t *testing.T) {
 		step := 2
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.TradingPairAll(wctx, request(nil, uint64(i), uint64(step), false))
+			resp, err := keeper.PoolReservesAll(wctx, request(nil, uint64(i), uint64(step), false))
 			require.NoError(t, err)
-			require.LessOrEqual(t, len(resp.TradingPair), step)
+			require.LessOrEqual(t, len(resp.PoolReserves), step)
 			require.Subset(t,
 				nullify.Fill(msgs),
-				nullify.Fill(resp.TradingPair),
+				nullify.Fill(resp.PoolReserves),
 			)
 		}
 	})
@@ -107,27 +109,27 @@ func TestTradingPairQueryPaginated(t *testing.T) {
 		step := 2
 		var next []byte
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.TradingPairAll(wctx, request(next, 0, uint64(step), false))
+			resp, err := keeper.PoolReservesAll(wctx, request(next, 0, uint64(step), false))
 			require.NoError(t, err)
-			require.LessOrEqual(t, len(resp.TradingPair), step)
+			require.LessOrEqual(t, len(resp.PoolReserves), step)
 			require.Subset(t,
 				nullify.Fill(msgs),
-				nullify.Fill(resp.TradingPair),
+				nullify.Fill(resp.PoolReserves),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
-		resp, err := keeper.TradingPairAll(wctx, request(nil, 0, 0, true))
+		resp, err := keeper.PoolReservesAll(wctx, request(nil, 0, 0, true))
 		require.NoError(t, err)
 		require.Equal(t, len(msgs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(msgs),
-			nullify.Fill(resp.TradingPair),
+			nullify.Fill(resp.PoolReserves),
 		)
 	})
 	t.Run("InvalidRequest", func(t *testing.T) {
-		_, err := keeper.TradingPairAll(wctx, nil)
+		_, err := keeper.PoolReservesAll(wctx, nil)
 		require.ErrorIs(t, err, status.Error(codes.InvalidArgument, "invalid request"))
 	})
 }

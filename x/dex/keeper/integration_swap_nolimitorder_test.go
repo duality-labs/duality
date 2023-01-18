@@ -1,10 +1,8 @@
 package keeper_test
 
 import (
-	"math"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/duality-labs/duality/x/dex/keeper"
+	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
@@ -265,7 +263,6 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveMin() {
 	// GIVEN
 	// deposit 10 of token A at tick 0 fee 1
 	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
-	s.assertMinTick(-1)
 
 	// WHEN
 	// swap 5 of token B for A with minOut 4
@@ -273,7 +270,6 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveMin() {
 
 	// THEN
 	// current1To0 unchanged
-	s.assertMinTick(-1)
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLO1to0ExhaustMin() {
@@ -282,7 +278,6 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0ExhaustMin() {
 	// GIVEN
 	// deposit 10 of token A at tick 0 fee 1
 	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
-	s.assertMinTick(-1)
 
 	// WHEN
 	// swap 5 of token B for A with minOut 4
@@ -290,7 +285,6 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0ExhaustMin() {
 
 	// THEN
 	// current1To0 unchanged
-	s.assertMinTick(math.MaxInt64)
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLO1to0MovesMaxUp() {
@@ -302,7 +296,6 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0MovesMaxUp() {
 		NewDeposit(0, 10, 0, 0),
 		NewDeposit(10, 0, 0, 1),
 	)
-	s.assertMaxTick(1)
 
 	// WHEN
 	// swap 5 of token B for A with minOut 4
@@ -310,7 +303,6 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0MovesMaxUp() {
 
 	// THEN
 	// max tick moved up to 3
-	s.assertMaxTick(3)
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveMaxUp() {
@@ -325,7 +317,6 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveMaxUp() {
 		NewDeposit(10, 0, 0, 1),
 		NewDeposit(10, 10, 0, 2),
 	)
-	s.assertMaxTick(5)
 
 	// WHEN
 	// swap 5 of token B for A with minOut 4
@@ -333,7 +324,6 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveMaxUp() {
 
 	// THEN
 	// max unchanged
-	s.assertMaxTick(5)
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveCurr0to1() {
@@ -440,7 +430,6 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1ExhaustMax() {
 	// GIVEN
 	// deposit 10 of token B at tick 0 fee 1
 	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
-	s.assertMaxTick(1)
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
@@ -448,7 +437,6 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1ExhaustMax() {
 
 	// THEN
 	// current0To1 unchanged
-	s.assertMaxTick(math.MinInt64)
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLO0to1MovedMinDown() {
@@ -460,7 +448,6 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1MovedMinDown() {
 		NewDeposit(10, 0, 0, 0),
 		NewDeposit(0, 10, 0, 1),
 	)
-	s.assertMinTick(-1)
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
@@ -468,7 +455,6 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1MovedMinDown() {
 
 	// THEN
 	// max tick moved up to 3
-	s.assertMinTick(-3)
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveMinDown() {
@@ -483,7 +469,6 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveMinDown() {
 		NewDeposit(0, 10, 0, 1),
 		NewDeposit(10, 10, 0, 2),
 	)
-	s.assertMinTick(-5)
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
@@ -491,7 +476,6 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveMinDown() {
 
 	// THEN
 	// min unchanged
-	s.assertMinTick(-5)
 }
 
 // TODO: 0to1 moves min up
@@ -512,7 +496,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOMinLimitTickNotMet() {
 	amountIn := 10
 	amountInInt := sdk.NewInt(10)
 
-	limitPrice, err := keeper.CalcPrice1To0(-10)
+	limitPrice, err := utils.CalcPrice1To0(-10)
 	s.Assert().Nil(err)
 
 	s.bobMarketSellsWithLimitPrice("TokenB", amountIn, 5, limitPrice)
@@ -541,7 +525,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOMaxLimitTickNotMet() {
 	amountIn := 10
 	amountInInt := sdk.NewInt(10)
 
-	limitPrice, err := keeper.CalcPrice0To1(10)
+	limitPrice, err := utils.CalcPrice0To1(10)
 	s.Assert().Nil(err)
 
 	s.bobMarketSellsWithLimitPrice("TokenA", amountIn, 5, limitPrice)
@@ -571,7 +555,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOMaxLimitTickMet() {
 	amountIn := 10
 	amountInInt := sdk.NewInt(10)
 
-	limitPrice, err := keeper.CalcPrice0To1(1)
+	limitPrice, err := utils.CalcPrice0To1(1)
 	s.Assert().Nil(err)
 
 	s.bobMarketSellsWithLimitPrice("TokenA", amountIn, 5, limitPrice)
@@ -601,7 +585,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOMinLimitTickMet() {
 	amountIn := 10
 	amountInInt := sdk.NewInt(10)
 
-	limitPrice, err := keeper.CalcPrice1To0(-1)
+	limitPrice, err := utils.CalcPrice1To0(-1)
 	s.Assert().Nil(err)
 
 	s.bobMarketSellsWithLimitPrice("TokenB", amountIn, 5, limitPrice)

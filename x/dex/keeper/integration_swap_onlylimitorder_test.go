@@ -172,7 +172,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO1to0DoesntMoveMin() {
 	// place LO selling 10 of token A at tick -1
 	s.aliceLimitSells("TokenA", -1, 10)
 	s.assertLimitLiquidityAtTick("TokenA", -1, 10)
-	s.assertMinTick(-1)
 
 	// WHEN
 	// swap 5 of token B for A with minOut 4
@@ -180,7 +179,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO1to0DoesntMoveMin() {
 
 	// THEN
 	// min unchanged
-	s.assertMinTick(-1)
 }
 
 func (s *MsgServerTestSuite) TestSwapOnlyLO1to0ExhaustMin() {
@@ -190,7 +188,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO1to0ExhaustMin() {
 	// place LO selling 10 of token A at tick -1
 	s.aliceLimitSells("TokenA", -1, 10)
 	s.assertLimitLiquidityAtTick("TokenA", -1, 10)
-	s.assertMinTick(-1)
 
 	// WHEN
 	// swap 15 of token B for A with minOut 14
@@ -198,7 +195,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO1to0ExhaustMin() {
 
 	// THEN
 	// min set to null value
-	s.assertMinTick(math.MaxInt64)
 }
 
 // TODO: 1to0 doesn't move max
@@ -250,7 +246,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO0to1DoesntMoveMax() {
 	// place LO selling 10 of token B at tick 1
 	s.aliceLimitSells("TokenB", 1, 10)
 	s.assertLimitLiquidityAtTick("TokenB", 1, 10)
-	s.assertMaxTick(1)
 
 	// WHEN
 	// swap 5 of token A for B with minOut 4
@@ -258,7 +253,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO0to1DoesntMoveMax() {
 
 	// THEN
 	// max unchanged
-	s.assertMaxTick(1)
 }
 
 func (s *MsgServerTestSuite) TestSwapOnlyLO0to1ExhaustMax() {
@@ -268,7 +262,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO0to1ExhaustMax() {
 	// place LO selling 10 of token B at tick 1
 	s.aliceLimitSells("TokenB", 1, 10)
 	s.assertLimitLiquidityAtTick("TokenB", 1, 10)
-	s.assertMaxTick(1)
 
 	// WHEN
 	// swap 15 of token A for B with minOut 14
@@ -276,7 +269,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO0to1ExhaustMax() {
 
 	// THEN
 	// max set to null value
-	s.assertMaxTick(math.MinInt64)
 }
 
 func (s *MsgServerTestSuite) TestSwapOnlyLOCorrectExecution1to0() {
@@ -454,7 +446,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace0to1ExhaustMax() {
 	// place another LO selling 10 of token A at tick -1
 	s.aliceLimitSells("TokenB", 1, 10)
 	s.assertCurr0To1(1)
-	s.assertMaxTick(1)
 
 	// WHEN
 	// swap 20 of token A for B with minOut 0
@@ -463,7 +454,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace0to1ExhaustMax() {
 	// THEN
 	// curr0to1 and max set to null values
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
 }
 
 func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace1to0Moves1to0() {
@@ -500,7 +490,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace1to0ExhaustMin() {
 	// place another LO selling 10 of token A at tick -1
 	s.aliceLimitSells("TokenA", -1, 10)
 	s.assertCurr1To0(-1)
-	s.assertMinTick(-1)
 
 	// WHEN
 	// swap 20 of token A for B with minOut 0
@@ -509,7 +498,6 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace1to0ExhaustMin() {
 	// THEN
 	// curr0to1 and max set to null values
 	s.assertCurr1To0(math.MinInt64)
-	s.assertMinTick(math.MaxInt64)
 }
 
 func (s *MsgServerTestSuite) TestSwapOnlyLOUnfilledLOSwapIncrementsFillKey() {
@@ -522,8 +510,9 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOUnfilledLOSwapIncrementsFillKey() {
 	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
 
 	// WHEN
-	// swap 20 of token A for B with minOut 0
+	// swap 20 of token A for B with minOut 0 and Place a new limitOrder
 	s.bobMarketSells("TokenB", 5, 0)
+	s.aliceLimitSells("TokenA", -1, 10)
 
 	// THEN
 	// place increased

@@ -1,206 +1,113 @@
 package keeper
 
 import (
-	"context"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
 type Liquidity interface {
-	Swap(maxAmount sdk.Int) (inAmount sdk.Int, outAmount sdk.Int, initedTick *types.Tick, deinitedTick *types.Tick)
-	Save(ctx context.Context, keeper Keeper)
+	Swap(maxAmount sdk.Int) (inAmount sdk.Int, outAmount sdk.Int)
+	Save(sdkCtx sdk.Context, keeper Keeper)
 	Price() sdk.Dec
-}
-
-type LiquidityIterator interface {
-	HasNext() bool
-	Next() Liquidity
 }
 
 func NewLiquidityIterator(
 	keeper Keeper,
-	ctx context.Context,
+	ctx sdk.Context,
 	tradingPair types.DirectionalTradingPair,
-	feeTiers []types.FeeTier,
-) LiquidityIterator {
+) *LiquidityIterator {
 
-	if tradingPair.IsTokenInToken0() {
-		return NewLiquidityIterator0To1(keeper, ctx, tradingPair.TradingPair, feeTiers)
-	} else {
-		return NewLiquidityIterator1To0(keeper, ctx, tradingPair.TradingPair, feeTiers)
+	return &LiquidityIterator{
+		iter:   keeper.NewTickIterator(ctx, tradingPair.PairId, tradingPair.TokenOut),
+		keeper: keeper,
+		ctx:    ctx,
+		pairId: tradingPair.PairId,
+		is0To1: tradingPair.IsTokenInToken0(),
 	}
+
 }
 
-type LiquidityIterator0To1 struct {
-	curTickIndex int64
-	curFeeIndex  uint64
-	maxTick      int64
-	keeper       Keeper
-	tradingPair  types.TradingPair
-	ctx          context.Context
-	nextLiq      Liquidity
-	feeTiers     []types.FeeTier
+type LiquidityIterator struct {
+	keeper Keeper
+	pairId *types.PairId
+	ctx    sdk.Context
+	iter   TickIterator
+	is0To1 bool
 }
 
-func (s *LiquidityIterator0To1) HasNext() bool {
-	return s.nextLiq != nil
-}
+func (s *LiquidityIterator) Next() Liquidity {
+	// Move iterator to the next tick after each call
+	// iter must be in valid state to call next
+	defer func() {
+		if s.iter.Valid() {
+			s.iter.Next()
+		}
+	}()
 
-func (s *LiquidityIterator0To1) Next() Liquidity {
-	if s.nextLiq == nil {
-		panic("should not call Next() if hasNext() returns false")
-	}
-	liq := s.nextLiq
-	s.nextLiq = s.getNext()
-	return liq
-}
-
-func (s *LiquidityIterator0To1) getNext() Liquidity {
-	iter := s.keeper.NewTickIterator(s.ctx, s.curTickIndex, s.maxTick, s.tradingPair.PairId, false)
-	defer iter.Close()
-
-	for ; iter.Valid(); iter.Next() {
-		upperTick := iter.Value()
-		for int(s.curFeeIndex) < len(upperTick.TickData.Reserve1) {
-			if upperTick.TickData.Reserve1[s.curFeeIndex].Equal(sdk.ZeroInt()) {
-				s.curFeeIndex++
-				continue
+	for ; s.iter.Valid(); s.iter.Next() {
+		tick := s.iter.Value()
+		switch liquidity := tick.Liquidity.(type) {
+		case *types.TickLiquidity_PoolReserves:
+			var err error
+			var pool Liquidity
+			poolReserves := *liquidity.PoolReserves
+			if s.is0To1 {
+				//Pool Reserves is upperTick
+				pool, err = s.createPool0To1(poolReserves)
+			} else {
+				//Pool Reserves is is lowerTick
+				pool, err = s.createPool1To0(poolReserves)
 			}
-			fee := s.feeTiers[s.curFeeIndex].Fee
-			lowerTick, err := s.keeper.GetOrInitTick(s.ctx, s.tradingPair.PairId, s.curTickIndex-2*fee)
+			// TODO: we are not actually handling the error here we're just stopping iteration
+			// Should be a very rare edge case where the opposing tick is initialized
+			// above/below the Min/Max tick limit
 			if err != nil {
 				return nil
 			}
+			return pool
 
-			pool := NewPool(
-				&s.tradingPair,
-				s.curTickIndex,
-				s.curFeeIndex,
-				&lowerTick,
-				&upperTick,
-			)
-			s.curFeeIndex++
-			return NewLiquidityFromPool0To1(&pool)
-		}
+		case *types.TickLiquidity_LimitOrderTranche:
+			return NewLimitOrderTrancheWrapper(liquidity.LimitOrderTranche)
 
-		s.curFeeIndex = 0
-		s.curTickIndex = upperTick.TickIndex + 1
+		default:
+			panic("Tick does not have liquidity")
 
-		orderBook := s.keeper.GetLimitOrderBook1To0(
-			s.ctx,
-			&s.tradingPair,
-			&upperTick,
-		)
-
-		if orderBook.HasLiquidity() {
-			return orderBook
 		}
 	}
 	return nil
 }
 
-func NewLiquidityIterator0To1(
-	keeper Keeper,
-	ctx context.Context,
-	tradingPair types.TradingPair,
-	feeTiers []types.FeeTier,
-) *LiquidityIterator0To1 {
-	iter := &LiquidityIterator0To1{
-		curTickIndex: tradingPair.CurrentTick0To1,
-		curFeeIndex:  0,
-		keeper:       keeper,
-		ctx:          ctx,
-		tradingPair:  tradingPair,
-		maxTick:      tradingPair.MaxTick,
-		nextLiq:      nil,
-		feeTiers:     feeTiers,
+func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquidity, error) {
+	tickIndex := upperTick.TickIndex
+	lowerTickIndex := tickIndex - 2*int64(upperTick.Fee)
+	lowerTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairId, s.pairId.Token0, lowerTickIndex, upperTick.Fee)
+	if err != nil {
+		return nil, err
 	}
-	iter.nextLiq = iter.getNext()
-	return iter
+	pool := NewPool(
+		tickIndex,
+		lowerTick,
+		&upperTick,
+	)
+	return NewLiquidityFromPool0To1(&pool), nil
 }
 
-type LiquidityIterator1To0 struct {
-	curTickIndex int64
-	curFeeIndex  uint64
-	minTick      int64
-	keeper       Keeper
-	tradingPair  types.TradingPair
-	ctx          context.Context
-	nextLiq      Liquidity
-	feeTiers     []types.FeeTier
-}
-
-func (s *LiquidityIterator1To0) HasNext() bool {
-	return s.nextLiq != nil
-}
-
-func (s *LiquidityIterator1To0) Next() Liquidity {
-	if s.nextLiq == nil {
-		panic("should not call next if hasNext() returns false")
-	}
-	liq := s.nextLiq
-	s.nextLiq = s.getNext()
-	return liq
-}
-
-func (s *LiquidityIterator1To0) getNext() Liquidity {
-	iter := s.keeper.NewTickIterator(s.ctx, s.curTickIndex, s.minTick, s.tradingPair.PairId, true)
-	defer iter.Close()
-
-	for ; iter.Valid(); iter.Next() {
-		lowerTick := iter.Value()
-
-		for int(s.curFeeIndex) < len(lowerTick.TickData.Reserve0) {
-			if lowerTick.TickData.Reserve0[s.curFeeIndex].Equal(sdk.ZeroInt()) {
-				s.curFeeIndex++
-				continue
-			}
-			fee := s.feeTiers[s.curFeeIndex].Fee
-			upperTick, err := s.keeper.GetOrInitTick(s.ctx, s.tradingPair.PairId, s.curTickIndex+2*fee)
-			if err != nil {
-				return nil
-			}
-
-			pool := NewPool(
-				&s.tradingPair,
-				s.curTickIndex,
-				s.curFeeIndex,
-				&lowerTick,
-				&upperTick,
-			)
-			s.curFeeIndex++
-			return NewLiquidityFromPool1To0(&pool)
-		}
-
-		s.curFeeIndex = 0
-		s.curTickIndex = lowerTick.TickIndex - 1
-
-		orderBook := s.keeper.GetLimitOrderBook0To1(
-			s.ctx,
-			&s.tradingPair,
-			&lowerTick,
-		)
-
-		if orderBook.HasLiquidity() {
-			return orderBook
-		}
+func (s *LiquidityIterator) createPool1To0(lowerTick types.PoolReserves) (Liquidity, error) {
+	tickIndex := lowerTick.TickIndex
+	upperTickIndex := tickIndex + 2*int64(lowerTick.Fee)
+	upperTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairId, s.pairId.Token1, upperTickIndex, lowerTick.Fee)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	pool := NewPool(
+		lowerTick.TickIndex,
+		&lowerTick,
+		upperTick,
+	)
+	return NewLiquidityFromPool1To0(&pool), nil
 }
 
-func NewLiquidityIterator1To0(keeper Keeper, ctx context.Context, tradingPair types.TradingPair, feeTiers []types.FeeTier) *LiquidityIterator1To0 {
-	iter := &LiquidityIterator1To0{
-		curTickIndex: tradingPair.CurrentTick1To0,
-		curFeeIndex:  0,
-		keeper:       keeper,
-		ctx:          ctx,
-		tradingPair:  tradingPair,
-		minTick:      tradingPair.MinTick,
-		feeTiers:     feeTiers,
-		nextLiq:      nil,
-	}
-	iter.nextLiq = iter.getNext()
-	return iter
+func (s *LiquidityIterator) Close() {
+	s.iter.Close()
 }

@@ -1,0 +1,34 @@
+syntax = "proto3";
+package dualitylabs.duality.dex;
+
+option go_package = "github.com/duality-labs/duality/x/dex/types";
+import "gogoproto/gogo.proto";
+import "duality/dex/pair_id.proto";
+
+message FilledLimitOrderTranche {
+  PairId pairId = 1;
+  string tokenIn = 2;
+  int64 tickIndex = 3;
+  uint64 trancheIndex = 4;
+  string reservesTokenOut = 5 [
+                                (gogoproto.moretags)   = "yaml:\"fill\"",
+                                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                                (gogoproto.nullable)   = false,
+                                (gogoproto.jsontag) = "reservesTokenOut"
+                                ];
+  string totalTokenIn = 6  [
+                            (gogoproto.moretags)   = "yaml:\"totalShares\"",
+                            (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                            (gogoproto.nullable)   = false,
+                            (gogoproto.jsontag) = "totalTokenIn"
+                            ];
+  string totalTokenOut = 7  [
+                             (gogoproto.moretags)   = "yaml:\"totalShares\"",
+                             (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                             (gogoproto.nullable)   = false,
+                             (gogoproto.jsontag) = "totalTokenOut"
+                             ];
+}
+
+
+

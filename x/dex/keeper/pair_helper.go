@@ -8,7 +8,7 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
-func SortTokens(ctx sdk.Context, tokenA string, tokenB string) (string, string, error) {
+func SortTokens(tokenA string, tokenB string) (string, string, error) {
 
 	relativeOrder := tokenA < tokenB
 
@@ -35,6 +35,15 @@ func CreatePairId(token0 string, token1 string) (pairId *types.PairId) {
 		Token0: token0,
 		Token1: token1,
 	}
+}
+
+func CreatePairIdFromUnsorted(tokenA, tokenB string) (*types.PairId, error) {
+	token0, token1, err := SortTokens(tokenA, tokenB)
+	if err != nil {
+		return nil, err
+	}
+	return CreatePairId(token0, token1), nil
+
 }
 
 func GetInOutTokens(tokenIn_ string, tokenA string, tokenB string) (tokenIn string, tokenOut string) {

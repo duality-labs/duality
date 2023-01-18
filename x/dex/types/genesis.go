@@ -10,13 +10,12 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		TickList:                  []Tick{},
-		TradingPairList:           []TradingPair{},
-		TokensList:                []Tokens{},
-		TokenMapList:              []TokenMap{},
-		FeeTierList:               []FeeTier{},
-		LimitOrderTrancheUserList: []LimitOrderTrancheUser{},
-		LimitOrderTrancheList:     []LimitOrderTranche{},
+		TokensList:                  []Tokens{},
+		TokenMapList:                []TokenMap{},
+		FeeTierList:                 []FeeTier{},
+		LimitOrderTrancheUserList:   []LimitOrderTrancheUser{},
+		TickLiquidityList:           []TickLiquidity{},
+		FilledLimitOrderTrancheList: []FilledLimitOrderTranche{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -25,26 +24,6 @@ func DefaultGenesis() *GenesisState {
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	// Check for duplicated index in Tick
-	TickIndexMap := make(map[string]struct{})
-
-	for _, elem := range gs.TickList {
-		index := string(TickKey(elem.PairId, elem.TickIndex))
-		if _, ok := TickIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for Tick")
-		}
-		TickIndexMap[index] = struct{}{}
-	}
-	// Check for duplicated index in TradingPair
-	TradingPairIndexMap := make(map[string]struct{})
-
-	for _, elem := range gs.TradingPairList {
-		index := string(TradingPairKey(elem.PairId))
-		if _, ok := TradingPairIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for TradingPair")
-		}
-		TradingPairIndexMap[index] = struct{}{}
-	}
 	// Check for duplicated ID in tokens
 	tokensIdMap := make(map[uint64]bool)
 	tokensCount := gs.GetTokensCount()
@@ -89,15 +68,42 @@ func (gs GenesisState) Validate() error {
 		}
 		LimitOrderTrancheUserIndexMap[index] = struct{}{}
 	}
-	// Check for duplicated index in LimitOrderTranche
-	LimitOrderTrancheIndexMap := make(map[string]struct{})
 
-	for _, elem := range gs.LimitOrderTrancheList {
-		index := string(LimitOrderTrancheKey(elem.PairId, elem.TickIndex, elem.TokenIn, elem.TrancheIndex))
-		if _, ok := LimitOrderTrancheIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for LimitOrderTranche")
+	// Check for duplicated index in tickLiquidity
+	tickLiquidityIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.TickLiquidityList {
+		var index string
+		switch liquidity := elem.Liquidity.(type) {
+		case *TickLiquidity_PoolReserves:
+			index = string(TickLiquidityKey(
+				liquidity.PoolReserves.PairId,
+				liquidity.PoolReserves.TokenIn,
+				liquidity.PoolReserves.TickIndex,
+				LiquidityTypePoolReserves,
+				liquidity.PoolReserves.Fee))
+		case *TickLiquidity_LimitOrderTranche:
+			index = string(TickLiquidityKey(
+				liquidity.LimitOrderTranche.PairId,
+				liquidity.LimitOrderTranche.TokenIn,
+				liquidity.LimitOrderTranche.TickIndex,
+				LiquidityTypeLimitOrder,
+				liquidity.LimitOrderTranche.TrancheIndex))
 		}
-		LimitOrderTrancheIndexMap[index] = struct{}{}
+		if _, ok := tickLiquidityIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for tickLiquidity")
+		}
+		tickLiquidityIndexMap[index] = struct{}{}
+	}
+	// Check for duplicated index in filledLimitOrderTranche
+	filledLimitOrderTrancheIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.FilledLimitOrderTrancheList {
+		index := string(FilledLimitOrderTrancheKey(elem.PairId, elem.TokenIn, elem.TickIndex, elem.TrancheIndex))
+		if _, ok := filledLimitOrderTrancheIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for filledLimitOrderTranche")
+		}
+		filledLimitOrderTrancheIndexMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 
