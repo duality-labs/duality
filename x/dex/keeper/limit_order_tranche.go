@@ -1,44 +1,58 @@
 package keeper
 
 import (
-	"context"
-
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type LimitOrderTranche struct {
-	Tranche           *types.LimitOrderTranche
-	Tick              *types.Tick
+type LimitOrderTrancheWrapper struct {
+	*types.LimitOrderTranche
+	Tick              *types.TickLiquidity
 	PriceTakerToMaker sdk.Dec
 	PriceMakerToTaker sdk.Dec
 }
 
 func NewLimitOrderTranche(
-	tick *types.Tick,
-	tranche *types.LimitOrderTranche,
-	priceMakerToTaker sdk.Dec,
-	priceTakerToMaker sdk.Dec,
-) *LimitOrderTranche {
-	return &LimitOrderTranche{
-		Tranche:           tranche,
+	tick *types.TickLiquidity,
+) *LimitOrderTrancheWrapper {
+	var priceMakerToTaker, priceTakerToMaker sdk.Dec
+	tranche := tick.LimitOrderTranche
+	if tranche.TokenIn == tick.PairId.Token0 {
+		priceMakerToTaker = MustCalcPrice0To1(tick.TickIndex)
+		priceTakerToMaker = MustCalcPrice1To0(tick.TickIndex)
+	} else {
+		priceMakerToTaker = MustCalcPrice1To0(tick.TickIndex)
+		priceTakerToMaker = MustCalcPrice0To1(tick.TickIndex)
+	}
+	return &LimitOrderTrancheWrapper{
+		LimitOrderTranche: tranche,
 		Tick:              tick,
 		PriceTakerToMaker: priceTakerToMaker,
 		PriceMakerToTaker: priceMakerToTaker,
 	}
 }
 
-func (t *LimitOrderTranche) Swap(maxAmountTaker sdk.Int) (
+func (t *LimitOrderTrancheWrapper) Cancel(trancheUser types.LimitOrderTrancheUser) (amountToCancel sdk.Int) {
+	totalTokenInDec := sdk.NewDecFromInt(t.TotalTokenIn)
+	totalTokenOutDec := sdk.NewDecFromInt(t.TotalTokenOut)
+
+	filledAmount := t.PriceTakerToMaker.Mul(totalTokenOutDec)
+	ratioNotFilled := totalTokenInDec.Sub(filledAmount).Quo(totalTokenInDec)
+
+	amountToCancel = trancheUser.SharesOwned.ToDec().Mul(ratioNotFilled).TruncateInt()
+	t.ReservesTokenIn = t.ReservesTokenIn.Sub(amountToCancel)
+
+	return amountToCancel
+
+}
+func (t *LimitOrderTrancheWrapper) Swap(maxAmountTaker sdk.Int) (
 	inAmount sdk.Int,
 	outAmount sdk.Int,
-	initedTick *types.Tick,
-	deinitedTick *types.Tick,
 ) {
-	tranche := t.Tranche
-	reservesTokenOut := &tranche.ReservesTokenIn
-	fillTokenIn := &tranche.ReservesTokenOut
-	totalTokenIn := &tranche.TotalTokenOut
+	reservesTokenOut := &t.ReservesTokenIn
+	fillTokenIn := &t.ReservesTokenOut
+	totalTokenIn := &t.TotalTokenOut
 	amountFilledTokenOut := maxAmountTaker.ToDec().Mul(t.PriceTakerToMaker).TruncateInt()
 	if reservesTokenOut.LTE(amountFilledTokenOut) {
 		inAmount = reservesTokenOut.ToDec().Mul(t.PriceMakerToTaker).TruncateInt()
@@ -46,7 +60,6 @@ func (t *LimitOrderTranche) Swap(maxAmountTaker sdk.Int) (
 		*reservesTokenOut = sdk.ZeroInt()
 		*fillTokenIn = fillTokenIn.Add(inAmount)
 		*totalTokenIn = totalTokenIn.Add(inAmount)
-		deinitedTick = t.Tick
 	} else {
 		inAmount = maxAmountTaker
 		outAmount = amountFilledTokenOut
@@ -54,104 +67,53 @@ func (t *LimitOrderTranche) Swap(maxAmountTaker sdk.Int) (
 		*totalTokenIn = totalTokenIn.Add(maxAmountTaker)
 		*reservesTokenOut = reservesTokenOut.Sub(amountFilledTokenOut)
 	}
-	return inAmount, outAmount, nil, deinitedTick
+	return inAmount, outAmount
 }
 
-func (t *LimitOrderTranche) Save(ctx context.Context, keeper Keeper) {
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	keeper.SetTick(sdkCtx, t.Tick.PairId, *t.Tick)
-	keeper.SetLimitOrderTranche(sdkCtx, *t.Tranche)
+func (t LimitOrderTrancheWrapper) IsFilled() bool {
+	return t.ReservesTokenIn.IsZero()
 }
 
-func (t *LimitOrderTranche) Price() sdk.Dec {
+func (t *LimitOrderTrancheWrapper) Save(sdkCtx sdk.Context, keeper Keeper) {
+	if t.Tick.HasActiveLimitOrders() {
+		keeper.SetTickLiquidity(sdkCtx, *t.Tick)
+	} else {
+		filledTranche := t.Tick.LimitOrderTranche.CreateFilledTranche()
+		keeper.SetFilledLimitOrderTranche(sdkCtx, filledTranche)
+		keeper.RemoveTickLiquidity(sdkCtx, *t.Tick)
+	}
+
+}
+
+func (t *LimitOrderTrancheWrapper) Price() sdk.Dec {
 	return t.PriceTakerToMaker
 }
 
-func (t LimitOrderTranche) HasLiquidity() bool {
-	return t.Tranche.ReservesTokenIn.GT(sdk.ZeroInt())
+func (t LimitOrderTrancheWrapper) HasLiquidity() bool {
+	return t.ReservesTokenIn.GT(sdk.ZeroInt())
 }
 
-// SetLimitOrderTranche set a specific LimitOrderTranche in the store from its index
-func (k Keeper) SetLimitOrderTranche(ctx sdk.Context, LimitOrderTranche types.LimitOrderTranche) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderTrancheKeyPrefix))
-	b := k.cdc.MustMarshal(&LimitOrderTranche)
-	store.Set(types.LimitOrderTrancheKey(
-		LimitOrderTranche.PairId,
-		LimitOrderTranche.TickIndex,
-		LimitOrderTranche.TokenIn,
-		LimitOrderTranche.TrancheIndex,
-	), b)
-}
-
-func (k Keeper) GetOrInitLimitOrderTranche(
-	ctx sdk.Context,
-	pairId *types.PairId,
-	tickIndex int64,
-	tokenIn string,
-	trancheIndex uint64,
-) types.LimitOrderTranche {
-	tranche, found := k.GetLimitOrderTranche(ctx, pairId, tickIndex, tokenIn, trancheIndex)
-	if !found {
-		tranche = types.LimitOrderTranche{
-			TrancheIndex:     trancheIndex,
-			TickIndex:        tickIndex,
-			TokenIn:          tokenIn,
-			PairId:           pairId,
-			ReservesTokenIn:  sdk.ZeroInt(),
-			ReservesTokenOut: sdk.ZeroInt(),
-			TotalTokenIn:     sdk.ZeroInt(),
-			TotalTokenOut:    sdk.ZeroInt(),
-		}
-		k.SetLimitOrderTranche(ctx, tranche)
-	}
-
-	return tranche
-}
-
-// GetLimitOrderTranche returns a LimitOrderTranche from its index
 func (k Keeper) GetLimitOrderTranche(
 	ctx sdk.Context,
 	pairId *types.PairId,
 	tickIndex int64,
 	token string,
-	tranchIndex uint64,
-
-) (val types.LimitOrderTranche, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderTrancheKeyPrefix))
-
-	b := store.Get(types.LimitOrderTrancheKey(
-		pairId,
-		tickIndex,
-		token,
-		tranchIndex,
-	))
-	if b == nil {
-		return val, false
-	}
-
-	k.cdc.MustUnmarshal(b, &val)
-	return val, true
-}
-
-// RemoveLimitOrderTranche removes a LimitOrderTranche from the store
-func (k Keeper) RemoveLimitOrderTranche(
-	ctx sdk.Context,
-	pairId *types.PairId,
-	tickIndex int64,
-	token string,
 	trancheIndex uint64,
+) (val types.LimitOrderTranche, fromFilled bool, found bool) {
 
-) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderTrancheKeyPrefix))
-	store.Delete(types.LimitOrderTrancheKey(
-		pairId,
-		tickIndex,
-		token,
-		trancheIndex,
-	))
+	// Try to find the tranche in the active liq index
+	tick, found := k.GetTickLiquidityLO(ctx, pairId, token, tickIndex, trancheIndex)
+	if found {
+		return *tick.LimitOrderTranche, false, true
+	}
+	// Look for filled limit orders
+	tranche, found := k.GetFilledLimitOrderTranche(ctx, pairId, token, tickIndex, trancheIndex)
+	if found {
+		return types.NewFromFilledTranche(tranche), true, true
+	}
+	return types.LimitOrderTranche{}, false, false
 }
 
-// GetAllLimitOrderTranche returns all LimitOrderTrancheUser
 func (k Keeper) GetAllLimitOrderTranche(ctx sdk.Context) (list []types.LimitOrderTranche) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderTrancheKeyPrefix))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})

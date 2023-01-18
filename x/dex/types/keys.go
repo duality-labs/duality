@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/binary"
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -47,6 +48,9 @@ const (
 
 	// TradingPairKeyPrefix is the prefix to retrieve all TradingPair
 	TradingPairKeyPrefix = "TradingPair/value"
+
+	// TickLiquidityKeyPrefix is the prefix to retrieve all TickLiquidity
+	TickLiquidityKeyPrefix = "TickLiquidity/value/"
 )
 
 func TickPrefix(pairId *PairId) []byte {
@@ -64,7 +68,12 @@ func TokenMapKey(address string) []byte {
 	return key
 }
 
-func TickIndexToBytes(tickIndex int64) []byte {
+func TickIndexToBytes(tickIndex int64, pairId *PairId, tokenIn string) []byte {
+	// NOTE: We flip the sign on ticks storing token0 so that all liquidity is index left to right.
+	// This allows us to iterate through liquidity consistently regardless of 0to1 vs 1to0
+	if pairId.Token0 == tokenIn {
+		tickIndex *= -1
+	}
 	key := make([]byte, 9)
 	if tickIndex < 0 {
 		copy(key[1:], sdk.Uint64ToBigEndian(uint64(tickIndex)))
@@ -72,20 +81,6 @@ func TickIndexToBytes(tickIndex int64) []byte {
 		copy(key[:1], []byte{0x01})
 		copy(key[1:], sdk.Uint64ToBigEndian(uint64(tickIndex)))
 	}
-
-	return key
-}
-
-func TickKey(pairId *PairId, tickIndex int64) []byte {
-	var key []byte
-
-	pairIdBytes := []byte(pairId.Stringify())
-	key = append(key, pairIdBytes...)
-	key = append(key, []byte("/")...)
-
-	tickIndexBytes := TickIndexToBytes(tickIndex)
-	key = append(key, tickIndexBytes...)
-	key = append(key, []byte("/")...)
 
 	return key
 }
@@ -104,48 +99,14 @@ func TradingPairKey(pairId *PairId) []byte {
 const (
 	BaseLimitOrderPrefix = "LimitOrderTranche/value"
 
-	// LimitOrderTrancheUserSharesWithdrawnKeyPrefix is the prefix to retrieve all LimitOrderTrancheUserSharesWithdrawn
-	LimitOrderTrancheUserSharesWithdrawnKeyPrefix = "LimitOrderTrancheUserSharesWithdrawn/value"
-
 	// LimitOrderTrancheUserKeyPrefix is the prefix to retrieve all LimitOrderTrancheUser
 	LimitOrderTrancheUserKeyPrefix = "LimitOrderTrancheUser/value"
 
 	// LimitOrderTrancheKeyPrefix is the prefix to retrieve all LimitOrderTranche
 	LimitOrderTrancheKeyPrefix = "LimitOrderTranche/value"
 
-	// LimitOrderTrancheReserveMapKeyPrefix is the prefix to retrieve all LimitOrderTrancheReserveMap
-	LimitOrderTrancheReserveMapKeyPrefix = "LimitOrderTrancheReserveMap/value"
-
-	// LimitOrderTrancheFillMapKeyPrefix is the prefix to retrieve all LimitOrderTrancheFillMap
-	LimitOrderTrancheFillMapKeyPrefix = "LimitOrderTrancheFillMap/value"
+	FilledLimitOrderTrancheKeyPrefix = "FilledLimitOrderTranche/value/"
 )
-
-// LimitOrderTrancheUserSharesWithdrawnKey returns the store key to retrieve a LimitOrderTrancheUserSharesWithdrawn from the index fields
-func LimitOrderTrancheUserSharesWithdrawnKey(pairId PairId, tickIndex int64, token string, count uint64, address string) []byte {
-	var key []byte
-
-	pairIdBytes := []byte(pairId.Stringify())
-	key = append(key, pairIdBytes...)
-	key = append(key, []byte("/")...)
-
-	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
-	key = append(key, tickIndexBytes...)
-	key = append(key, []byte("/")...)
-
-	tokenBytes := []byte(token)
-	key = append(key, tokenBytes...)
-	key = append(key, []byte("/")...)
-
-	countBytes := []byte(strconv.Itoa(int(count)))
-	key = append(key, countBytes...)
-	key = append(key, []byte("/")...)
-
-	addressBytes := []byte(address)
-	key = append(key, addressBytes...)
-	key = append(key, []byte("/")...)
-
-	return key
-}
 
 // LimitOrderTrancheUserKey returns the store key to retrieve a LimitOrderTrancheUser from the index fields
 func LimitOrderTrancheUserKey(pairId *PairId, tickIndex int64, token string, count uint64, address string) []byte {
@@ -197,47 +158,120 @@ func LimitOrderTrancheKey(pairId *PairId, tickIndex int64, token string, count u
 	return key
 }
 
-func LimitOrderTrancheReserveMapKey(pairId *PairId, tickIndex int64, token string, count uint64) []byte {
+// FilledLimitOrderTrancheKey returns the store key to retrieve a FilledLimitOrderTranche from the index fields
+func FilledLimitOrderTrancheKey(
+	pairId *PairId,
+	tokenIn string,
+	tickIndex int64,
+	trancheIndex uint64,
+) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId.Stringify())
 	key = append(key, pairIdBytes...)
 	key = append(key, []byte("/")...)
 
-	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
+	tokenInBytes := []byte(tokenIn)
+	key = append(key, tokenInBytes...)
+	key = append(key, []byte("/")...)
+
+	tickIndexBytes := TickIndexToBytes(tickIndex, pairId, tokenIn)
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
-	tokenBytes := []byte(token)
-	key = append(key, tokenBytes...)
-	key = append(key, []byte("/")...)
-
-	countBytes := []byte(strconv.Itoa(int(count)))
-	key = append(key, countBytes...)
+	trancheIndexBytes := make([]byte, 8)
+	binary.BigEndian.PutUint64(trancheIndexBytes, trancheIndex)
+	key = append(key, trancheIndexBytes...)
 	key = append(key, []byte("/")...)
 
 	return key
 }
 
-func LimitOrderTrancheFillMapKey(pairId *PairId, tickIndex int64, token string, count uint64) []byte {
+func FilledLimitOrderTranchePrefix(
+	pairId *PairId,
+	tokenIn string,
+	tickIndex int64,
+) []byte {
+	var key []byte = KeyPrefix(FilledLimitOrderTrancheKeyPrefix)
+
+	pairIdBytes := []byte(pairId.Stringify())
+	key = append(key, pairIdBytes...)
+	key = append(key, []byte("/")...)
+
+	tokenInBytes := []byte(tokenIn)
+	key = append(key, tokenInBytes...)
+	key = append(key, []byte("/")...)
+
+	tickIndexBytes := TickIndexToBytes(tickIndex, pairId, tokenIn)
+	key = append(key, tickIndexBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+func TickLiquidityKey(
+	pairId *PairId,
+	tokenIn string,
+	tickIndex int64,
+	liquidityType string,
+	liquidityIndex uint64,
+) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId.Stringify())
 	key = append(key, pairIdBytes...)
 	key = append(key, []byte("/")...)
 
-	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
+	tokenInBytes := []byte(tokenIn)
+	key = append(key, tokenInBytes...)
+	key = append(key, []byte("/")...)
+
+	tickIndexBytes := TickIndexToBytes(tickIndex, pairId, tokenIn)
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
-	tokenBytes := []byte(token)
-	key = append(key, tokenBytes...)
+	liquidityTypeBytes := []byte(liquidityType)
+	key = append(key, liquidityTypeBytes...)
 	key = append(key, []byte("/")...)
 
-	countBytes := []byte(strconv.Itoa(int(count)))
-	key = append(key, countBytes...)
+	liquidityIndexBytes := make([]byte, 8)
+	binary.BigEndian.PutUint64(liquidityIndexBytes, liquidityIndex)
+	key = append(key, liquidityIndexBytes...)
 	key = append(key, []byte("/")...)
 
+	return key
+}
+
+func TickLiquidityLOPrefix(
+	pairId *PairId,
+	tokenIn string,
+	tickIndex int64,
+) []byte {
+	var key []byte = KeyPrefix(TickLiquidityKeyPrefix)
+
+	pairIdBytes := []byte(pairId.Stringify())
+	key = append(key, pairIdBytes...)
+	key = append(key, []byte("/")...)
+
+	tokenInBytes := []byte(tokenIn)
+	key = append(key, tokenInBytes...)
+	key = append(key, []byte("/")...)
+
+	tickIndexBytes := TickIndexToBytes(tickIndex, pairId, tokenIn)
+	key = append(key, tickIndexBytes...)
+	key = append(key, []byte("/")...)
+
+	liquidityTypeBytes := []byte(LiquidityTypeLO)
+	key = append(key, liquidityTypeBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+func TickLiquidityPrefix(pairId *PairId, tokenIn string) []byte {
+	var key []byte
+	key = append(KeyPrefix(TickLiquidityKeyPrefix), KeyPrefix(pairId.Stringify())...)
+	key = append(key, KeyPrefix(tokenIn)...)
 	return key
 }
 
@@ -336,4 +370,10 @@ const (
 const (
 	FeeTierKey      = "FeeTier-value-"
 	FeeTierCountKey = "FeeTier-count-"
+)
+
+const (
+	// NOTE: have to add letter so that LP deposits are indexed ahead of LimitOrders
+	LiquidityTypeLP = "A_LPDeposit"
+	LiquidityTypeLO = "B_LODeposit"
 )

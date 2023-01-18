@@ -23,18 +23,14 @@ func (s *MsgServerTestSuite) TestWithdrawFilledSimpleFull() {
 	s.assertDexBalances(10, 0)
 	s.assertCurr1To0(0)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
-	s.assertMinTick(0)
 
 	s.bobMarketSells("TokenB", 10, 10)
 
 	s.assertAliceBalances(40, 50)
 	s.assertBobBalances(60, 40)
 	s.assertDexBalances(0, 10)
-	s.assertMinTick(math.MaxInt64)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
 
 	s.aliceWithdrawsLimitSell("TokenA", 0, 0)
 
@@ -43,8 +39,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledSimpleFull() {
 	s.assertDexBalances(0, 0)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
-	s.assertMinTick(math.MaxInt64)
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFilledPartial() {
@@ -94,8 +88,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.assertDexBalances(10, 0)
 	s.assertCurr1To0(0)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
-	s.assertMinTick(0)
 
 	s.bobMarketSells("TokenB", 10, 10)
 
@@ -104,8 +96,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.assertDexBalances(0, 10)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
-	s.assertMinTick(math.MaxInt64)
 
 	s.aliceWithdrawsLimitSell("TokenA", 0, 0)
 	s.aliceLimitSells("TokenA", 0, 10)
@@ -115,8 +105,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.assertDexBalances(10, 0)
 	s.assertCurr1To0(0)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
-	s.assertMinTick(0)
 
 	s.bobMarketSells("TokenB", 10, 10)
 
@@ -125,8 +113,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.assertDexBalances(0, 10)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
-	s.assertMinTick(math.MaxInt64)
 
 	s.aliceWithdrawsLimitSell("TokenA", 0, 1)
 
@@ -135,8 +121,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.assertDexBalances(0, 0)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
-	s.assertMinTick(math.MaxInt64)
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullDifferentDirection() {
@@ -156,8 +140,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullDifferentDirection() {
 	s.assertDexBalances(10, 0)
 	s.assertCurr1To0(0)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
-	s.assertMinTick(0)
 
 	s.bobMarketSells("TokenB", 10, 10)
 
@@ -166,8 +148,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullDifferentDirection() {
 	s.assertDexBalances(0, 10)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
-	s.assertMinTick(math.MaxInt64)
 
 	s.aliceWithdrawsLimitSell("TokenA", 0, 0)
 	s.aliceLimitSells("TokenB", 0, 10)
@@ -177,8 +157,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullDifferentDirection() {
 	s.assertDexBalances(0, 10)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(0)
-	s.assertMaxTick(0)
-	s.assertMinTick(math.MaxInt64)
 
 	s.bobMarketSells("TokenA", 10, 10)
 
@@ -187,8 +165,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullDifferentDirection() {
 	s.assertDexBalances(10, 0)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
-	s.assertMinTick(math.MaxInt64)
 
 	s.aliceWithdrawsLimitSell("TokenB", 0, 0)
 
@@ -197,8 +173,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullDifferentDirection() {
 	s.assertDexBalances(0, 0)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
-	s.assertMinTick(math.MaxInt64)
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFilledInvalidKeyToken() {
@@ -262,6 +236,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTrancheKeyDoesntExist() {
 	// bob tries to withdraw filled from tick 0 tranche 5
 	// THEN
 
-	err := types.ErrValidLimitOrderTrancheNotFound
+	err := types.ErrValidLimitOrderTrancheUserNotFound
 	s.bobWithdrawLimitSellFails(err, "TokenA", 0, 5)
 }

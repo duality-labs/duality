@@ -10,9 +10,9 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 	// WHEN Alice places 2 limit orders
 	s.fundAliceBalances(20, 20)
 	s.fundBobBalances(20, 20)
-	s.aliceLimitSells("TokenA", 0, 10)
+	s.aliceLimitSells("TokenA", -1, 10)
 	s.aliceLimitSells("TokenB", 0, 10)
-	s.bobLimitSells("TokenA", 0, 10)
+	s.bobLimitSells("TokenA", -1, 10)
 	profile := NewUserProfile(s.alice)
 
 	// THEN GetAllLimitOrderTrancheUserForAddress returns alice's same two orders
@@ -21,7 +21,7 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 	s.Assert().Equal(types.LimitOrderTrancheUser{
 		PairId:          defaultPairId,
 		Token:           "TokenA",
-		TickIndex:       0,
+		TickIndex:       -1,
 		Count:           0,
 		Address:         s.alice.String(),
 		SharesOwned:     sdk.NewInt(10),
