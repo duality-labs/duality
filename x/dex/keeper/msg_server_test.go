@@ -260,6 +260,18 @@ type Deposit struct {
 	FeeIndex  uint64
 }
 
+type DepositOptions struct {
+	Autoswap  bool
+}
+
+type DepositWithOptions struct {
+	AmountA   sdk.Int
+	AmountB   sdk.Int
+	TickIndex int64
+	FeeIndex  uint64
+	Options   DepositOptions
+}
+
 func NewDeposit(amountA int, amountB int, tickIndex int, feeIndex int) *Deposit {
 	return &Deposit{
 		AmountA:   sdk.NewInt(int64(amountA)),
@@ -269,8 +281,23 @@ func NewDeposit(amountA int, amountB int, tickIndex int, feeIndex int) *Deposit 
 	}
 }
 
+func NewDepositWithOptions(amountA int, amountB int, tickIndex int, feeIndex int, options DepositOptions) *DepositWithOptions {
+	return &DepositWithOptions{
+		AmountA:   sdk.NewInt(int64(amountA)),
+		AmountB:   sdk.NewInt(int64(amountB)),
+		TickIndex: int64(tickIndex),
+		FeeIndex:  uint64(feeIndex),
+		Options: options,
+	}
+}
+
 func (s *MsgServerTestSuite) aliceDeposits(deposits ...*Deposit) {
 	s.deposits(s.alice, deposits...)
+}
+
+
+func (s *MsgServerTestSuite) aliceDepositsWithOptions(deposits ...*DepositWithOptions) {
+	s.depositsWithOptions(s.alice, deposits...)
 }
 
 func (s *MsgServerTestSuite) bobDeposits(deposits ...*Deposit) {
@@ -290,11 +317,13 @@ func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits ...*Depos
 	amountsB := make([]sdk.Int, len(deposits))
 	tickIndexes := make([]int64, len(deposits))
 	feeIndexes := make([]uint64, len(deposits))
+	options := make([]*types.DepositOptions, len(deposits))
 	for i, e := range deposits {
 		amountsA[i] = e.AmountA
 		amountsB[i] = e.AmountB
 		tickIndexes[i] = e.TickIndex
 		feeIndexes[i] = e.FeeIndex
+		options[i] = &types.DepositOptions{false}
 	}
 
 	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
@@ -306,8 +335,99 @@ func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits ...*Depos
 		AmountsB:    amountsB,
 		TickIndexes: tickIndexes,
 		FeeIndexes:  feeIndexes,
+		Options: options,
 	})
 	s.Assert().Nil(err)
+}
+
+
+func (s *MsgServerTestSuite) depositsWithOptions(account sdk.AccAddress, deposits ...*DepositWithOptions) {
+	amountsA := make([]sdk.Int, len(deposits))
+	amountsB := make([]sdk.Int, len(deposits))
+	tickIndexes := make([]int64, len(deposits))
+	feeIndexes := make([]uint64, len(deposits))
+	options := make([]*types.DepositOptions, len(deposits))
+	for i, e := range deposits {
+		amountsA[i] = e.AmountA
+		amountsB[i] = e.AmountB
+		tickIndexes[i] = e.TickIndex
+		feeIndexes[i] = e.FeeIndex
+		options[i] = &types.DepositOptions{
+			Autoswap : e.Options.Autoswap,
+		}
+	}
+
+	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
+		Creator:     account.String(),
+		Receiver:    account.String(),
+		TokenA:      "TokenA",
+		TokenB:      "TokenB",
+		AmountsA:    amountsA,
+		AmountsB:    amountsB,
+		TickIndexes: tickIndexes,
+		FeeIndexes:  feeIndexes,
+		Options: options,
+	})
+	s.Assert().Nil(err)
+}
+
+func (s *MsgServerTestSuite) calcAutoswapSharesMinted(centerTick int64, feeIndex uint64, _residual0 int64, _residual1 int64, _balanced0 int64, _balanced1 int64, _totalShares int64, _valuePool int64) sdk.Int {
+	residual0, residual1, balanced0, balanced1, totalShares, valuePool := sdk.NewInt(_residual0), sdk.NewInt(_residual1), sdk.NewInt(_balanced0), sdk.NewInt(_balanced1), sdk.NewInt(_totalShares), sdk.NewInt(_valuePool)
+	
+	// residualValue = 1.0001^-f * residualAmount0 + 1.0001^{i-f} * residualAmount1
+	// balancedValue = balancedAmount0 + 1.0001^{i} * balancedAmount1
+	// value = residualValue + balancedValue
+	// shares minted = value * totalShares / valuePool
+	fee := s.feeTiers[feeIndex].Fee
+
+	centerPrice, _ := keeper.CalcPrice1To0(centerTick)
+	leftPrice, _ := keeper.CalcPrice1To0(centerTick - fee)
+	discountPrice, _ := keeper.CalcPrice1To0(-fee)
+
+	balancedValue := balanced0.ToDec().Add(centerPrice.Mul(balanced1.ToDec())).TruncateInt()
+	residualValue := residual0.ToDec().Mul(discountPrice).Add(leftPrice.Mul(residual1.ToDec())).TruncateInt()
+	valueMint := balancedValue.Add(residualValue)
+
+	return valueMint.Mul(totalShares).Quo(valuePool)
+}
+
+func (s *MsgServerTestSuite) calcSharesMinted(centerTick int64, feeIndex uint64, _amount0 int64, _amount1 int64) sdk.Int {
+	amount0, amount1 := sdk.NewInt(_amount0), sdk.NewInt(_amount1)
+	centerPrice, _ := keeper.CalcPrice1To0(centerTick)
+
+	return amount0.ToDec().Add(centerPrice.Mul(amount1.ToDec())).TruncateInt()
+}
+
+func (s *MsgServerTestSuite) calcExpectedBalancesAfterWithdrawOnePool(sharesMinted sdk.Int, account sdk.AccAddress, tickIndex int64, feeIndex uint64) (sdk.Int, sdk.Int, sdk.Int, sdk.Int) {
+	dexCurrentBalance0 := s.app.BankKeeper.GetBalance(s.ctx, s.app.AccountKeeper.GetModuleAddress("dex"), "TokenA").Amount
+	dexCurrentBalance1 := s.app.BankKeeper.GetBalance(s.ctx, s.app.AccountKeeper.GetModuleAddress("dex"), "TokenB").Amount
+	currentBalance0 := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenA").Amount
+	currentBalance1 := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenB").Amount
+	amountPool0, amountPool1 := s.getLiquidityAtTick(tickIndex, feeIndex)
+	poolShares := s.getPoolShares("TokenA", "TokenB", tickIndex, feeIndex)
+
+	amountOut0 := amountPool0.Mul(sharesMinted).Quo(poolShares)
+	amountOut1 := amountPool1.Mul(sharesMinted).Quo(poolShares)
+
+	expectedBalance0 := currentBalance0.Add(amountOut0)
+	expectedBalance1 := currentBalance1.Add(amountOut1)
+	dexExpectedBalance0 := dexCurrentBalance0.Sub(amountOut0)
+	dexExpectedBalance1 := dexCurrentBalance1.Sub(amountOut1)
+
+	return expectedBalance0, expectedBalance1, dexExpectedBalance0, dexExpectedBalance1
+}
+
+func (s *MsgServerTestSuite) getLiquidityAtTick(tickIndex int64, feeIndex uint64) (sdk.Int, sdk.Int) {
+	pairId := CreatePairId("TokenA", "TokenB")
+	fee := s.feeTiers[feeIndex].Fee
+
+	lowerTick, _ := s.app.DexKeeper.GetTick(s.ctx, pairId, tickIndex-fee)
+	liquidityA := lowerTick.TickData.Reserve0[feeIndex]
+
+	upperTick, _ := s.app.DexKeeper.GetTick(s.ctx, pairId, tickIndex+fee)
+	liquidityB := upperTick.TickData.Reserve1[feeIndex]
+
+	return liquidityA, liquidityB
 }
 
 func (s *MsgServerTestSuite) assertAliceDepositFails(err error, deposits ...*Deposit) {
@@ -330,11 +450,13 @@ func (s *MsgServerTestSuite) assertDepositFails(account sdk.AccAddress, expected
 	amountsB := make([]sdk.Int, len(deposits))
 	tickIndexes := make([]int64, len(deposits))
 	feeIndexes := make([]uint64, len(deposits))
+	options := make([]*types.DepositOptions, len(deposits))
 	for i, e := range deposits {
 		amountsA[i] = e.AmountA
 		amountsB[i] = e.AmountB
 		tickIndexes[i] = e.TickIndex
 		feeIndexes[i] = e.FeeIndex
+		options[i] = &types.DepositOptions{false}
 	}
 
 	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
@@ -346,6 +468,7 @@ func (s *MsgServerTestSuite) assertDepositFails(account sdk.AccAddress, expected
 		AmountsB:    amountsB,
 		TickIndexes: tickIndexes,
 		FeeIndexes:  feeIndexes,
+		Options: options,
 	})
 	s.Assert().NotNil(err)
 	s.Assert().ErrorIs(err, expectedErr)

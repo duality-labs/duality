@@ -15,7 +15,7 @@ import (
 // See full ADR here: https://www.notion.so/dualityxyz/A-Modest-Proposal-For-Truncating-696a919d59254876a617f82fb9567895
 
 // Handles core logic for MsgDeposit, checking and initializing data structures (tick, pair), calculating
-// shares based on amount deposited, and sending funds to moduleAddress
+// shares based on amount deposited, and sending funds to moduleAddress.
 func (k Keeper) DepositCore(
 	goCtx context.Context,
 	msg *types.MsgDeposit,
@@ -48,6 +48,7 @@ func (k Keeper) DepositCore(
 		amount1 := amounts1[i]
 		tickIndex := msg.TickIndexes[i]
 		feeIndex := msg.FeeIndexes[i]
+		autoswap := msg.Options[i].Autoswap
 
 		// check that feeIndex is a valid index of the fee tier
 		if feeIndex >= uint64(len(feeTiers)) {
@@ -92,7 +93,8 @@ func (k Keeper) DepositCore(
 			&upperTick,
 		)
 
-		inAmount0, inAmount1, outShares := pool.Deposit(amount0, amount1, totalShares)
+		inAmount0, inAmount1, outShares := pool.Deposit(amount0, amount1, totalShares, autoswap)
+
 		pool.Save(goCtx, k)
 		if outShares.GT(sdk.ZeroInt()) { // update shares accounting
 			if err := k.MintShares(ctx, receiverAddr, outShares, sharesId); err != nil {

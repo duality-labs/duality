@@ -23933,7 +23933,12 @@ paths:
                   type: object
                   properties:
                     pairId:
-                      type: string
+                      type: object
+                      properties:
+                        token0:
+                          type: string
+                        token1:
+                          type: string
                     tokenIn:
                       type: string
                     tickIndex:
@@ -24068,7 +24073,12 @@ paths:
                 type: object
                 properties:
                   pairId:
-                    type: string
+                    type: object
+                    properties:
+                      token0:
+                        type: string
+                      token1:
+                        type: string
                   tokenIn:
                     type: string
                   tickIndex:
@@ -24140,7 +24150,12 @@ paths:
                   type: object
                   properties:
                     pairId:
-                      type: string
+                      type: object
+                      properties:
+                        token0:
+                          type: string
+                        token1:
+                          type: string
                     token:
                       type: string
                     tickIndex:
@@ -24275,7 +24290,12 @@ paths:
                 type: object
                 properties:
                   pairId:
-                    type: string
+                    type: object
+                    properties:
+                      token0:
+                        type: string
+                      token1:
+                        type: string
                   token:
                     type: string
                   tickIndex:
@@ -24387,7 +24407,12 @@ paths:
                   type: object
                   properties:
                     pairId:
-                      type: string
+                      type: object
+                      properties:
+                        token0:
+                          type: string
+                        token1:
+                          type: string
                     tickIndex:
                       type: string
                       format: int64
@@ -24540,7 +24565,12 @@ paths:
                 type: object
                 properties:
                   pairId:
-                    type: string
+                    type: object
+                    properties:
+                      token0:
+                        type: string
+                      token1:
+                        type: string
                   tickIndex:
                     type: string
                     format: int64
@@ -24956,7 +24986,12 @@ paths:
                   type: object
                   properties:
                     pairId:
-                      type: string
+                      type: object
+                      properties:
+                        token0:
+                          type: string
+                        token1:
+                          type: string
                     currentTick0To1:
                       type: string
                       format: int64
@@ -25087,7 +25122,12 @@ paths:
                 type: object
                 properties:
                   pairId:
-                    type: string
+                    type: object
+                    properties:
+                      token0:
+                        type: string
+                      token1:
+                        type: string
                   currentTick0To1:
                     type: string
                     format: int64
@@ -25141,7 +25181,12 @@ paths:
                   type: object
                   properties:
                     pairId:
-                      type: string
+                      type: object
+                      properties:
+                        token0:
+                          type: string
+                        token1:
+                          type: string
                     sharesOwned:
                       type: string
                     centerTickIndex:
@@ -25197,7 +25242,12 @@ paths:
                   type: object
                   properties:
                     pairId:
-                      type: string
+                      type: object
+                      properties:
+                        token0:
+                          type: string
+                        token1:
+                          type: string
                     token:
                       type: string
                     tickIndex:
@@ -25258,7 +25308,12 @@ paths:
                       type: object
                       properties:
                         pairId:
-                          type: string
+                          type: object
+                          properties:
+                            token0:
+                              type: string
+                            token1:
+                              type: string
                         sharesOwned:
                           type: string
                         centerTickIndex:
@@ -25279,7 +25334,12 @@ paths:
                       type: object
                       properties:
                         pairId:
-                          type: string
+                          type: object
+                          properties:
+                            token0:
+                              type: string
+                            token1:
+                              type: string
                         token:
                           type: string
                         tickIndex:
@@ -45072,11 +45132,21 @@ definitions:
         type: string
         format: int64
     title: ValidatorUpdate
+  nicholasdotsol.duality.dex.DepositOptions:
+    type: object
+    properties:
+      autoswap:
+        type: boolean
   nicholasdotsol.duality.dex.DepositRecord:
     type: object
     properties:
       pairId:
-        type: string
+        type: object
+        properties:
+          token0:
+            type: string
+          token1:
+            type: string
       sharesOwned:
         type: string
       centerTickIndex:
@@ -45104,7 +45174,12 @@ definitions:
     type: object
     properties:
       pairId:
-        type: string
+        type: object
+        properties:
+          token0:
+            type: string
+          token1:
+            type: string
       tokenIn:
         type: string
       tickIndex:
@@ -45125,7 +45200,12 @@ definitions:
     type: object
     properties:
       pairId:
-        type: string
+        type: object
+        properties:
+          token0:
+            type: string
+          token1:
+            type: string
       token:
         type: string
       tickIndex:
@@ -45185,6 +45265,13 @@ definitions:
     type: object
   nicholasdotsol.duality.dex.MsgWithdrawlResponse:
     type: object
+  nicholasdotsol.duality.dex.PairId:
+    type: object
+    properties:
+      token0:
+        type: string
+      token1:
+        type: string
   nicholasdotsol.duality.dex.Params:
     type: object
     description: Params defines the parameters for the module.
@@ -45236,7 +45323,12 @@ definitions:
           type: object
           properties:
             pairId:
-              type: string
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
             tokenIn:
               type: string
             tickIndex:
@@ -45287,7 +45379,12 @@ definitions:
           type: object
           properties:
             pairId:
-              type: string
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
             token:
               type: string
             tickIndex:
@@ -45338,7 +45435,12 @@ definitions:
           type: object
           properties:
             pairId:
-              type: string
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
             tickIndex:
               type: string
               format: int64
@@ -45483,7 +45585,12 @@ definitions:
           type: object
           properties:
             pairId:
-              type: string
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
             currentTick0To1:
               type: string
               format: int64
@@ -45530,7 +45637,12 @@ definitions:
           type: object
           properties:
             pairId:
-              type: string
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
             sharesOwned:
               type: string
             centerTickIndex:
@@ -45554,7 +45666,12 @@ definitions:
           type: object
           properties:
             pairId:
-              type: string
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
             token:
               type: string
             tickIndex:
@@ -45590,7 +45707,12 @@ definitions:
         type: object
         properties:
           pairId:
-            type: string
+            type: object
+            properties:
+              token0:
+                type: string
+              token1:
+                type: string
           tokenIn:
             type: string
           tickIndex:
@@ -45614,7 +45736,12 @@ definitions:
         type: object
         properties:
           pairId:
-            type: string
+            type: object
+            properties:
+              token0:
+                type: string
+              token1:
+                type: string
           token:
             type: string
           tickIndex:
@@ -45638,7 +45765,12 @@ definitions:
         type: object
         properties:
           pairId:
-            type: string
+            type: object
+            properties:
+              token0:
+                type: string
+              token1:
+                type: string
           tickIndex:
             type: string
             format: int64
@@ -45702,7 +45834,12 @@ definitions:
         type: object
         properties:
           pairId:
-            type: string
+            type: object
+            properties:
+              token0:
+                type: string
+              token1:
+                type: string
           currentTick0To1:
             type: string
             format: int64
@@ -45727,7 +45864,12 @@ definitions:
               type: object
               properties:
                 pairId:
-                  type: string
+                  type: object
+                  properties:
+                    token0:
+                      type: string
+                    token1:
+                      type: string
                 sharesOwned:
                   type: string
                 centerTickIndex:
@@ -45748,7 +45890,12 @@ definitions:
               type: object
               properties:
                 pairId:
-                  type: string
+                  type: object
+                  properties:
+                    token0:
+                      type: string
+                    token1:
+                      type: string
                 token:
                   type: string
                 tickIndex:
@@ -45776,7 +45923,12 @@ definitions:
     type: object
     properties:
       pairId:
-        type: string
+        type: object
+        properties:
+          token0:
+            type: string
+          token1:
+            type: string
       tickIndex:
         type: string
         format: int64
@@ -45842,7 +45994,12 @@ definitions:
     type: object
     properties:
       pairId:
-        type: string
+        type: object
+        properties:
+          token0:
+            type: string
+          token1:
+            type: string
       currentTick0To1:
         type: string
         format: int64
@@ -45864,7 +46021,12 @@ definitions:
           type: object
           properties:
             pairId:
-              type: string
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
             sharesOwned:
               type: string
             centerTickIndex:
@@ -45885,7 +46047,12 @@ definitions:
           type: object
           properties:
             pairId:
-              type: string
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
             token:
               type: string
             tickIndex:
