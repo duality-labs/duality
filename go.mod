@@ -4,14 +4,14 @@ go 1.18
 
 require (
 	github.com/cosmos/admin-module v0.0.0
-	github.com/cosmos/cosmos-sdk v0.45.11
+	github.com/cosmos/cosmos-sdk v0.46.6
 	github.com/cosmos/ibc-go/v3 v3.4.0
 	github.com/cosmos/interchain-security v1.0.0-rc1
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/ignite-hq/cli v0.22.0
+	github.com/ignite/cli v0.25.2
 	github.com/spf13/cast v1.5.0
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
