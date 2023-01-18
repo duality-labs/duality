@@ -29,11 +29,18 @@ func networkWithTickLiquidityObjects(t *testing.T, n int) (*network.Network, []t
 
 	for i := 0; i < n; i++ {
 		tickLiquidity := types.TickLiquidity{
-			PairId:         &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-			TokenIn:        strconv.Itoa(i),
-			TickIndex:      int64(i),
-			LiquidityType:  strconv.Itoa(i),
-			LiquidityIndex: uint64(i),
+			Liquidity: &types.TickLiquidity_LimitOrderTranche{
+				LimitOrderTranche: &types.LimitOrderTranche{
+					PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+					TokenIn:          "TokenA",
+					TickIndex:        int64(i),
+					TrancheIndex:     uint64(i),
+					ReservesTokenIn:  sdk.NewInt(0),
+					ReservesTokenOut: sdk.NewInt(0),
+					TotalTokenIn:     sdk.NewInt(0),
+					TotalTokenOut:    sdk.NewInt(0),
+				},
+			},
 		}
 		nullify.Fill(&tickLiquidity)
 		state.TickLiquidityList = append(state.TickLiquidityList, tickLiquidity)
@@ -65,11 +72,11 @@ func TestShowTickLiquidity(t *testing.T) {
 	}{
 		{
 			desc:             "found",
-			idPairId:         objs[0].PairId,
-			idTokenIn:        objs[0].TokenIn,
-			idTickIndex:      objs[0].TickIndex,
-			idLiquidityType:  objs[0].LiquidityType,
-			idLiquidityIndex: objs[0].LiquidityIndex,
+			idPairId:         objs[0].PairId(),
+			idTokenIn:        objs[0].TokenIn(),
+			idTickIndex:      objs[0].TickIndex(),
+			idLiquidityType:  objs[0].LiquidityType(),
+			idLiquidityIndex: objs[0].LiquidityIndex(),
 
 			args: common,
 			obj:  objs[0],

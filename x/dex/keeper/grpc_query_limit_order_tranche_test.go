@@ -23,24 +23,21 @@ func createNLimitOrderTranches(keeper *keeper.Keeper, ctx sdk.Context, n int) []
 	items := make([]types.LimitOrderTranche, n)
 	for i := range items {
 		tick := types.TickLiquidity{
-			PairId:         &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-			TokenIn:        "TokenA",
-			TickIndex:      int64(i),
-			LiquidityType:  types.LiquidityTypeLO,
-			LiquidityIndex: uint64(i),
-			LimitOrderTranche: &types.LimitOrderTranche{
-				TrancheIndex:     uint64(i),
-				TickIndex:        int64(i),
-				TokenIn:          "TokenA",
-				PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-				ReservesTokenIn:  sdk.NewInt(10),
-				ReservesTokenOut: sdk.ZeroInt(),
-				TotalTokenIn:     sdk.NewInt(10),
-				TotalTokenOut:    sdk.ZeroInt(),
+			Liquidity: &types.TickLiquidity_LimitOrderTranche{
+				LimitOrderTranche: &types.LimitOrderTranche{
+					PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+					TokenIn:          "TokenA",
+					TickIndex:        int64(i),
+					TrancheIndex:     uint64(i),
+					ReservesTokenIn:  sdk.NewInt(10),
+					ReservesTokenOut: sdk.NewInt(10),
+					TotalTokenIn:     sdk.NewInt(10),
+					TotalTokenOut:    sdk.NewInt(10),
+				},
 			},
 		}
 		keeper.SetTickLiquidity(ctx, tick)
-		items[i] = *tick.LimitOrderTranche
+		items[i] = *tick.GetLimitOrderTranche()
 	}
 	return items
 }

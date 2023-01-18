@@ -21,7 +21,7 @@ var _ = strconv.IntSize
 func TestTickLiquidityQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNTickLiquidity(keeper, ctx, 2)
+	msgs := CreateNTickLiquidityLimitOrder(keeper, ctx, 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetTickLiquidityRequest
@@ -31,22 +31,22 @@ func TestTickLiquidityQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetTickLiquidityRequest{
-				PairId:         msgs[0].PairId.Stringify(),
-				TokenIn:        msgs[0].TokenIn,
-				TickIndex:      msgs[0].TickIndex,
-				LiquidityType:  msgs[0].LiquidityType,
-				LiquidityIndex: msgs[0].LiquidityIndex,
+				PairId:         msgs[0].PairId().Stringify(),
+				TokenIn:        msgs[0].TokenIn(),
+				TickIndex:      msgs[0].TickIndex(),
+				LiquidityType:  msgs[0].LiquidityType(),
+				LiquidityIndex: msgs[0].LiquidityIndex(),
 			},
 			response: &types.QueryGetTickLiquidityResponse{TickLiquidity: msgs[0]},
 		},
 		{
 			desc: "Second",
 			request: &types.QueryGetTickLiquidityRequest{
-				PairId:         msgs[1].PairId.Stringify(),
-				TokenIn:        msgs[1].TokenIn,
-				TickIndex:      msgs[1].TickIndex,
-				LiquidityType:  msgs[1].LiquidityType,
-				LiquidityIndex: msgs[1].LiquidityIndex,
+				PairId:         msgs[1].PairId().Stringify(),
+				TokenIn:        msgs[1].TokenIn(),
+				TickIndex:      msgs[1].TickIndex(),
+				LiquidityType:  msgs[1].LiquidityType(),
+				LiquidityIndex: msgs[1].LiquidityIndex(),
 			},
 			response: &types.QueryGetTickLiquidityResponse{TickLiquidity: msgs[1]},
 		},
@@ -84,7 +84,7 @@ func TestTickLiquidityQuerySingle(t *testing.T) {
 func TestTickLiquidityQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNTickLiquidity(keeper, ctx, 5)
+	msgs := CreateNTickLiquidityLimitOrder(keeper, ctx, 5)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllTickLiquidityRequest {
 		return &types.QueryAllTickLiquidityRequest{

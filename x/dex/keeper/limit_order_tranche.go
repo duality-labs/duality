@@ -8,26 +8,23 @@ import (
 
 type LimitOrderTrancheWrapper struct {
 	*types.LimitOrderTranche
-	Tick              *types.TickLiquidity
 	PriceTakerToMaker sdk.Dec
 	PriceMakerToTaker sdk.Dec
 }
 
-func NewLimitOrderTranche(
-	tick *types.TickLiquidity,
+func NewLimitOrderTrancheWrapper(
+	tranche *types.LimitOrderTranche,
 ) *LimitOrderTrancheWrapper {
 	var priceMakerToTaker, priceTakerToMaker sdk.Dec
-	tranche := tick.LimitOrderTranche
-	if tranche.TokenIn == tick.PairId.Token0 {
-		priceMakerToTaker = MustCalcPrice0To1(tick.TickIndex)
-		priceTakerToMaker = MustCalcPrice1To0(tick.TickIndex)
+	if tranche.TokenIn == tranche.PairId.Token0 {
+		priceMakerToTaker = MustCalcPrice0To1(tranche.TickIndex)
+		priceTakerToMaker = MustCalcPrice1To0(tranche.TickIndex)
 	} else {
-		priceMakerToTaker = MustCalcPrice1To0(tick.TickIndex)
-		priceTakerToMaker = MustCalcPrice0To1(tick.TickIndex)
+		priceMakerToTaker = MustCalcPrice1To0(tranche.TickIndex)
+		priceTakerToMaker = MustCalcPrice0To1(tranche.TickIndex)
 	}
 	return &LimitOrderTrancheWrapper{
 		LimitOrderTranche: tranche,
-		Tick:              tick,
 		PriceTakerToMaker: priceTakerToMaker,
 		PriceMakerToTaker: priceMakerToTaker,
 	}
@@ -75,12 +72,12 @@ func (t LimitOrderTrancheWrapper) IsFilled() bool {
 }
 
 func (t *LimitOrderTrancheWrapper) Save(sdkCtx sdk.Context, keeper Keeper) {
-	if t.Tick.HasActiveLimitOrders() {
-		keeper.SetTickLiquidity(sdkCtx, *t.Tick)
+	if t.HasToken() {
+		keeper.SetTickLiquidityLO(sdkCtx, *t.LimitOrderTranche)
 	} else {
-		filledTranche := t.Tick.LimitOrderTranche.CreateFilledTranche()
+		filledTranche := t.LimitOrderTranche.CreateFilledTranche()
 		keeper.SetFilledLimitOrderTranche(sdkCtx, filledTranche)
-		keeper.RemoveTickLiquidity(sdkCtx, *t.Tick)
+		keeper.RemoveLimitOrder(sdkCtx, *t.LimitOrderTranche)
 	}
 
 }
@@ -104,7 +101,7 @@ func (k Keeper) GetLimitOrderTranche(
 	// Try to find the tranche in the active liq index
 	tick, found := k.GetTickLiquidityLO(ctx, pairId, token, tickIndex, trancheIndex)
 	if found {
-		return *tick.LimitOrderTranche, false, true
+		return *tick.ToLimitOrderTranche(), false, true
 	}
 	// Look for filled limit orders
 	tranche, found := k.GetFilledLimitOrderTranche(ctx, pairId, token, tickIndex, trancheIndex)
@@ -127,4 +124,15 @@ func (k Keeper) GetAllLimitOrderTranche(ctx sdk.Context) (list []types.LimitOrde
 	}
 
 	return
+}
+
+func (k Keeper) SaveTranche(sdkCtx sdk.Context, tranche types.LimitOrderTranche) {
+	if tranche.HasToken() {
+		k.SetTickLiquidityLO(sdkCtx, tranche)
+	} else {
+		filledTranche := tranche.CreateFilledTranche()
+		k.SetFilledLimitOrderTranche(sdkCtx, filledTranche)
+		k.RemoveLimitOrder(sdkCtx, tranche)
+	}
+
 }

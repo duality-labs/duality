@@ -34,8 +34,10 @@ func (k Keeper) LimitOrderTrancheAll(c context.Context, req *types.QueryAllLimit
 		if err := k.cdc.Unmarshal(value, &tick); err != nil {
 			return err
 		}
-		if tick.HasActiveLimitOrders() {
-			LimitOrderTranches = append(LimitOrderTranches, *tick.LimitOrderTranche)
+
+		tranche := tick.GetLimitOrderTranche()
+		if tranche.HasToken() {
+			LimitOrderTranches = append(LimitOrderTranches, *tranche)
 		}
 		return nil
 	})

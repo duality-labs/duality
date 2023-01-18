@@ -84,7 +84,7 @@ func (gs GenesisState) Validate() error {
 	tickLiquidityIndexMap := make(map[string]struct{})
 
 	for _, elem := range gs.TickLiquidityList {
-		index := string(TickLiquidityKey(elem.PairId, elem.TokenIn, elem.TickIndex, elem.LiquidityType, elem.LiquidityIndex))
+		index := string(TickLiquidityKey(elem.PairId(), elem.TokenIn(), elem.TickIndex(), elem.LiquidityType(), elem.LiquidityIndex()))
 		if _, ok := tickLiquidityIndexMap[index]; ok {
 			return fmt.Errorf("duplicated index for tickLiquidity")
 		}

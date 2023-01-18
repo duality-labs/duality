@@ -46,72 +46,66 @@ func (k Keeper) GetOrInitPair(ctx sdk.Context, token0 string, token1 string) typ
 	return pair
 }
 
-func (k Keeper) GetOrInitTickLP(ctx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64, fee uint64) (*types.TickLiquidity, error) {
-	tickLiq, tickFound := k.GetTickLiquidity(
+// TODO: JCP RENAME GetOrInitPoolReserves
+func (k Keeper) GetOrInitTickLP(ctx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64, fee uint64) (types.TickLiquidityI, error) {
+	tickLiq, tickFound := k.GetTickLiquidityLP(
 		ctx,
 		pairId,
 		tokenIn,
 		tickIndex,
-		types.LiquidityTypeLP,
 		fee,
 	)
 	if tickFound {
-		return &tickLiq, nil
+		return tickLiq, nil
 	} else if IsTickOutOfRange(tickIndex) {
 		return nil, types.ErrTickOutsideRange
 	} else {
-		zero := sdk.ZeroInt()
-		return &types.TickLiquidity{
-			PairId:         pairId,
-			TokenIn:        tokenIn,
-			TickIndex:      tickIndex,
-			LiquidityType:  types.LiquidityTypeLP,
-			LiquidityIndex: fee,
-			LPReserve:      &zero,
+		return &types.PoolReserves{
+			PairId:    pairId,
+			TokenIn:   tokenIn,
+			TickIndex: tickIndex,
+			Fee:       fee,
+			Reserves:  sdk.ZeroInt(),
 		}, nil
 	}
 
 }
-func NewTickLO(pairId *types.PairId, tokenIn string, tickIndex int64, trancheIndex uint64) (types.TickLiquidity, error) {
+
+// TODO JCP rename to NewLimitOrderTranche
+func NewTickLO(pairId *types.PairId, tokenIn string, tickIndex int64, trancheIndex uint64) (types.LimitOrderTranche, error) {
 	if IsTickOutOfRange(tickIndex) {
-		return types.TickLiquidity{}, types.ErrTickOutsideRange
+		return types.LimitOrderTranche{}, types.ErrTickOutsideRange
 	}
-	return types.TickLiquidity{
-		PairId:         pairId,
-		TokenIn:        tokenIn,
-		TickIndex:      tickIndex,
-		LiquidityType:  types.LiquidityTypeLO,
-		LiquidityIndex: trancheIndex,
-		LimitOrderTranche: &types.LimitOrderTranche{
-			TrancheIndex:     trancheIndex,
-			TickIndex:        tickIndex,
-			TokenIn:          tokenIn,
-			PairId:           pairId,
-			ReservesTokenIn:  sdk.ZeroInt(),
-			ReservesTokenOut: sdk.ZeroInt(),
-			TotalTokenIn:     sdk.ZeroInt(),
-			TotalTokenOut:    sdk.ZeroInt(),
-		},
+	return types.LimitOrderTranche{
+		PairId:           pairId,
+		TokenIn:          tokenIn,
+		TickIndex:        tickIndex,
+		TrancheIndex:     trancheIndex,
+		ReservesTokenIn:  sdk.ZeroInt(),
+		ReservesTokenOut: sdk.ZeroInt(),
+		TotalTokenIn:     sdk.ZeroInt(),
+		TotalTokenOut:    sdk.ZeroInt(),
 	}, nil
 
 }
 
-func (k Keeper) GetOrInitTickLO(goCtx context.Context, pairId *types.PairId, tokenIn string, tickIndex int64, trancheIndex uint64) (types.TickLiquidity, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	tickLiq, tickFound := k.GetTickLiquidity(
-		ctx,
-		pairId,
-		tokenIn,
-		tickIndex,
-		types.LiquidityTypeLO,
-		trancheIndex,
-	)
-	if tickFound {
-		return tickLiq, nil
-	} else {
-		return NewTickLO(pairId, tokenIn, tickIndex, trancheIndex)
-	}
-}
+// TODO: JCP delete?
+// func (k Keeper) GetOrInitTickLO(goCtx context.Context, pairId *types.PairId, tokenIn string, tickIndex int64, trancheIndex uint64) (types.TickLiquidityI, error) {
+// 	ctx := sdk.UnwrapSDKContext(goCtx)
+// 	tickLiq, tickFound := k.GetTickLiquidity(
+// 		ctx,
+// 		pairId,
+// 		tokenIn,
+// 		tickIndex,
+// 		types.LiquidityTypeLO,
+// 		trancheIndex,
+// 	)
+// 	if tickFound {
+// 		return tickLiq, nil
+// 	} else {
+// 		return NewTickLO(pairId, tokenIn, tickIndex, trancheIndex)
+// 	}
+// }
 
 func (k Keeper) GetOrInitLimitOrderTrancheUser(
 	goCtx context.Context,
@@ -153,7 +147,7 @@ func (k Keeper) GetCurrTick1To0(ctx sdk.Context, pairId *types.PairId) (tickIdx 
 	for ; ti.Valid(); ti.Next() {
 		tick := ti.Value()
 		if tick.HasToken() {
-			return tick.TickIndex, true
+			return tick.TickIndexVal(), true
 		}
 	}
 	return math.MinInt64, false
@@ -166,7 +160,7 @@ func (k Keeper) GetCurrTick0To1(ctx sdk.Context, pairId *types.PairId) (tickIdx 
 	for ; ti.Valid(); ti.Next() {
 		tick := ti.Value()
 		if tick.HasToken() {
-			return tick.TickIndex, true
+			return tick.TickIndexVal(), true
 		}
 	}
 
@@ -277,16 +271,6 @@ func CalcPrice1To0(tickIndex int64) (sdk.Dec, error) {
 	} else {
 		return sdk.OneDec().Quo(Pow(BasePrice(), uint64(-1*tickIndex))), nil
 	}
-}
-
-func (k Keeper) ShouldDeinit(
-	ctx sdk.Context,
-	deinitedTick *types.TickLiquidity) bool {
-
-	if deinitedTick == nil {
-		return false
-	}
-	return !deinitedTick.HasToken()
 }
 
 ///////////////////////////////////////////////////////////////////////////////

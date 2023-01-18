@@ -86,7 +86,7 @@ func (s *CoreHelpersTestSuite) SetupTest() {
 	s.feeTiers = feeTiers
 }
 
-func (s *CoreHelpersTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amountB int) (types.TickLiquidity, types.TickLiquidity) {
+func (s *CoreHelpersTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amountB int) {
 	pairId := &types.PairId{"TokenA", "TokenB"}
 	sharesId := CreateSharesId("TokenA", "TokenB", tickIndex, 0)
 	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, pairId, tickIndex, s.feeTiers[0])
@@ -103,10 +103,9 @@ func (s *CoreHelpersTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amo
 
 	s.app.DexKeeper.MintShares(s.ctx, s.alice, totalShares, sharesId)
 
-	lowerTick.LPReserve = &amountAInt
-	upperTick.LPReserve = &amountBInt
+	lowerTick.Reserves = amountAInt
+	upperTick.Reserves = amountBInt
 	pool.Save(s.ctx, s.app.DexKeeper)
-	return *lowerTick, *upperTick
 }
 
 // TokenInit //////////////////////////////////////////////////////////////////

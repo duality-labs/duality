@@ -9,8 +9,8 @@ import (
 type Pool struct {
 	TickIndex      int64
 	FeeIndex       uint64
-	LowerTick0     *types.TickLiquidity
-	UpperTick1     *types.TickLiquidity
+	LowerTick0     *types.PoolReserves
+	UpperTick1     *types.PoolReserves
 	Price1To0Lower sdk.Dec
 	Price0To1Upper sdk.Dec
 }
@@ -18,16 +18,15 @@ type Pool struct {
 func NewPool(
 	tickIndex int64,
 	// feeIndex uint64,
-	lowerTick0 *types.TickLiquidity,
-	upperTick1 *types.TickLiquidity,
+	lowerTick0 types.TickLiquidityI,
+	upperTick1 types.TickLiquidityI,
 ) Pool {
 	// TODO: maybe store this somewhere so we don't have to recalculate
 	price0To1 := MustCalcPrice0To1(tickIndex)
 	return Pool{
-		TickIndex: tickIndex,
-		// FeeIndex:       feeIndex,
-		LowerTick0:     lowerTick0,
-		UpperTick1:     upperTick1,
+		TickIndex:      tickIndex,
+		LowerTick0:     lowerTick0.ToPoolReserves(),
+		UpperTick1:     upperTick1.ToPoolReserves(),
 		Price0To1Upper: price0To1,
 		Price1To0Lower: sdk.OneDec().Quo(price0To1),
 	}
@@ -48,20 +47,20 @@ func (k Keeper) GetOrInitPool(ctx sdk.Context, pairId *types.PairId, tickIndex i
 	return NewPool(tickIndex, lowertick, upperTick), nil
 }
 func (p *Pool) GetLowerReserve0() sdk.Int {
-	return *p.LowerTick0.LPReserve
+	return p.LowerTick0.Reserves
 }
 
 func (p *Pool) GetUpperReserve1() sdk.Int {
-	return *p.UpperTick1.LPReserve
+	return p.UpperTick1.Reserves
 }
 
 func (p *Pool) Swap0To1(maxAmount0 sdk.Int) (inAmount0 sdk.Int, outAmount1 sdk.Int) {
-	reserves1 := p.UpperTick1.LPReserve
+	reserves1 := &p.UpperTick1.Reserves
 	if maxAmount0.Equal(sdk.ZeroInt()) || reserves1.Equal(sdk.ZeroInt()) {
 		return sdk.ZeroInt(), sdk.ZeroInt()
 	}
 
-	reserves0 := p.LowerTick0.LPReserve
+	reserves0 := &p.LowerTick0.Reserves
 
 	price1To0Upper := sdk.OneDec().Quo(p.Price0To1Upper)
 	maxAmount1 := maxAmount0.ToDec().Mul(p.Price0To1Upper).TruncateInt()
@@ -80,12 +79,12 @@ func (p *Pool) Swap0To1(maxAmount0 sdk.Int) (inAmount0 sdk.Int, outAmount1 sdk.I
 }
 
 func (p *Pool) Swap1To0(maxAmount1 sdk.Int) (inAmount1 sdk.Int, outAmount0 sdk.Int) {
-	reserves0 := p.LowerTick0.LPReserve
+	reserves0 := &p.LowerTick0.Reserves
 	if maxAmount1.Equal(sdk.ZeroInt()) || reserves0.Equal(sdk.ZeroInt()) {
 		return sdk.ZeroInt(), sdk.ZeroInt()
 	}
 
-	reserves1 := p.UpperTick1.LPReserve
+	reserves1 := &p.UpperTick1.Reserves
 
 	price0To1Lower := sdk.OneDec().Quo(p.Price1To0Lower)
 	maxAmount0 := maxAmount1.ToDec().Mul(p.Price1To0Lower).TruncateInt()
@@ -137,8 +136,8 @@ func CalcGreatestMatchingRatio(
 // pool.save() is called or the underlying ticks are saved; this method does not use any keeper methods.
 func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.Int, autoswap bool) (inAmount0 sdk.Int, inAmount1 sdk.Int, outShares sdk.Int) {
 
-	lowerReserve0 := p.LowerTick0.LPReserve
-	upperReserve1 := p.UpperTick1.LPReserve
+	lowerReserve0 := &p.LowerTick0.Reserves
+	upperReserve1 := &p.UpperTick1.Reserves
 
 	inAmount0, inAmount1 = CalcGreatestMatchingRatio(
 		*lowerReserve0,
@@ -230,8 +229,8 @@ func (p *Pool) CalcResidualSharesMinted(
 }
 
 func (p *Pool) Withdraw(sharesToRemove sdk.Int, totalShares sdk.Int) (outAmount0 sdk.Int, outAmount1 sdk.Int) {
-	reserves0 := p.LowerTick0.LPReserve
-	reserves1 := p.UpperTick1.LPReserve
+	reserves0 := &p.LowerTick0.Reserves
+	reserves1 := &p.UpperTick1.Reserves
 	ownershipRatio := sharesToRemove.ToDec().Quo(totalShares.ToDec())
 	outAmount1 = ownershipRatio.Mul(reserves1.ToDec()).TruncateInt()
 	outAmount0 = ownershipRatio.Mul(reserves0.ToDec()).TruncateInt()
@@ -262,14 +261,14 @@ func CalcFee(upperTickIndex int64, lowerTickIndex int64) int64 {
 
 func (p *Pool) Save(sdkCtx sdk.Context, keeper Keeper) {
 	if p.LowerTick0.HasToken() {
-		keeper.SetTickLiquidity(sdkCtx, *p.LowerTick0)
+		keeper.SetTickLiquidityPoolReserves(sdkCtx, *p.LowerTick0)
 	} else {
-		keeper.RemoveTickLiquidity(sdkCtx, *p.LowerTick0)
+		keeper.RemovePoolReserves(sdkCtx, *p.LowerTick0)
 	}
 
 	if p.UpperTick1.HasToken() {
-		keeper.SetTickLiquidity(sdkCtx, *p.UpperTick1)
+		keeper.SetTickLiquidityPoolReserves(sdkCtx, *p.UpperTick1)
 	} else {
-		keeper.RemoveTickLiquidity(sdkCtx, *p.UpperTick1)
+		keeper.RemovePoolReserves(sdkCtx, *p.UpperTick1)
 	}
 }

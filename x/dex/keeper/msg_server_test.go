@@ -421,8 +421,8 @@ func (s *MsgServerTestSuite) getLiquidityAtTick(tickIndex int64, feeIndex uint64
 	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, pairId, tickIndex, feeTier)
 	s.Assert().NoError(err)
 
-	liquidityA := *pool.LowerTick0.LPReserve
-	liquidityB := *pool.UpperTick1.LPReserve
+	liquidityA := pool.LowerTick0.Reserves
+	liquidityB := pool.UpperTick1.Reserves
 
 	if &liquidityA == nil {
 		liquidityA = sdk.ZeroInt()
@@ -974,7 +974,7 @@ func (s *MsgServerTestSuite) assertLimitLiquidityAtTickInt(selling string, tickI
 	tranches := s.app.DexKeeper.GetAllLimitOrderTrancheAtIndex(s.ctx, pairId, selling, tickIndex)
 	liquidity := sdk.ZeroInt()
 	for _, t := range tranches {
-		liquidity = liquidity.Add(t.LimitOrderTranche.ReservesTokenIn)
+		liquidity = liquidity.Add(t.ReservesTokenIn)
 	}
 
 	s.Assert().True(amount.Equal(liquidity), "Incorrect liquidity: expected %s, have %s", amount.String(), liquidity.String())
@@ -987,12 +987,12 @@ func (s *MsgServerTestSuite) assertFillAndPlaceTrancheKeys(selling string, tickI
 	var fillIndex, placeIndex uint64 = 0, 0
 
 	if len(tranches) == 1 {
-		placeIndex = tranches[0].LiquidityIndex
+		placeIndex = tranches[0].TrancheIndex
 	}
 
 	if len(tranches) == 2 {
-		placeIndex = tranches[0].LiquidityIndex
-		fillIndex = tranches[1].LiquidityIndex
+		placeIndex = tranches[0].TrancheIndex
+		fillIndex = tranches[1].TrancheIndex
 	}
 
 	s.Assert().Equal(expectedFill, fillIndex)
@@ -1005,9 +1005,9 @@ func (s *MsgServerTestSuite) getLimitUserSharesAtTick(account sdk.AccAddress, se
 	tranches := s.app.DexKeeper.GetAllLimitOrderTrancheAtIndex(s.ctx, pairId, selling, tickIndex)
 	fillTranche := tranches[0]
 	// get user shares and total shares
-	userShares := s.getLimitUserSharesAtTickAtKey(account, selling, tickIndex, fillTranche.LiquidityIndex)
+	userShares := s.getLimitUserSharesAtTickAtKey(account, selling, tickIndex, fillTranche.TrancheIndex)
 	if len(tranches) >= 2 {
-		userShares = userShares.Add(s.getLimitUserSharesAtTickAtKey(account, selling, tickIndex, tranches[1].LiquidityIndex))
+		userShares = userShares.Add(s.getLimitUserSharesAtTickAtKey(account, selling, tickIndex, tranches[1].TrancheIndex))
 	}
 	return userShares
 }
@@ -1026,7 +1026,7 @@ func (s *MsgServerTestSuite) getLimitTotalSharesAtTick(selling string, tickIndex
 	// get user shares and total shares
 	totalShares := sdk.ZeroInt()
 	for _, t := range tranches {
-		totalShares = totalShares.Add(t.LimitOrderTranche.TotalTokenIn)
+		totalShares = totalShares.Add(t.TotalTokenIn)
 	}
 	return totalShares
 }

@@ -1,5 +1,9 @@
 package types
 
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
+
 func (t LimitOrderTranche) IsPlaceTranche() bool {
 	return t.ReservesTokenIn.Equal(t.TotalTokenIn)
 }
@@ -26,4 +30,24 @@ func (t LimitOrderTranche) CreateFilledTranche() FilledLimitOrderTranche {
 		TotalTokenOut:    t.TotalTokenOut,
 		ReservesTokenOut: t.ReservesTokenOut,
 	}
+}
+
+func (LimitOrderTranche) LiquidityType() string {
+	return LiquidityTypeLO
+}
+
+func (t LimitOrderTranche) HasToken() bool {
+	return t.ReservesTokenIn.GT(sdk.ZeroInt())
+}
+
+func (t LimitOrderTranche) TickIndexVal() int64 {
+	return t.TickIndex
+}
+
+func (t LimitOrderTranche) ToLimitOrderTranche() *LimitOrderTranche {
+	return &t
+}
+
+func (LimitOrderTranche) ToPoolReserves() *PoolReserves {
+	panic("Cannot convert LimitOrderTranche to PoolReserves")
 }
