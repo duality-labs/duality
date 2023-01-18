@@ -22,16 +22,6 @@ func TestGenesisState_Validate(t *testing.T) {
 			desc: "valid genesis state",
 			genState: &types.GenesisState{
 
-				TickList: []types.Tick{
-					{
-						TickIndex: 0,
-						PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-					},
-					{
-						TickIndex: 1,
-						PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-					},
-				},
 				TradingPairList: []types.TradingPair{
 					{
 						PairId: &types.PairId{Token0: "TokenA", Token1: "TokenB"},
@@ -78,35 +68,39 @@ func TestGenesisState_Validate(t *testing.T) {
 						PairId:  &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 				},
-				LimitOrderTrancheList: []types.LimitOrderTranche{
+				TickLiquidityList: []types.TickLiquidity{
 					{
-						TickIndex: 0,
-						PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenC"},
+						PairId:         &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						TokenIn:        "0",
+						TickIndex:      0,
+						LiquidityType:  "0",
+						LiquidityIndex: 0,
 					},
 					{
-						TickIndex: 1,
-						PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenC"},
+						PairId:         &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						TokenIn:        "1",
+						TickIndex:      1,
+						LiquidityType:  "1",
+						LiquidityIndex: 1,
+					},
+				},
+				FilledLimitOrderTrancheList: []types.FilledLimitOrderTranche{
+					{
+						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						TokenIn:      "0",
+						TickIndex:    0,
+						TrancheIndex: 0,
+					},
+					{
+						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						TokenIn:      "1",
+						TickIndex:    1,
+						TrancheIndex: 1,
 					},
 				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
-		},
-		{
-			desc: "duplicated Tick",
-			genState: &types.GenesisState{
-				TickList: []types.Tick{
-					{
-						TickIndex: 0,
-						PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-					},
-					{
-						TickIndex: 0,
-						PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-					},
-				},
-			},
-			valid: false,
 		},
 		{
 			desc: "duplicated TradingPair",
@@ -207,16 +201,42 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated LimitOrderTranche",
+			desc: "duplicated tickLiquidity",
 			genState: &types.GenesisState{
-				LimitOrderTrancheList: []types.LimitOrderTranche{
+				TickLiquidityList: []types.TickLiquidity{
 					{
-						TickIndex: 0,
-						PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						PairId:         &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						TokenIn:        "0",
+						TickIndex:      0,
+						LiquidityType:  "0",
+						LiquidityIndex: 0,
 					},
 					{
-						TickIndex: 0,
-						PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						PairId:         &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						TokenIn:        "0",
+						TickIndex:      0,
+						LiquidityType:  "0",
+						LiquidityIndex: 0,
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated filledLimitOrderTranche",
+			genState: &types.GenesisState{
+				FilledLimitOrderTrancheList: []types.FilledLimitOrderTranche{
+					{
+						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						TokenIn:      "0",
+						TickIndex:    0,
+						TrancheIndex: 0,
+					},
+					{
+						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						TokenIn:      "0",
+						TickIndex:    0,
+						TrancheIndex: 0,
 					},
 				},
 			},

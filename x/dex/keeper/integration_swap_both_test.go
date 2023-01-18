@@ -8,7 +8,7 @@ import (
 func (s *MsgServerTestSuite) TestSwapNoLiqudityPairNotFound() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 50)
-	err := types.ErrValidPairNotFound
+	err := types.ErrSlippageLimitReached
 	s.bobMarketSellFails(err, "TokenA", 5, 0)
 }
 

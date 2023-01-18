@@ -60,8 +60,8 @@ func DepositSharesToData(shares sdk.Coin, feeTiers []types.FeeTier) (types.Depos
 		PairId:          pairId,
 		SharesOwned:     shares.Amount,
 		CenterTickIndex: tickIndex,
-		LowerTickIndex:  tickIndex - feeTiers[feeIndex].Fee,
-		UpperTickIndex:  tickIndex + feeTiers[feeIndex].Fee,
+		LowerTickIndex:  tickIndex - int64(feeTiers[feeIndex].Fee),
+		UpperTickIndex:  tickIndex + int64(feeTiers[feeIndex].Fee),
 		FeeIndex:        feeIndex,
 	}, nil
 }

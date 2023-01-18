@@ -30,4 +30,5 @@ var (
 	ErrZeroSwap                           = sdkerrors.Register(ModuleName, 1125, "Cannot swap in zero tokens.")
 	ErrInvalidKeyToken                    = sdkerrors.Register(ModuleName, 1126, "KeyToken not in specified pair.")
 	ErrInvalidTokenIn                     = sdkerrors.Register(ModuleName, 1127, "TokenIn not in specified pair.")
+	ErrActiveLimitOrderNotFound           = sdkerrors.Register(ModuleName, 1128, "No active limit found. It does not exist or has already been filled")
 )

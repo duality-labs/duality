@@ -12,8 +12,9 @@ import (
 
 func CmdListLimitOrderTranche() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-limit-order-pool-total-shares-map",
-		Short: "list all LimitOrderTranche",
+		Use:   "list-limit-order-tranche [pair-id] [token-in]",
+		Short: "list all LimitOrderTranches",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -22,10 +23,15 @@ func CmdListLimitOrderTranche() *cobra.Command {
 				return err
 			}
 
+			argPairId := args[0]
+			argTokenIn := args[1]
+
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryAllLimitOrderTrancheRequest{
 				Pagination: pageReq,
+				PairId:     argPairId,
+				TokenIn:    argTokenIn,
 			}
 
 			res, err := queryClient.LimitOrderTrancheAll(context.Background(), params)
@@ -45,7 +51,7 @@ func CmdListLimitOrderTranche() *cobra.Command {
 
 func CmdShowLimitOrderTranche() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-limit-order-pool-total-shares-map [pairId] [tickIndex] [tokenIn] [TrancheIndex]",
+		Use:   "show-limit-order-tranche [pair-id] [tick-index] [token-in] [tranche-index]",
 		Short: "shows a LimitOrderTranche",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -73,7 +79,7 @@ func CmdShowLimitOrderTranche() *cobra.Command {
 			params := &types.QueryGetLimitOrderTrancheRequest{
 				PairId:       argPairId,
 				TickIndex:    int64(argTickIndexInt),
-				Token:        argTokenIn,
+				TokenIn:      argTokenIn,
 				TrancheIndex: uint64(argTrancheIndexInt),
 			}
 
