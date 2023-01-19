@@ -58,12 +58,6 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 }
 
 func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*types.MsgWithdrawlResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	// validate msg
-	if err := msg.ValidateBasic(); err != nil {
-		return nil, err
-	}
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
@@ -78,16 +72,10 @@ func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*t
 		return nil, err
 	}
 
-	_ = ctx
-
 	return &types.MsgWithdrawlResponse{}, nil
 }
 
 func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSwapResponse, error) {
-	// validate msg
-	if err := msg.ValidateBasic(); err != nil {
-		return nil, err
-	}
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
@@ -100,16 +88,10 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	}
 
 	//TODO: Inconsistent that this is the only response that returns coins instead of ints
-	return &types.MsgSwapResponse{coinOut}, nil
+	return &types.MsgSwapResponse{CoinOut: coinOut}, nil
 }
 
 func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLimitOrder) (*types.MsgPlaceLimitOrderResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	// validate msg
-	if err := msg.ValidateBasic(); err != nil {
-		return &types.MsgPlaceLimitOrderResponse{}, err
-	}
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 
 	tokenIn, tokenOut := GetInOutTokens(msg.TokenIn, msg.TokenA, msg.TokenB)
@@ -119,18 +101,10 @@ func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLim
 		return &types.MsgPlaceLimitOrderResponse{}, err
 	}
 
-	_ = ctx
-
 	return &types.MsgPlaceLimitOrderResponse{}, nil
 }
 
 func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.MsgWithdrawFilledLimitOrder) (*types.MsgWithdrawFilledLimitOrderResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	// validate msg
-	if err := msg.ValidateBasic(); err != nil {
-		return nil, err
-	}
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
@@ -141,23 +115,14 @@ func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.Ms
 	}
 
 	err = k.WithdrawFilledLimitOrderCore(goCtx, msg, token0, token1, callerAddr, receiverAddr)
-
 	if err != nil {
 		return &types.MsgWithdrawFilledLimitOrderResponse{}, err
 	}
-
-	_ = ctx
 
 	return &types.MsgWithdrawFilledLimitOrderResponse{}, nil
 }
 
 func (k msgServer) CancelLimitOrder(goCtx context.Context, msg *types.MsgCancelLimitOrder) (*types.MsgCancelLimitOrderResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	// validate msg
-	if err := msg.ValidateBasic(); err != nil {
-		return nil, err
-	}
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
@@ -168,11 +133,9 @@ func (k msgServer) CancelLimitOrder(goCtx context.Context, msg *types.MsgCancelL
 	}
 
 	err = k.CancelLimitOrderCore(goCtx, msg, token0, token1, callerAddr, receiverAddr)
-
 	if err != nil {
 		return &types.MsgCancelLimitOrderResponse{}, err
 	}
-	_ = ctx
 
 	return &types.MsgCancelLimitOrderResponse{}, nil
 }
