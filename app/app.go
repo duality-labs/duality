@@ -75,9 +75,10 @@ import (
 	ibcporttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
-	"github.com/ignite-hq/cli/ignite/pkg/cosmoscmd"
-	"github.com/ignite-hq/cli/ignite/pkg/openapiconsole"
+	ibctestingcore "github.com/cosmos/interchain-security/legacy_ibc_testing/core"
+	"github.com/ignite/cli/ignite/pkg/openapiconsole"
 	"github.com/spf13/cast"
+	"github.com/tendermint/spm/cosmoscmd"
 	forwardmiddleware "github.com/strangelove-ventures/packet-forward-middleware/v3/router"
 	forwardkeeper "github.com/strangelove-ventures/packet-forward-middleware/v3/router/keeper"
 	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v3/router/types"
@@ -330,9 +331,16 @@ func NewApp(
 		keys[authz.ModuleName], appCodec, app.MsgServiceRouter(),
 	)
 
+	// Remove the fee-pool from the group of blocked recipient addresses in bank
+	// this is required for the consumer chain to be able to send tokens to the provider chain
+	// RE: https://github.com/cosmos/interchain-security/blob/main/app/consumer/app.go#L272
+	bankBlockedAddrs := app.ModuleAccountAddrs()
+	delete(bankBlockedAddrs, authtypes.NewModuleAddress(
+		ccvconsumertypes.ConsumerToSendToProviderName).String())
 	app.BankKeeper = bankkeeper.NewBaseKeeper(
-		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.GetSubspace(banktypes.ModuleName), app.ModuleAccountAddrs(),
+		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.GetSubspace(banktypes.ModuleName), bankBlockedAddrs,
 	)
+
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
 		appCodec, keys[slashingtypes.StoreKey], &app.ConsumerKeeper, app.GetSubspace(slashingtypes.ModuleName),
 	)
@@ -559,18 +567,18 @@ func NewApp(
 	// can do so safely.
 	app.mm.SetOrderInitGenesis(
 		capabilitytypes.ModuleName,
-		ibctransfertypes.ModuleName,
 		authtypes.ModuleName,
-		authz.ModuleName,
 		banktypes.ModuleName,
-		vestingtypes.ModuleName,
 		slashingtypes.ModuleName,
 		crisistypes.ModuleName,
 		ibchost.ModuleName,
 		evidencetypes.ModuleName,
+		ibctransfertypes.ModuleName,
+		feegrant.ModuleName,
+		authz.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
-		feegrant.ModuleName,
+		vestingtypes.ModuleName,
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
@@ -813,8 +821,12 @@ func (app *App) GetIBCKeeper() *ibckeeper.Keeper {
 	return app.IBCKeeper
 }
 
+// // GetStakingKeeper implements the TestingApp interface.
+// func (app *App) GetStakingKeeper() ibcclienttypes.StakingKeeper {
+// 	return app.ConsumerKeeper
+// }
 // GetStakingKeeper implements the TestingApp interface.
-func (app *App) GetStakingKeeper() ibcclienttypes.StakingKeeper {
+func (app *App) GetStakingKeeper() ibctestingcore.StakingKeeper {
 	return app.ConsumerKeeper
 }
 

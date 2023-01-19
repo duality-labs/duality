@@ -20,7 +20,7 @@ import (
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/ignite-hq/cli/ignite/pkg/cosmoscmd"
+	"github.com/tendermint/spm/cosmoscmd"
 	types1 "github.com/tendermint/tendermint/abci/types"
 	tmrand "github.com/tendermint/tendermint/libs/rand"
 	tmtypes "github.com/tendermint/tendermint/types"

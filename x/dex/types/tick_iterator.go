@@ -4,5 +4,5 @@ type TickIteratorI interface {
 	Next()
 	Valid() bool
 	Close() error
-	Value() Tick
+	Value() TickLiquidity
 }

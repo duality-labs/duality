@@ -1,16 +1,16 @@
 package types
 
 type DirectionalTradingPair struct {
-	TradingPair
+	*PairId
 	TokenIn  string
 	TokenOut string
 }
 
-func NewDirectionalTradingPair(pair TradingPair, tokenIn string, tokenOut string) DirectionalTradingPair {
+func NewDirectionalTradingPair(pairId *PairId, tokenIn string, tokenOut string) DirectionalTradingPair {
 	return DirectionalTradingPair{
-		TradingPair: pair,
-		TokenIn:     tokenIn,
-		TokenOut:    tokenOut,
+		PairId:   pairId,
+		TokenIn:  tokenIn,
+		TokenOut: tokenOut,
 	}
 }
 
