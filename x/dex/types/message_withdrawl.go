@@ -58,5 +58,15 @@ func (msg *MsgWithdrawl) ValidateBasic() error {
 		len(msg.SharesToRemove) != len(msg.TickIndexes) {
 		return ErrUnbalancedTxArray
 	}
+
+	if len(msg.FeeIndexes) == 0 {
+		return ErrZeroWithdraw
+	}
+
+	for i := 0; i < len(msg.FeeIndexes); i++ {
+		if msg.SharesToRemove[i].Equal(sdk.ZeroInt()) {
+			return ErrZeroWithdraw
+		}
+	}
 	return nil
 }
