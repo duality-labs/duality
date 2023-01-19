@@ -1,9 +1,6 @@
 package keeper
 
 import (
-	"context"
-
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -12,7 +9,7 @@ type PoolLiquidity struct {
 	is0To1 bool
 }
 
-func (pl *PoolLiquidity) Swap(maxAmount sdk.Int) (inAmount sdk.Int, outAmount sdk.Int, initedTick *types.Tick, deinitedTick *types.Tick) {
+func (pl *PoolLiquidity) Swap(maxAmount sdk.Int) (inAmount sdk.Int, outAmount sdk.Int) {
 	if pl.is0To1 {
 		return pl.pool.Swap0To1(maxAmount)
 	} else {
@@ -20,8 +17,8 @@ func (pl *PoolLiquidity) Swap(maxAmount sdk.Int) (inAmount sdk.Int, outAmount sd
 	}
 }
 
-func (pl *PoolLiquidity) Save(ctx context.Context, keeper Keeper) {
-	pl.pool.Save(ctx, keeper)
+func (pl *PoolLiquidity) Save(sdkCtx sdk.Context, keeper Keeper) {
+	pl.pool.Save(sdkCtx, keeper)
 }
 
 func (pl *PoolLiquidity) Price() sdk.Dec {

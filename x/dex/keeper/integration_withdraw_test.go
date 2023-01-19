@@ -27,8 +27,6 @@ func (s *MsgServerTestSuite) TestPartialWithdrawOnlyA() {
 	s.assertDexBalances(10, 0)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMinTick(-1)
-	s.assertMaxTick(math.MinInt64)
 
 	s.aliceWithdraws(NewWithdrawl(5, 0, 0))
 
@@ -36,9 +34,6 @@ func (s *MsgServerTestSuite) TestPartialWithdrawOnlyA() {
 	s.assertDexBalances(5, 0)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMinTick(-1)
-	s.assertMaxTick(math.MinInt64)
-
 }
 
 func (s *MsgServerTestSuite) TestPartialWithdrawOnlyB() {
@@ -57,8 +52,6 @@ func (s *MsgServerTestSuite) TestPartialWithdrawOnlyB() {
 	s.assertDexBalances(0, 10)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
-	s.assertMinTick(math.MaxInt64)
-	s.assertMaxTick(1)
 
 	s.aliceWithdraws(NewWithdrawl(5, 0, 0))
 
@@ -66,8 +59,6 @@ func (s *MsgServerTestSuite) TestPartialWithdrawOnlyB() {
 	s.assertDexBalances(0, 5)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
-	s.assertMinTick(math.MaxInt64)
-	s.assertMaxTick(1)
 }
 
 func (s *MsgServerTestSuite) TestFullWithdrawOnlyB() {
@@ -86,8 +77,6 @@ func (s *MsgServerTestSuite) TestFullWithdrawOnlyB() {
 	s.assertDexBalances(0, 10)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
-	s.assertMinTick(math.MaxInt64)
-	s.assertMaxTick(1)
 
 	s.aliceWithdraws(NewWithdrawl(10, 0, 0))
 
@@ -95,8 +84,6 @@ func (s *MsgServerTestSuite) TestFullWithdrawOnlyB() {
 	s.assertDexBalances(0, 0)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMinTick(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
 }
 
 func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterDoubleSidedThenSingleSidedDepositAndPartialWithdrawal() {
@@ -112,8 +99,6 @@ func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterDoubleSidedThenSingleSid
 	s.assertDexBalances(10, 10)
 	s.assertCurr1To0(-3)
 	s.assertCurr0To1(3)
-	s.assertMinTick(-3)
-	s.assertMaxTick(3)
 
 	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
 
@@ -121,8 +106,6 @@ func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterDoubleSidedThenSingleSid
 	s.assertDexBalances(20, 10)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(3)
-	s.assertMinTick(-3)
-	s.assertMaxTick(3)
 
 	//DEBUG
 	s.aliceWithdraws(NewWithdrawl(10, 0, 1))
@@ -131,8 +114,6 @@ func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterDoubleSidedThenSingleSid
 	s.assertDexBalances(15, 5)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(3)
-	s.assertMinTick(-3)
-	s.assertMaxTick(3)
 }
 
 func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterDoubleSidedThenSingleSidedDepositAndFulllWithdrawal() {
@@ -148,8 +129,6 @@ func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterDoubleSidedThenSingleSid
 	s.assertDexBalances(10, 10)
 	s.assertCurr1To0(-3)
 	s.assertCurr0To1(3)
-	s.assertMinTick(-3)
-	s.assertMaxTick(3)
 
 	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
 
@@ -157,8 +136,6 @@ func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterDoubleSidedThenSingleSid
 	s.assertDexBalances(20, 10)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(3)
-	s.assertMinTick(-3)
-	s.assertMaxTick(3)
 
 	s.aliceWithdraws(NewWithdrawl(20, 0, 1))
 
@@ -166,8 +143,6 @@ func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterDoubleSidedThenSingleSid
 	s.assertDexBalances(10, 0)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMinTick(-1)
-	s.assertMaxTick(math.MinInt64)
 }
 
 func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedAtooMuchTick0() {
@@ -187,8 +162,6 @@ func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedAtooMuchTick0() {
 	s.assertDexBalances(5, 10)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(1)
-	s.assertMinTick(-1)
-	s.assertMaxTick(1)
 
 	s.bobDeposits(NewDeposit(10, 10, 0, 0))
 
@@ -197,8 +170,6 @@ func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedAtooMuchTick0() {
 	s.assertDexBalances(10, 20)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(1)
-	s.assertMinTick(-1)
-	s.assertMaxTick(1)
 
 	s.aliceWithdraws(NewWithdrawl(15, 0, 0))
 
@@ -207,8 +178,6 @@ func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedAtooMuchTick0() {
 	s.assertDexBalances(5, 10)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(1)
-	s.assertMinTick(-1)
-	s.assertMaxTick(1)
 
 	s.bobWithdraws(NewWithdrawl(15, 0, 0))
 
@@ -217,8 +186,6 @@ func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedAtooMuchTick0() {
 	s.assertDexBalances(0, 0)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMinTick(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
 }
 
 func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedBtooMuchTick0() {
@@ -238,8 +205,6 @@ func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedBtooMuchTick0() {
 	s.assertDexBalances(10, 5)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(1)
-	s.assertMinTick(-1)
-	s.assertMaxTick(1)
 
 	s.bobDeposits(NewDeposit(10, 10, 0, 0))
 
@@ -248,8 +213,6 @@ func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedBtooMuchTick0() {
 	s.assertDexBalances(20, 10)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(1)
-	s.assertMinTick(-1)
-	s.assertMaxTick(1)
 
 	s.aliceWithdraws(NewWithdrawl(15, 0, 0))
 
@@ -258,8 +221,6 @@ func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedBtooMuchTick0() {
 	s.assertDexBalances(10, 5)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(1)
-	s.assertMinTick(-1)
-	s.assertMaxTick(1)
 
 	s.bobWithdraws(NewWithdrawl(15, 0, 0))
 
@@ -268,43 +229,6 @@ func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedBtooMuchTick0() {
 	s.assertDexBalances(0, 0)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
-	s.assertMinTick(math.MaxInt64)
-	s.assertMaxTick(math.MinInt64)
-}
-
-func (s *MsgServerTestSuite) TestFullWithdrawalFindNewMaxTickDoS() {
-	s.fundAliceBalances(50, 50)
-	// CASE
-	// Alice deposits 10 of B at tick 0, fee tier 0
-	// Alice then deposits 10 of B at tick 100000 (really large tick)
-	// Alice then removes all of her liquidity from tick 100000
-
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
-
-	s.assertAliceBalances(50, 40)
-	s.assertDexBalances(0, 10)
-	s.assertCurr1To0(math.MinInt64)
-	s.assertCurr0To1(1)
-	s.assertMinTick(math.MaxInt64)
-	s.assertMaxTick(1)
-
-	s.aliceDeposits(NewDeposit(0, 10, 100000, 0))
-
-	s.assertAliceBalances(50, 30)
-	s.assertDexBalances(0, 20)
-	s.assertCurr1To0(math.MinInt64)
-	s.assertCurr0To1(1)
-	s.assertMinTick(math.MaxInt64)
-	s.assertMaxTick(100001)
-
-	s.aliceWithdraws(NewWithdrawl(220154, 100000, 0))
-
-	s.assertAliceBalances(50, 40)
-	s.assertDexBalances(0, 10)
-	s.assertCurr1To0(math.MinInt64)
-	s.assertCurr0To1(1)
-	s.assertMinTick(math.MaxInt64)
-	s.assertMaxTick(1)
 }
 
 func (s *MsgServerTestSuite) TestWithdrawalFailsWhenNotEnoughShares() {
@@ -339,19 +263,7 @@ func (s *MsgServerTestSuite) TestWithdrawalFailsWithNonExistentPair() {
 	// NOTE: As code is currently written we hit not enough shares check
 	// before validating pair existence. This is correct from a
 	// UX perspective --users should not care whether tick is initialized
-	s.Assert().ErrorIs(err, types.ErrValidPairNotFound)
-}
-
-func (s *MsgServerTestSuite) TestWithdrawalFailsWithInvalidTick() {
-	s.fundAliceBalances(100, 0)
-
-	// IF Alice Deposists 100
-	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
-
-	// WHEN Alice tries to withdraw from an invalid tick
-	// NOTE: See above NOTE on error condition from TestFailsWithNonExistentPair
-	err := types.ErrValidTickNotFound
-	s.aliceWithdrawFails(err, NewWithdrawl(50, 10, 0))
+	s.Assert().ErrorIs(err, types.ErrInsufficientShares)
 }
 
 func (s *MsgServerTestSuite) TestWithdrawalFailsWithInvalidFee() {

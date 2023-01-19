@@ -97,18 +97,14 @@
       }
     },
     "dex": {
-      "params": {},
-      "tickMapList": [],
-      "pairMapList": [],
-      "tokensList": [],
-      "tokensCount": "0",
-      "tokenMapList": [],
-      "feeListList": [],
-      "feeListCount": "0",
-      "edgeRowList": [],
-      "edgeRowCount": "0",
-      "adjanceyMatrixList": [],
-      "adjanceyMatrixCount": "0"
+        "params": {},
+        "tickLiquidityList": [],
+        "tradingPairList": [],
+        "tokensList": [],
+        "tokensCount": "0",
+        "tokenMapList": [],
+        "feeTierList": [],
+        "feeTier": "0",
     },
     "distribution": {
       "params": {
