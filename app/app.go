@@ -78,10 +78,10 @@ import (
 	ibctestingcore "github.com/cosmos/interchain-security/legacy_ibc_testing/core"
 	"github.com/ignite/cli/ignite/pkg/openapiconsole"
 	"github.com/spf13/cast"
-	"github.com/tendermint/spm/cosmoscmd"
 	forwardmiddleware "github.com/strangelove-ventures/packet-forward-middleware/v3/router"
 	forwardkeeper "github.com/strangelove-ventures/packet-forward-middleware/v3/router/keeper"
 	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v3/router/types"
+	"github.com/tendermint/spm/cosmoscmd"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	"github.com/tendermint/tendermint/libs/log"
@@ -225,7 +225,7 @@ type App struct {
 
 	DexKeeper     dexmodulekeeper.Keeper
 	SwapKeeper    swapkeeper.Keeper
-	ForwardKeeper forwardkeeper.Keeper
+	ForwardKeeper *forwardkeeper.Keeper
 
 	MevKeeper mevmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
@@ -822,9 +822,11 @@ func (app *App) GetIBCKeeper() *ibckeeper.Keeper {
 }
 
 // // GetStakingKeeper implements the TestingApp interface.
-// func (app *App) GetStakingKeeper() ibcclienttypes.StakingKeeper {
-// 	return app.ConsumerKeeper
-// }
+//
+//	func (app *App) GetStakingKeeper() ibcclienttypes.StakingKeeper {
+//		return app.ConsumerKeeper
+//	}
+//
 // GetStakingKeeper implements the TestingApp interface.
 func (app *App) GetStakingKeeper() ibctestingcore.StakingKeeper {
 	return app.ConsumerKeeper
