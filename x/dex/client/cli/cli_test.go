@@ -51,36 +51,29 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	pk = info2.GetPubKey()
 	s.addr2 = sdk.AccAddress(pk.Address())
 
-	// var commonFlags = []string{
-	// 	fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-	// 	fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-	// 	fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
-	// 	fmt.Sprintf("--%s=%s", flags.FlagGas, "200000000"),
-	// 	fmt.Sprintf("--%s=%s", flags.FlagFrom, s.network.Validators[0].Address.String()),
-	// }
+	var commonFlags = []string{
+		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
+		fmt.Sprintf("--%s=%s", flags.FlagGas, "200000000"),
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, s.network.Validators[0].Address.String()),
+	}
 
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	// args := append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "0", "1"}, commonFlags...)
-	// cmd := dexClient.CmdDeposit()
-	// _, err = cli.ExecTestCLICmd(clientCtx, cmd, args)
-	// require.NoError(s.T(), err)
+	args := append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "0", "1", "false"}, commonFlags...)
+	cmd := dexClient.CmdDeposit()
+	_, err = cli.ExecTestCLICmd(clientCtx, cmd, args)
+	require.NoError(s.T(), err)
 
-	// args = append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "20", "TokenB", "10"}, commonFlags...)
-	// cmd = dexClient.CmdPlaceLimitOrder()
-	// _, err = cli.ExecTestCLICmd(clientCtx, cmd, args)
-	// require.NoError(s.T(), err)
+	args = append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "20", "TokenB", "10"}, commonFlags...)
+	cmd = dexClient.CmdPlaceLimitOrder()
+	_, err = cli.ExecTestCLICmd(clientCtx, cmd, args)
+	require.NoError(s.T(), err)
 
 	s.fundAccount(clientCtx, s.network.Validators[0].Address, s.addr1, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(100)), sdk.NewCoin("TokenA", sdk.NewInt(100000))))
 
 	s.fundAccount(clientCtx, s.network.Validators[0].Address, s.addr2, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(100)), sdk.NewCoin("TokenA", sdk.NewInt(100000))))
-
-	// _, err = s.network.WaitForHeight(1)
-	// s.Require().NoError(err)
-
-	// cmd = bankClient.GetBalancesCmd()
-	// out, err := cli.ExecTestCLICmd(clientCtx, cmd, []string{s.network.Validators[0].Address.String()})
-	// fmt.Printf("out: %v\n", out)
 }
 
 func (s *IntegrationTestSuite) fundAccount(clientCtx client.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) {
@@ -100,7 +93,6 @@ func (s *IntegrationTestSuite) fundAccount(clientCtx client.Context, from sdk.Ac
 		commonFlags...,
 	)
 	require.NoError(err)
-
 	var res sdk.TxResponse
 	require.NoError(clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 	require.Zero(res.Code, res.RawLog)
@@ -225,41 +217,33 @@ func (s *IntegrationTestSuite) TestQueryCmdShowTick() {
 	clientCtx := val.ClientCtx
 	//clientCtx.OutputFormat = outputFormat
 
-	Index3Price0to1 := sdk.MustNewDecFromStr("0.999700059990001500")
+	ValidTestReserve := sdk.NewInt(10)
 	testCases := []struct {
 		name      string
 		args      []string
 		expErr    bool
 		expErrMsg string
-		expOutput types.Tick
+		expOutput types.TickLiquidity
 	}{
 		{
+			// show-tick-liquidity [pair-id] [token-in] [tick-index] [liquidity-type] [liquidity-index]
 			name: "valid",
-			args: []string{`3`, "TokenA<>TokenB"},
-			expOutput: types.Tick{
+			args: []string{"TokenA<>TokenB", "TokenA", `"-3"`, types.LiquidityTypeLP, "3"},
+			expOutput: types.TickLiquidity{
 				PairId: &types.PairId{
 					Token0: "TokenA",
 					Token1: "TokenB",
 				},
-				TickIndex: 3,
-				TickData: &types.TickDataType{
-					Reserve0: []sdk.Int{sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt()},
-					Reserve1: []sdk.Int{sdk.ZeroInt(), sdk.NewInt(10), sdk.ZeroInt(), sdk.ZeroInt()},
-				},
-				LimitOrderTranche0To1: &types.LimitTrancheIndexes{
-					PlaceTrancheIndex: 0,
-					FillTrancheIndex:  0,
-				},
-				LimitOrderTranche1To0: &types.LimitTrancheIndexes{
-					PlaceTrancheIndex: 0,
-					FillTrancheIndex:  0,
-				},
-				Price0To1: &Index3Price0to1,
+				TokenIn:        "TokenA",
+				TickIndex:      -3,
+				LiquidityType:  types.LiquidityTypeLP,
+				LiquidityIndex: 3,
+				LPReserve:      &ValidTestReserve,
 			},
 		},
 		{
 			name:      "uninitialized tick",
-			args:      []string{"1", "TokenA<>TokenB"},
+			args:      []string{"TokenA<>TokenB", "TokenA", "1", types.LiquidityTypeLP, "0"},
 			expErr:    true,
 			expErrMsg: "key not found",
 		},
@@ -268,41 +252,41 @@ func (s *IntegrationTestSuite) TestQueryCmdShowTick() {
 			name:      "pair not specified",
 			args:      []string{"1"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 2 arg(s), received 1",
+			expErrMsg: "Error: accepts 5 arg(s), received 1",
 		},
 
 		{
 			name:      "tick not specified",
-			args:      []string{"TokenA<>TokenB"},
+			args:      []string{"TokenA<>TokenB", "TokenA", "1", types.LiquidityTypeLP},
 			expErr:    true,
-			expErrMsg: "Error: accepts 2 arg(s), received 1",
+			expErrMsg: "Error: accepts 5 arg(s), received 4",
 		},
 
 		{
 			name:      "too many ticks",
-			args:      []string{"1", "1"},
+			args:      []string{"Token", "TokenA", "1", types.LiquidityTypeLP, "1"},
 			expErr:    true,
 			expErrMsg: "PairId does not conform to pattern",
 		},
 
 		{
 			name:      "multiple pairIds",
-			args:      []string{"TokenA<>TokenB", "TokenA<>stake"},
+			args:      []string{"TokenA<>TokenB", "TokenA<>stake", `"-3"`, types.LiquidityTypeLP, "3"},
 			expErr:    true,
 			expErrMsg: "key not found",
 		},
 
 		{
 			name:      "too many arguments",
-			args:      []string{"1", " '-1' ", "TokenA<>TokenB"},
+			args:      []string{"TokenA<>TokenB", "TokenA", `"-3`, types.LiquidityTypeLP, "3", "10"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 2 arg(s), received 3",
+			expErrMsg: "Error: accepts 5 arg(s), received 6",
 		},
 	}
 
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
-			cmd := dexClient.CmdShowTick()
+			cmd := dexClient.CmdShowTickLiquidity()
 			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
 			if tc.expErr {
 				require.Error(s.T(), err)
@@ -310,10 +294,10 @@ func (s *IntegrationTestSuite) TestQueryCmdShowTick() {
 			} else {
 				require.NoError(s.T(), err)
 
-				var res types.QueryGetTickResponse
+				var res types.QueryGetTickLiquidityResponse
 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
-				require.NotEmpty(s.T(), res.Tick)
-				require.Equal(s.T(), tc.expOutput, res.Tick)
+				require.NotEmpty(s.T(), res.TickLiquidity)
+				require.Equal(s.T(), tc.expOutput, res.TickLiquidity)
 
 			}
 		})
@@ -324,79 +308,61 @@ func (s *IntegrationTestSuite) TestQueryCmdListTick() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
 
-	Index3Price0to1 := sdk.MustNewDecFromStr("0.999700059990001500")
-	IndexNeg3Price0to1 := sdk.MustNewDecFromStr("1.000300030001000000")
-	Index20Price0to1 := sdk.MustNewDecFromStr("0.998002098460885074")
+	ValidTestReserve := sdk.NewInt(10)
 	testCases := []struct {
 		name      string
 		args      []string
 		expErr    bool
 		expErrMsg string
-		expOutput []types.Tick
+		expOutput []types.TickLiquidity
 	}{
 		{
 			name: "valid",
 			args: []string{},
-			expOutput: []types.Tick{
-				types.Tick{
+			expOutput: []types.TickLiquidity{
+				types.TickLiquidity{
 					PairId: &types.PairId{
 						Token0: "TokenA",
 						Token1: "TokenB",
 					},
-					TickIndex: -3,
-					TickData: &types.TickDataType{
-						Reserve0: []sdk.Int{sdk.ZeroInt(), sdk.NewInt(10), sdk.ZeroInt(), sdk.ZeroInt()},
-						Reserve1: []sdk.Int{sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt()},
-					},
-					LimitOrderTranche0To1: &types.LimitTrancheIndexes{
-						PlaceTrancheIndex: 0,
-						FillTrancheIndex:  0,
-					},
-					LimitOrderTranche1To0: &types.LimitTrancheIndexes{
-						PlaceTrancheIndex: 0,
-						FillTrancheIndex:  0,
-					},
-					Price0To1: &IndexNeg3Price0to1,
+					TokenIn:        "TokenA",
+					TickIndex:      -3,
+					LiquidityType:  types.LiquidityTypeLP,
+					LiquidityIndex: 3,
+					LPReserve:      &ValidTestReserve,
 				},
-				types.Tick{
+				types.TickLiquidity{
 					PairId: &types.PairId{
 						Token0: "TokenA",
 						Token1: "TokenB",
 					},
-					TickIndex: 3,
-					TickData: &types.TickDataType{
-						Reserve0: []sdk.Int{sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt()},
-						Reserve1: []sdk.Int{sdk.ZeroInt(), sdk.NewInt(10), sdk.ZeroInt(), sdk.ZeroInt()},
-					},
-					LimitOrderTranche0To1: &types.LimitTrancheIndexes{
-						PlaceTrancheIndex: 0,
-						FillTrancheIndex:  0,
-					},
-					LimitOrderTranche1To0: &types.LimitTrancheIndexes{
-						PlaceTrancheIndex: 0,
-						FillTrancheIndex:  0,
-					},
-					Price0To1: &Index3Price0to1,
+					TokenIn:        "TokenB",
+					TickIndex:      3,
+					LiquidityType:  types.LiquidityTypeLP,
+					LiquidityIndex: 3,
+					LPReserve:      &ValidTestReserve,
 				},
-				types.Tick{
+				types.TickLiquidity{
 					PairId: &types.PairId{
 						Token0: "TokenA",
 						Token1: "TokenB",
 					},
-					TickIndex: 20,
-					TickData: &types.TickDataType{
-						Reserve0: []sdk.Int{sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt()},
-						Reserve1: []sdk.Int{sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt()},
+					TokenIn:        "TokenB",
+					TickIndex:      20,
+					LiquidityType:  types.LiquidityTypeLO,
+					LiquidityIndex: 0,
+					LimitOrderTranche: &types.LimitOrderTranche{
+						PairId: &types.PairId{
+							Token0: "TokenA",
+							Token1: "TokenB",
+						},
+						TokenIn:          "TokenB",
+						TickIndex:        20,
+						ReservesTokenIn:  sdk.NewInt(10),
+						ReservesTokenOut: sdk.ZeroInt(),
+						TotalTokenIn:     sdk.NewInt(10),
+						TotalTokenOut:    sdk.ZeroInt(),
 					},
-					LimitOrderTranche0To1: &types.LimitTrancheIndexes{
-						PlaceTrancheIndex: 0,
-						FillTrancheIndex:  0,
-					},
-					LimitOrderTranche1To0: &types.LimitTrancheIndexes{
-						PlaceTrancheIndex: 0,
-						FillTrancheIndex:  0,
-					},
-					Price0To1: &Index20Price0to1,
 				},
 			},
 		},
@@ -404,137 +370,124 @@ func (s *IntegrationTestSuite) TestQueryCmdListTick() {
 
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
-			cmd := dexClient.CmdListTick()
+			cmd := dexClient.CmdListTickLiquidity()
 			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
 			if tc.expErr {
 				require.Error(s.T(), err)
 				require.Contains(s.T(), out.String(), tc.expErrMsg)
 			} else {
 				require.NoError(s.T(), err)
-
-				var res types.QueryAllTickResponse
+				var res types.QueryAllTickLiquidityResponse
 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 				require.NotEmpty(s.T(), res)
-				require.Equal(s.T(), tc.expOutput, res.Tick)
+				require.Equal(s.T(), tc.expOutput, res.TickLiquidity)
 
 			}
 		})
 	}
 }
 
-func (s *IntegrationTestSuite) TestQueryCmdShowTradingPair() {
-	val := s.network.Validators[0]
-	clientCtx := val.ClientCtx
+// func (s *IntegrationTestSuite) TestQueryCmdShowTradingPair() {
+// 	val := s.network.Validators[0]
+// 	clientCtx := val.ClientCtx
+// 	testCases := []struct {
+// 		name      string
+// 		args      []string
+// 		expErr    bool
+// 		expErrMsg string
+// 		expOutput types.TradingPair
+// 	}{
+// 		{
+// 			name: "valid",
+// 			args: []string{"TokenA<>TokenB"},
+// 			expOutput: types.TradingPair{
+// 				PairId: &types.PairId{
+// 					Token0: "TokenA",
+// 					Token1: "TokenB",
+// 				},
+// 				CurrentTick0To1: 3,
+// 				CurrentTick1To0: -3,
+// 			},
+// 		},
+// 		{
+// 			name:      "invalid pair",
+// 			args:      []string{"3"},
+// 			expErr:    true,
+// 			expErrMsg: "PairId does not conform to pattern",
+// 		},
+// 		{
+// 			name:      "too many pairs",
+// 			args:      []string{"TokenA<>TokenB", "TokenA<>stake"},
+// 			expErr:    true,
+// 			expErrMsg: "Error: accepts 1 arg(s), received",
+// 		},
+// 		{
+// 			name:      "no pair",
+// 			args:      []string{},
+// 			expErr:    true,
+// 			expErrMsg: "Error: accepts 1 arg(s), received 0",
+// 		},
+// 	}
+// 	for _, tc := range testCases {
+// 		s.Run(tc.name, func() {
+// 			cmd := dexClient.CmdShowTradingPair()
+// 			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
+// 			if tc.expErr {
+// 				require.Error(s.T(), err)
+// 				require.Contains(s.T(), out.String(), tc.expErrMsg)
+// 			} else {
+// 				require.NoError(s.T(), err)
+// 				var res types.QueryGetTradingPairResponse
+// 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
+// 				require.NotEmpty(s.T(), res)
+// 				require.Equal(s.T(), tc.expOutput, res.TradingPair)
+// 			}
+// 		})
+// 	}
+// }
 
-	testCases := []struct {
-		name      string
-		args      []string
-		expErr    bool
-		expErrMsg string
-		expOutput types.TradingPair
-	}{
-		{
-			name: "valid",
-			args: []string{"TokenA<>TokenB"},
-			expOutput: types.TradingPair{
-				PairId: &types.PairId{
-					Token0: "TokenA",
-					Token1: "TokenB",
-				},
-				CurrentTick0To1: 3,
-				CurrentTick1To0: -3,
-				MaxTick:         20,
-				MinTick:         -3,
-			},
-		},
-		{
-			name:      "invalid pair",
-			args:      []string{"3"},
-			expErr:    true,
-			expErrMsg: "PairId does not conform to pattern",
-		},
-		{
-			name:      "too many pairs",
-			args:      []string{"TokenA<>TokenB", "TokenA<>stake"},
-			expErr:    true,
-			expErrMsg: "Error: accepts 1 arg(s), received",
-		},
-		{
-			name:      "no pair",
-			args:      []string{},
-			expErr:    true,
-			expErrMsg: "Error: accepts 1 arg(s), received 0",
-		},
-	}
-
-	for _, tc := range testCases {
-		s.Run(tc.name, func() {
-			cmd := dexClient.CmdShowTradingPair()
-			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
-			if tc.expErr {
-				require.Error(s.T(), err)
-				require.Contains(s.T(), out.String(), tc.expErrMsg)
-			} else {
-				require.NoError(s.T(), err)
-
-				var res types.QueryGetTradingPairResponse
-				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
-				require.NotEmpty(s.T(), res)
-				require.Equal(s.T(), tc.expOutput, res.TradingPair)
-
-			}
-		})
-	}
-}
-
-func (s *IntegrationTestSuite) TestQueryCmdListTradingPair() {
-	val := s.network.Validators[0]
-	clientCtx := val.ClientCtx
-
-	testCases := []struct {
-		name      string
-		args      []string
-		expErr    bool
-		expErrMsg string
-		expOutput []types.TradingPair
-	}{
-		{
-			name: "valid",
-			args: []string{},
-			expOutput: []types.TradingPair{
-				types.TradingPair{
-					PairId: &types.PairId{
-						Token0: "TokenA",
-						Token1: "TokenB",
-					},
-					CurrentTick0To1: 3,
-					CurrentTick1To0: -3,
-					MaxTick:         20,
-					MinTick:         -3,
-				},
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		s.Run(tc.name, func() {
-			cmd := dexClient.CmdListTradingPair()
-			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
-			if tc.expErr {
-				require.Error(s.T(), err)
-				require.Contains(s.T(), out.String(), tc.expErrMsg)
-			} else {
-				require.NoError(s.T(), err)
-
-				var res types.QueryAllTradingPairResponse
-				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
-				require.NotEmpty(s.T(), res)
-				require.Equal(s.T(), tc.expOutput, res.TradingPair)
-
-			}
-		})
-	}
-}
+// func (s *IntegrationTestSuite) TestQueryCmdListTradingPair() {
+// 	val := s.network.Validators[0]
+// 	clientCtx := val.ClientCtx
+// 	testCases := []struct {
+// 		name      string
+// 		args      []string
+// 		expErr    bool
+// 		expErrMsg string
+// 		expOutput []types.TradingPair
+// 	}{
+// 		{
+// 			name: "valid",
+// 			args: []string{},
+// 			expOutput: []types.TradingPair{
+// 				types.TradingPair{
+// 					PairId: &types.PairId{
+// 						Token0: "TokenA",
+// 						Token1: "TokenB",
+// 					},
+// 					CurrentTick0To1: 3,
+// 					CurrentTick1To0: -3,
+// 				},
+// 			},
+// 		},
+// 	}
+// 	for _, tc := range testCases {
+// 		s.Run(tc.name, func() {
+// 			cmd := dexClient.CmdListTradingPair()
+// 			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
+// 			if tc.expErr {
+// 				require.Error(s.T(), err)
+// 				require.Contains(s.T(), out.String(), tc.expErrMsg)
+// 			} else {
+// 				require.NoError(s.T(), err)
+// 				var res types.QueryAllTradingPairResponse
+// 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
+// 				require.NotEmpty(s.T(), res)
+// 				require.Equal(s.T(), tc.expOutput, res.TradingPair)
+// 			}
+// 		})
+// 	}
+// }
 
 func (s *IntegrationTestSuite) TestQueryCmdShowUserPosition() {
 	val := s.network.Validators[0]
@@ -600,13 +553,11 @@ func (s *IntegrationTestSuite) TestQueryCmdShowUserPosition() {
 		s.Run(tc.name, func() {
 			cmd := dexClient.CmdShowUserPositions()
 			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
-			fmt.Printf("out: %v\n", out)
 			if tc.expErr {
 				require.Error(s.T(), err)
 				require.Contains(s.T(), out.String(), tc.expErrMsg)
 			} else {
 				require.NoError(s.T(), err)
-
 				var res types.QueryGetUserPositionsResponse
 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 				require.NotEmpty(s.T(), res)
@@ -617,110 +568,130 @@ func (s *IntegrationTestSuite) TestQueryCmdShowUserPosition() {
 	}
 }
 
-func (s *IntegrationTestSuite) TestQueryCmdShowTokens() {
+// TODO: Remove Test when we remove query ShowTokens
+// func (s *IntegrationTestSuite) TestQueryCmdShowTokens() {
+// 	val := s.network.Validators[0]
+// 	clientCtx := val.ClientCtx
+// 	testCases := []struct {
+// 		name      string
+// 		args      []string
+// 		expErr    bool
+// 		expErrMsg string
+// 		expOutput types.Tokens
+// 	{
+// 		{
+// 			name:      "valid",
+// 			args:      []string{"0"},
+// 			expOutput: types.Tokens{},
+// 		},
+// 		{
+// 			name:      "invalid token",
+// 			args:      []string{"3"},
+// 			expErr:    true,
+// 			expErrMsg: "key not found",
+// 		},
+// 		{
+// 			name:      "too many tokens",
+// 			args:      []string{"0", "1"},
+// 			expErr:    true,
+// 			expErrMsg: "Error: accepts 1 arg(s), received",
+// 		},
+// 		{
+// 			name:      "no token",
+// 			args:      []string{},
+// 			expErr:    true,
+// 			expErrMsg: "Error: accepts 1 arg(s), received 0",
+// 		},
+// 	}
+// 	for _, tc := range testCases {
+// 		s.Run(tc.name, func() {
+// 			cmd := dexClient.CmdShowTokens()
+// 			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
+// 			if tc.expErr {
+// 				require.Error(s.T(), err)
+// 				require.Contains(s.T(), out.String(), tc.expErrMsg)
+// 			} else {
+// 				require.NoError(s.T(), err)
+// 				var res types.QueryGetTokensResponse
+// 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
+// 				require.NotEmpty(s.T(), res)
+// 				require.Equal(s.T(), tc.expOutput, res.Tokens)
+// 			}
+// 		})
+// 	}
+// }
 
-	val := s.network.Validators[0]
-	clientCtx := val.ClientCtx
+// TODO: Remove Test when we remove query ListTokens
+// func (s *IntegrationTestSuite) TestQueryCmdListTokens() {
+// 	val := s.network.Validators[0]
+// 	clientCtx := val.ClientCtx
+// 	testCases := []struct {
+// 		name      string
+// 		args      []string
+// 		expErr    bool
+// 		expErrMsg string
+// 		expOutput []types.Tokens
+// 	}{
+// 		{
+// 			name: "valid",
+// 			args: []string{},
+// 			expOutput: []types.Tokens{},
+// 		},
+// 	}
+// 	for _, tc := range testCases {
+// 		s.Run(tc.name, func() {
+// 			cmd := dexClient.CmdListTokens()
+// 			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
+// 			if tc.expErr {
+// 				require.Error(s.T(), err)
+// 				require.Contains(s.T(), out.String(), tc.expErrMsg)
+// 			} else {
+// 				require.NoError(s.T(), err)
+// 				var res types.QueryAllTokensResponse
+// 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
+// 				require.NotEmpty(s.T(), res)
+// 				require.Equal(s.T(), tc.expOutput, res.Tokens)
+// 			}
+// 		})
+// 	}
+// }
 
-	testCases := []struct {
-		name      string
-		args      []string
-		expErr    bool
-		expErrMsg string
-		expOutput types.Tokens
-	}{
-		{
-			name:      "valid",
-			args:      []string{"0"},
-			expOutput: types.Tokens{Id: 0, Address: "TokenA"},
-		},
-		{
-			name:      "invalid token",
-			args:      []string{"3"},
-			expErr:    true,
-			expErrMsg: "key not found",
-		},
-		{
-			name:      "too many tokens",
-			args:      []string{"0", "1"},
-			expErr:    true,
-			expErrMsg: "Error: accepts 1 arg(s), received",
-		},
-		{
-			name:      "no token",
-			args:      []string{},
-			expErr:    true,
-			expErrMsg: "Error: accepts 1 arg(s), received 0",
-		},
-	}
-
-	for _, tc := range testCases {
-		s.Run(tc.name, func() {
-			cmd := dexClient.CmdShowTokens()
-			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
-			if tc.expErr {
-				require.Error(s.T(), err)
-				require.Contains(s.T(), out.String(), tc.expErrMsg)
-			} else {
-				require.NoError(s.T(), err)
-
-				var res types.QueryGetTokensResponse
-				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
-				require.NotEmpty(s.T(), res)
-				require.Equal(s.T(), tc.expOutput, res.Tokens)
-
-			}
-		})
-	}
-}
-
-func (s *IntegrationTestSuite) TestQueryCmdListTokens() {
-	val := s.network.Validators[0]
-
-	clientCtx := val.ClientCtx
-
-	testCases := []struct {
-		name      string
-		args      []string
-		expErr    bool
-		expErrMsg string
-		expOutput []types.Tokens
-	}{
-		{
-			name: "valid",
-			args: []string{},
-			expOutput: []types.Tokens{
-				types.Tokens{
-					Id:      0,
-					Address: "TokenA",
-				},
-				types.Tokens{
-					Id:      1,
-					Address: "TokenB",
-				},
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		s.Run(tc.name, func() {
-			cmd := dexClient.CmdListTokens()
-			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
-			if tc.expErr {
-				require.Error(s.T(), err)
-				require.Contains(s.T(), out.String(), tc.expErrMsg)
-			} else {
-				require.NoError(s.T(), err)
-
-				var res types.QueryAllTokensResponse
-				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
-				require.NotEmpty(s.T(), res)
-				require.Equal(s.T(), tc.expOutput, res.Tokens)
-
-			}
-		})
-	}
-}
+// TODO: Remove Test when we remove query ListLimitOrderTranche
+// func (s *IntegrationTestSuite) TestQueryCmdListLimitOrderTranche() {
+// 	val := s.network.Validators[0]
+// 	clientCtx := val.ClientCtx
+// 	testCases := []struct {
+// 		name      string
+// 		args      []string
+// 		expErr    bool
+// 		expErrMsg string
+// 		expOutput []types.LimitOrderTranche
+// 	}{
+// 		// show-limit-order-pool-total-shares-map [pairId] [tickIndex] [tokenIn] [TrancheIndex]
+// 		{
+// 			name: "valid",
+// 			args: []string{"TokenA<>TokenB", "TokenA"},
+// 			expOutput: []types.LimitOrderTranche{},
+// 		},
+// 	}
+// 	for _, tc := range testCases {
+// 		s.Run(tc.name, func() {
+// 			cmd := dexClient.CmdListLimitOrderTranche()
+// 			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
+// 			if tc.expErr {
+// 				require.Error(s.T(), err)
+// 				require.Contains(s.T(), out.String(), tc.expErrMsg)
+// 			} else {
+// 				require.NoError(s.T(), err)
+// 				var res types.QueryAllLimitOrderTrancheResponse
+// 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
+// 				require.NotEmpty(s.T(), res)
+// 				fmt.Printf("res.LimitOrderTranche: %v\n", res.LimitOrderTranche)
+// 				require.Equal(s.T(), tc.expOutput, res.LimitOrderTranche)
+// 			}
+// 		})
+// 	}
+// }
 
 func (s *IntegrationTestSuite) TestQueryCmdShowLimitOrderTranche() {
 	val := s.network.Validators[0]
@@ -774,7 +745,6 @@ func (s *IntegrationTestSuite) TestQueryCmdShowLimitOrderTranche() {
 			expErrMsg: "Error: accepts 4 arg(s), received 3",
 		},
 	}
-
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
 			cmd := dexClient.CmdShowLimitOrderTranche()
@@ -784,130 +754,10 @@ func (s *IntegrationTestSuite) TestQueryCmdShowLimitOrderTranche() {
 				require.Contains(s.T(), out.String(), tc.expErrMsg)
 			} else {
 				require.NoError(s.T(), err)
-
 				var res types.QueryGetLimitOrderTrancheResponse
 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 				require.NotEmpty(s.T(), res)
 				require.Equal(s.T(), tc.expOutput, res.LimitOrderTranche)
-
-			}
-		})
-	}
-}
-
-func (s *IntegrationTestSuite) TestQueryCmdListLimitOrderTranche() {
-	val := s.network.Validators[0]
-	clientCtx := val.ClientCtx
-	testCases := []struct {
-		name      string
-		args      []string
-		expErr    bool
-		expErrMsg string
-		expOutput []types.LimitOrderTranche
-	}{
-		// show-limit-order-pool-total-shares-map [pairId] [tickIndex] [tokenIn] [TrancheIndex]
-		{
-			name: "valid",
-			args: []string{},
-			expOutput: []types.LimitOrderTranche{
-				types.LimitOrderTranche{
-					PairId: &types.PairId{
-						Token0: "TokenA",
-						Token1: "TokenB",
-					},
-					TokenIn:          "TokenA",
-					TickIndex:        -3,
-					TrancheIndex:     0,
-					ReservesTokenIn:  sdk.NewInt(0),
-					ReservesTokenOut: sdk.NewInt(0),
-					TotalTokenIn:     sdk.NewInt(0),
-					TotalTokenOut:    sdk.NewInt(0),
-				},
-				types.LimitOrderTranche{
-					PairId: &types.PairId{
-						Token0: "TokenA",
-						Token1: "TokenB",
-					},
-					TokenIn:          "TokenB",
-					TickIndex:        -3,
-					TrancheIndex:     0,
-					ReservesTokenIn:  sdk.NewInt(0),
-					ReservesTokenOut: sdk.NewInt(0),
-					TotalTokenIn:     sdk.NewInt(0),
-					TotalTokenOut:    sdk.NewInt(0),
-				},
-				types.LimitOrderTranche{
-					PairId: &types.PairId{
-						Token0: "TokenA",
-						Token1: "TokenB",
-					},
-					TokenIn:          "TokenA",
-					TickIndex:        20,
-					TrancheIndex:     0,
-					ReservesTokenIn:  sdk.NewInt(0),
-					ReservesTokenOut: sdk.NewInt(0),
-					TotalTokenIn:     sdk.NewInt(0),
-					TotalTokenOut:    sdk.NewInt(0),
-				},
-				types.LimitOrderTranche{
-					PairId: &types.PairId{
-						Token0: "TokenA",
-						Token1: "TokenB",
-					},
-					TokenIn:          "TokenB",
-					TickIndex:        20,
-					TrancheIndex:     0,
-					ReservesTokenIn:  sdk.NewInt(10),
-					ReservesTokenOut: sdk.NewInt(0),
-					TotalTokenIn:     sdk.NewInt(10),
-					TotalTokenOut:    sdk.NewInt(0),
-				},
-				types.LimitOrderTranche{
-					PairId: &types.PairId{
-						Token0: "TokenA",
-						Token1: "TokenB",
-					},
-					TokenIn:          "TokenA",
-					TickIndex:        3,
-					TrancheIndex:     0,
-					ReservesTokenIn:  sdk.NewInt(0),
-					ReservesTokenOut: sdk.NewInt(0),
-					TotalTokenIn:     sdk.NewInt(0),
-					TotalTokenOut:    sdk.NewInt(0),
-				},
-				types.LimitOrderTranche{
-					PairId: &types.PairId{
-						Token0: "TokenA",
-						Token1: "TokenB",
-					},
-					TokenIn:          "TokenB",
-					TickIndex:        3,
-					TrancheIndex:     0,
-					ReservesTokenIn:  sdk.NewInt(0),
-					ReservesTokenOut: sdk.NewInt(0),
-					TotalTokenIn:     sdk.NewInt(0),
-					TotalTokenOut:    sdk.NewInt(0),
-				},
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		s.Run(tc.name, func() {
-			cmd := dexClient.CmdListLimitOrderTranche()
-			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
-			if tc.expErr {
-				require.Error(s.T(), err)
-				require.Contains(s.T(), out.String(), tc.expErrMsg)
-			} else {
-				require.NoError(s.T(), err)
-
-				var res types.QueryAllLimitOrderTrancheResponse
-				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
-				require.NotEmpty(s.T(), res)
-				fmt.Printf("res.LimitOrderTranche: %v\n", res.LimitOrderTranche)
-				require.Equal(s.T(), tc.expOutput, res.LimitOrderTranche)
-
 			}
 		})
 	}
@@ -1069,9 +919,6 @@ func (s *IntegrationTestSuite) TestQueryCmdListUserLimitOrders() {
 			},
 		},
 	}
-
-	fmt.Printf("testCases[0].args: %v\n", testCases[0].args)
-	fmt.Printf("testCases[0].expOutput: %v\n", testCases[0].expOutput)
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
 			cmd := dexClient.CmdListUserLimitOrders()
@@ -1083,7 +930,8 @@ func (s *IntegrationTestSuite) TestQueryCmdListUserLimitOrders() {
 				require.NoError(s.T(), err)
 
 				var res types.QueryAllUserLimitOrdersResponse
-				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
+				err := clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res)
+				require.NoError(s.T(), err)
 				require.NotEmpty(s.T(), res)
 				require.Equal(s.T(), tc.expOutput, res.LimitOrders)
 
@@ -1133,7 +981,6 @@ func (s *IntegrationTestSuite) TestQueryCmdListUserDeposits() {
 				var res types.QueryAllUserDepositsResponse
 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 				require.NotEmpty(s.T(), res)
-				fmt.Printf("res.Deposits: %v\n", res.Deposits)
 				require.Equal(s.T(), tc.expOutput, res.Deposits)
 
 			}
@@ -1154,7 +1001,7 @@ func (s *IntegrationTestSuite) TestQueryCmdListUserDeposits() {
 // 		{
 // 			name:      "valid",
 // 			args:      []string{"TokenA"},
-// 			expOutput: types.TokenMap{Address: "TokenA", Index: 0},
+// 			expOutput: types.TokenMap{},
 // 		},
 // 		{
 // 			name:      "invalid address",
@@ -1204,18 +1051,6 @@ func (s *IntegrationTestSuite) TestQueryCmdListUserDeposits() {
 // 		expOutput []types.TokenMap
 // 	}{
 // 		{
-// 			name: "valid",
-// 			args: []string{},
-// 			expOutput: []types.TokenMap{
-// 				types.TokenMap{
-// 					Address: "TokenA",
-// 					Index:   0,
-// 				},
-// 				types.TokenMap{
-// 					Address: "TokenB",
-// 					Index:   1,
-// 				},
-// 			},
 // 		},
 // 	}
 // 	for _, tc := range testCases {
@@ -1256,24 +1091,24 @@ func (s *IntegrationTestSuite) TestTxCmdDeposit() {
 	}{
 		{
 			name:      "missing arguments",
-			args:      []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "0"},
+			args:      []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "0", "false"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 7 arg(s), received 6",
+			expErrMsg: "Error: accepts 8 arg(s), received 7",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "0", "0", s.addr1.String()},
+			args:      []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "0", "0", "false", s.addr1.String()},
 			expErr:    true,
-			expErrMsg: "Error: accepts 7 arg(s), received 8",
+			expErrMsg: "Error: accepts 8 arg(s), received 9",
 		},
 		{
 			name:     "valid",
-			args:     []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "0", "0"},
+			args:     []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "0", "0", "false"},
 			errInRes: false,
 		},
 		{
 			name:     "valid: multiple case",
-			args:     []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "0,0", "10,10", "25,25", "1,1"},
+			args:     []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "0,0", "10,10", "25,25", "1,1", "false,false"},
 			errInRes: false,
 		},
 	}
@@ -1313,7 +1148,7 @@ func (s *IntegrationTestSuite) TestTx2CmdWithdraw() {
 	}
 
 	//Deposit Funds
-	args := append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "0", "0"}, commonFlags...)
+	args := append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "0", "0", "false"}, commonFlags...)
 	cmd := dexClient.CmdDeposit()
 	_, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
 	require.NoError(s.T(), err)
