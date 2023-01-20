@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-	"github.com/NicholasDotSol/duality/x/dex/types"
+	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"

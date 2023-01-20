@@ -5,10 +5,10 @@ import (
 
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 type (

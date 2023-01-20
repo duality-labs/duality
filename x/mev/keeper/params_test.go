@@ -3,8 +3,8 @@ package keeper_test
 import (
 	"testing"
 
-	testkeeper "github.com/NicholasDotSol/duality/testutil/keeper"
-	"github.com/NicholasDotSol/duality/x/mev/types"
+	testkeeper "github.com/duality-labs/duality/testutil/keeper"
+	"github.com/duality-labs/duality/x/mev/types"
 	"github.com/stretchr/testify/require"
 )
 

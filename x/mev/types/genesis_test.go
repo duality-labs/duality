@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	"github.com/NicholasDotSol/duality/x/mev/types"
+	"github.com/duality-labs/duality/x/mev/types"
 	"github.com/stretchr/testify/require"
 )
 

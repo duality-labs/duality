@@ -3,13 +3,13 @@ package testutil
 import (
 	"time"
 
-	"github.com/NicholasDotSol/duality/app"
 	ibctypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
 	"github.com/cosmos/ibc-go/v3/modules/core/23-commitment/types"
 	ibctmtypes "github.com/cosmos/ibc-go/v3/modules/light-clients/07-tendermint/types"
 	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
 	ccvprovidertypes "github.com/cosmos/interchain-security/x/ccv/provider/types"
 	typesccv "github.com/cosmos/interchain-security/x/ccv/types"
+	"github.com/duality-labs/duality/app"
 )
 
 // This function creates consumer module genesis state that is used as starting point for modifications

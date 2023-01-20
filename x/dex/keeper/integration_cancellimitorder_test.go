@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"math"
 
-	"github.com/NicholasDotSol/duality/x/dex/types"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 func (s *MsgServerTestSuite) TestCancelEntireLimitOrderAOneExists() {

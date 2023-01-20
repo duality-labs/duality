@@ -1,9 +1,9 @@
 package mev
 
 import (
-	"github.com/NicholasDotSol/duality/x/mev/keeper"
-	"github.com/NicholasDotSol/duality/x/mev/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/mev/keeper"
+	"github.com/duality-labs/duality/x/mev/types"
 )
 
 // InitGenesis initializes the capability module's state from a provided genesis

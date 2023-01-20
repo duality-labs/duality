@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/NicholasDotSol/duality/testutil"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
@@ -13,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
+	"github.com/duality-labs/duality/testutil"
 	"github.com/spf13/cobra"
 	types1 "github.com/tendermint/tendermint/abci/types"
 	pvm "github.com/tendermint/tendermint/privval"

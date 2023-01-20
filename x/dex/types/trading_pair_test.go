@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	dualityapp "github.com/NicholasDotSol/duality/app"
-	. "github.com/NicholasDotSol/duality/x/dex/types"
+	dualityapp "github.com/duality-labs/duality/app"
+	. "github.com/duality-labs/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"

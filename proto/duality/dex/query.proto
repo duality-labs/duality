@@ -1,5 +1,5 @@
 syntax = "proto3";
-package nicholasdotsol.duality.dex;
+package dualitylabs.duality.dex;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
@@ -16,97 +16,97 @@ import "duality/dex/user_positions.proto";
 import "duality/dex/deposit_record.proto";
 // this line is used by starport scaffolding # 1
 
-option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+option go_package = "github.com/duality-labs/duality/x/dex/types";
 
 // Query defines the gRPC querier service.
 service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/NicholasDotSol/duality/dex/params";
+    option (google.api.http).get = "/dualitylabs/duality/dex/params";
   }
   // Queries a Tick by index.
 	rpc Tick(QueryGetTickRequest) returns (QueryGetTickResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick/{pairId}/{tickIndex}";
+		option (google.api.http).get = "/dualitylabs/duality/dex/tick/{pairId}/{tickIndex}";
 	}
 
 	// Queries a list of Tick items.
 	rpc TickAll(QueryAllTickRequest) returns (QueryAllTickResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/tick";
+		option (google.api.http).get = "/dualitylabs/duality/dex/tick";
 	}
 
 // Queries a TradingPair by index.
 	rpc TradingPair(QueryGetTradingPairRequest) returns (QueryGetTradingPairResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/trading_pair/{pairId}";
+		option (google.api.http).get = "/dualitylabs/duality/dex/trading_pair/{pairId}";
 	}
 
 	// Queries a list of TradingPair items.
 	rpc TradingPairAll(QueryAllTradingPairRequest) returns (QueryAllTradingPairResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/trading_pair";
+		option (google.api.http).get = "/dualitylabs/duality/dex/trading_pair";
 	}
 
 // Queries a Tokens by id.
 	rpc Tokens(QueryGetTokensRequest) returns (QueryGetTokensResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/tokens/{id}";
+		option (google.api.http).get = "/dualitylabs/duality/dex/tokens/{id}";
 	}
 
 	// Queries a list of Tokens items.
 	rpc TokensAll(QueryAllTokensRequest) returns (QueryAllTokensResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/tokens";
+		option (google.api.http).get = "/dualitylabs/duality/dex/tokens";
 	}
 
 // Queries a TokenMap by index.
 	rpc TokenMap(QueryGetTokenMapRequest) returns (QueryGetTokenMapResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/token_map/{address}";
+		option (google.api.http).get = "/dualitylabs/duality/dex/token_map/{address}";
 	}
 
 	// Queries a list of TokenMap items.
 	rpc TokenMapAll(QueryAllTokenMapRequest) returns (QueryAllTokenMapResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/token_map";
+		option (google.api.http).get = "/dualitylabs/duality/dex/token_map";
 	}
 
 // Queries a FeeTier by id.
 	rpc FeeTier(QueryGetFeeTierRequest) returns (QueryGetFeeTierResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/fee_tier/{id}";
+		option (google.api.http).get = "/dualitylabs/duality/dex/fee_tier/{id}";
 	}
 
 	// Queries a list of FeeTier items.
 	rpc FeeTierAll(QueryAllFeeTierRequest) returns (QueryAllFeeTierResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/fee_tier";
+		option (google.api.http).get = "/dualitylabs/duality/dex/fee_tier";
 	}
 
   // Queries a LimitOrderTrancheUser by index.
 	rpc LimitOrderTrancheUser(QueryGetLimitOrderTrancheUserRequest) returns (QueryGetLimitOrderTrancheUserResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{count}/{address}";
+		option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{count}/{address}";
 	}
 
 	// Queries a list of LimitOrderTrancheMap items.
 	rpc LimitOrderTrancheUserAll(QueryAllLimitOrderTrancheUserRequest) returns (QueryAllLimitOrderTrancheUserResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_tranche_user";
+		option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche_user";
 	}
 
   // Queries a LimitOrderTranche by index.
 	rpc LimitOrderTranche(QueryGetLimitOrderTrancheRequest) returns (QueryGetLimitOrderTrancheResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_tranche/{pairId}/{token}/{tickIndex}/{trancheIndex}";
+  	option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche/{pairId}/{token}/{tickIndex}/{trancheIndex}";
 	}
 
-	// Queries a list of LimitOrderTranche items.
+  // Queries a list of LimitOrderTranche items for a given pairId / TokenIn combination.
 	rpc LimitOrderTrancheAll(QueryAllLimitOrderTrancheRequest) returns (QueryAllLimitOrderTrancheResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/limit_order_tranche";
+  	option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche";
 	}
 
 // Queries a list of GetUserPositions items.
 	rpc GetUserPositions(QueryGetUserPositionsRequest) returns (QueryGetUserPositionsResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/user/positions/{address}";
+		option (google.api.http).get = "/dualitylabs/duality/dex/user/positions/{address}";
 	}
 
 // Queries a list of UserDeposits items.
 	rpc UserDepositsAll(QueryAllUserDepositsRequest) returns (QueryAllUserDepositsResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/user/deposits/{address}";
+		option (google.api.http).get = "/dualitylabs/duality/dex/user/deposits/{address}";
 	}
 
 // Queries a list of UserLimitOrders items.
 	rpc UserLimitOrdersAll(QueryAllUserLimitOrdersRequest) returns (QueryAllUserLimitOrdersResponse) {
-		option (google.api.http).get = "/NicholasDotSol/duality/dex/user/limit_orders/{address}";
+		option (google.api.http).get = "/dualitylabs/duality/dex/user/limit_orders/{address}";
 	}
 
 // this line is used by starport scaffolding # 2

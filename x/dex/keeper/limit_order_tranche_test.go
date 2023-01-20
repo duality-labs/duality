@@ -4,10 +4,10 @@ import (
 	"strconv"
 	"testing"
 
-	keepertest "github.com/NicholasDotSol/duality/testutil/keeper"
-	"github.com/NicholasDotSol/duality/testutil/nullify"
-	"github.com/NicholasDotSol/duality/x/dex/keeper"
-	"github.com/NicholasDotSol/duality/x/dex/types"
+	keepertest "github.com/duality-labs/duality/testutil/keeper"
+	"github.com/duality-labs/duality/testutil/nullify"
+	"github.com/duality-labs/duality/x/dex/keeper"
+	"github.com/duality-labs/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )

@@ -4,11 +4,11 @@ import (
 	"math"
 
 	//"time"
-	//. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
-	//"github.com/NicholasDotSol/duality/x/dex/types"
+	//. "github.com/duality-labs/duality/x/dex/keeper/internal/testutils"
+	//"github.com/duality-labs/duality/x/dex/types"
 
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 func (s *MsgServerTestSuite) TestPartialWithdrawOnlyA() {

@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/NicholasDotSol/duality/x/mev/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/mev/types"
 )
 
 func (k msgServer) Send(goCtx context.Context, msg *types.MsgSend) (*types.MsgSendResponse, error) {

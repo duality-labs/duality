@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"testing"
 
-	dualityapp "github.com/NicholasDotSol/duality/app"
-	"github.com/NicholasDotSol/duality/x/dex/keeper"
-	. "github.com/NicholasDotSol/duality/x/dex/keeper"
-	. "github.com/NicholasDotSol/duality/x/dex/keeper/internal/testutils"
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	dualityapp "github.com/duality-labs/duality/app"
+	"github.com/duality-labs/duality/x/dex/keeper"
+	. "github.com/duality-labs/duality/x/dex/keeper"
+	. "github.com/duality-labs/duality/x/dex/keeper/internal/testutils"
+	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/suite"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
@@ -261,7 +261,7 @@ type Deposit struct {
 }
 
 type DepositOptions struct {
-	Autoswap  bool
+	Autoswap bool
 }
 
 type DepositWithOptions struct {
@@ -287,14 +287,13 @@ func NewDepositWithOptions(amountA int, amountB int, tickIndex int, feeIndex int
 		AmountB:   sdk.NewInt(int64(amountB)),
 		TickIndex: int64(tickIndex),
 		FeeIndex:  uint64(feeIndex),
-		Options: options,
+		Options:   options,
 	}
 }
 
 func (s *MsgServerTestSuite) aliceDeposits(deposits ...*Deposit) {
 	s.deposits(s.alice, deposits...)
 }
-
 
 func (s *MsgServerTestSuite) aliceDepositsWithOptions(deposits ...*DepositWithOptions) {
 	s.depositsWithOptions(s.alice, deposits...)
@@ -335,11 +334,10 @@ func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits ...*Depos
 		AmountsB:    amountsB,
 		TickIndexes: tickIndexes,
 		FeeIndexes:  feeIndexes,
-		Options: options,
+		Options:     options,
 	})
 	s.Assert().Nil(err)
 }
-
 
 func (s *MsgServerTestSuite) depositsWithOptions(account sdk.AccAddress, deposits ...*DepositWithOptions) {
 	amountsA := make([]sdk.Int, len(deposits))
@@ -353,7 +351,7 @@ func (s *MsgServerTestSuite) depositsWithOptions(account sdk.AccAddress, deposit
 		tickIndexes[i] = e.TickIndex
 		feeIndexes[i] = e.FeeIndex
 		options[i] = &types.DepositOptions{
-			Autoswap : e.Options.Autoswap,
+			Autoswap: e.Options.Autoswap,
 		}
 	}
 
@@ -366,14 +364,14 @@ func (s *MsgServerTestSuite) depositsWithOptions(account sdk.AccAddress, deposit
 		AmountsB:    amountsB,
 		TickIndexes: tickIndexes,
 		FeeIndexes:  feeIndexes,
-		Options: options,
+		Options:     options,
 	})
 	s.Assert().Nil(err)
 }
 
 func (s *MsgServerTestSuite) calcAutoswapSharesMinted(centerTick int64, feeIndex uint64, _residual0 int64, _residual1 int64, _balanced0 int64, _balanced1 int64, _totalShares int64, _valuePool int64) sdk.Int {
 	residual0, residual1, balanced0, balanced1, totalShares, valuePool := sdk.NewInt(_residual0), sdk.NewInt(_residual1), sdk.NewInt(_balanced0), sdk.NewInt(_balanced1), sdk.NewInt(_totalShares), sdk.NewInt(_valuePool)
-	
+
 	// residualValue = 1.0001^-f * residualAmount0 + 1.0001^{i-f} * residualAmount1
 	// balancedValue = balancedAmount0 + 1.0001^{i} * balancedAmount1
 	// value = residualValue + balancedValue
@@ -468,7 +466,7 @@ func (s *MsgServerTestSuite) assertDepositFails(account sdk.AccAddress, expected
 		AmountsB:    amountsB,
 		TickIndexes: tickIndexes,
 		FeeIndexes:  feeIndexes,
-		Options: options,
+		Options:     options,
 	})
 	s.Assert().NotNil(err)
 	s.Assert().ErrorIs(err, expectedErr)

@@ -11,14 +11,14 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/NicholasDotSol/duality/x/dex/client/cli"
-	"github.com/NicholasDotSol/duality/x/dex/keeper"
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/duality-labs/duality/x/dex/client/cli"
+	"github.com/duality-labs/duality/x/dex/keeper"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 var (

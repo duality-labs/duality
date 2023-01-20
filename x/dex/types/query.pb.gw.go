@@ -1844,41 +1844,41 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "params"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "params"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Tick_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"NicholasDotSol", "duality", "dex", "tick", "pairId", "tickIndex"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Tick_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "dex", "tick", "pairId", "tickIndex"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_TickAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "tick"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_TickAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "tick"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_TradingPair_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"NicholasDotSol", "duality", "dex", "trading_pair", "pairId"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_TradingPair_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"dualitylabs", "duality", "dex", "trading_pair", "pairId"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_TradingPairAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "trading_pair"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_TradingPairAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "trading_pair"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Tokens_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"NicholasDotSol", "duality", "dex", "tokens", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Tokens_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"dualitylabs", "duality", "dex", "tokens", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_TokensAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "tokens"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_TokensAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "tokens"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_TokenMap_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"NicholasDotSol", "duality", "dex", "token_map", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_TokenMap_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"dualitylabs", "duality", "dex", "token_map", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_TokenMapAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "token_map"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_TokenMapAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "token_map"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_FeeTier_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"NicholasDotSol", "duality", "dex", "fee_tier", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_FeeTier_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"dualitylabs", "duality", "dex", "fee_tier", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_FeeTierAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "fee_tier"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_FeeTierAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "fee_tier"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_LimitOrderTrancheUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"NicholasDotSol", "duality", "dex", "limit_order_tranche_user", "pairId", "token", "tickIndex", "count", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LimitOrderTrancheUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche_user", "pairId", "token", "tickIndex", "count", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_LimitOrderTrancheUserAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "limit_order_tranche_user"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LimitOrderTrancheUserAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche_user"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_LimitOrderTranche_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"NicholasDotSol", "duality", "dex", "limit_order_tranche", "pairId", "token", "tickIndex", "trancheIndex"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LimitOrderTranche_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche", "pairId", "token", "tickIndex", "trancheIndex"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_LimitOrderTrancheAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"NicholasDotSol", "duality", "dex", "limit_order_tranche"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LimitOrderTrancheAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetUserPositions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"NicholasDotSol", "duality", "dex", "user", "positions", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetUserPositions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "dex", "user", "positions", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_UserDepositsAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"NicholasDotSol", "duality", "dex", "user", "deposits", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_UserDepositsAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "dex", "user", "deposits", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_UserLimitOrdersAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"NicholasDotSol", "duality", "dex", "user", "limit_orders", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_UserLimitOrdersAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "dex", "user", "limit_orders", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

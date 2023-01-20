@@ -3,8 +3,8 @@ package keeper
 import (
 	"context"
 
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 type Pool struct {
@@ -142,7 +142,6 @@ func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.I
 		maxAmount1,
 	)
 
-
 	if inAmount0.Equal(sdk.ZeroInt()) && inAmount1.Equal(sdk.ZeroInt()) {
 		return sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt()
 	}
@@ -154,12 +153,12 @@ func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.I
 		inAmount0,
 		inAmount1,
 	)
-	
+
 	if autoswap {
 		residualAmount0 := maxAmount0.Sub(inAmount0)
 		residualAmount1 := maxAmount1.Sub(inAmount1)
 
-		// NOTE: Currently not doing anything with the error, but added error handling to all of the new functions for autoswap. 
+		// NOTE: Currently not doing anything with the error, but added error handling to all of the new functions for autoswap.
 		// Open to changing it however.
 		residualShares, _ := p.CalcResidualSharesMinted(
 			*lowerReserve0,
@@ -168,7 +167,7 @@ func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.I
 			residualAmount0,
 			residualAmount1,
 		)
-		
+
 		outShares = outShares.Add(residualShares)
 
 		inAmount0 = maxAmount0
@@ -253,7 +252,7 @@ func CalcResidualValue(amount0 sdk.Int, amount1 sdk.Int, priceLower1To0 sdk.Dec,
 	return (amount0Dec.Mul(amount0Discount)).Add(amount1Dec.Mul(priceLower1To0)), nil
 }
 
-func CalcFee(upperTickIndex int64, lowerTickIndex int64) (int64) {
+func CalcFee(upperTickIndex int64, lowerTickIndex int64) int64 {
 	return (upperTickIndex - lowerTickIndex) / 2
 }
 

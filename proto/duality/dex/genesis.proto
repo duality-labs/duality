@@ -1,5 +1,5 @@
 syntax = "proto3";
-package nicholasdotsol.duality.dex;
+package dualitylabs.duality.dex;
 
 import "gogoproto/gogo.proto";
 import "duality/dex/params.proto";
@@ -12,7 +12,7 @@ import "duality/dex/limit_order_tranche_user.proto";
 import "duality/dex/limit_order_tranche.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
-option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+option go_package = "github.com/duality-labs/duality/x/dex/types";
 
 // GenesisState defines the dex module's genesis state.
 message GenesisState {
