@@ -20,22 +20,24 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 			msg: MsgWithdrawl{
 				Creator:        "invalid_address",
 				Receiver:       sample.AccAddress(),
-				FeeIndexes:     []uint64{},
-				TickIndexes:    []int64{},
-				SharesToRemove: []sdk.Int{},
+				FeeIndexes:     []uint64{0},
+				TickIndexes:    []int64{0},
+				SharesToRemove: []sdk.Int{sdk.OneInt()},
 			},
 			err: sdkerrors.ErrInvalidAddress,
-		}, {
+		},
+		{
 			name: "invalid receiver",
 			msg: MsgWithdrawl{
 				Creator:        sample.AccAddress(),
 				Receiver:       "invalid_address",
-				FeeIndexes:     []uint64{},
-				TickIndexes:    []int64{},
-				SharesToRemove: []sdk.Int{},
+				FeeIndexes:     []uint64{0},
+				TickIndexes:    []int64{0},
+				SharesToRemove: []sdk.Int{sdk.OneInt()},
 			},
 			err: sdkerrors.ErrInvalidAddress,
-		}, {
+		},
+		{
 			name: "invalid fee indexes length",
 			msg: MsgWithdrawl{
 				Creator:        sample.AccAddress(),
@@ -45,7 +47,8 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 				SharesToRemove: []sdk.Int{sdk.OneInt()},
 			},
 			err: ErrUnbalancedTxArray,
-		}, {
+		},
+		{
 			name: "invalid tick indexes length",
 			msg: MsgWithdrawl{
 				Creator:        sample.AccAddress(),
@@ -55,7 +58,8 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 				SharesToRemove: []sdk.Int{sdk.OneInt()},
 			},
 			err: ErrUnbalancedTxArray,
-		}, {
+		},
+		{
 			name: "invalid shares to remove length",
 			msg: MsgWithdrawl{
 				Creator:        sample.AccAddress(),
@@ -65,7 +69,30 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 				SharesToRemove: []sdk.Int{},
 			},
 			err: ErrUnbalancedTxArray,
-		}, {
+		},
+		{
+			name: "no withdraw specs",
+			msg: MsgWithdrawl{
+				Creator:        sample.AccAddress(),
+				Receiver:       sample.AccAddress(),
+				FeeIndexes:     []uint64{},
+				TickIndexes:    []int64{},
+				SharesToRemove: []sdk.Int{},
+			},
+			err: ErrZeroWithdraw,
+		},
+		{
+			name: "no withdraw specs",
+			msg: MsgWithdrawl{
+				Creator:        sample.AccAddress(),
+				Receiver:       sample.AccAddress(),
+				FeeIndexes:     []uint64{0},
+				TickIndexes:    []int64{0},
+				SharesToRemove: []sdk.Int{sdk.ZeroInt()},
+			},
+			err: ErrZeroWithdraw,
+		},
+		{
 			name: "valid msg",
 			msg: MsgWithdrawl{
 				Creator:        sample.AccAddress(),

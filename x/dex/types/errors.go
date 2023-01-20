@@ -31,4 +31,5 @@ var (
 	ErrInvalidKeyToken                    = sdkerrors.Register(ModuleName, 1126, "KeyToken not in specified pair.")
 	ErrInvalidTokenIn                     = sdkerrors.Register(ModuleName, 1127, "TokenIn not in specified pair.")
 	ErrActiveLimitOrderNotFound           = sdkerrors.Register(ModuleName, 1128, "No active limit found. It does not exist or has already been filled")
+	ErrZeroWithdraw                       = sdkerrors.Register(ModuleName, 1129, "Withdraw amount cannot be 0.")
 )

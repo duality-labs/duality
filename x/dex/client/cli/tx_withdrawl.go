@@ -44,7 +44,8 @@ func CmdWithdrawl() *cobra.Command {
 			}
 
 			for _, s := range argTickIndexes {
-				TickIndexInt, err := strconv.Atoi(s)
+				str := strings.Trim(s, "\"")
+				TickIndexInt, err := strconv.Atoi(str)
 				if err != nil {
 					return err
 				}
