@@ -3,8 +3,8 @@ package keeper
 import (
 	"context"
 
-	"github.com/NicholasDotSol/duality/x/mev/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/mev/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

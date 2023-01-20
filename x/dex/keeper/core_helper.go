@@ -4,9 +4,9 @@ import (
 	"context"
 	"math"
 
-	. "github.com/NicholasDotSol/duality/utils"
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	. "github.com/duality-labs/duality/utils"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 // NOTE: -352,437 is the lowest possible tick at which price can be calculated with a < 1% error

@@ -1,8 +1,8 @@
 package app
 
 import (
-	appparams "github.com/NicholasDotSol/duality/app/params"
 	"github.com/cosmos/cosmos-sdk/std"
+	appparams "github.com/duality-labs/duality/app/params"
 	"github.com/tendermint/spm/cosmoscmd"
 )
 

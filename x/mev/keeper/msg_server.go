@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/NicholasDotSol/duality/x/mev/types"
+	"github.com/duality-labs/duality/x/mev/types"
 )
 
 type msgServer struct {

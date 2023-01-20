@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	dexmoduletypes "github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	dexmoduletypes "github.com/duality-labs/duality/x/dex/types"
 )
 
 func NewACoin(amt sdk.Int) sdk.Coin {

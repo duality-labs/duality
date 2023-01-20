@@ -3,11 +3,11 @@ package simulation
 import (
 	"math/rand"
 
-	"github.com/NicholasDotSol/duality/x/mev/keeper"
-	"github.com/NicholasDotSol/duality/x/mev/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+	"github.com/duality-labs/duality/x/mev/keeper"
+	"github.com/duality-labs/duality/x/mev/types"
 )
 
 func SimulateMsgSend(

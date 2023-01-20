@@ -1,8 +1,8 @@
 package keeper
 
 import (
-	"github.com/NicholasDotSol/duality/x/mev/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/mev/types"
 )
 
 // GetParams get all parameters as types.Params

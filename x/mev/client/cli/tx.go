@@ -8,7 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	// "github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/NicholasDotSol/duality/x/mev/types"
+	"github.com/duality-labs/duality/x/mev/types"
 )
 
 var (

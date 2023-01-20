@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	dextypes "github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
@@ -22,16 +21,17 @@ import (
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/tendermint/spm/cosmoscmd"
 	types1 "github.com/tendermint/tendermint/abci/types"
 	tmrand "github.com/tendermint/tendermint/libs/rand"
 	tmtypes "github.com/tendermint/tendermint/types"
 	tmdb "github.com/tendermint/tm-db"
 
-	"github.com/NicholasDotSol/duality/app"
-	"github.com/NicholasDotSol/duality/testutil"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
+	"github.com/duality-labs/duality/app"
+	"github.com/duality-labs/duality/testutil"
 )
 
 type (

@@ -3,8 +3,8 @@ package keeper_test
 import (
 	"testing"
 
-	"github.com/NicholasDotSol/duality/x/dex/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/dex/keeper"
 	"github.com/stretchr/testify/suite"
 )
 

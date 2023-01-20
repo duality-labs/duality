@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 type Pool struct {

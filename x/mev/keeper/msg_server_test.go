@@ -4,15 +4,15 @@ import (
 	"context"
 	"testing"
 
-	"github.com/NicholasDotSol/duality/x/mev/keeper"
-	"github.com/NicholasDotSol/duality/x/mev/types"
+	"github.com/duality-labs/duality/x/mev/keeper"
+	"github.com/duality-labs/duality/x/mev/types"
 
-	dualityapp "github.com/NicholasDotSol/duality/app"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	dualityapp "github.com/duality-labs/duality/app"
 	"github.com/stretchr/testify/suite"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )

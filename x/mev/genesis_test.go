@@ -3,10 +3,10 @@ package mev_test
 import (
 	"testing"
 
-	keepertest "github.com/NicholasDotSol/duality/testutil/keeper"
-	"github.com/NicholasDotSol/duality/testutil/nullify"
-	"github.com/NicholasDotSol/duality/x/mev"
-	"github.com/NicholasDotSol/duality/x/mev/types"
+	keepertest "github.com/duality-labs/duality/testutil/keeper"
+	"github.com/duality-labs/duality/testutil/nullify"
+	"github.com/duality-labs/duality/x/mev"
+	"github.com/duality-labs/duality/x/mev/types"
 	"github.com/stretchr/testify/require"
 )
 
