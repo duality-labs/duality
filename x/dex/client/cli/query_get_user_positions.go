@@ -32,6 +32,7 @@ func CmdShowUserPositions() *cobra.Command {
 			}
 
 			res, err := queryClient.GetUserPositions(cmd.Context(), params)
+
 			if err != nil {
 				return err
 			}

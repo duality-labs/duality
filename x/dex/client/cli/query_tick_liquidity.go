@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"strings"
 
 	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -55,7 +56,9 @@ func CmdShowTickLiquidity() *cobra.Command {
 
 			argPairId := args[0]
 			argTokenIn := args[1]
-			argTickIndex, err := cast.ToInt64E(args[2])
+
+			tickIndexString := strings.Trim(args[2], "\"")
+			argTickIndex, err := cast.ToInt64E(tickIndexString)
 			if err != nil {
 				return err
 			}
