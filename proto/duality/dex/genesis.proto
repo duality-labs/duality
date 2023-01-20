@@ -13,7 +13,7 @@ import "duality/dex/tick_liquidity.proto";
 import "duality/dex/filled_limit_order_tranche.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
-option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+option go_package = "github.com/duality-labs/duality/x/dex/types";
 
 // GenesisState defines the dex module's genesis state.
 message GenesisState {

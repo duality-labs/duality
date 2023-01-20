@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "mev/params.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
-option go_package = "github.com/NicholasDotSol/duality/x/mev/types";
+option go_package = "github.com/duality-labs/duality/x/mev/types";
 
 // GenesisState defines the mev module's genesis state.
 message GenesisState {

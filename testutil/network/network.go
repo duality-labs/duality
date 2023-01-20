@@ -26,10 +26,10 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	tmdb "github.com/tendermint/tm-db"
 
-	"github.com/NicholasDotSol/duality/app"
-	"github.com/NicholasDotSol/duality/testutil"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
+	"github.com/duality-labs/duality/app"
+	"github.com/duality-labs/duality/testutil"
 )
 
 type (

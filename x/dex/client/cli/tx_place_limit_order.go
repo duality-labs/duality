@@ -3,12 +3,12 @@ package cli
 import (
 	"strconv"
 
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/spf13/cobra"
 )
 

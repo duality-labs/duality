@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 // SetTradingPair set a specific TradingPair in the store from its index

@@ -12,10 +12,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/NicholasDotSol/duality/testutil/network"
-	"github.com/NicholasDotSol/duality/testutil/nullify"
-	"github.com/NicholasDotSol/duality/x/dex/client/cli"
-	"github.com/NicholasDotSol/duality/x/dex/types"
+	"github.com/duality-labs/duality/testutil/network"
+	"github.com/duality-labs/duality/testutil/nullify"
+	"github.com/duality-labs/duality/x/dex/client/cli"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 // Prevent strconv unused error

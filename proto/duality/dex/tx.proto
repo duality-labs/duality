@@ -3,7 +3,7 @@ package nicholasdotsol.duality.dex;
 
 // this line is used by starport scaffolding # proto/tx/import
 
-option go_package = "github.com/NicholasDotSol/duality/x/dex/types";
+option go_package = "github.com/duality-labs/duality/x/dex/types";
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 // Msg defines the Msg service.

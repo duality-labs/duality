@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/NicholasDotSol/duality/app"
 	ibctesting "github.com/cosmos/interchain-security/legacy_ibc_testing/testing"
+	"github.com/duality-labs/duality/app"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/libs/log"
 	tmdb "github.com/tendermint/tm-db"

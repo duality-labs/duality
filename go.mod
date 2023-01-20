@@ -1,4 +1,4 @@
-module github.com/NicholasDotSol/duality
+module github.com/duality-labs/duality
 
 go 1.18
 

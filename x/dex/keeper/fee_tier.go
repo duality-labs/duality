@@ -3,9 +3,9 @@ package keeper
 import (
 	"encoding/binary"
 
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 // GetFeeTierCount get the total number of FeeTier

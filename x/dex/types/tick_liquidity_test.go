@@ -3,8 +3,8 @@ package types_test
 import (
 	"testing"
 
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/assert"
 )
 

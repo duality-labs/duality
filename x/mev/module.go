@@ -3,6 +3,7 @@ package mev
 import (
 	"encoding/json"
 	"fmt"
+
 	// this line is used by starport scaffolding # 1
 
 	"github.com/gorilla/mux"
@@ -11,14 +12,14 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/NicholasDotSol/duality/x/mev/client/cli"
-	"github.com/NicholasDotSol/duality/x/mev/keeper"
-	"github.com/NicholasDotSol/duality/x/mev/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/duality-labs/duality/x/mev/client/cli"
+	"github.com/duality-labs/duality/x/mev/keeper"
+	"github.com/duality-labs/duality/x/mev/types"
 )
 
 var (

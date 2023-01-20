@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 // NOTE: Currently we are using TruncateInt in multiple places for converting Decs back into sdk.Ints.

@@ -11,7 +11,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	tmdb "github.com/tendermint/tm-db"
 
-	appConsumer "github.com/NicholasDotSol/duality/app"
+	appConsumer "github.com/duality-labs/duality/app"
 )
 
 // DualityAppIniter implements ibctesting.AppIniter for the duality consumer app

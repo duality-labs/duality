@@ -3,9 +3,9 @@ package types
 import (
 	"testing"
 
-	"github.com/NicholasDotSol/duality/testutil/sample"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/duality-labs/duality/testutil/sample"
 	"github.com/stretchr/testify/require"
 )
 
