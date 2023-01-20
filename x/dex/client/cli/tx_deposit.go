@@ -18,9 +18,9 @@ var _ = strconv.Itoa(0)
 func CmdDeposit() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:   "deposit [receiver] [token-a] [token-b] [list of amount-0] [list of amount-1] [list of tick-index] [list of fee] ",
+		Use:   "deposit [receiver] [token-a] [token-b] [list of amount-0] [list of amount-1] [list of tick-index] [list of fee] [deposit option parameters]",
 		Short: "Broadcast message deposit",
-		Args:  cobra.ExactArgs(7),
+		Args:  cobra.ExactArgs(8),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
 			argTokenA := args[1]
@@ -29,11 +29,13 @@ func CmdDeposit() *cobra.Command {
 			argAmountsB := strings.Split(args[4], ",")
 			argTicksIndexes := strings.Split(args[5], ",")
 			argFeesIndexes := strings.Split(args[6], ",")
+			argDepositOptions := strings.Split(args[7], ",")
 
 			var AmountsA []sdk.Int
 			var AmountsB []sdk.Int
 			var TicksIndexesInt []int64
 			var FeesIndexesUint []uint64
+			var DepositOptions []*types.DepositOptions
 
 			for _, s := range argAmountsA {
 				amountA, ok := sdk.NewIntFromString(s)
@@ -54,7 +56,8 @@ func CmdDeposit() *cobra.Command {
 			}
 
 			for _, s := range argTicksIndexes {
-				TickIndexInt, err := strconv.Atoi(s)
+				str := strings.Trim(s, "\"")
+				TickIndexInt, err := strconv.Atoi(str)
 				if err != nil {
 					return err
 				}
@@ -65,12 +68,19 @@ func CmdDeposit() *cobra.Command {
 
 			for _, s := range argFeesIndexes {
 				FeeIndexInt, err := strconv.Atoi(s)
-
 				if err != nil {
 					return err
 				}
 
 				FeesIndexesUint = append(FeesIndexesUint, uint64(FeeIndexInt))
+			}
+
+			for _, s := range argDepositOptions {
+				autoswap, err := strconv.ParseBool(s)
+				if err != nil {
+					return err
+				}
+				DepositOptions = append(DepositOptions, &types.DepositOptions{Autoswap: autoswap})
 			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -87,6 +97,7 @@ func CmdDeposit() *cobra.Command {
 				AmountsB,
 				TicksIndexesInt,
 				FeesIndexesUint,
+				DepositOptions,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

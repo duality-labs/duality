@@ -2,6 +2,7 @@ package cli
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -25,8 +26,8 @@ func CmdPlaceLimitOrder() *cobra.Command {
 			argTokenB := args[2]
 			argTickIndex := args[3]
 
+			argTickIndex = strings.Trim(argTickIndex, "\"")
 			argTickIndexInt, err := strconv.Atoi(argTickIndex)
-
 			if err != nil {
 				return err
 			}

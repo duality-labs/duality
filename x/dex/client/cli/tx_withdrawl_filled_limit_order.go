@@ -2,6 +2,7 @@ package cli
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -22,8 +23,9 @@ func CmdWithdrawFilledLimitOrder() *cobra.Command {
 			argTokenA := args[1]
 			argTokenB := args[2]
 			argTickIndex := args[3]
-			argTickIndexInt, err := strconv.Atoi(argTickIndex)
 
+			argTickIndex = strings.Trim(argTickIndex, "\"")
+			argTickIndexInt, err := strconv.Atoi(argTickIndex)
 			if err != nil {
 				return err
 			}
