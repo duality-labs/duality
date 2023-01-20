@@ -3,6 +3,7 @@ package ibc_swap
 import (
 	"context"
 	"encoding/json"
+	"strings"
 
 	"github.com/NicholasDotSol/duality/x/ibc-swap/keeper"
 	"github.com/NicholasDotSol/duality/x/ibc-swap/types"
@@ -126,6 +127,15 @@ func (im IBCMiddleware) OnRecvPacket(
 	if err != nil {
 		swapErr := sdkerrors.Wrap(types.ErrSwapFailed, err.Error())
 
+		// We need to get the denom for this token on this chain before issuing a refund
+		denomOnThisChain := getDenomForThisChain(
+			packet.DestinationPort, packet.DestinationChannel,
+			packet.SourcePort, packet.SourceChannel,
+			data.Denom,
+		)
+
+		data.Denom = denomOnThisChain
+
 		// We called into the transfer keepers OnRecvPacket callback to mint or unescrow the funds on this side
 		// so if the swap fails we need to explicitly refund to handle the bookkeeping properly
 		err = im.keeper.RefundPacketToken(ctx, packet, data)
@@ -205,4 +215,22 @@ func (im IBCMiddleware) WriteAcknowledgement(
 	ack ibcexported.Acknowledgement,
 ) error {
 	return im.keeper.WriteAcknowledgement(ctx, chanCap, packet, ack)
+}
+
+func getDenomForThisChain(port, channel, counterpartyPort, counterpartyChannel, denom string) string {
+	counterpartyPrefix := transfertypes.GetDenomPrefix(counterpartyPort, counterpartyChannel)
+	if strings.HasPrefix(denom, counterpartyPrefix) {
+		// unwind denom
+		unwoundDenom := denom[len(counterpartyPrefix):]
+		denomTrace := transfertypes.ParseDenomTrace(unwoundDenom)
+		if denomTrace.Path == "" {
+			// denom is now unwound back to native denom
+			return unwoundDenom
+		}
+		// denom is still IBC denom
+		return denomTrace.IBCDenom()
+	}
+	// append port and channel from this chain to denom
+	prefixedDenom := transfertypes.GetDenomPrefix(port, channel) + denom
+	return transfertypes.ParseDenomTrace(prefixedDenom).IBCDenom()
 }
