@@ -1,5 +1,5 @@
 syntax = "proto3";
-package nicholasdotsol.duality.mev;
+package dualitylabs.duality.mev;
 
 import "gogoproto/gogo.proto";
 import "mev/params.proto";

@@ -1,5 +1,5 @@
 syntax = "proto3";
-package nicholasdotsol.duality.mev;
+package dualitylabs.duality.mev;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
@@ -13,7 +13,7 @@ option go_package = "github.com/duality-labs/duality/x/mev/types";
 service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/NicholasDotSol/duality/mev/params";
+    option (google.api.http).get = "/dualitylabs/duality/mev/params";
   }
   // this line is used by starport scaffolding # 2
 }

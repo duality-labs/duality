@@ -1,5 +1,5 @@
 syntax = "proto3";
-package nicholasdotsol.duality.dex;
+package dualitylabs.duality.dex;
 
 option go_package = "github.com/duality-labs/duality/x/dex/types";
 

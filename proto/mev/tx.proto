@@ -1,5 +1,5 @@
 syntax = "proto3";
-package nicholasdotsol.duality.mev;
+package dualitylabs.duality.mev;
 
 // this line is used by starport scaffolding # proto/tx/import
 

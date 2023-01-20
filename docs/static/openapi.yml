@@ -12246,6 +12246,1908 @@ paths:
           format: int64
       tags:
         - Query
+  /dualitylabs/duality/dex/fee_tier:
+    get:
+      summary: Queries a list of FeeTier items.
+      operationId: DualitylabsDualityDexFeeTierAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              FeeTier:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uint64
+                    fee:
+                      type: string
+                      format: uint64
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /dualitylabs/duality/dex/fee_tier/{id}:
+    get:
+      summary: Queries a FeeTier by id.
+      operationId: DualitylabsDualityDexFeeTier
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              FeeTier:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uint64
+                  fee:
+                    type: string
+                    format: uint64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /dualitylabs/duality/dex/filled_limit_order_tranche:
+    get:
+      summary: Queries a list of FilledLimitOrderTranche items.
+      operationId: DualitylabsDualityDexFilledLimitOrderTrancheAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              filledLimitOrderTranche:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pairId:
+                      type: object
+                      properties:
+                        token0:
+                          type: string
+                        token1:
+                          type: string
+                    tokenIn:
+                      type: string
+                    tickIndex:
+                      type: string
+                      format: int64
+                    trancheIndex:
+                      type: string
+                      format: uint64
+                    reservesTokenOut:
+                      type: string
+                    totalTokenIn:
+                      type: string
+                    totalTokenOut:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /dualitylabs/duality/dex/filled_limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheIndex}:
+    get:
+      summary: Queries a FilledLimitOrderTranche by index.
+      operationId: DualitylabsDualityDexFilledLimitOrderTranche
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              filledLimitOrderTranche:
+                type: object
+                properties:
+                  pairId:
+                    type: object
+                    properties:
+                      token0:
+                        type: string
+                      token1:
+                        type: string
+                  tokenIn:
+                    type: string
+                  tickIndex:
+                    type: string
+                    format: int64
+                  trancheIndex:
+                    type: string
+                    format: uint64
+                  reservesTokenOut:
+                    type: string
+                  totalTokenIn:
+                    type: string
+                  totalTokenOut:
+                    type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pairId
+          in: path
+          required: true
+          type: string
+        - name: tokenIn
+          in: path
+          required: true
+          type: string
+        - name: tickIndex
+          in: path
+          required: true
+          type: string
+          format: int64
+        - name: trancheIndex
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}:
+    get:
+      summary: >-
+        Queries a list of LimitOrderTranche items for a given pairId / TokenIn
+        combination.
+      operationId: DualitylabsDualityDexLimitOrderTrancheAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              LimitOrderTranche:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pairId:
+                      type: object
+                      properties:
+                        token0:
+                          type: string
+                        token1:
+                          type: string
+                    tokenIn:
+                      type: string
+                    tickIndex:
+                      type: string
+                      format: int64
+                    trancheIndex:
+                      type: string
+                      format: uint64
+                    reservesTokenIn:
+                      type: string
+                    reservesTokenOut:
+                      type: string
+                    totalTokenIn:
+                      type: string
+                    totalTokenOut:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pairId
+          in: path
+          required: true
+          type: string
+        - name: tokenIn
+          in: path
+          required: true
+          type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheIndex}:
+    get:
+      summary: Queries a LimitOrderTranche by index.
+      operationId: DualitylabsDualityDexLimitOrderTranche
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              LimitOrderTranche:
+                type: object
+                properties:
+                  pairId:
+                    type: object
+                    properties:
+                      token0:
+                        type: string
+                      token1:
+                        type: string
+                  tokenIn:
+                    type: string
+                  tickIndex:
+                    type: string
+                    format: int64
+                  trancheIndex:
+                    type: string
+                    format: uint64
+                  reservesTokenIn:
+                    type: string
+                  reservesTokenOut:
+                    type: string
+                  totalTokenIn:
+                    type: string
+                  totalTokenOut:
+                    type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pairId
+          in: path
+          required: true
+          type: string
+        - name: tokenIn
+          in: path
+          required: true
+          type: string
+        - name: tickIndex
+          in: path
+          required: true
+          type: string
+          format: int64
+        - name: trancheIndex
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /dualitylabs/duality/dex/limit_order_tranche_user:
+    get:
+      summary: Queries a list of LimitOrderTrancheMap items.
+      operationId: DualitylabsDualityDexLimitOrderTrancheUserAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              LimitOrderTrancheUser:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pairId:
+                      type: object
+                      properties:
+                        token0:
+                          type: string
+                        token1:
+                          type: string
+                    token:
+                      type: string
+                    tickIndex:
+                      type: string
+                      format: int64
+                    count:
+                      type: string
+                      format: uint64
+                    address:
+                      type: string
+                    sharesOwned:
+                      type: string
+                    sharesWithdrawn:
+                      type: string
+                    sharesCancelled:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /dualitylabs/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{count}/{address}:
+    get:
+      summary: Queries a LimitOrderTrancheUser by index.
+      operationId: DualitylabsDualityDexLimitOrderTrancheUser
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              LimitOrderTrancheUser:
+                type: object
+                properties:
+                  pairId:
+                    type: object
+                    properties:
+                      token0:
+                        type: string
+                      token1:
+                        type: string
+                  token:
+                    type: string
+                  tickIndex:
+                    type: string
+                    format: int64
+                  count:
+                    type: string
+                    format: uint64
+                  address:
+                    type: string
+                  sharesOwned:
+                    type: string
+                  sharesWithdrawn:
+                    type: string
+                  sharesCancelled:
+                    type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pairId
+          in: path
+          required: true
+          type: string
+        - name: token
+          in: path
+          required: true
+          type: string
+        - name: tickIndex
+          in: path
+          required: true
+          type: string
+          format: int64
+        - name: count
+          in: path
+          required: true
+          type: string
+          format: uint64
+        - name: address
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /dualitylabs/duality/dex/params:
+    get:
+      summary: Parameters queries the parameters of the module.
+      operationId: DualitylabsDualityDexParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params holds all the parameters of this module.
+                type: object
+            description: >-
+              QueryParamsResponse is response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
+  /dualitylabs/duality/dex/tick_liquidity:
+    get:
+      summary: Queries a list of TickLiquidity items.
+      operationId: DualitylabsDualityDexTickLiquidityAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              tickLiquidity:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pairId:
+                      type: object
+                      properties:
+                        token0:
+                          type: string
+                        token1:
+                          type: string
+                    tokenIn:
+                      type: string
+                    tickIndex:
+                      type: string
+                      format: int64
+                    liquidityType:
+                      type: string
+                    liquidityIndex:
+                      type: string
+                      format: uint64
+                    LPReserve:
+                      type: string
+                    limitOrderTranche:
+                      type: object
+                      properties:
+                        pairId:
+                          type: object
+                          properties:
+                            token0:
+                              type: string
+                            token1:
+                              type: string
+                        tokenIn:
+                          type: string
+                        tickIndex:
+                          type: string
+                          format: int64
+                        trancheIndex:
+                          type: string
+                          format: uint64
+                        reservesTokenIn:
+                          type: string
+                        reservesTokenOut:
+                          type: string
+                        totalTokenIn:
+                          type: string
+                        totalTokenOut:
+                          type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /dualitylabs/duality/dex/tick_liquidity/{pairId}/{tokenIn}/{tickIndex}/{liquidityType}/{liquidityIndex}:
+    get:
+      summary: Queries a TickLiquidity by index.
+      operationId: DualitylabsDualityDexTickLiquidity
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              tickLiquidity:
+                type: object
+                properties:
+                  pairId:
+                    type: object
+                    properties:
+                      token0:
+                        type: string
+                      token1:
+                        type: string
+                  tokenIn:
+                    type: string
+                  tickIndex:
+                    type: string
+                    format: int64
+                  liquidityType:
+                    type: string
+                  liquidityIndex:
+                    type: string
+                    format: uint64
+                  LPReserve:
+                    type: string
+                  limitOrderTranche:
+                    type: object
+                    properties:
+                      pairId:
+                        type: object
+                        properties:
+                          token0:
+                            type: string
+                          token1:
+                            type: string
+                      tokenIn:
+                        type: string
+                      tickIndex:
+                        type: string
+                        format: int64
+                      trancheIndex:
+                        type: string
+                        format: uint64
+                      reservesTokenIn:
+                        type: string
+                      reservesTokenOut:
+                        type: string
+                      totalTokenIn:
+                        type: string
+                      totalTokenOut:
+                        type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pairId
+          in: path
+          required: true
+          type: string
+        - name: tokenIn
+          in: path
+          required: true
+          type: string
+        - name: tickIndex
+          in: path
+          required: true
+          type: string
+          format: int64
+        - name: liquidityType
+          in: path
+          required: true
+          type: string
+        - name: liquidityIndex
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /dualitylabs/duality/dex/token_map:
+    get:
+      summary: Queries a list of TokenMap items.
+      operationId: DualitylabsDualityDexTokenMapAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              tokenMap:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                    index:
+                      type: string
+                      format: int64
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /dualitylabs/duality/dex/token_map/{address}:
+    get:
+      summary: Queries a TokenMap by index.
+      operationId: DualitylabsDualityDexTokenMap
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              tokenMap:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  index:
+                    type: string
+                    format: int64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: address
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /dualitylabs/duality/dex/tokens:
+    get:
+      summary: Queries a list of Tokens items.
+      operationId: DualitylabsDualityDexTokensAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              Tokens:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uint64
+                    address:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /dualitylabs/duality/dex/tokens/{id}:
+    get:
+      summary: Queries a Tokens by id.
+      operationId: DualitylabsDualityDexTokens
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              Tokens:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uint64
+                  address:
+                    type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /dualitylabs/duality/dex/trading_pair:
+    get:
+      summary: Queries a list of TradingPair items.
+      operationId: DualitylabsDualityDexTradingPairAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              TradingPair:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pairId:
+                      type: object
+                      properties:
+                        token0:
+                          type: string
+                        token1:
+                          type: string
+                    currentTick0To1:
+                      type: string
+                      format: int64
+                    currentTick1To0:
+                      type: string
+                      format: int64
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /dualitylabs/duality/dex/trading_pair/{pairId}:
+    get:
+      summary: Queries a TradingPair by index.
+      operationId: DualitylabsDualityDexTradingPair
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              TradingPair:
+                type: object
+                properties:
+                  pairId:
+                    type: object
+                    properties:
+                      token0:
+                        type: string
+                      token1:
+                        type: string
+                  currentTick0To1:
+                    type: string
+                    format: int64
+                  currentTick1To0:
+                    type: string
+                    format: int64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pairId
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /dualitylabs/duality/dex/user/deposits/{address}:
+    get:
+      summary: Queries a list of UserDeposits items.
+      operationId: DualitylabsDualityDexUserDepositsAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              Deposits:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pairId:
+                      type: object
+                      properties:
+                        token0:
+                          type: string
+                        token1:
+                          type: string
+                    sharesOwned:
+                      type: string
+                    centerTickIndex:
+                      type: string
+                      format: int64
+                    lowerTickIndex:
+                      type: string
+                      format: int64
+                    upperTickIndex:
+                      type: string
+                      format: int64
+                    feeIndex:
+                      type: string
+                      format: uint64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: address
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /dualitylabs/duality/dex/user/limit_orders/{address}:
+    get:
+      summary: Queries a list of UserLimitOrders items.
+      operationId: DualitylabsDualityDexUserLimitOrdersAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              limitOrders:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pairId:
+                      type: object
+                      properties:
+                        token0:
+                          type: string
+                        token1:
+                          type: string
+                    token:
+                      type: string
+                    tickIndex:
+                      type: string
+                      format: int64
+                    count:
+                      type: string
+                      format: uint64
+                    address:
+                      type: string
+                    sharesOwned:
+                      type: string
+                    sharesWithdrawn:
+                      type: string
+                    sharesCancelled:
+                      type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: address
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /dualitylabs/duality/dex/user/positions/{address}:
+    get:
+      summary: Queries a list of GetUserPositions items.
+      operationId: DualitylabsDualityDexGetUserPositions
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              UserPositions:
+                type: object
+                properties:
+                  PoolDeposits:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        pairId:
+                          type: object
+                          properties:
+                            token0:
+                              type: string
+                            token1:
+                              type: string
+                        sharesOwned:
+                          type: string
+                        centerTickIndex:
+                          type: string
+                          format: int64
+                        lowerTickIndex:
+                          type: string
+                          format: int64
+                        upperTickIndex:
+                          type: string
+                          format: int64
+                        feeIndex:
+                          type: string
+                          format: uint64
+                  LimitOrders:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        pairId:
+                          type: object
+                          properties:
+                            token0:
+                              type: string
+                            token1:
+                              type: string
+                        token:
+                          type: string
+                        tickIndex:
+                          type: string
+                          format: int64
+                        count:
+                          type: string
+                          format: uint64
+                        address:
+                          type: string
+                        sharesOwned:
+                          type: string
+                        sharesWithdrawn:
+                          type: string
+                        sharesCancelled:
+                          type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: address
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /dualitylabs/duality/mev/params:
+    get:
+      summary: Parameters queries the parameters of the module.
+      operationId: DualitylabsDualityMevParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params holds all the parameters of this module.
+                type: object
+            description: >-
+              QueryParamsResponse is response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
   /ibc/apps/interchain_accounts/host/v1/params:
     get:
       summary: Params queries all parameters of the ICA host submodule.
@@ -25710,1828 +27612,6 @@ paths:
           type: string
       tags:
         - Query
-  /NicholasDotSol/duality/dex/fee_tier:
-    get:
-      summary: Queries a list of FeeTier items.
-      operationId: NicholasdotsolDualityDexFeeTierAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              FeeTier:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      format: uint64
-                    fee:
-                      type: string
-                      format: uint64
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/fee_tier/{id}:
-    get:
-      summary: Queries a FeeTier by id.
-      operationId: NicholasdotsolDualityDexFeeTier
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              FeeTier:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    format: uint64
-                  fee:
-                    type: string
-                    format: uint64
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: string
-          format: uint64
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/filled_limit_order_tranche:
-    get:
-      summary: Queries a list of FilledLimitOrderTranche items.
-      operationId: NicholasdotsolDualityDexFilledLimitOrderTrancheAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              filledLimitOrderTranche:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    pairId:
-                      type: object
-                      properties:
-                        token0:
-                          type: string
-                        token1:
-                          type: string
-                    tokenIn:
-                      type: string
-                    tickIndex:
-                      type: string
-                      format: int64
-                    trancheIndex:
-                      type: string
-                      format: uint64
-                    reservesTokenOut:
-                      type: string
-                    totalTokenIn:
-                      type: string
-                    totalTokenOut:
-                      type: string
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/filled_limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheIndex}:
-    get:
-      summary: Queries a FilledLimitOrderTranche by index.
-      operationId: NicholasdotsolDualityDexFilledLimitOrderTranche
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              filledLimitOrderTranche:
-                type: object
-                properties:
-                  pairId:
-                    type: object
-                    properties:
-                      token0:
-                        type: string
-                      token1:
-                        type: string
-                  tokenIn:
-                    type: string
-                  tickIndex:
-                    type: string
-                    format: int64
-                  trancheIndex:
-                    type: string
-                    format: uint64
-                  reservesTokenOut:
-                    type: string
-                  totalTokenIn:
-                    type: string
-                  totalTokenOut:
-                    type: string
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pairId
-          in: path
-          required: true
-          type: string
-        - name: tokenIn
-          in: path
-          required: true
-          type: string
-        - name: tickIndex
-          in: path
-          required: true
-          type: string
-          format: int64
-        - name: trancheIndex
-          in: path
-          required: true
-          type: string
-          format: uint64
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/limit_order_tranche/{pairId}/{tokenIn}:
-    get:
-      summary: >-
-        Queries a list of LimitOrderTranche items for a given pairId / TokenIn
-        combination.
-      operationId: NicholasdotsolDualityDexLimitOrderTrancheAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              LimitOrderTranche:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    pairId:
-                      type: object
-                      properties:
-                        token0:
-                          type: string
-                        token1:
-                          type: string
-                    tokenIn:
-                      type: string
-                    tickIndex:
-                      type: string
-                      format: int64
-                    trancheIndex:
-                      type: string
-                      format: uint64
-                    reservesTokenIn:
-                      type: string
-                    reservesTokenOut:
-                      type: string
-                    totalTokenIn:
-                      type: string
-                    totalTokenOut:
-                      type: string
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pairId
-          in: path
-          required: true
-          type: string
-        - name: tokenIn
-          in: path
-          required: true
-          type: string
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheIndex}:
-    get:
-      summary: Queries a LimitOrderTranche by index.
-      operationId: NicholasdotsolDualityDexLimitOrderTranche
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              LimitOrderTranche:
-                type: object
-                properties:
-                  pairId:
-                    type: object
-                    properties:
-                      token0:
-                        type: string
-                      token1:
-                        type: string
-                  tokenIn:
-                    type: string
-                  tickIndex:
-                    type: string
-                    format: int64
-                  trancheIndex:
-                    type: string
-                    format: uint64
-                  reservesTokenIn:
-                    type: string
-                  reservesTokenOut:
-                    type: string
-                  totalTokenIn:
-                    type: string
-                  totalTokenOut:
-                    type: string
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pairId
-          in: path
-          required: true
-          type: string
-        - name: tokenIn
-          in: path
-          required: true
-          type: string
-        - name: tickIndex
-          in: path
-          required: true
-          type: string
-          format: int64
-        - name: trancheIndex
-          in: path
-          required: true
-          type: string
-          format: uint64
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/limit_order_tranche_user:
-    get:
-      summary: Queries a list of LimitOrderTrancheMap items.
-      operationId: NicholasdotsolDualityDexLimitOrderTrancheUserAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              LimitOrderTrancheUser:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    pairId:
-                      type: object
-                      properties:
-                        token0:
-                          type: string
-                        token1:
-                          type: string
-                    token:
-                      type: string
-                    tickIndex:
-                      type: string
-                      format: int64
-                    count:
-                      type: string
-                      format: uint64
-                    address:
-                      type: string
-                    sharesOwned:
-                      type: string
-                    sharesWithdrawn:
-                      type: string
-                    sharesCancelled:
-                      type: string
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{count}/{address}:
-    get:
-      summary: Queries a LimitOrderTrancheUser by index.
-      operationId: NicholasdotsolDualityDexLimitOrderTrancheUser
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              LimitOrderTrancheUser:
-                type: object
-                properties:
-                  pairId:
-                    type: object
-                    properties:
-                      token0:
-                        type: string
-                      token1:
-                        type: string
-                  token:
-                    type: string
-                  tickIndex:
-                    type: string
-                    format: int64
-                  count:
-                    type: string
-                    format: uint64
-                  address:
-                    type: string
-                  sharesOwned:
-                    type: string
-                  sharesWithdrawn:
-                    type: string
-                  sharesCancelled:
-                    type: string
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pairId
-          in: path
-          required: true
-          type: string
-        - name: token
-          in: path
-          required: true
-          type: string
-        - name: tickIndex
-          in: path
-          required: true
-          type: string
-          format: int64
-        - name: count
-          in: path
-          required: true
-          type: string
-          format: uint64
-        - name: address
-          in: path
-          required: true
-          type: string
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/params:
-    get:
-      summary: Parameters queries the parameters of the module.
-      operationId: NicholasdotsolDualityDexParams
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              params:
-                description: params holds all the parameters of this module.
-                type: object
-            description: >-
-              QueryParamsResponse is response type for the Query/Params RPC
-              method.
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/tick_liquidity:
-    get:
-      summary: Queries a list of TickLiquidity items.
-      operationId: NicholasdotsolDualityDexTickLiquidityAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              tickLiquidity:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    pairId:
-                      type: object
-                      properties:
-                        token0:
-                          type: string
-                        token1:
-                          type: string
-                    tokenIn:
-                      type: string
-                    tickIndex:
-                      type: string
-                      format: int64
-                    liquidityType:
-                      type: string
-                    liquidityIndex:
-                      type: string
-                      format: uint64
-                    LPReserve:
-                      type: string
-                    limitOrderTranche:
-                      type: object
-                      properties:
-                        pairId:
-                          type: object
-                          properties:
-                            token0:
-                              type: string
-                            token1:
-                              type: string
-                        tokenIn:
-                          type: string
-                        tickIndex:
-                          type: string
-                          format: int64
-                        trancheIndex:
-                          type: string
-                          format: uint64
-                        reservesTokenIn:
-                          type: string
-                        reservesTokenOut:
-                          type: string
-                        totalTokenIn:
-                          type: string
-                        totalTokenOut:
-                          type: string
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/tick_liquidity/{pairId}/{tokenIn}/{tickIndex}/{liquidityType}/{liquidityIndex}:
-    get:
-      summary: Queries a TickLiquidity by index.
-      operationId: NicholasdotsolDualityDexTickLiquidity
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              tickLiquidity:
-                type: object
-                properties:
-                  pairId:
-                    type: object
-                    properties:
-                      token0:
-                        type: string
-                      token1:
-                        type: string
-                  tokenIn:
-                    type: string
-                  tickIndex:
-                    type: string
-                    format: int64
-                  liquidityType:
-                    type: string
-                  liquidityIndex:
-                    type: string
-                    format: uint64
-                  LPReserve:
-                    type: string
-                  limitOrderTranche:
-                    type: object
-                    properties:
-                      pairId:
-                        type: object
-                        properties:
-                          token0:
-                            type: string
-                          token1:
-                            type: string
-                      tokenIn:
-                        type: string
-                      tickIndex:
-                        type: string
-                        format: int64
-                      trancheIndex:
-                        type: string
-                        format: uint64
-                      reservesTokenIn:
-                        type: string
-                      reservesTokenOut:
-                        type: string
-                      totalTokenIn:
-                        type: string
-                      totalTokenOut:
-                        type: string
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pairId
-          in: path
-          required: true
-          type: string
-        - name: tokenIn
-          in: path
-          required: true
-          type: string
-        - name: tickIndex
-          in: path
-          required: true
-          type: string
-          format: int64
-        - name: liquidityType
-          in: path
-          required: true
-          type: string
-        - name: liquidityIndex
-          in: path
-          required: true
-          type: string
-          format: uint64
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/token_map:
-    get:
-      summary: Queries a list of TokenMap items.
-      operationId: NicholasdotsolDualityDexTokenMapAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              tokenMap:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    address:
-                      type: string
-                    index:
-                      type: string
-                      format: int64
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/token_map/{address}:
-    get:
-      summary: Queries a TokenMap by index.
-      operationId: NicholasdotsolDualityDexTokenMap
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              tokenMap:
-                type: object
-                properties:
-                  address:
-                    type: string
-                  index:
-                    type: string
-                    format: int64
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: address
-          in: path
-          required: true
-          type: string
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/tokens:
-    get:
-      summary: Queries a list of Tokens items.
-      operationId: NicholasdotsolDualityDexTokensAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              Tokens:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      format: uint64
-                    address:
-                      type: string
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/tokens/{id}:
-    get:
-      summary: Queries a Tokens by id.
-      operationId: NicholasdotsolDualityDexTokens
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              Tokens:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    format: uint64
-                  address:
-                    type: string
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: string
-          format: uint64
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/trading_pair:
-    get:
-      summary: Queries a list of TradingPair items.
-      operationId: NicholasdotsolDualityDexTradingPairAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              TradingPair:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    pairId:
-                      type: object
-                      properties:
-                        token0:
-                          type: string
-                        token1:
-                          type: string
-                    currentTick0To1:
-                      type: string
-                      format: int64
-                    currentTick1To0:
-                      type: string
-                      format: int64
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/trading_pair/{pairId}:
-    get:
-      summary: Queries a TradingPair by index.
-      operationId: NicholasdotsolDualityDexTradingPair
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              TradingPair:
-                type: object
-                properties:
-                  pairId:
-                    type: object
-                    properties:
-                      token0:
-                        type: string
-                      token1:
-                        type: string
-                  currentTick0To1:
-                    type: string
-                    format: int64
-                  currentTick1To0:
-                    type: string
-                    format: int64
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pairId
-          in: path
-          required: true
-          type: string
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/user/deposits/{address}:
-    get:
-      summary: Queries a list of UserDeposits items.
-      operationId: NicholasdotsolDualityDexUserDepositsAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              Deposits:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    pairId:
-                      type: object
-                      properties:
-                        token0:
-                          type: string
-                        token1:
-                          type: string
-                    sharesOwned:
-                      type: string
-                    centerTickIndex:
-                      type: string
-                      format: int64
-                    lowerTickIndex:
-                      type: string
-                      format: int64
-                    upperTickIndex:
-                      type: string
-                      format: int64
-                    feeIndex:
-                      type: string
-                      format: uint64
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: address
-          in: path
-          required: true
-          type: string
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/user/limit_orders/{address}:
-    get:
-      summary: Queries a list of UserLimitOrders items.
-      operationId: NicholasdotsolDualityDexUserLimitOrdersAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              limitOrders:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    pairId:
-                      type: object
-                      properties:
-                        token0:
-                          type: string
-                        token1:
-                          type: string
-                    token:
-                      type: string
-                    tickIndex:
-                      type: string
-                      format: int64
-                    count:
-                      type: string
-                      format: uint64
-                    address:
-                      type: string
-                    sharesOwned:
-                      type: string
-                    sharesWithdrawn:
-                      type: string
-                    sharesCancelled:
-                      type: string
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: address
-          in: path
-          required: true
-          type: string
-      tags:
-        - Query
-  /NicholasDotSol/duality/dex/user/positions/{address}:
-    get:
-      summary: Queries a list of GetUserPositions items.
-      operationId: NicholasdotsolDualityDexGetUserPositions
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              UserPositions:
-                type: object
-                properties:
-                  PoolDeposits:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        pairId:
-                          type: object
-                          properties:
-                            token0:
-                              type: string
-                            token1:
-                              type: string
-                        sharesOwned:
-                          type: string
-                        centerTickIndex:
-                          type: string
-                          format: int64
-                        lowerTickIndex:
-                          type: string
-                          format: int64
-                        upperTickIndex:
-                          type: string
-                          format: int64
-                        feeIndex:
-                          type: string
-                          format: uint64
-                  LimitOrders:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        pairId:
-                          type: object
-                          properties:
-                            token0:
-                              type: string
-                            token1:
-                              type: string
-                        token:
-                          type: string
-                        tickIndex:
-                          type: string
-                          format: int64
-                        count:
-                          type: string
-                          format: uint64
-                        address:
-                          type: string
-                        sharesOwned:
-                          type: string
-                        sharesWithdrawn:
-                          type: string
-                        sharesCancelled:
-                          type: string
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: address
-          in: path
-          required: true
-          type: string
-      tags:
-        - Query
-  /NicholasDotSol/duality/mev/params:
-    get:
-      summary: Parameters queries the parameters of the module.
-      operationId: NicholasdotsolDualityMevParams
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              params:
-                description: params holds all the parameters of this module.
-                type: object
-            description: >-
-              QueryParamsResponse is response type for the Query/Params RPC
-              method.
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      tags:
-        - Query
 definitions:
   cosmos.adminmodule.adminmodule.MsgAddAdminResponse:
     type: object
@@ -40170,6 +40250,1034 @@ definitions:
     description: >-
       MsgCreateVestingAccountResponse defines the Msg/CreateVestingAccount
       response type.
+  dualitylabs.duality.dex.DepositOptions:
+    type: object
+    properties:
+      autoswap:
+        type: boolean
+  dualitylabs.duality.dex.DepositRecord:
+    type: object
+    properties:
+      pairId:
+        type: object
+        properties:
+          token0:
+            type: string
+          token1:
+            type: string
+      sharesOwned:
+        type: string
+      centerTickIndex:
+        type: string
+        format: int64
+      lowerTickIndex:
+        type: string
+        format: int64
+      upperTickIndex:
+        type: string
+        format: int64
+      feeIndex:
+        type: string
+        format: uint64
+  dualitylabs.duality.dex.FeeTier:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+      fee:
+        type: string
+        format: uint64
+  dualitylabs.duality.dex.FilledLimitOrderTranche:
+    type: object
+    properties:
+      pairId:
+        type: object
+        properties:
+          token0:
+            type: string
+          token1:
+            type: string
+      tokenIn:
+        type: string
+      tickIndex:
+        type: string
+        format: int64
+      trancheIndex:
+        type: string
+        format: uint64
+      reservesTokenOut:
+        type: string
+      totalTokenIn:
+        type: string
+      totalTokenOut:
+        type: string
+  dualitylabs.duality.dex.LimitOrderTranche:
+    type: object
+    properties:
+      pairId:
+        type: object
+        properties:
+          token0:
+            type: string
+          token1:
+            type: string
+      tokenIn:
+        type: string
+      tickIndex:
+        type: string
+        format: int64
+      trancheIndex:
+        type: string
+        format: uint64
+      reservesTokenIn:
+        type: string
+      reservesTokenOut:
+        type: string
+      totalTokenIn:
+        type: string
+      totalTokenOut:
+        type: string
+  dualitylabs.duality.dex.LimitOrderTrancheUser:
+    type: object
+    properties:
+      pairId:
+        type: object
+        properties:
+          token0:
+            type: string
+          token1:
+            type: string
+      token:
+        type: string
+      tickIndex:
+        type: string
+        format: int64
+      count:
+        type: string
+        format: uint64
+      address:
+        type: string
+      sharesOwned:
+        type: string
+      sharesWithdrawn:
+        type: string
+      sharesCancelled:
+        type: string
+  dualitylabs.duality.dex.MsgCancelLimitOrderResponse:
+    type: object
+  dualitylabs.duality.dex.MsgDepositResponse:
+    type: object
+    properties:
+      Reserve0Deposited:
+        type: array
+        items:
+          type: string
+      Reserve1Deposited:
+        type: array
+        items:
+          type: string
+  dualitylabs.duality.dex.MsgPlaceLimitOrderResponse:
+    type: object
+  dualitylabs.duality.dex.MsgSwapResponse:
+    type: object
+    properties:
+      coinOut:
+        type: object
+        properties:
+          denom:
+            type: string
+          amount:
+            type: string
+        description: |-
+          Coin defines a token with a denomination and an amount.
+
+          NOTE: The amount field is an Int which implements the custom method
+          signatures required by gogoproto.
+  dualitylabs.duality.dex.MsgWithdrawFilledLimitOrderResponse:
+    type: object
+  dualitylabs.duality.dex.MsgWithdrawlResponse:
+    type: object
+  dualitylabs.duality.dex.PairId:
+    type: object
+    properties:
+      token0:
+        type: string
+      token1:
+        type: string
+  dualitylabs.duality.dex.Params:
+    type: object
+    description: Params defines the parameters for the module.
+  dualitylabs.duality.dex.QueryAllFeeTierResponse:
+    type: object
+    properties:
+      FeeTier:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uint64
+            fee:
+              type: string
+              format: uint64
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  dualitylabs.duality.dex.QueryAllFilledLimitOrderTrancheResponse:
+    type: object
+    properties:
+      filledLimitOrderTranche:
+        type: array
+        items:
+          type: object
+          properties:
+            pairId:
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
+            tokenIn:
+              type: string
+            tickIndex:
+              type: string
+              format: int64
+            trancheIndex:
+              type: string
+              format: uint64
+            reservesTokenOut:
+              type: string
+            totalTokenIn:
+              type: string
+            totalTokenOut:
+              type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  dualitylabs.duality.dex.QueryAllLimitOrderTrancheResponse:
+    type: object
+    properties:
+      LimitOrderTranche:
+        type: array
+        items:
+          type: object
+          properties:
+            pairId:
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
+            tokenIn:
+              type: string
+            tickIndex:
+              type: string
+              format: int64
+            trancheIndex:
+              type: string
+              format: uint64
+            reservesTokenIn:
+              type: string
+            reservesTokenOut:
+              type: string
+            totalTokenIn:
+              type: string
+            totalTokenOut:
+              type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  dualitylabs.duality.dex.QueryAllLimitOrderTrancheUserResponse:
+    type: object
+    properties:
+      LimitOrderTrancheUser:
+        type: array
+        items:
+          type: object
+          properties:
+            pairId:
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
+            token:
+              type: string
+            tickIndex:
+              type: string
+              format: int64
+            count:
+              type: string
+              format: uint64
+            address:
+              type: string
+            sharesOwned:
+              type: string
+            sharesWithdrawn:
+              type: string
+            sharesCancelled:
+              type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  dualitylabs.duality.dex.QueryAllTickLiquidityResponse:
+    type: object
+    properties:
+      tickLiquidity:
+        type: array
+        items:
+          type: object
+          properties:
+            pairId:
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
+            tokenIn:
+              type: string
+            tickIndex:
+              type: string
+              format: int64
+            liquidityType:
+              type: string
+            liquidityIndex:
+              type: string
+              format: uint64
+            LPReserve:
+              type: string
+            limitOrderTranche:
+              type: object
+              properties:
+                pairId:
+                  type: object
+                  properties:
+                    token0:
+                      type: string
+                    token1:
+                      type: string
+                tokenIn:
+                  type: string
+                tickIndex:
+                  type: string
+                  format: int64
+                trancheIndex:
+                  type: string
+                  format: uint64
+                reservesTokenIn:
+                  type: string
+                reservesTokenOut:
+                  type: string
+                totalTokenIn:
+                  type: string
+                totalTokenOut:
+                  type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  dualitylabs.duality.dex.QueryAllTokenMapResponse:
+    type: object
+    properties:
+      tokenMap:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            index:
+              type: string
+              format: int64
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  dualitylabs.duality.dex.QueryAllTokensResponse:
+    type: object
+    properties:
+      Tokens:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uint64
+            address:
+              type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  dualitylabs.duality.dex.QueryAllTradingPairResponse:
+    type: object
+    properties:
+      TradingPair:
+        type: array
+        items:
+          type: object
+          properties:
+            pairId:
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
+            currentTick0To1:
+              type: string
+              format: int64
+            currentTick1To0:
+              type: string
+              format: int64
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  dualitylabs.duality.dex.QueryAllUserDepositsResponse:
+    type: object
+    properties:
+      Deposits:
+        type: array
+        items:
+          type: object
+          properties:
+            pairId:
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
+            sharesOwned:
+              type: string
+            centerTickIndex:
+              type: string
+              format: int64
+            lowerTickIndex:
+              type: string
+              format: int64
+            upperTickIndex:
+              type: string
+              format: int64
+            feeIndex:
+              type: string
+              format: uint64
+  dualitylabs.duality.dex.QueryAllUserLimitOrdersResponse:
+    type: object
+    properties:
+      limitOrders:
+        type: array
+        items:
+          type: object
+          properties:
+            pairId:
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
+            token:
+              type: string
+            tickIndex:
+              type: string
+              format: int64
+            count:
+              type: string
+              format: uint64
+            address:
+              type: string
+            sharesOwned:
+              type: string
+            sharesWithdrawn:
+              type: string
+            sharesCancelled:
+              type: string
+  dualitylabs.duality.dex.QueryGetFeeTierResponse:
+    type: object
+    properties:
+      FeeTier:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+          fee:
+            type: string
+            format: uint64
+  dualitylabs.duality.dex.QueryGetFilledLimitOrderTrancheResponse:
+    type: object
+    properties:
+      filledLimitOrderTranche:
+        type: object
+        properties:
+          pairId:
+            type: object
+            properties:
+              token0:
+                type: string
+              token1:
+                type: string
+          tokenIn:
+            type: string
+          tickIndex:
+            type: string
+            format: int64
+          trancheIndex:
+            type: string
+            format: uint64
+          reservesTokenOut:
+            type: string
+          totalTokenIn:
+            type: string
+          totalTokenOut:
+            type: string
+  dualitylabs.duality.dex.QueryGetLimitOrderTrancheResponse:
+    type: object
+    properties:
+      LimitOrderTranche:
+        type: object
+        properties:
+          pairId:
+            type: object
+            properties:
+              token0:
+                type: string
+              token1:
+                type: string
+          tokenIn:
+            type: string
+          tickIndex:
+            type: string
+            format: int64
+          trancheIndex:
+            type: string
+            format: uint64
+          reservesTokenIn:
+            type: string
+          reservesTokenOut:
+            type: string
+          totalTokenIn:
+            type: string
+          totalTokenOut:
+            type: string
+  dualitylabs.duality.dex.QueryGetLimitOrderTrancheUserResponse:
+    type: object
+    properties:
+      LimitOrderTrancheUser:
+        type: object
+        properties:
+          pairId:
+            type: object
+            properties:
+              token0:
+                type: string
+              token1:
+                type: string
+          token:
+            type: string
+          tickIndex:
+            type: string
+            format: int64
+          count:
+            type: string
+            format: uint64
+          address:
+            type: string
+          sharesOwned:
+            type: string
+          sharesWithdrawn:
+            type: string
+          sharesCancelled:
+            type: string
+  dualitylabs.duality.dex.QueryGetTickLiquidityResponse:
+    type: object
+    properties:
+      tickLiquidity:
+        type: object
+        properties:
+          pairId:
+            type: object
+            properties:
+              token0:
+                type: string
+              token1:
+                type: string
+          tokenIn:
+            type: string
+          tickIndex:
+            type: string
+            format: int64
+          liquidityType:
+            type: string
+          liquidityIndex:
+            type: string
+            format: uint64
+          LPReserve:
+            type: string
+          limitOrderTranche:
+            type: object
+            properties:
+              pairId:
+                type: object
+                properties:
+                  token0:
+                    type: string
+                  token1:
+                    type: string
+              tokenIn:
+                type: string
+              tickIndex:
+                type: string
+                format: int64
+              trancheIndex:
+                type: string
+                format: uint64
+              reservesTokenIn:
+                type: string
+              reservesTokenOut:
+                type: string
+              totalTokenIn:
+                type: string
+              totalTokenOut:
+                type: string
+  dualitylabs.duality.dex.QueryGetTokenMapResponse:
+    type: object
+    properties:
+      tokenMap:
+        type: object
+        properties:
+          address:
+            type: string
+          index:
+            type: string
+            format: int64
+  dualitylabs.duality.dex.QueryGetTokensResponse:
+    type: object
+    properties:
+      Tokens:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+          address:
+            type: string
+  dualitylabs.duality.dex.QueryGetTradingPairResponse:
+    type: object
+    properties:
+      TradingPair:
+        type: object
+        properties:
+          pairId:
+            type: object
+            properties:
+              token0:
+                type: string
+              token1:
+                type: string
+          currentTick0To1:
+            type: string
+            format: int64
+          currentTick1To0:
+            type: string
+            format: int64
+  dualitylabs.duality.dex.QueryGetUserPositionsResponse:
+    type: object
+    properties:
+      UserPositions:
+        type: object
+        properties:
+          PoolDeposits:
+            type: array
+            items:
+              type: object
+              properties:
+                pairId:
+                  type: object
+                  properties:
+                    token0:
+                      type: string
+                    token1:
+                      type: string
+                sharesOwned:
+                  type: string
+                centerTickIndex:
+                  type: string
+                  format: int64
+                lowerTickIndex:
+                  type: string
+                  format: int64
+                upperTickIndex:
+                  type: string
+                  format: int64
+                feeIndex:
+                  type: string
+                  format: uint64
+          LimitOrders:
+            type: array
+            items:
+              type: object
+              properties:
+                pairId:
+                  type: object
+                  properties:
+                    token0:
+                      type: string
+                    token1:
+                      type: string
+                token:
+                  type: string
+                tickIndex:
+                  type: string
+                  format: int64
+                count:
+                  type: string
+                  format: uint64
+                address:
+                  type: string
+                sharesOwned:
+                  type: string
+                sharesWithdrawn:
+                  type: string
+                sharesCancelled:
+                  type: string
+  dualitylabs.duality.dex.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params holds all the parameters of this module.
+        type: object
+    description: QueryParamsResponse is response type for the Query/Params RPC method.
+  dualitylabs.duality.dex.TickLiquidity:
+    type: object
+    properties:
+      pairId:
+        type: object
+        properties:
+          token0:
+            type: string
+          token1:
+            type: string
+      tokenIn:
+        type: string
+      tickIndex:
+        type: string
+        format: int64
+      liquidityType:
+        type: string
+      liquidityIndex:
+        type: string
+        format: uint64
+      LPReserve:
+        type: string
+      limitOrderTranche:
+        type: object
+        properties:
+          pairId:
+            type: object
+            properties:
+              token0:
+                type: string
+              token1:
+                type: string
+          tokenIn:
+            type: string
+          tickIndex:
+            type: string
+            format: int64
+          trancheIndex:
+            type: string
+            format: uint64
+          reservesTokenIn:
+            type: string
+          reservesTokenOut:
+            type: string
+          totalTokenIn:
+            type: string
+          totalTokenOut:
+            type: string
+  dualitylabs.duality.dex.TokenMap:
+    type: object
+    properties:
+      address:
+        type: string
+      index:
+        type: string
+        format: int64
+  dualitylabs.duality.dex.Tokens:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+      address:
+        type: string
+  dualitylabs.duality.dex.TradingPair:
+    type: object
+    properties:
+      pairId:
+        type: object
+        properties:
+          token0:
+            type: string
+          token1:
+            type: string
+      currentTick0To1:
+        type: string
+        format: int64
+      currentTick1To0:
+        type: string
+        format: int64
+  dualitylabs.duality.dex.UserPositions:
+    type: object
+    properties:
+      PoolDeposits:
+        type: array
+        items:
+          type: object
+          properties:
+            pairId:
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
+            sharesOwned:
+              type: string
+            centerTickIndex:
+              type: string
+              format: int64
+            lowerTickIndex:
+              type: string
+              format: int64
+            upperTickIndex:
+              type: string
+              format: int64
+            feeIndex:
+              type: string
+              format: uint64
+      LimitOrders:
+        type: array
+        items:
+          type: object
+          properties:
+            pairId:
+              type: object
+              properties:
+                token0:
+                  type: string
+                token1:
+                  type: string
+            token:
+              type: string
+            tickIndex:
+              type: string
+              format: int64
+            count:
+              type: string
+              format: uint64
+            address:
+              type: string
+            sharesOwned:
+              type: string
+            sharesWithdrawn:
+              type: string
+            sharesCancelled:
+              type: string
+  dualitylabs.duality.mev.MsgSendResponse:
+    type: object
+  dualitylabs.duality.mev.Params:
+    type: object
+    description: Params defines the parameters for the module.
+  dualitylabs.duality.mev.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params holds all the parameters of this module.
+        type: object
+    description: QueryParamsResponse is response type for the Query/Params RPC method.
   ibc.applications.interchain_accounts.host.v1.Params:
     type: object
     properties:
@@ -48079,1031 +49187,3 @@ definitions:
         type: string
         format: int64
     title: ValidatorUpdate
-  nicholasdotsol.duality.dex.DepositOptions:
-    type: object
-    properties:
-      autoswap:
-        type: boolean
-  nicholasdotsol.duality.dex.DepositRecord:
-    type: object
-    properties:
-      pairId:
-        type: object
-        properties:
-          token0:
-            type: string
-          token1:
-            type: string
-      sharesOwned:
-        type: string
-      centerTickIndex:
-        type: string
-        format: int64
-      lowerTickIndex:
-        type: string
-        format: int64
-      upperTickIndex:
-        type: string
-        format: int64
-      feeIndex:
-        type: string
-        format: uint64
-  nicholasdotsol.duality.dex.FeeTier:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uint64
-      fee:
-        type: string
-        format: uint64
-  nicholasdotsol.duality.dex.FilledLimitOrderTranche:
-    type: object
-    properties:
-      pairId:
-        type: object
-        properties:
-          token0:
-            type: string
-          token1:
-            type: string
-      tokenIn:
-        type: string
-      tickIndex:
-        type: string
-        format: int64
-      trancheIndex:
-        type: string
-        format: uint64
-      reservesTokenOut:
-        type: string
-      totalTokenIn:
-        type: string
-      totalTokenOut:
-        type: string
-  nicholasdotsol.duality.dex.LimitOrderTranche:
-    type: object
-    properties:
-      pairId:
-        type: object
-        properties:
-          token0:
-            type: string
-          token1:
-            type: string
-      tokenIn:
-        type: string
-      tickIndex:
-        type: string
-        format: int64
-      trancheIndex:
-        type: string
-        format: uint64
-      reservesTokenIn:
-        type: string
-      reservesTokenOut:
-        type: string
-      totalTokenIn:
-        type: string
-      totalTokenOut:
-        type: string
-  nicholasdotsol.duality.dex.LimitOrderTrancheUser:
-    type: object
-    properties:
-      pairId:
-        type: object
-        properties:
-          token0:
-            type: string
-          token1:
-            type: string
-      token:
-        type: string
-      tickIndex:
-        type: string
-        format: int64
-      count:
-        type: string
-        format: uint64
-      address:
-        type: string
-      sharesOwned:
-        type: string
-      sharesWithdrawn:
-        type: string
-      sharesCancelled:
-        type: string
-  nicholasdotsol.duality.dex.MsgCancelLimitOrderResponse:
-    type: object
-  nicholasdotsol.duality.dex.MsgDepositResponse:
-    type: object
-    properties:
-      Reserve0Deposited:
-        type: array
-        items:
-          type: string
-      Reserve1Deposited:
-        type: array
-        items:
-          type: string
-  nicholasdotsol.duality.dex.MsgPlaceLimitOrderResponse:
-    type: object
-  nicholasdotsol.duality.dex.MsgSwapResponse:
-    type: object
-    properties:
-      coinOut:
-        type: object
-        properties:
-          denom:
-            type: string
-          amount:
-            type: string
-        description: |-
-          Coin defines a token with a denomination and an amount.
-
-          NOTE: The amount field is an Int which implements the custom method
-          signatures required by gogoproto.
-  nicholasdotsol.duality.dex.MsgWithdrawFilledLimitOrderResponse:
-    type: object
-  nicholasdotsol.duality.dex.MsgWithdrawlResponse:
-    type: object
-  nicholasdotsol.duality.dex.PairId:
-    type: object
-    properties:
-      token0:
-        type: string
-      token1:
-        type: string
-  nicholasdotsol.duality.dex.Params:
-    type: object
-    description: Params defines the parameters for the module.
-  nicholasdotsol.duality.dex.QueryAllFeeTierResponse:
-    type: object
-    properties:
-      FeeTier:
-        type: array
-        items:
-          type: object
-          properties:
-            id:
-              type: string
-              format: uint64
-            fee:
-              type: string
-              format: uint64
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
-  nicholasdotsol.duality.dex.QueryAllFilledLimitOrderTrancheResponse:
-    type: object
-    properties:
-      filledLimitOrderTranche:
-        type: array
-        items:
-          type: object
-          properties:
-            pairId:
-              type: object
-              properties:
-                token0:
-                  type: string
-                token1:
-                  type: string
-            tokenIn:
-              type: string
-            tickIndex:
-              type: string
-              format: int64
-            trancheIndex:
-              type: string
-              format: uint64
-            reservesTokenOut:
-              type: string
-            totalTokenIn:
-              type: string
-            totalTokenOut:
-              type: string
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
-  nicholasdotsol.duality.dex.QueryAllLimitOrderTrancheResponse:
-    type: object
-    properties:
-      LimitOrderTranche:
-        type: array
-        items:
-          type: object
-          properties:
-            pairId:
-              type: object
-              properties:
-                token0:
-                  type: string
-                token1:
-                  type: string
-            tokenIn:
-              type: string
-            tickIndex:
-              type: string
-              format: int64
-            trancheIndex:
-              type: string
-              format: uint64
-            reservesTokenIn:
-              type: string
-            reservesTokenOut:
-              type: string
-            totalTokenIn:
-              type: string
-            totalTokenOut:
-              type: string
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
-  nicholasdotsol.duality.dex.QueryAllLimitOrderTrancheUserResponse:
-    type: object
-    properties:
-      LimitOrderTrancheUser:
-        type: array
-        items:
-          type: object
-          properties:
-            pairId:
-              type: object
-              properties:
-                token0:
-                  type: string
-                token1:
-                  type: string
-            token:
-              type: string
-            tickIndex:
-              type: string
-              format: int64
-            count:
-              type: string
-              format: uint64
-            address:
-              type: string
-            sharesOwned:
-              type: string
-            sharesWithdrawn:
-              type: string
-            sharesCancelled:
-              type: string
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
-  nicholasdotsol.duality.dex.QueryAllTickLiquidityResponse:
-    type: object
-    properties:
-      tickLiquidity:
-        type: array
-        items:
-          type: object
-          properties:
-            pairId:
-              type: object
-              properties:
-                token0:
-                  type: string
-                token1:
-                  type: string
-            tokenIn:
-              type: string
-            tickIndex:
-              type: string
-              format: int64
-            liquidityType:
-              type: string
-            liquidityIndex:
-              type: string
-              format: uint64
-            LPReserve:
-              type: string
-            limitOrderTranche:
-              type: object
-              properties:
-                pairId:
-                  type: object
-                  properties:
-                    token0:
-                      type: string
-                    token1:
-                      type: string
-                tokenIn:
-                  type: string
-                tickIndex:
-                  type: string
-                  format: int64
-                trancheIndex:
-                  type: string
-                  format: uint64
-                reservesTokenIn:
-                  type: string
-                reservesTokenOut:
-                  type: string
-                totalTokenIn:
-                  type: string
-                totalTokenOut:
-                  type: string
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
-  nicholasdotsol.duality.dex.QueryAllTokenMapResponse:
-    type: object
-    properties:
-      tokenMap:
-        type: array
-        items:
-          type: object
-          properties:
-            address:
-              type: string
-            index:
-              type: string
-              format: int64
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
-  nicholasdotsol.duality.dex.QueryAllTokensResponse:
-    type: object
-    properties:
-      Tokens:
-        type: array
-        items:
-          type: object
-          properties:
-            id:
-              type: string
-              format: uint64
-            address:
-              type: string
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
-  nicholasdotsol.duality.dex.QueryAllTradingPairResponse:
-    type: object
-    properties:
-      TradingPair:
-        type: array
-        items:
-          type: object
-          properties:
-            pairId:
-              type: object
-              properties:
-                token0:
-                  type: string
-                token1:
-                  type: string
-            currentTick0To1:
-              type: string
-              format: int64
-            currentTick1To0:
-              type: string
-              format: int64
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
-  nicholasdotsol.duality.dex.QueryAllUserDepositsResponse:
-    type: object
-    properties:
-      Deposits:
-        type: array
-        items:
-          type: object
-          properties:
-            pairId:
-              type: object
-              properties:
-                token0:
-                  type: string
-                token1:
-                  type: string
-            sharesOwned:
-              type: string
-            centerTickIndex:
-              type: string
-              format: int64
-            lowerTickIndex:
-              type: string
-              format: int64
-            upperTickIndex:
-              type: string
-              format: int64
-            feeIndex:
-              type: string
-              format: uint64
-  nicholasdotsol.duality.dex.QueryAllUserLimitOrdersResponse:
-    type: object
-    properties:
-      limitOrders:
-        type: array
-        items:
-          type: object
-          properties:
-            pairId:
-              type: object
-              properties:
-                token0:
-                  type: string
-                token1:
-                  type: string
-            token:
-              type: string
-            tickIndex:
-              type: string
-              format: int64
-            count:
-              type: string
-              format: uint64
-            address:
-              type: string
-            sharesOwned:
-              type: string
-            sharesWithdrawn:
-              type: string
-            sharesCancelled:
-              type: string
-  nicholasdotsol.duality.dex.QueryGetFeeTierResponse:
-    type: object
-    properties:
-      FeeTier:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uint64
-          fee:
-            type: string
-            format: uint64
-  nicholasdotsol.duality.dex.QueryGetFilledLimitOrderTrancheResponse:
-    type: object
-    properties:
-      filledLimitOrderTranche:
-        type: object
-        properties:
-          pairId:
-            type: object
-            properties:
-              token0:
-                type: string
-              token1:
-                type: string
-          tokenIn:
-            type: string
-          tickIndex:
-            type: string
-            format: int64
-          trancheIndex:
-            type: string
-            format: uint64
-          reservesTokenOut:
-            type: string
-          totalTokenIn:
-            type: string
-          totalTokenOut:
-            type: string
-  nicholasdotsol.duality.dex.QueryGetLimitOrderTrancheResponse:
-    type: object
-    properties:
-      LimitOrderTranche:
-        type: object
-        properties:
-          pairId:
-            type: object
-            properties:
-              token0:
-                type: string
-              token1:
-                type: string
-          tokenIn:
-            type: string
-          tickIndex:
-            type: string
-            format: int64
-          trancheIndex:
-            type: string
-            format: uint64
-          reservesTokenIn:
-            type: string
-          reservesTokenOut:
-            type: string
-          totalTokenIn:
-            type: string
-          totalTokenOut:
-            type: string
-  nicholasdotsol.duality.dex.QueryGetLimitOrderTrancheUserResponse:
-    type: object
-    properties:
-      LimitOrderTrancheUser:
-        type: object
-        properties:
-          pairId:
-            type: object
-            properties:
-              token0:
-                type: string
-              token1:
-                type: string
-          token:
-            type: string
-          tickIndex:
-            type: string
-            format: int64
-          count:
-            type: string
-            format: uint64
-          address:
-            type: string
-          sharesOwned:
-            type: string
-          sharesWithdrawn:
-            type: string
-          sharesCancelled:
-            type: string
-  nicholasdotsol.duality.dex.QueryGetTickLiquidityResponse:
-    type: object
-    properties:
-      tickLiquidity:
-        type: object
-        properties:
-          pairId:
-            type: object
-            properties:
-              token0:
-                type: string
-              token1:
-                type: string
-          tokenIn:
-            type: string
-          tickIndex:
-            type: string
-            format: int64
-          liquidityType:
-            type: string
-          liquidityIndex:
-            type: string
-            format: uint64
-          LPReserve:
-            type: string
-          limitOrderTranche:
-            type: object
-            properties:
-              pairId:
-                type: object
-                properties:
-                  token0:
-                    type: string
-                  token1:
-                    type: string
-              tokenIn:
-                type: string
-              tickIndex:
-                type: string
-                format: int64
-              trancheIndex:
-                type: string
-                format: uint64
-              reservesTokenIn:
-                type: string
-              reservesTokenOut:
-                type: string
-              totalTokenIn:
-                type: string
-              totalTokenOut:
-                type: string
-  nicholasdotsol.duality.dex.QueryGetTokenMapResponse:
-    type: object
-    properties:
-      tokenMap:
-        type: object
-        properties:
-          address:
-            type: string
-          index:
-            type: string
-            format: int64
-  nicholasdotsol.duality.dex.QueryGetTokensResponse:
-    type: object
-    properties:
-      Tokens:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uint64
-          address:
-            type: string
-  nicholasdotsol.duality.dex.QueryGetTradingPairResponse:
-    type: object
-    properties:
-      TradingPair:
-        type: object
-        properties:
-          pairId:
-            type: object
-            properties:
-              token0:
-                type: string
-              token1:
-                type: string
-          currentTick0To1:
-            type: string
-            format: int64
-          currentTick1To0:
-            type: string
-            format: int64
-  nicholasdotsol.duality.dex.QueryGetUserPositionsResponse:
-    type: object
-    properties:
-      UserPositions:
-        type: object
-        properties:
-          PoolDeposits:
-            type: array
-            items:
-              type: object
-              properties:
-                pairId:
-                  type: object
-                  properties:
-                    token0:
-                      type: string
-                    token1:
-                      type: string
-                sharesOwned:
-                  type: string
-                centerTickIndex:
-                  type: string
-                  format: int64
-                lowerTickIndex:
-                  type: string
-                  format: int64
-                upperTickIndex:
-                  type: string
-                  format: int64
-                feeIndex:
-                  type: string
-                  format: uint64
-          LimitOrders:
-            type: array
-            items:
-              type: object
-              properties:
-                pairId:
-                  type: object
-                  properties:
-                    token0:
-                      type: string
-                    token1:
-                      type: string
-                token:
-                  type: string
-                tickIndex:
-                  type: string
-                  format: int64
-                count:
-                  type: string
-                  format: uint64
-                address:
-                  type: string
-                sharesOwned:
-                  type: string
-                sharesWithdrawn:
-                  type: string
-                sharesCancelled:
-                  type: string
-  nicholasdotsol.duality.dex.QueryParamsResponse:
-    type: object
-    properties:
-      params:
-        description: params holds all the parameters of this module.
-        type: object
-    description: QueryParamsResponse is response type for the Query/Params RPC method.
-  nicholasdotsol.duality.dex.TickLiquidity:
-    type: object
-    properties:
-      pairId:
-        type: object
-        properties:
-          token0:
-            type: string
-          token1:
-            type: string
-      tokenIn:
-        type: string
-      tickIndex:
-        type: string
-        format: int64
-      liquidityType:
-        type: string
-      liquidityIndex:
-        type: string
-        format: uint64
-      LPReserve:
-        type: string
-      limitOrderTranche:
-        type: object
-        properties:
-          pairId:
-            type: object
-            properties:
-              token0:
-                type: string
-              token1:
-                type: string
-          tokenIn:
-            type: string
-          tickIndex:
-            type: string
-            format: int64
-          trancheIndex:
-            type: string
-            format: uint64
-          reservesTokenIn:
-            type: string
-          reservesTokenOut:
-            type: string
-          totalTokenIn:
-            type: string
-          totalTokenOut:
-            type: string
-  nicholasdotsol.duality.dex.TokenMap:
-    type: object
-    properties:
-      address:
-        type: string
-      index:
-        type: string
-        format: int64
-  nicholasdotsol.duality.dex.Tokens:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uint64
-      address:
-        type: string
-  nicholasdotsol.duality.dex.TradingPair:
-    type: object
-    properties:
-      pairId:
-        type: object
-        properties:
-          token0:
-            type: string
-          token1:
-            type: string
-      currentTick0To1:
-        type: string
-        format: int64
-      currentTick1To0:
-        type: string
-        format: int64
-  nicholasdotsol.duality.dex.UserPositions:
-    type: object
-    properties:
-      PoolDeposits:
-        type: array
-        items:
-          type: object
-          properties:
-            pairId:
-              type: object
-              properties:
-                token0:
-                  type: string
-                token1:
-                  type: string
-            sharesOwned:
-              type: string
-            centerTickIndex:
-              type: string
-              format: int64
-            lowerTickIndex:
-              type: string
-              format: int64
-            upperTickIndex:
-              type: string
-              format: int64
-            feeIndex:
-              type: string
-              format: uint64
-      LimitOrders:
-        type: array
-        items:
-          type: object
-          properties:
-            pairId:
-              type: object
-              properties:
-                token0:
-                  type: string
-                token1:
-                  type: string
-            token:
-              type: string
-            tickIndex:
-              type: string
-              format: int64
-            count:
-              type: string
-              format: uint64
-            address:
-              type: string
-            sharesOwned:
-              type: string
-            sharesWithdrawn:
-              type: string
-            sharesCancelled:
-              type: string
-  nicholasdotsol.duality.mev.MsgSendResponse:
-    type: object
-  nicholasdotsol.duality.mev.Params:
-    type: object
-    description: Params defines the parameters for the module.
-  nicholasdotsol.duality.mev.QueryParamsResponse:
-    type: object
-    properties:
-      params:
-        description: params holds all the parameters of this module.
-        type: object
-    description: QueryParamsResponse is response type for the Query/Params RPC method.
