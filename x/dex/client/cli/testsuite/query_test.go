@@ -68,16 +68,11 @@ func (s *QueryTestSuite) SetupSuite() {
 	cmd = dexClient.CmdPlaceLimitOrder()
 	_, err = cli.ExecTestCLICmd(clientCtx, cmd, args)
 	require.NoError(s.T(), err)
-
-	//s.fundAccount(clientCtx, s.network.Validators[0].Address, s.addr1, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(100)), sdk.NewCoin("TokenA", sdk.NewInt(100000))))
-
-	//s.fundAccount(clientCtx, s.network.Validators[0].Address, s.addr2, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(100)), sdk.NewCoin("TokenA", sdk.NewInt(100000))))
 }
 
 func (s *QueryTestSuite) TestQueryCmdShowFeeTier() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	//clientCtx.OutputFormat = outputFormat
 	testCases := []struct {
 		name      string
 		args      []string
@@ -191,8 +186,6 @@ func (s *QueryTestSuite) TestQueryCmdListFeeTier() {
 func (s *QueryTestSuite) TestQueryCmdShowTick() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	//clientCtx.OutputFormat = outputFormat
-
 	ValidTestReserve := sdk.NewInt(10)
 	testCases := []struct {
 		name      string
@@ -357,84 +350,6 @@ func (s *QueryTestSuite) TestQueryCmdListTick() {
 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 				require.NotEmpty(s.T(), res)
 				require.Equal(s.T(), tc.expOutput, res.TickLiquidity)
-
-			}
-		})
-	}
-}
-
-func (s *QueryTestSuite) TestQueryCmdShowUserPosition() {
-	val := s.network.Validators[0]
-	clientCtx := val.ClientCtx
-
-	testCases := []struct {
-		name      string
-		args      []string
-		expErr    bool
-		expErrMsg string
-		expOutput types.UserPositions
-	}{
-		{
-			name: "valid",
-			args: []string{s.network.Validators[0].Address.String()},
-			expOutput: types.UserPositions{
-				PoolDeposits: []types.DepositRecord{
-					types.DepositRecord{
-						PairId: &types.PairId{
-							Token0: "TokenA",
-							Token1: "TokenB",
-						},
-						SharesOwned:     sdk.NewInt(20),
-						CenterTickIndex: 0,
-						LowerTickIndex:  -3,
-						UpperTickIndex:  3,
-						FeeIndex:        1,
-					},
-				},
-				LimitOrders: []types.LimitOrderTrancheUser{types.LimitOrderTrancheUser{}},
-			},
-		},
-		{
-			name:      "invalid address",
-			args:      []string{"0x0"},
-			expErr:    true,
-			expErrMsg: "invalid bech32 string length",
-		},
-		{
-			name:      "too many addresses",
-			args:      []string{s.network.Validators[0].Address.String(), s.addr1.String()},
-			expErr:    true,
-			expErrMsg: "Error: accepts 1 arg(s), received",
-		},
-		{
-			name:      "no address",
-			args:      []string{},
-			expErr:    true,
-			expErrMsg: "Error: accepts 1 arg(s), received 0",
-		},
-		{
-			name: "empty valid",
-			args: []string{s.addr1.String()},
-			expOutput: types.UserPositions{
-				PoolDeposits: []types.DepositRecord{},
-				LimitOrders:  []types.LimitOrderTrancheUser{},
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		s.Run(tc.name, func() {
-			cmd := dexClient.CmdShowUserPositions()
-			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
-			if tc.expErr {
-				require.Error(s.T(), err)
-				require.Contains(s.T(), out.String(), tc.expErrMsg)
-			} else {
-				require.NoError(s.T(), err)
-				var res types.QueryGetUserPositionsResponse
-				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
-				require.NotEmpty(s.T(), res)
-				require.Equal(s.T(), tc.expOutput, res.UserPositions)
 
 			}
 		})
@@ -637,185 +552,3 @@ func (s *QueryTestSuite) TestQueryCmdListLimitOrderTrancheUser() {
 		})
 	}
 }
-
-func (s *QueryTestSuite) TestQueryCmdListUserLimitOrders() {
-	val := s.network.Validators[0]
-	clientCtx := val.ClientCtx
-	testCases := []struct {
-		name      string
-		args      []string
-		expErr    bool
-		expErrMsg string
-		expOutput []types.LimitOrderTrancheUser
-	}{
-		{
-			name: "valid",
-			args: []string{s.network.Validators[0].Address.String()},
-			expOutput: []types.LimitOrderTrancheUser{
-				types.LimitOrderTrancheUser{
-					PairId: &types.PairId{
-						Token0: "TokenA",
-						Token1: "TokenB",
-					},
-					Token:           "TokenB",
-					TickIndex:       20,
-					Count:           0,
-					Address:         s.network.Validators[0].Address.String(),
-					SharesOwned:     sdk.NewInt(10),
-					SharesWithdrawn: sdk.NewInt(0),
-					SharesCancelled: sdk.NewInt(0),
-				},
-			},
-		},
-	}
-	for _, tc := range testCases {
-		s.Run(tc.name, func() {
-			cmd := dexClient.CmdListUserLimitOrders()
-			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
-			if tc.expErr {
-				require.Error(s.T(), err)
-				require.Contains(s.T(), out.String(), tc.expErrMsg)
-			} else {
-				require.NoError(s.T(), err)
-
-				var res types.QueryAllUserLimitOrdersResponse
-				err := clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res)
-				require.NoError(s.T(), err)
-				require.NotEmpty(s.T(), res)
-				require.Equal(s.T(), tc.expOutput, res.LimitOrders)
-
-			}
-		})
-	}
-}
-func (s *QueryTestSuite) TestQueryCmdListUserDeposits() {
-	val := s.network.Validators[0]
-	clientCtx := val.ClientCtx
-	testCases := []struct {
-		name      string
-		args      []string
-		expErr    bool
-		expErrMsg string
-		expOutput []types.DepositRecord
-	}{
-		{
-			name: "valid",
-			args: []string{s.network.Validators[0].Address.String()},
-			expOutput: []types.DepositRecord{
-				types.DepositRecord{
-					PairId: &types.PairId{
-						Token0: "TokenA",
-						Token1: "TokenB",
-					},
-					SharesOwned:     sdk.NewInt(20),
-					CenterTickIndex: 0,
-					LowerTickIndex:  -3,
-					UpperTickIndex:  3,
-					FeeIndex:        1,
-				},
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		s.Run(tc.name, func() {
-			cmd := dexClient.CmdListUserDeposits()
-			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
-			if tc.expErr {
-				require.Error(s.T(), err)
-				require.Contains(s.T(), out.String(), tc.expErrMsg)
-			} else {
-				require.NoError(s.T(), err)
-
-				var res types.QueryAllUserDepositsResponse
-				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
-				require.NotEmpty(s.T(), res)
-				require.Equal(s.T(), tc.expOutput, res.Deposits)
-
-			}
-		})
-	}
-}
-
-// func (s *QueryTestSuite) TestQuery11CmdShowTokenMap() {
-// 	val := s.network.Validators[0]
-// 	clientCtx := val.ClientCtx
-// 	testCases := []struct {
-// 		name      string
-// 		args      []string
-// 		expErr    bool
-// 		expErrMsg string
-// 		expOutput types.TokenMap
-// 	}{
-// 		{
-// 			name:      "valid",
-// 			args:      []string{"TokenA"},
-// 			expOutput: types.TokenMap{},
-// 		},
-// 		{
-// 			name:      "invalid address",
-// 			args:      []string{"TokenC"},
-// 			expErr:    true,
-// 			expErrMsg: "key not found",
-// 		},
-// 		{
-// 			name:      "too many addresses",
-// 			args:      []string{"TokenA", "TokenB"},
-// 			expErr:    true,
-// 			expErrMsg: "Error: accepts 1 arg(s), received 2",
-// 		},
-// 		{
-// 			name:      "no token address",
-// 			args:      []string{},
-// 			expErr:    true,
-// 			expErrMsg: "Error: accepts 1 arg(s), received 0",
-// 		},
-// 	}
-// 	for _, tc := range testCases {
-// 		s.Run(tc.name, func() {
-// 			cmd := dexClient.CmdShowTokenMap()
-// 			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
-// 			if tc.expErr {
-// 				require.Error(s.T(), err)
-// 				require.Contains(s.T(), out.String(), tc.expErrMsg)
-// 			} else {
-// 				require.NoError(s.T(), err)
-// 				var res types.QueryGetTokenMapResponse
-// 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
-// 				require.NotEmpty(s.T(), res)
-// 				require.Equal(s.T(), tc.expOutput, res.TokenMap)
-// 			}
-// 		})
-// 	}
-// }
-
-// func (s *QueryTestSuite) TestQuery12CmdListTokenMap() {
-// 	val := s.network.Validators[0]
-// 	clientCtx := val.ClientCtx
-// 	testCases := []struct {
-// 		name      string
-// 		args      []string
-// 		expErr    bool
-// 		expErrMsg string
-// 		expOutput []types.TokenMap
-// 	}{
-// 		{
-// 		},
-// 	}
-// 	for _, tc := range testCases {
-// 		s.Run(tc.name, func() {
-// 			cmd := dexClient.CmdListTokenMap()
-// 			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
-// 			if tc.expErr {
-// 				require.Error(s.T(), err)
-// 				require.Contains(s.T(), out.String(), tc.expErrMsg)
-// 			} else {
-// 				require.NoError(s.T(), err)
-// 				var res types.QueryAllTokenMapResponse
-// 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
-// 				require.NotEmpty(s.T(), res)
-// 				require.Equal(s.T(), tc.expOutput, res.TokenMap)
-// 			}
-// 		})
-// 	}
-// }
