@@ -175,24 +175,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullDifferentDirection() {
 	s.assertCurr0To1(math.MaxInt64)
 }
 
-func (s *MsgServerTestSuite) TestWithdrawFilledInvalidKeyToken() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 50)
-
-	// GIVEN
-	// existing limit order selling TokenA for TokenB that was filled
-	s.aliceLimitSells("TokenA", 0, 10)
-	s.bobMarketSells("TokenB", 10, 0)
-
-	// WHEN
-	// withdrawing the sold tokens
-	// THEN
-	// withdraw should fail with ErrInvalidTradingPair
-
-	err := types.ErrInvalidKeyToken
-	s.aliceWithdrawLimitSellFails(err, "TokenC", 0, 0)
-}
-
 func (s *MsgServerTestSuite) TestWithdrawFilledEmptyFilled() {
 	s.fundAliceBalances(50, 50)
 

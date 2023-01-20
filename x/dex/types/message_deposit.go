@@ -61,5 +61,15 @@ func (msg *MsgDeposit) ValidateBasic() error {
 		len(msg.AmountsA) != len(msg.TickIndexes) {
 		return ErrUnbalancedTxArray
 	}
+
+	if len(msg.AmountsA) == 0 {
+		return ErrZeroDeposit
+	}
+
+	for i := 0; i < len(msg.AmountsA); i++ {
+		if msg.AmountsA[i].Equal(sdk.ZeroInt()) && msg.AmountsB[i].Equal(sdk.ZeroInt()) {
+			return ErrZeroDeposit
+		}
+	}
 	return nil
 }
