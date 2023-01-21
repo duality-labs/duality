@@ -18,15 +18,15 @@ type Pool struct {
 func NewPool(
 	tickIndex int64,
 	// feeIndex uint64,
-	lowerTick0 types.TickLiquidityI,
-	upperTick1 types.TickLiquidityI,
+	lowerTick0 *types.PoolReserves,
+	upperTick1 *types.PoolReserves,
 ) Pool {
 	// TODO: maybe store this somewhere so we don't have to recalculate
 	price0To1 := MustCalcPrice0To1(tickIndex)
 	return Pool{
 		TickIndex:      tickIndex,
-		LowerTick0:     lowerTick0.ToPoolReserves(),
-		UpperTick1:     upperTick1.ToPoolReserves(),
+		LowerTick0:     lowerTick0,
+		UpperTick1:     upperTick1,
 		Price0To1Upper: price0To1,
 		Price1To0Lower: sdk.OneDec().Quo(price0To1),
 	}
@@ -34,12 +34,12 @@ func NewPool(
 
 func (k Keeper) GetOrInitPool(ctx sdk.Context, pairId *types.PairId, tickIndex int64, feeTier types.FeeTier) (Pool, error) {
 	fee := feeTier.Fee
-	lowertick, err := k.GetOrInitTickLP(ctx, pairId, pairId.Token0, tickIndex-int64(fee), fee)
+	lowertick, err := k.GetOrInitPoolReserves(ctx, pairId, pairId.Token0, tickIndex-int64(fee), fee)
 	if err != nil {
 		return Pool{}, sdkerrors.Wrapf(err, "Error for lower tick")
 	}
 
-	upperTick, err := k.GetOrInitTickLP(ctx, pairId, pairId.Token1, tickIndex+int64(fee), fee)
+	upperTick, err := k.GetOrInitPoolReserves(ctx, pairId, pairId.Token1, tickIndex+int64(fee), fee)
 	if err != nil {
 		return Pool{}, sdkerrors.Wrapf(err, "Error for upper tick")
 	}

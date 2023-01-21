@@ -47,24 +47,27 @@ func (s *LiquidityIterator) Next() Liquidity {
 	for ; s.iter.Valid(); s.iter.Next() {
 		tick := s.iter.Value()
 		switch tick.LiquidityType() {
-		case types.LiquidityTypeLP:
+		case types.LiquidityTypePoolReserves:
 			var err error
 			var pool Liquidity
-			poolReserves := *tick.ToPoolReserves()
+			poolReserves := *tick.GetPoolReserves()
 			if s.is0To1 {
+				//Pool Reserves is upperTick
 				pool, err = s.createPool0To1(poolReserves)
 			} else {
+				//Pool Reserves is is lowerTick
 				pool, err = s.createPool1To0(poolReserves)
 			}
 			// TODO: we are not actually handling the error here we're just stopping iteration
-			// Should be a very rare edge case where the opposing tick is initialized above/below the Min/Max tick limit
+			// Should be a very rare edge case where the opposing tick is initialized
+			// above/below the Min/Max tick limit
 			if err != nil {
 				return nil
 			}
 			return pool
 
-		case types.LiquidityTypeLO:
-			return NewLimitOrderTrancheWrapper(tick.ToLimitOrderTranche())
+		case types.LiquidityTypeLimitOrder:
+			return NewLimitOrderTrancheWrapper(tick.GetLimitOrderTranche())
 
 		default:
 			panic("Tick does not have liquidity")
@@ -77,7 +80,7 @@ func (s *LiquidityIterator) Next() Liquidity {
 func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquidity, error) {
 	tickIndex := upperTick.TickIndex
 	lowerTickIndex := tickIndex - 2*int64(upperTick.Fee)
-	lowerTick, err := s.keeper.GetOrInitTickLP(s.ctx, s.pairId, s.pairId.Token0, lowerTickIndex, upperTick.Fee)
+	lowerTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairId, s.pairId.Token0, lowerTickIndex, upperTick.Fee)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +95,7 @@ func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquid
 func (s *LiquidityIterator) createPool1To0(lowerTick types.PoolReserves) (Liquidity, error) {
 	tickIndex := lowerTick.TickIndex
 	upperTickIndex := tickIndex + 2*int64(lowerTick.Fee)
-	upperTick, err := s.keeper.GetOrInitTickLP(s.ctx, s.pairId, s.pairId.Token1, upperTickIndex, lowerTick.Fee)
+	upperTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairId, s.pairId.Token1, upperTickIndex, lowerTick.Fee)
 	if err != nil {
 		return nil, err
 	}

@@ -46,9 +46,8 @@ func (k Keeper) GetOrInitPair(ctx sdk.Context, token0 string, token1 string) typ
 	return pair
 }
 
-// TODO: JCP RENAME GetOrInitPoolReserves
-func (k Keeper) GetOrInitTickLP(ctx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64, fee uint64) (types.TickLiquidityI, error) {
-	tickLiq, tickFound := k.GetTickLiquidityLP(
+func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64, fee uint64) (*types.PoolReserves, error) {
+	tickLiq, tickFound := k.GetTickLiquidityPoolReserves(
 		ctx,
 		pairId,
 		tokenIn,
@@ -71,8 +70,7 @@ func (k Keeper) GetOrInitTickLP(ctx sdk.Context, pairId *types.PairId, tokenIn s
 
 }
 
-// TODO JCP rename to NewLimitOrderTranche
-func NewTickLO(pairId *types.PairId, tokenIn string, tickIndex int64, trancheIndex uint64) (types.LimitOrderTranche, error) {
+func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64, trancheIndex uint64) (types.LimitOrderTranche, error) {
 	if IsTickOutOfRange(tickIndex) {
 		return types.LimitOrderTranche{}, types.ErrTickOutsideRange
 	}
@@ -88,24 +86,6 @@ func NewTickLO(pairId *types.PairId, tokenIn string, tickIndex int64, trancheInd
 	}, nil
 
 }
-
-// TODO: JCP delete?
-// func (k Keeper) GetOrInitTickLO(goCtx context.Context, pairId *types.PairId, tokenIn string, tickIndex int64, trancheIndex uint64) (types.TickLiquidityI, error) {
-// 	ctx := sdk.UnwrapSDKContext(goCtx)
-// 	tickLiq, tickFound := k.GetTickLiquidity(
-// 		ctx,
-// 		pairId,
-// 		tokenIn,
-// 		tickIndex,
-// 		types.LiquidityTypeLO,
-// 		trancheIndex,
-// 	)
-// 	if tickFound {
-// 		return tickLiq, nil
-// 	} else {
-// 		return NewTickLO(pairId, tokenIn, tickIndex, trancheIndex)
-// 	}
-// }
 
 func (k Keeper) GetOrInitLimitOrderTrancheUser(
 	goCtx context.Context,
@@ -147,7 +127,7 @@ func (k Keeper) GetCurrTick1To0(ctx sdk.Context, pairId *types.PairId) (tickIdx 
 	for ; ti.Valid(); ti.Next() {
 		tick := ti.Value()
 		if tick.HasToken() {
-			return tick.TickIndexVal(), true
+			return tick.TickIndex(), true
 		}
 	}
 	return math.MinInt64, false
@@ -160,7 +140,7 @@ func (k Keeper) GetCurrTick0To1(ctx sdk.Context, pairId *types.PairId) (tickIdx 
 	for ; ti.Valid(); ti.Next() {
 		tick := ti.Value()
 		if tick.HasToken() {
-			return tick.TickIndexVal(), true
+			return tick.TickIndex(), true
 		}
 	}
 

@@ -242,7 +242,7 @@ func TickLiquidityKey(
 	return key
 }
 
-func TickLiquidityLOPrefix(
+func TickLiquidityLimitOrderPrefix(
 	pairId *PairId,
 	tokenIn string,
 	tickIndex int64,
@@ -261,7 +261,7 @@ func TickLiquidityLOPrefix(
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
-	liquidityTypeBytes := []byte(LiquidityTypeLO)
+	liquidityTypeBytes := []byte(LiquidityTypeLimitOrder)
 	key = append(key, liquidityTypeBytes...)
 	key = append(key, []byte("/")...)
 
@@ -374,6 +374,6 @@ const (
 
 const (
 	// NOTE: have to add letter so that LP deposits are indexed ahead of LimitOrders
-	LiquidityTypeLP = "A_LPDeposit"
-	LiquidityTypeLO = "B_LODeposit"
+	LiquidityTypePoolReserves = "A_PoolDeposit"
+	LiquidityTypeLimitOrder   = "B_LODeposit"
 )

@@ -32,22 +32,6 @@ func (t LimitOrderTranche) CreateFilledTranche() FilledLimitOrderTranche {
 	}
 }
 
-func (LimitOrderTranche) LiquidityType() string {
-	return LiquidityTypeLO
-}
-
 func (t LimitOrderTranche) HasToken() bool {
 	return t.ReservesTokenIn.GT(sdk.ZeroInt())
-}
-
-func (t LimitOrderTranche) TickIndexVal() int64 {
-	return t.TickIndex
-}
-
-func (t LimitOrderTranche) ToLimitOrderTranche() *LimitOrderTranche {
-	return &t
-}
-
-func (LimitOrderTranche) ToPoolReserves() *PoolReserves {
-	panic("Cannot convert LimitOrderTranche to PoolReserves")
 }

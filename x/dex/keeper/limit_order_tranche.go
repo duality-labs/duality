@@ -73,7 +73,7 @@ func (t LimitOrderTrancheWrapper) IsFilled() bool {
 
 func (t *LimitOrderTrancheWrapper) Save(sdkCtx sdk.Context, keeper Keeper) {
 	if t.HasToken() {
-		keeper.SetTickLiquidityLO(sdkCtx, *t.LimitOrderTranche)
+		keeper.SetTickLiquidityLimitOrder(sdkCtx, *t.LimitOrderTranche)
 	} else {
 		filledTranche := t.LimitOrderTranche.CreateFilledTranche()
 		keeper.SetFilledLimitOrderTranche(sdkCtx, filledTranche)
@@ -99,9 +99,9 @@ func (k Keeper) GetLimitOrderTranche(
 ) (val types.LimitOrderTranche, fromFilled bool, found bool) {
 
 	// Try to find the tranche in the active liq index
-	tick, found := k.GetTickLiquidityLO(ctx, pairId, token, tickIndex, trancheIndex)
+	tick, found := k.GetTickLiquidityLimitOrder(ctx, pairId, token, tickIndex, trancheIndex)
 	if found {
-		return *tick.ToLimitOrderTranche(), false, true
+		return *tick, false, true
 	}
 	// Look for filled limit orders
 	tranche, found := k.GetFilledLimitOrderTranche(ctx, pairId, token, tickIndex, trancheIndex)
@@ -128,7 +128,7 @@ func (k Keeper) GetAllLimitOrderTranche(ctx sdk.Context) (list []types.LimitOrde
 
 func (k Keeper) SaveTranche(sdkCtx sdk.Context, tranche types.LimitOrderTranche) {
 	if tranche.HasToken() {
-		k.SetTickLiquidityLO(sdkCtx, tranche)
+		k.SetTickLiquidityLimitOrder(sdkCtx, tranche)
 	} else {
 		filledTranche := tranche.CreateFilledTranche()
 		k.SetFilledLimitOrderTranche(sdkCtx, filledTranche)

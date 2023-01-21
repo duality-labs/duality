@@ -1,13 +1,5 @@
 package types
 
-type TickLiquidityI interface {
-	LiquidityType() string
-	HasToken() bool
-	TickIndexVal() int64
-	ToLimitOrderTranche() *LimitOrderTranche
-	ToPoolReserves() *PoolReserves
-}
-
 func (t TickLiquidity) TokenIn() string {
 	switch liquidity := t.Liquidity.(type) {
 	case *TickLiquidity_LimitOrderTranche:
@@ -47,10 +39,10 @@ func (t TickLiquidity) TickIndex() int64 {
 func (t TickLiquidity) LiquidityType() string {
 	switch t.Liquidity.(type) {
 	case *TickLiquidity_LimitOrderTranche:
-		return LiquidityTypeLO
+		return LiquidityTypeLimitOrder
 
 	case *TickLiquidity_PoolReserves:
-		return LiquidityTypeLP
+		return LiquidityTypePoolReserves
 	default:
 		panic("Tick does not contain valid liqudityType")
 	}
@@ -63,6 +55,18 @@ func (t TickLiquidity) LiquidityIndex() uint64 {
 
 	case *TickLiquidity_PoolReserves:
 		return liquidity.PoolReserves.Fee
+	default:
+		panic("Tick does not contain valid liqudityType")
+	}
+}
+
+func (t TickLiquidity) HasToken() bool {
+	switch liquidity := t.Liquidity.(type) {
+	case *TickLiquidity_LimitOrderTranche:
+		return liquidity.LimitOrderTranche.HasToken()
+
+	case *TickLiquidity_PoolReserves:
+		return liquidity.PoolReserves.HasToken()
 	default:
 		panic("Tick does not contain valid liqudityType")
 	}
