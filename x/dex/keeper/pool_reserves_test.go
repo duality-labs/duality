@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createNPoolReservess(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.PoolReserves {
+func createNPoolReserves(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.PoolReserves {
 	items := make([]types.PoolReserves, n)
 	for i := range items {
 		tranche := &types.PoolReserves{
@@ -29,7 +29,7 @@ func createNPoolReservess(keeper *keeper.Keeper, ctx sdk.Context, n int) []types
 
 func TestGetPoolReserves(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNPoolReservess(keeper, ctx, 10)
+	items := createNPoolReserves(keeper, ctx, 10)
 	for _, item := range items {
 		rst, found := keeper.GetPoolReserves(ctx,
 			item.PairId,
@@ -46,7 +46,7 @@ func TestGetPoolReserves(t *testing.T) {
 }
 func TestRemovePoolReserves(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNPoolReservess(keeper, ctx, 10)
+	items := createNPoolReserves(keeper, ctx, 10)
 	for _, item := range items {
 		keeper.RemovePoolReserves(ctx, item)
 		_, found := keeper.GetPoolReserves(ctx,

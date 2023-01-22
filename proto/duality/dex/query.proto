@@ -15,6 +15,7 @@ import "duality/dex/user_positions.proto";
 import "duality/dex/deposit_record.proto";
 import "duality/dex/tick_liquidity.proto";
 import "duality/dex/filled_limit_order_tranche.proto";
+import "duality/dex/pool_reserves.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/duality-labs/duality/x/dex/types";
@@ -114,6 +115,16 @@ service Query {
 	// Queries a list of FilledLimitOrderTranche items.
 	rpc FilledLimitOrderTrancheAll(QueryAllFilledLimitOrderTrancheRequest) returns (QueryAllFilledLimitOrderTrancheResponse) {
 		option (google.api.http).get = "/dualitylabs/duality/dex/filled_limit_order_tranche";
+	}
+
+// Queries a list of PoolReserves items.
+	rpc PoolReservesAll(QueryAllPoolReservesRequest) returns (QueryAllPoolReservesResponse) {
+		option (google.api.http).get = "/duality-labs/duality/dex/pool_reserves/{pairId}/{tokenIn}";
+	}
+
+  // Queries a PoolReserve by index
+  rpc PoolReserves(QueryGetPoolReservesRequest) returns (QueryGetPoolReservesResponse) {
+		option (google.api.http).get = "/duality-labs/duality/dex/pool_reserves/{pairId}/{tokenIn}/{tickIndex}/{fee}";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -298,4 +309,26 @@ message QueryAllFilledLimitOrderTrancheResponse {
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
+message QueryAllPoolReservesRequest {
+  string pairId = 1;
+  string tokenIn = 2;
+cosmos.base.query.v1beta1.PageRequest pagination = 3;
+}
+
+message QueryAllPoolReservesResponse {
+  repeated PoolReserves poolReserves = 1 [(gogoproto.nullable) = false];
+cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetPoolReservesRequest {
+  string pairId = 1;
+  string tokenIn = 2;
+  int64 tickIndex =3;
+  uint64 fee = 4;
+
+}
+
+message QueryGetPoolReservesResponse {
+	PoolReserves poolReserves = 1 [(gogoproto.nullable) = false];
+}
 // this line is used by starport scaffolding # 3
