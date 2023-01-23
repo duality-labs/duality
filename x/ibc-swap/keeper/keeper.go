@@ -19,22 +19,13 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 )
 
-// Middleware must implement types.ChannelKeeper and types.PortKeeper, expected interfaces
-// so that it can wrap IBC channel and port logic for underlying application.
-var (
-	_ types.ChannelKeeper = Keeper{}
-	_ types.PortKeeper    = Keeper{}
-)
-
 // Keeper defines the swap middleware keeper.
 type Keeper struct {
 	cdc              codec.BinaryCodec
 	msgServiceRouter *baseapp.MsgServiceRouter
 
-	ics4Wrapper   porttypes.ICS4Wrapper
-	channelKeeper types.ChannelKeeper
-	portKeeper    types.PortKeeper
-	bankKeeper    types.BankKeeper
+	ics4Wrapper porttypes.ICS4Wrapper
+	bankKeeper  types.BankKeeper
 }
 
 // NewKeeper creates a new swap Keeper instance.
@@ -42,18 +33,14 @@ func NewKeeper(
 	cdc codec.BinaryCodec,
 	msgServiceRouter *baseapp.MsgServiceRouter,
 	ics4Wrapper porttypes.ICS4Wrapper,
-	channelKeeper types.ChannelKeeper,
-	portKeeper types.PortKeeper,
 	bankKeeper types.BankKeeper,
 ) Keeper {
 	return Keeper{
 		cdc:              cdc,
 		msgServiceRouter: msgServiceRouter,
 
-		ics4Wrapper:   ics4Wrapper,
-		channelKeeper: channelKeeper,
-		portKeeper:    portKeeper,
-		bankKeeper:    bankKeeper,
+		ics4Wrapper: ics4Wrapper,
+		bankKeeper:  bankKeeper,
 	}
 }
 
@@ -82,27 +69,6 @@ func (k Keeper) Swap(ctx sdk.Context, msg *dextypes.MsgSwap) (*dextypes.MsgSwapR
 	return msgSwapRes, nil
 }
 
-// BindPort defines a wrapper function for the port Keeper's function in
-// order to expose it to module's InitGenesis function.
-func (k Keeper) BindPort(ctx sdk.Context, portID string) *capabilitytypes.Capability {
-	return k.portKeeper.BindPort(ctx, portID)
-}
-
-// GetChannel wraps IBC ChannelKeeper's GetChannel function.
-func (k Keeper) GetChannel(ctx sdk.Context, portID, channelID string) (channeltypes.Channel, bool) {
-	return k.channelKeeper.GetChannel(ctx, portID, channelID)
-}
-
-// GetPacketCommitment wraps IBC ChannelKeeper's GetPacketCommitment function.
-func (k Keeper) GetPacketCommitment(ctx sdk.Context, portID, channelID string, sequence uint64) []byte {
-	return k.channelKeeper.GetPacketCommitment(ctx, portID, channelID, sequence)
-}
-
-// GetNextSequenceSend wraps IBC ChannelKeeper's GetNextSequenceSend function.
-func (k Keeper) GetNextSequenceSend(ctx sdk.Context, portID, channelID string) (uint64, bool) {
-	return k.channelKeeper.GetNextSequenceSend(ctx, portID, channelID)
-}
-
 // SendPacket wraps IBC ChannelKeeper's SendPacket function
 func (k Keeper) SendPacket(ctx sdk.Context, chanCap *capabilitytypes.Capability, packet ibcexported.PacketI) error {
 	return k.ics4Wrapper.SendPacket(ctx, chanCap, packet)
@@ -117,6 +83,7 @@ func (k Keeper) WriteAcknowledgement(ctx sdk.Context, chanCap *capabilitytypes.C
 // RefundPacketToken handles the burning/minting of vouchers when an asset should be refunded, this comes straight from ics20.
 // This is only used in the case where we call into the transfer modules OnRecvPacket callback but then the swap fails.
 func (k Keeper) RefundPacketToken(ctx sdk.Context, packet channeltypes.Packet, data transfertypes.FungibleTokenPacketData) error {
+
 	// parse the denomination from the full denom path
 	trace := transfertypes.ParseDenomTrace(data.Denom)
 
@@ -127,35 +94,33 @@ func (k Keeper) RefundPacketToken(ctx sdk.Context, packet channeltypes.Packet, d
 	}
 	token := sdk.NewCoin(trace.IBCDenom(), transferAmount)
 
-	// decode the sender address
-	sender, err := sdk.AccAddressFromBech32(data.Sender)
+	// decode the receiver address
+	receiver, err := sdk.AccAddressFromBech32(data.Receiver)
 	if err != nil {
 		return err
 	}
 
-	if transfertypes.SenderChainIsSource(packet.GetSourcePort(), packet.GetSourceChannel(), data.Denom) {
-		// unescrow tokens back to sender
-		escrowAddress := transfertypes.GetEscrowAddress(packet.GetSourcePort(), packet.GetSourceChannel())
-		if err := k.bankKeeper.SendCoins(ctx, escrowAddress, sender, sdk.NewCoins(token)); err != nil {
-			// NOTE: this error is only expected to occur given an unexpected bug or a malicious
-			// counterparty module. The bug may occur in bank or any part of the code that allows
-			// the escrow address to be drained. A malicious counterparty module could drain the
-			// escrow address by allowing more tokens to be sent back then were escrowed.
-			return sdkerrors.Wrap(err, "unable to unescrow tokens, this may be caused by a malicious counterparty module or a bug: please open an issue on counterparty module")
+	if transfertypes.SenderChainIsSource(packet.SourcePort, packet.SourceChannel, data.Denom) {
+		// transfer coins from user account to transfer module
+		err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, receiver, transfertypes.ModuleName, sdk.NewCoins(token))
+		if err != nil {
+			return err
+		}
+
+		// burn the coins
+		err = k.bankKeeper.BurnCoins(ctx, transfertypes.ModuleName, sdk.NewCoins(token))
+		if err != nil {
+			return err
 		}
 
 		return nil
 	}
 
-	// mint vouchers back to sender
-	if err := k.bankKeeper.MintCoins(
-		ctx, transfertypes.ModuleName, sdk.NewCoins(token),
-	); err != nil {
+	// transfer coins from user account to escrow address
+	escrowAddress := transfertypes.GetEscrowAddress(packet.GetSourcePort(), packet.GetSourceChannel())
+	err = k.bankKeeper.SendCoins(ctx, receiver, escrowAddress, sdk.NewCoins(token))
+	if err != nil {
 		return err
-	}
-
-	if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, transfertypes.ModuleName, sender, sdk.NewCoins(token)); err != nil {
-		panic(fmt.Sprintf("unable to send coins from module to account despite previously minting coins to module account: %v", err))
 	}
 
 	return nil

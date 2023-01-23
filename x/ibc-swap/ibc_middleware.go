@@ -88,7 +88,7 @@ func (im IBCMiddleware) OnChanCloseConfirm(ctx sdk.Context, portID, channelID st
 
 // OnRecvPacket checks the memo field on this packet and if the metadata inside's root key indicates this packet
 // should be handled by the swap middleware it attempts to perform a swap. If the swap is successful
-// the underlying application's OnRecvPacket callback is invoked, an ack error is returned otherwise.
+// the underlying application's OnRecvPacket callback is invoked.
 func (im IBCMiddleware) OnRecvPacket(
 	ctx sdk.Context,
 	packet channeltypes.Packet,
@@ -127,7 +127,14 @@ func (im IBCMiddleware) OnRecvPacket(
 	if err != nil {
 		swapErr := sdkerrors.Wrap(types.ErrSwapFailed, err.Error())
 
-		// We need to get the denom for this token on this chain before issuing a refund
+		// If a refund to the counterparty chain is not being issued we return a successful ack containing the error
+		// This ensures that a refund is not issued on the counterparty chain
+		// see https://github.com/cosmos/ibc-go/blob/3ecc7dd3aef5790ec5d906936a297b34adf1ee41/modules/apps/transfer/keeper/relay.go#L320
+		if metadata.NonRefundable {
+			return channeltypes.NewResultAcknowledgement([]byte(swapErr.Error()))
+		}
+
+		// We need to get the denom for this token on this chain before issuing a refund on this side
 		denomOnThisChain := getDenomForThisChain(
 			packet.DestinationPort, packet.DestinationChannel,
 			packet.SourcePort, packet.SourceChannel,
@@ -140,7 +147,9 @@ func (im IBCMiddleware) OnRecvPacket(
 		// so if the swap fails we need to explicitly refund to handle the bookkeeping properly
 		err = im.keeper.RefundPacketToken(ctx, packet, data)
 		if err != nil {
-			return channeltypes.NewErrorAcknowledgement(err.Error())
+			// If the refund fails on this side we want to make sure that the refund does not happen on the counterparty
+			// So we return a successful ack containing the error
+			return channeltypes.NewResultAcknowledgement([]byte(err.Error()))
 		}
 
 		return channeltypes.NewErrorAcknowledgement(swapErr.Error())
@@ -217,6 +226,8 @@ func (im IBCMiddleware) WriteAcknowledgement(
 	return im.keeper.WriteAcknowledgement(ctx, chanCap, packet, ack)
 }
 
+// getDenomForThisChain composes a new token denom by either unwinding or prefixing the specified token denom appropriately.
+// This is necessary because the token denom in the packet data is from the perspective of the counterparty chain.
 func getDenomForThisChain(port, channel, counterpartyPort, counterpartyChannel, denom string) string {
 	counterpartyPrefix := transfertypes.GetDenomPrefix(counterpartyPort, counterpartyChannel)
 	if strings.HasPrefix(denom, counterpartyPrefix) {

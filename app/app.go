@@ -435,8 +435,6 @@ func NewApp(
 		appCodec,
 		app.MsgServiceRouter(),
 		app.IBCKeeper.ChannelKeeper,
-		app.IBCKeeper.ChannelKeeper,
-		&app.IBCKeeper.PortKeeper,
 		app.BankKeeper,
 	)
 	swapModule := swapmiddleware.NewAppModule(app.SwapKeeper)

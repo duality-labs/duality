@@ -17,6 +17,7 @@ An example JSON blob that would be marshaled into PacketMetadata where the next 
     "amountIn": "123.000000000000000000",
     "tokenIn": "token-in",
     "minOut": "456.000000000000000000",
+	"non-refundable": false,
     "next": ""
   }
 }
@@ -33,7 +34,8 @@ type PacketMetadata struct {
 // further in the middleware stack or on the counterparty.
 type SwapMetadata struct {
 	*dextypes.MsgSwap
-	Next string `json:"next,omitempty"`
+	NonRefundable bool   `json:"non-refundable,omitempty"`
+	Next          string `json:"next,omitempty"`
 }
 
 // Validate ensures that all the required fields are present in the SwapMetadata and contain valid values.
