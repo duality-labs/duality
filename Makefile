@@ -14,12 +14,18 @@ endif
 
 LEDGER_ENABLED ?= true
 DOCKER := $(shell which docker)
-BUILDDIR ?= $(CURDIR)/build
+TM_VERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::') # grab everything after the space in "github.com/tendermint/tendermint v0.34.7"
+BUILDDIR ?= $(CURDIR)/bin
+CHAIN_NAME = duality
+DAEMON_NAME = dualityd
 
 export GO111MODULE = on
 
-#GOPATH := $(shell go env GOPATH)
-#GOBIN := $(GOPATH)/bin
+all: install
+
+###############################################################################
+# Build / Install
+###############################################################################
 
 # process build tags
 
@@ -47,9 +53,6 @@ ifeq ($(LEDGER_ENABLED),true)
   endif
 endif
 
-ifeq (cleveldb,$(findstring cleveldb,$(GAIA_BUILD_OPTIONS)))
-  build_tags += gcc cleveldb
-endif
 build_tags += $(BUILD_TAGS)
 build_tags := $(strip $(build_tags))
 
@@ -60,57 +63,30 @@ build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
 # process linker flags
 
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=gaia \
-		  -X github.com/cosmos/cosmos-sdk/version.AppName=gaiad \
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=$(CHAIN_NAME) \
+		  -X github.com/cosmos/cosmos-sdk/version.AppName=$(DAEMON_NAME) \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
 			-X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TM_VERSION)
 
-ifeq (cleveldb,$(findstring cleveldb,$(GAIA_BUILD_OPTIONS)))
-  ldflags += -X github.com/cosmos/cosmos-sdk/types.DBBackend=cleveldb
-endif
-ifeq (,$(findstring nostrip,$(GAIA_BUILD_OPTIONS)))
-  ldflags += -w -s
-endif
 ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 
 BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
-# check for nostrip option
-ifeq (,$(findstring nostrip,$(GAIA_BUILD_OPTIONS)))
-  BUILD_FLAGS += -trimpath
-endif
-
-###############################################################################
-# Build / Install
-###############################################################################
-
-all: install
 
 BUILD_TARGETS := build install
 
 build: BUILD_ARGS=-o $(BUILDDIR)/
 
-$(BUILD_TARGETS): go.sum $(BUILDDIR)/
+$(BUILD_TARGETS): go.sum
 	go $@ -mod=readonly $(BUILD_FLAGS) $(BUILD_ARGS) ./...
 
 $(BUILDDIR)/:
 	mkdir -p $(BUILDDIR)/
 
-build-linux: go.sum
-	LEDGER_ENABLED=false GOOS=linux GOARCH=amd64 $(MAKE) build
-
-go-mod-cache: go.sum
-	@echo "--> Download go modules to local cache"
-	@go mod download
-
-go.sum: go.mod
-	@echo "--> Ensure dependencies have not been modified"
-	@go mod verify
-
 clean:
-	rm -rf $(BUILDDIR)/ artifacts/
+	rm -rf $(BUILDDIR)/
 
 ###############################################################################
 # Tests / CI
@@ -118,3 +94,8 @@ clean:
 
 test:
 	@go test -mod=readonly -race ./...
+
+ibctest:
+	cd ibctest && go test -race -v -run .
+
+.PHONY: test ibctest install build clean
