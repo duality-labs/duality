@@ -99,11 +99,6 @@ func (im IBCMiddleware) OnRecvPacket(
 		return channeltypes.NewErrorAcknowledgement(err.Error())
 	}
 
-	ctxWithForwardFlags := context.WithValue(ctx.Context(), forwardtypes.ProcessedKey{}, true)
-	ctxWithForwardFlags = context.WithValue(ctxWithForwardFlags, forwardtypes.NonrefundableKey{}, true)
-	ctxWithForwardFlags = context.WithValue(ctxWithForwardFlags, forwardtypes.DisableDenomCompositionKey{}, true)
-	wrappedSdkCtx := ctx.WithContext(ctxWithForwardFlags)
-
 	m := &types.PacketMetadata{}
 	err := json.Unmarshal([]byte(data.Memo), m)
 	if err != nil || m.Swap == nil {
@@ -116,10 +111,32 @@ func (im IBCMiddleware) OnRecvPacket(
 		return channeltypes.NewErrorAcknowledgement(err.Error())
 	}
 
-	// Call into the underlying apps OnRecvPacket to get the funds on this end
-	ack := im.app.OnRecvPacket(wrappedSdkCtx, packet, relayer)
-	if ack == nil || !ack.Success() {
-		return ack
+	// Check if a middleware before this has already processed this packet and passed the processed key via context
+	var processed bool
+	goCtx := ctx.Context()
+	p := goCtx.Value(types.ProcessedKey{})
+
+	if p != nil {
+		if pb, ok := p.(bool); ok {
+			processed = pb
+		}
+	}
+
+	// Compose our context with values that will be used to pass through to the forward middleware
+	ctxWithForwardFlags := context.WithValue(ctx.Context(), forwardtypes.ProcessedKey{}, true)
+	ctxWithForwardFlags = context.WithValue(ctxWithForwardFlags, forwardtypes.NonrefundableKey{}, true)
+	ctxWithForwardFlags = context.WithValue(ctxWithForwardFlags, forwardtypes.DisableDenomCompositionKey{}, true)
+	wrappedSdkCtx := ctx.WithContext(ctxWithForwardFlags)
+
+	// If this packet has been handled by another middleware in the stack there is no need to call into the
+	// underlying app, otherwise the transfer module's OnRecvPacket callback could be invoked more than once
+	// which would mint/burn vouchers more than once.
+	var ack ibcexported.Acknowledgement
+	if !processed {
+		ack = im.app.OnRecvPacket(wrappedSdkCtx, packet, relayer)
+		if ack == nil || !ack.Success() {
+			return ack
+		}
 	}
 
 	// Attempt to perform a swap since this packets memo included swap metadata.
@@ -143,12 +160,12 @@ func (im IBCMiddleware) OnRecvPacket(
 
 		data.Denom = denomOnThisChain
 
-		// We called into the transfer keepers OnRecvPacket callback to mint or unescrow the funds on this side
+		// We called into the transfer modules OnRecvPacket callback to mint or unescrow the funds on this side
 		// so if the swap fails we need to explicitly refund to handle the bookkeeping properly
 		err = im.keeper.RefundPacketToken(ctx, packet, data)
 		if err != nil {
-			// If the refund fails on this side we want to make sure that the refund does not happen on the counterparty
-			// So we return a successful ack containing the error
+			// If the refund fails on this side we want to make sure that the refund does not happen on the counterparty,
+			// so we return a successful ack containing the error
 			return channeltypes.NewResultAcknowledgement([]byte(err.Error()))
 		}
 
@@ -182,10 +199,9 @@ func (im IBCMiddleware) OnRecvPacket(
 	packet.Data = dataBz
 
 	// The forward middleware should return a nil ack if the forward is initiated properly.
-	// If not an error occurred and we return the original ack.
+	// If not an error occurred, and we return the original ack.
 	newAck := im.app.OnRecvPacket(wrappedSdkCtx, packet, relayer)
 	if newAck != nil {
-		// if non-nil ack is returned that means something went wrong before forward could be initiated so return ack
 		return ack
 	}
 
