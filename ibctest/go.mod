@@ -19,7 +19,7 @@ require (
 	github.com/cosmos/cosmos-sdk v0.46.6
 	github.com/cosmos/ibc-go/v3 v3.4.0
 	github.com/icza/dyno v0.0.0-20220812133438-f0b6f8a18845
-	github.com/strangelove-ventures/ibctest/v3 v3.0.0-20230110211600-98a0cb3083d0
+	github.com/strangelove-ventures/ibctest/v3 v3.0.0-20230124201814-7dd9aa5dc158
 	github.com/strangelove-ventures/packet-forward-middleware/v3 v3.1.1
 	github.com/stretchr/testify v1.8.1
 	go.uber.org/zap v1.23.0

@@ -730,8 +730,8 @@ github.com/spf13/viper v1.14.0/go.mod h1:WT//axPky3FdvXHzGw33dNdXXXfFQqmEalje+eg
 github.com/status-im/keycard-go v0.0.0-20190316090335-8537d3370df4/go.mod h1:RZLeN1LMWmRsyYjvAu+I6Dm9QmlDaIIt+Y+4Kd7Tp+Q=
 github.com/strangelove-ventures/go-subkey v1.0.7 h1:cOP/Lajg3uxV/tvspu0m6+0Cu+DJgygkEAbx/s+f35I=
 github.com/strangelove-ventures/go-subkey v1.0.7/go.mod h1:E34izOIEm+sZ1YmYawYRquqBQWeZBjVB4pF7bMuhc1c=
-github.com/strangelove-ventures/ibctest/v3 v3.0.0-20230110211600-98a0cb3083d0 h1:c4ympjSrDfHj6FoGJbs0P1XwdOfIszRrmC700TridtM=
-github.com/strangelove-ventures/ibctest/v3 v3.0.0-20230110211600-98a0cb3083d0/go.mod h1:b90xCiSm4NNTv91C5YACXVcjy+Nz4SDGxBgbKt5o818=
+github.com/strangelove-ventures/ibctest/v3 v3.0.0-20230124201814-7dd9aa5dc158 h1:tARRbdJQsQS766Q3Z5eEj0IK+Y2xUzCLuJY7DCr5Kk4=
+github.com/strangelove-ventures/ibctest/v3 v3.0.0-20230124201814-7dd9aa5dc158/go.mod h1:b90xCiSm4NNTv91C5YACXVcjy+Nz4SDGxBgbKt5o818=
 github.com/strangelove-ventures/packet-forward-middleware/v3 v3.1.1 h1:0WjyZOVu34A+mOFa7nBg83BHZ/BCcLRM68Jf339q97g=
 github.com/strangelove-ventures/packet-forward-middleware/v3 v3.1.1/go.mod h1:sRBHb6KwuHQVc07vy8Ice9wUKVdvzn7eEms9scr2Zco=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

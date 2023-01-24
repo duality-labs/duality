@@ -39,9 +39,9 @@ func TestSwapAndForward_Success(t *testing.T) {
 
 	// Create chain factory
 	cf := ibctest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*ibctest.ChainSpec{
-		{Name: "gaia", Version: "strangelove-forward_middleware_memo_v3", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
+		{Name: "gaia", Version: "v8.0.0-rc3", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
 		{Name: "duality", ChainConfig: chainCfg, NumValidators: &nv, NumFullNodes: &nf},
-		{Name: "gaia", Version: "strangelove-forward_middleware_memo_v3", ChainConfig: ibc.ChainConfig{ChainID: "chain-c", GasPrices: "0.0uatom"}}},
+		{Name: "gaia", Version: "v8.0.0-rc3", ChainConfig: ibc.ChainConfig{ChainID: "chain-c", GasPrices: "0.0uatom"}}},
 	)
 
 	// Get chains from the chain factory
@@ -71,10 +71,9 @@ func TestSwapAndForward_Success(t *testing.T) {
 	eRep := rep.RelayerExecReporter(t)
 
 	require.NoError(t, ic.Build(ctx, eRep, ibctest.InterchainBuildOptions{
-		TestName:          t.Name(),
-		Client:            client,
-		NetworkID:         network,
-		BlockDatabaseFile: ibctest.DefaultBlockDatabaseFilepath(),
+		TestName:  t.Name(),
+		Client:    client,
+		NetworkID: network,
 
 		SkipPathCreation: true,
 	}))
@@ -245,6 +244,7 @@ func TestSwapAndForward_Success(t *testing.T) {
 		depositAmount.String(),
 		"0",
 		"1",
+		"false",
 		"--chain-id", chainB.Config().ChainID,
 		"--node", chainB.GetRPCAddress(),
 		"--from", chainBKey.KeyName,
@@ -386,10 +386,9 @@ func TestSwapAndForward_MultiHopSuccess(t *testing.T) {
 	eRep := rep.RelayerExecReporter(t)
 
 	require.NoError(t, ic.Build(ctx, eRep, ibctest.InterchainBuildOptions{
-		TestName:          t.Name(),
-		Client:            client,
-		NetworkID:         network,
-		BlockDatabaseFile: ibctest.DefaultBlockDatabaseFilepath(),
+		TestName:  t.Name(),
+		Client:    client,
+		NetworkID: network,
 
 		SkipPathCreation: true,
 	}))
@@ -590,6 +589,7 @@ func TestSwapAndForward_MultiHopSuccess(t *testing.T) {
 		depositAmount.String(),
 		"0",
 		"1",
+		"false",
 		"--chain-id", chainB.Config().ChainID,
 		"--node", chainB.GetRPCAddress(),
 		"--from", chainBKey.KeyName,
@@ -715,9 +715,9 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 
 	// Create chain factory
 	cf := ibctest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*ibctest.ChainSpec{
-		{Name: "gaia", Version: "strangelove-forward_middleware_memo_v3", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
+		{Name: "gaia", Version: "v8.0.0-rc3", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
 		{Name: "duality", ChainConfig: chainCfg, NumValidators: &nv, NumFullNodes: &nf},
-		{Name: "gaia", Version: "strangelove-forward_middleware_memo_v3", ChainConfig: ibc.ChainConfig{ChainID: "chain-c", GasPrices: "0.0uatom"}}},
+		{Name: "gaia", Version: "v8.0.0-rc3", ChainConfig: ibc.ChainConfig{ChainID: "chain-c", GasPrices: "0.0uatom"}}},
 	)
 
 	// Get chains from the chain factory
@@ -747,10 +747,9 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 	eRep := rep.RelayerExecReporter(t)
 
 	require.NoError(t, ic.Build(ctx, eRep, ibctest.InterchainBuildOptions{
-		TestName:          t.Name(),
-		Client:            client,
-		NetworkID:         network,
-		BlockDatabaseFile: ibctest.DefaultBlockDatabaseFilepath(),
+		TestName:  t.Name(),
+		Client:    client,
+		NetworkID: network,
 
 		SkipPathCreation: true,
 	}))
@@ -872,10 +871,11 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 	chainCChannel := chainCChannels[0]
 
 	// Compose details for an IBC transfer
+	tmpTransferAmount := int64(1000000)
 	transfer := ibc.WalletAmount{
 		Address: chainBKey.Address,
 		Denom:   chainA.Config().Denom,
-		Amount:  ibcTransferAmount,
+		Amount:  tmpTransferAmount,
 	}
 
 	// Send an IBC transfer from chainA to chainB, so we can initialize a pool with the IBC denom token + native Duality token
@@ -907,14 +907,14 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 	// Assert that the funds are gone from the acc on chainA and present in the acc on chainB
 	chainABalTransfer, err := chainA.GetBalance(ctx, chainAAddr, chainA.Config().Denom)
 	require.NoError(t, err)
-	require.Equal(t, chainAOrigBalNative-ibcTransferAmount, chainABalTransfer)
+	require.Equal(t, chainAOrigBalNative-tmpTransferAmount, chainABalTransfer)
 
 	chainBBalTransfer, err := chainB.GetBalance(ctx, chainBKey.Address, chainADenomTrace.IBCDenom())
 	require.NoError(t, err)
-	require.Equal(t, ibcTransferAmount, chainBBalTransfer)
+	require.Equal(t, tmpTransferAmount, chainBBalTransfer)
 
 	// Compose the deposit cmd for initializing a pool on Duality (chainB)
-	depositAmount := sdktypes.NewInt(100000)
+	depositAmount := sdktypes.NewInt(1000000)
 
 	depositCmd := []string{
 		chainB.Config().Bin, "tx", "dex", "deposit",
@@ -925,6 +925,7 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 		depositAmount.String(),
 		"0",
 		"1",
+		"false",
 		"--chain-id", chainB.Config().ChainID,
 		"--node", chainB.GetRPCAddress(),
 		"--from", chainBKey.KeyName,
@@ -987,7 +988,7 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 
 	// Compose the IBC transfer memo metadata to be used in the swap and forward
 	swapAmount := sdktypes.NewInt(100_000)
-	minOut := sdktypes.NewInt(10_000)
+	minOut := sdktypes.NewInt(100_000)
 
 	retries := uint8(0)
 	forwardMetadata := forwardtypes.PacketMetadata{
@@ -1080,9 +1081,9 @@ func TestSwapAndForward_ForwardFails(t *testing.T) {
 
 	// Create chain factory
 	cf := ibctest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*ibctest.ChainSpec{
-		{Name: "gaia", Version: "strangelove-forward_middleware_memo_v3", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
+		{Name: "gaia", Version: "v8.0.0-rc3", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
 		{Name: "duality", ChainConfig: chainCfg, NumValidators: &nv, NumFullNodes: &nf},
-		{Name: "gaia", Version: "strangelove-forward_middleware_memo_v3", ChainConfig: ibc.ChainConfig{ChainID: "chain-c", GasPrices: "0.0uatom"}}},
+		{Name: "gaia", Version: "v8.0.0-rc3", ChainConfig: ibc.ChainConfig{ChainID: "chain-c", GasPrices: "0.0uatom"}}},
 	)
 
 	// Get chains from the chain factory
@@ -1112,10 +1113,9 @@ func TestSwapAndForward_ForwardFails(t *testing.T) {
 	eRep := rep.RelayerExecReporter(t)
 
 	require.NoError(t, ic.Build(ctx, eRep, ibctest.InterchainBuildOptions{
-		TestName:          t.Name(),
-		Client:            client,
-		NetworkID:         network,
-		BlockDatabaseFile: ibctest.DefaultBlockDatabaseFilepath(),
+		TestName:  t.Name(),
+		Client:    client,
+		NetworkID: network,
 
 		SkipPathCreation: true,
 	}))
@@ -1286,6 +1286,7 @@ func TestSwapAndForward_ForwardFails(t *testing.T) {
 		depositAmount.String(),
 		"0",
 		"1",
+		"false",
 		"--chain-id", chainB.Config().ChainID,
 		"--node", chainB.GetRPCAddress(),
 		"--from", chainBKey.KeyName,
