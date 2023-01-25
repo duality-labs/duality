@@ -353,19 +353,6 @@ func NewApp(
 
 	// ... other modules keepers
 
-	// Create IBC Keeper
-	app.IBCKeeper = ibckeeper.NewKeeper(
-		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), &app.ConsumerKeeper, app.UpgradeKeeper, scopedIBCKeeper,
-	)
-
-	// Create Transfer Keepers
-	app.TransferKeeper = ibctransferkeeper.NewKeeper(
-		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
-		app.IBCKeeper.ChannelKeeper, app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
-		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
-	)
-	transferModule := transfer.NewAppModule(app.TransferKeeper)
-
 	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
 		appCodec, keys[evidencetypes.StoreKey], &app.ConsumerKeeper, app.SlashingKeeper,
@@ -373,25 +360,10 @@ func NewApp(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.ConsumerKeeper = ccvconsumerkeeper.NewKeeper(
-		appCodec,
-		keys[ccvconsumertypes.StoreKey],
-		app.GetSubspace(ccvconsumertypes.ModuleName),
-		scopedCCVConsumerKeeper,
-		app.IBCKeeper.ChannelKeeper,
-		&app.IBCKeeper.PortKeeper,
-		app.IBCKeeper.ConnectionKeeper,
-		app.IBCKeeper.ClientKeeper,
-		app.SlashingKeeper,
-		app.BankKeeper,
-		app.AccountKeeper,
-		&app.TransferKeeper,
-		app.IBCKeeper,
-		authtypes.FeeCollectorName,
+	// Create IBC Keeper
+	app.IBCKeeper = ibckeeper.NewKeeper(
+		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), &app.ConsumerKeeper, app.UpgradeKeeper, scopedIBCKeeper,
 	)
-
-	app.ConsumerKeeper = *app.ConsumerKeeper.SetHooks(app.SlashingKeeper.Hooks())
-	consumerModule := ccvconsumer.NewAppModule(app.ConsumerKeeper)
 
 	adminRouter := govtypes.NewRouter()
 	adminRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
@@ -418,19 +390,7 @@ func NewApp(
 	)
 	dexModule := dexmodule.NewAppModule(appCodec, app.DexKeeper, app.AccountKeeper, app.BankKeeper)
 
-	app.ForwardKeeper = forwardkeeper.NewKeeper(
-		appCodec,
-		keys[forwardtypes.StoreKey],
-		app.GetSubspace(forwardtypes.ModuleName),
-		app.TransferKeeper,
-		app.IBCKeeper.ChannelKeeper,
-		&NoopDistributionKeeper{}, // Use a no-op implementation of the Distribution Keeper to avoid NPE
-		app.BankKeeper,
-		&app.IBCKeeper.PortKeeper,
-		app.IBCKeeper.ChannelKeeper,
-	)
-	forwardModule := forwardmiddleware.NewAppModule(app.ForwardKeeper)
-
+	// Create swap middleware keeper
 	app.SwapKeeper = swapkeeper.NewKeeper(
 		appCodec,
 		app.MsgServiceRouter(),
@@ -438,6 +398,51 @@ func NewApp(
 		app.BankKeeper,
 	)
 	swapModule := swapmiddleware.NewAppModule(app.SwapKeeper)
+
+	// Create packet forward middleware keeper
+	app.ForwardKeeper = forwardkeeper.NewKeeper(
+		appCodec,
+		keys[forwardtypes.StoreKey],
+		app.GetSubspace(forwardtypes.ModuleName),
+		app.TransferKeeper, // This is zero value because transfer keeper is not initialized yet
+		app.IBCKeeper.ChannelKeeper,
+		&NoopDistributionKeeper{}, // Use a no-op implementation of the Distribution Keeper to avoid NPE
+		app.BankKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.SwapKeeper,
+	)
+	forwardModule := forwardmiddleware.NewAppModule(app.ForwardKeeper)
+
+	// Create Transfer Keepers
+	app.TransferKeeper = ibctransferkeeper.NewKeeper(
+		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
+		app.ForwardKeeper, app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
+		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
+	)
+	transferModule := transfer.NewAppModule(app.TransferKeeper)
+
+	// Set the initialized transfer keeper for forward middleware
+	app.ForwardKeeper.SetTransferKeeper(app.TransferKeeper)
+
+	app.ConsumerKeeper = ccvconsumerkeeper.NewKeeper(
+		appCodec,
+		keys[ccvconsumertypes.StoreKey],
+		app.GetSubspace(ccvconsumertypes.ModuleName),
+		scopedCCVConsumerKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.IBCKeeper.ConnectionKeeper,
+		app.IBCKeeper.ClientKeeper,
+		app.SlashingKeeper,
+		app.BankKeeper,
+		app.AccountKeeper,
+		&app.TransferKeeper,
+		app.IBCKeeper,
+		authtypes.FeeCollectorName,
+	)
+
+	app.ConsumerKeeper = *app.ConsumerKeeper.SetHooks(app.SlashingKeeper.Hooks())
+	consumerModule := ccvconsumer.NewAppModule(app.ConsumerKeeper)
 
 	app.MevKeeper = *mevmodulekeeper.NewKeeper(
 		appCodec,
