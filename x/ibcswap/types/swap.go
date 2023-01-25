@@ -40,11 +40,8 @@ type SwapMetadata struct {
 
 // Validate ensures that all the required fields are present in the SwapMetadata and contain valid values.
 func (sm SwapMetadata) Validate() error {
-	if sm.Creator == "" {
-		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap creator cannot be an empty string")
-	}
-	if sm.Receiver == "" {
-		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap receiver cannot be an empty string")
+	if err := sm.ValidateBasic(); err != nil {
+		return sdkerrors.Wrap(ErrInvalidSwapMetadata, err.Error())
 	}
 	if sm.TokenA == "" {
 		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap tokenA cannot be an empty string")
@@ -52,14 +49,14 @@ func (sm SwapMetadata) Validate() error {
 	if sm.TokenB == "" {
 		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap tokenB cannot be an empty string")
 	}
+	if sm.TokenIn == "" {
+		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap tokenIn cannot be an empty string")
+	}
 	if sm.AmountIn.IsZero() || sm.AmountIn.IsNil() {
 		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap amountIn cannot be 0 or nil")
 	}
 	if sm.AmountIn.IsNegative() {
 		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap amountIn cannot be negative")
-	}
-	if sm.TokenIn == "" {
-		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap tokenIn cannot be an empty string")
 	}
 	if sm.MinOut.IsZero() || sm.MinOut.IsNil() {
 		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap minOut cannot be 0 or nil")

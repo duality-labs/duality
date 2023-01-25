@@ -39,12 +39,12 @@ func TestSwapMetadata_ValidatePass(t *testing.T) {
 	pm := PacketMetadata{
 		&SwapMetadata{
 			MsgSwap: &types.MsgSwap{
-				Creator:  "test-1",
-				Receiver: "test-1",
+				Creator:  "cosmos14zde8usc4ur04y3aqnufzzmv2uqdpwwttr5uwv",
+				Receiver: "cosmos14zde8usc4ur04y3aqnufzzmv2uqdpwwttr5uwv",
 				TokenA:   "token-a",
 				TokenB:   "token-b",
 				AmountIn: sdk.NewInt(123),
-				TokenIn:  "token-in",
+				TokenIn:  "token-a",
 				MinOut:   sdk.NewInt(456),
 			},
 			Next: "",

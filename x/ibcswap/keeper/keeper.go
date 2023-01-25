@@ -69,21 +69,19 @@ func (k Keeper) Swap(ctx sdk.Context, msg *dextypes.MsgSwap) (*dextypes.MsgSwapR
 	return msgSwapRes, nil
 }
 
-// SendPacket wraps IBC ChannelKeeper's SendPacket function
+// SendPacket wraps IBC ChannelKeeper's SendPacket function.
 func (k Keeper) SendPacket(ctx sdk.Context, chanCap *capabilitytypes.Capability, packet ibcexported.PacketI) error {
 	return k.ics4Wrapper.SendPacket(ctx, chanCap, packet)
 }
 
 // WriteAcknowledgement wraps IBC ChannelKeeper's WriteAcknowledgement function.
-// ICS29 WriteAcknowledgement is used for asynchronous acknowledgements.
 func (k Keeper) WriteAcknowledgement(ctx sdk.Context, chanCap *capabilitytypes.Capability, packet ibcexported.PacketI, acknowledgement ibcexported.Acknowledgement) error {
 	return k.ics4Wrapper.WriteAcknowledgement(ctx, chanCap, packet, acknowledgement)
 }
 
-// RefundPacketToken handles the burning/minting of vouchers when an asset should be refunded, this comes straight from ics20.
+// RefundPacketToken handles the burning or escrow lock up of vouchers when an asset should be refunded.
 // This is only used in the case where we call into the transfer modules OnRecvPacket callback but then the swap fails.
 func (k Keeper) RefundPacketToken(ctx sdk.Context, packet channeltypes.Packet, data transfertypes.FungibleTokenPacketData) error {
-
 	// parse the denomination from the full denom path
 	trace := transfertypes.ParseDenomTrace(data.Denom)
 
@@ -100,6 +98,7 @@ func (k Keeper) RefundPacketToken(ctx sdk.Context, packet channeltypes.Packet, d
 		return err
 	}
 
+	// if the sender chain is source that means a voucher was minted on Duality when the ics20 transfer took place
 	if transfertypes.SenderChainIsSource(packet.SourcePort, packet.SourceChannel, data.Denom) {
 		// transfer coins from user account to transfer module
 		err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, receiver, transfertypes.ModuleName, sdk.NewCoins(token))

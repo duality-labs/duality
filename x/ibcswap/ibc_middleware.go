@@ -129,8 +129,7 @@ func (im IBCMiddleware) OnRecvPacket(
 	wrappedSdkCtx := ctx.WithContext(ctxWithForwardFlags)
 
 	// If this packet has been handled by another middleware in the stack there is no need to call into the
-	// underlying app, otherwise the transfer module's OnRecvPacket callback could be invoked more than once
-	// which would mint/burn vouchers more than once.
+	// underlying app, otherwise the transfer module's OnRecvPacket callback could be invoked more than once.
 	var ack ibcexported.Acknowledgement
 	if !processed {
 		ack = im.app.OnRecvPacket(wrappedSdkCtx, packet, relayer)
@@ -257,6 +256,7 @@ func getDenomForThisChain(port, channel, counterpartyPort, counterpartyChannel, 
 		// denom is still IBC denom
 		return denomTrace.IBCDenom()
 	}
+
 	// append port and channel from this chain to denom
 	prefixedDenom := transfertypes.GetDenomPrefix(port, channel) + denom
 	return transfertypes.ParseDenomTrace(prefixedDenom).IBCDenom()
