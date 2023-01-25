@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"strconv"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -12,74 +11,32 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Prevent strconv unused error
-var _ = strconv.IntSize
-
-func CreateNTickLiquidityLimitOrder(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.TickLiquidity {
+func CreateNTickLiquidity(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.TickLiquidity {
 	items := make([]types.TickLiquidity, n)
 	for i := range items {
-		items[i] = types.TickLiquidity{
+		tick := types.TickLiquidity{
 			Liquidity: &types.TickLiquidity_LimitOrderTranche{
 				LimitOrderTranche: &types.LimitOrderTranche{
 					PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					TokenIn:          "TokenA",
 					TickIndex:        int64(i),
 					TrancheIndex:     uint64(i),
-					ReservesTokenIn:  sdk.NewInt(1),
-					ReservesTokenOut: sdk.NewInt(1),
-					TotalTokenIn:     sdk.NewInt(1),
-					TotalTokenOut:    sdk.NewInt(1),
+					ReservesTokenIn:  sdk.NewInt(10),
+					ReservesTokenOut: sdk.NewInt(10),
+					TotalTokenIn:     sdk.NewInt(10),
+					TotalTokenOut:    sdk.NewInt(10),
 				},
 			},
 		}
-		keeper.SetTickLiquidity(ctx, items[i])
+		keeper.SetLimitOrderTranche(ctx, *tick.GetLimitOrderTranche())
+		items[i] = tick
 	}
 	return items
 }
 
-func TestTickLiquidityGet(t *testing.T) {
-	keeper, ctx := keepertest.DexKeeper(t)
-	items := CreateNTickLiquidityLimitOrder(keeper, ctx, 10)
-	for _, item := range items {
-		rst, found := keeper.GetTickLiquidity(ctx,
-			item.PairId(),
-			item.TokenIn(),
-			item.TickIndex(),
-			item.LiquidityType(),
-			item.LiquidityIndex(),
-		)
-		require.True(t, found)
-		require.Equal(t,
-			nullify.Fill(&item),
-			nullify.Fill(&rst),
-		)
-	}
-}
-func TestTickLiquidityRemove(t *testing.T) {
-	keeper, ctx := keepertest.DexKeeper(t)
-	items := CreateNTickLiquidityLimitOrder(keeper, ctx, 10)
-	for _, item := range items {
-		keeper.RemoveTickLiquidity(ctx,
-			item.PairId(),
-			item.TokenIn(),
-			item.TickIndex(),
-			item.LiquidityType(),
-			item.LiquidityIndex(),
-		)
-		_, found := keeper.GetTickLiquidity(ctx,
-			item.PairId(),
-			item.TokenIn(),
-			item.TickIndex(),
-			item.LiquidityType(),
-			item.LiquidityIndex(),
-		)
-		require.False(t, found)
-	}
-}
-
 func TestTickLiquidityGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := CreateNTickLiquidityLimitOrder(keeper, ctx, 10)
+	items := CreateNTickLiquidity(keeper, ctx, 10)
 	require.ElementsMatch(t,
 		nullify.Fill(items),
 		nullify.Fill(keeper.GetAllTickLiquidity(ctx)),

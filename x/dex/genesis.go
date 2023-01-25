@@ -35,7 +35,12 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 
 	// Set all the tickLiquidity
 	for _, elem := range genState.TickLiquidityList {
-		k.SetTickLiquidity(ctx, elem)
+		switch elem.Liquidity.(type) {
+		case *types.TickLiquidity_PoolReserves:
+			k.SetPoolReserves(ctx, *elem.GetPoolReserves())
+		case *types.TickLiquidity_LimitOrderTranche:
+			k.SetLimitOrderTranche(ctx, *elem.GetLimitOrderTranche())
+		}
 	}
 	// Set all the filledLimitOrderTranche
 	for _, elem := range genState.FilledLimitOrderTrancheList {

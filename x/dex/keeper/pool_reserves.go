@@ -6,7 +6,7 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
-func (k Keeper) SetTickLiquidityPoolReserves(ctx sdk.Context, pool types.PoolReserves) {
+func (k Keeper) SetPoolReserves(ctx sdk.Context, pool types.PoolReserves) {
 	//Wrap pool back into TickLiquidity
 	tick := types.TickLiquidity{
 		Liquidity: &types.TickLiquidity_PoolReserves{
@@ -25,7 +25,7 @@ func (k Keeper) SetTickLiquidityPoolReserves(ctx sdk.Context, pool types.PoolRes
 	), b)
 }
 
-func (k Keeper) GetTickLiquidityPoolReserves(
+func (k Keeper) GetPoolReserves(
 	ctx sdk.Context,
 	pairId *types.PairId,
 	tokenIn string,

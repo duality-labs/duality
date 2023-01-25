@@ -11,6 +11,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// NOTE: For single queries of tick liquidity use explicty typed queries
+// (ie. the k.LimitOrderTranche & k.PoolReserves)
+
 func (k Keeper) TickLiquidityAll(c context.Context, req *types.QueryAllTickLiquidityRequest) (*types.QueryAllTickLiquidityResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
@@ -37,30 +40,4 @@ func (k Keeper) TickLiquidityAll(c context.Context, req *types.QueryAllTickLiqui
 	}
 
 	return &types.QueryAllTickLiquidityResponse{TickLiquidity: tickLiquiditys, Pagination: pageRes}, nil
-}
-
-func (k Keeper) TickLiquidity(c context.Context, req *types.QueryGetTickLiquidityRequest) (*types.QueryGetTickLiquidityResponse, error) {
-	if req == nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid request")
-	}
-	ctx := sdk.UnwrapSDKContext(c)
-
-	pairId, err := StringToPairId(req.PairId)
-	if err != nil {
-		return nil, err
-	}
-
-	val, found := k.GetTickLiquidity(
-		ctx,
-		pairId,
-		req.TokenIn,
-		req.TickIndex,
-		req.LiquidityType,
-		req.LiquidityIndex,
-	)
-	if !found {
-		return nil, status.Error(codes.NotFound, "not found")
-	}
-
-	return &types.QueryGetTickLiquidityResponse{TickLiquidity: val}, nil
 }

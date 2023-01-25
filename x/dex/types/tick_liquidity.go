@@ -1,5 +1,7 @@
 package types
 
+// NOTE: These type methods should be avoided if possible.
+// Generally default to dealing with LimitOrderTranche or PoolReserves explicityly
 func (t TickLiquidity) TokenIn() string {
 	switch liquidity := t.Liquidity.(type) {
 	case *TickLiquidity_LimitOrderTranche:

@@ -341,7 +341,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	trancheUser.SharesOwned = trancheUser.SharesOwned.Add(msg.AmountIn)
 
 	if msg.AmountIn.GT(sdk.ZeroInt()) {
-		k.SetTickLiquidityLimitOrder(ctx, placeTranche)
+		k.SetLimitOrderTranche(ctx, placeTranche)
 		k.SetLimitOrderTrancheUser(ctx, trancheUser)
 
 		coin0 := sdk.NewCoin(tokenIn, msg.AmountIn)
@@ -370,7 +370,7 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 
 	pairId := CreatePairId(token0, token1)
 
-	trancheRaw, found := k.GetTickLiquidityLimitOrder(ctx, pairId, msg.KeyToken, msg.TickIndex, msg.Key)
+	trancheRaw, found := k.GetLimitOrderTranche(ctx, pairId, msg.KeyToken, msg.TickIndex, msg.Key)
 	if !found {
 		return types.ErrActiveLimitOrderNotFound
 	}
@@ -450,7 +450,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		return types.ErrNotEnoughLimitOrderShares
 	}
 
-	trancheRaw, wasFilled, found := k.GetLimitOrderTranche(ctx, pairId, tickIndex, msg.KeyToken, trancheIndex)
+	trancheRaw, wasFilled, found := k.FindLimitOrderTranche(ctx, pairId, tickIndex, msg.KeyToken, trancheIndex)
 	if !found {
 		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheNotFound, "%d", trancheIndex)
 	}
@@ -481,7 +481,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	if wasFilled {
 		k.SetFilledLimitOrderTranche(ctx, tranche.CreateFilledTranche())
 	} else {
-		k.SetTickLiquidityLimitOrder(ctx, *tranche.LimitOrderTranche)
+		k.SetLimitOrderTranche(ctx, *tranche.LimitOrderTranche)
 	}
 
 	if amountOutTokenOut.GT(sdk.ZeroDec()) {

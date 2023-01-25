@@ -101,11 +101,6 @@ service Query {
 		option (google.api.http).get = "/dualitylabs/duality/dex/user/limit_orders/{address}";
 	}
 
-// Queries a TickLiquidity by index.
-	rpc TickLiquidity(QueryGetTickLiquidityRequest) returns (QueryGetTickLiquidityResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/tick_liquidity/{pairId}/{tokenIn}/{tickIndex}/{liquidityType}/{liquidityIndex}";
-	}
-
 	// Queries a list of TickLiquidity items.
 	rpc TickLiquidityAll(QueryAllTickLiquidityRequest) returns (QueryAllTickLiquidityResponse) {
 		option (google.api.http).get = "/dualitylabs/duality/dex/tick_liquidity";
@@ -271,22 +266,6 @@ message QueryAllUserLimitOrdersRequest {
 
 message QueryAllUserLimitOrdersResponse {
   repeated LimitOrderTrancheUser limitOrders = 1 [(gogoproto.nullable) = false];
-}
-
-
-
-
-message QueryGetTickLiquidityRequest {
-	  string pairId = 1;
-  string tokenIn = 2;
-  int64 tickIndex = 3;
-  string liquidityType = 4;
-  uint64 liquidityIndex = 5;
-
-}
-
-message QueryGetTickLiquidityResponse {
-	TickLiquidity tickLiquidity = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryAllTickLiquidityRequest {

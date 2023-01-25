@@ -47,7 +47,7 @@ func (k Keeper) GetOrInitPair(ctx sdk.Context, token0 string, token1 string) typ
 }
 
 func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64, fee uint64) (*types.PoolReserves, error) {
-	tickLiq, tickFound := k.GetTickLiquidityPoolReserves(
+	tickLiq, tickFound := k.GetPoolReserves(
 		ctx,
 		pairId,
 		tokenIn,
