@@ -10,7 +10,7 @@ import (
 	// "github.com/cosmos/cosmos-sdk/client/flags"
 	// sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/NicholasDotSol/duality/x/mev/types"
+	"github.com/duality-labs/duality/x/mev/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module

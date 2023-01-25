@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"github.com/NicholasDotSol/duality/x/dex/types"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 func (s *MsgServerTestSuite) TestDepositDoubleSidedInSpreadCurrTickAdjusted() {

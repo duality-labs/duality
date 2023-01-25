@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 // SetTickLiquidity set a specific tickLiquidity in the store from its index

@@ -92,19 +92,19 @@ import (
 	ccvconsumerkeeper "github.com/cosmos/interchain-security/x/ccv/consumer/keeper"
 	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
 
-	"github.com/NicholasDotSol/duality/docs"
-	dexmodule "github.com/NicholasDotSol/duality/x/dex"
-	dexmodulekeeper "github.com/NicholasDotSol/duality/x/dex/keeper"
-	dexmoduletypes "github.com/NicholasDotSol/duality/x/dex/types"
+	"github.com/duality-labs/duality/docs"
+	dexmodule "github.com/duality-labs/duality/x/dex"
+	dexmodulekeeper "github.com/duality-labs/duality/x/dex/keeper"
+	dexmoduletypes "github.com/duality-labs/duality/x/dex/types"
 
-	mevmodule "github.com/NicholasDotSol/duality/x/mev"
-	mevmodulekeeper "github.com/NicholasDotSol/duality/x/mev/keeper"
-	mevmoduletypes "github.com/NicholasDotSol/duality/x/mev/types"
-
-	swapmiddleware "github.com/NicholasDotSol/duality/x/ibc-swap"
-	swapkeeper "github.com/NicholasDotSol/duality/x/ibc-swap/keeper"
-	swaptypes "github.com/NicholasDotSol/duality/x/ibc-swap/types"
 	"github.com/cosmos/interchain-security/testutil/e2e"
+	mevmodule "github.com/duality-labs/duality/x/mev"
+	mevmodulekeeper "github.com/duality-labs/duality/x/mev/keeper"
+	mevmoduletypes "github.com/duality-labs/duality/x/mev/types"
+
+	swapmiddleware "github.com/duality-labs/duality/x/ibc-swap"
+	swapkeeper "github.com/duality-labs/duality/x/ibc-swap/keeper"
+	swaptypes "github.com/duality-labs/duality/x/ibc-swap/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 

@@ -3,8 +3,8 @@ package keeper_test
 import (
 	"math"
 
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderInSpread1To0() {

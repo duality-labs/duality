@@ -3,9 +3,9 @@ package keeper
 import (
 	"strings"
 
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 func SortTokens(tokenA string, tokenB string) (string, string, error) {

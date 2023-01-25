@@ -5,14 +5,14 @@ import (
 	"math"
 	"testing"
 
-	dualityapp "github.com/NicholasDotSol/duality/app"
-	"github.com/NicholasDotSol/duality/x/dex/keeper"
-	. "github.com/NicholasDotSol/duality/x/dex/keeper"
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	dualityapp "github.com/duality-labs/duality/app"
+	"github.com/duality-labs/duality/x/dex/keeper"
+	. "github.com/duality-labs/duality/x/dex/keeper"
+	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/suite"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )

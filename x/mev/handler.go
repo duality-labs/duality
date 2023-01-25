@@ -3,10 +3,10 @@ package mev
 import (
 	"fmt"
 
-	"github.com/NicholasDotSol/duality/x/mev/keeper"
-	"github.com/NicholasDotSol/duality/x/mev/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/duality-labs/duality/x/mev/keeper"
+	"github.com/duality-labs/duality/x/mev/types"
 )
 
 // NewHandler ...

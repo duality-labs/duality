@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	network "github.com/NicholasDotSol/duality/testutil/network"
-	dexClient "github.com/NicholasDotSol/duality/x/dex/client/cli"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
@@ -13,6 +11,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil/cli"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/client/testutil"
+	network "github.com/duality-labs/duality/testutil/network"
+	dexClient "github.com/duality-labs/duality/x/dex/client/cli"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
