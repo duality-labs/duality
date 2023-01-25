@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/NicholasDotSol/duality/x/dex/types"
-	swaptypes "github.com/NicholasDotSol/duality/x/ibc-swap/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	transfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
+	"github.com/duality-labs/duality/x/dex/types"
+	swaptypes "github.com/duality-labs/duality/x/ibcswap/types"
 	"github.com/strangelove-ventures/ibctest/v3"
 	"github.com/strangelove-ventures/ibctest/v3/chain/cosmos"
 	"github.com/strangelove-ventures/ibctest/v3/ibc"

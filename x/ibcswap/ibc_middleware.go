@@ -1,12 +1,10 @@
-package ibc_swap
+package ibcswap
 
 import (
 	"context"
 	"encoding/json"
 	"strings"
 
-	"github.com/NicholasDotSol/duality/x/ibc-swap/keeper"
-	"github.com/NicholasDotSol/duality/x/ibc-swap/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
@@ -14,6 +12,8 @@ import (
 	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
 	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v3/modules/core/exported"
+	"github.com/duality-labs/duality/x/ibcswap/keeper"
+	"github.com/duality-labs/duality/x/ibcswap/types"
 	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v3/router/types"
 )
 

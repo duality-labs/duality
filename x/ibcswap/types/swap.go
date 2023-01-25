@@ -1,8 +1,8 @@
 package types
 
 import (
-	dextypes "github.com/NicholasDotSol/duality/x/dex/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	dextypes "github.com/duality-labs/duality/x/dex/types"
 )
 
 /*

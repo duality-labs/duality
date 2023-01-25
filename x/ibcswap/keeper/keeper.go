@@ -3,8 +3,6 @@ package keeper
 import (
 	"fmt"
 
-	dextypes "github.com/NicholasDotSol/duality/x/dex/types"
-	"github.com/NicholasDotSol/duality/x/ibc-swap/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -15,6 +13,8 @@ import (
 	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
 	"github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibcexported "github.com/cosmos/ibc-go/v3/modules/core/exported"
+	dextypes "github.com/duality-labs/duality/x/dex/types"
+	"github.com/duality-labs/duality/x/ibcswap/types"
 	"github.com/gogo/protobuf/proto"
 	"github.com/tendermint/tendermint/libs/log"
 )

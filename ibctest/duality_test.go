@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"testing"
 
-	dextypes "github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
+	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/icza/dyno"
 	"github.com/strangelove-ventures/ibctest/v3"
 	"github.com/strangelove-ventures/ibctest/v3/chain/cosmos"

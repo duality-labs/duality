@@ -7,7 +7,7 @@ replace (
 	github.com/ChainSafe/go-schnorrkel/1 => github.com/ChainSafe/go-schnorrkel v1.0.0
 
 	// For this nested module, you always want to replace the parent reference with the current worktree.
-	github.com/NicholasDotSol/duality => ../
+	github.com/duality-labs/duality => ../
 
 	github.com/cosmos/admin-module => github.com/Ethernal-Tech/admin-module v0.0.0-20221102105340-e693f4d379c3
 	github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.45.11-ics
@@ -17,7 +17,7 @@ replace (
 )
 
 require (
-	github.com/NicholasDotSol/duality v0.0.0-00010101000000-000000000000
+	github.com/duality-labs/duality v0.0.0-00010101000000-000000000000
 	github.com/cosmos/cosmos-sdk v0.46.6
 	github.com/cosmos/ibc-go/v3 v3.4.0
 	github.com/icza/dyno v0.0.0-20220812133438-f0b6f8a18845

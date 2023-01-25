@@ -102,9 +102,9 @@ import (
 	mevmodulekeeper "github.com/duality-labs/duality/x/mev/keeper"
 	mevmoduletypes "github.com/duality-labs/duality/x/mev/types"
 
-	swapmiddleware "github.com/duality-labs/duality/x/ibc-swap"
-	swapkeeper "github.com/duality-labs/duality/x/ibc-swap/keeper"
-	swaptypes "github.com/duality-labs/duality/x/ibc-swap/types"
+	swapmiddleware "github.com/duality-labs/duality/x/ibcswap"
+	swapkeeper "github.com/duality-labs/duality/x/ibcswap/keeper"
+	swaptypes "github.com/duality-labs/duality/x/ibcswap/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
