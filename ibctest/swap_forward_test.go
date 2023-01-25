@@ -1031,14 +1031,6 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 		Amount:  ibcTransferAmount,
 	}
 
-	t.Logf("CHAIN A DENOM: %s \n", chainADenomTrace.IBCDenom())
-	t.Logf("CHAIN B DENOM: %s \n", chainBDenomTrace.IBCDenom())
-
-	/*
-	   swap_forward_test.go:1033: CHAIN A DENOM: ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2
-	   swap_forward_test.go:1034: CHAIN B DENOM: ibc/C053D637CCA2A2BA030E2C5EE1B28A16F71CCB0E45E8BE52766DC1B241B77878
-	*/
-
 	// Send an IBC transfer from chainA to chainB with packet memo containing the swap metadata
 	transferTx, err = chainA.SendIBCTransfer(ctx, chainAChannel.ChannelID, chainAAddr, swapTransfer, ibc.TransferOptions{Memo: string(metadataBz)})
 	require.NoError(t, err)

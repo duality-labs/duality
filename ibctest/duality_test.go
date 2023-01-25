@@ -50,8 +50,8 @@ var (
 		Name:    "duality",
 		ChainID: "chain-b",
 		Images: []ibc.DockerImage{{
-			Repository: "duality",
-			Version:    "local",
+			Repository: "ghcr.io/strangelove-ventures/heighliner/duality",
+			Version:    "justin-ibc-swap",
 			UidGid:     heighlinerUserString,
 		}},
 		Bin:                 "dualityd",
