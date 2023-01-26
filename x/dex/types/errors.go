@@ -32,4 +32,5 @@ var (
 	ErrInvalidTokenIn                     = sdkerrors.Register(ModuleName, 1127, "TokenIn not in specified pair.")
 	ErrActiveLimitOrderNotFound           = sdkerrors.Register(ModuleName, 1128, "No active limit found. It does not exist or has already been filled")
 	ErrZeroWithdraw                       = sdkerrors.Register(ModuleName, 1129, "Withdraw amount must be > 0.")
+	ErrZeroLimitOrder                     = sdkerrors.Register(ModuleName, 1130, "Limit order amount must be > 0.")
 )
