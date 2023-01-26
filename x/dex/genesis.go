@@ -41,6 +41,11 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, elem := range genState.FilledLimitOrderTrancheList {
 		k.SetFilledLimitOrderTranche(ctx, elem)
 	}
+
+	// Set all the LimitOrderTrancheUser
+	for _, elem := range genState.LimitOrderTrancheUserList {
+		k.SetLimitOrderTrancheUser(ctx, elem)
+	}
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
 }

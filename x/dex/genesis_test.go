@@ -3,6 +3,7 @@ package dex_test
 import (
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	keepertest "github.com/duality-labs/duality/testutil/keeper"
 	"github.com/duality-labs/duality/testutil/nullify"
 	"github.com/duality-labs/duality/x/dex"
@@ -43,12 +44,24 @@ func TestGenesis(t *testing.T) {
 		FeeTierCount: 2,
 		LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
 			{
-				Count:   0,
-				Address: "0",
+				PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				Token:           "TokenB",
+				TickIndex:       1,
+				Count:           0,
+				Address:         "fakeAddr",
+				SharesOwned:     sdk.NewInt(10),
+				SharesWithdrawn: sdk.NewInt(0),
+				SharesCancelled: sdk.NewInt(0),
 			},
 			{
-				Count:   1,
-				Address: "1",
+				PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				Token:           "TokenA",
+				TickIndex:       20,
+				Count:           0,
+				Address:         "fakeAddr",
+				SharesOwned:     sdk.NewInt(10),
+				SharesWithdrawn: sdk.NewInt(0),
+				SharesCancelled: sdk.NewInt(0),
 			},
 		},
 		TickLiquidityList: []types.TickLiquidity{
@@ -81,7 +94,6 @@ func TestGenesis(t *testing.T) {
 				TrancheIndex: 1,
 			},
 		},
-		// this line is used by starport scaffolding # genesis/test/state
 	}
 
 	k, ctx := keepertest.DexKeeper(t)
