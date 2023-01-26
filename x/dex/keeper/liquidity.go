@@ -46,11 +46,11 @@ func (s *LiquidityIterator) Next() Liquidity {
 
 	for ; s.iter.Valid(); s.iter.Next() {
 		tick := s.iter.Value()
-		switch tick.LiquidityType() {
-		case types.LiquidityTypePoolReserves:
+		switch liquidity := tick.Liquidity.(type) {
+		case *types.TickLiquidity_PoolReserves:
 			var err error
 			var pool Liquidity
-			poolReserves := *tick.GetPoolReserves()
+			poolReserves := *liquidity.PoolReserves
 			if s.is0To1 {
 				//Pool Reserves is upperTick
 				pool, err = s.createPool0To1(poolReserves)
@@ -66,8 +66,8 @@ func (s *LiquidityIterator) Next() Liquidity {
 			}
 			return pool
 
-		case types.LiquidityTypeLimitOrder:
-			return NewLimitOrderTrancheWrapper(tick.GetLimitOrderTranche())
+		case *types.TickLiquidity_LimitOrderTranche:
+			return NewLimitOrderTrancheWrapper(liquidity.LimitOrderTranche)
 
 		default:
 			panic("Tick does not have liquidity")
