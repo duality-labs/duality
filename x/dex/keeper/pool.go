@@ -3,6 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
@@ -22,7 +23,7 @@ func NewPool(
 	upperTick1 *types.PoolReserves,
 ) Pool {
 	// TODO: maybe store this somewhere so we don't have to recalculate
-	price0To1 := MustCalcPrice0To1(tickIndex)
+	price0To1 := utils.MustCalcPrice0To1(tickIndex)
 	return Pool{
 		TickIndex:      tickIndex,
 		LowerTick0:     lowerTick0,
@@ -186,7 +187,7 @@ func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.I
 func (p *Pool) MustCalcPrice1To0Center() sdk.Dec {
 	// NOTE: We can safely call the error-less version of CalcPrice here because the pool object
 	// has already been initialized with an upper and lower tick which satisfy a check for IsTickOutOfRange
-	return MustCalcPrice1To0(p.TickIndex)
+	return utils.MustCalcPrice1To0(p.TickIndex)
 }
 func (p *Pool) CalcSharesMinted(
 	reserve0 sdk.Int,
@@ -248,7 +249,7 @@ func CalcResidualValue(amount0 sdk.Int, amount1 sdk.Int, priceLower1To0 sdk.Dec,
 	amount0Dec := amount0.ToDec()
 	amount1Dec := amount1.ToDec()
 	// ResidualValue = Amount0 * (Price1to0Center / Price1to0Upper) + Amount1 * Price1to0Lower
-	amount0Discount, err := CalcPrice0To1(-fee)
+	amount0Discount, err := utils.CalcPrice0To1(-fee)
 	if err != nil {
 		return sdk.ZeroDec(), err
 	}

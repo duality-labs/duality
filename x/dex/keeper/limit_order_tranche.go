@@ -15,18 +15,10 @@ type LimitOrderTrancheWrapper struct {
 func NewLimitOrderTrancheWrapper(
 	tranche *types.LimitOrderTranche,
 ) *LimitOrderTrancheWrapper {
-	var priceMakerToTaker, priceTakerToMaker sdk.Dec
-	if tranche.TokenIn == tranche.PairId.Token0 {
-		priceMakerToTaker = MustCalcPrice0To1(tranche.TickIndex)
-		priceTakerToMaker = MustCalcPrice1To0(tranche.TickIndex)
-	} else {
-		priceMakerToTaker = MustCalcPrice1To0(tranche.TickIndex)
-		priceTakerToMaker = MustCalcPrice0To1(tranche.TickIndex)
-	}
 	return &LimitOrderTrancheWrapper{
 		LimitOrderTranche: tranche,
-		PriceTakerToMaker: priceTakerToMaker,
-		PriceMakerToTaker: priceMakerToTaker,
+		PriceTakerToMaker: tranche.PriceTakerToMaker(),
+		PriceMakerToTaker: tranche.PriceMakerToTaker(),
 	}
 }
 

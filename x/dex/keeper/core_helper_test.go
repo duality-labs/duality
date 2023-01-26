@@ -10,6 +10,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	dualityapp "github.com/duality-labs/duality/app"
+	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/keeper"
 	. "github.com/duality-labs/duality/x/dex/keeper"
 	"github.com/duality-labs/duality/x/dex/types"
@@ -91,7 +92,7 @@ func (s *CoreHelpersTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amo
 	sharesId := CreateSharesId("TokenA", "TokenB", tickIndex, 0)
 	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, pairId, tickIndex, s.feeTiers[0])
 
-	priceCenter1To0, err := keeper.CalcPrice0To1(tickIndex)
+	priceCenter1To0, err := utils.CalcPrice0To1(tickIndex)
 	if err != nil {
 		panic(err)
 	}

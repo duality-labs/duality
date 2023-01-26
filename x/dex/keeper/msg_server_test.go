@@ -10,6 +10,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	dualityapp "github.com/duality-labs/duality/app"
+	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/keeper"
 	. "github.com/duality-labs/duality/x/dex/keeper"
 	. "github.com/duality-labs/duality/x/dex/keeper/internal/testutils"
@@ -378,9 +379,9 @@ func (s *MsgServerTestSuite) calcAutoswapSharesMinted(centerTick int64, feeIndex
 	// shares minted = value * totalShares / valuePool
 	fee := s.feeTiers[feeIndex].Fee
 
-	centerPrice, _ := keeper.CalcPrice1To0(centerTick)
-	leftPrice, _ := keeper.CalcPrice1To0(centerTick - int64(fee))
-	discountPrice, _ := keeper.CalcPrice1To0(-int64(fee))
+	centerPrice, _ := utils.CalcPrice1To0(centerTick)
+	leftPrice, _ := utils.CalcPrice1To0(centerTick - int64(fee))
+	discountPrice, _ := utils.CalcPrice1To0(-int64(fee))
 
 	balancedValue := balanced0.ToDec().Add(centerPrice.Mul(balanced1.ToDec())).TruncateInt()
 	residualValue := residual0.ToDec().Mul(discountPrice).Add(leftPrice.Mul(residual1.ToDec())).TruncateInt()
@@ -391,7 +392,7 @@ func (s *MsgServerTestSuite) calcAutoswapSharesMinted(centerTick int64, feeIndex
 
 func (s *MsgServerTestSuite) calcSharesMinted(centerTick int64, feeIndex uint64, _amount0 int64, _amount1 int64) sdk.Int {
 	amount0, amount1 := sdk.NewInt(_amount0), sdk.NewInt(_amount1)
-	centerPrice, _ := keeper.CalcPrice1To0(centerTick)
+	centerPrice, _ := utils.CalcPrice1To0(centerTick)
 
 	return amount0.ToDec().Add(centerPrice.Mul(amount1.ToDec())).TruncateInt()
 }
@@ -1049,7 +1050,7 @@ func (s *MsgServerTestSuite) getLimitReservesAtTickAtKey(selling string, tickInd
 
 // Swap helpers (use for writing the tests, but replace with actual values before finishing!)
 func (s *MsgServerTestSuite) calculateSingleSwapNoLOAToB(tick int64, tickLiqudity int64, amountIn int64) (sdk.Int, sdk.Int) {
-	price, err := keeper.CalcPrice0To1(tick)
+	price, err := utils.CalcPrice0To1(tick)
 	if err != nil {
 		panic(err)
 	}
@@ -1058,7 +1059,7 @@ func (s *MsgServerTestSuite) calculateSingleSwapNoLOAToB(tick int64, tickLiqudit
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapOnlyLOAToB(tick int64, tickLimitOrderLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
-	price, err := keeper.CalcPrice0To1(tick)
+	price, err := utils.CalcPrice0To1(tick)
 	if err != nil {
 		panic(err)
 	}
@@ -1067,7 +1068,7 @@ func (s *MsgServerTestSuite) calculateSingleSwapOnlyLOAToB(tick int64, tickLimit
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapAToB(tick int64, tickLiqudidty int64, tickLimitOrderLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
-	price, err := keeper.CalcPrice0To1(tick)
+	price, err := utils.CalcPrice0To1(tick)
 	if err != nil {
 		panic(err)
 	}
@@ -1076,7 +1077,7 @@ func (s *MsgServerTestSuite) calculateSingleSwapAToB(tick int64, tickLiqudidty i
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapNoLOBToA(tick int64, tickLiqudity int64, amountIn int64) (sdk.Int, sdk.Int) {
-	price, err := keeper.CalcPrice1To0(tick)
+	price, err := utils.CalcPrice1To0(tick)
 	if err != nil {
 		panic(err)
 	}
@@ -1085,7 +1086,7 @@ func (s *MsgServerTestSuite) calculateSingleSwapNoLOBToA(tick int64, tickLiqudit
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapOnlyLOBToA(tick int64, tickLimitOrderLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
-	price, err := keeper.CalcPrice1To0(tick)
+	price, err := utils.CalcPrice1To0(tick)
 	if err != nil {
 		panic(err)
 	}
@@ -1094,7 +1095,7 @@ func (s *MsgServerTestSuite) calculateSingleSwapOnlyLOBToA(tick int64, tickLimit
 }
 
 func (s *MsgServerTestSuite) calculateSingleSwapBToA(tick int64, tickLiqudidty int64, tickLimitOrderLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
-	price, err := keeper.CalcPrice1To0(tick)
+	price, err := utils.CalcPrice1To0(tick)
 	if err != nil {
 		panic(err)
 	}
@@ -1143,7 +1144,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsAToB(tickIndexes []int64, tic
 	prices := make([]sdk.Dec, len(tickIndexes))
 	var err error
 	for i := range prices {
-		prices[i], err = keeper.CalcPrice0To1(tickIndexes[i])
+		prices[i], err = utils.CalcPrice0To1(tickIndexes[i])
 		if err != nil {
 			panic(err)
 		}
@@ -1155,7 +1156,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsNoLOAToB(tickIndexes []int64,
 	prices := make([]sdk.Dec, len(tickIndexes))
 	var err error
 	for i := range prices {
-		prices[i], err = keeper.CalcPrice0To1(tickIndexes[i])
+		prices[i], err = utils.CalcPrice0To1(tickIndexes[i])
 		if err != nil {
 			panic(err)
 		}
@@ -1167,7 +1168,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsOnlyLOAToB(tickIndexes []int6
 	prices := make([]sdk.Dec, len(tickIndexes))
 	var err error
 	for i := range prices {
-		prices[i], err = keeper.CalcPrice0To1(tickIndexes[i])
+		prices[i], err = utils.CalcPrice0To1(tickIndexes[i])
 		if err != nil {
 			panic(err)
 		}
@@ -1179,7 +1180,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsBToA(tickIndexes []int64, tic
 	prices := make([]sdk.Dec, len(tickIndexes))
 	var err error
 	for i := range prices {
-		prices[i], err = keeper.CalcPrice1To0(tickIndexes[i])
+		prices[i], err = utils.CalcPrice1To0(tickIndexes[i])
 		if err != nil {
 			panic(err)
 		}
@@ -1191,7 +1192,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsNoLOBToA(tickIndexes []int64,
 	prices := make([]sdk.Dec, len(tickIndexes))
 	var err error
 	for i := range prices {
-		prices[i], err = keeper.CalcPrice1To0(tickIndexes[i])
+		prices[i], err = utils.CalcPrice1To0(tickIndexes[i])
 		if err != nil {
 			panic(err)
 		}
@@ -1203,7 +1204,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsOnlyLOBToA(tickIndexes []int6
 	prices := make([]sdk.Dec, len(tickIndexes))
 	var err error
 	for i := range prices {
-		prices[i], err = keeper.CalcPrice1To0(tickIndexes[i])
+		prices[i], err = utils.CalcPrice1To0(tickIndexes[i])
 		if err != nil {
 			panic(err)
 		}
@@ -1387,7 +1388,7 @@ func MultiplePoolSwapAndUpdate(amounts_liquidity []sdk.Int,
 }
 
 func SharesOnDeposit(existing_shares sdk.Dec, existing_amount0 sdk.Int, existing_amount1 sdk.Int, new_amount0 sdk.Int, new_amount1 sdk.Int, tickIndex int64) (shares_minted sdk.Int) {
-	price1To0, err := keeper.CalcPrice1To0(tickIndex)
+	price1To0, err := utils.CalcPrice1To0(tickIndex)
 	if err != nil {
 		panic(err)
 	}
