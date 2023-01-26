@@ -10,9 +10,8 @@ import "duality/dex/pair_id.proto";
 
 message TickLiquidity {
   oneof liquidity {
-    // NOTE wire number must not conflict with the wire numbers for the internal oneof types
-    PoolReserves poolReserves = 10;
-    LimitOrderTranche limitOrderTranche = 11;
+    PoolReserves poolReserves = 1;
+    LimitOrderTranche limitOrderTranche = 2;
   }
 
 }
