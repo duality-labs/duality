@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -8,8 +9,6 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/spf13/cobra"
 )
-
-var _ = strconv.Itoa(0)
 
 func CmdListPoolReserves() *cobra.Command {
 	cmd := &cobra.Command{
@@ -40,6 +39,54 @@ func CmdListPoolReserves() *cobra.Command {
 			params.Pagination = pageReq
 
 			res, err := queryClient.PoolReservesAll(cmd.Context(), params)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func CmdShowPoolReserves() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "show-pool-reserves [pair-id] [tick-index] [token-in] [fee]",
+		Short: "shows a PoolReserves",
+		Args:  cobra.ExactArgs(4),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			queryClient := types.NewQueryClient(clientCtx)
+
+			argPairId := args[0]
+			argTickIndex := args[1]
+			argTokenIn := args[2]
+			argFee := args[3]
+
+			argTrancheIndexInt, err := strconv.Atoi(argFee)
+
+			if err != nil {
+				return err
+			}
+
+			argTickIndexInt, err := strconv.Atoi(argTickIndex)
+
+			if err != nil {
+				return err
+			}
+
+			params := &types.QueryGetPoolReservesRequest{
+				PairId:    argPairId,
+				TickIndex: int64(argTickIndexInt),
+				TokenIn:   argTokenIn,
+				Fee:       uint64(argTrancheIndexInt),
+			}
+
+			res, err := queryClient.PoolReserves(context.Background(), params)
 			if err != nil {
 				return err
 			}
