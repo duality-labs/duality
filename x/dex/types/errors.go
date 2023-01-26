@@ -33,4 +33,6 @@ var (
 	ErrActiveLimitOrderNotFound           = sdkerrors.Register(ModuleName, 1128, "No active limit found. It does not exist or has already been filled")
 	ErrZeroWithdraw                       = sdkerrors.Register(ModuleName, 1129, "Withdraw amount must be > 0.")
 	ErrZeroLimitOrder                     = sdkerrors.Register(ModuleName, 1130, "Limit order amount must be > 0.")
+	ErrNegativeMinOut                     = sdkerrors.Register(ModuleName, 1131, "MinOut must be >= 0.")
+	ErrNegativeLimitPrice                 = sdkerrors.Register(ModuleName, 1132, "LimitPrice must be > 0.")
 )
