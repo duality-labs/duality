@@ -51,7 +51,21 @@ func TestMsgSwap_ValidateBasic(t *testing.T) {
 				MinOut:   sdk.ZeroInt(),
 			},
 			err: ErrInvalidTokenIn,
-		}, {
+		},
+		{
+			name: "invalid zero swap",
+			msg: MsgSwap{
+				Creator:  sample.AccAddress(),
+				Receiver: sample.AccAddress(),
+				TokenA:   "TokenA",
+				TokenB:   "TokenB",
+				AmountIn: sdk.ZeroInt(),
+				TokenIn:  "TokenC",
+				MinOut:   sdk.ZeroInt(),
+			},
+			err: ErrZeroSwap,
+		},
+		{
 			name: "valid msg",
 			msg: MsgSwap{
 				Creator:  sample.AccAddress(),

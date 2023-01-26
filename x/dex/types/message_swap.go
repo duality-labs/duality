@@ -57,5 +57,9 @@ func (msg *MsgSwap) ValidateBasic() error {
 	if msg.TokenIn != msg.TokenA && msg.TokenIn != msg.TokenB {
 		return ErrInvalidTokenIn
 	}
+
+	if msg.AmountIn.LTE(sdk.ZeroInt()) {
+		return ErrZeroSwap
+	}
 	return nil
 }
