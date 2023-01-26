@@ -67,7 +67,7 @@ func (msg *MsgDeposit) ValidateBasic() error {
 	}
 
 	for i := 0; i < len(msg.AmountsA); i++ {
-		if msg.AmountsA[i].Equal(sdk.ZeroInt()) && msg.AmountsB[i].Equal(sdk.ZeroInt()) {
+		if msg.AmountsA[i].LTE(sdk.ZeroInt()) && msg.AmountsB[i].LTE(sdk.ZeroInt()) {
 			return ErrZeroDeposit
 		}
 	}

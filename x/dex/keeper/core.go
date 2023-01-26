@@ -63,11 +63,6 @@ func (k Keeper) DepositCore(
 			return nil, nil, types.ErrDepositBehindPairLiquidity
 		}
 
-		// check for non-zero deposit
-		if amount0.Equal(sdk.ZeroInt()) && amount1.Equal(sdk.ZeroInt()) {
-			return nil, nil, types.ErrZeroDeposit
-		}
-
 		sharesId := CreateSharesId(token0, token1, tickIndex, feeIndex)
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
