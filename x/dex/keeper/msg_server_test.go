@@ -895,11 +895,6 @@ func (s *MsgServerTestSuite) assertCurr1To0(curr1To0Expected int64) {
 	s.Assert().Equal(curr1To0Expected, curr1to0Actual)
 }
 
-func (s *MsgServerTestSuite) printTicks() {
-	tickMap, _ := s.app.DexKeeper.GetTradingPair(s.ctx, defaultPairId)
-	fmt.Printf("\nTick0To1: %v, Tick1To0: %v", tickMap.CurrentTick0To1, tickMap.CurrentTick1To0)
-}
-
 // Pool liquidity (i.e. deposited rather than LO)
 func (s *MsgServerTestSuite) assertLiquidityAtTick(amountA sdk.Int, amountB sdk.Int, tickIndex int64, feeIndex uint64) {
 

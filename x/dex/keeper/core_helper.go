@@ -25,23 +25,6 @@ func (k Keeper) TokenInit(ctx sdk.Context, address string) {
 	}
 }
 
-// Handles initializing a new pair (token0/token1) if not found, adds token0, token1 to global list of tokens active on the dex
-func (k Keeper) GetOrInitPair(ctx sdk.Context, token0 string, token1 string) types.TradingPair {
-	k.TokenInit(ctx, token0)
-	k.TokenInit(ctx, token1)
-	pairId := CreatePairId(token0, token1)
-	pair, found := k.GetTradingPair(ctx, pairId)
-	if !found {
-		pair = types.TradingPair{
-			PairId:          &types.PairId{Token0: token0, Token1: token1},
-			CurrentTick0To1: math.MaxInt64,
-			CurrentTick1To0: math.MinInt64,
-		}
-		k.SetTradingPair(ctx, pair)
-	}
-	return pair
-}
-
 func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64, fee uint64) (*types.PoolReserves, error) {
 	tickLiq, tickFound := k.GetPoolReserves(
 		ctx,

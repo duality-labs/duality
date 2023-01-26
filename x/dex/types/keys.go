@@ -46,9 +46,6 @@ const (
 	// TickKeyPrefix is the prefix to retrieve all Tick
 	BaseTickKeyPrefix = "Tick/value"
 
-	// TradingPairKeyPrefix is the prefix to retrieve all TradingPair
-	TradingPairKeyPrefix = "TradingPair/value"
-
 	// TickLiquidityKeyPrefix is the prefix to retrieve all TickLiquidity
 	TickLiquidityKeyPrefix = "TickLiquidity/value/"
 )
@@ -81,16 +78,6 @@ func TickIndexToBytes(tickIndex int64, pairId *PairId, tokenIn string) []byte {
 		copy(key[:1], []byte{0x01})
 		copy(key[1:], sdk.Uint64ToBigEndian(uint64(tickIndex)))
 	}
-
-	return key
-}
-
-func TradingPairKey(pairId *PairId) []byte {
-	var key []byte
-
-	pairIdBytes := []byte(pairId.Stringify())
-	key = append(key, pairIdBytes...)
-	key = append(key, []byte("/")...)
 
 	return key
 }

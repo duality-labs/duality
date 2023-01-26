@@ -5,7 +5,6 @@ option go_package = "github.com/duality-labs/duality/x/dex/types";
 import "gogoproto/gogo.proto";
 import "duality/dex/limit_order_tranche.proto";
 import "duality/dex/pool_reserves.proto";
-import "duality/dex/pair_id.proto";
 
 
 message TickLiquidity {
