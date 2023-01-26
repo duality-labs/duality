@@ -64,7 +64,7 @@ func (t LimitOrderTrancheWrapper) IsFilled() bool {
 }
 
 func (t *LimitOrderTrancheWrapper) Save(sdkCtx sdk.Context, keeper Keeper) {
-	if t.HasToken() {
+	if !t.IsFilled() {
 		keeper.SetLimitOrderTranche(sdkCtx, *t.LimitOrderTranche)
 	} else {
 		filledTranche := t.LimitOrderTranche.CreateFilledTranche()

@@ -41,10 +41,6 @@ func (t *LimitOrderTranche) Price() sdk.Dec {
 	return t.PriceTakerToMaker()
 }
 
-func (t LimitOrderTranche) HasLiquidity() bool {
-	return t.ReservesTokenIn.GT(sdk.ZeroInt())
-}
-
 func (t LimitOrderTranche) HasToken() bool {
 	return t.ReservesTokenIn.GT(sdk.ZeroInt())
 }

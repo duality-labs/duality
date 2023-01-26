@@ -18,7 +18,6 @@ type Pool struct {
 
 func NewPool(
 	tickIndex int64,
-	// feeIndex uint64,
 	lowerTick0 *types.PoolReserves,
 	upperTick1 *types.PoolReserves,
 ) Pool {
