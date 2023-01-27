@@ -249,22 +249,8 @@ func (s *QueryTestSuite) TestQueryCmdListTickLiquidity() {
 	}{
 		{
 			name: "valid",
-			args: []string{},
+			args: []string{"TokenA<>TokenB", "TokenB"},
 			expOutput: []types.TickLiquidity{
-				{
-					Liquidity: &types.TickLiquidity_PoolReserves{
-						PoolReserves: &types.PoolReserves{
-							PairId: &types.PairId{
-								Token0: "TokenA",
-								Token1: "TokenB",
-							},
-							TokenIn:   "TokenA",
-							TickIndex: -3,
-							Fee:       3,
-							Reserves:  sdk.NewInt(10),
-						},
-					},
-				},
 				{
 					Liquidity: &types.TickLiquidity_PoolReserves{
 						PoolReserves: &types.PoolReserves{

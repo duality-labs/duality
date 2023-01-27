@@ -11,10 +11,14 @@ import (
 
 func CmdListTickLiquidity() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-tick-liquidity",
+		Use:   "list-tick-liquidity [pair-id] [token-in]",
 		Short: "list all tickLiquidity",
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
+
+			argPairId := args[0]
+			argTokenIn := args[1]
 
 			pageReq, err := client.ReadPageRequest(cmd.Flags())
 			if err != nil {
@@ -24,6 +28,8 @@ func CmdListTickLiquidity() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryAllTickLiquidityRequest{
+				PairId:     argPairId,
+				TokenIn:    argTokenIn,
 				Pagination: pageReq,
 			}
 

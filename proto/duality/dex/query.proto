@@ -93,7 +93,7 @@ service Query {
 
 	// Queries a list of TickLiquidity items.
 	rpc TickLiquidityAll(QueryAllTickLiquidityRequest) returns (QueryAllTickLiquidityResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/tick_liquidity";
+		option (google.api.http).get = "/dualitylabs/duality/dex/tick_liquidity/{pairId}/{tokenIn}";
 	}
 
 // Queries a FilledLimitOrderTranche by index.
@@ -250,7 +250,9 @@ message QueryAllUserLimitOrdersResponse {
 }
 
 message QueryAllTickLiquidityRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+  string pairId = 1;
+  string tokenIn = 2;
+	cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 
 message QueryAllTickLiquidityResponse {
