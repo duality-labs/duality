@@ -142,46 +142,6 @@ func (k Keeper) IsBehindEnemyLines(ctx sdk.Context, pairId *types.PairId, tokenI
 	return false
 }
 
-// Balance trueAmount1 to the pool ratio
-func CalcTrueAmounts(
-	centerTickPrice1To0 sdk.Dec,
-	lowerReserve0 sdk.Int,
-	upperReserve1 sdk.Int,
-	amount0 sdk.Int,
-	amount1 sdk.Int,
-	totalShares sdk.Int,
-) (trueAmount0 sdk.Int, trueAmount1 sdk.Int, sharesMinted sdk.Int) {
-	lowerReserve0Dec := lowerReserve0.ToDec()
-	upperReserve1Dec := upperReserve1.ToDec()
-	amount0Dec := amount0.ToDec()
-	amount1Dec := amount1.ToDec()
-
-	// See spec: https://www.notion.so/dualityxyz/Autoswap-Spec-e856fa7b2438403c95147010d479b98c
-	if upperReserve1Dec.GT(sdk.ZeroDec()) {
-		trueAmount0 = sdk.MinDec(
-			amount0Dec,
-			amount1Dec.Mul(lowerReserve0Dec).Quo(upperReserve1Dec)).TruncateInt()
-	} else {
-		trueAmount0 = amount0
-	}
-
-	if lowerReserve0Dec.GT(sdk.ZeroDec()) {
-		trueAmount1 = sdk.MinDec(
-			amount1Dec,
-			amount0Dec.Mul(upperReserve1Dec).Quo(lowerReserve0Dec)).TruncateInt()
-	} else {
-		trueAmount1 = amount1
-	}
-
-	valueMintedToken0 := CalcShares(trueAmount0, trueAmount1, centerTickPrice1To0)
-	valueExistingToken0 := CalcShares(lowerReserve0, upperReserve1, centerTickPrice1To0)
-	if valueExistingToken0.GT(sdk.ZeroDec()) {
-		sharesMinted = valueMintedToken0.Quo(valueExistingToken0).MulInt(totalShares).TruncateInt()
-	} else {
-		sharesMinted = valueMintedToken0.TruncateInt()
-	}
-	return
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 //                            TOKENIZER UTILS                                //

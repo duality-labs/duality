@@ -196,14 +196,8 @@ func (p *Pool) CalcSharesMinted(
 	amount1 sdk.Int,
 ) (sharesMinted sdk.Int) {
 	price1To0Center := p.MustCalcPrice1To0Center()
-	valueMintedToken0 := CalcShares(amount0, amount1, price1To0Center)
-	valueExistingToken0 := CalcShares(reserve0, reserve1, price1To0Center)
-	if valueExistingToken0.GT(sdk.ZeroDec()) {
-		sharesMinted = valueMintedToken0.Quo(valueExistingToken0).Mul(totalShares.ToDec()).TruncateInt()
-	} else {
-		sharesMinted = valueMintedToken0.TruncateInt()
-	}
-	return sharesMinted
+
+	return CalcShares(amount0, amount1, price1To0Center).TruncateInt()
 }
 
 func (p *Pool) CalcResidualSharesMinted(
@@ -214,18 +208,12 @@ func (p *Pool) CalcResidualSharesMinted(
 	residualAmount1 sdk.Int,
 ) (sharesMinted sdk.Int, err error) {
 	fee := CalcFee(p.UpperTick1.TickIndex, p.LowerTick0.TickIndex)
-	price1To0Center := p.MustCalcPrice1To0Center()
 	valueMintedToken0, err := CalcResidualValue(residualAmount0, residualAmount1, p.Price1To0Lower, fee)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
-	valueExistingToken0 := CalcShares(reserve0, reserve1, price1To0Center)
-	if valueExistingToken0.GT(sdk.ZeroDec()) {
-		sharesMinted = valueMintedToken0.Quo(valueExistingToken0).Mul(totalShares.ToDec()).TruncateInt()
-	} else {
-		sharesMinted = valueMintedToken0.TruncateInt()
-	}
-	return sharesMinted, nil
+
+	return valueMintedToken0.TruncateInt(), nil
 }
 
 func (p *Pool) Withdraw(sharesToRemove sdk.Int, totalShares sdk.Int) (outAmount0 sdk.Int, outAmount1 sdk.Int) {
