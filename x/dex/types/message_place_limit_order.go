@@ -56,5 +56,9 @@ func (msg *MsgPlaceLimitOrder) ValidateBasic() error {
 	if msg.TokenIn != msg.TokenA && msg.TokenIn != msg.TokenB {
 		return ErrInvalidTokenIn
 	}
+
+	if msg.AmountIn.LTE(sdk.ZeroInt()) {
+		return ErrZeroLimitOrder
+	}
 	return nil
 }
