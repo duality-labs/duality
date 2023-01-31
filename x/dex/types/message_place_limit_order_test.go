@@ -51,6 +51,19 @@ func TestMsgPlaceLimitOrder_ValidateBasic(t *testing.T) {
 				AmountIn:  sdk.OneInt(),
 			},
 			err: ErrInvalidTokenIn,
+		},
+		{
+			name: "invalid zero limit order",
+			msg: MsgPlaceLimitOrder{
+				Creator:   sample.AccAddress(),
+				Receiver:  sample.AccAddress(),
+				TokenA:    "TokenA",
+				TokenB:    "TokenB",
+				TickIndex: 0,
+				TokenIn:   "TokenA",
+				AmountIn:  sdk.ZeroInt(),
+			},
+			err: ErrZeroLimitOrder,
 		}, {
 			name: "valid msg",
 			msg: MsgPlaceLimitOrder{

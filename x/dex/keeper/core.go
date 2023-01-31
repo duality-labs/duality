@@ -63,11 +63,6 @@ func (k Keeper) DepositCore(
 			return nil, nil, types.ErrDepositBehindPairLiquidity
 		}
 
-		// check for non-zero deposit
-		if amount0.Equal(sdk.ZeroInt()) && amount1.Equal(sdk.ZeroInt()) {
-			return nil, nil, types.ErrZeroDeposit
-		}
-
 		sharesId := CreateSharesId(token0, token1, tickIndex, feeIndex)
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
@@ -284,13 +279,8 @@ func (k Keeper) SwapCore(goCtx context.Context,
 	coinIn := sdk.NewCoin(tokenIn, amountToDeposit)
 	coinOut := sdk.NewCoin(tokenOut, totalOut)
 
-	if amountToDeposit.GT(sdk.ZeroInt()) {
-
-		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
-			return sdk.Coin{}, err
-		}
-	} else {
-		return sdk.Coin{}, types.ErrZeroSwap
+	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
+		return sdk.Coin{}, err
 	}
 
 	if totalOut.GT(sdk.ZeroInt()) {
