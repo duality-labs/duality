@@ -150,13 +150,7 @@ func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.I
 		return sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt()
 	}
 
-	outShares = p.CalcSharesMinted(
-		*lowerReserve0,
-		*upperReserve1,
-		totalShares,
-		inAmount0,
-		inAmount1,
-	)
+	outShares = p.CalcSharesMinted(inAmount0, inAmount1)
 
 	if autoswap {
 		residualAmount0 := maxAmount0.Sub(inAmount0)
@@ -164,13 +158,7 @@ func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.I
 
 		// NOTE: Currently not doing anything with the error, but added error handling to all of the new functions for autoswap.
 		// Open to changing it however.
-		residualShares, _ := p.CalcResidualSharesMinted(
-			*lowerReserve0,
-			*upperReserve1,
-			totalShares,
-			residualAmount0,
-			residualAmount1,
-		)
+		residualShares, _ := p.CalcResidualSharesMinted(residualAmount0, residualAmount1)
 
 		outShares = outShares.Add(residualShares)
 
@@ -188,44 +176,29 @@ func (p *Pool) MustCalcPrice1To0Center() sdk.Dec {
 	// has already been initialized with an upper and lower tick which satisfy a check for IsTickOutOfRange
 	return utils.MustCalcPrice1To0(p.TickIndex)
 }
+
 func (p *Pool) CalcSharesMinted(
-	reserve0 sdk.Int,
-	reserve1 sdk.Int,
-	totalShares sdk.Int,
 	amount0 sdk.Int,
 	amount1 sdk.Int,
 ) (sharesMinted sdk.Int) {
 	price1To0Center := p.MustCalcPrice1To0Center()
-	valueMintedToken0 := CalcShares(amount0, amount1, price1To0Center)
-	valueExistingToken0 := CalcShares(reserve0, reserve1, price1To0Center)
-	if valueExistingToken0.GT(sdk.ZeroDec()) {
-		sharesMinted = valueMintedToken0.Quo(valueExistingToken0).Mul(totalShares.ToDec()).TruncateInt()
-	} else {
-		sharesMinted = valueMintedToken0.TruncateInt()
-	}
-	return sharesMinted
+
+	amount0Dec := amount0.ToDec()
+	amount1Dec := amount1.ToDec()
+	return amount0Dec.Add(amount1Dec.Mul(price1To0Center)).TruncateInt()
 }
 
 func (p *Pool) CalcResidualSharesMinted(
-	reserve0 sdk.Int,
-	reserve1 sdk.Int,
-	totalShares sdk.Int,
 	residualAmount0 sdk.Int,
 	residualAmount1 sdk.Int,
 ) (sharesMinted sdk.Int, err error) {
 	fee := CalcFee(p.UpperTick1.TickIndex, p.LowerTick0.TickIndex)
-	price1To0Center := p.MustCalcPrice1To0Center()
 	valueMintedToken0, err := CalcResidualValue(residualAmount0, residualAmount1, p.Price1To0Lower, fee)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
-	valueExistingToken0 := CalcShares(reserve0, reserve1, price1To0Center)
-	if valueExistingToken0.GT(sdk.ZeroDec()) {
-		sharesMinted = valueMintedToken0.Quo(valueExistingToken0).Mul(totalShares.ToDec()).TruncateInt()
-	} else {
-		sharesMinted = valueMintedToken0.TruncateInt()
-	}
-	return sharesMinted, nil
+
+	return valueMintedToken0.TruncateInt(), nil
 }
 
 func (p *Pool) Withdraw(sharesToRemove sdk.Int, totalShares sdk.Int) (outAmount0 sdk.Int, outAmount1 sdk.Int) {
@@ -239,11 +212,6 @@ func (p *Pool) Withdraw(sharesToRemove sdk.Int, totalShares sdk.Int) (outAmount0
 	return outAmount0, outAmount1
 }
 
-func CalcShares(amount0 sdk.Int, amount1 sdk.Int, priceCenter1To0 sdk.Dec) sdk.Dec {
-	amount0Dec := amount0.ToDec()
-	amount1Dec := amount1.ToDec()
-	return amount0Dec.Add(amount1Dec.Mul(priceCenter1To0))
-}
 func CalcResidualValue(amount0 sdk.Int, amount1 sdk.Int, priceLower1To0 sdk.Dec, fee int64) (sdk.Dec, error) {
 	amount0Dec := amount0.ToDec()
 	amount1Dec := amount1.ToDec()
