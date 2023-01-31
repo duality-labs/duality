@@ -64,7 +64,7 @@ func (msg *MsgWithdrawl) ValidateBasic() error {
 	}
 
 	for i := 0; i < len(msg.FeeIndexes); i++ {
-		if msg.SharesToRemove[i].Equal(sdk.ZeroInt()) {
+		if msg.SharesToRemove[i].LTE(sdk.ZeroInt()) {
 			return ErrZeroWithdraw
 		}
 	}
