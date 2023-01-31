@@ -26,8 +26,6 @@ func TestQueryTestSuite(t *testing.T) {
 	suite.Run(t, new(QueryTestSuite))
 }
 
-var TEN = sdk.NewInt(10)
-
 var testAddress = sdk.AccAddress([]byte("testAddr"))
 
 var feeTierList = []types.FeeTier{
@@ -38,29 +36,37 @@ var feeTierList = []types.FeeTier{
 }
 
 var limitOrderTrancheList = []types.TickLiquidity{
-	{PairId: &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-		TokenIn:        "TokenB",
-		TickIndex:      1,
-		LiquidityIndex: 0,
-		LiquidityType:  types.LiquidityTypeLO,
+	{Liquidity: &types.TickLiquidity_LimitOrderTranche{
 		LimitOrderTranche: &types.LimitOrderTranche{
+			PairId: &types.PairId{
+				Token0: "TokenA",
+				Token1: "TokenB",
+			},
+			TokenIn:          "TokenB",
+			TickIndex:        1,
+			TrancheIndex:     0,
 			ReservesTokenIn:  sdk.NewInt(10),
 			ReservesTokenOut: sdk.ZeroInt(),
 			TotalTokenIn:     sdk.NewInt(10),
 			TotalTokenOut:    sdk.ZeroInt(),
 		},
 	},
-	{PairId: &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-		TokenIn:        "TokenB",
-		TickIndex:      2,
-		LiquidityIndex: 0,
-		LiquidityType:  types.LiquidityTypeLO,
+	},
+	{Liquidity: &types.TickLiquidity_LimitOrderTranche{
 		LimitOrderTranche: &types.LimitOrderTranche{
+			PairId: &types.PairId{
+				Token0: "TokenA",
+				Token1: "TokenB",
+			},
+			TokenIn:          "TokenB",
+			TickIndex:        2,
+			TrancheIndex:     1,
 			ReservesTokenIn:  sdk.NewInt(10),
 			ReservesTokenOut: sdk.ZeroInt(),
 			TotalTokenIn:     sdk.NewInt(10),
 			TotalTokenOut:    sdk.ZeroInt(),
 		},
+	},
 	},
 }
 
@@ -85,19 +91,33 @@ var filledLimitOrderTrancheList = []types.FilledLimitOrderTranche{
 
 var poolReservesList = []types.TickLiquidity{
 	{
-		PairId:         &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-		TokenIn:        "TokenA",
-		TickIndex:      0,
-		LiquidityIndex: 0,
-		LiquidityType:  types.LiquidityTypeLP,
-		LPReserve:      &TEN},
+		Liquidity: &types.TickLiquidity_PoolReserves{
+			PoolReserves: &types.PoolReserves{
+				PairId: &types.PairId{
+					Token0: "TokenA",
+					Token1: "TokenB",
+				},
+				TokenIn:   "TokenB",
+				TickIndex: 0,
+				Fee:       1,
+				Reserves:  sdk.NewInt(10),
+			},
+		},
+	},
 	{
-		PairId:         &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-		TokenIn:        "TokenA",
-		TickIndex:      0,
-		LiquidityIndex: 1,
-		LiquidityType:  types.LiquidityTypeLP,
-		LPReserve:      &TEN},
+		Liquidity: &types.TickLiquidity_PoolReserves{
+			PoolReserves: &types.PoolReserves{
+				PairId: &types.PairId{
+					Token0: "TokenA",
+					Token1: "TokenB",
+				},
+				TokenIn:   "TokenB",
+				TickIndex: 0,
+				Fee:       3,
+				Reserves:  sdk.NewInt(10),
+			},
+		},
+	},
 }
 
 var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
@@ -239,7 +259,6 @@ func (s *QueryTestSuite) TestQueryCmdListFeeTier() {
 func (s *QueryTestSuite) TestQueryCmdListTickLiquidity() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	targetTick := poolReservesList[0]
 	testCases := []struct {
 		name      string
 		args      []string
@@ -248,40 +267,9 @@ func (s *QueryTestSuite) TestQueryCmdListTickLiquidity() {
 		expOutput []types.TickLiquidity
 	}{
 		{
-			name: "valid",
-			args: []string{"TokenA<>TokenB", "TokenB"},
-			expOutput: []types.TickLiquidity{
-				{
-					Liquidity: &types.TickLiquidity_PoolReserves{
-						PoolReserves: &types.PoolReserves{
-							PairId: &types.PairId{
-								Token0: "TokenA",
-								Token1: "TokenB",
-							},
-							TokenIn:   "TokenB",
-							TickIndex: 3,
-							Fee:       3,
-							Reserves:  sdk.NewInt(10),
-						},
-					},
-				},
-				{
-					Liquidity: &types.TickLiquidity_LimitOrderTranche{
-						LimitOrderTranche: &types.LimitOrderTranche{
-							PairId: &types.PairId{
-								Token0: "TokenA",
-								Token1: "TokenB",
-							},
-							TokenIn:          "TokenB",
-							TickIndex:        20,
-							ReservesTokenIn:  sdk.NewInt(10),
-							ReservesTokenOut: sdk.ZeroInt(),
-							TotalTokenIn:     sdk.NewInt(10),
-							TotalTokenOut:    sdk.ZeroInt(),
-						},
-					},
-				},
-			},
+			name:      "valid",
+			args:      []string{"TokenA<>TokenB", "TokenB"},
+			expOutput: append(poolReservesList, limitOrderTrancheList...),
 		},
 	}
 
