@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"encoding/csv"
-	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -12,10 +11,9 @@ import (
 )
 
 func (s *MsgServerTestSuite) DoRun(nTicks int, step int, withLo bool) Data {
-	fmt.Printf("Start run with params %v, %v\n", nTicks, step)
-
 	s.fundAliceBalances(1000000, 1000000)
 	s.fundBobBalances(1000000, 1000000)
+
 	i := 0
 	amountDeposited := 0
 	for ; i < nTicks; i++ {
@@ -23,28 +21,53 @@ func (s *MsgServerTestSuite) DoRun(nTicks int, step int, withLo bool) Data {
 		s.aliceDeposits(
 			NewDeposit(0, 5, curIdx, 0),
 			NewDeposit(0, 5, curIdx, 1))
-
 		amountDeposited += 10
+
 		if withLo {
 			s.aliceLimitSells("TokenB", curIdx, 5)
 			amountDeposited += 5
 		}
 	}
+
 	startTime := time.Now()
 	startGas := s.ctx.GasMeter().GasConsumed()
-	amountToSwap := CalcAmountToSwap((nTicks-1)*step, amountDeposited)
-	fmt.Printf("Amount int: %v, amountToSwap: %v\n", amountDeposited, amountToSwap)
 
+	amountToSwap := CalcAmountToSwap((nTicks-1)*step, amountDeposited)
 	s.bobMarketSells("TokenA", int(amountToSwap), 0)
+
 	duration := time.Since(startTime)
 	endGas := s.ctx.GasMeter().GasConsumed()
 	totalGas := endGas - startGas
+
 	return Data{
 		NTicks:   nTicks,
 		Step:     step,
 		GasUsed:  totalGas,
 		Duration: int64(duration),
 	}
+}
+
+func (s *MsgServerTestSuite) TestGasSwap() {
+	var data []Data
+	tickAmts := []int{1, 2, 10, 20, 100, 200, 1000}
+	steps := []int{1, 2, 5, 10, 50}
+
+	for _, tickAmt := range tickAmts {
+		for _, step := range steps {
+			s.SetupTest()
+			runData := s.DoRun(tickAmt, step, false)
+			data = append(data, runData)
+		}
+	}
+
+	WriteCSV(data)
+}
+
+type Data struct {
+	NTicks   int
+	Step     int
+	GasUsed  sdk.Gas
+	Duration int64
 }
 
 func WriteCSV(data []Data) {
@@ -64,30 +87,6 @@ func WriteCSV(data []Data) {
 			log.Fatalln("error writing record to file", err)
 		}
 	}
-}
-
-func (s *MsgServerTestSuite) TestGasSwap() {
-	var data []Data
-	tickAmts := []int{1, 2, 10, 20, 100, 200, 1000}
-	steps := []int{1, 2, 5, 10, 50}
-	for _, tickAmt := range tickAmts {
-		for _, step := range steps {
-			s.SetupTest()
-			runData := s.DoRun(tickAmt, step, false)
-			data = append(data, runData)
-		}
-	}
-
-	WriteCSV(data)
-	fmt.Printf("All Data: %v\n", data)
-
-}
-
-type Data struct {
-	NTicks   int
-	Step     int
-	GasUsed  sdk.Gas
-	Duration int64
 }
 
 func (d Data) StringArr() []string {
