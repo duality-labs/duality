@@ -33,8 +33,7 @@ func (ti TickIterator) Close() error {
 	return ti.iter.Close()
 }
 
-func (ti TickIterator) Value() types.TickLiquidity {
-	var tick types.TickLiquidity
+func (ti TickIterator) Value() (tick types.TickLiquidity) {
 	ti.cdc.MustUnmarshal(ti.iter.Value(), &tick)
 	return tick
 }

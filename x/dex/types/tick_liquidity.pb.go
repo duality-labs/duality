@@ -5,7 +5,6 @@ package types
 
 import (
 	fmt "fmt"
-	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	io "io"
@@ -25,13 +24,10 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type TickLiquidity struct {
-	PairId            *PairId                                 `protobuf:"bytes,1,opt,name=pairId,proto3" json:"pairId,omitempty"`
-	TokenIn           string                                  `protobuf:"bytes,2,opt,name=tokenIn,proto3" json:"tokenIn,omitempty"`
-	TickIndex         int64                                   `protobuf:"varint,3,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
-	LiquidityType     string                                  `protobuf:"bytes,4,opt,name=liquidityType,proto3" json:"liquidityType,omitempty"`
-	LiquidityIndex    uint64                                  `protobuf:"varint,5,opt,name=liquidityIndex,proto3" json:"liquidityIndex,omitempty"`
-	LPReserve         *github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,6,opt,name=LPReserve,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"LPReserve" yaml:"LPReserve"`
-	LimitOrderTranche *LimitOrderTranche                      `protobuf:"bytes,7,opt,name=limitOrderTranche,proto3" json:"limitOrderTranche,omitempty"`
+	// Types that are valid to be assigned to Liquidity:
+	//	*TickLiquidity_PoolReserves
+	//	*TickLiquidity_LimitOrderTranche
+	Liquidity isTickLiquidity_Liquidity `protobuf_oneof:"liquidity"`
 }
 
 func (m *TickLiquidity) Reset()         { *m = TickLiquidity{} }
@@ -67,46 +63,49 @@ func (m *TickLiquidity) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_TickLiquidity proto.InternalMessageInfo
 
-func (m *TickLiquidity) GetPairId() *PairId {
+type isTickLiquidity_Liquidity interface {
+	isTickLiquidity_Liquidity()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type TickLiquidity_PoolReserves struct {
+	PoolReserves *PoolReserves `protobuf:"bytes,1,opt,name=poolReserves,proto3,oneof" json:"poolReserves,omitempty"`
+}
+type TickLiquidity_LimitOrderTranche struct {
+	LimitOrderTranche *LimitOrderTranche `protobuf:"bytes,2,opt,name=limitOrderTranche,proto3,oneof" json:"limitOrderTranche,omitempty"`
+}
+
+func (*TickLiquidity_PoolReserves) isTickLiquidity_Liquidity()      {}
+func (*TickLiquidity_LimitOrderTranche) isTickLiquidity_Liquidity() {}
+
+func (m *TickLiquidity) GetLiquidity() isTickLiquidity_Liquidity {
 	if m != nil {
-		return m.PairId
+		return m.Liquidity
 	}
 	return nil
 }
 
-func (m *TickLiquidity) GetTokenIn() string {
-	if m != nil {
-		return m.TokenIn
+func (m *TickLiquidity) GetPoolReserves() *PoolReserves {
+	if x, ok := m.GetLiquidity().(*TickLiquidity_PoolReserves); ok {
+		return x.PoolReserves
 	}
-	return ""
-}
-
-func (m *TickLiquidity) GetTickIndex() int64 {
-	if m != nil {
-		return m.TickIndex
-	}
-	return 0
-}
-
-func (m *TickLiquidity) GetLiquidityType() string {
-	if m != nil {
-		return m.LiquidityType
-	}
-	return ""
-}
-
-func (m *TickLiquidity) GetLiquidityIndex() uint64 {
-	if m != nil {
-		return m.LiquidityIndex
-	}
-	return 0
+	return nil
 }
 
 func (m *TickLiquidity) GetLimitOrderTranche() *LimitOrderTranche {
-	if m != nil {
-		return m.LimitOrderTranche
+	if x, ok := m.GetLiquidity().(*TickLiquidity_LimitOrderTranche); ok {
+		return x.LimitOrderTranche
 	}
 	return nil
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*TickLiquidity) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*TickLiquidity_PoolReserves)(nil),
+		(*TickLiquidity_LimitOrderTranche)(nil),
+	}
 }
 
 func init() {
@@ -116,32 +115,24 @@ func init() {
 func init() { proto.RegisterFile("duality/dex/tick_liquidity.proto", fileDescriptor_1bf4777d3c75e20c) }
 
 var fileDescriptor_1bf4777d3c75e20c = []byte{
-	// 394 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x92, 0x4d, 0x6b, 0xe2, 0x40,
-	0x18, 0xc7, 0x9d, 0xd5, 0x55, 0x9c, 0xc5, 0x65, 0x77, 0x58, 0xd8, 0xac, 0x2c, 0x49, 0x90, 0x56,
-	0x42, 0x8b, 0x09, 0xb4, 0x87, 0x42, 0x8f, 0x42, 0x0f, 0x01, 0x41, 0x09, 0x1e, 0x4a, 0x2f, 0x21,
-	0x66, 0x06, 0x1d, 0xf2, 0x32, 0x69, 0x32, 0x96, 0xe4, 0x5b, 0xf4, 0xd6, 0xaf, 0xe4, 0xd1, 0x63,
-	0xe9, 0x21, 0x14, 0xbd, 0xf5, 0xd8, 0x4f, 0x50, 0xf2, 0xe2, 0x4b, 0x2d, 0x9e, 0x32, 0xf3, 0x7f,
-	0x7e, 0xcf, 0x3f, 0xcf, 0xf3, 0x4f, 0xa0, 0x8c, 0xe7, 0x96, 0x4b, 0x79, 0xa2, 0x61, 0x12, 0x6b,
-	0x9c, 0xda, 0x8e, 0xe9, 0xd2, 0xfb, 0x39, 0xc5, 0x94, 0x27, 0x6a, 0x10, 0x32, 0xce, 0xd0, 0xdf,
-	0x92, 0x70, 0xad, 0x49, 0xa4, 0x96, 0x67, 0x15, 0x93, 0xb8, 0xfd, 0x67, 0xca, 0xa6, 0x2c, 0x67,
-	0xb4, 0xec, 0x54, 0xe0, 0xed, 0xd3, 0x7d, 0x43, 0x97, 0x7a, 0x94, 0x9b, 0x2c, 0xc4, 0x24, 0x34,
-	0x79, 0x68, 0xf9, 0xf6, 0x8c, 0x94, 0xd8, 0xbf, 0x7d, 0x2c, 0xb0, 0x68, 0x68, 0x52, 0x5c, 0x94,
-	0x3a, 0x4f, 0x55, 0xd8, 0x1a, 0x53, 0xdb, 0x19, 0x6c, 0x06, 0x41, 0x57, 0xb0, 0x9e, 0x21, 0x3a,
-	0x16, 0x80, 0x0c, 0x94, 0x1f, 0x17, 0x92, 0x7a, 0x64, 0x26, 0x75, 0x94, 0x63, 0x46, 0x89, 0x23,
-	0x01, 0x36, 0x38, 0x73, 0x88, 0xaf, 0xfb, 0xc2, 0x37, 0x19, 0x28, 0x4d, 0x63, 0x73, 0x45, 0xff,
-	0x61, 0x33, 0xdb, 0x56, 0xf7, 0x31, 0x89, 0x85, 0xaa, 0x0c, 0x94, 0xaa, 0xb1, 0x13, 0xd0, 0x09,
-	0x6c, 0x6d, 0x63, 0x18, 0x27, 0x01, 0x11, 0x6a, 0x79, 0xf7, 0x67, 0x11, 0x75, 0xe1, 0xcf, 0xad,
-	0x50, 0x18, 0x7d, 0x97, 0x81, 0x52, 0x33, 0x0e, 0x54, 0xe4, 0xc1, 0xe6, 0x60, 0x64, 0x90, 0x88,
-	0x84, 0x0f, 0x44, 0xa8, 0x67, 0x4e, 0xfd, 0xe1, 0x22, 0x95, 0xc0, 0x4b, 0x2a, 0x75, 0xa7, 0x94,
-	0xcf, 0xe6, 0x13, 0xd5, 0x66, 0x9e, 0x66, 0xb3, 0xc8, 0x63, 0x51, 0xf9, 0xe8, 0x45, 0xd8, 0xd1,
-	0x78, 0x12, 0x90, 0x48, 0xd5, 0x7d, 0xfe, 0x96, 0x4a, 0x3b, 0x8b, 0xf7, 0x54, 0xfa, 0x95, 0x58,
-	0x9e, 0x7b, 0xdd, 0xd9, 0x4a, 0x1d, 0x63, 0x57, 0x46, 0xb7, 0xf0, 0x77, 0x9e, 0xfb, 0x30, 0x8b,
-	0x7d, 0x5c, 0xa4, 0x2e, 0x34, 0xf2, 0xe0, 0xce, 0x8e, 0x06, 0x37, 0x38, 0xec, 0x30, 0xbe, 0x9a,
-	0xf4, 0x6f, 0x16, 0x2b, 0x11, 0x2c, 0x57, 0x22, 0x78, 0x5d, 0x89, 0xe0, 0x71, 0x2d, 0x56, 0x96,
-	0x6b, 0xb1, 0xf2, 0xbc, 0x16, 0x2b, 0x77, 0xe7, 0x7b, 0x7b, 0x94, 0xb6, 0xbd, 0xec, 0x1d, 0x9b,
-	0x8b, 0x16, 0x17, 0x3f, 0x58, 0xb6, 0xd0, 0xa4, 0x9e, 0x7f, 0xe7, 0xcb, 0x8f, 0x00, 0x00, 0x00,
-	0xff, 0xff, 0xf7, 0x5a, 0x5b, 0x04, 0x7c, 0x02, 0x00, 0x00,
+	// 267 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x52, 0x48, 0x29, 0x4d, 0xcc,
+	0xc9, 0x2c, 0xa9, 0xd4, 0x4f, 0x49, 0xad, 0xd0, 0x2f, 0xc9, 0x4c, 0xce, 0x8e, 0xcf, 0xc9, 0x2c,
+	0x2c, 0xcd, 0x4c, 0xc9, 0x2c, 0xa9, 0xd4, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x12, 0x87, 0xaa,
+	0xc8, 0x49, 0x4c, 0x2a, 0xd6, 0x83, 0xb2, 0xf5, 0x52, 0x52, 0x2b, 0xa4, 0x44, 0xd2, 0xf3, 0xd3,
+	0xf3, 0xc1, 0x6a, 0xf4, 0x41, 0x2c, 0x88, 0x72, 0x29, 0x55, 0x64, 0x03, 0x73, 0x32, 0x73, 0x33,
+	0x4b, 0xe2, 0xf3, 0x8b, 0x52, 0x52, 0x8b, 0xe2, 0x4b, 0x8a, 0x12, 0xf3, 0x92, 0x33, 0x52, 0xa1,
+	0xca, 0xe4, 0x91, 0x95, 0x15, 0xe4, 0xe7, 0xe7, 0xc4, 0x17, 0xa5, 0x16, 0xa7, 0x16, 0x95, 0xa5,
+	0x16, 0x43, 0x14, 0x28, 0x1d, 0x65, 0xe4, 0xe2, 0x0d, 0xc9, 0x4c, 0xce, 0xf6, 0x81, 0x39, 0x47,
+	0xc8, 0x9b, 0x8b, 0x07, 0xa4, 0x30, 0x08, 0xaa, 0x4e, 0x82, 0x51, 0x81, 0x51, 0x83, 0xdb, 0x48,
+	0x55, 0x0f, 0x87, 0xfb, 0xf4, 0x02, 0x90, 0x14, 0x7b, 0x30, 0x04, 0xa1, 0x68, 0x16, 0x8a, 0xe2,
+	0x12, 0x04, 0x3b, 0xce, 0x1f, 0xe4, 0xb6, 0x10, 0x88, 0xd3, 0x24, 0x98, 0xc0, 0x26, 0x6a, 0xe1,
+	0x34, 0xd1, 0x07, 0x5d, 0x87, 0x07, 0x43, 0x10, 0xa6, 0x31, 0x4e, 0xdc, 0x5c, 0x9c, 0xf0, 0x40,
+	0x74, 0x72, 0x3d, 0xf1, 0x48, 0x8e, 0xf1, 0xc2, 0x23, 0x39, 0xc6, 0x07, 0x8f, 0xe4, 0x18, 0x27,
+	0x3c, 0x96, 0x63, 0xb8, 0xf0, 0x58, 0x8e, 0xe1, 0xc6, 0x63, 0x39, 0x86, 0x28, 0xed, 0xf4, 0xcc,
+	0x92, 0x8c, 0xd2, 0x24, 0xbd, 0xe4, 0xfc, 0x5c, 0x7d, 0xa8, 0x2d, 0xba, 0x20, 0x2b, 0x61, 0x1c,
+	0xfd, 0x0a, 0x48, 0xa4, 0x54, 0x16, 0xa4, 0x16, 0x27, 0xb1, 0x81, 0x43, 0xc5, 0x18, 0x10, 0x00,
+	0x00, 0xff, 0xff, 0x48, 0xe5, 0x39, 0x5f, 0xb0, 0x01, 0x00, 0x00,
 }
 
 func (m *TickLiquidity) Marshal() (dAtA []byte, err error) {
@@ -164,57 +155,28 @@ func (m *TickLiquidity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.LimitOrderTranche != nil {
+	if m.Liquidity != nil {
 		{
-			size, err := m.LimitOrderTranche.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
+			size := m.Liquidity.Size()
+			i -= size
+			if _, err := m.Liquidity.MarshalTo(dAtA[i:]); err != nil {
 				return 0, err
 			}
-			i -= size
-			i = encodeVarintTickLiquidity(dAtA, i, uint64(size))
 		}
-		i--
-		dAtA[i] = 0x3a
 	}
-	if m.LPReserve != nil {
+	return len(dAtA) - i, nil
+}
+
+func (m *TickLiquidity_PoolReserves) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TickLiquidity_PoolReserves) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.PoolReserves != nil {
 		{
-			size := m.LPReserve.Size()
-			i -= size
-			if _, err := m.LPReserve.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-			i = encodeVarintTickLiquidity(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x32
-	}
-	if m.LiquidityIndex != 0 {
-		i = encodeVarintTickLiquidity(dAtA, i, uint64(m.LiquidityIndex))
-		i--
-		dAtA[i] = 0x28
-	}
-	if len(m.LiquidityType) > 0 {
-		i -= len(m.LiquidityType)
-		copy(dAtA[i:], m.LiquidityType)
-		i = encodeVarintTickLiquidity(dAtA, i, uint64(len(m.LiquidityType)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if m.TickIndex != 0 {
-		i = encodeVarintTickLiquidity(dAtA, i, uint64(m.TickIndex))
-		i--
-		dAtA[i] = 0x18
-	}
-	if len(m.TokenIn) > 0 {
-		i -= len(m.TokenIn)
-		copy(dAtA[i:], m.TokenIn)
-		i = encodeVarintTickLiquidity(dAtA, i, uint64(len(m.TokenIn)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.PairId != nil {
-		{
-			size, err := m.PairId.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.PoolReserves.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -226,7 +188,27 @@ func (m *TickLiquidity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	return len(dAtA) - i, nil
 }
+func (m *TickLiquidity_LimitOrderTranche) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
 
+func (m *TickLiquidity_LimitOrderTranche) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.LimitOrderTranche != nil {
+		{
+			size, err := m.LimitOrderTranche.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTickLiquidity(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	return len(dAtA) - i, nil
+}
 func encodeVarintTickLiquidity(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTickLiquidity(v)
 	base := offset
@@ -244,28 +226,30 @@ func (m *TickLiquidity) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.PairId != nil {
-		l = m.PairId.Size()
+	if m.Liquidity != nil {
+		n += m.Liquidity.Size()
+	}
+	return n
+}
+
+func (m *TickLiquidity_PoolReserves) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.PoolReserves != nil {
+		l = m.PoolReserves.Size()
 		n += 1 + l + sovTickLiquidity(uint64(l))
 	}
-	l = len(m.TokenIn)
-	if l > 0 {
-		n += 1 + l + sovTickLiquidity(uint64(l))
+	return n
+}
+func (m *TickLiquidity_LimitOrderTranche) Size() (n int) {
+	if m == nil {
+		return 0
 	}
-	if m.TickIndex != 0 {
-		n += 1 + sovTickLiquidity(uint64(m.TickIndex))
-	}
-	l = len(m.LiquidityType)
-	if l > 0 {
-		n += 1 + l + sovTickLiquidity(uint64(l))
-	}
-	if m.LiquidityIndex != 0 {
-		n += 1 + sovTickLiquidity(uint64(m.LiquidityIndex))
-	}
-	if m.LPReserve != nil {
-		l = m.LPReserve.Size()
-		n += 1 + l + sovTickLiquidity(uint64(l))
-	}
+	var l int
+	_ = l
 	if m.LimitOrderTranche != nil {
 		l = m.LimitOrderTranche.Size()
 		n += 1 + l + sovTickLiquidity(uint64(l))
@@ -310,7 +294,7 @@ func (m *TickLiquidity) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PairId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolReserves", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -337,152 +321,13 @@ func (m *TickLiquidity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.PairId == nil {
-				m.PairId = &PairId{}
-			}
-			if err := m.PairId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			v := &PoolReserves{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			m.Liquidity = &TickLiquidity_PoolReserves{v}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TokenIn", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTickLiquidity
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTickLiquidity
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTickLiquidity
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TokenIn = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TickIndex", wireType)
-			}
-			m.TickIndex = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTickLiquidity
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.TickIndex |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LiquidityType", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTickLiquidity
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTickLiquidity
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTickLiquidity
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.LiquidityType = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LiquidityIndex", wireType)
-			}
-			m.LiquidityIndex = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTickLiquidity
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.LiquidityIndex |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LPReserve", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTickLiquidity
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTickLiquidity
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTickLiquidity
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			var v github_com_cosmos_cosmos_sdk_types.Int
-			m.LPReserve = &v
-			if err := m.LPReserve.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LimitOrderTranche", wireType)
 			}
@@ -511,12 +356,11 @@ func (m *TickLiquidity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.LimitOrderTranche == nil {
-				m.LimitOrderTranche = &LimitOrderTranche{}
-			}
-			if err := m.LimitOrderTranche.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			v := &LimitOrderTranche{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			m.Liquidity = &TickLiquidity_LimitOrderTranche{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

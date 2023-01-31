@@ -2,7 +2,7 @@ package keeper_test
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/duality-labs/duality/x/dex/keeper"
+	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
@@ -496,7 +496,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOMinLimitTickNotMet() {
 	amountIn := 10
 	amountInInt := sdk.NewInt(10)
 
-	limitPrice, err := keeper.CalcPrice1To0(-10)
+	limitPrice, err := utils.CalcPrice1To0(-10)
 	s.Assert().Nil(err)
 
 	s.bobMarketSellsWithLimitPrice("TokenB", amountIn, 5, limitPrice)
@@ -525,7 +525,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOMaxLimitTickNotMet() {
 	amountIn := 10
 	amountInInt := sdk.NewInt(10)
 
-	limitPrice, err := keeper.CalcPrice0To1(10)
+	limitPrice, err := utils.CalcPrice0To1(10)
 	s.Assert().Nil(err)
 
 	s.bobMarketSellsWithLimitPrice("TokenA", amountIn, 5, limitPrice)
@@ -555,7 +555,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOMaxLimitTickMet() {
 	amountIn := 10
 	amountInInt := sdk.NewInt(10)
 
-	limitPrice, err := keeper.CalcPrice0To1(1)
+	limitPrice, err := utils.CalcPrice0To1(1)
 	s.Assert().Nil(err)
 
 	s.bobMarketSellsWithLimitPrice("TokenA", amountIn, 5, limitPrice)
@@ -585,7 +585,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOMinLimitTickMet() {
 	amountIn := 10
 	amountInInt := sdk.NewInt(10)
 
-	limitPrice, err := keeper.CalcPrice1To0(-1)
+	limitPrice, err := utils.CalcPrice1To0(-1)
 	s.Assert().Nil(err)
 
 	s.bobMarketSellsWithLimitPrice("TokenB", amountIn, 5, limitPrice)

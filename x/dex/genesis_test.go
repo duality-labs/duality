@@ -16,14 +16,6 @@ var defaultPairId *types.PairId = &types.PairId{Token0: "TokenA", Token1: "Token
 func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
-		TradingPairList: []types.TradingPair{
-			{
-				PairId: defaultPairId,
-			},
-			{
-				PairId: defaultPairId,
-			},
-		},
 		TokensList: []types.Tokens{
 			{
 				Id: 0,
@@ -66,18 +58,28 @@ func TestGenesis(t *testing.T) {
 		},
 		TickLiquidityList: []types.TickLiquidity{
 			{
-				PairId:         &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-				TokenIn:        "0",
-				TickIndex:      0,
-				LiquidityType:  "0",
-				LiquidityIndex: 0,
+				Liquidity: &types.TickLiquidity_LimitOrderTranche{
+					LimitOrderTranche: &types.LimitOrderTranche{
+						PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						TokenIn:          "0",
+						TickIndex:        0,
+						TrancheIndex:     0,
+						ReservesTokenIn:  sdk.NewInt(0),
+						ReservesTokenOut: sdk.NewInt(0),
+						TotalTokenIn:     sdk.NewInt(0),
+						TotalTokenOut:    sdk.NewInt(0),
+					},
+				},
 			},
 			{
-				PairId:         &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-				TokenIn:        "1",
-				TickIndex:      1,
-				LiquidityType:  "1",
-				LiquidityIndex: 1,
+				Liquidity: &types.TickLiquidity_LimitOrderTranche{
+					LimitOrderTranche: &types.LimitOrderTranche{
+						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						TokenIn:      "0",
+						TickIndex:    0,
+						TrancheIndex: 0,
+					},
+				},
 			},
 		},
 		FilledLimitOrderTrancheList: []types.FilledLimitOrderTranche{
@@ -104,7 +106,6 @@ func TestGenesis(t *testing.T) {
 	nullify.Fill(&genesisState)
 	nullify.Fill(got)
 
-	require.ElementsMatch(t, genesisState.TradingPairList, got.TradingPairList)
 	require.ElementsMatch(t, genesisState.TokensList, got.TokensList)
 	require.Equal(t, genesisState.TokensCount, got.TokensCount)
 	require.ElementsMatch(t, genesisState.FeeTierList, got.FeeTierList)

@@ -46,9 +46,6 @@ const (
 	// TickKeyPrefix is the prefix to retrieve all Tick
 	BaseTickKeyPrefix = "Tick/value"
 
-	// TradingPairKeyPrefix is the prefix to retrieve all TradingPair
-	TradingPairKeyPrefix = "TradingPair/value"
-
 	// TickLiquidityKeyPrefix is the prefix to retrieve all TickLiquidity
 	TickLiquidityKeyPrefix = "TickLiquidity/value/"
 )
@@ -81,16 +78,6 @@ func TickIndexToBytes(tickIndex int64, pairId *PairId, tokenIn string) []byte {
 		copy(key[:1], []byte{0x01})
 		copy(key[1:], sdk.Uint64ToBigEndian(uint64(tickIndex)))
 	}
-
-	return key
-}
-
-func TradingPairKey(pairId *PairId) []byte {
-	var key []byte
-
-	pairIdBytes := []byte(pairId.Stringify())
-	key = append(key, pairIdBytes...)
-	key = append(key, []byte("/")...)
 
 	return key
 }
@@ -242,7 +229,7 @@ func TickLiquidityKey(
 	return key
 }
 
-func TickLiquidityLOPrefix(
+func TickLiquidityLimitOrderPrefix(
 	pairId *PairId,
 	tokenIn string,
 	tickIndex int64,
@@ -261,7 +248,7 @@ func TickLiquidityLOPrefix(
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
-	liquidityTypeBytes := []byte(LiquidityTypeLO)
+	liquidityTypeBytes := []byte(LiquidityTypeLimitOrder)
 	key = append(key, liquidityTypeBytes...)
 	key = append(key, []byte("/")...)
 
@@ -374,6 +361,6 @@ const (
 
 const (
 	// NOTE: have to add letter so that LP deposits are indexed ahead of LimitOrders
-	LiquidityTypeLP = "A_LPDeposit"
-	LiquidityTypeLO = "B_LODeposit"
+	LiquidityTypePoolReserves = "A_PoolDeposit"
+	LiquidityTypeLimitOrder   = "B_LODeposit"
 )

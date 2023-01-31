@@ -28,16 +28,22 @@ func (k Keeper) LimitOrderTrancheAll(c context.Context, req *types.QueryAllLimit
 	store := ctx.KVStore(k.storeKey)
 	LimitOrderTrancheStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairId, req.TokenIn))
 
-	pageRes, err := query.Paginate(LimitOrderTrancheStore, req.Pagination, func(key []byte, value []byte) error {
+	pageRes, err := query.FilteredPaginate(LimitOrderTrancheStore, req.Pagination, func(key []byte, value []byte, accum bool) (hit bool, err error) {
 		var tick types.TickLiquidity
 
 		if err := k.cdc.Unmarshal(value, &tick); err != nil {
-			return err
+			return false, err
 		}
-		if tick.HasActiveLimitOrders() {
-			LimitOrderTranches = append(LimitOrderTranches, *tick.LimitOrderTranche)
+		tranche := tick.GetLimitOrderTranche()
+		//Check if this is a LimitOrderTranche and not PoolReserves
+		if tranche != nil {
+			if accum {
+				LimitOrderTranches = append(LimitOrderTranches, *tranche)
+			}
+			return true, nil
+		} else {
+			return false, nil
 		}
-		return nil
 	})
 
 	if err != nil {
@@ -57,7 +63,7 @@ func (k Keeper) LimitOrderTranche(c context.Context, req *types.QueryGetLimitOrd
 	if err != nil {
 		return nil, err
 	}
-	val, _, found := k.GetLimitOrderTranche(ctx, pairId, req.TickIndex, req.TokenIn, req.TrancheIndex)
+	val, _, found := k.FindLimitOrderTranche(ctx, pairId, req.TickIndex, req.TokenIn, req.TrancheIndex)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")
 	}
