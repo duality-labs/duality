@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"strconv"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -12,38 +11,9 @@ import (
 
 	keepertest "github.com/duality-labs/duality/testutil/keeper"
 	"github.com/duality-labs/duality/testutil/nullify"
-	"github.com/duality-labs/duality/x/dex/keeper"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
-// Prevent strconv unused error
-var _ = strconv.IntSize
-
-func createNLimitOrderTranches(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.LimitOrderTranche {
-	items := make([]types.LimitOrderTranche, n)
-	for i := range items {
-		tick := types.TickLiquidity{
-			PairId:         &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-			TokenIn:        "TokenA",
-			TickIndex:      int64(i),
-			LiquidityType:  types.LiquidityTypeLO,
-			LiquidityIndex: uint64(i),
-			LimitOrderTranche: &types.LimitOrderTranche{
-				TrancheIndex:     uint64(i),
-				TickIndex:        int64(i),
-				TokenIn:          "TokenA",
-				PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-				ReservesTokenIn:  sdk.NewInt(10),
-				ReservesTokenOut: sdk.ZeroInt(),
-				TotalTokenIn:     sdk.NewInt(10),
-				TotalTokenOut:    sdk.ZeroInt(),
-			},
-		}
-		keeper.SetTickLiquidity(ctx, tick)
-		items[i] = *tick.LimitOrderTranche
-	}
-	return items
-}
 func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
@@ -108,6 +78,8 @@ func TestLimitOrderTrancheQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
 	msgs := createNLimitOrderTranches(keeper, ctx, 2)
+	//Add more data to make sure only LO tranches are returned
+	createNPoolReserves(keeper, ctx, 2)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderTrancheRequest {
 		return &types.QueryAllLimitOrderTrancheRequest{
