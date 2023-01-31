@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"strconv"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -15,79 +14,15 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
-// Prevent strconv unused error
-var _ = strconv.IntSize
-
-func TestTickLiquidityQuerySingle(t *testing.T) {
-	keeper, ctx := keepertest.DexKeeper(t)
-	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNTickLiquidity(keeper, ctx, 2)
-	for _, tc := range []struct {
-		desc     string
-		request  *types.QueryGetTickLiquidityRequest
-		response *types.QueryGetTickLiquidityResponse
-		err      error
-	}{
-		{
-			desc: "First",
-			request: &types.QueryGetTickLiquidityRequest{
-				PairId:         msgs[0].PairId.Stringify(),
-				TokenIn:        msgs[0].TokenIn,
-				TickIndex:      msgs[0].TickIndex,
-				LiquidityType:  msgs[0].LiquidityType,
-				LiquidityIndex: msgs[0].LiquidityIndex,
-			},
-			response: &types.QueryGetTickLiquidityResponse{TickLiquidity: msgs[0]},
-		},
-		{
-			desc: "Second",
-			request: &types.QueryGetTickLiquidityRequest{
-				PairId:         msgs[1].PairId.Stringify(),
-				TokenIn:        msgs[1].TokenIn,
-				TickIndex:      msgs[1].TickIndex,
-				LiquidityType:  msgs[1].LiquidityType,
-				LiquidityIndex: msgs[1].LiquidityIndex,
-			},
-			response: &types.QueryGetTickLiquidityResponse{TickLiquidity: msgs[1]},
-		},
-		{
-			desc: "KeyNotFound",
-			request: &types.QueryGetTickLiquidityRequest{
-				PairId:         "TokenZ<>TokenQ",
-				TokenIn:        strconv.Itoa(100000),
-				TickIndex:      100000,
-				LiquidityType:  strconv.Itoa(100000),
-				LiquidityIndex: 100000,
-			},
-			err: status.Error(codes.NotFound, "not found"),
-		},
-		{
-			desc: "InvalidRequest",
-			err:  status.Error(codes.InvalidArgument, "invalid request"),
-		},
-	} {
-		t.Run(tc.desc, func(t *testing.T) {
-			response, err := keeper.TickLiquidity(wctx, tc.request)
-			if tc.err != nil {
-				require.ErrorIs(t, err, tc.err)
-			} else {
-				require.NoError(t, err)
-				require.Equal(t,
-					nullify.Fill(tc.response),
-					nullify.Fill(response),
-				)
-			}
-		})
-	}
-}
-
 func TestTickLiquidityQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNTickLiquidity(keeper, ctx, 5)
+	msgs := CreateNTickLiquidity(keeper, ctx, 5)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllTickLiquidityRequest {
 		return &types.QueryAllTickLiquidityRequest{
+			PairId:  "TokenA<>TokenB",
+			TokenIn: "TokenA",
 			Pagination: &query.PageRequest{
 				Key:        next,
 				Offset:     offset,

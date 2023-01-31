@@ -10,7 +10,6 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		TradingPairList:             []TradingPair{},
 		TokensList:                  []Tokens{},
 		TokenMapList:                []TokenMap{},
 		FeeTierList:                 []FeeTier{},
@@ -25,16 +24,6 @@ func DefaultGenesis() *GenesisState {
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	// Check for duplicated index in TradingPair
-	TradingPairIndexMap := make(map[string]struct{})
-
-	for _, elem := range gs.TradingPairList {
-		index := string(TradingPairKey(elem.PairId))
-		if _, ok := TradingPairIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for TradingPair")
-		}
-		TradingPairIndexMap[index] = struct{}{}
-	}
 	// Check for duplicated ID in tokens
 	tokensIdMap := make(map[uint64]bool)
 	tokensCount := gs.GetTokensCount()
@@ -84,7 +73,23 @@ func (gs GenesisState) Validate() error {
 	tickLiquidityIndexMap := make(map[string]struct{})
 
 	for _, elem := range gs.TickLiquidityList {
-		index := string(TickLiquidityKey(elem.PairId, elem.TokenIn, elem.TickIndex, elem.LiquidityType, elem.LiquidityIndex))
+		var index string
+		switch liquidity := elem.Liquidity.(type) {
+		case *TickLiquidity_PoolReserves:
+			index = string(TickLiquidityKey(
+				liquidity.PoolReserves.PairId,
+				liquidity.PoolReserves.TokenIn,
+				liquidity.PoolReserves.TickIndex,
+				LiquidityTypePoolReserves,
+				liquidity.PoolReserves.Fee))
+		case *TickLiquidity_LimitOrderTranche:
+			index = string(TickLiquidityKey(
+				liquidity.LimitOrderTranche.PairId,
+				liquidity.LimitOrderTranche.TokenIn,
+				liquidity.LimitOrderTranche.TickIndex,
+				LiquidityTypeLimitOrder,
+				liquidity.LimitOrderTranche.TrancheIndex))
+		}
 		if _, ok := tickLiquidityIndexMap[index]; ok {
 			return fmt.Errorf("duplicated index for tickLiquidity")
 		}

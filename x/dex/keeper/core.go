@@ -185,10 +185,10 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 			token1,
 			fmt.Sprint(msg.TickIndexes[i]),
 			fmt.Sprint(msg.FeeIndexes[i]),
-			pool.LowerTick0.LPReserve.Add(outAmount0).String(),
-			pool.UpperTick1.LPReserve.Add(outAmount1).String(),
-			pool.LowerTick0.LPReserve.String(),
-			pool.UpperTick1.LPReserve.String(),
+			pool.LowerTick0.Reserves.Add(outAmount0).String(),
+			pool.UpperTick1.Reserves.Add(outAmount1).String(),
+			pool.LowerTick0.Reserves.String(),
+			pool.UpperTick1.Reserves.String(),
 			sharesToRemove.String(),
 		))
 	}
@@ -318,11 +318,11 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 	tickIndex := msg.TickIndex
 	receiver := msg.Receiver
 
-	var placeTrancheTick types.TickLiquidity
-	placeTrancheTick, found := k.GetPlaceTrancheTick(ctx, pairId, tokenIn, tickIndex)
+	var placeTranche types.LimitOrderTranche
+	placeTranche, found := k.GetPlaceTranche(ctx, pairId, tokenIn, tickIndex)
 
 	if !found {
-		placeTrancheTick, err = k.InitPlaceTrancheTick(ctx, pairId, tokenIn, tickIndex)
+		placeTranche, err = k.InitPlaceTranche(ctx, pairId, tokenIn, tickIndex)
 		if err != nil {
 			return err
 		}
@@ -332,17 +332,16 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		return types.ErrPlaceLimitOrderBehindPairLiquidity
 	}
 
-	tranche := placeTrancheTick.LimitOrderTranche
-	placeTrancheIndex := tranche.TrancheIndex
+	placeTrancheIndex := placeTranche.TrancheIndex
 
 	trancheUser := k.GetOrInitLimitOrderTrancheUser(goCtx, pairId, tickIndex, tokenIn, placeTrancheIndex, receiver)
 
-	tranche.ReservesTokenIn = tranche.ReservesTokenIn.Add(msg.AmountIn)
-	tranche.TotalTokenIn = tranche.TotalTokenIn.Add(msg.AmountIn)
+	placeTranche.ReservesTokenIn = placeTranche.ReservesTokenIn.Add(msg.AmountIn)
+	placeTranche.TotalTokenIn = placeTranche.TotalTokenIn.Add(msg.AmountIn)
 	trancheUser.SharesOwned = trancheUser.SharesOwned.Add(msg.AmountIn)
 
 	if msg.AmountIn.GT(sdk.ZeroInt()) {
-		k.SetTickLiquidity(ctx, placeTrancheTick)
+		k.SetLimitOrderTranche(ctx, placeTranche)
 		k.SetLimitOrderTrancheUser(ctx, trancheUser)
 
 		coin0 := sdk.NewCoin(tokenIn, msg.AmountIn)
@@ -371,8 +370,8 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 
 	pairId := CreatePairId(token0, token1)
 
-	tick, tickFound := k.GetTickLiquidityLO(ctx, pairId, msg.KeyToken, msg.TickIndex, msg.Key)
-	if !tickFound {
+	trancheRaw, found := k.GetLimitOrderTranche(ctx, pairId, msg.KeyToken, msg.TickIndex, msg.Key)
+	if !found {
 		return types.ErrActiveLimitOrderNotFound
 	}
 
@@ -385,7 +384,7 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 		return types.ErrNotEnoughLimitOrderShares
 	}
 
-	tranche := NewLimitOrderTranche(&tick)
+	tranche := NewLimitOrderTrancheWrapper(trancheRaw)
 
 	amountToCancel := tranche.Cancel(trancheUser)
 	trancheUser.SharesCancelled = trancheUser.SharesCancelled.Add(amountToCancel)
@@ -451,19 +450,15 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		return types.ErrNotEnoughLimitOrderShares
 	}
 
-	tranche, wasFilled, found := k.GetLimitOrderTranche(ctx, pairId, tickIndex, msg.KeyToken, trancheIndex)
+	trancheRaw, wasFilled, found := k.FindLimitOrderTranche(ctx, pairId, tickIndex, msg.KeyToken, trancheIndex)
 	if !found {
 		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheNotFound, "%d", trancheIndex)
 	}
 
-	var priceLimitInToOut sdk.Dec
-	var priceLimitOutToIn sdk.Dec
-	if orderTokenIn == token0 {
-		priceLimitInToOut = MustCalcPrice0To1(tranche.TickIndex)
-	} else {
-		priceLimitInToOut = MustCalcPrice1To0(tranche.TickIndex)
-	}
-	priceLimitOutToIn = sdk.OneDec().Quo(priceLimitInToOut)
+	tranche := NewLimitOrderTrancheWrapper(&trancheRaw)
+
+	priceLimitInToOut := tranche.PriceMakerToTaker
+	priceLimitOutToIn := tranche.PriceTakerToMaker
 
 	reservesTokenOutDec := sdk.NewDecFromInt(tranche.ReservesTokenOut)
 	amountFilled := priceLimitOutToIn.MulInt(tranche.TotalTokenOut)
@@ -486,14 +481,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	if wasFilled {
 		k.SetFilledLimitOrderTranche(ctx, tranche.CreateFilledTranche())
 	} else {
-		k.SetTickLiquidity(ctx, types.TickLiquidity{
-			PairId:            pairId,
-			TokenIn:           msg.KeyToken,
-			TickIndex:         tickIndex,
-			LiquidityType:     types.LiquidityTypeLO,
-			LiquidityIndex:    trancheIndex,
-			LimitOrderTranche: &tranche,
-		})
+		k.SetLimitOrderTranche(ctx, *tranche.LimitOrderTranche)
 	}
 
 	if amountOutTokenOut.GT(sdk.ZeroDec()) {
