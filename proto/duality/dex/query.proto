@@ -108,12 +108,12 @@ service Query {
 
 // Queries a list of PoolReserves items.
 	rpc PoolReservesAll(QueryAllPoolReservesRequest) returns (QueryAllPoolReservesResponse) {
-		option (google.api.http).get = "/duality-labs/duality/dex/pool_reserves/{pairId}/{tokenIn}";
+		option (google.api.http).get = "/dualitylabs/duality/dex/pool_reserves/{pairId}/{tokenIn}";
 	}
 
   // Queries a PoolReserve by index
   rpc PoolReserves(QueryGetPoolReservesRequest) returns (QueryGetPoolReservesResponse) {
-		option (google.api.http).get = "/duality-labs/duality/dex/pool_reserves/{pairId}/{tokenIn}/{tickIndex}/{fee}";
+		option (google.api.http).get = "/dualitylabs/duality/dex/pool_reserves/{pairId}/{tokenIn}/{tickIndex}/{fee}";
 	}
 
 // this line is used by starport scaffolding # 2
