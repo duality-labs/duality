@@ -2241,9 +2241,9 @@ var (
 
 	pattern_Query_FilledLimitOrderTrancheAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "filled_limit_order_tranche"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_PoolReservesAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"duality-labs", "duality", "dex", "pool_reserves", "pairId", "tokenIn"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_PoolReservesAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "dex", "pool_reserves", "pairId", "tokenIn"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_PoolReserves_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"duality-labs", "duality", "dex", "pool_reserves", "pairId", "tokenIn", "tickIndex", "fee"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_PoolReserves_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"dualitylabs", "duality", "dex", "pool_reserves", "pairId", "tokenIn", "tickIndex", "fee"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
