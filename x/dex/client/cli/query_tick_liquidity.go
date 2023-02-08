@@ -11,9 +11,10 @@ import (
 
 func CmdListTickLiquidity() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-tick-liquidity [pair-id] [token-in]",
-		Short: "list all tickLiquidity",
-		Args:  cobra.ExactArgs(2),
+		Use:     "list-tick-liquidity [pair-id] [token-in]",
+		Short:   "list all tickLiquidity",
+		Example: "list-tick-liquidity tokenA<>tokenB tokenA",
+		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 

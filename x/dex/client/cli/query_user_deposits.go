@@ -9,9 +9,10 @@ import (
 
 func CmdListUserDeposits() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-user-deposits [address]",
-		Short: "list all users deposits",
-		Args:  cobra.ExactArgs(1),
+		Use:     "list-user-deposits [address]",
+		Short:   "list all users deposits",
+		Example: "list-user-deposits alice",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqAddress := args[0]
 

@@ -18,15 +18,20 @@ var _ = strconv.Itoa(0)
 func CmdWithdrawl() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:   "withdrawl [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fee indexes] ",
-		Short: "Broadcast message withdrawl",
-		Args:  cobra.ExactArgs(6),
+		Use:     "withdrawl [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fee indexes] ",
+		Short:   "Broadcast message withdrawl",
+		Example: "withdrawl alice tokenA tokenB 100,50 [-10,5] 1,1 --from alice",
+		Args:    cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
 			argTokenA := args[1]
 			argTokenB := args[2]
-
 			argSharesToRemove := strings.Split(args[3], ",")
+
+			if strings.HasPrefix(args[4], "[") && strings.HasSuffix(args[4], "]") {
+				args[4] = strings.TrimPrefix(args[4], "[")
+				args[4] = strings.TrimSuffix(args[4], "]")
+			}
 			argTickIndexes := strings.Split(args[4], ",")
 			argFeeIndexes := strings.Split(args[5], ",")
 
@@ -44,8 +49,7 @@ func CmdWithdrawl() *cobra.Command {
 			}
 
 			for _, s := range argTickIndexes {
-				str := strings.Trim(s, "\"")
-				TickIndexInt, err := strconv.Atoi(str)
+				TickIndexInt, err := strconv.Atoi(s)
 				if err != nil {
 					return err
 				}
