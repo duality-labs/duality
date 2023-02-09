@@ -45,16 +45,16 @@ message MsgDeposit {
 
 message MsgDepositResponse {
    repeated string Reserve0Deposited = 1 [
-      (gogoproto.moretags)   = "yaml:\"Reserve0Deposited\"",
+      (gogoproto.moretags)   = "yaml:\"reserve0Deposited\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
-      (gogoproto.jsontag) = "Reserve1Deposited"
+      (gogoproto.jsontag) = "reserve0Deposited"
   ]; 
   repeated string Reserve1Deposited = 2[
-      (gogoproto.moretags)   = "yaml:\"Reserve1Deposited\"",
+      (gogoproto.moretags)   = "yaml:\"reserve1Deposited\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
-      (gogoproto.jsontag) = "Reserve1Deposited"
+      (gogoproto.jsontag) = "reserve1Deposited"
   ]; 
 }
 

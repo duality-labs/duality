@@ -46,24 +46,28 @@ func (s *LiquidityIterator) Next() Liquidity {
 
 	for ; s.iter.Valid(); s.iter.Next() {
 		tick := s.iter.Value()
-		switch tick.LiquidityType {
-		case types.LiquidityTypeLP:
+		switch liquidity := tick.Liquidity.(type) {
+		case *types.TickLiquidity_PoolReserves:
 			var err error
 			var pool Liquidity
+			poolReserves := *liquidity.PoolReserves
 			if s.is0To1 {
-				pool, err = s.createPool0To1(tick)
+				//Pool Reserves is upperTick
+				pool, err = s.createPool0To1(poolReserves)
 			} else {
-				pool, err = s.createPool1To0(tick)
+				//Pool Reserves is is lowerTick
+				pool, err = s.createPool1To0(poolReserves)
 			}
 			// TODO: we are not actually handling the error here we're just stopping iteration
-			// Should be a very rare edge case where the opposing tick is initialized above/below the Min/Max tick limit
+			// Should be a very rare edge case where the opposing tick is initialized
+			// above/below the Min/Max tick limit
 			if err != nil {
 				return nil
 			}
 			return pool
 
-		case types.LiquidityTypeLO:
-			return NewLimitOrderTranche(&tick)
+		case *types.TickLiquidity_LimitOrderTranche:
+			return NewLimitOrderTrancheWrapper(liquidity.LimitOrderTranche)
 
 		default:
 			panic("Tick does not have liquidity")
@@ -73,10 +77,10 @@ func (s *LiquidityIterator) Next() Liquidity {
 	return nil
 }
 
-func (s *LiquidityIterator) createPool0To1(upperTick types.TickLiquidity) (Liquidity, error) {
+func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquidity, error) {
 	tickIndex := upperTick.TickIndex
-	lowerTickIndex := tickIndex - 2*int64(upperTick.LiquidityIndex)
-	lowerTick, err := s.keeper.GetOrInitTickLP(s.ctx, s.pairId, s.pairId.Token0, lowerTickIndex, upperTick.LiquidityIndex)
+	lowerTickIndex := tickIndex - 2*int64(upperTick.Fee)
+	lowerTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairId, s.pairId.Token0, lowerTickIndex, upperTick.Fee)
 	if err != nil {
 		return nil, err
 	}
@@ -88,10 +92,10 @@ func (s *LiquidityIterator) createPool0To1(upperTick types.TickLiquidity) (Liqui
 	return NewLiquidityFromPool0To1(&pool), nil
 }
 
-func (s *LiquidityIterator) createPool1To0(lowerTick types.TickLiquidity) (Liquidity, error) {
+func (s *LiquidityIterator) createPool1To0(lowerTick types.PoolReserves) (Liquidity, error) {
 	tickIndex := lowerTick.TickIndex
-	upperTickIndex := tickIndex + 2*int64(lowerTick.LiquidityIndex)
-	upperTick, err := s.keeper.GetOrInitTickLP(s.ctx, s.pairId, s.pairId.Token1, upperTickIndex, lowerTick.LiquidityIndex)
+	upperTickIndex := tickIndex + 2*int64(lowerTick.Fee)
+	upperTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairId, s.pairId.Token1, upperTickIndex, lowerTick.Fee)
 	if err != nil {
 		return nil, err
 	}

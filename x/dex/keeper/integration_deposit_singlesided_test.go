@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"math"
 
-	keeper "github.com/duality-labs/duality/x/dex/keeper"
+	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
@@ -368,7 +368,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedLowerTickOutsideRange() {
 	// THEN
 	// deposit should fail with TickOutsideRange
 
-	tickIndex := -1 * int(keeper.MaxTickExp)
+	tickIndex := -1 * int(utils.MaxTickExp)
 	err := types.ErrTickOutsideRange
 	s.assertAliceDepositFails(err, NewDeposit(10, 0, tickIndex, 0))
 }
@@ -384,7 +384,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedUpperTickOutsideRange() {
 	// THEN
 	// deposit should fail with TickOutsideRange
 
-	tickIndex := int(keeper.MaxTickExp)
+	tickIndex := int(utils.MaxTickExp)
 	err := types.ErrTickOutsideRange
 	s.assertAliceDepositFails(err, NewDeposit(0, 10, tickIndex, 0))
 }

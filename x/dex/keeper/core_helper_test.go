@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"context"
-	"math"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -86,12 +85,11 @@ func (s *CoreHelpersTestSuite) SetupTest() {
 	s.feeTiers = feeTiers
 }
 
-func (s *CoreHelpersTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amountB int) (types.TickLiquidity, types.TickLiquidity) {
+func (s *CoreHelpersTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amountB int) {
 	pairId := &types.PairId{"TokenA", "TokenB"}
 	sharesId := CreateSharesId("TokenA", "TokenB", tickIndex, 0)
 	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, pairId, tickIndex, s.feeTiers[0])
 
-	priceCenter1To0, err := keeper.CalcPrice0To1(tickIndex)
 	if err != nil {
 		panic(err)
 	}
@@ -99,14 +97,13 @@ func (s *CoreHelpersTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amo
 	lowerTick, upperTick := pool.LowerTick0, pool.UpperTick1
 	amountAInt := sdk.NewInt(int64(amountA))
 	amountBInt := sdk.NewInt(int64(amountB))
-	totalShares := keeper.CalcShares(amountAInt, amountBInt, priceCenter1To0).TruncateInt()
+	totalShares := pool.CalcSharesMinted(amountAInt, amountBInt)
 
 	s.app.DexKeeper.MintShares(s.ctx, s.alice, totalShares, sharesId)
 
-	lowerTick.LPReserve = &amountAInt
-	upperTick.LPReserve = &amountBInt
+	lowerTick.Reserves = amountAInt
+	upperTick.Reserves = amountBInt
 	pool.Save(s.ctx, s.app.DexKeeper)
-	return *lowerTick, *upperTick
 }
 
 // TokenInit //////////////////////////////////////////////////////////////////
@@ -130,56 +127,11 @@ func (s *CoreHelpersTestSuite) TestTokenInitExisting() {
 	s.app.DexKeeper.TokenInit(s.ctx, "TokenA")
 }
 
-// GetOrInitPair //////////////////////////////////////////////////////////////
-
-func (s *CoreHelpersTestSuite) TestGetOrInitPairNew() {
-	// GIVEN we initialize a new pair
-	s.app.DexKeeper.GetOrInitPair(s.ctx, "TokenA", "TokenB")
-
-	// THEN the component tokens are also initialized...
-	_, found0 := s.app.DexKeeper.GetTokenMap(s.ctx, "TokenA")
-	_, found1 := s.app.DexKeeper.GetTokenMap(s.ctx, "TokenA")
-
-	s.Assert().True(found0)
-	s.Assert().True(found1)
-
-	// AND 1 pair is initialized with the correct default values
-	pairCount := len(s.app.DexKeeper.GetAllTradingPair(s.ctx))
-	s.Assert().Equal(1, pairCount)
-
-	pair, foundPair := s.app.DexKeeper.GetTradingPair(s.ctx, defaultPairId)
-
-	s.Require().True(foundPair)
-
-	s.Assert().Equal(pair.PairId, &types.PairId{Token0: "TokenA", Token1: "TokenB"})
-	s.Assert().Equal(int64(math.MaxInt64), pair.CurrentTick0To1)
-	s.Assert().Equal(int64(math.MinInt64), pair.CurrentTick1To0)
-}
-
-func (s *CoreHelpersTestSuite) TestGetOrInitPairExisting() {
-
-	// GIVEN we initialize a pair TokenA/TokenB
-	s.app.DexKeeper.GetOrInitPair(s.ctx, "TokenA", "TokenB")
-
-	// WHEN we update values on that pair
-	pair, _ := s.app.DexKeeper.GetTradingPair(s.ctx, defaultPairId)
-	pair.CurrentTick0To1 = 20
-	s.app.DexKeeper.SetTradingPair(s.ctx, pair)
-
-	// AND try to initialize the same pair again
-	newPair := s.app.DexKeeper.GetOrInitPair(s.ctx, "TokenA", "TokenB")
-
-	// THEN there is still only 1 pair and it retains the values we set
-	pairCount := len(s.app.DexKeeper.GetAllTradingPair(s.ctx))
-	s.Assert().Equal(1, pairCount)
-	s.Assert().Equal(int64(20), newPair.CurrentTick0To1)
-}
-
 // GetOrInitUserShareData /////////////////////////////////////////////////////
 
 // TODO: WRITE ME
 
-// GetOrInitLimitOrderMaps ////////////////////////////////////////////////////
+// FindNextTick ////////////////////////////////////////////////////
 
 func (s *CoreHelpersTestSuite) TestFindNextTick1To0NoLiq() {
 	// GIVEN there is no ticks with token0 in the pool

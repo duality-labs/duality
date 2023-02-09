@@ -5,7 +5,6 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "duality/dex/params.proto";
-import "duality/dex/trading_pair.proto";
 import "duality/dex/tokens.proto";
 import "duality/dex/token_map.proto";
 import "duality/dex/fee_tier.proto";
@@ -15,6 +14,7 @@ import "duality/dex/user_positions.proto";
 import "duality/dex/deposit_record.proto";
 import "duality/dex/tick_liquidity.proto";
 import "duality/dex/filled_limit_order_tranche.proto";
+import "duality/dex/pool_reserves.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/duality-labs/duality/x/dex/types";
@@ -25,16 +25,6 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/dualitylabs/duality/dex/params";
   }
-
-// Queries a TradingPair by index.
-	rpc TradingPair(QueryGetTradingPairRequest) returns (QueryGetTradingPairResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/trading_pair/{pairId}";
-	}
-
-	// Queries a list of TradingPair items.
-	rpc TradingPairAll(QueryAllTradingPairRequest) returns (QueryAllTradingPairResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/trading_pair";
-	}
 
 // Queries a Tokens by id.
 	rpc Tokens(QueryGetTokensRequest) returns (QueryGetTokensResponse) {
@@ -101,14 +91,9 @@ service Query {
 		option (google.api.http).get = "/dualitylabs/duality/dex/user/limit_orders/{address}";
 	}
 
-// Queries a TickLiquidity by index.
-	rpc TickLiquidity(QueryGetTickLiquidityRequest) returns (QueryGetTickLiquidityResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/tick_liquidity/{pairId}/{tokenIn}/{tickIndex}/{liquidityType}/{liquidityIndex}";
-	}
-
 	// Queries a list of TickLiquidity items.
 	rpc TickLiquidityAll(QueryAllTickLiquidityRequest) returns (QueryAllTickLiquidityResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/tick_liquidity";
+		option (google.api.http).get = "/dualitylabs/duality/dex/tick_liquidity/{pairId}/{tokenIn}";
 	}
 
 // Queries a FilledLimitOrderTranche by index.
@@ -121,6 +106,16 @@ service Query {
 		option (google.api.http).get = "/dualitylabs/duality/dex/filled_limit_order_tranche";
 	}
 
+// Queries a list of PoolReserves items.
+	rpc PoolReservesAll(QueryAllPoolReservesRequest) returns (QueryAllPoolReservesResponse) {
+		option (google.api.http).get = "/dualitylabs/duality/dex/pool_reserves/{pairId}/{tokenIn}";
+	}
+
+  // Queries a PoolReserve by index
+  rpc PoolReserves(QueryGetPoolReservesRequest) returns (QueryGetPoolReservesResponse) {
+		option (google.api.http).get = "/dualitylabs/duality/dex/pool_reserves/{pairId}/{tokenIn}/{tickIndex}/{fee}";
+	}
+
 // this line is used by starport scaffolding # 2
 }
 
@@ -131,25 +126,6 @@ message QueryParamsRequest {}
 message QueryParamsResponse {
   // params holds all the parameters of this module.
   Params params = 1 [(gogoproto.nullable) = false];
-}
-
-
-message QueryGetTradingPairRequest {
-	  string pairId = 1;
-
-}
-
-message QueryGetTradingPairResponse {
-	TradingPair TradingPair = 1 [(gogoproto.nullable) = false];
-}
-
-message QueryAllTradingPairRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
-}
-
-message QueryAllTradingPairResponse {
-	repeated TradingPair TradingPair = 1 [(gogoproto.nullable) = false];
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 message QueryGetTokensRequest {
@@ -273,24 +249,10 @@ message QueryAllUserLimitOrdersResponse {
   repeated LimitOrderTrancheUser limitOrders = 1 [(gogoproto.nullable) = false];
 }
 
-
-
-
-message QueryGetTickLiquidityRequest {
-	  string pairId = 1;
-  string tokenIn = 2;
-  int64 tickIndex = 3;
-  string liquidityType = 4;
-  uint64 liquidityIndex = 5;
-
-}
-
-message QueryGetTickLiquidityResponse {
-	TickLiquidity tickLiquidity = 1 [(gogoproto.nullable) = false];
-}
-
 message QueryAllTickLiquidityRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+  string pairId = 1;
+  string tokenIn = 2;
+	cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 
 message QueryAllTickLiquidityResponse {
@@ -319,4 +281,26 @@ message QueryAllFilledLimitOrderTrancheResponse {
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
+message QueryAllPoolReservesRequest {
+  string pairId = 1;
+  string tokenIn = 2;
+cosmos.base.query.v1beta1.PageRequest pagination = 3;
+}
+
+message QueryAllPoolReservesResponse {
+  repeated PoolReserves poolReserves = 1 [(gogoproto.nullable) = false];
+cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetPoolReservesRequest {
+  string pairId = 1;
+  string tokenIn = 2;
+  int64 tickIndex =3;
+  uint64 fee = 4;
+
+}
+
+message QueryGetPoolReservesResponse {
+	PoolReserves poolReserves = 1 [(gogoproto.nullable) = false];
+}
 // this line is used by starport scaffolding # 3
