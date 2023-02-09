@@ -63,7 +63,7 @@ func (k Keeper) LimitOrderTranche(c context.Context, req *types.QueryGetLimitOrd
 	if err != nil {
 		return nil, err
 	}
-	val, _, found := k.FindLimitOrderTranche(ctx, pairId, req.TickIndex, req.TokenIn, req.TrancheIndex)
+	val, _, found := k.FindLimitOrderTranche(ctx, pairId, req.TickIndex, req.TokenIn, req.TrancheKey)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")
 	}

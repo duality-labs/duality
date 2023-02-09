@@ -69,9 +69,9 @@ func CmdShowLimitOrderTranche() *cobra.Command {
 			}
 			argTickIndex := args[1]
 			argTokenIn := args[2]
-			argTrancheIndex := args[3]
+			argTrancheKey := args[3]
 
-			argTrancheIndexInt, err := strconv.Atoi(argTrancheIndex)
+			argTrancheKeyInt, err := strconv.Atoi(argTrancheKey)
 
 			if err != nil {
 				return err
@@ -87,7 +87,7 @@ func CmdShowLimitOrderTranche() *cobra.Command {
 				PairId:       argPairId,
 				TickIndex:    int64(argTickIndexInt),
 				TokenIn:      argTokenIn,
-				TrancheIndex: uint64(argTrancheIndexInt),
+				TrancheKey: uint64(argTrancheKeyInt),
 			}
 
 			res, err := queryClient.LimitOrderTranche(context.Background(), params)

@@ -58,7 +58,7 @@ service Query {
 
   // Queries a LimitOrderTrancheUser by index.
 	rpc LimitOrderTrancheUser(QueryGetLimitOrderTrancheUserRequest) returns (QueryGetLimitOrderTrancheUserResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{count}/{address}";
+		option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{trancheKey}/{address}";
 	}
 
 	// Queries a list of LimitOrderTrancheMap items.
@@ -68,7 +68,7 @@ service Query {
 
   // Queries a LimitOrderTranche by index.
  rpc LimitOrderTranche(QueryGetLimitOrderTrancheRequest) returns (QueryGetLimitOrderTrancheResponse) {
-  	option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheIndex}";
+  	option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}";
   }
 
   // Queries a list of LimitOrderTranche items for a given pairId / TokenIn combination.
@@ -98,7 +98,7 @@ service Query {
 
 // Queries a FilledLimitOrderTranche by index.
 	rpc FilledLimitOrderTranche(QueryGetFilledLimitOrderTrancheRequest) returns (QueryGetFilledLimitOrderTrancheResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/filled_limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheIndex}";
+		option (google.api.http).get = "/dualitylabs/duality/dex/filled_limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}";
 	}
 
 	// Queries a list of FilledLimitOrderTranche items.
@@ -184,7 +184,7 @@ message QueryGetLimitOrderTrancheUserRequest {
   string pairId = 1;
   int64 tickIndex =2;
   string token = 3;
-    uint64 count = 4;
+    uint64 trancheKey = 4;
   string address = 5;
 
 }
@@ -206,7 +206,7 @@ message QueryGetLimitOrderTrancheRequest {
   string pairId = 1;
   int64 tickIndex =2;
   string tokenIn = 3;
-  uint64 trancheIndex = 4;
+  uint64 trancheKey = 4;
 
 }
 
@@ -264,7 +264,7 @@ message QueryGetFilledLimitOrderTrancheRequest {
 	string pairId = 1;
   string tokenIn = 2;
   int64 tickIndex = 3;
-  uint64 trancheIndex = 4;
+  uint64 trancheKey = 4;
 
 }
 

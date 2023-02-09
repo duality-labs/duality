@@ -150,7 +150,7 @@ func FilledLimitOrderTrancheKey(
 	pairId *PairId,
 	tokenIn string,
 	tickIndex int64,
-	trancheIndex uint64,
+	trancheKey uint64,
 ) []byte {
 	var key []byte
 
@@ -166,9 +166,9 @@ func FilledLimitOrderTrancheKey(
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
-	trancheIndexBytes := make([]byte, 8)
-	binary.BigEndian.PutUint64(trancheIndexBytes, trancheIndex)
-	key = append(key, trancheIndexBytes...)
+	trancheKeyBytes := make([]byte, 8)
+	binary.BigEndian.PutUint64(trancheKeyBytes, trancheKey)
+	key = append(key, trancheKeyBytes...)
 	key = append(key, []byte("/")...)
 
 	return key

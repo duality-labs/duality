@@ -62,7 +62,8 @@ func CmdShowLimitOrderTrancheUser() *cobra.Command {
 				args[1] = strings.TrimPrefix(args[1], "[")
 				args[1] = strings.TrimSuffix(args[1], "]")
 			}
-			argTrancheIndex := args[3]
+			argTrancheKey := args[3]
+
 			argAddress := args[4]
 
 			argTickIndexInt, err := strconv.Atoi(argTickIndex)
@@ -71,18 +72,18 @@ func CmdShowLimitOrderTrancheUser() *cobra.Command {
 				return err
 			}
 
-			argTrancheIndexInt, err := strconv.Atoi(argTrancheIndex)
+			argTrancheKeyInt, err := strconv.Atoi(argTrancheKey)
 
 			if err != nil {
 				return err
 			}
 
 			params := &types.QueryGetLimitOrderTrancheUserRequest{
-				PairId:    argPairId,
-				TickIndex: int64(argTickIndexInt),
-				Token:     argTokenIn,
-				Count:     uint64(argTrancheIndexInt),
-				Address:   argAddress,
+				PairId:       argPairId,
+				TickIndex:    int64(argTickIndexInt),
+				Token:        argTokenIn,
+				TrancheKey: uint64(argTrancheKeyInt),
+				Address:      argAddress,
 			}
 
 			res, err := queryClient.LimitOrderTrancheUser(context.Background(), params)

@@ -15,7 +15,7 @@ func createNFilledLimitOrderTranche(keeper *keeper.Keeper, ctx sdk.Context, n in
 	items := make([]types.FilledLimitOrderTranche, n)
 	for i := range items {
 		items[i] = types.FilledLimitOrderTranche{
-			TrancheIndex:     uint64(i),
+			TrancheKey:     uint64(i),
 			PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 			TickIndex:        int64(i),
 			TokenIn:          "TokenA",
@@ -32,7 +32,7 @@ func createNFilledLimitOrderTrancheSameTick(keeper *keeper.Keeper, ctx sdk.Conte
 	items := make([]types.FilledLimitOrderTranche, n)
 	for i := range items {
 		items[i] = types.FilledLimitOrderTranche{
-			TrancheIndex:     uint64(i),
+			TrancheKey:     uint64(i),
 			PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 			TickIndex:        0,
 			TokenIn:          "TokenA",
@@ -53,7 +53,7 @@ func TestFilledLimitOrderTrancheGet(t *testing.T) {
 			item.PairId,
 			item.TokenIn,
 			item.TickIndex,
-			item.TrancheIndex,
+			item.TrancheKey,
 		)
 		require.True(t, found)
 		require.Equal(t,
@@ -70,13 +70,13 @@ func TestFilledLimitOrderTrancheRemove(t *testing.T) {
 			item.PairId,
 			item.TokenIn,
 			item.TickIndex,
-			item.TrancheIndex,
+			item.TrancheKey,
 		)
 		_, found := keeper.GetFilledLimitOrderTranche(ctx,
 			item.PairId,
 			item.TokenIn,
 			item.TickIndex,
-			item.TrancheIndex,
+			item.TrancheKey,
 		)
 		require.False(t, found)
 	}

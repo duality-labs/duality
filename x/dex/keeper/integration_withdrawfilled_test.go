@@ -52,7 +52,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledPartial() {
 	// bob market sells 10 A
 	s.bobMarketSells("TokenA", 10, 10)
 	// alice has 10 A filled
-	s.assertAliceLimitFilledAtTickAtKey("TokenB", 10, 0, 0)
+	s.assertAliceLimitFilledAtTickAtIndex("TokenB", 10, 0, 0)
 	// balances are 50, 100 for alice and 90, 100 for bob
 	s.assertAliceBalances(100, 50)
 	s.assertBobBalances(90, 110)
@@ -65,7 +65,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledPartial() {
 	// limit order has been partially filled
 	s.assertAliceLimitLiquidityAtTick("TokenB", 40, 0)
 	// the filled reserved have been withdrawn from
-	s.assertAliceLimitFilledAtTickAtKey("TokenB", 0, 0, 0)
+	s.assertAliceLimitFilledAtTickAtIndex("TokenB", 0, 0, 0)
 	// balances are 110, 100 for alice and 90, 100 for bob
 	s.assertAliceBalances(110, 50)
 	s.assertBobBalances(90, 110)

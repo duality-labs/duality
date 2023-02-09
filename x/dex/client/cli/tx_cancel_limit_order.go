@@ -15,7 +15,7 @@ var _ = strconv.Itoa(0)
 
 func CmdCancelLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "cancel-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [key]",
+		Use:     "cancel-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [tranche-key]",
 		Short:   "Broadcast message CancelLimitOrder",
 		Example: "cancel-limit-order alice tokenA tokenB [-10] tokenA 0 --from alice",
 		Args:    cobra.ExactArgs(6),
@@ -36,13 +36,9 @@ func CmdCancelLimitOrder() *cobra.Command {
 			}
 
 			argKeyToken := args[4]
-			argKey := args[5]
+			argTrancheKey := args[5]
 
-			argKeyInt, err := strconv.Atoi(argKey)
 
-			if err != nil {
-				return err
-			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -56,7 +52,7 @@ func CmdCancelLimitOrder() *cobra.Command {
 				argTokenB,
 				int64(argTickIndexInt),
 				argKeyToken,
-				uint64(argKeyInt),
+				argTrancheKey,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

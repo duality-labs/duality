@@ -306,7 +306,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderNoLOPlaceLODoesntIncrementPlaceT
 	// no previous LO on existing tick
 	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
 	s.assertPoolLiquidity(10, 0, 0, 0)
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
+	s.assertFillAndPlaceTrancheIndices("TokenA", -1, 0, 0)
 
 	// WHEN
 	// placing order on same tick
@@ -314,7 +314,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderNoLOPlaceLODoesntIncrementPlaceT
 
 	// THEN
 	// fill and place tranche keys don't change
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
+	s.assertFillAndPlaceTrancheIndices("TokenA", -1, 0, 0)
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderUnfilledLOPlaceLODoesntIncrementPlaceTrancheKey() {
@@ -324,7 +324,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderUnfilledLOPlaceLODoesntIncrement
 	// unfilled limit order exists on tick -1
 	s.aliceLimitSells("TokenA", -1, 10)
 	s.assertLimitLiquidityAtTick("TokenA", -1, 10)
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
+	s.assertFillAndPlaceTrancheIndices("TokenA", -1, 0, 0)
 
 	// WHEN
 	// placing order on same tick
@@ -332,7 +332,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderUnfilledLOPlaceLODoesntIncrement
 
 	// THEN
 	// fill and place tranche keys don't change
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
+	s.assertFillAndPlaceTrancheIndices("TokenA", -1, 0, 0)
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderPartiallyFilledLOPlaceLOIncrementsPlaceTrancheKey() {
@@ -344,7 +344,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderPartiallyFilledLOPlaceLOIncremen
 	s.aliceLimitSells("TokenA", -1, 10)
 	s.bobMarketSells("TokenB", 5, 0)
 	s.aliceLimitSells("TokenA", -1, 10)
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
+	s.assertFillAndPlaceTrancheIndices("TokenA", -1, 0, 1)
 
 	// WHEN
 	// placing order on same tick
@@ -352,7 +352,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderPartiallyFilledLOPlaceLOIncremen
 
 	// THEN
 	// place tranche key changes
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
+	s.assertFillAndPlaceTrancheIndices("TokenA", -1, 0, 1)
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderFilledLOPlaceLODoesntIncrementsPlaceTrancheKey() {
@@ -364,7 +364,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFilledLOPlaceLODoesntIncrementsP
 	s.aliceLimitSells("TokenA", -1, 10)
 	s.bobMarketSells("TokenB", 10, 0)
 	s.aliceLimitSells("TokenA", -1, 10)
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
+	s.assertFillAndPlaceTrancheIndices("TokenA", -1, 0, 1)
 
 	// WHEN
 	// placing order on same tick
@@ -372,7 +372,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFilledLOPlaceLODoesntIncrementsP
 
 	// THEN
 	// fill and place tranche keys don't change
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
+	s.assertFillAndPlaceTrancheIndices("TokenA", -1, 0, 1)
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderInsufficientFunds() {

@@ -44,7 +44,7 @@ var limitOrderTrancheList = []types.TickLiquidity{
 			},
 			TokenIn:          "TokenB",
 			TickIndex:        1,
-			TrancheIndex:     0,
+			TrancheKey:     0,
 			ReservesTokenIn:  sdk.NewInt(10),
 			ReservesTokenOut: sdk.ZeroInt(),
 			TotalTokenIn:     sdk.NewInt(10),
@@ -60,7 +60,7 @@ var limitOrderTrancheList = []types.TickLiquidity{
 			},
 			TokenIn:          "TokenB",
 			TickIndex:        2,
-			TrancheIndex:     1,
+			TrancheKey:     1,
 			ReservesTokenIn:  sdk.NewInt(10),
 			ReservesTokenOut: sdk.ZeroInt(),
 			TotalTokenIn:     sdk.NewInt(10),
@@ -74,7 +74,7 @@ var filledLimitOrderTrancheList = []types.FilledLimitOrderTranche{
 	{PairId: &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 		TokenIn:          "TokenB",
 		TickIndex:        0,
-		TrancheIndex:     0,
+		TrancheKey:     0,
 		TotalTokenIn:     sdk.NewInt(10),
 		TotalTokenOut:    sdk.NewInt(10),
 		ReservesTokenOut: sdk.NewInt(10),
@@ -82,7 +82,7 @@ var filledLimitOrderTrancheList = []types.FilledLimitOrderTranche{
 	{PairId: &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 		TokenIn:          "TokenB",
 		TickIndex:        0,
-		TrancheIndex:     1,
+		TrancheKey:     1,
 		TotalTokenIn:     sdk.NewInt(10),
 		TotalTokenOut:    sdk.NewInt(10),
 		ReservesTokenOut: sdk.NewInt(10),
@@ -125,7 +125,7 @@ var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 		PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 		Token:           "TokenB",
 		TickIndex:       1,
-		Count:           0,
+		TrancheKey:    0,
 		Address:         testAddress.String(),
 		SharesOwned:     sdk.NewInt(10),
 		SharesWithdrawn: sdk.NewInt(0),
@@ -135,7 +135,7 @@ var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 		PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 		Token:           "TokenA",
 		TickIndex:       20,
-		Count:           0,
+		TrancheKey:    0,
 		Address:         testAddress.String(),
 		SharesOwned:     sdk.NewInt(10),
 		SharesWithdrawn: sdk.NewInt(0),
@@ -361,7 +361,7 @@ func (s *QueryTestSuite) TestQueryCmdShowLimitOrderTrancheUser() {
 		expErrMsg string
 		expOutput types.LimitOrderTrancheUser
 	}{
-		// "show-limit-order-pool-user-share-map [pairId] [tickIndex] [tokenIn] [trancheIndex] [address]"
+		// "show-limit-order-pool-user-share-map [pairId] [tickIndex] [tokenIn] [trancheKey] [address]"
 		{
 			name:      "valid",
 			args:      []string{"TokenA<>TokenB", "1", "TokenB", "0", testAddress.String()},

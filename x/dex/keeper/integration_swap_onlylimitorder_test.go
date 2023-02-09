@@ -507,7 +507,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOUnfilledLOSwapIncrementsFillKey() {
 	// GIVEN
 	// place LO selling 10 of token A at tick -1
 	s.aliceLimitSells("TokenA", -1, 10)
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
+	s.assertFillAndPlaceTrancheIndices("TokenA", -1, 0, 0)
 
 	// WHEN
 	// swap 20 of token A for B with minOut 0 and Place a new limitOrder
@@ -516,5 +516,5 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOUnfilledLOSwapIncrementsFillKey() {
 
 	// THEN
 	// place increased
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
+	s.assertFillAndPlaceTrancheIndices("TokenA", -1, 0, 1)
 }

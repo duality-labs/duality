@@ -87,16 +87,16 @@ func (k Keeper) FindLimitOrderTranche(
 	pairId *types.PairId,
 	tickIndex int64,
 	token string,
-	trancheIndex uint64,
+	trancheKey uint64,
 ) (val types.LimitOrderTranche, fromFilled bool, found bool) {
 
 	// Try to find the tranche in the active liq index
-	tick, found := k.GetLimitOrderTranche(ctx, pairId, token, tickIndex, trancheIndex)
+	tick, found := k.GetLimitOrderTranche(ctx, pairId, token, tickIndex, trancheKey)
 	if found {
 		return *tick, false, true
 	}
 	// Look for filled limit orders
-	tranche, found := k.GetFilledLimitOrderTranche(ctx, pairId, token, tickIndex, trancheIndex)
+	tranche, found := k.GetFilledLimitOrderTranche(ctx, pairId, token, tickIndex, trancheKey)
 	if found {
 		return types.NewFromFilledTranche(tranche), true, true
 	}
@@ -143,7 +143,7 @@ func (k Keeper) SetLimitOrderTranche(ctx sdk.Context, tranche types.LimitOrderTr
 		tranche.TokenIn,
 		tranche.TickIndex,
 		types.LiquidityTypeLimitOrder,
-		tranche.TrancheIndex,
+		tranche.TrancheKey,
 	), b)
 }
 
@@ -152,7 +152,7 @@ func (k Keeper) GetLimitOrderTranche(
 	pairId *types.PairId,
 	tokenIn string,
 	tickIndex int64,
-	trancheIndex uint64,
+	trancheKey uint64,
 
 ) (tranche *types.LimitOrderTranche, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickLiquidityKeyPrefix))
@@ -161,7 +161,7 @@ func (k Keeper) GetLimitOrderTranche(
 		tokenIn,
 		tickIndex,
 		types.LiquidityTypeLimitOrder,
-		trancheIndex,
+		trancheKey,
 	))
 
 	if b == nil {
@@ -180,7 +180,7 @@ func (k Keeper) RemoveLimitOrderTranche(ctx sdk.Context, tranche types.LimitOrde
 		tranche.TokenIn,
 		tranche.TickIndex,
 		types.LiquidityTypeLimitOrder,
-		tranche.TrancheIndex,
+		tranche.TrancheKey,
 	))
 }
 
@@ -236,14 +236,14 @@ func (k Keeper) InitPlaceTranche(sdkCtx sdk.Context, pairId *types.PairId, token
 
 	newestActiveTranche, found := k.GetNewestLimitOrderTranche(sdkCtx, pairId, tokenIn, tickIndex)
 	if found {
-		newTrancheIndex := newestActiveTranche.TrancheIndex + 1
-		return NewLimitOrderTranche(pairId, tokenIn, tickIndex, newTrancheIndex)
+		newTrancheKey := newestActiveTranche.TrancheKey + 1
+		return NewLimitOrderTranche(pairId, tokenIn, tickIndex, newTrancheKey)
 	}
 	newestFilledTranche, found := k.GetNewestFilledLimitOrderTranche(sdkCtx, pairId, tokenIn, tickIndex)
 
 	if found {
-		newTrancheIndex := newestFilledTranche.TrancheIndex + 1
-		return NewLimitOrderTranche(pairId, tokenIn, tickIndex, newTrancheIndex)
+		newTrancheKey := newestFilledTranche.TrancheKey + 1
+		return NewLimitOrderTranche(pairId, tokenIn, tickIndex, newTrancheKey)
 	}
 
 	return NewLimitOrderTranche(pairId, tokenIn, tickIndex, 0)

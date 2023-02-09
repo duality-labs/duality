@@ -66,7 +66,7 @@ func CmdShowFilledLimitOrderTranche() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			argTrancheIndex, err := cast.ToUint64E(args[3])
+			argTrancheKey, err := cast.ToUint64E(args[3])
 			if err != nil {
 				return err
 			}
@@ -75,7 +75,7 @@ func CmdShowFilledLimitOrderTranche() *cobra.Command {
 				PairId:       argPairId,
 				TokenIn:      argTokenIn,
 				TickIndex:    argTickIndex,
-				TrancheIndex: argTrancheIndex,
+				TrancheKey: argTrancheKey,
 			}
 
 			res, err := queryClient.FilledLimitOrderTranche(context.Background(), params)

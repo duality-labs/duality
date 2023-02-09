@@ -33,7 +33,7 @@ func networkWithFilledLimitOrderTrancheObjects(t *testing.T, n int) (*network.Ne
 			PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 			TokenIn:          strconv.Itoa(i),
 			TickIndex:        int64(i),
-			TrancheIndex:     uint64(i),
+			TrancheKey:     uint64(i),
 			TotalTokenIn:     sdk.ZeroInt(),
 			TotalTokenOut:    sdk.ZeroInt(),
 			ReservesTokenOut: sdk.ZeroInt(),
@@ -59,7 +59,7 @@ func TestShowFilledLimitOrderTranche(t *testing.T) {
 		idPairId       *types.PairId
 		idTokenIn      string
 		idTickIndex    int64
-		idTrancheIndex uint64
+		idTrancheKey uint64
 
 		args []string
 		err  error
@@ -70,7 +70,7 @@ func TestShowFilledLimitOrderTranche(t *testing.T) {
 			idPairId:       objs[0].PairId,
 			idTokenIn:      objs[0].TokenIn,
 			idTickIndex:    objs[0].TickIndex,
-			idTrancheIndex: objs[0].TrancheIndex,
+			idTrancheKey: objs[0].TrancheKey,
 
 			args: common,
 			obj:  objs[0],
@@ -80,7 +80,7 @@ func TestShowFilledLimitOrderTranche(t *testing.T) {
 			idPairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 			idTokenIn:      strconv.Itoa(100000),
 			idTickIndex:    100000,
-			idTrancheIndex: 100000,
+			idTrancheKey: 100000,
 
 			args: common,
 			err:  status.Error(codes.NotFound, "not found"),
@@ -91,7 +91,7 @@ func TestShowFilledLimitOrderTranche(t *testing.T) {
 				tc.idPairId.Stringify(),
 				tc.idTokenIn,
 				strconv.Itoa(int(tc.idTickIndex)),
-				strconv.Itoa(int(tc.idTrancheIndex)),
+				strconv.Itoa(int(tc.idTrancheKey)),
 			}
 			args = append(args, tc.args...)
 			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowFilledLimitOrderTranche(), args)

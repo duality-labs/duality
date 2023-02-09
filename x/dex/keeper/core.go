@@ -322,9 +322,9 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		return types.ErrPlaceLimitOrderBehindPairLiquidity
 	}
 
-	placeTrancheIndex := placeTranche.TrancheIndex
+	placeTrancheKey := placeTranche.TrancheKey
 
-	trancheUser := k.GetOrInitLimitOrderTrancheUser(goCtx, pairId, tickIndex, tokenIn, placeTrancheIndex, receiver)
+	trancheUser := k.GetOrInitLimitOrderTrancheUser(goCtx, pairId, tickIndex, tokenIn, placeTrancheKey, receiver)
 
 	placeTranche.ReservesTokenIn = placeTranche.ReservesTokenIn.Add(msg.AmountIn)
 	placeTranche.TotalTokenIn = placeTranche.TotalTokenIn.Add(msg.AmountIn)
@@ -348,7 +348,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		msg.TokenIn,
 		msg.AmountIn.String(),
 		msg.AmountIn.String(),
-		strconv.FormatUint(placeTrancheIndex, 10),
+		strconv.FormatUint(placeTrancheKey, 10),
 	))
 
 	return nil
@@ -360,12 +360,12 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 
 	pairId := CreatePairId(token0, token1)
 
-	trancheRaw, found := k.GetLimitOrderTranche(ctx, pairId, msg.KeyToken, msg.TickIndex, msg.Key)
+	trancheRaw, found := k.GetLimitOrderTranche(ctx, pairId, msg.KeyToken, msg.TickIndex, msg.TrancheKey)
 	if !found {
 		return types.ErrActiveLimitOrderNotFound
 	}
 
-	trancheUser, found := k.GetLimitOrderTrancheUser(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.Key, msg.Creator)
+	trancheUser, found := k.GetLimitOrderTrancheUser(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.TrancheKey, msg.Creator)
 	if !found {
 		return types.ErrIntOverflowLimitOrderTrancheUser
 	}
@@ -389,11 +389,11 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 		tranche.Save(ctx, k)
 
 	} else {
-		return sdkerrors.Wrapf(types.ErrCancelEmptyLimitOrder, "%d", tranche.TrancheIndex)
+		return sdkerrors.Wrapf(types.ErrCancelEmptyLimitOrder, "%d", tranche.TrancheKey)
 	}
 
 	ctx.EventManager().EmitEvent(types.CancelLimitOrderEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.KeyToken, strconv.Itoa(int(msg.Key)), amountToCancel.String(),
+		token0, token1, msg.KeyToken, strconv.Itoa(int(msg.TrancheKey)), amountToCancel.String(),
 	))
 
 	return nil
@@ -418,7 +418,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	} else {
 		orderTokenOut = token0
 	}
-	trancheIndex := msg.Key
+	trancheKey := msg.TrancheKey
 	tickIndex := msg.TickIndex
 
 	trancheUser, found := k.GetLimitOrderTrancheUser(
@@ -426,11 +426,11 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		pairId,
 		tickIndex,
 		orderTokenIn,
-		trancheIndex,
+		trancheKey,
 		msg.Creator,
 	)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheUserNotFound, "tranche %d, user %s", trancheIndex, msg.Creator)
+		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheUserNotFound, "tranche %d, user %s", trancheKey, msg.Creator)
 	}
 
 	sharesToWithdraw := trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled)
@@ -440,9 +440,9 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		return types.ErrNotEnoughLimitOrderShares
 	}
 
-	trancheRaw, wasFilled, found := k.FindLimitOrderTranche(ctx, pairId, tickIndex, msg.KeyToken, trancheIndex)
+	trancheRaw, wasFilled, found := k.FindLimitOrderTranche(ctx, pairId, tickIndex, msg.KeyToken, trancheKey)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheNotFound, "%d", trancheIndex)
+		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheNotFound, "%d", trancheKey)
 	}
 
 	tranche := NewLimitOrderTrancheWrapper(&trancheRaw)
@@ -484,7 +484,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	}
 
 	ctx.EventManager().EmitEvent(types.WithdrawFilledLimitOrderEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.KeyToken, strconv.Itoa(int(msg.Key)), amountOutTokenOut.String(),
+		token0, token1, msg.KeyToken, strconv.Itoa(int(msg.TrancheKey)), amountOutTokenOut.String(),
 	))
 
 	return nil

@@ -53,7 +53,7 @@ func (k Keeper) LimitOrderTrancheUser(c context.Context, req *types.QueryGetLimi
 		pairId,
 		req.TickIndex,
 		req.Token,
-		req.Count,
+		req.TrancheKey,
 		req.Address,
 	)
 	if !found {

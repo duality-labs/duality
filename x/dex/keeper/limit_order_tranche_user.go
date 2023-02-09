@@ -14,7 +14,7 @@ func (k Keeper) SetLimitOrderTrancheUser(ctx sdk.Context, LimitOrderTrancheUser 
 		LimitOrderTrancheUser.PairId,
 		LimitOrderTrancheUser.TickIndex,
 		LimitOrderTrancheUser.Token,
-		LimitOrderTrancheUser.Count,
+		LimitOrderTrancheUser.TrancheKey,
 		LimitOrderTrancheUser.Address,
 	), b)
 }

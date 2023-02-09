@@ -49,7 +49,7 @@ func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tok
 
 }
 
-func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64, trancheIndex uint64) (types.LimitOrderTranche, error) {
+func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey uint64) (types.LimitOrderTranche, error) {
 	if IsTickOutOfRange(tickIndex) {
 		return types.LimitOrderTranche{}, types.ErrTickOutsideRange
 	}
@@ -57,7 +57,7 @@ func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64,
 		PairId:           pairId,
 		TokenIn:          tokenIn,
 		TickIndex:        tickIndex,
-		TrancheIndex:     trancheIndex,
+		TrancheKey:     trancheKey,
 		ReservesTokenIn:  sdk.ZeroInt(),
 		ReservesTokenOut: sdk.ZeroInt(),
 		TotalTokenIn:     sdk.ZeroInt(),
@@ -80,7 +80,7 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 
 	if !UserShareDataFound {
 		return types.LimitOrderTrancheUser{
-			Count:           currentLimitOrderKey,
+			TrancheKey:    currentLimitOrderKey,
 			Address:         receiver,
 			SharesOwned:     sdk.ZeroInt(),
 			SharesWithdrawn: sdk.ZeroInt(),
@@ -141,7 +141,6 @@ func (k Keeper) IsBehindEnemyLines(ctx sdk.Context, pairId *types.PairId, tokenI
 	}
 	return false
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //                            TOKENIZER UTILS                                //

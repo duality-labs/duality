@@ -137,7 +137,7 @@ message MsgWithdrawFilledLimitOrder {
   string tokenB = 4;
   int64 tickIndex = 5;
   string keyToken = 6;
-  uint64 key = 7;
+  uint64 trancheKey = 7;
 }
 
 message MsgWithdrawFilledLimitOrderResponse {
@@ -150,7 +150,7 @@ message MsgCancelLimitOrder {
   string tokenB = 4;
   int64 tickIndex = 5;
   string keyToken = 6;
-  uint64 key = 7;
+  uint64 trancheKey = 7;
 }
 
 message MsgCancelLimitOrderResponse {
