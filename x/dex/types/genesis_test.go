@@ -49,12 +49,12 @@ func TestGenesisState_Validate(t *testing.T) {
 				FeeTierCount: 2,
 				LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
 					{
-						TrancheKey: 0,
+						TrancheKey: "0",
 						Address:      "0",
 						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 					{
-						TrancheKey: 1,
+						TrancheKey: "1",
 						Address:      "1",
 						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
@@ -66,7 +66,7 @@ func TestGenesisState_Validate(t *testing.T) {
 								PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 								TokenIn:      "0",
 								TickIndex:    0,
-								TrancheKey: 0,
+								TrancheKey: "0",
 							},
 						},
 					},
@@ -86,13 +86,13 @@ func TestGenesisState_Validate(t *testing.T) {
 						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 						TokenIn:      "0",
 						TickIndex:    0,
-						TrancheKey: 0,
+						TrancheKey: "0",
 					},
 					{
 						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 						TokenIn:      "1",
 						TickIndex:    1,
-						TrancheKey: 1,
+						TrancheKey: "1",
 					},
 				},
 				// this line is used by starport scaffolding # types/genesis/validField
@@ -170,12 +170,12 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 				LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
 					{
-						TrancheKey: 0,
+						TrancheKey: "0",
 						Address:      "0",
 						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 					{
-						TrancheKey: 0,
+						TrancheKey: "0",
 						Address:      "0",
 						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
@@ -193,7 +193,7 @@ func TestGenesisState_Validate(t *testing.T) {
 								PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 								TokenIn:      "0",
 								TickIndex:    0,
-								TrancheKey: 0,
+								TrancheKey: "0",
 							},
 						},
 					},
@@ -203,7 +203,7 @@ func TestGenesisState_Validate(t *testing.T) {
 								PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 								TokenIn:      "0",
 								TickIndex:    0,
-								TrancheKey: 0,
+								TrancheKey: "0",
 							},
 						},
 					},
@@ -219,13 +219,13 @@ func TestGenesisState_Validate(t *testing.T) {
 						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 						TokenIn:      "0",
 						TickIndex:    0,
-						TrancheKey: 0,
+						TrancheKey: "0",
 					},
 					{
 						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 						TokenIn:      "0",
 						TickIndex:    0,
-						TrancheKey: 0,
+						TrancheKey: "0",
 					},
 				},
 			},

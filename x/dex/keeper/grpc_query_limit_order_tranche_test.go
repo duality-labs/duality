@@ -27,9 +27,9 @@ func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetLimitOrderTrancheRequest{
-				PairId:       "TokenA<>TokenB",
-				TickIndex:    msgs[0].TickIndex,
-				TokenIn:      "TokenA",
+				PairId:     "TokenA<>TokenB",
+				TickIndex:  msgs[0].TickIndex,
+				TokenIn:    "TokenA",
 				TrancheKey: msgs[0].TrancheKey,
 			},
 			response: &types.QueryGetLimitOrderTrancheResponse{LimitOrderTranche: msgs[0]},
@@ -37,9 +37,9 @@ func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 		{
 			desc: "Second",
 			request: &types.QueryGetLimitOrderTrancheRequest{
-				PairId:       "TokenA<>TokenB",
-				TickIndex:    msgs[1].TickIndex,
-				TokenIn:      "TokenA",
+				PairId:     "TokenA<>TokenB",
+				TickIndex:  msgs[1].TickIndex,
+				TokenIn:    "TokenA",
 				TrancheKey: msgs[1].TrancheKey,
 			},
 			response: &types.QueryGetLimitOrderTrancheResponse{LimitOrderTranche: msgs[1]},
@@ -47,10 +47,10 @@ func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetLimitOrderTrancheRequest{
-				PairId:       "TokenA<>TokenB",
-				TickIndex:    0,
-				TokenIn:      "TokenA",
-				TrancheKey: 100000,
+				PairId:     "TokenA<>TokenB",
+				TickIndex:  0,
+				TokenIn:    "TokenA",
+				TrancheKey: "100000",
 			},
 			err: status.Error(codes.NotFound, "not found"),
 		},

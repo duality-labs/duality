@@ -49,7 +49,7 @@ func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tok
 
 }
 
-func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey uint64) (types.LimitOrderTranche, error) {
+func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey string) (types.LimitOrderTranche, error) {
 	if IsTickOutOfRange(tickIndex) {
 		return types.LimitOrderTranche{}, types.ErrTickOutsideRange
 	}
@@ -57,7 +57,7 @@ func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64,
 		PairId:           pairId,
 		TokenIn:          tokenIn,
 		TickIndex:        tickIndex,
-		TrancheKey:     trancheKey,
+		TrancheKey:       trancheKey,
 		ReservesTokenIn:  sdk.ZeroInt(),
 		ReservesTokenOut: sdk.ZeroInt(),
 		TotalTokenIn:     sdk.ZeroInt(),
@@ -71,7 +71,7 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 	pairId *types.PairId,
 	tickIndex int64,
 	tokenIn string,
-	currentLimitOrderKey uint64,
+	currentLimitOrderKey string,
 	receiver string,
 ) types.LimitOrderTrancheUser {
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -80,7 +80,7 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 
 	if !UserShareDataFound {
 		return types.LimitOrderTrancheUser{
-			TrancheKey:    currentLimitOrderKey,
+			TrancheKey:      currentLimitOrderKey,
 			Address:         receiver,
 			SharesOwned:     sdk.ZeroInt(),
 			SharesWithdrawn: sdk.ZeroInt(),

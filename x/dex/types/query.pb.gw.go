@@ -370,7 +370,7 @@ func request_Query_LimitOrderTrancheUser_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trancheKey")
 	}
 
-	protoReq.TrancheKey, err = runtime.Uint64(val)
+	protoReq.TrancheKey, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheKey", err)
@@ -441,7 +441,7 @@ func local_request_Query_LimitOrderTrancheUser_0(ctx context.Context, marshaler 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trancheKey")
 	}
 
-	protoReq.TrancheKey, err = runtime.Uint64(val)
+	protoReq.TrancheKey, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheKey", err)
@@ -548,7 +548,7 @@ func request_Query_LimitOrderTranche_0(ctx context.Context, marshaler runtime.Ma
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trancheKey")
 	}
 
-	protoReq.TrancheKey, err = runtime.Uint64(val)
+	protoReq.TrancheKey, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheKey", err)
@@ -608,7 +608,7 @@ func local_request_Query_LimitOrderTranche_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trancheKey")
 	}
 
-	protoReq.TrancheKey, err = runtime.Uint64(val)
+	protoReq.TrancheKey, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheKey", err)
@@ -1018,7 +1018,7 @@ func request_Query_FilledLimitOrderTranche_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trancheKey")
 	}
 
-	protoReq.TrancheKey, err = runtime.Uint64(val)
+	protoReq.TrancheKey, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheKey", err)
@@ -1078,7 +1078,7 @@ func local_request_Query_FilledLimitOrderTranche_0(ctx context.Context, marshale
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trancheKey")
 	}
 
-	protoReq.TrancheKey, err = runtime.Uint64(val)
+	protoReq.TrancheKey, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheKey", err)

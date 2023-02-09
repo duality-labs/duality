@@ -15,7 +15,7 @@ var _ = strconv.Itoa(0)
 
 func CmdWithdrawFilledLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "withdraw-filled-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [tranche-index]",
+		Use:   "withdraw-filled-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [tranche-key]",
 		Short:   "Broadcast message WithdrawFilledLimitOrder",
 		Example: "withdraw-filled-limit-order alice tokenA tokenB [-10] tokenA 0 --from alice",
 		Args:    cobra.ExactArgs(6),
@@ -28,17 +28,10 @@ func CmdWithdrawFilledLimitOrder() *cobra.Command {
 				args[3] = strings.TrimSuffix(args[3], "]")
 			}
 			argTickIndex := args[3]
+			argKeyToken := args[4]
+			argTrancheIndex := args[5]
 
 			argTickIndexInt, err := strconv.Atoi(argTickIndex)
-			if err != nil {
-				return err
-			}
-
-			argKeyToken := args[4]
-			argKey := args[5]
-
-			argKeyInt, err := strconv.Atoi(argKey)
-
 			if err != nil {
 				return err
 			}
@@ -55,7 +48,7 @@ func CmdWithdrawFilledLimitOrder() *cobra.Command {
 				argTokenB,
 				int64(argTickIndexInt),
 				argKeyToken,
-				uint64(argKeyInt),
+				argTrancheIndex,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

@@ -29,16 +29,13 @@ func CmdCancelLimitOrder() *cobra.Command {
 				args[3] = strings.TrimSuffix(args[3], "]")
 			}
 			argTickIndex := args[3]
+			argKeyToken := args[4]
+			argTrancheKey := args[5]
 
 			argTickIndexInt, err := strconv.Atoi(argTickIndex)
 			if err != nil {
 				return err
 			}
-
-			argKeyToken := args[4]
-			argTrancheKey := args[5]
-
-
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {

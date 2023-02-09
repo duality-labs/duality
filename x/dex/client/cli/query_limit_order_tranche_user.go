@@ -46,7 +46,7 @@ func CmdListLimitOrderTrancheUser() *cobra.Command {
 
 func CmdShowLimitOrderTrancheUser() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "show-limit-order-pool-user-share-map [pairId] [tickIndex] [tokenIn] [trancheIndex] [address]",
+		Use:   "show-limit-order-pool-user-share-map [pairId] [tickIndex] [tokenIn] [tranche-key] [address]",
 		Short:   "shows a LimitOrderTrancheUser",
 		Example: "show-limit-order-pool-user-share-map tokenA<>tokenB [-5] tokenA 0 alice",
 		Args:    cobra.ExactArgs(5),
@@ -72,18 +72,12 @@ func CmdShowLimitOrderTrancheUser() *cobra.Command {
 				return err
 			}
 
-			argTrancheKeyInt, err := strconv.Atoi(argTrancheKey)
-
-			if err != nil {
-				return err
-			}
-
 			params := &types.QueryGetLimitOrderTrancheUserRequest{
-				PairId:       argPairId,
-				TickIndex:    int64(argTickIndexInt),
-				Token:        argTokenIn,
-				TrancheKey: uint64(argTrancheKeyInt),
-				Address:      argAddress,
+				PairId:     argPairId,
+				TickIndex:  int64(argTickIndexInt),
+				Token:      argTokenIn,
+				TrancheKey: argTrancheKey,
+				Address:    argAddress,
 			}
 
 			res, err := queryClient.LimitOrderTrancheUser(context.Background(), params)

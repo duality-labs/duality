@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"strconv"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -15,7 +16,7 @@ func createNFilledLimitOrderTranche(keeper *keeper.Keeper, ctx sdk.Context, n in
 	items := make([]types.FilledLimitOrderTranche, n)
 	for i := range items {
 		items[i] = types.FilledLimitOrderTranche{
-			TrancheKey:     uint64(i),
+			TrancheKey:       strconv.Itoa(i),
 			PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 			TickIndex:        int64(i),
 			TokenIn:          "TokenA",
@@ -32,7 +33,7 @@ func createNFilledLimitOrderTrancheSameTick(keeper *keeper.Keeper, ctx sdk.Conte
 	items := make([]types.FilledLimitOrderTranche, n)
 	for i := range items {
 		items[i] = types.FilledLimitOrderTranche{
-			TrancheKey:     uint64(i),
+			TrancheKey:       strconv.Itoa(i),
 			PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 			TickIndex:        0,
 			TokenIn:          "TokenA",

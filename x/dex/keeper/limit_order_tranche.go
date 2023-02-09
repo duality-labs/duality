@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/types"
@@ -87,7 +89,7 @@ func (k Keeper) FindLimitOrderTranche(
 	pairId *types.PairId,
 	tickIndex int64,
 	token string,
-	trancheKey uint64,
+	trancheKey string,
 ) (val types.LimitOrderTranche, fromFilled bool, found bool) {
 
 	// Try to find the tranche in the active liq index
@@ -152,7 +154,7 @@ func (k Keeper) GetLimitOrderTranche(
 	pairId *types.PairId,
 	tokenIn string,
 	tickIndex int64,
-	trancheKey uint64,
+	trancheKey string,
 
 ) (tranche *types.LimitOrderTranche, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickLiquidityKeyPrefix))
@@ -201,9 +203,9 @@ func (k Keeper) GetPlaceTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenI
 	return types.LimitOrderTranche{}, false
 }
 
-func (k Keeper) GetNewestLimitOrderTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64) (*types.LimitOrderTranche, bool) {
+func (k Keeper) GetFillTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64) (*types.LimitOrderTranche, bool) {
 	prefixStore := prefix.NewStore(sdkCtx.KVStore(k.storeKey), types.TickLiquidityLimitOrderPrefix(pairId, tokenIn, tickIndex))
-	iter := sdk.KVStoreReversePrefixIterator(prefixStore, []byte{})
+	iter := sdk.KVStorePrefixIterator(prefixStore, []byte{})
 
 	defer iter.Close()
 	for ; iter.Valid(); iter.Next() {
@@ -226,25 +228,25 @@ func (k Keeper) GetAllLimitOrderTrancheAtIndex(sdkCtx sdk.Context, pairId *types
 	}
 	return trancheList
 }
+
+func NewTrancheKey(sdkCtx sdk.Context) string {
+	// NOTE this does require that blockHeight < 1E12 - 1 && totalGas < 1E12 - 1
+	//both should be sufficiently high limits so as never to be reached
+	maxSize := 999_999_999_999
+	blockHeight := sdkCtx.BlockHeight()
+	txGas := sdkCtx.GasMeter().GasConsumed()
+	blockGas := sdkCtx.BlockGasMeter().GasConsumed()
+	totalGas := blockGas + txGas
+
+	if blockHeight > int64(maxSize) || totalGas > uint64(maxSize) {
+		panic("Cannot compute tranche key BlockHeight or blockGas is too large")
+	}
+	return fmt.Sprintf("%012d-%012d", blockHeight, totalGas)
+}
+
 func (k Keeper) InitPlaceTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64) (types.LimitOrderTranche, error) {
 	// NOTE: CONTRACT: There is no active place tranche (ie. GetPlaceTrancheTick has returned false)
 
-	//TODO: This could probably be made more efficient since at this point it requires 3 lookups in the worst case
-	// ideally we can find a way to generate trancheIds that are lexographically increasing witout any lookups
-	// we can get close to this with sdkCtx.BlockTime(), but would have to track number of tranches created in a given block
-	// to handle cases where multiple placeTranches are created in a single block
-
-	newestActiveTranche, found := k.GetNewestLimitOrderTranche(sdkCtx, pairId, tokenIn, tickIndex)
-	if found {
-		newTrancheKey := newestActiveTranche.TrancheKey + 1
-		return NewLimitOrderTranche(pairId, tokenIn, tickIndex, newTrancheKey)
-	}
-	newestFilledTranche, found := k.GetNewestFilledLimitOrderTranche(sdkCtx, pairId, tokenIn, tickIndex)
-
-	if found {
-		newTrancheKey := newestFilledTranche.TrancheKey + 1
-		return NewLimitOrderTranche(pairId, tokenIn, tickIndex, newTrancheKey)
-	}
-
-	return NewLimitOrderTranche(pairId, tokenIn, tickIndex, 0)
+	trancheKey := NewTrancheKey(sdkCtx)
+	return NewLimitOrderTranche(pairId, tokenIn, tickIndex, trancheKey)
 }

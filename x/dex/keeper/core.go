@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -297,29 +296,28 @@ func (k Keeper) SwapCore(goCtx context.Context,
 }
 
 // Handles MsgPlaceLimitOrder, initializing (tick, pair) data structures if needed, calculating and storing information for a new limit order at a specific tick
-func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLimitOrder, tokenIn string, tokenOut string, callerAddr sdk.AccAddress) error {
+func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLimitOrder, tokenIn string, tokenOut string, callerAddr sdk.AccAddress) (trancheKey string, error error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	token0, token1, err := SortTokens(tokenIn, tokenOut)
 	if err != nil {
-		return err
+		return "", err
 	}
 	pairId := CreatePairId(token0, token1)
 	tickIndex := msg.TickIndex
 	receiver := msg.Receiver
 
-	var placeTranche types.LimitOrderTranche
 	placeTranche, found := k.GetPlaceTranche(ctx, pairId, tokenIn, tickIndex)
 
 	if !found {
 		placeTranche, err = k.InitPlaceTranche(ctx, pairId, tokenIn, tickIndex)
 		if err != nil {
-			return err
+			return "", err
 		}
 	}
 
 	if k.IsBehindEnemyLines(ctx, pairId, msg.TokenIn, tickIndex) {
-		return types.ErrPlaceLimitOrderBehindPairLiquidity
+		return "", types.ErrPlaceLimitOrderBehindPairLiquidity
 	}
 
 	placeTrancheKey := placeTranche.TrancheKey
@@ -337,7 +335,7 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		coin0 := sdk.NewCoin(tokenIn, msg.AmountIn)
 		err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0})
 		if err != nil {
-			return err
+			return "", err
 		}
 	}
 
@@ -348,10 +346,10 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		msg.TokenIn,
 		msg.AmountIn.String(),
 		msg.AmountIn.String(),
-		strconv.FormatUint(placeTrancheKey, 10),
+		placeTrancheKey,
 	))
 
-	return nil
+	return placeTrancheKey, nil
 }
 
 // Handles MsgCancelLimitOrder, removing a specifed number of shares from a limit order and returning the respective amount in terms of the reserve to the user
@@ -389,11 +387,11 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 		tranche.Save(ctx, k)
 
 	} else {
-		return sdkerrors.Wrapf(types.ErrCancelEmptyLimitOrder, "%d", tranche.TrancheKey)
+		return sdkerrors.Wrapf(types.ErrCancelEmptyLimitOrder, "%s", tranche.TrancheKey)
 	}
 
 	ctx.EventManager().EmitEvent(types.CancelLimitOrderEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.KeyToken, strconv.Itoa(int(msg.TrancheKey)), amountToCancel.String(),
+		token0, token1, msg.KeyToken, msg.TrancheKey, amountToCancel.String(),
 	))
 
 	return nil
@@ -430,7 +428,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		msg.Creator,
 	)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheUserNotFound, "tranche %d, user %s", trancheKey, msg.Creator)
+		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheUserNotFound, "tranche %s, user %s", trancheKey, msg.Creator)
 	}
 
 	sharesToWithdraw := trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled)
@@ -442,7 +440,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 
 	trancheRaw, wasFilled, found := k.FindLimitOrderTranche(ctx, pairId, tickIndex, msg.KeyToken, trancheKey)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheNotFound, "%d", trancheKey)
+		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheNotFound, "%s", trancheKey)
 	}
 
 	tranche := NewLimitOrderTrancheWrapper(&trancheRaw)
@@ -484,7 +482,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	}
 
 	ctx.EventManager().EmitEvent(types.WithdrawFilledLimitOrderEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.KeyToken, strconv.Itoa(int(msg.TrancheKey)), amountOutTokenOut.String(),
+		token0, token1, msg.KeyToken, msg.TrancheKey, amountOutTokenOut.String(),
 	))
 
 	return nil

@@ -31,9 +31,9 @@ func TestFilledLimitOrderTrancheQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetFilledLimitOrderTrancheRequest{
-				PairId:       msgs[0].PairId.Stringify(),
-				TokenIn:      msgs[0].TokenIn,
-				TickIndex:    msgs[0].TickIndex,
+				PairId:     msgs[0].PairId.Stringify(),
+				TokenIn:    msgs[0].TokenIn,
+				TickIndex:  msgs[0].TickIndex,
 				TrancheKey: msgs[0].TrancheKey,
 			},
 			response: &types.QueryGetFilledLimitOrderTrancheResponse{FilledLimitOrderTranche: msgs[0]},
@@ -41,9 +41,9 @@ func TestFilledLimitOrderTrancheQuerySingle(t *testing.T) {
 		{
 			desc: "Second",
 			request: &types.QueryGetFilledLimitOrderTrancheRequest{
-				PairId:       msgs[1].PairId.Stringify(),
-				TokenIn:      msgs[1].TokenIn,
-				TickIndex:    msgs[1].TickIndex,
+				PairId:     msgs[1].PairId.Stringify(),
+				TokenIn:    msgs[1].TokenIn,
+				TickIndex:  msgs[1].TickIndex,
 				TrancheKey: msgs[1].TrancheKey,
 			},
 			response: &types.QueryGetFilledLimitOrderTrancheResponse{FilledLimitOrderTranche: msgs[1]},
@@ -51,10 +51,10 @@ func TestFilledLimitOrderTrancheQuerySingle(t *testing.T) {
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetFilledLimitOrderTrancheRequest{
-				PairId:       "TokenZ<>TokenQ",
-				TokenIn:      strconv.Itoa(100000),
-				TickIndex:    100000,
-				TrancheKey: 100000,
+				PairId:     "TokenZ<>TokenQ",
+				TokenIn:    strconv.Itoa(100000),
+				TickIndex:  100000,
+				TrancheKey: "100000",
 			},
 			err: status.Error(codes.NotFound, "not found"),
 		},

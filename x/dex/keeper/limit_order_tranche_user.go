@@ -25,7 +25,7 @@ func (k Keeper) GetLimitOrderTrancheUser(
 	pairId *types.PairId,
 	tickIndex int64,
 	token string,
-	count uint64,
+	trancheKey string,
 	address string,
 ) (val types.LimitOrderTrancheUser, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderTrancheUserKeyPrefix))
@@ -34,7 +34,7 @@ func (k Keeper) GetLimitOrderTrancheUser(
 		pairId,
 		tickIndex,
 		token,
-		count,
+		trancheKey,
 		address,
 	))
 	if b == nil {
@@ -51,7 +51,7 @@ func (k Keeper) RemoveLimitOrderTrancheUser(
 	pairId *types.PairId,
 	tickIndex int64,
 	token string,
-	count uint64,
+	trancheKey string,
 	address string,
 
 ) {
@@ -60,7 +60,7 @@ func (k Keeper) RemoveLimitOrderTrancheUser(
 		pairId,
 		tickIndex,
 		token,
-		count,
+		trancheKey,
 		address,
 	))
 }

@@ -18,7 +18,7 @@ var _ = strconv.IntSize
 func createNLimitOrderTrancheUser(keeper *keeper.Keeper, ctx sdk.Context, tickIndex int64, token string, n int) []types.LimitOrderTrancheUser {
 	items := make([]types.LimitOrderTrancheUser, n)
 	for i := range items {
-		items[i].TrancheKey = uint64(i)
+		items[i].TrancheKey = strconv.Itoa(i)
 		items[i].Address = strconv.Itoa(i)
 		items[i].PairId = &types.PairId{Token0: "TokenA", Token1: "TokenB"}
 		items[i].Token = token

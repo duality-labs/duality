@@ -96,12 +96,12 @@ func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLim
 
 	tokenIn, tokenOut := GetInOutTokens(msg.TokenIn, msg.TokenA, msg.TokenB)
 
-	err := k.PlaceLimitOrderCore(goCtx, msg, tokenIn, tokenOut, callerAddr)
+	trancheKey, err := k.PlaceLimitOrderCore(goCtx, msg, tokenIn, tokenOut, callerAddr)
 	if err != nil {
 		return &types.MsgPlaceLimitOrderResponse{}, err
 	}
 
-	return &types.MsgPlaceLimitOrderResponse{}, nil
+	return &types.MsgPlaceLimitOrderResponse{TrancheKey: trancheKey}, nil
 }
 
 func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.MsgWithdrawFilledLimitOrder) (*types.MsgWithdrawFilledLimitOrderResponse, error) {

@@ -53,7 +53,7 @@ func CmdListLimitOrderTranche() *cobra.Command {
 
 func CmdShowLimitOrderTranche() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "show-limit-order-tranche [pair-id] [tick-index] [token-in] [tranche-index]",
+		Use:   "show-limit-order-tranche [pair-id] [tick-index] [token-in] [tranche-key]",
 		Short:   "shows a LimitOrderTranche",
 		Example: "show-limit-order-tranche tokenA<>tokenB [5] tokenA 0",
 		Args:    cobra.ExactArgs(4),
@@ -71,12 +71,6 @@ func CmdShowLimitOrderTranche() *cobra.Command {
 			argTokenIn := args[2]
 			argTrancheKey := args[3]
 
-			argTrancheKeyInt, err := strconv.Atoi(argTrancheKey)
-
-			if err != nil {
-				return err
-			}
-
 			argTickIndexInt, err := strconv.Atoi(argTickIndex)
 
 			if err != nil {
@@ -84,10 +78,10 @@ func CmdShowLimitOrderTranche() *cobra.Command {
 			}
 
 			params := &types.QueryGetLimitOrderTrancheRequest{
-				PairId:       argPairId,
-				TickIndex:    int64(argTickIndexInt),
-				TokenIn:      argTokenIn,
-				TrancheKey: uint64(argTrancheKeyInt),
+				PairId:     argPairId,
+				TickIndex:  int64(argTickIndexInt),
+				TokenIn:    argTokenIn,
+				TrancheKey: argTrancheKey,
 			}
 
 			res, err := queryClient.LimitOrderTranche(context.Background(), params)

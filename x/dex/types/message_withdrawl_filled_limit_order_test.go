@@ -23,7 +23,7 @@ func TestMsgWithdrawFilledLimitOrder_ValidateBasic(t *testing.T) {
 				TokenB:       "TokenB",
 				TickIndex:    0,
 				KeyToken:     "TokenA",
-				TrancheKey: 0,
+				TrancheKey: "0",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
@@ -35,7 +35,7 @@ func TestMsgWithdrawFilledLimitOrder_ValidateBasic(t *testing.T) {
 				TokenB:       "TokenB",
 				TickIndex:    0,
 				KeyToken:     "TokenA",
-				TrancheKey: 0,
+				TrancheKey: "0",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
@@ -47,7 +47,7 @@ func TestMsgWithdrawFilledLimitOrder_ValidateBasic(t *testing.T) {
 				TokenB:       "TokenB",
 				TickIndex:    0,
 				KeyToken:     "TokenC",
-				TrancheKey: 0,
+				TrancheKey: "0",
 			},
 			err: ErrInvalidKeyToken,
 		}, {
@@ -59,7 +59,7 @@ func TestMsgWithdrawFilledLimitOrder_ValidateBasic(t *testing.T) {
 				TokenB:       "TokenB",
 				TickIndex:    0,
 				KeyToken:     "TokenA",
-				TrancheKey: 0,
+				TrancheKey: "0",
 			},
 		},
 	}
