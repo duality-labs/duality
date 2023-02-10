@@ -5,6 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
@@ -230,18 +231,17 @@ func (k Keeper) GetAllLimitOrderTrancheAtIndex(sdkCtx sdk.Context, pairId *types
 }
 
 func NewTrancheKey(sdkCtx sdk.Context) string {
-	// NOTE this does require that blockHeight < 1E12 - 1 && totalGas < 1E12 - 1
-	//both should be sufficiently high limits so as never to be reached
-	maxSize := 999_999_999_999
+
 	blockHeight := sdkCtx.BlockHeight()
 	txGas := sdkCtx.GasMeter().GasConsumed()
 	blockGas := sdkCtx.BlockGasMeter().GasConsumed()
 	totalGas := blockGas + txGas
 
-	if blockHeight > int64(maxSize) || totalGas > uint64(maxSize) {
-		panic("Cannot compute tranche key BlockHeight or blockGas is too large")
-	}
-	return fmt.Sprintf("%012d-%012d", blockHeight, totalGas)
+	blockStr := utils.Uint64ToSortableString(uint64(blockHeight))
+	gasStr := utils.Uint64ToSortableString(totalGas)
+
+	return fmt.Sprintf("%s%s", blockStr, gasStr)
+
 }
 
 func (k Keeper) InitPlaceTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64) (types.LimitOrderTranche, error) {
