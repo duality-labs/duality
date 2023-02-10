@@ -12624,7 +12624,6 @@ paths:
           in: path
           required: true
           type: string
-          format: uint64
       tags:
         - Query
   /dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}:
@@ -12849,7 +12848,6 @@ paths:
           in: path
           required: true
           type: string
-          format: uint64
       tags:
         - Query
   /dualitylabs/duality/dex/limit_order_tranche_user:
@@ -13064,7 +13062,6 @@ paths:
           in: path
           required: true
           type: string
-          format: uint64
         - name: address
           in: path
           required: true
@@ -40305,6 +40302,9 @@ definitions:
           type: string
   dualitylabs.duality.dex.MsgPlaceLimitOrderResponse:
     type: object
+    properties:
+      trancheKey:
+        type: string
   dualitylabs.duality.dex.MsgSwapResponse:
     type: object
     properties:
