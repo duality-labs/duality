@@ -34,7 +34,7 @@ func TestTxTestSuite(t *testing.T) {
 }
 
 func findTrancheKeyInTx(tx string) string {
-	re := regexp.MustCompile(`TrancheKey.*?:\"(\d+-\d+)`)
+	re := regexp.MustCompile(`TrancheKey.*?:\\"([a-z0-9]+)`)
 	return re.FindStringSubmatch(tx)[1]
 }
 
