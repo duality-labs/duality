@@ -45,9 +45,9 @@ func (s *TxTestSuite) SetupSuite() {
 	info2, _, err := s.network.Validators[0].ClientCtx.Keyring.NewMnemonic("acc2", keyring.English, sdk.FullFundraiserPath, keyring.DefaultBIP39Passphrase, hd.Secp256k1)
 	s.Require().NoError(err)
 
-	pk := info1.GetPubKey()
+	pk, _ := info1.GetPubKey()
 	s.addr1 = sdk.AccAddress(pk.Address())
-	pk = info2.GetPubKey()
+	pk, _ = info2.GetPubKey()
 	s.addr2 = sdk.AccAddress(pk.Address())
 
 	var commonFlags = []string{

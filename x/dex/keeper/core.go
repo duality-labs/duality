@@ -253,10 +253,10 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		if liq.Price().LT(msg.LimitPrice) {
 			break
 		}
-
+		remainingInDec := sdk.NewDecFromInt(remainingIn)
 		// price only gets worse as we iterate, so we can greedily abort
 		// when the price is too low for minOut to be reached.
-		idealOut := totalOut.Add(remainingIn.ToDec().Mul(liq.Price()).TruncateInt())
+		idealOut := totalOut.Add(remainingInDec.Mul(liq.Price()).TruncateInt())
 		if idealOut.LT(msg.MinOut) {
 			return sdk.Coin{}, types.ErrSlippageLimitReached
 		}

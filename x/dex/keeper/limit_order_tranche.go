@@ -28,8 +28,8 @@ func (t *LimitOrderTrancheWrapper) Cancel(trancheUser types.LimitOrderTrancheUse
 
 	filledAmount := t.PriceTakerToMaker.Mul(totalTokenOutDec)
 	ratioNotFilled := totalTokenInDec.Sub(filledAmount).Quo(totalTokenInDec)
-
-	amountToCancel = trancheUser.SharesOwned.ToDec().Mul(ratioNotFilled).TruncateInt()
+	sharesOwnedDec := sdk.NewDecFromInt(trancheUser.SharesOwned)
+	amountToCancel = sharesOwnedDec.Mul(ratioNotFilled).TruncateInt()
 	t.ReservesTokenIn = t.ReservesTokenIn.Sub(amountToCancel)
 
 	return amountToCancel
@@ -42,9 +42,11 @@ func (t *LimitOrderTrancheWrapper) Swap(maxAmountTaker sdk.Int) (
 	reservesTokenOut := &t.ReservesTokenIn
 	fillTokenIn := &t.ReservesTokenOut
 	totalTokenIn := &t.TotalTokenOut
-	amountFilledTokenOut := maxAmountTaker.ToDec().Mul(t.PriceTakerToMaker).TruncateInt()
+	maxAmountTakerDec := sdk.NewDecFromInt(maxAmountTaker)
+	reservesTokenOutDec := sdk.NewDecFromInt(*reservesTokenOut)
+	amountFilledTokenOut := maxAmountTakerDec.Mul(t.PriceTakerToMaker).TruncateInt()
 	if reservesTokenOut.LTE(amountFilledTokenOut) {
-		inAmount = reservesTokenOut.ToDec().Mul(t.PriceMakerToTaker).TruncateInt()
+		inAmount = reservesTokenOutDec.Mul(t.PriceMakerToTaker).TruncateInt()
 		outAmount = *reservesTokenOut
 		*reservesTokenOut = sdk.ZeroInt()
 		*fillTokenIn = fillTokenIn.Add(inAmount)

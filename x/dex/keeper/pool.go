@@ -63,14 +63,14 @@ func (p *Pool) Swap0To1(maxAmount0 sdk.Int) (inAmount0 sdk.Int, outAmount1 sdk.I
 	reserves0 := &p.LowerTick0.Reserves
 
 	price1To0Upper := sdk.OneDec().Quo(p.Price0To1Upper)
-	maxAmount1 := maxAmount0.ToDec().Mul(p.Price0To1Upper).TruncateInt()
+	maxAmount1 := p.Price0To1Upper.MulInt(maxAmount0).TruncateInt()
 	if reserves1.LTE(maxAmount1) {
 		outAmount1 = *reserves1
-		inAmount0 = reserves1.ToDec().Mul(price1To0Upper).TruncateInt()
+		inAmount0 = price1To0Upper.MulInt(*reserves1).TruncateInt()
 		*reserves0 = reserves0.Add(inAmount0)
 		*reserves1 = sdk.ZeroInt()
 	} else {
-		outAmount1 = maxAmount0.ToDec().Mul(p.Price0To1Upper).TruncateInt()
+		outAmount1 = p.Price0To1Upper.MulInt(maxAmount0).TruncateInt()
 		*reserves0 = reserves0.Add(maxAmount0)
 		*reserves1 = reserves1.Sub(outAmount1)
 		inAmount0 = maxAmount0
@@ -87,14 +87,14 @@ func (p *Pool) Swap1To0(maxAmount1 sdk.Int) (inAmount1 sdk.Int, outAmount0 sdk.I
 	reserves1 := &p.UpperTick1.Reserves
 
 	price0To1Lower := sdk.OneDec().Quo(p.Price1To0Lower)
-	maxAmount0 := maxAmount1.ToDec().Mul(p.Price1To0Lower).TruncateInt()
+	maxAmount0 := p.Price1To0Lower.MulInt(maxAmount1).TruncateInt()
 	if reserves0.LTE(maxAmount0) {
 		outAmount0 = *reserves0
-		inAmount1 = reserves0.ToDec().Mul(price0To1Lower).TruncateInt()
+		inAmount1 = price0To1Lower.MulInt(*reserves0).TruncateInt()
 		*reserves1 = reserves1.Add(inAmount1)
 		*reserves0 = sdk.ZeroInt()
 	} else {
-		outAmount0 = maxAmount1.ToDec().Mul(p.Price1To0Lower).TruncateInt()
+		outAmount0 = p.Price1To0Lower.MulInt(maxAmount1).TruncateInt()
 		*reserves1 = reserves1.Add(maxAmount1)
 		*reserves0 = reserves0.Sub(outAmount0)
 		inAmount1 = maxAmount1
@@ -109,14 +109,14 @@ func CalcGreatestMatchingRatio(
 	amount0 sdk.Int,
 	amount1 sdk.Int,
 ) (resultAmount0 sdk.Int, resultAmount1 sdk.Int) {
-	targetAmount0Dec := targetAmount0.ToDec()
-	targetAmount1Dec := targetAmount1.ToDec()
+	targetAmount0Dec := sdk.NewDecFromInt(targetAmount0)
+	targetAmount1Dec := sdk.NewDecFromInt(targetAmount1)
 
 	// See spec: https://www.notion.so/dualityxyz/Autoswap-Spec-e856fa7b2438403c95147010d479b98c
 	if targetAmount1.GT(sdk.ZeroInt()) {
 		resultAmount0 = sdk.MinInt(
 			amount0,
-			amount1.ToDec().Mul(targetAmount0Dec).Quo(targetAmount1Dec).TruncateInt())
+			targetAmount0Dec.MulInt(amount1).Quo(targetAmount1Dec).TruncateInt())
 	} else {
 		resultAmount0 = amount0
 	}
@@ -124,7 +124,7 @@ func CalcGreatestMatchingRatio(
 	if targetAmount0.GT(sdk.ZeroInt()) {
 		resultAmount1 = sdk.MinInt(
 			amount1,
-			amount0.ToDec().Mul(targetAmount1Dec).Quo(targetAmount0Dec).TruncateInt())
+			targetAmount1Dec.MulInt(amount0).Quo(targetAmount0Dec).TruncateInt())
 	} else {
 		resultAmount1 = amount1
 	}
@@ -183,8 +183,8 @@ func (p *Pool) CalcSharesMinted(
 ) (sharesMinted sdk.Int) {
 	price1To0Center := p.MustCalcPrice1To0Center()
 
-	amount0Dec := amount0.ToDec()
-	amount1Dec := amount1.ToDec()
+	amount0Dec := sdk.NewDecFromInt(amount0)
+	amount1Dec := sdk.NewDecFromInt(amount1)
 	return amount0Dec.Add(amount1Dec.Mul(price1To0Center)).TruncateInt()
 }
 
@@ -204,17 +204,19 @@ func (p *Pool) CalcResidualSharesMinted(
 func (p *Pool) Withdraw(sharesToRemove sdk.Int, totalShares sdk.Int) (outAmount0 sdk.Int, outAmount1 sdk.Int) {
 	reserves0 := &p.LowerTick0.Reserves
 	reserves1 := &p.UpperTick1.Reserves
-	ownershipRatio := sharesToRemove.ToDec().Quo(totalShares.ToDec())
-	outAmount1 = ownershipRatio.Mul(reserves1.ToDec()).TruncateInt()
-	outAmount0 = ownershipRatio.Mul(reserves0.ToDec()).TruncateInt()
+
+	sharesToRemoveDec := sdk.NewDecFromInt(sharesToRemove)
+	ownershipRatio := sharesToRemoveDec.QuoInt(totalShares)
+	outAmount1 = ownershipRatio.MulInt(*reserves1).TruncateInt()
+	outAmount0 = ownershipRatio.MulInt(*reserves0).TruncateInt()
 	*reserves0 = reserves0.Sub(outAmount0)
 	*reserves1 = reserves1.Sub(outAmount1)
 	return outAmount0, outAmount1
 }
 
 func CalcResidualValue(amount0 sdk.Int, amount1 sdk.Int, priceLower1To0 sdk.Dec, fee int64) (sdk.Dec, error) {
-	amount0Dec := amount0.ToDec()
-	amount1Dec := amount1.ToDec()
+	amount0Dec := sdk.NewDecFromInt(amount0)
+	amount1Dec := sdk.NewDecFromInt(amount1)
 	// ResidualValue = Amount0 * (Price1to0Center / Price1to0Upper) + Amount1 * Price1to0Lower
 	amount0Discount, err := utils.CalcPrice0To1(-fee)
 	if err != nil {
