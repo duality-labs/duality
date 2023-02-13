@@ -13,7 +13,8 @@ echo $NAMESPACE_ID
 DA_BLOCK_HEIGHT=$(curl https://rpc-mocha.pops.one/block | jq -r '.result.block.header.height')
 echo $DA_BLOCK_HEIGHT
 
-# ignite chain build
+
+ignite chain build
 dualityd tendermint unsafe-reset-all
 dualityd init $VALIDATOR_NAME --chain-id $CHAIN_ID
 

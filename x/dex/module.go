@@ -147,9 +147,20 @@ func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {}
 // InitGenesis performs the capability module's genesis initialization It returns
 // no validator updates.
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.RawMessage) []abci.ValidatorUpdate {
-	var genState types.GenesisState
+	// var genState types.GenesisState
 	// Initialize global index to index in genesis state
-	cdc.MustUnmarshalJSON(gs, &genState)
+	// cdc.MustUnmarshalJSON(gs, &genState)
+
+	// TEMP: just for testing chain it's easier to have feetiers exist as part of genesis
+	genState := types.GenesisState{
+		FeeTierList: []types.FeeTier{
+			{Id: 0, Fee: 1},
+			{Id: 1, Fee: 3},
+			{Id: 2, Fee: 5},
+			{Id: 3, Fee: 10},
+		},
+	}
+	fmt.Printf("DO gen setup\n")
 
 	InitGenesis(ctx, am.keeper, genState)
 
