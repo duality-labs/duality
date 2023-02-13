@@ -1,9 +1,45 @@
-[![duality-labs](https://circleci.com/gh/duality-labs/duality.svg?style=svg&circle-token=284243a40cb1faeb2751d60ad8046ceb87573865)](<https://app.circleci.com/pipelines/github/duality-labs/duality>)
+# Startup Instructions
 
-Duality is a decentralized exchange optimized for capital efficiency and composability while protecting users from harmful price manipulation. With Duality, liquidity providers and protocols have intuitive, fine grain control over parameters and distribution of liquidity.
+## Setup Celestia Node
 
-Build Steps:
-0. [Install the Ignite CLI](https://docs.ignite.com/guide/install)
-0. To build for your local machine run `ignite chain build`. You can customize the build target like so: `ignite chain build -t linux:arm64`. The binary will output to $GOPATH/bin/dualityd.
+Install celestia node 
 
-For more on duality's functionality and design read our [documentation](https://duality.gitbook.io/duality-documentation/concepts)
+```cd $HOME 
+rm -rf celestia-node 
+git clone https://github.com/celestiaorg/celestia-node.git 
+cd celestia-node/ 
+git checkout tags/v0.6.4 
+make go-install 
+make cel-key ```
+
+Create & fund wallet
+
+```
+./cel-key add <key_name> --keyring-backend test --node.type light --p2p.network mocha
+
+```
+
+request funds in celestia discord 
+
+```$request <Wallet-Address>```
+
+Initialize node 
+```celestia light init ```
+
+
+
+Start node
+
+
+```
+celestia light start --core.ip https://rpc-mocha.pops.one  --keyring.accname <key-name> --gateway --gateway.addr localhost --gateway.port 26659 --p2p.network mocha
+
+```
+
+For more detailed instructions on light node setup see [celestia docs](https://docs.celestia.org/nodes/light-node/)
+
+## Run Duality 
+
+init.sh in root directory should handle build and startup for duality on celestia 
+
+```./init.sh```
