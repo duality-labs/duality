@@ -14,6 +14,7 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/suite"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 const (
@@ -40,7 +41,18 @@ func TestCoreHelpersTestSuite(t *testing.T) {
 }
 
 func (s *CoreHelpersTestSuite) SetupTest() {
-	app := dualityapp.Setup(false)
+	s.alice = sdk.AccAddress([]byte("alice"))
+	s.bob = sdk.AccAddress([]byte("bob"))
+	s.carol = sdk.AccAddress([]byte("carol"))
+	s.dan = sdk.AccAddress([]byte("dan"))
+	val, _ := tmtypes.RandValidator(false, 200)
+	valBal := banktypes.Balance{
+		Address: s.bob.String(),
+		Coins:   sdk.NewCoins(sdk.NewCoin("token", sdk.NewInt(1000000)), sdk.NewCoin("stake", sdk.NewInt(1000000))),
+	}
+	validators := []*tmtypes.Validator{val}
+	accts := []authtypes.GenesisAccount{authtypes.NewBaseAccountWithAddress(sdk.AccAddress(val.Address))}
+	app := dualityapp.SetupWithGenesisValSet(&testing.T{}, tmtypes.NewValidatorSet(validators), accts, valBal)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
 	app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
@@ -78,10 +90,7 @@ func (s *CoreHelpersTestSuite) SetupTest() {
 	s.ctx = ctx
 	s.goCtx = sdk.WrapSDKContext(ctx)
 	s.queryClient = queryClient
-	s.alice = sdk.AccAddress([]byte("alice"))
-	s.bob = sdk.AccAddress([]byte("bob"))
-	s.carol = sdk.AccAddress([]byte("carol"))
-	s.dan = sdk.AccAddress([]byte("dan"))
+
 	s.feeTiers = feeTiers
 }
 
