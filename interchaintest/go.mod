@@ -1,4 +1,4 @@
-module github.com/duality-labs/duality/ibctest
+module github.com/duality-labs/duality/interchaintest
 
 go 1.18
 
@@ -6,22 +6,22 @@ replace (
 	github.com/ChainSafe/go-schnorrkel => github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d
 	github.com/ChainSafe/go-schnorrkel/1 => github.com/ChainSafe/go-schnorrkel v1.0.0
 
-	// For this nested module, you always want to replace the parent reference with the current worktree.
-	github.com/duality-labs/duality => ../
-
 	github.com/cosmos/admin-module => github.com/Ethernal-Tech/admin-module v0.0.0-20221102105340-e693f4d379c3
 	github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.45.11-ics
+
+	// For this nested module, you always want to replace the parent reference with the current worktree.
+	github.com/duality-labs/duality => ../
 
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/vedhavyas/go-subkey => github.com/strangelove-ventures/go-subkey v1.0.7
 )
 
 require (
-	github.com/duality-labs/duality v0.0.0-00010101000000-000000000000
 	github.com/cosmos/cosmos-sdk v0.46.6
 	github.com/cosmos/ibc-go/v3 v3.4.0
+	github.com/duality-labs/duality v0.0.0-00010101000000-000000000000
 	github.com/icza/dyno v0.0.0-20220812133438-f0b6f8a18845
-	github.com/strangelove-ventures/ibctest/v3 v3.0.0-20230124201814-7dd9aa5dc158
+	github.com/strangelove-ventures/interchaintest/v3 v3.0.0-20230208002005-25d7ae3f49f8
 	github.com/strangelove-ventures/packet-forward-middleware/v3 v3.1.1
 	github.com/stretchr/testify v1.8.1
 	go.uber.org/zap v1.23.0
@@ -50,6 +50,7 @@ require (
 	github.com/cosmos/go-bip39 v1.0.0 // indirect
 	github.com/cosmos/gorocksdb v1.2.0 // indirect
 	github.com/cosmos/iavl v0.19.4 // indirect
+	github.com/cosmos/interchain-security v1.0.0-rc2 // indirect
 	github.com/cosmos/ledger-cosmos-go v0.11.1 // indirect
 	github.com/cosmos/ledger-go v0.9.3 // indirect
 	github.com/danieljoos/wincred v1.1.2 // indirect
@@ -95,6 +96,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.5-0.20210104140557-80c98217689d // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hdevalence/ed25519consensus v0.0.0-20220222234857-c00d1f31bab3 // indirect
+	github.com/iancoleman/orderedmap v0.2.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/ipfs/go-cid v0.0.7 // indirect
 	github.com/jmhodges/levigo v1.0.0 // indirect
