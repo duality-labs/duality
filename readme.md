@@ -4,13 +4,15 @@
 
 Install celestia node 
 
-```cd $HOME 
+```
+cd $HOME 
 rm -rf celestia-node 
 git clone https://github.com/celestiaorg/celestia-node.git 
 cd celestia-node/ 
 git checkout tags/v0.6.4 
 make go-install 
-make cel-key ```
+make cel-key 
+```
 
 Create & fund wallet
 
@@ -24,6 +26,7 @@ request funds in celestia discord
 ```$request <Wallet-Address>```
 
 Initialize node 
+
 ```celestia light init ```
 
 
