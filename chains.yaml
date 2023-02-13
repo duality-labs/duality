@@ -2,8 +2,8 @@
 - name: duality
   github-organization: duality-labs
   github-repo: duality
-  language: go
-  build-target: install
+  dockerfile: cosmos
+  build-target: make install
   build-env:
     - LEDGER_ENABLED=false
     - BUILD_TAGS=muslc
