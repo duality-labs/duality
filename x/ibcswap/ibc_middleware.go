@@ -142,6 +142,19 @@ func (im IBCMiddleware) OnRecvPacket(
 	res, err := im.keeper.Swap(ctx, metadata.MsgSwap)
 	if err != nil {
 		swapErr := sdkerrors.Wrap(types.ErrSwapFailed, err.Error())
+		im.keeper.Logger(ctx).Error(
+			"ibc swap failed",
+			"err", swapErr,
+			"creator", metadata.Creator,
+			"receiver", metadata.Receiver,
+			"tokenA", metadata.TokenA,
+			"tokenB", metadata.TokenB,
+			"tokenIn", metadata.TokenIn,
+			"amount in", metadata.AmountIn,
+			"min out", metadata.MinOut,
+			"limit price", metadata.LimitPrice,
+			"refundable", metadata.NonRefundable,
+		)
 
 		// If a refund to the counterparty chain is not being issued we return a successful ack containing the error
 		// This ensures that a refund is not issued on the counterparty chain
@@ -172,9 +185,18 @@ func (im IBCMiddleware) OnRecvPacket(
 	}
 
 	// If there is no next field set in the metadata return ack
-	if metadata.Next == "" {
+	if metadata.Next == nil {
 		return ack
 	}
+
+	memoBz, err := json.Marshal(metadata.Next)
+	if err != nil {
+		return ack
+	}
+
+	// We need to reset the packets memo field so that the root key in the metadata is the
+	// next field from the current metadata.
+	data.Memo = string(memoBz)
 
 	// Set the new packet data to include the token denom and amount that was received from the swap.
 	data.Denom = res.CoinOut.Denom
@@ -185,10 +207,6 @@ func (im IBCMiddleware) OnRecvPacket(
 	// Before passing to the forward middleware we need to override the packet receiver field to now point to the
 	// user controlled address that will be initiating the forward since this is where the funds are after the swap.
 	data.Receiver = m.Swap.Receiver
-
-	// We need to reset the packets memo field so that the root key in the metadata is the
-	// next field from the current metadata.
-	data.Memo = m.Swap.Next
 
 	dataBz, err := transfertypes.ModuleCdc.MarshalJSON(&data)
 	if err != nil {

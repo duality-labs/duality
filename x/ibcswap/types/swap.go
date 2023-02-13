@@ -1,12 +1,15 @@
 package types
 
 import (
+	"encoding/json"
+
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
+	"github.com/iancoleman/orderedmap"
 )
 
 /*
-An example JSON blob that would be marshaled into PacketMetadata where the next field can contain any arbitrary data.
+An example JSON blob that would be marshaled into PacketMetadata where the next field can contain any arbitrary string.
 
 {
   "swap": {
@@ -34,8 +37,11 @@ type PacketMetadata struct {
 // further in the middleware stack or on the counterparty.
 type SwapMetadata struct {
 	*dextypes.MsgSwap
-	NonRefundable bool   `json:"non-refundable,omitempty"`
-	Next          string `json:"next,omitempty"`
+	NonRefundable bool `json:"non-refundable,omitempty"`
+
+	// Using JSONObject so that objects for next property will not be mutated by golang's lexicographic key sort on map keys during Marshal.
+	// Supports primitives for Unmarshal/Marshal so that an escaped JSON-marshaled string is also valid.
+	Next *JSONObject `json:"next,omitempty"`
 }
 
 // Validate ensures that all the required fields are present in the SwapMetadata and contain valid values.
@@ -52,17 +58,53 @@ func (sm SwapMetadata) Validate() error {
 	if sm.TokenIn == "" {
 		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap tokenIn cannot be an empty string")
 	}
-	if sm.AmountIn.IsZero() || sm.AmountIn.IsNil() {
-		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap amountIn cannot be 0 or nil")
-	}
-	if sm.AmountIn.IsNegative() {
-		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap amountIn cannot be negative")
-	}
-	if sm.MinOut.IsZero() || sm.MinOut.IsNil() {
-		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap minOut cannot be 0 or nil")
-	}
-	if sm.MinOut.IsNegative() {
-		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap minOut cannot be negative")
-	}
 	return nil
+}
+
+// JSONObject is a wrapper type to allow either a primitive type or a JSON object.
+// In the case the value is a JSON object, OrderedMap type is used so that key order
+// is retained across Unmarshal/Marshal.
+type JSONObject struct {
+	obj        bool
+	primitive  []byte
+	orderedMap orderedmap.OrderedMap
+}
+
+// NewJSONObject is a constructor used for tests.
+// The usage of JSONObject in the middleware is only json Marshal/Unmarshal
+func NewJSONObject(object bool, primitive []byte, orderedMap orderedmap.OrderedMap) *JSONObject {
+	return &JSONObject{
+		obj:        object,
+		primitive:  primitive,
+		orderedMap: orderedMap,
+	}
+}
+
+// UnmarshalJSON overrides the default json.Unmarshal behavior
+func (o *JSONObject) UnmarshalJSON(b []byte) error {
+	if err := o.orderedMap.UnmarshalJSON(b); err != nil {
+		// If ordered map unmarshal fails, this is a primitive value
+		o.obj = false
+		// Attempt to unmarshal as string, this removes extra JSON escaping
+		var primitiveStr string
+		if err := json.Unmarshal(b, &primitiveStr); err != nil {
+			o.primitive = b
+			return nil
+		}
+		o.primitive = []byte(primitiveStr)
+		return nil
+	}
+	// This is a JSON object, now stored as an ordered map to retain key order.
+	o.obj = true
+	return nil
+}
+
+// MarshalJSON overrides the default json.Marshal behavior
+func (o *JSONObject) MarshalJSON() ([]byte, error) {
+	if o.obj {
+		// non-primitive, return marshaled ordered map.
+		return o.orderedMap.MarshalJSON()
+	}
+	// primitive, return raw bytes.
+	return o.primitive, nil
 }
