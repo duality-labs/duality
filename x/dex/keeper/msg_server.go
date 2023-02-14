@@ -143,7 +143,16 @@ func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.Ms
 		return nil, err
 	}
 
-	err = k.WithdrawFilledLimitOrderCore(goCtx, msg, token0, token1, callerAddr, receiverAddr)
+	err = k.WithdrawFilledLimitOrderCore(
+		goCtx,
+		token0,
+		token1,
+		msg.KeyToken,
+		callerAddr,
+		receiverAddr,
+		msg.TickIndex,
+		msg.Key,
+	)
 	if err != nil {
 		return &types.MsgWithdrawFilledLimitOrderResponse{}, err
 	}
@@ -161,7 +170,16 @@ func (k msgServer) CancelLimitOrder(goCtx context.Context, msg *types.MsgCancelL
 		return nil, err
 	}
 
-	err = k.CancelLimitOrderCore(goCtx, msg, token0, token1, callerAddr, receiverAddr)
+	err = k.CancelLimitOrderCore(
+		goCtx,
+		token0,
+		token1,
+		msg.KeyToken,
+		callerAddr,
+		receiverAddr,
+		msg.TickIndex,
+		msg.Key,
+	)
 	if err != nil {
 		return &types.MsgCancelLimitOrderResponse{}, err
 	}

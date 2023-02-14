@@ -372,17 +372,26 @@ func (k Keeper) PlaceLimitOrderCore(
 }
 
 // Handles MsgCancelLimitOrder, removing a specifed number of shares from a limit order and returning the respective amount in terms of the reserve to the user
-func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancelLimitOrder, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
+func (k Keeper) CancelLimitOrderCore(
+	goCtx context.Context,
+	token0 string,
+	token1 string,
+	keyToken string,
+	callerAddr sdk.AccAddress,
+	receiverAddr sdk.AccAddress,
+	tickIndex int64,
+	trancheKey uint64,
+) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	pairId := CreatePairId(token0, token1)
 
-	trancheRaw, found := k.GetLimitOrderTranche(ctx, pairId, msg.KeyToken, msg.TickIndex, msg.TrancheKey)
+	trancheRaw, found := k.GetLimitOrderTranche(ctx, pairId, keyToken, tickIndex, trancheKey)
 	if !found {
 		return types.ErrActiveLimitOrderNotFound
 	}
 
-	trancheUser, found := k.GetLimitOrderTrancheUser(ctx, pairId, msg.TickIndex, msg.KeyToken, msg.TrancheKey, msg.Creator)
+	trancheUser, found := k.GetLimitOrderTrancheUser(ctx, pairId, tickIndex, keyToken, trancheKey, callerAddr.String())
 	if !found {
 		return types.ErrIntOverflowLimitOrderTrancheUser
 	}
@@ -398,7 +407,7 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 
 	if amountToCancel.GT(sdk.ZeroInt()) {
 		// See top NOTE on rounding
-		coinOut := sdk.NewCoin(msg.KeyToken, amountToCancel)
+		coinOut := sdk.NewCoin(keyToken, amountToCancel)
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
@@ -409,8 +418,14 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 		return sdkerrors.Wrapf(types.ErrCancelEmptyLimitOrder, "%s", tranche.TrancheKey)
 	}
 
-	ctx.EventManager().EmitEvent(types.CancelLimitOrderEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.KeyToken, msg.TrancheKey, amountToCancel.String(),
+	ctx.EventManager().EmitEvent(types.CancelLimitOrderEvent(
+		callerAddr.String(),
+		receiverAddr.String(),
+		token0,
+		token1,
+		keyToken,
+		trancheKey,
+		amountToCancel.String(),
 	))
 
 	return nil
@@ -419,24 +434,24 @@ func (k Keeper) CancelLimitOrderCore(goCtx context.Context, msg *types.MsgCancel
 // Handles MsgWithdrawFilledLimitOrder, calculates and sends filled liqudity from module to user for a limit order based on amount wished to receive.
 func (k Keeper) WithdrawFilledLimitOrderCore(
 	goCtx context.Context,
-	msg *types.MsgWithdrawFilledLimitOrder,
 	token0 string,
 	token1 string,
+	keyToken string,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
+	tickIndex int64,
+	trancheKey uint64,
 ) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId := CreatePairId(token0, token1)
 
-	orderTokenIn := msg.KeyToken
+	orderTokenIn := keyToken
 	var orderTokenOut string
-	if msg.KeyToken == token0 {
+	if keyToken == token0 {
 		orderTokenOut = token1
 	} else {
 		orderTokenOut = token0
 	}
-	trancheKey := msg.TrancheKey
-	tickIndex := msg.TickIndex
 
 	trancheUser, found := k.GetLimitOrderTrancheUser(
 		ctx,
@@ -444,10 +459,10 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		tickIndex,
 		orderTokenIn,
 		trancheKey,
-		msg.Creator,
+		callerAddr.String(),
 	)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheUserNotFound, "tranche %s, user %s", trancheKey, msg.Creator)
+		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheUserNotFound, "tranche %d, user %s", trancheKey, callerAddr)
 	}
 
 	sharesToWithdraw := trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled)
@@ -457,9 +472,9 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		return types.ErrNotEnoughLimitOrderShares
 	}
 
-	trancheRaw, wasFilled, found := k.FindLimitOrderTranche(ctx, pairId, tickIndex, msg.KeyToken, trancheKey)
+	trancheRaw, wasFilled, found := k.FindLimitOrderTranche(ctx, pairId, tickIndex, keyToken, trancheKey)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheNotFound, "%s", trancheKey)
+		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheNotFound, "%d", trancheKey)
 	}
 
 	tranche := NewLimitOrderTrancheWrapper(&trancheRaw)
@@ -500,8 +515,14 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		return types.ErrWithdrawEmptyLimitOrder
 	}
 
-	ctx.EventManager().EmitEvent(types.WithdrawFilledLimitOrderEvent(msg.Creator, msg.Receiver,
-		token0, token1, msg.KeyToken, msg.TrancheKey, amountOutTokenOut.String(),
+	ctx.EventManager().EmitEvent(types.WithdrawFilledLimitOrderEvent(
+		callerAddr.String(),
+		receiverAddr.String(),
+		token0,
+		token1,
+		keyToken,
+		trancheKey,
+		amountOutTokenOut.String(),
 	))
 
 	return nil
