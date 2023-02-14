@@ -230,11 +230,13 @@ func (k Keeper) WithdrawCore(
 
 // Handles core logic for the asset 0 to asset1 direction of MsgSwap; faciliates swapping amount0 for some amount of amount1, given a specified pair (token0, token1)
 func (k Keeper) SwapCore(goCtx context.Context,
-	msg *types.MsgSwap,
 	tokenIn string,
 	tokenOut string,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
+	amountIn sdk.Int,
+	limitPrice sdk.Dec,
+	minOut sdk.Int,
 ) (sdk.Coin, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	cacheCtx, writeCache := ctx.CacheContext()
@@ -247,7 +249,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		return sdk.Coin{}, err
 	}
 
-	remainingIn := msg.AmountIn
+	remainingIn := amountIn
 	totalOut := sdk.ZeroInt()
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
@@ -260,14 +262,14 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		}
 
 		// break as soon as we iterated past tickLimit
-		if liq.Price().LT(msg.LimitPrice) {
+		if liq.Price().LT(limitPrice) {
 			break
 		}
 
 		// price only gets worse as we iterate, so we can greedily abort
 		// when the price is too low for minOut to be reached.
 		idealOut := totalOut.Add(remainingIn.ToDec().Mul(liq.Price()).TruncateInt())
-		if idealOut.LT(msg.MinOut) {
+		if idealOut.LT(minOut) {
 			return sdk.Coin{}, types.ErrSlippageLimitReached
 		}
 
@@ -280,12 +282,12 @@ func (k Keeper) SwapCore(goCtx context.Context,
 
 	}
 
-	if totalOut.LT(msg.MinOut) || msg.AmountIn.Equal(remainingIn) {
+	if totalOut.LT(minOut) || amountIn.Equal(remainingIn) {
 		return sdk.Coin{}, types.ErrSlippageLimitReached
 	}
 
 	// TODO: Move this to a separate ExecuteSwap function. Ditto for all other *Core fns
-	amountToDeposit := msg.AmountIn.Sub(remainingIn)
+	amountToDeposit := amountIn.Sub(remainingIn)
 	coinIn := sdk.NewCoin(tokenIn, amountToDeposit)
 	coinOut := sdk.NewCoin(tokenOut, totalOut)
 
@@ -299,8 +301,8 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		}
 	}
 	writeCache()
-	ctx.EventManager().EmitEvent(types.CreateSwapEvent(msg.Creator, msg.Receiver,
-		tokenIn, tokenOut, msg.AmountIn.String(), totalOut.String(), msg.MinOut.String(),
+	ctx.EventManager().EmitEvent(types.CreateSwapEvent(callerAddr.String(), receiverAddr.String(),
+		tokenIn, tokenOut, amountIn.String(), totalOut.String(), minOut.String(),
 	))
 
 	return coinOut, nil
