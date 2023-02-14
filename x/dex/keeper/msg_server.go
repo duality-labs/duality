@@ -39,13 +39,15 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 
 	Amounts0Deposit, Amounts1Deposit, err := k.DepositCore(
 		goCtx,
-		msg,
 		token0,
 		token1,
 		callerAddr,
 		receiverAddr,
 		amounts0,
 		amounts1,
+		msg.TickIndexes,
+		msg.FeeIndexes,
+		msg.Options,
 	)
 
 	if err != nil {

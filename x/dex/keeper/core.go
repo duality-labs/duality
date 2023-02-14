@@ -17,13 +17,15 @@ import (
 // shares based on amount deposited, and sending funds to moduleAddress.
 func (k Keeper) DepositCore(
 	goCtx context.Context,
-	msg *types.MsgDeposit,
 	token0 string,
 	token1 string,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
 	amounts0 []sdk.Int,
 	amounts1 []sdk.Int,
+	tickIndices []int64,
+	feeIndices []uint64,
+	options []*types.DepositOptions,
 ) (amounts0Deposit []sdk.Int, amounts1Deposit []sdk.Int, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId := CreatePairId(token0, token1)
@@ -40,9 +42,9 @@ func (k Keeper) DepositCore(
 
 	for i, amount0 := range amounts0 {
 		amount1 := amounts1[i]
-		tickIndex := msg.TickIndexes[i]
-		feeIndex := msg.FeeIndexes[i]
-		autoswap := msg.Options[i].Autoswap
+		tickIndex := tickIndices[i]
+		feeIndex := feeIndices[i]
+		autoswap := options[i].Autoswap
 
 		// check that feeIndex is a valid index of the fee tier
 		if feeIndex >= uint64(len(feeTiers)) {
@@ -96,12 +98,12 @@ func (k Keeper) DepositCore(
 		totalAmountReserve1 = totalAmountReserve1.Add(inAmount1)
 
 		ctx.EventManager().EmitEvent(types.CreateDepositEvent(
-			msg.Creator,
-			msg.Receiver,
+			callerAddr.String(),
+			receiverAddr.String(),
 			token0,
 			token1,
-			fmt.Sprint(msg.TickIndexes[i]),
-			fmt.Sprint(msg.FeeIndexes[i]),
+			fmt.Sprint(tickIndices[i]),
+			fmt.Sprint(feeIndices[i]),
 			pool.GetLowerReserve0().Sub(inAmount0).String(),
 			pool.GetUpperReserve1().Sub(inAmount1).String(),
 			pool.GetLowerReserve0().String(),
