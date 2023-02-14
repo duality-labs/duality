@@ -309,7 +309,14 @@ func (k Keeper) SwapCore(goCtx context.Context,
 }
 
 // Handles MsgPlaceLimitOrder, initializing (tick, pair) data structures if needed, calculating and storing information for a new limit order at a specific tick
-func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLimitOrder, tokenIn string, tokenOut string, callerAddr sdk.AccAddress) (trancheKey string, error error) {
+func (k Keeper) PlaceLimitOrderCore(
+	goCtx context.Context,
+	tokenIn string,
+	tokenOut string,
+	callerAddr sdk.AccAddress,
+	receiverAddr sdk.AccAddress,
+	amountIn sdk.Int,
+	tickIndex int64) (trancheKey string, error error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	token0, token1, err := SortTokens(tokenIn, tokenOut)
@@ -317,8 +324,6 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		return "", err
 	}
 	pairId := CreatePairId(token0, token1)
-	tickIndex := msg.TickIndex
-	receiver := msg.Receiver
 
 	placeTranche, found := k.GetPlaceTranche(ctx, pairId, tokenIn, tickIndex)
 
@@ -329,36 +334,37 @@ func (k Keeper) PlaceLimitOrderCore(goCtx context.Context, msg *types.MsgPlaceLi
 		}
 	}
 
-	if k.IsBehindEnemyLines(ctx, pairId, msg.TokenIn, tickIndex) {
+	if k.IsBehindEnemyLines(ctx, pairId, tokenIn, tickIndex) {
 		return "", types.ErrPlaceLimitOrderBehindPairLiquidity
 	}
 
 	placeTrancheKey := placeTranche.TrancheKey
 
-	trancheUser := k.GetOrInitLimitOrderTrancheUser(goCtx, pairId, tickIndex, tokenIn, placeTrancheKey, receiver)
+	trancheUser := k.GetOrInitLimitOrderTrancheUser(goCtx, pairId, tickIndex, tokenIn, placeTrancheKey, receiverAddr.String())
 
-	placeTranche.ReservesTokenIn = placeTranche.ReservesTokenIn.Add(msg.AmountIn)
-	placeTranche.TotalTokenIn = placeTranche.TotalTokenIn.Add(msg.AmountIn)
-	trancheUser.SharesOwned = trancheUser.SharesOwned.Add(msg.AmountIn)
+	placeTranche.ReservesTokenIn = placeTranche.ReservesTokenIn.Add(amountIn)
+	placeTranche.TotalTokenIn = placeTranche.TotalTokenIn.Add(amountIn)
+	trancheUser.SharesOwned = trancheUser.SharesOwned.Add(amountIn)
 
-	if msg.AmountIn.GT(sdk.ZeroInt()) {
+	if amountIn.GT(sdk.ZeroInt()) {
 		k.SetLimitOrderTranche(ctx, placeTranche)
 		k.SetLimitOrderTrancheUser(ctx, trancheUser)
 
-		coin0 := sdk.NewCoin(tokenIn, msg.AmountIn)
+		coin0 := sdk.NewCoin(tokenIn, amountIn)
 		err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0})
 		if err != nil {
 			return "", err
 		}
 	}
 
-	ctx.EventManager().EmitEvent(types.CreatePlaceLimitOrderEvent(msg.Creator,
-		msg.Receiver,
+	ctx.EventManager().EmitEvent(types.CreatePlaceLimitOrderEvent(
+		callerAddr.String(),
+		receiverAddr.String(),
 		token0,
 		token1,
-		msg.TokenIn,
-		msg.AmountIn.String(),
-		msg.AmountIn.String(),
+		tokenIn,
+		amountIn.String(),
+		amountIn.String(),
 		placeTrancheKey,
 	))
 

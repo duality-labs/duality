@@ -113,10 +113,19 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 
 func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLimitOrder) (*types.MsgPlaceLimitOrderResponse, error) {
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
+	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
 	tokenIn, tokenOut := GetInOutTokens(msg.TokenIn, msg.TokenA, msg.TokenB)
 
-	trancheKey, err := k.PlaceLimitOrderCore(goCtx, msg, tokenIn, tokenOut, callerAddr)
+	trancheKey, err := k.PlaceLimitOrderCore(
+		goCtx,
+		tokenIn,
+		tokenOut,
+		callerAddr,
+		receiverAddr,
+		msg.AmountIn,
+		msg.TickIndex,
+	)
 	if err != nil {
 		return &types.MsgPlaceLimitOrderResponse{}, err
 	}
