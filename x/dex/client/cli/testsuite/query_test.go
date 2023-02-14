@@ -450,7 +450,7 @@ func (s *QueryTestSuite) TestQueryCmdListLimitOrderTrancheUser() {
 	}
 }
 
-func (s *QueryTestSuite) TestQueryListFilledLimitOrderTranche() {
+func (s *QueryTestSuite) TestQueryCmdListFilledLimitOrderTranche() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
 	testCases := []struct {
@@ -482,6 +482,65 @@ func (s *QueryTestSuite) TestQueryListFilledLimitOrderTranche() {
 				require.NotEmpty(s.T(), res)
 				require.Equal(s.T(), tc.expOutput, res.FilledLimitOrderTranche)
 
+			}
+		})
+	}
+}
+
+func (s *QueryTestSuite) TestQueryCmdShowFilledLimitOrderTranche() {
+	val := s.network.Validators[0]
+	clientCtx := val.ClientCtx
+	testCases := []struct {
+		name      string
+		args      []string
+		expErr    bool
+		expErrMsg string
+		expOutput types.FilledLimitOrderTranche
+	}{
+		//show-filled-limit-order-tranche [pair-id] [token-in] [tick-index] [tranche-index]",
+		{
+			name:      "valid",
+			args:      []string{"TokenA<>TokenB", "TokenB", "0", "0"},
+			expOutput: filledLimitOrderTrancheList[0],
+		},
+		{
+			name:      "invalid pair",
+			args:      []string{"TokenC<>TokenB", "TokenB", "0", "0"},
+			expErr:    true,
+			expErrMsg: "key not found",
+		},
+		{
+			name:      "too many parameters",
+			args:      []string{"TokenC<>TokenB", "TokenB", "0", "0", "Extra arg"},
+			expErr:    true,
+			expErrMsg: "Error: accepts 4 arg(s), received 5",
+		},
+		{
+			name:      "no parameters",
+			args:      []string{},
+			expErr:    true,
+			expErrMsg: "Error: accepts 4 arg(s), received 0",
+		},
+		{
+			name:      "too few parameters",
+			args:      []string{"TokenC<>TokenB", "TokenB", "0"},
+			expErr:    true,
+			expErrMsg: "Error: accepts 4 arg(s), received 3",
+		},
+	}
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			cmd := dexClient.CmdShowFilledLimitOrderTranche()
+			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
+			if tc.expErr {
+				require.Error(s.T(), err)
+				require.Contains(s.T(), out.String(), tc.expErrMsg)
+			} else {
+				require.NoError(s.T(), err)
+				var res types.QueryGetFilledLimitOrderTrancheResponse
+				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
+				require.NotEmpty(s.T(), res)
+				require.Equal(s.T(), tc.expOutput, res.FilledLimitOrderTranche)
 			}
 		})
 	}
