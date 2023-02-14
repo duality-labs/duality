@@ -380,7 +380,7 @@ func (k Keeper) CancelLimitOrderCore(
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
 	tickIndex int64,
-	trancheKey uint64,
+	trancheKey string,
 ) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -440,7 +440,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
 	tickIndex int64,
-	trancheKey uint64,
+	trancheKey string,
 ) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId := CreatePairId(token0, token1)
@@ -462,7 +462,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		callerAddr.String(),
 	)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheUserNotFound, "tranche %d, user %s", trancheKey, callerAddr)
+		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheUserNotFound, "tranche %s, user %s", trancheKey, callerAddr)
 	}
 
 	sharesToWithdraw := trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled)
@@ -474,7 +474,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 
 	trancheRaw, wasFilled, found := k.FindLimitOrderTranche(ctx, pairId, tickIndex, keyToken, trancheKey)
 	if !found {
-		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheNotFound, "%d", trancheKey)
+		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheNotFound, "%s", trancheKey)
 	}
 
 	tranche := NewLimitOrderTrancheWrapper(&trancheRaw)
