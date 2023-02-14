@@ -1,0 +1,36 @@
+name: duality-rollkit
+version: '3.8'
+services:
+  # celestia-lc:
+  #   image: celestia-node
+  #   volumes:
+  #     - ${KEY_PATH}/celestia-lc/:${NODE_STORE}/keys:ro
+  #     - ${PWD}/scripts/celestia-lc/:/scripts:ro
+  #   ports:
+  #     - 9092:9090
+  #     - 26659:26659
+  #   env_file:
+  #     - ${PWD}/celestia-lc.env
+  #   command: /bin/sh -c '/scripts/init.sh && /scripts/start.sh'
+  duality:
+    image: duality-rollkit-aggregator:0.0.1
+    volumes:
+      - ${KEY_PATH}/duality-rollkit/:/keys
+      - ${PWD}/scripts/duality/:/scripts
+    env_file:
+      - ${PWD}/duality.env
+    ports:
+      - 26656:26656
+      - 26657:26657
+      - 9090:9090
+      - 9091:9091
+      - 1317:1317
+    command: >
+      /bin/sh -c '
+        #!/bin/bash/
+        /scripts/init.sh
+        if [ ! -z ${GENESIS} ]
+        then
+          /scripts/genesis.sh
+        fi
+        /scripts/start.sh'
