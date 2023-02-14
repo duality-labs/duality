@@ -132,7 +132,16 @@ func (k Keeper) DepositCore(
 
 // Handles core logic for MsgWithdrawl; calculating and withdrawing reserve0,reserve1 from a specified tick given a specfied number of shares to remove.
 // Calculates the amount of reserve0, reserve1 to withdraw based on the percetange of the desired number of shares to remove compared to the total number of shares at the given tick
-func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, token0 string, token1 string, callerAddr sdk.AccAddress, receiverAddr sdk.AccAddress) error {
+func (k Keeper) WithdrawCore(
+	goCtx context.Context,
+	token0 string,
+	token1 string,
+	callerAddr sdk.AccAddress,
+	receiverAddr sdk.AccAddress,
+	sharesToRemoveList []sdk.Int,
+	tickIndices []int64,
+	feeIndices []uint64,
+) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId := CreatePairId(token0, token1)
@@ -140,9 +149,9 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 	totalReserve1ToRemove := sdk.ZeroInt()
 	feeTiers := k.GetAllFeeTier(ctx)
 
-	for i, feeIndex := range msg.FeeIndexes {
-		sharesToRemove := msg.SharesToRemove[i]
-		tickIndex := msg.TickIndexes[i]
+	for i, feeIndex := range feeIndices {
+		sharesToRemove := sharesToRemoveList[i]
+		tickIndex := tickIndices[i]
 
 		// check that feeIndex is a valid index of the fee tier
 		if feeIndex >= uint64(len(feeTiers)) {
@@ -160,7 +169,7 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
 		if totalShares.LT(sharesToRemove) {
-			return sdkerrors.Wrapf(types.ErrInsufficientShares, "%s does not have %s shares of type %s", msg.Creator, sharesToRemove, sharesId)
+			return sdkerrors.Wrapf(types.ErrInsufficientShares, "%s does not have %s shares of type %s", callerAddr, sharesToRemove, sharesId)
 		}
 
 		outAmount0, outAmount1 := pool.Withdraw(sharesToRemove, totalShares)
@@ -175,12 +184,12 @@ func (k Keeper) WithdrawCore(goCtx context.Context, msg *types.MsgWithdrawl, tok
 		totalReserve1ToRemove = totalReserve1ToRemove.Add(outAmount1)
 
 		ctx.EventManager().EmitEvent(types.CreateWithdrawEvent(
-			msg.Creator,
-			msg.Receiver,
+			callerAddr.String(),
+			receiverAddr.String(),
 			token0,
 			token1,
-			fmt.Sprint(msg.TickIndexes[i]),
-			fmt.Sprint(msg.FeeIndexes[i]),
+			fmt.Sprint(tickIndices[i]),
+			fmt.Sprint(feeIndices[i]),
 			pool.LowerTick0.Reserves.Add(outAmount0).String(),
 			pool.UpperTick1.Reserves.Add(outAmount1).String(),
 			pool.LowerTick0.Reserves.String(),

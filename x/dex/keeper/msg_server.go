@@ -69,7 +69,16 @@ func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*t
 		return nil, err
 	}
 
-	err = k.WithdrawCore(goCtx, msg, token0, token1, callerAddr, receiverAddr)
+	err = k.WithdrawCore(
+		goCtx,
+		token0,
+		token1,
+		callerAddr,
+		receiverAddr,
+		msg.SharesToRemove,
+		msg.TickIndexes,
+		msg.FeeIndexes,
+	)
 	if err != nil {
 		return nil, err
 	}
