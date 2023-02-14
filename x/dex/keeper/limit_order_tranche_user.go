@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 // SetLimitOrderTrancheUser set a specific LimitOrderTrancheUser in the store from its index
@@ -22,7 +22,7 @@ func (k Keeper) SetLimitOrderTrancheUser(ctx sdk.Context, LimitOrderTrancheUser 
 // GetLimitOrderTrancheUser returns a LimitOrderTrancheUser from its index
 func (k Keeper) GetLimitOrderTrancheUser(
 	ctx sdk.Context,
-	pairId string,
+	pairId *types.PairId,
 	tickIndex int64,
 	token string,
 	count uint64,
@@ -48,7 +48,7 @@ func (k Keeper) GetLimitOrderTrancheUser(
 // RemoveLimitOrderTrancheUser removes a LimitOrderTrancheUser from the store
 func (k Keeper) RemoveLimitOrderTrancheUser(
 	ctx sdk.Context,
-	pairId string,
+	pairId *types.PairId,
 	tickIndex int64,
 	token string,
 	count uint64,
@@ -68,6 +68,33 @@ func (k Keeper) RemoveLimitOrderTrancheUser(
 // GetAllLimitOrderTrancheUser returns all LimitOrderTrancheUser
 func (k Keeper) GetAllLimitOrderTrancheUser(ctx sdk.Context) (list []types.LimitOrderTrancheUser) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderTrancheUserKeyPrefix))
+	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var val types.LimitOrderTrancheUser
+		k.cdc.MustUnmarshal(iterator.Value(), &val)
+		list = append(list, val)
+	}
+
+	return
+}
+
+func LimitOrderTrancheUserAddressPrefix(address string) []byte {
+
+	key := types.KeyPrefix(types.LimitOrderTrancheUserKeyPrefix)
+	addressBytes := []byte(address)
+	key = append(key, addressBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+func (k Keeper) GetAllLimitOrderTrancheUserForAddress(ctx sdk.Context, address sdk.AccAddress) (list []types.LimitOrderTrancheUser) {
+
+	addressPrefix := LimitOrderTrancheUserAddressPrefix(address.String())
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), addressPrefix)
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()

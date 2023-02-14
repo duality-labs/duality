@@ -2,12 +2,14 @@ package cli
 
 import (
 	"strconv"
+	"strings"
 
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/spf13/cobra"
 )
 
@@ -15,17 +17,20 @@ var _ = strconv.Itoa(0)
 
 func CmdPlaceLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "place-limit-order [receiver] [token-a] [token-b] [tick-index] [token-in] [amount-in]",
-		Short: "Broadcast message PlaceLimitOrder",
-		Args:  cobra.ExactArgs(5),
+		Use:     "place-limit-order [receiver] [token-a] [token-b] [tick-index] [token-in] [amount-in]",
+		Short:   "Broadcast message PlaceLimitOrder",
+		Example: "place-limit-order alice tokenA tokenB [-10] tokenA 50 --from alice",
+		Args:    cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
 			argTokenA := args[1]
 			argTokenB := args[2]
+			if strings.HasPrefix(args[3], "[") && strings.HasSuffix(args[3], "]") {
+				args[3] = strings.TrimPrefix(args[3], "[")
+				args[3] = strings.TrimSuffix(args[3], "]")
+			}
 			argTickIndex := args[3]
-
 			argTickIndexInt, err := strconv.Atoi(argTickIndex)
-
 			if err != nil {
 				return err
 			}
@@ -33,10 +38,9 @@ func CmdPlaceLimitOrder() *cobra.Command {
 			argTokenIn := args[4]
 			argAmountIn := args[5]
 
-			argAmountInDec, err := sdk.NewDecFromStr(argAmountIn)
-
-			if err != nil {
-				return err
+			amountInInt, ok := sdk.NewIntFromString(argAmountIn)
+			if ok != true {
+				return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for amount-in")
 			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -51,7 +55,7 @@ func CmdPlaceLimitOrder() *cobra.Command {
 				argTokenB,
 				int64(argTickIndexInt),
 				argTokenIn,
-				argAmountInDec,
+				amountInInt,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

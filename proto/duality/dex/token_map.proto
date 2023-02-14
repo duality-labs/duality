@@ -1,0 +1,11 @@
+syntax = "proto3";
+package dualitylabs.duality.dex;
+
+option go_package = "github.com/duality-labs/duality/x/dex/types";
+
+message TokenMap {
+  string address = 1; 
+  int64 index = 2; 
+  
+}
+

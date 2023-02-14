@@ -3,8 +3,9 @@ package types
 import (
 	"testing"
 
-	"github.com/NicholasDotSol/duality/testutil/sample"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/duality-labs/duality/testutil/sample"
 	"github.com/stretchr/testify/require"
 )
 
@@ -15,15 +16,110 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 		err  error
 	}{
 		{
-			name: "invalid address",
+			name: "invalid creator",
 			msg: MsgDeposit{
-				Creator: "invalid_address",
+				Creator:     "invalid_address",
+				Receiver:    sample.AccAddress(),
+				FeeIndexes:  []uint64{0},
+				TickIndexes: []int64{0},
+				AmountsA:    []sdk.Int{sdk.OneInt()},
+				AmountsB:    []sdk.Int{sdk.OneInt()},
 			},
 			err: sdkerrors.ErrInvalidAddress,
-		}, {
-			name: "valid address",
+		},
+		{
+			name: "invalid receiver",
 			msg: MsgDeposit{
-				Creator: sample.AccAddress(),
+				Creator:     sample.AccAddress(),
+				Receiver:    "invalid address",
+				FeeIndexes:  []uint64{0},
+				TickIndexes: []int64{0},
+				AmountsA:    []sdk.Int{sdk.OneInt()},
+				AmountsB:    []sdk.Int{sdk.OneInt()},
+			},
+			err: sdkerrors.ErrInvalidAddress,
+		},
+		{
+			name: "invalid fee indexes length",
+			msg: MsgDeposit{
+				Creator:     sample.AccAddress(),
+				Receiver:    sample.AccAddress(),
+				FeeIndexes:  []uint64{0},
+				TickIndexes: []int64{},
+				AmountsA:    []sdk.Int{},
+				AmountsB:    []sdk.Int{},
+			},
+			err: ErrUnbalancedTxArray,
+		},
+		{
+			name: "invalid tick indexes length",
+			msg: MsgDeposit{
+				Creator:     sample.AccAddress(),
+				Receiver:    sample.AccAddress(),
+				FeeIndexes:  []uint64{},
+				TickIndexes: []int64{0},
+				AmountsA:    []sdk.Int{},
+				AmountsB:    []sdk.Int{},
+			},
+			err: ErrUnbalancedTxArray,
+		},
+		{
+			name: "invalid amounts A length",
+			msg: MsgDeposit{
+				Creator:     sample.AccAddress(),
+				Receiver:    sample.AccAddress(),
+				FeeIndexes:  []uint64{},
+				TickIndexes: []int64{},
+				AmountsA:    []sdk.Int{sdk.OneInt()},
+				AmountsB:    []sdk.Int{},
+			},
+			err: ErrUnbalancedTxArray,
+		},
+		{
+			name: "invalid amounts B length",
+			msg: MsgDeposit{
+				Creator:     sample.AccAddress(),
+				Receiver:    sample.AccAddress(),
+				FeeIndexes:  []uint64{},
+				TickIndexes: []int64{},
+				AmountsA:    []sdk.Int{},
+				AmountsB:    []sdk.Int{sdk.OneInt()},
+			},
+			err: ErrUnbalancedTxArray,
+		},
+		{
+			name: "invalid no deposit",
+			msg: MsgDeposit{
+				Creator:     sample.AccAddress(),
+				Receiver:    sample.AccAddress(),
+				FeeIndexes:  []uint64{},
+				TickIndexes: []int64{},
+				AmountsA:    []sdk.Int{},
+				AmountsB:    []sdk.Int{},
+			},
+			err: ErrZeroDeposit,
+		},
+		{
+			name: "invalid no deposit",
+			msg: MsgDeposit{
+				Creator:     sample.AccAddress(),
+				Receiver:    sample.AccAddress(),
+				FeeIndexes:  []uint64{0},
+				TickIndexes: []int64{0},
+				AmountsA:    []sdk.Int{sdk.ZeroInt()},
+				AmountsB:    []sdk.Int{sdk.ZeroInt()},
+			},
+			err: ErrZeroDeposit,
+		},
+		{
+			name: "valid msg",
+			msg: MsgDeposit{
+				Creator:     sample.AccAddress(),
+				Receiver:    sample.AccAddress(),
+				FeeIndexes:  []uint64{0},
+				TickIndexes: []int64{0},
+				AmountsA:    []sdk.Int{sdk.OneInt()},
+				AmountsB:    []sdk.Int{sdk.OneInt()},
 			},
 		},
 	}

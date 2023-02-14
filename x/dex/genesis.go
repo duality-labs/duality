@@ -1,24 +1,15 @@
 package dex
 
 import (
-	"github.com/NicholasDotSol/duality/x/dex/keeper"
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/dex/keeper"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 
-	// Set all the pairMap
-	for _, elem := range genState.PairMapList {
-		k.SetPairMap(ctx, elem)
-		// Set all the tickMap
-		for _, elem2 := range genState.TickMapList {
-			k.SetTickMap(ctx, elem.PairId, elem2)
-		}
-
-	}
 	// Set all the tokens
 	for _, elem := range genState.TokensList {
 		k.SetTokens(ctx, elem)
@@ -30,38 +21,31 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, elem := range genState.TokenMapList {
 		k.SetTokenMap(ctx, elem)
 	}
-	// Set all the shares
-	for _, elem := range genState.SharesList {
-		k.SetShares(ctx, elem)
-	}
-	// Set all the feeList
-	for _, elem := range genState.FeeListList {
-		k.SetFeeList(ctx, elem)
+	// Set all the FeeTier
+	for _, elem := range genState.FeeTierList {
+		k.SetFeeTier(ctx, elem)
 	}
 
-	// Set feeList count
-	k.SetFeeListCount(ctx, genState.FeeListCount)
-	// Set all the edgeRow
-	for _, elem := range genState.EdgeRowList {
-		k.SetEdgeRow(ctx, elem)
+	// Set FeeTier count
+	k.SetFeeTierCount(ctx, genState.FeeTierCount)
+
+	// Set all the tickLiquidity
+	for _, elem := range genState.TickLiquidityList {
+		switch elem.Liquidity.(type) {
+		case *types.TickLiquidity_PoolReserves:
+			k.SetPoolReserves(ctx, *elem.GetPoolReserves())
+		case *types.TickLiquidity_LimitOrderTranche:
+			k.SetLimitOrderTranche(ctx, *elem.GetLimitOrderTranche())
+		}
+	}
+	// Set all the filledLimitOrderTranche
+	for _, elem := range genState.FilledLimitOrderTrancheList {
+		k.SetFilledLimitOrderTranche(ctx, elem)
 	}
 
-	// Set edgeRow count
-	k.SetEdgeRowCount(ctx, genState.EdgeRowCount)
-	// Set all the adjanceyMatrix
-	for _, elem := range genState.AdjanceyMatrixList {
-		k.SetAdjanceyMatrix(ctx, elem)
-	}
-
-	// Set adjanceyMatrix count
-	k.SetAdjanceyMatrixCount(ctx, genState.AdjanceyMatrixCount)
 	// Set all the LimitOrderTrancheUser
 	for _, elem := range genState.LimitOrderTrancheUserList {
 		k.SetLimitOrderTrancheUser(ctx, elem)
-	}
-	// Set all the LimitOrderTranche
-	for _, elem := range genState.LimitOrderTrancheList {
-		k.SetLimitOrderTranche(ctx, elem)
 	}
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
@@ -72,20 +56,14 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
 	genesis.Params = k.GetParams(ctx)
 
-	genesis.TickMapList = k.GetAllTickMap(ctx)
-	genesis.PairMapList = k.GetAllPairMap(ctx)
 	genesis.TokensList = k.GetAllTokens(ctx)
 	genesis.TokensCount = k.GetTokensCount(ctx)
 	genesis.TokenMapList = k.GetAllTokenMap(ctx)
-	genesis.SharesList = k.GetAllShares(ctx)
-	genesis.FeeListList = k.GetAllFeeList(ctx)
-	genesis.FeeListCount = k.GetFeeListCount(ctx)
-	genesis.EdgeRowList = k.GetAllEdgeRow(ctx)
-	genesis.EdgeRowCount = k.GetEdgeRowCount(ctx)
-	genesis.AdjanceyMatrixList = k.GetAllAdjanceyMatrix(ctx)
-	genesis.AdjanceyMatrixCount = k.GetAdjanceyMatrixCount(ctx)
+	genesis.FeeTierList = k.GetAllFeeTier(ctx)
+	genesis.FeeTierCount = k.GetFeeTierCount(ctx)
 	genesis.LimitOrderTrancheUserList = k.GetAllLimitOrderTrancheUser(ctx)
-	genesis.LimitOrderTrancheList = k.GetAllLimitOrderTranche(ctx)
+	genesis.TickLiquidityList = k.GetAllTickLiquidity(ctx)
+	genesis.FilledLimitOrderTrancheList = k.GetAllFilledLimitOrderTranche(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis

@@ -10,9 +10,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	keepertest "github.com/NicholasDotSol/duality/testutil/keeper"
-	"github.com/NicholasDotSol/duality/testutil/nullify"
-	"github.com/NicholasDotSol/duality/x/dex/types"
+	keepertest "github.com/duality-labs/duality/testutil/keeper"
+	"github.com/duality-labs/duality/testutil/nullify"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 // Prevent strconv unused error
@@ -21,7 +21,7 @@ var _ = strconv.IntSize
 func TestLimitOrderTrancheUserQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderTrancheUser(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 2)
+	msgs := createNLimitOrderTrancheUser(keeper, ctx, 0, "TokenA", 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetLimitOrderTrancheUserRequest
@@ -84,7 +84,7 @@ func TestLimitOrderTrancheUserQuerySingle(t *testing.T) {
 func TestLimitOrderTrancheUserQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderTrancheUser(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 5)
+	msgs := createNLimitOrderTrancheUser(keeper, ctx, 0, "TokenA", 5)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderTrancheUserRequest {
 		return &types.QueryAllLimitOrderTrancheUserRequest{

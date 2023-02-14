@@ -3,8 +3,9 @@ package types
 import (
 	"testing"
 
-	"github.com/NicholasDotSol/duality/testutil/sample"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/duality-labs/duality/testutil/sample"
 	"github.com/stretchr/testify/require"
 )
 
@@ -15,15 +16,96 @@ func TestMsgSwap_ValidateBasic(t *testing.T) {
 		err  error
 	}{
 		{
-			name: "invalid address",
+			name: "invalid creator",
 			msg: MsgSwap{
-				Creator: "invalid_address",
+				Creator:  "invalid_address",
+				Receiver: sample.AccAddress(),
+				TokenA:   "TokenA",
+				TokenB:   "TokenB",
+				AmountIn: sdk.OneInt(),
+				TokenIn:  "TokenA",
+				MinOut:   sdk.ZeroInt(),
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
-			name: "valid address",
+			name: "invalid receiver",
 			msg: MsgSwap{
-				Creator: sample.AccAddress(),
+				Creator:  sample.AccAddress(),
+				Receiver: "invalid address",
+				TokenA:   "TokenA",
+				TokenB:   "TokenB",
+				AmountIn: sdk.OneInt(),
+				TokenIn:  "TokenA",
+				MinOut:   sdk.ZeroInt(),
+			},
+			err: sdkerrors.ErrInvalidAddress,
+		}, {
+			name: "invalid token in",
+			msg: MsgSwap{
+				Creator:    sample.AccAddress(),
+				Receiver:   sample.AccAddress(),
+				TokenA:     "TokenA",
+				TokenB:     "TokenB",
+				AmountIn:   sdk.OneInt(),
+				TokenIn:    "TokenC",
+				MinOut:     sdk.ZeroInt(),
+				LimitPrice: sdk.ZeroDec(),
+			},
+			err: ErrInvalidTokenIn,
+		},
+		{
+			name: "invalid zero swap",
+			msg: MsgSwap{
+				Creator:    sample.AccAddress(),
+				Receiver:   sample.AccAddress(),
+				TokenA:     "TokenA",
+				TokenB:     "TokenB",
+				AmountIn:   sdk.ZeroInt(),
+				TokenIn:    "TokenA",
+				MinOut:     sdk.ZeroInt(),
+				LimitPrice: sdk.ZeroDec(),
+			},
+			err: ErrZeroSwap,
+		},
+		{
+			name: "invalid negative minOut",
+			msg: MsgSwap{
+				Creator:    sample.AccAddress(),
+				Receiver:   sample.AccAddress(),
+				TokenA:     "TokenA",
+				TokenB:     "TokenB",
+				AmountIn:   sdk.OneInt(),
+				TokenIn:    "TokenA",
+				MinOut:     sdk.NewInt(-1),
+				LimitPrice: sdk.ZeroDec(),
+			},
+			err: ErrNegativeMinOut,
+		},
+		{
+			name: "invalid zero limitPrice",
+			msg: MsgSwap{
+				Creator:    sample.AccAddress(),
+				Receiver:   sample.AccAddress(),
+				TokenA:     "TokenA",
+				TokenB:     "TokenB",
+				AmountIn:   sdk.OneInt(),
+				TokenIn:    "TokenA",
+				MinOut:     sdk.ZeroInt(),
+				LimitPrice: sdk.NewDec(-1),
+			},
+			err: ErrNegativeLimitPrice,
+		},
+		{
+			name: "valid msg",
+			msg: MsgSwap{
+				Creator:    sample.AccAddress(),
+				Receiver:   sample.AccAddress(),
+				TokenA:     "TokenA",
+				TokenB:     "TokenB",
+				AmountIn:   sdk.OneInt(),
+				TokenIn:    "TokenA",
+				MinOut:     sdk.ZeroInt(),
+				LimitPrice: sdk.ZeroDec(),
 			},
 		},
 	}

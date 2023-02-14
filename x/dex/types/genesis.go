@@ -10,16 +10,12 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		TickMapList:               []TickMap{},
-		PairMapList:               []PairMap{},
-		TokensList:                []Tokens{},
-		TokenMapList:              []TokenMap{},
-		SharesList:                []Shares{},
-		FeeListList:               []FeeList{},
-		EdgeRowList:               []EdgeRow{},
-		AdjanceyMatrixList:        []AdjanceyMatrix{},
-		LimitOrderTrancheUserList: []LimitOrderTrancheUser{},
-		LimitOrderTrancheList:     []LimitOrderTranche{},
+		TokensList:                  []Tokens{},
+		TokenMapList:                []TokenMap{},
+		FeeTierList:                 []FeeTier{},
+		LimitOrderTrancheUserList:   []LimitOrderTrancheUser{},
+		TickLiquidityList:           []TickLiquidity{},
+		FilledLimitOrderTrancheList: []FilledLimitOrderTranche{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -28,26 +24,6 @@ func DefaultGenesis() *GenesisState {
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	// Check for duplicated index in tickMap
-	tickMapIndexMap := make(map[string]struct{})
-
-	for _, elem := range gs.TickMapList {
-		index := string(TickMapKey(elem.PairId, elem.TickIndex))
-		if _, ok := tickMapIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for tickMap")
-		}
-		tickMapIndexMap[index] = struct{}{}
-	}
-	// Check for duplicated index in pairMap
-	pairMapIndexMap := make(map[string]struct{})
-
-	for _, elem := range gs.PairMapList {
-		index := string(PairMapKey(elem.PairId))
-		if _, ok := pairMapIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for pairMap")
-		}
-		pairMapIndexMap[index] = struct{}{}
-	}
 	// Check for duplicated ID in tokens
 	tokensIdMap := make(map[uint64]bool)
 	tokensCount := gs.GetTokensCount()
@@ -70,51 +46,17 @@ func (gs GenesisState) Validate() error {
 		}
 		tokenMapIndexMap[index] = struct{}{}
 	}
-	// Check for duplicated index in shares
-	sharesIndexMap := make(map[string]struct{})
-
-	for _, elem := range gs.SharesList {
-		index := string(SharesKey(elem.Address, elem.PairId, elem.TickIndex, elem.FeeIndex))
-		if _, ok := sharesIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for shares")
+	// Check for duplicated ID in FeeTier
+	FeeTierIdMap := make(map[uint64]bool)
+	FeeTierCount := gs.GetFeeTierCount()
+	for _, elem := range gs.FeeTierList {
+		if _, ok := FeeTierIdMap[elem.Id]; ok {
+			return fmt.Errorf("duplicated id for FeeTier")
 		}
-		sharesIndexMap[index] = struct{}{}
-	}
-	// Check for duplicated ID in feeList
-	feeListIdMap := make(map[uint64]bool)
-	feeListCount := gs.GetFeeListCount()
-	for _, elem := range gs.FeeListList {
-		if _, ok := feeListIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for feeList")
+		if elem.Id >= FeeTierCount {
+			return fmt.Errorf("FeeTier id should be lower or equal than the last id")
 		}
-		if elem.Id >= feeListCount {
-			return fmt.Errorf("feeList id should be lower or equal than the last id")
-		}
-		feeListIdMap[elem.Id] = true
-	}
-	// Check for duplicated ID in edgeRow
-	edgeRowIdMap := make(map[uint64]bool)
-	edgeRowCount := gs.GetEdgeRowCount()
-	for _, elem := range gs.EdgeRowList {
-		if _, ok := edgeRowIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for edgeRow")
-		}
-		if elem.Id >= edgeRowCount {
-			return fmt.Errorf("edgeRow id should be lower or equal than the last id")
-		}
-		edgeRowIdMap[elem.Id] = true
-	}
-	// Check for duplicated ID in adjanceyMatrix
-	adjanceyMatrixIdMap := make(map[uint64]bool)
-	adjanceyMatrixCount := gs.GetAdjanceyMatrixCount()
-	for _, elem := range gs.AdjanceyMatrixList {
-		if _, ok := adjanceyMatrixIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for adjanceyMatrix")
-		}
-		if elem.Id >= adjanceyMatrixCount {
-			return fmt.Errorf("adjanceyMatrix id should be lower or equal than the last id")
-		}
-		adjanceyMatrixIdMap[elem.Id] = true
+		FeeTierIdMap[elem.Id] = true
 	}
 	// Check for duplicated index in LimitOrderTrancheUser
 	LimitOrderTrancheUserIndexMap := make(map[string]struct{})
@@ -126,15 +68,42 @@ func (gs GenesisState) Validate() error {
 		}
 		LimitOrderTrancheUserIndexMap[index] = struct{}{}
 	}
-	// Check for duplicated index in LimitOrderTranche
-	LimitOrderTrancheIndexMap := make(map[string]struct{})
 
-	for _, elem := range gs.LimitOrderTrancheList {
-		index := string(LimitOrderTrancheKey(elem.PairId, elem.TickIndex, elem.TokenIn, elem.TrancheIndex))
-		if _, ok := LimitOrderTrancheIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for LimitOrderTranche")
+	// Check for duplicated index in tickLiquidity
+	tickLiquidityIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.TickLiquidityList {
+		var index string
+		switch liquidity := elem.Liquidity.(type) {
+		case *TickLiquidity_PoolReserves:
+			index = string(TickLiquidityKey(
+				liquidity.PoolReserves.PairId,
+				liquidity.PoolReserves.TokenIn,
+				liquidity.PoolReserves.TickIndex,
+				LiquidityTypePoolReserves,
+				liquidity.PoolReserves.Fee))
+		case *TickLiquidity_LimitOrderTranche:
+			index = string(TickLiquidityKey(
+				liquidity.LimitOrderTranche.PairId,
+				liquidity.LimitOrderTranche.TokenIn,
+				liquidity.LimitOrderTranche.TickIndex,
+				LiquidityTypeLimitOrder,
+				liquidity.LimitOrderTranche.TrancheIndex))
 		}
-		LimitOrderTrancheIndexMap[index] = struct{}{}
+		if _, ok := tickLiquidityIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for tickLiquidity")
+		}
+		tickLiquidityIndexMap[index] = struct{}{}
+	}
+	// Check for duplicated index in filledLimitOrderTranche
+	filledLimitOrderTrancheIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.FilledLimitOrderTrancheList {
+		index := string(FilledLimitOrderTrancheKey(elem.PairId, elem.TokenIn, elem.TickIndex, elem.TrancheIndex))
+		if _, ok := filledLimitOrderTrancheIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for filledLimitOrderTranche")
+		}
+		filledLimitOrderTrancheIndexMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 

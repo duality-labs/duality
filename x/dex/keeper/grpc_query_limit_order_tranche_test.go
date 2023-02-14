@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"strconv"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -10,18 +9,15 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	keepertest "github.com/NicholasDotSol/duality/testutil/keeper"
-	"github.com/NicholasDotSol/duality/testutil/nullify"
-	"github.com/NicholasDotSol/duality/x/dex/types"
+	keepertest "github.com/duality-labs/duality/testutil/keeper"
+	"github.com/duality-labs/duality/testutil/nullify"
+	"github.com/duality-labs/duality/x/dex/types"
 )
-
-// Prevent strconv unused error
-var _ = strconv.IntSize
 
 func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderTranche(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 2)
+	msgs := createNLimitOrderTranches(keeper, ctx, 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetLimitOrderTrancheRequest
@@ -31,30 +27,30 @@ func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetLimitOrderTrancheRequest{
-				PairId:    "TokenA<>TokenB",
-				TickIndex: 0,
-				Token:     "TokenA",
-				TrancheIndex:     msgs[0].TrancheIndex,
+				PairId:       "TokenA<>TokenB",
+				TickIndex:    msgs[0].TickIndex,
+				TokenIn:      "TokenA",
+				TrancheIndex: msgs[0].TrancheIndex,
 			},
 			response: &types.QueryGetLimitOrderTrancheResponse{LimitOrderTranche: msgs[0]},
 		},
 		{
 			desc: "Second",
 			request: &types.QueryGetLimitOrderTrancheRequest{
-				PairId:    "TokenA<>TokenB",
-				TickIndex: 0,
-				Token:     "TokenA",
-				TrancheIndex:     msgs[1].TrancheIndex,
+				PairId:       "TokenA<>TokenB",
+				TickIndex:    msgs[1].TickIndex,
+				TokenIn:      "TokenA",
+				TrancheIndex: msgs[1].TrancheIndex,
 			},
 			response: &types.QueryGetLimitOrderTrancheResponse{LimitOrderTranche: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetLimitOrderTrancheRequest{
-				PairId:    "TokenA<>TokenB",
-				TickIndex: 0,
-				Token:     "TokenA",
-				TrancheIndex:     100000,
+				PairId:       "TokenA<>TokenB",
+				TickIndex:    0,
+				TokenIn:      "TokenA",
+				TrancheIndex: 100000,
 			},
 			err: status.Error(codes.NotFound, "not found"),
 		},
@@ -81,10 +77,14 @@ func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 func TestLimitOrderTrancheQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderTranche(keeper, ctx, "TokenA<>TokenB", 0, "TokenA", 5)
+	msgs := createNLimitOrderTranches(keeper, ctx, 2)
+	//Add more data to make sure only LO tranches are returned
+	createNPoolReserves(keeper, ctx, 2)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderTrancheRequest {
 		return &types.QueryAllLimitOrderTrancheRequest{
+			PairId:  "TokenA<>TokenB",
+			TokenIn: "TokenA",
 			Pagination: &query.PageRequest{
 				Key:        next,
 				Offset:     offset,

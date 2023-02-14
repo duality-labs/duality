@@ -3,8 +3,9 @@ package types
 import (
 	"testing"
 
-	"github.com/NicholasDotSol/duality/testutil/sample"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/duality-labs/duality/testutil/sample"
 	"github.com/stretchr/testify/require"
 )
 
@@ -15,15 +16,90 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 		err  error
 	}{
 		{
-			name: "invalid address",
+			name: "invalid creator",
 			msg: MsgWithdrawl{
-				Creator: "invalid_address",
+				Creator:        "invalid_address",
+				Receiver:       sample.AccAddress(),
+				FeeIndexes:     []uint64{0},
+				TickIndexes:    []int64{0},
+				SharesToRemove: []sdk.Int{sdk.OneInt()},
 			},
 			err: sdkerrors.ErrInvalidAddress,
-		}, {
-			name: "valid address",
+		},
+		{
+			name: "invalid receiver",
 			msg: MsgWithdrawl{
-				Creator: sample.AccAddress(),
+				Creator:        sample.AccAddress(),
+				Receiver:       "invalid_address",
+				FeeIndexes:     []uint64{0},
+				TickIndexes:    []int64{0},
+				SharesToRemove: []sdk.Int{sdk.OneInt()},
+			},
+			err: sdkerrors.ErrInvalidAddress,
+		},
+		{
+			name: "invalid fee indexes length",
+			msg: MsgWithdrawl{
+				Creator:        sample.AccAddress(),
+				Receiver:       sample.AccAddress(),
+				FeeIndexes:     []uint64{},
+				TickIndexes:    []int64{0},
+				SharesToRemove: []sdk.Int{sdk.OneInt()},
+			},
+			err: ErrUnbalancedTxArray,
+		},
+		{
+			name: "invalid tick indexes length",
+			msg: MsgWithdrawl{
+				Creator:        sample.AccAddress(),
+				Receiver:       sample.AccAddress(),
+				FeeIndexes:     []uint64{0},
+				TickIndexes:    []int64{},
+				SharesToRemove: []sdk.Int{sdk.OneInt()},
+			},
+			err: ErrUnbalancedTxArray,
+		},
+		{
+			name: "invalid shares to remove length",
+			msg: MsgWithdrawl{
+				Creator:        sample.AccAddress(),
+				Receiver:       sample.AccAddress(),
+				FeeIndexes:     []uint64{0},
+				TickIndexes:    []int64{0},
+				SharesToRemove: []sdk.Int{},
+			},
+			err: ErrUnbalancedTxArray,
+		},
+		{
+			name: "no withdraw specs",
+			msg: MsgWithdrawl{
+				Creator:        sample.AccAddress(),
+				Receiver:       sample.AccAddress(),
+				FeeIndexes:     []uint64{},
+				TickIndexes:    []int64{},
+				SharesToRemove: []sdk.Int{},
+			},
+			err: ErrZeroWithdraw,
+		},
+		{
+			name: "no withdraw specs",
+			msg: MsgWithdrawl{
+				Creator:        sample.AccAddress(),
+				Receiver:       sample.AccAddress(),
+				FeeIndexes:     []uint64{0},
+				TickIndexes:    []int64{0},
+				SharesToRemove: []sdk.Int{sdk.ZeroInt()},
+			},
+			err: ErrZeroWithdraw,
+		},
+		{
+			name: "valid msg",
+			msg: MsgWithdrawl{
+				Creator:        sample.AccAddress(),
+				Receiver:       sample.AccAddress(),
+				FeeIndexes:     []uint64{0},
+				TickIndexes:    []int64{0},
+				SharesToRemove: []sdk.Int{sdk.OneInt()},
 			},
 		},
 	}

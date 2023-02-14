@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	"github.com/NicholasDotSol/duality/x/dex/types"
+	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -21,23 +21,6 @@ func TestGenesisState_Validate(t *testing.T) {
 		{
 			desc: "valid genesis state",
 			genState: &types.GenesisState{
-
-				TickMapList: []types.TickMap{
-					{
-						TickIndex: 0,
-					},
-					{
-						TickIndex: 1,
-					},
-				},
-				PairMapList: []types.PairMap{
-					{
-						PairId: "0",
-					},
-					{
-						PairId: "1",
-					},
-				},
 				TokensList: []types.Tokens{
 					{
 						Id: 0,
@@ -55,21 +38,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						Address: "1",
 					},
 				},
-				SharesList: []types.Shares{
-					{
-						Address:   "0",
-						PairId:    "0",
-						TickIndex: 0,
-						FeeIndex:  0,
-					},
-					{
-						Address:   "1",
-						PairId:    "1",
-						TickIndex: 1,
-						FeeIndex:  1,
-					},
-				},
-				FeeListList: []types.FeeList{
+				FeeTierList: []types.FeeTier{
 					{
 						Id: 0,
 					},
@@ -77,74 +46,58 @@ func TestGenesisState_Validate(t *testing.T) {
 						Id: 1,
 					},
 				},
-				FeeListCount: 2,
-				EdgeRowList: []types.EdgeRow{
-					{
-						Id: 0,
-					},
-					{
-						Id: 1,
-					},
-				},
-				EdgeRowCount: 2,
-				AdjanceyMatrixList: []types.AdjanceyMatrix{
-					{
-						Id: 0,
-					},
-					{
-						Id: 1,
-					},
-				},
-				AdjanceyMatrixCount: 2,
+				FeeTierCount: 2,
 				LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
 					{
 						Count:   0,
 						Address: "0",
+						PairId:  &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 					{
 						Count:   1,
 						Address: "1",
+						PairId:  &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 				},
-				LimitOrderTrancheList: []types.LimitOrderTranche{
+				TickLiquidityList: []types.TickLiquidity{
 					{
-						Count: 0,
+						Liquidity: &types.TickLiquidity_LimitOrderTranche{
+							LimitOrderTranche: &types.LimitOrderTranche{
+								PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+								TokenIn:      "0",
+								TickIndex:    0,
+								TrancheIndex: 0,
+							},
+						},
 					},
 					{
-						Count: 1,
+						Liquidity: &types.TickLiquidity_PoolReserves{
+							PoolReserves: &types.PoolReserves{
+								PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+								TokenIn:   "0",
+								TickIndex: 0,
+								Fee:       0,
+							},
+						},
+					},
+				},
+				FilledLimitOrderTrancheList: []types.FilledLimitOrderTranche{
+					{
+						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						TokenIn:      "0",
+						TickIndex:    0,
+						TrancheIndex: 0,
+					},
+					{
+						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						TokenIn:      "1",
+						TickIndex:    1,
+						TrancheIndex: 1,
 					},
 				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
-		},
-		{
-			desc: "duplicated tickMap",
-			genState: &types.GenesisState{
-				TickMapList: []types.TickMap{
-					{
-						TickIndex: 0,
-					},
-					{
-						TickIndex: 1,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "duplicated pairMap",
-			genState: &types.GenesisState{
-				PairMapList: []types.PairMap{
-					{
-						PairId: "0",
-					},
-					{
-						PairId: "0",
-					},
-				},
-			},
-			valid: false,
 		},
 		{
 			desc: "duplicated tokens",
@@ -187,29 +140,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated shares",
+			desc: "duplicated FeeTier",
 			genState: &types.GenesisState{
-				SharesList: []types.Shares{
-					{
-						Address:   "0",
-						PairId:    "0",
-						TickIndex: 0,
-						FeeIndex:  0,
-					},
-					{
-						Address:   "0",
-						PairId:    "0",
-						TickIndex: 0,
-						FeeIndex:  0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "duplicated feeList",
-			genState: &types.GenesisState{
-				FeeListList: []types.FeeList{
+				FeeTierList: []types.FeeTier{
 					{
 						Id: 0,
 					},
@@ -221,66 +154,14 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "invalid feeList count",
+			desc: "invalid FeeTier count",
 			genState: &types.GenesisState{
-				FeeListList: []types.FeeList{
+				FeeTierList: []types.FeeTier{
 					{
 						Id: 1,
 					},
 				},
-				FeeListCount: 0,
-			},
-			valid: false,
-		},
-		{
-			desc: "duplicated edgeRow",
-			genState: &types.GenesisState{
-				EdgeRowList: []types.EdgeRow{
-					{
-						Id: 0,
-					},
-					{
-						Id: 0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "invalid edgeRow count",
-			genState: &types.GenesisState{
-				EdgeRowList: []types.EdgeRow{
-					{
-						Id: 1,
-					},
-				},
-				EdgeRowCount: 0,
-			},
-			valid: false,
-		},
-		{
-			desc: "duplicated adjanceyMatrix",
-			genState: &types.GenesisState{
-				AdjanceyMatrixList: []types.AdjanceyMatrix{
-					{
-						Id: 0,
-					},
-					{
-						Id: 0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "invalid adjanceyMatrix count",
-			genState: &types.GenesisState{
-				AdjanceyMatrixList: []types.AdjanceyMatrix{
-					{
-						Id: 1,
-					},
-				},
-				AdjanceyMatrixCount: 0,
+				FeeTierCount: 0,
 			},
 			valid: false,
 		},
@@ -291,40 +172,60 @@ func TestGenesisState_Validate(t *testing.T) {
 					{
 						Count:   0,
 						Address: "0",
+						PairId:  &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 					{
 						Count:   0,
 						Address: "0",
+						PairId:  &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					},
 				},
 			},
 			valid: false,
 		},
 		{
-			desc: "duplicated LimitOrderTrancheUserSharesWithdrawn",
+			desc: "duplicated tickLiquidity",
 			genState: &types.GenesisState{
-				LimitOrderTrancheUserSharesWithdrawnList: []types.LimitOrderTrancheUserSharesWithdrawn{
+				TickLiquidityList: []types.TickLiquidity{
 					{
-						Count:   0,
-						Address: "0",
+						Liquidity: &types.TickLiquidity_LimitOrderTranche{
+							LimitOrderTranche: &types.LimitOrderTranche{
+								PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+								TokenIn:      "0",
+								TickIndex:    0,
+								TrancheIndex: 0,
+							},
+						},
 					},
 					{
-						Count:   0,
-						Address: "0",
+						Liquidity: &types.TickLiquidity_LimitOrderTranche{
+							LimitOrderTranche: &types.LimitOrderTranche{
+								PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+								TokenIn:      "0",
+								TickIndex:    0,
+								TrancheIndex: 0,
+							},
+						},
 					},
 				},
 			},
 			valid: false,
 		},
 		{
-			desc: "duplicated LimitOrderTranche",
+			desc: "duplicated filledLimitOrderTranche",
 			genState: &types.GenesisState{
-				LimitOrderTrancheList: []types.LimitOrderTranche{
+				FilledLimitOrderTrancheList: []types.FilledLimitOrderTranche{
 					{
-						Count: 0,
+						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						TokenIn:      "0",
+						TickIndex:    0,
+						TrancheIndex: 0,
 					},
 					{
-						Count: 0,
+						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						TokenIn:      "0",
+						TickIndex:    0,
+						TrancheIndex: 0,
 					},
 				},
 			},

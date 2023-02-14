@@ -4,9 +4,9 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/spf13/cobra"
 )
 
@@ -45,9 +45,10 @@ func CmdListTokens() *cobra.Command {
 
 func CmdShowTokens() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-tokens [id]",
-		Short: "shows a Tokens",
-		Args:  cobra.ExactArgs(1),
+		Use:     "show-tokens [id]",
+		Short:   "shows a Tokens",
+		Example: "show-tokens 1",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 

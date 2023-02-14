@@ -3,10 +3,10 @@ package keeper
 import (
 	"context"
 
-	"github.com/NicholasDotSol/duality/x/dex/types"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
+	"github.com/duality-labs/duality/x/dex/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -44,10 +44,13 @@ func (k Keeper) LimitOrderTrancheUser(c context.Context, req *types.QueryGetLimi
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(c)
-
+	pairId, err := StringToPairId(req.PairId)
+	if err != nil {
+		return nil, err
+	}
 	val, found := k.GetLimitOrderTrancheUser(
 		ctx,
-		req.PairId,
+		pairId,
 		req.TickIndex,
 		req.Token,
 		req.Count,
