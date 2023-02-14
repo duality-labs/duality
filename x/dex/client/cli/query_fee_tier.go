@@ -45,9 +45,10 @@ func CmdListFeeTier() *cobra.Command {
 
 func CmdShowFeeTier() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-fee-list [id]",
-		Short: "shows a FeeTier",
-		Args:  cobra.ExactArgs(1),
+		Use:     "show-fee-list [id]",
+		Short:   "shows a FeeTier",
+		Example: "show-fee-list 1",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 

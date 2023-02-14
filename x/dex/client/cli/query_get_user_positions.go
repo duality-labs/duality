@@ -13,9 +13,10 @@ var _ = strconv.Itoa(0)
 
 func CmdShowUserPositions() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-user-positions [address]",
-		Short: "shows a users current positions",
-		Args:  cobra.ExactArgs(1),
+		Use:     "show-user-positions [address]",
+		Short:   "shows a users current positions",
+		Example: "show-user-positions alice",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqAddress := args[0]
 

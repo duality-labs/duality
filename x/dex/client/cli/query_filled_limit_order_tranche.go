@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -45,9 +46,10 @@ func CmdListFilledLimitOrderTranche() *cobra.Command {
 
 func CmdShowFilledLimitOrderTranche() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-filled-limit-order-tranche [pair-id] [token-in] [tick-index] [tranche-index]",
-		Short: "shows a FilledLimitOrderTranche",
-		Args:  cobra.ExactArgs(4),
+		Use:     "show-filled-limit-order-tranche [pair-id] [token-in] [tick-index] [tranche-index]",
+		Short:   "shows a FilledLimitOrderTranche",
+		Example: "show-filled limit-order-tranche tokenA<>tokenB tokenA [10] 0",
+		Args:    cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -55,6 +57,11 @@ func CmdShowFilledLimitOrderTranche() *cobra.Command {
 
 			argPairId := args[0]
 			argTokenIn := args[1]
+
+			if strings.HasPrefix(args[2], "[") && strings.HasSuffix(args[2], "]") {
+				args[2] = strings.TrimPrefix(args[2], "[")
+				args[2] = strings.TrimSuffix(args[2], "]")
+			}
 			argTickIndex, err := cast.ToInt64E(args[2])
 			if err != nil {
 				return err

@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"strconv"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -12,9 +13,10 @@ import (
 
 func CmdListPoolReserves() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-pool-reserves [pair-id] [token-in]",
-		Short: "Query AllPoolReserves",
-		Args:  cobra.ExactArgs(2),
+		Use:     "list-pool-reserves [pair-id] [token-in]",
+		Short:   "Query AllPoolReserves",
+		Example: "list-pool-reserves tokenA<>tokenB tokenA",
+		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqPairId := args[0]
 			reqTokenIn := args[1]
@@ -54,15 +56,20 @@ func CmdListPoolReserves() *cobra.Command {
 
 func CmdShowPoolReserves() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-pool-reserves [pair-id] [tick-index] [token-in] [fee]",
-		Short: "shows a PoolReserves",
-		Args:  cobra.ExactArgs(4),
+		Use:     "show-pool-reserves [pair-id] [tick-index] [token-in] [fee]",
+		Short:   "shows a PoolReserves",
+		Example: "show-pool-reserves tokenA<>tokenB [-5] tokenA 1",
+		Args:    cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			queryClient := types.NewQueryClient(clientCtx)
 
 			argPairId := args[0]
+			if strings.HasPrefix(args[1], "[") && strings.HasSuffix(args[1], "]") {
+				args[1] = strings.TrimPrefix(args[1], "[")
+				args[1] = strings.TrimSuffix(args[1], "]")
+			}
 			argTickIndex := args[1]
 			argTokenIn := args[2]
 			argFee := args[3]

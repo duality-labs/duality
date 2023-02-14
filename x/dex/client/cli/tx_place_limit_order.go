@@ -17,16 +17,19 @@ var _ = strconv.Itoa(0)
 
 func CmdPlaceLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "place-limit-order [receiver] [token-a] [token-b] [tick-index] [token-in] [amount-in]",
-		Short: "Broadcast message PlaceLimitOrder",
-		Args:  cobra.ExactArgs(6),
+		Use:     "place-limit-order [receiver] [token-a] [token-b] [tick-index] [token-in] [amount-in]",
+		Short:   "Broadcast message PlaceLimitOrder",
+		Example: "place-limit-order alice tokenA tokenB [-10] tokenA 50 --from alice",
+		Args:    cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
 			argTokenA := args[1]
 			argTokenB := args[2]
+			if strings.HasPrefix(args[3], "[") && strings.HasSuffix(args[3], "]") {
+				args[3] = strings.TrimPrefix(args[3], "[")
+				args[3] = strings.TrimSuffix(args[3], "]")
+			}
 			argTickIndex := args[3]
-
-			argTickIndex = strings.Trim(argTickIndex, "\"")
 			argTickIndexInt, err := strconv.Atoi(argTickIndex)
 			if err != nil {
 				return err
