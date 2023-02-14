@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"fmt"
+	"strconv"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -55,4 +58,12 @@ func MaxDec(a, b sdk.Dec) sdk.Dec {
 		return a
 	}
 	return b
+}
+
+func Uint64ToSortableString(i uint64) string {
+	// Converts a Uint to a string that sorts lexogrpahically in integer order
+	intStr := strconv.FormatUint(i, 36)
+	lenStr := len(intStr)
+	lenChar := strconv.FormatUint(uint64(lenStr), 36)
+	return fmt.Sprintf("%s%s", lenChar, intStr)
 }

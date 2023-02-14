@@ -62,7 +62,7 @@ func (gs GenesisState) Validate() error {
 	LimitOrderTrancheUserIndexMap := make(map[string]struct{})
 
 	for _, elem := range gs.LimitOrderTrancheUserList {
-		index := string(LimitOrderTrancheUserKey(elem.PairId, elem.TickIndex, elem.Token, elem.Count, elem.Address))
+		index := string(LimitOrderTrancheUserKey(elem.PairId, elem.TickIndex, elem.Token, elem.TrancheKey, elem.Address))
 		if _, ok := LimitOrderTrancheUserIndexMap[index]; ok {
 			return fmt.Errorf("duplicated index for LimitOrderTrancheUser")
 		}
@@ -88,7 +88,7 @@ func (gs GenesisState) Validate() error {
 				liquidity.LimitOrderTranche.TokenIn,
 				liquidity.LimitOrderTranche.TickIndex,
 				LiquidityTypeLimitOrder,
-				liquidity.LimitOrderTranche.TrancheIndex))
+				liquidity.LimitOrderTranche.TrancheKey))
 		}
 		if _, ok := tickLiquidityIndexMap[index]; ok {
 			return fmt.Errorf("duplicated index for tickLiquidity")
@@ -96,14 +96,14 @@ func (gs GenesisState) Validate() error {
 		tickLiquidityIndexMap[index] = struct{}{}
 	}
 	// Check for duplicated index in filledLimitOrderTranche
-	filledLimitOrderTrancheIndexMap := make(map[string]struct{})
+	filledLimitOrderTrancheKeyMap := make(map[string]struct{})
 
 	for _, elem := range gs.FilledLimitOrderTrancheList {
-		index := string(FilledLimitOrderTrancheKey(elem.PairId, elem.TokenIn, elem.TickIndex, elem.TrancheIndex))
-		if _, ok := filledLimitOrderTrancheIndexMap[index]; ok {
+		index := string(FilledLimitOrderTrancheKey(elem.PairId, elem.TokenIn, elem.TickIndex, elem.TrancheKey))
+		if _, ok := filledLimitOrderTrancheKeyMap[index]; ok {
 			return fmt.Errorf("duplicated index for filledLimitOrderTranche")
 		}
-		filledLimitOrderTrancheIndexMap[index] = struct{}{}
+		filledLimitOrderTrancheKeyMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 

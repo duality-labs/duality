@@ -365,15 +365,15 @@ func request_Query_LimitOrderTrancheUser_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tickIndex", err)
 	}
 
-	val, ok = pathParams["count"]
+	val, ok = pathParams["trancheKey"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "count")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trancheKey")
 	}
 
-	protoReq.Count, err = runtime.Uint64(val)
+	protoReq.TrancheKey, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "count", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheKey", err)
 	}
 
 	val, ok = pathParams["address"]
@@ -436,15 +436,15 @@ func local_request_Query_LimitOrderTrancheUser_0(ctx context.Context, marshaler 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tickIndex", err)
 	}
 
-	val, ok = pathParams["count"]
+	val, ok = pathParams["trancheKey"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "count")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trancheKey")
 	}
 
-	protoReq.Count, err = runtime.Uint64(val)
+	protoReq.TrancheKey, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "count", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheKey", err)
 	}
 
 	val, ok = pathParams["address"]
@@ -543,15 +543,15 @@ func request_Query_LimitOrderTranche_0(ctx context.Context, marshaler runtime.Ma
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tickIndex", err)
 	}
 
-	val, ok = pathParams["trancheIndex"]
+	val, ok = pathParams["trancheKey"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trancheIndex")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trancheKey")
 	}
 
-	protoReq.TrancheIndex, err = runtime.Uint64(val)
+	protoReq.TrancheKey, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheIndex", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheKey", err)
 	}
 
 	msg, err := client.LimitOrderTranche(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -603,15 +603,15 @@ func local_request_Query_LimitOrderTranche_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tickIndex", err)
 	}
 
-	val, ok = pathParams["trancheIndex"]
+	val, ok = pathParams["trancheKey"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trancheIndex")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trancheKey")
 	}
 
-	protoReq.TrancheIndex, err = runtime.Uint64(val)
+	protoReq.TrancheKey, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheIndex", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheKey", err)
 	}
 
 	msg, err := server.LimitOrderTranche(ctx, &protoReq)
@@ -1013,15 +1013,15 @@ func request_Query_FilledLimitOrderTranche_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tickIndex", err)
 	}
 
-	val, ok = pathParams["trancheIndex"]
+	val, ok = pathParams["trancheKey"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trancheIndex")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trancheKey")
 	}
 
-	protoReq.TrancheIndex, err = runtime.Uint64(val)
+	protoReq.TrancheKey, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheIndex", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheKey", err)
 	}
 
 	msg, err := client.FilledLimitOrderTranche(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -1073,15 +1073,15 @@ func local_request_Query_FilledLimitOrderTranche_0(ctx context.Context, marshale
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tickIndex", err)
 	}
 
-	val, ok = pathParams["trancheIndex"]
+	val, ok = pathParams["trancheKey"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trancheIndex")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trancheKey")
 	}
 
-	protoReq.TrancheIndex, err = runtime.Uint64(val)
+	protoReq.TrancheKey, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheIndex", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheKey", err)
 	}
 
 	msg, err := server.FilledLimitOrderTranche(ctx, &protoReq)
@@ -2221,11 +2221,11 @@ var (
 
 	pattern_Query_FeeTierAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "fee_tier"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_LimitOrderTrancheUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche_user", "pairId", "token", "tickIndex", "count", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LimitOrderTrancheUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche_user", "pairId", "token", "tickIndex", "trancheKey", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_LimitOrderTrancheUserAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche_user"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_LimitOrderTranche_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche", "pairId", "tokenIn", "tickIndex", "trancheIndex"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LimitOrderTranche_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche", "pairId", "tokenIn", "tickIndex", "trancheKey"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_LimitOrderTrancheAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche", "pairId", "tokenIn"}, "", runtime.AssumeColonVerbOpt(true)))
 
@@ -2237,7 +2237,7 @@ var (
 
 	pattern_Query_TickLiquidityAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "dex", "tick_liquidity", "pairId", "tokenIn"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_FilledLimitOrderTranche_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"dualitylabs", "duality", "dex", "filled_limit_order_tranche", "pairId", "tokenIn", "tickIndex", "trancheIndex"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_FilledLimitOrderTranche_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"dualitylabs", "duality", "dex", "filled_limit_order_tranche", "pairId", "tokenIn", "tickIndex", "trancheKey"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_FilledLimitOrderTrancheAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "filled_limit_order_tranche"}, "", runtime.AssumeColonVerbOpt(true)))
 

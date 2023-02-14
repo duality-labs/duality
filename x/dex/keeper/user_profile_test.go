@@ -10,8 +10,8 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 	// WHEN Alice places 2 limit orders
 	s.fundAliceBalances(20, 20)
 	s.fundBobBalances(20, 20)
-	s.aliceLimitSells("TokenA", -1, 10)
-	s.aliceLimitSells("TokenB", 0, 10)
+	trancheKeyA := s.aliceLimitSells("TokenA", -1, 10)
+	trancheKeyB := s.aliceLimitSells("TokenB", 0, 10)
 	s.bobLimitSells("TokenA", -1, 10)
 	profile := NewUserProfile(s.alice)
 
@@ -22,7 +22,7 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 		PairId:          defaultPairId,
 		Token:           "TokenA",
 		TickIndex:       -1,
-		Count:           0,
+		TrancheKey:      trancheKeyA,
 		Address:         s.alice.String(),
 		SharesOwned:     sdk.NewInt(10),
 		SharesWithdrawn: sdk.NewInt(0),
@@ -34,7 +34,7 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 		PairId:          defaultPairId,
 		Token:           "TokenB",
 		TickIndex:       0,
-		Count:           0,
+		TrancheKey:      trancheKeyB,
 		Address:         s.alice.String(),
 		SharesOwned:     sdk.NewInt(10),
 		SharesWithdrawn: sdk.NewInt(0),

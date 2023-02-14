@@ -3,7 +3,7 @@ package dualitylabs.duality.dex;
 
 option go_package = "github.com/duality-labs/duality/x/dex/types";
 
-message LimitTrancheIndexes {
-  uint64 fillTrancheIndex = 1; 
-  uint64 placeTrancheIndex = 2; 
+message LimitTrancheKeyes {
+  uint64 fillTrancheKey = 1; 
+  uint64 placeTrancheKey = 2; 
 }

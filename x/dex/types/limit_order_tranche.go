@@ -11,7 +11,7 @@ func (t LimitOrderTranche) IsPlaceTranche() bool {
 
 func NewFromFilledTranche(t FilledLimitOrderTranche) LimitOrderTranche {
 	return LimitOrderTranche{
-		TrancheIndex:     t.TrancheIndex,
+		TrancheKey:     t.TrancheKey,
 		TickIndex:        t.TickIndex,
 		TokenIn:          t.TokenIn,
 		PairId:           t.PairId,
@@ -23,7 +23,7 @@ func NewFromFilledTranche(t FilledLimitOrderTranche) LimitOrderTranche {
 
 func (t LimitOrderTranche) CreateFilledTranche() FilledLimitOrderTranche {
 	return FilledLimitOrderTranche{
-		TrancheIndex:     t.TrancheIndex,
+		TrancheKey:     t.TrancheKey,
 		TickIndex:        t.TickIndex,
 		TokenIn:          t.TokenIn,
 		PairId:           t.PairId,

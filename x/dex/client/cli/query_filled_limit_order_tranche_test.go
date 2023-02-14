@@ -33,7 +33,7 @@ func networkWithFilledLimitOrderTrancheObjects(t *testing.T, n int) (*network.Ne
 			PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 			TokenIn:          strconv.Itoa(i),
 			TickIndex:        int64(i),
-			TrancheIndex:     uint64(i),
+			TrancheKey:       strconv.Itoa(i),
 			TotalTokenIn:     sdk.ZeroInt(),
 			TotalTokenOut:    sdk.ZeroInt(),
 			ReservesTokenOut: sdk.ZeroInt(),
@@ -55,32 +55,32 @@ func TestShowFilledLimitOrderTranche(t *testing.T) {
 		fmt.Sprintf("--%s=json", tmcli.OutputFlag),
 	}
 	for _, tc := range []struct {
-		desc           string
-		idPairId       *types.PairId
-		idTokenIn      string
-		idTickIndex    int64
-		idTrancheIndex uint64
+		desc         string
+		idPairId     *types.PairId
+		idTokenIn    string
+		idTickIndex  int64
+		idTrancheKey string
 
 		args []string
 		err  error
 		obj  types.FilledLimitOrderTranche
 	}{
 		{
-			desc:           "found",
-			idPairId:       objs[0].PairId,
-			idTokenIn:      objs[0].TokenIn,
-			idTickIndex:    objs[0].TickIndex,
-			idTrancheIndex: objs[0].TrancheIndex,
+			desc:         "found",
+			idPairId:     objs[0].PairId,
+			idTokenIn:    objs[0].TokenIn,
+			idTickIndex:  objs[0].TickIndex,
+			idTrancheKey: objs[0].TrancheKey,
 
 			args: common,
 			obj:  objs[0],
 		},
 		{
-			desc:           "not found",
-			idPairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-			idTokenIn:      strconv.Itoa(100000),
-			idTickIndex:    100000,
-			idTrancheIndex: 100000,
+			desc:         "not found",
+			idPairId:     &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+			idTokenIn:    strconv.Itoa(100000),
+			idTickIndex:  100000,
+			idTrancheKey: "100000",
 
 			args: common,
 			err:  status.Error(codes.NotFound, "not found"),
@@ -91,7 +91,7 @@ func TestShowFilledLimitOrderTranche(t *testing.T) {
 				tc.idPairId.Stringify(),
 				tc.idTokenIn,
 				strconv.Itoa(int(tc.idTickIndex)),
-				strconv.Itoa(int(tc.idTrancheIndex)),
+				tc.idTrancheKey,
 			}
 			args = append(args, tc.args...)
 			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowFilledLimitOrderTranche(), args)

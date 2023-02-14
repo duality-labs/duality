@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"strconv"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,7 +21,7 @@ func CreateNTickLiquidity(keeper *keeper.Keeper, ctx sdk.Context, n int) []types
 					PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 					TokenIn:          "TokenA",
 					TickIndex:        int64(i),
-					TrancheIndex:     uint64(i),
+					TrancheKey:       strconv.Itoa(i),
 					ReservesTokenIn:  sdk.NewInt(10),
 					ReservesTokenOut: sdk.NewInt(10),
 					TotalTokenIn:     sdk.NewInt(10),

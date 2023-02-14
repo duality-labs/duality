@@ -2,6 +2,7 @@ package cli_test
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -23,12 +24,18 @@ type TxTestSuite struct {
 	cfg     network.Config
 	network *network.Network
 
-	addr1 sdk.AccAddress
-	addr2 sdk.AccAddress
+	addr1      sdk.AccAddress
+	addr2      sdk.AccAddress
+	trancheKey string
 }
 
 func TestTxTestSuite(t *testing.T) {
 	suite.Run(t, new(TxTestSuite))
+}
+
+func findTrancheKeyInTx(tx string) string {
+	re := regexp.MustCompile(`TrancheKey.*?:\\"([a-z0-9]+)`)
+	return re.FindStringSubmatch(tx)[1]
 }
 
 func (s *TxTestSuite) SetupSuite() {
@@ -67,8 +74,10 @@ func (s *TxTestSuite) SetupSuite() {
 
 	args = append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "[20]", "TokenB", "10"}, commonFlags...)
 	cmd = dexClient.CmdPlaceLimitOrder()
-	_, err = cli.ExecTestCLICmd(clientCtx, cmd, args)
+	txBuff, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
+
 	require.NoError(s.T(), err)
+	s.trancheKey = findTrancheKeyInTx(txBuff.String())
 
 	s.fundAccount(clientCtx, s.network.Validators[0].Address, s.addr1, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(100)), sdk.NewCoin("TokenA", sdk.NewInt(100000))))
 
@@ -381,7 +390,7 @@ func (s *TxTestSuite) TestTx5CmdCancelLimitOrder() {
 		errInRes  bool
 	}{
 		{
-			//  "cancel-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [key]"
+			//  "cancel-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [tranche-key]"
 			name:      "missing arguments",
 			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB"},
 			expErr:    true,
@@ -395,7 +404,7 @@ func (s *TxTestSuite) TestTx5CmdCancelLimitOrder() {
 		},
 		{
 			name:     "valid",
-			args:     []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "0"},
+			args:     []string{s.addr1.String(), "TokenA", "TokenB", "20", "TokenB", s.trancheKey},
 			errInRes: false,
 		},
 	}
@@ -438,8 +447,9 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 	// Place Limit Order
 	args := append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "[0]", "TokenB", "10"}, commonFlags...)
 	cmd := dexClient.CmdPlaceLimitOrder()
-	_, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
+	txBuff, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
 	require.NoError(s.T(), err)
+	trancheKey := findTrancheKeyInTx(txBuff.String())
 
 	argsSwap := append([]string{s.network.Validators[0].Address.String(), "30", "TokenA", "TokenB", "TokenA", "0", "0.0"}, commonFlags...)
 	cmd = dexClient.CmdSwap()
@@ -454,7 +464,7 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 		errInRes  bool
 	}{
 		{
-			//  "withdraw-filled-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [key]"
+			//  "withdraw-filled-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [tranche-key]"
 			name:      "missing arguments",
 			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB"},
 			expErr:    true,
@@ -468,7 +478,7 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 		},
 		{
 			name:     "valid",
-			args:     []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "[0]", "TokenB", "1"},
+			args:     []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "0", "TokenB", trancheKey},
 			errInRes: false,
 		},
 	}

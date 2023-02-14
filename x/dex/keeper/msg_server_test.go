@@ -43,6 +43,7 @@ func TestMsgServerTestSuite(t *testing.T) {
 func (s *MsgServerTestSuite) SetupTest() {
 	app := dualityapp.Setup(false)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+	ctx = ctx.WithBlockGasMeter(sdk.NewInfiniteGasMeter())
 
 	app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())
 	app.BankKeeper.SetParams(ctx, banktypes.DefaultParams())
@@ -195,24 +196,24 @@ func (s *MsgServerTestSuite) traceBalances() {
 
 /// Place limit order
 
-func (s *MsgServerTestSuite) aliceLimitSells(selling string, tick int, amountIn int) {
-	s.limitSells(s.alice, selling, tick, amountIn)
+func (s *MsgServerTestSuite) aliceLimitSells(selling string, tick int, amountIn int) string {
+	return s.limitSells(s.alice, selling, tick, amountIn)
 }
 
-func (s *MsgServerTestSuite) bobLimitSells(selling string, tick int, amountIn int) {
-	s.limitSells(s.bob, selling, tick, amountIn)
+func (s *MsgServerTestSuite) bobLimitSells(selling string, tick int, amountIn int) string {
+	return s.limitSells(s.bob, selling, tick, amountIn)
 }
 
-func (s *MsgServerTestSuite) carolLimitSells(selling string, tick int, amountIn int) {
-	s.limitSells(s.carol, selling, tick, amountIn)
+func (s *MsgServerTestSuite) carolLimitSells(selling string, tick int, amountIn int) string {
+	return s.limitSells(s.carol, selling, tick, amountIn)
 }
 
-func (s *MsgServerTestSuite) danLimitSells(selling string, tick int, amountIn int) {
-	s.limitSells(s.dan, selling, tick, amountIn)
+func (s *MsgServerTestSuite) danLimitSells(selling string, tick int, amountIn int) string {
+	return s.limitSells(s.dan, selling, tick, amountIn)
 }
 
-func (s *MsgServerTestSuite) limitSells(account sdk.AccAddress, tokenIn string, tick int, amountIn int) {
-	_, err := s.msgServer.PlaceLimitOrder(s.goCtx, &types.MsgPlaceLimitOrder{
+func (s *MsgServerTestSuite) limitSells(account sdk.AccAddress, tokenIn string, tick int, amountIn int) string {
+	msg, err := s.msgServer.PlaceLimitOrder(s.goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   account.String(),
 		Receiver:  account.String(),
 		TokenA:    "TokenA",
@@ -222,6 +223,7 @@ func (s *MsgServerTestSuite) limitSells(account sdk.AccAddress, tokenIn string, 
 		AmountIn:  sdk.NewInt(int64(amountIn)),
 	})
 	s.Assert().Nil(err)
+	return msg.TrancheKey
 }
 
 func (s *MsgServerTestSuite) assertAliceLimitSellFails(err error, selling string, tick int, amountIn int) {
@@ -599,60 +601,60 @@ func (s *MsgServerTestSuite) withdrawFails(account sdk.AccAddress, expectedErr e
 
 /// Cancel limit order
 
-func (s *MsgServerTestSuite) aliceCancelsLimitSell(keyToken string, tick int, key int) {
-	s.cancelsLimitSell(s.alice, keyToken, tick, key)
+func (s *MsgServerTestSuite) aliceCancelsLimitSell(keyToken string, tick int, trancheKey string) {
+	s.cancelsLimitSell(s.alice, keyToken, tick, trancheKey)
 }
 
-func (s *MsgServerTestSuite) bobCancelsLimitSell(keyToken string, tick int, key int) {
-	s.cancelsLimitSell(s.bob, keyToken, tick, key)
+func (s *MsgServerTestSuite) bobCancelsLimitSell(keyToken string, tick int, trancheKey string) {
+	s.cancelsLimitSell(s.bob, keyToken, tick, trancheKey)
 }
 
-func (s *MsgServerTestSuite) carolCancelsLimitSell(keyToken string, tick int, key int) {
-	s.cancelsLimitSell(s.carol, keyToken, tick, key)
+func (s *MsgServerTestSuite) carolCancelsLimitSell(keyToken string, tick int, trancheKey string) {
+	s.cancelsLimitSell(s.carol, keyToken, tick, trancheKey)
 }
 
-func (s *MsgServerTestSuite) danCancelsLimitSell(keyToken string, tick int, key int) {
-	s.cancelsLimitSell(s.dan, keyToken, tick, key)
+func (s *MsgServerTestSuite) danCancelsLimitSell(keyToken string, tick int, trancheKey string) {
+	s.cancelsLimitSell(s.dan, keyToken, tick, trancheKey)
 }
 
-func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling string, tick int, key int) {
+func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling string, tick int, trancheKey string) {
 	_, err := s.msgServer.CancelLimitOrder(s.goCtx, &types.MsgCancelLimitOrder{
-		Creator:   account.String(),
-		Receiver:  account.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: int64(tick),
-		KeyToken:  selling,
-		Key:       uint64(key),
+		Creator:    account.String(),
+		Receiver:   account.String(),
+		TokenA:     "TokenA",
+		TokenB:     "TokenB",
+		TickIndex:  int64(tick),
+		KeyToken:   selling,
+		TrancheKey: trancheKey,
 	})
 	s.Assert().Nil(err)
 }
 
-func (s *MsgServerTestSuite) aliceCancelsLimitSellFails(keyToken string, tick int, key int, expectedErr error) {
-	s.cancelsLimitSellFails(s.alice, keyToken, tick, key, expectedErr)
+func (s *MsgServerTestSuite) aliceCancelsLimitSellFails(keyToken string, tick int, trancheKey string, expectedErr error) {
+	s.cancelsLimitSellFails(s.alice, keyToken, tick, trancheKey, expectedErr)
 }
 
-func (s *MsgServerTestSuite) bobCancelsLimitSellFails(keyToken string, tick int, key int, expectedErr error) {
-	s.cancelsLimitSellFails(s.bob, keyToken, tick, key, expectedErr)
+func (s *MsgServerTestSuite) bobCancelsLimitSellFails(keyToken string, tick int, trancheKey string, expectedErr error) {
+	s.cancelsLimitSellFails(s.bob, keyToken, tick, trancheKey, expectedErr)
 }
 
-func (s *MsgServerTestSuite) carolCancelsLimitSellFails(keyToken string, tick int, key int, expectedErr error) {
-	s.cancelsLimitSellFails(s.carol, keyToken, tick, key, expectedErr)
+func (s *MsgServerTestSuite) carolCancelsLimitSellFails(keyToken string, tick int, trancheKey string, expectedErr error) {
+	s.cancelsLimitSellFails(s.carol, keyToken, tick, trancheKey, expectedErr)
 }
 
-func (s *MsgServerTestSuite) danCancelsLimitSellFails(keyToken string, tick int, key int, expectedErr error) {
-	s.cancelsLimitSellFails(s.dan, keyToken, tick, key, expectedErr)
+func (s *MsgServerTestSuite) danCancelsLimitSellFails(keyToken string, tick int, trancheKey string, expectedErr error) {
+	s.cancelsLimitSellFails(s.dan, keyToken, tick, trancheKey, expectedErr)
 }
 
-func (s *MsgServerTestSuite) cancelsLimitSellFails(account sdk.AccAddress, selling string, tick int, key int, expectedErr error) {
+func (s *MsgServerTestSuite) cancelsLimitSellFails(account sdk.AccAddress, selling string, tick int, trancheKey string, expectedErr error) {
 	_, err := s.msgServer.CancelLimitOrder(s.goCtx, &types.MsgCancelLimitOrder{
-		Creator:   account.String(),
-		Receiver:  account.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: int64(tick),
-		KeyToken:  selling,
-		Key:       uint64(key),
+		Creator:    account.String(),
+		Receiver:   account.String(),
+		TokenA:     "TokenA",
+		TokenB:     "TokenB",
+		TickIndex:  int64(tick),
+		KeyToken:   selling,
+		TrancheKey: trancheKey,
 	})
 	s.Assert().ErrorIs(err, expectedErr)
 }
@@ -750,60 +752,60 @@ func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr
 
 /// Withdraw filled limit order
 
-func (s *MsgServerTestSuite) aliceWithdrawsLimitSell(selling string, tick int, tranche int) {
-	s.withdrawsLimitSell(s.alice, selling, tick, tranche)
+func (s *MsgServerTestSuite) aliceWithdrawsLimitSell(selling string, tick int, trancheKey string) {
+	s.withdrawsLimitSell(s.alice, selling, tick, trancheKey)
 }
 
-func (s *MsgServerTestSuite) bobWithdrawsLimitSell(selling string, tick int, tranche int) {
-	s.withdrawsLimitSell(s.bob, selling, tick, tranche)
+func (s *MsgServerTestSuite) bobWithdrawsLimitSell(selling string, tick int, trancheKey string) {
+	s.withdrawsLimitSell(s.bob, selling, tick, trancheKey)
 }
 
-func (s *MsgServerTestSuite) carolWithdrawsLimitSell(selling string, tick int, tranche int) {
-	s.withdrawsLimitSell(s.carol, selling, tick, tranche)
+func (s *MsgServerTestSuite) carolWithdrawsLimitSell(selling string, tick int, trancheKey string) {
+	s.withdrawsLimitSell(s.carol, selling, tick, trancheKey)
 }
 
-func (s *MsgServerTestSuite) danWithdrawsLimitSell(selling string, tick int, tranche int) {
-	s.withdrawsLimitSell(s.dan, selling, tick, tranche)
+func (s *MsgServerTestSuite) danWithdrawsLimitSell(selling string, tick int, trancheKey string) {
+	s.withdrawsLimitSell(s.dan, selling, tick, trancheKey)
 }
 
-func (s *MsgServerTestSuite) withdrawsLimitSell(account sdk.AccAddress, selling string, tick int, tranche int) {
+func (s *MsgServerTestSuite) withdrawsLimitSell(account sdk.AccAddress, selling string, tick int, trancheKey string) {
 	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
-		Creator:   account.String(),
-		Receiver:  account.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: int64(tick),
-		KeyToken:  selling,
-		Key:       uint64(tranche),
+		Creator:    account.String(),
+		Receiver:   account.String(),
+		TokenA:     "TokenA",
+		TokenB:     "TokenB",
+		TickIndex:  int64(tick),
+		KeyToken:   selling,
+		TrancheKey: trancheKey,
 	})
 	s.Assert().Nil(err)
 }
 
-func (s *MsgServerTestSuite) aliceWithdrawLimitSellFails(expectedErr error, selling string, tick int, tranche int) {
-	s.withdrawLimitSellFails(s.alice, expectedErr, selling, tick, tranche)
+func (s *MsgServerTestSuite) aliceWithdrawLimitSellFails(expectedErr error, selling string, tick int, trancheKey string) {
+	s.withdrawLimitSellFails(s.alice, expectedErr, selling, tick, trancheKey)
 }
 
-func (s *MsgServerTestSuite) bobWithdrawLimitSellFails(expectedErr error, selling string, tick int, tranche int) {
-	s.withdrawLimitSellFails(s.bob, expectedErr, selling, tick, tranche)
+func (s *MsgServerTestSuite) bobWithdrawLimitSellFails(expectedErr error, selling string, tick int, trancheKey string) {
+	s.withdrawLimitSellFails(s.bob, expectedErr, selling, tick, trancheKey)
 }
 
-func (s *MsgServerTestSuite) carolWithdrawLimitSellFails(expectedErr error, selling string, tick int, tranche int) {
-	s.withdrawLimitSellFails(s.carol, expectedErr, selling, tick, tranche)
+func (s *MsgServerTestSuite) carolWithdrawLimitSellFails(expectedErr error, selling string, tick int, trancheKey string) {
+	s.withdrawLimitSellFails(s.carol, expectedErr, selling, tick, trancheKey)
 }
 
-func (s *MsgServerTestSuite) danWithdrawLimitSellFails(expectedErr error, selling string, tick int, tranche int) {
-	s.withdrawLimitSellFails(s.dan, expectedErr, selling, tick, tranche)
+func (s *MsgServerTestSuite) danWithdrawLimitSellFails(expectedErr error, selling string, tick int, trancheKey string) {
+	s.withdrawLimitSellFails(s.dan, expectedErr, selling, tick, trancheKey)
 }
 
-func (s *MsgServerTestSuite) withdrawLimitSellFails(account sdk.AccAddress, expectedErr error, selling string, tick int, tranche int) {
+func (s *MsgServerTestSuite) withdrawLimitSellFails(account sdk.AccAddress, expectedErr error, selling string, tick int, trancheKey string) {
 	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
-		Creator:   account.String(),
-		Receiver:  account.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: int64(tick),
-		KeyToken:  selling,
-		Key:       uint64(tranche),
+		Creator:    account.String(),
+		Receiver:   account.String(),
+		TokenA:     "TokenA",
+		TokenB:     "TokenB",
+		TickIndex:  int64(tick),
+		KeyToken:   selling,
+		TrancheKey: trancheKey,
 	})
 	s.Assert().ErrorIs(err, expectedErr)
 }
@@ -912,24 +914,24 @@ func (s *MsgServerTestSuite) assertNoLiquidityAtTick(tickIndex int64, feeIndex u
 }
 
 // Filled limit liquidity
-func (s *MsgServerTestSuite) assertAliceLimitFilledAtTickAtKey(selling string, amount int, tickIndex int64, key uint64) {
-	s.assertLimitFilledAtTickAtKey(s.alice, selling, amount, tickIndex, key)
+func (s *MsgServerTestSuite) assertAliceLimitFilledAtTickAtIndex(selling string, amount int, tickIndex int64, trancheKey string) {
+	s.assertLimitFilledAtTickAtIndex(s.alice, selling, amount, tickIndex, trancheKey)
 }
 
-func (s *MsgServerTestSuite) assertBobLimitFilledAtTickAtKey(selling string, amount int, tickIndex int64, key uint64) {
-	s.assertLimitFilledAtTickAtKey(s.bob, selling, amount, tickIndex, key)
+func (s *MsgServerTestSuite) assertBobLimitFilledAtTickAtIndex(selling string, amount int, tickIndex int64, trancheKey string) {
+	s.assertLimitFilledAtTickAtIndex(s.bob, selling, amount, tickIndex, trancheKey)
 }
 
-func (s *MsgServerTestSuite) assertCarolLimitFilledAtTickAtKey(selling string, amount int, tickIndex int64, key uint64) {
-	s.assertLimitFilledAtTickAtKey(s.carol, selling, amount, tickIndex, key)
+func (s *MsgServerTestSuite) assertCarolLimitFilledAtTickAtIndex(selling string, amount int, tickIndex int64, trancheKey string) {
+	s.assertLimitFilledAtTickAtIndex(s.carol, selling, amount, tickIndex, trancheKey)
 }
 
-func (s *MsgServerTestSuite) assertDanLimitFilledAtTickAtKey(selling string, amount int, tickIndex int64, key uint64) {
-	s.assertLimitFilledAtTickAtKey(s.dan, selling, amount, tickIndex, key)
+func (s *MsgServerTestSuite) assertDanLimitFilledAtTickAtIndex(selling string, amount int, tickIndex int64, trancheKey string) {
+	s.assertLimitFilledAtTickAtIndex(s.dan, selling, amount, tickIndex, trancheKey)
 }
 
-func (s *MsgServerTestSuite) assertLimitFilledAtTickAtKey(account sdk.AccAddress, selling string, amount int, tickIndex int64, key uint64) {
-	filled := s.getLimitFilledLiquidityAtTickAtKey(selling, tickIndex, key)
+func (s *MsgServerTestSuite) assertLimitFilledAtTickAtIndex(account sdk.AccAddress, selling string, amount int, tickIndex int64, trancheKey string) {
+	filled := s.getLimitFilledLiquidityAtTickAtIndex(selling, tickIndex, trancheKey)
 	amt := sdk.NewInt(int64(amount))
 	s.Assert().True(amt.Equal(filled))
 }
@@ -976,23 +978,20 @@ func (s *MsgServerTestSuite) assertLimitLiquidityAtTickInt(selling string, tickI
 	s.Assert().True(amount.Equal(liquidity), "Incorrect liquidity: expected %s, have %s", amount.String(), liquidity.String())
 }
 
-// Fill and place tranche keys
-func (s *MsgServerTestSuite) assertFillAndPlaceTrancheKeys(selling string, tickIndex int64, expectedFill uint64, expectedPlace uint64) {
+func (s *MsgServerTestSuite) assertFillAndPlaceTrancheKeys(selling string, tickIndex int64, expectedFill string, expectedPlace string) {
 	pairId := CreatePairId("TokenA", "TokenB")
-	tranches := s.app.DexKeeper.GetAllLimitOrderTrancheAtIndex(s.ctx, pairId, selling, tickIndex)
-	var fillIndex, placeIndex uint64 = 0, 0
-
-	if len(tranches) == 1 {
-		placeIndex = tranches[0].TrancheIndex
+	placeTranche, foundPlace := s.app.DexKeeper.GetPlaceTranche(s.ctx, pairId, selling, tickIndex)
+	fillTranche, foundFill := s.app.DexKeeper.GetFillTranche(s.ctx, pairId, selling, tickIndex)
+	placeKey, fillKey := "", ""
+	if foundPlace {
+		placeKey = placeTranche.TrancheKey
 	}
 
-	if len(tranches) == 2 {
-		placeIndex = tranches[0].TrancheIndex
-		fillIndex = tranches[1].TrancheIndex
+	if foundFill {
+		fillKey = fillTranche.TrancheKey
 	}
-
-	s.Assert().Equal(expectedFill, fillIndex)
-	s.Assert().Equal(expectedPlace, placeIndex)
+	s.Assert().Equal(expectedFill, fillKey)
+	s.Assert().Equal(expectedPlace, placeKey)
 }
 
 // Limit order map helpers
@@ -1001,18 +1000,18 @@ func (s *MsgServerTestSuite) getLimitUserSharesAtTick(account sdk.AccAddress, se
 	tranches := s.app.DexKeeper.GetAllLimitOrderTrancheAtIndex(s.ctx, pairId, selling, tickIndex)
 	fillTranche := tranches[0]
 	// get user shares and total shares
-	userShares := s.getLimitUserSharesAtTickAtKey(account, selling, tickIndex, fillTranche.TrancheIndex)
+	userShares := s.getLimitUserSharesAtTickAtIndex(account, selling, tickIndex, fillTranche.TrancheKey)
 	if len(tranches) >= 2 {
-		userShares = userShares.Add(s.getLimitUserSharesAtTickAtKey(account, selling, tickIndex, tranches[1].TrancheIndex))
+		userShares = userShares.Add(s.getLimitUserSharesAtTickAtIndex(account, selling, tickIndex, tranches[1].TrancheKey))
 	}
 	return userShares
 }
 
-func (s *MsgServerTestSuite) getLimitUserSharesAtTickAtKey(account sdk.AccAddress, selling string, tickIndex int64, key uint64) sdk.Int {
+func (s *MsgServerTestSuite) getLimitUserSharesAtTickAtIndex(account sdk.AccAddress, selling string, tickIndex int64, trancheKey string) sdk.Int {
 	pairId := CreatePairId("TokenA", "TokenB")
 	// grab fill tranche reserves and shares
-	userShares, userSharesFound := s.app.DexKeeper.GetLimitOrderTrancheUser(s.ctx, pairId, tickIndex, selling, key, account.String())
-	s.Assert().True(userSharesFound, "Failed to get limit order user shares for key %s", key)
+	userShares, userSharesFound := s.app.DexKeeper.GetLimitOrderTrancheUser(s.ctx, pairId, tickIndex, selling, trancheKey, account.String())
+	s.Assert().True(userSharesFound, "Failed to get limit order user shares for index %s", trancheKey)
 	return userShares.SharesOwned
 }
 
@@ -1027,19 +1026,19 @@ func (s *MsgServerTestSuite) getLimitTotalSharesAtTick(selling string, tickIndex
 	return totalShares
 }
 
-func (s *MsgServerTestSuite) getLimitFilledLiquidityAtTickAtKey(selling string, tickIndex int64, key uint64) sdk.Int {
+func (s *MsgServerTestSuite) getLimitFilledLiquidityAtTickAtIndex(selling string, tickIndex int64, trancheKey string) sdk.Int {
 	pairId := CreatePairId("TokenA", "TokenB")
 	// grab fill tranche reserves and shares
-	tranche, _, found := s.app.DexKeeper.FindLimitOrderTranche(s.ctx, pairId, tickIndex, selling, key)
-	s.Assert().True(found, "Failed to get limit order filled reserves for key %s", key)
+	tranche, _, found := s.app.DexKeeper.FindLimitOrderTranche(s.ctx, pairId, tickIndex, selling, trancheKey)
+	s.Assert().True(found, "Failed to get limit order filled reserves for index %s", trancheKey)
 	return tranche.ReservesTokenOut
 }
 
-func (s *MsgServerTestSuite) getLimitReservesAtTickAtKey(selling string, tickIndex int64, key uint64) sdk.Int {
+func (s *MsgServerTestSuite) getLimitReservesAtTickAtKey(selling string, tickIndex int64, trancheKey string) sdk.Int {
 	pairId := CreatePairId("TokenA", "TokenB")
 	// grab fill tranche reserves and shares
-	tranche, _, found := s.app.DexKeeper.FindLimitOrderTranche(s.ctx, pairId, tickIndex, selling, key)
-	s.Assert().True(found, "Failed to get limit order reserves for key %s", key)
+	tranche, _, found := s.app.DexKeeper.FindLimitOrderTranche(s.ctx, pairId, tickIndex, selling, trancheKey)
+	s.Assert().True(found, "Failed to get limit order reserves for index %s", trancheKey)
 	return tranche.ReservesTokenIn
 }
 

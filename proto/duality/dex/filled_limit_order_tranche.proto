@@ -9,7 +9,7 @@ message FilledLimitOrderTranche {
   PairId pairId = 1;
   string tokenIn = 2;
   int64 tickIndex = 3;
-  uint64 trancheIndex = 4;
+  string trancheKey = 4;
   string reservesTokenOut = 5 [
                                 (gogoproto.moretags)   = "yaml:\"fill\"",
                                 (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",

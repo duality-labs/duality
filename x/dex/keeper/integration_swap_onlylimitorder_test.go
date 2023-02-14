@@ -506,15 +506,15 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOUnfilledLOSwapIncrementsFillKey() {
 	s.fundBobBalances(0, 50)
 	// GIVEN
 	// place LO selling 10 of token A at tick -1
-	s.aliceLimitSells("TokenA", -1, 10)
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
+	trancheKey0 := s.aliceLimitSells("TokenA", -1, 10)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, trancheKey0, trancheKey0)
 
 	// WHEN
 	// swap 20 of token A for B with minOut 0 and Place a new limitOrder
 	s.bobMarketSells("TokenB", 5, 0)
-	s.aliceLimitSells("TokenA", -1, 10)
+	trancheKey1 := s.aliceLimitSells("TokenA", -1, 10)
 
 	// THEN
 	// place increased
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, trancheKey0, trancheKey1)
 }

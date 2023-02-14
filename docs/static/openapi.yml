@@ -12359,6 +12359,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /dualitylabs/duality/dex/fee_tier/{id}:
@@ -12433,9 +12443,8 @@ paths:
                     tickIndex:
                       type: string
                       format: int64
-                    trancheIndex:
+                    trancheKey:
                       type: string
-                      format: uint64
                     reservesTokenOut:
                       type: string
                     totalTokenIn:
@@ -12534,9 +12543,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  /dualitylabs/duality/dex/filled_limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheIndex}:
+  /dualitylabs/duality/dex/filled_limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}:
     get:
       summary: Queries a FilledLimitOrderTranche by index.
       operationId: DualitylabsDualityDexFilledLimitOrderTranche
@@ -12561,9 +12580,8 @@ paths:
                   tickIndex:
                     type: string
                     format: int64
-                  trancheIndex:
+                  trancheKey:
                     type: string
-                    format: uint64
                   reservesTokenOut:
                     type: string
                   totalTokenIn:
@@ -12602,11 +12620,10 @@ paths:
           required: true
           type: string
           format: int64
-        - name: trancheIndex
+        - name: trancheKey
           in: path
           required: true
           type: string
-          format: uint64
       tags:
         - Query
   /dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}:
@@ -12638,9 +12655,8 @@ paths:
                     tickIndex:
                       type: string
                       format: int64
-                    trancheIndex:
+                    trancheKey:
                       type: string
-                      format: uint64
                     reservesTokenIn:
                       type: string
                     reservesTokenOut:
@@ -12749,9 +12765,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  /dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheIndex}:
+  /dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}:
     get:
       summary: Queries a LimitOrderTranche by index.
       operationId: DualitylabsDualityDexLimitOrderTranche
@@ -12776,9 +12802,8 @@ paths:
                   tickIndex:
                     type: string
                     format: int64
-                  trancheIndex:
+                  trancheKey:
                     type: string
-                    format: uint64
                   reservesTokenIn:
                     type: string
                   reservesTokenOut:
@@ -12819,11 +12844,10 @@ paths:
           required: true
           type: string
           format: int64
-        - name: trancheIndex
+        - name: trancheKey
           in: path
           required: true
           type: string
-          format: uint64
       tags:
         - Query
   /dualitylabs/duality/dex/limit_order_tranche_user:
@@ -12853,9 +12877,8 @@ paths:
                     tickIndex:
                       type: string
                       format: int64
-                    count:
+                    trancheKey:
                       type: string
-                      format: uint64
                     address:
                       type: string
                     sharesOwned:
@@ -12956,9 +12979,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  /dualitylabs/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{count}/{address}:
+  /dualitylabs/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{trancheKey}/{address}:
     get:
       summary: Queries a LimitOrderTrancheUser by index.
       operationId: DualitylabsDualityDexLimitOrderTrancheUser
@@ -12983,9 +13016,8 @@ paths:
                   tickIndex:
                     type: string
                     format: int64
-                  count:
+                  trancheKey:
                     type: string
-                    format: uint64
                   address:
                     type: string
                   sharesOwned:
@@ -13026,11 +13058,10 @@ paths:
           required: true
           type: string
           format: int64
-        - name: count
+        - name: trancheKey
           in: path
           required: true
           type: string
-          format: uint64
         - name: address
           in: path
           required: true
@@ -13205,6 +13236,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /dualitylabs/duality/dex/pool_reserves/{pairId}/{tokenIn}/{tickIndex}/{fee}:
@@ -13326,9 +13367,8 @@ paths:
                         tickIndex:
                           type: string
                           format: int64
-                        trancheIndex:
+                        trancheKey:
                           type: string
-                          format: uint64
                         reservesTokenIn:
                           type: string
                         reservesTokenOut:
@@ -13434,6 +13474,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -13548,6 +13598,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -13708,6 +13768,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /dualitylabs/duality/dex/tokens/{id}:
@@ -13842,9 +13912,8 @@ paths:
                     tickIndex:
                       type: string
                       format: int64
-                    count:
+                    trancheKey:
                       type: string
-                      format: uint64
                     address:
                       type: string
                     sharesOwned:
@@ -13934,9 +14003,8 @@ paths:
                         tickIndex:
                           type: string
                           format: int64
-                        count:
+                        trancheKey:
                           type: string
-                          format: uint64
                         address:
                           type: string
                         sharesOwned:
@@ -40161,9 +40229,8 @@ definitions:
       tickIndex:
         type: string
         format: int64
-      trancheIndex:
+      trancheKey:
         type: string
-        format: uint64
       reservesTokenOut:
         type: string
       totalTokenIn:
@@ -40185,9 +40252,8 @@ definitions:
       tickIndex:
         type: string
         format: int64
-      trancheIndex:
+      trancheKey:
         type: string
-        format: uint64
       reservesTokenIn:
         type: string
       reservesTokenOut:
@@ -40211,9 +40277,8 @@ definitions:
       tickIndex:
         type: string
         format: int64
-      count:
+      trancheKey:
         type: string
-        format: uint64
       address:
         type: string
       sharesOwned:
@@ -40237,6 +40302,9 @@ definitions:
           type: string
   dualitylabs.duality.dex.MsgPlaceLimitOrderResponse:
     type: object
+    properties:
+      trancheKey:
+        type: string
   dualitylabs.duality.dex.MsgSwapResponse:
     type: object
     properties:
@@ -40345,9 +40413,8 @@ definitions:
             tickIndex:
               type: string
               format: int64
-            trancheIndex:
+            trancheKey:
               type: string
-              format: uint64
             reservesTokenOut:
               type: string
             totalTokenIn:
@@ -40399,9 +40466,8 @@ definitions:
             tickIndex:
               type: string
               format: int64
-            trancheIndex:
+            trancheKey:
               type: string
-              format: uint64
             reservesTokenIn:
               type: string
             reservesTokenOut:
@@ -40455,9 +40521,8 @@ definitions:
             tickIndex:
               type: string
               format: int64
-            count:
+            trancheKey:
               type: string
-              format: uint64
             address:
               type: string
             sharesOwned:
@@ -40584,9 +40649,8 @@ definitions:
                 tickIndex:
                   type: string
                   format: int64
-                trancheIndex:
+                trancheKey:
                   type: string
-                  format: uint64
                 reservesTokenIn:
                   type: string
                 reservesTokenOut:
@@ -40745,9 +40809,8 @@ definitions:
             tickIndex:
               type: string
               format: int64
-            count:
+            trancheKey:
               type: string
-              format: uint64
             address:
               type: string
             sharesOwned:
@@ -40786,9 +40849,8 @@ definitions:
           tickIndex:
             type: string
             format: int64
-          trancheIndex:
+          trancheKey:
             type: string
-            format: uint64
           reservesTokenOut:
             type: string
           totalTokenIn:
@@ -40813,9 +40875,8 @@ definitions:
           tickIndex:
             type: string
             format: int64
-          trancheIndex:
+          trancheKey:
             type: string
-            format: uint64
           reservesTokenIn:
             type: string
           reservesTokenOut:
@@ -40842,9 +40903,8 @@ definitions:
           tickIndex:
             type: string
             format: int64
-          count:
+          trancheKey:
             type: string
-            format: uint64
           address:
             type: string
           sharesOwned:
@@ -40947,9 +41007,8 @@ definitions:
                 tickIndex:
                   type: string
                   format: int64
-                count:
+                trancheKey:
                   type: string
-                  format: uint64
                 address:
                   type: string
                 sharesOwned:
@@ -41003,9 +41062,8 @@ definitions:
           tickIndex:
             type: string
             format: int64
-          trancheIndex:
+          trancheKey:
             type: string
-            format: uint64
           reservesTokenIn:
             type: string
           reservesTokenOut:
@@ -41076,9 +41134,8 @@ definitions:
             tickIndex:
               type: string
               format: int64
-            count:
+            trancheKey:
               type: string
-              format: uint64
             address:
               type: string
             sharesOwned:

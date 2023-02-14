@@ -74,7 +74,7 @@ func CmdShowPoolReserves() *cobra.Command {
 			argTokenIn := args[2]
 			argFee := args[3]
 
-			argTrancheIndexInt, err := strconv.Atoi(argFee)
+			argTrancheKeyInt, err := strconv.Atoi(argFee)
 
 			if err != nil {
 				return err
@@ -90,7 +90,7 @@ func CmdShowPoolReserves() *cobra.Command {
 				PairId:    argPairId,
 				TickIndex: int64(argTickIndexInt),
 				TokenIn:   argTokenIn,
-				Fee:       uint64(argTrancheIndexInt),
+				Fee:       uint64(argTrancheKeyInt),
 			}
 
 			res, err := queryClient.PoolReserves(context.Background(), params)

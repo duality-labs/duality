@@ -53,7 +53,7 @@ func (k Keeper) FilledLimitOrderTranche(c context.Context, req *types.QueryGetFi
 		pairId,
 		req.TokenIn,
 		req.TickIndex,
-		req.TrancheIndex,
+		req.TrancheKey,
 	)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")

@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"strconv"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -18,7 +19,7 @@ func createNLimitOrderTranches(keeper *keeper.Keeper, ctx sdk.Context, n int) []
 			PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 			TokenIn:          "TokenA",
 			TickIndex:        int64(i),
-			TrancheIndex:     uint64(i),
+			TrancheKey:       strconv.Itoa(i),
 			ReservesTokenIn:  sdk.NewInt(10),
 			ReservesTokenOut: sdk.NewInt(10),
 			TotalTokenIn:     sdk.NewInt(10),
@@ -38,7 +39,7 @@ func TestGetLimitOrderTranche(t *testing.T) {
 			item.PairId,
 			item.TokenIn,
 			item.TickIndex,
-			item.TrancheIndex,
+			item.TrancheKey,
 		)
 		require.True(t, found)
 		require.Equal(t,
@@ -56,7 +57,7 @@ func TestRemoveLimitOrderTranche(t *testing.T) {
 			item.PairId,
 			item.TokenIn,
 			item.TickIndex,
-			item.TrancheIndex,
+			item.TrancheKey,
 		)
 		require.False(t, found)
 	}

@@ -18,7 +18,7 @@ var _ = strconv.IntSize
 func createNLimitOrderTrancheUser(keeper *keeper.Keeper, ctx sdk.Context, tickIndex int64, token string, n int) []types.LimitOrderTrancheUser {
 	items := make([]types.LimitOrderTrancheUser, n)
 	for i := range items {
-		items[i].Count = uint64(i)
+		items[i].TrancheKey = strconv.Itoa(i)
 		items[i].Address = strconv.Itoa(i)
 		items[i].PairId = &types.PairId{Token0: "TokenA", Token1: "TokenB"}
 		items[i].Token = token
@@ -41,7 +41,7 @@ func TestLimitOrderTrancheUserGet(t *testing.T) {
 			defaultPairId,
 			0,
 			"TokenA",
-			item.Count,
+			item.TrancheKey,
 			item.Address,
 		)
 		require.True(t, found)
@@ -59,14 +59,14 @@ func TestLimitOrderTrancheUserRemove(t *testing.T) {
 			&types.PairId{Token0: "TokenA", Token1: "TokenB"},
 			0,
 			"TokenA",
-			item.Count,
+			item.TrancheKey,
 			item.Address,
 		)
 		_, found := keeper.GetLimitOrderTrancheUser(ctx,
 			&types.PairId{Token0: "TokenA", Token1: "TokenB"},
 			0,
 			"TokenA",
-			item.Count,
+			item.TrancheKey,
 			item.Address,
 		)
 		require.False(t, found)

@@ -96,7 +96,7 @@ const (
 )
 
 // LimitOrderTrancheUserKey returns the store key to retrieve a LimitOrderTrancheUser from the index fields
-func LimitOrderTrancheUserKey(pairId *PairId, tickIndex int64, token string, count uint64, address string) []byte {
+func LimitOrderTrancheUserKey(pairId *PairId, tickIndex int64, token string, trancheKey string, address string) []byte {
 	var key []byte
 
 	addressBytes := []byte(address)
@@ -115,15 +115,15 @@ func LimitOrderTrancheUserKey(pairId *PairId, tickIndex int64, token string, cou
 	key = append(key, tokenBytes...)
 	key = append(key, []byte("/")...)
 
-	countBytes := []byte(strconv.Itoa(int(count)))
-	key = append(key, countBytes...)
+	trancheKeyBytes := []byte(trancheKey)
+	key = append(key, trancheKeyBytes...)
 	key = append(key, []byte("/")...)
 
 	return key
 }
 
 // LimitOrderTrancheKey returns the store key to retrieve a LimitOrderTranche from the index fields
-func LimitOrderTrancheKey(pairId *PairId, tickIndex int64, token string, count uint64) []byte {
+func LimitOrderTrancheKey(pairId *PairId, tickIndex int64, token string, trancheKey string) []byte {
 	var key []byte
 
 	pairIdBytes := []byte(pairId.Stringify())
@@ -138,8 +138,8 @@ func LimitOrderTrancheKey(pairId *PairId, tickIndex int64, token string, count u
 	key = append(key, tokenBytes...)
 	key = append(key, []byte("/")...)
 
-	countBytes := []byte(strconv.Itoa(int(count)))
-	key = append(key, countBytes...)
+	trancheKeyBytes := []byte(trancheKey)
+	key = append(key, trancheKeyBytes...)
 	key = append(key, []byte("/")...)
 
 	return key
@@ -150,7 +150,7 @@ func FilledLimitOrderTrancheKey(
 	pairId *PairId,
 	tokenIn string,
 	tickIndex int64,
-	trancheIndex uint64,
+	trancheKey string,
 ) []byte {
 	var key []byte
 
@@ -166,9 +166,8 @@ func FilledLimitOrderTrancheKey(
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
-	trancheIndexBytes := make([]byte, 8)
-	binary.BigEndian.PutUint64(trancheIndexBytes, trancheIndex)
-	key = append(key, trancheIndexBytes...)
+	trancheKeyBytes := []byte(trancheKey)
+	key = append(key, trancheKeyBytes...)
 	key = append(key, []byte("/")...)
 
 	return key
@@ -196,12 +195,25 @@ func FilledLimitOrderTranchePrefix(
 	return key
 }
 
+func LiquidityIndexBytes(liquidityIndex interface{}) []byte {
+	switch index := liquidityIndex.(type) {
+	case uint64:
+		liquidityIndexBytes := make([]byte, 8)
+		binary.BigEndian.PutUint64(liquidityIndexBytes, index)
+		return liquidityIndexBytes
+	case string:
+		return []byte(index)
+	default:
+		panic("LiquidityIndex is not a valid type")
+
+	}
+}
 func TickLiquidityKey(
 	pairId *PairId,
 	tokenIn string,
 	tickIndex int64,
 	liquidityType string,
-	liquidityIndex uint64,
+	liquidityIndex interface{},
 ) []byte {
 	var key []byte
 
@@ -221,9 +233,7 @@ func TickLiquidityKey(
 	key = append(key, liquidityTypeBytes...)
 	key = append(key, []byte("/")...)
 
-	liquidityIndexBytes := make([]byte, 8)
-	binary.BigEndian.PutUint64(liquidityIndexBytes, liquidityIndex)
-	key = append(key, liquidityIndexBytes...)
+	key = append(key, LiquidityIndexBytes(liquidityIndex)...)
 	key = append(key, []byte("/")...)
 
 	return key
@@ -329,7 +339,7 @@ const (
 	PlaceLimitOrderEventTokenIn    = "TokenIn"
 	PlaceLimitOrderEventAmountIn   = "AmountIn"
 	PlaceLimitOrderEventShares     = "Shares"
-	PlaceLimitOrderEventCurrentKey = "CurrentLimitOrderKey"
+	PlaceLimitOrderEventTrancheKey = "TrancheKey"
 )
 
 const (

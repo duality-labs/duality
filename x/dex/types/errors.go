@@ -14,8 +14,8 @@ var (
 	ErrValidPairNotFound                  = sdkerrors.Register(ModuleName, 1107, "Valid pair not found.")
 	ErrValidFeeIndexNotFound              = sdkerrors.Register(ModuleName, 1108, "Valid FeeIndex not found.") // "%d", feeIndex
 	ErrUnbalancedTxArray                  = sdkerrors.Register(ModuleName, 1110, "Transaction input arrays are not of the same length.")
-	ErrValidLimitOrderTrancheNotFound     = sdkerrors.Register(ModuleName, 1111, "Limit order trache not found:")                                // "%d", trancheIndex
-	ErrCancelEmptyLimitOrder              = sdkerrors.Register(ModuleName, 1112, "Cannot cancel additional liquidity from limit order tranche:") // "%d", tranche.TrancheIndex
+	ErrValidLimitOrderTrancheNotFound     = sdkerrors.Register(ModuleName, 1111, "Limit order trache not found:")                                // "%d", trancheKey
+	ErrCancelEmptyLimitOrder              = sdkerrors.Register(ModuleName, 1112, "Cannot cancel additional liquidity from limit order tranche:") // "%d", tranche.TrancheKey
 	ErrSlippageLimitReached               = sdkerrors.Register(ModuleName, 1114, "Slippage limit reached, minOut could not be satisfied.")
 	ErrDepositBehindPairLiquidity         = sdkerrors.Register(ModuleName, 1115, "Depositing behind the opposite token pair's liquidity is currently not allowed")
 	ErrPlaceLimitOrderBehindPairLiquidity = sdkerrors.Register(ModuleName, 1116, "Placing a limit order behind the opposite token pair's liquidity is currently not allowed")
@@ -25,7 +25,7 @@ var (
 	ErrZeroDeposit                        = sdkerrors.Register(ModuleName, 1120, "At least one deposit amount must be > 0.")
 	ErrZeroTrueDeposit                    = sdkerrors.Register(ModuleName, 1121, "Cannot deposit double-sided liquidity in tick with prexisting single-sided liquidity.")
 	ErrNotEnoughLimitOrderShares          = sdkerrors.Register(ModuleName, 1122, "Not enough limit order shares.")
-	ErrValidLimitOrderTrancheUserNotFound = sdkerrors.Register(ModuleName, 1123, "Limit order trache user not found:") // "tranche %d, user %s", trancheIndex, address
+	ErrValidLimitOrderTrancheUserNotFound = sdkerrors.Register(ModuleName, 1123, "Limit order trache user not found:") // "tranche %d, user %s", trancheKey, address
 	ErrWithdrawEmptyLimitOrder            = sdkerrors.Register(ModuleName, 1124, "Cannot withdraw additional liqudity from this limit order at this time.")
 	ErrZeroSwap                           = sdkerrors.Register(ModuleName, 1125, "Amount in must be > 0 for swap.")
 	ErrInvalidKeyToken                    = sdkerrors.Register(ModuleName, 1126, "KeyToken not in specified pair.")
