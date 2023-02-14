@@ -211,7 +211,7 @@ func (k Keeper) WithdrawCore(
 		}
 	}
 
-	// sends totalReserve1ToRemove to msg.Receiver
+	// sends totalReserve1ToRemove to receiverAddr
 	if totalReserve1ToRemove.GT(sdk.ZeroInt()) {
 		coin1 := sdk.NewCoin(token1, totalReserve1ToRemove)
 		err := k.bankKeeper.SendCoinsFromModuleToAccount(
