@@ -66,7 +66,7 @@ func (p *Pool) Swap0To1(maxAmount0 sdk.Int) (inAmount0 sdk.Int, outAmount1 sdk.I
 	maxAmount1 := maxAmount0.ToDec().Mul(p.Price0To1Upper).TruncateInt()
 	if reserves1.LTE(maxAmount1) {
 		outAmount1 = *reserves1
-		inAmount0 = reserves1.ToDec().Mul(price1To0Upper).TruncateInt()
+		inAmount0 = reserves1.ToDec().Mul(price1To0Upper).Ceil().TruncateInt()
 		*reserves0 = reserves0.Add(inAmount0)
 		*reserves1 = sdk.ZeroInt()
 	} else {
@@ -90,7 +90,7 @@ func (p *Pool) Swap1To0(maxAmount1 sdk.Int) (inAmount1 sdk.Int, outAmount0 sdk.I
 	maxAmount0 := maxAmount1.ToDec().Mul(p.Price1To0Lower).TruncateInt()
 	if reserves0.LTE(maxAmount0) {
 		outAmount0 = *reserves0
-		inAmount1 = reserves0.ToDec().Mul(price0To1Lower).TruncateInt()
+		inAmount1 = reserves0.ToDec().Mul(price0To1Lower).Ceil().TruncateInt()
 		*reserves1 = reserves1.Add(inAmount1)
 		*reserves0 = sdk.ZeroInt()
 	} else {
