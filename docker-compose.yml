@@ -3,27 +3,30 @@ version: '3.8'
 services:
   celestia-lc:
     image: ghcr.io/celestiaorg/celestia-node:bd96b3d
-    volumes:
-      - ${KEY_PATH}/celestia-lc/:${NODE_STORE}/keys:ro
-      - ${PWD}/scripts/celestia-lc/:/scripts:ro
     ports:
       - 9092:9090
       - 26659:26659
-    env_file:
-      - ${PWD}/celestia-lc.env
     command: >
       /bin/sh -c '
         #!/bin/bash/
-        /scripts/init.sh
-        /scripts/start.sh'
+
+        # init the node
+        /celestia light init \
+          --p2p.network ${CELESTIA_LC_P2P_NETWORK}
+
+        # add keys
+        echo -n "${CELESTIA_LC_MNEMONIC}" | cel-key add custom-user --recover --keyring-backend test \
+          --node.type light --p2p.network ${CELESTIA_LC_P2P_NETWORK}
+
+        # start node
+        /celestia light start --p2p.network ${CELESTIA_LC_P2P_NETWORK} \
+        	--core.ip ${CELESTIA_LC_NODE_ADDR} --gateway --gateway.addr ${CELESTIA_LC_GATEWAY_ADDR} --gateway.port ${CELESTIA_LC_GATEWAY_PORT}
+      '
     networks:
       localnet:
         ipv4_address: 192.168.10.2
   duality-rollkit-aggregator:
     image: duality-rollkit-aggregator:0.0.1
-    volumes:
-      - ${KEY_PATH}/duality-rollkit-aggregator/:/keys:ro
-      - ${PWD}/scripts/duality/:/scripts:ro
     env_file:
       - ${PWD}/duality.env
     ports:
