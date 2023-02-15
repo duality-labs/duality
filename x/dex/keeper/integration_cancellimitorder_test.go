@@ -24,6 +24,10 @@ func (s *MsgServerTestSuite) TestCancelEntireLimitOrderAOneExists() {
 	s.assertDexBalances(0, 0)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
+
+	// Assert that the LimitOrderTrancheUser has been deleted
+	_, found := s.app.DexKeeper.GetLimitOrderTrancheUser(s.ctx, defaultPairId, 0, "TokenA", trancheKey, s.alice.String())
+	s.Assert().False(found)
 }
 
 func (s *MsgServerTestSuite) TestCancelEntireLimitOrderBOneExists() {

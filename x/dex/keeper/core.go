@@ -411,7 +411,7 @@ func (k Keeper) CancelLimitOrderCore(
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
-		k.SetLimitOrderTrancheUser(ctx, trancheUser)
+		k.SaveTrancheUser(ctx, trancheUser)
 		tranche.Save(ctx, k)
 
 	} else {
@@ -494,7 +494,8 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	amountOutTokenOut := priceLimitInToOut.MulInt(amountOutTokenIn)
 
 	trancheUser.SharesWithdrawn = maxAllowedToWithdraw
-	k.SetLimitOrderTrancheUser(ctx, trancheUser)
+
+	k.SaveTrancheUser(ctx, trancheUser)
 
 	// See top NOTE on rounding
 	tranche.ReservesTokenOut = reservesTokenOutDec.Sub(amountOutTokenOut).TruncateInt()
