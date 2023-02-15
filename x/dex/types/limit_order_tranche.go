@@ -65,12 +65,18 @@ func (t LimitOrderTranche) PriceTakerToMaker() sdk.Dec {
 	}
 }
 
-func (t *LimitOrderTranche) Cancel(trancheUser LimitOrderTrancheUser) (amountToCancel sdk.Int) {
-	totalTokenInDec := sdk.NewDecFromInt(t.TotalTokenIn)
-	totalTokenOutDec := sdk.NewDecFromInt(t.TotalTokenOut)
+func (t LimitOrderTranche) RatioFilled() sdk.Dec {
+	amountFilled := t.PriceTakerToMaker().MulInt(t.TotalTokenOut)
+	ratioFilled := amountFilled.QuoInt(t.TotalTokenIn)
+	return ratioFilled
+}
 
-	filledAmount := t.PriceTakerToMaker().Mul(totalTokenOutDec)
-	ratioNotFilled := totalTokenInDec.Sub(filledAmount).Quo(totalTokenInDec)
+func (t LimitOrderTranche) HasLiquidity() bool {
+	return t.ReservesTokenIn.GT(sdk.ZeroInt())
+}
+
+func (t *LimitOrderTranche) Cancel(trancheUser LimitOrderTrancheUser) (amountToCancel sdk.Int) {
+	ratioNotFilled := sdk.OneDec().Sub(t.RatioFilled())
 
 	amountToCancel = trancheUser.SharesOwned.ToDec().Mul(ratioNotFilled).TruncateInt()
 	t.ReservesTokenIn = t.ReservesTokenIn.Sub(amountToCancel)
@@ -82,8 +88,7 @@ func (t *LimitOrderTranche) Cancel(trancheUser LimitOrderTrancheUser) (amountToC
 func (t *LimitOrderTranche) Withdraw(trancheUser LimitOrderTrancheUser) (sdk.Int, sdk.Dec) {
 	reservesTokenOutDec := sdk.NewDecFromInt(t.ReservesTokenOut)
 
-	amountFilled := t.PriceTakerToMaker().MulInt(t.TotalTokenOut)
-	ratioFilled := amountFilled.QuoInt(t.TotalTokenIn)
+	ratioFilled := t.RatioFilled()
 	maxAllowedToWithdraw := ratioFilled.MulInt(trancheUser.SharesOwned).TruncateInt()
 
 	amountOutTokenIn := maxAllowedToWithdraw.Sub(trancheUser.SharesWithdrawn)
@@ -93,6 +98,7 @@ func (t *LimitOrderTranche) Withdraw(trancheUser LimitOrderTrancheUser) (sdk.Int
 	return amountOutTokenIn, amountOutTokenOut
 
 }
+
 func (t *LimitOrderTranche) Swap(maxAmountTaker sdk.Int) (
 	inAmount sdk.Int,
 	outAmount sdk.Int,
@@ -115,8 +121,4 @@ func (t *LimitOrderTranche) Swap(maxAmountTaker sdk.Int) (
 		*reservesTokenOut = reservesTokenOut.Sub(amountFilledTokenOut)
 	}
 	return inAmount, outAmount
-}
-
-func (t LimitOrderTranche) HasLiquidity() bool {
-	return t.ReservesTokenIn.GT(sdk.ZeroInt())
 }
