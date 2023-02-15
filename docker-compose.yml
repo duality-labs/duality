@@ -23,7 +23,7 @@ services:
     image: duality-rollkit-aggregator:0.0.1
     volumes:
       - ${KEY_PATH}/duality-rollkit-aggregator/:/keys:ro
-      - ${PWD}/scripts/duality:/scripts:ro
+      - ${PWD}/scripts/duality/:/scripts:ro
     env_file:
       - ${PWD}/duality.env
     ports:
