@@ -10,8 +10,6 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		TokensList:                  []Tokens{},
-		TokenMapList:                []TokenMap{},
 		FeeTierList:                 []FeeTier{},
 		LimitOrderTrancheUserList:   []LimitOrderTrancheUser{},
 		TickLiquidityList:           []TickLiquidity{},
@@ -24,28 +22,6 @@ func DefaultGenesis() *GenesisState {
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	// Check for duplicated ID in tokens
-	tokensIdMap := make(map[uint64]bool)
-	tokensCount := gs.GetTokensCount()
-	for _, elem := range gs.TokensList {
-		if _, ok := tokensIdMap[elem.Id]; ok {
-			return fmt.Errorf("duplicated id for tokens")
-		}
-		if elem.Id >= tokensCount {
-			return fmt.Errorf("tokens id should be lower or equal than the last id")
-		}
-		tokensIdMap[elem.Id] = true
-	}
-	// Check for duplicated index in tokenMap
-	tokenMapIndexMap := make(map[string]struct{})
-
-	for _, elem := range gs.TokenMapList {
-		index := string(TokenMapKey(elem.Address))
-		if _, ok := tokenMapIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for tokenMap")
-		}
-		tokenMapIndexMap[index] = struct{}{}
-	}
 	// Check for duplicated ID in FeeTier
 	FeeTierIdMap := make(map[uint64]bool)
 	FeeTierCount := gs.GetFeeTierCount()
