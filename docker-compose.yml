@@ -15,7 +15,7 @@ services:
           --p2p.network ${CELESTIA_LC_P2P_NETWORK}
 
         # add keys
-        echo -n "${CELESTIA_LC_MNEMONIC}" | cel-key add custom-user --recover --keyring-backend test \
+        echo -n "${CELESTIA_LC_MNEMONIC}" | cel-key add ${CELESTIA_LC_KEY_NAME} -user --recover --keyring-backend test \
           --node.type light --p2p.network ${CELESTIA_LC_P2P_NETWORK}
 
         # start node
