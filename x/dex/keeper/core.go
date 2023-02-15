@@ -457,7 +457,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 
 	// TODO: this is a bit of a messy pattern
 	if wasFilled {
-		k.SetFilledLimitOrderTranche(ctx, tranche.CreateFilledTranche())
+		k.SetFilledLimitOrderTranche(ctx, tranche)
 	} else {
 		k.SetLimitOrderTranche(ctx, tranche)
 	}

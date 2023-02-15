@@ -25,7 +25,7 @@ func (k Keeper) FindLimitOrderTranche(
 	// Look for filled limit orders
 	tranche, found := k.GetFilledLimitOrderTranche(ctx, pairId, token, tickIndex, trancheKey)
 	if found {
-		return types.NewFromFilledTranche(tranche), true, true
+		return tranche, true, true
 	}
 	return types.LimitOrderTranche{}, false, false
 }
@@ -49,8 +49,7 @@ func (k Keeper) SaveTranche(sdkCtx sdk.Context, tranche types.LimitOrderTranche)
 	if tranche.HasToken() {
 		k.SetLimitOrderTranche(sdkCtx, tranche)
 	} else {
-		filledTranche := tranche.CreateFilledTranche()
-		k.SetFilledLimitOrderTranche(sdkCtx, filledTranche)
+		k.SetFilledLimitOrderTranche(sdkCtx, tranche)
 		k.RemoveLimitOrderTranche(sdkCtx, tranche)
 	}
 
