@@ -13,18 +13,6 @@ import (
 //                           GETTERS & INITIALIZERS                          //
 ///////////////////////////////////////////////////////////////////////////////
 
-func (k Keeper) TokenInit(ctx sdk.Context, address string) {
-	_, found := k.GetTokenMap(ctx, address)
-	if !found {
-		tokenIndex := k.GetTokensCount(ctx)
-		newTokenCount := tokenIndex + 1
-		// TODO: Consolidate TokenMap and Tokens into one type
-		k.SetTokenMap(ctx, types.TokenMap{Address: address, Index: int64(tokenIndex)})
-		k.AppendTokens(ctx, types.Tokens{Address: address, Id: tokenIndex})
-		k.SetTokensCount(ctx, newTokenCount)
-	}
-}
-
 func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64, fee uint64) (*types.PoolReserves, error) {
 	tickLiq, tickFound := k.GetPoolReserves(
 		ctx,

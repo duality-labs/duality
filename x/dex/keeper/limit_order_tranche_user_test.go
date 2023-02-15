@@ -55,7 +55,7 @@ func TestLimitOrderTrancheUserRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNLimitOrderTrancheUser(keeper, ctx, 0, "TokenA", 10)
 	for _, item := range items {
-		keeper.RemoveLimitOrderTrancheUser(ctx,
+		keeper.RemoveLimitOrderTrancheUserByKey(ctx,
 			&types.PairId{Token0: "TokenA", Token1: "TokenB"},
 			0,
 			"TokenA",
