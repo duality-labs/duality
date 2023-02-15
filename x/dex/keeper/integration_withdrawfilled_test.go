@@ -210,7 +210,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledNoExistingOrderByUser() {
 	// bob tries to withdraw filled from tick 0 tranche 0
 	// THEN
 
-	err := types.ErrValidLimitOrderTrancheUserNotFound
+	err := types.ErrValidLimitOrderTrancheNotFound
 	s.bobWithdrawLimitSellFails(err, "TokenA", 0, trancheKey)
 }
 
@@ -226,6 +226,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTrancheKeyDoesntExist() {
 	// bob tries to withdraw filled from tick 0 tranche 5
 	// THEN
 
-	err := types.ErrValidLimitOrderTrancheUserNotFound
+	err := types.ErrValidLimitOrderTrancheNotFound
 	s.bobWithdrawLimitSellFails(err, "TokenA", 0, "BADTRANCHE")
 }

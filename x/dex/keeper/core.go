@@ -386,18 +386,11 @@ func (k Keeper) CancelLimitOrderCore(
 
 	pairId := CreatePairId(token0, token1)
 
-	trancheRaw, found := k.GetLimitOrderTranche(ctx, pairId, keyToken, tickIndex, trancheKey)
-	if !found {
-		return types.ErrActiveLimitOrderNotFound
-	}
+	trancheRaw, foundTranche := k.GetLimitOrderTranche(ctx, pairId, keyToken, tickIndex, trancheKey)
+	trancheUser, foundTrancheUser := k.GetLimitOrderTrancheUser(ctx, pairId, tickIndex, keyToken, trancheKey, callerAddr.String())
 
-	trancheUser, found := k.GetLimitOrderTrancheUser(ctx, pairId, tickIndex, keyToken, trancheKey, callerAddr.String())
-	if !found {
-		return types.ErrIntOverflowLimitOrderTrancheUser
-	}
-	// checks that the user has some number of limit order shares wished to withdraw
-	if trancheUser.SharesOwned.LTE(sdk.ZeroInt()) {
-		return types.ErrNotEnoughLimitOrderShares
+	if !foundTranche || !foundTrancheUser {
+		return types.ErrActiveLimitOrderNotFound
 	}
 
 	tranche := NewLimitOrderTrancheWrapper(trancheRaw)
@@ -436,7 +429,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	goCtx context.Context,
 	token0 string,
 	token1 string,
-	keyToken string,
+	tokenIn string,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
 	tickIndex int64,
@@ -444,61 +437,28 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 ) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId := CreatePairId(token0, token1)
+	_, tokenOut := GetInOutTokens(tokenIn, token0, token1)
 
-	orderTokenIn := keyToken
-	var orderTokenOut string
-	if keyToken == token0 {
-		orderTokenOut = token1
-	} else {
-		orderTokenOut = token0
-	}
-
-	trancheUser, found := k.GetLimitOrderTrancheUser(
+	trancheUser, foundTrancheUser := k.GetLimitOrderTrancheUser(
 		ctx,
 		pairId,
 		tickIndex,
-		orderTokenIn,
+		tokenIn,
 		trancheKey,
 		callerAddr.String(),
 	)
-	if !found {
-		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheUserNotFound, "tranche %s, user %s", trancheKey, callerAddr)
-	}
+	trancheRaw, wasFilled, foundTranche := k.FindLimitOrderTranche(ctx, pairId, tickIndex, tokenIn, trancheKey)
 
-	sharesToWithdraw := trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled)
-
-	// checks that the user has some number of limit order shares wished to withdraw
-	if sharesToWithdraw.LTE(sdk.ZeroInt()) {
-		return types.ErrNotEnoughLimitOrderShares
-	}
-
-	trancheRaw, wasFilled, found := k.FindLimitOrderTranche(ctx, pairId, tickIndex, keyToken, trancheKey)
-	if !found {
+	if !foundTrancheUser || !foundTranche {
 		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheNotFound, "%s", trancheKey)
 	}
 
 	tranche := NewLimitOrderTrancheWrapper(&trancheRaw)
 
-	priceLimitInToOut := tranche.PriceMakerToTaker
-	priceLimitOutToIn := tranche.PriceTakerToMaker
+	amountOutTokenIn, amountOutTokenOut := tranche.Withdraw(trancheUser)
 
-	reservesTokenOutDec := sdk.NewDecFromInt(tranche.ReservesTokenOut)
-	amountFilled := priceLimitOutToIn.MulInt(tranche.TotalTokenOut)
-	ratioFilled := amountFilled.QuoInt(tranche.TotalTokenIn)
-	maxAllowedToWithdraw := sdk.MinInt(
-		ratioFilled.MulInt(trancheUser.SharesOwned).TruncateInt(), // cannot withdraw more than what's been filled
-		sharesToWithdraw,
-	)
-	amountOutTokenIn := maxAllowedToWithdraw.Sub(trancheUser.SharesWithdrawn)
-
-	amountOutTokenOut := priceLimitInToOut.MulInt(amountOutTokenIn)
-
-	trancheUser.SharesWithdrawn = maxAllowedToWithdraw
-
+	trancheUser.SharesWithdrawn = trancheUser.SharesWithdrawn.Add(amountOutTokenIn)
 	k.SaveTrancheUser(ctx, trancheUser)
-
-	// See top NOTE on rounding
-	tranche.ReservesTokenOut = reservesTokenOutDec.Sub(amountOutTokenOut).TruncateInt()
 
 	// TODO: this is a bit of a messy pattern
 	if wasFilled {
@@ -508,7 +468,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	}
 
 	if amountOutTokenOut.GT(sdk.ZeroDec()) {
-		coinOut := sdk.NewCoin(orderTokenOut, amountOutTokenOut.TruncateInt())
+		coinOut := sdk.NewCoin(tokenOut, amountOutTokenOut.TruncateInt())
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
@@ -521,7 +481,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		receiverAddr.String(),
 		token0,
 		token1,
-		keyToken,
+		tokenIn,
 		trancheKey,
 		amountOutTokenOut.String(),
 	))

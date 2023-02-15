@@ -24,8 +24,6 @@ var (
 	ErrInvalidPairIdStr                   = sdkerrors.Register(ModuleName, 1119, "PairId does not conform to pattern TokenA<>TokenB.")
 	ErrZeroDeposit                        = sdkerrors.Register(ModuleName, 1120, "At least one deposit amount must be > 0.")
 	ErrZeroTrueDeposit                    = sdkerrors.Register(ModuleName, 1121, "Cannot deposit double-sided liquidity in tick with prexisting single-sided liquidity.")
-	ErrNotEnoughLimitOrderShares          = sdkerrors.Register(ModuleName, 1122, "Not enough limit order shares.")
-	ErrValidLimitOrderTrancheUserNotFound = sdkerrors.Register(ModuleName, 1123, "Limit order trache user not found:") // "tranche %d, user %s", trancheKey, address
 	ErrWithdrawEmptyLimitOrder            = sdkerrors.Register(ModuleName, 1124, "Cannot withdraw additional liqudity from this limit order at this time.")
 	ErrZeroSwap                           = sdkerrors.Register(ModuleName, 1125, "Amount in must be > 0 for swap.")
 	ErrInvalidKeyToken                    = sdkerrors.Register(ModuleName, 1126, "KeyToken not in specified pair.")
