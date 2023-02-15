@@ -9,30 +9,6 @@ func (t LimitOrderTranche) IsPlaceTranche() bool {
 	return t.ReservesTokenIn.Equal(t.TotalTokenIn)
 }
 
-func NewFromFilledTranche(t FilledLimitOrderTranche) LimitOrderTranche {
-	return LimitOrderTranche{
-		TrancheKey:       t.TrancheKey,
-		TickIndex:        t.TickIndex,
-		TokenIn:          t.TokenIn,
-		PairId:           t.PairId,
-		TotalTokenOut:    t.TotalTokenOut,
-		TotalTokenIn:     t.TotalTokenIn,
-		ReservesTokenOut: t.ReservesTokenOut,
-	}
-}
-
-func (t LimitOrderTranche) CreateFilledTranche() FilledLimitOrderTranche {
-	return FilledLimitOrderTranche{
-		TrancheKey:       t.TrancheKey,
-		TickIndex:        t.TickIndex,
-		TokenIn:          t.TokenIn,
-		PairId:           t.PairId,
-		TotalTokenIn:     t.TotalTokenIn,
-		TotalTokenOut:    t.TotalTokenOut,
-		ReservesTokenOut: t.ReservesTokenOut,
-	}
-}
-
 func (t LimitOrderTranche) IsFilled() bool {
 	return t.ReservesTokenIn.IsZero()
 }
