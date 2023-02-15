@@ -1,22 +1,29 @@
 name: duality-rollkit
 version: '3.8'
 services:
-  # celestia-lc:
-  #   image: celestia-node
-  #   volumes:
-  #     - ${KEY_PATH}/celestia-lc/:${NODE_STORE}/keys:ro
-  #     - ${PWD}/scripts/celestia-lc/:/scripts:ro
-  #   ports:
-  #     - 9092:9090
-  #     - 26659:26659
-  #   env_file:
-  #     - ${PWD}/celestia-lc.env
-  #   command: /bin/sh -c '/scripts/init.sh && /scripts/start.sh'
-  duality:
+  celestia-lc:
+    image: ghcr.io/celestiaorg/celestia-node:bd96b3d
+    volumes:
+      - ${KEY_PATH}/celestia-lc/:${NODE_STORE}/keys:ro
+      - ${PWD}/scripts/celestia-lc/:/scripts:ro
+    ports:
+      - 9092:9090
+      - 26659:26659
+    env_file:
+      - ${PWD}/celestia-lc.env
+    command: >
+      /bin/sh -c '
+        #!/bin/bash/
+        /scripts/init.sh
+        /scripts/start.sh'
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.2
+  duality-rollkit-aggregator:
     image: duality-rollkit-aggregator:0.0.1
     volumes:
-      - ${KEY_PATH}/duality-rollkit/:/keys
-      - ${PWD}/scripts/duality/:/scripts
+      - ${KEY_PATH}/duality-rollkit-aggregator/:/keys:ro
+      - ${PWD}/scripts/duality:/scripts:ro
     env_file:
       - ${PWD}/duality.env
     ports:
@@ -34,3 +41,14 @@ services:
           /scripts/genesis.sh
         fi
         /scripts/start.sh'
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.3
+
+networks:
+  localnet:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.10.0/25

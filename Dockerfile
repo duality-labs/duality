@@ -1,4 +1,3 @@
-# [Choice] Go version (use -bullseye variants on local arm64/Apple Silicon): 1, 1.16, 1.17, 1-bullseye, 1.16-bullseye, 1.17-bullseye, 1-buster, 1.16-buster, 1.17-buster
 FROM golang:1.18 as build-env
 
 # install additional OS packages.
@@ -21,6 +20,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 # Copy rest of files
 COPY . .
 
+# build duality
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/root/go/pkg/mod \
     CGO_ENABLED=1 \
@@ -36,8 +36,10 @@ RUN apk add --update \
     # allow JSON parsing in startup shell scripts
     jq \
     # required for HTTPS to connect properly
-    ca-certificates
+    ca-certificates \
+    curl
 
 # Copy over binaries and genesis files from the build-env
 COPY --from=build-env /usr/src/build/dualityd /usr/bin/dualityd
 COPY networks networks
+COPY scripts/duality scripts
