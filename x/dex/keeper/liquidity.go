@@ -7,7 +7,6 @@ import (
 
 type Liquidity interface {
 	Swap(maxAmount sdk.Int) (inAmount sdk.Int, outAmount sdk.Int)
-	Save(sdkCtx sdk.Context, keeper Keeper)
 	Price() sdk.Dec
 }
 
@@ -67,7 +66,7 @@ func (s *LiquidityIterator) Next() Liquidity {
 			return pool
 
 		case *types.TickLiquidity_LimitOrderTranche:
-			return NewLimitOrderTrancheWrapper(liquidity.LimitOrderTranche)
+			return liquidity.LimitOrderTranche
 
 		default:
 			panic("Tick does not have liquidity")
@@ -110,4 +109,17 @@ func (s *LiquidityIterator) createPool1To0(lowerTick types.PoolReserves) (Liquid
 
 func (s *LiquidityIterator) Close() {
 	s.iter.Close()
+}
+
+func (k Keeper) SaveLiquidity(sdkCtx sdk.Context, liquidityI Liquidity) {
+	switch liquidity := liquidityI.(type) {
+	case *types.LimitOrderTranche:
+		k.SaveTranche(sdkCtx, *liquidity)
+
+	case *PoolLiquidity:
+		k.SavePool(sdkCtx, *liquidity.pool)
+	default:
+		panic("Invalid liquidity type")
+	}
+
 }

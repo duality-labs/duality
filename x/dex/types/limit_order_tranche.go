@@ -11,7 +11,7 @@ func (t LimitOrderTranche) IsPlaceTranche() bool {
 
 func NewFromFilledTranche(t FilledLimitOrderTranche) LimitOrderTranche {
 	return LimitOrderTranche{
-		TrancheKey:     t.TrancheKey,
+		TrancheKey:       t.TrancheKey,
 		TickIndex:        t.TickIndex,
 		TokenIn:          t.TokenIn,
 		PairId:           t.PairId,
@@ -23,7 +23,7 @@ func NewFromFilledTranche(t FilledLimitOrderTranche) LimitOrderTranche {
 
 func (t LimitOrderTranche) CreateFilledTranche() FilledLimitOrderTranche {
 	return FilledLimitOrderTranche{
-		TrancheKey:     t.TrancheKey,
+		TrancheKey:       t.TrancheKey,
 		TickIndex:        t.TickIndex,
 		TokenIn:          t.TokenIn,
 		PairId:           t.PairId,
@@ -63,4 +63,60 @@ func (t LimitOrderTranche) PriceTakerToMaker() sdk.Dec {
 	} else {
 		return utils.MustCalcPrice0To1(t.TickIndex)
 	}
+}
+
+func (t *LimitOrderTranche) Cancel(trancheUser LimitOrderTrancheUser) (amountToCancel sdk.Int) {
+	totalTokenInDec := sdk.NewDecFromInt(t.TotalTokenIn)
+	totalTokenOutDec := sdk.NewDecFromInt(t.TotalTokenOut)
+
+	filledAmount := t.PriceTakerToMaker().Mul(totalTokenOutDec)
+	ratioNotFilled := totalTokenInDec.Sub(filledAmount).Quo(totalTokenInDec)
+
+	amountToCancel = trancheUser.SharesOwned.ToDec().Mul(ratioNotFilled).TruncateInt()
+	t.ReservesTokenIn = t.ReservesTokenIn.Sub(amountToCancel)
+
+	return amountToCancel
+
+}
+
+func (t *LimitOrderTranche) Withdraw(trancheUser LimitOrderTrancheUser) (sdk.Int, sdk.Dec) {
+	reservesTokenOutDec := sdk.NewDecFromInt(t.ReservesTokenOut)
+
+	amountFilled := t.PriceTakerToMaker().MulInt(t.TotalTokenOut)
+	ratioFilled := amountFilled.QuoInt(t.TotalTokenIn)
+	maxAllowedToWithdraw := ratioFilled.MulInt(trancheUser.SharesOwned).TruncateInt()
+
+	amountOutTokenIn := maxAllowedToWithdraw.Sub(trancheUser.SharesWithdrawn)
+	amountOutTokenOut := t.PriceMakerToTaker().MulInt(amountOutTokenIn)
+	t.ReservesTokenOut = reservesTokenOutDec.Sub(amountOutTokenOut).TruncateInt()
+
+	return amountOutTokenIn, amountOutTokenOut
+
+}
+func (t *LimitOrderTranche) Swap(maxAmountTaker sdk.Int) (
+	inAmount sdk.Int,
+	outAmount sdk.Int,
+) {
+	reservesTokenOut := &t.ReservesTokenIn
+	fillTokenIn := &t.ReservesTokenOut
+	totalTokenIn := &t.TotalTokenOut
+	amountFilledTokenOut := maxAmountTaker.ToDec().Mul(t.PriceTakerToMaker()).TruncateInt()
+	if reservesTokenOut.LTE(amountFilledTokenOut) {
+		inAmount = reservesTokenOut.ToDec().Mul(t.PriceMakerToTaker()).TruncateInt()
+		outAmount = *reservesTokenOut
+		*reservesTokenOut = sdk.ZeroInt()
+		*fillTokenIn = fillTokenIn.Add(inAmount)
+		*totalTokenIn = totalTokenIn.Add(inAmount)
+	} else {
+		inAmount = maxAmountTaker
+		outAmount = amountFilledTokenOut
+		*fillTokenIn = fillTokenIn.Add(maxAmountTaker)
+		*totalTokenIn = totalTokenIn.Add(maxAmountTaker)
+		*reservesTokenOut = reservesTokenOut.Sub(amountFilledTokenOut)
+	}
+	return inAmount, outAmount
+}
+
+func (t LimitOrderTranche) HasLiquidity() bool {
+	return t.ReservesTokenIn.GT(sdk.ZeroInt())
 }
