@@ -103,7 +103,7 @@ func (s *CoreHelpersTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amo
 
 	lowerTick.Reserves = amountAInt
 	upperTick.Reserves = amountBInt
-	pool.Save(s.ctx, s.app.DexKeeper)
+	s.app.DexKeeper.SavePool(s.ctx, pool)
 }
 
 // GetOrInitUserShareData /////////////////////////////////////////////////////

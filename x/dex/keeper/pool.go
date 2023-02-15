@@ -227,16 +227,16 @@ func CalcFee(upperTickIndex int64, lowerTickIndex int64) int64 {
 	return (upperTickIndex - lowerTickIndex) / 2
 }
 
-func (p *Pool) Save(sdkCtx sdk.Context, keeper Keeper) {
-	if p.LowerTick0.HasToken() {
-		keeper.SetPoolReserves(sdkCtx, *p.LowerTick0)
+func (k Keeper) SavePool(sdkCtx sdk.Context, pool Pool) {
+	if pool.LowerTick0.HasToken() {
+		k.SetPoolReserves(sdkCtx, *pool.LowerTick0)
 	} else {
-		keeper.RemovePoolReserves(sdkCtx, *p.LowerTick0)
+		k.RemovePoolReserves(sdkCtx, *pool.LowerTick0)
 	}
 
-	if p.UpperTick1.HasToken() {
-		keeper.SetPoolReserves(sdkCtx, *p.UpperTick1)
+	if pool.UpperTick1.HasToken() {
+		k.SetPoolReserves(sdkCtx, *pool.UpperTick1)
 	} else {
-		keeper.RemovePoolReserves(sdkCtx, *p.UpperTick1)
+		k.RemovePoolReserves(sdkCtx, *pool.UpperTick1)
 	}
 }
