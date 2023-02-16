@@ -38,10 +38,9 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReac
 	s.bobMarketSells("TokenA", amountIn, 5)
 
 	// THEN
-	// swap should have in 10 out 10
-	s.assertBobBalances(40, 10)
-	s.assertDexBalances(10, 0)
-	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
+	// swap should have in 11 out 10
+	s.assertBobBalances(39, 10)
+	s.assertDexBalances(11, 0)
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReachedMinReached() {
@@ -60,10 +59,9 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReac
 	s.bobMarketSells("TokenB", amountIn, 5)
 
 	// THEN
-	// swap should have in 10 out 10
-	s.assertBobBalances(10, 40)
-	s.assertDexBalances(0, 10)
-	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
+	// swap should have in 11 out 10
+	s.assertBobBalances(10, 39)
+	s.assertDexBalances(0, 11)
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLOSlippageToleranceReached() {
@@ -173,14 +171,13 @@ func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionSomeFeeTiers() {
 	s.assertDexBalances(0, 20)
 
 	// WHEN
-	// swap 5 of token A for B with minOut 4
-	amountIn := 15
-	s.bobMarketSells("TokenA", amountIn, 14)
+	// swap 15 of token A for B with minOut 13
+	s.bobMarketSells("TokenA", 15, 13)
 
 	// THEN
-	// swap should have in 15 out 14
-	s.assertBobBalances(35, 14)
-	s.assertDexBalances(15, 6)
+	// swap should have in 15 out 13
+	s.assertBobBalances(35, 13)
+	s.assertDexBalances(15, 7)
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveCurr1to0() {
@@ -212,8 +209,8 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0MovesCurr1to0() {
 	s.assertCurr1To0(-1)
 
 	// WHEN
-	// swap 15 of token B for A with minOut 14
-	s.bobMarketSells("TokenB", 15, 14)
+	// swap 15 of token B for A with minOut 13
+	s.bobMarketSells("TokenB", 15, 13)
 
 	// THEN
 	// current 1to0 moves to -3
@@ -357,8 +354,8 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1MovesCurr0to1() {
 	s.assertCurr0To1(1)
 
 	// WHEN
-	// swap 15 of token A for B with minOut 14
-	s.bobMarketSells("TokenA", 15, 14)
+	// swap 15 of token A for B with minOut 13
+	s.bobMarketSells("TokenA", 15, 13)
 
 	// THEN
 	// current 0to1 moves to 3
