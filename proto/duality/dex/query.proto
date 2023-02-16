@@ -11,7 +11,6 @@ import "duality/dex/limit_order_tranche.proto";
 import "duality/dex/user_positions.proto";
 import "duality/dex/deposit_record.proto";
 import "duality/dex/tick_liquidity.proto";
-import "duality/dex/filled_limit_order_tranche.proto";
 import "duality/dex/pool_reserves.proto";
 // this line is used by starport scaffolding # 1
 
@@ -212,7 +211,7 @@ message QueryGetFilledLimitOrderTrancheRequest {
 }
 
 message QueryGetFilledLimitOrderTrancheResponse {
-	FilledLimitOrderTranche filledLimitOrderTranche = 1 [(gogoproto.nullable) = false];
+	LimitOrderTranche filledLimitOrderTranche = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryAllFilledLimitOrderTrancheRequest {
@@ -220,7 +219,7 @@ message QueryAllFilledLimitOrderTrancheRequest {
 }
 
 message QueryAllFilledLimitOrderTrancheResponse {
-	repeated FilledLimitOrderTranche filledLimitOrderTranche = 1 [(gogoproto.nullable) = false];
+	repeated LimitOrderTranche filledLimitOrderTranche = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

@@ -122,29 +122,6 @@ func LimitOrderTrancheUserKey(pairId *PairId, tickIndex int64, token string, tra
 	return key
 }
 
-// LimitOrderTrancheKey returns the store key to retrieve a LimitOrderTranche from the index fields
-func LimitOrderTrancheKey(pairId *PairId, tickIndex int64, token string, trancheKey string) []byte {
-	var key []byte
-
-	pairIdBytes := []byte(pairId.Stringify())
-	key = append(key, pairIdBytes...)
-	key = append(key, []byte("/")...)
-
-	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
-	key = append(key, tickIndexBytes...)
-	key = append(key, []byte("/")...)
-
-	tokenBytes := []byte(token)
-	key = append(key, tokenBytes...)
-	key = append(key, []byte("/")...)
-
-	trancheKeyBytes := []byte(trancheKey)
-	key = append(key, trancheKeyBytes...)
-	key = append(key, []byte("/")...)
-
-	return key
-}
-
 // FilledLimitOrderTrancheKey returns the store key to retrieve a FilledLimitOrderTranche from the index fields
 func FilledLimitOrderTrancheKey(
 	pairId *PairId,

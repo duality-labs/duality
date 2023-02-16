@@ -70,7 +70,7 @@ var limitOrderTrancheList = []types.TickLiquidity{
 	},
 }
 
-var filledLimitOrderTrancheList = []types.FilledLimitOrderTranche{
+var filledLimitOrderTrancheList = []types.LimitOrderTranche{
 	{PairId: &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 		TokenIn:          "TokenB",
 		TickIndex:        0,
@@ -78,6 +78,7 @@ var filledLimitOrderTrancheList = []types.FilledLimitOrderTranche{
 		TotalTokenIn:     sdk.NewInt(10),
 		TotalTokenOut:    sdk.NewInt(10),
 		ReservesTokenOut: sdk.NewInt(10),
+		ReservesTokenIn:  sdk.NewInt(0),
 	},
 	{PairId: &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 		TokenIn:          "TokenB",
@@ -86,6 +87,7 @@ var filledLimitOrderTrancheList = []types.FilledLimitOrderTranche{
 		TotalTokenIn:     sdk.NewInt(10),
 		TotalTokenOut:    sdk.NewInt(10),
 		ReservesTokenOut: sdk.NewInt(10),
+		ReservesTokenIn:  sdk.NewInt(0),
 	},
 }
 
@@ -458,7 +460,7 @@ func (s *QueryTestSuite) TestQueryCmdListFilledLimitOrderTranche() {
 		args      []string
 		expErr    bool
 		expErrMsg string
-		expOutput []types.FilledLimitOrderTranche
+		expOutput []types.LimitOrderTranche
 	}{
 		{
 			name:      "valid",
@@ -495,7 +497,7 @@ func (s *QueryTestSuite) TestQueryCmdShowFilledLimitOrderTranche() {
 		args      []string
 		expErr    bool
 		expErrMsg string
-		expOutput types.FilledLimitOrderTranche
+		expOutput types.LimitOrderTranche
 	}{
 		//show-filled-limit-order-tranche [pair-id] [token-in] [tick-index] [tranche-index]",
 		{

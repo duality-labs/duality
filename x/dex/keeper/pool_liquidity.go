@@ -17,10 +17,6 @@ func (pl *PoolLiquidity) Swap(maxAmount sdk.Int) (inAmount sdk.Int, outAmount sd
 	}
 }
 
-func (pl *PoolLiquidity) Save(sdkCtx sdk.Context, keeper Keeper) {
-	pl.pool.Save(sdkCtx, keeper)
-}
-
 func (pl *PoolLiquidity) Price() sdk.Dec {
 	if pl.is0To1 {
 		return pl.pool.Price0To1Upper

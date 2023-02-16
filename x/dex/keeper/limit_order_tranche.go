@@ -9,97 +9,6 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
-type LimitOrderTrancheWrapper struct {
-	*types.LimitOrderTranche
-	PriceTakerToMaker sdk.Dec
-	PriceMakerToTaker sdk.Dec
-}
-
-func NewLimitOrderTrancheWrapper(
-	tranche *types.LimitOrderTranche,
-) *LimitOrderTrancheWrapper {
-	return &LimitOrderTrancheWrapper{
-		LimitOrderTranche: tranche,
-		PriceTakerToMaker: tranche.PriceTakerToMaker(),
-		PriceMakerToTaker: tranche.PriceMakerToTaker(),
-	}
-}
-
-func (t *LimitOrderTrancheWrapper) Cancel(trancheUser types.LimitOrderTrancheUser) (amountToCancel sdk.Int) {
-	totalTokenInDec := sdk.NewDecFromInt(t.TotalTokenIn)
-	totalTokenOutDec := sdk.NewDecFromInt(t.TotalTokenOut)
-
-	filledAmount := t.PriceTakerToMaker.Mul(totalTokenOutDec)
-	ratioNotFilled := totalTokenInDec.Sub(filledAmount).Quo(totalTokenInDec)
-
-	amountToCancel = trancheUser.SharesOwned.ToDec().Mul(ratioNotFilled).TruncateInt()
-	t.ReservesTokenIn = t.ReservesTokenIn.Sub(amountToCancel)
-
-	return amountToCancel
-
-}
-
-func (t *LimitOrderTrancheWrapper) Withdraw(trancheUser types.LimitOrderTrancheUser) (sdk.Int, sdk.Dec) {
-	reservesTokenOutDec := sdk.NewDecFromInt(t.ReservesTokenOut)
-
-	amountFilled := t.PriceTakerToMaker.MulInt(t.TotalTokenOut)
-	ratioFilled := amountFilled.QuoInt(t.TotalTokenIn)
-	maxAllowedToWithdraw := ratioFilled.MulInt(trancheUser.SharesOwned).TruncateInt()
-
-	amountOutTokenIn := maxAllowedToWithdraw.Sub(trancheUser.SharesWithdrawn)
-	amountOutTokenOut := t.PriceMakerToTaker.MulInt(amountOutTokenIn)
-	t.ReservesTokenOut = reservesTokenOutDec.Sub(amountOutTokenOut).TruncateInt()
-
-	return amountOutTokenIn, amountOutTokenOut
-
-}
-func (t *LimitOrderTrancheWrapper) Swap(maxAmountTaker sdk.Int) (
-	inAmount sdk.Int,
-	outAmount sdk.Int,
-) {
-	reservesTokenOut := &t.ReservesTokenIn
-	fillTokenIn := &t.ReservesTokenOut
-	totalTokenIn := &t.TotalTokenOut
-	amountFilledTokenOut := maxAmountTaker.ToDec().Mul(t.PriceTakerToMaker).TruncateInt()
-	if reservesTokenOut.LTE(amountFilledTokenOut) {
-		inAmount = reservesTokenOut.ToDec().Mul(t.PriceMakerToTaker).TruncateInt()
-		outAmount = *reservesTokenOut
-		*reservesTokenOut = sdk.ZeroInt()
-		*fillTokenIn = fillTokenIn.Add(inAmount)
-		*totalTokenIn = totalTokenIn.Add(inAmount)
-	} else {
-		inAmount = maxAmountTaker
-		outAmount = amountFilledTokenOut
-		*fillTokenIn = fillTokenIn.Add(maxAmountTaker)
-		*totalTokenIn = totalTokenIn.Add(maxAmountTaker)
-		*reservesTokenOut = reservesTokenOut.Sub(amountFilledTokenOut)
-	}
-	return inAmount, outAmount
-}
-
-func (t LimitOrderTrancheWrapper) IsFilled() bool {
-	return t.ReservesTokenIn.IsZero()
-}
-
-func (t *LimitOrderTrancheWrapper) Save(sdkCtx sdk.Context, keeper Keeper) {
-	if !t.IsFilled() {
-		keeper.SetLimitOrderTranche(sdkCtx, *t.LimitOrderTranche)
-	} else {
-		filledTranche := t.LimitOrderTranche.CreateFilledTranche()
-		keeper.SetFilledLimitOrderTranche(sdkCtx, filledTranche)
-		keeper.RemoveLimitOrderTranche(sdkCtx, *t.LimitOrderTranche)
-	}
-
-}
-
-func (t *LimitOrderTrancheWrapper) Price() sdk.Dec {
-	return t.PriceTakerToMaker
-}
-
-func (t LimitOrderTrancheWrapper) HasLiquidity() bool {
-	return t.ReservesTokenIn.GT(sdk.ZeroInt())
-}
-
 func (k Keeper) FindLimitOrderTranche(
 	ctx sdk.Context,
 	pairId *types.PairId,
@@ -116,7 +25,7 @@ func (k Keeper) FindLimitOrderTranche(
 	// Look for filled limit orders
 	tranche, found := k.GetFilledLimitOrderTranche(ctx, pairId, token, tickIndex, trancheKey)
 	if found {
-		return types.NewFromFilledTranche(tranche), true, true
+		return tranche, true, true
 	}
 	return types.LimitOrderTranche{}, false, false
 }
@@ -140,8 +49,7 @@ func (k Keeper) SaveTranche(sdkCtx sdk.Context, tranche types.LimitOrderTranche)
 	if tranche.HasToken() {
 		k.SetLimitOrderTranche(sdkCtx, tranche)
 	} else {
-		filledTranche := tranche.CreateFilledTranche()
-		k.SetFilledLimitOrderTranche(sdkCtx, filledTranche)
+		k.SetFilledLimitOrderTranche(sdkCtx, tranche)
 		k.RemoveLimitOrderTranche(sdkCtx, tranche)
 	}
 
