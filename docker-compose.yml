@@ -23,6 +23,9 @@ services:
         	--core.ip ${CELESTIA_LC_NODE_ADDR} --gateway --gateway.addr ${CELESTIA_LC_GATEWAY_ADDR} --gateway.port ${CELESTIA_LC_GATEWAY_PORT}
       '
   duality-rollkit-aggregator:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: duality-rollkit-aggregator:0.0.1
     env_file:
       - ${PWD}/duality.env
