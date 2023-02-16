@@ -38,6 +38,21 @@ func (t *LimitOrderTrancheWrapper) Cancel(trancheUser types.LimitOrderTrancheUse
 	return amountToCancel
 
 }
+
+func (t *LimitOrderTrancheWrapper) Withdraw(trancheUser types.LimitOrderTrancheUser) (sdk.Int, sdk.Dec) {
+	reservesTokenOutDec := sdk.NewDecFromInt(t.ReservesTokenOut)
+
+	amountFilled := t.PriceTakerToMaker.MulInt(t.TotalTokenOut)
+	ratioFilled := amountFilled.QuoInt(t.TotalTokenIn)
+	maxAllowedToWithdraw := ratioFilled.MulInt(trancheUser.SharesOwned).TruncateInt()
+
+	amountOutTokenIn := maxAllowedToWithdraw.Sub(trancheUser.SharesWithdrawn)
+	amountOutTokenOut := t.PriceMakerToTaker.MulInt(amountOutTokenIn)
+	t.ReservesTokenOut = reservesTokenOutDec.Sub(amountOutTokenOut).TruncateInt()
+
+	return amountOutTokenIn, amountOutTokenOut
+
+}
 func (t *LimitOrderTrancheWrapper) Swap(maxAmountTaker sdk.Int) (
 	inAmount sdk.Int,
 	outAmount sdk.Int,
