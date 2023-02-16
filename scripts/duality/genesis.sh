@@ -23,7 +23,7 @@ jq -s 'def deepmerge(a;b):
     > /root/.duality/config/genesis.json
 
 # add key
-(echo $KEY_PASSWD; echo $KEY_PASSWD) | dualityd keys add $KEY_NAME --keyring-backend $KEYRING_BACKEND
+(echo -n $KEY_MNEMONIC) | dualityd keys add $KEY_NAME --recover --keyring-backend $KEYRING_BACKEND
 
 # add genesis balances
 # define a million, billion, Carl Sagan's worth of minimum denomination to save space
