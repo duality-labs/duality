@@ -40,6 +40,10 @@ RUN apk add --update \
     curl
 
 # Copy over binaries and genesis files from the build-env
+RUN wget https://github.com/TomWright/dasel/releases/download/v1.27.3/dasel_linux_arm64.gz; \
+    gzip -d dasel_linux_arm64.gz; \
+    chmod 755 dasel_linux_arm64; \
+    mv ./dasel_linux_arm64 /usr/local/bin/dasel;
 COPY --from=build-env /usr/src/build/dualityd /usr/bin/dualityd
 COPY networks networks
 COPY scripts/duality scripts
