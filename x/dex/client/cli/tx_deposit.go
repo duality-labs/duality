@@ -14,8 +14,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var _ = strconv.Itoa(0)
-
 func CmdDeposit() *cobra.Command {
 
 	cmd := &cobra.Command{
@@ -68,22 +66,22 @@ func CmdDeposit() *cobra.Command {
 			}
 
 			for _, s := range argTicksIndexes {
-				TickIndexInt, err := strconv.Atoi(s)
+				TickIndexInt, err := strconv.ParseInt(s, 10, 0)
 				if err != nil {
 					return err
 				}
 
-				TicksIndexesInt = append(TicksIndexesInt, int64(TickIndexInt))
+				TicksIndexesInt = append(TicksIndexesInt, TickIndexInt)
 
 			}
 
 			for _, s := range argFeesIndexes {
-				FeeIndexInt, err := strconv.Atoi(s)
+				FeeIndexInt, err := strconv.ParseUint(s, 10, 0)
 				if err != nil {
 					return err
 				}
 
-				FeesIndexesUint = append(FeesIndexesUint, uint64(FeeIndexInt))
+				FeesIndexesUint = append(FeesIndexesUint, FeeIndexInt)
 			}
 
 			for _, s := range argDepositOptions {

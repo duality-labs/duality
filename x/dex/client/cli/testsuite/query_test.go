@@ -125,7 +125,7 @@ var poolReservesList = []types.TickLiquidity{
 var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 	{
 		PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-		Token:           "TokenB",
+		Token:           "TokenA",
 		TickIndex:       1,
 		TrancheKey:      "0",
 		Address:         testAddress.String(),
@@ -135,7 +135,7 @@ var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 	},
 	{
 		PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-		Token:           "TokenA",
+		Token:           "TokenB",
 		TickIndex:       20,
 		TrancheKey:      "0",
 		Address:         testAddress.String(),
@@ -366,7 +366,7 @@ func (s *QueryTestSuite) TestQueryCmdShowLimitOrderTrancheUser() {
 		// "show-limit-order-pool-user-share-map [pairId] [tickIndex] [tokenIn] [trancheKey] [address]"
 		{
 			name:      "valid",
-			args:      []string{"TokenA<>TokenB", "1", "TokenB", "0", testAddress.String()},
+			args:      []string{"TokenA<>TokenB", "1", "TokenA", "0", testAddress.String()},
 			expOutput: limitOrderTrancheUserList[0],
 		},
 		{

@@ -2,7 +2,6 @@ package types
 
 import (
 	"encoding/binary"
-	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -107,7 +106,7 @@ func LimitOrderTrancheUserKey(pairId *PairId, tickIndex int64, token string, tra
 	key = append(key, pairIdBytes...)
 	key = append(key, []byte("/")...)
 
-	tickIndexBytes := []byte(strconv.Itoa(int(tickIndex)))
+	tickIndexBytes := TickIndexToBytes(tickIndex, pairId, token)
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 

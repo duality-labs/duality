@@ -28,7 +28,7 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 		SharesWithdrawn: sdk.NewInt(0),
 		SharesCancelled: sdk.NewInt(0),
 	},
-		LOList[0],
+		LOList[1],
 	)
 	s.Assert().Equal(types.LimitOrderTrancheUser{
 		PairId:          defaultPairId,
@@ -40,7 +40,7 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 		SharesWithdrawn: sdk.NewInt(0),
 		SharesCancelled: sdk.NewInt(0),
 	},
-		LOList[1],
+		LOList[0],
 	)
 }
 
