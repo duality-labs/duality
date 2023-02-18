@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -66,4 +67,16 @@ func Uint64ToSortableString(i uint64) string {
 	lenStr := len(intStr)
 	lenChar := strconv.FormatUint(uint64(lenStr), 36)
 	return fmt.Sprintf("%s%s", lenChar, intStr)
+}
+
+func SafeUint64(in uint64) (out int64, overflow bool) {
+	return int64(in), in > math.MaxInt64
+}
+
+func MustSafeUint64(in uint64) (out int64) {
+	int64, overflow := SafeUint64(in)
+	if overflow {
+		panic("Overflow while castting uint64 to int64")
+	}
+	return int64
 }

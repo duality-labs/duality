@@ -74,13 +74,13 @@ func CmdShowPoolReserves() *cobra.Command {
 			argTokenIn := args[2]
 			argFee := args[3]
 
-			argTrancheKeyInt, err := strconv.Atoi(argFee)
+			argTrancheKeyInt, err := strconv.ParseUint(argFee, 10, 0)
 
 			if err != nil {
 				return err
 			}
 
-			argTickIndexInt, err := strconv.Atoi(argTickIndex)
+			argTickIndexInt, err := strconv.ParseInt(argTickIndex, 10, 0)
 
 			if err != nil {
 				return err
@@ -88,9 +88,9 @@ func CmdShowPoolReserves() *cobra.Command {
 
 			params := &types.QueryGetPoolReservesRequest{
 				PairId:    argPairId,
-				TickIndex: int64(argTickIndexInt),
+				TickIndex: argTickIndexInt,
 				TokenIn:   argTokenIn,
-				Fee:       uint64(argTrancheKeyInt),
+				Fee:       argTrancheKeyInt,
 			}
 
 			res, err := queryClient.PoolReserves(context.Background(), params)

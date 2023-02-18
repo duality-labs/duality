@@ -13,8 +13,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var _ = strconv.Itoa(0)
-
 func CmdWithdrawl() *cobra.Command {
 
 	cmd := &cobra.Command{
@@ -49,22 +47,22 @@ func CmdWithdrawl() *cobra.Command {
 			}
 
 			for _, s := range argTickIndexes {
-				TickIndexInt, err := strconv.Atoi(s)
+				TickIndexInt, err := strconv.ParseInt(s, 10, 0)
 				if err != nil {
 					return err
 				}
 
-				TicksIndexesInt = append(TicksIndexesInt, int64(TickIndexInt))
+				TicksIndexesInt = append(TicksIndexesInt, TickIndexInt)
 
 			}
 
 			for _, s := range argFeeIndexes {
-				FeeIndexInt, err := strconv.Atoi(s)
+				FeeIndexInt, err := strconv.ParseUint(s, 10, 0)
 				if err != nil {
 					return err
 				}
 
-				FeeIndexesUint = append(FeeIndexesUint, uint64(FeeIndexInt))
+				FeeIndexesUint = append(FeeIndexesUint, FeeIndexInt)
 			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)

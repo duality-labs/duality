@@ -13,8 +13,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var _ = strconv.Itoa(0)
-
 func CmdPlaceLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "place-limit-order [receiver] [token-a] [token-b] [tick-index] [token-in] [amount-in]",
@@ -30,7 +28,7 @@ func CmdPlaceLimitOrder() *cobra.Command {
 				args[3] = strings.TrimSuffix(args[3], "]")
 			}
 			argTickIndex := args[3]
-			argTickIndexInt, err := strconv.Atoi(argTickIndex)
+			argTickIndexInt, err := strconv.ParseInt(argTickIndex, 10, 0)
 			if err != nil {
 				return err
 			}
@@ -53,7 +51,7 @@ func CmdPlaceLimitOrder() *cobra.Command {
 				argReceiver,
 				argTokenA,
 				argTokenB,
-				int64(argTickIndexInt),
+				argTickIndexInt,
 				argTokenIn,
 				amountInInt,
 			)
