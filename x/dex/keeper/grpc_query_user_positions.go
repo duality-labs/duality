@@ -20,8 +20,8 @@ func (k Keeper) GetUserPositions(goCtx context.Context, req *types.QueryGetUserP
 	}
 
 	userProfile := NewUserProfile(address)
-
+	ctx := sdk.UnwrapSDKContext(goCtx)
 	return &types.QueryGetUserPositionsResponse{
-		UserPositions: userProfile.GetAllPositions(goCtx, k),
+		UserPositions: userProfile.GetAllPositions(ctx, k),
 	}, nil
 }

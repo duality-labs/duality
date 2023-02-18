@@ -339,7 +339,7 @@ func (k Keeper) PlaceLimitOrderCore(
 
 	placeTrancheKey := placeTranche.TrancheKey
 
-	trancheUser := k.GetOrInitLimitOrderTrancheUser(goCtx, pairId, tickIndex, tokenIn, placeTrancheKey, receiverAddr.String())
+	trancheUser := k.GetOrInitLimitOrderTrancheUser(ctx, pairId, tickIndex, tokenIn, placeTrancheKey, receiverAddr.String())
 
 	placeTranche.ReservesTokenIn = placeTranche.ReservesTokenIn.Add(amountIn)
 	placeTranche.TotalTokenIn = placeTranche.TotalTokenIn.Add(amountIn)

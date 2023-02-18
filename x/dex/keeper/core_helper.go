@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"context"
 	"math"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -55,15 +54,13 @@ func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64,
 }
 
 func (k Keeper) GetOrInitLimitOrderTrancheUser(
-	goCtx context.Context,
+	ctx sdk.Context,
 	pairId *types.PairId,
 	tickIndex int64,
 	tokenIn string,
 	currentLimitOrderKey string,
 	receiver string,
 ) types.LimitOrderTrancheUser {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
 	UserShareData, UserShareDataFound := k.GetLimitOrderTrancheUser(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
 
 	if !UserShareDataFound {
