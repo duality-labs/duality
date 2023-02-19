@@ -121,6 +121,16 @@ func LimitOrderTrancheUserKey(pairId *PairId, tickIndex int64, token string, tra
 	return key
 }
 
+func LimitOrderTrancheUserAddressPrefix(address string) []byte {
+
+	key := KeyPrefix(LimitOrderTrancheUserKeyPrefix)
+	addressBytes := []byte(address)
+	key = append(key, addressBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
 // FilledLimitOrderTrancheKey returns the store key to retrieve a FilledLimitOrderTranche from the index fields
 func FilledLimitOrderTrancheKey(
 	pairId *PairId,
