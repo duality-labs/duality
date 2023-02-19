@@ -11,8 +11,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var _ = strconv.Itoa(0)
-
 func CmdCancelLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "cancel-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [tranche-key]",
@@ -32,7 +30,7 @@ func CmdCancelLimitOrder() *cobra.Command {
 			argKeyToken := args[4]
 			argTrancheKey := args[5]
 
-			argTickIndexInt, err := strconv.Atoi(argTickIndex)
+			argTickIndexInt, err := strconv.ParseInt(argTickIndex, 10, 0)
 			if err != nil {
 				return err
 			}
@@ -47,7 +45,7 @@ func CmdCancelLimitOrder() *cobra.Command {
 				argReceiver,
 				argTokenA,
 				argTokenB,
-				int64(argTickIndexInt),
+				argTickIndexInt,
 				argKeyToken,
 				argTrancheKey,
 			)

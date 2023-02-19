@@ -6,6 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
@@ -51,8 +52,9 @@ func (k Keeper) DepositCore(
 			return nil, nil, sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "%d", feeIndex)
 		}
 		fee := feeTiers[feeIndex].Fee
-		lowerTickIndex := tickIndex - int64(fee)
-		upperTickIndex := tickIndex + int64(fee)
+		feeUInt := utils.MustSafeUint64(fee)
+		lowerTickIndex := tickIndex - feeUInt
+		upperTickIndex := tickIndex + feeUInt
 
 		// behind enemy lines checks
 		// TODO: Allow user to deposit "behind enemy lines"

@@ -2,6 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
@@ -78,7 +79,7 @@ func (s *LiquidityIterator) Next() Liquidity {
 
 func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquidity, error) {
 	tickIndex := upperTick.TickIndex
-	lowerTickIndex := tickIndex - 2*int64(upperTick.Fee)
+	lowerTickIndex := tickIndex - 2*utils.MustSafeUint64(upperTick.Fee)
 	lowerTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairId, s.pairId.Token0, lowerTickIndex, upperTick.Fee)
 	if err != nil {
 		return nil, err
@@ -93,7 +94,7 @@ func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquid
 
 func (s *LiquidityIterator) createPool1To0(lowerTick types.PoolReserves) (Liquidity, error) {
 	tickIndex := lowerTick.TickIndex
-	upperTickIndex := tickIndex + 2*int64(lowerTick.Fee)
+	upperTickIndex := tickIndex + 2*utils.MustSafeUint64(lowerTick.Fee)
 	upperTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairId, s.pairId.Token1, upperTickIndex, lowerTick.Fee)
 	if err != nil {
 		return nil, err

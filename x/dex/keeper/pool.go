@@ -34,12 +34,13 @@ func NewPool(
 
 func (k Keeper) GetOrInitPool(ctx sdk.Context, pairId *types.PairId, tickIndex int64, feeTier types.FeeTier) (Pool, error) {
 	fee := feeTier.Fee
-	lowertick, err := k.GetOrInitPoolReserves(ctx, pairId, pairId.Token0, tickIndex-int64(fee), fee)
+	feeUint := utils.MustSafeUint64(fee)
+	lowertick, err := k.GetOrInitPoolReserves(ctx, pairId, pairId.Token0, tickIndex-feeUint, fee)
 	if err != nil {
 		return Pool{}, sdkerrors.Wrapf(err, "Error for lower tick")
 	}
 
-	upperTick, err := k.GetOrInitPoolReserves(ctx, pairId, pairId.Token1, tickIndex+int64(fee), fee)
+	upperTick, err := k.GetOrInitPoolReserves(ctx, pairId, pairId.Token1, tickIndex+feeUint, fee)
 	if err != nil {
 		return Pool{}, sdkerrors.Wrapf(err, "Error for upper tick")
 	}
