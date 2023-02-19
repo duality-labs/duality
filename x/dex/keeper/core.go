@@ -379,7 +379,6 @@ func (k Keeper) CancelLimitOrderCore(
 	token1 string,
 	keyToken string,
 	callerAddr sdk.AccAddress,
-	receiverAddr sdk.AccAddress,
 	tickIndex int64,
 	trancheKey string,
 ) error {
@@ -400,7 +399,7 @@ func (k Keeper) CancelLimitOrderCore(
 	if amountToCancel.GT(sdk.ZeroInt()) {
 		// See top NOTE on rounding
 		coinOut := sdk.NewCoin(keyToken, amountToCancel)
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
 		k.SaveTrancheUser(ctx, trancheUser)
@@ -412,7 +411,6 @@ func (k Keeper) CancelLimitOrderCore(
 
 	ctx.EventManager().EmitEvent(types.CancelLimitOrderEvent(
 		callerAddr.String(),
-		receiverAddr.String(),
 		token0,
 		token1,
 		keyToken,
@@ -430,7 +428,6 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	token1 string,
 	tokenIn string,
 	callerAddr sdk.AccAddress,
-	receiverAddr sdk.AccAddress,
 	tickIndex int64,
 	trancheKey string,
 ) error {
@@ -466,7 +463,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 
 	if amountOutTokenOut.GT(sdk.ZeroDec()) {
 		coinOut := sdk.NewCoin(tokenOut, amountOutTokenOut.TruncateInt())
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
 	} else {
@@ -475,7 +472,6 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 
 	ctx.EventManager().EmitEvent(types.WithdrawFilledLimitOrderEvent(
 		callerAddr.String(),
-		receiverAddr.String(),
 		token0,
 		token1,
 		tokenIn,

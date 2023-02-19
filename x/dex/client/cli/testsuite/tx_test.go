@@ -376,7 +376,6 @@ func (s *TxTestSuite) TestTx5CmdCancelLimitOrder() {
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, s.network.Validators[0].Address.String()),
 	}
 
-	// Place Limit Order
 	args := append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "[0]", "TokenB", "10"}, commonFlags...)
 	cmd := dexClient.CmdPlaceLimitOrder()
 	_, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
@@ -390,21 +389,21 @@ func (s *TxTestSuite) TestTx5CmdCancelLimitOrder() {
 		errInRes  bool
 	}{
 		{
-			//  "cancel-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [tranche-key]"
+			//  "cancel-limit-order [token-a] [token-b] [tick-index] [key-token] [tranche-key]"
 			name:      "missing arguments",
-			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB"},
+			args:      []string{"TokenA", "TokenB", "[0]", "TokenB"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 6 arg(s), received 5",
+			expErrMsg: "Error: accepts 5 arg(s), received 4",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "0", "1"},
+			args:      []string{"TokenA", "TokenB", "[0]", "TokenB", "0", "1"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 6 arg(s), received 7",
+			expErrMsg: "Error: accepts 5 arg(s), received 6",
 		},
 		{
 			name:     "valid",
-			args:     []string{s.addr1.String(), "TokenA", "TokenB", "20", "TokenB", s.trancheKey},
+			args:     []string{"TokenA", "TokenB", "20", "TokenB", s.trancheKey},
 			errInRes: false,
 		},
 	}
@@ -464,21 +463,21 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 		errInRes  bool
 	}{
 		{
-			//  "withdraw-filled-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [tranche-key]"
+			//  "withdraw-filled-limit-order [token-a] [token-b] [tick-index] [key-token] [tranche-key]"
 			name:      "missing arguments",
-			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB"},
+			args:      []string{"TokenA", "TokenB", "[0]", "TokenB"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 6 arg(s), received 5",
+			expErrMsg: "Error: accepts 5 arg(s), received 4",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "0", "1"},
+			args:      []string{"TokenA", "TokenB", "[0]", "TokenB", "0", "1"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 6 arg(s), received 7",
+			expErrMsg: "Error: accepts 5 arg(s), received 6",
 		},
 		{
 			name:     "valid",
-			args:     []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "0", "TokenB", trancheKey},
+			args:     []string{"TokenA", "TokenB", "0", "TokenB", trancheKey},
 			errInRes: false,
 		},
 	}
