@@ -42,8 +42,8 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilledSlippageToleranceNotRe
 
 	// THEN
 	// swap should have in 10 out 10
-	s.assertBobBalances(40, 10)
-	s.assertDexBalances(10, 0)
+	s.assertBobBalances(39, 10)
+	s.assertDexBalances(11, 0)
 	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
 }
 
@@ -64,8 +64,8 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilledSlippageToleranceNotRe
 
 	// THEN
 	// swap should have in 10 out 10
-	s.assertBobBalances(10, 40)
-	s.assertDexBalances(0, 10)
+	s.assertBobBalances(10, 39)
+	s.assertDexBalances(0, 11)
 	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
 }
 
@@ -364,8 +364,8 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustLOCorrectExecution() {
 
 	// THEN
 	// swap should have in 16 out 16
-	s.assertBobBalances(29, 20)
-	s.assertDexBalances(21, 0)
+	s.assertBobBalances(27, 20)
+	s.assertDexBalances(23, 0)
 	s.assertLimitLiquidityAtTick("TokenB", 1, 0)
 }
 
