@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"context"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/types"
 )
@@ -15,13 +13,11 @@ func NewUserProfile(address sdk.AccAddress) UserProfile {
 	return UserProfile{Address: address}
 }
 
-func (u UserProfile) GetAllLimitOrders(goCtx context.Context, k Keeper) []types.LimitOrderTrancheUser {
-	ctx := sdk.UnwrapSDKContext(goCtx)
+func (u UserProfile) GetAllLimitOrders(ctx sdk.Context, k Keeper) []types.LimitOrderTrancheUser {
 	return k.GetAllLimitOrderTrancheUserForAddress(ctx, u.Address)
 }
 
-func (u UserProfile) GetAllDeposits(goCtx context.Context, k Keeper) []types.DepositRecord {
-	ctx := sdk.UnwrapSDKContext(goCtx)
+func (u UserProfile) GetAllDeposits(ctx sdk.Context, k Keeper) []types.DepositRecord {
 	var depositArr []types.DepositRecord
 	feeTiers := k.GetAllFeeTier(ctx)
 	k.bankKeeper.IterateAccountBalances(ctx, u.Address,
@@ -38,9 +34,9 @@ func (u UserProfile) GetAllDeposits(goCtx context.Context, k Keeper) []types.Dep
 	return depositArr
 }
 
-func (u UserProfile) GetAllPositions(goCtx context.Context, k Keeper) types.UserPositions {
-	deposits := u.GetAllDeposits(goCtx, k)
-	limitOrders := u.GetAllLimitOrders(goCtx, k)
+func (u UserProfile) GetAllPositions(ctx sdk.Context, k Keeper) types.UserPositions {
+	deposits := u.GetAllDeposits(ctx, k)
+	limitOrders := u.GetAllLimitOrders(ctx, k)
 
 	return types.UserPositions{
 		PoolDeposits: deposits,
