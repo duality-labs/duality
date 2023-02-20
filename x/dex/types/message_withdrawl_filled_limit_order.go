@@ -9,10 +9,9 @@ const TypeMsgWithdrawFilledLimitOrder = "withdrawl_withdrawn_limit_order"
 
 var _ sdk.Msg = &MsgWithdrawFilledLimitOrder{}
 
-func NewMsgWithdrawFilledLimitOrder(creator string, receiver string, tokenA string, tokenB string, tickIndex int64, keyToken string, trancheKey string) *MsgWithdrawFilledLimitOrder {
+func NewMsgWithdrawFilledLimitOrder(creator string, tokenA string, tokenB string, tickIndex int64, keyToken string, trancheKey string) *MsgWithdrawFilledLimitOrder {
 	return &MsgWithdrawFilledLimitOrder{
 		Creator:    creator,
-		Receiver:   receiver,
 		TokenA:     tokenA,
 		TokenB:     tokenB,
 		TickIndex:  tickIndex,
@@ -46,11 +45,6 @@ func (msg *MsgWithdrawFilledLimitOrder) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
-
-	_, err = sdk.AccAddressFromBech32(msg.Receiver)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
 	if msg.KeyToken != msg.TokenA && msg.KeyToken != msg.TokenB {

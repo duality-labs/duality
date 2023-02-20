@@ -620,7 +620,6 @@ func (s *MsgServerTestSuite) danCancelsLimitSell(keyToken string, tick int, tran
 func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling string, tick int, trancheKey string) {
 	_, err := s.msgServer.CancelLimitOrder(s.goCtx, &types.MsgCancelLimitOrder{
 		Creator:    account.String(),
-		Receiver:   account.String(),
 		TokenA:     "TokenA",
 		TokenB:     "TokenB",
 		TickIndex:  int64(tick),
@@ -649,7 +648,6 @@ func (s *MsgServerTestSuite) danCancelsLimitSellFails(keyToken string, tick int,
 func (s *MsgServerTestSuite) cancelsLimitSellFails(account sdk.AccAddress, selling string, tick int, trancheKey string, expectedErr error) {
 	_, err := s.msgServer.CancelLimitOrder(s.goCtx, &types.MsgCancelLimitOrder{
 		Creator:    account.String(),
-		Receiver:   account.String(),
 		TokenA:     "TokenA",
 		TokenB:     "TokenB",
 		TickIndex:  int64(tick),
@@ -771,7 +769,6 @@ func (s *MsgServerTestSuite) danWithdrawsLimitSell(selling string, tick int, tra
 func (s *MsgServerTestSuite) withdrawsLimitSell(account sdk.AccAddress, selling string, tick int, trancheKey string) {
 	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
 		Creator:    account.String(),
-		Receiver:   account.String(),
 		TokenA:     "TokenA",
 		TokenB:     "TokenB",
 		TickIndex:  int64(tick),
@@ -800,7 +797,6 @@ func (s *MsgServerTestSuite) danWithdrawLimitSellFails(expectedErr error, sellin
 func (s *MsgServerTestSuite) withdrawLimitSellFails(account sdk.AccAddress, expectedErr error, selling string, tick int, trancheKey string) {
 	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
 		Creator:    account.String(),
-		Receiver:   account.String(),
 		TokenA:     "TokenA",
 		TokenB:     "TokenB",
 		TickIndex:  int64(tick),

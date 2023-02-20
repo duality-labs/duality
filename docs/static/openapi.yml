@@ -12445,6 +12445,8 @@ paths:
                       format: int64
                     trancheKey:
                       type: string
+                    reservesTokenIn:
+                      type: string
                     reservesTokenOut:
                       type: string
                     totalTokenIn:
@@ -12581,6 +12583,8 @@ paths:
                     type: string
                     format: int64
                   trancheKey:
+                    type: string
+                  reservesTokenIn:
                     type: string
                   reservesTokenOut:
                     type: string
@@ -39879,29 +39883,6 @@ definitions:
       fee:
         type: string
         format: uint64
-  dualitylabs.duality.dex.FilledLimitOrderTranche:
-    type: object
-    properties:
-      pairId:
-        type: object
-        properties:
-          token0:
-            type: string
-          token1:
-            type: string
-      tokenIn:
-        type: string
-      tickIndex:
-        type: string
-        format: int64
-      trancheKey:
-        type: string
-      reservesTokenOut:
-        type: string
-      totalTokenIn:
-        type: string
-      totalTokenOut:
-        type: string
   dualitylabs.duality.dex.LimitOrderTranche:
     type: object
     properties:
@@ -40079,6 +40060,8 @@ definitions:
               type: string
               format: int64
             trancheKey:
+              type: string
+            reservesTokenIn:
               type: string
             reservesTokenOut:
               type: string
@@ -40439,6 +40422,8 @@ definitions:
             type: string
             format: int64
           trancheKey:
+            type: string
+          reservesTokenIn:
             type: string
           reservesTokenOut:
             type: string

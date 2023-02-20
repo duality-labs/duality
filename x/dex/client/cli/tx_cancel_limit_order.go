@@ -13,22 +13,21 @@ import (
 
 func CmdCancelLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "cancel-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [tranche-key]",
+		Use:     "cancel-limit-order [token-a] [token-b] [tick-index] [key-token] [tranche-key]",
 		Short:   "Broadcast message CancelLimitOrder",
 		Example: "cancel-limit-order alice tokenA tokenB [-10] tokenA 0 --from alice",
-		Args:    cobra.ExactArgs(6),
+		Args:    cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argReceiver := args[0]
-			argTokenA := args[1]
-			argTokenB := args[2]
+			argTokenA := args[0]
+			argTokenB := args[1]
 
 			if strings.HasPrefix(args[3], "[") && strings.HasSuffix(args[3], "]") {
-				args[3] = strings.TrimPrefix(args[3], "[")
-				args[3] = strings.TrimSuffix(args[3], "]")
+				args[2] = strings.TrimPrefix(args[2], "[")
+				args[2] = strings.TrimSuffix(args[2], "]")
 			}
-			argTickIndex := args[3]
-			argKeyToken := args[4]
-			argTrancheKey := args[5]
+			argTickIndex := args[2]
+			argKeyToken := args[3]
+			argTrancheKey := args[4]
 
 			argTickIndexInt, err := strconv.ParseInt(argTickIndex, 10, 0)
 			if err != nil {
@@ -42,7 +41,6 @@ func CmdCancelLimitOrder() *cobra.Command {
 
 			msg := types.NewMsgCancelLimitOrder(
 				clientCtx.GetFromAddress().String(),
-				argReceiver,
 				argTokenA,
 				argTokenB,
 				argTickIndexInt,

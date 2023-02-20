@@ -135,7 +135,6 @@ func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLim
 
 func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.MsgWithdrawFilledLimitOrder) (*types.MsgWithdrawFilledLimitOrderResponse, error) {
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
-	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
 	// lexographically sort token0, token1
 	token0, token1, err := SortTokens(msg.TokenA, msg.TokenB)
@@ -149,7 +148,6 @@ func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.Ms
 		token1,
 		msg.KeyToken,
 		callerAddr,
-		receiverAddr,
 		msg.TickIndex,
 		msg.TrancheKey,
 	)
@@ -162,7 +160,6 @@ func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.Ms
 
 func (k msgServer) CancelLimitOrder(goCtx context.Context, msg *types.MsgCancelLimitOrder) (*types.MsgCancelLimitOrderResponse, error) {
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
-	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
 	// lexographically sort token0, token1
 	token0, token1, err := SortTokens(msg.TokenA, msg.TokenB)
@@ -176,7 +173,6 @@ func (k msgServer) CancelLimitOrder(goCtx context.Context, msg *types.MsgCancelL
 		token1,
 		msg.KeyToken,
 		callerAddr,
-		receiverAddr,
 		msg.TickIndex,
 		msg.TrancheKey,
 	)
