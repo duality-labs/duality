@@ -84,7 +84,7 @@ func (t *LimitOrderTranche) Swap(maxAmountTaker sdk.Int) (
 	totalTokenIn := &t.TotalTokenOut
 	amountFilledTokenOut := maxAmountTaker.ToDec().Mul(t.PriceTakerToMaker()).TruncateInt()
 	if reservesTokenOut.LTE(amountFilledTokenOut) {
-		inAmount = reservesTokenOut.ToDec().Mul(t.PriceMakerToTaker()).TruncateInt()
+		inAmount = reservesTokenOut.ToDec().Mul(t.PriceMakerToTaker()).Ceil().TruncateInt()
 		outAmount = *reservesTokenOut
 		*reservesTokenOut = sdk.ZeroInt()
 		*fillTokenIn = fillTokenIn.Add(inAmount)
