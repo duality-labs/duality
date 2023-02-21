@@ -203,9 +203,14 @@ func (p *Pool) CalcResidualSharesMinted(
 func (p *Pool) Withdraw(sharesToRemove sdk.Int, totalShares sdk.Int) (outAmount0 sdk.Int, outAmount1 sdk.Int) {
 	reserves0 := &p.LowerTick0.Reserves
 	reserves1 := &p.UpperTick1.Reserves
-	ownershipRatio := sharesToRemove.ToDec().Quo(totalShares.ToDec())
-	outAmount1 = ownershipRatio.Mul(reserves1.ToDec()).TruncateInt()
-	outAmount0 = ownershipRatio.Mul(reserves0.ToDec()).TruncateInt()
+	// outAmount1 = ownershipRatio * reserves1
+	//            = (sharesToRemove / totalShares) * reserves1
+	//            = (reserves1 * sharesToRemove ) / totalShares
+	outAmount1 = reserves1.Mul(sharesToRemove).ToDec().QuoInt(totalShares).TruncateInt()
+	// outAmount0 = ownershipRatio * reserves1
+	//            = (sharesToRemove / totalShares) * reserves1
+	//            = (reserves1 * sharesToRemove ) / totalShares
+	outAmount0 = reserves0.Mul(sharesToRemove).ToDec().QuoInt(totalShares).TruncateInt()
 	*reserves0 = reserves0.Sub(outAmount0)
 	*reserves1 = reserves1.Sub(outAmount1)
 	return outAmount0, outAmount1
