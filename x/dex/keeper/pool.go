@@ -184,6 +184,7 @@ func (p *Pool) CalcSharesMinted(
 
 	amount0Dec := amount0.ToDec()
 	amount1Dec := amount1.ToDec()
+	//TODO: Technically this is still quo before mult, but there's no easy way around it
 	return amount0Dec.Add(amount1Dec.Mul(price1To0Center)).TruncateInt()
 }
 
