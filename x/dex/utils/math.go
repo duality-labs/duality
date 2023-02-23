@@ -13,17 +13,6 @@ func BasePrice() sdk.Dec {
 	return sdk.MustNewDecFromStr("1.0001")
 }
 
-func Pow(a sdk.Dec, n uint64) sdk.Dec {
-	if n == 0 {
-		return sdk.OneDec()
-	}
-	if n&1 == 0 {
-		return Pow(a.Mul(a), n>>1)
-	} else {
-		return a.Mul(Pow(a.Mul(a), n>>1))
-	}
-}
-
 func Abs(x int64) uint64 {
 	if x < 0 {
 		return uint64(-x)

@@ -3,8 +3,8 @@ package keeper_test
 import (
 	"math"
 
-	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/types"
+	"github.com/duality-labs/duality/x/dex/utils"
 )
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedInSpread1To0() {

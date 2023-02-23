@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/types"
+	"github.com/duality-labs/duality/x/dex/utils"
 )
 
 const LPsharesRegexpStr = "^" + types.DepositSharesPrefix + "-" +
