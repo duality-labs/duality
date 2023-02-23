@@ -10,11 +10,11 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	dualityapp "github.com/duality-labs/duality/app"
-	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/keeper"
 	. "github.com/duality-labs/duality/x/dex/keeper"
 	. "github.com/duality-labs/duality/x/dex/keeper/internal/testutils"
 	"github.com/duality-labs/duality/x/dex/types"
+	"github.com/duality-labs/duality/x/dex/utils"
 	"github.com/stretchr/testify/suite"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
