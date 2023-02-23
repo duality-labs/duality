@@ -47,14 +47,18 @@ func (t LimitOrderTranche) RatioFilled() sdk.Dec {
 	return ratioFilled
 }
 
+func (t LimitOrderTranche) AmountUnfilled() sdk.Dec {
+	amountFilled := t.PriceTakerToMaker().MulInt(t.TotalTokenOut)
+	return t.TotalTokenIn.ToDec().Sub(amountFilled)
+}
+
 func (t LimitOrderTranche) HasLiquidity() bool {
 	return t.ReservesTokenIn.GT(sdk.ZeroInt())
 }
 
 func (t *LimitOrderTranche) Cancel(trancheUser LimitOrderTrancheUser) (amountToCancel sdk.Int) {
-	ratioNotFilled := sdk.OneDec().Sub(t.RatioFilled())
-
-	amountToCancel = trancheUser.SharesOwned.ToDec().Mul(ratioNotFilled).TruncateInt()
+	amountUnfilled := t.AmountUnfilled()
+	amountToCancel = amountUnfilled.MulInt(trancheUser.SharesOwned).QuoInt(t.TotalTokenIn).TruncateInt()
 	t.ReservesTokenIn = t.ReservesTokenIn.Sub(amountToCancel)
 
 	return amountToCancel
