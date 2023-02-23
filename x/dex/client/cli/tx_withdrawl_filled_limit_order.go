@@ -11,30 +11,24 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var _ = strconv.Itoa(0)
-
 func CmdWithdrawFilledLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "withdraw-filled-limit-order [receiver] [token-a] [token-b] [tick-index] [key-token] [key]",
-		Short: "Broadcast message WithdrawFilledLimitOrder",
-		Args:  cobra.ExactArgs(6),
+		Use:     "withdraw-filled-limit-order [token-a] [token-b] [tick-index] [key-token] [tranche-key]",
+		Short:   "Broadcast message WithdrawFilledLimitOrder",
+		Example: "withdraw-filled-limit-order tokenA tokenB [-10] tokenA 0 --from alice",
+		Args:    cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argReceiver := args[0]
-			argTokenA := args[1]
-			argTokenB := args[2]
-			argTickIndex := args[3]
-
-			argTickIndex = strings.Trim(argTickIndex, "\"")
-			argTickIndexInt, err := strconv.Atoi(argTickIndex)
-			if err != nil {
-				return err
+			argTokenA := args[0]
+			argTokenB := args[1]
+			if strings.HasPrefix(args[3], "[") && strings.HasSuffix(args[3], "]") {
+				args[2] = strings.TrimPrefix(args[2], "[")
+				args[2] = strings.TrimSuffix(args[2], "]")
 			}
+			argTickIndex := args[2]
+			argKeyToken := args[3]
+			argTrancheIndex := args[4]
 
-			argKeyToken := args[4]
-			argKey := args[5]
-
-			argKeyInt, err := strconv.Atoi(argKey)
-
+			argTickIndexInt, err := strconv.ParseInt(argTickIndex, 10, 0)
 			if err != nil {
 				return err
 			}
@@ -46,12 +40,11 @@ func CmdWithdrawFilledLimitOrder() *cobra.Command {
 
 			msg := types.NewMsgWithdrawFilledLimitOrder(
 				clientCtx.GetFromAddress().String(),
-				argReceiver,
 				argTokenA,
 				argTokenB,
-				int64(argTickIndexInt),
+				argTickIndexInt,
 				argKeyToken,
-				uint64(argKeyInt),
+				argTrancheIndex,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

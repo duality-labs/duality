@@ -42,8 +42,8 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilledSlippageToleranceNotRe
 
 	// THEN
 	// swap should have in 10 out 10
-	s.assertBobBalances(40, 10)
-	s.assertDexBalances(10, 0)
+	s.assertBobBalances(39, 10)
+	s.assertDexBalances(11, 0)
 	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
 }
 
@@ -64,8 +64,8 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilledSlippageToleranceNotRe
 
 	// THEN
 	// swap should have in 10 out 10
-	s.assertBobBalances(10, 40)
-	s.assertDexBalances(0, 10)
+	s.assertBobBalances(10, 39)
+	s.assertDexBalances(0, 11)
 	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
 }
 
@@ -364,8 +364,8 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustLOCorrectExecution() {
 
 	// THEN
 	// swap should have in 16 out 16
-	s.assertBobBalances(29, 20)
-	s.assertDexBalances(21, 0)
+	s.assertBobBalances(27, 20)
+	s.assertDexBalances(23, 0)
 	s.assertLimitLiquidityAtTick("TokenB", 1, 0)
 }
 
@@ -506,15 +506,15 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOUnfilledLOSwapIncrementsFillKey() {
 	s.fundBobBalances(0, 50)
 	// GIVEN
 	// place LO selling 10 of token A at tick -1
-	s.aliceLimitSells("TokenA", -1, 10)
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 0)
+	trancheKey0 := s.aliceLimitSells("TokenA", -1, 10)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, trancheKey0, trancheKey0)
 
 	// WHEN
 	// swap 20 of token A for B with minOut 0 and Place a new limitOrder
 	s.bobMarketSells("TokenB", 5, 0)
-	s.aliceLimitSells("TokenA", -1, 10)
+	trancheKey1 := s.aliceLimitSells("TokenA", -1, 10)
 
 	// THEN
 	// place increased
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, 0, 1)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, trancheKey0, trancheKey1)
 }

@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"context"
 	"math"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -12,18 +11,6 @@ import (
 ///////////////////////////////////////////////////////////////////////////////
 //                           GETTERS & INITIALIZERS                          //
 ///////////////////////////////////////////////////////////////////////////////
-
-func (k Keeper) TokenInit(ctx sdk.Context, address string) {
-	_, found := k.GetTokenMap(ctx, address)
-	if !found {
-		tokenIndex := k.GetTokensCount(ctx)
-		newTokenCount := tokenIndex + 1
-		// TODO: Consolidate TokenMap and Tokens into one type
-		k.SetTokenMap(ctx, types.TokenMap{Address: address, Index: int64(tokenIndex)})
-		k.AppendTokens(ctx, types.Tokens{Address: address, Id: tokenIndex})
-		k.SetTokensCount(ctx, newTokenCount)
-	}
-}
 
 func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64, fee uint64) (*types.PoolReserves, error) {
 	tickLiq, tickFound := k.GetPoolReserves(
@@ -49,7 +36,7 @@ func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tok
 
 }
 
-func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64, trancheIndex uint64) (types.LimitOrderTranche, error) {
+func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey string) (types.LimitOrderTranche, error) {
 	if IsTickOutOfRange(tickIndex) {
 		return types.LimitOrderTranche{}, types.ErrTickOutsideRange
 	}
@@ -57,7 +44,7 @@ func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64,
 		PairId:           pairId,
 		TokenIn:          tokenIn,
 		TickIndex:        tickIndex,
-		TrancheIndex:     trancheIndex,
+		TrancheKey:       trancheKey,
 		ReservesTokenIn:  sdk.ZeroInt(),
 		ReservesTokenOut: sdk.ZeroInt(),
 		TotalTokenIn:     sdk.ZeroInt(),
@@ -67,20 +54,18 @@ func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64,
 }
 
 func (k Keeper) GetOrInitLimitOrderTrancheUser(
-	goCtx context.Context,
+	ctx sdk.Context,
 	pairId *types.PairId,
 	tickIndex int64,
 	tokenIn string,
-	currentLimitOrderKey uint64,
+	currentLimitOrderKey string,
 	receiver string,
 ) types.LimitOrderTrancheUser {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
 	UserShareData, UserShareDataFound := k.GetLimitOrderTrancheUser(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
 
 	if !UserShareDataFound {
 		return types.LimitOrderTrancheUser{
-			Count:           currentLimitOrderKey,
+			TrancheKey:      currentLimitOrderKey,
 			Address:         receiver,
 			SharesOwned:     sdk.ZeroInt(),
 			SharesWithdrawn: sdk.ZeroInt(),
@@ -141,7 +126,6 @@ func (k Keeper) IsBehindEnemyLines(ctx sdk.Context, pairId *types.PairId, tokenI
 	}
 	return false
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //                            TOKENIZER UTILS                                //

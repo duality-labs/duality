@@ -16,7 +16,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledSimpleFull() {
 	// Bob swaps from B to A
 	// Alice withdraws the limit order
 
-	s.aliceLimitSells("TokenA", 0, 10)
+	trancheKey := s.aliceLimitSells("TokenA", 0, 10)
 
 	s.assertAliceBalances(40, 50)
 	s.assertBobBalances(50, 50)
@@ -32,13 +32,17 @@ func (s *MsgServerTestSuite) TestWithdrawFilledSimpleFull() {
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.aliceWithdrawsLimitSell("TokenA", 0, 0)
+	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
 
 	s.assertAliceBalances(40, 60)
 	s.assertBobBalances(60, 40)
 	s.assertDexBalances(0, 0)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
+
+	// Assert that the LimitOrderTrancheUser has been deleted
+	_, found := s.app.DexKeeper.GetLimitOrderTrancheUser(s.ctx, defaultPairId, 0, "TokenA", trancheKey, s.alice.String())
+	s.Assert().False(found)
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFilledPartial() {
@@ -47,28 +51,32 @@ func (s *MsgServerTestSuite) TestWithdrawFilledPartial() {
 
 	// GIVEN
 	// alice limit sells 50 B at tick 0
-	s.aliceLimitSells("TokenB", 0, 50)
+	trancheKey := s.aliceLimitSells("TokenB", 0, 50)
 	s.assertAliceLimitLiquidityAtTick("TokenB", 50, 0)
 	// bob market sells 10 A
 	s.bobMarketSells("TokenA", 10, 10)
 	// alice has 10 A filled
-	s.assertAliceLimitFilledAtTickAtKey("TokenB", 10, 0, 0)
+	s.assertAliceLimitFilledAtTickAtIndex("TokenB", 10, 0, trancheKey)
 	// balances are 50, 100 for alice and 90, 100 for bob
 	s.assertAliceBalances(100, 50)
 	s.assertBobBalances(90, 110)
 
 	// WHEN
 	// alice withdraws filled limit order proceeds from tick 0 tranche 0
-	s.aliceWithdrawsLimitSell("TokenB", 0, 0)
+	s.aliceWithdrawsLimitSell("TokenB", 0, trancheKey)
 
 	// THEN
 	// limit order has been partially filled
 	s.assertAliceLimitLiquidityAtTick("TokenB", 40, 0)
 	// the filled reserved have been withdrawn from
-	s.assertAliceLimitFilledAtTickAtKey("TokenB", 0, 0, 0)
+	s.assertAliceLimitFilledAtTickAtIndex("TokenB", 0, 0, trancheKey)
 	// balances are 110, 100 for alice and 90, 100 for bob
 	s.assertAliceBalances(110, 50)
 	s.assertBobBalances(90, 110)
+
+	// the LimitOrderTrancheUser still exists
+	_, found := s.app.DexKeeper.GetLimitOrderTrancheUser(s.ctx, defaultPairId, 0, "TokenA", trancheKey, s.alice.String())
+	s.Assert().False(found)
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
@@ -81,7 +89,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	// Bob swaps through again
 	// Alice withdraws the limit order
 
-	s.aliceLimitSells("TokenA", 0, 10)
+	trancheKey0 := s.aliceLimitSells("TokenA", 0, 10)
 
 	s.assertAliceBalances(40, 50)
 	s.assertBobBalances(50, 50)
@@ -97,8 +105,8 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.aliceWithdrawsLimitSell("TokenA", 0, 0)
-	s.aliceLimitSells("TokenA", 0, 10)
+	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey0)
+	trancheKey1 := s.aliceLimitSells("TokenA", 0, 10)
 
 	s.assertAliceBalances(30, 60)
 	s.assertBobBalances(60, 40)
@@ -114,7 +122,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.aliceWithdrawsLimitSell("TokenA", 0, 1)
+	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey1)
 
 	s.assertAliceBalances(30, 70)
 	s.assertBobBalances(70, 30)
@@ -133,7 +141,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullDifferentDirection() {
 	// Bob swaps through again
 	// Alice withdraws the limit order
 
-	s.aliceLimitSells("TokenA", 0, 10)
+	trancheKeyA := s.aliceLimitSells("TokenA", 0, 10)
 
 	s.assertAliceBalances(40, 50)
 	s.assertBobBalances(50, 50)
@@ -149,8 +157,8 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullDifferentDirection() {
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.aliceWithdrawsLimitSell("TokenA", 0, 0)
-	s.aliceLimitSells("TokenB", 0, 10)
+	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKeyA)
+	trancheKeyB := s.aliceLimitSells("TokenB", 0, 10)
 
 	s.assertAliceBalances(40, 50)
 	s.assertBobBalances(60, 40)
@@ -166,7 +174,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullDifferentDirection() {
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.aliceWithdrawsLimitSell("TokenB", 0, 0)
+	s.aliceWithdrawsLimitSell("TokenB", 0, trancheKeyB)
 
 	s.assertAliceBalances(50, 50)
 	s.assertBobBalances(50, 50)
@@ -180,14 +188,14 @@ func (s *MsgServerTestSuite) TestWithdrawFilledEmptyFilled() {
 
 	// GIVEN
 	// alice places limit order selling A for B at tick 0
-	s.aliceLimitSells("TokenA", 0, 10)
+	trancheKey := s.aliceLimitSells("TokenA", 0, 10)
 
 	// WHEN
 	// order is unfilled, i.e. trachne.filled = 0
 	// THEN
 
 	err := types.ErrWithdrawEmptyLimitOrder
-	s.aliceWithdrawLimitSellFails(err, "TokenA", 0, 0)
+	s.aliceWithdrawLimitSellFails(err, "TokenA", 0, trancheKey)
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFilledNoExistingOrderByUser() {
@@ -196,14 +204,14 @@ func (s *MsgServerTestSuite) TestWithdrawFilledNoExistingOrderByUser() {
 
 	// GIVEN
 	// only alice has an existing order placed
-	s.aliceLimitSells("TokenA", 0, 10)
+	trancheKey := s.aliceLimitSells("TokenA", 0, 10)
 
 	// WHEN
 	// bob tries to withdraw filled from tick 0 tranche 0
 	// THEN
 
-	err := types.ErrValidLimitOrderTrancheUserNotFound
-	s.bobWithdrawLimitSellFails(err, "TokenA", 0, 0)
+	err := types.ErrValidLimitOrderTrancheNotFound
+	s.bobWithdrawLimitSellFails(err, "TokenA", 0, trancheKey)
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFilledTrancheKeyDoesntExist() {
@@ -218,6 +226,6 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTrancheKeyDoesntExist() {
 	// bob tries to withdraw filled from tick 0 tranche 5
 	// THEN
 
-	err := types.ErrValidLimitOrderTrancheUserNotFound
-	s.bobWithdrawLimitSellFails(err, "TokenA", 0, 5)
+	err := types.ErrValidLimitOrderTrancheNotFound
+	s.bobWithdrawLimitSellFails(err, "TokenA", 0, "BADTRANCHE")
 }

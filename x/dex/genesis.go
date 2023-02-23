@@ -9,18 +9,6 @@ import (
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
-
-	// Set all the tokens
-	for _, elem := range genState.TokensList {
-		k.SetTokens(ctx, elem)
-	}
-
-	// Set tokens count
-	k.SetTokensCount(ctx, genState.TokensCount)
-	// Set all the tokenMap
-	for _, elem := range genState.TokenMapList {
-		k.SetTokenMap(ctx, elem)
-	}
 	// Set all the FeeTier
 	for _, elem := range genState.FeeTierList {
 		k.SetFeeTier(ctx, elem)
@@ -55,10 +43,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
 	genesis.Params = k.GetParams(ctx)
-
-	genesis.TokensList = k.GetAllTokens(ctx)
-	genesis.TokensCount = k.GetTokensCount(ctx)
-	genesis.TokenMapList = k.GetAllTokenMap(ctx)
 	genesis.FeeTierList = k.GetAllFeeTier(ctx)
 	genesis.FeeTierCount = k.GetFeeTierCount(ctx)
 	genesis.LimitOrderTrancheUserList = k.GetAllLimitOrderTrancheUser(ctx)

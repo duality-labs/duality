@@ -16,15 +16,6 @@ var defaultPairId *types.PairId = &types.PairId{Token0: "TokenA", Token1: "Token
 func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
-		TokensList: []types.Tokens{
-			{
-				Id: 0,
-			},
-			{
-				Id: 1,
-			},
-		},
-		TokensCount: 2,
 		FeeTierList: []types.FeeTier{
 			{
 				Id: 0,
@@ -39,7 +30,7 @@ func TestGenesis(t *testing.T) {
 				PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 				Token:           "TokenB",
 				TickIndex:       1,
-				Count:           0,
+				TrancheKey:      "0",
 				Address:         "fakeAddr",
 				SharesOwned:     sdk.NewInt(10),
 				SharesWithdrawn: sdk.NewInt(0),
@@ -49,7 +40,7 @@ func TestGenesis(t *testing.T) {
 				PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 				Token:           "TokenA",
 				TickIndex:       20,
-				Count:           0,
+				TrancheKey:      "0",
 				Address:         "fakeAddr",
 				SharesOwned:     sdk.NewInt(10),
 				SharesWithdrawn: sdk.NewInt(0),
@@ -63,7 +54,7 @@ func TestGenesis(t *testing.T) {
 						PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 						TokenIn:          "0",
 						TickIndex:        0,
-						TrancheIndex:     0,
+						TrancheKey:       "0",
 						ReservesTokenIn:  sdk.NewInt(0),
 						ReservesTokenOut: sdk.NewInt(0),
 						TotalTokenIn:     sdk.NewInt(0),
@@ -74,26 +65,26 @@ func TestGenesis(t *testing.T) {
 			{
 				Liquidity: &types.TickLiquidity_LimitOrderTranche{
 					LimitOrderTranche: &types.LimitOrderTranche{
-						PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-						TokenIn:      "0",
-						TickIndex:    0,
-						TrancheIndex: 0,
+						PairId:     &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						TokenIn:    "0",
+						TickIndex:  0,
+						TrancheKey: "0",
 					},
 				},
 			},
 		},
-		FilledLimitOrderTrancheList: []types.FilledLimitOrderTranche{
+		FilledLimitOrderTrancheList: []types.LimitOrderTranche{
 			{
-				PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-				TokenIn:      "0",
-				TickIndex:    0,
-				TrancheIndex: 0,
+				PairId:     &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				TokenIn:    "0",
+				TickIndex:  0,
+				TrancheKey: "0",
 			},
 			{
-				PairId:       &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-				TokenIn:      "1",
-				TickIndex:    1,
-				TrancheIndex: 1,
+				PairId:     &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				TokenIn:    "1",
+				TickIndex:  1,
+				TrancheKey: "1",
 			},
 		},
 	}
@@ -106,8 +97,6 @@ func TestGenesis(t *testing.T) {
 	nullify.Fill(&genesisState)
 	nullify.Fill(got)
 
-	require.ElementsMatch(t, genesisState.TokensList, got.TokensList)
-	require.Equal(t, genesisState.TokensCount, got.TokensCount)
 	require.ElementsMatch(t, genesisState.FeeTierList, got.FeeTierList)
 	require.Equal(t, genesisState.FeeTierCount, got.FeeTierCount)
 	require.ElementsMatch(t, genesisState.LimitOrderTrancheUserList, got.LimitOrderTrancheUserList)

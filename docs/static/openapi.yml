@@ -12359,6 +12359,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /dualitylabs/duality/dex/fee_tier/{id}:
@@ -12433,9 +12443,10 @@ paths:
                     tickIndex:
                       type: string
                       format: int64
-                    trancheIndex:
+                    trancheKey:
                       type: string
-                      format: uint64
+                    reservesTokenIn:
+                      type: string
                     reservesTokenOut:
                       type: string
                     totalTokenIn:
@@ -12534,9 +12545,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  /dualitylabs/duality/dex/filled_limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheIndex}:
+  /dualitylabs/duality/dex/filled_limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}:
     get:
       summary: Queries a FilledLimitOrderTranche by index.
       operationId: DualitylabsDualityDexFilledLimitOrderTranche
@@ -12561,9 +12582,10 @@ paths:
                   tickIndex:
                     type: string
                     format: int64
-                  trancheIndex:
+                  trancheKey:
                     type: string
-                    format: uint64
+                  reservesTokenIn:
+                    type: string
                   reservesTokenOut:
                     type: string
                   totalTokenIn:
@@ -12602,11 +12624,10 @@ paths:
           required: true
           type: string
           format: int64
-        - name: trancheIndex
+        - name: trancheKey
           in: path
           required: true
           type: string
-          format: uint64
       tags:
         - Query
   /dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}:
@@ -12638,9 +12659,8 @@ paths:
                     tickIndex:
                       type: string
                       format: int64
-                    trancheIndex:
+                    trancheKey:
                       type: string
-                      format: uint64
                     reservesTokenIn:
                       type: string
                     reservesTokenOut:
@@ -12749,9 +12769,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  /dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheIndex}:
+  /dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}:
     get:
       summary: Queries a LimitOrderTranche by index.
       operationId: DualitylabsDualityDexLimitOrderTranche
@@ -12776,9 +12806,8 @@ paths:
                   tickIndex:
                     type: string
                     format: int64
-                  trancheIndex:
+                  trancheKey:
                     type: string
-                    format: uint64
                   reservesTokenIn:
                     type: string
                   reservesTokenOut:
@@ -12819,11 +12848,10 @@ paths:
           required: true
           type: string
           format: int64
-        - name: trancheIndex
+        - name: trancheKey
           in: path
           required: true
           type: string
-          format: uint64
       tags:
         - Query
   /dualitylabs/duality/dex/limit_order_tranche_user:
@@ -12853,9 +12881,8 @@ paths:
                     tickIndex:
                       type: string
                       format: int64
-                    count:
+                    trancheKey:
                       type: string
-                      format: uint64
                     address:
                       type: string
                     sharesOwned:
@@ -12956,9 +12983,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
-  /dualitylabs/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{count}/{address}:
+  /dualitylabs/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{trancheKey}/{address}:
     get:
       summary: Queries a LimitOrderTrancheUser by index.
       operationId: DualitylabsDualityDexLimitOrderTrancheUser
@@ -12983,9 +13020,8 @@ paths:
                   tickIndex:
                     type: string
                     format: int64
-                  count:
+                  trancheKey:
                     type: string
-                    format: uint64
                   address:
                     type: string
                   sharesOwned:
@@ -13026,11 +13062,10 @@ paths:
           required: true
           type: string
           format: int64
-        - name: count
+        - name: trancheKey
           in: path
           required: true
           type: string
-          format: uint64
         - name: address
           in: path
           required: true
@@ -13205,6 +13240,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /dualitylabs/duality/dex/pool_reserves/{pairId}/{tokenIn}/{tickIndex}/{fee}:
@@ -13326,9 +13371,8 @@ paths:
                         tickIndex:
                           type: string
                           format: int64
-                        trancheIndex:
+                        trancheKey:
                           type: string
-                          format: uint64
                         reservesTokenIn:
                           type: string
                         reservesTokenOut:
@@ -13437,321 +13481,16 @@ paths:
           in: query
           required: false
           type: boolean
-      tags:
-        - Query
-  /dualitylabs/duality/dex/token_map:
-    get:
-      summary: Queries a list of TokenMap items.
-      operationId: DualitylabsDualityDexTokenMapAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              tokenMap:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    address:
-                      type: string
-                    index:
-                      type: string
-                      format: int64
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
+        - name: pagination.reverse
           description: >-
-            offset is a numeric offset that can be used when key is unavailable.
+            reverse is set to true if results are to be returned in the
+            descending order.
 
-            It is less efficient than using key. Only one of offset or key
-            should
 
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
-      tags:
-        - Query
-  /dualitylabs/duality/dex/token_map/{address}:
-    get:
-      summary: Queries a TokenMap by index.
-      operationId: DualitylabsDualityDexTokenMap
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              tokenMap:
-                type: object
-                properties:
-                  address:
-                    type: string
-                  index:
-                    type: string
-                    format: int64
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: address
-          in: path
-          required: true
-          type: string
-      tags:
-        - Query
-  /dualitylabs/duality/dex/tokens:
-    get:
-      summary: Queries a list of Tokens items.
-      operationId: DualitylabsDualityDexTokensAll
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              Tokens:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      format: uint64
-                    address:
-                      type: string
-              pagination:
-                type: object
-                properties:
-                  next_key:
-                    type: string
-                    format: byte
-                    title: |-
-                      next_key is the key to be passed to PageRequest.key to
-                      query the next page most efficiently
-                  total:
-                    type: string
-                    format: uint64
-                    title: >-
-                      total is total number of results available if
-                      PageRequest.count_total
-
-                      was set, its value is undefined otherwise
-                description: >-
-                  PageResponse is to be embedded in gRPC response messages where
-                  the
-
-                  corresponding request message has used PageRequest.
-
-                   message SomeResponse {
-                           repeated Bar results = 1;
-                           PageResponse page = 2;
-                   }
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-      tags:
-        - Query
-  /dualitylabs/duality/dex/tokens/{id}:
-    get:
-      summary: Queries a Tokens by id.
-      operationId: DualitylabsDualityDexTokens
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              Tokens:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    format: uint64
-                  address:
-                    type: string
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: string
-          format: uint64
       tags:
         - Query
   /dualitylabs/duality/dex/user/deposits/{address}:
@@ -13842,9 +13581,8 @@ paths:
                     tickIndex:
                       type: string
                       format: int64
-                    count:
+                    trancheKey:
                       type: string
-                      format: uint64
                     address:
                       type: string
                     sharesOwned:
@@ -13934,9 +13672,8 @@ paths:
                         tickIndex:
                           type: string
                           format: int64
-                        count:
+                        trancheKey:
                           type: string
-                          format: uint64
                         address:
                           type: string
                         sharesOwned:
@@ -40146,30 +39883,6 @@ definitions:
       fee:
         type: string
         format: uint64
-  dualitylabs.duality.dex.FilledLimitOrderTranche:
-    type: object
-    properties:
-      pairId:
-        type: object
-        properties:
-          token0:
-            type: string
-          token1:
-            type: string
-      tokenIn:
-        type: string
-      tickIndex:
-        type: string
-        format: int64
-      trancheIndex:
-        type: string
-        format: uint64
-      reservesTokenOut:
-        type: string
-      totalTokenIn:
-        type: string
-      totalTokenOut:
-        type: string
   dualitylabs.duality.dex.LimitOrderTranche:
     type: object
     properties:
@@ -40185,9 +39898,8 @@ definitions:
       tickIndex:
         type: string
         format: int64
-      trancheIndex:
+      trancheKey:
         type: string
-        format: uint64
       reservesTokenIn:
         type: string
       reservesTokenOut:
@@ -40211,9 +39923,8 @@ definitions:
       tickIndex:
         type: string
         format: int64
-      count:
+      trancheKey:
         type: string
-        format: uint64
       address:
         type: string
       sharesOwned:
@@ -40237,6 +39948,9 @@ definitions:
           type: string
   dualitylabs.duality.dex.MsgPlaceLimitOrderResponse:
     type: object
+    properties:
+      trancheKey:
+        type: string
   dualitylabs.duality.dex.MsgSwapResponse:
     type: object
     properties:
@@ -40345,9 +40059,10 @@ definitions:
             tickIndex:
               type: string
               format: int64
-            trancheIndex:
+            trancheKey:
               type: string
-              format: uint64
+            reservesTokenIn:
+              type: string
             reservesTokenOut:
               type: string
             totalTokenIn:
@@ -40399,9 +40114,8 @@ definitions:
             tickIndex:
               type: string
               format: int64
-            trancheIndex:
+            trancheKey:
               type: string
-              format: uint64
             reservesTokenIn:
               type: string
             reservesTokenOut:
@@ -40455,9 +40169,8 @@ definitions:
             tickIndex:
               type: string
               format: int64
-            count:
+            trancheKey:
               type: string
-              format: uint64
             address:
               type: string
             sharesOwned:
@@ -40584,9 +40297,8 @@ definitions:
                 tickIndex:
                   type: string
                   format: int64
-                trancheIndex:
+                trancheKey:
                   type: string
-                  format: uint64
                 reservesTokenIn:
                   type: string
                 reservesTokenOut:
@@ -40595,82 +40307,6 @@ definitions:
                   type: string
                 totalTokenOut:
                   type: string
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
-  dualitylabs.duality.dex.QueryAllTokenMapResponse:
-    type: object
-    properties:
-      tokenMap:
-        type: array
-        items:
-          type: object
-          properties:
-            address:
-              type: string
-            index:
-              type: string
-              format: int64
-      pagination:
-        type: object
-        properties:
-          next_key:
-            type: string
-            format: byte
-            title: |-
-              next_key is the key to be passed to PageRequest.key to
-              query the next page most efficiently
-          total:
-            type: string
-            format: uint64
-            title: >-
-              total is total number of results available if
-              PageRequest.count_total
-
-              was set, its value is undefined otherwise
-        description: |-
-          PageResponse is to be embedded in gRPC response messages where the
-          corresponding request message has used PageRequest.
-
-           message SomeResponse {
-                   repeated Bar results = 1;
-                   PageResponse page = 2;
-           }
-  dualitylabs.duality.dex.QueryAllTokensResponse:
-    type: object
-    properties:
-      Tokens:
-        type: array
-        items:
-          type: object
-          properties:
-            id:
-              type: string
-              format: uint64
-            address:
-              type: string
       pagination:
         type: object
         properties:
@@ -40745,9 +40381,8 @@ definitions:
             tickIndex:
               type: string
               format: int64
-            count:
+            trancheKey:
               type: string
-              format: uint64
             address:
               type: string
             sharesOwned:
@@ -40786,9 +40421,10 @@ definitions:
           tickIndex:
             type: string
             format: int64
-          trancheIndex:
+          trancheKey:
             type: string
-            format: uint64
+          reservesTokenIn:
+            type: string
           reservesTokenOut:
             type: string
           totalTokenIn:
@@ -40813,9 +40449,8 @@ definitions:
           tickIndex:
             type: string
             format: int64
-          trancheIndex:
+          trancheKey:
             type: string
-            format: uint64
           reservesTokenIn:
             type: string
           reservesTokenOut:
@@ -40842,9 +40477,8 @@ definitions:
           tickIndex:
             type: string
             format: int64
-          count:
+          trancheKey:
             type: string
-            format: uint64
           address:
             type: string
           sharesOwned:
@@ -40876,28 +40510,6 @@ definitions:
           fee:
             type: string
             format: uint64
-  dualitylabs.duality.dex.QueryGetTokenMapResponse:
-    type: object
-    properties:
-      tokenMap:
-        type: object
-        properties:
-          address:
-            type: string
-          index:
-            type: string
-            format: int64
-  dualitylabs.duality.dex.QueryGetTokensResponse:
-    type: object
-    properties:
-      Tokens:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uint64
-          address:
-            type: string
   dualitylabs.duality.dex.QueryGetUserPositionsResponse:
     type: object
     properties:
@@ -40947,9 +40559,8 @@ definitions:
                 tickIndex:
                   type: string
                   format: int64
-                count:
+                trancheKey:
                   type: string
-                  format: uint64
                 address:
                   type: string
                 sharesOwned:
@@ -41003,9 +40614,8 @@ definitions:
           tickIndex:
             type: string
             format: int64
-          trancheIndex:
+          trancheKey:
             type: string
-            format: uint64
           reservesTokenIn:
             type: string
           reservesTokenOut:
@@ -41014,22 +40624,6 @@ definitions:
             type: string
           totalTokenOut:
             type: string
-  dualitylabs.duality.dex.TokenMap:
-    type: object
-    properties:
-      address:
-        type: string
-      index:
-        type: string
-        format: int64
-  dualitylabs.duality.dex.Tokens:
-    type: object
-    properties:
-      id:
-        type: string
-        format: uint64
-      address:
-        type: string
   dualitylabs.duality.dex.UserPositions:
     type: object
     properties:
@@ -41076,9 +40670,8 @@ definitions:
             tickIndex:
               type: string
               format: int64
-            count:
+            trancheKey:
               type: string
-              format: uint64
             address:
               type: string
             sharesOwned:

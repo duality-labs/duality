@@ -10,37 +10,37 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 	// WHEN Alice places 2 limit orders
 	s.fundAliceBalances(20, 20)
 	s.fundBobBalances(20, 20)
-	s.aliceLimitSells("TokenA", -1, 10)
-	s.aliceLimitSells("TokenB", 0, 10)
+	trancheKeyA := s.aliceLimitSells("TokenA", -1, 10)
+	trancheKeyB := s.aliceLimitSells("TokenB", 0, 10)
 	s.bobLimitSells("TokenA", -1, 10)
 	profile := NewUserProfile(s.alice)
 
 	// THEN GetAllLimitOrderTrancheUserForAddress returns alice's same two orders
-	LOList := profile.GetAllLimitOrders(s.goCtx, s.app.DexKeeper)
+	LOList := profile.GetAllLimitOrders(s.ctx, s.app.DexKeeper)
 	s.Assert().Equal(2, len(LOList))
 	s.Assert().Equal(types.LimitOrderTrancheUser{
 		PairId:          defaultPairId,
 		Token:           "TokenA",
 		TickIndex:       -1,
-		Count:           0,
-		Address:         s.alice.String(),
-		SharesOwned:     sdk.NewInt(10),
-		SharesWithdrawn: sdk.NewInt(0),
-		SharesCancelled: sdk.NewInt(0),
-	},
-		LOList[0],
-	)
-	s.Assert().Equal(types.LimitOrderTrancheUser{
-		PairId:          defaultPairId,
-		Token:           "TokenB",
-		TickIndex:       0,
-		Count:           0,
+		TrancheKey:      trancheKeyA,
 		Address:         s.alice.String(),
 		SharesOwned:     sdk.NewInt(10),
 		SharesWithdrawn: sdk.NewInt(0),
 		SharesCancelled: sdk.NewInt(0),
 	},
 		LOList[1],
+	)
+	s.Assert().Equal(types.LimitOrderTrancheUser{
+		PairId:          defaultPairId,
+		Token:           "TokenB",
+		TickIndex:       0,
+		TrancheKey:      trancheKeyB,
+		Address:         s.alice.String(),
+		SharesOwned:     sdk.NewInt(10),
+		SharesWithdrawn: sdk.NewInt(0),
+		SharesCancelled: sdk.NewInt(0),
+	},
+		LOList[0],
 	)
 }
 
@@ -76,7 +76,7 @@ func (s *MsgServerTestSuite) TestGetAllDeposits() {
 	profile := NewUserProfile(s.alice)
 
 	// THEN GetAllDeposits returns the two remaining LP positions
-	depositList := profile.GetAllDeposits(s.goCtx, s.app.DexKeeper)
+	depositList := profile.GetAllDeposits(s.ctx, s.app.DexKeeper)
 	s.Assert().Equal(2, len(depositList))
 	s.Assert().Equal(types.DepositRecord{
 		PairId:          defaultPairId,
@@ -119,7 +119,7 @@ func (s *MsgServerTestSuite) TestGetAllPositions() {
 
 	s.aliceLimitSells("TokenA", 0, 10)
 	profile := NewUserProfile(s.alice)
-	positions := profile.GetAllPositions(s.goCtx, s.app.DexKeeper)
+	positions := profile.GetAllPositions(s.ctx, s.app.DexKeeper)
 
 	s.Assert().Equal(2, len(positions.PoolDeposits))
 	s.Assert().Equal(1, len(positions.LimitOrders))

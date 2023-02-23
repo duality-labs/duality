@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
@@ -56,12 +57,13 @@ func DepositSharesToData(shares sdk.Coin, feeTiers []types.FeeTier) (types.Depos
 		return types.DepositRecord{}, types.ErrInvalidDepositShares
 	}
 
+	feeUint := utils.MustSafeUint64(feeTiers[feeIndex].Fee)
 	return types.DepositRecord{
 		PairId:          pairId,
 		SharesOwned:     shares.Amount,
 		CenterTickIndex: tickIndex,
-		LowerTickIndex:  tickIndex - int64(feeTiers[feeIndex].Fee),
-		UpperTickIndex:  tickIndex + int64(feeTiers[feeIndex].Fee),
+		LowerTickIndex:  tickIndex - feeUint,
+		UpperTickIndex:  tickIndex + feeUint,
 		FeeIndex:        feeIndex,
 	}, nil
 }

@@ -9,9 +9,10 @@ import (
 
 func CmdListUserLimitOrders() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-user-limit-orders [address]",
-		Short: "list all users limit orders",
-		Args:  cobra.ExactArgs(1),
+		Use:     "list-user-limit-orders [address]",
+		Short:   "list all users limit orders",
+		Example: "list-user-limit-orders alice",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			reqAddress := args[0]
 

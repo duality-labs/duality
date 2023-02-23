@@ -16,14 +16,14 @@ func (k Keeper) FilledLimitOrderTrancheAll(c context.Context, req *types.QueryAl
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	var filledLimitOrderTranches []types.FilledLimitOrderTranche
+	var filledLimitOrderTranches []types.LimitOrderTranche
 	ctx := sdk.UnwrapSDKContext(c)
 
 	store := ctx.KVStore(k.storeKey)
 	filledLimitOrderTrancheStore := prefix.NewStore(store, types.KeyPrefix(types.FilledLimitOrderTrancheKeyPrefix))
 
 	pageRes, err := query.Paginate(filledLimitOrderTrancheStore, req.Pagination, func(key []byte, value []byte) error {
-		var filledLimitOrderTranche types.FilledLimitOrderTranche
+		var filledLimitOrderTranche types.LimitOrderTranche
 		if err := k.cdc.Unmarshal(value, &filledLimitOrderTranche); err != nil {
 			return err
 		}
@@ -53,7 +53,7 @@ func (k Keeper) FilledLimitOrderTranche(c context.Context, req *types.QueryGetFi
 		pairId,
 		req.TokenIn,
 		req.TickIndex,
-		req.TrancheIndex,
+		req.TrancheKey,
 	)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")

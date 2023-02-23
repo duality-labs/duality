@@ -44,7 +44,7 @@ var limitOrderTrancheList = []types.TickLiquidity{
 			},
 			TokenIn:          "TokenB",
 			TickIndex:        1,
-			TrancheIndex:     0,
+			TrancheKey:       "0",
 			ReservesTokenIn:  sdk.NewInt(10),
 			ReservesTokenOut: sdk.ZeroInt(),
 			TotalTokenIn:     sdk.NewInt(10),
@@ -60,7 +60,7 @@ var limitOrderTrancheList = []types.TickLiquidity{
 			},
 			TokenIn:          "TokenB",
 			TickIndex:        2,
-			TrancheIndex:     1,
+			TrancheKey:       "1",
 			ReservesTokenIn:  sdk.NewInt(10),
 			ReservesTokenOut: sdk.ZeroInt(),
 			TotalTokenIn:     sdk.NewInt(10),
@@ -70,22 +70,24 @@ var limitOrderTrancheList = []types.TickLiquidity{
 	},
 }
 
-var filledLimitOrderTrancheList = []types.FilledLimitOrderTranche{
+var filledLimitOrderTrancheList = []types.LimitOrderTranche{
 	{PairId: &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 		TokenIn:          "TokenB",
 		TickIndex:        0,
-		TrancheIndex:     0,
+		TrancheKey:       "0",
 		TotalTokenIn:     sdk.NewInt(10),
 		TotalTokenOut:    sdk.NewInt(10),
 		ReservesTokenOut: sdk.NewInt(10),
+		ReservesTokenIn:  sdk.NewInt(0),
 	},
 	{PairId: &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 		TokenIn:          "TokenB",
 		TickIndex:        0,
-		TrancheIndex:     1,
+		TrancheKey:       "1",
 		TotalTokenIn:     sdk.NewInt(10),
 		TotalTokenOut:    sdk.NewInt(10),
 		ReservesTokenOut: sdk.NewInt(10),
+		ReservesTokenIn:  sdk.NewInt(0),
 	},
 }
 
@@ -123,9 +125,9 @@ var poolReservesList = []types.TickLiquidity{
 var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 	{
 		PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-		Token:           "TokenB",
+		Token:           "TokenA",
 		TickIndex:       1,
-		Count:           0,
+		TrancheKey:      "0",
 		Address:         testAddress.String(),
 		SharesOwned:     sdk.NewInt(10),
 		SharesWithdrawn: sdk.NewInt(0),
@@ -133,9 +135,9 @@ var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 	},
 	{
 		PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-		Token:           "TokenA",
+		Token:           "TokenB",
 		TickIndex:       20,
-		Count:           0,
+		TrancheKey:      "0",
 		Address:         testAddress.String(),
 		SharesOwned:     sdk.NewInt(10),
 		SharesWithdrawn: sdk.NewInt(0),
@@ -302,7 +304,7 @@ func (s *QueryTestSuite) TestQueryCmdShowLimitOrderTranche() {
 		expErrMsg string
 		expOutput types.LimitOrderTranche
 	}{
-		//show-limit-order-tranche [pair-id] [tick-index] [token-in] [tranche-index]
+		//show-limit-order-tranche [pair-id] [tick-index] [token-in] [tranche-key]
 		{
 			name:      "valid",
 			args:      []string{"TokenA<>TokenB", "1", "TokenB", "0"},
@@ -361,10 +363,10 @@ func (s *QueryTestSuite) TestQueryCmdShowLimitOrderTrancheUser() {
 		expErrMsg string
 		expOutput types.LimitOrderTrancheUser
 	}{
-		// "show-limit-order-pool-user-share-map [pairId] [tickIndex] [tokenIn] [trancheIndex] [address]"
+		// "show-limit-order-pool-user-share-map [pairId] [tickIndex] [tokenIn] [trancheKey] [address]"
 		{
 			name:      "valid",
-			args:      []string{"TokenA<>TokenB", "1", "TokenB", "0", testAddress.String()},
+			args:      []string{"TokenA<>TokenB", "1", "TokenA", "0", testAddress.String()},
 			expOutput: limitOrderTrancheUserList[0],
 		},
 		{
@@ -450,7 +452,7 @@ func (s *QueryTestSuite) TestQueryCmdListLimitOrderTrancheUser() {
 	}
 }
 
-func (s *QueryTestSuite) TestQueryListFilledLimitOrderTranche() {
+func (s *QueryTestSuite) TestQueryCmdListFilledLimitOrderTranche() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
 	testCases := []struct {
@@ -458,7 +460,7 @@ func (s *QueryTestSuite) TestQueryListFilledLimitOrderTranche() {
 		args      []string
 		expErr    bool
 		expErrMsg string
-		expOutput []types.FilledLimitOrderTranche
+		expOutput []types.LimitOrderTranche
 	}{
 		{
 			name:      "valid",
@@ -482,6 +484,65 @@ func (s *QueryTestSuite) TestQueryListFilledLimitOrderTranche() {
 				require.NotEmpty(s.T(), res)
 				require.Equal(s.T(), tc.expOutput, res.FilledLimitOrderTranche)
 
+			}
+		})
+	}
+}
+
+func (s *QueryTestSuite) TestQueryCmdShowFilledLimitOrderTranche() {
+	val := s.network.Validators[0]
+	clientCtx := val.ClientCtx
+	testCases := []struct {
+		name      string
+		args      []string
+		expErr    bool
+		expErrMsg string
+		expOutput types.LimitOrderTranche
+	}{
+		//show-filled-limit-order-tranche [pair-id] [token-in] [tick-index] [tranche-index]",
+		{
+			name:      "valid",
+			args:      []string{"TokenA<>TokenB", "TokenB", "0", "0"},
+			expOutput: filledLimitOrderTrancheList[0],
+		},
+		{
+			name:      "invalid pair",
+			args:      []string{"TokenC<>TokenB", "TokenB", "0", "0"},
+			expErr:    true,
+			expErrMsg: "key not found",
+		},
+		{
+			name:      "too many parameters",
+			args:      []string{"TokenC<>TokenB", "TokenB", "0", "0", "Extra arg"},
+			expErr:    true,
+			expErrMsg: "Error: accepts 4 arg(s), received 5",
+		},
+		{
+			name:      "no parameters",
+			args:      []string{},
+			expErr:    true,
+			expErrMsg: "Error: accepts 4 arg(s), received 0",
+		},
+		{
+			name:      "too few parameters",
+			args:      []string{"TokenC<>TokenB", "TokenB", "0"},
+			expErr:    true,
+			expErrMsg: "Error: accepts 4 arg(s), received 3",
+		},
+	}
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			cmd := dexClient.CmdShowFilledLimitOrderTranche()
+			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
+			if tc.expErr {
+				require.Error(s.T(), err)
+				require.Contains(s.T(), out.String(), tc.expErrMsg)
+			} else {
+				require.NoError(s.T(), err)
+				var res types.QueryGetFilledLimitOrderTrancheResponse
+				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
+				require.NotEmpty(s.T(), res)
+				require.Equal(s.T(), tc.expOutput, res.FilledLimitOrderTranche)
 			}
 		})
 	}

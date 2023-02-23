@@ -2,12 +2,12 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
 type Liquidity interface {
 	Swap(maxAmount sdk.Int) (inAmount sdk.Int, outAmount sdk.Int)
-	Save(sdkCtx sdk.Context, keeper Keeper)
 	Price() sdk.Dec
 }
 
@@ -67,7 +67,7 @@ func (s *LiquidityIterator) Next() Liquidity {
 			return pool
 
 		case *types.TickLiquidity_LimitOrderTranche:
-			return NewLimitOrderTrancheWrapper(liquidity.LimitOrderTranche)
+			return liquidity.LimitOrderTranche
 
 		default:
 			panic("Tick does not have liquidity")
@@ -79,7 +79,7 @@ func (s *LiquidityIterator) Next() Liquidity {
 
 func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquidity, error) {
 	tickIndex := upperTick.TickIndex
-	lowerTickIndex := tickIndex - 2*int64(upperTick.Fee)
+	lowerTickIndex := tickIndex - 2*utils.MustSafeUint64(upperTick.Fee)
 	lowerTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairId, s.pairId.Token0, lowerTickIndex, upperTick.Fee)
 	if err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquid
 
 func (s *LiquidityIterator) createPool1To0(lowerTick types.PoolReserves) (Liquidity, error) {
 	tickIndex := lowerTick.TickIndex
-	upperTickIndex := tickIndex + 2*int64(lowerTick.Fee)
+	upperTickIndex := tickIndex + 2*utils.MustSafeUint64(lowerTick.Fee)
 	upperTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairId, s.pairId.Token1, upperTickIndex, lowerTick.Fee)
 	if err != nil {
 		return nil, err
@@ -110,4 +110,17 @@ func (s *LiquidityIterator) createPool1To0(lowerTick types.PoolReserves) (Liquid
 
 func (s *LiquidityIterator) Close() {
 	s.iter.Close()
+}
+
+func (k Keeper) SaveLiquidity(sdkCtx sdk.Context, liquidityI Liquidity) {
+	switch liquidity := liquidityI.(type) {
+	case *types.LimitOrderTranche:
+		k.SaveTranche(sdkCtx, *liquidity)
+
+	case *PoolLiquidity:
+		k.SavePool(sdkCtx, *liquidity.pool)
+	default:
+		panic("Invalid liquidity type")
+	}
+
 }

@@ -103,28 +103,7 @@ func (s *CoreHelpersTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amo
 
 	lowerTick.Reserves = amountAInt
 	upperTick.Reserves = amountBInt
-	pool.Save(s.ctx, s.app.DexKeeper)
-}
-
-// TokenInit //////////////////////////////////////////////////////////////////
-
-func (s *CoreHelpersTestSuite) TestTokenInitNew() {
-
-	s.app.DexKeeper.TokenInit(s.ctx, "TokenA")
-
-	tokenMap, found := s.app.DexKeeper.GetTokenMap(s.ctx, "TokenA")
-
-	s.Assert().True(found)
-	s.Assert().Equal("TokenA", tokenMap.Address)
-	s.Assert().Equal(uint64(1), s.app.DexKeeper.GetTokensCount(s.ctx))
-}
-
-func (s *CoreHelpersTestSuite) TestTokenInitExisting() {
-
-	s.app.DexKeeper.TokenInit(s.ctx, "TokenA")
-	s.Require().Equal(uint64(1), s.app.DexKeeper.GetTokensCount(s.ctx))
-
-	s.app.DexKeeper.TokenInit(s.ctx, "TokenA")
+	s.app.DexKeeper.SavePool(s.ctx, pool)
 }
 
 // GetOrInitUserShareData /////////////////////////////////////////////////////

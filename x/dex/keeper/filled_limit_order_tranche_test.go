@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"strconv"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -11,34 +12,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createNFilledLimitOrderTranche(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.FilledLimitOrderTranche {
-	items := make([]types.FilledLimitOrderTranche, n)
+func createNFilledLimitOrderTranche(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.LimitOrderTranche {
+	items := make([]types.LimitOrderTranche, n)
 	for i := range items {
-		items[i] = types.FilledLimitOrderTranche{
-			TrancheIndex:     uint64(i),
+		items[i] = types.LimitOrderTranche{
+			TrancheKey:       strconv.Itoa(i),
 			PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 			TickIndex:        int64(i),
 			TokenIn:          "TokenA",
 			TotalTokenIn:     sdk.ZeroInt(),
 			TotalTokenOut:    sdk.ZeroInt(),
 			ReservesTokenOut: sdk.ZeroInt(),
-		}
-		keeper.SetFilledLimitOrderTranche(ctx, items[i])
-	}
-	return items
-}
-
-func createNFilledLimitOrderTrancheSameTick(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.FilledLimitOrderTranche {
-	items := make([]types.FilledLimitOrderTranche, n)
-	for i := range items {
-		items[i] = types.FilledLimitOrderTranche{
-			TrancheIndex:     uint64(i),
-			PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-			TickIndex:        0,
-			TokenIn:          "TokenA",
-			TotalTokenIn:     sdk.ZeroInt(),
-			TotalTokenOut:    sdk.ZeroInt(),
-			ReservesTokenOut: sdk.ZeroInt(),
+			ReservesTokenIn:  sdk.ZeroInt(),
 		}
 		keeper.SetFilledLimitOrderTranche(ctx, items[i])
 	}
@@ -53,7 +38,7 @@ func TestFilledLimitOrderTrancheGet(t *testing.T) {
 			item.PairId,
 			item.TokenIn,
 			item.TickIndex,
-			item.TrancheIndex,
+			item.TrancheKey,
 		)
 		require.True(t, found)
 		require.Equal(t,
@@ -70,13 +55,13 @@ func TestFilledLimitOrderTrancheRemove(t *testing.T) {
 			item.PairId,
 			item.TokenIn,
 			item.TickIndex,
-			item.TrancheIndex,
+			item.TrancheKey,
 		)
 		_, found := keeper.GetFilledLimitOrderTranche(ctx,
 			item.PairId,
 			item.TokenIn,
 			item.TickIndex,
-			item.TrancheIndex,
+			item.TrancheKey,
 		)
 		require.False(t, found)
 	}
@@ -89,20 +74,4 @@ func TestFilledLimitOrderTrancheGetAll(t *testing.T) {
 		nullify.Fill(items),
 		nullify.Fill(keeper.GetAllFilledLimitOrderTranche(ctx)),
 	)
-}
-
-func TestGetNewestFilledLimitOrderTranche(t *testing.T) {
-	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNFilledLimitOrderTrancheSameTick(keeper, ctx, 10)
-	newestTranche, found := keeper.GetNewestFilledLimitOrderTranche(ctx, items[0].PairId, items[0].TokenIn, items[0].TickIndex)
-
-	require.True(t, found)
-	require.Equal(t, items[9], newestTranche)
-}
-
-func TestGetNewestFilledLimitOrderTrancheEmpty(t *testing.T) {
-	keeper, ctx := keepertest.DexKeeper(t)
-	_, found := keeper.GetNewestFilledLimitOrderTranche(ctx, defaultPairId, "TokenA", 0)
-
-	require.False(t, found)
 }

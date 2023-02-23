@@ -30,6 +30,7 @@ func (s *MsgServerTestSuite) TestSwapExhaustFeeTiersAndLimitOrder() {
 
 	s.bobMarketSells("TokenA", 30, 0)
 
-	s.assertPoolLiquidity(10, 0, 0, 0)
+	s.assertPoolLiquidity(11, 0, 0, 0)
+
 	s.assertLimitLiquidityAtTickInt("TokenB", 0, sdk.ZeroInt())
 }

@@ -128,16 +128,16 @@ message MsgPlaceLimitOrder {
 }
 
 message MsgPlaceLimitOrderResponse {
+  string trancheKey = 1;
 }
 
 message MsgWithdrawFilledLimitOrder {
   string creator = 1;
-  string receiver = 2;
-  string tokenA = 3;
-  string tokenB = 4;
-  int64 tickIndex = 5;
-  string keyToken = 6;
-  uint64 key = 7;
+  string tokenA = 2;
+  string tokenB = 3;
+  int64 tickIndex = 4;
+  string keyToken = 5;
+  string trancheKey = 6;
 }
 
 message MsgWithdrawFilledLimitOrderResponse {
@@ -145,12 +145,11 @@ message MsgWithdrawFilledLimitOrderResponse {
 
 message MsgCancelLimitOrder {
   string creator = 1;
-  string receiver = 2;
-  string tokenA = 3;
-  string tokenB = 4;
-  int64 tickIndex = 5;
-  string keyToken = 6;
-  uint64 key = 7;
+  string tokenA = 2;
+  string tokenB = 3;
+  int64 tickIndex = 4;
+  string keyToken = 5;
+  string trancheKey = 6;
 }
 
 message MsgCancelLimitOrderResponse {

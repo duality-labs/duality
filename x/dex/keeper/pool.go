@@ -34,12 +34,13 @@ func NewPool(
 
 func (k Keeper) GetOrInitPool(ctx sdk.Context, pairId *types.PairId, tickIndex int64, feeTier types.FeeTier) (Pool, error) {
 	fee := feeTier.Fee
-	lowertick, err := k.GetOrInitPoolReserves(ctx, pairId, pairId.Token0, tickIndex-int64(fee), fee)
+	feeUint := utils.MustSafeUint64(fee)
+	lowertick, err := k.GetOrInitPoolReserves(ctx, pairId, pairId.Token0, tickIndex-feeUint, fee)
 	if err != nil {
 		return Pool{}, sdkerrors.Wrapf(err, "Error for lower tick")
 	}
 
-	upperTick, err := k.GetOrInitPoolReserves(ctx, pairId, pairId.Token1, tickIndex+int64(fee), fee)
+	upperTick, err := k.GetOrInitPoolReserves(ctx, pairId, pairId.Token1, tickIndex+feeUint, fee)
 	if err != nil {
 		return Pool{}, sdkerrors.Wrapf(err, "Error for upper tick")
 	}
@@ -62,11 +63,10 @@ func (p *Pool) Swap0To1(maxAmount0 sdk.Int) (inAmount0 sdk.Int, outAmount1 sdk.I
 
 	reserves0 := &p.LowerTick0.Reserves
 
-	price1To0Upper := sdk.OneDec().Quo(p.Price0To1Upper)
 	maxAmount1 := maxAmount0.ToDec().Mul(p.Price0To1Upper).TruncateInt()
 	if reserves1.LTE(maxAmount1) {
 		outAmount1 = *reserves1
-		inAmount0 = reserves1.ToDec().Mul(price1To0Upper).TruncateInt()
+		inAmount0 = reserves1.ToDec().Quo(p.Price0To1Upper).Ceil().TruncateInt()
 		*reserves0 = reserves0.Add(inAmount0)
 		*reserves1 = sdk.ZeroInt()
 	} else {
@@ -86,11 +86,10 @@ func (p *Pool) Swap1To0(maxAmount1 sdk.Int) (inAmount1 sdk.Int, outAmount0 sdk.I
 
 	reserves1 := &p.UpperTick1.Reserves
 
-	price0To1Lower := sdk.OneDec().Quo(p.Price1To0Lower)
 	maxAmount0 := maxAmount1.ToDec().Mul(p.Price1To0Lower).TruncateInt()
 	if reserves0.LTE(maxAmount0) {
 		outAmount0 = *reserves0
-		inAmount1 = reserves0.ToDec().Mul(price0To1Lower).TruncateInt()
+		inAmount1 = reserves0.ToDec().Quo(p.Price1To0Lower).Ceil().TruncateInt()
 		*reserves1 = reserves1.Add(inAmount1)
 		*reserves0 = sdk.ZeroInt()
 	} else {
@@ -185,6 +184,7 @@ func (p *Pool) CalcSharesMinted(
 
 	amount0Dec := amount0.ToDec()
 	amount1Dec := amount1.ToDec()
+	//TODO: Technically this is still quo before mult, but there's no easy way around it
 	return amount0Dec.Add(amount1Dec.Mul(price1To0Center)).TruncateInt()
 }
 
@@ -204,9 +204,14 @@ func (p *Pool) CalcResidualSharesMinted(
 func (p *Pool) Withdraw(sharesToRemove sdk.Int, totalShares sdk.Int) (outAmount0 sdk.Int, outAmount1 sdk.Int) {
 	reserves0 := &p.LowerTick0.Reserves
 	reserves1 := &p.UpperTick1.Reserves
-	ownershipRatio := sharesToRemove.ToDec().Quo(totalShares.ToDec())
-	outAmount1 = ownershipRatio.Mul(reserves1.ToDec()).TruncateInt()
-	outAmount0 = ownershipRatio.Mul(reserves0.ToDec()).TruncateInt()
+	// outAmount1 = ownershipRatio * reserves1
+	//            = (sharesToRemove / totalShares) * reserves1
+	//            = (reserves1 * sharesToRemove ) / totalShares
+	outAmount1 = reserves1.Mul(sharesToRemove).ToDec().QuoInt(totalShares).TruncateInt()
+	// outAmount0 = ownershipRatio * reserves1
+	//            = (sharesToRemove / totalShares) * reserves1
+	//            = (reserves1 * sharesToRemove ) / totalShares
+	outAmount0 = reserves0.Mul(sharesToRemove).ToDec().QuoInt(totalShares).TruncateInt()
 	*reserves0 = reserves0.Sub(outAmount0)
 	*reserves1 = reserves1.Sub(outAmount1)
 	return outAmount0, outAmount1
@@ -227,16 +232,16 @@ func CalcFee(upperTickIndex int64, lowerTickIndex int64) int64 {
 	return (upperTickIndex - lowerTickIndex) / 2
 }
 
-func (p *Pool) Save(sdkCtx sdk.Context, keeper Keeper) {
-	if p.LowerTick0.HasToken() {
-		keeper.SetPoolReserves(sdkCtx, *p.LowerTick0)
+func (k Keeper) SavePool(sdkCtx sdk.Context, pool Pool) {
+	if pool.LowerTick0.HasToken() {
+		k.SetPoolReserves(sdkCtx, *pool.LowerTick0)
 	} else {
-		keeper.RemovePoolReserves(sdkCtx, *p.LowerTick0)
+		k.RemovePoolReserves(sdkCtx, *pool.LowerTick0)
 	}
 
-	if p.UpperTick1.HasToken() {
-		keeper.SetPoolReserves(sdkCtx, *p.UpperTick1)
+	if pool.UpperTick1.HasToken() {
+		k.SetPoolReserves(sdkCtx, *pool.UpperTick1)
 	} else {
-		keeper.RemovePoolReserves(sdkCtx, *p.UpperTick1)
+		k.RemovePoolReserves(sdkCtx, *pool.UpperTick1)
 	}
 }
