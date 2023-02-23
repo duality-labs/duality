@@ -6,8 +6,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/types"
+	"github.com/duality-labs/duality/x/dex/utils"
 )
 
 // NOTE: Currently we are using TruncateInt in multiple places for converting Decs back into sdk.Ints.
