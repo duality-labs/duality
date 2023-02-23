@@ -84,14 +84,16 @@ func (k Keeper) DepositCore(
 
 		k.SavePool(ctx, pool)
 
-		if outShares.GT(sdk.ZeroInt()) { // update shares accounting
-			if err := k.MintShares(ctx, receiverAddr, outShares, sharesId); err != nil {
-				return nil, nil, err
-			}
-		}
-
 		if inAmount0.Equal(sdk.ZeroInt()) && inAmount1.Equal(sdk.ZeroInt()) {
 			return nil, nil, types.ErrZeroTrueDeposit
+		}
+
+		if outShares.IsZero() {
+			return nil, nil, types.ErrDepositShareUnderflow
+		}
+
+		if err := k.MintShares(ctx, receiverAddr, outShares, sharesId); err != nil {
+			return nil, nil, err
 		}
 
 		amounts0Deposited[i] = inAmount0
@@ -128,7 +130,6 @@ func (k Keeper) DepositCore(
 		}
 	}
 
-	_ = goCtx
 	return amounts0Deposited, amounts1Deposited, nil
 }
 
