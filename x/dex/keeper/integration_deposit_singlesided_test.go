@@ -3,8 +3,8 @@ package keeper_test
 import (
 	"math"
 
-	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/types"
+	"github.com/duality-labs/duality/x/dex/utils"
 )
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedInSpread1To0() {
@@ -328,7 +328,6 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedMultiA() {
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedMultiB() {
-	// TODO: this fails because PairInit doesn't account for single sided liquidity
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -419,4 +418,16 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedZeroTrueAmountsFail() {
 
 	err := types.ErrZeroTrueDeposit
 	s.assertAliceDepositFails(err, NewDeposit(0, 5, 0, 0))
+}
+
+func (s *MsgServerTestSuite) TestDepositSingleLowTickUnderflowFails() {
+	s.fundAliceBalances(0, 50)
+
+	// GIVEN
+	// deposit 50 of token B at tick -352436 fee 0
+	// THEN 0 shares would be issued so deposit fails
+	s.assertAliceDepositFails(
+		types.ErrDepositShareUnderflow,
+		NewDeposit(0, 50, -352436, 0),
+	)
 }

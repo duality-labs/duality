@@ -6,8 +6,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/types"
+	"github.com/duality-labs/duality/x/dex/utils"
 )
 
 // NOTE: Currently we are using TruncateInt in multiple places for converting Decs back into sdk.Ints.
@@ -84,14 +84,16 @@ func (k Keeper) DepositCore(
 
 		k.SavePool(ctx, pool)
 
-		if outShares.GT(sdk.ZeroInt()) { // update shares accounting
-			if err := k.MintShares(ctx, receiverAddr, outShares, sharesId); err != nil {
-				return nil, nil, err
-			}
-		}
-
 		if inAmount0.Equal(sdk.ZeroInt()) && inAmount1.Equal(sdk.ZeroInt()) {
 			return nil, nil, types.ErrZeroTrueDeposit
+		}
+
+		if outShares.IsZero() {
+			return nil, nil, types.ErrDepositShareUnderflow
+		}
+
+		if err := k.MintShares(ctx, receiverAddr, outShares, sharesId); err != nil {
+			return nil, nil, err
 		}
 
 		amounts0Deposited[i] = inAmount0
@@ -127,7 +129,7 @@ func (k Keeper) DepositCore(
 			return nil, nil, err
 		}
 	}
-	_ = goCtx
+
 	return amounts0Deposited, amounts1Deposited, nil
 }
 

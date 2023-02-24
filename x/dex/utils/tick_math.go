@@ -27,9 +27,9 @@ func CalcPrice0To1(tickIndex int64) (sdk.Dec, error) {
 	}
 
 	if 0 <= tickIndex {
-		return sdk.OneDec().Quo(Pow(BasePrice(), uint64(tickIndex))), nil
+		return sdk.OneDec().Quo(BasePrice().Power(uint64(tickIndex))), nil
 	} else {
-		return Pow(BasePrice(), uint64(-1*tickIndex)), nil
+		return BasePrice().Power(uint64(-1 * tickIndex)), nil
 	}
 }
 
@@ -50,9 +50,9 @@ func CalcPrice1To0(tickIndex int64) (sdk.Dec, error) {
 		return sdk.ZeroDec(), errors.New("Supplying a tick outside the range of [-352437, 352437] is not allowed")
 	}
 	if 0 <= tickIndex {
-		return Pow(BasePrice(), uint64(tickIndex)), nil
+		return BasePrice().Power(uint64(tickIndex)), nil
 	} else {
-		return sdk.OneDec().Quo(Pow(BasePrice(), uint64(-1*tickIndex))), nil
+		return sdk.OneDec().Quo(BasePrice().Power(uint64(-1 * tickIndex))), nil
 	}
 }
 
