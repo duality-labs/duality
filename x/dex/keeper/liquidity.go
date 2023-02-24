@@ -78,14 +78,15 @@ func (s *LiquidityIterator) Next() Liquidity {
 }
 
 func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquidity, error) {
-	tickIndex := upperTick.TickIndex
-	lowerTickIndex := tickIndex - 2*utils.MustSafeUint64(upperTick.Fee)
+	upperTickIndex := upperTick.TickIndex
+	centerTickIndex := upperTickIndex - utils.MustSafeUint64(upperTick.Fee)
+	lowerTickIndex := centerTickIndex - utils.MustSafeUint64(upperTick.Fee)
 	lowerTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairId, s.pairId.Token0, lowerTickIndex, upperTick.Fee)
 	if err != nil {
 		return nil, err
 	}
 	pool := NewPool(
-		tickIndex,
+		centerTickIndex,
 		lowerTick,
 		&upperTick,
 	)
@@ -93,15 +94,16 @@ func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquid
 }
 
 func (s *LiquidityIterator) createPool1To0(lowerTick types.PoolReserves) (Liquidity, error) {
-	tickIndex := lowerTick.TickIndex
-	upperTickIndex := tickIndex + 2*utils.MustSafeUint64(lowerTick.Fee)
+	lowerTickIndex := lowerTick.TickIndex
+	centerTickIndex := lowerTickIndex + utils.MustSafeUint64(lowerTick.Fee)
+	upperTickIndex := centerTickIndex + utils.MustSafeUint64(lowerTick.Fee)
 	upperTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairId, s.pairId.Token1, upperTickIndex, lowerTick.Fee)
 	if err != nil {
 		return nil, err
 	}
 
 	pool := NewPool(
-		lowerTick.TickIndex,
+		centerTickIndex,
 		&lowerTick,
 		upperTick,
 	)

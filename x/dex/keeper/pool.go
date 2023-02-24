@@ -8,44 +8,45 @@ import (
 )
 
 type Pool struct {
-	TickIndex      int64
-	FeeIndex       uint64
-	LowerTick0     *types.PoolReserves
-	UpperTick1     *types.PoolReserves
-	Price1To0Lower sdk.Dec
-	Price0To1Upper sdk.Dec
+	CenterTickIndex int64
+	FeeIndex        uint64
+	LowerTick0      *types.PoolReserves
+	UpperTick1      *types.PoolReserves
+	Price1To0Lower  sdk.Dec
+	Price0To1Upper  sdk.Dec
 }
 
 func NewPool(
-	tickIndex int64,
+	centerTickIndex int64,
 	lowerTick0 *types.PoolReserves,
 	upperTick1 *types.PoolReserves,
 ) Pool {
 	// TODO: maybe store this somewhere so we don't have to recalculate
-	price0To1 := utils.MustCalcPrice0To1(tickIndex)
+	price0To1Upper := utils.MustCalcPrice0To1(upperTick1.TickIndex)
+	price1To0Lower := utils.MustCalcPrice1To0(lowerTick0.TickIndex)
 	return Pool{
-		TickIndex:      tickIndex,
-		LowerTick0:     lowerTick0,
-		UpperTick1:     upperTick1,
-		Price0To1Upper: price0To1,
-		Price1To0Lower: sdk.OneDec().Quo(price0To1),
+		CenterTickIndex: centerTickIndex,
+		LowerTick0:      lowerTick0,
+		UpperTick1:      upperTick1,
+		Price0To1Upper:  price0To1Upper,
+		Price1To0Lower:  price1To0Lower,
 	}
 }
 
-func (k Keeper) GetOrInitPool(ctx sdk.Context, pairId *types.PairId, tickIndex int64, feeTier types.FeeTier) (Pool, error) {
+func (k Keeper) GetOrInitPool(ctx sdk.Context, pairId *types.PairId, centerTickIndex int64, feeTier types.FeeTier) (Pool, error) {
 	fee := feeTier.Fee
 	feeUint := utils.MustSafeUint64(fee)
-	lowertick, err := k.GetOrInitPoolReserves(ctx, pairId, pairId.Token0, tickIndex-feeUint, fee)
+	lowertick, err := k.GetOrInitPoolReserves(ctx, pairId, pairId.Token0, centerTickIndex-feeUint, fee)
 	if err != nil {
 		return Pool{}, sdkerrors.Wrapf(err, "Error for lower tick")
 	}
 
-	upperTick, err := k.GetOrInitPoolReserves(ctx, pairId, pairId.Token1, tickIndex+feeUint, fee)
+	upperTick, err := k.GetOrInitPoolReserves(ctx, pairId, pairId.Token1, centerTickIndex+feeUint, fee)
 	if err != nil {
 		return Pool{}, sdkerrors.Wrapf(err, "Error for upper tick")
 	}
 
-	return NewPool(tickIndex, lowertick, upperTick), nil
+	return NewPool(centerTickIndex, lowertick, upperTick), nil
 }
 func (p *Pool) GetLowerReserve0() sdk.Int {
 	return p.LowerTick0.Reserves
@@ -173,7 +174,7 @@ func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.I
 func (p *Pool) MustCalcPrice1To0Center() sdk.Dec {
 	// NOTE: We can safely call the error-less version of CalcPrice here because the pool object
 	// has already been initialized with an upper and lower tick which satisfy a check for IsTickOutOfRange
-	return utils.MustCalcPrice1To0(p.TickIndex)
+	return utils.MustCalcPrice1To0(p.CenterTickIndex)
 }
 
 func (p *Pool) CalcSharesMinted(
