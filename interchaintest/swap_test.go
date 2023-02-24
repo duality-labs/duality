@@ -552,3 +552,174 @@ func TestIBCSwapMiddleware_FailNoRefund(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, chainABal-ibcTransferAmount, chainABalAfterSwap)
 }
+
+// TestIBCSwapMiddleware_FailWithRefundAddr asserts that the IBC swap middleware works as intended with Duality running as a
+// consumer chain connected to the Cosmos Hub. The swap should fail and funds should remain on Duality but be moved
+// to the refund address.
+func TestIBCSwapMiddleware_FailWithRefundAddr(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+	}
+
+	t.Parallel()
+
+	// Create chain factory with Duality and Cosmos Hub
+	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
+		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
+		{Name: "duality", ChainConfig: chainCfg}},
+	)
+
+	// Get both chains from the chain factory
+	chains, err := cf.Chains(t.Name())
+	require.NoError(t, err)
+	chainA, chainB := chains[0].(*cosmos.CosmosChain), chains[1].(*cosmos.CosmosChain)
+
+	ctx := context.Background()
+	client, network := interchaintest.DockerSetup(t)
+
+	// Create relayer factory with the go-relayer
+	r := interchaintest.NewBuiltinRelayerFactory(
+		ibc.CosmosRly,
+		zaptest.NewLogger(t),
+		relayer.CustomDockerImage("ghcr.io/cosmos/relayer", "andrew-paths_update", rly.RlyDefaultUidGid),
+	).Build(t, client, network)
+
+	// Initialize the Interchain object which describes the chains, relayers, and paths between chains
+	ic := interchaintest.NewInterchain().
+		AddChain(chainA).
+		AddChain(chainB).
+		AddRelayer(r, "relayer").
+		AddProviderConsumerLink(interchaintest.ProviderConsumerLink{
+			Provider:         chainA,
+			Consumer:         chainB,
+			Relayer:          r,
+			Path:             pathICS,
+			CreateClientOpts: ibc.CreateClientOptions{TrustingPeriod: "15m"},
+		})
+
+	rep := testreporter.NewNopReporter()
+	eRep := rep.RelayerExecReporter(t)
+
+	require.NoError(t, ic.Build(ctx, eRep, interchaintest.InterchainBuildOptions{
+		TestName:  t.Name(),
+		Client:    client,
+		NetworkID: network,
+
+		SkipPathCreation: false,
+	}))
+
+	t.Cleanup(func() {
+		_ = ic.Close()
+	})
+
+	// Start the relayer
+	require.NoError(t, r.StartRelayer(ctx, eRep, pathICS))
+
+	t.Cleanup(
+		func() {
+			err := r.StopRelayer(ctx, eRep)
+			if err != nil {
+				panic(fmt.Errorf("an error occured while stopping the relayer: %s", err))
+			}
+		},
+	)
+
+	users := interchaintest.GetAndFundTestUsers(t, ctx, t.Name(), genesisWalletAmount, chainA, chainB, chainB)
+
+	// wait a couple blocks for wallets to be initialized
+	err = testutil.WaitForBlocks(ctx, 2, chainA, chainB)
+	require.NoError(t, err)
+
+	chainAKey, chainBKey, chainBRefundKey := users[0], users[1], users[2]
+
+	// Get our bech32 encoded user address
+	chainAAddr := chainAKey.Bech32Address(chainA.Config().Bech32Prefix)
+	chainBAddr := chainBKey.Bech32Address(chainB.Config().Bech32Prefix)
+	chainBRefundAddr := chainBRefundKey.Bech32Address(chainB.Config().Bech32Prefix)
+
+	// Get channel between Gaia and Duality
+	abChannel, err := ibc.GetTransferChannel(ctx, r, eRep, chainA.Config().ChainID, chainB.Config().ChainID)
+	require.NoError(t, err)
+
+	// Get the IBC denom for ATOM on Duality
+	chainATokenDenom := transfertypes.GetPrefixedDenom(abChannel.Counterparty.PortID, abChannel.Counterparty.ChannelID, chainA.Config().Denom)
+	chainADenomTrace := transfertypes.ParseDenomTrace(chainATokenDenom)
+
+	// Get the acc balances before the transfer and swap takes place
+	chainABal, err := chainA.GetBalance(ctx, chainAAddr, chainA.Config().Denom)
+	require.NoError(t, err)
+	require.Equal(t, genesisWalletAmount, chainABal)
+
+	chainBNativeBal, err := chainB.GetBalance(ctx, chainBAddr, chainB.Config().Denom)
+	require.NoError(t, err)
+	require.Equal(t, genesisWalletAmount, chainBNativeBal)
+
+	chainBIBCBal, err := chainB.GetBalance(ctx, chainBAddr, chainADenomTrace.IBCDenom())
+	require.NoError(t, err)
+	require.Equal(t, int64(0), chainBIBCBal)
+
+	chainBRefundBal, err := chainB.GetBalance(ctx, chainBRefundAddr, chainADenomTrace.IBCDenom())
+	require.NoError(t, err)
+	require.Equal(t, int64(0), chainBRefundBal)
+
+	// Compose the swap metadata, this swap will fail because there is no pool initialized for this pair
+	swapAmount := sdktypes.NewInt(100000)
+	minOut := sdktypes.NewInt(100000)
+
+	metadata := swaptypes.PacketMetadata{
+		Swap: &swaptypes.SwapMetadata{
+			MsgSwap: &types.MsgSwap{
+				Creator:  chainBAddr,
+				Receiver: chainBAddr,
+				TokenA:   chainADenomTrace.IBCDenom(),
+				TokenB:   chainB.Config().Denom,
+				AmountIn: swapAmount,
+				TokenIn:  chainADenomTrace.IBCDenom(),
+				MinOut:   minOut,
+			},
+			NonRefundable: true,
+			RefundAddress: chainBRefundAddr,
+			Next:          nil,
+		},
+	}
+
+	metadataBz, err := json.Marshal(metadata)
+	require.NoError(t, err)
+
+	// Compose details for an IBC transfer
+	transfer := ibc.WalletAmount{
+		Address: chainBAddr,
+		Denom:   chainA.Config().Denom,
+		Amount:  ibcTransferAmount,
+	}
+
+	chainAHeight, err := chainA.Height(ctx)
+	require.NoError(t, err)
+
+	// Send an IBC transfer from Gaia to Duality with packet memo containing the swap metadata
+	transferTx, err := chainA.SendIBCTransfer(ctx, abChannel.ChannelID, chainAAddr, transfer, ibc.TransferOptions{Memo: string(metadataBz)})
+	require.NoError(t, err)
+
+	// Poll for the ack to know that the swap has failed
+	_, err = testutil.PollForAck(ctx, chainA, chainAHeight, chainAHeight+15, transferTx.Packet)
+	require.NoError(t, err)
+
+	// Check that the funds have been moved to the refund address
+	refundNewBal, err := chainB.GetBalance(ctx, chainBRefundAddr, chainADenomTrace.IBCDenom())
+	require.NoError(t, err)
+	require.Equal(t, chainBRefundBal+ibcTransferAmount, refundNewBal)
+
+	// Check that the funds are present in the account on Duality
+	chainBBalNativeSwap, err := chainB.GetBalance(ctx, chainBAddr, chainB.Config().Denom)
+	require.NoError(t, err)
+	require.Equal(t, chainBNativeBal, chainBBalNativeSwap)
+
+	chainBBalIBCSwap, err := chainB.GetBalance(ctx, chainBAddr, chainADenomTrace.IBCDenom())
+	require.NoError(t, err)
+	require.Equal(t, chainBIBCBal, chainBBalIBCSwap)
+
+	// Check that no refund takes place and the funds are not in the account on Gaia
+	chainABalAfterSwap, err := chainA.GetBalance(ctx, chainAAddr, chainA.Config().Denom)
+	require.NoError(t, err)
+	require.Equal(t, chainABal-ibcTransferAmount, chainABalAfterSwap)
+}
