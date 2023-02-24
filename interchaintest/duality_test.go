@@ -147,10 +147,10 @@ func modifyGenesisDuality(genbz []byte, feeList Fees) ([]byte, error) {
 	if err := json.Unmarshal(genbz, &g); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal genesis file: %w", err)
 	}
-	if err := dyno.Set(g, feeList.FeeList, "app_state", "dex", "FeeTierList"); err != nil {
+	if err := dyno.Set(g, feeList.FeeList, "app_state", "dex", "feeTierList"); err != nil {
 		return nil, fmt.Errorf("failed to set fee list in genesis json: %w", err)
 	}
-	if err := dyno.Set(g, len(feeList.FeeList), "app_state", "dex", "FeeTierCount"); err != nil {
+	if err := dyno.Set(g, len(feeList.FeeList), "app_state", "dex", "feeTierCount"); err != nil {
 		return nil, fmt.Errorf("failed set fee list count in genesis json")
 	}
 
