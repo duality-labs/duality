@@ -3,28 +3,11 @@ package types
 import (
 	"encoding/json"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/iancoleman/orderedmap"
 )
-
-/*
-An example JSON blob that would be marshaled into PacketMetadata where the next field can contain any arbitrary string.
-
-{
-  "swap": {
-    "creator": "test-1",
-    "receiver": "test-1",
-    "tokenA": "token-a",
-    "tokenB": "token-b",
-    "amountIn": "123.000000000000000000",
-    "tokenIn": "token-in",
-    "minOut": "456.000000000000000000",
-	"non-refundable": false,
-    "next": ""
-  }
-}
-*/
 
 // PacketMetadata wraps the SwapMetadata. The root key in the incoming ICS20 transfer packet's memo needs to be set to the same
 // value as the json tag in order for the swap middleware to process the swap.
@@ -37,7 +20,8 @@ type PacketMetadata struct {
 // further in the middleware stack or on the counterparty.
 type SwapMetadata struct {
 	*dextypes.MsgSwap
-	NonRefundable bool `json:"non-refundable,omitempty"`
+	NonRefundable bool   `json:"non-refundable,omitempty"`
+	RefundAddress string `json:"refund-address,omitempty"`
 
 	// Using JSONObject so that objects for next property will not be mutated by golang's lexicographic key sort on map keys during Marshal.
 	// Supports primitives for Unmarshal/Marshal so that an escaped JSON-marshaled string is also valid.
@@ -57,6 +41,12 @@ func (sm SwapMetadata) Validate() error {
 	}
 	if sm.TokenIn == "" {
 		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap tokenIn cannot be an empty string")
+	}
+	if sm.RefundAddress != "" {
+		_, err := sdk.AccAddressFromBech32(sm.RefundAddress)
+		if err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "%s is not a valid Duality address", sm.RefundAddress)
+		}
 	}
 	return nil
 }

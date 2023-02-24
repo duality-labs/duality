@@ -124,3 +124,18 @@ func (k Keeper) RefundPacketToken(ctx sdk.Context, packet channeltypes.Packet, d
 
 	return nil
 }
+
+// SendCoins wraps the BankKeepers SendCoins function so it can be invoked from the middleware.
+func (k Keeper) SendCoins(ctx sdk.Context, fromAddr string, toAddr string, amt sdk.Coins) error {
+	from, err := sdk.AccAddressFromBech32(fromAddr)
+	if err != nil {
+		return err
+	}
+
+	to, err := sdk.AccAddressFromBech32(toAddr)
+	if err != nil {
+		return err
+	}
+
+	return k.bankKeeper.SendCoins(ctx, from, to, amt)
+}

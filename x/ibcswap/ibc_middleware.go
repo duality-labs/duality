@@ -141,47 +141,7 @@ func (im IBCMiddleware) OnRecvPacket(
 	// Attempt to perform a swap since this packets memo included swap metadata.
 	res, err := im.keeper.Swap(ctx, metadata.MsgSwap)
 	if err != nil {
-		swapErr := sdkerrors.Wrap(types.ErrSwapFailed, err.Error())
-		im.keeper.Logger(ctx).Error(
-			"ibc swap failed",
-			"err", swapErr,
-			"creator", metadata.Creator,
-			"receiver", metadata.Receiver,
-			"tokenA", metadata.TokenA,
-			"tokenB", metadata.TokenB,
-			"tokenIn", metadata.TokenIn,
-			"amount in", metadata.AmountIn,
-			"min out", metadata.MinOut,
-			"limit price", metadata.LimitPrice,
-			"refundable", metadata.NonRefundable,
-		)
-
-		// If a refund to the counterparty chain is not being issued we return a successful ack containing the error
-		// This ensures that a refund is not issued on the counterparty chain
-		// see https://github.com/cosmos/ibc-go/blob/3ecc7dd3aef5790ec5d906936a297b34adf1ee41/modules/apps/transfer/keeper/relay.go#L320
-		if metadata.NonRefundable {
-			return channeltypes.NewResultAcknowledgement([]byte(swapErr.Error()))
-		}
-
-		// We need to get the denom for this token on this chain before issuing a refund on this side
-		denomOnThisChain := getDenomForThisChain(
-			packet.DestinationPort, packet.DestinationChannel,
-			packet.SourcePort, packet.SourceChannel,
-			data.Denom,
-		)
-
-		data.Denom = denomOnThisChain
-
-		// We called into the transfer modules OnRecvPacket callback to mint or unescrow the funds on this side
-		// so if the swap fails we need to explicitly refund to handle the bookkeeping properly
-		err = im.keeper.RefundPacketToken(ctx, packet, data)
-		if err != nil {
-			// If the refund fails on this side we want to make sure that the refund does not happen on the counterparty,
-			// so we return a successful ack containing the error
-			return channeltypes.NewResultAcknowledgement([]byte(err.Error()))
-		}
-
-		return channeltypes.NewErrorAcknowledgement(swapErr.Error())
+		return im.handleFailedSwap(ctx, packet, data, metadata, err)
 	}
 
 	// If there is no next field set in the metadata return ack
@@ -189,23 +149,21 @@ func (im IBCMiddleware) OnRecvPacket(
 		return ack
 	}
 
+	// We need to reset the packets memo field so that the root key in the metadata is the
+	// next field from the current metadata.
 	memoBz, err := json.Marshal(metadata.Next)
 	if err != nil {
 		return ack
 	}
 
-	// We need to reset the packets memo field so that the root key in the metadata is the
-	// next field from the current metadata.
 	data.Memo = string(memoBz)
 
-	// Set the new packet data to include the token denom and amount that was received from the swap.
+	// Override the packet data to include the token denom and amount that was received from the swap.
 	data.Denom = res.CoinOut.Denom
 	data.Amount = res.CoinOut.Amount.String()
 
-	// Swaps can come into Duality over IBC where the swap creator could be a module/contract swapping on behalf of the user.
-	// Then the swap's receiver field will be the user controlled address where funds are deposited afterwards.
-	// Before passing to the forward middleware we need to override the packet receiver field to now point to the
-	// user controlled address that will be initiating the forward since this is where the funds are after the swap.
+	// After a successful swap funds are now in the receiver account from the MsgSwap so,
+	// we need to override the packets receiver field before invoking the forward middlewares OnRecvPacket.
 	data.Receiver = m.Swap.Receiver
 
 	dataBz, err := transfertypes.ModuleCdc.MarshalJSON(&data)
@@ -257,6 +215,101 @@ func (im IBCMiddleware) WriteAcknowledgement(
 	ack ibcexported.Acknowledgement,
 ) error {
 	return im.keeper.WriteAcknowledgement(ctx, chanCap, packet, ack)
+}
+
+// handleFailedSwap will invoke the appropriate failover logic depending on if this swap was marked refundable
+// or non-refundable in the SwapMetadata.
+func (im IBCMiddleware) handleFailedSwap(
+	ctx sdk.Context,
+	packet channeltypes.Packet,
+	data transfertypes.FungibleTokenPacketData,
+	metadata *types.SwapMetadata,
+	err error,
+) ibcexported.Acknowledgement {
+	swapErr := sdkerrors.Wrap(types.ErrSwapFailed, err.Error())
+	im.keeper.Logger(ctx).Error(
+		"ibc swap failed",
+		"err", swapErr,
+		"creator", metadata.Creator,
+		"receiver", metadata.Receiver,
+		"tokenA", metadata.TokenA,
+		"tokenB", metadata.TokenB,
+		"tokenIn", metadata.TokenIn,
+		"amount in", metadata.AmountIn,
+		"min out", metadata.MinOut,
+		"limit price", metadata.LimitPrice,
+		"refundable", metadata.NonRefundable,
+		"refund address", metadata.RefundAddress,
+	)
+
+	// The current denom is from the sender chains perspective, we need to compose the appropriate denom for this side
+	denomOnThisChain := getDenomForThisChain(
+		packet.DestinationPort, packet.DestinationChannel,
+		packet.SourcePort, packet.SourceChannel,
+		data.Denom,
+	)
+
+	if metadata.NonRefundable {
+		return im.handleNoRefund(ctx, data, metadata, denomOnThisChain, err)
+	}
+
+	return im.handleRefund(ctx, packet, data, denomOnThisChain, err)
+}
+
+// handleNoRefund will compose a successful ack to send back to the counterparty chain containing any error messages.
+// Returning a successful ack ensures that a refund is not issued on the counterparty chain.
+// See: https://github.com/cosmos/ibc-go/blob/3ecc7dd3aef5790ec5d906936a297b34adf1ee41/modules/apps/transfer/keeper/relay.go#L320
+func (im IBCMiddleware) handleNoRefund(
+	ctx sdk.Context,
+	data transfertypes.FungibleTokenPacketData,
+	metadata *types.SwapMetadata,
+	newDenom string,
+	swapErr error,
+) ibcexported.Acknowledgement {
+	if metadata.RefundAddress == "" {
+		return channeltypes.NewResultAcknowledgement([]byte(swapErr.Error()))
+	}
+
+	amount, ok := sdk.NewIntFromString(data.Amount)
+	if !ok {
+		wrappedErr := sdkerrors.Wrapf(transfertypes.ErrInvalidAmount, "unable to parse transfer amount (%s) into math.Int", data.Amount)
+		wrappedErr = sdkerrors.Wrap(swapErr, wrappedErr.Error())
+		return channeltypes.NewResultAcknowledgement([]byte(wrappedErr.Error()))
+	}
+
+	token := sdk.NewCoin(newDenom, amount)
+	err := im.keeper.SendCoins(ctx, data.Receiver, metadata.RefundAddress, sdk.NewCoins(token))
+	if err != nil {
+		wrappedErr := sdkerrors.Wrap(err, "failed to move funds to refund address")
+		wrappedErr = sdkerrors.Wrap(swapErr, wrappedErr.Error())
+		return channeltypes.NewResultAcknowledgement([]byte(wrappedErr.Error()))
+	}
+
+	return channeltypes.NewResultAcknowledgement([]byte(swapErr.Error()))
+}
+
+// handleRefund will either burn or transfer the funds back to the appropriate escrow account.
+// When a packet comes in the transfer module's OnRecvPacket callback is invoked which either
+// mints or unescrows funds on this side so if the swap fails an explicit refund is required.
+func (im IBCMiddleware) handleRefund(
+	ctx sdk.Context,
+	packet channeltypes.Packet,
+	data transfertypes.FungibleTokenPacketData,
+	newDenom string,
+	swapErr error,
+) ibcexported.Acknowledgement {
+	data.Denom = newDenom
+
+	err := im.keeper.RefundPacketToken(ctx, packet, data)
+	if err != nil {
+		wrappedErr := sdkerrors.Wrap(swapErr, err.Error())
+
+		// If the refund fails on this side we want to make sure that the refund does not happen on the counterparty,
+		// so we return a successful ack containing the error
+		return channeltypes.NewResultAcknowledgement([]byte(wrappedErr.Error()))
+	}
+
+	return channeltypes.NewErrorAcknowledgement(swapErr.Error())
 }
 
 // getDenomForThisChain composes a new token denom by either unwinding or prefixing the specified token denom appropriately.
