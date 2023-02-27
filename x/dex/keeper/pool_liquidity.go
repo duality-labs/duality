@@ -2,6 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/dex/types"
 )
 
 type PoolLiquidity struct {
@@ -17,7 +18,7 @@ func (pl *PoolLiquidity) Swap(maxAmount sdk.Int) (inAmount sdk.Int, outAmount sd
 	}
 }
 
-func (pl *PoolLiquidity) Price() sdk.Dec {
+func (pl *PoolLiquidity) Price() *types.Price {
 	if pl.is0To1 {
 		return pl.pool.Price0To1Upper
 	} else {

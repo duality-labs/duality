@@ -14,7 +14,6 @@ import (
 	. "github.com/duality-labs/duality/x/dex/keeper"
 	. "github.com/duality-labs/duality/x/dex/keeper/internal/testutils"
 	"github.com/duality-labs/duality/x/dex/types"
-	"github.com/duality-labs/duality/x/dex/utils"
 	"github.com/stretchr/testify/suite"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
@@ -370,52 +369,6 @@ func (s *MsgServerTestSuite) depositsWithOptions(account sdk.AccAddress, deposit
 		Options:     options,
 	})
 	s.Assert().Nil(err)
-}
-
-func (s *MsgServerTestSuite) calcAutoswapSharesMinted(centerTick int64, feeIndex uint64, _residual0 int64, _residual1 int64, _balanced0 int64, _balanced1 int64, _totalShares int64, _valuePool int64) sdk.Int {
-	residual0, residual1, balanced0, balanced1, totalShares, valuePool := sdk.NewInt(_residual0), sdk.NewInt(_residual1), sdk.NewInt(_balanced0), sdk.NewInt(_balanced1), sdk.NewInt(_totalShares), sdk.NewInt(_valuePool)
-
-	// residualValue = 1.0001^-f * residualAmount0 + 1.0001^{i-f} * residualAmount1
-	// balancedValue = balancedAmount0 + 1.0001^{i} * balancedAmount1
-	// value = residualValue + balancedValue
-	// shares minted = value * totalShares / valuePool
-	fee := s.feeTiers[feeIndex].Fee
-
-	centerPrice, _ := utils.CalcPrice1To0(centerTick)
-	leftPrice, _ := utils.CalcPrice1To0(centerTick - int64(fee))
-	discountPrice, _ := utils.CalcPrice1To0(-int64(fee))
-
-	balancedValue := balanced0.ToDec().Add(centerPrice.Mul(balanced1.ToDec())).TruncateInt()
-	residualValue := residual0.ToDec().Mul(discountPrice).Add(leftPrice.Mul(residual1.ToDec())).TruncateInt()
-	valueMint := balancedValue.Add(residualValue)
-
-	return valueMint.Mul(totalShares).Quo(valuePool)
-}
-
-func (s *MsgServerTestSuite) calcSharesMinted(centerTick int64, feeIndex uint64, _amount0 int64, _amount1 int64) sdk.Int {
-	amount0, amount1 := sdk.NewInt(_amount0), sdk.NewInt(_amount1)
-	centerPrice, _ := utils.CalcPrice1To0(centerTick)
-
-	return amount0.ToDec().Add(centerPrice.Mul(amount1.ToDec())).TruncateInt()
-}
-
-func (s *MsgServerTestSuite) calcExpectedBalancesAfterWithdrawOnePool(sharesMinted sdk.Int, account sdk.AccAddress, tickIndex int64, feeIndex uint64) (sdk.Int, sdk.Int, sdk.Int, sdk.Int) {
-	dexCurrentBalance0 := s.app.BankKeeper.GetBalance(s.ctx, s.app.AccountKeeper.GetModuleAddress("dex"), "TokenA").Amount
-	dexCurrentBalance1 := s.app.BankKeeper.GetBalance(s.ctx, s.app.AccountKeeper.GetModuleAddress("dex"), "TokenB").Amount
-	currentBalance0 := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenA").Amount
-	currentBalance1 := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenB").Amount
-	amountPool0, amountPool1 := s.getLiquidityAtTick(tickIndex, feeIndex)
-	poolShares := s.getPoolShares("TokenA", "TokenB", tickIndex, feeIndex)
-
-	amountOut0 := amountPool0.Mul(sharesMinted).Quo(poolShares)
-	amountOut1 := amountPool1.Mul(sharesMinted).Quo(poolShares)
-
-	expectedBalance0 := currentBalance0.Add(amountOut0)
-	expectedBalance1 := currentBalance1.Add(amountOut1)
-	dexExpectedBalance0 := dexCurrentBalance0.Sub(amountOut0)
-	dexExpectedBalance1 := dexCurrentBalance1.Sub(amountOut1)
-
-	return expectedBalance0, expectedBalance1, dexExpectedBalance0, dexExpectedBalance1
 }
 
 func (s *MsgServerTestSuite) getLiquidityAtTick(tickIndex int64, feeIndex uint64) (sdk.Int, sdk.Int) {
@@ -1038,197 +991,6 @@ func (s *MsgServerTestSuite) getLimitReservesAtTickAtKey(selling string, tickInd
 	return tranche.ReservesTokenIn
 }
 
-// Swap helpers (use for writing the tests, but replace with actual values before finishing!)
-func (s *MsgServerTestSuite) calculateSingleSwapNoLOAToB(tick int64, tickLiqudity int64, amountIn int64) (sdk.Int, sdk.Int) {
-	price, err := utils.CalcPrice0To1(tick)
-	if err != nil {
-		panic(err)
-	}
-
-	return calculateSingleSwapNoLO(price, tickLiqudity, amountIn)
-}
-
-func (s *MsgServerTestSuite) calculateSingleSwapOnlyLOAToB(tick int64, tickLimitOrderLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
-	price, err := utils.CalcPrice0To1(tick)
-	if err != nil {
-		panic(err)
-	}
-
-	return calculateSingleSwapOnlyLO(price, tickLimitOrderLiquidity, amountIn)
-}
-
-func (s *MsgServerTestSuite) calculateSingleSwapAToB(tick int64, tickLiqudidty int64, tickLimitOrderLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
-	price, err := utils.CalcPrice0To1(tick)
-	if err != nil {
-		panic(err)
-	}
-
-	return calculateSingleSwap(price, tickLiqudidty, tickLimitOrderLiquidity, amountIn)
-}
-
-func (s *MsgServerTestSuite) calculateSingleSwapNoLOBToA(tick int64, tickLiqudity int64, amountIn int64) (sdk.Int, sdk.Int) {
-	price, err := utils.CalcPrice1To0(tick)
-	if err != nil {
-		panic(err)
-	}
-
-	return calculateSingleSwapNoLO(price, tickLiqudity, amountIn)
-}
-
-func (s *MsgServerTestSuite) calculateSingleSwapOnlyLOBToA(tick int64, tickLimitOrderLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
-	price, err := utils.CalcPrice1To0(tick)
-	if err != nil {
-		panic(err)
-	}
-
-	return calculateSingleSwapOnlyLO(price, tickLimitOrderLiquidity, amountIn)
-}
-
-func (s *MsgServerTestSuite) calculateSingleSwapBToA(tick int64, tickLiqudidty int64, tickLimitOrderLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
-	price, err := utils.CalcPrice1To0(tick)
-	if err != nil {
-		panic(err)
-	}
-
-	return calculateSingleSwap(price, tickLiqudidty, tickLimitOrderLiquidity, amountIn)
-}
-
-func calculateSingleSwapNoLO(price sdk.Dec, tickLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
-	return calculateSingleSwap(price, tickLiquidity, 0, amountIn)
-}
-
-func calculateSingleSwapOnlyLO(price sdk.Dec, tickLimitOrderLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
-	return calculateSingleSwap(price, 0, tickLimitOrderLiquidity, amountIn)
-}
-
-func calculateSingleSwap(price sdk.Dec, tickLiquidity int64, tickLimitOrderLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
-	// swap against CSMM liquidity
-	amountLeft, amountOut := calculateSwap(price, tickLiquidity, amountIn)
-	// fmt.Printf("left %s out %s\n", amountLeft, amountOut)
-
-	// swap against limit orders
-	if amountLeft.GT(sdk.ZeroInt()) {
-		tmpAmountLeft, tmpAmountOut := calculateSwap(price, tickLimitOrderLiquidity, amountLeft.Int64())
-		amountLeft = tmpAmountLeft
-		amountOut = amountOut.Add(tmpAmountOut)
-	}
-	return amountLeft, amountOut
-}
-
-func calculateSwap(price sdk.Dec, liquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
-	amountInInt := sdk.NewInt(amountIn)
-	liquidityInt := sdk.NewInt(liquidity)
-	if tmpAmountOut := price.MulInt(amountInInt); tmpAmountOut.LT(liquidityInt.ToDec()) {
-		// fmt.Printf("sufficient tmpOut %s\n", tmpAmountOut)
-		// sufficient liquidity
-		return sdk.ZeroInt(), tmpAmountOut.TruncateInt()
-	} else {
-		// only sufficient for part of amountIn
-		tmpAmountIn := liquidityInt.ToDec().Quo(price).TruncateInt()
-		// fmt.Printf("insufficient tmpIn %s\n", tmpAmountIn)
-		return amountInInt.Sub(tmpAmountIn), liquidityInt
-	}
-}
-
-func (s *MsgServerTestSuite) calculateMultipleSwapsAToB(tickIndexes []int64, tickLiquidities []int64, tickLimitOrderLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
-	prices := make([]sdk.Dec, len(tickIndexes))
-	var err error
-	for i := range prices {
-		prices[i], err = utils.CalcPrice0To1(tickIndexes[i])
-		if err != nil {
-			panic(err)
-		}
-	}
-	return s.calculateMultipleSwaps(prices, tickLiquidities, tickLimitOrderLiquidities, amountIn)
-}
-
-func (s *MsgServerTestSuite) calculateMultipleSwapsNoLOAToB(tickIndexes []int64, tickLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
-	prices := make([]sdk.Dec, len(tickIndexes))
-	var err error
-	for i := range prices {
-		prices[i], err = utils.CalcPrice0To1(tickIndexes[i])
-		if err != nil {
-			panic(err)
-		}
-	}
-	return s.calculateMultipleSwapsNoLO(prices, tickLiquidities, amountIn)
-}
-
-func (s *MsgServerTestSuite) calculateMultipleSwapsOnlyLOAToB(tickIndexes []int64, tickLimitOrderLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
-	prices := make([]sdk.Dec, len(tickIndexes))
-	var err error
-	for i := range prices {
-		prices[i], err = utils.CalcPrice0To1(tickIndexes[i])
-		if err != nil {
-			panic(err)
-		}
-	}
-	return s.calculateMultipleSwapsOnlyLO(prices, tickLimitOrderLiquidities, amountIn)
-}
-
-func (s *MsgServerTestSuite) calculateMultipleSwapsBToA(tickIndexes []int64, tickLiquidities []int64, tickLimitOrderLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
-	prices := make([]sdk.Dec, len(tickIndexes))
-	var err error
-	for i := range prices {
-		prices[i], err = utils.CalcPrice1To0(tickIndexes[i])
-		if err != nil {
-			panic(err)
-		}
-	}
-	return s.calculateMultipleSwaps(prices, tickLiquidities, tickLimitOrderLiquidities, amountIn)
-}
-
-func (s *MsgServerTestSuite) calculateMultipleSwapsNoLOBToA(tickIndexes []int64, tickLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
-	prices := make([]sdk.Dec, len(tickIndexes))
-	var err error
-	for i := range prices {
-		prices[i], err = utils.CalcPrice1To0(tickIndexes[i])
-		if err != nil {
-			panic(err)
-		}
-	}
-	return s.calculateMultipleSwapsNoLO(prices, tickLiquidities, amountIn)
-}
-
-func (s *MsgServerTestSuite) calculateMultipleSwapsOnlyLOBToA(tickIndexes []int64, tickLimitOrderLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
-	prices := make([]sdk.Dec, len(tickIndexes))
-	var err error
-	for i := range prices {
-		prices[i], err = utils.CalcPrice1To0(tickIndexes[i])
-		if err != nil {
-			panic(err)
-		}
-	}
-	return s.calculateMultipleSwapsOnlyLO(prices, tickLimitOrderLiquidities, amountIn)
-}
-
-func (s *MsgServerTestSuite) calculateMultipleSwapsNoLO(prices []sdk.Dec, tickLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
-	// zero array for tickLimitOrders
-	tickLimitOrderLiquidities := make([]int64, len(prices))
-	for i := range tickLimitOrderLiquidities {
-		tickLimitOrderLiquidities[i] = 0
-	}
-	return s.calculateMultipleSwaps(prices, tickLiquidities, tickLimitOrderLiquidities, amountIn)
-}
-
-func (s *MsgServerTestSuite) calculateMultipleSwapsOnlyLO(prices []sdk.Dec, tickLimitOrderLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
-	// zero array for tickLimitOrders
-	tickLiquidities := make([]int64, len(prices))
-	for i := range tickLiquidities {
-		tickLiquidities[i] = 0
-	}
-	return s.calculateMultipleSwaps(prices, tickLiquidities, tickLimitOrderLiquidities, amountIn)
-}
-
-func (s *MsgServerTestSuite) calculateMultipleSwaps(prices []sdk.Dec, tickLiquidities []int64, tickLimitOrderLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
-	amountLeft, amountOut := sdk.NewInt(amountIn), sdk.ZeroInt()
-	for i := 0; i < len(prices); i++ {
-		tmpAmountLeft, tmpAmountOut := calculateSingleSwap(prices[i], tickLiquidities[i], tickLimitOrderLiquidities[i], amountLeft.Int64())
-		amountLeft, amountOut = tmpAmountLeft, amountOut.Add(tmpAmountOut)
-	}
-	return amountLeft, amountOut
-}
-
 // SingleLimitOrderFill() simulates the fill of a single limit order and returns the amount
 // swapped into it, filling some of it (amount_in) and the amount swapped out (amount_out). It
 // takes as input the amount that was placed for the limit order (amount_placed), the price the
@@ -1378,10 +1140,7 @@ func MultiplePoolSwapAndUpdate(amounts_liquidity []sdk.Int,
 }
 
 func SharesOnDeposit(existing_shares sdk.Dec, existing_amount0 sdk.Int, existing_amount1 sdk.Int, new_amount0 sdk.Int, new_amount1 sdk.Int, tickIndex int64) (shares_minted sdk.Int) {
-	price1To0, err := utils.CalcPrice1To0(tickIndex)
-	if err != nil {
-		panic(err)
-	}
+	price1To0 := types.MustNewPrice(-1 * tickIndex)
 	newAmount0Dec := sdk.NewDecFromInt(new_amount0)
 	new_value := newAmount0Dec.Add(price1To0.MulInt(new_amount1))
 
@@ -1393,4 +1152,202 @@ func SharesOnDeposit(existing_shares sdk.Dec, existing_amount0 sdk.Int, existing
 	}
 
 	return shares_minted
+}
+
+func (s *MsgServerTestSuite) calcAutoswapSharesMinted(centerTick int64, feeIndex uint64, _residual0 int64, _residual1 int64, _balanced0 int64, _balanced1 int64, _totalShares int64, _valuePool int64) sdk.Int {
+	residual0, residual1, balanced0, balanced1, totalShares, valuePool := sdk.NewInt(_residual0), sdk.NewInt(_residual1), sdk.NewInt(_balanced0), sdk.NewInt(_balanced1), sdk.NewInt(_totalShares), sdk.NewInt(_valuePool)
+
+	// residualValue = 1.0001^-f * residualAmount0 + 1.0001^{i-f} * residualAmount1
+	// balancedValue = balancedAmount0 + 1.0001^{i} * balancedAmount1
+	// value = residualValue + balancedValue
+	// shares minted = value * totalShares / valuePool
+	fee := s.feeTiers[feeIndex].Fee
+
+	centerPrice := types.MustNewPrice(-1 * centerTick)
+	leftPrice := types.MustNewPrice(-1 * (centerTick - int64(fee)))
+	discountPrice := types.MustNewPrice(-1 * int64(fee))
+
+	balancedValue := balanced0.ToDec().Add(centerPrice.MulInt(balanced1)).TruncateInt()
+	residualValue := discountPrice.MulInt(residual0).Add(leftPrice.Mul(residual1.ToDec())).TruncateInt()
+	valueMint := balancedValue.Add(residualValue)
+
+	return valueMint.Mul(totalShares).Quo(valuePool)
+}
+
+func (s *MsgServerTestSuite) calcSharesMinted(centerTick int64, feeIndex uint64, _amount0 int64, _amount1 int64) sdk.Int {
+	amount0, amount1 := sdk.NewInt(_amount0), sdk.NewInt(_amount1)
+	centerPrice := types.MustNewPrice(-1 * centerTick)
+
+	return amount0.ToDec().Add(centerPrice.Mul(amount1.ToDec())).TruncateInt()
+}
+
+func (s *MsgServerTestSuite) calcExpectedBalancesAfterWithdrawOnePool(sharesMinted sdk.Int, account sdk.AccAddress, tickIndex int64, feeIndex uint64) (sdk.Int, sdk.Int, sdk.Int, sdk.Int) {
+	dexCurrentBalance0 := s.app.BankKeeper.GetBalance(s.ctx, s.app.AccountKeeper.GetModuleAddress("dex"), "TokenA").Amount
+	dexCurrentBalance1 := s.app.BankKeeper.GetBalance(s.ctx, s.app.AccountKeeper.GetModuleAddress("dex"), "TokenB").Amount
+	currentBalance0 := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenA").Amount
+	currentBalance1 := s.app.BankKeeper.GetBalance(s.ctx, account, "TokenB").Amount
+	amountPool0, amountPool1 := s.getLiquidityAtTick(tickIndex, feeIndex)
+	poolShares := s.getPoolShares("TokenA", "TokenB", tickIndex, feeIndex)
+
+	amountOut0 := amountPool0.Mul(sharesMinted).Quo(poolShares)
+	amountOut1 := amountPool1.Mul(sharesMinted).Quo(poolShares)
+
+	expectedBalance0 := currentBalance0.Add(amountOut0)
+	expectedBalance1 := currentBalance1.Add(amountOut1)
+	dexExpectedBalance0 := dexCurrentBalance0.Sub(amountOut0)
+	dexExpectedBalance1 := dexCurrentBalance1.Sub(amountOut1)
+
+	return expectedBalance0, expectedBalance1, dexExpectedBalance0, dexExpectedBalance1
+}
+
+// Swap helpers (use for writing the tests, but replace with actual values before finishing!)
+func (s *MsgServerTestSuite) calculateSingleSwapNoLOAToB(tick int64, tickLiqudity int64, amountIn int64) (sdk.Int, sdk.Int) {
+	price := types.MustNewPrice(tick)
+	return calculateSingleSwapNoLO(price, tickLiqudity, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateSingleSwapOnlyLOAToB(tick int64, tickLimitOrderLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
+	price := types.MustNewPrice(tick)
+	return calculateSingleSwapOnlyLO(price, tickLimitOrderLiquidity, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateSingleSwapAToB(tick int64, tickLiqudidty int64, tickLimitOrderLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
+	price := types.MustNewPrice(tick)
+	return calculateSingleSwap(price, tickLiqudidty, tickLimitOrderLiquidity, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateSingleSwapNoLOBToA(tick int64, tickLiqudity int64, amountIn int64) (sdk.Int, sdk.Int) {
+	price := types.MustNewPrice(-1 * tick)
+	return calculateSingleSwapNoLO(price, tickLiqudity, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateSingleSwapOnlyLOBToA(tick int64, tickLimitOrderLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
+	price := types.MustNewPrice(-1 * tick)
+	return calculateSingleSwapOnlyLO(price, tickLimitOrderLiquidity, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateSingleSwapBToA(tick int64, tickLiqudidty int64, tickLimitOrderLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
+	price := types.MustNewPrice(-1 * tick)
+	return calculateSingleSwap(price, tickLiqudidty, tickLimitOrderLiquidity, amountIn)
+}
+
+func calculateSingleSwapNoLO(price *types.Price, tickLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
+	return calculateSingleSwap(price, tickLiquidity, 0, amountIn)
+}
+
+func calculateSingleSwapOnlyLO(price *types.Price, tickLimitOrderLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
+	return calculateSingleSwap(price, 0, tickLimitOrderLiquidity, amountIn)
+}
+
+func calculateSingleSwap(price *types.Price, tickLiquidity int64, tickLimitOrderLiquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
+	// swap against CSMM liquidity
+	amountLeft, amountOut := calculateSwap(price, tickLiquidity, amountIn)
+	// fmt.Printf("left %s out %s\n", amountLeft, amountOut)
+
+	// swap against limit orders
+	if amountLeft.GT(sdk.ZeroInt()) {
+		tmpAmountLeft, tmpAmountOut := calculateSwap(price, tickLimitOrderLiquidity, amountLeft.Int64())
+		amountLeft = tmpAmountLeft
+		amountOut = amountOut.Add(tmpAmountOut)
+	}
+	return amountLeft, amountOut
+}
+
+func calculateSwap(price *types.Price, liquidity int64, amountIn int64) (sdk.Int, sdk.Int) {
+	amountInInt := sdk.NewInt(amountIn)
+	liquidityInt := sdk.NewInt(liquidity)
+	if tmpAmountOut := price.MulInt(amountInInt); tmpAmountOut.LT(liquidityInt.ToDec()) {
+		// fmt.Printf("sufficient tmpOut %s\n", tmpAmountOut)
+		// sufficient liquidity
+		return sdk.ZeroInt(), tmpAmountOut.TruncateInt()
+	} else {
+		// only sufficient for part of amountIn
+		tmpAmountIn := price.Inv().MulInt(liquidityInt).TruncateInt()
+		// fmt.Printf("insufficient tmpIn %s\n", tmpAmountIn)
+		return amountInInt.Sub(tmpAmountIn), liquidityInt
+	}
+}
+
+func (s *MsgServerTestSuite) calculateMultipleSwapsAToB(
+	tickIndexes []int64,
+	tickLiquidities []int64,
+	tickLimitOrderLiquidities []int64,
+	amountIn int64,
+) (sdk.Int, sdk.Int) {
+	prices := make([]*types.Price, len(tickIndexes))
+	var err error
+	for i := range prices {
+		prices[i] = types.MustNewPrice(tickIndexes[i])
+		if err != nil {
+			panic(err)
+		}
+	}
+	return s.calculateMultipleSwaps(prices, tickLiquidities, tickLimitOrderLiquidities, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateMultipleSwapsNoLOAToB(tickIndexes []int64, tickLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
+	prices := make([]*types.Price, len(tickIndexes))
+	for i := range prices {
+		prices[i] = types.MustNewPrice(tickIndexes[i])
+	}
+	return s.calculateMultipleSwapsNoLO(prices, tickLiquidities, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateMultipleSwapsOnlyLOAToB(tickIndexes []int64, tickLimitOrderLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
+	prices := make([]*types.Price, len(tickIndexes))
+	for i := range prices {
+		prices[i] = types.MustNewPrice(tickIndexes[i])
+	}
+	return s.calculateMultipleSwapsOnlyLO(prices, tickLimitOrderLiquidities, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateMultipleSwapsBToA(tickIndexes []int64, tickLiquidities []int64, tickLimitOrderLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
+	prices := make([]*types.Price, len(tickIndexes))
+	for i := range prices {
+		prices[i] = types.MustNewPrice(-1 * tickIndexes[i])
+	}
+	return s.calculateMultipleSwaps(prices, tickLiquidities, tickLimitOrderLiquidities, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateMultipleSwapsNoLOBToA(tickIndexes []int64, tickLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
+	prices := make([]*types.Price, len(tickIndexes))
+	for i := range prices {
+		prices[i] = types.MustNewPrice(-1 * tickIndexes[i])
+	}
+	return s.calculateMultipleSwapsNoLO(prices, tickLiquidities, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateMultipleSwapsOnlyLOBToA(tickIndexes []int64, tickLimitOrderLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
+	prices := make([]*types.Price, len(tickIndexes))
+	for i := range prices {
+		prices[i] = types.MustNewPrice(-1 * tickIndexes[i])
+	}
+	return s.calculateMultipleSwapsOnlyLO(prices, tickLimitOrderLiquidities, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateMultipleSwapsNoLO(prices []*types.Price, tickLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
+	// zero array for tickLimitOrders
+	tickLimitOrderLiquidities := make([]int64, len(prices))
+	for i := range tickLimitOrderLiquidities {
+		tickLimitOrderLiquidities[i] = 0
+	}
+	return s.calculateMultipleSwaps(prices, tickLiquidities, tickLimitOrderLiquidities, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateMultipleSwapsOnlyLO(prices []*types.Price, tickLimitOrderLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
+	// zero array for tickLimitOrders
+	tickLiquidities := make([]int64, len(prices))
+	for i := range tickLiquidities {
+		tickLiquidities[i] = 0
+	}
+	return s.calculateMultipleSwaps(prices, tickLiquidities, tickLimitOrderLiquidities, amountIn)
+}
+
+func (s *MsgServerTestSuite) calculateMultipleSwaps(prices []*types.Price, tickLiquidities []int64, tickLimitOrderLiquidities []int64, amountIn int64) (sdk.Int, sdk.Int) {
+	amountLeft, amountOut := sdk.NewInt(amountIn), sdk.ZeroInt()
+	for i := 0; i < len(prices); i++ {
+		tmpAmountLeft, tmpAmountOut := calculateSingleSwap(prices[i], tickLiquidities[i], tickLimitOrderLiquidities[i], amountLeft.Int64())
+		amountLeft, amountOut = tmpAmountLeft, amountOut.Add(tmpAmountOut)
+	}
+	return amountLeft, amountOut
 }
