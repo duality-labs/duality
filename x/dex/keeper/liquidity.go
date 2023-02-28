@@ -8,7 +8,7 @@ import (
 
 type Liquidity interface {
 	Swap(maxAmount sdk.Int) (inAmount sdk.Int, outAmount sdk.Int)
-	Price() sdk.Dec
+	Price() *types.Price
 }
 
 func NewLiquidityIterator(

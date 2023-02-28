@@ -2,7 +2,6 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/duality-labs/duality/x/dex/utils"
 )
 
 func (t LimitOrderTranche) IsPlaceTranche() bool {
@@ -13,7 +12,7 @@ func (t LimitOrderTranche) IsFilled() bool {
 	return t.ReservesTokenIn.IsZero()
 }
 
-func (t *LimitOrderTranche) Price() sdk.Dec {
+func (t *LimitOrderTranche) Price() *Price {
 	return t.PriceTakerToMaker()
 }
 
@@ -25,19 +24,19 @@ func (t LimitOrderTranche) IsTokenInToken0() bool {
 	return t.TokenIn == t.PairId.Token0
 }
 
-func (t LimitOrderTranche) PriceMakerToTaker() sdk.Dec {
+func (t LimitOrderTranche) PriceMakerToTaker() *Price {
 	if t.IsTokenInToken0() {
-		return utils.MustCalcPrice0To1(t.TickIndex)
+		return MustNewPrice(t.TickIndex)
 	} else {
-		return utils.MustCalcPrice1To0(t.TickIndex)
+		return MustNewPrice(-1 * t.TickIndex)
 	}
 }
 
-func (t LimitOrderTranche) PriceTakerToMaker() sdk.Dec {
+func (t LimitOrderTranche) PriceTakerToMaker() *Price {
 	if t.IsTokenInToken0() {
-		return utils.MustCalcPrice1To0(t.TickIndex)
+		return MustNewPrice(-1 * t.TickIndex)
 	} else {
-		return utils.MustCalcPrice0To1(t.TickIndex)
+		return MustNewPrice(t.TickIndex)
 	}
 }
 
@@ -62,7 +61,6 @@ func (t *LimitOrderTranche) Cancel(trancheUser LimitOrderTrancheUser) (amountToC
 	t.ReservesTokenIn = t.ReservesTokenIn.Sub(amountToCancel)
 
 	return amountToCancel
-
 }
 
 func (t *LimitOrderTranche) Withdraw(trancheUser LimitOrderTrancheUser) (sdk.Int, sdk.Dec) {
@@ -86,9 +84,9 @@ func (t *LimitOrderTranche) Swap(maxAmountTaker sdk.Int) (
 	reservesTokenOut := &t.ReservesTokenIn
 	fillTokenIn := &t.ReservesTokenOut
 	totalTokenIn := &t.TotalTokenOut
-	amountFilledTokenOut := maxAmountTaker.ToDec().Mul(t.PriceTakerToMaker()).TruncateInt()
+	amountFilledTokenOut := t.PriceTakerToMaker().MulInt(maxAmountTaker).TruncateInt()
 	if reservesTokenOut.LTE(amountFilledTokenOut) {
-		inAmount = reservesTokenOut.ToDec().Mul(t.PriceMakerToTaker()).Ceil().TruncateInt()
+		inAmount = t.PriceMakerToTaker().MulInt(*reservesTokenOut).Ceil().TruncateInt()
 		outAmount = *reservesTokenOut
 		*reservesTokenOut = sdk.ZeroInt()
 		*fillTokenIn = fillTokenIn.Add(inAmount)

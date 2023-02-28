@@ -12,8 +12,8 @@ type Pool struct {
 	FeeIndex        uint64
 	LowerTick0      *types.PoolReserves
 	UpperTick1      *types.PoolReserves
-	Price1To0Lower  sdk.Dec
-	Price0To1Upper  sdk.Dec
+	Price1To0Lower  *types.Price
+	Price0To1Upper  *types.Price
 }
 
 func NewPool(
@@ -22,8 +22,8 @@ func NewPool(
 	upperTick1 *types.PoolReserves,
 ) Pool {
 	// TODO: maybe store this somewhere so we don't have to recalculate
-	price0To1Upper := utils.MustCalcPrice0To1(upperTick1.TickIndex)
-	price1To0Lower := utils.MustCalcPrice1To0(lowerTick0.TickIndex)
+	price0To1Upper := types.MustNewPrice(upperTick1.TickIndex)
+	price1To0Lower := types.MustNewPrice(-1 * lowerTick0.TickIndex)
 	return Pool{
 		CenterTickIndex: centerTickIndex,
 		LowerTick0:      lowerTick0,
@@ -64,14 +64,14 @@ func (p *Pool) Swap0To1(maxAmount0 sdk.Int) (inAmount0 sdk.Int, outAmount1 sdk.I
 
 	reserves0 := &p.LowerTick0.Reserves
 
-	maxAmount1 := maxAmount0.ToDec().Mul(p.Price0To1Upper).TruncateInt()
+	maxAmount1 := p.Price0To1Upper.MulInt(maxAmount0).TruncateInt()
 	if reserves1.LTE(maxAmount1) {
 		outAmount1 = *reserves1
-		inAmount0 = reserves1.ToDec().Quo(p.Price0To1Upper).Ceil().TruncateInt()
+		inAmount0 = p.Price0To1Upper.Inv().MulInt(*reserves1).Ceil().TruncateInt()
 		*reserves0 = reserves0.Add(inAmount0)
 		*reserves1 = sdk.ZeroInt()
 	} else {
-		outAmount1 = maxAmount0.ToDec().Mul(p.Price0To1Upper).TruncateInt()
+		outAmount1 = p.Price0To1Upper.MulInt(maxAmount0).TruncateInt()
 		*reserves0 = reserves0.Add(maxAmount0)
 		*reserves1 = reserves1.Sub(outAmount1)
 		inAmount0 = maxAmount0
@@ -87,14 +87,14 @@ func (p *Pool) Swap1To0(maxAmount1 sdk.Int) (inAmount1 sdk.Int, outAmount0 sdk.I
 
 	reserves1 := &p.UpperTick1.Reserves
 
-	maxAmount0 := maxAmount1.ToDec().Mul(p.Price1To0Lower).TruncateInt()
+	maxAmount0 := p.Price1To0Lower.MulInt(maxAmount1).TruncateInt()
 	if reserves0.LTE(maxAmount0) {
 		outAmount0 = *reserves0
-		inAmount1 = reserves0.ToDec().Quo(p.Price1To0Lower).Ceil().TruncateInt()
+		inAmount1 = p.Price1To0Lower.Inv().MulInt(*reserves0).Ceil().TruncateInt()
 		*reserves1 = reserves1.Add(inAmount1)
 		*reserves0 = sdk.ZeroInt()
 	} else {
-		outAmount0 = maxAmount1.ToDec().Mul(p.Price1To0Lower).TruncateInt()
+		outAmount0 = p.Price1To0Lower.MulInt(maxAmount1).TruncateInt()
 		*reserves1 = reserves1.Add(maxAmount1)
 		*reserves0 = reserves0.Sub(outAmount0)
 		inAmount1 = maxAmount1
@@ -171,10 +171,10 @@ func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.I
 	return inAmount0, inAmount1, outShares
 }
 
-func (p *Pool) MustCalcPrice1To0Center() sdk.Dec {
+func (p *Pool) MustCalcPrice1To0Center() *types.Price {
 	// NOTE: We can safely call the error-less version of CalcPrice here because the pool object
 	// has already been initialized with an upper and lower tick which satisfy a check for IsTickOutOfRange
-	return utils.MustCalcPrice1To0(p.CenterTickIndex)
+	return types.MustNewPrice(-1 * p.CenterTickIndex)
 }
 
 func (p *Pool) CalcSharesMinted(
@@ -182,11 +182,7 @@ func (p *Pool) CalcSharesMinted(
 	amount1 sdk.Int,
 ) (sharesMinted sdk.Int) {
 	price1To0Center := p.MustCalcPrice1To0Center()
-
-	amount0Dec := amount0.ToDec()
-	amount1Dec := amount1.ToDec()
-	//TODO: Technically this is still quo before mult, but there's no easy way around it
-	return amount0Dec.Add(amount1Dec.Mul(price1To0Center)).TruncateInt()
+	return amount0.ToDec().Add(price1To0Center.MulInt(amount1)).TruncateInt()
 }
 
 func (p *Pool) CalcResidualSharesMinted(
@@ -218,15 +214,13 @@ func (p *Pool) Withdraw(sharesToRemove sdk.Int, totalShares sdk.Int) (outAmount0
 	return outAmount0, outAmount1
 }
 
-func CalcResidualValue(amount0 sdk.Int, amount1 sdk.Int, priceLower1To0 sdk.Dec, fee int64) (sdk.Dec, error) {
-	amount0Dec := amount0.ToDec()
-	amount1Dec := amount1.ToDec()
+func CalcResidualValue(amount0 sdk.Int, amount1 sdk.Int, priceLower1To0 *types.Price, fee int64) (sdk.Dec, error) {
 	// ResidualValue = Amount0 * (Price1to0Center / Price1to0Upper) + Amount1 * Price1to0Lower
-	amount0Discount, err := utils.CalcPrice0To1(-fee)
+	amount0Discount, err := types.NewPrice(-fee)
 	if err != nil {
 		return sdk.ZeroDec(), err
 	}
-	return (amount0Dec.Mul(amount0Discount)).Add(amount1Dec.Mul(priceLower1To0)), nil
+	return amount0Discount.MulInt(amount0).Add(priceLower1To0.MulInt(amount1)), nil
 }
 
 func CalcFee(upperTickIndex int64, lowerTickIndex int64) int64 {

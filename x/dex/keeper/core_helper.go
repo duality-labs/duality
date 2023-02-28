@@ -5,7 +5,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/types"
-	"github.com/duality-labs/duality/x/dex/utils"
 )
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -22,7 +21,7 @@ func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tok
 	)
 	if tickFound {
 		return tickLiq, nil
-	} else if utils.IsTickOutOfRange(tickIndex) {
+	} else if types.IsTickOutOfRange(tickIndex) {
 		return nil, types.ErrTickOutsideRange
 	} else {
 		return &types.PoolReserves{
@@ -37,7 +36,7 @@ func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tok
 }
 
 func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey string) (types.LimitOrderTranche, error) {
-	if utils.IsTickOutOfRange(tickIndex) {
+	if types.IsTickOutOfRange(tickIndex) {
 		return types.LimitOrderTranche{}, types.ErrTickOutsideRange
 	}
 	return types.LimitOrderTranche{

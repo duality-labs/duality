@@ -4,7 +4,6 @@ import (
 	"math"
 
 	"github.com/duality-labs/duality/x/dex/types"
-	"github.com/duality-labs/duality/x/dex/utils"
 )
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedInSpread1To0() {
@@ -367,7 +366,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedLowerTickOutsideRange() {
 	// THEN
 	// deposit should fail with TickOutsideRange
 
-	tickIndex := -1 * int(utils.MaxTickExp)
+	tickIndex := -1 * int(types.MaxTickExp)
 	err := types.ErrTickOutsideRange
 	s.assertAliceDepositFails(err, NewDeposit(10, 0, tickIndex, 0))
 }
@@ -383,7 +382,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedUpperTickOutsideRange() {
 	// THEN
 	// deposit should fail with TickOutsideRange
 
-	tickIndex := int(utils.MaxTickExp)
+	tickIndex := int(types.MaxTickExp)
 	err := types.ErrTickOutsideRange
 	s.assertAliceDepositFails(err, NewDeposit(0, 10, tickIndex, 0))
 }
