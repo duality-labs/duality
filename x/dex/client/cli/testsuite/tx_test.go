@@ -262,21 +262,21 @@ func (s *TxTestSuite) TestTx3CmdSwap() {
 		errInRes  bool
 	}{
 		{
-			// "swap [receiver] [amount-in] [tokenA] [tokenB] [token-in] [minOut] [priceLimit]",
+			// "swap [receiver] [amount-in] [tokenA] [tokenB] [token-in] [minOut]",
 			name:      "missing arguments",
-			args:      []string{s.addr1.String(), "5", "TokenA", "TokenB", "TokenA", "4"},
+			args:      []string{s.addr1.String(), "5", "TokenA", "TokenB", "TokenA"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 7 arg(s), received 6",
+			expErrMsg: "Error: accepts 6 arg(s), received 5",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{s.addr1.String(), "5", "TokenA", "TokenB", "TokenA", "0", "2", s.addr1.String()},
+			args:      []string{s.addr1.String(), "5", "TokenA", "TokenB", "TokenA", "0", s.addr1.String()},
 			expErr:    true,
-			expErrMsg: "Error: accepts 7 arg(s), received 8",
+			expErrMsg: "Error: accepts 6 arg(s), received 7",
 		},
 		{
 			name:     "valid",
-			args:     []string{s.addr1.String(), "2", "TokenA", "TokenB", "TokenA", "0", "0.0"},
+			args:     []string{s.addr1.String(), "2", "TokenA", "TokenB", "TokenA", "0"},
 			errInRes: false,
 		},
 	}
@@ -450,7 +450,7 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 	require.NoError(s.T(), err)
 	trancheKey := findTrancheKeyInTx(txBuff.String())
 
-	argsSwap := append([]string{s.network.Validators[0].Address.String(), "30", "TokenA", "TokenB", "TokenA", "0", "0.0"}, commonFlags...)
+	argsSwap := append([]string{s.network.Validators[0].Address.String(), "30", "TokenA", "TokenB", "TokenA", "0"}, commonFlags...)
 	cmd = dexClient.CmdSwap()
 	_, err = cli.ExecTestCLICmd(clientCtx, cmd, argsSwap)
 	require.NoError(s.T(), err)

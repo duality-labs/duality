@@ -630,14 +630,13 @@ func (s *MsgServerTestSuite) danMarketSells(selling string, amountIn int, minOut
 
 func (s *MsgServerTestSuite) marketSells(account sdk.AccAddress, selling string, amountIn int, minOut int) {
 	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
-		Creator:    account.String(),
-		Receiver:   account.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
-		TokenIn:    selling,
-		AmountIn:   sdk.NewInt(int64(amountIn)),
-		MinOut:     sdk.NewInt(int64(minOut)),
-		LimitPrice: sdk.ZeroDec(),
+		Creator:  account.String(),
+		Receiver: account.String(),
+		TokenA:   "TokenA",
+		TokenB:   "TokenB",
+		TokenIn:  selling,
+		AmountIn: sdk.NewInt(int64(amountIn)),
+		MinOut:   sdk.NewInt(int64(minOut)),
 	})
 	s.Assert().Nil(err)
 }
@@ -660,14 +659,13 @@ func (s *MsgServerTestSuite) danMarketSellsWithLimitPrice(selling string, amount
 
 func (s *MsgServerTestSuite) marketSellsWithLimitPrice(account sdk.AccAddress, selling string, amountIn int, minOut int, limitPrice sdk.Dec) {
 	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
-		Creator:    account.String(),
-		Receiver:   account.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
-		TokenIn:    selling,
-		AmountIn:   sdk.NewInt(int64(amountIn)),
-		MinOut:     sdk.NewInt(int64(minOut)),
-		LimitPrice: limitPrice,
+		Creator:  account.String(),
+		Receiver: account.String(),
+		TokenA:   "TokenA",
+		TokenB:   "TokenB",
+		TokenIn:  selling,
+		AmountIn: sdk.NewInt(int64(amountIn)),
+		MinOut:   sdk.NewInt(int64(minOut)),
 	})
 	s.Assert().Nil(err)
 }
@@ -689,14 +687,13 @@ func (s *MsgServerTestSuite) danMarketSellFails(err error, selling string, amoun
 }
 func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr error, selling string, amountIn int, minOut int) {
 	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
-		Creator:    account.String(),
-		Receiver:   account.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
-		TokenIn:    selling,
-		AmountIn:   sdk.NewInt(int64(amountIn)),
-		MinOut:     sdk.NewInt(int64(minOut)),
-		LimitPrice: sdk.ZeroDec(),
+		Creator:  account.String(),
+		Receiver: account.String(),
+		TokenA:   "TokenA",
+		TokenB:   "TokenB",
+		TokenIn:  selling,
+		AmountIn: sdk.NewInt(int64(amountIn)),
+		MinOut:   sdk.NewInt(int64(minOut)),
 	})
 	s.Assert().ErrorIs(err, expectedErr)
 }

@@ -238,8 +238,8 @@ func (k Keeper) SwapCore(goCtx context.Context,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
 	amountIn sdk.Int,
-	limitPrice sdk.Dec,
 	minOut sdk.Int,
+	limitTick *int64,
 ) (sdk.Coin, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	cacheCtx, writeCache := ctx.CacheContext()
@@ -265,7 +265,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		}
 
 		// break as soon as we iterated past tickLimit
-		if liq.Price().ToDec().LT(limitPrice) {
+		if limitTick != nil && liqIter.PastLimitTick(*limitTick) {
 			break
 		}
 

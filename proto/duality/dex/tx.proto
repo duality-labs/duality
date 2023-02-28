@@ -95,13 +95,6 @@ message MsgSwap {
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "minOut"
   ];
-  string limitPrice = 8 [
-      (gogoproto.moretags)   = "yaml:\"tickLimit\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-      (gogoproto.nullable)   = false,
-      (gogoproto.jsontag) = "tickLimit"
-  ];
-  
 }
 
 message MsgSwapResponse {

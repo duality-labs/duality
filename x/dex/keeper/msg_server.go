@@ -100,8 +100,8 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		callerAddr,
 		receiverAddr,
 		msg.AmountIn,
-		msg.LimitPrice,
 		msg.MinOut,
+		nil,
 	)
 	if err != nil {
 		return nil, err
