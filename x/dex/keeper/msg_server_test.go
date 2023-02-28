@@ -392,7 +392,7 @@ func (s *MsgServerTestSuite) calcAutoswapSharesMinted(centerTick int64, feeIndex
 	return valueMint.Mul(totalShares).Quo(valuePool)
 }
 
-func (s *MsgServerTestSuite) calcSharesMinted(centerTick int64, feeIndex uint64, _amount0 int64, _amount1 int64) sdk.Int {
+func (s *MsgServerTestSuite) calcSharesMinted(centerTick int64, _amount0 int64, _amount1 int64) sdk.Int {
 	amount0, amount1 := sdk.NewInt(_amount0), sdk.NewInt(_amount1)
 	centerPrice, _ := utils.CalcPrice1To0(centerTick)
 

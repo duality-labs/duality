@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/dex/utils"
 	//"github.com/duality-labs/duality/x/dex/types"
 )
 
@@ -16,7 +17,9 @@ func (s *MsgServerTestSuite) TestAutoswapperWithdraws() {
 	tickIndex := 200
 	feeIndex := 2
 
-	bobSharesMinted := s.calcSharesMinted(int64(tickIndex), uint64(feeIndex), int64(bobDep0), int64(bobDep1))
+	amount0, amount1 := sdk.NewInt(int64(bobDep0)), sdk.NewInt(int64(bobDep1))
+	centerPrice, _ := utils.CalcPrice1To0(int64(tickIndex))
+	bobSharesMinted := amount0.ToDec().Add(centerPrice.Mul(amount1.ToDec())).TruncateInt()
 
 	s.bobDeposits(NewDeposit(bobDep0, bobDep1, tickIndex, feeIndex))
 	s.assertBobBalances(40, 40)
@@ -27,8 +30,25 @@ func (s *MsgServerTestSuite) TestAutoswapperWithdraws() {
 	s.assertAliceBalances(38, 45)
 	s.assertDexBalances(22, 15)
 
+	residual0, residual1, balanced0, balanced1, totalShares, valuePool := sdk.NewInt(7), sdk.NewInt(0), sdk.NewInt(5), sdk.NewInt(5), sdk.NewInt(bobSharesMinted.Int64()), sdk.NewInt(bobSharesMinted.Int64())
+
+	// residualValue = 1.0001^-f * residualAmount0 + 1.0001^{i-f} * residualAmount1
+	// balancedValue = balancedAmount0 + 1.0001^{i} * balancedAmount1
+	// value = residualValue + balancedValue
+	// shares minted = value * totalShares / valuePool
+	fee := int64(s.feeTiers[uint64(feeIndex)].Fee)
+
+	centerPrice, _ = utils.CalcPrice1To0(int64(tickIndex))
+	leftPrice, _ := utils.CalcPrice1To0(int64(tickIndex) - fee)
+	discountPrice, _ := utils.CalcPrice1To0(- fee)
+
+	balancedValue := balanced0.ToDec().Add(centerPrice.Mul(balanced1.ToDec())).TruncateInt()
+	residualValue := residual0.ToDec().Mul(discountPrice).Add(leftPrice.Mul(residual1.ToDec())).TruncateInt()
+	valueMint := balancedValue.Add(residualValue)
+
 	// Calculated expected amounts out
-	autoswapSharesMinted := s.calcAutoswapSharesMinted(int64(tickIndex), uint64(feeIndex), 7, 0, 5, 5, bobSharesMinted.Int64(), bobSharesMinted.Int64())
+	autoswapSharesMinted := valueMint.Mul(totalShares).Quo(valuePool)
+
 	//totalShares := autoswapSharesMinted.Add(sdk.NewInt(20))
 
 	aliceExpectedBalance0, aliceExpectedBalance1, dexExpectedBalance0, dexExpectedBalance1 := s.calcExpectedBalancesAfterWithdrawOnePool(autoswapSharesMinted, s.alice, int64(tickIndex), uint64(feeIndex))
@@ -50,7 +70,9 @@ func (s *MsgServerTestSuite) TestAutoswapOtherDepositorWithdraws() {
 	tickIndex := 150
 	feeIndex := 3
 
-	bobSharesMinted := s.calcSharesMinted(int64(tickIndex), uint64(feeIndex), int64(bobDep0), int64(bobDep1))
+	amount0, amount1 := sdk.NewInt(int64(bobDep0)), sdk.NewInt(int64(bobDep1))
+	centerPrice, _ := utils.CalcPrice1To0(int64(tickIndex))
+	bobSharesMinted := amount0.ToDec().Add(centerPrice.Mul(amount1.ToDec())).TruncateInt()
 
 	s.bobDeposits(NewDeposit(bobDep0, bobDep1, tickIndex, feeIndex))
 	s.assertBobBalances(40, 40)
@@ -83,7 +105,9 @@ func (s *MsgServerTestSuite) TestAutoswapBothWithdraws() {
 	tickIndex := 10000
 	feeIndex := 3
 
-	bobSharesMinted := s.calcSharesMinted(int64(tickIndex), uint64(feeIndex), int64(bobDep0), int64(bobDep1))
+	amount0, amount1 := sdk.NewInt(int64(bobDep0)), sdk.NewInt(int64(bobDep1))
+	centerPrice, _ := utils.CalcPrice1To0(int64(tickIndex))
+	bobSharesMinted := amount0.ToDec().Add(centerPrice.Mul(amount1.ToDec())).TruncateInt()
 
 	s.bobDeposits(NewDeposit(bobDep0, bobDep1, tickIndex, feeIndex))
 	s.assertBobBalances(40, 40)
@@ -94,9 +118,24 @@ func (s *MsgServerTestSuite) TestAutoswapBothWithdraws() {
 	s.assertAliceBalances(40, 45)
 	s.assertDexBalances(20, 15)
 
+	residual0, residual1, balanced0, balanced1, totalShares, valuePool := sdk.NewInt(5), sdk.NewInt(0), sdk.NewInt(5), sdk.NewInt(5), sdk.NewInt(bobSharesMinted.Int64()), sdk.NewInt(bobSharesMinted.Int64())
+
+	// residualValue = 1.0001^-f * residualAmount0 + 1.0001^{i-f} * residualAmount1
+	// balancedValue = balancedAmount0 + 1.0001^{i} * balancedAmount1
+	// value = residualValue + balancedValue
+	// shares minted = value * totalShares / valuePool
+	fee := int64(s.feeTiers[uint64(feeIndex)].Fee)
+
+	centerPrice, _ = utils.CalcPrice1To0(int64(tickIndex))
+	leftPrice, _ := utils.CalcPrice1To0(int64(tickIndex) - fee)
+	discountPrice, _ := utils.CalcPrice1To0(- fee)
+
+	balancedValue := balanced0.ToDec().Add(centerPrice.Mul(balanced1.ToDec())).TruncateInt()
+	residualValue := residual0.ToDec().Mul(discountPrice).Add(leftPrice.Mul(residual1.ToDec())).TruncateInt()
+	valueMint := balancedValue.Add(residualValue)
+
 	// Calculated expected amounts out
-	autoswapSharesMinted := s.calcAutoswapSharesMinted(int64(tickIndex), uint64(feeIndex), 5, 0, 5, 5, bobSharesMinted.Int64(), bobSharesMinted.Int64())
-	//totalShares := autoswapSharesMinted.Add(sdk.NewInt(20))
+	autoswapSharesMinted := valueMint.Mul(totalShares).Quo(valuePool)
 
 	bobExpectedBalance0, bobExpectedBalance1, dexExpectedBalance0, dexExpectedBalance1 := s.calcExpectedBalancesAfterWithdrawOnePool(bobSharesMinted, s.bob, int64(tickIndex), uint64(feeIndex))
 
