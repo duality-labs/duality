@@ -240,16 +240,16 @@ func (k Keeper) SwapCore(goCtx context.Context,
 	amountIn sdk.Int,
 	minOut sdk.Int,
 	limitTick *int64,
-) (sdk.Coin, error) {
+) (sdk.Int, sdk.Int, sdk.Int, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	cacheCtx, writeCache := ctx.CacheContext()
 	pairId, err := CreatePairIdFromUnsorted(tokenIn, tokenOut)
 	if err != nil {
-		return sdk.Coin{}, err
+		return sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt(), err
 	}
 	pair := types.NewDirectionalTradingPair(pairId, tokenIn, tokenOut)
 	if err != nil {
-		return sdk.Coin{}, err
+		return sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt(), err
 	}
 
 	remainingIn := amountIn
@@ -273,7 +273,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		// when the price is too low for minOut to be reached.
 		idealOut := totalOut.Add(liq.Price().MulInt(remainingIn).TruncateInt())
 		if idealOut.LT(minOut) {
-			return sdk.Coin{}, types.ErrSlippageLimitReached
+			return sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt(), types.ErrSlippageLimitReached
 		}
 
 		inAmount, outAmount := liq.Swap(remainingIn)
@@ -285,26 +285,37 @@ func (k Keeper) SwapCore(goCtx context.Context,
 	}
 
 	if totalOut.LT(minOut) || amountIn.Equal(remainingIn) {
-		return sdk.Coin{}, types.ErrSlippageLimitReached
+		return sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt(), types.ErrSlippageLimitReached
 	}
+	writeCache()
+	totalIn := amountIn.Sub(remainingIn)
+	return totalIn, totalOut, remainingIn, nil
+}
 
-	// TODO: Move this to a separate ExecuteSwap function. Ditto for all other *Core fns
-	amountToDeposit := amountIn.Sub(remainingIn)
-	coinIn := sdk.NewCoin(tokenIn, amountToDeposit)
-	coinOut := sdk.NewCoin(tokenOut, totalOut)
+func (k Keeper) ExecuteSwap(goCtx context.Context,
+	tokenIn string,
+	tokenOut string,
+	amountIn sdk.Int,
+	amountOut sdk.Int,
+	callerAddr sdk.AccAddress,
+	receiverAddr sdk.AccAddress,
+	minOut sdk.Int,
+) (sdk.Coin, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	coinIn := sdk.NewCoin(tokenIn, amountIn)
+	coinOut := sdk.NewCoin(tokenOut, amountOut)
 
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
 		return sdk.Coin{}, err
 	}
 
-	if totalOut.GT(sdk.ZeroInt()) {
+	if amountOut.GT(sdk.ZeroInt()) {
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
 			return sdk.Coin{}, err
 		}
 	}
-	writeCache()
 	ctx.EventManager().EmitEvent(types.CreateSwapEvent(callerAddr.String(), receiverAddr.String(),
-		tokenIn, tokenOut, amountIn.String(), totalOut.String(), minOut.String(),
+		tokenIn, tokenOut, amountIn.String(), amountOut.String(), minOut.String(),
 	))
 
 	return coinOut, nil
@@ -318,8 +329,69 @@ func (k Keeper) PlaceLimitOrderCore(
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
 	amountIn sdk.Int,
-	tickIndex int64) (trancheKey string, error error) {
+	tickIndex int64,
+	orderType types.LimitOrderType,
+) (trancheKey string, err error) {
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	var amountInSwap, amountOutSwap sdk.Int
+	amountLeft := amountIn
+
+	// For everything except just-in-time (JIT) orders try to execute as a swap first
+	if !orderType.IsJIT() {
+		var err error
+		_, amountOutSwap, amountLeft, err = k.SwapCore(
+			goCtx,
+			tokenIn,
+			tokenOut,
+			callerAddr,
+			receiverAddr,
+			amountIn,
+			// TODO: verify that this is maximally efficient vs precomputing minOut
+			sdk.ZeroInt(),
+			&tickIndex,
+		)
+		if err != nil {
+			return "", err
+		}
+
+		if amountOutSwap.GT(sdk.ZeroInt()) {
+			coinOut := sdk.NewCoin(tokenOut, amountOutSwap)
+			if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
+				return "", err
+			}
+		}
+	}
+
+	if !amountLeft.IsZero() && orderType.IsFoK() {
+		return "", types.ErrFOKLimitOrderNotFilled
+	}
+
+	trancheKey, err = k.PlaceMakerLimitOrder(ctx, tokenIn, tokenOut, callerAddr, receiverAddr, amountLeft, tickIndex)
+
+	if err != nil {
+		return "", err
+	}
+	// TODO: is it possible for totalIn != amountIn
+	totalIn := amountInSwap.Add(amountLeft)
+	coin0 := sdk.NewCoin(tokenIn, totalIn)
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0})
+	if err != nil {
+		return "", err
+	}
+	return trancheKey, nil
+}
+
+func (k Keeper) PlaceMakerLimitOrder(
+	ctx sdk.Context,
+	tokenIn string,
+	tokenOut string,
+	callerAddr sdk.AccAddress,
+	receiverAddr sdk.AccAddress,
+	amountIn sdk.Int,
+	tickIndex int64,
+) (trancheKey string, error error) {
 
 	token0, token1, err := SortTokens(tokenIn, tokenOut)
 	if err != nil {
@@ -352,11 +424,6 @@ func (k Keeper) PlaceLimitOrderCore(
 		k.SetLimitOrderTranche(ctx, placeTranche)
 		k.SetLimitOrderTrancheUser(ctx, trancheUser)
 
-		coin0 := sdk.NewCoin(tokenIn, amountIn)
-		err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0})
-		if err != nil {
-			return "", err
-		}
 	}
 
 	ctx.EventManager().EmitEvent(types.CreatePlaceLimitOrderEvent(

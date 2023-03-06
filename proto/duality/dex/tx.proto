@@ -105,6 +105,13 @@ message MsgSwapResponse {
   ];
 }
 
+enum limitOrderType{
+  GOOD_TIL_CANCELLED = 0;
+  FILL_OR_KILL = 1;
+  IMMEDIATE_OR_CANCEL = 2;
+  JUST_IN_TIME = 3;
+}
+
 message MsgPlaceLimitOrder {
   string creator = 1;
   string receiver = 2;
@@ -117,7 +124,8 @@ message MsgPlaceLimitOrder {
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountIn"
-  ]; 
+  ];
+  limitOrderType orderType = 8;
 }
 
 message MsgPlaceLimitOrderResponse {

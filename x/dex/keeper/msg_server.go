@@ -93,7 +93,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	// TODO: Should switch swap API to just take TokenIn and TokenOut
 	tokenIn, tokenOut := GetInOutTokens(msg.TokenIn, msg.TokenA, msg.TokenB)
 
-	coinOut, err := k.SwapCore(
+	amountIn, amountOut, _, err := k.SwapCore(
 		goCtx,
 		tokenIn,
 		tokenOut,
@@ -103,6 +103,12 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		msg.MinOut,
 		nil,
 	)
+	if err != nil {
+		return nil, err
+	}
+
+	coinOut, err := k.ExecuteSwap(goCtx, tokenIn, tokenOut, amountIn, amountOut, callerAddr, receiverAddr, msg.MinOut)
+
 	if err != nil {
 		return nil, err
 	}
