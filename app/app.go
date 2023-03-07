@@ -95,6 +95,9 @@ import (
 	dexmoduletypes "github.com/duality-labs/duality/x/dex/types"
 
 	"github.com/cosmos/interchain-security/testutil/e2e"
+	incentivesmodule "github.com/duality-labs/duality/x/incentives"
+	incentivesmodulekeeper "github.com/duality-labs/duality/x/incentives/keeper"
+	incentivesmoduletypes "github.com/duality-labs/duality/x/incentives/types"
 	mevmodule "github.com/duality-labs/duality/x/mev"
 	mevmodulekeeper "github.com/duality-labs/duality/x/mev/keeper"
 	mevmoduletypes "github.com/duality-labs/duality/x/mev/types"
@@ -146,6 +149,7 @@ var (
 		),
 		dexmodule.AppModuleBasic{},
 		mevmodule.AppModuleBasic{},
+		incentivesmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -217,6 +221,8 @@ type App struct {
 	DexKeeper dexmodulekeeper.Keeper
 
 	MevKeeper mevmodulekeeper.Keeper
+
+	IncentivesKeeper incentivesmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -280,6 +286,7 @@ func NewApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		dexmoduletypes.StoreKey, ccvconsumertypes.StoreKey, adminmodulemoduletypes.StoreKey,
 		mevmoduletypes.StoreKey,
+		incentivesmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -420,6 +427,14 @@ func NewApp(
 	)
 	mevModule := mevmodule.NewAppModule(appCodec, app.MevKeeper, app.AccountKeeper, app.BankKeeper)
 
+	app.IncentivesKeeper = *incentivesmodulekeeper.NewKeeper(
+		appCodec,
+		keys[incentivesmoduletypes.StoreKey],
+		keys[incentivesmoduletypes.MemStoreKey],
+		app.GetSubspace(incentivesmoduletypes.ModuleName),
+	)
+	incentivesModule := incentivesmodule.NewAppModule(appCodec, app.IncentivesKeeper, app.AccountKeeper, app.BankKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create static IBC router, add transfer route, then set and seal it
@@ -456,6 +471,7 @@ func NewApp(
 		adminModule,
 		dexModule,
 		mevModule,
+		incentivesModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -482,6 +498,7 @@ func NewApp(
 		dexmoduletypes.ModuleName,
 
 		mevmoduletypes.ModuleName,
+		incentivesmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -504,6 +521,7 @@ func NewApp(
 		dexmoduletypes.ModuleName,
 
 		mevmoduletypes.ModuleName,
+		incentivesmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -531,6 +549,7 @@ func NewApp(
 		dexmoduletypes.ModuleName,
 
 		mevmoduletypes.ModuleName,
+		incentivesmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -553,6 +572,7 @@ func NewApp(
 		dexModule,
 
 		mevModule,
+		incentivesModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 	app.sm.RegisterStoreDecoders()
@@ -743,6 +763,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ccvconsumertypes.ModuleName)
 	paramsKeeper.Subspace(dexmoduletypes.ModuleName)
 	paramsKeeper.Subspace(mevmoduletypes.ModuleName)
+	paramsKeeper.Subspace(incentivesmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
@@ -766,9 +787,11 @@ func (app *App) GetIBCKeeper() *ibckeeper.Keeper {
 }
 
 // // GetStakingKeeper implements the TestingApp interface.
-// func (app *App) GetStakingKeeper() ibcclienttypes.StakingKeeper {
-// 	return app.ConsumerKeeper
-// }
+//
+//	func (app *App) GetStakingKeeper() ibcclienttypes.StakingKeeper {
+//		return app.ConsumerKeeper
+//	}
+//
 // GetStakingKeeper implements the TestingApp interface.
 func (app *App) GetStakingKeeper() ibctestingcore.StakingKeeper {
 	return app.ConsumerKeeper

@@ -46,7 +46,7 @@ func CmdListFilledLimitOrderTranche() *cobra.Command {
 
 func CmdShowFilledLimitOrderTranche() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-filled-limit-order-tranche [pair-id] [token-in] [tick-index] [tranche-key]",
+		Use:     "show-filled-limit-order-tranche [pair-id] [token-in] [tick-index] [tranche-key]",
 		Short:   "shows a FilledLimitOrderTranche",
 		Example: "show-filled limit-order-tranche tokenA<>tokenB tokenA [10] 0",
 		Args:    cobra.ExactArgs(4),

@@ -1112,7 +1112,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/auth/v1beta1/accounts/{address}:
+  '/cosmos/auth/v1beta1/accounts/{address}':
     get:
       summary: Account returns account details based on address.
       operationId: CosmosAuthV1Beta1Account
@@ -1380,7 +1380,7 @@ paths:
           type: string
       tags:
         - Query
-  /cosmos/auth/v1beta1/module_accounts/{name}:
+  '/cosmos/auth/v1beta1/module_accounts/{name}':
     get:
       summary: ModuleAccountByName returns the module account info by module name
       operationId: CosmosAuthV1Beta1ModuleAccountByName
@@ -1975,7 +1975,7 @@ paths:
         - Query
   /cosmos/authz/v1beta1/grants:
     get:
-      summary: Returns list of `Authorization`, granted to the grantee by the granter.
+      summary: 'Returns list of `Authorization`, granted to the grantee by the granter.'
       operationId: CosmosAuthzV1Beta1Grants
       responses:
         '200':
@@ -2452,7 +2452,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/authz/v1beta1/grants/grantee/{grantee}:
+  '/cosmos/authz/v1beta1/grants/grantee/{grantee}':
     get:
       summary: GranteeGrants returns a list of `GrantAuthorization` by grantee.
       description: 'Since: cosmos-sdk 0.45.2'
@@ -2926,9 +2926,9 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/authz/v1beta1/grants/granter/{granter}:
+  '/cosmos/authz/v1beta1/grants/granter/{granter}':
     get:
-      summary: GranterGrants returns list of `GrantAuthorization`, granted by granter.
+      summary: 'GranterGrants returns list of `GrantAuthorization`, granted by granter.'
       description: 'Since: cosmos-sdk 0.45.2'
       operationId: CosmosAuthzV1Beta1GranterGrants
       responses:
@@ -3400,7 +3400,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/bank/v1beta1/balances/{address}:
+  '/cosmos/bank/v1beta1/balances/{address}':
     get:
       summary: AllBalances queries the balance of all coins for a single account.
       operationId: CosmosBankV1Beta1AllBalances
@@ -3533,7 +3533,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/bank/v1beta1/balances/{address}/by_denom:
+  '/cosmos/bank/v1beta1/balances/{address}/by_denom':
     get:
       summary: Balance queries the balance of a single coin for a single account.
       operationId: CosmosBankV1Beta1Balance
@@ -3773,7 +3773,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/bank/v1beta1/denoms_metadata/{denom}:
+  '/cosmos/bank/v1beta1/denoms_metadata/{denom}':
     get:
       summary: DenomsMetadata queries the client metadata of a given coin denomination.
       operationId: CosmosBankV1Beta1DenomMetadata
@@ -3938,7 +3938,7 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  /cosmos/bank/v1beta1/spendable_balances/{address}:
+  '/cosmos/bank/v1beta1/spendable_balances/{address}':
     get:
       summary: |-
         SpendableBalances queries the spenable balance of all coins for a single
@@ -4204,7 +4204,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/bank/v1beta1/supply/{denom}:
+  '/cosmos/bank/v1beta1/supply/{denom}':
     get:
       summary: SupplyOf queries the supply of a single coin.
       operationId: CosmosBankV1Beta1SupplyOf
@@ -5031,7 +5031,7 @@ paths:
                         }
       tags:
         - Service
-  /cosmos/base/tendermint/v1beta1/blocks/{height}:
+  '/cosmos/base/tendermint/v1beta1/blocks/{height}':
     get:
       summary: GetBlockByHeight queries block for given height.
       operationId: CosmosBaseTendermintV1Beta1GetBlockByHeight
@@ -6755,7 +6755,7 @@ paths:
           type: boolean
       tags:
         - Service
-  /cosmos/base/tendermint/v1beta1/validatorsets/{height}:
+  '/cosmos/base/tendermint/v1beta1/validatorsets/{height}':
     get:
       summary: GetValidatorSetByHeight queries validator-set at a given height.
       operationId: CosmosBaseTendermintV1Beta1GetValidatorSetByHeight
@@ -7680,7 +7680,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/evidence/v1beta1/evidence/{evidence_hash}:
+  '/cosmos/evidence/v1beta1/evidence/{evidence_hash}':
     get:
       summary: Evidence queries evidence based on evidence hash.
       operationId: CosmosEvidenceV1Beta1Evidence
@@ -7949,7 +7949,7 @@ paths:
           format: byte
       tags:
         - Query
-  /cosmos/feegrant/v1beta1/allowance/{granter}/{grantee}:
+  '/cosmos/feegrant/v1beta1/allowance/{granter}/{grantee}':
     get:
       summary: Allowance returns fee granted to the grantee by the granter.
       operationId: CosmosFeegrantV1Beta1Allowance
@@ -8244,7 +8244,7 @@ paths:
           type: string
       tags:
         - Query
-  /cosmos/feegrant/v1beta1/allowances/{grantee}:
+  '/cosmos/feegrant/v1beta1/allowances/{grantee}':
     get:
       summary: Allowances returns all the grants for address.
       operationId: CosmosFeegrantV1Beta1Allowances
@@ -8607,7 +8607,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/feegrant/v1beta1/issued/{granter}:
+  '/cosmos/feegrant/v1beta1/issued/{granter}':
     get:
       summary: |-
         AllowancesByGranter returns all the grants given by an address
@@ -9253,7 +9253,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/slashing/v1beta1/signing_infos/{cons_address}:
+  '/cosmos/slashing/v1beta1/signing_infos/{cons_address}':
     get:
       summary: SigningInfo queries the signing info of given cons address
       operationId: CosmosSlashingV1Beta1SigningInfo
@@ -9928,7 +9928,7 @@ paths:
                     description: Response code.
                   data:
                     type: string
-                    description: Result bytes, if any.
+                    description: 'Result bytes, if any.'
                   raw_log:
                     type: string
                     description: >-
@@ -10345,7 +10345,7 @@ paths:
               RPC method.
       tags:
         - Service
-  /cosmos/tx/v1beta1/txs/block/{height}:
+  '/cosmos/tx/v1beta1/txs/block/{height}':
     get:
       summary: GetBlockWithTxs fetches a block with decoded txs.
       description: 'Since: cosmos-sdk 0.45.2'
@@ -10605,7 +10605,7 @@ paths:
           type: boolean
       tags:
         - Service
-  /cosmos/tx/v1beta1/txs/{hash}:
+  '/cosmos/tx/v1beta1/txs/{hash}':
     get:
       summary: GetTx fetches a tx by hash.
       operationId: CosmosTxV1Beta1GetTx
@@ -10801,13 +10801,13 @@ paths:
                         }
       parameters:
         - name: hash
-          description: hash is the tx hash to query, encoded as a hex string.
+          description: 'hash is the tx hash to query, encoded as a hex string.'
           in: path
           required: true
           type: string
       tags:
         - Service
-  /cosmos/upgrade/v1beta1/applied_plan/{name}:
+  '/cosmos/upgrade/v1beta1/applied_plan/{name}':
     get:
       summary: AppliedPlan queries a previously applied upgrade plan by its name.
       operationId: CosmosUpgradeV1Beta1AppliedPlan
@@ -11574,7 +11574,7 @@ paths:
           type: string
       tags:
         - Query
-  /cosmos/upgrade/v1beta1/upgraded_consensus_state/{last_height}:
+  '/cosmos/upgrade/v1beta1/upgraded_consensus_state/{last_height}':
     get:
       summary: >-
         UpgradedConsensusState queries the consensus state that will serve
@@ -11925,7 +11925,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /dualitylabs/duality/dex/fee_tier/{id}:
+  '/dualitylabs/duality/dex/fee_tier/{id}':
     get:
       summary: Queries a FeeTier by id.
       operationId: DualitylabsDualityDexFeeTier
@@ -12111,7 +12111,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /dualitylabs/duality/dex/filled_limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}:
+  '/dualitylabs/duality/dex/filled_limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}':
     get:
       summary: Queries a FilledLimitOrderTranche by index.
       operationId: DualitylabsDualityDexFilledLimitOrderTranche
@@ -12184,7 +12184,7 @@ paths:
           type: string
       tags:
         - Query
-  /dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}:
+  '/dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}':
     get:
       summary: >-
         Queries a list of LimitOrderTranche items for a given pairId / TokenIn
@@ -12335,7 +12335,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}:
+  '/dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}':
     get:
       summary: Queries a LimitOrderTranche by index.
       operationId: DualitylabsDualityDexLimitOrderTranche
@@ -12549,7 +12549,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /dualitylabs/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{trancheKey}/{address}:
+  '/dualitylabs/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{trancheKey}/{address}':
     get:
       summary: Queries a LimitOrderTrancheUser by index.
       operationId: DualitylabsDualityDexLimitOrderTrancheUser
@@ -12662,7 +12662,7 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  /dualitylabs/duality/dex/pool_reserves/{pairId}/{tokenIn}:
+  '/dualitylabs/duality/dex/pool_reserves/{pairId}/{tokenIn}':
     get:
       summary: Queries a list of PoolReserves items.
       operationId: DualitylabsDualityDexPoolReservesAll
@@ -12806,7 +12806,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /dualitylabs/duality/dex/pool_reserves/{pairId}/{tokenIn}/{tickIndex}/{fee}:
+  '/dualitylabs/duality/dex/pool_reserves/{pairId}/{tokenIn}/{tickIndex}/{fee}':
     get:
       summary: Queries a PoolReserve by index
       operationId: DualitylabsDualityDexPoolReserves
@@ -12875,7 +12875,7 @@ paths:
           format: uint64
       tags:
         - Query
-  /dualitylabs/duality/dex/tick_liquidity/{pairId}/{tokenIn}:
+  '/dualitylabs/duality/dex/tick_liquidity/{pairId}/{tokenIn}':
     get:
       summary: Queries a list of TickLiquidity items.
       operationId: DualitylabsDualityDexTickLiquidityAll
@@ -13047,7 +13047,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /dualitylabs/duality/dex/user/deposits/{address}:
+  '/dualitylabs/duality/dex/user/deposits/{address}':
     get:
       summary: Queries a list of UserDeposits items.
       operationId: DualitylabsDualityDexUserDepositsAll
@@ -13108,7 +13108,7 @@ paths:
           type: string
       tags:
         - Query
-  /dualitylabs/duality/dex/user/limit_orders/{address}:
+  '/dualitylabs/duality/dex/user/limit_orders/{address}':
     get:
       summary: Queries a list of UserLimitOrders items.
       operationId: DualitylabsDualityDexUserLimitOrdersAll
@@ -13170,7 +13170,7 @@ paths:
           type: string
       tags:
         - Query
-  /dualitylabs/duality/dex/user/positions/{address}:
+  '/dualitylabs/duality/dex/user/positions/{address}':
     get:
       summary: Queries a list of GetUserPositions items.
       operationId: DualitylabsDualityDexGetUserPositions
@@ -13261,6 +13261,42 @@ paths:
           type: string
       tags:
         - Query
+  /duality-labs/duality/incentives/params:
+    get:
+      summary: Parameters queries the parameters of the module.
+      operationId: DualitylabsDualityIncentivesParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params holds all the parameters of this module.
+                type: object
+            description: >-
+              QueryParamsResponse is response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
   /dualitylabs/duality/mev/params:
     get:
       summary: Parameters queries the parameters of the module.
@@ -13344,7 +13380,7 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  /ibc/apps/transfer/v1/channels/{channel_id}/ports/{port_id}/escrow_address:
+  '/ibc/apps/transfer/v1/channels/{channel_id}/ports/{port_id}/escrow_address':
     get:
       summary: >-
         EscrowAddress returns the escrow address for a particular port and
@@ -13560,7 +13596,7 @@ paths:
           type: string
       tags:
         - Query
-  /ibc/apps/transfer/v1/denom_hashes/{trace}:
+  '/ibc/apps/transfer/v1/denom_hashes/{trace}':
     get:
       summary: DenomHash queries a denomination hash information.
       operationId: IbcApplicationsTransferV1DenomHash
@@ -13765,7 +13801,7 @@ paths:
                         }
       parameters:
         - name: trace
-          description: The denomination trace ([port_id]/[channel_id])+/[denom]
+          description: 'The denomination trace ([port_id]/[channel_id])+/[denom]'
           in: path
           required: true
           type: string
@@ -14059,7 +14095,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /ibc/apps/transfer/v1/denom_traces/{hash}:
+  '/ibc/apps/transfer/v1/denom_traces/{hash}':
     get:
       summary: DenomTrace queries a denomination trace information.
       operationId: IbcApplicationsTransferV1DenomTrace
@@ -14887,7 +14923,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}':
     get:
       summary: Channel queries an IBC Channel.
       operationId: IbcCoreChannelV1Channel
@@ -15210,7 +15246,7 @@ paths:
           type: string
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/client_state:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/client_state':
     get:
       summary: >-
         ChannelClientState queries for the client state for the channel
@@ -15644,7 +15680,7 @@ paths:
           type: string
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/consensus_state/revision/{revision_number}/height/{revision_height}:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/consensus_state/revision/{revision_number}/height/{revision_height}':
     get:
       summary: |-
         ChannelConsensusState queries for the consensus state for the channel
@@ -16075,7 +16111,7 @@ paths:
           format: uint64
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/next_sequence:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/next_sequence':
     get:
       summary: >-
         NextSequenceReceive returns the next receive sequence for a given
@@ -16325,7 +16361,7 @@ paths:
           type: string
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acknowledgements:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acknowledgements':
     get:
       summary: >-
         PacketAcknowledgements returns all the packet acknowledgements
@@ -16681,7 +16717,7 @@ paths:
           collectionFormat: multi
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acks/{sequence}:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acks/{sequence}':
     get:
       summary: PacketAcknowledgement queries a stored packet acknowledgement hash.
       operationId: IbcCoreChannelV1PacketAcknowledgement
@@ -16939,7 +16975,7 @@ paths:
           format: uint64
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments':
     get:
       summary: |-
         PacketCommitments returns all the packet commitments hashes associated
@@ -17284,7 +17320,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_ack_sequences}/unreceived_acks:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_ack_sequences}/unreceived_acks':
     get:
       summary: >-
         UnreceivedAcks returns all the unreceived IBC acknowledgements
@@ -17544,7 +17580,7 @@ paths:
           minItems: 1
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_commitment_sequences}/unreceived_packets:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_commitment_sequences}/unreceived_packets':
     get:
       summary: >-
         UnreceivedPackets returns all the unreceived IBC packets associated with
@@ -17804,7 +17840,7 @@ paths:
           minItems: 1
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{sequence}:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{sequence}':
     get:
       summary: PacketCommitment queries a stored packet commitment hash.
       operationId: IbcCoreChannelV1PacketCommitment
@@ -18063,7 +18099,7 @@ paths:
           format: uint64
       tags:
         - Query
-  /ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_receipts/{sequence}:
+  '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_receipts/{sequence}':
     get:
       summary: >-
         PacketReceipt queries if a given packet sequence has been received on
@@ -18325,7 +18361,7 @@ paths:
           format: uint64
       tags:
         - Query
-  /ibc/core/channel/v1/connections/{connection}/channels:
+  '/ibc/core/channel/v1/connections/{connection}/channels':
     get:
       summary: |-
         ConnectionChannels queries all the channels associated with a connection
@@ -19396,7 +19432,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /ibc/core/client/v1/client_states/{client_id}:
+  '/ibc/core/client/v1/client_states/{client_id}':
     get:
       summary: ClientState queries an IBC light client.
       operationId: IbcCoreClientV1ClientState
@@ -19810,7 +19846,7 @@ paths:
           type: string
       tags:
         - Query
-  /ibc/core/client/v1/client_status/{client_id}:
+  '/ibc/core/client/v1/client_status/{client_id}':
     get:
       summary: Status queries the status of an IBC client.
       operationId: IbcCoreClientV1ClientStatus
@@ -20020,7 +20056,7 @@ paths:
           type: string
       tags:
         - Query
-  /ibc/core/client/v1/consensus_states/{client_id}:
+  '/ibc/core/client/v1/consensus_states/{client_id}':
     get:
       summary: |-
         ConsensusStates queries all the consensus state associated with a given
@@ -20518,7 +20554,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /ibc/core/client/v1/consensus_states/{client_id}/heights:
+  '/ibc/core/client/v1/consensus_states/{client_id}/heights':
     get:
       summary: >-
         ConsensusStateHeights queries the height of every consensus states
@@ -20838,7 +20874,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /ibc/core/client/v1/consensus_states/{client_id}/revision/{revision_number}/height/{revision_height}:
+  '/ibc/core/client/v1/consensus_states/{client_id}/revision/{revision_number}/height/{revision_height}':
     get:
       summary: >-
         ConsensusState queries a consensus state associated with a client state
@@ -22016,7 +22052,7 @@ paths:
                         }
       tags:
         - Query
-  /ibc/core/connection/v1/client_connections/{client_id}:
+  '/ibc/core/connection/v1/client_connections/{client_id}':
     get:
       summary: |-
         ClientConnections queries the connection paths associated with a client
@@ -22655,7 +22691,7 @@ paths:
           type: boolean
       tags:
         - Query
-  /ibc/core/connection/v1/connections/{connection_id}:
+  '/ibc/core/connection/v1/connections/{connection_id}':
     get:
       summary: Connection queries an IBC connection end.
       operationId: IbcCoreConnectionV1Connection
@@ -22992,7 +23028,7 @@ paths:
           type: string
       tags:
         - Query
-  /ibc/core/connection/v1/connections/{connection_id}/client_state:
+  '/ibc/core/connection/v1/connections/{connection_id}/client_state':
     get:
       summary: |-
         ConnectionClientState queries the client state associated with the
@@ -23419,7 +23455,7 @@ paths:
           type: string
       tags:
         - Query
-  /ibc/core/connection/v1/connections/{connection_id}/consensus_state/revision/{revision_number}/height/{revision_height}:
+  '/ibc/core/connection/v1/connections/{connection_id}/consensus_state/revision/{revision_number}/height/{revision_height}':
     get:
       summary: |-
         ConnectionConsensusState queries the consensus state associated with the
@@ -24853,7 +24889,7 @@ paths:
                         }
       tags:
         - Query
-  /interchain_security/ccv/provider/consumer_genesis/{chain_id}:
+  '/interchain_security/ccv/provider/consumer_genesis/{chain_id}':
     get:
       summary: >-
         ConsumerGenesis queries the genesis state needed to start a consumer
@@ -24954,13 +24990,13 @@ paths:
                     title: Params defines the parameters for CCV consumer module
                   provider_client_id:
                     type: string
-                    description: empty for a new chain, filled in on restart.
+                    description: 'empty for a new chain, filled in on restart.'
                   provider_channel_id:
                     type: string
-                    description: empty for a new chain, filled in on restart.
+                    description: 'empty for a new chain, filled in on restart.'
                   new_chain:
                     type: boolean
-                    description: true for new chain GenesisState, false for chain restart.
+                    description: 'true for new chain GenesisState, false for chain restart.'
                   provider_client_state:
                     description: >-
                       ProviderClientState filled in on new chain, nil on
@@ -25384,7 +25420,7 @@ paths:
                       title: >-
                         MaturingVSCPacket contains the maturing time of a
                         received VSCPacket
-                    description: MaturingPackets nil on new chain, filled in on restart.
+                    description: 'MaturingPackets nil on new chain, filled in on restart.'
                   initial_val_set:
                     type: array
                     items:
@@ -25778,7 +25814,7 @@ paths:
                               type: string
                               format: int64
                               description: The voting power
-                              title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+                              title: 'PubKey pub_key = 2 [(gogoproto.nullable)=false];'
                           title: Validator
                         valset_update_id:
                           type: string
@@ -26105,7 +26141,7 @@ paths:
                               type: string
                               format: int64
                               description: The voting power
-                              title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+                              title: 'PubKey pub_key = 2 [(gogoproto.nullable)=false];'
                           title: Validator
                         valset_update_id:
                           type: string
@@ -35026,7 +35062,7 @@ definitions:
         description: Response code.
       data:
         type: string
-        description: Result bytes, if any.
+        description: 'Result bytes, if any.'
       raw_log:
         type: string
         description: |-
@@ -35405,7 +35441,7 @@ definitions:
             description: Response code.
           data:
             type: string
-            description: Result bytes, if any.
+            description: 'Result bytes, if any.'
           raw_log:
             type: string
             description: |-
@@ -36271,7 +36307,7 @@ definitions:
             description: Response code.
           data:
             type: string
-            description: Result bytes, if any.
+            description: 'Result bytes, if any.'
           raw_log:
             type: string
             description: |-
@@ -36483,7 +36519,7 @@ definitions:
               description: Response code.
             data:
               type: string
-              description: Result bytes, if any.
+              description: 'Result bytes, if any.'
             raw_log:
               type: string
               description: |-
@@ -38157,7 +38193,7 @@ definitions:
             index:
               type: boolean
               title: nondeterministic
-          description: EventAttribute is a single key-value pair, associated with an event.
+          description: 'EventAttribute is a single key-value pair, associated with an event.'
     description: >-
       Event allows application developers to attach additional information to
 
@@ -38177,7 +38213,7 @@ definitions:
       index:
         type: boolean
         title: nondeterministic
-    description: EventAttribute is a single key-value pair, associated with an event.
+    description: 'EventAttribute is a single key-value pair, associated with an event.'
   cosmos.upgrade.v1beta1.ModuleVersion:
     type: object
     properties:
@@ -39319,6 +39355,16 @@ definitions:
               type: string
             sharesCancelled:
               type: string
+  dualitylabs.duality.incentives.Params:
+    type: object
+    description: Params defines the parameters for the module.
+  dualitylabs.duality.incentives.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params holds all the parameters of this module.
+        type: object
+    description: QueryParamsResponse is response type for the Query/Params RPC method.
   dualitylabs.duality.mev.MsgSendResponse:
     type: object
   dualitylabs.duality.mev.Params:
@@ -39607,7 +39653,7 @@ definitions:
           this channel will travel
       version:
         type: string
-        title: opaque channel version, which is agreed upon during the handshake
+        title: 'opaque channel version, which is agreed upon during the handshake'
     description: |-
       Channel defines pipeline for exactly-once packet delivery between specific
       modules on separate blockchains, which has at least one end capable of
@@ -39682,7 +39728,7 @@ definitions:
           this channel will travel
       version:
         type: string
-        title: opaque channel version, which is agreed upon during the handshake
+        title: 'opaque channel version, which is agreed upon during the handshake'
       port_id:
         type: string
         title: port identifier
@@ -40372,7 +40418,7 @@ definitions:
               this channel will travel
           version:
             type: string
-            title: opaque channel version, which is agreed upon during the handshake
+            title: 'opaque channel version, which is agreed upon during the handshake'
         description: >-
           Channel defines pipeline for exactly-once packet delivery between
           specific
@@ -44809,15 +44855,15 @@ definitions:
         title: Params defines the parameters for CCV consumer module
       provider_client_id:
         type: string
-        description: empty for a new chain, filled in on restart.
+        description: 'empty for a new chain, filled in on restart.'
       provider_channel_id:
         type: string
-        description: empty for a new chain, filled in on restart.
+        description: 'empty for a new chain, filled in on restart.'
       new_chain:
         type: boolean
-        description: true for new chain GenesisState, false for chain restart.
+        description: 'true for new chain GenesisState, false for chain restart.'
       provider_client_state:
-        description: ProviderClientState filled in on new chain, nil on restart.
+        description: 'ProviderClientState filled in on new chain, nil on restart.'
         type: object
         properties:
           chain_id:
@@ -45181,7 +45227,7 @@ definitions:
 
               whose chain has experienced a misbehaviour event
       provider_consensus_state:
-        description: ProviderConsensusState filled in on new chain, nil on restart.
+        description: 'ProviderConsensusState filled in on new chain, nil on restart.'
         type: object
         properties:
           timestamp:
@@ -45217,7 +45263,7 @@ definitions:
               type: string
               format: date-time
           title: MaturingVSCPacket contains the maturing time of a received VSCPacket
-        description: MaturingPackets nil on new chain, filled in on restart.
+        description: 'MaturingPackets nil on new chain, filled in on restart.'
       initial_val_set:
         type: array
         items:
@@ -45256,7 +45302,7 @@ definitions:
             mapping 
 
             of each block height to a valset update id
-        description: HeightToValsetUpdateId nil on new chain, filled in on restart.
+        description: 'HeightToValsetUpdateId nil on new chain, filled in on restart.'
       outstanding_downtime_slashing:
         type: array
         items:
@@ -45269,9 +45315,9 @@ definitions:
             validator
 
             flagged with an outstanding downtime slashing.
-        description: OutstandingDowntimes nil on new chain, filled  in on restart.
+        description: 'OutstandingDowntimes nil on new chain, filled  in on restart.'
       pending_consumer_packets:
-        description: PendingConsumerPackets nil on new chain, filled in on restart.
+        description: 'PendingConsumerPackets nil on new chain, filled in on restart.'
         type: object
         properties:
           list:
@@ -45307,7 +45353,7 @@ definitions:
                           type: string
                           format: int64
                           description: The voting power
-                          title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+                          title: 'PubKey pub_key = 2 [(gogoproto.nullable)=false];'
                       title: Validator
                     valset_update_id:
                       type: string
@@ -45355,7 +45401,7 @@ definitions:
                 ConsumerPacketData contains a consumer packet data and a type
                 tag
       last_transmission_block_height:
-        description: LastTransmissionBlockHeight nil on new chain, filled in on restart.
+        description: 'LastTransmissionBlockHeight nil on new chain, filled in on restart.'
         type: object
         properties:
           height:
@@ -46089,15 +46135,15 @@ definitions:
             title: Params defines the parameters for CCV consumer module
           provider_client_id:
             type: string
-            description: empty for a new chain, filled in on restart.
+            description: 'empty for a new chain, filled in on restart.'
           provider_channel_id:
             type: string
-            description: empty for a new chain, filled in on restart.
+            description: 'empty for a new chain, filled in on restart.'
           new_chain:
             type: boolean
-            description: true for new chain GenesisState, false for chain restart.
+            description: 'true for new chain GenesisState, false for chain restart.'
           provider_client_state:
-            description: ProviderClientState filled in on new chain, nil on restart.
+            description: 'ProviderClientState filled in on new chain, nil on restart.'
             type: object
             properties:
               chain_id:
@@ -46463,7 +46509,7 @@ definitions:
 
                   whose chain has experienced a misbehaviour event
           provider_consensus_state:
-            description: ProviderConsensusState filled in on new chain, nil on restart.
+            description: 'ProviderConsensusState filled in on new chain, nil on restart.'
             type: object
             properties:
               timestamp:
@@ -46503,7 +46549,7 @@ definitions:
               title: >-
                 MaturingVSCPacket contains the maturing time of a received
                 VSCPacket
-            description: MaturingPackets nil on new chain, filled in on restart.
+            description: 'MaturingPackets nil on new chain, filled in on restart.'
           initial_val_set:
             type: array
             items:
@@ -46542,7 +46588,7 @@ definitions:
                 mapping 
 
                 of each block height to a valset update id
-            description: HeightToValsetUpdateId nil on new chain, filled in on restart.
+            description: 'HeightToValsetUpdateId nil on new chain, filled in on restart.'
           outstanding_downtime_slashing:
             type: array
             items:
@@ -46555,9 +46601,9 @@ definitions:
                 validator
 
                 flagged with an outstanding downtime slashing.
-            description: OutstandingDowntimes nil on new chain, filled  in on restart.
+            description: 'OutstandingDowntimes nil on new chain, filled  in on restart.'
           pending_consumer_packets:
-            description: PendingConsumerPackets nil on new chain, filled in on restart.
+            description: 'PendingConsumerPackets nil on new chain, filled in on restart.'
             type: object
             properties:
               list:
@@ -46593,7 +46639,7 @@ definitions:
                               type: string
                               format: int64
                               description: The voting power
-                              title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+                              title: 'PubKey pub_key = 2 [(gogoproto.nullable)=false];'
                           title: Validator
                         valset_update_id:
                           type: string
@@ -46728,7 +46774,7 @@ definitions:
                       type: string
                       format: int64
                       description: The voting power
-                      title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+                      title: 'PubKey pub_key = 2 [(gogoproto.nullable)=false];'
                   title: Validator
                 valset_update_id:
                   type: string
@@ -46790,7 +46836,7 @@ definitions:
                       type: string
                       format: int64
                       description: The voting power
-                      title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+                      title: 'PubKey pub_key = 2 [(gogoproto.nullable)=false];'
                   title: Validator
                 valset_update_id:
                   type: string
@@ -46866,7 +46912,7 @@ definitions:
                 type: string
                 format: int64
                 description: The voting power
-                title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+                title: 'PubKey pub_key = 2 [(gogoproto.nullable)=false];'
             title: Validator
           valset_update_id:
             type: string
@@ -46958,7 +47004,7 @@ definitions:
                 type: string
                 format: int64
                 description: The voting power
-                title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+                title: 'PubKey pub_key = 2 [(gogoproto.nullable)=false];'
             title: Validator
           valset_update_id:
             type: string
@@ -47018,7 +47064,7 @@ definitions:
                 type: string
                 format: int64
                 description: The voting power
-                title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+                title: 'PubKey pub_key = 2 [(gogoproto.nullable)=false];'
             title: Validator
           valset_update_id:
             type: string
@@ -47091,7 +47137,7 @@ definitions:
                       type: string
                       format: int64
                       description: The voting power
-                      title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+                      title: 'PubKey pub_key = 2 [(gogoproto.nullable)=false];'
                   title: Validator
                 valset_update_id:
                   type: string
@@ -47164,7 +47210,7 @@ definitions:
             type: string
             format: int64
             description: The voting power
-            title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+            title: 'PubKey pub_key = 2 [(gogoproto.nullable)=false];'
         title: Validator
       valset_update_id:
         type: string
@@ -47209,7 +47255,7 @@ definitions:
         type: string
         format: int64
         description: The voting power
-        title: PubKey pub_key = 2 [(gogoproto.nullable)=false];
+        title: 'PubKey pub_key = 2 [(gogoproto.nullable)=false];'
     title: Validator
   tendermint.abci.ValidatorUpdate:
     type: object
