@@ -1,0 +1,15 @@
+syntax = "proto3";
+package dualitylabs.duality.incentives;
+
+option go_package = "github.com/duality-labs/duality/x/incentives/types";
+import "gogoproto/gogo.proto"; 
+import "cosmos/base/v1beta1/coin.proto"; 
+
+message UserStake {
+  string index = 1; 
+  repeated cosmos.base.v1beta1.Coin amount = 2 [(gogoproto.nullable) = false]; 
+  uint64 startDate = 3; 
+  uint64 endDate = 4; 
+  string creator = 5;
+}
+

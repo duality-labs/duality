@@ -30,6 +30,14 @@ func TestGenesisState_Validate(t *testing.T) {
 						Index: "1",
 					},
 				},
+				UserStakeList: []types.UserStake{
+					{
+						Index: "0",
+					},
+					{
+						Index: "1",
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -38,6 +46,20 @@ func TestGenesisState_Validate(t *testing.T) {
 			desc: "duplicated incentivePlan",
 			genState: &types.GenesisState{
 				IncentivePlanList: []types.IncentivePlan{
+					{
+						Index: "0",
+					},
+					{
+						Index: "0",
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated userStake",
+			genState: &types.GenesisState{
+				UserStakeList: []types.UserStake{
 					{
 						Index: "0",
 					},

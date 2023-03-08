@@ -11,6 +11,9 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateIncentivePlan{}, "incentives/CreateIncentivePlan", nil)
 	cdc.RegisterConcrete(&MsgUpdateIncentivePlan{}, "incentives/UpdateIncentivePlan", nil)
 	cdc.RegisterConcrete(&MsgDeleteIncentivePlan{}, "incentives/DeleteIncentivePlan", nil)
+	cdc.RegisterConcrete(&MsgCreateUserStake{}, "incentives/CreateUserStake", nil)
+	cdc.RegisterConcrete(&MsgUpdateUserStake{}, "incentives/UpdateUserStake", nil)
+	cdc.RegisterConcrete(&MsgDeleteUserStake{}, "incentives/DeleteUserStake", nil)
 	// this line is used by starport scaffolding # 2
 }
 
@@ -19,6 +22,11 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgCreateIncentivePlan{},
 		&MsgUpdateIncentivePlan{},
 		&MsgDeleteIncentivePlan{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgCreateUserStake{},
+		&MsgUpdateUserStake{},
+		&MsgDeleteUserStake{},
 	)
 	// this line is used by starport scaffolding # 3
 

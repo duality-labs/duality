@@ -36,6 +36,18 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgDeleteIncentivePlan int = 100
 
+	opWeightMsgCreateUserStake = "op_weight_msg_user_stake"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgCreateUserStake int = 100
+
+	opWeightMsgUpdateUserStake = "op_weight_msg_user_stake"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgUpdateUserStake int = 100
+
+	opWeightMsgDeleteUserStake = "op_weight_msg_user_stake"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgDeleteUserStake int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -48,6 +60,16 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 	incentivesGenesis := types.GenesisState{
 		Params: types.DefaultParams(),
 		IncentivePlanList: []types.IncentivePlan{
+			{
+				Creator: sample.AccAddress(),
+				Index:   "0",
+			},
+			{
+				Creator: sample.AccAddress(),
+				Index:   "1",
+			},
+		},
+		UserStakeList: []types.UserStake{
 			{
 				Creator: sample.AccAddress(),
 				Index:   "0",
@@ -111,6 +133,39 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgDeleteIncentivePlan,
 		incentivessimulation.SimulateMsgDeleteIncentivePlan(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgCreateUserStake int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgCreateUserStake, &weightMsgCreateUserStake, nil,
+		func(_ *rand.Rand) {
+			weightMsgCreateUserStake = defaultWeightMsgCreateUserStake
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgCreateUserStake,
+		incentivessimulation.SimulateMsgCreateUserStake(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgUpdateUserStake int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateUserStake, &weightMsgUpdateUserStake, nil,
+		func(_ *rand.Rand) {
+			weightMsgUpdateUserStake = defaultWeightMsgUpdateUserStake
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgUpdateUserStake,
+		incentivessimulation.SimulateMsgUpdateUserStake(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgDeleteUserStake int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgDeleteUserStake, &weightMsgDeleteUserStake, nil,
+		func(_ *rand.Rand) {
+			weightMsgDeleteUserStake = defaultWeightMsgDeleteUserStake
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgDeleteUserStake,
+		incentivessimulation.SimulateMsgDeleteUserStake(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation

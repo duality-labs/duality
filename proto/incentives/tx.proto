@@ -2,6 +2,7 @@ syntax = "proto3";
 package dualitylabs.duality.incentives;
 
 import "incentives/incentive_plan.proto";
+import "incentives/user_stake.proto";
 // this line is used by starport scaffolding # proto/tx/import
 import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
@@ -13,6 +14,9 @@ service Msg {
       rpc CreateIncentivePlan(MsgCreateIncentivePlan) returns (MsgCreateIncentivePlanResponse);
   rpc UpdateIncentivePlan(MsgUpdateIncentivePlan) returns (MsgUpdateIncentivePlanResponse);
   rpc DeleteIncentivePlan(MsgDeleteIncentivePlan) returns (MsgDeleteIncentivePlanResponse);
+  rpc CreateUserStake(MsgCreateUserStake) returns (MsgCreateUserStakeResponse);
+  rpc UpdateUserStake(MsgUpdateUserStake) returns (MsgUpdateUserStakeResponse);
+  rpc DeleteUserStake(MsgDeleteUserStake) returns (MsgDeleteUserStakeResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -47,5 +51,31 @@ message MsgDeleteIncentivePlan {
   string index = 2;
 }
 message MsgDeleteIncentivePlanResponse {}
+
+message MsgCreateUserStake {
+  string creator = 1;
+  string index = 2;
+
+  repeated cosmos.base.v1beta1.Coin amount = 3 [(gogoproto.nullable) = false];
+  uint64 startDate = 4;
+  uint64 endDate = 5;
+}
+message MsgCreateUserStakeResponse {}
+
+message MsgUpdateUserStake {
+  string creator = 1;
+  string index = 2;
+
+  repeated cosmos.base.v1beta1.Coin amount = 3 [(gogoproto.nullable) = false];
+  uint64 startDate = 4;
+  uint64 endDate = 5;
+}
+message MsgUpdateUserStakeResponse {}
+
+message MsgDeleteUserStake {
+  string creator = 1;
+  string index = 2;
+}
+message MsgDeleteUserStakeResponse {}
 
 // this line is used by starport scaffolding # proto/tx/message

@@ -5,6 +5,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "incentives/params.proto";
 import "incentives/incentive_plan.proto";
+import "incentives/user_stake.proto";
 // this line is used by starport scaffolding # 1
 import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
@@ -25,6 +26,16 @@ service Query {
 	// Queries a list of IncentivePlan items.
 	rpc IncentivePlanAll(QueryAllIncentivePlanRequest) returns (QueryAllIncentivePlanResponse) {
 		option (google.api.http).get = "/duality-labs/duality/incentives/incentive_plan";
+	}
+
+// Queries a UserStake by index.
+	rpc UserStake(QueryGetUserStakeRequest) returns (QueryGetUserStakeResponse) {
+		option (google.api.http).get = "/duality-labs/duality/incentives/user_stake/{index}";
+	}
+
+	// Queries a list of UserStake items.
+	rpc UserStakeAll(QueryAllUserStakeRequest) returns (QueryAllUserStakeResponse) {
+		option (google.api.http).get = "/duality-labs/duality/incentives/user_stake";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -54,6 +65,24 @@ message QueryAllIncentivePlanRequest {
 
 message QueryAllIncentivePlanResponse {
 	repeated IncentivePlan incentivePlan = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetUserStakeRequest {
+	  string index = 1;
+
+}
+
+message QueryGetUserStakeResponse {
+	UserStake userStake = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllUserStakeRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllUserStakeResponse {
+	repeated UserStake userStake = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
