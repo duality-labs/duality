@@ -11,20 +11,20 @@ func (k Keeper) SetUserStake(ctx sdk.Context, userStake types.UserStake) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.UserStakeKeyPrefix))
 	b := k.cdc.MustMarshal(&userStake)
 	store.Set(types.UserStakeKey(
-		userStake.Index,
+		userStake.Creator,
 	), b)
 }
 
 // GetUserStake returns a userStake from its index
 func (k Keeper) GetUserStake(
 	ctx sdk.Context,
-	index string,
+	creator string,
 
 ) (val types.UserStake, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.UserStakeKeyPrefix))
 
 	b := store.Get(types.UserStakeKey(
-		index,
+		creator,
 	))
 	if b == nil {
 		return val, false
@@ -37,12 +37,11 @@ func (k Keeper) GetUserStake(
 // RemoveUserStake removes a userStake from the store
 func (k Keeper) RemoveUserStake(
 	ctx sdk.Context,
-	index string,
-
+	creator string,
 ) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.UserStakeKeyPrefix))
 	store.Delete(types.UserStakeKey(
-		index,
+		creator,
 	))
 }
 

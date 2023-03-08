@@ -57,53 +57,6 @@ func CmdCreateUserStake() *cobra.Command {
 	return cmd
 }
 
-func CmdUpdateUserStake() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "update-user-stake [index] [amount] [start-date] [end-date]",
-		Short: "Update a UserStake",
-		Args:  cobra.ExactArgs(4),
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			// Get indexes
-			indexIndex := args[0]
-
-			// Get value arguments
-			argAmount, err := sdk.ParseCoinsNormalized(args[1])
-			if err != nil {
-				return err
-			}
-			argStartDate, err := cast.ToUint64E(args[2])
-			if err != nil {
-				return err
-			}
-			argEndDate, err := cast.ToUint64E(args[3])
-			if err != nil {
-				return err
-			}
-
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			msg := types.NewMsgUpdateUserStake(
-				clientCtx.GetFromAddress().String(),
-				indexIndex,
-				argAmount,
-				argStartDate,
-				argEndDate,
-			)
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
-		},
-	}
-
-	flags.AddTxFlagsToCmd(cmd)
-
-	return cmd
-}
-
 func CmdDeleteUserStake() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-user-stake [index]",

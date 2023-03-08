@@ -31,10 +31,8 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdCreateIncentivePlan())
-	cmd.AddCommand(CmdUpdateIncentivePlan())
 	cmd.AddCommand(CmdDeleteIncentivePlan())
 	cmd.AddCommand(CmdCreateUserStake())
-	cmd.AddCommand(CmdUpdateUserStake())
 	cmd.AddCommand(CmdDeleteUserStake())
 	// this line is used by starport scaffolding # 1
 

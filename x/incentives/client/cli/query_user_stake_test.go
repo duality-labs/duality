@@ -29,7 +29,7 @@ func networkWithUserStakeObjects(t *testing.T, n int) (*network.Network, []types
 
 	for i := 0; i < n; i++ {
 		userStake := types.UserStake{
-			Index: strconv.Itoa(i),
+			Creator: strconv.Itoa(i),
 		}
 		nullify.Fill(&userStake)
 		state.UserStakeList = append(state.UserStakeList, userStake)
@@ -57,7 +57,7 @@ func TestShowUserStake(t *testing.T) {
 	}{
 		{
 			desc:    "found",
-			idIndex: objs[0].Index,
+			idIndex: objs[0].Creator,
 
 			args: common,
 			obj:  objs[0],

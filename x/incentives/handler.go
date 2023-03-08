@@ -20,17 +20,11 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgCreateIncentivePlan:
 			res, err := msgServer.CreateIncentivePlan(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgUpdateIncentivePlan:
-			res, err := msgServer.UpdateIncentivePlan(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgDeleteIncentivePlan:
 			res, err := msgServer.DeleteIncentivePlan(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgCreateUserStake:
 			res, err := msgServer.CreateUserStake(sdk.WrapSDKContext(ctx), msg)
-			return sdk.WrapServiceResult(ctx, res, err)
-		case *types.MsgUpdateUserStake:
-			res, err := msgServer.UpdateUserStake(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		case *types.MsgDeleteUserStake:
 			res, err := msgServer.DeleteUserStake(sdk.WrapSDKContext(ctx), msg)

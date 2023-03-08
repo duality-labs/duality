@@ -18,7 +18,7 @@ var _ = strconv.IntSize
 func createNUserStake(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.UserStake {
 	items := make([]types.UserStake, n)
 	for i := range items {
-		items[i].Index = strconv.Itoa(i)
+		items[i].Creator = strconv.Itoa(i)
 
 		keeper.SetUserStake(ctx, items[i])
 	}
@@ -30,7 +30,7 @@ func TestUserStakeGet(t *testing.T) {
 	items := createNUserStake(keeper, ctx, 10)
 	for _, item := range items {
 		rst, found := keeper.GetUserStake(ctx,
-			item.Index,
+			item.Creator,
 		)
 		require.True(t, found)
 		require.Equal(t,
@@ -44,10 +44,10 @@ func TestUserStakeRemove(t *testing.T) {
 	items := createNUserStake(keeper, ctx, 10)
 	for _, item := range items {
 		keeper.RemoveUserStake(ctx,
-			item.Index,
+			item.Creator,
 		)
 		_, found := keeper.GetUserStake(ctx,
-			item.Index,
+			item.Creator,
 		)
 		require.False(t, found)
 	}

@@ -22,7 +22,6 @@ func (k msgServer) CreateUserStake(goCtx context.Context, msg *types.MsgCreateUs
 
 	var userStake = types.UserStake{
 		Creator:   msg.Creator,
-		Index:     msg.Index,
 		Amount:    msg.Amount,
 		StartDate: msg.StartDate,
 		EndDate:   msg.EndDate,
@@ -33,36 +32,6 @@ func (k msgServer) CreateUserStake(goCtx context.Context, msg *types.MsgCreateUs
 		userStake,
 	)
 	return &types.MsgCreateUserStakeResponse{}, nil
-}
-
-func (k msgServer) UpdateUserStake(goCtx context.Context, msg *types.MsgUpdateUserStake) (*types.MsgUpdateUserStakeResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	// Check if the value exists
-	valFound, isFound := k.GetUserStake(
-		ctx,
-		msg.Index,
-	)
-	if !isFound {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, "index not set")
-	}
-
-	// Checks if the the msg creator is the same as the current owner
-	if msg.Creator != valFound.Creator {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
-	}
-
-	var userStake = types.UserStake{
-		Creator:   msg.Creator,
-		Index:     msg.Index,
-		Amount:    msg.Amount,
-		StartDate: msg.StartDate,
-		EndDate:   msg.EndDate,
-	}
-
-	k.SetUserStake(ctx, userStake)
-
-	return &types.MsgUpdateUserStakeResponse{}, nil
 }
 
 func (k msgServer) DeleteUserStake(goCtx context.Context, msg *types.MsgDeleteUserStake) (*types.MsgDeleteUserStakeResponse, error) {

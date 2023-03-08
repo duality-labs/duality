@@ -35,60 +35,6 @@ func TestUserStakeMsgServerCreate(t *testing.T) {
 	}
 }
 
-func TestUserStakeMsgServerUpdate(t *testing.T) {
-	creator := "A"
-
-	for _, tc := range []struct {
-		desc    string
-		request *types.MsgUpdateUserStake
-		err     error
-	}{
-		{
-			desc: "Completed",
-			request: &types.MsgUpdateUserStake{Creator: creator,
-				Index: strconv.Itoa(0),
-			},
-		},
-		{
-			desc: "Unauthorized",
-			request: &types.MsgUpdateUserStake{Creator: "B",
-				Index: strconv.Itoa(0),
-			},
-			err: sdkerrors.ErrUnauthorized,
-		},
-		{
-			desc: "KeyNotFound",
-			request: &types.MsgUpdateUserStake{Creator: creator,
-				Index: strconv.Itoa(100000),
-			},
-			err: sdkerrors.ErrKeyNotFound,
-		},
-	} {
-		t.Run(tc.desc, func(t *testing.T) {
-			k, ctx := keepertest.IncentivesKeeper(t)
-			srv := keeper.NewMsgServerImpl(*k)
-			wctx := sdk.WrapSDKContext(ctx)
-			expected := &types.MsgCreateUserStake{Creator: creator,
-				Index: strconv.Itoa(0),
-			}
-			_, err := srv.CreateUserStake(wctx, expected)
-			require.NoError(t, err)
-
-			_, err = srv.UpdateUserStake(wctx, tc.request)
-			if tc.err != nil {
-				require.ErrorIs(t, err, tc.err)
-			} else {
-				require.NoError(t, err)
-				rst, found := k.GetUserStake(ctx,
-					expected.Index,
-				)
-				require.True(t, found)
-				require.Equal(t, expected.Creator, rst.Creator)
-			}
-		})
-	}
-}
-
 func TestUserStakeMsgServerDelete(t *testing.T) {
 	creator := "A"
 

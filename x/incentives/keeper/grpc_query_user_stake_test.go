@@ -31,14 +31,14 @@ func TestUserStakeQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetUserStakeRequest{
-				Index: msgs[0].Index,
+				Index: msgs[0].Creator,
 			},
 			response: &types.QueryGetUserStakeResponse{UserStake: msgs[0]},
 		},
 		{
 			desc: "Second",
 			request: &types.QueryGetUserStakeRequest{
-				Index: msgs[1].Index,
+				Index: msgs[1].Creator,
 			},
 			response: &types.QueryGetUserStakeResponse{UserStake: msgs[1]},
 		},

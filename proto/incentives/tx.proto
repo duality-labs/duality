@@ -11,11 +11,9 @@ option go_package = "github.com/duality-labs/duality/x/incentives/types";
 
 // Msg defines the Msg service.
 service Msg {
-      rpc CreateIncentivePlan(MsgCreateIncentivePlan) returns (MsgCreateIncentivePlanResponse);
-  rpc UpdateIncentivePlan(MsgUpdateIncentivePlan) returns (MsgUpdateIncentivePlanResponse);
+  rpc CreateIncentivePlan(MsgCreateIncentivePlan) returns (MsgCreateIncentivePlanResponse);
   rpc DeleteIncentivePlan(MsgDeleteIncentivePlan) returns (MsgDeleteIncentivePlanResponse);
   rpc CreateUserStake(MsgCreateUserStake) returns (MsgCreateUserStakeResponse);
-  rpc UpdateUserStake(MsgUpdateUserStake) returns (MsgUpdateUserStakeResponse);
   rpc DeleteUserStake(MsgDeleteUserStake) returns (MsgDeleteUserStakeResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
@@ -33,19 +31,6 @@ message MsgCreateIncentivePlan {
 }
 message MsgCreateIncentivePlanResponse {}
 
-message MsgUpdateIncentivePlan {
-  string creator = 1;
-  string index = 2;
-
-  uint64 startDate = 3;
-  uint64 endDate = 4;
-  string tradingPair = 5;
-  cosmos.base.v1beta1.Coin totalAmount = 6 [(gogoproto.nullable) = false];
-  int64 startTick = 7;
-  int64 endTick = 8;
-}
-message MsgUpdateIncentivePlanResponse {}
-
 message MsgDeleteIncentivePlan {
   string creator = 1;
   string index = 2;
@@ -61,16 +46,6 @@ message MsgCreateUserStake {
   uint64 endDate = 5;
 }
 message MsgCreateUserStakeResponse {}
-
-message MsgUpdateUserStake {
-  string creator = 1;
-  string index = 2;
-
-  repeated cosmos.base.v1beta1.Coin amount = 3 [(gogoproto.nullable) = false];
-  uint64 startDate = 4;
-  uint64 endDate = 5;
-}
-message MsgUpdateUserStakeResponse {}
 
 message MsgDeleteUserStake {
   string creator = 1;

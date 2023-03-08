@@ -11,11 +11,11 @@ const (
 
 // UserStakeKey returns the store key to retrieve a UserStake from the index fields
 func UserStakeKey(
-	index string,
+	creator string,
 ) []byte {
 	var key []byte
 
-	indexBytes := []byte(index)
+	indexBytes := []byte(creator)
 	key = append(key, indexBytes...)
 	key = append(key, []byte("/")...)
 
