@@ -1,11 +1,13 @@
 syntax = "proto3";
 package dualitylabs.duality.incentives;
 
-import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "incentives/params.proto";
+import "incentives/incentive_plan.proto";
 // this line is used by starport scaffolding # 1
+import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
 
 option go_package = "github.com/duality-labs/duality/x/incentives/types";
 
@@ -15,7 +17,17 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/duality-labs/duality/incentives/params";
   }
-  // this line is used by starport scaffolding # 2
+  // Queries a IncentivePlan by index.
+	rpc IncentivePlan(QueryGetIncentivePlanRequest) returns (QueryGetIncentivePlanResponse) {
+		option (google.api.http).get = "/duality-labs/duality/incentives/incentive_plan/{index}";
+	}
+
+	// Queries a list of IncentivePlan items.
+	rpc IncentivePlanAll(QueryAllIncentivePlanRequest) returns (QueryAllIncentivePlanResponse) {
+		option (google.api.http).get = "/duality-labs/duality/incentives/incentive_plan";
+	}
+
+// this line is used by starport scaffolding # 2
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -25,6 +37,24 @@ message QueryParamsRequest {}
 message QueryParamsResponse {
   // params holds all the parameters of this module.
   Params params = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryGetIncentivePlanRequest {
+	  string index = 1;
+
+}
+
+message QueryGetIncentivePlanResponse {
+	IncentivePlan incentivePlan = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllIncentivePlanRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllIncentivePlanResponse {
+	repeated IncentivePlan incentivePlan = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // this line is used by starport scaffolding # 3

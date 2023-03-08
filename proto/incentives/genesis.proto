@@ -3,6 +3,7 @@ package dualitylabs.duality.incentives;
 
 import "gogoproto/gogo.proto";
 import "incentives/params.proto";
+import "incentives/incentive_plan.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/duality-labs/duality/x/incentives/types";
@@ -10,5 +11,6 @@ option go_package = "github.com/duality-labs/duality/x/incentives/types";
 // GenesisState defines the incentives module's genesis state.
 message GenesisState {
   Params params = 1 [(gogoproto.nullable) = false];
+  repeated IncentivePlan incentivePlanList = 2 [(gogoproto.nullable) = false];
   // this line is used by starport scaffolding # genesis/proto/state
 }
