@@ -134,7 +134,7 @@ func CalcGreatestMatchingRatio(
 
 // Mutates the Pool object and returns relevant change variables. Deposit is not commited until
 // pool.save() is called or the underlying ticks are saved; this method does not use any keeper methods.
-func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.Int, autoswap bool) (inAmount0 sdk.Int, inAmount1 sdk.Int, outShares sdk.Int) {
+func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, existingShares sdk.Int, autoswap bool) (inAmount0 sdk.Int, inAmount1 sdk.Int, outShares sdk.Int) {
 
 	lowerReserve0 := &p.LowerTick0.Reserves
 	upperReserve1 := &p.UpperTick1.Reserves
@@ -150,7 +150,7 @@ func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, totalShares sdk.I
 		return sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt()
 	}
 
-	outShares = p.CalcSharesMinted(inAmount0, inAmount1)
+	outShares = p.CalcSharesMinted(inAmount0, inAmount1, existingShares)
 
 	if autoswap {
 		residualAmount0 := maxAmount0.Sub(inAmount0)
@@ -180,9 +180,18 @@ func (p *Pool) MustCalcPrice1To0Center() *types.Price {
 func (p *Pool) CalcSharesMinted(
 	amount0 sdk.Int,
 	amount1 sdk.Int,
+	existingShares sdk.Int,
 ) (sharesMinted sdk.Int) {
 	price1To0Center := p.MustCalcPrice1To0Center()
-	return amount0.ToDec().Add(price1To0Center.MulInt(amount1)).TruncateInt()
+	valueMintedToken0 := CalcAmountAsToken0(amount0, amount1, *price1To0Center)
+
+	valueExistingToken0 := CalcAmountAsToken0(p.LowerTick0.Reserves, p.UpperTick1.Reserves, *price1To0Center)
+	if valueExistingToken0.GT(sdk.ZeroDec()) {
+		sharesMinted = valueMintedToken0.MulInt(existingShares).Quo(valueExistingToken0).TruncateInt()
+	} else {
+		sharesMinted = valueMintedToken0.TruncateInt()
+	}
+	return sharesMinted
 }
 
 func (p *Pool) CalcResidualSharesMinted(

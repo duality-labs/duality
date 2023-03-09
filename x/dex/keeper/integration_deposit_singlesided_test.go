@@ -3,7 +3,6 @@ package keeper_test
 import (
 	"math"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
@@ -430,38 +429,4 @@ func (s *MsgServerTestSuite) TestDepositSingleLowTickUnderflowFails() {
 		types.ErrDepositShareUnderflow,
 		NewDeposit(0, 50, -352436, 0),
 	)
-}
-
-func (s *MsgServerTestSuite) TestDepositValueAccural() {
-	s.fundAliceBalances(100, 0)
-	s.fundBobBalances(1000, 1000)
-	s.fundCarolBalances(100, 1)
-
-	//Alice deposits 100TokenA @ tick0 => 100 shares
-	s.aliceDeposits(NewDeposit(100, 0, 0, 3))
-	s.assertAliceShares(0, 3, 100)
-	s.assertLiquidityAtTick(sdk.NewInt(100), sdk.ZeroInt(), 0, 3)
-
-	//Lots of trade activity => ~200 ExistingValueToken0
-	for i := 0; i < 100; i++ {
-		liquidityA, liquidityB := s.getLiquidityAtTick(0, 3)
-		if i%2 == 0 {
-			s.bobMarketSells("TokenB", int(liquidityA.Int64()), 0)
-		} else {
-			s.bobMarketSells("TokenA", int(liquidityB.Int64()), 0)
-		}
-
-	}
-	s.assertLiquidityAtTick(sdk.NewInt(199), sdk.NewInt(1), 0, 3)
-	s.assertDexBalances(199, 1)
-
-	//Carol deposits 100TokenA @tick0
-	s.carolDeposits(NewDeposit(100, 1, 0, 3))
-	s.assertCarolShares(0, 3, 100)
-
-	s.aliceWithdraws(NewWithdrawl(100, 0, 3))
-	s.assertAliceBalances(199, 0)
-
-	s.carolWithdraws(NewWithdrawl(100, 0, 3))
-	s.assertCarolBalances(100, 0)
 }

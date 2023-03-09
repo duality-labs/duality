@@ -67,7 +67,7 @@ func (k Keeper) DepositCore(
 		}
 
 		sharesId := CreateSharesId(token0, token1, tickIndex, feeIndex)
-		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
+		existingShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
 		pool, err := k.GetOrInitPool(
 			ctx,
@@ -80,7 +80,7 @@ func (k Keeper) DepositCore(
 			return nil, nil, err
 		}
 
-		inAmount0, inAmount1, outShares := pool.Deposit(amount0, amount1, totalShares, autoswap)
+		inAmount0, inAmount1, outShares := pool.Deposit(amount0, amount1, existingShares, autoswap)
 
 		k.SavePool(ctx, pool)
 

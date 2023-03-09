@@ -93,11 +93,13 @@ func (s *CoreHelpersTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amo
 	if err != nil {
 		panic(err)
 	}
-
 	lowerTick, upperTick := pool.LowerTick0, pool.UpperTick1
 	amountAInt := sdk.NewInt(int64(amountA))
 	amountBInt := sdk.NewInt(int64(amountB))
-	totalShares := pool.CalcSharesMinted(amountAInt, amountBInt)
+
+	existingShares := s.app.BankKeeper.GetSupply(s.ctx, sharesId).Amount
+
+	totalShares := pool.CalcSharesMinted(amountAInt, amountBInt, existingShares)
 
 	s.app.DexKeeper.MintShares(s.ctx, s.alice, totalShares, sharesId)
 
