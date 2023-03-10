@@ -195,23 +195,57 @@ func (s *MsgServerTestSuite) traceBalances() {
 
 /// Place limit order
 
-func (s *MsgServerTestSuite) aliceLimitSells(selling string, tick int, amountIn int) string {
-	return s.limitSells(s.alice, selling, tick, amountIn)
+func (s *MsgServerTestSuite) aliceLimitSells(selling string, tick int, amountIn int, orderTypeOpt ...types.LimitOrderType) string {
+	return s.limitSellsSuccess(s.alice, selling, tick, amountIn, orderTypeOpt...)
 }
 
-func (s *MsgServerTestSuite) bobLimitSells(selling string, tick int, amountIn int) string {
-	return s.limitSells(s.bob, selling, tick, amountIn)
+func (s *MsgServerTestSuite) bobLimitSells(selling string, tick int, amountIn int, orderTypeOpt ...types.LimitOrderType) string {
+	return s.limitSellsSuccess(s.bob, selling, tick, amountIn, orderTypeOpt...)
 }
 
-func (s *MsgServerTestSuite) carolLimitSells(selling string, tick int, amountIn int) string {
-	return s.limitSells(s.carol, selling, tick, amountIn)
+func (s *MsgServerTestSuite) carolLimitSells(selling string, tick int, amountIn int, orderTypeOpt ...types.LimitOrderType) string {
+	return s.limitSellsSuccess(s.carol, selling, tick, amountIn, orderTypeOpt...)
 }
 
-func (s *MsgServerTestSuite) danLimitSells(selling string, tick int, amountIn int) string {
-	return s.limitSells(s.dan, selling, tick, amountIn)
+func (s *MsgServerTestSuite) danLimitSells(selling string, tick int, amountIn int, orderTypeOpt ...types.LimitOrderType) string {
+	return s.limitSellsSuccess(s.dan, selling, tick, amountIn, orderTypeOpt...)
 }
 
-func (s *MsgServerTestSuite) limitSells(account sdk.AccAddress, tokenIn string, tick int, amountIn int) string {
+func (s *MsgServerTestSuite) limitSellsSuccess(account sdk.AccAddress, tokenIn string, tick int, amountIn int, orderTypeOpt ...types.LimitOrderType) string {
+	trancheKey, err := s.limitSells(account, tokenIn, tick, amountIn, orderTypeOpt...)
+	s.Assert().Nil(err)
+	return trancheKey
+}
+
+func (s *MsgServerTestSuite) assertAliceLimitSellFails(err error, selling string, tick int, amountIn int, orderTypeOpt ...types.LimitOrderType) {
+	s.assertLimitSellFails(s.alice, err, selling, tick, amountIn, orderTypeOpt...)
+}
+
+func (s *MsgServerTestSuite) assertBobLimitSellFails(err error, selling string, tick int, amountIn int, orderTypeOpt ...types.LimitOrderType) {
+	s.assertLimitSellFails(s.bob, err, selling, tick, amountIn, orderTypeOpt...)
+}
+
+func (s *MsgServerTestSuite) assertCarolLimitSellFails(err error, selling string, tick int, amountIn int, orderTypeOpt ...types.LimitOrderType) {
+	s.assertLimitSellFails(s.carol, err, selling, tick, amountIn, orderTypeOpt...)
+}
+
+func (s *MsgServerTestSuite) assertDanLimitSellFails(err error, selling string, tick int, amountIn int, orderTypeOpt ...types.LimitOrderType) {
+	s.assertLimitSellFails(s.dan, err, selling, tick, amountIn)
+}
+
+func (s *MsgServerTestSuite) assertLimitSellFails(account sdk.AccAddress, expectedErr error, tokenIn string, tick int, amountIn int, orderTypeOpt ...types.LimitOrderType) {
+	_, err := s.limitSells(account, tokenIn, tick, amountIn, orderTypeOpt...)
+	s.Assert().ErrorIs(err, expectedErr)
+}
+
+func (s *MsgServerTestSuite) limitSells(account sdk.AccAddress, tokenIn string, tick int, amountIn int, orderTypeOpt ...types.LimitOrderType) (string, error) {
+	var orderType types.LimitOrderType
+	if len(orderTypeOpt) == 0 {
+		orderType = types.LimitOrderType_GOOD_TIL_CANCELLED
+	} else {
+		orderType = orderTypeOpt[0]
+	}
+
 	msg, err := s.msgServer.PlaceLimitOrder(s.goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   account.String(),
 		Receiver:  account.String(),
@@ -220,39 +254,10 @@ func (s *MsgServerTestSuite) limitSells(account sdk.AccAddress, tokenIn string, 
 		TickIndex: int64(tick),
 		TokenIn:   tokenIn,
 		AmountIn:  sdk.NewInt(int64(amountIn)),
-		OrderType: types.LimitOrderType_GOOD_TIL_CANCELLED,
+		OrderType: orderType,
 	})
-	s.Assert().Nil(err)
-	return msg.TrancheKey
-}
 
-func (s *MsgServerTestSuite) assertAliceLimitSellFails(err error, selling string, tick int, amountIn int) {
-	s.assertLimitSellFails(s.alice, err, selling, tick, amountIn)
-}
-
-func (s *MsgServerTestSuite) assertBobLimitSellFails(err error, selling string, tick int, amountIn int) {
-	s.assertLimitSellFails(s.bob, err, selling, tick, amountIn)
-}
-
-func (s *MsgServerTestSuite) assertCarolLimitSellFails(err error, selling string, tick int, amountIn int) {
-	s.assertLimitSellFails(s.carol, err, selling, tick, amountIn)
-}
-
-func (s *MsgServerTestSuite) assertDanLimitSellFails(err error, selling string, tick int, amountIn int) {
-	s.assertLimitSellFails(s.dan, err, selling, tick, amountIn)
-}
-
-func (s *MsgServerTestSuite) assertLimitSellFails(account sdk.AccAddress, expectedErr error, tokenIn string, tick int, amountIn int) {
-	_, err := s.msgServer.PlaceLimitOrder(s.goCtx, &types.MsgPlaceLimitOrder{
-		Creator:   account.String(),
-		Receiver:  account.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: int64(tick),
-		TokenIn:   tokenIn,
-		AmountIn:  sdk.NewInt(int64(amountIn)),
-	})
-	s.Assert().ErrorIs(err, expectedErr)
+	return msg.TrancheKey, err
 }
 
 // / Deposit

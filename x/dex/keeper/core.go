@@ -239,7 +239,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 	receiverAddr sdk.AccAddress,
 	amountIn sdk.Int,
 	minOut sdk.Int,
-	limitTick *int64,
+	limitPrice *sdk.Dec,
 ) (sdk.Int, sdk.Int, sdk.Int, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	cacheCtx, writeCache := ctx.CacheContext()
@@ -264,9 +264,10 @@ func (k Keeper) SwapCore(goCtx context.Context,
 			break
 		}
 
-		// break as soon as we iterated past tickLimit
-		if limitTick != nil && liqIter.PastLimitTick(*limitTick) {
+		// break as soon as we iterated past limitPrice
+		if limitPrice != nil && liq.Price().ToDec().LT(*limitPrice) {
 			break
+
 		}
 
 		// price only gets worse as we iterate, so we can greedily abort
@@ -347,23 +348,25 @@ func (k Keeper) PlaceLimitOrderCore(
 
 	// For everything except just-in-time (JIT) orders try to execute as a swap first
 
+	var totalIn sdk.Int
 	if !orderType.IsJIT() {
-		var amountOutSwap sdk.Int
-		_, amountOutSwap, amountLeft, err = k.SwapCore(
+		var amountInSwap, amountOutSwap sdk.Int
+		limitPrice := placeTranche.PriceMakerToTaker().ToDec()
+		amountInSwap, amountOutSwap, amountLeft, err = k.SwapCore(
 			goCtx,
 			tokenIn,
 			tokenOut,
 			callerAddr,
 			receiverAddr,
 			amountIn,
-			// TODO: verify that this is maximally efficient vs precomputing minOut
+			// TODO: JCP verify that this is maximally efficient vs precomputing minOut
 			sdk.ZeroInt(),
-			&tickIndex,
+			&limitPrice,
 		)
 		if err != nil {
 			return "", err
 		}
-
+		totalIn = amountInSwap
 		trancheUser.ReservesFromSwap = amountOutSwap
 	}
 
@@ -371,20 +374,27 @@ func (k Keeper) PlaceLimitOrderCore(
 		return "", types.ErrFOKLimitOrderNotFilled
 	}
 
-	// FOR GTC, IOC and JIT try to place a maker limitOrder with remaining Amount
-	if orderType.IsGTC() || orderType.IsIoC() || orderType.IsJIT() {
-		if k.IsBehindEnemyLines(ctx, placeTranche.PairId, placeTranche.TokenIn, placeTranche.TickIndex) {
-			return "", types.ErrPlaceLimitOrderBehindPairLiquidity
-		}
+	sharesIssued := sdk.ZeroInt()
+	// FOR GTC and JIT try to place a maker limitOrder with remaining Amount
+	if !amountLeft.IsZero() && (orderType.IsGTC() || orderType.IsJIT()) {
+		// TODO: JCP confirm that we never need this check. If GTC they should have already traded through cheaper liq so it doesn't matter
+		// if JIT we just kinda assume they know what they are doing and we won't stop them.
+		// if we do want this we can save a calculation by doing this first and skipping swap step in not BEL
+
+		// if k.IsBehindEnemyLines(ctx, placeTranche.PairId, placeTranche.TokenIn, placeTranche.TickIndex) {
+		// 	return "", types.ErrPlaceLimitOrderBehindPairLiquidity
+		// }
 		placeTranche.PlaceMakerLimitOrder(ctx, amountLeft)
 		trancheUser.SharesOwned = trancheUser.SharesOwned.Add(amountLeft)
+		k.SaveTranche(ctx, placeTranche)
+		totalIn = totalIn.Add(amountLeft)
+		sharesIssued = amountLeft
 	}
 
 	k.SaveTrancheUser(ctx, trancheUser)
-	k.SaveTranche(ctx, placeTranche)
 
 	// TODO: is it possible for totalIn != amountIn
-	coin0 := sdk.NewCoin(tokenIn, amountIn)
+	coin0 := sdk.NewCoin(tokenIn, totalIn)
 	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0})
 	if err != nil {
 		return "", err
@@ -395,8 +405,8 @@ func (k Keeper) PlaceLimitOrderCore(
 		token0,
 		token1,
 		tokenIn,
-		amountIn.String(),
-		amountIn.String(),
+		totalIn.String(),
+		sharesIssued.String(),
 		trancheKey,
 	))
 
@@ -427,10 +437,13 @@ func (k Keeper) CancelLimitOrderCore(
 
 	amountToCancel := tranche.Cancel(trancheUser)
 	trancheUser.SharesCancelled = trancheUser.SharesCancelled.Add(amountToCancel)
+	userReserves := trancheUser.WithdrawSwapReserves()
 
-	if amountToCancel.GT(sdk.ZeroInt()) {
+	amountOut := amountToCancel.Add(userReserves)
+	if amountOut.GT(sdk.ZeroInt()) {
+
 		// See top NOTE on rounding
-		coinOut := sdk.NewCoin(keyToken, amountToCancel)
+		coinOut := sdk.NewCoin(keyToken, amountOut)
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
@@ -475,23 +488,32 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		trancheKey,
 		callerAddr.String(),
 	)
-	tranche, wasFilled, foundTranche := k.FindLimitOrderTranche(ctx, pairId, tickIndex, tokenIn, trancheKey)
-
-	if !foundTrancheUser || !foundTranche {
+	if !foundTrancheUser {
 		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheNotFound, "%s", trancheKey)
 	}
 
-	amountOutTokenIn, amountOutTokenOut := tranche.Withdraw(trancheUser)
+	tranche, wasFilled, foundTranche := k.FindLimitOrderTranche(ctx, pairId, tickIndex, tokenIn, trancheKey)
 
-	trancheUser.SharesWithdrawn = trancheUser.SharesWithdrawn.Add(amountOutTokenIn)
-	k.SaveTrancheUser(ctx, trancheUser)
+	amountOutTokenOut := sdk.ZeroDec()
 
-	// TODO: this is a bit of a messy pattern
-	if wasFilled {
-		k.SetFilledLimitOrderTranche(ctx, tranche)
-	} else {
-		k.SetLimitOrderTranche(ctx, tranche)
+	// It's possible that a TrancheUser exists but tranche does not if LO was filled entirely through a swap
+	if foundTranche {
+
+		var amountOutTokenIn sdk.Int
+		amountOutTokenIn, amountOutTokenOut = tranche.Withdraw(trancheUser)
+		trancheUser.SharesWithdrawn = trancheUser.SharesWithdrawn.Add(amountOutTokenIn)
+		// TODO: this is a bit of a messy pattern
+		if wasFilled {
+			k.SetFilledLimitOrderTranche(ctx, tranche)
+		} else {
+			k.SetLimitOrderTranche(ctx, tranche)
+		}
 	}
+
+	userReserves := trancheUser.WithdrawSwapReserves()
+	amountOutTokenOut = amountOutTokenOut.Add(userReserves.ToDec())
+
+	k.SaveTrancheUser(ctx, trancheUser)
 
 	if amountOutTokenOut.GT(sdk.ZeroDec()) {
 		coinOut := sdk.NewCoin(tokenOut, amountOutTokenOut.TruncateInt())
