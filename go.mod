@@ -8,7 +8,7 @@ require (
 	github.com/cosmos/ibc-go/v3 v3.4.0
 	github.com/cosmos/interchain-security v1.0.0-rc1
 	github.com/gogo/protobuf v1.3.3
-	github.com/golang/protobuf v1.5.2
+	github.com/golang/protobuf v1.5.3
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/ignite/cli v0.25.2
