@@ -28,6 +28,12 @@ message LimitOrderTrancheUser {
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "sharesCancelled"
-  ]; 
+  ];
+  string reservesFromSwap = 9 [
+                               (gogoproto.moretags)   = "yaml:\"reservesFromSwap\"",
+                               (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                               (gogoproto.nullable)   = false,
+                               (gogoproto.jsontag) = "reservesFromSwap"
+                               ]; 
 }
 

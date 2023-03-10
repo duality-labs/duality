@@ -173,3 +173,14 @@ func (k Keeper) InitPlaceTranche(sdkCtx sdk.Context, pairId *types.PairId, token
 	trancheKey := NewTrancheKey(sdkCtx)
 	return NewLimitOrderTranche(pairId, tokenIn, tickIndex, trancheKey)
 }
+
+func (k Keeper) GetOrInitPlaceTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64) (placeTranche types.LimitOrderTranche, err error) {
+	placeTranche, found := k.GetPlaceTranche(sdkCtx, pairId, tokenIn, tickIndex)
+	if !found {
+		placeTranche, err = k.InitPlaceTranche(sdkCtx, pairId, tokenIn, tickIndex)
+		if err != nil {
+			return types.LimitOrderTranche{}, err
+		}
+	}
+	return placeTranche, nil
+}

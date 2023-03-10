@@ -23,11 +23,12 @@ func createNLimitOrderTrancheUser(keeper *keeper.Keeper, ctx sdk.Context, tickIn
 		items[i].PairId = &types.PairId{Token0: "TokenA", Token1: "TokenB"}
 		items[i].Token = token
 		items[i].TickIndex = tickIndex
-
-		keeper.SetLimitOrderTrancheUser(ctx, items[i])
 		items[i].SharesOwned = sdk.ZeroInt()
 		items[i].SharesWithdrawn = sdk.ZeroInt()
 		items[i].SharesCancelled = sdk.ZeroInt()
+		items[i].ReservesFromSwap = sdk.ZeroInt()
+
+		keeper.SetLimitOrderTrancheUser(ctx, items[i])
 
 	}
 	return items

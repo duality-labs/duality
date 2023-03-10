@@ -100,3 +100,9 @@ func (t *LimitOrderTranche) Swap(maxAmountTaker sdk.Int) (
 	}
 	return inAmount, outAmount
 }
+
+func (placeTranche *LimitOrderTranche) PlaceMakerLimitOrder(ctx sdk.Context, amountIn sdk.Int) {
+	placeTranche.ReservesTokenIn = placeTranche.ReservesTokenIn.Add(amountIn)
+	placeTranche.TotalTokenIn = placeTranche.TotalTokenIn.Add(amountIn)
+
+}
