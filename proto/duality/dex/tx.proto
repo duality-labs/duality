@@ -1,11 +1,14 @@
 syntax = "proto3";
 package dualitylabs.duality.dex;
 
+import "duality/dex/good_till_record.proto";
+import "duality/dex/good_till_record.proto";
 // this line is used by starport scaffolding # proto/tx/import
 
 option go_package = "github.com/duality-labs/duality/x/dex/types";
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "google/protobuf/timestamp.proto";
 // Msg defines the Msg service.
 service Msg {
   rpc Deposit(MsgDeposit) returns (MsgDepositResponse);
@@ -106,10 +109,11 @@ message MsgSwapResponse {
 }
 
 enum limitOrderType{
-  GOOD_TIL_CANCELLED = 0;
+  GOOD_TILL_CANCELLED = 0;
   FILL_OR_KILL = 1;
   IMMEDIATE_OR_CANCEL = 2;
   JUST_IN_TIME = 3;
+  GOOD_TILl_DATE = 4;
 }
 
 message MsgPlaceLimitOrder {
@@ -126,6 +130,10 @@ message MsgPlaceLimitOrder {
       (gogoproto.jsontag) = "amountIn"
   ];
   limitOrderType orderType = 8;
+  google.protobuf.Timestamp GoodTill = 9 [
+                                             (gogoproto.stdtime) = true,
+                                             (gogoproto.nullable) = true
+                                             ];
 }
 
 message MsgPlaceLimitOrderResponse {

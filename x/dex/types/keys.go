@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/binary"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -357,4 +358,18 @@ const (
 	// NOTE: have to add letter so that LP deposits are indexed ahead of LimitOrders
 	LiquidityTypePoolReserves = "A_PoolDeposit"
 	LiquidityTypeLimitOrder   = "B_LODeposit"
+)
+
+var (
+	JITGoodTilTime = time.Time{}
+)
+
+const (
+	GoodTillRecordKey= "GoodTillRecord/value/"
+	GoodTillRecordCountKey= "GoodTillRecord/count/"
+)
+
+const (
+	GoodTillRecordKey= "GoodTillRecord/value/"
+	GoodTillRecordCountKey= "GoodTillRecord/count/"
 )

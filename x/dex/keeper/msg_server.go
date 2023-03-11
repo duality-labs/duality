@@ -132,6 +132,7 @@ func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLim
 		msg.AmountIn,
 		msg.TickIndex,
 		msg.OrderType,
+		msg.GoodTill,
 	)
 	if err != nil {
 		return &types.MsgPlaceLimitOrderResponse{}, err

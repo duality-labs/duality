@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -333,6 +334,7 @@ func (k Keeper) PlaceLimitOrderCore(
 	amountIn sdk.Int,
 	tickIndex int64,
 	orderType types.LimitOrderType,
+	goodTill *time.Time,
 ) (trancheKey string, err error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -341,7 +343,21 @@ func (k Keeper) PlaceLimitOrderCore(
 		return "", err
 	}
 	pairId := CreatePairId(token0, token1)
-	placeTranche, err := k.GetOrInitPlaceTranche(ctx, pairId, tokenIn, tickIndex)
+	var placeTranche types.LimitOrderTranche
+
+	// TODO: JCP maybe move this somewhere else to simplify logic here
+	switch orderType {
+	case types.LimitOrderType_JUST_IN_TIME:
+		placeTranche, err = k.InitPlaceTrancheWithGoodtill(ctx, pairId, tokenIn, tickIndex, types.JITGoodTilTime)
+	case types.LimitOrderType_GOOD_TILl_DATE:
+		placeTranche, err = k.InitPlaceTrancheWithGoodtill(ctx, pairId, tokenIn, tickIndex, *goodTill)
+	default:
+		placeTranche, err = k.GetOrInitPlaceTranche(ctx, pairId, tokenIn, tickIndex)
+	}
+	if err != nil {
+		return "", err
+	}
+
 	trancheKey = placeTranche.TrancheKey
 	trancheUser := k.GetOrInitLimitOrderTrancheUser(ctx, pairId, tickIndex, tokenIn, trancheKey, receiverAddr.String())
 	amountLeft := amountIn

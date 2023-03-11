@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"math"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/types"
@@ -32,6 +33,24 @@ func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tok
 			Reserves:  sdk.ZeroInt(),
 		}, nil
 	}
+
+}
+
+func NewLimitOrderTrancheWithGoodTill(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey string, goodTill time.Time) (types.LimitOrderTranche, error) {
+	if types.IsTickOutOfRange(tickIndex) {
+		return types.LimitOrderTranche{}, types.ErrTickOutsideRange
+	}
+	return types.LimitOrderTranche{
+		PairId:           pairId,
+		TokenIn:          tokenIn,
+		TickIndex:        tickIndex,
+		TrancheKey:       trancheKey,
+		ReservesTokenIn:  sdk.ZeroInt(),
+		ReservesTokenOut: sdk.ZeroInt(),
+		TotalTokenIn:     sdk.ZeroInt(),
+		TotalTokenOut:    sdk.ZeroInt(),
+		GoodTillDate:     &goodTill,
+	}, nil
 
 }
 

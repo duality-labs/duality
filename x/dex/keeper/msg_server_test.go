@@ -241,7 +241,7 @@ func (s *MsgServerTestSuite) assertLimitSellFails(account sdk.AccAddress, expect
 func (s *MsgServerTestSuite) limitSells(account sdk.AccAddress, tokenIn string, tick int, amountIn int, orderTypeOpt ...types.LimitOrderType) (string, error) {
 	var orderType types.LimitOrderType
 	if len(orderTypeOpt) == 0 {
-		orderType = types.LimitOrderType_GOOD_TIL_CANCELLED
+		orderType = types.LimitOrderType_GOOD_TILL_CANCELLED
 	} else {
 		orderType = orderTypeOpt[0]
 	}
