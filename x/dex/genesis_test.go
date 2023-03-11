@@ -87,6 +87,7 @@ func TestGenesis(t *testing.T) {
 				TrancheKey: "1",
 			},
 		},
+		// this line is used by starport scaffolding # genesis/test/state
 	}
 
 	k, ctx := keepertest.DexKeeper(t)
