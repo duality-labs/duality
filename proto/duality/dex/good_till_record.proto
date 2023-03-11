@@ -1,0 +1,18 @@
+syntax = "proto3";
+package dualitylabs.duality.dex;
+
+option go_package = "github.com/duality-labs/duality/x/dex/types";
+import "google/protobuf/timestamp.proto";
+
+import "gogoproto/gogo.proto";
+
+message GoodTillRecord {
+  // see limitOrderTranche.proto for details on goodTillDate
+  google.protobuf.Timestamp GoodTilllDate = 1 [
+                                               (gogoproto.stdtime) = true,
+                                               (gogoproto.nullable) = true
+                                               ];
+  string trancheRef = 2;
+
+}
+

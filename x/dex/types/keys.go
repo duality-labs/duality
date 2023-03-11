@@ -93,6 +93,9 @@ const (
 	LimitOrderTrancheKeyPrefix = "LimitOrderTranche/value"
 
 	FilledLimitOrderTrancheKeyPrefix = "FilledLimitOrderTranche/value/"
+
+	// GoodTillRecordKeyPrefix is the prefix to retrieve all GoodTillRecord
+	GoodTillRecordKeyPrefix = "GoodTillRecord/value/"
 )
 
 // LimitOrderTrancheUserKey returns the store key to retrieve a LimitOrderTrancheUser from the index fields
@@ -259,6 +262,23 @@ func TickLiquidityPrefix(pairId *PairId, tokenIn string) []byte {
 	return key
 }
 
+func GoodTillRecordKey(
+	goodTillDate string,
+	trancheRef string,
+) []byte {
+	var key []byte
+
+	goodTillDateBytes := []byte(goodTillDate)
+	key = append(key, goodTillDateBytes...)
+	key = append(key, []byte("/")...)
+
+	trancheRefBytes := []byte(trancheRef)
+	key = append(key, trancheRefBytes...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
 // Deposit Event Attributes
 const (
 	DepositEventKey          = "NewDeposit"
@@ -362,14 +382,4 @@ const (
 
 var (
 	JITGoodTilTime = time.Time{}
-)
-
-const (
-	GoodTillRecordKey= "GoodTillRecord/value/"
-	GoodTillRecordCountKey= "GoodTillRecord/count/"
-)
-
-const (
-	GoodTillRecordKey= "GoodTillRecord/value/"
-	GoodTillRecordCountKey= "GoodTillRecord/count/"
 )
