@@ -65,8 +65,9 @@ func (t LimitOrderTranche) HasLiquidity() bool {
 }
 
 func (t *LimitOrderTranche) RemoveTokenIn(trancheUser LimitOrderTrancheUser) (amountToRemove sdk.Int) {
-	amountUnfilled := t.AmountUnfilled()
-	amountToRemove = amountUnfilled.MulInt(trancheUser.SharesOwned).QuoInt(t.TotalTokenIn).TruncateInt()
+	// TODO: JCP double check this math and make its its right
+	outstandingShares := trancheUser.SharesOwned.Sub(trancheUser.SharesCancelled).Sub(trancheUser.SharesWithdrawn)
+	amountToRemove = t.ReservesTokenIn.Mul(outstandingShares).ToDec().QuoInt(t.TotalTokenIn).TruncateInt()
 	t.ReservesTokenIn = t.ReservesTokenIn.Sub(amountToRemove)
 
 	return amountToRemove
@@ -77,7 +78,6 @@ func (t *LimitOrderTranche) Withdraw(trancheUser LimitOrderTrancheUser) (sdk.Int
 
 	ratioFilled := t.RatioFilled()
 	maxAllowedToWithdraw := ratioFilled.MulInt(trancheUser.SharesOwned).TruncateInt()
-
 	amountOutTokenIn := maxAllowedToWithdraw.Sub(trancheUser.SharesWithdrawn)
 	amountOutTokenOut := t.PriceMakerToTaker().MulInt(amountOutTokenIn)
 	t.ReservesTokenOut = reservesTokenOutDec.Sub(amountOutTokenOut).TruncateInt()

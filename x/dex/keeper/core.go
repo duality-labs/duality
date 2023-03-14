@@ -515,11 +515,9 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	remainingTokenIn := sdk.ZeroInt()
 	// It's possible that a TrancheUser exists but tranche does not if LO was filled entirely through a swap
 	if foundTranche {
-
 		var amountOutTokenIn sdk.Int
 		amountOutTokenIn, amountOutTokenOut = tranche.Withdraw(trancheUser)
 
-		trancheUser.SharesWithdrawn = trancheUser.SharesWithdrawn.Add(amountOutTokenIn)
 		// TODO: this is a bit of a messy pattern
 
 		if wasFilled {
@@ -530,6 +528,8 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		} else {
 			k.SetLimitOrderTranche(ctx, tranche)
 		}
+
+		trancheUser.SharesWithdrawn = trancheUser.SharesWithdrawn.Add(amountOutTokenIn)
 	}
 
 	userReserves := trancheUser.WithdrawSwapReserves()
