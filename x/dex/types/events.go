@@ -1,6 +1,8 @@
 package types
 
 import (
+	"strconv"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -180,6 +182,17 @@ func WithdrawFilledLimitOrderEvent(creator string, token0 string, token1 string,
 		key,
 		amountOut,
 	)
+}
+
+func GoodTillPurgeHitLimitEvent(gas sdk.Gas, otherAttrs ...sdk.Attribute) sdk.Event {
+	attrs := []sdk.Attribute{
+		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
+		sdk.NewAttribute(sdk.AttributeKeyAction, GoodTillPurgeHitGasLimitEventKey),
+		sdk.NewAttribute(GoodTillPurgeHitGasLimitEventGas, strconv.FormatUint(gas, 10)),
+	}
+	attrs = append(attrs, otherAttrs...)
+	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
+
 }
 
 func cancelLimitOrderEvent(creator string, token0 string, token1 string, tokenKey string, key string, amountOut string, otherAttrs ...sdk.Attribute) sdk.Event {

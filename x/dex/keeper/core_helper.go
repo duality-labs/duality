@@ -64,7 +64,7 @@ func NewGoodTillRecord(pairId *types.PairId, tokenIn string, tickIndex int64, tr
 	)
 	return types.GoodTillRecord{
 		TrancheRef:   trancheRef,
-		GoodTillDate: &goodTill,
+		GoodTillDate: goodTill,
 	}
 }
 

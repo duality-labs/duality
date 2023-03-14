@@ -64,12 +64,12 @@ func (t LimitOrderTranche) HasLiquidity() bool {
 	return t.ReservesTokenIn.GT(sdk.ZeroInt())
 }
 
-func (t *LimitOrderTranche) Cancel(trancheUser LimitOrderTrancheUser) (amountToCancel sdk.Int) {
+func (t *LimitOrderTranche) RemoveTokenIn(trancheUser LimitOrderTrancheUser) (amountToRemove sdk.Int) {
 	amountUnfilled := t.AmountUnfilled()
-	amountToCancel = amountUnfilled.MulInt(trancheUser.SharesOwned).QuoInt(t.TotalTokenIn).TruncateInt()
-	t.ReservesTokenIn = t.ReservesTokenIn.Sub(amountToCancel)
+	amountToRemove = amountUnfilled.MulInt(trancheUser.SharesOwned).QuoInt(t.TotalTokenIn).TruncateInt()
+	t.ReservesTokenIn = t.ReservesTokenIn.Sub(amountToRemove)
 
-	return amountToCancel
+	return amountToRemove
 }
 
 func (t *LimitOrderTranche) Withdraw(trancheUser LimitOrderTrancheUser) (sdk.Int, sdk.Dec) {

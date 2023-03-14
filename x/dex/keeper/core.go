@@ -390,8 +390,8 @@ func (k Keeper) PlaceLimitOrderCore(
 	}
 
 	sharesIssued := sdk.ZeroInt()
-	// FOR GTC and JIT try to place a maker limitOrder with remaining Amount
-	if !amountLeft.IsZero() && (orderType.IsGTC() || orderType.IsJIT()) {
+	// FOR GTC, JIT & GoodTill try to place a maker limitOrder with remaining Amount
+	if !amountLeft.IsZero() && (orderType.IsGTC() || orderType.IsJIT() || orderType.IsGoodTill()) {
 		// TODO: JCP confirm that we never need this check. If GTC they should have already traded through cheaper liq so it doesn't matter
 		// if JIT we just kinda assume they know what they are doing and we won't stop them.
 		// if we do want this we can save a calculation by doing this first and skipping swap step in not BEL
@@ -454,7 +454,7 @@ func (k Keeper) CancelLimitOrderCore(
 		return types.ErrActiveLimitOrderNotFound
 	}
 
-	amountToCancel := tranche.Cancel(trancheUser)
+	amountToCancel := tranche.RemoveTokenIn(trancheUser)
 	trancheUser.SharesCancelled = trancheUser.SharesCancelled.Add(amountToCancel)
 	userReserves := trancheUser.WithdrawSwapReserves()
 
@@ -514,15 +514,20 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	tranche, wasFilled, foundTranche := k.FindLimitOrderTranche(ctx, pairId, tickIndex, tokenIn, trancheKey)
 
 	amountOutTokenOut := sdk.ZeroDec()
-
+	remainingTokenIn := sdk.ZeroInt()
 	// It's possible that a TrancheUser exists but tranche does not if LO was filled entirely through a swap
 	if foundTranche {
 
 		var amountOutTokenIn sdk.Int
 		amountOutTokenIn, amountOutTokenOut = tranche.Withdraw(trancheUser)
+
 		trancheUser.SharesWithdrawn = trancheUser.SharesWithdrawn.Add(amountOutTokenIn)
 		// TODO: this is a bit of a messy pattern
+
 		if wasFilled {
+			//This is only relevant for JIT and GoodTill limit orders where the arhived
+			remainingTokenIn = tranche.RemoveTokenIn(trancheUser)
+			// TODO: switch to k.SaveFilledLimitOrderTranche and delete empty tranches
 			k.SetFilledLimitOrderTranche(ctx, tranche)
 		} else {
 			k.SetLimitOrderTranche(ctx, tranche)
@@ -534,9 +539,13 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 
 	k.SaveTrancheUser(ctx, trancheUser)
 
-	if amountOutTokenOut.GT(sdk.ZeroDec()) {
+	if !amountOutTokenOut.IsZero() || !remainingTokenIn.IsZero() {
 		coinOut := sdk.NewCoin(tokenOut, amountOutTokenOut.TruncateInt())
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
+			return err
+		}
+		coinInRefund := sdk.NewCoin(tokenIn, remainingTokenIn)
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinInRefund}); err != nil {
 			return err
 		}
 	} else {

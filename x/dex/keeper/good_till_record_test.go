@@ -3,12 +3,13 @@ package keeper_test
 import (
 	"strconv"
 	"testing"
+	"time"
 
-	"github.com/duality-labs/duality/x/dex/keeper"
-	"github.com/duality-labs/duality/x/dex/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	keepertest "github.com/duality-labs/duality/testutil/keeper"
 	"github.com/duality-labs/duality/testutil/nullify"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/dex/keeper"
+	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,9 +19,9 @@ var _ = strconv.IntSize
 func createNGoodTillRecord(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.GoodTillRecord {
 	items := make([]types.GoodTillRecord, n)
 	for i := range items {
-		items[i].GoodTillDate = strconv.Itoa(i)
-        items[i].TrancheRef = strconv.Itoa(i)
-        
+		items[i].GoodTillDate = time.Unix(int64(i), 0)
+		items[i].TrancheRef = []byte(strconv.Itoa(i))
+
 		keeper.SetGoodTillRecord(ctx, items[i])
 	}
 	return items
@@ -31,9 +32,8 @@ func TestGoodTillRecordGet(t *testing.T) {
 	items := createNGoodTillRecord(keeper, ctx, 10)
 	for _, item := range items {
 		rst, found := keeper.GetGoodTillRecord(ctx,
-		    item.GoodTillDate,
-            item.TrancheRef,
-            
+			item.GoodTillDate,
+			item.TrancheRef,
 		)
 		require.True(t, found)
 		require.Equal(t,
@@ -47,14 +47,12 @@ func TestGoodTillRecordRemove(t *testing.T) {
 	items := createNGoodTillRecord(keeper, ctx, 10)
 	for _, item := range items {
 		keeper.RemoveGoodTillRecord(ctx,
-		    item.GoodTillDate,
-            item.TrancheRef,
-            
+			item.GoodTillDate,
+			item.TrancheRef,
 		)
 		_, found := keeper.GetGoodTillRecord(ctx,
-		    item.GoodTillDate,
-            item.TrancheRef,
-            
+			item.GoodTillDate,
+			item.TrancheRef,
 		)
 		require.False(t, found)
 	}

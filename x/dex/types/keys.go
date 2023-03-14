@@ -366,6 +366,11 @@ const (
 )
 
 const (
+	GoodTillPurgeHitGasLimitEventKey = "GoodTillPurgeHitGasLimit"
+	GoodTillPurgeHitGasLimitEventGas = "Gas"
+)
+
+const (
 	CancelLimitOrderEventKey           = "NewWithdraw"
 	CancelLimitOrderEventCreator       = "Creator"
 	CancelLimitOrderEventToken0        = "Token0"
@@ -388,4 +393,9 @@ const (
 
 var (
 	JITGoodTillTime = time.Time{}
+)
+
+const (
+	// TODO: jcp figure out a good number here
+	GoodTillPurgeGasBuffer = 1000
 )

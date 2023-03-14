@@ -100,6 +100,23 @@ func (k Keeper) GetLimitOrderTranche(
 	return tick.GetLimitOrderTranche(), true
 }
 
+func (k Keeper) GetLimitOrderTrancheByKey(
+	ctx sdk.Context,
+	key []byte,
+
+) (tranche *types.LimitOrderTranche, found bool) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickLiquidityKeyPrefix))
+	b := store.Get(key)
+
+	if b == nil {
+		return nil, false
+	}
+
+	var tick types.TickLiquidity
+	k.cdc.MustUnmarshal(b, &tick)
+	return tick.GetLimitOrderTranche(), true
+}
+
 func (k Keeper) RemoveLimitOrderTranche(ctx sdk.Context, tranche types.LimitOrderTranche) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickLiquidityKeyPrefix))
 	store.Delete(types.TickLiquidityKey(
