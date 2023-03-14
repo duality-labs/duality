@@ -5,6 +5,7 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/dex/utils"
 )
 
 const (
@@ -200,9 +201,9 @@ func LiquidityIndexBytes(liquidityIndex interface{}) []byte {
 }
 
 func TimeBytes(timestamp time.Time) []byte {
-	timeBytes := make([]byte, 8)
-	binary.BigEndian.PutUint64(timeBytes, uint64(timestamp.UTC().Second()))
-	return liquidityIndexBytes
+	unixMs := uint64(timestamp.UnixMilli())
+	str := utils.Uint64ToSortableString(unixMs)
+	return []byte(str)
 }
 func TickLiquidityKey(
 	pairId *PairId,
@@ -274,7 +275,7 @@ func GoodTillRecordKey(
 ) []byte {
 	var key []byte
 
-	goodTillDateBytes := []byte(goodTillDate)
+	goodTillDateBytes := TimeBytes(goodTillDate)
 	key = append(key, goodTillDateBytes...)
 	key = append(key, []byte("/")...)
 
