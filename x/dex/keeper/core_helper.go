@@ -54,6 +54,20 @@ func NewLimitOrderTrancheWithGoodTill(pairId *types.PairId, tokenIn string, tick
 
 }
 
+func NewGoodTillRecord(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey string, goodTill time.Time) types.GoodTillRecord {
+	trancheRef := types.TickLiquidityKey(
+		pairId,
+		tokenIn,
+		tickIndex,
+		types.LiquidityTypeLimitOrder,
+		trancheKey,
+	)
+	return types.GoodTillRecord{
+		TrancheRef:   trancheRef,
+		GoodTillDate: &goodTill,
+	}
+}
+
 func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey string) (types.LimitOrderTranche, error) {
 	if types.IsTickOutOfRange(tickIndex) {
 		return types.LimitOrderTranche{}, types.ErrTickOutsideRange

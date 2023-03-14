@@ -179,7 +179,8 @@ func (k Keeper) InitPlaceTrancheWithGoodtill(sdkCtx sdk.Context, pairId *types.P
 	// TODO: right now we are not indexing by goodTil date so we can't easily check if there's already a tranche with the same goodTil date so instead we create a new tranche for each goodTil order
 	// if there is a large number of limitOrders with the same goodTilTime (most likely JIT) aggregating might be more efficient particularly for deletion, but if they are relatively sparse it will incur fewer lookups to just create a new limitOrderTranche
 	trancheKey := NewTrancheKey(sdkCtx)
-	return NewLimitOrderTrancheWithGoodTill(pairId, tokenIn, tickIndex, trancheKey, goodTill)
+	tranche, err := NewLimitOrderTrancheWithGoodTill(pairId, tokenIn, tickIndex, trancheKey, goodTill)
+	return tranche, err
 }
 
 func (k Keeper) GetOrInitPlaceTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64) (placeTranche types.LimitOrderTranche, err error) {

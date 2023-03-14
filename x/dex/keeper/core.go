@@ -344,11 +344,10 @@ func (k Keeper) PlaceLimitOrderCore(
 	}
 	pairId := CreatePairId(token0, token1)
 	var placeTranche types.LimitOrderTranche
-
 	// TODO: JCP maybe move this somewhere else to simplify logic here
 	switch orderType {
 	case types.LimitOrderType_JUST_IN_TIME:
-		placeTranche, err = k.InitPlaceTrancheWithGoodtill(ctx, pairId, tokenIn, tickIndex, types.JITGoodTilTime)
+		placeTranche, err = k.InitPlaceTrancheWithGoodtill(ctx, pairId, tokenIn, tickIndex, types.JITGoodTillTime)
 	case types.LimitOrderType_GOOD_TILl_DATE:
 		placeTranche, err = k.InitPlaceTrancheWithGoodtill(ctx, pairId, tokenIn, tickIndex, *goodTill)
 	default:
@@ -402,6 +401,11 @@ func (k Keeper) PlaceLimitOrderCore(
 		// }
 		placeTranche.PlaceMakerLimitOrder(ctx, amountLeft)
 		trancheUser.SharesOwned = trancheUser.SharesOwned.Add(amountLeft)
+
+		if orderType.IsJIT() || orderType.IsGoodTill() {
+			goodTillRecord := NewGoodTillRecord(pairId, tokenIn, tickIndex, trancheKey, *goodTill)
+			k.SetGoodTillRecord(ctx, goodTillRecord)
+		}
 		k.SaveTranche(ctx, placeTranche)
 		totalIn = totalIn.Add(amountLeft)
 		sharesIssued = amountLeft
@@ -409,7 +413,6 @@ func (k Keeper) PlaceLimitOrderCore(
 
 	k.SaveTrancheUser(ctx, trancheUser)
 
-	// TODO: is it possible for totalIn != amountIn
 	coin0 := sdk.NewCoin(tokenIn, totalIn)
 	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0})
 	if err != nil {

@@ -15,3 +15,7 @@ func (l LimitOrderType) IsIoC() bool {
 func (l LimitOrderType) IsJIT() bool {
 	return l == LimitOrderType_JUST_IN_TIME
 }
+
+func (l LimitOrderType) IsGoodTill() bool {
+	return l == LimitOrderType_GOOD_TILl_DATE
+}

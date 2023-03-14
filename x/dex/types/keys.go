@@ -198,6 +198,12 @@ func LiquidityIndexBytes(liquidityIndex interface{}) []byte {
 
 	}
 }
+
+func TimeBytes(timestamp time.Time) []byte {
+	timeBytes := make([]byte, 8)
+	binary.BigEndian.PutUint64(timeBytes, uint64(timestamp.UTC().Second()))
+	return liquidityIndexBytes
+}
 func TickLiquidityKey(
 	pairId *PairId,
 	tokenIn string,
@@ -263,8 +269,8 @@ func TickLiquidityPrefix(pairId *PairId, tokenIn string) []byte {
 }
 
 func GoodTillRecordKey(
-	goodTillDate string,
-	trancheRef string,
+	goodTillDate time.Time,
+	trancheRef []byte,
 ) []byte {
 	var key []byte
 
@@ -272,8 +278,7 @@ func GoodTillRecordKey(
 	key = append(key, goodTillDateBytes...)
 	key = append(key, []byte("/")...)
 
-	trancheRefBytes := []byte(trancheRef)
-	key = append(key, trancheRefBytes...)
+	key = append(key, trancheRef...)
 	key = append(key, []byte("/")...)
 
 	return key
@@ -381,5 +386,5 @@ const (
 )
 
 var (
-	JITGoodTilTime = time.Time{}
+	JITGoodTillTime = time.Time{}
 )

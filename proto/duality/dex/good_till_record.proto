@@ -8,11 +8,11 @@ import "gogoproto/gogo.proto";
 
 message GoodTillRecord {
   // see limitOrderTranche.proto for details on goodTillDate
-  google.protobuf.Timestamp GoodTilllDate = 1 [
+  google.protobuf.Timestamp GoodTillDate = 1 [
                                                (gogoproto.stdtime) = true,
-                                               (gogoproto.nullable) = true
+                                               (gogoproto.nullable) = false
                                                ];
-  string trancheRef = 2;
+  bytes trancheRef = 2;
 
 }
 

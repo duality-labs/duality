@@ -1,6 +1,8 @@
 package types
 
 import (
+	"time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -10,6 +12,13 @@ func (t LimitOrderTranche) IsPlaceTranche() bool {
 
 func (t LimitOrderTranche) IsFilled() bool {
 	return t.ReservesTokenIn.IsZero()
+}
+
+func (t LimitOrderTranche) IsJIT() bool {
+	return t.GoodTillDate != nil && t.GoodTillDate == &JITGoodTillTime
+}
+func (t LimitOrderTranche) PastGoodTill(timestamp time.Time) bool {
+	return t.GoodTillDate != nil && !t.IsJIT() && t.GoodTillDate.Before(timestamp)
 }
 
 func (t *LimitOrderTranche) Price() *Price {

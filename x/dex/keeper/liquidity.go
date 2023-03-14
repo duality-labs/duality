@@ -28,12 +28,11 @@ func NewLiquidityIterator(
 }
 
 type LiquidityIterator struct {
-	keeper      Keeper
-	pairId      *types.PairId
-	ctx         sdk.Context
-	iter        TickIterator
-	is0To1      bool
-	currentTick int64
+	keeper Keeper
+	pairId *types.PairId
+	ctx    sdk.Context
+	iter   TickIterator
+	is0To1 bool
 }
 
 func (s *LiquidityIterator) Next() Liquidity {
@@ -52,7 +51,6 @@ func (s *LiquidityIterator) Next() Liquidity {
 			var err error
 			var pool Liquidity
 			poolReserves := *liquidity.PoolReserves
-			s.currentTick = poolReserves.TickIndex
 			if s.is0To1 {
 				//Pool Reserves is upperTick
 				pool, err = s.createPool0To1(poolReserves)
@@ -69,8 +67,13 @@ func (s *LiquidityIterator) Next() Liquidity {
 			return pool
 
 		case *types.TickLiquidity_LimitOrderTranche:
-			s.currentTick = liquidity.LimitOrderTranche.TickIndex
-			return liquidity.LimitOrderTranche
+			tranche := liquidity.LimitOrderTranche
+			// If we hit a tranche with an expired goodTill date keep iterating
+			if tranche.PastGoodTill(s.ctx.BlockTime()) {
+				continue
+			} else {
+				return tranche
+			}
 
 		default:
 			panic("Tick does not have liquidity")
@@ -126,15 +129,6 @@ func (k Keeper) SaveLiquidity(sdkCtx sdk.Context, liquidityI Liquidity) {
 		k.SavePool(sdkCtx, *liquidity.pool)
 	default:
 		panic("Invalid liquidity type")
-	}
-
-}
-
-func (s LiquidityIterator) PastLimitTick(limitTick int64) bool {
-	if s.is0To1 {
-		return s.currentTick > limitTick
-	} else {
-		return s.currentTick < limitTick
 	}
 
 }
