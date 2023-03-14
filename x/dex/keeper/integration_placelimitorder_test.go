@@ -528,13 +528,13 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPPartialFill() {
 	s.bobDeposits(NewDeposit(0, 5, -1, 0))
 	//WHEN alice submits IoC limitOrder for 10 tokenA
 	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
-	s.assertAliceBalances(0, 0)
-	// THEN alice's LimitOrder trades 5 TokenA
+	s.assertAliceBalances(5, 0)
+	// THEN alice's LimitOrder swap 5 TokenA
 
 	// No maker LO is placed
 	s.assertFillAndPlaceTrancheKeys("TokenA", 1, "", "")
 	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
-	s.assertDexBalances(5, 10)
+	s.assertDexBalances(5, 5)
 
 	// Alice can withdraw her partial fill immediately
 	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
