@@ -19,7 +19,7 @@ var _ = strconv.IntSize
 func createNGoodTillRecord(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.GoodTillRecord {
 	items := make([]types.GoodTillRecord, n)
 	for i := range items {
-		items[i].GoodTillDate = time.Unix(int64(i), 0)
+		items[i].GoodTillDate = time.Unix(int64(i), 10).UTC()
 		items[i].TrancheRef = []byte(strconv.Itoa(i))
 
 		keeper.SetGoodTillRecord(ctx, items[i])
