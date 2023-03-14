@@ -460,8 +460,6 @@ func (k Keeper) CancelLimitOrderCore(
 
 	amountOut := amountToCancel.Add(userReserves)
 	if amountOut.GT(sdk.ZeroInt()) {
-
-		// See top NOTE on rounding
 		coinOut := sdk.NewCoin(keyToken, amountOut)
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
 			return err
@@ -541,11 +539,10 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 
 	if !amountOutTokenOut.IsZero() || !remainingTokenIn.IsZero() {
 		coinOut := sdk.NewCoin(tokenOut, amountOutTokenOut.TruncateInt())
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
-			return err
-		}
 		coinInRefund := sdk.NewCoin(tokenIn, remainingTokenIn)
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinInRefund}); err != nil {
+		// TODO: NewCoins does a lot of unnecesary work to sanitize and validate coins, all we really is to remove zero coins
+		coins := sdk.NewCoins(coinOut, coinInRefund)
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, coins); err != nil {
 			return err
 		}
 	} else {
