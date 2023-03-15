@@ -30,7 +30,7 @@ jobs:
   binary-build:
     working_directory: ~/repo
     docker:
-      - image: ignitehq/cli:0.25.2
+      - image: ignitehq/cli:0.23.0
     steps:
       - checkout
       - run:
@@ -51,7 +51,7 @@ jobs:
   binary-release-build:
     working_directory: ~/repo
     docker:
-      - image: ignitehq/cli:0.25.2
+      - image: ignitehq/cli:0.23.0
     steps:
       - checkout
       - run:
