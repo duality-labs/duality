@@ -36,7 +36,7 @@ func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tok
 
 }
 
-func NewLimitOrderTrancheWithGoodTill(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey string, goodTill time.Time) (types.LimitOrderTranche, error) {
+func NewLimitOrderTrancheWithGoodTil(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey string, goodTil time.Time) (types.LimitOrderTranche, error) {
 	if types.IsTickOutOfRange(tickIndex) {
 		return types.LimitOrderTranche{}, types.ErrTickOutsideRange
 	}
@@ -49,12 +49,12 @@ func NewLimitOrderTrancheWithGoodTill(pairId *types.PairId, tokenIn string, tick
 		ReservesTokenOut: sdk.ZeroInt(),
 		TotalTokenIn:     sdk.ZeroInt(),
 		TotalTokenOut:    sdk.ZeroInt(),
-		GoodTillDate:     &goodTill,
+		GoodTilDate:     &goodTil,
 	}, nil
 
 }
 
-func NewGoodTillRecord(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey string, goodTill time.Time) types.GoodTillRecord {
+func NewGoodTilRecord(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey string, goodTil time.Time) types.GoodTilRecord {
 	trancheRef := types.TickLiquidityKey(
 		pairId,
 		tokenIn,
@@ -62,9 +62,9 @@ func NewGoodTillRecord(pairId *types.PairId, tokenIn string, tickIndex int64, tr
 		types.LiquidityTypeLimitOrder,
 		trancheKey,
 	)
-	return types.GoodTillRecord{
+	return types.GoodTilRecord{
 		TrancheRef:   trancheRef,
-		GoodTillDate: goodTill,
+		GoodTilDate: goodTil,
 	}
 }
 

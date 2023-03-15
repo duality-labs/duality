@@ -95,8 +95,8 @@ const (
 
 	FilledLimitOrderTrancheKeyPrefix = "FilledLimitOrderTranche/value/"
 
-	// GoodTillRecordKeyPrefix is the prefix to retrieve all GoodTillRecord
-	GoodTillRecordKeyPrefix = "GoodTillRecord/value/"
+	// GoodTilRecordKeyPrefix is the prefix to retrieve all GoodTilRecord
+	GoodTilRecordKeyPrefix = "GoodTilRecord/value/"
 )
 
 // LimitOrderTrancheUserKey returns the store key to retrieve a LimitOrderTrancheUser from the index fields
@@ -269,14 +269,14 @@ func TickLiquidityPrefix(pairId *PairId, tokenIn string) []byte {
 	return key
 }
 
-func GoodTillRecordKey(
-	goodTillDate time.Time,
+func GoodTilRecordKey(
+	goodTilDate time.Time,
 	trancheRef []byte,
 ) []byte {
 	var key []byte
 
-	goodTillDateBytes := TimeBytes(goodTillDate)
-	key = append(key, goodTillDateBytes...)
+	goodTilDateBytes := TimeBytes(goodTilDate)
+	key = append(key, goodTilDateBytes...)
 	key = append(key, []byte("/")...)
 
 	key = append(key, trancheRef...)
@@ -366,8 +366,8 @@ const (
 )
 
 const (
-	GoodTillPurgeHitGasLimitEventKey = "GoodTillPurgeHitGasLimit"
-	GoodTillPurgeHitGasLimitEventGas = "Gas"
+	GoodTilPurgeHitGasLimitEventKey = "GoodTilPurgeHitGasLimit"
+	GoodTilPurgeHitGasLimitEventGas = "Gas"
 )
 
 const (
@@ -392,10 +392,10 @@ const (
 )
 
 var (
-	JITGoodTillTime = time.Time{}
+	JITGoodTilTime = time.Time{}
 )
 
 const (
 	// TODO: jcp figure out a good number here
-	GoodTillPurgeGasBuffer = 1000
+	GoodTilPurgeGasBuffer = 1000
 )

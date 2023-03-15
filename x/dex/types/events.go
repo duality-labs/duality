@@ -184,11 +184,11 @@ func WithdrawFilledLimitOrderEvent(creator string, token0 string, token1 string,
 	)
 }
 
-func GoodTillPurgeHitLimitEvent(gas sdk.Gas, otherAttrs ...sdk.Attribute) sdk.Event {
+func GoodTilPurgeHitLimitEvent(gas sdk.Gas, otherAttrs ...sdk.Attribute) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
-		sdk.NewAttribute(sdk.AttributeKeyAction, GoodTillPurgeHitGasLimitEventKey),
-		sdk.NewAttribute(GoodTillPurgeHitGasLimitEventGas, strconv.FormatUint(gas, 10)),
+		sdk.NewAttribute(sdk.AttributeKeyAction, GoodTilPurgeHitGasLimitEventKey),
+		sdk.NewAttribute(GoodTilPurgeHitGasLimitEventGas, strconv.FormatUint(gas, 10)),
 	}
 	attrs = append(attrs, otherAttrs...)
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)

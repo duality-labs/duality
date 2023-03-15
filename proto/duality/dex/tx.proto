@@ -128,7 +128,7 @@ message MsgPlaceLimitOrder {
       (gogoproto.jsontag) = "amountIn"
   ];
   limitOrderType orderType = 8;
-  google.protobuf.Timestamp GoodTill = 9 [
+  google.protobuf.Timestamp GoodTil = 9 [
                                              (gogoproto.stdtime) = true,
                                              (gogoproto.nullable) = true
                                              ];

@@ -334,7 +334,7 @@ func (k Keeper) PlaceLimitOrderCore(
 	amountIn sdk.Int,
 	tickIndex int64,
 	orderType types.LimitOrderType,
-	goodTill *time.Time,
+	goodTil *time.Time,
 ) (trancheKey string, err error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -347,9 +347,9 @@ func (k Keeper) PlaceLimitOrderCore(
 	// TODO: JCP maybe move this somewhere else to simplify logic here
 	switch orderType {
 	case types.LimitOrderType_JUST_IN_TIME:
-		placeTranche, err = k.InitPlaceTrancheWithGoodtill(ctx, pairId, tokenIn, tickIndex, types.JITGoodTillTime)
+		placeTranche, err = k.InitPlaceTrancheWithGoodTil(ctx, pairId, tokenIn, tickIndex, types.JITGoodTilTime)
 	case types.LimitOrderType_GOOD_TILl_DATE:
-		placeTranche, err = k.InitPlaceTrancheWithGoodtill(ctx, pairId, tokenIn, tickIndex, *goodTill)
+		placeTranche, err = k.InitPlaceTrancheWithGoodTil(ctx, pairId, tokenIn, tickIndex, *goodTil)
 	default:
 		placeTranche, err = k.GetOrInitPlaceTranche(ctx, pairId, tokenIn, tickIndex)
 	}
@@ -390,8 +390,8 @@ func (k Keeper) PlaceLimitOrderCore(
 	}
 
 	sharesIssued := sdk.ZeroInt()
-	// FOR GTC, JIT & GoodTill try to place a maker limitOrder with remaining Amount
-	if !amountLeft.IsZero() && (orderType.IsGTC() || orderType.IsJIT() || orderType.IsGoodTill()) {
+	// FOR GTC, JIT & GoodTil try to place a maker limitOrder with remaining Amount
+	if !amountLeft.IsZero() && (orderType.IsGTC() || orderType.IsJIT() || orderType.IsGoodTil()) {
 		// TODO: JCP confirm that we never need this check. If GTC they should have already traded through cheaper liq so it doesn't matter
 		// if JIT we just kinda assume they know what they are doing and we won't stop them.
 		// if we do want this we can save a calculation by doing this first and skipping swap step in not BEL
@@ -402,9 +402,9 @@ func (k Keeper) PlaceLimitOrderCore(
 		placeTranche.PlaceMakerLimitOrder(ctx, amountLeft)
 		trancheUser.SharesOwned = trancheUser.SharesOwned.Add(amountLeft)
 
-		if orderType.IsJIT() || orderType.IsGoodTill() {
-			goodTillRecord := NewGoodTillRecord(pairId, tokenIn, tickIndex, trancheKey, *goodTill)
-			k.SetGoodTillRecord(ctx, goodTillRecord)
+		if orderType.IsJIT() || orderType.IsGoodTil() {
+			goodTilRecord := NewGoodTilRecord(pairId, tokenIn, tickIndex, trancheKey, *goodTil)
+			k.SetGoodTilRecord(ctx, goodTilRecord)
 		}
 		k.SaveTranche(ctx, placeTranche)
 		totalIn = totalIn.Add(amountLeft)
@@ -523,7 +523,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		// TODO: this is a bit of a messy pattern
 
 		if wasFilled {
-			//This is only relevant for JIT and GoodTill limit orders where the arhived
+			//This is only relevant for JIT and GoodTil limit orders where the arhived
 			remainingTokenIn = tranche.RemoveTokenIn(trancheUser)
 			// TODO: switch to k.SaveFilledLimitOrderTranche and delete empty tranches
 			k.SetFilledLimitOrderTranche(ctx, tranche)

@@ -16,23 +16,23 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNGoodTillRecord(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.GoodTillRecord {
-	items := make([]types.GoodTillRecord, n)
+func createNGoodTilRecord(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.GoodTilRecord {
+	items := make([]types.GoodTilRecord, n)
 	for i := range items {
-		items[i].GoodTillDate = time.Unix(int64(i), 10).UTC()
+		items[i].GoodTilDate = time.Unix(int64(i), 10).UTC()
 		items[i].TrancheRef = []byte(strconv.Itoa(i))
 
-		keeper.SetGoodTillRecord(ctx, items[i])
+		keeper.SetGoodTilRecord(ctx, items[i])
 	}
 	return items
 }
 
-func TestGoodTillRecordGet(t *testing.T) {
+func TestGoodTilRecordGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNGoodTillRecord(keeper, ctx, 10)
+	items := createNGoodTilRecord(keeper, ctx, 10)
 	for _, item := range items {
-		rst, found := keeper.GetGoodTillRecord(ctx,
-			item.GoodTillDate,
+		rst, found := keeper.GetGoodTilRecord(ctx,
+			item.GoodTilDate,
 			item.TrancheRef,
 		)
 		require.True(t, found)
@@ -42,27 +42,27 @@ func TestGoodTillRecordGet(t *testing.T) {
 		)
 	}
 }
-func TestGoodTillRecordRemove(t *testing.T) {
+func TestGoodTilRecordRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNGoodTillRecord(keeper, ctx, 10)
+	items := createNGoodTilRecord(keeper, ctx, 10)
 	for _, item := range items {
-		keeper.RemoveGoodTillRecord(ctx,
-			item.GoodTillDate,
+		keeper.RemoveGoodTilRecord(ctx,
+			item.GoodTilDate,
 			item.TrancheRef,
 		)
-		_, found := keeper.GetGoodTillRecord(ctx,
-			item.GoodTillDate,
+		_, found := keeper.GetGoodTilRecord(ctx,
+			item.GoodTilDate,
 			item.TrancheRef,
 		)
 		require.False(t, found)
 	}
 }
 
-func TestGoodTillRecordGetAll(t *testing.T) {
+func TestGoodTilRecordGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNGoodTillRecord(keeper, ctx, 10)
+	items := createNGoodTilRecord(keeper, ctx, 10)
 	require.ElementsMatch(t,
 		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllGoodTillRecord(ctx)),
+		nullify.Fill(keeper.GetAllGoodTilRecord(ctx)),
 	)
 }

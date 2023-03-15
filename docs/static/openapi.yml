@@ -12444,17 +12444,17 @@ paths:
                     totalTokenOut:
                       type: string
                       title: >-
-                        GoodTillDate is represented as seconds since  January 1,
+                        GoodTilDate is represented as seconds since  January 1,
                         year 1, 00:00:00.00 UTC
-                         LimitOrders with goodTillDate set are valid as long as blockTime <= goodTillDate
-                    GoodTillDate:
+                         LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
+                    GoodTilDate:
                       type: string
                       format: date-time
                       title: >-
-                        JIT orders also use goodTillDate to handle deletion but
+                        JIT orders also use goodTilDate to handle deletion but
                         represent a special case
 
-                        All JIT orders have a goodTillDate of 0 and an exception
+                        All JIT orders have a goodTilDate of 0 and an exception
                         is made to still still treat these orders as live
 
                         Order deletion still functions the same and the orders
@@ -12589,17 +12589,17 @@ paths:
                   totalTokenOut:
                     type: string
                     title: >-
-                      GoodTillDate is represented as seconds since  January 1,
+                      GoodTilDate is represented as seconds since  January 1,
                       year 1, 00:00:00.00 UTC
-                       LimitOrders with goodTillDate set are valid as long as blockTime <= goodTillDate
-                  GoodTillDate:
+                       LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
+                  GoodTilDate:
                     type: string
                     format: date-time
                     title: >-
-                      JIT orders also use goodTillDate to handle deletion but
+                      JIT orders also use goodTilDate to handle deletion but
                       represent a special case
 
-                      All JIT orders have a goodTillDate of 0 and an exception
+                      All JIT orders have a goodTilDate of 0 and an exception
                       is made to still still treat these orders as live
 
                       Order deletion still functions the same and the orders
@@ -12682,17 +12682,17 @@ paths:
                     totalTokenOut:
                       type: string
                       title: >-
-                        GoodTillDate is represented as seconds since  January 1,
+                        GoodTilDate is represented as seconds since  January 1,
                         year 1, 00:00:00.00 UTC
-                         LimitOrders with goodTillDate set are valid as long as blockTime <= goodTillDate
-                    GoodTillDate:
+                         LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
+                    GoodTilDate:
                       type: string
                       format: date-time
                       title: >-
-                        JIT orders also use goodTillDate to handle deletion but
+                        JIT orders also use goodTilDate to handle deletion but
                         represent a special case
 
-                        All JIT orders have a goodTillDate of 0 and an exception
+                        All JIT orders have a goodTilDate of 0 and an exception
                         is made to still still treat these orders as live
 
                         Order deletion still functions the same and the orders
@@ -12835,17 +12835,17 @@ paths:
                   totalTokenOut:
                     type: string
                     title: >-
-                      GoodTillDate is represented as seconds since  January 1,
+                      GoodTilDate is represented as seconds since  January 1,
                       year 1, 00:00:00.00 UTC
-                       LimitOrders with goodTillDate set are valid as long as blockTime <= goodTillDate
-                  GoodTillDate:
+                       LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
+                  GoodTilDate:
                     type: string
                     format: date-time
                     title: >-
-                      JIT orders also use goodTillDate to handle deletion but
+                      JIT orders also use goodTilDate to handle deletion but
                       represent a special case
 
-                      All JIT orders have a goodTillDate of 0 and an exception
+                      All JIT orders have a goodTilDate of 0 and an exception
                       is made to still still treat these orders as live
 
                       Order deletion still functions the same and the orders
@@ -13400,17 +13400,17 @@ paths:
                         totalTokenOut:
                           type: string
                           title: >-
-                            GoodTillDate is represented as seconds since 
+                            GoodTilDate is represented as seconds since 
                             January 1, year 1, 00:00:00.00 UTC
-                             LimitOrders with goodTillDate set are valid as long as blockTime <= goodTillDate
-                        GoodTillDate:
+                             LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
+                        GoodTilDate:
                           type: string
                           format: date-time
                           title: >-
-                            JIT orders also use goodTillDate to handle deletion
+                            JIT orders also use goodTilDate to handle deletion
                             but represent a special case
 
-                            All JIT orders have a goodTillDate of 0 and an
+                            All JIT orders have a goodTilDate of 0 and an
                             exception is made to still still treat these orders
                             as live
 
@@ -39938,17 +39938,17 @@ definitions:
       totalTokenOut:
         type: string
         title: >-
-          GoodTillDate is represented as seconds since  January 1, year 1,
+          GoodTilDate is represented as seconds since  January 1, year 1,
           00:00:00.00 UTC
-           LimitOrders with goodTillDate set are valid as long as blockTime <= goodTillDate
-      GoodTillDate:
+           LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
+      GoodTilDate:
         type: string
         format: date-time
         title: >-
-          JIT orders also use goodTillDate to handle deletion but represent a
+          JIT orders also use goodTilDate to handle deletion but represent a
           special case
 
-          All JIT orders have a goodTillDate of 0 and an exception is made to
+          All JIT orders have a goodTilDate of 0 and an exception is made to
           still still treat these orders as live
 
           Order deletion still functions the same and the orders will be deleted
@@ -40117,17 +40117,17 @@ definitions:
             totalTokenOut:
               type: string
               title: >-
-                GoodTillDate is represented as seconds since  January 1, year 1,
+                GoodTilDate is represented as seconds since  January 1, year 1,
                 00:00:00.00 UTC
-                 LimitOrders with goodTillDate set are valid as long as blockTime <= goodTillDate
-            GoodTillDate:
+                 LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
+            GoodTilDate:
               type: string
               format: date-time
               title: >-
-                JIT orders also use goodTillDate to handle deletion but
+                JIT orders also use goodTilDate to handle deletion but
                 represent a special case
 
-                All JIT orders have a goodTillDate of 0 and an exception is made
+                All JIT orders have a goodTilDate of 0 and an exception is made
                 to still still treat these orders as live
 
                 Order deletion still functions the same and the orders will be
@@ -40188,17 +40188,17 @@ definitions:
             totalTokenOut:
               type: string
               title: >-
-                GoodTillDate is represented as seconds since  January 1, year 1,
+                GoodTilDate is represented as seconds since  January 1, year 1,
                 00:00:00.00 UTC
-                 LimitOrders with goodTillDate set are valid as long as blockTime <= goodTillDate
-            GoodTillDate:
+                 LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
+            GoodTilDate:
               type: string
               format: date-time
               title: >-
-                JIT orders also use goodTillDate to handle deletion but
+                JIT orders also use goodTilDate to handle deletion but
                 represent a special case
 
-                All JIT orders have a goodTillDate of 0 and an exception is made
+                All JIT orders have a goodTilDate of 0 and an exception is made
                 to still still treat these orders as live
 
                 Order deletion still functions the same and the orders will be
@@ -40389,17 +40389,17 @@ definitions:
                 totalTokenOut:
                   type: string
                   title: >-
-                    GoodTillDate is represented as seconds since  January 1,
+                    GoodTilDate is represented as seconds since  January 1,
                     year 1, 00:00:00.00 UTC
-                     LimitOrders with goodTillDate set are valid as long as blockTime <= goodTillDate
-                GoodTillDate:
+                     LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
+                GoodTilDate:
                   type: string
                   format: date-time
                   title: >-
-                    JIT orders also use goodTillDate to handle deletion but
+                    JIT orders also use goodTilDate to handle deletion but
                     represent a special case
 
-                    All JIT orders have a goodTillDate of 0 and an exception is
+                    All JIT orders have a goodTilDate of 0 and an exception is
                     made to still still treat these orders as live
 
                     Order deletion still functions the same and the orders will
@@ -40531,17 +40531,17 @@ definitions:
           totalTokenOut:
             type: string
             title: >-
-              GoodTillDate is represented as seconds since  January 1, year 1,
+              GoodTilDate is represented as seconds since  January 1, year 1,
               00:00:00.00 UTC
-               LimitOrders with goodTillDate set are valid as long as blockTime <= goodTillDate
-          GoodTillDate:
+               LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
+          GoodTilDate:
             type: string
             format: date-time
             title: >-
-              JIT orders also use goodTillDate to handle deletion but represent
+              JIT orders also use goodTilDate to handle deletion but represent
               a special case
 
-              All JIT orders have a goodTillDate of 0 and an exception is made
+              All JIT orders have a goodTilDate of 0 and an exception is made
               to still still treat these orders as live
 
               Order deletion still functions the same and the orders will be
@@ -40575,17 +40575,17 @@ definitions:
           totalTokenOut:
             type: string
             title: >-
-              GoodTillDate is represented as seconds since  January 1, year 1,
+              GoodTilDate is represented as seconds since  January 1, year 1,
               00:00:00.00 UTC
-               LimitOrders with goodTillDate set are valid as long as blockTime <= goodTillDate
-          GoodTillDate:
+               LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
+          GoodTilDate:
             type: string
             format: date-time
             title: >-
-              JIT orders also use goodTillDate to handle deletion but represent
+              JIT orders also use goodTilDate to handle deletion but represent
               a special case
 
-              All JIT orders have a goodTillDate of 0 and an exception is made
+              All JIT orders have a goodTilDate of 0 and an exception is made
               to still still treat these orders as live
 
               Order deletion still functions the same and the orders will be
@@ -40760,17 +40760,17 @@ definitions:
           totalTokenOut:
             type: string
             title: >-
-              GoodTillDate is represented as seconds since  January 1, year 1,
+              GoodTilDate is represented as seconds since  January 1, year 1,
               00:00:00.00 UTC
-               LimitOrders with goodTillDate set are valid as long as blockTime <= goodTillDate
-          GoodTillDate:
+               LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
+          GoodTilDate:
             type: string
             format: date-time
             title: >-
-              JIT orders also use goodTillDate to handle deletion but represent
+              JIT orders also use goodTilDate to handle deletion but represent
               a special case
 
-              All JIT orders have a goodTillDate of 0 and an exception is made
+              All JIT orders have a goodTilDate of 0 and an exception is made
               to still still treat these orders as live
 
               Order deletion still functions the same and the orders will be
