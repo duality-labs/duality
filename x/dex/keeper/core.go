@@ -413,10 +413,12 @@ func (k Keeper) PlaceLimitOrderCore(
 
 	k.SaveTrancheUser(ctx, trancheUser)
 
-	coin0 := sdk.NewCoin(tokenIn, totalIn)
-	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0})
-	if err != nil {
-		return "", err
+	if !totalIn.IsZero() {
+		coin0 := sdk.NewCoin(tokenIn, totalIn)
+		err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0})
+		if err != nil {
+			return "", err
+		}
 	}
 	ctx.EventManager().EmitEvent(types.CreatePlaceLimitOrderEvent(
 		callerAddr.String(),
