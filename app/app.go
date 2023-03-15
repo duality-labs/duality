@@ -98,6 +98,10 @@ import (
 	mevmodule "github.com/duality-labs/duality/x/mev"
 	mevmodulekeeper "github.com/duality-labs/duality/x/mev/keeper"
 	mevmoduletypes "github.com/duality-labs/duality/x/mev/types"
+
+	epochsmodule "github.com/duality-labs/duality/x/epochs"
+	epochsmodulekeeper "github.com/duality-labs/duality/x/epochs/keeper"
+	epochsmoduletypes "github.com/duality-labs/duality/x/epochs/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -146,6 +150,7 @@ var (
 		),
 		dexmodule.AppModuleBasic{},
 		mevmodule.AppModuleBasic{},
+		epochsmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -217,6 +222,8 @@ type App struct {
 	DexKeeper dexmodulekeeper.Keeper
 
 	MevKeeper mevmodulekeeper.Keeper
+
+	EpochsKeeper epochsmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -279,7 +286,7 @@ func NewApp(
 		slashingtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		dexmoduletypes.StoreKey, ccvconsumertypes.StoreKey, adminmodulemoduletypes.StoreKey,
-		mevmoduletypes.StoreKey,
+		mevmoduletypes.StoreKey, epochsmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -420,6 +427,15 @@ func NewApp(
 	)
 	mevModule := mevmodule.NewAppModule(appCodec, app.MevKeeper, app.AccountKeeper, app.BankKeeper)
 
+	app.EpochsKeeper = *epochsmodulekeeper.NewKeeper(keys[epochsmoduletypes.StoreKey])
+	epochsModule := epochsmodule.NewAppModule(app.EpochsKeeper)
+	// multiEpochHooks := epochsmoduletypes.NewMultiEpochHooks(
+	// // insert epoch hooks receivers here
+	// )
+	app.EpochsKeeper.SetHooks(
+		// multiEpochHooks,
+		&epochsmoduletypes.MultiEpochHooks{},
+	)
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create static IBC router, add transfer route, then set and seal it
@@ -451,11 +467,13 @@ func NewApp(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
+
 		transferModule,
 		consumerModule,
 		adminModule,
 		dexModule,
 		mevModule,
+		epochsModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -465,6 +483,7 @@ func NewApp(
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	app.mm.SetOrderBeginBlockers(
 		upgradetypes.ModuleName,
+		epochsmoduletypes.ModuleName,
 		capabilitytypes.ModuleName,
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
@@ -480,7 +499,6 @@ func NewApp(
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
-
 		mevmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
@@ -502,6 +520,7 @@ func NewApp(
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
 		mevmoduletypes.ModuleName,
+		epochsmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 
 		// NOTE: Because of the gas sensitivity of PurgeExpiredLimit order operations dexmodule must be the last endBlock module to run
@@ -530,8 +549,8 @@ func NewApp(
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
-
 		mevmoduletypes.ModuleName,
+		epochsmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -744,6 +763,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ccvconsumertypes.ModuleName)
 	paramsKeeper.Subspace(dexmoduletypes.ModuleName)
 	paramsKeeper.Subspace(mevmoduletypes.ModuleName)
+	paramsKeeper.Subspace(epochsmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
