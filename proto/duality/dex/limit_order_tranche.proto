@@ -42,7 +42,7 @@ message LimitOrderTranche {
   // JIT orders also use goodTilDate to handle deletion but represent a special case
   // All JIT orders have a goodTilDate of 0 and an exception is made to still still treat these orders as live
   // Order deletion still functions the same and the orders will be deleted at the end of the block
-  google.protobuf.Timestamp GoodTilDate = 9 [
+  google.protobuf.Timestamp expirationTime = 9 [
                                              (gogoproto.stdtime) = true,
                                              (gogoproto.nullable) = true
                                              ];

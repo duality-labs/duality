@@ -15,10 +15,10 @@ func (t LimitOrderTranche) IsFilled() bool {
 }
 
 func (t LimitOrderTranche) IsJIT() bool {
-	return t.GoodTilDate != nil && t.GoodTilDate == &JITGoodTilTime
+	return t.ExpirationTime != nil && t.ExpirationTime == &JITGoodTilTime
 }
 func (t LimitOrderTranche) PastGoodTil(timestamp time.Time) bool {
-	return t.GoodTilDate != nil && !t.IsJIT() && t.GoodTilDate.Before(timestamp)
+	return t.ExpirationTime != nil && !t.IsJIT() && t.ExpirationTime.Before(timestamp)
 }
 
 func (t *LimitOrderTranche) Price() *Price {

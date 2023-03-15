@@ -12359,6 +12359,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /dualitylabs/duality/dex/fee_tier/{id}:
@@ -12447,7 +12457,7 @@ paths:
                         GoodTilDate is represented as seconds since  January 1,
                         year 1, 00:00:00.00 UTC
                          LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
-                    GoodTilDate:
+                    expirationTime:
                       type: string
                       format: date-time
                       title: >-
@@ -12551,6 +12561,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /dualitylabs/duality/dex/filled_limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}:
@@ -12592,15 +12612,15 @@ paths:
                       GoodTilDate is represented as seconds since  January 1,
                       year 1, 00:00:00.00 UTC
                        LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
-                  GoodTilDate:
+                  expirationTime:
                     type: string
                     format: date-time
                     title: >-
                       JIT orders also use goodTilDate to handle deletion but
                       represent a special case
 
-                      All JIT orders have a goodTilDate of 0 and an exception
-                      is made to still still treat these orders as live
+                      All JIT orders have a goodTilDate of 0 and an exception is
+                      made to still still treat these orders as live
 
                       Order deletion still functions the same and the orders
                       will be deleted at the end of the block
@@ -12685,7 +12705,7 @@ paths:
                         GoodTilDate is represented as seconds since  January 1,
                         year 1, 00:00:00.00 UTC
                          LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
-                    GoodTilDate:
+                    expirationTime:
                       type: string
                       format: date-time
                       title: >-
@@ -12797,6 +12817,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}:
@@ -12838,15 +12868,15 @@ paths:
                       GoodTilDate is represented as seconds since  January 1,
                       year 1, 00:00:00.00 UTC
                        LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
-                  GoodTilDate:
+                  expirationTime:
                     type: string
                     format: date-time
                     title: >-
                       JIT orders also use goodTilDate to handle deletion but
                       represent a special case
 
-                      All JIT orders have a goodTilDate of 0 and an exception
-                      is made to still still treat these orders as live
+                      All JIT orders have a goodTilDate of 0 and an exception is
+                      made to still still treat these orders as live
 
                       Order deletion still functions the same and the orders
                       will be deleted at the end of the block
@@ -13016,6 +13046,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -13268,6 +13308,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /dualitylabs/duality/dex/pool_reserves/{pairId}/{tokenIn}/{tickIndex}/{fee}:
@@ -13400,10 +13450,10 @@ paths:
                         totalTokenOut:
                           type: string
                           title: >-
-                            GoodTilDate is represented as seconds since 
-                            January 1, year 1, 00:00:00.00 UTC
+                            GoodTilDate is represented as seconds since  January
+                            1, year 1, 00:00:00.00 UTC
                              LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
-                        GoodTilDate:
+                        expirationTime:
                           type: string
                           format: date-time
                           title: >-
@@ -13513,6 +13563,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -39941,7 +40001,7 @@ definitions:
           GoodTilDate is represented as seconds since  January 1, year 1,
           00:00:00.00 UTC
            LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
-      GoodTilDate:
+      expirationTime:
         type: string
         format: date-time
         title: >-
@@ -40120,12 +40180,12 @@ definitions:
                 GoodTilDate is represented as seconds since  January 1, year 1,
                 00:00:00.00 UTC
                  LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
-            GoodTilDate:
+            expirationTime:
               type: string
               format: date-time
               title: >-
-                JIT orders also use goodTilDate to handle deletion but
-                represent a special case
+                JIT orders also use goodTilDate to handle deletion but represent
+                a special case
 
                 All JIT orders have a goodTilDate of 0 and an exception is made
                 to still still treat these orders as live
@@ -40191,12 +40251,12 @@ definitions:
                 GoodTilDate is represented as seconds since  January 1, year 1,
                 00:00:00.00 UTC
                  LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
-            GoodTilDate:
+            expirationTime:
               type: string
               format: date-time
               title: >-
-                JIT orders also use goodTilDate to handle deletion but
-                represent a special case
+                JIT orders also use goodTilDate to handle deletion but represent
+                a special case
 
                 All JIT orders have a goodTilDate of 0 and an exception is made
                 to still still treat these orders as live
@@ -40389,10 +40449,10 @@ definitions:
                 totalTokenOut:
                   type: string
                   title: >-
-                    GoodTilDate is represented as seconds since  January 1,
-                    year 1, 00:00:00.00 UTC
+                    GoodTilDate is represented as seconds since  January 1, year
+                    1, 00:00:00.00 UTC
                      LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
-                GoodTilDate:
+                expirationTime:
                   type: string
                   format: date-time
                   title: >-
@@ -40534,15 +40594,15 @@ definitions:
               GoodTilDate is represented as seconds since  January 1, year 1,
               00:00:00.00 UTC
                LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
-          GoodTilDate:
+          expirationTime:
             type: string
             format: date-time
             title: >-
-              JIT orders also use goodTilDate to handle deletion but represent
-              a special case
+              JIT orders also use goodTilDate to handle deletion but represent a
+              special case
 
-              All JIT orders have a goodTilDate of 0 and an exception is made
-              to still still treat these orders as live
+              All JIT orders have a goodTilDate of 0 and an exception is made to
+              still still treat these orders as live
 
               Order deletion still functions the same and the orders will be
               deleted at the end of the block
@@ -40578,15 +40638,15 @@ definitions:
               GoodTilDate is represented as seconds since  January 1, year 1,
               00:00:00.00 UTC
                LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
-          GoodTilDate:
+          expirationTime:
             type: string
             format: date-time
             title: >-
-              JIT orders also use goodTilDate to handle deletion but represent
-              a special case
+              JIT orders also use goodTilDate to handle deletion but represent a
+              special case
 
-              All JIT orders have a goodTilDate of 0 and an exception is made
-              to still still treat these orders as live
+              All JIT orders have a goodTilDate of 0 and an exception is made to
+              still still treat these orders as live
 
               Order deletion still functions the same and the orders will be
               deleted at the end of the block
@@ -40763,15 +40823,15 @@ definitions:
               GoodTilDate is represented as seconds since  January 1, year 1,
               00:00:00.00 UTC
                LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
-          GoodTilDate:
+          expirationTime:
             type: string
             format: date-time
             title: >-
-              JIT orders also use goodTilDate to handle deletion but represent
-              a special case
+              JIT orders also use goodTilDate to handle deletion but represent a
+              special case
 
-              All JIT orders have a goodTilDate of 0 and an exception is made
-              to still still treat these orders as live
+              All JIT orders have a goodTilDate of 0 and an exception is made to
+              still still treat these orders as live
 
               Order deletion still functions the same and the orders will be
               deleted at the end of the block

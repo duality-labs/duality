@@ -49,7 +49,7 @@ func NewLimitOrderTrancheWithGoodTil(pairId *types.PairId, tokenIn string, tickI
 		ReservesTokenOut: sdk.ZeroInt(),
 		TotalTokenIn:     sdk.ZeroInt(),
 		TotalTokenOut:    sdk.ZeroInt(),
-		GoodTilDate:     &goodTil,
+		ExpirationTime:   &goodTil,
 	}, nil
 
 }
@@ -63,7 +63,7 @@ func NewGoodTilRecord(pairId *types.PairId, tokenIn string, tickIndex int64, tra
 		trancheKey,
 	)
 	return types.GoodTilRecord{
-		TrancheRef:   trancheRef,
+		TrancheRef:  trancheRef,
 		GoodTilDate: goodTil,
 	}
 }
