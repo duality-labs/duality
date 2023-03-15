@@ -100,14 +100,13 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		callerAddr,
 		receiverAddr,
 		msg.AmountIn,
-		msg.MinOut,
 		nil,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	coinOut, err := k.ExecuteSwap(goCtx, tokenIn, tokenOut, amountIn, amountOut, callerAddr, receiverAddr, msg.MinOut)
+	coinOut, err := k.ExecuteSwap(goCtx, tokenIn, tokenOut, amountIn, amountOut, callerAddr, receiverAddr)
 
 	if err != nil {
 		return nil, err

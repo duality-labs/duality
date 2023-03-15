@@ -262,21 +262,21 @@ func (s *TxTestSuite) TestTx3CmdSwap() {
 		errInRes  bool
 	}{
 		{
-			// "swap [receiver] [amount-in] [tokenA] [tokenB] [token-in] [minOut]",
+			// "swap [receiver] [amount-in] [tokenA] [tokenB] [token-in]",
 			name:      "missing arguments",
-			args:      []string{s.addr1.String(), "5", "TokenA", "TokenB", "TokenA"},
+			args:      []string{s.addr1.String(), "5", "TokenA", "TokenB"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 6 arg(s), received 5",
+			expErrMsg: "Error: accepts 5 arg(s), received 4",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{s.addr1.String(), "5", "TokenA", "TokenB", "TokenA", "0", s.addr1.String()},
+			args:      []string{s.addr1.String(), "5", "TokenA", "TokenB", "TokenA", "BADARG"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 6 arg(s), received 7",
+			expErrMsg: "Error: accepts 5 arg(s), received 6",
 		},
 		{
 			name:     "valid",
-			args:     []string{s.addr1.String(), "2", "TokenA", "TokenB", "TokenA", "0"},
+			args:     []string{s.addr1.String(), "2", "TokenA", "TokenB", "TokenA"},
 			errInRes: false,
 		},
 	}

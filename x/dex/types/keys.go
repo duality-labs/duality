@@ -339,7 +339,6 @@ const (
 	SwapEventTokenIn  = "TokenIn"
 	SwapEventTokenOut = "TokenOut"
 	SwapEventAmountIn = "AmountIn"
-	SwapEventMinOut   = "MinOut"
 	SwapEventAmoutOut = "AmountOut"
 )
 

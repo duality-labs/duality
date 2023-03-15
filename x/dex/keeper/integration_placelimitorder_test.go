@@ -303,7 +303,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderPartiallyFilledLOPlaceLOIncremen
 	// GIVEN
 	// partially filled limit order exists on tick -1
 	trancheKey0 := s.aliceLimitSells("TokenA", -1, 10)
-	s.bobMarketSells("TokenB", 5, 0)
+	s.bobMarketSells("TokenB", 5)
 	trancheKey1 := s.aliceLimitSells("TokenA", -1, 10)
 	s.assertFillAndPlaceTrancheKeys("TokenA", -1, trancheKey0, trancheKey1)
 
@@ -323,7 +323,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFilledLOPlaceLODoesntIncrementsP
 	// GIVEN
 	// filled LO with partially filled place tranche
 	trancheKey0 := s.aliceLimitSells("TokenA", -1, 10)
-	s.bobMarketSells("TokenB", 10, 0)
+	s.bobMarketSells("TokenB", 10)
 	trancheKey1 := s.aliceLimitSells("TokenA", -1, 10)
 	s.assertFillAndPlaceTrancheKeys("TokenA", -1, trancheKey0, trancheKey1)
 
@@ -362,7 +362,7 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertDexBalances(0, 50)
 	s.assertCurrentTicks(math.MinInt64, 0)
 
-	s.bobMarketSells("TokenA", 10, 10)
+	s.bobMarketSells("TokenA", 10)
 
 	s.assertAliceBalances(100, 50)
 	s.assertBobBalances(90, 110)
@@ -383,7 +383,7 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertDexBalances(10, 50)
 	s.assertCurrentTicks(math.MinInt64, 0)
 
-	s.bobMarketSells("TokenA", 10, 10)
+	s.bobMarketSells("TokenA", 10)
 
 	s.assertAliceBalances(100, 40)
 	s.assertBobBalances(80, 120)

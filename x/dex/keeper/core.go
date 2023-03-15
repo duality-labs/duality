@@ -239,7 +239,6 @@ func (k Keeper) SwapCore(goCtx context.Context,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
 	amountIn sdk.Int,
-	minOut sdk.Int,
 	limitPrice *sdk.Dec,
 ) (sdk.Int, sdk.Int, sdk.Int, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -271,13 +270,6 @@ func (k Keeper) SwapCore(goCtx context.Context,
 
 		}
 
-		// price only gets worse as we iterate, so we can greedily abort
-		// when the price is too low for minOut to be reached.
-		idealOut := totalOut.Add(liq.Price().MulInt(remainingIn).TruncateInt())
-		if idealOut.LT(minOut) {
-			return sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt(), nil
-		}
-
 		inAmount, outAmount := liq.Swap(remainingIn)
 
 		remainingIn = remainingIn.Sub(inAmount)
@@ -298,11 +290,10 @@ func (k Keeper) ExecuteSwap(goCtx context.Context,
 	amountOut sdk.Int,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
-	minOut sdk.Int,
 ) (sdk.Coin, error) {
 
-	if amountOut.LT(minOut) || amountOut.IsZero() {
-		return sdk.Coin{}, types.ErrSlippageLimitReached
+	if amountOut.IsZero() {
+		return sdk.Coin{}, types.ErrInsufficientLiquidity
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	coinIn := sdk.NewCoin(tokenIn, amountIn)
@@ -318,8 +309,7 @@ func (k Keeper) ExecuteSwap(goCtx context.Context,
 		}
 	}
 	ctx.EventManager().EmitEvent(types.CreateSwapEvent(callerAddr.String(), receiverAddr.String(),
-		tokenIn, tokenOut, amountIn.String(), amountOut.String(), minOut.String(),
-	))
+		tokenIn, tokenOut, amountIn.String(), amountOut.String()))
 
 	return coinOut, nil
 }
@@ -374,8 +364,6 @@ func (k Keeper) PlaceLimitOrderCore(
 			callerAddr,
 			receiverAddr,
 			amountIn,
-			// TODO: JCP verify that this is maximally efficient vs precomputing minOut
-			sdk.ZeroInt(),
 			&limitPrice,
 		)
 		if err != nil {

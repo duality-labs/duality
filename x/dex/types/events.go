@@ -100,7 +100,7 @@ func CreateWithdrawEvent(creator string, receiver string, token0 string, token1 
 	)
 }
 
-func createSwapEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, amountOut string, minOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+func createSwapEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, amountOut string, otherAttrs ...sdk.Attribute) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, SwapEventKey),
@@ -110,13 +110,12 @@ func createSwapEvent(creator string, receiver string, tokenIn string, tokenOut s
 		sdk.NewAttribute(SwapEventTokenOut, tokenOut),
 		sdk.NewAttribute(SwapEventAmountIn, amountIn),
 		sdk.NewAttribute(SwapEventAmoutOut, amountOut),
-		sdk.NewAttribute(SwapEventMinOut, minOut),
 	}
 	attrs = append(attrs, otherAttrs...)
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateSwapEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, amountOut string, minOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreateSwapEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, amountOut string, otherAttrs ...sdk.Attribute) sdk.Event {
 	return createSwapEvent(
 		creator,
 		receiver,
@@ -124,7 +123,6 @@ func CreateSwapEvent(creator string, receiver string, tokenIn string, tokenOut s
 		tokenOut,
 		amountIn,
 		amountOut,
-		minOut,
 	)
 }
 

@@ -24,7 +24,6 @@ func TestMsgSwap_ValidateBasic(t *testing.T) {
 				TokenB:   "TokenB",
 				AmountIn: sdk.OneInt(),
 				TokenIn:  "TokenA",
-				MinOut:   sdk.ZeroInt(),
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
@@ -36,7 +35,6 @@ func TestMsgSwap_ValidateBasic(t *testing.T) {
 				TokenB:   "TokenB",
 				AmountIn: sdk.OneInt(),
 				TokenIn:  "TokenA",
-				MinOut:   sdk.ZeroInt(),
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
@@ -48,7 +46,6 @@ func TestMsgSwap_ValidateBasic(t *testing.T) {
 				TokenB:   "TokenB",
 				AmountIn: sdk.OneInt(),
 				TokenIn:  "TokenC",
-				MinOut:   sdk.ZeroInt(),
 			},
 			err: ErrInvalidTokenIn,
 		},
@@ -61,22 +58,8 @@ func TestMsgSwap_ValidateBasic(t *testing.T) {
 				TokenB:   "TokenB",
 				AmountIn: sdk.ZeroInt(),
 				TokenIn:  "TokenA",
-				MinOut:   sdk.ZeroInt(),
 			},
 			err: ErrZeroSwap,
-		},
-		{
-			name: "invalid negative minOut",
-			msg: MsgSwap{
-				Creator:  sample.AccAddress(),
-				Receiver: sample.AccAddress(),
-				TokenA:   "TokenA",
-				TokenB:   "TokenB",
-				AmountIn: sdk.OneInt(),
-				TokenIn:  "TokenA",
-				MinOut:   sdk.NewInt(-1),
-			},
-			err: ErrNegativeMinOut,
 		},
 		{
 			name: "valid msg",
@@ -87,7 +70,6 @@ func TestMsgSwap_ValidateBasic(t *testing.T) {
 				TokenB:   "TokenB",
 				AmountIn: sdk.OneInt(),
 				TokenIn:  "TokenA",
-				MinOut:   sdk.ZeroInt(),
 			},
 		},
 	}

@@ -16,7 +16,7 @@ var (
 	ErrUnbalancedTxArray                  = sdkerrors.Register(ModuleName, 1110, "Transaction input arrays are not of the same length.")
 	ErrValidLimitOrderTrancheNotFound     = sdkerrors.Register(ModuleName, 1111, "Limit order trache not found:")                                // "%d", trancheKey
 	ErrCancelEmptyLimitOrder              = sdkerrors.Register(ModuleName, 1112, "Cannot cancel additional liquidity from limit order tranche:") // "%d", tranche.TrancheKey
-	ErrSlippageLimitReached               = sdkerrors.Register(ModuleName, 1114, "Slippage limit reached, minOut could not be satisfied.")
+	ErrInsufficientLiquidity              = sdkerrors.Register(ModuleName, 1114, "Not enough liquidity to complete trade")
 	ErrDepositBehindPairLiquidity         = sdkerrors.Register(ModuleName, 1115, "Depositing behind the opposite token pair's liquidity is currently not allowed")
 	ErrPlaceLimitOrderBehindPairLiquidity = sdkerrors.Register(ModuleName, 1116, "Placing a limit order behind the opposite token pair's liquidity is currently not allowed")
 	ErrTickOutsideRange                   = sdkerrors.Register(ModuleName, 1117, "Supplying a tick outside the range of [-352437, 352437] is not allowed")
@@ -31,7 +31,6 @@ var (
 	ErrActiveLimitOrderNotFound           = sdkerrors.Register(ModuleName, 1128, "No active limit found. It does not exist or has already been filled")
 	ErrZeroWithdraw                       = sdkerrors.Register(ModuleName, 1129, "Withdraw amount must be > 0.")
 	ErrZeroLimitOrder                     = sdkerrors.Register(ModuleName, 1130, "Limit order amount must be > 0.")
-	ErrNegativeMinOut                     = sdkerrors.Register(ModuleName, 1131, "MinOut must be >= 0.")
 	ErrNegativeLimitPrice                 = sdkerrors.Register(ModuleName, 1132, "LimitPrice must be > 0.")
 	ErrDepositShareUnderflow              = sdkerrors.Register(ModuleName, 1133, "Deposit amount is too small to issue shares")
 	ErrFOKLimitOrderNotFilled             = sdkerrors.Register(ModuleName, 1134, "Fill Or Kill limit order couldn't not be executed in its entirety.")
