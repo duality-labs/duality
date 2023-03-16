@@ -126,15 +126,14 @@ func CreateSwapEvent(creator string, receiver string, tokenIn string, tokenOut s
 	)
 }
 
-func createPlaceLimitOrderEvent(creator string, receiver string, token0 string, token1 string, tokenIn string, amountIn string, shares string, trancheKey string, otherAttrs ...sdk.Attribute) sdk.Event {
+func createPlaceLimitOrderEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, shares string, trancheKey string, otherAttrs ...sdk.Attribute) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, PlaceLimitOrderEventKey),
 		sdk.NewAttribute(PlaceLimitOrderEventCreator, creator),
 		sdk.NewAttribute(PlaceLimitOrderEventReceiver, receiver),
-		sdk.NewAttribute(PlaceLimitOrderEventToken0, token0),
-		sdk.NewAttribute(PlaceLimitOrderEventToken1, token1),
 		sdk.NewAttribute(PlaceLimitOrderEventTokenIn, tokenIn),
+		sdk.NewAttribute(PlaceLimitOrderEventTokenOut, tokenOut),
 		sdk.NewAttribute(PlaceLimitOrderEventAmountIn, amountIn),
 		sdk.NewAttribute(PlaceLimitOrderEventShares, shares),
 		sdk.NewAttribute(PlaceLimitOrderEventTrancheKey, trancheKey),
@@ -143,13 +142,12 @@ func createPlaceLimitOrderEvent(creator string, receiver string, token0 string, 
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreatePlaceLimitOrderEvent(creator string, receiver string, token0 string, token1 string, tokenIn string, amountIn string, shares string, currentLimitOrderKey string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreatePlaceLimitOrderEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, shares string, currentLimitOrderKey string, otherAttrs ...sdk.Attribute) sdk.Event {
 	return createPlaceLimitOrderEvent(
 		creator,
 		receiver,
-		token0,
-		token1,
 		tokenIn,
+		tokenOut,
 		amountIn,
 		shares,
 		currentLimitOrderKey,

@@ -239,75 +239,33 @@ func (k Keeper) SwapCore(goCtx context.Context,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
 	amountIn sdk.Int,
-	limitPrice *sdk.Dec,
-) (totalIn sdk.Int, totalOut sdk.Int, remainingIn sdk.Int, error error) {
+) (coinOut sdk.Coin, error error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	cacheCtx, writeCache := ctx.CacheContext()
 	pairId, err := CreatePairIdFromUnsorted(tokenIn, tokenOut)
 	if err != nil {
-		return sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt(), err
+		return sdk.Coin{}, err
 	}
-	pair := types.NewDirectionalTradingPair(pairId, tokenIn, tokenOut)
+
+	amountIn, amountOut, err := k.Swap(ctx, pairId, tokenIn, tokenOut, amountIn, nil)
 	if err != nil {
-		return sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt(), err
+		return sdk.Coin{}, err
 	}
-
-	remainingIn = amountIn
-	totalOut = sdk.ZeroInt()
-
-	// verify that amount left is not zero and that there are additional valid ticks to check
-	liqIter := NewLiquidityIterator(k, ctx, pair)
-	defer liqIter.Close()
-	for remainingIn.GT(sdk.ZeroInt()) {
-		liq := liqIter.Next()
-		if liq == nil {
-			break
-		}
-
-		// break as soon as we iterated past limitPrice
-		if limitPrice != nil && liq.Price().ToDec().LT(*limitPrice) {
-			break
-
-		}
-
-		inAmount, outAmount := liq.Swap(remainingIn)
-
-		remainingIn = remainingIn.Sub(inAmount)
-		totalOut = totalOut.Add(outAmount)
-
-		k.SaveLiquidity(cacheCtx, liq)
-	}
-
-	writeCache()
-	totalIn = amountIn.Sub(remainingIn)
-	return totalIn, totalOut, remainingIn, nil
-}
-
-func (k Keeper) ExecuteSwap(goCtx context.Context,
-	tokenIn string,
-	tokenOut string,
-	amountIn sdk.Int,
-	amountOut sdk.Int,
-	callerAddr sdk.AccAddress,
-	receiverAddr sdk.AccAddress,
-) (sdk.Coin, error) {
 
 	if amountOut.IsZero() {
 		return sdk.Coin{}, types.ErrInsufficientLiquidity
 	}
-	ctx := sdk.UnwrapSDKContext(goCtx)
+
 	coinIn := sdk.NewCoin(tokenIn, amountIn)
-	coinOut := sdk.NewCoin(tokenOut, amountOut)
+	coinOut = sdk.NewCoin(tokenOut, amountOut)
 
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
 		return sdk.Coin{}, err
 	}
 
-	if amountOut.GT(sdk.ZeroInt()) {
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
-			return sdk.Coin{}, err
-		}
+	if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
+		return sdk.Coin{}, err
 	}
+
 	ctx.EventManager().EmitEvent(types.CreateSwapEvent(callerAddr.String(), receiverAddr.String(),
 		tokenIn, tokenOut, amountIn.String(), amountOut.String()))
 
@@ -326,46 +284,27 @@ func (k Keeper) PlaceLimitOrderCore(
 	orderType types.LimitOrderType,
 	goodTil *time.Time,
 ) (trancheKeyP *string, err error) {
-
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	token0, token1, err := SortTokens(tokenIn, tokenOut)
-	if err != nil {
-		return nil, err
-	}
-	pairId := CreatePairId(token0, token1)
-	var placeTranche types.LimitOrderTranche
-	// TODO: JCP maybe move this somewhere else to simplify logic here
 
-	// TODO: right now we are not indexing by goodTil date so we can't easily check if there's already a tranche with the same goodTil date so instead we create a new tranche for each goodTil order
-	// if there is a large number of limitOrders with the same goodTilTime (most likely JIT) aggregating might be more efficient particularly for deletion, but if they are relatively sparse it will incur fewer lookups to just create a new limitOrderTranche
-	switch orderType {
-	case types.LimitOrderType_JUST_IN_TIME:
-		placeTranche, err = NewLimitOrderTranche(ctx, pairId, tokenIn, tickIndex, &types.JITGoodTilTime)
-	case types.LimitOrderType_GOOD_TIL_TIME:
-		placeTranche, err = NewLimitOrderTranche(ctx, pairId, tokenIn, tickIndex, goodTil)
-	default:
-		placeTranche, err = k.GetOrInitPlaceTranche(ctx, pairId, tokenIn, tickIndex)
-	}
+	pairId, err := CreatePairIdFromUnsorted(tokenIn, tokenOut)
 	if err != nil {
 		return nil, err
 	}
 
+	placeTranche, err := k.GetOrInitPlaceTranche(ctx, pairId, tokenIn, tickIndex, goodTil, orderType)
 	trancheKey := placeTranche.TrancheKey
 	trancheUser := k.GetOrInitLimitOrderTrancheUser(ctx, pairId, tickIndex, tokenIn, trancheKey, receiverAddr.String())
-	amountLeft := amountIn
 
+	amountLeft, totalIn := amountIn, sdk.ZeroInt()
 	// For everything except just-in-time (JIT) orders try to execute as a swap first
-
-	var totalIn sdk.Int
 	if !orderType.IsJIT() {
 		var amountInSwap, amountOutSwap sdk.Int
 		limitPrice := placeTranche.PriceMakerToTaker().ToDec()
-		amountInSwap, amountOutSwap, amountLeft, err = k.SwapCore(
-			goCtx,
+		amountInSwap, amountOutSwap, err = k.Swap(
+			ctx,
+			pairId,
 			tokenIn,
 			tokenOut,
-			callerAddr,
-			receiverAddr,
 			amountIn,
 			&limitPrice,
 		)
@@ -374,6 +313,7 @@ func (k Keeper) PlaceLimitOrderCore(
 		}
 		totalIn = amountInSwap
 		trancheUser.ReservesFromSwap = amountOutSwap
+		amountLeft = amountLeft.Sub(amountInSwap)
 	}
 
 	if amountLeft.IsPositive() && orderType.IsFoK() {
@@ -407,9 +347,8 @@ func (k Keeper) PlaceLimitOrderCore(
 	ctx.EventManager().EmitEvent(types.CreatePlaceLimitOrderEvent(
 		callerAddr.String(),
 		receiverAddr.String(),
-		token0,
-		token1,
 		tokenIn,
+		tokenOut,
 		totalIn.String(),
 		sharesIssued.String(),
 		trancheKey,

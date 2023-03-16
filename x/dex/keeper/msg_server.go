@@ -90,24 +90,10 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
-	// TODO: Should switch swap API to just take TokenIn and TokenOut
 	tokenIn, tokenOut := GetInOutTokens(msg.TokenIn, msg.TokenA, msg.TokenB)
 
-	amountIn, amountOut, _, err := k.SwapCore(
-		goCtx,
-		tokenIn,
-		tokenOut,
-		callerAddr,
-		receiverAddr,
-		msg.AmountIn,
-		nil,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	coinOut, err := k.ExecuteSwap(goCtx, tokenIn, tokenOut, amountIn, amountOut, callerAddr, receiverAddr)
-
+	// TODO: Should switch swap API to just take TokenIn and TokenOut
+	coinOut, err := k.SwapCore(goCtx, tokenIn, tokenOut, callerAddr, receiverAddr, msg.AmountIn)
 	if err != nil {
 		return nil, err
 	}

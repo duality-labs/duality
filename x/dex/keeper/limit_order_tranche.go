@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -184,14 +185,32 @@ func NewTrancheKey(sdkCtx sdk.Context) string {
 
 }
 
-func (k Keeper) GetOrInitPlaceTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64) (placeTranche types.LimitOrderTranche, err error) {
-
-	placeTranche, found := k.GetPlaceTranche(sdkCtx, pairId, tokenIn, tickIndex)
-	if !found {
-		placeTranche, err = NewLimitOrderTranche(sdkCtx, pairId, tokenIn, tickIndex, nil)
-		if err != nil {
-			return types.LimitOrderTranche{}, err
+func (k Keeper) GetOrInitPlaceTranche(ctx sdk.Context,
+	pairId *types.PairId,
+	tokenIn string,
+	tickIndex int64,
+	goodTil *time.Time,
+	orderType types.LimitOrderType) (placeTranche types.LimitOrderTranche, err error) {
+	// TODO: right now we are not indexing by goodTil date so we can't easily check if there's already a tranche with the same goodTil date so instead we create a new tranche for each goodTil order
+	// if there is a large number of limitOrders with the same goodTilTime (most likely JIT) aggregating might be more efficient particularly for deletion, but if they are relatively sparse it will incur fewer lookups to just create a new limitOrderTranche
+	switch orderType {
+	case types.LimitOrderType_JUST_IN_TIME:
+		placeTranche, err = NewLimitOrderTranche(ctx, pairId, tokenIn, tickIndex, &types.JITGoodTilTime)
+	case types.LimitOrderType_GOOD_TIL_TIME:
+		placeTranche, err = NewLimitOrderTranche(ctx, pairId, tokenIn, tickIndex, goodTil)
+	default:
+		var found bool
+		placeTranche, found = k.GetPlaceTranche(ctx, pairId, tokenIn, tickIndex)
+		if !found {
+			placeTranche, err = NewLimitOrderTranche(ctx, pairId, tokenIn, tickIndex, nil)
+			if err != nil {
+				return types.LimitOrderTranche{}, err
+			}
 		}
 	}
+	if err != nil {
+		return types.LimitOrderTranche{}, err
+	}
+
 	return placeTranche, nil
 }
