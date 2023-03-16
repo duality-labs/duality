@@ -312,7 +312,7 @@ func (k Keeper) PlaceLimitOrderCore(
 			return nil, err
 		}
 		totalIn = amountInSwap
-		trancheUser.ReservesFromSwap = amountOutSwap
+		trancheUser.TakerReserves = amountOutSwap
 		amountLeft = amountLeft.Sub(amountInSwap)
 	}
 

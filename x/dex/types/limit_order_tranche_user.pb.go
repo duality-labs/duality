@@ -33,7 +33,7 @@ type LimitOrderTrancheUser struct {
 	SharesOwned      github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,6,opt,name=sharesOwned,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"sharesOwned" yaml:"sharesOwned"`
 	SharesWithdrawn  github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,7,opt,name=sharesWithdrawn,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"sharesWithdrawn" yaml:"sharesWithdrawn"`
 	SharesCancelled  github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,8,opt,name=sharesCancelled,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"sharesCancelled" yaml:"sharesCancelled"`
-	ReservesFromSwap github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,9,opt,name=reservesFromSwap,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"reservesFromSwap" yaml:"reservesFromSwap"`
+	TakerReserves github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,9,opt,name=reservesFromSwap,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"reservesFromSwap" yaml:"reservesFromSwap"`
 }
 
 func (m *LimitOrderTrancheUser) Reset()         { *m = LimitOrderTrancheUser{} }
@@ -166,9 +166,9 @@ func (m *LimitOrderTrancheUser) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	{
-		size := m.ReservesFromSwap.Size()
+		size := m.TakerReserves.Size()
 		i -= size
-		if _, err := m.ReservesFromSwap.MarshalTo(dAtA[i:]); err != nil {
+		if _, err := m.TakerReserves.MarshalTo(dAtA[i:]); err != nil {
 			return 0, err
 		}
 		i = encodeVarintLimitOrderTrancheUser(dAtA, i, uint64(size))
@@ -288,7 +288,7 @@ func (m *LimitOrderTrancheUser) Size() (n int) {
 	n += 1 + l + sovLimitOrderTrancheUser(uint64(l))
 	l = m.SharesCancelled.Size()
 	n += 1 + l + sovLimitOrderTrancheUser(uint64(l))
-	l = m.ReservesFromSwap.Size()
+	l = m.TakerReserves.Size()
 	n += 1 + l + sovLimitOrderTrancheUser(uint64(l))
 	return n
 }
@@ -611,7 +611,7 @@ func (m *LimitOrderTrancheUser) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.ReservesFromSwap.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.TakerReserves.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

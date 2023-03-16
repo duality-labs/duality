@@ -6,12 +6,12 @@ import (
 
 func (l LimitOrderTrancheUser) IsEmpty() bool {
 	sharesRemoved := l.SharesCancelled.Add(l.SharesWithdrawn)
-	return sharesRemoved.Equal(l.SharesOwned) && l.ReservesFromSwap.IsZero()
+	return sharesRemoved.Equal(l.SharesOwned) && l.TakerReserves.IsZero()
 }
 
 func (l *LimitOrderTrancheUser) WithdrawSwapReserves() sdk.Int {
-	amountOut := l.ReservesFromSwap
-	l.ReservesFromSwap = sdk.ZeroInt()
+	amountOut := l.TakerReserves
+	l.TakerReserves = sdk.ZeroInt()
 	return amountOut
 
 }

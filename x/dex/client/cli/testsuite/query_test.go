@@ -124,34 +124,34 @@ var poolReservesList = []types.TickLiquidity{
 
 var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 	{
-		PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-		Token:            "TokenA",
-		TickIndex:        1,
-		TrancheKey:       "0",
-		Address:          testAddress.String(),
-		SharesOwned:      sdk.NewInt(10),
-		SharesWithdrawn:  sdk.NewInt(0),
-		SharesCancelled:  sdk.NewInt(0),
-		ReservesFromSwap: sdk.ZeroInt(),
+		PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+		Token:           "TokenA",
+		TickIndex:       1,
+		TrancheKey:      "0",
+		Address:         testAddress.String(),
+		SharesOwned:     sdk.NewInt(10),
+		SharesWithdrawn: sdk.NewInt(0),
+		SharesCancelled: sdk.NewInt(0),
+		TakerReserves:   sdk.ZeroInt(),
 	},
 	{
-		PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
-		Token:            "TokenB",
-		TickIndex:        20,
-		TrancheKey:       "0",
-		Address:          testAddress.String(),
-		SharesOwned:      sdk.NewInt(10),
-		SharesWithdrawn:  sdk.NewInt(0),
-		SharesCancelled:  sdk.NewInt(0),
-		ReservesFromSwap: sdk.ZeroInt(),
+		PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+		Token:           "TokenB",
+		TickIndex:       20,
+		TrancheKey:      "0",
+		Address:         testAddress.String(),
+		SharesOwned:     sdk.NewInt(10),
+		SharesWithdrawn: sdk.NewInt(0),
+		SharesCancelled: sdk.NewInt(0),
+		TakerReserves:   sdk.ZeroInt(),
 	},
 }
 
 var genesisState types.GenesisState = types.GenesisState{
-	TickLiquidityList:           append(poolReservesList, limitOrderTrancheList...),
-	LimitOrderTrancheUserList:   limitOrderTrancheUserList,
+	TickLiquidityList:             append(poolReservesList, limitOrderTrancheList...),
+	LimitOrderTrancheUserList:     limitOrderTrancheUserList,
 	InactiveLimitOrderTrancheList: inactiveLimitOrderTrancheList,
-	FeeTierList:                 feeTierList,
+	FeeTierList:                   feeTierList,
 }
 
 func (s *QueryTestSuite) SetupSuite() {
