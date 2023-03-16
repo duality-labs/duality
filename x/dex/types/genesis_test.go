@@ -64,7 +64,7 @@ func TestGenesisState_Validate(t *testing.T) {
 						},
 					},
 				},
-				FilledLimitOrderTrancheList: []types.LimitOrderTranche{
+				InactiveLimitOrderTrancheList: []types.LimitOrderTranche{
 					{
 						PairId:     &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 						TokenIn:    "0",
@@ -155,9 +155,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		{
-			desc: "duplicated filledLimitOrderTranche",
+			desc: "duplicated inactiveLimitOrderTranche",
 			genState: &types.GenesisState{
-				FilledLimitOrderTrancheList: []types.LimitOrderTranche{
+				InactiveLimitOrderTrancheList: []types.LimitOrderTranche{
 					{
 						PairId:     &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 						TokenIn:    "0",

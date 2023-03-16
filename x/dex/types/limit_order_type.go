@@ -1,7 +1,7 @@
 package types
 
 func (l LimitOrderType) IsGTC() bool {
-	return l == LimitOrderType_GOOD_TILL_CANCELLED
+	return l == LimitOrderType_GOOD_TIL_CANCELLED
 }
 
 func (l LimitOrderType) IsFoK() bool {
@@ -17,5 +17,5 @@ func (l LimitOrderType) IsJIT() bool {
 }
 
 func (l LimitOrderType) IsGoodTil() bool {
-	return l == LimitOrderType_GOOD_TILl_DATE
+	return l == LimitOrderType_GOOD_TIL_TIME
 }

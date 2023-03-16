@@ -73,7 +73,7 @@ func TestGenesis(t *testing.T) {
 				},
 			},
 		},
-		FilledLimitOrderTrancheList: []types.LimitOrderTranche{
+		InactiveLimitOrderTrancheList: []types.LimitOrderTranche{
 			{
 				PairId:     &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 				TokenIn:    "0",
@@ -102,6 +102,6 @@ func TestGenesis(t *testing.T) {
 	require.Equal(t, genesisState.FeeTierCount, got.FeeTierCount)
 	require.ElementsMatch(t, genesisState.LimitOrderTrancheUserList, got.LimitOrderTrancheUserList)
 	require.ElementsMatch(t, genesisState.TickLiquidityList, got.TickLiquidityList)
-	require.ElementsMatch(t, genesisState.FilledLimitOrderTrancheList, got.FilledLimitOrderTrancheList)
+	require.ElementsMatch(t, genesisState.InactiveLimitOrderTrancheList, got.InactiveLimitOrderTrancheList)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

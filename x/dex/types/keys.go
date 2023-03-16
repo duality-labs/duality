@@ -93,10 +93,10 @@ const (
 	// LimitOrderTrancheKeyPrefix is the prefix to retrieve all LimitOrderTranche
 	LimitOrderTrancheKeyPrefix = "LimitOrderTranche/value"
 
-	FilledLimitOrderTrancheKeyPrefix = "FilledLimitOrderTranche/value/"
+	InactiveLimitOrderTrancheKeyPrefix = "InactiveLimitOrderTranche/value/"
 
-	// GoodTilRecordKeyPrefix is the prefix to retrieve all GoodTilRecord
-	GoodTilRecordKeyPrefix = "GoodTilRecord/value/"
+	// LimitOrderExpirationKeyPrefix is the prefix to retrieve all LimitOrderExpiration
+	LimitOrderExpirationKeyPrefix = "LimitOrderExpiration/value/"
 )
 
 // LimitOrderTrancheUserKey returns the store key to retrieve a LimitOrderTrancheUser from the index fields
@@ -136,8 +136,8 @@ func LimitOrderTrancheUserAddressPrefix(address string) []byte {
 	return key
 }
 
-// FilledLimitOrderTrancheKey returns the store key to retrieve a FilledLimitOrderTranche from the index fields
-func FilledLimitOrderTrancheKey(
+// InactiveLimitOrderTrancheKey returns the store key to retrieve a InactiveLimitOrderTranche from the index fields
+func InactiveLimitOrderTrancheKey(
 	pairId *PairId,
 	tokenIn string,
 	tickIndex int64,
@@ -164,12 +164,12 @@ func FilledLimitOrderTrancheKey(
 	return key
 }
 
-func FilledLimitOrderTranchePrefix(
+func InactiveLimitOrderTranchePrefix(
 	pairId *PairId,
 	tokenIn string,
 	tickIndex int64,
 ) []byte {
-	var key []byte = KeyPrefix(FilledLimitOrderTrancheKeyPrefix)
+	var key []byte = KeyPrefix(InactiveLimitOrderTrancheKeyPrefix)
 
 	pairIdBytes := []byte(pairId.Stringify())
 	key = append(key, pairIdBytes...)
@@ -269,7 +269,7 @@ func TickLiquidityPrefix(pairId *PairId, tokenIn string) []byte {
 	return key
 }
 
-func GoodTilRecordKey(
+func LimitOrderExpirationKey(
 	goodTilDate time.Time,
 	trancheRef []byte,
 ) []byte {

@@ -35,8 +35,8 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	cmd.AddCommand(CmdListUserDeposits())
 	cmd.AddCommand(CmdListUserLimitOrders())
 	cmd.AddCommand(CmdListTickLiquidity())
-	cmd.AddCommand(CmdListFilledLimitOrderTranche())
-	cmd.AddCommand(CmdShowFilledLimitOrderTranche())
+	cmd.AddCommand(CmdListInactiveLimitOrderTranche())
+	cmd.AddCommand(CmdShowInactiveLimitOrderTranche())
 	cmd.AddCommand(CmdListPoolReserves())
 	cmd.AddCommand(CmdShowPoolReserves())
 

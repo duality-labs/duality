@@ -36,25 +36,7 @@ func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tok
 
 }
 
-func NewLimitOrderTrancheWithGoodTil(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey string, goodTil time.Time) (types.LimitOrderTranche, error) {
-	if types.IsTickOutOfRange(tickIndex) {
-		return types.LimitOrderTranche{}, types.ErrTickOutsideRange
-	}
-	return types.LimitOrderTranche{
-		PairId:           pairId,
-		TokenIn:          tokenIn,
-		TickIndex:        tickIndex,
-		TrancheKey:       trancheKey,
-		ReservesTokenIn:  sdk.ZeroInt(),
-		ReservesTokenOut: sdk.ZeroInt(),
-		TotalTokenIn:     sdk.ZeroInt(),
-		TotalTokenOut:    sdk.ZeroInt(),
-		ExpirationTime:   &goodTil,
-	}, nil
-
-}
-
-func NewGoodTilRecord(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey string, goodTil time.Time) types.GoodTilRecord {
+func NewLimitOrderExpiration(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey string, goodTil time.Time) types.LimitOrderExpiration {
 	trancheRef := types.TickLiquidityKey(
 		pairId,
 		tokenIn,
@@ -62,16 +44,18 @@ func NewGoodTilRecord(pairId *types.PairId, tokenIn string, tickIndex int64, tra
 		types.LiquidityTypeLimitOrder,
 		trancheKey,
 	)
-	return types.GoodTilRecord{
-		TrancheRef:  trancheRef,
-		GoodTilDate: goodTil,
+	return types.LimitOrderExpiration{
+		TrancheRef:     trancheRef,
+		ExpirationTime: goodTil,
 	}
 }
 
-func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey string) (types.LimitOrderTranche, error) {
+func NewLimitOrderTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64, goodTil *time.Time) (types.LimitOrderTranche, error) {
+	// NOTE: CONTRACT: There is no active place tranche (ie. GetPlaceTrancheTick has returned false)
 	if types.IsTickOutOfRange(tickIndex) {
 		return types.LimitOrderTranche{}, types.ErrTickOutsideRange
 	}
+	trancheKey := NewTrancheKey(sdkCtx)
 	return types.LimitOrderTranche{
 		PairId:           pairId,
 		TokenIn:          tokenIn,
@@ -81,6 +65,7 @@ func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64,
 		ReservesTokenOut: sdk.ZeroInt(),
 		TotalTokenIn:     sdk.ZeroInt(),
 		TotalTokenOut:    sdk.ZeroInt(),
+		ExpirationTime:   goodTil,
 	}, nil
 
 }

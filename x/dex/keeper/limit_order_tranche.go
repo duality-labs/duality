@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -24,7 +23,7 @@ func (k Keeper) FindLimitOrderTranche(
 		return *tick, false, true
 	}
 	// Look for filled limit orders
-	tranche, found := k.GetFilledLimitOrderTranche(ctx, pairId, token, tickIndex, trancheKey)
+	tranche, found := k.GetInactiveLimitOrderTranche(ctx, pairId, token, tickIndex, trancheKey)
 	if found {
 		return tranche, true, true
 	}
@@ -47,10 +46,10 @@ func (k Keeper) GetAllLimitOrderTranche(ctx sdk.Context) (list []types.LimitOrde
 }
 
 func (k Keeper) SaveTranche(sdkCtx sdk.Context, tranche types.LimitOrderTranche) {
-	if tranche.HasToken() {
+	if tranche.HasTokenIn() {
 		k.SetLimitOrderTranche(sdkCtx, tranche)
 	} else {
-		k.SetFilledLimitOrderTranche(sdkCtx, tranche)
+		k.SetInactiveLimitOrderTranche(sdkCtx, tranche)
 		k.RemoveLimitOrderTranche(sdkCtx, tranche)
 	}
 
@@ -185,26 +184,11 @@ func NewTrancheKey(sdkCtx sdk.Context) string {
 
 }
 
-func (k Keeper) InitPlaceTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64) (types.LimitOrderTranche, error) {
-	// NOTE: CONTRACT: There is no active place tranche (ie. GetPlaceTrancheTick has returned false)
-
-	trancheKey := NewTrancheKey(sdkCtx)
-	return NewLimitOrderTranche(pairId, tokenIn, tickIndex, trancheKey)
-}
-
-func (k Keeper) InitPlaceTrancheWithGoodTil(sdkCtx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64, goodTil time.Time) (types.LimitOrderTranche, error) {
-	// TODO: right now we are not indexing by goodTil date so we can't easily check if there's already a tranche with the same goodTil date so instead we create a new tranche for each goodTil order
-	// if there is a large number of limitOrders with the same goodTilTime (most likely JIT) aggregating might be more efficient particularly for deletion, but if they are relatively sparse it will incur fewer lookups to just create a new limitOrderTranche
-	trancheKey := NewTrancheKey(sdkCtx)
-	tranche, err := NewLimitOrderTrancheWithGoodTil(pairId, tokenIn, tickIndex, trancheKey, goodTil)
-	return tranche, err
-}
-
 func (k Keeper) GetOrInitPlaceTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64) (placeTranche types.LimitOrderTranche, err error) {
 
 	placeTranche, found := k.GetPlaceTranche(sdkCtx, pairId, tokenIn, tickIndex)
 	if !found {
-		placeTranche, err = k.InitPlaceTranche(sdkCtx, pairId, tokenIn, tickIndex)
+		placeTranche, err = NewLimitOrderTranche(sdkCtx, pairId, tokenIn, tickIndex, nil)
 		if err != nil {
 			return types.LimitOrderTranche{}, err
 		}

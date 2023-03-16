@@ -26,9 +26,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 			k.SetLimitOrderTranche(ctx, *elem.GetLimitOrderTranche())
 		}
 	}
-	// Set all the filledLimitOrderTranche
-	for _, elem := range genState.FilledLimitOrderTrancheList {
-		k.SetFilledLimitOrderTranche(ctx, elem)
+	// Set all the inactiveLimitOrderTranche
+	for _, elem := range genState.InactiveLimitOrderTrancheList {
+		k.SetInactiveLimitOrderTranche(ctx, elem)
 	}
 
 	// Set all the LimitOrderTrancheUser
@@ -47,7 +47,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.FeeTierCount = k.GetFeeTierCount(ctx)
 	genesis.LimitOrderTrancheUserList = k.GetAllLimitOrderTrancheUser(ctx)
 	genesis.TickLiquidityList = k.GetAllTickLiquidity(ctx)
-	genesis.FilledLimitOrderTrancheList = k.GetAllFilledLimitOrderTranche(ctx)
+	genesis.InactiveLimitOrderTrancheList = k.GetAllInactiveLimitOrderTranche(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis

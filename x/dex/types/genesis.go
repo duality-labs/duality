@@ -13,7 +13,7 @@ func DefaultGenesis() *GenesisState {
 		FeeTierList:                 []FeeTier{},
 		LimitOrderTrancheUserList:   []LimitOrderTrancheUser{},
 		TickLiquidityList:           []TickLiquidity{},
-		FilledLimitOrderTrancheList: []LimitOrderTranche{},
+		InactiveLimitOrderTrancheList: []LimitOrderTranche{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -71,15 +71,15 @@ func (gs GenesisState) Validate() error {
 		}
 		tickLiquidityIndexMap[index] = struct{}{}
 	}
-	// Check for duplicated index in filledLimitOrderTranche
-	filledLimitOrderTrancheKeyMap := make(map[string]struct{})
+	// Check for duplicated index in inactiveLimitOrderTranche
+	inactiveLimitOrderTrancheKeyMap := make(map[string]struct{})
 
-	for _, elem := range gs.FilledLimitOrderTrancheList {
-		index := string(FilledLimitOrderTrancheKey(elem.PairId, elem.TokenIn, elem.TickIndex, elem.TrancheKey))
-		if _, ok := filledLimitOrderTrancheKeyMap[index]; ok {
-			return fmt.Errorf("duplicated index for filledLimitOrderTranche")
+	for _, elem := range gs.InactiveLimitOrderTrancheList {
+		index := string(InactiveLimitOrderTrancheKey(elem.PairId, elem.TokenIn, elem.TickIndex, elem.TrancheKey))
+		if _, ok := inactiveLimitOrderTrancheKeyMap[index]; ok {
+			return fmt.Errorf("duplicated index for inactiveLimitOrderTranche")
 		}
-		filledLimitOrderTrancheKeyMap[index] = struct{}{}
+		inactiveLimitOrderTrancheKeyMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 

@@ -33,5 +33,5 @@ var (
 	ErrZeroLimitOrder                     = sdkerrors.Register(ModuleName, 1130, "Limit order amount must be > 0.")
 	ErrNegativeLimitPrice                 = sdkerrors.Register(ModuleName, 1132, "LimitPrice must be > 0.")
 	ErrDepositShareUnderflow              = sdkerrors.Register(ModuleName, 1133, "Deposit amount is too small to issue shares")
-	ErrFOKLimitOrderNotFilled             = sdkerrors.Register(ModuleName, 1134, "Fill Or Kill limit order couldn't not be executed in its entirety.")
+	ErrFoKLimitOrderNotFilled             = sdkerrors.Register(ModuleName, 1134, "Fill Or Kill limit order couldn't not be executed in its entirety.")
 )

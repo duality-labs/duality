@@ -100,12 +100,12 @@ message MsgSwapResponse {
   ];
 }
 
-enum limitOrderType{
-  GOOD_TILL_CANCELLED = 0;
+enum LimitOrderType{
+  GOOD_TIL_CANCELLED = 0;
   FILL_OR_KILL = 1;
   IMMEDIATE_OR_CANCEL = 2;
   JUST_IN_TIME = 3;
-  GOOD_TILl_DATE = 4;
+  GOOD_TIL_TIME = 4;
 }
 
 message MsgPlaceLimitOrder {
@@ -121,8 +121,8 @@ message MsgPlaceLimitOrder {
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountIn"
   ];
-  limitOrderType orderType = 8;
-  google.protobuf.Timestamp GoodTil = 9 [
+  LimitOrderType orderType = 8;
+  google.protobuf.Timestamp expirationTime = 9 [
                                              (gogoproto.stdtime) = true,
                                              (gogoproto.nullable) = true
                                              ];

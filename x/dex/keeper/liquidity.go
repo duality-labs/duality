@@ -69,7 +69,7 @@ func (s *LiquidityIterator) Next() Liquidity {
 		case *types.TickLiquidity_LimitOrderTranche:
 			tranche := liquidity.LimitOrderTranche
 			// If we hit a tranche with an expired goodTil date keep iterating
-			if tranche.PastGoodTil(s.ctx.BlockTime()) {
+			if tranche.IsExpired(s.ctx) {
 				continue
 			} else {
 				return tranche

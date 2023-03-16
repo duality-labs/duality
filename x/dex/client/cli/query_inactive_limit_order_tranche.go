@@ -11,10 +11,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdListFilledLimitOrderTranche() *cobra.Command {
+func CmdListInactiveLimitOrderTranche() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-filled-limit-order-tranche",
-		Short: "list all FilledLimitOrderTranche",
+		Short: "list all InactiveLimitOrderTranche",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
@@ -25,11 +25,11 @@ func CmdListFilledLimitOrderTranche() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllFilledLimitOrderTrancheRequest{
+			params := &types.QueryAllInactiveLimitOrderTrancheRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.FilledLimitOrderTrancheAll(context.Background(), params)
+			res, err := queryClient.InactiveLimitOrderTrancheAll(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -44,10 +44,10 @@ func CmdListFilledLimitOrderTranche() *cobra.Command {
 	return cmd
 }
 
-func CmdShowFilledLimitOrderTranche() *cobra.Command {
+func CmdShowInactiveLimitOrderTranche() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "show-filled-limit-order-tranche [pair-id] [token-in] [tick-index] [tranche-key]",
-		Short:   "shows a FilledLimitOrderTranche",
+		Short:   "shows a InactiveLimitOrderTranche",
 		Example: "show-filled limit-order-tranche tokenA<>tokenB tokenA [10] 0",
 		Args:    cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -68,14 +68,14 @@ func CmdShowFilledLimitOrderTranche() *cobra.Command {
 				return err
 			}
 
-			params := &types.QueryGetFilledLimitOrderTrancheRequest{
+			params := &types.QueryGetInactiveLimitOrderTrancheRequest{
 				PairId:     argPairId,
 				TokenIn:    argTokenIn,
 				TickIndex:  argTickIndex,
 				TrancheKey: argTrancheKey,
 			}
 
-			res, err := queryClient.FilledLimitOrderTranche(context.Background(), params)
+			res, err := queryClient.InactiveLimitOrderTranche(context.Background(), params)
 			if err != nil {
 				return err
 			}

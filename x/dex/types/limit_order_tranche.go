@@ -1,8 +1,6 @@
 package types
 
 import (
-	"time"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -17,16 +15,21 @@ func (t LimitOrderTranche) IsFilled() bool {
 func (t LimitOrderTranche) IsJIT() bool {
 	return t.ExpirationTime != nil && t.ExpirationTime == &JITGoodTilTime
 }
-func (t LimitOrderTranche) PastGoodTil(timestamp time.Time) bool {
-	return t.ExpirationTime != nil && !t.IsJIT() && t.ExpirationTime.Before(timestamp)
+
+func (t LimitOrderTranche) IsExpired(ctx sdk.Context) bool {
+	return t.ExpirationTime != nil && !t.IsJIT() && t.ExpirationTime.Before(ctx.BlockTime())
 }
 
 func (t *LimitOrderTranche) Price() *Price {
 	return t.PriceTakerToMaker()
 }
 
-func (t LimitOrderTranche) HasToken() bool {
+func (t LimitOrderTranche) HasTokenIn() bool {
 	return t.ReservesTokenIn.GT(sdk.ZeroInt())
+}
+
+func (t LimitOrderTranche) HasTokenOut() bool {
+	return t.ReservesTokenOut.GT(sdk.ZeroInt())
 }
 
 func (t LimitOrderTranche) IsTokenInToken0() bool {

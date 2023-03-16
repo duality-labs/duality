@@ -240,7 +240,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 	receiverAddr sdk.AccAddress,
 	amountIn sdk.Int,
 	limitPrice *sdk.Dec,
-) (sdk.Int, sdk.Int, sdk.Int, error) {
+) (totalIn sdk.Int, totalOut sdk.Int, remainingIn sdk.Int, error error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	cacheCtx, writeCache := ctx.CacheContext()
 	pairId, err := CreatePairIdFromUnsorted(tokenIn, tokenOut)
@@ -252,8 +252,8 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		return sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt(), err
 	}
 
-	remainingIn := amountIn
-	totalOut := sdk.ZeroInt()
+	remainingIn = amountIn
+	totalOut = sdk.ZeroInt()
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
 	liqIter := NewLiquidityIterator(k, ctx, pair)
@@ -279,7 +279,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 	}
 
 	writeCache()
-	totalIn := amountIn.Sub(remainingIn)
+	totalIn = amountIn.Sub(remainingIn)
 	return totalIn, totalOut, remainingIn, nil
 }
 
@@ -325,29 +325,32 @@ func (k Keeper) PlaceLimitOrderCore(
 	tickIndex int64,
 	orderType types.LimitOrderType,
 	goodTil *time.Time,
-) (trancheKey string, err error) {
+) (trancheKeyP *string, err error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	token0, token1, err := SortTokens(tokenIn, tokenOut)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	pairId := CreatePairId(token0, token1)
 	var placeTranche types.LimitOrderTranche
 	// TODO: JCP maybe move this somewhere else to simplify logic here
+
+	// TODO: right now we are not indexing by goodTil date so we can't easily check if there's already a tranche with the same goodTil date so instead we create a new tranche for each goodTil order
+	// if there is a large number of limitOrders with the same goodTilTime (most likely JIT) aggregating might be more efficient particularly for deletion, but if they are relatively sparse it will incur fewer lookups to just create a new limitOrderTranche
 	switch orderType {
 	case types.LimitOrderType_JUST_IN_TIME:
-		placeTranche, err = k.InitPlaceTrancheWithGoodTil(ctx, pairId, tokenIn, tickIndex, types.JITGoodTilTime)
-	case types.LimitOrderType_GOOD_TILl_DATE:
-		placeTranche, err = k.InitPlaceTrancheWithGoodTil(ctx, pairId, tokenIn, tickIndex, *goodTil)
+		placeTranche, err = NewLimitOrderTranche(ctx, pairId, tokenIn, tickIndex, &types.JITGoodTilTime)
+	case types.LimitOrderType_GOOD_TIL_TIME:
+		placeTranche, err = NewLimitOrderTranche(ctx, pairId, tokenIn, tickIndex, goodTil)
 	default:
 		placeTranche, err = k.GetOrInitPlaceTranche(ctx, pairId, tokenIn, tickIndex)
 	}
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	trancheKey = placeTranche.TrancheKey
+	trancheKey := placeTranche.TrancheKey
 	trancheUser := k.GetOrInitLimitOrderTrancheUser(ctx, pairId, tickIndex, tokenIn, trancheKey, receiverAddr.String())
 	amountLeft := amountIn
 
@@ -367,32 +370,25 @@ func (k Keeper) PlaceLimitOrderCore(
 			&limitPrice,
 		)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 		totalIn = amountInSwap
 		trancheUser.ReservesFromSwap = amountOutSwap
 	}
 
-	if !amountLeft.IsZero() && orderType.IsFoK() {
-		return "", types.ErrFOKLimitOrderNotFilled
+	if amountLeft.IsPositive() && orderType.IsFoK() {
+		return nil, types.ErrFoKLimitOrderNotFilled
 	}
 
 	sharesIssued := sdk.ZeroInt()
 	// FOR GTC, JIT & GoodTil try to place a maker limitOrder with remaining Amount
-	if !amountLeft.IsZero() && (orderType.IsGTC() || orderType.IsJIT() || orderType.IsGoodTil()) {
-		// TODO: JCP confirm that we never need this check. If GTC they should have already traded through cheaper liq so it doesn't matter
-		// if JIT we just kinda assume they know what they are doing and we won't stop them.
-		// if we do want this we can save a calculation by doing this first and skipping swap step in not BEL
-
-		// if k.IsBehindEnemyLines(ctx, placeTranche.PairId, placeTranche.TokenIn, placeTranche.TickIndex) {
-		// 	return "", types.ErrPlaceLimitOrderBehindPairLiquidity
-		// }
+	if amountLeft.IsPositive() && (orderType.IsGTC() || orderType.IsJIT() || orderType.IsGoodTil()) {
 		placeTranche.PlaceMakerLimitOrder(ctx, amountLeft)
 		trancheUser.SharesOwned = trancheUser.SharesOwned.Add(amountLeft)
 
 		if orderType.IsJIT() || orderType.IsGoodTil() {
-			goodTilRecord := NewGoodTilRecord(pairId, tokenIn, tickIndex, trancheKey, *goodTil)
-			k.SetGoodTilRecord(ctx, goodTilRecord)
+			goodTilRecord := NewLimitOrderExpiration(pairId, tokenIn, tickIndex, trancheKey, *goodTil)
+			k.SetLimitOrderExpiration(ctx, goodTilRecord)
 		}
 		k.SaveTranche(ctx, placeTranche)
 		totalIn = totalIn.Add(amountLeft)
@@ -401,11 +397,11 @@ func (k Keeper) PlaceLimitOrderCore(
 
 	k.SaveTrancheUser(ctx, trancheUser)
 
-	if !totalIn.IsZero() {
+	if totalIn.IsPositive() {
 		coin0 := sdk.NewCoin(tokenIn, totalIn)
 		err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0})
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 	}
 	ctx.EventManager().EmitEvent(types.CreatePlaceLimitOrderEvent(
@@ -419,7 +415,7 @@ func (k Keeper) PlaceLimitOrderCore(
 		trancheKey,
 	))
 
-	return trancheKey, nil
+	return &trancheKey, nil
 }
 
 // Handles MsgCancelLimitOrder, removing a specifed number of shares from a limit order and returning the respective amount in terms of the reserve to the user
@@ -511,10 +507,9 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		// TODO: this is a bit of a messy pattern
 
 		if wasFilled {
-			//This is only relevant for JIT and GoodTil limit orders where the arhived
+			//This is only relevant for inactive JIT and GoodTil limit orders
 			remainingTokenIn = tranche.RemoveTokenIn(trancheUser)
-			// TODO: switch to k.SaveFilledLimitOrderTranche and delete empty tranches
-			k.SetFilledLimitOrderTranche(ctx, tranche)
+			k.SaveInactiveTranche(ctx, tranche)
 		} else {
 			k.SetLimitOrderTranche(ctx, tranche)
 		}
@@ -527,7 +522,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 
 	k.SaveTrancheUser(ctx, trancheUser)
 
-	if !amountOutTokenOut.IsZero() || !remainingTokenIn.IsZero() {
+	if amountOutTokenOut.IsPositive() || remainingTokenIn.IsPositive() {
 		coinOut := sdk.NewCoin(tokenOut, amountOutTokenOut.TruncateInt())
 		coinInRefund := sdk.NewCoin(tokenIn, remainingTokenIn)
 		// TODO: NewCoins does a lot of unnecesary work to sanitize and validate coins, all we really is to remove zero coins

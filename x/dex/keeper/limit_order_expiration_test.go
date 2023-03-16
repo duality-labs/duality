@@ -16,23 +16,23 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNGoodTilRecord(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.GoodTilRecord {
-	items := make([]types.GoodTilRecord, n)
+func createNLimitOrderExpiration(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.LimitOrderExpiration {
+	items := make([]types.LimitOrderExpiration, n)
 	for i := range items {
-		items[i].GoodTilDate = time.Unix(int64(i), 10).UTC()
+		items[i].ExpirationTime = time.Unix(int64(i), 10).UTC()
 		items[i].TrancheRef = []byte(strconv.Itoa(i))
 
-		keeper.SetGoodTilRecord(ctx, items[i])
+		keeper.SetLimitOrderExpiration(ctx, items[i])
 	}
 	return items
 }
 
-func TestGoodTilRecordGet(t *testing.T) {
+func TestLimitOrderExpirationGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNGoodTilRecord(keeper, ctx, 10)
+	items := createNLimitOrderExpiration(keeper, ctx, 10)
 	for _, item := range items {
-		rst, found := keeper.GetGoodTilRecord(ctx,
-			item.GoodTilDate,
+		rst, found := keeper.GetLimitOrderExpiration(ctx,
+			item.ExpirationTime,
 			item.TrancheRef,
 		)
 		require.True(t, found)
@@ -42,27 +42,27 @@ func TestGoodTilRecordGet(t *testing.T) {
 		)
 	}
 }
-func TestGoodTilRecordRemove(t *testing.T) {
+func TestLimitOrderExpirationRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNGoodTilRecord(keeper, ctx, 10)
+	items := createNLimitOrderExpiration(keeper, ctx, 10)
 	for _, item := range items {
-		keeper.RemoveGoodTilRecord(ctx,
-			item.GoodTilDate,
+		keeper.RemoveLimitOrderExpiration(ctx,
+			item.ExpirationTime,
 			item.TrancheRef,
 		)
-		_, found := keeper.GetGoodTilRecord(ctx,
-			item.GoodTilDate,
+		_, found := keeper.GetLimitOrderExpiration(ctx,
+			item.ExpirationTime,
 			item.TrancheRef,
 		)
 		require.False(t, found)
 	}
 }
 
-func TestGoodTilRecordGetAll(t *testing.T) {
+func TestLimitOrderExpirationGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNGoodTilRecord(keeper, ctx, 10)
+	items := createNLimitOrderExpiration(keeper, ctx, 10)
 	require.ElementsMatch(t,
 		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllGoodTilRecord(ctx)),
+		nullify.Fill(keeper.GetAllLimitOrderExpiration(ctx)),
 	)
 }

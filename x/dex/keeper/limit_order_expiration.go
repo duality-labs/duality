@@ -8,26 +8,26 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
-// SetGoodTilRecord set a specific goodTilRecord in the store from its index
-func (k Keeper) SetGoodTilRecord(ctx sdk.Context, goodTilRecord types.GoodTilRecord) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.GoodTilRecordKeyPrefix))
+// SetLimitOrderExpiration set a specific goodTilRecord in the store from its index
+func (k Keeper) SetLimitOrderExpiration(ctx sdk.Context, goodTilRecord types.LimitOrderExpiration) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderExpirationKeyPrefix))
 	b := k.cdc.MustMarshal(&goodTilRecord)
-	store.Set(types.GoodTilRecordKey(
-		goodTilRecord.GoodTilDate,
+	store.Set(types.LimitOrderExpirationKey(
+		goodTilRecord.ExpirationTime,
 		goodTilRecord.TrancheRef,
 	), b)
 }
 
-// GetGoodTilRecord returns a goodTilRecord from its index
-func (k Keeper) GetGoodTilRecord(
+// GetLimitOrderExpiration returns a goodTilRecord from its index
+func (k Keeper) GetLimitOrderExpiration(
 	ctx sdk.Context,
 	goodTilDate time.Time,
 	trancheRef []byte,
 
-) (val types.GoodTilRecord, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.GoodTilRecordKeyPrefix))
+) (val types.LimitOrderExpiration, found bool) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderExpirationKeyPrefix))
 
-	b := store.Get(types.GoodTilRecordKey(
+	b := store.Get(types.LimitOrderExpirationKey(
 		goodTilDate,
 		trancheRef,
 	))
@@ -39,34 +39,34 @@ func (k Keeper) GetGoodTilRecord(
 	return val, true
 }
 
-// RemoveGoodTilRecord removes a goodTilRecord from the store
-func (k Keeper) RemoveGoodTilRecord(
+// RemoveLimitOrderExpiration removes a goodTilRecord from the store
+func (k Keeper) RemoveLimitOrderExpiration(
 	ctx sdk.Context,
 	goodTilDate time.Time,
 	trancheRef []byte,
 
 ) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.GoodTilRecordKeyPrefix))
-	store.Delete(types.GoodTilRecordKey(
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderExpirationKeyPrefix))
+	store.Delete(types.LimitOrderExpirationKey(
 		goodTilDate,
 		trancheRef,
 	))
 }
 
-func (k Keeper) RemoveGoodTilRecordByPrefixedyKey(ctx sdk.Context, key []byte) {
+func (k Keeper) RemoveLimitOrderExpirationByPrefixedyKey(ctx sdk.Context, key []byte) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(key)
 }
 
-// GetAllGoodTilRecord returns all goodTilRecord
-func (k Keeper) GetAllGoodTilRecord(ctx sdk.Context) (list []types.GoodTilRecord) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.GoodTilRecordKeyPrefix))
+// GetAllLimitOrderExpiration returns all goodTilRecord
+func (k Keeper) GetAllLimitOrderExpiration(ctx sdk.Context) (list []types.LimitOrderExpiration) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderExpirationKeyPrefix))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var val types.GoodTilRecord
+		var val types.LimitOrderExpiration
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
 		list = append(list, val)
 	}
@@ -74,9 +74,9 @@ func (k Keeper) GetAllGoodTilRecord(ctx sdk.Context) (list []types.GoodTilRecord
 	return
 }
 
-func (k Keeper) PurgeExpiredGoodTilRecords(ctx sdk.Context, curTime time.Time) {
+func (k Keeper) PurgeExpiredLimitOrderExpirations(ctx sdk.Context, curTime time.Time) {
 
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.GoodTilRecordKeyPrefix))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderExpirationKeyPrefix))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 	inGTDSegment := false
 
@@ -85,10 +85,10 @@ func (k Keeper) PurgeExpiredGoodTilRecords(ctx sdk.Context, curTime time.Time) {
 	gasCutoff := ctx.BlockGasMeter().Limit() - types.GoodTilPurgeGasBuffer
 
 	for ; iterator.Valid(); iterator.Next() {
-		var val types.GoodTilRecord
+		var val types.LimitOrderExpiration
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
-		if val.GoodTilDate.Before(curTime) {
-			inGTDSegment = inGTDSegment || val.GoodTilDate != types.JITGoodTilTime
+		if val.ExpirationTime.Before(curTime) {
+			inGTDSegment = inGTDSegment || val.ExpirationTime != types.JITGoodTilTime
 			gasConsumed := ctx.BlockGasMeter().GasConsumed()
 
 			if inGTDSegment && gasConsumed >= gasCutoff {
@@ -106,12 +106,12 @@ func (k Keeper) PurgeExpiredGoodTilRecords(ctx sdk.Context, curTime time.Time) {
 				tranche, found := k.GetLimitOrderTrancheByKey(ctx, val.TrancheRef)
 				// Convert the tranche to a filled tranche
 				if found {
-					k.SetFilledLimitOrderTranche(ctx, *tranche)
+					k.SetInactiveLimitOrderTranche(ctx, *tranche)
 					k.RemoveLimitOrderTranche(ctx, *tranche)
 					archivedTranches[string(val.TrancheRef)] = true
 				}
 			}
-			k.RemoveGoodTilRecordByPrefixedyKey(ctx, iterator.Key())
+			k.RemoveLimitOrderExpirationByPrefixedyKey(ctx, iterator.Key())
 		} else {
 			return
 		}

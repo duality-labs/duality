@@ -131,13 +131,13 @@ func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLim
 		msg.AmountIn,
 		msg.TickIndex,
 		msg.OrderType,
-		msg.GoodTil,
+		msg.ExpirationTime,
 	)
 	if err != nil {
 		return &types.MsgPlaceLimitOrderResponse{}, err
 	}
 
-	return &types.MsgPlaceLimitOrderResponse{TrancheKey: trancheKey}, nil
+	return &types.MsgPlaceLimitOrderResponse{TrancheKey: *trancheKey}, nil
 }
 
 func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.MsgWithdrawFilledLimitOrder) (*types.MsgWithdrawFilledLimitOrderResponse, error) {

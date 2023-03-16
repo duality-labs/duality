@@ -436,7 +436,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFoKFailsWithInsufficientLiq() {
 	// GIVEN LP liq at tick -1 of 9 tokenB
 	s.bobDeposits(NewDeposit(0, 9, -1, 0))
 	//WHEN alice submits FoK limitOrder for 10 at tick 0 it fails
-	s.assertAliceLimitSellFails(types.ErrFOKLimitOrderNotFilled, "TokenA", 0, 10, types.LimitOrderType_FILL_OR_KILL)
+	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenA", 0, 10, types.LimitOrderType_FILL_OR_KILL)
 
 }
 
@@ -446,7 +446,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrder0FoKFailsWithLowLimit() {
 	// GIVEN LP liq at tick -1 of 20 tokenB
 	s.bobDeposits(NewDeposit(0, 20, -1, 0))
 	//WHEN alice submits FoK limitOrder for 10 at tick -1 it fails
-	s.assertAliceLimitSellFails(types.ErrFOKLimitOrderNotFilled, "TokenA", -1, 10, types.LimitOrderType_FILL_OR_KILL)
+	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenA", -1, 10, types.LimitOrderType_FILL_OR_KILL)
 
 }
 
@@ -456,7 +456,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrder1FoKFailsWithHighLimit() {
 	// GIVEN LP liq at tick 20 of 20 tokenA
 	s.bobDeposits(NewDeposit(20, 0, 20, 0))
 	//WHEN alice submits FoK limitOrder for 10 at tick -1 it fails
-	s.assertAliceLimitSellFails(types.ErrFOKLimitOrderNotFilled, "TokenB", 21, 10, types.LimitOrderType_FILL_OR_KILL)
+	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenB", 21, 10, types.LimitOrderType_FILL_OR_KILL)
 }
 
 // Immediate Or Cancel LimitOrders ////////////////////////////////////////////////////////////////////

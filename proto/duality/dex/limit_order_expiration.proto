@@ -6,9 +6,9 @@ import "google/protobuf/timestamp.proto";
 
 import "gogoproto/gogo.proto";
 
-message GoodTilRecord {
+message LimitOrderExpiration {
   // see limitOrderTranche.proto for details on goodTilDate
-  google.protobuf.Timestamp GoodTilDate = 1 [
+  google.protobuf.Timestamp ExpirationTime = 1 [
                                                (gogoproto.stdtime) = true,
                                                (gogoproto.nullable) = false
                                                ];

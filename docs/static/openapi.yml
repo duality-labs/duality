@@ -12418,15 +12418,15 @@ paths:
         - Query
   /dualitylabs/duality/dex/filled_limit_order_tranche:
     get:
-      summary: Queries a list of FilledLimitOrderTranche items.
-      operationId: DualitylabsDualityDexFilledLimitOrderTrancheAll
+      summary: Queries a list of InactiveLimitOrderTranche items.
+      operationId: DualitylabsDualityDexInactiveLimitOrderTrancheAll
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              filledLimitOrderTranche:
+              inactiveLimitOrderTranche:
                 type: array
                 items:
                   type: object
@@ -12575,15 +12575,15 @@ paths:
         - Query
   /dualitylabs/duality/dex/filled_limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}:
     get:
-      summary: Queries a FilledLimitOrderTranche by index.
-      operationId: DualitylabsDualityDexFilledLimitOrderTranche
+      summary: Queries a InactiveLimitOrderTranche by index.
+      operationId: DualitylabsDualityDexInactiveLimitOrderTranche
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              filledLimitOrderTranche:
+              inactiveLimitOrderTranche:
                 type: object
                 properties:
                   pairId:
@@ -40146,10 +40146,10 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  dualitylabs.duality.dex.QueryAllFilledLimitOrderTrancheResponse:
+  dualitylabs.duality.dex.QueryAllInactiveLimitOrderTrancheResponse:
     type: object
     properties:
-      filledLimitOrderTranche:
+      inactiveLimitOrderTranche:
         type: array
         items:
           type: object
@@ -40562,10 +40562,10 @@ definitions:
           fee:
             type: string
             format: uint64
-  dualitylabs.duality.dex.QueryGetFilledLimitOrderTrancheResponse:
+  dualitylabs.duality.dex.QueryGetInactiveLimitOrderTrancheResponse:
     type: object
     properties:
-      filledLimitOrderTranche:
+      inactiveLimitOrderTranche:
         type: object
         properties:
           pairId:
@@ -40896,12 +40896,12 @@ definitions:
   dualitylabs.duality.dex.limitOrderType:
     type: string
     enum:
-      - GOOD_TILL_CANCELLED
+      - GOOD_TIL_CANCELLED
       - FILL_OR_KILL
       - IMMEDIATE_OR_CANCEL
       - JUST_IN_TIME
-      - GOOD_TILl_DATE
-    default: GOOD_TILL_CANCELLED
+      - GOOD_TIL_DATE
+    default: GOOD_TIL_CANCELLED
   dualitylabs.duality.mev.MsgSendResponse:
     type: object
   dualitylabs.duality.mev.Params:

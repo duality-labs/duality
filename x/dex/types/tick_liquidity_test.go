@@ -19,7 +19,7 @@ func TestHasTokenEmptyLO(t *testing.T) {
 
 	// WHEN has no limits orders
 	tick := &types.LimitOrderTranche{ReservesTokenIn: sdk.NewInt(0)}
-	assert.False(t, tick.HasToken())
+	assert.False(t, tick.HasTokenIn())
 }
 
 func TestHasToken0HasReserves(t *testing.T) {
@@ -34,5 +34,5 @@ func TestHasTokenHasLO(t *testing.T) {
 
 	// WHEN has limit ordeers
 	tick := &types.LimitOrderTranche{ReservesTokenIn: sdk.NewInt(10)}
-	assert.True(t, tick.HasToken())
+	assert.True(t, tick.HasTokenIn())
 }
