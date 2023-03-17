@@ -3,6 +3,7 @@ package cli
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -15,10 +16,10 @@ import (
 
 func CmdPlaceLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "place-limit-order [receiver] [token-a] [token-b] [tick-index] [token-in] [amount-in]",
+		Use:     "place-limit-order [receiver] [token-a] [token-b] [tick-index] [token-in] [amount-in] ?[expirationTime]",
 		Short:   "Broadcast message PlaceLimitOrder",
 		Example: "place-limit-order alice tokenA tokenB [-10] tokenA 50 --from alice",
-		Args:    cobra.ExactArgs(6),
+		Args:    cobra.RangeArgs(6, 7),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
 			argTokenA := args[1]
@@ -40,6 +41,17 @@ func CmdPlaceLimitOrder() *cobra.Command {
 			if ok != true {
 				return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for amount-in")
 			}
+			var goodTil *time.Time = nil
+			if len(args) == 7 {
+				const timeFormat = "01/02/2006 15:04:05"
+				tm, err := time.Parse(timeFormat, args[6])
+				if err != nil {
+					return sdkerrors.Wrapf(types.ErrInvalidTimeString, err.Error())
+				}
+				goodTil = &tm
+
+			} else {
+			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -54,6 +66,7 @@ func CmdPlaceLimitOrder() *cobra.Command {
 				argTickIndexInt,
 				argTokenIn,
 				amountInInt,
+				goodTil,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

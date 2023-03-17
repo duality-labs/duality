@@ -34,4 +34,7 @@ var (
 	ErrNegativeLimitPrice                 = sdkerrors.Register(ModuleName, 1132, "LimitPrice must be > 0.")
 	ErrDepositShareUnderflow              = sdkerrors.Register(ModuleName, 1133, "Deposit amount is too small to issue shares")
 	ErrFoKLimitOrderNotFilled             = sdkerrors.Register(ModuleName, 1134, "Fill Or Kill limit order couldn't not be executed in its entirety.")
+	ErrInvalidTimeString                  = sdkerrors.Register(ModuleName, 1135, "Time string must be formatted as MM/dd/yyyy HH:mm:ss (ex. 02/05/2023 15:34:56) ")
+	ErrGoodTilOrderWithoutExpiration      = sdkerrors.Register(ModuleName, 1136, "Limit orders of type GOOD_TIL_TIME must supply an ExpirationTime.")
+	ErrExpirationOnWrongOrderType         = sdkerrors.Register(ModuleName, 1137, "Only Limit orders of type GOOD_TIL_TIME can supply an ExpirationTime.")
 )

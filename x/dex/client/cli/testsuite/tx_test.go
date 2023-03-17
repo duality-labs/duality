@@ -14,6 +14,7 @@ import (
 	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/client/testutil"
 	network "github.com/duality-labs/duality/testutil/network"
 	dexClient "github.com/duality-labs/duality/x/dex/client/cli"
+	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
@@ -323,21 +324,32 @@ func (s *TxTestSuite) TestTx4Cmd4laceLimitOrder() {
 		errInRes  bool
 	}{
 		{
-			// "place-limit-order [receiver] [token-a] [token-b] [tick-index] [token-in] [amount-in]",,
+			// "place-limit-order [receiver] [token-a] [token-b] [tick-index] [token-in] [amount-in] ?[expirationTime]"
 			name:      "missing arguments",
 			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 6 arg(s), received 5",
+			expErrMsg: "Error: accepts between 6 and 7 arg(s), received 5",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10", "1"},
+			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10", "1", "1"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 6 arg(s), received 7",
+			expErrMsg: "Error: accepts between 6 and 7 arg(s), received 8",
+		},
+		{
+			name:      "invalid goodTil",
+			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10", "january"},
+			expErr:    true,
+			expErrMsg: types.ErrInvalidTimeString.Error(),
 		},
 		{
 			name:     "valid",
 			args:     []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10"},
+			errInRes: false,
+		},
+		{
+			name:     "valid goodTil",
+			args:     []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10", "06/15/2025 02:00:00"},
 			errInRes: false,
 		},
 	}
@@ -450,7 +462,7 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 	require.NoError(s.T(), err)
 	trancheKey := findTrancheKeyInTx(txBuff.String())
 
-	argsSwap := append([]string{s.network.Validators[0].Address.String(), "30", "TokenA", "TokenB", "TokenA", "0"}, commonFlags...)
+	argsSwap := append([]string{s.network.Validators[0].Address.String(), "30", "TokenA", "TokenB", "TokenA"}, commonFlags...)
 	cmd = dexClient.CmdSwap()
 	_, err = cli.ExecTestCLICmd(clientCtx, cmd, argsSwap)
 	require.NoError(s.T(), err)
