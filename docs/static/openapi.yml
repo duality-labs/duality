@@ -12955,8 +12955,17 @@ paths:
                       type: string
                     sharesCancelled:
                       type: string
-                    reservesFromSwap:
+                    takerReserves:
                       type: string
+                    orderType:
+                      type: string
+                      enum:
+                        - GOOD_TIL_CANCELLED
+                        - FILL_OR_KILL
+                        - IMMEDIATE_OR_CANCEL
+                        - JUST_IN_TIME
+                        - GOOD_TIL_TIME
+                      default: GOOD_TIL_CANCELLED
               pagination:
                 type: object
                 properties:
@@ -13096,8 +13105,17 @@ paths:
                     type: string
                   sharesCancelled:
                     type: string
-                  reservesFromSwap:
+                  takerReserves:
                     type: string
+                  orderType:
+                    type: string
+                    enum:
+                      - GOOD_TIL_CANCELLED
+                      - FILL_OR_KILL
+                      - IMMEDIATE_OR_CANCEL
+                      - JUST_IN_TIME
+                      - GOOD_TIL_TIME
+                    default: GOOD_TIL_CANCELLED
         default:
           description: An unexpected error response.
           schema:
@@ -13676,8 +13694,17 @@ paths:
                       type: string
                     sharesCancelled:
                       type: string
-                    reservesFromSwap:
+                    takerReserves:
                       type: string
+                    orderType:
+                      type: string
+                      enum:
+                        - GOOD_TIL_CANCELLED
+                        - FILL_OR_KILL
+                        - IMMEDIATE_OR_CANCEL
+                        - JUST_IN_TIME
+                        - GOOD_TIL_TIME
+                      default: GOOD_TIL_CANCELLED
         default:
           description: An unexpected error response.
           schema:
@@ -13769,8 +13796,17 @@ paths:
                           type: string
                         sharesCancelled:
                           type: string
-                        reservesFromSwap:
+                        takerReserves:
                           type: string
+                        orderType:
+                          type: string
+                          enum:
+                            - GOOD_TIL_CANCELLED
+                            - FILL_OR_KILL
+                            - IMMEDIATE_OR_CANCEL
+                            - JUST_IN_TIME
+                            - GOOD_TIL_TIME
+                          default: GOOD_TIL_CANCELLED
         default:
           description: An unexpected error response.
           schema:
@@ -40038,8 +40074,26 @@ definitions:
         type: string
       sharesCancelled:
         type: string
-      reservesFromSwap:
+      takerReserves:
         type: string
+      orderType:
+        type: string
+        enum:
+          - GOOD_TIL_CANCELLED
+          - FILL_OR_KILL
+          - IMMEDIATE_OR_CANCEL
+          - JUST_IN_TIME
+          - GOOD_TIL_TIME
+        default: GOOD_TIL_CANCELLED
+  dualitylabs.duality.dex.LimitOrderType:
+    type: string
+    enum:
+      - GOOD_TIL_CANCELLED
+      - FILL_OR_KILL
+      - IMMEDIATE_OR_CANCEL
+      - JUST_IN_TIME
+      - GOOD_TIL_TIME
+    default: GOOD_TIL_CANCELLED
   dualitylabs.duality.dex.MsgCancelLimitOrderResponse:
     type: object
   dualitylabs.duality.dex.MsgDepositResponse:
@@ -40318,8 +40372,17 @@ definitions:
               type: string
             sharesCancelled:
               type: string
-            reservesFromSwap:
+            takerReserves:
               type: string
+            orderType:
+              type: string
+              enum:
+                - GOOD_TIL_CANCELLED
+                - FILL_OR_KILL
+                - IMMEDIATE_OR_CANCEL
+                - JUST_IN_TIME
+                - GOOD_TIL_TIME
+              default: GOOD_TIL_CANCELLED
       pagination:
         type: object
         properties:
@@ -40548,8 +40611,17 @@ definitions:
               type: string
             sharesCancelled:
               type: string
-            reservesFromSwap:
+            takerReserves:
               type: string
+            orderType:
+              type: string
+              enum:
+                - GOOD_TIL_CANCELLED
+                - FILL_OR_KILL
+                - IMMEDIATE_OR_CANCEL
+                - JUST_IN_TIME
+                - GOOD_TIL_TIME
+              default: GOOD_TIL_CANCELLED
   dualitylabs.duality.dex.QueryGetFeeTierResponse:
     type: object
     properties:
@@ -40678,8 +40750,17 @@ definitions:
             type: string
           sharesCancelled:
             type: string
-          reservesFromSwap:
+          takerReserves:
             type: string
+          orderType:
+            type: string
+            enum:
+              - GOOD_TIL_CANCELLED
+              - FILL_OR_KILL
+              - IMMEDIATE_OR_CANCEL
+              - JUST_IN_TIME
+              - GOOD_TIL_TIME
+            default: GOOD_TIL_CANCELLED
   dualitylabs.duality.dex.QueryGetPoolReservesResponse:
     type: object
     properties:
@@ -40762,8 +40843,17 @@ definitions:
                   type: string
                 sharesCancelled:
                   type: string
-                reservesFromSwap:
+                takerReserves:
                   type: string
+                orderType:
+                  type: string
+                  enum:
+                    - GOOD_TIL_CANCELLED
+                    - FILL_OR_KILL
+                    - IMMEDIATE_OR_CANCEL
+                    - JUST_IN_TIME
+                    - GOOD_TIL_TIME
+                  default: GOOD_TIL_CANCELLED
   dualitylabs.duality.dex.QueryParamsResponse:
     type: object
     properties:
@@ -40891,17 +40981,17 @@ definitions:
               type: string
             sharesCancelled:
               type: string
-            reservesFromSwap:
+            takerReserves:
               type: string
-  dualitylabs.duality.dex.limitOrderType:
-    type: string
-    enum:
-      - GOOD_TIL_CANCELLED
-      - FILL_OR_KILL
-      - IMMEDIATE_OR_CANCEL
-      - JUST_IN_TIME
-      - GOOD_TIL_DATE
-    default: GOOD_TIL_CANCELLED
+            orderType:
+              type: string
+              enum:
+                - GOOD_TIL_CANCELLED
+                - FILL_OR_KILL
+                - IMMEDIATE_OR_CANCEL
+                - JUST_IN_TIME
+                - GOOD_TIL_TIME
+              default: GOOD_TIL_CANCELLED
   dualitylabs.duality.mev.MsgSendResponse:
     type: object
   dualitylabs.duality.mev.Params:
