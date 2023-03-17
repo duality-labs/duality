@@ -84,13 +84,14 @@ func (k Keeper) PurgeExpiredLimitOrders(ctx sdk.Context, curTime time.Time) {
 	defer iterator.Close()
 
 	gasCutoff := ctx.BlockGasMeter().Limit() - types.GoodTilPurgeGasBuffer
+	curBlockGas := ctx.BlockGasMeter().GasConsumed()
 
 	for ; iterator.Valid(); iterator.Next() {
 		var val types.LimitOrderExpiration
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
 		if !val.ExpirationTime.After(curTime) {
 			inGoodTilSegment = inGoodTilSegment || val.ExpirationTime != types.JITGoodTilTime
-			gasConsumed := ctx.BlockGasMeter().GasConsumed()
+			gasConsumed := curBlockGas + ctx.GasMeter().GasConsumed()
 
 			if inGoodTilSegment && gasConsumed >= gasCutoff {
 				// If we hit our gas cutoff stop deleting so as not to timeout the block.

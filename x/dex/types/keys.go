@@ -394,6 +394,9 @@ var (
 )
 
 const (
-	// TODO: jcp figure out a good number here
-	GoodTilPurgeGasBuffer = 1000
+	// NOTE: This number is based current cost of all operations in EndBlock,
+	// if that changes this value must be updated to ensure there is enough
+	// remaining gas (weak proxy for timeoutPrepareProposal) to complete endBlock
+	GoodTilPurgeGasBuffer = 50000
+	ExpiringLimitOrderGas = 10000
 )

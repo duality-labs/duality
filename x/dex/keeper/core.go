@@ -329,6 +329,7 @@ func (k Keeper) PlaceLimitOrderCore(
 		if orderType.IsJIT() || orderType.IsGoodTil() {
 			goodTilRecord := NewLimitOrderExpiration(placeTranche)
 			k.SetLimitOrderExpiration(ctx, goodTilRecord)
+			ctx.GasMeter().ConsumeGas(types.ExpiringLimitOrderGas, "Expiring LimitOrder Fee")
 		}
 		k.SaveTranche(ctx, placeTranche)
 		totalIn = totalIn.Add(amountLeft)
