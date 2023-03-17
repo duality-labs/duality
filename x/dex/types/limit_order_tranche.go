@@ -36,6 +36,17 @@ func (t LimitOrderTranche) IsTokenInToken0() bool {
 	return t.TokenIn == t.PairId.Token0
 }
 
+func (t *LimitOrderTranche) Ref() []byte {
+	// returns the KVstore key for a tranche
+	return TickLiquidityKey(
+		t.PairId,
+		t.TokenIn,
+		t.TickIndex,
+		LiquidityTypeLimitOrder,
+		t.TrancheKey,
+	)
+}
+
 func (t LimitOrderTranche) PriceMakerToTaker() *Price {
 	if t.IsTokenInToken0() {
 		return MustNewPrice(t.TickIndex)
@@ -112,8 +123,7 @@ func (t *LimitOrderTranche) Swap(maxAmountTaker sdk.Int) (
 	return inAmount, outAmount
 }
 
-func (placeTranche *LimitOrderTranche) PlaceMakerLimitOrder(ctx sdk.Context, amountIn sdk.Int) {
-	placeTranche.ReservesTokenIn = placeTranche.ReservesTokenIn.Add(amountIn)
-	placeTranche.TotalTokenIn = placeTranche.TotalTokenIn.Add(amountIn)
-
+func (t *LimitOrderTranche) PlaceMakerLimitOrder(ctx sdk.Context, amountIn sdk.Int) {
+	t.ReservesTokenIn = t.ReservesTokenIn.Add(amountIn)
+	t.TotalTokenIn = t.TotalTokenIn.Add(amountIn)
 }

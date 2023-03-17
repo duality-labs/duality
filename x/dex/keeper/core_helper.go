@@ -37,13 +37,6 @@ func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tok
 }
 
 func NewLimitOrderExpiration(tranche types.LimitOrderTranche) types.LimitOrderExpiration {
-	trancheRef := types.TickLiquidityKey(
-		tranche.PairId,
-		tranche.TokenIn,
-		tranche.TickIndex,
-		types.LiquidityTypeLimitOrder,
-		tranche.TrancheKey,
-	)
 
 	trancheExpiry := tranche.ExpirationTime
 	if trancheExpiry == nil {
@@ -51,7 +44,7 @@ func NewLimitOrderExpiration(tranche types.LimitOrderTranche) types.LimitOrderEx
 	}
 
 	return types.LimitOrderExpiration{
-		TrancheRef:     trancheRef,
+		TrancheRef:     tranche.Ref(),
 		ExpirationTime: *tranche.ExpirationTime,
 	}
 }
@@ -82,6 +75,7 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 	tickIndex int64,
 	tokenIn string,
 	currentLimitOrderKey string,
+	orderType types.LimitOrderType,
 	receiver string,
 ) types.LimitOrderTrancheUser {
 	UserShareData, UserShareDataFound := k.GetLimitOrderTrancheUser(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
@@ -96,6 +90,7 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 			TickIndex:       tickIndex,
 			Token:           tokenIn,
 			PairId:          pairId,
+			OrderType:       orderType,
 		}
 	}
 

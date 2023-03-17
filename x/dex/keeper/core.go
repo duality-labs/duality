@@ -293,7 +293,7 @@ func (k Keeper) PlaceLimitOrderCore(
 
 	placeTranche, err := k.GetOrInitPlaceTranche(ctx, pairId, tokenIn, tickIndex, goodTil, orderType)
 	trancheKey := placeTranche.TrancheKey
-	trancheUser := k.GetOrInitLimitOrderTrancheUser(ctx, pairId, tickIndex, tokenIn, trancheKey, receiverAddr.String())
+	trancheUser := k.GetOrInitLimitOrderTrancheUser(ctx, pairId, tickIndex, tokenIn, trancheKey, orderType, receiverAddr.String())
 
 	amountLeft, totalIn := amountIn, sdk.ZeroInt()
 	// For everything except just-in-time (JIT) orders try to execute as a swap first
@@ -389,6 +389,9 @@ func (k Keeper) CancelLimitOrderCore(
 		}
 		k.SaveTrancheUser(ctx, trancheUser)
 		k.SaveTranche(ctx, *tranche)
+		if trancheUser.OrderType.IsGoodTil() {
+			k.RemoveLimitOrderExpiration(ctx, *tranche.ExpirationTime, tranche.Ref())
+		}
 
 	} else {
 		return sdkerrors.Wrapf(types.ErrCancelEmptyLimitOrder, "%s", tranche.TrancheKey)
