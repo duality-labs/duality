@@ -53,8 +53,8 @@ func (k Keeper) RemoveLimitOrderExpiration(
 	))
 }
 
-func (k Keeper) RemoveLimitOrderExpirationByPrefixedyKey(ctx sdk.Context, key []byte) {
-	store := ctx.KVStore(k.storeKey)
+func (k Keeper) RemoveLimitOrderExpirationByKey(ctx sdk.Context, key []byte) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderExpirationKeyPrefix))
 	store.Delete(key)
 }
 
@@ -74,24 +74,25 @@ func (k Keeper) GetAllLimitOrderExpiration(ctx sdk.Context) (list []types.LimitO
 	return
 }
 
-func (k Keeper) PurgeExpiredLimitOrderExpirations(ctx sdk.Context, curTime time.Time) {
+func (k Keeper) PurgeExpiredLimitOrders(ctx sdk.Context, curTime time.Time) {
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderExpirationKeyPrefix))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
-	inGTDSegment := false
+	inGoodTilSegment := false
 
 	archivedTranches := make(map[string]bool)
 	defer iterator.Close()
+
 	gasCutoff := ctx.BlockGasMeter().Limit() - types.GoodTilPurgeGasBuffer
 
 	for ; iterator.Valid(); iterator.Next() {
 		var val types.LimitOrderExpiration
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
-		if val.ExpirationTime.Before(curTime) {
-			inGTDSegment = inGTDSegment || val.ExpirationTime != types.JITGoodTilTime
+		if !val.ExpirationTime.After(curTime) {
+			inGoodTilSegment = inGoodTilSegment || val.ExpirationTime != types.JITGoodTilTime
 			gasConsumed := ctx.BlockGasMeter().GasConsumed()
 
-			if inGTDSegment && gasConsumed >= gasCutoff {
+			if inGoodTilSegment && gasConsumed >= gasCutoff {
 				// If we hit our gas cutoff stop deleting so as not to timeout the block.
 				// We can only do this if we are proccesing normal GT limitOrders
 				// and not JIT limit orders, since there is not protection in place
@@ -104,14 +105,15 @@ func (k Keeper) PurgeExpiredLimitOrderExpirations(ctx sdk.Context, curTime time.
 			}
 			if _, ok := archivedTranches[string(val.TrancheRef)]; !ok {
 				tranche, found := k.GetLimitOrderTrancheByKey(ctx, val.TrancheRef)
-				// Convert the tranche to a filled tranche
 				if found {
+					// Convert the tranche to an inactiveTranche
 					k.SetInactiveLimitOrderTranche(ctx, *tranche)
 					k.RemoveLimitOrderTranche(ctx, *tranche)
 					archivedTranches[string(val.TrancheRef)] = true
 				}
 			}
-			k.RemoveLimitOrderExpirationByPrefixedyKey(ctx, iterator.Key())
+
+			k.RemoveLimitOrderExpirationByKey(ctx, iterator.Key())
 		} else {
 			return
 		}

@@ -31,21 +31,6 @@ func (k Keeper) FindLimitOrderTranche(
 	return types.LimitOrderTranche{}, false, false
 }
 
-func (k Keeper) GetAllLimitOrderTranche(ctx sdk.Context) (list []types.LimitOrderTranche) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderTrancheKeyPrefix))
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
-
-	defer iterator.Close()
-
-	for ; iterator.Valid(); iterator.Next() {
-		var val types.LimitOrderTranche
-		k.cdc.MustUnmarshal(iterator.Value(), &val)
-		list = append(list, val)
-	}
-
-	return
-}
-
 func (k Keeper) SaveTranche(sdkCtx sdk.Context, tranche types.LimitOrderTranche) {
 	if tranche.HasTokenIn() {
 		k.SetLimitOrderTranche(sdkCtx, tranche)
@@ -160,13 +145,17 @@ func (k Keeper) GetFillTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenIn
 
 func (k Keeper) GetAllLimitOrderTrancheAtIndex(sdkCtx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64) (trancheList []types.LimitOrderTranche) {
 	prefixStore := prefix.NewStore(sdkCtx.KVStore(k.storeKey), types.TickLiquidityLimitOrderPrefix(pairId, tokenIn, tickIndex))
-	iter := sdk.KVStoreReversePrefixIterator(prefixStore, []byte{})
+	iter := sdk.KVStorePrefixIterator(prefixStore, []byte{})
 
 	defer iter.Close()
 	for ; iter.Valid(); iter.Next() {
 		var tick types.TickLiquidity
 		k.cdc.MustUnmarshal(iter.Value(), &tick)
-		trancheList = append(trancheList, *tick.GetLimitOrderTranche())
+		maybeTranche := tick.GetLimitOrderTranche()
+		if maybeTranche != nil {
+			trancheList = append(trancheList, *maybeTranche)
+		}
+
 	}
 	return trancheList
 }
