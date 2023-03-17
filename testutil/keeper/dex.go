@@ -56,10 +56,10 @@ func AssertEventEmitted(t *testing.T, ctx sdk.Context, eventValue string, messag
 	allEvents := ctx.EventManager().Events()
 	for _, attr := range allEvents[len(allEvents)-1].Attributes {
 		if string(attr.Value) == eventValue {
-			break
+			return
 		}
-		require.Fail(t, message)
 	}
+	require.Fail(t, message)
 }
 
 func AssertEventNotEmitted(t *testing.T, ctx sdk.Context, eventValue string, message string) {

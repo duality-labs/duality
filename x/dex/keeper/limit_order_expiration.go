@@ -104,6 +104,7 @@ func (k Keeper) PurgeExpiredLimitOrders(ctx sdk.Context, curTime time.Time) {
 				ctx.EventManager().EmitEvent(types.GoodTilPurgeHitLimitEvent(gasConsumed))
 				return
 			}
+
 			if _, ok := archivedTranches[string(val.TrancheRef)]; !ok {
 				tranche, found := k.GetLimitOrderTrancheByKey(ctx, val.TrancheRef)
 				if found {

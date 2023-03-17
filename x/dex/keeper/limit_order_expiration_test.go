@@ -158,7 +158,7 @@ func TestPurgeExpiredLimitOrdersAtBlockGasLimit(t *testing.T) {
 	keeper.PurgeExpiredLimitOrders(ctx, now)
 
 	// THEN GoodTilPurgeHitGasLimit event is emitted
-	keepertest.AssertEventEmitted(t, ctx, types.GoodTilPurgeHitGasLimitEventGas, "Gas Limit Event not emitted")
+	keepertest.AssertEventEmitted(t, ctx, types.GoodTilPurgeHitGasLimitEventKey, "Gas Limit Event not emitted")
 
 	// All JIT expirations are purged but other expirations remain
 	expList := keeper.GetAllLimitOrderExpiration(ctx)
