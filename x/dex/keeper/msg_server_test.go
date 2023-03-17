@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -217,6 +218,22 @@ func (s *MsgServerTestSuite) limitSellsSuccess(account sdk.AccAddress, tokenIn s
 	return trancheKey
 }
 
+func (s *MsgServerTestSuite) aliceLimitSellsGoodTil(selling string, tick int, amountIn int, goodTil time.Time) string {
+	return s.limitSellsGoodTil(s.alice, selling, tick, amountIn, goodTil)
+}
+
+func (s *MsgServerTestSuite) bobLimitSellsGoodTil(selling string, tick int, amountIn int, goodTil time.Time) string {
+	return s.limitSellsGoodTil(s.bob, selling, tick, amountIn, goodTil)
+}
+
+func (s *MsgServerTestSuite) carolLimitSellsGoodTil(selling string, tick int, amountIn int, goodTil time.Time) string {
+	return s.limitSellsGoodTil(s.carol, selling, tick, amountIn, goodTil)
+}
+
+func (s *MsgServerTestSuite) danLimitSellsGoodTil(selling string, tick int, amountIn int, goodTil time.Time) string {
+	return s.limitSellsGoodTil(s.dan, selling, tick, amountIn, goodTil)
+}
+
 func (s *MsgServerTestSuite) assertAliceLimitSellFails(err error, selling string, tick int, amountIn int, orderTypeOpt ...types.LimitOrderType) {
 	s.assertLimitSellFails(s.alice, err, selling, tick, amountIn, orderTypeOpt...)
 }
@@ -258,6 +275,24 @@ func (s *MsgServerTestSuite) limitSells(account sdk.AccAddress, tokenIn string, 
 	})
 
 	return msg.TrancheKey, err
+}
+
+func (s *MsgServerTestSuite) limitSellsGoodTil(account sdk.AccAddress, tokenIn string, tick int, amountIn int, goodTil time.Time) string {
+
+	msg, err := s.msgServer.PlaceLimitOrder(s.goCtx, &types.MsgPlaceLimitOrder{
+		Creator:        account.String(),
+		Receiver:       account.String(),
+		TokenA:         "TokenA",
+		TokenB:         "TokenB",
+		TickIndex:      int64(tick),
+		TokenIn:        tokenIn,
+		AmountIn:       sdk.NewInt(int64(amountIn)),
+		OrderType:      types.LimitOrderType_GOOD_TIL_TIME,
+		ExpirationTime: &goodTil,
+	})
+
+	s.Assert().NoError(err)
+	return msg.TrancheKey
 }
 
 // / Deposit
@@ -961,6 +996,11 @@ func (s *MsgServerTestSuite) getLimitReservesAtTickAtKey(selling string, tickInd
 	tranche, _, found := s.app.DexKeeper.FindLimitOrderTranche(s.ctx, pairId, tickIndex, selling, trancheKey)
 	s.Assert().True(found, "Failed to get limit order reserves for index %s", trancheKey)
 	return tranche.ReservesTokenIn
+}
+
+func (s *MsgServerTestSuite) assertNLimitOrderExpiration(expected int) {
+	exps := s.app.DexKeeper.GetAllLimitOrderExpiration(s.ctx)
+	s.Assert().Equal(expected, len(exps))
 }
 
 // SingleLimitOrderFill() simulates the fill of a single limit order and returns the amount
