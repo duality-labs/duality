@@ -59,11 +59,11 @@ func (k Keeper) DepositCore(
 
 		// behind enemy lines checks
 		// TODO: Allow user to deposit "behind enemy lines"
-		if amount0.GT(sdk.ZeroInt()) && k.IsBehindEnemyLines(ctx, pairId, pairId.Token0, lowerTickIndex) {
+		if amount0.IsPositive() && k.IsBehindEnemyLines(ctx, pairId, pairId.Token0, lowerTickIndex) {
 			return nil, nil, types.ErrDepositBehindPairLiquidity
 		}
 		// TODO: Allow user to deposit "behind enemy lines"
-		if amount1.GT(sdk.ZeroInt()) && k.IsBehindEnemyLines(ctx, pairId, pairId.Token1, upperTickIndex) {
+		if amount1.IsPositive() && k.IsBehindEnemyLines(ctx, pairId, pairId.Token1, upperTickIndex) {
 			return nil, nil, types.ErrDepositBehindPairLiquidity
 		}
 
@@ -85,7 +85,7 @@ func (k Keeper) DepositCore(
 
 		k.SavePool(ctx, pool)
 
-		if inAmount0.Equal(sdk.ZeroInt()) && inAmount1.Equal(sdk.ZeroInt()) {
+		if inAmount0.IsZero() && inAmount1.IsZero() {
 			return nil, nil, types.ErrZeroTrueDeposit
 		}
 
@@ -117,14 +117,14 @@ func (k Keeper) DepositCore(
 		))
 	}
 
-	if totalAmountReserve0.GT(sdk.ZeroInt()) {
+	if totalAmountReserve0.IsPositive() {
 		coin0 := sdk.NewCoin(token0, totalAmountReserve0)
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
 			return nil, nil, err
 		}
 	}
 
-	if totalAmountReserve1.GT(sdk.ZeroInt()) {
+	if totalAmountReserve1.IsPositive() {
 		coin1 := sdk.NewCoin(token1, totalAmountReserve1)
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
 			return nil, nil, err
@@ -178,7 +178,7 @@ func (k Keeper) WithdrawCore(
 
 		outAmount0, outAmount1 := pool.Withdraw(sharesToRemove, totalShares)
 		k.SavePool(ctx, pool)
-		if sharesToRemove.GT(sdk.ZeroInt()) { // update shares accounting
+		if sharesToRemove.IsPositive() {
 			if err := k.BurnShares(ctx, callerAddr, sharesToRemove, sharesId); err != nil {
 				return err
 			}
@@ -202,7 +202,7 @@ func (k Keeper) WithdrawCore(
 		))
 	}
 
-	if totalReserve0ToRemove.GT(sdk.ZeroInt()) {
+	if totalReserve0ToRemove.IsPositive() {
 		coin0 := sdk.NewCoin(token0, totalReserve0ToRemove)
 		err := k.bankKeeper.SendCoinsFromModuleToAccount(
 			ctx,
@@ -216,7 +216,7 @@ func (k Keeper) WithdrawCore(
 	}
 
 	// sends totalReserve1ToRemove to receiverAddr
-	if totalReserve1ToRemove.GT(sdk.ZeroInt()) {
+	if totalReserve1ToRemove.IsPositive() {
 		coin1 := sdk.NewCoin(token1, totalReserve1ToRemove)
 		err := k.bankKeeper.SendCoinsFromModuleToAccount(
 			ctx,
@@ -327,7 +327,7 @@ func (k Keeper) PlaceLimitOrderCore(
 		trancheUser.SharesOwned = trancheUser.SharesOwned.Add(amountLeft)
 
 		if orderType.IsJIT() || orderType.IsGoodTil() {
-			goodTilRecord := NewLimitOrderExpiration(pairId, tokenIn, tickIndex, trancheKey, *goodTil)
+			goodTilRecord := NewLimitOrderExpiration(placeTranche)
 			k.SetLimitOrderExpiration(ctx, goodTilRecord)
 		}
 		k.SaveTranche(ctx, placeTranche)
@@ -381,11 +381,9 @@ func (k Keeper) CancelLimitOrderCore(
 
 	amountToCancel := tranche.RemoveTokenIn(trancheUser)
 	trancheUser.SharesCancelled = trancheUser.SharesCancelled.Add(amountToCancel)
-	userReserves := trancheUser.WithdrawSwapReserves()
 
-	amountOut := amountToCancel.Add(userReserves)
-	if amountOut.GT(sdk.ZeroInt()) {
-		coinOut := sdk.NewCoin(keyToken, amountOut)
+	if amountToCancel.IsPositive() {
+		coinOut := sdk.NewCoin(keyToken, amountToCancel)
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
@@ -443,8 +441,6 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		var amountOutTokenIn sdk.Int
 		amountOutTokenIn, amountOutTokenOut = tranche.Withdraw(trancheUser)
 
-		// TODO: this is a bit of a messy pattern
-
 		if wasFilled {
 			//This is only relevant for inactive JIT and GoodTil limit orders
 			remainingTokenIn = tranche.RemoveTokenIn(trancheUser)
@@ -456,15 +452,14 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		trancheUser.SharesWithdrawn = trancheUser.SharesWithdrawn.Add(amountOutTokenIn)
 	}
 
-	userReserves := trancheUser.WithdrawSwapReserves()
-	amountOutTokenOut = amountOutTokenOut.Add(userReserves.ToDec())
+	takerReserves := trancheUser.WithdrawTakerReserves()
+	amountOutTokenOut = amountOutTokenOut.Add(takerReserves.ToDec())
 
 	k.SaveTrancheUser(ctx, trancheUser)
 
 	if amountOutTokenOut.IsPositive() || remainingTokenIn.IsPositive() {
 		coinOut := sdk.NewCoin(tokenOut, amountOutTokenOut.TruncateInt())
 		coinInRefund := sdk.NewCoin(tokenIn, remainingTokenIn)
-		// TODO: NewCoins does a lot of unnecesary work to sanitize and validate coins, all we really is to remove zero coins
 		coins := sdk.NewCoins(coinOut, coinInRefund)
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, coins); err != nil {
 			return err

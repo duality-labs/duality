@@ -9,7 +9,7 @@ func (l LimitOrderTrancheUser) IsEmpty() bool {
 	return sharesRemoved.Equal(l.SharesOwned) && l.TakerReserves.IsZero()
 }
 
-func (l *LimitOrderTrancheUser) WithdrawSwapReserves() sdk.Int {
+func (l *LimitOrderTrancheUser) WithdrawTakerReserves() sdk.Int {
 	amountOut := l.TakerReserves
 	l.TakerReserves = sdk.ZeroInt()
 	return amountOut

@@ -36,17 +36,23 @@ func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tok
 
 }
 
-func NewLimitOrderExpiration(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey string, goodTil time.Time) types.LimitOrderExpiration {
+func NewLimitOrderExpiration(tranche types.LimitOrderTranche) types.LimitOrderExpiration {
 	trancheRef := types.TickLiquidityKey(
-		pairId,
-		tokenIn,
-		tickIndex,
+		tranche.PairId,
+		tranche.TokenIn,
+		tranche.TickIndex,
 		types.LiquidityTypeLimitOrder,
-		trancheKey,
+		tranche.TrancheKey,
 	)
+
+	trancheExpiry := tranche.ExpirationTime
+	if trancheExpiry == nil {
+		panic("Cannot create LimitOrderExpiration from tranche with nil ExpirationTime")
+	}
+
 	return types.LimitOrderExpiration{
 		TrancheRef:     trancheRef,
-		ExpirationTime: goodTil,
+		ExpirationTime: *tranche.ExpirationTime,
 	}
 }
 
