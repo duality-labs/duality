@@ -11,7 +11,7 @@ const TypeMsgPlaceLimitOrder = "place_limit_order"
 
 var _ sdk.Msg = &MsgPlaceLimitOrder{}
 
-func NewMsgPlaceLimitOrder(creator string, receiver string, tokenA string, tokenB string, tickIndex int64, tokenIn string, amountIn sdk.Int, goodTil *time.Time) *MsgPlaceLimitOrder {
+func NewMsgPlaceLimitOrder(creator string, receiver string, tokenA string, tokenB string, tickIndex int64, tokenIn string, amountIn sdk.Int, orderType LimitOrderType, goodTil *time.Time) *MsgPlaceLimitOrder {
 	return &MsgPlaceLimitOrder{
 		Creator:        creator,
 		Receiver:       receiver,
@@ -20,6 +20,7 @@ func NewMsgPlaceLimitOrder(creator string, receiver string, tokenA string, token
 		TickIndex:      tickIndex,
 		TokenIn:        tokenIn,
 		AmountIn:       amountIn,
+		OrderType:      orderType,
 		ExpirationTime: goodTil,
 	}
 }

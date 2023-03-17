@@ -328,17 +328,23 @@ func (s *TxTestSuite) TestTx4Cmd4laceLimitOrder() {
 			name:      "missing arguments",
 			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB"},
 			expErr:    true,
-			expErrMsg: "Error: accepts between 6 and 7 arg(s), received 5",
+			expErrMsg: "Error: accepts between 6 and 8 arg(s), received 5",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10", "1", "1"},
+			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10", "1", "1", "BAD"},
 			expErr:    true,
-			expErrMsg: "Error: accepts between 6 and 7 arg(s), received 8",
+			expErrMsg: "Error: accepts between 6 and 8 arg(s), received 9",
+		},
+		{
+			name:      "invalid orderType",
+			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10", "JUST_SEND_IT"},
+			expErr:    true,
+			expErrMsg: types.ErrInvalidOrderType.Error(),
 		},
 		{
 			name:      "invalid goodTil",
-			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10", "january"},
+			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10", "GOOD_TIL_TIME", "january"},
 			expErr:    true,
 			expErrMsg: types.ErrInvalidTimeString.Error(),
 		},
@@ -349,7 +355,7 @@ func (s *TxTestSuite) TestTx4Cmd4laceLimitOrder() {
 		},
 		{
 			name:     "valid goodTil",
-			args:     []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10", "06/15/2025 02:00:00"},
+			args:     []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10", "GOOD_TIL_TIME", "06/15/2025 02:00:00"},
 			errInRes: false,
 		},
 	}

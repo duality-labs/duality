@@ -37,4 +37,5 @@ var (
 	ErrInvalidTimeString                  = sdkerrors.Register(ModuleName, 1135, "Time string must be formatted as MM/dd/yyyy HH:mm:ss (ex. 02/05/2023 15:34:56) ")
 	ErrGoodTilOrderWithoutExpiration      = sdkerrors.Register(ModuleName, 1136, "Limit orders of type GOOD_TIL_TIME must supply an ExpirationTime.")
 	ErrExpirationOnWrongOrderType         = sdkerrors.Register(ModuleName, 1137, "Only Limit orders of type GOOD_TIL_TIME can supply an ExpirationTime.")
+	ErrInvalidOrderType                   = sdkerrors.Register(ModuleName, 1138, "Order type must be one of: GOOD_TIL_CANCELLED, FILL_OR_KILL, IMMEDIATE_OR_CANCEL, JUST_IN_TIME, or GOOD_TIL_TIME.")
 )
