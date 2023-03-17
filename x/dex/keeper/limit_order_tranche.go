@@ -180,8 +180,9 @@ func (k Keeper) GetOrInitPlaceTranche(ctx sdk.Context,
 	tickIndex int64,
 	goodTil *time.Time,
 	orderType types.LimitOrderType) (placeTranche types.LimitOrderTranche, err error) {
-	// TODO: right now we are not indexing by goodTil date so we can't easily check if there's already a tranche with the same goodTil date so instead we create a new tranche for each goodTil order
+	// NOTE: Right now we are not indexing by goodTil date so we can't easily check if there's already a tranche with the same goodTil date so instead we create a new tranche for each goodTil order
 	// if there is a large number of limitOrders with the same goodTilTime (most likely JIT) aggregating might be more efficient particularly for deletion, but if they are relatively sparse it will incur fewer lookups to just create a new limitOrderTranche
+	// also trying to cancel aggregated good_til orders will be a PITA
 	switch orderType {
 	case types.LimitOrderType_JUST_IN_TIME:
 		placeTranche, err = NewLimitOrderTranche(ctx, pairId, tokenIn, tickIndex, &types.JITGoodTilTime)
