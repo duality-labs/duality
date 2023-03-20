@@ -16,6 +16,7 @@ import (
 	. "github.com/duality-labs/duality/x/dex/keeper/internal/testutils"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/suite"
+	abci "github.com/tendermint/tendermint/abci/types"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
@@ -1364,4 +1365,13 @@ func (s *MsgServerTestSuite) calculateMultipleSwaps(prices []*types.Price, tickL
 		amountLeft, amountOut = tmpAmountLeft, amountOut.Add(tmpAmountOut)
 	}
 	return amountLeft, amountOut
+}
+
+func (s *MsgServerTestSuite) nextBlockWithTime(blockTime time.Time) {
+	newCtx := s.ctx.WithBlockTime(blockTime)
+	s.ctx = newCtx
+	s.goCtx = sdk.WrapSDKContext(newCtx)
+	s.app.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{Height: s.app.LastBlockHeight() + 1, AppHash: s.app.LastCommitID().Hash,
+		Time: blockTime,
+	}})
 }

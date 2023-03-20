@@ -575,6 +575,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderJITNextBlock() {
 	s.assertAliceBalances(0, 0)
 
 	// WHEN we move to block N+1
+	s.nextBlockWithTime(time.Now())
 	s.app.EndBlock(abci.RequestEndBlock{Height: 0})
 
 	// THEN there is no liquidity available
@@ -608,7 +609,28 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilFills() {
 
 }
 
-func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilExpiresNoEndBlock() {
+func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilExpires() {
+	s.fundAliceBalances(10, 0)
+	s.fundBobBalances(0, 20)
+	tomorrow := time.Now().AddDate(0, 0, 1)
+	//GIVEN Alice submits JIT limitOrder for 10 tokenA expiring tomorrow
+	trancheKey := s.aliceLimitSellsGoodTil("TokenA", 0, 10, tomorrow)
+	s.assertLimitLiquidityAtTick("TokenA", 0, 10)
+	s.assertAliceBalances(0, 0)
+
+	// When two days go by and multiple blocks are created (ie. purge is run)
+	s.nextBlockWithTime(time.Now().AddDate(0, 0, 2))
+	s.app.EndBlock(abci.RequestEndBlock{Height: 0})
+	// THEN there is no liquidity available
+	s.bobMarketSellFails(types.ErrInsufficientLiquidity, "TokenB", 10)
+	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
+	//Alice can withdraw the entirety of the unfilled limitOrder
+	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
+	s.assertAliceBalances(10, 0)
+
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilExpiresNotPurged() {
 	// This is testing the case where the limitOrder has expired but has not yet been purged
 	s.fundAliceBalances(10, 0)
 	s.fundBobBalances(0, 20)
@@ -619,9 +641,8 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilExpiresNoEndBlock() {
 	s.assertAliceBalances(0, 0)
 
 	// When two days go by
-	newCtx := s.ctx.WithBlockTime(time.Now().AddDate(0, 0, 2))
-	s.goCtx = sdk.WrapSDKContext(newCtx)
-	s.ctx = newCtx
+	// for simplicity sake we never run endBlock, it reality it would be run, but gas limit would be hit
+	s.nextBlockWithTime(time.Now().AddDate(0, 0, 2))
 
 	// THEN there is no liquidity available
 	s.bobMarketSellFails(types.ErrInsufficientLiquidity, "TokenB", 10)
@@ -629,6 +650,16 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilExpiresNoEndBlock() {
 	//Alice can cancel the entirety of the unfilled limitOrder
 	s.aliceCancelsLimitSell("TokenA", 0, trancheKey)
 	s.assertAliceBalances(10, 0)
+
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilHandlesTimezoneCorrectly() {
+	s.fundAliceBalances(10, 0)
+	timeInPST, _ := time.Parse(time.RFC3339, "2050-01-02T15:04:05-08:00")
+	trancheKey := s.aliceLimitSellsGoodTil("TokenA", 0, 10, timeInPST)
+	tranche, _ := s.app.DexKeeper.GetLimitOrderTranche(s.ctx, defaultPairId, "TokenA", 0, trancheKey)
+
+	s.Assert().Equal(tranche.ExpirationTime.Unix(), timeInPST.Unix())
 
 }
 

@@ -262,6 +262,7 @@ func (s *MsgServerTestSuite) TestCancelJITNextBlock() {
 	s.assertNLimitOrderExpiration(1)
 
 	// WHEN we move to block N+1
+	s.nextBlockWithTime(time.Now())
 	s.app.EndBlock(abci.RequestEndBlock{Height: 0})
 
 	// THEN alice cancellation fails
