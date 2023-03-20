@@ -122,6 +122,7 @@ message MsgPlaceLimitOrder {
       (gogoproto.jsontag) = "amountIn"
   ];
   LimitOrderType orderType = 8;
+  // expirationTime is only valid iff orderType == GOOD_TIL_TIME.
   google.protobuf.Timestamp expirationTime = 9 [
                                              (gogoproto.stdtime) = true,
                                              (gogoproto.nullable) = true

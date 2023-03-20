@@ -31,10 +31,10 @@ message LimitOrderTrancheUser {
       (gogoproto.jsontag) = "sharesCancelled"
   ];
   string takerReserves = 9 [
-                               (gogoproto.moretags)   = "yaml:\"reservesFromSwap\"",
+                               (gogoproto.moretags)   = "yaml:\"takerReserves\"",
                                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
                                (gogoproto.nullable)   = false,
-                               (gogoproto.jsontag) = "reservesFromSwap"
+                               (gogoproto.jsontag) = "takerReserves"
                                ];
   LimitOrderType orderType = 10;
 }
