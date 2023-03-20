@@ -631,3 +631,24 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilExpiresNoEndBlock() {
 	s.assertAliceBalances(10, 0)
 
 }
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilAlreadyExpiredFails() {
+	s.fundAliceBalances(10, 0)
+
+	now := time.Now()
+	yesterday := time.Now().AddDate(0, 0, -1)
+	s.nextBlockWithTime(now)
+
+	_, err := s.msgServer.PlaceLimitOrder(s.goCtx, &types.MsgPlaceLimitOrder{
+		Creator:        s.alice.String(),
+		Receiver:       s.alice.String(),
+		TokenA:         "TokenA",
+		TokenB:         "TokenB",
+		TickIndex:      0,
+		TokenIn:        "TokenA",
+		AmountIn:       sdk.NewInt(50),
+		OrderType:      types.LimitOrderType_GOOD_TIL_TIME,
+		ExpirationTime: &yesterday,
+	})
+	s.Assert().ErrorIs(err, types.ErrExpirationTimeInPast)
+}
