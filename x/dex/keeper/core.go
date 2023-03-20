@@ -326,7 +326,7 @@ func (k Keeper) PlaceLimitOrderCore(
 		placeTranche.PlaceMakerLimitOrder(ctx, amountLeft)
 		trancheUser.SharesOwned = trancheUser.SharesOwned.Add(amountLeft)
 
-		if orderType.IsJIT() || orderType.IsGoodTil() {
+		if orderType.HasExpiration() {
 			goodTilRecord := NewLimitOrderExpiration(placeTranche)
 			k.SetLimitOrderExpiration(ctx, goodTilRecord)
 			ctx.GasMeter().ConsumeGas(types.ExpiringLimitOrderGas, "Expiring LimitOrder Fee")
@@ -390,7 +390,7 @@ func (k Keeper) CancelLimitOrderCore(
 		}
 		k.SaveTrancheUser(ctx, trancheUser)
 		k.SaveTranche(ctx, *tranche)
-		if trancheUser.OrderType.IsGoodTil() {
+		if trancheUser.OrderType.HasExpiration() {
 			k.RemoveLimitOrderExpiration(ctx, *tranche.ExpirationTime, tranche.Ref())
 		}
 
