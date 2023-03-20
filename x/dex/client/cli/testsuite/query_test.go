@@ -70,7 +70,7 @@ var limitOrderTrancheList = []types.TickLiquidity{
 	},
 }
 
-var filledLimitOrderTrancheList = []types.LimitOrderTranche{
+var inactiveLimitOrderTrancheList = []types.LimitOrderTranche{
 	{PairId: &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 		TokenIn:          "TokenB",
 		TickIndex:        0,
@@ -132,6 +132,7 @@ var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 		SharesOwned:     sdk.NewInt(10),
 		SharesWithdrawn: sdk.NewInt(0),
 		SharesCancelled: sdk.NewInt(0),
+		TakerReserves:   sdk.ZeroInt(),
 	},
 	{
 		PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
@@ -142,14 +143,15 @@ var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 		SharesOwned:     sdk.NewInt(10),
 		SharesWithdrawn: sdk.NewInt(0),
 		SharesCancelled: sdk.NewInt(0),
+		TakerReserves:   sdk.ZeroInt(),
 	},
 }
 
 var genesisState types.GenesisState = types.GenesisState{
-	TickLiquidityList:           append(poolReservesList, limitOrderTrancheList...),
-	LimitOrderTrancheUserList:   limitOrderTrancheUserList,
-	FilledLimitOrderTrancheList: filledLimitOrderTrancheList,
-	FeeTierList:                 feeTierList,
+	TickLiquidityList:             append(poolReservesList, limitOrderTrancheList...),
+	LimitOrderTrancheUserList:     limitOrderTrancheUserList,
+	InactiveLimitOrderTrancheList: inactiveLimitOrderTrancheList,
+	FeeTierList:                   feeTierList,
 }
 
 func (s *QueryTestSuite) SetupSuite() {
@@ -452,7 +454,7 @@ func (s *QueryTestSuite) TestQueryCmdListLimitOrderTrancheUser() {
 	}
 }
 
-func (s *QueryTestSuite) TestQueryCmdListFilledLimitOrderTranche() {
+func (s *QueryTestSuite) TestQueryCmdListInactiveLimitOrderTranche() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
 	testCases := []struct {
@@ -465,13 +467,13 @@ func (s *QueryTestSuite) TestQueryCmdListFilledLimitOrderTranche() {
 		{
 			name:      "valid",
 			args:      []string{},
-			expOutput: filledLimitOrderTrancheList,
+			expOutput: inactiveLimitOrderTrancheList,
 		},
 	}
 
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
-			cmd := dexClient.CmdListFilledLimitOrderTranche()
+			cmd := dexClient.CmdListInactiveLimitOrderTranche()
 			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
 			if tc.expErr {
 				require.Error(s.T(), err)
@@ -479,17 +481,17 @@ func (s *QueryTestSuite) TestQueryCmdListFilledLimitOrderTranche() {
 			} else {
 				require.NoError(s.T(), err)
 
-				var res types.QueryAllFilledLimitOrderTrancheResponse
+				var res types.QueryAllInactiveLimitOrderTrancheResponse
 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 				require.NotEmpty(s.T(), res)
-				require.Equal(s.T(), tc.expOutput, res.FilledLimitOrderTranche)
+				require.Equal(s.T(), tc.expOutput, res.InactiveLimitOrderTranche)
 
 			}
 		})
 	}
 }
 
-func (s *QueryTestSuite) TestQueryCmdShowFilledLimitOrderTranche() {
+func (s *QueryTestSuite) TestQueryCmdShowInactiveLimitOrderTranche() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
 	testCases := []struct {
@@ -503,7 +505,7 @@ func (s *QueryTestSuite) TestQueryCmdShowFilledLimitOrderTranche() {
 		{
 			name:      "valid",
 			args:      []string{"TokenA<>TokenB", "TokenB", "0", "0"},
-			expOutput: filledLimitOrderTrancheList[0],
+			expOutput: inactiveLimitOrderTrancheList[0],
 		},
 		{
 			name:      "invalid pair",
@@ -532,17 +534,17 @@ func (s *QueryTestSuite) TestQueryCmdShowFilledLimitOrderTranche() {
 	}
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
-			cmd := dexClient.CmdShowFilledLimitOrderTranche()
+			cmd := dexClient.CmdShowInactiveLimitOrderTranche()
 			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
 			if tc.expErr {
 				require.Error(s.T(), err)
 				require.Contains(s.T(), out.String(), tc.expErrMsg)
 			} else {
 				require.NoError(s.T(), err)
-				var res types.QueryGetFilledLimitOrderTrancheResponse
+				var res types.QueryGetInactiveLimitOrderTrancheResponse
 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 				require.NotEmpty(s.T(), res)
-				require.Equal(s.T(), tc.expOutput, res.FilledLimitOrderTranche)
+				require.Equal(s.T(), tc.expOutput, res.InactiveLimitOrderTranche)
 			}
 		})
 	}

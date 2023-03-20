@@ -18,7 +18,7 @@ func (t TickLiquidity) TickIndex() int64 {
 func (t TickLiquidity) HasToken() bool {
 	switch liquidity := t.Liquidity.(type) {
 	case *TickLiquidity_LimitOrderTranche:
-		return liquidity.LimitOrderTranche.HasToken()
+		return liquidity.LimitOrderTranche.HasTokenIn()
 
 	case *TickLiquidity_PoolReserves:
 		return liquidity.PoolReserves.HasToken()

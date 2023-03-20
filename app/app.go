@@ -501,10 +501,11 @@ func NewApp(
 		ibctransfertypes.ModuleName,
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
-		dexmoduletypes.ModuleName,
-
 		mevmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
+
+		// NOTE: Because of the gas sensitivity of PurgeExpiredLimit order operations dexmodule must be the last endBlock module to run
+		dexmoduletypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -766,9 +767,11 @@ func (app *App) GetIBCKeeper() *ibckeeper.Keeper {
 }
 
 // // GetStakingKeeper implements the TestingApp interface.
-// func (app *App) GetStakingKeeper() ibcclienttypes.StakingKeeper {
-// 	return app.ConsumerKeeper
-// }
+//
+//	func (app *App) GetStakingKeeper() ibcclienttypes.StakingKeeper {
+//		return app.ConsumerKeeper
+//	}
+//
 // GetStakingKeeper implements the TestingApp interface.
 func (app *App) GetStakingKeeper() ibctestingcore.StakingKeeper {
 	return app.ConsumerKeeper

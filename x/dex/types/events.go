@@ -1,6 +1,8 @@
 package types
 
 import (
+	"strconv"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -98,7 +100,7 @@ func CreateWithdrawEvent(creator string, receiver string, token0 string, token1 
 	)
 }
 
-func createSwapEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, amountOut string, minOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+func createSwapEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, amountOut string, otherAttrs ...sdk.Attribute) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, SwapEventKey),
@@ -108,13 +110,12 @@ func createSwapEvent(creator string, receiver string, tokenIn string, tokenOut s
 		sdk.NewAttribute(SwapEventTokenOut, tokenOut),
 		sdk.NewAttribute(SwapEventAmountIn, amountIn),
 		sdk.NewAttribute(SwapEventAmoutOut, amountOut),
-		sdk.NewAttribute(SwapEventMinOut, minOut),
 	}
 	attrs = append(attrs, otherAttrs...)
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateSwapEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, amountOut string, minOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreateSwapEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, amountOut string, otherAttrs ...sdk.Attribute) sdk.Event {
 	return createSwapEvent(
 		creator,
 		receiver,
@@ -122,19 +123,17 @@ func CreateSwapEvent(creator string, receiver string, tokenIn string, tokenOut s
 		tokenOut,
 		amountIn,
 		amountOut,
-		minOut,
 	)
 }
 
-func createPlaceLimitOrderEvent(creator string, receiver string, token0 string, token1 string, tokenIn string, amountIn string, shares string, trancheKey string, otherAttrs ...sdk.Attribute) sdk.Event {
+func createPlaceLimitOrderEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, shares string, trancheKey string, otherAttrs ...sdk.Attribute) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, PlaceLimitOrderEventKey),
 		sdk.NewAttribute(PlaceLimitOrderEventCreator, creator),
 		sdk.NewAttribute(PlaceLimitOrderEventReceiver, receiver),
-		sdk.NewAttribute(PlaceLimitOrderEventToken0, token0),
-		sdk.NewAttribute(PlaceLimitOrderEventToken1, token1),
 		sdk.NewAttribute(PlaceLimitOrderEventTokenIn, tokenIn),
+		sdk.NewAttribute(PlaceLimitOrderEventTokenOut, tokenOut),
 		sdk.NewAttribute(PlaceLimitOrderEventAmountIn, amountIn),
 		sdk.NewAttribute(PlaceLimitOrderEventShares, shares),
 		sdk.NewAttribute(PlaceLimitOrderEventTrancheKey, trancheKey),
@@ -143,13 +142,12 @@ func createPlaceLimitOrderEvent(creator string, receiver string, token0 string, 
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreatePlaceLimitOrderEvent(creator string, receiver string, token0 string, token1 string, tokenIn string, amountIn string, shares string, currentLimitOrderKey string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreatePlaceLimitOrderEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, shares string, currentLimitOrderKey string, otherAttrs ...sdk.Attribute) sdk.Event {
 	return createPlaceLimitOrderEvent(
 		creator,
 		receiver,
-		token0,
-		token1,
 		tokenIn,
+		tokenOut,
 		amountIn,
 		shares,
 		currentLimitOrderKey,
@@ -180,6 +178,17 @@ func WithdrawFilledLimitOrderEvent(creator string, token0 string, token1 string,
 		key,
 		amountOut,
 	)
+}
+
+func GoodTilPurgeHitLimitEvent(gas sdk.Gas, otherAttrs ...sdk.Attribute) sdk.Event {
+	attrs := []sdk.Attribute{
+		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
+		sdk.NewAttribute(sdk.AttributeKeyAction, GoodTilPurgeHitGasLimitEventKey),
+		sdk.NewAttribute(GoodTilPurgeHitGasLimitEventGas, strconv.FormatUint(gas, 10)),
+	}
+	attrs = append(attrs, otherAttrs...)
+	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
+
 }
 
 func cancelLimitOrderEvent(creator string, token0 string, token1 string, tokenKey string, key string, amountOut string, otherAttrs ...sdk.Attribute) sdk.Event {

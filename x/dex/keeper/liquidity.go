@@ -67,7 +67,13 @@ func (s *LiquidityIterator) Next() Liquidity {
 			return pool
 
 		case *types.TickLiquidity_LimitOrderTranche:
-			return liquidity.LimitOrderTranche
+			tranche := liquidity.LimitOrderTranche
+			// If we hit a tranche with an expired goodTil date keep iterating
+			if tranche.IsExpired(s.ctx) {
+				continue
+			} else {
+				return tranche
+			}
 
 		default:
 			panic("Tick does not have liquidity")
@@ -125,4 +131,44 @@ func (k Keeper) SaveLiquidity(sdkCtx sdk.Context, liquidityI Liquidity) {
 		panic("Invalid liquidity type")
 	}
 
+}
+
+func (k Keeper) Swap(ctx sdk.Context,
+	pairId *types.PairId,
+	tokenIn string,
+	tokenOut string,
+	amountIn sdk.Int,
+	limitPrice *sdk.Dec) (totalIn sdk.Int, totalOut sdk.Int, error error) {
+	cacheCtx, writeCache := ctx.CacheContext()
+	pair := types.NewDirectionalTradingPair(pairId, tokenIn, tokenOut)
+
+	remainingIn := amountIn
+	totalOut = sdk.ZeroInt()
+
+	// verify that amount left is not zero and that there are additional valid ticks to check
+	liqIter := NewLiquidityIterator(k, ctx, pair)
+	defer liqIter.Close()
+	for remainingIn.GT(sdk.ZeroInt()) {
+		liq := liqIter.Next()
+		if liq == nil {
+			break
+		}
+
+		// break as soon as we iterated past limitPrice
+		if limitPrice != nil && liq.Price().ToDec().LT(*limitPrice) {
+			break
+
+		}
+
+		inAmount, outAmount := liq.Swap(remainingIn)
+
+		remainingIn = remainingIn.Sub(inAmount)
+		totalOut = totalOut.Add(outAmount)
+
+		k.SaveLiquidity(cacheCtx, liq)
+	}
+
+	writeCache()
+	totalIn = amountIn.Sub(remainingIn)
+	return totalIn, totalOut, nil
 }

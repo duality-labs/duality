@@ -12,7 +12,7 @@ import (
 )
 
 // Returns all ACTIVE limit order tranches for a given pairId/tokenIn combination
-// Does NOT return filledLimitOrderTranches
+// Does NOT return inactiveLimitOrderTranches
 func (k Keeper) LimitOrderTrancheAll(c context.Context, req *types.QueryAllLimitOrderTrancheRequest) (*types.QueryAllLimitOrderTrancheResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")

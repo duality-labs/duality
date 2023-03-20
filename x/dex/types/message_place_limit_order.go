@@ -1,6 +1,8 @@
 package types
 
 import (
+	"time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -9,15 +11,17 @@ const TypeMsgPlaceLimitOrder = "place_limit_order"
 
 var _ sdk.Msg = &MsgPlaceLimitOrder{}
 
-func NewMsgPlaceLimitOrder(creator string, receiver string, tokenA string, tokenB string, tickIndex int64, tokenIn string, amountIn sdk.Int) *MsgPlaceLimitOrder {
+func NewMsgPlaceLimitOrder(creator string, receiver string, tokenA string, tokenB string, tickIndex int64, tokenIn string, amountIn sdk.Int, orderType LimitOrderType, goodTil *time.Time) *MsgPlaceLimitOrder {
 	return &MsgPlaceLimitOrder{
-		Creator:   creator,
-		Receiver:  receiver,
-		TokenA:    tokenA,
-		TokenB:    tokenB,
-		TickIndex: tickIndex,
-		TokenIn:   tokenIn,
-		AmountIn:  amountIn,
+		Creator:        creator,
+		Receiver:       receiver,
+		TokenA:         tokenA,
+		TokenB:         tokenB,
+		TickIndex:      tickIndex,
+		TokenIn:        tokenIn,
+		AmountIn:       amountIn,
+		OrderType:      orderType,
+		ExpirationTime: goodTil,
 	}
 }
 
@@ -59,6 +63,14 @@ func (msg *MsgPlaceLimitOrder) ValidateBasic() error {
 
 	if msg.AmountIn.LTE(sdk.ZeroInt()) {
 		return ErrZeroLimitOrder
+	}
+
+	if msg.OrderType.IsGoodTil() && msg.ExpirationTime == nil {
+		return ErrGoodTilOrderWithoutExpiration
+	}
+
+	if !msg.OrderType.IsGoodTil() && msg.ExpirationTime != nil {
+		return ErrExpirationOnWrongOrderType
 	}
 	return nil
 }

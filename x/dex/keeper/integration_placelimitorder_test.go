@@ -7,6 +7,7 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
+// Core tests w/ GTC limitOrders //////////////////////////////////////////////
 func (s *MsgServerTestSuite) TestPlaceLimitOrderInSpread1To0() {
 	s.fundAliceBalances(50, 50)
 
@@ -206,7 +207,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMaxNotAdjusted() {
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityA() {
-	//TODO: this fails because PairInit doesn't account for single sided liquidity
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -234,7 +234,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityA() {
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityB() {
-	// TODO: this fails because PairInit doesn't account for single sided liquidity
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -259,44 +258,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityB() {
 	s.assertDexBalances(0, 20)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
-}
-
-func (s *MsgServerTestSuite) TestPlaceLimitOrderBelowEnemyLines() {
-	s.fundAliceBalances(50, 50)
-
-	// GIVEN
-	// deposit 10 of token B at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
-	s.assertAliceBalances(50, 40)
-	s.assertDexBalances(0, 10)
-	s.assertPoolLiquidity(0, 10, 0, 0)
-
-	// WHEN
-	// place limit order for token A below enemy lines at tick -5
-	// THEN
-	// deposit should fail with BEL error
-
-	err := types.ErrPlaceLimitOrderBehindPairLiquidity // TODO: this needs to be changed to a more specific error type
-	s.assertAliceLimitSellFails(err, "TokenA", 5, 10)
-}
-
-func (s *MsgServerTestSuite) TestPlaceLimitOrderAboveEnemyLines() {
-	s.fundAliceBalances(50, 50)
-
-	// GIVEN
-	// deposit 10 of token A at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
-	s.assertAliceBalances(40, 50)
-	s.assertDexBalances(10, 0)
-	s.assertPoolLiquidity(10, 0, 0, 0)
-
-	// WHEN
-	// place limit order for token B above enemy lines at tick 5
-	// THEN
-	// deposit should fail with BEL error
-
-	err := types.ErrPlaceLimitOrderBehindPairLiquidity // TODO: this needs to be changed to a more specific error type
-	s.assertAliceLimitSellFails(err, "TokenB", -5, 10)
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderNoLOPlaceLODoesntIncrementPlaceTrancheKey() {
@@ -342,7 +303,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderPartiallyFilledLOPlaceLOIncremen
 	// GIVEN
 	// partially filled limit order exists on tick -1
 	trancheKey0 := s.aliceLimitSells("TokenA", -1, 10)
-	s.bobMarketSells("TokenB", 5, 0)
+	s.bobMarketSells("TokenB", 5)
 	trancheKey1 := s.aliceLimitSells("TokenA", -1, 10)
 	s.assertFillAndPlaceTrancheKeys("TokenA", -1, trancheKey0, trancheKey1)
 
@@ -362,7 +323,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFilledLOPlaceLODoesntIncrementsP
 	// GIVEN
 	// filled LO with partially filled place tranche
 	trancheKey0 := s.aliceLimitSells("TokenA", -1, 10)
-	s.bobMarketSells("TokenB", 10, 0)
+	s.bobMarketSells("TokenB", 10)
 	trancheKey1 := s.aliceLimitSells("TokenA", -1, 10)
 	s.assertFillAndPlaceTrancheKeys("TokenA", -1, trancheKey0, trancheKey1)
 
@@ -401,7 +362,7 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertDexBalances(0, 50)
 	s.assertCurrentTicks(math.MinInt64, 0)
 
-	s.bobMarketSells("TokenA", 10, 10)
+	s.bobMarketSells("TokenA", 10)
 
 	s.assertAliceBalances(100, 50)
 	s.assertBobBalances(90, 110)
@@ -422,7 +383,7 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertDexBalances(10, 50)
 	s.assertCurrentTicks(math.MinInt64, 0)
 
-	s.bobMarketSells("TokenA", 10, 10)
+	s.bobMarketSells("TokenA", 10)
 
 	s.assertAliceBalances(100, 40)
 	s.assertBobBalances(80, 120)
@@ -445,4 +406,114 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertAliceBalances(120, 80)
 	s.assertBobBalances(80, 120)
 	s.assertDexBalances(0, 0)
+}
+
+// Fill Or Kill limit orders ///////////////////////////////////////////////////////////
+func (s *MsgServerTestSuite) TestPlaceLimitOrderFoKWithLPFills() {
+	s.fundAliceBalances(10, 0)
+	s.fundBobBalances(0, 20)
+	// GIVEN LP liq at tick -1
+	s.bobDeposits(NewDeposit(0, 20, -1, 0))
+	//WHEN alice submits FoK limitOrder
+	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_FILL_OR_KILL)
+	s.assertAliceBalances(0, 0)
+	// THEN alice's LimitOrder fills via swap
+
+	// No maker LO is placed
+	s.assertFillAndPlaceTrancheKeys("TokenA", 1, "", "")
+	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
+	s.assertDexBalances(10, 20)
+
+	// Alice can withdraw immediately
+	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
+	s.assertDexBalances(10, 10)
+	s.assertAliceBalances(0, 10)
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderFoKFailsWithInsufficientLiq() {
+	s.fundAliceBalances(10, 0)
+	s.fundBobBalances(0, 20)
+	// GIVEN LP liq at tick -1 of 9 tokenB
+	s.bobDeposits(NewDeposit(0, 9, -1, 0))
+	//WHEN alice submits FoK limitOrder for 10 at tick 0 it fails
+	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenA", 0, 10, types.LimitOrderType_FILL_OR_KILL)
+
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrder0FoKFailsWithLowLimit() {
+	s.fundAliceBalances(10, 0)
+	s.fundBobBalances(0, 20)
+	// GIVEN LP liq at tick -1 of 20 tokenB
+	s.bobDeposits(NewDeposit(0, 20, -1, 0))
+	//WHEN alice submits FoK limitOrder for 10 at tick -1 it fails
+	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenA", -1, 10, types.LimitOrderType_FILL_OR_KILL)
+
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrder1FoKFailsWithHighLimit() {
+	s.fundAliceBalances(0, 10)
+	s.fundBobBalances(20, 0)
+	// GIVEN LP liq at tick 20 of 20 tokenA
+	s.bobDeposits(NewDeposit(20, 0, 20, 0))
+	//WHEN alice submits FoK limitOrder for 10 at tick -1 it fails
+	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenB", 21, 10, types.LimitOrderType_FILL_OR_KILL)
+}
+
+// Immediate Or Cancel LimitOrders ////////////////////////////////////////////////////////////////////
+func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPFills() {
+	s.fundAliceBalances(10, 0)
+	s.fundBobBalances(0, 20)
+	// GIVEN LP liq at tick -1
+	s.bobDeposits(NewDeposit(0, 20, -1, 0))
+	//WHEN alice submits IoC limitOrder
+	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
+	s.assertAliceBalances(0, 0)
+	// THEN alice's LimitOrder fills via swap
+	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
+	s.assertDexBalances(10, 20)
+	// No maker LO is placed
+	s.assertFillAndPlaceTrancheKeys("TokenA", 1, "", "")
+	// Alice can withdraw immediately
+	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
+	s.assertDexBalances(10, 10)
+	s.assertAliceBalances(0, 10)
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPPartialFill() {
+	s.fundAliceBalances(10, 0)
+	s.fundBobBalances(0, 20)
+	// GIVEN LP of 5 tokenB at tick -1
+	s.bobDeposits(NewDeposit(0, 5, -1, 0))
+	//WHEN alice submits IoC limitOrder for 10 tokenA
+	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
+	s.assertAliceBalances(5, 0)
+	// THEN alice's LimitOrder swap 5 TokenA
+
+	// No maker LO is placed
+	s.assertFillAndPlaceTrancheKeys("TokenA", 1, "", "")
+	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
+	s.assertDexBalances(5, 5)
+
+	// Alice can withdraw her partial fill immediately
+	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
+	s.assertDexBalances(5, 0)
+	s.assertAliceBalances(5, 5)
+
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPNoFill() {
+	s.fundAliceBalances(10, 0)
+	s.fundBobBalances(0, 20)
+	// GIVEN LP of 5 tokenB at tick -1
+	s.bobDeposits(NewDeposit(0, 5, -1, 0))
+	//WHEN alice submits IoC limitOrder for 10 tokenA below current 0To1 price
+	s.aliceLimitSells("TokenA", -1, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
+
+	// THEN alice's LimitOrder doesn't fill and is canceled
+	s.assertDexBalances(0, 5)
+	s.assertAliceBalances(10, 0)
+	// No maker LO is placed
+	s.assertFillAndPlaceTrancheKeys("TokenA", 1, "", "")
+	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
+
 }

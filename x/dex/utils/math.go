@@ -65,7 +65,7 @@ func SafeUint64(in uint64) (out int64, overflow bool) {
 func MustSafeUint64(in uint64) (out int64) {
 	int64, overflow := SafeUint64(in)
 	if overflow {
-		panic("Overflow while castting uint64 to int64")
+		panic("Overflow while casting uint64 to int64")
 	}
 	return int64
 }

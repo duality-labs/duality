@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createNFilledLimitOrderTranche(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.LimitOrderTranche {
+func createNInactiveLimitOrderTranche(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.LimitOrderTranche {
 	items := make([]types.LimitOrderTranche, n)
 	for i := range items {
 		items[i] = types.LimitOrderTranche{
@@ -25,16 +25,16 @@ func createNFilledLimitOrderTranche(keeper *keeper.Keeper, ctx sdk.Context, n in
 			ReservesTokenOut: sdk.ZeroInt(),
 			ReservesTokenIn:  sdk.ZeroInt(),
 		}
-		keeper.SetFilledLimitOrderTranche(ctx, items[i])
+		keeper.SetInactiveLimitOrderTranche(ctx, items[i])
 	}
 	return items
 }
 
-func TestFilledLimitOrderTrancheGet(t *testing.T) {
+func TestInactiveLimitOrderTrancheGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNFilledLimitOrderTranche(keeper, ctx, 10)
+	items := createNInactiveLimitOrderTranche(keeper, ctx, 10)
 	for _, item := range items {
-		rst, found := keeper.GetFilledLimitOrderTranche(ctx,
+		rst, found := keeper.GetInactiveLimitOrderTranche(ctx,
 			item.PairId,
 			item.TokenIn,
 			item.TickIndex,
@@ -47,17 +47,17 @@ func TestFilledLimitOrderTrancheGet(t *testing.T) {
 		)
 	}
 }
-func TestFilledLimitOrderTrancheRemove(t *testing.T) {
+func TestInactiveLimitOrderTrancheRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNFilledLimitOrderTranche(keeper, ctx, 10)
+	items := createNInactiveLimitOrderTranche(keeper, ctx, 10)
 	for _, item := range items {
-		keeper.RemoveFilledLimitOrderTranche(ctx,
+		keeper.RemoveInactiveLimitOrderTranche(ctx,
 			item.PairId,
 			item.TokenIn,
 			item.TickIndex,
 			item.TrancheKey,
 		)
-		_, found := keeper.GetFilledLimitOrderTranche(ctx,
+		_, found := keeper.GetInactiveLimitOrderTranche(ctx,
 			item.PairId,
 			item.TokenIn,
 			item.TickIndex,
@@ -67,11 +67,11 @@ func TestFilledLimitOrderTrancheRemove(t *testing.T) {
 	}
 }
 
-func TestFilledLimitOrderTrancheGetAll(t *testing.T) {
+func TestInactiveLimitOrderTrancheGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNFilledLimitOrderTranche(keeper, ctx, 10)
+	items := createNInactiveLimitOrderTranche(keeper, ctx, 10)
 	require.ElementsMatch(t,
 		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllFilledLimitOrderTranche(ctx)),
+		nullify.Fill(keeper.GetAllInactiveLimitOrderTranche(ctx)),
 	)
 }

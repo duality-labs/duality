@@ -17,7 +17,7 @@ message GenesisState {
   repeated TickLiquidity tickLiquidityList = 2 [(gogoproto.nullable) = false];
   repeated FeeTier feeTierList = 3 [(gogoproto.nullable) = false];
   uint64 feeTierCount = 4;
-  repeated LimitOrderTranche filledLimitOrderTrancheList = 6 [(gogoproto.nullable) = false];
+  repeated LimitOrderTranche inactiveLimitOrderTrancheList = 6 [(gogoproto.nullable) = false];
   repeated LimitOrderTrancheUser limitOrderTrancheUserList = 7 [(gogoproto.nullable) = false];
 
 

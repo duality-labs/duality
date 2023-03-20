@@ -6,6 +6,7 @@ package dualitylabs.duality.dex;
 option go_package = "github.com/duality-labs/duality/x/dex/types";
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "google/protobuf/timestamp.proto";
 // Msg defines the Msg service.
 service Msg {
   rpc Deposit(MsgDeposit) returns (MsgDepositResponse);
@@ -89,19 +90,6 @@ message MsgSwap {
       (gogoproto.jsontag) = "amountIn"
   ]; 
   string tokenIn = 6;
-  string minOut = 7 [
-      (gogoproto.moretags)   = "yaml:\"minOut\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-      (gogoproto.nullable)   = false,
-      (gogoproto.jsontag) = "minOut"
-  ];
-  string limitPrice = 8 [
-      (gogoproto.moretags)   = "yaml:\"tickLimit\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-      (gogoproto.nullable)   = false,
-      (gogoproto.jsontag) = "tickLimit"
-  ];
-  
 }
 
 message MsgSwapResponse {
@@ -110,6 +98,14 @@ message MsgSwapResponse {
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
     (gogoproto.jsontag) = "coinOut"
   ];
+}
+
+enum LimitOrderType{
+  GOOD_TIL_CANCELLED = 0;
+  FILL_OR_KILL = 1;
+  IMMEDIATE_OR_CANCEL = 2;
+  JUST_IN_TIME = 3;
+  GOOD_TIL_TIME = 4;
 }
 
 message MsgPlaceLimitOrder {
@@ -124,7 +120,13 @@ message MsgPlaceLimitOrder {
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountIn"
-  ]; 
+  ];
+  LimitOrderType orderType = 8;
+  // expirationTime is only valid iff orderType == GOOD_TIL_TIME.
+  google.protobuf.Timestamp expirationTime = 9 [
+                                             (gogoproto.stdtime) = true,
+                                             (gogoproto.nullable) = true
+                                             ];
 }
 
 message MsgPlaceLimitOrderResponse {

@@ -73,13 +73,13 @@ service Query {
 		option (google.api.http).get = "/dualitylabs/duality/dex/tick_liquidity/{pairId}/{tokenIn}";
 	}
 
-// Queries a FilledLimitOrderTranche by index.
-	rpc FilledLimitOrderTranche(QueryGetFilledLimitOrderTrancheRequest) returns (QueryGetFilledLimitOrderTrancheResponse) {
+// Queries a InactiveLimitOrderTranche by index.
+	rpc InactiveLimitOrderTranche(QueryGetInactiveLimitOrderTrancheRequest) returns (QueryGetInactiveLimitOrderTrancheResponse) {
 		option (google.api.http).get = "/dualitylabs/duality/dex/filled_limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}";
 	}
 
-	// Queries a list of FilledLimitOrderTranche items.
-	rpc FilledLimitOrderTrancheAll(QueryAllFilledLimitOrderTrancheRequest) returns (QueryAllFilledLimitOrderTrancheResponse) {
+	// Queries a list of InactiveLimitOrderTranche items.
+	rpc InactiveLimitOrderTrancheAll(QueryAllInactiveLimitOrderTrancheRequest) returns (QueryAllInactiveLimitOrderTrancheResponse) {
 		option (google.api.http).get = "/dualitylabs/duality/dex/filled_limit_order_tranche";
 	}
 
@@ -202,7 +202,7 @@ message QueryAllTickLiquidityResponse {
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-message QueryGetFilledLimitOrderTrancheRequest {
+message QueryGetInactiveLimitOrderTrancheRequest {
 	string pairId = 1;
   string tokenIn = 2;
   int64 tickIndex = 3;
@@ -210,16 +210,16 @@ message QueryGetFilledLimitOrderTrancheRequest {
 
 }
 
-message QueryGetFilledLimitOrderTrancheResponse {
-	LimitOrderTranche filledLimitOrderTranche = 1 [(gogoproto.nullable) = false];
+message QueryGetInactiveLimitOrderTrancheResponse {
+	LimitOrderTranche inactiveLimitOrderTranche = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryAllFilledLimitOrderTrancheRequest {
+message QueryAllInactiveLimitOrderTrancheRequest {
 	cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-message QueryAllFilledLimitOrderTrancheResponse {
-	repeated LimitOrderTranche filledLimitOrderTranche = 1 [(gogoproto.nullable) = false];
+message QueryAllInactiveLimitOrderTrancheResponse {
+	repeated LimitOrderTranche inactiveLimitOrderTranche = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

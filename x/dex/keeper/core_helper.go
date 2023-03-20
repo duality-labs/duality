@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"math"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/types"
@@ -35,10 +36,25 @@ func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tok
 
 }
 
-func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64, trancheKey string) (types.LimitOrderTranche, error) {
+func NewLimitOrderExpiration(tranche types.LimitOrderTranche) types.LimitOrderExpiration {
+
+	trancheExpiry := tranche.ExpirationTime
+	if trancheExpiry == nil {
+		panic("Cannot create LimitOrderExpiration from tranche with nil ExpirationTime")
+	}
+
+	return types.LimitOrderExpiration{
+		TrancheRef:     tranche.Ref(),
+		ExpirationTime: *tranche.ExpirationTime,
+	}
+}
+
+func NewLimitOrderTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64, goodTil *time.Time) (types.LimitOrderTranche, error) {
+	// NOTE: CONTRACT: There is no active place tranche (ie. GetPlaceTrancheTick has returned false)
 	if types.IsTickOutOfRange(tickIndex) {
 		return types.LimitOrderTranche{}, types.ErrTickOutsideRange
 	}
+	trancheKey := NewTrancheKey(sdkCtx)
 	return types.LimitOrderTranche{
 		PairId:           pairId,
 		TokenIn:          tokenIn,
@@ -48,6 +64,7 @@ func NewLimitOrderTranche(pairId *types.PairId, tokenIn string, tickIndex int64,
 		ReservesTokenOut: sdk.ZeroInt(),
 		TotalTokenIn:     sdk.ZeroInt(),
 		TotalTokenOut:    sdk.ZeroInt(),
+		ExpirationTime:   goodTil,
 	}, nil
 
 }
@@ -58,6 +75,7 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 	tickIndex int64,
 	tokenIn string,
 	currentLimitOrderKey string,
+	orderType types.LimitOrderType,
 	receiver string,
 ) types.LimitOrderTrancheUser {
 	UserShareData, UserShareDataFound := k.GetLimitOrderTrancheUser(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
@@ -72,6 +90,7 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 			TickIndex:       tickIndex,
 			Token:           tokenIn,
 			PairId:          pairId,
+			OrderType:       orderType,
 		}
 	}
 

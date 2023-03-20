@@ -237,9 +237,9 @@ func (s *MsgServerTestSuite) TestDepositValueAccural() {
 	for i := 0; i < 100; i++ {
 		liquidityA, liquidityB := s.getLiquidityAtTick(0, 3)
 		if i%2 == 0 {
-			s.bobMarketSells("TokenB", int(liquidityA.Int64()), 0)
+			s.bobMarketSells("TokenB", int(liquidityA.Int64()))
 		} else {
-			s.bobMarketSells("TokenA", int(liquidityB.Int64()), 0)
+			s.bobMarketSells("TokenA", int(liquidityB.Int64()))
 		}
 
 	}

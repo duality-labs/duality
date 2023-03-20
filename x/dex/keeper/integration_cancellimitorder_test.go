@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"math"
+	"time"
 
 	"github.com/duality-labs/duality/x/dex/types"
 )
@@ -172,4 +173,67 @@ func (s *MsgServerTestSuite) TestCancelTwiceFails() {
 
 	s.aliceCancelsLimitSellFails("TokenB", -1, trancheKey, types.ErrActiveLimitOrderNotFound)
 
+}
+
+func (s *MsgServerTestSuite) TestCancelPartiallyFilled() {
+	s.fundAliceBalances(50, 0)
+	s.fundBobBalances(0, 50)
+
+	// GIVEN alice limit sells 50 TokenA
+	trancheKey := s.aliceLimitSells("TokenA", 0, 50)
+	// Bob swaps 25 TokenB for TokenA
+	s.bobMarketSells("TokenB", 25)
+
+	s.assertDexBalances(25, 25)
+	s.assertAliceBalances(0, 0)
+
+	//WHEN alice cancels her limit order
+	s.aliceCancelsLimitSell("TokenA", 0, trancheKey)
+
+	//Then alice gets back remaining 25 TokenA LO reserves
+	s.assertAliceBalances(25, 0)
+	s.assertDexBalances(0, 25)
+}
+
+func (s *MsgServerTestSuite) TestCancelPartiallyFilledMultiUser() {
+	s.fundAliceBalances(50, 0)
+	s.fundBobBalances(0, 50)
+	s.fundCarolBalances(100, 0)
+
+	// GIVEN alice limit sells 50 TokenA; carol sells 100 tokenA
+	trancheKey := s.aliceLimitSells("TokenA", 0, 50)
+	s.carolLimitSells("TokenA", 0, 100)
+	// Bob swaps 25 TokenB for TokenA
+	s.bobMarketSells("TokenB", 25)
+
+	s.assertLimitLiquidityAtTick("TokenA", 0, 125)
+	s.assertDexBalances(125, 25)
+	s.assertAliceBalances(0, 0)
+
+	//WHEN alice and carol cancel their limit orders
+	s.aliceCancelsLimitSell("TokenA", 0, trancheKey)
+	s.carolCancelsLimitSell("TokenA", 0, trancheKey)
+
+	//THEN alice gets back 41 TokenA (125 * 1/3)
+	s.assertAliceBalances(41, 0)
+
+	//Carol gets back 83 TokenA (125 * 2/3)
+	s.assertCarolBalances(83, 0)
+	s.assertDexBalances(1, 25)
+}
+
+func (s *MsgServerTestSuite) TestCancelGoodTil() {
+	s.fundAliceBalances(50, 0)
+	tomorrow := time.Now().AddDate(0, 0, 1)
+	// GIVEN alice limit sells 50 TokenA with goodTil date of tommrow
+	trancheKey := s.aliceLimitSellsGoodTil("TokenA", 0, 50, tomorrow)
+	s.assertLimitLiquidityAtTick("TokenA", 0, 50)
+	s.assertNLimitOrderExpiration(1)
+
+	// WHEN alice cancels the limit order
+	s.aliceCancelsLimitSell("TokenA", 0, trancheKey)
+	// THEN there is no liquidity left
+	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
+	// and the LimitOrderExpiration has been removed
+	s.assertNLimitOrderExpiration(0)
 }

@@ -2,8 +2,10 @@ package types
 
 import (
 	"encoding/binary"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/dex/utils"
 )
 
 const (
@@ -91,7 +93,10 @@ const (
 	// LimitOrderTrancheKeyPrefix is the prefix to retrieve all LimitOrderTranche
 	LimitOrderTrancheKeyPrefix = "LimitOrderTranche/value"
 
-	FilledLimitOrderTrancheKeyPrefix = "FilledLimitOrderTranche/value/"
+	InactiveLimitOrderTrancheKeyPrefix = "InactiveLimitOrderTranche/value/"
+
+	// LimitOrderExpirationKeyPrefix is the prefix to retrieve all LimitOrderExpiration
+	LimitOrderExpirationKeyPrefix = "LimitOrderExpiration/value/"
 )
 
 // LimitOrderTrancheUserKey returns the store key to retrieve a LimitOrderTrancheUser from the index fields
@@ -131,8 +136,8 @@ func LimitOrderTrancheUserAddressPrefix(address string) []byte {
 	return key
 }
 
-// FilledLimitOrderTrancheKey returns the store key to retrieve a FilledLimitOrderTranche from the index fields
-func FilledLimitOrderTrancheKey(
+// InactiveLimitOrderTrancheKey returns the store key to retrieve a InactiveLimitOrderTranche from the index fields
+func InactiveLimitOrderTrancheKey(
 	pairId *PairId,
 	tokenIn string,
 	tickIndex int64,
@@ -159,12 +164,12 @@ func FilledLimitOrderTrancheKey(
 	return key
 }
 
-func FilledLimitOrderTranchePrefix(
+func InactiveLimitOrderTranchePrefix(
 	pairId *PairId,
 	tokenIn string,
 	tickIndex int64,
 ) []byte {
-	var key []byte = KeyPrefix(FilledLimitOrderTrancheKeyPrefix)
+	var key []byte = KeyPrefix(InactiveLimitOrderTrancheKeyPrefix)
 
 	pairIdBytes := []byte(pairId.Stringify())
 	key = append(key, pairIdBytes...)
@@ -193,6 +198,12 @@ func LiquidityIndexBytes(liquidityIndex interface{}) []byte {
 		panic("LiquidityIndex is not a valid type")
 
 	}
+}
+
+func TimeBytes(timestamp time.Time) []byte {
+	unixMs := uint64(timestamp.UnixMilli())
+	str := utils.Uint64ToSortableString(unixMs)
+	return []byte(str)
 }
 func TickLiquidityKey(
 	pairId *PairId,
@@ -258,6 +269,22 @@ func TickLiquidityPrefix(pairId *PairId, tokenIn string) []byte {
 	return key
 }
 
+func LimitOrderExpirationKey(
+	goodTilDate time.Time,
+	trancheRef []byte,
+) []byte {
+	var key []byte
+
+	goodTilDateBytes := TimeBytes(goodTilDate)
+	key = append(key, goodTilDateBytes...)
+	key = append(key, []byte("/")...)
+
+	key = append(key, trancheRef...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
 // Deposit Event Attributes
 const (
 	DepositEventKey          = "NewDeposit"
@@ -312,7 +339,6 @@ const (
 	SwapEventTokenIn  = "TokenIn"
 	SwapEventTokenOut = "TokenOut"
 	SwapEventAmountIn = "AmountIn"
-	SwapEventMinOut   = "MinOut"
 	SwapEventAmoutOut = "AmountOut"
 )
 
@@ -320,9 +346,8 @@ const (
 	PlaceLimitOrderEventKey        = "NewPlaceLimitOrder"
 	PlaceLimitOrderEventCreator    = "Creator"
 	PlaceLimitOrderEventReceiver   = "Receiver"
-	PlaceLimitOrderEventToken0     = "Token0"
-	PlaceLimitOrderEventToken1     = "Token1"
 	PlaceLimitOrderEventTokenIn    = "TokenIn"
+	PlaceLimitOrderEventTokenOut   = "TokenOut"
 	PlaceLimitOrderEventAmountIn   = "AmountIn"
 	PlaceLimitOrderEventShares     = "Shares"
 	PlaceLimitOrderEventTrancheKey = "TrancheKey"
@@ -336,6 +361,11 @@ const (
 	WithdrawFilledLimitOrderEventTokenKey      = "TokenKey"
 	WithdrawFilledLimitOrderEventLimitOrderKey = "LimitOrderKey"
 	WithdrawFilledLimitOrderEventAmountOut     = "AmountOut"
+)
+
+const (
+	GoodTilPurgeHitGasLimitEventKey = "GoodTilPurgeHitGasLimit"
+	GoodTilPurgeHitGasLimitEventGas = "Gas"
 )
 
 const (
@@ -357,4 +387,16 @@ const (
 	// NOTE: have to add letter so that LP deposits are indexed ahead of LimitOrders
 	LiquidityTypePoolReserves = "A_PoolDeposit"
 	LiquidityTypeLimitOrder   = "B_LODeposit"
+)
+
+var (
+	JITGoodTilTime = time.Time{}
+)
+
+const (
+	// NOTE: This number is based current cost of all operations in EndBlock,
+	// if that changes this value must be updated to ensure there is enough
+	// remaining gas (weak proxy for timeoutPrepareProposal) to complete endBlock
+	GoodTilPurgeGasBuffer = 50_000
+	ExpiringLimitOrderGas = 10_000
 )
