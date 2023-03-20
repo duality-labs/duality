@@ -13,7 +13,7 @@ func (t LimitOrderTranche) IsFilled() bool {
 }
 
 func (t LimitOrderTranche) IsJIT() bool {
-	return t.ExpirationTime != nil && t.ExpirationTime == &JITGoodTilTime
+	return t.ExpirationTime != nil && *t.ExpirationTime == JITGoodTilTime
 }
 
 func (t LimitOrderTranche) IsExpired(ctx sdk.Context) bool {
