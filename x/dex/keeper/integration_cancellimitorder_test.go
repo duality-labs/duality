@@ -239,6 +239,23 @@ func (s *MsgServerTestSuite) TestCancelGoodTil() {
 	s.assertNLimitOrderExpiration(0)
 }
 
+func (s *MsgServerTestSuite) TestCancelGoodTilAfterExpirationFails() {
+	s.fundAliceBalances(50, 0)
+	tomorrow := time.Now().AddDate(0, 0, 1)
+	// GIVEN alice limit sells 50 TokenA with goodTil date of tommrow
+	trancheKey := s.aliceLimitSellsGoodTil("TokenA", 0, 50, tomorrow)
+	s.assertLimitLiquidityAtTick("TokenA", 0, 50)
+	s.assertNLimitOrderExpiration(1)
+
+	// WHEN expiration date has passed
+	s.nextBlockWithTime(time.Now().AddDate(0, 0, 2))
+	s.app.EndBlock(abci.RequestEndBlock{Height: 0})
+
+	// THEN alice cancellation fails
+	s.aliceCancelsLimitSellFails("TokenA", 0, trancheKey, types.ErrActiveLimitOrderNotFound)
+
+}
+
 func (s *MsgServerTestSuite) TestCancelJITSameBlock() {
 	s.fundAliceBalances(50, 0)
 	// GIVEN alice limit sells 50 TokenA as JIT
