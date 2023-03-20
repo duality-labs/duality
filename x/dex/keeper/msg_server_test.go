@@ -928,7 +928,9 @@ func (s *MsgServerTestSuite) assertLimitLiquidityAtTickInt(selling string, tickI
 	tranches := s.app.DexKeeper.GetAllLimitOrderTrancheAtIndex(s.ctx, pairId, selling, tickIndex)
 	liquidity := sdk.ZeroInt()
 	for _, t := range tranches {
-		liquidity = liquidity.Add(t.ReservesTokenIn)
+		if !t.IsExpired(s.ctx) {
+			liquidity = liquidity.Add(t.ReservesTokenIn)
+		}
 	}
 
 	s.Assert().True(amount.Equal(liquidity), "Incorrect liquidity: expected %s, have %s", amount.String(), liquidity.String())

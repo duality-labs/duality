@@ -2,9 +2,12 @@ package keeper_test
 
 import (
 	"math"
+	"time"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/duality-labs/duality/x/dex/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // Core tests w/ GTC limitOrders //////////////////////////////////////////////
@@ -515,5 +518,116 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPNoFill() {
 	// No maker LO is placed
 	s.assertFillAndPlaceTrancheKeys("TokenA", 1, "", "")
 	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
+
+}
+
+// Just In Time Limit Orders //////////////////////////////////////////////////
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderJITFills() {
+	s.fundAliceBalances(10, 0)
+	s.fundBobBalances(0, 20)
+
+	//GIVEN Alice submits JIT limitOrder for 10 tokenA at tick 0
+	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_JUST_IN_TIME)
+	s.assertLimitLiquidityAtTick("TokenA", 0, 10)
+	s.assertAliceBalances(0, 0)
+
+	// WHEN bob swaps through all the liquidity
+	s.bobMarketSells("TokenB", 10)
+
+	// THEN all liquidity is depleted
+	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
+	//Alice can withdraw 10 TokenB
+	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
+	s.assertAliceBalances(0, 10)
+
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderJITBehindEnemyLines() {
+	s.fundAliceBalances(10, 0)
+	s.fundBobBalances(0, 20)
+
+	//GIVEN 10 LP liquidity for token exists at tick 0
+	s.bobDeposits(NewDeposit(0, 10, 0, 0))
+
+	// WHEN alice places a JIT limit order for TokenA at tick 1 (above enemy lines)
+	trancheKey := s.aliceLimitSells("TokenA", 1, 10, types.LimitOrderType_JUST_IN_TIME)
+	s.assertLimitLiquidityAtTick("TokenA", 1, 10)
+	s.assertAliceBalances(0, 0)
+	// AND bob swaps through all the liquidity
+	s.bobMarketSells("TokenB", 10)
+
+	// THEN all liquidity is depleted
+	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
+	//Alice can withdraw 9 TokenB
+	s.aliceWithdrawsLimitSell("TokenA", 1, trancheKey)
+	s.assertAliceBalances(0, 9)
+
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderJITNextBlock() {
+	s.fundAliceBalances(10, 0)
+	s.fundBobBalances(0, 20)
+
+	//GIVEN Alice submits JIT limitOrder for 10 tokenA at tick 0 for block N
+	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_JUST_IN_TIME)
+	s.assertLimitLiquidityAtTick("TokenA", 0, 10)
+	s.assertAliceBalances(0, 0)
+
+	// WHEN we move to block N+1
+	s.app.EndBlock(abci.RequestEndBlock{Height: 0})
+
+	// THEN there is no liquidity available
+	s.bobMarketSellFails(types.ErrInsufficientLiquidity, "TokenB", 10)
+	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
+	//Alice can withdraw the entirety of the unfilled limitOrder
+	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
+	s.assertAliceBalances(10, 0)
+
+}
+
+// GoodTilLimitOrders //////////////////////////////////////////////////
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilFills() {
+	s.fundAliceBalances(10, 0)
+	s.fundBobBalances(0, 20)
+	tomorrow := time.Now().AddDate(0, 0, 1)
+	//GIVEN Alice submits JIT limitOrder for 10 tokenA expiring tomorrow
+	trancheKey := s.aliceLimitSellsGoodTil("TokenA", 0, 10, tomorrow)
+	s.assertLimitLiquidityAtTick("TokenA", 0, 10)
+	s.assertAliceBalances(0, 0)
+
+	// WHEN bob swaps through all the liquidity
+	s.bobMarketSells("TokenB", 10)
+
+	// THEN all liquidity is depleted
+	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
+	//Alice can withdraw 10 TokenB
+	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
+	s.assertAliceBalances(0, 10)
+
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilExpiresNoEndBlock() {
+	// This is testing the case where the limitOrder has expired but has not yet been purged
+	s.fundAliceBalances(10, 0)
+	s.fundBobBalances(0, 20)
+	tomorrow := time.Now().AddDate(0, 0, 1)
+	//GIVEN Alice submits JIT limitOrder for 10 tokenA expiring tomorrow
+	trancheKey := s.aliceLimitSellsGoodTil("TokenA", 0, 10, tomorrow)
+	s.assertLimitLiquidityAtTick("TokenA", 0, 10)
+	s.assertAliceBalances(0, 0)
+
+	// When two days go by
+	newCtx := s.ctx.WithBlockTime(time.Now().AddDate(0, 0, 2))
+	s.goCtx = sdk.WrapSDKContext(newCtx)
+	s.ctx = newCtx
+
+	// THEN there is no liquidity available
+	s.bobMarketSellFails(types.ErrInsufficientLiquidity, "TokenB", 10)
+	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
+	//Alice can cancel the entirety of the unfilled limitOrder
+	s.aliceCancelsLimitSell("TokenA", 0, trancheKey)
+	s.assertAliceBalances(10, 0)
 
 }
