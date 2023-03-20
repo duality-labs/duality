@@ -480,15 +480,16 @@ func (m *MsgSwapResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgSwapResponse proto.InternalMessageInfo
 
 type MsgPlaceLimitOrder struct {
-	Creator        string                                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Receiver       string                                 `protobuf:"bytes,2,opt,name=receiver,proto3" json:"receiver,omitempty"`
-	TokenA         string                                 `protobuf:"bytes,3,opt,name=tokenA,proto3" json:"tokenA,omitempty"`
-	TokenB         string                                 `protobuf:"bytes,4,opt,name=tokenB,proto3" json:"tokenB,omitempty"`
-	TickIndex      int64                                  `protobuf:"varint,5,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
-	TokenIn        string                                 `protobuf:"bytes,6,opt,name=tokenIn,proto3" json:"tokenIn,omitempty"`
-	AmountIn       github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,7,opt,name=amountIn,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"amountIn" yaml:"amountIn"`
-	OrderType      LimitOrderType                         `protobuf:"varint,8,opt,name=orderType,proto3,enum=dualitylabs.duality.dex.LimitOrderType" json:"orderType,omitempty"`
-	ExpirationTime *time.Time                             `protobuf:"bytes,9,opt,name=expirationTime,proto3,stdtime" json:"expirationTime,omitempty"`
+	Creator   string                                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Receiver  string                                 `protobuf:"bytes,2,opt,name=receiver,proto3" json:"receiver,omitempty"`
+	TokenA    string                                 `protobuf:"bytes,3,opt,name=tokenA,proto3" json:"tokenA,omitempty"`
+	TokenB    string                                 `protobuf:"bytes,4,opt,name=tokenB,proto3" json:"tokenB,omitempty"`
+	TickIndex int64                                  `protobuf:"varint,5,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
+	TokenIn   string                                 `protobuf:"bytes,6,opt,name=tokenIn,proto3" json:"tokenIn,omitempty"`
+	AmountIn  github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,7,opt,name=amountIn,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"amountIn" yaml:"amountIn"`
+	OrderType LimitOrderType                         `protobuf:"varint,8,opt,name=orderType,proto3,enum=dualitylabs.duality.dex.LimitOrderType" json:"orderType,omitempty"`
+	// expirationTime is only valid iff orderType == GOOD_TIL_TIME.
+	ExpirationTime *time.Time `protobuf:"bytes,9,opt,name=expirationTime,proto3,stdtime" json:"expirationTime,omitempty"`
 }
 
 func (m *MsgPlaceLimitOrder) Reset()         { *m = MsgPlaceLimitOrder{} }
