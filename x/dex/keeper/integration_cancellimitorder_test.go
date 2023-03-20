@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/duality-labs/duality/x/dex/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 func (s *MsgServerTestSuite) TestCancelEntireLimitOrderAOneExists() {
@@ -236,4 +237,52 @@ func (s *MsgServerTestSuite) TestCancelGoodTil() {
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
 	// and the LimitOrderExpiration has been removed
 	s.assertNLimitOrderExpiration(0)
+}
+
+func (s *MsgServerTestSuite) TestCancelGoodTilAfterExpirationFails() {
+	s.fundAliceBalances(50, 0)
+	tomorrow := time.Now().AddDate(0, 0, 1)
+	// GIVEN alice limit sells 50 TokenA with goodTil date of tommrow
+	trancheKey := s.aliceLimitSellsGoodTil("TokenA", 0, 50, tomorrow)
+	s.assertLimitLiquidityAtTick("TokenA", 0, 50)
+	s.assertNLimitOrderExpiration(1)
+
+	// WHEN expiration date has passed
+	s.nextBlockWithTime(time.Now().AddDate(0, 0, 2))
+	s.app.EndBlock(abci.RequestEndBlock{Height: 0})
+
+	// THEN alice cancellation fails
+	s.aliceCancelsLimitSellFails("TokenA", 0, trancheKey, types.ErrActiveLimitOrderNotFound)
+
+}
+
+func (s *MsgServerTestSuite) TestCancelJITSameBlock() {
+	s.fundAliceBalances(50, 0)
+	// GIVEN alice limit sells 50 TokenA as JIT
+	trancheKey := s.aliceLimitSells("TokenA", 0, 50, types.LimitOrderType_JUST_IN_TIME)
+	s.assertLimitLiquidityAtTick("TokenA", 0, 50)
+	s.assertNLimitOrderExpiration(1)
+
+	// WHEN alice cancels the limit order
+	s.aliceCancelsLimitSell("TokenA", 0, trancheKey)
+	// THEN there is no liquidity left
+	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
+	// and the LimitOrderExpiration has been removed
+	s.assertNLimitOrderExpiration(0)
+}
+
+func (s *MsgServerTestSuite) TestCancelJITNextBlock() {
+	s.fundAliceBalances(50, 0)
+	// GIVEN alice limit sells 50 TokenA as JIT
+	trancheKey := s.aliceLimitSells("TokenA", 0, 50, types.LimitOrderType_JUST_IN_TIME)
+	s.assertLimitLiquidityAtTick("TokenA", 0, 50)
+	s.assertNLimitOrderExpiration(1)
+
+	// WHEN we move to block N+1
+	s.nextBlockWithTime(time.Now())
+	s.app.EndBlock(abci.RequestEndBlock{Height: 0})
+
+	// THEN alice cancellation fails
+	s.aliceCancelsLimitSellFails("TokenA", 0, trancheKey, types.ErrActiveLimitOrderNotFound)
+	s.assertAliceBalances(0, 0)
 }

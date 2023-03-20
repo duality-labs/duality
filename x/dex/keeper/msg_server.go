@@ -106,6 +106,12 @@ func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLim
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
+	sdkCtx := sdk.UnwrapSDKContext(goCtx)
+	err := msg.ValidateGoodTilExpiration(sdkCtx.BlockTime())
+	if err != nil {
+		return &types.MsgPlaceLimitOrderResponse{}, err
+	}
+
 	tokenIn, tokenOut := GetInOutTokens(msg.TokenIn, msg.TokenA, msg.TokenB)
 
 	trancheKey, err := k.PlaceLimitOrderCore(

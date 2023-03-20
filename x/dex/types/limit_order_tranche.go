@@ -13,11 +13,11 @@ func (t LimitOrderTranche) IsFilled() bool {
 }
 
 func (t LimitOrderTranche) IsJIT() bool {
-	return t.ExpirationTime != nil && t.ExpirationTime == &JITGoodTilTime
+	return t.ExpirationTime != nil && *t.ExpirationTime == JITGoodTilTime
 }
 
 func (t LimitOrderTranche) IsExpired(ctx sdk.Context) bool {
-	return t.ExpirationTime != nil && !t.IsJIT() && t.ExpirationTime.Before(ctx.BlockTime())
+	return t.ExpirationTime != nil && !t.IsJIT() && !t.ExpirationTime.After(ctx.BlockTime())
 }
 
 func (t *LimitOrderTranche) Price() *Price {

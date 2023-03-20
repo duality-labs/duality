@@ -19,3 +19,7 @@ func (l LimitOrderType) IsJIT() bool {
 func (l LimitOrderType) IsGoodTil() bool {
 	return l == LimitOrderType_GOOD_TIL_TIME
 }
+
+func (l LimitOrderType) HasExpiration() bool {
+	return l.IsGoodTil() || l.IsJIT()
+}

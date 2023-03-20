@@ -74,3 +74,14 @@ func (msg *MsgPlaceLimitOrder) ValidateBasic() error {
 	}
 	return nil
 }
+
+func (msg *MsgPlaceLimitOrder) ValidateGoodTilExpiration(blockTime time.Time) error {
+	if msg.OrderType.IsGoodTil() && !msg.ExpirationTime.After(blockTime) {
+		return sdkerrors.Wrapf(ErrExpirationTimeInPast,
+			"Current BlockTime: %s; Provided ExpirationTime: %s",
+			blockTime.String(),
+			msg.ExpirationTime.String(),
+		)
+	}
+	return nil
+}
