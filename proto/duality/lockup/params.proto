@@ -1,0 +1,8 @@
+syntax = "proto3";
+package duality.lockup;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/duality-labs/duality/x/lockup/types";
+
+message Params {}

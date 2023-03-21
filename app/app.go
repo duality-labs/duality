@@ -102,6 +102,10 @@ import (
 	epochsmodule "github.com/duality-labs/duality/x/epochs"
 	epochsmodulekeeper "github.com/duality-labs/duality/x/epochs/keeper"
 	epochsmoduletypes "github.com/duality-labs/duality/x/epochs/types"
+
+	lockupmodule "github.com/duality-labs/duality/x/lockup"
+	lockupmodulekeeper "github.com/duality-labs/duality/x/lockup/keeper"
+	lockupmoduletypes "github.com/duality-labs/duality/x/lockup/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -151,6 +155,7 @@ var (
 		dexmodule.AppModuleBasic{},
 		mevmodule.AppModuleBasic{},
 		epochsmodule.AppModuleBasic{},
+		lockupmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -162,6 +167,8 @@ var (
 		ccvconsumertypes.ConsumerRedistributeName:     nil,
 		ccvconsumertypes.ConsumerToSendToProviderName: nil,
 		mevmoduletypes.ModuleName:                     {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+		lockupmoduletypes.ModuleName:                  {authtypes.Minter, authtypes.Burner},
+
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -224,6 +231,8 @@ type App struct {
 	MevKeeper mevmodulekeeper.Keeper
 
 	EpochsKeeper epochsmodulekeeper.Keeper
+
+	LockupKeeper lockupmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -286,7 +295,7 @@ func NewApp(
 		slashingtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		dexmoduletypes.StoreKey, ccvconsumertypes.StoreKey, adminmodulemoduletypes.StoreKey,
-		mevmoduletypes.StoreKey, epochsmoduletypes.StoreKey,
+		mevmoduletypes.StoreKey, epochsmoduletypes.StoreKey, lockupmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -436,6 +445,21 @@ func NewApp(
 		// multiEpochHooks,
 		&epochsmoduletypes.MultiEpochHooks{},
 	)
+
+	app.LockupKeeper = *lockupmodulekeeper.NewKeeper(
+		keys[lockupmoduletypes.StoreKey],
+		// TODO: Visit why this needs to be deref'd
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.GetSubspace(lockupmoduletypes.ModuleName))
+
+	app.LockupKeeper.SetHooks(
+		lockupmoduletypes.NewMultiLockupHooks(
+		// insert lockup hooks receivers here
+		),
+	)
+	lockupModule := lockupmodule.NewAppModule(app.LockupKeeper, app.AccountKeeper, app.BankKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create static IBC router, add transfer route, then set and seal it
@@ -474,6 +498,7 @@ func NewApp(
 		dexModule,
 		mevModule,
 		epochsModule,
+		lockupModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -500,6 +525,7 @@ func NewApp(
 		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
 		mevmoduletypes.ModuleName,
+		lockupmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -521,6 +547,7 @@ func NewApp(
 		adminmodulemoduletypes.ModuleName,
 		mevmoduletypes.ModuleName,
 		epochsmoduletypes.ModuleName,
+		lockupmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 
 		// NOTE: Because of the gas sensitivity of PurgeExpiredLimit order operations dexmodule must be the last endBlock module to run
@@ -551,6 +578,7 @@ func NewApp(
 		dexmoduletypes.ModuleName,
 		mevmoduletypes.ModuleName,
 		epochsmoduletypes.ModuleName,
+		lockupmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -573,6 +601,8 @@ func NewApp(
 		dexModule,
 
 		mevModule,
+		// TODO: Enable lockupModule simulation testing
+
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 	app.sm.RegisterStoreDecoders()
@@ -764,6 +794,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(dexmoduletypes.ModuleName)
 	paramsKeeper.Subspace(mevmoduletypes.ModuleName)
 	paramsKeeper.Subspace(epochsmoduletypes.ModuleName)
+	paramsKeeper.Subspace(lockupmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
