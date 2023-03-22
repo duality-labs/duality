@@ -13189,7 +13189,7 @@ paths:
                     upperTickIndex:
                       type: string
                       format: int64
-                    feeIndex:
+                    fee:
                       type: string
                       format: uint64
         default:
@@ -13326,7 +13326,7 @@ paths:
                         upperTickIndex:
                           type: string
                           format: int64
-                        feeIndex:
+                        fee:
                           type: string
                           format: uint64
                   LimitOrders:
@@ -36160,7 +36160,7 @@ definitions:
       upperTickIndex:
         type: string
         format: int64
-      feeIndex:
+      fee:
         type: string
         format: uint64
   dualitylabs.duality.dex.LimitOrderTranche:
@@ -36694,7 +36694,7 @@ definitions:
             upperTickIndex:
               type: string
               format: int64
-            feeIndex:
+            fee:
               type: string
               format: uint64
   dualitylabs.duality.dex.QueryAllUserLimitOrdersResponse:
@@ -36917,7 +36917,7 @@ definitions:
                 upperTickIndex:
                   type: string
                   format: int64
-                feeIndex:
+                fee:
                   type: string
                   format: uint64
           LimitOrders:
@@ -37055,7 +37055,7 @@ definitions:
             upperTickIndex:
               type: string
               format: int64
-            feeIndex:
+            fee:
               type: string
               format: uint64
       LimitOrders:
