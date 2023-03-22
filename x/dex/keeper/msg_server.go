@@ -20,7 +20,6 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 var _ types.MsgServer = msgServer{}
 
 func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.MsgDepositResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
@@ -49,8 +48,6 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 	if err != nil {
 		return nil, err
 	}
-
-	_ = ctx
 
 	return &types.MsgDepositResponse{Amounts0Deposit, Amounts1Deposit}, nil
 }

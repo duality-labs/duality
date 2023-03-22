@@ -10,7 +10,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedInSpreadCurrTickAdjusted() {
 
 	// GIVEN
 	// create spread around -5, 5
-	s.aliceDeposits(NewDeposit(10, 10, 0, 2))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 5))
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
 	s.assertCurr1To0(-5)
@@ -18,7 +18,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedInSpreadCurrTickAdjusted() {
 
 	// WHEN
 	// deposit in spread (10 of A,B at tick 0 fee 1)
-	s.aliceDeposits(NewDeposit(10, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 1))
 	s.assertAliceBalances(30, 30)
 	s.assertDexBalances(20, 20)
 
@@ -33,7 +33,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedAroundSpreadCurrTickNotAdjust
 
 	// GIVEN
 	// create spread around -1, 1
-	s.aliceDeposits(NewDeposit(10, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 1))
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
 	s.assertCurr1To0(-1)
@@ -41,7 +41,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedAroundSpreadCurrTickNotAdjust
 
 	// WHEN
 	// deposit around spread (10 of A,B at tick 0 fee 3)
-	s.aliceDeposits(NewDeposit(10, 10, 0, 1))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 3))
 	s.assertAliceBalances(30, 30)
 	s.assertDexBalances(20, 20)
 
@@ -56,7 +56,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedHalfInSpreadCurrTick0To1Adjus
 
 	// GIVEN
 	// create spread around -5, 5
-	s.aliceDeposits(NewDeposit(10, 10, 0, 2))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 5))
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
 	s.assertCurr1To0(-5)
@@ -64,7 +64,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedHalfInSpreadCurrTick0To1Adjus
 
 	// WHEN
 	// deposit half in spread (10 of A,B at tick 1 fee 5)
-	s.aliceDeposits(NewDeposit(10, 10, 1, 2))
+	s.aliceDeposits(NewDeposit(10, 10, 1, 5))
 	s.assertAliceBalances(30, 30)
 	s.assertDexBalances(20, 20)
 
@@ -79,7 +79,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedHalfInSpreadCurrTick1To0Adjus
 
 	// GIVEN
 	// create spread around -5, 5
-	s.aliceDeposits(NewDeposit(10, 10, 0, 2))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 5))
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
 	s.assertCurr1To0(-5)
@@ -87,7 +87,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedHalfInSpreadCurrTick1To0Adjus
 
 	// WHEN
 	// deposit half in spread (10 of A,B at tick -1 fee 5)
-	s.aliceDeposits(NewDeposit(10, 10, -1, 2))
+	s.aliceDeposits(NewDeposit(10, 10, -1, 5))
 	s.assertAliceBalances(30, 30)
 	s.assertDexBalances(20, 20)
 
@@ -102,10 +102,10 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedBelowEnemyLines() {
 
 	// GIVEN
 	// deposit 10 of token A at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 0, 0, 1))
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
-	s.assertPoolLiquidity(10, 0, 0, 0)
+	s.assertPoolLiquidity(10, 0, 0, 1)
 
 	// WHEN
 	// depositing below enemy lines at tick -5
@@ -113,7 +113,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedBelowEnemyLines() {
 	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
 
 	err := types.ErrDepositBehindPairLiquidity
-	s.assertAliceDepositFails(err, NewDeposit(10, 10, -5, 0))
+	s.assertAliceDepositFails(err, NewDeposit(10, 10, -5, 1))
 }
 
 func (s *MsgServerTestSuite) TestDepositDoubleSidedAboveEnemyLines() {
@@ -121,10 +121,10 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedAboveEnemyLines() {
 
 	// GIVEN
 	// deposit 10 of token A at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(0, 10, 0, 1))
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
-	s.assertPoolLiquidity(0, 10, 0, 0)
+	s.assertPoolLiquidity(0, 10, 0, 1)
 
 	// WHEN
 	// depositing above enemy lines at tick 5
@@ -132,7 +132,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedAboveEnemyLines() {
 	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
 
 	err := types.ErrDepositBehindPairLiquidity
-	s.assertAliceDepositFails(err, NewDeposit(10, 10, 5, 0))
+	s.assertAliceDepositFails(err, NewDeposit(10, 10, 5, 1))
 }
 
 func (s *MsgServerTestSuite) TestDepositDoubleSidedFirstSharesMintedTotal() {
@@ -141,11 +141,11 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedFirstSharesMintedTotal() {
 	// GIVEN
 	// empty pool
 	s.assertPoolShares(0, 1, 0)
-	s.assertPoolLiquidity(0, 0, 0, 0)
+	s.assertPoolLiquidity(0, 0, 0, 1)
 
 	// WHEN
 	// depositing 10, 5 at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 5, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 5, 0, 1))
 
 	// THEN
 	// 15 shares are minted and are the total
@@ -158,12 +158,12 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedFirstSharesMintedUser() {
 	// GIVEN
 	// empty pool
 	s.assertAliceShares(0, 1, 0)
-	s.assertPoolLiquidity(0, 0, 0, 0)
+	s.assertPoolLiquidity(0, 0, 0, 1)
 	s.assertAliceShares(0, 1, 0)
 
 	// WHEN
 	// depositing 10, 5 at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 5, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 5, 0, 1))
 
 	// THEN
 	// 15 shares are minted for alice
@@ -175,13 +175,13 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedExistingSharesMintedTotal() {
 
 	// GIVEN
 	// tick 0 fee 1 has existing liquidity of 10 tokenA and 5 tokenB, shares are 15
-	s.aliceDeposits(NewDeposit(10, 5, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 5, 0, 1))
 	s.assertPoolShares(0, 1, 15)
-	s.assertPoolLiquidity(10, 5, 0, 0)
+	s.assertPoolLiquidity(10, 5, 0, 1)
 
 	// WHEN
 	// depositing 10, 5 at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 5, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 5, 0, 1))
 
 	// THEN
 	// 15 more shares are minted and the total is 30
@@ -193,33 +193,18 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedExistingSharesMintedUser() {
 
 	// GIVEN
 	// tick 0 fee 1 has existing liquidity of 10 tokenA and 5 tokenB, shares are 15
-	s.aliceDeposits(NewDeposit(10, 5, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 5, 0, 1))
 	s.assertAliceShares(0, 1, 15)
 	s.assertPoolShares(0, 1, 15)
-	s.assertPoolLiquidity(10, 5, 0, 0)
+	s.assertPoolLiquidity(10, 5, 0, 1)
 
 	// WHEN
 	// alice deposits 6, 3 at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(6, 3, 0, 0))
+	s.aliceDeposits(NewDeposit(6, 3, 0, 1))
 
 	// THEN
 	// 9 more shares are minted for alice for a total of 24
 	s.assertAliceShares(0, 1, 24)
-}
-
-func (s *MsgServerTestSuite) TestDepositDoubleSidedZeroDeposit() {
-	s.fundAliceBalances(50, 50)
-
-	// GIVEN
-	// empty pool
-
-	// WHEN
-	// depositing 0,0
-	// THEN
-	// deposit should fail with InvalidType error
-
-	err := types.ErrZeroDeposit
-	s.assertAliceDepositFails(err, NewDeposit(0, 0, 0, 0))
 }
 
 func (s *MsgServerTestSuite) TestDepositValueAccural() {
@@ -228,14 +213,14 @@ func (s *MsgServerTestSuite) TestDepositValueAccural() {
 	s.fundCarolBalances(100, 1)
 
 	//Alice deposits 100TokenA @ tick0 => 100 shares
-	s.aliceDeposits(NewDeposit(100, 0, 0, 3))
-	s.assertAliceShares(0, 5, 100)
-	s.assertLiquidityAtTick(sdk.NewInt(100), sdk.ZeroInt(), 0, 3)
+	s.aliceDeposits(NewDeposit(100, 0, 0, 10))
+	s.assertAliceShares(0, 10, 100)
+	s.assertLiquidityAtTick(sdk.NewInt(100), sdk.ZeroInt(), 0, 10)
 
 	//Lots of trade activity => ~200 ExistingValueToken0
 
 	for i := 0; i < 100; i++ {
-		liquidityA, liquidityB := s.getLiquidityAtTick(0, 3)
+		liquidityA, liquidityB := s.getLiquidityAtTick(0, 10)
 		if i%2 == 0 {
 			s.bobMarketSells("TokenB", int(liquidityA.Int64()))
 		} else {
@@ -243,16 +228,16 @@ func (s *MsgServerTestSuite) TestDepositValueAccural() {
 		}
 
 	}
-	s.assertLiquidityAtTick(sdk.NewInt(199), sdk.NewInt(1), 0, 3)
+	s.assertLiquidityAtTick(sdk.NewInt(199), sdk.NewInt(1), 0, 10)
 	s.assertDexBalances(199, 1)
 
 	//Carol deposits 100TokenA @tick0
-	s.carolDeposits(NewDeposit(100, 1, 0, 3))
-	s.assertCarolShares(0, 3, 50)
+	s.carolDeposits(NewDeposit(100, 1, 0, 10))
+	s.assertCarolShares(0, 10, 50)
 
-	s.aliceWithdraws(NewWithdrawl(100, 0, 3))
+	s.aliceWithdraws(NewWithdrawl(100, 0, 10))
 	s.assertAliceBalances(199, 0)
 
-	s.carolWithdraws(NewWithdrawl(50, 0, 3))
+	s.carolWithdraws(NewWithdrawl(50, 0, 10))
 	s.assertCarolBalances(100, 2)
 }

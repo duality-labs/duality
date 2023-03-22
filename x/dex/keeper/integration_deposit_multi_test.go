@@ -19,8 +19,8 @@ func (s *MsgServerTestSuite) TestDepositMultiCompleteFailure() {
 	err := types.ErrZeroTrueDeposit
 	s.assertAliceDepositFails(
 		err,
-		NewDeposit(5, 0, 0, 0),
-		NewDeposit(0, 5, 0, 0),
+		NewDeposit(5, 0, 0, 1),
+		NewDeposit(0, 5, 0, 1),
 	)
 }
 
@@ -33,13 +33,13 @@ func (s *MsgServerTestSuite) TestDepositMultiSuccess() {
 	// WHEN
 	// alice deposits 5 A, 5 B at tick 0 fee 0 and then 10 A, 10 B at tick 5 fee 0
 	s.aliceDeposits(
-		NewDeposit(5, 5, 0, 0),
-		NewDeposit(10, 10, 0, 0),
+		NewDeposit(5, 5, 0, 1),
+		NewDeposit(10, 10, 0, 1),
 	)
 
 	// THEN
 	// both deposits should go through
 	s.assertAliceBalances(35, 35)
-	s.assertLiquidityAtTick(sdk.NewInt(15), sdk.NewInt(15), 0, 0)
+	s.assertLiquidityAtTick(sdk.NewInt(15), sdk.NewInt(15), 0, 1)
 	s.assertDexBalances(15, 15)
 }

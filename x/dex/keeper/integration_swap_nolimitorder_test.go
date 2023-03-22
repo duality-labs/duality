@@ -9,7 +9,7 @@ func (s *MsgServerTestSuite) TestSwapNoLONoLiquidity() {
 	s.fundBobBalances(50, 50)
 	// GIVEN
 	// no liqudity of token A (deposit only token B at tick 0 fee 1)
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(0, 10, 0, 1))
 	s.assertAliceBalances(50, 40)
 
 	// WHEN
@@ -25,10 +25,10 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReac
 	s.fundBobBalances(50, 0)
 	// GIVEN
 	// deposit 10 of tokenB
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(0, 10, 0, 1))
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
-	s.assertPoolLiquidity(0, 10, 0, 0)
+	s.assertPoolLiquidity(0, 10, 0, 1)
 	//
 	// WHEN
 	// swap 20 of tokenA at
@@ -46,10 +46,10 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReac
 	s.fundBobBalances(0, 50)
 	// GIVEN
 	// deposit 10 of token A at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 0, 0, 1))
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
-	s.assertPoolLiquidity(10, 0, 0, 0)
+	s.assertPoolLiquidity(10, 0, 0, 1)
 	//
 	// WHEN
 	// swap 20 of token A for B
@@ -67,7 +67,7 @@ func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMinFee() {
 	s.fundBobBalances(50, 0)
 	// GIVEN
 	// deposit 10 of token B at tick 0 fee 0
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(0, 10, 0, 1))
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
 
@@ -106,8 +106,8 @@ func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionSomeFeeTiers() {
 	// GIVEN
 	// deposit 10 of token B at tick 0 fee 1 and 10 of token B at tick 0 fee 3
 	s.aliceDeposits(
-		NewDeposit(0, 10, 0, 0),
 		NewDeposit(0, 10, 0, 1),
+		NewDeposit(0, 10, 0, 3),
 	)
 	s.assertAliceBalances(50, 30)
 	s.assertDexBalances(0, 20)
@@ -127,7 +127,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveCurr1to0() {
 	s.fundBobBalances(0, 50)
 	// GIVEN
 	// deposit 10 of token A at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 0, 0, 1))
 	s.assertCurr1To0(-1)
 
 	// WHEN
@@ -145,8 +145,8 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0MovesCurr1to0() {
 	// GIVEN
 	// deposit 10 of token A at tick 0 fee 1, 10 of token A at tick 0 fee 3
 	s.aliceDeposits(
-		NewDeposit(10, 0, 0, 0),
 		NewDeposit(10, 0, 0, 1),
+		NewDeposit(10, 0, 0, 3),
 	)
 	s.assertCurr1To0(-1)
 
@@ -164,7 +164,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveCurr0to1() {
 	s.fundBobBalances(0, 50)
 	// GIVEN
 	// deposit 10 of both token A and B at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 1))
 	s.assertCurr0To1(1)
 
 	// WHEN
@@ -182,8 +182,8 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0MovesCurr0to1() {
 	// GIVEN
 	// deposit 10 of token A at tick 0 fee 1 and 10 of both token A and B at tick 0 fee 3
 	s.aliceDeposits(
-		NewDeposit(10, 0, 0, 0),
-		NewDeposit(10, 10, 0, 1),
+		NewDeposit(10, 0, 0, 1),
+		NewDeposit(10, 10, 0, 3),
 	)
 	s.assertCurr0To1(3)
 
@@ -202,7 +202,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveCurr0to1() {
 	// GIVEN
 	// deposit 10 of token B at tick 0 fee 1
 	s.aliceDeposits(
-		NewDeposit(0, 10, 0, 0),
+		NewDeposit(0, 10, 0, 1),
 	)
 	s.assertCurr0To1(1)
 
@@ -221,8 +221,8 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1MovesCurr0to1() {
 	// GIVEN
 	// deposit 10 of token B at tick 0 fee 1, 10 of token B at tick 0 fee 3
 	s.aliceDeposits(
-		NewDeposit(0, 10, 0, 0),
 		NewDeposit(0, 10, 0, 1),
+		NewDeposit(0, 10, 0, 3),
 	)
 	s.assertCurr0To1(1)
 
@@ -240,7 +240,7 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveCurr1to0() {
 	s.fundBobBalances(50, 0)
 	// GIVEN
 	// deposit 10 of both token A and B at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 1))
 	s.assertCurr1To0(-1)
 
 	// WHEN
@@ -259,8 +259,8 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1MovesCurr1to0() {
 	// deposit 10 of token B at tick 0 fee 1 and 10 of both token A and B at tick 0 fee 3
 	// to create spread of -3, 1
 	s.aliceDeposits(
-		NewDeposit(0, 10, 0, 0),
-		NewDeposit(10, 10, 0, 1),
+		NewDeposit(0, 10, 0, 1),
+		NewDeposit(10, 10, 0, 3),
 	)
 	s.assertCurr1To0(-3)
 
@@ -280,8 +280,8 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveMax() {
 	// deposit 10 of token B at tick 0 fee 1 and 10 of both token A and B at tick 0 fee 3
 	// to create spread of -3, 1
 	s.aliceDeposits(
-		NewDeposit(0, 10, 0, 0),
-		NewDeposit(10, 10, 0, 1),
+		NewDeposit(0, 10, 0, 1),
+		NewDeposit(10, 10, 0, 3),
 	)
 	s.assertCurr1To0(-3)
 
