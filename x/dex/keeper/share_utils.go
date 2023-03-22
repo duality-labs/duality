@@ -18,15 +18,15 @@ const LPsharesRegexpStr = "^" + types.DepositSharesPrefix + "-" +
 	"([a-zA-Z][a-zA-Z0-9/-]{2,127})" + "-" +
 	// Tickindex
 	`t(\d+)` + "-" +
-	// feeIndex
+	// fee
 	`f(\d+)`
 
 var LPSharesRegexp = regexp.MustCompile(LPsharesRegexpStr)
 
-func CreateSharesId(token0 string, token1 string, tickIndex int64, feeIndex uint64) (denom string) {
+func CreateSharesId(token0 string, token1 string, tickIndex int64, fee uint64) (denom string) {
 	t0 := strings.ReplaceAll(token0, "-", "")
 	t1 := strings.ReplaceAll(token1, "-", "")
-	return fmt.Sprintf("%s-%s-%s-t%d-f%d", types.DepositSharesPrefix, t0, t1, tickIndex, feeIndex)
+	return fmt.Sprintf("%s-%s-%s-t%d-f%d", types.DepositSharesPrefix, t0, t1, tickIndex, fee)
 }
 
 func ParseDepositShares(shares sdk.Coin) (matches []string, valid bool) {
@@ -40,7 +40,7 @@ func ParseDepositShares(shares sdk.Coin) (matches []string, valid bool) {
 	return matchArr[0][1:5], true
 }
 
-func DepositSharesToData(shares sdk.Coin, feeTiers []types.FeeTier) (types.DepositRecord, error) {
+func DepositSharesToData(shares sdk.Coin) (types.DepositRecord, error) {
 	matches, valid := ParseDepositShares(shares)
 
 	if !valid {
@@ -52,18 +52,17 @@ func DepositSharesToData(shares sdk.Coin, feeTiers []types.FeeTier) (types.Depos
 	if err != nil {
 		return types.DepositRecord{}, types.ErrInvalidDepositShares
 	}
-	feeIndex, err := strconv.ParseUint(matches[3], 10, 0)
+	fee, err := strconv.ParseUint(matches[3], 10, 0)
 	if err != nil {
 		return types.DepositRecord{}, types.ErrInvalidDepositShares
 	}
-
-	feeUint := utils.MustSafeUint64(feeTiers[feeIndex].Fee)
+	feeUint := utils.MustSafeUint64(fee)
 	return types.DepositRecord{
 		PairId:          pairId,
 		SharesOwned:     shares.Amount,
 		CenterTickIndex: tickIndex,
 		LowerTickIndex:  tickIndex - feeUint,
 		UpperTickIndex:  tickIndex + feeUint,
-		FeeIndex:        feeIndex,
+		Fee:             fee,
 	}, nil
 }

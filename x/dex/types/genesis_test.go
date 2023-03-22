@@ -21,15 +21,6 @@ func TestGenesisState_Validate(t *testing.T) {
 		{
 			desc: "valid genesis state",
 			genState: &types.GenesisState{
-				FeeTierList: []types.FeeTier{
-					{
-						Id: 0,
-					},
-					{
-						Id: 1,
-					},
-				},
-				FeeTierCount: 2,
 				LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
 					{
 						TrancheKey: "0",
@@ -81,32 +72,6 @@ func TestGenesisState_Validate(t *testing.T) {
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
-		},
-		{
-			desc: "duplicated FeeTier",
-			genState: &types.GenesisState{
-				FeeTierList: []types.FeeTier{
-					{
-						Id: 0,
-					},
-					{
-						Id: 0,
-					},
-				},
-			},
-			valid: false,
-		},
-		{
-			desc: "invalid FeeTier count",
-			genState: &types.GenesisState{
-				FeeTierList: []types.FeeTier{
-					{
-						Id: 1,
-					},
-				},
-				FeeTierCount: 0,
-			},
-			valid: false,
 		},
 		{
 			desc: "duplicated LimitOrderTrancheUser",

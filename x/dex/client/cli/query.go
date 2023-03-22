@@ -25,8 +25,6 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdQueryParams())
-	cmd.AddCommand(CmdListFeeTier())
-	cmd.AddCommand(CmdShowFeeTier())
 	cmd.AddCommand(CmdListLimitOrderTrancheUser())
 	cmd.AddCommand(CmdShowLimitOrderTrancheUser())
 	cmd.AddCommand(CmdListLimitOrderTranche())

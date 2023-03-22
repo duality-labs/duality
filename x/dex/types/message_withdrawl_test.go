@@ -20,7 +20,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 			msg: MsgWithdrawl{
 				Creator:        "invalid_address",
 				Receiver:       sample.AccAddress(),
-				FeeIndexes:     []uint64{0},
+				Fees:           []uint64{0},
 				TickIndexes:    []int64{0},
 				SharesToRemove: []sdk.Int{sdk.OneInt()},
 			},
@@ -31,7 +31,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 			msg: MsgWithdrawl{
 				Creator:        sample.AccAddress(),
 				Receiver:       "invalid_address",
-				FeeIndexes:     []uint64{0},
+				Fees:           []uint64{0},
 				TickIndexes:    []int64{0},
 				SharesToRemove: []sdk.Int{sdk.OneInt()},
 			},
@@ -42,7 +42,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 			msg: MsgWithdrawl{
 				Creator:        sample.AccAddress(),
 				Receiver:       sample.AccAddress(),
-				FeeIndexes:     []uint64{},
+				Fees:           []uint64{},
 				TickIndexes:    []int64{0},
 				SharesToRemove: []sdk.Int{sdk.OneInt()},
 			},
@@ -53,7 +53,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 			msg: MsgWithdrawl{
 				Creator:        sample.AccAddress(),
 				Receiver:       sample.AccAddress(),
-				FeeIndexes:     []uint64{0},
+				Fees:           []uint64{0},
 				TickIndexes:    []int64{},
 				SharesToRemove: []sdk.Int{sdk.OneInt()},
 			},
@@ -64,7 +64,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 			msg: MsgWithdrawl{
 				Creator:        sample.AccAddress(),
 				Receiver:       sample.AccAddress(),
-				FeeIndexes:     []uint64{0},
+				Fees:           []uint64{0},
 				TickIndexes:    []int64{0},
 				SharesToRemove: []sdk.Int{},
 			},
@@ -75,7 +75,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 			msg: MsgWithdrawl{
 				Creator:        sample.AccAddress(),
 				Receiver:       sample.AccAddress(),
-				FeeIndexes:     []uint64{},
+				Fees:           []uint64{},
 				TickIndexes:    []int64{},
 				SharesToRemove: []sdk.Int{},
 			},
@@ -86,7 +86,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 			msg: MsgWithdrawl{
 				Creator:        sample.AccAddress(),
 				Receiver:       sample.AccAddress(),
-				FeeIndexes:     []uint64{0},
+				Fees:           []uint64{0},
 				TickIndexes:    []int64{0},
 				SharesToRemove: []sdk.Int{sdk.ZeroInt()},
 			},
@@ -97,7 +97,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 			msg: MsgWithdrawl{
 				Creator:        sample.AccAddress(),
 				Receiver:       sample.AccAddress(),
-				FeeIndexes:     []uint64{0},
+				Fees:           []uint64{0},
 				TickIndexes:    []int64{0},
 				SharesToRemove: []sdk.Int{sdk.OneInt()},
 			},

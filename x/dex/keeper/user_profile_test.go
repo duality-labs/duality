@@ -54,24 +54,24 @@ func (s *MsgServerTestSuite) TestGetAllDeposits() {
 			AmountA:   sdk.NewInt(1),
 			AmountB:   sdk.NewInt(0),
 			TickIndex: -50,
-			FeeIndex:  0,
+			Fee:       0,
 		},
 		&Deposit{
 			AmountA:   sdk.NewInt(5),
 			AmountB:   sdk.NewInt(5),
 			TickIndex: 0,
-			FeeIndex:  0,
+			Fee:       0,
 		},
 		&Deposit{
 			AmountA:   sdk.NewInt(0),
 			AmountB:   sdk.NewInt(10),
 			TickIndex: 2,
-			FeeIndex:  0,
+			Fee:       0,
 		},
 	)
 	s.aliceWithdraws(&Withdrawl{
 		TickIndex: -50,
-		FeeIndex:  0,
+		Fee:       0,
 		Shares:    sdk.NewInt(1),
 	},
 	)
@@ -86,7 +86,7 @@ func (s *MsgServerTestSuite) TestGetAllDeposits() {
 		CenterTickIndex: 0,
 		LowerTickIndex:  -1,
 		UpperTickIndex:  1,
-		FeeIndex:        0,
+		Fee:             0,
 	},
 		depositList[0],
 	)
@@ -96,7 +96,7 @@ func (s *MsgServerTestSuite) TestGetAllDeposits() {
 		CenterTickIndex: 2,
 		LowerTickIndex:  1,
 		UpperTickIndex:  3,
-		FeeIndex:        0,
+		Fee:             0,
 	},
 		depositList[1],
 	)
@@ -109,13 +109,13 @@ func (s *MsgServerTestSuite) TestGetAllPositions() {
 			AmountA:   sdk.NewInt(1),
 			AmountB:   sdk.NewInt(0),
 			TickIndex: 1,
-			FeeIndex:  0,
+			Fee:       0,
 		},
 		&Deposit{
 			AmountA:   sdk.NewInt(5),
 			AmountB:   sdk.NewInt(5),
 			TickIndex: 0,
-			FeeIndex:  0,
+			Fee:       0,
 		},
 	)
 

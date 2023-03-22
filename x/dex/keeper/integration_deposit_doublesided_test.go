@@ -140,7 +140,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedFirstSharesMintedTotal() {
 
 	// GIVEN
 	// empty pool
-	s.assertPoolShares(0, 0, 0)
+	s.assertPoolShares(0, 1, 0)
 	s.assertPoolLiquidity(0, 0, 0, 0)
 
 	// WHEN
@@ -149,7 +149,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedFirstSharesMintedTotal() {
 
 	// THEN
 	// 15 shares are minted and are the total
-	s.assertPoolShares(0, 0, 15)
+	s.assertPoolShares(0, 1, 15)
 }
 
 func (s *MsgServerTestSuite) TestDepositDoubleSidedFirstSharesMintedUser() {
@@ -157,9 +157,9 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedFirstSharesMintedUser() {
 
 	// GIVEN
 	// empty pool
-	s.assertAliceShares(0, 0, 0)
+	s.assertAliceShares(0, 1, 0)
 	s.assertPoolLiquidity(0, 0, 0, 0)
-	s.assertAliceShares(0, 0, 0)
+	s.assertAliceShares(0, 1, 0)
 
 	// WHEN
 	// depositing 10, 5 at tick 0 fee 1
@@ -167,7 +167,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedFirstSharesMintedUser() {
 
 	// THEN
 	// 15 shares are minted for alice
-	s.assertAliceShares(0, 0, 15)
+	s.assertAliceShares(0, 1, 15)
 }
 
 func (s *MsgServerTestSuite) TestDepositDoubleSidedExistingSharesMintedTotal() {
@@ -176,7 +176,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedExistingSharesMintedTotal() {
 	// GIVEN
 	// tick 0 fee 1 has existing liquidity of 10 tokenA and 5 tokenB, shares are 15
 	s.aliceDeposits(NewDeposit(10, 5, 0, 0))
-	s.assertPoolShares(0, 0, 15)
+	s.assertPoolShares(0, 1, 15)
 	s.assertPoolLiquidity(10, 5, 0, 0)
 
 	// WHEN
@@ -185,7 +185,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedExistingSharesMintedTotal() {
 
 	// THEN
 	// 15 more shares are minted and the total is 30
-	s.assertPoolShares(0, 0, 30)
+	s.assertPoolShares(0, 1, 30)
 }
 
 func (s *MsgServerTestSuite) TestDepositDoubleSidedExistingSharesMintedUser() {
@@ -194,8 +194,8 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedExistingSharesMintedUser() {
 	// GIVEN
 	// tick 0 fee 1 has existing liquidity of 10 tokenA and 5 tokenB, shares are 15
 	s.aliceDeposits(NewDeposit(10, 5, 0, 0))
-	s.assertAliceShares(0, 0, 15)
-	s.assertPoolShares(0, 0, 15)
+	s.assertAliceShares(0, 1, 15)
+	s.assertPoolShares(0, 1, 15)
 	s.assertPoolLiquidity(10, 5, 0, 0)
 
 	// WHEN
@@ -204,7 +204,7 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedExistingSharesMintedUser() {
 
 	// THEN
 	// 9 more shares are minted for alice for a total of 24
-	s.assertAliceShares(0, 0, 24)
+	s.assertAliceShares(0, 1, 24)
 }
 
 func (s *MsgServerTestSuite) TestDepositDoubleSidedZeroDeposit() {
@@ -229,7 +229,7 @@ func (s *MsgServerTestSuite) TestDepositValueAccural() {
 
 	//Alice deposits 100TokenA @ tick0 => 100 shares
 	s.aliceDeposits(NewDeposit(100, 0, 0, 3))
-	s.assertAliceShares(0, 3, 100)
+	s.assertAliceShares(0, 5, 100)
 	s.assertLiquidityAtTick(sdk.NewInt(100), sdk.ZeroInt(), 0, 3)
 
 	//Lots of trade activity => ~200 ExistingValueToken0

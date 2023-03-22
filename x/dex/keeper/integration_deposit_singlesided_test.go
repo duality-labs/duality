@@ -387,22 +387,6 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedUpperTickOutsideRange() {
 	s.assertAliceDepositFails(err, NewDeposit(0, 10, tickIndex, 0))
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedInvalidFeeIndex() {
-	s.fundAliceBalances(50, 50)
-
-	// GIVEN
-	// no existing liquidity
-
-	// WHEN
-	// depositing at an invalid fee tier
-	// THEN
-	// deposit should fail with ValidFeeIndexNotFound
-
-	feeIndex := len(s.feeTiers)
-	err := types.ErrValidFeeIndexNotFound
-	s.assertAliceDepositFails(err, NewDeposit(0, 10, 0, feeIndex))
-}
-
 func (s *MsgServerTestSuite) TestDepositSingleSidedZeroTrueAmountsFail() {
 	s.fundAliceBalances(50, 50)
 

@@ -227,26 +227,6 @@ func modifyConsumerGenesisCLITestSetup(val network.Validator) error {
 	var dexGenesisState dextypes.GenesisState
 	json.Unmarshal(dexData, &dexGenesisState)
 
-	dexGenesisState.FeeTierList = []dextypes.FeeTier{
-		dextypes.FeeTier{
-			Id:  0,
-			Fee: 1,
-		},
-		dextypes.FeeTier{
-			Id:  1,
-			Fee: 3,
-		},
-		dextypes.FeeTier{
-			Id:  2,
-			Fee: 5,
-		},
-		dextypes.FeeTier{
-			Id:  3,
-			Fee: 10,
-		},
-	}
-	dexGenesisState.FeeTierCount = 4
-
 	newRawJSON, _ := json.Marshal(dexGenesisState)
 	appState[dextypes.ModuleName] = newRawJSON
 

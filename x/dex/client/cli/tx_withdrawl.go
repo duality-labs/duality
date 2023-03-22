@@ -16,7 +16,7 @@ import (
 func CmdWithdrawl() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:     "withdrawl [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fee indexes] ",
+		Use:     "withdrawl [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fees] ",
 		Short:   "Broadcast message withdrawl",
 		Example: "withdrawl alice tokenA tokenB 100,50 [-10,5] 1,1 --from alice",
 		Args:    cobra.ExactArgs(6),
@@ -31,11 +31,11 @@ func CmdWithdrawl() *cobra.Command {
 				args[4] = strings.TrimSuffix(args[4], "]")
 			}
 			argTickIndexes := strings.Split(args[4], ",")
-			argFeeIndexes := strings.Split(args[5], ",")
+			argFees := strings.Split(args[5], ",")
 
 			var SharesToRemoveInt []sdk.Int
 			var TicksIndexesInt []int64
-			var FeeIndexesUint []uint64
+			var FeesUint []uint64
 			for _, s := range argSharesToRemove {
 				sharesToRemoveInt, ok := sdk.NewIntFromString(s)
 
@@ -56,13 +56,13 @@ func CmdWithdrawl() *cobra.Command {
 
 			}
 
-			for _, s := range argFeeIndexes {
-				FeeIndexInt, err := strconv.ParseUint(s, 10, 0)
+			for _, s := range argFees {
+				feeInt, err := strconv.ParseUint(s, 10, 0)
 				if err != nil {
 					return err
 				}
 
-				FeeIndexesUint = append(FeeIndexesUint, FeeIndexInt)
+				FeesUint = append(FeesUint, feeInt)
 			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -77,7 +77,7 @@ func CmdWithdrawl() *cobra.Command {
 				argTokenB,
 				SharesToRemoveInt,
 				TicksIndexesInt,
-				FeeIndexesUint,
+				FeesUint,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

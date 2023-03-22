@@ -16,5 +16,5 @@ message DepositRecord {
   int64 centerTickIndex = 3;
   int64 lowerTickIndex = 4;
   int64 upperTickIndex = 5;
-  uint64 feeIndex = 6;
+  uint64 fee = 6;
 }

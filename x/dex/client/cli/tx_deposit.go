@@ -17,7 +17,7 @@ import (
 func CmdDeposit() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:     "deposit [receiver] [token-a] [token-b] [list of amount-0] [list of amount-1] [list of tick-index] [list of fee] [deposit option parameters]",
+		Use:     "deposit [receiver] [token-a] [token-b] [list of amount-0] [list of amount-1] [list of tick-index] [list of fees] [deposit option parameters]",
 		Short:   "Broadcast message deposit",
 		Example: "deposit alice tokenA tokenB 100,50 [-10,5] 1,1 false,false --from alice",
 		Args:    cobra.ExactArgs(8),
@@ -38,13 +38,13 @@ func CmdDeposit() *cobra.Command {
 			}
 			argTicksIndexes := strings.Split(args[5], ",")
 
-			argFeesIndexes := strings.Split(args[6], ",")
+			argFees := strings.Split(args[6], ",")
 			argDepositOptions := strings.Split(args[7], ",")
 
 			var AmountsA []sdk.Int
 			var AmountsB []sdk.Int
 			var TicksIndexesInt []int64
-			var FeesIndexesUint []uint64
+			var FeesUint []uint64
 			var DepositOptions []*types.DepositOptions
 
 			for _, s := range argAmountsA {
@@ -75,13 +75,13 @@ func CmdDeposit() *cobra.Command {
 
 			}
 
-			for _, s := range argFeesIndexes {
-				FeeIndexInt, err := strconv.ParseUint(s, 10, 0)
+			for _, s := range argFees {
+				FeeInt, err := strconv.ParseUint(s, 10, 0)
 				if err != nil {
 					return err
 				}
 
-				FeesIndexesUint = append(FeesIndexesUint, FeeIndexInt)
+				FeesUint = append(FeesUint, FeeInt)
 			}
 
 			for _, s := range argDepositOptions {
@@ -105,7 +105,7 @@ func CmdDeposit() *cobra.Command {
 				AmountsA,
 				AmountsB,
 				TicksIndexesInt,
-				FeesIndexesUint,
+				FeesUint,
 				DepositOptions,
 			)
 			if err := msg.ValidateBasic(); err != nil {

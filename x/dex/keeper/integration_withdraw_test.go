@@ -257,22 +257,11 @@ func (s *MsgServerTestSuite) TestWithdrawalFailsWithNonExistentPair() {
 		TokenB:         "TokenZ",
 		SharesToRemove: []sdk.Int{sdk.NewInt(10)},
 		TickIndexes:    []int64{0},
-		FeeIndexes:     []uint64{0},
+		Fees:           []uint64{0},
 	})
 
 	// NOTE: As code is currently written we hit not enough shares check
 	// before validating pair existence. This is correct from a
 	// UX perspective --users should not care whether tick is initialized
 	s.Assert().ErrorIs(err, types.ErrInsufficientShares)
-}
-
-func (s *MsgServerTestSuite) TestWithdrawalFailsWithInvalidFee() {
-	s.fundAliceBalances(100, 0)
-
-	// IF Alice Deposists 100
-	s.aliceDeposits(NewDeposit(100, 0, 0, 0))
-
-	// WHEN Alice tries to withdraw from an invalid tick
-	err := types.ErrValidFeeIndexNotFound
-	s.aliceWithdrawFails(err, NewWithdrawl(100, 0, 99))
 }

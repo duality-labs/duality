@@ -26,7 +26,7 @@ func (k Keeper) DepositCore(
 	amounts0 []sdk.Int,
 	amounts1 []sdk.Int,
 	tickIndices []int64,
-	feeIndices []uint64,
+	fees []uint64,
 	options []*types.DepositOptions,
 ) (amounts0Deposit []sdk.Int, amounts1Deposit []sdk.Int, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -40,19 +40,12 @@ func (k Keeper) DepositCore(
 		amounts1Deposited[i] = sdk.ZeroInt()
 	}
 
-	feeTiers := k.GetAllFeeTier(ctx)
-
 	for i, amount0 := range amounts0 {
 		amount1 := amounts1[i]
 		tickIndex := tickIndices[i]
-		feeIndex := feeIndices[i]
+		fee := fees[i]
 		autoswap := options[i].Autoswap
 
-		// check that feeIndex is a valid index of the fee tier
-		if feeIndex >= uint64(len(feeTiers)) {
-			return nil, nil, sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "%d", feeIndex)
-		}
-		fee := feeTiers[feeIndex].Fee
 		feeUInt := utils.MustSafeUint64(fee)
 		lowerTickIndex := tickIndex - feeUInt
 		upperTickIndex := tickIndex + feeUInt
@@ -67,14 +60,14 @@ func (k Keeper) DepositCore(
 			return nil, nil, types.ErrDepositBehindPairLiquidity
 		}
 
-		sharesId := CreateSharesId(token0, token1, tickIndex, feeIndex)
+		sharesId := CreateSharesId(token0, token1, tickIndex, fee)
 		existingShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
 		pool, err := k.GetOrInitPool(
 			ctx,
 			pairId,
 			tickIndex,
-			feeTiers[feeIndex],
+			fee,
 		)
 
 		if err != nil {
@@ -108,7 +101,7 @@ func (k Keeper) DepositCore(
 			token0,
 			token1,
 			fmt.Sprint(tickIndices[i]),
-			fmt.Sprint(feeIndices[i]),
+			fmt.Sprint(fees[i]),
 			pool.GetLowerReserve0().Sub(inAmount0).String(),
 			pool.GetUpperReserve1().Sub(inAmount1).String(),
 			pool.GetLowerReserve0().String(),
@@ -144,32 +137,24 @@ func (k Keeper) WithdrawCore(
 	receiverAddr sdk.AccAddress,
 	sharesToRemoveList []sdk.Int,
 	tickIndices []int64,
-	feeIndices []uint64,
+	fees []uint64,
 ) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId := CreatePairId(token0, token1)
 	totalReserve0ToRemove := sdk.ZeroInt()
 	totalReserve1ToRemove := sdk.ZeroInt()
-	feeTiers := k.GetAllFeeTier(ctx)
 
-	for i, feeIndex := range feeIndices {
+	for i, fee := range fees {
 		sharesToRemove := sharesToRemoveList[i]
 		tickIndex := tickIndices[i]
 
-		// check that feeIndex is a valid index of the fee tier
-		if feeIndex >= uint64(len(feeTiers)) {
-			return sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "%d", feeIndex)
-		}
-
-		feeTier := feeTiers[feeIndex]
-
-		pool, err := k.GetOrInitPool(ctx, pairId, tickIndex, feeTier)
+		pool, err := k.GetOrInitPool(ctx, pairId, tickIndex, fee)
 		if err != nil {
 			return err
 		}
 
-		sharesId := CreateSharesId(token0, token1, tickIndex, feeIndex)
+		sharesId := CreateSharesId(token0, token1, tickIndex, fee)
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
 		if totalShares.LT(sharesToRemove) {
@@ -193,7 +178,7 @@ func (k Keeper) WithdrawCore(
 			token0,
 			token1,
 			fmt.Sprint(tickIndices[i]),
-			fmt.Sprint(feeIndices[i]),
+			fmt.Sprint(fees[i]),
 			pool.LowerTick0.Reserves.Add(outAmount0).String(),
 			pool.UpperTick1.Reserves.Add(outAmount1).String(),
 			pool.LowerTick0.Reserves.String(),

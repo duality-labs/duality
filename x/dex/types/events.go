@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func createDepositEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, otherAttrs ...sdk.Attribute) sdk.Event {
+func createDepositEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, fee string, otherAttrs ...sdk.Attribute) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, DepositEventKey),
@@ -15,20 +15,20 @@ func createDepositEvent(creator string, receiver string, token0 string, token1 s
 		sdk.NewAttribute(DepositEventToken0, token0),
 		sdk.NewAttribute(DepositEventToken1, token1),
 		sdk.NewAttribute(DepositEventPrice, tickIndex),
-		sdk.NewAttribute(DepositEventFeeIndex, feeIndex),
+		sdk.NewAttribute(DepositEventFee, fee),
 	}
 	attrs = append(attrs, otherAttrs...)
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateDepositEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, oldReserve0 string, oldReserve1 string, newReserve0 string, newReserve1 string, sharesMinted string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreateDepositEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, fee string, oldReserve0 string, oldReserve1 string, newReserve0 string, newReserve1 string, sharesMinted string, otherAttrs ...sdk.Attribute) sdk.Event {
 	return createDepositEvent(
 		creator,
 		receiver,
 		token0,
 		token1,
 		tickIndex,
-		feeIndex,
+		fee,
 
 		sdk.NewAttribute(DepositEventOldReserves0, oldReserve0),
 		sdk.NewAttribute(DepositEventNewReserves0, newReserve0),
@@ -38,7 +38,7 @@ func CreateDepositEvent(creator string, receiver string, token0 string, token1 s
 	)
 }
 
-func createDepositFailedEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, otherAttrs ...sdk.Attribute) sdk.Event {
+func createDepositFailedEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, fee string, otherAttrs ...sdk.Attribute) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, DepositFailEventKey),
@@ -47,20 +47,20 @@ func createDepositFailedEvent(creator string, receiver string, token0 string, to
 		sdk.NewAttribute(DepositFailEventToken0, token0),
 		sdk.NewAttribute(DepositFailEventToken1, token1),
 		sdk.NewAttribute(DepositFailEventPrice, tickIndex),
-		sdk.NewAttribute(DepositFailEventFeeIndex, feeIndex),
+		sdk.NewAttribute(DepositFailEventFee, fee),
 	}
 	attrs = append(attrs, otherAttrs...)
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateDepositFailedEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, oldReserve0 string, oldReserve1 string, amount0 string, amount1 string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreateDepositFailedEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, fee string, oldReserve0 string, oldReserve1 string, amount0 string, amount1 string, otherAttrs ...sdk.Attribute) sdk.Event {
 	return createDepositEvent(
 		creator,
 		receiver,
 		token0,
 		token1,
 		tickIndex,
-		feeIndex,
+		fee,
 
 		sdk.NewAttribute(DepositEventOldReserves0, oldReserve0),
 		sdk.NewAttribute(DepositEventOldReserves1, oldReserve1),
@@ -69,7 +69,7 @@ func CreateDepositFailedEvent(creator string, receiver string, token0 string, to
 	)
 }
 
-func createWithdrawEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, otherAttrs ...sdk.Attribute) sdk.Event {
+func createWithdrawEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, fee string, otherAttrs ...sdk.Attribute) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, WithdrawEventKey),
@@ -78,20 +78,20 @@ func createWithdrawEvent(creator string, receiver string, token0 string, token1 
 		sdk.NewAttribute(WithdrawEventToken0, token0),
 		sdk.NewAttribute(WithdrawEventToken1, token1),
 		sdk.NewAttribute(WithdrawEventPrice, tickIndex),
-		sdk.NewAttribute(WithdrawEventFee, feeIndex),
+		sdk.NewAttribute(WithdrawEventFee, fee),
 	}
 	attrs = append(attrs, otherAttrs...)
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateWithdrawEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, feeIndex string, oldReserve0 string, oldReserve1 string, newReserve0 string, newReserve1 string, sharesRemoved string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreateWithdrawEvent(creator string, receiver string, token0 string, token1 string, tickIndex string, fee string, oldReserve0 string, oldReserve1 string, newReserve0 string, newReserve1 string, sharesRemoved string, otherAttrs ...sdk.Attribute) sdk.Event {
 	return createWithdrawEvent(
 		creator,
 		receiver,
 		token0,
 		token1,
 		tickIndex,
-		feeIndex,
+		fee,
 		sdk.NewAttribute(WithdrawEventOldReserves0, oldReserve0),
 		sdk.NewAttribute(WithdrawEventOldReserves1, oldReserve1),
 		sdk.NewAttribute(WithdrawEventNewReserves0, newReserve0),

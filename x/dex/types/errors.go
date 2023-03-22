@@ -12,7 +12,6 @@ var (
 	ErrInsufficientShares                 = sdkerrors.Register(ModuleName, 1104, "Insufficient shares:")  // "%s does not have %s shares of type %s", address, shares, sharesId
 	ErrValidTickNotFound                  = sdkerrors.Register(ModuleName, 1106, "Valid tick not found:") // "%d", tickIndex
 	ErrValidPairNotFound                  = sdkerrors.Register(ModuleName, 1107, "Valid pair not found.")
-	ErrValidFeeIndexNotFound              = sdkerrors.Register(ModuleName, 1108, "Valid FeeIndex not found.") // "%d", feeIndex
 	ErrUnbalancedTxArray                  = sdkerrors.Register(ModuleName, 1110, "Transaction input arrays are not of the same length.")
 	ErrValidLimitOrderTrancheNotFound     = sdkerrors.Register(ModuleName, 1111, "Limit order trache not found:")                                // "%d", trancheKey
 	ErrCancelEmptyLimitOrder              = sdkerrors.Register(ModuleName, 1112, "Cannot cancel additional liquidity from limit order tranche:") // "%d", tranche.TrancheKey

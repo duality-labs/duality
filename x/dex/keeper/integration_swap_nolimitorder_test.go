@@ -62,11 +62,11 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReac
 	s.assertDexBalances(0, 11)
 }
 
-func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMinFeeTier() {
+func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMinFee() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
 	// GIVEN
-	// deposit 10 of token B at tick 0 fee 1
+	// deposit 10 of token B at tick 0 fee 0
 	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
@@ -81,12 +81,12 @@ func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMinFeeTier() {
 	s.assertDexBalances(5, 6)
 }
 
-func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMaxFeeTier() {
+func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionHighFee() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
 	// GIVEN
 	// deposit 10 of token B at tick 0 fee 10
-	s.aliceDeposits(NewDeposit(0, 10, 0, len(s.feeTiers)-1))
+	s.aliceDeposits(NewDeposit(0, 10, 0, 10))
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
 

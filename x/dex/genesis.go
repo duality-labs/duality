@@ -9,13 +9,6 @@ import (
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
-	// Set all the FeeTier
-	for _, elem := range genState.FeeTierList {
-		k.SetFeeTier(ctx, elem)
-	}
-
-	// Set FeeTier count
-	k.SetFeeTierCount(ctx, genState.FeeTierCount)
 
 	// Set all the tickLiquidity
 	for _, elem := range genState.TickLiquidityList {
@@ -43,8 +36,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
 	genesis.Params = k.GetParams(ctx)
-	genesis.FeeTierList = k.GetAllFeeTier(ctx)
-	genesis.FeeTierCount = k.GetFeeTierCount(ctx)
 	genesis.LimitOrderTrancheUserList = k.GetAllLimitOrderTrancheUser(ctx)
 	genesis.TickLiquidityList = k.GetAllTickLiquidity(ctx)
 	genesis.InactiveLimitOrderTrancheList = k.GetAllInactiveLimitOrderTranche(ctx)
