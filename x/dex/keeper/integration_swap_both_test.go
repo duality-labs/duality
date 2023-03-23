@@ -24,13 +24,13 @@ func (s *MsgServerTestSuite) TestSwapExhaustFeeTiersAndLimitOrder() {
 
 	s.aliceLimitSells("TokenB", 0, 10)
 
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(0, 10, 0, 1))
 
 	s.assertBobBalances(45, 5)
 
 	s.bobMarketSells("TokenA", 30)
 
-	s.assertPoolLiquidity(11, 0, 0, 0)
+	s.assertPoolLiquidity(11, 0, 0, 1)
 
 	s.assertLimitLiquidityAtTickInt("TokenB", 0, sdk.ZeroInt())
 }

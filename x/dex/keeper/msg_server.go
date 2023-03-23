@@ -20,12 +20,7 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 var _ types.MsgServer = msgServer{}
 
 func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.MsgDepositResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// validate msg
-	if err := msg.ValidateBasic(); err != nil {
-		return nil, err
-	}
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
@@ -46,15 +41,13 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 		amounts0,
 		amounts1,
 		msg.TickIndexes,
-		msg.FeeIndexes,
+		msg.Fees,
 		msg.Options,
 	)
 
 	if err != nil {
 		return nil, err
 	}
-
-	_ = ctx
 
 	return &types.MsgDepositResponse{Amounts0Deposit, Amounts1Deposit}, nil
 }
@@ -77,7 +70,7 @@ func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*t
 		receiverAddr,
 		msg.SharesToRemove,
 		msg.TickIndexes,
-		msg.FeeIndexes,
+		msg.Fees,
 	)
 	if err != nil {
 		return nil, err

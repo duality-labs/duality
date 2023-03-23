@@ -5,7 +5,6 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "duality/dex/params.proto";
-import "duality/dex/fee_tier.proto";
 import "duality/dex/limit_order_tranche_user.proto";
 import "duality/dex/limit_order_tranche.proto";
 import "duality/dex/user_positions.proto";
@@ -22,16 +21,6 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/dualitylabs/duality/dex/params";
   }
-
-// Queries a FeeTier by id.
-	rpc FeeTier(QueryGetFeeTierRequest) returns (QueryGetFeeTierResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/fee_tier/{id}";
-	}
-
-	// Queries a list of FeeTier items.
-	rpc FeeTierAll(QueryAllFeeTierRequest) returns (QueryAllFeeTierResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/fee_tier";
-	}
 
   // Queries a LimitOrderTrancheUser by index.
 	rpc LimitOrderTrancheUser(QueryGetLimitOrderTrancheUserRequest) returns (QueryGetLimitOrderTrancheUserResponse) {
@@ -103,23 +92,6 @@ message QueryParamsRequest {}
 message QueryParamsResponse {
   // params holds all the parameters of this module.
   Params params = 1 [(gogoproto.nullable) = false];
-}
-
-message QueryGetFeeTierRequest {
-	uint64 id = 1;
-}
-
-message QueryGetFeeTierResponse {
-	FeeTier FeeTier = 1 [(gogoproto.nullable) = false];
-}
-
-message QueryAllFeeTierRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
-}
-
-message QueryAllFeeTierResponse {
-	repeated FeeTier FeeTier = 1 [(gogoproto.nullable) = false];
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 message QueryGetLimitOrderTrancheUserRequest {

@@ -16,10 +16,6 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
-const (
-	feeCount = 4
-)
-
 // Test Suite ///////////////////////////////////////////////////////////////
 type CoreHelpersTestSuite struct {
 	suite.Suite
@@ -32,7 +28,6 @@ type CoreHelpersTestSuite struct {
 	carol       sdk.AccAddress
 	dan         sdk.AccAddress
 	goCtx       context.Context
-	feeTiers    []types.FeeTier
 }
 
 func TestCoreHelpersTestSuite(t *testing.T) {
@@ -59,20 +54,6 @@ func (s *CoreHelpersTestSuite) SetupTest() {
 	accDan := app.AccountKeeper.NewAccountWithAddress(ctx, s.dan)
 	app.AccountKeeper.SetAccount(ctx, accDan)
 
-	// add the fee tiers of 1, 3, 5, 10 ticks
-	feeTiers := []types.FeeTier{
-		{Id: 0, Fee: 1},
-		{Id: 1, Fee: 3},
-		{Id: 2, Fee: 5},
-		{Id: 3, Fee: 10},
-	}
-
-	// Set Fee List
-	app.DexKeeper.AppendFeeTier(ctx, feeTiers[0])
-	app.DexKeeper.AppendFeeTier(ctx, feeTiers[1])
-	app.DexKeeper.AppendFeeTier(ctx, feeTiers[2])
-	app.DexKeeper.AppendFeeTier(ctx, feeTiers[3])
-
 	s.app = app
 	s.msgServer = keeper.NewMsgServerImpl(app.DexKeeper)
 	s.ctx = ctx
@@ -82,13 +63,12 @@ func (s *CoreHelpersTestSuite) SetupTest() {
 	s.bob = sdk.AccAddress([]byte("bob"))
 	s.carol = sdk.AccAddress([]byte("carol"))
 	s.dan = sdk.AccAddress([]byte("dan"))
-	s.feeTiers = feeTiers
 }
 
-func (s *CoreHelpersTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amountB int) {
+func (s *CoreHelpersTestSuite) setLPAtFee1Pool(tickIndex int64, amountA int, amountB int) {
 	pairId := &types.PairId{"TokenA", "TokenB"}
-	sharesId := CreateSharesId("TokenA", "TokenB", tickIndex, 0)
-	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, pairId, tickIndex, s.feeTiers[0])
+	sharesId := CreateSharesId("TokenA", "TokenB", tickIndex, 1)
+	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, pairId, tickIndex, 1)
 
 	if err != nil {
 		panic(err)
@@ -117,7 +97,7 @@ func (s *CoreHelpersTestSuite) setLPAtFee0Pool(tickIndex int64, amountA int, amo
 func (s *CoreHelpersTestSuite) TestFindNextTick1To0NoLiq() {
 	// GIVEN there is no ticks with token0 in the pool
 
-	s.setLPAtFee0Pool(1, 0, 10)
+	s.setLPAtFee1Pool(1, 0, 10)
 
 	// THEN GetCurrTick1To0 doesn't find a tick
 
@@ -128,8 +108,8 @@ func (s *CoreHelpersTestSuite) TestFindNextTick1To0NoLiq() {
 
 func (s *CoreHelpersTestSuite) TestGetCurrTick1To0WithLiq() {
 	// Given multiple locations of token0
-	s.setLPAtFee0Pool(-1, 10, 0)
-	s.setLPAtFee0Pool(0, 10, 0)
+	s.setLPAtFee1Pool(-1, 10, 0)
+	s.setLPAtFee1Pool(0, 10, 0)
 
 	// THEN GetCurrTick1To0 finds the tick at -1
 
@@ -141,8 +121,8 @@ func (s *CoreHelpersTestSuite) TestGetCurrTick1To0WithLiq() {
 
 func (s *CoreHelpersTestSuite) TestGetCurrTick1To0WithMinLiq() {
 	// GIVEN tick with token0 @ index -1
-	s.setLPAtFee0Pool(-1, 10, 0)
-	s.setLPAtFee0Pool(1, 0, 0)
+	s.setLPAtFee1Pool(-1, 10, 0)
+	s.setLPAtFee1Pool(1, 0, 0)
 
 	// THEN GetCurrTick1To0 finds the tick at -2
 
@@ -157,7 +137,7 @@ func (s *CoreHelpersTestSuite) TestGetCurrTick1To0WithMinLiq() {
 func (s *CoreHelpersTestSuite) TestGetCurrTick0To1NoLiq() {
 	// GIVEN there are no tick with Token1 in the pool
 
-	s.setLPAtFee0Pool(0, 10, 0)
+	s.setLPAtFee1Pool(0, 10, 0)
 
 	// THEN GetCurrTick0To1 doesn't find a tick
 
@@ -169,9 +149,9 @@ func (s *CoreHelpersTestSuite) TestGetCurrTick0To1NoLiq() {
 func (s *CoreHelpersTestSuite) TestGetCurrTick0To1WithLiq() {
 	// GIVEN multiple locations of token1
 
-	s.setLPAtFee0Pool(-1, 10, 0)
-	s.setLPAtFee0Pool(0, 0, 10)
-	s.setLPAtFee0Pool(1, 0, 10)
+	s.setLPAtFee1Pool(-1, 10, 0)
+	s.setLPAtFee1Pool(0, 0, 10)
+	s.setLPAtFee1Pool(1, 0, 10)
 
 	// THEN GetCurrTick0To1 finds the tick at 1
 
@@ -182,8 +162,8 @@ func (s *CoreHelpersTestSuite) TestGetCurrTick0To1WithLiq() {
 
 func (s *CoreHelpersTestSuite) TestGetCurrTick0To1WithMinLiq() {
 	// WHEN tick with token1 @ index 1
-	s.setLPAtFee0Pool(-1, 0, 0)
-	s.setLPAtFee0Pool(1, 0, 10)
+	s.setLPAtFee1Pool(-1, 0, 0)
+	s.setLPAtFee1Pool(1, 0, 10)
 
 	// THEN GetCurrTick0To1 finds the tick at 2
 

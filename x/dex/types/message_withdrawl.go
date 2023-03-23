@@ -9,7 +9,7 @@ const TypeMsgWithdrawl = "withdrawl"
 
 var _ sdk.Msg = &MsgWithdrawl{}
 
-func NewMsgWithdrawl(creator string, receiver string, tokenA string, tokenB string, sharesToRemove []sdk.Int, tickIndexes []int64, feeIndexes []uint64) *MsgWithdrawl {
+func NewMsgWithdrawl(creator string, receiver string, tokenA string, tokenB string, sharesToRemove []sdk.Int, tickIndexes []int64, fees []uint64) *MsgWithdrawl {
 	return &MsgWithdrawl{
 		Creator:        creator,
 		Receiver:       receiver,
@@ -17,7 +17,7 @@ func NewMsgWithdrawl(creator string, receiver string, tokenA string, tokenB stri
 		TokenB:         tokenB,
 		SharesToRemove: sharesToRemove,
 		TickIndexes:    tickIndexes,
-		FeeIndexes:     feeIndexes,
+		Fees:           fees,
 	}
 }
 
@@ -53,17 +53,17 @@ func (msg *MsgWithdrawl) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
-	// Verify that the lengths of TickIndexes, FeeIndexes, SharesToRemove are all equal
-	if len(msg.FeeIndexes) != len(msg.TickIndexes) ||
+	// Verify that the lengths of TickIndexes, Fees, SharesToRemove are all equal
+	if len(msg.Fees) != len(msg.TickIndexes) ||
 		len(msg.SharesToRemove) != len(msg.TickIndexes) {
 		return ErrUnbalancedTxArray
 	}
 
-	if len(msg.FeeIndexes) == 0 {
+	if len(msg.Fees) == 0 {
 		return ErrZeroWithdraw
 	}
 
-	for i := 0; i < len(msg.FeeIndexes); i++ {
+	for i := 0; i < len(msg.Fees); i++ {
 		if msg.SharesToRemove[i].LTE(sdk.ZeroInt()) {
 			return ErrZeroWithdraw
 		}

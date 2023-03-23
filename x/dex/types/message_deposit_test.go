@@ -20,7 +20,7 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 			msg: MsgDeposit{
 				Creator:     "invalid_address",
 				Receiver:    sample.AccAddress(),
-				FeeIndexes:  []uint64{0},
+				Fees:        []uint64{0},
 				TickIndexes: []int64{0},
 				AmountsA:    []sdk.Int{sdk.OneInt()},
 				AmountsB:    []sdk.Int{sdk.OneInt()},
@@ -32,7 +32,7 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 			msg: MsgDeposit{
 				Creator:     sample.AccAddress(),
 				Receiver:    "invalid address",
-				FeeIndexes:  []uint64{0},
+				Fees:        []uint64{0},
 				TickIndexes: []int64{0},
 				AmountsA:    []sdk.Int{sdk.OneInt()},
 				AmountsB:    []sdk.Int{sdk.OneInt()},
@@ -44,7 +44,7 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 			msg: MsgDeposit{
 				Creator:     sample.AccAddress(),
 				Receiver:    sample.AccAddress(),
-				FeeIndexes:  []uint64{0},
+				Fees:        []uint64{0},
 				TickIndexes: []int64{},
 				AmountsA:    []sdk.Int{},
 				AmountsB:    []sdk.Int{},
@@ -56,7 +56,7 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 			msg: MsgDeposit{
 				Creator:     sample.AccAddress(),
 				Receiver:    sample.AccAddress(),
-				FeeIndexes:  []uint64{},
+				Fees:        []uint64{},
 				TickIndexes: []int64{0},
 				AmountsA:    []sdk.Int{},
 				AmountsB:    []sdk.Int{},
@@ -68,7 +68,7 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 			msg: MsgDeposit{
 				Creator:     sample.AccAddress(),
 				Receiver:    sample.AccAddress(),
-				FeeIndexes:  []uint64{},
+				Fees:        []uint64{},
 				TickIndexes: []int64{},
 				AmountsA:    []sdk.Int{sdk.OneInt()},
 				AmountsB:    []sdk.Int{},
@@ -80,7 +80,7 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 			msg: MsgDeposit{
 				Creator:     sample.AccAddress(),
 				Receiver:    sample.AccAddress(),
-				FeeIndexes:  []uint64{},
+				Fees:        []uint64{},
 				TickIndexes: []int64{},
 				AmountsA:    []sdk.Int{},
 				AmountsB:    []sdk.Int{sdk.OneInt()},
@@ -92,7 +92,7 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 			msg: MsgDeposit{
 				Creator:     sample.AccAddress(),
 				Receiver:    sample.AccAddress(),
-				FeeIndexes:  []uint64{},
+				Fees:        []uint64{},
 				TickIndexes: []int64{},
 				AmountsA:    []sdk.Int{},
 				AmountsB:    []sdk.Int{},
@@ -104,7 +104,7 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 			msg: MsgDeposit{
 				Creator:     sample.AccAddress(),
 				Receiver:    sample.AccAddress(),
-				FeeIndexes:  []uint64{0},
+				Fees:        []uint64{0},
 				TickIndexes: []int64{0},
 				AmountsA:    []sdk.Int{sdk.ZeroInt()},
 				AmountsB:    []sdk.Int{sdk.ZeroInt()},
@@ -116,7 +116,7 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 			msg: MsgDeposit{
 				Creator:     sample.AccAddress(),
 				Receiver:    sample.AccAddress(),
-				FeeIndexes:  []uint64{0},
+				Fees:        []uint64{0},
 				TickIndexes: []int64{0},
 				AmountsA:    []sdk.Int{sdk.OneInt()},
 				AmountsB:    []sdk.Int{sdk.OneInt()},

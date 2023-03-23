@@ -19,10 +19,9 @@ func (u UserProfile) GetAllLimitOrders(ctx sdk.Context, k Keeper) []types.LimitO
 
 func (u UserProfile) GetAllDeposits(ctx sdk.Context, k Keeper) []types.DepositRecord {
 	var depositArr []types.DepositRecord
-	feeTiers := k.GetAllFeeTier(ctx)
 	k.bankKeeper.IterateAccountBalances(ctx, u.Address,
 		func(sharesMaybe sdk.Coin) bool {
-			depositRecord, err := DepositSharesToData(sharesMaybe, feeTiers)
+			depositRecord, err := DepositSharesToData(sharesMaybe)
 			if err == nil {
 				depositArr = append(depositArr, depositRecord)
 			}

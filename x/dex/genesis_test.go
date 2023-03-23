@@ -16,15 +16,6 @@ var defaultPairId *types.PairId = &types.PairId{Token0: "TokenA", Token1: "Token
 func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
-		FeeTierList: []types.FeeTier{
-			{
-				Id: 0,
-			},
-			{
-				Id: 1,
-			},
-		},
-		FeeTierCount: 2,
 		LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
 			{
 				PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
@@ -98,8 +89,6 @@ func TestGenesis(t *testing.T) {
 	nullify.Fill(&genesisState)
 	nullify.Fill(got)
 
-	require.ElementsMatch(t, genesisState.FeeTierList, got.FeeTierList)
-	require.Equal(t, genesisState.FeeTierCount, got.FeeTierCount)
 	require.ElementsMatch(t, genesisState.LimitOrderTrancheUserList, got.LimitOrderTrancheUserList)
 	require.ElementsMatch(t, genesisState.TickLiquidityList, got.TickLiquidityList)
 	require.ElementsMatch(t, genesisState.InactiveLimitOrderTrancheList, got.InactiveLimitOrderTrancheList)

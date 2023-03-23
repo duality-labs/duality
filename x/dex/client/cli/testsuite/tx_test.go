@@ -133,13 +133,13 @@ func (s *TxTestSuite) TestTxCmdDeposit() {
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "[0]", "0", "false", s.addr1.String()},
+			args:      []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "[0]", "1", "false", s.addr1.String()},
 			expErr:    true,
 			expErrMsg: "Error: accepts 8 arg(s), received 9",
 		},
 		{
 			name:     "valid",
-			args:     []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "[0]", "0", "false"},
+			args:     []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "[0]", "1", "false"},
 			errInRes: false,
 		},
 		{

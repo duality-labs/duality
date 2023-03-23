@@ -28,13 +28,6 @@ func TestQueryTestSuite(t *testing.T) {
 
 var testAddress = sdk.AccAddress([]byte("testAddr"))
 
-var feeTierList = []types.FeeTier{
-	{Id: 0, Fee: 1},
-	{Id: 1, Fee: 3},
-	{Id: 2, Fee: 5},
-	{Id: 3, Fee: 10},
-}
-
 var limitOrderTrancheList = []types.TickLiquidity{
 	{Liquidity: &types.TickLiquidity_LimitOrderTranche{
 		LimitOrderTranche: &types.LimitOrderTranche{
@@ -151,7 +144,6 @@ var genesisState types.GenesisState = types.GenesisState{
 	TickLiquidityList:             append(poolReservesList, limitOrderTrancheList...),
 	LimitOrderTrancheUserList:     limitOrderTrancheUserList,
 	InactiveLimitOrderTrancheList: inactiveLimitOrderTrancheList,
-	FeeTierList:                   feeTierList,
 }
 
 func (s *QueryTestSuite) SetupSuite() {
@@ -168,96 +160,6 @@ func (s *QueryTestSuite) SetupSuite() {
 
 	_, err = s.network.WaitForHeight(1)
 	s.Require().NoError(err)
-}
-
-func (s *QueryTestSuite) TestQueryCmdShowFeeTier() {
-	val := s.network.Validators[0]
-	clientCtx := val.ClientCtx
-	testCases := []struct {
-		name      string
-		args      []string
-		expErr    bool
-		expErrMsg string
-		expOutput types.FeeTier
-	}{
-		{
-			name:      "missing args",
-			args:      []string{},
-			expErr:    true,
-			expErrMsg: "Error: accepts 1 arg(s), received 0",
-		},
-		{
-			name:      "too many args",
-			args:      []string{"foo", "bar"},
-			expErr:    true,
-			expErrMsg: "Error: accepts 1 arg(s), received 2",
-		},
-		{
-			name:      "valid",
-			args:      []string{"0"},
-			expOutput: feeTierList[0],
-		},
-		{
-			name:      "valid 2",
-			args:      []string{"1"},
-			expOutput: feeTierList[1],
-		},
-	}
-
-	for _, tc := range testCases {
-		s.Run(tc.name, func() {
-			cmd := dexClient.CmdShowFeeTier()
-			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
-			if tc.expErr {
-				require.Error(s.T(), err)
-				require.Contains(s.T(), out.String(), tc.expErrMsg)
-			} else {
-				require.NoError(s.T(), err)
-
-				var res types.QueryGetFeeTierResponse
-				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
-				require.NotEmpty(s.T(), res.FeeTier)
-				require.Equal(s.T(), tc.expOutput, res.FeeTier)
-			}
-		})
-	}
-}
-
-func (s *QueryTestSuite) TestQueryCmdListFeeTier() {
-	val := s.network.Validators[0]
-	clientCtx := val.ClientCtx
-	testCases := []struct {
-		name      string
-		args      []string
-		expErr    bool
-		expErrMsg string
-		expOutput []types.FeeTier
-	}{
-		{
-			name:      "valid",
-			args:      []string{},
-			expOutput: feeTierList,
-		},
-	}
-
-	for _, tc := range testCases {
-		s.Run(tc.name, func() {
-			cmd := dexClient.CmdListFeeTier()
-			out, err := cli.ExecTestCLICmd(clientCtx, cmd, tc.args)
-			if tc.expErr {
-				require.Error(s.T(), err)
-				require.Contains(s.T(), out.String(), tc.expErrMsg)
-			} else {
-				require.NoError(s.T(), err)
-
-				var res types.QueryAllFeeTierResponse
-				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
-				require.NotEmpty(s.T(), res)
-				require.Equal(s.T(), tc.expOutput, res.FeeTier)
-
-			}
-		})
-	}
 }
 
 func (s *QueryTestSuite) TestQueryCmdListTickLiquidity() {

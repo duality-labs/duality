@@ -9,7 +9,7 @@ import (
 
 type Pool struct {
 	CenterTickIndex int64
-	FeeIndex        uint64
+	Fee             uint64
 	LowerTick0      *types.PoolReserves
 	UpperTick1      *types.PoolReserves
 	Price1To0Lower  *types.Price
@@ -33,8 +33,7 @@ func NewPool(
 	}
 }
 
-func (k Keeper) GetOrInitPool(ctx sdk.Context, pairId *types.PairId, centerTickIndex int64, feeTier types.FeeTier) (Pool, error) {
-	fee := feeTier.Fee
+func (k Keeper) GetOrInitPool(ctx sdk.Context, pairId *types.PairId, centerTickIndex int64, fee uint64) (Pool, error) {
 	feeUint := utils.MustSafeUint64(fee)
 	lowertick, err := k.GetOrInitPoolReserves(ctx, pairId, pairId.Token0, centerTickIndex-feeUint, fee)
 	if err != nil {

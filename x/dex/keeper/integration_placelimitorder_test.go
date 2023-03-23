@@ -16,7 +16,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderInSpread1To0() {
 
 	// GIVEN
 	// create spread around -5, 5
-	s.aliceDeposits(NewDeposit(10, 10, 0, 2))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 5))
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
 	s.assertCurr1To0(-5)
@@ -37,7 +37,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderInSpread0To1() {
 
 	// GIVEN
 	// create spread around -5, 5
-	s.aliceDeposits(NewDeposit(10, 10, 0, 2))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 5))
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
 	s.assertCurr1To0(-5)
@@ -59,7 +59,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderInSpreadMinMaxNotAdjusted() {
 
 	// GIVEN
 	// create spread around -5, 5
-	s.aliceDeposits(NewDeposit(10, 10, 0, 2))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 5))
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
 
@@ -78,7 +78,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpread0To1NotAdjusted() {
 
 	// GIVEN
 	// create spread around -1, 1
-	s.aliceDeposits(NewDeposit(10, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 1))
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
 	s.assertCurr1To0(-1)
@@ -100,7 +100,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpread1To0NotAdjusted() {
 
 	// GIVEN
 	// create spread around -1, 1
-	s.aliceDeposits(NewDeposit(10, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 1))
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
 	s.assertCurr1To0(-1)
@@ -122,7 +122,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMinAdjusted() {
 
 	// GIVEN
 	// create spread around -1, 1
-	s.aliceDeposits(NewDeposit(10, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 1))
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
 	s.assertCurr1To0(-1)
@@ -143,7 +143,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMaxAdjusted() {
 
 	// GIVEN
 	// create spread around -1, 1
-	s.aliceDeposits(NewDeposit(10, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 1))
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
 	s.assertCurr1To0(-1)
@@ -164,13 +164,13 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMinNotAdjusted() {
 
 	// GIVEN
 	// create spread around -1, 1
-	s.aliceDeposits(NewDeposit(10, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 1))
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(1)
 	// deposit new min at -5
-	s.aliceDeposits(NewDeposit(10, 0, 0, 2))
+	s.aliceDeposits(NewDeposit(10, 0, 0, 5))
 	s.assertAliceBalances(30, 40)
 	s.assertDexBalances(20, 10)
 
@@ -189,13 +189,13 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMaxNotAdjusted() {
 
 	// GIVEN
 	// create spread around -1, 1
-	s.aliceDeposits(NewDeposit(10, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 1))
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(1)
 	// deposit new max at 5
-	s.aliceDeposits(NewDeposit(0, 10, 0, 2))
+	s.aliceDeposits(NewDeposit(0, 10, 0, 5))
 	s.assertAliceBalances(40, 30)
 	s.assertDexBalances(10, 20)
 
@@ -268,8 +268,8 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderNoLOPlaceLODoesntIncrementPlaceT
 
 	// GIVEN
 	// no previous LO on existing tick
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
-	s.assertPoolLiquidity(10, 0, 0, 0)
+	s.aliceDeposits(NewDeposit(10, 0, 0, 1))
+	s.assertPoolLiquidity(10, 0, 0, 1)
 	s.assertFillAndPlaceTrancheKeys("TokenA", -1, "", "")
 
 	// WHEN
@@ -416,7 +416,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFoKWithLPFills() {
 	s.fundAliceBalances(10, 0)
 	s.fundBobBalances(0, 20)
 	// GIVEN LP liq at tick -1
-	s.bobDeposits(NewDeposit(0, 20, -1, 0))
+	s.bobDeposits(NewDeposit(0, 20, -1, 1))
 	//WHEN alice submits FoK limitOrder
 	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_FILL_OR_KILL)
 	s.assertAliceBalances(0, 0)
@@ -437,7 +437,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFoKFailsWithInsufficientLiq() {
 	s.fundAliceBalances(10, 0)
 	s.fundBobBalances(0, 20)
 	// GIVEN LP liq at tick -1 of 9 tokenB
-	s.bobDeposits(NewDeposit(0, 9, -1, 0))
+	s.bobDeposits(NewDeposit(0, 9, -1, 1))
 	//WHEN alice submits FoK limitOrder for 10 at tick 0 it fails
 	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenA", 0, 10, types.LimitOrderType_FILL_OR_KILL)
 
@@ -447,7 +447,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrder0FoKFailsWithLowLimit() {
 	s.fundAliceBalances(10, 0)
 	s.fundBobBalances(0, 20)
 	// GIVEN LP liq at tick -1 of 20 tokenB
-	s.bobDeposits(NewDeposit(0, 20, -1, 0))
+	s.bobDeposits(NewDeposit(0, 20, -1, 1))
 	//WHEN alice submits FoK limitOrder for 10 at tick -1 it fails
 	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenA", -1, 10, types.LimitOrderType_FILL_OR_KILL)
 
@@ -457,7 +457,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrder1FoKFailsWithHighLimit() {
 	s.fundAliceBalances(0, 10)
 	s.fundBobBalances(20, 0)
 	// GIVEN LP liq at tick 20 of 20 tokenA
-	s.bobDeposits(NewDeposit(20, 0, 20, 0))
+	s.bobDeposits(NewDeposit(20, 0, 20, 1))
 	//WHEN alice submits FoK limitOrder for 10 at tick -1 it fails
 	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenB", 21, 10, types.LimitOrderType_FILL_OR_KILL)
 }
@@ -467,7 +467,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPFills() {
 	s.fundAliceBalances(10, 0)
 	s.fundBobBalances(0, 20)
 	// GIVEN LP liq at tick -1
-	s.bobDeposits(NewDeposit(0, 20, -1, 0))
+	s.bobDeposits(NewDeposit(0, 20, -1, 1))
 	//WHEN alice submits IoC limitOrder
 	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
 	s.assertAliceBalances(0, 0)
@@ -486,7 +486,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPPartialFill() {
 	s.fundAliceBalances(10, 0)
 	s.fundBobBalances(0, 20)
 	// GIVEN LP of 5 tokenB at tick -1
-	s.bobDeposits(NewDeposit(0, 5, -1, 0))
+	s.bobDeposits(NewDeposit(0, 5, -1, 1))
 	//WHEN alice submits IoC limitOrder for 10 tokenA
 	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
 	s.assertAliceBalances(5, 0)
@@ -508,7 +508,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPNoFill() {
 	s.fundAliceBalances(10, 0)
 	s.fundBobBalances(0, 20)
 	// GIVEN LP of 5 tokenB at tick -1
-	s.bobDeposits(NewDeposit(0, 5, -1, 0))
+	s.bobDeposits(NewDeposit(0, 5, -1, 1))
 	//WHEN alice submits IoC limitOrder for 10 tokenA below current 0To1 price
 	s.aliceLimitSells("TokenA", -1, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
 
@@ -548,7 +548,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderJITBehindEnemyLines() {
 	s.fundBobBalances(0, 20)
 
 	//GIVEN 10 LP liquidity for token exists at tick 0
-	s.bobDeposits(NewDeposit(0, 10, 0, 0))
+	s.bobDeposits(NewDeposit(0, 10, 0, 1))
 
 	// WHEN alice places a JIT limit order for TokenA at tick 1 (above enemy lines)
 	trancheKey := s.aliceLimitSells("TokenA", 1, 10, types.LimitOrderType_JUST_IN_TIME)

@@ -292,7 +292,7 @@ const (
 	DepositEventToken0       = "Token0"
 	DepositEventToken1       = "Token1"
 	DepositEventPrice        = "TickIndex"
-	DepositEventFeeIndex     = "FeeIndex"
+	DepositEventFee          = "Fee"
 	DepositEventReceiver     = "Receiver"
 	DepositEventOldReserves0 = "OldReserves0"
 	DepositEventOldReserves1 = "OldReserves1"
@@ -308,7 +308,7 @@ const (
 	DepositFailEventToken0       = "Token0"
 	DepositFailEventToken1       = "Token1"
 	DepositFailEventPrice        = "TickIndex"
-	DepositFailEventFeeIndex     = "FeeIndex"
+	DepositFailEventFee          = "Fee"
 	DepositFailEventReceiver     = "Receiver"
 	DepositFailEventOldReserves0 = "OldReserves0"
 	DepositFailEventOldReserves1 = "OldReserves1"
@@ -323,7 +323,7 @@ const (
 	WithdrawEventToken0        = "Token0"
 	WithdrawEventToken1        = "Token1"
 	WithdrawEventPrice         = "TickIndex"
-	WithdrawEventFee           = "FeeIndex"
+	WithdrawEventFee           = "Fee"
 	WithdrawEventReceiver      = "Receiver"
 	WithdrawEventOldReserves0  = "OldReserves0"
 	WithdrawEventOldReserves1  = "OldReserves1"
@@ -376,11 +376,6 @@ const (
 	CancelLimitOrderEventTokenKey      = "TokenKey"
 	CancelLimitOrderEventLimitOrderKey = "LimitOrderKey"
 	CancelLimitOrderEventAmountOut     = "AmountOut"
-)
-
-const (
-	FeeTierKey      = "FeeTier-value-"
-	FeeTierCountKey = "FeeTier-count-"
 )
 
 const (
