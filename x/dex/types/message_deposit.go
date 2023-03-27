@@ -11,15 +11,15 @@ var _ sdk.Msg = &MsgDeposit{}
 
 func NewMsgDeposit(creator string, receiver string, tokenA string, tokenB string, amountsA []sdk.Int, amountsB []sdk.Int, tickIndexes []int64, fees []uint64, depositOptions []*DepositOptions) *MsgDeposit {
 	return &MsgDeposit{
-		Creator:     creator,
-		Receiver:    receiver,
-		TokenA:      tokenA,
-		TokenB:      tokenB,
-		AmountsA:    amountsA,
-		AmountsB:    amountsB,
-		TickIndexes: tickIndexes,
-		Fees:        fees,
-		Options:     depositOptions,
+		Creator:         creator,
+		Receiver:        receiver,
+		TokenA:          tokenA,
+		TokenB:          tokenB,
+		AmountsA:        amountsA,
+		AmountsB:        amountsB,
+		TickIndexesAToB: tickIndexes,
+		Fees:            fees,
+		Options:         depositOptions,
 	}
 }
 
@@ -56,9 +56,9 @@ func (msg *MsgDeposit) ValidateBasic() error {
 	}
 
 	// Verify that the lengths of TickIndexes, Fees, AmountsA, AmountsB are all equal
-	if len(msg.Fees) != len(msg.TickIndexes) ||
+	if len(msg.Fees) != len(msg.TickIndexesAToB) ||
 		len(msg.AmountsA) != len(msg.AmountsB) ||
-		len(msg.AmountsA) != len(msg.TickIndexes) {
+		len(msg.AmountsA) != len(msg.TickIndexesAToB) {
 		return ErrUnbalancedTxArray
 	}
 

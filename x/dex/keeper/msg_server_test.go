@@ -354,15 +354,15 @@ func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits ...*Depos
 	}
 
 	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
-		Creator:     account.String(),
-		Receiver:    account.String(),
-		TokenA:      "TokenA",
-		TokenB:      "TokenB",
-		AmountsA:    amountsA,
-		AmountsB:    amountsB,
-		TickIndexes: tickIndexes,
-		Fees:        fees,
-		Options:     options,
+		Creator:         account.String(),
+		Receiver:        account.String(),
+		TokenA:          "TokenA",
+		TokenB:          "TokenB",
+		AmountsA:        amountsA,
+		AmountsB:        amountsB,
+		TickIndexesAToB: tickIndexes,
+		Fees:            fees,
+		Options:         options,
 	})
 	s.Assert().Nil(err)
 }
@@ -384,15 +384,15 @@ func (s *MsgServerTestSuite) depositsWithOptions(account sdk.AccAddress, deposit
 	}
 
 	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
-		Creator:     account.String(),
-		Receiver:    account.String(),
-		TokenA:      "TokenA",
-		TokenB:      "TokenB",
-		AmountsA:    amountsA,
-		AmountsB:    amountsB,
-		TickIndexes: tickIndexes,
-		Fees:        fees,
-		Options:     options,
+		Creator:         account.String(),
+		Receiver:        account.String(),
+		TokenA:          "TokenA",
+		TokenB:          "TokenB",
+		AmountsA:        amountsA,
+		AmountsB:        amountsB,
+		TickIndexesAToB: tickIndexes,
+		Fees:            fees,
+		Options:         options,
 	})
 	s.Assert().Nil(err)
 }
@@ -446,15 +446,15 @@ func (s *MsgServerTestSuite) assertDepositFails(account sdk.AccAddress, expected
 	}
 
 	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
-		Creator:     account.String(),
-		Receiver:    account.String(),
-		TokenA:      "TokenA",
-		TokenB:      "TokenB",
-		AmountsA:    amountsA,
-		AmountsB:    amountsB,
-		TickIndexes: tickIndexes,
-		Fees:        fees,
-		Options:     options,
+		Creator:         account.String(),
+		Receiver:        account.String(),
+		TokenA:          "TokenA",
+		TokenB:          "TokenB",
+		AmountsA:        amountsA,
+		AmountsB:        amountsB,
+		TickIndexesAToB: tickIndexes,
+		Fees:            fees,
+		Options:         options,
 	})
 	s.Assert().NotNil(err)
 	s.Assert().ErrorIs(err, expectedErr)
@@ -527,13 +527,13 @@ func (s *MsgServerTestSuite) withdraws(account sdk.AccAddress, withdrawls ...*Wi
 	}
 
 	_, err := s.msgServer.Withdrawl(s.goCtx, &types.MsgWithdrawl{
-		Creator:        account.String(),
-		Receiver:       account.String(),
-		TokenA:         "TokenA",
-		TokenB:         "TokenB",
-		SharesToRemove: sharesToRemove,
-		TickIndexes:    tickIndexes,
-		Fees:           fee,
+		Creator:         account.String(),
+		Receiver:        account.String(),
+		TokenA:          "TokenA",
+		TokenB:          "TokenB",
+		SharesToRemove:  sharesToRemove,
+		TickIndexesAToB: tickIndexes,
+		Fees:            fee,
 	})
 	s.Assert().Nil(err)
 }
@@ -565,13 +565,13 @@ func (s *MsgServerTestSuite) withdrawFails(account sdk.AccAddress, expectedErr e
 	}
 
 	_, err := s.msgServer.Withdrawl(s.goCtx, &types.MsgWithdrawl{
-		Creator:        account.String(),
-		Receiver:       account.String(),
-		TokenA:         "TokenA",
-		TokenB:         "TokenB",
-		SharesToRemove: sharesToRemove,
-		TickIndexes:    tickIndexes,
-		Fees:           fee,
+		Creator:         account.String(),
+		Receiver:        account.String(),
+		TokenA:          "TokenA",
+		TokenB:          "TokenB",
+		SharesToRemove:  sharesToRemove,
+		TickIndexesAToB: tickIndexes,
+		Fees:            fee,
 	})
 	s.Assert().NotNil(err)
 	s.Assert().ErrorIs(err, expectedErr)

@@ -100,7 +100,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderATwoExistDiffTicksDi
 	// Alice adds one limit orders from A to B and one from B to A and removes the one from A to B
 
 	trancheKey := s.aliceLimitSells("TokenA", 0, 10)
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
@@ -121,7 +121,7 @@ func (s *MsgServerTestSuite) TestCancelHigherEntireLimitOrderBTwoExistDiffTicksS
 	// Alice adds two limit orders from B to A and removes the one at tick 0
 
 	trancheKey := s.aliceLimitSells("TokenB", 0, 10)
-	s.aliceLimitSells("TokenB", -1, 10)
+	s.aliceLimitSells("TokenB", 1, 10)
 
 	s.assertAliceBalances(50, 30)
 	s.assertDexBalances(0, 20)
@@ -142,14 +142,14 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderBTwoExistDiffTicksSa
 	// Alice adds two limit orders from B to A and removes the one at tick 0
 
 	s.aliceLimitSells("TokenB", 0, 10)
-	trancheKey := s.aliceLimitSells("TokenB", -1, 10)
+	trancheKey := s.aliceLimitSells("TokenB", 1, 10)
 
 	s.assertAliceBalances(50, 30)
 	s.assertDexBalances(0, 20)
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(-1)
 
-	s.aliceCancelsLimitSell("TokenB", -1, trancheKey)
+	s.aliceCancelsLimitSell("TokenB", 1, trancheKey)
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)

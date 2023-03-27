@@ -45,7 +45,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderInSpread0To1() {
 
 	// WHEN
 	// place limit order for A at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 	s.assertAliceBalances(40, 30)
 	s.assertDexBalances(10, 20)
 
@@ -86,7 +86,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpread0To1NotAdjusted() {
 
 	// WHEN
 	// place limit order out of spread (for A at tick 3)
-	s.aliceLimitSells("TokenB", 3, 10)
+	s.aliceLimitSells("TokenB", -3, 10)
 	s.assertAliceBalances(40, 30)
 	s.assertDexBalances(10, 20)
 
@@ -151,7 +151,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMaxAdjusted() {
 
 	// WHEN
 	// place limit order out of spread (for A at tick 3)
-	s.aliceLimitSells("TokenB", 3, 10)
+	s.aliceLimitSells("TokenB", -3, 10)
 	s.assertAliceBalances(40, 30)
 	s.assertDexBalances(10, 20)
 
@@ -201,7 +201,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderOutOfSpreadMaxNotAdjusted() {
 
 	// WHEN
 	// place limit order in spread (for A at tick 3)
-	s.aliceLimitSells("TokenB", 3, 10)
+	s.aliceLimitSells("TokenB", -3, 10)
 	s.assertAliceBalances(40, 20)
 	s.assertDexBalances(10, 30)
 
@@ -241,7 +241,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityB() {
 
 	// GIVEN
 	// deposit 10 of token B at tick 1 fee 0
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
 	s.assertLimitLiquidityAtTick("TokenB", 1, 10)
@@ -251,7 +251,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderExistingLiquidityB() {
 
 	// WHEN
 	// place limit order on same tick (for A at tick 1)
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 
 	// THEN
 	// assert 20 of token B deposited at tick 0 fee 0 and ticks unchanged
@@ -459,7 +459,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrder1FoKFailsWithHighLimit() {
 	// GIVEN LP liq at tick 20 of 20 tokenA
 	s.bobDeposits(NewDeposit(20, 0, 20, 1))
 	//WHEN alice submits FoK limitOrder for 10 at tick -1 it fails
-	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenB", 21, 10, types.LimitOrderType_FILL_OR_KILL)
+	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenB", -21, 10, types.LimitOrderType_FILL_OR_KILL)
 }
 
 // Immediate Or Cancel LimitOrders ////////////////////////////////////////////////////////////////////
