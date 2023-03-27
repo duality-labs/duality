@@ -20,10 +20,9 @@ func TestMsgSwap_ValidateBasic(t *testing.T) {
 			msg: MsgSwap{
 				Creator:  "invalid_address",
 				Receiver: sample.AccAddress(),
-				TokenA:   "TokenA",
-				TokenB:   "TokenB",
-				AmountIn: sdk.OneInt(),
 				TokenIn:  "TokenA",
+				TokenOut: "TokenB",
+				AmountIn: sdk.OneInt(),
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
@@ -31,10 +30,9 @@ func TestMsgSwap_ValidateBasic(t *testing.T) {
 			msg: MsgSwap{
 				Creator:  sample.AccAddress(),
 				Receiver: "invalid address",
-				TokenA:   "TokenA",
-				TokenB:   "TokenB",
-				AmountIn: sdk.OneInt(),
 				TokenIn:  "TokenA",
+				TokenOut: "TokenB",
+				AmountIn: sdk.OneInt(),
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		},
@@ -43,10 +41,9 @@ func TestMsgSwap_ValidateBasic(t *testing.T) {
 			msg: MsgSwap{
 				Creator:  sample.AccAddress(),
 				Receiver: sample.AccAddress(),
-				TokenA:   "TokenA",
-				TokenB:   "TokenB",
-				AmountIn: sdk.ZeroInt(),
 				TokenIn:  "TokenA",
+				TokenOut: "TokenB",
+				AmountIn: sdk.ZeroInt(),
 			},
 			err: ErrZeroSwap,
 		},
@@ -55,10 +52,9 @@ func TestMsgSwap_ValidateBasic(t *testing.T) {
 			msg: MsgSwap{
 				Creator:  sample.AccAddress(),
 				Receiver: sample.AccAddress(),
-				TokenA:   "TokenA",
-				TokenB:   "TokenB",
-				AmountIn: sdk.OneInt(),
 				TokenIn:  "TokenA",
+				TokenOut: "TokenB",
+				AmountIn: sdk.OneInt(),
 			},
 		},
 	}

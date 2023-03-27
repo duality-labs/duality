@@ -673,10 +673,9 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilAlreadyExpiredFails() {
 	_, err := s.msgServer.PlaceLimitOrder(s.goCtx, &types.MsgPlaceLimitOrder{
 		Creator:        s.alice.String(),
 		Receiver:       s.alice.String(),
-		TokenA:         "TokenA",
-		TokenB:         "TokenB",
-		TickIndex:      0,
 		TokenIn:        "TokenA",
+		TokenOut:       "TokenB",
+		TickIndex:      0,
 		AmountIn:       sdk.NewInt(50),
 		OrderType:      types.LimitOrderType_GOOD_TIL_TIME,
 		ExpirationTime: &yesterday,

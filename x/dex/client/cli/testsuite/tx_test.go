@@ -73,7 +73,7 @@ func (s *TxTestSuite) SetupSuite() {
 	_, err = cli.ExecTestCLICmd(clientCtx, cmd, args)
 	require.NoError(s.T(), err)
 
-	args = append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "[20]", "TokenB", "10"}, commonFlags...)
+	args = append([]string{s.network.Validators[0].Address.String(), "TokenB", "TokenA", "[20]", "10"}, commonFlags...)
 	cmd = dexClient.CmdPlaceLimitOrder()
 	txBuff, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
 
@@ -263,21 +263,21 @@ func (s *TxTestSuite) TestTx3CmdSwap() {
 		errInRes  bool
 	}{
 		{
-			// "swap [receiver] [amount-in] [tokenA] [tokenB] [token-in]",
+			// "swap [receiver] [amount-in] [token-in] [token-out]",
 			name:      "missing arguments",
-			args:      []string{s.addr1.String(), "5", "TokenA", "TokenB"},
+			args:      []string{s.addr1.String(), "5", "TokenA"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 5 arg(s), received 4",
+			expErrMsg: "Error: accepts 4 arg(s), received 3",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{s.addr1.String(), "5", "TokenA", "TokenB", "TokenA", "BADARG"},
+			args:      []string{s.addr1.String(), "5", "TokenA", "TokenB", "BADARG"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 5 arg(s), received 6",
+			expErrMsg: "Error: accepts 4 arg(s), received 5",
 		},
 		{
 			name:     "valid",
-			args:     []string{s.addr1.String(), "2", "TokenA", "TokenB", "TokenA"},
+			args:     []string{s.addr1.String(), "2", "TokenA", "TokenB"},
 			errInRes: false,
 		},
 	}
@@ -305,7 +305,7 @@ func (s *TxTestSuite) TestTx3CmdSwap() {
 	}
 }
 
-func (s *TxTestSuite) TestTx4Cmd4laceLimitOrder() {
+func (s *TxTestSuite) TestTx4Cmd4PlaceLimitOrder() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
 	var commonFlags = []string{
@@ -324,38 +324,38 @@ func (s *TxTestSuite) TestTx4Cmd4laceLimitOrder() {
 		errInRes  bool
 	}{
 		{
-			// "place-limit-order [receiver] [token-a] [token-b] [tick-index] [token-in] [amount-in] ?[expirationTime]"
+			// "place-limit-order [receiver] [token-in] [token-out] [tick-index] [amount-in] ?[order-type] ?[expirationTime]"
 			name:      "missing arguments",
-			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB"},
+			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]"},
 			expErr:    true,
-			expErrMsg: "Error: accepts between 6 and 8 arg(s), received 5",
+			expErrMsg: "Error: accepts between 5 and 7 arg(s), received 4",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10", "1", "1", "BAD"},
+			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "10", "1", "1", "BAD"},
 			expErr:    true,
-			expErrMsg: "Error: accepts between 6 and 8 arg(s), received 9",
+			expErrMsg: "Error: accepts between 5 and 7 arg(s), received 8",
 		},
 		{
 			name:      "invalid orderType",
-			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10", "JUST_SEND_IT"},
+			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "10", "JUST_SEND_IT"},
 			expErr:    true,
 			expErrMsg: types.ErrInvalidOrderType.Error(),
 		},
 		{
 			name:      "invalid goodTil",
-			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10", "GOOD_TIL_TIME", "january"},
+			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "10", "GOOD_TIL_TIME", "january"},
 			expErr:    true,
 			expErrMsg: types.ErrInvalidTimeString.Error(),
 		},
 		{
 			name:     "valid",
-			args:     []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10"},
+			args:     []string{s.addr1.String(), "TokenB", "TokenA", "[0]", "10"},
 			errInRes: false,
 		},
 		{
 			name:     "valid goodTil",
-			args:     []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10", "GOOD_TIL_TIME", "06/15/2025 02:00:00"},
+			args:     []string{s.addr1.String(), "TokenB", "TokenA", "[0]", "10", "GOOD_TIL_TIME", "06/15/2025 02:00:00"},
 			errInRes: false,
 		},
 	}
@@ -394,11 +394,6 @@ func (s *TxTestSuite) TestTx5CmdCancelLimitOrder() {
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, s.network.Validators[0].Address.String()),
 	}
 
-	args := append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "[0]", "TokenB", "10"}, commonFlags...)
-	cmd := dexClient.CmdPlaceLimitOrder()
-	_, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
-	require.NoError(s.T(), err)
-
 	testCases := []struct {
 		name      string
 		args      []string
@@ -407,21 +402,21 @@ func (s *TxTestSuite) TestTx5CmdCancelLimitOrder() {
 		errInRes  bool
 	}{
 		{
-			//  "cancel-limit-order [token-a] [token-b] [tick-index] [key-token] [tranche-key]"
+			//  "cancel-limit-order [token-in] [token-out] [tick-index [tranche-key]"
 			name:      "missing arguments",
-			args:      []string{"TokenA", "TokenB", "[0]", "TokenB"},
+			args:      []string{"TokenA", "TokenB", "[0]"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 5 arg(s), received 4",
+			expErrMsg: "Error: accepts 4 arg(s), received 3",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{"TokenA", "TokenB", "[0]", "TokenB", "0", "1"},
+			args:      []string{"TokenA", "TokenB", "[0]", "0", "1"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 5 arg(s), received 6",
+			expErrMsg: "Error: accepts 4 arg(s), received 5",
 		},
 		{
 			name:     "valid",
-			args:     []string{"TokenA", "TokenB", "20", "TokenB", s.trancheKey},
+			args:     []string{"TokenB", "TokenA", "20", s.trancheKey},
 			errInRes: false,
 		},
 	}
@@ -462,13 +457,13 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 	}
 
 	// Place Limit Order
-	args := append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "[0]", "TokenB", "10"}, commonFlags...)
+	args := append([]string{s.network.Validators[0].Address.String(), "TokenB", "TokenA", "[0]", "10"}, commonFlags...)
 	cmd := dexClient.CmdPlaceLimitOrder()
 	txBuff, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
 	require.NoError(s.T(), err)
 	trancheKey := findTrancheKeyInTx(txBuff.String())
 
-	argsSwap := append([]string{s.network.Validators[0].Address.String(), "30", "TokenA", "TokenB", "TokenA"}, commonFlags...)
+	argsSwap := append([]string{s.network.Validators[0].Address.String(), "30", "TokenA", "TokenB"}, commonFlags...)
 	cmd = dexClient.CmdSwap()
 	_, err = cli.ExecTestCLICmd(clientCtx, cmd, argsSwap)
 	require.NoError(s.T(), err)
@@ -481,21 +476,21 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 		errInRes  bool
 	}{
 		{
-			//  "withdraw-filled-limit-order [token-a] [token-b] [tick-index] [key-token] [tranche-key]"
+			//  "withdraw-filled-limit-order [token-in] [token-out] [tick-index] [tranche-key]"
 			name:      "missing arguments",
-			args:      []string{"TokenA", "TokenB", "[0]", "TokenB"},
+			args:      []string{"TokenA", "TokenB", "[0]"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 5 arg(s), received 4",
+			expErrMsg: "Error: accepts 4 arg(s), received 3",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{"TokenA", "TokenB", "[0]", "TokenB", "0", "1"},
+			args:      []string{"TokenA", "TokenB", "[0]", "0", "1"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 5 arg(s), received 6",
+			expErrMsg: "Error: accepts 4 arg(s), received 5",
 		},
 		{
 			name:     "valid",
-			args:     []string{"TokenA", "TokenB", "0", "TokenB", trancheKey},
+			args:     []string{"TokenB", "TokenA", "0", trancheKey},
 			errInRes: false,
 		},
 	}

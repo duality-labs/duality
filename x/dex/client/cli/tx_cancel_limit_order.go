@@ -21,7 +21,7 @@ func CmdCancelLimitOrder() *cobra.Command {
 			argTokenIn := args[0]
 			argTokenOut := args[1]
 
-			if strings.HasPrefix(args[2], "[") && strings.HasSuffix(args[3], "]") {
+			if strings.HasPrefix(args[2], "[") && strings.HasSuffix(args[2], "]") {
 				args[2] = strings.TrimPrefix(args[2], "[")
 				args[2] = strings.TrimSuffix(args[2], "]")
 			}

@@ -247,14 +247,14 @@ func (s *MsgServerTestSuite) limitSells(account sdk.AccAddress, tokenIn string, 
 	} else {
 		orderType = orderTypeOpt[0]
 	}
+	tokenIn, tokenOut := GetInOutTokens(tokenIn, "TokenA", "TokenB")
 
 	msg, err := s.msgServer.PlaceLimitOrder(s.goCtx, &types.MsgPlaceLimitOrder{
 		Creator:   account.String(),
 		Receiver:  account.String(),
-		TokenA:    "TokenA",
-		TokenB:    "TokenB",
-		TickIndex: int64(tick),
 		TokenIn:   tokenIn,
+		TokenOut:  tokenOut,
+		TickIndex: int64(tick),
 		AmountIn:  sdk.NewInt(int64(amountIn)),
 		OrderType: orderType,
 	})
@@ -263,14 +263,14 @@ func (s *MsgServerTestSuite) limitSells(account sdk.AccAddress, tokenIn string, 
 }
 
 func (s *MsgServerTestSuite) limitSellsGoodTil(account sdk.AccAddress, tokenIn string, tick int, amountIn int, goodTil time.Time) string {
+	tokenIn, tokenOut := GetInOutTokens(tokenIn, "TokenA", "TokenB")
 
 	msg, err := s.msgServer.PlaceLimitOrder(s.goCtx, &types.MsgPlaceLimitOrder{
 		Creator:        account.String(),
 		Receiver:       account.String(),
-		TokenA:         "TokenA",
-		TokenB:         "TokenB",
-		TickIndex:      int64(tick),
 		TokenIn:        tokenIn,
+		TokenOut:       tokenOut,
+		TickIndex:      int64(tick),
 		AmountIn:       sdk.NewInt(int64(amountIn)),
 		OrderType:      types.LimitOrderType_GOOD_TIL_TIME,
 		ExpirationTime: &goodTil,
@@ -596,12 +596,12 @@ func (s *MsgServerTestSuite) danCancelsLimitSell(tokenIn string, tick int, tranc
 }
 
 func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling string, tick int, trancheKey string) {
+	tokenIn, tokenOut := GetInOutTokens(selling, "TokenA", "TokenB")
 	_, err := s.msgServer.CancelLimitOrder(s.goCtx, &types.MsgCancelLimitOrder{
 		Creator:    account.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
+		TokenIn:    tokenIn,
+		TokenOut:   tokenOut,
 		TickIndex:  int64(tick),
-		TokenIn:    selling,
 		TrancheKey: trancheKey,
 	})
 	s.Assert().Nil(err)
@@ -624,12 +624,12 @@ func (s *MsgServerTestSuite) danCancelsLimitSellFails(tokenIn string, tick int, 
 }
 
 func (s *MsgServerTestSuite) cancelsLimitSellFails(account sdk.AccAddress, selling string, tick int, trancheKey string, expectedErr error) {
+	tokenIn, tokenOut := GetInOutTokens(selling, "TokenA", "TokenB")
 	_, err := s.msgServer.CancelLimitOrder(s.goCtx, &types.MsgCancelLimitOrder{
 		Creator:    account.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
+		TokenIn:    tokenIn,
+		TokenOut:   tokenOut,
 		TickIndex:  int64(tick),
-		TokenIn:    selling,
 		TrancheKey: trancheKey,
 	})
 	s.Assert().ErrorIs(err, expectedErr)
@@ -654,12 +654,12 @@ func (s *MsgServerTestSuite) danMarketSells(selling string, amountIn int) {
 }
 
 func (s *MsgServerTestSuite) marketSells(account sdk.AccAddress, selling string, amountIn int) {
+	tokenIn, tokenOut := GetInOutTokens(selling, "TokenA", "TokenB")
 	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
 		Creator:  account.String(),
 		Receiver: account.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
-		TokenIn:  selling,
+		TokenIn:  tokenIn,
+		TokenOut: tokenOut,
 		AmountIn: sdk.NewInt(int64(amountIn)),
 	})
 	s.Assert().Nil(err)
@@ -681,12 +681,12 @@ func (s *MsgServerTestSuite) danMarketSellFails(err error, selling string, amoun
 	s.marketSellFails(s.bob, err, selling, amountIn)
 }
 func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr error, selling string, amountIn int) {
+	tokenIn, tokenOut := GetInOutTokens(selling, "TokenA", "TokenB")
 	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
 		Creator:  account.String(),
 		Receiver: account.String(),
-		TokenA:   "TokenA",
-		TokenB:   "TokenB",
-		TokenIn:  selling,
+		TokenIn:  tokenIn,
+		TokenOut: tokenOut,
 		AmountIn: sdk.NewInt(int64(amountIn)),
 	})
 	s.Assert().ErrorIs(err, expectedErr)
@@ -711,12 +711,12 @@ func (s *MsgServerTestSuite) danWithdrawsLimitSell(selling string, tick int, tra
 }
 
 func (s *MsgServerTestSuite) withdrawsLimitSell(account sdk.AccAddress, selling string, tick int, trancheKey string) {
+	tokenIn, tokenOut := GetInOutTokens(selling, "TokenA", "TokenB")
 	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
 		Creator:    account.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
+		TokenIn:    tokenIn,
+		TokenOut:   tokenOut,
 		TickIndex:  int64(tick),
-		TokenIn:    selling,
 		TrancheKey: trancheKey,
 	})
 	s.Assert().Nil(err)
@@ -739,12 +739,12 @@ func (s *MsgServerTestSuite) danWithdrawLimitSellFails(expectedErr error, sellin
 }
 
 func (s *MsgServerTestSuite) withdrawLimitSellFails(account sdk.AccAddress, expectedErr error, selling string, tick int, trancheKey string) {
+	tokenIn, tokenOut := GetInOutTokens(selling, "TokenA", "TokenB")
 	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
 		Creator:    account.String(),
-		TokenA:     "TokenA",
-		TokenB:     "TokenB",
+		TokenIn:    tokenIn,
+		TokenOut:   tokenOut,
 		TickIndex:  int64(tick),
-		TokenIn:    selling,
 		TrancheKey: trancheKey,
 	})
 	s.Assert().ErrorIs(err, expectedErr)

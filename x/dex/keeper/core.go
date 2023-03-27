@@ -221,9 +221,9 @@ func (k Keeper) WithdrawCore(
 func (k Keeper) SwapCore(goCtx context.Context,
 	tokenIn string,
 	tokenOut string,
+	amountIn sdk.Int,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
-	amountIn sdk.Int,
 ) (coinOut sdk.Coin, error error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId, err := CreatePairIdFromUnsorted(tokenIn, tokenOut)
@@ -262,12 +262,12 @@ func (k Keeper) PlaceLimitOrderCore(
 	goCtx context.Context,
 	tokenIn string,
 	tokenOut string,
-	callerAddr sdk.AccAddress,
-	receiverAddr sdk.AccAddress,
 	amountIn sdk.Int,
 	tickIndex int64,
 	orderType types.LimitOrderType,
 	goodTil *time.Time,
+	callerAddr sdk.AccAddress,
+	receiverAddr sdk.AccAddress,
 ) (trancheKeyP *string, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -348,9 +348,9 @@ func (k Keeper) CancelLimitOrderCore(
 	goCtx context.Context,
 	tokenIn string,
 	tokenOut string,
-	callerAddr sdk.AccAddress,
 	tickIndex int64,
 	trancheKey string,
+	callerAddr sdk.AccAddress,
 ) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -402,9 +402,9 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	goCtx context.Context,
 	tokenIn string,
 	tokenOut string,
-	callerAddr sdk.AccAddress,
 	tickIndex int64,
 	trancheKey string,
+	callerAddr sdk.AccAddress,
 ) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId, err := CreatePairIdFromUnsorted(tokenIn, tokenOut)
