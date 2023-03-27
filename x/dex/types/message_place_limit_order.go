@@ -11,14 +11,13 @@ const TypeMsgPlaceLimitOrder = "place_limit_order"
 
 var _ sdk.Msg = &MsgPlaceLimitOrder{}
 
-func NewMsgPlaceLimitOrder(creator string, receiver string, tokenA string, tokenB string, tickIndex int64, tokenIn string, amountIn sdk.Int, orderType LimitOrderType, goodTil *time.Time) *MsgPlaceLimitOrder {
+func NewMsgPlaceLimitOrder(creator string, receiver string, tokenIn string, tokenOut string, tickIndex int64, amountIn sdk.Int, orderType LimitOrderType, goodTil *time.Time) *MsgPlaceLimitOrder {
 	return &MsgPlaceLimitOrder{
 		Creator:        creator,
 		Receiver:       receiver,
-		TokenA:         tokenA,
-		TokenB:         tokenB,
-		TickIndex:      tickIndex,
 		TokenIn:        tokenIn,
+		TokenOut:       tokenOut,
+		TickIndex:      tickIndex,
 		AmountIn:       amountIn,
 		OrderType:      orderType,
 		ExpirationTime: goodTil,
@@ -55,10 +54,6 @@ func (msg *MsgPlaceLimitOrder) ValidateBasic() error {
 	_, err = sdk.AccAddressFromBech32(msg.Receiver)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
-	}
-
-	if msg.TokenIn != msg.TokenA && msg.TokenIn != msg.TokenB {
-		return ErrInvalidTokenIn
 	}
 
 	if msg.AmountIn.LTE(sdk.ZeroInt()) {

@@ -579,20 +579,20 @@ func (s *MsgServerTestSuite) withdrawFails(account sdk.AccAddress, expectedErr e
 
 /// Cancel limit order
 
-func (s *MsgServerTestSuite) aliceCancelsLimitSell(keyToken string, tick int, trancheKey string) {
-	s.cancelsLimitSell(s.alice, keyToken, tick, trancheKey)
+func (s *MsgServerTestSuite) aliceCancelsLimitSell(tokenIn string, tick int, trancheKey string) {
+	s.cancelsLimitSell(s.alice, tokenIn, tick, trancheKey)
 }
 
-func (s *MsgServerTestSuite) bobCancelsLimitSell(keyToken string, tick int, trancheKey string) {
-	s.cancelsLimitSell(s.bob, keyToken, tick, trancheKey)
+func (s *MsgServerTestSuite) bobCancelsLimitSell(tokenIn string, tick int, trancheKey string) {
+	s.cancelsLimitSell(s.bob, tokenIn, tick, trancheKey)
 }
 
-func (s *MsgServerTestSuite) carolCancelsLimitSell(keyToken string, tick int, trancheKey string) {
-	s.cancelsLimitSell(s.carol, keyToken, tick, trancheKey)
+func (s *MsgServerTestSuite) carolCancelsLimitSell(tokenIn string, tick int, trancheKey string) {
+	s.cancelsLimitSell(s.carol, tokenIn, tick, trancheKey)
 }
 
-func (s *MsgServerTestSuite) danCancelsLimitSell(keyToken string, tick int, trancheKey string) {
-	s.cancelsLimitSell(s.dan, keyToken, tick, trancheKey)
+func (s *MsgServerTestSuite) danCancelsLimitSell(tokenIn string, tick int, trancheKey string) {
+	s.cancelsLimitSell(s.dan, tokenIn, tick, trancheKey)
 }
 
 func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling string, tick int, trancheKey string) {
@@ -601,26 +601,26 @@ func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling st
 		TokenA:     "TokenA",
 		TokenB:     "TokenB",
 		TickIndex:  int64(tick),
-		KeyToken:   selling,
+		TokenIn:    selling,
 		TrancheKey: trancheKey,
 	})
 	s.Assert().Nil(err)
 }
 
-func (s *MsgServerTestSuite) aliceCancelsLimitSellFails(keyToken string, tick int, trancheKey string, expectedErr error) {
-	s.cancelsLimitSellFails(s.alice, keyToken, tick, trancheKey, expectedErr)
+func (s *MsgServerTestSuite) aliceCancelsLimitSellFails(tokenIn string, tick int, trancheKey string, expectedErr error) {
+	s.cancelsLimitSellFails(s.alice, tokenIn, tick, trancheKey, expectedErr)
 }
 
-func (s *MsgServerTestSuite) bobCancelsLimitSellFails(keyToken string, tick int, trancheKey string, expectedErr error) {
-	s.cancelsLimitSellFails(s.bob, keyToken, tick, trancheKey, expectedErr)
+func (s *MsgServerTestSuite) bobCancelsLimitSellFails(tokenIn string, tick int, trancheKey string, expectedErr error) {
+	s.cancelsLimitSellFails(s.bob, tokenIn, tick, trancheKey, expectedErr)
 }
 
-func (s *MsgServerTestSuite) carolCancelsLimitSellFails(keyToken string, tick int, trancheKey string, expectedErr error) {
-	s.cancelsLimitSellFails(s.carol, keyToken, tick, trancheKey, expectedErr)
+func (s *MsgServerTestSuite) carolCancelsLimitSellFails(tokenIn string, tick int, trancheKey string, expectedErr error) {
+	s.cancelsLimitSellFails(s.carol, tokenIn, tick, trancheKey, expectedErr)
 }
 
-func (s *MsgServerTestSuite) danCancelsLimitSellFails(keyToken string, tick int, trancheKey string, expectedErr error) {
-	s.cancelsLimitSellFails(s.dan, keyToken, tick, trancheKey, expectedErr)
+func (s *MsgServerTestSuite) danCancelsLimitSellFails(tokenIn string, tick int, trancheKey string, expectedErr error) {
+	s.cancelsLimitSellFails(s.dan, tokenIn, tick, trancheKey, expectedErr)
 }
 
 func (s *MsgServerTestSuite) cancelsLimitSellFails(account sdk.AccAddress, selling string, tick int, trancheKey string, expectedErr error) {
@@ -629,7 +629,7 @@ func (s *MsgServerTestSuite) cancelsLimitSellFails(account sdk.AccAddress, selli
 		TokenA:     "TokenA",
 		TokenB:     "TokenB",
 		TickIndex:  int64(tick),
-		KeyToken:   selling,
+		TokenIn:    selling,
 		TrancheKey: trancheKey,
 	})
 	s.Assert().ErrorIs(err, expectedErr)
@@ -716,7 +716,7 @@ func (s *MsgServerTestSuite) withdrawsLimitSell(account sdk.AccAddress, selling 
 		TokenA:     "TokenA",
 		TokenB:     "TokenB",
 		TickIndex:  int64(tick),
-		KeyToken:   selling,
+		TokenIn:    selling,
 		TrancheKey: trancheKey,
 	})
 	s.Assert().Nil(err)
@@ -744,7 +744,7 @@ func (s *MsgServerTestSuite) withdrawLimitSellFails(account sdk.AccAddress, expe
 		TokenA:     "TokenA",
 		TokenB:     "TokenB",
 		TickIndex:  int64(tick),
-		KeyToken:   selling,
+		TokenIn:    selling,
 		TrancheKey: trancheKey,
 	})
 	s.Assert().ErrorIs(err, expectedErr)

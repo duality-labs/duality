@@ -25,7 +25,6 @@ var (
 	ErrZeroTrueDeposit                    = sdkerrors.Register(ModuleName, 1121, "Cannot deposit double-sided liquidity in tick with prexisting single-sided liquidity.")
 	ErrWithdrawEmptyLimitOrder            = sdkerrors.Register(ModuleName, 1124, "Cannot withdraw additional liqudity from this limit order at this time.")
 	ErrZeroSwap                           = sdkerrors.Register(ModuleName, 1125, "Amount in must be > 0 for swap.")
-	ErrInvalidKeyToken                    = sdkerrors.Register(ModuleName, 1126, "KeyToken not in specified pair.")
 	ErrInvalidTokenIn                     = sdkerrors.Register(ModuleName, 1127, "TokenIn not in specified pair.")
 	ErrActiveLimitOrderNotFound           = sdkerrors.Register(ModuleName, 1128, "No active limit found. It does not exist or has already been filled")
 	ErrZeroWithdraw                       = sdkerrors.Register(ModuleName, 1129, "Withdraw amount must be > 0.")

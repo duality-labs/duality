@@ -21,21 +21,10 @@ func TestMsgCancelLimitOrder_ValidateBasic(t *testing.T) {
 				TokenA:     "TokenA",
 				TokenB:     "TokenB",
 				TickIndex:  0,
-				KeyToken:   "TokenA",
+				TokenIn:    "TokenA",
 				TrancheKey: "0",
 			},
 			err: sdkerrors.ErrInvalidAddress,
-		}, {
-			name: "invalid key token",
-			msg: MsgCancelLimitOrder{
-				Creator:    sample.AccAddress(),
-				TokenA:     "TokenA",
-				TokenB:     "TokenB",
-				TickIndex:  0,
-				KeyToken:   "TokenC",
-				TrancheKey: "0",
-			},
-			err: ErrInvalidKeyToken,
 		}, {
 			name: "valid msg",
 			msg: MsgCancelLimitOrder{
@@ -43,7 +32,7 @@ func TestMsgCancelLimitOrder_ValidateBasic(t *testing.T) {
 				TokenA:     "TokenA",
 				TokenB:     "TokenB",
 				TickIndex:  0,
-				KeyToken:   "TokenA",
+				TokenIn:    "TokenA",
 				TrancheKey: "0",
 			},
 		},

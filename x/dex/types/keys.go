@@ -356,9 +356,8 @@ const (
 const (
 	WithdrawFilledLimitOrderEventKey           = "NewWithdraw"
 	WithdrawFilledLimitOrderEventCreator       = "Creator"
-	WithdrawFilledLimitOrderEventToken0        = "Token0"
-	WithdrawFilledLimitOrderEventToken1        = "Token1"
-	WithdrawFilledLimitOrderEventTokenKey      = "TokenKey"
+	WithdrawFilledLimitOrderEventTokenIn       = "TokenIn"
+	WithdrawFilledLimitOrderEventTokenOut      = "TokenOut"
 	WithdrawFilledLimitOrderEventLimitOrderKey = "LimitOrderKey"
 	WithdrawFilledLimitOrderEventAmountOut     = "AmountOut"
 )
@@ -371,9 +370,8 @@ const (
 const (
 	CancelLimitOrderEventKey           = "NewWithdraw"
 	CancelLimitOrderEventCreator       = "Creator"
-	CancelLimitOrderEventToken0        = "Token0"
-	CancelLimitOrderEventToken1        = "Token1"
-	CancelLimitOrderEventTokenKey      = "TokenKey"
+	CancelLimitOrderEventTokenIn       = "TokenIn"
+	CancelLimitOrderEventTokenOut      = "TokenOut"
 	CancelLimitOrderEventLimitOrderKey = "LimitOrderKey"
 	CancelLimitOrderEventAmountOut     = "AmountOut"
 )
