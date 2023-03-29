@@ -23,7 +23,7 @@ const LPsharesRegexpStr = "^" + types.DepositSharesPrefix + "-" +
 
 var LPSharesRegexp = regexp.MustCompile(LPsharesRegexpStr)
 
-func CreateSharesId(token0 string, token1 string, tickIndex int64, fee uint64) (denom string) {
+func CreateSharesId(token0, token1 string, tickIndex int64, fee uint64) (denom string) {
 	t0 := strings.ReplaceAll(token0, "-", "")
 	t1 := strings.ReplaceAll(token1, "-", "")
 	return fmt.Sprintf("%s-%s-%s-t%d-f%d", types.DepositSharesPrefix, t0, t1, tickIndex, fee)

@@ -8,7 +8,7 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
-func SortTokens(tokenA string, tokenB string) (string, string, error) {
+func SortTokens(tokenA, tokenB string) (string, string, error) {
 	relativeOrder := tokenA < tokenB
 
 	equalCheck := tokenA == tokenB
@@ -21,7 +21,7 @@ func SortTokens(tokenA string, tokenB string) (string, string, error) {
 	}
 }
 
-func SortAmounts(tokenA string, token0 string, amountsA []sdk.Int, amountsB []sdk.Int) ([]sdk.Int, []sdk.Int) {
+func SortAmounts(tokenA, token0 string, amountsA, amountsB []sdk.Int) ([]sdk.Int, []sdk.Int) {
 	if tokenA == token0 {
 		return amountsA, amountsB
 	} else {
@@ -29,7 +29,7 @@ func SortAmounts(tokenA string, token0 string, amountsA []sdk.Int, amountsB []sd
 	}
 }
 
-func CreatePairId(token0 string, token1 string) (pairId *types.PairId) {
+func CreatePairId(token0, token1 string) (pairId *types.PairId) {
 	return &types.PairId{
 		Token0: token0,
 		Token1: token1,
@@ -44,7 +44,7 @@ func CreatePairIdFromUnsorted(tokenA, tokenB string) (*types.PairId, error) {
 	return CreatePairId(token0, token1), nil
 }
 
-func GetInOutTokens(tokenIn_ string, tokenA string, tokenB string) (tokenIn string, tokenOut string) {
+func GetInOutTokens(tokenIn_, tokenA, tokenB string) (tokenIn, tokenOut string) {
 	if tokenIn_ == tokenA {
 		return tokenA, tokenB
 	} else {

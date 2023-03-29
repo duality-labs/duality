@@ -52,7 +52,7 @@ func DexKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 	return k, ctx
 }
 
-func AssertEventEmitted(t *testing.T, ctx sdk.Context, eventValue string, message string) {
+func AssertEventEmitted(t *testing.T, ctx sdk.Context, eventValue, message string) {
 	allEvents := ctx.EventManager().Events()
 	for _, attr := range allEvents[len(allEvents)-1].Attributes {
 		if string(attr.Value) == eventValue {
@@ -62,7 +62,7 @@ func AssertEventEmitted(t *testing.T, ctx sdk.Context, eventValue string, messag
 	require.Fail(t, message)
 }
 
-func AssertEventNotEmitted(t *testing.T, ctx sdk.Context, eventValue string, message string) {
+func AssertEventNotEmitted(t *testing.T, ctx sdk.Context, eventValue, message string) {
 	allEvents := ctx.EventManager().Events()
 	if len(allEvents) != 0 {
 		for _, attr := range allEvents[len(allEvents)-1].Attributes {

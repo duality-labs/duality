@@ -65,7 +65,7 @@ func (s *CoreHelpersTestSuite) SetupTest() {
 	s.dan = sdk.AccAddress([]byte("dan"))
 }
 
-func (s *CoreHelpersTestSuite) setLPAtFee1Pool(tickIndex int64, amountA int, amountB int) {
+func (s *CoreHelpersTestSuite) setLPAtFee1Pool(tickIndex int64, amountA, amountB int) {
 	pairId := &types.PairId{"TokenA", "TokenB"}
 	sharesId := CreateSharesId("TokenA", "TokenB", tickIndex, 1)
 	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, pairId, tickIndex, 1)

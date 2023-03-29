@@ -16,7 +16,7 @@ func (k Keeper) FindLimitOrderTranche(
 	tickIndex int64,
 	token string,
 	trancheKey string,
-) (val types.LimitOrderTranche, fromFilled bool, found bool) {
+) (val types.LimitOrderTranche, fromFilled, found bool) {
 	// Try to find the tranche in the active liq index
 	tick, found := k.GetLimitOrderTranche(ctx, pairId, token, tickIndex, trancheKey)
 	if found {

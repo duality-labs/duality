@@ -6,7 +6,7 @@ type DirectionalTradingPair struct {
 	TokenOut string
 }
 
-func NewDirectionalTradingPair(pairId *PairId, tokenIn string, tokenOut string) DirectionalTradingPair {
+func NewDirectionalTradingPair(pairId *PairId, tokenIn, tokenOut string) DirectionalTradingPair {
 	return DirectionalTradingPair{
 		PairId:   pairId,
 		TokenIn:  tokenIn,

@@ -140,7 +140,7 @@ func (k Keeper) IsBehindEnemyLines(ctx sdk.Context, pairId *types.PairId, tokenI
 	return false
 }
 
-func CalcAmountAsToken0(amount0 sdk.Int, amount1 sdk.Int, price1To0 types.Price) sdk.Dec {
+func CalcAmountAsToken0(amount0, amount1 sdk.Int, price1To0 types.Price) sdk.Dec {
 	amount0Dec := amount0.ToDec()
 	return amount0Dec.Add(price1To0.MulInt(amount1))
 }

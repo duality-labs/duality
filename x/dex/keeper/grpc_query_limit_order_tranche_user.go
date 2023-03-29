@@ -22,7 +22,7 @@ func (k Keeper) LimitOrderTrancheUserAll(c context.Context, req *types.QueryAllL
 	store := ctx.KVStore(k.storeKey)
 	LimitOrderTrancheUserStore := prefix.NewStore(store, types.KeyPrefix(types.LimitOrderTrancheUserKeyPrefix))
 
-	pageRes, err := query.Paginate(LimitOrderTrancheUserStore, req.Pagination, func(key []byte, value []byte) error {
+	pageRes, err := query.Paginate(LimitOrderTrancheUserStore, req.Pagination, func(key, value []byte) error {
 		var LimitOrderTrancheUser types.LimitOrderTrancheUser
 		if err := k.cdc.Unmarshal(value, &LimitOrderTrancheUser); err != nil {
 			return err

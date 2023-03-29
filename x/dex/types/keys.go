@@ -100,7 +100,7 @@ const (
 )
 
 // LimitOrderTrancheUserKey returns the store key to retrieve a LimitOrderTrancheUser from the index fields
-func LimitOrderTrancheUserKey(address string, trancheKey string) []byte {
+func LimitOrderTrancheUserKey(address, trancheKey string) []byte {
 	var key []byte
 
 	addressBytes := []byte(address)

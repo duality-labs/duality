@@ -26,7 +26,7 @@ func (k Keeper) PoolReservesAll(goCtx context.Context, req *types.QueryAllPoolRe
 	PoolReservesStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairId, req.TokenIn))
 
 	var poolReserves []types.PoolReserves
-	pageRes, err := query.FilteredPaginate(PoolReservesStore, req.Pagination, func(key []byte, value []byte, accum bool) (hit bool, err error) {
+	pageRes, err := query.FilteredPaginate(PoolReservesStore, req.Pagination, func(key, value []byte, accum bool) (hit bool, err error) {
 		var tick types.TickLiquidity
 
 		if err := k.cdc.Unmarshal(value, &tick); err != nil {

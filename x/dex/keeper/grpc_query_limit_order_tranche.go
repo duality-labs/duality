@@ -28,7 +28,7 @@ func (k Keeper) LimitOrderTrancheAll(c context.Context, req *types.QueryAllLimit
 	store := ctx.KVStore(k.storeKey)
 	LimitOrderTrancheStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairId, req.TokenIn))
 
-	pageRes, err := query.FilteredPaginate(LimitOrderTrancheStore, req.Pagination, func(key []byte, value []byte, accum bool) (hit bool, err error) {
+	pageRes, err := query.FilteredPaginate(LimitOrderTrancheStore, req.Pagination, func(key, value []byte, accum bool) (hit bool, err error) {
 		var tick types.TickLiquidity
 
 		if err := k.cdc.Unmarshal(value, &tick); err != nil {

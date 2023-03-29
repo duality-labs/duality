@@ -21,7 +21,7 @@ const (
 	bitlen = 64
 )
 
-func ParseUint64SliceFromString(s string, separator string) ([]uint64, error) {
+func ParseUint64SliceFromString(s, separator string) ([]uint64, error) {
 	var parsedInts []uint64
 	for _, s := range strings.Split(s, separator) {
 		s = strings.TrimSpace(s)
@@ -35,7 +35,7 @@ func ParseUint64SliceFromString(s string, separator string) ([]uint64, error) {
 	return parsedInts, nil
 }
 
-func ParseSdkIntFromString(s string, separator string) ([]sdk.Int, error) {
+func ParseSdkIntFromString(s, separator string) ([]sdk.Int, error) {
 	var parsedInts []sdk.Int
 	for _, weightStr := range strings.Split(s, separator) {
 		weightStr = strings.TrimSpace(weightStr)
@@ -49,7 +49,7 @@ func ParseSdkIntFromString(s string, separator string) ([]sdk.Int, error) {
 	return parsedInts, nil
 }
 
-func ParseSdkDecFromString(s string, separator string) ([]sdk.Dec, error) {
+func ParseSdkDecFromString(s, separator string) ([]sdk.Dec, error) {
 	var parsedDec []sdk.Dec
 	for _, weightStr := range strings.Split(s, separator) {
 		weightStr = strings.TrimSpace(weightStr)

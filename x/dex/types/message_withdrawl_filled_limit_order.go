@@ -9,7 +9,7 @@ const TypeMsgWithdrawFilledLimitOrder = "withdrawl_withdrawn_limit_order"
 
 var _ sdk.Msg = &MsgWithdrawFilledLimitOrder{}
 
-func NewMsgWithdrawFilledLimitOrder(creator string, trancheKey string) *MsgWithdrawFilledLimitOrder {
+func NewMsgWithdrawFilledLimitOrder(creator, trancheKey string) *MsgWithdrawFilledLimitOrder {
 	return &MsgWithdrawFilledLimitOrder{
 		Creator:    creator,
 		TrancheKey: trancheKey,

@@ -28,7 +28,7 @@ func (k Keeper) DepositCore(
 	tickIndices []int64,
 	fees []uint64,
 	options []*types.DepositOptions,
-) (amounts0Deposit []sdk.Int, amounts1Deposit []sdk.Int, err error) {
+) (amounts0Deposit, amounts1Deposit []sdk.Int, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId := CreatePairId(token0, token1)
 	totalAmountReserve0 := sdk.ZeroInt()

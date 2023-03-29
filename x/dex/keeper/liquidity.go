@@ -7,7 +7,7 @@ import (
 )
 
 type Liquidity interface {
-	Swap(maxAmount sdk.Int) (inAmount sdk.Int, outAmount sdk.Int)
+	Swap(maxAmount sdk.Int) (inAmount, outAmount sdk.Int)
 	Price() *types.Price
 }
 
@@ -136,7 +136,7 @@ func (k Keeper) Swap(ctx sdk.Context,
 	tokenOut string,
 	amountIn sdk.Int,
 	limitPrice *sdk.Dec,
-) (totalIn sdk.Int, totalOut sdk.Int, error error) {
+) (totalIn, totalOut sdk.Int, error error) {
 	cacheCtx, writeCache := ctx.CacheContext()
 	pair := types.NewDirectionalTradingPair(pairId, tokenIn, tokenOut)
 

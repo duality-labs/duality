@@ -85,7 +85,7 @@ func (s *TxTestSuite) SetupSuite() {
 	s.fundAccount(clientCtx, s.network.Validators[0].Address, s.addr2, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(100)), sdk.NewCoin("TokenA", sdk.NewInt(100000))))
 }
 
-func (s *TxTestSuite) fundAccount(clientCtx client.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) {
+func (s *TxTestSuite) fundAccount(clientCtx client.Context, from, to sdk.AccAddress, coins sdk.Coins) {
 	require := s.Require()
 
 	commonFlags := []string{

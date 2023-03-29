@@ -9,7 +9,7 @@ const TypeMsgCancelLimitOrder = "cancel_limit_order"
 
 var _ sdk.Msg = &MsgCancelLimitOrder{}
 
-func NewMsgCancelLimitOrder(creator string, trancheKey string) *MsgCancelLimitOrder {
+func NewMsgCancelLimitOrder(creator, trancheKey string) *MsgCancelLimitOrder {
 	return &MsgCancelLimitOrder{
 		Creator:    creator,
 		TrancheKey: trancheKey,

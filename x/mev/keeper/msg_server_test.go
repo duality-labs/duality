@@ -73,7 +73,7 @@ func FundAccount(bankKeeper bankkeeper.Keeper, ctx sdk.Context, addr sdk.AccAddr
 	return bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, amounts)
 }
 
-func (s *MsgServerTestSuite) fundAccountBalances(account sdk.AccAddress, aBalance int64, bBalance int64) {
+func (s *MsgServerTestSuite) fundAccountBalances(account sdk.AccAddress, aBalance, bBalance int64) {
 	aBalanceInt := sdk.NewInt(aBalance)
 	bBalanceInt := sdk.NewInt(bBalance)
 	balances := sdk.NewCoins(NewACoin(aBalanceInt), NewBCoin(bBalanceInt))
@@ -82,19 +82,19 @@ func (s *MsgServerTestSuite) fundAccountBalances(account sdk.AccAddress, aBalanc
 	s.assertAccountBalances(account, aBalance, bBalance)
 }
 
-func (s *MsgServerTestSuite) fundAliceBalances(a int64, b int64) {
+func (s *MsgServerTestSuite) fundAliceBalances(a, b int64) {
 	s.fundAccountBalances(s.alice, a, b)
 }
 
-func (s *MsgServerTestSuite) fundBobBalances(a int64, b int64) {
+func (s *MsgServerTestSuite) fundBobBalances(a, b int64) {
 	s.fundAccountBalances(s.bob, a, b)
 }
 
-func (s *MsgServerTestSuite) fundCarolBalances(a int64, b int64) {
+func (s *MsgServerTestSuite) fundCarolBalances(a, b int64) {
 	s.fundAccountBalances(s.carol, a, b)
 }
 
-func (s *MsgServerTestSuite) fundDanBalances(a int64, b int64) {
+func (s *MsgServerTestSuite) fundDanBalances(a, b int64) {
 	s.fundAccountBalances(s.dan, a, b)
 }
 
@@ -161,59 +161,59 @@ func (s *MsgServerTestSuite) assertAccountBalances(
 	s.assertAccountBalancesInt(account, sdk.NewInt(aBalance), sdk.NewInt(bBalance))
 }
 
-func (s *MsgServerTestSuite) assertAliceBalances(a int64, b int64) {
+func (s *MsgServerTestSuite) assertAliceBalances(a, b int64) {
 	s.assertAccountBalances(s.alice, a, b)
 }
 
-func (s *MsgServerTestSuite) assertAliceBalancesInt(a sdk.Int, b sdk.Int) {
+func (s *MsgServerTestSuite) assertAliceBalancesInt(a, b sdk.Int) {
 	s.assertAccountBalancesInt(s.alice, a, b)
 }
 
-func (s *MsgServerTestSuite) assertAliceBalancesEpsilon(a sdk.Int, b sdk.Int) {
+func (s *MsgServerTestSuite) assertAliceBalancesEpsilon(a, b sdk.Int) {
 	s.assertAccountBalancesEpsilon(s.alice, a, b)
 }
 
-func (s *MsgServerTestSuite) assertBobBalances(a int64, b int64) {
+func (s *MsgServerTestSuite) assertBobBalances(a, b int64) {
 	s.assertAccountBalances(s.bob, a, b)
 }
 
-func (s *MsgServerTestSuite) assertBobBalancesEpsilon(a sdk.Int, b sdk.Int) {
+func (s *MsgServerTestSuite) assertBobBalancesEpsilon(a, b sdk.Int) {
 	s.assertAccountBalancesEpsilon(s.bob, a, b)
 }
 
-func (s *MsgServerTestSuite) assertBobBalancesInt(a sdk.Int, b sdk.Int) {
+func (s *MsgServerTestSuite) assertBobBalancesInt(a, b sdk.Int) {
 	s.assertAccountBalancesInt(s.bob, a, b)
 }
 
-func (s *MsgServerTestSuite) assertCarolBalances(a int64, b int64) {
+func (s *MsgServerTestSuite) assertCarolBalances(a, b int64) {
 	s.assertAccountBalances(s.carol, a, b)
 }
 
-func (s *MsgServerTestSuite) assertCarolBalancesInt(a sdk.Int, b sdk.Int) {
+func (s *MsgServerTestSuite) assertCarolBalancesInt(a, b sdk.Int) {
 	s.assertAccountBalancesInt(s.carol, a, b)
 }
 
-func (s *MsgServerTestSuite) assertCarolBalancesEpsilon(a sdk.Int, b sdk.Int) {
+func (s *MsgServerTestSuite) assertCarolBalancesEpsilon(a, b sdk.Int) {
 	s.assertAccountBalancesEpsilon(s.carol, a, b)
 }
 
-func (s *MsgServerTestSuite) assertDanBalances(a int64, b int64) {
+func (s *MsgServerTestSuite) assertDanBalances(a, b int64) {
 	s.assertAccountBalances(s.dan, a, b)
 }
 
-func (s *MsgServerTestSuite) assertDanBalancesInt(a sdk.Int, b sdk.Int) {
+func (s *MsgServerTestSuite) assertDanBalancesInt(a, b sdk.Int) {
 	s.assertAccountBalancesInt(s.dan, a, b)
 }
 
-func (s *MsgServerTestSuite) assertDanBalancesEpsilon(a sdk.Int, b sdk.Int) {
+func (s *MsgServerTestSuite) assertDanBalancesEpsilon(a, b sdk.Int) {
 	s.assertAccountBalancesEpsilon(s.dan, a, b)
 }
 
-func (s *MsgServerTestSuite) assertMEVDummyBalances(a int64, b int64) {
+func (s *MsgServerTestSuite) assertMEVDummyBalances(a, b int64) {
 	s.assertAccountBalances(s.app.AccountKeeper.GetModuleAddress("mev"), a, b)
 }
 
-func (s *MsgServerTestSuite) assertMEVDummyBalancesInt(a sdk.Int, b sdk.Int) {
+func (s *MsgServerTestSuite) assertMEVDummyBalancesInt(a, b sdk.Int) {
 	s.assertAccountBalancesInt(s.app.AccountKeeper.GetModuleAddress("mev"), a, b)
 }
 
@@ -253,5 +253,4 @@ func (s *MsgServerTestSuite) TestValidTransaction() {
 	//}
 
 	// err := s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, types.ModuleName, s.alice, amt)
-
 }
