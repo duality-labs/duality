@@ -58,7 +58,6 @@ func CmdPlaceLimitOrder() *cobra.Command {
 					return sdkerrors.Wrapf(types.ErrInvalidTimeString, err.Error())
 				}
 				goodTil = &tm
-
 			} else {
 			}
 

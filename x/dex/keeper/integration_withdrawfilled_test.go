@@ -4,8 +4,6 @@ import (
 	"math"
 
 	"github.com/duality-labs/duality/x/dex/types"
-	//. "github.com/duality-labs/duality/x/dex/keeper/internal/testutils"
-	//"github.com/duality-labs/duality/x/dex/types"
 )
 
 func (s *MsgServerTestSuite) TestWithdrawFilledSimpleFull() {

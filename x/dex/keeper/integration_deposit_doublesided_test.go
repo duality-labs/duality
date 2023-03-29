@@ -226,7 +226,6 @@ func (s *MsgServerTestSuite) TestDepositValueAccural() {
 		} else {
 			s.bobMarketSells("TokenA", int(liquidityB.Int64()))
 		}
-
 	}
 	s.assertLiquidityAtTick(sdk.NewInt(199), sdk.NewInt(1), 0, 10)
 	s.assertDexBalances(199, 1)

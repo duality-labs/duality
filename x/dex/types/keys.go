@@ -183,7 +183,6 @@ func LiquidityIndexBytes(liquidityIndex interface{}) []byte {
 		return []byte(index)
 	default:
 		panic("LiquidityIndex is not a valid type")
-
 	}
 }
 

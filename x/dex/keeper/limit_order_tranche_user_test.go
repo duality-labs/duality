@@ -26,7 +26,6 @@ func createNLimitOrderTrancheUser(keeper *keeper.Keeper, ctx sdk.Context, tickIn
 		items[i].TakerReserves = sdk.ZeroInt()
 
 		keeper.SetLimitOrderTrancheUser(ctx, items[i])
-
 	}
 	return items
 }

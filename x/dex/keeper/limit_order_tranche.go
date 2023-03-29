@@ -150,7 +150,6 @@ func (k Keeper) GetAllLimitOrderTrancheAtIndex(sdkCtx sdk.Context, pairID *types
 		if maybeTranche != nil {
 			trancheList = append(trancheList, *maybeTranche)
 		}
-
 	}
 	return trancheList
 }

@@ -195,7 +195,6 @@ func (s *QueryTestSuite) TestQueryCmdListTickLiquidity() {
 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 				require.NotEmpty(s.T(), res)
 				require.Equal(s.T(), tc.expOutput, res.TickLiquidity)
-
 			}
 		})
 	}
@@ -316,7 +315,6 @@ func (s *QueryTestSuite) TestQueryCmdShowLimitOrderTrancheUser() {
 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 				require.NotEmpty(s.T(), res)
 				require.Equal(s.T(), tc.expOutput, res.LimitOrderTrancheUser)
-
 			}
 		})
 	}
@@ -353,7 +351,6 @@ func (s *QueryTestSuite) TestQueryCmdListLimitOrderTrancheUser() {
 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 				require.NotEmpty(s.T(), res)
 				require.Equal(s.T(), tc.expOutput, res.LimitOrderTrancheUser)
-
 			}
 		})
 	}
@@ -390,7 +387,6 @@ func (s *QueryTestSuite) TestQueryCmdListInactiveLimitOrderTranche() {
 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 				require.NotEmpty(s.T(), res)
 				require.Equal(s.T(), tc.expOutput, res.InactiveLimitOrderTranche)
-
 			}
 		})
 	}

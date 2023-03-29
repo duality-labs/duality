@@ -52,7 +52,6 @@ func CmdWithdrawal() *cobra.Command {
 				}
 
 				TicksIndexesInt = append(TicksIndexesInt, TickIndexInt)
-
 			}
 
 			for _, s := range argFees {

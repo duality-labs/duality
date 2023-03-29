@@ -131,7 +131,6 @@ func (k Keeper) IsBehindEnemyLines(ctx sdk.Context, pairID *types.PairID, tokenI
 			return true
 		}
 	} else {
-
 		curr1To0, _ := k.GetCurrTick1To0(ctx, pairID)
 		if tickIndex <= curr1To0 {
 			return true

@@ -16,7 +16,6 @@ func (p *PairID) OppositeToken(token string) (oppToken string, ok bool) {
 		return p.Token0, true
 	default:
 		return "", false
-
 	}
 }
 

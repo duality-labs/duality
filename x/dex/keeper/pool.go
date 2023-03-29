@@ -132,7 +132,7 @@ func CalcGreatestMatchingRatio(
 	return resultAmount0, resultAmount1
 }
 
-// Mutates the Pool object and returns relevant change variables. Deposit is not commited until
+// Mutates the Pool object and returns relevant change variables. Deposit is not committed until
 // pool.save() is called or the underlying ticks are saved; this method does not use any keeper methods.
 func (p *Pool) Deposit(maxAmount0, maxAmount1, existingShares sdk.Int, autoswap bool) (inAmount0, inAmount1, outShares sdk.Int) {
 	lowerReserve0 := &p.LowerTick0.Reserves

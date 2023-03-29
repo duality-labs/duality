@@ -71,7 +71,6 @@ func CmdDeposit() *cobra.Command {
 				}
 
 				TicksIndexesInt = append(TicksIndexesInt, TickIndexInt)
-
 			}
 
 			for _, s := range argFees {

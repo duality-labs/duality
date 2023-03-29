@@ -75,7 +75,6 @@ func (s *LiquidityIterator) Next() Liquidity {
 
 		default:
 			panic("Tick does not have liquidity")
-
 		}
 	}
 	return nil

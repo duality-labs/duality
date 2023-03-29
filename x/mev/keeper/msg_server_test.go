@@ -244,13 +244,4 @@ func (s *MsgServerTestSuite) TestValidTransaction() {
 	s.msgSend(s.alice, 5, "TokenA")
 	s.assertAliceBalances(5, 10)
 	s.assertMEVDummyBalances(5, 0)
-
-	//amt := sdk.Coins{
-	//sdk.Coin{
-	//"TokenA",
-	//sdk.NewInt(5),
-	//},
-	//}
-
-	// err := s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, types.ModuleName, s.alice, amt)
 }
