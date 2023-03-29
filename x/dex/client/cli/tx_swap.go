@@ -12,10 +12,10 @@ import (
 
 func CmdSwap() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "swap [receiver] [amount-in] [tokenA] [tokenB] [token-in]",
+		Use:     "swap [receiver] [amount-in] [tokenIn] [tokenOut]",
 		Short:   "Broadcast message swap",
-		Example: "swap alice 50 tokenA tokenB tokenA --from alice",
-		Args:    cobra.ExactArgs(5),
+		Example: "swap alice 50 tokenA tokenB --from alice",
+		Args:    cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
 			argAmountIn := args[1]
@@ -25,9 +25,9 @@ func CmdSwap() *cobra.Command {
 				return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for amount-in")
 			}
 
-			argTokenA := args[2]
-			argTokenB := args[3]
-			argTokenIn := args[4]
+			argTokenIn := args[2]
+			argTokenOut := args[3]
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -35,10 +35,9 @@ func CmdSwap() *cobra.Command {
 
 			msg := types.NewMsgSwap(
 				clientCtx.GetFromAddress().String(),
-				argTokenA,
-				argTokenB,
-				amountInInt,
 				argTokenIn,
+				argTokenOut,
+				amountInInt,
 				argReceiver,
 			)
 			if err := msg.ValidateBasic(); err != nil {

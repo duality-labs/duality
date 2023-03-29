@@ -9,13 +9,12 @@ const TypeMsgSwap = "swap"
 
 var _ sdk.Msg = &MsgSwap{}
 
-func NewMsgSwap(creator string, tokenA string, tokenB string, amountIn sdk.Int, tokenIn string, receiver string) *MsgSwap {
+func NewMsgSwap(creator string, tokenIn string, tokenOut string, amountIn sdk.Int, receiver string) *MsgSwap {
 	return &MsgSwap{
 		Creator:  creator,
 		AmountIn: amountIn,
-		TokenA:   tokenA,
-		TokenB:   tokenB,
 		TokenIn:  tokenIn,
+		TokenOut: tokenOut,
 		Receiver: receiver,
 	}
 }
@@ -50,10 +49,6 @@ func (msg *MsgSwap) ValidateBasic() error {
 	_, err = sdk.AccAddressFromBech32(msg.Receiver)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
-	}
-
-	if msg.TokenIn != msg.TokenA && msg.TokenIn != msg.TokenB {
-		return ErrInvalidTokenIn
 	}
 
 	if msg.AmountIn.LTE(sdk.ZeroInt()) {

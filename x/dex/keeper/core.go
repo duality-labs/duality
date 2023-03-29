@@ -221,9 +221,9 @@ func (k Keeper) WithdrawCore(
 func (k Keeper) SwapCore(goCtx context.Context,
 	tokenIn string,
 	tokenOut string,
+	amountIn sdk.Int,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
-	amountIn sdk.Int,
 ) (coinOut sdk.Coin, error error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId, err := CreatePairIdFromUnsorted(tokenIn, tokenOut)
@@ -262,12 +262,12 @@ func (k Keeper) PlaceLimitOrderCore(
 	goCtx context.Context,
 	tokenIn string,
 	tokenOut string,
-	callerAddr sdk.AccAddress,
-	receiverAddr sdk.AccAddress,
 	amountIn sdk.Int,
 	tickIndex int64,
 	orderType types.LimitOrderType,
 	goodTil *time.Time,
+	callerAddr sdk.AccAddress,
+	receiverAddr sdk.AccAddress,
 ) (trancheKeyP *string, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -346,20 +346,23 @@ func (k Keeper) PlaceLimitOrderCore(
 // Handles MsgCancelLimitOrder, removing a specifed number of shares from a limit order and returning the respective amount in terms of the reserve to the user
 func (k Keeper) CancelLimitOrderCore(
 	goCtx context.Context,
-	token0 string,
-	token1 string,
-	keyToken string,
-	callerAddr sdk.AccAddress,
+	tokenIn string,
+	tokenOut string,
 	tickIndex int64,
 	trancheKey string,
+	callerAddr sdk.AccAddress,
 ) error {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	pairId := CreatePairId(token0, token1)
+	pairId, err := CreatePairIdFromUnsorted(tokenIn, tokenOut)
 
-	tranche, foundTranche := k.GetLimitOrderTranche(ctx, pairId, keyToken, tickIndex, trancheKey)
-	trancheUser, foundTrancheUser := k.GetLimitOrderTrancheUser(ctx, pairId, tickIndex, keyToken, trancheKey, callerAddr.String())
+	if err != nil {
+		return err
+	}
+
+	tranche, foundTranche := k.GetLimitOrderTranche(ctx, pairId, tokenIn, tickIndex, trancheKey)
+	trancheUser, foundTrancheUser := k.GetLimitOrderTrancheUser(ctx, pairId, tickIndex, tokenIn, trancheKey, callerAddr.String())
 
 	if !foundTranche || !foundTrancheUser {
 		return types.ErrActiveLimitOrderNotFound
@@ -369,7 +372,7 @@ func (k Keeper) CancelLimitOrderCore(
 	trancheUser.SharesCancelled = trancheUser.SharesCancelled.Add(amountToCancel)
 
 	if amountToCancel.IsPositive() {
-		coinOut := sdk.NewCoin(keyToken, amountToCancel)
+		coinOut := sdk.NewCoin(tokenIn, amountToCancel)
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
 			return err
 		}
@@ -385,9 +388,8 @@ func (k Keeper) CancelLimitOrderCore(
 
 	ctx.EventManager().EmitEvent(types.CancelLimitOrderEvent(
 		callerAddr.String(),
-		token0,
-		token1,
-		keyToken,
+		tokenIn,
+		tokenOut,
 		trancheKey,
 		amountToCancel.String(),
 	))
@@ -398,16 +400,17 @@ func (k Keeper) CancelLimitOrderCore(
 // Handles MsgWithdrawFilledLimitOrder, calculates and sends filled liqudity from module to user for a limit order based on amount wished to receive.
 func (k Keeper) WithdrawFilledLimitOrderCore(
 	goCtx context.Context,
-	token0 string,
-	token1 string,
 	tokenIn string,
-	callerAddr sdk.AccAddress,
+	tokenOut string,
 	tickIndex int64,
 	trancheKey string,
+	callerAddr sdk.AccAddress,
 ) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	pairId := CreatePairId(token0, token1)
-	_, tokenOut := GetInOutTokens(tokenIn, token0, token1)
+	pairId, err := CreatePairIdFromUnsorted(tokenIn, tokenOut)
+	if err != nil {
+		return err
+	}
 
 	trancheUser, foundTrancheUser := k.GetLimitOrderTrancheUser(
 		ctx,
@@ -459,9 +462,8 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 
 	ctx.EventManager().EmitEvent(types.WithdrawFilledLimitOrderEvent(
 		callerAddr.String(),
-		token0,
-		token1,
 		tokenIn,
+		tokenOut,
 		trancheKey,
 		amountOutTokenOut.String(),
 	))

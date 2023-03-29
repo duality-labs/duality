@@ -9,13 +9,13 @@ const TypeMsgCancelLimitOrder = "cancel_limit_order"
 
 var _ sdk.Msg = &MsgCancelLimitOrder{}
 
-func NewMsgCancelLimitOrder(creator string, tokenA string, tokenB string, tickIndex int64, keyToken string, trancheKey string) *MsgCancelLimitOrder {
+func NewMsgCancelLimitOrder(creator string, tokenIn string, tokenOut string, tickIndex int64, trancheKey string) *MsgCancelLimitOrder {
 	return &MsgCancelLimitOrder{
-		Creator:    creator,
-		TokenA:     tokenA,
-		TokenB:     tokenB,
-		TickIndex:  tickIndex,
-		KeyToken:   keyToken,
+		Creator:   creator,
+		TokenIn:   tokenIn,
+		TokenOut:  tokenOut,
+		TickIndex: tickIndex,
+
 		TrancheKey: trancheKey,
 	}
 }
@@ -47,8 +47,5 @@ func (msg *MsgCancelLimitOrder) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
-	if msg.KeyToken != msg.TokenA && msg.KeyToken != msg.TokenB {
-		return ErrInvalidKeyToken
-	}
 	return nil
 }

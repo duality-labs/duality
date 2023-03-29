@@ -13,20 +13,19 @@ import (
 
 func CmdWithdrawFilledLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "withdraw-filled-limit-order [token-a] [token-b] [tick-index] [key-token] [tranche-key]",
+		Use:     "withdraw-filled-limit-order [token-in] [token-out] [tick-index] [tranche-key]",
 		Short:   "Broadcast message WithdrawFilledLimitOrder",
-		Example: "withdraw-filled-limit-order tokenA tokenB [-10] tokenA 0 --from alice",
-		Args:    cobra.ExactArgs(5),
+		Example: "withdraw-filled-limit-order tokenA tokenB [-10] 0 --from alice",
+		Args:    cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argTokenA := args[0]
-			argTokenB := args[1]
-			if strings.HasPrefix(args[3], "[") && strings.HasSuffix(args[3], "]") {
+			argTokenIn := args[0]
+			argTokenOut := args[1]
+			if strings.HasPrefix(args[2], "[") && strings.HasSuffix(args[2], "]") {
 				args[2] = strings.TrimPrefix(args[2], "[")
 				args[2] = strings.TrimSuffix(args[2], "]")
 			}
 			argTickIndex := args[2]
-			argKeyToken := args[3]
-			argTrancheIndex := args[4]
+			argTrancheIndex := args[3]
 
 			argTickIndexInt, err := strconv.ParseInt(argTickIndex, 10, 0)
 			if err != nil {
@@ -40,10 +39,9 @@ func CmdWithdrawFilledLimitOrder() *cobra.Command {
 
 			msg := types.NewMsgWithdrawFilledLimitOrder(
 				clientCtx.GetFromAddress().String(),
-				argTokenA,
-				argTokenB,
+				argTokenIn,
+				argTokenOut,
 				argTickIndexInt,
-				argKeyToken,
 				argTrancheIndex,
 			)
 			if err := msg.ValidateBasic(); err != nil {

@@ -16,14 +16,14 @@ import (
 
 func CmdPlaceLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "place-limit-order [receiver] [token-a] [token-b] [tick-index] [token-in] [amount-in] ?[order-type] ?[expirationTime]",
+		Use:     "place-limit-order [receiver] [token-in] [token-out] [tick-index] [amount-in] ?[order-type] ?[expirationTime]",
 		Short:   "Broadcast message PlaceLimitOrder",
 		Example: "place-limit-order alice tokenA tokenB [-10] tokenA 50 GOOD_TIL_TIME '01/02/2006 15:04:05' --from alice",
-		Args:    cobra.RangeArgs(6, 8),
+		Args:    cobra.RangeArgs(5, 7),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
-			argTokenA := args[1]
-			argTokenB := args[2]
+			argTokenIn := args[1]
+			argTokenOut := args[2]
 			if strings.HasPrefix(args[3], "[") && strings.HasSuffix(args[3], "]") {
 				args[3] = strings.TrimPrefix(args[3], "[")
 				args[3] = strings.TrimSuffix(args[3], "]")
@@ -34,8 +34,7 @@ func CmdPlaceLimitOrder() *cobra.Command {
 				return err
 			}
 
-			argTokenIn := args[4]
-			argAmountIn := args[5]
+			argAmountIn := args[4]
 
 			amountInInt, ok := sdk.NewIntFromString(argAmountIn)
 			if ok != true {
@@ -43,8 +42,8 @@ func CmdPlaceLimitOrder() *cobra.Command {
 			}
 
 			orderType := types.LimitOrderType_GOOD_TIL_CANCELLED
-			if len(args) >= 7 {
-				orderTypeInt, ok := types.LimitOrderType_value[args[6]]
+			if len(args) >= 6 {
+				orderTypeInt, ok := types.LimitOrderType_value[args[5]]
 				if !ok {
 					return types.ErrInvalidOrderType
 				}
@@ -52,9 +51,9 @@ func CmdPlaceLimitOrder() *cobra.Command {
 			}
 
 			var goodTil *time.Time = nil
-			if len(args) == 8 {
+			if len(args) == 7 {
 				const timeFormat = "01/02/2006 15:04:05"
-				tm, err := time.Parse(timeFormat, args[7])
+				tm, err := time.Parse(timeFormat, args[6])
 				if err != nil {
 					return sdkerrors.Wrapf(types.ErrInvalidTimeString, err.Error())
 				}
@@ -71,10 +70,9 @@ func CmdPlaceLimitOrder() *cobra.Command {
 			msg := types.NewMsgPlaceLimitOrder(
 				clientCtx.GetFromAddress().String(),
 				argReceiver,
-				argTokenA,
-				argTokenB,
-				argTickIndexInt,
 				argTokenIn,
+				argTokenOut,
+				argTickIndexInt,
 				amountInInt,
 				orderType,
 				goodTil,

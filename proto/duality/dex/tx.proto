@@ -81,15 +81,14 @@ message MsgWithdrawlResponse {
 message MsgSwap {
   string creator = 1;
   string receiver = 2;
-  string tokenA = 3;
-  string tokenB = 4;
+  string tokenIn = 3;
+  string tokenOut = 4;
   string amountIn = 5 [
       (gogoproto.moretags)   = "yaml:\"amountIn\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountIn"
-  ]; 
-  string tokenIn = 6;
+  ];
 }
 
 message MsgSwapResponse {
@@ -111,10 +110,9 @@ enum LimitOrderType{
 message MsgPlaceLimitOrder {
   string creator = 1;
   string receiver = 2;
-  string tokenA = 3;
-  string tokenB = 4;
+  string tokenIn = 3;
+  string tokenOut = 4;
   int64 tickIndex = 5;
-  string tokenIn = 6;
   string amountIn = 7 [
       (gogoproto.moretags)   = "yaml:\"amountIn\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
@@ -135,11 +133,10 @@ message MsgPlaceLimitOrderResponse {
 
 message MsgWithdrawFilledLimitOrder {
   string creator = 1;
-  string tokenA = 2;
-  string tokenB = 3;
+  string tokenIn = 2;
+  string tokenOut = 3;
   int64 tickIndex = 4;
-  string keyToken = 5;
-  string trancheKey = 6;
+  string trancheKey = 5;
 }
 
 message MsgWithdrawFilledLimitOrderResponse {
@@ -147,11 +144,10 @@ message MsgWithdrawFilledLimitOrderResponse {
 
 message MsgCancelLimitOrder {
   string creator = 1;
-  string tokenA = 2;
-  string tokenB = 3;
+  string tokenIn = 2;
+  string tokenOut = 3;
   int64 tickIndex = 4;
-  string keyToken = 5;
-  string trancheKey = 6;
+  string trancheKey = 5;
 }
 
 message MsgCancelLimitOrderResponse {
