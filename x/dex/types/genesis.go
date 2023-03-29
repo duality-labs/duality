@@ -21,7 +21,6 @@ func DefaultGenesis() *GenesisState {
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-
 	// Check for duplicated index in LimitOrderTrancheUser
 	LimitOrderTrancheUserIndexMap := make(map[string]struct{})
 

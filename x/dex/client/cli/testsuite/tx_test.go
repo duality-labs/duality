@@ -58,7 +58,7 @@ func (s *TxTestSuite) SetupSuite() {
 	pk = info2.GetPubKey()
 	s.addr2 = sdk.AccAddress(pk.Address())
 
-	var commonFlags = []string{
+	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
@@ -88,7 +88,7 @@ func (s *TxTestSuite) SetupSuite() {
 func (s *TxTestSuite) fundAccount(clientCtx client.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) {
 	require := s.Require()
 
-	var commonFlags = []string{
+	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
@@ -110,7 +110,7 @@ func (s *TxTestSuite) fundAccount(clientCtx client.Context, from sdk.AccAddress,
 func (s *TxTestSuite) TestTxCmdDeposit() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	var commonFlags = []string{
+	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
@@ -166,7 +166,6 @@ func (s *TxTestSuite) TestTxCmdDeposit() {
 					require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 					require.Zero(s.T(), res.Code, res.RawLog)
 				}
-
 			}
 		})
 	}
@@ -175,7 +174,7 @@ func (s *TxTestSuite) TestTxCmdDeposit() {
 func (s *TxTestSuite) TestTx2CmdWithdraw() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	var commonFlags = []string{
+	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
@@ -183,7 +182,7 @@ func (s *TxTestSuite) TestTx2CmdWithdraw() {
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, s.network.Validators[0].Address.String()),
 	}
 
-	//Deposit Funds
+	// Deposit Funds
 	args := append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "[0]", "0", "false"}, commonFlags...)
 	cmd := dexClient.CmdDeposit()
 	_, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
@@ -238,7 +237,6 @@ func (s *TxTestSuite) TestTx2CmdWithdraw() {
 					require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 					require.Zero(s.T(), res.Code, res.RawLog)
 				}
-
 			}
 		})
 	}
@@ -247,7 +245,7 @@ func (s *TxTestSuite) TestTx2CmdWithdraw() {
 func (s *TxTestSuite) TestTx3CmdSwap() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	var commonFlags = []string{
+	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
@@ -299,7 +297,6 @@ func (s *TxTestSuite) TestTx3CmdSwap() {
 					require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 					require.Zero(s.T(), res.Code, res.RawLog)
 				}
-
 			}
 		})
 	}
@@ -308,7 +305,7 @@ func (s *TxTestSuite) TestTx3CmdSwap() {
 func (s *TxTestSuite) TestTx4Cmd4PlaceLimitOrder() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	var commonFlags = []string{
+	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
@@ -377,7 +374,6 @@ func (s *TxTestSuite) TestTx4Cmd4PlaceLimitOrder() {
 					require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 					require.Zero(s.T(), res.Code, res.RawLog)
 				}
-
 			}
 		})
 	}
@@ -386,7 +382,7 @@ func (s *TxTestSuite) TestTx4Cmd4PlaceLimitOrder() {
 func (s *TxTestSuite) TestTx5CmdCancelLimitOrder() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	var commonFlags = []string{
+	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
@@ -438,7 +434,6 @@ func (s *TxTestSuite) TestTx5CmdCancelLimitOrder() {
 					require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 					require.Zero(s.T(), res.Code, res.RawLog)
 				}
-
 			}
 		})
 	}
@@ -448,7 +443,7 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
 
-	var commonFlags = []string{
+	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
@@ -512,7 +507,6 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 					require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 					require.Zero(s.T(), res.Code, res.RawLog)
 				}
-
 			}
 		})
 	}

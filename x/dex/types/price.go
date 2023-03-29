@@ -31,7 +31,7 @@ func MustNewPrice(relativeTickIndex int64) *Price {
 func NewPrice(relativeTickIndex int64) (*Price, error) {
 	if IsTickOutOfRange(relativeTickIndex) {
 		// TODO: This is a bit weird that we can't return a types.ErrTickOutsideRange because of cyclical dependencesi
-		//Also maybe don't need this at all since we already validate that the tick is in range upstream
+		// Also maybe don't need this at all since we already validate that the tick is in range upstream
 		return nil, errors.New("Supplying a tick outside the range of [-352437, 352437] is not allowed")
 	}
 	return &Price{

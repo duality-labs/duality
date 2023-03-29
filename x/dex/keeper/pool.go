@@ -47,6 +47,7 @@ func (k Keeper) GetOrInitPool(ctx sdk.Context, pairId *types.PairId, centerTickI
 
 	return NewPool(centerTickIndex, lowertick, upperTick), nil
 }
+
 func (p *Pool) GetLowerReserve0() sdk.Int {
 	return p.LowerTick0.Reserves
 }
@@ -134,7 +135,6 @@ func CalcGreatestMatchingRatio(
 // Mutates the Pool object and returns relevant change variables. Deposit is not commited until
 // pool.save() is called or the underlying ticks are saved; this method does not use any keeper methods.
 func (p *Pool) Deposit(maxAmount0 sdk.Int, maxAmount1 sdk.Int, existingShares sdk.Int, autoswap bool) (inAmount0 sdk.Int, inAmount1 sdk.Int, outShares sdk.Int) {
-
 	lowerReserve0 := &p.LowerTick0.Reserves
 	upperReserve1 := &p.UpperTick1.Reserves
 

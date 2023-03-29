@@ -69,7 +69,6 @@ func (k Keeper) DepositCore(
 			tickIndex,
 			fee,
 		)
-
 		if err != nil {
 			return nil, nil, err
 		}
@@ -139,7 +138,6 @@ func (k Keeper) WithdrawCore(
 	tickIndices []int64,
 	fees []uint64,
 ) error {
-
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairId := CreatePairId(token0, token1)
 	totalReserve0ToRemove := sdk.ZeroInt()
@@ -419,7 +417,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		amountOutTokenIn, amountOutTokenOut = tranche.Withdraw(trancheUser)
 
 		if wasFilled {
-			//This is only relevant for inactive JIT and GoodTil limit orders
+			// This is only relevant for inactive JIT and GoodTil limit orders
 			remainingTokenIn = tranche.RemoveTokenIn(trancheUser)
 			k.SaveInactiveTranche(ctx, tranche)
 		} else {

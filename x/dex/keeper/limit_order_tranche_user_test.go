@@ -43,6 +43,7 @@ func TestLimitOrderTrancheUserGet(t *testing.T) {
 		)
 	}
 }
+
 func TestLimitOrderTrancheUserRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNLimitOrderTrancheUser(keeper, ctx, 0, "TokenA", 10)

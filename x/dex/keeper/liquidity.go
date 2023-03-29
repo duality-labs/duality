@@ -16,7 +16,6 @@ func NewLiquidityIterator(
 	ctx sdk.Context,
 	tradingPair types.DirectionalTradingPair,
 ) *LiquidityIterator {
-
 	return &LiquidityIterator{
 		iter:   keeper.NewTickIterator(ctx, tradingPair.PairId, tradingPair.TokenOut),
 		keeper: keeper,
@@ -24,7 +23,6 @@ func NewLiquidityIterator(
 		pairId: tradingPair.PairId,
 		is0To1: tradingPair.IsTokenInToken0(),
 	}
-
 }
 
 type LiquidityIterator struct {
@@ -52,10 +50,10 @@ func (s *LiquidityIterator) Next() Liquidity {
 			var pool Liquidity
 			poolReserves := *liquidity.PoolReserves
 			if s.is0To1 {
-				//Pool Reserves is upperTick
+				// Pool Reserves is upperTick
 				pool, err = s.createPool0To1(poolReserves)
 			} else {
-				//Pool Reserves is is lowerTick
+				// Pool Reserves is is lowerTick
 				pool, err = s.createPool1To0(poolReserves)
 			}
 			// TODO: we are not actually handling the error here we're just stopping iteration
@@ -130,7 +128,6 @@ func (k Keeper) SaveLiquidity(sdkCtx sdk.Context, liquidityI Liquidity) {
 	default:
 		panic("Invalid liquidity type")
 	}
-
 }
 
 func (k Keeper) Swap(ctx sdk.Context,
@@ -138,7 +135,8 @@ func (k Keeper) Swap(ctx sdk.Context,
 	tokenIn string,
 	tokenOut string,
 	amountIn sdk.Int,
-	limitPrice *sdk.Dec) (totalIn sdk.Int, totalOut sdk.Int, error error) {
+	limitPrice *sdk.Dec,
+) (totalIn sdk.Int, totalOut sdk.Int, error error) {
 	cacheCtx, writeCache := ctx.CacheContext()
 	pair := types.NewDirectionalTradingPair(pairId, tokenIn, tokenOut)
 
@@ -157,7 +155,6 @@ func (k Keeper) Swap(ctx sdk.Context,
 		// break as soon as we iterated past limitPrice
 		if limitPrice != nil && liq.Price().ToDec().LT(*limitPrice) {
 			break
-
 		}
 
 		inAmount, outAmount := liq.Swap(remainingIn)

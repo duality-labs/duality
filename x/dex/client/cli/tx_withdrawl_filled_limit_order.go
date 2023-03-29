@@ -15,7 +15,6 @@ func CmdWithdrawFilledLimitOrder() *cobra.Command {
 		Example: "withdraw-filled-limit-order TRANCHEKEY123 --from alice",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err

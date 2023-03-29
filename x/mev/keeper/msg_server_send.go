@@ -21,7 +21,6 @@ func (k msgServer) Send(goCtx context.Context, msg *types.MsgSend) (*types.MsgSe
 	fmt.Printf(" %v \n ", sdk.AccAddress(msg.Creator))
 
 	accAddressCreator, err := sdk.AccAddressFromBech32(msg.Creator)
-
 	if err != nil {
 		return nil, err
 	}

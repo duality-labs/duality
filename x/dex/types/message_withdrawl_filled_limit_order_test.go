@@ -17,14 +17,14 @@ func TestMsgWithdrawFilledLimitOrder_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid creator",
 			msg: MsgWithdrawFilledLimitOrder{
-				Creator: "invalid_address",
+				Creator:    "invalid_address",
 				TrancheKey: "ORDER123",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid msg",
 			msg: MsgWithdrawFilledLimitOrder{
-				Creator: sample.AccAddress(),
+				Creator:    sample.AccAddress(),
 				TrancheKey: "ORDER123",
 			},
 		},

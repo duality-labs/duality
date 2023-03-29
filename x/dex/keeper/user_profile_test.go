@@ -125,5 +125,4 @@ func (s *MsgServerTestSuite) TestGetAllPositions() {
 
 	s.Assert().Equal(2, len(positions.PoolDeposits))
 	s.Assert().Equal(1, len(positions.LimitOrders))
-
 }

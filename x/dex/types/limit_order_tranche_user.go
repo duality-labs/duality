@@ -13,5 +13,4 @@ func (l *LimitOrderTrancheUser) WithdrawTakerReserves() sdk.Int {
 	amountOut := l.TakerReserves
 	l.TakerReserves = sdk.ZeroInt()
 	return amountOut
-
 }

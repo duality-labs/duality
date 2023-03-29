@@ -26,7 +26,8 @@ func TestMsgPlaceLimitOrder_ValidateBasic(t *testing.T) {
 				AmountIn:  sdk.OneInt(),
 			},
 			err: sdkerrors.ErrInvalidAddress,
-		}, {
+		},
+		{
 			name: "invalid receiver",
 			msg: MsgPlaceLimitOrder{
 				Creator:   sample.AccAddress(),
@@ -49,7 +50,8 @@ func TestMsgPlaceLimitOrder_ValidateBasic(t *testing.T) {
 				AmountIn:  sdk.ZeroInt(),
 			},
 			err: ErrZeroLimitOrder,
-		}, {
+		},
+		{
 			name: "valid msg",
 			msg: MsgPlaceLimitOrder{
 				Creator:   sample.AccAddress(),

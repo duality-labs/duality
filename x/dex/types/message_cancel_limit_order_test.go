@@ -17,14 +17,14 @@ func TestMsgCancelLimitOrder_ValidateBasic(t *testing.T) {
 		{
 			name: "invalid creator",
 			msg: MsgCancelLimitOrder{
-				Creator: "invalid_address",
+				Creator:    "invalid_address",
 				TrancheKey: "ORDER123",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid msg",
 			msg: MsgCancelLimitOrder{
-				Creator: sample.AccAddress(),
+				Creator:    sample.AccAddress(),
 				TrancheKey: "ORDER123",
 			},
 		},

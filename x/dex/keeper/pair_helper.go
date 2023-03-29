@@ -9,7 +9,6 @@ import (
 )
 
 func SortTokens(tokenA string, tokenB string) (string, string, error) {
-
 	relativeOrder := tokenA < tokenB
 
 	equalCheck := tokenA == tokenB
@@ -43,7 +42,6 @@ func CreatePairIdFromUnsorted(tokenA, tokenB string) (*types.PairId, error) {
 		return nil, err
 	}
 	return CreatePairId(token0, token1), nil
-
 }
 
 func GetInOutTokens(tokenIn_ string, tokenA string, tokenB string) (tokenIn string, tokenOut string) {

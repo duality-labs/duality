@@ -47,6 +47,7 @@ func TestInactiveLimitOrderTrancheGet(t *testing.T) {
 		)
 	}
 }
+
 func TestInactiveLimitOrderTrancheRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNInactiveLimitOrderTranche(keeper, ctx, 10)

@@ -96,7 +96,6 @@ func (t *LimitOrderTranche) Withdraw(trancheUser LimitOrderTrancheUser) (sdk.Int
 	t.ReservesTokenOut = reservesTokenOutDec.Sub(amountOutTokenOut).TruncateInt()
 
 	return amountOutTokenIn, amountOutTokenOut
-
 }
 
 func (t *LimitOrderTranche) Swap(maxAmountTaker sdk.Int) (

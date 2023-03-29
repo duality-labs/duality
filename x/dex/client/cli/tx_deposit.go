@@ -15,7 +15,6 @@ import (
 )
 
 func CmdDeposit() *cobra.Command {
-
 	cmd := &cobra.Command{
 		Use:     "deposit [receiver] [token-a] [token-b] [list of amount-0] [list of amount-1] [list of tick-index] [list of fees] [deposit option parameters]",
 		Short:   "Broadcast message deposit",

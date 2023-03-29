@@ -35,7 +35,7 @@ func (k Keeper) LimitOrderTrancheAll(c context.Context, req *types.QueryAllLimit
 			return false, err
 		}
 		tranche := tick.GetLimitOrderTranche()
-		//Check if this is a LimitOrderTranche and not PoolReserves
+		// Check if this is a LimitOrderTranche and not PoolReserves
 		if tranche != nil {
 			if accum {
 				LimitOrderTranches = append(LimitOrderTranches, *tranche)
@@ -45,7 +45,6 @@ func (k Keeper) LimitOrderTrancheAll(c context.Context, req *types.QueryAllLimit
 			return false, nil
 		}
 	})
-
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

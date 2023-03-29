@@ -33,11 +33,9 @@ func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tok
 			Reserves:  sdk.ZeroInt(),
 		}, nil
 	}
-
 }
 
 func NewLimitOrderExpiration(tranche types.LimitOrderTranche) types.LimitOrderExpiration {
-
 	trancheExpiry := tranche.ExpirationTime
 	if trancheExpiry == nil {
 		panic("Cannot create LimitOrderExpiration from tranche with nil ExpirationTime")
@@ -66,7 +64,6 @@ func NewLimitOrderTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenIn stri
 		TotalTokenOut:    sdk.ZeroInt(),
 		ExpirationTime:   goodTil,
 	}, nil
-
 }
 
 func (k Keeper) GetOrInitLimitOrderTrancheUser(
@@ -102,7 +99,6 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 ///////////////////////////////////////////////////////////////////////////////
 
 func (k Keeper) GetCurrTick1To0(ctx sdk.Context, pairId *types.PairId) (tickIdx int64, found bool) {
-
 	ti := k.NewTickIterator(ctx, pairId, pairId.Token0)
 
 	defer ti.Close()
@@ -113,7 +109,6 @@ func (k Keeper) GetCurrTick1To0(ctx sdk.Context, pairId *types.PairId) (tickIdx 
 		}
 	}
 	return math.MinInt64, false
-
 }
 
 func (k Keeper) GetCurrTick0To1(ctx sdk.Context, pairId *types.PairId) (tickIdx int64, found bool) {

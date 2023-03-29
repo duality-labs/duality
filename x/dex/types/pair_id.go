@@ -21,7 +21,6 @@ func (p *PairId) OppositeToken(token string) (oppToken string, ok bool) {
 }
 
 func (p *PairId) MustOppositeToken(token string) string {
-
 	if oppToken, ok := p.OppositeToken(token); ok {
 		return oppToken
 	} else {

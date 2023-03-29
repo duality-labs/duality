@@ -65,6 +65,7 @@ func TestLimitOrderExpirationGet(t *testing.T) {
 		)
 	}
 }
+
 func TestLimitOrderExpirationRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNLimitOrderExpiration(keeper, ctx, 10)
@@ -166,7 +167,6 @@ func TestPurgeExpiredLimitOrdersAtBlockGasLimit(t *testing.T) {
 	// for deleting expirations. If this cost changes the number of remaining
 	// expirations may change
 	require.Equal(t, 1, len(expList))
-
 }
 
 func TestPurgeExpiredLimitOrdersAtBlockGasLimitOnlyJIT(t *testing.T) {
@@ -198,5 +198,4 @@ func TestPurgeExpiredLimitOrdersAtBlockGasLimitOnlyJIT(t *testing.T) {
 	// All JIT expirations are purged
 	expList := keeper.GetAllLimitOrderExpiration(ctx)
 	require.Equal(t, 0, len(expList))
-
 }

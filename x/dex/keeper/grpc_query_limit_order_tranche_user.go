@@ -31,7 +31,6 @@ func (k Keeper) LimitOrderTrancheUserAll(c context.Context, req *types.QueryAllL
 		LimitOrderTrancheUsers = append(LimitOrderTrancheUsers, LimitOrderTrancheUser)
 		return nil
 	})
-
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

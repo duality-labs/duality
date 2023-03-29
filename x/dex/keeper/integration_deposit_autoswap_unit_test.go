@@ -29,7 +29,7 @@ func (s *MsgServerTestSuite) TestAutoswapperWithdraws() {
 
 	// Calculated expected amounts out
 	autoswapSharesMinted := s.calcAutoswapSharesMinted(int64(tickIndex), uint64(fee), 7, 0, 5, 5, bobSharesMinted.Int64(), bobSharesMinted.Int64())
-	//totalShares := autoswapSharesMinted.Add(sdk.NewInt(20))
+	// totalShares := autoswapSharesMinted.Add(sdk.NewInt(20))
 
 	aliceExpectedBalance0, aliceExpectedBalance1, dexExpectedBalance0, dexExpectedBalance1 := s.calcExpectedBalancesAfterWithdrawOnePool(autoswapSharesMinted, s.alice, int64(tickIndex), uint64(fee))
 
@@ -69,7 +69,6 @@ func (s *MsgServerTestSuite) TestAutoswapOtherDepositorWithdraws() {
 
 	s.assertBobBalances(bobExpectedBalance0.Int64(), bobExpectedBalance1.Int64())
 	s.assertDexBalances(dexExpectedBalance0.Int64(), dexExpectedBalance1.Int64())
-
 }
 
 func (s *MsgServerTestSuite) TestAutoswapBothWithdraws() {
@@ -96,7 +95,7 @@ func (s *MsgServerTestSuite) TestAutoswapBothWithdraws() {
 
 	// Calculated expected amounts out
 	autoswapSharesMinted := s.calcAutoswapSharesMinted(int64(tickIndex), uint64(fee), 5, 0, 5, 5, bobSharesMinted.Int64(), bobSharesMinted.Int64())
-	//totalShares := autoswapSharesMinted.Add(sdk.NewInt(20))
+	// totalShares := autoswapSharesMinted.Add(sdk.NewInt(20))
 
 	bobExpectedBalance0, bobExpectedBalance1, dexExpectedBalance0, dexExpectedBalance1 := s.calcExpectedBalancesAfterWithdrawOnePool(bobSharesMinted, s.bob, int64(tickIndex), uint64(fee))
 

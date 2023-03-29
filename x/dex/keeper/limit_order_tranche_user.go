@@ -44,7 +44,6 @@ func (k Keeper) RemoveLimitOrderTrancheUserByKey(
 	token string,
 	trancheKey string,
 	address string,
-
 ) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderTrancheUserKeyPrefix))
 	store.Delete(types.LimitOrderTrancheUserKey(
@@ -89,7 +88,6 @@ func (k Keeper) GetAllLimitOrderTrancheUser(ctx sdk.Context) (list []types.Limit
 }
 
 func (k Keeper) GetAllLimitOrderTrancheUserForAddress(ctx sdk.Context, address sdk.AccAddress) (list []types.LimitOrderTrancheUser) {
-
 	addressPrefix := types.LimitOrderTrancheUserAddressPrefix(address.String())
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), addressPrefix)
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})

@@ -44,6 +44,7 @@ func TestGetPoolReserves(t *testing.T) {
 		)
 	}
 }
+
 func TestRemovePoolReserves(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNPoolReserves(keeper, ctx, 10)

@@ -20,7 +20,6 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 var _ types.MsgServer = msgServer{}
 
 func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.MsgDepositResponse, error) {
-
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
@@ -46,7 +45,6 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 		msg.Fees,
 		msg.Options,
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +90,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		return nil, err
 	}
 
-	//TODO: Inconsistent that this is the only response that returns coins instead of ints
+	// TODO: Inconsistent that this is the only response that returns coins instead of ints
 	return &types.MsgSwapResponse{CoinOut: coinOut}, nil
 }
 

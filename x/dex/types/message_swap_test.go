@@ -25,7 +25,8 @@ func TestMsgSwap_ValidateBasic(t *testing.T) {
 				AmountIn: sdk.OneInt(),
 			},
 			err: sdkerrors.ErrInvalidAddress,
-		}, {
+		},
+		{
 			name: "invalid receiver",
 			msg: MsgSwap{
 				Creator:  sample.AccAddress(),

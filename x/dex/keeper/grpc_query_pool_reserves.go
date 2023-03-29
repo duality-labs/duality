@@ -33,7 +33,7 @@ func (k Keeper) PoolReservesAll(goCtx context.Context, req *types.QueryAllPoolRe
 			return false, err
 		}
 		reserves := tick.GetPoolReserves()
-		//Check if this is a LimitOrderTranche and not PoolReserves
+		// Check if this is a LimitOrderTranche and not PoolReserves
 		if reserves != nil {
 			if accum {
 				poolReserves = append(poolReserves, *reserves)
@@ -43,7 +43,6 @@ func (k Keeper) PoolReservesAll(goCtx context.Context, req *types.QueryAllPoolRe
 			return false, nil
 		}
 	})
-
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

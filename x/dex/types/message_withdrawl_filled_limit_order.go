@@ -11,7 +11,7 @@ var _ sdk.Msg = &MsgWithdrawFilledLimitOrder{}
 
 func NewMsgWithdrawFilledLimitOrder(creator string, trancheKey string) *MsgWithdrawFilledLimitOrder {
 	return &MsgWithdrawFilledLimitOrder{
-		Creator: creator,
+		Creator:    creator,
 		TrancheKey: trancheKey,
 	}
 }

@@ -235,7 +235,7 @@ func modifyConsumerGenesisCLITestSetup(val network.Validator) error {
 	json.Unmarshal(bankData, &bankGenesisState)
 
 	bankGenesisState.Balances = []banktypes.Balance{
-		banktypes.Balance{
+		{
 			Address: val.Address.String(),
 			Coins:   sdk.Coins{sdk.Coin{"TokenA", sdk.NewInt(100000000)}, sdk.Coin{"TokenB", sdk.NewInt(100000000)}, sdk.Coin{sdk.DefaultBondDenom, sdk.NewInt(10000)}},
 		},

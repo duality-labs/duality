@@ -23,7 +23,6 @@ func (k Keeper) GetLimitOrderExpiration(
 	ctx sdk.Context,
 	goodTilDate time.Time,
 	trancheRef []byte,
-
 ) (val types.LimitOrderExpiration, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderExpirationKeyPrefix))
 
@@ -44,7 +43,6 @@ func (k Keeper) RemoveLimitOrderExpiration(
 	ctx sdk.Context,
 	goodTilDate time.Time,
 	trancheRef []byte,
-
 ) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderExpirationKeyPrefix))
 	store.Delete(types.LimitOrderExpirationKey(
@@ -75,7 +73,6 @@ func (k Keeper) GetAllLimitOrderExpiration(ctx sdk.Context) (list []types.LimitO
 }
 
 func (k Keeper) PurgeExpiredLimitOrders(ctx sdk.Context, curTime time.Time) {
-
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderExpirationKeyPrefix))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 	inGoodTilSegment := false

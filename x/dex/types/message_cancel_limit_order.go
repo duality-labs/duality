@@ -11,7 +11,7 @@ var _ sdk.Msg = &MsgCancelLimitOrder{}
 
 func NewMsgCancelLimitOrder(creator string, trancheKey string) *MsgCancelLimitOrder {
 	return &MsgCancelLimitOrder{
-		Creator: creator,
+		Creator:    creator,
 		TrancheKey: trancheKey,
 	}
 }

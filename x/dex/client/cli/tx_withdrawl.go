@@ -14,7 +14,6 @@ import (
 )
 
 func CmdWithdrawl() *cobra.Command {
-
 	cmd := &cobra.Command{
 		Use:     "withdrawl [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fees] ",
 		Short:   "Broadcast message withdrawl",

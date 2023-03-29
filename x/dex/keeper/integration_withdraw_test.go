@@ -107,7 +107,7 @@ func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterDoubleSidedThenSingleSid
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(3)
 
-	//DEBUG
+	// DEBUG
 	s.aliceWithdraws(NewWithdrawl(10, 0, 3))
 
 	s.assertAliceBalances(35, 45)

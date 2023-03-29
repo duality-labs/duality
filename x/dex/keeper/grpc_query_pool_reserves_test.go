@@ -78,7 +78,7 @@ func TestPoolReservesQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
 	msgs := createNPoolReserves(keeper, ctx, 2)
-	//Add more data to make sure only LO tranches are returned
+	// Add more data to make sure only LO tranches are returned
 	createNLimitOrderTranches(keeper, ctx, 2)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllPoolReservesRequest {

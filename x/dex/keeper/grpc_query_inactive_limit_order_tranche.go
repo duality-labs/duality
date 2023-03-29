@@ -31,7 +31,6 @@ func (k Keeper) InactiveLimitOrderTrancheAll(c context.Context, req *types.Query
 		inactiveLimitOrderTranches = append(inactiveLimitOrderTranches, inactiveLimitOrderTranche)
 		return nil
 	})
-
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

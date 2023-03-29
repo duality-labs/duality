@@ -7,7 +7,7 @@ import (
 )
 
 func (k Keeper) SetPoolReserves(ctx sdk.Context, pool types.PoolReserves) {
-	//Wrap pool back into TickLiquidity
+	// Wrap pool back into TickLiquidity
 	tick := types.TickLiquidity{
 		Liquidity: &types.TickLiquidity_PoolReserves{
 			PoolReserves: &pool,
@@ -31,7 +31,6 @@ func (k Keeper) GetPoolReserves(
 	tokenIn string,
 	tickIndex int64,
 	fee uint64,
-
 ) (pool *types.PoolReserves, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickLiquidityKeyPrefix))
 	b := store.Get(types.TickLiquidityKey(

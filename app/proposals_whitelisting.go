@@ -9,7 +9,6 @@ import (
 )
 
 func IsProposalWhitelisted(content govtypes.Content) bool {
-
 	switch c := content.(type) {
 	case *proposal.ParameterChangeProposal:
 		return isParamChangeWhitelisted(c.Changes)
@@ -20,7 +19,6 @@ func IsProposalWhitelisted(content govtypes.Content) bool {
 	default:
 		return false
 	}
-
 }
 
 func isParamChangeWhitelisted(paramChanges []proposal.ParamChange) bool {
@@ -38,9 +36,9 @@ type paramChangeKey struct {
 }
 
 var WhitelistedParams = map[paramChangeKey]struct{}{
-	//bank
+	// bank
 	{Subspace: banktypes.ModuleName, Key: "SendEnabled"}: {},
-	//ibc transfer
+	// ibc transfer
 	{Subspace: ibctransfertypes.ModuleName, Key: "SendEnabled"}:    {},
 	{Subspace: ibctransfertypes.ModuleName, Key: "ReceiveEnabled"}: {},
 }

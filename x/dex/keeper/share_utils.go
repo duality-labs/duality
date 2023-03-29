@@ -35,7 +35,6 @@ func ParseDepositShares(shares sdk.Coin) (matches []string, valid bool) {
 	matchArr := LPSharesRegexp.FindAllStringSubmatch(shares.Denom, -1)
 	if matchArr == nil {
 		return nil, false
-
 	}
 	return matchArr[0][1:5], true
 }

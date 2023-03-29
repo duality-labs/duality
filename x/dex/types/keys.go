@@ -115,7 +115,6 @@ func LimitOrderTrancheUserKey(address string, trancheKey string) []byte {
 }
 
 func LimitOrderTrancheUserAddressPrefix(address string) []byte {
-
 	key := KeyPrefix(LimitOrderTrancheUserKeyPrefix)
 	addressBytes := []byte(address)
 	key = append(key, addressBytes...)
@@ -193,6 +192,7 @@ func TimeBytes(timestamp time.Time) []byte {
 	str := utils.Uint64ToSortableString(unixMs)
 	return []byte(str)
 }
+
 func TickLiquidityKey(
 	pairId *PairId,
 	tokenIn string,
@@ -342,12 +342,12 @@ const (
 )
 
 const (
-	WithdrawFilledLimitOrderEventKey           = "NewWithdraw"
-	WithdrawFilledLimitOrderEventCreator       = "Creator"
-	WithdrawFilledLimitOrderEventTokenIn       = "TokenIn"
-	WithdrawFilledLimitOrderEventTokenOut      = "TokenOut"
+	WithdrawFilledLimitOrderEventKey        = "NewWithdraw"
+	WithdrawFilledLimitOrderEventCreator    = "Creator"
+	WithdrawFilledLimitOrderEventTokenIn    = "TokenIn"
+	WithdrawFilledLimitOrderEventTokenOut   = "TokenOut"
 	WithdrawFilledLimitOrderEventTrancheKey = "TrancheKey"
-	WithdrawFilledLimitOrderEventAmountOut     = "AmountOut"
+	WithdrawFilledLimitOrderEventAmountOut  = "AmountOut"
 )
 
 const (
@@ -356,12 +356,12 @@ const (
 )
 
 const (
-	CancelLimitOrderEventKey           = "NewWithdraw"
-	CancelLimitOrderEventCreator       = "Creator"
-	CancelLimitOrderEventTokenIn       = "TokenIn"
-	CancelLimitOrderEventTokenOut      = "TokenOut"
+	CancelLimitOrderEventKey        = "NewWithdraw"
+	CancelLimitOrderEventCreator    = "Creator"
+	CancelLimitOrderEventTokenIn    = "TokenIn"
+	CancelLimitOrderEventTokenOut   = "TokenOut"
 	CancelLimitOrderEventTrancheKey = "TrancheKey"
-	CancelLimitOrderEventAmountOut     = "AmountOut"
+	CancelLimitOrderEventAmountOut  = "AmountOut"
 )
 
 const (
@@ -370,9 +370,7 @@ const (
 	LiquidityTypeLimitOrder   = "B_LODeposit"
 )
 
-var (
-	JITGoodTilTime = time.Time{}
-)
+var JITGoodTilTime = time.Time{}
 
 const (
 	// NOTE: This number is based current cost of all operations in EndBlock,

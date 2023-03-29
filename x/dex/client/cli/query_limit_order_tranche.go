@@ -72,7 +72,6 @@ func CmdShowLimitOrderTranche() *cobra.Command {
 			argTrancheKey := args[3]
 
 			argTickIndexInt, err := strconv.ParseInt(argTickIndex, 10, 0)
-
 			if err != nil {
 				return err
 			}

@@ -24,12 +24,10 @@ func CmdShowUserPositions() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryGetUserPositionsRequest{
-
 				Address: reqAddress,
 			}
 
 			res, err := queryClient.GetUserPositions(cmd.Context(), params)
-
 			if err != nil {
 				return err
 			}

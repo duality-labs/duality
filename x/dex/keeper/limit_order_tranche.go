@@ -17,7 +17,6 @@ func (k Keeper) FindLimitOrderTranche(
 	token string,
 	trancheKey string,
 ) (val types.LimitOrderTranche, fromFilled bool, found bool) {
-
 	// Try to find the tranche in the active liq index
 	tick, found := k.GetLimitOrderTranche(ctx, pairId, token, tickIndex, trancheKey)
 	if found {
@@ -38,11 +37,10 @@ func (k Keeper) SaveTranche(sdkCtx sdk.Context, tranche types.LimitOrderTranche)
 		k.SetInactiveLimitOrderTranche(sdkCtx, tranche)
 		k.RemoveLimitOrderTranche(sdkCtx, tranche)
 	}
-
 }
 
 func (k Keeper) SetLimitOrderTranche(ctx sdk.Context, tranche types.LimitOrderTranche) {
-	//Wrap tranche back into TickLiquidity
+	// Wrap tranche back into TickLiquidity
 	tick := types.TickLiquidity{
 		Liquidity: &types.TickLiquidity_LimitOrderTranche{
 			LimitOrderTranche: &tranche,
@@ -65,7 +63,6 @@ func (k Keeper) GetLimitOrderTranche(
 	tokenIn string,
 	tickIndex int64,
 	trancheKey string,
-
 ) (tranche *types.LimitOrderTranche, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickLiquidityKeyPrefix))
 	b := store.Get(types.TickLiquidityKey(
@@ -88,7 +85,6 @@ func (k Keeper) GetLimitOrderTranche(
 func (k Keeper) GetLimitOrderTrancheByKey(
 	ctx sdk.Context,
 	key []byte,
-
 ) (tranche *types.LimitOrderTranche, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickLiquidityKeyPrefix))
 	b := store.Get(key)
@@ -124,7 +120,6 @@ func (k Keeper) GetPlaceTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenI
 		tranche := tick.GetLimitOrderTranche()
 		if tranche.IsPlaceTranche() {
 			return *tranche, true
-
 		}
 	}
 	return types.LimitOrderTranche{}, false
@@ -161,7 +156,6 @@ func (k Keeper) GetAllLimitOrderTrancheAtIndex(sdkCtx sdk.Context, pairId *types
 }
 
 func NewTrancheKey(sdkCtx sdk.Context) string {
-
 	blockHeight := sdkCtx.BlockHeight()
 	txGas := sdkCtx.GasMeter().GasConsumed()
 	blockGas := sdkCtx.BlockGasMeter().GasConsumed()
@@ -171,7 +165,6 @@ func NewTrancheKey(sdkCtx sdk.Context) string {
 	gasStr := utils.Uint64ToSortableString(totalGas)
 
 	return fmt.Sprintf("%s%s", blockStr, gasStr)
-
 }
 
 func (k Keeper) GetOrInitPlaceTranche(ctx sdk.Context,
@@ -179,7 +172,8 @@ func (k Keeper) GetOrInitPlaceTranche(ctx sdk.Context,
 	tokenIn string,
 	tickIndex int64,
 	goodTil *time.Time,
-	orderType types.LimitOrderType) (placeTranche types.LimitOrderTranche, err error) {
+	orderType types.LimitOrderType,
+) (placeTranche types.LimitOrderTranche, err error) {
 	// NOTE: Right now we are not indexing by goodTil date so we can't easily check if there's already a tranche with the same goodTil date so instead we create a new tranche for each goodTil order
 	// if there is a large number of limitOrders with the same goodTilTime (most likely JIT) aggregating might be more efficient particularly for deletion, but if they are relatively sparse it will incur fewer lookups to just create a new limitOrderTranche
 	// also trying to cancel aggregated good_til orders will be a PITA

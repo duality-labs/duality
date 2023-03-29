@@ -29,7 +29,6 @@ func CmdListPoolReserves() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryAllPoolReservesRequest{
-
 				PairId:  reqPairId,
 				TokenIn: reqTokenIn,
 			}
@@ -75,13 +74,11 @@ func CmdShowPoolReserves() *cobra.Command {
 			argFee := args[3]
 
 			argTrancheKeyInt, err := strconv.ParseUint(argFee, 10, 0)
-
 			if err != nil {
 				return err
 			}
 
 			argTickIndexInt, err := strconv.ParseInt(argTickIndex, 10, 0)
-
 			if err != nil {
 				return err
 			}

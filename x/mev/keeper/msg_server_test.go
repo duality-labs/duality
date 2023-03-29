@@ -218,7 +218,6 @@ func (s *MsgServerTestSuite) assertMEVDummyBalancesInt(a sdk.Int, b sdk.Int) {
 }
 
 func (s *MsgServerTestSuite) msgSend(account sdk.AccAddress, amountIn int, tokenIn string) {
-
 	amountInInt := sdk.NewInt(int64(amountIn))
 	_, err := s.msgServer.Send(s.goCtx, &types.MsgSend{
 		Creator:  account.String(),
@@ -253,6 +252,6 @@ func (s *MsgServerTestSuite) TestValidTransaction() {
 	//},
 	//}
 
-	//err := s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, types.ModuleName, s.alice, amt)
+	// err := s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, types.ModuleName, s.alice, amt)
 
 }
