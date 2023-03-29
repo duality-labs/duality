@@ -18,7 +18,7 @@ func CreateNTickLiquidity(keeper *keeper.Keeper, ctx sdk.Context, n int) []types
 		tick := types.TickLiquidity{
 			Liquidity: &types.TickLiquidity_LimitOrderTranche{
 				LimitOrderTranche: &types.LimitOrderTranche{
-					PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+					PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 					TokenIn:          "TokenA",
 					TickIndex:        int64(i),
 					TrancheKey:       strconv.Itoa(i),

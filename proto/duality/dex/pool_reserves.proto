@@ -6,7 +6,7 @@ import "gogoproto/gogo.proto";
 import "duality/dex/pair_id.proto";
 
 message PoolReserves {
-  PairId pairId = 1;
+  PairID pairID = 1;
   string tokenIn = 2;
   int64 tickIndex = 3;
   string reserves = 4 [

@@ -14,10 +14,10 @@ type TickIterator struct {
 
 func (k Keeper) NewTickIterator(
 	ctx sdk.Context,
-	pairId *types.PairId,
+	pairID *types.PairID,
 	tokenIn string,
 ) TickIterator {
-	prefixStore := prefix.NewStore(ctx.KVStore(k.storeKey), types.TickLiquidityPrefix(pairId, tokenIn))
+	prefixStore := prefix.NewStore(ctx.KVStore(k.storeKey), types.TickLiquidityPrefix(pairID, tokenIn))
 
 	return TickIterator{
 		iter: prefixStore.Iterator(nil, nil),

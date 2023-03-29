@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// Returns all ACTIVE limit order tranches for a given pairId/tokenIn combination
+// Returns all ACTIVE limit order tranches for a given pairID/tokenIn combination
 // Does NOT return inactiveLimitOrderTranches
 func (k Keeper) LimitOrderTrancheAll(c context.Context, req *types.QueryAllLimitOrderTrancheRequest) (*types.QueryAllLimitOrderTrancheResponse, error) {
 	if req == nil {
@@ -21,12 +21,12 @@ func (k Keeper) LimitOrderTrancheAll(c context.Context, req *types.QueryAllLimit
 	var LimitOrderTranches []types.LimitOrderTranche
 	ctx := sdk.UnwrapSDKContext(c)
 
-	pairId, err := StringToPairId(req.PairId)
+	pairID, err := StringToPairID(req.PairID)
 	if err != nil {
 		return nil, err
 	}
 	store := ctx.KVStore(k.storeKey)
-	LimitOrderTrancheStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairId, req.TokenIn))
+	LimitOrderTrancheStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairID, req.TokenIn))
 
 	pageRes, err := query.FilteredPaginate(LimitOrderTrancheStore, req.Pagination, func(key, value []byte, accum bool) (hit bool, err error) {
 		var tick types.TickLiquidity
@@ -58,11 +58,11 @@ func (k Keeper) LimitOrderTranche(c context.Context, req *types.QueryGetLimitOrd
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(c)
-	pairId, err := StringToPairId(req.PairId)
+	pairID, err := StringToPairID(req.PairID)
 	if err != nil {
 		return nil, err
 	}
-	val, _, found := k.FindLimitOrderTranche(ctx, pairId, req.TickIndex, req.TokenIn, req.TrancheKey)
+	val, _, found := k.FindLimitOrderTranche(ctx, pairID, req.TickIndex, req.TokenIn, req.TrancheKey)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")
 	}

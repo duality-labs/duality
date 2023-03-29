@@ -33,13 +33,13 @@ func (t LimitOrderTranche) HasTokenOut() bool {
 }
 
 func (t LimitOrderTranche) IsTokenInToken0() bool {
-	return t.TokenIn == t.PairId.Token0
+	return t.TokenIn == t.PairID.Token0
 }
 
 func (t *LimitOrderTranche) Ref() []byte {
 	// returns the KVstore key for a tranche
 	return TickLiquidityKey(
-		t.PairId,
+		t.PairID,
 		t.TokenIn,
 		t.TickIndex,
 		LiquidityTypeLimitOrder,

@@ -18,12 +18,12 @@ func (k Keeper) PoolReservesAll(goCtx context.Context, req *types.QueryAllPoolRe
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	pairId, err := StringToPairId(req.PairId)
+	pairID, err := StringToPairID(req.PairID)
 	if err != nil {
 		return nil, err
 	}
 	store := ctx.KVStore(k.storeKey)
-	PoolReservesStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairId, req.TokenIn))
+	PoolReservesStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairID, req.TokenIn))
 
 	var poolReserves []types.PoolReserves
 	pageRes, err := query.FilteredPaginate(PoolReservesStore, req.Pagination, func(key, value []byte, accum bool) (hit bool, err error) {
@@ -55,11 +55,11 @@ func (k Keeper) PoolReserves(goCtx context.Context, req *types.QueryGetPoolReser
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	pairId, err := StringToPairId(req.PairId)
+	pairID, err := StringToPairID(req.PairID)
 	if err != nil {
 		return nil, err
 	}
-	val, found := k.GetPoolReserves(ctx, pairId, req.TokenIn, req.TickIndex, req.Fee)
+	val, found := k.GetPoolReserves(ctx, pairID, req.TokenIn, req.TickIndex, req.Fee)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")
 	}

@@ -43,13 +43,13 @@ func (k Keeper) InactiveLimitOrderTranche(c context.Context, req *types.QueryGet
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(c)
-	pairId, err := StringToPairId(req.PairId)
+	pairID, err := StringToPairID(req.PairID)
 	if err != nil {
 		return nil, err
 	}
 	val, found := k.GetInactiveLimitOrderTranche(
 		ctx,
-		pairId,
+		pairID,
 		req.TokenIn,
 		req.TickIndex,
 		req.TrancheKey,

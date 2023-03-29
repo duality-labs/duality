@@ -11,14 +11,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var defaultPairId *types.PairId = &types.PairId{Token0: "TokenA", Token1: "TokenB"}
+var defaultPairID *types.PairID = &types.PairID{Token0: "TokenA", Token1: "TokenB"}
 
 func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
 		LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
 			{
-				PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				PairID:          &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 				Token:           "TokenB",
 				TickIndex:       1,
 				TrancheKey:      "0",
@@ -28,7 +28,7 @@ func TestGenesis(t *testing.T) {
 				SharesCancelled: sdk.NewInt(0),
 			},
 			{
-				PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				PairID:          &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 				Token:           "TokenA",
 				TickIndex:       20,
 				TrancheKey:      "0",
@@ -42,7 +42,7 @@ func TestGenesis(t *testing.T) {
 			{
 				Liquidity: &types.TickLiquidity_LimitOrderTranche{
 					LimitOrderTranche: &types.LimitOrderTranche{
-						PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 						TokenIn:          "0",
 						TickIndex:        0,
 						TrancheKey:       "0",
@@ -56,7 +56,7 @@ func TestGenesis(t *testing.T) {
 			{
 				Liquidity: &types.TickLiquidity_LimitOrderTranche{
 					LimitOrderTranche: &types.LimitOrderTranche{
-						PairId:     &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						PairID:     &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 						TokenIn:    "0",
 						TickIndex:  0,
 						TrancheKey: "0",
@@ -66,13 +66,13 @@ func TestGenesis(t *testing.T) {
 		},
 		InactiveLimitOrderTrancheList: []types.LimitOrderTranche{
 			{
-				PairId:     &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				PairID:     &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 				TokenIn:    "0",
 				TickIndex:  0,
 				TrancheKey: "0",
 			},
 			{
-				PairId:     &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				PairID:     &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 				TokenIn:    "1",
 				TickIndex:  1,
 				TrancheKey: "1",

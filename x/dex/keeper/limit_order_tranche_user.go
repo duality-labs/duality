@@ -39,7 +39,7 @@ func (k Keeper) GetLimitOrderTrancheUser(
 // RemoveLimitOrderTrancheUserByKey removes a LimitOrderTrancheUser from the store
 func (k Keeper) RemoveLimitOrderTrancheUserByKey(
 	ctx sdk.Context,
-	pairId *types.PairId,
+	pairID *types.PairID,
 	tickIndex int64,
 	token string,
 	trancheKey string,
@@ -55,7 +55,7 @@ func (k Keeper) RemoveLimitOrderTrancheUserByKey(
 func (k Keeper) RemoveLimitOrderTrancheUser(ctx sdk.Context, trancheUser types.LimitOrderTrancheUser) {
 	k.RemoveLimitOrderTrancheUserByKey(
 		ctx,
-		trancheUser.PairId,
+		trancheUser.PairID,
 		trancheUser.TickIndex,
 		trancheUser.Token,
 		trancheUser.TrancheKey,

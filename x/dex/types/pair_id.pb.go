@@ -22,23 +22,23 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type PairId struct {
+type PairID struct {
 	Token0 string `protobuf:"bytes,1,opt,name=token0,proto3" json:"token0,omitempty"`
 	Token1 string `protobuf:"bytes,2,opt,name=token1,proto3" json:"token1,omitempty"`
 }
 
-func (m *PairId) Reset()         { *m = PairId{} }
-func (m *PairId) String() string { return proto.CompactTextString(m) }
-func (*PairId) ProtoMessage()    {}
-func (*PairId) Descriptor() ([]byte, []int) {
+func (m *PairID) Reset()         { *m = PairID{} }
+func (m *PairID) String() string { return proto.CompactTextString(m) }
+func (*PairID) ProtoMessage()    {}
+func (*PairID) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1919813da3dc14c8, []int{0}
 }
-func (m *PairId) XXX_Unmarshal(b []byte) error {
+func (m *PairID) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *PairId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *PairID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_PairId.Marshal(b, m, deterministic)
+		return xxx_messageInfo_PairID.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -48,26 +48,26 @@ func (m *PairId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *PairId) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PairId.Merge(m, src)
+func (m *PairID) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PairID.Merge(m, src)
 }
-func (m *PairId) XXX_Size() int {
+func (m *PairID) XXX_Size() int {
 	return m.Size()
 }
-func (m *PairId) XXX_DiscardUnknown() {
-	xxx_messageInfo_PairId.DiscardUnknown(m)
+func (m *PairID) XXX_DiscardUnknown() {
+	xxx_messageInfo_PairID.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_PairId proto.InternalMessageInfo
+var xxx_messageInfo_PairID proto.InternalMessageInfo
 
-func (m *PairId) GetToken0() string {
+func (m *PairID) GetToken0() string {
 	if m != nil {
 		return m.Token0
 	}
 	return ""
 }
 
-func (m *PairId) GetToken1() string {
+func (m *PairID) GetToken1() string {
 	if m != nil {
 		return m.Token1
 	}
@@ -75,7 +75,7 @@ func (m *PairId) GetToken1() string {
 }
 
 func init() {
-	proto.RegisterType((*PairId)(nil), "dualitylabs.duality.dex.PairId")
+	proto.RegisterType((*PairID)(nil), "dualitylabs.duality.dex.PairID")
 }
 
 func init() { proto.RegisterFile("duality/dex/pair_id.proto", fileDescriptor_1919813da3dc14c8) }
@@ -95,7 +95,7 @@ var fileDescriptor_1919813da3dc14c8 = []byte{
 	0xbd, 0x00, 0x00, 0x00,
 }
 
-func (m *PairId) Marshal() (dAtA []byte, err error) {
+func (m *PairID) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -105,12 +105,12 @@ func (m *PairId) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *PairId) MarshalTo(dAtA []byte) (int, error) {
+func (m *PairID) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *PairId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *PairID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -118,22 +118,22 @@ func (m *PairId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if len(m.Token1) > 0 {
 		i -= len(m.Token1)
 		copy(dAtA[i:], m.Token1)
-		i = encodeVarintPairId(dAtA, i, uint64(len(m.Token1)))
+		i = encodeVarintPairID(dAtA, i, uint64(len(m.Token1)))
 		i--
 		dAtA[i] = 0x12
 	}
 	if len(m.Token0) > 0 {
 		i -= len(m.Token0)
 		copy(dAtA[i:], m.Token0)
-		i = encodeVarintPairId(dAtA, i, uint64(len(m.Token0)))
+		i = encodeVarintPairID(dAtA, i, uint64(len(m.Token0)))
 		i--
 		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
 
-func encodeVarintPairId(dAtA []byte, offset int, v uint64) int {
-	offset -= sovPairId(v)
+func encodeVarintPairID(dAtA []byte, offset int, v uint64) int {
+	offset -= sovPairID(v)
 	base := offset
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
@@ -143,7 +143,7 @@ func encodeVarintPairId(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *PairId) Size() (n int) {
+func (m *PairID) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -151,22 +151,22 @@ func (m *PairId) Size() (n int) {
 	_ = l
 	l = len(m.Token0)
 	if l > 0 {
-		n += 1 + l + sovPairId(uint64(l))
+		n += 1 + l + sovPairID(uint64(l))
 	}
 	l = len(m.Token1)
 	if l > 0 {
-		n += 1 + l + sovPairId(uint64(l))
+		n += 1 + l + sovPairID(uint64(l))
 	}
 	return n
 }
 
-func sovPairId(x uint64) (n int) {
+func sovPairID(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
-func sozPairId(x uint64) (n int) {
-	return sovPairId(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+func sozPairID(x uint64) (n int) {
+	return sovPairID(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *PairId) Unmarshal(dAtA []byte) error {
+func (m *PairID) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -174,7 +174,7 @@ func (m *PairId) Unmarshal(dAtA []byte) error {
 		var wire uint64
 		for shift := uint(0); ; shift += 7 {
 			if shift >= 64 {
-				return ErrIntOverflowPairId
+				return ErrIntOverflowPairID
 			}
 			if iNdEx >= l {
 				return io.ErrUnexpectedEOF
@@ -189,10 +189,10 @@ func (m *PairId) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: PairId: wiretype end group for non-group")
+			return fmt.Errorf("proto: PairID: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: PairId: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: PairID: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -202,7 +202,7 @@ func (m *PairId) Unmarshal(dAtA []byte) error {
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return ErrIntOverflowPairId
+					return ErrIntOverflowPairID
 				}
 				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
@@ -216,11 +216,11 @@ func (m *PairId) Unmarshal(dAtA []byte) error {
 			}
 			intStringLen := int(stringLen)
 			if intStringLen < 0 {
-				return ErrInvalidLengthPairId
+				return ErrInvalidLengthPairID
 			}
 			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
-				return ErrInvalidLengthPairId
+				return ErrInvalidLengthPairID
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
@@ -234,7 +234,7 @@ func (m *PairId) Unmarshal(dAtA []byte) error {
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return ErrIntOverflowPairId
+					return ErrIntOverflowPairID
 				}
 				if iNdEx >= l {
 					return io.ErrUnexpectedEOF
@@ -248,11 +248,11 @@ func (m *PairId) Unmarshal(dAtA []byte) error {
 			}
 			intStringLen := int(stringLen)
 			if intStringLen < 0 {
-				return ErrInvalidLengthPairId
+				return ErrInvalidLengthPairID
 			}
 			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
-				return ErrInvalidLengthPairId
+				return ErrInvalidLengthPairID
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
@@ -261,12 +261,12 @@ func (m *PairId) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
-			skippy, err := skipPairId(dAtA[iNdEx:])
+			skippy, err := skipPairID(dAtA[iNdEx:])
 			if err != nil {
 				return err
 			}
 			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthPairId
+				return ErrInvalidLengthPairID
 			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
@@ -280,7 +280,7 @@ func (m *PairId) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func skipPairId(dAtA []byte) (n int, err error) {
+func skipPairID(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
 	depth := 0
@@ -288,7 +288,7 @@ func skipPairId(dAtA []byte) (n int, err error) {
 		var wire uint64
 		for shift := uint(0); ; shift += 7 {
 			if shift >= 64 {
-				return 0, ErrIntOverflowPairId
+				return 0, ErrIntOverflowPairID
 			}
 			if iNdEx >= l {
 				return 0, io.ErrUnexpectedEOF
@@ -305,7 +305,7 @@ func skipPairId(dAtA []byte) (n int, err error) {
 		case 0:
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return 0, ErrIntOverflowPairId
+					return 0, ErrIntOverflowPairID
 				}
 				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
@@ -321,7 +321,7 @@ func skipPairId(dAtA []byte) (n int, err error) {
 			var length int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
-					return 0, ErrIntOverflowPairId
+					return 0, ErrIntOverflowPairID
 				}
 				if iNdEx >= l {
 					return 0, io.ErrUnexpectedEOF
@@ -334,14 +334,14 @@ func skipPairId(dAtA []byte) (n int, err error) {
 				}
 			}
 			if length < 0 {
-				return 0, ErrInvalidLengthPairId
+				return 0, ErrInvalidLengthPairID
 			}
 			iNdEx += length
 		case 3:
 			depth++
 		case 4:
 			if depth == 0 {
-				return 0, ErrUnexpectedEndOfGroupPairId
+				return 0, ErrUnexpectedEndOfGroupPairID
 			}
 			depth--
 		case 5:
@@ -350,7 +350,7 @@ func skipPairId(dAtA []byte) (n int, err error) {
 			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
 		}
 		if iNdEx < 0 {
-			return 0, ErrInvalidLengthPairId
+			return 0, ErrInvalidLengthPairID
 		}
 		if depth == 0 {
 			return iNdEx, nil
@@ -360,7 +360,7 @@ func skipPairId(dAtA []byte) (n int, err error) {
 }
 
 var (
-	ErrInvalidLengthPairId        = fmt.Errorf("proto: negative length found during unmarshaling")
-	ErrIntOverflowPairId          = fmt.Errorf("proto: integer overflow")
-	ErrUnexpectedEndOfGroupPairId = fmt.Errorf("proto: unexpected end of group")
+	ErrInvalidLengthPairID        = fmt.Errorf("proto: negative length found during unmarshaling")
+	ErrIntOverflowPairID          = fmt.Errorf("proto: integer overflow")
+	ErrUnexpectedEndOfGroupPairID = fmt.Errorf("proto: unexpected end of group")
 )

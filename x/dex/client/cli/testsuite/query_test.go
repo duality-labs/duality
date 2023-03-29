@@ -32,7 +32,7 @@ var limitOrderTrancheList = []types.TickLiquidity{
 	{
 		Liquidity: &types.TickLiquidity_LimitOrderTranche{
 			LimitOrderTranche: &types.LimitOrderTranche{
-				PairId: &types.PairId{
+				PairID: &types.PairID{
 					Token0: "TokenA",
 					Token1: "TokenB",
 				},
@@ -49,7 +49,7 @@ var limitOrderTrancheList = []types.TickLiquidity{
 	{
 		Liquidity: &types.TickLiquidity_LimitOrderTranche{
 			LimitOrderTranche: &types.LimitOrderTranche{
-				PairId: &types.PairId{
+				PairID: &types.PairID{
 					Token0: "TokenA",
 					Token1: "TokenB",
 				},
@@ -67,7 +67,7 @@ var limitOrderTrancheList = []types.TickLiquidity{
 
 var inactiveLimitOrderTrancheList = []types.LimitOrderTranche{
 	{
-		PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+		PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 		TokenIn:          "TokenB",
 		TickIndex:        0,
 		TrancheKey:       "0",
@@ -77,7 +77,7 @@ var inactiveLimitOrderTrancheList = []types.LimitOrderTranche{
 		ReservesTokenIn:  sdk.NewInt(0),
 	},
 	{
-		PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+		PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 		TokenIn:          "TokenB",
 		TickIndex:        0,
 		TrancheKey:       "1",
@@ -92,7 +92,7 @@ var poolReservesList = []types.TickLiquidity{
 	{
 		Liquidity: &types.TickLiquidity_PoolReserves{
 			PoolReserves: &types.PoolReserves{
-				PairId: &types.PairId{
+				PairID: &types.PairID{
 					Token0: "TokenA",
 					Token1: "TokenB",
 				},
@@ -106,7 +106,7 @@ var poolReservesList = []types.TickLiquidity{
 	{
 		Liquidity: &types.TickLiquidity_PoolReserves{
 			PoolReserves: &types.PoolReserves{
-				PairId: &types.PairId{
+				PairID: &types.PairID{
 					Token0: "TokenA",
 					Token1: "TokenB",
 				},
@@ -121,7 +121,7 @@ var poolReservesList = []types.TickLiquidity{
 
 var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 	{
-		PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+		PairID:          &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 		Token:           "TokenA",
 		TickIndex:       1,
 		TrancheKey:      "0",
@@ -132,7 +132,7 @@ var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 		TakerReserves:   sdk.ZeroInt(),
 	},
 	{
-		PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+		PairID:          &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 		Token:           "TokenB",
 		TickIndex:       20,
 		TrancheKey:      "1",

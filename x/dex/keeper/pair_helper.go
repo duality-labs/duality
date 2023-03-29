@@ -29,19 +29,19 @@ func SortAmounts(tokenA, token0 string, amountsA, amountsB []sdk.Int) ([]sdk.Int
 	}
 }
 
-func CreatePairId(token0, token1 string) (pairId *types.PairId) {
-	return &types.PairId{
+func CreatePairID(token0, token1 string) (pairID *types.PairID) {
+	return &types.PairID{
 		Token0: token0,
 		Token1: token1,
 	}
 }
 
-func CreatePairIdFromUnsorted(tokenA, tokenB string) (*types.PairId, error) {
+func CreatePairIDFromUnsorted(tokenA, tokenB string) (*types.PairID, error) {
 	token0, token1, err := SortTokens(tokenA, tokenB)
 	if err != nil {
 		return nil, err
 	}
-	return CreatePairId(token0, token1), nil
+	return CreatePairID(token0, token1), nil
 }
 
 func GetInOutTokens(tokenIn_, tokenA, tokenB string) (tokenIn, tokenOut string) {
@@ -52,16 +52,16 @@ func GetInOutTokens(tokenIn_, tokenA, tokenB string) (tokenIn, tokenOut string) 
 	}
 }
 
-func StringToPairId(pairIdStr string) (*types.PairId, error) {
-	tokens := strings.Split(pairIdStr, "<>")
+func StringToPairID(pairIDStr string) (*types.PairID, error) {
+	tokens := strings.Split(pairIDStr, "<>")
 
 	if len(tokens) == 2 {
-		return &types.PairId{
+		return &types.PairID{
 			Token0: tokens[0],
 			Token1: tokens[1],
 		}, nil
 	} else {
-		return &types.PairId{}, sdkerrors.Wrapf(types.ErrInvalidPairIdStr, pairIdStr)
+		return &types.PairID{}, sdkerrors.Wrapf(types.ErrInvalidPairIDStr, pairIDStr)
 	}
 }
 

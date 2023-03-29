@@ -306,7 +306,7 @@ func (m *QueryAllLimitOrderTrancheUserResponse) GetPagination() *query.PageRespo
 }
 
 type QueryGetLimitOrderTrancheRequest struct {
-	PairId     string `protobuf:"bytes,1,opt,name=pairId,proto3" json:"pairId,omitempty"`
+	PairID     string `protobuf:"bytes,1,opt,name=pairID,proto3" json:"pairID,omitempty"`
 	TickIndex  int64  `protobuf:"varint,2,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
 	TokenIn    string `protobuf:"bytes,3,opt,name=tokenIn,proto3" json:"tokenIn,omitempty"`
 	TrancheKey string `protobuf:"bytes,4,opt,name=trancheKey,proto3" json:"trancheKey,omitempty"`
@@ -345,9 +345,9 @@ func (m *QueryGetLimitOrderTrancheRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryGetLimitOrderTrancheRequest proto.InternalMessageInfo
 
-func (m *QueryGetLimitOrderTrancheRequest) GetPairId() string {
+func (m *QueryGetLimitOrderTrancheRequest) GetPairID() string {
 	if m != nil {
-		return m.PairId
+		return m.PairID
 	}
 	return ""
 }
@@ -418,7 +418,7 @@ func (m *QueryGetLimitOrderTrancheResponse) GetLimitOrderTranche() LimitOrderTra
 }
 
 type QueryAllLimitOrderTrancheRequest struct {
-	PairId     string             `protobuf:"bytes,1,opt,name=pairId,proto3" json:"pairId,omitempty"`
+	PairID     string             `protobuf:"bytes,1,opt,name=pairID,proto3" json:"pairID,omitempty"`
 	TokenIn    string             `protobuf:"bytes,2,opt,name=tokenIn,proto3" json:"tokenIn,omitempty"`
 	Pagination *query.PageRequest `protobuf:"bytes,3,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
@@ -456,9 +456,9 @@ func (m *QueryAllLimitOrderTrancheRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryAllLimitOrderTrancheRequest proto.InternalMessageInfo
 
-func (m *QueryAllLimitOrderTrancheRequest) GetPairId() string {
+func (m *QueryAllLimitOrderTrancheRequest) GetPairID() string {
 	if m != nil {
-		return m.PairId
+		return m.PairID
 	}
 	return ""
 }
@@ -794,7 +794,7 @@ func (m *QueryAllUserLimitOrdersResponse) GetLimitOrders() []LimitOrderTrancheUs
 }
 
 type QueryAllTickLiquidityRequest struct {
-	PairId     string             `protobuf:"bytes,1,opt,name=pairId,proto3" json:"pairId,omitempty"`
+	PairID     string             `protobuf:"bytes,1,opt,name=pairID,proto3" json:"pairID,omitempty"`
 	TokenIn    string             `protobuf:"bytes,2,opt,name=tokenIn,proto3" json:"tokenIn,omitempty"`
 	Pagination *query.PageRequest `protobuf:"bytes,3,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
@@ -832,9 +832,9 @@ func (m *QueryAllTickLiquidityRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryAllTickLiquidityRequest proto.InternalMessageInfo
 
-func (m *QueryAllTickLiquidityRequest) GetPairId() string {
+func (m *QueryAllTickLiquidityRequest) GetPairID() string {
 	if m != nil {
-		return m.PairId
+		return m.PairID
 	}
 	return ""
 }
@@ -906,7 +906,7 @@ func (m *QueryAllTickLiquidityResponse) GetPagination() *query.PageResponse {
 }
 
 type QueryGetInactiveLimitOrderTrancheRequest struct {
-	PairId     string `protobuf:"bytes,1,opt,name=pairId,proto3" json:"pairId,omitempty"`
+	PairID     string `protobuf:"bytes,1,opt,name=pairID,proto3" json:"pairID,omitempty"`
 	TokenIn    string `protobuf:"bytes,2,opt,name=tokenIn,proto3" json:"tokenIn,omitempty"`
 	TickIndex  int64  `protobuf:"varint,3,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
 	TrancheKey string `protobuf:"bytes,4,opt,name=trancheKey,proto3" json:"trancheKey,omitempty"`
@@ -947,9 +947,9 @@ func (m *QueryGetInactiveLimitOrderTrancheRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryGetInactiveLimitOrderTrancheRequest proto.InternalMessageInfo
 
-func (m *QueryGetInactiveLimitOrderTrancheRequest) GetPairId() string {
+func (m *QueryGetInactiveLimitOrderTrancheRequest) GetPairID() string {
 	if m != nil {
-		return m.PairId
+		return m.PairID
 	}
 	return ""
 }
@@ -1126,7 +1126,7 @@ func (m *QueryAllInactiveLimitOrderTrancheResponse) GetPagination() *query.PageR
 }
 
 type QueryAllPoolReservesRequest struct {
-	PairId     string             `protobuf:"bytes,1,opt,name=pairId,proto3" json:"pairId,omitempty"`
+	PairID     string             `protobuf:"bytes,1,opt,name=pairID,proto3" json:"pairID,omitempty"`
 	TokenIn    string             `protobuf:"bytes,2,opt,name=tokenIn,proto3" json:"tokenIn,omitempty"`
 	Pagination *query.PageRequest `protobuf:"bytes,3,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
@@ -1164,9 +1164,9 @@ func (m *QueryAllPoolReservesRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryAllPoolReservesRequest proto.InternalMessageInfo
 
-func (m *QueryAllPoolReservesRequest) GetPairId() string {
+func (m *QueryAllPoolReservesRequest) GetPairID() string {
 	if m != nil {
-		return m.PairId
+		return m.PairID
 	}
 	return ""
 }
@@ -1238,7 +1238,7 @@ func (m *QueryAllPoolReservesResponse) GetPagination() *query.PageResponse {
 }
 
 type QueryGetPoolReservesRequest struct {
-	PairId    string `protobuf:"bytes,1,opt,name=pairId,proto3" json:"pairId,omitempty"`
+	PairID    string `protobuf:"bytes,1,opt,name=pairID,proto3" json:"pairID,omitempty"`
 	TokenIn   string `protobuf:"bytes,2,opt,name=tokenIn,proto3" json:"tokenIn,omitempty"`
 	TickIndex int64  `protobuf:"varint,3,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
 	Fee       uint64 `protobuf:"varint,4,opt,name=fee,proto3" json:"fee,omitempty"`
@@ -1277,9 +1277,9 @@ func (m *QueryGetPoolReservesRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryGetPoolReservesRequest proto.InternalMessageInfo
 
-func (m *QueryGetPoolReservesRequest) GetPairId() string {
+func (m *QueryGetPoolReservesRequest) GetPairID() string {
 	if m != nil {
-		return m.PairId
+		return m.PairID
 	}
 	return ""
 }
@@ -1488,7 +1488,7 @@ type QueryClient interface {
 	LimitOrderTrancheUserAll(ctx context.Context, in *QueryAllLimitOrderTrancheUserRequest, opts ...grpc.CallOption) (*QueryAllLimitOrderTrancheUserResponse, error)
 	// Queries a LimitOrderTranche by index.
 	LimitOrderTranche(ctx context.Context, in *QueryGetLimitOrderTrancheRequest, opts ...grpc.CallOption) (*QueryGetLimitOrderTrancheResponse, error)
-	// Queries a list of LimitOrderTranche items for a given pairId / TokenIn combination.
+	// Queries a list of LimitOrderTranche items for a given pairID / TokenIn combination.
 	LimitOrderTrancheAll(ctx context.Context, in *QueryAllLimitOrderTrancheRequest, opts ...grpc.CallOption) (*QueryAllLimitOrderTrancheResponse, error)
 	// Queries a list of GetUserPositions items.
 	GetUserPositions(ctx context.Context, in *QueryGetUserPositionsRequest, opts ...grpc.CallOption) (*QueryGetUserPositionsResponse, error)
@@ -1643,7 +1643,7 @@ type QueryServer interface {
 	LimitOrderTrancheUserAll(context.Context, *QueryAllLimitOrderTrancheUserRequest) (*QueryAllLimitOrderTrancheUserResponse, error)
 	// Queries a LimitOrderTranche by index.
 	LimitOrderTranche(context.Context, *QueryGetLimitOrderTrancheRequest) (*QueryGetLimitOrderTrancheResponse, error)
-	// Queries a list of LimitOrderTranche items for a given pairId / TokenIn combination.
+	// Queries a list of LimitOrderTranche items for a given pairID / TokenIn combination.
 	LimitOrderTrancheAll(context.Context, *QueryAllLimitOrderTrancheRequest) (*QueryAllLimitOrderTrancheResponse, error)
 	// Queries a list of GetUserPositions items.
 	GetUserPositions(context.Context, *QueryGetUserPositionsRequest) (*QueryGetUserPositionsResponse, error)
@@ -2255,10 +2255,10 @@ func (m *QueryGetLimitOrderTrancheRequest) MarshalToSizedBuffer(dAtA []byte) (in
 		i--
 		dAtA[i] = 0x10
 	}
-	if len(m.PairId) > 0 {
-		i -= len(m.PairId)
-		copy(dAtA[i:], m.PairId)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairId)))
+	if len(m.PairID) > 0 {
+		i -= len(m.PairID)
+		copy(dAtA[i:], m.PairID)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairID)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -2337,10 +2337,10 @@ func (m *QueryAllLimitOrderTrancheRequest) MarshalToSizedBuffer(dAtA []byte) (in
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.PairId) > 0 {
-		i -= len(m.PairId)
-		copy(dAtA[i:], m.PairId)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairId)))
+	if len(m.PairID) > 0 {
+		i -= len(m.PairID)
+		copy(dAtA[i:], m.PairID)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairID)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -2632,10 +2632,10 @@ func (m *QueryAllTickLiquidityRequest) MarshalToSizedBuffer(dAtA []byte) (int, e
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.PairId) > 0 {
-		i -= len(m.PairId)
-		copy(dAtA[i:], m.PairId)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairId)))
+	if len(m.PairID) > 0 {
+		i -= len(m.PairID)
+		copy(dAtA[i:], m.PairID)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairID)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -2730,10 +2730,10 @@ func (m *QueryGetInactiveLimitOrderTrancheRequest) MarshalToSizedBuffer(dAtA []b
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.PairId) > 0 {
-		i -= len(m.PairId)
-		copy(dAtA[i:], m.PairId)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairId)))
+	if len(m.PairID) > 0 {
+		i -= len(m.PairID)
+		copy(dAtA[i:], m.PairID)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairID)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -2896,10 +2896,10 @@ func (m *QueryAllPoolReservesRequest) MarshalToSizedBuffer(dAtA []byte) (int, er
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.PairId) > 0 {
-		i -= len(m.PairId)
-		copy(dAtA[i:], m.PairId)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairId)))
+	if len(m.PairID) > 0 {
+		i -= len(m.PairID)
+		copy(dAtA[i:], m.PairID)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairID)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -2992,10 +2992,10 @@ func (m *QueryGetPoolReservesRequest) MarshalToSizedBuffer(dAtA []byte) (int, er
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.PairId) > 0 {
-		i -= len(m.PairId)
-		copy(dAtA[i:], m.PairId)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairId)))
+	if len(m.PairID) > 0 {
+		i -= len(m.PairID)
+		copy(dAtA[i:], m.PairID)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.PairID)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -3132,7 +3132,7 @@ func (m *QueryGetLimitOrderTrancheRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.PairId)
+	l = len(m.PairID)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
@@ -3167,7 +3167,7 @@ func (m *QueryAllLimitOrderTrancheRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.PairId)
+	l = len(m.PairID)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
@@ -3287,7 +3287,7 @@ func (m *QueryAllTickLiquidityRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.PairId)
+	l = len(m.PairID)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
@@ -3327,7 +3327,7 @@ func (m *QueryGetInactiveLimitOrderTrancheRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.PairId)
+	l = len(m.PairID)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
@@ -3394,7 +3394,7 @@ func (m *QueryAllPoolReservesRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.PairId)
+	l = len(m.PairID)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
@@ -3434,7 +3434,7 @@ func (m *QueryGetPoolReservesRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.PairId)
+	l = len(m.PairID)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
@@ -4035,7 +4035,7 @@ func (m *QueryGetLimitOrderTrancheRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PairId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PairID", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4063,7 +4063,7 @@ func (m *QueryGetLimitOrderTrancheRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PairId = string(dAtA[iNdEx:postIndex])
+			m.PairID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 0 {
@@ -4283,7 +4283,7 @@ func (m *QueryAllLimitOrderTrancheRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PairId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PairID", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -4311,7 +4311,7 @@ func (m *QueryAllLimitOrderTrancheRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PairId = string(dAtA[iNdEx:postIndex])
+			m.PairID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -5050,7 +5050,7 @@ func (m *QueryAllTickLiquidityRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PairId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PairID", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5078,7 +5078,7 @@ func (m *QueryAllTickLiquidityRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PairId = string(dAtA[iNdEx:postIndex])
+			m.PairID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -5320,7 +5320,7 @@ func (m *QueryGetInactiveLimitOrderTrancheRequest) Unmarshal(dAtA []byte) error 
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PairId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PairID", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5348,7 +5348,7 @@ func (m *QueryGetInactiveLimitOrderTrancheRequest) Unmarshal(dAtA []byte) error 
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PairId = string(dAtA[iNdEx:postIndex])
+			m.PairID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -5774,7 +5774,7 @@ func (m *QueryAllPoolReservesRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PairId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PairID", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5802,7 +5802,7 @@ func (m *QueryAllPoolReservesRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PairId = string(dAtA[iNdEx:postIndex])
+			m.PairID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -6044,7 +6044,7 @@ func (m *QueryGetPoolReservesRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PairId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PairID", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -6072,7 +6072,7 @@ func (m *QueryGetPoolReservesRequest) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PairId = string(dAtA[iNdEx:postIndex])
+			m.PairID = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {

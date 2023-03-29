@@ -25,7 +25,7 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type DepositRecord struct {
-	PairId          *PairId                                `protobuf:"bytes,1,opt,name=pairId,proto3" json:"pairId,omitempty"`
+	PairID          *PairID                                `protobuf:"bytes,1,opt,name=pairID,proto3" json:"pairID,omitempty"`
 	SharesOwned     github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,2,opt,name=sharesOwned,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"totalShares" yaml:"totalShares"`
 	CenterTickIndex int64                                  `protobuf:"varint,3,opt,name=centerTickIndex,proto3" json:"centerTickIndex,omitempty"`
 	LowerTickIndex  int64                                  `protobuf:"varint,4,opt,name=lowerTickIndex,proto3" json:"lowerTickIndex,omitempty"`
@@ -66,9 +66,9 @@ func (m *DepositRecord) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DepositRecord proto.InternalMessageInfo
 
-func (m *DepositRecord) GetPairId() *PairId {
+func (m *DepositRecord) GetPairID() *PairID {
 	if m != nil {
-		return m.PairId
+		return m.PairID
 	}
 	return nil
 }
@@ -183,9 +183,9 @@ func (m *DepositRecord) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0x12
-	if m.PairId != nil {
+	if m.PairID != nil {
 		{
-			size, err := m.PairId.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.PairID.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -215,8 +215,8 @@ func (m *DepositRecord) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.PairId != nil {
-		l = m.PairId.Size()
+	if m.PairID != nil {
+		l = m.PairID.Size()
 		n += 1 + l + sovDepositRecord(uint64(l))
 	}
 	l = m.SharesOwned.Size()
@@ -273,7 +273,7 @@ func (m *DepositRecord) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PairId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PairID", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -300,10 +300,10 @@ func (m *DepositRecord) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.PairId == nil {
-				m.PairId = &PairId{}
+			if m.PairID == nil {
+				m.PairID = &PairID{}
 			}
-			if err := m.PairId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.PairID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

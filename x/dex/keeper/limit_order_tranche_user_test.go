@@ -17,7 +17,7 @@ func createNLimitOrderTrancheUser(keeper *keeper.Keeper, ctx sdk.Context, tickIn
 	for i := range items {
 		items[i].TrancheKey = strconv.Itoa(i)
 		items[i].Address = strconv.Itoa(i)
-		items[i].PairId = &types.PairId{Token0: "TokenA", Token1: "TokenB"}
+		items[i].PairID = &types.PairID{Token0: "TokenA", Token1: "TokenB"}
 		items[i].Token = token
 		items[i].TickIndex = tickIndex
 		items[i].SharesOwned = sdk.ZeroInt()
@@ -49,7 +49,7 @@ func TestLimitOrderTrancheUserRemove(t *testing.T) {
 	items := createNLimitOrderTrancheUser(keeper, ctx, 0, "TokenA", 10)
 	for _, item := range items {
 		keeper.RemoveLimitOrderTrancheUserByKey(ctx,
-			&types.PairId{Token0: "TokenA", Token1: "TokenB"},
+			&types.PairID{Token0: "TokenA", Token1: "TokenB"},
 			0,
 			"TokenA",
 			item.TrancheKey,

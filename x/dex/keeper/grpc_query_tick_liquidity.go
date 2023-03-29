@@ -22,13 +22,13 @@ func (k Keeper) TickLiquidityAll(c context.Context, req *types.QueryAllTickLiqui
 	var tickLiquiditys []types.TickLiquidity
 	ctx := sdk.UnwrapSDKContext(c)
 
-	pairId, err := StringToPairId(req.PairId)
+	pairID, err := StringToPairID(req.PairID)
 	if err != nil {
 		return nil, err
 	}
 
 	store := ctx.KVStore(k.storeKey)
-	tickLiquidityStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairId, req.TokenIn))
+	tickLiquidityStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairID, req.TokenIn))
 
 	pageRes, err := query.Paginate(tickLiquidityStore, req.Pagination, func(key, value []byte) error {
 		var tickLiquidity types.TickLiquidity

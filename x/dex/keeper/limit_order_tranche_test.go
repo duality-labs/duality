@@ -16,7 +16,7 @@ func createNLimitOrderTranches(keeper *keeper.Keeper, ctx sdk.Context, n int) []
 	items := make([]types.LimitOrderTranche, n)
 	for i := range items {
 		tranche := &types.LimitOrderTranche{
-			PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+			PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 			TokenIn:          "TokenA",
 			TickIndex:        int64(i),
 			TrancheKey:       strconv.Itoa(i),
@@ -36,7 +36,7 @@ func TestGetLimitOrderTranche(t *testing.T) {
 	items := createNLimitOrderTranches(keeper, ctx, 10)
 	for _, item := range items {
 		rst, found := keeper.GetLimitOrderTranche(ctx,
-			item.PairId,
+			item.PairID,
 			item.TokenIn,
 			item.TickIndex,
 			item.TrancheKey,
@@ -55,7 +55,7 @@ func TestRemoveLimitOrderTranche(t *testing.T) {
 	for _, item := range items {
 		keeper.RemoveLimitOrderTranche(ctx, item)
 		_, found := keeper.GetLimitOrderTranche(ctx,
-			item.PairId,
+			item.PairID,
 			item.TokenIn,
 			item.TickIndex,
 			item.TrancheKey,

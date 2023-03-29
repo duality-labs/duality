@@ -11991,7 +11991,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    pairId:
+                    pairID:
                       type: object
                       properties:
                         token0:
@@ -12123,7 +12123,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/dualitylabs/duality/dex/filled_limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}':
+  '/dualitylabs/duality/dex/filled_limit_order_tranche/{pairID}/{tokenIn}/{tickIndex}/{trancheKey}':
     get:
       summary: Queries a InactiveLimitOrderTranche by index.
       operationId: DualitylabsDualityDexInactiveLimitOrderTranche
@@ -12136,7 +12136,7 @@ paths:
               inactiveLimitOrderTranche:
                 type: object
                 properties:
-                  pairId:
+                  pairID:
                     type: object
                     properties:
                       token0:
@@ -12193,7 +12193,7 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
-        - name: pairId
+        - name: pairID
           in: path
           required: true
           type: string
@@ -12212,10 +12212,10 @@ paths:
           type: string
       tags:
         - Query
-  '/dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}':
+  '/dualitylabs/duality/dex/limit_order_tranche/{pairID}/{tokenIn}':
     get:
       summary: >-
-        Queries a list of LimitOrderTranche items for a given pairId / TokenIn
+        Queries a list of LimitOrderTranche items for a given pairID / TokenIn
         combination.
       operationId: DualitylabsDualityDexLimitOrderTrancheAll
       responses:
@@ -12229,7 +12229,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    pairId:
+                    pairID:
                       type: object
                       properties:
                         token0:
@@ -12313,7 +12313,7 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
-        - name: pairId
+        - name: pairID
           in: path
           required: true
           type: string
@@ -12369,7 +12369,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}':
+  '/dualitylabs/duality/dex/limit_order_tranche/{pairID}/{tokenIn}/{tickIndex}/{trancheKey}':
     get:
       summary: Queries a LimitOrderTranche by index.
       operationId: DualitylabsDualityDexLimitOrderTranche
@@ -12382,7 +12382,7 @@ paths:
               LimitOrderTranche:
                 type: object
                 properties:
-                  pairId:
+                  pairID:
                     type: object
                     properties:
                       token0:
@@ -12439,7 +12439,7 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
-        - name: pairId
+        - name: pairID
           in: path
           required: true
           type: string
@@ -12473,7 +12473,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    pairId:
+                    pairID:
                       type: object
                       properties:
                         token0:
@@ -12613,7 +12613,7 @@ paths:
               LimitOrderTrancheUser:
                 type: object
                 properties:
-                  pairId:
+                  pairID:
                     type: object
                     properties:
                       token0:
@@ -12711,7 +12711,7 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  '/dualitylabs/duality/dex/pool_reserves/{pairId}/{tokenIn}':
+  '/dualitylabs/duality/dex/pool_reserves/{pairID}/{tokenIn}':
     get:
       summary: Queries a list of PoolReserves items.
       operationId: DualitylabsDualityDexPoolReservesAll
@@ -12726,7 +12726,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    pairId:
+                    pairID:
                       type: object
                       properties:
                         token0:
@@ -12789,7 +12789,7 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
-        - name: pairId
+        - name: pairID
           in: path
           required: true
           type: string
@@ -12845,7 +12845,7 @@ paths:
           type: boolean
       tags:
         - Query
-  '/dualitylabs/duality/dex/pool_reserves/{pairId}/{tokenIn}/{tickIndex}/{fee}':
+  '/dualitylabs/duality/dex/pool_reserves/{pairID}/{tokenIn}/{tickIndex}/{fee}':
     get:
       summary: Queries a PoolReserve by index
       operationId: DualitylabsDualityDexPoolReserves
@@ -12858,7 +12858,7 @@ paths:
               poolReserves:
                 type: object
                 properties:
-                  pairId:
+                  pairID:
                     type: object
                     properties:
                       token0:
@@ -12894,7 +12894,7 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
-        - name: pairId
+        - name: pairID
           in: path
           required: true
           type: string
@@ -12914,7 +12914,7 @@ paths:
           format: uint64
       tags:
         - Query
-  '/dualitylabs/duality/dex/tick_liquidity/{pairId}/{tokenIn}':
+  '/dualitylabs/duality/dex/tick_liquidity/{pairID}/{tokenIn}':
     get:
       summary: Queries a list of TickLiquidity items.
       operationId: DualitylabsDualityDexTickLiquidityAll
@@ -12932,7 +12932,7 @@ paths:
                     poolReserves:
                       type: object
                       properties:
-                        pairId:
+                        pairID:
                           type: object
                           properties:
                             token0:
@@ -12952,7 +12952,7 @@ paths:
                     limitOrderTranche:
                       type: object
                       properties:
-                        pairId:
+                        pairID:
                           type: object
                           properties:
                             token0:
@@ -13037,7 +13037,7 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
-        - name: pairId
+        - name: pairID
           in: path
           required: true
           type: string
@@ -13108,7 +13108,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    pairId:
+                    pairID:
                       type: object
                       properties:
                         token0:
@@ -13169,7 +13169,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    pairId:
+                    pairID:
                       type: object
                       properties:
                         token0:
@@ -13245,7 +13245,7 @@ paths:
                     items:
                       type: object
                       properties:
-                        pairId:
+                        pairID:
                           type: object
                           properties:
                             token0:
@@ -13271,7 +13271,7 @@ paths:
                     items:
                       type: object
                       properties:
-                        pairId:
+                        pairID:
                           type: object
                           properties:
                             token0:
@@ -36079,7 +36079,7 @@ definitions:
   dualitylabs.duality.dex.DepositRecord:
     type: object
     properties:
-      pairId:
+      pairID:
         type: object
         properties:
           token0:
@@ -36103,7 +36103,7 @@ definitions:
   dualitylabs.duality.dex.LimitOrderTranche:
     type: object
     properties:
-      pairId:
+      pairID:
         type: object
         properties:
           token0:
@@ -36144,7 +36144,7 @@ definitions:
   dualitylabs.duality.dex.LimitOrderTrancheUser:
     type: object
     properties:
-      pairId:
+      pairID:
         type: object
         properties:
           token0:
@@ -36223,7 +36223,7 @@ definitions:
     type: object
   dualitylabs.duality.dex.MsgWithdrawlResponse:
     type: object
-  dualitylabs.duality.dex.PairId:
+  dualitylabs.duality.dex.PairID:
     type: object
     properties:
       token0:
@@ -36236,7 +36236,7 @@ definitions:
   dualitylabs.duality.dex.PoolReserves:
     type: object
     properties:
-      pairId:
+      pairID:
         type: object
         properties:
           token0:
@@ -36261,7 +36261,7 @@ definitions:
         items:
           type: object
           properties:
-            pairId:
+            pairID:
               type: object
               properties:
                 token0:
@@ -36332,7 +36332,7 @@ definitions:
         items:
           type: object
           properties:
-            pairId:
+            pairID:
               type: object
               properties:
                 token0:
@@ -36403,7 +36403,7 @@ definitions:
         items:
           type: object
           properties:
-            pairId:
+            pairID:
               type: object
               properties:
                 token0:
@@ -36469,7 +36469,7 @@ definitions:
         items:
           type: object
           properties:
-            pairId:
+            pairID:
               type: object
               properties:
                 token0:
@@ -36522,7 +36522,7 @@ definitions:
             poolReserves:
               type: object
               properties:
-                pairId:
+                pairID:
                   type: object
                   properties:
                     token0:
@@ -36542,7 +36542,7 @@ definitions:
             limitOrderTranche:
               type: object
               properties:
-                pairId:
+                pairID:
                   type: object
                   properties:
                     token0:
@@ -36613,7 +36613,7 @@ definitions:
         items:
           type: object
           properties:
-            pairId:
+            pairID:
               type: object
               properties:
                 token0:
@@ -36642,7 +36642,7 @@ definitions:
         items:
           type: object
           properties:
-            pairId:
+            pairID:
               type: object
               properties:
                 token0:
@@ -36681,7 +36681,7 @@ definitions:
       inactiveLimitOrderTranche:
         type: object
         properties:
-          pairId:
+          pairID:
             type: object
             properties:
               token0:
@@ -36725,7 +36725,7 @@ definitions:
       LimitOrderTranche:
         type: object
         properties:
-          pairId:
+          pairID:
             type: object
             properties:
               token0:
@@ -36769,7 +36769,7 @@ definitions:
       LimitOrderTrancheUser:
         type: object
         properties:
-          pairId:
+          pairID:
             type: object
             properties:
               token0:
@@ -36808,7 +36808,7 @@ definitions:
       poolReserves:
         type: object
         properties:
-          pairId:
+          pairID:
             type: object
             properties:
               token0:
@@ -36836,7 +36836,7 @@ definitions:
             items:
               type: object
               properties:
-                pairId:
+                pairID:
                   type: object
                   properties:
                     token0:
@@ -36862,7 +36862,7 @@ definitions:
             items:
               type: object
               properties:
-                pairId:
+                pairID:
                   type: object
                   properties:
                     token0:
@@ -36908,7 +36908,7 @@ definitions:
       poolReserves:
         type: object
         properties:
-          pairId:
+          pairID:
             type: object
             properties:
               token0:
@@ -36928,7 +36928,7 @@ definitions:
       limitOrderTranche:
         type: object
         properties:
-          pairId:
+          pairID:
             type: object
             properties:
               token0:
@@ -36974,7 +36974,7 @@ definitions:
         items:
           type: object
           properties:
-            pairId:
+            pairID:
               type: object
               properties:
                 token0:
@@ -37000,7 +37000,7 @@ definitions:
         items:
           type: object
           properties:
-            pairId:
+            pairID:
               type: object
               properties:
                 token0:

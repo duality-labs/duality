@@ -46,7 +46,7 @@ func DepositSharesToData(shares sdk.Coin) (types.DepositRecord, error) {
 		return types.DepositRecord{}, types.ErrInvalidDepositShares
 	}
 
-	pairId := CreatePairId(matches[0], matches[1])
+	pairID := CreatePairID(matches[0], matches[1])
 	tickIndex, err := strconv.ParseInt(matches[2], 10, 0)
 	if err != nil {
 		return types.DepositRecord{}, types.ErrInvalidDepositShares
@@ -57,7 +57,7 @@ func DepositSharesToData(shares sdk.Coin) (types.DepositRecord, error) {
 	}
 	feeUint := utils.MustSafeUint64(fee)
 	return types.DepositRecord{
-		PairId:          pairId,
+		PairID:          pairID,
 		SharesOwned:     shares.Amount,
 		CenterTickIndex: tickIndex,
 		LowerTickIndex:  tickIndex - feeUint,

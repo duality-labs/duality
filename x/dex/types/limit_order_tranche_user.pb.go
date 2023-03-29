@@ -25,7 +25,7 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type LimitOrderTrancheUser struct {
-	PairId          *PairId                                `protobuf:"bytes,1,opt,name=pairId,proto3" json:"pairId,omitempty"`
+	PairID          *PairID                                `protobuf:"bytes,1,opt,name=pairID,proto3" json:"pairID,omitempty"`
 	Token           string                                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
 	TickIndex       int64                                  `protobuf:"varint,3,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
 	TrancheKey      string                                 `protobuf:"bytes,4,opt,name=trancheKey,proto3" json:"trancheKey,omitempty"`
@@ -70,9 +70,9 @@ func (m *LimitOrderTrancheUser) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_LimitOrderTrancheUser proto.InternalMessageInfo
 
-func (m *LimitOrderTrancheUser) GetPairId() *PairId {
+func (m *LimitOrderTrancheUser) GetPairID() *PairID {
 	if m != nil {
-		return m.PairId
+		return m.PairID
 	}
 	return nil
 }
@@ -246,9 +246,9 @@ func (m *LimitOrderTrancheUser) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if m.PairId != nil {
+	if m.PairID != nil {
 		{
-			size, err := m.PairId.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.PairID.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -278,8 +278,8 @@ func (m *LimitOrderTrancheUser) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.PairId != nil {
-		l = m.PairId.Size()
+	if m.PairID != nil {
+		l = m.PairID.Size()
 		n += 1 + l + sovLimitOrderTrancheUser(uint64(l))
 	}
 	l = len(m.Token)
@@ -348,7 +348,7 @@ func (m *LimitOrderTrancheUser) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PairId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PairID", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -375,10 +375,10 @@ func (m *LimitOrderTrancheUser) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.PairId == nil {
-				m.PairId = &PairId{}
+			if m.PairID == nil {
+				m.PairID = &PairID{}
 			}
-			if err := m.PairId.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.PairID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

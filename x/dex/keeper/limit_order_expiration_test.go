@@ -31,7 +31,7 @@ func createLimitOrderExpirationAndTranches(keeper *keeper.Keeper, ctx sdk.Contex
 	items := make([]types.LimitOrderExpiration, len(expTimes))
 	for i := range items {
 		tranche := types.LimitOrderTranche{
-			PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+			PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 			TokenIn:          "TokenA",
 			TickIndex:        0,
 			TrancheKey:       strconv.Itoa(i),
@@ -119,7 +119,7 @@ func TestPurgeExpiredLimitOrders(t *testing.T) {
 	require.Equal(t, nextWeek, expList[1].ExpirationTime)
 
 	// Only future LimitOrderTranches Exist
-	trancheList := keeper.GetAllLimitOrderTrancheAtIndex(ctx, defaultPairId, "TokenA", 0)
+	trancheList := keeper.GetAllLimitOrderTrancheAtIndex(ctx, defaultPairID, "TokenA", 0)
 	require.Equal(t, 2, len(trancheList))
 	require.Equal(t, tomorrow, *trancheList[0].ExpirationTime)
 	require.Equal(t, nextWeek, *trancheList[1].ExpirationTime)

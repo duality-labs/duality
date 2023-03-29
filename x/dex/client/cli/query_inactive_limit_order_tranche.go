@@ -55,7 +55,7 @@ func CmdShowInactiveLimitOrderTranche() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			argPairId := args[0]
+			argPairID := args[0]
 			argTokenIn := args[1]
 
 			if strings.HasPrefix(args[2], "[") && strings.HasSuffix(args[2], "]") {
@@ -69,7 +69,7 @@ func CmdShowInactiveLimitOrderTranche() *cobra.Command {
 			}
 
 			params := &types.QueryGetInactiveLimitOrderTrancheRequest{
-				PairId:     argPairId,
+				PairID:     argPairID,
 				TokenIn:    argTokenIn,
 				TickIndex:  argTickIndex,
 				TrancheKey: argTrancheKey,

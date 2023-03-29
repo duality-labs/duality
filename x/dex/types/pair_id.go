@@ -4,11 +4,11 @@ import (
 	"fmt"
 )
 
-func (p *PairId) Stringify() string {
+func (p *PairID) Stringify() string {
 	return fmt.Sprintf("%s<>%s", p.Token0, p.Token1)
 }
 
-func (p *PairId) OppositeToken(token string) (oppToken string, ok bool) {
+func (p *PairID) OppositeToken(token string) (oppToken string, ok bool) {
 	switch token {
 	case p.Token0:
 		return p.Token1, true
@@ -20,7 +20,7 @@ func (p *PairId) OppositeToken(token string) (oppToken string, ok bool) {
 	}
 }
 
-func (p *PairId) MustOppositeToken(token string) string {
+func (p *PairID) MustOppositeToken(token string) string {
 	if oppToken, ok := p.OppositeToken(token); ok {
 		return oppToken
 	} else {

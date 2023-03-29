@@ -1,21 +1,21 @@
 package types
 
 type DirectionalTradingPair struct {
-	*PairId
+	*PairID
 	TokenIn  string
 	TokenOut string
 }
 
-func NewDirectionalTradingPair(pairId *PairId, tokenIn, tokenOut string) DirectionalTradingPair {
+func NewDirectionalTradingPair(pairID *PairID, tokenIn, tokenOut string) DirectionalTradingPair {
 	return DirectionalTradingPair{
-		PairId:   pairId,
+		PairID:   pairID,
 		TokenIn:  tokenIn,
 		TokenOut: tokenOut,
 	}
 }
 
 func (dp DirectionalTradingPair) IsTokenInToken0() bool {
-	return dp.TokenIn == dp.PairId.Token0
+	return dp.TokenIn == dp.PairID.Token0
 }
 
 func (dp DirectionalTradingPair) IsTokenOutToken0() bool {
