@@ -73,7 +73,7 @@ func (s *TxTestSuite) SetupSuite() {
 	_, err = cli.ExecTestCLICmd(clientCtx, cmd, args)
 	require.NoError(s.T(), err)
 
-	args = append([]string{s.network.Validators[0].Address.String(), "TokenB", "TokenA", "[20]", "10"}, commonFlags...)
+	args = append([]string{s.network.Validators[0].Address.String(), "TokenB", "TokenA", "[-20]", "10"}, commonFlags...)
 	cmd = dexClient.CmdPlaceLimitOrder()
 	txBuff, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
 
@@ -416,7 +416,7 @@ func (s *TxTestSuite) TestTx5CmdCancelLimitOrder() {
 		},
 		{
 			name:     "valid",
-			args:     []string{"TokenB", "TokenA", "20", s.trancheKey},
+			args:     []string{"TokenB", "TokenA", "[-20]", s.trancheKey},
 			errInRes: false,
 		},
 	}

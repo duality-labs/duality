@@ -251,13 +251,13 @@ func (s *MsgServerTestSuite) TestWithdrawalFailsWithNonExistentPair() {
 
 	// WHEN Alice tries to withdraw from a nonexistent tokenPair
 	_, err := s.msgServer.Withdrawl(s.goCtx, &types.MsgWithdrawl{
-		Creator:        s.alice.String(),
-		Receiver:       s.alice.String(),
-		TokenA:         "TokenX",
-		TokenB:         "TokenZ",
-		SharesToRemove: []sdk.Int{sdk.NewInt(10)},
-		TickIndexes:    []int64{0},
-		Fees:           []uint64{0},
+		Creator:         s.alice.String(),
+		Receiver:        s.alice.String(),
+		TokenA:          "TokenX",
+		TokenB:          "TokenZ",
+		SharesToRemove:  []sdk.Int{sdk.NewInt(10)},
+		TickIndexesAToB: []int64{0},
+		Fees:            []uint64{0},
 	})
 
 	// NOTE: As code is currently written we hit not enough shares check

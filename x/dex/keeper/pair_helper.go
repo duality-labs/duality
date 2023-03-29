@@ -66,3 +66,17 @@ func StringToPairId(pairIdStr string) (*types.PairId, error) {
 		return &types.PairId{}, sdkerrors.Wrapf(types.ErrInvalidPairIdStr, pairIdStr)
 	}
 }
+
+func NormalizeTickIndex(baseToken, token0 string, tickIndex int64) int64 {
+	if baseToken != token0 {
+		tickIndex = tickIndex * -1
+	}
+	return tickIndex
+}
+
+func NormalizeAllTickIndexes(baseToken, token0 string, tickIndexes []int64) []int64 {
+	for i, idx := range tickIndexes {
+		tickIndexes[i] = NormalizeTickIndex(baseToken, token0, idx)
+	}
+	return tickIndexes
+}

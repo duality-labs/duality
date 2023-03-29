@@ -11,7 +11,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLONoLiquidity() {
 	s.fundBobBalances(50, 50)
 	// GIVEN
 	// no liqudity of token A (place LO only for token B at tick 0 fee 1)
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 
 	s.assertLimitLiquidityAtTick("TokenB", 1, 10)
 	s.assertAliceBalances(50, 40)
@@ -30,7 +30,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilledSlippageToleranceNotRe
 	s.fundBobBalances(50, 0)
 	// GIVEN
 	// place LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 	s.assertLimitLiquidityAtTick("TokenB", 1, 10)
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
@@ -110,7 +110,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO0to1DoesntMoveCurr0to1() {
 	s.fundBobBalances(50, 0)
 	// GIVEN
 	// place LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 	s.assertLimitLiquidityAtTick("TokenB", 1, 10)
 	s.assertCurr0To1(1)
 
@@ -128,8 +128,8 @@ func (s *MsgServerTestSuite) TestSwapOnlyLO0to1MovesCurr0to1() {
 	s.fundBobBalances(50, 0)
 	// GIVEN
 	// place LO selling 10 of token B at tick 1 and 10 of token B at tick 3
-	s.aliceLimitSells("TokenB", 1, 10)
-	s.aliceLimitSells("TokenB", 3, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
+	s.aliceLimitSells("TokenB", -3, 10)
 	s.assertLimitLiquidityAtTick("TokenB", 1, 10)
 	s.assertLimitLiquidityAtTick("TokenB", 3, 10)
 	s.assertCurr0To1(1)
@@ -170,7 +170,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOCorrectExecution0to1() {
 	s.fundBobBalances(50, 0)
 	// GIVEN
 	// place LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
 
@@ -190,7 +190,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilledCorrectExecution() {
 	s.fundBobBalances(50, 0)
 	// GIVEN
 	// place LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 
 	// Partially fill the LO, will have some token B remaining to fill
 	s.bobMarketSells("TokenA", 5)
@@ -198,7 +198,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilledCorrectExecution() {
 	s.assertLimitLiquidityAtTick("TokenB", 1, 6)
 
 	// place another LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 	s.assertLimitLiquidityAtTick("TokenB", 1, 16)
 	s.assertBobBalances(45, 4)
 
@@ -218,7 +218,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustLOCorrectExecution() {
 	s.fundBobBalances(50, 0)
 	// GIVEN
 	// place LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 
 	// Partially fill the LO, will have some token B remaining to fill
 	s.bobMarketSells("TokenA", 5)
@@ -226,7 +226,7 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustLOCorrectExecution() {
 	s.assertLimitLiquidityAtTick("TokenB", 1, 6)
 
 	// place another LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 	s.assertLimitLiquidityAtTick("TokenB", 1, 16)
 	s.assertBobBalances(45, 4)
 
@@ -246,12 +246,12 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOPartiallyFilled0to1DoesntMove0to1() {
 	s.fundBobBalances(50, 0)
 	// GIVEN
 	// place LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 
 	// Partially fill the LO, will have some token B remaining to fill
 	s.bobMarketSells("TokenA", 5)
 	// place another LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 	s.assertCurr0To1(1)
 
 	// WHEN
@@ -289,13 +289,13 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace0to1Moves0to1() {
 	s.fundBobBalances(50, 0)
 	// GIVEN
 	// place LO selling 10 of token B at tick 10
-	s.aliceLimitSells("TokenB", 10, 10)
+	s.aliceLimitSells("TokenB", -10, 10)
 	// place LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 	// Partially fill the LO, will have some token B remaining to fill
 	s.bobMarketSells("TokenA", 5)
 	// place another LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 	s.assertCurr0To1(1)
 
 	// WHEN
@@ -312,11 +312,11 @@ func (s *MsgServerTestSuite) TestSwapOnlyLOExhaustFillAndPlace0to1ExhaustMax() {
 	s.fundBobBalances(50, 0)
 	// GIVEN
 	// place LO selling 10 of token B at tick 1
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 	// Partially fill the LO, will have some token B remaining to fill
 	s.bobMarketSells("TokenA", 5)
 	// place another LO selling 10 of token A at tick -1
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 	s.assertCurr0To1(1)
 
 	// WHEN

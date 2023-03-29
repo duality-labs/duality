@@ -39,7 +39,7 @@ message MsgDeposit {
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountB"
   ]; 
-  repeated int64 tickIndexes = 7;
+  repeated int64 tickIndexesAToB = 7;
   repeated uint64 fees = 8;
   repeated DepositOptions Options = 9;
 }
@@ -70,7 +70,7 @@ message MsgWithdrawl {
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "sharesToRemove"
   ]; 
-  repeated int64 tickIndexes = 6;
+  repeated int64 tickIndexesAToB = 6;
   repeated uint64 fees = 7;
   
 }

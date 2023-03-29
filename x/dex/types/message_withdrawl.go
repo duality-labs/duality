@@ -11,13 +11,13 @@ var _ sdk.Msg = &MsgWithdrawl{}
 
 func NewMsgWithdrawl(creator string, receiver string, tokenA string, tokenB string, sharesToRemove []sdk.Int, tickIndexes []int64, fees []uint64) *MsgWithdrawl {
 	return &MsgWithdrawl{
-		Creator:        creator,
-		Receiver:       receiver,
-		TokenA:         tokenA,
-		TokenB:         tokenB,
-		SharesToRemove: sharesToRemove,
-		TickIndexes:    tickIndexes,
-		Fees:           fees,
+		Creator:         creator,
+		Receiver:        receiver,
+		TokenA:          tokenA,
+		TokenB:          tokenB,
+		SharesToRemove:  sharesToRemove,
+		TickIndexesAToB: tickIndexes,
+		Fees:            fees,
 	}
 }
 
@@ -54,8 +54,8 @@ func (msg *MsgWithdrawl) ValidateBasic() error {
 	}
 
 	// Verify that the lengths of TickIndexes, Fees, SharesToRemove are all equal
-	if len(msg.Fees) != len(msg.TickIndexes) ||
-		len(msg.SharesToRemove) != len(msg.TickIndexes) {
+	if len(msg.Fees) != len(msg.TickIndexesAToB) ||
+		len(msg.SharesToRemove) != len(msg.TickIndexesAToB) {
 		return ErrUnbalancedTxArray
 	}
 
