@@ -142,7 +142,7 @@ func createPlaceLimitOrderEvent(creator string, receiver string, tokenIn string,
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreatePlaceLimitOrderEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, shares string, currentLimitOrderKey string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreatePlaceLimitOrderEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, shares string, trancheKey string, otherAttrs ...sdk.Attribute) sdk.Event {
 	return createPlaceLimitOrderEvent(
 		creator,
 		receiver,
@@ -150,7 +150,7 @@ func CreatePlaceLimitOrderEvent(creator string, receiver string, tokenIn string,
 		tokenOut,
 		amountIn,
 		shares,
-		currentLimitOrderKey,
+		trancheKey,
 	)
 }
 
@@ -161,7 +161,7 @@ func withdrawFilledLimitOrderEvent(creator string, tokenIn string, tokenOut stri
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventCreator, creator),
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventTokenIn, tokenIn),
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventTokenOut, tokenOut),
-		sdk.NewAttribute(WithdrawFilledLimitOrderEventLimitOrderKey, key),
+		sdk.NewAttribute(WithdrawFilledLimitOrderEventTrancheKey, key),
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventAmountOut, amountOut),
 	}
 	attrs = append(attrs, otherAttrs...)
@@ -196,7 +196,7 @@ func cancelLimitOrderEvent(creator string, tokenIn string, tokenOut string, key 
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventCreator, creator),
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventTokenIn, tokenIn),
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventTokenOut, tokenOut),
-		sdk.NewAttribute(WithdrawFilledLimitOrderEventLimitOrderKey, key),
+		sdk.NewAttribute(WithdrawFilledLimitOrderEventTrancheKey, key),
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventAmountOut, amountOut),
 	}
 	attrs = append(attrs, otherAttrs...)

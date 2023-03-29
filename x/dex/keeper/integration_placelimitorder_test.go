@@ -307,12 +307,11 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderPartiallyFilledLOPlaceLOIncremen
 	// partially filled limit order exists on tick -1
 	trancheKey0 := s.aliceLimitSells("TokenA", -1, 10)
 	s.bobMarketSells("TokenB", 5)
-	trancheKey1 := s.aliceLimitSells("TokenA", -1, 10)
-	s.assertFillAndPlaceTrancheKeys("TokenA", -1, trancheKey0, trancheKey1)
+	s.assertFillAndPlaceTrancheKeys("TokenA", -1, trancheKey0, "")
 
 	// WHEN
 	// placing order on same tick
-	s.aliceLimitSells("TokenA", -1, 10)
+	trancheKey1 := s.aliceLimitSells("TokenA", -1, 10)
 
 	// THEN
 	// place tranche key changes
@@ -379,7 +378,7 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertDexBalances(10, 90)
 	s.assertCurrentTicks(math.MinInt64, 0)
 
-	s.aliceCancelsLimitSell("TokenB", 0, trancheKey0)
+	s.aliceCancelsLimitSell(trancheKey0)
 
 	s.assertAliceBalances(100, 40)
 	s.assertBobBalances(90, 110)
@@ -392,19 +391,19 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertBobBalances(80, 120)
 	s.assertDexBalances(20, 40)
 
-	s.aliceCancelsLimitSell("TokenB", 0, trancheKey1)
+	s.aliceCancelsLimitSell(trancheKey1)
 
 	s.assertAliceBalances(100, 80)
 	s.assertBobBalances(80, 120)
 	s.assertDexBalances(20, 0)
 
-	s.aliceWithdrawsLimitSell("TokenB", 0, trancheKey0)
+	s.aliceWithdrawsLimitSell(trancheKey0)
 
 	s.assertAliceBalances(110, 80)
 	s.assertBobBalances(80, 120)
 	s.assertDexBalances(10, 0)
 
-	s.aliceWithdrawsLimitSell("TokenB", 0, trancheKey1)
+	s.aliceWithdrawsLimitSell(trancheKey1)
 
 	s.assertAliceBalances(120, 80)
 	s.assertBobBalances(80, 120)
@@ -428,7 +427,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFoKWithLPFills() {
 	s.assertDexBalances(10, 20)
 
 	// Alice can withdraw immediately
-	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
+	s.aliceWithdrawsLimitSell(trancheKey)
 	s.assertDexBalances(10, 10)
 	s.assertAliceBalances(0, 10)
 }
@@ -477,7 +476,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPFills() {
 	// No maker LO is placed
 	s.assertFillAndPlaceTrancheKeys("TokenA", 1, "", "")
 	// Alice can withdraw immediately
-	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
+	s.aliceWithdrawsLimitSell(trancheKey)
 	s.assertDexBalances(10, 10)
 	s.assertAliceBalances(0, 10)
 }
@@ -498,7 +497,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPPartialFill() {
 	s.assertDexBalances(5, 5)
 
 	// Alice can withdraw her partial fill immediately
-	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
+	s.aliceWithdrawsLimitSell(trancheKey)
 	s.assertDexBalances(5, 0)
 	s.assertAliceBalances(5, 5)
 
@@ -538,7 +537,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderJITFills() {
 	// THEN all liquidity is depleted
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
 	//Alice can withdraw 10 TokenB
-	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
+	s.aliceWithdrawsLimitSell(trancheKey)
 	s.assertAliceBalances(0, 10)
 
 }
@@ -560,7 +559,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderJITBehindEnemyLines() {
 	// THEN all liquidity is depleted
 	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
 	//Alice can withdraw 9 TokenB
-	s.aliceWithdrawsLimitSell("TokenA", 1, trancheKey)
+	s.aliceWithdrawsLimitSell(trancheKey)
 	s.assertAliceBalances(0, 9)
 
 }
@@ -582,7 +581,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderJITNextBlock() {
 	s.bobMarketSellFails(types.ErrInsufficientLiquidity, "TokenB", 10)
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
 	//Alice can withdraw the entirety of the unfilled limitOrder
-	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
+	s.aliceWithdrawsLimitSell(trancheKey)
 	s.assertAliceBalances(10, 0)
 
 }
@@ -604,7 +603,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilFills() {
 	// THEN all liquidity is depleted
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
 	//Alice can withdraw 10 TokenB
-	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
+	s.aliceWithdrawsLimitSell(trancheKey)
 	s.assertAliceBalances(0, 10)
 
 }
@@ -625,7 +624,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilExpires() {
 	s.bobMarketSellFails(types.ErrInsufficientLiquidity, "TokenB", 10)
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
 	//Alice can withdraw the entirety of the unfilled limitOrder
-	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
+	s.aliceWithdrawsLimitSell(trancheKey)
 	s.assertAliceBalances(10, 0)
 
 }
@@ -648,7 +647,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilExpiresNotPurged() {
 	s.bobMarketSellFails(types.ErrInsufficientLiquidity, "TokenB", 10)
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
 	//Alice can cancel the entirety of the unfilled limitOrder
-	s.aliceCancelsLimitSell("TokenA", 0, trancheKey)
+	s.aliceCancelsLimitSell(trancheKey)
 	s.assertAliceBalances(10, 0)
 
 }

@@ -11,31 +11,22 @@ func (k Keeper) SetLimitOrderTrancheUser(ctx sdk.Context, LimitOrderTrancheUser 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderTrancheUserKeyPrefix))
 	b := k.cdc.MustMarshal(&LimitOrderTrancheUser)
 	store.Set(types.LimitOrderTrancheUserKey(
-		LimitOrderTrancheUser.PairId,
-		LimitOrderTrancheUser.TickIndex,
-		LimitOrderTrancheUser.Token,
-		LimitOrderTrancheUser.TrancheKey,
 		LimitOrderTrancheUser.Address,
+		LimitOrderTrancheUser.TrancheKey,
 	), b)
 }
 
 // GetLimitOrderTrancheUser returns a LimitOrderTrancheUser from its index
 func (k Keeper) GetLimitOrderTrancheUser(
 	ctx sdk.Context,
-	pairId *types.PairId,
-	tickIndex int64,
-	token string,
-	trancheKey string,
 	address string,
+	trancheKey string,
 ) (val types.LimitOrderTrancheUser, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderTrancheUserKeyPrefix))
 
 	b := store.Get(types.LimitOrderTrancheUserKey(
-		pairId,
-		tickIndex,
-		token,
-		trancheKey,
 		address,
+		trancheKey,
 	))
 	if b == nil {
 		return val, false
@@ -57,11 +48,8 @@ func (k Keeper) RemoveLimitOrderTrancheUserByKey(
 ) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderTrancheUserKeyPrefix))
 	store.Delete(types.LimitOrderTrancheUserKey(
-		pairId,
-		tickIndex,
-		token,
-		trancheKey,
 		address,
+		trancheKey,
 	))
 }
 

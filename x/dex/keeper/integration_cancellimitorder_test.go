@@ -20,7 +20,7 @@ func (s *MsgServerTestSuite) TestCancelEntireLimitOrderAOneExists() {
 	s.assertCurr1To0(0)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.aliceCancelsLimitSell("TokenA", 0, trancheKey)
+	s.aliceCancelsLimitSell(trancheKey)
 
 	s.assertAliceBalances(50, 50)
 	s.assertDexBalances(0, 0)
@@ -28,7 +28,7 @@ func (s *MsgServerTestSuite) TestCancelEntireLimitOrderAOneExists() {
 	s.assertCurr0To1(math.MaxInt64)
 
 	// Assert that the LimitOrderTrancheUser has been deleted
-	_, found := s.app.DexKeeper.GetLimitOrderTrancheUser(s.ctx, defaultPairId, 0, "TokenA", trancheKey, s.alice.String())
+	_, found := s.app.DexKeeper.GetLimitOrderTrancheUser(s.ctx, s.alice.String(), trancheKey)
 	s.Assert().False(found)
 }
 
@@ -44,7 +44,7 @@ func (s *MsgServerTestSuite) TestCancelEntireLimitOrderBOneExists() {
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(0)
 
-	s.aliceCancelsLimitSell("TokenB", 0, trancheKey)
+	s.aliceCancelsLimitSell(trancheKey)
 
 	s.assertAliceBalances(50, 50)
 	s.assertDexBalances(0, 0)
@@ -65,7 +65,7 @@ func (s *MsgServerTestSuite) TestCancelHigherEntireLimitOrderATwoExistDiffTicksS
 	s.assertCurr1To0(0)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.aliceCancelsLimitSell("TokenA", 0, trancheKey)
+	s.aliceCancelsLimitSell(trancheKey)
 
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
@@ -86,7 +86,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderATwoExistDiffTicksSa
 	s.assertCurr1To0(0)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.aliceCancelsLimitSell("TokenA", -1, trancheKey)
+	s.aliceCancelsLimitSell(trancheKey)
 
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
@@ -107,7 +107,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderATwoExistDiffTicksDi
 	s.assertCurr1To0(0)
 	s.assertCurr0To1(1)
 
-	s.aliceCancelsLimitSell("TokenA", 0, trancheKey)
+	s.aliceCancelsLimitSell(trancheKey)
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
@@ -128,7 +128,7 @@ func (s *MsgServerTestSuite) TestCancelHigherEntireLimitOrderBTwoExistDiffTicksS
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(-1)
 
-	s.aliceCancelsLimitSell("TokenB", 0, trancheKey)
+	s.aliceCancelsLimitSell(trancheKey)
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
@@ -149,7 +149,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderBTwoExistDiffTicksSa
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(-1)
 
-	s.aliceCancelsLimitSell("TokenB", 1, trancheKey)
+	s.aliceCancelsLimitSell(trancheKey)
 
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
@@ -167,12 +167,12 @@ func (s *MsgServerTestSuite) TestCancelTwiceFails() {
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
 
-	s.aliceCancelsLimitSell("TokenB", 0, trancheKey)
+	s.aliceCancelsLimitSell(trancheKey)
 
 	s.assertAliceBalances(50, 50)
 	s.assertDexBalances(0, 0)
 
-	s.aliceCancelsLimitSellFails("TokenB", -1, trancheKey, types.ErrActiveLimitOrderNotFound)
+	s.aliceCancelsLimitSellFails(trancheKey, types.ErrActiveLimitOrderNotFound)
 
 }
 
@@ -189,7 +189,7 @@ func (s *MsgServerTestSuite) TestCancelPartiallyFilled() {
 	s.assertAliceBalances(0, 0)
 
 	//WHEN alice cancels her limit order
-	s.aliceCancelsLimitSell("TokenA", 0, trancheKey)
+	s.aliceCancelsLimitSell(trancheKey)
 
 	//Then alice gets back remaining 25 TokenA LO reserves
 	s.assertAliceBalances(25, 0)
@@ -212,8 +212,8 @@ func (s *MsgServerTestSuite) TestCancelPartiallyFilledMultiUser() {
 	s.assertAliceBalances(0, 0)
 
 	//WHEN alice and carol cancel their limit orders
-	s.aliceCancelsLimitSell("TokenA", 0, trancheKey)
-	s.carolCancelsLimitSell("TokenA", 0, trancheKey)
+	s.aliceCancelsLimitSell(trancheKey)
+	s.carolCancelsLimitSell(trancheKey)
 
 	//THEN alice gets back 41 TokenA (125 * 1/3)
 	s.assertAliceBalances(41, 0)
@@ -232,7 +232,7 @@ func (s *MsgServerTestSuite) TestCancelGoodTil() {
 	s.assertNLimitOrderExpiration(1)
 
 	// WHEN alice cancels the limit order
-	s.aliceCancelsLimitSell("TokenA", 0, trancheKey)
+	s.aliceCancelsLimitSell(trancheKey)
 	// THEN there is no liquidity left
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
 	// and the LimitOrderExpiration has been removed
@@ -252,7 +252,7 @@ func (s *MsgServerTestSuite) TestCancelGoodTilAfterExpirationFails() {
 	s.app.EndBlock(abci.RequestEndBlock{Height: 0})
 
 	// THEN alice cancellation fails
-	s.aliceCancelsLimitSellFails("TokenA", 0, trancheKey, types.ErrActiveLimitOrderNotFound)
+	s.aliceCancelsLimitSellFails(trancheKey, types.ErrActiveLimitOrderNotFound)
 
 }
 
@@ -264,7 +264,7 @@ func (s *MsgServerTestSuite) TestCancelJITSameBlock() {
 	s.assertNLimitOrderExpiration(1)
 
 	// WHEN alice cancels the limit order
-	s.aliceCancelsLimitSell("TokenA", 0, trancheKey)
+	s.aliceCancelsLimitSell(trancheKey)
 	// THEN there is no liquidity left
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
 	// and the LimitOrderExpiration has been removed
@@ -283,6 +283,6 @@ func (s *MsgServerTestSuite) TestCancelJITNextBlock() {
 	s.app.EndBlock(abci.RequestEndBlock{Height: 0})
 
 	// THEN alice cancellation fails
-	s.aliceCancelsLimitSellFails("TokenA", 0, trancheKey, types.ErrActiveLimitOrderNotFound)
+	s.aliceCancelsLimitSellFails(trancheKey, types.ErrActiveLimitOrderNotFound)
 	s.assertAliceBalances(0, 0)
 }

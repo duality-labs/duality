@@ -44,17 +44,10 @@ func (k Keeper) LimitOrderTrancheUser(c context.Context, req *types.QueryGetLimi
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(c)
-	pairId, err := StringToPairId(req.PairId)
-	if err != nil {
-		return nil, err
-	}
 	val, found := k.GetLimitOrderTrancheUser(
 		ctx,
-		pairId,
-		req.TickIndex,
-		req.Token,
-		req.TrancheKey,
 		req.Address,
+		req.TrancheKey,
 	)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")

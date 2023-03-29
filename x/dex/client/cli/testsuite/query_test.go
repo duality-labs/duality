@@ -131,7 +131,7 @@ var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 		PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
 		Token:           "TokenB",
 		TickIndex:       20,
-		TrancheKey:      "0",
+		TrancheKey:      "1",
 		Address:         testAddress.String(),
 		SharesOwned:     sdk.NewInt(10),
 		SharesWithdrawn: sdk.NewInt(0),
@@ -267,35 +267,35 @@ func (s *QueryTestSuite) TestQueryCmdShowLimitOrderTrancheUser() {
 		expErrMsg string
 		expOutput types.LimitOrderTrancheUser
 	}{
-		// "show-limit-order-pool-user-share-map [pairId] [tickIndex] [tokenIn] [trancheKey] [address]"
+		// "show-limit-order-tranche-user [address] [tranche-key]"
 		{
 			name:      "valid",
-			args:      []string{"TokenA<>TokenB", "1", "TokenA", "0", testAddress.String()},
+			args:      []string{testAddress.String(), "0"},
 			expOutput: limitOrderTrancheUserList[0],
 		},
 		{
 			name:      "invalid pair",
-			args:      []string{"TokenB<>TokenC", "20", "TokenB", "0", testAddress.String()},
+			args:      []string{testAddress.String(), "BADKEY"},
 			expErr:    true,
 			expErrMsg: "key not found",
 		},
 		{
 			name:      "too many parameters",
-			args:      []string{"TokenA<>TokenB", "20", "TokenB", "0", "1", testAddress.String()},
+			args:      []string{testAddress.String(), "0", "EXTRAARG"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 5 arg(s), received 6",
+			expErrMsg: "Error: accepts 2 arg(s), received 3",
 		},
 		{
 			name:      "no parameters",
 			args:      []string{},
 			expErr:    true,
-			expErrMsg: "Error: accepts 5 arg(s), received 0",
+			expErrMsg: "Error: accepts 2 arg(s), received 0",
 		},
 		{
 			name:      "too few parameters",
-			args:      []string{"TokenA<>TokenB", "20", "TokenB", "0"},
+			args:      []string{testAddress.String()},
 			expErr:    true,
-			expErrMsg: "Error: accepts 5 arg(s), received 4",
+			expErrMsg: "Error: accepts 2 arg(s), received 1",
 		},
 	}
 

@@ -579,57 +579,49 @@ func (s *MsgServerTestSuite) withdrawFails(account sdk.AccAddress, expectedErr e
 
 /// Cancel limit order
 
-func (s *MsgServerTestSuite) aliceCancelsLimitSell(tokenIn string, tick int, trancheKey string) {
-	s.cancelsLimitSell(s.alice, tokenIn, tick, trancheKey)
+func (s *MsgServerTestSuite) aliceCancelsLimitSell(trancheKey string) {
+	s.cancelsLimitSell(s.alice, trancheKey)
 }
 
-func (s *MsgServerTestSuite) bobCancelsLimitSell(tokenIn string, tick int, trancheKey string) {
-	s.cancelsLimitSell(s.bob, tokenIn, tick, trancheKey)
+func (s *MsgServerTestSuite) bobCancelsLimitSell(trancheKey string) {
+	s.cancelsLimitSell(s.bob, trancheKey)
 }
 
-func (s *MsgServerTestSuite) carolCancelsLimitSell(tokenIn string, tick int, trancheKey string) {
-	s.cancelsLimitSell(s.carol, tokenIn, tick, trancheKey)
+func (s *MsgServerTestSuite) carolCancelsLimitSell(trancheKey string) {
+	s.cancelsLimitSell(s.carol, trancheKey)
 }
 
-func (s *MsgServerTestSuite) danCancelsLimitSell(tokenIn string, tick int, trancheKey string) {
-	s.cancelsLimitSell(s.dan, tokenIn, tick, trancheKey)
+func (s *MsgServerTestSuite) danCancelsLimitSell(trancheKey string) {
+	s.cancelsLimitSell(s.dan, trancheKey)
 }
 
-func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, selling string, tick int, trancheKey string) {
-	tokenIn, tokenOut := GetInOutTokens(selling, "TokenA", "TokenB")
+func (s *MsgServerTestSuite) cancelsLimitSell(account sdk.AccAddress, trancheKey string) {
 	_, err := s.msgServer.CancelLimitOrder(s.goCtx, &types.MsgCancelLimitOrder{
 		Creator:    account.String(),
-		TokenIn:    tokenIn,
-		TokenOut:   tokenOut,
-		TickIndex:  int64(tick),
 		TrancheKey: trancheKey,
 	})
 	s.Assert().Nil(err)
 }
 
-func (s *MsgServerTestSuite) aliceCancelsLimitSellFails(tokenIn string, tick int, trancheKey string, expectedErr error) {
-	s.cancelsLimitSellFails(s.alice, tokenIn, tick, trancheKey, expectedErr)
+func (s *MsgServerTestSuite) aliceCancelsLimitSellFails(trancheKey string, expectedErr error) {
+	s.cancelsLimitSellFails(s.alice, trancheKey, expectedErr)
 }
 
-func (s *MsgServerTestSuite) bobCancelsLimitSellFails(tokenIn string, tick int, trancheKey string, expectedErr error) {
-	s.cancelsLimitSellFails(s.bob, tokenIn, tick, trancheKey, expectedErr)
+func (s *MsgServerTestSuite) bobCancelsLimitSellFails(trancheKey string, expectedErr error) {
+	s.cancelsLimitSellFails(s.bob, trancheKey, expectedErr)
 }
 
-func (s *MsgServerTestSuite) carolCancelsLimitSellFails(tokenIn string, tick int, trancheKey string, expectedErr error) {
-	s.cancelsLimitSellFails(s.carol, tokenIn, tick, trancheKey, expectedErr)
+func (s *MsgServerTestSuite) carolCancelsLimitSellFails(trancheKey string, expectedErr error) {
+	s.cancelsLimitSellFails(s.carol, trancheKey, expectedErr)
 }
 
-func (s *MsgServerTestSuite) danCancelsLimitSellFails(tokenIn string, tick int, trancheKey string, expectedErr error) {
-	s.cancelsLimitSellFails(s.dan, tokenIn, tick, trancheKey, expectedErr)
+func (s *MsgServerTestSuite) danCancelsLimitSellFails(trancheKey string, expectedErr error) {
+	s.cancelsLimitSellFails(s.dan, trancheKey, expectedErr)
 }
 
-func (s *MsgServerTestSuite) cancelsLimitSellFails(account sdk.AccAddress, selling string, tick int, trancheKey string, expectedErr error) {
-	tokenIn, tokenOut := GetInOutTokens(selling, "TokenA", "TokenB")
+func (s *MsgServerTestSuite) cancelsLimitSellFails(account sdk.AccAddress, trancheKey string, expectedErr error) {
 	_, err := s.msgServer.CancelLimitOrder(s.goCtx, &types.MsgCancelLimitOrder{
 		Creator:    account.String(),
-		TokenIn:    tokenIn,
-		TokenOut:   tokenOut,
-		TickIndex:  int64(tick),
 		TrancheKey: trancheKey,
 	})
 	s.Assert().ErrorIs(err, expectedErr)
@@ -694,57 +686,49 @@ func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr
 
 /// Withdraw filled limit order
 
-func (s *MsgServerTestSuite) aliceWithdrawsLimitSell(selling string, tick int, trancheKey string) {
-	s.withdrawsLimitSell(s.alice, selling, tick, trancheKey)
+func (s *MsgServerTestSuite) aliceWithdrawsLimitSell(trancheKey string) {
+	s.withdrawsLimitSell(s.alice, trancheKey)
 }
 
-func (s *MsgServerTestSuite) bobWithdrawsLimitSell(selling string, tick int, trancheKey string) {
-	s.withdrawsLimitSell(s.bob, selling, tick, trancheKey)
+func (s *MsgServerTestSuite) bobWithdrawsLimitSell(trancheKey string) {
+	s.withdrawsLimitSell(s.bob, trancheKey)
 }
 
-func (s *MsgServerTestSuite) carolWithdrawsLimitSell(selling string, tick int, trancheKey string) {
-	s.withdrawsLimitSell(s.carol, selling, tick, trancheKey)
+func (s *MsgServerTestSuite) carolWithdrawsLimitSell(trancheKey string) {
+	s.withdrawsLimitSell(s.carol, trancheKey)
 }
 
-func (s *MsgServerTestSuite) danWithdrawsLimitSell(selling string, tick int, trancheKey string) {
-	s.withdrawsLimitSell(s.dan, selling, tick, trancheKey)
+func (s *MsgServerTestSuite) danWithdrawsLimitSell(trancheKey string) {
+	s.withdrawsLimitSell(s.dan, trancheKey)
 }
 
-func (s *MsgServerTestSuite) withdrawsLimitSell(account sdk.AccAddress, selling string, tick int, trancheKey string) {
-	tokenIn, tokenOut := GetInOutTokens(selling, "TokenA", "TokenB")
+func (s *MsgServerTestSuite) withdrawsLimitSell(account sdk.AccAddress, trancheKey string) {
 	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
 		Creator:    account.String(),
-		TokenIn:    tokenIn,
-		TokenOut:   tokenOut,
-		TickIndex:  int64(tick),
 		TrancheKey: trancheKey,
 	})
 	s.Assert().Nil(err)
 }
 
-func (s *MsgServerTestSuite) aliceWithdrawLimitSellFails(expectedErr error, selling string, tick int, trancheKey string) {
-	s.withdrawLimitSellFails(s.alice, expectedErr, selling, tick, trancheKey)
+func (s *MsgServerTestSuite) aliceWithdrawLimitSellFails(expectedErr error, trancheKey string) {
+	s.withdrawLimitSellFails(s.alice, expectedErr, trancheKey)
 }
 
-func (s *MsgServerTestSuite) bobWithdrawLimitSellFails(expectedErr error, selling string, tick int, trancheKey string) {
-	s.withdrawLimitSellFails(s.bob, expectedErr, selling, tick, trancheKey)
+func (s *MsgServerTestSuite) bobWithdrawLimitSellFails(expectedErr error, trancheKey string) {
+	s.withdrawLimitSellFails(s.bob, expectedErr, trancheKey)
 }
 
-func (s *MsgServerTestSuite) carolWithdrawLimitSellFails(expectedErr error, selling string, tick int, trancheKey string) {
-	s.withdrawLimitSellFails(s.carol, expectedErr, selling, tick, trancheKey)
+func (s *MsgServerTestSuite) carolWithdrawLimitSellFails(expectedErr error, trancheKey string) {
+	s.withdrawLimitSellFails(s.carol, expectedErr, trancheKey)
 }
 
-func (s *MsgServerTestSuite) danWithdrawLimitSellFails(expectedErr error, selling string, tick int, trancheKey string) {
-	s.withdrawLimitSellFails(s.dan, expectedErr, selling, tick, trancheKey)
+func (s *MsgServerTestSuite) danWithdrawLimitSellFails(expectedErr error, trancheKey string) {
+	s.withdrawLimitSellFails(s.dan, expectedErr, trancheKey)
 }
 
-func (s *MsgServerTestSuite) withdrawLimitSellFails(account sdk.AccAddress, expectedErr error, selling string, tick int, trancheKey string) {
-	tokenIn, tokenOut := GetInOutTokens(selling, "TokenA", "TokenB")
+func (s *MsgServerTestSuite) withdrawLimitSellFails(account sdk.AccAddress, expectedErr error, trancheKey string) {
 	_, err := s.msgServer.WithdrawFilledLimitOrder(s.goCtx, &types.MsgWithdrawFilledLimitOrder{
 		Creator:    account.String(),
-		TokenIn:    tokenIn,
-		TokenOut:   tokenOut,
-		TickIndex:  int64(tick),
 		TrancheKey: trancheKey,
 	})
 	s.Assert().ErrorIs(err, expectedErr)
@@ -942,9 +926,7 @@ func (s *MsgServerTestSuite) getLimitUserSharesAtTick(account sdk.AccAddress, se
 }
 
 func (s *MsgServerTestSuite) getLimitUserSharesAtTickAtIndex(account sdk.AccAddress, selling string, tickIndex int64, trancheKey string) sdk.Int {
-	pairId := CreatePairId("TokenA", "TokenB")
-	// grab fill tranche reserves and shares
-	userShares, userSharesFound := s.app.DexKeeper.GetLimitOrderTrancheUser(s.ctx, pairId, tickIndex, selling, trancheKey, account.String())
+	userShares, userSharesFound := s.app.DexKeeper.GetLimitOrderTrancheUser(s.ctx, account.String(), trancheKey)
 	s.Assert().True(userSharesFound, "Failed to get limit order user shares for index %s", trancheKey)
 	return userShares.SharesOwned
 }

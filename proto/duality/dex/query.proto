@@ -24,7 +24,7 @@ service Query {
 
   // Queries a LimitOrderTrancheUser by index.
 	rpc LimitOrderTrancheUser(QueryGetLimitOrderTrancheUserRequest) returns (QueryGetLimitOrderTrancheUserResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{trancheKey}/{address}";
+		option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche_user/{address}/{trancheKey}";
 	}
 
 	// Queries a list of LimitOrderTrancheMap items.
@@ -95,12 +95,8 @@ message QueryParamsResponse {
 }
 
 message QueryGetLimitOrderTrancheUserRequest {
-  string pairId = 1;
-  int64 tickIndex =2;
-  string token = 3;
-    string trancheKey = 4;
-  string address = 5;
-
+  string address = 1;
+  string trancheKey = 2;
 }
 
 message QueryGetLimitOrderTrancheUserResponse {

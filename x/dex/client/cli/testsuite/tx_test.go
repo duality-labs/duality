@@ -402,21 +402,21 @@ func (s *TxTestSuite) TestTx5CmdCancelLimitOrder() {
 		errInRes  bool
 	}{
 		{
-			//  "cancel-limit-order [token-in] [token-out] [tick-index [tranche-key]"
+			//  "cancel-limit-order [tranche-key]"
 			name:      "missing arguments",
-			args:      []string{"TokenA", "TokenB", "[0]"},
+			args:      []string{},
 			expErr:    true,
-			expErrMsg: "Error: accepts 4 arg(s), received 3",
+			expErrMsg: "Error: accepts 1 arg(s), received 0",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{"TokenA", "TokenB", "[0]", "0", "1"},
+			args:      []string{"trancheKey123", "extraarg"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 4 arg(s), received 5",
+			expErrMsg: "Error: accepts 1 arg(s), received 2",
 		},
 		{
 			name:     "valid",
-			args:     []string{"TokenB", "TokenA", "[-20]", s.trancheKey},
+			args:     []string{s.trancheKey},
 			errInRes: false,
 		},
 	}
@@ -476,21 +476,21 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 		errInRes  bool
 	}{
 		{
-			//  "withdraw-filled-limit-order [token-in] [token-out] [tick-index] [tranche-key]"
+			//  "withdraw-filled-limit-order [tranche-key]"
 			name:      "missing arguments",
-			args:      []string{"TokenA", "TokenB", "[0]"},
+			args:      []string{},
 			expErr:    true,
-			expErrMsg: "Error: accepts 4 arg(s), received 3",
+			expErrMsg: "Error: accepts 1 arg(s), received 0",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{"TokenA", "TokenB", "[0]", "0", "1"},
+			args:      []string{"trancheKey123", "EXTRA-ARG"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 4 arg(s), received 5",
+			expErrMsg: "Error: accepts 1 arg(s), received 2",
 		},
 		{
 			name:     "valid",
-			args:     []string{"TokenB", "TokenA", "0", trancheKey},
+			args:     []string{trancheKey},
 			errInRes: false,
 		},
 	}

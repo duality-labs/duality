@@ -1,9 +1,6 @@
 package cli
 
 import (
-	"strconv"
-	"strings"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -13,25 +10,11 @@ import (
 
 func CmdCancelLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "cancel-limit-order [tokenIn] [tokenOut] [tick-index] [tranche-key]",
+		Use:     "cancel-limit-order [tranche-key]",
 		Short:   "Broadcast message CancelLimitOrder",
-		Example: "cancel-limit-order alice tokenA tokenB [-10] 0 --from alice",
-		Args:    cobra.ExactArgs(4),
+		Example: "cancel-limit-order TRANCHEKEY123 --from alice",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argTokenIn := args[0]
-			argTokenOut := args[1]
-
-			if strings.HasPrefix(args[2], "[") && strings.HasSuffix(args[2], "]") {
-				args[2] = strings.TrimPrefix(args[2], "[")
-				args[2] = strings.TrimSuffix(args[2], "]")
-			}
-			argTickIndex := args[2]
-			argTrancheKey := args[3]
-
-			argTickIndexInt, err := strconv.ParseInt(argTickIndex, 10, 0)
-			if err != nil {
-				return err
-			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -40,10 +23,7 @@ func CmdCancelLimitOrder() *cobra.Command {
 
 			msg := types.NewMsgCancelLimitOrder(
 				clientCtx.GetFromAddress().String(),
-				argTokenIn,
-				argTokenOut,
-				argTickIndexInt,
-				argTrancheKey,
+				args[0],
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

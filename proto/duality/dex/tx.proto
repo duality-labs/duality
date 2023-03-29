@@ -133,10 +133,7 @@ message MsgPlaceLimitOrderResponse {
 
 message MsgWithdrawFilledLimitOrder {
   string creator = 1;
-  string tokenIn = 2;
-  string tokenOut = 3;
-  int64 tickIndex = 4;
-  string trancheKey = 5;
+  string trancheKey = 2;
 }
 
 message MsgWithdrawFilledLimitOrderResponse {
@@ -144,10 +141,7 @@ message MsgWithdrawFilledLimitOrderResponse {
 
 message MsgCancelLimitOrder {
   string creator = 1;
-  string tokenIn = 2;
-  string tokenOut = 3;
-  int64 tickIndex = 4;
-  string trancheKey = 5;
+  string trancheKey = 2;
 }
 
 message MsgCancelLimitOrderResponse {

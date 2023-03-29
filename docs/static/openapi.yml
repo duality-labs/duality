@@ -12121,16 +12121,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/dualitylabs/duality/dex/filled_limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}':
@@ -12377,16 +12367,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/dualitylabs/duality/dex/limit_order_tranche/{pairId}/{tokenIn}/{tickIndex}/{trancheKey}':
@@ -12618,19 +12598,9 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
-  '/dualitylabs/duality/dex/limit_order_tranche_user/{pairId}/{token}/{tickIndex}/{trancheKey}/{address}':
+  '/dualitylabs/duality/dex/limit_order_tranche_user/{address}/{trancheKey}':
     get:
       summary: Queries a LimitOrderTrancheUser by index.
       operationId: DualitylabsDualityDexLimitOrderTrancheUser
@@ -12695,24 +12665,11 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
-        - name: pairId
-          in: path
-          required: true
-          type: string
-        - name: token
-          in: path
-          required: true
-          type: string
-        - name: tickIndex
-          in: path
-          required: true
-          type: string
-          format: int64
-        - name: trancheKey
-          in: path
-          required: true
-          type: string
         - name: address
+          in: path
+          required: true
+          type: string
+        - name: trancheKey
           in: path
           required: true
           type: string
@@ -12883,16 +12840,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -13141,16 +13088,6 @@ paths:
             when key
 
             is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
