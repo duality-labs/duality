@@ -7,6 +7,8 @@ import (
 )
 
 // x/dex module sentinel errors
+
+//nolint:all
 var (
 	ErrInvalidTradingPair                 = sdkerrors.Register(ModuleName, 1102, "Invalid token pair:")   // "%s<>%s", tokenA, tokenB
 	ErrInsufficientShares                 = sdkerrors.Register(ModuleName, 1104, "Insufficient shares:")  // "%s does not have %s shares of type %s", address, shares, sharesID

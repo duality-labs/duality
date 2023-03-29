@@ -6,7 +6,15 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func createDepositEvent(creator, receiver, token0, token1, tickIndex, fee string, otherAttrs ...sdk.Attribute) sdk.Event {
+func createDepositEvent(
+	creator,
+	receiver,
+	token0,
+	token1,
+	tickIndex,
+	fee string,
+	otherAttrs ...sdk.Attribute,
+) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, DepositEventKey),
@@ -21,7 +29,20 @@ func createDepositEvent(creator, receiver, token0, token1, tickIndex, fee string
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateDepositEvent(creator, receiver, token0, token1, tickIndex, fee, oldReserve0, oldReserve1, newReserve0, newReserve1, sharesMinted string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreateDepositEvent(
+	creator,
+	receiver,
+	token0,
+	token1,
+	tickIndex,
+	fee,
+	oldReserve0,
+	oldReserve1,
+	newReserve0,
+	newReserve1,
+	sharesMinted string,
+	otherAttrs ...sdk.Attribute,
+) sdk.Event {
 	return createDepositEvent(
 		creator,
 		receiver,
@@ -53,7 +74,19 @@ func createDepositFailedEvent(creator, receiver, token0, token1, tickIndex, fee 
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateDepositFailedEvent(creator, receiver, token0, token1, tickIndex, fee, oldReserve0, oldReserve1, amount0, amount1 string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreateDepositFailedEvent(
+	creator,
+	receiver,
+	token0,
+	token1,
+	tickIndex,
+	fee,
+	oldReserve0,
+	oldReserve1,
+	amount0,
+	amount1 string,
+	otherAttrs ...sdk.Attribute,
+) sdk.Event {
 	return createDepositEvent(
 		creator,
 		receiver,
@@ -69,7 +102,15 @@ func CreateDepositFailedEvent(creator, receiver, token0, token1, tickIndex, fee,
 	)
 }
 
-func createWithdrawEvent(creator, receiver, token0, token1, tickIndex, fee string, otherAttrs ...sdk.Attribute) sdk.Event {
+func createWithdrawEvent(
+	creator,
+	receiver,
+	token0,
+	token1,
+	tickIndex,
+	fee string,
+	otherAttrs ...sdk.Attribute,
+) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, WithdrawEventKey),
@@ -84,7 +125,20 @@ func createWithdrawEvent(creator, receiver, token0, token1, tickIndex, fee strin
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateWithdrawEvent(creator, receiver, token0, token1, tickIndex, fee, oldReserve0, oldReserve1, newReserve0, newReserve1, sharesRemoved string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreateWithdrawEvent(
+	creator,
+	receiver,
+	token0,
+	token1,
+	tickIndex,
+	fee,
+	oldReserve0,
+	oldReserve1,
+	newReserve0,
+	newReserve1,
+	sharesRemoved string,
+	otherAttrs ...sdk.Attribute,
+) sdk.Event {
 	return createWithdrawEvent(
 		creator,
 		receiver,
@@ -100,7 +154,7 @@ func CreateWithdrawEvent(creator, receiver, token0, token1, tickIndex, fee, oldR
 	)
 }
 
-func createSwapEvent(creator, receiver, tokenIn, tokenOut, amountIn, amountOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+func createSwapEvent(creator, receiver, tokenIn, tokenOut, amountIn, amountOut string) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, SwapEventKey),
@@ -111,11 +165,10 @@ func createSwapEvent(creator, receiver, tokenIn, tokenOut, amountIn, amountOut s
 		sdk.NewAttribute(SwapEventAmountIn, amountIn),
 		sdk.NewAttribute(SwapEventAmoutOut, amountOut),
 	}
-	attrs = append(attrs, otherAttrs...)
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateSwapEvent(creator, receiver, tokenIn, tokenOut, amountIn, amountOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreateSwapEvent(creator, receiver, tokenIn, tokenOut, amountIn, amountOut string) sdk.Event {
 	return createSwapEvent(
 		creator,
 		receiver,
@@ -126,7 +179,7 @@ func CreateSwapEvent(creator, receiver, tokenIn, tokenOut, amountIn, amountOut s
 	)
 }
 
-func createPlaceLimitOrderEvent(creator, receiver, tokenIn, tokenOut, amountIn, shares, trancheKey string, otherAttrs ...sdk.Attribute) sdk.Event {
+func createPlaceLimitOrderEvent(creator, receiver, tokenIn, tokenOut, amountIn, shares, trancheKey string) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, PlaceLimitOrderEventKey),
@@ -138,11 +191,10 @@ func createPlaceLimitOrderEvent(creator, receiver, tokenIn, tokenOut, amountIn, 
 		sdk.NewAttribute(PlaceLimitOrderEventShares, shares),
 		sdk.NewAttribute(PlaceLimitOrderEventTrancheKey, trancheKey),
 	}
-	attrs = append(attrs, otherAttrs...)
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreatePlaceLimitOrderEvent(creator, receiver, tokenIn, tokenOut, amountIn, shares, trancheKey string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreatePlaceLimitOrderEvent(creator, receiver, tokenIn, tokenOut, amountIn, shares, trancheKey string) sdk.Event {
 	return createPlaceLimitOrderEvent(
 		creator,
 		receiver,
@@ -154,7 +206,7 @@ func CreatePlaceLimitOrderEvent(creator, receiver, tokenIn, tokenOut, amountIn, 
 	)
 }
 
-func withdrawFilledLimitOrderEvent(creator, tokenIn, tokenOut, key, amountOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+func withdrawFilledLimitOrderEvent(creator, tokenIn, tokenOut, key, amountOut string) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, WithdrawFilledLimitOrderEventKey),
@@ -164,11 +216,10 @@ func withdrawFilledLimitOrderEvent(creator, tokenIn, tokenOut, key, amountOut st
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventTrancheKey, key),
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventAmountOut, amountOut),
 	}
-	attrs = append(attrs, otherAttrs...)
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func WithdrawFilledLimitOrderEvent(creator, tokenIn, tokenOut, key, amountOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+func WithdrawFilledLimitOrderEvent(creator, tokenIn, tokenOut, key, amountOut string) sdk.Event {
 	return withdrawFilledLimitOrderEvent(
 		creator,
 		tokenIn,
@@ -178,17 +229,16 @@ func WithdrawFilledLimitOrderEvent(creator, tokenIn, tokenOut, key, amountOut st
 	)
 }
 
-func GoodTilPurgeHitLimitEvent(gas sdk.Gas, otherAttrs ...sdk.Attribute) sdk.Event {
+func GoodTilPurgeHitLimitEvent(gas sdk.Gas) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, GoodTilPurgeHitGasLimitEventKey),
 		sdk.NewAttribute(GoodTilPurgeHitGasLimitEventGas, strconv.FormatUint(gas, 10)),
 	}
-	attrs = append(attrs, otherAttrs...)
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func cancelLimitOrderEvent(creator, tokenIn, tokenOut, key, amountOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+func cancelLimitOrderEvent(creator, tokenIn, tokenOut, key, amountOut string) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
 		sdk.NewAttribute(sdk.AttributeKeyAction, WithdrawFilledLimitOrderEventKey),
@@ -198,11 +248,10 @@ func cancelLimitOrderEvent(creator, tokenIn, tokenOut, key, amountOut string, ot
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventTrancheKey, key),
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventAmountOut, amountOut),
 	}
-	attrs = append(attrs, otherAttrs...)
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CancelLimitOrderEvent(creator, tokenIn, tokenOut, key, amountOut string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CancelLimitOrderEvent(creator, tokenIn, tokenOut, key, amountOut string) sdk.Event {
 	return cancelLimitOrderEvent(
 		creator,
 		tokenIn,

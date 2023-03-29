@@ -3,10 +3,6 @@ package keeper_test
 import (
 	"math"
 
-	//"time"
-	//. "github.com/duality-labs/duality/x/dex/keeper/internal/testutils"
-	//"github.com/duality-labs/duality/x/dex/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/types"
 )

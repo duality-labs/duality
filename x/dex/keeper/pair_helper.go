@@ -11,8 +11,7 @@ import (
 func SortTokens(tokenA, tokenB string) (string, string, error) {
 	relativeOrder := tokenA < tokenB
 
-	equalCheck := tokenA == tokenB
-	if equalCheck {
+	if tokenA == tokenB {
 		return "", "", sdkerrors.Wrapf(types.ErrInvalidTradingPair, "%s<>%s", tokenA, tokenB)
 	} else if relativeOrder {
 		return tokenA, tokenB, nil
@@ -44,8 +43,8 @@ func CreatePairIDFromUnsorted(tokenA, tokenB string) (*types.PairID, error) {
 	return CreatePairID(token0, token1), nil
 }
 
-func GetInOutTokens(tokenIn_, tokenA, tokenB string) (tokenIn, tokenOut string) {
-	if tokenIn_ == tokenA {
+func GetInOutTokens(tokenIn, tokenA, tokenB string) (_, tokenOut string) {
+	if tokenIn == tokenA {
 		return tokenA, tokenB
 	} else {
 		return tokenB, tokenA
@@ -67,7 +66,7 @@ func StringToPairID(pairIDStr string) (*types.PairID, error) {
 
 func NormalizeTickIndex(baseToken, token0 string, tickIndex int64) int64 {
 	if baseToken != token0 {
-		tickIndex = tickIndex * -1
+		tickIndex *= -1
 	}
 	return tickIndex
 }

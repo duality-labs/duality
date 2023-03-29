@@ -9,7 +9,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) UserDepositsAll(goCtx context.Context, req *types.QueryAllUserDepositsRequest) (*types.QueryAllUserDepositsResponse, error) {
+func (k Keeper) UserDepositsAll(
+	goCtx context.Context,
+	req *types.QueryAllUserDepositsRequest,
+) (*types.QueryAllUserDepositsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}

@@ -1,3 +1,4 @@
+//nolint:lll,unused
 package keeper_test
 
 import (
@@ -11,7 +12,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	dualityapp "github.com/duality-labs/duality/app"
-	"github.com/duality-labs/duality/x/dex/keeper"
 	. "github.com/duality-labs/duality/x/dex/keeper"
 	. "github.com/duality-labs/duality/x/dex/keeper/internal/testutils"
 	"github.com/duality-labs/duality/x/dex/types"
@@ -62,7 +62,7 @@ func (s *MsgServerTestSuite) SetupTest() {
 	app.AccountKeeper.SetAccount(ctx, accDan)
 
 	s.app = app
-	s.msgServer = keeper.NewMsgServerImpl(app.DexKeeper)
+	s.msgServer = NewMsgServerImpl(app.DexKeeper)
 	s.ctx = ctx
 	s.goCtx = sdk.WrapSDKContext(ctx)
 	s.queryClient = queryClient
@@ -1236,12 +1236,10 @@ func calculateSwap(price *types.Price, liquidity, amountIn int64) (sdk.Int, sdk.
 		// fmt.Printf("sufficient tmpOut %s\n", tmpAmountOut)
 		// sufficient liquidity
 		return sdk.ZeroInt(), tmpAmountOut.TruncateInt()
-	} else {
-		// only sufficient for part of amountIn
-		tmpAmountIn := price.Inv().MulInt(liquidityInt).TruncateInt()
-		// fmt.Printf("insufficient tmpIn %s\n", tmpAmountIn)
-		return amountInInt.Sub(tmpAmountIn), liquidityInt
 	}
+	// only sufficient for part of amountIn
+	tmpAmountIn := price.Inv().MulInt(liquidityInt).TruncateInt()
+	return amountInInt.Sub(tmpAmountIn), liquidityInt
 }
 
 func (s *MsgServerTestSuite) calculateMultipleSwapsAToB(
