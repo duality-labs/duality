@@ -32,7 +32,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledSimpleFull() {
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey)
+	s.aliceWithdrawsLimitSell(trancheKey)
 
 	s.assertAliceBalances(40, 60)
 	s.assertBobBalances(60, 40)
@@ -41,7 +41,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledSimpleFull() {
 	s.assertCurr0To1(math.MaxInt64)
 
 	// Assert that the LimitOrderTrancheUser has been deleted
-	_, found := s.app.DexKeeper.GetLimitOrderTrancheUser(s.ctx, defaultPairId, 0, "TokenA", trancheKey, s.alice.String())
+	_, found := s.app.DexKeeper.GetLimitOrderTrancheUser(s.ctx, s.alice.String(), trancheKey)
 	s.Assert().False(found)
 }
 
@@ -63,7 +63,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledPartial() {
 
 	// WHEN
 	// alice withdraws filled limit order proceeds from tick 0 tranche 0
-	s.aliceWithdrawsLimitSell("TokenB", 0, trancheKey)
+	s.aliceWithdrawsLimitSell(trancheKey)
 
 	// THEN
 	// limit order has been partially filled
@@ -75,8 +75,8 @@ func (s *MsgServerTestSuite) TestWithdrawFilledPartial() {
 	s.assertBobBalances(90, 110)
 
 	// the LimitOrderTrancheUser still exists
-	_, found := s.app.DexKeeper.GetLimitOrderTrancheUser(s.ctx, defaultPairId, 0, "TokenA", trancheKey, s.alice.String())
-	s.Assert().False(found)
+	_, found := s.app.DexKeeper.GetLimitOrderTrancheUser(s.ctx, s.alice.String(), trancheKey)
+	s.Assert().True(found)
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
@@ -105,7 +105,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey0)
+	s.aliceWithdrawsLimitSell(trancheKey0)
 	trancheKey1 := s.aliceLimitSells("TokenA", 0, 10)
 
 	s.assertAliceBalances(30, 60)
@@ -122,7 +122,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKey1)
+	s.aliceWithdrawsLimitSell(trancheKey1)
 
 	s.assertAliceBalances(30, 70)
 	s.assertBobBalances(70, 30)
@@ -157,7 +157,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullDifferentDirection() {
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.aliceWithdrawsLimitSell("TokenA", 0, trancheKeyA)
+	s.aliceWithdrawsLimitSell(trancheKeyA)
 	trancheKeyB := s.aliceLimitSells("TokenB", 0, 10)
 
 	s.assertAliceBalances(40, 50)
@@ -174,7 +174,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullDifferentDirection() {
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.aliceWithdrawsLimitSell("TokenB", 0, trancheKeyB)
+	s.aliceWithdrawsLimitSell(trancheKeyB)
 
 	s.assertAliceBalances(50, 50)
 	s.assertBobBalances(50, 50)
@@ -195,7 +195,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledEmptyFilled() {
 	// THEN
 
 	err := types.ErrWithdrawEmptyLimitOrder
-	s.aliceWithdrawLimitSellFails(err, "TokenA", 0, trancheKey)
+	s.aliceWithdrawLimitSellFails(err, trancheKey)
 }
 
 func (s *MsgServerTestSuite) TestWithdrawFilledNoExistingOrderByUser() {
@@ -211,21 +211,21 @@ func (s *MsgServerTestSuite) TestWithdrawFilledNoExistingOrderByUser() {
 	// THEN
 
 	err := types.ErrValidLimitOrderTrancheNotFound
-	s.bobWithdrawLimitSellFails(err, "TokenA", 0, trancheKey)
+	s.bobWithdrawLimitSellFails(err, trancheKey)
 }
 
-func (s *MsgServerTestSuite) TestWithdrawFilledTrancheKeyDoesntExist() {
+func (s *MsgServerTestSuite) TestWithdrawFilledOtherUserOrder() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 50)
 
 	// GIVEN
 	// only alice has a single existing order placed
-	s.aliceLimitSells("TokenA", 0, 10)
+	trancheKey := s.aliceLimitSells("TokenA", 0, 10)
 
 	// WHEN
-	// bob tries to withdraw filled from tick 0 tranche 5
+	// bob tries to withdraw with allice's TrancheKey
 	// THEN
 
 	err := types.ErrValidLimitOrderTrancheNotFound
-	s.bobWithdrawLimitSellFails(err, "TokenA", 0, "BADTRANCHE")
+	s.bobWithdrawLimitSellFails(err, trancheKey)
 }

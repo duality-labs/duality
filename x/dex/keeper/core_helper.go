@@ -74,15 +74,15 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 	pairId *types.PairId,
 	tickIndex int64,
 	tokenIn string,
-	currentLimitOrderKey string,
+	trancheKey string,
 	orderType types.LimitOrderType,
 	receiver string,
 ) types.LimitOrderTrancheUser {
-	UserShareData, UserShareDataFound := k.GetLimitOrderTrancheUser(ctx, pairId, tickIndex, tokenIn, currentLimitOrderKey, receiver)
+	UserShareData, UserShareDataFound := k.GetLimitOrderTrancheUser(ctx, receiver, trancheKey)
 
 	if !UserShareDataFound {
 		return types.LimitOrderTrancheUser{
-			TrancheKey:      currentLimitOrderKey,
+			TrancheKey:      trancheKey,
 			Address:         receiver,
 			SharesOwned:     sdk.ZeroInt(),
 			SharesWithdrawn: sdk.ZeroInt(),

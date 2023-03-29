@@ -100,23 +100,11 @@ const (
 )
 
 // LimitOrderTrancheUserKey returns the store key to retrieve a LimitOrderTrancheUser from the index fields
-func LimitOrderTrancheUserKey(pairId *PairId, tickIndex int64, token string, trancheKey string, address string) []byte {
+func LimitOrderTrancheUserKey(address string, trancheKey string) []byte {
 	var key []byte
 
 	addressBytes := []byte(address)
 	key = append(key, addressBytes...)
-	key = append(key, []byte("/")...)
-
-	pairIdBytes := []byte(pairId.Stringify())
-	key = append(key, pairIdBytes...)
-	key = append(key, []byte("/")...)
-
-	tickIndexBytes := TickIndexToBytes(tickIndex, pairId, token)
-	key = append(key, tickIndexBytes...)
-	key = append(key, []byte("/")...)
-
-	tokenBytes := []byte(token)
-	key = append(key, tokenBytes...)
 	key = append(key, []byte("/")...)
 
 	trancheKeyBytes := []byte(trancheKey)

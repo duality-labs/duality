@@ -26,7 +26,7 @@ func (gs GenesisState) Validate() error {
 	LimitOrderTrancheUserIndexMap := make(map[string]struct{})
 
 	for _, elem := range gs.LimitOrderTrancheUserList {
-		index := string(LimitOrderTrancheUserKey(elem.PairId, elem.TickIndex, elem.Token, elem.TrancheKey, elem.Address))
+		index := string(LimitOrderTrancheUserKey(elem.Address, elem.TrancheKey))
 		if _, ok := LimitOrderTrancheUserIndexMap[index]; ok {
 			return fmt.Errorf("duplicated index for LimitOrderTrancheUser")
 		}

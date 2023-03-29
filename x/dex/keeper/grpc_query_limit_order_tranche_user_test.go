@@ -15,9 +15,6 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
-// Prevent strconv unused error
-var _ = strconv.IntSize
-
 func TestLimitOrderTrancheUserQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
@@ -31,9 +28,6 @@ func TestLimitOrderTrancheUserQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetLimitOrderTrancheUserRequest{
-				PairId:     "TokenA<>TokenB",
-				TickIndex:  0,
-				Token:      "TokenA",
 				TrancheKey: msgs[0].TrancheKey,
 				Address:    msgs[0].Address,
 			},
@@ -42,9 +36,6 @@ func TestLimitOrderTrancheUserQuerySingle(t *testing.T) {
 		{
 			desc: "Second",
 			request: &types.QueryGetLimitOrderTrancheUserRequest{
-				PairId:     "TokenA<>TokenB",
-				TickIndex:  0,
-				Token:      "TokenA",
 				TrancheKey: msgs[1].TrancheKey,
 				Address:    msgs[1].Address,
 			},
@@ -53,9 +44,6 @@ func TestLimitOrderTrancheUserQuerySingle(t *testing.T) {
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetLimitOrderTrancheUserRequest{
-				PairId:     "TokenA<>TokenB",
-				TickIndex:  0,
-				Token:      "TokenA",
 				TrancheKey: "100000",
 				Address:    strconv.Itoa(100000),
 			},

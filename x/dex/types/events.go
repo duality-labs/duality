@@ -142,7 +142,7 @@ func createPlaceLimitOrderEvent(creator string, receiver string, tokenIn string,
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreatePlaceLimitOrderEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, shares string, currentLimitOrderKey string, otherAttrs ...sdk.Attribute) sdk.Event {
+func CreatePlaceLimitOrderEvent(creator string, receiver string, tokenIn string, tokenOut string, amountIn string, shares string, trancheKey string, otherAttrs ...sdk.Attribute) sdk.Event {
 	return createPlaceLimitOrderEvent(
 		creator,
 		receiver,
@@ -150,7 +150,7 @@ func CreatePlaceLimitOrderEvent(creator string, receiver string, tokenIn string,
 		tokenOut,
 		amountIn,
 		shares,
-		currentLimitOrderKey,
+		trancheKey,
 	)
 }
 

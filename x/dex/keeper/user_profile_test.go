@@ -15,7 +15,7 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 	s.bobLimitSells("TokenA", -1, 10)
 	profile := NewUserProfile(s.alice)
 
-	// THEN GetAllLimitOrderTrancheUserForAddress returns alice's same two orders
+	// THEN GetAllLimitOrders returns alice's same two orders
 	LOList := profile.GetAllLimitOrders(s.ctx, s.app.DexKeeper)
 	s.Assert().Equal(2, len(LOList))
 	s.Assert().Equal(types.LimitOrderTrancheUser{
@@ -29,7 +29,7 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 		SharesCancelled: sdk.NewInt(0),
 		TakerReserves:   sdk.ZeroInt(),
 	},
-		LOList[1],
+		LOList[0],
 	)
 	s.Assert().Equal(types.LimitOrderTrancheUser{
 		PairId:          defaultPairId,
@@ -42,7 +42,7 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 		SharesCancelled: sdk.NewInt(0),
 		TakerReserves:   sdk.ZeroInt(),
 	},
-		LOList[0],
+		LOList[1],
 	)
 }
 
