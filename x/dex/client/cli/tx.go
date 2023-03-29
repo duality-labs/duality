@@ -29,7 +29,7 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdDeposit())
-	cmd.AddCommand(CmdWithdrawl())
+	cmd.AddCommand(CmdWithdrawal())
 	cmd.AddCommand(CmdSwap())
 	cmd.AddCommand(CmdPlaceLimitOrder())
 	cmd.AddCommand(CmdWithdrawFilledLimitOrder())

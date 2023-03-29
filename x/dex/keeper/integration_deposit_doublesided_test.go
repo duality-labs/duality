@@ -235,9 +235,9 @@ func (s *MsgServerTestSuite) TestDepositValueAccural() {
 	s.carolDeposits(NewDeposit(100, 1, 0, 10))
 	s.assertCarolShares(0, 10, 50)
 
-	s.aliceWithdraws(NewWithdrawl(100, 0, 10))
+	s.aliceWithdraws(NewWithdrawal(100, 0, 10))
 	s.assertAliceBalances(199, 0)
 
-	s.carolWithdraws(NewWithdrawl(50, 0, 10))
+	s.carolWithdraws(NewWithdrawal(50, 0, 10))
 	s.assertCarolBalances(100, 2)
 }

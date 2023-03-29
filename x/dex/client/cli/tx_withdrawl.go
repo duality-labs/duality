@@ -13,11 +13,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdWithdrawl() *cobra.Command {
+func CmdWithdrawal() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "withdrawl [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fees] ",
-		Short:   "Broadcast message withdrawl",
-		Example: "withdrawl alice tokenA tokenB 100,50 [-10,5] 1,1 --from alice",
+		Use:     "withdrawal [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fees] ",
+		Short:   "Broadcast message withdrawal",
+		Example: "withdrawal alice tokenA tokenB 100,50 [-10,5] 1,1 --from alice",
 		Args:    cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
@@ -69,7 +69,7 @@ func CmdWithdrawl() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgWithdrawl(
+			msg := types.NewMsgWithdrawal(
 				clientCtx.GetFromAddress().String(),
 				argReceiver,
 				argTokenA,

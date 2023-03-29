@@ -482,51 +482,51 @@ type DepositReponse struct {
 }
 
 // Withdraw
-type Withdrawl struct {
+type Withdrawal struct {
 	TickIndex int64
 	Fee       uint64
 	Shares    sdk.Int
 }
 
-func NewWithdrawlInt(shares sdk.Int, tick int64, fee uint64) *Withdrawl {
-	return &Withdrawl{
+func NewWithdrawalInt(shares sdk.Int, tick int64, fee uint64) *Withdrawal {
+	return &Withdrawal{
 		Shares:    shares,
 		Fee:       fee,
 		TickIndex: tick,
 	}
 }
 
-func NewWithdrawl(shares, tick int64, fee uint64) *Withdrawl {
-	return NewWithdrawlInt(sdk.NewInt(shares), tick, fee)
+func NewWithdrawal(shares, tick int64, fee uint64) *Withdrawal {
+	return NewWithdrawalInt(sdk.NewInt(shares), tick, fee)
 }
 
-func (s *MsgServerTestSuite) aliceWithdraws(withdrawals ...*Withdrawl) {
+func (s *MsgServerTestSuite) aliceWithdraws(withdrawals ...*Withdrawal) {
 	s.withdraws(s.alice, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) bobWithdraws(withdrawals ...*Withdrawl) {
+func (s *MsgServerTestSuite) bobWithdraws(withdrawals ...*Withdrawal) {
 	s.withdraws(s.bob, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) carolWithdraws(withdrawals ...*Withdrawl) {
+func (s *MsgServerTestSuite) carolWithdraws(withdrawals ...*Withdrawal) {
 	s.withdraws(s.carol, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) danWithdraws(withdrawals ...*Withdrawl) {
+func (s *MsgServerTestSuite) danWithdraws(withdrawals ...*Withdrawal) {
 	s.withdraws(s.dan, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) withdraws(account sdk.AccAddress, withdrawls ...*Withdrawl) {
-	tickIndexes := make([]int64, len(withdrawls))
-	fee := make([]uint64, len(withdrawls))
-	sharesToRemove := make([]sdk.Int, len(withdrawls))
-	for i, e := range withdrawls {
+func (s *MsgServerTestSuite) withdraws(account sdk.AccAddress, withdrawals ...*Withdrawal) {
+	tickIndexes := make([]int64, len(withdrawals))
+	fee := make([]uint64, len(withdrawals))
+	sharesToRemove := make([]sdk.Int, len(withdrawals))
+	for i, e := range withdrawals {
 		tickIndexes[i] = e.TickIndex
 		fee[i] = e.Fee
 		sharesToRemove[i] = e.Shares
 	}
 
-	_, err := s.msgServer.Withdrawl(s.goCtx, &types.MsgWithdrawl{
+	_, err := s.msgServer.Withdrawal(s.goCtx, &types.MsgWithdrawal{
 		Creator:         account.String(),
 		Receiver:        account.String(),
 		TokenA:          "TokenA",
@@ -538,23 +538,23 @@ func (s *MsgServerTestSuite) withdraws(account sdk.AccAddress, withdrawls ...*Wi
 	s.Assert().Nil(err)
 }
 
-func (s *MsgServerTestSuite) aliceWithdrawFails(expectedErr error, withdrawals ...*Withdrawl) {
+func (s *MsgServerTestSuite) aliceWithdrawFails(expectedErr error, withdrawals ...*Withdrawal) {
 	s.withdrawFails(s.alice, expectedErr, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) bobWithdrawFails(expectedErr error, withdrawals ...*Withdrawl) {
+func (s *MsgServerTestSuite) bobWithdrawFails(expectedErr error, withdrawals ...*Withdrawal) {
 	s.withdrawFails(s.bob, expectedErr, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) carolWithdrawFails(expectedErr error, withdrawals ...*Withdrawl) {
+func (s *MsgServerTestSuite) carolWithdrawFails(expectedErr error, withdrawals ...*Withdrawal) {
 	s.withdrawFails(s.carol, expectedErr, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) danWithdrawFails(expectedErr error, withdrawals ...*Withdrawl) {
+func (s *MsgServerTestSuite) danWithdrawFails(expectedErr error, withdrawals ...*Withdrawal) {
 	s.withdrawFails(s.dan, expectedErr, withdrawals...)
 }
 
-func (s *MsgServerTestSuite) withdrawFails(account sdk.AccAddress, expectedErr error, withdrawals ...*Withdrawl) {
+func (s *MsgServerTestSuite) withdrawFails(account sdk.AccAddress, expectedErr error, withdrawals ...*Withdrawal) {
 	tickIndexes := make([]int64, len(withdrawals))
 	fee := make([]uint64, len(withdrawals))
 	sharesToRemove := make([]sdk.Int, len(withdrawals))
@@ -564,7 +564,7 @@ func (s *MsgServerTestSuite) withdrawFails(account sdk.AccAddress, expectedErr e
 		sharesToRemove[i] = e.Shares
 	}
 
-	_, err := s.msgServer.Withdrawl(s.goCtx, &types.MsgWithdrawl{
+	_, err := s.msgServer.Withdrawal(s.goCtx, &types.MsgWithdrawal{
 		Creator:         account.String(),
 		Receiver:        account.String(),
 		TokenA:          "TokenA",

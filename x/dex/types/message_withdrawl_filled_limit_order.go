@@ -5,7 +5,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const TypeMsgWithdrawFilledLimitOrder = "withdrawl_withdrawn_limit_order"
+const TypeMsgWithdrawFilledLimitOrder = "withdrawal_withdrawn_limit_order"
 
 var _ sdk.Msg = &MsgWithdrawFilledLimitOrder{}
 

@@ -33,7 +33,7 @@ func (s *MsgServerTestSuite) TestAutoswapperWithdraws() {
 
 	aliceExpectedBalance0, aliceExpectedBalance1, dexExpectedBalance0, dexExpectedBalance1 := s.calcExpectedBalancesAfterWithdrawOnePool(autoswapSharesMinted, s.alice, int64(tickIndex), uint64(fee))
 
-	s.aliceWithdraws(NewWithdrawlInt(autoswapSharesMinted, int64(tickIndex), uint64(fee)))
+	s.aliceWithdraws(NewWithdrawalInt(autoswapSharesMinted, int64(tickIndex), uint64(fee)))
 
 	s.assertAliceBalances(aliceExpectedBalance0.Int64(), aliceExpectedBalance1.Int64())
 	s.assertDexBalances(dexExpectedBalance0.Int64(), dexExpectedBalance1.Int64())
@@ -65,7 +65,7 @@ func (s *MsgServerTestSuite) TestAutoswapOtherDepositorWithdraws() {
 
 	bobExpectedBalance0, bobExpectedBalance1, dexExpectedBalance0, dexExpectedBalance1 := s.calcExpectedBalancesAfterWithdrawOnePool(bobSharesMinted, s.bob, int64(tickIndex), uint64(fee))
 
-	s.bobWithdraws(NewWithdrawl(bobSharesMinted.Int64(), int64(tickIndex), uint64(fee)))
+	s.bobWithdraws(NewWithdrawal(bobSharesMinted.Int64(), int64(tickIndex), uint64(fee)))
 
 	s.assertBobBalances(bobExpectedBalance0.Int64(), bobExpectedBalance1.Int64())
 	s.assertDexBalances(dexExpectedBalance0.Int64(), dexExpectedBalance1.Int64())
@@ -99,7 +99,7 @@ func (s *MsgServerTestSuite) TestAutoswapBothWithdraws() {
 
 	bobExpectedBalance0, bobExpectedBalance1, dexExpectedBalance0, dexExpectedBalance1 := s.calcExpectedBalancesAfterWithdrawOnePool(bobSharesMinted, s.bob, int64(tickIndex), uint64(fee))
 
-	s.bobWithdraws(NewWithdrawl(bobSharesMinted.Int64(), int64(tickIndex), uint64(fee)))
+	s.bobWithdraws(NewWithdrawal(bobSharesMinted.Int64(), int64(tickIndex), uint64(fee)))
 
 	s.assertBobBalances(bobExpectedBalance0.Int64(), bobExpectedBalance1.Int64())
 	s.assertDexBalances(dexExpectedBalance0.Int64(), dexExpectedBalance1.Int64())
@@ -108,7 +108,7 @@ func (s *MsgServerTestSuite) TestAutoswapBothWithdraws() {
 	aliceExpectedBalance1 := sdk.NewInt(0)
 	aliceExpectedBalance0, aliceExpectedBalance1, dexExpectedBalance0, dexExpectedBalance1 = s.calcExpectedBalancesAfterWithdrawOnePool(autoswapSharesMinted, s.alice, int64(tickIndex), uint64(fee))
 
-	s.aliceWithdraws(NewWithdrawlInt(autoswapSharesMinted, int64(tickIndex), uint64(fee)))
+	s.aliceWithdraws(NewWithdrawalInt(autoswapSharesMinted, int64(tickIndex), uint64(fee)))
 
 	s.assertAliceBalances(aliceExpectedBalance0.Int64(), aliceExpectedBalance1.Int64())
 	s.assertDexBalances(dexExpectedBalance0.Int64(), dexExpectedBalance1.Int64())

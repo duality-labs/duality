@@ -36221,7 +36221,7 @@ definitions:
           signatures required by gogoproto.
   dualitylabs.duality.dex.MsgWithdrawFilledLimitOrderResponse:
     type: object
-  dualitylabs.duality.dex.MsgWithdrawlResponse:
+  dualitylabs.duality.dex.MsgWithdrawalResponse:
     type: object
   dualitylabs.duality.dex.PairID:
     type: object

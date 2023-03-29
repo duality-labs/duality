@@ -196,7 +196,7 @@ func (s *TxTestSuite) TestTx2CmdWithdraw() {
 		errInRes  bool
 	}{
 		{
-			// "withdrawl [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fee indexes] ",
+			// "withdrawal [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fee indexes] ",
 			name:      "missing arguments",
 			args:      []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "[10]", "0"},
 			expErr:    true,
@@ -222,7 +222,7 @@ func (s *TxTestSuite) TestTx2CmdWithdraw() {
 
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
-			cmd := dexClient.CmdWithdrawl()
+			cmd := dexClient.CmdWithdrawal()
 			args := append(tc.args, commonFlags...)
 			out, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
 			if tc.expErr {

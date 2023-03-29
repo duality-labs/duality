@@ -69,7 +69,7 @@ func (s *MsgServerTestSuite) TestGetAllDeposits() {
 			Fee:       1,
 		},
 	)
-	s.aliceWithdraws(&Withdrawl{
+	s.aliceWithdraws(&Withdrawal{
 		TickIndex: -50,
 		Fee:       1,
 		Shares:    sdk.NewInt(1),

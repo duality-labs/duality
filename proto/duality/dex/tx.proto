@@ -10,7 +10,7 @@ import "google/protobuf/timestamp.proto";
 // Msg defines the Msg service.
 service Msg {
   rpc Deposit(MsgDeposit) returns (MsgDepositResponse);
-  rpc Withdrawl(MsgWithdrawl) returns (MsgWithdrawlResponse);
+  rpc Withdrawal(MsgWithdrawal) returns (MsgWithdrawalResponse);
   rpc Swap(MsgSwap) returns (MsgSwapResponse);
   rpc PlaceLimitOrder(MsgPlaceLimitOrder) returns (MsgPlaceLimitOrderResponse);
   rpc WithdrawFilledLimitOrder(MsgWithdrawFilledLimitOrder) returns (MsgWithdrawFilledLimitOrderResponse);
@@ -59,7 +59,7 @@ message MsgDepositResponse {
   ]; 
 }
 
-message MsgWithdrawl {
+message MsgWithdrawal {
   string creator = 1;
   string receiver = 2;
   string tokenA = 3;
@@ -75,7 +75,7 @@ message MsgWithdrawl {
   
 }
 
-message MsgWithdrawlResponse {
+message MsgWithdrawalResponse {
 }
 
 message MsgSwap {

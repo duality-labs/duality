@@ -21,8 +21,8 @@ func (s *MsgServerTestSuite) TestWithdrawMultiFailure() {
 	// failure on second withdraw (insufficient shares) will trigger ErrNotEnoughShares
 	err := types.ErrInsufficientShares
 	s.aliceWithdrawFails(err,
-		NewWithdrawl(6, 0, 1),
-		NewWithdrawl(10, 0, 1),
+		NewWithdrawal(6, 0, 1),
+		NewWithdrawal(10, 0, 1),
 	)
 }
 
@@ -40,8 +40,8 @@ func (s *MsgServerTestSuite) TestWithdrawMultiSuccess() {
 	// WHEN
 	// alice withdraws 6 shares, then 4 shares
 	s.aliceWithdraws(
-		NewWithdrawl(6, 0, 1),
-		NewWithdrawl(4, 0, 1),
+		NewWithdrawal(6, 0, 1),
+		NewWithdrawal(4, 0, 1),
 	)
 
 	// THEN
