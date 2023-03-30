@@ -156,7 +156,7 @@ func InactiveLimitOrderTranchePrefix(
 	tokenIn string,
 	tickIndex int64,
 ) []byte {
-	var key []byte = KeyPrefix(InactiveLimitOrderTrancheKeyPrefix)
+	key := KeyPrefix(InactiveLimitOrderTrancheKeyPrefix)
 
 	pairIDBytes := []byte(pairID.Stringify())
 	key = append(key, pairIDBytes...)
@@ -228,7 +228,7 @@ func TickLiquidityLimitOrderPrefix(
 	tokenIn string,
 	tickIndex int64,
 ) []byte {
-	var key []byte = KeyPrefix(TickLiquidityKeyPrefix)
+	key := KeyPrefix(TickLiquidityKeyPrefix)
 
 	pairIDBytes := []byte(pairID.Stringify())
 	key = append(key, pairIDBytes...)
@@ -253,6 +253,7 @@ func TickLiquidityPrefix(pairID *PairID, tokenIn string) []byte {
 	var key []byte
 	key = append(KeyPrefix(TickLiquidityKeyPrefix), KeyPrefix(pairID.Stringify())...)
 	key = append(key, KeyPrefix(tokenIn)...)
+
 	return key
 }
 

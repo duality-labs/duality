@@ -9,7 +9,14 @@ const TypeMsgWithdrawal = "withdrawal"
 
 var _ sdk.Msg = &MsgWithdrawal{}
 
-func NewMsgWithdrawal(creator, receiver, tokenA, tokenB string, sharesToRemove []sdk.Int, tickIndexes []int64, fees []uint64) *MsgWithdrawal {
+func NewMsgWithdrawal(creator,
+	receiver,
+	tokenA,
+	tokenB string,
+	sharesToRemove []sdk.Int,
+	tickIndexes []int64,
+	fees []uint64,
+) *MsgWithdrawal {
 	return &MsgWithdrawal{
 		Creator:         creator,
 		Receiver:        receiver,
@@ -34,6 +41,7 @@ func (msg *MsgWithdrawal) GetSigners() []sdk.AccAddress {
 	if err != nil {
 		panic(err)
 	}
+
 	return []sdk.AccAddress{creator}
 }
 
@@ -68,5 +76,6 @@ func (msg *MsgWithdrawal) ValidateBasic() error {
 			return ErrZeroWithdraw
 		}
 	}
+
 	return nil
 }

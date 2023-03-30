@@ -32,6 +32,7 @@ func (msg *MsgSwap) GetSigners() []sdk.AccAddress {
 	if err != nil {
 		panic(err)
 	}
+
 	return []sdk.AccAddress{creator}
 }
 
@@ -54,5 +55,6 @@ func (msg *MsgSwap) ValidateBasic() error {
 	if msg.AmountIn.LTE(sdk.ZeroInt()) {
 		return ErrZeroSwap
 	}
+
 	return nil
 }

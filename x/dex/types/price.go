@@ -25,15 +25,17 @@ func MustNewPrice(relativeTickIndex int64) *Price {
 	if err != nil {
 		panic(err)
 	}
+
 	return price
 }
 
 func NewPrice(relativeTickIndex int64) (*Price, error) {
 	if IsTickOutOfRange(relativeTickIndex) {
-		// TODO: This is a bit weird that we can't return a types.ErrTickOutsideRange because of cyclical dependencesi
+		// TODO: This is a bit weird that we can't return a types.ErrTickOutsideRange because of cyclical dependencies
 		// Also maybe don't need this at all since we already validate that the tick is in range upstream
-		return nil, errors.New("Supplying a tick outside the range of [-352437, 352437] is not allowed")
+		return nil, errors.New("supplying a tick outside the range of [-352437, 352437] is not allowed")
 	}
+
 	return &Price{
 		RelativeTickIndex: relativeTickIndex,
 	}, nil
@@ -47,9 +49,9 @@ func (p Price) MulInt(other sdk.Int) sdk.Dec {
 func (p Price) Mul(other sdk.Dec) sdk.Dec {
 	if p.RelativeTickIndex >= 0 {
 		return other.Quo(utils.BasePrice().Power(uint64(p.RelativeTickIndex)))
-	} else {
-		return other.Mul(utils.BasePrice().Power(uint64(-1 * p.RelativeTickIndex)))
 	}
+
+	return other.Mul(utils.BasePrice().Power(uint64(-1 * p.RelativeTickIndex)))
 }
 
 func (p Price) Inv() *Price {
@@ -63,9 +65,9 @@ func (p Price) Inv() *Price {
 func (p Price) ToDec() sdk.Dec {
 	if p.RelativeTickIndex >= 0 {
 		return sdk.OneDec().Quo(utils.BasePrice().Power(uint64(p.RelativeTickIndex)))
-	} else {
-		return utils.BasePrice().Power(uint64(-1 * p.RelativeTickIndex))
 	}
+
+	return utils.BasePrice().Power(uint64(-1 * p.RelativeTickIndex))
 }
 
 func MustCalcPrice0To1(tickIndex int64) *Price {
@@ -73,6 +75,7 @@ func MustCalcPrice0To1(tickIndex int64) *Price {
 	if err != nil {
 		panic(err)
 	}
+
 	return price
 }
 

@@ -341,7 +341,7 @@ func (k Keeper) PlaceLimitOrderCore(
 	sharesIssued := sdk.ZeroInt()
 	// FOR GTC, JIT & GoodTil try to place a maker limitOrder with remaining Amount
 	if amountLeft.IsPositive() && (orderType.IsGTC() || orderType.IsJIT() || orderType.IsGoodTil()) {
-		placeTranche.PlaceMakerLimitOrder(ctx, amountLeft)
+		placeTranche.PlaceMakerLimitOrder(amountLeft)
 		trancheUser.SharesOwned = trancheUser.SharesOwned.Add(amountLeft)
 
 		if orderType.HasExpiration() {

@@ -9,7 +9,17 @@ const TypeMsgDeposit = "deposit"
 
 var _ sdk.Msg = &MsgDeposit{}
 
-func NewMsgDeposit(creator, receiver, tokenA, tokenB string, amountsA, amountsB []sdk.Int, tickIndexes []int64, fees []uint64, depositOptions []*DepositOptions) *MsgDeposit {
+func NewMsgDeposit(
+	creator,
+	receiver,
+	tokenA,
+	tokenB string,
+	amountsA,
+	amountsB []sdk.Int,
+	tickIndexes []int64,
+	fees []uint64,
+	depositOptions []*DepositOptions,
+) *MsgDeposit {
 	return &MsgDeposit{
 		Creator:         creator,
 		Receiver:        receiver,
@@ -36,6 +46,7 @@ func (msg *MsgDeposit) GetSigners() []sdk.AccAddress {
 	if err != nil {
 		panic(err)
 	}
+
 	return []sdk.AccAddress{creator}
 }
 
@@ -71,5 +82,6 @@ func (msg *MsgDeposit) ValidateBasic() error {
 			return ErrZeroDeposit
 		}
 	}
+
 	return nil
 }

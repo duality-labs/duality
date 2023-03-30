@@ -11,7 +11,16 @@ const TypeMsgPlaceLimitOrder = "place_limit_order"
 
 var _ sdk.Msg = &MsgPlaceLimitOrder{}
 
-func NewMsgPlaceLimitOrder(creator, receiver, tokenIn, tokenOut string, tickIndex int64, amountIn sdk.Int, orderType LimitOrderType, goodTil *time.Time) *MsgPlaceLimitOrder {
+func NewMsgPlaceLimitOrder(
+	creator,
+	receiver,
+	tokenIn,
+	tokenOut string,
+	tickIndex int64,
+	amountIn sdk.Int,
+	orderType LimitOrderType,
+	goodTil *time.Time,
+) *MsgPlaceLimitOrder {
 	return &MsgPlaceLimitOrder{
 		Creator:        creator,
 		Receiver:       receiver,
@@ -37,6 +46,7 @@ func (msg *MsgPlaceLimitOrder) GetSigners() []sdk.AccAddress {
 	if err != nil {
 		panic(err)
 	}
+
 	return []sdk.AccAddress{creator}
 }
 
@@ -67,6 +77,7 @@ func (msg *MsgPlaceLimitOrder) ValidateBasic() error {
 	if !msg.OrderType.IsGoodTil() && msg.ExpirationTime != nil {
 		return ErrExpirationOnWrongOrderType
 	}
+
 	return nil
 }
 
@@ -78,5 +89,6 @@ func (msg *MsgPlaceLimitOrder) ValidateGoodTilExpiration(blockTime time.Time) er
 			msg.ExpirationTime.String(),
 		)
 	}
+
 	return nil
 }

@@ -11,8 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var defaultPairID *types.PairID = &types.PairID{Token0: "TokenA", Token1: "TokenB"}
-
 func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
