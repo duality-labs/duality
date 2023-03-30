@@ -7,12 +7,12 @@ import (
 )
 
 // SetLimitOrderTrancheUser set a specific LimitOrderTrancheUser in the store from its index
-func (k Keeper) SetLimitOrderTrancheUser(ctx sdk.Context, LimitOrderTrancheUser types.LimitOrderTrancheUser) {
+func (k Keeper) SetLimitOrderTrancheUser(ctx sdk.Context, limitOrderTrancheUser types.LimitOrderTrancheUser) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderTrancheUserKeyPrefix))
-	b := k.cdc.MustMarshal(&LimitOrderTrancheUser)
+	b := k.cdc.MustMarshal(&limitOrderTrancheUser)
 	store.Set(types.LimitOrderTrancheUserKey(
-		LimitOrderTrancheUser.Address,
-		LimitOrderTrancheUser.TrancheKey,
+		limitOrderTrancheUser.Address,
+		limitOrderTrancheUser.TrancheKey,
 	), b)
 }
 
@@ -33,15 +33,13 @@ func (k Keeper) GetLimitOrderTrancheUser(
 	}
 
 	k.cdc.MustUnmarshal(b, &val)
+
 	return val, true
 }
 
 // RemoveLimitOrderTrancheUserByKey removes a LimitOrderTrancheUser from the store
 func (k Keeper) RemoveLimitOrderTrancheUserByKey(
 	ctx sdk.Context,
-	pairID *types.PairID,
-	tickIndex int64,
-	token string,
 	trancheKey string,
 	address string,
 ) {
@@ -55,9 +53,6 @@ func (k Keeper) RemoveLimitOrderTrancheUserByKey(
 func (k Keeper) RemoveLimitOrderTrancheUser(ctx sdk.Context, trancheUser types.LimitOrderTrancheUser) {
 	k.RemoveLimitOrderTrancheUserByKey(
 		ctx,
-		trancheUser.PairID,
-		trancheUser.TickIndex,
-		trancheUser.Token,
 		trancheUser.TrancheKey,
 		trancheUser.Address,
 	)
@@ -87,7 +82,10 @@ func (k Keeper) GetAllLimitOrderTrancheUser(ctx sdk.Context) (list []types.Limit
 	return
 }
 
-func (k Keeper) GetAllLimitOrderTrancheUserForAddress(ctx sdk.Context, address sdk.AccAddress) (list []types.LimitOrderTrancheUser) {
+func (k Keeper) GetAllLimitOrderTrancheUserForAddress(
+	ctx sdk.Context,
+	address sdk.AccAddress,
+) (list []types.LimitOrderTrancheUser) {
 	addressPrefix := types.LimitOrderTrancheUserAddressPrefix(address.String())
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), addressPrefix)
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})

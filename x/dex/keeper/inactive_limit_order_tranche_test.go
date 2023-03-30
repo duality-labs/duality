@@ -27,6 +27,7 @@ func createNInactiveLimitOrderTranche(keeper *keeper.Keeper, ctx sdk.Context, n 
 		}
 		keeper.SetInactiveLimitOrderTranche(ctx, items[i])
 	}
+
 	return items
 }
 

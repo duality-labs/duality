@@ -53,7 +53,7 @@ func (s *LiquidityIterator) Next() Liquidity {
 				// Pool Reserves is upperTick
 				pool, err = s.createPool0To1(poolReserves)
 			} else {
-				// Pool Reserves is is lowerTick
+				// Pool Reserves is lowerTick
 				pool, err = s.createPool1To0(poolReserves)
 			}
 			// TODO: we are not actually handling the error here we're just stopping iteration
@@ -62,6 +62,7 @@ func (s *LiquidityIterator) Next() Liquidity {
 			if err != nil {
 				return nil
 			}
+
 			return pool
 
 		case *types.TickLiquidity_LimitOrderTranche:
@@ -69,14 +70,15 @@ func (s *LiquidityIterator) Next() Liquidity {
 			// If we hit a tranche with an expired goodTil date keep iterating
 			if tranche.IsExpired(s.ctx) {
 				continue
-			} else {
-				return tranche
 			}
+
+			return tranche
 
 		default:
 			panic("Tick does not have liquidity")
 		}
 	}
+
 	return nil
 }
 
@@ -93,6 +95,7 @@ func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquid
 		lowerTick,
 		&upperTick,
 	)
+
 	return NewLiquidityFromPool0To1(&pool), nil
 }
 
@@ -110,6 +113,7 @@ func (s *LiquidityIterator) createPool1To0(lowerTick types.PoolReserves) (Liquid
 		&lowerTick,
 		upperTick,
 	)
+
 	return NewLiquidityFromPool1To0(&pool), nil
 }
 
@@ -135,7 +139,7 @@ func (k Keeper) Swap(ctx sdk.Context,
 	tokenOut string,
 	amountIn sdk.Int,
 	limitPrice *sdk.Dec,
-) (totalIn, totalOut sdk.Int, error error) {
+) (totalIn, totalOut sdk.Int, err error) {
 	cacheCtx, writeCache := ctx.CacheContext()
 	pair := types.NewDirectionalTradingPair(pairID, tokenIn, tokenOut)
 
@@ -166,5 +170,6 @@ func (k Keeper) Swap(ctx sdk.Context,
 
 	writeCache()
 	totalIn = amountIn.Sub(remainingIn)
+
 	return totalIn, totalOut, nil
 }

@@ -13,7 +13,10 @@ import (
 
 // Returns all ACTIVE limit order tranches for a given pairID/tokenIn combination
 // Does NOT return inactiveLimitOrderTranches
-func (k Keeper) LimitOrderTrancheAll(c context.Context, req *types.QueryAllLimitOrderTrancheRequest) (*types.QueryAllLimitOrderTrancheResponse, error) {
+func (k Keeper) LimitOrderTrancheAll(
+	c context.Context,
+	req *types.QueryAllLimitOrderTrancheRequest,
+) (*types.QueryAllLimitOrderTrancheResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -28,23 +31,26 @@ func (k Keeper) LimitOrderTrancheAll(c context.Context, req *types.QueryAllLimit
 	store := ctx.KVStore(k.storeKey)
 	LimitOrderTrancheStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairID, req.TokenIn))
 
-	pageRes, err := query.FilteredPaginate(LimitOrderTrancheStore, req.Pagination, func(key, value []byte, accum bool) (hit bool, err error) {
-		var tick types.TickLiquidity
+	pageRes, err := query.FilteredPaginate(
+		LimitOrderTrancheStore,
+		req.Pagination, func(key, value []byte, accum bool) (hit bool, err error) {
+			var tick types.TickLiquidity
 
-		if err := k.cdc.Unmarshal(value, &tick); err != nil {
-			return false, err
-		}
-		tranche := tick.GetLimitOrderTranche()
-		// Check if this is a LimitOrderTranche and not PoolReserves
-		if tranche != nil {
-			if accum {
-				LimitOrderTranches = append(LimitOrderTranches, *tranche)
+			if err := k.cdc.Unmarshal(value, &tick); err != nil {
+				return false, err
 			}
-			return true, nil
-		} else {
+			tranche := tick.GetLimitOrderTranche()
+			// Check if this is a LimitOrderTranche and not PoolReserves
+			if tranche != nil {
+				if accum {
+					LimitOrderTranches = append(LimitOrderTranches, *tranche)
+				}
+
+				return true, nil
+			}
+
 			return false, nil
-		}
-	})
+		})
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -53,7 +59,10 @@ func (k Keeper) LimitOrderTrancheAll(c context.Context, req *types.QueryAllLimit
 }
 
 // Returns a specific limit order tranche either from the tickLiquidity index or from the FillLimitOrderTranche index
-func (k Keeper) LimitOrderTranche(c context.Context, req *types.QueryGetLimitOrderTrancheRequest) (*types.QueryGetLimitOrderTrancheResponse, error) {
+func (k Keeper) LimitOrderTranche(
+	c context.Context,
+	req *types.QueryGetLimitOrderTrancheRequest,
+) (*types.QueryGetLimitOrderTrancheResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}

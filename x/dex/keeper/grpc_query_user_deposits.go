@@ -23,6 +23,7 @@ func (k Keeper) UserDepositsAll(
 	}
 	profile := NewUserProfile(addr)
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
 	return &types.QueryAllUserDepositsResponse{
 		Deposits: profile.GetAllDeposits(ctx, k),
 	}, nil

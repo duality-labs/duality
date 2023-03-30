@@ -39,6 +39,7 @@ func (k Keeper) GetInactiveLimitOrderTranche(
 	}
 
 	k.cdc.MustUnmarshal(b, &val)
+
 	return val, true
 }
 

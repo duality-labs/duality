@@ -61,7 +61,7 @@ func (k Keeper) DepositCore(
 			return nil, nil, types.ErrDepositBehindPairLiquidity
 		}
 
-		sharesID := CreateSharesId(token0, token1, tickIndex, fee)
+		sharesID := CreateSharesID(token0, token1, tickIndex, fee)
 		existingShares := k.bankKeeper.GetSupply(ctx, sharesID).Amount
 
 		pool, err := k.GetOrInitPool(
@@ -155,7 +155,7 @@ func (k Keeper) WithdrawCore(
 			return err
 		}
 
-		sharesID := CreateSharesId(token0, token1, tickIndex, fee)
+		sharesID := CreateSharesID(token0, token1, tickIndex, fee)
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesID).Amount
 
 		if totalShares.LT(sharesToRemove) {

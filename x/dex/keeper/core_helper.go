@@ -12,7 +12,13 @@ import (
 //                           GETTERS & INITIALIZERS                          //
 ///////////////////////////////////////////////////////////////////////////////
 
-func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairID *types.PairID, tokenIn string, tickIndex int64, fee uint64) (*types.PoolReserves, error) {
+func (k Keeper) GetOrInitPoolReserves(
+	ctx sdk.Context,
+	pairID *types.PairID,
+	tokenIn string,
+	tickIndex int64,
+	fee uint64,
+) (*types.PoolReserves, error) {
 	tickLiq, tickFound := k.GetPoolReserves(
 		ctx,
 		pairID,
@@ -20,11 +26,12 @@ func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairID *types.PairID, tok
 		tickIndex,
 		fee,
 	)
-	if tickFound {
+	switch {
+	case tickFound:
 		return tickLiq, nil
-	} else if types.IsTickOutOfRange(tickIndex) {
+	case types.IsTickOutOfRange(tickIndex):
 		return nil, types.ErrTickOutsideRange
-	} else {
+	default:
 		return &types.PoolReserves{
 			PairID:    pairID,
 			TokenIn:   tokenIn,
@@ -47,12 +54,19 @@ func NewLimitOrderExpiration(tranche types.LimitOrderTranche) types.LimitOrderEx
 	}
 }
 
-func NewLimitOrderTranche(sdkCtx sdk.Context, pairID *types.PairID, tokenIn string, tickIndex int64, goodTil *time.Time) (types.LimitOrderTranche, error) {
+func NewLimitOrderTranche(
+	sdkCtx sdk.Context,
+	pairID *types.PairID,
+	tokenIn string,
+	tickIndex int64,
+	goodTil *time.Time,
+) (types.LimitOrderTranche, error) {
 	// NOTE: CONTRACT: There is no active place tranche (ie. GetPlaceTrancheTick has returned false)
 	if types.IsTickOutOfRange(tickIndex) {
 		return types.LimitOrderTranche{}, types.ErrTickOutsideRange
 	}
 	trancheKey := NewTrancheKey(sdkCtx)
+
 	return types.LimitOrderTranche{
 		PairID:           pairID,
 		TokenIn:          tokenIn,
@@ -108,6 +122,7 @@ func (k Keeper) GetCurrTick1To0(ctx sdk.Context, pairID *types.PairID) (tickIdx 
 			return tick.TickIndex(), true
 		}
 	}
+
 	return math.MinInt64, false
 }
 
@@ -136,11 +151,13 @@ func (k Keeper) IsBehindEnemyLines(ctx sdk.Context, pairID *types.PairID, tokenI
 			return true
 		}
 	}
+
 	return false
 }
 
 func CalcAmountAsToken0(amount0, amount1 sdk.Int, price1To0 types.Price) sdk.Dec {
 	amount0Dec := amount0.ToDec()
+
 	return amount0Dec.Add(price1To0.MulInt(amount1))
 }
 
@@ -155,10 +172,9 @@ func (k Keeper) MintShares(ctx sdk.Context, addr sdk.AccAddress, amount sdk.Int,
 		return err
 	}
 	// transfer them to addr
-	if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, sharesCoins); err != nil {
-		return err
-	}
-	return nil
+	err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, sharesCoins)
+
+	return err
 }
 
 func (k Keeper) BurnShares(ctx sdk.Context, addr sdk.AccAddress, amount sdk.Int, sharesID string) error {
@@ -168,8 +184,7 @@ func (k Keeper) BurnShares(ctx sdk.Context, addr sdk.AccAddress, amount sdk.Int,
 		return err
 	}
 	// burn tokens
-	if err := k.bankKeeper.BurnCoins(ctx, types.ModuleName, sharesCoins); err != nil {
-		return err
-	}
-	return nil
+	err := k.bankKeeper.BurnCoins(ctx, types.ModuleName, sharesCoins)
+
+	return err
 }

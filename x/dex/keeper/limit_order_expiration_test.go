@@ -24,10 +24,11 @@ func createNLimitOrderExpiration(keeper *keeper.Keeper, ctx sdk.Context, n int) 
 
 		keeper.SetLimitOrderExpiration(ctx, items[i])
 	}
+
 	return items
 }
 
-func createLimitOrderExpirationAndTranches(keeper *keeper.Keeper, ctx sdk.Context, expTimes []time.Time) []types.LimitOrderExpiration {
+func createLimitOrderExpirationAndTranches(keeper *keeper.Keeper, ctx sdk.Context, expTimes []time.Time) {
 	items := make([]types.LimitOrderExpiration, len(expTimes))
 	for i := range items {
 		tranche := types.LimitOrderTranche{
@@ -47,7 +48,6 @@ func createLimitOrderExpirationAndTranches(keeper *keeper.Keeper, ctx sdk.Contex
 		keeper.SetLimitOrderExpiration(ctx, items[i])
 		keeper.SetLimitOrderTranche(ctx, tranche)
 	}
-	return items
 }
 
 func TestLimitOrderExpirationGet(t *testing.T) {

@@ -32,6 +32,7 @@ func CreateNTickLiquidity(keeper *keeper.Keeper, ctx sdk.Context, n int) []types
 		keeper.SetLimitOrderTranche(ctx, *tick.GetLimitOrderTranche())
 		items[i] = tick
 	}
+
 	return items
 }
 

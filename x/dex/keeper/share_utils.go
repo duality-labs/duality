@@ -23,19 +23,22 @@ const LPsharesRegexpStr = "^" + types.DepositSharesPrefix + "-" +
 
 var LPSharesRegexp = regexp.MustCompile(LPsharesRegexpStr)
 
-func CreateSharesId(token0, token1 string, tickIndex int64, fee uint64) (denom string) {
+func CreateSharesID(token0, token1 string, tickIndex int64, fee uint64) (denom string) {
 	t0 := strings.ReplaceAll(token0, "-", "")
 	t1 := strings.ReplaceAll(token1, "-", "")
+
 	return fmt.Sprintf("%s-%s-%s-t%d-f%d", types.DepositSharesPrefix, t0, t1, tickIndex, fee)
 }
 
 func ParseDepositShares(shares sdk.Coin) (matches []string, valid bool) {
-	// NOTE: Since dashes are removed as part of CreateSharesId, if either side of the LP position are denoms that contain dashes
-	// they will not be parsed correctly and the correct dneom will not be returned
+	// NOTE: Since dashes are removed as part of CreateSharesId,
+	// if either side of the LP position are denoms that contain dashes
+	// they will not be parsed correctly and the correct dneom will not be returned.
 	matchArr := LPSharesRegexp.FindAllStringSubmatch(shares.Denom, -1)
 	if matchArr == nil {
 		return nil, false
 	}
+
 	return matchArr[0][1:5], true
 }
 
@@ -56,6 +59,7 @@ func DepositSharesToData(shares sdk.Coin) (types.DepositRecord, error) {
 		return types.DepositRecord{}, types.ErrInvalidDepositShares
 	}
 	feeUint := utils.MustSafeUint64(fee)
+
 	return types.DepositRecord{
 		PairID:          pairID,
 		SharesOwned:     shares.Amount,

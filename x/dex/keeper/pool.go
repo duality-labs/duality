@@ -24,6 +24,7 @@ func NewPool(
 	// TODO: maybe store this somewhere so we don't have to recalculate
 	price0To1Upper := types.MustNewPrice(upperTick1.TickIndex)
 	price1To0Lower := types.MustNewPrice(-1 * lowerTick0.TickIndex)
+
 	return Pool{
 		CenterTickIndex: centerTickIndex,
 		LowerTick0:      lowerTick0,
@@ -76,6 +77,7 @@ func (p *Pool) Swap0To1(maxAmount0 sdk.Int) (inAmount0, outAmount1 sdk.Int) {
 		*reserves1 = reserves1.Sub(outAmount1)
 		inAmount0 = maxAmount0
 	}
+
 	return inAmount0, outAmount1
 }
 
@@ -99,6 +101,7 @@ func (p *Pool) Swap1To0(maxAmount1 sdk.Int) (inAmount1, outAmount0 sdk.Int) {
 		*reserves0 = reserves0.Sub(outAmount0)
 		inAmount1 = maxAmount1
 	}
+
 	return inAmount1, outAmount0
 }
 
@@ -134,7 +137,12 @@ func CalcGreatestMatchingRatio(
 
 // Mutates the Pool object and returns relevant change variables. Deposit is not committed until
 // pool.save() is called or the underlying ticks are saved; this method does not use any keeper methods.
-func (p *Pool) Deposit(maxAmount0, maxAmount1, existingShares sdk.Int, autoswap bool) (inAmount0, inAmount1, outShares sdk.Int) {
+func (p *Pool) Deposit(
+	maxAmount0,
+	maxAmount1,
+	existingShares sdk.Int,
+	autoswap bool,
+) (inAmount0, inAmount1, outShares sdk.Int) {
 	lowerReserve0 := &p.LowerTick0.Reserves
 	upperReserve1 := &p.UpperTick1.Reserves
 
@@ -155,7 +163,8 @@ func (p *Pool) Deposit(maxAmount0, maxAmount1, existingShares sdk.Int, autoswap 
 		residualAmount0 := maxAmount0.Sub(inAmount0)
 		residualAmount1 := maxAmount1.Sub(inAmount1)
 
-		// NOTE: Currently not doing anything with the error, but added error handling to all of the new functions for autoswap.
+		// NOTE: Currently not doing anything with the error,
+		// but added error handling to all of the new functions for autoswap.
 		// Open to changing it however.
 		residualShares, _ := p.CalcResidualSharesMinted(residualAmount0, residualAmount1)
 
@@ -167,6 +176,7 @@ func (p *Pool) Deposit(maxAmount0, maxAmount1, existingShares sdk.Int, autoswap 
 
 	*lowerReserve0 = lowerReserve0.Add(inAmount0)
 	*upperReserve1 = upperReserve1.Add(inAmount1)
+
 	return inAmount0, inAmount1, outShares
 }
 
@@ -190,6 +200,7 @@ func (p *Pool) CalcSharesMinted(
 	} else {
 		sharesMinted = valueMintedToken0.TruncateInt()
 	}
+
 	return sharesMinted
 }
 
@@ -219,6 +230,7 @@ func (p *Pool) Withdraw(sharesToRemove, totalShares sdk.Int) (outAmount0, outAmo
 	outAmount0 = reserves0.Mul(sharesToRemove).ToDec().QuoInt(totalShares).TruncateInt()
 	*reserves0 = reserves0.Sub(outAmount0)
 	*reserves1 = reserves1.Sub(outAmount1)
+
 	return outAmount0, outAmount1
 }
 
@@ -228,6 +240,7 @@ func CalcResidualValue(amount0, amount1 sdk.Int, priceLower1To0 *types.Price, fe
 	if err != nil {
 		return sdk.ZeroDec(), err
 	}
+
 	return amount0Discount.MulInt(amount0).Add(priceLower1To0.MulInt(amount1)), nil
 }
 

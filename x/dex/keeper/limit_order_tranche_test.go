@@ -28,6 +28,7 @@ func createNLimitOrderTranches(keeper *keeper.Keeper, ctx sdk.Context, n int) []
 		keeper.SetLimitOrderTranche(ctx, *tranche)
 		items[i] = *tranche
 	}
+
 	return items
 }
 

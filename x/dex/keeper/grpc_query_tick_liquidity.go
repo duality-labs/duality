@@ -14,7 +14,10 @@ import (
 // NOTE: For single queries of tick liquidity use explicty typed queries
 // (ie. the k.LimitOrderTranche & k.PoolReserves)
 
-func (k Keeper) TickLiquidityAll(c context.Context, req *types.QueryAllTickLiquidityRequest) (*types.QueryAllTickLiquidityResponse, error) {
+func (k Keeper) TickLiquidityAll(
+	c context.Context,
+	req *types.QueryAllTickLiquidityRequest,
+) (*types.QueryAllTickLiquidityResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -37,6 +40,7 @@ func (k Keeper) TickLiquidityAll(c context.Context, req *types.QueryAllTickLiqui
 		}
 
 		tickLiquiditys = append(tickLiquiditys, tickLiquidity)
+
 		return nil
 	})
 	if err != nil {

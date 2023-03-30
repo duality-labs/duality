@@ -1,9 +1,5 @@
 package keeper_test
 
-import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
-)
-
 func (s *MsgServerTestSuite) TestAutoswapperWithdraws() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 50)
@@ -103,9 +99,7 @@ func (s *MsgServerTestSuite) TestAutoswapBothWithdraws() {
 	s.assertBobBalances(bobExpectedBalance0.Int64(), bobExpectedBalance1.Int64())
 	s.assertDexBalances(dexExpectedBalance0.Int64(), dexExpectedBalance1.Int64())
 
-	aliceExpectedBalance0 := sdk.NewInt(0)
-	aliceExpectedBalance1 := sdk.NewInt(0)
-	aliceExpectedBalance0, aliceExpectedBalance1, dexExpectedBalance0, dexExpectedBalance1 = s.calcExpectedBalancesAfterWithdrawOnePool(autoswapSharesMinted, s.alice, int64(tickIndex), uint64(fee))
+	aliceExpectedBalance0, aliceExpectedBalance1, dexExpectedBalance0, dexExpectedBalance1 := s.calcExpectedBalancesAfterWithdrawOnePool(autoswapSharesMinted, s.alice, int64(tickIndex), uint64(fee))
 
 	s.aliceWithdraws(NewWithdrawalInt(autoswapSharesMinted, int64(tickIndex), uint64(fee)))
 

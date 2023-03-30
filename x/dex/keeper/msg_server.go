@@ -49,7 +49,7 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 		return nil, err
 	}
 
-	return &types.MsgDepositResponse{Amounts0Deposit, Amounts1Deposit}, nil
+	return &types.MsgDepositResponse{Reserve0Deposited: Amounts0Deposit, Reserve1Deposited: Amounts1Deposit}, nil
 }
 
 func (k msgServer) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (*types.MsgWithdrawalResponse, error) {
@@ -94,7 +94,10 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	return &types.MsgSwapResponse{CoinOut: coinOut}, nil
 }
 
-func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLimitOrder) (*types.MsgPlaceLimitOrderResponse, error) {
+func (k msgServer) PlaceLimitOrder(
+	goCtx context.Context,
+	msg *types.MsgPlaceLimitOrder,
+) (*types.MsgPlaceLimitOrderResponse, error) {
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
@@ -128,7 +131,10 @@ func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLim
 	return &types.MsgPlaceLimitOrderResponse{TrancheKey: *trancheKey}, nil
 }
 
-func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.MsgWithdrawFilledLimitOrder) (*types.MsgWithdrawFilledLimitOrderResponse, error) {
+func (k msgServer) WithdrawFilledLimitOrder(
+	goCtx context.Context,
+	msg *types.MsgWithdrawFilledLimitOrder,
+) (*types.MsgWithdrawFilledLimitOrderResponse, error) {
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 
 	err := k.WithdrawFilledLimitOrderCore(
@@ -143,7 +149,10 @@ func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.Ms
 	return &types.MsgWithdrawFilledLimitOrderResponse{}, nil
 }
 
-func (k msgServer) CancelLimitOrder(goCtx context.Context, msg *types.MsgCancelLimitOrder) (*types.MsgCancelLimitOrderResponse, error) {
+func (k msgServer) CancelLimitOrder(
+	goCtx context.Context,
+	msg *types.MsgCancelLimitOrder,
+) (*types.MsgCancelLimitOrderResponse, error) {
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 
 	err := k.CancelLimitOrderCore(

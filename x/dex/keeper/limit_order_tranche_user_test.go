@@ -12,14 +12,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createNLimitOrderTrancheUser(keeper *keeper.Keeper, ctx sdk.Context, tickIndex int64, token string, n int) []types.LimitOrderTrancheUser {
+func createNLimitOrderTrancheUser(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.LimitOrderTrancheUser {
 	items := make([]types.LimitOrderTrancheUser, n)
 	for i := range items {
 		items[i].TrancheKey = strconv.Itoa(i)
 		items[i].Address = strconv.Itoa(i)
 		items[i].PairID = &types.PairID{Token0: "TokenA", Token1: "TokenB"}
-		items[i].Token = token
-		items[i].TickIndex = tickIndex
+		items[i].Token = "TokenA"
+		items[i].TickIndex = 0
 		items[i].SharesOwned = sdk.ZeroInt()
 		items[i].SharesWithdrawn = sdk.ZeroInt()
 		items[i].SharesCancelled = sdk.ZeroInt()
@@ -27,12 +27,13 @@ func createNLimitOrderTrancheUser(keeper *keeper.Keeper, ctx sdk.Context, tickIn
 
 		keeper.SetLimitOrderTrancheUser(ctx, items[i])
 	}
+
 	return items
 }
 
 func TestLimitOrderTrancheUserGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderTrancheUser(keeper, ctx, 0, "TokenA", 10)
+	items := createNLimitOrderTrancheUser(keeper, ctx, 10)
 	for _, item := range items {
 		rst, found := keeper.GetLimitOrderTrancheUser(ctx, item.Address, item.TrancheKey)
 		require.True(t, found)
@@ -45,15 +46,9 @@ func TestLimitOrderTrancheUserGet(t *testing.T) {
 
 func TestLimitOrderTrancheUserRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
-	items := createNLimitOrderTrancheUser(keeper, ctx, 0, "TokenA", 10)
+	items := createNLimitOrderTrancheUser(keeper, ctx, 10)
 	for _, item := range items {
-		keeper.RemoveLimitOrderTrancheUserByKey(ctx,
-			&types.PairID{Token0: "TokenA", Token1: "TokenB"},
-			0,
-			"TokenA",
-			item.TrancheKey,
-			item.Address,
-		)
+		keeper.RemoveLimitOrderTrancheUserByKey(ctx, item.TrancheKey, item.Address)
 		_, found := keeper.GetLimitOrderTrancheUser(ctx, item.Address, item.TrancheKey)
 		require.False(t, found)
 	}

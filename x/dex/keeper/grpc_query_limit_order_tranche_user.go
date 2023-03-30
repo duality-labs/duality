@@ -11,7 +11,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) LimitOrderTrancheUserAll(c context.Context, req *types.QueryAllLimitOrderTrancheUserRequest) (*types.QueryAllLimitOrderTrancheUserResponse, error) {
+func (k Keeper) LimitOrderTrancheUserAll(
+	c context.Context,
+	req *types.QueryAllLimitOrderTrancheUserRequest,
+) (*types.QueryAllLimitOrderTrancheUserResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -29,16 +32,22 @@ func (k Keeper) LimitOrderTrancheUserAll(c context.Context, req *types.QueryAllL
 		}
 
 		LimitOrderTrancheUsers = append(LimitOrderTrancheUsers, LimitOrderTrancheUser)
+
 		return nil
 	})
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryAllLimitOrderTrancheUserResponse{LimitOrderTrancheUser: LimitOrderTrancheUsers, Pagination: pageRes}, nil
+	return &types.QueryAllLimitOrderTrancheUserResponse{
+		LimitOrderTrancheUser: LimitOrderTrancheUsers,
+		Pagination:            pageRes,
+	}, nil
 }
 
-func (k Keeper) LimitOrderTrancheUser(c context.Context, req *types.QueryGetLimitOrderTrancheUserRequest) (*types.QueryGetLimitOrderTrancheUserResponse, error) {
+func (k Keeper) LimitOrderTrancheUser(c context.Context,
+	req *types.QueryGetLimitOrderTrancheUserRequest,
+) (*types.QueryGetLimitOrderTrancheUserResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}

@@ -24,6 +24,7 @@ func (k Keeper) GetUserPositions(
 
 	userProfile := NewUserProfile(address)
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
 	return &types.QueryGetUserPositionsResponse{
 		UserPositions: userProfile.GetAllPositions(ctx, k),
 	}, nil

@@ -18,7 +18,7 @@ import (
 func TestLimitOrderTrancheUserQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderTrancheUser(keeper, ctx, 0, "TokenA", 2)
+	msgs := createNLimitOrderTrancheUser(keeper, ctx, 2)
 	for _, tc := range []struct {
 		desc     string
 		request  *types.QueryGetLimitOrderTrancheUserRequest
@@ -72,7 +72,7 @@ func TestLimitOrderTrancheUserQuerySingle(t *testing.T) {
 func TestLimitOrderTrancheUserQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLimitOrderTrancheUser(keeper, ctx, 0, "TokenA", 5)
+	msgs := createNLimitOrderTrancheUser(keeper, ctx, 5)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderTrancheUserRequest {
 		return &types.QueryAllLimitOrderTrancheUserRequest{

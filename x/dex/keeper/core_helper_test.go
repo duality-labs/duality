@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -9,7 +8,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	dualityapp "github.com/duality-labs/duality/app"
-	"github.com/duality-labs/duality/x/dex/keeper"
 	. "github.com/duality-labs/duality/x/dex/keeper"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/suite"
@@ -27,7 +25,6 @@ type CoreHelpersTestSuite struct {
 	bob         sdk.AccAddress
 	carol       sdk.AccAddress
 	dan         sdk.AccAddress
-	goCtx       context.Context
 }
 
 func TestCoreHelpersTestSuite(t *testing.T) {
@@ -55,9 +52,8 @@ func (s *CoreHelpersTestSuite) SetupTest() {
 	app.AccountKeeper.SetAccount(ctx, accDan)
 
 	s.app = app
-	s.msgServer = keeper.NewMsgServerImpl(app.DexKeeper)
+	s.msgServer = NewMsgServerImpl(app.DexKeeper)
 	s.ctx = ctx
-	s.goCtx = sdk.WrapSDKContext(ctx)
 	s.queryClient = queryClient
 	s.alice = sdk.AccAddress([]byte("alice"))
 	s.bob = sdk.AccAddress([]byte("bob"))
@@ -66,8 +62,8 @@ func (s *CoreHelpersTestSuite) SetupTest() {
 }
 
 func (s *CoreHelpersTestSuite) setLPAtFee1Pool(tickIndex int64, amountA, amountB int) {
-	pairID := &types.PairID{"TokenA", "TokenB"}
-	sharesID := CreateSharesId("TokenA", "TokenB", tickIndex, 1)
+	pairID := &types.PairID{Token0: "TokenA", Token1: "TokenB"}
+	sharesID := CreateSharesID("TokenA", "TokenB", tickIndex, 1)
 	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, pairID, tickIndex, 1)
 	if err != nil {
 		panic(err)

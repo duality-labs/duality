@@ -9,13 +9,12 @@ import (
 )
 
 func SortTokens(tokenA, tokenB string) (string, string, error) {
-	relativeOrder := tokenA < tokenB
-
-	if tokenA == tokenB {
+	switch {
+	case tokenA == tokenB:
 		return "", "", sdkerrors.Wrapf(types.ErrInvalidTradingPair, "%s<>%s", tokenA, tokenB)
-	} else if relativeOrder {
+	case tokenA < tokenB:
 		return tokenA, tokenB, nil
-	} else {
+	default:
 		return tokenB, tokenA, nil
 	}
 }
@@ -23,9 +22,9 @@ func SortTokens(tokenA, tokenB string) (string, string, error) {
 func SortAmounts(tokenA, token0 string, amountsA, amountsB []sdk.Int) ([]sdk.Int, []sdk.Int) {
 	if tokenA == token0 {
 		return amountsA, amountsB
-	} else {
-		return amountsB, amountsA
 	}
+
+	return amountsB, amountsA
 }
 
 func CreatePairID(token0, token1 string) (pairID *types.PairID) {
@@ -40,15 +39,16 @@ func CreatePairIDFromUnsorted(tokenA, tokenB string) (*types.PairID, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return CreatePairID(token0, token1), nil
 }
 
 func GetInOutTokens(tokenIn, tokenA, tokenB string) (_, tokenOut string) {
 	if tokenIn == tokenA {
 		return tokenA, tokenB
-	} else {
-		return tokenB, tokenA
 	}
+
+	return tokenB, tokenA
 }
 
 func StringToPairID(pairIDStr string) (*types.PairID, error) {
@@ -59,15 +59,16 @@ func StringToPairID(pairIDStr string) (*types.PairID, error) {
 			Token0: tokens[0],
 			Token1: tokens[1],
 		}, nil
-	} else {
-		return &types.PairID{}, sdkerrors.Wrapf(types.ErrInvalidPairIDStr, pairIDStr)
 	}
+
+	return &types.PairID{}, sdkerrors.Wrapf(types.ErrInvalidPairIDStr, pairIDStr)
 }
 
 func NormalizeTickIndex(baseToken, token0 string, tickIndex int64) int64 {
 	if baseToken != token0 {
 		tickIndex *= -1
 	}
+
 	return tickIndex
 }
 
@@ -75,5 +76,6 @@ func NormalizeAllTickIndexes(baseToken, token0 string, tickIndexes []int64) []in
 	for i, idx := range tickIndexes {
 		tickIndexes[i] = NormalizeTickIndex(baseToken, token0, idx)
 	}
+
 	return tickIndexes
 }

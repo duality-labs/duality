@@ -23,6 +23,7 @@ func (k Keeper) UserLimitOrdersAll(
 	}
 	profile := NewUserProfile(addr)
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
 	return &types.QueryAllUserLimitOrdersResponse{
 		LimitOrders: profile.GetAllLimitOrders(ctx, k),
 	}, nil

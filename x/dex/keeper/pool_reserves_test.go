@@ -24,6 +24,7 @@ func createNPoolReserves(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.
 		keeper.SetPoolReserves(ctx, *tranche)
 		items[i] = *tranche
 	}
+
 	return items
 }
 

@@ -27,6 +27,7 @@ func (k Keeper) FindLimitOrderTranche(
 	if found {
 		return tranche, true, true
 	}
+
 	return types.LimitOrderTranche{}, false, false
 }
 
@@ -79,6 +80,7 @@ func (k Keeper) GetLimitOrderTranche(
 
 	var tick types.TickLiquidity
 	k.cdc.MustUnmarshal(b, &tick)
+
 	return tick.GetLimitOrderTranche(), true
 }
 
@@ -95,6 +97,7 @@ func (k Keeper) GetLimitOrderTrancheByKey(
 
 	var tick types.TickLiquidity
 	k.cdc.MustUnmarshal(b, &tick)
+
 	return tick.GetLimitOrderTranche(), true
 }
 
@@ -109,8 +112,16 @@ func (k Keeper) RemoveLimitOrderTranche(ctx sdk.Context, tranche types.LimitOrde
 	))
 }
 
-func (k Keeper) GetPlaceTranche(sdkCtx sdk.Context, pairID *types.PairID, tokenIn string, tickIndex int64) (types.LimitOrderTranche, bool) {
-	prefixStore := prefix.NewStore(sdkCtx.KVStore(k.storeKey), types.TickLiquidityLimitOrderPrefix(pairID, tokenIn, tickIndex))
+func (k Keeper) GetPlaceTranche(
+	sdkCtx sdk.Context,
+	pairID *types.PairID,
+	tokenIn string,
+	tickIndex int64,
+) (types.LimitOrderTranche, bool) {
+	prefixStore := prefix.NewStore(
+		sdkCtx.KVStore(k.storeKey),
+		types.TickLiquidityLimitOrderPrefix(pairID, tokenIn, tickIndex),
+	)
 	iter := prefixStore.Iterator(nil, nil)
 
 	defer iter.Close()
@@ -122,24 +133,43 @@ func (k Keeper) GetPlaceTranche(sdkCtx sdk.Context, pairID *types.PairID, tokenI
 			return *tranche, true
 		}
 	}
+
 	return types.LimitOrderTranche{}, false
 }
 
-func (k Keeper) GetFillTranche(sdkCtx sdk.Context, pairID *types.PairID, tokenIn string, tickIndex int64) (*types.LimitOrderTranche, bool) {
-	prefixStore := prefix.NewStore(sdkCtx.KVStore(k.storeKey), types.TickLiquidityLimitOrderPrefix(pairID, tokenIn, tickIndex))
+func (k Keeper) GetFillTranche(
+	sdkCtx sdk.Context,
+	pairID *types.PairID,
+	tokenIn string,
+	tickIndex int64,
+) (*types.LimitOrderTranche, bool) {
+	prefixStore := prefix.NewStore(
+		sdkCtx.KVStore(k.storeKey),
+		types.TickLiquidityLimitOrderPrefix(pairID, tokenIn, tickIndex),
+	)
 	iter := sdk.KVStorePrefixIterator(prefixStore, []byte{})
 
 	defer iter.Close()
 	for ; iter.Valid(); iter.Next() {
 		var tick types.TickLiquidity
 		k.cdc.MustUnmarshal(iter.Value(), &tick)
+
 		return tick.GetLimitOrderTranche(), true
 	}
+
 	return &types.LimitOrderTranche{}, false
 }
 
-func (k Keeper) GetAllLimitOrderTrancheAtIndex(sdkCtx sdk.Context, pairID *types.PairID, tokenIn string, tickIndex int64) (trancheList []types.LimitOrderTranche) {
-	prefixStore := prefix.NewStore(sdkCtx.KVStore(k.storeKey), types.TickLiquidityLimitOrderPrefix(pairID, tokenIn, tickIndex))
+func (k Keeper) GetAllLimitOrderTrancheAtIndex(
+	sdkCtx sdk.Context,
+	pairID *types.PairID,
+	tokenIn string,
+	tickIndex int64,
+) (trancheList []types.LimitOrderTranche) {
+	prefixStore := prefix.NewStore(
+		sdkCtx.KVStore(k.storeKey),
+		types.TickLiquidityLimitOrderPrefix(pairID, tokenIn, tickIndex),
+	)
 	iter := sdk.KVStorePrefixIterator(prefixStore, []byte{})
 
 	defer iter.Close()
@@ -151,6 +181,7 @@ func (k Keeper) GetAllLimitOrderTrancheAtIndex(sdkCtx sdk.Context, pairID *types
 			trancheList = append(trancheList, *maybeTranche)
 		}
 	}
+
 	return trancheList
 }
 
@@ -173,9 +204,14 @@ func (k Keeper) GetOrInitPlaceTranche(ctx sdk.Context,
 	goodTil *time.Time,
 	orderType types.LimitOrderType,
 ) (placeTranche types.LimitOrderTranche, err error) {
-	// NOTE: Right now we are not indexing by goodTil date so we can't easily check if there's already a tranche with the same goodTil date so instead we create a new tranche for each goodTil order
-	// if there is a large number of limitOrders with the same goodTilTime (most likely JIT) aggregating might be more efficient particularly for deletion, but if they are relatively sparse it will incur fewer lookups to just create a new limitOrderTranche
-	// also trying to cancel aggregated good_til orders will be a PITA
+	// NOTE: Right now we are not indexing by goodTil date so we can't easily check if there's already a tranche
+	// with the same goodTil date so instead we create a new tranche for each goodTil order
+	// if there is a large number of limitOrders with the same goodTilTime (most likely JIT)
+	// aggregating might be more efficient particularly for deletion, but if they are relatively sparse
+	// it will incur fewer lookups to just create a new limitOrderTranche
+	// Also trying to cancel aggregated good_til orders will be a PITA
+
+	//nolint:exhaustive
 	switch orderType {
 	case types.LimitOrderType_JUST_IN_TIME:
 		placeTranche, err = NewLimitOrderTranche(ctx, pairID, tokenIn, tickIndex, &types.JITGoodTilTime)

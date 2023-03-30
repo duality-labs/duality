@@ -1,4 +1,4 @@
-//nolint:lll,unused
+//nolint:unused
 package keeper_test
 
 import (
@@ -232,7 +232,7 @@ func (s *MsgServerTestSuite) assertCarolLimitSellFails(err error, selling string
 }
 
 func (s *MsgServerTestSuite) assertDanLimitSellFails(err error, selling string, tick, amountIn int, orderTypeOpt ...types.LimitOrderType) {
-	s.assertLimitSellFails(s.dan, err, selling, tick, amountIn)
+	s.assertLimitSellFails(s.dan, err, selling, tick, amountIn, orderTypeOpt...)
 }
 
 func (s *MsgServerTestSuite) assertLimitSellFails(account sdk.AccAddress, expectedErr error, tokenIn string, tick, amountIn int, orderTypeOpt ...types.LimitOrderType) {
@@ -277,6 +277,7 @@ func (s *MsgServerTestSuite) limitSellsGoodTil(account sdk.AccAddress, tokenIn s
 	})
 
 	s.Assert().NoError(err)
+
 	return msg.TrancheKey
 }
 
@@ -350,7 +351,7 @@ func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits ...*Depos
 		amountsB[i] = e.AmountB
 		tickIndexes[i] = e.TickIndex
 		fees[i] = e.Fee
-		options[i] = &types.DepositOptions{false}
+		options[i] = &types.DepositOptions{Autoswap: false}
 	}
 
 	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
@@ -405,14 +406,6 @@ func (s *MsgServerTestSuite) getLiquidityAtTick(tickIndex int64, fee uint64) (sd
 	liquidityA := pool.LowerTick0.Reserves
 	liquidityB := pool.UpperTick1.Reserves
 
-	if &liquidityA == nil {
-		liquidityA = sdk.ZeroInt()
-	}
-
-	if &liquidityB == nil {
-		liquidityB = sdk.ZeroInt()
-	}
-
 	return liquidityA, liquidityB
 }
 
@@ -443,7 +436,7 @@ func (s *MsgServerTestSuite) assertDepositFails(account sdk.AccAddress, expected
 		amountsB[i] = e.AmountB
 		tickIndexes[i] = e.TickIndex
 		fees[i] = e.Fee
-		options[i] = &types.DepositOptions{false}
+		options[i] = &types.DepositOptions{Autoswap: false}
 	}
 
 	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
@@ -742,7 +735,7 @@ func (s *MsgServerTestSuite) getPoolShares(
 	tick int64,
 	fee uint64,
 ) (shares sdk.Int) {
-	sharesID := CreateSharesId(token0, token1, tick, fee)
+	sharesID := CreateSharesID(token0, token1, tick, fee)
 	return s.app.BankKeeper.GetSupply(s.ctx, sharesID).Amount
 }
 
@@ -763,7 +756,7 @@ func (s *MsgServerTestSuite) getAccountShares(
 	tick int64,
 	fee uint64,
 ) (shares sdk.Int) {
-	sharesID := CreateSharesId(token0, token1, tick, fee)
+	sharesID := CreateSharesID(token0, token1, tick, fee)
 	return s.app.BankKeeper.GetBalance(s.ctx, account, sharesID).Amount
 }
 
@@ -849,9 +842,12 @@ func (s *MsgServerTestSuite) assertDanLimitFilledAtTickAtIndex(selling string, a
 }
 
 func (s *MsgServerTestSuite) assertLimitFilledAtTickAtIndex(account sdk.AccAddress, selling string, amount int, tickIndex int64, trancheKey string) {
+	userShares, totalShares := s.getLimitUserSharesAtTick(account, selling, tickIndex), s.getLimitTotalSharesAtTick(selling, tickIndex)
+	userRatio := userShares.ToDec().QuoInt(totalShares)
 	filled := s.getLimitFilledLiquidityAtTickAtIndex(selling, tickIndex, trancheKey)
 	amt := sdk.NewInt(int64(amount))
-	s.Assert().True(amt.Equal(filled))
+	userFilled := userRatio.MulInt(filled).RoundInt()
+	s.Assert().True(amt.Equal(userFilled))
 }
 
 // Limit liquidity
@@ -918,14 +914,15 @@ func (s *MsgServerTestSuite) getLimitUserSharesAtTick(account sdk.AccAddress, se
 	tranches := s.app.DexKeeper.GetAllLimitOrderTrancheAtIndex(s.ctx, pairID, selling, tickIndex)
 	fillTranche := tranches[0]
 	// get user shares and total shares
-	userShares := s.getLimitUserSharesAtTickAtIndex(account, selling, tickIndex, fillTranche.TrancheKey)
+	userShares := s.getLimitUserSharesAtTickAtIndex(account, fillTranche.TrancheKey)
 	if len(tranches) >= 2 {
-		userShares = userShares.Add(s.getLimitUserSharesAtTickAtIndex(account, selling, tickIndex, tranches[1].TrancheKey))
+		userShares = userShares.Add(s.getLimitUserSharesAtTickAtIndex(account, tranches[1].TrancheKey))
 	}
+
 	return userShares
 }
 
-func (s *MsgServerTestSuite) getLimitUserSharesAtTickAtIndex(account sdk.AccAddress, selling string, tickIndex int64, trancheKey string) sdk.Int {
+func (s *MsgServerTestSuite) getLimitUserSharesAtTickAtIndex(account sdk.AccAddress, trancheKey string) sdk.Int {
 	userShares, userSharesFound := s.app.DexKeeper.GetLimitOrderTrancheUser(s.ctx, account.String(), trancheKey)
 	s.Assert().True(userSharesFound, "Failed to get limit order user shares for index %s", trancheKey)
 	return userShares.SharesOwned
@@ -939,6 +936,7 @@ func (s *MsgServerTestSuite) getLimitTotalSharesAtTick(selling string, tickIndex
 	for _, t := range tranches {
 		totalShares = totalShares.Add(t.TotalTokenIn)
 	}
+
 	return totalShares
 }
 
@@ -947,6 +945,7 @@ func (s *MsgServerTestSuite) getLimitFilledLiquidityAtTickAtIndex(selling string
 	// grab fill tranche reserves and shares
 	tranche, _, found := s.app.DexKeeper.FindLimitOrderTranche(s.ctx, pairID, tickIndex, selling, trancheKey)
 	s.Assert().True(found, "Failed to get limit order filled reserves for index %s", trancheKey)
+
 	return tranche.ReservesTokenOut
 }
 
@@ -955,6 +954,7 @@ func (s *MsgServerTestSuite) getLimitReservesAtTickAtKey(selling string, tickInd
 	// grab fill tranche reserves and shares
 	tranche, _, found := s.app.DexKeeper.FindLimitOrderTranche(s.ctx, pairID, tickIndex, selling, trancheKey)
 	s.Assert().True(found, "Failed to get limit order reserves for index %s", trancheKey)
+
 	return tranche.ReservesTokenIn
 }
 
@@ -968,55 +968,56 @@ func (s *MsgServerTestSuite) assertNLimitOrderExpiration(expected int) {
 // takes as input the amount that was placed for the limit order (amount_placed), the price the
 // trader pays when filling it (price_filled_at) and the amount that they are swapping (amount_to_swap).
 // The format of the return statement is (amount_in, amount_out).
-func SingleLimitOrderFill(amount_placed sdk.Int,
-	price_filled_at sdk.Dec,
-	amount_to_swap sdk.Int,
-) (sdk.Dec, sdk.Dec) {
-	amount_out, amount_in := sdk.ZeroDec(), sdk.ZeroDec()
-	amountPlacedDec := amount_placed.ToDec()
-	amountPlacedForPrice := amountPlacedDec.Quo(price_filled_at)
+func SingleLimitOrderFill(amountPlaced sdk.Int,
+	priceFilledAt sdk.Dec,
+	amountToSwap sdk.Int,
+) (amountIn sdk.Dec, amountOut sdk.Dec) {
+	amountPlacedDec := amountPlaced.ToDec()
+	amountPlacedForPrice := amountPlacedDec.Quo(priceFilledAt)
 	// Checks if the swap will deplete the entire limit order and simulates the trade accordingly
-	if amount_to_swap.ToDec().GT(amountPlacedForPrice) {
-		amount_out = amount_placed.ToDec()
-		amount_in = amountPlacedForPrice
+	if amountToSwap.ToDec().GT(amountPlacedForPrice) {
+		amountOut = amountPlaced.ToDec()
+		amountIn = amountPlacedForPrice
 	} else {
-		amount_in = amount_to_swap.ToDec()
-		amount_out = amount_in.Mul(price_filled_at)
+		amountIn = amountToSwap.ToDec()
+		amountOut = amountIn.Mul(priceFilledAt)
 	}
 
-	return amount_in, amount_out
+	return amountIn, amountOut
 }
 
 // Calls SingleLimitOrderFill() and updates the filled and unfilled reserves.
 // Returns the unfilled reserves (unfilled_reserves), filled reserves (filled_reserves) and the amount left to swap
 // (amount_to_swap_remaining)
-func SingleLimitOrderFillAndUpdate(amount_placed sdk.Int,
-	price_filled_at sdk.Dec,
-	amount_to_swap sdk.Int,
-	unfilled_reserves sdk.Int,
+func SingleLimitOrderFillAndUpdate(amountPlaced sdk.Int,
+	priceFilledAt sdk.Dec,
+	amountToSwap sdk.Int,
+	unfilledReserves sdk.Int,
 ) (sdk.Dec, sdk.Dec, sdk.Dec) {
-	amount_in, amount_out := SingleLimitOrderFill(amount_placed, price_filled_at, amount_to_swap)
-	unfilled_reservesDec := unfilled_reserves.ToDec().Sub(amount_out)
-	filled_reserves := amount_placed.ToDec().Add(amount_in)
-	amount_to_swap_remaining := amount_to_swap.ToDec().Sub(amount_in)
-	return unfilled_reservesDec, filled_reserves, amount_to_swap_remaining
+	amountIn, amountOut := SingleLimitOrderFill(amountPlaced, priceFilledAt, amountToSwap)
+	unfilledReservesDec := unfilledReserves.ToDec().Sub(amountOut)
+	filledReserves := amountPlaced.ToDec().Add(amountIn)
+	amountToSwapRemaining := amountToSwap.ToDec().Sub(amountIn)
+
+	return unfilledReservesDec, filledReserves, amountToSwapRemaining
 }
 
 // MultipleLimitOrderFills() simulates the fill of multiple consecutive limit orders and returns the
 // total amount filled. It takes as input the amounts that were placed for the limit
 // order (amount_placed), the pricesthe trader pays when filling the orders (price_filled_at)
 // and the amount that they are swapping (amount_to_swap).
-func MultipleLimitOrderFills(amounts_placed []sdk.Int, prices []sdk.Dec, amount_to_swap sdk.Int) sdk.Dec {
-	total_out, amount_remaining := sdk.ZeroDec(), amount_to_swap
+func MultipleLimitOrderFills(amountsPlaced []sdk.Int, prices []sdk.Dec, amountToSwap sdk.Int) sdk.Dec {
+	totalOut, amountRemaining := sdk.ZeroDec(), amountToSwap
 
 	// Loops through all of the limit orders that need to be filled
-	for i := 0; i < len(amounts_placed); i++ {
-		_, amount_out := SingleLimitOrderFill(amounts_placed[i], prices[i], amount_remaining)
+	for i := 0; i < len(amountsPlaced); i++ {
+		_, amountOut := SingleLimitOrderFill(amountsPlaced[i], prices[i], amountRemaining)
 
 		// amount_remaining = amount_remaining.Sub(amount_in)
-		total_out = total_out.Add(amount_out)
+		totalOut = totalOut.Add(amountOut)
 	}
-	return total_out
+
+	return totalOut
 }
 
 // SinglePoolSwap() simulates swapping through a single liquidity pool and returns the amount
@@ -1025,18 +1026,19 @@ func MultipleLimitOrderFills(amounts_placed []sdk.Int, prices []sdk.Dec, amount_
 // trader pays when swapping through it (price_swapped_at) and the amount that they are
 // swapping (amount_to_swap). The format of the return statement is (amount_in, amount_out).
 // Same thing as SingleLimitOrderFill() except in naming.
-func SinglePoolSwap(amount_liquidity sdk.Int, price_swapped_at sdk.Dec, amount_to_swap sdk.Int) (sdk.Dec, sdk.Dec) {
-	amount_out, amount_in := sdk.ZeroDec(), sdk.ZeroDec()
-	liquidityAtPrice := amount_liquidity.ToDec().Quo(price_swapped_at)
+func SinglePoolSwap(amountLiquidity sdk.Int, priceSwappedAt sdk.Dec, amountToSwap sdk.Int) (sdk.Dec, sdk.Dec) {
+	var amountOut, amountIn sdk.Dec
+	liquidityAtPrice := amountLiquidity.ToDec().Quo(priceSwappedAt)
 	// Checks if the swap will deplete the entire limit order and simulates the trade accordingly
-	if amount_to_swap.ToDec().GT(liquidityAtPrice) {
-		amount_out = amount_liquidity.ToDec()
-		amount_in = liquidityAtPrice
+	if amountToSwap.ToDec().GT(liquidityAtPrice) {
+		amountOut = amountLiquidity.ToDec()
+		amountIn = liquidityAtPrice
 	} else {
-		amount_in = amount_to_swap.ToDec()
-		amount_out = amount_in.Mul(price_swapped_at)
+		amountIn = amountToSwap.ToDec()
+		amountOut = amountIn.Mul(priceSwappedAt)
 	}
-	return amount_in, amount_out
+
+	return amountIn, amountOut
 }
 
 // SinglePoolSwapAndUpdate() simulates swapping through a single liquidity pool and updates that pool's
@@ -1044,16 +1046,17 @@ func SinglePoolSwap(amount_liquidity sdk.Int, price_swapped_at sdk.Dec, amount_t
 // and amount_to_swap; but has additional inputs, reservesOfInToken, reservesOfOutToken. It returns the
 // updated amounts for the reservesOfInToken and the reservesOfOutToken, in the format of
 // (resulting_reserves_in_token, resulting_reserves_out_token, amount_in, amount_out)
-func SinglePoolSwapAndUpdate(amount_liquidity sdk.Int,
-	price_swapped_at sdk.Dec,
-	amount_to_swap sdk.Int,
+func SinglePoolSwapAndUpdate(amountLiquidity sdk.Int,
+	priceSwappedAt sdk.Dec,
+	amountToSwap sdk.Int,
 	reservesOfInToken sdk.Int,
 	reservesOfOutToken sdk.Int,
 ) (sdk.Dec, sdk.Dec, sdk.Dec, sdk.Dec) {
-	amount_in, amount_out := SinglePoolSwap(amount_liquidity, price_swapped_at, amount_to_swap)
-	resulting_reserves_in_token := reservesOfInToken.ToDec().Add(amount_in)
-	resulting_reserves_out_token := reservesOfOutToken.ToDec().Add(amount_out)
-	return resulting_reserves_in_token, resulting_reserves_out_token, amount_in, amount_out
+	amountIn, amountOut := SinglePoolSwap(amountLiquidity, priceSwappedAt, amountToSwap)
+	resultingReservesInToken := reservesOfInToken.ToDec().Add(amountIn)
+	resultingReservesOutToken := reservesOfOutToken.ToDec().Add(amountOut)
+
+	return resultingReservesInToken, resultingReservesOutToken, amountIn, amountOut
 }
 
 // SinglePoolSwapAndUpdateDirection() simulates swapping through a single liquidity pool and updates that pool's
@@ -1062,27 +1065,27 @@ func SinglePoolSwapAndUpdate(amount_liquidity sdk.Int,
 // reservesOfToken1 but has an additional input inToken which is a bool indicating whether 0 or 1 is swapped into
 // the pool. It returns the updated amounts for the reservesOfInToken and the reservesOfOutToken, in the format
 // of (reservesOfInToken,reservesOfOutToken).
-func SinglePoolSwapAndUpdateDirectional(amount_liquidity sdk.Int,
-	price_swapped_at sdk.Dec,
-	amount_to_swap sdk.Int,
+func SinglePoolSwapAndUpdateDirectional(amountLiquidity sdk.Int,
+	priceSwappedAt sdk.Dec,
+	amountToSwap sdk.Int,
 	reservesOfToken0 sdk.Int,
 	reservesOfToken1 sdk.Int,
 	inToken bool,
-) (sdk.Dec, sdk.Dec) {
-	resultingReservesOfToken0, resultingReservesOfToken1 := sdk.ZeroDec(), sdk.ZeroDec()
+) (resultingReservesOfToken0 sdk.Dec, resultingReservesOfToken1 sdk.Dec) {
 	if inToken {
-		resultingReservesOfToken1, resultingReservesOfToken0, _, _ = SinglePoolSwapAndUpdate(amount_liquidity,
-			price_swapped_at,
-			amount_to_swap,
+		resultingReservesOfToken1, resultingReservesOfToken0, _, _ = SinglePoolSwapAndUpdate(amountLiquidity,
+			priceSwappedAt,
+			amountToSwap,
 			reservesOfToken1,
 			reservesOfToken0)
 	} else {
-		resultingReservesOfToken0, resultingReservesOfToken1, _, _ = SinglePoolSwapAndUpdate(amount_liquidity,
-			price_swapped_at,
-			amount_to_swap,
+		resultingReservesOfToken0, resultingReservesOfToken1, _, _ = SinglePoolSwapAndUpdate(amountLiquidity,
+			priceSwappedAt,
+			amountToSwap,
 			reservesOfToken0,
 			reservesOfToken1)
 	}
+
 	return resultingReservesOfToken0, resultingReservesOfToken1
 }
 
@@ -1091,48 +1094,48 @@ func SinglePoolSwapAndUpdateDirectional(amount_liquidity sdk.Int,
 // and amount_to_swap, reservesOfInToken, reservesOfOutToken; But they are held in arrays the size of how many
 // pools are being swapped through. It returns the updated amounts for the reservesOfInToken and the
 // reservesOfOutToken, in the format of (reservesOfInToken,reservesOfOutToken)
-func MultiplePoolSwapAndUpdate(amounts_liquidity []sdk.Int,
-	prices_swapped_at []sdk.Dec,
-	amount_to_swap sdk.Int,
-	reserves_in_token_array []sdk.Int,
-	reserves_out_token_array []sdk.Int,
+func MultiplePoolSwapAndUpdate(amountsLiquidity []sdk.Int,
+	pricesSwappedAt []sdk.Dec,
+	amountToSwap sdk.Int,
+	reservesInTokenArray []sdk.Int,
+	reservesOutTokenArray []sdk.Int,
 ) ([]sdk.Dec, []sdk.Dec, sdk.Dec, sdk.Dec) {
-	num_pools := len(amounts_liquidity)
-	amountRemainingDec := amount_to_swap.ToDec()
-	amount_out_total, amount_out_temp, amount_in := sdk.ZeroDec(), sdk.ZeroDec(), sdk.ZeroDec()
-	resulting_reserves_in_token := make([]sdk.Dec, num_pools, num_pools)
-	resulting_reserves_out_token := make([]sdk.Dec, num_pools, num_pools)
-	for i := 0; i < num_pools; i++ {
-		resulting_reserves_in_token[i], resulting_reserves_out_token[i], amount_in, amount_out_temp = SinglePoolSwapAndUpdate(amounts_liquidity[i],
-			prices_swapped_at[i],
-			amount_to_swap,
-			reserves_in_token_array[i],
-			reserves_out_token_array[i])
-		amount_out_total = amount_out_total.Add(amount_out_temp)
-		amountRemainingDec = amountRemainingDec.Sub(amount_in)
+	numPools := len(amountsLiquidity)
+	amountRemainingDec := amountToSwap.ToDec()
+	var amountOutTotal, amountIn, amountOutTemp sdk.Dec
+	resultingReservesInToken := make([]sdk.Dec, numPools)
+	resultingReservesOutToken := make([]sdk.Dec, numPools)
+	for i := 0; i < numPools; i++ {
+		resultingReservesInToken[i], resultingReservesOutToken[i], amountIn, amountOutTemp = SinglePoolSwapAndUpdate(amountsLiquidity[i],
+			pricesSwappedAt[i],
+			amountToSwap,
+			reservesInTokenArray[i],
+			reservesOutTokenArray[i])
+		amountOutTotal = amountOutTotal.Add(amountOutTemp)
+		amountRemainingDec = amountRemainingDec.Sub(amountIn)
 		i++
 	}
 
-	return resulting_reserves_in_token, resulting_reserves_out_token, amountRemainingDec, amount_out_total
+	return resultingReservesInToken, resultingReservesOutToken, amountRemainingDec, amountOutTotal
 }
 
-func SharesOnDeposit(existing_shares sdk.Dec, existing_amount0, existing_amount1, new_amount0, new_amount1 sdk.Int, tickIndex int64) (shares_minted sdk.Int) {
+func SharesOnDeposit(existingAmount0, existingAmount1, newAmount0, newAmount1 sdk.Int, tickIndex int64) (sharesMinted sdk.Int) {
 	price1To0 := types.MustNewPrice(-1 * tickIndex)
-	newAmount0Dec := sdk.NewDecFromInt(new_amount0)
-	new_value := newAmount0Dec.Add(price1To0.MulInt(new_amount1))
+	newAmount0Dec := sdk.NewDecFromInt(newAmount0)
+	newValue := newAmount0Dec.Add(price1To0.MulInt(newAmount1))
 
-	if existing_amount0.Add(existing_amount1).GT(sdk.ZeroInt()) {
-		existing_value := existing_amount0.ToDec().Add(price1To0.MulInt(existing_amount1))
-		shares_minted = shares_minted.ToDec().Mul(new_value.Quo(existing_value)).TruncateInt()
+	if existingAmount0.Add(existingAmount1).GT(sdk.ZeroInt()) {
+		existingValue := existingAmount0.ToDec().Add(price1To0.MulInt(existingAmount1))
+		sharesMinted = sharesMinted.ToDec().Mul(newValue.Quo(existingValue)).TruncateInt()
 	} else {
-		shares_minted = new_value.TruncateInt()
+		sharesMinted = newValue.TruncateInt()
 	}
 
-	return shares_minted
+	return sharesMinted
 }
 
-func (s *MsgServerTestSuite) calcAutoswapSharesMinted(centerTick int64, fee uint64, _residual0, _residual1, _balanced0, _balanced1, _totalShares, _valuePool int64) sdk.Int {
-	residual0, residual1, balanced0, balanced1, totalShares, valuePool := sdk.NewInt(_residual0), sdk.NewInt(_residual1), sdk.NewInt(_balanced0), sdk.NewInt(_balanced1), sdk.NewInt(_totalShares), sdk.NewInt(_valuePool)
+func (s *MsgServerTestSuite) calcAutoswapSharesMinted(centerTick int64, fee uint64, residual0, residual1, balanced0, balanced1, totalShares, valuePool int64) sdk.Int {
+	residual0Int, residual1Int, balanced0Int, balanced1Int, totalSharesInt, valuePoolInt := sdk.NewInt(residual0), sdk.NewInt(residual1), sdk.NewInt(balanced0), sdk.NewInt(balanced1), sdk.NewInt(totalShares), sdk.NewInt(valuePool)
 
 	// residualValue = 1.0001^-f * residualAmount0 + 1.0001^{i-f} * residualAmount1
 	// balancedValue = balancedAmount0 + 1.0001^{i} * balancedAmount1
@@ -1143,15 +1146,15 @@ func (s *MsgServerTestSuite) calcAutoswapSharesMinted(centerTick int64, fee uint
 	leftPrice := types.MustNewPrice(-1 * (centerTick - int64(fee)))
 	discountPrice := types.MustNewPrice(-1 * int64(fee))
 
-	balancedValue := balanced0.ToDec().Add(centerPrice.MulInt(balanced1)).TruncateInt()
-	residualValue := discountPrice.MulInt(residual0).Add(leftPrice.Mul(residual1.ToDec())).TruncateInt()
+	balancedValue := balanced0Int.ToDec().Add(centerPrice.MulInt(balanced1Int)).TruncateInt()
+	residualValue := discountPrice.MulInt(residual0Int).Add(leftPrice.Mul(residual1Int.ToDec())).TruncateInt()
 	valueMint := balancedValue.Add(residualValue)
 
-	return valueMint.Mul(totalShares).Quo(valuePool)
+	return valueMint.Mul(totalSharesInt).Quo(valuePoolInt)
 }
 
-func (s *MsgServerTestSuite) calcSharesMinted(centerTick, _amount0, _amount1 int64) sdk.Int {
-	amount0, amount1 := sdk.NewInt(_amount0), sdk.NewInt(_amount1)
+func (s *MsgServerTestSuite) calcSharesMinted(centerTick, amount0Int, amount1Int int64) sdk.Int {
+	amount0, amount1 := sdk.NewInt(amount0Int), sdk.NewInt(amount1Int)
 	centerPrice := types.MustNewPrice(-1 * centerTick)
 
 	return amount0.ToDec().Add(centerPrice.Mul(amount1.ToDec())).TruncateInt()
@@ -1226,6 +1229,7 @@ func calculateSingleSwap(price *types.Price, tickLiquidity, tickLimitOrderLiquid
 		amountLeft = tmpAmountLeft
 		amountOut = amountOut.Add(tmpAmountOut)
 	}
+
 	return amountLeft, amountOut
 }
 
@@ -1239,6 +1243,7 @@ func calculateSwap(price *types.Price, liquidity, amountIn int64) (sdk.Int, sdk.
 	}
 	// only sufficient for part of amountIn
 	tmpAmountIn := price.Inv().MulInt(liquidityInt).TruncateInt()
+
 	return amountInInt.Sub(tmpAmountIn), liquidityInt
 }
 
@@ -1256,6 +1261,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsAToB(
 			panic(err)
 		}
 	}
+
 	return s.calculateMultipleSwaps(prices, tickLiquidities, tickLimitOrderLiquidities, amountIn)
 }
 
@@ -1264,6 +1270,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsNoLOAToB(tickIndexes, tickLiq
 	for i := range prices {
 		prices[i] = types.MustNewPrice(tickIndexes[i])
 	}
+
 	return s.calculateMultipleSwapsNoLO(prices, tickLiquidities, amountIn)
 }
 
@@ -1272,6 +1279,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsOnlyLOAToB(tickIndexes, tickL
 	for i := range prices {
 		prices[i] = types.MustNewPrice(tickIndexes[i])
 	}
+
 	return s.calculateMultipleSwapsOnlyLO(prices, tickLimitOrderLiquidities, amountIn)
 }
 
@@ -1280,6 +1288,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsBToA(tickIndexes, tickLiquidi
 	for i := range prices {
 		prices[i] = types.MustNewPrice(-1 * tickIndexes[i])
 	}
+
 	return s.calculateMultipleSwaps(prices, tickLiquidities, tickLimitOrderLiquidities, amountIn)
 }
 
@@ -1288,6 +1297,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsNoLOBToA(tickIndexes, tickLiq
 	for i := range prices {
 		prices[i] = types.MustNewPrice(-1 * tickIndexes[i])
 	}
+
 	return s.calculateMultipleSwapsNoLO(prices, tickLiquidities, amountIn)
 }
 
@@ -1296,6 +1306,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsOnlyLOBToA(tickIndexes, tickL
 	for i := range prices {
 		prices[i] = types.MustNewPrice(-1 * tickIndexes[i])
 	}
+
 	return s.calculateMultipleSwapsOnlyLO(prices, tickLimitOrderLiquidities, amountIn)
 }
 
@@ -1305,6 +1316,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsNoLO(prices []*types.Price, t
 	for i := range tickLimitOrderLiquidities {
 		tickLimitOrderLiquidities[i] = 0
 	}
+
 	return s.calculateMultipleSwaps(prices, tickLiquidities, tickLimitOrderLiquidities, amountIn)
 }
 
@@ -1314,6 +1326,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwapsOnlyLO(prices []*types.Price,
 	for i := range tickLiquidities {
 		tickLiquidities[i] = 0
 	}
+
 	return s.calculateMultipleSwaps(prices, tickLiquidities, tickLimitOrderLiquidities, amountIn)
 }
 
@@ -1323,6 +1336,7 @@ func (s *MsgServerTestSuite) calculateMultipleSwaps(prices []*types.Price, tickL
 		tmpAmountLeft, tmpAmountOut := calculateSingleSwap(prices[i], tickLiquidities[i], tickLimitOrderLiquidities[i], amountLeft.Int64())
 		amountLeft, amountOut = tmpAmountLeft, amountOut.Add(tmpAmountOut)
 	}
+
 	return amountLeft, amountOut
 }
 
