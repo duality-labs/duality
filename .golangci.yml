@@ -1,0 +1,54 @@
+linters:
+  enable-all: true
+  disable:
+    - exhaustivestruct
+    - exhaustruct
+    - paralleltest
+    - nonamedreturns
+    - varnamelen
+    - godot
+    - gomoddirectives
+    - ireturn
+    - interfacer
+
+    # remove eventually
+    - funlen
+    - wrapcheck
+    - cyclop
+    - godox
+    - dupl
+    - wsl
+    - gomnd
+    - gci
+    - containedctx
+    - scopelint
+linters-settings:
+  gosec:
+    excludes:
+      - G601 # Implicit memory aliasing of items from a range statement
+  nlreturn:
+    block-size: 3
+
+
+issues:
+  exclude-rules:
+    - path: '(.+)_test\.go'
+      linters:
+        - errcheck
+        - gochecknoglobals
+        # remove eventually
+        - forbidigo
+        - lll
+    - linters:
+        - nosnakecase
+      text: 'TickLiquidity_'
+    - linters:
+        - nosnakecase
+      text: 'LimitOrderType_'
+    - linters:
+        - unparam
+      text: 'always receives'
+      path: '(.+)_test\.go'
+  
+
+
