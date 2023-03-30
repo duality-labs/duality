@@ -22,7 +22,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
-          version: v3.4.0
+          version: v1.52.2
           # Optional: golangci-lint command line arguments.
           # args: --issues-exit-code=0
           only-new-issues: true
