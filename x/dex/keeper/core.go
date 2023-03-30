@@ -273,6 +273,51 @@ func (k Keeper) SwapCore(goCtx context.Context,
 	return coinOut, nil
 }
 
+func (k Keeper) MultiHopSwapCore(
+	goCtx context.Context,
+	amountIn sdk.Int,
+	hops []string,
+	exitLimitPrice sdk.Dec,
+	callerAddr sdk.AccAddress,
+	receiverAddr sdk.AccAddress,
+) (coinOut sdk.Coin, err error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	initialInCoin := sdk.NewCoin(hops[0], amountIn)
+	var currentOutCoin sdk.Coin
+	inCoin := initialInCoin
+
+	for i := 0; i < len(hops)-1; i++ {
+		tokenIn := hops[i]
+		tokenOut := hops[i+1]
+		pairId, err := CreatePairIdFromUnsorted(tokenIn, tokenOut)
+		if err != nil {
+			return sdk.Coin{}, err
+		}
+		amountIn, amountOut, err := k.Swap(ctx, pairId, tokenIn, tokenOut, inCoin.Amount, nil)
+		if !amountIn.Equal(inCoin.Amount) {
+			// TODO: wrap with token failed at
+			return sdk.Coin{}, types.ErrInsufficientLiquidity
+		}
+		currentOutCoin = sdk.NewCoin(tokenOut, amountOut)
+	}
+
+	finalPrice := initialInCoin.Amount.ToDec().Quo(currentOutCoin.Amount.ToDec())
+
+	if exitLimitPrice.GT(finalPrice) {
+		// return error limitprice hit
+	}
+
+	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{initialInCoin}); err != nil {
+		return sdk.Coin{}, err
+	}
+
+	if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{currentOutCoin}); err != nil {
+		return sdk.Coin{}, err
+	}
+
+	return currentOutCoin, nil
+}
+
 // Handles MsgPlaceLimitOrder, initializing (tick, pair) data structures if needed, calculating and
 // storing information for a new limit order at a specific tick.
 func (k Keeper) PlaceLimitOrderCore(

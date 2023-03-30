@@ -168,10 +168,20 @@ func (k msgServer) CancelLimitOrder(
 }
 
 func (k msgServer) MultiHopSwap(goCtx context.Context, msg *types.MsgMultiHopSwap) (*types.MsgMultiHopSwapResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
+	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
+	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiever)
 
-	// TODO: Handling the message
-	_ = ctx
+	coinOut, err := k.MultiHopSwapCore(
+		goCtx,
+		msg.AmountIn,
+		msg.Hops,
+		msg.ExitLimitPrice,
+		callerAddr,
+		receiverAddr,
+	)
+	if err != nil {
+		return &types.MsgMultiHopSwapResponse{}, err
+	}
 
-	return &types.MsgMultiHopSwapResponse{}, nil
+	return &types.MsgMultiHopSwapResponse{CoinOut: co}, nil
 }

@@ -9,7 +9,7 @@ const TypeMsgMultiHopSwap = "multi_hop_swap"
 
 var _ sdk.Msg = &MsgMultiHopSwap{}
 
-func NewMsgMultiHopSwap(creator string, receiever string, hops string, amountIn string, exitLimitPrice string) *MsgMultiHopSwap {
+func NewMsgMultiHopSwap(creator string, receiever string, hops []string, amountIn sdk.Int, exitLimitPrice sdk.Dec) *MsgMultiHopSwap {
 	return &MsgMultiHopSwap{
 		Creator:        creator,
 		Receiever:      receiever,
@@ -45,5 +45,12 @@ func (msg *MsgMultiHopSwap) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+	_, err = sdk.AccAddressFromBech32(msg.Receiver)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
+	}
+
+	// TODO: validate len(hops) > 3 < MaxHops
+
 	return nil
 }
