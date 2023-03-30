@@ -29,42 +29,45 @@ func TestQueryTestSuite(t *testing.T) {
 var testAddress = sdk.AccAddress([]byte("testAddr"))
 
 var limitOrderTrancheList = []types.TickLiquidity{
-	{Liquidity: &types.TickLiquidity_LimitOrderTranche{
-		LimitOrderTranche: &types.LimitOrderTranche{
-			PairId: &types.PairId{
-				Token0: "TokenA",
-				Token1: "TokenB",
+	{
+		Liquidity: &types.TickLiquidity_LimitOrderTranche{
+			LimitOrderTranche: &types.LimitOrderTranche{
+				PairID: &types.PairID{
+					Token0: "TokenA",
+					Token1: "TokenB",
+				},
+				TokenIn:          "TokenB",
+				TickIndex:        1,
+				TrancheKey:       "0",
+				ReservesTokenIn:  sdk.NewInt(10),
+				ReservesTokenOut: sdk.ZeroInt(),
+				TotalTokenIn:     sdk.NewInt(10),
+				TotalTokenOut:    sdk.ZeroInt(),
 			},
-			TokenIn:          "TokenB",
-			TickIndex:        1,
-			TrancheKey:       "0",
-			ReservesTokenIn:  sdk.NewInt(10),
-			ReservesTokenOut: sdk.ZeroInt(),
-			TotalTokenIn:     sdk.NewInt(10),
-			TotalTokenOut:    sdk.ZeroInt(),
 		},
 	},
-	},
-	{Liquidity: &types.TickLiquidity_LimitOrderTranche{
-		LimitOrderTranche: &types.LimitOrderTranche{
-			PairId: &types.PairId{
-				Token0: "TokenA",
-				Token1: "TokenB",
+	{
+		Liquidity: &types.TickLiquidity_LimitOrderTranche{
+			LimitOrderTranche: &types.LimitOrderTranche{
+				PairID: &types.PairID{
+					Token0: "TokenA",
+					Token1: "TokenB",
+				},
+				TokenIn:          "TokenB",
+				TickIndex:        2,
+				TrancheKey:       "1",
+				ReservesTokenIn:  sdk.NewInt(10),
+				ReservesTokenOut: sdk.ZeroInt(),
+				TotalTokenIn:     sdk.NewInt(10),
+				TotalTokenOut:    sdk.ZeroInt(),
 			},
-			TokenIn:          "TokenB",
-			TickIndex:        2,
-			TrancheKey:       "1",
-			ReservesTokenIn:  sdk.NewInt(10),
-			ReservesTokenOut: sdk.ZeroInt(),
-			TotalTokenIn:     sdk.NewInt(10),
-			TotalTokenOut:    sdk.ZeroInt(),
 		},
-	},
 	},
 }
 
 var inactiveLimitOrderTrancheList = []types.LimitOrderTranche{
-	{PairId: &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+	{
+		PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 		TokenIn:          "TokenB",
 		TickIndex:        0,
 		TrancheKey:       "0",
@@ -73,7 +76,8 @@ var inactiveLimitOrderTrancheList = []types.LimitOrderTranche{
 		ReservesTokenOut: sdk.NewInt(10),
 		ReservesTokenIn:  sdk.NewInt(0),
 	},
-	{PairId: &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+	{
+		PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 		TokenIn:          "TokenB",
 		TickIndex:        0,
 		TrancheKey:       "1",
@@ -88,7 +92,7 @@ var poolReservesList = []types.TickLiquidity{
 	{
 		Liquidity: &types.TickLiquidity_PoolReserves{
 			PoolReserves: &types.PoolReserves{
-				PairId: &types.PairId{
+				PairID: &types.PairID{
 					Token0: "TokenA",
 					Token1: "TokenB",
 				},
@@ -102,7 +106,7 @@ var poolReservesList = []types.TickLiquidity{
 	{
 		Liquidity: &types.TickLiquidity_PoolReserves{
 			PoolReserves: &types.PoolReserves{
-				PairId: &types.PairId{
+				PairID: &types.PairID{
 					Token0: "TokenA",
 					Token1: "TokenB",
 				},
@@ -117,7 +121,7 @@ var poolReservesList = []types.TickLiquidity{
 
 var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 	{
-		PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+		PairID:          &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 		Token:           "TokenA",
 		TickIndex:       1,
 		TrancheKey:      "0",
@@ -128,7 +132,7 @@ var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 		TakerReserves:   sdk.ZeroInt(),
 	},
 	{
-		PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+		PairID:          &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 		Token:           "TokenB",
 		TickIndex:       20,
 		TrancheKey:      "1",
@@ -147,7 +151,6 @@ var genesisState types.GenesisState = types.GenesisState{
 }
 
 func (s *QueryTestSuite) SetupSuite() {
-
 	s.T().Log("setting up integration test suite")
 
 	config := network.DefaultConfig()
@@ -192,7 +195,6 @@ func (s *QueryTestSuite) TestQueryCmdListTickLiquidity() {
 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 				require.NotEmpty(s.T(), res)
 				require.Equal(s.T(), tc.expOutput, res.TickLiquidity)
-
 			}
 		})
 	}
@@ -208,7 +210,7 @@ func (s *QueryTestSuite) TestQueryCmdShowLimitOrderTranche() {
 		expErrMsg string
 		expOutput types.LimitOrderTranche
 	}{
-		//show-limit-order-tranche [pair-id] [tick-index] [token-in] [tranche-key]
+		// show-limit-order-tranche [pair-id] [tick-index] [token-in] [tranche-key]
 		{
 			name:      "valid",
 			args:      []string{"TokenA<>TokenB", "1", "TokenB", "0"},
@@ -313,7 +315,6 @@ func (s *QueryTestSuite) TestQueryCmdShowLimitOrderTrancheUser() {
 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 				require.NotEmpty(s.T(), res)
 				require.Equal(s.T(), tc.expOutput, res.LimitOrderTrancheUser)
-
 			}
 		})
 	}
@@ -350,7 +351,6 @@ func (s *QueryTestSuite) TestQueryCmdListLimitOrderTrancheUser() {
 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 				require.NotEmpty(s.T(), res)
 				require.Equal(s.T(), tc.expOutput, res.LimitOrderTrancheUser)
-
 			}
 		})
 	}
@@ -387,7 +387,6 @@ func (s *QueryTestSuite) TestQueryCmdListInactiveLimitOrderTranche() {
 				require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 				require.NotEmpty(s.T(), res)
 				require.Equal(s.T(), tc.expOutput, res.InactiveLimitOrderTranche)
-
 			}
 		})
 	}
@@ -403,7 +402,7 @@ func (s *QueryTestSuite) TestQueryCmdShowInactiveLimitOrderTranche() {
 		expErrMsg string
 		expOutput types.LimitOrderTranche
 	}{
-		//show-filled-limit-order-tranche [pair-id] [token-in] [tick-index] [tranche-index]",
+		// show-filled-limit-order-tranche [pair-id] [token-in] [tick-index] [tranche-index]",
 		{
 			name:      "valid",
 			args:      []string{"TokenA<>TokenB", "TokenB", "0", "0"},

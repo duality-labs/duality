@@ -24,14 +24,15 @@ func createNLimitOrderExpiration(keeper *keeper.Keeper, ctx sdk.Context, n int) 
 
 		keeper.SetLimitOrderExpiration(ctx, items[i])
 	}
+
 	return items
 }
 
-func createLimitOrderExpirationAndTranches(keeper *keeper.Keeper, ctx sdk.Context, expTimes []time.Time) []types.LimitOrderExpiration {
+func createLimitOrderExpirationAndTranches(keeper *keeper.Keeper, ctx sdk.Context, expTimes []time.Time) {
 	items := make([]types.LimitOrderExpiration, len(expTimes))
 	for i := range items {
 		tranche := types.LimitOrderTranche{
-			PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+			PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 			TokenIn:          "TokenA",
 			TickIndex:        0,
 			TrancheKey:       strconv.Itoa(i),
@@ -47,7 +48,6 @@ func createLimitOrderExpirationAndTranches(keeper *keeper.Keeper, ctx sdk.Contex
 		keeper.SetLimitOrderExpiration(ctx, items[i])
 		keeper.SetLimitOrderTranche(ctx, tranche)
 	}
-	return items
 }
 
 func TestLimitOrderExpirationGet(t *testing.T) {
@@ -65,6 +65,7 @@ func TestLimitOrderExpirationGet(t *testing.T) {
 		)
 	}
 }
+
 func TestLimitOrderExpirationRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNLimitOrderExpiration(keeper, ctx, 10)
@@ -118,7 +119,7 @@ func TestPurgeExpiredLimitOrders(t *testing.T) {
 	require.Equal(t, nextWeek, expList[1].ExpirationTime)
 
 	// Only future LimitOrderTranches Exist
-	trancheList := keeper.GetAllLimitOrderTrancheAtIndex(ctx, defaultPairId, "TokenA", 0)
+	trancheList := keeper.GetAllLimitOrderTrancheAtIndex(ctx, defaultPairID, "TokenA", 0)
 	require.Equal(t, 2, len(trancheList))
 	require.Equal(t, tomorrow, *trancheList[0].ExpirationTime)
 	require.Equal(t, nextWeek, *trancheList[1].ExpirationTime)
@@ -142,8 +143,8 @@ func TestPurgeExpiredLimitOrdersAtBlockGasLimit(t *testing.T) {
 	yesterday := now.AddDate(0, 0, -1)
 
 	expTimes := []time.Time{
-		types.JITGoodTilTime,
-		types.JITGoodTilTime,
+		types.JITGoodTilTime(),
+		types.JITGoodTilTime(),
 		yesterday,
 		yesterday,
 		yesterday,
@@ -166,7 +167,6 @@ func TestPurgeExpiredLimitOrdersAtBlockGasLimit(t *testing.T) {
 	// for deleting expirations. If this cost changes the number of remaining
 	// expirations may change
 	require.Equal(t, 1, len(expList))
-
 }
 
 func TestPurgeExpiredLimitOrdersAtBlockGasLimitOnlyJIT(t *testing.T) {
@@ -178,13 +178,13 @@ func TestPurgeExpiredLimitOrdersAtBlockGasLimitOnlyJIT(t *testing.T) {
 	gasUsed := gasLimt - types.GoodTilPurgeGasBuffer - 30000
 
 	expTimes := []time.Time{
-		types.JITGoodTilTime,
-		types.JITGoodTilTime,
-		types.JITGoodTilTime,
-		types.JITGoodTilTime,
-		types.JITGoodTilTime,
-		types.JITGoodTilTime,
-		types.JITGoodTilTime,
+		types.JITGoodTilTime(),
+		types.JITGoodTilTime(),
+		types.JITGoodTilTime(),
+		types.JITGoodTilTime(),
+		types.JITGoodTilTime(),
+		types.JITGoodTilTime(),
+		types.JITGoodTilTime(),
 	}
 
 	createLimitOrderExpirationAndTranches(keeper, ctx, expTimes)
@@ -198,5 +198,4 @@ func TestPurgeExpiredLimitOrdersAtBlockGasLimitOnlyJIT(t *testing.T) {
 	// All JIT expirations are purged
 	expList := keeper.GetAllLimitOrderExpiration(ctx)
 	require.Equal(t, 0, len(expList))
-
 }

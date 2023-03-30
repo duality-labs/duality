@@ -212,12 +212,12 @@ func (s *MsgServerTestSuite) TestDepositValueAccural() {
 	s.fundBobBalances(1000, 1000)
 	s.fundCarolBalances(100, 1)
 
-	//Alice deposits 100TokenA @ tick0 => 100 shares
+	// Alice deposits 100TokenA @ tick0 => 100 shares
 	s.aliceDeposits(NewDeposit(100, 0, 0, 10))
 	s.assertAliceShares(0, 10, 100)
 	s.assertLiquidityAtTick(sdk.NewInt(100), sdk.ZeroInt(), 0, 10)
 
-	//Lots of trade activity => ~200 ExistingValueToken0
+	// Lots of trade activity => ~200 ExistingValueToken0
 
 	for i := 0; i < 100; i++ {
 		liquidityA, liquidityB := s.getLiquidityAtTick(0, 10)
@@ -226,18 +226,17 @@ func (s *MsgServerTestSuite) TestDepositValueAccural() {
 		} else {
 			s.bobMarketSells("TokenA", int(liquidityB.Int64()))
 		}
-
 	}
 	s.assertLiquidityAtTick(sdk.NewInt(199), sdk.NewInt(1), 0, 10)
 	s.assertDexBalances(199, 1)
 
-	//Carol deposits 100TokenA @tick0
+	// Carol deposits 100TokenA @tick0
 	s.carolDeposits(NewDeposit(100, 1, 0, 10))
 	s.assertCarolShares(0, 10, 50)
 
-	s.aliceWithdraws(NewWithdrawl(100, 0, 10))
+	s.aliceWithdraws(NewWithdrawal(100, 0, 10))
 	s.assertAliceBalances(199, 0)
 
-	s.carolWithdraws(NewWithdrawl(50, 0, 10))
+	s.carolWithdraws(NewWithdrawal(50, 0, 10))
 	s.assertCarolBalances(100, 2)
 }

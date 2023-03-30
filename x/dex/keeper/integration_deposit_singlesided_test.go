@@ -27,6 +27,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedInSpread1To0() {
 	// assert currentTick1To0 moved
 	s.assertCurr1To0(-1)
 }
+
 func (s *MsgServerTestSuite) TestDepositSingleSidedInSpread0To1() {
 	s.fundAliceBalances(50, 50)
 
@@ -205,7 +206,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMaxNotAdjusted() {
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityA() {
-	//TODO: this fails because PairInit doesn't account for single sided liquidity
+	// TODO: this fails because PairInit doesn't account for single sided liquidity
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN

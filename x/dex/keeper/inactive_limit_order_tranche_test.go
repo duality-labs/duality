@@ -17,7 +17,7 @@ func createNInactiveLimitOrderTranche(keeper *keeper.Keeper, ctx sdk.Context, n 
 	for i := range items {
 		items[i] = types.LimitOrderTranche{
 			TrancheKey:       strconv.Itoa(i),
-			PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+			PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 			TickIndex:        int64(i),
 			TokenIn:          "TokenA",
 			TotalTokenIn:     sdk.ZeroInt(),
@@ -27,6 +27,7 @@ func createNInactiveLimitOrderTranche(keeper *keeper.Keeper, ctx sdk.Context, n 
 		}
 		keeper.SetInactiveLimitOrderTranche(ctx, items[i])
 	}
+
 	return items
 }
 
@@ -35,7 +36,7 @@ func TestInactiveLimitOrderTrancheGet(t *testing.T) {
 	items := createNInactiveLimitOrderTranche(keeper, ctx, 10)
 	for _, item := range items {
 		rst, found := keeper.GetInactiveLimitOrderTranche(ctx,
-			item.PairId,
+			item.PairID,
 			item.TokenIn,
 			item.TickIndex,
 			item.TrancheKey,
@@ -47,18 +48,19 @@ func TestInactiveLimitOrderTrancheGet(t *testing.T) {
 		)
 	}
 }
+
 func TestInactiveLimitOrderTrancheRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNInactiveLimitOrderTranche(keeper, ctx, 10)
 	for _, item := range items {
 		keeper.RemoveInactiveLimitOrderTranche(ctx,
-			item.PairId,
+			item.PairID,
 			item.TokenIn,
 			item.TickIndex,
 			item.TrancheKey,
 		)
 		_, found := keeper.GetInactiveLimitOrderTranche(ctx,
-			item.PairId,
+			item.PairID,
 			item.TokenIn,
 			item.TickIndex,
 			item.TrancheKey,

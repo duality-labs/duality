@@ -109,7 +109,7 @@ func (s *KeeperTestHelper) FundModuleAcc(moduleName string, amounts sdk.Coins) {
 // }
 
 // SetupValidator sets up a validator and returns the ValAddress.
-func (s *KeeperTestHelper) SetupValidator(bondStatus stakingtypes.BondStatus) sdk.ValAddress {
+func (s *KeeperTestHelper) SetupValidator(_ stakingtypes.BondStatus) sdk.ValAddress {
 	valPub := secp256k1.GenPrivKey().PubKey()
 	valAddr := sdk.ValAddress(valPub.Address())
 	// bondDenom := s.App.StakingKeeper.GetParams(s.Ctx).BondDenom
@@ -155,6 +155,7 @@ func (s *KeeperTestHelper) SetupMultipleValidators(numValidator int) []string {
 		valAddr := s.SetupValidator(stakingtypes.Bonded)
 		valAddrs = append(valAddrs, valAddr.String())
 	}
+
 	return valAddrs
 }
 
@@ -292,5 +293,6 @@ func GenerateTestAddrs() (string, string) {
 	pk1 := ed25519.GenPrivKey().PubKey()
 	validAddr := sdk.AccAddress(pk1.Address()).String()
 	invalidAddr := sdk.AccAddress("invalid").String()
+
 	return validAddr, invalidAddr
 }

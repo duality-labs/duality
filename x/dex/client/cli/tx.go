@@ -11,14 +11,7 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
-var (
-	DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
-)
-
-const (
-	flagPacketTimeoutTimestamp = "packet-timeout-timestamp"
-	listSeparator              = ","
-)
+var DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
 
 // GetTxCmd returns the transaction commands for this module
 func GetTxCmd() *cobra.Command {
@@ -31,7 +24,7 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdDeposit())
-	cmd.AddCommand(CmdWithdrawl())
+	cmd.AddCommand(CmdWithdrawal())
 	cmd.AddCommand(CmdSwap())
 	cmd.AddCommand(CmdPlaceLimitOrder())
 	cmd.AddCommand(CmdWithdrawFilledLimitOrder())

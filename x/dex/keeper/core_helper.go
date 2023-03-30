@@ -12,32 +12,37 @@ import (
 //                           GETTERS & INITIALIZERS                          //
 ///////////////////////////////////////////////////////////////////////////////
 
-func (k Keeper) GetOrInitPoolReserves(ctx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64, fee uint64) (*types.PoolReserves, error) {
+func (k Keeper) GetOrInitPoolReserves(
+	ctx sdk.Context,
+	pairID *types.PairID,
+	tokenIn string,
+	tickIndex int64,
+	fee uint64,
+) (*types.PoolReserves, error) {
 	tickLiq, tickFound := k.GetPoolReserves(
 		ctx,
-		pairId,
+		pairID,
 		tokenIn,
 		tickIndex,
 		fee,
 	)
-	if tickFound {
+	switch {
+	case tickFound:
 		return tickLiq, nil
-	} else if types.IsTickOutOfRange(tickIndex) {
+	case types.IsTickOutOfRange(tickIndex):
 		return nil, types.ErrTickOutsideRange
-	} else {
+	default:
 		return &types.PoolReserves{
-			PairId:    pairId,
+			PairID:    pairID,
 			TokenIn:   tokenIn,
 			TickIndex: tickIndex,
 			Fee:       fee,
 			Reserves:  sdk.ZeroInt(),
 		}, nil
 	}
-
 }
 
 func NewLimitOrderExpiration(tranche types.LimitOrderTranche) types.LimitOrderExpiration {
-
 	trancheExpiry := tranche.ExpirationTime
 	if trancheExpiry == nil {
 		panic("Cannot create LimitOrderExpiration from tranche with nil ExpirationTime")
@@ -49,14 +54,21 @@ func NewLimitOrderExpiration(tranche types.LimitOrderTranche) types.LimitOrderEx
 	}
 }
 
-func NewLimitOrderTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64, goodTil *time.Time) (types.LimitOrderTranche, error) {
+func NewLimitOrderTranche(
+	sdkCtx sdk.Context,
+	pairID *types.PairID,
+	tokenIn string,
+	tickIndex int64,
+	goodTil *time.Time,
+) (types.LimitOrderTranche, error) {
 	// NOTE: CONTRACT: There is no active place tranche (ie. GetPlaceTrancheTick has returned false)
 	if types.IsTickOutOfRange(tickIndex) {
 		return types.LimitOrderTranche{}, types.ErrTickOutsideRange
 	}
 	trancheKey := NewTrancheKey(sdkCtx)
+
 	return types.LimitOrderTranche{
-		PairId:           pairId,
+		PairID:           pairID,
 		TokenIn:          tokenIn,
 		TickIndex:        tickIndex,
 		TrancheKey:       trancheKey,
@@ -66,12 +78,11 @@ func NewLimitOrderTranche(sdkCtx sdk.Context, pairId *types.PairId, tokenIn stri
 		TotalTokenOut:    sdk.ZeroInt(),
 		ExpirationTime:   goodTil,
 	}, nil
-
 }
 
 func (k Keeper) GetOrInitLimitOrderTrancheUser(
 	ctx sdk.Context,
-	pairId *types.PairId,
+	pairID *types.PairID,
 	tickIndex int64,
 	tokenIn string,
 	trancheKey string,
@@ -89,7 +100,7 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 			SharesCancelled: sdk.ZeroInt(),
 			TickIndex:       tickIndex,
 			Token:           tokenIn,
-			PairId:          pairId,
+			PairID:          pairID,
 			OrderType:       orderType,
 		}
 	}
@@ -101,9 +112,8 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 //                          STATE CALCULATIONS                               //
 ///////////////////////////////////////////////////////////////////////////////
 
-func (k Keeper) GetCurrTick1To0(ctx sdk.Context, pairId *types.PairId) (tickIdx int64, found bool) {
-
-	ti := k.NewTickIterator(ctx, pairId, pairId.Token0)
+func (k Keeper) GetCurrTick1To0(ctx sdk.Context, pairID *types.PairID) (tickIdx int64, found bool) {
+	ti := k.NewTickIterator(ctx, pairID, pairID.Token0)
 
 	defer ti.Close()
 	for ; ti.Valid(); ti.Next() {
@@ -112,12 +122,12 @@ func (k Keeper) GetCurrTick1To0(ctx sdk.Context, pairId *types.PairId) (tickIdx 
 			return tick.TickIndex(), true
 		}
 	}
-	return math.MinInt64, false
 
+	return math.MinInt64, false
 }
 
-func (k Keeper) GetCurrTick0To1(ctx sdk.Context, pairId *types.PairId) (tickIdx int64, found bool) {
-	ti := k.NewTickIterator(ctx, pairId, pairId.Token1)
+func (k Keeper) GetCurrTick0To1(ctx sdk.Context, pairID *types.PairID) (tickIdx int64, found bool) {
+	ti := k.NewTickIterator(ctx, pairID, pairID.Token1)
 	defer ti.Close()
 	for ; ti.Valid(); ti.Next() {
 		tick := ti.Value()
@@ -129,24 +139,25 @@ func (k Keeper) GetCurrTick0To1(ctx sdk.Context, pairId *types.PairId) (tickIdx 
 	return math.MaxInt64, false
 }
 
-func (k Keeper) IsBehindEnemyLines(ctx sdk.Context, pairId *types.PairId, tokenIn string, tickIndex int64) bool {
-	if tokenIn == pairId.Token0 {
-		curr0To1, _ := k.GetCurrTick0To1(ctx, pairId)
+func (k Keeper) IsBehindEnemyLines(ctx sdk.Context, pairID *types.PairID, tokenIn string, tickIndex int64) bool {
+	if tokenIn == pairID.Token0 {
+		curr0To1, _ := k.GetCurrTick0To1(ctx, pairID)
 		if tickIndex >= curr0To1 {
 			return true
 		}
 	} else {
-
-		curr1To0, _ := k.GetCurrTick1To0(ctx, pairId)
+		curr1To0, _ := k.GetCurrTick1To0(ctx, pairID)
 		if tickIndex <= curr1To0 {
 			return true
 		}
 	}
+
 	return false
 }
 
-func CalcAmountAsToken0(amount0 sdk.Int, amount1 sdk.Int, price1To0 types.Price) sdk.Dec {
+func CalcAmountAsToken0(amount0, amount1 sdk.Int, price1To0 types.Price) sdk.Dec {
 	amount0Dec := amount0.ToDec()
+
 	return amount0Dec.Add(price1To0.MulInt(amount1))
 }
 
@@ -154,28 +165,26 @@ func CalcAmountAsToken0(amount0 sdk.Int, amount1 sdk.Int, price1To0 types.Price)
 //                            TOKENIZER UTILS                                //
 ///////////////////////////////////////////////////////////////////////////////
 
-func (k Keeper) MintShares(ctx sdk.Context, addr sdk.AccAddress, amount sdk.Int, sharesId string) error {
+func (k Keeper) MintShares(ctx sdk.Context, addr sdk.AccAddress, amount sdk.Int, sharesID string) error {
 	// mint share tokens
-	sharesCoins := sdk.Coins{sdk.NewCoin(sharesId, amount)}
+	sharesCoins := sdk.Coins{sdk.NewCoin(sharesID, amount)}
 	if err := k.bankKeeper.MintCoins(ctx, types.ModuleName, sharesCoins); err != nil {
 		return err
 	}
 	// transfer them to addr
-	if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, sharesCoins); err != nil {
-		return err
-	}
-	return nil
+	err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, sharesCoins)
+
+	return err
 }
 
-func (k Keeper) BurnShares(ctx sdk.Context, addr sdk.AccAddress, amount sdk.Int, sharesId string) error {
-	sharesCoins := sdk.Coins{sdk.NewCoin(sharesId, amount)}
+func (k Keeper) BurnShares(ctx sdk.Context, addr sdk.AccAddress, amount sdk.Int, sharesID string) error {
+	sharesCoins := sdk.Coins{sdk.NewCoin(sharesID, amount)}
 	// transfer tokens to module
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, addr, types.ModuleName, sharesCoins); err != nil {
 		return err
 	}
 	// burn tokens
-	if err := k.bankKeeper.BurnCoins(ctx, types.ModuleName, sharesCoins); err != nil {
-		return err
-	}
-	return nil
+	err := k.bankKeeper.BurnCoins(ctx, types.ModuleName, sharesCoins)
+
+	return err
 }

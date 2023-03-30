@@ -7,9 +7,11 @@ import (
 )
 
 // x/dex module sentinel errors
+
+//nolint:all
 var (
 	ErrInvalidTradingPair                 = sdkerrors.Register(ModuleName, 1102, "Invalid token pair:")   // "%s<>%s", tokenA, tokenB
-	ErrInsufficientShares                 = sdkerrors.Register(ModuleName, 1104, "Insufficient shares:")  // "%s does not have %s shares of type %s", address, shares, sharesId
+	ErrInsufficientShares                 = sdkerrors.Register(ModuleName, 1104, "Insufficient shares:")  // "%s does not have %s shares of type %s", address, shares, sharesID
 	ErrValidTickNotFound                  = sdkerrors.Register(ModuleName, 1106, "Valid tick not found:") // "%d", tickIndex
 	ErrValidPairNotFound                  = sdkerrors.Register(ModuleName, 1107, "Valid pair not found.")
 	ErrUnbalancedTxArray                  = sdkerrors.Register(ModuleName, 1110, "Transaction input arrays are not of the same length.")
@@ -20,7 +22,7 @@ var (
 	ErrPlaceLimitOrderBehindPairLiquidity = sdkerrors.Register(ModuleName, 1116, "Placing a limit order behind the opposite token pair's liquidity is currently not allowed")
 	ErrTickOutsideRange                   = sdkerrors.Register(ModuleName, 1117, "Supplying a tick outside the range of [-352437, 352437] is not allowed")
 	ErrInvalidDepositShares               = sdkerrors.Register(ModuleName, 1118, "Denom is not an instance of Duality Pool Shares.")
-	ErrInvalidPairIdStr                   = sdkerrors.Register(ModuleName, 1119, "PairId does not conform to pattern TokenA<>TokenB.")
+	ErrInvalidPairIDStr                   = sdkerrors.Register(ModuleName, 1119, "PairID does not conform to pattern TokenA<>TokenB.")
 	ErrZeroDeposit                        = sdkerrors.Register(ModuleName, 1120, "At least one deposit amount must be > 0.")
 	ErrZeroTrueDeposit                    = sdkerrors.Register(ModuleName, 1121, "Cannot deposit double-sided liquidity in tick with prexisting single-sided liquidity.")
 	ErrWithdrawEmptyLimitOrder            = sdkerrors.Register(ModuleName, 1124, "Cannot withdraw additional liqudity from this limit order at this time.")

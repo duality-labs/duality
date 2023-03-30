@@ -3,13 +3,13 @@ package dex
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/keeper"
+
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
-
 	// Set all the tickLiquidity
 	for _, elem := range genState.TickLiquidityList {
 		switch elem.Liquidity.(type) {

@@ -45,6 +45,7 @@ func setup(withGenesis bool, invCheckPeriod uint) (*App, GenesisState) {
 	if withGenesis {
 		return app, NewDefaultGenesisState(encCdc.Marshaler)
 	}
+
 	return app, GenesisState{}
 }
 
@@ -106,7 +107,6 @@ func SetupWithGenesisValSet(t *testing.T, valSet *tmtypes.ValidatorSet, genAccs 
 		}
 		validators = append(validators, validator)
 		delegations = append(delegations, stakingtypes.NewDelegation(genAccs[0].GetAddress(), val.Address.Bytes(), sdk.OneDec()))
-
 	}
 
 	// set validators and delegations
@@ -156,6 +156,6 @@ type EmptyAppOptions struct {
 }
 
 // Get implements AppOptions
-func (ao EmptyAppOptions) Get(o string) interface{} {
+func (ao EmptyAppOptions) Get(_ string) interface{} {
 	return nil
 }

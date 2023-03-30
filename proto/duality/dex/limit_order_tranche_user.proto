@@ -7,7 +7,7 @@ import "duality/dex/pair_id.proto";
 import "duality/dex/tx.proto";
 
 message LimitOrderTrancheUser {
-  PairId pairId = 1;
+  PairID pairID = 1;
   string token = 2;
   int64 tickIndex = 3;
   string trancheKey = 4; 

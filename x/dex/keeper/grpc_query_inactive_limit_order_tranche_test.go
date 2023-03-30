@@ -31,7 +31,7 @@ func TestInactiveLimitOrderTrancheQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetInactiveLimitOrderTrancheRequest{
-				PairId:     msgs[0].PairId.Stringify(),
+				PairID:     msgs[0].PairID.Stringify(),
 				TokenIn:    msgs[0].TokenIn,
 				TickIndex:  msgs[0].TickIndex,
 				TrancheKey: msgs[0].TrancheKey,
@@ -41,7 +41,7 @@ func TestInactiveLimitOrderTrancheQuerySingle(t *testing.T) {
 		{
 			desc: "Second",
 			request: &types.QueryGetInactiveLimitOrderTrancheRequest{
-				PairId:     msgs[1].PairId.Stringify(),
+				PairID:     msgs[1].PairID.Stringify(),
 				TokenIn:    msgs[1].TokenIn,
 				TickIndex:  msgs[1].TickIndex,
 				TrancheKey: msgs[1].TrancheKey,
@@ -51,7 +51,7 @@ func TestInactiveLimitOrderTrancheQuerySingle(t *testing.T) {
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetInactiveLimitOrderTrancheRequest{
-				PairId:     "TokenZ<>TokenQ",
+				PairID:     "TokenZ<>TokenQ",
 				TokenIn:    strconv.Itoa(100000),
 				TickIndex:  100000,
 				TrancheKey: "100000",

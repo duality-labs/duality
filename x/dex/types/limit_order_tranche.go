@@ -13,7 +13,7 @@ func (t LimitOrderTranche) IsFilled() bool {
 }
 
 func (t LimitOrderTranche) IsJIT() bool {
-	return t.ExpirationTime != nil && *t.ExpirationTime == JITGoodTilTime
+	return t.ExpirationTime != nil && *t.ExpirationTime == JITGoodTilTime()
 }
 
 func (t LimitOrderTranche) IsExpired(ctx sdk.Context) bool {
@@ -33,13 +33,13 @@ func (t LimitOrderTranche) HasTokenOut() bool {
 }
 
 func (t LimitOrderTranche) IsTokenInToken0() bool {
-	return t.TokenIn == t.PairId.Token0
+	return t.TokenIn == t.PairID.Token0
 }
 
 func (t *LimitOrderTranche) Ref() []byte {
 	// returns the KVstore key for a tranche
 	return TickLiquidityKey(
-		t.PairId,
+		t.PairID,
 		t.TokenIn,
 		t.TickIndex,
 		LiquidityTypeLimitOrder,
@@ -50,17 +50,17 @@ func (t *LimitOrderTranche) Ref() []byte {
 func (t LimitOrderTranche) PriceMakerToTaker() *Price {
 	if t.IsTokenInToken0() {
 		return MustNewPrice(t.TickIndex)
-	} else {
-		return MustNewPrice(-1 * t.TickIndex)
 	}
+
+	return MustNewPrice(-1 * t.TickIndex)
 }
 
 func (t LimitOrderTranche) PriceTakerToMaker() *Price {
 	if t.IsTokenInToken0() {
 		return MustNewPrice(-1 * t.TickIndex)
-	} else {
-		return MustNewPrice(t.TickIndex)
 	}
+
+	return MustNewPrice(t.TickIndex)
 }
 
 func (t LimitOrderTranche) RatioFilled() sdk.Dec {
@@ -80,7 +80,8 @@ func (t LimitOrderTranche) HasLiquidity() bool {
 
 func (t *LimitOrderTranche) RemoveTokenIn(trancheUser LimitOrderTrancheUser) (amountToRemove sdk.Int) {
 	amountUnfilled := t.AmountUnfilled()
-	amountToRemove = amountUnfilled.MulInt(trancheUser.SharesOwned).QuoInt(t.TotalTokenIn).TruncateInt().Sub(trancheUser.SharesCancelled)
+	maxAmountToRemove := amountUnfilled.MulInt(trancheUser.SharesOwned).QuoInt(t.TotalTokenIn).TruncateInt()
+	amountToRemove = maxAmountToRemove.Sub(trancheUser.SharesCancelled)
 	t.ReservesTokenIn = t.ReservesTokenIn.Sub(amountToRemove)
 
 	return amountToRemove
@@ -96,7 +97,6 @@ func (t *LimitOrderTranche) Withdraw(trancheUser LimitOrderTrancheUser) (sdk.Int
 	t.ReservesTokenOut = reservesTokenOutDec.Sub(amountOutTokenOut).TruncateInt()
 
 	return amountOutTokenIn, amountOutTokenOut
-
 }
 
 func (t *LimitOrderTranche) Swap(maxAmountTaker sdk.Int) (
@@ -120,10 +120,11 @@ func (t *LimitOrderTranche) Swap(maxAmountTaker sdk.Int) (
 		*totalTokenIn = totalTokenIn.Add(maxAmountTaker)
 		*reservesTokenOut = reservesTokenOut.Sub(amountFilledTokenOut)
 	}
+
 	return inAmount, outAmount
 }
 
-func (t *LimitOrderTranche) PlaceMakerLimitOrder(ctx sdk.Context, amountIn sdk.Int) {
+func (t *LimitOrderTranche) PlaceMakerLimitOrder(amountIn sdk.Int) {
 	t.ReservesTokenIn = t.ReservesTokenIn.Add(amountIn)
 	t.TotalTokenIn = t.TotalTokenIn.Add(amountIn)
 }

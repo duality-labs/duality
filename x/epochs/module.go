@@ -55,10 +55,10 @@ func (AppModuleBasic) Name() string {
 }
 
 // RegisterLegacyAminoCodec registers the module's Amino codec that properly handles protobuf types with Any's.
-func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {}
+func (AppModuleBasic) RegisterLegacyAminoCodec(_ *codec.LegacyAmino) {}
 
 // RegisterInterfaces registers the module's interface types.
-func (a AppModuleBasic) RegisterInterfaces(reg cdctypes.InterfaceRegistry) {}
+func (a AppModuleBasic) RegisterInterfaces(_ cdctypes.InterfaceRegistry) {}
 
 // DefaultGenesis returns the capability module's default genesis state.
 func (AppModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
@@ -66,16 +66,17 @@ func (AppModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 }
 
 // ValidateGenesis performs genesis state validation for the capability module.
-func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncodingConfig, bz json.RawMessage) error {
+func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, _ client.TxEncodingConfig, bz json.RawMessage) error {
 	var genState types.GenesisState
 	if err := cdc.UnmarshalJSON(bz, &genState); err != nil {
 		return fmt.Errorf("failed to unmarshal %s genesis state: %w", types.ModuleName, err)
 	}
+
 	return genState.Validate()
 }
 
 // RegisterRESTRoutes registers the capability module's REST service handlers.
-func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {}
+func (AppModuleBasic) RegisterRESTRoutes(_ client.Context, _ *mux.Router) {}
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the module.
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
@@ -124,7 +125,7 @@ func (am AppModule) Route() sdk.Route {
 func (AppModule) QuerierRoute() string { return types.QuerierRoute }
 
 // LegacyQuerierHandler returns the x/epochs module's Querier.
-func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
+func (am AppModule) LegacyQuerierHandler(_ *codec.LegacyAmino) sdk.Querier {
 	return func(sdk.Context, []string, abci.RequestQuery) ([]byte, error) {
 		return nil, fmt.Errorf("legacy querier not supported for the x/%s module", types.ModuleName)
 	}
@@ -164,7 +165,7 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 
 // EndBlock executes all ABCI EndBlock logic respective to the capability module. It
 // returns no validator updates.
-func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
+func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
 	return []abci.ValidatorUpdate{}
 }
 

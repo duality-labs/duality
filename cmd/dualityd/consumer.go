@@ -1,3 +1,4 @@
+//nolint:lll,deadcode
 package main
 
 import (
@@ -105,6 +106,7 @@ func (x DefaultGenesisIO) AlterConsumerModuleState(cmd *cobra.Command, callback 
 	}
 
 	g.GenDoc.AppState = appStateJSON
+
 	return genutil.ExportGenesisFile(g.GenDoc, g.GenesisFile)
 }
 

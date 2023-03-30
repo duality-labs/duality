@@ -32,6 +32,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderInSpread1To0() {
 	// assert currentTick1To0 moved
 	s.assertCurr1To0(-1)
 }
+
 func (s *MsgServerTestSuite) TestPlaceLimitOrderInSpread0To1() {
 	s.fundAliceBalances(50, 50)
 
@@ -416,7 +417,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFoKWithLPFills() {
 	s.fundBobBalances(0, 20)
 	// GIVEN LP liq at tick -1
 	s.bobDeposits(NewDeposit(0, 20, -1, 1))
-	//WHEN alice submits FoK limitOrder
+	// WHEN alice submits FoK limitOrder
 	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_FILL_OR_KILL)
 	s.assertAliceBalances(0, 0)
 	// THEN alice's LimitOrder fills via swap
@@ -437,9 +438,8 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFoKFailsWithInsufficientLiq() {
 	s.fundBobBalances(0, 20)
 	// GIVEN LP liq at tick -1 of 9 tokenB
 	s.bobDeposits(NewDeposit(0, 9, -1, 1))
-	//WHEN alice submits FoK limitOrder for 10 at tick 0 it fails
+	// WHEN alice submits FoK limitOrder for 10 at tick 0 it fails
 	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenA", 0, 10, types.LimitOrderType_FILL_OR_KILL)
-
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrder0FoKFailsWithLowLimit() {
@@ -447,9 +447,8 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrder0FoKFailsWithLowLimit() {
 	s.fundBobBalances(0, 20)
 	// GIVEN LP liq at tick -1 of 20 tokenB
 	s.bobDeposits(NewDeposit(0, 20, -1, 1))
-	//WHEN alice submits FoK limitOrder for 10 at tick -1 it fails
+	// WHEN alice submits FoK limitOrder for 10 at tick -1 it fails
 	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenA", -1, 10, types.LimitOrderType_FILL_OR_KILL)
-
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrder1FoKFailsWithHighLimit() {
@@ -457,7 +456,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrder1FoKFailsWithHighLimit() {
 	s.fundBobBalances(20, 0)
 	// GIVEN LP liq at tick 20 of 20 tokenA
 	s.bobDeposits(NewDeposit(20, 0, 20, 1))
-	//WHEN alice submits FoK limitOrder for 10 at tick -1 it fails
+	// WHEN alice submits FoK limitOrder for 10 at tick -1 it fails
 	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenB", -21, 10, types.LimitOrderType_FILL_OR_KILL)
 }
 
@@ -467,7 +466,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPFills() {
 	s.fundBobBalances(0, 20)
 	// GIVEN LP liq at tick -1
 	s.bobDeposits(NewDeposit(0, 20, -1, 1))
-	//WHEN alice submits IoC limitOrder
+	// WHEN alice submits IoC limitOrder
 	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
 	s.assertAliceBalances(0, 0)
 	// THEN alice's LimitOrder fills via swap
@@ -486,7 +485,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPPartialFill() {
 	s.fundBobBalances(0, 20)
 	// GIVEN LP of 5 tokenB at tick -1
 	s.bobDeposits(NewDeposit(0, 5, -1, 1))
-	//WHEN alice submits IoC limitOrder for 10 tokenA
+	// WHEN alice submits IoC limitOrder for 10 tokenA
 	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
 	s.assertAliceBalances(5, 0)
 	// THEN alice's LimitOrder swap 5 TokenA
@@ -500,7 +499,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPPartialFill() {
 	s.aliceWithdrawsLimitSell(trancheKey)
 	s.assertDexBalances(5, 0)
 	s.assertAliceBalances(5, 5)
-
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPNoFill() {
@@ -508,7 +506,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPNoFill() {
 	s.fundBobBalances(0, 20)
 	// GIVEN LP of 5 tokenB at tick -1
 	s.bobDeposits(NewDeposit(0, 5, -1, 1))
-	//WHEN alice submits IoC limitOrder for 10 tokenA below current 0To1 price
+	// WHEN alice submits IoC limitOrder for 10 tokenA below current 0To1 price
 	s.aliceLimitSells("TokenA", -1, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
 
 	// THEN alice's LimitOrder doesn't fill and is canceled
@@ -517,7 +515,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPNoFill() {
 	// No maker LO is placed
 	s.assertFillAndPlaceTrancheKeys("TokenA", 1, "", "")
 	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
-
 }
 
 // Just In Time Limit Orders //////////////////////////////////////////////////
@@ -526,7 +523,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderJITFills() {
 	s.fundAliceBalances(10, 0)
 	s.fundBobBalances(0, 20)
 
-	//GIVEN Alice submits JIT limitOrder for 10 tokenA at tick 0
+	// GIVEN Alice submits JIT limitOrder for 10 tokenA at tick 0
 	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_JUST_IN_TIME)
 	s.assertLimitLiquidityAtTick("TokenA", 0, 10)
 	s.assertAliceBalances(0, 0)
@@ -536,17 +533,16 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderJITFills() {
 
 	// THEN all liquidity is depleted
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
-	//Alice can withdraw 10 TokenB
+	// Alice can withdraw 10 TokenB
 	s.aliceWithdrawsLimitSell(trancheKey)
 	s.assertAliceBalances(0, 10)
-
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderJITBehindEnemyLines() {
 	s.fundAliceBalances(10, 0)
 	s.fundBobBalances(0, 20)
 
-	//GIVEN 10 LP liquidity for token exists at tick 0
+	// GIVEN 10 LP liquidity for token exists at tick 0
 	s.bobDeposits(NewDeposit(0, 10, 0, 1))
 
 	// WHEN alice places a JIT limit order for TokenA at tick 1 (above enemy lines)
@@ -558,17 +554,16 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderJITBehindEnemyLines() {
 
 	// THEN all liquidity is depleted
 	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
-	//Alice can withdraw 9 TokenB
+	// Alice can withdraw 9 TokenB
 	s.aliceWithdrawsLimitSell(trancheKey)
 	s.assertAliceBalances(0, 9)
-
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderJITNextBlock() {
 	s.fundAliceBalances(10, 0)
 	s.fundBobBalances(0, 20)
 
-	//GIVEN Alice submits JIT limitOrder for 10 tokenA at tick 0 for block N
+	// GIVEN Alice submits JIT limitOrder for 10 tokenA at tick 0 for block N
 	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_JUST_IN_TIME)
 	s.assertLimitLiquidityAtTick("TokenA", 0, 10)
 	s.assertAliceBalances(0, 0)
@@ -580,10 +575,9 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderJITNextBlock() {
 	// THEN there is no liquidity available
 	s.bobMarketSellFails(types.ErrInsufficientLiquidity, "TokenB", 10)
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
-	//Alice can withdraw the entirety of the unfilled limitOrder
+	// Alice can withdraw the entirety of the unfilled limitOrder
 	s.aliceWithdrawsLimitSell(trancheKey)
 	s.assertAliceBalances(10, 0)
-
 }
 
 // GoodTilLimitOrders //////////////////////////////////////////////////
@@ -592,7 +586,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilFills() {
 	s.fundAliceBalances(10, 0)
 	s.fundBobBalances(0, 20)
 	tomorrow := time.Now().AddDate(0, 0, 1)
-	//GIVEN Alice submits JIT limitOrder for 10 tokenA expiring tomorrow
+	// GIVEN Alice submits JIT limitOrder for 10 tokenA expiring tomorrow
 	trancheKey := s.aliceLimitSellsGoodTil("TokenA", 0, 10, tomorrow)
 	s.assertLimitLiquidityAtTick("TokenA", 0, 10)
 	s.assertAliceBalances(0, 0)
@@ -602,17 +596,16 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilFills() {
 
 	// THEN all liquidity is depleted
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
-	//Alice can withdraw 10 TokenB
+	// Alice can withdraw 10 TokenB
 	s.aliceWithdrawsLimitSell(trancheKey)
 	s.assertAliceBalances(0, 10)
-
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilExpires() {
 	s.fundAliceBalances(10, 0)
 	s.fundBobBalances(0, 20)
 	tomorrow := time.Now().AddDate(0, 0, 1)
-	//GIVEN Alice submits JIT limitOrder for 10 tokenA expiring tomorrow
+	// GIVEN Alice submits JIT limitOrder for 10 tokenA expiring tomorrow
 	trancheKey := s.aliceLimitSellsGoodTil("TokenA", 0, 10, tomorrow)
 	s.assertLimitLiquidityAtTick("TokenA", 0, 10)
 	s.assertAliceBalances(0, 0)
@@ -623,10 +616,9 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilExpires() {
 	// THEN there is no liquidity available
 	s.bobMarketSellFails(types.ErrInsufficientLiquidity, "TokenB", 10)
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
-	//Alice can withdraw the entirety of the unfilled limitOrder
+	// Alice can withdraw the entirety of the unfilled limitOrder
 	s.aliceWithdrawsLimitSell(trancheKey)
 	s.assertAliceBalances(10, 0)
-
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilExpiresNotPurged() {
@@ -634,7 +626,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilExpiresNotPurged() {
 	s.fundAliceBalances(10, 0)
 	s.fundBobBalances(0, 20)
 	tomorrow := time.Now().AddDate(0, 0, 1)
-	//GIVEN Alice submits JIT limitOrder for 10 tokenA expiring tomorrow
+	// GIVEN Alice submits JIT limitOrder for 10 tokenA expiring tomorrow
 	trancheKey := s.aliceLimitSellsGoodTil("TokenA", 0, 10, tomorrow)
 	s.assertLimitLiquidityAtTick("TokenA", 0, 10)
 	s.assertAliceBalances(0, 0)
@@ -646,20 +638,18 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilExpiresNotPurged() {
 	// THEN there is no liquidity available
 	s.bobMarketSellFails(types.ErrInsufficientLiquidity, "TokenB", 10)
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
-	//Alice can cancel the entirety of the unfilled limitOrder
+	// Alice can cancel the entirety of the unfilled limitOrder
 	s.aliceCancelsLimitSell(trancheKey)
 	s.assertAliceBalances(10, 0)
-
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilHandlesTimezoneCorrectly() {
 	s.fundAliceBalances(10, 0)
 	timeInPST, _ := time.Parse(time.RFC3339, "2050-01-02T15:04:05-08:00")
 	trancheKey := s.aliceLimitSellsGoodTil("TokenA", 0, 10, timeInPST)
-	tranche, _ := s.app.DexKeeper.GetLimitOrderTranche(s.ctx, defaultPairId, "TokenA", 0, trancheKey)
+	tranche, _ := s.app.DexKeeper.GetLimitOrderTranche(s.ctx, defaultPairID, "TokenA", 0, trancheKey)
 
 	s.Assert().Equal(tranche.ExpirationTime.Unix(), timeInPST.Unix())
-
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilAlreadyExpiredFails() {

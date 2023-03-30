@@ -21,7 +21,6 @@ func DefaultGenesis() *GenesisState {
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-
 	// Check for duplicated index in LimitOrderTrancheUser
 	LimitOrderTrancheUserIndexMap := make(map[string]struct{})
 
@@ -41,14 +40,14 @@ func (gs GenesisState) Validate() error {
 		switch liquidity := elem.Liquidity.(type) {
 		case *TickLiquidity_PoolReserves:
 			index = string(TickLiquidityKey(
-				liquidity.PoolReserves.PairId,
+				liquidity.PoolReserves.PairID,
 				liquidity.PoolReserves.TokenIn,
 				liquidity.PoolReserves.TickIndex,
 				LiquidityTypePoolReserves,
 				liquidity.PoolReserves.Fee))
 		case *TickLiquidity_LimitOrderTranche:
 			index = string(TickLiquidityKey(
-				liquidity.LimitOrderTranche.PairId,
+				liquidity.LimitOrderTranche.PairID,
 				liquidity.LimitOrderTranche.TokenIn,
 				liquidity.LimitOrderTranche.TickIndex,
 				LiquidityTypeLimitOrder,
@@ -63,7 +62,7 @@ func (gs GenesisState) Validate() error {
 	inactiveLimitOrderTrancheKeyMap := make(map[string]struct{})
 
 	for _, elem := range gs.InactiveLimitOrderTrancheList {
-		index := string(InactiveLimitOrderTrancheKey(elem.PairId, elem.TokenIn, elem.TickIndex, elem.TrancheKey))
+		index := string(InactiveLimitOrderTrancheKey(elem.PairID, elem.TokenIn, elem.TickIndex, elem.TrancheKey))
 		if _, ok := inactiveLimitOrderTrancheKeyMap[index]; ok {
 			return fmt.Errorf("duplicated index for inactiveLimitOrderTranche")
 		}

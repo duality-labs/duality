@@ -3,10 +3,6 @@ package keeper_test
 import (
 	"math"
 
-	//"time"
-	//. "github.com/duality-labs/duality/x/dex/keeper/internal/testutils"
-	//"github.com/duality-labs/duality/x/dex/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/types"
 )
@@ -28,7 +24,7 @@ func (s *MsgServerTestSuite) TestPartialWithdrawOnlyA() {
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.aliceWithdraws(NewWithdrawl(5, 0, 1))
+	s.aliceWithdraws(NewWithdrawal(5, 0, 1))
 
 	s.assertAliceBalances(45, 50)
 	s.assertDexBalances(5, 0)
@@ -53,7 +49,7 @@ func (s *MsgServerTestSuite) TestPartialWithdrawOnlyB() {
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
 
-	s.aliceWithdraws(NewWithdrawl(5, 0, 1))
+	s.aliceWithdraws(NewWithdrawal(5, 0, 1))
 
 	s.assertAliceBalances(50, 45)
 	s.assertDexBalances(0, 5)
@@ -78,7 +74,7 @@ func (s *MsgServerTestSuite) TestFullWithdrawOnlyB() {
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(1)
 
-	s.aliceWithdraws(NewWithdrawl(10, 0, 1))
+	s.aliceWithdraws(NewWithdrawal(10, 0, 1))
 
 	s.assertAliceBalances(50, 50)
 	s.assertDexBalances(0, 0)
@@ -107,8 +103,8 @@ func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterDoubleSidedThenSingleSid
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(3)
 
-	//DEBUG
-	s.aliceWithdraws(NewWithdrawl(10, 0, 3))
+	// DEBUG
+	s.aliceWithdraws(NewWithdrawal(10, 0, 3))
 
 	s.assertAliceBalances(35, 45)
 	s.assertDexBalances(15, 5)
@@ -137,7 +133,7 @@ func (s *MsgServerTestSuite) TestCurrentTickUpdatesAfterDoubleSidedThenSingleSid
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(3)
 
-	s.aliceWithdraws(NewWithdrawl(20, 0, 3))
+	s.aliceWithdraws(NewWithdrawal(20, 0, 3))
 
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
@@ -171,7 +167,7 @@ func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedAtooMuchTick0() {
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(1)
 
-	s.aliceWithdraws(NewWithdrawl(15, 0, 1))
+	s.aliceWithdraws(NewWithdrawal(15, 0, 1))
 
 	s.assertAliceBalances(50, 50)
 	s.assertBobBalances(45, 40)
@@ -179,7 +175,7 @@ func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedAtooMuchTick0() {
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(1)
 
-	s.bobWithdraws(NewWithdrawl(15, 0, 1))
+	s.bobWithdraws(NewWithdrawal(15, 0, 1))
 
 	s.assertAliceBalances(50, 50)
 	s.assertBobBalances(50, 50)
@@ -214,7 +210,7 @@ func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedBtooMuchTick0() {
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(1)
 
-	s.aliceWithdraws(NewWithdrawl(15, 0, 1))
+	s.aliceWithdraws(NewWithdrawal(15, 0, 1))
 
 	s.assertAliceBalances(50, 50)
 	s.assertBobBalances(40, 45)
@@ -222,7 +218,7 @@ func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedBtooMuchTick0() {
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(1)
 
-	s.bobWithdraws(NewWithdrawl(15, 0, 1))
+	s.bobWithdraws(NewWithdrawal(15, 0, 1))
 
 	s.assertAliceBalances(50, 50)
 	s.assertBobBalances(50, 50)
@@ -240,7 +236,7 @@ func (s *MsgServerTestSuite) TestWithdrawalFailsWhenNotEnoughShares() {
 	// WHEN Alice tries to withdraw 200
 	// THEN ensure error is thrown and Alice and Dex balances remain unchanged
 	err := types.ErrInsufficientShares
-	s.aliceWithdrawFails(err, NewWithdrawl(200, 0, 1))
+	s.aliceWithdrawFails(err, NewWithdrawal(200, 0, 1))
 }
 
 func (s *MsgServerTestSuite) TestWithdrawalFailsWithNonExistentPair() {
@@ -250,7 +246,7 @@ func (s *MsgServerTestSuite) TestWithdrawalFailsWithNonExistentPair() {
 	s.aliceDeposits(NewDeposit(100, 0, 0, 1))
 
 	// WHEN Alice tries to withdraw from a nonexistent tokenPair
-	_, err := s.msgServer.Withdrawl(s.goCtx, &types.MsgWithdrawl{
+	_, err := s.msgServer.Withdrawal(s.goCtx, &types.MsgWithdrawal{
 		Creator:         s.alice.String(),
 		Receiver:        s.alice.String(),
 		TokenA:          "TokenX",

@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -9,7 +8,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	dualityapp "github.com/duality-labs/duality/app"
-	"github.com/duality-labs/duality/x/dex/keeper"
 	. "github.com/duality-labs/duality/x/dex/keeper"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/suite"
@@ -27,7 +25,6 @@ type CoreHelpersTestSuite struct {
 	bob         sdk.AccAddress
 	carol       sdk.AccAddress
 	dan         sdk.AccAddress
-	goCtx       context.Context
 }
 
 func TestCoreHelpersTestSuite(t *testing.T) {
@@ -55,9 +52,8 @@ func (s *CoreHelpersTestSuite) SetupTest() {
 	app.AccountKeeper.SetAccount(ctx, accDan)
 
 	s.app = app
-	s.msgServer = keeper.NewMsgServerImpl(app.DexKeeper)
+	s.msgServer = NewMsgServerImpl(app.DexKeeper)
 	s.ctx = ctx
-	s.goCtx = sdk.WrapSDKContext(ctx)
 	s.queryClient = queryClient
 	s.alice = sdk.AccAddress([]byte("alice"))
 	s.bob = sdk.AccAddress([]byte("bob"))
@@ -65,11 +61,10 @@ func (s *CoreHelpersTestSuite) SetupTest() {
 	s.dan = sdk.AccAddress([]byte("dan"))
 }
 
-func (s *CoreHelpersTestSuite) setLPAtFee1Pool(tickIndex int64, amountA int, amountB int) {
-	pairId := &types.PairId{"TokenA", "TokenB"}
-	sharesId := CreateSharesId("TokenA", "TokenB", tickIndex, 1)
-	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, pairId, tickIndex, 1)
-
+func (s *CoreHelpersTestSuite) setLPAtFee1Pool(tickIndex int64, amountA, amountB int) {
+	pairID := &types.PairID{Token0: "TokenA", Token1: "TokenB"}
+	sharesID := CreateSharesID("TokenA", "TokenB", tickIndex, 1)
+	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, pairID, tickIndex, 1)
 	if err != nil {
 		panic(err)
 	}
@@ -77,11 +72,11 @@ func (s *CoreHelpersTestSuite) setLPAtFee1Pool(tickIndex int64, amountA int, amo
 	amountAInt := sdk.NewInt(int64(amountA))
 	amountBInt := sdk.NewInt(int64(amountB))
 
-	existingShares := s.app.BankKeeper.GetSupply(s.ctx, sharesId).Amount
+	existingShares := s.app.BankKeeper.GetSupply(s.ctx, sharesID).Amount
 
 	totalShares := pool.CalcSharesMinted(amountAInt, amountBInt, existingShares)
 
-	s.app.DexKeeper.MintShares(s.ctx, s.alice, totalShares, sharesId)
+	s.app.DexKeeper.MintShares(s.ctx, s.alice, totalShares, sharesID)
 
 	lowerTick.Reserves = amountAInt
 	upperTick.Reserves = amountBInt
@@ -101,9 +96,8 @@ func (s *CoreHelpersTestSuite) TestFindNextTick1To0NoLiq() {
 
 	// THEN GetCurrTick1To0 doesn't find a tick
 
-	_, found := s.app.DexKeeper.GetCurrTick1To0(s.ctx, defaultPairId)
+	_, found := s.app.DexKeeper.GetCurrTick1To0(s.ctx, defaultPairID)
 	s.Assert().False(found)
-
 }
 
 func (s *CoreHelpersTestSuite) TestGetCurrTick1To0WithLiq() {
@@ -113,10 +107,9 @@ func (s *CoreHelpersTestSuite) TestGetCurrTick1To0WithLiq() {
 
 	// THEN GetCurrTick1To0 finds the tick at -1
 
-	tickIdx, found := s.app.DexKeeper.GetCurrTick1To0(s.ctx, defaultPairId)
+	tickIdx, found := s.app.DexKeeper.GetCurrTick1To0(s.ctx, defaultPairID)
 	s.Require().True(found)
 	s.Assert().Equal(int64(-1), tickIdx)
-
 }
 
 func (s *CoreHelpersTestSuite) TestGetCurrTick1To0WithMinLiq() {
@@ -126,10 +119,9 @@ func (s *CoreHelpersTestSuite) TestGetCurrTick1To0WithMinLiq() {
 
 	// THEN GetCurrTick1To0 finds the tick at -2
 
-	tickIdx, found := s.app.DexKeeper.GetCurrTick1To0(s.ctx, defaultPairId)
+	tickIdx, found := s.app.DexKeeper.GetCurrTick1To0(s.ctx, defaultPairID)
 	s.Require().True(found)
 	s.Assert().Equal(int64(-2), tickIdx)
-
 }
 
 // GetCurrTick0To1 ///////////////////////////////////////////////////////////
@@ -141,9 +133,8 @@ func (s *CoreHelpersTestSuite) TestGetCurrTick0To1NoLiq() {
 
 	// THEN GetCurrTick0To1 doesn't find a tick
 
-	_, found := s.app.DexKeeper.GetCurrTick0To1(s.ctx, defaultPairId)
+	_, found := s.app.DexKeeper.GetCurrTick0To1(s.ctx, defaultPairID)
 	s.Assert().False(found)
-
 }
 
 func (s *CoreHelpersTestSuite) TestGetCurrTick0To1WithLiq() {
@@ -155,7 +146,7 @@ func (s *CoreHelpersTestSuite) TestGetCurrTick0To1WithLiq() {
 
 	// THEN GetCurrTick0To1 finds the tick at 1
 
-	tickIdx, found := s.app.DexKeeper.GetCurrTick0To1(s.ctx, defaultPairId)
+	tickIdx, found := s.app.DexKeeper.GetCurrTick0To1(s.ctx, defaultPairID)
 	s.Require().True(found)
 	s.Assert().Equal(int64(1), tickIdx)
 }
@@ -167,7 +158,7 @@ func (s *CoreHelpersTestSuite) TestGetCurrTick0To1WithMinLiq() {
 
 	// THEN GetCurrTick0To1 finds the tick at 2
 
-	tickIdx, found := s.app.DexKeeper.GetCurrTick0To1(s.ctx, defaultPairId)
+	tickIdx, found := s.app.DexKeeper.GetCurrTick0To1(s.ctx, defaultPairID)
 	s.Require().True(found)
 	s.Assert().Equal(int64(2), tickIdx)
 }

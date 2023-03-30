@@ -9,7 +9,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) UserLimitOrdersAll(goCtx context.Context, req *types.QueryAllUserLimitOrdersRequest) (*types.QueryAllUserLimitOrdersResponse, error) {
+func (k Keeper) UserLimitOrdersAll(
+	goCtx context.Context,
+	req *types.QueryAllUserLimitOrdersRequest,
+) (*types.QueryAllUserLimitOrdersResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -20,6 +23,7 @@ func (k Keeper) UserLimitOrdersAll(goCtx context.Context, req *types.QueryAllUse
 	}
 	profile := NewUserProfile(addr)
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
 	return &types.QueryAllUserLimitOrdersResponse{
 		LimitOrders: profile.GetAllLimitOrders(ctx, k),
 	}, nil

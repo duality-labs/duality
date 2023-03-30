@@ -1,3 +1,4 @@
+//nolint:deadcode,varcheck
 package app_test
 
 import (

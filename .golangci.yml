@@ -1,0 +1,104 @@
+linters:
+  enable-all: true
+  disable:
+    - exhaustivestruct
+    - exhaustruct
+    - paralleltest
+    - nonamedreturns
+    - varnamelen
+    - godot
+    - gomoddirectives
+    - ireturn
+    - interfacer
+    - gochecknoinits
+    - golint
+    - nosnakecase
+    - varcheck
+    - maligned
+    - deadcode
+    - structcheck
+
+    # remove eventually
+    - thelper
+    - funlen
+    - wrapcheck
+    - cyclop
+    - gocognit
+    - maintidx
+    - godox
+    - dupl
+    - wsl
+    - gomnd
+    - gci
+    - containedctx
+    - scopelint
+    - goerr113
+    - exhaustive
+linters-settings:
+  gosec:
+    excludes:
+      - G601 # Implicit memory aliasing of items from a range statement
+    config:
+      G101:
+        # opWeightXX get matched as hardcoded credentials G101
+        pattern: "(?i)passwd|pass|password|pwd|secret|token|apiKey|bearer|cred"
+  nlreturn:
+    block-size: 3
+  errchkjson:
+    exclude-functions:
+      - encoding/json.Marshal
+      - encoding/json.MarshalIndent
+
+
+issues:
+  exclude-rules:
+    # Less strict for tests
+    - path: 'test'
+      linters:
+        - errcheck
+        - errchkjson
+        - gochecknoglobals
+        - unused
+        - maligned
+        - forcetypeassert
+        # remove eventually
+        - lll
+
+    # Exceptions for protogo snake_case
+    - linters:
+        - nosnakecase
+      text: 'TickLiquidity_'
+    - linters:
+        - nosnakecase
+      text: 'LimitOrderType_'
+
+    # Allow unused parameters for tests
+    - linters:
+        - unparam
+      text: 'always receives'
+      path: '(.+)_test\.go'
+
+    # Allow bad appends in tests
+    - linters:
+        - gocritic
+      text: 'appendAssign'
+      path: '(.+)_test\.go'
+
+    # Ignore this error: "`if` block ends with a `return` statement, so drop this `else` and outdent its block (golint)"
+    - linters:
+        - golint
+      text: 'block ends with a'
+
+      # allow global vars if named 'DefaultXX' or Key; maybe remove eventually
+    - linters:
+        - gochecknoglobals
+      text: 'Default|Key'
+
+run:
+  skip-files:
+    # Don't lint osmosis code; remove eventually
+    - "osmoutils"
+
+  
+
+

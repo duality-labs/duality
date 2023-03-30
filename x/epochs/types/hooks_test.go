@@ -44,10 +44,10 @@ func dummyBeforeEpochStartEvent(epochIdentifier string, epochNumber int64) sdk.E
 	)
 }
 
-var dummyErr = errors.New("9", 9, "dummyError")
+var errDummy = errors.New("9", 9, "dummyError")
 
 // dummyEpochHook is a struct satisfying the epoch hook interface,
-// that maintains a counter for how many times its been succesfully called,
+// that maintains a counter for how many times its been successfully called,
 // and a boolean for whether it should panic during its execution.
 type dummyEpochHook struct {
 	successCounter int
@@ -60,10 +60,11 @@ func (hook *dummyEpochHook) AfterEpochEnd(ctx sdk.Context, epochIdentifier strin
 		panic("dummyEpochHook is panicking")
 	}
 	if hook.shouldError {
-		return dummyErr
+		return errDummy
 	}
-	hook.successCounter += 1
+	hook.successCounter++
 	ctx.EventManager().EmitEvent(dummyAfterEpochEndEvent(epochIdentifier, epochNumber))
+
 	return nil
 }
 
@@ -72,10 +73,11 @@ func (hook *dummyEpochHook) BeforeEpochStart(ctx sdk.Context, epochIdentifier st
 		panic("dummyEpochHook is panicking")
 	}
 	if hook.shouldError {
-		return dummyErr
+		return errDummy
 	}
-	hook.successCounter += 1
+	hook.successCounter++
 	ctx.EventManager().EmitEvent(dummyBeforeEpochStartEvent(epochIdentifier, epochNumber))
+
 	return nil
 }
 
@@ -120,6 +122,7 @@ func (suite *KeeperTestSuite) TestHooksPanicRecovery() {
 				for i := 0; i < tc.lenEvents; i++ {
 					evts[i] = dummyEvent(epochID, epochNumber)
 				}
+
 				return evts
 			}
 

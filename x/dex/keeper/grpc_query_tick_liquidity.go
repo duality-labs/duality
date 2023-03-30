@@ -14,7 +14,10 @@ import (
 // NOTE: For single queries of tick liquidity use explicty typed queries
 // (ie. the k.LimitOrderTranche & k.PoolReserves)
 
-func (k Keeper) TickLiquidityAll(c context.Context, req *types.QueryAllTickLiquidityRequest) (*types.QueryAllTickLiquidityResponse, error) {
+func (k Keeper) TickLiquidityAll(
+	c context.Context,
+	req *types.QueryAllTickLiquidityRequest,
+) (*types.QueryAllTickLiquidityResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -22,24 +25,24 @@ func (k Keeper) TickLiquidityAll(c context.Context, req *types.QueryAllTickLiqui
 	var tickLiquiditys []types.TickLiquidity
 	ctx := sdk.UnwrapSDKContext(c)
 
-	pairId, err := StringToPairId(req.PairId)
+	pairID, err := StringToPairID(req.PairID)
 	if err != nil {
 		return nil, err
 	}
 
 	store := ctx.KVStore(k.storeKey)
-	tickLiquidityStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairId, req.TokenIn))
+	tickLiquidityStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairID, req.TokenIn))
 
-	pageRes, err := query.Paginate(tickLiquidityStore, req.Pagination, func(key []byte, value []byte) error {
+	pageRes, err := query.Paginate(tickLiquidityStore, req.Pagination, func(key, value []byte) error {
 		var tickLiquidity types.TickLiquidity
 		if err := k.cdc.Unmarshal(value, &tickLiquidity); err != nil {
 			return err
 		}
 
 		tickLiquiditys = append(tickLiquiditys, tickLiquidity)
+
 		return nil
 	})
-
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

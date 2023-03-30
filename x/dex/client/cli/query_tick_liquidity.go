@@ -18,7 +18,7 @@ func CmdListTickLiquidity() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
-			argPairId := args[0]
+			argPairID := args[0]
 			argTokenIn := args[1]
 
 			pageReq, err := client.ReadPageRequest(cmd.Flags())
@@ -29,7 +29,7 @@ func CmdListTickLiquidity() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryAllTickLiquidityRequest{
-				PairId:     argPairId,
+				PairID:     argPairID,
 				TokenIn:    argTokenIn,
 				Pagination: pageReq,
 			}

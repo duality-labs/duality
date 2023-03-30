@@ -27,7 +27,7 @@ func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetLimitOrderTrancheRequest{
-				PairId:     "TokenA<>TokenB",
+				PairID:     "TokenA<>TokenB",
 				TickIndex:  msgs[0].TickIndex,
 				TokenIn:    "TokenA",
 				TrancheKey: msgs[0].TrancheKey,
@@ -37,7 +37,7 @@ func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 		{
 			desc: "Second",
 			request: &types.QueryGetLimitOrderTrancheRequest{
-				PairId:     "TokenA<>TokenB",
+				PairID:     "TokenA<>TokenB",
 				TickIndex:  msgs[1].TickIndex,
 				TokenIn:    "TokenA",
 				TrancheKey: msgs[1].TrancheKey,
@@ -47,7 +47,7 @@ func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 		{
 			desc: "KeyNotFound",
 			request: &types.QueryGetLimitOrderTrancheRequest{
-				PairId:     "TokenA<>TokenB",
+				PairID:     "TokenA<>TokenB",
 				TickIndex:  0,
 				TokenIn:    "TokenA",
 				TrancheKey: "100000",
@@ -78,12 +78,12 @@ func TestLimitOrderTrancheQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
 	msgs := createNLimitOrderTranches(keeper, ctx, 2)
-	//Add more data to make sure only LO tranches are returned
+	// Add more data to make sure only LO tranches are returned
 	createNPoolReserves(keeper, ctx, 2)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLimitOrderTrancheRequest {
 		return &types.QueryAllLimitOrderTrancheRequest{
-			PairId:  "TokenA<>TokenB",
+			PairID:  "TokenA<>TokenB",
 			TokenIn: "TokenA",
 			Pagination: &query.PageRequest{
 				Key:        next,

@@ -25,7 +25,10 @@ func NewQuerier(k Keeper) Querier {
 }
 
 // EpochInfos provide running epochInfos.
-func (q Querier) EpochInfos(c context.Context, _ *types.QueryEpochsInfoRequest) (*types.QueryEpochsInfoResponse, error) {
+func (q Querier) EpochInfos(
+	c context.Context,
+	_ *types.QueryEpochsInfoRequest,
+) (*types.QueryEpochsInfoResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 
 	return &types.QueryEpochsInfoResponse{
@@ -34,7 +37,9 @@ func (q Querier) EpochInfos(c context.Context, _ *types.QueryEpochsInfoRequest) 
 }
 
 // CurrentEpoch provides current epoch of specified identifier.
-func (q Querier) CurrentEpoch(c context.Context, req *types.QueryCurrentEpochRequest) (*types.QueryCurrentEpochResponse, error) {
+func (q Querier) CurrentEpoch(c context.Context,
+	req *types.QueryCurrentEpochRequest,
+) (*types.QueryCurrentEpochResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}

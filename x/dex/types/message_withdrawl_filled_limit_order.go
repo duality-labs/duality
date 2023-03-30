@@ -5,13 +5,13 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const TypeMsgWithdrawFilledLimitOrder = "withdrawl_withdrawn_limit_order"
+const TypeMsgWithdrawFilledLimitOrder = "withdrawal_withdrawn_limit_order"
 
 var _ sdk.Msg = &MsgWithdrawFilledLimitOrder{}
 
-func NewMsgWithdrawFilledLimitOrder(creator string, trancheKey string) *MsgWithdrawFilledLimitOrder {
+func NewMsgWithdrawFilledLimitOrder(creator, trancheKey string) *MsgWithdrawFilledLimitOrder {
 	return &MsgWithdrawFilledLimitOrder{
-		Creator: creator,
+		Creator:    creator,
 		TrancheKey: trancheKey,
 	}
 }
@@ -29,6 +29,7 @@ func (msg *MsgWithdrawFilledLimitOrder) GetSigners() []sdk.AccAddress {
 	if err != nil {
 		panic(err)
 	}
+
 	return []sdk.AccAddress{creator}
 }
 

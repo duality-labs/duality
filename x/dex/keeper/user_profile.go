@@ -27,9 +27,9 @@ func (u UserProfile) GetAllDeposits(ctx sdk.Context, k Keeper) []types.DepositRe
 			}
 
 			return false
-
 		},
 	)
+
 	return depositArr
 }
 

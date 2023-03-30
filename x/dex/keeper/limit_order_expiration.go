@@ -23,7 +23,6 @@ func (k Keeper) GetLimitOrderExpiration(
 	ctx sdk.Context,
 	goodTilDate time.Time,
 	trancheRef []byte,
-
 ) (val types.LimitOrderExpiration, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderExpirationKeyPrefix))
 
@@ -36,6 +35,7 @@ func (k Keeper) GetLimitOrderExpiration(
 	}
 
 	k.cdc.MustUnmarshal(b, &val)
+
 	return val, true
 }
 
@@ -44,7 +44,6 @@ func (k Keeper) RemoveLimitOrderExpiration(
 	ctx sdk.Context,
 	goodTilDate time.Time,
 	trancheRef []byte,
-
 ) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderExpirationKeyPrefix))
 	store.Delete(types.LimitOrderExpirationKey(
@@ -75,7 +74,6 @@ func (k Keeper) GetAllLimitOrderExpiration(ctx sdk.Context) (list []types.LimitO
 }
 
 func (k Keeper) PurgeExpiredLimitOrders(ctx sdk.Context, curTime time.Time) {
-
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderExpirationKeyPrefix))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 	inGoodTilSegment := false
@@ -89,37 +87,35 @@ func (k Keeper) PurgeExpiredLimitOrders(ctx sdk.Context, curTime time.Time) {
 	for ; iterator.Valid(); iterator.Next() {
 		var val types.LimitOrderExpiration
 		k.cdc.MustUnmarshal(iterator.Value(), &val)
-		if !val.ExpirationTime.After(curTime) {
-			inGoodTilSegment = inGoodTilSegment || val.ExpirationTime != types.JITGoodTilTime
-			gasConsumed := curBlockGas + ctx.GasMeter().GasConsumed()
-
-			if inGoodTilSegment && gasConsumed >= gasCutoff {
-				// If we hit our gas cutoff stop deleting so as not to timeout the block.
-				// We can only do this if we are proccesing normal GT limitOrders
-				// and not JIT limit orders, since there is not protection in place
-				// to prevent JIT order from being traded on the the next block.
-				// This is ok since only GT limit orders pose a meaningful attack
-				// vector since there is no upper bound on how many GT limit orders can be
-				// canceled in a single block.
-				ctx.EventManager().EmitEvent(types.GoodTilPurgeHitLimitEvent(gasConsumed))
-				return
-			}
-
-			if _, ok := archivedTranches[string(val.TrancheRef)]; !ok {
-				tranche, found := k.GetLimitOrderTrancheByKey(ctx, val.TrancheRef)
-				if found {
-					// Convert the tranche to an inactiveTranche
-					k.SetInactiveLimitOrderTranche(ctx, *tranche)
-					k.RemoveLimitOrderTranche(ctx, *tranche)
-					archivedTranches[string(val.TrancheRef)] = true
-				}
-			}
-
-			k.RemoveLimitOrderExpirationByKey(ctx, iterator.Key())
-		} else {
+		if val.ExpirationTime.After(curTime) {
 			return
 		}
-	}
+		inGoodTilSegment = inGoodTilSegment || val.ExpirationTime != types.JITGoodTilTime()
+		gasConsumed := curBlockGas + ctx.GasMeter().GasConsumed()
 
-	return
+		if inGoodTilSegment && gasConsumed >= gasCutoff {
+			// If we hit our gas cutoff stop deleting so as not to timeout the block.
+			// We can only do this if we are proccesing normal GT limitOrders
+			// and not JIT limit orders, since there is not protection in place
+			// to prevent JIT order from being traded on the next block.
+			// This is ok since only GT limit orders pose a meaningful attack
+			// vector since there is no upper bound on how many GT limit orders can be
+			// canceled in a single block.
+			ctx.EventManager().EmitEvent(types.GoodTilPurgeHitLimitEvent(gasConsumed))
+
+			return
+		}
+
+		if _, ok := archivedTranches[string(val.TrancheRef)]; !ok {
+			tranche, found := k.GetLimitOrderTrancheByKey(ctx, val.TrancheRef)
+			if found {
+				// Convert the tranche to an inactiveTranche
+				k.SetInactiveLimitOrderTranche(ctx, *tranche)
+				k.RemoveLimitOrderTranche(ctx, *tranche)
+				archivedTranches[string(val.TrancheRef)] = true
+			}
+		}
+
+		k.RemoveLimitOrderExpirationByKey(ctx, iterator.Key())
+	}
 }

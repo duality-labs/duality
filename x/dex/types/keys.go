@@ -37,39 +37,10 @@ func KeyPrefix(p string) []byte {
 	return key
 }
 
-const (
-	TokensKey      = "Tokens-value-"
-	TokensCountKey = "Tokens-count-"
-
-	// TokenMapKeyPrefix is the prefix to retrieve all TokenMap
-	TokenMapKeyPrefix = "TokenMap/value"
-
-	// TickKeyPrefix is the prefix to retrieve all Tick
-	BaseTickKeyPrefix = "Tick/value"
-
-	// TickLiquidityKeyPrefix is the prefix to retrieve all TickLiquidity
-	TickLiquidityKeyPrefix = "TickLiquidity/value/"
-)
-
-func TickPrefix(pairId *PairId) []byte {
-	return append(KeyPrefix(BaseTickKeyPrefix), KeyPrefix(pairId.Stringify())...)
-}
-
-// TokenMapKey returns the store key to retrieve a TokenMap from the index fields
-func TokenMapKey(address string) []byte {
-	var key []byte
-
-	addressBytes := []byte(address)
-	key = append(key, addressBytes...)
-	key = append(key, []byte("/")...)
-
-	return key
-}
-
-func TickIndexToBytes(tickIndex int64, pairId *PairId, tokenIn string) []byte {
+func TickIndexToBytes(tickIndex int64, pairID *PairID, tokenIn string) []byte {
 	// NOTE: We flip the sign on ticks storing token0 so that all liquidity is index left to right.
 	// This allows us to iterate through liquidity consistently regardless of 0to1 vs 1to0
-	if pairId.Token0 == tokenIn {
+	if pairID.Token0 == tokenIn {
 		tickIndex *= -1
 	}
 	key := make([]byte, 9)
@@ -83,9 +54,9 @@ func TickIndexToBytes(tickIndex int64, pairId *PairId, tokenIn string) []byte {
 	return key
 }
 
-// Limit Order Pool Mappings and Keys
 const (
-	BaseLimitOrderPrefix = "LimitOrderTranche/value"
+	// TickLiquidityKeyPrefix is the prefix to retrieve all TickLiquidity
+	TickLiquidityKeyPrefix = "TickLiquidity/value/"
 
 	// LimitOrderTrancheUserKeyPrefix is the prefix to retrieve all LimitOrderTrancheUser
 	LimitOrderTrancheUserKeyPrefix = "LimitOrderTrancheUser/value"
@@ -93,6 +64,7 @@ const (
 	// LimitOrderTrancheKeyPrefix is the prefix to retrieve all LimitOrderTranche
 	LimitOrderTrancheKeyPrefix = "LimitOrderTranche/value"
 
+	// InactiveLimitOrderTrancheKeyPrefix is the prefix to retrieve all InactiveLimitOrderTranche
 	InactiveLimitOrderTrancheKeyPrefix = "InactiveLimitOrderTranche/value/"
 
 	// LimitOrderExpirationKeyPrefix is the prefix to retrieve all LimitOrderExpiration
@@ -100,7 +72,7 @@ const (
 )
 
 // LimitOrderTrancheUserKey returns the store key to retrieve a LimitOrderTrancheUser from the index fields
-func LimitOrderTrancheUserKey(address string, trancheKey string) []byte {
+func LimitOrderTrancheUserKey(address, trancheKey string) []byte {
 	var key []byte
 
 	addressBytes := []byte(address)
@@ -115,7 +87,6 @@ func LimitOrderTrancheUserKey(address string, trancheKey string) []byte {
 }
 
 func LimitOrderTrancheUserAddressPrefix(address string) []byte {
-
 	key := KeyPrefix(LimitOrderTrancheUserKeyPrefix)
 	addressBytes := []byte(address)
 	key = append(key, addressBytes...)
@@ -126,22 +97,22 @@ func LimitOrderTrancheUserAddressPrefix(address string) []byte {
 
 // InactiveLimitOrderTrancheKey returns the store key to retrieve a InactiveLimitOrderTranche from the index fields
 func InactiveLimitOrderTrancheKey(
-	pairId *PairId,
+	pairID *PairID,
 	tokenIn string,
 	tickIndex int64,
 	trancheKey string,
 ) []byte {
 	var key []byte
 
-	pairIdBytes := []byte(pairId.Stringify())
-	key = append(key, pairIdBytes...)
+	pairIDBytes := []byte(pairID.Stringify())
+	key = append(key, pairIDBytes...)
 	key = append(key, []byte("/")...)
 
 	tokenInBytes := []byte(tokenIn)
 	key = append(key, tokenInBytes...)
 	key = append(key, []byte("/")...)
 
-	tickIndexBytes := TickIndexToBytes(tickIndex, pairId, tokenIn)
+	tickIndexBytes := TickIndexToBytes(tickIndex, pairID, tokenIn)
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
@@ -153,21 +124,21 @@ func InactiveLimitOrderTrancheKey(
 }
 
 func InactiveLimitOrderTranchePrefix(
-	pairId *PairId,
+	pairID *PairID,
 	tokenIn string,
 	tickIndex int64,
 ) []byte {
-	var key []byte = KeyPrefix(InactiveLimitOrderTrancheKeyPrefix)
+	key := KeyPrefix(InactiveLimitOrderTrancheKeyPrefix)
 
-	pairIdBytes := []byte(pairId.Stringify())
-	key = append(key, pairIdBytes...)
+	pairIDBytes := []byte(pairID.Stringify())
+	key = append(key, pairIDBytes...)
 	key = append(key, []byte("/")...)
 
 	tokenInBytes := []byte(tokenIn)
 	key = append(key, tokenInBytes...)
 	key = append(key, []byte("/")...)
 
-	tickIndexBytes := TickIndexToBytes(tickIndex, pairId, tokenIn)
+	tickIndexBytes := TickIndexToBytes(tickIndex, pairID, tokenIn)
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
@@ -184,7 +155,6 @@ func LiquidityIndexBytes(liquidityIndex interface{}) []byte {
 		return []byte(index)
 	default:
 		panic("LiquidityIndex is not a valid type")
-
 	}
 }
 
@@ -193,8 +163,9 @@ func TimeBytes(timestamp time.Time) []byte {
 	str := utils.Uint64ToSortableString(unixMs)
 	return []byte(str)
 }
+
 func TickLiquidityKey(
-	pairId *PairId,
+	pairID *PairID,
 	tokenIn string,
 	tickIndex int64,
 	liquidityType string,
@@ -202,15 +173,15 @@ func TickLiquidityKey(
 ) []byte {
 	var key []byte
 
-	pairIdBytes := []byte(pairId.Stringify())
-	key = append(key, pairIdBytes...)
+	pairIDBytes := []byte(pairID.Stringify())
+	key = append(key, pairIDBytes...)
 	key = append(key, []byte("/")...)
 
 	tokenInBytes := []byte(tokenIn)
 	key = append(key, tokenInBytes...)
 	key = append(key, []byte("/")...)
 
-	tickIndexBytes := TickIndexToBytes(tickIndex, pairId, tokenIn)
+	tickIndexBytes := TickIndexToBytes(tickIndex, pairID, tokenIn)
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
@@ -225,21 +196,21 @@ func TickLiquidityKey(
 }
 
 func TickLiquidityLimitOrderPrefix(
-	pairId *PairId,
+	pairID *PairID,
 	tokenIn string,
 	tickIndex int64,
 ) []byte {
-	var key []byte = KeyPrefix(TickLiquidityKeyPrefix)
+	key := KeyPrefix(TickLiquidityKeyPrefix)
 
-	pairIdBytes := []byte(pairId.Stringify())
-	key = append(key, pairIdBytes...)
+	pairIDBytes := []byte(pairID.Stringify())
+	key = append(key, pairIDBytes...)
 	key = append(key, []byte("/")...)
 
 	tokenInBytes := []byte(tokenIn)
 	key = append(key, tokenInBytes...)
 	key = append(key, []byte("/")...)
 
-	tickIndexBytes := TickIndexToBytes(tickIndex, pairId, tokenIn)
+	tickIndexBytes := TickIndexToBytes(tickIndex, pairID, tokenIn)
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
@@ -250,10 +221,11 @@ func TickLiquidityLimitOrderPrefix(
 	return key
 }
 
-func TickLiquidityPrefix(pairId *PairId, tokenIn string) []byte {
+func TickLiquidityPrefix(pairID *PairID, tokenIn string) []byte {
 	var key []byte
-	key = append(KeyPrefix(TickLiquidityKeyPrefix), KeyPrefix(pairId.Stringify())...)
+	key = append(KeyPrefix(TickLiquidityKeyPrefix), KeyPrefix(pairID.Stringify())...)
 	key = append(key, KeyPrefix(tokenIn)...)
+
 	return key
 }
 
@@ -287,21 +259,6 @@ const (
 	DepositEventNewReserves0 = "NewReserves0"
 	DepositEventNewReserves1 = "NewReserves1"
 	DepositEventSharesMinted = "SharesMinted"
-)
-
-// DepositFailed Event Attributes
-const (
-	DepositFailEventKey          = "NewDeposit"
-	DepositFailEventCreator      = "Creator"
-	DepositFailEventToken0       = "Token0"
-	DepositFailEventToken1       = "Token1"
-	DepositFailEventPrice        = "TickIndex"
-	DepositFailEventFee          = "Fee"
-	DepositFailEventReceiver     = "Receiver"
-	DepositFailEventOldReserves0 = "OldReserves0"
-	DepositFailEventOldReserves1 = "OldReserves1"
-	DepositFailAmountToDeposit0  = "AmountToDeposit0"
-	DepositFailAmountToDeposit1  = "AmountToDeposit1"
 )
 
 // Withdraw Event Attributes
@@ -342,12 +299,12 @@ const (
 )
 
 const (
-	WithdrawFilledLimitOrderEventKey           = "NewWithdraw"
-	WithdrawFilledLimitOrderEventCreator       = "Creator"
-	WithdrawFilledLimitOrderEventTokenIn       = "TokenIn"
-	WithdrawFilledLimitOrderEventTokenOut      = "TokenOut"
+	WithdrawFilledLimitOrderEventKey        = "NewWithdraw"
+	WithdrawFilledLimitOrderEventCreator    = "Creator"
+	WithdrawFilledLimitOrderEventTokenIn    = "TokenIn"
+	WithdrawFilledLimitOrderEventTokenOut   = "TokenOut"
 	WithdrawFilledLimitOrderEventTrancheKey = "TrancheKey"
-	WithdrawFilledLimitOrderEventAmountOut     = "AmountOut"
+	WithdrawFilledLimitOrderEventAmountOut  = "AmountOut"
 )
 
 const (
@@ -356,12 +313,12 @@ const (
 )
 
 const (
-	CancelLimitOrderEventKey           = "NewWithdraw"
-	CancelLimitOrderEventCreator       = "Creator"
-	CancelLimitOrderEventTokenIn       = "TokenIn"
-	CancelLimitOrderEventTokenOut      = "TokenOut"
+	CancelLimitOrderEventKey        = "NewWithdraw"
+	CancelLimitOrderEventCreator    = "Creator"
+	CancelLimitOrderEventTokenIn    = "TokenIn"
+	CancelLimitOrderEventTokenOut   = "TokenOut"
 	CancelLimitOrderEventTrancheKey = "TrancheKey"
-	CancelLimitOrderEventAmountOut     = "AmountOut"
+	CancelLimitOrderEventAmountOut  = "AmountOut"
 )
 
 const (
@@ -370,9 +327,9 @@ const (
 	LiquidityTypeLimitOrder   = "B_LODeposit"
 )
 
-var (
-	JITGoodTilTime = time.Time{}
-)
+func JITGoodTilTime() time.Time {
+	return time.Time{}
+}
 
 const (
 	// NOTE: This number is based current cost of all operations in EndBlock,

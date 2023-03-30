@@ -19,7 +19,7 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 	LOList := profile.GetAllLimitOrders(s.ctx, s.app.DexKeeper)
 	s.Assert().Equal(2, len(LOList))
 	s.Assert().Equal(types.LimitOrderTrancheUser{
-		PairId:          defaultPairId,
+		PairID:          defaultPairID,
 		Token:           "TokenA",
 		TickIndex:       -1,
 		TrancheKey:      trancheKeyA,
@@ -32,7 +32,7 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 		LOList[0],
 	)
 	s.Assert().Equal(types.LimitOrderTrancheUser{
-		PairId:          defaultPairId,
+		PairID:          defaultPairID,
 		Token:           "TokenB",
 		TickIndex:       0,
 		TrancheKey:      trancheKeyB,
@@ -69,7 +69,7 @@ func (s *MsgServerTestSuite) TestGetAllDeposits() {
 			Fee:       1,
 		},
 	)
-	s.aliceWithdraws(&Withdrawl{
+	s.aliceWithdraws(&Withdrawal{
 		TickIndex: -50,
 		Fee:       1,
 		Shares:    sdk.NewInt(1),
@@ -81,7 +81,7 @@ func (s *MsgServerTestSuite) TestGetAllDeposits() {
 	depositList := profile.GetAllDeposits(s.ctx, s.app.DexKeeper)
 	s.Assert().Equal(2, len(depositList))
 	s.Assert().Equal(types.DepositRecord{
-		PairId:          defaultPairId,
+		PairID:          defaultPairID,
 		SharesOwned:     sdk.NewInt(10),
 		CenterTickIndex: 0,
 		LowerTickIndex:  -1,
@@ -91,7 +91,7 @@ func (s *MsgServerTestSuite) TestGetAllDeposits() {
 		depositList[0],
 	)
 	s.Assert().Equal(types.DepositRecord{
-		PairId:          defaultPairId,
+		PairID:          defaultPairID,
 		SharesOwned:     sdk.NewInt(10),
 		CenterTickIndex: 2,
 		LowerTickIndex:  1,
@@ -125,5 +125,4 @@ func (s *MsgServerTestSuite) TestGetAllPositions() {
 
 	s.Assert().Equal(2, len(positions.PoolDeposits))
 	s.Assert().Equal(1, len(positions.LimitOrders))
-
 }

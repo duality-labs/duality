@@ -7,7 +7,7 @@ import (
 )
 
 type Liquidity interface {
-	Swap(maxAmount sdk.Int) (inAmount sdk.Int, outAmount sdk.Int)
+	Swap(maxAmount sdk.Int) (inAmount, outAmount sdk.Int)
 	Price() *types.Price
 }
 
@@ -16,20 +16,18 @@ func NewLiquidityIterator(
 	ctx sdk.Context,
 	tradingPair types.DirectionalTradingPair,
 ) *LiquidityIterator {
-
 	return &LiquidityIterator{
-		iter:   keeper.NewTickIterator(ctx, tradingPair.PairId, tradingPair.TokenOut),
+		iter:   keeper.NewTickIterator(ctx, tradingPair.PairID, tradingPair.TokenOut),
 		keeper: keeper,
 		ctx:    ctx,
-		pairId: tradingPair.PairId,
+		pairID: tradingPair.PairID,
 		is0To1: tradingPair.IsTokenInToken0(),
 	}
-
 }
 
 type LiquidityIterator struct {
 	keeper Keeper
-	pairId *types.PairId
+	pairID *types.PairID
 	ctx    sdk.Context
 	iter   TickIterator
 	is0To1 bool
@@ -52,10 +50,10 @@ func (s *LiquidityIterator) Next() Liquidity {
 			var pool Liquidity
 			poolReserves := *liquidity.PoolReserves
 			if s.is0To1 {
-				//Pool Reserves is upperTick
+				// Pool Reserves is upperTick
 				pool, err = s.createPool0To1(poolReserves)
 			} else {
-				//Pool Reserves is is lowerTick
+				// Pool Reserves is lowerTick
 				pool, err = s.createPool1To0(poolReserves)
 			}
 			// TODO: we are not actually handling the error here we're just stopping iteration
@@ -64,6 +62,7 @@ func (s *LiquidityIterator) Next() Liquidity {
 			if err != nil {
 				return nil
 			}
+
 			return pool
 
 		case *types.TickLiquidity_LimitOrderTranche:
@@ -71,15 +70,15 @@ func (s *LiquidityIterator) Next() Liquidity {
 			// If we hit a tranche with an expired goodTil date keep iterating
 			if tranche.IsExpired(s.ctx) {
 				continue
-			} else {
-				return tranche
 			}
+
+			return tranche
 
 		default:
 			panic("Tick does not have liquidity")
-
 		}
 	}
+
 	return nil
 }
 
@@ -87,7 +86,7 @@ func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquid
 	upperTickIndex := upperTick.TickIndex
 	centerTickIndex := upperTickIndex - utils.MustSafeUint64(upperTick.Fee)
 	lowerTickIndex := centerTickIndex - utils.MustSafeUint64(upperTick.Fee)
-	lowerTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairId, s.pairId.Token0, lowerTickIndex, upperTick.Fee)
+	lowerTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairID, s.pairID.Token0, lowerTickIndex, upperTick.Fee)
 	if err != nil {
 		return nil, err
 	}
@@ -96,6 +95,7 @@ func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquid
 		lowerTick,
 		&upperTick,
 	)
+
 	return NewLiquidityFromPool0To1(&pool), nil
 }
 
@@ -103,7 +103,7 @@ func (s *LiquidityIterator) createPool1To0(lowerTick types.PoolReserves) (Liquid
 	lowerTickIndex := lowerTick.TickIndex
 	centerTickIndex := lowerTickIndex + utils.MustSafeUint64(lowerTick.Fee)
 	upperTickIndex := centerTickIndex + utils.MustSafeUint64(lowerTick.Fee)
-	upperTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairId, s.pairId.Token1, upperTickIndex, lowerTick.Fee)
+	upperTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairID, s.pairID.Token1, upperTickIndex, lowerTick.Fee)
 	if err != nil {
 		return nil, err
 	}
@@ -113,6 +113,7 @@ func (s *LiquidityIterator) createPool1To0(lowerTick types.PoolReserves) (Liquid
 		&lowerTick,
 		upperTick,
 	)
+
 	return NewLiquidityFromPool1To0(&pool), nil
 }
 
@@ -130,17 +131,17 @@ func (k Keeper) SaveLiquidity(sdkCtx sdk.Context, liquidityI Liquidity) {
 	default:
 		panic("Invalid liquidity type")
 	}
-
 }
 
 func (k Keeper) Swap(ctx sdk.Context,
-	pairId *types.PairId,
+	pairID *types.PairID,
 	tokenIn string,
 	tokenOut string,
 	amountIn sdk.Int,
-	limitPrice *sdk.Dec) (totalIn sdk.Int, totalOut sdk.Int, error error) {
+	limitPrice *sdk.Dec,
+) (totalIn, totalOut sdk.Int, err error) {
 	cacheCtx, writeCache := ctx.CacheContext()
-	pair := types.NewDirectionalTradingPair(pairId, tokenIn, tokenOut)
+	pair := types.NewDirectionalTradingPair(pairID, tokenIn, tokenOut)
 
 	remainingIn := amountIn
 	totalOut = sdk.ZeroInt()
@@ -157,7 +158,6 @@ func (k Keeper) Swap(ctx sdk.Context,
 		// break as soon as we iterated past limitPrice
 		if limitPrice != nil && liq.Price().ToDec().LT(*limitPrice) {
 			break
-
 		}
 
 		inAmount, outAmount := liq.Swap(remainingIn)
@@ -170,5 +170,6 @@ func (k Keeper) Swap(ctx sdk.Context,
 
 	writeCache()
 	totalIn = amountIn.Sub(remainingIn)
+
 	return totalIn, totalOut, nil
 }

@@ -28,9 +28,9 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgDeposit int = 100
 
-	opWeightMsgWithdrawl = "op_weight_msg_withdrawl"
+	opWeightMsgWithdrawal = "op_weight_msg_withdrawal"
 	// TODO: Determine the simulation weight value
-	defaultWeightMsgWithdrawl int = 100
+	defaultWeightMsgWithdrawal int = 100
 
 	opWeightMsgSwap = "op_weight_msg_swap"
 	// TODO: Determine the simulation weight value
@@ -40,7 +40,7 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgPlaceLimitOrder int = 100
 
-	opWeightMsgWithdrawFilledLimitOrder = "op_weight_msg_withdrawl_withdrawn_limit_order"
+	opWeightMsgWithdrawFilledLimitOrder = "op_weight_msg_withdrawal_withdrawn_limit_order"
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgWithdrawFilledLimitOrder int = 100
 
@@ -71,7 +71,6 @@ func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedP
 
 // RandomizedParams creates randomized  param changes for the simulator
 func (am AppModule) RandomizedParams(_ *rand.Rand) []simtypes.ParamChange {
-
 	return []simtypes.ParamChange{}
 }
 
@@ -93,15 +92,15 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		dexsimulation.SimulateMsgDeposit(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-	var weightMsgWithdrawl int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgWithdrawl, &weightMsgWithdrawl, nil,
+	var weightMsgWithdrawal int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgWithdrawal, &weightMsgWithdrawal, nil,
 		func(_ *rand.Rand) {
-			weightMsgWithdrawl = defaultWeightMsgWithdrawl
+			weightMsgWithdrawal = defaultWeightMsgWithdrawal
 		},
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgWithdrawl,
-		dexsimulation.SimulateMsgWithdrawl(am.accountKeeper, am.bankKeeper, am.keeper),
+		weightMsgWithdrawal,
+		dexsimulation.SimulateMsgWithdrawal(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	var weightMsgSwap int
@@ -127,7 +126,11 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	))
 
 	var weightMsgWithdrawFilledLimitOrder int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgWithdrawFilledLimitOrder, &weightMsgWithdrawFilledLimitOrder, nil,
+	simState.AppParams.GetOrGenerate(
+		simState.Cdc,
+		opWeightMsgWithdrawFilledLimitOrder,
+		&weightMsgWithdrawFilledLimitOrder,
+		nil,
 		func(_ *rand.Rand) {
 			weightMsgWithdrawFilledLimitOrder = defaultWeightMsgWithdrawFilledLimitOrder
 		},

@@ -10,20 +10,20 @@ type PoolLiquidity struct {
 	is0To1 bool
 }
 
-func (pl *PoolLiquidity) Swap(maxAmount sdk.Int) (inAmount sdk.Int, outAmount sdk.Int) {
+func (pl *PoolLiquidity) Swap(maxAmount sdk.Int) (inAmount, outAmount sdk.Int) {
 	if pl.is0To1 {
 		return pl.pool.Swap0To1(maxAmount)
-	} else {
-		return pl.pool.Swap1To0(maxAmount)
 	}
+
+	return pl.pool.Swap1To0(maxAmount)
 }
 
 func (pl *PoolLiquidity) Price() *types.Price {
 	if pl.is0To1 {
 		return pl.pool.Price0To1Upper
-	} else {
-		return pl.pool.Price1To0Lower
 	}
+
+	return pl.pool.Price1To0Lower
 }
 
 func NewLiquidityFromPool0To1(pool *Pool) Liquidity {

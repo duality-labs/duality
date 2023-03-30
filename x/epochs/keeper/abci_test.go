@@ -113,6 +113,7 @@ func initializeBlankEpochInfoFields(epoch types.EpochInfo, identifier string, du
 		epoch.Duration = duration
 	}
 	epoch.EpochCountingStarted = (epoch.CurrentEpoch != 0)
+
 	return epoch
 }
 

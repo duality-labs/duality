@@ -7,7 +7,7 @@ import (
 )
 
 func (k Keeper) SetPoolReserves(ctx sdk.Context, pool types.PoolReserves) {
-	//Wrap pool back into TickLiquidity
+	// Wrap pool back into TickLiquidity
 	tick := types.TickLiquidity{
 		Liquidity: &types.TickLiquidity_PoolReserves{
 			PoolReserves: &pool,
@@ -17,7 +17,7 @@ func (k Keeper) SetPoolReserves(ctx sdk.Context, pool types.PoolReserves) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickLiquidityKeyPrefix))
 	b := k.cdc.MustMarshal(&tick)
 	store.Set(types.TickLiquidityKey(
-		pool.PairId,
+		pool.PairID,
 		pool.TokenIn,
 		pool.TickIndex,
 		types.LiquidityTypePoolReserves,
@@ -27,15 +27,14 @@ func (k Keeper) SetPoolReserves(ctx sdk.Context, pool types.PoolReserves) {
 
 func (k Keeper) GetPoolReserves(
 	ctx sdk.Context,
-	pairId *types.PairId,
+	pairID *types.PairID,
 	tokenIn string,
 	tickIndex int64,
 	fee uint64,
-
 ) (pool *types.PoolReserves, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickLiquidityKeyPrefix))
 	b := store.Get(types.TickLiquidityKey(
-		pairId,
+		pairID,
 		tokenIn,
 		tickIndex,
 		types.LiquidityTypePoolReserves,
@@ -55,7 +54,7 @@ func (k Keeper) GetPoolReserves(
 func (k Keeper) RemovePoolReserves(ctx sdk.Context, pool types.PoolReserves) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickLiquidityKeyPrefix))
 	store.Delete(types.TickLiquidityKey(
-		pool.PairId,
+		pool.PairID,
 		pool.TokenIn,
 		pool.TickIndex,
 		types.LiquidityTypePoolReserves,

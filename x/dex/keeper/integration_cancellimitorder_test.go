@@ -173,7 +173,6 @@ func (s *MsgServerTestSuite) TestCancelTwiceFails() {
 	s.assertDexBalances(0, 0)
 
 	s.aliceCancelsLimitSellFails(trancheKey, types.ErrActiveLimitOrderNotFound)
-
 }
 
 func (s *MsgServerTestSuite) TestCancelPartiallyFilled() {
@@ -188,10 +187,10 @@ func (s *MsgServerTestSuite) TestCancelPartiallyFilled() {
 	s.assertDexBalances(25, 25)
 	s.assertAliceBalances(0, 0)
 
-	//WHEN alice cancels her limit order
+	// WHEN alice cancels her limit order
 	s.aliceCancelsLimitSell(trancheKey)
 
-	//Then alice gets back remaining 25 TokenA LO reserves
+	// Then alice gets back remaining 25 TokenA LO reserves
 	s.assertAliceBalances(25, 0)
 	s.assertDexBalances(0, 25)
 }
@@ -211,14 +210,14 @@ func (s *MsgServerTestSuite) TestCancelPartiallyFilledMultiUser() {
 	s.assertDexBalances(125, 25)
 	s.assertAliceBalances(0, 0)
 
-	//WHEN alice and carol cancel their limit orders
+	// WHEN alice and carol cancel their limit orders
 	s.aliceCancelsLimitSell(trancheKey)
 	s.carolCancelsLimitSell(trancheKey)
 
-	//THEN alice gets back 41 TokenA (125 * 1/3)
+	// THEN alice gets back 41 TokenA (125 * 1/3)
 	s.assertAliceBalances(41, 0)
 
-	//Carol gets back 83 TokenA (125 * 2/3)
+	// Carol gets back 83 TokenA (125 * 2/3)
 	s.assertCarolBalances(83, 0)
 	s.assertDexBalances(1, 25)
 }
@@ -253,7 +252,6 @@ func (s *MsgServerTestSuite) TestCancelGoodTilAfterExpirationFails() {
 
 	// THEN alice cancellation fails
 	s.aliceCancelsLimitSellFails(trancheKey, types.ErrActiveLimitOrderNotFound)
-
 }
 
 func (s *MsgServerTestSuite) TestCancelJITSameBlock() {

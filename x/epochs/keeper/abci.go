@@ -35,7 +35,7 @@ func (k Keeper) BeginBlocker(ctx sdk.Context) {
 			epochInfo.EpochCountingStarted = true
 			epochInfo.CurrentEpoch = 1
 			epochInfo.CurrentEpochStartTime = epochInfo.StartTime
-			logger.Info(fmt.Sprintf("Starting new epoch with identifier %s epoch number %d", epochInfo.Identifier, epochInfo.CurrentEpoch))
+			logger.Info("Starting epoch", "Identifier", epochInfo.Identifier, "CurEpoch", epochInfo.CurrentEpoch)
 		} else {
 			ctx.EventManager().EmitEvent(
 				sdk.NewEvent(
@@ -44,9 +44,9 @@ func (k Keeper) BeginBlocker(ctx sdk.Context) {
 				),
 			)
 			k.AfterEpochEnd(ctx, epochInfo.Identifier, epochInfo.CurrentEpoch)
-			epochInfo.CurrentEpoch += 1
+			epochInfo.CurrentEpoch++
 			epochInfo.CurrentEpochStartTime = epochInfo.CurrentEpochStartTime.Add(epochInfo.Duration)
-			logger.Info(fmt.Sprintf("Starting epoch with identifier %s epoch number %d", epochInfo.Identifier, epochInfo.CurrentEpoch))
+			logger.Info("Starting epoch", "Identifier", epochInfo.Identifier, "CurEpoch", epochInfo.CurrentEpoch)
 		}
 
 		// emit new epoch start event, set epoch info, and run BeforeEpochStart hook

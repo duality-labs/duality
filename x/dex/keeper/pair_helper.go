@@ -8,69 +8,67 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
-func SortTokens(tokenA string, tokenB string) (string, string, error) {
-
-	relativeOrder := tokenA < tokenB
-
-	equalCheck := tokenA == tokenB
-	if equalCheck {
+func SortTokens(tokenA, tokenB string) (string, string, error) {
+	switch {
+	case tokenA == tokenB:
 		return "", "", sdkerrors.Wrapf(types.ErrInvalidTradingPair, "%s<>%s", tokenA, tokenB)
-	} else if relativeOrder {
+	case tokenA < tokenB:
 		return tokenA, tokenB, nil
-	} else {
+	default:
 		return tokenB, tokenA, nil
 	}
 }
 
-func SortAmounts(tokenA string, token0 string, amountsA []sdk.Int, amountsB []sdk.Int) ([]sdk.Int, []sdk.Int) {
+func SortAmounts(tokenA, token0 string, amountsA, amountsB []sdk.Int) ([]sdk.Int, []sdk.Int) {
 	if tokenA == token0 {
 		return amountsA, amountsB
-	} else {
-		return amountsB, amountsA
 	}
+
+	return amountsB, amountsA
 }
 
-func CreatePairId(token0 string, token1 string) (pairId *types.PairId) {
-	return &types.PairId{
+func CreatePairID(token0, token1 string) (pairID *types.PairID) {
+	return &types.PairID{
 		Token0: token0,
 		Token1: token1,
 	}
 }
 
-func CreatePairIdFromUnsorted(tokenA, tokenB string) (*types.PairId, error) {
+func CreatePairIDFromUnsorted(tokenA, tokenB string) (*types.PairID, error) {
 	token0, token1, err := SortTokens(tokenA, tokenB)
 	if err != nil {
 		return nil, err
 	}
-	return CreatePairId(token0, token1), nil
 
+	return CreatePairID(token0, token1), nil
 }
 
-func GetInOutTokens(tokenIn_ string, tokenA string, tokenB string) (tokenIn string, tokenOut string) {
-	if tokenIn_ == tokenA {
+func GetInOutTokens(tokenIn, tokenA, tokenB string) (_, tokenOut string) {
+	if tokenIn == tokenA {
 		return tokenA, tokenB
-	} else {
-		return tokenB, tokenA
 	}
+
+	return tokenB, tokenA
 }
 
-func StringToPairId(pairIdStr string) (*types.PairId, error) {
-	tokens := strings.Split(pairIdStr, "<>")
+func StringToPairID(pairIDStr string) (*types.PairID, error) {
+	tokens := strings.Split(pairIDStr, "<>")
 
 	if len(tokens) == 2 {
-		return &types.PairId{
+		return &types.PairID{
 			Token0: tokens[0],
 			Token1: tokens[1],
 		}, nil
-	} else {
-		return &types.PairId{}, sdkerrors.Wrapf(types.ErrInvalidPairIdStr, pairIdStr)
 	}
+
+	return &types.PairID{}, sdkerrors.Wrapf(types.ErrInvalidPairIDStr, pairIDStr)
 }
 
 func NormalizeTickIndex(baseToken, token0 string, tickIndex int64) int64 {
 	if baseToken != token0 {
-		tickIndex = tickIndex * -1
+		tickIndex *= -1
 	}
+
 	return tickIndex
 }
 
@@ -78,5 +76,6 @@ func NormalizeAllTickIndexes(baseToken, token0 string, tickIndexes []int64) []in
 	for i, idx := range tickIndexes {
 		tickIndexes[i] = NormalizeTickIndex(baseToken, token0, idx)
 	}
+
 	return tickIndexes
 }

@@ -1,4 +1,4 @@
-package osmocli
+package osmocli_test
 
 import (
 	"reflect"
@@ -6,6 +6,7 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	. "github.com/duality-labs/duality/osmoutils/osmocli"
 	"github.com/stretchr/testify/require"
 )
 

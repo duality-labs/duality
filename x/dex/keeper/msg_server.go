@@ -20,7 +20,6 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 var _ types.MsgServer = msgServer{}
 
 func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.MsgDepositResponse, error) {
-
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
@@ -46,15 +45,14 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 		msg.Fees,
 		msg.Options,
 	)
-
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.MsgDepositResponse{Amounts0Deposit, Amounts1Deposit}, nil
+	return &types.MsgDepositResponse{Reserve0Deposited: Amounts0Deposit, Reserve1Deposited: Amounts1Deposit}, nil
 }
 
-func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*types.MsgWithdrawlResponse, error) {
+func (k msgServer) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (*types.MsgWithdrawalResponse, error) {
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
@@ -80,7 +78,7 @@ func (k msgServer) Withdrawl(goCtx context.Context, msg *types.MsgWithdrawl) (*t
 		return nil, err
 	}
 
-	return &types.MsgWithdrawlResponse{}, nil
+	return &types.MsgWithdrawalResponse{}, nil
 }
 
 func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSwapResponse, error) {
@@ -92,11 +90,14 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 		return nil, err
 	}
 
-	//TODO: Inconsistent that this is the only response that returns coins instead of ints
+	// TODO: Inconsistent that this is the only response that returns coins instead of ints
 	return &types.MsgSwapResponse{CoinOut: coinOut}, nil
 }
 
-func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLimitOrder) (*types.MsgPlaceLimitOrderResponse, error) {
+func (k msgServer) PlaceLimitOrder(
+	goCtx context.Context,
+	msg *types.MsgPlaceLimitOrder,
+) (*types.MsgPlaceLimitOrderResponse, error) {
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
@@ -130,7 +131,10 @@ func (k msgServer) PlaceLimitOrder(goCtx context.Context, msg *types.MsgPlaceLim
 	return &types.MsgPlaceLimitOrderResponse{TrancheKey: *trancheKey}, nil
 }
 
-func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.MsgWithdrawFilledLimitOrder) (*types.MsgWithdrawFilledLimitOrderResponse, error) {
+func (k msgServer) WithdrawFilledLimitOrder(
+	goCtx context.Context,
+	msg *types.MsgWithdrawFilledLimitOrder,
+) (*types.MsgWithdrawFilledLimitOrderResponse, error) {
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 
 	err := k.WithdrawFilledLimitOrderCore(
@@ -145,7 +149,10 @@ func (k msgServer) WithdrawFilledLimitOrder(goCtx context.Context, msg *types.Ms
 	return &types.MsgWithdrawFilledLimitOrderResponse{}, nil
 }
 
-func (k msgServer) CancelLimitOrder(goCtx context.Context, msg *types.MsgCancelLimitOrder) (*types.MsgCancelLimitOrderResponse, error) {
+func (k msgServer) CancelLimitOrder(
+	goCtx context.Context,
+	msg *types.MsgCancelLimitOrder,
+) (*types.MsgCancelLimitOrderResponse, error) {
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 
 	err := k.CancelLimitOrderCore(

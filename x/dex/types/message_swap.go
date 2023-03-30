@@ -9,7 +9,7 @@ const TypeMsgSwap = "swap"
 
 var _ sdk.Msg = &MsgSwap{}
 
-func NewMsgSwap(creator string, tokenIn string, tokenOut string, amountIn sdk.Int, receiver string) *MsgSwap {
+func NewMsgSwap(creator, tokenIn, tokenOut string, amountIn sdk.Int, receiver string) *MsgSwap {
 	return &MsgSwap{
 		Creator:  creator,
 		AmountIn: amountIn,
@@ -32,6 +32,7 @@ func (msg *MsgSwap) GetSigners() []sdk.AccAddress {
 	if err != nil {
 		panic(err)
 	}
+
 	return []sdk.AccAddress{creator}
 }
 
@@ -54,5 +55,6 @@ func (msg *MsgSwap) ValidateBasic() error {
 	if msg.AmountIn.LTE(sdk.ZeroInt()) {
 		return ErrZeroSwap
 	}
+
 	return nil
 }

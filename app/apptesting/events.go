@@ -24,6 +24,7 @@ func (s *KeeperTestHelper) FindEvent(events []sdk.Event, name string) sdk.Event 
 	if index == -1 {
 		return sdk.Event{}
 	}
+
 	return events[index]
 }
 
@@ -35,5 +36,6 @@ func (s *KeeperTestHelper) ExtractAttributes(event sdk.Event) map[string]string 
 	for _, a := range event.Attributes {
 		attrs[string(a.Key)] = string(a.Value)
 	}
+
 	return attrs
 }

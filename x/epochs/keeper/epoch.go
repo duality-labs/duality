@@ -23,6 +23,7 @@ func (k Keeper) GetEpochInfo(ctx sdk.Context, identifier string) types.EpochInfo
 	if err != nil {
 		panic(err)
 	}
+
 	return epoch
 }
 
@@ -30,8 +31,7 @@ func (k Keeper) GetEpochInfo(ctx sdk.Context, identifier string) types.EpochInfo
 // or re-uses an existing identifier.
 // This method also sets the start time if left unset, and sets the epoch start height.
 func (k Keeper) AddEpochInfo(ctx sdk.Context, epoch types.EpochInfo) error {
-	err := epoch.Validate()
-	if err != nil {
+	if err := epoch.Validate(); err != nil {
 		return err
 	}
 	// Check if identifier already exists
@@ -45,6 +45,7 @@ func (k Keeper) AddEpochInfo(ctx sdk.Context, epoch types.EpochInfo) error {
 	}
 	epoch.CurrentEpochStartHeight = ctx.BlockHeight()
 	k.setEpochInfo(ctx, epoch)
+
 	return nil
 }
 
@@ -95,6 +96,7 @@ func (k Keeper) AllEpochInfos(ctx sdk.Context) []types.EpochInfo {
 		epochs = append(epochs, epochInfo)
 		return false
 	})
+
 	return epochs
 }
 
@@ -107,5 +109,6 @@ func (k Keeper) NumBlocksSinceEpochStart(ctx sdk.Context, identifier string) (in
 	if (epoch == types.EpochInfo{}) {
 		return 0, fmt.Errorf("epoch with identifier %s not found", identifier)
 	}
+
 	return ctx.BlockHeight() - epoch.CurrentEpochStartHeight, nil
 }

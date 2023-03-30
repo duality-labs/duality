@@ -1,4 +1,4 @@
-package types
+package types_test
 
 import (
 	"testing"
@@ -6,18 +6,19 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/duality-labs/duality/testutil/sample"
+	. "github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/require"
 )
 
-func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
+func TestMsgWithdrawal_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgWithdrawl
+		msg  MsgWithdrawal
 		err  error
 	}{
 		{
 			name: "invalid creator",
-			msg: MsgWithdrawl{
+			msg: MsgWithdrawal{
 				Creator:         "invalid_address",
 				Receiver:        sample.AccAddress(),
 				Fees:            []uint64{0},
@@ -28,7 +29,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "invalid receiver",
-			msg: MsgWithdrawl{
+			msg: MsgWithdrawal{
 				Creator:         sample.AccAddress(),
 				Receiver:        "invalid_address",
 				Fees:            []uint64{0},
@@ -39,7 +40,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "invalid fee indexes length",
-			msg: MsgWithdrawl{
+			msg: MsgWithdrawal{
 				Creator:         sample.AccAddress(),
 				Receiver:        sample.AccAddress(),
 				Fees:            []uint64{},
@@ -50,7 +51,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "invalid tick indexes length",
-			msg: MsgWithdrawl{
+			msg: MsgWithdrawal{
 				Creator:         sample.AccAddress(),
 				Receiver:        sample.AccAddress(),
 				Fees:            []uint64{0},
@@ -61,7 +62,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "invalid shares to remove length",
-			msg: MsgWithdrawl{
+			msg: MsgWithdrawal{
 				Creator:         sample.AccAddress(),
 				Receiver:        sample.AccAddress(),
 				Fees:            []uint64{0},
@@ -72,7 +73,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "no withdraw specs",
-			msg: MsgWithdrawl{
+			msg: MsgWithdrawal{
 				Creator:         sample.AccAddress(),
 				Receiver:        sample.AccAddress(),
 				Fees:            []uint64{},
@@ -83,7 +84,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "no withdraw specs",
-			msg: MsgWithdrawl{
+			msg: MsgWithdrawal{
 				Creator:         sample.AccAddress(),
 				Receiver:        sample.AccAddress(),
 				Fees:            []uint64{0},
@@ -94,7 +95,7 @@ func TestMsgWithdrawl_ValidateBasic(t *testing.T) {
 		},
 		{
 			name: "valid msg",
-			msg: MsgWithdrawl{
+			msg: MsgWithdrawal{
 				Creator:         sample.AccAddress(),
 				Receiver:        sample.AccAddress(),
 				Fees:            []uint64{0},
