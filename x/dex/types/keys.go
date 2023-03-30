@@ -37,35 +37,6 @@ func KeyPrefix(p string) []byte {
 	return key
 }
 
-const (
-	TokensKey      = "Tokens-value-"
-	TokensCountKey = "Tokens-count-"
-
-	// TokenMapKeyPrefix is the prefix to retrieve all TokenMap
-	TokenMapKeyPrefix = "TokenMap/value"
-
-	// TickKeyPrefix is the prefix to retrieve all Tick
-	BaseTickKeyPrefix = "Tick/value"
-
-	// TickLiquidityKeyPrefix is the prefix to retrieve all TickLiquidity
-	TickLiquidityKeyPrefix = "TickLiquidity/value/"
-)
-
-func TickPrefix(pairID *PairID) []byte {
-	return append(KeyPrefix(BaseTickKeyPrefix), KeyPrefix(pairID.Stringify())...)
-}
-
-// TokenMapKey returns the store key to retrieve a TokenMap from the index fields
-func TokenMapKey(address string) []byte {
-	var key []byte
-
-	addressBytes := []byte(address)
-	key = append(key, addressBytes...)
-	key = append(key, []byte("/")...)
-
-	return key
-}
-
 func TickIndexToBytes(tickIndex int64, pairID *PairID, tokenIn string) []byte {
 	// NOTE: We flip the sign on ticks storing token0 so that all liquidity is index left to right.
 	// This allows us to iterate through liquidity consistently regardless of 0to1 vs 1to0
@@ -83,9 +54,9 @@ func TickIndexToBytes(tickIndex int64, pairID *PairID, tokenIn string) []byte {
 	return key
 }
 
-// Limit Order Pool Mappings and Keys
 const (
-	BaseLimitOrderPrefix = "LimitOrderTranche/value"
+	// TickLiquidityKeyPrefix is the prefix to retrieve all TickLiquidity
+	TickLiquidityKeyPrefix = "TickLiquidity/value/"
 
 	// LimitOrderTrancheUserKeyPrefix is the prefix to retrieve all LimitOrderTrancheUser
 	LimitOrderTrancheUserKeyPrefix = "LimitOrderTrancheUser/value"
@@ -93,6 +64,7 @@ const (
 	// LimitOrderTrancheKeyPrefix is the prefix to retrieve all LimitOrderTranche
 	LimitOrderTrancheKeyPrefix = "LimitOrderTranche/value"
 
+	// InactiveLimitOrderTrancheKeyPrefix is the prefix to retrieve all InactiveLimitOrderTranche
 	InactiveLimitOrderTrancheKeyPrefix = "InactiveLimitOrderTranche/value/"
 
 	// LimitOrderExpirationKeyPrefix is the prefix to retrieve all LimitOrderExpiration
@@ -287,21 +259,6 @@ const (
 	DepositEventNewReserves0 = "NewReserves0"
 	DepositEventNewReserves1 = "NewReserves1"
 	DepositEventSharesMinted = "SharesMinted"
-)
-
-// DepositFailed Event Attributes
-const (
-	DepositFailEventKey          = "NewDeposit"
-	DepositFailEventCreator      = "Creator"
-	DepositFailEventToken0       = "Token0"
-	DepositFailEventToken1       = "Token1"
-	DepositFailEventPrice        = "TickIndex"
-	DepositFailEventFee          = "Fee"
-	DepositFailEventReceiver     = "Receiver"
-	DepositFailEventOldReserves0 = "OldReserves0"
-	DepositFailEventOldReserves1 = "OldReserves1"
-	DepositFailAmountToDeposit0  = "AmountToDeposit0"
-	DepositFailAmountToDeposit1  = "AmountToDeposit1"
 )
 
 // Withdraw Event Attributes
