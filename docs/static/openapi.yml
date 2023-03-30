@@ -36249,6 +36249,8 @@ definitions:
         type: array
         items:
           type: string
+  dualitylabs.duality.dex.MsgMultiHopSwapResponse:
+    type: object
   dualitylabs.duality.dex.MsgPlaceLimitOrderResponse:
     type: object
     properties:

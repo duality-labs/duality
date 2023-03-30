@@ -166,3 +166,12 @@ func (k msgServer) CancelLimitOrder(
 
 	return &types.MsgCancelLimitOrderResponse{}, nil
 }
+
+func (k msgServer) MultiHopSwap(goCtx context.Context, msg *types.MsgMultiHopSwap) (*types.MsgMultiHopSwapResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// TODO: Handling the message
+	_ = ctx
+
+	return &types.MsgMultiHopSwapResponse{}, nil
+}

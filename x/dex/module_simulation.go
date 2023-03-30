@@ -48,6 +48,10 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgCancelLimitOrder int = 100
 
+	opWeightMsgMultiHopSwap = "op_weight_msg_multi_hop_swap"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgMultiHopSwap int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -149,6 +153,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgCancelLimitOrder,
 		dexsimulation.SimulateMsgCancelLimitOrder(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgMultiHopSwap int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgMultiHopSwap, &weightMsgMultiHopSwap, nil,
+		func(_ *rand.Rand) {
+			weightMsgMultiHopSwap = defaultWeightMsgMultiHopSwap
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgMultiHopSwap,
+		dexsimulation.SimulateMsgMultiHopSwap(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation
