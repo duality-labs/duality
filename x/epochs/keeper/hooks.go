@@ -4,7 +4,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// AfterEpochEnd gets called at the end of the epoch, end of epoch is the timestamp of first block produced after epoch duration.
+// AfterEpochEnd gets called at the end of the epoch,
+// end of epoch is the timestamp of first block produced after epoch duration.
 func (k Keeper) AfterEpochEnd(ctx sdk.Context, identifier string, epochNumber int64) {
 	// Error is not handled as AfterEpochEnd Hooks use osmoutils.ApplyFuncIfNoError()
 	if k.hooks != nil {

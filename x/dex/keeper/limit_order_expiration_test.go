@@ -143,8 +143,8 @@ func TestPurgeExpiredLimitOrdersAtBlockGasLimit(t *testing.T) {
 	yesterday := now.AddDate(0, 0, -1)
 
 	expTimes := []time.Time{
-		types.JITGoodTilTime,
-		types.JITGoodTilTime,
+		types.JITGoodTilTime(),
+		types.JITGoodTilTime(),
 		yesterday,
 		yesterday,
 		yesterday,
@@ -178,13 +178,13 @@ func TestPurgeExpiredLimitOrdersAtBlockGasLimitOnlyJIT(t *testing.T) {
 	gasUsed := gasLimt - types.GoodTilPurgeGasBuffer - 30000
 
 	expTimes := []time.Time{
-		types.JITGoodTilTime,
-		types.JITGoodTilTime,
-		types.JITGoodTilTime,
-		types.JITGoodTilTime,
-		types.JITGoodTilTime,
-		types.JITGoodTilTime,
-		types.JITGoodTilTime,
+		types.JITGoodTilTime(),
+		types.JITGoodTilTime(),
+		types.JITGoodTilTime(),
+		types.JITGoodTilTime(),
+		types.JITGoodTilTime(),
+		types.JITGoodTilTime(),
+		types.JITGoodTilTime(),
 	}
 
 	createLimitOrderExpirationAndTranches(keeper, ctx, expTimes)

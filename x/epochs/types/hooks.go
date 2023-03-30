@@ -29,6 +29,7 @@ func (h MultiEpochHooks) AfterEpochEnd(ctx sdk.Context, epochIdentifier string, 
 	for i := range h {
 		panicCatchingEpochHook(ctx, h[i].AfterEpochEnd, epochIdentifier, epochNumber)
 	}
+
 	return nil
 }
 
@@ -37,6 +38,7 @@ func (h MultiEpochHooks) BeforeEpochStart(ctx sdk.Context, epochIdentifier strin
 	for i := range h {
 		panicCatchingEpochHook(ctx, h[i].BeforeEpochStart, epochIdentifier, epochNumber)
 	}
+
 	return nil
 }
 

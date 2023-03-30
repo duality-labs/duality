@@ -38,7 +38,7 @@ func CmdWithdrawal() *cobra.Command {
 			for _, s := range argSharesToRemove {
 				sharesToRemoveInt, ok := sdk.NewIntFromString(s)
 
-				if ok != true {
+				if !ok {
 					return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer Overflow for shares-to-remove")
 				}
 
@@ -80,6 +80,7 @@ func CmdWithdrawal() *cobra.Command {
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}

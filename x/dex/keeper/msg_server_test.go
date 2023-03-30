@@ -1,9 +1,7 @@
-//nolint:unused
 package keeper_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -170,7 +168,7 @@ func (s *MsgServerTestSuite) traceBalances() {
 	carolB := s.app.BankKeeper.GetBalance(s.ctx, s.carol, "TokenB")
 	danA := s.app.BankKeeper.GetBalance(s.ctx, s.dan, "TokenA")
 	danB := s.app.BankKeeper.GetBalance(s.ctx, s.dan, "TokenB")
-	fmt.Printf(
+	s.T().Logf(
 		"Alice: %+v %+v\nBob: %+v %+v\nCarol: %+v %+v\nDan: %+v %+v",
 		aliceA, aliceB,
 		bobA, bobB,

@@ -21,7 +21,7 @@ func CmdSwap() *cobra.Command {
 			argAmountIn := args[1]
 
 			amountInInt, ok := sdk.NewIntFromString(argAmountIn)
-			if ok != true {
+			if !ok {
 				return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for amount-in")
 			}
 
@@ -43,6 +43,7 @@ func CmdSwap() *cobra.Command {
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}

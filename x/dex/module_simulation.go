@@ -126,7 +126,11 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	))
 
 	var weightMsgWithdrawFilledLimitOrder int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgWithdrawFilledLimitOrder, &weightMsgWithdrawFilledLimitOrder, nil,
+	simState.AppParams.GetOrGenerate(
+		simState.Cdc,
+		opWeightMsgWithdrawFilledLimitOrder,
+		&weightMsgWithdrawFilledLimitOrder,
+		nil,
 		func(_ *rand.Rand) {
 			weightMsgWithdrawFilledLimitOrder = defaultWeightMsgWithdrawFilledLimitOrder
 		},

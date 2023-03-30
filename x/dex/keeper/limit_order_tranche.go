@@ -210,11 +210,10 @@ func (k Keeper) GetOrInitPlaceTranche(ctx sdk.Context,
 	// aggregating might be more efficient particularly for deletion, but if they are relatively sparse
 	// it will incur fewer lookups to just create a new limitOrderTranche
 	// Also trying to cancel aggregated good_til orders will be a PITA
-
-	//nolint:exhaustive
+	JITGoodTilTime := types.JITGoodTilTime()
 	switch orderType {
 	case types.LimitOrderType_JUST_IN_TIME:
-		placeTranche, err = NewLimitOrderTranche(ctx, pairID, tokenIn, tickIndex, &types.JITGoodTilTime)
+		placeTranche, err = NewLimitOrderTranche(ctx, pairID, tokenIn, tickIndex, &JITGoodTilTime)
 	case types.LimitOrderType_GOOD_TIL_TIME:
 		placeTranche, err = NewLimitOrderTranche(ctx, pairID, tokenIn, tickIndex, goodTil)
 	default:

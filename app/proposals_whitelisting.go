@@ -1,3 +1,4 @@
+//nolint:gochecknoglobals
 package app
 
 import (
@@ -28,6 +29,7 @@ func isParamChangeWhitelisted(paramChanges []proposal.ParamChange) bool {
 			return false
 		}
 	}
+
 	return true
 }
 

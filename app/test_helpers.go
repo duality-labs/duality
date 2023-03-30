@@ -45,6 +45,7 @@ func setup(withGenesis bool, invCheckPeriod uint) (*App, GenesisState) {
 	if withGenesis {
 		return app, NewDefaultGenesisState(encCdc.Marshaler)
 	}
+
 	return app, GenesisState{}
 }
 
@@ -155,6 +156,6 @@ type EmptyAppOptions struct {
 }
 
 // Get implements AppOptions
-func (ao EmptyAppOptions) Get(o string) interface{} {
+func (ao EmptyAppOptions) Get(_ string) interface{} {
 	return nil
 }

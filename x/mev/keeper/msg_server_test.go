@@ -1,4 +1,3 @@
-//nolint:unused,lll,containedctx
 package keeper_test
 
 import (

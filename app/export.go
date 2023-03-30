@@ -51,6 +51,8 @@ func (app *App) ExportAppStateAndValidators(
 // NOTE zero height genesis is a temporary feature which will be deprecated
 //
 //	in favour of export at a block height
+//
+//nolint:unparam,revive
 func (app *App) prepForZeroHeightGenesis(ctx sdk.Context, jailAllowedAddrs []string) {
 	/* Just to be safe, assert the invariants on current state. */
 	app.CrisisKeeper.AssertInvariants(ctx)
@@ -86,5 +88,6 @@ func (app *App) GetValidatorSet(ctx sdk.Context) ([]tmtypes.GenesisValidator, er
 	for _, v := range cVals {
 		vals = append(vals, tmtypes.GenesisValidator{Address: v.Address, Power: v.Power})
 	}
+
 	return vals, nil
 }

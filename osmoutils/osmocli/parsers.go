@@ -33,7 +33,7 @@ func ParseFieldsFromFlagsAndArgs[reqP any](flagAdvice FlagAdvice, flags *pflag.F
 			return req, err
 		}
 		if !usedArg {
-			argIndexOffset -= 1
+			argIndexOffset--
 		}
 	}
 	return req, nil
@@ -78,7 +78,14 @@ const paginationType = "*query.PageRequest"
 // ParseField parses field #fieldIndex from either an arg or a flag.
 // Returns true if it was parsed from an argument.
 // Returns error if there was an issue in parsing this field.
-func ParseField(v reflect.Value, t reflect.Type, fieldIndex int, arg string, flagAdvice FlagAdvice, flags *pflag.FlagSet) (bool, error) {
+func ParseField(
+	v reflect.Value,
+	t reflect.Type,
+	fieldIndex int,
+	arg string,
+	flagAdvice FlagAdvice,
+	flags *pflag.FlagSet,
+) (bool, error) {
 	fVal := v.Field(fieldIndex)
 	fType := t.Field(fieldIndex)
 	// fmt.Printf("Field %d: %s %s %s\n", fieldIndex, fType.Name, fType.Type, fType.Type.Kind())
@@ -109,7 +116,12 @@ func ParseField(v reflect.Value, t reflect.Type, fieldIndex int, arg string, fla
 // Otherwise, `false` is returned.
 // In the true case, the parsed value is set on the provided `reflect.Value`.
 // An error is returned if there is an issue parsing the field from the flag.
-func ParseFieldFromFlag(fVal reflect.Value, fType reflect.StructField, flagAdvice FlagAdvice, flags *pflag.FlagSet) (bool, error) {
+func ParseFieldFromFlag(
+	fVal reflect.Value,
+	fType reflect.StructField,
+	flagAdvice FlagAdvice,
+	flags *pflag.FlagSet,
+) (bool, error) {
 	lowercaseFieldNameStr := strings.ToLower(fType.Name)
 	if flagName, ok := flagAdvice.CustomFlagOverrides[lowercaseFieldNameStr]; ok {
 		return true, parseFieldFromDirectlySetFlag(fVal, fType, flagAdvice, flagName, flags)
@@ -144,13 +156,19 @@ func ParseFieldFromFlag(fVal reflect.Value, fType reflect.StructField, flagAdvic
 	return false, nil
 }
 
-func parseFieldFromDirectlySetFlag(fVal reflect.Value, fType reflect.StructField, flagAdvice FlagAdvice, flagName string, flags *pflag.FlagSet) error {
+func parseFieldFromDirectlySetFlag(
+	fVal reflect.Value,
+	fType reflect.StructField,
+	_ FlagAdvice,
+	flagName string,
+	flags *pflag.FlagSet,
+) error {
 	// get string. If its a string great, run through arg parser. Otherwise try setting directly
 	s, err := flags.GetString(flagName)
 	if err != nil {
 		flag := flags.Lookup(flagName)
 		if flag == nil {
-			return fmt.Errorf("Programmer set the flag name wrong. Flag %s does not exist", flagName)
+			return fmt.Errorf("programmer set the flag name wrong. Flag %s does not exist", flagName)
 		}
 		t := flag.Value.Type()
 		if t == "uint64" {

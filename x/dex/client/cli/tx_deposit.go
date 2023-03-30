@@ -16,6 +16,7 @@ import (
 
 func CmdDeposit() *cobra.Command {
 	cmd := &cobra.Command{
+		//nolint:lll
 		Use:     "deposit [receiver] [token-a] [token-b] [list of amount-0] [list of amount-1] [list of tick-index] [list of fees] [deposit option parameters]",
 		Short:   "Broadcast message deposit",
 		Example: "deposit alice tokenA tokenB 100,50 [-10,5] 1,1 false,false --from alice",
@@ -48,7 +49,7 @@ func CmdDeposit() *cobra.Command {
 
 			for _, s := range argAmountsA {
 				amountA, ok := sdk.NewIntFromString(s)
-				if ok != true {
+				if !ok {
 					return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for amountsA")
 				}
 
@@ -57,7 +58,7 @@ func CmdDeposit() *cobra.Command {
 
 			for _, s := range argAmountsB {
 				amountB, ok := sdk.NewIntFromString(s)
-				if ok != true {
+				if !ok {
 					return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for amountsB")
 				}
 
@@ -109,6 +110,7 @@ func CmdDeposit() *cobra.Command {
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}

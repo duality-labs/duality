@@ -327,7 +327,9 @@ const (
 	LiquidityTypeLimitOrder   = "B_LODeposit"
 )
 
-var JITGoodTilTime = time.Time{}
+func JITGoodTilTime() time.Time {
+	return time.Time{}
+}
 
 const (
 	// NOTE: This number is based current cost of all operations in EndBlock,

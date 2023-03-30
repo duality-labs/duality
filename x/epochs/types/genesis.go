@@ -19,6 +19,7 @@ func DefaultGenesis() *GenesisState {
 		NewGenesisEpochInfo("hour", time.Hour),
 		NewGenesisEpochInfo("week", time.Hour*24*7),
 	}
+
 	return NewGenesisState(epochs)
 }
 
@@ -35,6 +36,7 @@ func (gs GenesisState) Validate() error {
 		}
 		epochIdentifiers[epoch.Identifier] = true
 	}
+
 	return nil
 }
 
@@ -52,6 +54,7 @@ func (epoch EpochInfo) Validate() error {
 	if epoch.CurrentEpochStartHeight < 0 {
 		return errors.New("epoch CurrentEpoch must be non-negative")
 	}
+
 	return nil
 }
 

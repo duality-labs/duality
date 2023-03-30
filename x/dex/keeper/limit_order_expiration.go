@@ -90,7 +90,7 @@ func (k Keeper) PurgeExpiredLimitOrders(ctx sdk.Context, curTime time.Time) {
 		if val.ExpirationTime.After(curTime) {
 			return
 		}
-		inGoodTilSegment = inGoodTilSegment || val.ExpirationTime != types.JITGoodTilTime
+		inGoodTilSegment = inGoodTilSegment || val.ExpirationTime != types.JITGoodTilTime()
 		gasConsumed := curBlockGas + ctx.GasMeter().GasConsumed()
 
 		if inGoodTilSegment && gasConsumed >= gasCutoff {
