@@ -38,6 +38,7 @@ func (msg *MsgMultiHopSwap) GetSigners() []sdk.AccAddress {
 	if err != nil {
 		panic(err)
 	}
+
 	return []sdk.AccAddress{creator}
 }
 
