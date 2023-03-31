@@ -81,6 +81,14 @@ func (s *MsgServerTestSuite) fundAccountBalances(account sdk.AccAddress, aBalanc
 	s.assertAccountBalances(account, aBalance, bBalance)
 }
 
+func (s *MsgServerTestSuite) fundAccountBalancesExotic(addr sdk.AccAddress, amounts sdk.Coins) error {
+	if err := s.app.BankKeeper.MintCoins(s.ctx, types.ModuleName, amounts); err != nil {
+		return err
+	}
+
+	return s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, types.ModuleName, addr, amounts)
+}
+
 func (s *MsgServerTestSuite) fundAliceBalances(a, b int64) {
 	s.fundAccountBalances(s.alice, a, b)
 }
@@ -119,6 +127,12 @@ func (s *MsgServerTestSuite) assertAccountBalances(
 	s.assertAccountBalancesInt(account, sdk.NewInt(aBalance), sdk.NewInt(bBalance))
 }
 
+func (s *MsgServerTestSuite) assertAccountBalanceExotic(account sdk.AccAddress, denom string, expBalance int64) {
+	actualBalance := s.app.BankKeeper.GetBalance(s.ctx, account, denom).Amount
+	expBalanceInt := sdk.NewInt(expBalance)
+	s.Assert().True(expBalanceInt.Equal(actualBalance), "expected %s != actual %s", expBalance, actualBalance)
+}
+
 func (s *MsgServerTestSuite) assertAliceBalances(a, b int64) {
 	s.assertAccountBalances(s.alice, a, b)
 }
@@ -153,6 +167,10 @@ func (s *MsgServerTestSuite) assertDanBalancesInt(a, b sdk.Int) {
 
 func (s *MsgServerTestSuite) assertDexBalances(a, b int64) {
 	s.assertAccountBalances(s.app.AccountKeeper.GetModuleAddress("dex"), a, b)
+}
+
+func (s *MsgServerTestSuite) assertDexBalanceExotic(denom string, expectedAmount int64) {
+	s.assertAccountBalanceExotic(s.app.AccountKeeper.GetModuleAddress("dex"), denom, expectedAmount)
 }
 
 func (s *MsgServerTestSuite) assertDexBalancesInt(a, b sdk.Int) {
@@ -319,7 +337,7 @@ func NewDepositWithOptions(amountA, amountB, tickIndex, fee int, options Deposit
 }
 
 func (s *MsgServerTestSuite) aliceDeposits(deposits ...*Deposit) {
-	s.deposits(s.alice, deposits...)
+	s.deposits(s.alice, deposits)
 }
 
 func (s *MsgServerTestSuite) aliceDepositsWithOptions(deposits ...*DepositWithOptions) {
@@ -327,18 +345,18 @@ func (s *MsgServerTestSuite) aliceDepositsWithOptions(deposits ...*DepositWithOp
 }
 
 func (s *MsgServerTestSuite) bobDeposits(deposits ...*Deposit) {
-	s.deposits(s.bob, deposits...)
+	s.deposits(s.bob, deposits)
 }
 
 func (s *MsgServerTestSuite) carolDeposits(deposits ...*Deposit) {
-	s.deposits(s.carol, deposits...)
+	s.deposits(s.carol, deposits)
 }
 
 func (s *MsgServerTestSuite) danDeposits(deposits ...*Deposit) {
-	s.deposits(s.dan, deposits...)
+	s.deposits(s.dan, deposits)
 }
 
-func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits ...*Deposit) {
+func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits []*Deposit, pairID ...types.PairID) {
 	amountsA := make([]sdk.Int, len(deposits))
 	amountsB := make([]sdk.Int, len(deposits))
 	tickIndexes := make([]int64, len(deposits))
@@ -352,11 +370,23 @@ func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits ...*Depos
 		options[i] = &types.DepositOptions{Autoswap: false}
 	}
 
+	var tokenA, tokenB string
+	switch {
+	case len(pairID) == 0:
+		tokenA = "TokenA"
+		tokenB = "TokenB"
+	case len(pairID) == 1:
+		tokenA = pairID[0].Token0
+		tokenB = pairID[0].Token1
+	case len(pairID) > 1:
+		s.Assert().Fail("Only 1 pairID can be provided")
+	}
+
 	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
 		Creator:         account.String(),
 		Receiver:        account.String(),
-		TokenA:          "TokenA",
-		TokenB:          "TokenB",
+		TokenA:          tokenA,
+		TokenB:          tokenB,
 		AmountsA:        amountsA,
 		AmountsB:        amountsB,
 		TickIndexesAToB: tickIndexes,
@@ -672,6 +702,62 @@ func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr
 		TokenIn:  tokenIn,
 		TokenOut: tokenOut,
 		AmountIn: sdk.NewInt(int64(amountIn)),
+	})
+	s.Assert().ErrorIs(err, expectedErr)
+}
+
+/// MultiHopSwap
+
+func (s *MsgServerTestSuite) aliceMultiHopSwaps(hops []string, amountIn int, exitLimitPrice sdk.Dec) {
+	s.multiHopSwaps(s.alice, hops, amountIn, exitLimitPrice)
+}
+
+func (s *MsgServerTestSuite) bobMultiHopSwaps(hops []string, amountIn int, exitLimitPrice sdk.Dec) {
+	s.multiHopSwaps(s.bob, hops, amountIn, exitLimitPrice)
+}
+
+func (s *MsgServerTestSuite) carolMultiHopSwaps(hops []string, amountIn int, exitLimitPrice sdk.Dec) {
+	s.multiHopSwaps(s.carol, hops, amountIn, exitLimitPrice)
+}
+
+func (s *MsgServerTestSuite) danMultiHopSwaps(hops []string, amountIn int, exitLimitPrice sdk.Dec) {
+	s.multiHopSwaps(s.dan, hops, amountIn, exitLimitPrice)
+}
+
+func (s *MsgServerTestSuite) multiHopSwaps(account sdk.AccAddress, hops []string, amountIn int, exitLimitPrice sdk.Dec) {
+	_, err := s.msgServer.MultiHopSwap(s.goCtx, &types.MsgMultiHopSwap{
+		Creator:        account.String(),
+		Receiver:       account.String(),
+		Hops:           hops,
+		AmountIn:       sdk.NewInt(int64(amountIn)),
+		ExitLimitPrice: exitLimitPrice,
+	})
+	s.Assert().Nil(err)
+}
+
+func (s *MsgServerTestSuite) aliceMultiHopSwapFails(err error, hops []string, amountIn int, exitLimitPrice sdk.Dec) {
+	s.multiHopSwapFails(s.alice, err, hops, amountIn, exitLimitPrice)
+}
+
+func (s *MsgServerTestSuite) bobMultiHopSwapFails(err error, hops []string, amountIn int, exitLimitPrice sdk.Dec) {
+	s.multiHopSwapFails(s.bob, err, hops, amountIn, exitLimitPrice)
+}
+
+func (s *MsgServerTestSuite) carolMultiHopSwapFails(err error, hops []string, amountIn int, exitLimitPrice sdk.Dec) {
+	s.multiHopSwapFails(s.carol, err, hops, amountIn, exitLimitPrice)
+}
+
+func (s *MsgServerTestSuite) danMultiHopSwapFails(err error, hops []string, amountIn int, exitLimitPrice sdk.Dec) {
+	s.multiHopSwapFails(s.dan, err, hops, amountIn, exitLimitPrice)
+}
+
+func (s *MsgServerTestSuite) multiHopSwapFails(account sdk.AccAddress, expectedErr error, hops []string, amountIn int, exitLimitPrice sdk.Dec) {
+	_, err := s.msgServer.MultiHopSwap(s.goCtx, &types.MsgMultiHopSwap{
+		Creator:        account.String(),
+		Receiver:       account.String(),
+		Hops:           hops,
+		AmountIn:       sdk.NewInt(int64(amountIn)),
+		ExitLimitPrice: exitLimitPrice,
 	})
 	s.Assert().ErrorIs(err, expectedErr)
 }

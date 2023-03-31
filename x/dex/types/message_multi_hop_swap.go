@@ -9,7 +9,13 @@ const TypeMsgMultiHopSwap = "multi_hop_swap"
 
 var _ sdk.Msg = &MsgMultiHopSwap{}
 
-func NewMsgMultiHopSwap(creator string, receiever string, hops []string, amountIn sdk.Int, exitLimitPrice sdk.Dec) *MsgMultiHopSwap {
+func NewMsgMultiHopSwap(
+	creator string,
+	receiever string,
+	hops []string,
+	amountIn sdk.Int,
+	exitLimitPrice sdk.Dec,
+) *MsgMultiHopSwap {
 	return &MsgMultiHopSwap{
 		Creator:        creator,
 		Receiver:       receiever,

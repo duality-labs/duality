@@ -289,11 +289,14 @@ func (k Keeper) MultiHopSwapCore(
 	for i := 0; i < len(hops)-1; i++ {
 		tokenIn := hops[i]
 		tokenOut := hops[i+1]
-		pairId, err := CreatePairIdFromUnsorted(tokenIn, tokenOut)
+		pairID, err := CreatePairIDFromUnsorted(tokenIn, tokenOut)
 		if err != nil {
 			return sdk.Coin{}, err
 		}
-		amountIn, amountOut, err := k.Swap(ctx, pairId, tokenIn, tokenOut, inCoin.Amount, nil)
+		amountIn, amountOut, err := k.Swap(ctx, pairID, tokenIn, tokenOut, inCoin.Amount, nil)
+		if err != nil {
+			return sdk.Coin{}, err
+		}
 		if !amountIn.Equal(inCoin.Amount) {
 			// TODO: wrap with token failed at
 			return sdk.Coin{}, types.ErrInsufficientLiquidity
@@ -301,17 +304,19 @@ func (k Keeper) MultiHopSwapCore(
 		currentOutCoin = sdk.NewCoin(tokenOut, amountOut)
 	}
 
-	finalPrice := initialInCoin.Amount.ToDec().Quo(currentOutCoin.Amount.ToDec())
+	finalPrice := currentOutCoin.Amount.ToDec().Quo(initialInCoin.Amount.ToDec())
 
 	if exitLimitPrice.GT(finalPrice) {
-		// return error limitprice hit
+		return sdk.Coin{}, types.ErrExitLimitPriceHit
 	}
 
-	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{initialInCoin}); err != nil {
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{initialInCoin})
+	if err != nil {
 		return sdk.Coin{}, err
 	}
 
-	if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{currentOutCoin}); err != nil {
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{currentOutCoin})
+	if err != nil {
 		return sdk.Coin{}, err
 	}
 
