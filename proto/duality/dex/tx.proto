@@ -150,7 +150,7 @@ message MsgCancelLimitOrderResponse {
 
 message MsgMultiHopSwap {
   string creator = 1;
-  string receiever = 2;
+  string receiver = 2;
   repeated string hops = 3;
   string amountIn = 4 [
                        (gogoproto.moretags)   = "yaml:\"amountIn\"",

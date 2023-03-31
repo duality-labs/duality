@@ -169,7 +169,7 @@ func (k msgServer) CancelLimitOrder(
 
 func (k msgServer) MultiHopSwap(goCtx context.Context, msg *types.MsgMultiHopSwap) (*types.MsgMultiHopSwapResponse, error) {
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
-	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiever)
+	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
 	coinOut, err := k.MultiHopSwapCore(
 		goCtx,

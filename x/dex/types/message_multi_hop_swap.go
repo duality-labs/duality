@@ -12,7 +12,7 @@ var _ sdk.Msg = &MsgMultiHopSwap{}
 func NewMsgMultiHopSwap(creator string, receiever string, hops []string, amountIn sdk.Int, exitLimitPrice sdk.Dec) *MsgMultiHopSwap {
 	return &MsgMultiHopSwap{
 		Creator:        creator,
-		Receiever:      receiever,
+		Receiver:       receiever,
 		Hops:           hops,
 		AmountIn:       amountIn,
 		ExitLimitPrice: exitLimitPrice,
