@@ -33,7 +33,7 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 
 	tickIndexes := NormalizeAllTickIndexes(msg.TokenA, token0, msg.TickIndexesAToB)
 
-	Amounts0Deposit, Amounts1Deposit, err := k.DepositCore(
+	Amounts0Deposit, Amounts1Deposit, _, err := k.DepositCore(
 		goCtx,
 		token0,
 		token1,

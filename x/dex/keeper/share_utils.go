@@ -8,8 +8,62 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/types"
-	"github.com/duality-labs/duality/x/dex/utils"
 )
+
+type DepositDenom struct {
+	PairID *types.PairID
+	Tick   int64
+	Fee    uint64
+}
+
+func NewDepositDenom(pairId *types.PairID, tick int64, fee uint64) *DepositDenom {
+	return &DepositDenom{
+		PairID: pairId,
+		Tick:   tick,
+		Fee:    fee,
+	}
+}
+
+func NewDepositDenomFromString(denom string) (depositDenom *DepositDenom, err error) {
+	// NOTE: Since dashes are removed as part of CreateSharesId, if either side of the LP position are denoms that contain dashes
+	// they will not be parsed correctly and the correct dneom will not be returned
+	matchArr := LPSharesRegexp.FindAllStringSubmatch(denom, -1)
+	if matchArr == nil {
+		return nil, types.ErrInvalidDepositDenom
+	}
+
+	matches := matchArr[0][1:5]
+	tick, err := strconv.ParseInt(matches[2], 10, 0)
+	if err != nil {
+		return nil, types.ErrInvalidDepositDenom
+	}
+
+	fee, err := strconv.ParseUint(matches[3], 10, 0)
+	if err != nil {
+		return nil, types.ErrInvalidDepositDenom
+	}
+
+	return &DepositDenom{
+		PairID: &types.PairID{
+			Token0: matches[0],
+			Token1: matches[1],
+		},
+		Tick: tick,
+		Fee:  fee,
+	}, nil
+}
+
+func (d DepositDenom) String() string {
+	// TODO: Revist security of this.
+	prefix := DepositDenomPairIDPrefix(d.PairID.Token0, d.PairID.Token1)
+	return fmt.Sprintf("%s-t%d-f%d", prefix, d.Tick, d.Fee)
+}
+
+func DepositDenomPairIDPrefix(token0, token1 string) string {
+	t0 := strings.ReplaceAll(token0, "-", "")
+	t1 := strings.ReplaceAll(token1, "-", "")
+	return fmt.Sprintf("%s-%s-%s", types.DepositSharesPrefix, t0, t1)
+}
 
 const LPsharesRegexpStr = "^" + types.DepositSharesPrefix + "-" +
 	// Token0 (regexp from cosmos-sdk.types.coin.reDnmString)
@@ -22,13 +76,6 @@ const LPsharesRegexpStr = "^" + types.DepositSharesPrefix + "-" +
 	`f(\d+)`
 
 var LPSharesRegexp = regexp.MustCompile(LPsharesRegexpStr)
-
-func CreateSharesID(token0, token1 string, tickIndex int64, fee uint64) (denom string) {
-	t0 := strings.ReplaceAll(token0, "-", "")
-	t1 := strings.ReplaceAll(token1, "-", "")
-
-	return fmt.Sprintf("%s-%s-%s-t%d-f%d", types.DepositSharesPrefix, t0, t1, tickIndex, fee)
-}
 
 func ParseDepositShares(shares sdk.Coin) (matches []string, valid bool) {
 	// NOTE: Since dashes are removed as part of CreateSharesId,
@@ -43,29 +90,17 @@ func ParseDepositShares(shares sdk.Coin) (matches []string, valid bool) {
 }
 
 func DepositSharesToData(shares sdk.Coin) (types.DepositRecord, error) {
-	matches, valid := ParseDepositShares(shares)
-
-	if !valid {
-		return types.DepositRecord{}, types.ErrInvalidDepositShares
-	}
-
-	pairID := CreatePairID(matches[0], matches[1])
-	tickIndex, err := strconv.ParseInt(matches[2], 10, 0)
+	depositDenom, err := NewDepositDenomFromString(shares.Denom)
 	if err != nil {
-		return types.DepositRecord{}, types.ErrInvalidDepositShares
+		return types.DepositRecord{}, err
 	}
-	fee, err := strconv.ParseUint(matches[3], 10, 0)
-	if err != nil {
-		return types.DepositRecord{}, types.ErrInvalidDepositShares
-	}
-	feeUint := utils.MustSafeUint64(fee)
 
 	return types.DepositRecord{
-		PairID:          pairID,
+		PairID:          depositDenom.PairID,
 		SharesOwned:     shares.Amount,
-		CenterTickIndex: tickIndex,
-		LowerTickIndex:  tickIndex - feeUint,
-		UpperTickIndex:  tickIndex + feeUint,
-		Fee:             fee,
+		CenterTickIndex: depositDenom.Tick,
+		LowerTickIndex:  depositDenom.Tick - int64(depositDenom.Fee),
+		UpperTickIndex:  depositDenom.Tick + int64(depositDenom.Fee),
+		Fee:             depositDenom.Fee,
 	}, nil
 }
