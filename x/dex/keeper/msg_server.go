@@ -177,8 +177,9 @@ func (k msgServer) MultiHopSwap(
 	coinOut, err := k.MultiHopSwapCore(
 		goCtx,
 		msg.AmountIn,
-		msg.Hops,
+		msg.Routes,
 		msg.ExitLimitPrice,
+		msg.PickBestRoute,
 		callerAddr,
 		receiverAddr,
 	)

@@ -12,16 +12,23 @@ var _ sdk.Msg = &MsgMultiHopSwap{}
 func NewMsgMultiHopSwap(
 	creator string,
 	receiever string,
-	hops []string,
+	routesArr [][]string,
 	amountIn sdk.Int,
 	exitLimitPrice sdk.Dec,
+	pickBestRoute bool,
 ) *MsgMultiHopSwap {
+	routes := make([]*MultiHopRoute, len(routesArr))
+	for i, hops := range routesArr {
+		routes[i] = &MultiHopRoute{Hops: hops}
+	}
+
 	return &MsgMultiHopSwap{
 		Creator:        creator,
 		Receiver:       receiever,
-		Hops:           hops,
+		Routes:         routes,
 		AmountIn:       amountIn,
 		ExitLimitPrice: exitLimitPrice,
+		PickBestRoute:  pickBestRoute,
 	}
 }
 
@@ -57,7 +64,17 @@ func (msg *MsgMultiHopSwap) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
-	// TODO: validate len(hops) > 3 < MaxHops
+	expectedExitToken := msg.Routes[0].Hops[len(msg.Routes[0].Hops)-1]
+	for _, route := range msg.Routes[1:] {
+		hops := route.Hops
+		if expectedExitToken != hops[len(hops)-1] {
+			return ErrMultihopExitTokensMismatch
+		}
+	}
+
+	if msg.AmountIn.LTE(sdk.ZeroInt()) {
+		return ErrZeroSwap
+	}
 
 	return nil
 }

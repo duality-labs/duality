@@ -17,14 +17,20 @@ var _ = strconv.Itoa(0)
 
 func CmdMultiHopSwap() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "multi-hop-swap [receiver] [hops] [amount-in] [exit-limit-price]",
+		Use:   "multi-hop-swap [receiver] [routes] [amount-in] [exit-limit-price] [pick-best-route]",
 		Short: "Broadcast message multiHopSwap",
-		Args:  cobra.ExactArgs(4),
+		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiever := args[0]
-			argHops := strings.Split(args[1], ",")
+			argRoutes := strings.Split(args[1], ";")
 			argAmountIn := args[2]
 			argExitLimitPrice := args[3]
+			argPickBest := args[4]
+
+			routesArr := make([][]string, len(argRoutes))
+			for i, route := range argRoutes {
+				routesArr[i] = strings.Split(route, ",")
+			}
 
 			amountInInt, ok := sdk.NewIntFromString(argAmountIn)
 			if !ok {
@@ -35,6 +41,12 @@ func CmdMultiHopSwap() *cobra.Command {
 			if err != nil {
 				return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Invalid value for exit-limit-price")
 			}
+
+			pickBest, err := strconv.ParseBool(argPickBest)
+			if err != nil {
+				return err
+			}
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -43,9 +55,10 @@ func CmdMultiHopSwap() *cobra.Command {
 			msg := types.NewMsgMultiHopSwap(
 				clientCtx.GetFromAddress().String(),
 				argReceiever,
-				argHops,
+				routesArr,
 				amountInInt,
 				exitLimitPriceDec,
+				pickBest,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

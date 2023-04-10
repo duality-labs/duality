@@ -148,10 +148,14 @@ message MsgCancelLimitOrder {
 message MsgCancelLimitOrderResponse {
 }
 
+message MultiHopRoute {
+  repeated string hops = 1;
+}
+
 message MsgMultiHopSwap {
   string creator = 1;
   string receiver = 2;
-  repeated string hops = 3;
+  repeated MultiHopRoute routes = 3;
   string amountIn = 4 [
                        (gogoproto.moretags)   = "yaml:\"amountIn\"",
                        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
@@ -164,6 +168,9 @@ message MsgMultiHopSwap {
                              (gogoproto.nullable)   = false,
                              (gogoproto.jsontag) = "exitLimitPrice"
                              ];
+// If pickBestRoute == true then all routes are run and the route with the best price is chosen
+// otherwise, the first succesful route is used.
+  bool pickBestRoute = 6;
 }
 
 message MsgMultiHopSwapResponse {

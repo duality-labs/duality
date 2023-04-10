@@ -41,7 +41,7 @@ func (s *MsgServerTestSuite) SetupMultiplePools(poolSetups ...PoolSetup) {
 	}
 }
 
-func (s *MsgServerTestSuite) TestMultiHopSwap() {
+func (s *MsgServerTestSuite) TestMultiHopSwapSingleRoute() {
 	s.fundAliceBalances(100, 0)
 
 	// GIVEN liquidity in pools A<>B, B<>C, C<>D,
@@ -52,8 +52,8 @@ func (s *MsgServerTestSuite) TestMultiHopSwap() {
 	)
 
 	// WHEN alice multihopswaps A<>B => B<>C => C<>D,
-	hops := []string{"TokenA", "TokenB", "TokenC", "TokenD"}
-	s.aliceMultiHopSwaps(hops, 100, sdk.MustNewDecFromStr("0.9"))
+	route := [][]string{{"TokenA", "TokenB", "TokenC", "TokenD"}}
+	s.aliceMultiHopSwaps(route, 100, sdk.MustNewDecFromStr("0.9"), false)
 
 	// THEN alice gets out 99 TokenD
 	s.assertAccountBalanceExotic(s.alice, "TokenA", 0)
@@ -65,7 +65,7 @@ func (s *MsgServerTestSuite) TestMultiHopSwap() {
 	s.assertDexBalanceExotic("TokenD", 1)
 }
 
-func (s *MsgServerTestSuite) TestMultiHopSwapInsufficientLiquidity() {
+func (s *MsgServerTestSuite) TestMultiHopSwapInsufficientLiquiditySingleRoute() {
 	s.fundAliceBalances(100, 0)
 
 	// GIVEN liquidity in pools A<>B, B<>C, C<>D with insufficient liquidity in C<>D
@@ -76,11 +76,11 @@ func (s *MsgServerTestSuite) TestMultiHopSwapInsufficientLiquidity() {
 	)
 
 	// THEN alice multihopswap fails
-	hops := []string{"TokenA", "TokenB", "TokenC", "TokenD"}
-	s.aliceMultiHopSwapFails(types.ErrInsufficientLiquidity, hops, 100, sdk.MustNewDecFromStr("0.9"))
+	route := [][]string{{"TokenA", "TokenB", "TokenC", "TokenD"}}
+	s.aliceMultiHopSwapFails(types.ErrInsufficientLiquidity, route, 100, sdk.MustNewDecFromStr("0.9"), false)
 }
 
-func (s *MsgServerTestSuite) TestMultiHopSwapLimitPriceNotMet() {
+func (s *MsgServerTestSuite) TestMultiHopSwapLimitPriceNotMetSingleRoute() {
 	s.fundAliceBalances(100, 0)
 
 	// GIVEN liquidity in pools A<>B, B<>C, C<>D with insufficient liquidity in C<>D
@@ -91,6 +91,115 @@ func (s *MsgServerTestSuite) TestMultiHopSwapLimitPriceNotMet() {
 	)
 
 	// THEN alice multihopswap fails
-	hops := []string{"TokenA", "TokenB", "TokenC", "TokenD"}
-	s.aliceMultiHopSwapFails(types.ErrExitLimitPriceHit, hops, 50, sdk.MustNewDecFromStr("0.9"))
+	route := [][]string{{"TokenA", "TokenB", "TokenC", "TokenD"}}
+	s.aliceMultiHopSwapFails(types.ErrExitLimitPriceHit, route, 50, sdk.MustNewDecFromStr("0.9"), false)
+}
+
+func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteOneGood() {
+	s.fundAliceBalances(100, 0)
+
+	// GIVEN viable liquidity in pools A<>B, B<>E, E<>X
+	s.SetupMultiplePools(
+		NewPoolSetup("TokenA", "TokenB", 0, 100, 0, 1),
+		NewPoolSetup("TokenB", "TokenC", 0, 100, 0, 1),
+		NewPoolSetup("TokenC", "TokenX", 0, 50, 0, 1),
+		NewPoolSetup("TokenC", "TokenX", 0, 50, 2200, 1),
+		NewPoolSetup("TokenB", "TokenD", 0, 100, 0, 1),
+		NewPoolSetup("TokenD", "TokenX", 0, 50, 0, 1),
+		NewPoolSetup("TokenD", "TokenX", 0, 50, 2200, 1),
+		NewPoolSetup("TokenB", "TokenE", 0, 100, 0, 1),
+		NewPoolSetup("TokenE", "TokenX", 0, 100, 0, 1),
+	)
+
+	// WHEN alice multihopswaps with three routes the first two routes fail and the third works
+	routes := [][]string{
+		{"TokenA", "TokenB", "TokenC", "TokenX"},
+		{"TokenA", "TokenB", "TokenD", "TokenX"},
+		{"TokenA", "TokenB", "TokenE", "TokenX"},
+	}
+	s.aliceMultiHopSwaps(routes, 100, sdk.MustNewDecFromStr("0.9"), false)
+
+	// THEN swap succeeds through route A<>B, B<>E, E<>X
+
+	s.assertAccountBalanceExotic(s.alice, "TokenA", 0)
+	s.assertAccountBalanceExotic(s.alice, "TokenX", 99)
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenA", Token1: "TokenB"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenB", Token1: "TokenE"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenE", Token1: "TokenX"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
+
+	// Other pools are unaffected
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenB", Token1: "TokenC"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenC", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(50), 0, 1)
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenC", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(50), 2200, 1)
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenB", Token1: "TokenD"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenD", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(50), 0, 1)
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenD", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(50), 2200, 1)
+}
+
+func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteAllFail() {
+	s.fundAliceBalances(100, 0)
+
+	// GIVEN liquidity in sufficient liquidity but inadequate prices
+	s.SetupMultiplePools(
+		NewPoolSetup("TokenA", "TokenB", 0, 100, 0, 1),
+		NewPoolSetup("TokenB", "TokenC", 0, 100, 0, 1),
+		NewPoolSetup("TokenC", "TokenX", 0, 50, 0, 1),
+		NewPoolSetup("TokenC", "TokenX", 0, 50, 2200, 1),
+		NewPoolSetup("TokenB", "TokenD", 0, 100, 0, 1),
+		NewPoolSetup("TokenD", "TokenX", 0, 50, 0, 1),
+		NewPoolSetup("TokenD", "TokenX", 0, 50, 2200, 1),
+		NewPoolSetup("TokenB", "TokenE", 0, 50, 0, 1),
+		NewPoolSetup("TokenE", "TokenX", 0, 50, 2200, 1),
+	)
+
+	// WHEN alice multihopswaps with three routes they all fail
+	routes := [][]string{
+		{"TokenA", "TokenB", "TokenC", "TokenX"},
+		{"TokenA", "TokenB", "TokenD", "TokenX"},
+		{"TokenA", "TokenB", "TokenE", "TokenX"},
+	}
+
+	// Then fails with findBestRoute
+	s.aliceMultiHopSwapFails(types.ErrExitLimitPriceHit, routes, 100, sdk.MustNewDecFromStr("0.9"), true)
+
+	// and with findFirstRoute
+
+	s.aliceMultiHopSwapFails(types.ErrInsufficientLiquidity, routes, 100, sdk.MustNewDecFromStr("0.9"), false)
+}
+
+func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteFindBestRoute() {
+	s.fundAliceBalances(100, 0)
+
+	// GIVEN viable liquidity in pools but with a best route through E<>X
+	s.SetupMultiplePools(
+		NewPoolSetup("TokenA", "TokenB", 0, 100, 0, 1),
+		NewPoolSetup("TokenB", "TokenC", 0, 100, 0, 1),
+		NewPoolSetup("TokenC", "TokenX", 0, 1000, -1000, 1),
+		NewPoolSetup("TokenB", "TokenD", 0, 100, 0, 1),
+		NewPoolSetup("TokenD", "TokenX", 0, 1000, -2000, 1),
+		NewPoolSetup("TokenB", "TokenE", 0, 100, 0, 1),
+		NewPoolSetup("TokenE", "TokenX", 0, 1000, -3000, 1),
+	)
+
+	// WHEN alice multihopswaps with three routes
+	routes := [][]string{
+		{"TokenA", "TokenB", "TokenC", "TokenX"},
+		{"TokenA", "TokenB", "TokenD", "TokenX"},
+		{"TokenA", "TokenB", "TokenE", "TokenX"},
+	}
+	s.aliceMultiHopSwaps(routes, 100, sdk.MustNewDecFromStr("0.9"), true)
+
+	// THEN swap succeeds through route A<>B, B<>E, E<>X
+
+	s.assertAccountBalanceExotic(s.alice, "TokenA", 0)
+	s.assertAccountBalanceExotic(s.alice, "TokenX", 134)
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenA", Token1: "TokenB"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenB", Token1: "TokenE"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenE", Token1: "TokenX"}, sdk.NewInt(100), sdk.NewInt(866), -3000, 1)
+
+	// Other pools are unaffected
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenB", Token1: "TokenC"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenC", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(1000), -1000, 1)
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenB", Token1: "TokenD"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenD", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(1000), -2000, 1)
 }

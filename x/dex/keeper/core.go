@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -50,7 +51,6 @@ func (k Keeper) DepositCore(
 		feeUInt := utils.MustSafeUint64(fee)
 		lowerTickIndex := tickIndex - feeUInt
 		upperTickIndex := tickIndex + feeUInt
-
 		// behind enemy lines checks
 		// TODO: Allow user to deposit "behind enemy lines"
 		if amount0.IsPositive() && k.IsBehindEnemyLines(ctx, pairID, pairID.Token0, lowerTickIndex) {
@@ -242,7 +242,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		return sdk.Coin{}, err
 	}
 
-	amountIn, amountOut, err := k.Swap(ctx, pairID, tokenIn, tokenOut, amountIn, nil)
+	amountIn, amountOut, err := k.SwapWithCache(ctx, pairID, tokenIn, tokenOut, amountIn, nil)
 	if err != nil {
 		return sdk.Coin{}, err
 	}
@@ -276,51 +276,53 @@ func (k Keeper) SwapCore(goCtx context.Context,
 func (k Keeper) MultiHopSwapCore(
 	goCtx context.Context,
 	amountIn sdk.Int,
-	hops []string,
+	routes []*types.MultiHopRoute,
 	exitLimitPrice sdk.Dec,
+	pickBestRoute bool,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
 ) (coinOut sdk.Coin, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	initialInCoin := sdk.NewCoin(hops[0], amountIn)
-	var currentOutCoin sdk.Coin
-	inCoin := initialInCoin
+	var routeErrors []error
+	initialInCoin := sdk.NewCoin(routes[0].Hops[0], amountIn)
+	stepCache := make(map[string]StepResult)
+	var bestWrite func()
+	bestCoinOut := sdk.Coin{Amount: sdk.ZeroInt()}
 
-	for i := 0; i < len(hops)-1; i++ {
-		tokenIn := hops[i]
-		tokenOut := hops[i+1]
-		pairID, err := CreatePairIDFromUnsorted(tokenIn, tokenOut)
+	for _, route := range routes {
+		routeCoinOut, writeRoute, err := k.RunMultihopRoute(ctx, *route, initialInCoin, exitLimitPrice, stepCache)
 		if err != nil {
-			return sdk.Coin{}, err
+			routeErrors = append(routeErrors, err)
+			continue
 		}
-		amountIn, amountOut, err := k.Swap(ctx, pairID, tokenIn, tokenOut, inCoin.Amount, nil)
-		if err != nil {
-			return sdk.Coin{}, err
+
+		if !pickBestRoute || bestCoinOut.Amount.LT(routeCoinOut.Amount) {
+			bestCoinOut = routeCoinOut
+			bestWrite = writeRoute
 		}
-		if !amountIn.Equal(inCoin.Amount) {
-			// TODO: wrap with token failed at
-			return sdk.Coin{}, types.ErrInsufficientLiquidity
+		if !pickBestRoute {
+			break
 		}
-		currentOutCoin = sdk.NewCoin(tokenOut, amountOut)
 	}
 
-	finalPrice := currentOutCoin.Amount.ToDec().Quo(initialInCoin.Amount.ToDec())
-
-	if exitLimitPrice.GT(finalPrice) {
-		return sdk.Coin{}, types.ErrExitLimitPriceHit
+	if len(routeErrors) == len(routes) {
+		// All routes have failed
+		allErr := errors.Join(routeErrors...)
+		return sdk.Coin{}, allErr
 	}
 
+	bestWrite()
 	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{initialInCoin})
 	if err != nil {
 		return sdk.Coin{}, err
 	}
 
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{currentOutCoin})
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{bestCoinOut})
 	if err != nil {
 		return sdk.Coin{}, err
 	}
 
-	return currentOutCoin, nil
+	return coinOut, nil
 }
 
 // Handles MsgPlaceLimitOrder, initializing (tick, pair) data structures if needed, calculating and
@@ -365,8 +367,7 @@ func (k Keeper) PlaceLimitOrderCore(
 		var amountInSwap, amountOutSwap sdk.Int
 
 		limitPrice := placeTranche.PriceMakerToTaker().ToDec()
-
-		amountInSwap, amountOutSwap, err = k.Swap(
+		amountInSwap, amountOutSwap, err = k.SwapWithCache(
 			ctx,
 			pairID,
 			tokenIn,
