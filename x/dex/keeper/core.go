@@ -156,7 +156,7 @@ func (k Keeper) WithdrawCore(
 			return err
 		}
 
-		sharesID := NewDepositDenom(&types.PairID{Token0: token0, Token1: token1}, tickIndex, fee).String()
+		sharesID := types.NewDepositDenom(&types.PairID{Token0: token0, Token1: token1}, tickIndex, fee).String()
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesID).Amount
 
 		if totalShares.LT(sharesToRemove) {

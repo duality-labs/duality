@@ -5,7 +5,6 @@ import (
 	time "time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	dexkeeper "github.com/duality-labs/duality/x/dex/keeper"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	. "github.com/duality-labs/duality/x/incentives/types"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +17,7 @@ func TestLocksCoinsByQueryCondition(t *testing.T) {
 
 	allCoins := sdk.Coins{
 		sdk.NewInt64Coin(
-			dexkeeper.NewDepositDenom(
+			dextypes.NewDepositDenom(
 				&dextypes.PairID{
 					Token0: "coin1",
 					Token1: "coin2",
@@ -29,7 +28,7 @@ func TestLocksCoinsByQueryCondition(t *testing.T) {
 			100,
 		),
 		sdk.NewInt64Coin(
-			dexkeeper.NewDepositDenom(
+			dextypes.NewDepositDenom(
 				&dextypes.PairID{
 					Token0: "coin1",
 					Token1: "coin2",
@@ -40,7 +39,7 @@ func TestLocksCoinsByQueryCondition(t *testing.T) {
 			200,
 		),
 		sdk.NewInt64Coin(
-			dexkeeper.NewDepositDenom(
+			dextypes.NewDepositDenom(
 				&dextypes.PairID{
 					Token0: "coin1",
 					Token1: "coin2",

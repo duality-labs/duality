@@ -733,7 +733,7 @@ func (s *MsgServerTestSuite) getPoolShares(
 	tick int64,
 	fee uint64,
 ) (shares sdk.Int) {
-	sharesID := NewDepositDenom(&types.PairID{Token0: token0, Token1: token1}, tick, fee).String()
+	sharesID := types.NewDepositDenom(&types.PairID{Token0: token0, Token1: token1}, tick, fee).String()
 	return s.app.BankKeeper.GetSupply(s.ctx, sharesID).Amount
 }
 
@@ -754,7 +754,7 @@ func (s *MsgServerTestSuite) getAccountShares(
 	tick int64,
 	fee uint64,
 ) (shares sdk.Int) {
-	sharesID := NewDepositDenom(&types.PairID{Token0: token0, Token1: token1}, tick, fee).String()
+	sharesID := types.NewDepositDenom(&types.PairID{Token0: token0, Token1: token1}, tick, fee).String()
 	return s.app.BankKeeper.GetBalance(s.ctx, account, sharesID).Amount
 }
 

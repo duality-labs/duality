@@ -3,16 +3,16 @@ package types
 import (
 	"strings"
 
-	dexkeeper "github.com/duality-labs/duality/x/dex/keeper"
+	dextypes "github.com/duality-labs/duality/x/dex/types"
 )
 
 func (qc QueryCondition) Test(denom string) bool {
-	denomPrefix := dexkeeper.DepositDenomPairIDPrefix(qc.PairID.Token0, qc.PairID.Token1)
+	denomPrefix := dextypes.DepositDenomPairIDPrefix(qc.PairID.Token0, qc.PairID.Token1)
 	if !strings.Contains(denom, denomPrefix) {
 		return false
 	}
 
-	depositDenom, err := dexkeeper.NewDepositDenomFromString(denom)
+	depositDenom, err := dextypes.NewDepositDenomFromString(denom)
 	if err != nil {
 		return false
 	}

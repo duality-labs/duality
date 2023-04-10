@@ -3,7 +3,6 @@ package keeper_test
 import (
 	"time"
 
-	dexkeeper "github.com/duality-labs/duality/x/dex/keeper"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"
 
@@ -69,10 +68,10 @@ func (suite *KeeperTestSuite) SetupLock(
 	return lock
 }
 
-func GetQualifyingDenom(qc types.QueryCondition) *dexkeeper.DepositDenom {
+func GetQualifyingDenom(qc types.QueryCondition) *dextypes.DepositDenom {
 	tick := qc.StartTick + (qc.EndTick-qc.StartTick)/2
 	fee := (qc.EndTick - qc.StartTick) / 3
-	return dexkeeper.NewDepositDenom(
+	return dextypes.NewDepositDenom(
 		qc.PairID,
 		tick,
 		uint64(fee),

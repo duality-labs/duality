@@ -2,7 +2,6 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	dexkeeper "github.com/duality-labs/duality/x/dex/keeper"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"
 )
@@ -46,7 +45,7 @@ func getLockRefKeys(lock *types.Lock) ([][]byte, error) {
 	refKeys = append(refKeys, types.CombineKeys(lockRefPrefix, types.KeyPrefixLockIndexAccount, owner))
 
 	for _, coin := range lock.Coins {
-		depositDenom, err := dexkeeper.NewDepositDenomFromString(coin.Denom)
+		depositDenom, err := dextypes.NewDepositDenomFromString(coin.Denom)
 		if err != nil {
 			panic("Only valid LP tokens should be locked")
 		}

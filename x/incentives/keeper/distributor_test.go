@@ -6,7 +6,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/app"
-	dexkeeper "github.com/duality-labs/duality/x/dex/keeper"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	. "github.com/duality-labs/duality/x/incentives/keeper"
 	"github.com/duality-labs/duality/x/incentives/types"
@@ -55,8 +54,8 @@ func TestDistributor(t *testing.T) {
 		sdk.Coins{},
 		0,
 	)
-	rewardedDenom := dexkeeper.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 5, 1).String()
-	nonRewardedDenom := dexkeeper.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 12, 1).String()
+	rewardedDenom := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 5, 1).String()
+	nonRewardedDenom := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 12, 1).String()
 	allLocks := types.Locks{
 		{1, "addr1", time.Minute, time.Time{}, sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(50))}},
 		{2, "addr2", time.Minute, time.Time{}, sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}},
