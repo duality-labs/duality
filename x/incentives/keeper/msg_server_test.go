@@ -68,53 +68,48 @@ var tenTokens = sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100000
 // 	}
 
 // 	for _, tc := range tests {
-// 		suite.SetupTest()
+// 		suite.T().Run(tc.name, func(t *testing.T) {
+// 			suite.SetupTest()
 
-// 		testAccountPubkey := secp256k1.GenPrivKeyFromSecret([]byte("acc")).PubKey()
-// 		testAccountAddress := sdk.AccAddress(testAccountPubkey.Address())
+// 			ctx := suite.Ctx
+// 			msgServer := keeper.NewMsgServerImpl(&suite.App.IncentivesKeeper)
 
-// 		ctx := suite.Ctx
-// 		bankKeeper := suite.App.BankKeeper
-// 		// accountKeeper := suite.App.AccountKeeper
-// 		msgServer := keeper.NewMsgServerImpl(&suite.App.IncentivesKeeper)
+// 			suite.SetupLock(suite.SetupAddr(0), , defaultLPTokens, defaultLockDuration)
+// 			distrTo := types.QueryCondition{
+// 				// TODO
+// 				// LockQueryType: types.ByDuration,
+// 				// Denom:         defaultLPDenom,
+// 				// Duration:      defaultLockDuration,
+// 			}
 
-// 		suite.FundAcc(testAccountAddress, tc.accountBalanceToFund)
+// 			msg := &types.MsgCreateGauge{
+// 				IsPerpetual:       tc.isPerpetual,
+// 				Owner:             testAccountAddress.String(),
+// 				DistributeTo:      distrTo,
+// 				Coins:             tc.gaugeAddition,
+// 				StartTime:         time.Now(),
+// 				NumEpochsPaidOver: 1,
+// 			}
+// 			// System under test.
+// 			_, err := msgServer.CreateGauge(sdk.WrapSDKContext(ctx), msg)
 
-// 		suite.SetupManyLocks(1, defaultLiquidTokens, defaultLPTokens, defaultLockDuration)
-// 		distrTo := types.QueryCondition{
-// 			// TODO
-// 			// LockQueryType: types.ByDuration,
-// 			// Denom:         defaultLPDenom,
-// 			// Duration:      defaultLockDuration,
-// 		}
+// 			if tc.expectErr {
+// 				suite.Require().Error(err)
+// 			} else {
+// 				suite.Require().NoError(err)
+// 			}
 
-// 		msg := &types.MsgCreateGauge{
-// 			IsPerpetual:       tc.isPerpetual,
-// 			Owner:             testAccountAddress.String(),
-// 			DistributeTo:      distrTo,
-// 			Coins:             tc.gaugeAddition,
-// 			StartTime:         time.Now(),
-// 			NumEpochsPaidOver: 1,
-// 		}
-// 		// System under test.
-// 		_, err := msgServer.CreateGauge(sdk.WrapSDKContext(ctx), msg)
+// 			balanceAmount := bankKeeper.GetAllBalances(ctx, testAccountAddress)
 
-// 		if tc.expectErr {
-// 			suite.Require().Error(err)
-// 		} else {
-// 			suite.Require().NoError(err)
-// 		}
-
-// 		balanceAmount := bankKeeper.GetAllBalances(ctx, testAccountAddress)
-
-// 		if tc.expectErr {
-// 			suite.Require().Equal(tc.accountBalanceToFund.String(), balanceAmount.String(), "test: %v", tc.name)
-// 		} else {
-// 			fee := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, types.CreateGaugeFee))
-// 			accountBalance := tc.accountBalanceToFund.Sub(tc.gaugeAddition)
-// 			finalAccountBalance := accountBalance.Sub(fee)
-// 			suite.Require().Equal(finalAccountBalance.String(), balanceAmount.String(), "test: %v", tc.name)
-// 		}
+// 			if tc.expectErr {
+// 				suite.Require().Equal(tc.accountBalanceToFund.String(), balanceAmount.String(), "test: %v", tc.name)
+// 			} else {
+// 				fee := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, types.CreateGaugeFee))
+// 				accountBalance := tc.accountBalanceToFund.Sub(tc.gaugeAddition)
+// 				finalAccountBalance := accountBalance.Sub(fee)
+// 				suite.Require().Equal(finalAccountBalance.String(), balanceAmount.String(), "test: %v", tc.name)
+// 			}
+// 		})
 // 	}
 // }
 

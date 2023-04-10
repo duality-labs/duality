@@ -5,8 +5,7 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	dexkeeper "github.com/duality-labs/duality/x/dex/keeper"
-	dextypes "github.com/duality-labs/duality/x/dex/keeper"
+	dextypes "github.com/duality-labs/duality/x/dex/types"
 )
 
 // NewLock returns a new instance of period lock.
@@ -66,7 +65,7 @@ func (p Lock) CoinsPassingQueryCondition(distrTo QueryCondition) sdk.Coins {
 
 	default:
 		// Binary search the amount of coins remaining
-		denomPrefix := dexkeeper.DepositDenomPairIDPrefix(distrTo.PairID.Token0, distrTo.PairID.Token1)
+		denomPrefix := dextypes.DepositDenomPairIDPrefix(distrTo.PairID.Token0, distrTo.PairID.Token1)
 		coins := sdk.Coins{}
 		low := 0
 		high := len(coins)

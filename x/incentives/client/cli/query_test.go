@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/duality-labs/duality/app/apptesting"
-	dexkeeper "github.com/duality-labs/duality/x/dex/keeper"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/keeper"
 	"github.com/duality-labs/duality/x/incentives/types"
@@ -36,7 +35,7 @@ func (s *QueryTestSuite) SetupSuite() {
 	s.Setup()
 	s.queryClient = types.NewQueryClient(s.QueryHelper)
 
-	denom := dexkeeper.NewDepositDenom(
+	denom := dextypes.NewDepositDenom(
 		&dextypes.PairID{
 			Token0: "TokenA",
 			Token1: "TokenB",

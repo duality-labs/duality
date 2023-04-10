@@ -12,7 +12,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
-	dexkeeper "github.com/duality-labs/duality/x/dex/keeper"
+	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"
 )
 
@@ -197,7 +197,7 @@ func (q QueryServer) filterByPrefixAndDenom(ctx sdk.Context, prefixType []byte, 
 	gauges := types.Gauges{}
 	store := ctx.KVStore(q.Keeper.storeKey)
 	valStore := prefix.NewStore(store, prefixType)
-	depositDenom, err := dexkeeper.NewDepositDenomFromString(denom)
+	depositDenom, err := dextypes.NewDepositDenomFromString(denom)
 	if err != nil {
 		return nil, nil, err
 	}

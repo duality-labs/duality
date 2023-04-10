@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	dexkeeper "github.com/duality-labs/duality/x/dex/keeper"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"
 
@@ -15,7 +14,7 @@ var _ DistributorKeeper = Keeper{}
 
 func (k Keeper) ValueForShares(ctx sdk.Context, coin sdk.Coin, tick int64) (sdk.Int, error) {
 	totalShares := k.bk.GetSupply(ctx, coin.Denom).Amount
-	depositDenom, err := dexkeeper.NewDepositDenomFromString(coin.Denom)
+	depositDenom, err := dextypes.NewDepositDenomFromString(coin.Denom)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
@@ -111,7 +110,7 @@ func (k Keeper) GetRewardsEstimate(ctx sdk.Context, addr sdk.AccAddress, filterL
 	pairSet := map[dextypes.PairID]bool{}
 	for _, l := range filterLocks {
 		for _, c := range l.Coins {
-			depositDenom, err := dexkeeper.NewDepositDenomFromString(c.Denom)
+			depositDenom, err := dextypes.NewDepositDenomFromString(c.Denom)
 			if err != nil {
 				panic("all locks should be valid deposit denoms")
 			}

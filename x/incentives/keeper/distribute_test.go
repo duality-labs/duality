@@ -9,7 +9,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/app/apptesting"
-	dexkeeper "github.com/duality-labs/duality/x/dex/keeper"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"
 )
@@ -46,7 +45,7 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 				},
 			},
 			coin: sdk.NewInt64Coin(
-				dexkeeper.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).String(),
+				dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).String(),
 				20,
 			),
 			tick:        1000,
@@ -64,7 +63,7 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 				},
 			},
 			coin: sdk.NewInt64Coin(
-				dexkeeper.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).String(),
+				dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).String(),
 				20,
 			),
 			tick:        0,
@@ -89,7 +88,7 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 				},
 			},
 			coin: sdk.NewInt64Coin(
-				dexkeeper.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).String(),
+				dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).String(),
 				20,
 			),
 			tick:        1000,
@@ -114,7 +113,7 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 				},
 			},
 			coin: sdk.NewInt64Coin(
-				dexkeeper.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).String(),
+				dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).String(),
 				20,
 			),
 			tick:        1000,

@@ -184,7 +184,7 @@ func (p *Pool) Deposit(
 }
 
 func (p *Pool) GetDepositDenom() string {
-	return NewDepositDenom(p.LowerTick0.PairID, p.CenterTickIndex, p.Fee).String()
+	return types.NewDepositDenom(p.LowerTick0.PairID, p.CenterTickIndex, p.Fee).String()
 }
 
 func (p *Pool) MustCalcPrice1To0Center() *types.Price {
