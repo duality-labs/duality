@@ -1,31 +1,34 @@
 package apptesting
 
 import (
+	"crypto/rand"
+	"fmt"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/store/rootmulti"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/duality-labs/duality/app"
 	"github.com/stretchr/testify/suite"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/ed25519"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
-
-	"github.com/duality-labs/duality/app"
 )
 
 type KeeperTestHelper struct {
 	suite.Suite
 
-	App         *app.App
-	Ctx         sdk.Context
+	App *app.App
+	Ctx sdk.Context
+	// Used for testing queries end to end.
+	// You can wrap this in a module-specific QueryClient()
+	// and then make calls as you would a normal GRPC client.
 	QueryHelper *baseapp.QueryServiceTestHelper
-	TestAccs    []sdk.AccAddress
 }
 
 var (
@@ -43,7 +46,6 @@ func (s *KeeperTestHelper) Setup() {
 	}
 
 	s.SetEpochStartTime()
-	s.TestAccs = CreateRandomAccounts(3)
 }
 
 // func (s *KeeperTestHelper) SetupTestForInitGenesis() {
@@ -63,6 +65,35 @@ func (s *KeeperTestHelper) SetEpochStartTime() {
 			panic(err)
 		}
 	}
+}
+
+// setupAddr takes a balance, prefix, and address number. Then returns the respective account address byte array.
+// If prefix is left blank, it will be replaced with a random prefix.
+func SetupAddr(index int) sdk.AccAddress {
+	prefixBz := make([]byte, 8)
+	_, _ = rand.Read(prefixBz)
+	prefix := string(prefixBz)
+	addr := sdk.AccAddress([]byte(fmt.Sprintf("addr%s%8d", prefix, index)))
+	return addr
+}
+
+func SetupAddrs(numAddrs int) []sdk.AccAddress {
+	addrs := make([]sdk.AccAddress, numAddrs)
+	for i := 0; i < numAddrs; i++ {
+		addrs[i] = SetupAddr(i)
+	}
+	return addrs
+}
+
+// These are for testing msg.ValidateBasic() functions
+// which need to validate for valid/invalid addresses.
+// Should not be used for anything else because these addresses
+// are totally uninterpretable (100% random).
+func GenerateTestAddrs() (string, string) {
+	pk1 := ed25519.GenPrivKey().PubKey()
+	validAddr := sdk.AccAddress(pk1.Address()).String()
+	invalidAddr := sdk.AccAddress("").String()
+	return validAddr, invalidAddr
 }
 
 // CreateTestContext creates a test context.
@@ -93,15 +124,18 @@ func (s *KeeperTestHelper) Commit() {
 
 // FundAcc funds target address with specified amount.
 func (s *KeeperTestHelper) FundAcc(acc sdk.AccAddress, amounts sdk.Coins) {
-	err := simapp.FundAccount(s.App.BankKeeper, s.Ctx, acc, amounts)
+	err := s.App.BankKeeper.MintCoins(s.Ctx, banktypes.ModuleName, amounts)
+	s.Require().NoError(err)
+
+	err = s.App.BankKeeper.SendCoinsFromModuleToAccount(s.Ctx, banktypes.ModuleName, acc, amounts)
 	s.Require().NoError(err)
 }
 
-// FundModuleAcc funds target modules with specified amount.
-func (s *KeeperTestHelper) FundModuleAcc(moduleName string, amounts sdk.Coins) {
-	err := simapp.FundModuleAccount(s.App.BankKeeper, s.Ctx, moduleName, amounts)
-	s.Require().NoError(err)
-}
+// // FundModuleAcc funds target modules with specified amount.
+// func (s *KeeperTestHelper) FundModuleAcc(moduleName string, amounts sdk.Coins) {
+// 	err := simapp.FundModuleAccount(s.App.BankKeeper, s.Ctx, moduleName, amounts)
+// 	s.Require().NoError(err)
+// }
 
 // func (s *KeeperTestHelper) MintCoins(coins sdk.Coins) {
 // 	err := s.App.BankKeeper.MintCoins(s.Ctx, minttypes.ModuleName, coins)
@@ -239,11 +273,11 @@ func (s *KeeperTestHelper) SetupMultipleValidators(numValidator int) []string {
 // }
 
 // LockTokens funds an account, locks tokens and returns a lockID.
-// func (s *KeeperTestHelper) LockTokens(addr sdk.AccAddress, coins sdk.Coins, duration time.Duration) (lockID uint64) {
-// 	msgServer := lockupkeeper.NewMsgServerImpl(s.App.LockupKeeper)
+// func (s *KeeperTestHelper) SetupLock(addr sdk.AccAddress, coins sdk.Coins, duration time.Duration) (lockID uint64) {
+// 	msgServer := lockupkeeper.NewMsgServerImpl(s.app.IncentivesKeeper)
 // 	s.FundAcc(addr, coins)
 
-// 	msgResponse, err := msgServer.LockTokens(sdk.WrapSDKContext(s.Ctx), lockuptypes.NewMsgLockTokens(addr, duration, coins))
+// 	msgResponse, err := msgServer.SetupLock(sdk.WrapSDKContext(s.Ctx), lockuptypes.NewMsgSetupLock(addr, duration, coins))
 // 	s.Require().NoError(err)
 
 // 	return msgResponse.ID
@@ -271,28 +305,59 @@ func (s *KeeperTestHelper) SetupMultipleValidators(numValidator int) []string {
 // }
 
 // StateNotAltered validates that app state is not altered. Fails if it is.
-// func (s *KeeperTestHelper) StateNotAltered() {
-// 	oldState := s.App.ExportState(s.Ctx)
-// 	s.App.Commit()
-// 	newState := s.App.ExportState(s.Ctx)
-// 	s.Require().Equal(oldState, newState)
+func (s *KeeperTestHelper) StateNotAltered() {
+	oldState := s.App.ExportState(s.Ctx)
+	s.App.Commit()
+	newState := s.App.ExportState(s.Ctx)
+	s.Require().Equal(oldState, newState)
+}
+
+// // CreateRandomAccounts is a function return a list of randomly generated AccAddresses
+// func CreateRandomAccounts(numAccts int) []sdk.AccAddress {
+// 	testAddrs := make([]sdk.AccAddress, numAccts)
+// 	for i := 0; i < numAccts; i++ {
+// 		pk := ed25519.GenPrivKey().PubKey()
+// 		testAddrs[i] = sdk.AccAddress(pk.Address())
+// 	}
+
+// 	return testAddrs
 // }
 
-// CreateRandomAccounts is a function return a list of randomly generated AccAddresses
-func CreateRandomAccounts(numAccts int) []sdk.AccAddress {
-	testAddrs := make([]sdk.AccAddress, numAccts)
-	for i := 0; i < numAccts; i++ {
-		pk := ed25519.GenPrivKey().PubKey()
-		testAddrs[i] = sdk.AccAddress(pk.Address())
-	}
+// func TestMessageAuthzSerialization(t *testing.T, msg sdk.Msg) {
+// 	someDate := time.Date(1, 1, 1, 1, 1, 1, 1, time.UTC)
+// 	const (
+// 		mockGranter string = "cosmos1abc"
+// 		mockGrantee string = "cosmos1xyz"
+// 	)
 
-	return testAddrs
-}
+// 	var (
+// 		mockMsgGrant  authz.MsgGrant
+// 		mockMsgRevoke authz.MsgRevoke
+// 		mockMsgExec   authz.MsgExec
+// 	)
 
-func GenerateTestAddrs() (string, string) {
-	pk1 := ed25519.GenPrivKey().PubKey()
-	validAddr := sdk.AccAddress(pk1.Address()).String()
-	invalidAddr := sdk.AccAddress("invalid").String()
+// 	// Authz: Grant Msg
+// 	typeURL := sdk.MsgTypeURL(msg)
+// 	grant, err := authz.NewGrant(someDate, authz.NewGenericAuthorization(typeURL), someDate.Add(time.Hour))
+// 	require.NoError(t, err)
 
-	return validAddr, invalidAddr
-}
+// 	msgGrant := authz.MsgGrant{Granter: mockGranter, Grantee: mockGrantee, Grant: grant}
+// 	msgGrantBytes := json.RawMessage(sdk.MustSortJSON(authzcodec.ModuleCdc.MustMarshalJSON(&msgGrant)))
+// 	err = authzcodec.ModuleCdc.UnmarshalJSON(msgGrantBytes, &mockMsgGrant)
+// 	require.NoError(t, err)
+
+// 	// Authz: Revoke Msg
+// 	msgRevoke := authz.MsgRevoke{Granter: mockGranter, Grantee: mockGrantee, MsgTypeUrl: typeURL}
+// 	msgRevokeByte := json.RawMessage(sdk.MustSortJSON(authzcodec.ModuleCdc.MustMarshalJSON(&msgRevoke)))
+// 	err = authzcodec.ModuleCdc.UnmarshalJSON(msgRevokeByte, &mockMsgRevoke)
+// 	require.NoError(t, err)
+
+// 	// Authz: Exec Msg
+// 	msgAny, err := cdctypes.NewAnyWithValue(msg)
+// 	require.NoError(t, err)
+// 	msgExec := authz.MsgExec{Grantee: mockGrantee, Msgs: []*cdctypes.Any{msgAny}}
+// 	execMsgByte := json.RawMessage(sdk.MustSortJSON(authzcodec.ModuleCdc.MustMarshalJSON(&msgExec)))
+// 	err = authzcodec.ModuleCdc.UnmarshalJSON(execMsgByte, &mockMsgExec)
+// 	require.NoError(t, err)
+// 	require.Equal(t, msgExec.Msgs[0].Value, mockMsgExec.Msgs[0].Value)// // // // // // // // // // // // // // // // // // // // // // // // // // // // // // // //
+// }

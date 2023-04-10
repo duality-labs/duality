@@ -183,9 +183,9 @@ func CalcAmountAsToken0(amount0, amount1 sdk.Int, price1To0 types.Price) sdk.Dec
 //                            TOKENIZER UTILS                                //
 ///////////////////////////////////////////////////////////////////////////////
 
-func (k Keeper) MintShares(ctx sdk.Context, addr sdk.AccAddress, amount sdk.Int, sharesID string) error {
+func (k Keeper) MintShares(ctx sdk.Context, addr sdk.AccAddress, shareCoin sdk.Coin) error {
 	// mint share tokens
-	sharesCoins := sdk.Coins{sdk.NewCoin(sharesID, amount)}
+	sharesCoins := sdk.Coins{shareCoin}
 	if err := k.bankKeeper.MintCoins(ctx, types.ModuleName, sharesCoins); err != nil {
 		return err
 	}

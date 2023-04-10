@@ -2,14 +2,17 @@ package app
 
 import (
 	"encoding/json"
+	"os"
 	"testing"
 	"time"
 
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/duality-labs/duality/x/dex/types"
@@ -51,6 +54,9 @@ func setup(withGenesis bool, invCheckPeriod uint) (*App, GenesisState) {
 
 // Setup initializes a new SimApp. A Nop logger is set in SimApp.
 func Setup(isCheckTx bool) *App {
+	// Give bank module minter permissions for testing (ie. KeeperTestHelper.FundAcc)
+	maccPerms[banktypes.ModuleName] = []string{authtypes.Minter}
+
 	app, genesisState := setup(!isCheckTx, 5)
 	if !isCheckTx {
 		// init chain must be called to stop deliverState from being nil
@@ -158,4 +164,61 @@ type EmptyAppOptions struct {
 // Get implements AppOptions
 func (ao EmptyAppOptions) Get(_ string) interface{} {
 	return nil
+}
+
+func FundAccount(bankKeeper bankkeeper.Keeper, ctx sdk.Context, addr sdk.AccAddress, amounts sdk.Coins) error {
+	if err := bankKeeper.MintCoins(ctx, banktypes.ModuleName, amounts); err != nil {
+		return err
+	}
+
+	return bankKeeper.SendCoinsFromModuleToAccount(ctx, banktypes.ModuleName, addr, amounts)
+}
+
+// SetupTestingAppWithLevelDb initializes a new OsmosisApp intended for testing,
+// with LevelDB as a db.
+func SetupTestingAppWithLevelDb(isCheckTx bool) (app *App, cleanupFn func()) {
+	dir, err := os.MkdirTemp(os.TempDir(), "osmosis_leveldb_testing")
+	if err != nil {
+		panic(err)
+	}
+	db, err := sdk.NewLevelDB("osmosis_leveldb_testing", dir)
+	if err != nil {
+		panic(err)
+	}
+	encCdc := MakeTestEncodingConfig()
+	app = NewApp(log.NewNopLogger(),
+		db,
+		nil,
+		true,
+		map[int64]bool{},
+		DefaultNodeHome,
+		5,
+		encCdc,
+		EmptyAppOptions{},
+	)
+	if !isCheckTx {
+		genesisState := NewDefaultGenesisState(encCdc.Marshaler)
+		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
+		if err != nil {
+			panic(err)
+		}
+
+		app.InitChain(
+			abci.RequestInitChain{
+				Validators:      []abci.ValidatorUpdate{},
+				ConsensusParams: simapp.DefaultConsensusParams,
+				AppStateBytes:   stateBytes,
+			},
+		)
+	}
+
+	cleanupFn = func() {
+		db.Close()
+		err = os.RemoveAll(dir)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	return app, cleanupFn
 }

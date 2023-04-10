@@ -91,3 +91,8 @@ func (app *App) GetValidatorSet(ctx sdk.Context) ([]tmtypes.GenesisValidator, er
 
 	return vals, nil
 }
+
+// Used for testing
+func (app *App) ExportState(ctx sdk.Context) map[string]json.RawMessage {
+	return app.mm.ExportGenesis(ctx, app.AppCodec())
+}

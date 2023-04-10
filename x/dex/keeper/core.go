@@ -29,13 +29,14 @@ func (k Keeper) DepositCore(
 	tickIndices []int64,
 	fees []uint64,
 	options []*types.DepositOptions,
-) (amounts0Deposit, amounts1Deposit []sdk.Int, err error) {
+) (amounts0Deposit, amounts1Deposit []sdk.Int, sharesIssued sdk.Coins, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	pairID := CreatePairID(token0, token1)
 	totalAmountReserve0 := sdk.ZeroInt()
 	totalAmountReserve1 := sdk.ZeroInt()
 	amounts0Deposited := make([]sdk.Int, len(amounts0))
 	amounts1Deposited := make([]sdk.Int, len(amounts1))
+	sharesIssued = sdk.Coins{}
 
 	for i := 0; i < len(amounts0); i++ {
 		amounts0Deposited[i] = sdk.ZeroInt()
@@ -54,15 +55,12 @@ func (k Keeper) DepositCore(
 		// behind enemy lines checks
 		// TODO: Allow user to deposit "behind enemy lines"
 		if amount0.IsPositive() && k.IsBehindEnemyLines(ctx, pairID, pairID.Token0, lowerTickIndex) {
-			return nil, nil, types.ErrDepositBehindPairLiquidity
+			return nil, nil, nil, types.ErrDepositBehindPairLiquidity
 		}
 		// TODO: Allow user to deposit "behind enemy lines"
 		if amount1.IsPositive() && k.IsBehindEnemyLines(ctx, pairID, pairID.Token1, upperTickIndex) {
-			return nil, nil, types.ErrDepositBehindPairLiquidity
+			return nil, nil, nil, types.ErrDepositBehindPairLiquidity
 		}
-
-		sharesID := CreateSharesID(token0, token1, tickIndex, fee)
-		existingShares := k.bankKeeper.GetSupply(ctx, sharesID).Amount
 
 		pool, err := k.GetOrInitPool(
 			ctx,
@@ -71,24 +69,27 @@ func (k Keeper) DepositCore(
 			fee,
 		)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
+
+		existingShares := k.bankKeeper.GetSupply(ctx, pool.GetDepositDenom()).Amount
 
 		inAmount0, inAmount1, outShares := pool.Deposit(amount0, amount1, existingShares, autoswap)
 
 		k.SavePool(ctx, pool)
 
 		if inAmount0.IsZero() && inAmount1.IsZero() {
-			return nil, nil, types.ErrZeroTrueDeposit
+			return nil, nil, nil, types.ErrZeroTrueDeposit
 		}
 
 		if outShares.IsZero() {
-			return nil, nil, types.ErrDepositShareUnderflow
+			return nil, nil, nil, types.ErrDepositShareUnderflow
 		}
 
-		if err := k.MintShares(ctx, receiverAddr, outShares, sharesID); err != nil {
-			return nil, nil, err
+		if err := k.MintShares(ctx, receiverAddr, outShares); err != nil {
+			return nil, nil, nil, err
 		}
+		sharesIssued = sharesIssued.Add(outShares)
 
 		amounts0Deposited[i] = inAmount0
 		amounts1Deposited[i] = inAmount1
@@ -113,18 +114,18 @@ func (k Keeper) DepositCore(
 	if totalAmountReserve0.IsPositive() {
 		coin0 := sdk.NewCoin(token0, totalAmountReserve0)
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 	}
 
 	if totalAmountReserve1.IsPositive() {
 		coin1 := sdk.NewCoin(token1, totalAmountReserve1)
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 	}
 
-	return amounts0Deposited, amounts1Deposited, nil
+	return amounts0Deposited, amounts1Deposited, sharesIssued, nil
 }
 
 // Handles core logic for MsgWithdrawal; calculating and withdrawing reserve0,reserve1 from a specified tick
@@ -155,7 +156,7 @@ func (k Keeper) WithdrawCore(
 			return err
 		}
 
-		sharesID := CreateSharesID(token0, token1, tickIndex, fee)
+		sharesID := NewDepositDenom(&types.PairID{Token0: token0, Token1: token1}, tickIndex, fee).String()
 		totalShares := k.bankKeeper.GetSupply(ctx, sharesID).Amount
 
 		if totalShares.LT(sharesToRemove) {
