@@ -3,6 +3,7 @@ package types_test
 import (
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/duality-labs/duality/testutil/sample"
 	. "github.com/duality-labs/duality/x/dex/types"
@@ -32,10 +33,42 @@ func TestMsgMultiHopSwap_ValidateBasic(t *testing.T) {
 			err: sdkerrors.ErrInvalidAddress,
 		},
 		{
-			name: "valid addresses",
+			name: "missing route",
 			msg: MsgMultiHopSwap{
 				Creator:  sample.AccAddress(),
 				Receiver: sample.AccAddress(),
+			},
+			err: ErrMissingMultihopRoute,
+		},
+		{
+			name: "invalid exit tokens",
+			msg: MsgMultiHopSwap{
+				Creator:  sample.AccAddress(),
+				Receiver: sample.AccAddress(),
+				Routes: []*MultiHopRoute{
+					{Hops: []string{"A", "B", "C"}},
+					{Hops: []string{"A", "B", "Z"}},
+				},
+			},
+			err: ErrMultihopExitTokensMismatch,
+		},
+		{
+			name: "invalid amountIn",
+			msg: MsgMultiHopSwap{
+				Creator:  sample.AccAddress(),
+				Receiver: sample.AccAddress(),
+				Routes:   []*MultiHopRoute{{Hops: []string{"A", "B", "C"}}},
+				AmountIn: sdk.NewInt(-1),
+			},
+			err: ErrZeroSwap,
+		},
+		{
+			name: "valid",
+			msg: MsgMultiHopSwap{
+				Routes:   []*MultiHopRoute{{Hops: []string{"A", "B", "C"}}},
+				Creator:  sample.AccAddress(),
+				Receiver: sample.AccAddress(),
+				AmountIn: sdk.OneInt(),
 			},
 		},
 	}

@@ -64,6 +64,10 @@ func (msg *MsgMultiHopSwap) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
+	if len(msg.Routes) == 0 {
+		return ErrMissingMultihopRoute
+	}
+
 	expectedExitToken := msg.Routes[0].Hops[len(msg.Routes[0].Hops)-1]
 	for _, route := range msg.Routes[1:] {
 		hops := route.Hops
