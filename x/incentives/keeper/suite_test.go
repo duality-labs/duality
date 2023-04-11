@@ -28,6 +28,7 @@ type gaugeSpec struct {
 	startTick   int64
 	endTick     int64
 	pricingTick int64
+	startTime   time.Time
 }
 
 // AddToGauge adds coins to the specified gauge.
@@ -39,23 +40,28 @@ func (suite *KeeperTestSuite) AddToGauge(coins sdk.Coins, gaugeID uint64) uint64
 	return gaugeID
 }
 
-func (suite *KeeperTestSuite) SetupDeposit(addr sdk.AccAddress, token0 sdk.Coin, token1 sdk.Coin, tick int64, fee uint64) sdk.Coins {
-	suite.FundAcc(addr, sdk.Coins{token0, token1})
+func (suite *KeeperTestSuite) SetupDeposit(s depositSpec) sdk.Coins {
+	suite.FundAcc(s.addr, sdk.Coins{s.token0, s.token1})
 	_, _, shares, err := suite.App.DexKeeper.DepositCore(
 		sdk.WrapSDKContext(suite.Ctx),
-		token0.Denom,
-		token1.Denom,
-		addr,
-		addr,
-		[]sdk.Int{token0.Amount},
-		[]sdk.Int{token1.Amount},
-		[]int64{tick},
-		[]uint64{fee},
+		s.token0.Denom,
+		s.token1.Denom,
+		s.addr,
+		s.addr,
+		[]sdk.Int{s.token0.Amount},
+		[]sdk.Int{s.token1.Amount},
+		[]int64{s.tick},
+		[]uint64{s.fee},
 		[]*dextypes.DepositOptions{{}},
 	)
 	suite.Require().NoError(err)
 	suite.Require().NotEmpty(shares)
 	return shares
+}
+
+func (suite *KeeperTestSuite) SetupDepositAndLock(s depositSpec) *types.Lock {
+	shares := suite.SetupDeposit(s)
+	return suite.SetupLock(s.addr, shares)
 }
 
 // LockTokens locks tokens for the specified duration
@@ -79,42 +85,36 @@ func GetQualifyingDenom(qc types.QueryCondition) *dextypes.DepositDenom {
 }
 
 // setupNewGauge creates a gauge with the specified duration.
-func (suite *KeeperTestSuite) SetupGauge(
-	isPerpetual bool,
-	coins sdk.Coins,
-	paidOver uint64,
-	startTick int64,
-	endTick int64,
-	pricingTick int64,
-) *types.Gauge {
+func (suite *KeeperTestSuite) SetupGauge(s gaugeSpec) *types.Gauge {
 	addr := sdk.AccAddress([]byte("Gauge_Creation_Addr_"))
-	distrTo := types.QueryCondition{
-		PairID: &dextypes.PairID{
-			Token0: "TokenA",
-			Token1: "TokenB",
-		},
-		StartTick: startTick,
-		EndTick:   endTick,
-	}
-
-	if isPerpetual {
-		paidOver = uint64(1)
-	}
 
 	// fund reward tokens
-	suite.FundAcc(addr, coins)
+	suite.FundAcc(addr, s.rewards)
 
 	// create gauge
 	gauge, err := suite.App.IncentivesKeeper.CreateGauge(
 		suite.Ctx,
-		isPerpetual,
+		s.isPerpetual,
 		addr,
-		coins,
-		distrTo,
-		suite.Ctx.BlockTime(),
-		paidOver,
-		pricingTick,
+		s.rewards,
+		types.QueryCondition{
+			PairID: &dextypes.PairID{
+				Token0: "TokenA",
+				Token1: "TokenB",
+			},
+			StartTick: s.startTick,
+			EndTick:   s.endTick,
+		},
+		s.startTime,
+		s.paidOver,
+		s.pricingTick,
 	)
 	suite.Require().NoError(err)
 	return gauge
+}
+
+func (suite *KeeperTestSuite) SetupGauges(specs []gaugeSpec) {
+	for _, s := range specs {
+		suite.SetupGauge(s)
+	}
 }

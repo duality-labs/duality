@@ -11,6 +11,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
+var _ types.MsgServer = msgServer{}
+
 // msgServer provides a way to reference keeper pointer in the message server interface.
 type msgServer struct {
 	keeper *Keeper
@@ -22,8 +24,6 @@ func NewMsgServerImpl(keeper *Keeper) types.MsgServer {
 		keeper: keeper,
 	}
 }
-
-var _ types.MsgServer = msgServer{}
 
 // CreateGauge creates a gauge and sends coins to the gauge.
 // Emits create gauge event and returns the create gauge response.
