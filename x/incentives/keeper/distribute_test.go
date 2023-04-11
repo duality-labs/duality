@@ -124,12 +124,7 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 		suite.T().Run(tc.name, func(t *testing.T) {
 			suite.SetupTest()
 			for _, lockSpec := range tc.deposits {
-				suite.SetupDeposit(
-					lockSpec.addr, lockSpec.token0,
-					lockSpec.token1,
-					lockSpec.tick,
-					lockSpec.fee,
-				)
+				suite.SetupDeposit(lockSpec)
 			}
 			value, err := suite.App.IncentivesKeeper.ValueForShares(suite.Ctx, tc.coin, tc.tick)
 			if tc.err == nil {
@@ -286,19 +281,11 @@ func (suite *KeeperTestSuite) TestDistribute() {
 		suite.T().Run(tc.name, func(t *testing.T) {
 			suite.SetupTest()
 			for _, depositSpec := range tc.depositSpecs {
-				shares := suite.SetupDeposit(depositSpec.addr, depositSpec.token0, depositSpec.token1, depositSpec.tick, depositSpec.fee)
-				suite.SetupLock(depositSpec.addr, shares)
+				suite.SetupDepositAndLock(depositSpec)
 			}
 			gauges := make(types.Gauges, len(tc.gaugeSpecs))
 			for i, gaugeSpec := range tc.gaugeSpecs {
-				gauge := suite.SetupGauge(
-					gaugeSpec.isPerpetual,
-					gaugeSpec.rewards,
-					gaugeSpec.paidOver,
-					gaugeSpec.startTick,
-					gaugeSpec.endTick,
-					gaugeSpec.pricingTick,
-				)
+				gauge := suite.SetupGauge(gaugeSpec)
 				gauges[i] = gauge
 			}
 			_, err := suite.App.IncentivesKeeper.Distribute(suite.Ctx, gauges)

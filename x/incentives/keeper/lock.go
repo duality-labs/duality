@@ -145,21 +145,26 @@ func (k Keeper) BeginUnlock(ctx sdk.Context, lockID uint64, coins sdk.Coins) (ui
 		return 0, fmt.Errorf("trying to unlock a lock that is already unlocking")
 	}
 
-	// If the amount were unlocking is empty, or the entire coins amount, unlock the entire lock.
-	// Otherwise, split the lock into two locks, and fully unlock the newly created lock.
-	// (By virtue, the newly created lock we split into should have the unlock amount)
-	if len(coins) != 0 && !coins.IsEqual(lock.Coins) {
-		splitLock, err := k.splitLock(ctx, lock, coins)
-		if err != nil {
-			return 0, err
-		}
-		lock = splitLock
-	}
-
 	// remove existing lock refs from not unlocking queue
 	err = k.deleteLockRefs(ctx, lock)
 	if err != nil {
 		return 0, err
+	}
+
+	// If the amount were unlocking is empty, or the entire coins amount, unlock the entire lock.
+	// Otherwise, split the lock into two locks, and fully unlock the newly created lock.
+	// (By virtue, the newly created lock we split into should have the unlock amount)
+	if len(coins) != 0 && !coins.IsEqual(lock.Coins) {
+		splitLock, err := k.unlockPartial(ctx, lock, coins)
+		if err != nil {
+			return 0, err
+		}
+		// re-add remaining lock refs
+		err = k.addLockRefs(ctx, lock)
+		if err != nil {
+			return 0, err
+		}
+		lock = splitLock
 	}
 
 	// store lock with the end time set to current block time + duration
@@ -243,13 +248,13 @@ func (k Keeper) deleteLock(ctx sdk.Context, id uint64) {
 }
 
 // splitLock splits a lock with the given amount, and stores split new lock to the state.
-// Returns the new lock after modifying the state of the old lock.
-func (k Keeper) splitLock(ctx sdk.Context, lock *types.Lock, coins sdk.Coins) (*types.Lock, error) {
+// Returns the new lock after modifying the state of the old lock. Does not add any lock refs,
+// the caller is responsible for doing this.
+func (k Keeper) unlockPartial(ctx sdk.Context, lock *types.Lock, coins sdk.Coins) (*types.Lock, error) {
 	if lock.IsUnlocking() {
 		return nil, fmt.Errorf("cannot split unlocking lock")
 	}
 
-	// TODO: Manage removing coin refs
 	lock.Coins = lock.Coins.Sub(coins)
 
 	err := k.setLock(ctx, lock)
@@ -258,7 +263,17 @@ func (k Keeper) splitLock(ctx sdk.Context, lock *types.Lock, coins sdk.Coins) (*
 	}
 
 	// create a new lock
-	return k.CreateLock(ctx, lock.OwnerAddress(), coins, lock.Duration)
+	splitLockID := k.GetLastLockID(ctx) + 1
+
+	// unlock time is initially set without a value, gets set as unlock start time + duration
+	// when unlocking starts.
+	newLock := types.NewLock(splitLockID, lock.OwnerAddress(), lock.Duration, lock.EndTime, coins)
+	err = k.Lock(ctx, lock, lock.Coins)
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
+	}
+	k.SetLastLockID(ctx, lock.ID)
+	return newLock, nil
 }
 
 // GetLockByID Returns lock from lockID.
@@ -347,6 +362,7 @@ func (k Keeper) CreateLock(ctx sdk.Context, owner sdk.AccAddress, coins sdk.Coin
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
 	}
+	k.SetLastLockID(ctx, lock.ID)
 
 	// add lock refs into not unlocking queue
 	err = k.addLockRefs(ctx, lock)
@@ -354,6 +370,5 @@ func (k Keeper) CreateLock(ctx sdk.Context, owner sdk.AccAddress, coins sdk.Coin
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
 	}
 
-	k.SetLastLockID(ctx, lock.ID)
 	return lock, nil
 }

@@ -104,11 +104,6 @@ func (k Keeper) CreateGauge(
 	numEpochsPaidOver uint64,
 	pricingTick int64,
 ) (*types.Gauge, error) {
-	// Ensure that the denom this gauge pays out to exists on-chain
-	// TODO(teddyknox): Understand why this valoper second condition is here
-	// if !k.bk.HasSupply(ctx, distrTo.Denom) && !strings.Contains(distrTo.Denom, "cosmosvaloper") {
-	// 	return 0, fmt.Errorf("denom does not exist: %s", distrTo.Denom)
-	// }
 
 	gauge := &types.Gauge{
 		Id:                k.GetLastGaugeID(ctx) + 1,
