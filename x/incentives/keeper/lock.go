@@ -268,7 +268,8 @@ func (k Keeper) unlockPartial(ctx sdk.Context, lock *types.Lock, coins sdk.Coins
 	// unlock time is initially set without a value, gets set as unlock start time + duration
 	// when unlocking starts.
 	newLock := types.NewLock(splitLockID, lock.OwnerAddress(), lock.Duration, lock.EndTime, coins)
-	err = k.Lock(ctx, lock, lock.Coins)
+	// store lock object into the store
+	err = k.setLock(ctx, lock)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
 	}
