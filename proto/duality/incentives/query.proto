@@ -39,11 +39,11 @@ service Query {
         "/dualitylabs/duality/incentives/get_lock_by_id/{lock_id}";
   }
 
-  // // GetLocks returns locks by the filter provided. At least one filter must be provided.
-  // rpc GetLocks(GetLocksRequest) returns (GetLocksResponse) {
-  //   option (google.api.http).get =
-  //       "/dualitylabs/duality/incentives/get_locks";
-  // }
+  // GetLocks returns locks by the filter provided. At least one filter must be provided.
+  rpc GetLocks(GetLocksRequest) returns (GetLocksResponse) {
+    option (google.api.http).get =
+        "/dualitylabs/duality/incentives/get_locks";
+  }
 
   // GetFutureRewardsEstimate returns an estimate of the rewards from now until a specified
   // time in the future. The requestor either provides an address or a set of locks
@@ -106,17 +106,21 @@ message GetLockByIDResponse {
   Lock lock = 1;
 };
 
-// message GetLocksRequest {
-//   message Filter {
-//     string denom = 1;
-//     string owner = 2 [ (gogoproto.moretags) = "yaml:\"owner\"" ];
-//     bool isUnlocking = 3 [ (gogoproto.moretags) = "yaml:\"isUnlocking\"" ];
-//   }
-//   Filter filter = 1 [ (gogoproto.nullable) = false ];
-// };
-// message GetLocksResponse {
-//   repeated Lock lock = 1;
-// };
+message GetLocksRequest {
+  message Filter {
+    enum UnlockingFilter {
+      ALL = 0;
+      UNLOCKING = 1;
+      NOT_UNLOCKING = 2;
+    }
+    string owner = 1 [ (gogoproto.moretags) = "yaml:\"owner\"" ];
+    UnlockingFilter unlocking_filter = 2;
+  }
+  Filter filter = 1 [ (gogoproto.nullable) = false ];
+};
+message GetLocksResponse {
+  repeated Lock locks = 1;
+};
 
 message GetFutureRewardEstimateRequest {
   // Address that is being queried for future estimated rewards

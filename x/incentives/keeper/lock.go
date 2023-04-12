@@ -334,8 +334,16 @@ func (k Keeper) getUnlockingLocks(ctx sdk.Context) types.Locks {
 	return k.getLocksFromIterator(ctx, k.iterator(ctx, types.GetKeyLockIndex(true)))
 }
 
+func (k Keeper) getUnlockingLocksByAccount(ctx sdk.Context, acct sdk.AccAddress) types.Locks {
+	return k.getLocksFromIterator(ctx, k.iterator(ctx, types.GetKeyLockIndexByAccount(true, acct)))
+}
+
 func (k Keeper) getFullLocks(ctx sdk.Context) types.Locks {
 	return k.getLocksFromIterator(ctx, k.iterator(ctx, types.GetKeyLockIndex(false)))
+}
+
+func (k Keeper) getFullLocksByAccount(ctx sdk.Context, acct sdk.AccAddress) types.Locks {
+	return k.getLocksFromIterator(ctx, k.iterator(ctx, types.GetKeyLockIndexByAccount(false, acct)))
 }
 
 // GetLocks Returns the period locks on pool.

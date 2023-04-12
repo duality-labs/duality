@@ -94,42 +94,40 @@ func (q QueryServer) GetLockByID(goCtx context.Context, req *types.GetLockByIDRe
 	return &types.GetLockByIDResponse{Lock: lock}, nil
 }
 
-// func (q QueryServer) GetLocks(goCtx context.Context, req *types.GetLocksRequest) (*types.GetLocksResponse, error) {
-// 	if req == nil {
-// 		return nil, status.Error(codes.InvalidArgument, "empty request")
-// 	}
+func (q QueryServer) GetLocks(goCtx context.Context, req *types.GetLocksRequest) (*types.GetLocksResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
 
-// 	ctx := sdk.UnwrapSDKContext(goCtx)
-// 	hasDenom := len(req.Filter.Denom) > 0
-// 	hasOwner := len(req.Filter.Owner) > 0
-// 	if hasOwner {
-// 		owner, err := sdk.AccAddressFromBech32(req.Filter.Owner)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		if hasDenom {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	hasOwner := len(req.Filter.Owner) > 0
+	if !hasOwner {
+		// TODO: Verify this protection is necessary
+		return nil, status.Error(codes.InvalidArgument, "for performance reasons will not return all locks")
+	}
 
-// 		} else {
+	owner, err := sdk.AccAddressFromBech32(req.Filter.Owner)
+	if err != nil {
+		return nil, err
+	}
 
-// 		}
-// 	} else { // no owner, maybe denom
-// 		if hasDenom {
+	var locks []*types.Lock
+	if req.Filter.UnlockingFilter == types.GetLocksRequest_Filter_ALL {
+		fullLocks := q.Keeper.getFullLocksByAccount(ctx, owner)
+		unlockingLocks := q.Keeper.getUnlockingLocksByAccount(ctx, owner)
+		locks = append(fullLocks, unlockingLocks...)
+	} else if req.Filter.UnlockingFilter == types.GetLocksRequest_Filter_NOT_UNLOCKING {
+		locks = q.Keeper.getFullLocksByAccount(ctx, owner)
+	} else if req.Filter.UnlockingFilter == types.GetLocksRequest_Filter_UNLOCKING {
+		locks = q.Keeper.getUnlockingLocksByAccount(ctx, owner)
+	} else {
+		return nil, status.Error(codes.InvalidArgument, "unrecognized unlocking filter value")
+	}
 
-// 		} else {
-// 			// TODO: Verify this protection is necessary
-// 			return nil, status.Error(codes.InvalidArgument, "for performance reasons will not return all locks")
-// 		}
-// 	}
-
-// 	// q.Keeper.GetAccountUnlockableCoins(ctx, owner)
-// 	// q.Keeper.GetAccountLockedCoins(ctx, owner)
-// 	// q.Keeper.GetAccountUnlockingCoins(ctx, owner)
-// 	// q.Keeper.GetAccount(ctx, owner, req.Duration)
-// 	// q.Keeper.GetLockedDenom(ctx, req.Denom, req.Duration)
-// 	// q.Keeper.GetAccountLockedPastTimeFullyLocked(ctx, owner, req.Timestamp)
-
-// 	return &types.GetLocksResponse{}, nil
-// }
+	return &types.GetLocksResponse{
+		Locks: locks,
+	}, nil
+}
 
 func (q QueryServer) GetFutureRewardEstimate(goCtx context.Context, req *types.GetFutureRewardEstimateRequest) (*types.GetFutureRewardEstimateResponse, error) {
 	if req == nil {
