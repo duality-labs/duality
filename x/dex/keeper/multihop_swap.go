@@ -52,7 +52,7 @@ func (k Keeper) HopsToRouteData(ctx sdk.Context, hops []string, exitLimitPrice s
 	return routeArr, nil
 }
 
-func CalcPriceUpperbound(currentPrice sdk.Dec, remainingSteps []MultihopStep) sdk.Dec {
+func CalcMultihopPriceUpperbound(currentPrice sdk.Dec, remainingSteps []MultihopStep) sdk.Dec {
 	price := currentPrice
 	for _, step := range remainingSteps {
 		price = step.BestPrice.Mul(price)
@@ -76,7 +76,7 @@ func (k Keeper) MultihopStep(
 	remainingSteps []MultihopStep,
 	stepCache map[string]StepResult,
 ) (sdk.Coin, types.BranchableCache, error) {
-	priceUpperbound := CalcPriceUpperbound(currentPrice, remainingSteps)
+	priceUpperbound := CalcMultihopPriceUpperbound(currentPrice, remainingSteps)
 	if exitLimitPrice.GT(priceUpperbound) {
 		// If we can't hit the best possible price we can greedily abort
 		return sdk.Coin{}, bctx, types.ErrExitLimitPriceHit
@@ -115,6 +115,7 @@ func (k Keeper) RunMultihopRoute(
 	var currentOutCoin sdk.Coin
 	inCoin := initialInCoin
 	bCacheCtx := types.NewBranchableCache(ctx)
+
 	for i, step := range routeData {
 		currentOutCoin, bCacheCtx, err = k.MultihopStep(
 			bCacheCtx,

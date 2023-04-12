@@ -203,3 +203,44 @@ func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteFindBestRoute() {
 	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenB", Token1: "TokenD"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
 	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenD", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(1000), -2000, 1)
 }
+
+func (s *MsgServerTestSuite) TestMultiHopSwapLongRouteWithCache() {
+	s.fundAliceBalances(100, 0)
+
+	// GIVEN viable route from A->B->C...->L but last leg to X only possible through K->M->X
+	s.SetupMultiplePools(
+		NewPoolSetup("TokenA", "TokenB", 0, 100, 0, 1),
+		NewPoolSetup("TokenB", "TokenC", 0, 100, 0, 1),
+		NewPoolSetup("TokenC", "TokenD", 0, 100, 0, 1),
+		NewPoolSetup("TokenD", "TokenE", 0, 100, 0, 1),
+		NewPoolSetup("TokenE", "TokenF", 0, 100, 0, 1),
+		NewPoolSetup("TokenF", "TokenG", 0, 100, 0, 1),
+		NewPoolSetup("TokenG", "TokenH", 0, 100, 0, 1),
+		NewPoolSetup("TokenH", "TokenI", 0, 100, 0, 1),
+		NewPoolSetup("TokenI", "TokenJ", 0, 100, 0, 1),
+		NewPoolSetup("TokenJ", "TokenK", 0, 100, 0, 1),
+		NewPoolSetup("TokenK", "TokenL", 0, 100, 0, 1),
+
+		NewPoolSetup("TokenK", "TokenM", 0, 100, 0, 1),
+		NewPoolSetup("TokenM", "TokenX", 0, 100, 0, 1),
+	)
+
+	// WHEN alice multihopswaps with two overlapping routes with only the last leg different
+	routes := [][]string{
+		{
+			"TokenA", "TokenB", "TokenC", "TokenD", "TokenE", "TokenF",
+			"TokenG", "TokenH", "TokenI", "TokenJ", "TokenK", "TokenL", "TokenX",
+		},
+		{
+			"TokenA", "TokenB", "TokenC", "TokenD", "TokenE", "TokenF",
+			"TokenG", "TokenH", "TokenI", "TokenJ", "TokenK", "TokenM", "TokenX",
+		},
+	}
+	s.aliceMultiHopSwaps(routes, 100, sdk.MustNewDecFromStr("0.9"), true)
+
+	// THEN swap succeeds with second route
+
+	s.assertAccountBalanceExotic(s.alice, "TokenA", 0)
+	s.assertAccountBalanceExotic(s.alice, "TokenX", 99)
+	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenM", Token1: "TokenX"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
+}
