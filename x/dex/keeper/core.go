@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -286,8 +287,12 @@ func (k Keeper) MultiHopSwapCore(
 	var routeErrors []error
 	initialInCoin := sdk.NewCoin(routes[0].Hops[0], amountIn)
 	stepCache := make(map[string]StepResult)
-	var bestWrite func()
-	bestCoinOut := sdk.Coin{Amount: sdk.ZeroInt()}
+	var bestRoute struct {
+		write   func()
+		coinOut sdk.Coin
+		route   []string
+	}
+	bestRoute.coinOut = sdk.Coin{Amount: sdk.ZeroInt()}
 
 	for _, route := range routes {
 		routeCoinOut, writeRoute, err := k.RunMultihopRoute(ctx, *route, initialInCoin, exitLimitPrice, stepCache)
@@ -296,9 +301,10 @@ func (k Keeper) MultiHopSwapCore(
 			continue
 		}
 
-		if !pickBestRoute || bestCoinOut.Amount.LT(routeCoinOut.Amount) {
-			bestCoinOut = routeCoinOut
-			bestWrite = writeRoute
+		if !pickBestRoute || bestRoute.coinOut.Amount.LT(routeCoinOut.Amount) {
+			bestRoute.coinOut = routeCoinOut
+			bestRoute.write = writeRoute
+			bestRoute.route = route.Hops
 		}
 		if !pickBestRoute {
 			break
@@ -311,16 +317,18 @@ func (k Keeper) MultiHopSwapCore(
 		return sdk.Coin{}, allErr
 	}
 
-	bestWrite()
+	bestRoute.write()
 	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{initialInCoin})
 	if err != nil {
 		return sdk.Coin{}, err
 	}
 
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{bestCoinOut})
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{bestRoute.coinOut})
 	if err != nil {
 		return sdk.Coin{}, err
 	}
+	ctx.EventManager().EmitEvent(types.CreateMultihopSwapEvent(callerAddr.String(), receiverAddr.String(),
+		initialInCoin.String(), bestRoute.coinOut.String(), strings.Join(bestRoute.route, ",")))
 
 	return coinOut, nil
 }
