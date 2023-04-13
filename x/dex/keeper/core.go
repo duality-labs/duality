@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -313,7 +312,9 @@ func (k Keeper) MultiHopSwapCore(
 
 	if len(routeErrors) == len(routes) {
 		// All routes have failed
-		allErr := errors.Join(routeErrors...)
+
+		allErr := utils.JoinErrors(types.ErrAllMultiHopRoutesFailed, routeErrors...)
+
 		return sdk.Coin{}, allErr
 	}
 
