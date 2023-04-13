@@ -41,8 +41,8 @@ func (d Distributor) Distribute(ctx sdk.Context, gauge *types.Gauge, filterLocks
 				return nil, err
 			}
 			lockTotal = lockTotal.Add(adjustedPositionValue)
-			adjustedGaugeTotal = adjustedGaugeTotal.Add(adjustedPositionValue)
 		}
+		adjustedGaugeTotal = adjustedGaugeTotal.Add(lockTotal)
 		lockSumCache[lock.ID] = lockTotal
 	}
 	if adjustedGaugeTotal.IsZero() {
@@ -50,11 +50,11 @@ func (d Distributor) Distribute(ctx sdk.Context, gauge *types.Gauge, filterLocks
 	}
 
 	for _, lock := range filterLocks {
+		lockAmt := lockSumCache[lock.ID]
 		distCoins := sdk.Coins{}
 		for _, epochRewards := range rewardsNextEpoch {
 			// distribution amount = gauge_size * denom_lock_amount / (total_denom_lock_amount * remain_epochs)
-			lockAmt := lockSumCache[lock.ID]
-			amount := epochRewards.Amount.Mul(lockAmt).Quo(adjustedGaugeTotal)
+			amount := epochRewards.Amount.ToDec().Mul(lockAmt.ToDec()).Quo(adjustedGaugeTotal.ToDec()).TruncateInt()
 			reward := sdk.Coin{Denom: epochRewards.Denom, Amount: amount}
 			distCoins = distCoins.Add(reward)
 		}
@@ -64,7 +64,6 @@ func (d Distributor) Distribute(ctx sdk.Context, gauge *types.Gauge, filterLocks
 			continue
 		}
 
-		gauge.DistributedCoins = gauge.DistributedCoins.Add(distCoins...)
 		if spec, ok := distSpec[lock.Owner]; ok {
 			distSpec[lock.Owner] = spec.Add(distCoins...)
 		} else {
@@ -72,6 +71,7 @@ func (d Distributor) Distribute(ctx sdk.Context, gauge *types.Gauge, filterLocks
 		}
 	}
 
+	gauge.DistributedCoins = gauge.DistributedCoins.Add(rewardsNextEpoch...)
 	gauge.FilledEpochs += 1
 	return distSpec, nil
 }

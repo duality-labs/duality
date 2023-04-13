@@ -139,6 +139,7 @@ func (k Keeper) GetRewardsEstimate(ctx sdk.Context, addr sdk.AccAddress, filterL
 
 		// TODO: Make more efficient by making it possible to call distribute with this
 		// gaugeLocks := k.GetLocksByQueryCondition(cacheCtx, &gauge.DistributeTo)
+		gaugeRewards := sdk.Coins{}
 		for epoch := distrBeginEpoch; epoch <= endEpoch; epoch++ {
 			epochTime := epochInfo.StartTime.Add(time.Duration(epoch-epochInfo.CurrentEpoch) * epochInfo.Duration)
 			if !gauge.IsActiveGauge(epochTime) {
@@ -151,8 +152,9 @@ func (k Keeper) GetRewardsEstimate(ctx sdk.Context, addr sdk.AccAddress, filterL
 				return nil, err
 			}
 
-			estimatedRewards = estimatedRewards.Add(distSpec.GetTotal()...)
+			gaugeRewards = gaugeRewards.Add(distSpec.GetTotal()...)
 		}
+		estimatedRewards = estimatedRewards.Add(gaugeRewards...)
 	}
 
 	return estimatedRewards, nil
