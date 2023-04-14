@@ -70,3 +70,25 @@ func GetCmdGetLockByID() (*osmocli.QueryDescriptor, *types.GetLockByIDRequest) {
 		Long:  `{{.Short}}{{.ExampleHeader}}`,
 	}, &types.GetLockByIDRequest{}
 }
+
+func parseUnlockingFilter(arg string, _ *pflag.FlagSet) (any, osmocli.FieldReadLocation, error) {
+	unlockingFilterInt, ok := types.UnlockingFilter_value[arg]
+	if !ok {
+		return 0, osmocli.UsedArg, types.ErrInvalidUnlockingStatus
+	}
+	unlockingFilter := types.UnlockingFilter(unlockingFilterInt)
+
+	return unlockingFilter, osmocli.UsedArg, nil
+}
+
+// GetCmdLocks returns all gauges for a given filter.
+func GetCmdLocks() (*osmocli.QueryDescriptor, *types.GetLocksRequest) {
+	return &osmocli.QueryDescriptor{
+		Use:   "list-locks [UnlockingFilter] [owner]",
+		Short: "Query all locks",
+		Long:  `{{.Short}}{{.ExampleHeader}}`,
+		CustomFieldParsers: map[string]osmocli.CustomFieldParserFn{
+			"UnlockingFilter": parseUnlockingFilter,
+		},
+	}, &types.GetLocksRequest{}
+}

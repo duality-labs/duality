@@ -1,6 +1,7 @@
 package cli_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/types/query"
@@ -76,6 +77,37 @@ func TestGetCmdGetLockByID(t *testing.T) {
 	tcs := map[string]osmocli.QueryCliTestCase[*types.GetLockByIDRequest]{
 		"basic test": {
 			Cmd: "1", ExpectedQuery: &types.GetLockByIDRequest{LockId: 1},
+		},
+	}
+	osmocli.RunQueryTestCases(t, desc, tcs)
+}
+
+func TestGetCmdLocks(t *testing.T) {
+	desc, _ := cli.GetCmdLocks()
+	tcs := map[string]osmocli.QueryCliTestCase[*types.GetLocksRequest]{
+		"test ALL with pagination": {
+			Cmd: fmt.Sprintf("ALL %s --offset=2", testAddresses[0]),
+			ExpectedQuery: &types.GetLocksRequest{
+				UnlockingFilter: types.UnlockingFilter_ALL,
+				Owner:           testAddresses[0].String(),
+				Pagination:      &query.PageRequest{Key: []uint8{}, Offset: 2, Limit: 100},
+			},
+		},
+		"test UNLOCKING": {
+			Cmd: fmt.Sprintf("UNLOCKING %s", testAddresses[0]),
+			ExpectedQuery: &types.GetLocksRequest{
+				UnlockingFilter: types.UnlockingFilter_UNLOCKING,
+				Owner:           testAddresses[0].String(),
+				Pagination:      &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
+			},
+		},
+		"test NOT_UNLOCKING": {
+			Cmd: fmt.Sprintf("NOT_UNLOCKING %s", testAddresses[0]),
+			ExpectedQuery: &types.GetLocksRequest{
+				UnlockingFilter: types.UnlockingFilter_NOT_UNLOCKING,
+				Owner:           testAddresses[0].String(),
+				Pagination:      &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
+			},
 		},
 	}
 	osmocli.RunQueryTestCases(t, desc, tcs)

@@ -105,8 +105,16 @@ message GetStakeByIDResponse {
   Stake stake = 1;
 };
 
+enum UnlockingFilter {
+  ALL = 0;
+  UNLOCKING = 1;
+  NOT_UNLOCKING = 2;
+}
+
 message GetStakesRequest {
-  string owner = 1 [ (gogoproto.moretags) = "yaml:\"owner\"" ];
+  UnlockingFilter unlocking_filter = 1;
+  string owner = 2 [ (gogoproto.moretags) = "yaml:\"owner\"" ];
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
 };
 message GetStakesResponse {
   repeated Stake stakes = 1;
