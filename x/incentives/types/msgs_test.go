@@ -186,17 +186,17 @@ func TestMsgAddToGauge(t *testing.T) {
 	}
 }
 
-func TestMsgSetupLock(t *testing.T) {
+func TestMsgSetupStake(t *testing.T) {
 	addr1, invalidAddr := apptesting.GenerateTestAddrs()
 
 	tests := []struct {
 		name       string
-		msg        types.MsgLockTokens
+		msg        types.MsgStake
 		expectPass bool
 	}{
 		{
 			name: "proper msg",
-			msg: types.MsgLockTokens{
+			msg: types.MsgStake{
 				Owner: addr1,
 				Coins: sdk.NewCoins(sdk.NewCoin("test", sdk.NewInt(100))),
 			},
@@ -204,21 +204,21 @@ func TestMsgSetupLock(t *testing.T) {
 		},
 		{
 			name: "invalid owner",
-			msg: types.MsgLockTokens{
+			msg: types.MsgStake{
 				Owner: invalidAddr,
 				Coins: sdk.NewCoins(sdk.NewCoin("test", sdk.NewInt(100))),
 			},
 		},
 		{
 			name: "invalid coin length",
-			msg: types.MsgLockTokens{
+			msg: types.MsgStake{
 				Owner: addr1,
 				Coins: sdk.NewCoins(sdk.NewCoin("test1", sdk.NewInt(100000)), sdk.NewCoin("test2", sdk.NewInt(100000))),
 			},
 		},
 		{
 			name: "zero token amount",
-			msg: types.MsgLockTokens{
+			msg: types.MsgStake{
 				Owner: addr1,
 				Coins: sdk.NewCoins(sdk.NewCoin("test", sdk.NewInt(0))),
 			},
@@ -230,7 +230,7 @@ func TestMsgSetupLock(t *testing.T) {
 			if test.expectPass {
 				require.NoError(t, test.msg.ValidateBasic(), "test: %v", test.name)
 				require.Equal(t, test.msg.Route(), types.RouterKey)
-				require.Equal(t, test.msg.Type(), "lock_tokens")
+				require.Equal(t, test.msg.Type(), "stake_tokens")
 				signers := test.msg.GetSigners()
 				require.Equal(t, len(signers), 1)
 				require.Equal(t, signers[0].String(), addr1)
@@ -241,101 +241,86 @@ func TestMsgSetupLock(t *testing.T) {
 	}
 }
 
-func TestMsgBeginUnlockingAll(t *testing.T) {
+func TestMsgUnstake(t *testing.T) {
 	addr1, invalidAddr := apptesting.GenerateTestAddrs()
 
 	tests := []struct {
 		name       string
-		msg        types.MsgBeginUnlockingAll
+		msg        types.MsgUnstake
 		expectPass bool
 	}{
 		{
 			name: "proper msg",
-			msg: types.MsgBeginUnlockingAll{
+			msg: types.MsgUnstake{
 				Owner: addr1,
+				Unstakes: []*incentivestypes.MsgUnstake_UnstakeDescriptor{
+					{
+						ID:    1,
+						Coins: sdk.NewCoins(sdk.NewCoin("test", sdk.NewInt(100))),
+					},
+				},
 			},
 			expectPass: true,
 		},
 		{
 			name: "invalid owner",
-			msg: types.MsgBeginUnlockingAll{
+			msg: types.MsgUnstake{
 				Owner: invalidAddr,
+				Unstakes: []*incentivestypes.MsgUnstake_UnstakeDescriptor{
+					{
+						ID:    1,
+						Coins: sdk.NewCoins(sdk.NewCoin("test", sdk.NewInt(100))),
+					},
+				},
 			},
 		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			if test.expectPass {
-				require.NoError(t, test.msg.ValidateBasic(), "test: %v", test.name)
-				require.Equal(t, test.msg.Route(), types.RouterKey)
-				require.Equal(t, test.msg.Type(), "begin_unlocking_all")
-				signers := test.msg.GetSigners()
-				require.Equal(t, len(signers), 1)
-				require.Equal(t, signers[0].String(), addr1)
-			} else {
-				require.Error(t, test.msg.ValidateBasic(), "test: %v", test.name)
-			}
-		})
-	}
-}
-
-func TestMsgBeginUnlocking(t *testing.T) {
-	addr1, invalidAddr := apptesting.GenerateTestAddrs()
-
-	tests := []struct {
-		name       string
-		msg        types.MsgBeginUnlocking
-		expectPass bool
-	}{
 		{
-			name: "proper msg",
-			msg: types.MsgBeginUnlocking{
+			name: "invalid stakeup ID",
+			msg: types.MsgUnstake{
 				Owner: addr1,
-				ID:    1,
-				Coins: sdk.NewCoins(sdk.NewCoin("test", sdk.NewInt(100))),
-			},
-			expectPass: true,
-		},
-		{
-			name: "invalid owner",
-			msg: types.MsgBeginUnlocking{
-				Owner: invalidAddr,
-				ID:    1,
-				Coins: sdk.NewCoins(sdk.NewCoin("test", sdk.NewInt(100))),
-			},
-		},
-		{
-			name: "invalid lockup ID",
-			msg: types.MsgBeginUnlocking{
-				Owner: addr1,
-				ID:    0,
-				Coins: sdk.NewCoins(sdk.NewCoin("test", sdk.NewInt(100))),
+				Unstakes: []*incentivestypes.MsgUnstake_UnstakeDescriptor{
+					{
+						ID:    0,
+						Coins: sdk.NewCoins(sdk.NewCoin("test", sdk.NewInt(100))),
+					},
+				},
 			},
 		},
 		{
 			name: "invalid coins length",
-			msg: types.MsgBeginUnlocking{
+			msg: types.MsgUnstake{
 				Owner: addr1,
-				ID:    1,
-				Coins: sdk.NewCoins(sdk.NewCoin("test1", sdk.NewInt(100000)), sdk.NewCoin("test2", sdk.NewInt(100000))),
+				Unstakes: []*incentivestypes.MsgUnstake_UnstakeDescriptor{
+					{
+						ID:    1,
+						Coins: sdk.NewCoins(sdk.NewCoin("test1", sdk.NewInt(100000)), sdk.NewCoin("test2", sdk.NewInt(100000))),
+					},
+				},
 			},
 		},
 		{
 			name: "zero coins (same as nil)",
-			msg: types.MsgBeginUnlocking{
+			msg: types.MsgUnstake{
 				Owner: addr1,
-				ID:    1,
-				Coins: sdk.NewCoins(sdk.NewCoin("test1", sdk.NewInt(0))),
+				Unstakes: []*incentivestypes.MsgUnstake_UnstakeDescriptor{
+					{
+						ID:    1,
+						Coins: sdk.NewCoins(sdk.NewCoin("test1", sdk.NewInt(0))),
+					},
+				},
 			},
 			expectPass: true,
 		},
 		{
-			name: "nil coins (unlock by ID)",
-			msg: types.MsgBeginUnlocking{
+			name: "nil coins (unstake by ID)",
+			msg: types.MsgUnstake{
 				Owner: addr1,
-				ID:    1,
-				Coins: sdk.NewCoins(),
+				Unstakes: []*incentivestypes.MsgUnstake_UnstakeDescriptor{
+					{
+						ID:    1,
+						Coins: sdk.NewCoins(),
+					},
+				},
 			},
 			expectPass: true,
 		},
@@ -346,7 +331,7 @@ func TestMsgBeginUnlocking(t *testing.T) {
 			if test.expectPass {
 				require.NoError(t, test.msg.ValidateBasic(), "test: %v", test.name)
 				require.Equal(t, test.msg.Route(), types.RouterKey)
-				require.Equal(t, test.msg.Type(), "begin_unlocking")
+				require.Equal(t, test.msg.Type(), "begin_unstaking")
 				signers := test.msg.GetSigners()
 				require.Equal(t, len(signers), 1)
 				require.Equal(t, signers[0].String(), addr1)

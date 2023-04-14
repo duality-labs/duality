@@ -20,24 +20,24 @@ func GetQueryCmd() *cobra.Command {
 	// osmocli.AddQueryCmd(cmd, qcGetter, GetCmdUpcomingGauges)
 	// osmocli.AddQueryCmd(cmd, qcGetter, GetCmdUpcomingGaugesPerDenom)
 	// osmocli.AddQueryCmd(cmd, qcGetter, GetCmdModuleBalance)
-	// osmocli.AddQueryCmd(cmd, qcGetter, GetCmdModuleLockedAmount)
-	// osmocli.AddQueryCmd(cmd, qcGetter, GetCmdAccountUnlockingCoins)
-	// osmocli.AddQueryCmd(cmd, qcGetter, GetCmdAccountLockedPastTime)
-	// osmocli.AddQueryCmd(cmd, qcGetter, GetCmdAccountLockedPastTimeNotUnlockingOnly)
-	// osmocli.AddQueryCmd(cmd, qcGetter, GetCmdTotalLockedByDenom)
+	// osmocli.AddQueryCmd(cmd, qcGetter, GetCmdModuleStakedAmount)
+	// osmocli.AddQueryCmd(cmd, qcGetter, GetCmdAccountUnstakingCoins)
+	// osmocli.AddQueryCmd(cmd, qcGetter, GetCmdAccountStakedPastTime)
+	// osmocli.AddQueryCmd(cmd, qcGetter, GetCmdAccountStakedPastTimeNotUnstakingOnly)
+	// osmocli.AddQueryCmd(cmd, qcGetter, GetCmdTotalStakedByDenom)
 	cmd.AddCommand(
 	// GetCmdRewardsEstimate(),
-	// GetCmdAccountUnlockableCoins(),
-	// GetCmdAccountLockedCoins(),
-	// GetCmdAccountUnlockedBeforeTime(),
-	// GetCmdAccountLockedPastTimeDenom(),
-	// GetCmdLockedByID(),
-	// GetCmdAccountLockedLongerDuration(),
-	// GetCmdAccountLockedLongerDurationNotUnlockingOnly(),
-	// GetCmdAccountLockedLongerDurationDenom(),
-	// GetCmdOutputLocksJson(),
-	// GetCmdAccountLockedDuration(),
-	// GetCmdNextLockID(),
+	// GetCmdAccountUnstakeableCoins(),
+	// GetCmdAccountStakedCoins(),
+	// GetCmdAccountUnstakedBeforeTime(),
+	// GetCmdAccountStakedPastTimeDenom(),
+	// GetCmdStakedByID(),
+	// GetCmdAccountStakedLongerDuration(),
+	// GetCmdAccountStakedLongerDurationNotUnstakingOnly(),
+	// GetCmdAccountStakedLongerDurationDenom(),
+	// GetCmdOutputStakesJson(),
+	// GetCmdAccountStakedDuration(),
+	// GetCmdNextStakeID(),
 	// osmocli.GetParams[*types.QueryParamsRequest](
 	// 	types.ModuleName, types.NewQueryClient),
 	)
@@ -121,52 +121,52 @@ func GetQueryCmd() *cobra.Command {
 // 		),
 // 		Args: cobra.ExactArgs(0),
 // 		RunE: func(cmd *cobra.Command, args []string) error {
-// 			var res *types.AccountLockedLongerDurationResponse
-// 			ownerLocks := []uint64{}
-// 			lockIds := []uint64{}
+// 			var res *types.AccountStakedLongerDurationResponse
+// 			ownerStakes := []uint64{}
+// 			stakeIds := []uint64{}
 
 // 			owner, err := cmd.Flags().GetString(FlagOwner)
 // 			if err != nil {
 // 				return err
 // 			}
 
-// 			lockIdsCombined, err := cmd.Flags().GetString(FlagLockIds)
+// 			stakeIdsCombined, err := cmd.Flags().GetString(FlagStakeIds)
 // 			if err != nil {
 // 				return err
 // 			}
-// 			lockIdStrs := strings.Split(lockIdsCombined, ",")
+// 			stakeIdStrs := strings.Split(stakeIdsCombined, ",")
 
 // 			endEpoch, err := cmd.Flags().GetInt64(FlagEndEpoch)
 // 			if err != nil {
 // 				return err
 // 			}
 
-// 			// if user doesn't provide at least one of the lock ids or owner, we don't have enough information to proceed.
-// 			if lockIdsCombined == "" && owner == "" {
-// 				return fmt.Errorf("either one of owner flag or lock IDs must be provided")
+// 			// if user doesn't provide at least one of the stake ids or owner, we don't have enough information to proceed.
+// 			if stakeIdsCombined == "" && owner == "" {
+// 				return fmt.Errorf("either one of owner flag or stake IDs must be provided")
 
-// 				// if user provides lockIDs, use these lockIDs in our rewards estimation
+// 				// if user provides stakeIDs, use these stakeIDs in our rewards estimation
 // 			} else if owner == "" {
-// 				for _, lockIdStr := range lockIdStrs {
-// 					lockId, err := strconv.ParseUint(lockIdStr, 10, 64)
+// 				for _, stakeIdStr := range stakeIdStrs {
+// 					stakeId, err := strconv.ParseUint(stakeIdStr, 10, 64)
 // 					if err != nil {
 // 						return err
 // 					}
-// 					lockIds = append(lockIds, lockId)
+// 					stakeIds = append(stakeIds, stakeId)
 // 				}
 
-// 				// if no lockIDs are provided but an owner is provided, we query the rewards for all of the locks the owner has
-// 			} else if lockIdsCombined == "" {
-// 				lockIds = append(lockIds, ownerLocks...)
+// 				// if no stakeIDs are provided but an owner is provided, we query the rewards for all of the stakes the owner has
+// 			} else if stakeIdsCombined == "" {
+// 				stakeIds = append(stakeIds, ownerStakes...)
 // 			}
 
-// 			// if lockIDs are provided and an owner is provided, only query the lockIDs that are provided
-// 			// if a lockID was provided and it doesn't belong to the owner, return an error
-// 			if len(lockIds) != 0 && owner != "" {
-// 				for _, lockId := range lockIds {
-// 					validInputLockId := contains(ownerLocks, lockId)
-// 					if !validInputLockId {
-// 						return fmt.Errorf("lock-id %v does not belong to %v", lockId, owner)
+// 			// if stakeIDs are provided and an owner is provided, only query the stakeIDs that are provided
+// 			// if a stakeID was provided and it doesn't belong to the owner, return an error
+// 			if len(stakeIds) != 0 && owner != "" {
+// 				for _, stakeId := range stakeIds {
+// 					validInputStakeId := contains(ownerStakes, stakeId)
+// 					if !validInputStakeId {
+// 						return fmt.Errorf("stake-id %v does not belong to %v", stakeId, owner)
 // 					}
 // 				}
 // 			}
@@ -178,21 +178,21 @@ func GetQueryCmd() *cobra.Command {
 // 			queryClient := types.NewQueryClient(clientCtx)
 
 // 			if owner != "" {
-// 				queryClientLockup := types.NewQueryClient(clientCtx)
+// 				queryClientStakeup := types.NewQueryClient(clientCtx)
 
-// 				res, err = queryClientLockup.AccountLockedLongerDuration(cmd.Context(), &types.AccountLockedLongerDurationRequest{Owner: owner, Duration: time.Millisecond})
+// 				res, err = queryClientStakeup.AccountStakedLongerDuration(cmd.Context(), &types.AccountStakedLongerDurationRequest{Owner: owner, Duration: time.Millisecond})
 // 				if err != nil {
 // 					return err
 // 				}
-// 				for _, lockId := range res.Locks {
-// 					ownerLocks = append(ownerLocks, lockId.ID)
+// 				for _, stakeId := range res.Stakes {
+// 					ownerStakes = append(ownerStakes, stakeId.ID)
 // 				}
 // 			}
 
 // 			// TODO: Fix accumulation store bug. For now, we return a graceful error when attempting to query bugged gauges
 // 			RewardsEstimateResult, err := queryClient.RewardsEstimate(cmd.Context(), &types.RewardsEstimateRequest{
-// 				Owner:    owner, // owner is used only when lockIds are empty
-// 				LockIds:  lockIds,
+// 				Owner:    owner, // owner is used only when stakeIds are empty
+// 				StakeIds:  stakeIds,
 // 				EndEpoch: endEpoch,
 // 			})
 // 			if err != nil {
@@ -204,8 +204,8 @@ func GetQueryCmd() *cobra.Command {
 // 	}
 
 // 	flags.AddQueryFlagsToCmd(cmd)
-// 	cmd.Flags().String(FlagOwner, "", "Owner to receive rewards, optionally used when lock-ids flag is NOT set")
-// 	cmd.Flags().String(FlagLockIds, "", "the lock ids to receive rewards, when it is empty, all lock ids of the owner are used")
+// 	cmd.Flags().String(FlagOwner, "", "Owner to receive rewards, optionally used when stake-ids flag is NOT set")
+// 	cmd.Flags().String(FlagStakeIds, "", "the stake ids to receive rewards, when it is empty, all stake ids of the owner are used")
 // 	cmd.Flags().Int64(FlagEndEpoch, 0, "the end epoch number to participate in rewards calculation")
 
 // 	return cmd
@@ -221,9 +221,9 @@ func contains(s []uint64, value uint64) bool {
 	return false
 }
 
-// // GetCmdModuleBalance returns full balance of the lockup module.
-// // Lockup module is where coins of locks are held.
-// // This includes locked balance and unlocked balance of the module.
+// // GetCmdModuleBalance returns full balance of the stakeup module.
+// // Stakeup module is where coins of stakes are held.
+// // This includes staked balance and unstaked balance of the module.
 // func GetCmdModuleBalance() (*osmocli.QueryDescriptor, *types.ModuleBalanceRequest) {
 // 	return &osmocli.QueryDescriptor{
 // 		Use:   "module-balance",
@@ -231,26 +231,26 @@ func contains(s []uint64, value uint64) bool {
 // 		Long:  `{{.Short}}`}, &types.ModuleBalanceRequest{}
 // }
 
-// // GetCmdModuleLockedAmount returns locked balance of the module,
-// // which are all the tokens not unlocking + tokens that are not finished unlocking.
-// func GetCmdModuleLockedAmount() (*osmocli.QueryDescriptor, *types.ModuleLockedAmountRequest) {
+// // GetCmdModuleStakedAmount returns staked balance of the module,
+// // which are all the tokens not unstaking + tokens that are not finished unstaking.
+// func GetCmdModuleStakedAmount() (*osmocli.QueryDescriptor, *types.ModuleStakedAmountRequest) {
 // 	return &osmocli.QueryDescriptor{
-// 		Use:   "module-locked-amount",
-// 		Short: "Query locked amount",
-// 		Long:  `{{.Short}}`}, &types.ModuleLockedAmountRequest{}
+// 		Use:   "module-staked-amount",
+// 		Short: "Query staked amount",
+// 		Long:  `{{.Short}}`}, &types.ModuleStakedAmountRequest{}
 // }
 
-// // GetCmdAccountUnlockableCoins returns unlockable coins which has finsihed unlocking.
+// // GetCmdAccountUnstakeableCoins returns unstakeable coins which has finsihed unstaking.
 // // TODO: DELETE THIS + Actual query in subsequent PR
-// func GetCmdAccountUnlockableCoins() *cobra.Command {
+// func GetCmdAccountUnstakeableCoins() *cobra.Command {
 // 	cmd := &cobra.Command{
-// 		Use:   "account-unlockable-coins <address>",
-// 		Short: "Query account's unlockable coins",
+// 		Use:   "account-unstakeable-coins <address>",
+// 		Short: "Query account's unstakeable coins",
 // 		Long: strings.TrimSpace(
-// 			fmt.Sprintf(`Query account's unlockable coins.
+// 			fmt.Sprintf(`Query account's unstakeable coins.
 
 // Example:
-// $ %s query lockup account-unlockable-coins <address>
+// $ %s query stakeup account-unstakeable-coins <address>
 // `,
 // 				version.AppName,
 // 			),
@@ -264,7 +264,7 @@ func contains(s []uint64, value uint64) bool {
 
 // 			queryClient := types.NewQueryClient(clientCtx)
 
-// 			res, err := queryClient.AccountUnlockableCoins(cmd.Context(), &types.AccountUnlockableCoinsRequest{Owner: args[0]})
+// 			res, err := queryClient.AccountUnstakeableCoins(cmd.Context(), &types.AccountUnstakeableCoinsRequest{Owner: args[0]})
 // 			if err != nil {
 // 				return err
 // 			}
@@ -278,143 +278,143 @@ func contains(s []uint64, value uint64) bool {
 // 	return cmd
 // }
 
-// // GetCmdAccountUnlockingCoins returns unlocking coins of a specific account.
-// func GetCmdAccountUnlockingCoins() (*osmocli.QueryDescriptor, *types.AccountUnlockingCoinsRequest) {
+// // GetCmdAccountUnstakingCoins returns unstaking coins of a specific account.
+// func GetCmdAccountUnstakingCoins() (*osmocli.QueryDescriptor, *types.AccountUnstakingCoinsRequest) {
 // 	return &osmocli.QueryDescriptor{
-// 		Use:   "account-unlocking-coins <address>",
-// 		Short: "Query account's unlocking coins",
+// 		Use:   "account-unstaking-coins <address>",
+// 		Short: "Query account's unstaking coins",
 // 		Long: `{{.Short}}{{.ExampleHeader}}
-// {{.CommandPrefix}} account-unlocking-coins <address>`}, &types.AccountUnlockingCoinsRequest{}
+// {{.CommandPrefix}} account-unstaking-coins <address>`}, &types.AccountUnstakingCoinsRequest{}
 // }
 
-// // GetCmdAccountLockedCoins returns locked coins that that are still in a locked state from the specified account.
-// func GetCmdAccountLockedCoins() *cobra.Command {
-// 	return osmocli.SimpleQueryCmd[*types.AccountLockedCoinsRequest](
-// 		"account-locked-coins <address>",
-// 		"Query account's locked coins",
+// // GetCmdAccountStakedCoins returns staked coins that that are still in a staked state from the specified account.
+// func GetCmdAccountStakedCoins() *cobra.Command {
+// 	return osmocli.SimpleQueryCmd[*types.AccountStakedCoinsRequest](
+// 		"account-staked-coins <address>",
+// 		"Query account's staked coins",
 // 		`{{.Short}}{{.ExampleHeader}}
-// {{.CommandPrefix}} account-locked-coins <address>
+// {{.CommandPrefix}} account-staked-coins <address>
 // `, types.ModuleName, types.NewQueryClient)
 // }
 
-// // GetCmdAccountLockedPastTime returns locks of an account with unlock time beyond timestamp.
-// func GetCmdAccountLockedPastTime() (*osmocli.QueryDescriptor, *types.AccountLockedPastTimeRequest) {
+// // GetCmdAccountStakedPastTime returns stakes of an account with unstake time beyond timestamp.
+// func GetCmdAccountStakedPastTime() (*osmocli.QueryDescriptor, *types.AccountStakedPastTimeRequest) {
 // 	return &osmocli.QueryDescriptor{
-// 		Use:   "account-locked-pastime <address> <timestamp>",
-// 		Short: "Query locked records of an account with unlock time beyond timestamp",
+// 		Use:   "account-staked-pastime <address> <timestamp>",
+// 		Short: "Query staked records of an account with unstake time beyond timestamp",
 // 		Long: `{{.Short}}{{.ExampleHeader}}
-// {{.CommandPrefix}} account-locked-pastime <address> <timestamp>
-// `}, &types.AccountLockedPastTimeRequest{}
+// {{.CommandPrefix}} account-staked-pastime <address> <timestamp>
+// `}, &types.AccountStakedPastTimeRequest{}
 // }
 
-// // GetCmdAccountLockedPastTimeNotUnlockingOnly returns locks of an account with unlock time beyond provided timestamp
-// // amongst the locks that are in the unlocking queue.
-// func GetCmdAccountLockedPastTimeNotUnlockingOnly() (*osmocli.QueryDescriptor, *types.AccountLockedPastTimeNotUnlockingOnlyRequest) {
+// // GetCmdAccountStakedPastTimeNotUnstakingOnly returns stakes of an account with unstake time beyond provided timestamp
+// // amongst the stakes that are in the unstaking queue.
+// func GetCmdAccountStakedPastTimeNotUnstakingOnly() (*osmocli.QueryDescriptor, *types.AccountStakedPastTimeNotUnstakingOnlyRequest) {
 // 	return &osmocli.QueryDescriptor{
-// 		Use:   "account-locked-pastime-not-unlocking <address> <timestamp>",
-// 		Short: "Query locked records of an account with unlock time beyond timestamp within not unlocking queue.",
+// 		Use:   "account-staked-pastime-not-unstaking <address> <timestamp>",
+// 		Short: "Query staked records of an account with unstake time beyond timestamp within not unstaking queue.",
 // 		Long: `{{.Short}}
 // Timestamp is UNIX time in seconds.{{.ExampleHeader}}
-// {{.CommandPrefix}} account-locked-pastime-not-unlocking <address> <timestamp>
-// `}, &types.AccountLockedPastTimeNotUnlockingOnlyRequest{}
+// {{.CommandPrefix}} account-staked-pastime-not-unstaking <address> <timestamp>
+// `}, &types.AccountStakedPastTimeNotUnstakingOnlyRequest{}
 // }
 
-// // GetCmdAccountUnlockedBeforeTime returns locks with unlock time before the provided timestamp.
-// func GetCmdAccountUnlockedBeforeTime() *cobra.Command {
-// 	return osmocli.SimpleQueryCmd[*types.AccountUnlockedBeforeTimeRequest](
-// 		"account-locked-beforetime <address> <timestamp>",
-// 		"Query account's unlocked records before specific time",
+// // GetCmdAccountUnstakedBeforeTime returns stakes with unstake time before the provided timestamp.
+// func GetCmdAccountUnstakedBeforeTime() *cobra.Command {
+// 	return osmocli.SimpleQueryCmd[*types.AccountUnstakedBeforeTimeRequest](
+// 		"account-staked-beforetime <address> <timestamp>",
+// 		"Query account's unstaked records before specific time",
 // 		`{{.Short}}
 // Timestamp is UNIX time in seconds.{{.ExampleHeader}}
-// {{.CommandPrefix}} account-locked-pastime <address> <timestamp>
+// {{.CommandPrefix}} account-staked-pastime <address> <timestamp>
 // `, types.ModuleName, types.NewQueryClient)
 // }
 
-// // GetCmdAccountLockedPastTimeDenom returns locks of an account whose unlock time is
-// // beyond given timestamp, and locks with the specified denom.
-// func GetCmdAccountLockedPastTimeDenom() *cobra.Command {
-// 	return osmocli.SimpleQueryCmd[*types.AccountLockedPastTimeDenomRequest](
-// 		"account-locked-pastime-denom <address> <timestamp> <denom>",
-// 		"Query account's lock records by address, timestamp, denom",
+// // GetCmdAccountStakedPastTimeDenom returns stakes of an account whose unstake time is
+// // beyond given timestamp, and stakes with the specified denom.
+// func GetCmdAccountStakedPastTimeDenom() *cobra.Command {
+// 	return osmocli.SimpleQueryCmd[*types.AccountStakedPastTimeDenomRequest](
+// 		"account-staked-pastime-denom <address> <timestamp> <denom>",
+// 		"Query account's stake records by address, timestamp, denom",
 // 		`{{.Short}}
 // Timestamp is UNIX time in seconds.{{.ExampleHeader}}
-// {{.CommandPrefix}} account-locked-pastime-denom <address> <timestamp> <denom>
+// {{.CommandPrefix}} account-staked-pastime-denom <address> <timestamp> <denom>
 // `, types.ModuleName, types.NewQueryClient)
 // }
 
-// // GetCmdLockedByID returns lock by id.
-// func GetCmdLockedByID() *cobra.Command {
+// // GetCmdStakedByID returns stake by id.
+// func GetCmdStakedByID() *cobra.Command {
 // 	q := osmocli.QueryDescriptor{
-// 		Use:   "lock-by-id <id>",
-// 		Short: "Query account's lock record by id",
+// 		Use:   "stake-by-id <id>",
+// 		Short: "Query account's stake record by id",
 // 		Long: `{{.Short}}{{.ExampleHeader}}
-// {{.CommandPrefix}} lock-by-id 1`,
-// 		QueryFnName: "LockedByID",
+// {{.CommandPrefix}} stake-by-id 1`,
+// 		QueryFnName: "StakedByID",
 // 	}
 // 	q.Long = osmocli.FormatLongDesc(q.Long, osmocli.NewLongMetadata(types.ModuleName).WithShort(q.Short))
-// 	return osmocli.BuildQueryCli[*types.LockedRequest](&q, types.NewQueryClient)
+// 	return osmocli.BuildQueryCli[*types.StakedRequest](&q, types.NewQueryClient)
 // }
 
-// // GetCmdNextLockID returns next lock id to be created.
-// func GetCmdNextLockID() *cobra.Command {
-// 	return osmocli.SimpleQueryCmd[*types.NextLockIDRequest](
-// 		"next-lock-id",
-// 		"Query next lock id to be created",
+// // GetCmdNextStakeID returns next stake id to be created.
+// func GetCmdNextStakeID() *cobra.Command {
+// 	return osmocli.SimpleQueryCmd[*types.NextStakeIDRequest](
+// 		"next-stake-id",
+// 		"Query next stake id to be created",
 // 		`{{.Short}}`, types.ModuleName, types.NewQueryClient)
 // }
 
-// // GetCmdAccountLockedLongerDuration returns account locked records with longer duration.
-// func GetCmdAccountLockedLongerDuration() *cobra.Command {
-// 	return osmocli.SimpleQueryCmd[*types.AccountLockedLongerDurationRequest](
-// 		"account-locked-longer-duration <address> <duration>",
-// 		"Query account locked records with longer duration",
+// // GetCmdAccountStakedLongerDuration returns account staked records with longer duration.
+// func GetCmdAccountStakedLongerDuration() *cobra.Command {
+// 	return osmocli.SimpleQueryCmd[*types.AccountStakedLongerDurationRequest](
+// 		"account-staked-longer-duration <address> <duration>",
+// 		"Query account staked records with longer duration",
 // 		`{{.Short}}`, types.ModuleName, types.NewQueryClient)
 // }
 
-// // GetCmdAccountLockedLongerDuration returns account locked records with longer duration.
-// func GetCmdAccountLockedDuration() *cobra.Command {
-// 	return osmocli.SimpleQueryCmd[*types.AccountLockedDurationRequest](
-// 		"account-locked-duration <address> <duration>",
-// 		"Query account locked records with a specific duration",
+// // GetCmdAccountStakedLongerDuration returns account staked records with longer duration.
+// func GetCmdAccountStakedDuration() *cobra.Command {
+// 	return osmocli.SimpleQueryCmd[*types.AccountStakedDurationRequest](
+// 		"account-staked-duration <address> <duration>",
+// 		"Query account staked records with a specific duration",
 // 		`{{.Short}}{{.ExampleHeader}}
-// {{.CommandPrefix}} account-locked-duration osmo1yl6hdjhmkf37639730gffanpzndzdpmhxy9ep3 604800s`, types.ModuleName, types.NewQueryClient)
+// {{.CommandPrefix}} account-staked-duration osmo1yl6hdjhmkf37639730gffanpzndzdpmhxy9ep3 604800s`, types.ModuleName, types.NewQueryClient)
 // }
 
-// // GetCmdAccountLockedLongerDurationNotUnlockingOnly returns account locked records with longer duration from unlocking only queue.
-// func GetCmdAccountLockedLongerDurationNotUnlockingOnly() *cobra.Command {
-// 	return osmocli.SimpleQueryCmd[*types.AccountLockedLongerDurationNotUnlockingOnlyRequest](
-// 		"account-locked-longer-duration-not-unlocking <address> <duration>",
-// 		"Query account locked records with longer duration from unlocking only queue",
+// // GetCmdAccountStakedLongerDurationNotUnstakingOnly returns account staked records with longer duration from unstaking only queue.
+// func GetCmdAccountStakedLongerDurationNotUnstakingOnly() *cobra.Command {
+// 	return osmocli.SimpleQueryCmd[*types.AccountStakedLongerDurationNotUnstakingOnlyRequest](
+// 		"account-staked-longer-duration-not-unstaking <address> <duration>",
+// 		"Query account staked records with longer duration from unstaking only queue",
 // 		`{{.Short}}`, types.ModuleName, types.NewQueryClient)
 // }
 
-// // GetCmdAccountLockedLongerDurationDenom returns account's locks for a specific denom
+// // GetCmdAccountStakedLongerDurationDenom returns account's stakes for a specific denom
 // // with longer duration than the given duration.
-// func GetCmdAccountLockedLongerDurationDenom() *cobra.Command {
-// 	return osmocli.SimpleQueryCmd[*types.AccountLockedLongerDurationDenomRequest](
-// 		"account-locked-longer-duration-denom <address> <duration> <denom>",
-// 		"Query locked records for a denom with longer duration",
+// func GetCmdAccountStakedLongerDurationDenom() *cobra.Command {
+// 	return osmocli.SimpleQueryCmd[*types.AccountStakedLongerDurationDenomRequest](
+// 		"account-staked-longer-duration-denom <address> <duration> <denom>",
+// 		"Query staked records for a denom with longer duration",
 // 		`{{.Short}}`, types.ModuleName, types.NewQueryClient)
 // }
 
-// func GetCmdTotalLockedByDenom() (*osmocli.QueryDescriptor, *types.LockedDenomRequest) {
+// func GetCmdTotalStakedByDenom() (*osmocli.QueryDescriptor, *types.StakedDenomRequest) {
 // 	return &osmocli.QueryDescriptor{
-// 		Use:   "total-locked-of-denom <denom>",
-// 		Short: "Query locked amount for a specific denom bigger then duration provided",
+// 		Use:   "total-staked-of-denom <denom>",
+// 		Short: "Query staked amount for a specific denom bigger then duration provided",
 // 		Long: osmocli.FormatLongDescDirect(`{{.Short}}{{.ExampleHeader}}
-// {{.CommandPrefix}} total-locked-of-denom uosmo --min-duration=0s`, types.ModuleName),
-// 	}, &types.LockedDenomRequest{}
+// {{.CommandPrefix}} total-staked-of-denom uosmo --min-duration=0s`, types.ModuleName),
+// 	}, &types.StakedDenomRequest{}
 // }
 
-// // GetCmdOutputLocksJson outputs all locks into a file called lock_export.json.
-// func GetCmdOutputLocksJson() *cobra.Command {
+// // GetCmdOutputStakesJson outputs all stakes into a file called stake_export.json.
+// func GetCmdOutputStakesJson() *cobra.Command {
 // 	cmd := &cobra.Command{
-// 		Use:   "output-all-locks <max lock ID>",
-// 		Short: "output all locks into a json file",
+// 		Use:   "output-all-stakes <max stake ID>",
+// 		Short: "output all stakes into a json file",
 // 		Long: strings.TrimSpace(
-// 			fmt.Sprintf(`Output all locks into a json file.
+// 			fmt.Sprintf(`Output all stakes into a json file.
 // Example:
-// $ %s query lockup output-all-locks <max lock ID>
+// $ %s query stakeup output-all-stakes <max stake ID>
 // `,
 // 				version.AppName,
 // 			),
@@ -426,7 +426,7 @@ func contains(s []uint64, value uint64) bool {
 // 				return err
 // 			}
 
-// 			maxLockID, err := strconv.ParseInt(args[0], 10, 32)
+// 			maxStakeID, err := strconv.ParseInt(args[0], 10, 32)
 // 			if err != nil {
 // 				return err
 // 			}
@@ -438,7 +438,7 @@ func contains(s []uint64, value uint64) bool {
 // 				bonded_status
 // 			)
 
-// 			type LockResult struct {
+// 			type StakeResult struct {
 // 				Id            int
 // 				Status        int // one of {doesnt_exist, }
 // 				Denom         string
@@ -448,38 +448,38 @@ func contains(s []uint64, value uint64) bool {
 // 			}
 // 			queryClient := types.NewQueryClient(clientCtx)
 
-// 			results := []LockResult{}
-// 			for i := 0; i <= int(maxLockID); i++ {
-// 				curLockResult := LockResult{Id: i}
-// 				res, err := queryClient.LockedByID(cmd.Context(), &types.LockedRequest{LockId: uint64(i)})
+// 			results := []StakeResult{}
+// 			for i := 0; i <= int(maxStakeID); i++ {
+// 				curStakeResult := StakeResult{Id: i}
+// 				res, err := queryClient.StakedByID(cmd.Context(), &types.StakedRequest{StakeId: uint64(i)})
 // 				if err != nil {
-// 					curLockResult.Status = doesnt_exist_status
-// 					results = append(results, curLockResult)
+// 					curStakeResult.Status = doesnt_exist_status
+// 					results = append(results, curStakeResult)
 // 					continue
 // 				}
 // 				// 1527019420 is hardcoded time well before launch, but well after year 1
-// 				if res.Lock.EndTime.Before(time.Unix(1527019420, 0)) {
-// 					curLockResult.Status = bonded_status
+// 				if res.Stake.EndTime.Before(time.Unix(1527019420, 0)) {
+// 					curStakeResult.Status = bonded_status
 // 				} else {
-// 					curLockResult.Status = unbonding_status
-// 					curLockResult.UnbondEndTime = res.Lock.EndTime
-// 					curLockResult.Denom = res.Lock.Coins[0].Denom
-// 					curLockResult.Amount = res.Lock.Coins[0].Amount
-// 					curLockResult.Address = res.Lock.Owner
+// 					curStakeResult.Status = unbonding_status
+// 					curStakeResult.UnbondEndTime = res.Stake.EndTime
+// 					curStakeResult.Denom = res.Stake.Coins[0].Denom
+// 					curStakeResult.Amount = res.Stake.Coins[0].Amount
+// 					curStakeResult.Address = res.Stake.Owner
 // 				}
-// 				results = append(results, curLockResult)
+// 				results = append(results, curStakeResult)
 // 			}
 
 // 			bz, err := json.Marshal(results)
 // 			if err != nil {
 // 				return err
 // 			}
-// 			err = os.WriteFile("lock_export.json", bz, 0o777)
+// 			err = os.WriteFile("stake_export.json", bz, 0o777)
 // 			if err != nil {
 // 				return err
 // 			}
 
-// 			fmt.Println("Writing to lock_export.json")
+// 			fmt.Println("Writing to stake_export.json")
 // 			return nil
 // 		},
 // 	}

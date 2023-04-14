@@ -63,29 +63,29 @@ func TestRemoveValue(t *testing.T) {
 	require.Equal(t, index4, -1)
 }
 
-func TestLockRefKeys(t *testing.T) {
+func TestStakeRefKeys(t *testing.T) {
 	addr1 := sdk.AccAddress([]byte("addr1---------------"))
 	// empty address and 1 coin
-	lock1 := types.NewLock(1, sdk.AccAddress{}, time.Second, time.Now(), sdk.Coins{sdk.NewInt64Coin("stake", 10)})
-	_, err := unlockingLockRefKeys(lock1)
+	stake1 := types.NewStake(1, sdk.AccAddress{}, sdk.Coins{sdk.NewInt64Coin("stake", 10)}, time.Now())
+	_, err := getStakeRefKeys(stake1)
 	require.Error(t, err)
 
 	// empty address and 2 coins
-	lock2 := types.NewLock(1, sdk.AccAddress{}, time.Second, time.Now(), sdk.Coins{sdk.NewInt64Coin("stake", 10), sdk.NewInt64Coin("atom", 1)})
-	_, err = unlockingLockRefKeys(lock2)
+	stake2 := types.NewStake(1, sdk.AccAddress{}, sdk.Coins{sdk.NewInt64Coin("stake", 10), sdk.NewInt64Coin("atom", 1)}, time.Now())
+	_, err = getStakeRefKeys(stake2)
 	require.Error(t, err)
 
 	// not empty address and 1 coin
-	lock3 := types.NewLock(1, addr1, time.Second, time.Now(), sdk.Coins{sdk.NewInt64Coin("stake", 10)})
-	keys3, err := unlockingLockRefKeys(lock3)
+	stake3 := types.NewStake(1, addr1, sdk.Coins{sdk.NewInt64Coin("stake", 10)}, time.Now())
+	keys3, err := getStakeRefKeys(stake3)
 	require.Len(t, keys3, 4)
 
 	// not empty address and empty coin
-	lock4 := types.NewLock(1, addr1, time.Second, time.Now(), sdk.Coins{sdk.NewInt64Coin("stake", 10)})
-	keys4, err := unlockingLockRefKeys(lock4)
+	stake4 := types.NewStake(1, addr1, sdk.Coins{sdk.NewInt64Coin("stake", 10)}, time.Now())
+	keys4, err := getStakeRefKeys(stake4)
 	require.Len(t, keys4, 4)
 	// not empty address and 2 coins
-	lock5 := types.NewLock(1, addr1, time.Second, time.Now(), sdk.Coins{sdk.NewInt64Coin("stake", 10), sdk.NewInt64Coin("atom", 1)})
-	keys5, err := unlockingLockRefKeys(lock5)
+	stake5 := types.NewStake(1, addr1, sdk.Coins{sdk.NewInt64Coin("stake", 10), sdk.NewInt64Coin("atom", 1)}, time.Now())
+	keys5, err := getStakeRefKeys(stake5)
 	require.Len(t, keys5, 6)
 }

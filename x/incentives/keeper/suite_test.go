@@ -9,8 +9,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type userLocks struct {
-	lockAmounts []sdk.Coins
+type userStakes struct {
+	stakeAmounts []sdk.Coins
 }
 
 type depositSpec struct {
@@ -59,19 +59,19 @@ func (suite *KeeperTestSuite) SetupDeposit(s depositSpec) sdk.Coins {
 	return shares
 }
 
-func (suite *KeeperTestSuite) SetupDepositAndLock(s depositSpec) *types.Lock {
+func (suite *KeeperTestSuite) SetupDepositAndStake(s depositSpec) *types.Stake {
 	shares := suite.SetupDeposit(s)
-	return suite.SetupLock(s.addr, shares)
+	return suite.SetupStake(s.addr, shares)
 }
 
-// LockTokens locks tokens for the specified duration
-func (suite *KeeperTestSuite) SetupLock(
+// StakeTokens stakes tokens for the specified duration
+func (suite *KeeperTestSuite) SetupStake(
 	addr sdk.AccAddress,
 	shares sdk.Coins,
-) *types.Lock {
-	lock, err := suite.App.IncentivesKeeper.CreateLock(suite.Ctx, addr, shares, 24*time.Hour)
+) *types.Stake {
+	stake, err := suite.App.IncentivesKeeper.CreateStake(suite.Ctx, addr, shares)
 	suite.Require().NoError(err)
-	return lock
+	return stake
 }
 
 func GetQualifyingDenom(qc types.QueryCondition) *dextypes.DepositDenom {

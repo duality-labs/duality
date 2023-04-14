@@ -15,15 +15,14 @@ import (
 func (suite *KeeperTestSuite) TestGenesis() {
 	validAddr, _ := apptesting.GenerateTestAddrs()
 	genesisState := types.GenesisState{
-		Params:     types.DefaultParams(),
-		LastLockId: 10,
-		Locks: []*types.Lock{
+		Params:      types.DefaultParams(),
+		LastStakeId: 10,
+		Stakes: []*types.Stake{
 			{
-				ID:       0,
-				Owner:    validAddr,
-				Duration: 24 * time.Hour,
-				EndTime:  time.Time{},
-				Coins:    sdk.NewCoins(sdk.NewInt64Coin(suite.LPDenom, 10)),
+				ID:        0,
+				Owner:     validAddr,
+				StartTime: time.Time{},
+				Coins:     sdk.NewCoins(sdk.NewInt64Coin(suite.LPDenom, 10)),
 			},
 		},
 		LastGaugeId: 10,
@@ -52,7 +51,7 @@ func (suite *KeeperTestSuite) TestGenesis() {
 	nullify.Fill(got)
 
 	require.ElementsMatch(suite.T(), genesisState.Gauges, got.Gauges)
-	require.ElementsMatch(suite.T(), genesisState.Locks, got.Locks)
-	require.Equal(suite.T(), genesisState.LastLockId, got.LastLockId)
+	require.ElementsMatch(suite.T(), genesisState.Stakes, got.Stakes)
+	require.Equal(suite.T(), genesisState.LastStakeId, got.LastStakeId)
 	require.Equal(suite.T(), genesisState.LastGaugeId, got.LastGaugeId)
 }

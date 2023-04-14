@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type LockI interface {
+type StakeI interface {
 	GetOwner() string
 	Amount() sdk.Coins
 }

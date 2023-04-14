@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestLocksCoinsByQueryCondition(t *testing.T) {
+func TestStakesCoinsByQueryCondition(t *testing.T) {
 	owner, err := sdk.AccAddressFromBech32("cosmos1xv9tklw7d82sezh9haa573wufgy59vmwe6xxe5")
 	require.NoError(t, err)
 
@@ -51,13 +51,10 @@ func TestLocksCoinsByQueryCondition(t *testing.T) {
 		),
 	}
 
-	duration := time.Duration(1 * time.Hour)
-	endTime := time.Time{}
-
-	locks := Locks{
-		NewLock(1, owner, duration, endTime, sdk.Coins{allCoins[0]}),
-		NewLock(2, owner, duration, endTime, sdk.Coins{allCoins[1]}),
-		NewLock(3, owner, duration, endTime, sdk.Coins{allCoins[2]}),
+	stakes := Stakes{
+		NewStake(1, owner, sdk.Coins{allCoins[0]}, time.Time{}),
+		NewStake(2, owner, sdk.Coins{allCoins[1]}, time.Time{}),
+		NewStake(3, owner, sdk.Coins{allCoins[2]}, time.Time{}),
 	}
 
 	pairID := &dextypes.PairID{
@@ -94,7 +91,7 @@ func TestLocksCoinsByQueryCondition(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			coins := locks.CoinsByQueryCondition(tt.queryCond)
+			coins := stakes.CoinsByQueryCondition(tt.queryCond)
 			assert.Equal(t, tt.coinsByCond, coins)
 		})
 	}

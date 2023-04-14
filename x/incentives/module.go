@@ -212,9 +212,9 @@ func (am AppModule) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
 // 	// 	simState.AppParams, simState.Cdc,
 // 	// 	am.accountKeeper, am.bankKeeper, am.epochKeeper, am.keeper,
 // 	// )
-// 	// simtypes.NewMsgBasedAction("lock tokens", am.keeper, simulation.RandomMsgLockTokens),
-// 	// simtypes.NewMsgBasedAction("unlock all tokens", am.keeper, simulation.RandomMsgBeginUnlockingAll),
-// 	// simtypes.NewMsgBasedAction("unlock lock", am.keeper, simulation.RandomMsgBeginUnlocking),
+// 	// simtypes.NewMsgBasedAction("stake tokens", am.keeper, simulation.RandomMsgStakeTokens),
+// 	// simtypes.NewMsgBasedAction("unstake all tokens", am.keeper, simulation.RandomMsgBeginUnstakingAll),
+// 	// simtypes.NewMsgBasedAction("unstake stake", am.keeper, simulation.RandomMsgBeginUnstaking),
 // }
 
 // ConsensusVersion implements AppModule/ConsensusVersion.
