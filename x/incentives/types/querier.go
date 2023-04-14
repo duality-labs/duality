@@ -1,16 +1,16 @@
 package types
 
-// query endpoints supported by the lockup QueryServer.
+// query endpoints supported by the stakeup QueryServer.
 const (
 	QueryModuleBalance                    = "module_balance"
-	QueryModuleLockedAmount               = "module_locked_amount"
-	QueryAccountUnlockableCoins           = "account_unlockable_coins"
-	QueryAccountLockedCoins               = "account_locked_coins"
-	QueryAccountLockedPastTime            = "account_locked_pastime"
-	QueryAccountUnlockedBeforeTime        = "account_unlocked_beforetime"
-	QueryAccountLockedPastTimeDenom       = "account_locked_denom_pastime"
-	QueryLockedByID                       = "locked_by_id"
-	QueryAccountLockedLongerDuration      = "account_locked_longer_than_duration"
-	QueryAccountLockedLongerDurationDenom = "account_locked_longer_than_duration_denom"
-	QueryAccountLockedDuration            = "account_locked_duration"
+	QueryModuleStakedAmount               = "module_staked_amount"
+	QueryAccountUnstakeableCoins          = "account_unstakeable_coins"
+	QueryAccountStakedCoins               = "account_staked_coins"
+	QueryAccountStakedPastTime            = "account_staked_pastime"
+	QueryAccountUnstakedBeforeTime        = "account_unstaked_beforetime"
+	QueryAccountStakedPastTimeDenom       = "account_staked_denom_pastime"
+	QueryStakedByID                       = "staked_by_id"
+	QueryAccountStakedLongerDuration      = "account_staked_longer_than_duration"
+	QueryAccountStakedLongerDurationDenom = "account_staked_longer_than_duration_denom"
+	QueryAccountStakedDuration            = "account_staked_duration"
 )

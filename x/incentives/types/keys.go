@@ -47,52 +47,46 @@ var (
 	// KeyPrefixGaugeIndexByPair defines prefix key for storing indexes of gauge IDs by denomination.
 	KeyPrefixGaugeIndexByPair = []byte{0x05}
 
-	// KeyLastLockID defines key to store lock ID used by last.
-	KeyLastLockID = []byte{0x06}
+	// KeyLastStakeID defines key to store stake ID used by last.
+	KeyLastStakeID = []byte{0x06}
 
-	// KeyPrefixLock defines prefix to store period lock by ID.
-	KeyPrefixLock = []byte{0x07}
+	// KeyPrefixStake defines prefix to store period stake by ID.
+	KeyPrefixStake = []byte{0x07}
 
-	// KeyPrefixLockIndexNotUnlocking defines prefix to query iterators which hasn't started unlocking.
-	KeyPrefixLockIndexNotUnlocking = []byte{0x08}
+	// KeyPrefixStakeIndexAccount defines prefix for the iteration of stake IDs by account.
+	KeyPrefixStakeIndex = []byte{0x08}
 
-	// KeyPrefixLockIndexUnlocking defines prefix to query iterators which has started unlocking.
-	KeyPrefixLockIndexUnlocking = []byte{0x09}
+	// KeyPrefixStakeIndexAccount defines prefix for the iteration of stake IDs by account.
+	KeyPrefixStakeIndexAccount = []byte{0x09}
 
-	// KeyPrefixLockIndex defines prefix for the iteration of lock IDs.
-	KeyPrefixLockIndex = []byte{0x0a}
+	// KeyPrefixStakeIndexDenom defines prefix for the iteration of stake IDs by denom.
+	KeyPrefixStakeIndexDenom = []byte{0x0c}
 
-	// KeyPrefixLockIndexAccount defines prefix for the iteration of lock IDs by account.
-	KeyPrefixLockIndexAccount = []byte{0x0b}
+	// KeyPrefixStakeIndexPairTick defines prefix for the iteration of stake IDs by pairId and tick index.
+	KeyPrefixStakeIndexPairTick = []byte{0x0d}
 
-	// KeyPrefixLockIndexDenom defines prefix for the iteration of lock IDs by denom.
-	KeyPrefixLockIndexDenom = []byte{0x0c}
+	// KeyPrefixStakeIndexAccountDenom defines prefix for the iteration of stake IDs by account, denomination.
+	KeyPrefixStakeIndexAccountDenom = []byte{0x0e}
 
-	// KeyPrefixLockIndexPairTick defines prefix for the iteration of lock IDs by pairId and tick index.
-	KeyPrefixLockIndexPairTick = []byte{0x0d}
+	// KeyPrefixStakeIndexTimestamp defines prefix for the iteration of stake IDs by timestamp.
+	KeyPrefixStakeIndexPairTimestamp = []byte{0x0f}
 
-	// KeyPrefixLockIndexAccountDenom defines prefix for the iteration of lock IDs by account, denomination.
-	KeyPrefixLockIndexAccountDenom = []byte{0x0e}
+	// // KeyPrefixStakeIndexAccountTimestamp defines prefix for the iteration of stake IDs by account and timestamp.
+	// KeyPrefixStakeIndexAccountTimestamp = []byte{0x10}
 
-	// KeyPrefixLockIndexTimestamp defines prefix for the iteration of lock IDs by timestamp.
-	KeyPrefixLockIndexTimestamp = []byte{0x0f}
+	// // KeyPrefixStakeIndexDenomTimestamp defines prefix for the iteration of stake IDs by denom and timestamp.
+	// KeyPrefixStakeIndexDenomTimestamp = []byte{0x11}
 
-	// KeyPrefixLockIndexAccountTimestamp defines prefix for the iteration of lock IDs by account and timestamp.
-	KeyPrefixLockIndexAccountTimestamp = []byte{0x10}
-
-	// KeyPrefixLockIndexDenomTimestamp defines prefix for the iteration of lock IDs by denom and timestamp.
-	KeyPrefixLockIndexDenomTimestamp = []byte{0x11}
-
-	// KeyPrefixLockIndexAccountDenomTimestamp defines prefix for the iteration of lock IDs by account, denomination and timestamp.
-	KeyPrefixLockIndexAccountDenomTimestamp = []byte{0x12}
+	// // KeyPrefixStakeIndexAccountDenomTimestamp defines prefix for the iteration of stake IDs by account, denomination and timestamp.
+	// KeyPrefixStakeIndexAccountDenomTimestamp = []byte{0x12}
 
 	// KeyndexSeparator defines separator between keys when combine, it should be one that is not used in denom expression.
 	KeyIndexSeparator = []byte{0xFF}
 )
 
-// lockStoreKey returns action store key from ID.
-func GetLockStoreKey(ID uint64) []byte {
-	return CombineKeys(KeyPrefixLock, sdk.Uint64ToBigEndian(ID))
+// stakeStoreKey returns action store key from ID.
+func GetStakeStoreKey(ID uint64) []byte {
+	return CombineKeys(KeyPrefixStake, sdk.Uint64ToBigEndian(ID))
 }
 
 // combineKeys combine bytes array into a single bytes.
@@ -100,8 +94,8 @@ func CombineKeys(keys ...[]byte) []byte {
 	return bytes.Join(keys, KeyIndexSeparator)
 }
 
-// getTimeKey returns the key used for getting a set of period locks
-// where unlockTime is after a specific time.
+// getTimeKey returns the key used for getting a set of period stakes
+// where unstakeTime is after a specific time.
 func GetTimeKey(timestamp time.Time) []byte {
 	timeBz := sdk.FormatTimeBytes(timestamp)
 	timeBzL := len(timeBz)
@@ -120,7 +114,7 @@ func GetTimeKey(timestamp time.Time) []byte {
 	return bz
 }
 
-func CombineLocks(pl1 Locks, pl2 Locks) Locks {
+func CombineStakes(pl1 Stakes, pl2 Stakes) Stakes {
 	return append(pl1, pl2...)
 }
 
@@ -134,88 +128,51 @@ func GetKeyGaugeIndexByPair(pairID string) []byte {
 	return CombineKeys(KeyPrefixGaugeIndexByPair, []byte(pairID))
 }
 
-func GetPrefixLockStatus(isUnlocking bool) []byte {
-	if isUnlocking {
-		return KeyPrefixLockIndexUnlocking
+func GetKeyStakeIndexByAccount(account sdk.AccAddress) []byte {
+	return CombineKeys(
+		KeyPrefixStakeIndexAccount,
+		account,
+	)
+}
+
+func GetKeyStakeIndexByDenom(denom string) []byte {
+	return CombineKeys(
+		KeyPrefixStakeIndexDenom,
+		[]byte(denom),
+	)
+}
+
+func GetKeyStakeIndexByAccountDenom(account sdk.AccAddress, denom string) []byte {
+	return CombineKeys(
+		KeyPrefixStakeIndexAccountDenom,
+		account,
+		[]byte(denom),
+	)
+}
+
+func GetKeyStakeIndexByTimestamp(pairID string, timestamp time.Time) []byte {
+	return CombineKeys(
+		KeyPrefixStakeIndexPairTimestamp,
+		[]byte(pairID),
+		GetTimeKey(timestamp),
+	)
+}
+
+func GetKeyStakeIndexByPairTick(pairID string, tickIndex int64) []byte {
+	return CombineKeys(
+		KeyPrefixStakeIndexPairTick,
+		[]byte(pairID),
+		TickIndexToBytes(tickIndex),
+	)
+}
+
+func TickIndexToBytes(tickIndex int64) []byte {
+	key := make([]byte, 9)
+	if tickIndex < 0 {
+		copy(key[1:], sdk.Uint64ToBigEndian(uint64(tickIndex)))
+	} else {
+		copy(key[:1], []byte{0x01})
+		copy(key[1:], sdk.Uint64ToBigEndian(uint64(tickIndex)))
 	}
-	return KeyPrefixLockIndexNotUnlocking
+	return key
 }
-
-func GetKeyLockIndex(isUnlocking bool) []byte {
-	return CombineKeys(
-		GetPrefixLockStatus(isUnlocking),
-		KeyPrefixLockIndex,
-	)
-}
-
-func GetKeyLockIndexByAccount(isUnlocking bool, account sdk.AccAddress) []byte {
-	return CombineKeys(
-		GetPrefixLockStatus(isUnlocking),
-		KeyPrefixLockIndexAccount,
-		account,
-	)
-}
-
-// TODO: revisit whether denom index is necessary
-func GetKeyLockIndexByDenom(isUnlocking bool, denom string) []byte {
-	return CombineKeys(
-		GetPrefixLockStatus(isUnlocking),
-		KeyPrefixLockIndexDenom,
-		[]byte(denom),
-	)
-}
-
-func GetKeyLockIndexByAccountDenom(isUnlocking bool, account sdk.AccAddress, denom string) []byte {
-	return CombineKeys(
-		GetPrefixLockStatus(isUnlocking),
-		KeyPrefixLockIndexAccountDenom,
-		account,
-		[]byte(denom),
-	)
-}
-
-func GetKeyLockIndexUnlockingByTimestamp(timestamp time.Time) []byte {
-	return CombineKeys(
-		GetPrefixLockStatus(true),
-		KeyPrefixLockIndexTimestamp,
-		GetTimeKey(timestamp),
-	)
-}
-
-func GetKeyLockIndexUnlockingByAccountTimestamp(account sdk.AccAddress, timestamp time.Time) []byte {
-	return CombineKeys(
-		GetPrefixLockStatus(true),
-		KeyPrefixLockIndexAccountTimestamp,
-		account,
-		GetTimeKey(timestamp),
-	)
-}
-
-func GetKeyLockIndexUnlockingByDenomTimestamp(denom string, timestamp time.Time) []byte {
-	return CombineKeys(
-		GetPrefixLockStatus(true),
-		KeyPrefixLockIndexDenomTimestamp,
-		[]byte(denom),
-		GetTimeKey(timestamp),
-	)
-}
-
-func GetKeyLockIndexUnlockingByAccountDenomTimestamp(account sdk.AccAddress, denom string, timestamp time.Time) []byte {
-	return CombineKeys(
-		GetPrefixLockStatus(true),
-		KeyPrefixLockIndexAccountDenomTimestamp,
-		account,
-		[]byte(denom),
-		GetTimeKey(timestamp),
-	)
-}
-
-// func GetKeyLockIndexByPairTick(isUnlocking bool, pairID string, tickIndex int64) []byte {
-// 	return CombineKeys(
-// 		GetPrefixLockStatus(isUnlocking),
-// 		KeyPrefixLockIndexPairTick,
-// 		// TODO
-// 		[]byte(pairID),
-// 		Int64ToBytes(tickIndex),
-// 	)
-// }

@@ -31,8 +31,8 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 		expectation sdk.Int
 		err         error
 	}{
-		// gauge 1 gives 3k coins. three locks, all eligible. 1k coins per lock.
-		// 1k should go to oneLockupUser and 2k to twoLockupUser.
+		// gauge 1 gives 3k coins. three stakes, all eligible. 1k coins per stake.
+		// 1k should go to oneStakeupUser and 2k to twoStakeupUser.
 		{
 			name: "one deposit",
 			deposits: []depositSpec{
@@ -123,8 +123,8 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 	for _, tc := range tests {
 		suite.T().Run(tc.name, func(t *testing.T) {
 			suite.SetupTest()
-			for _, lockSpec := range tc.deposits {
-				suite.SetupDeposit(lockSpec)
+			for _, stakeSpec := range tc.deposits {
+				suite.SetupDeposit(stakeSpec)
 			}
 			value, err := suite.App.IncentivesKeeper.ValueForShares(suite.Ctx, tc.coin, tc.tick)
 			if tc.err == nil {
@@ -138,7 +138,7 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 }
 
 // TestDistribute tests that when the distribute command is executed on a provided gauge
-// that the correct amount of rewards is sent to the correct lock owners.
+// that the correct amount of rewards is sent to the correct stake owners.
 func (suite *KeeperTestSuite) TestDistribute() {
 	addrs := apptesting.SetupAddrs(3)
 	tests := []struct {
@@ -237,7 +237,7 @@ func (suite *KeeperTestSuite) TestDistribute() {
 			},
 		},
 		{
-			name: "one lock with adjustment",
+			name: "one stake with adjustment",
 			depositSpecs: []depositSpec{
 				{
 					addr:   addrs[0],
@@ -281,7 +281,7 @@ func (suite *KeeperTestSuite) TestDistribute() {
 		suite.T().Run(tc.name, func(t *testing.T) {
 			suite.SetupTest()
 			for _, depositSpec := range tc.depositSpecs {
-				suite.SetupDepositAndLock(depositSpec)
+				suite.SetupDepositAndStake(depositSpec)
 			}
 			gauges := make(types.Gauges, len(tc.gaugeSpecs))
 			for i, gaugeSpec := range tc.gaugeSpecs {
@@ -299,9 +299,9 @@ func (suite *KeeperTestSuite) TestDistribute() {
 	}
 }
 
-// // TestNoLockPerpetualGaugeDistribution tests that the creation of a perp gauge that has no locks associated does not distribute any tokens.
-// func (suite *KeeperTestSuite) TestNoLockPerpetualGaugeDistribution() {
-// 	// setup a perpetual gauge with no associated locks
+// // TestNoStakePerpetualGaugeDistribution tests that the creation of a perp gauge that has no stakes associated does not distribute any tokens.
+// func (suite *KeeperTestSuite) TestNoStakePerpetualGaugeDistribution() {
+// 	// setup a perpetual gauge with no associated stakes
 // 	coins := sdk.Coins{sdk.NewInt64Coin("stake", 10)}
 // 	gaugeID, _, _, startTime := suite.SetupGauge(true, coins)
 
@@ -342,11 +342,11 @@ func (suite *KeeperTestSuite) TestDistribute() {
 // 	suite.Require().Equal(gauges[0].String(), expectedGauge.String())
 // }
 
-// // TestNoLockNonPerpetualGaugeDistribution tests that the creation of a non perp gauge that has no locks associated does not distribute any tokens.
-// func (suite *KeeperTestSuite) TestNoLockNonPerpetualGaugeDistribution() {
-// 	// setup non-perpetual gauge with no associated locks
+// // TestNoStakeNonPerpetualGaugeDistribution tests that the creation of a non perp gauge that has no stakes associated does not distribute any tokens.
+// func (suite *KeeperTestSuite) TestNoStakeNonPerpetualGaugeDistribution() {
+// 	// setup non-perpetual gauge with no associated stakes
 // 	coins := sdk.Coins{sdk.NewInt64Coin("stake", 10)}
-// 	lock, gauge := suite.SetupGauge(false, coins)
+// 	stake, gauge := suite.SetupGauge(false, coins)
 
 // 	// ensure the created gauge has not completed distribution
 // 	gauges := suite.App.IncentivesKeeper.GetNotFinishedGauges(suite.Ctx)

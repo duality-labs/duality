@@ -32,7 +32,7 @@ package keeper_test
 
 // var _ = suite.TestingSuite(nil)
 
-// func (suite *KeeperTestSuite) TestLockReferencesManagement() {
+// func (suite *KeeperTestSuite) TestStakeReferencesManagement() {
 // 	key1 := []byte{0x11}
 // 	key2 := []byte{0x12}
 
@@ -43,12 +43,12 @@ package keeper_test
 // 	_ = suite.App.IncentivesKeeper.addRefByKey(suite.Ctx, key2, 2)
 // 	_ = suite.App.IncentivesKeeper.addRefByKey(suite.Ctx, key2, 3)
 
-// 	lockIDs1 := suite.App.IncentivesKeeper.getRefs(suite.Ctx, key1)
-// 	suite.Require().Equal(len(lockIDs1), 2)
-// 	lockIDs2 := suite.App.IncentivesKeeper.getRefs(suite.Ctx, key2)
-// 	suite.Require().Equal(len(lockIDs2), 3)
+// 	stakeIDs1 := suite.App.IncentivesKeeper.getRefs(suite.Ctx, key1)
+// 	suite.Require().Equal(len(stakeIDs1), 2)
+// 	stakeIDs2 := suite.App.IncentivesKeeper.getRefs(suite.Ctx, key2)
+// 	suite.Require().Equal(len(stakeIDs2), 3)
 
 // 	suite.App.IncentivesKeeper.deleteRefByKey(suite.Ctx, key2, 1)
-// 	lockIDs2 = suite.App.IncentivesKeeper.getRefs(suite.Ctx, key2)
-// 	suite.Require().Equal(len(lockIDs2), 2)
+// 	stakeIDs2 = suite.App.IncentivesKeeper.getRefs(suite.Ctx, key2)
+// 	suite.Require().Equal(len(stakeIDs2), 2)
 // }

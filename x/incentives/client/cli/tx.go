@@ -24,9 +24,8 @@ func GetTxCmd() *cobra.Command {
 		NewCreateGaugeCmd(),
 		NewAddToGaugeCmd(),
 	)
-	osmocli.AddTxCmd(cmd, NewLockTokensCmd)
-	osmocli.AddTxCmd(cmd, NewBeginUnlockingAllCmd)
-	osmocli.AddTxCmd(cmd, NewBeginUnlockByIDCmd)
+	osmocli.AddTxCmd(cmd, NewStakeTokensCmd)
+	osmocli.AddTxCmd(cmd, NewUnstakeByIDCmd)
 
 	return cmd
 }
@@ -35,7 +34,7 @@ func GetTxCmd() *cobra.Command {
 // NewCreateGaugeCmd broadcasts a CreateGauge message.
 func NewCreateGaugeCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create-gauge [lockup_denom] [reward] [flags]",
+		Use:   "create-gauge [stakeup_denom] [reward] [flags]",
 		Short: "create a gauge to distribute rewards to users",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -110,29 +109,21 @@ func NewAddToGaugeCmd() *cobra.Command {
 	})
 }
 
-func NewLockTokensCmd() (*osmocli.TxCliDesc, *types.MsgLockTokens) {
+func NewStakeTokensCmd() (*osmocli.TxCliDesc, *types.MsgStake) {
 	return &osmocli.TxCliDesc{
-		Use:   "lock-tokens [tokens]",
-		Short: "lock tokens into lockup pool from user account",
-	}, &types.MsgLockTokens{}
+		Use:   "stake-tokens [tokens]",
+		Short: "stake tokens into stakeup pool from user account",
+	}, &types.MsgStake{}
 }
 
-// TODO: We should change the Use string to be unlock-all
-func NewBeginUnlockingAllCmd() (*osmocli.TxCliDesc, *types.MsgBeginUnlockingAll) {
+// NewUnstakeByIDCmd unstakes individual period stake by ID.
+func NewUnstakeByIDCmd() (*osmocli.TxCliDesc, *types.MsgUnstake) {
 	return &osmocli.TxCliDesc{
-		Use:   "begin-unlock-tokens",
-		Short: "begin unlock not unlocking tokens from lockup pool for sender",
-	}, &types.MsgBeginUnlockingAll{}
-}
-
-// NewBeginUnlockByIDCmd unlocks individual period lock by ID.
-func NewBeginUnlockByIDCmd() (*osmocli.TxCliDesc, *types.MsgBeginUnlocking) {
-	return &osmocli.TxCliDesc{
-		Use:   "begin-unlock-by-id [id]",
-		Short: "begin unlock individual period lock by ID",
+		Use:   "begin-unstake-by-id [id]",
+		Short: "begin unstake individual period stake by ID",
 		CustomFlagOverrides: map[string]string{
 			"coins": FlagAmount,
 		},
-		Flags: osmocli.FlagDesc{OptionalFlags: []*pflag.FlagSet{FlagSetUnSetupLock()}},
-	}, &types.MsgBeginUnlocking{}
+		Flags: osmocli.FlagDesc{OptionalFlags: []*pflag.FlagSet{FlagSetUnSetupStake()}},
+	}, &types.MsgUnstake{}
 }

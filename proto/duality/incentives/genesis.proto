@@ -2,10 +2,9 @@ syntax = "proto3";
 package duality.incentives;
 
 import "gogoproto/gogo.proto";
-import "google/protobuf/duration.proto";
 import "duality/incentives/params.proto";
 import "duality/incentives/gauge.proto";
-import "duality/incentives/lock.proto";
+import "duality/incentives/stake.proto";
 
 option go_package = "github.com/duality-labs/duality/x/incentives/types";
 
@@ -20,6 +19,6 @@ message GenesisState {
   // the next gauge after genesis
   uint64 last_gauge_id = 3;
 
-  uint64 last_lock_id = 4;
-  repeated Lock locks = 5;
+  uint64 last_stake_id = 4;
+  repeated Stake stakes = 5;
 }

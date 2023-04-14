@@ -11,45 +11,41 @@ import (
 // InitGenesis initializes the incentives module's state from a provided genesis state.
 func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 	k.SetParams(ctx, genState.Params)
-	if err := k.InitializeAllLocks(ctx, genState.Locks); err != nil {
+	if err := k.InitializeAllStakes(ctx, genState.Stakes); err != nil {
 		return
 	}
 	if err := k.InitializeAllGauges(ctx, genState.Gauges); err != nil {
 		return
 	}
-	k.SetLastLockID(ctx, genState.LastLockId)
+	k.SetLastStakeID(ctx, genState.LastStakeId)
 	k.SetLastGaugeID(ctx, genState.LastGaugeId)
 }
 
 // ExportGenesis returns the x/incentives module's exported genesis.
 func (k Keeper) ExportGenesis(ctx sdk.Context) *types.GenesisState {
-	locks, err := k.GetLocks(ctx)
-	if err != nil {
-		panic(err)
-	}
 	return &types.GenesisState{
 		Params:      k.GetParams(ctx),
 		Gauges:      k.GetNotFinishedGauges(ctx),
 		LastGaugeId: k.GetLastGaugeID(ctx),
-		LastLockId:  k.GetLastLockID(ctx),
-		Locks:       locks,
+		LastStakeId: k.GetLastStakeID(ctx),
+		Stakes:      k.GetStakes(ctx),
 	}
 }
 
-// InitializeAllLocks takes a set of locks, and initializes state to be storing
+// InitializeAllStakes takes a set of stakes, and initializes state to be storing
 // them all correctly.
-func (k Keeper) InitializeAllLocks(ctx sdk.Context, locks types.Locks) error {
-	for i, lock := range locks {
+func (k Keeper) InitializeAllStakes(ctx sdk.Context, stakes types.Stakes) error {
+	for i, stake := range stakes {
 		if i%25000 == 0 {
-			msg := fmt.Sprintf("Reset %d lock refs, cur lock ID %d", i, lock.ID)
+			msg := fmt.Sprintf("Reset %d stake refs, cur stake ID %d", i, stake.ID)
 			ctx.Logger().Info(msg)
 		}
-		err := k.setLock(ctx, lock)
+		err := k.setStake(ctx, stake)
 		if err != nil {
 			return err
 		}
 
-		err = k.addLockRefs(ctx, lock)
+		err = k.addStakeRefs(ctx, stake)
 		if err != nil {
 			return err
 		}

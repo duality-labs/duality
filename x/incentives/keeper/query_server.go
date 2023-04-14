@@ -32,7 +32,7 @@ func (q QueryServer) GetModuleStatus(goCtx context.Context, req *types.GetModule
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	return &types.GetModuleStatusResponse{
 		RewardCoins: q.Keeper.GetModuleCoinsToBeDistributed(ctx),
-		LockCoins:   q.Keeper.GetModuleLockedCoins(ctx),
+		StakedCoins: q.Keeper.GetModuleStakedCoins(ctx),
 		Params:      q.Keeper.GetParams(ctx),
 	}, nil
 }
@@ -82,50 +82,38 @@ func (q QueryServer) GetGauges(goCtx context.Context, req *types.GetGaugesReques
 	}, nil
 }
 
-func (q QueryServer) GetLockByID(goCtx context.Context, req *types.GetLockByIDRequest) (*types.GetLockByIDResponse, error) {
+func (q QueryServer) GetStakeByID(goCtx context.Context, req *types.GetStakeByIDRequest) (*types.GetStakeByIDResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	lock, err := q.Keeper.GetLockByID(ctx, req.LockId)
+	stake, err := q.Keeper.GetStakeByID(ctx, req.StakeId)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &types.GetLockByIDResponse{Lock: lock}, nil
+	return &types.GetStakeByIDResponse{Stake: stake}, nil
 }
 
-func (q QueryServer) GetLocks(goCtx context.Context, req *types.GetLocksRequest) (*types.GetLocksResponse, error) {
+func (q QueryServer) GetStakes(goCtx context.Context, req *types.GetStakesRequest) (*types.GetStakesResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	hasOwner := len(req.Filter.Owner) > 0
+	hasOwner := len(req.Owner) > 0
 	if !hasOwner {
 		// TODO: Verify this protection is necessary
-		return nil, status.Error(codes.InvalidArgument, "for performance reasons will not return all locks")
+		return nil, status.Error(codes.InvalidArgument, "for performance reasons will not return all stakes")
 	}
 
-	owner, err := sdk.AccAddressFromBech32(req.Filter.Owner)
+	owner, err := sdk.AccAddressFromBech32(req.Owner)
 	if err != nil {
 		return nil, err
 	}
 
-	var locks []*types.Lock
-	if req.Filter.UnlockingFilter == types.GetLocksRequest_Filter_ALL {
-		fullLocks := q.Keeper.getFullLocksByAccount(ctx, owner)
-		unlockingLocks := q.Keeper.getUnlockingLocksByAccount(ctx, owner)
-		locks = append(fullLocks, unlockingLocks...)
-	} else if req.Filter.UnlockingFilter == types.GetLocksRequest_Filter_NOT_UNLOCKING {
-		locks = q.Keeper.getFullLocksByAccount(ctx, owner)
-	} else if req.Filter.UnlockingFilter == types.GetLocksRequest_Filter_UNLOCKING {
-		locks = q.Keeper.getUnlockingLocksByAccount(ctx, owner)
-	} else {
-		return nil, status.Error(codes.InvalidArgument, "unrecognized unlocking filter value")
-	}
-
-	return &types.GetLocksResponse{
-		Locks: locks,
+	stakes := q.Keeper.getStakesByAccount(ctx, owner)
+	return &types.GetStakesResponse{
+		Stakes: stakes,
 	}, nil
 }
 
@@ -133,7 +121,7 @@ func (q QueryServer) GetFutureRewardEstimate(goCtx context.Context, req *types.G
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
-	if len(req.Owner) == 0 && len(req.LockIds) == 0 {
+	if len(req.Owner) == 0 && len(req.StakeIds) == 0 {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "empty owner")
 	}
 
@@ -152,16 +140,16 @@ func (q QueryServer) GetFutureRewardEstimate(goCtx context.Context, req *types.G
 		ownerAddress = owner
 	}
 
-	locks := make(types.Locks, 0, len(req.LockIds))
-	for _, lockId := range req.LockIds {
-		lock, err := q.Keeper.GetLockByID(ctx, lockId)
+	stakes := make(types.Stakes, 0, len(req.StakeIds))
+	for _, stakeId := range req.StakeIds {
+		stake, err := q.Keeper.GetStakeByID(ctx, stakeId)
 		if err != nil {
 			return nil, err
 		}
-		locks = append(locks, lock)
+		stakes = append(stakes, stake)
 	}
 
-	rewards, err := q.Keeper.GetRewardsEstimate(ctx, ownerAddress, locks, req.EndEpoch)
+	rewards, err := q.Keeper.GetRewardsEstimate(ctx, ownerAddress, stakes, req.EndEpoch)
 	if err != nil {
 		return nil, err
 	}

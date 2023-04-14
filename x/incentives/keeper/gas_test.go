@@ -9,19 +9,19 @@ var (
 	defaultCoins sdk.Coins      = sdk.Coins{sdk.NewInt64Coin("stake", 10)}
 )
 
-// func (suite *KeeperTestSuite) measureLockGas(addr sdk.AccAddress, coins sdk.Coins, dur time.Duration) uint64 {
+// func (suite *KeeperTestSuite) measureStakeGas(addr sdk.AccAddress, coins sdk.Coins, dur time.Duration) uint64 {
 // 	// fundAccount outside of gas measurement
 // 	suite.FundAcc(addr, coins)
 // 	// start measuring gas
 // 	alreadySpent := suite.Ctx.GasMeter().GasConsumed()
-// 	_, err := suite.App.IncentivesKeeper.CreateLock(suite.Ctx, addr, coins, dur)
+// 	_, err := suite.App.IncentivesKeeper.CreateStake(suite.Ctx, addr, coins, dur)
 // 	suite.Require().NoError(err)
 // 	newSpent := suite.Ctx.GasMeter().GasConsumed()
 // 	spentNow := newSpent - alreadySpent
 // 	return spentNow
 // }
 
-// func (suite *KeeperTestSuite) measureAvgAndMaxLockGas(
+// func (suite *KeeperTestSuite) measureAvgAndMaxStakeGas(
 // 	numIterations int,
 // 	addr sdk.AccAddress,
 // 	coinsFn func(int) sdk.Coins,
@@ -30,10 +30,10 @@ var (
 // 	runningTotal := uint64(0)
 // 	maxGas = uint64(0)
 // 	for i := 1; i <= numIterations; i++ {
-// 		lockGas := suite.measureLockGas(addr, coinsFn(i), durFn(i))
-// 		runningTotal += lockGas
-// 		if lockGas > maxGas {
-// 			maxGas = lockGas
+// 		stakeGas := suite.measureStakeGas(addr, coinsFn(i), durFn(i))
+// 		runningTotal += stakeGas
+// 		if stakeGas > maxGas {
+// 			maxGas = stakeGas
 // 			// fmt.Println(suite.Ctx.GasMeter().String())
 // 		}
 // 	}
@@ -43,35 +43,35 @@ var (
 
 // // This maintains hard coded gas test vector changes,
 // // so we can easily track changes
-// func (suite *KeeperTestSuite) TestRepeatedLockTokensGas() {
+// func (suite *KeeperTestSuite) TestRepeatedStakeTokensGas() {
 // 	suite.SetupTest()
 
 // 	coinsFn := func(int) sdk.Coins { return defaultCoins }
 // 	durFn := func(int) time.Duration { return time.Second }
 // 	startAveragingAt := 1000
-// 	totalNumLocks := 10000
+// 	totalNumStakes := 10000
 
-// 	firstLockGasAmount := suite.measureLockGas(defaultAddr, defaultCoins, time.Second)
-// 	suite.Assert().LessOrEqual(int(firstLockGasAmount), 100000)
+// 	firstStakeGasAmount := suite.measureStakeGas(defaultAddr, defaultCoins, time.Second)
+// 	suite.Assert().LessOrEqual(int(firstStakeGasAmount), 100000)
 
 // 	for i := 1; i < startAveragingAt; i++ {
-// 		suite.SetupLock(defaultAddr, defaultCoins)
+// 		suite.SetupStake(defaultAddr, defaultCoins)
 // 	}
-// 	avgGas, maxGas := suite.measureAvgAndMaxLockGas(totalNumLocks-startAveragingAt, defaultAddr, coinsFn, durFn)
-// 	fmt.Printf("test deets: total locks created %d, begin average at %d\n", totalNumLocks, startAveragingAt)
-// 	suite.Assert().LessOrEqual(int(avgGas), 100000, "average gas / lock")
-// 	suite.Assert().LessOrEqual(int(maxGas), 100000, "max gas / lock")
+// 	avgGas, maxGas := suite.measureAvgAndMaxStakeGas(totalNumStakes-startAveragingAt, defaultAddr, coinsFn, durFn)
+// 	fmt.Printf("test deets: total stakes created %d, begin average at %d\n", totalNumStakes, startAveragingAt)
+// 	suite.Assert().LessOrEqual(int(avgGas), 100000, "average gas / stake")
+// 	suite.Assert().LessOrEqual(int(maxGas), 100000, "max gas / stake")
 // }
 
-// func (suite *KeeperTestSuite) TestRepeatedLockTokensDistinctDurationGas() {
+// func (suite *KeeperTestSuite) TestRepeatedStakeTokensDistinctDurationGas() {
 // 	suite.SetupTest()
 
 // 	coinsFn := func(int) sdk.Coins { return defaultCoins }
 // 	durFn := func(i int) time.Duration { return time.Duration(i+1) * time.Second }
-// 	totalNumLocks := 10000
+// 	totalNumStakes := 10000
 
-// 	avgGas, maxGas := suite.measureAvgAndMaxLockGas(totalNumLocks, defaultAddr, coinsFn, durFn)
-// 	fmt.Printf("test deets: total locks created %d\n", totalNumLocks)
-// 	suite.Assert().LessOrEqual(int(avgGas), 150000, "average gas / lock")
-// 	suite.Assert().LessOrEqual(int(maxGas), 300000, "max gas / lock")
+// 	avgGas, maxGas := suite.measureAvgAndMaxStakeGas(totalNumStakes, defaultAddr, coinsFn, durFn)
+// 	fmt.Printf("test deets: total stakes created %d\n", totalNumStakes)
+// 	suite.Assert().LessOrEqual(int(avgGas), 150000, "average gas / stake")
+// 	suite.Assert().LessOrEqual(int(maxGas), 300000, "max gas / stake")
 // }

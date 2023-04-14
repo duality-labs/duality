@@ -65,34 +65,6 @@ func (GetGaugesRequest_Filter_StatusFilter) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_27b4715672276428, []int{4, 0, 0}
 }
 
-type GetLocksRequest_Filter_UnlockingFilter int32
-
-const (
-	GetLocksRequest_Filter_ALL           GetLocksRequest_Filter_UnlockingFilter = 0
-	GetLocksRequest_Filter_UNLOCKING     GetLocksRequest_Filter_UnlockingFilter = 1
-	GetLocksRequest_Filter_NOT_UNLOCKING GetLocksRequest_Filter_UnlockingFilter = 2
-)
-
-var GetLocksRequest_Filter_UnlockingFilter_name = map[int32]string{
-	0: "ALL",
-	1: "UNLOCKING",
-	2: "NOT_UNLOCKING",
-}
-
-var GetLocksRequest_Filter_UnlockingFilter_value = map[string]int32{
-	"ALL":           0,
-	"UNLOCKING":     1,
-	"NOT_UNLOCKING": 2,
-}
-
-func (x GetLocksRequest_Filter_UnlockingFilter) String() string {
-	return proto.EnumName(GetLocksRequest_Filter_UnlockingFilter_name, int32(x))
-}
-
-func (GetLocksRequest_Filter_UnlockingFilter) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_27b4715672276428, []int{8, 0, 0}
-}
-
 type GetModuleStatusRequest struct {
 }
 
@@ -131,8 +103,8 @@ var xxx_messageInfo_GetModuleStatusRequest proto.InternalMessageInfo
 
 type GetModuleStatusResponse struct {
 	// Coins that have yet to be distributed
-	RewardCoins github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,1,rep,name=rewardCoins,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"rewardCoins"`
-	LockCoins   github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,2,rep,name=lockCoins,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"lockCoins"`
+	RewardCoins github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,1,rep,name=reward_coins,json=rewardCoins,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"reward_coins"`
+	StakedCoins github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,2,rep,name=staked_coins,json=stakedCoins,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"staked_coins"`
 	Params      Params                                   `protobuf:"bytes,3,opt,name=params,proto3" json:"params"`
 }
 
@@ -176,9 +148,9 @@ func (m *GetModuleStatusResponse) GetRewardCoins() github_com_cosmos_cosmos_sdk_
 	return nil
 }
 
-func (m *GetModuleStatusResponse) GetLockCoins() github_com_cosmos_cosmos_sdk_types.Coins {
+func (m *GetModuleStatusResponse) GetStakedCoins() github_com_cosmos_cosmos_sdk_types.Coins {
 	if m != nil {
-		return m.LockCoins
+		return m.StakedCoins
 	}
 	return nil
 }
@@ -439,22 +411,22 @@ func (m *GetGaugesResponse) GetPagination() *query.PageResponse {
 	return nil
 }
 
-type GetLockByIDRequest struct {
-	LockId uint64 `protobuf:"varint,1,opt,name=lock_id,json=lockId,proto3" json:"lock_id,omitempty"`
+type GetStakeByIDRequest struct {
+	StakeId uint64 `protobuf:"varint,1,opt,name=stake_id,json=stakeId,proto3" json:"stake_id,omitempty"`
 }
 
-func (m *GetLockByIDRequest) Reset()         { *m = GetLockByIDRequest{} }
-func (m *GetLockByIDRequest) String() string { return proto.CompactTextString(m) }
-func (*GetLockByIDRequest) ProtoMessage()    {}
-func (*GetLockByIDRequest) Descriptor() ([]byte, []int) {
+func (m *GetStakeByIDRequest) Reset()         { *m = GetStakeByIDRequest{} }
+func (m *GetStakeByIDRequest) String() string { return proto.CompactTextString(m) }
+func (*GetStakeByIDRequest) ProtoMessage()    {}
+func (*GetStakeByIDRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_27b4715672276428, []int{6}
 }
-func (m *GetLockByIDRequest) XXX_Unmarshal(b []byte) error {
+func (m *GetStakeByIDRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *GetLockByIDRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *GetStakeByIDRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_GetLockByIDRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_GetStakeByIDRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -464,41 +436,41 @@ func (m *GetLockByIDRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
-func (m *GetLockByIDRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetLockByIDRequest.Merge(m, src)
+func (m *GetStakeByIDRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetStakeByIDRequest.Merge(m, src)
 }
-func (m *GetLockByIDRequest) XXX_Size() int {
+func (m *GetStakeByIDRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *GetLockByIDRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetLockByIDRequest.DiscardUnknown(m)
+func (m *GetStakeByIDRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetStakeByIDRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_GetLockByIDRequest proto.InternalMessageInfo
+var xxx_messageInfo_GetStakeByIDRequest proto.InternalMessageInfo
 
-func (m *GetLockByIDRequest) GetLockId() uint64 {
+func (m *GetStakeByIDRequest) GetStakeId() uint64 {
 	if m != nil {
-		return m.LockId
+		return m.StakeId
 	}
 	return 0
 }
 
-type GetLockByIDResponse struct {
-	Lock *Lock `protobuf:"bytes,1,opt,name=lock,proto3" json:"lock,omitempty"`
+type GetStakeByIDResponse struct {
+	Stake *Stake `protobuf:"bytes,1,opt,name=stake,proto3" json:"stake,omitempty"`
 }
 
-func (m *GetLockByIDResponse) Reset()         { *m = GetLockByIDResponse{} }
-func (m *GetLockByIDResponse) String() string { return proto.CompactTextString(m) }
-func (*GetLockByIDResponse) ProtoMessage()    {}
-func (*GetLockByIDResponse) Descriptor() ([]byte, []int) {
+func (m *GetStakeByIDResponse) Reset()         { *m = GetStakeByIDResponse{} }
+func (m *GetStakeByIDResponse) String() string { return proto.CompactTextString(m) }
+func (*GetStakeByIDResponse) ProtoMessage()    {}
+func (*GetStakeByIDResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_27b4715672276428, []int{7}
 }
-func (m *GetLockByIDResponse) XXX_Unmarshal(b []byte) error {
+func (m *GetStakeByIDResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *GetLockByIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *GetStakeByIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_GetLockByIDResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_GetStakeByIDResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -508,41 +480,41 @@ func (m *GetLockByIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (m *GetLockByIDResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetLockByIDResponse.Merge(m, src)
+func (m *GetStakeByIDResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetStakeByIDResponse.Merge(m, src)
 }
-func (m *GetLockByIDResponse) XXX_Size() int {
+func (m *GetStakeByIDResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *GetLockByIDResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetLockByIDResponse.DiscardUnknown(m)
+func (m *GetStakeByIDResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetStakeByIDResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_GetLockByIDResponse proto.InternalMessageInfo
+var xxx_messageInfo_GetStakeByIDResponse proto.InternalMessageInfo
 
-func (m *GetLockByIDResponse) GetLock() *Lock {
+func (m *GetStakeByIDResponse) GetStake() *Stake {
 	if m != nil {
-		return m.Lock
+		return m.Stake
 	}
 	return nil
 }
 
-type GetLocksRequest struct {
-	Filter GetLocksRequest_Filter `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter"`
+type GetStakesRequest struct {
+	Owner string `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty" yaml:"owner"`
 }
 
-func (m *GetLocksRequest) Reset()         { *m = GetLocksRequest{} }
-func (m *GetLocksRequest) String() string { return proto.CompactTextString(m) }
-func (*GetLocksRequest) ProtoMessage()    {}
-func (*GetLocksRequest) Descriptor() ([]byte, []int) {
+func (m *GetStakesRequest) Reset()         { *m = GetStakesRequest{} }
+func (m *GetStakesRequest) String() string { return proto.CompactTextString(m) }
+func (*GetStakesRequest) ProtoMessage()    {}
+func (*GetStakesRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_27b4715672276428, []int{8}
 }
-func (m *GetLocksRequest) XXX_Unmarshal(b []byte) error {
+func (m *GetStakesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *GetLocksRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *GetStakesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_GetLocksRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_GetStakesRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -552,93 +524,41 @@ func (m *GetLocksRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return b[:n], nil
 	}
 }
-func (m *GetLocksRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetLocksRequest.Merge(m, src)
+func (m *GetStakesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetStakesRequest.Merge(m, src)
 }
-func (m *GetLocksRequest) XXX_Size() int {
+func (m *GetStakesRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *GetLocksRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetLocksRequest.DiscardUnknown(m)
+func (m *GetStakesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetStakesRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_GetLocksRequest proto.InternalMessageInfo
+var xxx_messageInfo_GetStakesRequest proto.InternalMessageInfo
 
-func (m *GetLocksRequest) GetFilter() GetLocksRequest_Filter {
-	if m != nil {
-		return m.Filter
-	}
-	return GetLocksRequest_Filter{}
-}
-
-type GetLocksRequest_Filter struct {
-	Owner           string                                 `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty" yaml:"owner"`
-	UnlockingFilter GetLocksRequest_Filter_UnlockingFilter `protobuf:"varint,2,opt,name=unlocking_filter,json=unlockingFilter,proto3,enum=duality.incentives.GetLocksRequest_Filter_UnlockingFilter" json:"unlocking_filter,omitempty"`
-}
-
-func (m *GetLocksRequest_Filter) Reset()         { *m = GetLocksRequest_Filter{} }
-func (m *GetLocksRequest_Filter) String() string { return proto.CompactTextString(m) }
-func (*GetLocksRequest_Filter) ProtoMessage()    {}
-func (*GetLocksRequest_Filter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_27b4715672276428, []int{8, 0}
-}
-func (m *GetLocksRequest_Filter) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *GetLocksRequest_Filter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_GetLocksRequest_Filter.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *GetLocksRequest_Filter) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetLocksRequest_Filter.Merge(m, src)
-}
-func (m *GetLocksRequest_Filter) XXX_Size() int {
-	return m.Size()
-}
-func (m *GetLocksRequest_Filter) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetLocksRequest_Filter.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetLocksRequest_Filter proto.InternalMessageInfo
-
-func (m *GetLocksRequest_Filter) GetOwner() string {
+func (m *GetStakesRequest) GetOwner() string {
 	if m != nil {
 		return m.Owner
 	}
 	return ""
 }
 
-func (m *GetLocksRequest_Filter) GetUnlockingFilter() GetLocksRequest_Filter_UnlockingFilter {
-	if m != nil {
-		return m.UnlockingFilter
-	}
-	return GetLocksRequest_Filter_ALL
+type GetStakesResponse struct {
+	Stakes []*Stake `protobuf:"bytes,1,rep,name=stakes,proto3" json:"stakes,omitempty"`
 }
 
-type GetLocksResponse struct {
-	Locks []*Lock `protobuf:"bytes,1,rep,name=locks,proto3" json:"locks,omitempty"`
-}
-
-func (m *GetLocksResponse) Reset()         { *m = GetLocksResponse{} }
-func (m *GetLocksResponse) String() string { return proto.CompactTextString(m) }
-func (*GetLocksResponse) ProtoMessage()    {}
-func (*GetLocksResponse) Descriptor() ([]byte, []int) {
+func (m *GetStakesResponse) Reset()         { *m = GetStakesResponse{} }
+func (m *GetStakesResponse) String() string { return proto.CompactTextString(m) }
+func (*GetStakesResponse) ProtoMessage()    {}
+func (*GetStakesResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_27b4715672276428, []int{9}
 }
-func (m *GetLocksResponse) XXX_Unmarshal(b []byte) error {
+func (m *GetStakesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *GetLocksResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *GetStakesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_GetLocksResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_GetStakesResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -648,21 +568,21 @@ func (m *GetLocksResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-func (m *GetLocksResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetLocksResponse.Merge(m, src)
+func (m *GetStakesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetStakesResponse.Merge(m, src)
 }
-func (m *GetLocksResponse) XXX_Size() int {
+func (m *GetStakesResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *GetLocksResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetLocksResponse.DiscardUnknown(m)
+func (m *GetStakesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetStakesResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_GetLocksResponse proto.InternalMessageInfo
+var xxx_messageInfo_GetStakesResponse proto.InternalMessageInfo
 
-func (m *GetLocksResponse) GetLocks() []*Lock {
+func (m *GetStakesResponse) GetStakes() []*Stake {
 	if m != nil {
-		return m.Locks
+		return m.Stakes
 	}
 	return nil
 }
@@ -670,8 +590,8 @@ func (m *GetLocksResponse) GetLocks() []*Lock {
 type GetFutureRewardEstimateRequest struct {
 	// Address that is being queried for future estimated rewards
 	Owner string `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty" yaml:"owner"`
-	// Lock IDs included in future reward estimation
-	LockIds []uint64 `protobuf:"varint,2,rep,packed,name=lock_ids,json=lockIds,proto3" json:"lock_ids,omitempty"`
+	// Stake IDs included in future reward estimation
+	StakeIds []uint64 `protobuf:"varint,2,rep,packed,name=stake_ids,json=stakeIds,proto3" json:"stake_ids,omitempty"`
 	// Upper time limit of reward estimation
 	// Lower limit is current epoch
 	EndEpoch int64 `protobuf:"varint,3,opt,name=end_epoch,json=endEpoch,proto3" json:"end_epoch,omitempty"`
@@ -717,9 +637,9 @@ func (m *GetFutureRewardEstimateRequest) GetOwner() string {
 	return ""
 }
 
-func (m *GetFutureRewardEstimateRequest) GetLockIds() []uint64 {
+func (m *GetFutureRewardEstimateRequest) GetStakeIds() []uint64 {
 	if m != nil {
-		return m.LockIds
+		return m.StakeIds
 	}
 	return nil
 }
@@ -779,7 +699,6 @@ func (m *GetFutureRewardEstimateResponse) GetCoins() github_com_cosmos_cosmos_sd
 
 func init() {
 	proto.RegisterEnum("duality.incentives.GetGaugesRequest_Filter_StatusFilter", GetGaugesRequest_Filter_StatusFilter_name, GetGaugesRequest_Filter_StatusFilter_value)
-	proto.RegisterEnum("duality.incentives.GetLocksRequest_Filter_UnlockingFilter", GetLocksRequest_Filter_UnlockingFilter_name, GetLocksRequest_Filter_UnlockingFilter_value)
 	proto.RegisterType((*GetModuleStatusRequest)(nil), "duality.incentives.GetModuleStatusRequest")
 	proto.RegisterType((*GetModuleStatusResponse)(nil), "duality.incentives.GetModuleStatusResponse")
 	proto.RegisterType((*GetGaugeByIDRequest)(nil), "duality.incentives.GetGaugeByIDRequest")
@@ -787,11 +706,10 @@ func init() {
 	proto.RegisterType((*GetGaugesRequest)(nil), "duality.incentives.GetGaugesRequest")
 	proto.RegisterType((*GetGaugesRequest_Filter)(nil), "duality.incentives.GetGaugesRequest.Filter")
 	proto.RegisterType((*GetGaugesResponse)(nil), "duality.incentives.GetGaugesResponse")
-	proto.RegisterType((*GetLockByIDRequest)(nil), "duality.incentives.GetLockByIDRequest")
-	proto.RegisterType((*GetLockByIDResponse)(nil), "duality.incentives.GetLockByIDResponse")
-	proto.RegisterType((*GetLocksRequest)(nil), "duality.incentives.GetLocksRequest")
-	proto.RegisterType((*GetLocksRequest_Filter)(nil), "duality.incentives.GetLocksRequest.Filter")
-	proto.RegisterType((*GetLocksResponse)(nil), "duality.incentives.GetLocksResponse")
+	proto.RegisterType((*GetStakeByIDRequest)(nil), "duality.incentives.GetStakeByIDRequest")
+	proto.RegisterType((*GetStakeByIDResponse)(nil), "duality.incentives.GetStakeByIDResponse")
+	proto.RegisterType((*GetStakesRequest)(nil), "duality.incentives.GetStakesRequest")
+	proto.RegisterType((*GetStakesResponse)(nil), "duality.incentives.GetStakesResponse")
 	proto.RegisterType((*GetFutureRewardEstimateRequest)(nil), "duality.incentives.GetFutureRewardEstimateRequest")
 	proto.RegisterType((*GetFutureRewardEstimateResponse)(nil), "duality.incentives.GetFutureRewardEstimateResponse")
 }
@@ -799,78 +717,72 @@ func init() {
 func init() { proto.RegisterFile("duality/incentives/query.proto", fileDescriptor_27b4715672276428) }
 
 var fileDescriptor_27b4715672276428 = []byte{
-	// 1128 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0xc1, 0x6f, 0x1b, 0xc5,
-	0x17, 0xf6, 0x3a, 0xb1, 0x13, 0xbf, 0xa4, 0x89, 0x3b, 0x8d, 0x7e, 0x75, 0xfd, 0x03, 0x27, 0x5a,
-	0xda, 0xc4, 0x34, 0x64, 0xb7, 0x71, 0x85, 0x14, 0x45, 0x48, 0x10, 0xa7, 0x89, 0x6b, 0xd5, 0x4d,
-	0xc2, 0xb6, 0xe1, 0xc0, 0x65, 0xb5, 0xf6, 0x4e, 0xb6, 0xab, 0xd8, 0x3b, 0xae, 0x67, 0xb6, 0xc5,
-	0xaa, 0x2a, 0x21, 0xc4, 0x81, 0x1b, 0x48, 0x1c, 0xb9, 0xc0, 0x15, 0x89, 0x13, 0x67, 0xee, 0x95,
-	0xb8, 0x44, 0x42, 0x48, 0x9c, 0x0a, 0x4a, 0xe0, 0x1f, 0xe0, 0x2f, 0x40, 0x3b, 0x33, 0x6b, 0xaf,
-	0xd3, 0x75, 0xec, 0x4a, 0x70, 0x4a, 0x66, 0xdf, 0x37, 0xef, 0x7d, 0xef, 0xbd, 0xef, 0xbd, 0x31,
-	0x14, 0x6c, 0xdf, 0x6a, 0xba, 0xac, 0xab, 0xbb, 0x5e, 0x03, 0x7b, 0xcc, 0x7d, 0x82, 0xa9, 0xfe,
-	0xd8, 0xc7, 0x9d, 0xae, 0xd6, 0xee, 0x10, 0x46, 0x10, 0x92, 0x76, 0xad, 0x6f, 0xcf, 0x2f, 0x38,
-	0xc4, 0x21, 0xdc, 0xac, 0x07, 0xff, 0x09, 0x64, 0xfe, 0x0d, 0x87, 0x10, 0xa7, 0x89, 0x75, 0xab,
-	0xed, 0xea, 0x96, 0xe7, 0x11, 0x66, 0x31, 0x97, 0x78, 0x54, 0x5a, 0x0b, 0xd2, 0xca, 0x4f, 0x75,
-	0xff, 0x48, 0xb7, 0xfd, 0x0e, 0x07, 0x84, 0xf6, 0x06, 0xa1, 0x2d, 0x42, 0xf5, 0xba, 0x45, 0xb1,
-	0xfe, 0x64, 0xbd, 0x8e, 0x99, 0xb5, 0xae, 0x37, 0x88, 0x1b, 0xda, 0x6f, 0x46, 0xed, 0x9c, 0x60,
-	0x0f, 0xd5, 0xb6, 0x1c, 0xd7, 0x1b, 0xf0, 0x15, 0x93, 0x93, 0x63, 0xf9, 0x0e, 0x96, 0xf6, 0x37,
-	0x63, 0xec, 0x4d, 0xd2, 0x38, 0x96, 0xe6, 0xc5, 0xf3, 0x54, 0x99, 0xdb, 0xc2, 0x94, 0x59, 0xad,
-	0x76, 0x08, 0x88, 0xb9, 0xdf, 0xb6, 0x3a, 0x56, 0x4b, 0x26, 0xab, 0xe6, 0xe0, 0x7f, 0x15, 0xcc,
-	0xee, 0x13, 0xdb, 0x6f, 0xe2, 0x07, 0xcc, 0x62, 0x3e, 0x35, 0xf0, 0x63, 0x1f, 0x53, 0xa6, 0xfe,
-	0x90, 0x84, 0xab, 0xaf, 0x98, 0x68, 0x9b, 0x78, 0x14, 0xa3, 0x16, 0xcc, 0x74, 0xf0, 0x53, 0xab,
-	0x63, 0x6f, 0x13, 0xd7, 0xa3, 0x39, 0x65, 0x69, 0xa2, 0x38, 0x53, 0xba, 0xa6, 0x89, 0xc4, 0xb5,
-	0x20, 0x71, 0x4d, 0xa6, 0xac, 0x05, 0x88, 0xf2, 0xad, 0x17, 0x2f, 0x17, 0x13, 0xdf, 0xff, 0xbe,
-	0x58, 0x74, 0x5c, 0xf6, 0xc8, 0xaf, 0x6b, 0x0d, 0xd2, 0xd2, 0x65, 0x95, 0xc4, 0x9f, 0x35, 0x6a,
-	0x1f, 0xeb, 0xac, 0xdb, 0xc6, 0x94, 0x5f, 0xa0, 0x46, 0xd4, 0x3f, 0x72, 0x21, 0x13, 0x24, 0x2d,
-	0x82, 0x25, 0xff, 0xfd, 0x60, 0x7d, 0xef, 0x68, 0x03, 0xd2, 0xa2, 0x3e, 0xb9, 0x89, 0x25, 0xa5,
-	0x38, 0x53, 0xca, 0x6b, 0xaf, 0xaa, 0x4a, 0x3b, 0xe0, 0x88, 0xf2, 0x64, 0x10, 0xc8, 0x90, 0x78,
-	0xf5, 0x06, 0x5c, 0xa9, 0x60, 0x56, 0x09, 0x9a, 0x57, 0xee, 0x56, 0xef, 0xc8, 0x32, 0xa2, 0x39,
-	0x48, 0xba, 0x76, 0x4e, 0x59, 0x52, 0x8a, 0x93, 0x46, 0xd2, 0xb5, 0xd5, 0x0a, 0x2c, 0x0c, 0xc2,
-	0x64, 0x49, 0x75, 0x48, 0xf1, 0xc6, 0x73, 0x68, 0x90, 0x5f, 0x4c, 0x5c, 0x7e, 0xcb, 0x10, 0x38,
-	0xf5, 0xaf, 0x24, 0x64, 0x43, 0x4f, 0x61, 0xd3, 0xd0, 0x2e, 0x40, 0x5f, 0x63, 0xd2, 0xd5, 0xf2,
-	0x40, 0xa9, 0xc4, 0xc4, 0x84, 0x05, 0x3b, 0xb0, 0x1c, 0x2c, 0xef, 0x1a, 0x91, 0x9b, 0xa8, 0x0a,
-	0xe9, 0x23, 0xb7, 0xc9, 0x70, 0x27, 0x97, 0xe4, 0x3e, 0x56, 0x63, 0xe9, 0x9c, 0x8b, 0xae, 0xed,
-	0xf2, 0x2b, 0x61, 0x5d, 0x84, 0x83, 0xfc, 0x4f, 0x0a, 0xa4, 0x85, 0x01, 0x1d, 0x40, 0x9a, 0x72,
-	0x21, 0x71, 0x66, 0x73, 0xa5, 0x8d, 0xd7, 0xf0, 0xaa, 0x09, 0x09, 0x8a, 0x83, 0x21, 0xfd, 0xa0,
-	0x05, 0x48, 0xd9, 0xd8, 0x23, 0x2d, 0x4e, 0x33, 0x63, 0x88, 0x83, 0x7a, 0x0f, 0x66, 0xa3, 0x68,
-	0x74, 0x05, 0xe6, 0xb7, 0xb6, 0x1f, 0x56, 0x3f, 0xda, 0x31, 0x0f, 0x0f, 0xb6, 0xf7, 0xef, 0x57,
-	0xf7, 0x2a, 0xd9, 0x04, 0x02, 0x48, 0x8b, 0x8f, 0x59, 0x05, 0xcd, 0xc2, 0x74, 0xcf, 0x92, 0x0c,
-	0x4e, 0xbb, 0xd5, 0xbd, 0xea, 0x83, 0xbb, 0x3b, 0x77, 0xb2, 0x13, 0xea, 0x97, 0x0a, 0x5c, 0x8e,
-	0x70, 0x92, 0xed, 0x5a, 0x87, 0x34, 0x6f, 0x43, 0x5f, 0xfc, 0x43, 0xfb, 0x25, 0x81, 0xa8, 0x32,
-	0xd0, 0x1b, 0x51, 0xd7, 0x95, 0x91, 0xbd, 0x11, 0xf1, 0xa2, 0xcd, 0x51, 0xd7, 0x00, 0x55, 0x30,
-	0xab, 0x91, 0xc6, 0x71, 0x54, 0x68, 0x57, 0x61, 0x2a, 0x90, 0xb1, 0xd9, 0x53, 0x5b, 0x3a, 0x38,
-	0x56, 0x6d, 0x75, 0x9b, 0x0b, 0xb3, 0x0f, 0x97, 0x19, 0xbc, 0x03, 0x93, 0x01, 0x40, 0x8a, 0x24,
-	0x17, 0xc7, 0x3f, 0xb8, 0x63, 0x70, 0x94, 0xfa, 0x63, 0x12, 0xe6, 0xa5, 0x97, 0x9e, 0xd8, 0xee,
-	0xf6, 0x44, 0x22, 0x7c, 0xdc, 0x1c, 0xd2, 0xce, 0xe8, 0xa5, 0x78, 0x8d, 0xfc, 0xda, 0xd7, 0xc8,
-	0x32, 0xa4, 0xc8, 0x53, 0x4f, 0xfa, 0xcc, 0x94, 0xb3, 0x7f, 0xbf, 0x5c, 0x9c, 0xed, 0x5a, 0xad,
-	0xe6, 0xa6, 0xca, 0x3f, 0xab, 0x86, 0x30, 0x23, 0x0c, 0x59, 0xdf, 0x0b, 0xa8, 0xb9, 0x9e, 0x63,
-	0x46, 0xb4, 0x3a, 0x57, 0xda, 0x1c, 0x9f, 0x86, 0x76, 0x18, 0xba, 0x90, 0xba, 0x9a, 0xf7, 0x07,
-	0x3f, 0xa8, 0xef, 0xc1, 0xfc, 0x39, 0x0c, 0x9a, 0x82, 0x89, 0xad, 0x5a, 0x2d, 0x9b, 0x40, 0x97,
-	0x20, 0x73, 0xb8, 0x57, 0xdb, 0xdf, 0xbe, 0x17, 0xc8, 0x46, 0x41, 0x97, 0xe1, 0xd2, 0xde, 0xfe,
-	0x43, 0xb3, 0xff, 0x29, 0xa9, 0x96, 0xf9, 0x88, 0xca, 0xc0, 0xb2, 0xee, 0x1a, 0xa4, 0x02, 0x7f,
-	0xa1, 0x70, 0x86, 0x17, 0x5e, 0xc0, 0xd4, 0x4f, 0x15, 0x28, 0x54, 0x30, 0xdb, 0xf5, 0x99, 0xdf,
-	0xc1, 0x06, 0xdf, 0x8a, 0x3b, 0x94, 0xb9, 0x2d, 0x8b, 0x85, 0x93, 0x3b, 0x76, 0xcd, 0xae, 0xc1,
-	0xb4, 0x94, 0x88, 0x58, 0xa3, 0x93, 0xc6, 0x94, 0xd0, 0x08, 0x45, 0xff, 0x87, 0x0c, 0xf6, 0x6c,
-	0x13, 0xb7, 0x49, 0xe3, 0x11, 0x5f, 0x7d, 0x13, 0xc6, 0x34, 0xf6, 0xec, 0x9d, 0xe0, 0xac, 0x7e,
-	0xae, 0xc0, 0xe2, 0x50, 0x0a, 0x32, 0x2d, 0x0b, 0x52, 0x8d, 0xff, 0xea, 0x31, 0x10, 0x9e, 0x4b,
-	0x27, 0x53, 0x90, 0xfa, 0x30, 0x18, 0x11, 0xf4, 0x9d, 0xc2, 0xd5, 0x18, 0x7d, 0x9b, 0xd0, 0x30,
-	0xf5, 0xc5, 0xbc, 0x6d, 0xf9, 0xd5, 0xb1, 0xb0, 0x22, 0x33, 0xf5, 0xdd, 0xcf, 0x7e, 0xf9, 0xf3,
-	0xeb, 0xa4, 0x8e, 0xd6, 0xf4, 0x98, 0xc7, 0x34, 0x7c, 0xd9, 0x1d, 0xcc, 0xcc, 0x16, 0xbf, 0x6d,
-	0xca, 0xd5, 0xf4, 0x8d, 0x02, 0xb3, 0xd1, 0x4d, 0x8f, 0x56, 0x2e, 0xda, 0x76, 0x91, 0x49, 0xce,
-	0x17, 0x47, 0x03, 0x25, 0xb5, 0x0d, 0x4e, 0xad, 0x84, 0x6e, 0x8d, 0xa2, 0xc6, 0x57, 0x90, 0x59,
-	0xef, 0x9a, 0xae, 0xad, 0x3f, 0x73, 0xed, 0xe7, 0xe8, 0x0b, 0x05, 0x32, 0xbd, 0xad, 0x86, 0xae,
-	0x8f, 0xb3, 0x88, 0xf3, 0x37, 0x46, 0xa0, 0x24, 0x29, 0x8d, 0x93, 0x2a, 0xa2, 0xe5, 0xb1, 0x48,
-	0x51, 0xf4, 0xad, 0x02, 0x33, 0x91, 0x05, 0x85, 0x96, 0x2f, 0x98, 0xdf, 0x68, 0x99, 0x56, 0x46,
-	0xe2, 0x24, 0xa1, 0x0f, 0x38, 0xa1, 0x4d, 0xb4, 0x11, 0x12, 0x6a, 0x5a, 0x75, 0x1a, 0x47, 0x2e,
-	0x20, 0xc5, 0x07, 0x44, 0x16, 0x4a, 0x0e, 0x0b, 0xaf, 0xd6, 0x74, 0x38, 0xc8, 0xe8, 0xad, 0x31,
-	0xf6, 0x4b, 0xfe, 0xfa, 0xc5, 0x20, 0xc9, 0x6c, 0x9d, 0x33, 0x5b, 0x45, 0x6f, 0x8f, 0xcb, 0x8c,
-	0xa2, 0x9f, 0x15, 0xfe, 0xb3, 0x2c, 0x6e, 0x16, 0x51, 0x69, 0x48, 0xd0, 0x0b, 0x76, 0x47, 0xfe,
-	0xf6, 0x6b, 0xdd, 0x91, 0xbc, 0x2b, 0x9c, 0xf7, 0x16, 0x7a, 0x7f, 0x54, 0x8b, 0x8f, 0xb8, 0x17,
-	0x53, 0xfc, 0x98, 0xa3, 0x26, 0x96, 0x8e, 0xf4, 0x67, 0x7c, 0x21, 0x3d, 0x2f, 0xd7, 0x5e, 0x9c,
-	0x16, 0x94, 0x93, 0xd3, 0x82, 0xf2, 0xc7, 0x69, 0x41, 0xf9, 0xea, 0xac, 0x90, 0x38, 0x39, 0x2b,
-	0x24, 0x7e, 0x3b, 0x2b, 0x24, 0x3e, 0x2e, 0x45, 0xb6, 0x83, 0x0c, 0xb2, 0x36, 0x50, 0x9d, 0x4f,
-	0xa2, 0x31, 0xf9, 0xb6, 0xa8, 0xa7, 0xf9, 0x6f, 0xda, 0xdb, 0xff, 0x04, 0x00, 0x00, 0xff, 0xff,
-	0x6a, 0x71, 0xa6, 0xbe, 0x2a, 0x0c, 0x00, 0x00,
+	// 1031 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0xcf, 0x6f, 0x1b, 0x45,
+	0x14, 0xf6, 0x3a, 0xb5, 0x9b, 0x4c, 0xac, 0xd6, 0x4c, 0x23, 0x70, 0x0d, 0xb2, 0xa3, 0x15, 0x4d,
+	0xad, 0x94, 0xec, 0x26, 0xae, 0x90, 0xa2, 0x08, 0x09, 0xd5, 0x69, 0x6c, 0x2c, 0x68, 0x09, 0x1b,
+	0xe0, 0xc0, 0x65, 0x35, 0xf6, 0x4e, 0xb6, 0xab, 0x7a, 0x77, 0xdc, 0x9d, 0xd9, 0x16, 0xab, 0xca,
+	0xa5, 0xe2, 0xc0, 0x01, 0x09, 0x24, 0x8e, 0x9c, 0x38, 0x70, 0xe1, 0xca, 0x99, 0x7b, 0x25, 0x2e,
+	0x95, 0xb8, 0xc0, 0xa5, 0xa0, 0x04, 0xfe, 0x01, 0xfe, 0x02, 0xb4, 0x6f, 0x66, 0xed, 0x75, 0xe2,
+	0x1f, 0xc9, 0xa1, 0xa7, 0x64, 0xfc, 0xbe, 0xf7, 0xde, 0xf7, 0xbe, 0xf7, 0xc3, 0x46, 0x15, 0x27,
+	0x22, 0x3d, 0x4f, 0x0c, 0x4c, 0x2f, 0xe8, 0xd2, 0x40, 0x78, 0x8f, 0x29, 0x37, 0x1f, 0x45, 0x34,
+	0x1c, 0x18, 0xfd, 0x90, 0x09, 0x86, 0xb1, 0xb2, 0x1b, 0x23, 0x7b, 0x79, 0xc5, 0x65, 0x2e, 0x03,
+	0xb3, 0x19, 0xff, 0x27, 0x91, 0xe5, 0xb7, 0x5c, 0xc6, 0xdc, 0x1e, 0x35, 0x49, 0xdf, 0x33, 0x49,
+	0x10, 0x30, 0x41, 0x84, 0xc7, 0x02, 0xae, 0xac, 0x15, 0x65, 0x85, 0x57, 0x27, 0x3a, 0x34, 0x9d,
+	0x28, 0x04, 0x40, 0x62, 0xef, 0x32, 0xee, 0x33, 0x6e, 0x76, 0x08, 0xa7, 0xe6, 0xe3, 0xad, 0x0e,
+	0x15, 0x64, 0xcb, 0xec, 0x32, 0x2f, 0xb1, 0xaf, 0xa7, 0xed, 0x40, 0x70, 0x88, 0xea, 0x13, 0xd7,
+	0x0b, 0xc6, 0x62, 0x4d, 0xa8, 0xc9, 0x25, 0x91, 0x4b, 0x67, 0xd8, 0xb9, 0x20, 0x0f, 0x13, 0x7b,
+	0xf5, 0x34, 0x57, 0xe1, 0xf9, 0x94, 0x0b, 0xe2, 0xf7, 0x13, 0xc0, 0x84, 0x00, 0x7d, 0x12, 0x12,
+	0x5f, 0x55, 0xab, 0x97, 0xd0, 0xeb, 0x2d, 0x2a, 0xee, 0x31, 0x27, 0xea, 0xd1, 0x03, 0x41, 0x44,
+	0xc4, 0x2d, 0xfa, 0x28, 0xa2, 0x5c, 0xe8, 0xbf, 0x64, 0xd1, 0x1b, 0x67, 0x4c, 0xbc, 0xcf, 0x02,
+	0x4e, 0x71, 0x80, 0x0a, 0x21, 0x7d, 0x42, 0x42, 0xc7, 0x8e, 0x0b, 0xe7, 0x25, 0x6d, 0x75, 0xa1,
+	0xb6, 0x5c, 0xbf, 0x6e, 0xc8, 0xd2, 0x8d, 0xb8, 0x74, 0x43, 0x15, 0x6d, 0xec, 0x32, 0x2f, 0x68,
+	0x6c, 0x3e, 0x7f, 0x59, 0xcd, 0xfc, 0xfc, 0x57, 0xb5, 0xe6, 0x7a, 0xe2, 0x41, 0xd4, 0x31, 0xba,
+	0xcc, 0x37, 0x95, 0x4e, 0xf2, 0xcf, 0x06, 0x77, 0x1e, 0x9a, 0x62, 0xd0, 0xa7, 0x1c, 0x1c, 0xb8,
+	0xb5, 0x2c, 0x13, 0xc0, 0x23, 0xce, 0x07, 0x65, 0x27, 0xf9, 0xb2, 0xaf, 0x20, 0x9f, 0x4c, 0x20,
+	0xf3, 0x6d, 0xa3, 0xbc, 0x54, 0xa9, 0xb4, 0xb0, 0xaa, 0xd5, 0x96, 0xeb, 0x65, 0xe3, 0xec, 0x70,
+	0x19, 0xfb, 0x80, 0x68, 0x5c, 0x8a, 0x53, 0x59, 0x0a, 0xaf, 0xdf, 0x40, 0xd7, 0x5a, 0x54, 0xb4,
+	0xe2, 0x1e, 0x36, 0x06, 0xed, 0xbb, 0x4a, 0x4c, 0x7c, 0x05, 0x65, 0x3d, 0xa7, 0xa4, 0xad, 0x6a,
+	0xb5, 0x4b, 0x56, 0xd6, 0x73, 0xf4, 0x16, 0x5a, 0x19, 0x87, 0x29, 0x61, 0x4d, 0x94, 0x83, 0xfe,
+	0x03, 0x34, 0xae, 0x70, 0x42, 0x5e, 0xf0, 0xb2, 0x24, 0x4e, 0xff, 0x37, 0x8b, 0x8a, 0x49, 0xa4,
+	0xa4, 0x75, 0xb8, 0x89, 0xd0, 0x68, 0xd4, 0x54, 0xa8, 0xb5, 0x31, 0xb1, 0xe4, 0xe2, 0x24, 0x92,
+	0xed, 0x13, 0x97, 0x2a, 0x5f, 0x2b, 0xe5, 0x89, 0xdb, 0x28, 0x7f, 0xe8, 0xf5, 0x04, 0x0d, 0x4b,
+	0x59, 0x88, 0x71, 0x6b, 0x22, 0x9d, 0x53, 0xd9, 0x8d, 0x26, 0xb8, 0x24, 0xba, 0xc8, 0x00, 0xe5,
+	0x5f, 0x35, 0x94, 0x97, 0x06, 0xbc, 0x8f, 0xf2, 0x1c, 0xc6, 0x09, 0x98, 0x5d, 0xa9, 0x6f, 0x5f,
+	0x20, 0xaa, 0x21, 0x07, 0x51, 0x3e, 0x2c, 0x15, 0x07, 0xaf, 0xa0, 0x9c, 0x43, 0x03, 0xe6, 0x03,
+	0xcd, 0x25, 0x4b, 0x3e, 0xf4, 0x0f, 0x51, 0x21, 0x8d, 0xc6, 0xd7, 0xd0, 0xd5, 0x3b, 0xbb, 0x9f,
+	0xb6, 0x3f, 0xdf, 0xb3, 0x3f, 0xdb, 0xdf, 0xfd, 0xf8, 0x5e, 0xfb, 0x7e, 0xab, 0x98, 0xc1, 0x08,
+	0xe5, 0xe5, 0x87, 0x45, 0x0d, 0x17, 0xd0, 0xe2, 0xd0, 0x92, 0x8d, 0x5f, 0xcd, 0xf6, 0xfd, 0xf6,
+	0xc1, 0x07, 0x7b, 0x77, 0x8b, 0x0b, 0xfa, 0xb7, 0x1a, 0x7a, 0x2d, 0xc5, 0x49, 0xb5, 0x6b, 0x0b,
+	0xe5, 0xa1, 0x0d, 0xa3, 0x0d, 0x98, 0xda, 0x2f, 0x05, 0xc4, 0xad, 0xb1, 0xde, 0x48, 0x5d, 0x6f,
+	0xce, 0xed, 0x8d, 0xcc, 0x97, 0x6e, 0x8e, 0xbe, 0x09, 0x93, 0x76, 0x10, 0x4f, 0x6d, 0x7a, 0xd2,
+	0xae, 0xa3, 0x45, 0x98, 0x64, 0x7b, 0x38, 0x6f, 0x97, 0xe1, 0xdd, 0x4e, 0x86, 0x2e, 0xe5, 0x31,
+	0x1a, 0x3a, 0x80, 0xcc, 0x1a, 0x3a, 0xf0, 0xb2, 0x24, 0x4e, 0xdf, 0x81, 0x99, 0x83, 0x8f, 0x86,
+	0x33, 0xb7, 0x86, 0x72, 0xec, 0x49, 0x40, 0x43, 0x08, 0xb2, 0xd4, 0x28, 0xfe, 0xf7, 0xb2, 0x5a,
+	0x18, 0x10, 0xbf, 0xb7, 0xa3, 0xc3, 0xc7, 0xba, 0x25, 0xcd, 0x7a, 0x13, 0x74, 0x4c, 0x7c, 0x47,
+	0x3a, 0x42, 0xe4, 0x99, 0x3a, 0x4a, 0x0a, 0x0a, 0xa8, 0x3f, 0xd3, 0x50, 0xa5, 0x45, 0x45, 0x33,
+	0x12, 0x51, 0x48, 0x2d, 0xb8, 0x15, 0x7b, 0x5c, 0x78, 0x3e, 0x11, 0xf4, 0x82, 0x94, 0xf0, 0x9b,
+	0x68, 0x29, 0x91, 0x4c, 0x9e, 0x96, 0x4b, 0xd6, 0xa2, 0xd2, 0x8c, 0xc7, 0x46, 0x1a, 0x38, 0x36,
+	0xed, 0xb3, 0xee, 0x03, 0xb8, 0x06, 0x0b, 0xd6, 0x22, 0x0d, 0x9c, 0xbd, 0xf8, 0xad, 0x7f, 0xa5,
+	0xa1, 0xea, 0x54, 0x12, 0xaa, 0x36, 0x82, 0x72, 0xaf, 0xec, 0x48, 0xca, 0xc8, 0xf5, 0x3f, 0x2f,
+	0xa3, 0xdc, 0x27, 0xf1, 0xd4, 0xe0, 0x1f, 0x35, 0x74, 0xf5, 0xd4, 0xd1, 0xc6, 0xeb, 0x53, 0xf6,
+	0x6b, 0xc2, 0xd1, 0x2f, 0xdf, 0x3a, 0x17, 0x56, 0x56, 0xa6, 0xbf, 0xfb, 0xec, 0xf7, 0x7f, 0xbe,
+	0xcf, 0x9a, 0x78, 0xc3, 0x9c, 0xf0, 0x2d, 0x93, 0x7c, 0xe7, 0xb9, 0x54, 0xd8, 0x3e, 0x78, 0xdb,
+	0x6a, 0x5b, 0x7f, 0xd0, 0x50, 0x21, 0x7d, 0xfc, 0xf0, 0xcd, 0x59, 0x07, 0x20, 0x35, 0xdb, 0xe5,
+	0xda, 0x7c, 0xa0, 0xa2, 0xb6, 0x0d, 0xd4, 0xea, 0x78, 0x73, 0x1e, 0x35, 0xd8, 0x4a, 0xbb, 0x33,
+	0xb0, 0x3d, 0xc7, 0x7c, 0xea, 0x39, 0x47, 0xf8, 0x6b, 0x0d, 0x2d, 0x0d, 0x17, 0x1d, 0xbf, 0x7d,
+	0x9e, 0xdb, 0x54, 0xbe, 0x31, 0x07, 0xa5, 0x48, 0x19, 0x40, 0xaa, 0x86, 0xd7, 0xce, 0x45, 0x8a,
+	0xe3, 0x9f, 0xa4, 0x50, 0xc3, 0x85, 0x9d, 0x2a, 0xd4, 0xe9, 0x23, 0x30, 0x55, 0xa8, 0x33, 0xbb,
+	0xaf, 0x37, 0x80, 0xd3, 0x7b, 0x78, 0x27, 0xe1, 0xd4, 0x23, 0x1d, 0x3e, 0x89, 0x5f, 0xcc, 0x4b,
+	0x6e, 0x89, 0x12, 0x2b, 0x59, 0x99, 0x23, 0xfc, 0x8d, 0x94, 0x4c, 0xee, 0xf4, 0x54, 0xc9, 0xc6,
+	0xce, 0xc5, 0x54, 0xc9, 0xc6, 0x0f, 0x83, 0x5e, 0x07, 0x7a, 0xef, 0xe0, 0xf5, 0x73, 0xd3, 0xe3,
+	0xf8, 0x37, 0x0d, 0x7e, 0xb8, 0x4c, 0x5a, 0x4a, 0x5c, 0x9f, 0x92, 0x76, 0xc6, 0x19, 0x29, 0xdf,
+	0xbe, 0x90, 0x8f, 0x22, 0xde, 0x02, 0xe2, 0x77, 0xf0, 0xfb, 0xf3, 0x7a, 0x7d, 0x08, 0x51, 0x6c,
+	0xf9, 0x6b, 0x87, 0xdb, 0x54, 0x05, 0x32, 0x9f, 0xc2, 0x6d, 0x3a, 0x6a, 0x7c, 0xf4, 0xfc, 0xb8,
+	0xa2, 0xbd, 0x38, 0xae, 0x68, 0x7f, 0x1f, 0x57, 0xb4, 0xef, 0x4e, 0x2a, 0x99, 0x17, 0x27, 0x95,
+	0xcc, 0x1f, 0x27, 0x95, 0xcc, 0x17, 0xf5, 0xd4, 0x99, 0x50, 0x49, 0x36, 0xc6, 0xe4, 0xf9, 0x32,
+	0x9d, 0x13, 0xce, 0x46, 0x27, 0x0f, 0xbf, 0xfa, 0x6e, 0xff, 0x1f, 0x00, 0x00, 0xff, 0xff, 0x32,
+	0xee, 0x38, 0xf5, 0x4d, 0x0b, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -891,10 +803,10 @@ type QueryClient interface {
 	GetGaugeByID(ctx context.Context, in *GetGaugeByIDRequest, opts ...grpc.CallOption) (*GetGaugeByIDResponse, error)
 	// GetGauges returns gauges according to the filter provided
 	GetGauges(ctx context.Context, in *GetGaugesRequest, opts ...grpc.CallOption) (*GetGaugesResponse, error)
-	// GetLockByID returns a lock by its ID
-	GetLockByID(ctx context.Context, in *GetLockByIDRequest, opts ...grpc.CallOption) (*GetLockByIDResponse, error)
-	// GetLocks returns locks by the filter provided. At least one filter must be provided.
-	GetLocks(ctx context.Context, in *GetLocksRequest, opts ...grpc.CallOption) (*GetLocksResponse, error)
+	// GetStakeByID returns a stake by its ID
+	GetStakeByID(ctx context.Context, in *GetStakeByIDRequest, opts ...grpc.CallOption) (*GetStakeByIDResponse, error)
+	// GetStakes returns stakes by the filter provided. At least one filter must be provided.
+	GetStakes(ctx context.Context, in *GetStakesRequest, opts ...grpc.CallOption) (*GetStakesResponse, error)
 	// GetFutureRewardsEstimate returns an estimate of the rewards from now until a specified
 	// time in the future. The requestor either provides an address or a set of locks
 	// for which they want to find the associated rewards.
@@ -936,18 +848,18 @@ func (c *queryClient) GetGauges(ctx context.Context, in *GetGaugesRequest, opts 
 	return out, nil
 }
 
-func (c *queryClient) GetLockByID(ctx context.Context, in *GetLockByIDRequest, opts ...grpc.CallOption) (*GetLockByIDResponse, error) {
-	out := new(GetLockByIDResponse)
-	err := c.cc.Invoke(ctx, "/duality.incentives.Query/GetLockByID", in, out, opts...)
+func (c *queryClient) GetStakeByID(ctx context.Context, in *GetStakeByIDRequest, opts ...grpc.CallOption) (*GetStakeByIDResponse, error) {
+	out := new(GetStakeByIDResponse)
+	err := c.cc.Invoke(ctx, "/duality.incentives.Query/GetStakeByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *queryClient) GetLocks(ctx context.Context, in *GetLocksRequest, opts ...grpc.CallOption) (*GetLocksResponse, error) {
-	out := new(GetLocksResponse)
-	err := c.cc.Invoke(ctx, "/duality.incentives.Query/GetLocks", in, out, opts...)
+func (c *queryClient) GetStakes(ctx context.Context, in *GetStakesRequest, opts ...grpc.CallOption) (*GetStakesResponse, error) {
+	out := new(GetStakesResponse)
+	err := c.cc.Invoke(ctx, "/duality.incentives.Query/GetStakes", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -971,10 +883,10 @@ type QueryServer interface {
 	GetGaugeByID(context.Context, *GetGaugeByIDRequest) (*GetGaugeByIDResponse, error)
 	// GetGauges returns gauges according to the filter provided
 	GetGauges(context.Context, *GetGaugesRequest) (*GetGaugesResponse, error)
-	// GetLockByID returns a lock by its ID
-	GetLockByID(context.Context, *GetLockByIDRequest) (*GetLockByIDResponse, error)
-	// GetLocks returns locks by the filter provided. At least one filter must be provided.
-	GetLocks(context.Context, *GetLocksRequest) (*GetLocksResponse, error)
+	// GetStakeByID returns a stake by its ID
+	GetStakeByID(context.Context, *GetStakeByIDRequest) (*GetStakeByIDResponse, error)
+	// GetStakes returns stakes by the filter provided. At least one filter must be provided.
+	GetStakes(context.Context, *GetStakesRequest) (*GetStakesResponse, error)
 	// GetFutureRewardsEstimate returns an estimate of the rewards from now until a specified
 	// time in the future. The requestor either provides an address or a set of locks
 	// for which they want to find the associated rewards.
@@ -994,11 +906,11 @@ func (*UnimplementedQueryServer) GetGaugeByID(ctx context.Context, req *GetGauge
 func (*UnimplementedQueryServer) GetGauges(ctx context.Context, req *GetGaugesRequest) (*GetGaugesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetGauges not implemented")
 }
-func (*UnimplementedQueryServer) GetLockByID(ctx context.Context, req *GetLockByIDRequest) (*GetLockByIDResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetLockByID not implemented")
+func (*UnimplementedQueryServer) GetStakeByID(ctx context.Context, req *GetStakeByIDRequest) (*GetStakeByIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStakeByID not implemented")
 }
-func (*UnimplementedQueryServer) GetLocks(ctx context.Context, req *GetLocksRequest) (*GetLocksResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetLocks not implemented")
+func (*UnimplementedQueryServer) GetStakes(ctx context.Context, req *GetStakesRequest) (*GetStakesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStakes not implemented")
 }
 func (*UnimplementedQueryServer) GetFutureRewardEstimate(ctx context.Context, req *GetFutureRewardEstimateRequest) (*GetFutureRewardEstimateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFutureRewardEstimate not implemented")
@@ -1062,38 +974,38 @@ func _Query_GetGauges_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_GetLockByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetLockByIDRequest)
+func _Query_GetStakeByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetStakeByIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).GetLockByID(ctx, in)
+		return srv.(QueryServer).GetStakeByID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/duality.incentives.Query/GetLockByID",
+		FullMethod: "/duality.incentives.Query/GetStakeByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetLockByID(ctx, req.(*GetLockByIDRequest))
+		return srv.(QueryServer).GetStakeByID(ctx, req.(*GetStakeByIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_GetLocks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetLocksRequest)
+func _Query_GetStakes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetStakesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).GetLocks(ctx, in)
+		return srv.(QueryServer).GetStakes(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/duality.incentives.Query/GetLocks",
+		FullMethod: "/duality.incentives.Query/GetStakes",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GetLocks(ctx, req.(*GetLocksRequest))
+		return srv.(QueryServer).GetStakes(ctx, req.(*GetStakesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1133,12 +1045,12 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Query_GetGauges_Handler,
 		},
 		{
-			MethodName: "GetLockByID",
-			Handler:    _Query_GetLockByID_Handler,
+			MethodName: "GetStakeByID",
+			Handler:    _Query_GetStakeByID_Handler,
 		},
 		{
-			MethodName: "GetLocks",
-			Handler:    _Query_GetLocks_Handler,
+			MethodName: "GetStakes",
+			Handler:    _Query_GetStakes_Handler,
 		},
 		{
 			MethodName: "GetFutureRewardEstimate",
@@ -1202,10 +1114,10 @@ func (m *GetModuleStatusResponse) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	}
 	i--
 	dAtA[i] = 0x1a
-	if len(m.LockCoins) > 0 {
-		for iNdEx := len(m.LockCoins) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.StakedCoins) > 0 {
+		for iNdEx := len(m.StakedCoins) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.LockCoins[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.StakedCoins[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1425,7 +1337,7 @@ func (m *GetGaugesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *GetLockByIDRequest) Marshal() (dAtA []byte, err error) {
+func (m *GetStakeByIDRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1435,25 +1347,25 @@ func (m *GetLockByIDRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *GetLockByIDRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *GetStakeByIDRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *GetLockByIDRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *GetStakeByIDRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.LockId != 0 {
-		i = encodeVarintQuery(dAtA, i, uint64(m.LockId))
+	if m.StakeId != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.StakeId))
 		i--
 		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
 
-func (m *GetLockByIDResponse) Marshal() (dAtA []byte, err error) {
+func (m *GetStakeByIDResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1463,19 +1375,19 @@ func (m *GetLockByIDResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *GetLockByIDResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *GetStakeByIDResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *GetLockByIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *GetStakeByIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Lock != nil {
+	if m.Stake != nil {
 		{
-			size, err := m.Lock.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.Stake.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -1488,7 +1400,7 @@ func (m *GetLockByIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *GetLocksRequest) Marshal() (dAtA []byte, err error) {
+func (m *GetStakesRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1498,54 +1410,16 @@ func (m *GetLocksRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *GetLocksRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *GetStakesRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *GetLocksRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *GetStakesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	{
-		size, err := m.Filter.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintQuery(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func (m *GetLocksRequest_Filter) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *GetLocksRequest_Filter) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *GetLocksRequest_Filter) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.UnlockingFilter != 0 {
-		i = encodeVarintQuery(dAtA, i, uint64(m.UnlockingFilter))
-		i--
-		dAtA[i] = 0x10
-	}
 	if len(m.Owner) > 0 {
 		i -= len(m.Owner)
 		copy(dAtA[i:], m.Owner)
@@ -1556,7 +1430,7 @@ func (m *GetLocksRequest_Filter) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
-func (m *GetLocksResponse) Marshal() (dAtA []byte, err error) {
+func (m *GetStakesResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1566,20 +1440,20 @@ func (m *GetLocksResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *GetLocksResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *GetStakesResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *GetLocksResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *GetStakesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Locks) > 0 {
-		for iNdEx := len(m.Locks) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.Stakes) > 0 {
+		for iNdEx := len(m.Stakes) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Locks[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.Stakes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -1618,21 +1492,21 @@ func (m *GetFutureRewardEstimateRequest) MarshalToSizedBuffer(dAtA []byte) (int,
 		i--
 		dAtA[i] = 0x18
 	}
-	if len(m.LockIds) > 0 {
-		dAtA9 := make([]byte, len(m.LockIds)*10)
-		var j8 int
-		for _, num := range m.LockIds {
+	if len(m.StakeIds) > 0 {
+		dAtA8 := make([]byte, len(m.StakeIds)*10)
+		var j7 int
+		for _, num := range m.StakeIds {
 			for num >= 1<<7 {
-				dAtA9[j8] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA8[j7] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j8++
+				j7++
 			}
-			dAtA9[j8] = uint8(num)
-			j8++
+			dAtA8[j7] = uint8(num)
+			j7++
 		}
-		i -= j8
-		copy(dAtA[i:], dAtA9[:j8])
-		i = encodeVarintQuery(dAtA, i, uint64(j8))
+		i -= j7
+		copy(dAtA[i:], dAtA8[:j7])
+		i = encodeVarintQuery(dAtA, i, uint64(j7))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -1715,8 +1589,8 @@ func (m *GetModuleStatusResponse) Size() (n int) {
 			n += 1 + l + sovQuery(uint64(l))
 		}
 	}
-	if len(m.LockCoins) > 0 {
-		for _, e := range m.LockCoins {
+	if len(m.StakedCoins) > 0 {
+		for _, e := range m.StakedCoins {
 			l = e.Size()
 			n += 1 + l + sovQuery(uint64(l))
 		}
@@ -1801,43 +1675,32 @@ func (m *GetGaugesResponse) Size() (n int) {
 	return n
 }
 
-func (m *GetLockByIDRequest) Size() (n int) {
+func (m *GetStakeByIDRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.LockId != 0 {
-		n += 1 + sovQuery(uint64(m.LockId))
+	if m.StakeId != 0 {
+		n += 1 + sovQuery(uint64(m.StakeId))
 	}
 	return n
 }
 
-func (m *GetLockByIDResponse) Size() (n int) {
+func (m *GetStakeByIDResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.Lock != nil {
-		l = m.Lock.Size()
+	if m.Stake != nil {
+		l = m.Stake.Size()
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
 }
 
-func (m *GetLocksRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = m.Filter.Size()
-	n += 1 + l + sovQuery(uint64(l))
-	return n
-}
-
-func (m *GetLocksRequest_Filter) Size() (n int) {
+func (m *GetStakesRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1847,20 +1710,17 @@ func (m *GetLocksRequest_Filter) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
-	if m.UnlockingFilter != 0 {
-		n += 1 + sovQuery(uint64(m.UnlockingFilter))
-	}
 	return n
 }
 
-func (m *GetLocksResponse) Size() (n int) {
+func (m *GetStakesResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.Locks) > 0 {
-		for _, e := range m.Locks {
+	if len(m.Stakes) > 0 {
+		for _, e := range m.Stakes {
 			l = e.Size()
 			n += 1 + l + sovQuery(uint64(l))
 		}
@@ -1878,9 +1738,9 @@ func (m *GetFutureRewardEstimateRequest) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
-	if len(m.LockIds) > 0 {
+	if len(m.StakeIds) > 0 {
 		l = 0
-		for _, e := range m.LockIds {
+		for _, e := range m.StakeIds {
 			l += sovQuery(uint64(e))
 		}
 		n += 1 + sovQuery(uint64(l)) + l
@@ -2027,7 +1887,7 @@ func (m *GetModuleStatusResponse) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LockCoins", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field StakedCoins", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2054,8 +1914,8 @@ func (m *GetModuleStatusResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.LockCoins = append(m.LockCoins, types.Coin{})
-			if err := m.LockCoins[len(m.LockCoins)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.StakedCoins = append(m.StakedCoins, types.Coin{})
+			if err := m.StakedCoins[len(m.StakedCoins)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2608,7 +2468,7 @@ func (m *GetGaugesResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *GetLockByIDRequest) Unmarshal(dAtA []byte) error {
+func (m *GetStakeByIDRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2631,17 +2491,17 @@ func (m *GetLockByIDRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: GetLockByIDRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: GetStakeByIDRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GetLockByIDRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: GetStakeByIDRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LockId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field StakeId", wireType)
 			}
-			m.LockId = 0
+			m.StakeId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowQuery
@@ -2651,7 +2511,7 @@ func (m *GetLockByIDRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.LockId |= uint64(b&0x7F) << shift
+				m.StakeId |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2677,7 +2537,7 @@ func (m *GetLockByIDRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *GetLockByIDResponse) Unmarshal(dAtA []byte) error {
+func (m *GetStakeByIDResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2700,15 +2560,15 @@ func (m *GetLockByIDResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: GetLockByIDResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: GetStakeByIDResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GetLockByIDResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: GetStakeByIDResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Lock", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Stake", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2735,10 +2595,10 @@ func (m *GetLockByIDResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Lock == nil {
-				m.Lock = &Lock{}
+			if m.Stake == nil {
+				m.Stake = &Stake{}
 			}
-			if err := m.Lock.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Stake.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2763,7 +2623,7 @@ func (m *GetLockByIDResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *GetLocksRequest) Unmarshal(dAtA []byte) error {
+func (m *GetStakesRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2786,93 +2646,10 @@ func (m *GetLocksRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: GetLocksRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: GetStakesRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GetLocksRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Filter", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.Filter.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *GetLocksRequest_Filter) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Filter: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Filter: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: GetStakesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2907,25 +2684,6 @@ func (m *GetLocksRequest_Filter) Unmarshal(dAtA []byte) error {
 			}
 			m.Owner = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UnlockingFilter", wireType)
-			}
-			m.UnlockingFilter = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.UnlockingFilter |= GetLocksRequest_Filter_UnlockingFilter(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipQuery(dAtA[iNdEx:])
@@ -2947,7 +2705,7 @@ func (m *GetLocksRequest_Filter) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *GetLocksResponse) Unmarshal(dAtA []byte) error {
+func (m *GetStakesResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2970,15 +2728,15 @@ func (m *GetLocksResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: GetLocksResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: GetStakesResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GetLocksResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: GetStakesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Locks", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Stakes", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -3005,8 +2763,8 @@ func (m *GetLocksResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Locks = append(m.Locks, &Lock{})
-			if err := m.Locks[len(m.Locks)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.Stakes = append(m.Stakes, &Stake{})
+			if err := m.Stakes[len(m.Stakes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3109,7 +2867,7 @@ func (m *GetFutureRewardEstimateRequest) Unmarshal(dAtA []byte) error {
 						break
 					}
 				}
-				m.LockIds = append(m.LockIds, v)
+				m.StakeIds = append(m.StakeIds, v)
 			} else if wireType == 2 {
 				var packedLen int
 				for shift := uint(0); ; shift += 7 {
@@ -3144,8 +2902,8 @@ func (m *GetFutureRewardEstimateRequest) Unmarshal(dAtA []byte) error {
 					}
 				}
 				elementCount = count
-				if elementCount != 0 && len(m.LockIds) == 0 {
-					m.LockIds = make([]uint64, 0, elementCount)
+				if elementCount != 0 && len(m.StakeIds) == 0 {
+					m.StakeIds = make([]uint64, 0, elementCount)
 				}
 				for iNdEx < postIndex {
 					var v uint64
@@ -3163,10 +2921,10 @@ func (m *GetFutureRewardEstimateRequest) Unmarshal(dAtA []byte) error {
 							break
 						}
 					}
-					m.LockIds = append(m.LockIds, v)
+					m.StakeIds = append(m.StakeIds, v)
 				}
 			} else {
-				return fmt.Errorf("proto: wrong wireType = %d for field LockIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field StakeIds", wireType)
 			}
 		case 3:
 			if wireType != 0 {

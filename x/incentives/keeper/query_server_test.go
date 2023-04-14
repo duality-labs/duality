@@ -11,7 +11,7 @@ var _ = suite.TestingSuite(nil)
 
 func (suite *KeeperTestSuite) TestGetFutureRewardEstimate() {
 	addr1 := suite.SetupAddr(0)
-	suite.SetupDepositAndLock(depositSpec{
+	suite.SetupDepositAndStake(depositSpec{
 		addr:   addr1,
 		token0: sdk.NewInt64Coin("TokenA", 10),
 		token1: sdk.NewInt64Coin("TokenB", 10),
@@ -19,7 +19,7 @@ func (suite *KeeperTestSuite) TestGetFutureRewardEstimate() {
 		fee:    1,
 	})
 	addr2 := suite.SetupAddr(1)
-	suite.SetupDepositAndLock(depositSpec{
+	suite.SetupDepositAndStake(depositSpec{
 		addr:   addr2,
 		token0: sdk.NewInt64Coin("TokenA", 10),
 		token1: sdk.NewInt64Coin("TokenB", 10),

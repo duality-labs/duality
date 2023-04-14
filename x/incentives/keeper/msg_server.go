@@ -82,12 +82,12 @@ func (server msgServer) AddToGauge(goCtx context.Context, msg *types.MsgAddToGau
 	return &types.MsgAddToGaugeResponse{}, nil
 }
 
-// LockTokens locks tokens in either two ways.
-// 1. Add to an existing lock if a lock with the same owner and same duration exists.
-// 2. Create a new lock if not.
+// StakeTokens stakes tokens in either two ways.
+// 1. Add to an existing stake if a stake with the same owner and same duration exists.
+// 2. Create a new stake if not.
 // A sanity check to ensure given tokens is a single token is done in ValidateBaic.
-// That is, a lock with multiple tokens cannot be created.
-func (server msgServer) LockTokens(goCtx context.Context, msg *types.MsgLockTokens) (*types.MsgLockTokensResponse, error) {
+// That is, a stake with multiple tokens cannot be created.
+func (server msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*types.MsgStakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
@@ -95,120 +95,57 @@ func (server msgServer) LockTokens(goCtx context.Context, msg *types.MsgLockToke
 		return nil, err
 	}
 
-	epochInfo := server.keeper.GetEpochInfo(ctx)
-	epochDuration := epochInfo.Duration
-
-	// check if there's an existing lock from the same owner with the same duration.
-	// If so, simply add tokens to the existing lock.
-	lockExists := server.keeper.HasFullLock(ctx, owner)
-	if lockExists {
-		lockID, err := server.keeper.AddToExistingLock(ctx, owner, msg.Coins)
-		if err != nil {
-			return nil, err
-		}
-
-		ctx.EventManager().EmitEvents(sdk.Events{
-			sdk.NewEvent(
-				types.TypeEvtAddTokensToLock,
-				sdk.NewAttribute(types.AttributeLockID, strconv.FormatUint(lockID, 10)),
-				sdk.NewAttribute(types.AttributeLockOwner, msg.Owner),
-				sdk.NewAttribute(types.AttributeLockAmount, msg.Coins.String()),
-			),
-		})
-		return &types.MsgLockTokensResponse{ID: lockID}, nil
-	}
-
-	// if the owner + duration combination is new, create a new lock.
-	lock, err := server.keeper.CreateLock(ctx, owner, msg.Coins, epochDuration)
+	// if the owner + duration combination is new, create a new stake.
+	stake, err := server.keeper.CreateStake(ctx, owner, msg.Coins)
 	if err != nil {
 		return nil, err
 	}
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			types.TypeEvtLockTokens,
-			sdk.NewAttribute(types.AttributeLockID, strconv.FormatUint(lock.ID, 10)),
-			sdk.NewAttribute(types.AttributeLockOwner, lock.Owner),
-			sdk.NewAttribute(types.AttributeLockAmount, lock.Coins.String()),
-			sdk.NewAttribute(types.AttributeLockDuration, lock.Duration.String()),
-			sdk.NewAttribute(types.AttributeLockUnlockTime, lock.EndTime.String()),
+			types.TypeEvtStake,
+			sdk.NewAttribute(types.AttributeStakeID, strconv.FormatUint(stake.ID, 10)),
+			sdk.NewAttribute(types.AttributeStakeOwner, stake.Owner),
+			sdk.NewAttribute(types.AttributeStakeAmount, stake.Coins.String()),
 		),
 	})
 
-	return &types.MsgLockTokensResponse{ID: lock.ID}, nil
+	return &types.MsgStakeResponse{ID: stake.ID}, nil
 }
 
-// BeginUnlocking begins unlocking of the specified lock.
-// The lock would enter the unlocking queue, with the endtime of the lock set as block time + duration.
-func (server msgServer) BeginUnlocking(goCtx context.Context, msg *types.MsgBeginUnlocking) (*types.MsgBeginUnlockingResponse, error) {
+// BeginUnstaking begins unstaking of the specified stake.
+// The stake would enter the unstaking queue, with the endtime of the stake set as block time + duration.
+func (server msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*types.MsgUnstakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	lock, err := server.keeper.GetLockByID(ctx, msg.ID)
-	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
-	}
-
-	if msg.Owner != lock.Owner {
-		return nil, sdkerrors.Wrap(types.ErrNotLockOwner, fmt.Sprintf("msg sender (%s) and lock owner (%s) does not match", msg.Owner, lock.Owner))
-	}
-
-	unlockingLock, err := server.keeper.BeginUnlock(ctx, lock.ID, msg.Coins)
-	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
-	}
-
-	// N.B. begin unlock event is emitted downstream in the keeper method.
-
-	return &types.MsgBeginUnlockingResponse{Success: true, UnlockingLockID: unlockingLock}, nil
-}
-
-// BeginUnlockingAll begins unlocking for all the locks that the account has by iterating all the not-unlocking locks the account holds.
-func (server msgServer) BeginUnlockingAll(goCtx context.Context, msg *types.MsgBeginUnlockingAll) (*types.MsgBeginUnlockingAllResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	owner, err := sdk.AccAddressFromBech32(msg.Owner)
-	if err != nil {
-		return nil, err
-	}
-
-	unlocks := server.keeper.getLocksFromIterator(
-		ctx,
-		server.keeper.iterator(ctx, types.GetKeyLockIndexByAccount(false, owner)))
-
-	for _, lock := range unlocks {
-		_, err := server.keeper.BeginUnlock(ctx, lock.ID, nil)
-		if err != nil {
-			return nil, err
+	unstakes := msg.Unstakes
+	if len(msg.Unstakes) == 0 {
+		stakes := server.keeper.GetStakesByAccount(ctx, sdk.AccAddress(msg.Owner))
+		unstakes = make([]*types.MsgUnstake_UnstakeDescriptor, len(stakes))
+		for i, stake := range stakes {
+			unstakes[i] = &types.MsgUnstake_UnstakeDescriptor{
+				ID:    stake.ID,
+				Coins: stake.Coins,
+			}
 		}
 	}
-	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
+
+	for _, unstake := range unstakes {
+		stake, err := server.keeper.GetStakeByID(ctx, unstake.ID)
+		if err != nil {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
+		}
+
+		if msg.Owner != stake.Owner {
+			return nil, sdkerrors.Wrap(types.ErrNotStakeOwner, fmt.Sprintf("msg sender (%s) and stake owner (%s) does not match", msg.Owner, stake.Owner))
+		}
+
+		_, err = server.keeper.Unstake(ctx, stake, unstake.Coins)
+		if err != nil {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
+		}
 	}
 
-	// Create the events for this message
-	unlockedCoins := unlocks.GetCoins()
-	events := sdk.Events{
-		sdk.NewEvent(
-			types.TypeEvtBeginUnlockAll,
-			sdk.NewAttribute(types.AttributeLockOwner, msg.Owner),
-			sdk.NewAttribute(types.AttributeUnlockedCoins, unlockedCoins.String()),
-		),
-	}
-	for _, lock := range unlocks {
-		lock := lock
-		events = events.AppendEvent(createBeginUnlockEvent(lock))
-	}
-	ctx.EventManager().EmitEvents(events)
-
-	return &types.MsgBeginUnlockingAllResponse{}, nil
-}
-
-func createBeginUnlockEvent(lock *types.Lock) sdk.Event {
-	return sdk.NewEvent(
-		types.TypeEvtBeginUnlock,
-		sdk.NewAttribute(types.AttributeLockID, strconv.FormatUint(lock.ID, 10)),
-		sdk.NewAttribute(types.AttributeLockOwner, lock.Owner),
-		sdk.NewAttribute(types.AttributeLockDuration, lock.Duration.String()),
-		sdk.NewAttribute(types.AttributeLockUnlockTime, lock.EndTime.String()),
-	)
+	// N.B. begin unstake event is emitted downstream in the keeper method.
+	return &types.MsgUnstakeResponse{}, nil
 }

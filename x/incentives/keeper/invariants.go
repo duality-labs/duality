@@ -5,10 +5,10 @@ package keeper
 // // RegisterInvariants registers all governance invariants.
 // func RegisterInvariants(ir sdk.InvariantRegistry, keeper Keeper) {
 // 	ir.RegisterRoute(types.ModuleName, "accumulation-store-invariant", AccumulationStoreInvariant(keeper))
-// 	ir.RegisterRoute(types.ModuleName, "locks-amount-invariant", LocksBalancesInvariant(keeper))
+// 	ir.RegisterRoute(types.ModuleName, "stakes-amount-invariant", StakesBalancesInvariant(keeper))
 // }
 
-// // AccumulationStoreInvariant ensures that the sum of all lockups at a given duration
+// // AccumulationStoreInvariant ensures that the sum of all stakeups at a given duration
 // // is equal to the value stored within the accumulation store.
 // func AccumulationStoreInvariant(keeper Keeper) sdk.Invariant {
 // 	return func(ctx sdk.Context) (string, bool) {
@@ -23,58 +23,58 @@ package keeper
 // 			time.Hour * 24 * 14,
 // 		}
 
-// 		// loop all denoms on lockup module
+// 		// loop all denoms on stakeup module
 // 		for _, coin := range balances {
 // 			denom := coin.Denom
 // 			for _, duration := range durations {
-// 				accumulation := keeper.GetLocksAccumulation(ctx, types.QueryCondition{
-// 					LockQueryType: types.ByDuration,
+// 				accumulation := keeper.GetStakesAccumulation(ctx, types.QueryCondition{
+// 					StakeQueryType: types.ByDuration,
 // 					Denom:         denom,
 // 					Duration:      duration,
 // 				})
 
-// 				locks := keeper.GetLocksLongerThanDurationPair(ctx, denom, duration)
-// 				lockupSum := sdk.ZeroInt()
-// 				for _, lock := range locks {
-// 					lockupSum = lockupSum.Add(lock.Coins.AmountOf(denom))
+// 				stakes := keeper.GetStakesLongerThanDurationPair(ctx, denom, duration)
+// 				stakeupSum := sdk.ZeroInt()
+// 				for _, stake := range stakes {
+// 					stakeupSum = stakeupSum.Add(stake.Coins.AmountOf(denom))
 // 				}
 
-// 				if !accumulation.Equal(lockupSum) {
+// 				if !accumulation.Equal(stakeupSum) {
 // 					return sdk.FormatInvariant(types.ModuleName, "accumulation-store-invariant",
-// 						fmt.Sprintf("\taccumulation store value does not fit actual lockup sum: %s != %s\n",
-// 							accumulation.String(), lockupSum.String(),
+// 						fmt.Sprintf("\taccumulation store value does not fit actual stakeup sum: %s != %s\n",
+// 							accumulation.String(), stakeupSum.String(),
 // 						)), true
 // 				}
 // 			}
 // 		}
 
-// 		return sdk.FormatInvariant(types.ModuleName, "accumulation-store-invariant", "All lockup accumulation invariant passed"), false
+// 		return sdk.FormatInvariant(types.ModuleName, "accumulation-store-invariant", "All stakeup accumulation invariant passed"), false
 // 	}
 // }
 
-// // LocksBalancesInvariant ensure that the module balance and the sum of all
-// // tokens within all locks have the equivalent amount of tokens.
-// func LocksBalancesInvariant(keeper Keeper) sdk.Invariant {
+// // StakesBalancesInvariant ensure that the module balance and the sum of all
+// // tokens within all stakes have the equivalent amount of tokens.
+// func StakesBalancesInvariant(keeper Keeper) sdk.Invariant {
 // 	return func(ctx sdk.Context) (string, bool) {
 // 		moduleAcc := keeper.ak.GetModuleAccount(ctx, types.ModuleName)
 // 		balances := keeper.bk.GetAllBalances(ctx, moduleAcc.GetAddress())
 
-// 		// loop all denoms on lockup module
+// 		// loop all denoms on stakeup module
 // 		for _, coin := range balances {
 // 			denom := coin.Denom
-// 			lockedAmount := sdk.ZeroInt()
-// 			locksByDenom := keeper.GetLocksPair(ctx, denom)
-// 			for _, lock := range locksByDenom {
-// 				lockedAmount = lockedAmount.Add(lock.Coins.AmountOf(denom))
+// 			stakedAmount := sdk.ZeroInt()
+// 			stakesByDenom := keeper.GetStakesPair(ctx, denom)
+// 			for _, stake := range stakesByDenom {
+// 				stakedAmount = stakedAmount.Add(stake.Coins.AmountOf(denom))
 // 			}
-// 			if !lockedAmount.Equal(coin.Amount) {
-// 				return sdk.FormatInvariant(types.ModuleName, "locks-amount-invariant",
-// 					fmt.Sprintf("\tlocks amount of %s does not fit actual module balance: %s != %s\n",
-// 						denom, lockedAmount.String(), coin.Amount.String(),
+// 			if !stakedAmount.Equal(coin.Amount) {
+// 				return sdk.FormatInvariant(types.ModuleName, "stakes-amount-invariant",
+// 					fmt.Sprintf("\tstakes amount of %s does not fit actual module balance: %s != %s\n",
+// 						denom, stakedAmount.String(), coin.Amount.String(),
 // 					)), true
 // 			}
 // 		}
 
-// 		return sdk.FormatInvariant(types.ModuleName, "locks-amount-invariant", "All lockup amount invariant passed"), false
+// 		return sdk.FormatInvariant(types.ModuleName, "stakes-amount-invariant", "All stakeup amount invariant passed"), false
 // 	}
 // }

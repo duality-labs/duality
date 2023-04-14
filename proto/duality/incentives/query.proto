@@ -7,7 +7,7 @@ import "google/protobuf/duration.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "duality/incentives/gauge.proto";
-import "duality/incentives/lock.proto";
+import "duality/incentives/stake.proto";
 import "google/protobuf/timestamp.proto";
 import "duality/incentives/params.proto";
 
@@ -33,16 +33,16 @@ service Query {
     option (google.api.http).get = "/duality/incentives/v1beta1/get_gauges";
   }
 
-  // GetLockByID returns a lock by its ID
-  rpc GetLockByID(GetLockByIDRequest) returns (GetLockByIDResponse) {
+  // GetStakeByID returns a stake by its ID
+  rpc GetStakeByID(GetStakeByIDRequest) returns (GetStakeByIDResponse) {
     option (google.api.http).get =
-        "/dualitylabs/duality/incentives/get_lock_by_id/{lock_id}";
+        "/dualitylabs/duality/incentives/get_stake_by_id/{stake_id}";
   }
 
-  // GetLocks returns locks by the filter provided. At least one filter must be provided.
-  rpc GetLocks(GetLocksRequest) returns (GetLocksResponse) {
+  // GetStakes returns stakes by the filter provided. At least one filter must be provided.
+  rpc GetStakes(GetStakesRequest) returns (GetStakesResponse) {
     option (google.api.http).get =
-        "/dualitylabs/duality/incentives/get_locks";
+        "/dualitylabs/duality/incentives/get_stakes";
   }
 
   // GetFutureRewardsEstimate returns an estimate of the rewards from now until a specified
@@ -57,11 +57,11 @@ service Query {
 message GetModuleStatusRequest {}
 message GetModuleStatusResponse {
   // Coins that have yet to be distributed
-  repeated cosmos.base.v1beta1.Coin rewardCoins = 1 [
+  repeated cosmos.base.v1beta1.Coin reward_coins = 1 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
-  repeated cosmos.base.v1beta1.Coin lockCoins = 2 [
+  repeated cosmos.base.v1beta1.Coin staked_coins = 2 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
@@ -99,34 +99,25 @@ message GetGaugesResponse {
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-message GetLockByIDRequest {
-  uint64 lock_id = 1;
+message GetStakeByIDRequest {
+  uint64 stake_id = 1;
 };
-message GetLockByIDResponse {
-  Lock lock = 1;
+message GetStakeByIDResponse {
+  Stake stake = 1;
 };
 
-message GetLocksRequest {
-  message Filter {
-    enum UnlockingFilter {
-      ALL = 0;
-      UNLOCKING = 1;
-      NOT_UNLOCKING = 2;
-    }
-    string owner = 1 [ (gogoproto.moretags) = "yaml:\"owner\"" ];
-    UnlockingFilter unlocking_filter = 2;
-  }
-  Filter filter = 1 [ (gogoproto.nullable) = false ];
+message GetStakesRequest {
+  string owner = 1 [ (gogoproto.moretags) = "yaml:\"owner\"" ];
 };
-message GetLocksResponse {
-  repeated Lock locks = 1;
+message GetStakesResponse {
+  repeated Stake stakes = 1;
 };
 
 message GetFutureRewardEstimateRequest {
   // Address that is being queried for future estimated rewards
   string owner = 1 [ (gogoproto.moretags) = "yaml:\"owner\"" ];
-  // Lock IDs included in future reward estimation
-  repeated uint64 lock_ids = 2;
+  // Stake IDs included in future reward estimation
+  repeated uint64 stake_ids = 2;
   // Upper time limit of reward estimation
   // Lower limit is current epoch
   int64 end_epoch = 3;

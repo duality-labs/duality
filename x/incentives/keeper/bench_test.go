@@ -48,20 +48,20 @@ func genRewardCoins(r *rand.Rand, coins sdk.Coins) (res sdk.Coins) {
 // genQueryCondition takes coins and returns a QueryConditon struct.
 func genQueryCondition(
 	r *rand.Rand,
-	blocktime time.Time,
+	bstaketime time.Time,
 	coins sdk.Coins,
 ) types.QueryCondition {
 	return types.QueryCondition{}
 }
 
-// // benchmarkDistributionLogic creates gauges with lockups that get distributed to. Benchmarks the performance of the distribution process.
-// func benchmarkDistributionLogic(numAccts, numDenoms, numGauges, numLockups, numDistrs int, b *testing.B) {
+// // benchmarkDistributionLogic creates gauges with stakeups that get distributed to. Benchmarks the performance of the distribution process.
+// func benchmarkDistributionLogic(numAccts, numDenoms, numGauges, numStakeups, numDistrs int, b *testing.B) {
 // 	b.StopTimer()
 
-// 	blockStartTime := time.Now().UTC()
+// 	bstakeStartTime := time.Now().UTC()
 // 	app, cleanupFn := app.SetupTestingAppWithLevelDb(false)
 // 	defer cleanupFn()
-// 	ctx := app.BaseApp.NewContext(false, tmproto.Header{Height: 1, ChainID: "duality-1", Time: blockStartTime})
+// 	ctx := app.BaseApp.NewContext(false, tmproto.Header{Height: 1, ChainID: "duality-1", Time: bstakeStartTime})
 
 // 	r := rand.New(rand.NewSource(10))
 
@@ -110,23 +110,23 @@ func genQueryCondition(
 // 	futureSecs := r.Intn(1 * 60 * 60 * 24 * 7)
 // 	ctx = ctx.WithBlockTime(ctx.BlockTime().Add(time.Duration(futureSecs) * time.Second))
 
-// 	lockSecs := r.Intn(1 * 60 * 60 * 8)
-// 	// setup lockups
-// 	for i := 0; i < numLockups; i++ {
+// 	stakeSecs := r.Intn(1 * 60 * 60 * 8)
+// 	// setup stakeups
+// 	for i := 0; i < numStakeups; i++ {
 // 		addr := addrs[i%numAccts]
 // 		simCoins := app.BankKeeper.SpendableCoins(ctx, addr)
 
 // 		if i%10 == 0 {
-// 			lockSecs = r.Intn(1 * 60 * 60 * 8)
+// 			stakeSecs = r.Intn(1 * 60 * 60 * 8)
 // 		}
-// 		duration := time.Duration(lockSecs) * time.Second
-// 		_, err := app.IncentivesKeeper.CreateLock(ctx, addr, simCoins, duration)
+// 		duration := time.Duration(stakeSecs) * time.Second
+// 		_, err := app.IncentivesKeeper.CreateStake(ctx, addr, simCoins, duration)
 // 		if err != nil {
-// 			fmt.Printf("Lock tokens, %v\n", err)
+// 			fmt.Printf("Stake tokens, %v\n", err)
 // 			b.FailNow()
 // 		}
 // 	}
-// 	fmt.Println("created all lockups")
+// 	fmt.Println("created all stakeups")
 
 // 	// begin distribution for all gauges
 // 	for _, gaugeId := range gaugeIds {
@@ -139,7 +139,7 @@ func genQueryCondition(
 // 	}
 
 // 	b.StartTimer()
-// 	// distribute coins from gauges to lockup owners
+// 	// distribute coins from gauges to stakeup owners
 // 	for i := 0; i < numDistrs; i++ {
 // 		gauges := types.Gauges{}
 // 		for _, gaugeId := range gaugeIds {
@@ -157,58 +157,58 @@ func genQueryCondition(
 // 	numAccts := 1
 // 	numDenoms := 1
 // 	numGauges := 1
-// 	numLockups := 1
+// 	numStakeups := 1
 // 	numDistrs := 1
-// 	benchmarkDistributionLogic(numAccts, numDenoms, numGauges, numLockups, numDistrs, b)
+// 	benchmarkDistributionLogic(numAccts, numDenoms, numGauges, numStakeups, numDistrs, b)
 // }
 
 // func BenchmarkDistributionLogicSmall(b *testing.B) {
 // 	numAccts := 10
 // 	numDenoms := 1
 // 	numGauges := 10
-// 	numLockups := 1000
+// 	numStakeups := 1000
 // 	numDistrs := 100
-// 	benchmarkDistributionLogic(numAccts, numDenoms, numGauges, numLockups, numDistrs, b)
+// 	benchmarkDistributionLogic(numAccts, numDenoms, numGauges, numStakeups, numDistrs, b)
 // }
 
 // func BenchmarkDistributionLogicMedium(b *testing.B) {
 // 	numAccts := 1000
 // 	numDenoms := 8
 // 	numGauges := 30
-// 	numLockups := 20000
+// 	numStakeups := 20000
 // 	numDistrs := 1
 
-// 	benchmarkDistributionLogic(numAccts, numDenoms, numGauges, numLockups, numDistrs, b)
+// 	benchmarkDistributionLogic(numAccts, numDenoms, numGauges, numStakeups, numDistrs, b)
 // }
 
 // func BenchmarkDistributionLogicLarge(b *testing.B) {
 // 	numAccts := 50000
 // 	numDenoms := 10
 // 	numGauges := 60
-// 	numLockups := 100000
+// 	numStakeups := 100000
 // 	numDistrs := 1
 
-// 	benchmarkDistributionLogic(numAccts, numDenoms, numGauges, numLockups, numDistrs, b)
+// 	benchmarkDistributionLogic(numAccts, numDenoms, numGauges, numStakeups, numDistrs, b)
 // }
 
 // func BenchmarkDistributionLogicHuge(b *testing.B) {
 // 	numAccts := 1000
 // 	numDenoms := 100
 // 	numGauges := 1000
-// 	numLockups := 1000
+// 	numStakeups := 1000
 // 	numDistrs := 30000
-// 	benchmarkDistributionLogic(numAccts, numDenoms, numGauges, numLockups, numDistrs, b)
+// 	benchmarkDistributionLogic(numAccts, numDenoms, numGauges, numStakeups, numDistrs, b)
 // }
 
-// from lockup
+// from stakeup
 
-func benchmarkResetLogic(numLockups int, b *testing.B) {
+func benchmarkResetLogic(numStakeups int, b *testing.B) {
 	// b.ReportAllocs()
 	b.StopTimer()
 
-	blockStartTime := time.Now().UTC()
+	bstakeStartTime := time.Now().UTC()
 	app := app.Setup(false)
-	ctx := app.BaseApp.NewContext(false, tmproto.Header{Height: 1, ChainID: "duality-1", Time: blockStartTime})
+	ctx := app.BaseApp.NewContext(false, tmproto.Header{Height: 1, ChainID: "duality-1", Time: bstakeStartTime})
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	numAccts := 100
@@ -233,20 +233,20 @@ func benchmarkResetLogic(numLockups int, b *testing.B) {
 	futureSecs := r.Intn(1 * 60 * 60 * 24 * 7)
 	ctx = ctx.WithBlockTime(ctx.BlockTime().Add(time.Duration(futureSecs) * time.Second))
 
-	locks := make(types.Locks, numLockups)
-	// setup lockups
-	for i := 0; i < numLockups; i++ {
+	stakes := make(types.Stakes, numStakeups)
+	// setup stakeups
+	for i := 0; i < numStakeups; i++ {
 		addr := addrs[r.Int()%numAccts]
 		simCoins := sdk.NewCoins(sdk.NewCoin(denom, sdk.NewInt(r.Int63n(100))))
-		duration := time.Duration(r.Intn(1*60*60*24*7)) * time.Second
-		lock := types.NewLock(uint64(i+1), addr, duration, time.Time{}, simCoins)
-		locks[i] = lock
+		// duration := time.Duration(r.Intn(1*60*60*24*7)) * time.Second
+		stake := types.NewStake(uint64(i+1), addr, simCoins, ctx.BlockTime())
+		stakes[i] = stake
 	}
 
 	b.StartTimer()
 	b.ReportAllocs()
-	// distribute coins from gauges to lockup owners
-	_ = app.IncentivesKeeper.InitializeAllLocks(ctx, locks)
+	// distribute coins from gauges to stakeup owners
+	_ = app.IncentivesKeeper.InitializeAllStakes(ctx, stakes)
 }
 
 func BenchmarkResetLogicMedium(b *testing.B) {

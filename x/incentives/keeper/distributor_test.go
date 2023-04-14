@@ -15,12 +15,12 @@ import (
 )
 
 type MockKeeper struct {
-	locks types.Locks
+	stakes types.Stakes
 }
 
-func NewMockKeeper(locks types.Locks) MockKeeper {
+func NewMockKeeper(stakes types.Stakes) MockKeeper {
 	return MockKeeper{
-		locks: locks,
+		stakes: stakes,
 	}
 }
 
@@ -28,8 +28,8 @@ func (k MockKeeper) ValueForShares(ctx sdk.Context, coin sdk.Coin, tick int64) (
 	return coin.Amount.Mul(sdk.NewInt(2)), nil
 }
 
-func (k MockKeeper) GetLocksByQueryCondition(ctx sdk.Context, distrTo *types.QueryCondition) types.Locks {
-	return k.locks
+func (k MockKeeper) GetStakesByQueryCondition(ctx sdk.Context, distrTo *types.QueryCondition) types.Stakes {
+	return k.stakes
 }
 
 func TestDistributor(t *testing.T) {
@@ -56,33 +56,33 @@ func TestDistributor(t *testing.T) {
 	)
 	rewardedDenom := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 5, 1).String()
 	nonRewardedDenom := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 12, 1).String()
-	allLocks := types.Locks{
-		{1, "addr1", time.Minute, time.Time{}, sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(50))}},
-		{2, "addr2", time.Minute, time.Time{}, sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}},
-		{3, "addr2", time.Minute, time.Time{}, sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}},
-		{4, "addr3", time.Minute, time.Time{}, sdk.Coins{sdk.NewCoin(nonRewardedDenom, sdk.NewInt(50))}},
+	allStakes := types.Stakes{
+		{1, "addr1", time.Time{}, sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(50))}},
+		{2, "addr2", time.Time{}, sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}},
+		{3, "addr2", time.Time{}, sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}},
+		{4, "addr3", time.Time{}, sdk.Coins{sdk.NewCoin(nonRewardedDenom, sdk.NewInt(50))}},
 	}
 
-	distributor := NewDistributor(NewMockKeeper(allLocks))
+	distributor := NewDistributor(NewMockKeeper(allStakes))
 
 	testCases := []struct {
-		name        string
-		timeOffset  time.Duration
-		filterLocks types.Locks
-		expected    types.DistributionSpec
-		expectedErr error
+		name         string
+		timeOffset   time.Duration
+		filterStakes types.Stakes
+		expected     types.DistributionSpec
+		expectedErr  error
 	}{
 		{
-			name:        "Error case: gauge not active",
-			timeOffset:  -1 * time.Minute,
-			filterLocks: allLocks,
-			expected:    nil,
-			expectedErr: types.ErrGaugeNotActive,
+			name:         "Error case: gauge not active",
+			timeOffset:   -1 * time.Minute,
+			filterStakes: allStakes,
+			expected:     nil,
+			expectedErr:  types.ErrGaugeNotActive,
 		},
 		{
-			name:        "Successful case: distribute to all locks",
-			timeOffset:  0,
-			filterLocks: allLocks,
+			name:         "Successful case: distribute to all stakes",
+			timeOffset:   0,
+			filterStakes: allStakes,
 			expected: types.DistributionSpec{
 				"addr1": sdk.Coins{sdk.NewCoin("coin1", sdk.NewInt(5))},
 				"addr2": sdk.Coins{sdk.NewCoin("coin1", sdk.NewInt(4))},
@@ -90,20 +90,20 @@ func TestDistributor(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			name:        "Successful case: distribute to one lock",
-			timeOffset:  0,
-			filterLocks: types.Locks{allLocks[0]},
+			name:         "Successful case: distribute to one stake",
+			timeOffset:   0,
+			filterStakes: types.Stakes{allStakes[0]},
 			expected: types.DistributionSpec{
 				"addr1": sdk.Coins{sdk.NewCoin("coin1", sdk.NewInt(5))},
 			},
 			expectedErr: nil,
 		},
 		{
-			name:        "No distribution: empty filterLocks",
-			timeOffset:  0,
-			filterLocks: types.Locks{},
-			expected:    types.DistributionSpec{},
-			expectedErr: nil,
+			name:         "No distribution: empty filterStakes",
+			timeOffset:   0,
+			filterStakes: types.Stakes{},
+			expected:     types.DistributionSpec{},
+			expectedErr:  nil,
 		},
 	}
 
@@ -112,7 +112,7 @@ func TestDistributor(t *testing.T) {
 			distSpec, err := distributor.Distribute(
 				ctx.WithBlockTime(ctx.BlockTime().Add(tc.timeOffset)),
 				&gauge,
-				tc.filterLocks,
+				tc.filterStakes,
 			)
 			if tc.expectedErr != nil {
 				assert.Equal(t, tc.expectedErr, err)

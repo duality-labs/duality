@@ -70,10 +70,8 @@ func (k Keeper) GetModuleBalance(ctx sdk.Context) sdk.Coins {
 	return k.bk.GetAllBalances(ctx, acc.GetAddress())
 }
 
-// GetModuleLockedCoins Returns locked balance of the module.
-func (k Keeper) GetModuleLockedCoins(ctx sdk.Context) sdk.Coins {
-	// all not unlocking + not finished unlocking
-	notUnlockingLocksCoins := k.getFullLocks(ctx).GetCoins()
-	unlockingLocksNotMaturedCoins := k.getUnlockingLocksNotMatured(ctx).GetCoins()
-	return notUnlockingLocksCoins.Add(unlockingLocksNotMaturedCoins...)
+// GetModuleStakedCoins Returns staked balance of the module.
+func (k Keeper) GetModuleStakedCoins(ctx sdk.Context) sdk.Coins {
+	// all not unstaking + not finished unstaking
+	return k.GetStakes(ctx).GetCoins()
 }

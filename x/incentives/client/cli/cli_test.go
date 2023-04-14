@@ -89,12 +89,12 @@ var testAddresses = osmoutils.CreateRandomAccounts(3)
 // 	osmocli.RunQueryTestCases(t, desc, tcs)
 // }
 
-// func TestLockTokensCmd(t *testing.T) {
-// 	desc, _ := cli.NewLockTokensCmd()
-// 	tcs := map[string]osmocli.TxCliTestCase[*types.MsgLockTokens]{
-// 		"lock 201stake tokens for 1 day": {
+// func TestStakeTokensCmd(t *testing.T) {
+// 	desc, _ := cli.NewStakeTokensCmd()
+// 	tcs := map[string]osmocli.TxCliTestCase[*types.MsgStake]{
+// 		"stake 201stake tokens for 1 day": {
 // 			Cmd: "201uosmo --from=" + testAddresses[0].String(),
-// 			ExpectedMsg: &types.MsgLockTokens{
+// 			ExpectedMsg: &types.MsgStake{
 // 				Owner: testAddresses[0].String(),
 // 				Coins: sdk.NewCoins(sdk.NewInt64Coin("uosmo", 201)),
 // 			},
@@ -103,12 +103,12 @@ var testAddresses = osmoutils.CreateRandomAccounts(3)
 // 	osmocli.RunTxTestCases(t, desc, tcs)
 // }
 
-// func TestBeginUnlockingAllCmd(t *testing.T) {
-// 	desc, _ := cli.NewBeginUnlockingAllCmd()
-// 	tcs := map[string]osmocli.TxCliTestCase[*types.MsgBeginUnlockingAll]{
+// func TestBeginUnstakingAllCmd(t *testing.T) {
+// 	desc, _ := cli.NewBeginUnstakingAllCmd()
+// 	tcs := map[string]osmocli.TxCliTestCase[*types.MsgBeginUnstakingAll]{
 // 		"basic test": {
 // 			Cmd: "--from=" + testAddresses[0].String(),
-// 			ExpectedMsg: &types.MsgBeginUnlockingAll{
+// 			ExpectedMsg: &types.MsgBeginUnstakingAll{
 // 				Owner: testAddresses[0].String(),
 // 			},
 // 		},
@@ -116,12 +116,12 @@ var testAddresses = osmoutils.CreateRandomAccounts(3)
 // 	osmocli.RunTxTestCases(t, desc, tcs)
 // }
 
-// func TestBeginUnlockingByIDCmd(t *testing.T) {
-// 	desc, _ := cli.NewBeginUnlockByIDCmd()
-// 	tcs := map[string]osmocli.TxCliTestCase[*types.MsgBeginUnlocking]{
+// func TestBeginUnstakingByIDCmd(t *testing.T) {
+// 	desc, _ := cli.NewUnstakeByIDCmd()
+// 	tcs := map[string]osmocli.TxCliTestCase[*types.MsgUnstake]{
 // 		"basic test no coins": {
 // 			Cmd: "10 --from=" + testAddresses[0].String(),
-// 			ExpectedMsg: &types.MsgBeginUnlocking{
+// 			ExpectedMsg: &types.MsgUnstake{
 // 				Owner: testAddresses[0].String(),
 // 				ID:    10,
 // 				Coins: sdk.Coins(nil),
@@ -129,7 +129,7 @@ var testAddresses = osmoutils.CreateRandomAccounts(3)
 // 		},
 // 		"basic test w/ coins": {
 // 			Cmd: "10 --amount=5uosmo --from=" + testAddresses[0].String(),
-// 			ExpectedMsg: &types.MsgBeginUnlocking{
+// 			ExpectedMsg: &types.MsgUnstake{
 // 				Owner: testAddresses[0].String(),
 // 				ID:    10,
 // 				Coins: sdk.NewCoins(sdk.NewInt64Coin("uosmo", 5)),
@@ -150,12 +150,12 @@ var testAddresses = osmoutils.CreateRandomAccounts(3)
 // 	osmocli.RunQueryTestCases(t, desc, tcs)
 // }
 
-// func TestAccountUnlockingCoinsCmd(t *testing.T) {
-// 	desc, _ := cli.GetCmdAccountUnlockingCoins()
-// 	tcs := map[string]osmocli.QueryCliTestCase[*types.AccountUnlockingCoinsRequest]{
+// func TestAccountUnstakingCoinsCmd(t *testing.T) {
+// 	desc, _ := cli.GetCmdAccountUnstakingCoins()
+// 	tcs := map[string]osmocli.QueryCliTestCase[*types.AccountUnstakingCoinsRequest]{
 // 		"basic test": {
 // 			Cmd: testAddresses[0].String(),
-// 			ExpectedQuery: &types.AccountUnlockingCoinsRequest{
+// 			ExpectedQuery: &types.AccountUnstakingCoinsRequest{
 // 				Owner: testAddresses[0].String(),
 // 			},
 // 		},
@@ -163,12 +163,12 @@ var testAddresses = osmoutils.CreateRandomAccounts(3)
 // 	osmocli.RunQueryTestCases(t, desc, tcs)
 // }
 
-// func TestCmdAccountLockedPastTime(t *testing.T) {
-// 	desc, _ := cli.GetCmdAccountLockedPastTime()
-// 	tcs := map[string]osmocli.QueryCliTestCase[*types.AccountLockedPastTimeRequest]{
+// func TestCmdAccountStakedPastTime(t *testing.T) {
+// 	desc, _ := cli.GetCmdAccountStakedPastTime()
+// 	tcs := map[string]osmocli.QueryCliTestCase[*types.AccountStakedPastTimeRequest]{
 // 		"basic test": {
 // 			Cmd: testAddresses[0].String() + " 1670431012",
-// 			ExpectedQuery: &types.AccountLockedPastTimeRequest{
+// 			ExpectedQuery: &types.AccountStakedPastTimeRequest{
 // 				Owner:     testAddresses[0].String(),
 // 				Timestamp: time.Unix(1670431012, 0),
 // 			},
@@ -177,12 +177,12 @@ var testAddresses = osmoutils.CreateRandomAccounts(3)
 // 	osmocli.RunQueryTestCases(t, desc, tcs)
 // }
 
-// func TestCmdAccountLockedPastTimeNotUnlockingOnly(t *testing.T) {
-// 	desc, _ := cli.GetCmdAccountLockedPastTimeNotUnlockingOnly()
-// 	tcs := map[string]osmocli.QueryCliTestCase[*types.AccountLockedPastTimeNotUnlockingOnlyRequest]{
+// func TestCmdAccountStakedPastTimeNotUnstakingOnly(t *testing.T) {
+// 	desc, _ := cli.GetCmdAccountStakedPastTimeNotUnstakingOnly()
+// 	tcs := map[string]osmocli.QueryCliTestCase[*types.AccountStakedPastTimeNotUnstakingOnlyRequest]{
 // 		"basic test": {
 // 			Cmd: testAddresses[0].String() + " 1670431012",
-// 			ExpectedQuery: &types.AccountLockedPastTimeNotUnlockingOnlyRequest{
+// 			ExpectedQuery: &types.AccountStakedPastTimeNotUnstakingOnlyRequest{
 // 				Owner:     testAddresses[0].String(),
 // 				Timestamp: time.Unix(1670431012, 0),
 // 			},
@@ -191,12 +191,12 @@ var testAddresses = osmoutils.CreateRandomAccounts(3)
 // 	osmocli.RunQueryTestCases(t, desc, tcs)
 // }
 
-// func TestCmdTotalLockedByDenom(t *testing.T) {
-// 	desc, _ := cli.GetCmdTotalLockedByDenom()
-// 	tcs := map[string]osmocli.QueryCliTestCase[*types.LockedDenomRequest]{
+// func TestCmdTotalStakedByDenom(t *testing.T) {
+// 	desc, _ := cli.GetCmdTotalStakedByDenom()
+// 	tcs := map[string]osmocli.QueryCliTestCase[*types.StakedDenomRequest]{
 // 		"basic test": {
 // 			Cmd: "uosmo --min-duration=1s",
-// 			ExpectedQuery: &types.LockedDenomRequest{
+// 			ExpectedQuery: &types.StakedDenomRequest{
 // 				Denom:    "uosmo",
 // 				Duration: time.Second,
 // 			},

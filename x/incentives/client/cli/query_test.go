@@ -20,12 +20,12 @@ type QueryTestSuite struct {
 	queryClient types.QueryClient
 }
 
-// LockTokens funds an account, locks tokens and returns a lockID.
-func (s *QueryTestSuite) SetupLock(addr sdk.AccAddress, coins sdk.Coins, duration time.Duration) (lockID uint64) {
+// StakeTokens funds an account, stakes tokens and returns a stakeID.
+func (s *QueryTestSuite) SetupStake(addr sdk.AccAddress, coins sdk.Coins, duration time.Duration) (stakeID uint64) {
 	msgServer := keeper.NewMsgServerImpl(&s.App.IncentivesKeeper)
 	s.FundAcc(addr, coins)
 
-	msgResponse, err := msgServer.LockTokens(sdk.WrapSDKContext(s.Ctx), types.NewMsgSetupLock(addr, duration, coins))
+	msgResponse, err := msgServer.Stake(sdk.WrapSDKContext(s.Ctx), types.NewMsgSetupStake(addr, duration, coins))
 	s.Require().NoError(err)
 
 	return msgResponse.ID
@@ -44,9 +44,9 @@ func (s *QueryTestSuite) SetupSuite() {
 		1,
 	).String()
 
-	// set up lock with id = 1
+	// set up stake with id = 1
 	addr := apptesting.SetupAddr(0)
-	s.SetupLock(addr, sdk.Coins{sdk.NewCoin(denom, sdk.NewInt(1000000))}, time.Hour*24)
+	s.SetupStake(addr, sdk.Coins{sdk.NewCoin(denom, sdk.NewInt(1000000))}, time.Hour*24)
 
 	s.Commit()
 }
@@ -83,10 +83,10 @@ func (s *QueryTestSuite) TestQueriesNeverAlterState() {
 		// 	&types.GetGaugesActiveUpcomingResponse{},
 		// },
 		// {
-		// 	"Query lockable durations",
-		// 	"/duality.incentives.Query/LockableDurations",
-		// 	&types.QueryLockableDurationsRequest{},
-		// 	&types.QueryLockableDurationsResponse{},
+		// 	"Query stakeable durations",
+		// 	"/duality.incentives.Query/StakeableDurations",
+		// 	&types.QueryStakeableDurationsRequest{},
+		// 	&types.QueryStakeableDurationsResponse{},
 		// },
 		// {
 		// 	"Query module to distibute coins",

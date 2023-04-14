@@ -28,11 +28,11 @@ There are two kinds of `gauges`, perpetual and non-perpetual ones.
 ## Concepts
 
 The purpose of `incentives` module is to provide incentives to the users
-who lock specific token for specific period of time.
+who stake specific token for specific period of time.
 
-Locked tokens can be of any denomination, including LP tokens (gamm/pool/x), IBC tokens (tokens sent through IBC such as ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2), and native tokens (such as ATOM or LUNA).
+Staked tokens can be of any denomination, including LP tokens (gamm/pool/x), IBC tokens (tokens sent through IBC such as ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2), and native tokens (such as ATOM or LUNA).
 
-The incentive amount is entered by the gauge creator. Rewards for a given pool of locked up tokens are pooled into a gauge until the disbursement time. At the disbursement time, they are distributed pro-rata (proportionally) to members of the pool.
+The incentive amount is entered by the gauge creator. Rewards for a given pool of staked up tokens are pooled into a gauge until the disbursement time. At the disbursement time, they are distributed pro-rata (proportionally) to members of the pool.
 
 Anyone can create a gauge and add rewards to the gauge. There is no way to withdraw gauge rewards other than distribution. Governance proposals can be raised to match the external incentive tokens with equivalent Osmo incentives (see for example: [proposal 47](https://www.mintscan.io/osmosis/proposals/47)).
 
@@ -46,7 +46,7 @@ There are two kinds of gauges: **`perpetual`** and **`non-perpetual`**:
 
 ### Incentives management
 
-All the incentives that are going to be provided are locked into
+All the incentives that are going to be provided are staked into
 `IncentivePool` until released to the appropriate recipients after a
 specific period of time.
 
@@ -58,25 +58,25 @@ gauge, the cadence at which rewards are to be distributed, and the
 number of epochs to distribute the reward over.
 
 ```protobuf
-enum LockQueryType {
+enum StakeQueryType {
   option (gogoproto.goproto_enum_prefix) = false;
 
-  ByDuration = 0; // locks which has more than specific duration
-  ByTime = 1; // locks which are started before specific time
+  ByDuration = 0; // stakes which has more than specific duration
+  ByTime = 1; // stakes which are started before specific time
 }
 
 message QueryCondition {
-  LockQueryType lock_query_type = 1; // type of lock, ByLockDuration | ByLockTime
-  string denom = 2; // lock denom
-  google.protobuf.Duration duration = 3; // condition for lock duration, only valid if positive
-  google.protobuf.Timestamp timestamp = 4; // condition for lock start time, not valid if unset value
+  StakeQueryType stake_query_type = 1; // type of stake, ByStakeDuration | ByStakeTime
+  string denom = 2; // stake denom
+  google.protobuf.Duration duration = 3; // condition for stake duration, only valid if positive
+  google.protobuf.Timestamp timestamp = 4; // condition for stake start time, not valid if unset value
 }
 
 message Gauge {
   uint64 id = 1; // unique ID of a Gauge
-  QueryCondition distribute_to = 2; // distribute condition of a lock which meet one of these conditions
+  QueryCondition distribute_to = 2; // distribute condition of a stake which meet one of these conditions
   repeated cosmos.base.v1beta1.Coin coins = 3; // can distribute multiple coins
-  google.protobuf.Timestamp start_time = 4; // condition for lock start time, not valid if unset value
+  google.protobuf.Timestamp start_time = 4; // condition for stake start time, not valid if unset value
   uint64 num_epochs_paid_over = 5; // number of epochs distribution will be done
 }
 ```
@@ -105,7 +105,7 @@ in track.
 
 #### Module state
 
-The state of the module is expressed by `params`, `lockable_durations`
+The state of the module is expressed by `params`, `stakeable_durations`
 and `gauges`.
 
 ```protobuf
@@ -114,10 +114,10 @@ message GenesisState {
   // params defines all the parameters of the module
   Params params = 1 [ (gogoproto.nullable) = false ];
   repeated Gauge gauges = 2 [ (gogoproto.nullable) = false ];
-  repeated google.protobuf.Duration lockable_durations = 3 [
+  repeated google.protobuf.Duration stakeable_durations = 3 [
     (gogoproto.nullable) = false,
     (gogoproto.stdduration) = true,
-    (gogoproto.moretags) = "yaml:\"lockable_durations\""
+    (gogoproto.moretags) = "yaml:\"stakeable_durations\""
   ];
 }
 ```
@@ -142,7 +142,7 @@ type MsgCreateGauge struct {
 
 - Validate `Owner` has enough tokens for rewards
 - Generate new `Gauge` record
-- Save the record inside the keeper's time basis unlock queue
+- Save the record inside the keeper's time basis unstake queue
 - Transfer the tokens from the `Owner` to incentives `ModuleAccount`.
 
 ### Adding balance to Gauge
@@ -245,12 +245,12 @@ done at `AfterEpochEnd` hook
 Create a gauge to distribute rewards to users
 
 ```sh
-osmosisd tx incentives create-gauge [lockup_denom] [reward] [flags]
+osmosisd tx incentives create-gauge [stakeup_denom] [reward] [flags]
 ```
 
 ::: details Example 1
 
-I want to make incentives for LP tokens of pool 3, namely gamm/pool/3 that have been locked up for at least 1 day.
+I want to make incentives for LP tokens of pool 3, namely gamm/pool/3 that have been staked up for at least 1 day.
 I want to reward 100 AKT to this pool over 2 days (2 epochs). (50 rewarded on each day)
 I want the rewards to start dispersing on 21 December 2021 (1640081402 UNIX time)
 
@@ -263,7 +263,7 @@ osmosisd tx incentives create-gauge gamm/pool/3 10000ibc/1480B8FD20AD5FCAE81EA87
 
 ::: details Example 2
 
-I want to make incentives for ATOM (ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2) that have been locked up for at least 1 week (164h).
+I want to make incentives for ATOM (ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2) that have been staked up for at least 1 week (164h).
 I want to reward 1000 JUNO (ibc/46B44899322F3CD854D2D46DEEF881958467CDD4B3B10086DA49296BBED94BED) to ATOM holders perpetually (perpetually meaning I must add more tokens to this gauge myself every epoch). I want the reward to start dispersing immediately.
 
 ```bash
@@ -311,11 +311,11 @@ service Query {
   // returns scheduled gauges
   rpc UpcomingGauges(UpcomingGetGaugesActiveUpcomingRequest) returns (UpcomingGetGaugesActiveUpcomingResponse) {}
   // RewardsEst returns an estimate of the rewards at a future specific time.
-  // The QueryServer either provides an address or a set of locks
+  // The QueryServer either provides an address or a set of stakes
   // for which they want to find the associated rewards.
   rpc RewardsEst(RewardsEstRequest) returns (RewardsEstResponse) {}
-  // returns lockable durations that are valid to give incentives
-  rpc LockableDurations(QueryLockableDurationsRequest) returns (QueryLockableDurationsResponse) {}
+  // returns stakeable durations that are valid to give incentives
+  rpc StakeableDurations(QueryStakeableDurationsRequest) returns (QueryStakeableDurationsResponse) {}
 }
 ```
 
@@ -340,7 +340,7 @@ An example output
   distribute_to:
     denom: gamm/pool/99
     duration: 604800s
-    lock_query_type: ByDuration
+    stake_query_type: ByDuration
     timestamp: "0001-01-01T00:00:00Z"
   distributed_coins: []
   filled_epochs: "0"
@@ -352,7 +352,7 @@ An example output
   distribute_to:
     denom: gamm/pool/99
     duration: 1209600s
-    lock_query_type: ByDuration
+    stake_query_type: ByDuration
     timestamp: "0001-01-01T00:00:00Z"
   distributed_coins: []
   filled_epochs: "0"
@@ -391,7 +391,7 @@ An example output:
   distribute_to:
     denom: gamm/pool/341
     duration: 604800s
-    lock_query_type: ByDuration
+    stake_query_type: ByDuration
     timestamp: "0001-01-01T00:00:00Z"
   distributed_coins: []
   filled_epochs: "0"
@@ -403,7 +403,7 @@ An example output:
   distribute_to:
     denom: gamm/pool/341
     duration: 1209600s
-    lock_query_type: ByDuration
+    stake_query_type: ByDuration
     timestamp: "0001-01-01T00:00:00Z"
   distributed_coins: []
   filled_epochs: "0"
@@ -493,7 +493,7 @@ gauge:
   distribute_to:
     denom: gamm/pool/1
     duration: 86400s
-    lock_query_type: ByDuration
+    stake_query_type: ByDuration
     timestamp: "0001-01-01T00:00:00Z"
   distributed_coins:
   - amount: "16589795315655"
@@ -532,7 +532,7 @@ An example output:
   distribute_to:
     denom: gamm/pool/348
     duration: 604800s
-    lock_query_type: ByDuration
+    stake_query_type: ByDuration
     timestamp: "0001-01-01T00:00:00Z"
   distributed_coins: []
   filled_epochs: "0"
@@ -546,7 +546,7 @@ An example output:
   distribute_to:
     denom: gamm/pool/348
     duration: 1209600s
-    lock_query_type: ByDuration
+    stake_query_type: ByDuration
     timestamp: "0001-01-01T00:00:00Z"
   distributed_coins: []
   filled_epochs: "0"
@@ -637,7 +637,7 @@ Using this command, we will see the gauge we created earlier, among all other up
   distribute_to:
     denom: gamm/pool/3
     duration: 86400s
-    lock_query_type: ByDuration
+    stake_query_type: ByDuration
     timestamp: "1970-01-01T00:00:00Z"
   distributed_coins: []
   filled_epochs: "0"

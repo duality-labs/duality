@@ -1,14 +1,14 @@
-# Lockup
+# Stakeup
 
 ## Abstract
 
-Lockup module provides an interface for users to lock tokens (also known as bonding) into the module to get incentives.
+Stakeup module provides an interface for users to stake tokens (also known as bonding) into the module to get incentives.
 
-After tokens have been added to a specific pool and turned into LP shares through the GAMM module, users can then lock these LP shares with a specific duration in order to begin earing rewards.
+After tokens have been added to a specific pool and turned into LP shares through the GAMM module, users can then stake these LP shares with a specific duration in order to begin earing rewards.
 
-To unlock these LP shares, users must trigger the unlock timer and wait for the unlock period that was set initially to be completed. After the unlock period is over, users can turn LP shares back into their respective share of tokens.
+To unstake these LP shares, users must trigger the unstake timer and wait for the unstake period that was set initially to be completed. After the unstake period is over, users can turn LP shares back into their respective share of tokens.
 
-This module provides interfaces for other modules to iterate the locks efficiently and grpc query to check the status of locked coins.
+This module provides interfaces for other modules to iterate the stakes efficiently and grpc query to check the status of staked coins.
 
 ## Contents
 
@@ -21,25 +21,25 @@ This module provides interfaces for other modules to iterate the locks efficient
 7. **[Queries](#queries)**
 8. **[Transactions](#transactions)**
 9. **[Params](#params)**
-10. **[Endblocker](#endblocker)**
+10. **[Endbstakeer](#endbstakeer)**
 
 ## Concepts
 
-The purpose of `lockup` module is to provide the functionality to lock
+The purpose of `stakeup` module is to provide the functionality to stake
 tokens for specific period of time for LP token stakers to get
 incentives.
 
-To unlock these LP shares, users must trigger the unlock timer and wait for the unlock period that was set initially to be completed. After the unlock period is over, users can turn LP shares back into their respective share of tokens.
+To unstake these LP shares, users must trigger the unstake timer and wait for the unstake period that was set initially to be completed. After the unstake period is over, users can turn LP shares back into their respective share of tokens.
 
-This module provides interfaces for other modules to iterate the locks efficiently and grpc query to check the status of locked coins.
+This module provides interfaces for other modules to iterate the stakes efficiently and grpc query to check the status of staked coins.
 
-There are currently three incentivize lockup periods; `1 day` (24h), `1 week` (168h), and `2 weeks` (336h). When locking tokens in the 2 week period, the liquidity provider is effectively earning rewards for a combination of the 1 day, 1 week, and 2 week bonding periods.
+There are currently three incentivize stakeup periods; `1 day` (24h), `1 week` (168h), and `2 weeks` (336h). When staking tokens in the 2 week period, the liquidity provider is effectively earning rewards for a combination of the 1 day, 1 week, and 2 week bonding periods.
 
-The 2 week period refers to how long it takes to unbond the LP shares. The liquidity provider can keep their LP shares bonded to the 2 week lockup period indefinitely. Unbonding is only required when the liquidity provider desires access to the underlying assets.
+The 2 week period refers to how long it takes to unbond the LP shares. The liquidity provider can keep their LP shares bonded to the 2 week stakeup period indefinitely. Unbonding is only required when the liquidity provider desires access to the underlying assets.
 
 If the liquidity provider begins the unbonding process for their 2 week bonded LP shares, they will earn rewards for all three bonding periods during the first day of unbonding.
 
-After the first day passes, they will only receive rewards for the 1 day and 1 week lockup periods. After seven days pass, they will only receive the 1 day rewards until the 2 weeks is complete and their LP shares are unlocked. The below chart is a visual example of what was just explained.
+After the first day passes, they will only receive rewards for the 1 day and 1 week stakeup periods. After seven days pass, they will only receive the 1 day rewards until the 2 weeks is complete and their LP shares are unstaked. The below chart is a visual example of what was just explained.
 
 <br/>
 <p style="text-align:center;">
@@ -51,96 +51,96 @@ After the first day passes, they will only receive rewards for the 1 day and 1 w
 
 ## State
 
-### Locked coins management
+### Staked coins management
 
-Locked coins are all stored in module account for `lockup` module which
-is called `LockPool`. When user lock coins within `lockup` module, it's
-moved from user account to `LockPool` and a record (`PeriodLock` struct)
+Staked coins are all stored in module account for `stakeup` module which
+is called `StakePool`. When user stake coins within `stakeup` module, it's
+moved from user account to `StakePool` and a record (`PeriodStake` struct)
 is created.
 
 Once the period is over, user can withdraw it at anytime from
-`LockPool`. User can withdraw by PeriodLock ID or withdraw all
-`UnlockableCoins` at a time.
+`StakePool`. User can withdraw by PeriodStake ID or withdraw all
+`UnstakeableCoins` at a time.
 
-### Period Lock
+### Period Stake
 
-A `PeriodLock` is a single unit of lock by period. It's a record of
-locked coin at a specific time. It stores owner, duration, unlock time
-and the amount of coins locked.
+A `PeriodStake` is a single unit of stake by period. It's a record of
+staked coin at a specific time. It stores owner, duration, unstake time
+and the amount of coins staked.
 
 ``` {.go}
-type PeriodLock struct {
+type PeriodStake struct {
   ID         uint64
   Owner      sdk.AccAddress
   Duration   time.Duration
-  UnlockTime time.Time
+  UnstakeTime time.Time
   Coins      sdk.Coins
 }
 ```
 
-All locks are stored on the KVStore as value at
-`{KeyPrefixPeriodLock}{ID}` key.
+All stakes are stored on the KVStore as value at
+`{KeyPrefixPeriodStake}{ID}` key.
 
-### Period lock reference queues
+### Period stake reference queues
 
 To provide time efficient queries, several reference queues are managed
-by denom, unlock time, and duration. There are two big queues to store
-the lock references. (`a_prefix_key`)
+by denom, unstake time, and duration. There are two big queues to store
+the stake references. (`a_prefix_key`)
 
-1. Lock references that hasn't started with unlocking yet has prefix of
-    `KeyPrefixNotUnlocking`.
-2. Lock references that has started unlocking already has prefix of
-    `KeyPrefixUnlocking`.
-3. Lock references that has withdrawn, it's removed from the store.
+1. Stake references that hasn't started with unstaking yet has prefix of
+    `KeyPrefixNotUnstaking`.
+2. Stake references that has started unstaking already has prefix of
+    `KeyPrefixUnstaking`.
+3. Stake references that has withdrawn, it's removed from the store.
 
-Regardless the lock has started unlocking or not, it stores below
+Regardless the stake has started unstaking or not, it stores below
 references. (`b_prefix_key`)
 
-1. `{KeyPrefixLockDuration}{Duration}`
-2. `{KeyPrefixAccountLockDuration}{Owner}{Duration}`
-3. `{KeyPrefixDenomLockDuration}{Denom}{Duration}`
-4. `{KeyPrefixAccountDenomLockDuration}{Owner}{Denom}{Duration}`
+1. `{KeyPrefixStakeDuration}{Duration}`
+2. `{KeyPrefixAccountStakeDuration}{Owner}{Duration}`
+3. `{KeyPrefixDenomStakeDuration}{Denom}{Duration}`
+4. `{KeyPrefixAccountDenomStakeDuration}{Owner}{Denom}{Duration}`
 
-If the lock is unlocking, it also stores the below references.
+If the stake is unstaking, it also stores the below references.
 
-1. `{KeyPrefixLockTimestamp}{LockEndTime}`
-2. `{KeyPrefixAccountLockTimestamp}{Owner}{LockEndTime}`
-3. `{KeyPrefixDenomLockTimestamp}{Denom}{LockEndTime}`
-4. `{KeyPrefixAccountDenomLockTimestamp}{Owner}{Denom}{LockEndTime}`
+1. `{KeyPrefixStakeTimestamp}{StakeEndTime}`
+2. `{KeyPrefixAccountStakeTimestamp}{Owner}{StakeEndTime}`
+3. `{KeyPrefixDenomStakeTimestamp}{Denom}{StakeEndTime}`
+4. `{KeyPrefixAccountDenomStakeTimestamp}{Owner}{Denom}{StakeEndTime}`
 
 For end time keys, they are converted to sortable string by using
 `sdk.FormatTimeBytes` function.
 
-**Note:** Additionally, for locks that hasn't started unlocking yet, it
+**Note:** Additionally, for stakes that hasn't started unstaking yet, it
 stores accumulation store for efficient rewards distribution mechanism.
 
-For reference management, `addLockRefByKey` function is used a lot. Here
+For reference management, `addStakeRefByKey` function is used a lot. Here
 key is the prefix key to be used for iteration. It is combination of two
 prefix keys.(`{a_prefix_key}{b_prefix_key}`)
 
 ``` {.go}
-// addLockRefByKey make a lockID iterable with the prefix `key`
-func (k Keeper) addLockRefByKey(ctx sdk.Context, key []byte, lockID uint64) error {
+// addStakeRefByKey make a stakeID iterable with the prefix `key`
+func (k Keeper) addStakeRefByKey(ctx sdk.Context, key []byte, stakeID uint64) error {
  store := ctx.KVStore(k.storeKey)
- lockIDBz := sdk.Uint64ToBigEndian(lockID)
- endKey := combineKeys(key, lockIDBz)
+ stakeIDBz := sdk.Uint64ToBigEndian(stakeID)
+ endKey := combineKeys(key, stakeIDBz)
  if store.Has(endKey) {
-  return fmt.Errorf("lock with same ID exist: %d", lockID)
+  return fmt.Errorf("stake with same ID exist: %d", stakeID)
  }
- store.Set(endKey, lockIDBz)
+ store.Set(endKey, stakeIDBz)
  return nil
 }
 ```
 
 ## Messages
 
-### Lock Tokens
+### Stake Tokens
 
-`MsgLockTokens` can be submitted by any token holder via a
-`MsgLockTokens` transaction.
+`MsgStake` can be submitted by any token holder via a
+`MsgStake` transaction.
 
 ``` {.go}
-type MsgLockTokens struct {
+type MsgStake struct {
  Owner    sdk.AccAddress
  Duration time.Duration
  Coins    sdk.Coins
@@ -150,36 +150,36 @@ type MsgLockTokens struct {
 **State modifications:**
 
 - Validate `Owner` has enough tokens
-- Generate new `PeriodLock` record
-- Save the record inside the keeper's time basis unlock queue
-- Transfer the tokens from the `Owner` to lockup `ModuleAccount`.
+- Generate new `PeriodStake` record
+- Save the record inside the keeper's time basis unstake queue
+- Transfer the tokens from the `Owner` to stakeup `ModuleAccount`.
 
-### Begin Unlock of all locks
+### Begin Unstake of all stakes
 
-Once time is over, users can withdraw unlocked coins from lockup
+Once time is over, users can withdraw unstaked coins from stakeup
 `ModuleAccount`.
 
 ``` {.go}
-type MsgBeginUnlockingAll struct {
+type MsgBeginUnstakingAll struct {
  Owner string
 }
 ```
 
 **State modifications:**
 
-- Fetch all unlockable `PeriodLock`s that has not started unlocking
+- Fetch all unstakeable `PeriodStake`s that has not started unstaking
     yet
-- Set `PeriodLock`'s unlock time
-- Remove lock references from `NotUnlocking` queue
-- Add lock references to `Unlocking` queue
+- Set `PeriodStake`'s unstake time
+- Remove stake references from `NotUnstaking` queue
+- Add stake references to `Unstaking` queue
 
-### Begin unlock for a lock
+### Begin unstake for a stake
 
-Once time is over, users can withdraw unlocked coins from lockup
+Once time is over, users can withdraw unstaked coins from stakeup
 `ModuleAccount`.
 
 ``` {.go}
-type MsgBeginUnlocking struct {
+type MsgUnstake struct {
  Owner string
  ID    uint64
 }
@@ -187,215 +187,215 @@ type MsgBeginUnlocking struct {
 
 **State modifications:**
 
-- Check `PeriodLock` with `ID` specified by `MsgBeginUnlocking` is not
-    started unlocking yet
-- Set `PeriodLock`'s unlock time
-- Remove lock references from `NotUnlocking` queue
-- Add lock references to `Unlocking` queue
+- Check `PeriodStake` with `ID` specified by `MsgUnstake` is not
+    started unstaking yet
+- Set `PeriodStake`'s unstake time
+- Remove stake references from `NotUnstaking` queue
+- Add stake references to `Unstaking` queue
 
-Note: If another module needs past `PeriodLock` item, it can log the
+Note: If another module needs past `PeriodStake` item, it can log the
 details themselves using the hooks.
 
 ## Events
 
-The lockup module emits the following events:
+The stakeup module emits the following events:
 
 ### Handlers
 
-#### MsgLockTokens
+#### MsgStake
 
 |  Type          | Attribute Key     | Attribute Value  |
 |  --------------| ------------------| -----------------|
-|  lock\_tokens  | period\_lock\_id  | {periodLockID}   |
-|  lock\_tokens  | owner             | {owner}          |
-|  lock\_tokens  | amount            | {amount}         |
-|  lock\_tokens  | duration          | {duration}       |
-|  lock\_tokens  | unlock\_time      | {unlockTime}     |
-|  message       | action            | lock\_tokens     |
+|  stake\_tokens  | period\_stake\_id  | {periodStakeID}   |
+|  stake\_tokens  | owner             | {owner}          |
+|  stake\_tokens  | amount            | {amount}         |
+|  stake\_tokens  | duration          | {duration}       |
+|  stake\_tokens  | unstake\_time      | {unstakeTime}     |
+|  message       | action            | stake\_tokens     |
 |  message       | sender            | {owner}          |
 |  transfer      | recipient         | {moduleAccount}  |
 |  transfer      | sender            | {owner}          |
 |  transfer      | amount            | {amount}         |
 
-#### MsgBeginUnlocking
+#### MsgUnstake
 
 |  Type           | Attribute Key     | Attribute Value   |
 |  ---------------| ------------------| ------------------|
-|  begin\_unlock  | period\_lock\_id  | {periodLockID}    |
-|  begin\_unlock  | owner             | {owner}           |
-|  begin\_unlock  | amount            | {amount}          |
-|  begin\_unlock  | duration          | {duration}        |
-|  begin\_unlock  | unlock\_time      | {unlockTime}      |
-|  message        | action            | begin\_unlocking  |
+|  begin\_unstake  | period\_stake\_id  | {periodStakeID}    |
+|  begin\_unstake  | owner             | {owner}           |
+|  begin\_unstake  | amount            | {amount}          |
+|  begin\_unstake  | duration          | {duration}        |
+|  begin\_unstake  | unstake\_time      | {unstakeTime}      |
+|  message        | action            | begin\_unstaking  |
 |  message        | sender            | {owner}           |
 
-#### MsgBeginUnlockingAll
+#### MsgBeginUnstakingAll
 
 |  Type                | Attribute Key     | Attribute Value        |
 |  --------------------| ------------------| -----------------------|
-|  begin\_unlock\_all  | owner             | {owner}                |
-|  begin\_unlock\_all  | unlocked\_coins   | {unlockedCoins}        |
-|  begin\_unlock       | period\_lock\_id  | {periodLockID}         |
-|  begin\_unlock       | owner             | {owner}                |
-|  begin\_unlock       | amount            | {amount}               |
-|  begin\_unlock       | duration          | {duration}             |
-|  begin\_unlock       | unlock\_time      | {unlockTime}           |
-|  message             | action            | begin\_unlocking\_all  |
+|  begin\_unstake\_all  | owner             | {owner}                |
+|  begin\_unstake\_all  | unstaked\_coins   | {unstakedCoins}        |
+|  begin\_unstake       | period\_stake\_id  | {periodStakeID}         |
+|  begin\_unstake       | owner             | {owner}                |
+|  begin\_unstake       | amount            | {amount}               |
+|  begin\_unstake       | duration          | {duration}             |
+|  begin\_unstake       | unstake\_time      | {unstakeTime}           |
+|  message             | action            | begin\_unstaking\_all  |
 |  message             | sender            | {owner}                |
 
-### Endblocker
+### Endbstakeer
 
-#### Automatic withdraw when unlock time mature
+#### Automatic withdraw when unstake time mature
 
 |  Type            | Attribute Key     | Attribute Value  |
 |  ----------------| ------------------| -----------------|
-|  message         | action            | unlock\_tokens   |
+|  message         | action            | unstake\_tokens   |
 |  message         | sender            | {owner}          |
 |  transfer\[\]    | recipient         | {owner}          |
 |  transfer\[\]    | sender            | {moduleAccount}  |
-|  transfer\[\]    | amount            | {unlockAmount}   |
-|  unlock\[\]      | period\_lock\_id  | {owner}          |
-|  unlock\[\]      | owner             | {lockID}         |
-|  unlock\[\]      | duration          | {lockDuration}   |
-|  unlock\[\]      | unlock\_time      | {unlockTime}     |
-|  unlock\_tokens  | owner             | {owner}          |
-|  unlock\_tokens  | unlocked\_coins   | {totalAmount}    |
+|  transfer\[\]    | amount            | {unstakeAmount}   |
+|  unstake\[\]      | period\_stake\_id  | {owner}          |
+|  unstake\[\]      | owner             | {stakeID}         |
+|  unstake\[\]      | duration          | {stakeDuration}   |
+|  unstake\[\]      | unstake\_time      | {unstakeTime}     |
+|  unstake\_tokens  | owner             | {owner}          |
+|  unstake\_tokens  | unstaked\_coins   | {totalAmount}    |
 
 ## Keepers
 
-### Lockup Keeper
+### Stakeup Keeper
 
-Lockup keeper provides utility functions to store lock queues and query
-locks.
+Stakeup keeper provides utility functions to store stake queues and query
+stakes.
 
 ```go
-// Keeper is the interface for lockup module keeper
+// Keeper is the interface for stakeup module keeper
 type Keeper interface {
     // GetModuleBalance Returns full balance of the module
     GetModuleBalance(sdk.Context) sdk.Coins
-    // GetModuleLockedCoins Returns locked balance of the module
-    GetModuleLockedCoins(sdk.Context) sdk.Coins
-    // GetAccountUnlockableCoins Returns whole unlockable coins which are not withdrawn yet
-    GetAccountUnlockableCoins(sdk.Context, addr sdk.AccAddress) sdk.Coins
-    // GetAccountUnlockingCoins Returns whole unlocking coins
-    GetAccountUnlockingCoins(sdk.Context, addr sdk.AccAddress) sdk.Coins
-    // GetAccountLockedCoins Returns a locked coins that can't be withdrawn
-    GetAccountLockedCoins(sdk.Context, addr sdk.AccAddress) sdk.Coins
-    // GetAccountLockedPastTime Returns the total locks of an account whose unlock time is beyond timestamp
-    GetAccountLockedPastTime(sdk.Context, addr sdk.AccAddress, timestamp time.Time) []types.PeriodLock
-    // GetAccountUnlockedBeforeTime Returns the total unlocks of an account whose unlock time is before timestamp
-    GetAccountUnlockedBeforeTime(sdk.Context, addr sdk.AccAddress, timestamp time.Time) []types.PeriodLock
-    // GetAccountLockedPastTimeDenom is equal to GetAccountLockedPastTime but denom specific
-    GetAccountLockedPastTimeDenom(ctx sdk.Context, addr sdk.AccAddress, denom string, timestamp time.Time) []types.PeriodLock
+    // GetModuleStakedCoins Returns staked balance of the module
+    GetModuleStakedCoins(sdk.Context) sdk.Coins
+    // GetAccountUnstakeableCoins Returns whole unstakeable coins which are not withdrawn yet
+    GetAccountUnstakeableCoins(sdk.Context, addr sdk.AccAddress) sdk.Coins
+    // GetAccountUnstakingCoins Returns whole unstaking coins
+    GetAccountUnstakingCoins(sdk.Context, addr sdk.AccAddress) sdk.Coins
+    // GetAccountStakedCoins Returns a staked coins that can't be withdrawn
+    GetAccountStakedCoins(sdk.Context, addr sdk.AccAddress) sdk.Coins
+    // GetAccountStakedPastTime Returns the total stakes of an account whose unstake time is beyond timestamp
+    GetAccountStakedPastTime(sdk.Context, addr sdk.AccAddress, timestamp time.Time) []types.PeriodStake
+    // GetAccountUnstakedBeforeTime Returns the total unstakes of an account whose unstake time is before timestamp
+    GetAccountUnstakedBeforeTime(sdk.Context, addr sdk.AccAddress, timestamp time.Time) []types.PeriodStake
+    // GetAccountStakedPastTimeDenom is equal to GetAccountStakedPastTime but denom specific
+    GetAccountStakedPastTimeDenom(ctx sdk.Context, addr sdk.AccAddress, denom string, timestamp time.Time) []types.PeriodStake
 
-    // GetAccountLockedLongerDuration Returns account locked with duration longer than specified
-    GetAccountLockedLongerDuration(sdk.Context, addr sdk.AccAddress, duration time.Duration) []types.PeriodLock
-    // GetAccountLockedLongerDurationDenom Returns account locked with duration longer than specified with specific denom
-    GetAccountLockedLongerDurationDenom(sdk.Context, addr sdk.AccAddress, denom string, duration time.Duration) []types.PeriodLock
-    // GetLocksPastTimeDenom Returns the locks whose unlock time is beyond timestamp
-    GetLocksPastTimeDenom(ctx sdk.Context, addr sdk.AccAddress, denom string, timestamp time.Time) []types.PeriodLock
-    // GetLocksLongerThanDurationDenom Returns the locks whose unlock duration is longer than duration
-    GetLocksLongerThanDurationDenom(ctx sdk.Context, addr sdk.AccAddress, denom string, duration time.Duration) []types.PeriodLock
-    // GetLockByID Returns lock from lockID
-    GetLockByID(sdk.Context, lockID uint64) (*types.PeriodLock, error)
-    // GetPeriodLocks Returns the period locks on pool
-    GetPeriodLocks(sdk.Context) ([]types.PeriodLock, error)
-    // UnlockAllUnlockableCoins Unlock all unlockable coins
-    UnlockAllUnlockableCoins(sdk.Context, account sdk.AccAddress) (sdk.Coins, error)
-    // LockTokens lock tokens from an account for specified duration
-    LockTokens(sdk.Context, owner sdk.AccAddress, coins sdk.Coins, duration time.Duration) (types.PeriodLock, error)
-    // AddTokensToLock locks more tokens into a lockup
-    AddTokensToLock(ctx sdk.Context, owner sdk.AccAddress, lockID uint64, coins sdk.Coins) (*types.PeriodLock, error)
-    // Lock is a utility to lock coins into module account
-    Lock(sdk.Context, lock types.PeriodLock) error
-    // Unlock is a utility to unlock coins from module account
-    Unlock(sdk.Context, lock types.PeriodLock) error
+    // GetAccountStakedLongerDuration Returns account staked with duration longer than specified
+    GetAccountStakedLongerDuration(sdk.Context, addr sdk.AccAddress, duration time.Duration) []types.PeriodStake
+    // GetAccountStakedLongerDurationDenom Returns account staked with duration longer than specified with specific denom
+    GetAccountStakedLongerDurationDenom(sdk.Context, addr sdk.AccAddress, denom string, duration time.Duration) []types.PeriodStake
+    // GetStakesPastTimeDenom Returns the stakes whose unstake time is beyond timestamp
+    GetStakesPastTimeDenom(ctx sdk.Context, addr sdk.AccAddress, denom string, timestamp time.Time) []types.PeriodStake
+    // GetStakesLongerThanDurationDenom Returns the stakes whose unstake duration is longer than duration
+    GetStakesLongerThanDurationDenom(ctx sdk.Context, addr sdk.AccAddress, denom string, duration time.Duration) []types.PeriodStake
+    // GetStakeByID Returns stake from stakeID
+    GetStakeByID(sdk.Context, stakeID uint64) (*types.PeriodStake, error)
+    // GetPeriodStakes Returns the period stakes on pool
+    GetPeriodStakes(sdk.Context) ([]types.PeriodStake, error)
+    // UnstakeAllUnstakeableCoins Unstake all unstakeable coins
+    UnstakeAllUnstakeableCoins(sdk.Context, account sdk.AccAddress) (sdk.Coins, error)
+    // StakeTokens stake tokens from an account for specified duration
+    StakeTokens(sdk.Context, owner sdk.AccAddress, coins sdk.Coins, duration time.Duration) (types.PeriodStake, error)
+    // AddTokensToStake stakes more tokens into a stakeup
+    AddTokensToStake(ctx sdk.Context, owner sdk.AccAddress, stakeID uint64, coins sdk.Coins) (*types.PeriodStake, error)
+    // Stake is a utility to stake coins into module account
+    Stake(sdk.Context, stake types.PeriodStake) error
+    // Unstake is a utility to unstake coins from module account
+    Unstake(sdk.Context, stake types.PeriodStake) error
 ```
 
 ## Hooks
 
-In this section we describe the "hooks" that `lockup` module provide for
+In this section we describe the "hooks" that `stakeup` module provide for
 other modules.
 
-### Tokens Locked
+### Tokens Staked
 
-On lock/unlock events, lockup module execute hooks for other modules to
+On stake/unstake events, stakeup module execute hooks for other modules to
 make following actions.
 
 ``` go
-  OnTokenLocked(ctx sdk.Context, address sdk.AccAddress, lockID uint64, amount sdk.Coins, lockDuration time.Duration, unlockTime time.Time)
-  OnTokenUnlocked(ctx sdk.Context, address sdk.AccAddress, lockID uint64, amount sdk.Coins, lockDuration time.Duration, unlockTime time.Time)
+  OnTokenStaked(ctx sdk.Context, address sdk.AccAddress, stakeID uint64, amount sdk.Coins, stakeDuration time.Duration, unstakeTime time.Time)
+  OnTokenUnstaked(ctx sdk.Context, address sdk.AccAddress, stakeID uint64, amount sdk.Coins, stakeDuration time.Duration, unstakeTime time.Time)
 ```
 
 ## Parameters
 
-The lockup module contains the following parameters:
+The stakeup module contains the following parameters:
 
 | Key                    | Type            | Example |
 | ---------------------- | --------------- | ------- |
 
-Note: Currently no parameters are set for `lockup` module, we will need
-to move lockable durations from incentives module to lockup module.
+Note: Currently no parameters are set for `stakeup` module, we will need
+to move stakeable durations from incentives module to stakeup module.
 
-## Endblocker
+## Endbstakeer
 
-### Withdraw tokens after unlock time mature
+### Withdraw tokens after unstake time mature
 
-Once time is over, endblocker withdraw coins from matured locks and
-coins are sent from lockup `ModuleAccount`.
+Once time is over, endbstakeer withdraw coins from matured stakes and
+coins are sent from stakeup `ModuleAccount`.
 
 **State modifications:**
 
-- Fetch all unlockable `PeriodLock`s that `Owner` has not withdrawn
+- Fetch all unstakeable `PeriodStake`s that `Owner` has not withdrawn
     yet
-- Remove `PeriodLock` records from the state
-- Transfer the tokens from lockup `ModuleAccount` to the
-    `MsgUnlockTokens.Owner`.
+- Remove `PeriodStake` records from the state
+- Transfer the tokens from stakeup `ModuleAccount` to the
+    `MsgUnstakeTokens.Owner`.
 
-### Remove synthetic locks after removal time mature
+### Remove synthetic stakes after removal time mature
 
-For synthetic lockups, no coin movement is made, but lockup record and
+For synthetic stakeups, no coin movement is made, but stakeup record and
 reference queues are removed.
 
 
 ## Transactions
 
-### lock-tokens
+### stake-tokens
 
 Bond tokens in a LP for a set duration
 
 ```sh
-dualityd tx lockup lock-tokens [tokens] --duration --from --chain-id
+dualityd tx stakeup stake-tokens [tokens] --duration --from --chain-id
 ```
 
 ::: details Example
 
-To lockup `15.527546134174465309gamm/pool/3` tokens for a `one day` bonding period from `WALLET_NAME` on the osmosis mainnet:
+To stakeup `15.527546134174465309gamm/pool/3` tokens for a `one day` bonding period from `WALLET_NAME` on the osmosis mainnet:
 
 ```bash
-dualityd tx lockup lock-tokens 15527546134174465309gamm/pool/3 --duration="24h" --from WALLET_NAME --chain-id osmosis-1
+dualityd tx stakeup stake-tokens 15527546134174465309gamm/pool/3 --duration="24h" --from WALLET_NAME --chain-id osmosis-1
 ```
 
-To lockup `25.527546134174465309gamm/pool/13` tokens for a `one week` bonding period from `WALLET_NAME` on the osmosis testnet:
+To stakeup `25.527546134174465309gamm/pool/13` tokens for a `one week` bonding period from `WALLET_NAME` on the osmosis testnet:
 
 ```bash
-dualityd tx lockup lock-tokens 25527546134174465309gamm/pool/13 --duration="168h" --from WALLET_NAME --chain-id osmo-test-4
+dualityd tx stakeup stake-tokens 25527546134174465309gamm/pool/13 --duration="168h" --from WALLET_NAME --chain-id osmo-test-4
 ```
 
-To lockup `35.527546134174465309 gamm/pool/197` tokens for a `two week` bonding period from `WALLET_NAME` on the osmosis mainnet:
+To stakeup `35.527546134174465309 gamm/pool/197` tokens for a `two week` bonding period from `WALLET_NAME` on the osmosis mainnet:
 
 ```bash
-dualityd tx lockup lock-tokens 35527546134174465309gamm/pool/197 --duration="336h" --from WALLET_NAME --chain-id osmosis-1
+dualityd tx stakeup stake-tokens 35527546134174465309gamm/pool/197 --duration="336h" --from WALLET_NAME --chain-id osmosis-1
 ```
 :::
 
 
-### begin-unlock-by-id
+### begin-unstake-by-id
 
-Begin the unbonding process for tokens given their unique lock ID
+Begin the unbonding process for tokens given their unique stake ID
 
 ```sh
-dualityd tx lockup begin-unlock-by-id [id] --from --chain-id
+dualityd tx stakeup begin-unstake-by-id [id] --from --chain-id
 ```
 
 ::: details Example
@@ -403,19 +403,19 @@ dualityd tx lockup begin-unlock-by-id [id] --from --chain-id
 To begin the unbonding time for all bonded tokens under id `75` from `WALLET_NAME` on the osmosis mainnet:
 
 ```bash
-dualityd tx lockup begin-unlock-by-id 75 --from WALLET_NAME --chain-id osmosis-1
+dualityd tx stakeup begin-unstake-by-id 75 --from WALLET_NAME --chain-id osmosis-1
 ```
 :::
 ::: warning Note
-The ID corresponds to the unique ID given to your lockup transaction (explained more in lock-by-id section)
+The ID corresponds to the unique ID given to your stakeup transaction (explained more in stake-by-id section)
 :::
 
-### begin-unlock-tokens
+### begin-unstake-tokens
 
 Begin unbonding process for all bonded tokens in a wallet
 
 ```sh
-dualityd tx lockup begin-unlock-tokens --from --chain-id
+dualityd tx stakeup begin-unstake-tokens --from --chain-id
 ```
 
 ::: details Example
@@ -424,7 +424,7 @@ To begin unbonding time for ALL pools and ALL bonded tokens in `WALLET_NAME` on 
 
 
 ```bash
-dualityd tx lockup begin-unlock-tokens --from=WALLET_NAME --chain-id=osmosis-1 --yes
+dualityd tx stakeup begin-unstake-tokens --from=WALLET_NAME --chain-id=osmosis-1 --yes
 ```
 :::
 
@@ -437,60 +437,60 @@ In this section we describe the queries required on grpc server.
 service Query {
     // Return full balance of the module
  rpc ModuleBalance(ModuleBalanceRequest) returns (ModuleBalanceResponse);
- // Return locked balance of the module
- rpc ModuleLockedAmount(ModuleLockedAmountRequest) returns (ModuleLockedAmountResponse);
+ // Return staked balance of the module
+ rpc ModuleStakedAmount(ModuleStakedAmountRequest) returns (ModuleStakedAmountResponse);
 
- // Returns unlockable coins which are not withdrawn yet
- rpc AccountUnlockableCoins(AccountUnlockableCoinsRequest) returns (AccountUnlockableCoinsResponse);
- // Returns unlocking coins
-   rpc AccountUnlockingCoins(AccountUnlockingCoinsRequest) returns (AccountUnlockingCoinsResponse) {}
- // Return a locked coins that can't be withdrawn
- rpc AccountLockedCoins(AccountLockedCoinsRequest) returns (AccountLockedCoinsResponse);
+ // Returns unstakeable coins which are not withdrawn yet
+ rpc AccountUnstakeableCoins(AccountUnstakeableCoinsRequest) returns (AccountUnstakeableCoinsResponse);
+ // Returns unstaking coins
+   rpc AccountUnstakingCoins(AccountUnstakingCoinsRequest) returns (AccountUnstakingCoinsResponse) {}
+ // Return a staked coins that can't be withdrawn
+ rpc AccountStakedCoins(AccountStakedCoinsRequest) returns (AccountStakedCoinsResponse);
 
- // Returns locked records of an account with unlock time beyond timestamp
- rpc AccountLockedPastTime(AccountLockedPastTimeRequest) returns (AccountLockedPastTimeResponse);
- // Returns locked records of an account with unlock time beyond timestamp excluding tokens started unlocking
- rpc AccountLockedPastTimeNotUnlockingOnly(AccountLockedPastTimeNotUnlockingOnlyRequest) returns (AccountLockedPastTimeNotUnlockingOnlyResponse) {}
- // Returns unlocked records with unlock time before timestamp
- rpc AccountUnlockedBeforeTime(AccountUnlockedBeforeTimeRequest) returns (AccountUnlockedBeforeTimeResponse);
+ // Returns staked records of an account with unstake time beyond timestamp
+ rpc AccountStakedPastTime(AccountStakedPastTimeRequest) returns (AccountStakedPastTimeResponse);
+ // Returns staked records of an account with unstake time beyond timestamp excluding tokens started unstaking
+ rpc AccountStakedPastTimeNotUnstakingOnly(AccountStakedPastTimeNotUnstakingOnlyRequest) returns (AccountStakedPastTimeNotUnstakingOnlyResponse) {}
+ // Returns unstaked records with unstake time before timestamp
+ rpc AccountUnstakedBeforeTime(AccountUnstakedBeforeTimeRequest) returns (AccountUnstakedBeforeTimeResponse);
 
- // Returns lock records by address, timestamp, denom
- rpc AccountLockedPastTimeDenom(AccountLockedPastTimeDenomRequest) returns (AccountLockedPastTimeDenomResponse);
- // Returns lock record by id
- rpc LockedByID(LockedRequest) returns (LockedResponse);
+ // Returns stake records by address, timestamp, denom
+ rpc AccountStakedPastTimeDenom(AccountStakedPastTimeDenomRequest) returns (AccountStakedPastTimeDenomResponse);
+ // Returns stake record by id
+ rpc StakedByID(StakedRequest) returns (StakedResponse);
 
- // Returns account locked records with longer duration
- rpc AccountLockedLongerDuration(AccountLockedLongerDurationRequest) returns (AccountLockedLongerDurationResponse);
- // Returns account locked records with longer duration excluding tokens started unlocking
-   rpc AccountLockedLongerDurationNotUnlockingOnly(AccountLockedLongerDurationNotUnlockingOnlyRequest) returns (AccountLockedLongerDurationNotUnlockingOnlyResponse) {}
- // Returns account's locked records for a denom with longer duration
- rpc AccountLockedLongerDurationDenom(AccountLockedLongerDurationDenomRequest) returns (AccountLockedLongerDurationDenomResponse);
+ // Returns account staked records with longer duration
+ rpc AccountStakedLongerDuration(AccountStakedLongerDurationRequest) returns (AccountStakedLongerDurationResponse);
+ // Returns account staked records with longer duration excluding tokens started unstaking
+   rpc AccountStakedLongerDurationNotUnstakingOnly(AccountStakedLongerDurationNotUnstakingOnlyRequest) returns (AccountStakedLongerDurationNotUnstakingOnlyResponse) {}
+ // Returns account's staked records for a denom with longer duration
+ rpc AccountStakedLongerDurationDenom(AccountStakedLongerDurationDenomRequest) returns (AccountStakedLongerDurationDenomResponse);
 
- // Returns account locked records with a specific duration
- rpc AccountLockedDuration(AccountLockedDurationRequest) returns (AccountLockedDurationResponse);
+ // Returns account staked records with a specific duration
+ rpc AccountStakedDuration(AccountStakedDurationRequest) returns (AccountStakedDurationResponse);
 }
 ```
 
-### account-locked-beforetime
+### account-staked-beforetime
 
-Query an account's unlocked records after a specified time (UNIX) has passed
+Query an account's unstaked records after a specified time (UNIX) has passed
 
-In other words, if an account unlocked all their bonded tokens the moment the query was executed, only the locks that would have completed their bond time requirement by the time the `TIMESTAMP` is reached will be returned.
+In other words, if an account unstaked all their bonded tokens the moment the query was executed, only the stakes that would have completed their bond time requirement by the time the `TIMESTAMP` is reached will be returned.
 
 ::: details Example
 
 In this example, the current UNIX time is `1639776682`, 2 days from now is approx `1639971082`, and 15 days from now is approx `1641094282`.
 
-An account's `ADDRESS` is locked in both the `1 day` and `1 week` gamm/pool/3. To query the `ADDRESS` with a timestamp 2 days from now `1639971082`:
+An account's `ADDRESS` is staked in both the `1 day` and `1 week` gamm/pool/3. To query the `ADDRESS` with a timestamp 2 days from now `1639971082`:
 
 ```bash
-dualityd query lockup account-locked-beforetime ADDRESS 1639971082
+dualityd query stakeup account-staked-beforetime ADDRESS 1639971082
 ```
 
-In this example will output the `1 day` lock but not the `1 week` lock:
+In this example will output the `1 day` stake but not the `1 week` stake:
 
 ```bash
-locks:
+stakes:
 - ID: "571839"
   coins:
   - amount: "15527546134174465309"
@@ -503,13 +503,13 @@ locks:
 If querying the same `ADDRESS` with a timestamp 15 days from now `1641094282`:
 
 ```bash
-dualityd query lockup account-locked-beforetime ADDRESS 1641094282
+dualityd query stakeup account-staked-beforetime ADDRESS 1641094282
 ```
 
-In this example will output both the `1 day` and `1 week` lock:
+In this example will output both the `1 day` and `1 week` stake:
 
 ```bash
-locks:
+stakes:
 - ID: "572027"
   coins:
   - amount: "16120691802759484268"
@@ -528,18 +528,18 @@ locks:
 :::
 
 
-### account-locked-coins
+### account-staked-coins
 
-Query an account's locked (bonded) LP tokens
+Query an account's staked (bonded) LP tokens
 
 ```sh
-dualityd query lockup account-locked-coins [address]
+dualityd query stakeup account-staked-coins [address]
 ```
 
 :::: details Example
 
 ```bash
-dualityd query lockup account-locked-coins osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259
+dualityd query stakeup account-staked-coins osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259
 ```
 
 An example output:
@@ -566,12 +566,12 @@ You may also specify a --height flag to see bonded LP tokens at a specified heig
 :::
 ::::
 
-### account-locked-longer-duration
+### account-staked-longer-duration
 
-Query an account's locked records that are greater than or equal to a specified lock duration
+Query an account's staked records that are greater than or equal to a specified stake duration
 
 ```sh
-dualityd query lockup account-locked-longer-duration [address] [duration]
+dualityd query stakeup account-staked-longer-duration [address] [duration]
 ```
 
 ::: details Example
@@ -579,13 +579,13 @@ dualityd query lockup account-locked-longer-duration [address] [duration]
 Here is an example of querying an `ADDRESS` for all `1 day` or greater bonding periods:
 
 ```bash
-dualityd query lockup account-locked-longer-duration osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259 24h
+dualityd query stakeup account-staked-longer-duration osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259 24h
 ```
 
 An example output:
 
 ```bash
-locks:
+stakes:
 - ID: "572027"
   coins:
   - amount: "16120691802759484268"
@@ -604,26 +604,26 @@ locks:
 :::
 
 
-### account-locked-longer-duration-denom
+### account-staked-longer-duration-denom
 
-Query an account's locked records for a denom that is locked equal to or greater than the specified duration AND match a specified denom
+Query an account's staked records for a denom that is staked equal to or greater than the specified duration AND match a specified denom
 
 ```sh
-dualityd query lockup account-locked-longer-duration-denom [address] [duration] [denom]
+dualityd query stakeup account-staked-longer-duration-denom [address] [duration] [denom]
 ```
 
 ::: details Example
 
-Here is an example of an `ADDRESS` that is locked in both the `1 day` and `1 week` for both the gamm/pool/3 and gamm/pool/1, then queries the `ADDRESS` for all bonding periods equal to or greater than `1 day` for just the gamm/pool/3:
+Here is an example of an `ADDRESS` that is staked in both the `1 day` and `1 week` for both the gamm/pool/3 and gamm/pool/1, then queries the `ADDRESS` for all bonding periods equal to or greater than `1 day` for just the gamm/pool/3:
 
 ```bash
-dualityd query lockup account-locked-longer-duration-denom osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259 24h gamm/pool/3
+dualityd query stakeup account-staked-longer-duration-denom osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259 24h gamm/pool/3
 ```
 
 An example output:
 
 ```bash
-locks:
+stakes:
 - ID: "571839"
   coins:
   - amount: "15527546134174465309"
@@ -644,26 +644,26 @@ As shown, the gamm/pool/3 is returned but not the gamm/pool/1 due to the denom f
 :::
 
 
-### account-locked-longer-duration-not-unlocking
+### account-staked-longer-duration-not-unstaking
 
-Query an account's locked records for a denom that is locked equal to or greater than the specified duration AND is not in the process of being unlocked
+Query an account's staked records for a denom that is staked equal to or greater than the specified duration AND is not in the process of being unstaked
 
 ```sh
-dualityd query lockup account-locked-longer-duration-not-unlocking [address] [duration]
+dualityd query stakeup account-staked-longer-duration-not-unstaking [address] [duration]
 ```
 
 ::: details Example
 
-Here is an example of an `ADDRESS` that is locked in both the `1 day` and `1 week` gamm/pool/3, begins unlocking process for the `1 day` bond, and queries the `ADDRESS` for all bonding periods equal to or greater than `1 day` that are not unbonding:
+Here is an example of an `ADDRESS` that is staked in both the `1 day` and `1 week` gamm/pool/3, begins unstaking process for the `1 day` bond, and queries the `ADDRESS` for all bonding periods equal to or greater than `1 day` that are not unbonding:
 
 ```bash
-dualityd query lockup account-locked-longer-duration-not-unlocking osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259 24h
+dualityd query stakeup account-staked-longer-duration-not-unstaking osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259 24h
 ```
 
 An example output:
 
 ```bash
-locks:
+stakes:
 - ID: "571839"
   coins:
   - amount: "16120691802759484268"
@@ -677,26 +677,26 @@ The `1 day` bond does not show since it is in the process of unbonding.
 :::
 
 
-### account-locked-pasttime
+### account-staked-pasttime
 
-Query the locked records of an account with the unlock time beyond timestamp (UNIX)
+Query the staked records of an account with the unstake time beyond timestamp (UNIX)
 
 ```bash
-dualityd query lockup account-locked-pasttime [address] [timestamp]
+dualityd query stakeup account-staked-pasttime [address] [timestamp]
 ```
 
 ::: details Example
 
-Here is an example of an account that is locked in both the `1 day` and `1 week` gamm/pool/3. In this example, the UNIX time is currently `1639776682` and queries an `ADDRESS` for UNIX time two days later from the current time (which in this example would be `1639971082`)
+Here is an example of an account that is staked in both the `1 day` and `1 week` gamm/pool/3. In this example, the UNIX time is currently `1639776682` and queries an `ADDRESS` for UNIX time two days later from the current time (which in this example would be `1639971082`)
 
 ```bash
-dualityd query lockup account-locked-pasttime osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259 1639971082
+dualityd query stakeup account-staked-pasttime osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259 1639971082
 ```
 
 The example output:
 
 ```bash
-locks:
+stakes:
 - ID: "572027"
   coins:
   - amount: "16120691802759484268"
@@ -706,30 +706,30 @@ locks:
   owner: osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259
 ```
 
-Note that the `1 day` lock ID did not display because, if the unbonding time began counting down from the time the command was executed, the bonding period would be complete before the two day window given by the UNIX timestamp input.
+Note that the `1 day` stake ID did not display because, if the unbonding time began counting down from the time the command was executed, the bonding period would be complete before the two day window given by the UNIX timestamp input.
 :::
 
 
-### account-locked-pasttime-denom
+### account-staked-pasttime-denom
 
-Query the locked records of an account with the unlock time beyond timestamp (unix) and filter by a specific denom
+Query the staked records of an account with the unstake time beyond timestamp (unix) and filter by a specific denom
 
 ```bash
-dualityd query lockup account-locked-pasttime-denom osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259 [timestamp] [denom]
+dualityd query stakeup account-staked-pasttime-denom osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259 [timestamp] [denom]
 ```
 
 ::: details Example
 
-Here is an example of an account that is locked in both the `1 day` and `1 week` gamm/pool/3 and `1 day` and `1 week` gamm/pool/1. In this example, the UNIX time is currently `1639776682` and queries an `ADDRESS` for UNIX time two days later from the current time (which in this example would be `1639971082`) and filters for gamm/pool/3
+Here is an example of an account that is staked in both the `1 day` and `1 week` gamm/pool/3 and `1 day` and `1 week` gamm/pool/1. In this example, the UNIX time is currently `1639776682` and queries an `ADDRESS` for UNIX time two days later from the current time (which in this example would be `1639971082`) and filters for gamm/pool/3
 
 ```bash
-dualityd query lockup account-locked-pasttime-denom osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259 1639971082 gamm/pool/3
+dualityd query stakeup account-staked-pasttime-denom osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259 1639971082 gamm/pool/3
 ```
 
 The example output:
 
 ```bash
-locks:
+stakes:
 - ID: "572027"
   coins:
   - amount: "16120691802759484268"
@@ -739,30 +739,30 @@ locks:
   owner: osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259
 ```
 
-Note that the `1 day` lock ID did not display because, if the unbonding time began counting down from the time the command was executed, the bonding period would be complete before the two day window given by the UNIX timestamp input. Additionally, neither of the `1 day` or `1 week` lock IDs for gamm/pool/1 showed due to the denom filter.
+Note that the `1 day` stake ID did not display because, if the unbonding time began counting down from the time the command was executed, the bonding period would be complete before the two day window given by the UNIX timestamp input. Additionally, neither of the `1 day` or `1 week` stake IDs for gamm/pool/1 showed due to the denom filter.
 :::
 
 
-### account-locked-pasttime-not-unlocking
+### account-staked-pasttime-not-unstaking
 
-Query the locked records of an account with the unlock time beyond timestamp (unix) AND is not in the process of unlocking
+Query the staked records of an account with the unstake time beyond timestamp (unix) AND is not in the process of unstaking
 
 ```sh
-dualityd query lockup account-locked-pasttime [address] [timestamp]
+dualityd query stakeup account-staked-pasttime [address] [timestamp]
 ```
 
 ::: details Example
 
-Here is an example of an account that is locked in both the `1 day` and `1 week` gamm/pool/3. In this example, the UNIX time is currently `1639776682` and queries an `ADDRESS` for UNIX time two days later from the current time (which in this example would be `1639971082`) AND is not unlocking:
+Here is an example of an account that is staked in both the `1 day` and `1 week` gamm/pool/3. In this example, the UNIX time is currently `1639776682` and queries an `ADDRESS` for UNIX time two days later from the current time (which in this example would be `1639971082`) AND is not unstaking:
 
 ```bash
-dualityd query lockup account-locked-pasttime osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259 1639971082
+dualityd query stakeup account-staked-pasttime osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259 1639971082
 ```
 
 The example output:
 
 ```bash
-locks:
+stakes:
 - ID: "572027"
   coins:
   - amount: "16120691802759484268"
@@ -772,32 +772,32 @@ locks:
   owner: osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259
 ```
 
-Note that the `1 day` lock ID did not display because, if the unbonding time began counting down from the time the command was executed, the bonding period would be complete before the two day window given by the UNIX timestamp input. Additionally, if ID 572027 were to begin the unlocking process, the query would have returned blank.
+Note that the `1 day` stake ID did not display because, if the unbonding time began counting down from the time the command was executed, the bonding period would be complete before the two day window given by the UNIX timestamp input. Additionally, if ID 572027 were to begin the unstaking process, the query would have returned blank.
 :::
 
 
-### account-unlockable-coins
+### account-unstakeable-coins
 
-Query an address's LP shares that have completed the unlocking period and are ready to be withdrawn
+Query an address's LP shares that have completed the unstaking period and are ready to be withdrawn
 
 ```bash
-dualityd query lockup account-unlockable-coins ADDRESS
+dualityd query stakeup account-unstakeable-coins ADDRESS
 ```
 
 
 
-### account-unlocking-coins
+### account-unstaking-coins
 
-Query an address's LP shares that are currently unlocking
+Query an address's LP shares that are currently unstaking
 
 ```sh
-dualityd query lockup account-unlocking-coins [address]
+dualityd query stakeup account-unstaking-coins [address]
 ```
 
 ::: details Example
 
 ```bash
-dualityd query lockup account-unlocking-coins osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259
+dualityd query stakeup account-unstaking-coins osmo1xqhlshlhs5g0acqgrkafdemvf5kz4pp4c2x259
 ```
 
 Example output:
@@ -810,28 +810,28 @@ coins:
 :::
 
 
-### lock-by-id
+### stake-by-id
 
-Query a lock record by its ID
+Query a stake record by its ID
 
 ```sh
-dualityd query lockup lock-by-id [id]
+dualityd query stakeup stake-by-id [id]
 ```
 
 ::: details Example
 
-Every time a user bonds tokens to an LP, a unique lock ID is created for that transaction.
+Every time a user bonds tokens to an LP, a unique stake ID is created for that transaction.
 
-Here is an example viewing the lock record for ID 9:
+Here is an example viewing the stake record for ID 9:
 
 ```bash
-dualityd query lockup lock-by-id 9
+dualityd query stakeup stake-by-id 9
 ```
 
 And its output:
 
 ```bash
-lock:
+stake:
   ID: "9"
   coins:
   - amount: "2449472670508255020346507"
@@ -841,7 +841,7 @@ lock:
   owner: osmo16r39ghhwqjcwxa8q3yswlz8jhzldygy66vlm82
 ```
 
-In summary, this shows wallet `osmo16r39ghhwqjcwxa8q3yswlz8jhzldygy66vlm82` bonded `2449472.670 gamm/pool/2` LP shares for a `2 week` locking period.
+In summary, this shows wallet `osmo16r39ghhwqjcwxa8q3yswlz8jhzldygy66vlm82` bonded `2449472.670 gamm/pool/2` LP shares for a `2 week` staking period.
 :::
 
 
@@ -850,13 +850,13 @@ In summary, this shows wallet `osmo16r39ghhwqjcwxa8q3yswlz8jhzldygy66vlm82` bond
 Query the balance of all LP shares (bonded and unbonded)
 
 ```sh
-dualityd query lockup module-balance
+dualityd query stakeup module-balance
 ```
 
 ::: details Example
 
 ```bash
-dualityd query lockup module-balance
+dualityd query stakeup module-balance
 ```
 
 An example output:
@@ -899,18 +899,18 @@ coins:
 :::
 
 
-### module-locked-amount
+### module-staked-amount
 
 Query the balance of all bonded LP shares
 
 ```sh
-dualityd query lockup module-locked-amount
+dualityd query stakeup module-staked-amount
 ```
 
 ::: details Example
 
 ```bash
-dualityd query lockup module-locked-amount
+dualityd query stakeup module-staked-amount
 ```
 
 An example output:
@@ -959,41 +959,41 @@ NOTE: This command seems to only work on gRPC and on CLI returns an EOF error.
 
 
 
-### output-all-locks
+### output-all-stakes
 
-Output all locks into a json file
+Output all stakes into a json file
 
 ```sh
-dualityd query lockup output-all-locks [max lock ID]
+dualityd query stakeup output-all-stakes [max stake ID]
 ```
 
 :::: details Example
 
-This example command outputs locks 1-1000 and saves to a json file:
+This example command outputs stakes 1-1000 and saves to a json file:
 
 ```bash
-dualityd query lockup output-all-locks 1000
+dualityd query stakeup output-all-stakes 1000
 ```
 ::: warning Note
-If a lockup has been completed, the lockup status will show as "0" (or successful) and no further information will be available. To get further information on a completed lock, run the lock-by-id query.
+If a stakeup has been completed, the stakeup status will show as "0" (or successful) and no further information will be available. To get further information on a completed stake, run the stake-by-id query.
 :::
 ::::
 
 
-### total-locked-of-denom
+### total-staked-of-denom
 
-Query locked amount for a specific denom in the duration provided
+Query staked amount for a specific denom in the duration provided
 
 ```sh
-dualityd query lockup total-locked-of-denom [denom] --min-duration
+dualityd query stakeup total-staked-of-denom [denom] --min-duration
 ```
 
 :::: details Example
 
-This example command outputs the amount of `gamm/pool/2` LP shares that locked in the `2 week` bonding period:
+This example command outputs the amount of `gamm/pool/2` LP shares that staked in the `2 week` bonding period:
 
 ```bash
-dualityd query lockup total-locked-of-denom gamm/pool/2 --min-duration "336h"
+dualityd query stakeup total-staked-of-denom gamm/pool/2 --min-duration "336h"
 ```
 
 Which, at the time of this writing outputs `14106985399822075248947045` which is equivalent to `14106985.3998 gamm/pool/2`
@@ -1004,51 +1004,51 @@ NOTE: As of this writing, there is a bug that defaults the min duration to days 
 ## Commands
 
 ```sh
-# 1 day 100stake lock-tokens command
-dualityd tx lockup lock-tokens 200stake --duration="86400s" --from=validator --chain-id=testing --keyring-backend=test --yes
+# 1 day 100stake stake-tokens command
+dualityd tx stakeup stake-tokens 200stake --duration="86400s" --from=validator --chain-id=testing --keyring-backend=test --yes
 
-# 5s 100stake lock-tokens command
-dualityd tx lockup lock-tokens 100stake --duration="5s" --from=validator --chain-id=testing --keyring-backend=test --yes
+# 5s 100stake stake-tokens command
+dualityd tx stakeup stake-tokens 100stake --duration="5s" --from=validator --chain-id=testing --keyring-backend=test --yes
 
-# begin unlock tokens, NOTE: add more gas when unlocking more than two locks in a same command
-dualityd tx lockup begin-unlock-tokens --from=validator --gas=500000 --chain-id=testing --keyring-backend=test --yes
+# begin unstake tokens, NOTE: add more gas when unstaking more than two stakes in a same command
+dualityd tx stakeup begin-unstake-tokens --from=validator --gas=500000 --chain-id=testing --keyring-backend=test --yes
 
-# unlock tokens, NOTE: add more gas when unlocking more than two locks in a same command
-dualityd tx lockup unlock-tokens --from=validator --gas=500000 --chain-id=testing --keyring-backend=test --yes
+# unstake tokens, NOTE: add more gas when unstaking more than two stakes in a same command
+dualityd tx stakeup unstake-tokens --from=validator --gas=500000 --chain-id=testing --keyring-backend=test --yes
 
-# unlock specific period lock
-dualityd tx lockup unlock-by-id 1 --from=validator --chain-id=testing --keyring-backend=test --yes
+# unstake specific period stake
+dualityd tx stakeup unstake-by-id 1 --from=validator --chain-id=testing --keyring-backend=test --yes
 
 # account balance
 dualityd query bank balances $(dualityd keys show -a validator --keyring-backend=test)
 
 # query module balance
-dualityd query lockup module-balance
+dualityd query stakeup module-balance
 
-# query locked amount
-dualityd query lockup module-locked-amount
+# query staked amount
+dualityd query stakeup module-staked-amount
 
-# query lock by id
-dualityd query lockup lock-by-id 1
+# query stake by id
+dualityd query stakeup stake-by-id 1
 
-# query account unlockable coins
-dualityd query lockup account-unlockable-coins $(dualityd keys show -a validator --keyring-backend=test)
+# query account unstakeable coins
+dualityd query stakeup account-unstakeable-coins $(dualityd keys show -a validator --keyring-backend=test)
 
-# query account locks by denom past time
-dualityd query lockup account-locked-pasttime-denom $(dualityd keys show -a validator --keyring-backend=test) 1611879610 stake
+# query account stakes by denom past time
+dualityd query stakeup account-staked-pasttime-denom $(dualityd keys show -a validator --keyring-backend=test) 1611879610 stake
 
-# query account locks past time
-dualityd query lockup account-locked-pasttime $(dualityd keys show -a validator --keyring-backend=test) 1611879610
+# query account stakes past time
+dualityd query stakeup account-staked-pasttime $(dualityd keys show -a validator --keyring-backend=test) 1611879610
 
-# query account locks by denom with longer duration
-dualityd query lockup account-locked-longer-duration-denom $(dualityd keys show -a validator --keyring-backend=test) 5.1s stake
+# query account stakes by denom with longer duration
+dualityd query stakeup account-staked-longer-duration-denom $(dualityd keys show -a validator --keyring-backend=test) 5.1s stake
 
-# query account locks with longer duration
-dualityd query lockup account-locked-longer-duration $(dualityd keys show -a validator --keyring-backend=test) 5.1s
+# query account stakes with longer duration
+dualityd query stakeup account-staked-longer-duration $(dualityd keys show -a validator --keyring-backend=test) 5.1s
 
-# query account locked coins
-dualityd query lockup account-locked-coins $(dualityd keys show -a validator --keyring-backend=test)
+# query account staked coins
+dualityd query stakeup account-staked-coins $(dualityd keys show -a validator --keyring-backend=test)
 
-# query account locks before time
-dualityd query lockup account-locked-beforetime $(dualityd keys show -a validator --keyring-backend=test) 1611879610
+# query account stakes before time
+dualityd query stakeup account-staked-beforetime $(dualityd keys show -a validator --keyring-backend=test) 1611879610
 ```

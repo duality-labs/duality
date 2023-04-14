@@ -7,19 +7,17 @@ const (
 	TypeEvtDistribution = "distribution"
 
 	AttributeGaugeID     = "gauge_id"
-	AttributeLockedDenom = "denom"
+	AttributeStakedDenom = "denom"
 	AttributeReceiver    = "receiver"
 	AttributeAmount      = "amount"
 
-	TypeEvtLockTokens      = "lock_tokens"
-	TypeEvtAddTokensToLock = "add_tokens_to_lock"
-	TypeEvtBeginUnlockAll  = "begin_unlock_all"
-	TypeEvtBeginUnlock     = "begin_unlock"
+	TypeEvtStake            = "stake"
+	TypeEvtAddTokensToStake = "add_tokens_to_stake"
+	TypeEvtUnstake          = "unstake"
 
-	AttributeLockID         = "period_lock_id"
-	AttributeLockOwner      = "owner"
-	AttributeLockAmount     = "amount"
-	AttributeLockDuration   = "duration"
-	AttributeLockUnlockTime = "unlock_time"
-	AttributeUnlockedCoins  = "unlocked_coins"
+	AttributeStakeID          = "period_stake_id"
+	AttributeStakeOwner       = "owner"
+	AttributeStakeAmount      = "amount"
+	AttributeStakeUnstakeTime = "stake_time"
+	AttributeUnstakedCoins    = "unstaked_coins"
 )

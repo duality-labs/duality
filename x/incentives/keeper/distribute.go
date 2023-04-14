@@ -33,12 +33,12 @@ func (k Keeper) ValueForShares(ctx sdk.Context, coin sdk.Coin, tick int64) (sdk.
 	return amount0.ToDec().Add(price1To0Center.MulInt(amount1)).TruncateInt(), nil
 }
 
-// Distribute distributes coins from an array of gauges to all eligible locks.
+// Distribute distributes coins from an array of gauges to all eligible stakes.
 func (k Keeper) Distribute(ctx sdk.Context, gauges types.Gauges) (types.DistributionSpec, error) {
 	distSpec := types.DistributionSpec{}
 	for _, gauge := range gauges {
-		filterLocks := k.GetLocksByQueryCondition(ctx, &gauge.DistributeTo)
-		gaugeDistSpec, err := k.distributor.Distribute(ctx, gauge, filterLocks)
+		filterStakes := k.GetStakesByQueryCondition(ctx, &gauge.DistributeTo)
+		gaugeDistSpec, err := k.distributor.Distribute(ctx, gauge, filterStakes)
 
 		if err != nil {
 			return nil, err
@@ -98,21 +98,21 @@ func (k Keeper) GetModuleDistributedCoins(ctx sdk.Context) sdk.Coins {
 }
 
 // GetRewardsEstimate returns rewards estimation at a future specific time (by epoch)
-// If locks are nil, it returns the rewards between now and the end epoch associated with address.
-// If locks are not nil, it returns all the rewards for the given locks between now and end epoch.
-func (k Keeper) GetRewardsEstimate(ctx sdk.Context, addr sdk.AccAddress, filterLocks types.Locks, endEpoch int64) (sdk.Coins, error) {
-	// if locks are nil, populate with all locks associated with the address
-	if len(filterLocks) == 0 {
-		filterLocks = k.GetLocksByAccount(ctx, addr)
+// If stakes are nil, it returns the rewards between now and the end epoch associated with address.
+// If stakes are not nil, it returns all the rewards for the given stakes between now and end epoch.
+func (k Keeper) GetRewardsEstimate(ctx sdk.Context, addr sdk.AccAddress, filterStakes types.Stakes, endEpoch int64) (sdk.Coins, error) {
+	// if stakes are nil, populate with all stakes associated with the address
+	if len(filterStakes) == 0 {
+		filterStakes = k.GetStakesByAccount(ctx, addr)
 	}
 
-	// for each specified lock get associated pairs
+	// for each specified stake get associated pairs
 	pairSet := map[dextypes.PairID]bool{}
-	for _, l := range filterLocks {
+	for _, l := range filterStakes {
 		for _, c := range l.Coins {
 			depositDenom, err := dextypes.NewDepositDenomFromString(c.Denom)
 			if err != nil {
-				panic("all locks should be valid deposit denoms")
+				panic("all stakes should be valid deposit denoms")
 			}
 			pairSet[*depositDenom.PairID] = true
 		}
@@ -132,13 +132,13 @@ func (k Keeper) GetRewardsEstimate(ctx sdk.Context, addr sdk.AccAddress, filterL
 	cacheCtx, _ := ctx.CacheContext()
 	for _, gauge := range gauges {
 		distrBeginEpoch := epochInfo.CurrentEpoch
-		blockTime := ctx.BlockTime()
-		if gauge.StartTime.After(blockTime) {
-			distrBeginEpoch = epochInfo.CurrentEpoch + 1 + int64(gauge.StartTime.Sub(blockTime)/epochInfo.Duration)
+		bstakeTime := ctx.BlockTime()
+		if gauge.StartTime.After(bstakeTime) {
+			distrBeginEpoch = epochInfo.CurrentEpoch + 1 + int64(gauge.StartTime.Sub(bstakeTime)/epochInfo.Duration)
 		}
 
 		// TODO: Make more efficient by making it possible to call distribute with this
-		// gaugeLocks := k.GetLocksByQueryCondition(cacheCtx, &gauge.DistributeTo)
+		// gaugeStakes := k.GetStakesByQueryCondition(cacheCtx, &gauge.DistributeTo)
 		gaugeRewards := sdk.Coins{}
 		for epoch := distrBeginEpoch; epoch <= endEpoch; epoch++ {
 			epochTime := epochInfo.StartTime.Add(time.Duration(epoch-epochInfo.CurrentEpoch) * epochInfo.Duration)
@@ -147,7 +147,7 @@ func (k Keeper) GetRewardsEstimate(ctx sdk.Context, addr sdk.AccAddress, filterL
 			}
 
 			futureCtx := cacheCtx.WithBlockTime(epochTime)
-			distSpec, err := k.distributor.Distribute(futureCtx, gauge, filterLocks)
+			distSpec, err := k.distributor.Distribute(futureCtx, gauge, filterStakes)
 			if err != nil {
 				return nil, err
 			}

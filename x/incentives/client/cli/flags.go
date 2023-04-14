@@ -11,7 +11,7 @@ const (
 	FlagPerpetual = "perpetual"
 	FlagTimestamp = "timestamp"
 	FlagOwner     = "owner"
-	FlagLockIds   = "lock-ids"
+	FlagStakeIds  = "stake-ids"
 	FlagEndEpoch  = "end-epoch"
 	FlagAmount    = "amount"
 )
@@ -26,14 +26,14 @@ func FlagSetCreateGauge() *flag.FlagSet {
 	return fs
 }
 
-// FlagSetLockTokens returns flags for LockTokens msg builder.
-func FlagSetSetupLock() *flag.FlagSet {
+// FlagSetStakeTokens returns flags for StakeTokens msg builder.
+func FlagSetSetupStake() *flag.FlagSet {
 	fs := flag.NewFlagSet("", flag.ContinueOnError)
 	return fs
 }
 
-func FlagSetUnSetupLock() *flag.FlagSet {
+func FlagSetUnSetupStake() *flag.FlagSet {
 	fs := flag.NewFlagSet("", flag.ContinueOnError)
-	fs.String(FlagAmount, "", "The amount to be unlocked. e.g. 1osmo")
+	fs.String(FlagAmount, "", "The amount to be unstaked. e.g. 1osmo")
 	return fs
 }
