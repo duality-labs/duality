@@ -77,20 +77,19 @@ message GetGaugeByIDResponse {
   Gauge gauge = 1;
 }
 
+enum StatusFilter {
+  ACTIVE_UPCOMING = 0;
+  ACTIVE = 1;
+  UPCOMING = 2;
+  FINISHED = 3;
+}
+
 message GetGaugesRequest {
-  message Filter {
-    enum StatusFilter {
-      ACTIVE_UPCOMING = 0;
-      ACTIVE = 1;
-      UPCOMING = 2;
-      FINISHED = 3;
-    }
-    StatusFilter status = 1;
-    string denom = 2;
-  }
   // Pagination defines pagination for the request
-  cosmos.base.query.v1beta1.PageRequest pagination = 1;
-  Filter filter = 2 [ (gogoproto.nullable) = false ];
+
+  StatusFilter status_filter = 1;
+  string denom = 2;
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 message GetGaugesResponse {
   // Upcoming and active gauges

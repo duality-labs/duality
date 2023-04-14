@@ -59,19 +59,19 @@ func (q QueryServer) GetGauges(goCtx context.Context, req *types.GetGaugesReques
 	var pagination *query.PageResponse
 
 	var prefix []byte
-	switch req.Filter.Status {
-	case types.GetGaugesRequest_Filter_ACTIVE_UPCOMING:
+	switch req.StatusFilter {
+	case types.StatusFilter_ACTIVE_UPCOMING:
 		prefix = types.KeyPrefixGaugeIndex
-	case types.GetGaugesRequest_Filter_ACTIVE:
+	case types.StatusFilter_ACTIVE:
 		prefix = types.KeyPrefixGaugeIndexActive
-	case types.GetGaugesRequest_Filter_UPCOMING:
+	case types.StatusFilter_UPCOMING:
 		prefix = types.KeyPrefixGaugeIndexUpcoming
-	case types.GetGaugesRequest_Filter_FINISHED:
+	case types.StatusFilter_FINISHED:
 		prefix = types.KeyPrefixGaugeIndexFinished
 	default:
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid status filter value")
 	}
-	pagination, gauges, err := q.filterByPrefixAndDenom(ctx, prefix, req.Filter.Denom, req.Pagination)
+	pagination, gauges, err := q.filterByPrefixAndDenom(ctx, prefix, req.Denom, req.Pagination)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
