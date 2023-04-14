@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"strings"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/duality-labs/duality/x/dex/types"
@@ -49,19 +47,6 @@ func GetInOutTokens(tokenIn, tokenA, tokenB string) (_, tokenOut string) {
 	}
 
 	return tokenB, tokenA
-}
-
-func StringToPairID(pairIDStr string) (*types.PairID, error) {
-	tokens := strings.Split(pairIDStr, "<>")
-
-	if len(tokens) == 2 {
-		return &types.PairID{
-			Token0: tokens[0],
-			Token1: tokens[1],
-		}, nil
-	}
-
-	return &types.PairID{}, sdkerrors.Wrapf(types.ErrInvalidPairIDStr, pairIDStr)
 }
 
 func NormalizeTickIndex(baseToken, token0 string, tickIndex int64) int64 {

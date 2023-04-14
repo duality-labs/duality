@@ -25,7 +25,7 @@ func (k Keeper) TickLiquidityAll(
 	var tickLiquiditys []types.TickLiquidity
 	ctx := sdk.UnwrapSDKContext(c)
 
-	pairID, err := StringToPairID(req.PairID)
+	pairID, err := types.StringToPairID(req.PairID)
 	if err != nil {
 		return nil, err
 	}
