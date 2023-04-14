@@ -40,24 +40,24 @@ func GetCmdGetGaugeByID() (*osmocli.QueryDescriptor, *types.GetGaugeByIDRequest)
 	}, &types.GetGaugeByIDRequest{}
 }
 
-func parseFilterStatus(arg string, _ *pflag.FlagSet) (any, osmocli.FieldReadLocation, error) {
-	filterStatusInt, ok := types.StatusFilter_value[arg]
+func parseGaugeStatus(arg string, _ *pflag.FlagSet) (any, osmocli.FieldReadLocation, error) {
+	gaugeStatusInt, ok := types.GaugeStatus_value[arg]
 	if !ok {
 		return 0, osmocli.UsedArg, types.ErrInvalidGaugeStatus
 	}
-	filterStatus := types.StatusFilter(filterStatusInt)
+	gaugeStatus := types.GaugeStatus(gaugeStatusInt)
 
-	return filterStatus, osmocli.UsedArg, nil
+	return gaugeStatus, osmocli.UsedArg, nil
 }
 
-// GetCmdGauges returns all gauges for a given filter.
+// GetCmdGauges returns all gauges for a given status and denom.
 func GetCmdGauges() (*osmocli.QueryDescriptor, *types.GetGaugesRequest) {
 	return &osmocli.QueryDescriptor{
-		Use:   "list-gauges [StatusFilter] [denom]",
+		Use:   "list-gauges [status] [denom]",
 		Short: "Query all gauges",
 		Long:  `{{.Short}}{{.ExampleHeader}}`,
 		CustomFieldParsers: map[string]osmocli.CustomFieldParserFn{
-			"StatusFilter": parseFilterStatus,
+			"Status": parseGaugeStatus,
 		},
 	}, &types.GetGaugesRequest{}
 }
@@ -71,24 +71,24 @@ func GetCmdGetLockByID() (*osmocli.QueryDescriptor, *types.GetLockByIDRequest) {
 	}, &types.GetLockByIDRequest{}
 }
 
-func parseUnlockingFilter(arg string, _ *pflag.FlagSet) (any, osmocli.FieldReadLocation, error) {
-	unlockingFilterInt, ok := types.UnlockingFilter_value[arg]
+func parseLockStatus(arg string, _ *pflag.FlagSet) (any, osmocli.FieldReadLocation, error) {
+	lockStatusInt, ok := types.LockStatus_value[arg]
 	if !ok {
-		return 0, osmocli.UsedArg, types.ErrInvalidUnlockingStatus
+		return 0, osmocli.UsedArg, types.ErrInvalidLockStatus
 	}
-	unlockingFilter := types.UnlockingFilter(unlockingFilterInt)
+	lockStatus := types.LockStatus(lockStatusInt)
 
-	return unlockingFilter, osmocli.UsedArg, nil
+	return lockStatus, osmocli.UsedArg, nil
 }
 
-// GetCmdLocks returns all gauges for a given filter.
+// GetCmdLocks returns all gauges for a given status and owner.
 func GetCmdLocks() (*osmocli.QueryDescriptor, *types.GetLocksRequest) {
 	return &osmocli.QueryDescriptor{
-		Use:   "list-locks [UnlockingFilter] [owner]",
+		Use:   "list-locks [status] [owner]",
 		Short: "Query all locks",
 		Long:  `{{.Short}}{{.ExampleHeader}}`,
 		CustomFieldParsers: map[string]osmocli.CustomFieldParserFn{
-			"UnlockingFilter": parseUnlockingFilter,
+			"Status": parseLockStatus,
 		},
 	}, &types.GetLocksRequest{}
 }

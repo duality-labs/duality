@@ -39,33 +39,33 @@ func TestGetCmdGauges(t *testing.T) {
 		"test ACTIVE with pagination": {
 			Cmd: "ACTIVE TokenA --offset=2",
 			ExpectedQuery: &types.GetGaugesRequest{
-				StatusFilter: types.StatusFilter_ACTIVE,
-				Denom:        "TokenA",
-				Pagination:   &query.PageRequest{Key: []uint8{}, Offset: 2, Limit: 100},
+				Status:     types.GaugeStatus_ACTIVE,
+				Denom:      "TokenA",
+				Pagination: &query.PageRequest{Key: []uint8{}, Offset: 2, Limit: 100},
 			},
 		},
 		"test ACTIVE_UPCOMING": {
 			Cmd: "ACTIVE_UPCOMING TokenA",
 			ExpectedQuery: &types.GetGaugesRequest{
-				StatusFilter: types.StatusFilter_ACTIVE_UPCOMING,
-				Denom:        "TokenA",
-				Pagination:   &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
+				Status:     types.GaugeStatus_ACTIVE_UPCOMING,
+				Denom:      "TokenA",
+				Pagination: &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
 			},
 		},
 		"test UPCOMING": {
 			Cmd: "UPCOMING TokenA",
 			ExpectedQuery: &types.GetGaugesRequest{
-				StatusFilter: types.StatusFilter_UPCOMING,
-				Denom:        "TokenA",
-				Pagination:   &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
+				Status:     types.GaugeStatus_UPCOMING,
+				Denom:      "TokenA",
+				Pagination: &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
 			},
 		},
 		"test FINISHED": {
 			Cmd: "FINISHED TokenA",
 			ExpectedQuery: &types.GetGaugesRequest{
-				StatusFilter: types.StatusFilter_FINISHED,
-				Denom:        "TokenA",
-				Pagination:   &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
+				Status:     types.GaugeStatus_FINISHED,
+				Denom:      "TokenA",
+				Pagination: &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
 			},
 		},
 	}
@@ -88,25 +88,25 @@ func TestGetCmdLocks(t *testing.T) {
 		"test ALL with pagination": {
 			Cmd: fmt.Sprintf("ALL %s --offset=2", testAddresses[0]),
 			ExpectedQuery: &types.GetLocksRequest{
-				UnlockingFilter: types.UnlockingFilter_ALL,
-				Owner:           testAddresses[0].String(),
-				Pagination:      &query.PageRequest{Key: []uint8{}, Offset: 2, Limit: 100},
+				Status:     types.LockStatus_ALL,
+				Owner:      testAddresses[0].String(),
+				Pagination: &query.PageRequest{Key: []uint8{}, Offset: 2, Limit: 100},
 			},
 		},
 		"test UNLOCKING": {
 			Cmd: fmt.Sprintf("UNLOCKING %s", testAddresses[0]),
 			ExpectedQuery: &types.GetLocksRequest{
-				UnlockingFilter: types.UnlockingFilter_UNLOCKING,
-				Owner:           testAddresses[0].String(),
-				Pagination:      &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
+				Status:     types.LockStatus_UNLOCKING,
+				Owner:      testAddresses[0].String(),
+				Pagination: &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
 			},
 		},
 		"test NOT_UNLOCKING": {
 			Cmd: fmt.Sprintf("NOT_UNLOCKING %s", testAddresses[0]),
 			ExpectedQuery: &types.GetLocksRequest{
-				UnlockingFilter: types.UnlockingFilter_NOT_UNLOCKING,
-				Owner:           testAddresses[0].String(),
-				Pagination:      &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
+				Status:     types.LockStatus_NOT_UNLOCKING,
+				Owner:      testAddresses[0].String(),
+				Pagination: &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
 			},
 		},
 	}
