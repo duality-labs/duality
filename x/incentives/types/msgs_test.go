@@ -39,6 +39,7 @@ func TestMsgCreatePool(t *testing.T) {
 			sdk.Coins{},
 			time.Now(),
 			2,
+			0,
 		)
 
 		return after(properMsg)

@@ -3,15 +3,20 @@ package cli_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/duality-labs/duality/osmoutils"
 	"github.com/duality-labs/duality/osmoutils/osmocli"
+	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/client/cli"
 	"github.com/duality-labs/duality/x/incentives/types"
 )
 
 var testAddresses = osmoutils.CreateRandomAccounts(3)
+
+// Queries ////////////////////////////////////////////////////////////////////
 
 func TestGetCmdGetModuleStatus(t *testing.T) {
 	desc, _ := cli.GetCmdGetModuleStatus()
@@ -126,4 +131,178 @@ func TestGetCmdFutureRewardEstimate(t *testing.T) {
 		},
 	}
 	osmocli.RunQueryTestCases(t, desc, tcs)
+}
+
+// TXS ////////////////////////////////////////////////////////////////////////
+
+func TestNewCreateGaugeCmd(t *testing.T) {
+	testTime := time.Unix(1681505514, 0)
+	desc, _ := cli.NewCreateGaugeCmd()
+	tcs := map[string]osmocli.TxCliTestCase[*types.MsgCreateGauge]{
+		"basic test": {
+			Cmd: fmt.Sprintf("TokenA<>TokenB 0 100 100TokenA,100TokenB 50 0 --from %s", testAddresses[0]),
+			ExpectedMsg: &types.MsgCreateGauge{
+				IsPerpetual: false,
+				Owner:       testAddresses[0].String(),
+				DistributeTo: types.QueryCondition{
+					PairID:    &dextypes.PairID{Token0: "TokenA", Token1: "TokenB"},
+					StartTick: 0,
+					EndTick:   100,
+				},
+				Coins: sdk.NewCoins(
+					sdk.NewCoin("TokenA", sdk.NewInt(100)),
+					sdk.NewCoin("TokenB", sdk.NewInt(100)),
+				),
+				StartTime:         time.Unix(0, 0),
+				NumEpochsPaidOver: 50,
+				PricingTick:       0,
+			},
+		},
+		"tests with time (RFC3339)": {
+			Cmd: fmt.Sprintf("TokenA<>TokenB [-20] 20 100TokenA,100TokenB 50 0 --start-time %s --from %s", testTime.Format(time.RFC3339), testAddresses[0]),
+			ExpectedMsg: &types.MsgCreateGauge{
+				IsPerpetual: false,
+				Owner:       testAddresses[0].String(),
+				DistributeTo: types.QueryCondition{
+					PairID:    &dextypes.PairID{Token0: "TokenA", Token1: "TokenB"},
+					StartTick: -20,
+					EndTick:   20,
+				},
+				Coins: sdk.NewCoins(
+					sdk.NewCoin("TokenA", sdk.NewInt(100)),
+					sdk.NewCoin("TokenB", sdk.NewInt(100)),
+				),
+				StartTime:         testTime,
+				NumEpochsPaidOver: 50,
+				PricingTick:       0,
+			},
+		},
+		"tests with time (unix int)": {
+			Cmd: fmt.Sprintf("TokenA<>TokenB [-20] 20 100TokenA,100TokenB 50 0 --start-time %d --from %s", testTime.Unix(), testAddresses[0]),
+			ExpectedMsg: &types.MsgCreateGauge{
+				IsPerpetual: false,
+				Owner:       testAddresses[0].String(),
+				DistributeTo: types.QueryCondition{
+					PairID:    &dextypes.PairID{Token0: "TokenA", Token1: "TokenB"},
+					StartTick: -20,
+					EndTick:   20,
+				},
+				Coins: sdk.NewCoins(
+					sdk.NewCoin("TokenA", sdk.NewInt(100)),
+					sdk.NewCoin("TokenB", sdk.NewInt(100)),
+				),
+				StartTime:         testTime,
+				NumEpochsPaidOver: 50,
+				PricingTick:       0,
+			},
+		},
+		"tests with perpetual": {
+			Cmd: fmt.Sprintf("TokenA<>TokenB [-20] 20 100TokenA,100TokenB 50 0 --perpetual --from %s", testAddresses[0]),
+			ExpectedMsg: &types.MsgCreateGauge{
+				IsPerpetual: true,
+				Owner:       testAddresses[0].String(),
+				DistributeTo: types.QueryCondition{
+					PairID:    &dextypes.PairID{Token0: "TokenA", Token1: "TokenB"},
+					StartTick: -20,
+					EndTick:   20,
+				},
+				Coins: sdk.NewCoins(
+					sdk.NewCoin("TokenA", sdk.NewInt(100)),
+					sdk.NewCoin("TokenB", sdk.NewInt(100)),
+				),
+				StartTime:         time.Unix(0, 0),
+				NumEpochsPaidOver: 1,
+				PricingTick:       0,
+			},
+		},
+	}
+	osmocli.RunTxTestCases(t, desc, tcs)
+}
+
+func TestNewAddToGaugeCmd(t *testing.T) {
+	desc, _ := cli.NewAddToGaugeCmd()
+	tcs := map[string]osmocli.TxCliTestCase[*types.MsgAddToGauge]{
+		"basic test": {
+			Cmd: fmt.Sprintf("1 1000TokenA --from %s", testAddresses[0]),
+			ExpectedMsg: &types.MsgAddToGauge{
+				Owner:   testAddresses[0].String(),
+				GaugeId: 1,
+				Rewards: sdk.NewCoins(sdk.NewCoin("TokenA", sdk.NewInt(1000))),
+			},
+		},
+		"multiple tokens": {
+			Cmd: fmt.Sprintf("1 1000TokenA,1TokenZ --from %s", testAddresses[0]),
+			ExpectedMsg: &types.MsgAddToGauge{
+				Owner:   testAddresses[0].String(),
+				GaugeId: 1,
+				Rewards: sdk.NewCoins(
+					sdk.NewCoin("TokenA", sdk.NewInt(1000)),
+					sdk.NewCoin("TokenZ", sdk.NewInt(1)),
+				),
+			},
+		},
+	}
+	osmocli.RunTxTestCases(t, desc, tcs)
+}
+
+func TestNewLockTokensCmd(t *testing.T) {
+	desc, _ := cli.NewLockTokensCmd()
+	tcs := map[string]osmocli.TxCliTestCase[*types.MsgLockTokens]{
+		"basic test": {
+			Cmd: fmt.Sprintf("1000TokenA --from %s", testAddresses[0]),
+			ExpectedMsg: &types.MsgLockTokens{
+				Owner: testAddresses[0].String(),
+				Coins: sdk.NewCoins(sdk.NewCoin("TokenA", sdk.NewInt(1000))),
+			},
+		},
+		"multiple tokens": {
+			Cmd: fmt.Sprintf("1000TokenA,1TokenZ --from %s", testAddresses[0]),
+			ExpectedMsg: &types.MsgLockTokens{
+				Owner: testAddresses[0].String(),
+				Coins: sdk.NewCoins(
+					sdk.NewCoin("TokenA", sdk.NewInt(1000)),
+					sdk.NewCoin("TokenZ", sdk.NewInt(1)),
+				),
+			},
+		},
+	}
+	osmocli.RunTxTestCases(t, desc, tcs)
+}
+
+func TestNewBeginUnlockingAllCmd(t *testing.T) {
+	desc, _ := cli.NewBeginUnlockingAllCmd()
+	tcs := map[string]osmocli.TxCliTestCase[*types.MsgBeginUnlockingAll]{
+		"basic test": {
+			Cmd: fmt.Sprintf("--from %s", testAddresses[0]),
+			ExpectedMsg: &types.MsgBeginUnlockingAll{
+				Owner: testAddresses[0].String(),
+			},
+		},
+	}
+	osmocli.RunTxTestCases(t, desc, tcs)
+}
+
+func TestNewBeginUnlockingByIDCmd(t *testing.T) {
+	desc, _ := cli.NewBeginUnlockByIDCmd()
+	tcs := map[string]osmocli.TxCliTestCase[*types.MsgBeginUnlocking]{
+		"basic test": {
+			Cmd: fmt.Sprintf("1 --from %s", testAddresses[0]),
+			ExpectedMsg: &types.MsgBeginUnlocking{
+				ID:    1,
+				Owner: testAddresses[0].String(),
+			},
+		},
+		"with coins": {
+			Cmd: fmt.Sprintf("10 --amount 12TokenA,12TokenB --from %s", testAddresses[0]),
+			ExpectedMsg: &types.MsgBeginUnlocking{
+				ID:    10,
+				Owner: testAddresses[0].String(),
+				Coins: sdk.NewCoins(
+					sdk.NewCoin("TokenA", sdk.NewInt(12)),
+					sdk.NewCoin("TokenB", sdk.NewInt(12)),
+				),
+			},
+		},
+	}
+	osmocli.RunTxTestCases(t, desc, tcs)
 }

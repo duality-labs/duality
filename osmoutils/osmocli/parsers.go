@@ -294,6 +294,15 @@ func ParseInt(arg, fieldName string) (int64, error) {
 	return v, nil
 }
 
+func ParseIntMaybeNegative(arg, fieldName string) (int64, error) {
+	if strings.HasPrefix(arg, "[") && strings.HasSuffix(arg, "]") {
+		arg = strings.TrimPrefix(arg, "[")
+		arg = strings.TrimSuffix(arg, "]")
+	}
+
+	return ParseInt(arg, fieldName)
+}
+
 func ParseUnixTime(arg, fieldName string) (time.Time, error) {
 	timeUnix, err := strconv.ParseInt(arg, 10, 64)
 	if err != nil {
