@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -65,27 +66,30 @@ func TestRemoveValue(t *testing.T) {
 
 func TestStakeRefKeys(t *testing.T) {
 	addr1 := sdk.AccAddress([]byte("addr1---------------"))
+	denom1 := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).String()
+	denom2 := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenC"}, 0, 1).String()
 	// empty address and 1 coin
-	stake1 := types.NewStake(1, sdk.AccAddress{}, sdk.Coins{sdk.NewInt64Coin("stake", 10)}, time.Now())
+	stake1 := types.NewStake(1, sdk.AccAddress{}, sdk.Coins{sdk.NewInt64Coin(denom1, 10)}, time.Now())
 	_, err := getStakeRefKeys(stake1)
 	require.Error(t, err)
 
 	// empty address and 2 coins
-	stake2 := types.NewStake(1, sdk.AccAddress{}, sdk.Coins{sdk.NewInt64Coin("stake", 10), sdk.NewInt64Coin("atom", 1)}, time.Now())
+	stake2 := types.NewStake(1, sdk.AccAddress{}, sdk.Coins{sdk.NewInt64Coin(denom1, 10), sdk.NewInt64Coin(denom2, 1)}, time.Now())
 	_, err = getStakeRefKeys(stake2)
 	require.Error(t, err)
 
 	// not empty address and 1 coin
-	stake3 := types.NewStake(1, addr1, sdk.Coins{sdk.NewInt64Coin("stake", 10)}, time.Now())
+	stake3 := types.NewStake(1, addr1, sdk.Coins{sdk.NewInt64Coin(denom1, 10)}, time.Now())
 	keys3, err := getStakeRefKeys(stake3)
-	require.Len(t, keys3, 4)
+	require.Len(t, keys3, 6)
 
 	// not empty address and empty coin
-	stake4 := types.NewStake(1, addr1, sdk.Coins{sdk.NewInt64Coin("stake", 10)}, time.Now())
+	stake4 := types.NewStake(1, addr1, sdk.Coins{sdk.NewInt64Coin(denom1, 10)}, time.Now())
 	keys4, err := getStakeRefKeys(stake4)
-	require.Len(t, keys4, 4)
+	require.Len(t, keys4, 6)
+
 	// not empty address and 2 coins
-	stake5 := types.NewStake(1, addr1, sdk.Coins{sdk.NewInt64Coin("stake", 10), sdk.NewInt64Coin("atom", 1)}, time.Now())
+	stake5 := types.NewStake(1, addr1, sdk.Coins{sdk.NewInt64Coin(denom1, 10), sdk.NewInt64Coin(denom2, 1)}, time.Now())
 	keys5, err := getStakeRefKeys(stake5)
-	require.Len(t, keys5, 6)
+	require.Len(t, keys5, 10)
 }
