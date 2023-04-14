@@ -1,6 +1,7 @@
 package osmocli
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -344,4 +345,14 @@ func ParseSdkDec(arg, fieldName string) (sdk.Dec, error) {
 		return sdk.Dec{}, fmt.Errorf("could not parse %s as sdk.Dec for field %s: %w", arg, fieldName, err)
 	}
 	return i, nil
+}
+
+func ParseUintArray(arg string, _ *pflag.FlagSet) (any, FieldReadLocation, error) {
+	var arr []uint64
+	err := json.Unmarshal([]byte(arg), &arr)
+	if err != nil {
+		return nil, UsedArg, err
+	}
+
+	return arr, UsedArg, err
 }

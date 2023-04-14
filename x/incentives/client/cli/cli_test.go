@@ -112,3 +112,18 @@ func TestGetCmdLocks(t *testing.T) {
 	}
 	osmocli.RunQueryTestCases(t, desc, tcs)
 }
+
+func TestGetCmdFutureRewardEstimate(t *testing.T) {
+	desc, _ := cli.GetCmdGetFutureRewardEstimate()
+	tcs := map[string]osmocli.QueryCliTestCase[*types.GetFutureRewardEstimateRequest]{
+		"basic test": {
+			Cmd: fmt.Sprintf("%s [1,2,3] 1000", testAddresses[0]),
+			ExpectedQuery: &types.GetFutureRewardEstimateRequest{
+				Owner:    testAddresses[0].String(),
+				LockIds:  []uint64{1, 2, 3},
+				EndEpoch: 1000,
+			},
+		},
+	}
+	osmocli.RunQueryTestCases(t, desc, tcs)
+}

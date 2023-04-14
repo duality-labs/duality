@@ -12410,7 +12410,7 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
-        - name: status_filter
+        - name: status
           in: query
           required: false
           type: string
@@ -12664,6 +12664,181 @@ paths:
           required: true
           type: string
           format: uint64
+      tags:
+        - Query
+  /dualitylabs/duality/incentives/get_locks:
+    get:
+      summary: >-
+        GetLocks returns locks by the filter provided. At least one filter must
+        be provided.
+      operationId: DualityIncentivesGetLocks
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              locks:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    ID:
+                      type: string
+                      format: uint64
+                      description: >-
+                        ID is the unique id of the lock.
+
+                        The ID of the lock is decided upon lock creation,
+                        incrementing by 1 for
+
+                        every lock.
+                    owner:
+                      type: string
+                      description: |-
+                        Owner is the account address of the lock owner.
+                        Only the owner can modify the state of the lock.
+                    duration:
+                      type: string
+                      description: >-
+                        Duration is the time needed for a lock to mature after
+                        unlocking has
+
+                        started.
+                    end_time:
+                      type: string
+                      format: date-time
+                      description: >-
+                        EndTime refers to the time at which the lock would
+                        mature and get deleted.
+
+                        This value is first initialized when an unlock has
+                        started for the lock,
+
+                        end time being block time + duration.
+                    coins:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          denom:
+                            type: string
+                          amount:
+                            type: string
+                        description: >-
+                          Coin defines a token with a denomination and an
+                          amount.
+
+
+                          NOTE: The amount field is an Int which implements the
+                          custom method
+
+                          signatures required by gogoproto.
+                      description: >-
+                        Coins are the tokens locked within the lock, kept in the
+                        module account.
+                  description: >-
+                    Lock is a single lock unit by period defined by the x/lockup
+                    module.
+
+                    It's a record of a locked coin at a specific time. It stores
+                    owner, duration,
+
+                    unlock time and the number of coins locked. A state of a
+                    period lock is
+
+                    created upon lock creation, and deleted once the lock has
+                    been matured after
+
+                    the `duration` has passed since unbonding started.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: status
+          in: query
+          required: false
+          type: string
+          enum:
+            - ALL
+            - UNLOCKING
+            - NOT_UNLOCKING
+          default: ALL
+        - name: owner
+          in: query
+          required: false
+          type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   /dualitylabs/duality/dex/filled_limit_order_tranche:
@@ -36918,6 +37093,14 @@ definitions:
       Gauge is an object that stores and distributes yields to recipients who
       satisfy certain conditions. Currently gauges support conditions around the
       duration for which a given denom is locked.
+  duality.incentives.GaugeStatus:
+    type: string
+    enum:
+      - ACTIVE_UPCOMING
+      - ACTIVE
+      - UPCOMING
+      - FINISHED
+    default: ACTIVE_UPCOMING
   duality.incentives.GetFutureRewardEstimateResponse:
     type: object
     properties:
@@ -37282,6 +37465,80 @@ definitions:
           after
 
           the `duration` has passed since unbonding started.
+  duality.incentives.GetLocksResponse:
+    type: object
+    properties:
+      locks:
+        type: array
+        items:
+          type: object
+          properties:
+            ID:
+              type: string
+              format: uint64
+              description: >-
+                ID is the unique id of the lock.
+
+                The ID of the lock is decided upon lock creation, incrementing
+                by 1 for
+
+                every lock.
+            owner:
+              type: string
+              description: |-
+                Owner is the account address of the lock owner.
+                Only the owner can modify the state of the lock.
+            duration:
+              type: string
+              description: >-
+                Duration is the time needed for a lock to mature after unlocking
+                has
+
+                started.
+            end_time:
+              type: string
+              format: date-time
+              description: >-
+                EndTime refers to the time at which the lock would mature and
+                get deleted.
+
+                This value is first initialized when an unlock has started for
+                the lock,
+
+                end time being block time + duration.
+            coins:
+              type: array
+              items:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+                description: >-
+                  Coin defines a token with a denomination and an amount.
+
+
+                  NOTE: The amount field is an Int which implements the custom
+                  method
+
+                  signatures required by gogoproto.
+              description: >-
+                Coins are the tokens locked within the lock, kept in the module
+                account.
+          description: >-
+            Lock is a single lock unit by period defined by the x/lockup module.
+
+            It's a record of a locked coin at a specific time. It stores owner,
+            duration,
+
+            unlock time and the number of coins locked. A state of a period lock
+            is
+
+            created upon lock creation, and deleted once the lock has been
+            matured after
+
+            the `duration` has passed since unbonding started.
   duality.incentives.GetModuleStatusResponse:
     type: object
     properties:
@@ -37388,6 +37645,13 @@ definitions:
       after
 
       the `duration` has passed since unbonding started.
+  duality.incentives.LockStatus:
+    type: string
+    enum:
+      - ALL
+      - UNLOCKING
+      - NOT_UNLOCKING
+    default: ALL
   duality.incentives.MsgAddToGaugeResponse:
     type: object
   duality.incentives.MsgBeginUnlockingAllResponse:
@@ -37513,14 +37777,6 @@ definitions:
     description: >-
       QueryCondition is a struct used for querying locks upon different
       conditions.
-  duality.incentives.StatusFilter:
-    type: string
-    enum:
-      - ACTIVE_UPCOMING
-      - ACTIVE
-      - UPCOMING
-      - FINISHED
-    default: ACTIVE_UPCOMING
   dualitylabs.duality.dex.PairID:
     type: object
     properties:

@@ -17,6 +17,9 @@ func GetQueryCmd() *cobra.Command {
 	osmocli.AddQueryCmd(cmd, qcGetter, GetCmdGetGaugeByID)
 	osmocli.AddQueryCmd(cmd, qcGetter, GetCmdGauges)
 	osmocli.AddQueryCmd(cmd, qcGetter, GetCmdGetLockByID)
+	osmocli.AddQueryCmd(cmd, qcGetter, GetCmdLocks)
+	osmocli.AddQueryCmd(cmd, qcGetter, GetCmdGetFutureRewardEstimate)
+
 	return cmd
 }
 
@@ -24,10 +27,8 @@ func GetQueryCmd() *cobra.Command {
 func GetCmdGetModuleStatus() (*osmocli.QueryDescriptor, *types.GetModuleStatusRequest) {
 	return &osmocli.QueryDescriptor{
 		Use:   "module-status",
-		Short: "Query module status..",
-		Long: `{{.Short}}{{.ExampleHeader}}
-{{.CommandPrefix}} gauge-by-id 1
-`,
+		Short: "Query module status.",
+		Long:  `{{.Short}}{{.ExampleHeader}}`,
 	}, &types.GetModuleStatusRequest{}
 }
 
@@ -91,4 +92,16 @@ func GetCmdLocks() (*osmocli.QueryDescriptor, *types.GetLocksRequest) {
 			"Status": parseLockStatus,
 		},
 	}, &types.GetLocksRequest{}
+}
+
+// GetCmdGetFutureRewardsEstimate returns a rewards estimate for a given set of locks.
+func GetCmdGetFutureRewardEstimate() (*osmocli.QueryDescriptor, *types.GetFutureRewardEstimateRequest) {
+	return &osmocli.QueryDescriptor{
+		Use:   "rewards-estime [owner] [lockIDs] [endEpoch]",
+		Short: "Get rewards estimate for set of locks",
+		Long:  `{{.Short}}{{.ExampleHeader}}`,
+		CustomFieldParsers: map[string]osmocli.CustomFieldParserFn{
+			"LockIDs": osmocli.ParseUintArray,
+		},
+	}, &types.GetFutureRewardEstimateRequest{}
 }
