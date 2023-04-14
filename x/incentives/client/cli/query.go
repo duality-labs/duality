@@ -28,7 +28,7 @@ func GetCmdGetModuleStatus() (*osmocli.QueryDescriptor, *types.GetModuleStatusRe
 	return &osmocli.QueryDescriptor{
 		Use:   "module-status",
 		Short: "Query module status.",
-		Long:  `{{.Short}}{{.ExampleHeader}}`,
+		Long:  `{{.Short}}`,
 	}, &types.GetModuleStatusRequest{}
 }
 
@@ -37,7 +37,7 @@ func GetCmdGetGaugeByID() (*osmocli.QueryDescriptor, *types.GetGaugeByIDRequest)
 	return &osmocli.QueryDescriptor{
 		Use:   "gauge-by-id [id]",
 		Short: "Query gauge by id.",
-		Long:  `{{.Short}}{{.ExampleHeader}}`,
+		Long:  `{{.Short}}{{.ExampleHeader}} gauge-by-id 1`,
 	}, &types.GetGaugeByIDRequest{}
 }
 
@@ -55,8 +55,8 @@ func parseGaugeStatus(arg string, _ *pflag.FlagSet) (any, osmocli.FieldReadLocat
 func GetCmdGauges() (*osmocli.QueryDescriptor, *types.GetGaugesRequest) {
 	return &osmocli.QueryDescriptor{
 		Use:   "list-gauges [status] [denom]",
-		Short: "Query all gauges",
-		Long:  `{{.Short}}{{.ExampleHeader}}`,
+		Short: "Query gauges",
+		Long:  `{{.Short}}{{.ExampleHeader}} list-gauges UPCOMING TokenA`,
 		CustomFieldParsers: map[string]osmocli.CustomFieldParserFn{
 			"Status": parseGaugeStatus,
 		},
@@ -68,7 +68,7 @@ func GetCmdGetLockByID() (*osmocli.QueryDescriptor, *types.GetLockByIDRequest) {
 	return &osmocli.QueryDescriptor{
 		Use:   "lock-by-id [LockId]",
 		Short: "Query lock by id.",
-		Long:  `{{.Short}}{{.ExampleHeader}}`,
+		Long:  `{{.Short}}{{.ExampleHeader}} lock-by-id 1`,
 	}, &types.GetLockByIDRequest{}
 }
 
@@ -86,8 +86,8 @@ func parseLockStatus(arg string, _ *pflag.FlagSet) (any, osmocli.FieldReadLocati
 func GetCmdLocks() (*osmocli.QueryDescriptor, *types.GetLocksRequest) {
 	return &osmocli.QueryDescriptor{
 		Use:   "list-locks [status] [owner]",
-		Short: "Query all locks",
-		Long:  `{{.Short}}{{.ExampleHeader}}`,
+		Short: "Query locks",
+		Long:  `{{.Short}}{{.ExampleHeader}} list-locks ALL cosmos1chl62vc593p99z2tfh2pp8tl4anm0w4l8h8svx`,
 		CustomFieldParsers: map[string]osmocli.CustomFieldParserFn{
 			"Status": parseLockStatus,
 		},
@@ -97,9 +97,9 @@ func GetCmdLocks() (*osmocli.QueryDescriptor, *types.GetLocksRequest) {
 // GetCmdGetFutureRewardsEstimate returns a rewards estimate for a given set of locks.
 func GetCmdGetFutureRewardEstimate() (*osmocli.QueryDescriptor, *types.GetFutureRewardEstimateRequest) {
 	return &osmocli.QueryDescriptor{
-		Use:   "rewards-estime [owner] [lockIDs] [endEpoch]",
+		Use:   "reward-estimate [owner] [lockIDs] [endEpoch]",
 		Short: "Get rewards estimate for set of locks",
-		Long:  `{{.Short}}{{.ExampleHeader}}`,
+		Long:  `{{.Short}}{{.ExampleHeader}} reward-estimate cosmos1chl62vc593p99z2tfh2pp8tl4anm0w4l8h8svx [1,2,3] 1681450672`,
 		CustomFieldParsers: map[string]osmocli.CustomFieldParserFn{
 			"LockIDs": osmocli.ParseUintArray,
 		},
