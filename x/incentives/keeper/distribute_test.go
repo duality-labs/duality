@@ -231,6 +231,16 @@ func (suite *KeeperTestSuite) TestDistribute() {
 					},
 					stakeTimeOffset: -24 * time.Hour,
 				},
+				{
+					depositSpec: depositSpec{
+						addr:   addrs[0],
+						token0: sdk.NewInt64Coin("TokenA", 10),
+						token1: sdk.NewInt64Coin("TokenB", 10),
+						tick:   0,
+						fee:    1,
+					},
+					stakeTimeOffset: -12 * time.Hour,
+				},
 			},
 			gaugeSpecs: []gaugeSpec{
 				{
@@ -287,6 +297,16 @@ func (suite *KeeperTestSuite) TestDistribute() {
 						fee:    40,
 					},
 					stakeTimeOffset: -24 * time.Hour,
+				},
+				{
+					depositSpec: depositSpec{
+						addr:   addrs[1],
+						token0: sdk.NewInt64Coin("TokenA", 10),
+						token1: sdk.NewInt64Coin("TokenB", 10),
+						tick:   999,
+						fee:    40,
+					},
+					stakeTimeOffset: -12 * time.Hour,
 				},
 			},
 			gaugeSpecs: []gaugeSpec{
