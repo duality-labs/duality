@@ -1,6 +1,7 @@
 package osmocli
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -293,6 +294,15 @@ func ParseInt(arg, fieldName string) (int64, error) {
 	return v, nil
 }
 
+func ParseIntMaybeNegative(arg, fieldName string) (int64, error) {
+	if strings.HasPrefix(arg, "[") && strings.HasSuffix(arg, "]") {
+		arg = strings.TrimPrefix(arg, "[")
+		arg = strings.TrimSuffix(arg, "]")
+	}
+
+	return ParseInt(arg, fieldName)
+}
+
 func ParseUnixTime(arg, fieldName string) (time.Time, error) {
 	timeUnix, err := strconv.ParseInt(arg, 10, 64)
 	if err != nil {
@@ -344,4 +354,14 @@ func ParseSdkDec(arg, fieldName string) (sdk.Dec, error) {
 		return sdk.Dec{}, fmt.Errorf("could not parse %s as sdk.Dec for field %s: %w", arg, fieldName, err)
 	}
 	return i, nil
+}
+
+func ParseUintArray(arg string, _ *pflag.FlagSet) (any, FieldReadLocation, error) {
+	var arr []uint64
+	err := json.Unmarshal([]byte(arg), &arr)
+	if err != nil {
+		return nil, UsedArg, err
+	}
+
+	return arr, UsedArg, err
 }

@@ -77,20 +77,19 @@ message GetGaugeByIDResponse {
   Gauge gauge = 1;
 }
 
+enum GaugeStatus {
+  ACTIVE_UPCOMING = 0;
+  ACTIVE = 1;
+  UPCOMING = 2;
+  FINISHED = 3;
+}
+
 message GetGaugesRequest {
-  message Filter {
-    enum StatusFilter {
-      ACTIVE_UPCOMING = 0;
-      ACTIVE = 1;
-      UPCOMING = 2;
-      FINISHED = 3;
-    }
-    StatusFilter status = 1;
-    string denom = 2;
-  }
   // Pagination defines pagination for the request
-  cosmos.base.query.v1beta1.PageRequest pagination = 1;
-  Filter filter = 2 [ (gogoproto.nullable) = false ];
+
+  GaugeStatus status = 1;
+  string denom = 2;
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 message GetGaugesResponse {
   // Upcoming and active gauges
@@ -109,6 +108,7 @@ message GetStakeByIDResponse {
 message GetStakesRequest {
   string owner = 1 [ (gogoproto.moretags) = "yaml:\"owner\"" ];
 };
+
 message GetStakesResponse {
   repeated Stake stakes = 1;
 };

@@ -2,6 +2,9 @@ package types
 
 import (
 	"fmt"
+	"strings"
+
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 func (p *PairID) Stringify() string {
@@ -24,4 +27,17 @@ func (p *PairID) MustOppositeToken(token string) string {
 		return oppToken
 	}
 	panic("Supplied token matches neither side of pair")
+}
+
+func StringToPairID(pairIDStr string) (*PairID, error) {
+	tokens := strings.Split(pairIDStr, "<>")
+
+	if len(tokens) == 2 {
+		return &PairID{
+			Token0: tokens[0],
+			Token1: tokens[1],
+		}, nil
+	}
+
+	return &PairID{}, sdkerrors.Wrapf(ErrInvalidPairIDStr, pairIDStr)
 }
