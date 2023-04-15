@@ -2,7 +2,9 @@ package cli
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -21,9 +23,8 @@ func GetTxCmd() *cobra.Command {
 
 	osmocli.AddTxCmd(cmd, NewCreateGaugeCmd)
 	osmocli.AddTxCmd(cmd, NewAddToGaugeCmd)
-	osmocli.AddTxCmd(cmd, NewLockTokensCmd)
-	osmocli.AddTxCmd(cmd, NewBeginUnlockingAllCmd)
-	osmocli.AddTxCmd(cmd, NewBeginUnlockByIDCmd)
+	osmocli.AddTxCmd(cmd, NewStakeCmd)
+	osmocli.AddTxCmd(cmd, NewUnstakeCmd)
 
 	return cmd
 }
@@ -122,21 +123,47 @@ func NewAddToGaugeCmd() (*osmocli.TxCliDesc, *types.MsgAddToGauge) {
 	}, &types.MsgAddToGauge{}
 }
 
-func NewStakeTokensCmd() (*osmocli.TxCliDesc, *types.MsgStake) {
+func NewStakeCmd() (*osmocli.TxCliDesc, *types.MsgStake) {
 	return &osmocli.TxCliDesc{
-		Use:   "stake-tokens [tokens]",
+		Use:   "stake-tokens [coins]",
 		Short: "stake tokens into stakeup pool from user account",
 	}, &types.MsgStake{}
 }
 
-// NewUnstakeByIDCmd unstakes individual period stake by ID.
-func NewUnstakeByIDCmd() (*osmocli.TxCliDesc, *types.MsgUnstake) {
+func UnstakeCmdBuilder(clientCtx client.Context, args []string, _ *pflag.FlagSet) (sdk.Msg, error) {
+	// "unstake-tokens [poolID]:[coins] [poolID]:[coins] ..."
+	unstakes := make([]*types.MsgUnstake_UnstakeDescriptor, 0, len(args))
+	for i, unstake := range args {
+		if strings.HasPrefix(unstake, "-") {
+			// no more unstakes left, only flags
+			break
+		}
+
+		parts := strings.Split(unstake, ":")
+		if len(parts) != 2 {
+			return &types.MsgUnstake{}, errors.New("invalid syntax for unstake tokens")
+		}
+		poolID, err := osmocli.ParseUint(parts[0], fmt.Sprintf("poolID[%d]", i))
+		if err != nil {
+			return &types.MsgUnstake{}, err
+		}
+
+		coins, err := osmocli.ParseCoins(parts[1], fmt.Sprintf("coins[%d]", i))
+		if err != nil {
+			return &types.MsgUnstake{}, err
+		}
+
+		unstakes = append(unstakes, types.NewMsgUnstakeDescriptor(poolID, coins))
+	}
+
+	return types.NewMsgUnstake(clientCtx.GetFromAddress(), unstakes), nil
+}
+
+func NewUnstakeCmd() (*osmocli.TxCliDesc, *types.MsgUnstake) {
 	return &osmocli.TxCliDesc{
-		Use:   "begin-unstake-by-id [id]",
-		Short: "begin unstake individual period stake by ID",
-		CustomFlagOverrides: map[string]string{
-			"coins": FlagAmount,
-		},
-		Flags: osmocli.FlagDesc{OptionalFlags: []*pflag.FlagSet{FlagSetUnSetupStake()}},
+		Use:              "unstake-tokens [poolID]:[coins] [poolID]:[coins] ...",
+		Short:            "Unstake tokens",
+		ParseAndBuildMsg: UnstakeCmdBuilder,
+		Long:             `{{.Short}}{{.ExampleHeader}} unstake-tokens 1:100TokenA 2:10TokenZ,20TokenB`,
 	}, &types.MsgUnstake{}
 }

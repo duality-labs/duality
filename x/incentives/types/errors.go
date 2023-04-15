@@ -12,5 +12,4 @@ var (
 	ErrStakeupNotFound    = sdkerrors.Register(ModuleName, 2, "stakeup not found")
 	ErrGaugeNotActive     = sdkerrors.Register(ModuleName, 3, "cannot distribute from gauges when it is not active")
 	ErrInvalidGaugeStatus = sdkerrors.Register(ModuleName, 4, "Gauge status filter must be one of: ACTIVE_UPCOMING, ACTIVE, UPCOMING, FINISHED")
-	ErrInvalidStakeStatus = sdkerrors.Register(ModuleName, 5, "Stake status must be one of: ALL, UNLOCKING, NOT_UNLOCKING")
 )

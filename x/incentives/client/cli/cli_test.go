@@ -77,41 +77,23 @@ func TestGetCmdGauges(t *testing.T) {
 	osmocli.RunQueryTestCases(t, desc, tcs)
 }
 
-func TestGetCmdGetLockByID(t *testing.T) {
-	desc, _ := cli.GetCmdGetLockByID()
-	tcs := map[string]osmocli.QueryCliTestCase[*types.GetLockByIDRequest]{
+func TestGetCmdGetStakeByID(t *testing.T) {
+	desc, _ := cli.GetCmdGetStakeByID()
+	tcs := map[string]osmocli.QueryCliTestCase[*types.GetStakeByIDRequest]{
 		"basic test": {
-			Cmd: "1", ExpectedQuery: &types.GetLockByIDRequest{LockId: 1},
+			Cmd: "1", ExpectedQuery: &types.GetStakeByIDRequest{StakeId: 1},
 		},
 	}
 	osmocli.RunQueryTestCases(t, desc, tcs)
 }
 
-func TestGetCmdLocks(t *testing.T) {
-	desc, _ := cli.GetCmdLocks()
-	tcs := map[string]osmocli.QueryCliTestCase[*types.GetLocksRequest]{
-		"test ALL with pagination": {
-			Cmd: fmt.Sprintf("ALL %s --offset=2", testAddresses[0]),
-			ExpectedQuery: &types.GetLocksRequest{
-				Status:     types.LockStatus_ALL,
-				Owner:      testAddresses[0].String(),
-				Pagination: &query.PageRequest{Key: []uint8{}, Offset: 2, Limit: 100},
-			},
-		},
-		"test UNLOCKING": {
-			Cmd: fmt.Sprintf("UNLOCKING %s", testAddresses[0]),
-			ExpectedQuery: &types.GetLocksRequest{
-				Status:     types.LockStatus_UNLOCKING,
-				Owner:      testAddresses[0].String(),
-				Pagination: &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
-			},
-		},
-		"test NOT_UNLOCKING": {
-			Cmd: fmt.Sprintf("NOT_UNLOCKING %s", testAddresses[0]),
-			ExpectedQuery: &types.GetLocksRequest{
-				Status:     types.LockStatus_NOT_UNLOCKING,
-				Owner:      testAddresses[0].String(),
-				Pagination: &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
+func TestGetCmdStakes(t *testing.T) {
+	desc, _ := cli.GetCmdStakes()
+	tcs := map[string]osmocli.QueryCliTestCase[*types.GetStakesRequest]{
+		"basic test": {
+			Cmd: fmt.Sprintf("%s", testAddresses[0]),
+			ExpectedQuery: &types.GetStakesRequest{
+				Owner: testAddresses[0].String(),
 			},
 		},
 	}
@@ -125,7 +107,7 @@ func TestGetCmdFutureRewardEstimate(t *testing.T) {
 			Cmd: fmt.Sprintf("%s [1,2,3] 1000", testAddresses[0]),
 			ExpectedQuery: &types.GetFutureRewardEstimateRequest{
 				Owner:    testAddresses[0].String(),
-				LockIds:  []uint64{1, 2, 3},
+				StakeIds: []uint64{1, 2, 3},
 				EndEpoch: 1000,
 			},
 		},
@@ -245,19 +227,19 @@ func TestNewAddToGaugeCmd(t *testing.T) {
 	osmocli.RunTxTestCases(t, desc, tcs)
 }
 
-func TestNewLockTokensCmd(t *testing.T) {
-	desc, _ := cli.NewLockTokensCmd()
-	tcs := map[string]osmocli.TxCliTestCase[*types.MsgLockTokens]{
+func TestNewStakeCmd(t *testing.T) {
+	desc, _ := cli.NewStakeCmd()
+	tcs := map[string]osmocli.TxCliTestCase[*types.MsgStake]{
 		"basic test": {
 			Cmd: fmt.Sprintf("1000TokenA --from %s", testAddresses[0]),
-			ExpectedMsg: &types.MsgLockTokens{
+			ExpectedMsg: &types.MsgStake{
 				Owner: testAddresses[0].String(),
 				Coins: sdk.NewCoins(sdk.NewCoin("TokenA", sdk.NewInt(1000))),
 			},
 		},
 		"multiple tokens": {
 			Cmd: fmt.Sprintf("1000TokenA,1TokenZ --from %s", testAddresses[0]),
-			ExpectedMsg: &types.MsgLockTokens{
+			ExpectedMsg: &types.MsgStake{
 				Owner: testAddresses[0].String(),
 				Coins: sdk.NewCoins(
 					sdk.NewCoin("TokenA", sdk.NewInt(1000)),
@@ -269,38 +251,34 @@ func TestNewLockTokensCmd(t *testing.T) {
 	osmocli.RunTxTestCases(t, desc, tcs)
 }
 
-func TestNewBeginUnlockingAllCmd(t *testing.T) {
-	desc, _ := cli.NewBeginUnlockingAllCmd()
-	tcs := map[string]osmocli.TxCliTestCase[*types.MsgBeginUnlockingAll]{
+func TestNewUnstakeCmd(t *testing.T) {
+	desc, _ := cli.NewUnstakeCmd()
+	tcs := map[string]osmocli.TxCliTestCase[*types.MsgUnstake]{
 		"basic test": {
 			Cmd: fmt.Sprintf("--from %s", testAddresses[0]),
-			ExpectedMsg: &types.MsgBeginUnlockingAll{
-				Owner: testAddresses[0].String(),
-			},
-		},
-	}
-	osmocli.RunTxTestCases(t, desc, tcs)
-}
-
-func TestNewBeginUnlockingByIDCmd(t *testing.T) {
-	desc, _ := cli.NewBeginUnlockByIDCmd()
-	tcs := map[string]osmocli.TxCliTestCase[*types.MsgBeginUnlocking]{
-		"basic test": {
-			Cmd: fmt.Sprintf("1 --from %s", testAddresses[0]),
-			ExpectedMsg: &types.MsgBeginUnlocking{
-				ID:    1,
-				Owner: testAddresses[0].String(),
+			ExpectedMsg: &types.MsgUnstake{
+				Owner:    testAddresses[0].String(),
+				Unstakes: []*types.MsgUnstake_UnstakeDescriptor{},
 			},
 		},
 		"with coins": {
-			Cmd: fmt.Sprintf("10 --amount 12TokenA,12TokenB --from %s", testAddresses[0]),
-			ExpectedMsg: &types.MsgBeginUnlocking{
-				ID:    10,
+			Cmd: fmt.Sprintf("1:10TokenA 10:10TokenA,10TokenC --from %s", testAddresses[0]),
+			ExpectedMsg: &types.MsgUnstake{
 				Owner: testAddresses[0].String(),
-				Coins: sdk.NewCoins(
-					sdk.NewCoin("TokenA", sdk.NewInt(12)),
-					sdk.NewCoin("TokenB", sdk.NewInt(12)),
-				),
+				Unstakes: []*types.MsgUnstake_UnstakeDescriptor{
+					{
+						ID: 1,
+						Coins: sdk.NewCoins(
+							sdk.NewCoin("TokenA", sdk.NewInt(10)),
+						),
+					}, {
+						ID: 10,
+						Coins: sdk.NewCoins(
+							sdk.NewCoin("TokenA", sdk.NewInt(10)),
+							sdk.NewCoin("TokenC", sdk.NewInt(10)),
+						),
+					},
+				},
 			},
 		},
 	}

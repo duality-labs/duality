@@ -12039,8 +12039,8 @@ paths:
           in: path
           required: true
           type: string
-        - name: lock_ids
-          description: Lock IDs included in future reward estimation
+        - name: stake_ids
+          description: Stake IDs included in future reward estimation
           in: query
           required: false
           type: array
@@ -12120,7 +12120,7 @@ paths:
                         format: int64
                         title: End tick exclusive
                     description: >-
-                      QueryCondition is a struct used for querying locks upon
+                      QueryCondition is a struct used for querying stakes upon
                       different conditions.
                   coins:
                     type: array
@@ -12285,7 +12285,7 @@ paths:
                           format: int64
                           title: End tick exclusive
                       description: >-
-                        QueryCondition is a struct used for querying locks upon
+                        QueryCondition is a struct used for querying stakes upon
                         different conditions.
                     coins:
                       type: array
@@ -12494,7 +12494,7 @@ paths:
           schema:
             type: object
             properties:
-              rewardCoins:
+              reward_coins:
                 type: array
                 items:
                   type: object
@@ -12512,7 +12512,7 @@ paths:
 
                     signatures required by gogoproto.
                 title: Coins that have yet to be distributed
-              lockCoins:
+              staked_coins:
                 type: array
                 items:
                   type: object
@@ -12560,17 +12560,17 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  '/dualitylabs/duality/incentives/get_lock_by_id/{lock_id}':
+  '/dualitylabs/duality/incentives/get_stake_by_id/{stake_id}':
     get:
-      summary: GetLockByID returns a lock by its ID
-      operationId: DualityIncentivesGetLockByID
+      summary: GetStakeByID returns a stake by its ID
+      operationId: DualityIncentivesGetStakeByID
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              lock:
+              stake:
                 type: object
                 properties:
                   ID:
@@ -12588,24 +12588,14 @@ paths:
                     description: |-
                       Owner is the account address of the lock owner.
                       Only the owner can modify the state of the lock.
-                  duration:
-                    type: string
-                    description: >-
-                      Duration is the time needed for a lock to mature after
-                      unlocking has
-
-                      started.
-                  end_time:
+                  start_time:
                     type: string
                     format: date-time
                     description: >-
-                      EndTime refers to the time at which the lock would mature
-                      and get deleted.
+                      Start time is the time needed for a lock to mature after
+                      unlocking has
 
-                      This value is first initialized when an unlock has started
-                      for the lock,
-
-                      end time being block time + duration.
+                      started.
                   coins:
                     type: array
                     items:
@@ -12627,19 +12617,13 @@ paths:
                       Coins are the tokens locked within the lock, kept in the
                       module account.
                 description: >-
-                  Lock is a single lock unit by period defined by the x/lockup
-                  module.
+                  Stake is a record of staked coin beginning at a specific time.
+                  It stores owner, 
 
-                  It's a record of a locked coin at a specific time. It stores
-                  owner, duration,
+                  start_time and the number of coins locked. A stake record is
+                  deleted once the 
 
-                  unlock time and the number of coins locked. A state of a
-                  period lock is
-
-                  created upon lock creation, and deleted once the lock has been
-                  matured after
-
-                  the `duration` has passed since unbonding started.
+                  coins in the stake record are all withdrawn.
         default:
           description: An unexpected error response.
           schema:
@@ -12659,26 +12643,26 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
-        - name: lock_id
+        - name: stake_id
           in: path
           required: true
           type: string
           format: uint64
       tags:
         - Query
-  /dualitylabs/duality/incentives/get_locks:
+  /dualitylabs/duality/incentives/get_stakes:
     get:
       summary: >-
-        GetLocks returns locks by the filter provided. At least one filter must
-        be provided.
-      operationId: DualityIncentivesGetLocks
+        GetStakes returns stakes by the filter provided. At least one filter
+        must be provided.
+      operationId: DualityIncentivesGetStakes
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              locks:
+              stakes:
                 type: array
                 items:
                   type: object
@@ -12698,24 +12682,14 @@ paths:
                       description: |-
                         Owner is the account address of the lock owner.
                         Only the owner can modify the state of the lock.
-                    duration:
-                      type: string
-                      description: >-
-                        Duration is the time needed for a lock to mature after
-                        unlocking has
-
-                        started.
-                    end_time:
+                    start_time:
                       type: string
                       format: date-time
                       description: >-
-                        EndTime refers to the time at which the lock would
-                        mature and get deleted.
+                        Start time is the time needed for a lock to mature after
+                        unlocking has
 
-                        This value is first initialized when an unlock has
-                        started for the lock,
-
-                        end time being block time + duration.
+                        started.
                     coins:
                       type: array
                       items:
@@ -12738,19 +12712,13 @@ paths:
                         Coins are the tokens locked within the lock, kept in the
                         module account.
                   description: >-
-                    Lock is a single lock unit by period defined by the x/lockup
-                    module.
+                    Stake is a record of staked coin beginning at a specific
+                    time. It stores owner, 
 
-                    It's a record of a locked coin at a specific time. It stores
-                    owner, duration,
+                    start_time and the number of coins locked. A stake record is
+                    deleted once the 
 
-                    unlock time and the number of coins locked. A state of a
-                    period lock is
-
-                    created upon lock creation, and deleted once the lock has
-                    been matured after
-
-                    the `duration` has passed since unbonding started.
+                    coins in the stake record are all withdrawn.
         default:
           description: An unexpected error response.
           schema:
@@ -12770,75 +12738,10 @@ paths:
                       type: string
                   additionalProperties: {}
       parameters:
-        - name: status
-          in: query
-          required: false
-          type: string
-          enum:
-            - ALL
-            - UNLOCKING
-            - NOT_UNLOCKING
-          default: ALL
         - name: owner
           in: query
           required: false
           type: string
-        - name: pagination.key
-          description: |-
-            key is a value returned in PageResponse.next_key to begin
-            querying the next page most efficiently. Only one of offset or key
-            should be set.
-          in: query
-          required: false
-          type: string
-          format: byte
-        - name: pagination.offset
-          description: >-
-            offset is a numeric offset that can be used when key is unavailable.
-
-            It is less efficient than using key. Only one of offset or key
-            should
-
-            be set.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.limit
-          description: >-
-            limit is the total number of results to be returned in the result
-            page.
-
-            If left empty it will default to a value to be set by each app.
-          in: query
-          required: false
-          type: string
-          format: uint64
-        - name: pagination.count_total
-          description: >-
-            count_total is set to true  to indicate that the result set should
-            include
-
-            a count of the total number of items available for pagination in
-            UIs.
-
-            count_total is only respected when offset is used. It is ignored
-            when key
-
-            is set.
-          in: query
-          required: false
-          type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   /dualitylabs/duality/dex/filled_limit_order_tranche:
@@ -37032,7 +36935,7 @@ definitions:
             format: int64
             title: End tick exclusive
         description: >-
-          QueryCondition is a struct used for querying locks upon different
+          QueryCondition is a struct used for querying stakes upon different
           conditions.
       coins:
         type: array
@@ -37172,7 +37075,7 @@ definitions:
                 format: int64
                 title: End tick exclusive
             description: >-
-              QueryCondition is a struct used for querying locks upon different
+              QueryCondition is a struct used for querying stakes upon different
               conditions.
           coins:
             type: array
@@ -37295,7 +37198,7 @@ definitions:
                   format: int64
                   title: End tick exclusive
               description: >-
-                QueryCondition is a struct used for querying locks upon
+                QueryCondition is a struct used for querying stakes upon
                 different conditions.
             coins:
               type: array
@@ -37393,156 +37296,10 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
-  duality.incentives.GetLockByIDResponse:
-    type: object
-    properties:
-      lock:
-        type: object
-        properties:
-          ID:
-            type: string
-            format: uint64
-            description: >-
-              ID is the unique id of the lock.
-
-              The ID of the lock is decided upon lock creation, incrementing by
-              1 for
-
-              every lock.
-          owner:
-            type: string
-            description: |-
-              Owner is the account address of the lock owner.
-              Only the owner can modify the state of the lock.
-          duration:
-            type: string
-            description: >-
-              Duration is the time needed for a lock to mature after unlocking
-              has
-
-              started.
-          end_time:
-            type: string
-            format: date-time
-            description: >-
-              EndTime refers to the time at which the lock would mature and get
-              deleted.
-
-              This value is first initialized when an unlock has started for the
-              lock,
-
-              end time being block time + duration.
-          coins:
-            type: array
-            items:
-              type: object
-              properties:
-                denom:
-                  type: string
-                amount:
-                  type: string
-              description: >-
-                Coin defines a token with a denomination and an amount.
-
-
-                NOTE: The amount field is an Int which implements the custom
-                method
-
-                signatures required by gogoproto.
-            description: >-
-              Coins are the tokens locked within the lock, kept in the module
-              account.
-        description: >-
-          Lock is a single lock unit by period defined by the x/lockup module.
-
-          It's a record of a locked coin at a specific time. It stores owner,
-          duration,
-
-          unlock time and the number of coins locked. A state of a period lock
-          is
-
-          created upon lock creation, and deleted once the lock has been matured
-          after
-
-          the `duration` has passed since unbonding started.
-  duality.incentives.GetLocksResponse:
-    type: object
-    properties:
-      locks:
-        type: array
-        items:
-          type: object
-          properties:
-            ID:
-              type: string
-              format: uint64
-              description: >-
-                ID is the unique id of the lock.
-
-                The ID of the lock is decided upon lock creation, incrementing
-                by 1 for
-
-                every lock.
-            owner:
-              type: string
-              description: |-
-                Owner is the account address of the lock owner.
-                Only the owner can modify the state of the lock.
-            duration:
-              type: string
-              description: >-
-                Duration is the time needed for a lock to mature after unlocking
-                has
-
-                started.
-            end_time:
-              type: string
-              format: date-time
-              description: >-
-                EndTime refers to the time at which the lock would mature and
-                get deleted.
-
-                This value is first initialized when an unlock has started for
-                the lock,
-
-                end time being block time + duration.
-            coins:
-              type: array
-              items:
-                type: object
-                properties:
-                  denom:
-                    type: string
-                  amount:
-                    type: string
-                description: >-
-                  Coin defines a token with a denomination and an amount.
-
-
-                  NOTE: The amount field is an Int which implements the custom
-                  method
-
-                  signatures required by gogoproto.
-              description: >-
-                Coins are the tokens locked within the lock, kept in the module
-                account.
-          description: >-
-            Lock is a single lock unit by period defined by the x/lockup module.
-
-            It's a record of a locked coin at a specific time. It stores owner,
-            duration,
-
-            unlock time and the number of coins locked. A state of a period lock
-            is
-
-            created upon lock creation, and deleted once the lock has been
-            matured after
-
-            the `duration` has passed since unbonding started.
   duality.incentives.GetModuleStatusResponse:
     type: object
     properties:
-      rewardCoins:
+      reward_coins:
         type: array
         items:
           type: object
@@ -37557,7 +37314,7 @@ definitions:
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
         title: Coins that have yet to be distributed
-      lockCoins:
+      staked_coins:
         type: array
         items:
           type: object
@@ -37582,82 +37339,67 @@ definitions:
 
               (day, week, etc.)
         title: Params holds parameters for the incentives module
-  duality.incentives.Lock:
+  duality.incentives.GetStakeByIDResponse:
     type: object
     properties:
-      ID:
-        type: string
-        format: uint64
+      stake:
+        type: object
+        properties:
+          ID:
+            type: string
+            format: uint64
+            description: >-
+              ID is the unique id of the lock.
+
+              The ID of the lock is decided upon lock creation, incrementing by
+              1 for
+
+              every lock.
+          owner:
+            type: string
+            description: |-
+              Owner is the account address of the lock owner.
+              Only the owner can modify the state of the lock.
+          start_time:
+            type: string
+            format: date-time
+            description: >-
+              Start time is the time needed for a lock to mature after unlocking
+              has
+
+              started.
+          coins:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            description: >-
+              Coins are the tokens locked within the lock, kept in the module
+              account.
         description: >-
-          ID is the unique id of the lock.
+          Stake is a record of staked coin beginning at a specific time. It
+          stores owner, 
 
-          The ID of the lock is decided upon lock creation, incrementing by 1
-          for
+          start_time and the number of coins locked. A stake record is deleted
+          once the 
 
-          every lock.
-      owner:
-        type: string
-        description: |-
-          Owner is the account address of the lock owner.
-          Only the owner can modify the state of the lock.
-      duration:
-        type: string
-        description: |-
-          Duration is the time needed for a lock to mature after unlocking has
-          started.
-      end_time:
-        type: string
-        format: date-time
-        description: >-
-          EndTime refers to the time at which the lock would mature and get
-          deleted.
-
-          This value is first initialized when an unlock has started for the
-          lock,
-
-          end time being block time + duration.
-      coins:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
-        description: >-
-          Coins are the tokens locked within the lock, kept in the module
-          account.
-    description: >-
-      Lock is a single lock unit by period defined by the x/lockup module.
-
-      It's a record of a locked coin at a specific time. It stores owner,
-      duration,
-
-      unlock time and the number of coins locked. A state of a period lock is
-
-      created upon lock creation, and deleted once the lock has been matured
-      after
-
-      the `duration` has passed since unbonding started.
-  duality.incentives.LockStatus:
-    type: string
-    enum:
-      - ALL
-      - UNLOCKING
-      - NOT_UNLOCKING
-    default: ALL
-  duality.incentives.MsgAddToGaugeResponse:
-    type: object
-  duality.incentives.MsgBeginUnlockingAllResponse:
+          coins in the stake record are all withdrawn.
+  duality.incentives.GetStakesResponse:
     type: object
     properties:
-      unlocks:
+      stakes:
         type: array
         items:
           type: object
@@ -37677,24 +37419,14 @@ definitions:
               description: |-
                 Owner is the account address of the lock owner.
                 Only the owner can modify the state of the lock.
-            duration:
-              type: string
-              description: >-
-                Duration is the time needed for a lock to mature after unlocking
-                has
-
-                started.
-            end_time:
+            start_time:
               type: string
               format: date-time
               description: >-
-                EndTime refers to the time at which the lock would mature and
-                get deleted.
+                Start time is the time needed for a lock to mature after
+                unlocking has
 
-                This value is first initialized when an unlock has started for
-                the lock,
-
-                end time being block time + duration.
+                started.
             coins:
               type: array
               items:
@@ -37716,34 +37448,45 @@ definitions:
                 Coins are the tokens locked within the lock, kept in the module
                 account.
           description: >-
-            Lock is a single lock unit by period defined by the x/lockup module.
+            Stake is a record of staked coin beginning at a specific time. It
+            stores owner, 
 
-            It's a record of a locked coin at a specific time. It stores owner,
-            duration,
+            start_time and the number of coins locked. A stake record is deleted
+            once the 
 
-            unlock time and the number of coins locked. A state of a period lock
-            is
-
-            created upon lock creation, and deleted once the lock has been
-            matured after
-
-            the `duration` has passed since unbonding started.
-  duality.incentives.MsgBeginUnlockingResponse:
+            coins in the stake record are all withdrawn.
+  duality.incentives.MsgAddToGaugeResponse:
     type: object
-    properties:
-      success:
-        type: boolean
-      unlockingLockID:
-        type: string
-        format: uint64
   duality.incentives.MsgCreateGaugeResponse:
     type: object
-  duality.incentives.MsgLockTokensResponse:
+  duality.incentives.MsgStakeResponse:
     type: object
     properties:
       ID:
         type: string
         format: uint64
+  duality.incentives.MsgUnstake.UnstakeDescriptor:
+    type: object
+    properties:
+      ID:
+        type: string
+        format: uint64
+      coins:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+  duality.incentives.MsgUnstakeResponse:
+    type: object
   duality.incentives.Params:
     type: object
     properties:
@@ -37775,8 +37518,57 @@ definitions:
         format: int64
         title: End tick exclusive
     description: >-
-      QueryCondition is a struct used for querying locks upon different
+      QueryCondition is a struct used for querying stakes upon different
       conditions.
+  duality.incentives.Stake:
+    type: object
+    properties:
+      ID:
+        type: string
+        format: uint64
+        description: >-
+          ID is the unique id of the lock.
+
+          The ID of the lock is decided upon lock creation, incrementing by 1
+          for
+
+          every lock.
+      owner:
+        type: string
+        description: |-
+          Owner is the account address of the lock owner.
+          Only the owner can modify the state of the lock.
+      start_time:
+        type: string
+        format: date-time
+        description: |-
+          Start time is the time needed for a lock to mature after unlocking has
+          started.
+      coins:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+        description: >-
+          Coins are the tokens locked within the lock, kept in the module
+          account.
+    description: >-
+      Stake is a record of staked coin beginning at a specific time. It stores
+      owner, 
+
+      start_time and the number of coins locked. A stake record is deleted once
+      the 
+
+      coins in the stake record are all withdrawn.
   dualitylabs.duality.dex.PairID:
     type: object
     properties:

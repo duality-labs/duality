@@ -16,8 +16,8 @@ func GetQueryCmd() *cobra.Command {
 	osmocli.AddQueryCmd(cmd, qcGetter, GetCmdGetModuleStatus)
 	osmocli.AddQueryCmd(cmd, qcGetter, GetCmdGetGaugeByID)
 	osmocli.AddQueryCmd(cmd, qcGetter, GetCmdGauges)
-	osmocli.AddQueryCmd(cmd, qcGetter, GetCmdGetLockByID)
-	osmocli.AddQueryCmd(cmd, qcGetter, GetCmdLocks)
+	osmocli.AddQueryCmd(cmd, qcGetter, GetCmdGetStakeByID)
+	osmocli.AddQueryCmd(cmd, qcGetter, GetCmdStakes)
 	osmocli.AddQueryCmd(cmd, qcGetter, GetCmdGetFutureRewardEstimate)
 
 	return cmd
@@ -63,45 +63,32 @@ func GetCmdGauges() (*osmocli.QueryDescriptor, *types.GetGaugesRequest) {
 	}, &types.GetGaugesRequest{}
 }
 
-// GetCmdGetLockByID returns a lock by ID.
-func GetCmdGetLockByID() (*osmocli.QueryDescriptor, *types.GetLockByIDRequest) {
+// GetCmdGetStakeByID returns a lock by ID.
+func GetCmdGetStakeByID() (*osmocli.QueryDescriptor, *types.GetStakeByIDRequest) {
 	return &osmocli.QueryDescriptor{
-		Use:   "lock-by-id [LockId]",
-		Short: "Query lock by id.",
-		Long:  `{{.Short}}{{.ExampleHeader}} lock-by-id 1`,
-	}, &types.GetLockByIDRequest{}
+		Use:   "stake-by-id [stakeID]",
+		Short: "Query stake by id.",
+		Long:  `{{.Short}}{{.ExampleHeader}} Stake-by-id 1`,
+	}, &types.GetStakeByIDRequest{}
 }
 
-func parseLockStatus(arg string, _ *pflag.FlagSet) (any, osmocli.FieldReadLocation, error) {
-	lockStatusInt, ok := types.LockStatus_value[arg]
-	if !ok {
-		return 0, osmocli.UsedArg, types.ErrInvalidLockStatus
-	}
-	lockStatus := types.LockStatus(lockStatusInt)
-
-	return lockStatus, osmocli.UsedArg, nil
-}
-
-// GetCmdLocks returns all gauges for a given status and owner.
-func GetCmdLocks() (*osmocli.QueryDescriptor, *types.GetLocksRequest) {
+// GetCmdStakes returns all gauges for a given status and owner.
+func GetCmdStakes() (*osmocli.QueryDescriptor, *types.GetStakesRequest) {
 	return &osmocli.QueryDescriptor{
-		Use:   "list-locks [status] [owner]",
-		Short: "Query locks",
-		Long:  `{{.Short}}{{.ExampleHeader}} list-locks ALL cosmos1chl62vc593p99z2tfh2pp8tl4anm0w4l8h8svx`,
-		CustomFieldParsers: map[string]osmocli.CustomFieldParserFn{
-			"Status": parseLockStatus,
-		},
-	}, &types.GetLocksRequest{}
+		Use:   "list-stakes [owner]",
+		Short: "Query stakes",
+		Long:  `{{.Short}}{{.ExampleHeader}} list-stakes cosmos1chl62vc593p99z2tfh2pp8tl4anm0w4l8h8svx`,
+	}, &types.GetStakesRequest{}
 }
 
-// GetCmdGetFutureRewardsEstimate returns a rewards estimate for a given set of locks.
+// GetCmdGetFutureRewardsEstimate returns a rewards estimate for a given set of stakes.
 func GetCmdGetFutureRewardEstimate() (*osmocli.QueryDescriptor, *types.GetFutureRewardEstimateRequest) {
 	return &osmocli.QueryDescriptor{
-		Use:   "reward-estimate [owner] [lockIDs] [endEpoch]",
-		Short: "Get rewards estimate for set of locks",
+		Use:   "reward-estimate [owner] [stakeIDs] [endEpoch]",
+		Short: "Get rewards estimate for set of stakes",
 		Long:  `{{.Short}}{{.ExampleHeader}} reward-estimate cosmos1chl62vc593p99z2tfh2pp8tl4anm0w4l8h8svx [1,2,3] 1681450672`,
 		CustomFieldParsers: map[string]osmocli.CustomFieldParserFn{
-			"LockIDs": osmocli.ParseUintArray,
+			"StakeIDs": osmocli.ParseUintArray,
 		},
 	}, &types.GetFutureRewardEstimateRequest{}
 }
