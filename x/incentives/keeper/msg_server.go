@@ -96,7 +96,7 @@ func (server msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*type
 	}
 
 	// if the owner + duration combination is new, create a new stake.
-	stake, err := server.keeper.CreateStake(ctx, owner, msg.Coins)
+	stake, err := server.keeper.CreateStake(ctx, owner, msg.Coins, ctx.BlockTime())
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (server msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*
 		for i, stake := range stakes {
 			unstakes[i] = &types.MsgUnstake_UnstakeDescriptor{
 				ID:    stake.ID,
-				Coins: stake.Coins,
+				Coins: sdk.NewCoins(),
 			}
 		}
 	}

@@ -60,6 +60,10 @@ func (k Keeper) Stake(ctx sdk.Context, stake *types.Stake, tokensToStake sdk.Coi
 }
 
 func (k Keeper) Unstake(ctx sdk.Context, stake *types.Stake, coins sdk.Coins) (uint64, error) {
+	if coins.Empty() {
+		coins = stake.Coins
+	}
+
 	if !coins.IsAllLTE(stake.Coins) {
 		return 0, fmt.Errorf("requested amount to unstake exceeds locked tokens")
 	}
@@ -180,13 +184,13 @@ func (k Keeper) GetStakesByQueryCondition(ctx sdk.Context, distrTo *types.QueryC
 	}
 
 	results := make([]*types.Stake, len(resultIds))
-	for _, stakeId := range resultIds {
+	for i, stakeId := range resultIds {
 		stake, err := k.GetStakeByID(ctx, stakeId)
 		if err != nil {
 			// This represents a db inconsistency
 			panic(err)
 		}
-		results = append(results, stake)
+		results[i] = stake
 	}
 	return results
 }
@@ -204,12 +208,12 @@ func (k Keeper) GetStakesByAccount(ctx sdk.Context, addr sdk.AccAddress) types.S
 	return k.getStakesFromIterator(ctx, k.iterator(ctx, types.GetKeyStakeIndexByAccount(addr)))
 }
 
-func (k Keeper) CreateStake(ctx sdk.Context, owner sdk.AccAddress, coins sdk.Coins) (*types.Stake, error) {
+func (k Keeper) CreateStake(ctx sdk.Context, owner sdk.AccAddress, coins sdk.Coins, startTime time.Time) (*types.Stake, error) {
 	ID := k.GetLastStakeID(ctx) + 1
 
 	// unlock time is initially set without a value, gets set as unlock start time + duration
 	// when unlocking starts.
-	stake := types.NewStake(ID, owner, coins, ctx.BlockTime())
+	stake := types.NewStake(ID, owner, coins, startTime)
 	err := k.Stake(ctx, stake, stake.Coins)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())

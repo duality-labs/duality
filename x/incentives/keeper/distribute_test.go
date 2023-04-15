@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -123,8 +124,8 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 	for _, tc := range tests {
 		suite.T().Run(tc.name, func(t *testing.T) {
 			suite.SetupTest()
-			for _, stakeSpec := range tc.deposits {
-				suite.SetupDeposit(stakeSpec)
+			for _, depositSpec := range tc.deposits {
+				suite.SetupDeposit(depositSpec)
 			}
 			value, err := suite.App.IncentivesKeeper.ValueForShares(suite.Ctx, tc.coin, tc.tick)
 			if tc.err == nil {
@@ -142,35 +143,44 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 func (suite *KeeperTestSuite) TestDistribute() {
 	addrs := apptesting.SetupAddrs(3)
 	tests := []struct {
-		name         string
-		addrs        []sdk.AccAddress
-		depositSpecs []depositSpec
-		gaugeSpecs   []gaugeSpec
-		assertions   []balanceAssertion
+		name              string
+		addrs             []sdk.AccAddress
+		depositStakeSpecs []depositStakeSpec
+		gaugeSpecs        []gaugeSpec
+		assertions        []balanceAssertion
 	}{
 		{
 			name: "one gauge",
-			depositSpecs: []depositSpec{
+			depositStakeSpecs: []depositStakeSpec{
 				{
-					addr:   addrs[0],
-					token0: sdk.NewInt64Coin("TokenA", 10),
-					token1: sdk.NewInt64Coin("TokenB", 10),
-					tick:   0,
-					fee:    1,
+					depositSpec: depositSpec{
+						addr:   addrs[0],
+						token0: sdk.NewInt64Coin("TokenA", 10),
+						token1: sdk.NewInt64Coin("TokenB", 10),
+						tick:   0,
+						fee:    1,
+					},
+					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					addr:   addrs[1],
-					token0: sdk.NewInt64Coin("TokenA", 10),
-					token1: sdk.NewInt64Coin("TokenB", 10),
-					tick:   0,
-					fee:    1,
+					depositSpec: depositSpec{
+						addr:   addrs[1],
+						token0: sdk.NewInt64Coin("TokenA", 10),
+						token1: sdk.NewInt64Coin("TokenB", 10),
+						tick:   0,
+						fee:    1,
+					},
+					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					addr:   addrs[1],
-					token0: sdk.NewInt64Coin("TokenA", 10),
-					token1: sdk.NewInt64Coin("TokenB", 10),
-					tick:   0,
-					fee:    1,
+					depositSpec: depositSpec{
+						addr:   addrs[1],
+						token0: sdk.NewInt64Coin("TokenA", 10),
+						token1: sdk.NewInt64Coin("TokenB", 10),
+						tick:   0,
+						fee:    1,
+					},
+					stakeTimeOffset: -24 * time.Hour,
 				},
 			},
 			gaugeSpecs: []gaugeSpec{
@@ -190,27 +200,36 @@ func (suite *KeeperTestSuite) TestDistribute() {
 		},
 		{
 			name: "two gauges",
-			depositSpecs: []depositSpec{
+			depositStakeSpecs: []depositStakeSpec{
 				{
-					addr:   addrs[0],
-					token0: sdk.NewInt64Coin("TokenA", 10),
-					token1: sdk.NewInt64Coin("TokenB", 10),
-					tick:   0,
-					fee:    1,
+					depositSpec: depositSpec{
+						addr:   addrs[0],
+						token0: sdk.NewInt64Coin("TokenA", 10),
+						token1: sdk.NewInt64Coin("TokenB", 10),
+						tick:   0,
+						fee:    1,
+					},
+					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					addr:   addrs[1],
-					token0: sdk.NewInt64Coin("TokenA", 10),
-					token1: sdk.NewInt64Coin("TokenB", 10),
-					tick:   0,
-					fee:    1,
+					depositSpec: depositSpec{
+						addr:   addrs[1],
+						token0: sdk.NewInt64Coin("TokenA", 10),
+						token1: sdk.NewInt64Coin("TokenB", 10),
+						tick:   0,
+						fee:    1,
+					},
+					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					addr:   addrs[1],
-					token0: sdk.NewInt64Coin("TokenA", 10),
-					token1: sdk.NewInt64Coin("TokenB", 10),
-					tick:   0,
-					fee:    1,
+					depositSpec: depositSpec{
+						addr:   addrs[1],
+						token0: sdk.NewInt64Coin("TokenA", 10),
+						token1: sdk.NewInt64Coin("TokenB", 10),
+						tick:   0,
+						fee:    1,
+					},
+					stakeTimeOffset: -24 * time.Hour,
 				},
 			},
 			gaugeSpecs: []gaugeSpec{
@@ -238,27 +257,36 @@ func (suite *KeeperTestSuite) TestDistribute() {
 		},
 		{
 			name: "one stake with adjustment",
-			depositSpecs: []depositSpec{
+			depositStakeSpecs: []depositStakeSpec{
 				{
-					addr:   addrs[0],
-					token0: sdk.NewInt64Coin("TokenA", 10),
-					token1: sdk.NewInt64Coin("TokenB", 10),
-					tick:   999,
-					fee:    1,
+					depositSpec: depositSpec{
+						addr:   addrs[0],
+						token0: sdk.NewInt64Coin("TokenA", 10),
+						token1: sdk.NewInt64Coin("TokenB", 10),
+						tick:   999,
+						fee:    1,
+					},
+					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					addr:   addrs[1],
-					token0: sdk.NewInt64Coin("TokenA", 10),
-					token1: sdk.NewInt64Coin("TokenB", 10),
-					tick:   999,
-					fee:    1,
+					depositSpec: depositSpec{
+						addr:   addrs[1],
+						token0: sdk.NewInt64Coin("TokenA", 10),
+						token1: sdk.NewInt64Coin("TokenB", 10),
+						tick:   999,
+						fee:    1,
+					},
+					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					addr:   addrs[1],
-					token0: sdk.NewInt64Coin("TokenA", 10),
-					token1: sdk.NewInt64Coin("TokenB", 10),
-					tick:   999,
-					fee:    40,
+					depositSpec: depositSpec{
+						addr:   addrs[1],
+						token0: sdk.NewInt64Coin("TokenA", 10),
+						token1: sdk.NewInt64Coin("TokenB", 10),
+						tick:   999,
+						fee:    40,
+					},
+					stakeTimeOffset: -24 * time.Hour,
 				},
 			},
 			gaugeSpecs: []gaugeSpec{
@@ -280,7 +308,7 @@ func (suite *KeeperTestSuite) TestDistribute() {
 	for _, tc := range tests {
 		suite.T().Run(tc.name, func(t *testing.T) {
 			suite.SetupTest()
-			for _, depositSpec := range tc.depositSpecs {
+			for _, depositSpec := range tc.depositStakeSpecs {
 				suite.SetupDepositAndStake(depositSpec)
 			}
 			gauges := make(types.Gauges, len(tc.gaugeSpecs))
@@ -298,89 +326,3 @@ func (suite *KeeperTestSuite) TestDistribute() {
 		})
 	}
 }
-
-// // TestNoStakePerpetualGaugeDistribution tests that the creation of a perp gauge that has no stakes associated does not distribute any tokens.
-// func (suite *KeeperTestSuite) TestNoStakePerpetualGaugeDistribution() {
-// 	// setup a perpetual gauge with no associated stakes
-// 	coins := sdk.Coins{sdk.NewInt64Coin("stake", 10)}
-// 	gaugeID, _, _, startTime := suite.SetupGauge(true, coins)
-
-// 	// ensure the created gauge has not completed distribution
-// 	gauges := suite.App.IncentivesKeeper.GetNotFinishedGauges(suite.Ctx)
-// 	suite.Require().Len(gauges, 1)
-
-// 	// ensure the not finished gauge matches the previously created gauge
-// 	expectedGauge := types.Gauge{
-// 		Id:           gaugeID,
-// 		IsPerpetual:  true,
-// 		DistributeTo: types.QueryCondition{
-// 			// TODO
-// 		},
-// 		Coins:             coins,
-// 		NumEpochsPaidOver: 1,
-// 		FilledEpochs:      0,
-// 		DistributedCoins:  sdk.Coins{},
-// 		StartTime:         startTime,
-// 	}
-// 	suite.Require().Equal(gauges[0].String(), expectedGauge.String())
-
-// 	// move the created gauge from upcoming to active
-// 	suite.Ctx = suite.Ctx.WithBlockTime(startTime)
-// 	gauge, err := suite.App.IncentivesKeeper.GetGaugeByID(suite.Ctx, gaugeID)
-// 	suite.Require().NoError(err)
-// 	err = suite.App.IncentivesKeeper.MoveUpcomingGaugeToActiveGauge(suite.Ctx, gauge)
-// 	suite.Require().NoError(err)
-
-// 	// distribute coins to stakers, since it's perpetual distribute everything on single distribution
-// 	distCoins, err := suite.App.IncentivesKeeper.Distribute(suite.Ctx, types.Gauges{gauge})
-// 	suite.Require().NoError(err)
-// 	suite.Require().Equal(distCoins, sdk.Coins(nil))
-
-// 	// check state is same after distribution
-// 	gauges = suite.App.IncentivesKeeper.GetNotFinishedGauges(suite.Ctx)
-// 	suite.Require().Len(gauges, 1)
-// 	suite.Require().Equal(gauges[0].String(), expectedGauge.String())
-// }
-
-// // TestNoStakeNonPerpetualGaugeDistribution tests that the creation of a non perp gauge that has no stakes associated does not distribute any tokens.
-// func (suite *KeeperTestSuite) TestNoStakeNonPerpetualGaugeDistribution() {
-// 	// setup non-perpetual gauge with no associated stakes
-// 	coins := sdk.Coins{sdk.NewInt64Coin("stake", 10)}
-// 	stake, gauge := suite.SetupGauge(false, coins)
-
-// 	// ensure the created gauge has not completed distribution
-// 	gauges := suite.App.IncentivesKeeper.GetNotFinishedGauges(suite.Ctx)
-// 	suite.Require().Len(gauges, 1)
-
-// 	// ensure the not finished gauge matches the previously created gauge
-// 	expectedGauge := types.Gauge{
-// 		Id:           gaugeID,
-// 		IsPerpetual:  false,
-// 		DistributeTo: types.QueryCondition{
-// 			// TODO
-// 		},
-// 		Coins:             coins,
-// 		NumEpochsPaidOver: 2,
-// 		FilledEpochs:      0,
-// 		DistributedCoins:  sdk.Coins{},
-// 		StartTime:         startTime,
-// 	}
-// 	suite.Require().Equal(gauges[0].String(), expectedGauge.String())
-
-// 	// move the created gauge from upcoming to active
-// 	suite.Ctx = suite.Ctx.WithBlockTime(startTime)
-// 	gauge, err := suite.App.IncentivesKeeper.GetGaugeByID(suite.Ctx, gaugeID)
-// 	suite.Require().NoError(err)
-// 	err = suite.App.IncentivesKeeper.MoveUpcomingGaugeToActiveGauge(suite.Ctx, gauge)
-// 	suite.Require().NoError(err)
-
-// 	// distribute coins to stakers
-// 	distCoins, err := suite.App.IncentivesKeeper.Distribute(suite.Ctx, types.Gauges{gauge})
-// 	suite.Require().NoError(err)
-// 	suite.Require().Equal(distCoins, sdk.Coins(nil))
-
-// 	// check state is same after distribution
-// 	gauges = suite.App.IncentivesKeeper.GetNotFinishedGauges(suite.Ctx)
-// 	suite.Require().Len(gauges, 1)
-// 	suite.Require().Equal(gauges[0].String(), expectedGauge.String())
-// }

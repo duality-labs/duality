@@ -15,12 +15,15 @@ func (suite *KeeperTestSuite) TestGaugeLifecycle() {
 	addr0 := suite.SetupAddr(0)
 
 	// setup dex deposit and stake of those shares
-	suite.SetupDepositAndStake(depositSpec{
-		addr:   addr0,
-		token0: sdk.NewInt64Coin("TokenA", 10),
-		token1: sdk.NewInt64Coin("TokenB", 10),
-		tick:   0,
-		fee:    1,
+	suite.SetupDepositAndStake(depositStakeSpec{
+		depositSpec: depositSpec{
+			addr:   addr0,
+			token0: sdk.NewInt64Coin("TokenA", 10),
+			token1: sdk.NewInt64Coin("TokenB", 10),
+			tick:   0,
+			fee:    1,
+		},
+		stakeTimeOffset: -24 * time.Hour,
 	})
 
 	// setup gauge starting 24 hours in the future
