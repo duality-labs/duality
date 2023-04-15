@@ -14,6 +14,8 @@ import (
 	tmtypes "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
+var _ DistributorKeeper = MockKeeper{}
+
 type MockKeeper struct {
 	stakes types.Stakes
 }
@@ -36,7 +38,6 @@ func TestDistributor(t *testing.T) {
 	app := app.Setup(false)
 	ctx := app.BaseApp.NewContext(false, tmtypes.Header{Height: 1, ChainID: "duality-1", Time: time.Now().UTC()})
 
-	coins := sdk.Coins{sdk.NewCoin("coin1", sdk.NewInt(100))}
 	gauge := types.NewGauge(
 		1,
 		false,
@@ -47,7 +48,7 @@ func TestDistributor(t *testing.T) {
 			},
 			StartTick: -10,
 			EndTick:   10},
-		coins,
+		sdk.Coins{sdk.NewCoin("coin1", sdk.NewInt(100))},
 		ctx.BlockTime(),
 		10,
 		0,
@@ -57,10 +58,10 @@ func TestDistributor(t *testing.T) {
 	rewardedDenom := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 5, 1).String()
 	nonRewardedDenom := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 12, 1).String()
 	allStakes := types.Stakes{
-		{1, "addr1", time.Time{}, sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(50))}},
-		{2, "addr2", time.Time{}, sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}},
-		{3, "addr2", time.Time{}, sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}},
-		{4, "addr3", time.Time{}, sdk.Coins{sdk.NewCoin(nonRewardedDenom, sdk.NewInt(50))}},
+		{1, "addr1", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(50))}},
+		{2, "addr2", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}},
+		{3, "addr2", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}},
+		{4, "addr3", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(nonRewardedDenom, sdk.NewInt(50))}},
 	}
 
 	distributor := NewDistributor(NewMockKeeper(allStakes))
@@ -100,7 +101,6 @@ func TestDistributor(t *testing.T) {
 		},
 		{
 			name:         "No distribution: empty filterStakes",
-			timeOffset:   0,
 			filterStakes: types.Stakes{},
 			expected:     types.DistributionSpec{},
 			expectedErr:  nil,

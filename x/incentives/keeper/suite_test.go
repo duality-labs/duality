@@ -13,6 +13,11 @@ type userStakes struct {
 	stakeAmounts []sdk.Coins
 }
 
+type depositStakeSpec struct {
+	depositSpec     depositSpec
+	stakeTimeOffset time.Duration // used for simulating the time of staking
+}
+
 type depositSpec struct {
 	addr   sdk.AccAddress
 	token0 sdk.Coin
@@ -59,17 +64,18 @@ func (suite *KeeperTestSuite) SetupDeposit(s depositSpec) sdk.Coins {
 	return shares
 }
 
-func (suite *KeeperTestSuite) SetupDepositAndStake(s depositSpec) *types.Stake {
-	shares := suite.SetupDeposit(s)
-	return suite.SetupStake(s.addr, shares)
+func (suite *KeeperTestSuite) SetupDepositAndStake(s depositStakeSpec) *types.Stake {
+	shares := suite.SetupDeposit(s.depositSpec)
+	return suite.SetupStake(s.depositSpec.addr, shares, s.stakeTimeOffset)
 }
 
 // StakeTokens stakes tokens for the specified duration
 func (suite *KeeperTestSuite) SetupStake(
 	addr sdk.AccAddress,
 	shares sdk.Coins,
+	timeOffset time.Duration,
 ) *types.Stake {
-	stake, err := suite.App.IncentivesKeeper.CreateStake(suite.Ctx, addr, shares)
+	stake, err := suite.App.IncentivesKeeper.CreateStake(suite.Ctx, addr, shares, suite.Ctx.BlockTime().Add(timeOffset))
 	suite.Require().NoError(err)
 	return stake
 }
