@@ -53,7 +53,7 @@ func (k Keeper) InactiveLimitOrderTranche(
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(c)
-	pairID, err := StringToPairID(req.PairID)
+	pairID, err := types.StringToPairID(req.PairID)
 	if err != nil {
 		return nil, err
 	}

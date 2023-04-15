@@ -11976,6 +11976,774 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
+  '/duality/incentives/v1beta1/get_future_rewards_estimate/{owner}':
+    get:
+      summary: >-
+        GetFutureRewardsEstimate returns an estimate of the rewards from now
+        until a specified
+
+        time in the future. The requestor either provides an address or a set of
+        locks
+
+        for which they want to find the associated rewards.
+      operationId: DualityIncentivesGetFutureRewardEstimate
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              coins:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    denom:
+                      type: string
+                    amount:
+                      type: string
+                  description: >-
+                    Coin defines a token with a denomination and an amount.
+
+
+                    NOTE: The amount field is an Int which implements the custom
+                    method
+
+                    signatures required by gogoproto.
+                title: >-
+                  Estimated coin rewards that will be recieved at provided
+                  address
+
+                  from specified locks between current time and end epoch
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: owner
+          description: Address that is being queried for future estimated rewards
+          in: path
+          required: true
+          type: string
+        - name: stake_ids
+          description: Stake IDs included in future reward estimation
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+            format: uint64
+          collectionFormat: multi
+        - name: end_epoch
+          description: |-
+            Upper time limit of reward estimation
+            Lower limit is current epoch
+          in: query
+          required: false
+          type: string
+          format: int64
+      tags:
+        - Query
+  '/duality/incentives/v1beta1/get_gauge_by_id/{id}':
+    get:
+      summary: GetGaugeByID returns a gauge by its ID
+      operationId: DualityIncentivesGetGaugeByID
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              gauge:
+                title: Gauge that corresponds to provided gague ID
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uint64
+                    title: id is the unique ID of a Gauge
+                  is_perpetual:
+                    type: boolean
+                    description: >-
+                      is_perpetual is a flag to show if it's a perpetual or
+                      non-perpetual gauge
+
+                      Non-perpetual gauges distribute their tokens equally per
+                      epoch while the
+
+                      gauge is in the active period. Perpetual gauges distribute
+                      all their tokens
+
+                      at a single time and only distribute their tokens again
+                      once the gauge is
+
+                      refilled, Intended for use with incentives that get
+                      refilled daily.
+                  distribute_to:
+                    title: >-
+                      distribute_to is where the gauge rewards are distributed
+                      to.
+
+                      This is queried via lock duration or by timestamp
+                    type: object
+                    properties:
+                      pairID:
+                        title: >-
+                          PairID represents the token pair we are looking to
+                          lock up
+                        type: object
+                        properties:
+                          token0:
+                            type: string
+                          token1:
+                            type: string
+                      startTick:
+                        type: string
+                        format: int64
+                        title: Start tick inclusive
+                      endTick:
+                        type: string
+                        format: int64
+                        title: End tick exclusive
+                    description: >-
+                      QueryCondition is a struct used for querying stakes upon
+                      different conditions.
+                  coins:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    title: >-
+                      coins is the total amount of coins that have been in the
+                      gauge
+
+                      Can distribute multiple coin denoms
+                  start_time:
+                    type: string
+                    format: date-time
+                    title: start_time is the distribution start time
+                  num_epochs_paid_over:
+                    type: string
+                    format: uint64
+                    title: >-
+                      num_epochs_paid_over is the number of total epochs
+                      distribution will be
+
+                      completed over
+                  filled_epochs:
+                    type: string
+                    format: uint64
+                    title: >-
+                      filled_epochs is the number of epochs distribution has
+                      been completed on
+
+                      already
+                  distributed_coins:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    title: >-
+                      distributed_coins are coins that have been distributed
+                      already
+                  pricing_tick:
+                    type: string
+                    format: int64
+                description: >-
+                  Gauge is an object that stores and distributes yields to
+                  recipients who
+
+                  satisfy certain conditions. Currently gauges support
+                  conditions around the
+
+                  duration for which a given denom is locked.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: id
+          description: Gague ID being queried
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /duality/incentives/v1beta1/get_gauges:
+    get:
+      summary: GetGauges returns gauges according to the filter provided
+      operationId: DualityIncentivesGetGauges
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              gauges:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uint64
+                      title: id is the unique ID of a Gauge
+                    is_perpetual:
+                      type: boolean
+                      description: >-
+                        is_perpetual is a flag to show if it's a perpetual or
+                        non-perpetual gauge
+
+                        Non-perpetual gauges distribute their tokens equally per
+                        epoch while the
+
+                        gauge is in the active period. Perpetual gauges
+                        distribute all their tokens
+
+                        at a single time and only distribute their tokens again
+                        once the gauge is
+
+                        refilled, Intended for use with incentives that get
+                        refilled daily.
+                    distribute_to:
+                      title: >-
+                        distribute_to is where the gauge rewards are distributed
+                        to.
+
+                        This is queried via lock duration or by timestamp
+                      type: object
+                      properties:
+                        pairID:
+                          title: >-
+                            PairID represents the token pair we are looking to
+                            lock up
+                          type: object
+                          properties:
+                            token0:
+                              type: string
+                            token1:
+                              type: string
+                        startTick:
+                          type: string
+                          format: int64
+                          title: Start tick inclusive
+                        endTick:
+                          type: string
+                          format: int64
+                          title: End tick exclusive
+                      description: >-
+                        QueryCondition is a struct used for querying stakes upon
+                        different conditions.
+                    coins:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          denom:
+                            type: string
+                          amount:
+                            type: string
+                        description: >-
+                          Coin defines a token with a denomination and an
+                          amount.
+
+
+                          NOTE: The amount field is an Int which implements the
+                          custom method
+
+                          signatures required by gogoproto.
+                      title: >-
+                        coins is the total amount of coins that have been in the
+                        gauge
+
+                        Can distribute multiple coin denoms
+                    start_time:
+                      type: string
+                      format: date-time
+                      title: start_time is the distribution start time
+                    num_epochs_paid_over:
+                      type: string
+                      format: uint64
+                      title: >-
+                        num_epochs_paid_over is the number of total epochs
+                        distribution will be
+
+                        completed over
+                    filled_epochs:
+                      type: string
+                      format: uint64
+                      title: >-
+                        filled_epochs is the number of epochs distribution has
+                        been completed on
+
+                        already
+                    distributed_coins:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          denom:
+                            type: string
+                          amount:
+                            type: string
+                        description: >-
+                          Coin defines a token with a denomination and an
+                          amount.
+
+
+                          NOTE: The amount field is an Int which implements the
+                          custom method
+
+                          signatures required by gogoproto.
+                      title: >-
+                        distributed_coins are coins that have been distributed
+                        already
+                    pricing_tick:
+                      type: string
+                      format: int64
+                  description: >-
+                    Gauge is an object that stores and distributes yields to
+                    recipients who
+
+                    satisfy certain conditions. Currently gauges support
+                    conditions around the
+
+                    duration for which a given denom is locked.
+                title: Upcoming and active gauges
+              pagination:
+                title: Pagination defines pagination for the response
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    title: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: status
+          in: query
+          required: false
+          type: string
+          enum:
+            - ACTIVE_UPCOMING
+            - ACTIVE
+            - UPCOMING
+            - FINISHED
+          default: ACTIVE_UPCOMING
+        - name: denom
+          in: query
+          required: false
+          type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /duality/incentives/v1beta1/get_module_status:
+    get:
+      summary: >-
+        GetModuleStatus returns a rundown of coins in the module and their
+        status
+      operationId: DualityIncentivesGetModuleStatus
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              reward_coins:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    denom:
+                      type: string
+                    amount:
+                      type: string
+                  description: >-
+                    Coin defines a token with a denomination and an amount.
+
+
+                    NOTE: The amount field is an Int which implements the custom
+                    method
+
+                    signatures required by gogoproto.
+                title: Coins that have yet to be distributed
+              staked_coins:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    denom:
+                      type: string
+                    amount:
+                      type: string
+                  description: >-
+                    Coin defines a token with a denomination and an amount.
+
+
+                    NOTE: The amount field is an Int which implements the custom
+                    method
+
+                    signatures required by gogoproto.
+              params:
+                type: object
+                properties:
+                  distr_epoch_identifier:
+                    type: string
+                    title: >-
+                      distr_epoch_identifier is what epoch type distribution
+                      will be triggered by
+
+                      (day, week, etc.)
+                title: Params holds parameters for the incentives module
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
+  '/dualitylabs/duality/incentives/get_stake_by_id/{stake_id}':
+    get:
+      summary: GetStakeByID returns a stake by its ID
+      operationId: DualityIncentivesGetStakeByID
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              stake:
+                type: object
+                properties:
+                  ID:
+                    type: string
+                    format: uint64
+                    description: >-
+                      ID is the unique id of the lock.
+
+                      The ID of the lock is decided upon lock creation,
+                      incrementing by 1 for
+
+                      every lock.
+                  owner:
+                    type: string
+                    description: |-
+                      Owner is the account address of the lock owner.
+                      Only the owner can modify the state of the lock.
+                  start_time:
+                    type: string
+                    format: date-time
+                    description: >-
+                      Start time is the time needed for a lock to mature after
+                      unlocking has
+
+                      started.
+                  coins:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    description: >-
+                      Coins are the tokens locked within the lock, kept in the
+                      module account.
+                description: >-
+                  Stake is a record of staked coin beginning at a specific time.
+                  It stores owner, 
+
+                  start_time and the number of coins locked. A stake record is
+                  deleted once the 
+
+                  coins in the stake record are all withdrawn.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: stake_id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /dualitylabs/duality/incentives/get_stakes:
+    get:
+      summary: >-
+        GetStakes returns stakes by the filter provided. At least one filter
+        must be provided.
+      operationId: DualityIncentivesGetStakes
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              stakes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    ID:
+                      type: string
+                      format: uint64
+                      description: >-
+                        ID is the unique id of the lock.
+
+                        The ID of the lock is decided upon lock creation,
+                        incrementing by 1 for
+
+                        every lock.
+                    owner:
+                      type: string
+                      description: |-
+                        Owner is the account address of the lock owner.
+                        Only the owner can modify the state of the lock.
+                    start_time:
+                      type: string
+                      format: date-time
+                      description: >-
+                        Start time is the time needed for a lock to mature after
+                        unlocking has
+
+                        started.
+                    coins:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          denom:
+                            type: string
+                          amount:
+                            type: string
+                        description: >-
+                          Coin defines a token with a denomination and an
+                          amount.
+
+
+                          NOTE: The amount field is an Int which implements the
+                          custom method
+
+                          signatures required by gogoproto.
+                      description: >-
+                        Coins are the tokens locked within the lock, kept in the
+                        module account.
+                  description: >-
+                    Stake is a record of staked coin beginning at a specific
+                    time. It stores owner, 
+
+                    start_time and the number of coins locked. A stake record is
+                    deleted once the 
+
+                    coins in the stake record are all withdrawn.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: owner
+          in: query
+          required: false
+          type: string
+      tags:
+        - Query
   /dualitylabs/duality/dex/filled_limit_order_tranche:
     get:
       summary: Queries a list of InactiveLimitOrderTranche items.
@@ -36121,6 +36889,693 @@ definitions:
           description: |-
             EpochInfo is a struct that describes the data going into
             a timer defined by the x/epochs module.
+  duality.incentives.Gauge:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uint64
+        title: id is the unique ID of a Gauge
+      is_perpetual:
+        type: boolean
+        description: >-
+          is_perpetual is a flag to show if it's a perpetual or non-perpetual
+          gauge
+
+          Non-perpetual gauges distribute their tokens equally per epoch while
+          the
+
+          gauge is in the active period. Perpetual gauges distribute all their
+          tokens
+
+          at a single time and only distribute their tokens again once the gauge
+          is
+
+          refilled, Intended for use with incentives that get refilled daily.
+      distribute_to:
+        title: |-
+          distribute_to is where the gauge rewards are distributed to.
+          This is queried via lock duration or by timestamp
+        type: object
+        properties:
+          pairID:
+            title: PairID represents the token pair we are looking to lock up
+            type: object
+            properties:
+              token0:
+                type: string
+              token1:
+                type: string
+          startTick:
+            type: string
+            format: int64
+            title: Start tick inclusive
+          endTick:
+            type: string
+            format: int64
+            title: End tick exclusive
+        description: >-
+          QueryCondition is a struct used for querying stakes upon different
+          conditions.
+      coins:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+        title: |-
+          coins is the total amount of coins that have been in the gauge
+          Can distribute multiple coin denoms
+      start_time:
+        type: string
+        format: date-time
+        title: start_time is the distribution start time
+      num_epochs_paid_over:
+        type: string
+        format: uint64
+        title: >-
+          num_epochs_paid_over is the number of total epochs distribution will
+          be
+
+          completed over
+      filled_epochs:
+        type: string
+        format: uint64
+        title: >-
+          filled_epochs is the number of epochs distribution has been completed
+          on
+
+          already
+      distributed_coins:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+        title: distributed_coins are coins that have been distributed already
+      pricing_tick:
+        type: string
+        format: int64
+    description: |-
+      Gauge is an object that stores and distributes yields to recipients who
+      satisfy certain conditions. Currently gauges support conditions around the
+      duration for which a given denom is locked.
+  duality.incentives.GaugeStatus:
+    type: string
+    enum:
+      - ACTIVE_UPCOMING
+      - ACTIVE
+      - UPCOMING
+      - FINISHED
+    default: ACTIVE_UPCOMING
+  duality.incentives.GetFutureRewardEstimateResponse:
+    type: object
+    properties:
+      coins:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+        title: |-
+          Estimated coin rewards that will be recieved at provided address
+          from specified locks between current time and end epoch
+  duality.incentives.GetGaugeByIDResponse:
+    type: object
+    properties:
+      gauge:
+        title: Gauge that corresponds to provided gague ID
+        type: object
+        properties:
+          id:
+            type: string
+            format: uint64
+            title: id is the unique ID of a Gauge
+          is_perpetual:
+            type: boolean
+            description: >-
+              is_perpetual is a flag to show if it's a perpetual or
+              non-perpetual gauge
+
+              Non-perpetual gauges distribute their tokens equally per epoch
+              while the
+
+              gauge is in the active period. Perpetual gauges distribute all
+              their tokens
+
+              at a single time and only distribute their tokens again once the
+              gauge is
+
+              refilled, Intended for use with incentives that get refilled
+              daily.
+          distribute_to:
+            title: |-
+              distribute_to is where the gauge rewards are distributed to.
+              This is queried via lock duration or by timestamp
+            type: object
+            properties:
+              pairID:
+                title: PairID represents the token pair we are looking to lock up
+                type: object
+                properties:
+                  token0:
+                    type: string
+                  token1:
+                    type: string
+              startTick:
+                type: string
+                format: int64
+                title: Start tick inclusive
+              endTick:
+                type: string
+                format: int64
+                title: End tick exclusive
+            description: >-
+              QueryCondition is a struct used for querying stakes upon different
+              conditions.
+          coins:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            title: |-
+              coins is the total amount of coins that have been in the gauge
+              Can distribute multiple coin denoms
+          start_time:
+            type: string
+            format: date-time
+            title: start_time is the distribution start time
+          num_epochs_paid_over:
+            type: string
+            format: uint64
+            title: >-
+              num_epochs_paid_over is the number of total epochs distribution
+              will be
+
+              completed over
+          filled_epochs:
+            type: string
+            format: uint64
+            title: >-
+              filled_epochs is the number of epochs distribution has been
+              completed on
+
+              already
+          distributed_coins:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            title: distributed_coins are coins that have been distributed already
+          pricing_tick:
+            type: string
+            format: int64
+        description: >-
+          Gauge is an object that stores and distributes yields to recipients
+          who
+
+          satisfy certain conditions. Currently gauges support conditions around
+          the
+
+          duration for which a given denom is locked.
+  duality.incentives.GetGaugesResponse:
+    type: object
+    properties:
+      gauges:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uint64
+              title: id is the unique ID of a Gauge
+            is_perpetual:
+              type: boolean
+              description: >-
+                is_perpetual is a flag to show if it's a perpetual or
+                non-perpetual gauge
+
+                Non-perpetual gauges distribute their tokens equally per epoch
+                while the
+
+                gauge is in the active period. Perpetual gauges distribute all
+                their tokens
+
+                at a single time and only distribute their tokens again once the
+                gauge is
+
+                refilled, Intended for use with incentives that get refilled
+                daily.
+            distribute_to:
+              title: |-
+                distribute_to is where the gauge rewards are distributed to.
+                This is queried via lock duration or by timestamp
+              type: object
+              properties:
+                pairID:
+                  title: PairID represents the token pair we are looking to lock up
+                  type: object
+                  properties:
+                    token0:
+                      type: string
+                    token1:
+                      type: string
+                startTick:
+                  type: string
+                  format: int64
+                  title: Start tick inclusive
+                endTick:
+                  type: string
+                  format: int64
+                  title: End tick exclusive
+              description: >-
+                QueryCondition is a struct used for querying stakes upon
+                different conditions.
+            coins:
+              type: array
+              items:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+                description: >-
+                  Coin defines a token with a denomination and an amount.
+
+
+                  NOTE: The amount field is an Int which implements the custom
+                  method
+
+                  signatures required by gogoproto.
+              title: |-
+                coins is the total amount of coins that have been in the gauge
+                Can distribute multiple coin denoms
+            start_time:
+              type: string
+              format: date-time
+              title: start_time is the distribution start time
+            num_epochs_paid_over:
+              type: string
+              format: uint64
+              title: >-
+                num_epochs_paid_over is the number of total epochs distribution
+                will be
+
+                completed over
+            filled_epochs:
+              type: string
+              format: uint64
+              title: >-
+                filled_epochs is the number of epochs distribution has been
+                completed on
+
+                already
+            distributed_coins:
+              type: array
+              items:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+                description: >-
+                  Coin defines a token with a denomination and an amount.
+
+
+                  NOTE: The amount field is an Int which implements the custom
+                  method
+
+                  signatures required by gogoproto.
+              title: distributed_coins are coins that have been distributed already
+            pricing_tick:
+              type: string
+              format: int64
+          description: >-
+            Gauge is an object that stores and distributes yields to recipients
+            who
+
+            satisfy certain conditions. Currently gauges support conditions
+            around the
+
+            duration for which a given denom is locked.
+        title: Upcoming and active gauges
+      pagination:
+        title: Pagination defines pagination for the response
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            title: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  duality.incentives.GetModuleStatusResponse:
+    type: object
+    properties:
+      reward_coins:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+        title: Coins that have yet to be distributed
+      staked_coins:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+      params:
+        type: object
+        properties:
+          distr_epoch_identifier:
+            type: string
+            title: >-
+              distr_epoch_identifier is what epoch type distribution will be
+              triggered by
+
+              (day, week, etc.)
+        title: Params holds parameters for the incentives module
+  duality.incentives.GetStakeByIDResponse:
+    type: object
+    properties:
+      stake:
+        type: object
+        properties:
+          ID:
+            type: string
+            format: uint64
+            description: >-
+              ID is the unique id of the lock.
+
+              The ID of the lock is decided upon lock creation, incrementing by
+              1 for
+
+              every lock.
+          owner:
+            type: string
+            description: |-
+              Owner is the account address of the lock owner.
+              Only the owner can modify the state of the lock.
+          start_time:
+            type: string
+            format: date-time
+            description: >-
+              Start time is the time needed for a lock to mature after unlocking
+              has
+
+              started.
+          coins:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            description: >-
+              Coins are the tokens locked within the lock, kept in the module
+              account.
+        description: >-
+          Stake is a record of staked coin beginning at a specific time. It
+          stores owner, 
+
+          start_time and the number of coins locked. A stake record is deleted
+          once the 
+
+          coins in the stake record are all withdrawn.
+  duality.incentives.GetStakesResponse:
+    type: object
+    properties:
+      stakes:
+        type: array
+        items:
+          type: object
+          properties:
+            ID:
+              type: string
+              format: uint64
+              description: >-
+                ID is the unique id of the lock.
+
+                The ID of the lock is decided upon lock creation, incrementing
+                by 1 for
+
+                every lock.
+            owner:
+              type: string
+              description: |-
+                Owner is the account address of the lock owner.
+                Only the owner can modify the state of the lock.
+            start_time:
+              type: string
+              format: date-time
+              description: >-
+                Start time is the time needed for a lock to mature after
+                unlocking has
+
+                started.
+            coins:
+              type: array
+              items:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+                description: >-
+                  Coin defines a token with a denomination and an amount.
+
+
+                  NOTE: The amount field is an Int which implements the custom
+                  method
+
+                  signatures required by gogoproto.
+              description: >-
+                Coins are the tokens locked within the lock, kept in the module
+                account.
+          description: >-
+            Stake is a record of staked coin beginning at a specific time. It
+            stores owner, 
+
+            start_time and the number of coins locked. A stake record is deleted
+            once the 
+
+            coins in the stake record are all withdrawn.
+  duality.incentives.MsgAddToGaugeResponse:
+    type: object
+  duality.incentives.MsgCreateGaugeResponse:
+    type: object
+  duality.incentives.MsgStakeResponse:
+    type: object
+    properties:
+      ID:
+        type: string
+        format: uint64
+  duality.incentives.MsgUnstake.UnstakeDescriptor:
+    type: object
+    properties:
+      ID:
+        type: string
+        format: uint64
+      coins:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+  duality.incentives.MsgUnstakeResponse:
+    type: object
+  duality.incentives.Params:
+    type: object
+    properties:
+      distr_epoch_identifier:
+        type: string
+        title: >-
+          distr_epoch_identifier is what epoch type distribution will be
+          triggered by
+
+          (day, week, etc.)
+    title: Params holds parameters for the incentives module
+  duality.incentives.QueryCondition:
+    type: object
+    properties:
+      pairID:
+        title: PairID represents the token pair we are looking to lock up
+        type: object
+        properties:
+          token0:
+            type: string
+          token1:
+            type: string
+      startTick:
+        type: string
+        format: int64
+        title: Start tick inclusive
+      endTick:
+        type: string
+        format: int64
+        title: End tick exclusive
+    description: >-
+      QueryCondition is a struct used for querying stakes upon different
+      conditions.
+  duality.incentives.Stake:
+    type: object
+    properties:
+      ID:
+        type: string
+        format: uint64
+        description: >-
+          ID is the unique id of the lock.
+
+          The ID of the lock is decided upon lock creation, incrementing by 1
+          for
+
+          every lock.
+      owner:
+        type: string
+        description: |-
+          Owner is the account address of the lock owner.
+          Only the owner can modify the state of the lock.
+      start_time:
+        type: string
+        format: date-time
+        description: |-
+          Start time is the time needed for a lock to mature after unlocking has
+          started.
+      coins:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+        description: >-
+          Coins are the tokens locked within the lock, kept in the module
+          account.
+    description: >-
+      Stake is a record of staked coin beginning at a specific time. It stores
+      owner, 
+
+      start_time and the number of coins locked. A stake record is deleted once
+      the 
+
+      coins in the stake record are all withdrawn.
+  dualitylabs.duality.dex.PairID:
+    type: object
+    properties:
+      token0:
+        type: string
+      token1:
+        type: string
   dualitylabs.duality.dex.DepositOptions:
     type: object
     properties:
@@ -36295,13 +37750,6 @@ definitions:
         type: array
         items:
           type: string
-  dualitylabs.duality.dex.PairID:
-    type: object
-    properties:
-      token0:
-        type: string
-      token1:
-        type: string
   dualitylabs.duality.dex.Params:
     type: object
     description: Params defines the parameters for the module.
