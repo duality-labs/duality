@@ -118,7 +118,7 @@ func TestGetCmdFutureRewardEstimate(t *testing.T) {
 // TXS ////////////////////////////////////////////////////////////////////////
 
 func TestNewCreateGaugeCmd(t *testing.T) {
-	testTime := time.Unix(1681505514, 0)
+	testTime := time.Unix(1681505514, 0).UTC()
 	desc, _ := cli.NewCreateGaugeCmd()
 	tcs := map[string]osmocli.TxCliTestCase[*types.MsgCreateGauge]{
 		"basic test": {
