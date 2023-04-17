@@ -16,6 +16,7 @@ type Pool struct {
 	Price0To1Upper  *types.Price
 }
 
+// TODO: Accept a PairID here so that GetDepositDenom() can reference it directly
 func NewPool(
 	centerTickIndex int64,
 	lowerTick0 *types.PoolReserves,
@@ -27,6 +28,7 @@ func NewPool(
 
 	return Pool{
 		CenterTickIndex: centerTickIndex,
+		Fee:             lowerTick0.Fee,
 		LowerTick0:      lowerTick0,
 		UpperTick1:      upperTick1,
 		Price0To1Upper:  price0To1Upper,
@@ -142,7 +144,7 @@ func (p *Pool) Deposit(
 	maxAmount1,
 	existingShares sdk.Int,
 	autoswap bool,
-) (inAmount0, inAmount1, outShares sdk.Int) {
+) (inAmount0, inAmount1 sdk.Int, outShares sdk.Coin) {
 	lowerReserve0 := &p.LowerTick0.Reserves
 	upperReserve1 := &p.UpperTick1.Reserves
 
@@ -154,7 +156,7 @@ func (p *Pool) Deposit(
 	)
 
 	if inAmount0.Equal(sdk.ZeroInt()) && inAmount1.Equal(sdk.ZeroInt()) {
-		return sdk.ZeroInt(), sdk.ZeroInt(), sdk.ZeroInt()
+		return sdk.ZeroInt(), sdk.ZeroInt(), sdk.Coin{Denom: p.GetDepositDenom()}
 	}
 
 	outShares = p.CalcSharesMinted(inAmount0, inAmount1, existingShares)
@@ -167,6 +169,7 @@ func (p *Pool) Deposit(
 		// but added error handling to all of the new functions for autoswap.
 		// Open to changing it however.
 		residualShares, _ := p.CalcResidualSharesMinted(residualAmount0, residualAmount1)
+		// TODO: Fix
 
 		outShares = outShares.Add(residualShares)
 
@@ -180,6 +183,10 @@ func (p *Pool) Deposit(
 	return inAmount0, inAmount1, outShares
 }
 
+func (p *Pool) GetDepositDenom() string {
+	return types.NewDepositDenom(p.LowerTick0.PairID, p.CenterTickIndex, p.Fee).String()
+}
+
 func (p *Pool) MustCalcPrice1To0Center() *types.Price {
 	// NOTE: We can safely call the error-less version of CalcPrice here because the pool object
 	// has already been initialized with an upper and lower tick which satisfy a check for IsTickOutOfRange
@@ -190,34 +197,35 @@ func (p *Pool) CalcSharesMinted(
 	amount0 sdk.Int,
 	amount1 sdk.Int,
 	existingShares sdk.Int,
-) (sharesMinted sdk.Int) {
+) (sharesMinted sdk.Coin) {
 	price1To0Center := p.MustCalcPrice1To0Center()
 	valueMintedToken0 := CalcAmountAsToken0(amount0, amount1, *price1To0Center)
 
 	valueExistingToken0 := CalcAmountAsToken0(p.LowerTick0.Reserves, p.UpperTick1.Reserves, *price1To0Center)
+	var sharesMintedAmount sdk.Int
 	if valueExistingToken0.GT(sdk.ZeroDec()) {
-		sharesMinted = valueMintedToken0.MulInt(existingShares).Quo(valueExistingToken0).TruncateInt()
+		sharesMintedAmount = valueMintedToken0.MulInt(existingShares).Quo(valueExistingToken0).TruncateInt()
 	} else {
-		sharesMinted = valueMintedToken0.TruncateInt()
+		sharesMintedAmount = valueMintedToken0.TruncateInt()
 	}
 
-	return sharesMinted
+	return sdk.Coin{Denom: p.GetDepositDenom(), Amount: sharesMintedAmount}
 }
 
 func (p *Pool) CalcResidualSharesMinted(
 	residualAmount0 sdk.Int,
 	residualAmount1 sdk.Int,
-) (sharesMinted sdk.Int, err error) {
+) (sharesMinted sdk.Coin, err error) {
 	fee := CalcFee(p.UpperTick1.TickIndex, p.LowerTick0.TickIndex)
 	valueMintedToken0, err := CalcResidualValue(residualAmount0, residualAmount1, p.Price1To0Lower, fee)
 	if err != nil {
-		return sdk.ZeroInt(), err
+		return sdk.Coin{Denom: p.GetDepositDenom()}, err
 	}
 
-	return valueMintedToken0.TruncateInt(), nil
+	return sdk.Coin{Denom: p.GetDepositDenom(), Amount: valueMintedToken0.TruncateInt()}, nil
 }
 
-func (p *Pool) Withdraw(sharesToRemove, totalShares sdk.Int) (outAmount0, outAmount1 sdk.Int) {
+func (p *Pool) RedeemValue(sharesToRemove, totalShares sdk.Int) (outAmount0, outAmount1 sdk.Int) {
 	reserves0 := &p.LowerTick0.Reserves
 	reserves1 := &p.UpperTick1.Reserves
 	// outAmount1 = ownershipRatio * reserves1
@@ -228,6 +236,14 @@ func (p *Pool) Withdraw(sharesToRemove, totalShares sdk.Int) (outAmount0, outAmo
 	//            = (sharesToRemove / totalShares) * reserves1
 	//            = (reserves1 * sharesToRemove ) / totalShares
 	outAmount0 = reserves0.Mul(sharesToRemove).ToDec().QuoInt(totalShares).TruncateInt()
+
+	return outAmount0, outAmount1
+}
+
+func (p *Pool) Withdraw(sharesToRemove, totalShares sdk.Int) (outAmount0, outAmount1 sdk.Int) {
+	reserves0 := &p.LowerTick0.Reserves
+	reserves1 := &p.UpperTick1.Reserves
+	outAmount0, outAmount1 = p.RedeemValue(sharesToRemove, totalShares)
 	*reserves0 = reserves0.Sub(outAmount0)
 	*reserves1 = reserves1.Sub(outAmount1)
 

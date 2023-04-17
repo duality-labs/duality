@@ -61,9 +61,9 @@ func (s *CoreHelpersTestSuite) SetupTest() {
 	s.dan = sdk.AccAddress([]byte("dan"))
 }
 
-func (s *CoreHelpersTestSuite) setLPAtFee1Pool(tickIndex int64, amountA, amountB int) {
+func (s *CoreHelpersTestSuite) setLPAtFee1Pool(tickIndex int64, amountA int, amountB int) {
 	pairID := &types.PairID{Token0: "TokenA", Token1: "TokenB"}
-	sharesID := CreateSharesID("TokenA", "TokenB", tickIndex, 1)
+	sharesID := types.NewDepositDenom(pairID, tickIndex, 0).String()
 	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, pairID, tickIndex, 1)
 	if err != nil {
 		panic(err)
@@ -76,7 +76,7 @@ func (s *CoreHelpersTestSuite) setLPAtFee1Pool(tickIndex int64, amountA, amountB
 
 	totalShares := pool.CalcSharesMinted(amountAInt, amountBInt, existingShares)
 
-	s.app.DexKeeper.MintShares(s.ctx, s.alice, totalShares, sharesID)
+	s.app.DexKeeper.MintShares(s.ctx, s.alice, totalShares)
 
 	lowerTick.Reserves = amountAInt
 	upperTick.Reserves = amountBInt

@@ -1,6 +1,7 @@
 package osmocli
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -265,7 +266,6 @@ func ParseFieldFromArg(fVal reflect.Value, fType reflect.StructField, arg string
 		fVal.Set(reflect.ValueOf(v))
 		return nil
 	}
-	fmt.Println(fType.Type.Kind().String())
 	return fmt.Errorf("field type not recognized. Got type %v", fType)
 }
 
@@ -291,6 +291,15 @@ func ParseInt(arg, fieldName string) (int64, error) {
 		return 0, fmt.Errorf("could not parse %s as int for field %s: %w", arg, fieldName, err)
 	}
 	return v, nil
+}
+
+func ParseIntMaybeNegative(arg, fieldName string) (int64, error) {
+	if strings.HasPrefix(arg, "[") && strings.HasSuffix(arg, "]") {
+		arg = strings.TrimPrefix(arg, "[")
+		arg = strings.TrimSuffix(arg, "]")
+	}
+
+	return ParseInt(arg, fieldName)
 }
 
 func ParseUnixTime(arg, fieldName string) (time.Time, error) {
@@ -344,4 +353,14 @@ func ParseSdkDec(arg, fieldName string) (sdk.Dec, error) {
 		return sdk.Dec{}, fmt.Errorf("could not parse %s as sdk.Dec for field %s: %w", arg, fieldName, err)
 	}
 	return i, nil
+}
+
+func ParseUintArray(arg string, _ *pflag.FlagSet) (any, FieldReadLocation, error) {
+	var arr []uint64
+	err := json.Unmarshal([]byte(arg), &arr)
+	if err != nil {
+		return nil, UsedArg, err
+	}
+
+	return arr, UsedArg, err
 }
