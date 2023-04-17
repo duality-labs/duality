@@ -7,10 +7,8 @@ import (
 )
 
 type MultihopStep struct {
-	PairID    *types.PairID
-	BestPrice types.Price
-	TokenIn   string
-	TokenOut  string
+	BestPrice   types.Price
+	TradingPair types.DirectionalTradingPair
 }
 
 func (k Keeper) HopsToRouteData(ctx sdk.Context, hops []string, exitLimitPrice sdk.Dec) ([]MultihopStep, error) {
@@ -21,6 +19,7 @@ func (k Keeper) HopsToRouteData(ctx sdk.Context, hops []string, exitLimitPrice s
 		tokenIn := hops[i]
 		tokenOut := hops[i+1]
 		pairID, err := CreatePairIDFromUnsorted(tokenIn, tokenOut)
+		dPair := types.NewDirectionalTradingPair(pairID, tokenIn, tokenOut)
 		if err != nil {
 			return routeArr, err
 		}
@@ -36,10 +35,8 @@ func (k Keeper) HopsToRouteData(ctx sdk.Context, hops []string, exitLimitPrice s
 		}
 		priceUpperbound = price.Mul(priceUpperbound)
 		routeArr[i] = MultihopStep{
-			PairID:    pairID,
-			BestPrice: price,
-			TokenIn:   tokenIn,
-			TokenOut:  tokenOut,
+			TradingPair: dPair,
+			BestPrice:   price,
 		}
 	}
 
@@ -93,14 +90,21 @@ func (k Keeper) MultihopStep(
 		// If we can't hit the best possible price we can greedily abort
 		return sdk.Coin{}, bctx, types.ErrExitLimitPriceHit
 	}
-	cacheKey := newCacheKey(step.TokenIn, step.TokenOut, inCoin.Amount)
+	cacheKey := newCacheKey(step.TradingPair.TokenIn, step.TradingPair.TokenOut, inCoin.Amount)
 	val, ok := stepCache[cacheKey]
 	if ok {
 		ctxBranchCopy := val.Ctx.Branch()
 		return val.CoinOut, ctxBranchCopy, val.Err
 	}
 
-	_, coinOut, err := k.SwapExactAmountIn(bctx.Ctx, step.PairID, step.TokenIn, step.TokenOut, inCoin.Amount, nil)
+	_, coinOut, err := k.SwapExactAmountIn(
+		bctx.Ctx,
+		step.TradingPair.PairID,
+		step.TradingPair.TokenIn,
+		step.TradingPair.TokenOut,
+		inCoin.Amount,
+		nil,
+	)
 	ctxBranch := bctx.Branch()
 	stepCache[cacheKey] = StepResult{Ctx: bctx, CoinOut: coinOut, Err: err}
 	if err != nil {
@@ -138,7 +142,7 @@ func (k Keeper) RunMultihopRoute(
 			stepCache,
 		)
 		if err != nil {
-			return sdk.Coin{}, nil, sdkerrors.Wrapf(err, "Failed at pair: %s", step.PairID.Stringify())
+			return sdk.Coin{}, nil, sdkerrors.Wrapf(err, "Failed at pair: %s", step.TradingPair.PairID.Stringify())
 		}
 		currentPrice = currentOutCoin.Amount.ToDec().Quo(initialInCoin.Amount.ToDec())
 	}
