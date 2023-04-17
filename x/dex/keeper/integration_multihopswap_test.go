@@ -31,7 +31,7 @@ func (s *MsgServerTestSuite) SetupMultiplePools(poolSetups ...PoolSetup) {
 			sdk.NewCoin(p.TokenA, sdk.NewInt(int64(p.AmountA))),
 			sdk.NewCoin(p.TokenB, sdk.NewInt(int64(p.AmountB))),
 		)
-		s.fundAccountBalancesExotic(s.bob, coins)
+		s.fundAccountBalancesWithDenom(s.bob, coins)
 		pairID := types.PairID{Token0: p.TokenA, Token1: p.TokenB}
 		s.deposits(
 			s.bob,
@@ -56,13 +56,13 @@ func (s *MsgServerTestSuite) TestMultiHopSwapSingleRoute() {
 	s.aliceMultiHopSwaps(route, 100, sdk.MustNewDecFromStr("0.9"), false)
 
 	// THEN alice gets out 99 TokenD
-	s.assertAccountBalanceExotic(s.alice, "TokenA", 0)
-	s.assertAccountBalanceExotic(s.alice, "TokenD", 99)
+	s.assertAccountBalanceWithDenom(s.alice, "TokenA", 0)
+	s.assertAccountBalanceWithDenom(s.alice, "TokenD", 99)
 
-	s.assertDexBalanceExotic("TokenA", 100)
-	s.assertDexBalanceExotic("TokenB", 100)
-	s.assertDexBalanceExotic("TokenC", 100)
-	s.assertDexBalanceExotic("TokenD", 1)
+	s.assertDexBalanceWithDenom("TokenA", 100)
+	s.assertDexBalanceWithDenom("TokenB", 100)
+	s.assertDexBalanceWithDenom("TokenC", 100)
+	s.assertDexBalanceWithDenom("TokenD", 1)
 }
 
 func (s *MsgServerTestSuite) TestMultiHopSwapInsufficientLiquiditySingleRoute() {
@@ -121,19 +121,19 @@ func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteOneGood() {
 
 	// THEN swap succeeds through route A<>B, B<>E, E<>X
 
-	s.assertAccountBalanceExotic(s.alice, "TokenA", 0)
-	s.assertAccountBalanceExotic(s.alice, "TokenX", 99)
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenA", Token1: "TokenB"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenB", Token1: "TokenE"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenE", Token1: "TokenX"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
+	s.assertAccountBalanceWithDenom(s.alice, "TokenA", 0)
+	s.assertAccountBalanceWithDenom(s.alice, "TokenX", 99)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenA", Token1: "TokenB"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenB", Token1: "TokenE"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenE", Token1: "TokenX"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
 
 	// Other pools are unaffected
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenB", Token1: "TokenC"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenC", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(50), 0, 1)
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenC", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(50), 2200, 1)
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenB", Token1: "TokenD"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenD", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(50), 0, 1)
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenD", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(50), 2200, 1)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenB", Token1: "TokenC"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenC", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(50), 0, 1)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenC", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(50), 2200, 1)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenB", Token1: "TokenD"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenD", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(50), 0, 1)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenD", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(50), 2200, 1)
 }
 
 func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteAllFail() {
@@ -191,17 +191,17 @@ func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteFindBestRoute() {
 
 	// THEN swap succeeds through route A<>B, B<>E, E<>X
 
-	s.assertAccountBalanceExotic(s.alice, "TokenA", 0)
-	s.assertAccountBalanceExotic(s.alice, "TokenX", 134)
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenA", Token1: "TokenB"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenB", Token1: "TokenE"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenE", Token1: "TokenX"}, sdk.NewInt(100), sdk.NewInt(866), -3000, 1)
+	s.assertAccountBalanceWithDenom(s.alice, "TokenA", 0)
+	s.assertAccountBalanceWithDenom(s.alice, "TokenX", 134)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenA", Token1: "TokenB"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenB", Token1: "TokenE"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenE", Token1: "TokenX"}, sdk.NewInt(100), sdk.NewInt(866), -3000, 1)
 
 	// Other pools are unaffected
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenB", Token1: "TokenC"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenC", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(1000), -1000, 1)
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenB", Token1: "TokenD"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenD", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(1000), -2000, 1)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenB", Token1: "TokenC"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenC", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(1000), -1000, 1)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenB", Token1: "TokenD"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenD", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(1000), -2000, 1)
 }
 
 func (s *MsgServerTestSuite) TestMultiHopSwapLongRouteWithCache() {
@@ -242,7 +242,7 @@ func (s *MsgServerTestSuite) TestMultiHopSwapLongRouteWithCache() {
 
 	// THEN swap succeeds with second route
 
-	s.assertAccountBalanceExotic(s.alice, "TokenA", 0)
-	s.assertAccountBalanceExotic(s.alice, "TokenX", 99)
-	s.assertLiquidityAtTickExotic(&types.PairID{Token0: "TokenM", Token1: "TokenX"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
+	s.assertAccountBalanceWithDenom(s.alice, "TokenA", 0)
+	s.assertAccountBalanceWithDenom(s.alice, "TokenX", 99)
+	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenM", Token1: "TokenX"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
 }

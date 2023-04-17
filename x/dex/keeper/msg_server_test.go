@@ -81,7 +81,7 @@ func (s *MsgServerTestSuite) fundAccountBalances(account sdk.AccAddress, aBalanc
 	s.assertAccountBalances(account, aBalance, bBalance)
 }
 
-func (s *MsgServerTestSuite) fundAccountBalancesExotic(addr sdk.AccAddress, amounts sdk.Coins) error {
+func (s *MsgServerTestSuite) fundAccountBalancesWithDenom(addr sdk.AccAddress, amounts sdk.Coins) error {
 	if err := s.app.BankKeeper.MintCoins(s.ctx, types.ModuleName, amounts); err != nil {
 		return err
 	}
@@ -127,7 +127,7 @@ func (s *MsgServerTestSuite) assertAccountBalances(
 	s.assertAccountBalancesInt(account, sdk.NewInt(aBalance), sdk.NewInt(bBalance))
 }
 
-func (s *MsgServerTestSuite) assertAccountBalanceExotic(account sdk.AccAddress, denom string, expBalance int64) {
+func (s *MsgServerTestSuite) assertAccountBalanceWithDenom(account sdk.AccAddress, denom string, expBalance int64) {
 	actualBalance := s.app.BankKeeper.GetBalance(s.ctx, account, denom).Amount
 	expBalanceInt := sdk.NewInt(expBalance)
 	s.Assert().True(expBalanceInt.Equal(actualBalance), "expected %s != actual %s", expBalance, actualBalance)
@@ -169,8 +169,8 @@ func (s *MsgServerTestSuite) assertDexBalances(a, b int64) {
 	s.assertAccountBalances(s.app.AccountKeeper.GetModuleAddress("dex"), a, b)
 }
 
-func (s *MsgServerTestSuite) assertDexBalanceExotic(denom string, expectedAmount int64) {
-	s.assertAccountBalanceExotic(s.app.AccountKeeper.GetModuleAddress("dex"), denom, expectedAmount)
+func (s *MsgServerTestSuite) assertDexBalanceWithDenom(denom string, expectedAmount int64) {
+	s.assertAccountBalanceWithDenom(s.app.AccountKeeper.GetModuleAddress("dex"), denom, expectedAmount)
 }
 
 func (s *MsgServerTestSuite) assertDexBalancesInt(a, b sdk.Int) {
@@ -437,7 +437,7 @@ func (s *MsgServerTestSuite) getLiquidityAtTick(tickIndex int64, fee uint64) (sd
 	return liquidityA, liquidityB
 }
 
-func (s *MsgServerTestSuite) getLiquidityAtTickExotic(pairID *types.PairID, tickIndex int64, fee uint64) (sdk.Int, sdk.Int) {
+func (s *MsgServerTestSuite) getLiquidityAtTickWithDenom(pairID *types.PairID, tickIndex int64, fee uint64) (sdk.Int, sdk.Int) {
 	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, pairID, tickIndex, fee)
 	s.Assert().NoError(err)
 
@@ -914,8 +914,8 @@ func (s *MsgServerTestSuite) assertLiquidityAtTick(amountA, amountB sdk.Int, tic
 	s.Assert().True(amountB.Equal(liquidityB), "liquidity B: actual %s, expected %s", liquidityB, amountB)
 }
 
-func (s *MsgServerTestSuite) assertLiquidityAtTickExotic(pairID *types.PairID, expected0, expected1 sdk.Int, tickIndex int64, fee uint64) {
-	liquidity0, liquidity1 := s.getLiquidityAtTickExotic(pairID, tickIndex, fee)
+func (s *MsgServerTestSuite) assertLiquidityAtTickWithDenom(pairID *types.PairID, expected0, expected1 sdk.Int, tickIndex int64, fee uint64) {
+	liquidity0, liquidity1 := s.getLiquidityAtTickWithDenom(pairID, tickIndex, fee)
 	s.Assert().True(expected0.Equal(liquidity0), "liquidity 0: actual %s, expected %s", liquidity0, expected0)
 	s.Assert().True(expected1.Equal(liquidity1), "liquidity 1: actual %s, expected %s", liquidity1, expected1)
 }
