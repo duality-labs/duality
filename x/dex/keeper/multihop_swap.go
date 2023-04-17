@@ -88,11 +88,10 @@ func (k Keeper) MultihopStep(
 		return val.CoinOut, ctxBranchCopy, val.Err
 	}
 
-	_, amountOut, err := k.SwapExactAmountIn(bctx.Ctx, step.PairID, step.TokenIn, step.TokenOut, inCoin.Amount, nil)
+	_, coinOut, err := k.SwapExactAmountIn(bctx.Ctx, step.PairID, step.TokenIn, step.TokenOut, inCoin.Amount, nil)
 	if err != nil {
 		return sdk.Coin{}, bctx, err
 	}
-	coinOut := sdk.NewCoin(step.TokenOut, amountOut)
 	ctxBranch := bctx.Branch()
 	stepCache[cacheKey] = StepResult{Ctx: bctx, CoinOut: coinOut, Err: err}
 

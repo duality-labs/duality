@@ -242,17 +242,14 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		return sdk.Coin{}, err
 	}
 
-	amountIn, amountOut, err := k.SwapWithCache(ctx, pairID, tokenIn, tokenOut, amountIn, nil)
+	coinIn, coinOut, err := k.SwapWithCache(ctx, pairID, tokenIn, tokenOut, amountIn, nil)
 	if err != nil {
 		return sdk.Coin{}, err
 	}
 
-	if amountOut.IsZero() {
+	if coinOut.IsZero() {
 		return sdk.Coin{}, types.ErrInsufficientLiquidity
 	}
-
-	coinIn := sdk.NewCoin(tokenIn, amountIn)
-	coinOut = sdk.NewCoin(tokenOut, amountOut)
 
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
 		return sdk.Coin{}, err
@@ -268,7 +265,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 	}
 
 	ctx.EventManager().EmitEvent(types.CreateSwapEvent(callerAddr.String(), receiverAddr.String(),
-		tokenIn, tokenOut, amountIn.String(), amountOut.String()))
+		tokenIn, tokenOut, amountIn.String(), coinOut.Amount.String()))
 
 	return coinOut, nil
 }
@@ -373,10 +370,8 @@ func (k Keeper) PlaceLimitOrderCore(
 	amountLeft, totalIn := amountIn, sdk.ZeroInt()
 	// For everything except just-in-time (JIT) orders try to execute as a swap first
 	if !orderType.IsJIT() {
-		var amountInSwap, amountOutSwap sdk.Int
-
 		limitPrice := placeTranche.PriceMakerToTaker().ToDec()
-		amountInSwap, amountOutSwap, err = k.SwapWithCache(
+		coinInSwap, coinOutSwap, err := k.SwapWithCache(
 			ctx,
 			pairID,
 			tokenIn,
@@ -388,10 +383,10 @@ func (k Keeper) PlaceLimitOrderCore(
 			return nil, err
 		}
 
-		totalIn = amountInSwap
-		amountLeft = amountLeft.Sub(amountInSwap)
+		totalIn = coinInSwap.Amount
+		amountLeft = amountLeft.Sub(coinInSwap.Amount)
 
-		trancheUser.TakerReserves = amountOutSwap
+		trancheUser.TakerReserves = coinOutSwap.Amount
 	}
 
 	if amountLeft.IsPositive() && orderType.IsFoK() {
