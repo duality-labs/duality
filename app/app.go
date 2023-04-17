@@ -168,7 +168,7 @@ var (
 		ccvconsumertypes.ConsumerRedistributeName:     nil,
 		ccvconsumertypes.ConsumerToSendToProviderName: nil,
 		mevmoduletypes.ModuleName:                     {authtypes.Minter, authtypes.Burner, authtypes.Staking},
-		incentivesmoduletypes.ModuleName:              {authtypes.Minter, authtypes.Burner},
+		incentivesmoduletypes.ModuleName:              nil,
 
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}

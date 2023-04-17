@@ -266,7 +266,6 @@ func ParseFieldFromArg(fVal reflect.Value, fType reflect.StructField, arg string
 		fVal.Set(reflect.ValueOf(v))
 		return nil
 	}
-	fmt.Println(fType.Type.Kind().String())
 	return fmt.Errorf("field type not recognized. Got type %v", fType)
 }
 

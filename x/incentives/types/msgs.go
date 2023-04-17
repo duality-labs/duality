@@ -127,11 +127,6 @@ func (m MsgStake) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "Invalid owner address (%s)", err)
 	}
 
-	// we only allow stakes with one denom for now
-	if m.Coins.Len() != 1 {
-		return fmt.Errorf("stakeups can only have one denom per stake ID, got %v", m.Coins)
-	}
-
 	if !m.Coins.IsAllPositive() {
 		return fmt.Errorf("cannot stake up a zero or negative amount")
 	}
@@ -176,11 +171,6 @@ func (m MsgUnstake) ValidateBasic() error {
 	for _, unstake := range m.Unstakes {
 		if unstake.ID == 0 {
 			return fmt.Errorf("invalid stakeup ID, got %v", unstake.ID)
-		}
-
-		// only allow unstakes with a single denom or empty
-		if unstake.Coins.Len() > 1 {
-			return fmt.Errorf("can only unstake one denom per stake ID, got %v", unstake.Coins)
 		}
 
 		if !unstake.Coins.Empty() && !unstake.Coins.IsAllPositive() {

@@ -354,7 +354,7 @@ coins are sent from stakeup `ModuleAccount`.
 
 ### Remove synthetic stakes after removal time mature
 
-For synthetic stakeups, no coin movement is made, but stakeup record and
+For synthetic stakes, no coin movement is made, but stakeup record and
 reference queues are removed.
 
 

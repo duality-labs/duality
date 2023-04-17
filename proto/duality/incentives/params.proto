@@ -11,4 +11,7 @@ message Params {
   // (day, week, etc.)
   string distr_epoch_identifier = 1
       [ (gogoproto.moretags) = "yaml:\"distr_epoch_identifier\"" ];
+  
+  uint64 max_gauges = 2
+      [ (gogoproto.moretags) = "yaml:\"max_gauges\"" ];
 }

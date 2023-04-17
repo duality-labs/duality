@@ -9,6 +9,7 @@ import (
 // Incentives parameters key store.
 var (
 	KeyDistrEpochIdentifier = []byte("DistrEpochIdentifier")
+	KeyMaxGauges            = []byte("MaxGauges")
 )
 
 // ParamKeyTable returns the key table for the incentive module's parameters.
@@ -17,16 +18,18 @@ func ParamKeyTable() paramtypes.KeyTable {
 }
 
 // NewParams takes an epoch distribution identifier, then returns an incentives Params struct.
-func NewParams(distrEpochIdentifier string) Params {
+func NewParams(distrEpochIdentifier string, maxGauges uint64) Params {
 	return Params{
 		DistrEpochIdentifier: distrEpochIdentifier,
+		MaxGauges:            maxGauges,
 	}
 }
 
 // DefaultParams returns the default incentives module parameters.
 func DefaultParams() Params {
 	return Params{
-		DistrEpochIdentifier: "week",
+		DistrEpochIdentifier: "day",
+		MaxGauges:            20,
 	}
 }
 
@@ -42,5 +45,6 @@ func (p Params) Validate() error {
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.NewParamSetPair(KeyDistrEpochIdentifier, &p.DistrEpochIdentifier, epochtypes.ValidateEpochIdentifierInterface),
+		paramtypes.NewParamSetPair(KeyMaxGauges, &p.MaxGauges, func(interface{}) error { return nil }),
 	}
 }

@@ -612,17 +612,17 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_GetModuleStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"duality", "incentives", "v1beta1", "get_module_status"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetModuleStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"dualitylabs", "duality", "incentives", "v1beta1", "module_status"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetGaugeByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"duality", "incentives", "v1beta1", "get_gauge_by_id", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetGaugeByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "incentives", "v1beta1", "gauges", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetGauges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"duality", "incentives", "v1beta1", "get_gauges"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetGauges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"dualitylabs", "duality", "incentives", "v1beta1", "gauges"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetStakeByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"dualitylabs", "duality", "incentives", "get_stake_by_id", "stake_id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetStakeByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"dualitylabs", "duality", "incentives", "stakes", "stake_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetStakes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "incentives", "get_stakes"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetStakes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "incentives", "stakes"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GetFutureRewardEstimate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"duality", "incentives", "v1beta1", "get_future_rewards_estimate", "owner"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_GetFutureRewardEstimate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "incentives", "v1beta1", "future_rewards_estimate", "owner"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

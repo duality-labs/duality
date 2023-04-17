@@ -56,7 +56,7 @@ func GetCmdGauges() (*osmocli.QueryDescriptor, *types.GetGaugesRequest) {
 	return &osmocli.QueryDescriptor{
 		Use:   "list-gauges [status] [denom]",
 		Short: "Query gauges",
-		Long:  `{{.Short}}{{.ExampleHeader}} list-gauges UPCOMING TokenA`,
+		Long:  `{{.Short}}{{.ExampleHeader}} list-gauges UPCOMING DualityPoolShares-stake-token-t0-f1`,
 		CustomFieldParsers: map[string]osmocli.CustomFieldParserFn{
 			"Status": parseGaugeStatus,
 		},

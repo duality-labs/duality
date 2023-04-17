@@ -8,7 +8,7 @@ package keeper
 // 	ir.RegisterRoute(types.ModuleName, "stakes-amount-invariant", StakesBalancesInvariant(keeper))
 // }
 
-// // AccumulationStoreInvariant ensures that the sum of all stakeups at a given duration
+// // AccumulationStoreInvariant ensures that the sum of all stakes at a given duration
 // // is equal to the value stored within the accumulation store.
 // func AccumulationStoreInvariant(keeper Keeper) sdk.Invariant {
 // 	return func(ctx sdk.Context) (string, bool) {
@@ -34,15 +34,15 @@ package keeper
 // 				})
 
 // 				stakes := keeper.GetStakesLongerThanDurationPair(ctx, denom, duration)
-// 				stakeupSum := sdk.ZeroInt()
+// 				stakesum := sdk.ZeroInt()
 // 				for _, stake := range stakes {
-// 					stakeupSum = stakeupSum.Add(stake.Coins.AmountOf(denom))
+// 					stakesum = stakesum.Add(stake.Coins.AmountOf(denom))
 // 				}
 
-// 				if !accumulation.Equal(stakeupSum) {
+// 				if !accumulation.Equal(stakesum) {
 // 					return sdk.FormatInvariant(types.ModuleName, "accumulation-store-invariant",
 // 						fmt.Sprintf("\taccumulation store value does not fit actual stakeup sum: %s != %s\n",
-// 							accumulation.String(), stakeupSum.String(),
+// 							accumulation.String(), stakesum.String(),
 // 						)), true
 // 				}
 // 			}
