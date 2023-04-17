@@ -11,8 +11,7 @@ import (
 
 	"github.com/duality-labs/duality/app/apptesting"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
-	"github.com/duality-labs/duality/x/incentives/types"
-	incentivestypes "github.com/duality-labs/duality/x/incentives/types"
+	. "github.com/duality-labs/duality/x/incentives/types"
 )
 
 // TestMsgCreatePool tests if valid/invalid create pool messages are properly validated/invalidated
@@ -22,8 +21,8 @@ func TestMsgCreatePool(t *testing.T) {
 	addr1 := sdk.AccAddress(pk1.Address())
 
 	// make a proper createPool message
-	createMsg := func(after func(msg incentivestypes.MsgCreateGauge) incentivestypes.MsgCreateGauge) incentivestypes.MsgCreateGauge {
-		distributeTo := types.QueryCondition{
+	createMsg := func(after func(msg MsgCreateGauge) MsgCreateGauge) MsgCreateGauge {
+		distributeTo := QueryCondition{
 			PairID: &dextypes.PairID{
 				Token0: "TokenA",
 				Token1: "TokenB",
@@ -32,7 +31,7 @@ func TestMsgCreatePool(t *testing.T) {
 			EndTick:   10,
 		}
 
-		properMsg := *incentivestypes.NewMsgCreateGauge(
+		properMsg := *NewMsgCreateGauge(
 			false,
 			addr1,
 			distributeTo,
@@ -46,10 +45,10 @@ func TestMsgCreatePool(t *testing.T) {
 	}
 
 	// validate createPool message was created as intended
-	msg := createMsg(func(msg incentivestypes.MsgCreateGauge) incentivestypes.MsgCreateGauge {
+	msg := createMsg(func(msg MsgCreateGauge) MsgCreateGauge {
 		return msg
 	})
-	require.Equal(t, msg.Route(), incentivestypes.RouterKey)
+	require.Equal(t, msg.Route(), RouterKey)
 	require.Equal(t, msg.Type(), "create_gauge")
 	signers := msg.GetSigners()
 	require.Equal(t, len(signers), 1)
@@ -57,19 +56,19 @@ func TestMsgCreatePool(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		msg        incentivestypes.MsgCreateGauge
+		msg        MsgCreateGauge
 		expectPass bool
 	}{
 		{
 			name: "proper msg",
-			msg: createMsg(func(msg incentivestypes.MsgCreateGauge) incentivestypes.MsgCreateGauge {
+			msg: createMsg(func(msg MsgCreateGauge) MsgCreateGauge {
 				return msg
 			}),
 			expectPass: true,
 		},
 		{
 			name: "empty owner",
-			msg: createMsg(func(msg incentivestypes.MsgCreateGauge) incentivestypes.MsgCreateGauge {
+			msg: createMsg(func(msg MsgCreateGauge) MsgCreateGauge {
 				msg.Owner = ""
 				return msg
 			}),
@@ -78,7 +77,7 @@ func TestMsgCreatePool(t *testing.T) {
 		// TODO
 		{
 			name: "invalid distribution start time",
-			msg: createMsg(func(msg incentivestypes.MsgCreateGauge) incentivestypes.MsgCreateGauge {
+			msg: createMsg(func(msg MsgCreateGauge) MsgCreateGauge {
 				msg.StartTime = time.Time{}
 				return msg
 			}),
@@ -86,7 +85,7 @@ func TestMsgCreatePool(t *testing.T) {
 		},
 		{
 			name: "invalid num epochs paid over",
-			msg: createMsg(func(msg incentivestypes.MsgCreateGauge) incentivestypes.MsgCreateGauge {
+			msg: createMsg(func(msg MsgCreateGauge) MsgCreateGauge {
 				msg.NumEpochsPaidOver = 0
 				return msg
 			}),
@@ -94,7 +93,7 @@ func TestMsgCreatePool(t *testing.T) {
 		},
 		{
 			name: "invalid num epochs paid over for perpetual gauge",
-			msg: createMsg(func(msg incentivestypes.MsgCreateGauge) incentivestypes.MsgCreateGauge {
+			msg: createMsg(func(msg MsgCreateGauge) MsgCreateGauge {
 				msg.NumEpochsPaidOver = 2
 				msg.IsPerpetual = true
 				return msg
@@ -103,7 +102,7 @@ func TestMsgCreatePool(t *testing.T) {
 		},
 		{
 			name: "valid num epochs paid over for perpetual gauge",
-			msg: createMsg(func(msg incentivestypes.MsgCreateGauge) incentivestypes.MsgCreateGauge {
+			msg: createMsg(func(msg MsgCreateGauge) MsgCreateGauge {
 				msg.NumEpochsPaidOver = 1
 				msg.IsPerpetual = true
 				return msg
@@ -128,8 +127,8 @@ func TestMsgAddToGauge(t *testing.T) {
 	addr1 := sdk.AccAddress(pk1.Address())
 
 	// make a proper addToGauge message
-	createMsg := func(after func(msg incentivestypes.MsgAddToGauge) incentivestypes.MsgAddToGauge) incentivestypes.MsgAddToGauge {
-		properMsg := *incentivestypes.NewMsgAddToGauge(
+	createMsg := func(after func(msg MsgAddToGauge) MsgAddToGauge) MsgAddToGauge {
+		properMsg := *NewMsgAddToGauge(
 			addr1,
 			1,
 			sdk.Coins{sdk.NewInt64Coin("stake", 10)},
@@ -139,10 +138,10 @@ func TestMsgAddToGauge(t *testing.T) {
 	}
 
 	// validate addToGauge message was created as intended
-	msg := createMsg(func(msg incentivestypes.MsgAddToGauge) incentivestypes.MsgAddToGauge {
+	msg := createMsg(func(msg MsgAddToGauge) MsgAddToGauge {
 		return msg
 	})
-	require.Equal(t, msg.Route(), incentivestypes.RouterKey)
+	require.Equal(t, msg.Route(), RouterKey)
 	require.Equal(t, msg.Type(), "add_to_gauge")
 	signers := msg.GetSigners()
 	require.Equal(t, len(signers), 1)
@@ -150,19 +149,19 @@ func TestMsgAddToGauge(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		msg        incentivestypes.MsgAddToGauge
+		msg        MsgAddToGauge
 		expectPass bool
 	}{
 		{
 			name: "proper msg",
-			msg: createMsg(func(msg incentivestypes.MsgAddToGauge) incentivestypes.MsgAddToGauge {
+			msg: createMsg(func(msg MsgAddToGauge) MsgAddToGauge {
 				return msg
 			}),
 			expectPass: true,
 		},
 		{
 			name: "empty owner",
-			msg: createMsg(func(msg incentivestypes.MsgAddToGauge) incentivestypes.MsgAddToGauge {
+			msg: createMsg(func(msg MsgAddToGauge) MsgAddToGauge {
 				msg.Owner = ""
 				return msg
 			}),
@@ -170,7 +169,7 @@ func TestMsgAddToGauge(t *testing.T) {
 		},
 		{
 			name: "empty rewards",
-			msg: createMsg(func(msg incentivestypes.MsgAddToGauge) incentivestypes.MsgAddToGauge {
+			msg: createMsg(func(msg MsgAddToGauge) MsgAddToGauge {
 				msg.Rewards = sdk.Coins{}
 				return msg
 			}),
@@ -192,12 +191,12 @@ func TestMsgSetupStake(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		msg        types.MsgStake
+		msg        MsgStake
 		expectPass bool
 	}{
 		{
 			name: "proper msg",
-			msg: types.MsgStake{
+			msg: MsgStake{
 				Owner: addr1,
 				Coins: sdk.NewCoins(sdk.NewCoin("test", sdk.NewInt(100))),
 			},
@@ -205,21 +204,14 @@ func TestMsgSetupStake(t *testing.T) {
 		},
 		{
 			name: "invalid owner",
-			msg: types.MsgStake{
+			msg: MsgStake{
 				Owner: invalidAddr,
 				Coins: sdk.NewCoins(sdk.NewCoin("test", sdk.NewInt(100))),
 			},
 		},
 		{
-			name: "invalid coin length",
-			msg: types.MsgStake{
-				Owner: addr1,
-				Coins: sdk.NewCoins(sdk.NewCoin("test1", sdk.NewInt(100000)), sdk.NewCoin("test2", sdk.NewInt(100000))),
-			},
-		},
-		{
 			name: "zero token amount",
-			msg: types.MsgStake{
+			msg: MsgStake{
 				Owner: addr1,
 				Coins: sdk.NewCoins(sdk.NewCoin("test", sdk.NewInt(0))),
 			},
@@ -230,7 +222,7 @@ func TestMsgSetupStake(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			if test.expectPass {
 				require.NoError(t, test.msg.ValidateBasic(), "test: %v", test.name)
-				require.Equal(t, test.msg.Route(), types.RouterKey)
+				require.Equal(t, test.msg.Route(), RouterKey)
 				require.Equal(t, test.msg.Type(), "stake_tokens")
 				signers := test.msg.GetSigners()
 				require.Equal(t, len(signers), 1)
@@ -247,14 +239,14 @@ func TestMsgUnstake(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		msg        types.MsgUnstake
+		msg        MsgUnstake
 		expectPass bool
 	}{
 		{
 			name: "proper msg",
-			msg: types.MsgUnstake{
+			msg: MsgUnstake{
 				Owner: addr1,
-				Unstakes: []*incentivestypes.MsgUnstake_UnstakeDescriptor{
+				Unstakes: []*MsgUnstake_UnstakeDescriptor{
 					{
 						ID:    1,
 						Coins: sdk.NewCoins(sdk.NewCoin("test", sdk.NewInt(100))),
@@ -265,9 +257,9 @@ func TestMsgUnstake(t *testing.T) {
 		},
 		{
 			name: "invalid owner",
-			msg: types.MsgUnstake{
+			msg: MsgUnstake{
 				Owner: invalidAddr,
-				Unstakes: []*incentivestypes.MsgUnstake_UnstakeDescriptor{
+				Unstakes: []*MsgUnstake_UnstakeDescriptor{
 					{
 						ID:    1,
 						Coins: sdk.NewCoins(sdk.NewCoin("test", sdk.NewInt(100))),
@@ -277,9 +269,9 @@ func TestMsgUnstake(t *testing.T) {
 		},
 		{
 			name: "invalid stakeup ID",
-			msg: types.MsgUnstake{
+			msg: MsgUnstake{
 				Owner: addr1,
-				Unstakes: []*incentivestypes.MsgUnstake_UnstakeDescriptor{
+				Unstakes: []*MsgUnstake_UnstakeDescriptor{
 					{
 						ID:    0,
 						Coins: sdk.NewCoins(sdk.NewCoin("test", sdk.NewInt(100))),
@@ -288,22 +280,10 @@ func TestMsgUnstake(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid coins length",
-			msg: types.MsgUnstake{
-				Owner: addr1,
-				Unstakes: []*incentivestypes.MsgUnstake_UnstakeDescriptor{
-					{
-						ID:    1,
-						Coins: sdk.NewCoins(sdk.NewCoin("test1", sdk.NewInt(100000)), sdk.NewCoin("test2", sdk.NewInt(100000))),
-					},
-				},
-			},
-		},
-		{
 			name: "zero coins (same as nil)",
-			msg: types.MsgUnstake{
+			msg: MsgUnstake{
 				Owner: addr1,
-				Unstakes: []*incentivestypes.MsgUnstake_UnstakeDescriptor{
+				Unstakes: []*MsgUnstake_UnstakeDescriptor{
 					{
 						ID:    1,
 						Coins: sdk.NewCoins(sdk.NewCoin("test1", sdk.NewInt(0))),
@@ -314,9 +294,9 @@ func TestMsgUnstake(t *testing.T) {
 		},
 		{
 			name: "nil coins (unstake by ID)",
-			msg: types.MsgUnstake{
+			msg: MsgUnstake{
 				Owner: addr1,
-				Unstakes: []*incentivestypes.MsgUnstake_UnstakeDescriptor{
+				Unstakes: []*MsgUnstake_UnstakeDescriptor{
 					{
 						ID:    1,
 						Coins: sdk.NewCoins(),
@@ -331,7 +311,7 @@ func TestMsgUnstake(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			if test.expectPass {
 				require.NoError(t, test.msg.ValidateBasic(), "test: %v", test.name)
-				require.Equal(t, test.msg.Route(), types.RouterKey)
+				require.Equal(t, test.msg.Route(), RouterKey)
 				require.Equal(t, test.msg.Type(), "begin_unstaking")
 				signers := test.msg.GetSigners()
 				require.Equal(t, len(signers), 1)

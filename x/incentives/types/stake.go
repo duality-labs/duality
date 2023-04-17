@@ -9,9 +9,9 @@ import (
 )
 
 // NewStake returns a new instance of period stake.
-func NewStake(ID uint64, owner sdk.AccAddress, coins sdk.Coins, startTime time.Time) *Stake {
+func NewStake(id uint64, owner sdk.AccAddress, coins sdk.Coins, startTime time.Time) *Stake {
 	return &Stake{
-		ID:        ID,
+		ID:        id,
 		Owner:     owner.String(),
 		Coins:     coins,
 		StartTime: startTime,
@@ -77,7 +77,7 @@ func (p Stake) CoinsPassingQueryCondition(distrTo QueryCondition) sdk.Coins {
 						break
 					}
 					coins = coins.Add(coin)
-					midLeft -= 1
+					midLeft--
 				}
 
 				midRight := mid + 1
@@ -87,7 +87,7 @@ func (p Stake) CoinsPassingQueryCondition(distrTo QueryCondition) sdk.Coins {
 						break
 					}
 					coins = coins.Add(coin)
-					midRight += 1
+					midRight++
 				}
 
 				return coins

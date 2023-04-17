@@ -25,9 +25,9 @@ type DepositDenom struct {
 	Fee    uint64
 }
 
-func NewDepositDenom(pairId *PairID, tick int64, fee uint64) *DepositDenom {
+func NewDepositDenom(pairID *PairID, tick int64, fee uint64) *DepositDenom {
 	return &DepositDenom{
-		PairID: pairId,
+		PairID: pairID,
 		Tick:   tick,
 		Fee:    fee,
 	}

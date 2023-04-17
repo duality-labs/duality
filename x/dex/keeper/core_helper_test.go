@@ -62,9 +62,9 @@ func (s *CoreHelpersTestSuite) SetupTest() {
 }
 
 func (s *CoreHelpersTestSuite) setLPAtFee1Pool(tickIndex int64, amountA int, amountB int) {
-	pairId := &types.PairID{Token0: "TokenA", Token1: "TokenB"}
-	sharesID := types.NewDepositDenom(pairId, tickIndex, 0).String()
-	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, pairId, tickIndex, 1)
+	pairID := &types.PairID{Token0: "TokenA", Token1: "TokenB"}
+	sharesID := types.NewDepositDenom(pairID, tickIndex, 0).String()
+	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, pairID, tickIndex, 1)
 	if err != nil {
 		panic(err)
 	}

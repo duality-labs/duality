@@ -29,9 +29,9 @@ func (k Keeper) GetLastGaugeID(ctx sdk.Context) uint64 {
 }
 
 // SetLastGaugeID sets the last used gauge ID to the provided ID.
-func (k Keeper) SetLastGaugeID(ctx sdk.Context, ID uint64) {
+func (k Keeper) SetLastGaugeID(ctx sdk.Context, id uint64) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.KeyLastGaugeID, sdk.Uint64ToBigEndian(ID))
+	store.Set(types.KeyLastGaugeID, sdk.Uint64ToBigEndian(id))
 }
 
 // getGaugesFromIterator iterates over everything in a gauge's iterator, until it reaches the end. Return all gauges iterated over.

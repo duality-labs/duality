@@ -30,3 +30,15 @@ func (k Keeper) MoveUpcomingGaugeToActiveGauge(ctx sdk.Context, gauge *types.Gau
 func (k Keeper) MoveActiveGaugeToFinishedGauge(ctx sdk.Context, gauge *types.Gauge) error {
 	return k.moveActiveGaugeToFinishedGauge(ctx, gauge)
 }
+
+func GetStakeRefKeys(stake *types.Stake) ([][]byte, error) {
+	return getStakeRefKeys(stake)
+}
+
+func RemoveValue(ids []uint64, id uint64) ([]uint64, int) {
+	return removeValue(ids, id)
+}
+
+func FindIndex(ids []uint64, id uint64) int {
+	return findIndex(ids, id)
+}

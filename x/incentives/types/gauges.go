@@ -9,6 +9,7 @@ func (g Gauges) GetCoinsDistributed() sdk.Coins {
 	for _, gauge := range g {
 		result = result.Add(gauge.DistributedCoins...)
 	}
+
 	return result
 }
 

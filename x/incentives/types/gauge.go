@@ -72,9 +72,9 @@ func (gauge Gauge) RewardsNextEpoch() sdk.Coins {
 func (gauge Gauge) EpochsRemaining() uint64 {
 	if !gauge.IsPerpetual {
 		return gauge.NumEpochsPaidOver - gauge.FilledEpochs
-	} else {
-		return 1
 	}
+
+	return 1
 }
 
 func (gauge Gauge) CoinsRemaining() sdk.Coins {

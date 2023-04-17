@@ -47,7 +47,7 @@ func (k Keeper) getStakesFromIterator(ctx sdk.Context, iterator db.Iterator) typ
 	return stakes
 }
 
-func (k Keeper) getIDsFromIterator(ctx sdk.Context, iterator db.Iterator) []uint64 {
+func (k Keeper) getIDsFromIterator(iterator db.Iterator) []uint64 {
 	allIds := []uint64{}
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
@@ -55,24 +55,4 @@ func (k Keeper) getIDsFromIterator(ctx sdk.Context, iterator db.Iterator) []uint
 		allIds = append(allIds, ids...)
 	}
 	return allIds
-}
-
-func (k Keeper) getStakeByRefKey(ctx sdk.Context, key []byte) *types.Stake {
-	store := ctx.KVStore(k.storeKey)
-	stakeRefArrayBz := store.Get(key)
-	if stakeRefArrayBz == nil {
-		return nil
-	}
-	stakeIDs := UnmarshalRefArray(stakeRefArrayBz)
-	if len(stakeIDs) > 1 {
-		panic("not expecting more than one here")
-	}
-	if len(stakeIDs) == 0 {
-		return nil
-	}
-	stake, err := k.GetStakeByID(ctx, stakeIDs[0])
-	if err != nil {
-		panic(err)
-	}
-	return stake
 }

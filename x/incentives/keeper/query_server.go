@@ -141,8 +141,8 @@ func (q QueryServer) GetFutureRewardEstimate(goCtx context.Context, req *types.G
 	}
 
 	stakes := make(types.Stakes, 0, len(req.StakeIds))
-	for _, stakeId := range req.StakeIds {
-		stake, err := q.Keeper.GetStakeByID(ctx, stakeId)
+	for _, stakeID := range req.StakeIds {
+		stake, err := q.Keeper.GetStakeByID(ctx, stakeID)
 		if err != nil {
 			return nil, err
 		}

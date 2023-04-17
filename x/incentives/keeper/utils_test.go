@@ -1,4 +1,4 @@
-package keeper
+package keeper_test
 
 import (
 	"testing"
@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	dextypes "github.com/duality-labs/duality/x/dex/types"
+	. "github.com/duality-labs/duality/x/incentives/keeper"
 	"github.com/duality-labs/duality/x/incentives/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -36,12 +37,12 @@ func TestFindIndex(t *testing.T) {
 	// create an array of 5 IDs
 	IDs := []uint64{1, 2, 3, 4, 5}
 
-	// use the findIndex function to find the index of the respective IDs
+	// use the FindIndex function to find the index of the respective IDs
 	// if it doesn't exist, return -1
-	require.Equal(t, findIndex(IDs, 1), 0)
-	require.Equal(t, findIndex(IDs, 3), 2)
-	require.Equal(t, findIndex(IDs, 5), 4)
-	require.Equal(t, findIndex(IDs, 6), -1)
+	require.Equal(t, FindIndex(IDs, 1), 0)
+	require.Equal(t, FindIndex(IDs, 3), 2)
+	require.Equal(t, FindIndex(IDs, 5), 4)
+	require.Equal(t, FindIndex(IDs, 6), -1)
 }
 
 func TestRemoveValue(t *testing.T) {
@@ -50,16 +51,16 @@ func TestRemoveValue(t *testing.T) {
 
 	// remove an ID
 	// ensure if ID exists, the length is reduced by one and the index of the removed ID is returned
-	IDs, index1 := removeValue(IDs, 5)
+	IDs, index1 := RemoveValue(IDs, 5)
 	require.Len(t, IDs, 4)
 	require.Equal(t, index1, 4)
-	IDs, index2 := removeValue(IDs, 3)
+	IDs, index2 := RemoveValue(IDs, 3)
 	require.Len(t, IDs, 3)
 	require.Equal(t, index2, 2)
-	IDs, index3 := removeValue(IDs, 1)
+	IDs, index3 := RemoveValue(IDs, 1)
 	require.Len(t, IDs, 2)
 	require.Equal(t, index3, 0)
-	IDs, index4 := removeValue(IDs, 6)
+	IDs, index4 := RemoveValue(IDs, 6)
 	require.Len(t, IDs, 2)
 	require.Equal(t, index4, -1)
 }
@@ -70,26 +71,26 @@ func TestStakeRefKeys(t *testing.T) {
 	denom2 := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenC"}, 0, 1).String()
 	// empty address and 1 coin
 	stake1 := types.NewStake(1, sdk.AccAddress{}, sdk.Coins{sdk.NewInt64Coin(denom1, 10)}, time.Now())
-	_, err := getStakeRefKeys(stake1)
+	_, err := GetStakeRefKeys(stake1)
 	require.Error(t, err)
 
 	// empty address and 2 coins
 	stake2 := types.NewStake(1, sdk.AccAddress{}, sdk.Coins{sdk.NewInt64Coin(denom1, 10), sdk.NewInt64Coin(denom2, 1)}, time.Now())
-	_, err = getStakeRefKeys(stake2)
+	_, err = GetStakeRefKeys(stake2)
 	require.Error(t, err)
 
 	// not empty address and 1 coin
 	stake3 := types.NewStake(1, addr1, sdk.Coins{sdk.NewInt64Coin(denom1, 10)}, time.Now())
-	keys3, err := getStakeRefKeys(stake3)
+	keys3, err := GetStakeRefKeys(stake3)
 	require.Len(t, keys3, 6)
 
 	// not empty address and empty coin
 	stake4 := types.NewStake(1, addr1, sdk.Coins{sdk.NewInt64Coin(denom1, 10)}, time.Now())
-	keys4, err := getStakeRefKeys(stake4)
+	keys4, err := GetStakeRefKeys(stake4)
 	require.Len(t, keys4, 6)
 
 	// not empty address and 2 coins
 	stake5 := types.NewStake(1, addr1, sdk.Coins{sdk.NewInt64Coin(denom1, 10), sdk.NewInt64Coin(denom2, 1)}, time.Now())
-	keys5, err := getStakeRefKeys(stake5)
+	keys5, err := GetStakeRefKeys(stake5)
 	require.Len(t, keys5, 10)
 }

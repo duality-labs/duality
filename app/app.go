@@ -473,7 +473,12 @@ func NewApp(
 		// insert Incentives hooks receivers here
 		),
 	)
-	incentivesModule := incentivesmodule.NewAppModule(app.IncentivesKeeper, app.AccountKeeper, app.BankKeeper, app.EpochsKeeper)
+	incentivesModule := incentivesmodule.NewAppModule(
+		app.IncentivesKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.EpochsKeeper,
+	)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 

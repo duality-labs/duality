@@ -28,7 +28,10 @@ func (k Keeper) deleteStakeRefs(ctx sdk.Context, stake *types.Stake) error {
 		return err
 	}
 	for _, refKey := range refKeys {
-		k.deleteRefByKey(ctx, refKey, stake.ID)
+		err = k.deleteRefByKey(ctx, refKey, stake.ID)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -49,12 +52,12 @@ func getStakeRefKeys(stake *types.Stake) ([][]byte, error) {
 			panic("Only valid LP tokens should be staked")
 		}
 		denomBz := []byte(coin.Denom)
-		pairIdBz := []byte(depositDenom.PairID.Stringify())
+		pairIDBz := []byte(depositDenom.PairID.Stringify())
 		tickBz := dextypes.TickIndexToBytes(depositDenom.Tick, depositDenom.PairID, depositDenom.PairID.Token1)
 		refKeys = append(refKeys, types.CombineKeys(types.KeyPrefixStakeIndexDenom, denomBz))
-		refKeys = append(refKeys, types.CombineKeys(types.KeyPrefixStakeIndexPairTick, pairIdBz, tickBz))
+		refKeys = append(refKeys, types.CombineKeys(types.KeyPrefixStakeIndexPairTick, pairIDBz, tickBz))
 		refKeys = append(refKeys, types.CombineKeys(types.KeyPrefixStakeIndexAccountDenom, owner, denomBz))
-		refKeys = append(refKeys, types.CombineKeys(types.KeyPrefixStakeIndexPairTimestamp, pairIdBz, types.GetTimeKey(stake.StartTime)))
+		refKeys = append(refKeys, types.CombineKeys(types.KeyPrefixStakeIndexPairTimestamp, pairIDBz, types.GetTimeKey(stake.StartTime)))
 	}
 
 	return refKeys, nil

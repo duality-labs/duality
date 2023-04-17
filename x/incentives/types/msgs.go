@@ -72,10 +72,10 @@ func (m MsgCreateGauge) GetSigners() []sdk.AccAddress {
 var _ sdk.Msg = &MsgAddToGauge{}
 
 // NewMsgAddToGauge creates a message to add rewards to a specific gauge.
-func NewMsgAddToGauge(owner sdk.AccAddress, gaugeId uint64, rewards sdk.Coins) *MsgAddToGauge {
+func NewMsgAddToGauge(owner sdk.AccAddress, gaugeID uint64, rewards sdk.Coins) *MsgAddToGauge {
 	return &MsgAddToGauge{
 		Owner:   owner.String(),
-		GaugeId: gaugeId,
+		GaugeId: gaugeID,
 		Rewards: rewards,
 	}
 }

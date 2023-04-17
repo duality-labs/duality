@@ -20,7 +20,11 @@ func NewDistributor(keeper DistributorKeeper) Distributor {
 	}
 }
 
-func (d Distributor) Distribute(ctx sdk.Context, gauge *types.Gauge, filterStakes types.Stakes) (types.DistributionSpec, error) {
+func (d Distributor) Distribute(
+	ctx sdk.Context,
+	gauge *types.Gauge,
+	filterStakes types.Stakes,
+) (types.DistributionSpec, error) {
 	if !gauge.IsActiveGauge(ctx.BlockTime()) {
 		return nil, types.ErrGaugeNotActive
 	}
@@ -72,6 +76,6 @@ func (d Distributor) Distribute(ctx sdk.Context, gauge *types.Gauge, filterStake
 	}
 
 	gauge.DistributedCoins = gauge.DistributedCoins.Add(rewardsNextEpoch...)
-	gauge.FilledEpochs += 1
+	gauge.FilledEpochs++
 	return distSpec, nil
 }

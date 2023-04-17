@@ -85,8 +85,8 @@ var (
 )
 
 // stakeStoreKey returns action store key from ID.
-func GetStakeStoreKey(ID uint64) []byte {
-	return CombineKeys(KeyPrefixStake, sdk.Uint64ToBigEndian(ID))
+func GetStakeStoreKey(id uint64) []byte {
+	return CombineKeys(KeyPrefixStake, sdk.Uint64ToBigEndian(id))
 }
 
 // combineKeys combine bytes array into a single bytes.
@@ -119,8 +119,8 @@ func CombineStakes(pl1 Stakes, pl2 Stakes) Stakes {
 }
 
 // gaugeStoreKey returns the combined byte array (store key) of the provided gauge ID's key prefix and the ID itself.
-func GetKeyGaugeStore(ID uint64) []byte {
-	return CombineKeys(KeyPrefixGauge, sdk.Uint64ToBigEndian(ID))
+func GetKeyGaugeStore(id uint64) []byte {
+	return CombineKeys(KeyPrefixGauge, sdk.Uint64ToBigEndian(id))
 }
 
 // gaugePairStoreKey returns the combined byte array (store key) of the provided gauge denom key prefix and the denom itself.

@@ -25,9 +25,9 @@ func (k Keeper) GetLastStakeID(ctx sdk.Context) uint64 {
 }
 
 // SetLastStakeID save ID used by last stake.
-func (k Keeper) SetLastStakeID(ctx sdk.Context, ID uint64) {
+func (k Keeper) SetLastStakeID(ctx sdk.Context, id uint64) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.KeyLastStakeID, sdk.Uint64ToBigEndian(ID))
+	store.Set(types.KeyLastStakeID, sdk.Uint64ToBigEndian(id))
 }
 
 // stake is an internal utility to stake coins and set corresponding states.
@@ -146,7 +146,6 @@ func (k Keeper) GetStakeByID(ctx sdk.Context, stakeID uint64) (*types.Stake, err
 func (k Keeper) GetStakesByQueryCondition(ctx sdk.Context, distrTo *types.QueryCondition) types.Stakes {
 	pairIDString := distrTo.PairID.Stringify()
 	tickStakeIds := k.getIDsFromIterator(
-		ctx,
 		k.iteratorStartEnd(
 			ctx,
 			types.GetKeyStakeIndexByPairTick(pairIDString, distrTo.StartTick),
@@ -163,7 +162,6 @@ func (k Keeper) GetStakesByQueryCondition(ctx sdk.Context, distrTo *types.QueryC
 	// the query condition or the distribution interval.
 	stakedBefore := ctx.BlockTime().Add(-24 * time.Hour)
 	timeStakeIds := k.getIDsFromIterator(
-		ctx,
 		k.iteratorStartEnd(
 			ctx,
 			types.GetKeyStakeIndexByTimestamp(
@@ -184,8 +182,8 @@ func (k Keeper) GetStakesByQueryCondition(ctx sdk.Context, distrTo *types.QueryC
 	}
 
 	results := make([]*types.Stake, len(resultIds))
-	for i, stakeId := range resultIds {
-		stake, err := k.GetStakeByID(ctx, stakeId)
+	for i, stakeID := range resultIds {
+		stake, err := k.GetStakeByID(ctx, stakeID)
 		if err != nil {
 			// This represents a db inconsistency
 			panic(err)
