@@ -15,6 +15,7 @@ service Msg {
   rpc PlaceLimitOrder(MsgPlaceLimitOrder) returns (MsgPlaceLimitOrderResponse);
   rpc WithdrawFilledLimitOrder(MsgWithdrawFilledLimitOrder) returns (MsgWithdrawFilledLimitOrderResponse);
   rpc CancelLimitOrder(MsgCancelLimitOrder) returns (MsgCancelLimitOrderResponse);
+  rpc MultiHopSwap(MsgMultiHopSwap) returns (MsgMultiHopSwapResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -145,6 +146,39 @@ message MsgCancelLimitOrder {
 }
 
 message MsgCancelLimitOrderResponse {
+}
+
+message MultiHopRoute {
+  repeated string hops = 1;
+}
+
+message MsgMultiHopSwap {
+  string creator = 1;
+  string receiver = 2;
+  repeated MultiHopRoute routes = 3;
+  string amountIn = 4 [
+                       (gogoproto.moretags)   = "yaml:\"amountIn\"",
+                       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                       (gogoproto.nullable)   = false,
+                       (gogoproto.jsontag) = "amountIn"
+                       ];
+  string exitLimitPrice = 5 [
+                             (gogoproto.moretags)   = "yaml:\"exitLimitPrice\"",
+                             (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+                             (gogoproto.nullable)   = false,
+                             (gogoproto.jsontag) = "exitLimitPrice"
+                             ];
+// If pickBestRoute == true then all routes are run and the route with the best price is chosen
+// otherwise, the first succesful route is used.
+  bool pickBestRoute = 6;
+}
+
+message MsgMultiHopSwapResponse {
+  cosmos.base.v1beta1.Coin coinOut = 1 [
+                                        (gogoproto.nullable) = false,
+                                        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+                                        (gogoproto.jsontag) = "coinOut"
+                                        ];
 }
 
 // this line is used by starport scaffolding # proto/tx/message

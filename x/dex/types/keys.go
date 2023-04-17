@@ -288,6 +288,15 @@ const (
 )
 
 const (
+	MultihopSwapEventKey      = "NewMultihopSwap"
+	MultihopSwapEventCreator  = "Creator"
+	MultihopSwapEventReceiver = "Receiver"
+	MultihopSwapEventCoinIn   = "CoinIn"
+	MultihopSwapEventCoinOut  = "CoinOut"
+	MultihopSwapEventRoute    = "Route"
+)
+
+const (
 	PlaceLimitOrderEventKey        = "NewPlaceLimitOrder"
 	PlaceLimitOrderEventCreator    = "Creator"
 	PlaceLimitOrderEventReceiver   = "Receiver"

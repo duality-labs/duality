@@ -36249,6 +36249,21 @@ definitions:
         type: array
         items:
           type: string
+  dualitylabs.duality.dex.MsgMultiHopSwapResponse:
+    type: object
+    properties:
+      coinOut:
+        type: object
+        properties:
+          denom:
+            type: string
+          amount:
+            type: string
+        description: |-
+          Coin defines a token with a denomination and an amount.
+
+          NOTE: The amount field is an Int which implements the custom method
+          signatures required by gogoproto.
   dualitylabs.duality.dex.MsgPlaceLimitOrderResponse:
     type: object
     properties:
@@ -36273,6 +36288,13 @@ definitions:
     type: object
   dualitylabs.duality.dex.MsgWithdrawalResponse:
     type: object
+  dualitylabs.duality.dex.MultiHopRoute:
+    type: object
+    properties:
+      hops:
+        type: array
+        items:
+          type: string
   dualitylabs.duality.dex.PairID:
     type: object
     properties:

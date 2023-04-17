@@ -152,6 +152,30 @@ func CreateSwapEvent(creator, receiver, tokenIn, tokenOut, amountIn, amountOut s
 	)
 }
 
+func createMultihopSwapEvent(creator, receiver, coinIn, coinOut, route string) sdk.Event {
+	attrs := []sdk.Attribute{
+		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
+		sdk.NewAttribute(sdk.AttributeKeyAction, SwapEventKey),
+		sdk.NewAttribute(MultihopSwapEventCreator, creator),
+		sdk.NewAttribute(MultihopSwapEventReceiver, receiver),
+		sdk.NewAttribute(MultihopSwapEventCoinIn, coinIn),
+		sdk.NewAttribute(MultihopSwapEventCoinOut, coinOut),
+		sdk.NewAttribute(MultihopSwapEventRoute, route),
+	}
+
+	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
+}
+
+func CreateMultihopSwapEvent(creator, receiver, coinIn, coinOut, route string) sdk.Event {
+	return createMultihopSwapEvent(
+		creator,
+		receiver,
+		coinIn,
+		coinOut,
+		route,
+	)
+}
+
 func createPlaceLimitOrderEvent(creator, receiver, tokenIn, tokenOut, amountIn, shares, trancheKey string) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),

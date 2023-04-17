@@ -112,6 +112,15 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 //                          STATE CALCULATIONS                               //
 ///////////////////////////////////////////////////////////////////////////////
 
+func (k Keeper) GetCurrPrice1To0(ctx sdk.Context, pairID *types.PairID) (price types.Price, found bool) {
+	tick, found := k.GetCurrTick1To0(ctx, pairID)
+	if !found {
+		return types.Price{}, false
+	}
+
+	return *types.MustNewPrice(tick * -1), true
+}
+
 func (k Keeper) GetCurrTick1To0(ctx sdk.Context, pairID *types.PairID) (tickIdx int64, found bool) {
 	ti := k.NewTickIterator(ctx, pairID, pairID.Token0)
 
@@ -124,6 +133,15 @@ func (k Keeper) GetCurrTick1To0(ctx sdk.Context, pairID *types.PairID) (tickIdx 
 	}
 
 	return math.MinInt64, false
+}
+
+func (k Keeper) GetCurrPrice0To1(ctx sdk.Context, pairID *types.PairID) (price types.Price, found bool) {
+	tick, found := k.GetCurrTick0To1(ctx, pairID)
+	if !found {
+		return types.Price{}, false
+	}
+
+	return *types.MustNewPrice(tick), true
 }
 
 func (k Keeper) GetCurrTick0To1(ctx sdk.Context, pairID *types.PairID) (tickIdx int64, found bool) {

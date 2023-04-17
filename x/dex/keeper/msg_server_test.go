@@ -81,6 +81,14 @@ func (s *MsgServerTestSuite) fundAccountBalances(account sdk.AccAddress, aBalanc
 	s.assertAccountBalances(account, aBalance, bBalance)
 }
 
+func (s *MsgServerTestSuite) fundAccountBalancesWithDenom(addr sdk.AccAddress, amounts sdk.Coins) error {
+	if err := s.app.BankKeeper.MintCoins(s.ctx, types.ModuleName, amounts); err != nil {
+		return err
+	}
+
+	return s.app.BankKeeper.SendCoinsFromModuleToAccount(s.ctx, types.ModuleName, addr, amounts)
+}
+
 func (s *MsgServerTestSuite) fundAliceBalances(a, b int64) {
 	s.fundAccountBalances(s.alice, a, b)
 }
@@ -119,6 +127,12 @@ func (s *MsgServerTestSuite) assertAccountBalances(
 	s.assertAccountBalancesInt(account, sdk.NewInt(aBalance), sdk.NewInt(bBalance))
 }
 
+func (s *MsgServerTestSuite) assertAccountBalanceWithDenom(account sdk.AccAddress, denom string, expBalance int64) {
+	actualBalance := s.app.BankKeeper.GetBalance(s.ctx, account, denom).Amount
+	expBalanceInt := sdk.NewInt(expBalance)
+	s.Assert().True(expBalanceInt.Equal(actualBalance), "expected %s != actual %s", expBalance, actualBalance)
+}
+
 func (s *MsgServerTestSuite) assertAliceBalances(a, b int64) {
 	s.assertAccountBalances(s.alice, a, b)
 }
@@ -153,6 +167,10 @@ func (s *MsgServerTestSuite) assertDanBalancesInt(a, b sdk.Int) {
 
 func (s *MsgServerTestSuite) assertDexBalances(a, b int64) {
 	s.assertAccountBalances(s.app.AccountKeeper.GetModuleAddress("dex"), a, b)
+}
+
+func (s *MsgServerTestSuite) assertDexBalanceWithDenom(denom string, expectedAmount int64) {
+	s.assertAccountBalanceWithDenom(s.app.AccountKeeper.GetModuleAddress("dex"), denom, expectedAmount)
 }
 
 func (s *MsgServerTestSuite) assertDexBalancesInt(a, b sdk.Int) {
@@ -319,7 +337,7 @@ func NewDepositWithOptions(amountA, amountB, tickIndex, fee int, options Deposit
 }
 
 func (s *MsgServerTestSuite) aliceDeposits(deposits ...*Deposit) {
-	s.deposits(s.alice, deposits...)
+	s.deposits(s.alice, deposits)
 }
 
 func (s *MsgServerTestSuite) aliceDepositsWithOptions(deposits ...*DepositWithOptions) {
@@ -327,18 +345,18 @@ func (s *MsgServerTestSuite) aliceDepositsWithOptions(deposits ...*DepositWithOp
 }
 
 func (s *MsgServerTestSuite) bobDeposits(deposits ...*Deposit) {
-	s.deposits(s.bob, deposits...)
+	s.deposits(s.bob, deposits)
 }
 
 func (s *MsgServerTestSuite) carolDeposits(deposits ...*Deposit) {
-	s.deposits(s.carol, deposits...)
+	s.deposits(s.carol, deposits)
 }
 
 func (s *MsgServerTestSuite) danDeposits(deposits ...*Deposit) {
-	s.deposits(s.dan, deposits...)
+	s.deposits(s.dan, deposits)
 }
 
-func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits ...*Deposit) {
+func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits []*Deposit, pairID ...types.PairID) {
 	amountsA := make([]sdk.Int, len(deposits))
 	amountsB := make([]sdk.Int, len(deposits))
 	tickIndexes := make([]int64, len(deposits))
@@ -352,11 +370,23 @@ func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits ...*Depos
 		options[i] = &types.DepositOptions{Autoswap: false}
 	}
 
+	var tokenA, tokenB string
+	switch {
+	case len(pairID) == 0:
+		tokenA = "TokenA"
+		tokenB = "TokenB"
+	case len(pairID) == 1:
+		tokenA = pairID[0].Token0
+		tokenB = pairID[0].Token1
+	case len(pairID) > 1:
+		s.Assert().Fail("Only 1 pairID can be provided")
+	}
+
 	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
 		Creator:         account.String(),
 		Receiver:        account.String(),
-		TokenA:          "TokenA",
-		TokenB:          "TokenB",
+		TokenA:          tokenA,
+		TokenB:          tokenB,
 		AmountsA:        amountsA,
 		AmountsB:        amountsB,
 		TickIndexesAToB: tickIndexes,
@@ -398,6 +428,16 @@ func (s *MsgServerTestSuite) depositsWithOptions(account sdk.AccAddress, deposit
 
 func (s *MsgServerTestSuite) getLiquidityAtTick(tickIndex int64, fee uint64) (sdk.Int, sdk.Int) {
 	pairID := CreatePairID("TokenA", "TokenB")
+	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, pairID, tickIndex, fee)
+	s.Assert().NoError(err)
+
+	liquidityA := pool.LowerTick0.Reserves
+	liquidityB := pool.UpperTick1.Reserves
+
+	return liquidityA, liquidityB
+}
+
+func (s *MsgServerTestSuite) getLiquidityAtTickWithDenom(pairID *types.PairID, tickIndex int64, fee uint64) (sdk.Int, sdk.Int) {
 	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, pairID, tickIndex, fee)
 	s.Assert().NoError(err)
 
@@ -676,6 +716,66 @@ func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr
 	s.Assert().ErrorIs(err, expectedErr)
 }
 
+/// MultiHopSwap
+
+func (s *MsgServerTestSuite) aliceMultiHopSwaps(routes [][]string, amountIn int, exitLimitPrice sdk.Dec, pickBest bool) {
+	s.multiHopSwaps(s.alice, routes, amountIn, exitLimitPrice, pickBest)
+}
+
+func (s *MsgServerTestSuite) bobMultiHopSwaps(routes [][]string, amountIn int, exitLimitPrice sdk.Dec, pickBest bool) {
+	s.multiHopSwaps(s.bob, routes, amountIn, exitLimitPrice, pickBest)
+}
+
+func (s *MsgServerTestSuite) carolMultiHopSwaps(routes [][]string, amountIn int, exitLimitPrice sdk.Dec, pickBest bool) {
+	s.multiHopSwaps(s.carol, routes, amountIn, exitLimitPrice, pickBest)
+}
+
+func (s *MsgServerTestSuite) danMultiHopSwaps(routes [][]string, amountIn int, exitLimitPrice sdk.Dec, pickBest bool) {
+	s.multiHopSwaps(s.dan, routes, amountIn, exitLimitPrice, pickBest)
+}
+
+func (s *MsgServerTestSuite) multiHopSwaps(account sdk.AccAddress, routes [][]string, amountIn int, exitLimitPrice sdk.Dec, pickBest bool) {
+	msg := types.NewMsgMultiHopSwap(
+		account.String(),
+		account.String(),
+		routes,
+		sdk.NewInt(int64(amountIn)),
+		exitLimitPrice,
+		pickBest,
+	)
+	_, err := s.msgServer.MultiHopSwap(s.goCtx, msg)
+	s.Assert().Nil(err)
+}
+
+func (s *MsgServerTestSuite) aliceMultiHopSwapFails(err error, routes [][]string, amountIn int, exitLimitPrice sdk.Dec, pickBest bool) {
+	s.multiHopSwapFails(s.alice, err, routes, amountIn, exitLimitPrice, pickBest)
+}
+
+func (s *MsgServerTestSuite) bobMultiHopSwapFails(err error, routes [][]string, amountIn int, exitLimitPrice sdk.Dec, pickBest bool) {
+	s.multiHopSwapFails(s.bob, err, routes, amountIn, exitLimitPrice, pickBest)
+}
+
+func (s *MsgServerTestSuite) carolMultiHopSwapFails(err error, routes [][]string, amountIn int, exitLimitPrice sdk.Dec, pickBest bool) {
+	s.multiHopSwapFails(s.carol, err, routes, amountIn, exitLimitPrice, pickBest)
+}
+
+func (s *MsgServerTestSuite) danMultiHopSwapFails(err error, routes [][]string, amountIn int, exitLimitPrice sdk.Dec, pickBest bool) {
+	s.multiHopSwapFails(s.dan, err, routes, amountIn, exitLimitPrice, pickBest)
+}
+
+func (s *MsgServerTestSuite) multiHopSwapFails(account sdk.AccAddress, expectedErr error, routes [][]string, amountIn int, exitLimitPrice sdk.Dec, pickBest bool) {
+	msg := types.NewMsgMultiHopSwap(
+		account.String(),
+		account.String(),
+		routes,
+		sdk.NewInt(int64(amountIn)),
+		exitLimitPrice,
+		pickBest,
+	)
+	_, err := s.msgServer.MultiHopSwap(s.goCtx, msg)
+	s.Assert().ErrorIs(err, expectedErr)
+}
+
 /// Withdraw filled limit order
 
 func (s *MsgServerTestSuite) aliceWithdrawsLimitSell(trancheKey string) {
@@ -812,6 +912,12 @@ func (s *MsgServerTestSuite) assertLiquidityAtTick(amountA, amountB sdk.Int, tic
 	liquidityA, liquidityB := s.getLiquidityAtTick(tickIndex, fee)
 	s.Assert().True(amountA.Equal(liquidityA), "liquidity A: actual %s, expected %s", liquidityA, amountA)
 	s.Assert().True(amountB.Equal(liquidityB), "liquidity B: actual %s, expected %s", liquidityB, amountB)
+}
+
+func (s *MsgServerTestSuite) assertLiquidityAtTickWithDenom(pairID *types.PairID, expected0, expected1 sdk.Int, tickIndex int64, fee uint64) {
+	liquidity0, liquidity1 := s.getLiquidityAtTickWithDenom(pairID, tickIndex, fee)
+	s.Assert().True(expected0.Equal(liquidity0), "liquidity 0: actual %s, expected %s", liquidity0, expected0)
+	s.Assert().True(expected1.Equal(liquidity1), "liquidity 1: actual %s, expected %s", liquidity1, expected1)
 }
 
 func (s *MsgServerTestSuite) assertPoolLiquidity(amountA, amountB int, tickIndex int64, fee uint64) {

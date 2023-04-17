@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -50,7 +51,6 @@ func (k Keeper) DepositCore(
 		feeUInt := utils.MustSafeUint64(fee)
 		lowerTickIndex := tickIndex - feeUInt
 		upperTickIndex := tickIndex + feeUInt
-
 		// behind enemy lines checks
 		// TODO: Allow user to deposit "behind enemy lines"
 		if amount0.IsPositive() && k.IsBehindEnemyLines(ctx, pairID, pairID.Token0, lowerTickIndex) {
@@ -242,17 +242,14 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		return sdk.Coin{}, err
 	}
 
-	amountIn, amountOut, err := k.Swap(ctx, pairID, tokenIn, tokenOut, amountIn, nil)
+	coinIn, coinOut, err := k.SwapWithCache(ctx, pairID, tokenIn, tokenOut, amountIn, nil)
 	if err != nil {
 		return sdk.Coin{}, err
 	}
 
-	if amountOut.IsZero() {
+	if coinOut.IsZero() {
 		return sdk.Coin{}, types.ErrInsufficientLiquidity
 	}
-
-	coinIn := sdk.NewCoin(tokenIn, amountIn)
-	coinOut = sdk.NewCoin(tokenOut, amountOut)
 
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
 		return sdk.Coin{}, err
@@ -268,7 +265,68 @@ func (k Keeper) SwapCore(goCtx context.Context,
 	}
 
 	ctx.EventManager().EmitEvent(types.CreateSwapEvent(callerAddr.String(), receiverAddr.String(),
-		tokenIn, tokenOut, amountIn.String(), amountOut.String()))
+		tokenIn, tokenOut, amountIn.String(), coinOut.Amount.String()))
+
+	return coinOut, nil
+}
+
+func (k Keeper) MultiHopSwapCore(
+	goCtx context.Context,
+	amountIn sdk.Int,
+	routes []*types.MultiHopRoute,
+	exitLimitPrice sdk.Dec,
+	pickBestRoute bool,
+	callerAddr sdk.AccAddress,
+	receiverAddr sdk.AccAddress,
+) (coinOut sdk.Coin, err error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	var routeErrors []error
+	initialInCoin := sdk.NewCoin(routes[0].Hops[0], amountIn)
+	stepCache := make(map[multihopCacheKey]StepResult)
+	var bestRoute struct {
+		write   func()
+		coinOut sdk.Coin
+		route   []string
+	}
+	bestRoute.coinOut = sdk.Coin{Amount: sdk.ZeroInt()}
+
+	for _, route := range routes {
+		routeCoinOut, writeRoute, err := k.RunMultihopRoute(ctx, *route, initialInCoin, exitLimitPrice, stepCache)
+		if err != nil {
+			routeErrors = append(routeErrors, err)
+			continue
+		}
+
+		if !pickBestRoute || bestRoute.coinOut.Amount.LT(routeCoinOut.Amount) {
+			bestRoute.coinOut = routeCoinOut
+			bestRoute.write = writeRoute
+			bestRoute.route = route.Hops
+		}
+		if !pickBestRoute {
+			break
+		}
+	}
+
+	if len(routeErrors) == len(routes) {
+		// All routes have failed
+
+		allErr := utils.JoinErrors(types.ErrAllMultiHopRoutesFailed, routeErrors...)
+
+		return sdk.Coin{}, allErr
+	}
+
+	bestRoute.write()
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{initialInCoin})
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{bestRoute.coinOut})
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+	ctx.EventManager().EmitEvent(types.CreateMultihopSwapEvent(callerAddr.String(), receiverAddr.String(),
+		initialInCoin.String(), bestRoute.coinOut.String(), strings.Join(bestRoute.route, ",")))
 
 	return coinOut, nil
 }
@@ -312,11 +370,8 @@ func (k Keeper) PlaceLimitOrderCore(
 	amountLeft, totalIn := amountIn, sdk.ZeroInt()
 	// For everything except just-in-time (JIT) orders try to execute as a swap first
 	if !orderType.IsJIT() {
-		var amountInSwap, amountOutSwap sdk.Int
-
 		limitPrice := placeTranche.PriceMakerToTaker().ToDec()
-
-		amountInSwap, amountOutSwap, err = k.Swap(
+		coinInSwap, coinOutSwap, err := k.SwapWithCache(
 			ctx,
 			pairID,
 			tokenIn,
@@ -328,10 +383,10 @@ func (k Keeper) PlaceLimitOrderCore(
 			return nil, err
 		}
 
-		totalIn = amountInSwap
-		amountLeft = amountLeft.Sub(amountInSwap)
+		totalIn = coinInSwap.Amount
+		amountLeft = amountLeft.Sub(coinInSwap.Amount)
 
-		trancheUser.TakerReserves = amountOutSwap
+		trancheUser.TakerReserves = coinOutSwap.Amount
 	}
 
 	if amountLeft.IsPositive() && orderType.IsFoK() {
