@@ -57,9 +57,9 @@ func CreateGaugeCmdBuilder(clientCtx client.Context, args []string, flags *pflag
 		return &types.MsgCreateGauge{}, err
 	}
 	if timeStr == "" { // empty start time
-		startTime = time.Unix(0, 0)
+		startTime = time.Unix(0, 0).UTC()
 	} else if timeUnix, err := strconv.ParseInt(timeStr, 10, 64); err == nil { // unix time
-		startTime = time.Unix(timeUnix, 0)
+		startTime = time.Unix(timeUnix, 0).UTC()
 	} else if timeRFC, err := time.Parse(time.RFC3339, timeStr); err == nil { // RFC time
 		startTime = timeRFC
 	} else { // invalid input
