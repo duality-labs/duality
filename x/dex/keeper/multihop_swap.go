@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/duality-labs/duality/x/dex/types"
@@ -67,6 +65,20 @@ type StepResult struct {
 	Err     error
 }
 
+type multihopCacheKey struct {
+	TokenIn  string
+	TokenOut string
+	InAmount sdk.Int
+}
+
+func newCacheKey(tokenIn, tokenOut string, inAmount sdk.Int) multihopCacheKey {
+	return multihopCacheKey{
+		TokenIn:  tokenIn,
+		TokenOut: tokenOut,
+		InAmount: inAmount,
+	}
+}
+
 func (k Keeper) MultihopStep(
 	bctx types.BranchableCache,
 	step MultihopStep,
@@ -74,14 +86,14 @@ func (k Keeper) MultihopStep(
 	exitLimitPrice sdk.Dec,
 	currentPrice sdk.Dec,
 	remainingSteps []MultihopStep,
-	stepCache map[string]StepResult,
+	stepCache map[multihopCacheKey]StepResult,
 ) (sdk.Coin, types.BranchableCache, error) {
 	priceUpperbound := CalcMultihopPriceUpperbound(currentPrice, remainingSteps)
 	if exitLimitPrice.GT(priceUpperbound) {
 		// If we can't hit the best possible price we can greedily abort
 		return sdk.Coin{}, bctx, types.ErrExitLimitPriceHit
 	}
-	cacheKey := fmt.Sprintf("%s-%s-%s", step.TokenIn, step.TokenOut, inCoin.Amount)
+	cacheKey := newCacheKey(step.TokenIn, step.TokenOut, inCoin.Amount)
 	val, ok := stepCache[cacheKey]
 	if ok {
 		ctxBranchCopy := val.Ctx.Branch()
@@ -89,11 +101,11 @@ func (k Keeper) MultihopStep(
 	}
 
 	_, coinOut, err := k.SwapExactAmountIn(bctx.Ctx, step.PairID, step.TokenIn, step.TokenOut, inCoin.Amount, nil)
+	ctxBranch := bctx.Branch()
+	stepCache[cacheKey] = StepResult{Ctx: bctx, CoinOut: coinOut, Err: err}
 	if err != nil {
 		return sdk.Coin{}, bctx, err
 	}
-	ctxBranch := bctx.Branch()
-	stepCache[cacheKey] = StepResult{Ctx: bctx, CoinOut: coinOut, Err: err}
 
 	return coinOut, ctxBranch, nil
 }
@@ -103,7 +115,7 @@ func (k Keeper) RunMultihopRoute(
 	route types.MultiHopRoute,
 	initialInCoin sdk.Coin,
 	exitLimitPrice sdk.Dec,
-	stepCache map[string]StepResult,
+	stepCache map[multihopCacheKey]StepResult,
 ) (sdk.Coin, func(), error) {
 	routeData, err := k.HopsToRouteData(ctx, route.Hops, exitLimitPrice)
 	if err != nil {

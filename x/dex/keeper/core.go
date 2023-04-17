@@ -282,7 +282,7 @@ func (k Keeper) MultiHopSwapCore(
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	var routeErrors []error
 	initialInCoin := sdk.NewCoin(routes[0].Hops[0], amountIn)
-	stepCache := make(map[string]StepResult)
+	stepCache := make(map[multihopCacheKey]StepResult)
 	var bestRoute struct {
 		write   func()
 		coinOut sdk.Coin
