@@ -7,7 +7,7 @@ import (
 )
 
 type Liquidity interface {
-	Swap(maxAmount sdk.Int) (inAmount, outAmount sdk.Int)
+	Swap(maxAmountIn sdk.Int, maxAmountOut *sdk.Int) (inAmount, outAmount sdk.Int)
 	Price() *types.Price
 }
 
@@ -138,6 +138,7 @@ func (k Keeper) Swap(ctx sdk.Context,
 	tokenIn string,
 	tokenOut string,
 	amountIn sdk.Int,
+	maxAmountOut *sdk.Int,
 	limitPrice *sdk.Dec,
 ) (totalInCoin, totalOutCoin sdk.Coin, err error) {
 	pair := types.NewDirectionalTradingPair(pairID, tokenIn, tokenOut)
@@ -159,7 +160,7 @@ func (k Keeper) Swap(ctx sdk.Context,
 			break
 		}
 
-		inAmount, outAmount := liq.Swap(remainingIn)
+		inAmount, outAmount := liq.Swap(remainingIn, maxAmountOut)
 
 		remainingIn = remainingIn.Sub(inAmount)
 		totalOut = totalOut.Add(outAmount)
@@ -176,9 +177,10 @@ func (k Keeper) SwapExactAmountIn(ctx sdk.Context,
 	tokenIn string,
 	tokenOut string,
 	amountIn sdk.Int,
+	maxAmountOut *sdk.Int,
 	limitPrice *sdk.Dec,
 ) (totalIn, totalOut sdk.Coin, err error) {
-	swapAmountIn, swapAmountOut, err := k.Swap(ctx, pairID, tokenIn, tokenOut, amountIn, limitPrice)
+	swapAmountIn, swapAmountOut, err := k.Swap(ctx, pairID, tokenIn, tokenOut, amountIn, maxAmountOut, limitPrice)
 	if err != nil {
 		return sdk.Coin{}, sdk.Coin{}, err
 	}
@@ -195,10 +197,11 @@ func (k Keeper) SwapWithCache(
 	tokenIn string,
 	tokenOut string,
 	amountIn sdk.Int,
+	maxAmountOut *sdk.Int,
 	limitPrice *sdk.Dec,
 ) (totalIn, totalOut sdk.Coin, err error) {
 	cacheCtx, writeCache := ctx.CacheContext()
-	totalIn, totalOut, err = k.Swap(cacheCtx, pairID, tokenIn, tokenOut, amountIn, limitPrice)
+	totalIn, totalOut, err = k.Swap(cacheCtx, pairID, tokenIn, tokenOut, amountIn, maxAmountOut, limitPrice)
 
 	writeCache()
 

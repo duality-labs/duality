@@ -90,6 +90,15 @@ message MsgSwap {
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountIn"
   ];
+  // Optional argument to specify a specific amount out for a trade.
+  // swap will stop as soon as amountOut is reached.
+  string maxAmountOut = 6 [
+                        (gogoproto.moretags)   = "yaml:\"amountOut\"",
+                        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                        (gogoproto.nullable)   = true,
+                        (gogoproto.jsontag) = "amountOut"
+                        ];
+
 }
 
 message MsgSwapResponse {

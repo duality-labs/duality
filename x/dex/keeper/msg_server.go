@@ -85,7 +85,7 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
-	coinOut, err := k.SwapCore(goCtx, msg.TokenIn, msg.TokenOut, msg.AmountIn, callerAddr, receiverAddr)
+	coinOut, err := k.SwapCore(goCtx, msg.TokenIn, msg.TokenOut, msg.AmountIn, msg.MaxAmountOut, callerAddr, receiverAddr)
 	if err != nil {
 		return nil, err
 	}

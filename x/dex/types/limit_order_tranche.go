@@ -99,7 +99,7 @@ func (t *LimitOrderTranche) Withdraw(trancheUser LimitOrderTrancheUser) (sdk.Int
 	return amountOutTokenIn, amountOutTokenOut
 }
 
-func (t *LimitOrderTranche) Swap(maxAmountTaker sdk.Int) (
+func (t *LimitOrderTranche) Swap(maxAmountTaker sdk.Int, maxAmountOut *sdk.Int) (
 	inAmount sdk.Int,
 	outAmount sdk.Int,
 ) {

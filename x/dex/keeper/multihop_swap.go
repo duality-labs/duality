@@ -104,6 +104,7 @@ func (k Keeper) MultihopStep(
 		step.TradingPair.TokenOut,
 		inCoin.Amount,
 		nil,
+		nil,
 	)
 	ctxBranch := bctx.Branch()
 	stepCache[cacheKey] = StepResult{Ctx: bctx, CoinOut: coinOut, Err: err}

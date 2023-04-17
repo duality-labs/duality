@@ -53,6 +53,28 @@ func MaxDec(a, b sdk.Dec) sdk.Dec {
 	return b
 }
 
+func MinIntArr(vals []sdk.Int) sdk.Int {
+	min := vals[0]
+	for _, val := range vals {
+		if val.LT(min) {
+			min = val
+		}
+	}
+
+	return min
+}
+
+func MaxIntArr(vals []sdk.Int) sdk.Int {
+	max := vals[0]
+	for _, val := range vals {
+		if val.GT(max) {
+			max = val
+		}
+	}
+
+	return max
+}
+
 func Uint64ToSortableString(i uint64) string {
 	// Converts a Uint to a string that sorts lexogrpahically in integer order
 	intStr := strconv.FormatUint(i, 36)

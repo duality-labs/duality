@@ -56,5 +56,9 @@ func (msg *MsgSwap) ValidateBasic() error {
 		return ErrZeroSwap
 	}
 
+	if msg.MaxAmountOut.IsNegative() {
+		return ErrNegativeAmountOut
+	}
+
 	return nil
 }

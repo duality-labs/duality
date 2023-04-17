@@ -227,6 +227,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 	tokenIn string,
 	tokenOut string,
 	amountIn sdk.Int,
+	maxAmountOut *sdk.Int,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
 ) (coinOut sdk.Coin, err error) {
@@ -237,7 +238,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		return sdk.Coin{}, err
 	}
 
-	coinIn, coinOut, err := k.SwapWithCache(ctx, pairID, tokenIn, tokenOut, amountIn, nil)
+	coinIn, coinOut, err := k.SwapWithCache(ctx, pairID, tokenIn, tokenOut, amountIn, maxAmountOut, nil)
 	if err != nil {
 		return sdk.Coin{}, err
 	}
@@ -386,6 +387,8 @@ func (k Keeper) PlaceLimitOrderCore(
 			tokenIn,
 			tokenOut,
 			amountIn,
+			// JCP FIX ME
+			nil,
 			&limitPrice,
 		)
 		if err != nil {
