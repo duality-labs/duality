@@ -104,7 +104,6 @@ func (k Keeper) CreateGauge(
 	numEpochsPaidOver uint64,
 	pricingTick int64,
 ) (*types.Gauge, error) {
-
 	gauge := &types.Gauge{
 		Id:                k.GetLastGaugeID(ctx) + 1,
 		IsPerpetual:       isPerpetual,

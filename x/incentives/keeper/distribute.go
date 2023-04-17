@@ -39,7 +39,6 @@ func (k Keeper) Distribute(ctx sdk.Context, gauges types.Gauges) (types.Distribu
 	for _, gauge := range gauges {
 		filterStakes := k.GetStakesByQueryCondition(ctx, &gauge.DistributeTo)
 		gaugeDistSpec, err := k.distributor.Distribute(ctx, gauge, filterStakes)
-
 		if err != nil {
 			return nil, err
 		}
