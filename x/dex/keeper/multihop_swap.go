@@ -84,7 +84,7 @@ func (k Keeper) MultihopStep(
 	cacheKey := fmt.Sprintf("%s-%s-%s", step.TokenIn, step.TokenOut, inCoin.Amount)
 	val, ok := stepCache[cacheKey]
 	if ok {
-		ctxBranchCopy := bctx.Branch()
+		ctxBranchCopy := val.Ctx.Branch()
 		return val.CoinOut, ctxBranchCopy, val.Err
 	}
 
