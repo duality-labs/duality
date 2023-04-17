@@ -220,6 +220,8 @@ func (s *MsgServerTestSuite) TestMultiHopSwapLongRouteWithCache() {
 		NewPoolSetup("TokenI", "TokenJ", 0, 100, 0, 1),
 		NewPoolSetup("TokenJ", "TokenK", 0, 100, 0, 1),
 		NewPoolSetup("TokenK", "TokenL", 0, 100, 0, 1),
+		NewPoolSetup("TokenL", "TokenX", 0, 50, 0, 1),
+		NewPoolSetup("TokenL", "TokenX", 0, 50, 100, 1),
 
 		NewPoolSetup("TokenK", "TokenM", 0, 100, 0, 1),
 		NewPoolSetup("TokenM", "TokenX", 0, 100, 0, 1),
