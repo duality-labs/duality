@@ -2,13 +2,14 @@ package utils
 
 import (
 	"fmt"
-	"strings"
 )
 
-func JoinErrors(parentError error, errors ...error) error {
-	// Can be used for bundling multiple errors. For now only the parent error and first error in []errors
-	// will be matched by ErrorIs.
+func JoinErrors(parentError error, errs ...error) error {
 	// TODO: switch to errors.Join when we bump to golang 1.20
-	errorFmt := strings.Repeat("%w", len(errors))
-	return fmt.Errorf("%w Additional errors: %w %v "+errorFmt, parentError, errors[0], errors[1:])
+	fullError := fmt.Errorf("errors: %w", parentError)
+	for _, err := range errs {
+		fullError = fmt.Errorf("%w", err)
+	}
+
+	return fullError
 }
