@@ -2,8 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
-	"strings"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -97,16 +95,15 @@ func (k Keeper) DepositCore(
 		totalAmountReserve1 = totalAmountReserve1.Add(inAmount1)
 
 		ctx.EventManager().EmitEvent(types.CreateDepositEvent(
-			callerAddr
-			receiverAddr
+			callerAddr,
+			receiverAddr,
 			token0,
 			token1,
 			tickIndex,
 			fee,
 			inAmount0,
 			inAmount1,
-			totalAmount
-			outShares,
+			outShares.Amount,
 		))
 	}
 
@@ -181,12 +178,12 @@ func (k Keeper) WithdrawCore(
 		totalReserve1ToRemove = totalReserve1ToRemove.Add(outAmount1)
 
 		ctx.EventManager().EmitEvent(types.CreateWithdrawEvent(
-			callerAddr
-			receiverAddr
+			callerAddr,
+			receiverAddr,
 			token0,
 			token1,
-			tickIndex
-			fee
+			tickIndex,
+			fee,
 			outAmount0,
 			outAmount1,
 			sharesToRemove,
@@ -331,8 +328,8 @@ func (k Keeper) MultiHopSwapCore(
 		return sdk.Coin{}, err
 	}
 	ctx.EventManager().EmitEvent(types.CreateMultihopSwapEvent(
-		callerAddr
-		receiverAddr
+		callerAddr,
+		receiverAddr,
 		initialInCoin.Denom,
 		bestRoute.coinOut.Denom,
 		initialInCoin.Amount,
@@ -442,7 +439,7 @@ func (k Keeper) PlaceLimitOrderCore(
 		tokenIn,
 		tokenOut,
 		totalIn,
-		limitPrice,
+		tickIndex,
 		orderType.String(),
 		sharesIssued,
 		trancheKey,
@@ -498,13 +495,13 @@ func (k Keeper) CancelLimitOrderCore(
 	}
 
 	ctx.EventManager().EmitEvent(types.CancelLimitOrderEvent(
-		callerAddr.String(),
+		callerAddr,
 		pairID.Token0,
 		pairID.Token1,
 		tokenIn,
 		pairID.MustOppositeToken(tokenIn),
+		amountToCancel,
 		trancheKey,
-		amountToCancel.String(),
 	))
 
 	return nil
@@ -573,7 +570,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		pairID.Token1,
 		tokenIn,
 		tokenOut,
-		amountOutTokenOut,
+		amountOutTokenOut.TruncateInt(),
 		trancheKey,
 	))
 

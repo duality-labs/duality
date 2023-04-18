@@ -264,20 +264,20 @@ func CalcFee(upperTickIndex, lowerTickIndex int64) int64 {
 	return (upperTickIndex - lowerTickIndex) / 2
 }
 
-func (k Keeper) SavePool(sdkCtx sdk.Context, pool Pool) {
+func (k Keeper) SavePool(ctx sdk.Context, pool Pool) {
 	if pool.LowerTick0.HasToken() {
-		k.SetPoolReserves(sdkCtx, *pool.LowerTick0)
+		k.SetPoolReserves(ctx, *pool.LowerTick0)
 	} else {
-		k.RemovePoolReserves(sdkCtx, *pool.LowerTick0)
+		k.RemovePoolReserves(ctx, *pool.LowerTick0)
 	}
 	if pool.UpperTick1.HasToken() {
-		k.SetPoolReserves(sdkCtx, *pool.UpperTick1)
+		k.SetPoolReserves(ctx, *pool.UpperTick1)
 	} else {
-		k.RemovePoolReserves(sdkCtx, *pool.UpperTick1)
+		k.RemovePoolReserves(ctx, *pool.UpperTick1)
 	}
 
 	// TODO: this will create a bit of extra noise since not every Save is updating both ticks
-	// this should be solved upstream by better tracking of dirty ticks
+	// This should be solved upstream by better tracking of dirty ticks
 	ctx.EventManager().EmitEvent(types.CreateTickUpdatePoolReserves(*pool.LowerTick0))
 	ctx.EventManager().EmitEvent(types.CreateTickUpdatePoolReserves(*pool.UpperTick1))
 }

@@ -308,7 +308,7 @@ const (
 	PlaceLimitOrderEventTokenIn    = "TokenIn"
 	PlaceLimitOrderEventTokenOut   = "TokenOut"
 	PlaceLimitOrderEventAmountIn   = "AmountIn"
-	PlaceLimitOrderEventLimitPrice = "LimitPrice"
+	PlaceLimitOrderEventLimitTick  = "LimitTick"
 	PlaceLimitOrderEventOrderType  = "OrderType"
 	PlaceLimitOrderEventShares     = "Shares"
 	PlaceLimitOrderEventTrancheKey = "TrancheKey"
