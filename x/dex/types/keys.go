@@ -247,87 +247,113 @@ func LimitOrderExpirationKey(
 
 // Deposit Event Attributes
 const (
-	DepositEventKey          = "NewDeposit"
-	DepositEventCreator      = "Creator"
-	DepositEventToken0       = "Token0"
-	DepositEventToken1       = "Token1"
-	DepositEventPrice        = "TickIndex"
-	DepositEventFee          = "Fee"
-	DepositEventReceiver     = "Receiver"
-	DepositEventOldReserves0 = "OldReserves0"
-	DepositEventOldReserves1 = "OldReserves1"
-	DepositEventNewReserves0 = "NewReserves0"
-	DepositEventNewReserves1 = "NewReserves1"
-	DepositEventSharesMinted = "SharesMinted"
+	DepositEventKey                = "Deposit"
+	DepositEventCreator            = "Creator"
+	DepositEventToken0             = "Token0"
+	DepositEventToken1             = "Token1"
+	DepositEventPrice              = "TickIndex"
+	DepositEventFee                = "Fee"
+	DepositEventReceiver           = "Receiver"
+	DepositEventReserves0Deposited = "Reserves0Deposited"
+	DepositEventReserves1Deposited = "Reserves1Deposited"
+	DepositEventSharesMinted       = "SharesMinted"
 )
 
 // Withdraw Event Attributes
 const (
-	WithdrawEventKey           = "NewWithdraw"
-	WithdrawEventCreator       = "Creator"
-	WithdrawEventToken0        = "Token0"
-	WithdrawEventToken1        = "Token1"
-	WithdrawEventPrice         = "TickIndex"
-	WithdrawEventFee           = "Fee"
-	WithdrawEventReceiver      = "Receiver"
-	WithdrawEventOldReserves0  = "OldReserves0"
-	WithdrawEventOldReserves1  = "OldReserves1"
-	WithdrawEventNewReserves0  = "NewReserves0"
-	WithdrawEventNewReserves1  = "NewReserves1"
-	WithdrawEventSharesRemoved = "SharesRemoved"
+	WithdrawEventKey                = "Withdraw"
+	WithdrawEventCreator            = "Creator"
+	WithdrawEventToken0             = "Token0"
+	WithdrawEventToken1             = "Token1"
+	WithdrawEventPrice              = "TickIndex"
+	WithdrawEventFee                = "Fee"
+	WithdrawEventReceiver           = "Receiver"
+	WithdrawEventReserves0Withdrawn = "Reserves0Withdrawn"
+	WithdrawEventReserves1Withdrawn = "Reserves1Withdrawn"
+	WithdrawEventSharesRemoved      = "SharesRemoved"
 )
 
+// Swap Event Attributes
 const (
-	SwapEventKey      = "NewSwap"
+	SwapEventKey      = "Swap"
 	SwapEventCreator  = "Creator"
 	SwapEventReceiver = "Receiver"
+	SwapEventToken0   = "Token0"
+	SwapEventToken1   = "Token1"
 	SwapEventTokenIn  = "TokenIn"
 	SwapEventTokenOut = "TokenOut"
 	SwapEventAmountIn = "AmountIn"
 	SwapEventAmoutOut = "AmountOut"
 )
 
+// Multihop-Swap Event Attributes
 const (
-	MultihopSwapEventKey      = "NewMultihopSwap"
-	MultihopSwapEventCreator  = "Creator"
-	MultihopSwapEventReceiver = "Receiver"
-	MultihopSwapEventCoinIn   = "CoinIn"
-	MultihopSwapEventCoinOut  = "CoinOut"
-	MultihopSwapEventRoute    = "Route"
+	MultihopSwapEventKey       = "MultihopSwap"
+	MultihopSwapEventCreator   = "Creator"
+	MultihopSwapEventReceiver  = "Receiver"
+	MultihopSwapEventTokenIn   = "TokenIn"
+	MultihopSwapEventTokenOut  = "TokenOut"
+	MultihopSwapEventAmountIn  = "AmountIn"
+	MultihopSwapEventAmountOut = "AmountOut"
+	MultihopSwapEventRoute     = "Route"
 )
 
+// Place LimitOrder Event Attributes
 const (
-	PlaceLimitOrderEventKey        = "NewPlaceLimitOrder"
+	PlaceLimitOrderEventKey        = "PlaceLimitOrder"
 	PlaceLimitOrderEventCreator    = "Creator"
 	PlaceLimitOrderEventReceiver   = "Receiver"
+	PlaceLimitOrderEventToken0     = "Token0"
+	PlaceLimitOrderEventToken1     = "Token1"
 	PlaceLimitOrderEventTokenIn    = "TokenIn"
 	PlaceLimitOrderEventTokenOut   = "TokenOut"
 	PlaceLimitOrderEventAmountIn   = "AmountIn"
+	PlaceLimitOrderEventLimitTick  = "LimitTick"
+	PlaceLimitOrderEventOrderType  = "OrderType"
 	PlaceLimitOrderEventShares     = "Shares"
 	PlaceLimitOrderEventTrancheKey = "TrancheKey"
 )
 
+// Withdraw LimitOrder Event Attributes
 const (
-	WithdrawFilledLimitOrderEventKey        = "NewWithdraw"
+	WithdrawFilledLimitOrderEventKey        = "Withdraw"
 	WithdrawFilledLimitOrderEventCreator    = "Creator"
+	WithdrawFilledLimitOrderEventToken0     = "Token0"
+	WithdrawFilledLimitOrderEventToken1     = "Token1"
 	WithdrawFilledLimitOrderEventTokenIn    = "TokenIn"
 	WithdrawFilledLimitOrderEventTokenOut   = "TokenOut"
 	WithdrawFilledLimitOrderEventTrancheKey = "TrancheKey"
 	WithdrawFilledLimitOrderEventAmountOut  = "AmountOut"
 )
 
+// Cancel LimitOrder Event Attributes
 const (
-	GoodTilPurgeHitGasLimitEventKey = "GoodTilPurgeHitGasLimit"
-	GoodTilPurgeHitGasLimitEventGas = "Gas"
-)
-
-const (
-	CancelLimitOrderEventKey        = "NewWithdraw"
+	CancelLimitOrderEventKey        = "Withdraw"
 	CancelLimitOrderEventCreator    = "Creator"
+	CancelLimitOrderEventToken0     = "Token0"
+	CancelLimitOrderEventToken1     = "Token1"
 	CancelLimitOrderEventTokenIn    = "TokenIn"
 	CancelLimitOrderEventTokenOut   = "TokenOut"
 	CancelLimitOrderEventTrancheKey = "TrancheKey"
 	CancelLimitOrderEventAmountOut  = "AmountOut"
+)
+
+// Tick Update Event Attributes
+const (
+	EventTypeTickUpdate       = "TickUpdate"
+	TickUpdateEventKey        = "TickUpdate"
+	TickUpdateEventToken0     = "Token0"
+	TickUpdateEventToken1     = "Token1"
+	TickUpdateEventTokenIn    = "TokenIn"
+	TickUpdateEventTickIndex  = "TickIndex"
+	TickUpdateEventFee        = "Fee"
+	TickUpdateEventTrancheKey = "TrancheKey"
+	TickUpdateEventReserves   = "Reserves"
+)
+
+const (
+	GoodTilPurgeHitGasLimitEventKey = "GoodTilPurgeHitGasLimit"
+	GoodTilPurgeHitGasLimitEventGas = "Gas"
 )
 
 const (
