@@ -137,13 +137,13 @@ func (k Keeper) Swap(ctx sdk.Context,
 	pairID *types.PairID,
 	tokenIn string,
 	tokenOut string,
-	amountIn sdk.Int,
+	maxAmountIn sdk.Int,
 	maxAmountOut sdk.Int,
 	limitPrice *sdk.Dec,
 ) (totalInCoin, totalOutCoin sdk.Coin, err error) {
 	pair := types.NewDirectionalTradingPair(pairID, tokenIn, tokenOut)
 
-	remainingIn := amountIn
+	remainingIn := maxAmountIn
 	totalOut := sdk.ZeroInt()
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
@@ -167,7 +167,7 @@ func (k Keeper) Swap(ctx sdk.Context,
 
 		k.SaveLiquidity(ctx, liq)
 	}
-	totalIn := amountIn.Sub(remainingIn)
+	totalIn := maxAmountIn.Sub(remainingIn)
 
 	return sdk.NewCoin(tokenIn, totalIn), sdk.NewCoin(tokenOut, totalOut), nil
 }
@@ -196,12 +196,12 @@ func (k Keeper) SwapWithCache(
 	pairID *types.PairID,
 	tokenIn string,
 	tokenOut string,
-	amountIn sdk.Int,
+	maxAmountIn sdk.Int,
 	maxAmountOut sdk.Int,
 	limitPrice *sdk.Dec,
 ) (totalIn, totalOut sdk.Coin, err error) {
 	cacheCtx, writeCache := ctx.CacheContext()
-	totalIn, totalOut, err = k.Swap(cacheCtx, pairID, tokenIn, tokenOut, amountIn, maxAmountOut, limitPrice)
+	totalIn, totalOut, err = k.Swap(cacheCtx, pairID, tokenIn, tokenOut, maxAmountIn, maxAmountOut, limitPrice)
 
 	writeCache()
 

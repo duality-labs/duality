@@ -679,11 +679,11 @@ func (s *MsgServerTestSuite) danMarketSells(selling string, amountIn int) {
 func (s *MsgServerTestSuite) marketSells(account sdk.AccAddress, selling string, amountIn int) {
 	tokenIn, tokenOut := GetInOutTokens(selling, "TokenA", "TokenB")
 	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
-		Creator:  account.String(),
-		Receiver: account.String(),
-		TokenIn:  tokenIn,
-		TokenOut: tokenOut,
-		AmountIn: sdk.NewInt(int64(amountIn)),
+		Creator:     account.String(),
+		Receiver:    account.String(),
+		TokenIn:     tokenIn,
+		TokenOut:    tokenOut,
+		MaxAmountIn: sdk.NewInt(int64(amountIn)),
 	})
 	s.Assert().Nil(err)
 }
@@ -711,7 +711,7 @@ func (s *MsgServerTestSuite) marketSellsWithMaxOut(account sdk.AccAddress, selli
 		Receiver:     account.String(),
 		TokenIn:      tokenIn,
 		TokenOut:     tokenOut,
-		AmountIn:     sdk.NewInt(int64(amountIn)),
+		MaxAmountIn:  sdk.NewInt(int64(amountIn)),
 		MaxAmountOut: sdk.NewInt(int64(maxAmountOut)),
 	})
 	s.Assert().Nil(err)
@@ -736,11 +736,11 @@ func (s *MsgServerTestSuite) danMarketSellFails(err error, selling string, amoun
 func (s *MsgServerTestSuite) marketSellFails(account sdk.AccAddress, expectedErr error, selling string, amountIn int) {
 	tokenIn, tokenOut := GetInOutTokens(selling, "TokenA", "TokenB")
 	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
-		Creator:  account.String(),
-		Receiver: account.String(),
-		TokenIn:  tokenIn,
-		TokenOut: tokenOut,
-		AmountIn: sdk.NewInt(int64(amountIn)),
+		Creator:     account.String(),
+		Receiver:    account.String(),
+		TokenIn:     tokenIn,
+		TokenOut:    tokenOut,
+		MaxAmountIn: sdk.NewInt(int64(amountIn)),
 	})
 	s.Assert().ErrorIs(err, expectedErr)
 }

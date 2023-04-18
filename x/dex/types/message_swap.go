@@ -12,7 +12,7 @@ var _ sdk.Msg = &MsgSwap{}
 func NewMsgSwap(creator, tokenIn, tokenOut string, amountIn sdk.Int, maxAmountOut sdk.Int, receiver string) *MsgSwap {
 	return &MsgSwap{
 		Creator:      creator,
-		AmountIn:     amountIn,
+		MaxAmountIn:  amountIn,
 		TokenIn:      tokenIn,
 		TokenOut:     tokenOut,
 		Receiver:     receiver,
@@ -53,7 +53,7 @@ func (msg *MsgSwap) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
-	if !msg.AmountIn.IsPositive() {
+	if !msg.MaxAmountIn.IsPositive() {
 		return ErrZeroSwap
 	}
 

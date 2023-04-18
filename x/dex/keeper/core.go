@@ -226,7 +226,7 @@ func (k Keeper) WithdrawCore(
 func (k Keeper) SwapCore(goCtx context.Context,
 	tokenIn string,
 	tokenOut string,
-	amountIn sdk.Int,
+	maxAmountIn sdk.Int,
 	maxAmountOut sdk.Int,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
@@ -238,7 +238,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		return sdk.Coin{}, err
 	}
 
-	coinIn, coinOut, err := k.SwapWithCache(ctx, pairID, tokenIn, tokenOut, amountIn, maxAmountOut, nil)
+	coinIn, coinOut, err := k.SwapWithCache(ctx, pairID, tokenIn, tokenOut, maxAmountIn, maxAmountOut, nil)
 	if err != nil {
 		return sdk.Coin{}, err
 	}
@@ -267,7 +267,7 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		pairID.Token1,
 		tokenIn,
 		tokenOut,
-		amountIn,
+		coinIn.Amount,
 		coinOut.Amount))
 
 	return coinOut, nil
@@ -348,7 +348,6 @@ func (k Keeper) PlaceLimitOrderCore(
 	tokenIn string,
 	tokenOut string,
 	amountIn sdk.Int,
-	maxAmountOut sdk.Int,
 	tickIndex int64,
 	orderType types.LimitOrderType,
 	goodTil *time.Time,
@@ -388,7 +387,7 @@ func (k Keeper) PlaceLimitOrderCore(
 			tokenIn,
 			tokenOut,
 			amountIn,
-			maxAmountOut,
+			sdk.ZeroInt(),
 			&limitPrice,
 		)
 		if err != nil {

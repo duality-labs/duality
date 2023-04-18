@@ -84,8 +84,8 @@ message MsgSwap {
   string receiver = 2;
   string tokenIn = 3;
   string tokenOut = 4;
-  string amountIn = 5 [
-      (gogoproto.moretags)   = "yaml:\"amountIn\"",
+  string maxAmountIn = 5 [
+      (gogoproto.moretags)   = "yaml:\"maxAmountIn\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountIn"
@@ -93,10 +93,10 @@ message MsgSwap {
   // Optional argument to specify a specific amount out for a trade.
   // swap will stop as soon as amountOut is reached.
   string maxAmountOut = 6 [
-                        (gogoproto.moretags)   = "yaml:\"amountOut\"",
+                        (gogoproto.moretags)   = "yaml:\"maxAmountOut\"",
                         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
                         (gogoproto.nullable)   = false,
-                        (gogoproto.jsontag) = "amountOut"
+                        (gogoproto.jsontag) = "maxAmountOut"
                         ];
 
 }
@@ -135,16 +135,6 @@ message MsgPlaceLimitOrder {
                                              (gogoproto.stdtime) = true,
                                              (gogoproto.nullable) = true
                                              ];
-
-  // Optional argument to specify a specific amount out for a trade.
-  // swap will stop as soon as amountOut is reached.
-  // Only available for FoK or IoC
-  string maxAmountOut = 6 [
-                           (gogoproto.moretags)   = "yaml:\"amountOut\"",
-                           (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-                           (gogoproto.nullable)   = false,
-                           (gogoproto.jsontag) = "amountOut"
-                           ];
 }
 
 message MsgPlaceLimitOrderResponse {

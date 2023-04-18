@@ -360,11 +360,6 @@ func (s *TxTestSuite) TestTx4Cmd4PlaceLimitOrder() {
 			args:     []string{s.addr1.String(), "TokenB", "TokenA", "[0]", "10", "GOOD_TIL_TIME", "06/15/2025 02:00:00"},
 			errInRes: false,
 		},
-		{
-			name:     "valid maxAmountOut",
-			args:     []string{s.addr1.String(), "TokenB", "TokenA", "[0]", "10", "IMMEDIATE_OR_CANCEL", "--max-amount-out=10"},
-			errInRes: false,
-		},
 	}
 
 	for _, tc := range testCases {
