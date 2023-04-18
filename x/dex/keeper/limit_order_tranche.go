@@ -31,13 +31,15 @@ func (k Keeper) FindLimitOrderTranche(
 	return types.LimitOrderTranche{}, false, false
 }
 
-func (k Keeper) SaveTranche(sdkCtx sdk.Context, tranche types.LimitOrderTranche) {
+func (k Keeper) SaveTranche(ctx sdk.Context, tranche types.LimitOrderTranche) {
 	if tranche.HasTokenIn() {
-		k.SetLimitOrderTranche(sdkCtx, tranche)
+		k.SetLimitOrderTranche(ctx, tranche)
 	} else {
-		k.SetInactiveLimitOrderTranche(sdkCtx, tranche)
-		k.RemoveLimitOrderTranche(sdkCtx, tranche)
+		k.SetInactiveLimitOrderTranche(ctx, tranche)
+		k.RemoveLimitOrderTranche(ctx, tranche)
 	}
+
+	ctx.EventManager().EmitEvent(types.CreateTickUpdateLimitOrderTranche(tranche))
 }
 
 func (k Keeper) SetLimitOrderTranche(ctx sdk.Context, tranche types.LimitOrderTranche) {

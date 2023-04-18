@@ -2,8 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
-	"strings"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -97,17 +95,15 @@ func (k Keeper) DepositCore(
 		totalAmountReserve1 = totalAmountReserve1.Add(inAmount1)
 
 		ctx.EventManager().EmitEvent(types.CreateDepositEvent(
-			callerAddr.String(),
-			receiverAddr.String(),
+			callerAddr,
+			receiverAddr,
 			token0,
 			token1,
-			fmt.Sprint(tickIndices[i]),
-			fmt.Sprint(fees[i]),
-			pool.GetLowerReserve0().Sub(inAmount0).String(),
-			pool.GetUpperReserve1().Sub(inAmount1).String(),
-			pool.GetLowerReserve0().String(),
-			pool.GetUpperReserve1().String(),
-			outShares.String(),
+			tickIndex,
+			fee,
+			inAmount0,
+			inAmount1,
+			outShares.Amount,
 		))
 	}
 
@@ -182,17 +178,15 @@ func (k Keeper) WithdrawCore(
 		totalReserve1ToRemove = totalReserve1ToRemove.Add(outAmount1)
 
 		ctx.EventManager().EmitEvent(types.CreateWithdrawEvent(
-			callerAddr.String(),
-			receiverAddr.String(),
+			callerAddr,
+			receiverAddr,
 			token0,
 			token1,
-			fmt.Sprint(tickIndices[i]),
-			fmt.Sprint(fees[i]),
-			pool.LowerTick0.Reserves.Add(outAmount0).String(),
-			pool.UpperTick1.Reserves.Add(outAmount1).String(),
-			pool.LowerTick0.Reserves.String(),
-			pool.UpperTick1.Reserves.String(),
-			sharesToRemove.String(),
+			tickIndex,
+			fee,
+			outAmount0,
+			outAmount1,
+			sharesToRemove,
 		))
 	}
 
@@ -265,8 +259,15 @@ func (k Keeper) SwapCore(goCtx context.Context,
 		return sdk.Coin{}, err
 	}
 
-	ctx.EventManager().EmitEvent(types.CreateSwapEvent(callerAddr.String(), receiverAddr.String(),
-		tokenIn, tokenOut, amountIn.String(), coinOut.Amount.String()))
+	ctx.EventManager().EmitEvent(types.CreateSwapEvent(
+		callerAddr,
+		receiverAddr,
+		pairID.Token0,
+		pairID.Token1,
+		tokenIn,
+		tokenOut,
+		amountIn,
+		coinOut.Amount))
 
 	return coinOut, nil
 }
@@ -326,8 +327,15 @@ func (k Keeper) MultiHopSwapCore(
 	if err != nil {
 		return sdk.Coin{}, err
 	}
-	ctx.EventManager().EmitEvent(types.CreateMultihopSwapEvent(callerAddr.String(), receiverAddr.String(),
-		initialInCoin.String(), bestRoute.coinOut.String(), strings.Join(bestRoute.route, ",")))
+	ctx.EventManager().EmitEvent(types.CreateMultihopSwapEvent(
+		callerAddr,
+		receiverAddr,
+		initialInCoin.Denom,
+		bestRoute.coinOut.Denom,
+		initialInCoin.Amount,
+		bestRoute.coinOut.Amount,
+		bestRoute.route,
+	))
 
 	return coinOut, nil
 }
@@ -434,12 +442,16 @@ func (k Keeper) PlaceLimitOrderCore(
 	}
 
 	ctx.EventManager().EmitEvent(types.CreatePlaceLimitOrderEvent(
-		callerAddr.String(),
-		receiverAddr.String(),
+		callerAddr,
+		receiverAddr,
+		pairID.Token0,
+		pairID.Token1,
 		tokenIn,
 		tokenOut,
-		totalIn.String(),
-		sharesIssued.String(),
+		totalIn,
+		tickIndex,
+		orderType.String(),
+		sharesIssued,
 		trancheKey,
 	))
 
@@ -493,11 +505,13 @@ func (k Keeper) CancelLimitOrderCore(
 	}
 
 	ctx.EventManager().EmitEvent(types.CancelLimitOrderEvent(
-		callerAddr.String(),
+		callerAddr,
+		pairID.Token0,
+		pairID.Token1,
 		tokenIn,
 		pairID.MustOppositeToken(tokenIn),
+		amountToCancel,
 		trancheKey,
-		amountToCancel.String(),
 	))
 
 	return nil
@@ -558,11 +572,13 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	}
 
 	ctx.EventManager().EmitEvent(types.WithdrawFilledLimitOrderEvent(
-		callerAddr.String(),
+		callerAddr,
+		pairID.Token0,
+		pairID.Token1,
 		tokenIn,
 		tokenOut,
+		amountOutTokenOut.TruncateInt(),
 		trancheKey,
-		amountOutTokenOut.String(),
 	))
 
 	return nil
