@@ -12490,16 +12490,6 @@ paths:
           in: query
           required: false
           type: boolean
-        - name: pagination.reverse
-          description: >-
-            reverse is set to true if results are to be returned in the
-            descending order.
-
-
-            Since: cosmos-sdk 0.43
-          in: query
-          required: false
-          type: boolean
       tags:
         - Query
   '/dualitylabs/duality/incentives/v1beta1/gauges/{id}':
@@ -13266,8 +13256,6 @@ paths:
                       type: string
                     sharesCancelled:
                       type: string
-                    takerReserves:
-                      type: string
                     orderType:
                       type: string
                       enum:
@@ -13405,8 +13393,6 @@ paths:
                   sharesWithdrawn:
                     type: string
                   sharesCancelled:
-                    type: string
-                  takerReserves:
                     type: string
                   orderType:
                     type: string
@@ -13962,8 +13948,6 @@ paths:
                       type: string
                     sharesCancelled:
                       type: string
-                    takerReserves:
-                      type: string
                     orderType:
                       type: string
                       enum:
@@ -14063,8 +14047,6 @@ paths:
                         sharesWithdrawn:
                           type: string
                         sharesCancelled:
-                          type: string
-                        takerReserves:
                           type: string
                         orderType:
                           type: string
@@ -37630,8 +37612,6 @@ definitions:
         type: string
       sharesCancelled:
         type: string
-      takerReserves:
-        type: string
       orderType:
         type: string
         enum:
@@ -37904,8 +37884,6 @@ definitions:
               type: string
             sharesCancelled:
               type: string
-            takerReserves:
-              type: string
             orderType:
               type: string
               enum:
@@ -38143,8 +38121,6 @@ definitions:
               type: string
             sharesCancelled:
               type: string
-            takerReserves:
-              type: string
             orderType:
               type: string
               enum:
@@ -38270,8 +38246,6 @@ definitions:
             type: string
           sharesCancelled:
             type: string
-          takerReserves:
-            type: string
           orderType:
             type: string
             enum:
@@ -38362,8 +38336,6 @@ definitions:
                 sharesWithdrawn:
                   type: string
                 sharesCancelled:
-                  type: string
-                takerReserves:
                   type: string
                 orderType:
                   type: string
@@ -38500,8 +38472,6 @@ definitions:
             sharesWithdrawn:
               type: string
             sharesCancelled:
-              type: string
-            takerReserves:
               type: string
             orderType:
               type: string

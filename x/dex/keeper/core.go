@@ -395,7 +395,17 @@ func (k Keeper) PlaceLimitOrderCore(
 		totalIn = coinInSwap.Amount
 		amountLeft = amountLeft.Sub(coinInSwap.Amount)
 
-		trancheUser.TakerReserves = coinOutSwap.Amount
+		if coinOutSwap.IsPositive() {
+			err = k.bankKeeper.SendCoinsFromModuleToAccount(
+				ctx,
+				types.ModuleName,
+				receiverAddr,
+				sdk.Coins{coinOutSwap},
+			)
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	if amountLeft.IsPositive() && orderType.IsFoK() {
@@ -423,9 +433,9 @@ func (k Keeper) PlaceLimitOrderCore(
 	k.SaveTrancheUser(ctx, trancheUser)
 
 	if totalIn.IsPositive() {
-		coin0 := sdk.NewCoin(tokenIn, totalIn)
+		coinIn := sdk.NewCoin(tokenIn, totalIn)
 
-		err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0})
+		err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn})
 		if err != nil {
 			return nil, err
 		}
@@ -546,9 +556,6 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 
 		trancheUser.SharesWithdrawn = trancheUser.SharesWithdrawn.Add(amountOutTokenIn)
 	}
-
-	takerReserves := trancheUser.WithdrawTakerReserves()
-	amountOutTokenOut = amountOutTokenOut.Add(takerReserves.ToDec())
 
 	k.SaveTrancheUser(ctx, trancheUser)
 
