@@ -27,7 +27,6 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 		SharesOwned:     sdk.NewInt(10),
 		SharesWithdrawn: sdk.NewInt(0),
 		SharesCancelled: sdk.NewInt(0),
-		TakerReserves:   sdk.ZeroInt(),
 	},
 		LOList[0],
 	)
@@ -40,7 +39,6 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 		SharesOwned:     sdk.NewInt(10),
 		SharesWithdrawn: sdk.NewInt(0),
 		SharesCancelled: sdk.NewInt(0),
-		TakerReserves:   sdk.ZeroInt(),
 	},
 		LOList[1],
 	)

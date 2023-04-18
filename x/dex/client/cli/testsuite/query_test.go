@@ -129,7 +129,6 @@ var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 		SharesOwned:     sdk.NewInt(10),
 		SharesWithdrawn: sdk.NewInt(0),
 		SharesCancelled: sdk.NewInt(0),
-		TakerReserves:   sdk.ZeroInt(),
 	},
 	{
 		PairID:          &types.PairID{Token0: "TokenA", Token1: "TokenB"},
@@ -140,7 +139,6 @@ var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 		SharesOwned:     sdk.NewInt(10),
 		SharesWithdrawn: sdk.NewInt(0),
 		SharesCancelled: sdk.NewInt(0),
-		TakerReserves:   sdk.ZeroInt(),
 	},
 }
 

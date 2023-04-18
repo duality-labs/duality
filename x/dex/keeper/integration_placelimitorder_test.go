@@ -418,19 +418,14 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFoKWithLPFills() {
 	// GIVEN LP liq at tick -1
 	s.bobDeposits(NewDeposit(0, 20, -1, 1))
 	// WHEN alice submits FoK limitOrder
-	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_FILL_OR_KILL)
-	s.assertAliceBalances(0, 0)
-	// THEN alice's LimitOrder fills via swap
+	s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_FILL_OR_KILL)
+	// THEN alice's LimitOrder fills via swap and auto-withdraws
+	s.assertDexBalances(10, 10)
+	s.assertAliceBalances(0, 10)
 
 	// No maker LO is placed
 	s.assertFillAndPlaceTrancheKeys("TokenA", 1, "", "")
 	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
-	s.assertDexBalances(10, 20)
-
-	// Alice can withdraw immediately
-	s.aliceWithdrawsLimitSell(trancheKey)
-	s.assertDexBalances(10, 10)
-	s.assertAliceBalances(0, 10)
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderFoKFailsWithInsufficientLiq() {
@@ -467,17 +462,15 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPFills() {
 	// GIVEN LP liq at tick -1
 	s.bobDeposits(NewDeposit(0, 20, -1, 1))
 	// WHEN alice submits IoC limitOrder
-	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
-	s.assertAliceBalances(0, 0)
-	// THEN alice's LimitOrder fills via swap
-	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
-	s.assertDexBalances(10, 20)
-	// No maker LO is placed
-	s.assertFillAndPlaceTrancheKeys("TokenA", 1, "", "")
-	// Alice can withdraw immediately
-	s.aliceWithdrawsLimitSell(trancheKey)
+	s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
+
+	// THEN alice's LimitOrder fills via swap and auto-withdraws
 	s.assertDexBalances(10, 10)
 	s.assertAliceBalances(0, 10)
+
+	// No maker LO is placed
+	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
+	s.assertFillAndPlaceTrancheKeys("TokenA", 1, "", "")
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPPartialFill() {
@@ -486,19 +479,15 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPPartialFill() {
 	// GIVEN LP of 5 tokenB at tick -1
 	s.bobDeposits(NewDeposit(0, 5, -1, 1))
 	// WHEN alice submits IoC limitOrder for 10 tokenA
-	trancheKey := s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
-	s.assertAliceBalances(5, 0)
-	// THEN alice's LimitOrder swap 5 TokenA
+	s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
+
+	// THEN alice's LimitOrder swaps 5 TokenA and auto-withdraws
+	s.assertDexBalances(5, 0)
+	s.assertAliceBalances(5, 5)
 
 	// No maker LO is placed
 	s.assertFillAndPlaceTrancheKeys("TokenA", 1, "", "")
 	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
-	s.assertDexBalances(5, 5)
-
-	// Alice can withdraw her partial fill immediately
-	s.aliceWithdrawsLimitSell(trancheKey)
-	s.assertDexBalances(5, 0)
-	s.assertAliceBalances(5, 5)
 }
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPNoFill() {
