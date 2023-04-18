@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/x/dex/utils"
 )
 
 func (t LimitOrderTranche) IsPlaceTranche() bool {
@@ -99,27 +100,28 @@ func (t *LimitOrderTranche) Withdraw(trancheUser LimitOrderTrancheUser) (sdk.Int
 	return amountOutTokenIn, amountOutTokenOut
 }
 
-func (t *LimitOrderTranche) Swap(maxAmountTaker sdk.Int, maxAmountOut *sdk.Int) (
+func (t *LimitOrderTranche) Swap(maxAmountTakerIn sdk.Int, maxAmountOut *sdk.Int) (
 	inAmount sdk.Int,
 	outAmount sdk.Int,
 ) {
 	reservesTokenOut := &t.ReservesTokenIn
 	fillTokenIn := &t.ReservesTokenOut
 	totalTokenIn := &t.TotalTokenOut
-	amountFilledTokenOut := t.PriceTakerToMaker().MulInt(maxAmountTaker).TruncateInt()
-	if reservesTokenOut.LTE(amountFilledTokenOut) {
-		inAmount = t.PriceMakerToTaker().MulInt(*reservesTokenOut).Ceil().TruncateInt()
-		outAmount = *reservesTokenOut
-		*reservesTokenOut = sdk.ZeroInt()
-		*fillTokenIn = fillTokenIn.Add(inAmount)
-		*totalTokenIn = totalTokenIn.Add(inAmount)
-	} else {
-		inAmount = maxAmountTaker
-		outAmount = amountFilledTokenOut
-		*fillTokenIn = fillTokenIn.Add(maxAmountTaker)
-		*totalTokenIn = totalTokenIn.Add(maxAmountTaker)
-		*reservesTokenOut = reservesTokenOut.Sub(amountFilledTokenOut)
+	maxOutGivenIn := t.PriceTakerToMaker().MulInt(maxAmountTakerIn).TruncateInt()
+	possibleOutAmounts := []sdk.Int{*reservesTokenOut, maxOutGivenIn}
+	if maxAmountOut != nil {
+		possibleOutAmounts = append(possibleOutAmounts, *maxAmountOut)
 	}
+	outAmount = utils.MinIntArr(possibleOutAmounts)
+	if outAmount == maxOutGivenIn {
+		inAmount = maxAmountTakerIn
+	} else {
+		inAmount = t.PriceMakerToTaker().MulInt(outAmount).Ceil().TruncateInt()
+	}
+
+	*fillTokenIn = fillTokenIn.Add(inAmount)
+	*totalTokenIn = totalTokenIn.Add(inAmount)
+	*reservesTokenOut = reservesTokenOut.Sub(outAmount)
 
 	return inAmount, outAmount
 }

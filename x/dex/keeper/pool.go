@@ -67,8 +67,8 @@ func (p *Pool) Swap0To1(maxAmount0 sdk.Int, maxAmountOut1 *sdk.Int) (inAmount0, 
 
 	reserves0 := &p.LowerTick0.Reserves
 
-	maxAmount1 := p.Price0To1Upper.MulInt(maxAmount0).TruncateInt()
-	possibleOutAmounts := []sdk.Int{*reserves1, maxAmount1}
+	maxOutGivenIn1 := p.Price0To1Upper.MulInt(maxAmount0).TruncateInt()
+	possibleOutAmounts := []sdk.Int{*reserves1, maxOutGivenIn1}
 	if maxAmountOut1 != nil {
 		possibleOutAmounts = append(possibleOutAmounts, *maxAmountOut1)
 	}
@@ -80,7 +80,7 @@ func (p *Pool) Swap0To1(maxAmount0 sdk.Int, maxAmountOut1 *sdk.Int) (inAmount0, 
 	outAmount1 = utils.MinIntArr(possibleOutAmounts)
 
 	// we can skip price calc if we are using maxAmount1, since we already know it
-	if outAmount1 == maxAmount1 {
+	if outAmount1 == maxOutGivenIn1 {
 		inAmount0 = maxAmount0
 	} else {
 		inAmount0 = p.Price0To1Upper.Inv().MulInt(outAmount1).Ceil().TruncateInt()
