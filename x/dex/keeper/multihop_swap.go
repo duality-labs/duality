@@ -103,6 +103,7 @@ func (k Keeper) MultihopStep(
 		step.TradingPair.TokenIn,
 		step.TradingPair.TokenOut,
 		inCoin.Amount,
+		sdk.ZeroInt(),
 		nil,
 	)
 	ctxBranch := bctx.Branch()

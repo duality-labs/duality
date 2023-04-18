@@ -34,7 +34,6 @@ func CmdPlaceLimitOrder() *cobra.Command {
 			if err != nil {
 				return err
 			}
-
 			argAmountIn := args[4]
 
 			amountInInt, ok := sdk.NewIntFromString(argAmountIn)

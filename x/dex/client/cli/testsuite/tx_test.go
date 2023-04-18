@@ -261,21 +261,26 @@ func (s *TxTestSuite) TestTx3CmdSwap() {
 		errInRes  bool
 	}{
 		{
-			// "swap [receiver] [amount-in] [token-in] [token-out]",
+			// "swap [receiver] [amount-in] [token-in] [token-out] ?(--max-amount-out)",
 			name:      "missing arguments",
 			args:      []string{s.addr1.String(), "5", "TokenA"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 4 arg(s), received 3",
+			expErrMsg: "accepts 4 arg(s), received 3",
 		},
 		{
 			name:      "too many arguments",
 			args:      []string{s.addr1.String(), "5", "TokenA", "TokenB", "BADARG"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 4 arg(s), received 5",
+			expErrMsg: "accepts 4 arg(s), received 5",
 		},
 		{
 			name:     "valid",
 			args:     []string{s.addr1.String(), "2", "TokenA", "TokenB"},
+			errInRes: false,
+		},
+		{
+			name:     "valid with amountOut",
+			args:     []string{s.addr1.String(), "2", "TokenA", "TokenB", "--max-amount-out=10"},
 			errInRes: false,
 		},
 	}
@@ -321,7 +326,7 @@ func (s *TxTestSuite) TestTx4Cmd4PlaceLimitOrder() {
 		errInRes  bool
 	}{
 		{
-			// "place-limit-order [receiver] [token-in] [token-out] [tick-index] [amount-in] ?[order-type] ?[expirationTime]"
+			// "place-limit-order [receiver] [token-in] [token-out] [tick-index] [amount-in] ?[order-type] ?[expirationTime] ?(--max-amout-out)"
 			name:      "missing arguments",
 			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]"},
 			expErr:    true,

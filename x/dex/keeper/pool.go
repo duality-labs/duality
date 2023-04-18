@@ -59,7 +59,7 @@ func (p *Pool) GetUpperReserve1() sdk.Int {
 	return p.UpperTick1.Reserves
 }
 
-func (p *Pool) Swap0To1(maxAmount0 sdk.Int) (inAmount0, outAmount1 sdk.Int) {
+func (p *Pool) Swap0To1(maxAmount0 sdk.Int, maxAmountOut1 sdk.Int) (inAmount0, outAmount1 sdk.Int) {
 	reserves1 := &p.UpperTick1.Reserves
 	if maxAmount0.Equal(sdk.ZeroInt()) || reserves1.Equal(sdk.ZeroInt()) {
 		return sdk.ZeroInt(), sdk.ZeroInt()
@@ -67,23 +67,32 @@ func (p *Pool) Swap0To1(maxAmount0 sdk.Int) (inAmount0, outAmount1 sdk.Int) {
 
 	reserves0 := &p.LowerTick0.Reserves
 
-	maxAmount1 := p.Price0To1Upper.MulInt(maxAmount0).TruncateInt()
-	if reserves1.LTE(maxAmount1) {
-		outAmount1 = *reserves1
-		inAmount0 = p.Price0To1Upper.Inv().MulInt(*reserves1).Ceil().TruncateInt()
-		*reserves0 = reserves0.Add(inAmount0)
-		*reserves1 = sdk.ZeroInt()
-	} else {
-		outAmount1 = p.Price0To1Upper.MulInt(maxAmount0).TruncateInt()
-		*reserves0 = reserves0.Add(maxAmount0)
-		*reserves1 = reserves1.Sub(outAmount1)
-		inAmount0 = maxAmount0
+	maxOutGivenIn1 := p.Price0To1Upper.MulInt(maxAmount0).TruncateInt()
+	possibleOutAmounts := []sdk.Int{*reserves1, maxOutGivenIn1}
+	if !maxAmountOut1.IsZero() {
+		possibleOutAmounts = append(possibleOutAmounts, maxAmountOut1)
 	}
+
+	// outAmount will be the smallest value of:
+	// a.) The available reserve1,
+	// b.) The most the user could get out given maxAmount0 (maxAmount1),
+	// c.) The maximum amount the user wants out (amountOutCap1)
+	outAmount1 = utils.MinIntArr(possibleOutAmounts)
+
+	// we can skip price calc if we are using maxAmount1, since we already know it
+	if outAmount1 == maxOutGivenIn1 {
+		inAmount0 = maxAmount0
+	} else {
+		inAmount0 = p.Price0To1Upper.Inv().MulInt(outAmount1).Ceil().TruncateInt()
+	}
+
+	*reserves0 = reserves0.Add(inAmount0)
+	*reserves1 = reserves1.Sub(outAmount1)
 
 	return inAmount0, outAmount1
 }
 
-func (p *Pool) Swap1To0(maxAmount1 sdk.Int) (inAmount1, outAmount0 sdk.Int) {
+func (p *Pool) Swap1To0(maxAmount1 sdk.Int, maxAmountOut0 sdk.Int) (inAmount1, outAmount0 sdk.Int) {
 	reserves0 := &p.LowerTick0.Reserves
 	if maxAmount1.Equal(sdk.ZeroInt()) || reserves0.Equal(sdk.ZeroInt()) {
 		return sdk.ZeroInt(), sdk.ZeroInt()
@@ -92,17 +101,26 @@ func (p *Pool) Swap1To0(maxAmount1 sdk.Int) (inAmount1, outAmount0 sdk.Int) {
 	reserves1 := &p.UpperTick1.Reserves
 
 	maxAmount0 := p.Price1To0Lower.MulInt(maxAmount1).TruncateInt()
-	if reserves0.LTE(maxAmount0) {
-		outAmount0 = *reserves0
-		inAmount1 = p.Price1To0Lower.Inv().MulInt(*reserves0).Ceil().TruncateInt()
-		*reserves1 = reserves1.Add(inAmount1)
-		*reserves0 = sdk.ZeroInt()
-	} else {
-		outAmount0 = p.Price1To0Lower.MulInt(maxAmount1).TruncateInt()
-		*reserves1 = reserves1.Add(maxAmount1)
-		*reserves0 = reserves0.Sub(outAmount0)
-		inAmount1 = maxAmount1
+	possibleOutAmounts := []sdk.Int{*reserves0, maxAmount0}
+	if !maxAmountOut0.IsZero() {
+		possibleOutAmounts = append(possibleOutAmounts, maxAmountOut0)
 	}
+
+	// outAmount will be the smallest value of:
+	// a.) The available reserve1,
+	// b.) The most the user could get out given maxAmount1 (maxAmount0),
+	// c.) The maximum amount the user wants out (amountOutCap0)
+	outAmount0 = utils.MinIntArr(possibleOutAmounts)
+
+	// we can skip price calc if we are using maxAmount1, since we already know it
+	if outAmount0 == maxAmount1 {
+		inAmount1 = maxAmount0
+	} else {
+		inAmount1 = p.Price1To0Lower.Inv().MulInt(outAmount0).Ceil().TruncateInt()
+	}
+
+	*reserves1 = reserves1.Add(inAmount1)
+	*reserves0 = reserves0.Sub(outAmount0)
 
 	return inAmount1, outAmount0
 }

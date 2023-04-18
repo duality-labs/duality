@@ -12,25 +12,36 @@ import (
 
 func CmdSwap() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "swap [receiver] [amount-in] [tokenIn] [tokenOut]",
+		Use:     "swap [receiver] [amount-in] [token-in] [token-out] ?(--max-amout-out)",
 		Short:   "Broadcast message swap",
-		Example: "swap alice 50 tokenA tokenB --from alice",
+		Example: "swap alice 50 tokenA tokenB --max-amount-out 45 --from alice",
 		Args:    cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
 			argAmountIn := args[1]
+			argTokenIn := args[2]
+			argTokenOut := args[3]
 
 			amountInInt, ok := sdk.NewIntFromString(argAmountIn)
 			if !ok {
 				return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for amount-in")
 			}
 
-			argTokenIn := args[2]
-			argTokenOut := args[3]
-
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
+			}
+
+			maxAmountOutArg, err := cmd.Flags().GetString(FlagMaxAmountOut)
+			if err != nil {
+				return err
+			}
+			var maxAmountOutInt sdk.Int
+			if maxAmountOutArg != "" {
+				maxAmountOutInt, ok = sdk.NewIntFromString(maxAmountOutArg)
+				if !ok {
+					return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for max-amount-out")
+				}
 			}
 
 			msg := types.NewMsgSwap(
@@ -38,6 +49,7 @@ func CmdSwap() *cobra.Command {
 				argTokenIn,
 				argTokenOut,
 				amountInInt,
+				maxAmountOutInt,
 				argReceiver,
 			)
 			if err := msg.ValidateBasic(); err != nil {
@@ -49,6 +61,7 @@ func CmdSwap() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
+	cmd.Flags().AddFlagSet(FlagSetMaxAmountOut())
 
 	return cmd
 }
