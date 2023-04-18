@@ -95,7 +95,7 @@ message MsgSwap {
   string maxAmountOut = 6 [
                         (gogoproto.moretags)   = "yaml:\"amountOut\"",
                         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-                        (gogoproto.nullable)   = true,
+                        (gogoproto.nullable)   = false,
                         (gogoproto.jsontag) = "amountOut"
                         ];
 
@@ -135,6 +135,16 @@ message MsgPlaceLimitOrder {
                                              (gogoproto.stdtime) = true,
                                              (gogoproto.nullable) = true
                                              ];
+
+  // Optional argument to specify a specific amount out for a trade.
+  // swap will stop as soon as amountOut is reached.
+  // Only available for FoK or IoC
+  string maxAmountOut = 6 [
+                           (gogoproto.moretags)   = "yaml:\"amountOut\"",
+                           (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                           (gogoproto.nullable)   = false,
+                           (gogoproto.jsontag) = "amountOut"
+                           ];
 }
 
 message MsgPlaceLimitOrderResponse {

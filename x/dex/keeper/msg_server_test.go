@@ -688,6 +688,35 @@ func (s *MsgServerTestSuite) marketSells(account sdk.AccAddress, selling string,
 	s.Assert().Nil(err)
 }
 
+func (s *MsgServerTestSuite) aliceMarketSellsWithMaxOut(selling string, amountIn, maxAmountOut int) {
+	s.marketSellsWithMaxOut(s.alice, selling, amountIn, maxAmountOut)
+}
+
+func (s *MsgServerTestSuite) bobMarketSellsWithMaxOut(selling string, amountIn, maxAmountOut int) {
+	s.marketSellsWithMaxOut(s.bob, selling, amountIn, maxAmountOut)
+}
+
+func (s *MsgServerTestSuite) carolMarketSellsWithMaxOut(selling string, amountIn, maxAmountOut int) {
+	s.marketSellsWithMaxOut(s.carol, selling, amountIn, maxAmountOut)
+}
+
+func (s *MsgServerTestSuite) danMarketSellsWithMaxOut(selling string, amountIn, maxAmountOut int) {
+	s.marketSellsWithMaxOut(s.dan, selling, amountIn, maxAmountOut)
+}
+
+func (s *MsgServerTestSuite) marketSellsWithMaxOut(account sdk.AccAddress, selling string, amountIn int, maxAmountOut int) {
+	tokenIn, tokenOut := GetInOutTokens(selling, "TokenA", "TokenB")
+	_, err := s.msgServer.Swap(s.goCtx, &types.MsgSwap{
+		Creator:      account.String(),
+		Receiver:     account.String(),
+		TokenIn:      tokenIn,
+		TokenOut:     tokenOut,
+		AmountIn:     sdk.NewInt(int64(amountIn)),
+		MaxAmountOut: sdk.NewInt(int64(maxAmountOut)),
+	})
+	s.Assert().Nil(err)
+}
+
 func (s *MsgServerTestSuite) aliceMarketSellFails(err error, selling string, amountIn int) {
 	s.marketSellFails(s.alice, err, selling, amountIn)
 }

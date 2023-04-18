@@ -293,3 +293,39 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveMax() {
 	// current 0to1 moves down to 1
 	s.assertCurr1To0(-1)
 }
+
+func (s *MsgServerTestSuite) TestSwapNoLOMaxAmountOutUsed() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 0)
+	// GIVEN
+	// 10 TokenB available
+	s.aliceDeposits(
+		NewDeposit(0, 10, 0, 1),
+	)
+
+	// WHEN
+	// swap 50 with maxOut of 5
+	s.bobMarketSellsWithMaxOut("TokenA", 50, 5)
+
+	// THEN
+	// bob gets 5 out
+	s.assertBobBalances(44, 5)
+}
+
+func (s *MsgServerTestSuite) TestSwapNoLOMaxAmountNotOutUsed() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 0)
+	// GIVEN
+	// 10 TokenB available
+	s.aliceDeposits(
+		NewDeposit(0, 10, 0, 1),
+	)
+
+	// WHEN
+	// swap 8 with maxOut of 15
+	s.bobMarketSellsWithMaxOut("TokenA", 8, 15)
+
+	// THEN
+	// bob gets 7 out
+	s.assertBobBalances(42, 7)
+}

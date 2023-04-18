@@ -100,7 +100,7 @@ func (t *LimitOrderTranche) Withdraw(trancheUser LimitOrderTrancheUser) (sdk.Int
 	return amountOutTokenIn, amountOutTokenOut
 }
 
-func (t *LimitOrderTranche) Swap(maxAmountTakerIn sdk.Int, maxAmountOut *sdk.Int) (
+func (t *LimitOrderTranche) Swap(maxAmountTakerIn sdk.Int, maxAmountOut sdk.Int) (
 	inAmount sdk.Int,
 	outAmount sdk.Int,
 ) {
@@ -109,8 +109,8 @@ func (t *LimitOrderTranche) Swap(maxAmountTakerIn sdk.Int, maxAmountOut *sdk.Int
 	totalTokenIn := &t.TotalTokenOut
 	maxOutGivenIn := t.PriceTakerToMaker().MulInt(maxAmountTakerIn).TruncateInt()
 	possibleOutAmounts := []sdk.Int{*reservesTokenOut, maxOutGivenIn}
-	if maxAmountOut != nil {
-		possibleOutAmounts = append(possibleOutAmounts, *maxAmountOut)
+	if !maxAmountOut.IsZero() {
+		possibleOutAmounts = append(possibleOutAmounts, maxAmountOut)
 	}
 	outAmount = utils.MinIntArr(possibleOutAmounts)
 	if outAmount == maxOutGivenIn {

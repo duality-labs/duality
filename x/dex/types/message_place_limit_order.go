@@ -18,6 +18,7 @@ func NewMsgPlaceLimitOrder(
 	tokenOut string,
 	tickIndex int64,
 	amountIn sdk.Int,
+	maxAmountOut sdk.Int,
 	orderType LimitOrderType,
 	goodTil *time.Time,
 ) *MsgPlaceLimitOrder {
@@ -30,6 +31,7 @@ func NewMsgPlaceLimitOrder(
 		AmountIn:       amountIn,
 		OrderType:      orderType,
 		ExpirationTime: goodTil,
+		MaxAmountOut:   maxAmountOut,
 	}
 }
 
@@ -76,6 +78,16 @@ func (msg *MsgPlaceLimitOrder) ValidateBasic() error {
 
 	if !msg.OrderType.IsGoodTil() && msg.ExpirationTime != nil {
 		return ErrExpirationOnWrongOrderType
+	}
+
+	if msg.OrderType.IsFoK() || msg.OrderType.IsIoC() {
+		if !msg.MaxAmountOut.IsNil() && msg.MaxAmountOut.IsNegative() {
+			return ErrNegativeMaxAmountOut
+		}
+	} else {
+		if !msg.MaxAmountOut.IsNil() && msg.MaxAmountOut.IsPositive() {
+			return ErrInvalidOrderTypeForMaxAmountOut
+		}
 	}
 
 	return nil

@@ -9,7 +9,7 @@ const TypeMsgSwap = "swap"
 
 var _ sdk.Msg = &MsgSwap{}
 
-func NewMsgSwap(creator, tokenIn, tokenOut string, amountIn sdk.Int, maxAmountOut *sdk.Int, receiver string) *MsgSwap {
+func NewMsgSwap(creator, tokenIn, tokenOut string, amountIn sdk.Int, maxAmountOut sdk.Int, receiver string) *MsgSwap {
 	return &MsgSwap{
 		Creator:      creator,
 		AmountIn:     amountIn,
@@ -57,8 +57,8 @@ func (msg *MsgSwap) ValidateBasic() error {
 		return ErrZeroSwap
 	}
 
-	if msg.MaxAmountOut != nil && !msg.MaxAmountOut.IsPositive() {
-		return ErrNegativeAmountOut
+	if !msg.MaxAmountOut.IsNil() && msg.MaxAmountOut.IsNegative() {
+		return ErrNegativeMaxAmountOut
 	}
 
 	return nil

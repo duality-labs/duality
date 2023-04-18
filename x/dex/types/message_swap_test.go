@@ -50,6 +50,18 @@ func TestMsgSwap_ValidateBasic(t *testing.T) {
 			err: ErrZeroSwap,
 		},
 		{
+			name: "invalid negative maxAmountOut",
+			msg: MsgSwap{
+				Creator:      sample.AccAddress(),
+				Receiver:     sample.AccAddress(),
+				TokenIn:      "TokenA",
+				TokenOut:     "TokenB",
+				AmountIn:     sdk.OneInt(),
+				MaxAmountOut: sdk.NewInt(-1),
+			},
+			err: ErrNegativeMaxAmountOut,
+		},
+		{
 			name: "valid msg",
 			msg: MsgSwap{
 				Creator:  sample.AccAddress(),
@@ -57,6 +69,17 @@ func TestMsgSwap_ValidateBasic(t *testing.T) {
 				TokenIn:  "TokenA",
 				TokenOut: "TokenB",
 				AmountIn: sdk.OneInt(),
+			},
+		},
+		{
+			name: "valid msg with maxAmountOut",
+			msg: MsgSwap{
+				Creator:      sample.AccAddress(),
+				Receiver:     sample.AccAddress(),
+				TokenIn:      "TokenA",
+				TokenOut:     "TokenB",
+				AmountIn:     sdk.OneInt(),
+				MaxAmountOut: sdk.OneInt(),
 			},
 		},
 	}

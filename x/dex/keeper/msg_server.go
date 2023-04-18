@@ -85,6 +85,9 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
+	if msg.MaxAmountOut.IsNil() {
+		msg.MaxAmountOut = sdk.ZeroInt()
+	}
 	coinOut, err := k.SwapCore(goCtx, msg.TokenIn, msg.TokenOut, msg.AmountIn, msg.MaxAmountOut, callerAddr, receiverAddr)
 	if err != nil {
 		return nil, err
@@ -112,12 +115,16 @@ func (k msgServer) PlaceLimitOrder(
 	if err != nil {
 		return &types.MsgPlaceLimitOrderResponse{}, err
 	}
+	if msg.MaxAmountOut.IsNil() {
+		msg.MaxAmountOut = sdk.ZeroInt()
+	}
 
 	trancheKey, err := k.PlaceLimitOrderCore(
 		goCtx,
 		msg.TokenIn,
 		msg.TokenOut,
 		msg.AmountIn,
+		msg.MaxAmountOut,
 		tickIndex,
 		msg.OrderType,
 		msg.ExpirationTime,
