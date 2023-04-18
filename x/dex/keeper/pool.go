@@ -270,10 +270,14 @@ func (k Keeper) SavePool(sdkCtx sdk.Context, pool Pool) {
 	} else {
 		k.RemovePoolReserves(sdkCtx, *pool.LowerTick0)
 	}
-
 	if pool.UpperTick1.HasToken() {
 		k.SetPoolReserves(sdkCtx, *pool.UpperTick1)
 	} else {
 		k.RemovePoolReserves(sdkCtx, *pool.UpperTick1)
 	}
+
+	// TODO: this will create a bit of extra noise since not every Save is updating both ticks
+	// this should be solved upstream by better tracking of dirty ticks
+	ctx.EventManager().EmitEvent(types.CreateTickUpdatePoolReserves(*pool.LowerTick0))
+	ctx.EventManager().EmitEvent(types.CreateTickUpdatePoolReserves(*pool.UpperTick1))
 }

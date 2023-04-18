@@ -38,6 +38,8 @@ func (k Keeper) SaveTranche(sdkCtx sdk.Context, tranche types.LimitOrderTranche)
 		k.SetInactiveLimitOrderTranche(sdkCtx, tranche)
 		k.RemoveLimitOrderTranche(sdkCtx, tranche)
 	}
+
+	ctx.EventManager().EmitEvent(types.CreateTickUpdateLimitOrderTranche(tranche))
 }
 
 func (k Keeper) SetLimitOrderTranche(ctx sdk.Context, tranche types.LimitOrderTranche) {
