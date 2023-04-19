@@ -165,7 +165,7 @@ else
     found_network=$( echo $node_status_json | jq -r ".result.node_info.network" )
     if [[ "$found_network" == "$CHAIN_ID" ]]
     then
-        echo "Found Duality chain!"
+        echo "Found Duality chain! (id: ${found_network})"
     else
         echo "Could not establish connection to Duality chain, found network: ${found_network-none}"
         echo "Exiting..."
