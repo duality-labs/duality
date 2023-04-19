@@ -95,6 +95,7 @@ services:
       - NODE_MONIKER=tester
       - MODE=fullnode
       - RPC_ADDRESS=http://192.168.10.100:26657
+      - API_ADDRESS=http://192.168.10.10:1317
       - MNEMONIC=
           absorb entire pelican ride economy about slide pig fruit miss just fit kit moon away grocery deliver sense secret galaxy frequent panel lab say
       - LOG_LEVEL=${LOG_LEVEL:-warn}
@@ -159,6 +160,7 @@ services:
       - NODE_MONIKER=node0
       - MODE=fullnode
       - RPC_ADDRESS=http://192.168.10.100:26657
+      - API_ADDRESS=http://192.168.10.10:1317
       - ID=0
       - LOG=${LOG:-simd.log}
       - LOG_LEVEL=${LOG_LEVEL:-warn}
@@ -193,6 +195,7 @@ services:
       - NODE_MONIKER=node1
       - MODE=fullnode
       - RPC_ADDRESS=http://192.168.10.100:26657
+      - API_ADDRESS=http://192.168.10.10:1317
       - ID=1
       - LOG=${LOG:-simd.log}
       - LOG_LEVEL=${LOG_LEVEL:-warn}
@@ -227,6 +230,7 @@ services:
       - NODE_MONIKER=node2
       - MODE=fullnode
       - RPC_ADDRESS=http://192.168.10.100:26657
+      - API_ADDRESS=http://192.168.10.10:1317
       - ID=2
       - LOG=${LOG:-simd.log}
       - LOG_LEVEL=${LOG_LEVEL:-warn}
@@ -261,6 +265,7 @@ services:
       - NODE_MONIKER=node3
       - MODE=fullnode
       - RPC_ADDRESS=http://192.168.10.100:26657
+      - API_ADDRESS=http://192.168.10.10:1317
       - ID=3
       - LOG=${LOG:-simd.log}
       - LOG_LEVEL=${LOG_LEVEL:-warn}

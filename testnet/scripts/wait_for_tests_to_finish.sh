@@ -18,7 +18,7 @@ expected_tests="${1-$total_test_files}" timeout $total_wait_time_all_tests bash 
     while [ $completed_tests -lt $expected_tests ]
     do
         sleep 1;
-        completed_tests=$( wget -q -O - http://dualitynode0:1317/cosmos/tx/v1beta1/txs?events=tx.height%3E%3D0 | jq .txs[].body.memo | grep --count completed-test- )
+        completed_tests=$( wget -q -O - $API_ADDRESS/cosmos/tx/v1beta1/txs?events=tx.height%3E%3D0 | jq .txs[].body.memo | grep --count completed-test- )
         echo "waited, has: $completed_tests of $expected_tests done"
     done
     echo " --- $expected_tests tests have finished --- ";
