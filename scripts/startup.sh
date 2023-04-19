@@ -3,6 +3,7 @@
 # set variable defaults
 MAINNET="duality-1"
 NETWORK="${NETWORK:-$MAINNET}"
+CHAIN_ID="${CHAIN_ID:-$NETWORK}"
 STARTUP_MODE="${MODE:-fullnode}"
 NODE_MONIKER="${MONIKER}"
 
@@ -15,7 +16,7 @@ fi
 echo "Startup mode: $STARTUP_MODE"
 
 echo "Initializing chain..."
-dualityd init --chain-id $NETWORK duality
+dualityd init --chain-id $CHAIN_ID duality
 
 # Add consumer section to the ICS chain
 dualityd add-consumer-section
@@ -97,7 +98,7 @@ then
     dualityd add-genesis-account $(dualityd keys show fred -a --keyring-backend test) "${B}token,${B}stake,${B}tokenA,${B}tokenB,${B}tokenC,${B}tokenD,${B}tokenE,${B}tokenF,${B}tokenG,${B}tokenH,${B}tokenI,${B}tokenJ,${B}tokenK,${B}tokenL,${B}tokenM,${B}tokenN,${B}tokenO,${B}tokenP,${B}tokenQ,${B}tokenR,${B}tokenS,${B}tokenT,${B}tokenU,${B}tokenV,${B}tokenW,${B}tokenX,${B}tokenY,${B}tokenZ" --keyring-backend test
 
     # do not add a validator gentx here as there is already a leading ICS validator
-    # eg. dualityd gentx alice 1000000stake --chain-id $NETWORK --keyring-backend test
+    # eg. dualityd gentx alice 1000000stake --chain-id $CHAIN_ID --keyring-backend test
     # eg. dualityd collect-gentxs
 
     echo "Starting new chain..."
@@ -162,7 +163,7 @@ else
     # check we are on the correct network and can get information from the current network
     node_status_json=$( wget --tries 30 -q -O - $rpc_address/status )
     found_network=$( echo $node_status_json | jq -r ".result.node_info.network" )
-    if [[ "$found_network" == "$NETWORK" ]]
+    if [[ "$found_network" == "$CHAIN_ID" ]]
     then
         echo "Found Duality chain!"
     else
@@ -200,7 +201,7 @@ else
         # sent request to become a validator (to the first RPC address defined)
         dualityd tx staking create-validator \
             --node-id `dualityd tendermint show-node-id` \
-            --chain-id $NETWORK \
+            --chain-id $CHAIN_ID \
             --pubkey `dualityd tendermint show-validator` \
             --commission-rate="${VALIDATOR_COMMISSION_RATE:-1.0}" \
             --commission-max-rate="${VALIDATOR_COMMISSION_MAX_RATE:-1.0}" \

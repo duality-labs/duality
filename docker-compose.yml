@@ -34,6 +34,7 @@ services:
       target: testnet-env
       args:
         NETWORK: duality-testnet-1
+        CHAIN_ID: duality-composenet-1
     command: >
       /bin/bash -c '
         #!/bin/bash
@@ -117,6 +118,7 @@ services:
       target: testnet-env
       args:
         NETWORK: duality-testnet-1
+        CHAIN_ID: duality-composenet-1
     environment:
       - DEBUG=1
       - NODE_MONIKER=leader
@@ -149,6 +151,7 @@ services:
       target: testnet-env
       args:
         NETWORK: duality-testnet-1
+        CHAIN_ID: duality-composenet-1
         NODE_ID: 0
     command: sh /root/.duality/scripts/start-testnet.sh
     environment:
@@ -182,6 +185,7 @@ services:
       target: testnet-env
       args:
         NETWORK: duality-testnet-1
+        CHAIN_ID: duality-composenet-1
         NODE_ID: 1
     command: sh /root/.duality/scripts/start-testnet.sh
     environment:
@@ -215,6 +219,7 @@ services:
       target: testnet-env
       args:
         NETWORK: duality-testnet-1
+        CHAIN_ID: duality-composenet-1
         NODE_ID: 2
     command: sh /root/.duality/scripts/start-testnet.sh
     environment:
@@ -248,6 +253,7 @@ services:
       target: testnet-env
       args:
         NETWORK: duality-testnet-1
+        CHAIN_ID: duality-composenet-1
         NODE_ID: 3
     command: sh /root/.duality/scripts/start-testnet.sh
     environment:
