@@ -47,9 +47,11 @@ RUN apk add --update \
 
 # Define network settings to be used (defined under top-level folder networks/)
 ARG NETWORK=duality-1
+ARG CHAIN_ID=$NETWORK
 
-# Make NETWORK available as an ENV variable for the running proccess
+# Make NETWORK and CHAIN_ID available as an ENV variable for the running proccess
 ENV NETWORK=$NETWORK
+ENV CHAIN_ID=$CHAIN_ID
 
 WORKDIR /usr/src
 
@@ -80,7 +82,7 @@ RUN wget https://github.com/TomWright/dasel/releases/download/v1.27.3/dasel_linu
     mv ./dasel_linux_arm64 /usr/local/bin/dasel;
 
 #  create default config files
-RUN dualityd init --chain-id "$NETWORK" duality
+RUN dualityd init --chain-id "$CHAIN_ID" duality
 
 # edit config files
 # determine some settings by either being a mainnet or testnet
@@ -97,7 +99,7 @@ RUN IS_MAINNET=${IS_MAINNET-$([[ "$NETWORK" =~ "^duality-\d+$" ]] && echo "true"
     dasel put string -f /root/.duality/config/config.toml ".rpc.laddr" "tcp://0.0.0.0:26657"; \
     # todo: add Prometheus telemetry
     # set chain id to network name
-    dasel put string -f /root/.duality/config/client.toml ".chain-id" "$NETWORK";
+    dasel put string -f /root/.duality/config/client.toml ".chain-id" "$CHAIN_ID";
 
 
 # take configured files but don't take the dasel binary (the TOML files should be always safe to use)
