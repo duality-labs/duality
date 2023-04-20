@@ -11997,25 +11997,29 @@ paths:
                       type: string
                       format: uint64
                       description: >-
-                        ID is the unique id of the lock.
-
-                        The ID of the lock is decided upon lock creation,
-                        incrementing by 1 for
-
-                        every lock.
+                        ID is the "autoincrementing" id of the stake, assigned
+                        at creation.
                     owner:
                       type: string
-                      description: |-
-                        Owner is the account address of the lock owner.
-                        Only the owner can modify the state of the lock.
+                      description: >-
+                        owner is the account originating the stake. Only the
+                        owner can withdraw
+
+                        coins from the stake.
                     start_time:
                       type: string
                       format: date-time
                       description: >-
-                        Start time is the time needed for a lock to mature after
-                        unlocking has
+                        start_time is the time at which the coins in the lock
+                        were staked. This is
 
-                        started.
+                        used by distribution logic to filter on stakes that have
+                        existed for longer
+
+                        than the distribution period (you can only qualify for
+                        today's rewards if
+
+                        you staked your LP tokens yesterday).
                     coins:
                       type: array
                       items:
@@ -12035,16 +12039,13 @@ paths:
 
                           signatures required by gogoproto.
                       description: >-
-                        Coins are the tokens locked within the lock, kept in the
-                        module account.
+                        coins are the tokens staked, and managed by the module
+                        account.
                   description: >-
-                    Stake is a record of staked coin beginning at a specific
-                    time. It stores owner, 
+                    Stake records what coins are staked when by who for the
+                    purpose of
 
-                    start_time and the number of coins locked. A stake record is
-                    deleted once the 
-
-                    coins in the stake record are all withdrawn.
+                    calculating gauge reward distributions.
         default:
           description: An unexpected error response.
           schema:
@@ -12087,25 +12088,29 @@ paths:
                     type: string
                     format: uint64
                     description: >-
-                      ID is the unique id of the lock.
-
-                      The ID of the lock is decided upon lock creation,
-                      incrementing by 1 for
-
-                      every lock.
+                      ID is the "autoincrementing" id of the stake, assigned at
+                      creation.
                   owner:
                     type: string
-                    description: |-
-                      Owner is the account address of the lock owner.
-                      Only the owner can modify the state of the lock.
+                    description: >-
+                      owner is the account originating the stake. Only the owner
+                      can withdraw
+
+                      coins from the stake.
                   start_time:
                     type: string
                     format: date-time
                     description: >-
-                      Start time is the time needed for a lock to mature after
-                      unlocking has
+                      start_time is the time at which the coins in the lock were
+                      staked. This is
 
-                      started.
+                      used by distribution logic to filter on stakes that have
+                      existed for longer
+
+                      than the distribution period (you can only qualify for
+                      today's rewards if
+
+                      you staked your LP tokens yesterday).
                   coins:
                     type: array
                     items:
@@ -12124,16 +12129,13 @@ paths:
 
                         signatures required by gogoproto.
                     description: >-
-                      Coins are the tokens locked within the lock, kept in the
-                      module account.
+                      coins are the tokens staked, and managed by the module
+                      account.
                 description: >-
-                  Stake is a record of staked coin beginning at a specific time.
-                  It stores owner, 
+                  Stake records what coins are staked when by who for the
+                  purpose of
 
-                  start_time and the number of coins locked. A stake record is
-                  deleted once the 
-
-                  coins in the stake record are all withdrawn.
+                  calculating gauge reward distributions.
         default:
           description: An unexpected error response.
           schema:
@@ -12264,32 +12266,49 @@ paths:
                     is_perpetual:
                       type: boolean
                       description: >-
-                        is_perpetual is a flag to show if it's a perpetual or
+                        There are two kinds of gauges: perpetual and
+                        non-perpetual. Perpetual
+
+                        gauges describe an incentivization program for which the
+                        token rewards
+
+                        distributed on any given day must be added to the gauge
+                        prior to that day's
+
+                        distribution using an AddToGauge message.  When
+                        distribute is called on a
+
+                        perpetual gauge, all of the remaining rewards in the
+                        gauge are distributed.
+
+                        Because of this, all perpetual gauges must have
+                        `num_epochs_paid_over` set
+
+                        to 1.  A non-perpetual gauge by contrast distributes its
+                        rewards over a
+
+                        schedule as determined by `num_epochs_paid_over`. If a
                         non-perpetual gauge
 
-                        Non-perpetual gauges distribute their tokens equally per
-                        epoch while the
+                        is created with coins=[100atom] and
+                        num_epochs_paid_over=10, this means
 
-                        gauge is in the active period. Perpetual gauges
-                        distribute all their tokens
+                        that for 10 days (10 epochs) the gauge will distribute
+                        10atom each day to
 
-                        at a single time and only distribute their tokens again
-                        once the gauge is
-
-                        refilled, Intended for use with incentives that get
-                        refilled daily.
+                        the staked LP positions qualifying for the gauge.
                     distribute_to:
-                      title: >-
-                        distribute_to is where the gauge rewards are distributed
-                        to.
+                      description: >-
+                        distribute_to describes a set of staked LP positions
+                        that should be
 
-                        This is queried via lock duration or by timestamp
+                        distributed to from this gauge.
                       type: object
                       properties:
                         pairID:
-                          title: >-
-                            PairID represents the token pair we are looking to
-                            lock up
+                          description: >-
+                            pairID is the token pair which should be distributed
+                            to.
                           type: object
                           properties:
                             token0:
@@ -12299,14 +12318,19 @@ paths:
                         startTick:
                           type: string
                           format: int64
-                          title: Start tick inclusive
+                          description: >-
+                            start_tick is the inclusive lower bound on the
+                            location of LP tokens that
+
+                            qualify for a gauge's distribution.
                         endTick:
                           type: string
                           format: int64
-                          title: End tick exclusive
-                      description: >-
-                        QueryCondition is a struct used for querying stakes upon
-                        different conditions.
+                          description: >-
+                            end_tick is the inclusive upper bound on the
+                            location of LP tokens that
+
+                            qualify for a gauge's distribution.
                     coins:
                       type: array
                       items:
@@ -12325,29 +12349,36 @@ paths:
                           custom method
 
                           signatures required by gogoproto.
-                      title: >-
-                        coins is the total amount of coins that have been in the
-                        gauge
+                      description: >-
+                        coins describes the total amount of coins that have been
+                        added to this
 
-                        Can distribute multiple coin denoms
+                        gauge for distribution.
                     start_time:
                       type: string
                       format: date-time
-                      title: start_time is the distribution start time
+                      description: >-
+                        start_time describes when this gauge should begin
+                        distributing rewards.
+
+                        This allows gauge creators to schedule gauges into the
+                        future, in the event
+
+                        that an earlier gauge is expected to expire.
                     num_epochs_paid_over:
                       type: string
                       format: uint64
-                      title: >-
+                      description: >-
                         num_epochs_paid_over is the number of total epochs
-                        distribution will be
+                        (days) the rewards in
 
-                        completed over
+                        this gauge will be distributed over.
                     filled_epochs:
                       type: string
                       format: uint64
                       title: >-
-                        filled_epochs is the number of epochs distribution has
-                        been completed on
+                        filled_epochs describes the number of epochs
+                        distribution have been completed
 
                         already
                     distributed_coins:
@@ -12368,20 +12399,97 @@ paths:
                           custom method
 
                           signatures required by gogoproto.
-                      title: >-
-                        distributed_coins are coins that have been distributed
-                        already
+                      description: >-
+                        distributed_coins describes coins that have been
+                        distributed already from
+
+                        this gauge.
                     pricing_tick:
                       type: string
                       format: int64
+                      description: >-
+                        pricing_tick is necessary for fairly distributing
+                        rewards over a range of
+
+                        ticks.  Without pricing_tick, we might naively
+                        distribute rewards in
+
+                        proportion to the number of deposit shares staked within
+                        the gauge's
+
+                        qualifying tick range.
+
+
+                        For example, a gauge with a distribute_to tick range of
+                        [-10, 10] would
+
+                        distribute to staked LP tokens where both tick-fee and
+                        tick+fee are within
+
+                        [-10, 10]. Let's say for pair "tokenA<>tokenB", the
+                        current trading tick is
+
+                        0. If Alice were to LP (10tokenA, 0tokenB) @ tick -8,
+                        fee 2, this would
+
+                        mean Alice would be issued 10 shares (10 + 0 *
+                        1.0001^-8), since shares are
+
+                        in terms of token0. Let's further assume Bob LPs
+                        (0tokenA, 10tokenB) @ tick
+
+                        8, fee 2, such that Bob is issued 10.008 shares (0 + 10
+                        * 1.0001^8). Under
+
+                        this naive approach, if Alice and Bob were to stake
+                        their shares, Bob would
+
+                        receive more in rewards, purely on the basis of the
+                        relative locations of
+
+                        their liquidity.
+
+
+                        This disparity originates in the fact that LP deposit
+                        denominations are not
+
+                        fungible across ticks. To avoid this, we can use a
+                        single price throughout
+
+                        the gauge's tick range for relating the relative value
+                        of token0 and
+
+                        token1, as specified by pricing_tick.
+
+
+                        Let's run through the earier example using the more
+                        sophisticated approach,
+
+                        where the gauge has pricing_tick set to 0. For the
+                        purpose of calculating
+
+                        reward distribution weight, Alice's shares are worth 10
+                        + 0 * 1.0001^0 = 10
+
+                        and Bob's shares are worth 0 + 10 * 1.0001^0 = 10. With
+                        the distribution
+
+                        weight of both shares set according to a gauge-specific
+                        tick, we do not
+
+                        distribute more or less rewards according to the
+                        relative location of
+
+                        liquidity within the gauge's tick range, freeing users
+                        to place liquidity
+
+                        whereever they deem most profitable in the gauge's range
+                        and still equally
+
+                        qualify for rewards.
                   description: >-
-                    Gauge is an object that stores and distributes yields to
-                    recipients who
-
-                    satisfy certain conditions. Currently gauges support
-                    conditions around the
-
-                    duration for which a given denom is locked.
+                    Gauge is an object that describes an LP incentivization plan
+                    and its state.
                 title: Upcoming and active gauges
               pagination:
                 title: Pagination defines pagination for the response
@@ -12490,6 +12598,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   '/dualitylabs/duality/incentives/v1beta1/gauges/{id}':
@@ -12513,32 +12631,49 @@ paths:
                   is_perpetual:
                     type: boolean
                     description: >-
-                      is_perpetual is a flag to show if it's a perpetual or
+                      There are two kinds of gauges: perpetual and
+                      non-perpetual. Perpetual
+
+                      gauges describe an incentivization program for which the
+                      token rewards
+
+                      distributed on any given day must be added to the gauge
+                      prior to that day's
+
+                      distribution using an AddToGauge message.  When distribute
+                      is called on a
+
+                      perpetual gauge, all of the remaining rewards in the gauge
+                      are distributed.
+
+                      Because of this, all perpetual gauges must have
+                      `num_epochs_paid_over` set
+
+                      to 1.  A non-perpetual gauge by contrast distributes its
+                      rewards over a
+
+                      schedule as determined by `num_epochs_paid_over`. If a
                       non-perpetual gauge
 
-                      Non-perpetual gauges distribute their tokens equally per
-                      epoch while the
+                      is created with coins=[100atom] and
+                      num_epochs_paid_over=10, this means
 
-                      gauge is in the active period. Perpetual gauges distribute
-                      all their tokens
+                      that for 10 days (10 epochs) the gauge will distribute
+                      10atom each day to
 
-                      at a single time and only distribute their tokens again
-                      once the gauge is
-
-                      refilled, Intended for use with incentives that get
-                      refilled daily.
+                      the staked LP positions qualifying for the gauge.
                   distribute_to:
-                    title: >-
-                      distribute_to is where the gauge rewards are distributed
-                      to.
+                    description: >-
+                      distribute_to describes a set of staked LP positions that
+                      should be
 
-                      This is queried via lock duration or by timestamp
+                      distributed to from this gauge.
                     type: object
                     properties:
                       pairID:
-                        title: >-
-                          PairID represents the token pair we are looking to
-                          lock up
+                        description: >-
+                          pairID is the token pair which should be distributed
+                          to.
                         type: object
                         properties:
                           token0:
@@ -12548,14 +12683,19 @@ paths:
                       startTick:
                         type: string
                         format: int64
-                        title: Start tick inclusive
+                        description: >-
+                          start_tick is the inclusive lower bound on the
+                          location of LP tokens that
+
+                          qualify for a gauge's distribution.
                       endTick:
                         type: string
                         format: int64
-                        title: End tick exclusive
-                    description: >-
-                      QueryCondition is a struct used for querying stakes upon
-                      different conditions.
+                        description: >-
+                          end_tick is the inclusive upper bound on the location
+                          of LP tokens that
+
+                          qualify for a gauge's distribution.
                   coins:
                     type: array
                     items:
@@ -12573,29 +12713,36 @@ paths:
                         custom method
 
                         signatures required by gogoproto.
-                    title: >-
-                      coins is the total amount of coins that have been in the
-                      gauge
+                    description: >-
+                      coins describes the total amount of coins that have been
+                      added to this
 
-                      Can distribute multiple coin denoms
+                      gauge for distribution.
                   start_time:
                     type: string
                     format: date-time
-                    title: start_time is the distribution start time
+                    description: >-
+                      start_time describes when this gauge should begin
+                      distributing rewards.
+
+                      This allows gauge creators to schedule gauges into the
+                      future, in the event
+
+                      that an earlier gauge is expected to expire.
                   num_epochs_paid_over:
                     type: string
                     format: uint64
-                    title: >-
-                      num_epochs_paid_over is the number of total epochs
-                      distribution will be
+                    description: >-
+                      num_epochs_paid_over is the number of total epochs (days)
+                      the rewards in
 
-                      completed over
+                      this gauge will be distributed over.
                   filled_epochs:
                     type: string
                     format: uint64
                     title: >-
-                      filled_epochs is the number of epochs distribution has
-                      been completed on
+                      filled_epochs describes the number of epochs distribution
+                      have been completed
 
                       already
                   distributed_coins:
@@ -12615,20 +12762,97 @@ paths:
                         custom method
 
                         signatures required by gogoproto.
-                    title: >-
-                      distributed_coins are coins that have been distributed
-                      already
+                    description: >-
+                      distributed_coins describes coins that have been
+                      distributed already from
+
+                      this gauge.
                   pricing_tick:
                     type: string
                     format: int64
+                    description: >-
+                      pricing_tick is necessary for fairly distributing rewards
+                      over a range of
+
+                      ticks.  Without pricing_tick, we might naively distribute
+                      rewards in
+
+                      proportion to the number of deposit shares staked within
+                      the gauge's
+
+                      qualifying tick range.
+
+
+                      For example, a gauge with a distribute_to tick range of
+                      [-10, 10] would
+
+                      distribute to staked LP tokens where both tick-fee and
+                      tick+fee are within
+
+                      [-10, 10]. Let's say for pair "tokenA<>tokenB", the
+                      current trading tick is
+
+                      0. If Alice were to LP (10tokenA, 0tokenB) @ tick -8, fee
+                      2, this would
+
+                      mean Alice would be issued 10 shares (10 + 0 * 1.0001^-8),
+                      since shares are
+
+                      in terms of token0. Let's further assume Bob LPs (0tokenA,
+                      10tokenB) @ tick
+
+                      8, fee 2, such that Bob is issued 10.008 shares (0 + 10 *
+                      1.0001^8). Under
+
+                      this naive approach, if Alice and Bob were to stake their
+                      shares, Bob would
+
+                      receive more in rewards, purely on the basis of the
+                      relative locations of
+
+                      their liquidity.
+
+
+                      This disparity originates in the fact that LP deposit
+                      denominations are not
+
+                      fungible across ticks. To avoid this, we can use a single
+                      price throughout
+
+                      the gauge's tick range for relating the relative value of
+                      token0 and
+
+                      token1, as specified by pricing_tick.
+
+
+                      Let's run through the earier example using the more
+                      sophisticated approach,
+
+                      where the gauge has pricing_tick set to 0. For the purpose
+                      of calculating
+
+                      reward distribution weight, Alice's shares are worth 10 +
+                      0 * 1.0001^0 = 10
+
+                      and Bob's shares are worth 0 + 10 * 1.0001^0 = 10. With
+                      the distribution
+
+                      weight of both shares set according to a gauge-specific
+                      tick, we do not
+
+                      distribute more or less rewards according to the relative
+                      location of
+
+                      liquidity within the gauge's tick range, freeing users to
+                      place liquidity
+
+                      whereever they deem most profitable in the gauge's range
+                      and still equally
+
+                      qualify for rewards.
                 description: >-
-                  Gauge is an object that stores and distributes yields to
-                  recipients who
-
-                  satisfy certain conditions. Currently gauges support
-                  conditions around the
-
-                  duration for which a given denom is locked.
+                  Gauge is an object that describes an LP incentivization plan
+                  and its state.
         default:
           description: An unexpected error response.
           schema:
@@ -12882,6 +13106,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   '/dualitylabs/duality/dex/filled_limit_order_tranche/{pairID}/{tokenIn}/{tickIndex}/{trancheKey}':
@@ -13128,6 +13362,16 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
       tags:
         - Query
   '/dualitylabs/duality/dex/limit_order_tranche/{pairID}/{tokenIn}/{tickIndex}/{trancheKey}':
@@ -13354,6 +13598,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -13597,6 +13851,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -13845,6 +14109,16 @@ paths:
             when key
 
             is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
           in: query
           required: false
           type: boolean
@@ -36834,27 +37108,43 @@ definitions:
       is_perpetual:
         type: boolean
         description: >-
-          is_perpetual is a flag to show if it's a perpetual or non-perpetual
+          There are two kinds of gauges: perpetual and non-perpetual. Perpetual
+
+          gauges describe an incentivization program for which the token rewards
+
+          distributed on any given day must be added to the gauge prior to that
+          day's
+
+          distribution using an AddToGauge message.  When distribute is called
+          on a
+
+          perpetual gauge, all of the remaining rewards in the gauge are
+          distributed.
+
+          Because of this, all perpetual gauges must have `num_epochs_paid_over`
+          set
+
+          to 1.  A non-perpetual gauge by contrast distributes its rewards over
+          a
+
+          schedule as determined by `num_epochs_paid_over`. If a non-perpetual
           gauge
 
-          Non-perpetual gauges distribute their tokens equally per epoch while
-          the
+          is created with coins=[100atom] and num_epochs_paid_over=10, this
+          means
 
-          gauge is in the active period. Perpetual gauges distribute all their
-          tokens
+          that for 10 days (10 epochs) the gauge will distribute 10atom each day
+          to
 
-          at a single time and only distribute their tokens again once the gauge
-          is
-
-          refilled, Intended for use with incentives that get refilled daily.
+          the staked LP positions qualifying for the gauge.
       distribute_to:
-        title: |-
-          distribute_to is where the gauge rewards are distributed to.
-          This is queried via lock duration or by timestamp
+        description: |-
+          distribute_to describes a set of staked LP positions that should be
+          distributed to from this gauge.
         type: object
         properties:
           pairID:
-            title: PairID represents the token pair we are looking to lock up
+            description: pairID is the token pair which should be distributed to.
             type: object
             properties:
               token0:
@@ -36864,14 +37154,19 @@ definitions:
           startTick:
             type: string
             format: int64
-            title: Start tick inclusive
+            description: >-
+              start_tick is the inclusive lower bound on the location of LP
+              tokens that
+
+              qualify for a gauge's distribution.
           endTick:
             type: string
             format: int64
-            title: End tick exclusive
-        description: >-
-          QueryCondition is a struct used for querying stakes upon different
-          conditions.
+            description: >-
+              end_tick is the inclusive upper bound on the location of LP tokens
+              that
+
+              qualify for a gauge's distribution.
       coins:
         type: array
         items:
@@ -36886,27 +37181,34 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
-        title: |-
-          coins is the total amount of coins that have been in the gauge
-          Can distribute multiple coin denoms
+        description: |-
+          coins describes the total amount of coins that have been added to this
+          gauge for distribution.
       start_time:
         type: string
         format: date-time
-        title: start_time is the distribution start time
+        description: >-
+          start_time describes when this gauge should begin distributing
+          rewards.
+
+          This allows gauge creators to schedule gauges into the future, in the
+          event
+
+          that an earlier gauge is expected to expire.
       num_epochs_paid_over:
         type: string
         format: uint64
-        title: >-
-          num_epochs_paid_over is the number of total epochs distribution will
-          be
+        description: >-
+          num_epochs_paid_over is the number of total epochs (days) the rewards
+          in
 
-          completed over
+          this gauge will be distributed over.
       filled_epochs:
         type: string
         format: uint64
         title: >-
-          filled_epochs is the number of epochs distribution has been completed
-          on
+          filled_epochs describes the number of epochs distribution have been
+          completed
 
           already
       distributed_coins:
@@ -36923,14 +37225,93 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
-        title: distributed_coins are coins that have been distributed already
+        description: >-
+          distributed_coins describes coins that have been distributed already
+          from
+
+          this gauge.
       pricing_tick:
         type: string
         format: int64
-    description: |-
-      Gauge is an object that stores and distributes yields to recipients who
-      satisfy certain conditions. Currently gauges support conditions around the
-      duration for which a given denom is locked.
+        description: >-
+          pricing_tick is necessary for fairly distributing rewards over a range
+          of
+
+          ticks.  Without pricing_tick, we might naively distribute rewards in
+
+          proportion to the number of deposit shares staked within the gauge's
+
+          qualifying tick range.
+
+
+          For example, a gauge with a distribute_to tick range of [-10, 10]
+          would
+
+          distribute to staked LP tokens where both tick-fee and tick+fee are
+          within
+
+          [-10, 10]. Let's say for pair "tokenA<>tokenB", the current trading
+          tick is
+
+          0. If Alice were to LP (10tokenA, 0tokenB) @ tick -8, fee 2, this
+          would
+
+          mean Alice would be issued 10 shares (10 + 0 * 1.0001^-8), since
+          shares are
+
+          in terms of token0. Let's further assume Bob LPs (0tokenA, 10tokenB) @
+          tick
+
+          8, fee 2, such that Bob is issued 10.008 shares (0 + 10 * 1.0001^8).
+          Under
+
+          this naive approach, if Alice and Bob were to stake their shares, Bob
+          would
+
+          receive more in rewards, purely on the basis of the relative locations
+          of
+
+          their liquidity.
+
+
+          This disparity originates in the fact that LP deposit denominations
+          are not
+
+          fungible across ticks. To avoid this, we can use a single price
+          throughout
+
+          the gauge's tick range for relating the relative value of token0 and
+
+          token1, as specified by pricing_tick.
+
+
+          Let's run through the earier example using the more sophisticated
+          approach,
+
+          where the gauge has pricing_tick set to 0. For the purpose of
+          calculating
+
+          reward distribution weight, Alice's shares are worth 10 + 0 * 1.0001^0
+          = 10
+
+          and Bob's shares are worth 0 + 10 * 1.0001^0 = 10. With the
+          distribution
+
+          weight of both shares set according to a gauge-specific tick, we do
+          not
+
+          distribute more or less rewards according to the relative location of
+
+          liquidity within the gauge's tick range, freeing users to place
+          liquidity
+
+          whereever they deem most profitable in the gauge's range and still
+          equally
+
+          qualify for rewards.
+    description: >-
+      Gauge is an object that describes an LP incentivization plan and its
+      state.
   duality.incentives.GaugeStatus:
     type: string
     enum:
@@ -36973,28 +37354,47 @@ definitions:
           is_perpetual:
             type: boolean
             description: >-
-              is_perpetual is a flag to show if it's a perpetual or
+              There are two kinds of gauges: perpetual and non-perpetual.
+              Perpetual
+
+              gauges describe an incentivization program for which the token
+              rewards
+
+              distributed on any given day must be added to the gauge prior to
+              that day's
+
+              distribution using an AddToGauge message.  When distribute is
+              called on a
+
+              perpetual gauge, all of the remaining rewards in the gauge are
+              distributed.
+
+              Because of this, all perpetual gauges must have
+              `num_epochs_paid_over` set
+
+              to 1.  A non-perpetual gauge by contrast distributes its rewards
+              over a
+
+              schedule as determined by `num_epochs_paid_over`. If a
               non-perpetual gauge
 
-              Non-perpetual gauges distribute their tokens equally per epoch
-              while the
+              is created with coins=[100atom] and num_epochs_paid_over=10, this
+              means
 
-              gauge is in the active period. Perpetual gauges distribute all
-              their tokens
+              that for 10 days (10 epochs) the gauge will distribute 10atom each
+              day to
 
-              at a single time and only distribute their tokens again once the
-              gauge is
-
-              refilled, Intended for use with incentives that get refilled
-              daily.
+              the staked LP positions qualifying for the gauge.
           distribute_to:
-            title: |-
-              distribute_to is where the gauge rewards are distributed to.
-              This is queried via lock duration or by timestamp
+            description: >-
+              distribute_to describes a set of staked LP positions that should
+              be
+
+              distributed to from this gauge.
             type: object
             properties:
               pairID:
-                title: PairID represents the token pair we are looking to lock up
+                description: pairID is the token pair which should be distributed to.
                 type: object
                 properties:
                   token0:
@@ -37004,14 +37404,19 @@ definitions:
               startTick:
                 type: string
                 format: int64
-                title: Start tick inclusive
+                description: >-
+                  start_tick is the inclusive lower bound on the location of LP
+                  tokens that
+
+                  qualify for a gauge's distribution.
               endTick:
                 type: string
                 format: int64
-                title: End tick exclusive
-            description: >-
-              QueryCondition is a struct used for querying stakes upon different
-              conditions.
+                description: >-
+                  end_tick is the inclusive upper bound on the location of LP
+                  tokens that
+
+                  qualify for a gauge's distribution.
           coins:
             type: array
             items:
@@ -37029,27 +37434,36 @@ definitions:
                 method
 
                 signatures required by gogoproto.
-            title: |-
-              coins is the total amount of coins that have been in the gauge
-              Can distribute multiple coin denoms
+            description: >-
+              coins describes the total amount of coins that have been added to
+              this
+
+              gauge for distribution.
           start_time:
             type: string
             format: date-time
-            title: start_time is the distribution start time
+            description: >-
+              start_time describes when this gauge should begin distributing
+              rewards.
+
+              This allows gauge creators to schedule gauges into the future, in
+              the event
+
+              that an earlier gauge is expected to expire.
           num_epochs_paid_over:
             type: string
             format: uint64
-            title: >-
-              num_epochs_paid_over is the number of total epochs distribution
-              will be
+            description: >-
+              num_epochs_paid_over is the number of total epochs (days) the
+              rewards in
 
-              completed over
+              this gauge will be distributed over.
           filled_epochs:
             type: string
             format: uint64
             title: >-
-              filled_epochs is the number of epochs distribution has been
-              completed on
+              filled_epochs describes the number of epochs distribution have
+              been completed
 
               already
           distributed_coins:
@@ -37069,18 +37483,97 @@ definitions:
                 method
 
                 signatures required by gogoproto.
-            title: distributed_coins are coins that have been distributed already
+            description: >-
+              distributed_coins describes coins that have been distributed
+              already from
+
+              this gauge.
           pricing_tick:
             type: string
             format: int64
+            description: >-
+              pricing_tick is necessary for fairly distributing rewards over a
+              range of
+
+              ticks.  Without pricing_tick, we might naively distribute rewards
+              in
+
+              proportion to the number of deposit shares staked within the
+              gauge's
+
+              qualifying tick range.
+
+
+              For example, a gauge with a distribute_to tick range of [-10, 10]
+              would
+
+              distribute to staked LP tokens where both tick-fee and tick+fee
+              are within
+
+              [-10, 10]. Let's say for pair "tokenA<>tokenB", the current
+              trading tick is
+
+              0. If Alice were to LP (10tokenA, 0tokenB) @ tick -8, fee 2, this
+              would
+
+              mean Alice would be issued 10 shares (10 + 0 * 1.0001^-8), since
+              shares are
+
+              in terms of token0. Let's further assume Bob LPs (0tokenA,
+              10tokenB) @ tick
+
+              8, fee 2, such that Bob is issued 10.008 shares (0 + 10 *
+              1.0001^8). Under
+
+              this naive approach, if Alice and Bob were to stake their shares,
+              Bob would
+
+              receive more in rewards, purely on the basis of the relative
+              locations of
+
+              their liquidity.
+
+
+              This disparity originates in the fact that LP deposit
+              denominations are not
+
+              fungible across ticks. To avoid this, we can use a single price
+              throughout
+
+              the gauge's tick range for relating the relative value of token0
+              and
+
+              token1, as specified by pricing_tick.
+
+
+              Let's run through the earier example using the more sophisticated
+              approach,
+
+              where the gauge has pricing_tick set to 0. For the purpose of
+              calculating
+
+              reward distribution weight, Alice's shares are worth 10 + 0 *
+              1.0001^0 = 10
+
+              and Bob's shares are worth 0 + 10 * 1.0001^0 = 10. With the
+              distribution
+
+              weight of both shares set according to a gauge-specific tick, we
+              do not
+
+              distribute more or less rewards according to the relative location
+              of
+
+              liquidity within the gauge's tick range, freeing users to place
+              liquidity
+
+              whereever they deem most profitable in the gauge's range and still
+              equally
+
+              qualify for rewards.
         description: >-
-          Gauge is an object that stores and distributes yields to recipients
-          who
-
-          satisfy certain conditions. Currently gauges support conditions around
-          the
-
-          duration for which a given denom is locked.
+          Gauge is an object that describes an LP incentivization plan and its
+          state.
   duality.incentives.GetGaugesResponse:
     type: object
     properties:
@@ -37096,28 +37589,47 @@ definitions:
             is_perpetual:
               type: boolean
               description: >-
-                is_perpetual is a flag to show if it's a perpetual or
+                There are two kinds of gauges: perpetual and non-perpetual.
+                Perpetual
+
+                gauges describe an incentivization program for which the token
+                rewards
+
+                distributed on any given day must be added to the gauge prior to
+                that day's
+
+                distribution using an AddToGauge message.  When distribute is
+                called on a
+
+                perpetual gauge, all of the remaining rewards in the gauge are
+                distributed.
+
+                Because of this, all perpetual gauges must have
+                `num_epochs_paid_over` set
+
+                to 1.  A non-perpetual gauge by contrast distributes its rewards
+                over a
+
+                schedule as determined by `num_epochs_paid_over`. If a
                 non-perpetual gauge
 
-                Non-perpetual gauges distribute their tokens equally per epoch
-                while the
+                is created with coins=[100atom] and num_epochs_paid_over=10,
+                this means
 
-                gauge is in the active period. Perpetual gauges distribute all
-                their tokens
+                that for 10 days (10 epochs) the gauge will distribute 10atom
+                each day to
 
-                at a single time and only distribute their tokens again once the
-                gauge is
-
-                refilled, Intended for use with incentives that get refilled
-                daily.
+                the staked LP positions qualifying for the gauge.
             distribute_to:
-              title: |-
-                distribute_to is where the gauge rewards are distributed to.
-                This is queried via lock duration or by timestamp
+              description: >-
+                distribute_to describes a set of staked LP positions that should
+                be
+
+                distributed to from this gauge.
               type: object
               properties:
                 pairID:
-                  title: PairID represents the token pair we are looking to lock up
+                  description: pairID is the token pair which should be distributed to.
                   type: object
                   properties:
                     token0:
@@ -37127,14 +37639,19 @@ definitions:
                 startTick:
                   type: string
                   format: int64
-                  title: Start tick inclusive
+                  description: >-
+                    start_tick is the inclusive lower bound on the location of
+                    LP tokens that
+
+                    qualify for a gauge's distribution.
                 endTick:
                   type: string
                   format: int64
-                  title: End tick exclusive
-              description: >-
-                QueryCondition is a struct used for querying stakes upon
-                different conditions.
+                  description: >-
+                    end_tick is the inclusive upper bound on the location of LP
+                    tokens that
+
+                    qualify for a gauge's distribution.
             coins:
               type: array
               items:
@@ -37152,27 +37669,36 @@ definitions:
                   method
 
                   signatures required by gogoproto.
-              title: |-
-                coins is the total amount of coins that have been in the gauge
-                Can distribute multiple coin denoms
+              description: >-
+                coins describes the total amount of coins that have been added
+                to this
+
+                gauge for distribution.
             start_time:
               type: string
               format: date-time
-              title: start_time is the distribution start time
+              description: >-
+                start_time describes when this gauge should begin distributing
+                rewards.
+
+                This allows gauge creators to schedule gauges into the future,
+                in the event
+
+                that an earlier gauge is expected to expire.
             num_epochs_paid_over:
               type: string
               format: uint64
-              title: >-
-                num_epochs_paid_over is the number of total epochs distribution
-                will be
+              description: >-
+                num_epochs_paid_over is the number of total epochs (days) the
+                rewards in
 
-                completed over
+                this gauge will be distributed over.
             filled_epochs:
               type: string
               format: uint64
               title: >-
-                filled_epochs is the number of epochs distribution has been
-                completed on
+                filled_epochs describes the number of epochs distribution have
+                been completed
 
                 already
             distributed_coins:
@@ -37192,18 +37718,97 @@ definitions:
                   method
 
                   signatures required by gogoproto.
-              title: distributed_coins are coins that have been distributed already
+              description: >-
+                distributed_coins describes coins that have been distributed
+                already from
+
+                this gauge.
             pricing_tick:
               type: string
               format: int64
+              description: >-
+                pricing_tick is necessary for fairly distributing rewards over a
+                range of
+
+                ticks.  Without pricing_tick, we might naively distribute
+                rewards in
+
+                proportion to the number of deposit shares staked within the
+                gauge's
+
+                qualifying tick range.
+
+
+                For example, a gauge with a distribute_to tick range of [-10,
+                10] would
+
+                distribute to staked LP tokens where both tick-fee and tick+fee
+                are within
+
+                [-10, 10]. Let's say for pair "tokenA<>tokenB", the current
+                trading tick is
+
+                0. If Alice were to LP (10tokenA, 0tokenB) @ tick -8, fee 2,
+                this would
+
+                mean Alice would be issued 10 shares (10 + 0 * 1.0001^-8), since
+                shares are
+
+                in terms of token0. Let's further assume Bob LPs (0tokenA,
+                10tokenB) @ tick
+
+                8, fee 2, such that Bob is issued 10.008 shares (0 + 10 *
+                1.0001^8). Under
+
+                this naive approach, if Alice and Bob were to stake their
+                shares, Bob would
+
+                receive more in rewards, purely on the basis of the relative
+                locations of
+
+                their liquidity.
+
+
+                This disparity originates in the fact that LP deposit
+                denominations are not
+
+                fungible across ticks. To avoid this, we can use a single price
+                throughout
+
+                the gauge's tick range for relating the relative value of token0
+                and
+
+                token1, as specified by pricing_tick.
+
+
+                Let's run through the earier example using the more
+                sophisticated approach,
+
+                where the gauge has pricing_tick set to 0. For the purpose of
+                calculating
+
+                reward distribution weight, Alice's shares are worth 10 + 0 *
+                1.0001^0 = 10
+
+                and Bob's shares are worth 0 + 10 * 1.0001^0 = 10. With the
+                distribution
+
+                weight of both shares set according to a gauge-specific tick, we
+                do not
+
+                distribute more or less rewards according to the relative
+                location of
+
+                liquidity within the gauge's tick range, freeing users to place
+                liquidity
+
+                whereever they deem most profitable in the gauge's range and
+                still equally
+
+                qualify for rewards.
           description: >-
-            Gauge is an object that stores and distributes yields to recipients
-            who
-
-            satisfy certain conditions. Currently gauges support conditions
-            around the
-
-            duration for which a given denom is locked.
+            Gauge is an object that describes an LP incentivization plan and its
+            state.
         title: Upcoming and active gauges
       pagination:
         title: Pagination defines pagination for the response
@@ -37287,25 +37892,29 @@ definitions:
             type: string
             format: uint64
             description: >-
-              ID is the unique id of the lock.
-
-              The ID of the lock is decided upon lock creation, incrementing by
-              1 for
-
-              every lock.
+              ID is the "autoincrementing" id of the stake, assigned at
+              creation.
           owner:
             type: string
-            description: |-
-              Owner is the account address of the lock owner.
-              Only the owner can modify the state of the lock.
+            description: >-
+              owner is the account originating the stake. Only the owner can
+              withdraw
+
+              coins from the stake.
           start_time:
             type: string
             format: date-time
             description: >-
-              Start time is the time needed for a lock to mature after unlocking
-              has
+              start_time is the time at which the coins in the lock were staked.
+              This is
 
-              started.
+              used by distribution logic to filter on stakes that have existed
+              for longer
+
+              than the distribution period (you can only qualify for today's
+              rewards if
+
+              you staked your LP tokens yesterday).
           coins:
             type: array
             items:
@@ -37323,17 +37932,10 @@ definitions:
                 method
 
                 signatures required by gogoproto.
-            description: >-
-              Coins are the tokens locked within the lock, kept in the module
-              account.
-        description: >-
-          Stake is a record of staked coin beginning at a specific time. It
-          stores owner, 
-
-          start_time and the number of coins locked. A stake record is deleted
-          once the 
-
-          coins in the stake record are all withdrawn.
+            description: 'coins are the tokens staked, and managed by the module account.'
+        description: |-
+          Stake records what coins are staked when by who for the purpose of
+          calculating gauge reward distributions.
   duality.incentives.GetStakesResponse:
     type: object
     properties:
@@ -37346,25 +37948,29 @@ definitions:
               type: string
               format: uint64
               description: >-
-                ID is the unique id of the lock.
-
-                The ID of the lock is decided upon lock creation, incrementing
-                by 1 for
-
-                every lock.
+                ID is the "autoincrementing" id of the stake, assigned at
+                creation.
             owner:
               type: string
-              description: |-
-                Owner is the account address of the lock owner.
-                Only the owner can modify the state of the lock.
+              description: >-
+                owner is the account originating the stake. Only the owner can
+                withdraw
+
+                coins from the stake.
             start_time:
               type: string
               format: date-time
               description: >-
-                Start time is the time needed for a lock to mature after
-                unlocking has
+                start_time is the time at which the coins in the lock were
+                staked. This is
 
-                started.
+                used by distribution logic to filter on stakes that have existed
+                for longer
+
+                than the distribution period (you can only qualify for today's
+                rewards if
+
+                you staked your LP tokens yesterday).
             coins:
               type: array
               items:
@@ -37382,17 +37988,10 @@ definitions:
                   method
 
                   signatures required by gogoproto.
-              description: >-
-                Coins are the tokens locked within the lock, kept in the module
-                account.
-          description: >-
-            Stake is a record of staked coin beginning at a specific time. It
-            stores owner, 
-
-            start_time and the number of coins locked. A stake record is deleted
-            once the 
-
-            coins in the stake record are all withdrawn.
+              description: 'coins are the tokens staked, and managed by the module account.'
+          description: |-
+            Stake records what coins are staked when by who for the purpose of
+            calculating gauge reward distributions.
   duality.incentives.MsgAddToGaugeResponse:
     type: object
   duality.incentives.MsgCreateGaugeResponse:
@@ -37443,7 +38042,7 @@ definitions:
     type: object
     properties:
       pairID:
-        title: PairID represents the token pair we are looking to lock up
+        description: pairID is the token pair which should be distributed to.
         type: object
         properties:
           token0:
@@ -37453,38 +38052,57 @@ definitions:
       startTick:
         type: string
         format: int64
-        title: Start tick inclusive
+        description: >-
+          start_tick is the inclusive lower bound on the location of LP tokens
+          that
+
+          qualify for a gauge's distribution.
       endTick:
         type: string
         format: int64
-        title: End tick exclusive
+        description: >-
+          end_tick is the inclusive upper bound on the location of LP tokens
+          that
+
+          qualify for a gauge's distribution.
     description: >-
-      QueryCondition is a struct used for querying stakes upon different
-      conditions.
+      QueryCondition describes a set of staked LP positions that a gauge is
+
+      configured to distribute to. LP tokens qualifying for a given
+      QueryCondition
+
+      must have both tick-fee and tick+fee fall within the range [startTick,
+      endTick],
+
+      such that all of the tradable liquidity for the pool is within that range.
   duality.incentives.Stake:
     type: object
     properties:
       ID:
         type: string
         format: uint64
-        description: >-
-          ID is the unique id of the lock.
-
-          The ID of the lock is decided upon lock creation, incrementing by 1
-          for
-
-          every lock.
+        description: 'ID is the "autoincrementing" id of the stake, assigned at creation.'
       owner:
         type: string
-        description: |-
-          Owner is the account address of the lock owner.
-          Only the owner can modify the state of the lock.
+        description: >-
+          owner is the account originating the stake. Only the owner can
+          withdraw
+
+          coins from the stake.
       start_time:
         type: string
         format: date-time
-        description: |-
-          Start time is the time needed for a lock to mature after unlocking has
-          started.
+        description: >-
+          start_time is the time at which the coins in the lock were staked.
+          This is
+
+          used by distribution logic to filter on stakes that have existed for
+          longer
+
+          than the distribution period (you can only qualify for today's rewards
+          if
+
+          you staked your LP tokens yesterday).
       coins:
         type: array
         items:
@@ -37499,17 +38117,10 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
-        description: >-
-          Coins are the tokens locked within the lock, kept in the module
-          account.
-    description: >-
-      Stake is a record of staked coin beginning at a specific time. It stores
-      owner, 
-
-      start_time and the number of coins locked. A stake record is deleted once
-      the 
-
-      coins in the stake record are all withdrawn.
+        description: 'coins are the tokens staked, and managed by the module account.'
+    description: |-
+      Stake records what coins are staked when by who for the purpose of
+      calculating gauge reward distributions.
   dualitylabs.duality.dex.PairID:
     type: object
     properties:

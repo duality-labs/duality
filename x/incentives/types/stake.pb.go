@@ -29,21 +29,20 @@ var _ = time.Kitchen
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// Stake is a record of staked coin beginning at a specific time. It stores owner,
-// start_time and the number of coins locked. A stake record is deleted once the
-// coins in the stake record are all withdrawn.
+// Stake records what coins are staked when by who for the purpose of
+// calculating gauge reward distributions.
 type Stake struct {
-	// ID is the unique id of the lock.
-	// The ID of the lock is decided upon lock creation, incrementing by 1 for
-	// every lock.
+	// ID is the "autoincrementing" id of the stake, assigned at creation.
 	ID uint64 `protobuf:"varint,1,opt,name=ID,proto3" json:"ID,omitempty"`
-	// Owner is the account address of the lock owner.
-	// Only the owner can modify the state of the lock.
+	// owner is the account originating the stake. Only the owner can withdraw
+	// coins from the stake.
 	Owner string `protobuf:"bytes,2,opt,name=owner,proto3" json:"owner,omitempty" yaml:"owner"`
-	// Start time is the time needed for a lock to mature after unlocking has
-	// started.
+	// start_time is the time at which the coins in the lock were staked. This is
+	// used by distribution logic to filter on stakes that have existed for longer
+	// than the distribution period (you can only qualify for today's rewards if
+	// you staked your LP tokens yesterday).
 	StartTime time.Time `protobuf:"bytes,3,opt,name=start_time,json=startTime,proto3,stdtime" json:"start_time,omitempty" yaml:"start_time"`
-	// Coins are the tokens locked within the lock, kept in the module account.
+	// coins are the tokens staked, and managed by the module account.
 	Coins github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,4,rep,name=coins,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"coins"`
 }
 

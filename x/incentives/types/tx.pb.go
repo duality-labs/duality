@@ -591,11 +591,13 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
+	// Create an incentive program
 	CreateGauge(ctx context.Context, in *MsgCreateGauge, opts ...grpc.CallOption) (*MsgCreateGaugeResponse, error)
+	// Add rewards to an existing incentives program
 	AddToGauge(ctx context.Context, in *MsgAddToGauge, opts ...grpc.CallOption) (*MsgAddToGaugeResponse, error)
-	// Stake stakes tokens
+	// Deposit LP tokens to the module, qualifying for rewards from gauges
 	Stake(ctx context.Context, in *MsgStake, opts ...grpc.CallOption) (*MsgStakeResponse, error)
-	// UnstakeTokens unstakes tokens by stake IDs
+	// Withdraw LP tokens from the module, forfeiting future rewards from gauges
 	Unstake(ctx context.Context, in *MsgUnstake, opts ...grpc.CallOption) (*MsgUnstakeResponse, error)
 }
 
@@ -645,11 +647,13 @@ func (c *msgClient) Unstake(ctx context.Context, in *MsgUnstake, opts ...grpc.Ca
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
+	// Create an incentive program
 	CreateGauge(context.Context, *MsgCreateGauge) (*MsgCreateGaugeResponse, error)
+	// Add rewards to an existing incentives program
 	AddToGauge(context.Context, *MsgAddToGauge) (*MsgAddToGaugeResponse, error)
-	// Stake stakes tokens
+	// Deposit LP tokens to the module, qualifying for rewards from gauges
 	Stake(context.Context, *MsgStake) (*MsgStakeResponse, error)
-	// UnstakeTokens unstakes tokens by stake IDs
+	// Withdraw LP tokens from the module, forfeiting future rewards from gauges
 	Unstake(context.Context, *MsgUnstake) (*MsgUnstakeResponse, error)
 }
 
