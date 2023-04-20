@@ -1,54 +1,41 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/types/expected_keepers.go)
+[View code on GitHub](https://github.com/duality-labs/duality/types/expected_keepers.go)
 
-This file defines two interfaces, `AccountKeeper` and `BankKeeper`, which are expected to be used in the duality project for simulations and retrieving account balances, respectively. 
+The code in this file is part of the `types` package and defines two interfaces, `AccountKeeper` and `BankKeeper`, which are expected to be implemented by other components in the Duality project. These interfaces provide a set of methods for managing accounts and their balances, as well as interacting with the underlying blockchain.
 
-The `AccountKeeper` interface has one method, `GetAccount`, which takes a `sdk.Context` and a `sdk.AccAddress` as arguments and returns an `types.AccountI`. This method is used to retrieve an account from the state based on its address. 
+`AccountKeeper` is an interface that defines a single method, `GetAccount`, which retrieves an account based on its address. This interface is used for simulations and is expected to be implemented by the account keeper component in the project. The actual methods imported from the account should be defined within this interface.
 
-The `BankKeeper` interface has several methods, including `SendCoinsFromAccountToModule`, `SendCoinsFromModuleToAccount`, `MintCoins`, `BurnCoins`, `GetBalance`, `IterateAccountBalances`, `SpendableCoins`, and `GetSupply`. These methods are used to perform various operations related to account balances, such as sending coins between accounts and modules, minting and burning coins, retrieving balances, and iterating over account balances. 
-
-Overall, these interfaces provide a way for other parts of the duality project to interact with and manipulate account balances in a standardized way. For example, a module that needs to send coins from one account to another can use the `SendCoinsFromAccountToModule` and `SendCoinsFromModuleToAccount` methods provided by the `BankKeeper` interface, rather than implementing its own logic for these operations. 
-
-Here is an example of how the `GetAccount` method from the `AccountKeeper` interface might be used:
-
-```
-import (
-    "github.com/cosmos/cosmos-sdk/types"
-    "github.com/cosmos/cosmos-sdk/x/auth/types"
-    "github.com/duality/types"
-)
-
-func myFunction(ctx types.Context, addr types.AccAddress) {
-    var acc types.AccountI
-    accountKeeper := types.AccountKeeper{}
-    acc = accountKeeper.GetAccount(ctx, addr)
-    // Do something with the account
+```go
+type AccountKeeper interface {
+    GetAccount(ctx sdk.Context, addr sdk.AccAddress) types.AccountI
+    // Methods imported from account should be defined here
 }
 ```
 
-And here is an example of how the `SendCoinsFromAccountToModule` method from the `BankKeeper` interface might be used:
+`BankKeeper` is an interface that defines a set of methods for managing account balances and interacting with the blockchain. These methods include sending coins between accounts and modules, minting and burning coins, getting account balances, iterating through account balances, and retrieving the supply of a specific denomination.
 
-```
-import (
-    "github.com/cosmos/cosmos-sdk/types"
-    "github.com/cosmos/cosmos-sdk/x/auth/types"
-    "github.com/duality/types"
-)
-
-func myFunction(ctx types.Context, senderAddr types.AccAddress, recipientModule string, amt types.Coins) {
-    bankKeeper := types.BankKeeper{}
-    err := bankKeeper.SendCoinsFromAccountToModule(ctx, senderAddr, recipientModule, amt)
-    if err != nil {
-        // Handle error
-    }
-    // Coins have been sent successfully
+```go
+type BankKeeper interface {
+    SendCoinsFromAccountToModule(ctx sdk.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error
+    SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error
+    MintCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error
+    BurnCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error
+    GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom string) sdk.Coin
+    IterateAccountBalances(ctx sdk.Context, addr sdk.AccAddress, cb func(sdk.Coin) bool)
+    SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
+    GetSupply(ctx sdk.Context, denom string) sdk.Coin
 }
 ```
+
+These interfaces are essential for the larger project as they provide a standardized way for other components to interact with accounts and their balances. By implementing these interfaces, developers can ensure that their components are compatible with the rest of the Duality project and can be easily integrated into the overall system.
 ## Questions: 
- 1. What is the purpose of the `types` package being imported?
-- The `types` package from `github.com/cosmos/cosmos-sdk/x/auth/types` is being imported to define the `AccountKeeper` interface.
+ 1. **Question:** What is the purpose of the `AccountKeeper` and `BankKeeper` interfaces in this code?
 
-2. What is the difference between `SendCoinsFromAccountToModule` and `SendCoinsFromModuleToAccount` methods?
-- `SendCoinsFromAccountToModule` method sends coins from a user account to a module account, while `SendCoinsFromModuleToAccount` method sends coins from a module account to a user account.
+   **Answer:** The `AccountKeeper` interface defines the expected account keeper used for simulations, while the `BankKeeper` interface defines the expected interface needed to retrieve account balances and perform various operations like sending coins, minting coins, and burning coins.
 
-3. What is the purpose of the `IterateAccountBalances` method?
-- The `IterateAccountBalances` method is used to iterate over all the balances of an account and execute a callback function on each balance.
+2. **Question:** Are there any other methods that need to be implemented for the `AccountKeeper` and `BankKeeper` interfaces?
+
+   **Answer:** The code mentions that methods imported from the account and bank should be defined in their respective interfaces, but it does not provide any specific methods. It is up to the developer to implement the required methods based on the project's requirements.
+
+3. **Question:** What is the purpose of the `noalias` comment in the `AccountKeeper` interface definition?
+
+   **Answer:** The `noalias` comment is a directive for the Cosmos SDK code generation tool to indicate that this interface should not have any aliases generated for it. This is typically used to avoid circular dependencies or other issues that may arise from having multiple names for the same type.

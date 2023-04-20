@@ -1,31 +1,31 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/keeper/core.go)
+[View code on GitHub](https://github.com/duality-labs/duality/keeper/core.go)
 
-This code is part of the `keeper` package and handles the core logic for various operations in a decentralized exchange (DEX) module, such as depositing, withdrawing, swapping, placing limit orders, canceling limit orders, and withdrawing filled limit orders. The DEX module is built on top of the Cosmos SDK and uses its types and utilities.
+This code is part of the `keeper` package and provides core functionalities for handling various operations in a decentralized exchange (DEX) module, such as depositing, withdrawing, swapping, placing limit orders, canceling limit orders, and withdrawing filled limit orders.
 
-The `DepositCore` function handles the deposit operation, which involves checking and initializing data structures (tick, pair), calculating shares based on the amount deposited, and sending funds to the module address. It returns the amounts deposited and shares issued.
+The `DepositCore` function handles the core logic for depositing tokens into the DEX. It checks and initializes data structures (tick, pair), calculates shares based on the amount deposited, and sends funds to the module address.
 
-The `WithdrawCore` function handles the withdrawal operation, which calculates and withdraws reserve0 and reserve1 from a specified tick given a specified number of shares to remove. It returns an error if the operation fails.
+The `WithdrawCore` function handles the core logic for withdrawing tokens from the DEX. It calculates the amount of reserve tokens to withdraw based on the specified number of shares to remove and sends the withdrawn tokens to the user's account.
 
-The `SwapCore` function facilitates swapping one asset for another, given a specified pair (token0, token1). It returns the output coin and an error if the operation fails.
+The `SwapCore` function facilitates swapping tokens in the DEX. It takes input tokens and calculates the output tokens based on the specified pair (token0, token1) and sends the output tokens to the user's account.
 
-The `MultiHopSwapCore` function handles multi-hop swaps, allowing users to swap assets through multiple routes. It returns the output coin and an error if the operation fails.
+The `MultiHopSwapCore` function allows users to perform multi-hop swaps, which involve swapping tokens through multiple routes to achieve the best price.
 
-The `PlaceLimitOrderCore` function handles placing limit orders, initializing data structures if needed, and storing information for a new limit order at a specific tick. It returns a pointer to the tranche key and an error if the operation fails.
+The `PlaceLimitOrderCore` function handles placing limit orders in the DEX. It initializes data structures if needed, calculates and stores information for a new limit order at a specific tick.
 
-The `CancelLimitOrderCore` function handles canceling limit orders, removing a specified number of shares from a limit order, and returning the respective amount in terms of the reserve to the user. It returns an error if the operation fails.
+The `CancelLimitOrderCore` function handles canceling limit orders in the DEX. It removes the specified number of shares from a limit order and returns the respective amount in terms of the reserve to the user.
 
-The `WithdrawFilledLimitOrderCore` function handles withdrawing filled limit orders, calculating and sending filled liquidity from the module to the user based on the amount wished to receive. It returns an error if the operation fails.
+The `WithdrawFilledLimitOrderCore` function handles withdrawing filled liquidity from a limit order based on the amount wished to receive. It calculates and sends filled liquidity from the module to the user's account.
 
-These functions are essential for the operation of a decentralized exchange and can be used in the larger project to facilitate various trading operations.
+These functions are essential for the operation of a decentralized exchange and can be used in various scenarios within the larger project, such as trading, providing liquidity, and managing orders.
 ## Questions: 
- 1. **Question**: What is the purpose of the `TruncateInt` function mentioned in the note at the beginning of the code, and what are the potential accounting anomalies it may create?
+ 1. **Question**: What is the purpose of the `TruncateInt` function mentioned in the note at the beginning of the code, and why is it used in multiple places?
    
-   **Answer**: The `TruncateInt` function is used for converting Decs back into sdk.Ints in multiple places throughout the code. The potential accounting anomalies it may create are not explicitly mentioned, but they could be related to rounding errors or loss of precision during the conversion process.
+   **Answer**: The `TruncateInt` function is used to convert Decimals back into sdk.Ints. It is used in multiple places because it may create some accounting anomalies, but it is considered preferable to other alternatives. The full ADR can be found at the provided link: https://www.notion.so/dualityxyz/A-Modest-Proposal-For-Truncating-696a919d59254876a617f82fb9567895
 
-2. **Question**: What is the purpose of the `IsBehindEnemyLines` function and what does it mean for a user to deposit "behind enemy lines"?
+2. **Question**: What is the purpose of the `IsBehindEnemyLines` function and why are there TODO comments related to it?
 
-   **Answer**: The `IsBehindEnemyLines` function checks if a deposit is being made in a position that is considered unfavorable or risky, which is referred to as "behind enemy lines". The code currently does not allow users to deposit in such positions, but there are TODO comments indicating that this restriction might be lifted in the future.
+   **Answer**: The `IsBehindEnemyLines` function checks if a deposit is being made "behind enemy lines", meaning it is being deposited in a tick that is not favorable for the depositor. The TODO comments indicate that there are plans to allow users to deposit "behind enemy lines" in the future, but it is currently not allowed.
 
-3. **Question**: What is the purpose of the `MultiHopSwapCore` function and how does it handle multiple routes for swapping assets?
+3. **Question**: What is the purpose of the `MultiHopSwapCore` function and how does it differ from the `SwapCore` function?
 
-   **Answer**: The `MultiHopSwapCore` function facilitates swapping assets through multiple routes, allowing users to find the best route for their swap. It iterates through all the provided routes, calculates the output for each route, and either picks the best route with the highest output (if `pickBestRoute` is true) or stops at the first successful route (if `pickBestRoute` is false).
+   **Answer**: The `MultiHopSwapCore` function facilitates a multi-hop swap, which means it allows swapping between multiple pairs of tokens in a single transaction. This is different from the `SwapCore` function, which only facilitates a swap between a single pair of tokens. The `MultiHopSwapCore` function can be useful when there is no direct liquidity between two tokens, and a multi-hop swap can provide better rates.

@@ -1,74 +1,34 @@
-[View code on GitHub](https://github.com/duality-labs/duality/utodoc/docs/json/x/mev/keeper)
+[View code on GitHub](https://github.com/duality-labs/duality/oc/docs/json/x/mev/keeper)
 
-The `keeper` package in the `duality` project plays a crucial role in managing the state of the blockchain and handling various operations, such as querying data, sending coins, and managing parameters. It contains several important files, each with specific functionality.
+The `keeper` package in the `duality` project is responsible for interacting with the state of the blockchain, including reading and writing data, managing parameters, and handling transactions and events. It contains a `Keeper` struct and a `NewKeeper` function that returns an instance of this struct. The `Keeper` struct has several fields, such as a binary codec, two store keys, a parameter subspace, and a bank keeper.
 
-`grpc_query.go` defines a `Keeper` struct that implements the `QueryServer` interface from the `types` package. This allows the `duality` project to query data from the `keeper` module. For instance, to retrieve data from the `keeper` module, a query can be made using the methods defined in the `QueryServer` interface:
+The `Keeper` struct provides methods for reading and writing data to the blockchain and handling transactions and events. The `bankKeeper` field is used to interact with the `duality` bank module, while the `paramstore` field is used to manage the parameters of the `duality` module. The `Logger` method returns a logger for logging messages related to the `duality` module.
 
-```go
-import (
-    "github.com/duality-labs/duality/keeper"
-    "github.com/duality-labs/duality/x/mev/types"
-)
+The `msgServer` struct in the `msg_server.go` file implements the `types.MsgServer` interface, providing an implementation for the `Keeper` struct. The `NewMsgServerImpl` function creates a new instance of the `msgServer` struct with the provided `Keeper` struct, which is then used to handle messages sent to the `duality` network.
 
-func main() {
-    k := keeper.Keeper{}
-    query := types.Query{...}
-    response := k.Query(query)
-}
-```
+The `Send` function in the `msg_server_send.go` file is responsible for sending coins from a user's account to a module's account. It takes in a context and a message of type `MsgSend`, processes the transaction, and returns a `MsgSendResponse` object.
 
-`grpc_query_params.go` contains a `Params` function that retrieves the current parameters of the Duality network. It takes a context and a `QueryParamsRequest` object as arguments and returns a `QueryParamsResponse` object containing the current parameters:
+The `params.go` file contains the `GetParams` and `SetParams` functions, which are used to retrieve and set parameters for the `mev` module of the `duality` project. This module handles miner-extractable value (MEV) transactions on the `duality` blockchain.
+
+Example usage:
 
 ```go
-import (
-    "context"
-    "github.com/duality-labs/duality/x/mev/types"
-    "github.com/duality-labs/duality/keeper"
-)
-
-func main() {
-    ctx := context.Background()
-    req := &types.QueryParamsRequest{}
-    k := keeper.NewKeeper()
-    params, err := k.Params(ctx, req)
-    displayParams(params)
-}
-```
-
-`keeper.go` contains the `Keeper` struct and a `NewKeeper` function that returns an instance of this struct. The `Keeper` struct is responsible for interacting with the state of the `duality` blockchain, including reading and writing data, managing parameters, and handling transactions and events.
-
-`msg_server.go` defines a `msgServer` struct that implements the `types.MsgServer` interface, providing an implementation for the `Keeper` struct. This allows for efficient and organized message handling in the `duality` project:
-
-```go
+// Create a new instance of the Keeper struct
 keeper := NewKeeper(...)
 msgServer := NewMsgServerImpl(keeper)
-```
 
-`msg_server_send.go` contains a `Send` function that sends coins from a user's account to a module's account. It takes a context and a `MsgSend` message as arguments and returns a `MsgSendResponse` object:
-
-```go
-import (
-    "context"
-    "github.com/duality-labs/duality/x/mev/types"
-)
-
-func main() {
-    msg := &types.MsgSend{
-        Creator: "user1",
-        TokenIn: "dual",
-        AmountIn: 100,
-    }
-    ctx := context.Background()
-    response, err := Send(ctx, msg)
+// Send tokens
+msg := &types.MsgSend{
+    Creator: "user1",
+    TokenIn: "dual",
+    AmountIn: 100,
 }
+ctx := context.Background()
+response, err := msgServer.Send(ctx, msg)
+
+// Retrieve and set parameters for the mev module
+params := keeper.GetParams(ctx)
+keeper.SetParams(ctx, params)
 ```
 
-`params.go` defines `GetParams` and `SetParams` functions that allow for the retrieval and setting of parameters for the `mev` module, which handles miner-extractable value (MEV) transactions on the `duality` blockchain:
-
-```go
-k := Keeper{}
-params := k.GetParams(ctx)
-k.SetParams(ctx, params)
-```
-
-In summary, the `keeper` package provides essential functionality for the `duality` project, enabling interaction with the blockchain state and handling various operations.
+In summary, the `keeper` package provides essential components for interacting with the state of the `duality` blockchain, such as the `Keeper` struct and the `NewKeeper` function. It also contains implementations for handling messages and managing parameters for the `mev` module.

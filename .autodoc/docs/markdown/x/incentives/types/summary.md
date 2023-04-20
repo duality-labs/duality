@@ -1,5 +1,7 @@
-[View code on GitHub](https://github.com/duality-labs/duality/utodoc/docs/json/x/incentives/types)
+[View code on GitHub](https://github.com/duality-labs/duality/oc/docs/json/x/incentives/types)
 
-The `types` package in the `duality` project contains various types, functions, and interfaces that are used throughout the project, particularly for managing incentives, staking, and rewards distribution. The package provides functionality for registering concrete types and interfaces used for Amino JSON serialization and message services, as well as defining sentinel errors, events, and expected keepers for the `x/incentives` module.
+The `types` package in the `duality` project contains various data types, functions, and interfaces used throughout the project, particularly for the incentives module. This module is responsible for managing the distribution of rewards to users who participate in the network.
 
-For example, the `codec.go` file provides functions for registering concrete types and interfaces for Amino JSON serialization, which can be used to ensure that the necessary types and interfaces are registered and available for use in other parts of the project. The `errors.go` file defines sentinel errors that are used to indicate specific error conditions that may occur while using the `x/incentives` module, providing more detailed and informative error
+The package provides functionality for registering concrete types and interfaces used for Amino JSON serialization and message services. It also defines sentinel errors for specific error conditions that may occur while using the `x/incentives` module. Additionally, it defines event types and attribute keys for the Incentive module, which are used to track and record various actions taken by users.
+
+The package also contains interfaces that are expected to be implemented by other modules in the duality project, such as `BankKeeper`, `EpochKeeper`, `AccountKeeper`, and `DexKeeper`. These interfaces provide a way

@@ -1,38 +1,31 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/types/tick_liquidity.go)
+[View code on GitHub](https://github.com/duality-labs/duality/types/tick_liquidity.go)
 
-The `types` package contains two methods: `TickIndex()` and `HasToken()`. These methods are related to the `TickLiquidity` struct, which is used in the larger project to represent the liquidity of a given tick in a Uniswap pool. 
+The code provided is part of a larger project and is located in the `duality` package under the `types` subpackage. The main purpose of this code is to provide utility methods for working with `TickLiquidity` objects, which represent liquidity in a financial market. The code focuses on two specific types of liquidity: `LimitOrderTranche` and `PoolReserves`. These methods should be avoided if possible, and it is recommended to deal with these liquidity types explicitly.
 
-The `TickIndex()` method returns the tick index of the `TickLiquidity` struct. The tick index is an integer value that represents the position of the tick in the Uniswap pool. The method first checks the type of liquidity stored in the `TickLiquidity` struct. If the liquidity is of type `LimitOrderTranche`, the method returns the tick index of the `LimitOrderTranche`. If the liquidity is of type `PoolReserves`, the method returns the tick index of the `PoolReserves`. If the liquidity is of any other type, the method panics with an error message.
+The `TickLiquidity` struct has a field `Liquidity` which is an interface and can hold either a `LimitOrderTranche` or a `PoolReserves` object. The two methods provided in this code, `TickIndex()` and `HasToken()`, are used to extract information from the `TickLiquidity` object based on the type of liquidity it contains.
 
-The `HasToken()` method returns a boolean value indicating whether the `TickLiquidity` struct contains a token. The method first checks the type of liquidity stored in the `TickLiquidity` struct. If the liquidity is of type `LimitOrderTranche`, the method returns the result of calling the `HasTokenIn()` method on the `LimitOrderTranche`. If the liquidity is of type `PoolReserves`, the method returns the result of calling the `HasToken()` method on the `PoolReserves`. If the liquidity is of any other type, the method panics with an error message.
+1. `TickIndex()`: This method returns the tick index of the liquidity object. It uses a type switch to determine the type of liquidity contained in the `TickLiquidity` object and then returns the appropriate tick index. If the liquidity is of type `LimitOrderTranche`, it returns `liquidity.LimitOrderTranche.TickIndex`. If the liquidity is of type `PoolReserves`, it returns `liquidity.PoolReserves.TickIndex`. If the liquidity type is not valid, the method panics with an error message.
 
-These methods should be avoided if possible, as noted in the comments. Instead, it is recommended to deal with `LimitOrderTranche` or `PoolReserves` explicitly. 
+   Example usage:
+   ```
+   tickLiquidity := ... // some TickLiquidity object
+   tickIndex := tickLiquidity.TickIndex()
+   ```
 
-Here is an example of how these methods might be used in the larger project:
+2. `HasToken()`: This method checks if the liquidity object contains a token. Similar to the `TickIndex()` method, it uses a type switch to determine the type of liquidity contained in the `TickLiquidity` object and then returns a boolean value indicating whether the liquidity object has a token. If the liquidity is of type `LimitOrderTranche`, it returns `liquidity.LimitOrderTranche.HasTokenIn()`. If the liquidity is of type `PoolReserves`, it returns `liquidity.PoolReserves.HasToken()`. If the liquidity type is not valid, the method panics with an error message.
 
-```
-import "duality/types"
-
-// create a TickLiquidity struct with a LimitOrderTranche
-tickLiquidity := types.TickLiquidity{
-    Liquidity: &types.TickLiquidity_LimitOrderTranche{
-        LimitOrderTranche: &types.LimitOrderTranche{
-            TickIndex: 100,
-            // other fields
-        },
-    },
-}
-
-// get the tick index of the tickLiquidity struct
-tickIndex := tickLiquidity.TickIndex() // returns 100
-
-// check if the tickLiquidity struct has a token
-hasToken := tickLiquidity.HasToken() // returns true or false
-```
+   Example usage:
+   ```
+   tickLiquidity := ... // some TickLiquidity object
+   hasToken := tickLiquidity.HasToken()
+   ```
+These utility methods can be used in the larger project to work with `TickLiquidity` objects and extract relevant information based on the type of liquidity they contain.
 ## Questions: 
- 1. What is the purpose of the `TickLiquidity` type and its associated methods?
-   - The `TickLiquidity` type is used to represent liquidity information for a specific tick in the duality project. The `TickIndex` method returns the tick index for a given `TickLiquidity` instance, while the `HasToken` method checks if the tick has a token.
-2. Why does the code include a note to avoid using these methods?
-   - The code notes that these methods should be avoided if possible because it is generally better to deal with `LimitOrderTranche` or `PoolReserves` explicitly instead of using the `TickLiquidity` type.
-3. What happens if the `TickLiquidity` instance does not contain a valid liquidity type?
-   - If the `TickLiquidity` instance does not contain a valid liquidity type, the code will panic and stop execution.
+ 1. **Question:** What are the possible types of `TickLiquidity` and what do they represent?
+   **Answer:** There are two possible types of `TickLiquidity`: `TickLiquidity_LimitOrderTranche` and `TickLiquidity_PoolReserves`. They represent different types of liquidity in the system, with `LimitOrderTranche` being a limit order tranche and `PoolReserves` being the pool reserves.
+
+2. **Question:** Why is it recommended to avoid using these methods if possible?
+   **Answer:** The comment in the code suggests that these methods should be avoided because it is generally better to deal with `LimitOrderTranche` or `PoolReserves` explicitly. This is likely because using these methods may lead to less readable or maintainable code, or because they may introduce unnecessary complexity.
+
+3. **Question:** What happens if the `TickLiquidity` type is not one of the expected types?
+   **Answer:** If the `TickLiquidity` type is not one of the expected types (`TickLiquidity_LimitOrderTranche` or `TickLiquidity_PoolReserves`), the code will panic with the message "Tick does not contain valid liqudityType". This is to ensure that the code fails fast in case of an unexpected type, making it easier to identify and fix the issue.

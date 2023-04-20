@@ -1,32 +1,58 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/keeper/msg_server.go)
+[View code on GitHub](https://github.com/duality-labs/duality/keeper/msg_server.go)
 
-The `keeper` package contains an implementation of the `types.MsgServer` interface for the `duality` project's decentralized exchange (DEX). The `msgServer` struct is defined to include a `Keeper` instance, which is used to interact with the DEX's state. 
+The code in this file is part of the `keeper` package and provides an implementation of the `MsgServer` interface for the Duality project. The `MsgServer` interface is responsible for handling various types of messages related to the decentralized exchange (DEX) functionality, such as depositing, withdrawing, swapping tokens, and managing limit orders.
 
-The `NewMsgServerImpl` function returns an instance of the `msgServer` struct, which implements the `types.MsgServer` interface. This function takes a `Keeper` instance as an argument and returns an instance of the `types.MsgServer` interface. This function is used to create a new instance of the `msgServer` struct, which is used to handle incoming messages from clients.
+The `NewMsgServerImpl` function returns a new instance of the `msgServer` struct, which embeds the `Keeper` struct and implements the `MsgServer` interface. The `msgServer` struct has methods for handling different types of messages:
 
-The `msgServer` struct implements several methods that handle different types of messages. These methods include `Deposit`, `Withdrawal`, `Swap`, `PlaceLimitOrder`, `WithdrawFilledLimitOrder`, `CancelLimitOrder`, and `MultiHopSwap`. Each of these methods takes a context and a message as arguments and returns a response and an error.
+1. `Deposit`: This method handles depositing tokens into the DEX. It sorts the input tokens and amounts, normalizes the tick indexes, and calls the `DepositCore` method to perform the deposit operation. The response includes the deposited amounts for both tokens.
 
-The `Deposit` method handles depositing tokens into the DEX. It takes a `MsgDeposit` message as an argument, which includes the tokens to be deposited, the amounts to be deposited, and the fees to be paid. The method sorts the tokens and amounts, normalizes the tick indexes, and then calls the `DepositCore` method on the `Keeper` instance to deposit the tokens.
+   ```go
+   return &types.MsgDepositResponse{Reserve0Deposited: Amounts0Deposit, Reserve1Deposited: Amounts1Deposit}, nil
+   ```
 
-The `Withdrawal` method handles withdrawing tokens from the DEX. It takes a `MsgWithdrawal` message as an argument, which includes the tokens to be withdrawn, the shares to be removed, and the fees to be paid. The method sorts the tokens, normalizes the tick indexes, and then calls the `WithdrawCore` method on the `Keeper` instance to withdraw the tokens.
+2. `Withdrawal`: This method handles withdrawing tokens from the DEX. It sorts the input tokens, normalizes the tick indexes, and calls the `WithdrawCore` method to perform the withdrawal operation.
 
-The `Swap` method handles swapping tokens on the DEX. It takes a `MsgSwap` message as an argument, which includes the tokens to be swapped, the amounts to be swapped, and the fees to be paid. The method calls the `SwapCore` method on the `Keeper` instance to perform the swap.
+   ```go
+   return &types.MsgWithdrawalResponse{}, nil
+   ```
 
-The `PlaceLimitOrder` method handles placing a limit order on the DEX. It takes a `MsgPlaceLimitOrder` message as an argument, which includes the tokens to be traded, the amount to be traded, the tick index, the order type, the expiration time, and the fees to be paid. The method normalizes the tick index and then calls the `PlaceLimitOrderCore` method on the `Keeper` instance to place the limit order.
+3. `Swap`: This method handles swapping tokens within the DEX. It calls the `SwapCore` method to perform the swap operation and returns the output coin.
 
-The `WithdrawFilledLimitOrder` method handles withdrawing a filled limit order from the DEX. It takes a `MsgWithdrawFilledLimitOrder` message as an argument, which includes the tranche key of the filled limit order and the fees to be paid. The method calls the `WithdrawFilledLimitOrderCore` method on the `Keeper` instance to withdraw the filled limit order.
+   ```go
+   return &types.MsgSwapResponse{CoinOut: coinOut}, nil
+   ```
 
-The `CancelLimitOrder` method handles canceling a limit order on the DEX. It takes a `MsgCancelLimitOrder` message as an argument, which includes the tranche key of the limit order and the fees to be paid. The method calls the `CancelLimitOrderCore` method on the `Keeper` instance to cancel the limit order.
+4. `PlaceLimitOrder`: This method handles placing limit orders in the DEX. It sorts the input tokens, normalizes the tick index, validates the order expiration time, and calls the `PlaceLimitOrderCore` method to place the limit order. The response includes the tranche key for the placed order.
 
-The `MultiHopSwap` method handles performing a multi-hop swap on the DEX. It takes a `MsgMultiHopSwap` message as an argument, which includes the amount to be swapped, the routes to be taken, the exit limit price, the pick best route flag, and the fees to be paid. The method calls the `MultiHopSwapCore` method on the `Keeper` instance to perform the multi-hop swap.
+   ```go
+   return &types.MsgPlaceLimitOrderResponse{TrancheKey: *trancheKey}, nil
+   ```
 
-Overall, this package provides an implementation of the `types.MsgServer` interface for the `duality` project's DEX. The methods provided by this package handle different types of messages that can be sent to the DEX, such as depositing tokens, withdrawing tokens, swapping tokens, placing limit orders, and performing multi-hop swaps. These methods interact with the DEX's state through the `Keeper` instance provided to the `msgServer` struct.
+5. `WithdrawFilledLimitOrder`: This method handles withdrawing filled limit orders from the DEX. It calls the `WithdrawFilledLimitOrderCore` method to perform the withdrawal operation.
+
+   ```go
+   return &types.MsgWithdrawFilledLimitOrderResponse{}, nil
+   ```
+
+6. `CancelLimitOrder`: This method handles canceling limit orders in the DEX. It calls the `CancelLimitOrderCore` method to perform the cancellation operation.
+
+   ```go
+   return &types.MsgCancelLimitOrderResponse{}, nil
+   ```
+
+7. `MultiHopSwap`: This method handles multi-hop swaps within the DEX. It calls the `MultiHopSwapCore` method to perform the multi-hop swap operation and returns the output coin.
+
+   ```go
+   return &types.MsgMultiHopSwapResponse{CoinOut: coinOut}, nil
+   ```
+
+These methods provide the core functionality for interacting with the DEX in the Duality project, enabling users to deposit, withdraw, swap tokens, and manage limit orders.
 ## Questions: 
- 1. What is the purpose of this code file?
-- This code file contains the implementation of the `MsgServer` interface for the `duality` project's decentralized exchange (DEX) module.
+ 1. **Question**: What is the purpose of the `msgServer` struct and how is it used in the code?
+   **Answer**: The `msgServer` struct is an implementation of the `MsgServer` interface from the `duality/x/dex/types` package. It embeds the `Keeper` struct and provides methods for handling various message types like Deposit, Withdrawal, Swap, and others.
 
-2. What are the main functions provided by this code file?
-- This code file provides functions for depositing, withdrawing, swapping, placing limit orders, withdrawing filled limit orders, cancelling limit orders, and performing multi-hop swaps on the DEX.
+2. **Question**: How does the `Deposit` function work and what are its inputs and outputs?
+   **Answer**: The `Deposit` function is a method of the `msgServer` struct that takes a `context.Context` and a `*types.MsgDeposit` as input. It processes the deposit message, performs the necessary operations using the `Keeper`, and returns a `*types.MsgDepositResponse` containing the deposited amounts, or an error if any issues occur during the process.
 
-3. What external dependencies does this code file have?
-- This code file imports the `cosmos-sdk/types` and `duality-labs/duality/x/dex/types` packages.
+3. **Question**: What is the purpose of the `NormalizeAllTickIndexes` and `SortTokens` functions, and how are they used in the code?
+   **Answer**: The `NormalizeAllTickIndexes` function is used to normalize tick indexes based on the order of the input tokens. The `SortTokens` function is used to lexographically sort two input tokens. Both functions are used in various methods of the `msgServer` struct, such as `Deposit`, `Withdrawal`, and `PlaceLimitOrder`, to ensure consistent ordering of tokens and tick indexes throughout the code.

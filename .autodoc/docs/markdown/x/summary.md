@@ -1,84 +1,83 @@
-[View code on GitHub](https://github.com/duality-labs/duality/utodoc/docs/json/x)
+[View code on GitHub](https://github.com/duality-labs/duality/oc/docs/json/x)
 
-The `.autodoc/docs/json/x` folder contains essential modules for the Duality project, including `dex`, `epochs`, `incentives`, and `mev`. These modules provide core functionalities such as decentralized exchange, periodic event scheduling, incentives management, and Maximal Extractable Value (MEV) handling.
+The `.autodoc/docs/json/x` folder contains the core modules for the Duality project, including `dex`, `epochs`, `incentives`, and `mev`. These modules are responsible for managing various aspects of the project, such as decentralized exchange functionality, periodic event handling, incentives distribution, and miner-extractable value tracking.
 
-The `dex` package offers core functionality for the Duality decentralized exchange (DEX) module. It includes functions for initializing and exporting the DEX module's state, handling incoming messages related to trading, and implementing the AppModuleBasic and AppModule interfaces for the module. Developers can use this package to build more complex trading strategies and applications on top of the DEX module.
+The `dex` module, located in the `dex` folder, manages the trading of assets, liquidity pools, and limit orders within the project. It initializes and exports the genesis state of the DEX module, handles various message types related to DEX functionality, and provides utility functions for error handling and mathematical operations.
 
-```go
-import (
-    "github.com/duality-labs/duality/x/dex/keeper"
-    "github.com/duality-labs/duality/x/dex/types"
-)
-
-func main() {
-    // create a new DEX keeper
-    k := keeper.NewKeeper()
-
-    // create a new handler for the DEX module
-    handler := NewHandler(k)
-
-    // create a new deposit message
-    depositMsg := types.NewMsgDeposit(...)
-
-    // process the deposit message using the handler
-    result, err := handler(ctx, depositMsg)
-    if err != nil {
-        // handle error
-    }
-
-    // handle result
-}
-```
-
-The `epochs` module allows other modules to run code periodically by providing a generalized epoch interface. This enables modules to schedule and execute code at specified intervals without having to implement their own scheduling logic.
+Example usage of the `dex` module:
 
 ```go
-import (
-    "github.com/duality/epochs"
-    "github.com/duality/epochs/types"
-)
-
-// Initialize the epochs module
-appModule := epochs.NewAppModule(keeper)
-
-// Register a new epoch
-epochInfo := types.EpochInfo{
-    Identifier: "weekly-update",
-    StartTime:  time.Now(),
-    Duration:   7 * 24 * time.Hour,
-}
-appModule.Keeper.AddEpochInfo(ctx, epochInfo)
-
-// Register a hook to be executed at the start of the epoch
-appModule.Keeper.SetHooks(types.MultiEpochHooks{
-    BeforeEpochStart: func(ctx sdk.Context, epochInfo types.EpochInfo) {
-        // Execute custom code at the start of the epoch
-    },
-})
-```
-
-The `incentives` module manages the incentives system for the Duality blockchain, providing functionalities for creating, modifying, and retrieving gauges and stakes, as well as distributing rewards to users based on certain conditions.
-
-```go
-// create a new gauge
-keeper.CreateGauge(ctx, ...)
-
-// stake tokens
-keeper.Stake(ctx, ...)
-
-// get active gauges
-activeGauges := keeper.GetActiveGauges(ctx)
-```
-
-The `mev` package manages the Maximal Extractable Value (MEV) module, providing functionalities such as initializing and exporting the module's state, handling messages related to the module, and simulating the module's behavior.
-
-```go
-ctx := sdk.Context{}
-keeper := keeper.Keeper{}
-genesisState := types.GenesisState{}
-
+// Initialize the DEX module's state with specific parameters
+ctx := sdk.Context(...)
+keeper := keeper.NewKeeper(...)
+genesisState := types.GenesisState{...}
 InitGenesis(ctx, keeper, genesisState)
+
+// Create a new handler for processing messages related to the DEX module
+handler := NewHandler(keeper)
+
+// Send a message to the DEX module
+msg := types.MsgDeposit{...}
+res, err := handler(ctx, msg)
+
+// Export the DEX module's state
 exportedGenesisState := ExportGenesis(ctx, keeper)
 ```
 
-These modules play a crucial role in the Duality project, providing essential functionalities and enabling developers to build more complex applications on top of the Duality blockchain.
+The `epochs` module, located in the `epochs` folder, allows other modules to run code periodically by providing a generalized epoch interface. It manages the state of epochs and provides hooks for custom actions at the start or end of an epoch.
+
+Example usage of the `epochs` module:
+
+```go
+// Initialize the epochs module
+appModule := epochs.NewAppModule(keeper.NewKeeper(...))
+
+// Register the epochs module with the application
+app.RegisterModule(appModule)
+
+// Define a custom hook function to be executed at the start of an epoch
+func myEpochStartHook(ctx sdk.Context, epoch types.EpochInfo) {
+    // Perform custom actions here
+}
+
+// Register the custom hook function with the epochs module
+appModule.GetKeeper().SetHooks(types.NewMultiEpochHooks(myEpochStartHook))
+```
+
+The `incentives` module, located in the `incentives` folder, manages the incentives system for the Duality blockchain. It provides functionality for creating, modifying, and retrieving gauges, which are used to distribute rewards to users based on certain conditions.
+
+Example usage of the `incentives` module:
+
+```go
+ctx := types.NewContext(nil, types.Header{}, false, nil)
+req := types.RequestBeginBlock{}
+k := keeper.NewKeeper()
+
+incentives.BeginBlocker(ctx, req, k)
+updates := incentives.EndBlocker(ctx, k)
+// do something with updates
+```
+
+The `mev` module, located in the `mev` folder, manages and tracks various aspects of the project's functionality, such as handling incoming messages and executing appropriate actions. It also interacts with the state of the blockchain, including reading and writing data, managing parameters, and handling transactions and events.
+
+Example usage of the `mev` module:
+
+```go
+// Initialize the mev module's state with specific parameters
+ctx := sdk.Context(...)
+keeper := keeper.NewKeeper(...)
+genesisState := types.GenesisState{...}
+InitGenesis(ctx, keeper, genesisState)
+
+// Create a new handler for processing messages related to the mev module
+handler := NewHandler(keeper)
+
+// Send a message to the mev module
+msg := types.MsgSend{...}
+res, err := handler(ctx, msg)
+
+// Export the mev module's state
+exportedGenesisState := ExportGenesis(ctx, keeper)
+```
+
+In summary, the `.autodoc/docs/json/x` folder contains the core modules for the Duality project, which work together to provide a robust and flexible system for handling various aspects of the project's functionality.

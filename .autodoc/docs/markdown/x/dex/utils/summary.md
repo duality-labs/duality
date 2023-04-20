@@ -1,26 +1,43 @@
-[View code on GitHub](https://github.com/duality-labs/duality/utodoc/docs/json/x/dex/utils)
+[View code on GitHub](https://github.com/duality-labs/duality/oc/docs/json/x/dex/utils)
 
-The `utils` package in the `duality` project provides a set of utility functions that can be used across the project. These functions are focused on error handling, basic math, and conversion operations.
+The `utils` package in the `dex` folder provides utility functions for the duality project, focusing on error handling and mathematical operations. These functions are designed to work with the Cosmos SDK, a framework for building blockchain applications in Golang.
 
-In `errors.go`, the `JoinErrors` function combines multiple errors into a single error message. This is useful for handling errors that occur in different parts of the code, making it easier to understand what went wrong and where the error occurred. For example:
+`errors.go` contains a utility function called `JoinErrors` that combines multiple errors into a single error. This is useful when a function encounters multiple errors and needs to return all of them to the caller for proper handling or logging. For example:
 
 ```go
-func doSomething() error {
-    err1 := someFunction()
-    err2 := anotherFunction()
-    if err1 != nil || err2 != nil {
-        return utils.JoinErrors(err1, err2)
+func performOperations() error {
+    err1 := operation1()
+    err2 := operation2()
+    err3 := operation3()
+
+    if err1 != nil || err2 != nil || err3 != nil {
+        return utils.JoinErrors(errors.New("operation errors"), err1, err2, err3)
     }
+
     return nil
 }
 ```
 
-In this example, `doSomething` calls two different functions that may return errors. If either of those functions returns an error, `JoinErrors` is called to combine the errors into a single error message that is returned to the caller.
+In this example, if any of the operations return an error, the `JoinErrors` function is called to combine all the errors into a single error, which is then returned to the caller.
 
-In `math.go`, various utility functions provide basic math and conversion operations. Functions like `Abs`, `MaxInt64`, `MinInt64`, `MinDec`, `MaxDec`, `MinIntArr`, and `MaxIntArr` are used to perform operations on integers and decimals, ensuring that values fall within a certain range or are always positive.
+`math.go` provides utility functions for mathematical operations and conversions, such as:
 
-The `Uint64ToSortableString` function converts a `uint64` value to a string that sorts lexicographically in integer order, which can be useful for sorting `uint64` values as strings.
+1. `BasePrice()`: Returns the base value for price as a decimal, which is 1.0001.
+2. `Abs(x int64)`: Calculates the absolute value of an int64 input and returns it as a uint64.
+3. `MaxInt64(a, b int64)` and `MinInt64(a, b int64)`: Return the maximum and minimum values, respectively, between two int64 inputs.
+4. `MinDec(a, b sdk.Dec)` and `MaxDec(a, b sdk.Dec)`: Return the minimum and maximum values, respectively, between two sdk.Dec (decimal) inputs.
+5. `MinIntArr(vals []sdk.Int)` and `MaxIntArr(vals []sdk.Int)`: Return the minimum and maximum values, respectively, from an array of sdk.Int inputs.
+6. `Uint64ToSortableString(i uint64)`: Converts a uint64 input to a string that sorts lexicographically in integer order.
+7. `SafeUint64(in uint64)` and `MustSafeUint64(in uint64)`: Safely convert a uint64 input to an int64 output.
 
-The `SafeUint64` and `MustSafeUint64` functions are used to safely convert `uint64` values to `int64` values, with the latter panicking if an overflow occurs during the conversion. These functions can be used when handling conversions between different integer types.
+These utility functions can be used throughout the duality project to perform common mathematical operations and conversions, ensuring consistency and reducing the need for repetitive code. For example, when comparing two prices in the project, one can use the `MaxDec` and `MinDec` functions to easily determine the higher and lower prices:
 
-Overall, the utility functions in this package provide essential operations that can be used throughout the `duality` project, ensuring consistent error handling, math operations, and conversions.
+```go
+price1 := sdk.NewDec(100)
+price2 := sdk.NewDec(200)
+
+maxPrice := utils.MaxDec(price1, price2)
+minPrice := utils.MinDec(price1, price2)
+```
+
+In summary, the `utils` package in the `dex` folder provides essential utility functions for error handling and mathematical operations, which can be used throughout the duality project to ensure consistency and reduce code repetition.

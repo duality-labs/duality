@@ -4,10 +4,9 @@
     "root": ".",
     "output": "./.autodoc",
     "llms": [
-        "gpt-3.5-turbo",
-        "gpt-4"
+        "gpt-4-32k"
     ],
-    "root": "./x",
+    "root": "./x/dex",
     "ignore": [
         ".*",
         "*package-lock.json",
@@ -17,6 +16,8 @@
         "*build*",
         "*test*",
         "*.svg",
+        "*grpc*",
+        "*cli*",
         "*simulation*",
         "*.md",
         "*vue*",

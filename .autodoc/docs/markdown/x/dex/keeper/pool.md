@@ -1,39 +1,22 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/keeper/pool.go)
+[View code on GitHub](https://github.com/duality-labs/duality/keeper/pool.go)
 
-The code in this file is part of the `keeper` package and is responsible for managing the liquidity pool in a decentralized exchange (DEX) module. The main struct, `Pool`, represents a liquidity pool with its properties such as tick indices, fees, and reserves. The pool allows users to swap tokens, deposit liquidity, and withdraw liquidity.
+The code in this file is part of the `keeper` package and is responsible for managing the liquidity pool in the Duality project. The main struct, `Pool`, represents a liquidity pool with its properties such as `CenterTickIndex`, `Fee`, `LowerTick0`, `UpperTick1`, `Price1To0Lower`, and `Price0To1Upper`.
 
-The `NewPool` function initializes a new `Pool` object with the given tick indices and reserves. The `GetOrInitPool` function retrieves an existing pool or initializes a new one with the specified parameters.
+The `NewPool` function initializes a new `Pool` object with the given parameters. The `GetOrInitPool` function retrieves or initializes a pool with the specified `PairID`, `centerTickIndex`, and `fee`.
 
-The `Swap0To1` and `Swap1To0` functions handle token swaps within the pool. They calculate the input and output amounts based on the provided maximum input and output amounts, and update the reserves accordingly.
+The `Pool` struct provides methods for managing the pool's reserves and performing swaps between tokens. The `Swap0To1` and `Swap1To0` methods perform swaps between tokens, updating the pool's reserves accordingly. The `Deposit` method allows users to deposit tokens into the pool, updating the pool's reserves and minting shares for the depositor. The `Withdraw` method allows users to withdraw tokens from the pool, updating the pool's reserves and burning the shares.
 
-The `Deposit` function allows users to deposit liquidity into the pool. It calculates the greatest matching ratio of the input amounts and updates the reserves. If the `autoswap` flag is set, it also calculates the residual shares minted and updates the input amounts.
+The `CalcGreatestMatchingRatio` function calculates the greatest matching ratio for depositing tokens into the pool. The `CalcSharesMinted` and `CalcResidualSharesMinted` functions calculate the number of shares to be minted for the depositor based on the deposited amounts and the pool's current state.
 
-The `Withdraw` function allows users to withdraw liquidity from the pool. It calculates the redeemable value based on the shares to remove and total shares, and updates the reserves accordingly.
+The `RedeemValue` function calculates the value of the shares to be removed from the pool. The `SavePool` function saves the updated pool state to the context, emitting events for updating the pool's reserves.
 
-The `CalcGreatestMatchingRatio`, `CalcResidualValue`, and `CalcFee` functions are utility functions that help in calculating various values related to the pool, such as the greatest matching ratio of input amounts, the residual value of input amounts, and the fee for a given tick range.
-
-Finally, the `SavePool` function saves the updated pool state to the store and emits events for updating the pool reserves.
-
-Here's an example of how to create a new pool and perform a token swap:
-
-```go
-// Initialize a new pool
-pool := NewPool(centerTickIndex, lowerTick0, upperTick1)
-
-// Perform a token swap
-inAmount0, outAmount1 := pool.Swap0To1(maxAmount0, maxAmountOut1)
-```
-
-Overall, this code is essential for managing liquidity pools in a DEX module, allowing users to swap tokens and provide liquidity to the market.
+Overall, this code is responsible for managing the liquidity pool's state and performing operations such as swaps, deposits, and withdrawals. It plays a crucial role in the larger Duality project by enabling users to interact with the decentralized exchange and providing liquidity for token pairs.
 ## Questions: 
- 1. **What is the purpose of the `Pool` struct and its fields?**
+ 1. **Question**: What is the purpose of the `Pool` struct and its fields?
+   **Answer**: The `Pool` struct represents a liquidity pool in the DEX (Decentralized Exchange) module. It contains information about the pool's center tick index, fee, lower and upper tick reserves, and the prices for swapping between the two tokens in the pool.
 
-   The `Pool` struct represents a liquidity pool in the DEX (Decentralized Exchange) module. It contains information about the pool's center tick index, fee, lower and upper tick pool reserves, and the prices for swapping between the two tokens in the pool.
+2. **Question**: What does the `GetOrInitPool` function do, and how does it handle errors?
+   **Answer**: The `GetOrInitPool` function retrieves an existing pool or initializes a new one with the given parameters. It handles errors by returning a zero-value `Pool` struct and wrapping the error with additional context, such as "Error for lower tick" or "Error for upper tick".
 
-2. **What is the role of the `NewPool` function and why are there TODO comments in it?**
-
-   The `NewPool` function is a constructor for the `Pool` struct. It takes the center tick index, lower tick pool reserves, and upper tick pool reserves as arguments and returns a new `Pool` instance. The TODO comments indicate that there are potential improvements to be made, such as accepting a PairID as an argument and storing the calculated prices to avoid recalculating them.
-
-3. **How does the `Deposit` function work and what is the purpose of the `autoswap` parameter?**
-
-   The `Deposit` function is used to add liquidity to the pool by depositing tokens. It takes the maximum amounts of token0 and token1 to be deposited, the existing shares, and a boolean `autoswap` parameter. If `autoswap` is set to true, the function will also perform an automatic swap between the two tokens to balance the pool's reserves. The function returns the actual amounts of token0 and token1 deposited, as well as the shares minted for the depositor.
+3. **Question**: What is the purpose of the `Deposit` function, and how does it handle the `autoswap` parameter?
+   **Answer**: The `Deposit` function is used to deposit tokens into the liquidity pool and calculate the shares minted for the depositor. If the `autoswap` parameter is set to true, it will also perform an automatic swap between the two tokens using the residual amounts, and the resulting shares will include both the shares from the initial deposit and the shares from the autoswap.

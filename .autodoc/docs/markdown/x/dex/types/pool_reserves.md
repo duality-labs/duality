@@ -1,36 +1,31 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/types/pool_reserves.go)
+[View code on GitHub](https://github.com/duality-labs/duality/types/pool_reserves.go)
 
-The `types` package in the `duality` project contains a function called `HasToken()` which takes in a `PoolReserves` object and returns a boolean value. The purpose of this function is to check if the `PoolReserves` object has any tokens in its reserves. 
+The code provided is part of the `duality` project and is located in the `types` package. This package is responsible for defining custom data types and related functions that are used throughout the project. In this specific code snippet, we are dealing with the `PoolReserves` type and its associated method `HasToken()`.
 
-The `PoolReserves` object is a custom type that contains two fields: `Reserves` and `TotalShares`. `Reserves` is of type `sdk.Int` which is a custom type from the `cosmos-sdk/types` package. It represents the total amount of tokens held in the pool's reserves. `TotalShares` is also of type `sdk.Int` and represents the total number of shares issued by the pool.
+The `PoolReserves` type is not explicitly defined in the provided code, but it can be inferred that it is a custom type with a field named `Reserves`, which is of type `sdk.Int`. The `sdk.Int` type is imported from the Cosmos SDK, a popular framework for building blockchain applications in Golang. The `sdk.Int` type represents arbitrary-precision integers and provides various utility methods for working with them.
 
-The `HasToken()` function checks if the `Reserves` field of the `PoolReserves` object is greater than zero. If it is, then the function returns `true`, indicating that the pool has tokens in its reserves. If the `Reserves` field is equal to or less than zero, then the function returns `false`, indicating that the pool has no tokens in its reserves.
+The `HasToken()` method is a receiver function for the `PoolReserves` type. This method checks if the `Reserves` field of the `PoolReserves` instance has a value greater than zero. It does this by calling the `GT()` method on the `Reserves` field, which stands for "greater than" and returns a boolean value. The `GT()` method is provided by the `sdk.Int` type and takes another `sdk.Int` value as an argument. In this case, the argument is `sdk.ZeroInt()`, which is a utility function that returns an `sdk.Int` value representing zero.
 
-This function can be used in the larger project to determine if a pool has any tokens available for trading. For example, if a user wants to trade a specific token on a decentralized exchange, they would need to know if that token is available in the pool's reserves. The `HasToken()` function can be used to check if the token is available before attempting to make a trade.
+In the context of the larger project, the `HasToken()` method can be used to determine if a specific instance of `PoolReserves` has any tokens in its reserves. This information can be useful for various purposes, such as validating transactions, updating the state of the blockchain, or providing information to users about the status of a particular pool.
 
-Here is an example of how the `HasToken()` function can be used:
+Here's an example of how the `HasToken()` method might be used in the project:
 
-```
-import "duality/types"
-
-func main() {
-    poolReserves := types.PoolReserves{
-        Reserves:    sdk.NewInt(100),
-        TotalShares: sdk.NewInt(50),
-    }
-
-    hasToken := poolReserves.HasToken()
-    fmt.Println(hasToken) // Output: true
+```go
+pool := getPoolReserves(poolID)
+if pool.HasToken() {
+    // Perform some action if the pool has tokens in its reserves
+} else {
+    // Perform some other action if the pool does not have tokens in its reserves
 }
 ```
 
-In this example, a `PoolReserves` object is created with 100 tokens in its reserves and 50 total shares issued. The `HasToken()` function is called on this object and returns `true` since the `Reserves` field is greater than zero.
+In summary, the provided code defines a method for the `PoolReserves` type that checks if the reserves have a value greater than zero, indicating the presence of tokens. This method can be used in various parts of the project to make decisions based on the status of a pool's reserves.
 ## Questions: 
- 1. What is the purpose of the `types` package in the `duality` project?
-- The `types` package is imported to define the `sdk` type from the `cosmos-sdk` library.
+ 1. **Question:** What is the purpose of the `HasToken` function in the `PoolReserves` type?
+   **Answer:** The `HasToken` function checks if the pool reserves have a token balance greater than zero, returning true if it does and false otherwise.
 
-2. What does the `HasToken()` function do?
-- The `HasToken()` function checks if the `Reserves` value in the `PoolReserves` struct is greater than zero and returns a boolean value.
+2. **Question:** What is the `PoolReserves` type and how is it defined?
+   **Answer:** The `PoolReserves` type is not shown in the provided code snippet. It would be helpful to see its definition to understand the context of the `HasToken` function.
 
-3. What is the significance of the `sdk.ZeroInt()` function?
-- The `sdk.ZeroInt()` function returns an integer value of zero from the `cosmos-sdk` library and is used as a comparison value in the `HasToken()` function.
+3. **Question:** What is the `sdk.ZeroInt()` function and what does it return?
+   **Answer:** The `sdk.ZeroInt()` function is from the Cosmos SDK and returns a new `Int` object with a value of zero. It is used here to compare the pool reserves to ensure they have a non-zero balance.

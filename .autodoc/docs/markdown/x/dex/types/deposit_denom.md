@@ -1,24 +1,41 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/types/deposit_denom.go)
+[View code on GitHub](https://github.com/duality-labs/duality/types/deposit_denom.go)
 
-The `types` package contains the `DepositDenom` struct and related functions. The `DepositDenom` struct represents a deposit denomination for a liquidity pool. It contains a `PairID` field, which is a struct that contains two token symbols, a `Tick` field, which is an integer representing the tick index of the liquidity pool, and a `Fee` field, which is an unsigned integer representing the fee of the liquidity pool.
+The `duality` code file focuses on handling deposit denominations (denoms) for liquidity pool shares in a decentralized exchange. It provides a structure and functions to create, parse, and represent deposit denoms.
 
-The `NewDepositDenom` function is a constructor for the `DepositDenom` struct. It takes a `PairID`, a `Tick`, and a `Fee` as arguments and returns a pointer to a new `DepositDenom` struct.
+The `DepositDenom` struct is the main data structure, containing a `PairID` (tokens involved in the liquidity pool), `Tick` (index of the price range), and `Fee` (liquidity provider fee). The `PairID` struct contains `Token0` and `Token1`, representing the two tokens in the liquidity pool.
 
-The `NewDepositDenomFromString` function is another constructor for the `DepositDenom` struct. It takes a string as an argument and returns a pointer to a new `DepositDenom` struct. The string is expected to be in the format of a deposit denomination for a liquidity pool. The function parses the string and extracts the `PairID`, `Tick`, and `Fee` fields to create a new `DepositDenom` struct.
+The `NewDepositDenom` function creates a new `DepositDenom` instance, taking a `PairID`, `Tick`, and `Fee` as input. The `NewDepositDenomFromString` function parses a string representation of a deposit denom and returns a `DepositDenom` instance. It uses the `LPSharesRegexp` regular expression to extract the required information (tokens, tick index, and fee) from the input string. If the input string is invalid, it returns an `ErrInvalidDepositDenom` error.
 
-The `String` method is a string representation of the `DepositDenom` struct. It returns a string in the format of a deposit denomination for a liquidity pool.
+The `String` method of the `DepositDenom` struct returns a string representation of the deposit denom, which can be used for display or storage purposes. It uses the `DepositDenomPairIDPrefix` function to generate a prefix for the string, which includes the `DepositSharesPrefix` constant and the sanitized token names (with dashes removed).
 
-The `DepositDenomPairIDPrefix` function is a helper function that takes two token symbols as arguments and returns a string in the format of a deposit denomination prefix for a liquidity pool.
+Here's an example of creating a `DepositDenom` instance and converting it to a string:
 
-The `LPSharesRegexp` variable is a regular expression that matches the format of a deposit denomination for a liquidity pool. It is used by the `NewDepositDenomFromString` function to parse the string argument.
+```go
+pairID := &PairID{Token0: "tokenA", Token1: "tokenB"}
+depositDenom := NewDepositDenom(pairID, 10, 5)
+denomStr := depositDenom.String() // "d-tokenA-tokenB-t10-f5"
+```
 
-Overall, this code provides functionality for creating and parsing deposit denominations for liquidity pools. It can be used in the larger project to manage liquidity pools and their associated deposit denominations. For example, it could be used to create new deposit denominations when users deposit tokens into a liquidity pool, or to parse existing deposit denominations when users withdraw tokens from a liquidity pool.
+And an example of parsing a deposit denom string:
+
+```go
+denomStr := "d-tokenA-tokenB-t10-f5"
+depositDenom, err := NewDepositDenomFromString(denomStr)
+if err != nil {
+    // Handle error
+}
+```
+
+This code is essential for managing liquidity pool shares in the larger project, as it provides a standardized way to represent and manipulate deposit denoms.
 ## Questions: 
- 1. What is the purpose of the `DepositDenom` struct and its associated functions?
-- The `DepositDenom` struct represents a deposit denomination for a liquidity pool and its associated functions are used to create and parse deposit denominations.
+ 1. **Question:** What is the purpose of the `DepositDenom` struct and its associated functions?
 
-2. What is the purpose of the `LPSharesRegexp` variable?
-- The `LPSharesRegexp` variable is a regular expression used to match and parse deposit denominations for a liquidity pool.
+   **Answer:** The `DepositDenom` struct represents a deposit denomination with a pair of tokens, tick index, and fee. The associated functions are used to create a new `DepositDenom` instance, parse a deposit denomination from a string, and convert a `DepositDenom` instance to a string representation.
 
-3. What is the purpose of the `DepositDenomPairIDPrefix` function?
-- The `DepositDenomPairIDPrefix` function returns a string prefix for a deposit denomination based on the token IDs of the liquidity pool.
+2. **Question:** What is the role of the `LPSharesRegexp` variable and how is it used in the code?
+
+   **Answer:** The `LPSharesRegexp` variable is a compiled regular expression used to match and extract information from a deposit denomination string. It is used in the `NewDepositDenomFromString` function to parse the input string and extract the required information to create a `DepositDenom` instance.
+
+3. **Question:** What is the purpose of the `DepositDenomPairIDPrefix` function and how is it used in the code?
+
+   **Answer:** The `DepositDenomPairIDPrefix` function is used to create a prefix string for a deposit denomination based on the given token0 and token1 strings. It is used in the `String` method of the `DepositDenom` struct to generate the string representation of a `DepositDenom` instance.

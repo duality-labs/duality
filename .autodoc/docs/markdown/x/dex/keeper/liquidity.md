@@ -1,16 +1,26 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/keeper/liquidity.go)
+[View code on GitHub](https://github.com/duality-labs/duality/keeper/liquidity.go)
 
-The `keeper` package contains code that is used to manage liquidity pools and execute swaps in the Duality project. The `Liquidity` interface defines two methods: `Swap` and `Price`. The `Swap` method takes in two `sdk.Int` values, `maxAmountIn` and `maxAmountOut`, and returns two `sdk.Int` values, `inAmount` and `outAmount`. The `Price` method returns a pointer to a `types.Price` struct. 
+This code is part of the `keeper` package and provides functionality for managing liquidity in a decentralized exchange (DEX) built on the Cosmos SDK. The main purpose of this code is to facilitate token swaps between trading pairs and manage the liquidity pools associated with those pairs.
 
-The `LiquidityIterator` struct is used to iterate over the liquidity in a given trading pair. It contains a `keeper` object, a `pairID` object, a `ctx` object, an `iter` object, and an `is0To1` boolean. The `Next` method is used to move the iterator to the next tick and return the liquidity at that tick. The `createPool0To1` and `createPool1To0` methods are used to create a new liquidity pool for a given trading pair. The `Close` method is used to close the iterator.
+The `Liquidity` interface defines two methods: `Swap` and `Price`. The `Swap` method is used to calculate the input and output amounts for a token swap, while the `Price` method returns the current price of the trading pair.
 
-The `SaveLiquidity` method is used to save the liquidity to the keeper. It takes in an `sdk.Context` object and a `Liquidity` interface and saves the liquidity to the keeper. The `Swap` method is used to execute a swap between two tokens. It takes in a `sdk.Context` object, a `pairID` object, two token strings, `maxAmountIn` and `maxAmountOut` values, and a `limitPrice` value. It returns two `sdk.Coin` values, `totalInCoin` and `totalOutCoin`, and an error. The `SwapExactAmountIn` method is used to execute a swap with a specified amount of input token. It takes in a `sdk.Context` object, a `pairID` object, two token strings, an `amountIn` value, a `maxAmountOut` value, and a `limitPrice` value. It returns two `sdk.Coin` values, `totalIn` and `totalOut`, and an error. The `SwapWithCache` method is used to execute a swap with a cache. It takes in a `sdk.Context` object, a `pairID` object, two token strings, `maxAmountIn` and `maxAmountOut` values, and a `limitPrice` value. It returns two `sdk.Coin` values, `totalIn` and `totalOut`, and an error.
+The `NewLiquidityIterator` function creates a new `LiquidityIterator` object, which is used to iterate through the liquidity pools and limit order tranches associated with a given trading pair. The `Next` method of the `LiquidityIterator` struct returns the next liquidity object (either a pool or a limit order tranche) in the iteration.
 
-Overall, this code is used to manage liquidity pools and execute swaps in the Duality project. The `LiquidityIterator` struct is used to iterate over the liquidity in a given trading pair, while the `SaveLiquidity`, `Swap`, `SwapExactAmountIn`, and `SwapWithCache` methods are used to manage liquidity and execute swaps.
+The `createPool0To1` and `createPool1To0` methods are used to create liquidity pools for token swaps in different directions (from token 0 to token 1 and vice versa). These methods are called by the `Next` method of the `LiquidityIterator` struct.
+
+The `Swap` function is the main entry point for performing token swaps. It takes the trading pair, input and output tokens, maximum input and output amounts, and an optional limit price as arguments. It uses the `LiquidityIterator` to iterate through the liquidity pools and limit order tranches, performing swaps until the desired input or output amount is reached or the limit price is exceeded.
+
+The `SwapExactAmountIn` function is a wrapper around the `Swap` function that ensures the exact input amount is used for the swap. If the swap cannot be performed with the exact input amount, an error is returned.
+
+The `SwapWithCache` function is another wrapper around the `Swap` function that uses a cache context to perform the swap. This allows the swap to be performed without modifying the main context, and the changes can be written to the main context using the `writeCache` function.
+
+Overall, this code provides the necessary functionality for managing liquidity and performing token swaps in a DEX built on the Cosmos SDK.
 ## Questions: 
- 1. What is the purpose of the `Liquidity` interface and what methods does it require?
-- The `Liquidity` interface defines two methods: `Swap` and `Price`, which are used to execute a swap and get the current price of the liquidity pool, respectively.
-2. What is the purpose of the `LiquidityIterator` struct and how is it used?
-- The `LiquidityIterator` struct is used to iterate over the liquidity of a trading pair in a specific direction. It is used to find the best liquidity pool to execute a swap and returns the corresponding `Liquidity` object.
-3. What is the purpose of the `Swap` function and what parameters does it take?
-- The `Swap` function is used to execute a swap between two tokens in a specific trading pair. It takes in the trading pair ID, the input and output tokens, the maximum amount of input and output tokens, and an optional limit price. It returns the total amount of input and output tokens swapped.
+ 1. **Question**: What is the purpose of the `Liquidity` interface and how is it used in the code?
+   **Answer**: The `Liquidity` interface defines two methods, `Swap` and `Price`, which are implemented by different types of liquidity providers. It is used in the `LiquidityIterator` struct to iterate through different liquidity sources and perform swaps or get prices.
+
+2. **Question**: How does the `Swap` function work and what are its input parameters and return values?
+   **Answer**: The `Swap` function is used to perform a swap between two tokens in a trading pair. It takes the trading pair ID, input token, output token, maximum input amount, maximum output amount, and an optional limit price as input parameters. It returns the total input and output amounts as sdk.Coin values, and an error if any issues occur during the swap.
+
+3. **Question**: What is the purpose of the `SwapWithCache` function and how does it differ from the `Swap` function?
+   **Answer**: The `SwapWithCache` function is used to perform a swap operation with a cache context, allowing for temporary changes to be made and then committed or discarded based on the outcome of the swap. It differs from the `Swap` function in that it uses a cache context to perform the swap, and then commits the changes using `writeCache()` if the swap is successful.

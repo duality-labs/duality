@@ -1,18 +1,64 @@
-[View code on GitHub](https://github.com/duality-labs/duality/utodoc/docs/json/app)
+[View code on GitHub](https://github.com/duality-labs/duality/oc/docs/json/app)
 
-The `.autodoc/docs/json/app` folder contains essential code files for the duality project, which is a blockchain application built on top of the Cosmos SDK framework. These files are responsible for various functionalities such as transaction validation, encoding configuration, exporting app state, and proposal whitelisting.
+The `.autodoc/docs/json/app` folder contains essential code files for the duality project, focusing on transaction validation, encoding configuration, exporting application state, and proposal whitelisting.
 
-For instance, the `ante_handler.go` file is crucial for transaction validation. It creates an AnteHandler middleware that validates transactions before they are processed by the blockchain. The AnteHandler is composed of a series of AnteDecorators, each responsible for performing specific validation tasks. This ensures that transactions are valid and secure, preventing malicious actors from exploiting vulnerabilities in the blockchain.
+`ante_handler.go` is responsible for creating an AnteHandler middleware that validates transactions before they are processed by the blockchain. The AnteHandler is composed of a series of AnteDecorators, each performing specific validation tasks. The `NewAnteHandler` function takes in a `HandlerOptions` struct and returns the AnteHandler created by chaining together the AnteDecorators.
 
-The `encoding.go` file provides a deprecated function, `MakeTestEncodingConfig()`, which creates an `EncodingConfig` object for testing purposes. Although it is not recommended to use this function in production code, it demonstrates how to create new codecs using the `AppCodec` object.
+Example usage:
 
-The `export.go` file is responsible for exporting the state of the application for a genesis file. This includes the application state, validators, height, and consensus parameters. It allows for the state of the application to be exported and used for initialization.
+```go
+import (
+    "github.com/duality-labs/duality/app"
+)
 
-The `genesis.go` file defines a type called `GenesisState`, which represents the initial state of the blockchain. It is used to initialize the system during the `init` process. The `NewDefaultGenesisState` function generates this default state by calling the `DefaultGenesis` function of the `ModuleBasics` object.
+func main() {
+    handlerOptions := app.HandlerOptions{...}
+    anteHandler, err := app.NewAnteHandler(handlerOptions)
+    // use anteHandler to validate transactions
+}
+```
 
-The `proposals_whitelisting.go` file provides a way to whitelist certain types of proposals based on their content. This ensures that only certain types of proposals are allowed to be submitted and voted on by the governance module, preventing malicious actors from submitting harmful proposals.
+`encoding.go` provides a deprecated function `MakeTestEncodingConfig()` for creating an `EncodingConfig` object for testing purposes. Instead, the `AppCodec` object should be used to create new codecs.
 
-Here's an example of how the `IsProposalWhitelisted` function from `proposals_whitelisting.go` might be used:
+Example usage:
+
+```go
+import (
+    "github.com/duality-labs/duality/app"
+    "github.com/tendermint/spm/cosmoscmd"
+)
+
+func main() {
+    encodingConfig := app.MakeTestEncodingConfig()
+    codec := encodingConfig.Marshaler
+    // use codec to encode and decode data structures
+}
+```
+
+`export.go` contains the `App` struct with the `ExportAppStateAndValidators` method, which exports the state of the application for a genesis file. This method is crucial for exporting the application state and initializing the system.
+
+`genesis.go` defines the `GenesisState` type, representing the initial state of the blockchain. The `NewDefaultGenesisState` function generates the default state by calling the `DefaultGenesis` function of the `ModuleBasics` object.
+
+Example usage:
+
+```go
+package main
+
+import (
+	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/duality/app"
+)
+
+func main() {
+	cdc := codec.New()
+	genesisState := app.NewDefaultGenesisState(cdc)
+	// use genesisState to initialize the system
+}
+```
+
+`proposals_whitelisting.go` contains the `IsProposalWhitelisted` function, which checks if a proposal is whitelisted based on its content. This is useful for ensuring that only certain types of proposals are allowed to be submitted and voted on by the governance module.
+
+Example usage:
 
 ```go
 import (
@@ -38,4 +84,17 @@ func main() {
 }
 ```
 
-In summary, the code files in the `.autodoc/docs/json/app` folder play crucial roles in the duality project by providing essential functionalities such as transaction validation, encoding configuration, exporting app state, and proposal whitelisting. These files work together to ensure the stability, security, and overall quality of the project.
+The `params` subfolder contains the `proto.go` file, which creates an `EncodingConfig` for a non-amino based test configuration. This is important for testing the project's functionality without relying on amino.
+
+Example usage:
+
+```go
+import (
+    "github.com/duality/params"
+)
+
+func main() {
+    encodingConfig := params.MakeTestEncodingConfig()
+    // use encodingConfig to test project functionality
+}
+```

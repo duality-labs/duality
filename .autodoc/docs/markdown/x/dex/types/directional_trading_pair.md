@@ -1,25 +1,40 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/types/directional_trading_pair.go)
+[View code on GitHub](https://github.com/duality-labs/duality/types/directional_trading_pair.go)
 
-The `DirectionalTradingPair` type in the `types` package is used to represent a trading pair between two tokens in a decentralized exchange. It contains a `PairID` field, which is a unique identifier for the trading pair, and two string fields `TokenIn` and `TokenOut`, which represent the input and output tokens in the pair.
+The `duality` code defines a package named `types` which contains a struct and associated methods for handling directional trading pairs in a trading system. The main purpose of this code is to manage and manipulate trading pairs with specific input and output tokens.
 
-The `NewDirectionalTradingPair` function is a constructor for creating a new `DirectionalTradingPair` instance. It takes a `PairID` pointer and two string arguments `tokenIn` and `tokenOut`, and returns a new `DirectionalTradingPair` instance with the `PairID` field set to the provided `PairID` pointer, and the `TokenIn` and `TokenOut` fields set to the provided string arguments.
+The `DirectionalTradingPair` struct consists of three fields:
 
-The `IsTokenInToken0` and `IsTokenOutToken0` methods are used to determine whether the input token (`TokenIn`) or the output token (`TokenOut`) is the same as the `Token0` field of the `PairID`. The `Token0` field is a predefined field in the `PairID` type that represents the token with the lower address in the pair. If `TokenIn` is the same as `Token0`, then `IsTokenInToken0` returns `true`, otherwise it returns `false`. Similarly, if `TokenOut` is the same as `Token0`, then `IsTokenOutToken0` returns `false`, otherwise it returns `true`.
+- `PairID`: A pointer to a `PairID` struct, which presumably contains information about the trading pair's unique identifier.
+- `TokenIn`: A string representing the input token for the trading pair.
+- `TokenOut`: A string representing the output token for the trading pair.
 
-This code is likely used in the larger project to represent and manipulate trading pairs in a decentralized exchange. For example, it may be used to determine the order in which tokens are listed in a trading pair, or to calculate the price of a trade between two tokens. Here is an example usage of this code:
+The `NewDirectionalTradingPair` function is a constructor for creating a new `DirectionalTradingPair` instance. It takes a pointer to a `PairID` struct, an input token string, and an output token string as arguments, and returns a new `DirectionalTradingPair` with the provided values.
 
+```go
+pair := NewDirectionalTradingPair(pairID, "ETH", "BTC")
 ```
-pairID := &PairID{Token0: "0x123", Token1: "0x456"}
-pair := NewDirectionalTradingPair(pairID, "0x123", "0x789")
-fmt.Println(pair.IsTokenInToken0()) // true
-fmt.Println(pair.IsTokenOutToken0()) // false
+
+Two methods are defined on the `DirectionalTradingPair` struct:
+
+1. `IsTokenInToken0`: This method checks if the input token (`TokenIn`) is equal to the first token in the `PairID` struct (`Token0`). It returns a boolean value, `true` if they are equal, and `false` otherwise.
+
+```go
+isTokenInToken0 := pair.IsTokenInToken0() // true if TokenIn is Token0
 ```
+
+2. `IsTokenOutToken0`: This method checks if the output token (`TokenOut`) is equal to the first token in the `PairID` struct (`Token0`). It does this by calling the `IsTokenInToken0` method and returning the negation of its result. If `IsTokenInToken0` returns `true`, this method will return `false`, and vice versa.
+
+```go
+isTokenOutToken0 := pair.IsTokenOutToken0() // true if TokenOut is Token0
+```
+
+These methods can be useful in the larger project for determining the direction of a trade, validating trading pairs, or performing calculations based on the input and output tokens.
 ## Questions: 
- 1. What is the purpose of the `DirectionalTradingPair` struct?
-- The `DirectionalTradingPair` struct represents a trading pair between two tokens, with a specified input and output token.
+ 1. **Question:** What is the purpose of the `DirectionalTradingPair` struct and its fields?
+   **Answer:** The `DirectionalTradingPair` struct represents a trading pair with a specific direction, containing a `PairID` pointer, and two strings `TokenIn` and `TokenOut` representing the input and output tokens for the trade.
 
-2. What is the `NewDirectionalTradingPair` function used for?
-- The `NewDirectionalTradingPair` function is a constructor for the `DirectionalTradingPair` struct, which takes in a `PairID` and two token strings and returns a new `DirectionalTradingPair` instance.
+2. **Question:** How does the `NewDirectionalTradingPair` function work and what are its parameters?
+   **Answer:** The `NewDirectionalTradingPair` function is a constructor for creating a new `DirectionalTradingPair` instance. It takes a pointer to a `PairID`, and two strings `tokenIn` and `tokenOut` as parameters, and returns a new `DirectionalTradingPair` with the provided values.
 
-3. What do the `IsTokenInToken0` and `IsTokenOutToken0` methods do?
-- The `IsTokenInToken0` method checks if the input token is the same as the `Token0` of the `PairID`, while the `IsTokenOutToken0` method checks if the output token is the same as the `Token0` of the `PairID`.
+3. **Question:** What do the `IsTokenInToken0` and `IsTokenOutToken0` methods do, and how do they relate to each other?
+   **Answer:** The `IsTokenInToken0` method checks if the input token (`TokenIn`) is equal to the first token in the pair (`Token0`). The `IsTokenOutToken0` method checks if the output token (`TokenOut`) is equal to the first token in the pair by negating the result of `IsTokenInToken0`. These methods help determine the direction of the trading pair.

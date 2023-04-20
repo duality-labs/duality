@@ -1,27 +1,44 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/types/message_place_limit_order.go)
+[View code on GitHub](https://github.com/duality-labs/duality/types/message_place_limit_order.go)
 
-The `types` package contains the message types for the `duality` project. This file defines a message type called `MsgPlaceLimitOrder` that represents a limit order placed by a user. A limit order is an order to buy or sell a specific amount of a cryptocurrency at a specific price or better. 
+This code defines a module for placing limit orders in a decentralized exchange (DEX) within the larger Duality project. The main purpose of this module is to create, validate, and process limit order messages.
 
-The `NewMsgPlaceLimitOrder` function creates a new `MsgPlaceLimitOrder` message with the provided parameters. The `creator` parameter is the address of the user who placed the order, `receiver` is the address of the user who will receive the traded tokens, `tokenIn` and `tokenOut` are the input and output tokens of the trade, `tickIndex` is the index of the price tick at which the order was placed, `amountIn` is the amount of input tokens to be traded, `orderType` is the type of the order (good-til-cancelled or immediate-or-cancel), and `goodTil` is the expiration time of the order (if it is a good-til-cancelled order).
+The `MsgPlaceLimitOrder` struct represents a limit order message, containing fields such as the creator, receiver, input and output tokens, tick index, input amount, order type, and expiration time. The `NewMsgPlaceLimitOrder` function is used to create a new limit order message with the provided parameters.
 
-The `Route` function returns the name of the module that handles this message type. The `Type` function returns the type of the message, which is `place_limit_order`.
+The `MsgPlaceLimitOrder` struct implements the `sdk.Msg` interface, which requires the following methods: `Route`, `Type`, `GetSigners`, `GetSignBytes`, and `ValidateBasic`. These methods are used by the Cosmos SDK to process and validate the message.
 
-The `GetSigners` function returns the list of signers for the message, which is the creator of the order. The `GetSignBytes` function returns the bytes to be signed for the message.
+- `Route` returns the router key, which is used to route the message to the appropriate module.
+- `Type` returns the message type, which is used for message identification.
+- `GetSigners` returns the list of addresses that need to sign the message. In this case, it's just the creator's address.
+- `GetSignBytes` returns the byte representation of the message, which is used for signing.
+- `ValidateBasic` checks the basic validity of the message, such as checking if the creator and receiver addresses are valid, if the input amount is greater than zero, and if the expiration time is set correctly based on the order type.
 
-The `ValidateBasic` function validates the basic fields of the message. It checks that the creator and receiver addresses are valid, the amount of input tokens is greater than zero, and the order type and expiration time are valid. If any of these checks fail, an error is returned.
+Additionally, the `ValidateGoodTilExpiration` method checks if the expiration time of a "Good Til" order is in the future, compared to the current block time. If not, it returns an error.
 
-The `ValidateGoodTilExpiration` function validates the expiration time of a good-til-cancelled order. It checks that the expiration time is in the future, relative to the provided block time. If the expiration time is in the past, an error is returned.
+Here's an example of how to create a new limit order message:
 
-This message type can be used by the `duality` project to allow users to place limit orders on a decentralized exchange. For example, a user could call the `NewMsgPlaceLimitOrder` function to create a new limit order, and then broadcast the resulting message to the network using the Cosmos SDK. The `ValidateBasic` and `ValidateGoodTilExpiration` functions ensure that the order is valid and can be executed by the exchange.
+```go
+msg := NewMsgPlaceLimitOrder(
+    "cosmos1...",
+    "cosmos2...",
+    "token1",
+    "token2",
+    123,
+    sdk.NewInt(100),
+    LimitOrderType_GoodTil,
+    time.Now().Add(24 * time.Hour),
+)
+```
+
+In the larger Duality project, this module would be used to handle limit order placement and validation, enabling users to trade tokens on the DEX with specified price limits and order types.
 ## Questions: 
- 1. What is the purpose of this code?
-   
-   This code defines a message type for placing a limit order in a trading system, including the order details and validation rules.
+ 1. **What is the purpose of the `NewMsgPlaceLimitOrder` function?**
 
-2. What external dependencies does this code have?
-   
-   This code imports two packages from the Cosmos SDK: `github.com/cosmos/cosmos-sdk/types` and `github.com/cosmos/cosmos-sdk/types/errors`.
+   The `NewMsgPlaceLimitOrder` function is a constructor that creates and returns a new instance of the `MsgPlaceLimitOrder` struct with the provided parameters.
 
-3. What are some potential errors that could be returned by the `ValidateBasic` method?
-   
-   The `ValidateBasic` method could return errors related to invalid creator or receiver addresses, zero limit orders, good-til-canceled orders without expiration times, or expiration times on immediate-or-cancel orders.
+2. **What is the role of the `ValidateBasic` function in the `MsgPlaceLimitOrder` struct?**
+
+   The `ValidateBasic` function is responsible for performing basic validation checks on the `MsgPlaceLimitOrder` struct, such as checking if the creator and receiver addresses are valid, if the amount is greater than zero, and if the order type and expiration time are consistent.
+
+3. **What does the `ValidateGoodTilExpiration` function do?**
+
+   The `ValidateGoodTilExpiration` function checks if the expiration time of a "Good Til" order is in the future, compared to the current block time. If the expiration time is in the past, it returns an error.

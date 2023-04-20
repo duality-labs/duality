@@ -1,33 +1,38 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/utils/errors.go)
+[View code on GitHub](https://github.com/duality-labs/duality/utils/errors.go)
 
-The `JoinErrors` function in the `utils` package is designed to combine multiple errors into a single error message. This function takes in a parent error and a variable number of additional errors as arguments. It then creates a new error message that includes all of the errors passed in as arguments.
+The `utils` package in this code snippet provides a utility function called `JoinErrors` that is used to combine multiple errors into a single error. This can be useful in situations where a function or operation encounters multiple errors, and it is necessary to return all of them to the caller for proper handling or logging.
 
-The function first creates a new error message using the `fmt.Errorf` function, which formats a string according to a format specifier and returns a new error message. In this case, the format specifier is "errors: %w", where `%w` is a special verb that indicates that the error message should include the error passed in as an argument. The parent error is passed in as the argument to this format specifier, so the resulting error message includes the parent error.
+The `JoinErrors` function takes two arguments: a `parentError` of type `error`, and a variadic parameter `errs` which is a slice of errors. The variadic parameter allows the function to accept any number of error arguments.
 
-Next, the function loops through all of the additional errors passed in as arguments and adds them to the error message using the `%w` verb. Each error is added to the error message using the `fmt.Errorf` function, which creates a new error message that includes the error passed in as an argument.
+Inside the function, a new error called `fullError` is created using the `fmt.Errorf` function. The `parentError` is wrapped with a message "errors: %w" using the `%w` verb, which is a placeholder for the error argument. This verb is used to wrap errors so that they can be unwrapped later using the `errors.Unwrap` function.
 
-Finally, the function returns the full error message, which includes all of the errors passed in as arguments. This error message can then be used to provide more detailed information about what went wrong in the code.
+Next, the function iterates through the `errs` slice using a `for` loop. For each error in the slice, the `fullError` is updated by wrapping the current error using the `%w` verb. This creates a chain of wrapped errors, with each error wrapping the previous one.
 
-This function can be useful in the larger project for handling errors that occur in different parts of the code. By combining multiple errors into a single error message, it can be easier to understand what went wrong and where the error occurred. For example, if there are multiple errors that occur during a database query, this function can be used to combine all of those errors into a single error message that can be returned to the user. 
+Finally, the `fullError` is returned to the caller. This error now contains all the input errors wrapped together, allowing the caller to handle or log them as needed.
 
-Here is an example of how this function might be used:
+Here's an example of how the `JoinErrors` function might be used in the larger project:
 
-```
-func doSomething() error {
-    err1 := someFunction()
-    err2 := anotherFunction()
-    if err1 != nil || err2 != nil {
-        return utils.JoinErrors(err1, err2)
+```go
+func performOperations() error {
+    err1 := operation1()
+    err2 := operation2()
+    err3 := operation3()
+
+    if err1 != nil || err2 != nil || err3 != nil {
+        return utils.JoinErrors(errors.New("operation errors"), err1, err2, err3)
     }
+
     return nil
 }
 ```
 
-In this example, `doSomething` calls two different functions that may return errors. If either of those functions returns an error, `JoinErrors` is called to combine the errors into a single error message that is returned to the caller.
+In this example, if any of the operations return an error, the `JoinErrors` function is called to combine all the errors into a single error, which is then returned to the caller.
 ## Questions: 
- 1. What is the purpose of the `JoinErrors` function?
-   - The `JoinErrors` function takes in a parent error and a variadic list of errors, and returns a new error that combines all of the input errors into one error message.
-2. Why is there a TODO comment referencing `errors.Join`?
-   - The TODO comment suggests that the `JoinErrors` function should eventually be updated to use the `errors.Join` function instead, which is a built-in function in Go 1.20 that simplifies error concatenation.
-3. What does the `%w` verb in the `fmt.Errorf` calls do?
-   - The `%w` verb is used to wrap an error with additional context, allowing the error to be unwrapped later using the `errors.Unwrap` function. In this case, it is used to add the parent error and each individual error to the final error message.
+ 1. **Question:** What is the purpose of the `JoinErrors` function?
+   **Answer:** The `JoinErrors` function is used to combine multiple errors into a single error, with the `parentError` being the main error and the rest of the errors being appended to it.
+
+2. **Question:** Why is there a TODO comment about switching to `errors.Join` when bumping to Golang 1.20?
+   **Answer:** The TODO comment suggests that the current implementation of `JoinErrors` might be replaced with the `errors.Join` function when the project upgrades to Golang 1.20, as it might provide a more efficient or idiomatic way to join errors.
+
+3. **Question:** How does the current implementation of `JoinErrors` handle the case when multiple errors are passed in the `errs` parameter?
+   **Answer:** The current implementation iterates through the `errs` parameter and appends each error to the `fullError` variable using the `%w` verb in `fmt.Errorf`. However, it seems to overwrite the `fullError` in each iteration, which might not be the intended behavior for joining multiple errors.

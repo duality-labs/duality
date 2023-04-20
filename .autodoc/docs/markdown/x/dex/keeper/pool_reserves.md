@@ -1,18 +1,32 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/keeper/pool_reserves.go)
+[View code on GitHub](https://github.com/duality-labs/duality/keeper/pool_reserves.go)
 
-The `keeper` package contains the implementation of the `Keeper` struct, which is responsible for managing the state of the duality blockchain. This package provides functions for setting, getting, and removing pool reserves from the blockchain.
+The code in this file is part of the `keeper` package and is responsible for managing the storage and retrieval of `PoolReserves` objects in the Duality project. `PoolReserves` objects represent the reserves of a liquidity pool in a decentralized exchange (DEX) and are used to facilitate token swaps and manage liquidity.
 
-The `SetPoolReserves` function takes a `PoolReserves` object and stores it in the blockchain. The `PoolReserves` object contains information about the reserves of a liquidity pool, such as the pair ID, token in, tick index, fee, and the amount of tokens in the pool. The function first wraps the `PoolReserves` object into a `TickLiquidity` object and then marshals it into bytes using the `cdc.MustMarshal` function. It then stores the bytes in the blockchain using the `prefix.NewStore` function and the `store.Set` function.
+The `SetPoolReserves` function takes a `PoolReserves` object and stores it in the DEX's state using a key-value store. It first wraps the `PoolReserves` object into a `TickLiquidity` object, which is a more general structure that can hold different types of liquidity data. Then, it creates a new store with the appropriate key prefix and stores the serialized `TickLiquidity` object using a generated key based on the pool's properties.
 
-The `GetPoolReserves` function retrieves a `PoolReserves` object from the blockchain based on the pair ID, token in, tick index, fee, and returns it if it exists. The function first retrieves the bytes from the blockchain using the `prefix.NewStore` function and the `store.Get` function. It then unmarshals the bytes into a `TickLiquidity` object using the `cdc.MustUnmarshal` function and returns the `PoolReserves` object from the `TickLiquidity` object.
+```go
+func (k Keeper) SetPoolReserves(ctx sdk.Context, pool types.PoolReserves) { ... }
+```
 
-The `RemovePoolReserves` function removes a `PoolReserves` object from the blockchain based on the pair ID, token in, tick index, fee. The function first retrieves the bytes from the blockchain using the `prefix.NewStore` function and the `store.Delete` function.
+The `GetPoolReserves` function retrieves a `PoolReserves` object from the store based on the provided parameters, such as the `pairID`, `tokenIn`, `tickIndex`, and `fee`. It creates a new store with the appropriate key prefix, generates the key based on the input parameters, and attempts to retrieve the serialized `TickLiquidity` object. If found, it deserializes the object and returns the `PoolReserves` object along with a boolean flag indicating its existence.
 
-These functions are used to manage the state of the duality blockchain by storing and retrieving information about the reserves of liquidity pools. Other parts of the duality project can use these functions to interact with the blockchain and retrieve information about the state of the liquidity pools. For example, a user interface can use the `GetPoolReserves` function to display the current reserves of a liquidity pool to the user.
+```go
+func (k Keeper) GetPoolReserves(ctx sdk.Context, pairID *types.PairID, tokenIn string, tickIndex int64, fee uint64) (pool *types.PoolReserves, found bool) { ... }
+```
+
+The `RemovePoolReserves` function deletes a `PoolReserves` object from the store. It creates a new store with the appropriate key prefix, generates the key based on the pool's properties, and removes the corresponding entry from the store.
+
+```go
+func (k Keeper) RemovePoolReserves(ctx sdk.Context, pool types.PoolReserves) { ... }
+```
+
+These functions are essential for managing the liquidity pools in the DEX, allowing the system to add, retrieve, and remove pool reserves as needed for various operations, such as token swaps and liquidity provision.
 ## Questions: 
- 1. What is the purpose of the `duality-labs/duality/x/dex/types` package?
-   - The `duality-labs/duality/x/dex/types` package is used in this code to define the `PoolReserves` and `TickLiquidity` types.
-2. What is the significance of the `TickLiquidityKeyPrefix` constant?
-   - The `TickLiquidityKeyPrefix` constant is used to create a prefix for the keys in the key-value store that this code interacts with.
-3. What happens if `GetPoolReserves` is called with a non-existent key?
-   - If `GetPoolReserves` is called with a non-existent key, it will return `nil` for the `pool` value and `false` for the `found` boolean.
+ 1. **Question**: What is the purpose of the `SetPoolReserves` function and how does it store the data?
+   **Answer**: The `SetPoolReserves` function is used to store the pool reserves data in the key-value store. It wraps the pool reserves data into a `TickLiquidity` object and then marshals it into bytes before storing it with the appropriate key.
+
+2. **Question**: How does the `GetPoolReserves` function retrieve the pool reserves data and what does it return if the data is not found?
+   **Answer**: The `GetPoolReserves` function retrieves the pool reserves data by using the provided parameters to construct the key and then fetching the data from the key-value store. If the data is not found, it returns `nil` and `false`.
+
+3. **Question**: What is the purpose of the `RemovePoolReserves` function and how does it delete the data from the store?
+   **Answer**: The `RemovePoolReserves` function is used to delete the pool reserves data from the key-value store. It constructs the key using the provided pool reserves data and then deletes the data associated with that key from the store.

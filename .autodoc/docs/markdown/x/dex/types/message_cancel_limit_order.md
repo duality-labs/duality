@@ -1,35 +1,59 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/types/message_cancel_limit_order.go)
+[View code on GitHub](https://github.com/duality-labs/duality/types/message_cancel_limit_order.go)
 
-This code defines a message type for cancelling a limit order in the duality project. The `MsgCancelLimitOrder` struct contains two fields: `Creator` and `TrancheKey`. The `Creator` field is a string representing the address of the account that created the limit order, while the `TrancheKey` field is a string representing the key of the tranche associated with the limit order. 
+The code in this file is part of the `types` package and is responsible for handling the cancellation of limit orders in the duality project. It defines a new message type `MsgCancelLimitOrder` and its associated methods to create, validate, and process the message.
 
-The `NewMsgCancelLimitOrder` function is a constructor for creating a new `MsgCancelLimitOrder` instance. It takes in a `creator` and `trancheKey` string and returns a pointer to a new `MsgCancelLimitOrder` instance with those fields set.
+The `NewMsgCancelLimitOrder` function is used to create a new `MsgCancelLimitOrder` instance with the given `creator` and `trancheKey` parameters. This function can be used in the larger project to create a cancel limit order message when a user wants to cancel an existing limit order.
 
-The `Route` method returns the router key for this message type, which is used to route the message to the appropriate handler.
-
-The `Type` method returns the type of the message, which is `cancel_limit_order`.
-
-The `GetSigners` method returns an array of `sdk.AccAddress` instances representing the signers of the message. In this case, there is only one signer, which is the account that created the limit order.
-
-The `GetSignBytes` method returns the bytes to be signed for the message. It marshals the message into JSON format and sorts the resulting bytes.
-
-The `ValidateBasic` method validates the basic fields of the message. It checks that the `Creator` field is a valid account address.
-
-This code is used in the duality project to allow users to cancel limit orders that they have created. When a user wants to cancel a limit order, they create a new `MsgCancelLimitOrder` instance with their account address and the key of the tranche associated with the limit order. This message is then sent to the appropriate handler, which cancels the limit order. 
-
-Example usage:
-
+```go
+msg := NewMsgCancelLimitOrder(creator, trancheKey)
 ```
-msg := types.NewMsgCancelLimitOrder("creator_address", "tranche_key")
-err := msg.ValidateBasic()
-if err != nil {
-    panic(err)
+
+The `MsgCancelLimitOrder` struct implements the `sdk.Msg` interface, which means it must provide the following methods: `Route`, `Type`, `GetSigners`, `GetSignBytes`, and `ValidateBasic`.
+
+- `Route` returns the router key, which is used to route the message to the appropriate module.
+- `Type` returns the message type, which is a string constant "cancel_limit_order".
+- `GetSigners` returns an array of account addresses that need to sign the message. In this case, it's just the creator's address.
+- `GetSignBytes` returns the byte representation of the message, which is used for signing. It marshals the message to JSON and sorts it using the `sdk.MustSortJSON` function.
+- `ValidateBasic` checks if the message is valid by verifying the creator's address. If the address is invalid, it returns an error.
+
+Here's an example of how the message can be used in the larger project:
+
+```go
+// Create a new cancel limit order message
+msg := NewMsgCancelLimitOrder(creator, trancheKey)
+
+// Validate the message
+if err := msg.ValidateBasic(); err != nil {
+    // Handle the error
 }
-// send message to appropriate handler to cancel limit order
+
+// Get the signers and sign bytes
+signers := msg.GetSigners()
+signBytes := msg.GetSignBytes()
+
+// Sign the message and broadcast it to the network
+signedMsg, err := signMessage(signBytes, signers)
+if err != nil {
+    // Handle the error
+}
+
+// Broadcast the signed message
+result, err := broadcastMessage(signedMsg)
+if err != nil {
+    // Handle the error
+}
 ```
+
+In summary, this code file provides the necessary functionality to create, validate, and process cancel limit order messages in the duality project.
 ## Questions: 
- 1. What is the purpose of this code and what does it do?
-   - This code defines a message type for cancelling a limit order and provides functions for routing, signing, and validation.
-2. What external dependencies does this code have?
-   - This code imports two packages from the `cosmos-sdk` library: `types` and `types/errors`.
-3. What is the expected input format for the `NewMsgCancelLimitOrder` function?
-   - The `NewMsgCancelLimitOrder` function takes two string arguments: `creator` and `trancheKey`, and returns a pointer to a `MsgCancelLimitOrder` struct.
+ 1. **What is the purpose of the `duality` project and the `MsgCancelLimitOrder` message type?**
+
+   A smart developer might want to understand the overall context and use case of the `duality` project and the specific purpose of the `MsgCancelLimitOrder` message type within the project.
+
+2. **How is the `trancheKey` used in the `MsgCancelLimitOrder` struct and what is its significance?**
+
+   A developer might want to know the role of the `trancheKey` field in the `MsgCancelLimitOrder` struct, how it is used in the message processing, and its importance in the overall functionality of the code.
+
+3. **Are there any specific error handling or edge cases that should be considered when using the `MsgCancelLimitOrder` message type?**
+
+   A smart developer might want to know if there are any specific error handling scenarios or edge cases that should be considered when using the `MsgCancelLimitOrder` message type, such as potential issues with the `creator` address or the `trancheKey`.

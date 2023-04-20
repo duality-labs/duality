@@ -1,37 +1,47 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/types/message_multi_hop_swap.go)
+[View code on GitHub](https://github.com/duality-labs/duality/types/message_multi_hop_swap.go)
 
-The `types` package contains the definition of the `MsgMultiHopSwap` message type, which is used to initiate a multi-hop swap transaction. This message type implements the `sdk.Msg` interface, which is required for all messages in the Cosmos SDK.
+The code in this file defines a message type `MsgMultiHopSwap` for the duality project, which is used to perform a multi-hop swap operation. A multi-hop swap is a process where assets are exchanged through multiple intermediate assets to achieve the desired conversion. This can be useful in cases where a direct swap between two assets is not available or not efficient.
 
-The `NewMsgMultiHopSwap` function is a constructor for the `MsgMultiHopSwap` message type. It takes several parameters, including the creator and receiver addresses, an array of routes, the amount to be swapped, the exit limit price, and a boolean flag indicating whether to pick the best route automatically. It returns a pointer to a new `MsgMultiHopSwap` instance.
+The `NewMsgMultiHopSwap` function is a constructor for creating a new `MsgMultiHopSwap` instance. It takes the following parameters:
 
-The `Route` method returns the router key for this message type, which is used to route the message to the appropriate handler.
+- `creator`: The address of the user initiating the swap.
+- `receiver`: The address of the user receiving the swapped assets.
+- `routesArr`: A 2D array of strings representing the possible routes for the swap, where each route is an array of asset symbols.
+- `amountIn`: The amount of input asset to be swapped.
+- `exitLimitPrice`: The minimum acceptable price for the final asset in the swap.
+- `pickBestRoute`: A boolean flag indicating whether to automatically pick the best route for the swap.
 
-The `Type` method returns the message type string, which is used to identify the message type in the transaction.
+The `MsgMultiHopSwap` struct implements the `sdk.Msg` interface, which includes methods like `Route`, `Type`, `GetSigners`, `GetSignBytes`, and `ValidateBasic`. These methods are used by the Cosmos SDK to handle and process the message.
 
-The `GetSigners` method returns an array of signer addresses for this message. In this case, it returns an array containing only the creator address.
+The `ValidateBasic` method checks if the message is valid by verifying the creator and receiver addresses, ensuring there is at least one route, and checking that all routes have the same exit token. It also checks if the input amount is greater than zero.
 
-The `GetSignBytes` method returns the bytes to be signed for this message. It marshals the message to JSON format and sorts the resulting bytes.
+Here's an example of how to create a `MsgMultiHopSwap` instance:
 
-The `ValidateBasic` method performs basic validation on the message. It checks that the creator and receiver addresses are valid, that at least one route is specified, that the exit tokens for each route match, and that the amount to be swapped is greater than zero.
-
-Overall, this code defines a message type for initiating a multi-hop swap transaction and provides methods for routing, signing, and validating the message. This message type is likely used in the larger duality project to enable multi-hop swaps between different tokens on the Cosmos network. An example usage of this message type might look like:
-
-```
-msg := types.NewMsgMultiHopSwap(
-    "cosmos1abcdefg...", // creator address
-    "cosmos1hijklmn...", // receiver address
-    [][]string{{"tokenA", "tokenB", "tokenC"}, {"tokenC", "tokenD", "tokenE"}}, // routes
-    sdk.NewInt(1000000), // amount to be swapped
-    sdk.NewDec(1.5), // exit limit price
-    true, // pick best route automatically
+```go
+routes := [][]string{
+	{"ATOM", "BTC", "ETH"},
+	{"ATOM", "USDT", "ETH"},
+}
+msg := NewMsgMultiHopSwap(
+	"cosmos1qy352eufqy352eufqy352eufqy35...",
+	"cosmos1qy352eufqy352eufqy352eufqy35...",
+	routes,
+	sdk.NewInt(100),
+	sdk.NewDecWithPrec(1, 2),
+	true,
 )
 ```
+
+In the larger project, this message type would be used to initiate a multi-hop swap operation, which would be processed by the corresponding handler and eventually executed by the application's state machine.
 ## Questions: 
- 1. What is the purpose of the `duality` project and how does this code fit into it?
-- This code is part of the `types` package in the `duality` project, but it's unclear what the overall purpose of the project is.
+ 1. **Question:** What is the purpose of the `NewMsgMultiHopSwap` function and what are its input parameters?
 
-2. What is the `MsgMultiHopSwap` message used for and how does it work?
-- The `MsgMultiHopSwap` message is used to initiate a multi-hop swap transaction, and it takes in various parameters such as the creator, receiver, routes, amount, and exit limit price. The `ValidateBasic` function checks that the creator and receiver addresses are valid, that there is at least one multi-hop route, that the exit tokens match across all routes, and that the amount to be swapped is greater than zero.
+   **Answer:** The `NewMsgMultiHopSwap` function is a constructor for creating a new `MsgMultiHopSwap` object. It takes the following input parameters: `creator` (string), `receiver` (string), `routesArr` (a 2D slice of strings), `amountIn` (sdk.Int), `exitLimitPrice` (sdk.Dec), and `pickBestRoute` (bool).
 
-3. What is the `RouterKey` constant used for and where is it defined?
-- The `RouterKey` constant is used in the `Route` function of the `MsgMultiHopSwap` message, but it's unclear where it is defined and what its purpose is.
+2. **Question:** How does the `ValidateBasic` function work and what are the possible errors it can return?
+
+   **Answer:** The `ValidateBasic` function checks the validity of the `MsgMultiHopSwap` object by validating the creator and receiver addresses, ensuring there is at least one route, checking for exit token mismatches, and ensuring the input amount is greater than zero. It can return errors related to invalid addresses, missing multihop routes, exit token mismatches, or zero swap amounts.
+
+3. **Question:** What is the purpose of the `GetSigners` function and how does it work?
+
+   **Answer:** The `GetSigners` function returns a slice of account addresses that are required to sign the message. In this case, it converts the `msg.Creator` string to an `sdk.AccAddress` and returns a slice containing only the creator's address. If there is an error in the conversion, it will panic.

@@ -1,34 +1,34 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/types/limit_order_tranche_user.go)
+[View code on GitHub](https://github.com/duality-labs/duality/types/limit_order_tranche_user.go)
 
-The code above is a method defined in the `types` package of the `duality` project. The purpose of this method is to determine whether a `LimitOrderTrancheUser` object is empty or not. 
+The code provided is a part of a larger project and is located in the `duality` package under the `types` subpackage. The purpose of this code is to define a method called `IsEmpty()` for the `LimitOrderTrancheUser` struct. This method checks if a limit order tranche user has any remaining shares after accounting for the shares that have been cancelled and withdrawn.
 
-A `LimitOrderTrancheUser` object represents a user's ownership of a particular tranche of a limit order. It contains information about the shares owned, shares cancelled, and shares withdrawn by the user. The `IsEmpty()` method calculates the total number of shares that have been removed (cancelled + withdrawn) and checks if it is equal to the number of shares owned. If they are equal, then the `LimitOrderTrancheUser` object is considered empty and the method returns `true`. Otherwise, it returns `false`.
+The `IsEmpty()` method works by first calculating the total number of shares removed from the user's account. This is done by adding the number of shares cancelled (`l.SharesCancelled`) and the number of shares withdrawn (`l.SharesWithdrawn`). The result is stored in the `sharesRemoved` variable.
 
-This method can be used in the larger project to determine whether a user has any ownership of a particular tranche of a limit order. For example, if a user cancels or withdraws all of their shares from a tranche, the `IsEmpty()` method can be called to check if the user still has any ownership of that tranche. If the method returns `true`, then the tranche can be removed from the limit order entirely.
+Next, the method checks if the total number of shares removed is equal to the total number of shares owned by the user (`l.SharesOwned`). If these two values are equal, it means that the user has no remaining shares, and the method returns `true`. Otherwise, it returns `false`.
 
-Here is an example usage of the `IsEmpty()` method:
+This method can be used in the larger project to determine if a user's limit order tranche is empty and can be removed from the system or if further actions need to be taken. For example, if the `IsEmpty()` method returns `true`, the system might decide to remove the user's limit order tranche from the order book or notify the user that their order has been fully executed.
 
-```
-user := LimitOrderTrancheUser{
-    SharesOwned:     big.NewInt(100),
-    SharesCancelled: big.NewInt(50),
-    SharesWithdrawn: big.NewInt(50),
-}
+Here's an example of how the `IsEmpty()` method might be used in the larger project:
 
-if user.IsEmpty() {
-    fmt.Println("User has no ownership of this tranche")
+```go
+if limitOrderTrancheUser.IsEmpty() {
+    // Remove the limit order tranche from the order book
+    orderBook.Remove(limitOrderTrancheUser)
 } else {
-    fmt.Println("User still owns some shares in this tranche")
+    // Perform other actions, such as updating the order book or notifying the user
 }
 ```
 
-In this example, the `LimitOrderTrancheUser` object represents a user who originally owned 100 shares in a tranche, but has since cancelled 50 shares and withdrawn 50 shares. The `IsEmpty()` method is called on this object, and since the total number of shares removed is equal to the number of shares owned, the method returns `true` and the message "User has no ownership of this tranche" is printed.
+In summary, the `IsEmpty()` method for the `LimitOrderTrancheUser` struct is a utility function that helps determine if a user's limit order tranche has any remaining shares after accounting for cancellations and withdrawals. This information can be used to make decisions about how to handle the user's limit order tranche in the larger project.
 ## Questions: 
- 1. What is the purpose of the `LimitOrderTrancheUser` type?
-- The `LimitOrderTrancheUser` type is likely used to represent a user's ownership and activity related to a specific tranche of a limit order.
+ 1. **What is the purpose of the `IsEmpty` function?**
 
-2. What do the `SharesCancelled`, `SharesWithdrawn`, and `SharesOwned` fields represent?
-- These fields likely represent different types of activity related to a user's ownership of shares in a specific tranche of a limit order. `SharesCancelled` and `SharesWithdrawn` likely represent shares that were cancelled or withdrawn by the user, while `SharesOwned` represents the total number of shares the user currently owns in the tranche.
+   The `IsEmpty` function checks if a `LimitOrderTrancheUser` object is empty by comparing the sum of its `SharesCancelled` and `SharesWithdrawn` with its `SharesOwned`.
 
-3. What does the `IsEmpty` method do?
-- The `IsEmpty` method calculates the total number of shares that have been removed from a user's ownership in a specific tranche of a limit order (by adding the `SharesCancelled` and `SharesWithdrawn` fields), and returns `true` if this total is equal to the `SharesOwned` field. This indicates that the user no longer owns any shares in the tranche.
+2. **What are the types of `SharesCancelled`, `SharesWithdrawn`, and `SharesOwned`?**
+
+   The types of `SharesCancelled`, `SharesWithdrawn`, and `SharesOwned` are not explicitly shown in this code snippet, but they should be of a type that supports the `Add` and `Equal` methods.
+
+3. **What does the `Equal` method do, and what does it return?**
+
+   The `Equal` method is not defined in this code snippet, but it is likely a method that compares two objects of the same type and returns a boolean value indicating whether they are equal or not.

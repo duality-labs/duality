@@ -1,34 +1,29 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/keeper/limit_order_tranche.go)
+[View code on GitHub](https://github.com/duality-labs/duality/keeper/limit_order_tranche.go)
 
-The `keeper` package contains the implementation of the `Keeper` struct, which is responsible for managing the state of the duality project. The `FindLimitOrderTranche` method takes a `sdk.Context` object, a `pairID` of type `*types.PairID`, an `int64` `tickIndex`, a `string` `token`, and a `string` `trancheKey`. It returns a `types.LimitOrderTranche` object, a `bool` `fromFilled`, and a `bool` `found`. This method tries to find the tranche in the active liq index. If it is found, it returns the tranche and sets `fromFilled` to `false` and `found` to `true`. If it is not found, it looks for filled limit orders. If it finds a filled limit order, it returns the tranche and sets `fromFilled` to `true` and `found` to `true`. If it does not find the tranche, it returns an empty `types.LimitOrderTranche` object and sets `fromFilled` and `found` to `false`.
+The code in this file is part of the `keeper` package and is responsible for managing limit order tranches in the Duality project. A limit order tranche is a collection of limit orders at a specific price level. The code provides functions to create, retrieve, update, and delete limit order tranches in the context of a decentralized exchange (DEX).
 
-The `SaveTranche` method takes a `sdk.Context` object and a `types.LimitOrderTranche` object. It saves the tranche in the store and emits an event.
+The `FindLimitOrderTranche` function searches for a limit order tranche based on the given parameters, such as the trading pair, tick index, and token. It first looks for the tranche in the active liquidity index and then in the filled limit orders. The function returns the found tranche, a boolean indicating if it was found in the filled orders, and a boolean indicating if it was found at all.
 
-The `SetLimitOrderTranche` method takes a `sdk.Context` object and a `types.LimitOrderTranche` object. It wraps the tranche back into `TickLiquidity` and saves it in the store.
+The `SaveTranche` function saves a limit order tranche to the store. If the tranche has a token in it, the function sets the tranche as active; otherwise, it sets the tranche as inactive and removes it from the active tranches. It also emits an event to update the tranche.
 
-The `GetLimitOrderTranche` method takes a `sdk.Context` object, a `pairID` of type `*types.PairID`, a `string` `tokenIn`, an `int64` `tickIndex`, and a `string` `trancheKey`. It returns a `*types.LimitOrderTranche` object and a `bool` `found`. It gets the tranche from the store and returns it if it exists. Otherwise, it returns `nil` and `false`.
+The `SetLimitOrderTranche`, `GetLimitOrderTranche`, `GetLimitOrderTrancheByKey`, and `RemoveLimitOrderTranche` functions are used to manage limit order tranches in the store. They allow setting, getting, and removing tranches based on various keys and parameters.
 
-The `GetLimitOrderTrancheByKey` method takes a `sdk.Context` object and a `[]byte` `key`. It returns a `*types.LimitOrderTranche` object and a `bool` `found`. It gets the tranche from the store using the key and returns it if it exists. Otherwise, it returns `nil` and `false`.
+The `GetPlaceTranche`, `GetFillTranche`, and `GetAllLimitOrderTrancheAtIndex` functions are used to retrieve specific tranches or lists of tranches based on certain conditions, such as the trading pair, tick index, and token.
 
-The `RemoveLimitOrderTranche` method takes a `sdk.Context` object and a `types.LimitOrderTranche` object. It removes the tranche from the store.
+The `NewTrancheKey` function generates a unique key for a limit order tranche based on the current block height and gas consumed.
 
-The `GetPlaceTranche` method takes a `sdk.Context` object, a `pairID` of type `*types.PairID`, a `string` `tokenIn`, and an `int64` `tickIndex`. It returns a `types.LimitOrderTranche` object and a `bool` `found`. It gets the place tranche from the store and returns it if it exists. Otherwise, it returns an empty `types.LimitOrderTranche` object and `false`.
+The `GetOrInitPlaceTranche` function retrieves or initializes a limit order tranche based on the given parameters, such as the trading pair, tick index, token, and order type. It handles different order types, such as Just-In-Time (JIT) and Good-Til-Time (GTT) orders, and creates a new tranche if necessary.
 
-The `GetFillTranche` method takes a `sdk.Context` object, a `pairID` of type `*types.PairID`, a `string` `tokenIn`, and an `int64` `tickIndex`. It returns a `*types.LimitOrderTranche` object and a `bool` `found`. It gets the fill tranche from the store and returns it if it exists. Otherwise, it returns `nil` and `false`.
-
-The `GetAllLimitOrderTrancheAtIndex` method takes a `sdk.Context` object, a `pairID` of type `*types.PairID`, a `string` `tokenIn`, and an `int64` `tickIndex`. It returns a slice of `types.LimitOrderTranche` objects. It gets all the limit order tranches from the store and returns them.
-
-The `NewTrancheKey` method takes a `sdk.Context` object. It returns a `string` representing the tranche key.
-
-The `GetOrInitPlaceTranche` method takes a `sdk.Context` object, a `pairID` of type `*types.PairID`, a `string` `tokenIn`, an `int64` `tickIndex`, a `*time.Time` `goodTil`, and a `types.LimitOrderType` `orderType`. It returns a `types.LimitOrderTranche` object and an `error`. It gets the place tranche from the store if it exists. Otherwise, it creates a new place tranche and returns it. If there is an error, it returns an empty `types.LimitOrderTranche` object and the error.
-
-Overall, the `keeper` package provides methods for managing limit order tranches in the duality project. These methods are used to save, get, and remove limit order tranches from the store. They are also used to create new limit order tranches and get existing limit order tranches. The `NewTrancheKey` method is used to generate a tranche key. The `GetOrInitPlaceTranche` method is used to get or create a place tranche.
+Overall, this code is essential for managing limit order tranches in the Duality project's DEX, allowing efficient and organized handling of limit orders at different price levels.
 ## Questions: 
- 1. What is the purpose of the `duality-labs/duality/x/dex` package and how does it relate to the `keeper` package?
-- The `duality-labs/duality/x/dex` package contains types and functions related to the decentralized exchange (DEX) module of the Duality blockchain, while the `keeper` package contains the implementation of the DEX module's business logic. The `keeper` package imports types and functions from the `duality-labs/duality/x/dex` package to perform its operations.
+ 1. **What is the purpose of the `FindLimitOrderTranche` function and what does it return?**
 
-2. What is the difference between `GetLimitOrderTranche` and `GetLimitOrderTrancheByKey` functions?
-- `GetLimitOrderTranche` retrieves a limit order tranche from the store based on its pair ID, token in, tick index, and tranche key, while `GetLimitOrderTrancheByKey` retrieves a limit order tranche from the store based on its raw key. The raw key is passed as a byte slice to `GetLimitOrderTrancheByKey`, while the other function takes the individual components of the key as separate arguments.
+   The `FindLimitOrderTranche` function searches for a limit order tranche in the active liquidity index and, if not found, looks for filled limit orders. It returns the found limit order tranche, a boolean indicating if it was found in filled limit orders, and a boolean indicating if the tranche was found at all.
 
-3. What is the purpose of the `NewTrancheKey` function and how is it used?
-- The `NewTrancheKey` function generates a new tranche key based on the current block height and the total gas consumed by the current transaction and block. This key is used to uniquely identify a limit order tranche in the store. The function is called when creating a new limit order tranche in `GetOrInitPlaceTranche`.
+2. **How does the `SaveTranche` function work and what events does it emit?**
+
+   The `SaveTranche` function saves a given limit order tranche by either setting it as an active limit order tranche or as an inactive limit order tranche, depending on whether the tranche has tokens in it or not. It also removes the tranche from the active limit order tranches if it's inactive. The function emits a `TickUpdateLimitOrderTranche` event with the tranche as its argument.
+
+3. **What is the purpose of the `NewTrancheKey` function and what does it return?**
+
+   The `NewTrancheKey` function generates a unique key for a limit order tranche based on the current block height and the total gas consumed (sum of block gas and transaction gas). It returns a string representation of the key, which is a concatenation of the sortable string representations of the block height and total gas.

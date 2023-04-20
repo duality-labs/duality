@@ -1,43 +1,35 @@
-[View code on GitHub](https://github.com/duality-labs/duality/utodoc/docs/json/osmoutils)
+[View code on GitHub](https://github.com/duality-labs/duality/oc/docs/json/osmoutils)
 
-The `osmoutils` package provides utility functions and error handling mechanisms for the `duality` project. It contains functions for executing state-modifying functions within a cache context, parsing and creating various data types, creating new instances of generic types, and manipulating and analyzing slices.
+The `osmoutils` package in the `.autodoc/docs/json/osmoutils` folder provides utility functions that can be used throughout the `duality` project to handle errors, create new instances of types, and manipulate slices. 
 
-For example, the `ApplyFuncIfNoError` function in `cache_ctx.go` is used to execute a function `f` within a cache context. If there is an error or panic, the state machine change is dropped and the error is logged. This function is useful for executing functions that modify the state of the application, such as transactions.
+The `cache_ctx.go` file contains the `ApplyFuncIfNoError` function, which is used to execute a function `f` within a cache context. This is useful for executing functions that modify the state of the application, such as transactions. If there is an error or panic, the state machine change is dropped and the error is logged. The `IsOutOfGasError` and `PrintPanicRecoveryError` functions are helper functions that determine if an error is an out of gas error and log any errors or panics that occur.
+
+The `generic_helper.go` file contains the `MakeNew` function, which creates a new instance of a generic type `T`. This function can be used in various scenarios where dynamic creation of new instances of a type is required, such as in a factory pattern. Here's an example of how to use `MakeNew`:
 
 ```go
-func someFunction(ctx sdk.Context) error {
-    // Modify the state of the application
+type Person struct {
+    Name string
+    Age int
 }
 
 func main() {
-    ctx := sdk.Context{}
-    osmoutils.ApplyFuncIfNoError(ctx, someFunction)
+    p := MakeNew[Person]()
+    p.Name = "John"
+    p.Age = 30
+    fmt.Println(p) // prints "{John 30}"
 }
 ```
 
-The `osmocli` subfolder provides a command-line interface (CLI) for interacting with the Osmocom cellular network stack and a Cosmos SDK-based blockchain. It offers a flexible and extensible way to handle command-line flags, create query and transaction commands, and generate formatted long descriptions for CLI commands.
-
-For example, the `BuildQueryCli` function in `query_cmd_wrap.go` can be used to create a query command for a Cosmos SDK-based blockchain:
-
-```go
-queryDesc := osmocli.QueryDescriptor{
-    Name: "myquery",
-    Desc: "My custom query command",
-    QueryFn: func(clientCtx client.Context, req *myquery.Request) (*myquery.Response, error) {
-        // Call the blockchain to retrieve the data
-    },
-}
-queryCmd := osmocli.BuildQueryCli(queryDesc, createGrpcClient)
-```
-
-The utility functions in `slice_helper.go` can be used to manipulate and analyze slices of various types in the `duality` project. For example, the `SortSlice` function can be used to sort a slice of integers in ascending order:
+The `slice_helper.go` file contains utility functions for manipulating and analyzing slices, such as `SortSlice`, `Filter`, `ReverseSlice`, and `ContainsDuplicate`. These functions can be used throughout the `duality` project to work with slices of various types. Here's an example of how to use `Filter`:
 
 ```go
 import "osmoutils"
 
 numbers := []int{3, 1, 4, 1, 5, 9, 2, 6, 5, 3}
-osmoutils.SortSlice(numbers)
-fmt.Println(numbers) // Output: [1 1 2 3 3 4 5 5 6 9]
+evenNumbers := osmoutils.Filter(func(n int) bool {
+    return n%2 == 0
+}, numbers)
+fmt.Println(evenNumbers) // Output: [4 2 6]
 ```
 
-These utility functions and CLI tools can be used throughout the `duality` project to handle errors, parse user input, create transaction fees, generate test data, and interact with the Osmocom cellular network stack and a Cosmos SDK-based blockchain.
+In summary, the `osmoutils` package provides a set of utility functions that can be used throughout the `duality` project to handle errors, create new instances of types, and manipulate slices. These functions help improve code reusability and maintainability within the project.

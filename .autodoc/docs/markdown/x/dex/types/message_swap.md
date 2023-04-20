@@ -1,26 +1,35 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/types/message_swap.go)
+[View code on GitHub](https://github.com/duality-labs/duality/types/message_swap.go)
 
-The code defines a message type called `MsgSwap` that can be used in the duality project to represent a swap transaction between two tokens. The `MsgSwap` message contains information about the creator of the swap, the input token, the output token, the amount of input token to be swapped, the maximum amount of output token to be received, and the receiver of the output token. 
+The code in this file defines a `MsgSwap` struct and its associated methods, which are part of the `types` package. The purpose of this code is to facilitate token swapping functionality within the larger project.
 
-The `NewMsgSwap` function is a constructor for the `MsgSwap` message. It takes in the creator's address, the input token, the output token, the amount of input token to be swapped, the maximum amount of output token to be received, and the receiver's address as arguments and returns a pointer to a new `MsgSwap` message.
+`MsgSwap` struct contains fields such as `Creator`, `TokenIn`, `TokenOut`, `AmountIn`, `MaxAmountOut`, and `Receiver`. These fields store information about the user initiating the swap, the input and output tokens, the input amount, the maximum output amount, and the receiver of the swapped tokens.
 
-The `Route` method returns the router key for the `MsgSwap` message, which is used to route the message to the appropriate handler.
+The `NewMsgSwap` function is a constructor that initializes a new `MsgSwap` instance with the provided parameters. This function can be used to create a new swap message with the desired token swap details.
 
-The `Type` method returns the type of the `MsgSwap` message, which is "swap".
+The `Route`, `Type`, `GetSigners`, `GetSignBytes`, and `ValidateBasic` methods implement the `sdk.Msg` interface for the `MsgSwap` struct. These methods are used by the Cosmos SDK to handle and process the swap message.
 
-The `GetSigners` method returns an array of signer addresses for the `MsgSwap` message. In this case, it returns an array containing only the creator's address.
+- `Route` returns the router key, which is used to route the message to the appropriate module.
+- `Type` returns the message type, which is "swap" in this case.
+- `GetSigners` returns the account address of the creator, who is required to sign the message.
+- `GetSignBytes` returns the JSON-encoded message in a canonical form, which is used for signing.
+- `ValidateBasic` checks the validity of the message, such as ensuring that the creator and receiver addresses are valid, the input amount is positive, and the maximum output amount is non-negative.
 
-The `GetSignBytes` method returns the bytes to be signed for the `MsgSwap` message. It marshals the message into JSON format and sorts the resulting bytes.
+Here's an example of how to create a new `MsgSwap` instance:
 
-The `ValidateBasic` method validates the basic fields of the `MsgSwap` message. It checks that the creator and receiver addresses are valid, that the maximum amount of input token to be swapped is positive, and that the maximum amount of output token to be received is not negative. If any of these checks fail, an appropriate error is returned.
+```go
+msg := NewMsgSwap("cosmos1...", "tokenA", "tokenB", sdk.NewInt(100), sdk.NewInt(200), "cosmos2...")
+```
 
-This code can be used in the duality project to create and validate swap transactions between two tokens. For example, a user could create a `MsgSwap` message using the `NewMsgSwap` function and submit it to the blockchain for processing. The blockchain would then validate the message using the `ValidateBasic` method and execute the swap transaction if it is valid.
+This code creates a new swap message with the specified creator, input and output tokens, input amount, maximum output amount, and receiver. The message can then be processed by the Cosmos SDK to perform the token swap.
 ## Questions: 
- 1. What is the purpose of this code and what problem does it solve?
-- This code defines a message type for a swap transaction in a blockchain-based application. It allows users to exchange one token for another, with validation checks to ensure the transaction is valid.
+ 1. **What is the purpose of the `NewMsgSwap` function?**
 
-2. What external dependencies does this code have?
-- This code imports two packages from the Cosmos SDK: `github.com/cosmos/cosmos-sdk/types` and `github.com/cosmos/cosmos-sdk/types/errors`. It relies on these packages for various functions and types.
+   The `NewMsgSwap` function is a constructor that initializes and returns a new `MsgSwap` struct with the provided parameters, such as creator, tokenIn, tokenOut, amountIn, maxAmountOut, and receiver.
 
-3. What are some potential errors that could occur during message validation?
-- The `ValidateBasic` function checks for several potential errors, including invalid creator or receiver addresses, a zero swap amount, and a negative maximum amount out. If any of these errors occur, the function returns an error message.
+2. **How does the `GetSigners` function work and what does it return?**
+
+   The `GetSigners` function converts the `msg.Creator` string into an `sdk.AccAddress` type using the `sdk.AccAddressFromBech32` function. If there is an error during the conversion, it panics. Otherwise, it returns a slice containing the creator's `sdk.AccAddress`.
+
+3. **What does the `ValidateBasic` function do and what are the possible error cases?**
+
+   The `ValidateBasic` function checks if the provided creator and receiver addresses are valid by converting them using `sdk.AccAddressFromBech32`. It also checks if the `MaxAmountIn` is positive and if the `MaxAmountOut` is not negative. If any of these conditions are not met, it returns an appropriate error.

@@ -1,20 +1,58 @@
-[View code on GitHub](https://github.com/duality-labs/duality/dex/types/message_withdrawl_filled_limit_order.go)
+[View code on GitHub](https://github.com/duality-labs/duality/types/message_withdrawl_filled_limit_order.go)
 
-The code defines a message type for withdrawing a filled limit order in the duality project. The message is implemented as a struct called `MsgWithdrawFilledLimitOrder` and is defined in the `types` package. The message has two fields: `Creator` and `TrancheKey`, both of which are strings. 
+The `duality` code file is part of a larger project and focuses on handling the withdrawal of filled limit orders in a blockchain-based trading system. It defines a new message type `MsgWithdrawFilledLimitOrder` and its associated methods for creating, routing, signing, and validating the message.
 
-The `MsgWithdrawFilledLimitOrder` struct implements the `sdk.Msg` interface, which is used in the Cosmos SDK to define messages that can be sent and received by modules. The `sdk.Msg` interface requires the implementation of several methods, including `Route()`, `Type()`, `GetSigners()`, `GetSignBytes()`, and `ValidateBasic()`. 
+The `NewMsgWithdrawFilledLimitOrder` function is used to create a new `MsgWithdrawFilledLimitOrder` instance with the given `creator` and `trancheKey` parameters. The `creator` parameter represents the address of the user who created the limit order, while the `trancheKey` parameter is a unique identifier for the specific limit order.
 
-The `Route()` method returns the name of the module that handles the message, which is defined as `RouterKey` in this case. The `Type()` method returns the type of the message, which is defined as `TypeMsgWithdrawFilledLimitOrder`. The `GetSigners()` method returns the list of addresses that need to sign the message, which in this case is just the creator of the message. The `GetSignBytes()` method returns the bytes that need to be signed by the signers of the message. Finally, the `ValidateBasic()` method validates the basic fields of the message, such as the creator address.
+```go
+func NewMsgWithdrawFilledLimitOrder(creator, trancheKey string) *MsgWithdrawFilledLimitOrder {
+	return &MsgWithdrawFilledLimitOrder{
+		Creator:    creator,
+		TrancheKey: trancheKey,
+	}
+}
+```
 
-The `NewMsgWithdrawFilledLimitOrder()` function is a constructor for the `MsgWithdrawFilledLimitOrder` struct. It takes two arguments, `creator` and `trancheKey`, and returns a pointer to a new `MsgWithdrawFilledLimitOrder` struct with those fields set. 
+The `Route` and `Type` methods return the router key and message type, respectively, which are used by the Cosmos SDK to route and process the message.
 
-This message type can be used in the duality project to allow users to withdraw filled limit orders. For example, a user might create a limit order to buy a certain amount of a token at a certain price, and when that order is filled, they can use this message type to withdraw the tokens they bought. The message would be sent to the module that handles limit orders, which would then execute the withdrawal and update the user's balance.
+The `GetSigners` method extracts the creator's account address from the Bech32 encoded string and returns it as the signer of the message. If the address is invalid, it will panic.
+
+```go
+func (msg *MsgWithdrawFilledLimitOrder) GetSigners() []sdk.AccAddress {
+	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		panic(err)
+	}
+
+	return []sdk.AccAddress{creator}
+}
+```
+
+The `GetSignBytes` method serializes the message into a JSON format and returns the sorted JSON bytes, which are used for signing the message.
+
+The `ValidateBasic` method checks if the creator's address is valid and returns an error if it's not. This method is used to perform basic validation checks before processing the message.
+
+```go
+func (msg *MsgWithdrawFilledLimitOrder) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+
+	return nil
+}
+```
+
+In summary, this code file is responsible for handling the withdrawal of filled limit orders in a blockchain-based trading system by defining a new message type and its associated methods.
 ## Questions: 
- 1. What is the purpose of this code and what does it do?
-   - This code defines a message type for withdrawing a filled limit order and provides functions for routing, signing, and validation.
+ 1. **What is the purpose of the `MsgWithdrawFilledLimitOrder` struct and its associated methods?**
 
-2. What dependencies does this code have?
-   - This code imports two packages from the `cosmos-sdk/types` module: `sdk` and `sdkerrors`.
+   The `MsgWithdrawFilledLimitOrder` struct represents a message for withdrawing a filled limit order in the duality project. The associated methods are used to create a new message, get the route, type, signers, sign bytes, and validate the message.
 
-3. What is the format of the message type defined in this code?
-   - The message type is called `MsgWithdrawFilledLimitOrder` and has fields for `Creator` (a string), `TrancheKey` (a string), and functions for routing, signing, and validation.
+2. **What is the role of the `NewMsgWithdrawFilledLimitOrder` function?**
+
+   The `NewMsgWithdrawFilledLimitOrder` function is a constructor that creates and returns a new instance of the `MsgWithdrawFilledLimitOrder` struct with the provided `creator` and `trancheKey` values.
+
+3. **How does the `GetSigners` method work and what does it return?**
+
+   The `GetSigners` method converts the `msg.Creator` string into an `sdk.AccAddress` object using the `sdk.AccAddressFromBech32` function. If there is an error during the conversion, it panics. Otherwise, it returns a slice containing the `creator` address as the only element.
