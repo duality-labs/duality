@@ -86,10 +86,6 @@ do
   # add some randomness into price goal
   goal_price=$(( $current_price + $RANDOM % 1000 - 500 ))
 
-  # log the current state (the new goal should be within the current tick range)
-  # sort array
-  indexes=( $( printf '%s\n' "${indexes[@]}" | sort -n ) )
-
   # - make a swap to get to current price
 
   # first, find the reserves of tokens that are outside the desired price
@@ -130,6 +126,30 @@ do
 
   # - replace the end pieces of liquidity with values closer to the current price
 
+  # determine new indexes close to the current price
+  new_index0=$(( $current_price - 1000 - $RANDOM % 1000 ))
+  new_index1=$(( $current_price + 1000 + $RANDOM % 1000 ))
+
+  # add these extra ticks to prevent swapping though all ticks errors
+  # we deposit first to lessen the cases where we have entirely one-sided liquidity
+  dualityd tx dex deposit \
+    $(dualityd keys show "$person" --output json | jq -r .address) \
+    stake \
+    token \
+    "$amount,0" \
+    "0,$( get_token_1_reserves_amount $amount $new_index1 )" \
+    "[$new_index0,$new_index1]" \
+    "$fee,$fee" \
+    false,false \
+    --from $person --yes --output json --broadcast-mode block --gas 300000 \
+    | jq -r '"[ tx code: \(.code) ] [ tx hash \(.txhash) ]"' \
+    | xargs -I{} echo "{} deposited: new close-to-price ticks $new_index0, $new_index1"
+
+  # add to array
+  indexes+=( $new_index0 $new_index1 )
+  # then sort array
+  indexes=( $( printf '%s\n' "${indexes[@]}" | sort -n ) )
+
   # withdraw the end values
   dualityd tx dex withdrawal \
     $(dualityd keys show "$person" --output json | jq -r .address) \
@@ -142,22 +162,8 @@ do
     | jq -r '"[ tx code: \(.code) ] [ tx hash \(.txhash) ]"' \
     | xargs -I{} echo "{} withdrew:  end ticks $(( indexes[0] )), $(( indexes[-1] ))"
 
-  # determine new indexes close to the current price
-  indexes[0]=$(( $current_price - 1000 - $RANDOM % 1000 ))
-  indexes[-1]=$(( $current_price + 1000 + $RANDOM % 1000 ))
-
-  # add these extra ticks to prevent swapping though all ticks errors
-  dualityd tx dex deposit \
-    $(dualityd keys show "$person" --output json | jq -r .address) \
-    stake \
-    token \
-    "$amount,0" \
-    "0,$( get_token_1_reserves_amount $amount $(( indexes[-1] )) )" \
-    "[$(( indexes[0] )),$(( indexes[-1] ))]" \
-    "$fee,$fee" \
-    false,false \
-    --from $person --yes --output json --broadcast-mode block --gas 300000 \
-    | jq -r '"[ tx code: \(.code) ] [ tx hash \(.txhash) ]"' \
-    | xargs -I{} echo "{} deposited: new close-to-price ticks $(( indexes[0] )), $(( indexes[-1] ))"
+  # remove the withdrawn indexes
+  unset 'indexes[0]'
+  unset 'indexes[-1]'
 
 done
