@@ -55,8 +55,8 @@ func CreateWithdrawEvent(
 		sdk.NewAttribute(WithdrawEventToken1, token1),
 		sdk.NewAttribute(WithdrawEventPrice, strconv.FormatInt(tickIndex, 10)),
 		sdk.NewAttribute(WithdrawEventFee, strconv.FormatUint(fee, 10)),
-		sdk.NewAttribute(WithdrawEventReserves0Withdrawn, withdrawAmountReserve1.String()),
 		sdk.NewAttribute(WithdrawEventReserves0Withdrawn, withdrawAmountReserve0.String()),
+		sdk.NewAttribute(WithdrawEventReserves1Withdrawn, withdrawAmountReserve1.String()),
 		sdk.NewAttribute(WithdrawEventSharesRemoved, sharesRemoved.String()),
 	}
 
