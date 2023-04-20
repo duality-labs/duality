@@ -46,7 +46,7 @@ dualityd tx dex deposit \
   "$(repeat_with_comma "false"),$(repeat_with_comma "false")" \
   --from $person --yes --output json --broadcast-mode block --gas 1000000 \
   | jq -r '"[ tx code: \(.code) ] [ tx hash \(.txhash) ]"' \
-  | xargs -I{} echo "  {}: deposited initial $count seed liquidity ticks"
+  | xargs -I{} echo "{} deposited: initial $count seed liquidity ticks"
 
 # approximate price with sine curves of given amplitude and period
 # macro curve oscillates over hours
@@ -95,7 +95,7 @@ do
       --max-amount-out $reserves0 \
       --from $person --yes --output json --broadcast-mode block --gas 300000 \
       | jq -r '"[ tx code: \(.code) ] [ tx hash \(.txhash) ]"' \
-      | xargs -I{} echo "  {}: swapped ticks toward target price of $goal_price"
+      | xargs -I{} echo "{} swapped:   ticks toward target tick index of $goal_price"
   else
     reserves1=$( \
       wget -q -O - $API_ADDRESS/dualitylabs/duality/dex/tick_liquidity/stake%3C%3Etoken/token?pagination.limit=100 \
@@ -111,7 +111,7 @@ do
         --max-amount-out $reserves1 \
         --from $person --yes --output json --broadcast-mode block --gas 300000 \
         | jq -r '"[ tx code: \(.code) ] [ tx hash \(.txhash) ]"' \
-        | xargs -I{} echo "  {}: swapped ticks toward target price of $goal_price"
+        | xargs -I{} echo "{} swapped:   ticks toward target tick index of $goal_price"
     fi
   fi
 
@@ -130,7 +130,7 @@ do
     "$fee,$fee" \
     --from $person --yes --output json --broadcast-mode block --gas 300000 \
     | jq -r '"[ tx code: \(.code) ] [ tx hash \(.txhash) ]"' \
-    | xargs -I{} echo "  {}: withdrew end ticks"
+    | xargs -I{} echo "{} withdrew:  end ticks $(( indexes[0] )), $(( indexes[-1] ))"
 
   # determine new indexes close to the current price
   indexes[0]=$(( $current_price - 1000 - $RANDOM % 1000 ))
@@ -148,6 +148,6 @@ do
     true,true \
     --from $person --yes --output json --broadcast-mode block --gas 300000 \
     | jq -r '"[ tx code: \(.code) ] [ tx hash \(.txhash) ]"' \
-    | xargs -I{} echo "  {}: tx deposit new close-to-price ticks"
+    | xargs -I{} echo "{} deposited: new close-to-price ticks $(( indexes[0] )), $(( indexes[-1] ))"
 
 done
