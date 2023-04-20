@@ -155,7 +155,7 @@ do
     "0,$( get_token_1_reserves_amount $amount $(( indexes[-1] )) )" \
     "[$(( indexes[0] )),$(( indexes[-1] ))]" \
     "$fee,$fee" \
-    true,true \
+    false,false \
     --from $person --yes --output json --broadcast-mode block --gas 300000 \
     | jq -r '"[ tx code: \(.code) ] [ tx hash \(.txhash) ]"' \
     | xargs -I{} echo "{} deposited: new close-to-price ticks $(( indexes[0] )), $(( indexes[-1] ))"
