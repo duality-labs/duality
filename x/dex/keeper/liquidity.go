@@ -144,6 +144,7 @@ func (k Keeper) Swap(ctx sdk.Context,
 	pair := types.NewDirectionalTradingPair(pairID, tokenIn, tokenOut)
 
 	remainingIn := maxAmountIn
+	remainingOut := maxAmountOut
 	totalOut := sdk.ZeroInt()
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
@@ -160,12 +161,18 @@ func (k Keeper) Swap(ctx sdk.Context,
 			break
 		}
 
-		inAmount, outAmount := liq.Swap(remainingIn, maxAmountOut)
+		inAmount, outAmount := liq.Swap(remainingIn, remainingOut)
 
 		remainingIn = remainingIn.Sub(inAmount)
+		remainingOut = remainingOut.Sub(outAmount)
 		totalOut = totalOut.Add(outAmount)
 
 		k.SaveLiquidity(ctx, liq)
+
+		// if remaining out has been used up then exit
+		if remainingOut.LTE(sdk.ZeroInt()) {
+			break
+		}
 	}
 	totalIn := maxAmountIn.Sub(remainingIn)
 
