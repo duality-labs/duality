@@ -344,10 +344,32 @@ func (s *MsgServerTestSuite) TestSwapNoLOMaxAmountOutUsedMultiTick() {
 	)
 
 	// WHEN
-	// swap 50 with maxOut of 5
+	// swap 50 with maxOut of 20
 	s.bobMarketSellsWithMaxOut("TokenA", 50, 20)
 
 	// THEN
-	// bob gets 5 out
-	s.assertBobBalances(44, 5)
+	// bob gets 20 out
+	s.assertBobBalances(26, 20)
+}
+
+func (s *MsgServerTestSuite) TestSwapNoLOMaxAmountOutNotUsedMultiTick() {
+	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 0)
+	// GIVEN
+	// 50 TokenB available across multiple ticks
+	s.aliceDeposits(
+		NewDeposit(0, 5, 0, 1),
+		NewDeposit(0, 5, 1, 1),
+		NewDeposit(0, 5, 2, 1),
+		NewDeposit(0, 5, 3, 1),
+		NewDeposit(0, 30, 4, 1),
+	)
+
+	// WHEN
+	// swap 19 TokenA with maxOut of 20
+	s.bobMarketSellsWithMaxOut("TokenA", 19, 20)
+
+	// THEN
+	// bob gets 15 out
+	s.assertBobBalances(31, 15)
 }
