@@ -29,6 +29,8 @@ services:
   # you can also override the test accounts (using MNEMONIC or MNEMONICS) passed in here
   dualitytester:
     container_name: dualitytester
+    profiles:
+      - test
     build:
       context: .
       target: testnet-env
@@ -146,6 +148,8 @@ services:
         ipv4_address: 192.168.10.100
 
   dualitynode0:
+    profiles:
+      - test
     container_name: dualitynode0
     build:
       context: .
@@ -182,6 +186,8 @@ services:
 
   dualitynode1:
     container_name: dualitynode1
+    profiles:
+      - test
     build:
       context: .
       target: testnet-env
@@ -217,6 +223,8 @@ services:
 
   dualitynode2:
     container_name: dualitynode2
+    profiles:
+      - test
     build:
       context: .
       target: testnet-env
@@ -252,6 +260,8 @@ services:
 
   dualitynode3:
     container_name: dualitynode3
+    profiles:
+      - test
     build:
       context: .
       target: testnet-env
