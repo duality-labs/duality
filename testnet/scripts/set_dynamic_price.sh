@@ -19,28 +19,41 @@ function repeat_with_comma {
   done
   join_with_comma "${repeated[@]}"
 }
+function get_token_1_reserves_amount {
+  amount=$1
+  index=$2;
+  echo " $amount / (1.0001 ^ $index) " \
+    | bc -l \
+    | awk '{printf("%d\n",$0+1)}' # round up only (in case we don't create enough reserves)
+}
 
 # create initial tick array outside of max price amplitude
 max_tick_index=12000
 indexes0=()
 indexes1=()
+amounts0=()
+amounts1=()
+amount=1000000
+fee=30
 for (( i=0; i<$count/4; i++ ))
 do
   index=$(( $RANDOM % $max_tick_index ))
   indexes0+=( $(( -$max_tick_index - $index )) -$index )
   indexes1+=( $index $(( $index + $max_tick_index )) )
+  # calculate reserve amounts to add that will equal the same amount of shares
+  amounts0+=( $amount $amount )
+  amounts1+=( $( get_token_1_reserves_amount $amount $index ) )
+  amounts1+=( $( get_token_1_reserves_amount $amount $(( $index + $max_tick_index )) ) )
 done
 indexes=( "${indexes0[@]}" "${indexes1[@]}" )
 
 # apply an amount to all tick indexes specified
-amount=1000000
-fee=30
 dualityd tx dex deposit \
   $(dualityd keys show "$person" --output json | jq -r .address) \
   stake \
   token \
   "$(repeat_with_comma "$amount"),$(repeat_with_comma "0")" \
-  "$(repeat_with_comma "0"),$(repeat_with_comma "$amount")" \
+  "$(repeat_with_comma "0"),$(join_with_comma "${amounts1[@]}")" \
   "[$(join_with_comma "${indexes0[@]}"),$(join_with_comma "${indexes1[@]}")]" \
   "$(repeat_with_comma "$fee"),$(repeat_with_comma "$fee")" \
   "$(repeat_with_comma "false"),$(repeat_with_comma "false")" \
@@ -118,14 +131,11 @@ do
   # - replace the end pieces of liquidity with values closer to the current price
 
   # withdraw the end values
-  # note that the amount of shares must be calculated (not number of tokens)
-  shares0=$amount
-  shares1=$( echo " $amount * 1.0001 ^ $(( indexes[-1] )) " | bc -l | awk '{printf("%d\n",$0)}' ) # round down only
   dualityd tx dex withdrawal \
     $(dualityd keys show "$person" --output json | jq -r .address) \
     stake \
     token \
-    "$shares0,$shares1" \
+    "$amount,$amount" \
     "[$(( indexes[0] )),$(( indexes[-1] ))]" \
     "$fee,$fee" \
     --from $person --yes --output json --broadcast-mode block --gas 300000 \
@@ -142,7 +152,7 @@ do
     stake \
     token \
     "$amount,0" \
-    "0,$amount" \
+    "0,$( get_token_1_reserves_amount $amount $(( indexes[-1] )) )" \
     "[$(( indexes[0] )),$(( indexes[-1] ))]" \
     "$fee,$fee" \
     true,true \
