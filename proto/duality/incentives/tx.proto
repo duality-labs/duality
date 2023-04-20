@@ -11,11 +11,13 @@ import "google/protobuf/duration.proto";
 option go_package = "github.com/duality-labs/duality/x/incentives/types";
 
 service Msg {
+  // Create an incentive program
   rpc CreateGauge(MsgCreateGauge) returns (MsgCreateGaugeResponse);
+  // Add rewards to an existing incentives program
   rpc AddToGauge(MsgAddToGauge) returns (MsgAddToGaugeResponse);
-  // Stake stakes tokens
+  // Deposit LP tokens to the module, qualifying for rewards from gauges
   rpc Stake(MsgStake) returns (MsgStakeResponse);
-  // UnstakeTokens unstakes tokens by stake IDs
+  // Withdraw LP tokens from the module, forfeiting future rewards from gauges
   rpc Unstake(MsgUnstake) returns (MsgUnstakeResponse);
 }
 

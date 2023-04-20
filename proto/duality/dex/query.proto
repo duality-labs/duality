@@ -42,7 +42,7 @@ service Query {
   	option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche/{pairID}/{tokenIn}";
   }
 
-// Queries a list of GetUserPositions items.
+  // Queries a list of GetUserPositions items.
 	rpc GetUserPositions(QueryGetUserPositionsRequest) returns (QueryGetUserPositionsResponse) {
 		option (google.api.http).get = "/dualitylabs/duality/dex/user/positions/{address}";
 	}
