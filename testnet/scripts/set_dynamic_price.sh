@@ -6,7 +6,7 @@ set -e
 person=$(bash /root/.duality/scripts/test_helpers.sh createAndFundUser 1000000000000stake,1000000000000token)
 
 # add some helper functions to generate chain CLI args
-count=20; # should be divisible by 4
+count=100; # should be divisible by 4
 function join_with_comma {
   local IFS=,
   echo "$*"
@@ -44,7 +44,7 @@ dualityd tx dex deposit \
   "[$(join_with_comma "${indexes0[@]}"),$(join_with_comma "${indexes1[@]}")]" \
   "$(repeat_with_comma "$fee"),$(repeat_with_comma "$fee")" \
   "$(repeat_with_comma "false"),$(repeat_with_comma "false")" \
-  --from $person --yes --output json --broadcast-mode block --gas 1000000 \
+  --from $person --yes --output json --broadcast-mode block --gas 10000000 \
   | jq -r '"[ tx code: \(.code) ] [ tx hash \(.txhash) ]"' \
   | xargs -I{} echo "{} deposited: initial $count seed liquidity ticks"
 
@@ -61,7 +61,7 @@ two_pi=$( echo "scale=8; 8*a(1)" | bc -l )
 while true
 do
   # wait a bit, maybe less than a block or enough that we don't touch a block or two
-  sleep $(( $RANDOM % 20 + 1 ))
+  sleep $(( $RANDOM % 20 + 2 ))
 
   # determine the new current price goal
   current_price=$( \
