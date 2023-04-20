@@ -1,0 +1,36 @@
+[View code on GitHub](https://github.com/duality-labs/duality/dex/types/pool_reserves.go)
+
+The `types` package in the `duality` project contains a function called `HasToken()` which takes in a `PoolReserves` object and returns a boolean value. The purpose of this function is to check if the `PoolReserves` object has any tokens in its reserves. 
+
+The `PoolReserves` object is a custom type that contains two fields: `Reserves` and `TotalShares`. `Reserves` is of type `sdk.Int` which is a custom type from the `cosmos-sdk/types` package. It represents the total amount of tokens held in the pool's reserves. `TotalShares` is also of type `sdk.Int` and represents the total number of shares issued by the pool.
+
+The `HasToken()` function checks if the `Reserves` field of the `PoolReserves` object is greater than zero. If it is, then the function returns `true`, indicating that the pool has tokens in its reserves. If the `Reserves` field is equal to or less than zero, then the function returns `false`, indicating that the pool has no tokens in its reserves.
+
+This function can be used in the larger project to determine if a pool has any tokens available for trading. For example, if a user wants to trade a specific token on a decentralized exchange, they would need to know if that token is available in the pool's reserves. The `HasToken()` function can be used to check if the token is available before attempting to make a trade.
+
+Here is an example of how the `HasToken()` function can be used:
+
+```
+import "duality/types"
+
+func main() {
+    poolReserves := types.PoolReserves{
+        Reserves:    sdk.NewInt(100),
+        TotalShares: sdk.NewInt(50),
+    }
+
+    hasToken := poolReserves.HasToken()
+    fmt.Println(hasToken) // Output: true
+}
+```
+
+In this example, a `PoolReserves` object is created with 100 tokens in its reserves and 50 total shares issued. The `HasToken()` function is called on this object and returns `true` since the `Reserves` field is greater than zero.
+## Questions: 
+ 1. What is the purpose of the `types` package in the `duality` project?
+- The `types` package is imported to define the `sdk` type from the `cosmos-sdk` library.
+
+2. What does the `HasToken()` function do?
+- The `HasToken()` function checks if the `Reserves` value in the `PoolReserves` struct is greater than zero and returns a boolean value.
+
+3. What is the significance of the `sdk.ZeroInt()` function?
+- The `sdk.ZeroInt()` function returns an integer value of zero from the `cosmos-sdk` library and is used as a comparison value in the `HasToken()` function.

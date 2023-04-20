@@ -1,0 +1,16 @@
+[View code on GitHub](https://github.com/duality-labs/duality/dex/keeper/liquidity.go)
+
+The `keeper` package contains code that is used to manage liquidity pools and execute swaps in the Duality project. The `Liquidity` interface defines two methods: `Swap` and `Price`. The `Swap` method takes in two `sdk.Int` values, `maxAmountIn` and `maxAmountOut`, and returns two `sdk.Int` values, `inAmount` and `outAmount`. The `Price` method returns a pointer to a `types.Price` struct. 
+
+The `LiquidityIterator` struct is used to iterate over the liquidity in a given trading pair. It contains a `keeper` object, a `pairID` object, a `ctx` object, an `iter` object, and an `is0To1` boolean. The `Next` method is used to move the iterator to the next tick and return the liquidity at that tick. The `createPool0To1` and `createPool1To0` methods are used to create a new liquidity pool for a given trading pair. The `Close` method is used to close the iterator.
+
+The `SaveLiquidity` method is used to save the liquidity to the keeper. It takes in an `sdk.Context` object and a `Liquidity` interface and saves the liquidity to the keeper. The `Swap` method is used to execute a swap between two tokens. It takes in a `sdk.Context` object, a `pairID` object, two token strings, `maxAmountIn` and `maxAmountOut` values, and a `limitPrice` value. It returns two `sdk.Coin` values, `totalInCoin` and `totalOutCoin`, and an error. The `SwapExactAmountIn` method is used to execute a swap with a specified amount of input token. It takes in a `sdk.Context` object, a `pairID` object, two token strings, an `amountIn` value, a `maxAmountOut` value, and a `limitPrice` value. It returns two `sdk.Coin` values, `totalIn` and `totalOut`, and an error. The `SwapWithCache` method is used to execute a swap with a cache. It takes in a `sdk.Context` object, a `pairID` object, two token strings, `maxAmountIn` and `maxAmountOut` values, and a `limitPrice` value. It returns two `sdk.Coin` values, `totalIn` and `totalOut`, and an error.
+
+Overall, this code is used to manage liquidity pools and execute swaps in the Duality project. The `LiquidityIterator` struct is used to iterate over the liquidity in a given trading pair, while the `SaveLiquidity`, `Swap`, `SwapExactAmountIn`, and `SwapWithCache` methods are used to manage liquidity and execute swaps.
+## Questions: 
+ 1. What is the purpose of the `Liquidity` interface and what methods does it require?
+- The `Liquidity` interface defines two methods: `Swap` and `Price`, which are used to execute a swap and get the current price of the liquidity pool, respectively.
+2. What is the purpose of the `LiquidityIterator` struct and how is it used?
+- The `LiquidityIterator` struct is used to iterate over the liquidity of a trading pair in a specific direction. It is used to find the best liquidity pool to execute a swap and returns the corresponding `Liquidity` object.
+3. What is the purpose of the `Swap` function and what parameters does it take?
+- The `Swap` function is used to execute a swap between two tokens in a specific trading pair. It takes in the trading pair ID, the input and output tokens, the maximum amount of input and output tokens, and an optional limit price. It returns the total amount of input and output tokens swapped.

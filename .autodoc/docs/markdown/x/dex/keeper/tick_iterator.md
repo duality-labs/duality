@@ -1,0 +1,29 @@
+[View code on GitHub](https://github.com/duality-labs/duality/dex/keeper/tick_iterator.go)
+
+The `keeper` package contains code related to the storage and retrieval of data for the duality project. Specifically, this file defines a `TickIterator` type and associated methods for iterating over a collection of `TickLiquidity` objects.
+
+The `TickIterator` type is defined as a struct with two fields: an `iter` field of type `sdk.Iterator` and a `cdc` field of type `codec.BinaryCodec`. The `iter` field is used to iterate over a collection of `TickLiquidity` objects, while the `cdc` field is used to marshal and unmarshal binary data.
+
+The `NewTickIterator` method is used to create a new `TickIterator` object. It takes three arguments: a `ctx` argument of type `sdk.Context`, a `pairID` argument of type `*types.PairID`, and a `tokenIn` argument of type `string`. The `ctx` argument is used to access the underlying key-value store, while the `pairID` and `tokenIn` arguments are used to construct a prefix for the key-value store. The method returns a new `TickIterator` object.
+
+The `Valid` method is used to determine if the current position of the iterator is valid. It returns a boolean value indicating whether or not the iterator is valid.
+
+The `Close` method is used to close the iterator. It returns an error if the iterator cannot be closed.
+
+The `Value` method is used to retrieve the current value of the iterator. It returns a `TickLiquidity` object.
+
+The `Next` method is used to advance the iterator to the next position.
+
+Overall, this code provides a way to iterate over a collection of `TickLiquidity` objects stored in the key-value store. This functionality may be used in the larger duality project to retrieve and manipulate data related to liquidity pools and trading pairs. For example, the `TickIterator` may be used to calculate the average price of a trading pair over a certain time period.
+## Questions: 
+ 1. What is the purpose of the `TickIterator` struct and how is it used in the `duality` project?
+   
+   The `TickIterator` struct is used to iterate over a prefix store of `TickLiquidity` objects for a given `PairID` and `tokenIn`. It is used in the `duality` project to provide an iterator for the `TickLiquidity` objects stored in the prefix store.
+
+2. What is the relationship between the `TickIterator` struct and the `Keeper` struct?
+   
+   The `NewTickIterator` method is defined on the `Keeper` struct and returns a new instance of the `TickIterator` struct. This method is used to create a new iterator for a given `PairID` and `tokenIn`.
+
+3. What is the purpose of the `codec` package and how is it used in this code?
+   
+   The `codec` package is used to marshal and unmarshal binary data in the `duality` project. In this code, it is used to unmarshal the binary data stored in the prefix store into a `TickLiquidity` object using the `MustUnmarshal` method.

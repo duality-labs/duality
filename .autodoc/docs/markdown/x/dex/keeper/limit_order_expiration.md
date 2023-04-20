@@ -1,0 +1,26 @@
+[View code on GitHub](https://github.com/duality-labs/duality/dex/keeper/limit_order_expiration.go)
+
+The `keeper` package contains the implementation of the `Keeper` struct, which is responsible for managing the state of the duality project. This file contains functions related to managing limit order expirations.
+
+The `SetLimitOrderExpiration` function takes a `goodTilRecord` of type `types.LimitOrderExpiration` and stores it in the key-value store. The `goodTilRecord` contains an expiration time and a tranche reference. The function creates a new store using the `prefix.NewStore` function and marshals the `goodTilRecord` using the `cdc.MustMarshal` function. It then sets the value in the store using the `store.Set` function.
+
+The `GetLimitOrderExpiration` function takes a `goodTilDate` of type `time.Time` and a `trancheRef` of type `[]byte` and returns the corresponding `goodTilRecord` of type `types.LimitOrderExpiration` from the key-value store. The function creates a new store using the `prefix.NewStore` function and retrieves the value from the store using the `store.Get` function. If the value is not found, the function returns a default value and `false`. Otherwise, it unmarshals the value using the `cdc.MustUnmarshal` function and returns the unmarshalled value and `true`.
+
+The `RemoveLimitOrderExpiration` function takes a `goodTilDate` of type `time.Time` and a `trancheRef` of type `[]byte` and removes the corresponding `goodTilRecord` from the key-value store. The function creates a new store using the `prefix.NewStore` function and deletes the value from the store using the `store.Delete` function.
+
+The `RemoveLimitOrderExpirationByKey` function takes a `key` of type `[]byte` and removes the corresponding `goodTilRecord` from the key-value store. The function creates a new store using the `prefix.NewStore` function and deletes the value from the store using the `store.Delete` function.
+
+The `GetAllLimitOrderExpiration` function returns all `goodTilRecord` of type `types.LimitOrderExpiration` from the key-value store. The function creates a new store using the `prefix.NewStore` function and retrieves all values from the store using the `sdk.KVStorePrefixIterator` function. It then unmarshals each value using the `cdc.MustUnmarshal` function and appends it to a list.
+
+The `PurgeExpiredLimitOrders` function removes all expired limit orders from the key-value store. The function creates a new store using the `prefix.NewStore` function and retrieves all values from the store using the `sdk.KVStorePrefixIterator` function. It then iterates over each value and checks if it has expired. If it has, the function removes the corresponding `goodTilRecord` from the key-value store using the `RemoveLimitOrderExpirationByKey` function. If the function consumes more than a certain amount of gas, it stops deleting to prevent the block from timing out. The function also archives the corresponding tranche if it has not already been archived using the `SetInactiveLimitOrderTranche` and `RemoveLimitOrderTranche` functions.
+
+Overall, this file contains functions for managing limit order expirations in the duality project. These functions allow for the storage, retrieval, and removal of limit order expirations from the key-value store. The `PurgeExpiredLimitOrders` function is particularly important as it removes expired limit orders from the key-value store to prevent them from being traded on the next block.
+## Questions: 
+ 1. What is the purpose of the `duality-labs/duality/x/dex/types` package?
+- The `duality-labs/duality/x/dex/types` package is imported to define the `LimitOrderExpiration` type used in this file.
+
+2. What is the significance of the `goodTilDate` and `trancheRef` parameters in the `GetLimitOrderExpiration` and `RemoveLimitOrderExpiration` functions?
+- The `goodTilDate` parameter is used to retrieve or delete a `LimitOrderExpiration` record with a specific expiration time. The `trancheRef` parameter is used to identify the tranche to which the `LimitOrderExpiration` record belongs.
+ 
+3. What is the purpose of the `PurgeExpiredLimitOrders` function?
+- The `PurgeExpiredLimitOrders` function is used to remove expired `LimitOrderExpiration` records from the store and archive the corresponding limit order tranches. It also includes logic to prevent the function from timing out the block by stopping deletion if the gas limit is reached.
