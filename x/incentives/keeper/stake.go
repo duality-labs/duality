@@ -104,7 +104,7 @@ func (k Keeper) Unstake(ctx sdk.Context, stake *types.Stake, coins sdk.Coins) (u
 			types.TypeEvtUnstake,
 			sdk.NewAttribute(types.AttributeStakeID, strconv.FormatUint(stake.ID, 10)),
 			sdk.NewAttribute(types.AttributeStakeOwner, stake.Owner),
-			sdk.NewAttribute(types.AttributeStakeUnstakeTime, stake.StartTime.String()),
+			sdk.NewAttribute(types.AttributeStakeStakeTime, stake.StartTime.String()),
 			sdk.NewAttribute(types.AttributeUnstakedCoins, coins.String()),
 		),
 	})
