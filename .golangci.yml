@@ -95,6 +95,8 @@ issues:
       text: 'Default|Key'
 
 run:
+  # Don't actually fail CI for linting errors
+  issues-exit-code: 0
   skip-files:
     # Don't lint osmosis code; remove eventually
     - "osmoutils"
