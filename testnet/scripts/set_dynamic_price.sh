@@ -102,7 +102,7 @@ do
       token \
       stake \
       --max-amount-out $reserves0 \
-      --from $person --yes --output json --broadcast-mode block --gas 300000 \
+      --from $person --yes --output json --broadcast-mode block --gas 10000000 \
       | jq -r '"[ tx code: \(.code) ] [ tx hash \(.txhash) ]"' \
       | xargs -I{} echo "{} swapped:   ticks toward target tick index of $goal_price"
   else
@@ -118,7 +118,7 @@ do
         stake \
         token \
         --max-amount-out $reserves1 \
-        --from $person --yes --output json --broadcast-mode block --gas 300000 \
+        --from $person --yes --output json --broadcast-mode block --gas 10000000 \
         | jq -r '"[ tx code: \(.code) ] [ tx hash \(.txhash) ]"' \
         | xargs -I{} echo "{} swapped:   ticks toward target tick index of $goal_price"
     fi
