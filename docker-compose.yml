@@ -295,6 +295,64 @@ services:
       localnet:
         ipv4_address: 192.168.10.13
 
+  dualityliquidityprovider:
+    container_name: liquidity-provider
+    profiles:
+      - simulation
+    build:
+      context: .
+      target: testnet-env
+      args:
+        NETWORK: duality-testnet-1
+        CHAIN_ID: duality-composenet-1
+    command: >
+      /bin/bash -c '
+        #!/bin/bash
+        set -e
+
+        # wait a bit for the leader to start the chain
+        echo "waiting for testnet to start...";
+        sleep 10;
+
+        # start as full node
+        KEEP_RUNNING=false sh ./scripts/startup.sh
+
+        # wait for next block at least for new address to be registered?
+        sleep 10;
+
+        echo "Start providing liquidity..."
+
+        bash /root/.duality/scripts/set_dynamic_price.sh
+
+        echo "Done providing liquidity..."
+
+        # keep container running
+        tail -f /dev/null
+      '
+    environment:
+      - DEBUG=0
+      - NODE_MONIKER=liquidityprovider
+      - MODE=fullnode
+      - RPC_ADDRESS=http://192.168.10.100:26657
+      - API_ADDRESS=http://192.168.10.100:1317
+      - LOG=${LOG:-simd.log}
+      - LOG_LEVEL=${LOG_LEVEL:-warn}
+      - FAUCET=tail raccoon real chaos item lift pretty slice normal come target rack public design concert vintage main word evolve dog denial bomb swarm tortoise
+      - MNEMONIC=
+          life remember forward tiny acoustic trumpet viable alcohol shadow thank dress intact metal brain marble poverty fashion segment cheap course improve fancy material shoot
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    ports:
+      - "26656-26657:26656-26657"
+      - "1317:1317"
+      - "9090:9090"
+      - "2345:2345"
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.10
+
 networks:
   localnet:
     driver: bridge
