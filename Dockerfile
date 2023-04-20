@@ -34,7 +34,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 
 
 # Final image build on small stable release of ARM64 Linux
-FROM arm64v8/alpine:20220715 as base-env
+FROM arm64v8/alpine:3.14 as base-env
 
 # Install ca-certificates
 RUN apk add --update \
