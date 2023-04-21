@@ -3,21 +3,21 @@ package cli
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/duality-labs/duality/osmoutils/osmocli"
+	"github.com/duality-labs/duality/utils/dcli"
 	"github.com/duality-labs/duality/x/epochs/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module.
 func GetQueryCmd() *cobra.Command {
-	cmd := osmocli.QueryIndexCmd(types.ModuleName)
-	osmocli.AddQueryCmd(cmd, types.NewQueryClient, GetCmdEpochInfos)
-	osmocli.AddQueryCmd(cmd, types.NewQueryClient, GetCmdCurrentEpoch)
+	cmd := dcli.QueryIndexCmd(types.ModuleName)
+	dcli.AddQueryCmd(cmd, types.NewQueryClient, GetCmdEpochInfos)
+	dcli.AddQueryCmd(cmd, types.NewQueryClient, GetCmdCurrentEpoch)
 
 	return cmd
 }
 
-func GetCmdEpochInfos() (*osmocli.QueryDescriptor, *types.QueryEpochsInfoRequest) {
-	return &osmocli.QueryDescriptor{
+func GetCmdEpochInfos() (*dcli.QueryDescriptor, *types.QueryEpochsInfoRequest) {
+	return &dcli.QueryDescriptor{
 		Use:   "epoch-infos",
 		Short: "Query running epoch infos.",
 		Long: `{{.Short}}{{.ExampleHeader}}
@@ -26,8 +26,8 @@ func GetCmdEpochInfos() (*osmocli.QueryDescriptor, *types.QueryEpochsInfoRequest
 	}, &types.QueryEpochsInfoRequest{}
 }
 
-func GetCmdCurrentEpoch() (*osmocli.QueryDescriptor, *types.QueryCurrentEpochRequest) {
-	return &osmocli.QueryDescriptor{
+func GetCmdCurrentEpoch() (*dcli.QueryDescriptor, *types.QueryCurrentEpochRequest) {
+	return &dcli.QueryDescriptor{
 		Use:   "current-epoch",
 		Short: "Query current epoch by specified identifier.",
 		Long: `{{.Short}}{{.ExampleHeader}}

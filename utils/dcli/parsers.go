@@ -1,4 +1,4 @@
-package osmocli
+package dcli
 
 import (
 	"encoding/json"
@@ -12,13 +12,13 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/pflag"
 
-	osmoutils "github.com/duality-labs/duality/osmoutils"
+	utils "github.com/duality-labs/duality/utils"
 )
 
 // Parses arguments 1-1 from args
 // makes an exception, where it allows Pagination to come from flags.
 func ParseFieldsFromFlagsAndArgs[reqP any](flagAdvice FlagAdvice, flags *pflag.FlagSet, args []string) (reqP, error) {
-	req := osmoutils.MakeNew[reqP]()
+	req := utils.MakeNew[reqP]()
 	v := reflect.ValueOf(req).Elem()
 	t := v.Type()
 
@@ -41,14 +41,14 @@ func ParseFieldsFromFlagsAndArgs[reqP any](flagAdvice FlagAdvice, flags *pflag.F
 }
 
 func ParseNumFields[reqP any]() int {
-	req := osmoutils.MakeNew[reqP]()
+	req := utils.MakeNew[reqP]()
 	v := reflect.ValueOf(req).Elem()
 	t := v.Type()
 	return t.NumField()
 }
 
 func ParseExpectedQueryFnName[reqP any]() string {
-	req := osmoutils.MakeNew[reqP]()
+	req := utils.MakeNew[reqP]()
 	v := reflect.ValueOf(req).Elem()
 	s := v.Type().String()
 	// handle some non-std queries
@@ -63,7 +63,7 @@ func ParseExpectedQueryFnName[reqP any]() string {
 }
 
 func ParseHasPagination[reqP any]() bool {
-	req := osmoutils.MakeNew[reqP]()
+	req := utils.MakeNew[reqP]()
 	t := reflect.ValueOf(req).Elem().Type()
 	for i := 0; i < t.NumField(); i++ {
 		fType := t.Field(i)

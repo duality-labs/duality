@@ -12,19 +12,19 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/duality-labs/duality/osmoutils/osmocli"
+	"github.com/duality-labs/duality/utils/dcli"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"
 )
 
 // GetTxCmd returns the transaction commands for this module.
 func GetTxCmd() *cobra.Command {
-	cmd := osmocli.TxIndexCmd(types.ModuleName)
+	cmd := dcli.TxIndexCmd(types.ModuleName)
 
-	osmocli.AddTxCmd(cmd, NewCreateGaugeCmd)
-	osmocli.AddTxCmd(cmd, NewAddToGaugeCmd)
-	osmocli.AddTxCmd(cmd, NewStakeCmd)
-	osmocli.AddTxCmd(cmd, NewUnstakeCmd)
+	dcli.AddTxCmd(cmd, NewCreateGaugeCmd)
+	dcli.AddTxCmd(cmd, NewAddToGaugeCmd)
+	dcli.AddTxCmd(cmd, NewStakeCmd)
+	dcli.AddTxCmd(cmd, NewUnstakeCmd)
 
 	return cmd
 }
@@ -36,12 +36,12 @@ func CreateGaugeCmdBuilder(clientCtx client.Context, args []string, flags *pflag
 		return &types.MsgCreateGauge{}, err
 	}
 
-	startTick, err := osmocli.ParseIntMaybeNegative(args[1], "startTick")
+	startTick, err := dcli.ParseIntMaybeNegative(args[1], "startTick")
 	if err != nil {
 		return &types.MsgCreateGauge{}, err
 	}
 
-	endTick, err := osmocli.ParseIntMaybeNegative(args[2], "endTick")
+	endTick, err := dcli.ParseIntMaybeNegative(args[2], "endTick")
 	if err != nil {
 		return &types.MsgCreateGauge{}, err
 	}
@@ -66,7 +66,7 @@ func CreateGaugeCmdBuilder(clientCtx client.Context, args []string, flags *pflag
 		return &types.MsgCreateGauge{}, errors.New("invalid start time format")
 	}
 
-	epochs, err := osmocli.ParseUint(args[4], "numEpochs")
+	epochs, err := dcli.ParseUint(args[4], "numEpochs")
 	if err != nil {
 		return &types.MsgCreateGauge{}, err
 	}
@@ -80,7 +80,7 @@ func CreateGaugeCmdBuilder(clientCtx client.Context, args []string, flags *pflag
 		epochs = 1
 	}
 
-	pricingTick, err := osmocli.ParseIntMaybeNegative(args[5], "pricingTick")
+	pricingTick, err := dcli.ParseIntMaybeNegative(args[5], "pricingTick")
 	if err != nil {
 		return &types.MsgCreateGauge{}, err
 	}
@@ -104,27 +104,27 @@ func CreateGaugeCmdBuilder(clientCtx client.Context, args []string, flags *pflag
 	return msg, nil
 }
 
-func NewCreateGaugeCmd() (*osmocli.TxCliDesc, *types.MsgCreateGauge) {
-	return &osmocli.TxCliDesc{
+func NewCreateGaugeCmd() (*dcli.TxCliDesc, *types.MsgCreateGauge) {
+	return &dcli.TxCliDesc{
 		ParseAndBuildMsg: CreateGaugeCmdBuilder,
 		Use:              "create-gauge [pairID] [startTick] [endTick] [coins] [numEpochs] [pricingTick]",
 		Short:            "create a gauge to distribute rewards to users",
 		Long: `{{.Short}}{{.ExampleHeader}}
 TokenA<>TokenB [-10] 200 100TokenA,200TokenB 6 0 --start-time 2006-01-02T15:04:05Z07:00 --perpetual true`,
-		Flags: osmocli.FlagDesc{OptionalFlags: []*pflag.FlagSet{FlagSetCreateGauge()}},
+		Flags: dcli.FlagDesc{OptionalFlags: []*pflag.FlagSet{FlagSetCreateGauge()}},
 	}, &types.MsgCreateGauge{}
 }
 
-func NewAddToGaugeCmd() (*osmocli.TxCliDesc, *types.MsgAddToGauge) {
-	return &osmocli.TxCliDesc{
+func NewAddToGaugeCmd() (*dcli.TxCliDesc, *types.MsgAddToGauge) {
+	return &dcli.TxCliDesc{
 		Use:   "add-to-gauge [gauge_id] [coins]",
 		Short: "add coins to gauge to distribute more rewards to users",
 		Long:  `{{.Short}}{{.ExampleHeader}} add-to-gauge 1 TokenA,TokenB`,
 	}, &types.MsgAddToGauge{}
 }
 
-func NewStakeCmd() (*osmocli.TxCliDesc, *types.MsgStake) {
-	return &osmocli.TxCliDesc{
+func NewStakeCmd() (*dcli.TxCliDesc, *types.MsgStake) {
+	return &dcli.TxCliDesc{
 		Use:   "stake-tokens [coins]",
 		Short: "stake tokens into stakeup pool from user account",
 	}, &types.MsgStake{}
@@ -143,12 +143,12 @@ func UnstakeCmdBuilder(clientCtx client.Context, args []string, _ *pflag.FlagSet
 		if len(parts) != 2 {
 			return &types.MsgUnstake{}, errors.New("invalid syntax for unstake tokens")
 		}
-		poolID, err := osmocli.ParseUint(parts[0], fmt.Sprintf("poolID[%d]", i))
+		poolID, err := dcli.ParseUint(parts[0], fmt.Sprintf("poolID[%d]", i))
 		if err != nil {
 			return &types.MsgUnstake{}, err
 		}
 
-		coins, err := osmocli.ParseCoins(parts[1], fmt.Sprintf("coins[%d]", i))
+		coins, err := dcli.ParseCoins(parts[1], fmt.Sprintf("coins[%d]", i))
 		if err != nil {
 			return &types.MsgUnstake{}, err
 		}
@@ -159,8 +159,8 @@ func UnstakeCmdBuilder(clientCtx client.Context, args []string, _ *pflag.FlagSet
 	return types.NewMsgUnstake(clientCtx.GetFromAddress(), unstakes), nil
 }
 
-func NewUnstakeCmd() (*osmocli.TxCliDesc, *types.MsgUnstake) {
-	return &osmocli.TxCliDesc{
+func NewUnstakeCmd() (*dcli.TxCliDesc, *types.MsgUnstake) {
+	return &dcli.TxCliDesc{
 		Use:              "unstake-tokens [poolID]:[coins] [poolID]:[coins] ...",
 		Short:            "Unstake tokens",
 		ParseAndBuildMsg: UnstakeCmdBuilder,
