@@ -12,7 +12,7 @@ import (
 
 	"golang.org/x/exp/maps"
 
-	"github.com/duality-labs/duality/osmoutils"
+	"github.com/duality-labs/duality/utils"
 )
 
 // This test is responsible for testing how epochs increment based off
@@ -91,7 +91,7 @@ func (suite KeeperTestSuite) TestEpochInfoBeginBlockChanges() {
 
 			// get sorted heights
 			heights := maps.Keys(test.blockHeightTimePairs)
-			osmoutils.SortSlice(heights)
+			utils.SortSlice(heights)
 			for _, h := range heights {
 				// for each height in order, run begin block
 				suite.Ctx = suite.Ctx.WithBlockHeight(int64(h)).WithBlockTime(test.blockHeightTimePairs[h])

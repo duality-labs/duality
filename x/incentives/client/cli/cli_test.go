@@ -7,40 +7,40 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
-	"github.com/duality-labs/duality/osmoutils"
-	"github.com/duality-labs/duality/osmoutils/osmocli"
+	"github.com/duality-labs/duality/utils"
+	"github.com/duality-labs/duality/utils/dcli"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/client/cli"
 	"github.com/duality-labs/duality/x/incentives/types"
 )
 
-var testAddresses = osmoutils.CreateRandomAccounts(3)
+var testAddresses = utils.CreateRandomAccounts(3)
 
 // Queries ////////////////////////////////////////////////////////////////////
 
 func TestGetCmdGetModuleStatus(t *testing.T) {
 	desc, _ := cli.GetCmdGetModuleStatus()
-	tcs := map[string]osmocli.QueryCliTestCase[*types.GetModuleStatusRequest]{
+	tcs := map[string]dcli.QueryCliTestCase[*types.GetModuleStatusRequest]{
 		"basic test": {
 			ExpectedQuery: &types.GetModuleStatusRequest{},
 		},
 	}
-	osmocli.RunQueryTestCases(t, desc, tcs)
+	dcli.RunQueryTestCases(t, desc, tcs)
 }
 
 func TestGetCmdGetGaugeByID(t *testing.T) {
 	desc, _ := cli.GetCmdGetGaugeByID()
-	tcs := map[string]osmocli.QueryCliTestCase[*types.GetGaugeByIDRequest]{
+	tcs := map[string]dcli.QueryCliTestCase[*types.GetGaugeByIDRequest]{
 		"basic test": {
 			Cmd: "1", ExpectedQuery: &types.GetGaugeByIDRequest{Id: 1},
 		},
 	}
-	osmocli.RunQueryTestCases(t, desc, tcs)
+	dcli.RunQueryTestCases(t, desc, tcs)
 }
 
 func TestGetCmdGauges(t *testing.T) {
 	desc, _ := cli.GetCmdGauges()
-	tcs := map[string]osmocli.QueryCliTestCase[*types.GetGaugesRequest]{
+	tcs := map[string]dcli.QueryCliTestCase[*types.GetGaugesRequest]{
 		"test ACTIVE with pagination": {
 			Cmd: "ACTIVE TokenA --offset=2",
 			ExpectedQuery: &types.GetGaugesRequest{
@@ -74,22 +74,22 @@ func TestGetCmdGauges(t *testing.T) {
 			},
 		},
 	}
-	osmocli.RunQueryTestCases(t, desc, tcs)
+	dcli.RunQueryTestCases(t, desc, tcs)
 }
 
 func TestGetCmdGetStakeByID(t *testing.T) {
 	desc, _ := cli.GetCmdGetStakeByID()
-	tcs := map[string]osmocli.QueryCliTestCase[*types.GetStakeByIDRequest]{
+	tcs := map[string]dcli.QueryCliTestCase[*types.GetStakeByIDRequest]{
 		"basic test": {
 			Cmd: "1", ExpectedQuery: &types.GetStakeByIDRequest{StakeId: 1},
 		},
 	}
-	osmocli.RunQueryTestCases(t, desc, tcs)
+	dcli.RunQueryTestCases(t, desc, tcs)
 }
 
 func TestGetCmdStakes(t *testing.T) {
 	desc, _ := cli.GetCmdStakes()
-	tcs := map[string]osmocli.QueryCliTestCase[*types.GetStakesRequest]{
+	tcs := map[string]dcli.QueryCliTestCase[*types.GetStakesRequest]{
 		"basic test": {
 			Cmd: fmt.Sprintf("%s", testAddresses[0]),
 			ExpectedQuery: &types.GetStakesRequest{
@@ -97,12 +97,12 @@ func TestGetCmdStakes(t *testing.T) {
 			},
 		},
 	}
-	osmocli.RunQueryTestCases(t, desc, tcs)
+	dcli.RunQueryTestCases(t, desc, tcs)
 }
 
 func TestGetCmdFutureRewardEstimate(t *testing.T) {
 	desc, _ := cli.GetCmdGetFutureRewardEstimate()
-	tcs := map[string]osmocli.QueryCliTestCase[*types.GetFutureRewardEstimateRequest]{
+	tcs := map[string]dcli.QueryCliTestCase[*types.GetFutureRewardEstimateRequest]{
 		"basic test": {
 			Cmd: fmt.Sprintf("%s [1,2,3] 1000", testAddresses[0]),
 			ExpectedQuery: &types.GetFutureRewardEstimateRequest{
@@ -112,7 +112,7 @@ func TestGetCmdFutureRewardEstimate(t *testing.T) {
 			},
 		},
 	}
-	osmocli.RunQueryTestCases(t, desc, tcs)
+	dcli.RunQueryTestCases(t, desc, tcs)
 }
 
 // TXS ////////////////////////////////////////////////////////////////////////
@@ -120,7 +120,7 @@ func TestGetCmdFutureRewardEstimate(t *testing.T) {
 func TestNewCreateGaugeCmd(t *testing.T) {
 	testTime := time.Unix(1681505514, 0).UTC()
 	desc, _ := cli.NewCreateGaugeCmd()
-	tcs := map[string]osmocli.TxCliTestCase[*types.MsgCreateGauge]{
+	tcs := map[string]dcli.TxCliTestCase[*types.MsgCreateGauge]{
 		"basic test": {
 			Cmd: fmt.Sprintf("TokenA<>TokenB 0 100 100TokenA,100TokenB 50 0 --from %s", testAddresses[0]),
 			ExpectedMsg: &types.MsgCreateGauge{
@@ -198,12 +198,12 @@ func TestNewCreateGaugeCmd(t *testing.T) {
 			},
 		},
 	}
-	osmocli.RunTxTestCases(t, desc, tcs)
+	dcli.RunTxTestCases(t, desc, tcs)
 }
 
 func TestNewAddToGaugeCmd(t *testing.T) {
 	desc, _ := cli.NewAddToGaugeCmd()
-	tcs := map[string]osmocli.TxCliTestCase[*types.MsgAddToGauge]{
+	tcs := map[string]dcli.TxCliTestCase[*types.MsgAddToGauge]{
 		"basic test": {
 			Cmd: fmt.Sprintf("1 1000TokenA --from %s", testAddresses[0]),
 			ExpectedMsg: &types.MsgAddToGauge{
@@ -224,12 +224,12 @@ func TestNewAddToGaugeCmd(t *testing.T) {
 			},
 		},
 	}
-	osmocli.RunTxTestCases(t, desc, tcs)
+	dcli.RunTxTestCases(t, desc, tcs)
 }
 
 func TestNewStakeCmd(t *testing.T) {
 	desc, _ := cli.NewStakeCmd()
-	tcs := map[string]osmocli.TxCliTestCase[*types.MsgStake]{
+	tcs := map[string]dcli.TxCliTestCase[*types.MsgStake]{
 		"basic test": {
 			Cmd: fmt.Sprintf("1000TokenA --from %s", testAddresses[0]),
 			ExpectedMsg: &types.MsgStake{
@@ -248,12 +248,12 @@ func TestNewStakeCmd(t *testing.T) {
 			},
 		},
 	}
-	osmocli.RunTxTestCases(t, desc, tcs)
+	dcli.RunTxTestCases(t, desc, tcs)
 }
 
 func TestNewUnstakeCmd(t *testing.T) {
 	desc, _ := cli.NewUnstakeCmd()
-	tcs := map[string]osmocli.TxCliTestCase[*types.MsgUnstake]{
+	tcs := map[string]dcli.TxCliTestCase[*types.MsgUnstake]{
 		"basic test": {
 			Cmd: fmt.Sprintf("--from %s", testAddresses[0]),
 			ExpectedMsg: &types.MsgUnstake{
@@ -282,5 +282,5 @@ func TestNewUnstakeCmd(t *testing.T) {
 			},
 		},
 	}
-	osmocli.RunTxTestCases(t, desc, tcs)
+	dcli.RunTxTestCases(t, desc, tcs)
 }

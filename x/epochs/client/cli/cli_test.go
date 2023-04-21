@@ -3,14 +3,14 @@ package cli_test
 import (
 	"testing"
 
-	"github.com/duality-labs/duality/osmoutils/osmocli"
+	"github.com/duality-labs/duality/utils/dcli"
 	"github.com/duality-labs/duality/x/epochs/client/cli"
 	"github.com/duality-labs/duality/x/epochs/types"
 )
 
 func TestGetCmdCurrentEpoch(t *testing.T) {
 	desc, _ := cli.GetCmdCurrentEpoch()
-	tcs := map[string]osmocli.QueryCliTestCase[*types.QueryCurrentEpochRequest]{
+	tcs := map[string]dcli.QueryCliTestCase[*types.QueryCurrentEpochRequest]{
 		"basic test": {
 			Cmd: "day",
 			ExpectedQuery: &types.QueryCurrentEpochRequest{
@@ -18,16 +18,16 @@ func TestGetCmdCurrentEpoch(t *testing.T) {
 			},
 		},
 	}
-	osmocli.RunQueryTestCases(t, desc, tcs)
+	dcli.RunQueryTestCases(t, desc, tcs)
 }
 
 func TestGetCmdEpochsInfo(t *testing.T) {
 	desc, _ := cli.GetCmdEpochInfos()
-	tcs := map[string]osmocli.QueryCliTestCase[*types.QueryEpochsInfoRequest]{
+	tcs := map[string]dcli.QueryCliTestCase[*types.QueryEpochsInfoRequest]{
 		"basic test": {
 			Cmd:           "",
 			ExpectedQuery: &types.QueryEpochsInfoRequest{},
 		},
 	}
-	osmocli.RunQueryTestCases(t, desc, tcs)
+	dcli.RunQueryTestCases(t, desc, tcs)
 }
