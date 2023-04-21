@@ -11,13 +11,12 @@ const (
 	AttributeReceiver    = "receiver"
 	AttributeAmount      = "amount"
 
-	TypeEvtStake            = "stake"
-	TypeEvtAddTokensToStake = "add_tokens_to_stake"
-	TypeEvtUnstake          = "unstake"
+	TypeEvtStake   = "stake"
+	TypeEvtUnstake = "unstake"
 
-	AttributeStakeID          = "period_stake_id"
-	AttributeStakeOwner       = "owner"
-	AttributeStakeAmount      = "amount"
-	AttributeStakeUnstakeTime = "stake_time"
-	AttributeUnstakedCoins    = "unstaked_coins"
+	AttributeStakeID        = "stake_id"
+	AttributeStakeOwner     = "owner"
+	AttributeStakeAmount    = "amount"
+	AttributeStakeStakeTime = "stake_time"
+	AttributeUnstakedCoins  = "unstaked_coins"
 )

@@ -37,8 +37,7 @@ func (k Keeper) ValueForShares(ctx sdk.Context, coin sdk.Coin, tick int64) (sdk.
 func (k Keeper) Distribute(ctx sdk.Context, gauges types.Gauges) (types.DistributionSpec, error) {
 	distSpec := types.DistributionSpec{}
 	for _, gauge := range gauges {
-		filterStakes := k.GetStakesByQueryCondition(ctx, &gauge.DistributeTo)
-		gaugeDistSpec, err := k.distributor.Distribute(ctx, gauge, filterStakes)
+		gaugeDistSpec, err := k.distributor.Distribute(ctx, gauge, nil)
 		if err != nil {
 			return nil, err
 		}
