@@ -99,7 +99,7 @@ run:
   issues-exit-code: 0
   skip-files:
     # Don't lint osmosis code; remove eventually
-    - "osmoutils"
+    - "utils"
 
   
 

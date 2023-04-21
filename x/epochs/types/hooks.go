@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/duality-labs/duality/osmoutils"
+	"github.com/duality-labs/duality/utils"
 )
 
 type EpochHooks interface {
@@ -52,7 +52,7 @@ func panicCatchingEpochHook(
 		return hookFn(ctx, epochIdentifier, epochNumber)
 	}
 	// TODO: Thread info for which hook this is, may be dependent on larger hook system refactoring
-	err := osmoutils.ApplyFuncIfNoError(ctx, wrappedHookFn)
+	err := utils.ApplyFuncIfNoError(ctx, wrappedHookFn)
 	if err != nil {
 		ctx.Logger().Error(fmt.Sprintf("error in epoch hook %v", err))
 	}
