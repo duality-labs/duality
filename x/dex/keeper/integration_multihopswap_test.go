@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	keepertest "github.com/duality-labs/duality/testutil/keeper"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
@@ -245,4 +246,19 @@ func (s *MsgServerTestSuite) TestMultiHopSwapLongRouteWithCache() {
 	s.assertAccountBalanceWithDenom(s.alice, "TokenA", 0)
 	s.assertAccountBalanceWithDenom(s.alice, "TokenX", 99)
 	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenM", Token1: "TokenX"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
+}
+
+func (s *MsgServerTestSuite) TestMultiHopSwapEventsEmitted() {
+	s.fundAliceBalances(100, 0)
+
+	s.SetupMultiplePools(
+		NewPoolSetup("TokenA", "TokenB", 0, 100, 0, 1),
+		NewPoolSetup("TokenB", "TokenC", 0, 100, 0, 1),
+	)
+
+	route := [][]string{{"TokenA", "TokenB", "TokenC"}}
+	s.aliceMultiHopSwaps(route, 100, sdk.MustNewDecFromStr("0.9"), false)
+
+	// 8 tickUpdateEvents are emitted 4x for pool setup 4x for two swaps
+	keepertest.AssertNEventsEmitted(s.T(), s.ctx, types.TickUpdateEventKey, 8)
 }

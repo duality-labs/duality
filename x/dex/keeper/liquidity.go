@@ -205,5 +205,10 @@ func (k Keeper) SwapWithCache(
 
 	writeCache()
 
+	// NOTE: in current version events from the cache are never passed to the
+	// parent context. This is fixed in cosmos v0.46.4
+	// Once we update, the below code can be removed
+	ctx.EventManager().EmitEvents(cacheCtx.EventManager().Events())
+
 	return totalIn, totalOut, err
 }
