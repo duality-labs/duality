@@ -1,4 +1,4 @@
-package osmocli
+package dcli
 
 import (
 	"context"

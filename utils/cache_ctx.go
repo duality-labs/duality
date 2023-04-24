@@ -1,4 +1,4 @@
-package osmoutils
+package utils
 
 import (
 	"errors"
