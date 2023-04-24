@@ -194,13 +194,12 @@ func TestIBCSwapMiddleware_Success(t *testing.T) {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgSwap: &types.MsgSwap{
-				Creator:  chainBAddr,
-				Receiver: chainBAddr,
-				TokenA:   chainADenomTrace.IBCDenom(),
-				TokenB:   chainB.Config().Denom,
-				AmountIn: swapAmount,
-				TokenIn:  chainADenomTrace.IBCDenom(),
-				MinOut:   minOut,
+				Creator:      chainBAddr,
+				Receiver:     chainBAddr,
+				TokenIn:      chainADenomTrace.IBCDenom(),
+				TokenOut:     chainB.Config().Denom,
+				MaxAmountIn:  swapAmount,
+				MaxAmountOut: minOut,
 			},
 			Next: nil,
 		},
@@ -345,13 +344,12 @@ func TestIBCSwapMiddleware_FailRefund(t *testing.T) {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgSwap: &types.MsgSwap{
-				Creator:  chainBAddr,
-				Receiver: chainBAddr,
-				TokenA:   chainADenomTrace.IBCDenom(),
-				TokenB:   chainB.Config().Denom,
-				AmountIn: swapAmount,
-				TokenIn:  chainADenomTrace.IBCDenom(),
-				MinOut:   minOut,
+				Creator:      chainBAddr,
+				Receiver:     chainBAddr,
+				TokenIn:      chainADenomTrace.IBCDenom(),
+				TokenOut:     chainB.Config().Denom,
+				MaxAmountIn:  swapAmount,
+				MaxAmountOut: minOut,
 			},
 			NonRefundable: false,
 			Next:          nil,
@@ -504,13 +502,12 @@ func TestIBCSwapMiddleware_FailNoRefund(t *testing.T) {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgSwap: &types.MsgSwap{
-				Creator:  chainBAddr,
-				Receiver: chainBAddr,
-				TokenA:   chainADenomTrace.IBCDenom(),
-				TokenB:   chainB.Config().Denom,
-				AmountIn: swapAmount,
-				TokenIn:  chainADenomTrace.IBCDenom(),
-				MinOut:   minOut,
+				Creator:      chainBAddr,
+				Receiver:     chainBAddr,
+				TokenIn:      chainADenomTrace.IBCDenom(),
+				TokenOut:     chainB.Config().Denom,
+				MaxAmountIn:  swapAmount,
+				MaxAmountOut: minOut,
 			},
 			NonRefundable: true,
 			Next:          nil,
@@ -669,13 +666,12 @@ func TestIBCSwapMiddleware_FailWithRefundAddr(t *testing.T) {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgSwap: &types.MsgSwap{
-				Creator:  chainBAddr,
-				Receiver: chainBAddr,
-				TokenA:   chainADenomTrace.IBCDenom(),
-				TokenB:   chainB.Config().Denom,
-				AmountIn: swapAmount,
-				TokenIn:  chainADenomTrace.IBCDenom(),
-				MinOut:   minOut,
+				Creator:      chainBAddr,
+				Receiver:     chainBAddr,
+				TokenIn:      chainADenomTrace.IBCDenom(),
+				TokenOut:     chainB.Config().Denom,
+				MaxAmountIn:  swapAmount,
+				MaxAmountOut: minOut,
 			},
 			NonRefundable: true,
 			RefundAddress: chainBRefundAddr,

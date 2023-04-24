@@ -18,7 +18,7 @@ func CmdListPoolReserves() *cobra.Command {
 		Example: "list-pool-reserves tokenA<>tokenB tokenA",
 		Args:    cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			reqPairId := args[0]
+			reqPairID := args[0]
 			reqTokenIn := args[1]
 
 			clientCtx, err := client.GetClientQueryContext(cmd)
@@ -29,8 +29,7 @@ func CmdListPoolReserves() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryAllPoolReservesRequest{
-
-				PairId:  reqPairId,
+				PairID:  reqPairID,
 				TokenIn: reqTokenIn,
 			}
 
@@ -65,7 +64,7 @@ func CmdShowPoolReserves() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			argPairId := args[0]
+			argPairID := args[0]
 			if strings.HasPrefix(args[1], "[") && strings.HasSuffix(args[1], "]") {
 				args[1] = strings.TrimPrefix(args[1], "[")
 				args[1] = strings.TrimSuffix(args[1], "]")
@@ -75,19 +74,17 @@ func CmdShowPoolReserves() *cobra.Command {
 			argFee := args[3]
 
 			argTrancheKeyInt, err := strconv.ParseUint(argFee, 10, 0)
-
 			if err != nil {
 				return err
 			}
 
 			argTickIndexInt, err := strconv.ParseInt(argTickIndex, 10, 0)
-
 			if err != nil {
 				return err
 			}
 
 			params := &types.QueryGetPoolReservesRequest{
-				PairId:    argPairId,
+				PairID:    argPairID,
 				TickIndex: argTickIndexInt,
 				TokenIn:   argTokenIn,
 				Fee:       argTrancheKeyInt,

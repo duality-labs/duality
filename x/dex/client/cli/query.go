@@ -14,7 +14,7 @@ import (
 )
 
 // GetQueryCmd returns the cli query commands for this module
-func GetQueryCmd(queryRoute string) *cobra.Command {
+func GetQueryCmd(_ string) *cobra.Command {
 	// Group dex queries under a subcommand
 	cmd := &cobra.Command{
 		Use:                        types.ModuleName,
@@ -25,8 +25,6 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdQueryParams())
-	cmd.AddCommand(CmdListFeeTier())
-	cmd.AddCommand(CmdShowFeeTier())
 	cmd.AddCommand(CmdListLimitOrderTrancheUser())
 	cmd.AddCommand(CmdShowLimitOrderTrancheUser())
 	cmd.AddCommand(CmdListLimitOrderTranche())
@@ -35,8 +33,8 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	cmd.AddCommand(CmdListUserDeposits())
 	cmd.AddCommand(CmdListUserLimitOrders())
 	cmd.AddCommand(CmdListTickLiquidity())
-	cmd.AddCommand(CmdListFilledLimitOrderTranche())
-	cmd.AddCommand(CmdShowFilledLimitOrderTranche())
+	cmd.AddCommand(CmdListInactiveLimitOrderTranche())
+	cmd.AddCommand(CmdShowInactiveLimitOrderTranche())
 	cmd.AddCommand(CmdListPoolReserves())
 	cmd.AddCommand(CmdShowPoolReserves())
 

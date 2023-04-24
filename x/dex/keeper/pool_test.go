@@ -9,7 +9,6 @@ import (
 )
 
 func TestCalcGreatestMatchingRatioBothReservesNonZero(t *testing.T) {
-
 	trueAmount0, trueAmount1 := CalcGreatestMatchingRatio(
 		sdk.NewInt(10),
 		sdk.NewInt(40),

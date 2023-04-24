@@ -51,96 +51,6 @@ func local_request_Query_Params_0(ctx context.Context, marshaler runtime.Marshal
 
 }
 
-func request_Query_FeeTier_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetFeeTierRequest
-	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
-	}
-
-	protoReq.Id, err = runtime.Uint64(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
-	}
-
-	msg, err := client.FeeTier(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-func local_request_Query_FeeTier_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetFeeTierRequest
-	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
-	}
-
-	protoReq.Id, err = runtime.Uint64(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
-	}
-
-	msg, err := server.FeeTier(ctx, &protoReq)
-	return msg, metadata, err
-
-}
-
-var (
-	filter_Query_FeeTierAll_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
-)
-
-func request_Query_FeeTierAll_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryAllFeeTierRequest
-	var metadata runtime.ServerMetadata
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_FeeTierAll_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-
-	msg, err := client.FeeTierAll(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-func local_request_Query_FeeTierAll_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryAllFeeTierRequest
-	var metadata runtime.ServerMetadata
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_FeeTierAll_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-
-	msg, err := server.FeeTierAll(ctx, &protoReq)
-	return msg, metadata, err
-
-}
-
 func request_Query_LimitOrderTrancheUser_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryGetLimitOrderTrancheUserRequest
 	var metadata runtime.ServerMetadata
@@ -152,37 +62,15 @@ func request_Query_LimitOrderTrancheUser_0(ctx context.Context, marshaler runtim
 		_   = err
 	)
 
-	val, ok = pathParams["pairId"]
+	val, ok = pathParams["address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "address")
 	}
 
-	protoReq.PairId, err = runtime.String(val)
+	protoReq.Address, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
-	}
-
-	val, ok = pathParams["token"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "token")
-	}
-
-	protoReq.Token, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "token", err)
-	}
-
-	val, ok = pathParams["tickIndex"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "tickIndex")
-	}
-
-	protoReq.TickIndex, err = runtime.Int64(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tickIndex", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
 	}
 
 	val, ok = pathParams["trancheKey"]
@@ -194,17 +82,6 @@ func request_Query_LimitOrderTrancheUser_0(ctx context.Context, marshaler runtim
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheKey", err)
-	}
-
-	val, ok = pathParams["address"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "address")
-	}
-
-	protoReq.Address, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
 	}
 
 	msg, err := client.LimitOrderTrancheUser(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -223,37 +100,15 @@ func local_request_Query_LimitOrderTrancheUser_0(ctx context.Context, marshaler 
 		_   = err
 	)
 
-	val, ok = pathParams["pairId"]
+	val, ok = pathParams["address"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "address")
 	}
 
-	protoReq.PairId, err = runtime.String(val)
+	protoReq.Address, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
-	}
-
-	val, ok = pathParams["token"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "token")
-	}
-
-	protoReq.Token, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "token", err)
-	}
-
-	val, ok = pathParams["tickIndex"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "tickIndex")
-	}
-
-	protoReq.TickIndex, err = runtime.Int64(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "tickIndex", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
 	}
 
 	val, ok = pathParams["trancheKey"]
@@ -265,17 +120,6 @@ func local_request_Query_LimitOrderTrancheUser_0(ctx context.Context, marshaler 
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheKey", err)
-	}
-
-	val, ok = pathParams["address"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "address")
-	}
-
-	protoReq.Address, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "address", err)
 	}
 
 	msg, err := server.LimitOrderTrancheUser(ctx, &protoReq)
@@ -330,15 +174,15 @@ func request_Query_LimitOrderTranche_0(ctx context.Context, marshaler runtime.Ma
 		_   = err
 	)
 
-	val, ok = pathParams["pairId"]
+	val, ok = pathParams["pairID"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairID")
 	}
 
-	protoReq.PairId, err = runtime.String(val)
+	protoReq.PairID, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairID", err)
 	}
 
 	val, ok = pathParams["tokenIn"]
@@ -390,15 +234,15 @@ func local_request_Query_LimitOrderTranche_0(ctx context.Context, marshaler runt
 		_   = err
 	)
 
-	val, ok = pathParams["pairId"]
+	val, ok = pathParams["pairID"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairID")
 	}
 
-	protoReq.PairId, err = runtime.String(val)
+	protoReq.PairID, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairID", err)
 	}
 
 	val, ok = pathParams["tokenIn"]
@@ -440,7 +284,7 @@ func local_request_Query_LimitOrderTranche_0(ctx context.Context, marshaler runt
 }
 
 var (
-	filter_Query_LimitOrderTrancheAll_0 = &utilities.DoubleArray{Encoding: map[string]int{"pairId": 0, "tokenIn": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_Query_LimitOrderTrancheAll_0 = &utilities.DoubleArray{Encoding: map[string]int{"pairID": 0, "tokenIn": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_Query_LimitOrderTrancheAll_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -454,15 +298,15 @@ func request_Query_LimitOrderTrancheAll_0(ctx context.Context, marshaler runtime
 		_   = err
 	)
 
-	val, ok = pathParams["pairId"]
+	val, ok = pathParams["pairID"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairID")
 	}
 
-	protoReq.PairId, err = runtime.String(val)
+	protoReq.PairID, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairID", err)
 	}
 
 	val, ok = pathParams["tokenIn"]
@@ -499,15 +343,15 @@ func local_request_Query_LimitOrderTrancheAll_0(ctx context.Context, marshaler r
 		_   = err
 	)
 
-	val, ok = pathParams["pairId"]
+	val, ok = pathParams["pairID"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairID")
 	}
 
-	protoReq.PairId, err = runtime.String(val)
+	protoReq.PairID, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairID", err)
 	}
 
 	val, ok = pathParams["tokenIn"]
@@ -696,7 +540,7 @@ func local_request_Query_UserLimitOrdersAll_0(ctx context.Context, marshaler run
 }
 
 var (
-	filter_Query_TickLiquidityAll_0 = &utilities.DoubleArray{Encoding: map[string]int{"pairId": 0, "tokenIn": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_Query_TickLiquidityAll_0 = &utilities.DoubleArray{Encoding: map[string]int{"pairID": 0, "tokenIn": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_Query_TickLiquidityAll_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -710,15 +554,15 @@ func request_Query_TickLiquidityAll_0(ctx context.Context, marshaler runtime.Mar
 		_   = err
 	)
 
-	val, ok = pathParams["pairId"]
+	val, ok = pathParams["pairID"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairID")
 	}
 
-	protoReq.PairId, err = runtime.String(val)
+	protoReq.PairID, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairID", err)
 	}
 
 	val, ok = pathParams["tokenIn"]
@@ -755,15 +599,15 @@ func local_request_Query_TickLiquidityAll_0(ctx context.Context, marshaler runti
 		_   = err
 	)
 
-	val, ok = pathParams["pairId"]
+	val, ok = pathParams["pairID"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairID")
 	}
 
-	protoReq.PairId, err = runtime.String(val)
+	protoReq.PairID, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairID", err)
 	}
 
 	val, ok = pathParams["tokenIn"]
@@ -789,8 +633,8 @@ func local_request_Query_TickLiquidityAll_0(ctx context.Context, marshaler runti
 
 }
 
-func request_Query_FilledLimitOrderTranche_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetFilledLimitOrderTrancheRequest
+func request_Query_InactiveLimitOrderTranche_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq QueryGetInactiveLimitOrderTrancheRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -800,15 +644,15 @@ func request_Query_FilledLimitOrderTranche_0(ctx context.Context, marshaler runt
 		_   = err
 	)
 
-	val, ok = pathParams["pairId"]
+	val, ok = pathParams["pairID"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairID")
 	}
 
-	protoReq.PairId, err = runtime.String(val)
+	protoReq.PairID, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairID", err)
 	}
 
 	val, ok = pathParams["tokenIn"]
@@ -844,13 +688,13 @@ func request_Query_FilledLimitOrderTranche_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheKey", err)
 	}
 
-	msg, err := client.FilledLimitOrderTranche(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.InactiveLimitOrderTranche(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_Query_FilledLimitOrderTranche_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryGetFilledLimitOrderTrancheRequest
+func local_request_Query_InactiveLimitOrderTranche_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq QueryGetInactiveLimitOrderTrancheRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -860,15 +704,15 @@ func local_request_Query_FilledLimitOrderTranche_0(ctx context.Context, marshale
 		_   = err
 	)
 
-	val, ok = pathParams["pairId"]
+	val, ok = pathParams["pairID"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairID")
 	}
 
-	protoReq.PairId, err = runtime.String(val)
+	protoReq.PairID, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairID", err)
 	}
 
 	val, ok = pathParams["tokenIn"]
@@ -904,49 +748,49 @@ func local_request_Query_FilledLimitOrderTranche_0(ctx context.Context, marshale
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trancheKey", err)
 	}
 
-	msg, err := server.FilledLimitOrderTranche(ctx, &protoReq)
+	msg, err := server.InactiveLimitOrderTranche(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
 var (
-	filter_Query_FilledLimitOrderTrancheAll_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+	filter_Query_InactiveLimitOrderTrancheAll_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
-func request_Query_FilledLimitOrderTrancheAll_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryAllFilledLimitOrderTrancheRequest
+func request_Query_InactiveLimitOrderTrancheAll_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq QueryAllInactiveLimitOrderTrancheRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_FilledLimitOrderTrancheAll_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_InactiveLimitOrderTrancheAll_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.FilledLimitOrderTrancheAll(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.InactiveLimitOrderTrancheAll(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_Query_FilledLimitOrderTrancheAll_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq QueryAllFilledLimitOrderTrancheRequest
+func local_request_Query_InactiveLimitOrderTrancheAll_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq QueryAllInactiveLimitOrderTrancheRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_FilledLimitOrderTrancheAll_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_Query_InactiveLimitOrderTrancheAll_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.FilledLimitOrderTrancheAll(ctx, &protoReq)
+	msg, err := server.InactiveLimitOrderTrancheAll(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
 var (
-	filter_Query_PoolReservesAll_0 = &utilities.DoubleArray{Encoding: map[string]int{"pairId": 0, "tokenIn": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
+	filter_Query_PoolReservesAll_0 = &utilities.DoubleArray{Encoding: map[string]int{"pairID": 0, "tokenIn": 1}, Base: []int{1, 1, 2, 0, 0}, Check: []int{0, 1, 1, 2, 3}}
 )
 
 func request_Query_PoolReservesAll_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -960,15 +804,15 @@ func request_Query_PoolReservesAll_0(ctx context.Context, marshaler runtime.Mars
 		_   = err
 	)
 
-	val, ok = pathParams["pairId"]
+	val, ok = pathParams["pairID"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairID")
 	}
 
-	protoReq.PairId, err = runtime.String(val)
+	protoReq.PairID, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairID", err)
 	}
 
 	val, ok = pathParams["tokenIn"]
@@ -1005,15 +849,15 @@ func local_request_Query_PoolReservesAll_0(ctx context.Context, marshaler runtim
 		_   = err
 	)
 
-	val, ok = pathParams["pairId"]
+	val, ok = pathParams["pairID"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairID")
 	}
 
-	protoReq.PairId, err = runtime.String(val)
+	protoReq.PairID, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairID", err)
 	}
 
 	val, ok = pathParams["tokenIn"]
@@ -1050,15 +894,15 @@ func request_Query_PoolReserves_0(ctx context.Context, marshaler runtime.Marshal
 		_   = err
 	)
 
-	val, ok = pathParams["pairId"]
+	val, ok = pathParams["pairID"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairID")
 	}
 
-	protoReq.PairId, err = runtime.String(val)
+	protoReq.PairID, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairID", err)
 	}
 
 	val, ok = pathParams["tokenIn"]
@@ -1110,15 +954,15 @@ func local_request_Query_PoolReserves_0(ctx context.Context, marshaler runtime.M
 		_   = err
 	)
 
-	val, ok = pathParams["pairId"]
+	val, ok = pathParams["pairID"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pairID")
 	}
 
-	protoReq.PairId, err = runtime.String(val)
+	protoReq.PairID, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pairID", err)
 	}
 
 	val, ok = pathParams["tokenIn"]
@@ -1185,52 +1029,6 @@ func RegisterQueryHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		}
 
 		forward_Query_Params_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("GET", pattern_Query_FeeTier_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		var stream runtime.ServerTransportStream
-		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := local_request_Query_FeeTier_0(rctx, inboundMarshaler, server, req, pathParams)
-		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_Query_FeeTier_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("GET", pattern_Query_FeeTierAll_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		var stream runtime.ServerTransportStream
-		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := local_request_Query_FeeTierAll_0(rctx, inboundMarshaler, server, req, pathParams)
-		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_Query_FeeTierAll_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1418,7 +1216,7 @@ func RegisterQueryHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 
 	})
 
-	mux.Handle("GET", pattern_Query_FilledLimitOrderTranche_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_Query_InactiveLimitOrderTranche_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -1429,7 +1227,7 @@ func RegisterQueryHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Query_FilledLimitOrderTranche_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Query_InactiveLimitOrderTranche_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -1437,11 +1235,11 @@ func RegisterQueryHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 			return
 		}
 
-		forward_Query_FilledLimitOrderTranche_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Query_InactiveLimitOrderTranche_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_Query_FilledLimitOrderTrancheAll_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_Query_InactiveLimitOrderTrancheAll_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -1452,7 +1250,7 @@ func RegisterQueryHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Query_FilledLimitOrderTrancheAll_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Query_InactiveLimitOrderTrancheAll_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -1460,7 +1258,7 @@ func RegisterQueryHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 			return
 		}
 
-		forward_Query_FilledLimitOrderTrancheAll_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Query_InactiveLimitOrderTrancheAll_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1568,46 +1366,6 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		}
 
 		forward_Query_Params_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("GET", pattern_Query_FeeTier_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_Query_FeeTier_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_Query_FeeTier_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("GET", pattern_Query_FeeTierAll_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_Query_FeeTierAll_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_Query_FeeTierAll_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1771,7 +1529,7 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 
 	})
 
-	mux.Handle("GET", pattern_Query_FilledLimitOrderTranche_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_Query_InactiveLimitOrderTranche_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -1780,18 +1538,18 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Query_FilledLimitOrderTranche_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_Query_InactiveLimitOrderTranche_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Query_FilledLimitOrderTranche_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Query_InactiveLimitOrderTranche_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_Query_FilledLimitOrderTrancheAll_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_Query_InactiveLimitOrderTrancheAll_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -1800,14 +1558,14 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Query_FilledLimitOrderTrancheAll_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_Query_InactiveLimitOrderTrancheAll_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Query_FilledLimitOrderTrancheAll_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_Query_InactiveLimitOrderTrancheAll_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1857,17 +1615,13 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 var (
 	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "params"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_FeeTier_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"dualitylabs", "duality", "dex", "fee_tier", "id"}, "", runtime.AssumeColonVerbOpt(true)))
-
-	pattern_Query_FeeTierAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "fee_tier"}, "", runtime.AssumeColonVerbOpt(true)))
-
-	pattern_Query_LimitOrderTrancheUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche_user", "pairId", "token", "tickIndex", "trancheKey", "address"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LimitOrderTrancheUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche_user", "address", "trancheKey"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_LimitOrderTrancheUserAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche_user"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_LimitOrderTranche_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche", "pairId", "tokenIn", "tickIndex", "trancheKey"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LimitOrderTranche_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche", "pairID", "tokenIn", "tickIndex", "trancheKey"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_LimitOrderTrancheAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche", "pairId", "tokenIn"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LimitOrderTrancheAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "dex", "limit_order_tranche", "pairID", "tokenIn"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_GetUserPositions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "dex", "user", "positions", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 
@@ -1875,23 +1629,19 @@ var (
 
 	pattern_Query_UserLimitOrdersAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "dex", "user", "limit_orders", "address"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_TickLiquidityAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "dex", "tick_liquidity", "pairId", "tokenIn"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_TickLiquidityAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "dex", "tick_liquidity", "pairID", "tokenIn"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_FilledLimitOrderTranche_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"dualitylabs", "duality", "dex", "filled_limit_order_tranche", "pairId", "tokenIn", "tickIndex", "trancheKey"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_InactiveLimitOrderTranche_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"dualitylabs", "duality", "dex", "filled_limit_order_tranche", "pairID", "tokenIn", "tickIndex", "trancheKey"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_FilledLimitOrderTrancheAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "filled_limit_order_tranche"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_InactiveLimitOrderTrancheAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"dualitylabs", "duality", "dex", "filled_limit_order_tranche"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_PoolReservesAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "dex", "pool_reserves", "pairId", "tokenIn"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_PoolReservesAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"dualitylabs", "duality", "dex", "pool_reserves", "pairID", "tokenIn"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_PoolReserves_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"dualitylabs", "duality", "dex", "pool_reserves", "pairId", "tokenIn", "tickIndex", "fee"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_PoolReserves_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"dualitylabs", "duality", "dex", "pool_reserves", "pairID", "tokenIn", "tickIndex", "fee"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
 	forward_Query_Params_0 = runtime.ForwardResponseMessage
-
-	forward_Query_FeeTier_0 = runtime.ForwardResponseMessage
-
-	forward_Query_FeeTierAll_0 = runtime.ForwardResponseMessage
 
 	forward_Query_LimitOrderTrancheUser_0 = runtime.ForwardResponseMessage
 
@@ -1909,9 +1659,9 @@ var (
 
 	forward_Query_TickLiquidityAll_0 = runtime.ForwardResponseMessage
 
-	forward_Query_FilledLimitOrderTranche_0 = runtime.ForwardResponseMessage
+	forward_Query_InactiveLimitOrderTranche_0 = runtime.ForwardResponseMessage
 
-	forward_Query_FilledLimitOrderTrancheAll_0 = runtime.ForwardResponseMessage
+	forward_Query_InactiveLimitOrderTrancheAll_0 = runtime.ForwardResponseMessage
 
 	forward_Query_PoolReservesAll_0 = runtime.ForwardResponseMessage
 

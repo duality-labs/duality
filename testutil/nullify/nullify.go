@@ -8,15 +8,15 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var (
-	coinType  = reflect.TypeOf(sdk.Coin{})
-	coinsType = reflect.TypeOf(sdk.Coins{})
-)
-
 // FilledReservesanalyze all struct fields and slices with
 // reflection and initialize the nil and empty slices,
 // structs, and pointers.
 func Fill(x interface{}) interface{} {
+	var (
+		coinType  = reflect.TypeOf(sdk.Coin{})
+		coinsType = reflect.TypeOf(sdk.Coins{})
+	)
+
 	v := reflect.Indirect(reflect.ValueOf(x))
 	switch v.Kind() {
 	case reflect.Slice:
@@ -53,5 +53,6 @@ func Fill(x interface{}) interface{} {
 			}
 		}
 	}
+
 	return reflect.Indirect(v).Interface()
 }

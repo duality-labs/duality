@@ -14,6 +14,7 @@ import (
 	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/client/testutil"
 	network "github.com/duality-labs/duality/testutil/network"
 	dexClient "github.com/duality-labs/duality/x/dex/client/cli"
+	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
@@ -57,7 +58,7 @@ func (s *TxTestSuite) SetupSuite() {
 	pk = info2.GetPubKey()
 	s.addr2 = sdk.AccAddress(pk.Address())
 
-	var commonFlags = []string{
+	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
@@ -72,7 +73,7 @@ func (s *TxTestSuite) SetupSuite() {
 	_, err = cli.ExecTestCLICmd(clientCtx, cmd, args)
 	require.NoError(s.T(), err)
 
-	args = append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "[20]", "TokenB", "10"}, commonFlags...)
+	args = append([]string{s.network.Validators[0].Address.String(), "TokenB", "TokenA", "[-20]", "10"}, commonFlags...)
 	cmd = dexClient.CmdPlaceLimitOrder()
 	txBuff, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
 
@@ -84,10 +85,10 @@ func (s *TxTestSuite) SetupSuite() {
 	s.fundAccount(clientCtx, s.network.Validators[0].Address, s.addr2, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(100)), sdk.NewCoin("TokenA", sdk.NewInt(100000))))
 }
 
-func (s *TxTestSuite) fundAccount(clientCtx client.Context, from sdk.AccAddress, to sdk.AccAddress, coins sdk.Coins) {
+func (s *TxTestSuite) fundAccount(clientCtx client.Context, from, to sdk.AccAddress, coins sdk.Coins) {
 	require := s.Require()
 
-	var commonFlags = []string{
+	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
@@ -109,7 +110,7 @@ func (s *TxTestSuite) fundAccount(clientCtx client.Context, from sdk.AccAddress,
 func (s *TxTestSuite) TestTxCmdDeposit() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	var commonFlags = []string{
+	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
@@ -132,13 +133,13 @@ func (s *TxTestSuite) TestTxCmdDeposit() {
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "[0]", "0", "false", s.addr1.String()},
+			args:      []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "[0]", "1", "false", s.addr1.String()},
 			expErr:    true,
 			expErrMsg: "Error: accepts 8 arg(s), received 9",
 		},
 		{
 			name:     "valid",
-			args:     []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "[0]", "0", "false"},
+			args:     []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "[0]", "1", "false"},
 			errInRes: false,
 		},
 		{
@@ -165,7 +166,6 @@ func (s *TxTestSuite) TestTxCmdDeposit() {
 					require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 					require.Zero(s.T(), res.Code, res.RawLog)
 				}
-
 			}
 		})
 	}
@@ -174,7 +174,7 @@ func (s *TxTestSuite) TestTxCmdDeposit() {
 func (s *TxTestSuite) TestTx2CmdWithdraw() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	var commonFlags = []string{
+	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
@@ -182,7 +182,7 @@ func (s *TxTestSuite) TestTx2CmdWithdraw() {
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, s.network.Validators[0].Address.String()),
 	}
 
-	//Deposit Funds
+	// Deposit Funds
 	args := append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "[0]", "0", "false"}, commonFlags...)
 	cmd := dexClient.CmdDeposit()
 	_, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
@@ -196,7 +196,7 @@ func (s *TxTestSuite) TestTx2CmdWithdraw() {
 		errInRes  bool
 	}{
 		{
-			// "withdrawl [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fee indexes] ",
+			// "withdrawal [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fee indexes] ",
 			name:      "missing arguments",
 			args:      []string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "[10]", "0"},
 			expErr:    true,
@@ -222,7 +222,7 @@ func (s *TxTestSuite) TestTx2CmdWithdraw() {
 
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {
-			cmd := dexClient.CmdWithdrawl()
+			cmd := dexClient.CmdWithdrawal()
 			args := append(tc.args, commonFlags...)
 			out, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
 			if tc.expErr {
@@ -237,7 +237,6 @@ func (s *TxTestSuite) TestTx2CmdWithdraw() {
 					require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 					require.Zero(s.T(), res.Code, res.RawLog)
 				}
-
 			}
 		})
 	}
@@ -246,7 +245,7 @@ func (s *TxTestSuite) TestTx2CmdWithdraw() {
 func (s *TxTestSuite) TestTx3CmdSwap() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	var commonFlags = []string{
+	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
@@ -262,21 +261,26 @@ func (s *TxTestSuite) TestTx3CmdSwap() {
 		errInRes  bool
 	}{
 		{
-			// "swap [receiver] [amount-in] [tokenA] [tokenB] [token-in] [minOut] [priceLimit]",
+			// "swap [receiver] [amount-in] [token-in] [token-out] ?(--max-amount-out)",
 			name:      "missing arguments",
-			args:      []string{s.addr1.String(), "5", "TokenA", "TokenB", "TokenA", "4"},
+			args:      []string{s.addr1.String(), "5", "TokenA"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 7 arg(s), received 6",
+			expErrMsg: "accepts 4 arg(s), received 3",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{s.addr1.String(), "5", "TokenA", "TokenB", "TokenA", "0", "2", s.addr1.String()},
+			args:      []string{s.addr1.String(), "5", "TokenA", "TokenB", "BADARG"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 7 arg(s), received 8",
+			expErrMsg: "accepts 4 arg(s), received 5",
 		},
 		{
 			name:     "valid",
-			args:     []string{s.addr1.String(), "2", "TokenA", "TokenB", "TokenA", "0", "0.0"},
+			args:     []string{s.addr1.String(), "2", "TokenA", "TokenB"},
+			errInRes: false,
+		},
+		{
+			name:     "valid with amountOut",
+			args:     []string{s.addr1.String(), "2", "TokenA", "TokenB", "--max-amount-out=10"},
 			errInRes: false,
 		},
 	}
@@ -298,16 +302,15 @@ func (s *TxTestSuite) TestTx3CmdSwap() {
 					require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 					require.Zero(s.T(), res.Code, res.RawLog)
 				}
-
 			}
 		})
 	}
 }
 
-func (s *TxTestSuite) TestTx4Cmd4laceLimitOrder() {
+func (s *TxTestSuite) TestTx4Cmd4PlaceLimitOrder() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	var commonFlags = []string{
+	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
@@ -323,21 +326,38 @@ func (s *TxTestSuite) TestTx4Cmd4laceLimitOrder() {
 		errInRes  bool
 	}{
 		{
-			// "place-limit-order [receiver] [token-a] [token-b] [tick-index] [token-in] [amount-in]",,
+			// "place-limit-order [receiver] [token-in] [token-out] [tick-index] [amount-in] ?[order-type] ?[expirationTime] ?(--max-amout-out)"
 			name:      "missing arguments",
-			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB"},
+			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 6 arg(s), received 5",
+			expErrMsg: "Error: accepts between 5 and 7 arg(s), received 4",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10", "1"},
+			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "10", "1", "1", "BAD"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 6 arg(s), received 7",
+			expErrMsg: "Error: accepts between 5 and 7 arg(s), received 8",
+		},
+		{
+			name:      "invalid orderType",
+			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "10", "JUST_SEND_IT"},
+			expErr:    true,
+			expErrMsg: types.ErrInvalidOrderType.Error(),
+		},
+		{
+			name:      "invalid goodTil",
+			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "10", "GOOD_TIL_TIME", "january"},
+			expErr:    true,
+			expErrMsg: types.ErrInvalidTimeString.Error(),
 		},
 		{
 			name:     "valid",
-			args:     []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "TokenB", "10"},
+			args:     []string{s.addr1.String(), "TokenB", "TokenA", "[0]", "10"},
+			errInRes: false,
+		},
+		{
+			name:     "valid goodTil",
+			args:     []string{s.addr1.String(), "TokenB", "TokenA", "[0]", "10", "GOOD_TIL_TIME", "06/15/2025 02:00:00"},
 			errInRes: false,
 		},
 	}
@@ -359,7 +379,6 @@ func (s *TxTestSuite) TestTx4Cmd4laceLimitOrder() {
 					require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 					require.Zero(s.T(), res.Code, res.RawLog)
 				}
-
 			}
 		})
 	}
@@ -368,18 +387,13 @@ func (s *TxTestSuite) TestTx4Cmd4laceLimitOrder() {
 func (s *TxTestSuite) TestTx5CmdCancelLimitOrder() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	var commonFlags = []string{
+	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
 		fmt.Sprintf("--%s=%s", flags.FlagGas, "200000000"),
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, s.network.Validators[0].Address.String()),
 	}
-
-	args := append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "[0]", "TokenB", "10"}, commonFlags...)
-	cmd := dexClient.CmdPlaceLimitOrder()
-	_, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
-	require.NoError(s.T(), err)
 
 	testCases := []struct {
 		name      string
@@ -389,21 +403,21 @@ func (s *TxTestSuite) TestTx5CmdCancelLimitOrder() {
 		errInRes  bool
 	}{
 		{
-			//  "cancel-limit-order [token-a] [token-b] [tick-index] [key-token] [tranche-key]"
+			//  "cancel-limit-order [tranche-key]"
 			name:      "missing arguments",
-			args:      []string{"TokenA", "TokenB", "[0]", "TokenB"},
+			args:      []string{},
 			expErr:    true,
-			expErrMsg: "Error: accepts 5 arg(s), received 4",
+			expErrMsg: "Error: accepts 1 arg(s), received 0",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{"TokenA", "TokenB", "[0]", "TokenB", "0", "1"},
+			args:      []string{"trancheKey123", "extraarg"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 5 arg(s), received 6",
+			expErrMsg: "Error: accepts 1 arg(s), received 2",
 		},
 		{
 			name:     "valid",
-			args:     []string{"TokenA", "TokenB", "20", "TokenB", s.trancheKey},
+			args:     []string{s.trancheKey},
 			errInRes: false,
 		},
 	}
@@ -425,7 +439,6 @@ func (s *TxTestSuite) TestTx5CmdCancelLimitOrder() {
 					require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 					require.Zero(s.T(), res.Code, res.RawLog)
 				}
-
 			}
 		})
 	}
@@ -435,7 +448,7 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
 
-	var commonFlags = []string{
+	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
@@ -444,13 +457,13 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 	}
 
 	// Place Limit Order
-	args := append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "[0]", "TokenB", "10"}, commonFlags...)
+	args := append([]string{s.network.Validators[0].Address.String(), "TokenB", "TokenA", "[0]", "10"}, commonFlags...)
 	cmd := dexClient.CmdPlaceLimitOrder()
 	txBuff, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
 	require.NoError(s.T(), err)
 	trancheKey := findTrancheKeyInTx(txBuff.String())
 
-	argsSwap := append([]string{s.network.Validators[0].Address.String(), "30", "TokenA", "TokenB", "TokenA", "0", "0.0"}, commonFlags...)
+	argsSwap := append([]string{s.network.Validators[0].Address.String(), "30", "TokenA", "TokenB"}, commonFlags...)
 	cmd = dexClient.CmdSwap()
 	_, err = cli.ExecTestCLICmd(clientCtx, cmd, argsSwap)
 	require.NoError(s.T(), err)
@@ -463,21 +476,21 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 		errInRes  bool
 	}{
 		{
-			//  "withdraw-filled-limit-order [token-a] [token-b] [tick-index] [key-token] [tranche-key]"
+			//  "withdraw-filled-limit-order [tranche-key]"
 			name:      "missing arguments",
-			args:      []string{"TokenA", "TokenB", "[0]", "TokenB"},
+			args:      []string{},
 			expErr:    true,
-			expErrMsg: "Error: accepts 5 arg(s), received 4",
+			expErrMsg: "Error: accepts 1 arg(s), received 0",
 		},
 		{
 			name:      "too many arguments",
-			args:      []string{"TokenA", "TokenB", "[0]", "TokenB", "0", "1"},
+			args:      []string{"trancheKey123", "EXTRA-ARG"},
 			expErr:    true,
-			expErrMsg: "Error: accepts 5 arg(s), received 6",
+			expErrMsg: "Error: accepts 1 arg(s), received 2",
 		},
 		{
 			name:     "valid",
-			args:     []string{"TokenA", "TokenB", "0", "TokenB", trancheKey},
+			args:     []string{trancheKey},
 			errInRes: false,
 		},
 	}
@@ -499,7 +512,6 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 					require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
 					require.Zero(s.T(), res.Code, res.RawLog)
 				}
-
 			}
 		})
 	}

@@ -21,7 +21,6 @@ jobs:
           command: mkdir -p /tmp/artifacts
       - run:
           name: Run tests
-          # NOTE: For now we only run the tests in the keeper directory
           command: |
             go test ./... -coverprofile=c.out -v
             go tool cover -html=c.out -o /tmp/artifacts/coverage.html
@@ -30,7 +29,7 @@ jobs:
   binary-build:
     working_directory: ~/repo
     docker:
-      - image: ignitehq/cli:0.25.2
+      - image: ignitehq/cli:0.23.0
     steps:
       - checkout
       - run:
@@ -51,7 +50,7 @@ jobs:
   binary-release-build:
     working_directory: ~/repo
     docker:
-      - image: ignitehq/cli:0.25.2
+      - image: ignitehq/cli:0.23.0
     steps:
       - checkout
       - run:
@@ -80,6 +79,23 @@ jobs:
           command: |
             go install github.com/tcnksm/ghr@v0.16.0
             ghr -t "${GITHUB_TOKEN}" -u "${CIRCLE_PROJECT_USERNAME}" -r "${CIRCLE_PROJECT_REPONAME}" -c "${CIRCLE_SHA1}" -delete ${CIRCLE_TAG} ./tmp/artifacts/release
+  lint:
+    working_directory: ~/repo
+    docker:
+      - image: cimg/go:1.19.3
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v4-{{ checksum "go.sum" }}
+      - run:
+          name: Install GolangCI-Lint
+          command: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.52.2
+      - run:
+          name: Run GolangCI-Lint
+          command: "./bin/golangci-lint run --out-format colored-line-number:linter.txt --timeout 6m"
+      - store_artifacts:
+          path: ./linter.txt
 
 workflows:
   version: 2
@@ -87,6 +103,9 @@ workflows:
     jobs:
       - go-tests
       - binary-build
+  lint:
+    jobs:
+      - lint
   publish-release-maybe:
     jobs:
       - go-tests:

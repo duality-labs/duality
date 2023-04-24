@@ -9,16 +9,14 @@ const TypeMsgSwap = "swap"
 
 var _ sdk.Msg = &MsgSwap{}
 
-func NewMsgSwap(creator string, tokenA string, tokenB string, amountIn sdk.Int, tokenIn string, minOut sdk.Int, limitPrice sdk.Dec, receiver string) *MsgSwap {
+func NewMsgSwap(creator, tokenIn, tokenOut string, amountIn sdk.Int, maxAmountOut sdk.Int, receiver string) *MsgSwap {
 	return &MsgSwap{
-		Creator:    creator,
-		AmountIn:   amountIn,
-		TokenA:     tokenA,
-		TokenB:     tokenB,
-		TokenIn:    tokenIn,
-		MinOut:     minOut,
-		Receiver:   receiver,
-		LimitPrice: limitPrice,
+		Creator:      creator,
+		MaxAmountIn:  amountIn,
+		TokenIn:      tokenIn,
+		TokenOut:     tokenOut,
+		Receiver:     receiver,
+		MaxAmountOut: maxAmountOut,
 	}
 }
 
@@ -35,6 +33,7 @@ func (msg *MsgSwap) GetSigners() []sdk.AccAddress {
 	if err != nil {
 		panic(err)
 	}
+
 	return []sdk.AccAddress{creator}
 }
 
@@ -54,20 +53,13 @@ func (msg *MsgSwap) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
-	if msg.TokenIn != msg.TokenA && msg.TokenIn != msg.TokenB {
-		return ErrInvalidTokenIn
-	}
-
-	if msg.AmountIn.LTE(sdk.ZeroInt()) {
+	if !msg.MaxAmountIn.IsPositive() {
 		return ErrZeroSwap
 	}
 
-	if msg.MinOut.IsNegative() {
-		return ErrNegativeMinOut
+	if !msg.MaxAmountOut.IsNil() && msg.MaxAmountOut.IsNegative() {
+		return ErrNegativeMaxAmountOut
 	}
 
-	if msg.LimitPrice.IsNegative() {
-		return ErrNegativeLimitPrice
-	}
 	return nil
 }

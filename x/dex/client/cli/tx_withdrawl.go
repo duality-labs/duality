@@ -13,12 +13,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func CmdWithdrawl() *cobra.Command {
-
+func CmdWithdrawal() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "withdrawl [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fee indexes] ",
-		Short:   "Broadcast message withdrawl",
-		Example: "withdrawl alice tokenA tokenB 100,50 [-10,5] 1,1 --from alice",
+		Use:     "withdrawal [receiver] [token-a] [token-b] [list of shares-to-remove] [list of tick-index] [list of fees] ",
+		Short:   "Broadcast message withdrawal",
+		Example: "withdrawal alice tokenA tokenB 100,50 [-10,5] 1,1 --from alice",
 		Args:    cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
@@ -31,15 +30,15 @@ func CmdWithdrawl() *cobra.Command {
 				args[4] = strings.TrimSuffix(args[4], "]")
 			}
 			argTickIndexes := strings.Split(args[4], ",")
-			argFeeIndexes := strings.Split(args[5], ",")
+			argFees := strings.Split(args[5], ",")
 
 			var SharesToRemoveInt []sdk.Int
 			var TicksIndexesInt []int64
-			var FeeIndexesUint []uint64
+			var FeesUint []uint64
 			for _, s := range argSharesToRemove {
 				sharesToRemoveInt, ok := sdk.NewIntFromString(s)
 
-				if ok != true {
+				if !ok {
 					return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer Overflow for shares-to-remove")
 				}
 
@@ -53,16 +52,15 @@ func CmdWithdrawl() *cobra.Command {
 				}
 
 				TicksIndexesInt = append(TicksIndexesInt, TickIndexInt)
-
 			}
 
-			for _, s := range argFeeIndexes {
-				FeeIndexInt, err := strconv.ParseUint(s, 10, 0)
+			for _, s := range argFees {
+				feeInt, err := strconv.ParseUint(s, 10, 0)
 				if err != nil {
 					return err
 				}
 
-				FeeIndexesUint = append(FeeIndexesUint, FeeIndexInt)
+				FeesUint = append(FeesUint, feeInt)
 			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -70,18 +68,19 @@ func CmdWithdrawl() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgWithdrawl(
+			msg := types.NewMsgWithdrawal(
 				clientCtx.GetFromAddress().String(),
 				argReceiver,
 				argTokenA,
 				argTokenB,
 				SharesToRemoveInt,
 				TicksIndexesInt,
-				FeeIndexesUint,
+				FeesUint,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}

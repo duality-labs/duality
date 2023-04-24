@@ -47,16 +47,16 @@ var (
 		Type:    "cosmos",
 		Name:    "duality",
 		ChainID: "chain-b",
-		//Images: []ibc.DockerImage{{
-		//	Repository: "ghcr.io/strangelove-ventures/heighliner/duality",
-		//	Version:    "justin-ibc-swap",
-		//	UidGid:     heighlinerUserString,
-		//}},
 		Images: []ibc.DockerImage{{
-			Repository: "duality",
-			Version:    "local",
+			Repository: "ghcr.io/strangelove-ventures/heighliner/duality",
+			Version:    "justin-ibc-swap",
 			UidGid:     heighlinerUserString,
 		}},
+		// Images: []ibc.DockerImage{{
+		// 	Repository: "duality",
+		// 	Version:    "local",
+		// 	UidGid:     heighlinerUserString,
+		// }},
 		Bin:            "dualityd",
 		Bech32Prefix:   "cosmos",
 		Denom:          "stake",

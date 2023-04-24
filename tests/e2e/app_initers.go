@@ -19,5 +19,6 @@ func DualityAppIniter() (ibctesting.TestingApp, map[string]json.RawMessage) {
 	encoding := cosmoscmd.MakeEncodingConfig(appConsumer.ModuleBasics)
 	testApp := appConsumer.New(log.NewNopLogger(), tmdb.NewMemDB(), nil, true, map[int64]bool{},
 		simapp.DefaultNodeHome, 5, encoding, simapp.EmptyAppOptions{}).(ibctesting.TestingApp)
+
 	return testApp, appConsumer.NewDefaultGenesisState(encoding.Marshaler)
 }

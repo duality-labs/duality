@@ -1,3 +1,4 @@
+//nolint:gochecknoglobals
 package app
 
 import (
@@ -102,9 +103,16 @@ import (
 	mevmodulekeeper "github.com/duality-labs/duality/x/mev/keeper"
 	mevmoduletypes "github.com/duality-labs/duality/x/mev/types"
 
+	epochsmodule "github.com/duality-labs/duality/x/epochs"
+	epochsmodulekeeper "github.com/duality-labs/duality/x/epochs/keeper"
+	epochsmoduletypes "github.com/duality-labs/duality/x/epochs/types"
 	swapmiddleware "github.com/duality-labs/duality/x/ibcswap"
 	swapkeeper "github.com/duality-labs/duality/x/ibcswap/keeper"
 	swaptypes "github.com/duality-labs/duality/x/ibcswap/types"
+
+	incentivesmodule "github.com/duality-labs/duality/x/incentives"
+	incentivesmodulekeeper "github.com/duality-labs/duality/x/incentives/keeper"
+	incentivesmoduletypes "github.com/duality-labs/duality/x/incentives/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -155,6 +163,8 @@ var (
 		forwardmiddleware.AppModuleBasic{},
 		swapmiddleware.AppModuleBasic{},
 		mevmodule.AppModuleBasic{},
+		epochsmodule.AppModuleBasic{},
+		incentivesmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -166,6 +176,8 @@ var (
 		ccvconsumertypes.ConsumerRedistributeName:     nil,
 		ccvconsumertypes.ConsumerToSendToProviderName: nil,
 		mevmoduletypes.ModuleName:                     {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+		incentivesmoduletypes.ModuleName:              nil,
+
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
@@ -228,6 +240,10 @@ type App struct {
 	ForwardKeeper *forwardkeeper.Keeper
 
 	MevKeeper mevmodulekeeper.Keeper
+
+	EpochsKeeper epochsmodulekeeper.Keeper
+
+	IncentivesKeeper incentivesmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -275,7 +291,6 @@ func NewApp(
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
-
 	appCodec := encodingConfig.Marshaler
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
@@ -291,6 +306,7 @@ func NewApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		dexmoduletypes.StoreKey, ccvconsumertypes.StoreKey, adminmodulemoduletypes.StoreKey,
 		mevmoduletypes.StoreKey, forwardtypes.StoreKey,
+		epochsmoduletypes.StoreKey, incentivesmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -313,7 +329,11 @@ func NewApp(
 	bApp.SetParamStore(app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramskeeper.ConsensusParamsKeyTable()))
 
 	// add capability keeper and ScopeToModule for ibc module
-	app.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
+	app.CapabilityKeeper = capabilitykeeper.NewKeeper(
+		appCodec,
+		keys[capabilitytypes.StoreKey],
+		memKeys[capabilitytypes.MemStoreKey],
+	)
 
 	// grant capabilities for the ibc and ibc-transfer modules
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
@@ -349,9 +369,33 @@ func NewApp(
 	)
 
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
-	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
+	app.UpgradeKeeper = upgradekeeper.NewKeeper(
+		skipUpgradeHeights,
+		keys[upgradetypes.StoreKey],
+		appCodec,
+		homePath,
+		app.BaseApp,
+	)
 
 	// ... other modules keepers
+
+	// Create IBC Keeper
+	app.IBCKeeper = ibckeeper.NewKeeper(
+		appCodec,
+		keys[ibchost.StoreKey],
+		app.GetSubspace(ibchost.ModuleName),
+		&app.ConsumerKeeper,
+		app.UpgradeKeeper,
+		scopedIBCKeeper,
+	)
+
+	// Create Transfer Keepers
+	app.TransferKeeper = ibctransferkeeper.NewKeeper(
+		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper, app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
+		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
+	)
+	transferModule := transfer.NewAppModule(app.TransferKeeper)
 
 	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
@@ -360,10 +404,25 @@ func NewApp(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	// Create IBC Keeper
-	app.IBCKeeper = ibckeeper.NewKeeper(
-		appCodec, keys[ibchost.StoreKey], app.GetSubspace(ibchost.ModuleName), &app.ConsumerKeeper, app.UpgradeKeeper, scopedIBCKeeper,
+	app.ConsumerKeeper = ccvconsumerkeeper.NewKeeper(
+		appCodec,
+		keys[ccvconsumertypes.StoreKey],
+		app.GetSubspace(ccvconsumertypes.ModuleName),
+		scopedCCVConsumerKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.IBCKeeper.ConnectionKeeper,
+		app.IBCKeeper.ClientKeeper,
+		app.SlashingKeeper,
+		app.BankKeeper,
+		app.AccountKeeper,
+		&app.TransferKeeper,
+		app.IBCKeeper,
+		authtypes.FeeCollectorName,
 	)
+
+	app.ConsumerKeeper = *app.ConsumerKeeper.SetHooks(app.SlashingKeeper.Hooks())
+	consumerModule := ccvconsumer.NewAppModule(app.ConsumerKeeper)
 
 	adminRouter := govtypes.NewRouter()
 	adminRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
@@ -390,6 +449,15 @@ func NewApp(
 	)
 	dexModule := dexmodule.NewAppModule(appCodec, app.DexKeeper, app.AccountKeeper, app.BankKeeper)
 
+	app.MevKeeper = *mevmodulekeeper.NewKeeper(
+		appCodec,
+		keys[mevmoduletypes.StoreKey],
+		keys[mevmoduletypes.MemStoreKey],
+		app.GetSubspace(mevmoduletypes.ModuleName),
+		app.BankKeeper,
+	)
+	mevModule := mevmodule.NewAppModule(appCodec, app.MevKeeper, app.AccountKeeper, app.BankKeeper)
+
 	// Create swap middleware keeper
 	app.SwapKeeper = swapkeeper.NewKeeper(
 		appCodec,
@@ -413,46 +481,37 @@ func NewApp(
 	)
 	forwardModule := forwardmiddleware.NewAppModule(app.ForwardKeeper)
 
-	// Create Transfer Keepers
-	app.TransferKeeper = ibctransferkeeper.NewKeeper(
-		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
-		app.ForwardKeeper, app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
-		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
+	app.EpochsKeeper = *epochsmodulekeeper.NewKeeper(keys[epochsmoduletypes.StoreKey])
+	epochsModule := epochsmodule.NewAppModule(app.EpochsKeeper)
+	app.EpochsKeeper.SetHooks(
+		epochsmoduletypes.NewMultiEpochHooks(
+			app.IncentivesKeeper.Hooks(),
+		),
 	)
-	transferModule := transfer.NewAppModule(app.TransferKeeper)
 
 	// Set the initialized transfer keeper for forward middleware
 	app.ForwardKeeper.SetTransferKeeper(app.TransferKeeper)
 
-	app.ConsumerKeeper = ccvconsumerkeeper.NewKeeper(
-		appCodec,
-		keys[ccvconsumertypes.StoreKey],
-		app.GetSubspace(ccvconsumertypes.ModuleName),
-		scopedCCVConsumerKeeper,
-		app.IBCKeeper.ChannelKeeper,
-		&app.IBCKeeper.PortKeeper,
-		app.IBCKeeper.ConnectionKeeper,
-		app.IBCKeeper.ClientKeeper,
-		app.SlashingKeeper,
-		app.BankKeeper,
+	app.IncentivesKeeper = *incentivesmodulekeeper.NewKeeper(
+		keys[incentivesmoduletypes.StoreKey],
+		app.GetSubspace(incentivesmoduletypes.ModuleName),
 		app.AccountKeeper,
-		&app.TransferKeeper,
-		app.IBCKeeper,
-		authtypes.FeeCollectorName,
-	)
-
-	app.ConsumerKeeper = *app.ConsumerKeeper.SetHooks(app.SlashingKeeper.Hooks())
-	consumerModule := ccvconsumer.NewAppModule(app.ConsumerKeeper)
-
-	app.MevKeeper = *mevmodulekeeper.NewKeeper(
-		appCodec,
-		keys[mevmoduletypes.StoreKey],
-		keys[mevmoduletypes.MemStoreKey],
-		app.GetSubspace(mevmoduletypes.ModuleName),
-
 		app.BankKeeper,
+		app.EpochsKeeper,
+		app.DexKeeper,
 	)
-	mevModule := mevmodule.NewAppModule(appCodec, app.MevKeeper, app.AccountKeeper, app.BankKeeper)
+
+	app.IncentivesKeeper.SetHooks(
+		incentivesmoduletypes.NewMultiIncentiveHooks(
+		// insert Incentives hooks receivers here
+		),
+	)
+	incentivesModule := incentivesmodule.NewAppModule(
+		app.IncentivesKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.EpochsKeeper,
+	)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
@@ -485,7 +544,7 @@ func NewApp(
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
 	// we prefer to be more strict in what arguments the modules expect.
-	var skipGenesisInvariants = cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
+	skipGenesisInvariants := cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
@@ -503,6 +562,7 @@ func NewApp(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
+
 		transferModule,
 		consumerModule,
 		adminModule,
@@ -510,6 +570,8 @@ func NewApp(
 		mevModule,
 		forwardModule,
 		swapModule,
+		epochsModule,
+		incentivesModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -519,6 +581,7 @@ func NewApp(
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	app.mm.SetOrderBeginBlockers(
 		upgradetypes.ModuleName,
+		epochsmoduletypes.ModuleName,
 		capabilitytypes.ModuleName,
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
@@ -537,6 +600,7 @@ func NewApp(
 		mevmoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
+		incentivesmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -556,11 +620,16 @@ func NewApp(
 		ibctransfertypes.ModuleName,
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
-		dexmoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
 		mevmoduletypes.ModuleName,
+		epochsmoduletypes.ModuleName,
+		incentivesmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
+
+		// NOTE: Because of the gas sensitivity of PurgeExpiredLimit order operations
+		// dexmodule must be the last endBlock module to run
+		dexmoduletypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -588,6 +657,8 @@ func NewApp(
 		mevmoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
+		epochsmoduletypes.ModuleName,
+		incentivesmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -610,7 +681,10 @@ func NewApp(
 		dexModule,
 		forwardModule,
 		swapModule,
+		// incentivesModule,
 		mevModule,
+		// TODO: Enable lockupModule simulation testing
+
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 	app.sm.RegisterStoreDecoders()
@@ -634,7 +708,7 @@ func NewApp(
 		},
 	)
 	if err != nil {
-		panic(fmt.Errorf("failed to create AnteHandler: %s", err))
+		panic(fmt.Errorf("failed to create AnteHandler: %w", err))
 	}
 
 	// initialize BaseApp
@@ -750,7 +824,7 @@ func (app *App) GetSubspace(moduleName string) paramstypes.Subspace {
 
 // RegisterAPIRoutes registers all application module routes with the provided
 // API server.
-func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
+func (app *App) RegisterAPIRoutes(apiSvr *api.Server, _ config.APIConfig) {
 	clientCtx := apiSvr.ClientCtx
 	rpc.RegisterRoutes(clientCtx, apiSvr.Router)
 	// Register legacy tx routes.
@@ -785,11 +859,17 @@ func GetMaccPerms() map[string][]string {
 	for k, v := range maccPerms {
 		dupMaccPerms[k] = v
 	}
+
 	return dupMaccPerms
 }
 
 // initParamsKeeper init params keeper and its subspaces
-func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key, tkey sdk.StoreKey) paramskeeper.Keeper {
+func initParamsKeeper(
+	appCodec codec.BinaryCodec,
+	legacyAmino *codec.LegacyAmino,
+	key,
+	tkey sdk.StoreKey,
+) paramskeeper.Keeper {
 	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
 
 	paramsKeeper.Subspace(authtypes.ModuleName)
@@ -802,6 +882,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(dexmoduletypes.ModuleName)
 	paramsKeeper.Subspace(forwardtypes.ModuleName).WithKeyTable(forwardtypes.ParamKeyTable())
 	paramsKeeper.Subspace(mevmoduletypes.ModuleName)
+	paramsKeeper.Subspace(epochsmoduletypes.ModuleName)
+	paramsKeeper.Subspace(incentivesmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper

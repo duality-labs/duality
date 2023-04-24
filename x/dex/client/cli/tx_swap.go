@@ -12,32 +12,19 @@ import (
 
 func CmdSwap() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "swap [receiver] [amount-in] [tokenA] [tokenB] [token-in] [minOut] [priceLimit]",
+		Use:     "swap [receiver] [amount-in] [token-in] [token-out] ?(--max-amout-out)",
 		Short:   "Broadcast message swap",
-		Example: "swap alice 50 tokenA tokenB tokenA 25  --from alice",
-		Args:    cobra.ExactArgs(7),
+		Example: "swap alice 50 tokenA tokenB --max-amount-out 45 --from alice",
+		Args:    cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
 			argAmountIn := args[1]
+			argTokenIn := args[2]
+			argTokenOut := args[3]
 
 			amountInInt, ok := sdk.NewIntFromString(argAmountIn)
-			if ok != true {
+			if !ok {
 				return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for amount-in")
-			}
-
-			argTokenA := args[2]
-			argTokenB := args[3]
-			argTokenIn := args[4]
-			argMinOut := args[5]
-			minOutInt, ok := sdk.NewIntFromString(argMinOut)
-			if ok != true {
-				return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for minOut")
-			}
-
-			argLimitPrice := args[6]
-			limitPriceDec, err := sdk.NewDecFromStr(argLimitPrice)
-			if err != nil {
-				return err
 			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -45,24 +32,36 @@ func CmdSwap() *cobra.Command {
 				return err
 			}
 
+			maxAmountOutArg, err := cmd.Flags().GetString(FlagMaxAmountOut)
+			if err != nil {
+				return err
+			}
+			var maxAmountOutInt sdk.Int
+			if maxAmountOutArg != "" {
+				maxAmountOutInt, ok = sdk.NewIntFromString(maxAmountOutArg)
+				if !ok {
+					return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for max-amount-out")
+				}
+			}
+
 			msg := types.NewMsgSwap(
 				clientCtx.GetFromAddress().String(),
-				argTokenA,
-				argTokenB,
-				amountInInt,
 				argTokenIn,
-				minOutInt,
-				limitPriceDec,
+				argTokenOut,
+				amountInInt,
+				maxAmountOutInt,
 				argReceiver,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
+	cmd.Flags().AddFlagSet(FlagSetMaxAmountOut())
 
 	return cmd
 }

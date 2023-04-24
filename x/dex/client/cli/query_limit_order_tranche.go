@@ -25,14 +25,14 @@ func CmdListLimitOrderTranche() *cobra.Command {
 				return err
 			}
 
-			argPairId := args[0]
+			argPairID := args[0]
 			argTokenIn := args[1]
 
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryAllLimitOrderTrancheRequest{
 				Pagination: pageReq,
-				PairId:     argPairId,
+				PairID:     argPairID,
 				TokenIn:    argTokenIn,
 			}
 
@@ -62,7 +62,7 @@ func CmdShowLimitOrderTranche() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			argPairId := args[0]
+			argPairID := args[0]
 			if strings.HasPrefix(args[1], "[") && strings.HasSuffix(args[1], "]") {
 				args[1] = strings.TrimPrefix(args[1], "[")
 				args[1] = strings.TrimSuffix(args[1], "]")
@@ -72,13 +72,12 @@ func CmdShowLimitOrderTranche() *cobra.Command {
 			argTrancheKey := args[3]
 
 			argTickIndexInt, err := strconv.ParseInt(argTickIndex, 10, 0)
-
 			if err != nil {
 				return err
 			}
 
 			params := &types.QueryGetLimitOrderTrancheRequest{
-				PairId:     argPairId,
+				PairID:     argPairID,
 				TickIndex:  argTickIndexInt,
 				TokenIn:    argTokenIn,
 				TrancheKey: argTrancheKey,

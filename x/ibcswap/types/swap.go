@@ -33,14 +33,11 @@ func (sm SwapMetadata) Validate() error {
 	if err := sm.ValidateBasic(); err != nil {
 		return sdkerrors.Wrap(ErrInvalidSwapMetadata, err.Error())
 	}
-	if sm.TokenA == "" {
-		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap tokenA cannot be an empty string")
-	}
-	if sm.TokenB == "" {
-		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap tokenB cannot be an empty string")
-	}
 	if sm.TokenIn == "" {
 		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap tokenIn cannot be an empty string")
+	}
+	if sm.TokenOut == "" {
+		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap tokenOut cannot be an empty string")
 	}
 	if sm.RefundAddress != "" {
 		_, err := sdk.AccAddressFromBech32(sm.RefundAddress)

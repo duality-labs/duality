@@ -7,8 +7,8 @@ import (
 )
 
 type Liquidity interface {
-	Swap(maxAmount sdk.Int) (inAmount sdk.Int, outAmount sdk.Int)
-	Price() sdk.Dec
+	Swap(maxAmountIn sdk.Int, maxAmountOut sdk.Int) (inAmount, outAmount sdk.Int)
+	Price() *types.Price
 }
 
 func NewLiquidityIterator(
@@ -16,20 +16,18 @@ func NewLiquidityIterator(
 	ctx sdk.Context,
 	tradingPair types.DirectionalTradingPair,
 ) *LiquidityIterator {
-
 	return &LiquidityIterator{
-		iter:   keeper.NewTickIterator(ctx, tradingPair.PairId, tradingPair.TokenOut),
+		iter:   keeper.NewTickIterator(ctx, tradingPair.PairID, tradingPair.TokenOut),
 		keeper: keeper,
 		ctx:    ctx,
-		pairId: tradingPair.PairId,
+		pairID: tradingPair.PairID,
 		is0To1: tradingPair.IsTokenInToken0(),
 	}
-
 }
 
 type LiquidityIterator struct {
 	keeper Keeper
-	pairId *types.PairId
+	pairID *types.PairID
 	ctx    sdk.Context
 	iter   TickIterator
 	is0To1 bool
@@ -52,10 +50,10 @@ func (s *LiquidityIterator) Next() Liquidity {
 			var pool Liquidity
 			poolReserves := *liquidity.PoolReserves
 			if s.is0To1 {
-				//Pool Reserves is upperTick
+				// Pool Reserves is upperTick
 				pool, err = s.createPool0To1(poolReserves)
 			} else {
-				//Pool Reserves is is lowerTick
+				// Pool Reserves is lowerTick
 				pool, err = s.createPool1To0(poolReserves)
 			}
 			// TODO: we are not actually handling the error here we're just stopping iteration
@@ -64,16 +62,23 @@ func (s *LiquidityIterator) Next() Liquidity {
 			if err != nil {
 				return nil
 			}
+
 			return pool
 
 		case *types.TickLiquidity_LimitOrderTranche:
-			return liquidity.LimitOrderTranche
+			tranche := liquidity.LimitOrderTranche
+			// If we hit a tranche with an expired goodTil date keep iterating
+			if tranche.IsExpired(s.ctx) {
+				continue
+			}
+
+			return tranche
 
 		default:
 			panic("Tick does not have liquidity")
-
 		}
 	}
+
 	return nil
 }
 
@@ -81,7 +86,7 @@ func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquid
 	upperTickIndex := upperTick.TickIndex
 	centerTickIndex := upperTickIndex - utils.MustSafeUint64(upperTick.Fee)
 	lowerTickIndex := centerTickIndex - utils.MustSafeUint64(upperTick.Fee)
-	lowerTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairId, s.pairId.Token0, lowerTickIndex, upperTick.Fee)
+	lowerTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairID, s.pairID.Token0, lowerTickIndex, upperTick.Fee)
 	if err != nil {
 		return nil, err
 	}
@@ -90,6 +95,7 @@ func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquid
 		lowerTick,
 		&upperTick,
 	)
+
 	return NewLiquidityFromPool0To1(&pool), nil
 }
 
@@ -97,7 +103,7 @@ func (s *LiquidityIterator) createPool1To0(lowerTick types.PoolReserves) (Liquid
 	lowerTickIndex := lowerTick.TickIndex
 	centerTickIndex := lowerTickIndex + utils.MustSafeUint64(lowerTick.Fee)
 	upperTickIndex := centerTickIndex + utils.MustSafeUint64(lowerTick.Fee)
-	upperTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairId, s.pairId.Token1, upperTickIndex, lowerTick.Fee)
+	upperTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairID, s.pairID.Token1, upperTickIndex, lowerTick.Fee)
 	if err != nil {
 		return nil, err
 	}
@@ -107,6 +113,7 @@ func (s *LiquidityIterator) createPool1To0(lowerTick types.PoolReserves) (Liquid
 		&lowerTick,
 		upperTick,
 	)
+
 	return NewLiquidityFromPool1To0(&pool), nil
 }
 
@@ -124,5 +131,84 @@ func (k Keeper) SaveLiquidity(sdkCtx sdk.Context, liquidityI Liquidity) {
 	default:
 		panic("Invalid liquidity type")
 	}
+}
 
+func (k Keeper) Swap(ctx sdk.Context,
+	pairID *types.PairID,
+	tokenIn string,
+	tokenOut string,
+	maxAmountIn sdk.Int,
+	maxAmountOut sdk.Int,
+	limitPrice *sdk.Dec,
+) (totalInCoin, totalOutCoin sdk.Coin, err error) {
+	pair := types.NewDirectionalTradingPair(pairID, tokenIn, tokenOut)
+
+	remainingIn := maxAmountIn
+	totalOut := sdk.ZeroInt()
+
+	// verify that amount left is not zero and that there are additional valid ticks to check
+	liqIter := NewLiquidityIterator(k, ctx, pair)
+	defer liqIter.Close()
+	for remainingIn.GT(sdk.ZeroInt()) {
+		liq := liqIter.Next()
+		if liq == nil {
+			break
+		}
+
+		// break as soon as we iterated past limitPrice
+		if limitPrice != nil && liq.Price().ToDec().LT(*limitPrice) {
+			break
+		}
+
+		inAmount, outAmount := liq.Swap(remainingIn, maxAmountOut)
+
+		remainingIn = remainingIn.Sub(inAmount)
+		totalOut = totalOut.Add(outAmount)
+
+		k.SaveLiquidity(ctx, liq)
+	}
+	totalIn := maxAmountIn.Sub(remainingIn)
+
+	return sdk.NewCoin(tokenIn, totalIn), sdk.NewCoin(tokenOut, totalOut), nil
+}
+
+func (k Keeper) SwapExactAmountIn(ctx sdk.Context,
+	pairID *types.PairID,
+	tokenIn string,
+	tokenOut string,
+	amountIn sdk.Int,
+	maxAmountOut sdk.Int,
+	limitPrice *sdk.Dec,
+) (totalIn, totalOut sdk.Coin, err error) {
+	swapAmountIn, swapAmountOut, err := k.Swap(ctx, pairID, tokenIn, tokenOut, amountIn, maxAmountOut, limitPrice)
+	if err != nil {
+		return sdk.Coin{}, sdk.Coin{}, err
+	}
+	if !swapAmountIn.Amount.Equal(amountIn) {
+		return sdk.Coin{}, sdk.Coin{}, types.ErrInsufficientLiquidity
+	}
+
+	return swapAmountIn, swapAmountOut, err
+}
+
+func (k Keeper) SwapWithCache(
+	ctx sdk.Context,
+	pairID *types.PairID,
+	tokenIn string,
+	tokenOut string,
+	maxAmountIn sdk.Int,
+	maxAmountOut sdk.Int,
+	limitPrice *sdk.Dec,
+) (totalIn, totalOut sdk.Coin, err error) {
+	cacheCtx, writeCache := ctx.CacheContext()
+	totalIn, totalOut, err = k.Swap(cacheCtx, pairID, tokenIn, tokenOut, maxAmountIn, maxAmountOut, limitPrice)
+
+	writeCache()
+
+	// NOTE: in current version events from the cache are never passed to the
+	// parent context. This is fixed in cosmos v0.46.4
+	// Once we update, the below code can be removed
+	ctx.EventManager().EmitEvents(cacheCtx.EventManager().Events())
+
+	return totalIn, totalOut, err
 }

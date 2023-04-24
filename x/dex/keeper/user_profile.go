@@ -19,18 +19,27 @@ func (u UserProfile) GetAllLimitOrders(ctx sdk.Context, k Keeper) []types.LimitO
 
 func (u UserProfile) GetAllDeposits(ctx sdk.Context, k Keeper) []types.DepositRecord {
 	var depositArr []types.DepositRecord
-	feeTiers := k.GetAllFeeTier(ctx)
 	k.bankKeeper.IterateAccountBalances(ctx, u.Address,
 		func(sharesMaybe sdk.Coin) bool {
-			depositRecord, err := DepositSharesToData(sharesMaybe, feeTiers)
-			if err == nil {
-				depositArr = append(depositArr, depositRecord)
+			depositDenom, err := types.NewDepositDenomFromString(sharesMaybe.Denom)
+			if err != nil {
+				return false
 			}
 
-			return false
+			depositRecord := types.DepositRecord{
+				PairID:          depositDenom.PairID,
+				SharesOwned:     sharesMaybe.Amount,
+				CenterTickIndex: depositDenom.Tick,
+				LowerTickIndex:  depositDenom.Tick - int64(depositDenom.Fee),
+				UpperTickIndex:  depositDenom.Tick + int64(depositDenom.Fee),
+				Fee:             depositDenom.Fee,
+			}
+			depositArr = append(depositArr, depositRecord)
 
+			return false
 		},
 	)
+
 	return depositArr
 }
 

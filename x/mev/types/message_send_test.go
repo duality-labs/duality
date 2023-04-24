@@ -1,10 +1,11 @@
-package types
+package types_test
 
 import (
 	"testing"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/duality-labs/duality/testutil/sample"
+	. "github.com/duality-labs/duality/x/mev/types"
 	"github.com/stretchr/testify/require"
 )
 

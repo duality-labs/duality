@@ -1,10 +1,11 @@
-package types
+package types_test
 
 import (
 	"testing"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/duality-labs/duality/testutil/sample"
+	. "github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,33 +19,14 @@ func TestMsgCancelLimitOrder_ValidateBasic(t *testing.T) {
 			name: "invalid creator",
 			msg: MsgCancelLimitOrder{
 				Creator:    "invalid_address",
-				TokenA:     "TokenA",
-				TokenB:     "TokenB",
-				TickIndex:  0,
-				KeyToken:   "TokenA",
-				TrancheKey: "0",
+				TrancheKey: "ORDER123",
 			},
 			err: sdkerrors.ErrInvalidAddress,
-		}, {
-			name: "invalid key token",
-			msg: MsgCancelLimitOrder{
-				Creator:    sample.AccAddress(),
-				TokenA:     "TokenA",
-				TokenB:     "TokenB",
-				TickIndex:  0,
-				KeyToken:   "TokenC",
-				TrancheKey: "0",
-			},
-			err: ErrInvalidKeyToken,
 		}, {
 			name: "valid msg",
 			msg: MsgCancelLimitOrder{
 				Creator:    sample.AccAddress(),
-				TokenA:     "TokenA",
-				TokenB:     "TokenB",
-				TickIndex:  0,
-				KeyToken:   "TokenA",
-				TrancheKey: "0",
+				TrancheKey: "ORDER123",
 			},
 		},
 	}

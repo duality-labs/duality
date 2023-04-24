@@ -9,17 +9,27 @@ const TypeMsgDeposit = "deposit"
 
 var _ sdk.Msg = &MsgDeposit{}
 
-func NewMsgDeposit(creator string, receiver string, tokenA string, tokenB string, amountsA []sdk.Int, amountsB []sdk.Int, tickIndexes []int64, feeIndexes []uint64, depositOptions []*DepositOptions) *MsgDeposit {
+func NewMsgDeposit(
+	creator,
+	receiver,
+	tokenA,
+	tokenB string,
+	amountsA,
+	amountsB []sdk.Int,
+	tickIndexes []int64,
+	fees []uint64,
+	depositOptions []*DepositOptions,
+) *MsgDeposit {
 	return &MsgDeposit{
-		Creator:     creator,
-		Receiver:    receiver,
-		TokenA:      tokenA,
-		TokenB:      tokenB,
-		AmountsA:    amountsA,
-		AmountsB:    amountsB,
-		TickIndexes: tickIndexes,
-		FeeIndexes:  feeIndexes,
-		Options:     depositOptions,
+		Creator:         creator,
+		Receiver:        receiver,
+		TokenA:          tokenA,
+		TokenB:          tokenB,
+		AmountsA:        amountsA,
+		AmountsB:        amountsB,
+		TickIndexesAToB: tickIndexes,
+		Fees:            fees,
+		Options:         depositOptions,
 	}
 }
 
@@ -36,6 +46,7 @@ func (msg *MsgDeposit) GetSigners() []sdk.AccAddress {
 	if err != nil {
 		panic(err)
 	}
+
 	return []sdk.AccAddress{creator}
 }
 
@@ -55,10 +66,10 @@ func (msg *MsgDeposit) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receiver address (%s)", err)
 	}
 
-	// Verify that the lengths of TickIndexes, FeeIndexes, AmountsA, AmountsB are all equal
-	if len(msg.FeeIndexes) != len(msg.TickIndexes) ||
+	// Verify that the lengths of TickIndexes, Fees, AmountsA, AmountsB are all equal
+	if len(msg.Fees) != len(msg.TickIndexesAToB) ||
 		len(msg.AmountsA) != len(msg.AmountsB) ||
-		len(msg.AmountsA) != len(msg.TickIndexes) {
+		len(msg.AmountsA) != len(msg.TickIndexesAToB) {
 		return ErrUnbalancedTxArray
 	}
 
@@ -71,5 +82,6 @@ func (msg *MsgDeposit) ValidateBasic() error {
 			return ErrZeroDeposit
 		}
 	}
+
 	return nil
 }

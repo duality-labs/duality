@@ -116,25 +116,6 @@
         }
       ],
       "tokensCount": 28,
-      "FeeTierList": [
-        {
-          "id": 0,
-          "fee": 1
-        },
-        {
-          "id": 1,
-          "fee": 5
-        },
-        {
-          "id": 2,
-          "fee": 30
-        },
-        {
-          "id": 3,
-          "fee": 100
-        }
-      ],
-      "FeeTierCount": 4
     }
   }
 }

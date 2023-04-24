@@ -24,7 +24,6 @@ func CmdListUserDeposits() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryAllUserDepositsRequest{
-
 				Address: reqAddress,
 			}
 

@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/mev/types"
@@ -16,12 +15,7 @@ func (k msgServer) Send(goCtx context.Context, msg *types.MsgSend) (*types.MsgSe
 		Amount: msg.AmountIn,
 	}}
 
-	fmt.Printf("Amount In: %v \n", msg.AmountIn)
-	fmt.Printf("%v \n", amt)
-	fmt.Printf(" %v \n ", sdk.AccAddress(msg.Creator))
-
 	accAddressCreator, err := sdk.AccAddressFromBech32(msg.Creator)
-
 	if err != nil {
 		return nil, err
 	}
@@ -32,6 +26,5 @@ func (k msgServer) Send(goCtx context.Context, msg *types.MsgSend) (*types.MsgSe
 		return nil, err
 	}
 
-	_ = ctx
 	return &types.MsgSendResponse{}, nil
 }

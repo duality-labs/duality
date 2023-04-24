@@ -6,14 +6,16 @@ package dualitylabs.duality.dex;
 option go_package = "github.com/duality-labs/duality/x/dex/types";
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "google/protobuf/timestamp.proto";
 // Msg defines the Msg service.
 service Msg {
   rpc Deposit(MsgDeposit) returns (MsgDepositResponse);
-  rpc Withdrawl(MsgWithdrawl) returns (MsgWithdrawlResponse);
+  rpc Withdrawal(MsgWithdrawal) returns (MsgWithdrawalResponse);
   rpc Swap(MsgSwap) returns (MsgSwapResponse);
   rpc PlaceLimitOrder(MsgPlaceLimitOrder) returns (MsgPlaceLimitOrderResponse);
   rpc WithdrawFilledLimitOrder(MsgWithdrawFilledLimitOrder) returns (MsgWithdrawFilledLimitOrderResponse);
   rpc CancelLimitOrder(MsgCancelLimitOrder) returns (MsgCancelLimitOrderResponse);
+  rpc MultiHopSwap(MsgMultiHopSwap) returns (MsgMultiHopSwapResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -38,8 +40,8 @@ message MsgDeposit {
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountB"
   ]; 
-  repeated int64 tickIndexes = 7;
-  repeated uint64 feeIndexes = 8;
+  repeated int64 tickIndexesAToB = 7;
+  repeated uint64 fees = 8;
   repeated DepositOptions Options = 9;
 }
 
@@ -58,7 +60,7 @@ message MsgDepositResponse {
   ]; 
 }
 
-message MsgWithdrawl {
+message MsgWithdrawal {
   string creator = 1;
   string receiver = 2;
   string tokenA = 3;
@@ -69,39 +71,34 @@ message MsgWithdrawl {
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "sharesToRemove"
   ]; 
-  repeated int64 tickIndexes = 6;
-  repeated uint64 feeIndexes = 7;
+  repeated int64 tickIndexesAToB = 6;
+  repeated uint64 fees = 7;
   
 }
 
-message MsgWithdrawlResponse {
+message MsgWithdrawalResponse {
 }
 
 message MsgSwap {
   string creator = 1;
   string receiver = 2;
-  string tokenA = 3;
-  string tokenB = 4;
-  string amountIn = 5 [
-      (gogoproto.moretags)   = "yaml:\"amountIn\"",
+  string tokenIn = 3;
+  string tokenOut = 4;
+  string maxAmountIn = 5 [
+      (gogoproto.moretags)   = "yaml:\"maxAmountIn\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountIn"
-  ]; 
-  string tokenIn = 6;
-  string minOut = 7 [
-      (gogoproto.moretags)   = "yaml:\"minOut\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-      (gogoproto.nullable)   = false,
-      (gogoproto.jsontag) = "minOut"
   ];
-  string limitPrice = 8 [
-      (gogoproto.moretags)   = "yaml:\"tickLimit\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-      (gogoproto.nullable)   = false,
-      (gogoproto.jsontag) = "tickLimit"
-  ];
-  
+  // Optional argument to specify a specific amount out for a trade.
+  // swap will stop as soon as amountOut is reached.
+  string maxAmountOut = 6 [
+                        (gogoproto.moretags)   = "yaml:\"maxAmountOut\"",
+                        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                        (gogoproto.nullable)   = false,
+                        (gogoproto.jsontag) = "maxAmountOut"
+                        ];
+
 }
 
 message MsgSwapResponse {
@@ -112,19 +109,33 @@ message MsgSwapResponse {
   ];
 }
 
+enum LimitOrderType{
+  GOOD_TIL_CANCELLED = 0;
+  FILL_OR_KILL = 1;
+  IMMEDIATE_OR_CANCEL = 2;
+  JUST_IN_TIME = 3;
+  GOOD_TIL_TIME = 4;
+}
+
 message MsgPlaceLimitOrder {
   string creator = 1;
   string receiver = 2;
-  string tokenA = 3;
-  string tokenB = 4;
+  string tokenIn = 3;
+  string tokenOut = 4;
   int64 tickIndex = 5;
-  string tokenIn = 6;
   string amountIn = 7 [
       (gogoproto.moretags)   = "yaml:\"amountIn\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountIn"
-  ]; 
+  ];
+  LimitOrderType orderType = 8;
+  // expirationTime is only valid iff orderType == GOOD_TIL_TIME.
+  google.protobuf.Timestamp expirationTime = 9 [
+                                             (gogoproto.stdtime) = true,
+                                             (gogoproto.nullable) = true
+                                             ];
+  // maxOut
 }
 
 message MsgPlaceLimitOrderResponse {
@@ -133,11 +144,7 @@ message MsgPlaceLimitOrderResponse {
 
 message MsgWithdrawFilledLimitOrder {
   string creator = 1;
-  string tokenA = 2;
-  string tokenB = 3;
-  int64 tickIndex = 4;
-  string keyToken = 5;
-  string trancheKey = 6;
+  string trancheKey = 2;
 }
 
 message MsgWithdrawFilledLimitOrderResponse {
@@ -145,14 +152,43 @@ message MsgWithdrawFilledLimitOrderResponse {
 
 message MsgCancelLimitOrder {
   string creator = 1;
-  string tokenA = 2;
-  string tokenB = 3;
-  int64 tickIndex = 4;
-  string keyToken = 5;
-  string trancheKey = 6;
+  string trancheKey = 2;
 }
 
 message MsgCancelLimitOrderResponse {
+}
+
+message MultiHopRoute {
+  repeated string hops = 1;
+}
+
+message MsgMultiHopSwap {
+  string creator = 1;
+  string receiver = 2;
+  repeated MultiHopRoute routes = 3;
+  string amountIn = 4 [
+                       (gogoproto.moretags)   = "yaml:\"amountIn\"",
+                       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                       (gogoproto.nullable)   = false,
+                       (gogoproto.jsontag) = "amountIn"
+                       ];
+  string exitLimitPrice = 5 [
+                             (gogoproto.moretags)   = "yaml:\"exitLimitPrice\"",
+                             (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+                             (gogoproto.nullable)   = false,
+                             (gogoproto.jsontag) = "exitLimitPrice"
+                             ];
+  // If pickBestRoute == true then all routes are run and the route with the best price is chosen
+  // otherwise, the first succesful route is used.
+  bool pickBestRoute = 6;
+}
+
+message MsgMultiHopSwapResponse {
+  cosmos.base.v1beta1.Coin coinOut = 1 [
+                                        (gogoproto.nullable) = false,
+                                        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+                                        (gogoproto.jsontag) = "coinOut"
+                                        ];
 }
 
 // this line is used by starport scaffolding # proto/tx/message

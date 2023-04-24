@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"context"
-	"fmt"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -25,76 +25,69 @@ func (k Keeper) DepositCore(
 	amounts0 []sdk.Int,
 	amounts1 []sdk.Int,
 	tickIndices []int64,
-	feeIndices []uint64,
+	fees []uint64,
 	options []*types.DepositOptions,
-) (amounts0Deposit []sdk.Int, amounts1Deposit []sdk.Int, err error) {
+) (amounts0Deposit, amounts1Deposit []sdk.Int, sharesIssued sdk.Coins, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	pairId := CreatePairId(token0, token1)
+	pairID := CreatePairID(token0, token1)
 	totalAmountReserve0 := sdk.ZeroInt()
 	totalAmountReserve1 := sdk.ZeroInt()
 	amounts0Deposited := make([]sdk.Int, len(amounts0))
 	amounts1Deposited := make([]sdk.Int, len(amounts1))
+	sharesIssued = sdk.Coins{}
+
 	for i := 0; i < len(amounts0); i++ {
 		amounts0Deposited[i] = sdk.ZeroInt()
 		amounts1Deposited[i] = sdk.ZeroInt()
 	}
 
-	feeTiers := k.GetAllFeeTier(ctx)
-
 	for i, amount0 := range amounts0 {
 		amount1 := amounts1[i]
 		tickIndex := tickIndices[i]
-		feeIndex := feeIndices[i]
+		fee := fees[i]
 		autoswap := options[i].Autoswap
 
-		// check that feeIndex is a valid index of the fee tier
-		if feeIndex >= uint64(len(feeTiers)) {
-			return nil, nil, sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "%d", feeIndex)
-		}
-		fee := feeTiers[feeIndex].Fee
 		feeUInt := utils.MustSafeUint64(fee)
 		lowerTickIndex := tickIndex - feeUInt
 		upperTickIndex := tickIndex + feeUInt
-
 		// behind enemy lines checks
 		// TODO: Allow user to deposit "behind enemy lines"
-		if amount0.GT(sdk.ZeroInt()) && k.IsBehindEnemyLines(ctx, pairId, pairId.Token0, lowerTickIndex) {
-			return nil, nil, types.ErrDepositBehindPairLiquidity
+		if amount0.IsPositive() && k.IsBehindEnemyLines(ctx, pairID, pairID.Token0, lowerTickIndex) {
+			return nil, nil, nil, types.ErrDepositBehindPairLiquidity
 		}
 		// TODO: Allow user to deposit "behind enemy lines"
-		if amount1.GT(sdk.ZeroInt()) && k.IsBehindEnemyLines(ctx, pairId, pairId.Token1, upperTickIndex) {
-			return nil, nil, types.ErrDepositBehindPairLiquidity
+		if amount1.IsPositive() && k.IsBehindEnemyLines(ctx, pairID, pairID.Token1, upperTickIndex) {
+			return nil, nil, nil, types.ErrDepositBehindPairLiquidity
 		}
-
-		sharesId := CreateSharesId(token0, token1, tickIndex, feeIndex)
-		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
 
 		pool, err := k.GetOrInitPool(
 			ctx,
-			pairId,
+			pairID,
 			tickIndex,
-			feeTiers[feeIndex],
+			fee,
 		)
-
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 
-		inAmount0, inAmount1, outShares := pool.Deposit(amount0, amount1, totalShares, autoswap)
+		existingShares := k.bankKeeper.GetSupply(ctx, pool.GetDepositDenom()).Amount
+
+		inAmount0, inAmount1, outShares := pool.Deposit(amount0, amount1, existingShares, autoswap)
 
 		k.SavePool(ctx, pool)
 
-		if inAmount0.Equal(sdk.ZeroInt()) && inAmount1.Equal(sdk.ZeroInt()) {
-			return nil, nil, types.ErrZeroTrueDeposit
+		if inAmount0.IsZero() && inAmount1.IsZero() {
+			return nil, nil, nil, types.ErrZeroTrueDeposit
 		}
 
 		if outShares.IsZero() {
-			return nil, nil, types.ErrDepositShareUnderflow
+			return nil, nil, nil, types.ErrDepositShareUnderflow
 		}
 
-		if err := k.MintShares(ctx, receiverAddr, outShares, sharesId); err != nil {
-			return nil, nil, err
+		if err := k.MintShares(ctx, receiverAddr, outShares); err != nil {
+			return nil, nil, nil, err
 		}
+		sharesIssued = sharesIssued.Add(outShares)
 
 		amounts0Deposited[i] = inAmount0
 		amounts1Deposited[i] = inAmount1
@@ -102,39 +95,39 @@ func (k Keeper) DepositCore(
 		totalAmountReserve1 = totalAmountReserve1.Add(inAmount1)
 
 		ctx.EventManager().EmitEvent(types.CreateDepositEvent(
-			callerAddr.String(),
-			receiverAddr.String(),
+			callerAddr,
+			receiverAddr,
 			token0,
 			token1,
-			fmt.Sprint(tickIndices[i]),
-			fmt.Sprint(feeIndices[i]),
-			pool.GetLowerReserve0().Sub(inAmount0).String(),
-			pool.GetUpperReserve1().Sub(inAmount1).String(),
-			pool.GetLowerReserve0().String(),
-			pool.GetUpperReserve1().String(),
-			outShares.String(),
+			tickIndex,
+			fee,
+			inAmount0,
+			inAmount1,
+			outShares.Amount,
 		))
 	}
 
-	if totalAmountReserve0.GT(sdk.ZeroInt()) {
+	if totalAmountReserve0.IsPositive() {
 		coin0 := sdk.NewCoin(token0, totalAmountReserve0)
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0}); err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 	}
 
-	if totalAmountReserve1.GT(sdk.ZeroInt()) {
+	if totalAmountReserve1.IsPositive() {
 		coin1 := sdk.NewCoin(token1, totalAmountReserve1)
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin1}); err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 	}
 
-	return amounts0Deposited, amounts1Deposited, nil
+	return amounts0Deposited, amounts1Deposited, sharesIssued, nil
 }
 
-// Handles core logic for MsgWithdrawl; calculating and withdrawing reserve0,reserve1 from a specified tick given a specfied number of shares to remove.
-// Calculates the amount of reserve0, reserve1 to withdraw based on the percetange of the desired number of shares to remove compared to the total number of shares at the given tick
+// Handles core logic for MsgWithdrawal; calculating and withdrawing reserve0,reserve1 from a specified tick
+// given a specfied number of shares to remove.
+// Calculates the amount of reserve0, reserve1 to withdraw based on the percentage of the desired
+// number of shares to remove compared to the total number of shares at the given tick.
 func (k Keeper) WithdrawCore(
 	goCtx context.Context,
 	token0 string,
@@ -143,42 +136,40 @@ func (k Keeper) WithdrawCore(
 	receiverAddr sdk.AccAddress,
 	sharesToRemoveList []sdk.Int,
 	tickIndices []int64,
-	feeIndices []uint64,
+	fees []uint64,
 ) error {
-
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	pairId := CreatePairId(token0, token1)
+	pairID := CreatePairID(token0, token1)
 	totalReserve0ToRemove := sdk.ZeroInt()
 	totalReserve1ToRemove := sdk.ZeroInt()
-	feeTiers := k.GetAllFeeTier(ctx)
 
-	for i, feeIndex := range feeIndices {
+	for i, fee := range fees {
 		sharesToRemove := sharesToRemoveList[i]
 		tickIndex := tickIndices[i]
 
-		// check that feeIndex is a valid index of the fee tier
-		if feeIndex >= uint64(len(feeTiers)) {
-			return sdkerrors.Wrapf(types.ErrValidFeeIndexNotFound, "%d", feeIndex)
-		}
-
-		feeTier := feeTiers[feeIndex]
-
-		pool, err := k.GetOrInitPool(ctx, pairId, tickIndex, feeTier)
+		pool, err := k.GetOrInitPool(ctx, pairID, tickIndex, fee)
 		if err != nil {
 			return err
 		}
 
-		sharesId := CreateSharesId(token0, token1, tickIndex, feeIndex)
-		totalShares := k.bankKeeper.GetSupply(ctx, sharesId).Amount
+		sharesID := types.NewDepositDenom(&types.PairID{Token0: token0, Token1: token1}, tickIndex, fee).String()
+		totalShares := k.bankKeeper.GetSupply(ctx, sharesID).Amount
 
 		if totalShares.LT(sharesToRemove) {
-			return sdkerrors.Wrapf(types.ErrInsufficientShares, "%s does not have %s shares of type %s", callerAddr, sharesToRemove, sharesId)
+			return sdkerrors.Wrapf(
+				types.ErrInsufficientShares,
+				"%s does not have %s shares of type %s",
+				callerAddr,
+				sharesToRemove,
+				sharesID,
+			)
 		}
 
 		outAmount0, outAmount1 := pool.Withdraw(sharesToRemove, totalShares)
 		k.SavePool(ctx, pool)
-		if sharesToRemove.GT(sdk.ZeroInt()) { // update shares accounting
-			if err := k.BurnShares(ctx, callerAddr, sharesToRemove, sharesId); err != nil {
+
+		if sharesToRemove.IsPositive() {
+			if err := k.BurnShares(ctx, callerAddr, sharesToRemove, sharesID); err != nil {
 				return err
 			}
 		}
@@ -187,22 +178,21 @@ func (k Keeper) WithdrawCore(
 		totalReserve1ToRemove = totalReserve1ToRemove.Add(outAmount1)
 
 		ctx.EventManager().EmitEvent(types.CreateWithdrawEvent(
-			callerAddr.String(),
-			receiverAddr.String(),
+			callerAddr,
+			receiverAddr,
 			token0,
 			token1,
-			fmt.Sprint(tickIndices[i]),
-			fmt.Sprint(feeIndices[i]),
-			pool.LowerTick0.Reserves.Add(outAmount0).String(),
-			pool.UpperTick1.Reserves.Add(outAmount1).String(),
-			pool.LowerTick0.Reserves.String(),
-			pool.UpperTick1.Reserves.String(),
-			sharesToRemove.String(),
+			tickIndex,
+			fee,
+			outAmount0,
+			outAmount1,
+			sharesToRemove,
 		))
 	}
 
-	if totalReserve0ToRemove.GT(sdk.ZeroInt()) {
+	if totalReserve0ToRemove.IsPositive() {
 		coin0 := sdk.NewCoin(token0, totalReserve0ToRemove)
+
 		err := k.bankKeeper.SendCoinsFromModuleToAccount(
 			ctx,
 			types.ModuleName,
@@ -215,7 +205,7 @@ func (k Keeper) WithdrawCore(
 	}
 
 	// sends totalReserve1ToRemove to receiverAddr
-	if totalReserve1ToRemove.GT(sdk.ZeroInt()) {
+	if totalReserve1ToRemove.IsPositive() {
 		coin1 := sdk.NewCoin(token1, totalReserve1ToRemove)
 		err := k.bankKeeper.SendCoinsFromModuleToAccount(
 			ctx,
@@ -231,240 +221,352 @@ func (k Keeper) WithdrawCore(
 	return nil
 }
 
-// Handles core logic for the asset 0 to asset1 direction of MsgSwap; faciliates swapping amount0 for some amount of amount1, given a specified pair (token0, token1)
+// Handles core logic for the asset 0 to asset1 direction of MsgSwap;
+// faciliates swapping amount0 for some amount of amount1, given a specified pair (token0, token1).
 func (k Keeper) SwapCore(goCtx context.Context,
 	tokenIn string,
 	tokenOut string,
+	maxAmountIn sdk.Int,
+	maxAmountOut sdk.Int,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
-	amountIn sdk.Int,
-	limitPrice sdk.Dec,
-	minOut sdk.Int,
-) (sdk.Coin, error) {
+) (coinOut sdk.Coin, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	cacheCtx, writeCache := ctx.CacheContext()
-	pairId, err := CreatePairIdFromUnsorted(tokenIn, tokenOut)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-	pair := types.NewDirectionalTradingPair(pairId, tokenIn, tokenOut)
+
+	pairID, err := CreatePairIDFromUnsorted(tokenIn, tokenOut)
 	if err != nil {
 		return sdk.Coin{}, err
 	}
 
-	remainingIn := amountIn
-	totalOut := sdk.ZeroInt()
-
-	// verify that amount left is not zero and that there are additional valid ticks to check
-	liqIter := NewLiquidityIterator(k, ctx, pair)
-	defer liqIter.Close()
-	for remainingIn.GT(sdk.ZeroInt()) {
-		liq := liqIter.Next()
-		if liq == nil {
-			break
-		}
-
-		// break as soon as we iterated past tickLimit
-		if liq.Price().LT(limitPrice) {
-			break
-		}
-
-		// price only gets worse as we iterate, so we can greedily abort
-		// when the price is too low for minOut to be reached.
-		idealOut := totalOut.Add(remainingIn.ToDec().Mul(liq.Price()).TruncateInt())
-		if idealOut.LT(minOut) {
-			return sdk.Coin{}, types.ErrSlippageLimitReached
-		}
-
-		inAmount, outAmount := liq.Swap(remainingIn)
-
-		remainingIn = remainingIn.Sub(inAmount)
-		totalOut = totalOut.Add(outAmount)
-
-		k.SaveLiquidity(cacheCtx, liq)
+	coinIn, coinOut, err := k.SwapWithCache(ctx, pairID, tokenIn, tokenOut, maxAmountIn, maxAmountOut, nil)
+	if err != nil {
+		return sdk.Coin{}, err
 	}
 
-	if totalOut.LT(minOut) || amountIn.Equal(remainingIn) {
-		return sdk.Coin{}, types.ErrSlippageLimitReached
+	if coinOut.IsZero() {
+		return sdk.Coin{}, types.ErrInsufficientLiquidity
 	}
-
-	// TODO: Move this to a separate ExecuteSwap function. Ditto for all other *Core fns
-	amountToDeposit := amountIn.Sub(remainingIn)
-	coinIn := sdk.NewCoin(tokenIn, amountToDeposit)
-	coinOut := sdk.NewCoin(tokenOut, totalOut)
 
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
 		return sdk.Coin{}, err
 	}
 
-	if totalOut.GT(sdk.ZeroInt()) {
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{coinOut}); err != nil {
-			return sdk.Coin{}, err
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(
+		ctx,
+		types.ModuleName,
+		receiverAddr,
+		sdk.Coins{coinOut})
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
+	ctx.EventManager().EmitEvent(types.CreateSwapEvent(
+		callerAddr,
+		receiverAddr,
+		pairID.Token0,
+		pairID.Token1,
+		tokenIn,
+		tokenOut,
+		coinIn.Amount,
+		coinOut.Amount))
+
+	return coinOut, nil
+}
+
+func (k Keeper) MultiHopSwapCore(
+	goCtx context.Context,
+	amountIn sdk.Int,
+	routes []*types.MultiHopRoute,
+	exitLimitPrice sdk.Dec,
+	pickBestRoute bool,
+	callerAddr sdk.AccAddress,
+	receiverAddr sdk.AccAddress,
+) (coinOut sdk.Coin, err error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	var routeErrors []error
+	initialInCoin := sdk.NewCoin(routes[0].Hops[0], amountIn)
+	stepCache := make(map[multihopCacheKey]StepResult)
+	var bestRoute struct {
+		write   func()
+		coinOut sdk.Coin
+		route   []string
+	}
+	bestRoute.coinOut = sdk.Coin{Amount: sdk.ZeroInt()}
+
+	for _, route := range routes {
+		routeCoinOut, writeRoute, err := k.RunMultihopRoute(ctx, *route, initialInCoin, exitLimitPrice, stepCache)
+		if err != nil {
+			routeErrors = append(routeErrors, err)
+			continue
+		}
+
+		if !pickBestRoute || bestRoute.coinOut.Amount.LT(routeCoinOut.Amount) {
+			bestRoute.coinOut = routeCoinOut
+			bestRoute.write = writeRoute
+			bestRoute.route = route.Hops
+		}
+		if !pickBestRoute {
+			break
 		}
 	}
-	writeCache()
-	ctx.EventManager().EmitEvent(types.CreateSwapEvent(callerAddr.String(), receiverAddr.String(),
-		tokenIn, tokenOut, amountIn.String(), totalOut.String(), minOut.String(),
+
+	if len(routeErrors) == len(routes) {
+		// All routes have failed
+
+		allErr := utils.JoinErrors(types.ErrAllMultiHopRoutesFailed, routeErrors...)
+
+		return sdk.Coin{}, allErr
+	}
+
+	bestRoute.write()
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{initialInCoin})
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
+	err = k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiverAddr, sdk.Coins{bestRoute.coinOut})
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+	ctx.EventManager().EmitEvent(types.CreateMultihopSwapEvent(
+		callerAddr,
+		receiverAddr,
+		initialInCoin.Denom,
+		bestRoute.coinOut.Denom,
+		initialInCoin.Amount,
+		bestRoute.coinOut.Amount,
+		bestRoute.route,
 	))
 
 	return coinOut, nil
 }
 
-// Handles MsgPlaceLimitOrder, initializing (tick, pair) data structures if needed, calculating and storing information for a new limit order at a specific tick
+// Handles MsgPlaceLimitOrder, initializing (tick, pair) data structures if needed, calculating and
+// storing information for a new limit order at a specific tick.
 func (k Keeper) PlaceLimitOrderCore(
 	goCtx context.Context,
 	tokenIn string,
 	tokenOut string,
+	amountIn sdk.Int,
+	tickIndex int64,
+	orderType types.LimitOrderType,
+	goodTil *time.Time,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
-	amountIn sdk.Int,
-	tickIndex int64) (trancheKey string, error error) {
+) (trancheKeyP *string, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	token0, token1, err := SortTokens(tokenIn, tokenOut)
+	pairID, err := CreatePairIDFromUnsorted(tokenIn, tokenOut)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	pairId := CreatePairId(token0, token1)
 
-	placeTranche, found := k.GetPlaceTranche(ctx, pairId, tokenIn, tickIndex)
+	placeTranche, err := k.GetOrInitPlaceTranche(ctx, pairID, tokenIn, tickIndex, goodTil, orderType)
+	if err != nil {
+		return nil, err
+	}
 
-	if !found {
-		placeTranche, err = k.InitPlaceTranche(ctx, pairId, tokenIn, tickIndex)
+	trancheKey := placeTranche.TrancheKey
+	trancheUser := k.GetOrInitLimitOrderTrancheUser(
+		ctx,
+		pairID,
+		tickIndex,
+		tokenIn,
+		trancheKey,
+		orderType,
+		receiverAddr.String(),
+	)
+
+	amountLeft, totalIn := amountIn, sdk.ZeroInt()
+	// For everything except just-in-time (JIT) orders try to execute as a swap first
+	if !orderType.IsJIT() {
+		limitPrice := placeTranche.PriceMakerToTaker().ToDec()
+		coinInSwap, coinOutSwap, err := k.SwapWithCache(
+			ctx,
+			pairID,
+			tokenIn,
+			tokenOut,
+			amountIn,
+			sdk.ZeroInt(),
+			&limitPrice,
+		)
 		if err != nil {
-			return "", err
+			return nil, err
+		}
+
+		totalIn = coinInSwap.Amount
+		amountLeft = amountLeft.Sub(coinInSwap.Amount)
+
+		if coinOutSwap.IsPositive() {
+			err = k.bankKeeper.SendCoinsFromModuleToAccount(
+				ctx,
+				types.ModuleName,
+				receiverAddr,
+				sdk.Coins{coinOutSwap},
+			)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	if k.IsBehindEnemyLines(ctx, pairId, tokenIn, tickIndex) {
-		return "", types.ErrPlaceLimitOrderBehindPairLiquidity
+	if amountLeft.IsPositive() && orderType.IsFoK() {
+		return nil, types.ErrFoKLimitOrderNotFilled
 	}
 
-	placeTrancheKey := placeTranche.TrancheKey
+	sharesIssued := sdk.ZeroInt()
+	// FOR GTC, JIT & GoodTil try to place a maker limitOrder with remaining Amount
+	if amountLeft.IsPositive() && (orderType.IsGTC() || orderType.IsJIT() || orderType.IsGoodTil()) {
+		placeTranche.PlaceMakerLimitOrder(amountLeft)
+		trancheUser.SharesOwned = trancheUser.SharesOwned.Add(amountLeft)
 
-	trancheUser := k.GetOrInitLimitOrderTrancheUser(ctx, pairId, tickIndex, tokenIn, placeTrancheKey, receiverAddr.String())
+		if orderType.HasExpiration() {
+			goodTilRecord := NewLimitOrderExpiration(placeTranche)
+			k.SetLimitOrderExpiration(ctx, goodTilRecord)
+			ctx.GasMeter().ConsumeGas(types.ExpiringLimitOrderGas, "Expiring LimitOrder Fee")
+		}
 
-	placeTranche.ReservesTokenIn = placeTranche.ReservesTokenIn.Add(amountIn)
-	placeTranche.TotalTokenIn = placeTranche.TotalTokenIn.Add(amountIn)
-	trancheUser.SharesOwned = trancheUser.SharesOwned.Add(amountIn)
+		k.SaveTranche(ctx, placeTranche)
 
-	if amountIn.GT(sdk.ZeroInt()) {
-		k.SetLimitOrderTranche(ctx, placeTranche)
-		k.SetLimitOrderTrancheUser(ctx, trancheUser)
+		totalIn = totalIn.Add(amountLeft)
+		sharesIssued = amountLeft
+	}
 
-		coin0 := sdk.NewCoin(tokenIn, amountIn)
-		err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coin0})
+	k.SaveTrancheUser(ctx, trancheUser)
+
+	if totalIn.IsPositive() {
+		coinIn := sdk.NewCoin(tokenIn, totalIn)
+
+		err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn})
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 	}
 
 	ctx.EventManager().EmitEvent(types.CreatePlaceLimitOrderEvent(
-		callerAddr.String(),
-		receiverAddr.String(),
-		token0,
-		token1,
+		callerAddr,
+		receiverAddr,
+		pairID.Token0,
+		pairID.Token1,
 		tokenIn,
-		amountIn.String(),
-		amountIn.String(),
-		placeTrancheKey,
+		tokenOut,
+		totalIn,
+		tickIndex,
+		orderType.String(),
+		sharesIssued,
+		trancheKey,
 	))
 
-	return placeTrancheKey, nil
+	return &trancheKey, nil
 }
 
-// Handles MsgCancelLimitOrder, removing a specifed number of shares from a limit order and returning the respective amount in terms of the reserve to the user
+// Handles MsgCancelLimitOrder, removing a specified number of shares from a limit order
+// and returning the respective amount in terms of the reserve to the user.
 func (k Keeper) CancelLimitOrderCore(
 	goCtx context.Context,
-	token0 string,
-	token1 string,
-	keyToken string,
-	callerAddr sdk.AccAddress,
-	tickIndex int64,
 	trancheKey string,
+	callerAddr sdk.AccAddress,
 ) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	pairId := CreatePairId(token0, token1)
-
-	tranche, foundTranche := k.GetLimitOrderTranche(ctx, pairId, keyToken, tickIndex, trancheKey)
-	trancheUser, foundTrancheUser := k.GetLimitOrderTrancheUser(ctx, pairId, tickIndex, keyToken, trancheKey, callerAddr.String())
-
-	if !foundTranche || !foundTrancheUser {
+	trancheUser, foundTrancheUser := k.GetLimitOrderTrancheUser(ctx, callerAddr.String(), trancheKey)
+	if !foundTrancheUser {
 		return types.ErrActiveLimitOrderNotFound
 	}
 
-	amountToCancel := tranche.Cancel(trancheUser)
+	pairID, tickIndex, tokenIn := trancheUser.PairID, trancheUser.TickIndex, trancheUser.Token
+	tranche, foundTranche := k.GetLimitOrderTranche(ctx, pairID, tokenIn, tickIndex, trancheKey)
+	if !foundTranche {
+		return types.ErrActiveLimitOrderNotFound
+	}
+
+	amountToCancel := tranche.RemoveTokenIn(trancheUser)
 	trancheUser.SharesCancelled = trancheUser.SharesCancelled.Add(amountToCancel)
 
-	if amountToCancel.GT(sdk.ZeroInt()) {
-		// See top NOTE on rounding
-		coinOut := sdk.NewCoin(keyToken, amountToCancel)
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
+	if amountToCancel.IsPositive() {
+		coinOut := sdk.NewCoin(tokenIn, amountToCancel)
+
+		err := k.bankKeeper.SendCoinsFromModuleToAccount(
+			ctx,
+			types.ModuleName,
+			callerAddr,
+			sdk.Coins{coinOut},
+		)
+		if err != nil {
 			return err
 		}
+
 		k.SaveTrancheUser(ctx, trancheUser)
 		k.SaveTranche(ctx, *tranche)
 
+		if trancheUser.OrderType.HasExpiration() {
+			k.RemoveLimitOrderExpiration(ctx, *tranche.ExpirationTime, tranche.Ref())
+		}
 	} else {
 		return sdkerrors.Wrapf(types.ErrCancelEmptyLimitOrder, "%s", tranche.TrancheKey)
 	}
 
 	ctx.EventManager().EmitEvent(types.CancelLimitOrderEvent(
-		callerAddr.String(),
-		token0,
-		token1,
-		keyToken,
+		callerAddr,
+		pairID.Token0,
+		pairID.Token1,
+		tokenIn,
+		pairID.MustOppositeToken(tokenIn),
+		amountToCancel,
 		trancheKey,
-		amountToCancel.String(),
 	))
 
 	return nil
 }
 
-// Handles MsgWithdrawFilledLimitOrder, calculates and sends filled liqudity from module to user for a limit order based on amount wished to receive.
+// Handles MsgWithdrawFilledLimitOrder, calculates and sends filled liqudity from module to user
+// for a limit order based on amount wished to receive.
 func (k Keeper) WithdrawFilledLimitOrderCore(
 	goCtx context.Context,
-	token0 string,
-	token1 string,
-	tokenIn string,
-	callerAddr sdk.AccAddress,
-	tickIndex int64,
 	trancheKey string,
+	callerAddr sdk.AccAddress,
 ) error {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	pairId := CreatePairId(token0, token1)
-	_, tokenOut := GetInOutTokens(tokenIn, token0, token1)
 
 	trancheUser, foundTrancheUser := k.GetLimitOrderTrancheUser(
 		ctx,
-		pairId,
-		tickIndex,
-		tokenIn,
-		trancheKey,
 		callerAddr.String(),
+		trancheKey,
 	)
-	tranche, wasFilled, foundTranche := k.FindLimitOrderTranche(ctx, pairId, tickIndex, tokenIn, trancheKey)
-
-	if !foundTrancheUser || !foundTranche {
+	if !foundTrancheUser {
 		return sdkerrors.Wrapf(types.ErrValidLimitOrderTrancheNotFound, "%s", trancheKey)
 	}
 
-	amountOutTokenIn, amountOutTokenOut := tranche.Withdraw(trancheUser)
+	pairID, tickIndex, tokenIn := trancheUser.PairID, trancheUser.TickIndex, trancheUser.Token
 
-	trancheUser.SharesWithdrawn = trancheUser.SharesWithdrawn.Add(amountOutTokenIn)
-	k.SaveTrancheUser(ctx, trancheUser)
+	tranche, wasFilled, foundTranche := k.FindLimitOrderTranche(ctx, pairID, tickIndex, tokenIn, trancheKey)
 
-	// TODO: this is a bit of a messy pattern
-	if wasFilled {
-		k.SetFilledLimitOrderTranche(ctx, tranche)
-	} else {
-		k.SetLimitOrderTranche(ctx, tranche)
+	amountOutTokenOut := sdk.ZeroDec()
+	remainingTokenIn := sdk.ZeroInt()
+	// It's possible that a TrancheUser exists but tranche does not if LO was filled entirely through a swap
+	if foundTranche {
+		var amountOutTokenIn sdk.Int
+		amountOutTokenIn, amountOutTokenOut = tranche.Withdraw(trancheUser)
+
+		if wasFilled {
+			// This is only relevant for inactive JIT and GoodTil limit orders
+			remainingTokenIn = tranche.RemoveTokenIn(trancheUser)
+			k.SaveInactiveTranche(ctx, tranche)
+		} else {
+			k.SetLimitOrderTranche(ctx, tranche)
+		}
+
+		trancheUser.SharesWithdrawn = trancheUser.SharesWithdrawn.Add(amountOutTokenIn)
 	}
 
-	if amountOutTokenOut.GT(sdk.ZeroDec()) {
+	k.SaveTrancheUser(ctx, trancheUser)
+
+	tokenOut := pairID.MustOppositeToken(tokenIn)
+	if amountOutTokenOut.IsPositive() || remainingTokenIn.IsPositive() {
 		coinOut := sdk.NewCoin(tokenOut, amountOutTokenOut.TruncateInt())
-		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, sdk.Coins{coinOut}); err != nil {
+		coinInRefund := sdk.NewCoin(tokenIn, remainingTokenIn)
+		coins := sdk.NewCoins(coinOut, coinInRefund)
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, callerAddr, coins); err != nil {
 			return err
 		}
 	} else {
@@ -472,12 +574,13 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 	}
 
 	ctx.EventManager().EmitEvent(types.WithdrawFilledLimitOrderEvent(
-		callerAddr.String(),
-		token0,
-		token1,
+		callerAddr,
+		pairID.Token0,
+		pairID.Token1,
 		tokenIn,
+		tokenOut,
+		amountOutTokenOut.TruncateInt(),
 		trancheKey,
-		amountOutTokenOut.String(),
 	))
 
 	return nil

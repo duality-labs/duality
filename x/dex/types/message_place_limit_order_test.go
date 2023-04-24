@@ -1,4 +1,4 @@
-package types
+package types_test
 
 import (
 	"testing"
@@ -6,6 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/duality-labs/duality/testutil/sample"
+	. "github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -20,59 +21,45 @@ func TestMsgPlaceLimitOrder_ValidateBasic(t *testing.T) {
 			msg: MsgPlaceLimitOrder{
 				Creator:   "invalid_address",
 				Receiver:  sample.AccAddress(),
-				TokenA:    "TokenA",
-				TokenB:    "TokenB",
-				TickIndex: 0,
 				TokenIn:   "TokenA",
+				TokenOut:  "TokenB",
+				TickIndex: 0,
 				AmountIn:  sdk.OneInt(),
 			},
 			err: sdkerrors.ErrInvalidAddress,
-		}, {
+		},
+		{
 			name: "invalid receiver",
 			msg: MsgPlaceLimitOrder{
 				Creator:   sample.AccAddress(),
 				Receiver:  "invalid_address",
-				TokenA:    "TokenA",
-				TokenB:    "TokenB",
-				TickIndex: 0,
 				TokenIn:   "TokenA",
+				TokenOut:  "TokenB",
+				TickIndex: 0,
 				AmountIn:  sdk.OneInt(),
 			},
 			err: sdkerrors.ErrInvalidAddress,
-		}, {
-			name: "invalid tokenIn",
-			msg: MsgPlaceLimitOrder{
-				Creator:   sample.AccAddress(),
-				Receiver:  sample.AccAddress(),
-				TokenA:    "TokenA",
-				TokenB:    "TokenB",
-				TickIndex: 0,
-				TokenIn:   "TokenC",
-				AmountIn:  sdk.OneInt(),
-			},
-			err: ErrInvalidTokenIn,
 		},
 		{
 			name: "invalid zero limit order",
 			msg: MsgPlaceLimitOrder{
 				Creator:   sample.AccAddress(),
 				Receiver:  sample.AccAddress(),
-				TokenA:    "TokenA",
-				TokenB:    "TokenB",
-				TickIndex: 0,
 				TokenIn:   "TokenA",
+				TokenOut:  "TokenB",
+				TickIndex: 0,
 				AmountIn:  sdk.ZeroInt(),
 			},
 			err: ErrZeroLimitOrder,
-		}, {
+		},
+		{
 			name: "valid msg",
 			msg: MsgPlaceLimitOrder{
 				Creator:   sample.AccAddress(),
 				Receiver:  sample.AccAddress(),
-				TokenA:    "TokenA",
-				TokenB:    "TokenB",
-				TickIndex: 0,
 				TokenIn:   "TokenA",
+				TokenOut:  "TokenB",
+				TickIndex: 0,
 				AmountIn:  sdk.OneInt(),
 			},
 		},

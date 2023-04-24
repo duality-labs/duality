@@ -53,6 +53,7 @@ func New(t *testing.T, configs ...network.Config) *network.Network {
 	}
 	net := network.New(t, cfg)
 	t.Cleanup(net.Cleanup)
+
 	return net
 }
 
@@ -64,6 +65,7 @@ func DefaultConfig() network.Config {
 	app.ModuleBasics[stakingtypes.ModuleName] = staking.AppModuleBasic{}
 
 	encoding := cosmoscmd.MakeEncodingConfig(app.ModuleBasics)
+
 	return network.Config{
 		Codec:             encoding.Marshaler,
 		TxConfig:          encoding.TxConfig,
@@ -75,6 +77,7 @@ func DefaultConfig() network.Config {
 			if err != nil {
 				panic(err)
 			}
+
 			return app.New(
 				val.Ctx.Logger, tmdb.NewMemDB(), nil, true, map[int64]bool{}, val.Ctx.Config.RootDir, 0,
 				encoding,
@@ -161,6 +164,7 @@ func NewCLITest(t *testing.T, configs ...network.Config) *network.Network {
 	}
 	net := network.New(t, cfg)
 	t.Cleanup(net.Cleanup)
+
 	return net
 }
 
@@ -172,6 +176,7 @@ func DefaultConfigCLITest() network.Config {
 	app.ModuleBasics[stakingtypes.ModuleName] = staking.AppModuleBasic{}
 
 	encoding := cosmoscmd.MakeEncodingConfig(app.ModuleBasics)
+
 	return network.Config{
 		Codec:             encoding.Marshaler,
 		TxConfig:          encoding.TxConfig,
@@ -227,26 +232,6 @@ func modifyConsumerGenesisCLITestSetup(val network.Validator) error {
 	var dexGenesisState dextypes.GenesisState
 	json.Unmarshal(dexData, &dexGenesisState)
 
-	dexGenesisState.FeeTierList = []dextypes.FeeTier{
-		dextypes.FeeTier{
-			Id:  0,
-			Fee: 1,
-		},
-		dextypes.FeeTier{
-			Id:  1,
-			Fee: 3,
-		},
-		dextypes.FeeTier{
-			Id:  2,
-			Fee: 5,
-		},
-		dextypes.FeeTier{
-			Id:  3,
-			Fee: 10,
-		},
-	}
-	dexGenesisState.FeeTierCount = 4
-
 	newRawJSON, _ := json.Marshal(dexGenesisState)
 	appState[dextypes.ModuleName] = newRawJSON
 
@@ -255,9 +240,13 @@ func modifyConsumerGenesisCLITestSetup(val network.Validator) error {
 	json.Unmarshal(bankData, &bankGenesisState)
 
 	bankGenesisState.Balances = []banktypes.Balance{
-		banktypes.Balance{
+		{
 			Address: val.Address.String(),
-			Coins:   sdk.Coins{sdk.Coin{"TokenA", sdk.NewInt(100000000)}, sdk.Coin{"TokenB", sdk.NewInt(100000000)}, sdk.Coin{sdk.DefaultBondDenom, sdk.NewInt(10000)}},
+			Coins: sdk.Coins{
+				sdk.NewCoin("TokenA", sdk.NewInt(100000000)),
+				sdk.NewCoin("TokenB", sdk.NewInt(100000000)),
+				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10000)),
+			},
 		},
 	}
 	newRawJSON, _ = json.Marshal(bankGenesisState)
@@ -271,5 +260,6 @@ func modifyConsumerGenesisCLITestSetup(val network.Validator) error {
 	if err != nil {
 		return sdkerrors.Wrap(err, "failed to export genesis state")
 	}
+
 	return nil
 }

@@ -242,13 +242,12 @@ func TestSwapAndForward_Success(t *testing.T) {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgSwap: &types.MsgSwap{
-				Creator:  chainBAddr,
-				Receiver: chainBAddr,
-				TokenA:   chainADenomTrace.IBCDenom(),
-				TokenB:   chainB.Config().Denom,
-				AmountIn: swapAmount,
-				TokenIn:  chainADenomTrace.IBCDenom(),
-				MinOut:   minOut,
+				Creator:      chainBAddr,
+				Receiver:     chainBAddr,
+				TokenIn:      chainADenomTrace.IBCDenom(),
+				TokenOut:     chainB.Config().Denom,
+				MaxAmountIn:  swapAmount,
+				MaxAmountOut: minOut,
 			},
 			Next: nextJSON,
 		},
@@ -535,13 +534,12 @@ func TestSwapAndForward_MultiHopSuccess(t *testing.T) {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgSwap: &types.MsgSwap{
-				Creator:  chainBAddr,
-				Receiver: chainBAddr,
-				TokenA:   chainADenomTrace.IBCDenom(),
-				TokenB:   chainB.Config().Denom,
-				AmountIn: swapAmount,
-				TokenIn:  chainADenomTrace.IBCDenom(),
-				MinOut:   minOut,
+				Creator:      chainBAddr,
+				Receiver:     chainBAddr,
+				TokenIn:      chainADenomTrace.IBCDenom(),
+				TokenOut:     chainB.Config().Denom,
+				MaxAmountIn:  swapAmount,
+				MaxAmountOut: minOut,
 			},
 			Next: nextJSON,
 		},
@@ -839,13 +837,12 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgSwap: &types.MsgSwap{
-				Creator:  chainBAddr,
-				Receiver: chainBAddr,
-				TokenA:   chainB.Config().Denom,
-				TokenB:   chainADenomTrace.IBCDenom(),
-				AmountIn: swapAmount,
-				TokenIn:  chainB.Config().Denom,
-				MinOut:   minOut,
+				Creator:      chainBAddr,
+				Receiver:     chainBAddr,
+				TokenIn:      chainB.Config().Denom,
+				TokenOut:     chainADenomTrace.IBCDenom(),
+				MaxAmountIn:  swapAmount,
+				MaxAmountOut: minOut,
 			},
 			Next: nextJSON,
 		},
@@ -1109,13 +1106,12 @@ func TestSwapAndForward_ForwardFails(t *testing.T) {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgSwap: &types.MsgSwap{
-				Creator:  chainBAddr,
-				Receiver: chainBAddr,
-				TokenA:   chainADenomTrace.IBCDenom(),
-				TokenB:   chainB.Config().Denom,
-				AmountIn: swapAmount,
-				TokenIn:  chainADenomTrace.IBCDenom(),
-				MinOut:   minOut,
+				Creator:      chainBAddr,
+				Receiver:     chainBAddr,
+				TokenIn:      chainADenomTrace.IBCDenom(),
+				TokenOut:     chainB.Config().Denom,
+				MaxAmountIn:  swapAmount,
+				MaxAmountOut: minOut,
 			},
 			Next: nextJSON,
 		},

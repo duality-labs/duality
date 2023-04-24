@@ -11,23 +11,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var defaultPairId *types.PairId = &types.PairId{Token0: "TokenA", Token1: "TokenB"}
-
 func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
-		FeeTierList: []types.FeeTier{
-			{
-				Id: 0,
-			},
-			{
-				Id: 1,
-			},
-		},
-		FeeTierCount: 2,
 		LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
 			{
-				PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				PairID:          &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 				Token:           "TokenB",
 				TickIndex:       1,
 				TrancheKey:      "0",
@@ -37,7 +26,7 @@ func TestGenesis(t *testing.T) {
 				SharesCancelled: sdk.NewInt(0),
 			},
 			{
-				PairId:          &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				PairID:          &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 				Token:           "TokenA",
 				TickIndex:       20,
 				TrancheKey:      "0",
@@ -51,7 +40,7 @@ func TestGenesis(t *testing.T) {
 			{
 				Liquidity: &types.TickLiquidity_LimitOrderTranche{
 					LimitOrderTranche: &types.LimitOrderTranche{
-						PairId:           &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 						TokenIn:          "0",
 						TickIndex:        0,
 						TrancheKey:       "0",
@@ -65,7 +54,7 @@ func TestGenesis(t *testing.T) {
 			{
 				Liquidity: &types.TickLiquidity_LimitOrderTranche{
 					LimitOrderTranche: &types.LimitOrderTranche{
-						PairId:     &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+						PairID:     &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 						TokenIn:    "0",
 						TickIndex:  0,
 						TrancheKey: "0",
@@ -73,20 +62,21 @@ func TestGenesis(t *testing.T) {
 				},
 			},
 		},
-		FilledLimitOrderTrancheList: []types.LimitOrderTranche{
+		InactiveLimitOrderTrancheList: []types.LimitOrderTranche{
 			{
-				PairId:     &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				PairID:     &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 				TokenIn:    "0",
 				TickIndex:  0,
 				TrancheKey: "0",
 			},
 			{
-				PairId:     &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+				PairID:     &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 				TokenIn:    "1",
 				TickIndex:  1,
 				TrancheKey: "1",
 			},
 		},
+		// this line is used by starport scaffolding # genesis/test/state
 	}
 
 	k, ctx := keepertest.DexKeeper(t)
@@ -97,10 +87,8 @@ func TestGenesis(t *testing.T) {
 	nullify.Fill(&genesisState)
 	nullify.Fill(got)
 
-	require.ElementsMatch(t, genesisState.FeeTierList, got.FeeTierList)
-	require.Equal(t, genesisState.FeeTierCount, got.FeeTierCount)
 	require.ElementsMatch(t, genesisState.LimitOrderTrancheUserList, got.LimitOrderTrancheUserList)
 	require.ElementsMatch(t, genesisState.TickLiquidityList, got.TickLiquidityList)
-	require.ElementsMatch(t, genesisState.FilledLimitOrderTrancheList, got.FilledLimitOrderTrancheList)
+	require.ElementsMatch(t, genesisState.InactiveLimitOrderTrancheList, got.InactiveLimitOrderTrancheList)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

@@ -1,9 +1,7 @@
 package keeper_test
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/types"
-	"github.com/duality-labs/duality/x/dex/utils"
 )
 
 func (s *MsgServerTestSuite) TestSwapNoLONoLiquidity() {
@@ -11,15 +9,15 @@ func (s *MsgServerTestSuite) TestSwapNoLONoLiquidity() {
 	s.fundBobBalances(50, 50)
 	// GIVEN
 	// no liqudity of token A (deposit only token B at tick 0 fee 1)
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(0, 10, 0, 1))
 	s.assertAliceBalances(50, 40)
 
 	// WHEN
 	// swap 5 of tokenB
 	// THEN
 	// swap should fail with Error Not enough coins
-	err := types.ErrSlippageLimitReached
-	s.bobMarketSellFails(err, "TokenB", 5, 0)
+	err := types.ErrInsufficientLiquidity
+	s.bobMarketSellFails(err, "TokenB", 5)
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReachedMaxReached() {
@@ -27,15 +25,15 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReac
 	s.fundBobBalances(50, 0)
 	// GIVEN
 	// deposit 10 of tokenB
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(0, 10, 0, 1))
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
-	s.assertPoolLiquidity(0, 10, 0, 0)
+	s.assertPoolLiquidity(0, 10, 0, 1)
 	//
 	// WHEN
 	// swap 20 of tokenA at
 	amountIn := 20
-	s.bobMarketSells("TokenA", amountIn, 5)
+	s.bobMarketSells("TokenA", amountIn)
 
 	// THEN
 	// swap should have in 11 out 10
@@ -48,15 +46,15 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReac
 	s.fundBobBalances(0, 50)
 	// GIVEN
 	// deposit 10 of token A at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 0, 0, 1))
 	s.assertAliceBalances(40, 50)
 	s.assertDexBalances(10, 0)
-	s.assertPoolLiquidity(10, 0, 0, 0)
+	s.assertPoolLiquidity(10, 0, 0, 1)
 	//
 	// WHEN
 	// swap 20 of token A for B
 	amountIn := 20
-	s.bobMarketSells("TokenB", amountIn, 5)
+	s.bobMarketSells("TokenB", amountIn)
 
 	// THEN
 	// swap should have in 11 out 10
@@ -64,73 +62,18 @@ func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReac
 	s.assertDexBalances(0, 11)
 }
 
-func (s *MsgServerTestSuite) TestSwapNoLOSlippageToleranceReached() {
+func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMinFee() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
 	// GIVEN
-	// deposit 10 of tokenB
-	s.aliceDeposits(
-		NewDeposit(0, 10, 0, 0),
-		NewDeposit(0, 10, 100000, 1),
-	)
-	s.assertAliceBalances(50, 30)
-	s.assertDexBalances(0, 20)
-
-	// WHEN
-	// swap 20 of token A for B with minOut 15
-	// THEN
-	// swap should fail with ErrNotEnoughCoins error
-	err := types.ErrSlippageLimitReached
-	s.bobMarketSellFails(err, "TokenA", 20, 19)
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceReachedMinReached() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 0)
-	// GIVEN
-	// deposit 10 of token B at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
-	s.assertAliceBalances(40, 50)
-	s.assertDexBalances(10, 0)
-
-	// WHEN
-	// swap 20 of token A for B with minOut 15
-	// THEN
-	// swap should fail with ErrNotEnoughCoins error
-	err := types.ErrSlippageLimitReached
-	s.bobMarketSellFails(err, "TokenB", 20, 15)
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceReachedMaxReached() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 0)
-	// GIVEN
-	// deposit 10 of token B at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
+	// deposit 10 of token B at tick 0 fee 0
+	s.aliceDeposits(NewDeposit(0, 10, 0, 1))
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
 
 	// WHEN
-	// swap 20 of token A for B with minOut 15
-	// THEN
-	// swap should fail with ErrNotEnoughCoins error
-	err := types.ErrSlippageLimitReached
-	s.bobMarketSellFails(err, "TokenA", 20, 15)
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMinFeeTier() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 0)
-	// GIVEN
-	// deposit 10 of token B at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
-	s.assertAliceBalances(50, 40)
-	s.assertDexBalances(0, 10)
-
-	// WHEN
-	// swap 5 of token A for B with minOut 4
-	amountIn := 5
-	s.bobMarketSells("TokenA", amountIn, 4)
+	// swap 5 of token A for B
+	s.bobMarketSells("TokenA", 5)
 
 	// THEN
 	// swap should have in 5 out 4
@@ -138,19 +81,18 @@ func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMinFeeTier() {
 	s.assertDexBalances(5, 6)
 }
 
-func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMaxFeeTier() {
+func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionHighFee() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
 	// GIVEN
 	// deposit 10 of token B at tick 0 fee 10
-	s.aliceDeposits(NewDeposit(0, 10, 0, len(s.feeTiers)-1))
+	s.aliceDeposits(NewDeposit(0, 10, 0, 10))
 	s.assertAliceBalances(50, 40)
 	s.assertDexBalances(0, 10)
 
 	// WHEN
-	// swap 5 of token A for B with minOut 4
-	amountIn := 5
-	s.bobMarketSells("TokenA", amountIn, 4)
+	// swap 5 of token A for B
+	s.bobMarketSells("TokenA", 5)
 
 	// THEN
 	// swap should have in 5 out 4
@@ -164,15 +106,15 @@ func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionSomeFeeTiers() {
 	// GIVEN
 	// deposit 10 of token B at tick 0 fee 1 and 10 of token B at tick 0 fee 3
 	s.aliceDeposits(
-		NewDeposit(0, 10, 0, 0),
 		NewDeposit(0, 10, 0, 1),
+		NewDeposit(0, 10, 0, 3),
 	)
 	s.assertAliceBalances(50, 30)
 	s.assertDexBalances(0, 20)
 
 	// WHEN
-	// swap 15 of token A for B with minOut 13
-	s.bobMarketSells("TokenA", 15, 13)
+	// swap 15 of token A for B
+	s.bobMarketSells("TokenA", 15)
 
 	// THEN
 	// swap should have in 15 out 13
@@ -185,12 +127,12 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveCurr1to0() {
 	s.fundBobBalances(0, 50)
 	// GIVEN
 	// deposit 10 of token A at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 0, 0, 1))
 	s.assertCurr1To0(-1)
 
 	// WHEN
-	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 5, 4)
+	// swap 5 of token B for A
+	s.bobMarketSells("TokenB", 5)
 
 	// THEN
 	// current1To0 unchanged
@@ -203,14 +145,14 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0MovesCurr1to0() {
 	// GIVEN
 	// deposit 10 of token A at tick 0 fee 1, 10 of token A at tick 0 fee 3
 	s.aliceDeposits(
-		NewDeposit(10, 0, 0, 0),
 		NewDeposit(10, 0, 0, 1),
+		NewDeposit(10, 0, 0, 3),
 	)
 	s.assertCurr1To0(-1)
 
 	// WHEN
-	// swap 15 of token B for A with minOut 13
-	s.bobMarketSells("TokenB", 15, 13)
+	// swap 15 of token B for A
+	s.bobMarketSells("TokenB", 15)
 
 	// THEN
 	// current 1to0 moves to -3
@@ -222,12 +164,12 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveCurr0to1() {
 	s.fundBobBalances(0, 50)
 	// GIVEN
 	// deposit 10 of both token A and B at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 1))
 	s.assertCurr0To1(1)
 
 	// WHEN
-	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 5, 4)
+	// swap 5 of token B for A
+	s.bobMarketSells("TokenB", 5)
 
 	// THEN
 	// current 0to1 unchanged
@@ -240,87 +182,18 @@ func (s *MsgServerTestSuite) TestSwapNoLO1to0MovesCurr0to1() {
 	// GIVEN
 	// deposit 10 of token A at tick 0 fee 1 and 10 of both token A and B at tick 0 fee 3
 	s.aliceDeposits(
-		NewDeposit(10, 0, 0, 0),
-		NewDeposit(10, 10, 0, 1),
+		NewDeposit(10, 0, 0, 1),
+		NewDeposit(10, 10, 0, 3),
 	)
 	s.assertCurr0To1(3)
 
 	// WHEN
-	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 5, 4)
+	// swap 5 of token B for A
+	s.bobMarketSells("TokenB", 5)
 
 	// THEN
 	// current 0to1 moves down to 1
 	s.assertCurr0To1(1)
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveMin() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(0, 50)
-	// GIVEN
-	// deposit 10 of token A at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
-
-	// WHEN
-	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 5, 4)
-
-	// THEN
-	// current1To0 unchanged
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLO1to0ExhaustMin() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(0, 50)
-	// GIVEN
-	// deposit 10 of token A at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
-
-	// WHEN
-	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 15, 10)
-
-	// THEN
-	// current1To0 unchanged
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLO1to0MovesMaxUp() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(0, 50)
-	// GIVEN
-	// deposit 10 of token B at tick 0 fee 1 and 10 of token A at tick 0 fee 3
-	s.aliceDeposits(
-		NewDeposit(0, 10, 0, 0),
-		NewDeposit(10, 0, 0, 1),
-	)
-
-	// WHEN
-	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 5, 4)
-
-	// THEN
-	// max tick moved up to 3
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLO1to0DoesntMoveMaxUp() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(0, 50)
-	// GIVEN
-	// deposit 10 of token B at tick 0 fee 1
-	// 		   10 of token A at tick 0 fee 3
-	//         10 of token A and B at tick 0 fee 5
-	s.aliceDeposits(
-		NewDeposit(0, 10, 0, 0),
-		NewDeposit(10, 0, 0, 1),
-		NewDeposit(10, 10, 0, 2),
-	)
-
-	// WHEN
-	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenB", 5, 4)
-
-	// THEN
-	// max unchanged
 }
 
 func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveCurr0to1() {
@@ -329,13 +202,13 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveCurr0to1() {
 	// GIVEN
 	// deposit 10 of token B at tick 0 fee 1
 	s.aliceDeposits(
-		NewDeposit(0, 10, 0, 0),
+		NewDeposit(0, 10, 0, 1),
 	)
 	s.assertCurr0To1(1)
 
 	// WHEN
-	// swap 5 of token A for B with minOut 4
-	s.bobMarketSells("TokenA", 5, 4)
+	// swap 5 of token A for B
+	s.bobMarketSells("TokenA", 5)
 
 	// THEN
 	// current0To1 unchanged
@@ -348,14 +221,14 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1MovesCurr0to1() {
 	// GIVEN
 	// deposit 10 of token B at tick 0 fee 1, 10 of token B at tick 0 fee 3
 	s.aliceDeposits(
-		NewDeposit(0, 10, 0, 0),
 		NewDeposit(0, 10, 0, 1),
+		NewDeposit(0, 10, 0, 3),
 	)
 	s.assertCurr0To1(1)
 
 	// WHEN
-	// swap 15 of token A for B with minOut 13
-	s.bobMarketSells("TokenA", 15, 13)
+	// swap 15 of token A for B
+	s.bobMarketSells("TokenA", 15)
 
 	// THEN
 	// current 0to1 moves to 3
@@ -367,12 +240,12 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveCurr1to0() {
 	s.fundBobBalances(50, 0)
 	// GIVEN
 	// deposit 10 of both token A and B at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 10, 0, 0))
+	s.aliceDeposits(NewDeposit(10, 10, 0, 1))
 	s.assertCurr1To0(-1)
 
 	// WHEN
-	// swap 5 of token A for B with minOut 4
-	s.bobMarketSells("TokenA", 5, 4)
+	// swap 5 of token A for B
+	s.bobMarketSells("TokenA", 5)
 
 	// THEN
 	// current 1to0 unchanged
@@ -386,14 +259,14 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1MovesCurr1to0() {
 	// deposit 10 of token B at tick 0 fee 1 and 10 of both token A and B at tick 0 fee 3
 	// to create spread of -3, 1
 	s.aliceDeposits(
-		NewDeposit(0, 10, 0, 0),
-		NewDeposit(10, 10, 0, 1),
+		NewDeposit(0, 10, 0, 1),
+		NewDeposit(10, 10, 0, 3),
 	)
 	s.assertCurr1To0(-3)
 
 	// WHEN
-	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenA", 5, 4)
+	// swap 5 of token B for A
+	s.bobMarketSells("TokenA", 5)
 
 	// THEN
 	// current 0to1 moves down to 1
@@ -407,251 +280,52 @@ func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveMax() {
 	// deposit 10 of token B at tick 0 fee 1 and 10 of both token A and B at tick 0 fee 3
 	// to create spread of -3, 1
 	s.aliceDeposits(
-		NewDeposit(0, 10, 0, 0),
-		NewDeposit(10, 10, 0, 1),
+		NewDeposit(0, 10, 0, 1),
+		NewDeposit(10, 10, 0, 3),
 	)
 	s.assertCurr1To0(-3)
 
 	// WHEN
-	// swap 5 of token B for A with minOut 4
-	s.bobMarketSells("TokenA", 5, 4)
+	// swap 5 of token B for A
+	s.bobMarketSells("TokenA", 5)
 
 	// THEN
 	// current 0to1 moves down to 1
 	s.assertCurr1To0(-1)
 }
 
-func (s *MsgServerTestSuite) TestSwapNoLO0to1ExhaustMax() {
+func (s *MsgServerTestSuite) TestSwapNoLOMaxAmountOutUsed() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
 	// GIVEN
-	// deposit 10 of token B at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
-
-	// WHEN
-	// swap 5 of token A for B with minOut 4
-	s.bobMarketSells("TokenA", 15, 10)
-
-	// THEN
-	// current0To1 unchanged
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLO0to1MovedMinDown() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 0)
-	// GIVEN
-	// deposit 10 of token A at tick 0 fee 1 and 10 of token B at tick 0 fee 3
+	// 10 TokenB available
 	s.aliceDeposits(
-		NewDeposit(10, 0, 0, 0),
 		NewDeposit(0, 10, 0, 1),
 	)
 
 	// WHEN
-	// swap 5 of token A for B with minOut 4
-	s.bobMarketSells("TokenA", 5, 4)
+	// swap 50 with maxOut of 5
+	s.bobMarketSellsWithMaxOut("TokenA", 50, 5)
 
 	// THEN
-	// max tick moved up to 3
+	// bob gets 5 out
+	s.assertBobBalances(44, 5)
 }
 
-func (s *MsgServerTestSuite) TestSwapNoLO0to1DoesntMoveMinDown() {
+func (s *MsgServerTestSuite) TestSwapNoLOMaxAmountNotOutUsed() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
 	// GIVEN
-	// deposit 10 of token A at tick 0 fee 1
-	// 		   10 of token B at tick 0 fee 3
-	//         10 of token A and B at tick 0 fee 5
+	// 10 TokenB available
 	s.aliceDeposits(
-		NewDeposit(10, 0, 0, 0),
 		NewDeposit(0, 10, 0, 1),
-		NewDeposit(10, 10, 0, 2),
 	)
 
 	// WHEN
-	// swap 5 of token A for B with minOut 4
-	s.bobMarketSells("TokenA", 5, 4)
+	// swap 8 with maxOut of 15
+	s.bobMarketSellsWithMaxOut("TokenA", 8, 15)
 
 	// THEN
-	// min unchanged
-}
-
-// TODO: 0to1 moves min up
-// TODO: 0to1 doesn't move min up
-
-func (s *MsgServerTestSuite) TestSwapNoLOMinLimitTickNotMet() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(0, 50)
-	// GIVEN
-	// deposit 10 of tokenA
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0))
-	s.assertAliceBalances(40, 50)
-	s.assertDexBalances(10, 0)
-	s.assertPoolLiquidity(10, 0, 0, 0)
-	//
-	// WHEN
-	// swap 20 of tokenB at
-	amountIn := 10
-	amountInInt := sdk.NewInt(10)
-
-	limitPrice, err := utils.CalcPrice1To0(-10)
-	s.Assert().Nil(err)
-
-	s.bobMarketSellsWithLimitPrice("TokenB", amountIn, 5, limitPrice)
-
-	// THEN
-	// swap should have in out
-	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOBToA(-1, 10, int64(amountIn))
-	expectedAmountIn := amountInInt.Sub(expectedAmountInLeft)
-	s.assertBobBalancesInt(expectedAmountOut, sdk.NewInt(50).Sub(expectedAmountIn))
-	s.assertDexBalancesInt(sdk.NewInt(10).Sub(expectedAmountOut), expectedAmountIn)
-	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLOMaxLimitTickNotMet() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 0)
-	// GIVEN
-	// deposit 10 of tokenB
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0))
-	s.assertAliceBalances(50, 40)
-	s.assertDexBalances(0, 10)
-	s.assertPoolLiquidity(0, 10, 0, 0)
-	//
-	// WHEN
-	// swap 20 of tokenA at
-	amountIn := 10
-	amountInInt := sdk.NewInt(10)
-
-	limitPrice, err := utils.CalcPrice0To1(10)
-	s.Assert().Nil(err)
-
-	s.bobMarketSellsWithLimitPrice("TokenA", amountIn, 5, limitPrice)
-
-	// THEN
-	// swap should have in out
-	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOAToB(1, 10, int64(amountIn))
-	expectedAmountIn := amountInInt.Sub(expectedAmountInLeft)
-	s.assertBobBalancesInt(sdk.NewInt(50).Sub(expectedAmountIn), expectedAmountOut)
-	s.assertDexBalancesInt(expectedAmountIn, sdk.NewInt(10).Sub(expectedAmountOut))
-	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLOMaxLimitTickMet() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 0)
-	// GIVEN
-	// deposit 10 of tokenB
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0), NewDeposit(0, 10, 1, 1))
-	s.assertAliceBalances(50, 30)
-	s.assertDexBalances(0, 20)
-	s.assertPoolLiquidity(0, 10, 0, 0)
-	s.assertPoolLiquidity(0, 10, 1, 1)
-	//
-	// WHEN
-	// swap 20 of tokenA at
-	amountIn := 10
-	amountInInt := sdk.NewInt(10)
-
-	limitPrice, err := utils.CalcPrice0To1(1)
-	s.Assert().Nil(err)
-
-	s.bobMarketSellsWithLimitPrice("TokenA", amountIn, 5, limitPrice)
-
-	// THEN
-	// swap should have in out
-	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOAToB(1, 10, int64(amountIn))
-	expectedAmountIn := amountInInt.Sub(expectedAmountInLeft)
-	s.assertBobBalancesInt(sdk.NewInt(50).Sub(expectedAmountIn), expectedAmountOut)
-	s.assertDexBalancesInt(expectedAmountIn, sdk.NewInt(20).Sub(expectedAmountOut))
-	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLOMinLimitTickMet() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(0, 50)
-	// GIVEN
-	// deposit 10 of tokenA
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0), NewDeposit(10, 0, -1, 1))
-	s.assertAliceBalances(30, 50)
-	s.assertDexBalances(20, 0)
-	s.assertPoolLiquidity(10, 0, 0, 0)
-	s.assertPoolLiquidity(10, 0, -1, 1)
-	//
-	// WHEN
-	// swap 20 of tokenB at
-	amountIn := 10
-	amountInInt := sdk.NewInt(10)
-
-	limitPrice, err := utils.CalcPrice1To0(-1)
-	s.Assert().Nil(err)
-
-	s.bobMarketSellsWithLimitPrice("TokenB", amountIn, 5, limitPrice)
-
-	// THEN
-	// swap should have in out
-	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOBToA(-1, 10, int64(amountIn))
-	expectedAmountIn := amountInInt.Sub(expectedAmountInLeft)
-	s.assertBobBalancesInt(expectedAmountOut, sdk.NewInt(50).Sub(expectedAmountIn))
-	s.assertDexBalancesInt(sdk.NewInt(20).Sub(expectedAmountOut), expectedAmountIn)
-	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLOMinLimitTickMetWithPrecisionPrice() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(0, 50)
-	// GIVEN
-	// deposit 10 of tokenA
-	s.aliceDeposits(NewDeposit(10, 0, 0, 0), NewDeposit(10, 0, -1, 1))
-	s.assertAliceBalances(30, 50)
-	s.assertDexBalances(20, 0)
-	s.assertPoolLiquidity(10, 0, 0, 0)
-	s.assertPoolLiquidity(10, 0, -1, 1)
-	//
-	// WHEN
-	// swap 20 of tokenB at
-	amountIn := 10
-	amountInInt := sdk.NewInt(10)
-
-	limitPriceOutsideTickPrecision, err := sdk.NewDecFromStr("0.999900000999000100")
-	s.Assert().Nil(err)
-
-	s.bobMarketSellsWithLimitPrice("TokenB", amountIn, 5, limitPriceOutsideTickPrecision)
-
-	// THEN
-	// swap should have in out
-	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOBToA(-1, 10, int64(amountIn))
-	expectedAmountIn := amountInInt.Sub(expectedAmountInLeft)
-	s.assertBobBalancesInt(expectedAmountOut, sdk.NewInt(50).Sub(expectedAmountIn))
-	s.assertDexBalancesInt(sdk.NewInt(20).Sub(expectedAmountOut), expectedAmountIn)
-	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLOMaxLimitTickMetWithPrecisionPrice() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 0)
-	// GIVEN
-	// deposit 10 of tokenB
-	s.aliceDeposits(NewDeposit(0, 10, 0, 0), NewDeposit(0, 10, 1, 1))
-	s.assertAliceBalances(50, 30)
-	s.assertDexBalances(0, 20)
-	s.assertPoolLiquidity(0, 10, 0, 0)
-	s.assertPoolLiquidity(0, 10, 1, 1)
-	//
-	// WHEN
-	// swap 20 of tokenA at
-	amountIn := 10
-	amountInInt := sdk.NewInt(10)
-
-	limitPriceOutsideTickPrecision, err := sdk.NewDecFromStr("0.999900000999000100")
-	s.Assert().Nil(err)
-
-	s.bobMarketSellsWithLimitPrice("TokenA", amountIn, 5, limitPriceOutsideTickPrecision)
-
-	// THEN
-	// swap should have in out
-	expectedAmountInLeft, expectedAmountOut := s.calculateSingleSwapNoLOAToB(1, 10, int64(amountIn))
-	expectedAmountIn := amountInInt.Sub(expectedAmountInLeft)
-	s.assertBobBalancesInt(sdk.NewInt(50).Sub(expectedAmountIn), expectedAmountOut)
-	s.assertDexBalancesInt(expectedAmountIn, sdk.NewInt(20).Sub(expectedAmountOut))
-	// TODO: this test case is acceptable but succeptible to DOSing by dusting many ticks with large distances between them
+	// bob gets 7 out
+	s.assertBobBalances(42, 7)
 }

@@ -4,9 +4,10 @@ package dualitylabs.duality.dex;
 option go_package = "github.com/duality-labs/duality/x/dex/types";
 import "gogoproto/gogo.proto";
 import "duality/dex/pair_id.proto";
+import "duality/dex/tx.proto";
 
 message LimitOrderTrancheUser {
-  PairId pairId = 1;
+  PairID pairID = 1;
   string token = 2;
   int64 tickIndex = 3;
   string trancheKey = 4; 
@@ -28,6 +29,7 @@ message LimitOrderTrancheUser {
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "sharesCancelled"
-  ]; 
+  ];
+  LimitOrderType orderType = 10;
 }
 

@@ -1,3 +1,4 @@
+//nolint:all
 package types
 
 import (
@@ -9,11 +10,12 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgDeposit{}, "dex/Deposit", nil)
-	cdc.RegisterConcrete(&MsgWithdrawl{}, "dex/Withdrawl", nil)
+	cdc.RegisterConcrete(&MsgWithdrawal{}, "dex/Withdrawal", nil)
 	cdc.RegisterConcrete(&MsgSwap{}, "dex/Swap", nil)
 	cdc.RegisterConcrete(&MsgPlaceLimitOrder{}, "dex/PlaceLimitOrder", nil)
 	cdc.RegisterConcrete(&MsgWithdrawFilledLimitOrder{}, "dex/WithdrawFilledLimitOrder", nil)
 	cdc.RegisterConcrete(&MsgCancelLimitOrder{}, "dex/CancelLimitOrder", nil)
+	cdc.RegisterConcrete(&MsgMultiHopSwap{}, "dex/MultiHopSwap", nil)
 	// this line is used by starport scaffolding # 2
 }
 
@@ -22,7 +24,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgDeposit{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgWithdrawl{},
+		&MsgWithdrawal{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgSwap{},
@@ -36,7 +38,12 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCancelLimitOrder{},
 	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgMultiHopSwap{},
+	)
 	// this line is used by starport scaffolding # 3
+
+	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

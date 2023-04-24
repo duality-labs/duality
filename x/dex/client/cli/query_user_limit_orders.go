@@ -24,7 +24,6 @@ func CmdListUserLimitOrders() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			params := &types.QueryAllUserLimitOrdersRequest{
-
 				Address: reqAddress,
 			}
 

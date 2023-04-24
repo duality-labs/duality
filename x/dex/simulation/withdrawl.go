@@ -10,20 +10,20 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
-func SimulateMsgWithdrawl(
-	ak types.AccountKeeper,
-	bk types.BankKeeper,
-	k keeper.Keeper,
+func SimulateMsgWithdrawal(
+	_ types.AccountKeeper,
+	_ types.BankKeeper,
+	_ keeper.Keeper,
 ) simtypes.Operation {
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
-		msg := &types.MsgWithdrawl{
+		msg := &types.MsgWithdrawal{
 			Creator: simAccount.Address.String(),
 		}
 
-		// TODO: Handling the Withdrawl simulation
+		// TODO: Handling the Withdrawal simulation
 
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "Withdrawl simulation not implemented"), nil, nil
+		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "Withdrawal simulation not implemented"), nil, nil
 	}
 }

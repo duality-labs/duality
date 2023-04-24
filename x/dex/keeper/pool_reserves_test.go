@@ -15,7 +15,7 @@ func createNPoolReserves(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.
 	items := make([]types.PoolReserves, n)
 	for i := range items {
 		tranche := &types.PoolReserves{
-			PairId:    &types.PairId{Token0: "TokenA", Token1: "TokenB"},
+			PairID:    &types.PairID{Token0: "TokenA", Token1: "TokenB"},
 			TokenIn:   "TokenA",
 			TickIndex: int64(i),
 			Fee:       uint64(i),
@@ -24,6 +24,7 @@ func createNPoolReserves(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.
 		keeper.SetPoolReserves(ctx, *tranche)
 		items[i] = *tranche
 	}
+
 	return items
 }
 
@@ -32,7 +33,7 @@ func TestGetPoolReserves(t *testing.T) {
 	items := createNPoolReserves(keeper, ctx, 10)
 	for _, item := range items {
 		rst, found := keeper.GetPoolReserves(ctx,
-			item.PairId,
+			item.PairID,
 			item.TokenIn,
 			item.TickIndex,
 			item.Fee,
@@ -44,13 +45,14 @@ func TestGetPoolReserves(t *testing.T) {
 		)
 	}
 }
+
 func TestRemovePoolReserves(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNPoolReserves(keeper, ctx, 10)
 	for _, item := range items {
 		keeper.RemovePoolReserves(ctx, item)
 		_, found := keeper.GetPoolReserves(ctx,
-			item.PairId,
+			item.PairID,
 			item.TokenIn,
 			item.TickIndex,
 			item.Fee,

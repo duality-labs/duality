@@ -11,7 +11,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) LimitOrderTrancheUserAll(c context.Context, req *types.QueryAllLimitOrderTrancheUserRequest) (*types.QueryAllLimitOrderTrancheUserResponse, error) {
+func (k Keeper) LimitOrderTrancheUserAll(
+	c context.Context,
+	req *types.QueryAllLimitOrderTrancheUserRequest,
+) (*types.QueryAllLimitOrderTrancheUserResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -22,39 +25,37 @@ func (k Keeper) LimitOrderTrancheUserAll(c context.Context, req *types.QueryAllL
 	store := ctx.KVStore(k.storeKey)
 	LimitOrderTrancheUserStore := prefix.NewStore(store, types.KeyPrefix(types.LimitOrderTrancheUserKeyPrefix))
 
-	pageRes, err := query.Paginate(LimitOrderTrancheUserStore, req.Pagination, func(key []byte, value []byte) error {
+	pageRes, err := query.Paginate(LimitOrderTrancheUserStore, req.Pagination, func(key, value []byte) error {
 		var LimitOrderTrancheUser types.LimitOrderTrancheUser
 		if err := k.cdc.Unmarshal(value, &LimitOrderTrancheUser); err != nil {
 			return err
 		}
 
 		LimitOrderTrancheUsers = append(LimitOrderTrancheUsers, LimitOrderTrancheUser)
+
 		return nil
 	})
-
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryAllLimitOrderTrancheUserResponse{LimitOrderTrancheUser: LimitOrderTrancheUsers, Pagination: pageRes}, nil
+	return &types.QueryAllLimitOrderTrancheUserResponse{
+		LimitOrderTrancheUser: LimitOrderTrancheUsers,
+		Pagination:            pageRes,
+	}, nil
 }
 
-func (k Keeper) LimitOrderTrancheUser(c context.Context, req *types.QueryGetLimitOrderTrancheUserRequest) (*types.QueryGetLimitOrderTrancheUserResponse, error) {
+func (k Keeper) LimitOrderTrancheUser(c context.Context,
+	req *types.QueryGetLimitOrderTrancheUserRequest,
+) (*types.QueryGetLimitOrderTrancheUserResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(c)
-	pairId, err := StringToPairId(req.PairId)
-	if err != nil {
-		return nil, err
-	}
 	val, found := k.GetLimitOrderTrancheUser(
 		ctx,
-		pairId,
-		req.TickIndex,
-		req.Token,
-		req.TrancheKey,
 		req.Address,
+		req.TrancheKey,
 	)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")
