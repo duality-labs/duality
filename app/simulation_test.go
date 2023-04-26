@@ -1,3 +1,4 @@
+//nolint:deadcode,varcheck
 package app_test
 
 import (
@@ -5,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/NicholasDotSol/duality/app"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/simapp"
@@ -13,8 +13,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simulationtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
-	"github.com/ignite-hq/cli/ignite/pkg/cosmoscmd"
+	"github.com/duality-labs/duality/app"
 	"github.com/stretchr/testify/require"
+	"github.com/tendermint/spm/cosmoscmd"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmtypes "github.com/tendermint/tendermint/types"

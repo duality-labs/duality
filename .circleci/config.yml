@@ -1,0 +1,133 @@
+version: 2.1
+jobs:
+  go-tests:
+    working_directory: ~/repo
+    docker:
+      - image: cimg/go:1.19.3
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v4-{{ checksum "go.sum" }}
+      - run:
+          name: Install Dependencies
+          command: go mod download
+      - save_cache:
+          key: go-mod-v4-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
+      - run:
+          name: Create a temp directory for artifacts
+          command: mkdir -p /tmp/artifacts
+      - run:
+          name: Run tests
+          command: |
+            go test ./... -coverprofile=c.out -v
+            go tool cover -html=c.out -o /tmp/artifacts/coverage.html
+      - store_artifacts:
+          path: /tmp/artifacts
+  binary-build:
+    working_directory: ~/repo
+    docker:
+      - image: ignitehq/cli:0.23.0
+    steps:
+      - checkout
+      - run:
+          name: Create a temp directory for artifacts
+          command: mkdir -p /tmp/artifacts
+      - run:
+          name: Build chain binary
+          command: ignite chain build -o /tmp/artifacts --clear-cache
+      - run:
+          name: Ensure ignite has not generated changes which have not been commited to VC
+          command: |
+            # NOTE: we are excluding openapi.yml from the new file check since it does not get generated predictably
+            CHANGES=$(git ls-files -m -- ':!:docs/static/openapi.yml')
+            [[ -n "$CHANGES" ]] && { echo -e "Untracked files created by ignite:\n$CHANGES" ; exit 1; }\
+            || { echo "No new files detected" ; exit 0; }
+      - store_artifacts:
+          path: /tmp/artifacts
+  binary-release-build:
+    working_directory: ~/repo
+    docker:
+      - image: ignitehq/cli:0.23.0
+    steps:
+      - checkout
+      - run:
+          name: Create a temp directory for artifacts
+          command: mkdir -p ./tmp/artifacts/release
+      - run:
+          name: Build chain binary
+          command: ignite chain build  --release -t linux:amd64 -t darwin:amd64 -o ./tmp/artifacts/release --clear-cache
+      - persist_to_workspace:
+          root: ./tmp/artifacts
+          paths:
+            - release
+  publish-github-release:
+    docker:
+      - image: cimg/go:1.19.3
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v4-{{ checksum "go.sum" }}
+      - attach_workspace:
+          at: ./tmp/artifacts
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            go install github.com/tcnksm/ghr@v0.16.0
+            ghr -t "${GITHUB_TOKEN}" -u "${CIRCLE_PROJECT_USERNAME}" -r "${CIRCLE_PROJECT_REPONAME}" -c "${CIRCLE_SHA1}" -delete ${CIRCLE_TAG} ./tmp/artifacts/release
+  lint:
+    working_directory: ~/repo
+    docker:
+      - image: cimg/go:1.19.3
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v4-{{ checksum "go.sum" }}
+      - run:
+          name: Install GolangCI-Lint
+          command: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.52.2
+      - run:
+          name: Run GolangCI-Lint
+          command: "./bin/golangci-lint run --out-format colored-line-number:linter.txt --timeout 6m"
+      - store_artifacts:
+          path: ./linter.txt
+
+workflows:
+  version: 2
+  full_test_suite:
+    jobs:
+      - go-tests
+      - binary-build
+  lint:
+    jobs:
+      - lint
+  publish-release-maybe:
+    jobs:
+      - go-tests:
+          filters:
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
+            branches:
+              ignore: /.*/
+      - binary-release-build:
+          filters:
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
+            branches:
+              ignore: /.*/
+      - publish-github-release:
+          filters:
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
+            branches:
+              ignore: /.*/
+          context:
+            - GITHUB_CREDS
+          requires:
+            - go-tests
+            - binary-release-build
