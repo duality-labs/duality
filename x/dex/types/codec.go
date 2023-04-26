@@ -11,7 +11,6 @@ import (
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgDeposit{}, "dex/Deposit", nil)
 	cdc.RegisterConcrete(&MsgWithdrawal{}, "dex/Withdrawal", nil)
-	cdc.RegisterConcrete(&MsgSwap{}, "dex/Swap", nil)
 	cdc.RegisterConcrete(&MsgPlaceLimitOrder{}, "dex/PlaceLimitOrder", nil)
 	cdc.RegisterConcrete(&MsgWithdrawFilledLimitOrder{}, "dex/WithdrawFilledLimitOrder", nil)
 	cdc.RegisterConcrete(&MsgCancelLimitOrder{}, "dex/CancelLimitOrder", nil)
@@ -25,9 +24,6 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgWithdrawal{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgSwap{},
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgPlaceLimitOrder{},

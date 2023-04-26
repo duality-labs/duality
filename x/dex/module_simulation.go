@@ -107,17 +107,6 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		dexsimulation.SimulateMsgWithdrawal(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-	var weightMsgSwap int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgSwap, &weightMsgSwap, nil,
-		func(_ *rand.Rand) {
-			weightMsgSwap = defaultWeightMsgSwap
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgSwap,
-		dexsimulation.SimulateMsgSwap(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
 	var weightMsgPlaceLimitOrder int
 	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgPlaceLimitOrder, &weightMsgPlaceLimitOrder, nil,
 		func(_ *rand.Rand) {

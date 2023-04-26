@@ -63,32 +63,6 @@ func CreateWithdrawEvent(
 	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
 }
 
-func CreateSwapEvent(
-	creator sdk.AccAddress,
-	receiver sdk.AccAddress,
-	token0 string,
-	token1 string,
-	tokenIn string,
-	tokenOut string,
-	amountIn sdk.Int,
-	amountOut sdk.Int,
-) sdk.Event {
-	attrs := []sdk.Attribute{
-		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
-		sdk.NewAttribute(sdk.AttributeKeyAction, SwapEventKey),
-		sdk.NewAttribute(SwapEventCreator, creator.String()),
-		sdk.NewAttribute(SwapEventReceiver, receiver.String()),
-		sdk.NewAttribute(SwapEventToken0, token0),
-		sdk.NewAttribute(SwapEventToken1, token1),
-		sdk.NewAttribute(SwapEventTokenIn, tokenIn),
-		sdk.NewAttribute(SwapEventTokenOut, tokenOut),
-		sdk.NewAttribute(SwapEventAmountIn, amountIn.String()),
-		sdk.NewAttribute(SwapEventAmoutOut, amountOut.String()),
-	}
-
-	return sdk.NewEvent(sdk.EventTypeMessage, attrs...)
-}
-
 func CreateMultihopSwapEvent(
 	creator sdk.AccAddress,
 	receiver sdk.AccAddress,

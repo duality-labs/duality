@@ -273,19 +273,6 @@ const (
 	WithdrawEventSharesRemoved      = "SharesRemoved"
 )
 
-// Swap Event Attributes
-const (
-	SwapEventKey      = "Swap"
-	SwapEventCreator  = "Creator"
-	SwapEventReceiver = "Receiver"
-	SwapEventToken0   = "Token0"
-	SwapEventToken1   = "Token1"
-	SwapEventTokenIn  = "TokenIn"
-	SwapEventTokenOut = "TokenOut"
-	SwapEventAmountIn = "AmountIn"
-	SwapEventAmoutOut = "AmountOut"
-)
-
 // Multihop-Swap Event Attributes
 const (
 	MultihopSwapEventKey       = "MultihopSwap"
