@@ -10,9 +10,6 @@ RUN apt update && \
 
 RUN apt-get install -y \
     build-essential \
-    ca-certificates \
-    # gcc \
-    # make \
     curl
 
 # [Choice] Node.js version: none, lts/*, 16, 14, 12, 10
