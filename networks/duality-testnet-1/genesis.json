@@ -96,14 +96,7 @@
         "amount": "1000"
       }
     },
-    "dex": {
-        "params": {},
-        "tickLiquidityList": [],
-        "tokensList": [],
-        "tokensCount": "0",
-        "tokenMapList": [],
-        "inactiveLimitOrderTrancheList": [],
-    },
+    "dex": {},
     "distribution": {
       "params": {
         "community_tax": "0.020000000000000000",
