@@ -22,8 +22,15 @@ RUN curl "https://get.ignite.com/cli@$IGNITE_CLI_VERSION!" | bash
 
 # see docs for exposed ports:
 #   https://docs.ignite.com/kb/config.html#host
+# rpc
 EXPOSE 26657
+# p2p
 EXPOSE 26656
-EXPOSE 6060
+# grpc-web
+EXPOSE 9091
+# grpc
 EXPOSE 9090
+# prof
+EXPOSE 6060
+# api
 EXPOSE 1317
