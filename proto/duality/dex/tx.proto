@@ -29,13 +29,13 @@ message MsgDeposit {
   string tokenA = 3;
   string tokenB = 4;
   repeated string amountsA = 5  [
-      (gogoproto.moretags)   = "yaml:\"amountA\"",
+      (gogoproto.moretags)   = "yaml:\"amountsA\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountA"
   ]; 
    repeated string amountsB = 6  [
-      (gogoproto.moretags)   = "yaml:\"amountB\"",
+      (gogoproto.moretags)   = "yaml:\"amountsB\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "amountB"
