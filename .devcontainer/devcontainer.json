@@ -25,7 +25,11 @@
 
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
+				// https://marketplace.visualstudio.com/items?itemName=golang.Go
+				// Go support: syntax highlighting, code completion, code navigation, test running
 				"golang.Go",
+				// https://marketplace.visualstudio.com/items?itemName=zxh404.vscode-proto3
+				// Protobuf 3 syntax highlighting & more
 				"zxh404.vscode-proto3"
 			]
 		}
