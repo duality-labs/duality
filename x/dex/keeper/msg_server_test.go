@@ -306,7 +306,7 @@ type Deposit struct {
 }
 
 type DepositOptions struct {
-	Autoswap bool
+	DisableAutoswap bool
 }
 
 type DepositWithOptions struct {
@@ -348,6 +348,10 @@ func (s *MsgServerTestSuite) bobDeposits(deposits ...*Deposit) {
 	s.deposits(s.bob, deposits)
 }
 
+func (s *MsgServerTestSuite) bobDepositsWithOptions(deposits ...*DepositWithOptions) {
+	s.depositsWithOptions(s.bob, deposits...)
+}
+
 func (s *MsgServerTestSuite) carolDeposits(deposits ...*Deposit) {
 	s.deposits(s.carol, deposits)
 }
@@ -367,7 +371,7 @@ func (s *MsgServerTestSuite) deposits(account sdk.AccAddress, deposits []*Deposi
 		amountsB[i] = e.AmountB
 		tickIndexes[i] = e.TickIndex
 		fees[i] = e.Fee
-		options[i] = &types.DepositOptions{Autoswap: false}
+		options[i] = &types.DepositOptions{DisableAutoswap: false}
 	}
 
 	var tokenA, tokenB string
@@ -408,7 +412,7 @@ func (s *MsgServerTestSuite) depositsWithOptions(account sdk.AccAddress, deposit
 		tickIndexes[i] = e.TickIndex
 		fees[i] = e.Fee
 		options[i] = &types.DepositOptions{
-			Autoswap: e.Options.Autoswap,
+			DisableAutoswap: e.Options.DisableAutoswap,
 		}
 	}
 
@@ -474,7 +478,7 @@ func (s *MsgServerTestSuite) assertDepositFails(account sdk.AccAddress, expected
 		amountsB[i] = e.AmountB
 		tickIndexes[i] = e.TickIndex
 		fees[i] = e.Fee
-		options[i] = &types.DepositOptions{Autoswap: false}
+		options[i] = &types.DepositOptions{DisableAutoswap: true}
 	}
 
 	_, err := s.msgServer.Deposit(s.goCtx, &types.MsgDeposit{
@@ -923,17 +927,24 @@ func (s *MsgServerTestSuite) assertCurrentTicks(
 	s.assertCurr1To0(expected1To0)
 }
 
-func (s *MsgServerTestSuite) assertCurr0To1(curr0To1Expected int64) {
+func (s *MsgServerTestSuite) GetCurrTick0To1() int64 {
 	pairID := CreatePairID("TokenA", "TokenB")
 	curr0To1Actual, _ := s.app.DexKeeper.GetCurrTick0To1(s.ctx, pairID)
-	s.Assert().Equal(curr0To1Expected, curr0To1Actual)
+	return curr0To1Actual
+}
+
+func (s *MsgServerTestSuite) GetCurrTick1To0() int64 {
+	pairID := CreatePairID("TokenA", "TokenB")
+	curr1To0Actual, _ := s.app.DexKeeper.GetCurrTick1To0(s.ctx, pairID)
+	return curr1To0Actual
+}
+
+func (s *MsgServerTestSuite) assertCurr0To1(curr0To1Expected int64) {
+	s.Assert().Equal(curr0To1Expected, s.GetCurrTick0To1())
 }
 
 func (s *MsgServerTestSuite) assertCurr1To0(curr1To0Expected int64) {
-	pairID := CreatePairID("TokenA", "TokenB")
-
-	curr1to0Actual, _ := s.app.DexKeeper.GetCurrTick1To0(s.ctx, pairID)
-	s.Assert().Equal(curr1To0Expected, curr1to0Actual)
+	s.Assert().Equal(curr1To0Expected, s.GetCurrTick1To0())
 }
 
 // Pool liquidity (i.e. deposited rather than LO)

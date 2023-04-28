@@ -257,8 +257,9 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityB() {
 	s.assertCurr0To1(1)
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedAboveEnemyLines() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedCreatingArbToken0() {
 	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 50)
 
 	// GIVEN
 	// deposit 10 of token B at tick 0 fee 1
@@ -271,14 +272,18 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedAboveEnemyLines() {
 	// WHEN
 	// depositing  above enemy lines at tick 1
 	// THEN
-	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
+	// deposit should not fail with BEL error, balances and liquidity should not change at deposited tick
+	s.aliceDeposits(NewDeposit(10, 0, 4000, 1))
 
-	err := types.ErrDepositBehindPairLiquidity // TODO: this needs to be changed to a more specific error type
-	s.assertAliceDepositFails(err, NewDeposit(10, 0, 2, 1))
+	// Bob arbs
+	s.bobLimitSells("TokenB", int(s.GetCurrTick0To1()), 50, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
+	s.bobMarketSells("TokenA", 10)
+	s.assertBobBalances(50, 52)
 }
 
-func (s *MsgServerTestSuite) TestDepositSingleSidedBelowEnemyLines() {
+func (s *MsgServerTestSuite) TestDepositSingleSidedCreatingArbToken1() {
 	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 50)
 
 	// GIVEN
 	// deposit 10 of token A at tick 0 fee 1
@@ -291,10 +296,14 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedBelowEnemyLines() {
 	// WHEN
 	// depositing above enemy lines at tick -1
 	// THEN
-	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
+	// deposit should not fail with BEL error, balances and liquidity should not change at deposited tick
 
-	err := types.ErrDepositBehindPairLiquidity // TODO: this needs to be changed to a more specific error type
-	s.assertAliceDepositFails(err, NewDeposit(0, 10, -2, 0))
+	s.aliceDeposits(NewDeposit(0, 10, -4000, 0))
+
+	// Bob arbs
+	s.bobLimitSells("TokenA", int(s.GetCurrTick1To0()), 50, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
+	s.bobMarketSells("TokenB", 10)
+	s.assertBobBalances(52, 50)
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedMultiA() {
