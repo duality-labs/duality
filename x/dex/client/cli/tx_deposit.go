@@ -19,7 +19,7 @@ func CmdDeposit() *cobra.Command {
 		//nolint:lll
 		Use:     "deposit [receiver] [token-a] [token-b] [list of amount-0] [list of amount-1] [list of tick-index] [list of fees] [should_autoswap]",
 		Short:   "Broadcast message deposit",
-		Example: "deposit alice tokenA tokenB 100,50 [-10,5] 1,1 false,false --from alice",
+		Example: "deposit alice tokenA tokenB 100,0 0,50 [-10,5] 1,1 false,false --from alice",
 		Args:    cobra.ExactArgs(8),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]

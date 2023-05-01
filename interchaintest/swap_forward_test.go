@@ -8,7 +8,7 @@ import (
 	"time"
 
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
-	transfertypes "github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
+	transfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
 	"github.com/duality-labs/duality/x/dex/types"
 	swaptypes "github.com/duality-labs/duality/x/ibcswap/types"
 	"github.com/strangelove-ventures/interchaintest/v3"

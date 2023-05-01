@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/cosmos/admin-module v0.0.0
 	github.com/cosmos/cosmos-sdk v0.46.6
-	github.com/cosmos/ibc-go/v3 v3.4.0
+	github.com/cosmos/ibc-go/v4 v3.4.0
 	github.com/cosmos/ibc-go/v4 v4.3.0
 	github.com/cosmos/interchain-security v1.0.0
 	github.com/gogo/protobuf v1.3.3
