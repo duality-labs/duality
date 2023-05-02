@@ -79,9 +79,9 @@ import (
 	ibctestingcore "github.com/cosmos/interchain-security/legacy_ibc_testing/core"
 	"github.com/ignite/cli/ignite/pkg/openapiconsole"
 	"github.com/spf13/cast"
-	forwardmiddleware "github.com/strangelove-ventures/packet-forward-middleware/v3/router"
-	forwardkeeper "github.com/strangelove-ventures/packet-forward-middleware/v3/router/keeper"
-	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v3/router/types"
+	forwardmiddleware "github.com/strangelove-ventures/packet-forward-middleware/v4/router"
+	forwardkeeper "github.com/strangelove-ventures/packet-forward-middleware/v4/router/keeper"
+	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
 	"github.com/tendermint/spm/cosmoscmd"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -476,8 +476,7 @@ func NewApp(
 		app.IBCKeeper.ChannelKeeper,
 		&NoopDistributionKeeper{}, // Use a no-op implementation of the Distribution Keeper to avoid NPE
 		app.BankKeeper,
-		&app.IBCKeeper.PortKeeper,
-		app.SwapKeeper,
+		&app.IBCKeeper.ChannelKeeper,
 	)
 	forwardModule := forwardmiddleware.NewAppModule(app.ForwardKeeper)
 

@@ -14,7 +14,7 @@ import (
 	ibcexported "github.com/cosmos/ibc-go/v4/modules/core/exported"
 	"github.com/duality-labs/duality/x/ibcswap/keeper"
 	"github.com/duality-labs/duality/x/ibcswap/types"
-	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v3/router/types"
+	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
 )
 
 var _ porttypes.Middleware = &IBCMiddleware{}
@@ -44,7 +44,7 @@ func (im IBCMiddleware) OnChanOpenInit(
 	chanCap *capabilitytypes.Capability,
 	counterparty channeltypes.Counterparty,
 	version string,
-) error {
+) (string, error) {
 	return im.app.OnChanOpenInit(ctx, order, connectionHops, portID, channelID, chanCap, counterparty, version)
 }
 
@@ -96,7 +96,7 @@ func (im IBCMiddleware) OnRecvPacket(
 ) ibcexported.Acknowledgement {
 	var data transfertypes.FungibleTokenPacketData
 	if err := transfertypes.ModuleCdc.UnmarshalJSON(packet.GetData(), &data); err != nil {
-		return channeltypes.NewErrorAcknowledgement(err.Error())
+		return channeltypes.NewErrorAcknowledgement(err)
 	}
 
 	m := &types.PacketMetadata{}
@@ -108,7 +108,7 @@ func (im IBCMiddleware) OnRecvPacket(
 
 	metadata := m.Swap
 	if err := metadata.Validate(); err != nil {
-		return channeltypes.NewErrorAcknowledgement(err.Error())
+		return channeltypes.NewErrorAcknowledgement(err)
 	}
 
 	// Check if a middleware before this has already processed this packet and passed the processed key via context
@@ -217,6 +217,10 @@ func (im IBCMiddleware) WriteAcknowledgement(
 	return im.keeper.WriteAcknowledgement(ctx, chanCap, packet, ack)
 }
 
+func (im IBCMiddleware) GetAppVersion(ctx sdk.Context, portID string, channelID string) (string, bool) {
+	return im.keeper.GetAppVersion(ctx, portID, channelID)
+}
+
 // handleFailedSwap will invoke the appropriate failover logic depending on if this swap was marked refundable
 // or non-refundable in the SwapMetadata.
 func (im IBCMiddleware) handleFailedSwap(
@@ -307,7 +311,7 @@ func (im IBCMiddleware) handleRefund(
 		return channeltypes.NewResultAcknowledgement([]byte(wrappedErr.Error()))
 	}
 
-	return channeltypes.NewErrorAcknowledgement(swapErr.Error())
+	return channeltypes.NewErrorAcknowledgement(swapErr)
 }
 
 // getDenomForThisChain composes a new token denom by either unwinding or prefixing the specified token denom appropriately.

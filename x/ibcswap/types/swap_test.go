@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/iancoleman/orderedmap"
-	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v3/router/types"
+	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
 	"github.com/stretchr/testify/require"
 )
 

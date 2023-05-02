@@ -11,14 +11,15 @@ import (
 	transfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
 	"github.com/duality-labs/duality/x/dex/types"
 	swaptypes "github.com/duality-labs/duality/x/ibcswap/types"
-	"github.com/strangelove-ventures/interchaintest/v3"
-	"github.com/strangelove-ventures/interchaintest/v3/chain/cosmos"
-	"github.com/strangelove-ventures/interchaintest/v3/ibc"
-	"github.com/strangelove-ventures/interchaintest/v3/relayer"
-	"github.com/strangelove-ventures/interchaintest/v3/relayer/rly"
-	"github.com/strangelove-ventures/interchaintest/v3/testreporter"
-	"github.com/strangelove-ventures/interchaintest/v3/testutil"
-	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v3/router/types"
+	"github.com/iancoleman/orderedmap"
+	"github.com/strangelove-ventures/interchaintest/v4"
+	"github.com/strangelove-ventures/interchaintest/v4/chain/cosmos"
+	"github.com/strangelove-ventures/interchaintest/v4/ibc"
+	"github.com/strangelove-ventures/interchaintest/v4/relayer"
+	"github.com/strangelove-ventures/interchaintest/v4/relayer/rly"
+	"github.com/strangelove-ventures/interchaintest/v4/testreporter"
+	"github.com/strangelove-ventures/interchaintest/v4/testutil"
+	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest"
 )
@@ -513,7 +514,7 @@ func TestSwapAndForward_MultiHopSuccess(t *testing.T) {
 	}
 	nextForwardBz, err := json.Marshal(nextForward)
 	require.NoError(t, err)
-	nextForwardStr := string(nextForwardBz)
+	nextForwardJSON := forwardtypes.NewJSONObject(false, nextForwardBz, orderedmap.OrderedMap{})
 
 	forwardMetadata := forwardtypes.PacketMetadata{
 		Forward: &forwardtypes.ForwardMetadata{
@@ -522,7 +523,7 @@ func TestSwapAndForward_MultiHopSuccess(t *testing.T) {
 			Channel:  cbChannel.Counterparty.ChannelID,
 			Timeout:  5 * time.Minute,
 			Retries:  &retries,
-			Next:     &nextForwardStr,
+			Next:     nextForwardJSON,
 		}}
 	bz, err := json.Marshal(forwardMetadata)
 	require.NoError(t, err)

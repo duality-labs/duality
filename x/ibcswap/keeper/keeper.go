@@ -11,7 +11,7 @@ import (
 	transfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
 	channeltypes "github.com/cosmos/ibc-go/v4/modules/core/04-channel/types"
 	porttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
-	"github.com/cosmos/ibc-go/v4/modules/core/24-host"
+	host "github.com/cosmos/ibc-go/v4/modules/core/24-host"
 	ibcexported "github.com/cosmos/ibc-go/v4/modules/core/exported"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/ibcswap/types"
@@ -138,4 +138,8 @@ func (k Keeper) SendCoins(ctx sdk.Context, fromAddr string, toAddr string, amt s
 	}
 
 	return k.bankKeeper.SendCoins(ctx, from, to, amt)
+}
+
+func (k Keeper) GetAppVersion(ctx sdk.Context, portID string, channelID string) (string, bool) {
+	return k.ics4Wrapper.GetAppVersion(ctx, portID, channelID)
 }
