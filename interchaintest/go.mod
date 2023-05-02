@@ -23,7 +23,6 @@ require (
 	github.com/cosmos/ibc-go/v4 v4.3.0
 	github.com/duality-labs/duality v0.0.0-00010101000000-000000000000
 	github.com/iancoleman/orderedmap v0.2.0
-	github.com/icza/dyno v0.0.0-20220812133438-f0b6f8a18845
 	github.com/strangelove-ventures/interchaintest/v4 v4.0.0-20230316161044-8d8c01f96b4a
 	github.com/strangelove-ventures/packet-forward-middleware/v4 v4.0.5
 	github.com/stretchr/testify v1.8.1
@@ -112,6 +111,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.5-0.20210104140557-80c98217689d // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hdevalence/ed25519consensus v0.0.0-20220222234857-c00d1f31bab3 // indirect
+	github.com/icza/dyno v0.0.0-20220812133438-f0b6f8a18845 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/ipfs/go-cid v0.0.7 // indirect
 	github.com/jmhodges/levigo v1.0.0 // indirect

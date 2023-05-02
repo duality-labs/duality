@@ -2,13 +2,10 @@ package interchaintest_test
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"testing"
 
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
-	"github.com/icza/dyno"
 	"github.com/strangelove-ventures/interchaintest/v4"
 	"github.com/strangelove-ventures/interchaintest/v4/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v4/ibc"
@@ -35,39 +32,29 @@ const (
 )
 
 var (
-	feeList = Fees{
-		FeeList: []FeeTier{
-			{0, 1},
-			{Id: 1, Fee: 0},
-			{Id: 2, Fee: 5},
-			{Id: 3, Fee: 10},
-		}}
-
 	chainCfg = ibc.ChainConfig{
 		Type:    "cosmos",
 		Name:    "duality",
 		ChainID: "chain-b",
-		Images: []ibc.DockerImage{{
-			Repository: "ghcr.io/strangelove-ventures/heighliner/duality",
-			Version:    "justin-ibc-swap",
-			UidGid:     heighlinerUserString,
-		}},
 		// Images: []ibc.DockerImage{{
-		// 	Repository: "duality",
-		// 	Version:    "local",
+		// 	Repository: "ghcr.io/strangelove-ventures/heighliner/duality",
+		// 	Version:    "justin-ibc-swap",
 		// 	UidGid:     heighlinerUserString,
 		// }},
-		Bin:            "dualityd",
-		Bech32Prefix:   "cosmos",
-		Denom:          "stake",
-		CoinType:       cosmosCoinType,
-		GasPrices:      "0.0stake",
-		GasAdjustment:  1.2,
-		TrustingPeriod: "336h",
-		NoHostMount:    false,
-		ModifyGenesis: func(config ibc.ChainConfig, bytes []byte) ([]byte, error) {
-			return modifyGenesisDuality(bytes, feeList)
-		},
+		Images: []ibc.DockerImage{{
+			Repository: "duality",
+			Version:    "local",
+			UidGid:     heighlinerUserString,
+		}},
+		Bin:                 "dualityd",
+		Bech32Prefix:        "cosmos",
+		Denom:               "stake",
+		CoinType:            cosmosCoinType,
+		GasPrices:           "0.0stake",
+		GasAdjustment:       1.2,
+		TrustingPeriod:      "336h",
+		NoHostMount:         false,
+		ModifyGenesis:       nil,
 		ConfigFileOverrides: nil,
 		EncodingConfig:      dualityEncoding(),
 	}
@@ -140,33 +127,4 @@ func dualityEncoding() *simappparams.EncodingConfig {
 	cfg := cosmos.DefaultEncoding()
 	dextypes.RegisterInterfaces(cfg.InterfaceRegistry)
 	return &cfg
-}
-
-func modifyGenesisDuality(genbz []byte, feeList Fees) ([]byte, error) {
-	g := make(map[string]interface{})
-	if err := json.Unmarshal(genbz, &g); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal genesis file: %w", err)
-	}
-	if err := dyno.Set(g, feeList.FeeList, "app_state", "dex", "feeTierList"); err != nil {
-		return nil, fmt.Errorf("failed to set fee list in genesis json: %w", err)
-	}
-	if err := dyno.Set(g, len(feeList.FeeList), "app_state", "dex", "feeTierCount"); err != nil {
-		return nil, fmt.Errorf("failed set fee list count in genesis json")
-	}
-
-	out, err := json.Marshal(g)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal genesis bytes to json: %w", err)
-	}
-	return out, nil
-
-}
-
-type Fees struct {
-	FeeList []FeeTier `yaml:"feeListList"`
-}
-
-type FeeTier struct {
-	Id  uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Fee int64  `protobuf:"varint,2,opt,name=fee,proto3" json:"fee,omitempty"`
 }
