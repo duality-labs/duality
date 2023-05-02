@@ -412,6 +412,16 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 }
 
 // Fill Or Kill limit orders ///////////////////////////////////////////////////////////
+func (s *MsgServerTestSuite) TestPlaceLimitOrderFoKNoLiq() {
+	s.fundAliceBalances(10, 0)
+	// GIVEN no liquidity
+	// THEN alice's LimitOrder fails
+	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenA", 0, 10, types.LimitOrderType_FILL_OR_KILL)
+
+	s.assertDexBalances(0, 0)
+	s.assertAliceBalances(10, 0)
+}
+
 func (s *MsgServerTestSuite) TestPlaceLimitOrderFoKWithLPFills() {
 	s.fundAliceBalances(10, 0)
 	s.fundBobBalances(0, 20)
@@ -456,6 +466,22 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrder1FoKFailsWithHighLimit() {
 }
 
 // Immediate Or Cancel LimitOrders ////////////////////////////////////////////////////////////////////
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCNoLiq() {
+	s.fundAliceBalances(10, 0)
+	// GIVEN no liquidity
+	// WHEN alice submits IoC limitOrder
+	s.aliceLimitSells("TokenA", 0, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
+
+	// THEN alice's LimitOrder is not filled
+	s.assertDexBalances(0, 0)
+	s.assertAliceBalances(10, 10)
+
+	// No maker LO is placed
+	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
+	s.assertFillAndPlaceTrancheKeys("TokenA", 1, "", "")
+}
+
 func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCWithLPFills() {
 	s.fundAliceBalances(10, 0)
 	s.fundBobBalances(0, 20)

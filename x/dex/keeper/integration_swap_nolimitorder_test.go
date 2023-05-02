@@ -1,25 +1,5 @@
 package keeper_test
 
-import (
-	"github.com/duality-labs/duality/x/dex/types"
-)
-
-func (s *MsgServerTestSuite) TestSwapNoLONoLiquidity() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 50)
-	// GIVEN
-	// no liqudity of token A (deposit only token B at tick 0 fee 1)
-	s.aliceDeposits(NewDeposit(0, 10, 0, 1))
-	s.assertAliceBalances(50, 40)
-
-	// WHEN
-	// swap 5 of tokenB
-	// THEN
-	// swap should fail with Error Not enough coins
-	err := types.ErrInsufficientLiquidity
-	s.bobMarketSellFails(err, "TokenB", 5)
-}
-
 func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReachedMaxReached() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)
