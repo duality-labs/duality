@@ -190,6 +190,7 @@ func TestIBCSwapMiddleware_Success(t *testing.T) {
 
 	swapAmount := sdktypes.NewInt(100000)
 	minOut := sdktypes.NewInt(100000)
+	expectedOut := sdktypes.NewInt(99_990)
 
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
@@ -227,7 +228,7 @@ func TestIBCSwapMiddleware_Success(t *testing.T) {
 	// Check that the funds are now present in the acc on Duality
 	chainBBalNativeSwap, err := chainB.GetBalance(ctx, chainBAddr, chainB.Config().Denom)
 	require.NoError(t, err)
-	require.Equal(t, chainBBalNative+minOut.Int64(), chainBBalNativeSwap)
+	require.Equal(t, chainBBalNative+expectedOut.Int64(), chainBBalNativeSwap)
 
 	chainBBalIBCSwap, err := chainB.GetBalance(ctx, chainBAddr, chainADenomTrace.IBCDenom())
 	require.NoError(t, err)

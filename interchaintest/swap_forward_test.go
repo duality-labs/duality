@@ -500,7 +500,8 @@ func TestSwapAndForward_MultiHopSuccess(t *testing.T) {
 
 	// Compose the IBC transfer memo metadata to be used in the swap and forward
 	swapAmount := sdktypes.NewInt(100000)
-	minOut := sdktypes.NewInt(100000)
+	maxOut := sdktypes.NewInt(100000)
+	expectedOut := sdktypes.NewInt(99_990)
 
 	retries := uint8(0)
 	nextForward := forwardtypes.PacketMetadata{
@@ -541,7 +542,7 @@ func TestSwapAndForward_MultiHopSuccess(t *testing.T) {
 				TokenIn:      chainADenomTrace.IBCDenom(),
 				TokenOut:     chainB.Config().Denom,
 				MaxAmountIn:  swapAmount,
-				MaxAmountOut: minOut,
+				MaxAmountOut: maxOut,
 			},
 			Next: nextJSON,
 		},
@@ -581,7 +582,7 @@ func TestSwapAndForward_MultiHopSuccess(t *testing.T) {
 
 	chainDBal, err := chainD.GetBalance(ctx, chainDAddr, chainDDenomTrace.IBCDenom())
 	require.NoError(t, err)
-	require.Equal(t, minOut.Int64(), chainDBal)
+	require.Equal(t, expectedOut.Int64(), chainDBal)
 }
 
 // TestSwapAndForward_UnwindIBCDenomSuccess asserts that the swap and forward middleware stack works as intended in the
@@ -816,7 +817,8 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 
 	// Compose the IBC transfer memo metadata to be used in the swap and forward
 	swapAmount := sdktypes.NewInt(100_000)
-	minOut := sdktypes.NewInt(100_000)
+	maxOut := sdktypes.NewInt(100_000)
+	expectedOut := sdktypes.NewInt(99_990)
 
 	retries := uint8(0)
 	forwardMetadata := forwardtypes.PacketMetadata{
@@ -844,7 +846,7 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 				TokenIn:      chainB.Config().Denom,
 				TokenOut:     chainADenomTrace.IBCDenom(),
 				MaxAmountIn:  swapAmount,
-				MaxAmountOut: minOut,
+				MaxAmountOut: maxOut,
 			},
 			Next: nextJSON,
 		},
@@ -886,7 +888,7 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 
 	chainCBal, err := chainC.GetBalance(ctx, chainCAddr, chainCDenomTrace.IBCDenom())
 	require.NoError(t, err)
-	require.Equal(t, minOut.Int64(), chainCBal)
+	require.Equal(t, expectedOut.Int64(), chainCBal)
 }
 
 // TestSwapAndForward_ForwardFails asserts that the swap and forward middleware stack works as intended in the case
@@ -1085,7 +1087,8 @@ func TestSwapAndForward_ForwardFails(t *testing.T) {
 
 	// Compose the IBC transfer memo metadata to be used in the swap and forward
 	swapAmount := sdktypes.NewInt(100000)
-	minOut := sdktypes.NewInt(100000)
+	maxOut := sdktypes.NewInt(100000)
+	expectedOut := sdktypes.NewInt(99_990)
 
 	retries := uint8(0)
 	forwardMetadata := forwardtypes.PacketMetadata{
@@ -1113,7 +1116,7 @@ func TestSwapAndForward_ForwardFails(t *testing.T) {
 				TokenIn:      chainADenomTrace.IBCDenom(),
 				TokenOut:     chainB.Config().Denom,
 				MaxAmountIn:  swapAmount,
-				MaxAmountOut: minOut,
+				MaxAmountOut: maxOut,
 			},
 			Next: nextJSON,
 		},
@@ -1141,7 +1144,7 @@ func TestSwapAndForward_ForwardFails(t *testing.T) {
 	// Check that the funds are now present in the acc on chainB
 	chainBBalNativeSwap, err := chainB.GetBalance(ctx, chainBAddr, chainB.Config().Denom)
 	require.NoError(t, err)
-	require.Equal(t, chainBBalNative+minOut.Int64(), chainBBalNativeSwap)
+	require.Equal(t, chainBBalNative+expectedOut.Int64(), chainBBalNativeSwap)
 
 	chainBBalIBCSwap, err := chainB.GetBalance(ctx, chainBAddr, chainADenomTrace.IBCDenom())
 	require.NoError(t, err)
