@@ -26,6 +26,34 @@ jobs:
             go tool cover -html=c.out -o /tmp/artifacts/coverage.html
       - store_artifacts:
           path: /tmp/artifacts
+  ictest:
+    working_directory: ~/repo
+    docker:
+      - image: cimg/go:1.19.3
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v4-{{ checksum "go.sum" }}
+      - run:
+          name: Install Dependencies
+          command: go mod download
+      - save_cache:
+          key: go-mod-v4-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
+      - setup_remote_docker:
+          version: 20.10.14
+          docker_layer_caching: true
+      - run:
+          name: Install heighliner
+          command: go install github.com/strangelove-ventures/heighliner
+      - run:
+          name: Build duality docker container
+          command: heighliner build -c duality --local
+      - run:
+          name: Run tests
+          command: cd interchaintest && go test -race -v -run .
   binary-build:
     working_directory: ~/repo
     docker:
@@ -102,6 +130,7 @@ workflows:
   full_test_suite:
     jobs:
       - go-tests
+      - ictest
       - binary-build
   lint:
     jobs:
