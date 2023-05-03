@@ -242,71 +242,6 @@ func (s *TxTestSuite) TestTx2CmdWithdraw() {
 	}
 }
 
-func (s *TxTestSuite) TestTx3CmdSwap() {
-	val := s.network.Validators[0]
-	clientCtx := val.ClientCtx
-	commonFlags := []string{
-		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
-		fmt.Sprintf("--%s=%s", flags.FlagGas, "200000000"),
-		fmt.Sprintf("--%s=%s", flags.FlagFrom, s.network.Validators[0].Address.String()),
-	}
-
-	testCases := []struct {
-		name      string
-		args      []string
-		expErr    bool
-		expErrMsg string
-		errInRes  bool
-	}{
-		{
-			// "swap [receiver] [amount-in] [token-in] [token-out] ?(--max-amount-out)",
-			name:      "missing arguments",
-			args:      []string{s.addr1.String(), "5", "TokenA"},
-			expErr:    true,
-			expErrMsg: "accepts 4 arg(s), received 3",
-		},
-		{
-			name:      "too many arguments",
-			args:      []string{s.addr1.String(), "5", "TokenA", "TokenB", "BADARG"},
-			expErr:    true,
-			expErrMsg: "accepts 4 arg(s), received 5",
-		},
-		{
-			name:     "valid",
-			args:     []string{s.addr1.String(), "2", "TokenA", "TokenB"},
-			errInRes: false,
-		},
-		{
-			name:     "valid with amountOut",
-			args:     []string{s.addr1.String(), "2", "TokenA", "TokenB", "--max-amount-out=10"},
-			errInRes: false,
-		},
-	}
-
-	for _, tc := range testCases {
-		s.Run(tc.name, func() {
-			cmd := dexClient.CmdSwap()
-			args := append(tc.args, commonFlags...)
-			out, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
-			if tc.expErr {
-				require.Error(s.T(), err)
-				require.Contains(s.T(), out.String(), tc.expErrMsg)
-			} else {
-				if tc.errInRes {
-					require.Contains(s.T(), out.String(), tc.expErrMsg)
-				} else {
-					require.NoError(s.T(), err)
-					var res sdk.TxResponse
-					require.NoError(s.T(), clientCtx.Codec.UnmarshalJSON(out.Bytes(), &res))
-					require.Zero(s.T(), res.Code, res.RawLog)
-				}
-			}
-		})
-	}
-}
-
 func (s *TxTestSuite) TestTx4Cmd4PlaceLimitOrder() {
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
@@ -463,8 +398,8 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 	require.NoError(s.T(), err)
 	trancheKey := findTrancheKeyInTx(txBuff.String())
 
-	argsSwap := append([]string{s.network.Validators[0].Address.String(), "30", "TokenA", "TokenB"}, commonFlags...)
-	cmd = dexClient.CmdSwap()
+	argsSwap := append([]string{s.addr1.String(), "TokenA", "TokenB", "0", "30", "IMMEDIATE_OR_CANCEL"}, commonFlags...)
+	cmd = dexClient.CmdPlaceLimitOrder()
 	_, err = cli.ExecTestCLICmd(clientCtx, cmd, argsSwap)
 	require.NoError(s.T(), err)
 

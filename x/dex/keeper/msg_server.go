@@ -81,22 +81,6 @@ func (k msgServer) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (
 	return &types.MsgWithdrawalResponse{}, nil
 }
 
-func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSwapResponse, error) {
-	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
-	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
-
-	if msg.MaxAmountOut.IsNil() {
-		msg.MaxAmountOut = sdk.ZeroInt()
-	}
-	coinOut, err := k.SwapCore(goCtx, msg.TokenIn, msg.TokenOut, msg.MaxAmountIn, msg.MaxAmountOut, callerAddr, receiverAddr)
-	if err != nil {
-		return nil, err
-	}
-
-	// TODO: Inconsistent that this is the only response that returns coins instead of ints
-	return &types.MsgSwapResponse{CoinOut: coinOut}, nil
-}
-
 func (k msgServer) PlaceLimitOrder(
 	goCtx context.Context,
 	msg *types.MsgPlaceLimitOrder,

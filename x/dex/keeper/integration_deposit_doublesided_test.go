@@ -228,9 +228,9 @@ func (s *MsgServerTestSuite) TestDepositValueAccural() {
 	for i := 0; i < 100; i++ {
 		liquidityA, liquidityB := s.getLiquidityAtTick(0, 10)
 		if i%2 == 0 {
-			s.bobMarketSells("TokenB", int(liquidityA.Int64()))
+			s.bobLimitSells("TokenB", 10, int(liquidityA.Int64()), types.LimitOrderType_FILL_OR_KILL)
 		} else {
-			s.bobMarketSells("TokenA", int(liquidityB.Int64()))
+			s.bobLimitSells("TokenA", 10, int(liquidityB.Int64()), types.LimitOrderType_FILL_OR_KILL)
 		}
 	}
 	s.assertLiquidityAtTick(sdk.NewInt(199), sdk.NewInt(1), 0, 10)

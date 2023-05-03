@@ -208,58 +208,6 @@ func (k Keeper) WithdrawCore(
 	return nil
 }
 
-// Handles core logic for the asset 0 to asset1 direction of MsgSwap;
-// faciliates swapping amount0 for some amount of amount1, given a specified pair (token0, token1).
-func (k Keeper) SwapCore(goCtx context.Context,
-	tokenIn string,
-	tokenOut string,
-	maxAmountIn sdk.Int,
-	maxAmountOut sdk.Int,
-	callerAddr sdk.AccAddress,
-	receiverAddr sdk.AccAddress,
-) (coinOut sdk.Coin, err error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	pairID, err := CreatePairIDFromUnsorted(tokenIn, tokenOut)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-
-	coinIn, coinOut, err := k.SwapWithCache(ctx, pairID, tokenIn, tokenOut, maxAmountIn, maxAmountOut, nil)
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-
-	if coinOut.IsZero() {
-		return sdk.Coin{}, types.ErrInsufficientLiquidity
-	}
-
-	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn}); err != nil {
-		return sdk.Coin{}, err
-	}
-
-	err = k.bankKeeper.SendCoinsFromModuleToAccount(
-		ctx,
-		types.ModuleName,
-		receiverAddr,
-		sdk.Coins{coinOut})
-	if err != nil {
-		return sdk.Coin{}, err
-	}
-
-	ctx.EventManager().EmitEvent(types.CreateSwapEvent(
-		callerAddr,
-		receiverAddr,
-		pairID.Token0,
-		pairID.Token1,
-		tokenIn,
-		tokenOut,
-		coinIn.Amount,
-		coinOut.Amount))
-
-	return coinOut, nil
-}
-
 func (k Keeper) MultiHopSwapCore(
 	goCtx context.Context,
 	amountIn sdk.Int,
