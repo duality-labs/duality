@@ -1,47 +1,5 @@
 package keeper_test
 
-func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReachedMaxReached() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(50, 0)
-	// GIVEN
-	// deposit 10 of tokenB
-	s.aliceDeposits(NewDeposit(0, 10, 0, 1))
-	s.assertAliceBalances(50, 40)
-	s.assertDexBalances(0, 10)
-	s.assertPoolLiquidity(0, 10, 0, 1)
-	//
-	// WHEN
-	// swap 20 of tokenA at
-	amountIn := 20
-	s.bobMarketSells("TokenA", amountIn)
-
-	// THEN
-	// swap should have in 11 out 10
-	s.assertBobBalances(39, 10)
-	s.assertDexBalances(11, 0)
-}
-
-func (s *MsgServerTestSuite) TestSwapNoLOPartiallyFilledSlippageToleranceNotReachedMinReached() {
-	s.fundAliceBalances(50, 50)
-	s.fundBobBalances(0, 50)
-	// GIVEN
-	// deposit 10 of token A at tick 0 fee 1
-	s.aliceDeposits(NewDeposit(10, 0, 0, 1))
-	s.assertAliceBalances(40, 50)
-	s.assertDexBalances(10, 0)
-	s.assertPoolLiquidity(10, 0, 0, 1)
-	//
-	// WHEN
-	// swap 20 of token A for B
-	amountIn := 20
-	s.bobMarketSells("TokenB", amountIn)
-
-	// THEN
-	// swap should have in 11 out 10
-	s.assertBobBalances(10, 39)
-	s.assertDexBalances(0, 11)
-}
-
 func (s *MsgServerTestSuite) TestSwapNoLOCorrectExecutionMinFee() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 0)

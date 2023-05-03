@@ -47,26 +47,26 @@ func (s *LiquidityTestSuite) TestSwapNoLiquidity() {
 	// GIVEN
 	// no liqudity of token A (deposit only token B and LO of token B)
 	s.AddDeposit(NewDeposit(0, 10, 0, 1))
-	s.AddGTCLimitOrder("TokenB", 10)
+	s.AddGTCLimitOrder("TokenB", 1000, 10)
 
 	// WHEN
 	// swap 10 of tokenB
 	// THEN
 	// swap should do 0 swap
-	tokenIn, tokenOut := s.Swap("TokenB", "TokenA", 10, 10, nil)
+	tokenIn, tokenOut := s.Swap("TokenB", "TokenA", 10, 0, nil)
 	s.AssertSwapOutput(tokenIn, 0, tokenOut, 0)
 }
 
 func (s *LiquidityTestSuite) TestSwapAToBPartialFillLP() {
 	// GIVEN
-	// 10 tokenB LP
+	// 10 tokenB LP @ tick 0 fee 1
 	s.AddDeposit(NewDeposit(0, 10, 0, 1))
 
 	// WHEN
-	// swap 10 of tokenA
+	// swap 20 of tokenA
 	// THEN
 	// swap should return 11 TokenA in and 10 TokenB out
-	tokenIn, tokenOut := s.Swap("TokenA", "TokenB", 20, 20, nil)
+	tokenIn, tokenOut := s.Swap("TokenA", "TokenB", 20, 0, nil)
 
 	s.Assert().Equal("TokenA", tokenIn.Denom)
 	s.Assert().Equal("TokenB", tokenOut.Denom)
@@ -75,14 +75,14 @@ func (s *LiquidityTestSuite) TestSwapAToBPartialFillLP() {
 
 func (s *LiquidityTestSuite) TestSwapBToAPartialFillLP() {
 	// GIVEN
-	// 10 tokenA LP
+	// 10 tokenA LP @ tick 0 fee 1
 	s.AddDeposit(NewDeposit(10, 0, 0, 1))
 
 	// WHEN
-	// swap 10 of tokenB
+	// swap 20 of tokenB
 	// THEN
 	// swap should return 11 TokenB in and 10 TokenA out
-	tokenIn, tokenOut := s.Swap("TokenB", "TokenA", 20, 20, nil)
+	tokenIn, tokenOut := s.Swap("TokenB", "TokenA", 20, 0, nil)
 
 	s.Assert().Equal("TokenB", tokenIn.Denom)
 	s.Assert().Equal("TokenA", tokenOut.Denom)
@@ -95,10 +95,10 @@ func (s *LiquidityTestSuite) TestSwapAToBFillLP() {
 	s.AddDeposit(NewDeposit(0, 100, 200, 5))
 
 	// WHEN
-	// swap 50 of tokenA
+	// swap 100 of tokenA
 	// THEN
-	// swap should return 10 TokenA in and 9 TokenB out
-	tokenIn, tokenOut := s.Swap("TokenA", "TokenB", 100, 200, nil)
+	// swap should return 100 TokenA in and 97 TokenB out
+	tokenIn, tokenOut := s.Swap("TokenA", "TokenB", 100, 0, nil)
 
 	s.Assert().Equal("TokenA", tokenIn.Denom)
 	s.Assert().Equal("TokenB", tokenOut.Denom)
@@ -107,18 +107,69 @@ func (s *LiquidityTestSuite) TestSwapAToBFillLP() {
 
 func (s *LiquidityTestSuite) TestSwapBToAFillLP() {
 	// GIVEN
-	// 10 tokenA LP @ tick -2000 fee 1
+	// 100 tokenA LP @ tick -20000 fee 1
 	s.AddDeposit(NewDeposit(100, 0, -20000, 1))
 
 	// WHEN
-	// swap 10 of tokenB
+	// swap 100 of tokenB
 	// THEN
-	// swap should return 10 TokenA in and 9 TokenB out
-	tokenIn, tokenOut := s.Swap("TokenB", "TokenA", 100, 200, nil)
+	// swap should return 97 TokenA in and 13 TokenB out
+	tokenIn, tokenOut := s.Swap("TokenB", "TokenA", 100, 0, nil)
 
 	s.Assert().Equal("TokenB", tokenIn.Denom)
 	s.Assert().Equal("TokenA", tokenOut.Denom)
-	s.AssertSwapOutput(tokenIn, 100, tokenOut, 81)
+	// NOTE: Given rounding for amountOut, amountIn does not use the full maxAmount
+	s.AssertSwapOutput(tokenIn, 97, tokenOut, 13)
+}
+
+func (s *LiquidityTestSuite) TestSwapAToBFillLPHighFee() {
+	// GIVEN
+	// 100 tokenB LP @ tick 20,000 fee 1000
+	s.AddDeposit(NewDeposit(0, 100, 20000, 1000))
+
+	// WHEN
+	// swap 100 of tokenA
+	// THEN
+	// swap should return 98 TokenA in and 12 TokenB out
+	tokenIn, tokenOut := s.Swap("TokenA", "TokenB", 100, 0, nil)
+
+	s.Assert().Equal("TokenA", tokenIn.Denom)
+	s.Assert().Equal("TokenB", tokenOut.Denom)
+	s.AssertSwapOutput(tokenIn, 98, tokenOut, 12)
+}
+
+func (s *LiquidityTestSuite) TestSwapBToAFillLPHighFee() {
+	// GIVEN
+	// 1000 tokenA LP @ tick 20000 fee 1000
+	s.AddDeposit(NewDeposit(1000, 0, 20000, 1000))
+
+	// WHEN
+	// swap 100 of tokenB
+	// THEN
+	// swap should return 100 TokenB in and 668 TokenA out
+	tokenIn, tokenOut := s.Swap("TokenB", "TokenA", 100, 0, nil)
+
+	s.Assert().Equal("TokenB", tokenIn.Denom)
+	s.Assert().Equal("TokenA", tokenOut.Denom)
+	s.AssertSwapOutput(tokenIn, 100, tokenOut, 668)
+}
+
+// swap multi LP
+
+func (s *LiquidityTestSuite) TestSwapAToBPartialFillLO() {
+	// GIVEN
+	// 10 tokenB LO @ tick 1000
+	s.AddGTCLimitOrder("TokenB", 10, 1000)
+
+	// WHEN
+	// swap 20 of tokenA
+	// THEN
+	// swap should return 11 TokenA in and 9 TokenB out
+	tokenIn, tokenOut := s.Swap("TokenA", "TokenB", 20, 0, nil)
+
+	s.Assert().Equal("TokenA", tokenIn.Denom)
+	s.Assert().Equal("TokenB", tokenOut.Denom)
+	s.AssertSwapOutput(tokenIn, 11, tokenOut, 9)
 }
 
 // Test helpers ///////////////////////////////////////////////////////////////
@@ -137,9 +188,10 @@ func (s *LiquidityTestSuite) AddDeposits(deposits ...*Deposit) {
 	}
 }
 
-func (s *LiquidityTestSuite) AddGTCLimitOrder(tokenIn string, tickIndex int64) {
+func (s *LiquidityTestSuite) AddGTCLimitOrder(tokenIn string, amountIn int64, tickIndex int64) {
 	tranche, err := s.app.DexKeeper.GetOrInitPlaceTranche(s.ctx, defaultPairID, tokenIn, tickIndex, nil, types.LimitOrderType_GOOD_TIL_CANCELLED)
 	s.Assert().NoError(err)
+	tranche.PlaceMakerLimitOrder(sdk.NewInt(amountIn))
 	s.app.DexKeeper.SaveTranche(s.ctx, tranche)
 }
 
