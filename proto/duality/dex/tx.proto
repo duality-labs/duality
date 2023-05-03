@@ -11,7 +11,6 @@ import "google/protobuf/timestamp.proto";
 service Msg {
   rpc Deposit(MsgDeposit) returns (MsgDepositResponse);
   rpc Withdrawal(MsgWithdrawal) returns (MsgWithdrawalResponse);
-  rpc Swap(MsgSwap) returns (MsgSwapResponse);
   rpc PlaceLimitOrder(MsgPlaceLimitOrder) returns (MsgPlaceLimitOrderResponse);
   rpc WithdrawFilledLimitOrder(MsgWithdrawFilledLimitOrder) returns (MsgWithdrawFilledLimitOrderResponse);
   rpc CancelLimitOrder(MsgCancelLimitOrder) returns (MsgCancelLimitOrderResponse);
@@ -77,36 +76,6 @@ message MsgWithdrawal {
 }
 
 message MsgWithdrawalResponse {
-}
-
-message MsgSwap {
-  string creator = 1;
-  string receiver = 2;
-  string tokenIn = 3;
-  string tokenOut = 4;
-  string maxAmountIn = 5 [
-      (gogoproto.moretags)   = "yaml:\"maxAmountIn\"",
-      (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-      (gogoproto.nullable)   = false,
-      (gogoproto.jsontag) = "amountIn"
-  ];
-  // Optional argument to specify a specific amount out for a trade.
-  // swap will stop as soon as amountOut is reached.
-  string maxAmountOut = 6 [
-                        (gogoproto.moretags)   = "yaml:\"maxAmountOut\"",
-                        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-                        (gogoproto.nullable)   = false,
-                        (gogoproto.jsontag) = "maxAmountOut"
-                        ];
-
-}
-
-message MsgSwapResponse {
-   cosmos.base.v1beta1.Coin coinOut = 1 [
-    (gogoproto.nullable) = false,
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
-    (gogoproto.jsontag) = "coinOut"
-  ];
 }
 
 enum LimitOrderType{

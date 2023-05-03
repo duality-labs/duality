@@ -38206,21 +38206,6 @@ definitions:
     properties:
       trancheKey:
         type: string
-  dualitylabs.duality.dex.MsgSwapResponse:
-    type: object
-    properties:
-      coinOut:
-        type: object
-        properties:
-          denom:
-            type: string
-          amount:
-            type: string
-        description: |-
-          Coin defines a token with a denomination and an amount.
-
-          NOTE: The amount field is an Int which implements the custom method
-          signatures required by gogoproto.
   dualitylabs.duality.dex.MsgWithdrawFilledLimitOrderResponse:
     type: object
   dualitylabs.duality.dex.MsgWithdrawalResponse:
