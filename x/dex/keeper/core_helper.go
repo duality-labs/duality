@@ -157,22 +157,6 @@ func (k Keeper) GetCurrTick0To1(ctx sdk.Context, pairID *types.PairID) (tickIdx 
 	return math.MaxInt64, false
 }
 
-func (k Keeper) IsBehindEnemyLines(ctx sdk.Context, pairID *types.PairID, tokenIn string, tickIndex int64) bool {
-	if tokenIn == pairID.Token0 {
-		curr0To1, _ := k.GetCurrTick0To1(ctx, pairID)
-		if tickIndex >= curr0To1 {
-			return true
-		}
-	} else {
-		curr1To0, _ := k.GetCurrTick1To0(ctx, pairID)
-		if tickIndex <= curr1To0 {
-			return true
-		}
-	}
-
-	return false
-}
-
 func CalcAmountAsToken0(amount0, amount1 sdk.Int, price1To0 types.Price) sdk.Dec {
 	amount0Dec := amount0.ToDec()
 

@@ -145,13 +145,13 @@ func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedAtooMuchTick0() {
 	s.fundAliceBalances(50, 50)
 	s.fundBobBalances(50, 50)
 	// CASE
-	// Alice deposits 10 of B and 5 of Aat tick 0, fee tier 0
+	// Alice deposits 5 of A and 10 of B at tick 0, fee tier 0
 	// Bob tries to deposit 10 of A and 10 of B
 	// Thus Bob should only end up depositing 5 of A and 10 of B
 	// Alice then withdraws
 	// David then withdraws
 
-	s.aliceDeposits(NewDeposit(5, 10, 0, 1))
+	s.aliceDepositsWithOptions(NewDepositWithOptions(5, 10, 0, 1, DepositOptions{DisableAutoswap: true}))
 
 	s.assertAliceBalances(45, 40)
 	s.assertBobBalances(50, 50)
@@ -159,7 +159,7 @@ func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedAtooMuchTick0() {
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(1)
 
-	s.bobDeposits(NewDeposit(10, 10, 0, 1))
+	s.bobDepositsWithOptions(NewDepositWithOptions(10, 10, 0, 1, DepositOptions{DisableAutoswap: true}))
 
 	s.assertAliceBalances(45, 40)
 	s.assertBobBalances(45, 40)
@@ -194,7 +194,7 @@ func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedBtooMuchTick0() {
 	// Alice then withdraws
 	// David then withdraws
 
-	s.aliceDeposits(NewDeposit(10, 5, 0, 1))
+	s.aliceDepositsWithOptions(NewDepositWithOptions(10, 5, 0, 1, DepositOptions{DisableAutoswap: true}))
 
 	s.assertAliceBalances(40, 45)
 	s.assertBobBalances(50, 50)
@@ -202,7 +202,7 @@ func (s *MsgServerTestSuite) TestTwoFullDoubleSidedRebalancedBtooMuchTick0() {
 	s.assertCurr1To0(-1)
 	s.assertCurr0To1(1)
 
-	s.bobDeposits(NewDeposit(10, 10, 0, 1))
+	s.bobDepositsWithOptions(NewDepositWithOptions(10, 10, 0, 1, DepositOptions{DisableAutoswap: true}))
 
 	s.assertAliceBalances(40, 45)
 	s.assertBobBalances(40, 45)

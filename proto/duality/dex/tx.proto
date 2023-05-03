@@ -20,7 +20,7 @@ service Msg {
 }
 
 message DepositOptions {
-  bool autoswap = 1; 
+  bool disable_autoswap = 1; 
 }
 
 message MsgDeposit {
