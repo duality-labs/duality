@@ -31,8 +31,6 @@ func TestSwapAndForward_Success(t *testing.T) {
 		t.Skip()
 	}
 
-	t.Parallel()
-
 	// Create chain factory
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
 		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
@@ -294,8 +292,6 @@ func TestSwapAndForward_MultiHopSuccess(t *testing.T) {
 	if testing.Short() {
 		t.Skip()
 	}
-
-	t.Parallel()
 
 	// Create chain factory
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
@@ -592,8 +588,6 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 	if testing.Short() {
 		t.Skip()
 	}
-
-	t.Parallel()
 
 	// Create chain factory
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
@@ -897,8 +891,6 @@ func TestSwapAndForward_ForwardFails(t *testing.T) {
 	if testing.Short() {
 		t.Skip()
 	}
-
-	t.Parallel()
 
 	// Create chain factory
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{

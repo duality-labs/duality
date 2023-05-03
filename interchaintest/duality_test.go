@@ -66,8 +66,6 @@ func TestDualityConsumerChainStart(t *testing.T) {
 		t.Skip()
 	}
 
-	t.Parallel()
-
 	// Create chain factory with Duality and Cosmos Hub
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
 		{Name: "duality", ChainConfig: chainCfg},
