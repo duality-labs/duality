@@ -371,5 +371,6 @@ func (s *MsgServerTestSuite) TestSwapNoLOMaxAmountOutNotUsedMultiTick() {
 
 	// THEN
 	// bob gets 15 out
-	s.assertBobBalances(31, 15)
+	// NOTE: Due to rounding, only 18 is used for the amountIn
+	s.assertBobBalances(32, 15)
 }
