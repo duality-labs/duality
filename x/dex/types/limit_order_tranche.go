@@ -113,11 +113,8 @@ func (t *LimitOrderTranche) Swap(maxAmountTakerIn sdk.Int, maxAmountOut sdk.Int)
 		possibleOutAmounts = append(possibleOutAmounts, maxAmountOut)
 	}
 	outAmount = utils.MinIntArr(possibleOutAmounts)
-	if outAmount == maxOutGivenIn {
-		inAmount = maxAmountTakerIn
-	} else {
-		inAmount = t.PriceMakerToTaker().MulInt(outAmount).Ceil().TruncateInt()
-	}
+
+	inAmount = t.PriceMakerToTaker().MulInt(outAmount).Ceil().TruncateInt()
 
 	*fillTokenIn = fillTokenIn.Add(inAmount)
 	*totalTokenIn = totalTokenIn.Add(inAmount)
