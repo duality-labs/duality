@@ -182,7 +182,7 @@ func (s *MsgServerTestSuite) TestCancelPartiallyFilled() {
 	// GIVEN alice limit sells 50 TokenA
 	trancheKey := s.aliceLimitSells("TokenA", 0, 50)
 	// Bob swaps 25 TokenB for TokenA
-	s.bobMarketSells("TokenB", 25)
+	s.bobLimitSells("TokenB", 10, 25, types.LimitOrderType_FILL_OR_KILL)
 
 	s.assertDexBalances(25, 25)
 	s.assertAliceBalances(0, 0)
@@ -204,7 +204,7 @@ func (s *MsgServerTestSuite) TestCancelPartiallyFilledMultiUser() {
 	trancheKey := s.aliceLimitSells("TokenA", 0, 50)
 	s.carolLimitSells("TokenA", 0, 100)
 	// Bob swaps 25 TokenB for TokenA
-	s.bobMarketSells("TokenB", 25)
+	s.bobLimitSells("TokenB", 10, 25, types.LimitOrderType_FILL_OR_KILL)
 
 	s.assertLimitLiquidityAtTick("TokenA", 0, 125)
 	s.assertDexBalances(125, 25)

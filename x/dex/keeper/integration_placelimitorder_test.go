@@ -307,7 +307,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderPartiallyFilledLOPlaceLOIncremen
 	// GIVEN
 	// partially filled limit order exists on tick -1
 	trancheKey0 := s.aliceLimitSells("TokenA", -1, 10)
-	s.bobMarketSells("TokenB", 5)
+	s.bobLimitSells("TokenB", 10, 5, types.LimitOrderType_FILL_OR_KILL)
 	s.assertFillAndPlaceTrancheKeys("TokenA", -1, trancheKey0, "")
 
 	// WHEN
@@ -326,7 +326,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFilledLOPlaceLODoesntIncrementsP
 	// GIVEN
 	// filled LO with partially filled place tranche
 	trancheKey0 := s.aliceLimitSells("TokenA", -1, 10)
-	s.bobMarketSells("TokenB", 10)
+	s.bobLimitSells("TokenB", 10, 10, types.LimitOrderType_FILL_OR_KILL)
 	trancheKey1 := s.aliceLimitSells("TokenA", -1, 10)
 	s.assertFillAndPlaceTrancheKeys("TokenA", -1, trancheKey0, trancheKey1)
 
@@ -365,7 +365,7 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertDexBalances(0, 50)
 	s.assertCurrentTicks(math.MinInt64, 0)
 
-	s.bobMarketSells("TokenA", 10)
+	s.bobLimitSells("TokenA", 10, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
 
 	s.assertAliceBalances(100, 50)
 	s.assertBobBalances(90, 110)
@@ -386,7 +386,7 @@ func (s *MsgServerTestSuite) TestLimitOrderPartialFillDepositCancel() {
 	s.assertDexBalances(10, 50)
 	s.assertCurrentTicks(math.MinInt64, 0)
 
-	s.bobMarketSells("TokenA", 10)
+	s.bobLimitSells("TokenA", 10, 10, types.LimitOrderType_FILL_OR_KILL)
 
 	s.assertAliceBalances(100, 40)
 	s.assertBobBalances(80, 120)
@@ -475,7 +475,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCNoLiq() {
 
 	// THEN alice's LimitOrder is not filled
 	s.assertDexBalances(0, 0)
-	s.assertAliceBalances(10, 10)
+	s.assertAliceBalances(10, 0)
 
 	// No maker LO is placed
 	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
@@ -544,7 +544,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderJITFills() {
 	s.assertAliceBalances(0, 0)
 
 	// WHEN bob swaps through all the liquidity
-	s.bobMarketSells("TokenB", 10)
+	s.bobLimitSells("TokenB", 10, 10, types.LimitOrderType_FILL_OR_KILL)
 
 	// THEN all liquidity is depleted
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
@@ -565,7 +565,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderJITBehindEnemyLines() {
 	s.assertLimitLiquidityAtTick("TokenA", 1, 10)
 	s.assertAliceBalances(0, 0)
 	// AND bob swaps through all the liquidity
-	s.bobMarketSells("TokenB", 10)
+	s.bobLimitSells("TokenB", 10, 10, types.LimitOrderType_FILL_OR_KILL)
 
 	// THEN all liquidity is depleted
 	s.assertLimitLiquidityAtTick("TokenA", 1, 0)
@@ -588,7 +588,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderJITNextBlock() {
 	s.app.EndBlock(abci.RequestEndBlock{Height: 0})
 
 	// THEN there is no liquidity available
-	s.bobMarketSellFails(types.ErrInsufficientLiquidity, "TokenB", 10)
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
 	// Alice can withdraw the entirety of the unfilled limitOrder
 	s.aliceWithdrawsLimitSell(trancheKey)
@@ -607,7 +606,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilFills() {
 	s.assertAliceBalances(0, 0)
 
 	// WHEN bob swaps through all the liquidity
-	s.bobMarketSells("TokenB", 10)
+	s.bobLimitSells("TokenB", 10, 10, types.LimitOrderType_FILL_OR_KILL)
 
 	// THEN all liquidity is depleted
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
@@ -629,7 +628,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilExpires() {
 	s.nextBlockWithTime(time.Now().AddDate(0, 0, 2))
 	s.app.EndBlock(abci.RequestEndBlock{Height: 0})
 	// THEN there is no liquidity available
-	s.bobMarketSellFails(types.ErrInsufficientLiquidity, "TokenB", 10)
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
 	// Alice can withdraw the entirety of the unfilled limitOrder
 	s.aliceWithdrawsLimitSell(trancheKey)
@@ -651,7 +649,6 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilExpiresNotPurged() {
 	s.nextBlockWithTime(time.Now().AddDate(0, 0, 2))
 
 	// THEN there is no liquidity available
-	s.bobMarketSellFails(types.ErrInsufficientLiquidity, "TokenB", 10)
 	s.assertLimitLiquidityAtTick("TokenA", 0, 0)
 	// Alice can cancel the entirety of the unfilled limitOrder
 	s.aliceCancelsLimitSell(trancheKey)

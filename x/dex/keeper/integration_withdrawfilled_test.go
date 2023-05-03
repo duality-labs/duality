@@ -22,7 +22,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledSimpleFull() {
 	s.assertCurr1To0(0)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.bobMarketSells("TokenB", 10)
+	s.bobLimitSells("TokenB", 10, 10, types.LimitOrderType_FILL_OR_KILL)
 
 	s.assertAliceBalances(40, 50)
 	s.assertBobBalances(60, 40)
@@ -52,7 +52,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledPartial() {
 	trancheKey := s.aliceLimitSells("TokenB", 0, 50)
 	s.assertAliceLimitLiquidityAtTick("TokenB", 50, 0)
 	// bob market sells 10 A
-	s.bobMarketSells("TokenA", 10)
+	s.bobLimitSells("TokenA", 10, 10, types.LimitOrderType_FILL_OR_KILL)
 	// alice has 10 A filled
 	s.assertAliceLimitFilledAtTickAtIndex("TokenB", 10, 0, trancheKey)
 	// balances are 50, 100 for alice and 90, 100 for bob
@@ -95,7 +95,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.assertCurr1To0(0)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.bobMarketSells("TokenB", 10)
+	s.bobLimitSells("TokenB", 10, 10, types.LimitOrderType_FILL_OR_KILL)
 
 	s.assertAliceBalances(40, 50)
 	s.assertBobBalances(60, 40)
@@ -112,7 +112,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.assertCurr1To0(0)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.bobMarketSells("TokenB", 10)
+	s.bobLimitSells("TokenB", 10, 10, types.LimitOrderType_FILL_OR_KILL)
 
 	s.assertAliceBalances(30, 60)
 	s.assertBobBalances(70, 30)
@@ -147,7 +147,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullDifferentDirection() {
 	s.assertCurr1To0(0)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.bobMarketSells("TokenB", 10)
+	s.bobLimitSells("TokenB", 0, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
 
 	s.assertAliceBalances(40, 50)
 	s.assertBobBalances(60, 40)
@@ -164,7 +164,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullDifferentDirection() {
 	s.assertCurr1To0(math.MinInt64)
 	s.assertCurr0To1(0)
 
-	s.bobMarketSells("TokenA", 10)
+	s.bobLimitSells("TokenA", 10, 10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
 
 	s.assertAliceBalances(40, 50)
 	s.assertBobBalances(50, 50)
