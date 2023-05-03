@@ -97,8 +97,9 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedHalfInSpreadCurrTick1To0Adjus
 	s.assertCurr0To1(4)
 }
 
-func (s *MsgServerTestSuite) TestDepositDoubleSidedBelowEnemyLines() {
+func (s *MsgServerTestSuite) TestDepositDoubleSidedCreatingArbBelow() {
 	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 50)
 
 	// GIVEN
 	// deposit 10 of token A at tick 0 fee 1
@@ -110,14 +111,17 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedBelowEnemyLines() {
 	// WHEN
 	// depositing below enemy lines at tick -5
 	// THEN
-	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
+	// deposit should not fail with BEL error, balances and liquidity should not change at deposited tick
 
-	err := types.ErrDepositBehindPairLiquidity
-	s.assertAliceDepositFails(err, NewDeposit(10, 10, -5, 1))
+	s.aliceDeposits(NewDeposit(10, 10, -5, 1))
+
+	// buying liquidity behind enemy lines doesn't break anything
+	s.bobLimitSells("TokenA", 0, 10, types.LimitOrderType_FILL_OR_KILL)
 }
 
-func (s *MsgServerTestSuite) TestDepositDoubleSidedAboveEnemyLines() {
+func (s *MsgServerTestSuite) TestDepositDoubleSidedCreatingArbAbove() {
 	s.fundAliceBalances(50, 50)
+	s.fundBobBalances(50, 50)
 
 	// GIVEN
 	// deposit 10 of token A at tick 0 fee 1
@@ -129,10 +133,12 @@ func (s *MsgServerTestSuite) TestDepositDoubleSidedAboveEnemyLines() {
 	// WHEN
 	// depositing above enemy lines at tick 5
 	// THEN
-	// deposit should fail with BEL error, balances and liquidity should not change at deposited tick
+	// deposit should not fail with BEL error, balances and liquidity should not change at deposited tick
 
-	err := types.ErrDepositBehindPairLiquidity
-	s.assertAliceDepositFails(err, NewDeposit(10, 10, 5, 1))
+	s.aliceDeposits(NewDeposit(10, 10, 5, 1))
+
+	// buying liquidity behind enemy lines doesn't break anything
+	s.bobLimitSells("TokenB", 0, 10, types.LimitOrderType_FILL_OR_KILL)
 }
 
 func (s *MsgServerTestSuite) TestDepositDoubleSidedFirstSharesMintedTotal() {
@@ -235,8 +241,8 @@ func (s *MsgServerTestSuite) TestDepositValueAccural() {
 	s.assertCarolShares(0, 10, 50)
 
 	s.aliceWithdraws(NewWithdrawal(100, 0, 10))
-	s.assertAliceBalances(199, 0)
+	s.assertAliceBalances(199, 1)
 
 	s.carolWithdraws(NewWithdrawal(50, 0, 10))
-	s.assertCarolBalances(100, 2)
+	s.assertCarolBalances(100, 1)
 }

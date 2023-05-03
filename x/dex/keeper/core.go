@@ -45,20 +45,7 @@ func (k Keeper) DepositCore(
 		amount1 := amounts1[i]
 		tickIndex := tickIndices[i]
 		fee := fees[i]
-		autoswap := options[i].Autoswap
-
-		feeUInt := utils.MustSafeUint64(fee)
-		lowerTickIndex := tickIndex - feeUInt
-		upperTickIndex := tickIndex + feeUInt
-		// behind enemy lines checks
-		// TODO: Allow user to deposit "behind enemy lines"
-		if amount0.IsPositive() && k.IsBehindEnemyLines(ctx, pairID, pairID.Token0, lowerTickIndex) {
-			return nil, nil, nil, types.ErrDepositBehindPairLiquidity
-		}
-		// TODO: Allow user to deposit "behind enemy lines"
-		if amount1.IsPositive() && k.IsBehindEnemyLines(ctx, pairID, pairID.Token1, upperTickIndex) {
-			return nil, nil, nil, types.ErrDepositBehindPairLiquidity
-		}
+		autoswap := !options[i].DisableAutoswap
 
 		pool, err := k.GetOrInitPool(
 			ctx,
