@@ -99,7 +99,7 @@ func (k msgServer) PlaceLimitOrder(
 	if err != nil {
 		return &types.MsgPlaceLimitOrderResponse{}, err
 	}
-	trancheKey, err := k.PlaceLimitOrderCore(
+	trancheKey, coinIn, coinOutSwap, err := k.PlaceLimitOrderCore(
 		goCtx,
 		msg.TokenIn,
 		msg.TokenOut,
@@ -114,7 +114,11 @@ func (k msgServer) PlaceLimitOrder(
 		return &types.MsgPlaceLimitOrderResponse{}, err
 	}
 
-	return &types.MsgPlaceLimitOrderResponse{TrancheKey: *trancheKey}, nil
+	return &types.MsgPlaceLimitOrderResponse{
+		TrancheKey:   *trancheKey,
+		CoinIn:       coinIn,
+		TakerCoinOut: coinOutSwap,
+	}, nil
 }
 
 func (k msgServer) WithdrawFilledLimitOrder(

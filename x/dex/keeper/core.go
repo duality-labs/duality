@@ -288,17 +288,17 @@ func (k Keeper) PlaceLimitOrderCore(
 	goodTil *time.Time,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
-) (trancheKeyP *string, err error) {
+) (trancheKeyP *string, coinIn sdk.Coin, coinOutSwap sdk.Coin, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	pairID, err := CreatePairIDFromUnsorted(tokenIn, tokenOut)
 	if err != nil {
-		return nil, err
+		return nil, coinIn, coinOutSwap, err
 	}
 
 	placeTranche, err := k.GetOrInitPlaceTranche(ctx, pairID, tokenIn, tickIndex, goodTil, orderType)
 	if err != nil {
-		return nil, err
+		return nil, coinIn, coinOutSwap, err
 	}
 
 	trancheKey := placeTranche.TrancheKey
@@ -313,10 +313,12 @@ func (k Keeper) PlaceLimitOrderCore(
 	)
 
 	amountLeft, totalIn := amountIn, sdk.ZeroInt()
+
 	// For everything except just-in-time (JIT) orders try to execute as a swap first
 	if !orderType.IsJIT() {
 		limitPrice := placeTranche.PriceMakerToTaker().ToDec()
-		coinInSwap, coinOutSwap, err := k.SwapWithCache(
+		var coinInSwap sdk.Coin
+		coinInSwap, coinOutSwap, err = k.SwapWithCache(
 			ctx,
 			pairID,
 			tokenIn,
@@ -326,7 +328,7 @@ func (k Keeper) PlaceLimitOrderCore(
 			&limitPrice,
 		)
 		if err != nil {
-			return nil, err
+			return nil, coinIn, coinOutSwap, err
 		}
 
 		totalIn = coinInSwap.Amount
@@ -340,13 +342,13 @@ func (k Keeper) PlaceLimitOrderCore(
 				sdk.Coins{coinOutSwap},
 			)
 			if err != nil {
-				return nil, err
+				return nil, coinIn, coinOutSwap, err
 			}
 		}
 	}
 
 	if amountLeft.IsPositive() && orderType.IsFoK() {
-		return nil, types.ErrFoKLimitOrderNotFilled
+		return nil, coinIn, coinOutSwap, types.ErrFoKLimitOrderNotFilled
 	}
 
 	sharesIssued := sdk.ZeroInt()
@@ -370,11 +372,11 @@ func (k Keeper) PlaceLimitOrderCore(
 	k.SaveTrancheUser(ctx, trancheUser)
 
 	if totalIn.IsPositive() {
-		coinIn := sdk.NewCoin(tokenIn, totalIn)
+		coinIn = sdk.NewCoin(tokenIn, totalIn)
 
 		err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, callerAddr, types.ModuleName, sdk.Coins{coinIn})
 		if err != nil {
-			return nil, err
+			return nil, coinIn, coinOutSwap, err
 		}
 	}
 
@@ -392,7 +394,7 @@ func (k Keeper) PlaceLimitOrderCore(
 		trancheKey,
 	))
 
-	return &trancheKey, nil
+	return &trancheKey, coinIn, coinOutSwap, nil
 }
 
 // Handles MsgCancelLimitOrder, removing a specified number of shares from a limit order
