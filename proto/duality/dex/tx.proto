@@ -110,18 +110,20 @@ message MsgPlaceLimitOrderResponse {
   string trancheKey = 1;
   // Total amount of coin used for the limit order
   cosmos.base.v1beta1.Coin coinIn = 2 [
-                                             (gogoproto.nullable) = false,
-                                             (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
-                                             (gogoproto.jsontag) = "coinIn"
-                                             ];
+                                       (gogoproto.moretags)   = "yaml:\"coinIn\"",
+                                       (gogoproto.nullable) = false,
+                                       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+                                       (gogoproto.jsontag) = "coinIn"
+                                       ];
   // Total amount of coin received from the taker portion of the limit order
   // This is the amount of coin immediately available in the users account after executing the
   // limit order. It does not include any future proceeds from the maker portion which will have withdrawn in the future
   cosmos.base.v1beta1.Coin takerCoinOut = 3 [
-                                        (gogoproto.nullable) = false,
-                                        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
-                                        (gogoproto.jsontag) = "coinOut"
-                                        ];
+                                             (gogoproto.moretags)   = "yaml:\"takerCoinOut\"",
+                                             (gogoproto.nullable) = false,
+                                             (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+                                             (gogoproto.jsontag) = "takerCoinOut"
+                                             ];
 
 }
 
