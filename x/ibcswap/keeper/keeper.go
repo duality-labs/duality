@@ -50,7 +50,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 }
 
 // Swap calls into the base app's msg service router so that the appropriate handler is called when sending the swap msg.
-func (k Keeper) Swap(ctx sdk.Context, msg *dextypes.MsgSwap) (*dextypes.MsgSwapResponse, error) {
+func (k Keeper) Swap(ctx sdk.Context, msg *dextypes.MsgPlaceLimitOrder) (*dextypes.MsgPlaceLimitOrderResponse, error) {
 	swapHandler := k.msgServiceRouter.Handler(msg)
 	if swapHandler == nil {
 		return nil, sdkerrors.Wrap(types.ErrMsgHandlerInvalid, fmt.Sprintf("could not find the handler for %T", msg))
@@ -61,7 +61,7 @@ func (k Keeper) Swap(ctx sdk.Context, msg *dextypes.MsgSwap) (*dextypes.MsgSwapR
 		return nil, err
 	}
 
-	msgSwapRes := &dextypes.MsgSwapResponse{}
+	msgSwapRes := &dextypes.MsgPlaceLimitOrderResponse{}
 	if err := proto.Unmarshal(res.Data, msgSwapRes); err != nil {
 		return nil, err
 	}

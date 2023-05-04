@@ -139,7 +139,7 @@ func (im IBCMiddleware) OnRecvPacket(
 	}
 
 	// Attempt to perform a swap since this packets memo included swap metadata.
-	res, err := im.keeper.Swap(ctx, metadata.MsgSwap)
+	res, err := im.keeper.Swap(ctx, metadata.MsgPlaceLimitOrder)
 	if err != nil {
 		return im.handleFailedSwap(ctx, packet, data, metadata, err)
 	}
@@ -162,7 +162,7 @@ func (im IBCMiddleware) OnRecvPacket(
 	data.Denom = res.CoinOut.Denom
 	data.Amount = res.CoinOut.Amount.String()
 
-	// After a successful swap funds are now in the receiver account from the MsgSwap so,
+	// After a successful swap funds are now in the receiver account from the MsgPlaceLimitOrder so,
 	// we need to override the packets receiver field before invoking the forward middlewares OnRecvPacket.
 	data.Receiver = m.Swap.Receiver
 

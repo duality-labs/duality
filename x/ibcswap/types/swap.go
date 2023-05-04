@@ -19,7 +19,7 @@ type PacketMetadata struct {
 // transfer packet. The next field is a string so that you can nest any arbitrary metadata to be handled
 // further in the middleware stack or on the counterparty.
 type SwapMetadata struct {
-	*dextypes.MsgSwap
+	*dextypes.MsgPlaceLimitOrder
 	NonRefundable bool   `json:"non-refundable,omitempty"`
 	RefundAddress string `json:"refund-address,omitempty"`
 
