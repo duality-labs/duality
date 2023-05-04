@@ -38245,6 +38245,40 @@ definitions:
     properties:
       trancheKey:
         type: string
+      coinIn:
+        type: object
+        properties:
+          denom:
+            type: string
+          amount:
+            type: string
+        description: |-
+          Coin defines a token with a denomination and an amount.
+
+          NOTE: The amount field is an Int which implements the custom method
+          signatures required by gogoproto.
+        title: Total amount of coin used for the limit order
+      takerCoinOut:
+        type: object
+        properties:
+          denom:
+            type: string
+          amount:
+            type: string
+        description: |-
+          Coin defines a token with a denomination and an amount.
+
+          NOTE: The amount field is an Int which implements the custom method
+          signatures required by gogoproto.
+        title: >-
+          Total amount of coin received from the taker portion of the limit
+          order
+
+          This is the amount of coin immediately available in the users account
+          after executing the
+
+          limit order. It does not include any future proceeds from the maker
+          portion which will have withdrawn in the future
   dualitylabs.duality.dex.MsgWithdrawFilledLimitOrderResponse:
     type: object
   dualitylabs.duality.dex.MsgWithdrawalResponse:
