@@ -159,8 +159,8 @@ func (im IBCMiddleware) OnRecvPacket(
 	data.Memo = string(memoBz)
 
 	// Override the packet data to include the token denom and amount that was received from the swap.
-	data.Denom = res.CoinOut.Denom
-	data.Amount = res.CoinOut.Amount.String()
+	data.Denom = res.TakerCoinOut.Denom
+	data.Amount = res.TakerCoinOut.Amount.String()
 
 	// After a successful swap funds are now in the receiver account from the MsgPlaceLimitOrder so,
 	// we need to override the packets receiver field before invoking the forward middlewares OnRecvPacket.
@@ -238,8 +238,11 @@ func (im IBCMiddleware) handleFailedSwap(
 		"receiver", metadata.Receiver,
 		"tokenIn", metadata.TokenIn,
 		"tokenOut", metadata.TokenOut,
-		"maxAmountIn", metadata.MaxAmountIn,
-		"maxAmountOut", metadata.MaxAmountOut,
+		"AmountIn", metadata.AmountIn,
+		"TickIndex", metadata.TickIndex,
+		"OrderType", metadata.OrderType,
+		// TODO: enable soon
+		// "maxAmountOut", metadata.MaxAmountOut,
 		"refundable", metadata.NonRefundable,
 		"refund address", metadata.RefundAddress,
 	)

@@ -31,7 +31,8 @@ func TestIBCSwapMiddleware_Success(t *testing.T) {
 	// Create chain factory with Duality and Cosmos Hub
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
 		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
-		{Name: "duality", ChainConfig: chainCfg}},
+		{Name: "duality", ChainConfig: chainCfg},
+	},
 	)
 
 	// Get both chains from the chain factory
@@ -187,18 +188,20 @@ func TestIBCSwapMiddleware_Success(t *testing.T) {
 	require.Equal(t, chainBOrigBalNative-depositAmount.Int64(), chainBBalNative)
 
 	swapAmount := sdktypes.NewInt(100000)
-	minOut := sdktypes.NewInt(100000)
 	expectedOut := sdktypes.NewInt(99_990)
 
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
-			MsgSwap: &types.MsgSwap{
-				Creator:      chainBAddr,
-				Receiver:     chainBAddr,
-				TokenIn:      chainADenomTrace.IBCDenom(),
-				TokenOut:     chainB.Config().Denom,
-				MaxAmountIn:  swapAmount,
-				MaxAmountOut: minOut,
+			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
+				Creator:   chainBAddr,
+				Receiver:  chainBAddr,
+				TokenIn:   chainADenomTrace.IBCDenom(),
+				TokenOut:  chainB.Config().Denom,
+				AmountIn:  swapAmount,
+				TickIndex: 0,
+				OrderType: types.LimitOrderType_IMMEDIATE_OR_CANCEL,
+				// TODO: enable soon
+				// MaxAmountOut: minOut,
 			},
 			Next: nil,
 		},
@@ -243,7 +246,8 @@ func TestIBCSwapMiddleware_FailRefund(t *testing.T) {
 	// Create chain factory with Gaia and Duality
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
 		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
-		{Name: "duality", ChainConfig: chainCfg}},
+		{Name: "duality", ChainConfig: chainCfg},
+	},
 	)
 
 	// Get both chains from the chain factory
@@ -336,17 +340,19 @@ func TestIBCSwapMiddleware_FailRefund(t *testing.T) {
 
 	// Compose the swap metadata, this swap will fail because there is no pool initialized for this pair
 	swapAmount := sdktypes.NewInt(100000)
-	minOut := sdktypes.NewInt(100000)
 
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
-			MsgSwap: &types.MsgSwap{
-				Creator:      chainBAddr,
-				Receiver:     chainBAddr,
-				TokenIn:      chainADenomTrace.IBCDenom(),
-				TokenOut:     chainB.Config().Denom,
-				MaxAmountIn:  swapAmount,
-				MaxAmountOut: minOut,
+			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
+				Creator:   chainBAddr,
+				Receiver:  chainBAddr,
+				TokenIn:   chainADenomTrace.IBCDenom(),
+				TokenOut:  chainB.Config().Denom,
+				AmountIn:  swapAmount,
+				TickIndex: 0,
+				OrderType: types.LimitOrderType_IMMEDIATE_OR_CANCEL,
+				// TODO: enable soon
+				// MaxAmountOut: minOut,
 			},
 			NonRefundable: false,
 			Next:          nil,
@@ -399,7 +405,8 @@ func TestIBCSwapMiddleware_FailNoRefund(t *testing.T) {
 	// Create chain factory with Duality and Cosmos Hub
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
 		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
-		{Name: "duality", ChainConfig: chainCfg}},
+		{Name: "duality", ChainConfig: chainCfg},
+	},
 	)
 
 	// Get both chains from the chain factory
@@ -492,17 +499,19 @@ func TestIBCSwapMiddleware_FailNoRefund(t *testing.T) {
 
 	// Compose the swap metadata, this swap will fail because there is no pool initialized for this pair
 	swapAmount := sdktypes.NewInt(100000)
-	minOut := sdktypes.NewInt(100000)
 
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
-			MsgSwap: &types.MsgSwap{
-				Creator:      chainBAddr,
-				Receiver:     chainBAddr,
-				TokenIn:      chainADenomTrace.IBCDenom(),
-				TokenOut:     chainB.Config().Denom,
-				MaxAmountIn:  swapAmount,
-				MaxAmountOut: minOut,
+			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
+				Creator:   chainBAddr,
+				Receiver:  chainBAddr,
+				TokenIn:   chainADenomTrace.IBCDenom(),
+				TokenOut:  chainB.Config().Denom,
+				AmountIn:  swapAmount,
+				TickIndex: 0,
+				OrderType: types.LimitOrderType_IMMEDIATE_OR_CANCEL,
+				// TODO: enable soon
+				// MaxAmountOut: minOut,
 			},
 			NonRefundable: true,
 			Next:          nil,
@@ -556,7 +565,8 @@ func TestIBCSwapMiddleware_FailWithRefundAddr(t *testing.T) {
 	// Create chain factory with Duality and Cosmos Hub
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
 		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
-		{Name: "duality", ChainConfig: chainCfg}},
+		{Name: "duality", ChainConfig: chainCfg},
+	},
 	)
 
 	// Get both chains from the chain factory
@@ -654,17 +664,19 @@ func TestIBCSwapMiddleware_FailWithRefundAddr(t *testing.T) {
 
 	// Compose the swap metadata, this swap will fail because there is no pool initialized for this pair
 	swapAmount := sdktypes.NewInt(100000)
-	minOut := sdktypes.NewInt(100000)
 
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
-			MsgSwap: &types.MsgSwap{
-				Creator:      chainBAddr,
-				Receiver:     chainBAddr,
-				TokenIn:      chainADenomTrace.IBCDenom(),
-				TokenOut:     chainB.Config().Denom,
-				MaxAmountIn:  swapAmount,
-				MaxAmountOut: minOut,
+			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
+				Creator:   chainBAddr,
+				Receiver:  chainBAddr,
+				TokenIn:   chainADenomTrace.IBCDenom(),
+				TokenOut:  chainB.Config().Denom,
+				AmountIn:  swapAmount,
+				TickIndex: 0,
+				OrderType: types.LimitOrderType_IMMEDIATE_OR_CANCEL,
+				// TODO: enable soon
+				// MaxAmountOut: minOut,
 			},
 			NonRefundable: true,
 			RefundAddress: chainBRefundAddr,

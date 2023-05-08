@@ -34,10 +34,10 @@ func (sm SwapMetadata) Validate() error {
 		return sdkerrors.Wrap(ErrInvalidSwapMetadata, err.Error())
 	}
 	if sm.TokenIn == "" {
-		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap tokenIn cannot be an empty string")
+		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "limit order tokenIn cannot be an empty string")
 	}
 	if sm.TokenOut == "" {
-		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "swap tokenOut cannot be an empty string")
+		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "limit order tokenOut cannot be an empty string")
 	}
 	if sm.RefundAddress != "" {
 		_, err := sdk.AccAddressFromBech32(sm.RefundAddress)
@@ -45,6 +45,11 @@ func (sm SwapMetadata) Validate() error {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "%s is not a valid Duality address", sm.RefundAddress)
 		}
 	}
+
+	if !sm.OrderType.IsFoK() && !sm.OrderType.IsIoC() {
+		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "Limit Order types must be IMMEDIATE_OR_CANCEL or FILL_OR_KILL")
+	}
+
 	return nil
 }
 

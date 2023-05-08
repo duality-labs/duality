@@ -218,7 +218,6 @@ func TestSwapAndForward_Success(t *testing.T) {
 
 	// Compose the IBC transfer memo metadata to be used in the swap and forward
 	swapAmount := sdktypes.NewInt(100000)
-	maxAmountOut := sdktypes.NewInt(100000)
 	expectedAmountOut := sdktypes.NewInt(99990)
 
 	retries := uint8(0)
@@ -230,7 +229,8 @@ func TestSwapAndForward_Success(t *testing.T) {
 			Timeout:  5 * time.Minute,
 			Retries:  &retries,
 			Next:     nil,
-		}}
+		},
+	}
 
 	bz, err := json.Marshal(forwardMetadata)
 	require.NoError(t, err)
@@ -241,13 +241,14 @@ func TestSwapAndForward_Success(t *testing.T) {
 
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
-			MsgSwap: &types.MsgSwap{
-				Creator:      chainBAddr,
-				Receiver:     chainBAddr,
-				TokenIn:      chainADenomTrace.IBCDenom(),
-				TokenOut:     chainB.Config().Denom,
-				MaxAmountIn:  swapAmount,
-				MaxAmountOut: maxAmountOut,
+			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
+				Creator:   chainBAddr,
+				Receiver:  chainBAddr,
+				TokenIn:   chainADenomTrace.IBCDenom(),
+				TokenOut:  chainB.Config().Denom,
+				AmountIn:  swapAmount,
+				TickIndex: 0,
+				OrderType: types.LimitOrderType_FILL_OR_KILL,
 			},
 			Next: nextJSON,
 		},
@@ -298,7 +299,8 @@ func TestSwapAndForward_MultiHopSuccess(t *testing.T) {
 		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
 		{Name: "duality", ChainConfig: chainCfg},
 		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-c", GasPrices: "0.0uatom"}},
-		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-d", GasPrices: "0.0uatom"}}},
+		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-d", GasPrices: "0.0uatom"}},
+	},
 	)
 
 	// Get chains from the chain factory
@@ -496,7 +498,7 @@ func TestSwapAndForward_MultiHopSuccess(t *testing.T) {
 
 	// Compose the IBC transfer memo metadata to be used in the swap and forward
 	swapAmount := sdktypes.NewInt(100000)
-	maxOut := sdktypes.NewInt(100000)
+
 	expectedOut := sdktypes.NewInt(99_990)
 
 	retries := uint8(0)
@@ -522,7 +524,8 @@ func TestSwapAndForward_MultiHopSuccess(t *testing.T) {
 			Timeout:  5 * time.Minute,
 			Retries:  &retries,
 			Next:     nextForwardJSON,
-		}}
+		},
+	}
 	bz, err := json.Marshal(forwardMetadata)
 	require.NoError(t, err)
 
@@ -532,13 +535,14 @@ func TestSwapAndForward_MultiHopSuccess(t *testing.T) {
 
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
-			MsgSwap: &types.MsgSwap{
-				Creator:      chainBAddr,
-				Receiver:     chainBAddr,
-				TokenIn:      chainADenomTrace.IBCDenom(),
-				TokenOut:     chainB.Config().Denom,
-				MaxAmountIn:  swapAmount,
-				MaxAmountOut: maxOut,
+			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
+				Creator:   chainBAddr,
+				Receiver:  chainBAddr,
+				TokenIn:   chainADenomTrace.IBCDenom(),
+				TokenOut:  chainB.Config().Denom,
+				AmountIn:  swapAmount,
+				TickIndex: 0,
+				OrderType: types.LimitOrderType_FILL_OR_KILL,
 			},
 			Next: nextJSON,
 		},
@@ -811,7 +815,6 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 
 	// Compose the IBC transfer memo metadata to be used in the swap and forward
 	swapAmount := sdktypes.NewInt(100_000)
-	maxOut := sdktypes.NewInt(100_000)
 	expectedOut := sdktypes.NewInt(99_990)
 
 	retries := uint8(0)
@@ -823,7 +826,8 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 			Timeout:  5 * time.Minute,
 			Retries:  &retries,
 			Next:     nil,
-		}}
+		},
+	}
 
 	bz, err := json.Marshal(forwardMetadata)
 	require.NoError(t, err)
@@ -834,13 +838,14 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
-			MsgSwap: &types.MsgSwap{
-				Creator:      chainBAddr,
-				Receiver:     chainBAddr,
-				TokenIn:      chainB.Config().Denom,
-				TokenOut:     chainADenomTrace.IBCDenom(),
-				MaxAmountIn:  swapAmount,
-				MaxAmountOut: maxOut,
+			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
+				Creator:   chainBAddr,
+				Receiver:  chainBAddr,
+				TokenIn:   chainB.Config().Denom,
+				TokenOut:  chainADenomTrace.IBCDenom(),
+				AmountIn:  swapAmount,
+				TickIndex: 0,
+				OrderType: types.LimitOrderType_FILL_OR_KILL,
 			},
 			Next: nextJSON,
 		},
@@ -896,7 +901,8 @@ func TestSwapAndForward_ForwardFails(t *testing.T) {
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
 		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
 		{Name: "duality", ChainConfig: chainCfg},
-		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-c", GasPrices: "0.0uatom"}}},
+		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-c", GasPrices: "0.0uatom"}},
+	},
 	)
 
 	// Get chains from the chain factory
@@ -1079,7 +1085,6 @@ func TestSwapAndForward_ForwardFails(t *testing.T) {
 
 	// Compose the IBC transfer memo metadata to be used in the swap and forward
 	swapAmount := sdktypes.NewInt(100000)
-	maxOut := sdktypes.NewInt(100000)
 	expectedOut := sdktypes.NewInt(99_990)
 
 	retries := uint8(0)
@@ -1102,13 +1107,14 @@ func TestSwapAndForward_ForwardFails(t *testing.T) {
 
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
-			MsgSwap: &types.MsgSwap{
-				Creator:      chainBAddr,
-				Receiver:     chainBAddr,
-				TokenIn:      chainADenomTrace.IBCDenom(),
-				TokenOut:     chainB.Config().Denom,
-				MaxAmountIn:  swapAmount,
-				MaxAmountOut: maxOut,
+			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
+				Creator:   chainBAddr,
+				Receiver:  chainBAddr,
+				TokenIn:   chainADenomTrace.IBCDenom(),
+				TokenOut:  chainB.Config().Denom,
+				AmountIn:  swapAmount,
+				TickIndex: 0,
+				OrderType: types.LimitOrderType_FILL_OR_KILL,
 			},
 			Next: nextJSON,
 		},
