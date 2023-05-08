@@ -2,6 +2,7 @@ package interchaintest_test
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
@@ -15,6 +16,8 @@ import (
 
 	"github.com/strangelove-ventures/interchaintest/v4/testutil"
 	"github.com/stretchr/testify/require"
+	cmtjson "github.com/tendermint/tendermint/libs/json"
+	tmtypes "github.com/tendermint/tendermint/types"
 	"go.uber.org/zap/zaptest"
 )
 
@@ -31,34 +34,44 @@ const (
 	cosmosCoinType = "118"
 )
 
-var (
-	chainCfg = ibc.ChainConfig{
-		Type:    "cosmos",
-		Name:    "duality",
-		ChainID: "chain-b",
-		// Images: []ibc.DockerImage{{
-		// 	Repository: "ghcr.io/strangelove-ventures/heighliner/duality",
-		// 	Version:    "justin-ibc-swap",
-		// 	UidGid:     heighlinerUserString,
-		// }},
-		Images: []ibc.DockerImage{{
-			Repository: "duality",
-			Version:    "local",
-			UidGid:     heighlinerUserString,
-		}},
-		Bin:                 "dualityd",
-		Bech32Prefix:        "cosmos",
-		Denom:               "stake",
-		CoinType:            cosmosCoinType,
-		GasPrices:           "0.0stake",
-		GasAdjustment:       1.2,
-		TrustingPeriod:      "336h",
-		NoHostMount:         false,
-		ModifyGenesis:       nil,
-		ConfigFileOverrides: nil,
-		EncodingConfig:      dualityEncoding(),
-	}
-)
+func AddBlockGasToGenesis(_ ibc.ChainConfig, genesisBz []byte) ([]byte, error) {
+	var genesis tmtypes.GenesisDoc
+
+	json.Unmarshal(genesisBz, &genesis)
+	genesis.ConsensusParams = tmtypes.DefaultConsensusParams()
+	genesis.ConsensusParams.Block.MaxGas = 1_000_000
+
+	genBytes, err := cmtjson.Marshal(genesis)
+
+	return genBytes, nil
+}
+
+var chainCfg = ibc.ChainConfig{
+	Type:    "cosmos",
+	Name:    "duality",
+	ChainID: "chain-b",
+	// Images: []ibc.DockerImage{{
+	// 	Repository: "ghcr.io/strangelove-ventures/heighliner/duality",
+	// 	Version:    "justin-ibc-swap",
+	// 	UidGid:     heighlinerUserString,
+	// }},
+	Images: []ibc.DockerImage{{
+		Repository: "duality",
+		Version:    "local",
+		UidGid:     heighlinerUserString,
+	}},
+	Bin:                 "dualityd",
+	Bech32Prefix:        "cosmos",
+	Denom:               "stake",
+	CoinType:            cosmosCoinType,
+	GasPrices:           "0.0stake",
+	GasAdjustment:       1.2,
+	TrustingPeriod:      "336h",
+	NoHostMount:         false,
+	ModifyGenesis:       AddBlockGasToGenesis,
+	ConfigFileOverrides: nil,
+	EncodingConfig:      dualityEncoding(),
+}
 
 // TestDualityConsumerChainStart asserts that the chain can be properly spun up as a standalone consumer chain.
 func TestDualityConsumerChainStart(t *testing.T) {
