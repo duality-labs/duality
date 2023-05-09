@@ -10,8 +10,10 @@ func GetBlockGasUsed(ctx sdk.Context) (gasUsed uint64, err error) {
 	case ctx.BlockGasMeter() != nil:
 		return ctx.BlockGasMeter().GasConsumed(), nil
 	case ctx.IsCheckTx():
+		// If we are checking a TX or this is a simulation we can return whatever
 		return 0, nil
 	default:
+		// Otherwise, BlockGasMeter should probably be initialized
 		return 0, sdkerrors.Wrap(sdkerrors.ErrAppConfig, "Block Gas Meter is not initialized")
 	}
 }
