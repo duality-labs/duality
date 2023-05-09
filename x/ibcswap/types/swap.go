@@ -46,8 +46,8 @@ func (sm SwapMetadata) Validate() error {
 		}
 	}
 
-	if !sm.OrderType.IsFoK() && !sm.OrderType.IsIoC() {
-		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "Limit Order types must be IMMEDIATE_OR_CANCEL or FILL_OR_KILL")
+	if !sm.OrderType.IsFoK() {
+		return sdkerrors.Wrap(ErrInvalidSwapMetadata, "Limit Order type must be FILL_OR_KILL")
 	}
 
 	return nil

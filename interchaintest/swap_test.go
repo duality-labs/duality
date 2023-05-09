@@ -199,7 +199,7 @@ func TestIBCSwapMiddleware_Success(t *testing.T) {
 				TokenOut:  chainB.Config().Denom,
 				AmountIn:  swapAmount,
 				TickIndex: 10,
-				OrderType: types.LimitOrderType_IMMEDIATE_OR_CANCEL,
+				OrderType: types.LimitOrderType_FILL_OR_KILL,
 				// TODO: enable soon
 				// MaxAmountOut: minOut,
 			},
@@ -350,7 +350,7 @@ func TestIBCSwapMiddleware_FailRefund(t *testing.T) {
 				TokenOut:  chainB.Config().Denom,
 				AmountIn:  swapAmount,
 				TickIndex: 0,
-				OrderType: types.LimitOrderType_IMMEDIATE_OR_CANCEL,
+				OrderType: types.LimitOrderType_FILL_OR_KILL,
 				// TODO: enable soon
 				// MaxAmountOut: minOut,
 			},
@@ -509,7 +509,7 @@ func TestIBCSwapMiddleware_FailNoRefund(t *testing.T) {
 				TokenOut:  chainB.Config().Denom,
 				AmountIn:  swapAmount,
 				TickIndex: 1,
-				OrderType: types.LimitOrderType_IMMEDIATE_OR_CANCEL,
+				OrderType: types.LimitOrderType_FILL_OR_KILL,
 				// TODO: enable soon
 				// MaxAmountOut: minOut,
 			},
@@ -674,7 +674,7 @@ func TestIBCSwapMiddleware_FailWithRefundAddr(t *testing.T) {
 				TokenOut:  chainB.Config().Denom,
 				AmountIn:  swapAmount,
 				TickIndex: 1,
-				OrderType: types.LimitOrderType_IMMEDIATE_OR_CANCEL,
+				OrderType: types.LimitOrderType_FILL_OR_KILL,
 				// TODO: enable soon
 				// MaxAmountOut: minOut,
 			},
