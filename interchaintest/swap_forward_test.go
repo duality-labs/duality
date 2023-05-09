@@ -35,7 +35,8 @@ func TestSwapAndForward_Success(t *testing.T) {
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
 		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
 		{Name: "duality", ChainConfig: chainCfg},
-		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-c", GasPrices: "0.0uatom"}}},
+		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-c", GasPrices: "0.0uatom"}},
+	},
 	)
 
 	// Get chains from the chain factory
@@ -247,7 +248,7 @@ func TestSwapAndForward_Success(t *testing.T) {
 				TokenIn:   chainADenomTrace.IBCDenom(),
 				TokenOut:  chainB.Config().Denom,
 				AmountIn:  swapAmount,
-				TickIndex: 0,
+				TickIndex: 2,
 				OrderType: types.LimitOrderType_FILL_OR_KILL,
 			},
 			Next: nextJSON,
@@ -541,8 +542,8 @@ func TestSwapAndForward_MultiHopSuccess(t *testing.T) {
 				TokenIn:   chainADenomTrace.IBCDenom(),
 				TokenOut:  chainB.Config().Denom,
 				AmountIn:  swapAmount,
-				TickIndex: 0,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				TickIndex: 2,
+				OrderType: types.LimitOrderType_IMMEDIATE_OR_CANCEL,
 			},
 			Next: nextJSON,
 		},
@@ -597,7 +598,8 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
 		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
 		{Name: "duality", ChainConfig: chainCfg},
-		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-c", GasPrices: "0.0uatom"}}},
+		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-c", GasPrices: "0.0uatom"}},
+	},
 	)
 
 	// Get chains from the chain factory
@@ -844,8 +846,8 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 				TokenIn:   chainB.Config().Denom,
 				TokenOut:  chainADenomTrace.IBCDenom(),
 				AmountIn:  swapAmount,
-				TickIndex: 0,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				TickIndex: 2,
+				OrderType: types.LimitOrderType_IMMEDIATE_OR_CANCEL,
 			},
 			Next: nextJSON,
 		},
@@ -1096,7 +1098,8 @@ func TestSwapAndForward_ForwardFails(t *testing.T) {
 			Timeout:  5 * time.Minute,
 			Retries:  &retries,
 			Next:     nil,
-		}}
+		},
+	}
 
 	bz, err := json.Marshal(forwardMetadata)
 	require.NoError(t, err)
@@ -1113,8 +1116,8 @@ func TestSwapAndForward_ForwardFails(t *testing.T) {
 				TokenIn:   chainADenomTrace.IBCDenom(),
 				TokenOut:  chainB.Config().Denom,
 				AmountIn:  swapAmount,
-				TickIndex: 0,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				TickIndex: 2,
+				OrderType: types.LimitOrderType_IMMEDIATE_OR_CANCEL,
 			},
 			Next: nextJSON,
 		},

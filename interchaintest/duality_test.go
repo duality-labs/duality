@@ -42,6 +42,9 @@ func AddBlockGasToGenesis(_ ibc.ChainConfig, genesisBz []byte) ([]byte, error) {
 	genesis.ConsensusParams.Block.MaxGas = 1_000_000
 
 	genBytes, err := cmtjson.Marshal(genesis)
+	if err != nil {
+		panic("Could not marshal genesis:" + err.Error())
+	}
 
 	return genBytes, nil
 }
