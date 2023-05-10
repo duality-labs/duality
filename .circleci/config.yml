@@ -54,6 +54,8 @@ jobs:
           working_directory: ./duality
           command: |
             TAG="${CIRCLE_TAG:-${CIRCLE_SHA1}}"
+            # Store TAG in bash_env so it can be reused in other steps
+            echo 'export TAG="${TAG}"' >> "$BASH_ENV"
             heighliner build -c duality --local -t ${TAG}
       - run:
           name: Authenticate with ECR
