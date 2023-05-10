@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+  go: circleci/go@1.7.3
 jobs:
   go-tests:
     working_directory: ~/repo
@@ -26,6 +28,31 @@ jobs:
             go tool cover -html=c.out -o /tmp/artifacts/coverage.html
       - store_artifacts:
           path: /tmp/artifacts
+  ictest:
+    working_directory: ~/repo
+    machine: # executor type
+      image: ubuntu-2004:2023.04.2 # recommended linux image - includes Ubuntu 20.04, docker 19.03.13, docker-compose 1.27.4
+    resource_class: large
+    steps:
+      - go/install:
+          version: "1.18"
+      - run:
+          name: Install heighliner
+          command: |
+            git clone -b v1.2.0 https://github.com/strangelove-ventures/heighliner
+            cd heighliner
+            go build
+            go install
+      - checkout:
+          path: ./duality
+      - run:
+          name: Build duality docker image
+          working_directory: ./duality
+          command: heighliner build -c duality --local
+      - run:
+          name: Run tests
+          working_directory: ./duality/interchaintest
+          command: go test -race -timeout 1h -v -run . 
   binary-build:
     working_directory: ~/repo
     docker:
@@ -102,6 +129,7 @@ workflows:
   full_test_suite:
     jobs:
       - go-tests
+      - ictest
       - binary-build
   lint:
     jobs:

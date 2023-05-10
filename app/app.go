@@ -79,6 +79,9 @@ import (
 	ibctestingcore "github.com/cosmos/interchain-security/legacy_ibc_testing/core"
 	"github.com/ignite/cli/ignite/pkg/openapiconsole"
 	"github.com/spf13/cast"
+	forwardmiddleware "github.com/strangelove-ventures/packet-forward-middleware/v4/router"
+	forwardkeeper "github.com/strangelove-ventures/packet-forward-middleware/v4/router/keeper"
+	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
 	"github.com/tendermint/spm/cosmoscmd"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -103,6 +106,9 @@ import (
 	epochsmodule "github.com/duality-labs/duality/x/epochs"
 	epochsmodulekeeper "github.com/duality-labs/duality/x/epochs/keeper"
 	epochsmoduletypes "github.com/duality-labs/duality/x/epochs/types"
+	swapmiddleware "github.com/duality-labs/duality/x/ibcswap"
+	swapkeeper "github.com/duality-labs/duality/x/ibcswap/keeper"
+	swaptypes "github.com/duality-labs/duality/x/ibcswap/types"
 
 	incentivesmodule "github.com/duality-labs/duality/x/incentives"
 	incentivesmodulekeeper "github.com/duality-labs/duality/x/incentives/keeper"
@@ -154,6 +160,8 @@ var (
 			),
 		),
 		dexmodule.AppModuleBasic{},
+		forwardmiddleware.AppModuleBasic{},
+		swapmiddleware.AppModuleBasic{},
 		mevmodule.AppModuleBasic{},
 		epochsmodule.AppModuleBasic{},
 		incentivesmodule.AppModuleBasic{},
@@ -227,7 +235,9 @@ type App struct {
 	ScopedTransferKeeper    capabilitykeeper.ScopedKeeper
 	ScopedCCVConsumerKeeper capabilitykeeper.ScopedKeeper
 
-	DexKeeper dexmodulekeeper.Keeper
+	DexKeeper     dexmodulekeeper.Keeper
+	SwapKeeper    swapkeeper.Keeper
+	ForwardKeeper *forwardkeeper.Keeper
 
 	MevKeeper mevmodulekeeper.Keeper
 
@@ -295,7 +305,8 @@ func NewApp(
 		slashingtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		dexmoduletypes.StoreKey, ccvconsumertypes.StoreKey, adminmodulemoduletypes.StoreKey,
-		mevmoduletypes.StoreKey, epochsmoduletypes.StoreKey, incentivesmoduletypes.StoreKey,
+		mevmoduletypes.StoreKey, forwardtypes.StoreKey,
+		epochsmoduletypes.StoreKey, incentivesmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -384,10 +395,7 @@ func NewApp(
 		app.IBCKeeper.ChannelKeeper, app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 	)
-	var (
-		transferModule    = transfer.NewAppModule(app.TransferKeeper)
-		transferIBCModule = transfer.NewIBCModule(app.TransferKeeper)
-	)
+	transferModule := transfer.NewAppModule(app.TransferKeeper)
 
 	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
@@ -446,10 +454,31 @@ func NewApp(
 		keys[mevmoduletypes.StoreKey],
 		keys[mevmoduletypes.MemStoreKey],
 		app.GetSubspace(mevmoduletypes.ModuleName),
-
 		app.BankKeeper,
 	)
 	mevModule := mevmodule.NewAppModule(appCodec, app.MevKeeper, app.AccountKeeper, app.BankKeeper)
+
+	// Create swap middleware keeper
+	app.SwapKeeper = swapkeeper.NewKeeper(
+		appCodec,
+		app.MsgServiceRouter(),
+		app.IBCKeeper.ChannelKeeper,
+		app.BankKeeper,
+	)
+	swapModule := swapmiddleware.NewAppModule(app.SwapKeeper)
+
+	// Create packet forward middleware keeper
+	app.ForwardKeeper = forwardkeeper.NewKeeper(
+		appCodec,
+		keys[forwardtypes.StoreKey],
+		app.GetSubspace(forwardtypes.ModuleName),
+		app.TransferKeeper, // This is zero value because transfer keeper is not initialized yet
+		app.IBCKeeper.ChannelKeeper,
+		&NoopDistributionKeeper{}, // Use a no-op implementation of the Distribution Keeper to avoid NPE
+		app.BankKeeper,
+		&app.IBCKeeper.ChannelKeeper,
+	)
+	forwardModule := forwardmiddleware.NewAppModule(app.ForwardKeeper)
 
 	app.EpochsKeeper = *epochsmodulekeeper.NewKeeper(keys[epochsmoduletypes.StoreKey])
 	epochsModule := epochsmodule.NewAppModule(app.EpochsKeeper)
@@ -458,6 +487,9 @@ func NewApp(
 			app.IncentivesKeeper.Hooks(),
 		),
 	)
+
+	// Set the initialized transfer keeper for forward middleware
+	app.ForwardKeeper.SetTransferKeeper(app.TransferKeeper)
 
 	app.IncentivesKeeper = *incentivesmodulekeeper.NewKeeper(
 		keys[incentivesmoduletypes.StoreKey],
@@ -482,9 +514,27 @@ func NewApp(
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
+	// Create our IBC middleware stack from bottom to top.
+	// The stack from top to bottom will look like this:
+	// -- channel.OnRecvPacket
+	// -- swap.OnRecvPacket
+	// -- forward.OnRecvPacket
+	// -- transfer.OnRecvPacket
+	// see: https://github.com/cosmos/ibc-go/blob/main/docs/middleware/ics29-fee/integration.md#configuring-an-application-stack-with-fee-middleware
+	var ibcStack ibcporttypes.IBCModule
+	ibcStack = transfer.NewIBCModule(app.TransferKeeper)
+	ibcStack = forwardmiddleware.NewIBCMiddleware(
+		ibcStack,
+		app.ForwardKeeper,
+		0, // TODO explore changing default values for retries and timeouts
+		forwardkeeper.DefaultForwardTransferPacketTimeoutTimestamp,
+		forwardkeeper.DefaultRefundTransferPacketTimeoutTimestamp,
+	)
+	ibcStack = swapmiddleware.NewIBCMiddleware(ibcStack, app.SwapKeeper)
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, ibcStack)
 	ibcRouter.AddRoute(ccvconsumertypes.ModuleName, consumerModule)
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
@@ -517,6 +567,8 @@ func NewApp(
 		adminModule,
 		dexModule,
 		mevModule,
+		forwardModule,
+		swapModule,
 		epochsModule,
 		incentivesModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
@@ -545,6 +597,8 @@ func NewApp(
 		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
 		mevmoduletypes.ModuleName,
+		forwardtypes.ModuleName,
+		swaptypes.ModuleName,
 		incentivesmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
@@ -565,6 +619,8 @@ func NewApp(
 		ibctransfertypes.ModuleName,
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
+		forwardtypes.ModuleName,
+		swaptypes.ModuleName,
 		mevmoduletypes.ModuleName,
 		epochsmoduletypes.ModuleName,
 		incentivesmoduletypes.ModuleName,
@@ -598,6 +654,8 @@ func NewApp(
 		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
 		mevmoduletypes.ModuleName,
+		forwardtypes.ModuleName,
+		swaptypes.ModuleName,
 		epochsmoduletypes.ModuleName,
 		incentivesmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
@@ -620,8 +678,9 @@ func NewApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 		dexModule,
+		forwardModule,
+		swapModule,
 		// incentivesModule,
-
 		mevModule,
 		// TODO: Enable lockupModule simulation testing
 
@@ -694,7 +753,6 @@ func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.Res
 		panic(err)
 	}
 	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
-
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
 
@@ -821,6 +879,7 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(ccvconsumertypes.ModuleName)
 	paramsKeeper.Subspace(dexmoduletypes.ModuleName)
+	paramsKeeper.Subspace(forwardtypes.ModuleName).WithKeyTable(forwardtypes.ParamKeyTable())
 	paramsKeeper.Subspace(mevmoduletypes.ModuleName)
 	paramsKeeper.Subspace(epochsmoduletypes.ModuleName)
 	paramsKeeper.Subspace(incentivesmoduletypes.ModuleName)
@@ -885,4 +944,18 @@ func (app *App) GetE2eSlashingKeeper() e2e.E2eSlashingKeeper {
 // GetE2eEvidenceKeeper implements the ConsumerApp interface.
 func (app *App) GetE2eEvidenceKeeper() e2e.E2eEvidenceKeeper {
 	return app.EvidenceKeeper
+}
+
+// NoopDistributionKeeper is a replacement for the distribution keeper that results in a no-op when its methods are called.
+// This is needed because the forward middleware expects the distribution keeper for funding the community pool if
+// a tax is set greater than 0. We only use this to avoid a possible nil pointer exception.
+type NoopDistributionKeeper struct {
+	// TODO explore other ways of funding community pool for consumer chains and remove this NoopDistributionKeeper
+}
+
+// FundCommunityPool is a no-op function that returns nil and logs that it was invoked.
+// Realistically this should never be called.
+func (k NoopDistributionKeeper) FundCommunityPool(ctx sdk.Context, amount sdk.Coins, sender sdk.AccAddress) error {
+	ctx.Logger().Info("FundCommunityPool call was invoked from the no-op distribution keeper")
+	return nil
 }

@@ -95,7 +95,7 @@ clean:
 test:
 	@go test -mod=readonly -race ./...
 
-ibctest:
-	cd ibctest && go test -race -v -run .
+ictest:
+	cd interchaintest && go test -race -v -run .
 
-.PHONY: test ibctest install build clean
+.PHONY: test ictest install build clean

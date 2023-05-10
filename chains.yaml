@@ -1,0 +1,11 @@
+# Duality
+- name: duality
+  github-organization: duality-labs
+  github-repo: duality
+  dockerfile: cosmos
+  build-target: make install
+  build-env:
+    - LEDGER_ENABLED=false
+    - BUILD_TAGS=muslc
+  binaries:
+    - /go/bin/dualityd

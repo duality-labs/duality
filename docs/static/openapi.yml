@@ -25119,6 +25119,45 @@ paths:
                         }
       tags:
         - Query
+  /ibc/apps/router/v1/params:
+    get:
+      summary: Params queries all parameters of the router module.
+      operationId: RouterV1Params
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params defines the parameters of the module.
+                type: object
+                properties:
+                  fee_percentage:
+                    type: string
+            description: >-
+              QueryParamsResponse is the response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
 definitions:
   cosmos.adminmodule.adminmodule.MsgAddAdminResponse:
     type: object
@@ -43598,3 +43637,19 @@ definitions:
         title: >-
           NextFeeDistributionEstimate holds information about next fee
           distribution
+  router.v1.Params:
+    type: object
+    properties:
+      fee_percentage:
+        type: string
+    description: Params defines the set of IBC router parameters.
+  router.v1.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params defines the parameters of the module.
+        type: object
+        properties:
+          fee_percentage:
+            type: string
+    description: QueryParamsResponse is the response type for the Query/Params RPC method.
