@@ -28,7 +28,7 @@ jobs:
             go tool cover -html=c.out -o /tmp/artifacts/coverage.html
       - store_artifacts:
           path: /tmp/artifacts
-  ictest:
+  heighliner-build:
     working_directory: ~/repo
     machine: # executor type
       image: ubuntu-2004:2023.04.2 # recommended linux image - includes Ubuntu 20.04, docker 19.03.13, docker-compose 1.27.4
@@ -36,6 +36,10 @@ jobs:
     steps:
       - go/install:
           version: "1.18"
+      - run:
+          name: Install AWS CLI
+          command: |
+            sudo apt-get update && sudo apt-get install -y awscli
       - run:
           name: Install heighliner
           command: |
@@ -48,7 +52,44 @@ jobs:
       - run:
           name: Build duality docker image
           working_directory: ./duality
-          command: heighliner build -c duality --local
+          command: |
+            TAG="${CIRCLE_TAG:-{CIRCLE_SHA1}}"
+            heighliner build -c duality --local -t $TAG
+      - run:
+          name: Authenticate with ECR
+          command: |
+            aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 137158674376.dkr.ecr.us-west-2.amazonaws.com
+      ## This could be its own step only for tagged builds
+      - run:
+          name: Push to ECR
+          command: |
+            docker tag duality:${TAG} 137158674376.dkr.ecr.us-west-2.amazonaws.com/devnet:${TAG}
+      - run:
+          name: Create a temp directory for docker image
+          command: mkdir -p ./tmp/docker
+      - run:
+          name: Save Docker Image
+          command: docker save --output ./tmp/docker/duality.tar duality
+      - persist_to_workspace:
+          root: ./tmp
+          paths:
+            - docker
+
+  ictest:
+    working_directory: ~/repo
+    machine: # executor type
+      image: ubuntu-2004:2023.04.2 # recommended linux image - includes Ubuntu 20.04, docker 19.03.13, docker-compose 1.27.4
+    resource_class: large
+    steps:
+      - go/install:
+          version: "1.18"
+      - checkout:
+          path: ./duality
+      - attach_workspace:
+          at: ./tmp/docker
+      - run:
+          name: load docker image
+          command: docker load -i ./tmp/docker/duality.tar
       - run:
           name: Run tests
           working_directory: ./duality/interchaintest
@@ -129,7 +170,10 @@ workflows:
   full_test_suite:
     jobs:
       - go-tests
-      - ictest
+      - heighliner-build
+      - ictest:
+          requires:
+            - heighliner-build
       - binary-build
   lint:
     jobs:
