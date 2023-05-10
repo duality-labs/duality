@@ -170,7 +170,9 @@ workflows:
   full_test_suite:
     jobs:
       - go-tests
-      - heighliner-build
+      - heighliner-build:
+          context:
+            AWS_CREDS
       - ictest:
           requires:
             - heighliner-build
