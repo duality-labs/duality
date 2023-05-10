@@ -53,8 +53,8 @@ jobs:
           name: Build duality docker image
           working_directory: ./duality
           command: |
-            TAG="${CIRCLE_TAG:-{CIRCLE_SHA1}}"
-            heighliner build -c duality --local -t $TAG
+            TAG="${CIRCLE_TAG:-${CIRCLE_SHA1}}"
+            heighliner build -c duality --local -t ${TAG}
       - run:
           name: Authenticate with ECR
           command: |
