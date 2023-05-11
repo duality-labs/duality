@@ -65,6 +65,7 @@ jobs:
           command: |
             TAG="${CIRCLE_TAG:-${CIRCLE_SHA1}}"
             docker tag duality:${TAG} 137158674376.dkr.ecr.us-west-2.amazonaws.com/devnet:${TAG}
+            docker push 137158674376.dkr.ecr.us-west-2.amazonaws.com/devnet:${TAG}
       - run:
           name: Create a temp directory for docker image
           command: mkdir -p ./tmp/docker
