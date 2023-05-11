@@ -1,0 +1,41 @@
+version: "3.8"
+x-aws-vpc: "vpc-013e79af9077c1e0e"
+x-aws-cluster: "devnet-cluster"
+x-aws-loadbalancer: "duality-devnet-lb"
+services:
+  genesis-node:
+    image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/devnet:${TAG:-latest}
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 8192M
+    ports:
+      - target: 26657
+        x-aws-protocol: http
+      - target: 26656
+        x-aws-protocol: http
+      - target: 1317
+        x-aws-protocol: http
+    command: scripts/leader-startup.sh
+    healthcheck:
+      test: ["NONE"]
+  follower-node:
+    image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/devnet:${TAG:-latest}
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 8192M
+    # TODO: AWS won't let us use the same ports for listeners, so we need to configure the follower config to use a completely different set of ports
+    # ports:
+    #   - 26655:26657
+    #   - 26654:26656
+    #   - 1316:1317
+    environment:
+      - RPC_ADDRESS=genesis-node:26657
+    depends_on:
+     - genesis-node
+    command: scripts/follower-startup.sh
+    healthcheck:
+      test: ["NONE"]

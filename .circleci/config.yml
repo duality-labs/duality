@@ -1,6 +1,8 @@
 version: 2.1
 orbs:
   go: circleci/go@1.7.3
+  aws-ecr: circleci/aws-ecr@8.1
+  aws-ecs: circleci/aws-ecs@3.2.0
 jobs:
   go-tests:
     working_directory: ~/repo
@@ -36,10 +38,6 @@ jobs:
     steps:
       - go/install:
           version: "1.18"
-      - run:
-          name: Install AWS CLI
-          command: |
-            sudo apt-get update && sudo apt-get install -y awscli
       - run:
           name: Install heighliner
           command: |
@@ -165,10 +163,9 @@ jobs:
           command: "./bin/golangci-lint run --out-format colored-line-number:linter.txt --timeout 6m"
       - store_artifacts:
           path: ./linter.txt
-
 workflows:
   version: 2
-  full_test_suite:
+  test_and_deploy:
     jobs:
       - go-tests
       - heighliner-build:
@@ -178,6 +175,32 @@ workflows:
           requires:
             - heighliner-build
       - binary-build
+      - aws-ecr/build-and-push-image:
+          context: AWS_CREDS
+          dockerfile: "dev.Dockerfile"
+          registry-id: AWS_ACCOUNT_ID
+          repo: devnet
+          tag: ${CIRCLE_SHA1},latest
+          extra-build-args: "--build-arg BASE_IMAGE_TAG=${CIRCLE_SHA1}"
+          requires:
+            - heighliner-build
+          # filters:
+          #   branches:
+          #     only: main
+      - aws-ecs/deploy-service-update:
+          context: AWS_CREDS
+          cluster: devnet-cluster
+          family: duality-devnet-genesis-node
+          container-image-name-updates: container=genesis-node,tag=${CIRCLE_SHA1}
+          requires:
+            - aws-ecr/build-and-push-image
+      - aws-ecs/deploy-service-update:
+          context: AWS_CREDS
+          cluster: devnet-cluster
+          family: duality-devnet-follower-validator
+          container-image-name-updates: container=follower-node,tag=${CIRCLE_SHA1}
+          requires:
+            - aws-ecr/build-and-push-image
   lint:
     jobs:
       - lint
