@@ -54,8 +54,6 @@ jobs:
           working_directory: ./duality
           command: |
             TAG="${CIRCLE_TAG:-${CIRCLE_SHA1}}"
-            # Store TAG in bash_env so it can be reused in other steps
-            echo 'export TAG="${TAG}"' >> "$BASH_ENV"
             heighliner build -c duality --local -t ${TAG}
       - run:
           name: Authenticate with ECR
@@ -65,6 +63,7 @@ jobs:
       - run:
           name: Push to ECR
           command: |
+            TAG="${CIRCLE_TAG:-${CIRCLE_SHA1}}"
             docker tag duality:${TAG} 137158674376.dkr.ecr.us-west-2.amazonaws.com/devnet:${TAG}
       - run:
           name: Create a temp directory for docker image
