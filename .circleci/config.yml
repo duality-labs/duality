@@ -1,6 +1,10 @@
 version: 2.1
 orbs:
   go: circleci/go@1.7.3
+  aws-ecr: circleci/aws-ecr@8.1
+  aws-ecs: circleci/aws-ecs@3.2.0
+  aws-cli: circleci/aws-cli@3.1.1
+
 jobs:
   go-tests:
     working_directory: ~/repo
@@ -37,10 +41,6 @@ jobs:
       - go/install:
           version: "1.18"
       - run:
-          name: Install AWS CLI
-          command: |
-            sudo apt-get update && sudo apt-get install -y awscli
-      - run:
           name: Install heighliner
           command: |
             git clone -b v1.2.0 https://github.com/strangelove-ventures/heighliner
@@ -58,13 +58,15 @@ jobs:
           name: Authenticate with github
           command: |
             echo $GH_CR_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
-      ## This could be its own step only for tagged builds
+        # NOTE: eventually we might only want to publish an image to GHCR for tags or certain branches
       - run:
-          name: Push to ECR
+          name: Push to GHCR
           command: |
-            TAG="${CIRCLE_TAG:-${CIRCLE_SHA1}}"
-            docker tag duality:local ghcr.io/duality-labs/duality:${TAG}
-            docker push ghcr.io/duality-labs/duality:${TAG}
+            docker tag duality:local ghcr.io/duality-labs/duality:heighliner-${CIRCLE_SHA1}
+            if [[ ! -z ${CIRCLE_TAG} ]]; then
+              docker tag duality:local ghcr.io/duality-labs/duality:heighliner-${CIRCLE_TAG}
+            fi
+            docker push ghcr.io/duality-labs/duality --all-tags
       - run:
           name: Create a temp directory for docker image
           command: mkdir -p ./tmp/docker
@@ -158,6 +160,73 @@ jobs:
           command: |
             go install github.com/tcnksm/ghr@v0.16.0
             ghr -t "${GITHUB_TOKEN}" -u "${CIRCLE_PROJECT_USERNAME}" -r "${CIRCLE_PROJECT_REPONAME}" -c "${CIRCLE_SHA1}" -delete ${CIRCLE_TAG} ./tmp/artifacts/release
+
+
+  deploy-network:
+    machine:
+      image: ubuntu-2004:2023.04.2
+    working_directory: ~/repo
+    parameters:
+      network:
+        type: string
+    steps:
+      - aws-cli/install
+
+      # Build our network compatible docker image
+      - aws-ecr/build-and-push-image:
+          dockerfile: "heighliner.Dockerfile"
+          registry-id: AWS_ACCOUNT_ID
+          repo: duality
+          tag: ${CIRCLE_SHA1},${CIRCLE_TAG:-${CIRCLE_SHA1}}
+          extra-build-args: "--build-arg BASE_IMAGE_TAG=heighliner-${CIRCLE_SHA1}"
+
+      # We will be updating the existing services in the cluster so we have to get their specific names
+      - run:
+          name: Get ECS cluster service names
+          command: |
+             GENESIS_SERVICE=$(aws ecs list-services \
+             --cluster << parameters.network >>-cluster \
+             --query 'serviceArns' | grep -oE "duality-<< parameters.network >>-Genesis[^\"]+")
+             echo "export GENESIS_SERVICE='${GENESIS_SERVICE}'" >> $BASH_ENV
+             FOLLOWER_SERVICE=$(aws ecs list-services \
+             --cluster << parameters.network >>-cluster \
+             --query 'serviceArns' | grep -oE "duality-<< parameters.network >>-Follower[^\"]+")
+             echo "export FOLLOWER_SERVICE='${FOLLOWER_SERVICE}'" >> $BASH_ENV
+
+      # Update the running genesis-node service with the new image we created
+      - aws-ecs/update-service:
+            cluster: << parameters.network >>-cluster
+            family: duality-<< parameters.network >>-genesis-node
+            service-name: ${GENESIS_SERVICE}
+            container-image-name-updates: container=genesis-node,tag=${CIRCLE_SHA1}
+
+
+      # We have to wait for the new genesis service to boot up before restarting the follower node
+      # First we get the ARN for the latest task revision
+      - run:
+          name: Get latest genesis task definition
+          command: >
+            TASK_DEFINITION_ARN=$(aws ecs describe-task-definition \
+                --task-definition duality-<< parameters.network >>-genesis-node \
+                --output text \
+                --query 'taskDefinition.taskDefinitionArn')
+            echo "export TASK_DEFINITION_ARN='${TASK_DEFINITION_ARN}'" >>
+            $BASH_ENV
+
+      # AND then we check to make sure the new task definition has deployed
+      - aws-ecs/verify-revision-is-deployed:
+            cluster: << parameters.network >>-cluster
+            family: duality-<< parameters.network >>-genesis-node
+            service-name: ${GENESIS_SERVICE}
+            task-definition-arn: ${TASK_DEFINITION_ARN}
+
+      # Finally, update the running follower-node to the new image we created
+      - aws-ecs/update-service:
+            cluster: << parameters.network >>-cluster
+            family: duality-<< parameters.network >>-follower-node
+            service-name: ${FOLLOWER_SERVICE}
+            container-image-name-updates: container=follower-node,tag=${CIRCLE_SHA1}
+
   lint:
     working_directory: ~/repo
     docker:
@@ -191,12 +260,43 @@ workflows:
       - lint
   publish-release-maybe:
     jobs:
+
+      # Core jobs
       - go-tests:
           filters:
             tags:
-              only: /^v\d+\.\d+\.\d+$/
+              only: /.*/
+      - lint
+      - heighliner-build:
+          filters:
+            tags:
+              only: /.*/
+          context:
+            - GITHUB_CREDS
+      - ictest:
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - heighliner-build
+      - binary-build
+
+      # Devnet deploy
+      - deploy-network:
+          # NOTE: for now we are just deploying anything pushed to the devnet branch to the devnet-cluster.
+          # The network argument is passed to the deploy-network job and referenced via `<< parameters.network >>`
+          network: devnet
+          filters:
             branches:
-              ignore: /.*/
+              only: devnet
+            tags:
+              only: /.*/
+          context:
+            - AWS_CREDS
+          requires:
+            - heighliner-build
+
+      # Publish releases
       - binary-release-build:
           filters:
             tags:
@@ -213,4 +313,8 @@ workflows:
             - GITHUB_CREDS
           requires:
             - go-tests
+            - ictest
             - binary-release-build
+
+# NOTE: By default CircleCI does not run jobs on tags only branches.
+# So any jobs that we want to run for tags or are requirements for those jobs must have a tags filter (ie. filters.tags.only: /.*/)

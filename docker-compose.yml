@@ -1,19 +1,35 @@
-version: "3"
+version: "3.8"
 services:
   genesis-node:
-    build: .
+    image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/duality:${TAG:-latest}
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 8192M
     environment:
       - MODE=new
-    volumes:
-      - validator-volume:/home/root/.duality
+      - NODE_MONIKER=genesis-node
+  follower-node:
+    image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/duality:${TAG:-latest}
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 8192M
+    # Only expose ports on follower node. This allows us to check network connectivity between nodes
     ports:
-      - 1317
-      - 6060
-      - 9090
-      - 26656
-      - 26657
+      #RPC
+      - target: 26657
+        x-aws-protocol: http
+      #API
+      - target: 1317
+        x-aws-protocol: http
     healthcheck:
-      test: [ "CMD", "dualityd", "status" ]
-      interval: 10s
-volumes:
-  validator-volume: {}
+       test: ["CMD", "curl", "http://localhost:26657/health"]
+    environment:
+      - MODE=fullnode
+      - RPC_ADDRESS=http://genesis-node:26657
+      - NODE_MONIKER=follower-node
+    depends_on:
+     - genesis-node
