@@ -55,16 +55,16 @@ jobs:
           command: |
             heighliner build -c duality --local
       - run:
-          name: Authenticate with ECR
+          name: Authenticate with github
           command: |
-            aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 137158674376.dkr.ecr.us-west-2.amazonaws.com
+            echo $GH_CR_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
       ## This could be its own step only for tagged builds
       - run:
           name: Push to ECR
           command: |
             TAG="${CIRCLE_TAG:-${CIRCLE_SHA1}}"
-            docker tag duality:local 137158674376.dkr.ecr.us-west-2.amazonaws.com/devnet:${TAG}
-            docker push 137158674376.dkr.ecr.us-west-2.amazonaws.com/devnet:${TAG}
+            docker tag duality:local ghcr.io/duality-labs/duality:${TAG}
+            docker push ghcr.io/duality-labs/duality:${TAG}
       - run:
           name: Create a temp directory for docker image
           command: mkdir -p ./tmp/docker
@@ -173,7 +173,7 @@ workflows:
       - go-tests
       - heighliner-build:
           context:
-            AWS_CREDS
+            - GITHUB_CREDS
       - ictest:
           requires:
             - heighliner-build
