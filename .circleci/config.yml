@@ -54,7 +54,7 @@ jobs:
           working_directory: ./duality
           command: |
             TAG="${CIRCLE_TAG:-${CIRCLE_SHA1}}"
-            heighliner build -c duality --local -t ${TAG}
+            heighliner build -c duality --local
       - run:
           name: Authenticate with github
           command: |
@@ -64,7 +64,7 @@ jobs:
           name: Push to ECR
           command: |
             TAG="${CIRCLE_TAG:-${CIRCLE_SHA1}}"
-            docker tag duality:${TAG} 137158674376.dkr.ecr.us-west-2.amazonaws.com/devnet:${TAG}
+            docker tag duality:local 137158674376.dkr.ecr.us-west-2.amazonaws.com/devnet:${TAG}
             docker push 137158674376.dkr.ecr.us-west-2.amazonaws.com/devnet:${TAG}
       - run:
           name: Create a temp directory for docker image
