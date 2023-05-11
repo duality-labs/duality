@@ -110,6 +110,8 @@ import (
 	swapkeeper "github.com/duality-labs/duality/x/ibcswap/keeper"
 	swaptypes "github.com/duality-labs/duality/x/ibcswap/types"
 
+	gmpmiddleware "github.com/duality-labs/duality/x/gmp"
+
 	incentivesmodule "github.com/duality-labs/duality/x/incentives"
 	incentivesmodulekeeper "github.com/duality-labs/duality/x/incentives/keeper"
 	incentivesmoduletypes "github.com/duality-labs/duality/x/incentives/types"
@@ -515,11 +517,25 @@ func NewApp(
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create our IBC middleware stack from bottom to top.
-	// The stack from top to bottom will look like this:
-	// -- channel.OnRecvPacket
-	// -- swap.OnRecvPacket
-	// -- forward.OnRecvPacket
-	// -- transfer.OnRecvPacket
+	// The stack order is this:
+	// -- channel.OnRecvPacket pre
+	// -- gmp.OnRecvPacket pre
+	// -- swap.OnRecvPacket pre
+	// -- forward.OnRecvPacket pre
+	// -- transfer.OnRecvPacket pre/post
+
+	// The logic order is this:
+	// -- channel.OnRecvPacket pre
+	// -- gmp.OnRecvPacket pre:
+	//    - check if we're getting something from the Axelar account, reencode memo field ABI => JSON
+	// -- swap.OnRecvPacket pre:
+	//    - validate swap memo
+	// -- forward.OnRecvPacket pre
+	// -- transfer.OnRecvPacket pre/post
+	// -- forward.OnRecvPacket post
+	// -- swap.OnRecvPacket post
+	// -- gmp.OnRecvPacket post
+	// -- channel.OnRecvPacket post
 	// see: https://github.com/cosmos/ibc-go/blob/main/docs/middleware/ics29-fee/integration.md#configuring-an-application-stack-with-fee-middleware
 	var ibcStack ibcporttypes.IBCModule
 	ibcStack = transfer.NewIBCModule(app.TransferKeeper)
@@ -531,6 +547,7 @@ func NewApp(
 		forwardkeeper.DefaultRefundTransferPacketTimeoutTimestamp,
 	)
 	ibcStack = swapmiddleware.NewIBCMiddleware(ibcStack, app.SwapKeeper)
+	ibcStack = gmpmiddleware.NewIBCMiddleware(ibcStack, gmpmiddleware.NewSwapForwardMemoTranscoder())
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
