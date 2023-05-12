@@ -96,3 +96,93 @@ func TestStakesCoinsByQueryCondition(t *testing.T) {
 		})
 	}
 }
+
+func TestStakesCoinsByQueryConditionMultiple(t *testing.T) {
+	owner, err := sdk.AccAddressFromBech32("cosmos1xv9tklw7d82sezh9haa573wufgy59vmwe6xxe5")
+	require.NoError(t, err)
+
+	allCoins := sdk.Coins{}
+
+	coins1 := sdk.NewInt64Coin(
+		dextypes.NewDepositDenom(
+			&dextypes.PairID{
+				Token0: "coin1",
+				Token1: "coin2",
+			},
+			25,
+			10,
+		).String(),
+		100,
+	)
+	allCoins = allCoins.Add(coins1)
+
+	coins2 := sdk.NewInt64Coin(
+		dextypes.NewDepositDenom(
+			&dextypes.PairID{
+				Token0: "coin1",
+				Token1: "coin2",
+			},
+			75,
+			10,
+		).String(),
+		200,
+	)
+	allCoins = allCoins.Add(coins2)
+
+	coins3 := sdk.NewInt64Coin(
+		dextypes.NewDepositDenom(
+			&dextypes.PairID{
+				Token0: "coin1",
+				Token1: "coin2",
+			},
+			75,
+			50,
+		).String(),
+		200,
+	)
+	allCoins = allCoins.Add(coins3)
+	assert.Equal(t, allCoins, allCoins.Sort())
+
+	stakes := Stakes{
+		NewStake(1, owner, allCoins, time.Time{}),
+	}
+
+	pairID := &dextypes.PairID{
+		Token0: "coin1",
+		Token1: "coin2",
+	}
+
+	tests := []struct {
+		name      string
+		queryCond QueryCondition
+		expected  sdk.Coins
+	}{
+		{
+			name:      "All coins",
+			queryCond: QueryCondition{PairID: pairID, StartTick: 0, EndTick: 100},
+			expected:  sdk.Coins{coins1, coins2},
+		},
+		{
+			name:      "Coin1 only",
+			queryCond: QueryCondition{PairID: pairID, StartTick: 0, EndTick: 50},
+			expected:  sdk.Coins{coins1},
+		},
+		{
+			name:      "Coin2 only",
+			queryCond: QueryCondition{PairID: pairID, StartTick: 50, EndTick: 100},
+			expected:  sdk.Coins{coins2},
+		},
+		{
+			name:      "No coins",
+			queryCond: QueryCondition{PairID: pairID, StartTick: 100, EndTick: 200},
+			expected:  sdk.Coins{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			coins := stakes.CoinsByQueryCondition(tt.queryCond)
+			assert.Equal(t, tt.expected, coins)
+		})
+	}
+}

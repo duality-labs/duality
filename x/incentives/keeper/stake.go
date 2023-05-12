@@ -30,35 +30,6 @@ func (k Keeper) SetLastStakeID(ctx sdk.Context, id uint64) {
 	store.Set(types.KeyLastStakeID, sdk.Uint64ToBigEndian(id))
 }
 
-// stake is an internal utility to stake coins and set corresponding states.
-// This is only called by either of the two possible entry points to stake tokens.
-// 1. CreateStake
-// 2. AddTokensToStakeByID
-func (k Keeper) Stake(ctx sdk.Context, stake *types.Stake, tokensToStake sdk.Coins) error {
-	owner, err := sdk.AccAddressFromBech32(stake.Owner)
-	if err != nil {
-		return err
-	}
-
-	err = stake.ValidateBasic()
-	if err != nil {
-		return err
-	}
-
-	if err := k.bk.SendCoinsFromAccountToModule(ctx, owner, types.ModuleName, tokensToStake); err != nil {
-		return err
-	}
-
-	// store stake object into the store
-	err = k.setStake(ctx, stake)
-	if err != nil {
-		return err
-	}
-
-	k.hooks.OnTokenStaked(ctx, owner, stake.ID, stake.Coins, ctx.BlockTime())
-	return nil
-}
-
 func (k Keeper) Unstake(ctx sdk.Context, stake *types.Stake, coins sdk.Coins) (uint64, error) {
 	if coins.Empty() {
 		coins = stake.Coins
@@ -212,10 +183,28 @@ func (k Keeper) CreateStake(ctx sdk.Context, owner sdk.AccAddress, coins sdk.Coi
 	// unlock time is initially set without a value, gets set as unlock start time + duration
 	// when unlocking starts.
 	stake := types.NewStake(ID, owner, coins, startTime)
-	err := k.Stake(ctx, stake, stake.Coins)
+
+	owner, err := sdk.AccAddressFromBech32(stake.Owner)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
 	}
+
+	err = stake.ValidateBasic()
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
+	}
+
+	if err := k.bk.SendCoinsFromAccountToModule(ctx, owner, types.ModuleName, stake.Coins); err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
+	}
+
+	// store stake object into the store
+	err = k.setStake(ctx, stake)
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
+	}
+
+	k.hooks.OnTokenStaked(ctx, owner, stake.ID, stake.Coins, ctx.BlockTime())
 	k.SetLastStakeID(ctx, stake.ID)
 
 	// add stake refs into not unlocking queue
