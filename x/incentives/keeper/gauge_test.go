@@ -1,8 +1,10 @@
 package keeper_test
 
 import (
+	"testing"
 	"time"
 
+	"github.com/duality-labs/duality/app/apptesting"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"
 	"github.com/stretchr/testify/require"
@@ -140,4 +142,111 @@ func (suite *KeeperTestSuite) TestGaugeLimit() {
 		0,
 	)
 	suite.Require().Error(err)
+}
+
+// TestGaugeCreateFails tests that when the distribute command is executed on a provided bad gauge
+// that the step fails gracefully.
+func (suite *KeeperTestSuite) TestGaugeCreateFails() {
+	addrs := apptesting.SetupAddrs(3)
+	tests := []struct {
+		name              string
+		addrs             []sdk.AccAddress
+		depositStakeSpecs []depositStakeSpec
+		gaugeSpecs        []gaugeSpec
+		assertions        []balanceAssertion
+	}{
+		{
+			name: "one stake with bad gauge",
+			depositStakeSpecs: []depositStakeSpec{
+				{
+					depositSpec: depositSpec{
+						addr:   addrs[0],
+						token0: sdk.NewInt64Coin("TokenA", 10),
+						token1: sdk.NewInt64Coin("TokenB", 10),
+						tick:   999,
+						fee:    1,
+					},
+					stakeTimeOffset: -24 * time.Hour,
+				},
+				{
+					depositSpec: depositSpec{
+						addr:   addrs[1],
+						token0: sdk.NewInt64Coin("TokenA", 10),
+						token1: sdk.NewInt64Coin("TokenB", 10),
+						tick:   999,
+						fee:    1,
+					},
+					stakeTimeOffset: -24 * time.Hour,
+				},
+				{
+					depositSpec: depositSpec{
+						addr:   addrs[1],
+						token0: sdk.NewInt64Coin("TokenA", 10),
+						token1: sdk.NewInt64Coin("TokenB", 10),
+						tick:   999,
+						fee:    40,
+					},
+					stakeTimeOffset: -24 * time.Hour,
+				},
+				{
+					depositSpec: depositSpec{
+						addr:   addrs[1],
+						token0: sdk.NewInt64Coin("TokenA", 10),
+						token1: sdk.NewInt64Coin("TokenB", 10),
+						tick:   999,
+						fee:    40,
+					},
+					stakeTimeOffset: -12 * time.Hour,
+				},
+			},
+			gaugeSpecs: []gaugeSpec{
+				{
+					isPerpetual: false,
+					rewards:     sdk.Coins{sdk.NewInt64Coin("reward", 3000)},
+					startTick:   -1000,
+					endTick:     1000,
+					paidOver:    1,
+					pricingTick: 9999999,
+				},
+			},
+			assertions: []balanceAssertion{
+				{addr: addrs[0], balances: sdk.Coins{sdk.NewInt64Coin("reward", 1500)}},
+				{addr: addrs[1], balances: sdk.Coins{sdk.NewInt64Coin("reward", 1500)}},
+			},
+		},
+	}
+	for _, tc := range tests {
+		suite.T().Run(tc.name, func(t *testing.T) {
+			suite.SetupTest()
+			for _, depositSpec := range tc.depositStakeSpecs {
+				suite.SetupDepositAndStake(depositSpec)
+			}
+			for _, s := range tc.gaugeSpecs {
+				addr := sdk.AccAddress([]byte("Gauge_Creation_Addr_"))
+
+				// fund reward tokens
+				suite.FundAcc(addr, s.rewards)
+
+				// create gauge
+				_, err := suite.App.IncentivesKeeper.CreateGauge(
+					suite.Ctx,
+					s.isPerpetual,
+					addr,
+					s.rewards,
+					types.QueryCondition{
+						PairID: &dextypes.PairID{
+							Token0: "TokenA",
+							Token1: "TokenB",
+						},
+						StartTick: s.startTick,
+						EndTick:   s.endTick,
+					},
+					s.startTime,
+					s.paidOver,
+					s.pricingTick,
+				)
+				require.Error(t, err)
+			}
+		})
+	}
 }

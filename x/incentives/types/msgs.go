@@ -1,12 +1,12 @@
 package types
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	dextypes "github.com/duality-labs/duality/x/dex/types"
 )
 
 const (
@@ -42,17 +42,26 @@ func (m MsgCreateGauge) Type() string { return TypeMsgCreateGauge }
 // ValidateBasic checks that the create gauge message is valid.
 func (m MsgCreateGauge) ValidateBasic() error {
 	if m.Owner == "" {
-		return errors.New("owner should be set")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "owner should be set")
 	}
-	// TODO
+	// TODO: If this is not set, infer start time as "now"
 	if m.StartTime.Equal(time.Time{}) {
-		return errors.New("distribution start time should be set")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "distribution start time should be set")
 	}
 	if m.NumEpochsPaidOver == 0 {
-		return errors.New("distribution period should be at least 1 epoch")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "distribution period should be at least 1 epoch")
 	}
 	if m.IsPerpetual && m.NumEpochsPaidOver != 1 {
-		return errors.New("distribution period should be 1 epoch for perpetual gauge")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "distribution period should be 1 epoch for perpetual gauge")
+	}
+	if dextypes.IsTickOutOfRange(m.PricingTick) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "pricing tick is out of range, must be between %d and %d", int64(dextypes.MaxTickExp)*-1, dextypes.MaxTickExp)
+	}
+	if dextypes.IsTickOutOfRange(m.DistributeTo.StartTick) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "start tick is out of range, must be between %d and %d", int64(dextypes.MaxTickExp)*-1, dextypes.MaxTickExp)
+	}
+	if dextypes.IsTickOutOfRange(m.DistributeTo.EndTick) {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "start tick is out of range, must be between %d and %d", int64(dextypes.MaxTickExp)*-1, dextypes.MaxTickExp)
 	}
 
 	return nil
@@ -89,10 +98,10 @@ func (m MsgAddToGauge) Type() string { return TypeMsgAddToGauge }
 // ValidateBasic checks that the add to gauge message is valid.
 func (m MsgAddToGauge) ValidateBasic() error {
 	if m.Owner == "" {
-		return errors.New("owner should be set")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "owner should be set")
 	}
 	if m.Rewards.Empty() {
-		return errors.New("additional rewards should not be empty")
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "additional rewards should not be empty")
 	}
 
 	return nil
