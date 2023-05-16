@@ -10,6 +10,7 @@ import (
 
 // NewStake returns a new instance of period stake.
 func NewStake(id uint64, owner sdk.AccAddress, coins sdk.Coins, startTime time.Time) *Stake {
+	coins = coins.Sort()
 	return &Stake{
 		ID:        id,
 		Owner:     owner.String(),
@@ -59,8 +60,8 @@ func (p Stake) CoinsPassingQueryCondition(distrTo QueryCondition) sdk.Coins {
 
 	default:
 		// Binary search the amount of coins remaining
+		result := sdk.NewCoins()
 		denomPrefix := dextypes.DepositDenomPairIDPrefix(distrTo.PairID.Token0, distrTo.PairID.Token1)
-		coins := sdk.Coins{}
 		low := 0
 		high := len(coins)
 		for low < high {
@@ -68,7 +69,7 @@ func (p Stake) CoinsPassingQueryCondition(distrTo QueryCondition) sdk.Coins {
 			coin := coins[mid]
 			switch {
 			case distrTo.Test(coin.Denom):
-				coins = coins.Add(coin)
+				result = result.Add(coin)
 
 				midLeft := mid - 1
 				for 0 <= midLeft {
@@ -76,7 +77,7 @@ func (p Stake) CoinsPassingQueryCondition(distrTo QueryCondition) sdk.Coins {
 					if !distrTo.Test(coin.Denom) {
 						break
 					}
-					coins = coins.Add(coin)
+					result = result.Add(coin)
 					midLeft--
 				}
 
@@ -86,11 +87,11 @@ func (p Stake) CoinsPassingQueryCondition(distrTo QueryCondition) sdk.Coins {
 					if !distrTo.Test(coin.Denom) {
 						break
 					}
-					coins = coins.Add(coin)
+					result = result.Add(coin)
 					midRight++
 				}
 
-				return coins
+				return result
 			case denomPrefix < coin.Denom:
 				high = mid
 			default:
