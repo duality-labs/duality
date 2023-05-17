@@ -29,7 +29,10 @@ func (k Keeper) ValueForShares(ctx sdk.Context, coin sdk.Coin, tick int64) (sdk.
 		return sdk.ZeroInt(), err
 	}
 	amount0, amount1 := pool.RedeemValue(coin.Amount, totalShares)
-	price1To0Center := dextypes.MustNewPrice(-1 * tick)
+	price1To0Center, err := dextypes.NewPrice(-1 * tick)
+	if err != nil {
+		return sdk.ZeroInt(), err
+	}
 	return amount0.ToDec().Add(price1To0Center.MulInt(amount1)).TruncateInt(), nil
 }
 

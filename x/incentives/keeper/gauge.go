@@ -110,6 +110,20 @@ func (k Keeper) CreateGauge(
 		return nil, types.ErrMaxGaugesReached
 	}
 
+	// Perhaps overly defensive checks, these validations are also being performed
+	// in the ValidateBasic() for CreateGaugeMsg.
+	if dextypes.IsTickOutOfRange(pricingTick) {
+		return nil, types.ErrGaugePricingTickOutOfRange
+	}
+
+	if dextypes.IsTickOutOfRange(distrTo.StartTick) {
+		return nil, types.ErrGaugeDistrToTickOutOfRange
+	}
+
+	if dextypes.IsTickOutOfRange(distrTo.EndTick) {
+		return nil, types.ErrGaugeDistrToTickOutOfRange
+	}
+
 	gauge := &types.Gauge{
 		Id:                k.GetLastGaugeID(ctx) + 1,
 		IsPerpetual:       isPerpetual,
@@ -117,7 +131,8 @@ func (k Keeper) CreateGauge(
 		Coins:             coins,
 		StartTime:         startTime,
 		NumEpochsPaidOver: numEpochsPaidOver,
-		PricingTick:       pricingTick,
+		// If this is outside the tick range then the distribution step will fail
+		PricingTick: pricingTick,
 	}
 
 	if err := k.bk.SendCoinsFromAccountToModule(ctx, owner, types.ModuleName, gauge.Coins); err != nil {
