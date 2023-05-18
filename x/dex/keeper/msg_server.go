@@ -23,20 +23,19 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
-	// lexographically sort token0, token1
-	token0, token1, err := SortTokens(msg.TokenA, msg.TokenB)
+	pairID, err := types.NewPairIDFromUnsorted(msg.TokenA, msg.TokenB)
 	if err != nil {
 		return nil, err
 	}
-	// sort amounts
-	amounts0, amounts1 := SortAmounts(msg.TokenA, token0, msg.AmountsA, msg.AmountsB)
 
-	tickIndexes := NormalizeAllTickIndexes(msg.TokenA, token0, msg.TickIndexesAToB)
+	// sort amounts
+	amounts0, amounts1 := SortAmounts(msg.TokenA, pairID.Token0, msg.AmountsA, msg.AmountsB)
+
+	tickIndexes := NormalizeAllTickIndexes(msg.TokenA, pairID.Token0, msg.TickIndexesAToB)
 
 	Amounts0Deposit, Amounts1Deposit, _, err := k.DepositCore(
 		goCtx,
-		token0,
-		token1,
+		pairID,
 		callerAddr,
 		receiverAddr,
 		amounts0,
@@ -56,18 +55,16 @@ func (k msgServer) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
-	// lexographically sort token0, token1
-	token0, token1, err := SortTokens(msg.TokenA, msg.TokenB)
+	pairID, err := types.NewPairIDFromUnsorted(msg.TokenA, msg.TokenB)
 	if err != nil {
 		return nil, err
 	}
 
-	tickIndexes := NormalizeAllTickIndexes(msg.TokenA, token0, msg.TickIndexesAToB)
+	tickIndexes := NormalizeAllTickIndexes(msg.TokenA, pairID.Token0, msg.TickIndexesAToB)
 
 	err = k.WithdrawCore(
 		goCtx,
-		token0,
-		token1,
+		pairID,
 		callerAddr,
 		receiverAddr,
 		msg.SharesToRemove,
@@ -88,11 +85,11 @@ func (k msgServer) PlaceLimitOrder(
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
-	token0, _, err := SortTokens(msg.TokenIn, msg.TokenOut)
+	pairID, err := types.NewPairIDFromUnsorted(msg.TokenIn, msg.TokenOut)
 	if err != nil {
-		return &types.MsgPlaceLimitOrderResponse{}, err
+		return nil, err
 	}
-	tickIndex := NormalizeTickIndex(msg.TokenIn, token0, msg.TickIndex)
+	tickIndex := NormalizeTickIndex(msg.TokenIn, pairID.Token0, msg.TickIndex)
 
 	sdkCtx := sdk.UnwrapSDKContext(goCtx)
 	err = msg.ValidateGoodTilExpiration(sdkCtx.BlockTime())

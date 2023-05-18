@@ -18,18 +18,17 @@ func CreateNTickLiquidity(keeper *keeper.Keeper, ctx sdk.Context, n int) []types
 		tick := types.TickLiquidity{
 			Liquidity: &types.TickLiquidity_LimitOrderTranche{
 				LimitOrderTranche: &types.LimitOrderTranche{
-					PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-					TokenIn:          "TokenA",
-					TickIndex:        int64(i),
-					TrancheKey:       strconv.Itoa(i),
-					ReservesTokenIn:  sdk.NewInt(10),
-					ReservesTokenOut: sdk.NewInt(10),
-					TotalTokenIn:     sdk.NewInt(10),
-					TotalTokenOut:    sdk.NewInt(10),
+					TradePairID:        &types.TradePairID{MakerDenom: "TokenA", TakerDenom: "TokenB"},
+					TickIndex:          int64(i),
+					TrancheKey:         strconv.Itoa(i),
+					ReservesMakerDenom: sdk.NewInt(10),
+					ReservesTakerDenom: sdk.NewInt(10),
+					TotalMakerDenom:    sdk.NewInt(10),
+					TotalTakerDenom:    sdk.NewInt(10),
 				},
 			},
 		}
-		keeper.SetLimitOrderTranche(ctx, *tick.GetLimitOrderTranche())
+		keeper.SetLimitOrderTranche(ctx, tick.GetLimitOrderTranche())
 		items[i] = tick
 	}
 

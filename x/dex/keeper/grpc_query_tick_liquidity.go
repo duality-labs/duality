@@ -30,8 +30,10 @@ func (k Keeper) TickLiquidityAll(
 		return nil, err
 	}
 
+	tradePairID := types.NewTradePairIDFromMaker(pairID, req.TokenIn)
+
 	store := ctx.KVStore(k.storeKey)
-	tickLiquidityStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairID, req.TokenIn))
+	tickLiquidityStore := prefix.NewStore(store, types.TickLiquidityPrefix(tradePairID))
 
 	pageRes, err := query.Paginate(tickLiquidityStore, req.Pagination, func(key, value []byte) error {
 		var tickLiquidity types.TickLiquidity

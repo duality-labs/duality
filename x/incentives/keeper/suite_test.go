@@ -49,8 +49,7 @@ func (suite *KeeperTestSuite) SetupDeposit(s depositSpec) sdk.Coins {
 	suite.FundAcc(s.addr, sdk.Coins{s.token0, s.token1})
 	_, _, shares, err := suite.App.DexKeeper.DepositCore(
 		sdk.WrapSDKContext(suite.Ctx),
-		s.token0.Denom,
-		s.token1.Denom,
+		dextypes.MustNewPairID(s.token0.Denom, s.token1.Denom),
 		s.addr,
 		s.addr,
 		[]sdk.Int{s.token0.Amount},

@@ -659,7 +659,7 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderGoodTilHandlesTimezoneCorrectly(
 	s.fundAliceBalances(10, 0)
 	timeInPST, _ := time.Parse(time.RFC3339, "2050-01-02T15:04:05-08:00")
 	trancheKey := s.aliceLimitSellsGoodTil("TokenA", 0, 10, timeInPST)
-	tranche, _ := s.app.DexKeeper.GetLimitOrderTranche(s.ctx, defaultPairID, "TokenA", 0, trancheKey)
+	tranche, _ := s.app.DexKeeper.GetLimitOrderTranche(s.ctx, defaultTradePairID1To0, 0, trancheKey)
 
 	s.Assert().Equal(tranche.ExpirationTime.Unix(), timeInPST.Unix())
 }

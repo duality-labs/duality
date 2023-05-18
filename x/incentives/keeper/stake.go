@@ -115,7 +115,7 @@ func (k Keeper) GetStakeByID(ctx sdk.Context, stakeID uint64) (*types.Stake, err
 
 // GetAccountStakes Returns the period locks associated to an account.
 func (k Keeper) GetStakesByQueryCondition(ctx sdk.Context, distrTo *types.QueryCondition) types.Stakes {
-	pairIDString := distrTo.PairID.Stringify()
+	pairIDString := distrTo.PairID.CanonicalString()
 	tickStakeIds := k.getIDsFromIterator(
 		k.iteratorStartEnd(
 			ctx,

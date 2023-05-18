@@ -25,8 +25,10 @@ func (k Keeper) PoolReservesAll(
 	if err != nil {
 		return nil, err
 	}
+	tradePairID := types.NewTradePairIDFromMaker(pairID, req.TokenIn)
+
 	store := ctx.KVStore(k.storeKey)
-	PoolReservesStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairID, req.TokenIn))
+	PoolReservesStore := prefix.NewStore(store, types.TickLiquidityPrefix(tradePairID))
 
 	var poolReserves []types.PoolReserves
 	pageRes, err := query.FilteredPaginate(
@@ -69,7 +71,9 @@ func (k Keeper) PoolReserves(
 	if err != nil {
 		return nil, err
 	}
-	val, found := k.GetPoolReserves(ctx, pairID, req.TokenIn, req.TickIndex, req.Fee)
+	tradePairID := types.NewTradePairIDFromMaker(pairID, req.TokenIn)
+
+	val, found := k.GetPoolReserves(ctx, tradePairID, req.TickIndex, req.Fee)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")
 	}

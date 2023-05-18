@@ -4,37 +4,37 @@ package dualitylabs.duality.dex;
 option go_package = "github.com/duality-labs/duality/x/dex/types";
 import "google/protobuf/timestamp.proto";
 
+import "duality/dex/trade_pair_id.proto";
 import "gogoproto/gogo.proto";
 import "duality/dex/pair_id.proto";
 
 message LimitOrderTranche {
-  PairID pairID = 1;
-  string tokenIn = 2;
-  int64 tickIndex = 3;
-  string trancheKey = 4; 
-  string reservesTokenIn = 5  [
-      (gogoproto.moretags)   = "yaml:\"reserves\"",
+  TradePairID tradePairID = 1;
+  int64 tickIndex = 2;
+  string trancheKey = 3; 
+  string reservesMakerDenom = 4  [
+      (gogoproto.moretags)   = "yaml:\"reservesMakerDenom\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
-      (gogoproto.jsontag) = "reservesTokenIn"
+      (gogoproto.jsontag) = "reservesMakerDenom"
   ]; 
-  string reservesTokenOut = 6  [
-      (gogoproto.moretags)   = "yaml:\"fill\"",
+  string reservesTakerDenom = 5  [
+      (gogoproto.moretags)   = "yaml:\"reservesTakerDenom\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
-      (gogoproto.jsontag) = "reservesTokenOut"
+      (gogoproto.jsontag) = "reservesTakerDenom"
   ];  
-  string totalTokenIn = 7  [
-      (gogoproto.moretags)   = "yaml:\"totalShares\"",
+  string totalMakerDenom = 6  [
+      (gogoproto.moretags)   = "yaml:\"totalMakerDenom\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "totalTokenIn"
   ];  
-  string totalTokenOut = 8  [
-      (gogoproto.moretags)   = "yaml:\"totalShares\"",
+  string totalTakerDenom = 7  [
+      (gogoproto.moretags)   = "yaml:\"totalTakerDenom\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
-      (gogoproto.jsontag) = "totalTokenOut"
+      (gogoproto.jsontag) = "totalTakerDenom"
   ];
   // GoodTilDate is represented as seconds since  January 1, year 1, 00:00:00.00 UTC
   // LimitOrders with goodTilDate set are valid as long as blockTime <= goodTilDate
@@ -42,9 +42,21 @@ message LimitOrderTranche {
   // JIT orders also use goodTilDate to handle deletion but represent a special case
   // All JIT orders have a goodTilDate of 0 and an exception is made to still still treat these orders as live
   // Order deletion still functions the same and the orders will be deleted at the end of the block
-  google.protobuf.Timestamp expirationTime = 9 [
+  google.protobuf.Timestamp expirationTime = 8 [
                                              (gogoproto.stdtime) = true,
                                              (gogoproto.nullable) = true
                                              ];
+  string priceTakerToMaker = 9 [
+                (gogoproto.moretags)   = "yaml:\"priceTakerToMaker\"",
+                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+                (gogoproto.nullable)   = false,
+                (gogoproto.jsontag) = "priceTakerToMaker"
+                ];
+  string priceMakerToTaker = 10 [
+                (gogoproto.moretags)   = "yaml:\"priceMakerToTaker\"",
+                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+                (gogoproto.nullable)   = false,
+                (gogoproto.jsontag) = "priceMakerToTaker"
+                ];
 }
 

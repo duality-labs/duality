@@ -28,11 +28,13 @@ func (k Keeper) LimitOrderTrancheAll(
 	if err != nil {
 		return nil, err
 	}
+	tradePairID := types.NewTradePairIDFromMaker(pairID, req.TokenIn)
+
 	store := ctx.KVStore(k.storeKey)
-	LimitOrderTrancheStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairID, req.TokenIn))
+	limitOrderTrancheStore := prefix.NewStore(store, types.TickLiquidityPrefix(tradePairID))
 
 	pageRes, err := query.FilteredPaginate(
-		LimitOrderTrancheStore,
+		limitOrderTrancheStore,
 		req.Pagination, func(key, value []byte, accum bool) (hit bool, err error) {
 			var tick types.TickLiquidity
 
@@ -71,10 +73,11 @@ func (k Keeper) LimitOrderTranche(
 	if err != nil {
 		return nil, err
 	}
-	val, _, found := k.FindLimitOrderTranche(ctx, pairID, req.TickIndex, req.TokenIn, req.TrancheKey)
+	tradePairID := types.NewTradePairIDFromMaker(pairID, req.TokenIn)
+	val, _, found := k.FindLimitOrderTranche(ctx, tradePairID, req.TickIndex, req.TrancheKey)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")
 	}
 
-	return &types.QueryGetLimitOrderTrancheResponse{LimitOrderTranche: val}, nil
+	return &types.QueryGetLimitOrderTrancheResponse{LimitOrderTranche: *val}, nil
 }

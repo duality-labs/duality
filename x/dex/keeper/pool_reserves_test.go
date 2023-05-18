@@ -14,15 +14,11 @@ import (
 func createNPoolReserves(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.PoolReserves {
 	items := make([]types.PoolReserves, n)
 	for i := range items {
-		tranche := &types.PoolReserves{
-			PairID:    &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-			TokenIn:   "TokenA",
-			TickIndex: int64(i),
-			Fee:       uint64(i),
-			Reserves:  sdk.NewInt(10),
-		}
-		keeper.SetPoolReserves(ctx, *tranche)
-		items[i] = *tranche
+		poolReserves := types.MustNewPoolReserves(
+			"TokenA", "TokenB", int64(i), uint64(i), sdk.NewInt(10),
+		)
+		keeper.SetPoolReserves(ctx, *poolReserves)
+		items[i] = *poolReserves
 	}
 
 	return items
@@ -33,8 +29,7 @@ func TestGetPoolReserves(t *testing.T) {
 	items := createNPoolReserves(keeper, ctx, 10)
 	for _, item := range items {
 		rst, found := keeper.GetPoolReserves(ctx,
-			item.PairID,
-			item.TokenIn,
+			item.TradePairID,
 			item.TickIndex,
 			item.Fee,
 		)
@@ -52,8 +47,7 @@ func TestRemovePoolReserves(t *testing.T) {
 	for _, item := range items {
 		keeper.RemovePoolReserves(ctx, item)
 		_, found := keeper.GetPoolReserves(ctx,
-			item.PairID,
-			item.TokenIn,
+			item.TradePairID,
 			item.TickIndex,
 			item.Fee,
 		)

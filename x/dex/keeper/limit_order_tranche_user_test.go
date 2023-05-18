@@ -17,8 +17,7 @@ func createNLimitOrderTrancheUser(keeper *keeper.Keeper, ctx sdk.Context, n int)
 	for i := range items {
 		items[i].TrancheKey = strconv.Itoa(i)
 		items[i].Address = strconv.Itoa(i)
-		items[i].PairID = &types.PairID{Token0: "TokenA", Token1: "TokenB"}
-		items[i].Token = "TokenA"
+		items[i].TradePairID = &types.TradePairID{MakerDenom: "TokenA", TakerDenom: "TokenB"}
 		items[i].TickIndex = 0
 		items[i].SharesOwned = sdk.ZeroInt()
 		items[i].SharesWithdrawn = sdk.ZeroInt()

@@ -57,10 +57,10 @@ func (k Keeper) InactiveLimitOrderTranche(
 	if err != nil {
 		return nil, err
 	}
+	tradePairID := types.NewTradePairIDFromMaker(pairID, req.TokenIn)
 	val, found := k.GetInactiveLimitOrderTranche(
 		ctx,
-		pairID,
-		req.TokenIn,
+		tradePairID,
 		req.TickIndex,
 		req.TrancheKey,
 	)
@@ -68,5 +68,5 @@ func (k Keeper) InactiveLimitOrderTranche(
 		return nil, status.Error(codes.NotFound, "not found")
 	}
 
-	return &types.QueryGetInactiveLimitOrderTrancheResponse{InactiveLimitOrderTranche: val}, nil
+	return &types.QueryGetInactiveLimitOrderTrancheResponse{InactiveLimitOrderTranche: *val}, nil
 }

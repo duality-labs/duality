@@ -19,8 +19,7 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 	LOList := profile.GetAllLimitOrders(s.ctx, s.app.DexKeeper)
 	s.Assert().Equal(2, len(LOList))
 	s.Assert().Equal(types.LimitOrderTrancheUser{
-		PairID:          defaultPairID,
-		Token:           "TokenA",
+		TradePairID:     defaultTradePairID1To0,
 		TickIndex:       -1,
 		TrancheKey:      trancheKeyA,
 		Address:         s.alice.String(),
@@ -31,8 +30,7 @@ func (s *MsgServerTestSuite) TestGetAllLimitOrders() {
 		LOList[0],
 	)
 	s.Assert().Equal(types.LimitOrderTrancheUser{
-		PairID:          defaultPairID,
-		Token:           "TokenB",
+		TradePairID:     defaultTradePairID0To1,
 		TickIndex:       0,
 		TrancheKey:      trancheKeyB,
 		Address:         s.alice.String(),

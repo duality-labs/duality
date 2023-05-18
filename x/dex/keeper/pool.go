@@ -12,8 +12,6 @@ type Pool struct {
 	Fee             uint64
 	LowerTick0      *types.PoolReserves
 	UpperTick1      *types.PoolReserves
-	Price1To0Lower  *types.Price
-	Price0To1Upper  *types.Price
 }
 
 // TODO: Accept a PairID here so that GetDepositDenom() can reference it directly
@@ -22,28 +20,27 @@ func NewPool(
 	lowerTick0 *types.PoolReserves,
 	upperTick1 *types.PoolReserves,
 ) Pool {
-	// TODO: maybe store this somewhere so we don't have to recalculate
-	price0To1Upper := types.MustNewPrice(upperTick1.TickIndex)
-	price1To0Lower := types.MustNewPrice(-1 * lowerTick0.TickIndex)
-
 	return Pool{
 		CenterTickIndex: centerTickIndex,
 		Fee:             lowerTick0.Fee,
 		LowerTick0:      lowerTick0,
 		UpperTick1:      upperTick1,
-		Price0To1Upper:  price0To1Upper,
-		Price1To0Lower:  price1To0Lower,
 	}
 }
 
 func (k Keeper) GetOrInitPool(ctx sdk.Context, pairID *types.PairID, centerTickIndex int64, fee uint64) (Pool, error) {
 	feeUint := utils.MustSafeUint64(fee)
-	lowertick, err := k.GetOrInitPoolReserves(ctx, pairID, pairID.Token0, centerTickIndex-feeUint, fee)
+
+	lowerTickIndex := centerTickIndex - feeUint
+	lowertradePairID := types.NewTradePairIDFromMaker(pairID, pairID.Token0)
+	lowertick, err := k.GetOrInitPoolReserves(ctx, lowertradePairID, lowerTickIndex, fee)
 	if err != nil {
 		return Pool{}, sdkerrors.Wrapf(err, "Error for lower tick")
 	}
 
-	upperTick, err := k.GetOrInitPoolReserves(ctx, pairID, pairID.Token1, centerTickIndex+feeUint, fee)
+	upperTickIndex := centerTickIndex + feeUint
+	uppertradePairID := types.NewTradePairIDFromMaker(pairID, pairID.Token1)
+	upperTick, err := k.GetOrInitPoolReserves(ctx, uppertradePairID, upperTickIndex, fee)
 	if err != nil {
 		return Pool{}, sdkerrors.Wrapf(err, "Error for upper tick")
 	}
@@ -52,22 +49,22 @@ func (k Keeper) GetOrInitPool(ctx sdk.Context, pairID *types.PairID, centerTickI
 }
 
 func (p *Pool) GetLowerReserve0() sdk.Int {
-	return p.LowerTick0.Reserves
+	return p.LowerTick0.ReservesMakerDenom
 }
 
 func (p *Pool) GetUpperReserve1() sdk.Int {
-	return p.UpperTick1.Reserves
+	return p.UpperTick1.ReservesMakerDenom
 }
 
 func (p *Pool) Swap0To1(maxAmountIn0 sdk.Int, maxAmountOut1 sdk.Int) (inAmount0, outAmount1 sdk.Int) {
-	reserves1 := &p.UpperTick1.Reserves
+	reserves1 := &p.UpperTick1.ReservesMakerDenom
 	if maxAmountIn0.Equal(sdk.ZeroInt()) || reserves1.Equal(sdk.ZeroInt()) {
 		return sdk.ZeroInt(), sdk.ZeroInt()
 	}
 
-	reserves0 := &p.LowerTick0.Reserves
+	reserves0 := &p.LowerTick0.ReservesMakerDenom
 
-	maxOutGivenIn1 := p.Price0To1Upper.MulInt(maxAmountIn0).TruncateInt()
+	maxOutGivenIn1 := p.UpperTick1.PriceTakerToMaker.MulInt(maxAmountIn0).TruncateInt()
 	possibleOutAmounts := []sdk.Int{*reserves1, maxOutGivenIn1}
 	if !maxAmountOut1.IsZero() {
 		possibleOutAmounts = append(possibleOutAmounts, maxAmountOut1)
@@ -78,7 +75,7 @@ func (p *Pool) Swap0To1(maxAmountIn0 sdk.Int, maxAmountOut1 sdk.Int) (inAmount0,
 	// b.) The most the user could get out given maxAmountIn0 (maxOutGivenIn1)
 	// c.) The maximum amount the user wants out (maxAmountOut1)
 	outAmount1 = utils.MinIntArr(possibleOutAmounts)
-	inAmount0 = p.Price0To1Upper.Inv().MulInt(outAmount1).Ceil().TruncateInt()
+	inAmount0 = p.UpperTick1.PriceMakerToTaker.MulInt(outAmount1).Ceil().TruncateInt()
 
 	*reserves0 = reserves0.Add(inAmount0)
 	*reserves1 = reserves1.Sub(outAmount1)
@@ -87,14 +84,14 @@ func (p *Pool) Swap0To1(maxAmountIn0 sdk.Int, maxAmountOut1 sdk.Int) (inAmount0,
 }
 
 func (p *Pool) Swap1To0(maxAmountIn1 sdk.Int, maxAmountOut0 sdk.Int) (inAmount1, outAmount0 sdk.Int) {
-	reserves0 := &p.LowerTick0.Reserves
+	reserves0 := &p.LowerTick0.ReservesMakerDenom
 	if maxAmountIn1.Equal(sdk.ZeroInt()) || reserves0.Equal(sdk.ZeroInt()) {
 		return sdk.ZeroInt(), sdk.ZeroInt()
 	}
 
-	reserves1 := &p.UpperTick1.Reserves
+	reserves1 := &p.UpperTick1.ReservesMakerDenom
 
-	maxOutGivenIn0 := p.Price1To0Lower.MulInt(maxAmountIn1).TruncateInt()
+	maxOutGivenIn0 := p.LowerTick0.PriceTakerToMaker.MulInt(maxAmountIn1).TruncateInt()
 	possibleOutAmounts := []sdk.Int{*reserves0, maxOutGivenIn0}
 	if !maxAmountOut0.IsZero() {
 		possibleOutAmounts = append(possibleOutAmounts, maxAmountOut0)
@@ -105,7 +102,7 @@ func (p *Pool) Swap1To0(maxAmountIn1 sdk.Int, maxAmountOut0 sdk.Int) (inAmount1,
 	// b.) The most the user could get out given maxAmountIn1 (maxOutGivenIn0),
 	// c.) The maximum amount the user wants out (maxAmountOut0)
 	outAmount0 = utils.MinIntArr(possibleOutAmounts)
-	inAmount1 = p.Price1To0Lower.Inv().MulInt(outAmount0).Ceil().TruncateInt()
+	inAmount1 = p.LowerTick0.PriceMakerToTaker.MulInt(outAmount0).Ceil().TruncateInt()
 
 	*reserves1 = reserves1.Add(inAmount1)
 	*reserves0 = reserves0.Sub(outAmount0)
@@ -151,8 +148,8 @@ func (p *Pool) Deposit(
 	existingShares sdk.Int,
 	autoswap bool,
 ) (inAmount0, inAmount1 sdk.Int, outShares sdk.Coin) {
-	lowerReserve0 := &p.LowerTick0.Reserves
-	upperReserve1 := &p.UpperTick1.Reserves
+	lowerReserve0 := &p.LowerTick0.ReservesMakerDenom
+	upperReserve1 := &p.UpperTick1.ReservesMakerDenom
 
 	inAmount0, inAmount1 = CalcGreatestMatchingRatio(
 		*lowerReserve0,
@@ -190,13 +187,13 @@ func (p *Pool) Deposit(
 }
 
 func (p *Pool) GetDepositDenom() string {
-	return types.NewDepositDenom(p.LowerTick0.PairID, p.CenterTickIndex, p.Fee).String()
+	return types.NewDepositDenom(p.LowerTick0.TradePairID.MustPairID(), p.CenterTickIndex, p.Fee).String()
 }
 
-func (p *Pool) MustCalcPrice1To0Center() *types.Price {
+func (p *Pool) MustCalcPrice1To0Center() sdk.Dec {
 	// NOTE: We can safely call the error-less version of CalcPrice here because the pool object
 	// has already been initialized with an upper and lower tick which satisfy a check for IsTickOutOfRange
-	return types.MustNewPrice(-1 * p.CenterTickIndex)
+	return types.MustCalcPrice(-1 * p.CenterTickIndex)
 }
 
 func (p *Pool) CalcSharesMinted(
@@ -205,9 +202,9 @@ func (p *Pool) CalcSharesMinted(
 	existingShares sdk.Int,
 ) (sharesMinted sdk.Coin) {
 	price1To0Center := p.MustCalcPrice1To0Center()
-	valueMintedToken0 := CalcAmountAsToken0(amount0, amount1, *price1To0Center)
+	valueMintedToken0 := CalcAmountAsToken0(amount0, amount1, price1To0Center)
 
-	valueExistingToken0 := CalcAmountAsToken0(p.LowerTick0.Reserves, p.UpperTick1.Reserves, *price1To0Center)
+	valueExistingToken0 := CalcAmountAsToken0(p.LowerTick0.ReservesMakerDenom, p.UpperTick1.ReservesMakerDenom, price1To0Center)
 	var sharesMintedAmount sdk.Int
 	if valueExistingToken0.GT(sdk.ZeroDec()) {
 		sharesMintedAmount = valueMintedToken0.MulInt(existingShares).Quo(valueExistingToken0).TruncateInt()
@@ -223,7 +220,7 @@ func (p *Pool) CalcResidualSharesMinted(
 	residualAmount1 sdk.Int,
 ) (sharesMinted sdk.Coin, err error) {
 	fee := CalcFee(p.UpperTick1.TickIndex, p.LowerTick0.TickIndex)
-	valueMintedToken0, err := CalcResidualValue(residualAmount0, residualAmount1, p.Price1To0Lower, fee)
+	valueMintedToken0, err := CalcResidualValue(residualAmount0, residualAmount1, p.LowerTick0.PriceTakerToMaker, fee)
 	if err != nil {
 		return sdk.Coin{Denom: p.GetDepositDenom()}, err
 	}
@@ -232,8 +229,8 @@ func (p *Pool) CalcResidualSharesMinted(
 }
 
 func (p *Pool) RedeemValue(sharesToRemove, totalShares sdk.Int) (outAmount0, outAmount1 sdk.Int) {
-	reserves0 := &p.LowerTick0.Reserves
-	reserves1 := &p.UpperTick1.Reserves
+	reserves0 := &p.LowerTick0.ReservesMakerDenom
+	reserves1 := &p.UpperTick1.ReservesMakerDenom
 	// outAmount1 = ownershipRatio * reserves1
 	//            = (sharesToRemove / totalShares) * reserves1
 	//            = (reserves1 * sharesToRemove ) / totalShares
@@ -247,8 +244,8 @@ func (p *Pool) RedeemValue(sharesToRemove, totalShares sdk.Int) (outAmount0, out
 }
 
 func (p *Pool) Withdraw(sharesToRemove, totalShares sdk.Int) (outAmount0, outAmount1 sdk.Int) {
-	reserves0 := &p.LowerTick0.Reserves
-	reserves1 := &p.UpperTick1.Reserves
+	reserves0 := &p.LowerTick0.ReservesMakerDenom
+	reserves1 := &p.UpperTick1.ReservesMakerDenom
 	outAmount0, outAmount1 = p.RedeemValue(sharesToRemove, totalShares)
 	*reserves0 = reserves0.Sub(outAmount0)
 	*reserves1 = reserves1.Sub(outAmount1)
@@ -256,14 +253,14 @@ func (p *Pool) Withdraw(sharesToRemove, totalShares sdk.Int) (outAmount0, outAmo
 	return outAmount0, outAmount1
 }
 
-func CalcResidualValue(amount0, amount1 sdk.Int, priceLower1To0 *types.Price, fee int64) (sdk.Dec, error) {
+func CalcResidualValue(amount0, amount1 sdk.Int, priceLowerTakerToMaker sdk.Dec, fee int64) (sdk.Dec, error) {
 	// ResidualValue = Amount0 * (Price1to0Center / Price1to0Upper) + Amount1 * Price1to0Lower
-	amount0Discount, err := types.NewPrice(-fee)
+	amount0Discount, err := types.CalcPrice(-fee)
 	if err != nil {
 		return sdk.ZeroDec(), err
 	}
 
-	return amount0Discount.MulInt(amount0).Add(priceLower1To0.MulInt(amount1)), nil
+	return amount0Discount.MulInt(amount0).Add(priceLowerTakerToMaker.MulInt(amount1)), nil
 }
 
 func CalcFee(upperTickIndex, lowerTickIndex int64) int64 {
@@ -271,14 +268,11 @@ func CalcFee(upperTickIndex, lowerTickIndex int64) int64 {
 }
 
 func (k Keeper) SavePool(ctx sdk.Context, pool Pool) {
-	if pool.LowerTick0.HasToken() {
+	if pool.LowerTick0.HasToken() || pool.UpperTick1.HasToken() {
 		k.SetPoolReserves(ctx, *pool.LowerTick0)
-	} else {
-		k.RemovePoolReserves(ctx, *pool.LowerTick0)
-	}
-	if pool.UpperTick1.HasToken() {
 		k.SetPoolReserves(ctx, *pool.UpperTick1)
 	} else {
+		k.RemovePoolReserves(ctx, *pool.LowerTick0)
 		k.RemovePoolReserves(ctx, *pool.UpperTick1)
 	}
 

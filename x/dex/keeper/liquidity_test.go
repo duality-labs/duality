@@ -591,8 +591,8 @@ func (s *LiquidityTestSuite) TestSwapExhaustsLOAndLP() {
 func (s *LiquidityTestSuite) addDeposit(deposit *Deposit) {
 	pool, err := s.app.DexKeeper.GetOrInitPool(s.ctx, defaultPairID, deposit.TickIndex, deposit.Fee)
 	s.Assert().NoError(err)
-	pool.LowerTick0.Reserves = pool.LowerTick0.Reserves.Add(deposit.AmountA)
-	pool.UpperTick1.Reserves = pool.UpperTick1.Reserves.Add(deposit.AmountB)
+	pool.LowerTick0.ReservesMakerDenom = pool.LowerTick0.ReservesMakerDenom.Add(deposit.AmountA)
+	pool.UpperTick1.ReservesMakerDenom = pool.UpperTick1.ReservesMakerDenom.Add(deposit.AmountB)
 	s.app.DexKeeper.SavePool(s.ctx, pool)
 }
 
@@ -602,15 +602,18 @@ func (s *LiquidityTestSuite) addDeposits(deposits ...*Deposit) {
 	}
 }
 
-func (s *LiquidityTestSuite) placeGTCLimitOrder(tokenIn string, amountIn int64, tickIndex int64) {
-	tranche, err := s.app.DexKeeper.GetOrInitPlaceTranche(s.ctx, defaultPairID, tokenIn, tickIndex, nil, types.LimitOrderType_GOOD_TIL_CANCELLED)
+func (s *LiquidityTestSuite) placeGTCLimitOrder(makerDenom string, amountIn int64, tickIndex int64) {
+	tradePairID := defaultPairID.MustTradePairIDFromMaker(makerDenom)
+	tranche, err := s.app.DexKeeper.GetOrInitPlaceTranche(s.ctx, tradePairID, tickIndex, nil, types.LimitOrderType_GOOD_TIL_CANCELLED)
 	s.Assert().NoError(err)
 	tranche.PlaceMakerLimitOrder(sdk.NewInt(amountIn))
 	s.app.DexKeeper.SaveTranche(s.ctx, tranche)
 }
 
 func (s *LiquidityTestSuite) swap(tokenIn string, tokenOut string, maxAmountIn int64, maxAmountOut int64, limitPrice *sdk.Dec) (coinIn, coinOut sdk.Coin) {
-	coinIn, coinOut, err := s.app.DexKeeper.Swap(s.ctx, defaultPairID, tokenIn, tokenOut, sdk.NewInt(maxAmountIn), sdk.NewInt(maxAmountOut), limitPrice)
+	tradePairID, err := types.NewTradePairID(tokenIn, tokenOut)
+	s.Assert().NoError(err)
+	coinIn, coinOut, err = s.app.DexKeeper.Swap(s.ctx, tradePairID, sdk.NewInt(maxAmountIn), sdk.NewInt(maxAmountOut), limitPrice)
 	s.Assert().NoError(err)
 	return coinIn, coinOut
 }
@@ -636,24 +639,24 @@ func (s *LiquidityTestSuite) assertDexBalances(expectedABalance int64, expectedB
 	for _, tick := range ticks {
 		switch liquidity := tick.Liquidity.(type) {
 		case *types.TickLiquidity_LimitOrderTranche:
-			tokenIn := liquidity.LimitOrderTranche.TokenIn
-			amountIn := liquidity.LimitOrderTranche.ReservesTokenIn
+			tokenIn := liquidity.LimitOrderTranche.TradePairID.MakerDenom
+			amountIn := liquidity.LimitOrderTranche.ReservesMakerDenom
 			allCoins = allCoins.Add(sdk.NewCoin(tokenIn, amountIn))
 
-			tokenOut := liquidity.LimitOrderTranche.PairID.MustOppositeToken(tokenIn)
-			amountOut := liquidity.LimitOrderTranche.ReservesTokenOut
+			tokenOut := liquidity.LimitOrderTranche.TradePairID.TakerDenom
+			amountOut := liquidity.LimitOrderTranche.ReservesTakerDenom
 			allCoins = allCoins.Add(sdk.NewCoin(tokenOut, amountOut))
 
 		case *types.TickLiquidity_PoolReserves:
-			tokenIn := liquidity.PoolReserves.TokenIn
-			reserves := liquidity.PoolReserves.Reserves
+			tokenIn := liquidity.PoolReserves.TradePairID.MakerDenom
+			reserves := liquidity.PoolReserves.ReservesMakerDenom
 			allCoins = allCoins.Add(sdk.NewCoin(tokenIn, reserves))
 		}
 	}
 
 	for _, lo := range inactiveLOs {
-		tokenOut := lo.PairID.MustOppositeToken(lo.TokenIn)
-		amountOut := lo.ReservesTokenOut
+		tokenOut := lo.TradePairID.TakerDenom
+		amountOut := lo.ReservesTakerDenom
 		allCoins = allCoins.Add(sdk.NewCoin(tokenOut, amountOut))
 	}
 
@@ -665,20 +668,29 @@ func (s *LiquidityTestSuite) assertDexBalances(expectedABalance int64, expectedB
 }
 
 func (s *LiquidityTestSuite) assertCurr0To1(curr0To1Expected int64) {
-	curr0To1Actual, _ := s.app.DexKeeper.GetCurrTick0To1(s.ctx, defaultPairID)
-	s.Assert().Equal(curr0To1Expected, curr0To1Actual)
+	curr0To1Actual, found := s.app.DexKeeper.GetCurrTick(s.ctx, defaultTradePairID0To1)
+	if curr0To1Expected == math.MaxInt64 {
+		s.Assert().False(found)
+	} else {
+		s.Assert().Equal(curr0To1Expected, curr0To1Actual)
+	}
 }
 
 func (s *LiquidityTestSuite) assertCurr1To0(curr1To0Expected int64) {
-	curr1to0Actual, _ := s.app.DexKeeper.GetCurrTick1To0(s.ctx, defaultPairID)
-	s.Assert().Equal(curr1To0Expected, curr1to0Actual)
+	curr1to0Actual, found := s.app.DexKeeper.GetCurrTick(s.ctx, defaultTradePairID1To0)
+	if curr1To0Expected == math.MinInt64 {
+		s.Assert().False(found)
+	} else {
+		s.Assert().Equal(curr1To0Expected, curr1to0Actual)
+	}
 }
 
 func (s *LiquidityTestSuite) assertFillAndPlaceTrancheKeys(selling string, tickIndex int64, expectedFill, expectedPlace string) {
-	placeTranche, foundPlace := s.app.DexKeeper.GetPlaceTranche(s.ctx, defaultPairID, selling, tickIndex)
-	fillTranche, foundFill := s.app.DexKeeper.GetFillTranche(s.ctx, defaultPairID, selling, tickIndex)
+	tradePairID := defaultPairID.MustTradePairIDFromMaker(selling)
+	placeTranche := s.app.DexKeeper.GetPlaceTranche(s.ctx, tradePairID, tickIndex)
+	fillTranche, foundFill := s.app.DexKeeper.GetFillTranche(s.ctx, tradePairID, tickIndex)
 	placeKey, fillKey := "", ""
-	if foundPlace {
+	if placeTranche != nil {
 		placeKey = placeTranche.TrancheKey
 	}
 

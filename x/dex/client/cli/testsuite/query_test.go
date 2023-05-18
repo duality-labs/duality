@@ -31,98 +31,55 @@ var testAddress = sdk.AccAddress([]byte("testAddr"))
 var limitOrderTrancheList = []types.TickLiquidity{
 	{
 		Liquidity: &types.TickLiquidity_LimitOrderTranche{
-			LimitOrderTranche: &types.LimitOrderTranche{
-				PairID: &types.PairID{
-					Token0: "TokenA",
-					Token1: "TokenB",
-				},
-				TokenIn:          "TokenB",
-				TickIndex:        1,
-				TrancheKey:       "0",
-				ReservesTokenIn:  sdk.NewInt(10),
-				ReservesTokenOut: sdk.ZeroInt(),
-				TotalTokenIn:     sdk.NewInt(10),
-				TotalTokenOut:    sdk.ZeroInt(),
-			},
+			LimitOrderTranche: types.MustNewLimitOrderTranche(
+				"TokenB",
+				"TokenA",
+				"0",
+				1,
+				sdk.NewInt(10),
+				sdk.NewInt(0),
+				sdk.NewInt(10),
+				sdk.NewInt(0),
+			),
 		},
 	},
 	{
 		Liquidity: &types.TickLiquidity_LimitOrderTranche{
-			LimitOrderTranche: &types.LimitOrderTranche{
-				PairID: &types.PairID{
-					Token0: "TokenA",
-					Token1: "TokenB",
-				},
-				TokenIn:          "TokenB",
-				TickIndex:        2,
-				TrancheKey:       "1",
-				ReservesTokenIn:  sdk.NewInt(10),
-				ReservesTokenOut: sdk.ZeroInt(),
-				TotalTokenIn:     sdk.NewInt(10),
-				TotalTokenOut:    sdk.ZeroInt(),
-			},
+			LimitOrderTranche: types.MustNewLimitOrderTranche(
+				"TokenB",
+				"TokenA",
+				"1",
+				2,
+				sdk.NewInt(10),
+				sdk.NewInt(0),
+				sdk.NewInt(10),
+				sdk.NewInt(0),
+			),
 		},
 	},
 }
 
 var inactiveLimitOrderTrancheList = []types.LimitOrderTranche{
-	{
-		PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-		TokenIn:          "TokenB",
-		TickIndex:        0,
-		TrancheKey:       "0",
-		TotalTokenIn:     sdk.NewInt(10),
-		TotalTokenOut:    sdk.NewInt(10),
-		ReservesTokenOut: sdk.NewInt(10),
-		ReservesTokenIn:  sdk.NewInt(0),
-	},
-	{
-		PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-		TokenIn:          "TokenB",
-		TickIndex:        0,
-		TrancheKey:       "1",
-		TotalTokenIn:     sdk.NewInt(10),
-		TotalTokenOut:    sdk.NewInt(10),
-		ReservesTokenOut: sdk.NewInt(10),
-		ReservesTokenIn:  sdk.NewInt(0),
-	},
+	*types.MustNewLimitOrderTranche("TokenB", "TokenA", "0", 0, sdk.ZeroInt(), sdk.NewInt(10), sdk.NewInt(10), sdk.NewInt(10)),
+	*types.MustNewLimitOrderTranche("TokenB", "TokenA", "1", 0, sdk.ZeroInt(), sdk.NewInt(10), sdk.NewInt(10), sdk.NewInt(10)),
 }
 
 var poolReservesList = []types.TickLiquidity{
 	{
 		Liquidity: &types.TickLiquidity_PoolReserves{
-			PoolReserves: &types.PoolReserves{
-				PairID: &types.PairID{
-					Token0: "TokenA",
-					Token1: "TokenB",
-				},
-				TokenIn:   "TokenB",
-				TickIndex: 0,
-				Fee:       1,
-				Reserves:  sdk.NewInt(10),
-			},
+			PoolReserves: types.MustNewPoolReserves("TokenB", "TokenA", 0, 1, sdk.NewInt(10)),
 		},
 	},
 	{
 		Liquidity: &types.TickLiquidity_PoolReserves{
-			PoolReserves: &types.PoolReserves{
-				PairID: &types.PairID{
-					Token0: "TokenA",
-					Token1: "TokenB",
-				},
-				TokenIn:   "TokenB",
-				TickIndex: 0,
-				Fee:       3,
-				Reserves:  sdk.NewInt(10),
-			},
+			PoolReserves: types.MustNewPoolReserves("TokenB", "TokenA", 0, 3, sdk.NewInt(10)),
 		},
 	},
 }
 
 var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 	{
-		PairID:          &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-		Token:           "TokenA",
+		TradePairID:     &types.TradePairID{MakerDenom: "TokenA", TakerDenom: "TokenB"},
 		TickIndex:       1,
 		TrancheKey:      "0",
 		Address:         testAddress.String(),
@@ -131,8 +88,7 @@ var limitOrderTrancheUserList = []types.LimitOrderTrancheUser{
 		SharesCancelled: sdk.NewInt(0),
 	},
 	{
-		PairID:          &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-		Token:           "TokenB",
+		TradePairID:     &types.TradePairID{TakerDenom: "TokenA", MakerDenom: "TokenB"},
 		TickIndex:       20,
 		TrancheKey:      "1",
 		Address:         testAddress.String(),

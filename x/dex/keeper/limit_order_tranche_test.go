@@ -16,16 +16,15 @@ func createNLimitOrderTranches(keeper *keeper.Keeper, ctx sdk.Context, n int) []
 	items := make([]types.LimitOrderTranche, n)
 	for i := range items {
 		tranche := &types.LimitOrderTranche{
-			PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-			TokenIn:          "TokenA",
-			TickIndex:        int64(i),
-			TrancheKey:       strconv.Itoa(i),
-			ReservesTokenIn:  sdk.NewInt(10),
-			ReservesTokenOut: sdk.NewInt(10),
-			TotalTokenIn:     sdk.NewInt(10),
-			TotalTokenOut:    sdk.NewInt(10),
+			TradePairID:        &types.TradePairID{MakerDenom: "TokenA", TakerDenom: "TokenB"},
+			TickIndex:          int64(i),
+			TrancheKey:         strconv.Itoa(i),
+			ReservesMakerDenom: sdk.NewInt(10),
+			ReservesTakerDenom: sdk.NewInt(10),
+			TotalMakerDenom:    sdk.NewInt(10),
+			TotalTakerDenom:    sdk.NewInt(10),
 		}
-		keeper.SetLimitOrderTranche(ctx, *tranche)
+		keeper.SetLimitOrderTranche(ctx, tranche)
 		items[i] = *tranche
 	}
 
@@ -37,8 +36,7 @@ func TestGetLimitOrderTranche(t *testing.T) {
 	items := createNLimitOrderTranches(keeper, ctx, 10)
 	for _, item := range items {
 		rst, found := keeper.GetLimitOrderTranche(ctx,
-			item.PairID,
-			item.TokenIn,
+			item.TradePairID,
 			item.TickIndex,
 			item.TrancheKey,
 		)
@@ -54,10 +52,9 @@ func TestRemoveLimitOrderTranche(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNLimitOrderTranches(keeper, ctx, 10)
 	for _, item := range items {
-		keeper.RemoveLimitOrderTranche(ctx, item)
+		keeper.RemoveLimitOrderTranche(ctx, &item)
 		_, found := keeper.GetLimitOrderTranche(ctx,
-			item.PairID,
-			item.TokenIn,
+			item.TradePairID,
 			item.TickIndex,
 			item.TrancheKey,
 		)

@@ -40,15 +40,13 @@ func (gs GenesisState) Validate() error {
 		switch liquidity := elem.Liquidity.(type) {
 		case *TickLiquidity_PoolReserves:
 			index = string(TickLiquidityKey(
-				liquidity.PoolReserves.PairID,
-				liquidity.PoolReserves.TokenIn,
+				liquidity.PoolReserves.TradePairID,
 				liquidity.PoolReserves.TickIndex,
 				LiquidityTypePoolReserves,
 				liquidity.PoolReserves.Fee))
 		case *TickLiquidity_LimitOrderTranche:
 			index = string(TickLiquidityKey(
-				liquidity.LimitOrderTranche.PairID,
-				liquidity.LimitOrderTranche.TokenIn,
+				liquidity.LimitOrderTranche.TradePairID,
 				liquidity.LimitOrderTranche.TickIndex,
 				LiquidityTypeLimitOrder,
 				liquidity.LimitOrderTranche.TrancheKey))
@@ -62,7 +60,7 @@ func (gs GenesisState) Validate() error {
 	inactiveLimitOrderTrancheKeyMap := make(map[string]struct{})
 
 	for _, elem := range gs.InactiveLimitOrderTrancheList {
-		index := string(InactiveLimitOrderTrancheKey(elem.PairID, elem.TokenIn, elem.TickIndex, elem.TrancheKey))
+		index := string(InactiveLimitOrderTrancheKey(elem.TradePairID, elem.TickIndex, elem.TrancheKey))
 		if _, ok := inactiveLimitOrderTrancheKeyMap[index]; ok {
 			return fmt.Errorf("duplicated index for inactiveLimitOrderTranche")
 		}

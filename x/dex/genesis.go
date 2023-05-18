@@ -16,12 +16,12 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		case *types.TickLiquidity_PoolReserves:
 			k.SetPoolReserves(ctx, *elem.GetPoolReserves())
 		case *types.TickLiquidity_LimitOrderTranche:
-			k.SetLimitOrderTranche(ctx, *elem.GetLimitOrderTranche())
+			k.SetLimitOrderTranche(ctx, elem.GetLimitOrderTranche())
 		}
 	}
 	// Set all the inactiveLimitOrderTranche
 	for _, elem := range genState.InactiveLimitOrderTrancheList {
-		k.SetInactiveLimitOrderTranche(ctx, elem)
+		k.SetInactiveLimitOrderTranche(ctx, &elem)
 	}
 
 	// Set all the LimitOrderTrancheUser

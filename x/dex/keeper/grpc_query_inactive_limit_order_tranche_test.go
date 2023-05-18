@@ -31,8 +31,8 @@ func TestInactiveLimitOrderTrancheQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetInactiveLimitOrderTrancheRequest{
-				PairID:     msgs[0].PairID.Stringify(),
-				TokenIn:    msgs[0].TokenIn,
+				PairID:     msgs[0].TradePairID.MustPairID().CanonicalString(),
+				TokenIn:    msgs[0].TradePairID.MakerDenom,
 				TickIndex:  msgs[0].TickIndex,
 				TrancheKey: msgs[0].TrancheKey,
 			},
@@ -41,8 +41,8 @@ func TestInactiveLimitOrderTrancheQuerySingle(t *testing.T) {
 		{
 			desc: "Second",
 			request: &types.QueryGetInactiveLimitOrderTrancheRequest{
-				PairID:     msgs[1].PairID.Stringify(),
-				TokenIn:    msgs[1].TokenIn,
+				PairID:     msgs[1].TradePairID.MustPairID().CanonicalString(),
+				TokenIn:    msgs[1].TradePairID.MakerDenom,
 				TickIndex:  msgs[1].TickIndex,
 				TrancheKey: msgs[1].TrancheKey,
 			},

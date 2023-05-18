@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"math"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -14,15 +13,13 @@ import (
 
 func (k Keeper) GetOrInitPoolReserves(
 	ctx sdk.Context,
-	pairID *types.PairID,
-	tokenIn string,
+	tradePairID *types.TradePairID,
 	tickIndex int64,
 	fee uint64,
 ) (*types.PoolReserves, error) {
 	tickLiq, tickFound := k.GetPoolReserves(
 		ctx,
-		pairID,
-		tokenIn,
+		tradePairID,
 		tickIndex,
 		fee,
 	)
@@ -32,17 +29,35 @@ func (k Keeper) GetOrInitPoolReserves(
 	case types.IsTickOutOfRange(tickIndex):
 		return nil, types.ErrTickOutsideRange
 	default:
+		var price0To1, price1To0, priceMakerToTaker, priceTakerToMaker sdk.Dec
+		var err error
+		price0To1, err = types.CalcPrice0To1(tickIndex)
+		if err != nil {
+			return nil, err
+		}
+		price1To0, err = types.CalcPrice1To0(tickIndex)
+		if err != nil {
+			return nil, err
+		}
+		if tradePairID.IsMakerDenomToken0() {
+			priceMakerToTaker = price0To1
+			priceTakerToMaker = price1To0
+		} else {
+			priceMakerToTaker = price1To0
+			priceTakerToMaker = price0To1
+		}
 		return &types.PoolReserves{
-			PairID:    pairID,
-			TokenIn:   tokenIn,
-			TickIndex: tickIndex,
-			Fee:       fee,
-			Reserves:  sdk.ZeroInt(),
+			TradePairID:        tradePairID,
+			TickIndex:          tickIndex,
+			Fee:                fee,
+			ReservesMakerDenom: sdk.ZeroInt(),
+			PriceMakerToTaker:  priceMakerToTaker,
+			PriceTakerToMaker:  priceTakerToMaker,
 		}, nil
 	}
 }
 
-func NewLimitOrderExpiration(tranche types.LimitOrderTranche) types.LimitOrderExpiration {
+func NewLimitOrderExpiration(tranche *types.LimitOrderTranche) types.LimitOrderExpiration {
 	trancheExpiry := tranche.ExpirationTime
 	if trancheExpiry == nil {
 		panic("Cannot create LimitOrderExpiration from tranche with nil ExpirationTime")
@@ -56,35 +71,36 @@ func NewLimitOrderExpiration(tranche types.LimitOrderTranche) types.LimitOrderEx
 
 func NewLimitOrderTranche(
 	sdkCtx sdk.Context,
-	pairID *types.PairID,
-	tokenIn string,
+	tradePairID *types.TradePairID,
 	tickIndex int64,
 	goodTil *time.Time,
-) (types.LimitOrderTranche, error) {
-	// NOTE: CONTRACT: There is no active place tranche (ie. GetPlaceTrancheTick has returned false)
-	if types.IsTickOutOfRange(tickIndex) {
-		return types.LimitOrderTranche{}, types.ErrTickOutsideRange
+) (*types.LimitOrderTranche, error) {
+	priceMakerToTaker, err := tradePairID.PriceMakerToTaker(tickIndex)
+	if err != nil {
+		return nil, err
 	}
-	trancheKey := NewTrancheKey(sdkCtx)
-
-	return types.LimitOrderTranche{
-		PairID:           pairID,
-		TokenIn:          tokenIn,
-		TickIndex:        tickIndex,
-		TrancheKey:       trancheKey,
-		ReservesTokenIn:  sdk.ZeroInt(),
-		ReservesTokenOut: sdk.ZeroInt(),
-		TotalTokenIn:     sdk.ZeroInt(),
-		TotalTokenOut:    sdk.ZeroInt(),
-		ExpirationTime:   goodTil,
+	priceTakerToMaker, err := tradePairID.PriceTakerToMaker(tickIndex)
+	if err != nil {
+		return nil, err
+	}
+	return &types.LimitOrderTranche{
+		TradePairID:        tradePairID,
+		TickIndex:          tickIndex,
+		TrancheKey:         NewTrancheKey(sdkCtx),
+		ReservesMakerDenom: sdk.ZeroInt(),
+		ReservesTakerDenom: sdk.ZeroInt(),
+		TotalMakerDenom:    sdk.ZeroInt(),
+		TotalTakerDenom:    sdk.ZeroInt(),
+		ExpirationTime:     goodTil,
+		PriceTakerToMaker:  priceTakerToMaker,
+		PriceMakerToTaker:  priceMakerToTaker,
 	}, nil
 }
 
 func (k Keeper) GetOrInitLimitOrderTrancheUser(
 	ctx sdk.Context,
-	pairID *types.PairID,
+	tradePairID *types.TradePairID,
 	tickIndex int64,
-	tokenIn string,
 	trancheKey string,
 	orderType types.LimitOrderType,
 	receiver string,
@@ -99,8 +115,7 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 			SharesWithdrawn: sdk.ZeroInt(),
 			SharesCancelled: sdk.ZeroInt(),
 			TickIndex:       tickIndex,
-			Token:           tokenIn,
-			PairID:          pairID,
+			TradePairID:     tradePairID,
 			OrderType:       orderType,
 		}
 	}
@@ -112,52 +127,36 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 //                          STATE CALCULATIONS                               //
 ///////////////////////////////////////////////////////////////////////////////
 
-func (k Keeper) GetCurrPrice1To0(ctx sdk.Context, pairID *types.PairID) (price types.Price, found bool) {
-	tick, found := k.GetCurrTick1To0(ctx, pairID)
-	if !found {
-		return types.Price{}, false
+func (k Keeper) GetCurrPrice(ctx sdk.Context, tradePairID *types.TradePairID) (sdk.Dec, bool) {
+	liq := k.GetCurrLiq(ctx, tradePairID)
+	if liq != nil {
+		return liq.Price(), true
 	}
-
-	return *types.MustNewPrice(tick * -1), true
+	return sdk.ZeroDec(), false
 }
 
-func (k Keeper) GetCurrTick1To0(ctx sdk.Context, pairID *types.PairID) (tickIdx int64, found bool) {
-	ti := k.NewTickIterator(ctx, pairID, pairID.Token0)
+func (k Keeper) GetCurrTick(ctx sdk.Context, tradePairID *types.TradePairID) (int64, bool) {
+	liq := k.GetCurrLiq(ctx, tradePairID)
+	if liq != nil {
+		return liq.TickIndex(), true
+	}
+	return 0, false
+}
 
+func (k Keeper) GetCurrLiq(ctx sdk.Context, tradePairID *types.TradePairID) *types.TickLiquidity {
+	ti := k.NewTickIterator(ctx, tradePairID)
 	defer ti.Close()
 	for ; ti.Valid(); ti.Next() {
 		tick := ti.Value()
 		if tick.HasToken() {
-			return tick.TickIndex(), true
+			return &tick
 		}
 	}
 
-	return math.MinInt64, false
+	return nil
 }
 
-func (k Keeper) GetCurrPrice0To1(ctx sdk.Context, pairID *types.PairID) (price types.Price, found bool) {
-	tick, found := k.GetCurrTick0To1(ctx, pairID)
-	if !found {
-		return types.Price{}, false
-	}
-
-	return *types.MustNewPrice(tick), true
-}
-
-func (k Keeper) GetCurrTick0To1(ctx sdk.Context, pairID *types.PairID) (tickIdx int64, found bool) {
-	ti := k.NewTickIterator(ctx, pairID, pairID.Token1)
-	defer ti.Close()
-	for ; ti.Valid(); ti.Next() {
-		tick := ti.Value()
-		if tick.HasToken() {
-			return tick.TickIndex(), true
-		}
-	}
-
-	return math.MaxInt64, false
-}
-
-func CalcAmountAsToken0(amount0, amount1 sdk.Int, price1To0 types.Price) sdk.Dec {
+func CalcAmountAsToken0(amount0, amount1 sdk.Int, price1To0 sdk.Dec) sdk.Dec {
 	amount0Dec := amount0.ToDec()
 
 	return amount0Dec.Add(price1To0.MulInt(amount1))

@@ -110,8 +110,8 @@ func (k Keeper) PurgeExpiredLimitOrders(ctx sdk.Context, curTime time.Time) {
 			tranche, found := k.GetLimitOrderTrancheByKey(ctx, val.TrancheRef)
 			if found {
 				// Convert the tranche to an inactiveTranche
-				k.SetInactiveLimitOrderTranche(ctx, *tranche)
-				k.RemoveLimitOrderTranche(ctx, *tranche)
+				k.SetInactiveLimitOrderTranche(ctx, tranche)
+				k.RemoveLimitOrderTranche(ctx, tranche)
 				archivedTranches[string(val.TrancheRef)] = true
 			}
 		}

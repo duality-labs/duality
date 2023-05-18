@@ -16,8 +16,7 @@ func TestGenesis(t *testing.T) {
 		Params: types.DefaultParams(),
 		LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
 			{
-				PairID:          &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-				Token:           "TokenB",
+				TradePairID:     &types.TradePairID{TakerDenom: "TokenA", MakerDenom: "TokenB"},
 				TickIndex:       1,
 				TrancheKey:      "0",
 				Address:         "fakeAddr",
@@ -26,8 +25,7 @@ func TestGenesis(t *testing.T) {
 				SharesCancelled: sdk.NewInt(0),
 			},
 			{
-				PairID:          &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-				Token:           "TokenA",
+				TradePairID:     &types.TradePairID{TakerDenom: "TokenB", MakerDenom: "TokenA"},
 				TickIndex:       20,
 				TrancheKey:      "0",
 				Address:         "fakeAddr",
@@ -39,41 +37,43 @@ func TestGenesis(t *testing.T) {
 		TickLiquidityList: []types.TickLiquidity{
 			{
 				Liquidity: &types.TickLiquidity_LimitOrderTranche{
-					LimitOrderTranche: &types.LimitOrderTranche{
-						PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-						TokenIn:          "0",
-						TickIndex:        0,
-						TrancheKey:       "0",
-						ReservesTokenIn:  sdk.NewInt(0),
-						ReservesTokenOut: sdk.NewInt(0),
-						TotalTokenIn:     sdk.NewInt(0),
-						TotalTokenOut:    sdk.NewInt(0),
-					},
+					LimitOrderTranche: types.MustNewLimitOrderTranche(
+						"TokenB",
+						"TokenA",
+						"0",
+						0,
+						sdk.ZeroInt(),
+						sdk.ZeroInt(),
+						sdk.ZeroInt(),
+						sdk.ZeroInt(),
+					),
 				},
 			},
 			{
 				Liquidity: &types.TickLiquidity_LimitOrderTranche{
-					LimitOrderTranche: &types.LimitOrderTranche{
-						PairID:     &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-						TokenIn:    "0",
-						TickIndex:  0,
-						TrancheKey: "0",
-					},
+					LimitOrderTranche: types.MustNewLimitOrderTranche(
+						"TokenB",
+						"TokenA",
+						"0",
+						0,
+						sdk.ZeroInt(),
+						sdk.ZeroInt(),
+						sdk.ZeroInt(),
+						sdk.ZeroInt(),
+					),
 				},
 			},
 		},
 		InactiveLimitOrderTrancheList: []types.LimitOrderTranche{
 			{
-				PairID:     &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-				TokenIn:    "0",
-				TickIndex:  0,
-				TrancheKey: "0",
+				TradePairID: &types.TradePairID{TakerDenom: "TokenA", MakerDenom: "TokenB"},
+				TickIndex:   0,
+				TrancheKey:  "0",
 			},
 			{
-				PairID:     &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-				TokenIn:    "1",
-				TickIndex:  1,
-				TrancheKey: "1",
+				TradePairID: &types.TradePairID{TakerDenom: "TokenA", MakerDenom: "TokenB"},
+				TickIndex:   1,
+				TrancheKey:  "1",
 			},
 		},
 		// this line is used by starport scaffolding # genesis/test/state

@@ -37,10 +37,10 @@ func KeyPrefix(p string) []byte {
 	return key
 }
 
-func TickIndexToBytes(tickIndex int64, pairID *PairID, tokenIn string) []byte {
+func TickIndexToBytes(tickIndex int64, tradePairID *TradePairID) []byte {
 	// NOTE: We flip the sign on ticks storing token0 so that all liquidity is index left to right.
 	// This allows us to iterate through liquidity consistently regardless of 0to1 vs 1to0
-	if pairID.Token0 == tokenIn {
+	if tradePairID.MustPairID().Token0 == tradePairID.MakerDenom {
 		tickIndex *= -1
 	}
 	key := make([]byte, 9)
@@ -97,22 +97,21 @@ func LimitOrderTrancheUserAddressPrefix(address string) []byte {
 
 // InactiveLimitOrderTrancheKey returns the store key to retrieve a InactiveLimitOrderTranche from the index fields
 func InactiveLimitOrderTrancheKey(
-	pairID *PairID,
-	tokenIn string,
+	tradePairID *TradePairID,
 	tickIndex int64,
 	trancheKey string,
 ) []byte {
 	var key []byte
 
-	pairIDBytes := []byte(pairID.Stringify())
+	pairIDBytes := []byte(tradePairID.MustPairID().CanonicalString())
 	key = append(key, pairIDBytes...)
 	key = append(key, []byte("/")...)
 
-	tokenInBytes := []byte(tokenIn)
-	key = append(key, tokenInBytes...)
+	makerDenomBytes := []byte(tradePairID.MakerDenom)
+	key = append(key, makerDenomBytes...)
 	key = append(key, []byte("/")...)
 
-	tickIndexBytes := TickIndexToBytes(tickIndex, pairID, tokenIn)
+	tickIndexBytes := TickIndexToBytes(tickIndex, tradePairID)
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
@@ -124,21 +123,20 @@ func InactiveLimitOrderTrancheKey(
 }
 
 func InactiveLimitOrderTranchePrefix(
-	pairID *PairID,
-	tokenIn string,
+	tradePairID *TradePairID,
 	tickIndex int64,
 ) []byte {
 	key := KeyPrefix(InactiveLimitOrderTrancheKeyPrefix)
 
-	pairIDBytes := []byte(pairID.Stringify())
+	pairIDBytes := []byte(tradePairID.MustPairID().CanonicalString())
 	key = append(key, pairIDBytes...)
 	key = append(key, []byte("/")...)
 
-	tokenInBytes := []byte(tokenIn)
-	key = append(key, tokenInBytes...)
+	makerDenomBytes := []byte(tradePairID.MakerDenom)
+	key = append(key, makerDenomBytes...)
 	key = append(key, []byte("/")...)
 
-	tickIndexBytes := TickIndexToBytes(tickIndex, pairID, tokenIn)
+	tickIndexBytes := TickIndexToBytes(tickIndex, tradePairID)
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
@@ -165,23 +163,22 @@ func TimeBytes(timestamp time.Time) []byte {
 }
 
 func TickLiquidityKey(
-	pairID *PairID,
-	tokenIn string,
+	tradePairID *TradePairID,
 	tickIndex int64,
 	liquidityType string,
 	liquidityIndex interface{},
 ) []byte {
 	var key []byte
 
-	pairIDBytes := []byte(pairID.Stringify())
+	pairIDBytes := []byte(tradePairID.MustPairID().CanonicalString())
 	key = append(key, pairIDBytes...)
 	key = append(key, []byte("/")...)
 
-	tokenInBytes := []byte(tokenIn)
-	key = append(key, tokenInBytes...)
+	makerDenomBytes := []byte(tradePairID.MakerDenom)
+	key = append(key, makerDenomBytes...)
 	key = append(key, []byte("/")...)
 
-	tickIndexBytes := TickIndexToBytes(tickIndex, pairID, tokenIn)
+	tickIndexBytes := TickIndexToBytes(tickIndex, tradePairID)
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
@@ -196,21 +193,20 @@ func TickLiquidityKey(
 }
 
 func TickLiquidityLimitOrderPrefix(
-	pairID *PairID,
-	tokenIn string,
+	tradePairID *TradePairID,
 	tickIndex int64,
 ) []byte {
 	key := KeyPrefix(TickLiquidityKeyPrefix)
 
-	pairIDBytes := []byte(pairID.Stringify())
+	pairIDBytes := []byte(tradePairID.MustPairID().CanonicalString())
 	key = append(key, pairIDBytes...)
 	key = append(key, []byte("/")...)
 
-	tokenInBytes := []byte(tokenIn)
-	key = append(key, tokenInBytes...)
+	makerDenomBytes := []byte(tradePairID.MakerDenom)
+	key = append(key, makerDenomBytes...)
 	key = append(key, []byte("/")...)
 
-	tickIndexBytes := TickIndexToBytes(tickIndex, pairID, tokenIn)
+	tickIndexBytes := TickIndexToBytes(tickIndex, tradePairID)
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
@@ -221,10 +217,10 @@ func TickLiquidityLimitOrderPrefix(
 	return key
 }
 
-func TickLiquidityPrefix(pairID *PairID, tokenIn string) []byte {
+func TickLiquidityPrefix(tradePairID *TradePairID) []byte {
 	var key []byte
-	key = append(KeyPrefix(TickLiquidityKeyPrefix), KeyPrefix(pairID.Stringify())...)
-	key = append(key, KeyPrefix(tokenIn)...)
+	key = append(KeyPrefix(TickLiquidityKeyPrefix), KeyPrefix(tradePairID.MustPairID().CanonicalString())...)
+	key = append(key, KeyPrefix(tradePairID.MakerDenom)...)
 
 	return key
 }

@@ -6,36 +6,29 @@ import (
 )
 
 type PoolLiquidity struct {
-	pool   *Pool
-	is0To1 bool
+	tradePairID *types.TradePairID
+	pool        *Pool
 }
 
-func (pl *PoolLiquidity) Swap(maxAmountIn sdk.Int, maxAmountOut sdk.Int) (inAmount, outAmount sdk.Int) {
-	if pl.is0To1 {
-		return pl.pool.Swap0To1(maxAmountIn, maxAmountOut)
+func (pl *PoolLiquidity) Swap(maxAmountTakerDenomIn sdk.Int, maxAmountMakerDenomOut sdk.Int) (inAmount, outAmount sdk.Int) {
+	if pl.tradePairID.IsTakerDenomToken0() {
+		return pl.pool.Swap0To1(maxAmountTakerDenomIn, maxAmountMakerDenomOut)
 	}
 
-	return pl.pool.Swap1To0(maxAmountIn, maxAmountOut)
+	return pl.pool.Swap1To0(maxAmountTakerDenomIn, maxAmountMakerDenomOut)
 }
 
-func (pl *PoolLiquidity) Price() *types.Price {
-	if pl.is0To1 {
-		return pl.pool.Price0To1Upper
+func (pl *PoolLiquidity) Price() sdk.Dec {
+	if pl.tradePairID.IsTakerDenomToken0() {
+		return pl.pool.UpperTick1.PriceTakerToMaker
 	}
 
-	return pl.pool.Price1To0Lower
+	return pl.pool.LowerTick0.PriceTakerToMaker
 }
 
-func NewLiquidityFromPool0To1(pool *Pool) Liquidity {
+func NewPoolLiquidity(tradePairID *types.TradePairID, pool *Pool) Liquidity {
 	return &PoolLiquidity{
-		pool:   pool,
-		is0To1: true,
-	}
-}
-
-func NewLiquidityFromPool1To0(pool *Pool) Liquidity {
-	return &PoolLiquidity{
-		pool:   pool,
-		is0To1: false,
+		tradePairID: tradePairID,
+		pool:        pool,
 	}
 }
