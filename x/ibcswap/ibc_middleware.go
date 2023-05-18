@@ -269,7 +269,7 @@ func (im IBCMiddleware) handleFailedSwap(
 		"tokenIn", metadata.TokenIn,
 		"tokenOut", metadata.TokenOut,
 		"AmountIn", metadata.AmountIn,
-		"TickIndex", metadata.TickIndex,
+		"TickIndexInToOut", metadata.TickIndexInToOut,
 		"OrderType", metadata.OrderType,
 		// TODO: enable soon
 		// "maxAmountOut", metadata.MaxAmountOut,

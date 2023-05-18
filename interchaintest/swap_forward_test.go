@@ -243,13 +243,13 @@ func TestSwapAndForward_Success(t *testing.T) {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   chainBAddr,
-				Receiver:  chainBAddr,
-				TokenIn:   chainADenomTrace.IBCDenom(),
-				TokenOut:  chainB.Config().Denom,
-				AmountIn:  swapAmount,
-				TickIndex: 2,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          chainBAddr,
+				Receiver:         chainBAddr,
+				TokenIn:          chainADenomTrace.IBCDenom(),
+				TokenOut:         chainB.Config().Denom,
+				AmountIn:         swapAmount,
+				TickIndexInToOut: 2,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 			},
 			Next: nextJSON,
 		},
@@ -537,13 +537,13 @@ func TestSwapAndForward_MultiHopSuccess(t *testing.T) {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   chainBAddr,
-				Receiver:  chainBAddr,
-				TokenIn:   chainADenomTrace.IBCDenom(),
-				TokenOut:  chainB.Config().Denom,
-				AmountIn:  swapAmount,
-				TickIndex: 2,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          chainBAddr,
+				Receiver:         chainBAddr,
+				TokenIn:          chainADenomTrace.IBCDenom(),
+				TokenOut:         chainB.Config().Denom,
+				AmountIn:         swapAmount,
+				TickIndexInToOut: 2,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 			},
 			Next: nextJSON,
 		},
@@ -841,13 +841,13 @@ func TestSwapAndForward_UnwindIBCDenomSuccess(t *testing.T) {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   chainBAddr,
-				Receiver:  chainBAddr,
-				TokenIn:   chainB.Config().Denom,
-				TokenOut:  chainADenomTrace.IBCDenom(),
-				AmountIn:  swapAmount,
-				TickIndex: 2,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          chainBAddr,
+				Receiver:         chainBAddr,
+				TokenIn:          chainB.Config().Denom,
+				TokenOut:         chainADenomTrace.IBCDenom(),
+				AmountIn:         swapAmount,
+				TickIndexInToOut: 2,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 			},
 			Next: nextJSON,
 		},
@@ -1111,13 +1111,13 @@ func TestSwapAndForward_ForwardFails(t *testing.T) {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   chainBAddr,
-				Receiver:  chainBAddr,
-				TokenIn:   chainADenomTrace.IBCDenom(),
-				TokenOut:  chainB.Config().Denom,
-				AmountIn:  swapAmount,
-				TickIndex: 2,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          chainBAddr,
+				Receiver:         chainBAddr,
+				TokenIn:          chainADenomTrace.IBCDenom(),
+				TokenOut:         chainB.Config().Denom,
+				AmountIn:         swapAmount,
+				TickIndexInToOut: 2,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 			},
 			Next: nextJSON,
 		},

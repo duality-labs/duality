@@ -6,40 +6,24 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
-func (k Keeper) SetPoolReserves(ctx sdk.Context, pool types.PoolReserves) {
-	// Wrap pool back into TickLiquidity
+func (k Keeper) SetPoolReserves(ctx sdk.Context, poolReserves *types.PoolReserves) {
 	tick := types.TickLiquidity{
 		Liquidity: &types.TickLiquidity_PoolReserves{
-			PoolReserves: &pool,
+			PoolReserves: poolReserves,
 		},
 	}
 
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickLiquidityKeyPrefix))
 	b := k.cdc.MustMarshal(&tick)
-	store.Set(types.TickLiquidityKey(
-		pool.PairID,
-		pool.TokenIn,
-		pool.TickIndex,
-		types.LiquidityTypePoolReserves,
-		pool.Fee,
-	), b)
+	store.Set(poolReserves.Key.KeyMarshal(), b)
 }
 
 func (k Keeper) GetPoolReserves(
 	ctx sdk.Context,
-	pairID *types.PairID,
-	tokenIn string,
-	tickIndex int64,
-	fee uint64,
+	poolReservesID *types.PoolReservesKey,
 ) (pool *types.PoolReserves, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickLiquidityKeyPrefix))
-	b := store.Get(types.TickLiquidityKey(
-		pairID,
-		tokenIn,
-		tickIndex,
-		types.LiquidityTypePoolReserves,
-		fee,
-	))
+	b := store.Get(poolReservesID.KeyMarshal())
 	if b == nil {
 		return nil, false
 	}
@@ -51,13 +35,7 @@ func (k Keeper) GetPoolReserves(
 }
 
 // RemoveTickLiquidity removes a tickLiquidity from the store
-func (k Keeper) RemovePoolReserves(ctx sdk.Context, pool types.PoolReserves) {
+func (k Keeper) RemovePoolReserves(ctx sdk.Context, poolReservesID *types.PoolReservesKey) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickLiquidityKeyPrefix))
-	store.Delete(types.TickLiquidityKey(
-		pool.PairID,
-		pool.TokenIn,
-		pool.TickIndex,
-		types.LiquidityTypePoolReserves,
-		pool.Fee,
-	))
+	store.Delete(poolReservesID.KeyMarshal())
 }

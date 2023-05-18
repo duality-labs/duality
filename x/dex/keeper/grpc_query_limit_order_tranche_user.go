@@ -19,19 +19,19 @@ func (k Keeper) LimitOrderTrancheUserAll(
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	var LimitOrderTrancheUsers []types.LimitOrderTrancheUser
+	var limitOrderTrancheUsers []*types.LimitOrderTrancheUser
 	ctx := sdk.UnwrapSDKContext(c)
 
 	store := ctx.KVStore(k.storeKey)
-	LimitOrderTrancheUserStore := prefix.NewStore(store, types.KeyPrefix(types.LimitOrderTrancheUserKeyPrefix))
+	limitOrderTrancheUserStore := prefix.NewStore(store, types.KeyPrefix(types.LimitOrderTrancheUserKeyPrefix))
 
-	pageRes, err := query.Paginate(LimitOrderTrancheUserStore, req.Pagination, func(key, value []byte) error {
-		var LimitOrderTrancheUser types.LimitOrderTrancheUser
-		if err := k.cdc.Unmarshal(value, &LimitOrderTrancheUser); err != nil {
+	pageRes, err := query.Paginate(limitOrderTrancheUserStore, req.Pagination, func(key, value []byte) error {
+		limitOrderTrancheUser := &types.LimitOrderTrancheUser{}
+		if err := k.cdc.Unmarshal(value, limitOrderTrancheUser); err != nil {
 			return err
 		}
 
-		LimitOrderTrancheUsers = append(LimitOrderTrancheUsers, LimitOrderTrancheUser)
+		limitOrderTrancheUsers = append(limitOrderTrancheUsers, limitOrderTrancheUser)
 
 		return nil
 	})
@@ -40,7 +40,7 @@ func (k Keeper) LimitOrderTrancheUserAll(
 	}
 
 	return &types.QueryAllLimitOrderTrancheUserResponse{
-		LimitOrderTrancheUser: LimitOrderTrancheUsers,
+		LimitOrderTrancheUser: limitOrderTrancheUsers,
 		Pagination:            pageRes,
 	}, nil
 }

@@ -121,7 +121,7 @@ func (k Keeper) GetStakesByQueryCondition(
 	ctx sdk.Context,
 	distrTo *types.QueryCondition,
 ) types.Stakes {
-	pairIDString := distrTo.PairID.Stringify()
+	pairIDString := distrTo.PairID.CanonicalString()
 	tickStakeIds := k.getIDsFromIterator(
 		k.iteratorStartEnd(
 			ctx,

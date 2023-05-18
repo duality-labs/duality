@@ -19,15 +19,15 @@ func (k Keeper) InactiveLimitOrderTrancheAll(
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	var inactiveLimitOrderTranches []types.LimitOrderTranche
+	var inactiveLimitOrderTranches []*types.LimitOrderTranche
 	ctx := sdk.UnwrapSDKContext(c)
 
 	store := ctx.KVStore(k.storeKey)
 	inactiveLimitOrderTrancheStore := prefix.NewStore(store, types.KeyPrefix(types.InactiveLimitOrderTrancheKeyPrefix))
 
 	pageRes, err := query.Paginate(inactiveLimitOrderTrancheStore, req.Pagination, func(key, value []byte) error {
-		var inactiveLimitOrderTranche types.LimitOrderTranche
-		if err := k.cdc.Unmarshal(value, &inactiveLimitOrderTranche); err != nil {
+		inactiveLimitOrderTranche := &types.LimitOrderTranche{}
+		if err := k.cdc.Unmarshal(value, inactiveLimitOrderTranche); err != nil {
 			return err
 		}
 
@@ -53,16 +53,18 @@ func (k Keeper) InactiveLimitOrderTranche(
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(c)
-	pairID, err := types.StringToPairID(req.PairID)
+	pairID, err := types.NewPairIDFromCanonicalString(req.PairID)
 	if err != nil {
 		return nil, err
 	}
+	tradePairID := types.NewTradePairIDFromMaker(pairID, req.TokenIn)
 	val, found := k.GetInactiveLimitOrderTranche(
 		ctx,
-		pairID,
-		req.TokenIn,
-		req.TickIndex,
-		req.TrancheKey,
+		&types.LimitOrderTrancheKey{
+			TradePairID:           tradePairID,
+			TickIndexTakerToMaker: req.TickIndex,
+			TrancheKey:            req.TrancheKey,
+		},
 	)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")

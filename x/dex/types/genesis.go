@@ -10,11 +10,11 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		LimitOrderTrancheUserList:     []LimitOrderTrancheUser{},
-		TickLiquidityList:             []TickLiquidity{},
-		InactiveLimitOrderTrancheList: []LimitOrderTranche{},
+		LimitOrderTrancheUserList:     []*LimitOrderTrancheUser{},
+		TickLiquidityList:             []*TickLiquidity{},
+		InactiveLimitOrderTrancheList: []*LimitOrderTranche{},
 		// this line is used by starport scaffolding # genesis/types/default
-		Params: DefaultParams(),
+		Params: *DefaultParams(),
 	}
 }
 
@@ -39,19 +39,9 @@ func (gs GenesisState) Validate() error {
 		var index string
 		switch liquidity := elem.Liquidity.(type) {
 		case *TickLiquidity_PoolReserves:
-			index = string(TickLiquidityKey(
-				liquidity.PoolReserves.PairID,
-				liquidity.PoolReserves.TokenIn,
-				liquidity.PoolReserves.TickIndex,
-				LiquidityTypePoolReserves,
-				liquidity.PoolReserves.Fee))
+			index = string(liquidity.PoolReserves.Key.KeyMarshal())
 		case *TickLiquidity_LimitOrderTranche:
-			index = string(TickLiquidityKey(
-				liquidity.LimitOrderTranche.PairID,
-				liquidity.LimitOrderTranche.TokenIn,
-				liquidity.LimitOrderTranche.TickIndex,
-				LiquidityTypeLimitOrder,
-				liquidity.LimitOrderTranche.TrancheKey))
+			index = string(liquidity.LimitOrderTranche.Key.KeyMarshal())
 		}
 		if _, ok := tickLiquidityIndexMap[index]; ok {
 			return fmt.Errorf("duplicated index for tickLiquidity")
@@ -62,7 +52,7 @@ func (gs GenesisState) Validate() error {
 	inactiveLimitOrderTrancheKeyMap := make(map[string]struct{})
 
 	for _, elem := range gs.InactiveLimitOrderTrancheList {
-		index := string(InactiveLimitOrderTrancheKey(elem.PairID, elem.TokenIn, elem.TickIndex, elem.TrancheKey))
+		index := string(elem.Key.KeyMarshal())
 		if _, ok := inactiveLimitOrderTrancheKeyMap[index]; ok {
 			return fmt.Errorf("duplicated index for inactiveLimitOrderTranche")
 		}

@@ -193,13 +193,13 @@ func TestIBCSwapMiddleware_Success(t *testing.T) {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   chainBAddr,
-				Receiver:  chainBAddr,
-				TokenIn:   chainADenomTrace.IBCDenom(),
-				TokenOut:  chainB.Config().Denom,
-				AmountIn:  swapAmount,
-				TickIndex: 10,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          chainBAddr,
+				Receiver:         chainBAddr,
+				TokenIn:          chainADenomTrace.IBCDenom(),
+				TokenOut:         chainB.Config().Denom,
+				AmountIn:         swapAmount,
+				TickIndexInToOut: 10,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 				// TODO: enable soon
 				// MaxAmountOut: minOut,
 			},
@@ -344,13 +344,13 @@ func TestIBCSwapMiddleware_FailRefund(t *testing.T) {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   chainBAddr,
-				Receiver:  chainBAddr,
-				TokenIn:   chainADenomTrace.IBCDenom(),
-				TokenOut:  chainB.Config().Denom,
-				AmountIn:  swapAmount,
-				TickIndex: 0,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          chainBAddr,
+				Receiver:         chainBAddr,
+				TokenIn:          chainADenomTrace.IBCDenom(),
+				TokenOut:         chainB.Config().Denom,
+				AmountIn:         swapAmount,
+				TickIndexInToOut: 0,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 				// TODO: enable soon
 				// MaxAmountOut: minOut,
 			},
@@ -503,13 +503,13 @@ func TestIBCSwapMiddleware_FailNoRefund(t *testing.T) {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   chainBAddr,
-				Receiver:  chainBAddr,
-				TokenIn:   chainADenomTrace.IBCDenom(),
-				TokenOut:  chainB.Config().Denom,
-				AmountIn:  swapAmount,
-				TickIndex: 1,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          chainBAddr,
+				Receiver:         chainBAddr,
+				TokenIn:          chainADenomTrace.IBCDenom(),
+				TokenOut:         chainB.Config().Denom,
+				AmountIn:         swapAmount,
+				TickIndexInToOut: 1,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 				// TODO: enable soon
 				// MaxAmountOut: minOut,
 			},
@@ -668,13 +668,13 @@ func TestIBCSwapMiddleware_FailWithRefundAddr(t *testing.T) {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   chainBAddr,
-				Receiver:  chainBAddr,
-				TokenIn:   chainADenomTrace.IBCDenom(),
-				TokenOut:  chainB.Config().Denom,
-				AmountIn:  swapAmount,
-				TickIndex: 1,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          chainBAddr,
+				Receiver:         chainBAddr,
+				TokenIn:          chainADenomTrace.IBCDenom(),
+				TokenOut:         chainB.Config().Denom,
+				AmountIn:         swapAmount,
+				TickIndexInToOut: 1,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 				// TODO: enable soon
 				// MaxAmountOut: minOut,
 			},

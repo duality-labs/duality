@@ -3,33 +3,32 @@ package dualitylabs.duality.dex;
 
 option go_package = "github.com/duality-labs/duality/x/dex/types";
 import "gogoproto/gogo.proto";
-import "dualitylabs/duality/dex/pair_id.proto";
+import "dualitylabs/duality/dex/trade_pair_id.proto";
 import "dualitylabs/duality/dex/tx.proto";
 
 message LimitOrderTrancheUser {
-  PairID pairID = 1;
-  string token = 2;
-  int64 tickIndex = 3;
-  string trancheKey = 4; 
-  string address = 5; 
-  string sharesOwned = 6  [
+  TradePairID tradePairID = 1;
+  int64 tickIndexTakerToMaker = 2;
+  string trancheKey = 3;
+  string address = 4; 
+  string sharesOwned = 5  [
       (gogoproto.moretags)   = "yaml:\"sharesOwned\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "sharesOwned"
   ];  
-  string sharesWithdrawn = 7  [
+  string sharesWithdrawn = 6  [
       (gogoproto.moretags)   = "yaml:\"sharesWithdrawn\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "sharesWithdrawn"
   ]; 
-  string sharesCancelled = 8  [
+  string sharesCancelled = 7  [
       (gogoproto.moretags)   = "yaml:\"sharesCancelled\"",
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
       (gogoproto.nullable)   = false,
       (gogoproto.jsontag) = "sharesCancelled"
   ];
-  LimitOrderType orderType = 10;
+  LimitOrderType orderType = 8;
 }
 

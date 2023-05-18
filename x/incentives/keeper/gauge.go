@@ -62,7 +62,7 @@ func (k Keeper) setGaugeRefs(ctx sdk.Context, gauge *types.Gauge) error {
 		}
 		err := k.addRefByKey(
 			ctx,
-			types.GetKeyGaugeIndexByPair(gauge.DistributeTo.PairID.Stringify()),
+			types.GetKeyGaugeIndexByPair(gauge.DistributeTo.PairID.CanonicalString()),
 			gauge.Id,
 		)
 		if err != nil {
@@ -73,7 +73,7 @@ func (k Keeper) setGaugeRefs(ctx sdk.Context, gauge *types.Gauge) error {
 		if err != nil {
 			return err
 		}
-		err = k.addRefByKey(ctx, types.GetKeyGaugeIndexByPair(gauge.DistributeTo.PairID.Stringify()), gauge.Id)
+		err = k.addRefByKey(ctx, types.GetKeyGaugeIndexByPair(gauge.DistributeTo.PairID.CanonicalString()), gauge.Id)
 		if err != nil {
 			return err
 		}
@@ -249,7 +249,7 @@ func (k Keeper) moveActiveGaugeToFinishedGauge(ctx sdk.Context, gauge *types.Gau
 	}
 	err := k.deleteRefByKey(
 		ctx,
-		types.GetKeyGaugeIndexByPair(gauge.DistributeTo.PairID.Stringify()),
+		types.GetKeyGaugeIndexByPair(gauge.DistributeTo.PairID.CanonicalString()),
 		gauge.Id,
 	)
 	if err != nil {
@@ -277,6 +277,6 @@ func (k Keeper) GetFinishedGauges(ctx sdk.Context) types.Gauges {
 func (k Keeper) GetGaugesByPair(ctx sdk.Context, pair *dextypes.PairID) []*types.Gauge {
 	return k.getGaugesFromIterator(
 		ctx,
-		k.iterator(ctx, types.GetKeyGaugeIndexByPair(pair.Stringify())),
+		k.iterator(ctx, types.GetKeyGaugeIndexByPair(pair.CanonicalString())),
 	)
 }
