@@ -1,6 +1,8 @@
 package types
 
 import (
+	"math/big"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/utils"
 )
@@ -17,14 +19,53 @@ func CalcPrice(relativeTickIndex int64) (sdk.Dec, error) {
 		return sdk.ZeroDec(), ErrTickOutsideRange
 	}
 	if relativeTickIndex < 0 {
-		return utils.BasePrice().Power(uint64(-1 * relativeTickIndex)), nil
+		return utils.BasePriceDec.Power(uint64(-1 * relativeTickIndex)), nil
 	} else {
-		return sdk.OneDec().Quo(utils.BasePrice().Power(uint64(relativeTickIndex))), nil
+		return sdk.OneDec().Quo(utils.BasePriceDec.Power(uint64(relativeTickIndex))), nil
 	}
 }
 
 func MustCalcPrice(relativeTickIndex int64) sdk.Dec {
 	price, err := CalcPrice(relativeTickIndex)
+	if err != nil {
+		panic(err)
+	}
+	return price
+}
+
+// Power returns a the result of raising to a positive integer power
+func RatPower(base *big.Rat, power uint64) *big.Rat {
+	if power == 0 {
+		return big.NewRat(1, 1)
+	}
+	tmp := big.NewRat(1, 1)
+
+	for i := power; i > 1; {
+		if i%2 != 0 {
+			tmp = tmp.Mul(tmp, base)
+		}
+		i /= 2
+		base = base.Mul(base, base)
+	}
+
+	return base.Mul(base, tmp)
+}
+
+func CalcPriceAsRat(relativeTickIndex int64) (*big.Rat, error) {
+	if IsTickOutOfRange(relativeTickIndex) {
+		return big.NewRat(0, 1), ErrTickOutsideRange
+	}
+	if relativeTickIndex < 0 {
+		inverseResult := RatPower(utils.BasePriceRat, uint64(-1*relativeTickIndex))
+		return inverseResult.Inv(inverseResult), nil
+	} else {
+		result := RatPower(utils.BasePriceRat, uint64(relativeTickIndex))
+		return result, nil
+	}
+}
+
+func MustCalcPriceAsRat(relativeTickIndex int64) *big.Rat {
+	price, err := CalcPriceAsRat(relativeTickIndex)
 	if err != nil {
 		panic(err)
 	}

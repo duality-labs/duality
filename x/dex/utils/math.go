@@ -3,15 +3,14 @@ package utils
 import (
 	"fmt"
 	"math"
+	"math/big"
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// Return the base value for price, 1.0001
-func BasePrice() sdk.Dec {
-	return sdk.MustNewDecFromStr("1.0001")
-}
+var BasePriceRat = big.NewRat(10001, 10000)
+var BasePriceDec = sdk.MustNewDecFromStr("1.0001")
 
 func Abs(x int64) uint64 {
 	if x < 0 {

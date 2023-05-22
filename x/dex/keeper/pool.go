@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"math/big"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/duality-labs/duality/x/dex/types"
@@ -190,10 +192,10 @@ func (p *Pool) GetDepositDenom() string {
 	return types.NewDepositDenom(p.LowerTick0.TradePairID.MustPairID(), p.CenterTickIndex, p.Fee).String()
 }
 
-func (p *Pool) MustCalcPrice1To0Center() sdk.Dec {
+func (p *Pool) MustCalcPrice1To0Center() *big.Rat {
 	// NOTE: We can safely call the error-less version of CalcPrice here because the pool object
 	// has already been initialized with an upper and lower tick which satisfy a check for IsTickOutOfRange
-	return types.MustCalcPrice(-1 * p.CenterTickIndex)
+	return types.MustCalcPriceAsRat(-1 * p.CenterTickIndex)
 }
 
 func (p *Pool) CalcSharesMinted(
@@ -206,10 +208,10 @@ func (p *Pool) CalcSharesMinted(
 
 	valueExistingToken0 := CalcAmountAsToken0(p.LowerTick0.ReservesMakerDenom, p.UpperTick1.ReservesMakerDenom, price1To0Center)
 	var sharesMintedAmount sdk.Int
-	if valueExistingToken0.GT(sdk.ZeroDec()) {
-		sharesMintedAmount = valueMintedToken0.MulInt(existingShares).Quo(valueExistingToken0).TruncateInt()
+	if valueExistingToken0.Cmp(big.NewInt(0)) > 0 {
+		sharesMintedAmount = valueMintedToken0.Mul(existingShares).Quo(valueExistingToken0)
 	} else {
-		sharesMintedAmount = valueMintedToken0.TruncateInt()
+		sharesMintedAmount = valueMintedToken0
 	}
 
 	return sdk.Coin{Denom: p.GetDepositDenom(), Amount: sharesMintedAmount}

@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"math/big"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -156,10 +157,10 @@ func (k Keeper) GetCurrLiq(ctx sdk.Context, tradePairID *types.TradePairID) *typ
 	return nil
 }
 
-func CalcAmountAsToken0(amount0, amount1 sdk.Int, price1To0 sdk.Dec) sdk.Dec {
-	amount0Dec := amount0.ToDec()
-
-	return amount0Dec.Add(price1To0.MulInt(amount1))
+func CalcAmountAsToken0(amount0, amount1 sdk.Int, price1To0 *big.Rat) big.Int {
+	numSDKInt := price1To0.Num()
+	denomSDKInt := price1To0.Denom()
+	return amount0.Mul(denomSDKInt).Add(amount1.Mul(numSDKInt))
 }
 
 ///////////////////////////////////////////////////////////////////////////////
