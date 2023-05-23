@@ -44,4 +44,5 @@ var (
 	ErrMultihopExitTokensMismatch         = sdkerrors.Register(ModuleName, 1142, "All multihop routes must have the same exit token")
 	ErrMissingMultihopRoute               = sdkerrors.Register(ModuleName, 1143, "Must supply at least 1 route for multihop swap")
 	ErrNegativeMaxAmountOut               = sdkerrors.Register(ModuleName, 1144, "MAxAmountOut is supplied it must be  > 0")
+	ErrInvalidFee                         = sdkerrors.Register(ModuleName, 1145, "Fee must be <= 10,000")
 )

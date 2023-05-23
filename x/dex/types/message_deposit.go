@@ -5,9 +5,10 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const TypeMsgDeposit = "deposit"
-
-var _ sdk.Msg = &MsgDeposit{}
+const (
+	TypeMsgDeposit = "deposit"
+	MaxFee         = 10000
+)
 
 func NewMsgDeposit(
 	creator,
@@ -80,6 +81,12 @@ func (msg *MsgDeposit) ValidateBasic() error {
 	for i := 0; i < len(msg.AmountsA); i++ {
 		if msg.AmountsA[i].LTE(sdk.ZeroInt()) && msg.AmountsB[i].LTE(sdk.ZeroInt()) {
 			return ErrZeroDeposit
+		}
+	}
+
+	for _, fee := range msg.Fees {
+		if fee > MaxFee {
+			return ErrInvalidFee
 		}
 	}
 

@@ -113,6 +113,18 @@ func TestMsgDeposit_ValidateBasic(t *testing.T) {
 			err: ErrZeroDeposit,
 		},
 		{
+			name: "invalid fee",
+			msg: MsgDeposit{
+				Creator:         sample.AccAddress(),
+				Receiver:        sample.AccAddress(),
+				Fees:            []uint64{20000},
+				TickIndexesAToB: []int64{1},
+				AmountsA:        []sdk.Int{sdk.OneInt()},
+				AmountsB:        []sdk.Int{sdk.ZeroInt()},
+			},
+			err: ErrInvalidFee,
+		},
+		{
 			name: "valid msg",
 			msg: MsgDeposit{
 				Creator:         sample.AccAddress(),
