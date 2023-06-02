@@ -201,14 +201,6 @@ workflows:
   version: 2
   test_and_deploy:
     jobs:
-      - go-tests
-      - heighliner-build:
-          context:
-            - GITHUB_CREDS
-      - ictest:
-          requires:
-            - heighliner-build
-      - binary-build
       - deploy-devnet:
           # filters:
           #   branches:
@@ -217,6 +209,15 @@ workflows:
             - AWS_CREDS
           requires:
             # - heighliner-build
+      - go-tests
+      - heighliner-build:
+          context:
+            - GITHUB_CREDS
+      - ictest:
+          requires:
+            - heighliner-build
+      - binary-build
+
 
   lint:
     jobs:
