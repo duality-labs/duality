@@ -465,6 +465,34 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrder1FoKFailsWithHighLimit() {
 	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenB", -21, 10, types.LimitOrderType_FILL_OR_KILL)
 }
 
+func (s *MsgServerTestSuite) TestPlaceLimitOrderFoK0TotalAmountInNotUsed() {
+	s.fundAliceBalances(9998, 0)
+	s.fundBobBalances(0, 5000)
+	// GIVEN LP liq at tick 20,000 & 20,001 of 1000 TokenB
+	s.bobDeposits(
+		NewDeposit(0, 1000, 20000, 1),
+		NewDeposit(0, 1000, 20001, 1),
+	)
+	// WHEN alice submits FoK limitOrder for 9998 it succeeds
+	// even though trueAmountIn < specifiedAmountIn due to rounding
+	s.aliceLimitSells("TokenA", 21000, 9998, types.LimitOrderType_FILL_OR_KILL)
+	s.assertAliceBalances(6, 1352)
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderFoK1TotalAmountInNotUsed() {
+	s.fundAliceBalances(0, 9998)
+	s.fundBobBalances(5000, 0)
+	// GIVEN LP liq at tick -20,000 & -20,001 of 1000 tokenA
+	s.bobDeposits(
+		NewDeposit(1000, 0, -20000, 1),
+		NewDeposit(1000, 0, -20001, 1),
+	)
+	// WHEN alice submits FoK limitOrder for 9998 it succeeds
+	// even though trueAmountIn < specifiedAmountIn due to rounding
+	s.aliceLimitSells("TokenB", 21000, 9998, types.LimitOrderType_FILL_OR_KILL)
+	s.assertAliceBalances(1352, 6)
+}
+
 // Immediate Or Cancel LimitOrders ////////////////////////////////////////////////////////////////////
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCNoLiq() {

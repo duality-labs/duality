@@ -610,7 +610,7 @@ func (s *LiquidityTestSuite) placeGTCLimitOrder(tokenIn string, amountIn int64, 
 }
 
 func (s *LiquidityTestSuite) swap(tokenIn string, tokenOut string, maxAmountIn int64, maxAmountOut int64, limitPrice *sdk.Dec) (coinIn, coinOut sdk.Coin) {
-	coinIn, coinOut, err := s.app.DexKeeper.Swap(s.ctx, defaultPairID, tokenIn, tokenOut, sdk.NewInt(maxAmountIn), sdk.NewInt(maxAmountOut), limitPrice)
+	coinIn, coinOut, _, err := s.app.DexKeeper.Swap(s.ctx, defaultPairID, tokenIn, tokenOut, sdk.NewInt(maxAmountIn), sdk.NewInt(maxAmountOut), limitPrice)
 	s.Assert().NoError(err)
 	return coinIn, coinOut
 }
