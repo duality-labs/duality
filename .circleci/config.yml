@@ -154,10 +154,6 @@ jobs:
     executor: aws-cli/default
     steps:
       - aws-cli/install
-      - aws-cli/setup:
-          aws-access-key-id: AWS_SECRET_ACCESS_KEY
-          aws-region: AWS_DEFAULT_REGION
-          aws-secret-access-key: AWS_DEFAULT_REGION
       - aws-ecr/build-and-push-image:
           dockerfile: "dev.Dockerfile"
           registry-id: AWS_ACCOUNT_ID
