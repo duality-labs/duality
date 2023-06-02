@@ -1,3 +1,6 @@
 x-aws-vpc: "vpc-013e79af9077c1e0e"
 x-aws-cluster: "devnet-cluster"
 x-aws-loadbalancer: "duality-devnet-lb"
+
+# Script for standing up new devnet:
+# docker-compose -p duality-devnet -f ./docker-compose.yml -f ./networks/duality-devnet/docker-compose.override.yml up -d

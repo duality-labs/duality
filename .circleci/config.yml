@@ -164,7 +164,7 @@ jobs:
           registry-id: AWS_ACCOUNT_ID
           repo: duality
           tag: ${CIRCLE_SHA1},latest
-          extra-build-args: "--build-arg BASE_IMAGE_TAG=5ad3c74e50b1accb4ef2e70d28458b83b95da866"
+          extra-build-args: "--build-arg BASE_IMAGE_TAG=${CIRCLE_SHA1}"
       - run:
           name: Get service names
           command: |
@@ -239,8 +239,8 @@ workflows:
               only: devnet
           context:
             - AWS_CREDS
-          # requires:
-            # - heighliner-build
+          requires:
+            - heighliner-build
 
 
   lint:
