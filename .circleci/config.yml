@@ -172,7 +172,7 @@ jobs:
              FOLLOWER_SERVICE=$(aws ecs list-services \
              --cluster devnet-cluster \
              --query 'serviceArns' | grep -oE "duality-devnet-Follower[^\"]+")
-             echo "export FOLLOWER_SERVICE='${GENESIS_SERVICE}'" >> $BASH_ENV
+             echo "export FOLLOWER_SERVICE='${FOLLOWER_SERVICE}'" >> $BASH_ENV
       - aws-ecs/update-service:
             cluster: devnet-cluster
             family: duality-devnet-genesis-node
