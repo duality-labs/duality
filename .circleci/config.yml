@@ -207,7 +207,7 @@ workflows:
           #     only: main
           context:
             - AWS_CREDS
-          requires:
+          # requires:
             # - heighliner-build
       - go-tests
       - heighliner-build:
