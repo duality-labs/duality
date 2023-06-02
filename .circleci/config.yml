@@ -163,10 +163,7 @@ jobs:
           registry-id: AWS_ACCOUNT_ID
           repo: devnet
           tag: ${CIRCLE_SHA1},latest
-          extra-build-args: "--build-arg BASE_IMAGE_TAG=${CIRCLE_SHA1}"
-          # filters:
-          #   branches:
-          #     only: main
+          extra-build-args: "--build-arg BASE_IMAGE_TAG=5ad3c74e50b1accb4ef2e70d28458b83b95da866"
       - run:
           name: Get service names
           command: |
@@ -217,10 +214,13 @@ workflows:
             - heighliner-build
       - binary-build
       - deploy-devnet:
+          # filters:
+          #   branches:
+          #     only: main
           context:
             - AWS_CREDS
           requires:
-            - heighliner-build
+            # - heighliner-build
 
   lint:
     jobs:
