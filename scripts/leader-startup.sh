@@ -8,8 +8,6 @@ fi
 
 export NETWORK=${NETWORK:-duality-devnet}
 export CHAIN_ID="${CHAIN_ID:-$NETWORK}"
-export NODE_MONIKER="${MONIKER:-devnet-genesis-node}"
-
 echo "NETWORK: $NETWORK \n CHAIN_ID: $CHAIN_ID"
 
 # define a million, billion, Carl Sagan's worth of minimum denomination to save space

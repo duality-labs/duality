@@ -150,7 +150,7 @@ jobs:
             ghr -t "${GITHUB_TOKEN}" -u "${CIRCLE_PROJECT_USERNAME}" -r "${CIRCLE_PROJECT_REPONAME}" -c "${CIRCLE_SHA1}" -delete ${CIRCLE_TAG} ./tmp/artifacts/release
 
 
-  deploy-devnet:
+  deploy-network:
     machine:
       image: ubuntu-2004:2023.04.2
     working_directory: ~/repo
@@ -166,16 +166,16 @@ jobs:
           name: Get service names
           command: |
              GENESIS_SERVICE=$(aws ecs list-services \
-             --cluster devnet-cluster \
-             --query 'serviceArns' | grep -oE "duality-devnet-Genesis[^\"]+")
+             --cluster ${NETWORK}-cluster \
+             --query 'serviceArns' | grep -oE "duality-${NETWORK}-Genesis[^\"]+")
              echo "export GENESIS_SERVICE='${GENESIS_SERVICE}'" >> $BASH_ENV
              FOLLOWER_SERVICE=$(aws ecs list-services \
-             --cluster devnet-cluster \
-             --query 'serviceArns' | grep -oE "duality-devnet-Follower[^\"]+")
+             --cluster ${NETWORK}-cluster \
+             --query 'serviceArns' | grep -oE "duality-${NETWORK}-Follower[^\"]+")
              echo "export FOLLOWER_SERVICE='${FOLLOWER_SERVICE}'" >> $BASH_ENV
       - aws-ecs/update-service:
-            cluster: devnet-cluster
-            family: duality-devnet-genesis-node
+            cluster: ${NETWORK}-cluster
+            family: duality-${NETWORK}-genesis-node
             service-name: ${GENESIS_SERVICE}
             container-image-name-updates: container=genesis-node,tag=${CIRCLE_SHA1}
       - run:
@@ -183,20 +183,20 @@ jobs:
           name: Get latest genesis task definition
           command: >
             TASK_DEFINITION_ARN=$(aws ecs describe-task-definition \
-                --task-definition duality-devnet-genesis-node \
+                --task-definition duality-${NETWORK}-genesis-node \
                 --output text \
                 --query 'taskDefinition.taskDefinitionArn')
             echo "export TASK_DEFINITION_ARN='${TASK_DEFINITION_ARN}'" >>
             $BASH_ENV
 
       - aws-ecs/verify-revision-is-deployed:
-            cluster: devnet-cluster
-            family: duality-devnet-genesis-node
+            cluster: ${NETWORK}-cluster
+            family: duality-${NETWORK}-genesis-node
             service-name: ${GENESIS_SERVICE}
             task-definition-arn: ${TASK_DEFINITION_ARN}
       - aws-ecs/update-service:
-            cluster: devnet-cluster
-            family: duality-devnet-follower-node
+            cluster: ${NETWORK}-cluster
+            family: duality-${NETWORK}-follower-node
             service-name: ${FOLLOWER_SERVICE}
             container-image-name-updates: container=follower-node,tag=${CIRCLE_SHA1}
 
@@ -221,14 +221,6 @@ workflows:
   version: 2
   test_and_deploy:
     jobs:
-      - deploy-devnet:
-          # filters:
-          #   branches:
-          #     only: main
-          context:
-            - AWS_CREDS
-          # requires:
-            # - heighliner-build
       - go-tests
       - heighliner-build:
           context:
@@ -237,6 +229,16 @@ workflows:
           requires:
             - heighliner-build
       - binary-build
+      - deploy-network:
+          # filters:
+          #   branches:
+          #     only: main
+          environment:
+            NETWORK: devnet
+          context:
+            - AWS_CREDS
+          # requires:
+            # - heighliner-build
 
 
   lint:

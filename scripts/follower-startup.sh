@@ -8,7 +8,7 @@ fi
 
 export NETWORK=${NETWORK:-duality-devnet}
 export CHAIN_ID="${CHAIN_ID:-$NETWORK}"
-export NODE_MONIKER="${MONIKER:-devnet-follower-node}"
+export NODE_MONIKER="${MONIKER:-follower-node}"
 
 echo "NETWORK: $NETWORK /n CHAIN_ID: $CHAIN_ID"
 
@@ -56,8 +56,6 @@ echo "Adding persistent peers:$PERSISTENT_PEERS"
 dasel put string -f ${HOME}/.duality/config/config.toml -s ".p2p.persistent_peers" $PERSISTENT_PEERS
 
 
-
-# start as not a validator
 echo "Starting fullnode..."
 dualityd --log_level ${LOG_LEVEL:-info} start & :
 echo "Started fullnode"
