@@ -166,12 +166,12 @@ jobs:
           name: Get service names
           command: |
              GENESIS_SERVICE=$(aws ecs list-services \
-             --cluster devnet-cluster
-             --query 'serviceArns' | grep -oE "duality-devnet-Genesis[^\"]+" \
+             --cluster devnet-cluster \
+             --query 'serviceArns' | grep -oE "duality-devnet-Genesis[^\"]+")
              echo "export GENESIS_SERVICE='${GENESIS_SERVICE}'" >> $BASH_ENV
              FOLLOWER_SERVICE=$(aws ecs list-services \
-             --cluster devnet-cluster
-             --query 'serviceArns' | grep -oE "duality-devnet-Follower[^\"]+" \
+             --cluster devnet-cluster \
+             --query 'serviceArns' | grep -oE "duality-devnet-Follower[^\"]+")
              echo "export FOLLOWER_SERVICE='${GENESIS_SERVICE}'" >> $BASH_ENV
       - aws-ecs/update-service:
             cluster: devnet-cluster
