@@ -176,11 +176,11 @@ jobs:
       - aws-ecs/update-service:
             cluster: devnet-cluster
             family: duality-devnet-genesis-node
-            container-image-name-updates: container=${GENESIS_SERVICE},tag=${CIRCLE_SHA1}
+            container-image-name-updates: container=genesis-node,tag=${CIRCLE_SHA1}
       - aws-ecs/update-service:
             cluster: devnet-cluster
             family: duality-devnet-follower-node
-            container-image-name-updates: container=${FOLLOWER_SERVICE},tag=${CIRCLE_SHA1}
+            container-image-name-updates: container=follower-node,tag=${CIRCLE_SHA1}
 
   lint:
     working_directory: ~/repo
