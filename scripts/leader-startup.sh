@@ -8,18 +8,28 @@ fi
 
 export NETWORK=${NETWORK:-duality-devnet}
 export CHAIN_ID="${CHAIN_ID:-$NETWORK}"
-echo "NETWORK: $NETWORK \n CHAIN_ID: $CHAIN_ID"
+export NODE_MONIKER="${MONIKER:-genesis-node}"
 
-# define a million, billion, Carl Sagan's worth of minimum denomination to save space
-
+echo "NETWORK: $NETWORK \nCHAIN_ID: $CHAIN_ID"
 
 dualityd init $NODE_MONIKER --chain-id $CHAIN_ID
 
 # Add consumer section to the ICS chain
 dualityd add-consumer-section
 
+# Use network genesis file if present
+genesis_file="./networks/${NETWORK}/genesis.json"
+if [ -f $genesis_file ]; then
+    echo "Using network genesis.json: $genesis_file"
+    cp $genesis_file ${HOME}/.duality/
+else
+    echo "Using auto-generated genesis file"
+fi
+
+
 # setup accounts from mnemonic file
 
+# define a million, billion, Carl Sagan's worth of minimum denomination to save space
 B=1000000000000000000000000
 mnemonic_file="networks/${NETWORK}/mnemonics.txt"
 if [ ! -f "$mnemonic_file" ]; then

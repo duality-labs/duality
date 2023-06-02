@@ -1,11 +1,11 @@
 {
-  "genesis_time": "2023-05-11T01:51:36.885793Z",
+  "genesis_time": "2023-06-02T05:42:05.516116Z",
   "chain_id": "duality",
   "initial_height": "1",
   "consensus_params": {
     "block": {
       "max_bytes": "22020096",
-      "max_gas": "-1",
+      "max_gas": "10000000",
       "time_iota_ms": "1000"
     },
     "evidence": {
@@ -61,7 +61,10 @@
         "transfer_timeout_period": "3600s",
         "consumer_redistribution_fraction": "0.75",
         "historical_entries": "10000",
-        "unbonding_period": "1728000s"
+        "unbonding_period": "1728000s",
+        "soft_opt_out_threshold": "0.05",
+        "reward_denoms": [],
+        "provider_reward_denoms": []
       },
       "provider_client_id": "",
       "provider_channel_id": "",
@@ -137,17 +140,17 @@
         "allow_update_after_misbehaviour": true
       },
       "provider_consensus_state": {
-        "timestamp": "2023-05-11T01:51:36.913743Z",
+        "timestamp": "2023-06-02T05:42:11.203117Z",
         "root": {
           "hash": "ZHVtbXk="
         },
-        "next_validators_hash": "DEF72C03D9470FD04CD454F7DD3164151687E4A401E659F2FA512FA2C3200352"
+        "next_validators_hash": "5A625E7EA955BF397E6D410507B47C0F35E0A82362F2A1D6FEC593D806AF4541"
       },
       "maturing_packets": [],
       "initial_val_set": [
         {
           "pub_key": {
-            "ed25519": "ImDb66XtSqFEUZuCiySdhzkdthjE2DN9GhFAk+V7id8="
+            "ed25519": "6E84Afu4/Vj4nmC1MQmrQJf0CkAdVzonU0AwSmJaFqM="
           },
           "power": "100"
         }
