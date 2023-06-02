@@ -15,8 +15,6 @@ services:
       - target: 1317
         x-aws-protocol: http
     command: scripts/leader-startup.sh
-    x-aws-flags:
-      HEALTHCHECK_OFF: "true"
   follower-node:
     image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/devnet:${TAG:-latest}
     deploy:
