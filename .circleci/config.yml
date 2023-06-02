@@ -3,6 +3,8 @@ orbs:
   go: circleci/go@1.7.3
   aws-ecr: circleci/aws-ecr@8.1
   aws-ecs: circleci/aws-ecs@3.2.0
+  aws-cli: circleci/aws-cli@3.1.1
+
 jobs:
   go-tests:
     working_directory: ~/repo
@@ -146,6 +148,45 @@ jobs:
           command: |
             go install github.com/tcnksm/ghr@v0.16.0
             ghr -t "${GITHUB_TOKEN}" -u "${CIRCLE_PROJECT_USERNAME}" -r "${CIRCLE_PROJECT_REPONAME}" -c "${CIRCLE_SHA1}" -delete ${CIRCLE_TAG} ./tmp/artifacts/release
+
+
+  deploy-devnet:
+    executor: aws-cli/default
+    steps:
+      - aws-cli/install
+      - aws-cli/setup:
+          aws-access-key-id: AWS_SECRET_ACCESS_KEY
+          aws-region: AWS_DEFAULT_REGION
+          aws-secret-access-key: AWS_DEFAULT_REGION
+      - aws-ecr/build-and-push-image:
+          dockerfile: "dev.Dockerfile"
+          registry-id: AWS_ACCOUNT_ID
+          repo: devnet
+          tag: ${CIRCLE_SHA1},latest
+          extra-build-args: "--build-arg BASE_IMAGE_TAG=${CIRCLE_SHA1}"
+          # filters:
+          #   branches:
+          #     only: main
+      - run:
+          name: Get service names
+          command: |
+             GENESIS_SERVICE=$(aws ecs list-services \
+             --cluster devnet-cluster
+             --query 'serviceArns' | grep -oE "duality-devnet-Genesis[^\"]+" \
+             echo "export GENESIS_SERVICE='${GENESIS_SERVICE}'" >> $BASH_ENV
+             FOLLOWER_SERVICE=$(aws ecs list-services \
+             --cluster devnet-cluster
+             --query 'serviceArns' | grep -oE "duality-devnet-Follower[^\"]+" \
+             echo "export FOLLOWER_SERVICE='${GENESIS_SERVICE}'" >> $BASH_ENV
+      - aws-ecs/update-service:
+            cluster: devnet-cluster
+            family: duality-devnet-genesis-node
+            container-image-name-updates: container=${GENESIS_SERVICE},tag=${CIRCLE_SHA1}
+      - aws-ecs/update-service:
+            cluster: devnet-cluster
+            family: duality-devnet-follower-node
+            container-image-name-updates: container=${FOLLOWER_SERVICE},tag=${CIRCLE_SHA1}
+
   lint:
     working_directory: ~/repo
     docker:
@@ -175,32 +216,12 @@ workflows:
           requires:
             - heighliner-build
       - binary-build
-      - aws-ecr/build-and-push-image:
-          context: AWS_CREDS
-          dockerfile: "dev.Dockerfile"
-          registry-id: AWS_ACCOUNT_ID
-          repo: devnet
-          tag: ${CIRCLE_SHA1},latest
-          extra-build-args: "--build-arg BASE_IMAGE_TAG=${CIRCLE_SHA1}"
+      - deploy-devnet:
+          context:
+            - AWS_CREDS
           requires:
             - heighliner-build
-          # filters:
-          #   branches:
-          #     only: main
-      - aws-ecs/deploy-service-update:
-          context: AWS_CREDS
-          cluster: devnet-cluster
-          family: duality-devnet-genesis-node
-          container-image-name-updates: container=genesis-node,tag=${CIRCLE_SHA1}
-          requires:
-            - aws-ecr/build-and-push-image
-      - aws-ecs/deploy-service-update:
-          context: AWS_CREDS
-          cluster: devnet-cluster
-          family: duality-devnet-follower-validator
-          container-image-name-updates: container=follower-node,tag=${CIRCLE_SHA1}
-          requires:
-            - aws-ecr/build-and-push-image
+
   lint:
     jobs:
       - lint
