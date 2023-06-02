@@ -1,7 +1,4 @@
 version: "3.8"
-x-aws-vpc: "vpc-013e79af9077c1e0e"
-x-aws-cluster: "devnet-cluster"
-x-aws-loadbalancer: "duality-devnet-lb"
 services:
   genesis-node:
     image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/devnet:${TAG:-latest}
@@ -18,8 +15,8 @@ services:
       - target: 1317
         x-aws-protocol: http
     command: scripts/leader-startup.sh
-    healthcheck:
-      test: ["NONE"]
+    x-aws-flags:
+      HEALTHCHECK_OFF: "true"
   follower-node:
     image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/devnet:${TAG:-latest}
     deploy:
@@ -37,5 +34,12 @@ services:
     depends_on:
      - genesis-node
     command: scripts/follower-startup.sh
-    healthcheck:
-      test: ["NONE"]
+x-aws-vpc: "vpc-013e79af9077c1e0e"
+x-aws-cluster: "devnet-cluster"
+x-aws-loadbalancer: "duality-devnet-lb"
+x-aws-cloudformation:
+  Resources:
+    Genesisnode26656TargetGroup:
+      Properties:
+        # Do health check on 26657 since 26656 won't work
+        HealthCheckPort: 26657
