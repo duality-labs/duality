@@ -192,6 +192,7 @@ jobs:
       - aws-ecs/verify-revision-is-deployed:
             cluster: devnet-cluster
             family: duality-devnet-genesis-node
+            service-name: ${GENESIS_SERVICE}
             task-definition-arn: ${TASK_DEFINITION_ARN}
       - aws-ecs/update-service:
             cluster: devnet-cluster
