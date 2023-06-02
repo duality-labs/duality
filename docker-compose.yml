@@ -32,9 +32,6 @@ services:
     depends_on:
      - genesis-node
     command: scripts/follower-startup.sh
-x-aws-vpc: "vpc-013e79af9077c1e0e"
-x-aws-cluster: "devnet-cluster"
-x-aws-loadbalancer: "duality-devnet-lb"
 x-aws-cloudformation:
   Resources:
     Genesisnode26656TargetGroup:

@@ -1,0 +1,3 @@
+x-aws-vpc: "vpc-013e79af9077c1e0e"
+x-aws-cluster: "devnet-cluster"
+x-aws-loadbalancer: "duality-devnet-lb"
