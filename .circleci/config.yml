@@ -154,6 +154,9 @@ jobs:
     machine:
       image: ubuntu-2004:2023.04.2
     working_directory: ~/repo
+    parameters:
+      network:
+        type: string
     steps:
       - aws-cli/install
       - aws-ecr/build-and-push-image:
@@ -166,16 +169,16 @@ jobs:
           name: Get service names
           command: |
              GENESIS_SERVICE=$(aws ecs list-services \
-             --cluster ${NETWORK}-cluster \
-             --query 'serviceArns' | grep -oE "duality-${NETWORK}-Genesis[^\"]+")
+             --cluster << parameters.network >>-cluster \
+             --query 'serviceArns' | grep -oE "duality-<< parameters.network >>-Genesis[^\"]+")
              echo "export GENESIS_SERVICE='${GENESIS_SERVICE}'" >> $BASH_ENV
              FOLLOWER_SERVICE=$(aws ecs list-services \
-             --cluster ${NETWORK}-cluster \
-             --query 'serviceArns' | grep -oE "duality-${NETWORK}-Follower[^\"]+")
+             --cluster << parameters.network >>-cluster \
+             --query 'serviceArns' | grep -oE "duality-<< parameters.network >>-Follower[^\"]+")
              echo "export FOLLOWER_SERVICE='${FOLLOWER_SERVICE}'" >> $BASH_ENV
       - aws-ecs/update-service:
-            cluster: ${NETWORK}-cluster
-            family: duality-${NETWORK}-genesis-node
+            cluster: << parameters.network >>-cluster
+            family: duality-<< parameters.network >>-genesis-node
             service-name: ${GENESIS_SERVICE}
             container-image-name-updates: container=genesis-node,tag=${CIRCLE_SHA1}
       - run:
@@ -183,20 +186,20 @@ jobs:
           name: Get latest genesis task definition
           command: >
             TASK_DEFINITION_ARN=$(aws ecs describe-task-definition \
-                --task-definition duality-${NETWORK}-genesis-node \
+                --task-definition duality-<< parameters.network >>-genesis-node \
                 --output text \
                 --query 'taskDefinition.taskDefinitionArn')
             echo "export TASK_DEFINITION_ARN='${TASK_DEFINITION_ARN}'" >>
             $BASH_ENV
 
       - aws-ecs/verify-revision-is-deployed:
-            cluster: ${NETWORK}-cluster
-            family: duality-${NETWORK}-genesis-node
+            cluster: << parameters.network >>-cluster
+            family: duality-<< parameters.network >>-genesis-node
             service-name: ${GENESIS_SERVICE}
             task-definition-arn: ${TASK_DEFINITION_ARN}
       - aws-ecs/update-service:
-            cluster: ${NETWORK}-cluster
-            family: duality-${NETWORK}-follower-node
+            cluster: << parameters.network >>-cluster
+            family: duality-<< parameters.network >>-follower-node
             service-name: ${FOLLOWER_SERVICE}
             container-image-name-updates: container=follower-node,tag=${CIRCLE_SHA1}
 
@@ -230,11 +233,10 @@ workflows:
             - heighliner-build
       - binary-build
       - deploy-network:
-          # filters:
-          #   branches:
-          #     only: main
-          environment:
-            NETWORK: devnet
+          network: devnet
+          filters:
+            branches:
+              only: devnet
           context:
             - AWS_CREDS
           # requires:
