@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   genesis-node:
-    image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/devnet:${TAG:-latest}
+    image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/duality:${TAG:-latest}
     deploy:
       resources:
         limits:
@@ -16,7 +16,7 @@ services:
         x-aws-protocol: http
     command: scripts/leader-startup.sh
   follower-node:
-    image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/devnet:${TAG:-latest}
+    image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/duality:${TAG:-latest}
     deploy:
       resources:
         limits:

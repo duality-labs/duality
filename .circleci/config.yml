@@ -159,7 +159,7 @@ jobs:
       - aws-ecr/build-and-push-image:
           dockerfile: "dev.Dockerfile"
           registry-id: AWS_ACCOUNT_ID
-          repo: devnet
+          repo: duality
           tag: ${CIRCLE_SHA1},latest
           extra-build-args: "--build-arg BASE_IMAGE_TAG=5ad3c74e50b1accb4ef2e70d28458b83b95da866"
       - run:
