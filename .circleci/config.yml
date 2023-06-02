@@ -56,6 +56,13 @@ jobs:
           name: Authenticate with github
           command: |
             echo $GH_CR_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+        # NOTE: eventually we might only want to publish an image to GHCR for tags or certain branches
+      - run:
+          name: Push to GHCR
+          command: |
+            TAG="${CIRCLE_TAG:-${CIRCLE_SHA1}}"
+            docker tag duality:local ghcr.io/duality-labs/duality:${TAG}
+            docker push ghcr.io/duality-labs/duality:${TAG}
       - run:
           name: Create a temp directory for docker image
           command: mkdir -p ./tmp/docker
