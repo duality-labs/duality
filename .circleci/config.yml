@@ -62,9 +62,11 @@ jobs:
       - run:
           name: Push to GHCR
           command: |
-            TAG="${CIRCLE_TAG:-${CIRCLE_SHA1}}"
-            docker tag duality:local ghcr.io/duality-labs/duality:${TAG}
-            docker push ghcr.io/duality-labs/duality:${TAG}
+            docker tag duality:local ghcr.io/duality-labs/duality:heighliner-${CIRCLE_SHA1}
+            if [[ ! -z ${CIRCLE_TAG} ]]; then
+              docker tag duality:local ghcr.io/duality-labs/duality:heighliner-${CIRCLE_TAG}
+            fi
+            docker push ghcr.io/duality-labs/duality --all-tags
       - run:
           name: Create a temp directory for docker image
           command: mkdir -p ./tmp/docker
@@ -163,8 +165,8 @@ jobs:
           dockerfile: "heighliner.Dockerfile"
           registry-id: AWS_ACCOUNT_ID
           repo: duality
-          tag: ${CIRCLE_SHA1},latest
-          extra-build-args: "--build-arg BASE_IMAGE_TAG=${CIRCLE_SHA1}"
+          tag: ${CIRCLE_SHA1},${CIRCLE_TAG:-${CIRCLE_SHA1}}
+          extra-build-args: "--build-arg BASE_IMAGE_TAG=heighliner-${CIRCLE_SHA1}"
       - run:
           name: Get service names
           command: |
