@@ -25,6 +25,8 @@ services:
       #API
       - target: 1317
         x-aws-protocol: http
+    healthcheck:
+       test: ["CMD", "curl", "http://localhost:26657/health"]
     environment:
       - MODE=fullnode
       - RPC_ADDRESS=http://genesis-node:26657
