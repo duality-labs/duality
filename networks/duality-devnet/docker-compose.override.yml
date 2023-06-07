@@ -7,6 +7,10 @@ services:
       - MNEMONICS=reveal gloom baby scan escape shine flock kind marriage sad clinic affair invite dove document youth weekend brave mutual chief sunny return myself sorry;input coin depth fetch interest shaft vendor ready cave tell ten robot stem cat travel visit unknown saddle rain great describe derive inhale attract;actress general today spike hire bronze elbow cage mystery scheme attack head october lucky poverty eagle forest column lizard flag nominee frog gap audit
       - FAUCET_MNEMONIC=guilt sausage note edit route horror miss key bike fire icon raven fire rug gas dust property attend salad cabin town toy green photo
 
+# Along with the core docker-compose.yml this can be used to (re)create the devnet-cluster on AWS.
+# Generally, CI will take care of updating the cluster, but the above can be used to manually deploy should the need arise
+# See: https://docs.docker.com/cloud/ecs-integration/ for more details
+
 # Script for standing updating AWS devnet manually:
 # docker context create ecs ecs [follow prompts]
 # docker-compose -p duality-devnet -f ./docker-compose.yml -f ./networks/duality-devnet/docker-compose.override.yml up -d

@@ -31,7 +31,7 @@ fi
 # Add persistent peers
 if [ -z "$PERSISTENT_PEERS" ]; then
     echo "manually setting persistent peers"
-    peer_root_address=$(echo $RPC_ADDRESS |  cut -d ':' -f 1)
+    peer_root_address=$(echo $RPC_ADDRESS | sed -E 's/(https?:\/\/|:\/\/)?([^:/]+).*/\2/')
     peer_id=$( wget -O - $RPC_ADDRESS/status | jq -r '.result.node_info.id')
     PERSISTENT_PEERS="$peer_id@$peer_root_address:26656"
 fi

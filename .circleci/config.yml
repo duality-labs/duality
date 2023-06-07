@@ -161,14 +161,18 @@ jobs:
         type: string
     steps:
       - aws-cli/install
+
+      # Build our network compatible docker image
       - aws-ecr/build-and-push-image:
           dockerfile: "heighliner.Dockerfile"
           registry-id: AWS_ACCOUNT_ID
           repo: duality
           tag: ${CIRCLE_SHA1},${CIRCLE_TAG:-${CIRCLE_SHA1}}
           extra-build-args: "--build-arg BASE_IMAGE_TAG=heighliner-${CIRCLE_SHA1}"
+
+      # We will be updating the existing services in the cluster so we have to get their specific names
       - run:
-          name: Get service names
+          name: Get ECS cluster service names
           command: |
              GENESIS_SERVICE=$(aws ecs list-services \
              --cluster << parameters.network >>-cluster \
@@ -178,13 +182,18 @@ jobs:
              --cluster << parameters.network >>-cluster \
              --query 'serviceArns' | grep -oE "duality-<< parameters.network >>-Follower[^\"]+")
              echo "export FOLLOWER_SERVICE='${FOLLOWER_SERVICE}'" >> $BASH_ENV
+
+      # Update the running genesis-node service with the new image we created
       - aws-ecs/update-service:
             cluster: << parameters.network >>-cluster
             family: duality-<< parameters.network >>-genesis-node
             service-name: ${GENESIS_SERVICE}
             container-image-name-updates: container=genesis-node,tag=${CIRCLE_SHA1}
+
+
+      # We have to wait for the new genesis service to boot up before restarting the follower node
+      # First we get the ARN for the latest task revision
       - run:
-        # We have to wait for the old genesis node to drain so that the follower connects to the new node
           name: Get latest genesis task definition
           command: >
             TASK_DEFINITION_ARN=$(aws ecs describe-task-definition \
@@ -194,11 +203,14 @@ jobs:
             echo "export TASK_DEFINITION_ARN='${TASK_DEFINITION_ARN}'" >>
             $BASH_ENV
 
+      # AND then we check to make sure the new task definition has deployed
       - aws-ecs/verify-revision-is-deployed:
             cluster: << parameters.network >>-cluster
             family: duality-<< parameters.network >>-genesis-node
             service-name: ${GENESIS_SERVICE}
             task-definition-arn: ${TASK_DEFINITION_ARN}
+
+      # Finally, update the running follower-node to the new image we created
       - aws-ecs/update-service:
             cluster: << parameters.network >>-cluster
             family: duality-<< parameters.network >>-follower-node
@@ -250,6 +262,8 @@ workflows:
 
       # Devnet deploy
       - deploy-network:
+          # NOTE: for now we are just deploying anything pushed to the devnet branch to the devnet-cluster.
+          # The network argument is passed to the deploy-network job and referenced via `<< parameters.network >>`
           network: devnet
           filters:
             branches:
