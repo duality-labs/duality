@@ -222,40 +222,46 @@ jobs:
           command: "./bin/golangci-lint run --out-format colored-line-number:linter.txt --timeout 6m"
       - store_artifacts:
           path: ./linter.txt
+
 workflows:
   version: 2
-  test_and_deploy:
+  build_test_deploy:
     jobs:
-      - go-tests
+
+      # Core jobs
+      - go-tests:
+          filters:
+            tags:
+              only: /.*/
+      - lint
       - heighliner-build:
+          filters:
+            tags:
+              only: /.*/
           context:
             - GITHUB_CREDS
       - ictest:
+          filters:
+            tags:
+              only: /.*/
           requires:
             - heighliner-build
       - binary-build
+
+      # Devnet deploy
       - deploy-network:
           network: devnet
           filters:
             branches:
               only: devnet
+            tags:
+              only: /.*/
           context:
             - AWS_CREDS
           requires:
             - heighliner-build
 
-
-  lint:
-    jobs:
-      - lint
-  publish-release-maybe:
-    jobs:
-      - go-tests:
-          filters:
-            tags:
-              only: /^v\d+\.\d+\.\d+$/
-            branches:
-              ignore: /.*/
+      # Publish releases
       - binary-release-build:
           filters:
             tags:
@@ -272,4 +278,5 @@ workflows:
             - GITHUB_CREDS
           requires:
             - go-tests
+            - ictest
             - binary-release-build
