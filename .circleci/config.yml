@@ -280,3 +280,6 @@ workflows:
             - go-tests
             - ictest
             - binary-release-build
+
+# NOTE: By default CircleCI does not run jobs on tags only branches.
+# So any jobs that we want to run for tags or are requirements for those jobs must have a tags filter (ie. filters.tags.only: /.*/)
