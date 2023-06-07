@@ -125,7 +125,7 @@ func (k Keeper) CreateGauge(
 	}
 
 	gauge := &types.Gauge{
-		Id:                k.GetLastGaugeID(ctx) + 1,
+		Id:                numGauges + 1,
 		IsPerpetual:       isPerpetual,
 		DistributeTo:      distrTo,
 		Coins:             coins,
