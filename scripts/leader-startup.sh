@@ -1,63 +1,35 @@
 #!/bin/sh
 
-# check current working directory
-if [[ ! -e scripts/startup.sh ]]; then
-    echo >&2 "Please run this script from the base repo directory"
-    exit 1
-fi
-
-export NETWORK=${NETWORK:-duality-devnet}
-export CHAIN_ID="${CHAIN_ID:-$NETWORK}"
-export NODE_MONIKER="${MONIKER:-genesis-node}"
-
-echo "NETWORK: $NETWORK \nCHAIN_ID: $CHAIN_ID"
-
-dualityd init $NODE_MONIKER --chain-id $CHAIN_ID
-
-# Add consumer section to the ICS chain
-dualityd add-consumer-section
-
-# Use network genesis file if present
-genesis_file="./networks/${NETWORK}/genesis.json"
-if [ -f $genesis_file ]; then
-    echo "Using network genesis.json: $genesis_file"
-    cp $genesis_file ${HOME}/.duality/
-else
-    echo "Using auto-generated genesis file"
-fi
-
-
-# setup accounts from mnemonic file
 
 # define a million, billion, Carl Sagan's worth of minimum denomination to save space
 B=1000000000000000000000000
-mnemonic_file="networks/${NETWORK}/mnemonics.txt"
-if [ ! -f "$mnemonic_file" ]; then
-    echo "File '$mnemonic_file' does not exist."
-    exit 1
+
+# Setup normal accounts
+if [ -z "$MNEMONICS" ]; then
+   echo "No MNEMONICS provided"
+else
+    echo "Adding accounts from MNEMONICS"
+    i=1
+    while mnemonic=$(echo "$MNEMONICS" | cut -d\; -f$i); [ -n "$mnemonic" ]
+    do
+        echo $mnemonic | dualityd keys add user-$i --recover --keyring-backend test
+        dualityd add-genesis-account $(dualityd keys show user-$i -a --keyring-backend test) ${B}token,${B}stake --keyring-backend test
+        i=$((i+1))
+    done
 fi
 
-# setup normal accounts
-sed \$d ${mnemonic_file} | nl | while read line; do
-    num=$(echo "$line" | awk '{print $1}')
-    mnemonic=$(echo "$line" | awk {'$1=""; print $0'})
-    acct_name="user${num}"
-    echo "$mnemonic" | dualityd keys add $acct_name --recover --keyring-backend test
-    dualityd add-genesis-account $acct_name ${B}token,${B}stake --keyring-backend test 
-
-done
 
 # Add faucet account
-faucet_mnemonic=$(tail -n 1 $mnemonic_file)
-echo $faucet_mnemonic | dualityd keys add faucet --recover --keyring-backend test
-dualityd add-genesis-account faucet "${B}token,${B}stake,${B}tokenA,${B}tokenB,${B}tokenC,${B}tokenD,${B}tokenE,${B}tokenF,${B}tokenG,${B}tokenH,${B}tokenI,${B}tokenJ,${B}tokenK,${B}tokenL,${B}tokenM,${B}tokenN,${B}tokenO,${B}tokenP,${B}tokenQ,${B}tokenR,${B}tokenS,${B}tokenT,${B}tokenU,${B}tokenV,${B}tokenW,${B}tokenX,${B}tokenY,${B}tokenZ" --keyring-backend test
+if [ -z "$FAUCET_MNEMONIC" ]; then
+   echo "No FAUCET_MNEMONIC"
+else
+    echo $FAUCET_MNEMONIC | dualityd keys add faucet --recover --keyring-backend test
+    dualityd add-genesis-account faucet "${B}token,${B}stake,${B}tokenA,${B}tokenB,${B}tokenC,${B}tokenD,${B}tokenE,${B}tokenF,${B}tokenG,${B}tokenH,${B}tokenI,${B}tokenJ,${B}tokenK,${B}tokenL,${B}tokenM,${B}tokenN,${B}tokenO,${B}tokenP,${B}tokenQ,${B}tokenR,${B}tokenS,${B}tokenT,${B}tokenU,${B}tokenV,${B}tokenW,${B}tokenX,${B}tokenY,${B}tokenZ" --keyring-backend test
+fi
 
 
-
-./scripts/config_setup.sh
 
 echo "Starting new chain..."
-dualityd --log_level ${LOG_LEVEL:-info} start
+dualityd --log_level ${LOG_LEVEL:-info} start & :
 
 
-tail -f /dev/null;
