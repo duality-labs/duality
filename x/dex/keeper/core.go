@@ -318,7 +318,8 @@ func (k Keeper) PlaceLimitOrderCore(
 	if !orderType.IsJIT() {
 		limitPrice := placeTranche.PriceMakerToTaker().ToDec()
 		var coinInSwap sdk.Coin
-		coinInSwap, coinOutSwap, err = k.SwapWithCache(
+		var orderFilled bool
+		coinInSwap, coinOutSwap, orderFilled, err = k.SwapWithCache(
 			ctx,
 			pairID,
 			tokenIn,
@@ -329,6 +330,10 @@ func (k Keeper) PlaceLimitOrderCore(
 		)
 		if err != nil {
 			return nil, coinIn, coinOutSwap, err
+		}
+
+		if orderType.IsFoK() && !orderFilled {
+			return nil, coinIn, coinOutSwap, types.ErrFoKLimitOrderNotFilled
 		}
 
 		totalIn = coinInSwap.Amount
@@ -345,10 +350,6 @@ func (k Keeper) PlaceLimitOrderCore(
 				return nil, coinIn, coinOutSwap, err
 			}
 		}
-	}
-
-	if amountLeft.IsPositive() && orderType.IsFoK() {
-		return nil, coinIn, coinOutSwap, types.ErrFoKLimitOrderNotFilled
 	}
 
 	sharesIssued := sdk.ZeroInt()

@@ -97,6 +97,10 @@ func (k Keeper) MultihopStep(
 		return val.CoinOut, ctxBranchCopy, val.Err
 	}
 
+	// TODO: Due to rounding on swap it is possible to leak tokens at each hop.
+	// In these cases the user will end up with trace amounts of tokens from intermediary steps.
+	// To fix this we would have to pre-calculate the route such that the amount
+	// in will be used completely at each step
 	_, coinOut, err := k.SwapExactAmountIn(
 		bctx.Ctx,
 		step.TradingPair.PairID,
