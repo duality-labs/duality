@@ -905,12 +905,6 @@ func (app *App) GetIBCKeeper() *ibckeeper.Keeper {
 	return app.IBCKeeper
 }
 
-// // GetStakingKeeper implements the TestingApp interface.
-//
-//	func (app *App) GetStakingKeeper() ibcclienttypes.StakingKeeper {
-//		return app.ConsumerKeeper
-//	}
-//
 // GetStakingKeeper implements the TestingApp interface.
 func (app *App) GetStakingKeeper() ibctestingcore.StakingKeeper {
 	return app.ConsumerKeeper
