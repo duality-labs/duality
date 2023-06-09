@@ -12,6 +12,10 @@ import (
 	ibctesting "github.com/cosmos/interchain-security/legacy_ibc_testing/testing"
 )
 
+func init() {
+	ibctesting.DefaultTestingAppInit = app.SetupTestingApp
+}
+
 type TransferTestSuite struct {
 	suite.Suite
 
@@ -140,8 +144,4 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 
 func TestTransferTestSuite(t *testing.T) {
 	suite.Run(t, new(TransferTestSuite))
-}
-
-func init() {
-	ibctesting.DefaultTestingAppInit = app.SetupTestingApp
 }
