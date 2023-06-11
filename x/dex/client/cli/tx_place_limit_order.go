@@ -17,9 +17,9 @@ import (
 func CmdPlaceLimitOrder() *cobra.Command {
 	cmd := &cobra.Command{
 		//nolint:lll
-		Use:     "place-limit-order [receiver] [token-in] [token-out] [tick-index] [amount-in] ?[order-type] ?[expirationTime]",
+		Use:     "place-limit-order [receiver] [token-in] [token-out] [tick-index] [amount-in] ?[order-type] ?[expirationTime] ?(--max-amout-out)",
 		Short:   "Broadcast message PlaceLimitOrder",
-		Example: "place-limit-order alice tokenA tokenB [-10] tokenA 50 GOOD_TIL_TIME '01/02/2006 15:04:05' --from alice",
+		Example: "place-limit-order alice tokenA tokenB [-10] tokenA 50 GOOD_TIL_TIME '01/02/2006 15:04:05' --max-amount-out 20 --from alice",
 		Args:    cobra.RangeArgs(5, 7),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argReceiver := args[0]
@@ -60,6 +60,19 @@ func CmdPlaceLimitOrder() *cobra.Command {
 				goodTil = &tm
 			}
 
+			maxAmountOutArg, err := cmd.Flags().GetString(FlagMaxAmountOut)
+			if err != nil {
+				return err
+			}
+			var maxAmountOutIntP *sdk.Int = nil
+			if maxAmountOutArg != "" {
+				maxAmountOutInt, ok := sdk.NewIntFromString(maxAmountOutArg)
+				if !ok {
+					return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for max-amount-out")
+				}
+				maxAmountOutIntP = &maxAmountOutInt
+			}
+
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -74,6 +87,7 @@ func CmdPlaceLimitOrder() *cobra.Command {
 				amountInInt,
 				orderType,
 				goodTil,
+				maxAmountOutIntP,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
@@ -84,6 +98,7 @@ func CmdPlaceLimitOrder() *cobra.Command {
 	}
 
 	flags.AddTxFlagsToCmd(cmd)
+	cmd.Flags().AddFlagSet(FlagSetMaxAmountOut())
 
 	return cmd
 }

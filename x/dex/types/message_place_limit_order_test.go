@@ -11,6 +11,8 @@ import (
 )
 
 func TestMsgPlaceLimitOrder_ValidateBasic(t *testing.T) {
+	ZEROINT := sdk.ZeroInt()
+	ONEINT := sdk.OneInt()
 	tests := []struct {
 		name string
 		msg  MsgPlaceLimitOrder
@@ -51,6 +53,34 @@ func TestMsgPlaceLimitOrder_ValidateBasic(t *testing.T) {
 				AmountIn:  sdk.ZeroInt(),
 			},
 			err: ErrZeroLimitOrder,
+		},
+		{
+			name: "zero maxOut",
+			msg: MsgPlaceLimitOrder{
+				Creator:      sample.AccAddress(),
+				Receiver:     sample.AccAddress(),
+				TokenIn:      "TokenA",
+				TokenOut:     "TokenB",
+				TickIndex:    0,
+				AmountIn:     sdk.OneInt(),
+				MaxAmountOut: &ZEROINT,
+				OrderType:    LimitOrderType_FILL_OR_KILL,
+			},
+			err: ErrZeroMaxAmountOut,
+		},
+		{
+			name: "max out with maker order",
+			msg: MsgPlaceLimitOrder{
+				Creator:      sample.AccAddress(),
+				Receiver:     sample.AccAddress(),
+				TokenIn:      "TokenA",
+				TokenOut:     "TokenB",
+				TickIndex:    0,
+				AmountIn:     sdk.OneInt(),
+				MaxAmountOut: &ONEINT,
+				OrderType:    LimitOrderType_GOOD_TIL_CANCELLED,
+			},
+			err: ErrInvalidMaxAmountOutForMaker,
 		},
 		{
 			name: "valid msg",

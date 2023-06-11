@@ -59,7 +59,7 @@ func (p *Pool) GetUpperReserve1() sdk.Int {
 	return p.UpperTick1.Reserves
 }
 
-func (p *Pool) Swap0To1(maxAmountIn0 sdk.Int, maxAmountOut1 sdk.Int) (inAmount0, outAmount1 sdk.Int) {
+func (p *Pool) Swap0To1(maxAmountIn0 sdk.Int, maxAmountOut1 *sdk.Int) (inAmount0, outAmount1 sdk.Int) {
 	reserves1 := &p.UpperTick1.Reserves
 	if maxAmountIn0.Equal(sdk.ZeroInt()) || reserves1.Equal(sdk.ZeroInt()) {
 		return sdk.ZeroInt(), sdk.ZeroInt()
@@ -69,8 +69,8 @@ func (p *Pool) Swap0To1(maxAmountIn0 sdk.Int, maxAmountOut1 sdk.Int) (inAmount0,
 
 	maxOutGivenIn1 := p.Price0To1Upper.MulInt(maxAmountIn0).TruncateInt()
 	possibleOutAmounts := []sdk.Int{*reserves1, maxOutGivenIn1}
-	if !maxAmountOut1.IsZero() {
-		possibleOutAmounts = append(possibleOutAmounts, maxAmountOut1)
+	if maxAmountOut1 != nil {
+		possibleOutAmounts = append(possibleOutAmounts, *maxAmountOut1)
 	}
 
 	// outAmount will be the smallest value of:
@@ -86,7 +86,7 @@ func (p *Pool) Swap0To1(maxAmountIn0 sdk.Int, maxAmountOut1 sdk.Int) (inAmount0,
 	return inAmount0, outAmount1
 }
 
-func (p *Pool) Swap1To0(maxAmountIn1 sdk.Int, maxAmountOut0 sdk.Int) (inAmount1, outAmount0 sdk.Int) {
+func (p *Pool) Swap1To0(maxAmountIn1 sdk.Int, maxAmountOut0 *sdk.Int) (inAmount1, outAmount0 sdk.Int) {
 	reserves0 := &p.LowerTick0.Reserves
 	if maxAmountIn1.Equal(sdk.ZeroInt()) || reserves0.Equal(sdk.ZeroInt()) {
 		return sdk.ZeroInt(), sdk.ZeroInt()
@@ -96,8 +96,8 @@ func (p *Pool) Swap1To0(maxAmountIn1 sdk.Int, maxAmountOut0 sdk.Int) (inAmount1,
 
 	maxOutGivenIn0 := p.Price1To0Lower.MulInt(maxAmountIn1).TruncateInt()
 	possibleOutAmounts := []sdk.Int{*reserves0, maxOutGivenIn0}
-	if !maxAmountOut0.IsZero() {
-		possibleOutAmounts = append(possibleOutAmounts, maxAmountOut0)
+	if maxAmountOut0 != nil {
+		possibleOutAmounts = append(possibleOutAmounts, *maxAmountOut0)
 	}
 
 	// outAmount will be the smallest value of:

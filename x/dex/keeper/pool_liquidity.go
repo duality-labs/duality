@@ -10,7 +10,7 @@ type PoolLiquidity struct {
 	is0To1 bool
 }
 
-func (pl *PoolLiquidity) Swap(maxAmountIn sdk.Int, maxAmountOut sdk.Int) (inAmount, outAmount sdk.Int) {
+func (pl *PoolLiquidity) Swap(maxAmountIn sdk.Int, maxAmountOut *sdk.Int) (inAmount, outAmount sdk.Int) {
 	if pl.is0To1 {
 		return pl.pool.Swap0To1(maxAmountIn, maxAmountOut)
 	}

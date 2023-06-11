@@ -107,6 +107,7 @@ func (k msgServer) PlaceLimitOrder(
 		tickIndex,
 		msg.OrderType,
 		msg.ExpirationTime,
+		msg.MaxAmountOut,
 		callerAddr,
 		receiverAddr,
 	)
