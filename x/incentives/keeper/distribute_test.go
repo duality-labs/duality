@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/duality-labs/duality/app/apptesting"
+	apptesting "github.com/duality-labs/duality/app/testing"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"
 )

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/duality-labs/duality/app/apptesting"
+	apptesting "github.com/duality-labs/duality/app/testing"
 	"github.com/duality-labs/duality/x/epochs/types"
 )
 

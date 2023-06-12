@@ -4,7 +4,7 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/duality-labs/duality/app/apptesting"
+	apptesting "github.com/duality-labs/duality/app/testing"
 	"github.com/duality-labs/duality/testutil/nullify"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"

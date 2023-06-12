@@ -1,4 +1,4 @@
-package apptesting
+package testing
 
 import (
 	"crypto/rand"

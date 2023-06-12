@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/duality-labs/duality/app/apptesting"
+	apptesting "github.com/duality-labs/duality/app/testing"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"
 	"github.com/stretchr/testify/require"
