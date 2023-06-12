@@ -18,7 +18,7 @@ fi
 echo "Startup mode: $STARTUP_MODE"
 
 echo "Initializing chain..."
-dualityd init --chain-id $CHAIN_ID duality
+dualityd init --chain-id $CHAIN_ID $NODE_MONIKER
 
 # Add consumer section to the ICS chain
 dualityd add-consumer-section
