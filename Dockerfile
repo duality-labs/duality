@@ -13,6 +13,9 @@ RUN apt-get install -y \
 
 WORKDIR /usr/src
 
+# add Ignite for generating docs
+RUN curl "https://get.ignite.com/cli@v0.23.0!" | bash
+
 # Get Go dependencies
 COPY go.mod ./go.mod
 COPY go.sum ./go.sum
@@ -22,6 +25,13 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 
 # Copy rest of files
 COPY . .
+
+# create docs spec file
+RUN ignite generate openapi -y
+# create docs Go package
+RUN echo 'package docs \n import "embed" \n //go:embed static \n var Docs embed.FS' > docs/docs.go
+# add docs package to app (over Ignite's version)
+RUN sed -i 's#github.com/ignite/cli/docs#github.com/duality-labs/duality/docs#' app/app.go
 
 # compile dualityd to ARM64 architecture for final image
 RUN --mount=type=cache,target=/root/.cache/go-build \
