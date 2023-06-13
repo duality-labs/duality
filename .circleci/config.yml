@@ -188,7 +188,7 @@ jobs:
             cluster: << parameters.network >>-cluster
             family: duality-<< parameters.network >>-genesis-node
             service-name: ${GENESIS_SERVICE}
-            container-image-name-updates: container=genesis-node,tag=${CIRCLE_SHA1}
+            container-image-name-updates: container=genesis-node,tag="heighliner-${CIRCLE_SHA1}"
 
 
       # We have to wait for the new genesis service to boot up before restarting the follower node

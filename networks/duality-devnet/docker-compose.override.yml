@@ -2,7 +2,7 @@ x-aws-vpc: "vpc-013e79af9077c1e0e"
 x-aws-cluster: "devnet-cluster"
 x-aws-loadbalancer: "duality-devnet-lb"
 services:
-  genesis-node:
+  genesis-node-launcher:
     environment:
       - MNEMONICS=reveal gloom baby scan escape shine flock kind marriage sad clinic affair invite dove document youth weekend brave mutual chief sunny return myself sorry;input coin depth fetch interest shaft vendor ready cave tell ten robot stem cat travel visit unknown saddle rain great describe derive inhale attract;actress general today spike hire bronze elbow cage mystery scheme attack head october lucky poverty eagle forest column lizard flag nominee frog gap audit
       - FAUCET_MNEMONIC=guilt sausage note edit route horror miss key bike fire icon raven fire rug gas dust property attend salad cabin town toy green photo
@@ -17,6 +17,7 @@ services:
       - REST_API=http://follower-node:1317
       - RPC_API=http://follower-node:26657
       - WEBSOCKET_URL=ws://follower-node:26657/websocket
+      - CORS_ORIGIN=*
     depends_on:
      follower-node:
        condition: service_healthy
@@ -29,6 +30,6 @@ services:
 # Script for standing updating AWS devnet manually:
 # docker context create ecs ecs [follow prompts]
 # docker context use ecs
-# docker-compose -p duality-devnet -f ./docker-compose.yml -f ./networks/duality-devnet/docker-compose.override.yml up -d
+# tag=[SHA-TAG] docker-compose -p duality-devnet -f ./docker-compose.yml -f ./networks/duality-devnet/docker-compose.override.yml up -d
 
 # This will update the existing devnet (devnet-cluster). To create a new devnet you can supply an alternative docker-compose.override.yml 

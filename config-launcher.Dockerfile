@@ -29,6 +29,6 @@ COPY scripts scripts
 COPY networks networks
 
 
-COPY --from=infra-toolkit --chown=heighliner /var/empty /home/heighliner/.duality
+USER root
 
 CMD ["sh", "./scripts/startup.sh"]

@@ -52,7 +52,7 @@ fi
 # for mainnets a custom genesis file should be curated outside of these scripts
 if [ $STARTUP_MODE == "new" ]
 then
-    ./scripts/leader-startup.sh
+    ./scripts/genesis-startup.sh
 elif [ $STARTUP_MODE == "fullnode" ]; then
    ./scripts/follower-startup.sh
 else
