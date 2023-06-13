@@ -1,0 +1,33 @@
+{
+  "chainId": "duality-1",
+  "chainName": "Duality",
+  "image": "https://assets.duality.xyz/duality.svg",
+  "rest": "https:/rest.duality-1.duality.xyz",
+  "rpc": "https://rpc.duality-1.duality.xyz",
+  "bip44": {
+    "coinType": 118
+  },
+  "bech32Config": {
+    "bech32PrefixAccAddr": "cosmos",
+    "bech32PrefixAccPub": "cosmospub",
+    "bech32PrefixValAddr": "cosmosvaloper",
+    "bech32PrefixValPub": "cosmosvaloperpub",
+    "bech32PrefixConsAddr": "cosmosvalcons",
+    "bech32PrefixConsPub": "cosmosvalconspub"
+  },
+  "currencies": [],
+  "feeCurrencies": [
+    {
+      "coinDenom": "ATOM",
+      "coinMinimalDenom": "uatom",
+      "coinDecimals": 6,
+      "coinGeckoId": "cosmos-hub",
+      "gasPriceStep": {
+        "low": 0.01,
+        "average": 0.025,
+        "high": 0.03
+      }
+    }
+  ],
+  "stakeCurrency": {}
+}
