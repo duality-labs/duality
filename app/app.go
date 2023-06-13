@@ -77,6 +77,7 @@ import (
 	ibchost "github.com/cosmos/ibc-go/v4/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
 	ibctestingcore "github.com/cosmos/interchain-security/legacy_ibc_testing/core"
+	"github.com/ignite/cli/docs"
 	"github.com/ignite/cli/ignite/pkg/openapiconsole"
 	"github.com/spf13/cast"
 	forwardmiddleware "github.com/strangelove-ventures/packet-forward-middleware/v4/router"
@@ -93,7 +94,6 @@ import (
 	ccvconsumerkeeper "github.com/cosmos/interchain-security/x/ccv/consumer/keeper"
 	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
 
-	"github.com/duality-labs/duality/docs"
 	dexmodule "github.com/duality-labs/duality/x/dex"
 	dexmodulekeeper "github.com/duality-labs/duality/x/dex/keeper"
 	dexmoduletypes "github.com/duality-labs/duality/x/dex/types"

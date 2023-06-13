@@ -34,13 +34,13 @@ func (d Distributor) Distribute(
 	rewardsNextEpoch := gauge.RewardsNextEpoch()
 
 	adjustedGaugeTotal := sdk.ZeroInt()
-	stakeSumCache := map[uint64]sdk.Int{}
 
 	gaugeStakes := d.keeper.GetStakesByQueryCondition(ctx, &gauge.DistributeTo)
 	if filterStakes == nil {
 		filterStakes = gaugeStakes
 	}
 
+	stakeSumCache := make(map[uint64]sdk.Int, len(gaugeStakes))
 	for _, stake := range gaugeStakes {
 		stakeCoins := stake.CoinsPassingQueryCondition(gauge.DistributeTo)
 		stakeTotal := sdk.ZeroInt()
