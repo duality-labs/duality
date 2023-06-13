@@ -297,7 +297,7 @@ func (s *TxTestSuite) TestTx4Cmd4PlaceLimitOrder() {
 		},
 		{
 			name:     "valid with maxAmountOut",
-			args:     []string{s.addr1.String(), "TokenB", "TokenA", "[0]", "10", "--max-amount-out=10"},
+			args:     []string{s.addr1.String(), "TokenB", "TokenA", "[0]", "10", "FILL_OR_KILL", "--max-amount-out=10"},
 			errInRes: false,
 		},
 	}
