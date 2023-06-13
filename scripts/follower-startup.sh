@@ -37,8 +37,3 @@ if [ -z "$PERSISTENT_PEERS" ]; then
 fi
 echo "Adding persistent peers:$PERSISTENT_PEERS"
 dasel put string -f ${HOME}/.duality/config/config.toml -s ".p2p.persistent_peers" $PERSISTENT_PEERS
-
-
-echo "Starting fullnode..."
-dualityd --log_level ${LOG_LEVEL:-info} start & :
-echo "Started fullnode"

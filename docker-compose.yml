@@ -1,17 +1,44 @@
 version: "3.8"
 services:
+  genesis-node-launcher:
+    # NOTE: This is a static build of duality-config-launcher that is not updated with each release
+    # The config launcher only handles core config and does not have to be up to date with the latest binary
+    # If there are breaking changes that effect `dualityd init` this image will need to be rebuilt 
+    image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/duality-config-launcher:latest
+    volumes:
+      - genesis-node-storage:/home/heighliner/.duality
+    environment:
+      - MODE=new
+      - NODE_MONIKER=genesis-node
+
   genesis-node:
-    image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/duality:${TAG:-latest}
+    image: ghcr.io/duality-labs/duality:heighliner-${TAG}
     deploy:
       resources:
         limits:
           cpus: '1'
           memory: 8192M
+    command: sh -c "dualityd add-consumer-section && dualityd start --log_level ${LOG_LEVEL:-info}"
+    volumes:
+      - genesis-node-storage:/home/heighliner/.duality
+    depends_on:
+     genesis-node-launcher:
+       condition: service_completed_successfully
+
+  follower-node-launcher:
+    image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/duality-config-launcher:latest
+    volumes:
+      - follower-node-storage:/home/heighliner/.duality
     environment:
-      - MODE=new
-      - NODE_MONIKER=genesis-node
+      - MODE=fullnode
+      - RPC_ADDRESS=http://genesis-node:26657
+      - NODE_MONIKER=follower-node
+    depends_on:
+      genesis-node:
+        condition: service_started
+
   follower-node:
-    image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/duality:${TAG:-latest}
+    image: ghcr.io/duality-labs/duality:heighliner-${TAG}
     deploy:
       resources:
         limits:
@@ -27,9 +54,12 @@ services:
         x-aws-protocol: http
     healthcheck:
        test: ["CMD", "curl", "http://localhost:26657/health"]
-    environment:
-      - MODE=fullnode
-      - RPC_ADDRESS=http://genesis-node:26657
-      - NODE_MONIKER=follower-node
+    command: sh -c "dualityd start --log_level ${LOG_LEVEL:-info}"
+    volumes:
+      - follower-node-storage:/home/heighliner/.duality
     depends_on:
-     - genesis-node
+      follower-node-launcher:
+        condition: service_completed_successfully
+volumes:
+  genesis-node-storage:
+  follower-node-storage:

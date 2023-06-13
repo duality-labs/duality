@@ -15,8 +15,9 @@ if [[ ! -e scripts/startup.sh ]]; then
     exit 1
 fi
 
-echo "Startup mode: $STARTUP_MODE"
+rm -r ${HOME}/.duality/*
 
+echo "Startup mode: $STARTUP_MODE"
 echo "Initializing chain..."
 dualityd init --chain-id $CHAIN_ID $NODE_MONIKER
 
@@ -58,13 +59,4 @@ else
     echo "Invalid startup mode: $STARTUP_MODE"
 fi
 
-if [[ $IS_MAINNET == true ]]; then
-   echo "Removing unsafe binaries"
-
-   rm -r /usr/lib/ /usr/bin /bin/busybox
-fi
-
-if [ "$KEEP_RUNNING" != "false" ]
-then
-    tail -f /dev/null;
-fi
+exit 0
