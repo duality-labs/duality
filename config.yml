@@ -20,11 +20,6 @@ faucet:
   - 5token
   - 100000stake
   host: 0.0.0.0:4500
-client:
-  vuex:
-    path: vue/src/store
-  openapi:
-    path: docs/static/openapi.yml
 validator:
   name: alice
   bonded: 100000000stake

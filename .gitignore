@@ -5,3 +5,4 @@ release/
 .DS_Store
 ts-client/
 tmp
+docs/static/openapi.yml
