@@ -1,0 +1,49 @@
+version: 1
+name: duality-devnet
+task_definition:
+  task_execution_role: ecsTaskExecutionRole
+  task_role_arn: ecsTaskExecutionRole
+  ecs_network_mode: bridge
+  task_size:
+    cpu_limit: 2048
+    mem_limit: 16GB
+  services:
+    logging:
+      essential: false
+    genesis-node-launcher:
+      essential: false
+    genesis-node:
+      cpu_shares: 1024
+      mem_limit: 8GB
+      depends_on:
+        - container_name: genesis-node-launcher
+          condition: COMPLETE
+      essential: true
+    follower-node-launcher:
+      essential: false
+    follower-node:
+      logging:
+        driver: awslogs
+        options:
+          awslogs-group: duality-devnet
+          awslogs-region: us-west-2
+          awslogs-stream-prefix: follower-node-launcher
+      cpu_shares: 1024
+      mem_limit: 8GB
+      depends_on:
+        - container_name: follower-node-launcher
+          condition: COMPLETE
+run_params:
+  network_configuration:
+    awsvpc_configuration:
+      subnets:
+        - subnet-071da78b06d4e0eb1 
+        # - subnet-02708ae8d672fc9ad
+      security_groups:
+        - sg-040c7c77456e351bf
+      assign_public_ip: ENABLED
+  # service_discovery:
+  #    private_dns_namespace:
+  #     name: devnet              
+  #     vpc: vpc-013e79af9077c1e0e
+  #     description: devnet ecs private dns
