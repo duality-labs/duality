@@ -28,7 +28,16 @@ COPY --from=infra-toolkit --chown=heighliner /usr/lib /usr/lib/
 COPY scripts scripts
 COPY networks networks
 
+# Setup shared volume for config-launcher and heighliner proccess
 
-USER root
+# For some stange reason `USER heighliner` throws errors so we have to specify the user by heighliner UID:GID
+USER 1025:1025 
+
+# Create a directory for shared mount and assign ownership to heighliner user
+RUN mkdir -p /home/heighliner/.duality
+RUN chown 1025:1025 /home/heighliner/.duality
+
+# declare mount volume
+VOLUME ["/home/heighliner/.duality"]
 
 CMD ["sh", "./scripts/startup.sh"]
