@@ -251,6 +251,22 @@ func (s *MsgServerTestSuite) assertDanLimitSellFails(err error, selling string, 
 	s.assertLimitSellFails(s.dan, err, selling, tick, amountIn, orderTypeOpt...)
 }
 
+func (s *MsgServerTestSuite) aliceLimitSellsWithMaxOut(selling string, tick, amountIn, maxAmountOut int) string {
+	return s.limitSellsWithMaxOut(s.alice, selling, tick, amountIn, maxAmountOut)
+}
+
+func (s *MsgServerTestSuite) bobLimitSellsWithMaxOut(selling string, tick, amountIn, maxAmountOut int) string {
+	return s.limitSellsWithMaxOut(s.bob, selling, tick, amountIn, maxAmountOut)
+}
+
+func (s *MsgServerTestSuite) carolLimitSellsWithMaxOut(selling string, tick, amountIn, maxAmountOut int) string {
+	return s.limitSellsWithMaxOut(s.carol, selling, tick, amountIn, maxAmountOut)
+}
+
+func (s *MsgServerTestSuite) danLimitSellsWithMaxOut(selling string, tick, amountIn, maxAmountOut int) string {
+	return s.limitSellsWithMaxOut(s.dan, selling, tick, amountIn, maxAmountOut)
+}
+
 func (s *MsgServerTestSuite) assertLimitSellFails(account sdk.AccAddress, expectedErr error, tokenIn string, tick, amountIn int, orderTypeOpt ...types.LimitOrderType) {
 	_, err := s.limitSells(account, tokenIn, tick, amountIn, orderTypeOpt...)
 	s.Assert().ErrorIs(err, expectedErr)
@@ -276,6 +292,26 @@ func (s *MsgServerTestSuite) limitSells(account sdk.AccAddress, tokenIn string, 
 	})
 
 	return msg.TrancheKey, err
+}
+
+func (s *MsgServerTestSuite) limitSellsWithMaxOut(account sdk.AccAddress, tokenIn string, tick, amountIn int, maxAmoutOut int) string {
+	tokenIn, tokenOut := GetInOutTokens(tokenIn, "TokenA", "TokenB")
+	maxAmountOutInt := sdk.NewInt(int64(maxAmoutOut))
+
+	msg, err := s.msgServer.PlaceLimitOrder(s.goCtx, &types.MsgPlaceLimitOrder{
+		Creator:      account.String(),
+		Receiver:     account.String(),
+		TokenIn:      tokenIn,
+		TokenOut:     tokenOut,
+		TickIndex:    int64(tick),
+		AmountIn:     sdk.NewInt(int64(amountIn)),
+		OrderType:    types.LimitOrderType_FILL_OR_KILL,
+		MaxAmountOut: &maxAmountOutInt,
+	})
+
+	s.Assert().NoError(err)
+
+	return msg.TrancheKey
 }
 
 func (s *MsgServerTestSuite) limitSellsGoodTil(account sdk.AccAddress, tokenIn string, tick, amountIn int, goodTil time.Time) string {

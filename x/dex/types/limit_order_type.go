@@ -20,6 +20,10 @@ func (l LimitOrderType) IsGoodTil() bool {
 	return l == LimitOrderType_GOOD_TIL_TIME
 }
 
+func (l LimitOrderType) IsTakerOnly() bool {
+	return l.IsIoC() || l.IsFoK()
+}
+
 func (l LimitOrderType) HasExpiration() bool {
 	return l.IsGoodTil() || l.IsJIT()
 }

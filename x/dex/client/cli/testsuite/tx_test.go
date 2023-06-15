@@ -68,7 +68,7 @@ func (s *TxTestSuite) SetupSuite() {
 
 	val := s.network.Validators[0]
 	clientCtx := val.ClientCtx
-	args := append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10", "10", "[0]", "1", "false"}, commonFlags...)
+	args := append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10_000", "10_000", "[0]", "1", "false"}, commonFlags...)
 	cmd := dexClient.CmdDeposit()
 	_, err = cli.ExecTestCLICmd(clientCtx, cmd, args)
 	require.NoError(s.T(), err)
@@ -293,6 +293,11 @@ func (s *TxTestSuite) TestTx4Cmd4PlaceLimitOrder() {
 		{
 			name:     "valid goodTil",
 			args:     []string{s.addr1.String(), "TokenB", "TokenA", "[0]", "10", "GOOD_TIL_TIME", "06/15/2025 02:00:00"},
+			errInRes: false,
+		},
+		{
+			name:     "valid with maxAmountOut",
+			args:     []string{s.addr1.String(), "TokenB", "TokenA", "[2]", "10", "FILL_OR_KILL", "--max-amount-out=10"},
 			errInRes: false,
 		},
 	}

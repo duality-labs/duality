@@ -493,6 +493,36 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrderFoK1TotalAmountInNotUsed() {
 	s.assertAliceBalances(1352, 6)
 }
 
+func (s *MsgServerTestSuite) TestPlaceLimitOrderFoKMaxOutUsed() {
+	s.fundAliceBalances(0, 50)
+	s.fundBobBalances(50, 0)
+	// GIVEN LP 50 TokenA at tick 600
+	s.bobDeposits(
+		NewDeposit(50, 0, 600, 1),
+	)
+	// WHEN alice submits FoK limitOrder of 50 TokenB with maxOut of 20
+	s.aliceLimitSellsWithMaxOut("TokenB", 0, 50, 20)
+
+	// THEN alice swap 19 TokenB and gets back 20 TokenA
+	s.assertAliceBalances(20, 31)
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderFoKMaxOutUsedMultiTick() {
+	s.fundAliceBalances(0, 50)
+	s.fundBobBalances(50, 0)
+	// GIVEN LP 30 TokenA at tick 600-602
+	s.bobDeposits(
+		NewDeposit(10, 0, 600, 1),
+		NewDeposit(10, 0, 601, 1),
+		NewDeposit(10, 0, 602, 1),
+	)
+	// WHEN alice submits FoK limitOrder of 50 TokenB with maxOut of 20
+	s.aliceLimitSellsWithMaxOut("TokenB", 0, 50, 20)
+
+	// THEN alice swap 20 TokenB and gets back 20 TokenA
+	s.assertAliceBalances(20, 30)
+}
+
 // Immediate Or Cancel LimitOrders ////////////////////////////////////////////////////////////////////
 
 func (s *MsgServerTestSuite) TestPlaceLimitOrderIoCNoLiq() {

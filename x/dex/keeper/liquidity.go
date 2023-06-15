@@ -7,7 +7,7 @@ import (
 )
 
 type Liquidity interface {
-	Swap(maxAmountIn sdk.Int, maxAmountOut sdk.Int) (inAmount, outAmount sdk.Int)
+	Swap(maxAmountIn sdk.Int, maxAmountOut *sdk.Int) (inAmount, outAmount sdk.Int)
 	Price() *types.Price
 }
 
@@ -138,14 +138,13 @@ func (k Keeper) Swap(ctx sdk.Context,
 	tokenIn string,
 	tokenOut string,
 	maxAmountIn sdk.Int,
-	maxAmountOut sdk.Int,
+	maxAmountOut *sdk.Int,
 	limitPrice *sdk.Dec,
 ) (totalInCoin, totalOutCoin sdk.Coin, orderFilled bool, err error) {
-	useMaxOut := !maxAmountOut.IsZero()
+	useMaxOut := maxAmountOut != nil
 	pair := types.NewDirectionalTradingPair(pairID, tokenIn, tokenOut)
 
 	remainingIn := maxAmountIn
-	remainingOut := maxAmountOut
 	totalOut := sdk.ZeroInt()
 	// track if we have completely filled the order
 	orderFilled = false
@@ -164,7 +163,7 @@ func (k Keeper) Swap(ctx sdk.Context,
 			break
 		}
 
-		inAmount, outAmount := liq.Swap(remainingIn, remainingOut)
+		inAmount, outAmount := liq.Swap(remainingIn, maxAmountOut)
 		k.SaveLiquidity(ctx, liq)
 
 		remainingIn = remainingIn.Sub(inAmount)
@@ -179,12 +178,14 @@ func (k Keeper) Swap(ctx sdk.Context,
 		}
 
 		if useMaxOut {
-			remainingOut = remainingOut.Sub(outAmount)
-		}
-		// if remainingOut has been used up then exit
-		if useMaxOut && remainingOut.LTE(sdk.ZeroInt()) {
-			orderFilled = true
-			break
+			newMaxOut := maxAmountOut.Sub(outAmount)
+			maxAmountOut = &newMaxOut
+
+			// if maxAmountOut has been used up then exit
+			if maxAmountOut.LTE(sdk.ZeroInt()) {
+				orderFilled = true
+				break
+			}
 		}
 	}
 	totalIn := maxAmountIn.Sub(remainingIn)
@@ -197,7 +198,7 @@ func (k Keeper) SwapExactAmountIn(ctx sdk.Context,
 	tokenIn string,
 	tokenOut string,
 	amountIn sdk.Int,
-	maxAmountOut sdk.Int,
+	maxAmountOut *sdk.Int,
 	limitPrice *sdk.Dec,
 ) (totalIn, totalOut sdk.Coin, err error) {
 	swapAmountIn, swapAmountOut, orderFilled, err := k.Swap(ctx, pairID, tokenIn, tokenOut, amountIn, maxAmountOut, limitPrice)
@@ -217,7 +218,7 @@ func (k Keeper) SwapWithCache(
 	tokenIn string,
 	tokenOut string,
 	maxAmountIn sdk.Int,
-	maxAmountOut sdk.Int,
+	maxAmountOut *sdk.Int,
 	limitPrice *sdk.Dec,
 ) (totalIn, totalOut sdk.Coin, orderFilled bool, err error) {
 	cacheCtx, writeCache := ctx.CacheContext()

@@ -104,7 +104,12 @@ message MsgPlaceLimitOrder {
                                              (gogoproto.stdtime) = true,
                                              (gogoproto.nullable) = true
                                              ];
-  // maxOut
+  string maxAmountOut = 10 [
+                       (gogoproto.moretags)   = "yaml:\"maxAmountOut\"",
+                       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                       (gogoproto.nullable)   = true,
+                       (gogoproto.jsontag) = "maxAmountOut"
+                       ];
 }
 
 message MsgPlaceLimitOrderResponse {

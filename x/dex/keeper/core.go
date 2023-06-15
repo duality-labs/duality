@@ -286,6 +286,7 @@ func (k Keeper) PlaceLimitOrderCore(
 	tickIndex int64,
 	orderType types.LimitOrderType,
 	goodTil *time.Time,
+	maxAmountOut *sdk.Int,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
 ) (trancheKeyP *string, coinIn sdk.Coin, coinOutSwap sdk.Coin, err error) {
@@ -325,7 +326,7 @@ func (k Keeper) PlaceLimitOrderCore(
 			tokenIn,
 			tokenOut,
 			amountIn,
-			sdk.ZeroInt(),
+			maxAmountOut,
 			&limitPrice,
 		)
 		if err != nil {
