@@ -99,9 +99,6 @@ import (
 	dexmoduletypes "github.com/duality-labs/duality/x/dex/types"
 
 	"github.com/cosmos/interchain-security/testutil/e2e"
-	mevmodule "github.com/duality-labs/duality/x/mev"
-	mevmodulekeeper "github.com/duality-labs/duality/x/mev/keeper"
-	mevmoduletypes "github.com/duality-labs/duality/x/mev/types"
 
 	epochsmodule "github.com/duality-labs/duality/x/epochs"
 	epochsmodulekeeper "github.com/duality-labs/duality/x/epochs/keeper"
@@ -162,7 +159,6 @@ var (
 		dexmodule.AppModuleBasic{},
 		forwardmiddleware.AppModuleBasic{},
 		swapmiddleware.AppModuleBasic{},
-		mevmodule.AppModuleBasic{},
 		epochsmodule.AppModuleBasic{},
 		incentivesmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
@@ -175,7 +171,6 @@ var (
 		dexmoduletypes.ModuleName:                     {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		ccvconsumertypes.ConsumerRedistributeName:     nil,
 		ccvconsumertypes.ConsumerToSendToProviderName: nil,
-		mevmoduletypes.ModuleName:                     {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		incentivesmoduletypes.ModuleName:              nil,
 
 		// this line is used by starport scaffolding # stargate/app/maccPerms
@@ -238,8 +233,6 @@ type App struct {
 	DexKeeper     dexmodulekeeper.Keeper
 	SwapKeeper    swapkeeper.Keeper
 	ForwardKeeper *forwardkeeper.Keeper
-
-	MevKeeper mevmodulekeeper.Keeper
 
 	EpochsKeeper epochsmodulekeeper.Keeper
 
@@ -305,7 +298,7 @@ func NewApp(
 		slashingtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		dexmoduletypes.StoreKey, ccvconsumertypes.StoreKey, adminmodulemoduletypes.StoreKey,
-		mevmoduletypes.StoreKey, forwardtypes.StoreKey,
+		forwardtypes.StoreKey,
 		epochsmoduletypes.StoreKey, incentivesmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
@@ -449,15 +442,6 @@ func NewApp(
 	)
 	dexModule := dexmodule.NewAppModule(appCodec, app.DexKeeper, app.AccountKeeper, app.BankKeeper)
 
-	app.MevKeeper = *mevmodulekeeper.NewKeeper(
-		appCodec,
-		keys[mevmoduletypes.StoreKey],
-		keys[mevmoduletypes.MemStoreKey],
-		app.GetSubspace(mevmoduletypes.ModuleName),
-		app.BankKeeper,
-	)
-	mevModule := mevmodule.NewAppModule(appCodec, app.MevKeeper, app.AccountKeeper, app.BankKeeper)
-
 	// Create swap middleware keeper
 	app.SwapKeeper = swapkeeper.NewKeeper(
 		appCodec,
@@ -566,7 +550,6 @@ func NewApp(
 		consumerModule,
 		adminModule,
 		dexModule,
-		mevModule,
 		forwardModule,
 		swapModule,
 		epochsModule,
@@ -596,7 +579,6 @@ func NewApp(
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
-		mevmoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
 		incentivesmoduletypes.ModuleName,
@@ -621,7 +603,6 @@ func NewApp(
 		adminmodulemoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
-		mevmoduletypes.ModuleName,
 		epochsmoduletypes.ModuleName,
 		incentivesmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
@@ -653,7 +634,6 @@ func NewApp(
 		ccvconsumertypes.ModuleName,
 		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
-		mevmoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
 		epochsmoduletypes.ModuleName,
@@ -681,7 +661,6 @@ func NewApp(
 		forwardModule,
 		swapModule,
 		// incentivesModule,
-		mevModule,
 		// TODO: Enable lockupModule simulation testing
 
 		// this line is used by starport scaffolding # stargate/app/appModule
@@ -880,7 +859,6 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(ccvconsumertypes.ModuleName)
 	paramsKeeper.Subspace(dexmoduletypes.ModuleName)
 	paramsKeeper.Subspace(forwardtypes.ModuleName).WithKeyTable(forwardtypes.ParamKeyTable())
-	paramsKeeper.Subspace(mevmoduletypes.ModuleName)
 	paramsKeeper.Subspace(epochsmoduletypes.ModuleName)
 	paramsKeeper.Subspace(incentivesmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
