@@ -1,5 +1,9 @@
-version: "3.8"
+# This docker compose file serves as a basic template for a full network with a genesis-node, follower-node and an indexer
+# It can be started locally by running `TAG=[GHCR_TAG] docker compose up`
+# Where [GHCR_TAG] is the tag for an image in the duality GHCR repository  
+version: "3"
 services:
+
   genesis-node-launcher:
     # NOTE: This is a static build of duality-config-launcher that is not updated with each release
     # The config launcher only handles core config and does not have to be up to date with the latest binary
@@ -10,20 +14,24 @@ services:
     environment:
       - MODE=new
       - NODE_MONIKER=genesis-node
+    profiles:
+      - genesis-node
+      - local-devnet
 
   genesis-node:
-    image: ghcr.io/duality-labs/duality:heighliner-${TAG}
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 8192M
+    image: ghcr.io/duality-labs/duality:${TAG}
     command: sh -c "dualityd add-consumer-section && dualityd start --log_level ${LOG_LEVEL:-info}"
     volumes:
       - genesis-node-storage:/home/heighliner/.duality
     depends_on:
-     genesis-node-launcher:
-       condition: service_completed_successfully
+     - genesis-node-launcher
+    healthcheck:
+      test: ["CMD", "dualityd", "status"]
+      interval: 10s
+    profiles:
+      - genesis-node
+      - local-devnet
+
 
   follower-node-launcher:
     image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/duality-config-launcher:latest
@@ -31,35 +39,50 @@ services:
       - follower-node-storage:/home/heighliner/.duality
     environment:
       - MODE=fullnode
-      - RPC_ADDRESS=http://genesis-node:26657
+      - RPC_ADDRESS=http://localhost:26657
       - NODE_MONIKER=follower-node
     depends_on:
-      genesis-node:
-        condition: service_started
+      - genesis-node
+    profiles:
+      - follower-node
+      - local-devnet
 
   follower-node:
-    image: ghcr.io/duality-labs/duality:heighliner-${TAG}
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 8192M
-    # Only expose ports on follower node. This allows us to check network connectivity between nodes
-    ports:
-      #RPC
-      - target: 26657
-        x-aws-protocol: http
-      #API
-      - target: 1317
-        x-aws-protocol: http
-    healthcheck:
-       test: ["CMD", "curl", "http://localhost:26657/health"]
-    command: sh -c "dualityd start --log_level ${LOG_LEVEL:-info}"
-    volumes:
-      - follower-node-storage:/home/heighliner/.duality
-    depends_on:
-      follower-node-launcher:
-        condition: service_completed_successfully
+     image: ghcr.io/duality-labs/duality:${TAG}
+     # Only expose ports on follower node. This allows us to check network connectivity between nodes
+     ports:
+       #RPC
+       - "26657:26657"
+       #API
+       - "1317:1317"
+     healthcheck:
+        test: ["CMD", "dualityd", "status"]
+        interval: 10s
+     command: sh -c "dualityd start --log_level ${LOG_LEVEL:-info}"
+     volumes:
+       - follower-node-storage:/home/heighliner/.duality
+     depends_on:
+       - follower-node-launcher
+     profiles:
+      - follower-node
+      - local-devnet
+
+  # indexer:
+  #   image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/hapi-indexer:${INDEXER_TAG:-latest}
+  #   ports:
+  #     - "8000"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - REST_API=http://follower-node:1317
+  #     - RPC_API=http://follower-node:26657
+  #     - WEBSOCKET_URL=ws://follower-node:26657/websocket
+  #     - CORS_ORIGIN=*
+  #   depends_on:
+  #    - follower-node
+  #   # profiles:
+  #   #   - indexer
+  #   #   - local-devnet
+
 volumes:
   genesis-node-storage:
   follower-node-storage:

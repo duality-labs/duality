@@ -52,9 +52,9 @@ fi
 # for mainnets a custom genesis file should be curated outside of these scripts
 if [ $STARTUP_MODE == "new" ]
 then
-    ./scripts/genesis-startup.sh
+    ./scripts/genesis-startup.sh || exit 1
 elif [ $STARTUP_MODE == "fullnode" ]; then
-   ./scripts/follower-startup.sh
+   ./scripts/follower-startup.sh || exit 1
 else
     echo "Invalid startup mode: $STARTUP_MODE"
 fi

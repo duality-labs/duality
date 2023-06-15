@@ -11,7 +11,7 @@ services:
     logging:
         driver: awslogs
         options:
-          awslogs-group: duality-devnet
+          awslogs-group: /ecs/duality-devnet
           awslogs-region: us-west-2
           awslogs-stream-prefix: genesis-node-launcher
 
@@ -19,7 +19,7 @@ services:
       logging:
         driver: awslogs
         options:
-          awslogs-group: duality-devnet
+          awslogs-group: /ecs/duality-devnet
           awslogs-region: us-west-2
           awslogs-stream-prefix: genesis-node
 
@@ -27,7 +27,7 @@ services:
       logging:
         driver: awslogs
         options:
-          awslogs-group: duality-devnet
+          awslogs-group: ecs/duality-devnet
           awslogs-region: us-west-2
           awslogs-stream-prefix: follower-node-launcher
 
@@ -35,7 +35,7 @@ services:
       logging:
         driver: awslogs
         options:
-          awslogs-group: duality-devnet
+          awslogs-group: ecs/duality-devnet
           awslogs-region: us-west-2
           awslogs-stream-prefix: follower-node
 
