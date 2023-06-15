@@ -180,11 +180,12 @@ func (k Keeper) Swap(ctx sdk.Context,
 		if useMaxOut {
 			newMaxOut := maxAmountOut.Sub(outAmount)
 			maxAmountOut = &newMaxOut
-		}
-		// if maxAmountOut has been used up then exit
-		if useMaxOut && maxAmountOut.LTE(sdk.ZeroInt()) {
-			orderFilled = true
-			break
+
+			// if maxAmountOut has been used up then exit
+			if maxAmountOut.LTE(sdk.ZeroInt()) {
+				orderFilled = true
+				break
+			}
 		}
 	}
 	totalIn := maxAmountIn.Sub(remainingIn)
