@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/duality-labs/duality/app"
+	"github.com/duality-labs/duality/tests/e2e"
 	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/suite"
 
@@ -15,10 +15,6 @@ import (
 	ibctesting "github.com/cosmos/interchain-security/legacy_ibc_testing/testing"
 )
 
-func init() {
-	ibctesting.DefaultTestingAppInit = app.SetupTestingApp
-}
-
 type TransferTestSuite struct {
 	suite.Suite
 
@@ -27,12 +23,16 @@ type TransferTestSuite struct {
 	// testing chains used for convenience and readability
 	chainA *ibctesting.TestChain
 	chainB *ibctesting.TestChain
+	path   *ibctesting.Path
 }
 
 func (suite *TransferTestSuite) SetupTest() {
+	ibctesting.DefaultTestingAppInit = e2e.DualityAppIniter
 	suite.coordinator = ibctesting.NewCoordinator(suite.T(), 2)
 	suite.chainA = suite.coordinator.GetChain(ibctesting.GetChainID(1))
 	suite.chainB = suite.coordinator.GetChain(ibctesting.GetChainID(2))
+	suite.path = NewTransferPath(suite.chainA, suite.chainB)
+	suite.coordinator.Setup(suite.path)
 }
 
 func NewTransferPath(chainA, chainB *ibctesting.TestChain) *ibctesting.Path {
@@ -48,10 +48,6 @@ func NewTransferPath(chainA, chainB *ibctesting.TestChain) *ibctesting.Path {
 // constructs a send from chainA to chainB on the established channel/connection
 // and sends the same coin back from chainB to chainA.
 func (suite *TransferTestSuite) TestHandleMsgTransfer() {
-	// setup between chainA and chainB
-	path := NewTransferPath(suite.chainA, suite.chainB)
-	suite.coordinator.Setup(path)
-
 	timeoutHeight := clienttypes.NewHeight(0, 110)
 
 	amount, ok := sdk.NewIntFromString("9223372036854775808") // 2^63 (one above int64)
@@ -60,8 +56,8 @@ func (suite *TransferTestSuite) TestHandleMsgTransfer() {
 
 	// send from chainA to chainB
 	msg := types.NewMsgTransfer(
-		path.EndpointA.ChannelConfig.PortID,
-		path.EndpointA.ChannelID,
+		suite.path.EndpointA.ChannelConfig.PortID,
+		suite.path.EndpointA.ChannelID,
 		coinToSendToB,
 		suite.chainA.SenderAccount.GetAddress().String(),
 		suite.chainB.SenderAccount.GetAddress().String(),

@@ -6,6 +6,7 @@ import (
 	appprovider "github.com/cosmos/interchain-security/app/provider"
 	"github.com/cosmos/interchain-security/tests/e2e"
 	appduality "github.com/duality-labs/duality/app"
+	. "github.com/duality-labs/duality/tests/e2e"
 
 	icsappiniters "github.com/cosmos/interchain-security/testutil/ibc_testing"
 	"github.com/stretchr/testify/suite"
