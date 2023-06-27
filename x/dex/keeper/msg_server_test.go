@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	abci "github.com/cometbft/cometbft/abci/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -14,8 +16,6 @@ import (
 	. "github.com/duality-labs/duality/x/dex/keeper/internal/testutils"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/suite"
-	abci "github.com/tendermint/tendermint/abci/types"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
 // / Test suite

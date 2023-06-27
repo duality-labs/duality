@@ -2,17 +2,22 @@ package cli_test
 
 import (
 	"fmt"
+	"io"
 	"regexp"
 	"testing"
 
+	"cosmossdk.io/api/tendermint/abci"
+	rpcclientmock "github.com/cometbft/cometbft/rpc/client/mock"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/testutil/cli"
+	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/client/testutil"
-	network "github.com/duality-labs/duality/testutil/network"
+	testutilmod "github.com/cosmos/cosmos-sdk/types/module/testutil"
+	bankclient "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
+	"github.com/duality-labs/duality/x/dex"
 	dexClient "github.com/duality-labs/duality/x/dex/client/cli"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/require"
@@ -22,8 +27,11 @@ import (
 type TxTestSuite struct {
 	suite.Suite
 
-	cfg     network.Config
-	network *network.Network
+	kr        keyring.Keyring
+	encCfg    testutilmod.TestEncodingConfig
+	baseCtx   client.Context
+	clientCtx client.Context
+	addrs     []sdk.AccAddress
 
 	addr1      sdk.AccAddress
 	addr2      sdk.AccAddress
@@ -40,49 +48,37 @@ func findTrancheKeyInTx(tx string) string {
 }
 
 func (s *TxTestSuite) SetupSuite() {
-	s.T().Log("setting up integration test suite")
-	nw := network.NewCLITest(s.T())
-	s.network = nw
+	s.encCfg = testutilmod.MakeTestEncodingConfig(dex.AppModuleBasic{})
+	s.kr = keyring.NewInMemory(s.encCfg.Codec)
+	s.baseCtx = client.Context{}.
+		WithKeyring(s.kr).
+		WithTxConfig(s.encCfg.TxConfig).
+		WithCodec(s.encCfg.Codec).
+		WithClient(clitestutil.MockCometRPC{Client: rpcclientmock.Client{}}).
+		WithAccountRetriever(client.MockAccountRetriever{}).
+		WithOutput(io.Discard).
+		WithChainID("test-chain")
 
-	_, err := s.network.WaitForHeight(1)
-	s.Require().NoError(err)
-
-	info1, _, err := s.network.Validators[0].ClientCtx.Keyring.NewMnemonic("acc1", keyring.English, sdk.FullFundraiserPath, keyring.DefaultBIP39Passphrase, hd.Secp256k1)
-	s.Require().NoError(err)
-
-	info2, _, err := s.network.Validators[0].ClientCtx.Keyring.NewMnemonic("acc2", keyring.English, sdk.FullFundraiserPath, keyring.DefaultBIP39Passphrase, hd.Secp256k1)
-	s.Require().NoError(err)
-
-	pk := info1.GetPubKey()
-	s.addr1 = sdk.AccAddress(pk.Address())
-	pk = info2.GetPubKey()
-	s.addr2 = sdk.AccAddress(pk.Address())
-
-	commonFlags := []string{
-		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
-		fmt.Sprintf("--%s=%s", flags.FlagGas, "200000000"),
-		fmt.Sprintf("--%s=%s", flags.FlagFrom, s.network.Validators[0].Address.String()),
+	ctxGen := func() client.Context {
+		bz, _ := s.encCfg.Codec.Marshal(&sdk.TxResponse{})
+		c := clitestutil.NewMockCometRPC(abci.ResponseQuery{
+			Value: bz,
+		})
+		return s.baseCtx.WithClient(c)
 	}
+	s.clientCtx = ctxGen()
 
-	val := s.network.Validators[0]
-	clientCtx := val.ClientCtx
-	args := append([]string{s.network.Validators[0].Address.String(), "TokenA", "TokenB", "10_000", "10_000", "[0]", "1", "false"}, commonFlags...)
-	cmd := dexClient.CmdDeposit()
-	_, err = cli.ExecTestCLICmd(clientCtx, cmd, args)
-	require.NoError(s.T(), err)
+	s.addrs = make([]sdk.AccAddress, 0)
+	for i := 0; i < 3; i++ {
+		k, _, err := s.clientCtx.Keyring.NewMnemonic("NewValidator", keyring.English, sdk.FullFundraiserPath, keyring.DefaultBIP39Passphrase, hd.Secp256k1)
+		s.Require().NoError(err)
 
-	args = append([]string{s.network.Validators[0].Address.String(), "TokenB", "TokenA", "[-20]", "10"}, commonFlags...)
-	cmd = dexClient.CmdPlaceLimitOrder()
-	txBuff, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
+		pub, err := k.GetPubKey()
+		s.Require().NoError(err)
 
-	require.NoError(s.T(), err)
-	s.trancheKey = findTrancheKeyInTx(txBuff.String())
-
-	s.fundAccount(clientCtx, s.network.Validators[0].Address, s.addr1, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(100)), sdk.NewCoin("TokenA", sdk.NewInt(100000))))
-
-	s.fundAccount(clientCtx, s.network.Validators[0].Address, s.addr2, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(100)), sdk.NewCoin("TokenA", sdk.NewInt(100000))))
+		newAddr := sdk.AccAddress(pub.Address())
+		s.addrs = append(s.addrs, newAddr)
+	}
 }
 
 func (s *TxTestSuite) fundAccount(clientCtx client.Context, from, to sdk.AccAddress, coins sdk.Coins) {
@@ -93,8 +89,11 @@ func (s *TxTestSuite) fundAccount(clientCtx client.Context, from, to sdk.AccAddr
 		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
 	}
+	cmd := bankclient.Cmd()
+	args := append(tc.args, commonFlags...)
+	out, err := cli.ExecTestCLICmd(clientCtx, cmd, args)
 
-	out, err := banktestutil.MsgSendExec(
+	out, err := clitestutil.MsgSendExec(
 		clientCtx,
 		from,
 		to,

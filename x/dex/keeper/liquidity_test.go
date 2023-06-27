@@ -4,12 +4,12 @@ import (
 	"math"
 	"testing"
 
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	dualityapp "github.com/duality-labs/duality/app"
 	keepertest "github.com/duality-labs/duality/testutil/keeper"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/suite"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
 type LiquidityTestSuite struct {

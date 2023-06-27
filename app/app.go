@@ -4,36 +4,32 @@ package app
 import (
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"path/filepath"
 
-	adminmodulemodule "github.com/cosmos/admin-module/x/adminmodule"
-	adminmodulecli "github.com/cosmos/admin-module/x/adminmodule/client/cli"
-	adminmodulemodulekeeper "github.com/cosmos/admin-module/x/adminmodule/keeper"
-	adminmodulemoduletypes "github.com/cosmos/admin-module/x/adminmodule/types"
-	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
+	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	paramsrest "github.com/cosmos/cosmos-sdk/x/params/client/rest"
 	proposaltypes "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
-	upgraderest "github.com/cosmos/cosmos-sdk/x/upgrade/client/rest"
 
+	dbm "github.com/cometbft/cometbft-db"
+	abci "github.com/cometbft/cometbft/abci/types"
+	tmjson "github.com/cometbft/cometbft/libs/json"
+	"github.com/cometbft/cometbft/libs/log"
+	tmos "github.com/cometbft/cometbft/libs/os"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
-	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
@@ -67,38 +63,30 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	"github.com/cosmos/ibc-go/v4/modules/apps/transfer"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v4/modules/apps/transfer/keeper"
-	ibctransfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/v4/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/v4/modules/core/02-client"
-	ibcclienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
-	ibcporttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
-	ibchost "github.com/cosmos/ibc-go/v4/modules/core/24-host"
-	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
-	ibctestingcore "github.com/cosmos/interchain-security/legacy_ibc_testing/core"
-	"github.com/ignite/cli/docs"
-	"github.com/ignite/cli/ignite/pkg/openapiconsole"
+	"github.com/cosmos/ibc-go/v7/modules/apps/transfer"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v7/modules/apps/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
+	ibc "github.com/cosmos/ibc-go/v7/modules/core"
+	ibcclient "github.com/cosmos/ibc-go/v7/modules/core/02-client"
+	ibcclienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
+	ibcporttypes "github.com/cosmos/ibc-go/v7/modules/core/05-port/types"
+	ibchost "github.com/cosmos/ibc-go/v7/modules/core/24-host"
+	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
+	ibctestingcore "github.com/cosmos/interchain-security/v3/legacy_ibc_testing/core"
 	"github.com/spf13/cast"
-	forwardmiddleware "github.com/strangelove-ventures/packet-forward-middleware/v4/router"
-	forwardkeeper "github.com/strangelove-ventures/packet-forward-middleware/v4/router/keeper"
-	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
-	"github.com/tendermint/spm/cosmoscmd"
-	abci "github.com/tendermint/tendermint/abci/types"
-	tmjson "github.com/tendermint/tendermint/libs/json"
-	"github.com/tendermint/tendermint/libs/log"
-	tmos "github.com/tendermint/tendermint/libs/os"
-	dbm "github.com/tendermint/tm-db"
+	forwardmiddleware "github.com/strangelove-ventures/packet-forward-middleware/v7/router"
+	forwardkeeper "github.com/strangelove-ventures/packet-forward-middleware/v7/router/keeper"
+	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v7/router/types"
 
-	ccvconsumer "github.com/cosmos/interchain-security/x/ccv/consumer"
-	ccvconsumerkeeper "github.com/cosmos/interchain-security/x/ccv/consumer/keeper"
-	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
+	ccvconsumer "github.com/cosmos/interchain-security/v3/x/ccv/consumer"
+	ccvconsumerkeeper "github.com/cosmos/interchain-security/v3/x/ccv/consumer/keeper"
+	ccvconsumertypes "github.com/cosmos/interchain-security/v3/x/ccv/consumer/types"
 
 	dexmodule "github.com/duality-labs/duality/x/dex"
 	dexmodulekeeper "github.com/duality-labs/duality/x/dex/keeper"
 	dexmoduletypes "github.com/duality-labs/duality/x/dex/types"
 
-	"github.com/cosmos/interchain-security/testutil/e2e"
+	testutil "github.com/cosmos/interchain-security/v3/testutil/integration"
 
 	epochsmodule "github.com/duality-labs/duality/x/epochs"
 	epochsmodulekeeper "github.com/duality-labs/duality/x/epochs/keeper"
@@ -142,20 +130,20 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		ccvconsumer.AppModuleBasic{},
-		adminmodulemodule.NewAppModuleBasic(
-			govclient.NewProposalHandler(
-				adminmodulecli.NewSubmitParamChangeProposalTxCmd,
-				paramsrest.ProposalRESTHandler,
-			),
-			govclient.NewProposalHandler(
-				adminmodulecli.NewCmdSubmitUpgradeProposal,
-				upgraderest.ProposalRESTHandler,
-			),
-			govclient.NewProposalHandler(
-				adminmodulecli.NewCmdSubmitCancelUpgradeProposal,
-				upgraderest.ProposalCancelRESTHandler,
-			),
-		),
+		// adminmodulemodule.NewAppModuleBasic(
+		// 	govclient.NewProposalHandler(
+		// 		adminmodulecli.NewSubmitParamChangeProposalTxCmd,
+		// 		paramsrest.ProposalRESTHandler,
+		// 	),
+		// 	govclient.NewProposalHandler(
+		// 		adminmodulecli.NewCmdSubmitUpgradeProposal,
+		// 		upgraderest.ProposalRESTHandler,
+		// 	),
+		// 	govclient.NewProposalHandler(
+		// 		adminmodulecli.NewCmdSubmitCancelUpgradeProposal,
+		// 		upgraderest.ProposalCancelRESTHandler,
+		// 	),
+		// ),
 		dexmodule.AppModuleBasic{},
 		forwardmiddleware.AppModuleBasic{},
 		swapmiddleware.AppModuleBasic{},
@@ -178,9 +166,10 @@ var (
 )
 
 var (
-	_ cosmoscmd.App           = (*App)(nil)
+	_ runtime.AppI            = (*App)(nil)
 	_ servertypes.Application = (*App)(nil)
-	_ simapp.App              = (*App)(nil)
+	_ ibctesting.TestingApp   = (*App)(nil)
+	_ testutil.ConsumerApp    = (*App)(nil)
 )
 
 func init() {
@@ -200,6 +189,7 @@ type App struct {
 
 	cdc               *codec.LegacyAmino
 	appCodec          codec.Codec
+	txConfig          client.TxConfig
 	interfaceRegistry types.InterfaceRegistry
 
 	invCheckPeriod uint
@@ -210,20 +200,19 @@ type App struct {
 	memKeys map[string]*sdk.MemoryStoreKey
 
 	// keepers
-	AccountKeeper     authkeeper.AccountKeeper
-	AuthzKeeper       authzkeeper.Keeper
-	BankKeeper        bankkeeper.Keeper
-	CapabilityKeeper  *capabilitykeeper.Keeper
-	SlashingKeeper    slashingkeeper.Keeper
-	CrisisKeeper      crisiskeeper.Keeper
-	UpgradeKeeper     upgradekeeper.Keeper
-	ParamsKeeper      paramskeeper.Keeper
-	IBCKeeper         *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	EvidenceKeeper    evidencekeeper.Keeper
-	TransferKeeper    ibctransferkeeper.Keeper
-	FeeGrantKeeper    feegrantkeeper.Keeper
-	ConsumerKeeper    ccvconsumerkeeper.Keeper
-	AdminmoduleKeeper adminmodulemodulekeeper.Keeper
+	AccountKeeper    authkeeper.AccountKeeper
+	AuthzKeeper      authzkeeper.Keeper
+	BankKeeper       bankkeeper.Keeper
+	CapabilityKeeper *capabilitykeeper.Keeper
+	SlashingKeeper   slashingkeeper.Keeper
+	CrisisKeeper     crisiskeeper.Keeper
+	UpgradeKeeper    upgradekeeper.Keeper
+	ParamsKeeper     paramskeeper.Keeper
+	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	EvidenceKeeper   evidencekeeper.Keeper
+	TransferKeeper   ibctransferkeeper.Keeper
+	FeeGrantKeeper   feegrantkeeper.Keeper
+	ConsumerKeeper   ccvconsumerkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -255,10 +244,9 @@ func New(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
-	encodingConfig cosmoscmd.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
-) cosmoscmd.App {
+) *App {
 	return NewApp(
 		logger,
 		db,
@@ -267,7 +255,6 @@ func New(
 		skipUpgradeHeights,
 		homePath,
 		invCheckPeriod,
-		encodingConfig,
 		appOpts,
 		baseAppOptions...)
 }
@@ -280,13 +267,15 @@ func NewApp(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
-	encodingConfig cosmoscmd.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
+	encodingConfig := MakeEncodingConfig()
+
 	appCodec := encodingConfig.Marshaler
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
+	txConfig := encodingConfig.TxConfig
 
 	bApp := baseapp.NewBaseApp(Name, logger, db, encodingConfig.TxConfig.TxDecoder(), baseAppOptions...)
 	bApp.SetCommitMultiStoreTracer(traceStore)
@@ -297,7 +286,7 @@ func NewApp(
 		authtypes.StoreKey, authz.ModuleName, banktypes.StoreKey,
 		slashingtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		dexmoduletypes.StoreKey, ccvconsumertypes.StoreKey, adminmodulemoduletypes.StoreKey,
+		dexmoduletypes.StoreKey, ccvconsumertypes.StoreKey,
 		forwardtypes.StoreKey,
 		epochsmoduletypes.StoreKey, incentivesmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
@@ -309,6 +298,7 @@ func NewApp(
 		BaseApp:           bApp,
 		cdc:               cdc,
 		appCodec:          appCodec,
+		txConfig:          txConfig,
 		interfaceRegistry: interfaceRegistry,
 		invCheckPeriod:    invCheckPeriod,
 		keys:              keys,
@@ -346,7 +336,7 @@ func NewApp(
 
 	// Remove the fee-pool from the group of blocked recipient addresses in bank
 	// this is required for the consumer chain to be able to send tokens to the provider chain
-	// RE: https://github.com/cosmos/interchain-security/blob/main/app/consumer/app.go#L272
+	// RE: https://github.com/cosmos/interchain-security/v3/blob/main/app/consumer/app.go#L272
 	bankBlockedAddrs := app.ModuleAccountAddrs()
 	delete(bankBlockedAddrs, authtypes.NewModuleAddress(
 		ccvconsumertypes.ConsumerToSendToProviderName).String())
@@ -422,15 +412,6 @@ func NewApp(
 		AddRoute(proposaltypes.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
-
-	app.AdminmoduleKeeper = *adminmodulemodulekeeper.NewKeeper(
-		appCodec,
-		keys[adminmodulemoduletypes.StoreKey],
-		keys[adminmodulemoduletypes.MemStoreKey],
-		adminRouter,
-		IsProposalWhitelisted,
-	)
-	adminModule := adminmodulemodule.NewAppModule(appCodec, app.AdminmoduleKeeper)
 
 	app.DexKeeper = *dexmodulekeeper.NewKeeper(
 		appCodec,
@@ -548,7 +529,6 @@ func NewApp(
 
 		transferModule,
 		consumerModule,
-		adminModule,
 		dexModule,
 		forwardModule,
 		swapModule,
@@ -577,7 +557,6 @@ func NewApp(
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		ccvconsumertypes.ModuleName,
-		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
@@ -600,7 +579,6 @@ func NewApp(
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
 		ccvconsumertypes.ModuleName,
-		adminmodulemoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
 		epochsmoduletypes.ModuleName,
@@ -632,7 +610,6 @@ func NewApp(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		ccvconsumertypes.ModuleName,
-		adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
@@ -804,21 +781,15 @@ func (app *App) GetSubspace(moduleName string) paramstypes.Subspace {
 // API server.
 func (app *App) RegisterAPIRoutes(apiSvr *api.Server, _ config.APIConfig) {
 	clientCtx := apiSvr.ClientCtx
-	rpc.RegisterRoutes(clientCtx, apiSvr.Router)
-	// Register legacy tx routes.
-	authrest.RegisterTxRoutes(clientCtx, apiSvr.Router)
 	// Register new tx routes from grpc-gateway.
 	authtx.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 	// Register new tendermint queries routes from grpc-gateway.
 	tmservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
+	// Register node gRPC service for grpc-gateway.
+	nodeservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
-	// Register legacy and grpc-gateway routes for all modules.
-	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
+	// Register grpc-gateway routes for all modules.
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
-
-	// register app's OpenAPI routes.
-	apiSvr.Router.Handle("/static/openapi.yml", http.FileServer(http.FS(docs.Docs)))
-	apiSvr.Router.HandleFunc("/", openapiconsole.Handler(Name, "/static/openapi.yml"))
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
@@ -828,7 +799,17 @@ func (app *App) RegisterTxService(clientCtx client.Context) {
 
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
 func (app *App) RegisterTendermintService(clientCtx client.Context) {
-	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
+	tmservice.RegisterTendermintService(
+		clientCtx,
+		app.BaseApp.GRPCQueryRouter(),
+		app.interfaceRegistry,
+		app.Query,
+	)
+}
+
+// RegisterNodeService implements the Application.RegisterNodeService method.
+func (app *App) RegisterNodeService(clientCtx client.Context) {
+	nodeservice.RegisterNodeService(clientCtx, app.GRPCQueryRouter())
 }
 
 // GetMaccPerms returns a copy of the module account permissions
@@ -871,11 +852,11 @@ func (app *App) SimulationManager() *module.SimulationManager {
 	return app.sm
 }
 
-// ConsumerApp interface implementations for e2e tests
+// ConsumerApp interface implementations for interchain-security tests
 
 // GetTxConfig implements the TestingApp interface.
 func (app *App) GetTxConfig() client.TxConfig {
-	return cosmoscmd.MakeEncodingConfig(ModuleBasics).TxConfig
+	return app.txConfig
 }
 
 // GetIBCKeeper implements the TestingApp interface.
@@ -904,23 +885,23 @@ func (app *App) GetConsumerKeeper() ccvconsumerkeeper.Keeper {
 	return app.ConsumerKeeper
 }
 
-// GetE2eBankKeeper implements the ConsumerApp interface.
-func (app *App) GetE2eBankKeeper() e2e.E2eBankKeeper {
+// GetTestBankKeeper implements the ConsumerApp interface.
+func (app *App) GetTestBankKeeper() testutil.TestBankKeeper {
 	return app.BankKeeper
 }
 
-// GetE2eAccountKeeper implements the ConsumerApp interface.
-func (app *App) GetE2eAccountKeeper() e2e.E2eAccountKeeper {
+// GetTestAccountKeeper implements the ConsumerApp interface.
+func (app *App) GetTestAccountKeeper() testutil.TestAccountKeeper {
 	return app.AccountKeeper
 }
 
-// GetE2eSlashingKeeper implements the ConsumerApp interface.
-func (app *App) GetE2eSlashingKeeper() e2e.E2eSlashingKeeper {
+// GetTestSlashingKeeper implements the ConsumerApp interface.
+func (app *App) GetTestSlashingKeeper() testutil.TestSlashingKeeper {
 	return app.SlashingKeeper
 }
 
-// GetE2eEvidenceKeeper implements the ConsumerApp interface.
-func (app *App) GetE2eEvidenceKeeper() e2e.E2eEvidenceKeeper {
+// GetTestEvidenceKeeper implements the ConsumerApp interface.
+func (app *App) GetTestEvidenceKeeper() testutil.TestEvidenceKeeper {
 	return app.EvidenceKeeper
 }
 

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"testing"
 
-	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/strangelove-ventures/interchaintest/v4"
 	"github.com/strangelove-ventures/interchaintest/v4/chain/cosmos"
@@ -14,10 +13,10 @@ import (
 	"github.com/strangelove-ventures/interchaintest/v4/relayer/rly"
 	"github.com/strangelove-ventures/interchaintest/v4/testreporter"
 
+	cmtjson "github.com/cometbft/cometbft/libs/json"
+	tmtypes "github.com/cometbft/cometbft/types"
 	"github.com/strangelove-ventures/interchaintest/v4/testutil"
 	"github.com/stretchr/testify/require"
-	cmtjson "github.com/tendermint/tendermint/libs/json"
-	tmtypes "github.com/tendermint/tendermint/types"
 	"go.uber.org/zap/zaptest"
 )
 

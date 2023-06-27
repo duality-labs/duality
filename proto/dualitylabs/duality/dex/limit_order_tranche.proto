@@ -5,7 +5,7 @@ option go_package = "github.com/duality-labs/duality/x/dex/types";
 import "google/protobuf/timestamp.proto";
 
 import "gogoproto/gogo.proto";
-import "duality/dex/pair_id.proto";
+import "dualitylabs/duality/dex/pair_id.proto";
 
 message LimitOrderTranche {
   PairID pairID = 1;

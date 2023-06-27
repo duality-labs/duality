@@ -8,13 +8,13 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
-	transfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
-	channeltypes "github.com/cosmos/ibc-go/v4/modules/core/04-channel/types"
-	porttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
-	ibcexported "github.com/cosmos/ibc-go/v4/modules/core/exported"
+	transfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
+	channeltypes "github.com/cosmos/ibc-go/v7/modules/core/04-channel/types"
+	porttypes "github.com/cosmos/ibc-go/v7/modules/core/05-port/types"
+	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 	"github.com/duality-labs/duality/x/ibcswap/keeper"
 	"github.com/duality-labs/duality/x/ibcswap/types"
-	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
+	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v7/router/types"
 )
 
 var _ porttypes.Middleware = &IBCMiddleware{}

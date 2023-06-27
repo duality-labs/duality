@@ -4,10 +4,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	ibcante "github.com/cosmos/ibc-go/v4/modules/core/ante"
-	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
-	consumerante "github.com/cosmos/interchain-security/app/consumer/ante"
-	ibcconsumerkeeper "github.com/cosmos/interchain-security/x/ccv/consumer/keeper"
+	ibcante "github.com/cosmos/ibc-go/v7/modules/core/ante"
+	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
+	consumerante "github.com/cosmos/interchain-security/v3/app/consumer/ante"
+	ibcconsumerkeeper "github.com/cosmos/interchain-security/v3/x/ccv/consumer/keeper"
 )
 
 // HandlerOptions extend the SDK's AnteHandler options by requiring the IBC
@@ -38,8 +38,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	anteDecorators := []sdk.AnteDecorator{
 		ante.NewSetUpContextDecorator(),
 		ante.NewRejectExtensionOptionsDecorator(),
-		// temporarily disabled so that chain can be tested locally without the provider chain running
-		// consumerante.NewMsgFilterDecorator(options.ConsumerKeeper),
+		consumerante.NewMsgFilterDecorator(options.ConsumerKeeper),
 		consumerante.NewDisabledModulesDecorator("/cosmos.evidence", "/cosmos.slashing"),
 		ante.NewMempoolFeeDecorator(),
 		ante.NewValidateBasicDecorator(),

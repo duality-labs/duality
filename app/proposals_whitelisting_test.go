@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"testing"
 
-	ibctesting "github.com/cosmos/interchain-security/legacy_ibc_testing/testing"
+	cmdb "github.com/cometbft/cometbft-db"
+	"github.com/cometbft/cometbft/libs/log"
+	ibctesting "github.com/cosmos/interchain-security/v3/legacy_ibc_testing/testing"
 	"github.com/duality-labs/duality/app"
 	"github.com/stretchr/testify/require"
-	"github.com/tendermint/tendermint/libs/log"
-	tmdb "github.com/tendermint/tm-db"
 )
 
 func TestConsumerWhitelistingKeys(t *testing.T) {
@@ -23,7 +23,7 @@ func TestConsumerWhitelistingKeys(t *testing.T) {
 }
 
 func SetupTestingAppConsumer() (ibctesting.TestingApp, map[string]json.RawMessage) {
-	db := tmdb.NewMemDB()
+	db := cmdb.NewMemDB()
 	encCdc := app.MakeTestEncodingConfig()
 	testApp := app.NewApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, app.DefaultNodeHome, 5, encCdc, app.EmptyAppOptions{})
 

@@ -1,10 +1,10 @@
 syntax = "proto3";
-package duality.epochs.v1beta1;
+package dualitylabs.duality.epochs;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "duality/epochs/genesis.proto";
+import "dualitylabs/duality/epochs/genesis.proto";
 
 option go_package = "github.com/duality-labs/duality/x/epochs/types";
 
@@ -12,12 +12,12 @@ option go_package = "github.com/duality-labs/duality/x/epochs/types";
 service Query {
   // EpochInfos provide running epochInfos
   rpc EpochInfos(QueryEpochsInfoRequest) returns (QueryEpochsInfoResponse) {
-    option (google.api.http).get = "/duality/epochs/v1beta1/epochs";
+    option (google.api.http).get = "/duality/epochs/epochs";
   }
   // CurrentEpoch provide current epoch of specified identifier
   rpc CurrentEpoch(QueryCurrentEpochRequest)
       returns (QueryCurrentEpochResponse) {
-    option (google.api.http).get = "/duality/epochs/v1beta1/current_epoch";
+    option (google.api.http).get = "/duality/epochs/current_epoch";
   }
 }
 

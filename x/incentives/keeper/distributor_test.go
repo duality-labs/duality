@@ -4,6 +4,7 @@ import (
 	"testing"
 	time "time"
 
+	tmtypes "github.com/cometbft/cometbft/proto/tendermint/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/app"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
@@ -11,7 +12,6 @@ import (
 	"github.com/duality-labs/duality/x/incentives/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	tmtypes "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
 var _ DistributorKeeper = MockKeeper{}

@@ -3,20 +3,20 @@ package keeper
 import (
 	"fmt"
 
+	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
-	transfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
-	channeltypes "github.com/cosmos/ibc-go/v4/modules/core/04-channel/types"
-	porttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
-	host "github.com/cosmos/ibc-go/v4/modules/core/24-host"
-	ibcexported "github.com/cosmos/ibc-go/v4/modules/core/exported"
+	"github.com/cosmos/gogoproto/proto"
+	transfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
+	channeltypes "github.com/cosmos/ibc-go/v7/modules/core/04-channel/types"
+	porttypes "github.com/cosmos/ibc-go/v7/modules/core/05-port/types"
+	host "github.com/cosmos/ibc-go/v7/modules/core/24-host"
+	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/ibcswap/types"
-	"github.com/gogo/protobuf/proto"
-	"github.com/tendermint/tendermint/libs/log"
 )
 
 // Keeper defines the swap middleware keeper.

@@ -4,10 +4,10 @@ import (
 	"testing"
 	"time"
 
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/stretchr/testify/require"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	simapp "github.com/duality-labs/duality/app"
+	"github.com/duality-labs/duality/app"
 	"github.com/duality-labs/duality/x/epochs/types"
 
 	"golang.org/x/exp/maps"
@@ -118,7 +118,7 @@ func initializeBlankEpochInfoFields(epoch types.EpochInfo, identifier string, du
 }
 
 func TestEpochStartingOneMonthAfterInitGenesis(t *testing.T) {
-	app := simapp.Setup(false)
+	app := app.Setup(false)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
 	// On init genesis, default epochs information is set

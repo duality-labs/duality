@@ -5,6 +5,11 @@ import (
 	"testing"
 	"time"
 
+	dbm "github.com/cometbft/cometbft-db"
+	abci "github.com/cometbft/cometbft/abci/types"
+	"github.com/cometbft/cometbft/libs/log"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	tmtypes "github.com/cometbft/cometbft/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -15,11 +20,6 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/require"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/libs/log"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	tmtypes "github.com/tendermint/tendermint/types"
-	dbm "github.com/tendermint/tm-db"
 )
 
 var DefaultConsensusParams = &abci.ConsensusParams{
