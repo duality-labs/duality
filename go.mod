@@ -185,8 +185,3 @@ require (
 	gotest.tools v2.2.0+incompatible
 	nhooyr.io/websocket v1.8.6 // indirect
 )
-
-replace (
-	github.com/cosmos/gogoproto => github.com/cosmos/gogoproto v1.4.10
-	github.com/stretchr/testify => github.com/stretchr/testify v1.7.1
-)
