@@ -10,8 +10,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/testutil/cli"
+	testutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/client/testutil"
 	network "github.com/duality-labs/duality/testutil/network"
 	dexClient "github.com/duality-labs/duality/x/dex/client/cli"
 	"github.com/duality-labs/duality/x/dex/types"
@@ -94,7 +94,7 @@ func (s *TxTestSuite) fundAccount(clientCtx client.Context, from, to sdk.AccAddr
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
 	}
 
-	out, err := banktestutil.MsgSendExec(
+	out, err := testutil.MsgSendExec(
 		clientCtx,
 		from,
 		to,
