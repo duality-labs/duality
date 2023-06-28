@@ -3,7 +3,7 @@ module github.com/duality-labs/duality
 go 1.18
 
 require (
-	github.com/cosmos/admin-module v0.0.0
+	// github.com/cosmos/admin-module v0.0.0
 	github.com/cosmos/cosmos-sdk v0.47.3
 	github.com/cosmos/ibc-go/v7 v7.1.0
 	github.com/cosmos/interchain-security/v3 v3.0.0-20230627090306-fcb1ff43a83b
@@ -159,7 +159,7 @@ require (
 
 replace (
 	// github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
-	github.com/cosmos/admin-module => github.com/Ethernal-Tech/admin-module v0.0.0-20221102105340-e693f4d379c3
+	// github.com/cosmos/admin-module => github.com/Ethernal-Tech/admin-module v0.0.0-20221102105340-e693f4d379c3
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/stretchr/testify => github.com/stretchr/testify v1.7.1
 	github.com/tendermint/tendermint => github.com/cometbft/cometbft v0.37.2

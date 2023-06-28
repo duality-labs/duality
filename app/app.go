@@ -8,13 +8,10 @@ import (
 	"os"
 	"path/filepath"
 
-	adminmodulemodule "github.com/cosmos/admin-module/x/adminmodule"
-	adminmodulecli "github.com/cosmos/admin-module/x/adminmodule/client/cli"
-	adminmodulemodulekeeper "github.com/cosmos/admin-module/x/adminmodule/keeper"
-	adminmodulemoduletypes "github.com/cosmos/admin-module/x/adminmodule/types"
-	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	proposaltypes "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
+	// adminmodulemodule "github.com/cosmos/admin-module/x/adminmodule"
+	// adminmodulecli "github.com/cosmos/admin-module/x/adminmodule/client/cli"
+	// adminmodulemodulekeeper "github.com/cosmos/admin-module/x/adminmodule/keeper"
+	// adminmodulemoduletypes "github.com/cosmos/admin-module/x/adminmodule/types"
 
 	"cosmossdk.io/simapp"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -68,8 +65,6 @@ import (
 	ibctransferkeeper "github.com/cosmos/ibc-go/v7/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v7/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/v7/modules/core/02-client"
-	ibcclienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
 	ibcporttypes "github.com/cosmos/ibc-go/v7/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v7/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
@@ -139,17 +134,17 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		ccvconsumer.AppModuleBasic{},
-		adminmodulemodule.NewAppModuleBasic(
-			govclient.NewProposalHandler(
-				adminmodulecli.NewSubmitParamChangeProposalTxCmd,
-			),
-			govclient.NewProposalHandler(
-				adminmodulecli.NewCmdSubmitUpgradeProposal,
-			),
-			govclient.NewProposalHandler(
-				adminmodulecli.NewCmdSubmitCancelUpgradeProposal,
-			),
-		),
+		// adminmodulemodule.NewAppModuleBasic(
+		// 	govclient.NewProposalHandler(
+		// 		adminmodulecli.NewSubmitParamChangeProposalTxCmd,
+		// 	),
+		// 	govclient.NewProposalHandler(
+		// 		adminmodulecli.NewCmdSubmitUpgradeProposal,
+		// 	),
+		// 	govclient.NewProposalHandler(
+		// 		adminmodulecli.NewCmdSubmitCancelUpgradeProposal,
+		// 	),
+		// ),
 		dexmodule.AppModuleBasic{},
 		forwardmiddleware.AppModuleBasic{},
 		swapmiddleware.AppModuleBasic{},
@@ -204,20 +199,20 @@ type App struct {
 	memKeys map[string]*sdk.MemoryStoreKey
 
 	// keepers
-	AccountKeeper     authkeeper.AccountKeeper
-	AuthzKeeper       authzkeeper.Keeper
-	BankKeeper        bankkeeper.Keeper
-	CapabilityKeeper  *capabilitykeeper.Keeper
-	SlashingKeeper    slashingkeeper.Keeper
-	CrisisKeeper      crisiskeeper.Keeper
-	UpgradeKeeper     upgradekeeper.Keeper
-	ParamsKeeper      paramskeeper.Keeper
-	IBCKeeper         *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	EvidenceKeeper    evidencekeeper.Keeper
-	TransferKeeper    ibctransferkeeper.Keeper
-	FeeGrantKeeper    feegrantkeeper.Keeper
-	ConsumerKeeper    ccvconsumerkeeper.Keeper
-	AdminmoduleKeeper adminmodulemodulekeeper.Keeper
+	AccountKeeper    authkeeper.AccountKeeper
+	AuthzKeeper      authzkeeper.Keeper
+	BankKeeper       bankkeeper.Keeper
+	CapabilityKeeper *capabilitykeeper.Keeper
+	SlashingKeeper   slashingkeeper.Keeper
+	CrisisKeeper     crisiskeeper.Keeper
+	UpgradeKeeper    upgradekeeper.Keeper
+	ParamsKeeper     paramskeeper.Keeper
+	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	EvidenceKeeper   evidencekeeper.Keeper
+	TransferKeeper   ibctransferkeeper.Keeper
+	FeeGrantKeeper   feegrantkeeper.Keeper
+	ConsumerKeeper   ccvconsumerkeeper.Keeper
+	// AdminmoduleKeeper adminmodulemodulekeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -291,7 +286,8 @@ func NewApp(
 		authtypes.StoreKey, authz.ModuleName, banktypes.StoreKey,
 		slashingtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		dexmoduletypes.StoreKey, ccvconsumertypes.StoreKey, adminmodulemoduletypes.StoreKey,
+		dexmoduletypes.StoreKey, ccvconsumertypes.StoreKey,
+		// adminmodulemoduletypes.StoreKey,
 		forwardtypes.StoreKey,
 		epochsmoduletypes.StoreKey, incentivesmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
@@ -411,20 +407,20 @@ func NewApp(
 	app.ConsumerKeeper = *app.ConsumerKeeper.SetHooks(app.SlashingKeeper.Hooks())
 	consumerModule := ccvconsumer.NewAppModule(app.ConsumerKeeper)
 
-	adminRouter := govtypes.NewRouter()
-	adminRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
-		AddRoute(proposaltypes.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
-		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
+	// adminRouter := govtypes.NewRouter()
+	// adminRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
+	// 	AddRoute(proposaltypes.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
+	// 	AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
+	// 	AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
 
-	app.AdminmoduleKeeper = *adminmodulemodulekeeper.NewKeeper(
-		appCodec,
-		keys[adminmodulemoduletypes.StoreKey],
-		keys[adminmodulemoduletypes.MemStoreKey],
-		adminRouter,
-		IsProposalWhitelisted,
-	)
-	adminModule := adminmodulemodule.NewAppModule(appCodec, app.AdminmoduleKeeper)
+	// app.AdminmoduleKeeper = *adminmodulemodulekeeper.NewKeeper(
+	// 	appCodec,
+	// 	keys[adminmodulemoduletypes.StoreKey],
+	// 	keys[adminmodulemoduletypes.MemStoreKey],
+	// 	adminRouter,
+	// 	IsProposalWhitelisted,
+	// )
+	// adminModule := adminmodulemodule.NewAppModule(appCodec, app.AdminmoduleKeeper)
 
 	app.DexKeeper = *dexmodulekeeper.NewKeeper(
 		appCodec,
