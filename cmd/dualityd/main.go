@@ -5,22 +5,15 @@ import (
 
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 	"github.com/duality-labs/duality/app"
+	"github.com/duality-labs/duality/cmd/dualityd/cmd"
 )
 
 func main() {
-	rootCmd, _ := svrcmd.NewRootCmd(
-		app.Name,
-		app.AccountAddressPrefix,
-		app.DefaultNodeHome,
-		app.Name,
-		app.ModuleBasics,
-		app.New,
-		// this line is used by starport scaffolding # root/arguments
-	)
+	rootCmd, _ := cmd.NewRootCmd()
 
 	rootCmd.AddCommand(AddConsumerSectionCmd(app.DefaultNodeHome))
 
-	if err := svrcmd.Execute(rootCmd, app.DefaultNodeHome); err != nil {
+	if err := svrcmd.Execute(rootCmd, "", app.DefaultNodeHome); err != nil {
 		os.Exit(1)
 	}
 }

@@ -42,7 +42,7 @@ func NewPrice(relativeTickIndex int64) (*Price, error) {
 }
 
 func (p Price) MulInt(other sdk.Int) sdk.Dec {
-	return p.Mul(other.ToDec())
+	return p.Mul(sdk.NewDecFromInt(other))
 }
 
 // We are careful not to use negative-valued exponents anywhere

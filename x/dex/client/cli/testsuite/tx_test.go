@@ -53,14 +53,16 @@ func (s *TxTestSuite) SetupSuite() {
 	info2, _, err := s.network.Validators[0].ClientCtx.Keyring.NewMnemonic("acc2", keyring.English, sdk.FullFundraiserPath, keyring.DefaultBIP39Passphrase, hd.Secp256k1)
 	s.Require().NoError(err)
 
-	pk := info1.GetPubKey()
+	pk, err := info1.GetPubKey()
+	s.Require().NoError(err)
 	s.addr1 = sdk.AccAddress(pk.Address())
-	pk = info2.GetPubKey()
+	pk, err = info2.GetPubKey()
+	s.Require().NoError(err)
 	s.addr2 = sdk.AccAddress(pk.Address())
 
 	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, "sync"),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
 		fmt.Sprintf("--%s=%s", flags.FlagGas, "200000000"),
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, s.network.Validators[0].Address.String()),
@@ -90,7 +92,7 @@ func (s *TxTestSuite) fundAccount(clientCtx client.Context, from, to sdk.AccAddr
 
 	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, "sync"),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
 	}
 
@@ -112,7 +114,7 @@ func (s *TxTestSuite) TestTxCmdDeposit() {
 	clientCtx := val.ClientCtx
 	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, "sync"),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
 		fmt.Sprintf("--%s=%s", flags.FlagGas, "200000000"),
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, s.network.Validators[0].Address.String()),
@@ -176,7 +178,7 @@ func (s *TxTestSuite) TestTx2CmdWithdraw() {
 	clientCtx := val.ClientCtx
 	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, "sync"),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
 		fmt.Sprintf("--%s=%s", flags.FlagGas, "200000000"),
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, s.network.Validators[0].Address.String()),
@@ -247,7 +249,7 @@ func (s *TxTestSuite) TestTx4Cmd4PlaceLimitOrder() {
 	clientCtx := val.ClientCtx
 	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, "sync"),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
 		fmt.Sprintf("--%s=%s", flags.FlagGas, "200000000"),
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, s.network.Validators[0].Address.String()),
@@ -329,7 +331,7 @@ func (s *TxTestSuite) TestTx5CmdCancelLimitOrder() {
 	clientCtx := val.ClientCtx
 	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, "sync"),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
 		fmt.Sprintf("--%s=%s", flags.FlagGas, "200000000"),
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, s.network.Validators[0].Address.String()),
@@ -390,7 +392,7 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 
 	commonFlags := []string{
 		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, "sync"),
 		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(10))).String()),
 		fmt.Sprintf("--%s=%s", flags.FlagGas, "200000000"),
 		fmt.Sprintf("--%s=%s", flags.FlagFrom, s.network.Validators[0].Address.String()),

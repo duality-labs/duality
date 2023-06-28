@@ -46,7 +46,7 @@ func (k Keeper) Unstake(ctx sdk.Context, stake *types.Stake, coins sdk.Coins) (u
 	}
 
 	if len(coins) != 0 && !coins.IsEqual(stake.Coins) {
-		stake.Coins = stake.Coins.Sub(coins)
+		stake.Coins = stake.Coins.Sub(coins...)
 		err := k.setStake(ctx, stake)
 		if err != nil {
 			return 0, err

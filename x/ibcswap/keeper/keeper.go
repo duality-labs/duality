@@ -3,12 +3,14 @@ package keeper
 import (
 	"fmt"
 
+	"github.com/cometbft/cometbft/libs/log"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	transfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
+	clienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
 	channeltypes "github.com/cosmos/ibc-go/v7/modules/core/04-channel/types"
 	porttypes "github.com/cosmos/ibc-go/v7/modules/core/05-port/types"
 	host "github.com/cosmos/ibc-go/v7/modules/core/24-host"
@@ -16,7 +18,6 @@ import (
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/ibcswap/types"
 	"github.com/gogo/protobuf/proto"
-	"github.com/cometbft/cometbft/libs/log"
 )
 
 // Keeper defines the swap middleware keeper.
@@ -46,7 +47,7 @@ func NewKeeper(
 
 // Logger returns a module-specific logger.
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
-	return ctx.Logger().With("module", "x/"+host.ModuleName+"-"+types.ModuleName)
+	return ctx.Logger().With("module", "x/"+host.SubModuleName+"-"+types.ModuleName)
 }
 
 // Swap calls into the base app's msg service router so that the appropriate handler is called when sending the swap msg.
@@ -70,8 +71,15 @@ func (k Keeper) Swap(ctx sdk.Context, msg *dextypes.MsgPlaceLimitOrder) (*dextyp
 }
 
 // SendPacket wraps IBC ChannelKeeper's SendPacket function.
-func (k Keeper) SendPacket(ctx sdk.Context, chanCap *capabilitytypes.Capability, packet ibcexported.PacketI) error {
-	return k.ics4Wrapper.SendPacket(ctx, chanCap, packet)
+func (k Keeper) SendPacket(ctx sdk.Context,
+	chanCap *capabilitytypes.Capability,
+	sourcePort string,
+	sourceChannel string,
+	timeoutHeight clienttypes.Height,
+	timeoutTimestamp uint64,
+	data []byte,
+) (uint64, error) {
+	return k.ics4Wrapper.SendPacket(ctx, chanCap, sourcePort, sourceChannel, timeoutHeight, timeoutTimestamp, data)
 }
 
 // WriteAcknowledgement wraps IBC ChannelKeeper's WriteAcknowledgement function.

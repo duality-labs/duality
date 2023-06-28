@@ -13,20 +13,20 @@ import (
 	// adminmodulemodulekeeper "github.com/cosmos/admin-module/x/adminmodule/keeper"
 	// adminmodulemoduletypes "github.com/cosmos/admin-module/x/adminmodule/types"
 
-	"cosmossdk.io/simapp"
 	abci "github.com/cometbft/cometbft/abci/types"
 	tmjson "github.com/cometbft/cometbft/libs/json"
 	"github.com/cometbft/cometbft/libs/log"
 	tmos "github.com/cometbft/cometbft/libs/os"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
+	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
-	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -47,6 +47,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/capability"
 	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
+	consensusparamkeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
+	consensusparamtypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	crisiskeeper "github.com/cosmos/cosmos-sdk/x/crisis/keeper"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
@@ -56,6 +58,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
 	feegrantmodule "github.com/cosmos/cosmos-sdk/x/feegrant/module"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -70,16 +73,18 @@ import (
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v7/modules/core"
 	ibcporttypes "github.com/cosmos/ibc-go/v7/modules/core/05-port/types"
-	ibchost "github.com/cosmos/ibc-go/v7/modules/core/24-host"
+	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
 	ibctestingcore "github.com/cosmos/interchain-security/legacy_ibc_testing/core"
+	ibctesting "github.com/cosmos/interchain-security/legacy_ibc_testing/testing"
+
+	dbm "github.com/cometbft/cometbft-db"
 	"github.com/ignite/cli/docs"
 	"github.com/ignite/cli/ignite/pkg/openapiconsole"
 	"github.com/spf13/cast"
 	forwardmiddleware "github.com/strangelove-ventures/packet-forward-middleware/v7/router"
 	forwardkeeper "github.com/strangelove-ventures/packet-forward-middleware/v7/router/keeper"
 	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v7/router/types"
-	dbm "github.com/tendermint/tm-db"
 
 	ccvconsumer "github.com/cosmos/interchain-security/x/ccv/consumer"
 	ccvconsumerkeeper "github.com/cosmos/interchain-security/x/ccv/consumer/keeper"
@@ -168,8 +173,10 @@ var (
 
 var (
 	_ servertypes.Application = (*App)(nil)
-	_ simapp.App              = (*App)(nil)
+	_ ibctesting.TestingApp   = (*App)(nil)
 )
+
+// TODO: we should eventually get this interface to work
 
 func init() {
 	userHomeDir, err := os.UserHomeDir()
@@ -193,24 +200,25 @@ type App struct {
 	invCheckPeriod uint
 
 	// keys to access the substores
-	keys    map[string]*sdk.KVStoreKey
-	tkeys   map[string]*sdk.TransientStoreKey
-	memKeys map[string]*sdk.MemoryStoreKey
+	keys    map[string]*storetypes.KVStoreKey
+	tkeys   map[string]*storetypes.TransientStoreKey
+	memKeys map[string]*storetypes.MemoryStoreKey
 
 	// keepers
-	AccountKeeper    authkeeper.AccountKeeper
-	AuthzKeeper      authzkeeper.Keeper
-	BankKeeper       bankkeeper.Keeper
-	CapabilityKeeper *capabilitykeeper.Keeper
-	SlashingKeeper   slashingkeeper.Keeper
-	CrisisKeeper     crisiskeeper.Keeper
-	UpgradeKeeper    upgradekeeper.Keeper
-	ParamsKeeper     paramskeeper.Keeper
-	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	EvidenceKeeper   evidencekeeper.Keeper
-	TransferKeeper   ibctransferkeeper.Keeper
-	FeeGrantKeeper   feegrantkeeper.Keeper
-	ConsumerKeeper   ccvconsumerkeeper.Keeper
+	AccountKeeper         authkeeper.AccountKeeper
+	AuthzKeeper           authzkeeper.Keeper
+	BankKeeper            bankkeeper.Keeper
+	CapabilityKeeper      *capabilitykeeper.Keeper
+	SlashingKeeper        slashingkeeper.Keeper
+	ConsensusParamsKeeper consensusparamkeeper.Keeper
+	CrisisKeeper          *crisiskeeper.Keeper
+	UpgradeKeeper         *upgradekeeper.Keeper
+	ParamsKeeper          paramskeeper.Keeper
+	IBCKeeper             *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	EvidenceKeeper        evidencekeeper.Keeper
+	TransferKeeper        ibctransferkeeper.Keeper
+	FeeGrantKeeper        feegrantkeeper.Keeper
+	ConsumerKeeper        ccvconsumerkeeper.Keeper
 	// AdminmoduleKeeper adminmodulemodulekeeper.Keeper
 
 	// make scoped keepers public for test purposes
@@ -283,7 +291,7 @@ func NewApp(
 
 	keys := sdk.NewKVStoreKeys(
 		authtypes.StoreKey, authz.ModuleName, banktypes.StoreKey,
-		slashingtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
+		slashingtypes.StoreKey, paramstypes.StoreKey, ibcexported.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		dexmoduletypes.StoreKey, ccvconsumertypes.StoreKey,
 		// adminmodulemoduletypes.StoreKey,
@@ -308,7 +316,12 @@ func NewApp(
 	app.ParamsKeeper = initParamsKeeper(appCodec, cdc, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
 
 	// set the BaseApp's parameter store
-	bApp.SetParamStore(app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramskeeper.ConsensusParamsKeyTable()))
+	app.ConsensusParamsKeeper = consensusparamkeeper.NewKeeper(
+		appCodec,
+		keys[consensusparamtypes.StoreKey],
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+	bApp.SetParamStore(&app.ConsensusParamsKeeper)
 
 	// add capability keeper and ScopeToModule for ibc module
 	app.CapabilityKeeper = capabilitykeeper.NewKeeper(
@@ -318,7 +331,7 @@ func NewApp(
 	)
 
 	// grant capabilities for the ibc and ibc-transfer modules
-	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
+	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibcexported.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedCCVConsumerKeeper := app.CapabilityKeeper.ScopeToModule(ccvconsumertypes.ModuleName)
 	app.CapabilityKeeper.Seal()
@@ -326,11 +339,16 @@ func NewApp(
 
 	// add keepers
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
-		appCodec, keys[authtypes.StoreKey], app.GetSubspace(authtypes.ModuleName), authtypes.ProtoBaseAccount, maccPerms,
+		appCodec,
+		keys[authtypes.StoreKey],
+		authtypes.ProtoBaseAccount,
+		maccPerms,
+		AccountAddressPrefix,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	app.AuthzKeeper = authzkeeper.NewKeeper(
-		keys[authz.ModuleName], appCodec, app.MsgServiceRouter(),
+		keys[authz.ModuleName], appCodec, app.MsgServiceRouter(), app.AccountKeeper,
 	)
 
 	// Remove the fee-pool from the group of blocked recipient addresses in bank
@@ -340,14 +358,16 @@ func NewApp(
 	delete(bankBlockedAddrs, authtypes.NewModuleAddress(
 		ccvconsumertypes.ConsumerToSendToProviderName).String())
 	app.BankKeeper = bankkeeper.NewBaseKeeper(
-		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.GetSubspace(banktypes.ModuleName), bankBlockedAddrs,
+		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, bankBlockedAddrs, authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	app.SlashingKeeper = slashingkeeper.NewKeeper(
-		appCodec, keys[slashingtypes.StoreKey], &app.ConsumerKeeper, app.GetSubspace(slashingtypes.ModuleName),
+		appCodec, encodingConfig.Amino, keys[slashingtypes.StoreKey], app.ConsumerKeeper, authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
+
 	app.CrisisKeeper = crisiskeeper.NewKeeper(
-		app.GetSubspace(crisistypes.ModuleName), invCheckPeriod, app.BankKeeper, authtypes.FeeCollectorName,
+		appCodec, keys[crisistypes.StoreKey],
+		invCheckPeriod, app.BankKeeper, authtypes.FeeCollectorName, authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(appCodec, keys[feegrant.StoreKey], app.AccountKeeper)
@@ -357,6 +377,7 @@ func NewApp(
 		appCodec,
 		homePath,
 		app.BaseApp,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
 	// ... other modules keepers
@@ -364,8 +385,8 @@ func NewApp(
 	// Create IBC Keeper
 	app.IBCKeeper = ibckeeper.NewKeeper(
 		appCodec,
-		keys[ibchost.StoreKey],
-		app.GetSubspace(ibchost.ModuleName),
+		keys[ibcexported.StoreKey],
+		app.GetSubspace(ibcexported.ModuleName),
 		&app.ConsumerKeeper,
 		app.UpgradeKeeper,
 		scopedIBCKeeper,
@@ -522,14 +543,14 @@ func NewApp(
 	// must be passed by reference here.
 
 	app.mm = module.NewManager(
-		auth.NewAppModule(appCodec, app.AccountKeeper, nil),
+		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts, app.GetSubspace(authtypes.ModuleName)),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		vesting.NewAppModule(app.AccountKeeper, app.BankKeeper),
-		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
-		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
+		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper, app.GetSubspace(banktypes.ModuleName)),
+		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
-		crisis.NewAppModule(&app.CrisisKeeper, skipGenesisInvariants),
-		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.ConsumerKeeper),
+		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)),
+		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.ConsumerKeeper, app.GetSubspace(slashingtypes.ModuleName)),
 		upgrade.NewAppModule(app.UpgradeKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
@@ -537,7 +558,7 @@ func NewApp(
 
 		transferModule,
 		consumerModule,
-		adminModule,
+		// adminModule,
 		dexModule,
 		forwardModule,
 		swapModule,
@@ -557,7 +578,7 @@ func NewApp(
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
 		vestingtypes.ModuleName,
-		ibchost.ModuleName,
+		ibcexported.ModuleName,
 		ibctransfertypes.ModuleName,
 		authtypes.ModuleName,
 		authz.ModuleName,
@@ -566,7 +587,7 @@ func NewApp(
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		ccvconsumertypes.ModuleName,
-		adminmodulemoduletypes.ModuleName,
+		// adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
@@ -586,10 +607,10 @@ func NewApp(
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
-		ibchost.ModuleName,
+		ibcexported.ModuleName,
 		ibctransfertypes.ModuleName,
 		ccvconsumertypes.ModuleName,
-		adminmodulemoduletypes.ModuleName,
+		// adminmodulemoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
 		epochsmoduletypes.ModuleName,
@@ -612,7 +633,7 @@ func NewApp(
 		banktypes.ModuleName,
 		slashingtypes.ModuleName,
 		crisistypes.ModuleName,
-		ibchost.ModuleName,
+		ibcexported.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		feegrant.ModuleName,
@@ -621,7 +642,7 @@ func NewApp(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		ccvconsumertypes.ModuleName,
-		adminmodulemoduletypes.ModuleName,
+		// adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
@@ -630,18 +651,17 @@ func NewApp(
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
-	app.mm.RegisterInvariants(&app.CrisisKeeper)
-	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
+	app.mm.RegisterInvariants(app.CrisisKeeper)
 	app.mm.RegisterServices(module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter()))
 
 	// create the simulation manager and define the order of the modules for deterministic simulations
 	app.sm = module.NewSimulationManager(
-		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts),
+		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts, app.GetSubspace(authtypes.ModuleName)),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
-		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
+		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper, app.GetSubspace(banktypes.ModuleName)),
+		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
-		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.ConsumerKeeper),
+		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.ConsumerKeeper, app.GetSubspace(slashingtypes.ModuleName)),
 		params.NewAppModule(app.ParamsKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
@@ -661,17 +681,13 @@ func NewApp(
 	app.MountTransientStores(tkeys)
 	app.MountMemoryStores(memKeys)
 
-	anteHandler, err := NewAnteHandler(
-		HandlerOptions{
-			HandlerOptions: ante.HandlerOptions{
-				AccountKeeper:   app.AccountKeeper,
-				BankKeeper:      app.BankKeeper,
-				FeegrantKeeper:  app.FeeGrantKeeper,
-				SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
-			},
-			IBCKeeper:      app.IBCKeeper,
-			ConsumerKeeper: app.ConsumerKeeper,
+	anteHandler, err := ante.NewAnteHandler(
+		ante.HandlerOptions{
+			AccountKeeper:   app.AccountKeeper,
+			BankKeeper:      app.BankKeeper,
+			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
+			FeegrantKeeper:  app.FeeGrantKeeper,
+			SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 		},
 	)
 	if err != nil {
@@ -763,21 +779,21 @@ func (app *App) InterfaceRegistry() types.InterfaceRegistry {
 // GetKey returns the KVStoreKey for the provided store key.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *App) GetKey(storeKey string) *sdk.KVStoreKey {
+func (app *App) GetKey(storeKey string) *storetypes.KVStoreKey {
 	return app.keys[storeKey]
 }
 
 // GetTKey returns the TransientStoreKey for the provided store key.
 //
 // NOTE: This is solely to be used for testing purposes.
-func (app *App) GetTKey(storeKey string) *sdk.TransientStoreKey {
+func (app *App) GetTKey(storeKey string) *storetypes.TransientStoreKey {
 	return app.tkeys[storeKey]
 }
 
 // GetMemKey returns the MemStoreKey for the provided mem key.
 //
 // NOTE: This is solely used for testing purposes.
-func (app *App) GetMemKey(storeKey string) *sdk.MemoryStoreKey {
+func (app *App) GetMemKey(storeKey string) *storetypes.MemoryStoreKey {
 	return app.memKeys[storeKey]
 }
 
@@ -793,14 +809,13 @@ func (app *App) GetSubspace(moduleName string) paramstypes.Subspace {
 // API server.
 func (app *App) RegisterAPIRoutes(apiSvr *api.Server, _ config.APIConfig) {
 	clientCtx := apiSvr.ClientCtx
-	rpc.RegisterRoutes(clientCtx, apiSvr.Router)
 	// Register new tx routes from grpc-gateway.
 	authtx.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 	// Register new tendermint queries routes from grpc-gateway.
 	tmservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
-
-	// Register legacy and grpc-gateway routes for all modules.
-	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
+	// Register node gRPC service for grpc-gateway.
+	nodeservice.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
+	// Register grpc-gateway routes for all modules.
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
 	// register app's OpenAPI routes.
@@ -815,7 +830,12 @@ func (app *App) RegisterTxService(clientCtx client.Context) {
 
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
 func (app *App) RegisterTendermintService(clientCtx client.Context) {
-	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
+	tmservice.RegisterTendermintService(clientCtx, app.BaseApp.GRPCQueryRouter(), app.interfaceRegistry, app.Query)
+}
+
+// RegisterNodeService registers the node gRPC Query service.
+func (app *App) RegisterNodeService(clientCtx client.Context) {
+	nodeservice.RegisterNodeService(clientCtx, app.GRPCQueryRouter())
 }
 
 // GetMaccPerms returns a copy of the module account permissions
@@ -833,7 +853,7 @@ func initParamsKeeper(
 	appCodec codec.BinaryCodec,
 	legacyAmino *codec.LegacyAmino,
 	key,
-	tkey sdk.StoreKey,
+	tkey storetypes.StoreKey,
 ) paramskeeper.Keeper {
 	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
 
@@ -842,7 +862,7 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
-	paramsKeeper.Subspace(ibchost.ModuleName)
+	paramsKeeper.Subspace(ibcexported.ModuleName)
 	paramsKeeper.Subspace(ccvconsumertypes.ModuleName)
 	paramsKeeper.Subspace(dexmoduletypes.ModuleName)
 	paramsKeeper.Subspace(forwardtypes.ModuleName).WithKeyTable(forwardtypes.ParamKeyTable())
@@ -862,7 +882,7 @@ func (app *App) SimulationManager() *module.SimulationManager {
 
 // GetTxConfig implements the TestingApp interface.
 func (app *App) GetTxConfig() client.TxConfig {
-	return appparams.MakeTestEncodingConfig(ModuleBasics).TxConfig
+	return appparams.MakeTestEncodingConfig().TxConfig
 }
 
 // GetIBCKeeper implements the TestingApp interface.
@@ -892,22 +912,22 @@ func (app *App) GetConsumerKeeper() ccvconsumerkeeper.Keeper {
 }
 
 // GetE2eBankKeeper implements the ConsumerApp interface.
-func (app *App) GetE2eBankKeeper() icstestintegration.TestBankKeeper {
+func (app *App) GetTestBankKeeper() icstestintegration.TestBankKeeper {
 	return app.BankKeeper
 }
 
-// GetE2eAccountKeeper implements the ConsumerApp interface.
-func (app *App) GetE2eAccountKeeper() icstestintegration.TestAccountKeeper {
+// GetTestAccountKeeper implements the ConsumerApp interface.
+func (app *App) GetTestAccountKeeper() icstestintegration.TestAccountKeeper {
 	return app.AccountKeeper
 }
 
-// GetE2eSlashingKeeper implements the ConsumerApp interface.
-func (app *App) GetE2eSlashingKeeper() icstestintegration.TestSlashingKeeper {
+// GetTestSlashingKeeper implements the ConsumerApp interface.
+func (app *App) GetTestSlashingKeeper() icstestintegration.TestSlashingKeeper {
 	return app.SlashingKeeper
 }
 
-// GetE2eEvidenceKeeper implements the ConsumerApp interface.
-func (app *App) GetE2eEvidenceKeeper() icstestintegration.TestEvidenceKeeper {
+// GetTestEvidenceKeeper implements the ConsumerApp interface.
+func (app *App) GetTestEvidenceKeeper() icstestintegration.TestEvidenceKeeper {
 	return app.EvidenceKeeper
 }
 

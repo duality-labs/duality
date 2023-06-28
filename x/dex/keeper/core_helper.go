@@ -158,7 +158,7 @@ func (k Keeper) GetCurrTick0To1(ctx sdk.Context, pairID *types.PairID) (tickIdx 
 }
 
 func CalcAmountAsToken0(amount0, amount1 sdk.Int, price1To0 types.Price) sdk.Dec {
-	amount0Dec := amount0.ToDec()
+	amount0Dec := sdk.NewDecFromInt(amount0)
 
 	return amount0Dec.Add(price1To0.MulInt(amount1))
 }

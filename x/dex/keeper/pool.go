@@ -120,14 +120,14 @@ func CalcGreatestMatchingRatio(
 	amount0 sdk.Int,
 	amount1 sdk.Int,
 ) (resultAmount0, resultAmount1 sdk.Int) {
-	targetAmount0Dec := targetAmount0.ToDec()
-	targetAmount1Dec := targetAmount1.ToDec()
+	targetAmount0Dec := sdk.NewDecFromInt(targetAmount0)
+	targetAmount1Dec := sdk.NewDecFromInt(targetAmount1)
 
 	// See spec: https://www.notion.so/dualityxyz/Autoswap-Spec-e856fa7b2438403c95147010d479b98c
 	if targetAmount1.GT(sdk.ZeroInt()) {
 		resultAmount0 = sdk.MinInt(
 			amount0,
-			amount1.ToDec().Mul(targetAmount0Dec).Quo(targetAmount1Dec).TruncateInt())
+			sdk.NewDecFromInt(amount1).Mul(targetAmount0Dec).Quo(targetAmount1Dec).TruncateInt())
 	} else {
 		resultAmount0 = amount0
 	}
@@ -135,7 +135,7 @@ func CalcGreatestMatchingRatio(
 	if targetAmount0.GT(sdk.ZeroInt()) {
 		resultAmount1 = sdk.MinInt(
 			amount1,
-			amount0.ToDec().Mul(targetAmount1Dec).Quo(targetAmount0Dec).TruncateInt())
+			sdk.NewDecFromInt(amount0).Mul(targetAmount1Dec).Quo(targetAmount0Dec).TruncateInt())
 	} else {
 		resultAmount1 = amount1
 	}
@@ -237,11 +237,11 @@ func (p *Pool) RedeemValue(sharesToRemove, totalShares sdk.Int) (outAmount0, out
 	// outAmount1 = ownershipRatio * reserves1
 	//            = (sharesToRemove / totalShares) * reserves1
 	//            = (reserves1 * sharesToRemove ) / totalShares
-	outAmount1 = reserves1.Mul(sharesToRemove).ToDec().QuoInt(totalShares).TruncateInt()
+	outAmount1 = sdk.NewDecFromInt(reserves1.Mul(sharesToRemove)).QuoInt(totalShares).TruncateInt()
 	// outAmount0 = ownershipRatio * reserves1
 	//            = (sharesToRemove / totalShares) * reserves1
 	//            = (reserves1 * sharesToRemove ) / totalShares
-	outAmount0 = reserves0.Mul(sharesToRemove).ToDec().QuoInt(totalShares).TruncateInt()
+	outAmount0 = sdk.NewDecFromInt(reserves0.Mul(sharesToRemove)).QuoInt(totalShares).TruncateInt()
 
 	return outAmount0, outAmount1
 }

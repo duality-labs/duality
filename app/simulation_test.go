@@ -6,23 +6,25 @@ import (
 	"testing"
 	"time"
 
-	"cosmossdk.io/simapp"
 	abci "github.com/cometbft/cometbft/abci/types"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	tmtypes1 "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simulationtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
+	simcli "github.com/cosmos/cosmos-sdk/x/simulation/client/cli"
 	"github.com/duality-labs/duality/app"
 	appparams "github.com/duality-labs/duality/app/params"
 	"github.com/stretchr/testify/require"
 )
 
 func init() {
-	simapp.GetSimulatorFlags()
+	simcli.GetSimulatorFlags()
 }
 
 type SimApp interface {
@@ -38,12 +40,12 @@ type SimApp interface {
 	InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain
 }
 
-var defaultConsensusParams = &abci.ConsensusParams{
-	Block: &abci.BlockParams{
+var defaultConsensusParams = &tmtypes1.ConsensusParams{
+	Block: &tmtypes1.BlockParams{
 		MaxBytes: 200000,
 		MaxGas:   2000000,
 	},
-	Evidence: &tmproto.EvidenceParams{
+	Evidence: &tmtypes1.EvidenceParams{
 		MaxAgeNumBlocks: 302400,
 		MaxAgeDuration:  504 * time.Hour, // 3 weeks is the max duration
 		MaxBytes:        10000,
@@ -61,10 +63,11 @@ var defaultConsensusParams = &abci.ConsensusParams{
 // Running as go benchmark test:
 // `go test -benchmem -run=^$ -bench ^BenchmarkSimulation ./app -NumBlocks=200 -BlockSize 50 -Commit=true -Verbose=true -Enabled=true`
 func BenchmarkSimulation(b *testing.B) {
-	simapp.FlagEnabledValue = true
-	simapp.FlagCommitValue = true
+	simcli.FlagEnabledValue = true
+	simcli.FlagCommitValue = true
 
-	config, db, dir, logger, _, err := simapp.SetupSimulation("goleveldb-app-sim", "Simulation")
+	config := simcli.NewConfigFromFlags()
+	db, dir, logger, _, err := simtestutil.SetupSimulation(config, "leveldb-app-sim-2", "Simulation-2", simcli.FlagVerboseValue, simcli.FlagEnabledValue)
 	require.NoError(b, err, "simulation setup failed")
 
 	b.Cleanup(func() {
@@ -73,9 +76,9 @@ func BenchmarkSimulation(b *testing.B) {
 		require.NoError(b, err)
 	})
 
-	encoding := appparams.MakeTestEncodingConfig(app.ModuleBasics)
+	encoding := appparams.MakeTestEncodingConfig()
 
-	app := app.New(
+	dualityApp := app.New(
 		logger,
 		db,
 		nil,
@@ -84,31 +87,32 @@ func BenchmarkSimulation(b *testing.B) {
 		app.DefaultNodeHome,
 		0,
 		encoding,
-		simapp.EmptyAppOptions{},
+		simtestutil.EmptyAppOptions{},
 	)
-
-	simApp, ok := app.(SimApp)
-	require.True(b, ok, "can't use simapp")
 
 	// Run randomized simulations
 	_, simParams, simErr := simulation.SimulateFromSeed(
 		b,
 		os.Stdout,
-		simApp.GetBaseApp(),
-		simapp.AppStateFn(simApp.AppCodec(), simApp.SimulationManager()),
+		dualityApp.BaseApp,
+		simtestutil.AppStateFn(
+			dualityApp.AppCodec(),
+			dualityApp.SimulationManager(),
+			app.NewDefaultGenesisState(dualityApp.AppCodec()),
+		),
 		simulationtypes.RandomAccounts,
-		simapp.SimulationOperations(simApp, simApp.AppCodec(), config),
-		simApp.ModuleAccountAddrs(),
+		simtestutil.SimulationOperations(dualityApp, dualityApp.AppCodec(), config),
+		dualityApp.ModuleAccountAddrs(),
 		config,
-		simApp.AppCodec(),
+		dualityApp.AppCodec(),
 	)
 
 	// export state and simParams before the simulation error is checked
-	err = simapp.CheckExportSimulation(simApp, config, simParams)
+	err = simtestutil.CheckExportSimulation(dualityApp, config, simParams)
 	require.NoError(b, err)
 	require.NoError(b, simErr)
 
 	if config.Commit {
-		simapp.PrintStats(db)
+		simtestutil.PrintStats(db)
 	}
 }

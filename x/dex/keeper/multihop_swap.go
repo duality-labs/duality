@@ -149,7 +149,7 @@ func (k Keeper) RunMultihopRoute(
 		if err != nil {
 			return sdk.Coin{}, nil, sdkerrors.Wrapf(err, "Failed at pair: %s", step.TradingPair.PairID.Stringify())
 		}
-		currentPrice = currentOutCoin.Amount.ToDec().Quo(initialInCoin.Amount.ToDec())
+		currentPrice = sdk.NewDecFromInt(currentOutCoin.Amount).QuoInt(initialInCoin.Amount)
 	}
 
 	if exitLimitPrice.GT(currentPrice) {

@@ -63,7 +63,7 @@ func (d Distributor) Distribute(
 		distCoins := sdk.Coins{}
 		for _, epochRewards := range rewardsNextEpoch {
 			// distribution amount = gauge_size * denom_stake_amount / (total_denom_stake_amount * remain_epochs)
-			amount := epochRewards.Amount.ToDec().Mul(stakeAmt.ToDec()).Quo(adjustedGaugeTotal.ToDec()).TruncateInt()
+			amount := sdk.NewDecFromInt(epochRewards.Amount.Mul(stakeAmt)).QuoInt(adjustedGaugeTotal).TruncateInt()
 			reward := sdk.Coin{Denom: epochRewards.Denom, Amount: amount}
 			distCoins = distCoins.Add(reward)
 		}

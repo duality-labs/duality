@@ -72,7 +72,7 @@ func (t LimitOrderTranche) RatioFilled() sdk.Dec {
 
 func (t LimitOrderTranche) AmountUnfilled() sdk.Dec {
 	amountFilled := t.PriceTakerToMaker().MulInt(t.TotalTokenOut)
-	return t.TotalTokenIn.ToDec().Sub(amountFilled)
+	return sdk.NewDecFromInt(t.TotalTokenIn).Sub(amountFilled)
 }
 
 func (t LimitOrderTranche) HasLiquidity() bool {

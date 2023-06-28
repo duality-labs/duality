@@ -1,37 +1,28 @@
 package network
 
 import (
-	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
 
-	"cosmossdk.io/simapp"
-	types1 "github.com/cometbft/cometbft/abci/types"
+	dbm "github.com/cometbft/cometbft-db"
 	tmrand "github.com/cometbft/cometbft/libs/rand"
-	tmtypes "github.com/cometbft/cometbft/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	pruningtypes "github.com/cosmos/cosmos-sdk/store/pruning/types"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	genutil "github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	dextypes "github.com/duality-labs/duality/x/dex/types"
-	tmdb "github.com/tendermint/tm-db"
+	"github.com/stretchr/testify/require"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
 	"github.com/duality-labs/duality/app"
 	appparams "github.com/duality-labs/duality/app/params"
-	"github.com/duality-labs/duality/testutil"
 )
 
 type (
@@ -51,7 +42,8 @@ func New(t *testing.T, configs ...network.Config) *network.Network {
 	} else {
 		cfg = configs[0]
 	}
-	net := network.New(t, cfg)
+	net, err := network.New(t, t.TempDir(), cfg)
+	require.NoError(t, err)
 	t.Cleanup(net.Cleanup)
 
 	return net
@@ -64,7 +56,7 @@ func DefaultConfig() network.Config {
 	app.ModuleBasics[genutiltypes.ModuleName] = genutil.AppModuleBasic{}
 	app.ModuleBasics[stakingtypes.ModuleName] = staking.AppModuleBasic{}
 
-	encoding := appparams.MakeTestEncodingConfig(app.ModuleBasics)
+	encoding := appparams.MakeTestEncodingConfig()
 
 	return network.Config{
 		Codec:             encoding.Marshaler,
@@ -72,18 +64,18 @@ func DefaultConfig() network.Config {
 		LegacyAmino:       encoding.Amino,
 		InterfaceRegistry: encoding.InterfaceRegistry,
 		AccountRetriever:  authtypes.AccountRetriever{},
-		AppConstructor: func(val network.Validator) servertypes.Application {
-			err := modifyConsumerGenesis(val)
-			if err != nil {
-				panic(err)
-			}
+		AppConstructor: func(val network.ValidatorI) servertypes.Application {
+			// err := modifyConsumerGenesis(val)
+			// if err != nil {
+			// 	panic(err)
+			// }
 
 			return app.New(
-				val.Ctx.Logger, tmdb.NewMemDB(), nil, true, map[int64]bool{}, val.Ctx.Config.RootDir, 0,
+				val.GetCtx().Logger, dbm.NewMemDB(), nil, true, map[int64]bool{}, val.GetCtx().Config.RootDir, 0,
 				encoding,
-				simapp.EmptyAppOptions{},
-				baseapp.SetPruning(storetypes.NewPruningOptionsFromString(val.AppConfig.Pruning)),
-				baseapp.SetMinGasPrices(val.AppConfig.MinGasPrices),
+				app.EmptyAppOptions{},
+				baseapp.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
+				baseapp.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
 			)
 		},
 		GenesisState:  app.ModuleBasics.DefaultGenesis(encoding.Marshaler),
@@ -97,58 +89,59 @@ func DefaultConfig() network.Config {
 		AccountTokens:   sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction),
 		StakingTokens:   sdk.TokensFromConsensusPower(500, sdk.DefaultPowerReduction),
 		BondedTokens:    sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction),
-		PruningStrategy: storetypes.PruningOptionNothing,
+		PruningStrategy: pruningtypes.PruningOptionNothing,
 		CleanupDir:      true,
 		SigningAlgo:     string(hd.Secp256k1Type),
 		KeyringOptions:  []keyring.Option{},
 	}
 }
 
-func modifyConsumerGenesis(val network.Validator) error {
-	genFile := val.Ctx.Config.GenesisFile()
-	appState, genDoc, err := genutiltypes.GenesisStateFromGenFile(genFile)
-	if err != nil {
-		return sdkerrors.Wrap(err, "failed to read genesis from the file")
-	}
+// TODO: safe to delete???
+// func modifyConsumerGenesis(val network.ValidatorI) error {
+// 	genFile := val.GetCtx().Config.GenesisFile()
+// 	appState, genDoc, err := genutiltypes.GenesisStateFromGenFile(genFile)
+// 	if err != nil {
+// 		return sdkerrors.Wrap(err, "failed to read genesis from the file")
+// 	}
 
-	tmProtoPublicKey, err := cryptocodec.ToTmProtoPublicKey(val.PubKey)
-	if err != nil {
-		return sdkerrors.Wrap(err, "invalid public key")
-	}
+// 	tmProtoPublicKey, err := cryptocodec.ToTmProtoPublicKey(val.GetCtx().)
+// 	if err != nil {
+// 		return sdkerrors.Wrap(err, "invalid public key")
+// 	}
 
-	initialValset := []types1.ValidatorUpdate{{PubKey: tmProtoPublicKey, Power: 100}}
-	vals, err := tmtypes.PB2TM.ValidatorUpdates(initialValset)
-	if err != nil {
-		return sdkerrors.Wrap(err, "could not convert val updates to validator set")
-	}
+// 	initialValset := []types1.ValidatorUpdate{{PubKey: tmProtoPublicKey, Power: 100}}
+// 	vals, err := tmtypes.PB2TM.ValidatorUpdates(initialValset)
+// 	if err != nil {
+// 		return sdkerrors.Wrap(err, "could not convert val updates to validator set")
+// 	}
 
-	consumerGenesisState := testutil.CreateMinimalConsumerTestGenesis()
-	consumerGenesisState.InitialValSet = initialValset
-	consumerGenesisState.ProviderConsensusState.NextValidatorsHash = tmtypes.NewValidatorSet(vals).Hash()
+// 	consumerGenesisState := testutil.CreateMinimalConsumerTestGenesis()
+// 	consumerGenesisState.InitialValSet = initialValset
+// 	consumerGenesisState.ProviderConsensusState.NextValidatorsHash = tmtypes.NewValidatorSet(vals).Hash()
 
-	if err := consumerGenesisState.Validate(); err != nil {
-		return sdkerrors.Wrap(err, "invalid consumer genesis")
-	}
+// 	if err := consumerGenesisState.Validate(); err != nil {
+// 		return sdkerrors.Wrap(err, "invalid consumer genesis")
+// 	}
 
-	consumerGenStateBz, err := val.ClientCtx.Codec.MarshalJSON(consumerGenesisState)
-	if err != nil {
-		return sdkerrors.Wrap(err, "failed to marshal consumer genesis state into JSON")
-	}
+// 	consumerGenStateBz, err := val.ClientCtx.Codec.MarshalJSON(consumerGenesisState)
+// 	if err != nil {
+// 		return sdkerrors.Wrap(err, "failed to marshal consumer genesis state into JSON")
+// 	}
 
-	appState[ccvconsumertypes.ModuleName] = consumerGenStateBz
-	appStateJSON, err := json.Marshal(appState)
-	if err != nil {
-		return sdkerrors.Wrap(err, "failed to marshal application genesis state into JSON")
-	}
+// 	appState[ccvconsumertypes.ModuleName] = consumerGenStateBz
+// 	appStateJSON, err := json.Marshal(appState)
+// 	if err != nil {
+// 		return sdkerrors.Wrap(err, "failed to marshal application genesis state into JSON")
+// 	}
 
-	genDoc.AppState = appStateJSON
-	err = genutil.ExportGenesisFile(genDoc, genFile)
-	if err != nil {
-		return sdkerrors.Wrap(err, "failed to export genesis state")
-	}
+// 	genDoc.AppState = appStateJSON
+// 	err = genutil.ExportGenesisFile(genDoc, genFile)
+// 	if err != nil {
+// 		return sdkerrors.Wrap(err, "failed to export genesis state")
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // New creates instance with fully configured cosmos network.
 // Accepts optional config, that will be used in place of the DefaultConfig() if provided.
@@ -162,7 +155,8 @@ func NewCLITest(t *testing.T, configs ...network.Config) *network.Network {
 	} else {
 		cfg = configs[0]
 	}
-	net := network.New(t, cfg)
+	net, err := network.New(t, t.TempDir(), cfg)
+	require.NoError(t, err)
 	t.Cleanup(net.Cleanup)
 
 	return net
@@ -175,7 +169,7 @@ func DefaultConfigCLITest() network.Config {
 	app.ModuleBasics[genutiltypes.ModuleName] = genutil.AppModuleBasic{}
 	app.ModuleBasics[stakingtypes.ModuleName] = staking.AppModuleBasic{}
 
-	encoding := appparams.MakeTestEncodingConfig(app.ModuleBasics)
+	encoding := appparams.MakeTestEncodingConfig()
 
 	return network.Config{
 		Codec:             encoding.Marshaler,
@@ -183,23 +177,23 @@ func DefaultConfigCLITest() network.Config {
 		LegacyAmino:       encoding.Amino,
 		InterfaceRegistry: encoding.InterfaceRegistry,
 		AccountRetriever:  authtypes.AccountRetriever{},
-		AppConstructor: func(val network.Validator) servertypes.Application {
-			err := modifyConsumerGenesis(val)
-			if err != nil {
-				panic(err)
-			}
+		AppConstructor: func(val network.ValidatorI) servertypes.Application {
+			// err := modifyConsumerGenesis(val)
+			// if err != nil {
+			// 	panic(err)
+			// }
 
-			err = modifyConsumerGenesisCLITestSetup(val)
-			if err != nil {
-				panic(err)
-			}
+			// err := modifyConsumerGenesisCLITestSetup(val)
+			// if err != nil {
+			// 	panic(err)
+			// }
 
 			return app.New(
-				val.Ctx.Logger, tmdb.NewMemDB(), nil, true, map[int64]bool{}, val.Ctx.Config.RootDir, 0,
+				val.GetCtx().Logger, dbm.NewMemDB(), nil, true, map[int64]bool{}, val.GetCtx().Config.RootDir, 0,
 				encoding,
-				simapp.EmptyAppOptions{},
-				baseapp.SetPruning(storetypes.NewPruningOptionsFromString(val.AppConfig.Pruning)),
-				baseapp.SetMinGasPrices(val.AppConfig.MinGasPrices),
+				app.EmptyAppOptions{},
+				baseapp.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
+				baseapp.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
 			)
 		},
 		GenesisState:  app.ModuleBasics.DefaultGenesis(encoding.Marshaler),
@@ -213,53 +207,53 @@ func DefaultConfigCLITest() network.Config {
 		AccountTokens:   sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction),
 		StakingTokens:   sdk.TokensFromConsensusPower(500, sdk.DefaultPowerReduction),
 		BondedTokens:    sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction),
-		PruningStrategy: storetypes.PruningOptionNothing,
+		PruningStrategy: pruningtypes.PruningOptionNothing,
 		CleanupDir:      true,
 		SigningAlgo:     string(hd.Secp256k1Type),
 		KeyringOptions:  []keyring.Option{},
 	}
 }
 
-func modifyConsumerGenesisCLITestSetup(val network.Validator) error {
-	genFile := val.Ctx.Config.GenesisFile()
-	appState, genDoc, err := genutiltypes.GenesisStateFromGenFile(genFile)
-	if err != nil {
-		return err
-	}
+// func modifyConsumerGenesisCLITestSetup(val network.Validator) error {
+// 	genFile := val.Ctx.Config.GenesisFile()
+// 	appState, genDoc, err := genutiltypes.GenesisStateFromGenFile(genFile)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	// Modify the data structure here
-	dexData := appState[dextypes.ModuleName]
-	var dexGenesisState dextypes.GenesisState
-	json.Unmarshal(dexData, &dexGenesisState)
+// 	// Modify the data structure here
+// 	dexData := appState[dextypes.ModuleName]
+// 	var dexGenesisState dextypes.GenesisState
+// 	json.Unmarshal(dexData, &dexGenesisState)
 
-	newRawJSON, _ := json.Marshal(dexGenesisState)
-	appState[dextypes.ModuleName] = newRawJSON
+// 	newRawJSON, _ := json.Marshal(dexGenesisState)
+// 	appState[dextypes.ModuleName] = newRawJSON
 
-	bankData := appState[banktypes.ModuleName]
-	var bankGenesisState banktypes.GenesisState
-	json.Unmarshal(bankData, &bankGenesisState)
+// 	bankData := appState[banktypes.ModuleName]
+// 	var bankGenesisState banktypes.GenesisState
+// 	json.Unmarshal(bankData, &bankGenesisState)
 
-	bankGenesisState.Balances = []banktypes.Balance{
-		{
-			Address: val.Address.String(),
-			Coins: sdk.Coins{
-				sdk.NewCoin("TokenA", sdk.NewInt(100000000)),
-				sdk.NewCoin("TokenB", sdk.NewInt(100000000)),
-				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10000)),
-			},
-		},
-	}
-	newRawJSON, _ = json.Marshal(bankGenesisState)
-	appState[banktypes.ModuleName] = newRawJSON
+// 	bankGenesisState.Balances = []banktypes.Balance{
+// 		{
+// 			Address: val.Address.String(),
+// 			Coins: sdk.Coins{
+// 				sdk.NewCoin("TokenA", sdk.NewInt(100000000)),
+// 				sdk.NewCoin("TokenB", sdk.NewInt(100000000)),
+// 				sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10000)),
+// 			},
+// 		},
+// 	}
+// 	newRawJSON, _ = json.Marshal(bankGenesisState)
+// 	appState[banktypes.ModuleName] = newRawJSON
 
-	appStateJSON, _ := json.Marshal(appState)
-	// Write the modified app state to the genesis file
-	genDoc.AppState = json.RawMessage(appStateJSON)
+// 	appStateJSON, _ := json.Marshal(appState)
+// 	// Write the modified app state to the genesis file
+// 	genDoc.AppState = json.RawMessage(appStateJSON)
 
-	err = genutil.ExportGenesisFile(genDoc, genFile)
-	if err != nil {
-		return sdkerrors.Wrap(err, "failed to export genesis state")
-	}
+// 	err = genutil.ExportGenesisFile(genDoc, genFile)
+// 	if err != nil {
+// 		return sdkerrors.Wrap(err, "failed to export genesis state")
+// 	}
 
-	return nil
-}
+// 	return nil
+// }

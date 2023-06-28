@@ -3,13 +3,13 @@ package app
 
 import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 )
 
-func IsProposalWhitelisted(content govtypes.Content) bool {
+func IsProposalWhitelisted(content govv1beta1.Content) bool {
 	switch c := content.(type) {
 	case *proposal.ParameterChangeProposal:
 		return isParamChangeWhitelisted(c.Changes)
