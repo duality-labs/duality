@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/cosmos/admin-module v0.0.0
-	github.com/cosmos/cosmos-sdk v0.46.6
+	github.com/cosmos/cosmos-sdk v0.47.3
 	github.com/cosmos/ibc-go/v4 v4.3.0
 	github.com/cosmos/interchain-security v1.2.0-multiden
 	github.com/gogo/protobuf v1.3.3
@@ -26,8 +26,6 @@ require (
 )
 
 require (
-	github.com/ghodss/yaml v1.0.0 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0 // indirect
 	google.golang.org/genproto v0.0.0-20230526203410-71b5a4ffd15e // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
 )
@@ -162,7 +160,6 @@ require (
 replace (
 	// github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
 	github.com/cosmos/admin-module => github.com/Ethernal-Tech/admin-module v0.0.0-20221102105340-e693f4d379c3
-	github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.45.15-ics
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/stretchr/testify => github.com/stretchr/testify v1.7.1
 	github.com/tendermint/tendermint => github.com/cometbft/cometbft v0.34.27
