@@ -28,7 +28,7 @@ import (
 	tmdb "github.com/tendermint/tm-db"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	ccvconsumertypes "github.com/cosmos/interchain-security/v3/x/ccv/consumer/types"
+	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
 	"github.com/duality-labs/duality/app"
 	appparams "github.com/duality-labs/duality/app/params"
 	"github.com/duality-labs/duality/testutil"

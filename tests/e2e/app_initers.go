@@ -6,7 +6,7 @@ import (
 	"cosmossdk.io/simapp"
 
 	"github.com/cometbft/cometbft/libs/log"
-	ibctesting "github.com/cosmos/interchain-security/v3/legacy_ibc_testing/testing"
+	ibctesting "github.com/cosmos/interchain-security/legacy_ibc_testing/testing"
 	appparams "github.com/duality-labs/duality/app/params"
 	tmdb "github.com/tendermint/tm-db"
 

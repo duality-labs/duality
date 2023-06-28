@@ -8,7 +8,7 @@ require (
 	// github.com/cosmos/admin-module v0.0.0
 	github.com/cosmos/cosmos-sdk v0.47.3
 	github.com/cosmos/ibc-go/v7 v7.1.0
-	github.com/cosmos/interchain-security/v3 v3.0.0-20230627090306-fcb1ff43a83b
+	github.com/cosmos/interchain-security v1.0.1-0.20230522154154-1bb8d39e691a
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.3
 	github.com/gorilla/mux v1.8.0

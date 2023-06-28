@@ -6,9 +6,9 @@ import (
 	ibctypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
 	"github.com/cosmos/ibc-go/v7/modules/core/23-commitment/types"
 	"github.com/cosmos/ibc-go/v7/modules/core/exported"
-	ccvconsumertypes "github.com/cosmos/interchain-security/v3/x/ccv/consumer/types"
-	ccvprovidertypes "github.com/cosmos/interchain-security/v3/x/ccv/provider/types"
-	typesccv "github.com/cosmos/interchain-security/v3/x/ccv/types"
+	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
+	ccvprovidertypes "github.com/cosmos/interchain-security/x/ccv/provider/types"
+	typesccv "github.com/cosmos/interchain-security/x/ccv/types"
 	"github.com/duality-labs/duality/app"
 )
 

@@ -72,7 +72,7 @@ import (
 	ibcporttypes "github.com/cosmos/ibc-go/v7/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v7/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
-	ibctestingcore "github.com/cosmos/interchain-security/v3/legacy_ibc_testing/core"
+	ibctestingcore "github.com/cosmos/interchain-security/legacy_ibc_testing/core"
 	"github.com/ignite/cli/docs"
 	"github.com/ignite/cli/ignite/pkg/openapiconsole"
 	"github.com/spf13/cast"
@@ -81,15 +81,15 @@ import (
 	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v7/router/types"
 	dbm "github.com/tendermint/tm-db"
 
-	ccvconsumer "github.com/cosmos/interchain-security/v3/x/ccv/consumer"
-	ccvconsumerkeeper "github.com/cosmos/interchain-security/v3/x/ccv/consumer/keeper"
-	ccvconsumertypes "github.com/cosmos/interchain-security/v3/x/ccv/consumer/types"
+	ccvconsumer "github.com/cosmos/interchain-security/x/ccv/consumer"
+	ccvconsumerkeeper "github.com/cosmos/interchain-security/x/ccv/consumer/keeper"
+	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
 
 	dexmodule "github.com/duality-labs/duality/x/dex"
 	dexmodulekeeper "github.com/duality-labs/duality/x/dex/keeper"
 	dexmoduletypes "github.com/duality-labs/duality/x/dex/types"
 
-	icstestintegration "github.com/cosmos/interchain-security/v3/testutil/integration"
+	icstestintegration "github.com/cosmos/interchain-security/testutil/integration"
 
 	appparams "github.com/duality-labs/duality/app/params"
 	epochsmodule "github.com/duality-labs/duality/x/epochs"
@@ -335,7 +335,7 @@ func NewApp(
 
 	// Remove the fee-pool from the group of blocked recipient addresses in bank
 	// this is required for the consumer chain to be able to send tokens to the provider chain
-	// RE: https://github.com/cosmos/interchain-security/v3/blob/main/app/consumer/app.go#L272
+	// RE: https://github.com/cosmos/interchain-security/blob/main/app/consumer/app.go#L272
 	bankBlockedAddrs := app.ModuleAccountAddrs()
 	delete(bankBlockedAddrs, authtypes.NewModuleAddress(
 		ccvconsumertypes.ConsumerToSendToProviderName).String())
