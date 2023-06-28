@@ -3,7 +3,7 @@ package e2e_test
 import (
 	"encoding/json"
 
-	"github.com/cosmos/cosmos-sdk/simapp"
+	"cosmossdk.io/simapp"
 
 	ibctesting "github.com/cosmos/interchain-security/legacy_ibc_testing/testing"
 

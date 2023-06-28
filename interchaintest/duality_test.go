@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
+	simappparams "cosmossdk.io/simapp/params"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/strangelove-ventures/interchaintest/v4"
 	"github.com/strangelove-ventures/interchaintest/v4/chain/cosmos"
