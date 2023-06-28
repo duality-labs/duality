@@ -5,7 +5,7 @@ import (
 
 	"cosmossdk.io/simapp"
 
-	ibctesting "github.com/cosmos/interchain-security/legacy_ibc_testing/testing"
+	ibctesting "github.com/cosmos/interchain-security/v3/legacy_ibc_testing/testing"
 
 	"github.com/tendermint/spm/cosmoscmd"
 	"github.com/tendermint/tendermint/libs/log"

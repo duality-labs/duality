@@ -3,11 +3,11 @@ package e2e_test
 import (
 	"testing"
 
-	appprovider "github.com/cosmos/interchain-security/app/provider"
-	"github.com/cosmos/interchain-security/tests/e2e"
+	appprovider "github.com/cosmos/interchain-security/v3/app/provider"
+	"github.com/cosmos/interchain-security/v3/tests/e2e"
 	appduality "github.com/duality-labs/duality/app"
 
-	icsappiniters "github.com/cosmos/interchain-security/testutil/ibc_testing"
+	icsappiniters "github.com/cosmos/interchain-security/v3/testutil/ibc_testing"
 	"github.com/stretchr/testify/suite"
 )
 

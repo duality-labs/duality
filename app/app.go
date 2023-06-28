@@ -18,6 +18,7 @@ import (
 	proposaltypes "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	upgraderest "github.com/cosmos/cosmos-sdk/x/upgrade/client/rest"
 
+	"cosmossdk.io/simapp"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
@@ -27,7 +28,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	"cosmossdk.io/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -76,7 +76,7 @@ import (
 	ibcporttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v4/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
-	ibctestingcore "github.com/cosmos/interchain-security/legacy_ibc_testing/core"
+	ibctestingcore "github.com/cosmos/interchain-security/v3/legacy_ibc_testing/core"
 	"github.com/ignite/cli/docs"
 	"github.com/ignite/cli/ignite/pkg/openapiconsole"
 	"github.com/spf13/cast"
@@ -90,15 +90,15 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
-	ccvconsumer "github.com/cosmos/interchain-security/x/ccv/consumer"
-	ccvconsumerkeeper "github.com/cosmos/interchain-security/x/ccv/consumer/keeper"
-	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
+	ccvconsumer "github.com/cosmos/interchain-security/v3/x/ccv/consumer"
+	ccvconsumerkeeper "github.com/cosmos/interchain-security/v3/x/ccv/consumer/keeper"
+	ccvconsumertypes "github.com/cosmos/interchain-security/v3/x/ccv/consumer/types"
 
 	dexmodule "github.com/duality-labs/duality/x/dex"
 	dexmodulekeeper "github.com/duality-labs/duality/x/dex/keeper"
 	dexmoduletypes "github.com/duality-labs/duality/x/dex/types"
 
-	"github.com/cosmos/interchain-security/testutil/e2e"
+	icstestintegration "github.com/cosmos/interchain-security/v3/testutil/integration"
 
 	epochsmodule "github.com/duality-labs/duality/x/epochs"
 	epochsmodulekeeper "github.com/duality-labs/duality/x/epochs/keeper"
@@ -346,7 +346,7 @@ func NewApp(
 
 	// Remove the fee-pool from the group of blocked recipient addresses in bank
 	// this is required for the consumer chain to be able to send tokens to the provider chain
-	// RE: https://github.com/cosmos/interchain-security/blob/main/app/consumer/app.go#L272
+	// RE: https://github.com/cosmos/interchain-security/v3/blob/main/app/consumer/app.go#L272
 	bankBlockedAddrs := app.ModuleAccountAddrs()
 	delete(bankBlockedAddrs, authtypes.NewModuleAddress(
 		ccvconsumertypes.ConsumerToSendToProviderName).String())
@@ -905,22 +905,22 @@ func (app *App) GetConsumerKeeper() ccvconsumerkeeper.Keeper {
 }
 
 // GetE2eBankKeeper implements the ConsumerApp interface.
-func (app *App) GetE2eBankKeeper() e2e.E2eBankKeeper {
+func (app *App) GetE2eBankKeeper() icstestintegration.TestBankKeeper {
 	return app.BankKeeper
 }
 
 // GetE2eAccountKeeper implements the ConsumerApp interface.
-func (app *App) GetE2eAccountKeeper() e2e.E2eAccountKeeper {
+func (app *App) GetE2eAccountKeeper() icstestintegration.TestAccountKeeper {
 	return app.AccountKeeper
 }
 
 // GetE2eSlashingKeeper implements the ConsumerApp interface.
-func (app *App) GetE2eSlashingKeeper() e2e.E2eSlashingKeeper {
+func (app *App) GetE2eSlashingKeeper() icstestintegration.TestSlashingKeeper {
 	return app.SlashingKeeper
 }
 
 // GetE2eEvidenceKeeper implements the ConsumerApp interface.
-func (app *App) GetE2eEvidenceKeeper() e2e.E2eEvidenceKeeper {
+func (app *App) GetE2eEvidenceKeeper() icstestintegration.TestEvidenceKeeper {
 	return app.EvidenceKeeper
 }
 
