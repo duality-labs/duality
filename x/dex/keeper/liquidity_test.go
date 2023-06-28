@@ -9,7 +9,7 @@ import (
 	keepertest "github.com/duality-labs/duality/testutil/keeper"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/suite"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 )
 
 type LiquidityTestSuite struct {

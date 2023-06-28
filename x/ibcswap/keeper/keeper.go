@@ -16,7 +16,7 @@ import (
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/ibcswap/types"
 	"github.com/gogo/protobuf/proto"
-	"github.com/tendermint/tendermint/libs/log"
+	"github.com/cometbft/cometbft/libs/log"
 )
 
 // Keeper defines the swap middleware keeper.

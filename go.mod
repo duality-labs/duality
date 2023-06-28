@@ -19,13 +19,14 @@ require (
 	github.com/strangelove-ventures/packet-forward-middleware/v7 v7.0.0-20230313184032-deafca012b7a
 	github.com/stretchr/testify v1.8.4
 	github.com/tendermint/spm v0.1.9
-	github.com/tendermint/tendermint v0.34.27
+  github.com/cometbft/cometbft v0.37.1
 	github.com/tendermint/tm-db v0.6.7
 	golang.org/x/exp v0.0.0-20230515195305-f3d0a9c9a5cc
 	google.golang.org/genproto/googleapis/api v0.0.0-20230530153820-e85fd2cbaebc
 	google.golang.org/grpc v1.55.0
 	gopkg.in/yaml.v2 v2.4.0
 	cosmossdk.io/store v0.1.0-alpha.1
+	github.com/cometbft/cometbft v0.37.2
 )
 
 require (
@@ -199,5 +200,4 @@ replace (
 	// github.com/cosmos/admin-module => github.com/Ethernal-Tech/admin-module v0.0.0-20221102105340-e693f4d379c3
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/stretchr/testify => github.com/stretchr/testify v1.7.1
-	github.com/tendermint/tendermint => github.com/cometbft/cometbft v0.37.2
 )

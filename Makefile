@@ -14,7 +14,7 @@ endif
 
 LEDGER_ENABLED ?= true
 DOCKER := $(shell which docker)
-TM_VERSION := $(shell go list -m github.com/tendermint/tendermint | sed 's:.* ::') # grab everything after the space in "github.com/tendermint/tendermint v0.34.7"
+TM_VERSION := $(shell go list -m github.com/cometbft/cometbft | sed 's:.* ::') # grab everything after the space in "github.com/cometbft/cometbft v0.34.7"
 BUILDDIR ?= $(CURDIR)/bin
 CHAIN_NAME = duality
 DAEMON_NAME = dualityd
@@ -68,7 +68,7 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=$(CHAIN_NAME) \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
-			-X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TM_VERSION)
+			-X github.com/cometbft/cometbft/version.TMCoreSemVer=$(TM_VERSION)
 
 ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))

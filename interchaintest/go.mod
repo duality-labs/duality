@@ -14,7 +14,7 @@ replace (
 	github.com/duality-labs/duality => ../
 
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
-	github.com/tendermint/tendermint => github.com/cometbft/cometbft v0.34.27
+	github.com/cometbft/cometbft => github.com/cometbft/cometbft v0.34.27
 	github.com/vedhavyas/go-subkey => github.com/strangelove-ventures/go-subkey v1.0.7
 )
 
@@ -26,7 +26,7 @@ require (
 	github.com/strangelove-ventures/interchaintest/v4 v4.0.0-20230316161044-8d8c01f96b4a
 	github.com/strangelove-ventures/packet-forward-middleware/v7 v4.0.5
 	github.com/stretchr/testify v1.8.1
-	github.com/tendermint/tendermint v0.34.27
+	github.com/cometbft/cometbft v0.34.27
 	go.uber.org/zap v1.23.0
 )
 

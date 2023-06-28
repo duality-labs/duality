@@ -23,9 +23,9 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/tendermint/spm/cosmoscmd"
-	types1 "github.com/tendermint/tendermint/abci/types"
-	tmrand "github.com/tendermint/tendermint/libs/rand"
-	tmtypes "github.com/tendermint/tendermint/types"
+	types1 "github.com/cometbft/cometbft/abci/types"
+	tmrand "github.com/cometbft/cometbft/libs/rand"
+	tmtypes "github.com/cometbft/cometbft/types"
 	tmdb "github.com/tendermint/tm-db"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"

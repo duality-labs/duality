@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/duality-labs/duality/x/dex/types"
-	abci "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/cometbft/cometbft/abci/types"
 )
 
 func (s *MsgServerTestSuite) TestCancelEntireLimitOrderAOneExists() {

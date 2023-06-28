@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	simapp "github.com/duality-labs/duality/app"
 	"github.com/duality-labs/duality/x/epochs/types"

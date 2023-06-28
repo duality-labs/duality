@@ -8,7 +8,7 @@ import (
 	ibctesting "github.com/cosmos/interchain-security/v3/legacy_ibc_testing/testing"
 
 	"github.com/tendermint/spm/cosmoscmd"
-	"github.com/tendermint/tendermint/libs/log"
+	"github.com/cometbft/cometbft/libs/log"
 	tmdb "github.com/tendermint/tm-db"
 
 	appConsumer "github.com/duality-labs/duality/app"

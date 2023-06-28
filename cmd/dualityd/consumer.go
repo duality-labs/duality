@@ -15,9 +15,9 @@ import (
 	ccvconsumertypes "github.com/cosmos/interchain-security/v3/x/ccv/consumer/types"
 	"github.com/duality-labs/duality/testutil"
 	"github.com/spf13/cobra"
-	types1 "github.com/tendermint/tendermint/abci/types"
-	pvm "github.com/tendermint/tendermint/privval"
-	tmtypes "github.com/tendermint/tendermint/types"
+	types1 "github.com/cometbft/cometbft/abci/types"
+	pvm "github.com/cometbft/cometbft/privval"
+	tmtypes "github.com/cometbft/cometbft/types"
 )
 
 func AddConsumerSectionCmd(defaultNodeHome string) *cobra.Command {

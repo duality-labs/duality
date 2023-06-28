@@ -11,7 +11,7 @@ import (
 	"github.com/duality-labs/duality/x/incentives/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	tmtypes "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmtypes "github.com/cometbft/cometbft/proto/tendermint/types"
 )
 
 var _ DistributorKeeper = MockKeeper{}

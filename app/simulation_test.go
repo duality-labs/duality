@@ -16,9 +16,9 @@ import (
 	"github.com/duality-labs/duality/app"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/spm/cosmoscmd"
-	abci "github.com/tendermint/tendermint/abci/types"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	tmtypes "github.com/tendermint/tendermint/types"
+	abci "github.com/cometbft/cometbft/abci/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	tmtypes "github.com/cometbft/cometbft/types"
 )
 
 func init() {

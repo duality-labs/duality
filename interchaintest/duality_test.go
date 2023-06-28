@@ -16,8 +16,8 @@ import (
 
 	"github.com/strangelove-ventures/interchaintest/v4/testutil"
 	"github.com/stretchr/testify/require"
-	cmtjson "github.com/tendermint/tendermint/libs/json"
-	tmtypes "github.com/tendermint/tendermint/types"
+	cmtjson "github.com/cometbft/cometbft/libs/json"
+	tmtypes "github.com/cometbft/cometbft/types"
 	"go.uber.org/zap/zaptest"
 )
 
