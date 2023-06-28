@@ -5,6 +5,7 @@ import (
 
 	"github.com/tendermint/tendermint/libs/log"
 
+	storetypes "cosmossdk.io/store/types"
 	"github.com/duality-labs/duality/x/epochs/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -12,13 +13,13 @@ import (
 
 type (
 	Keeper struct {
-		storeKey sdk.StoreKey
+		storeKey storetypes.StoreKey
 		hooks    types.EpochHooks
 	}
 )
 
 // NewKeeper returns a new keeper by codec and storeKey inputs.
-func NewKeeper(storeKey sdk.StoreKey) *Keeper {
+func NewKeeper(storeKey storetypes.StoreKey) *Keeper {
 	return &Keeper{
 		storeKey: storeKey,
 	}
