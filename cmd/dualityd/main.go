@@ -5,12 +5,13 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/server"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
+
 	"github.com/duality-labs/duality/app"
-	"github.com/duality-labs/duality/dualityd/cmd"
+	"github.com/duality-labs/duality/cmd/dualityd/cmd"
 )
 
 func main() {
-	rootCmd := cmd.NewRootCmd()
+	rootCmd, _ := cmd.NewRootCmd()
 	if err := svrcmd.Execute(rootCmd, "", app.DefaultNodeHome); err != nil {
 		switch e := err.(type) {
 		case server.ErrorCode:

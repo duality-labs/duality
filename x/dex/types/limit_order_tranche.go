@@ -72,16 +72,20 @@ func (t LimitOrderTranche) RatioFilled() sdk.Dec {
 
 func (t LimitOrderTranche) AmountUnfilled() sdk.Dec {
 	amountFilled := t.PriceTakerToMaker().MulInt(t.TotalTokenOut)
-	return t.TotalTokenIn.ToDec().Sub(amountFilled)
+	return sdk.NewDecFromInt(t.TotalTokenIn).Sub(amountFilled)
 }
 
 func (t LimitOrderTranche) HasLiquidity() bool {
 	return t.ReservesTokenIn.GT(sdk.ZeroInt())
 }
 
-func (t *LimitOrderTranche) RemoveTokenIn(trancheUser LimitOrderTrancheUser) (amountToRemove sdk.Int) {
+func (t *LimitOrderTranche) RemoveTokenIn(
+	trancheUser LimitOrderTrancheUser,
+) (amountToRemove sdk.Int) {
 	amountUnfilled := t.AmountUnfilled()
-	maxAmountToRemove := amountUnfilled.MulInt(trancheUser.SharesOwned).QuoInt(t.TotalTokenIn).TruncateInt()
+	maxAmountToRemove := amountUnfilled.MulInt(trancheUser.SharesOwned).
+		QuoInt(t.TotalTokenIn).
+		TruncateInt()
 	amountToRemove = maxAmountToRemove.Sub(trancheUser.SharesCancelled)
 	t.ReservesTokenIn = t.ReservesTokenIn.Sub(amountToRemove)
 

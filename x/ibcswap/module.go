@@ -2,7 +2,6 @@ package ibcswap
 
 import (
 	"encoding/json"
-	"math/rand"
 
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -44,7 +43,11 @@ func (AppModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 }
 
 // ValidateGenesis performs genesis state validation for the swap module.
-func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncodingConfig, bz json.RawMessage) error {
+func (AppModuleBasic) ValidateGenesis(
+	cdc codec.JSONCodec,
+	config client.TxEncodingConfig,
+	bz json.RawMessage,
+) error {
 	return nil
 }
 
@@ -79,19 +82,9 @@ func NewAppModule(keeper keeper.Keeper) *AppModule {
 // RegisterInvariants implements the AppModule interface.
 func (AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {}
 
-// Route implements the AppModule interface.
-func (am AppModule) Route() sdk.Route {
-	return sdk.Route{}
-}
-
 // QuerierRoute implements the AppModule interface.
 func (AppModule) QuerierRoute() string {
 	return ""
-}
-
-// LegacyQuerierHandler implements the AppModule interface
-func (am AppModule) LegacyQuerierHandler(*codec.LegacyAmino) sdk.Querier {
-	return nil
 }
 
 // RegisterServices registers module services.
@@ -99,7 +92,11 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {}
 
 // InitGenesis performs genesis initialization for the ibc-router module. It returns
 // no validator updates.
-func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.RawMessage) []abci.ValidatorUpdate {
+func (am AppModule) InitGenesis(
+	ctx sdk.Context,
+	cdc codec.JSONCodec,
+	data json.RawMessage,
+) []abci.ValidatorUpdate {
 	return []abci.ValidatorUpdate{}
 }
 
@@ -124,11 +121,6 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {}
 
 // ProposalContents implements the AppModuleSimulation interface.
 func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent {
-	return nil
-}
-
-// RandomizedParams implements the AppModuleSimulation interface.
-func (AppModule) RandomizedParams(r *rand.Rand) []simtypes.ParamChange {
 	return nil
 }
 

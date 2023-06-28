@@ -78,5 +78,5 @@ func (gauge Gauge) EpochsRemaining() uint64 {
 }
 
 func (gauge Gauge) CoinsRemaining() sdk.Coins {
-	return gauge.Coins.Sub(gauge.DistributedCoins)
+	return gauge.Coins.Sub(gauge.DistributedCoins...)
 }

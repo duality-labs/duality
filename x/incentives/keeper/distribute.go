@@ -33,7 +33,7 @@ func (k Keeper) ValueForShares(ctx sdk.Context, coin sdk.Coin, tick int64) (sdk.
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
-	return amount0.ToDec().Add(price1To0Center.MulInt(amount1)).TruncateInt(), nil
+	return sdk.NewDecFromInt(amount0).Add(price1To0Center.MulInt(amount1)).TruncateInt(), nil
 }
 
 // Distribute distributes coins from an array of gauges to all eligible stakes.

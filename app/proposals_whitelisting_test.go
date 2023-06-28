@@ -12,7 +12,12 @@ import (
 )
 
 func TestConsumerWhitelistingKeys(t *testing.T) {
-	chain := ibctesting.NewTestChain(t, ibctesting.NewCoordinator(t, 0), SetupTestingAppConsumer, "test")
+	chain := ibctesting.NewTestChain(
+		t,
+		ibctesting.NewCoordinator(t, 0),
+		SetupTestingAppConsumer,
+		"test",
+	)
 	paramKeeper := chain.App.(*app.App).ParamsKeeper
 	for paramKey := range app.WhitelistedParams {
 		ss, ok := paramKeeper.GetSubspace(paramKey.Subspace)
@@ -24,8 +29,25 @@ func TestConsumerWhitelistingKeys(t *testing.T) {
 
 func SetupTestingAppConsumer() (ibctesting.TestingApp, map[string]json.RawMessage) {
 	db := cmdb.NewMemDB()
-	encCdc := app.MakeTestEncodingConfig()
-	testApp := app.NewApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, app.DefaultNodeHome, 5, encCdc, app.EmptyAppOptions{})
+	encCdc := app.MakeEncodingConfig()
+
+	// TODO: Maybe these are needed
+	// std.RegisterLegacyAminoCodec(encCfg.Amino)
+	// std.RegisterInterfaces(encCfg.InterfaceRegistry)
+	// mb.RegisterLegacyAminoCodec(encCfg.Amino)
+	// mb.RegisterInterfaces(encCfg.InterfaceRegistry)
+
+	testApp := app.NewApp(
+		log.NewNopLogger(),
+		db,
+		nil,
+		true,
+		map[int64]bool{},
+		app.DefaultNodeHome,
+		5,
+		app.EmptyAppOptions{},
+		encCdc,
+	)
 
 	return testApp, app.NewDefaultGenesisState(encCdc.Marshaler)
 }
