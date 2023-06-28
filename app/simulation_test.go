@@ -6,19 +6,19 @@ import (
 	"testing"
 	"time"
 
+	"cosmossdk.io/simapp"
+	abci "github.com/cometbft/cometbft/abci/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	tmtypes "github.com/cometbft/cometbft/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"cosmossdk.io/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simulationtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 	"github.com/duality-labs/duality/app"
+	appparams "github.com/duality-labs/duality/app/params"
 	"github.com/stretchr/testify/require"
-	"github.com/tendermint/spm/cosmoscmd"
-	abci "github.com/cometbft/cometbft/abci/types"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-	tmtypes "github.com/cometbft/cometbft/types"
 )
 
 func init() {
@@ -26,7 +26,7 @@ func init() {
 }
 
 type SimApp interface {
-	cosmoscmd.App
+	app.App
 	GetBaseApp() *baseapp.BaseApp
 	AppCodec() codec.Codec
 	SimulationManager() *module.SimulationManager
@@ -73,7 +73,7 @@ func BenchmarkSimulation(b *testing.B) {
 		require.NoError(b, err)
 	})
 
-	encoding := cosmoscmd.MakeEncodingConfig(app.ModuleBasics)
+	encoding := appparams.MakeTestEncodingConfig(app.ModuleBasics)
 
 	app := app.New(
 		logger,

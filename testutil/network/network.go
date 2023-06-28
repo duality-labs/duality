@@ -6,12 +6,15 @@ import (
 	"testing"
 	"time"
 
+	"cosmossdk.io/simapp"
+	types1 "github.com/cometbft/cometbft/abci/types"
+	tmrand "github.com/cometbft/cometbft/libs/rand"
+	tmtypes "github.com/cometbft/cometbft/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	"cosmossdk.io/simapp"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -22,15 +25,12 @@ import (
 	staking "github.com/cosmos/cosmos-sdk/x/staking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
-	"github.com/tendermint/spm/cosmoscmd"
-	types1 "github.com/cometbft/cometbft/abci/types"
-	tmrand "github.com/cometbft/cometbft/libs/rand"
-	tmtypes "github.com/cometbft/cometbft/types"
 	tmdb "github.com/tendermint/tm-db"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	ccvconsumertypes "github.com/cosmos/interchain-security/v3/x/ccv/consumer/types"
 	"github.com/duality-labs/duality/app"
+	appparams "github.com/duality-labs/duality/app/params"
 	"github.com/duality-labs/duality/testutil"
 )
 
@@ -64,7 +64,7 @@ func DefaultConfig() network.Config {
 	app.ModuleBasics[genutiltypes.ModuleName] = genutil.AppModuleBasic{}
 	app.ModuleBasics[stakingtypes.ModuleName] = staking.AppModuleBasic{}
 
-	encoding := cosmoscmd.MakeEncodingConfig(app.ModuleBasics)
+	encoding := appparams.MakeTestEncodingConfig(app.ModuleBasics)
 
 	return network.Config{
 		Codec:             encoding.Marshaler,
@@ -175,7 +175,7 @@ func DefaultConfigCLITest() network.Config {
 	app.ModuleBasics[genutiltypes.ModuleName] = genutil.AppModuleBasic{}
 	app.ModuleBasics[stakingtypes.ModuleName] = staking.AppModuleBasic{}
 
-	encoding := cosmoscmd.MakeEncodingConfig(app.ModuleBasics)
+	encoding := appparams.MakeTestEncodingConfig(app.ModuleBasics)
 
 	return network.Config{
 		Codec:             encoding.Marshaler,

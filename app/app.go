@@ -14,6 +14,10 @@ import (
 	// adminmodulemoduletypes "github.com/cosmos/admin-module/x/adminmodule/types"
 
 	"cosmossdk.io/simapp"
+	abci "github.com/cometbft/cometbft/abci/types"
+	tmjson "github.com/cometbft/cometbft/libs/json"
+	"github.com/cometbft/cometbft/libs/log"
+	tmos "github.com/cometbft/cometbft/libs/os"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
@@ -75,11 +79,6 @@ import (
 	forwardmiddleware "github.com/strangelove-ventures/packet-forward-middleware/v7/router"
 	forwardkeeper "github.com/strangelove-ventures/packet-forward-middleware/v7/router/keeper"
 	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v7/router/types"
-	"github.com/tendermint/spm/cosmoscmd"
-	abci "github.com/cometbft/cometbft/abci/types"
-	tmjson "github.com/cometbft/cometbft/libs/json"
-	"github.com/cometbft/cometbft/libs/log"
-	tmos "github.com/cometbft/cometbft/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
 	ccvconsumer "github.com/cosmos/interchain-security/v3/x/ccv/consumer"
@@ -92,6 +91,7 @@ import (
 
 	icstestintegration "github.com/cosmos/interchain-security/v3/testutil/integration"
 
+	appparams "github.com/duality-labs/duality/app/params"
 	epochsmodule "github.com/duality-labs/duality/x/epochs"
 	epochsmodulekeeper "github.com/duality-labs/duality/x/epochs/keeper"
 	epochsmoduletypes "github.com/duality-labs/duality/x/epochs/types"
@@ -167,7 +167,6 @@ var (
 )
 
 var (
-	_ cosmoscmd.App           = (*App)(nil)
 	_ servertypes.Application = (*App)(nil)
 	_ simapp.App              = (*App)(nil)
 )
@@ -244,10 +243,10 @@ func New(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
-	encodingConfig cosmoscmd.EncodingConfig,
+	encodingConfig appparams.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
-) cosmoscmd.App {
+) *App {
 	return NewApp(
 		logger,
 		db,
@@ -269,7 +268,7 @@ func NewApp(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
-	encodingConfig cosmoscmd.EncodingConfig,
+	encodingConfig appparams.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
@@ -863,7 +862,7 @@ func (app *App) SimulationManager() *module.SimulationManager {
 
 // GetTxConfig implements the TestingApp interface.
 func (app *App) GetTxConfig() client.TxConfig {
-	return cosmoscmd.MakeEncodingConfig(ModuleBasics).TxConfig
+	return appparams.MakeTestEncodingConfig(ModuleBasics).TxConfig
 }
 
 // GetIBCKeeper implements the TestingApp interface.

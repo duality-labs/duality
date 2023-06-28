@@ -5,10 +5,9 @@ import (
 
 	"cosmossdk.io/simapp"
 
-	ibctesting "github.com/cosmos/interchain-security/v3/legacy_ibc_testing/testing"
-
-	"github.com/tendermint/spm/cosmoscmd"
 	"github.com/cometbft/cometbft/libs/log"
+	ibctesting "github.com/cosmos/interchain-security/v3/legacy_ibc_testing/testing"
+	appparams "github.com/duality-labs/duality/app/params"
 	tmdb "github.com/tendermint/tm-db"
 
 	appConsumer "github.com/duality-labs/duality/app"
@@ -16,7 +15,7 @@ import (
 
 // DualityAppIniter implements ibctesting.AppIniter for the duality consumer app
 func DualityAppIniter() (ibctesting.TestingApp, map[string]json.RawMessage) {
-	encoding := cosmoscmd.MakeEncodingConfig(appConsumer.ModuleBasics)
+	encoding := appparams.MakeTestEncodingConfig(appConsumer.ModuleBasics)
 	testApp := appConsumer.New(log.NewNopLogger(), tmdb.NewMemDB(), nil, true, map[int64]bool{},
 		simapp.DefaultNodeHome, 5, encoding, simapp.EmptyAppOptions{}).(ibctesting.TestingApp)
 
