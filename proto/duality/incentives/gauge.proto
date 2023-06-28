@@ -103,7 +103,7 @@ message Gauge {
 message QueryCondition {
 
   // pairID is the token pair which should be distributed to.
-  dualitylabs.duality.dex.PairID pairID = 1;
+  duality.dex.PairID pairID = 1;
 
   // start_tick is the inclusive lower bound on the location of LP tokens that
   // qualify for a gauge's distribution.

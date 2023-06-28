@@ -1,5 +1,5 @@
 syntax = "proto3";
-package dualitylabs.duality.dex;
+package duality.dex;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
@@ -19,67 +19,67 @@ option go_package = "github.com/duality-labs/duality/x/dex/types";
 service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/dualitylabs/duality/dex/params";
+    option (google.api.http).get = "/duality/dex/params";
   }
 
   // Queries a LimitOrderTrancheUser by index.
 	rpc LimitOrderTrancheUser(QueryGetLimitOrderTrancheUserRequest) returns (QueryGetLimitOrderTrancheUserResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche_user/{address}/{trancheKey}";
+		option (google.api.http).get = "/duality/dex/limit_order_tranche_user/{address}/{trancheKey}";
 	}
 
 	// Queries a list of LimitOrderTrancheMap items.
 	rpc LimitOrderTrancheUserAll(QueryAllLimitOrderTrancheUserRequest) returns (QueryAllLimitOrderTrancheUserResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche_user";
+		option (google.api.http).get = "/duality/dex/limit_order_tranche_user";
 	}
 
   // Queries a LimitOrderTranche by index.
  rpc LimitOrderTranche(QueryGetLimitOrderTrancheRequest) returns (QueryGetLimitOrderTrancheResponse) {
-  	option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche/{pairID}/{tokenIn}/{tickIndex}/{trancheKey}";
+  	option (google.api.http).get = "/duality/dex/limit_order_tranche/{pairID}/{tokenIn}/{tickIndex}/{trancheKey}";
   }
 
   // Queries a list of LimitOrderTranche items for a given pairID / TokenIn combination.
   rpc LimitOrderTrancheAll(QueryAllLimitOrderTrancheRequest) returns (QueryAllLimitOrderTrancheResponse) {
-  	option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche/{pairID}/{tokenIn}";
+  	option (google.api.http).get = "/duality/dex/limit_order_tranche/{pairID}/{tokenIn}";
   }
 
   // Queries a list of GetUserPositions items.
 	rpc GetUserPositions(QueryGetUserPositionsRequest) returns (QueryGetUserPositionsResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/user/positions/{address}";
+		option (google.api.http).get = "/duality/dex/user/positions/{address}";
 	}
 
 // Queries a list of UserDeposits items.
 	rpc UserDepositsAll(QueryAllUserDepositsRequest) returns (QueryAllUserDepositsResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/user/deposits/{address}";
+		option (google.api.http).get = "/duality/dex/user/deposits/{address}";
 	}
 
 // Queries a list of UserLimitOrders items.
 	rpc UserLimitOrdersAll(QueryAllUserLimitOrdersRequest) returns (QueryAllUserLimitOrdersResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/user/limit_orders/{address}";
+		option (google.api.http).get = "/duality/dex/user/limit_orders/{address}";
 	}
 
 	// Queries a list of TickLiquidity items.
 	rpc TickLiquidityAll(QueryAllTickLiquidityRequest) returns (QueryAllTickLiquidityResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/tick_liquidity/{pairID}/{tokenIn}";
+		option (google.api.http).get = "/duality/dex/tick_liquidity/{pairID}/{tokenIn}";
 	}
 
 // Queries a InactiveLimitOrderTranche by index.
 	rpc InactiveLimitOrderTranche(QueryGetInactiveLimitOrderTrancheRequest) returns (QueryGetInactiveLimitOrderTrancheResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/filled_limit_order_tranche/{pairID}/{tokenIn}/{tickIndex}/{trancheKey}";
+		option (google.api.http).get = "/duality/dex/filled_limit_order_tranche/{pairID}/{tokenIn}/{tickIndex}/{trancheKey}";
 	}
 
 	// Queries a list of InactiveLimitOrderTranche items.
 	rpc InactiveLimitOrderTrancheAll(QueryAllInactiveLimitOrderTrancheRequest) returns (QueryAllInactiveLimitOrderTrancheResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/filled_limit_order_tranche";
+		option (google.api.http).get = "/duality/dex/filled_limit_order_tranche";
 	}
 
 // Queries a list of PoolReserves items.
 	rpc PoolReservesAll(QueryAllPoolReservesRequest) returns (QueryAllPoolReservesResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/pool_reserves/{pairID}/{tokenIn}";
+		option (google.api.http).get = "/duality/dex/pool_reserves/{pairID}/{tokenIn}";
 	}
 
   // Queries a PoolReserve by index
   rpc PoolReserves(QueryGetPoolReservesRequest) returns (QueryGetPoolReservesResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/pool_reserves/{pairID}/{tokenIn}/{tickIndex}/{fee}";
+		option (google.api.http).get = "/duality/dex/pool_reserves/{pairID}/{tokenIn}/{tickIndex}/{fee}";
 	}
 
 // this line is used by starport scaffolding # 2

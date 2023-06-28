@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
+	"github.com/cosmos/gogoproto/proto"
 	db "github.com/tendermint/tm-db"
 
 	dextypes "github.com/duality-labs/duality/x/dex/types"
