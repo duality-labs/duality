@@ -3,9 +3,9 @@ package testutil
 import (
 	"time"
 
-	ibctypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
-	"github.com/cosmos/ibc-go/v4/modules/core/23-commitment/types"
-	ibctmtypes "github.com/cosmos/ibc-go/v4/modules/light-clients/07-tendermint/types"
+	ibctypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
+	"github.com/cosmos/ibc-go/v7/modules/core/23-commitment/types"
+	"github.com/cosmos/ibc-go/v7/modules/core/exported"
 	ccvconsumertypes "github.com/cosmos/interchain-security/v3/x/ccv/consumer/types"
 	ccvprovidertypes "github.com/cosmos/interchain-security/v3/x/ccv/provider/types"
 	typesccv "github.com/cosmos/interchain-security/v3/x/ccv/types"
@@ -25,7 +25,7 @@ func CreateMinimalConsumerTestGenesis() *ccvconsumertypes.GenesisState {
 	genesisState.ProviderClientState.TrustingPeriod, _ = typesccv.CalculateTrustPeriod(genesisState.Params.UnbondingPeriod, ccvprovidertypes.DefaultTrustingPeriodFraction)
 	genesisState.ProviderClientState.UnbondingPeriod = genesisState.Params.UnbondingPeriod
 	genesisState.ProviderClientState.MaxClockDrift = ccvprovidertypes.DefaultMaxClockDrift
-	genesisState.ProviderConsensusState = &ibctmtypes.ConsensusState{
+	genesisState.ProviderConsensusState = &exported.ConsensusState{
 		Timestamp: time.Now().UTC(),
 		Root:      types.MerkleRoot{Hash: []byte("dummy")},
 	}
