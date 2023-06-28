@@ -19,7 +19,7 @@ import (
 	"github.com/strangelove-ventures/interchaintest/v4/relayer/rly"
 	"github.com/strangelove-ventures/interchaintest/v4/testreporter"
 	"github.com/strangelove-ventures/interchaintest/v4/testutil"
-	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
+	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v7/router/types"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest"
 )

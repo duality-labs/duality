@@ -14,7 +14,7 @@ import (
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 	"github.com/duality-labs/duality/x/ibcswap/keeper"
 	"github.com/duality-labs/duality/x/ibcswap/types"
-	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
+	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v7/router/types"
 )
 
 var _ porttypes.Middleware = &IBCMiddleware{}

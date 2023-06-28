@@ -5,8 +5,8 @@ go 1.18
 require (
 	github.com/cosmos/admin-module v0.0.0
 	github.com/cosmos/cosmos-sdk v0.47.3
-	github.com/cosmos/interchain-security/v3 v3.0.0-20230627090306-fcb1ff43a83b
 	github.com/cosmos/ibc-go/v7 v7.1.0
+	github.com/cosmos/interchain-security/v3 v3.0.0-20230627090306-fcb1ff43a83b
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.3
 	github.com/gorilla/mux v1.8.0
@@ -15,7 +15,7 @@ require (
 	github.com/ignite/cli v0.25.2
 	github.com/spf13/cast v1.5.1
 	github.com/spf13/cobra v1.7.0
-	github.com/strangelove-ventures/packet-forward-middleware/v4 v4.0.5
+	github.com/strangelove-ventures/packet-forward-middleware/v7 v7.0.0-20230313184032-deafca012b7a
 	github.com/stretchr/testify v1.8.4
 	github.com/tendermint/spm v0.1.9
 	github.com/tendermint/tendermint v0.34.27
