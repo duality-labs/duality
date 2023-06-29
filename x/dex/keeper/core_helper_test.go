@@ -32,7 +32,7 @@ func TestCoreHelpersTestSuite(t *testing.T) {
 }
 
 func (s *CoreHelpersTestSuite) SetupTest() {
-	app := dualityapp.Setup(s.T(), false)
+	app := dualityapp.Setup(false)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
 	app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())

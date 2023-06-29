@@ -22,7 +22,7 @@ type LiquidityTestSuite struct {
 // don't need to test both LO and LP. At the level of swap testing these should be indistinguishable.
 
 func (s *LiquidityTestSuite) SetupTest() {
-	s.app = dualityapp.Setup(s.T(), false)
+	s.app = dualityapp.Setup(false)
 	ctx := s.app.BaseApp.NewContext(false, tmproto.Header{})
 	ctx = ctx.WithBlockGasMeter(sdk.NewInfiniteGasMeter())
 	s.ctx = ctx

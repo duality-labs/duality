@@ -2,6 +2,7 @@
 package app
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -736,6 +737,35 @@ func (app *App) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.Respo
 	return app.mm.EndBlock(ctx, req)
 }
 
+func (app *App) InitGenesisWithEmptyValSet(ctx sdk.Context, cdc codec.JSONCodec, genesisData map[string]json.RawMessage) abci.ResponseInitChain {
+	var validatorUpdates []abci.ValidatorUpdate
+	ctx.Logger().Info("initializing blockchain state from genesis.json")
+	for _, moduleName := range app.mm.OrderInitGenesis {
+		if genesisData[moduleName] == nil {
+			continue
+		}
+
+		if module, ok := app.mm.Modules[moduleName].(module.HasGenesis); ok {
+			ctx.Logger().Debug("running initialization for module", "module", moduleName)
+
+			moduleValUpdates := module.InitGenesis(ctx, cdc, genesisData[moduleName])
+
+			// use these validator updates if provided, the module manager assumes
+			// only one module will update the validator set
+			if len(moduleValUpdates) > 0 {
+				if len(validatorUpdates) > 0 {
+					panic("validator InitGenesis updates already set by a previous module")
+				}
+				validatorUpdates = moduleValUpdates
+			}
+		}
+	}
+
+	return abci.ResponseInitChain{
+		Validators: validatorUpdates,
+	}
+}
+
 // InitChainer application update at chain initialization
 func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState GenesisState
@@ -744,8 +774,13 @@ func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.Res
 	}
 	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
 
-	// return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
-	return abci.ResponseInitChain{Validators: req.Validators}
+	respIntChain := app.InitGenesisWithEmptyValSet(ctx, app.appCodec, genesisState)
+
+	if len(respIntChain.Validators) != 0 {
+		return respIntChain
+	} else {
+		return abci.ResponseInitChain{Validators: req.Validators}
+	}
 }
 
 // LoadHeight loads a particular height

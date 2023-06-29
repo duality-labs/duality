@@ -41,7 +41,7 @@ var DefaultConsensusParams = &tmproto.ConsensusParams{
 	},
 }
 
-func setup(withGenesis bool, invCheckPeriod uint, chainID string) (*App, GenesisState) {
+func setup(withGenesis bool, invCheckPeriod uint) (*App, GenesisState) {
 	db := dbm.NewMemDB()
 	encCdc := MakeTestEncodingConfig()
 	app := NewApp(log.NewNopLogger(),
@@ -53,7 +53,7 @@ func setup(withGenesis bool, invCheckPeriod uint, chainID string) (*App, Genesis
 		invCheckPeriod,
 		encCdc,
 		EmptyAppOptions{},
-		baseapp.SetChainID(chainID),
+		baseapp.SetChainID(Name),
 	)
 	if withGenesis {
 		return app, NewDefaultGenesisState(encCdc.Marshaler)
@@ -63,35 +63,34 @@ func setup(withGenesis bool, invCheckPeriod uint, chainID string) (*App, Genesis
 }
 
 // Setup initializes a new SimApp. A Nop logger is set in SimApp.
-func Setup(t *testing.T, isCheckTx bool) *App {
+// func Setup(t *testing.T, isCheckTx bool) *App {
+// 	// Give bank module minter permissions for testing (ie. KeeperTestHelper.FundAcc)
+// 	// maccPerms[banktypes.ModuleName] = []string{authtypes.Minter}
+// 	app, _ := setup(false, 5)
+// 	if !isCheckTx {
+// 		genesisState, _ := GenesisStateWithValSet(app)
+// 		// genesisState := NewDefaultGenesisState(app.appCodec)
+// 		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
+// 		if err != nil {
+// 			panic(err)
+// 		}
+
+// 		app.InitChain(
+// 			abci.RequestInitChain{
+// 				Validators:      []abci.ValidatorUpdate{},
+// 				ConsensusParams: DefaultConsensusParams,
+// 				AppStateBytes:   stateBytes,
+// 			},
+// 		)
+// 	}
+
+// 	return app
+// }
+
+func Setup(isCheckTx bool) *App {
 	// Give bank module minter permissions for testing (ie. KeeperTestHelper.FundAcc)
 	// maccPerms[banktypes.ModuleName] = []string{authtypes.Minter}
-	app, _ := setup(false, 5, "duality")
-	if !isCheckTx {
-		genesisState, _ := GenesisStateWithValSet(app)
-
-		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
-		if err != nil {
-			panic(err)
-		}
-
-		app.InitChain(
-			abci.RequestInitChain{
-				ChainId:         "duality",
-				Validators:      []abci.ValidatorUpdate{},
-				ConsensusParams: DefaultConsensusParams,
-				AppStateBytes:   stateBytes,
-			},
-		)
-	}
-
-	return app
-}
-
-func Setup2(isCheckTx bool, chainID string) *App {
-	// Give bank module minter permissions for testing (ie. KeeperTestHelper.FundAcc)
-	// maccPerms[banktypes.ModuleName] = []string{authtypes.Minter}
-	app, _ := setup(false, 5, chainID)
+	app, _ := setup(false, 5)
 	if !isCheckTx {
 		genesisState, valSet := GenesisStateWithValSet(app)
 
@@ -114,7 +113,7 @@ func Setup2(isCheckTx bool, chainID string) *App {
 
 		app.InitChain(
 			abci.RequestInitChain{
-				ChainId:         chainID,
+				ChainId:         Name,
 				Validators:      valUpdate,
 				ConsensusParams: DefaultConsensusParams,
 				AppStateBytes:   stateBytes,
@@ -126,7 +125,6 @@ func Setup2(isCheckTx bool, chainID string) *App {
 		// app.Commit()
 
 		// app.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
-		// 	ChainID:            chainID,
 		// 	Height:             app.LastBlockHeight() + 1,
 		// 	AppHash:            app.LastCommitID().Hash,
 		// 	ValidatorsHash:     valSet.Hash(),
@@ -146,7 +144,7 @@ func SetupWithGenesisValSet(
 ) *App {
 	t.Helper()
 
-	app, genesisState := setup(true, 5, "dualitysdsd")
+	app, genesisState := setup(true, 5)
 	genesisState, _ = GenesisStateWithValSet(app)
 
 	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
@@ -250,6 +248,9 @@ func GenesisStateWithValSet(app *App) (GenesisState, *tmtypes.ValidatorSet) {
 		[]banktypes.SendEnabled{},
 	)
 	genesisState[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
+
+	// update ccvconsumer
+
 	return genesisState, valSet
 }
 

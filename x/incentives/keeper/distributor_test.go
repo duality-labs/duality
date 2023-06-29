@@ -35,7 +35,7 @@ func (k MockKeeper) GetStakesByQueryCondition(ctx sdk.Context, distrTo *types.Qu
 }
 
 func TestDistributor(t *testing.T) {
-	app := app.Setup(t, false)
+	app := app.Setup(false)
 	ctx := app.BaseApp.NewContext(false, tmtypes.Header{Height: 1, ChainID: "duality-1", Time: time.Now().UTC()})
 
 	gauge := types.NewGauge(

@@ -60,10 +60,7 @@ func New(t *testing.T, configs ...network.Config) *network.Network {
 func DefaultConfig() network.Config {
 	app.ModuleBasics[genutiltypes.ModuleName] = genutil.AppModuleBasic{}
 	app.ModuleBasics[stakingtypes.ModuleName] = staking.AppModuleBasic{}
-	var (
-		encoding = app.MakeTestEncodingConfig()
-		chainID  = "chain-" + tmrand.NewRand().Str(6)
-	)
+	encoding := app.MakeTestEncodingConfig()
 	return network.Config{
 		Codec:             encoding.Marshaler,
 		TxConfig:          encoding.TxConfig,
@@ -75,7 +72,7 @@ func DefaultConfig() network.Config {
 			if err != nil {
 				panic(err)
 			}
-			return app.Setup2(false, chainID)
+			return app.Setup(false)
 			// 	return app.New(
 			// 		val.GetCtx().Logger,
 			// 		dbm.NewMemDB(),
@@ -93,7 +90,7 @@ func DefaultConfig() network.Config {
 		},
 		GenesisState:    app.ModuleBasics.DefaultGenesis(encoding.Marshaler),
 		TimeoutCommit:   2 * time.Second,
-		ChainID:         chainID,
+		ChainID:         app.Name,
 		NumValidators:   1,
 		BondDenom:       sdk.DefaultBondDenom,
 		MinGasPrices:    fmt.Sprintf("0.000006%s", sdk.DefaultBondDenom),

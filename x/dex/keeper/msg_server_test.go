@@ -11,6 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/duality-labs/duality/app"
 	dualityapp "github.com/duality-labs/duality/app"
 	. "github.com/duality-labs/duality/x/dex/keeper"
 	. "github.com/duality-labs/duality/x/dex/keeper/internal/testutils"
@@ -39,7 +40,7 @@ func TestMsgServerTestSuite(t *testing.T) {
 }
 
 func (s *MsgServerTestSuite) SetupTest() {
-	app := dualityapp.Setup(s.T(), false)
+	app := dualityapp.Setup(false)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 	ctx = ctx.WithBlockGasMeter(sdk.NewInfiniteGasMeter())
 
@@ -1438,7 +1439,8 @@ func (s *MsgServerTestSuite) nextBlockWithTime(blockTime time.Time) {
 	s.ctx = newCtx
 	s.goCtx = sdk.WrapSDKContext(newCtx)
 	s.app.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
-		Height: s.app.LastBlockHeight() + 1, AppHash: s.app.LastCommitID().Hash,
+		ChainID: app.Name,
+		Height:  s.app.LastBlockHeight() + 1, AppHash: s.app.LastCommitID().Hash,
 		Time: blockTime,
 	}})
 }

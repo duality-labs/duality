@@ -118,7 +118,7 @@ func initializeBlankEpochInfoFields(epoch types.EpochInfo, identifier string, du
 }
 
 func TestEpochStartingOneMonthAfterInitGenesis(t *testing.T) {
-	app := simapp.Setup(t, false)
+	app := simapp.Setup(false)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
 	// On init genesis, default epochs information is set
