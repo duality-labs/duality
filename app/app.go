@@ -76,6 +76,7 @@ import (
 	ibcporttypes "github.com/cosmos/ibc-go/v7/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
+	tendermint "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
 	ibctestingcore "github.com/cosmos/interchain-security/v3/legacy_ibc_testing/core"
 	ibctesting "github.com/cosmos/interchain-security/v3/legacy_ibc_testing/testing"
 	"github.com/spf13/cast"
@@ -155,6 +156,7 @@ var (
 		swapmiddleware.AppModuleBasic{},
 		epochsmodule.AppModuleBasic{},
 		incentivesmodule.AppModuleBasic{},
+		tendermint.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
