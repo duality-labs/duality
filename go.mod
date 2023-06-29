@@ -3,6 +3,7 @@ module github.com/duality-labs/duality
 go 1.19
 
 require (
+	cosmossdk.io/math v1.0.1
 	github.com/cometbft/cometbft v0.37.2
 	github.com/cometbft/cometbft-db v0.8.0
 	github.com/cosmos/cosmos-sdk v0.47.3
@@ -32,7 +33,6 @@ require (
 	cosmossdk.io/api v0.3.1 // indirect
 	cosmossdk.io/errors v1.0.0-beta.7 // indirect
 	cosmossdk.io/log v1.1.0 // indirect
-	cosmossdk.io/math v1.0.1 // indirect
 	cosmossdk.io/tools/rosetta v0.2.1 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/OneOfOne/xxhash v1.2.8 // indirect

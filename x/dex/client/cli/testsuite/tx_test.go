@@ -33,8 +33,6 @@ type TxTestSuite struct {
 	clientCtx client.Context
 	addrs     []sdk.AccAddress
 
-	addr1      sdk.AccAddress
-	addr2      sdk.AccAddress
 	trancheKey string
 }
 
@@ -162,7 +160,7 @@ func (s *TxTestSuite) TestTxCmdDeposit() {
 				"[0]",
 				"1",
 				"false",
-				s.addr1.String(),
+				s.addrs[0].String(),
 			},
 			expErr:    true,
 			expErrMsg: "Error: accepts 8 arg(s), received 9",
@@ -279,7 +277,7 @@ func (s *TxTestSuite) TestTx2CmdWithdraw() {
 				"10",
 				"[0]",
 				"1",
-				s.addr1.String(),
+				s.addrs[0].String(),
 			},
 			expErr:    true,
 			expErrMsg: "Error: accepts 6 arg(s), received 7",
@@ -356,26 +354,42 @@ func (s *TxTestSuite) TestTx4Cmd4PlaceLimitOrder() {
 		{
 			// "place-limit-order [receiver] [token-in] [token-out] [tick-index] [amount-in] ?[order-type] ?[expirationTime] ?(--max-amout-out)"
 			name:      "missing arguments",
-			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]"},
+			args:      []string{s.addrs[0].String(), "TokenA", "TokenB", "[0]"},
 			expErr:    true,
 			expErrMsg: "Error: accepts between 5 and 7 arg(s), received 4",
 		},
 		{
-			name:      "too many arguments",
-			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "10", "1", "1", "BAD"},
+			name: "too many arguments",
+			args: []string{
+				s.addrs[0].String(),
+				"TokenA",
+				"TokenB",
+				"[0]",
+				"10",
+				"1",
+				"1",
+				"BAD",
+			},
 			expErr:    true,
 			expErrMsg: "Error: accepts between 5 and 7 arg(s), received 8",
 		},
 		{
-			name:      "invalid orderType",
-			args:      []string{s.addr1.String(), "TokenA", "TokenB", "[0]", "10", "JUST_SEND_IT"},
+			name: "invalid orderType",
+			args: []string{
+				s.addrs[0].String(),
+				"TokenA",
+				"TokenB",
+				"[0]",
+				"10",
+				"JUST_SEND_IT",
+			},
 			expErr:    true,
 			expErrMsg: types.ErrInvalidOrderType.Error(),
 		},
 		{
 			name: "invalid goodTil",
 			args: []string{
-				s.addr1.String(),
+				s.addrs[0].String(),
 				"TokenA",
 				"TokenB",
 				"[0]",
@@ -388,13 +402,13 @@ func (s *TxTestSuite) TestTx4Cmd4PlaceLimitOrder() {
 		},
 		{
 			name:     "valid",
-			args:     []string{s.addr1.String(), "TokenB", "TokenA", "[0]", "10"},
+			args:     []string{s.addrs[0].String(), "TokenB", "TokenA", "[0]", "10"},
 			errInRes: false,
 		},
 		{
 			name: "valid goodTil",
 			args: []string{
-				s.addr1.String(),
+				s.addrs[0].String(),
 				"TokenB",
 				"TokenA",
 				"[0]",
@@ -407,7 +421,7 @@ func (s *TxTestSuite) TestTx4Cmd4PlaceLimitOrder() {
 		{
 			name: "valid with maxAmountOut",
 			args: []string{
-				s.addr1.String(),
+				s.addrs[0].String(),
 				"TokenB",
 				"TokenA",
 				"[2]",
@@ -529,7 +543,7 @@ func (s *TxTestSuite) TestTx6CmdWithdrawFilledLimitOrder() {
 	trancheKey := findTrancheKeyInTx(txBuff.String())
 
 	argsSwap := append(
-		[]string{s.addr1.String(), "TokenA", "TokenB", "0", "30", "IMMEDIATE_OR_CANCEL"},
+		[]string{s.addrs[0].String(), "TokenA", "TokenB", "0", "30", "IMMEDIATE_OR_CANCEL"},
 		commonFlags...)
 	cmd = dexClient.CmdPlaceLimitOrder()
 	_, err = cli.ExecTestCLICmd(s.clientCtx, cmd, argsSwap)

@@ -9,6 +9,7 @@ import (
 
 	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
 	"github.com/cosmos/cosmos-sdk/runtime"
+	"github.com/cosmos/cosmos-sdk/x/genutil"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	proposaltypes "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 
@@ -157,6 +158,7 @@ var (
 		epochsmodule.AppModuleBasic{},
 		incentivesmodule.AppModuleBasic{},
 		tendermint.AppModuleBasic{},
+		genutil.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
