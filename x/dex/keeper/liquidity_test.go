@@ -4,12 +4,12 @@ import (
 	"math"
 	"testing"
 
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	dualityapp "github.com/duality-labs/duality/app"
 	keepertest "github.com/duality-labs/duality/testutil/keeper"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/suite"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 )
 
 type LiquidityTestSuite struct {
@@ -22,7 +22,7 @@ type LiquidityTestSuite struct {
 // don't need to test both LO and LP. At the level of swap testing these should be indistinguishable.
 
 func (s *LiquidityTestSuite) SetupTest() {
-	s.app = dualityapp.Setup(false)
+	s.app = dualityapp.Setup(s.T(), false)
 	ctx := s.app.BaseApp.NewContext(false, tmproto.Header{})
 	ctx = ctx.WithBlockGasMeter(sdk.NewInfiniteGasMeter())
 	s.ctx = ctx

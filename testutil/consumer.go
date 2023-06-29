@@ -9,7 +9,6 @@ import (
 	ccvconsumertypes "github.com/cosmos/interchain-security/v3/x/ccv/consumer/types"
 	ccvprovidertypes "github.com/cosmos/interchain-security/v3/x/ccv/provider/types"
 	typesccv "github.com/cosmos/interchain-security/v3/x/ccv/types"
-	"github.com/duality-labs/duality/app"
 )
 
 // This function creates consumer module genesis state that is used as starting point for modifications
@@ -20,7 +19,7 @@ func CreateMinimalConsumerTestGenesis() *ccvconsumertypes.GenesisState {
 	genesisState.Params.Enabled = true
 	genesisState.NewChain = true
 	genesisState.ProviderClientState = ccvprovidertypes.DefaultParams().TemplateClient
-	genesisState.ProviderClientState.ChainId = app.Name
+	genesisState.ProviderClientState.ChainId = "duality"
 	genesisState.ProviderClientState.LatestHeight = ibctypes.Height{RevisionNumber: 0, RevisionHeight: 1}
 	genesisState.ProviderClientState.TrustingPeriod, _ = typesccv.CalculateTrustPeriod(genesisState.Params.UnbondingPeriod, ccvprovidertypes.DefaultTrustingPeriodFraction)
 	genesisState.ProviderClientState.UnbondingPeriod = genesisState.Params.UnbondingPeriod

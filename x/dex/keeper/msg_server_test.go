@@ -39,7 +39,7 @@ func TestMsgServerTestSuite(t *testing.T) {
 }
 
 func (s *MsgServerTestSuite) SetupTest() {
-	app := dualityapp.Setup(false)
+	app := dualityapp.Setup(s.T(), false)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 	ctx = ctx.WithBlockGasMeter(sdk.NewInfiniteGasMeter())
 

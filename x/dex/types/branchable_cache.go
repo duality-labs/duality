@@ -13,11 +13,11 @@ func (bc BranchableCache) Branch() BranchableCache {
 		// To write a branch back the root KVstore we have to recursively call
 		// the write fn for all parent branches
 		writeCache()
-		// NOTE: in current version events from the cache are never passed to the
-		// parent context. This is fixed in cosmos v0.46.4
-		// Once we update, the below code can be removed
-		bc.Ctx.EventManager().EmitEvents(cacheCtx.EventManager().Events())
-		bc.Write()
+		// // NOTE: in current version events from the cache are never passed to the
+		// // parent context. This is fixed in cosmos v0.46.4
+		// // Once we update, the below code can be removed
+		// bc.Ctx.EventManager().EmitEvents(cacheCtx.EventManager().Events())
+		// bc.Write()
 	}
 
 	return BranchableCache{Ctx: cacheCtx, Write: newWriteFn}

@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"testing"
 
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -11,7 +12,6 @@ import (
 	. "github.com/duality-labs/duality/x/dex/keeper"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/suite"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 )
 
 // Test Suite ///////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ func TestCoreHelpersTestSuite(t *testing.T) {
 }
 
 func (s *CoreHelpersTestSuite) SetupTest() {
-	app := dualityapp.Setup(false)
+	app := dualityapp.Setup(s.T(), false)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
 	app.AccountKeeper.SetParams(ctx, authtypes.DefaultParams())

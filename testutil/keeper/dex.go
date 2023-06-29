@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"testing"
 
 	dbm "github.com/cometbft/cometbft-db"
@@ -69,6 +70,7 @@ func AssertNEventsEmitted(t *testing.T, ctx sdk.Context, eventValue string, nEve
 	allEvents := ctx.EventManager().Events()
 	for _, event := range allEvents {
 		for _, attr := range event.Attributes {
+			fmt.Printf("EVENT: %v\n", string(attr.Value))
 			if string(attr.Value) == eventValue {
 				emissions++
 			}
