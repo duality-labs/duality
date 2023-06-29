@@ -26,7 +26,8 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	consumertypes "github.com/cosmos/interchain-security/v3/x/ccv/consumer/types"
-	"github.com/duality-labs/duality/testutil"
+
+	dualitytestutil "github.com/duality-labs/duality/testutil"
 
 	"github.com/stretchr/testify/require"
 )
@@ -374,7 +375,7 @@ func GenesisStateWithValSet(
 		panic("failed to get vals")
 	}
 
-	consumerGenesisState := testutil.CreateMinimalConsumerTestGenesis()
+	consumerGenesisState := dualitytestutil.CreateMinimalConsumerTestGenesis()
 	consumerGenesisState.InitialValSet = initValPowers
 	consumerGenesisState.ProviderConsensusState.NextValidatorsHash = tmtypes.NewValidatorSet(vals).
 		Hash()
@@ -405,3 +406,42 @@ func FundAccount(
 
 	return bankKeeper.SendCoinsFromModuleToAccount(ctx, banktypes.ModuleName, addr, amounts)
 }
+
+// // NewTestNetworkFixture returns a new simapp AppConstructor for network simulation tests
+// func NewTestNetworkFixture() network.TestFixture {
+// 	dir, err := os.MkdirTemp("", "simapp")
+// 	if err != nil {
+// 		panic(fmt.Sprintf("failed creating temporary directory: %v", err))
+// 	}
+// 	defer os.RemoveAll(dir)
+
+// 	encConfig := app.MakeEncodingConfig()
+
+// 	appCtr := func(val network.ValidatorI) servertypes.Application {
+// 		return NewApp(
+// 			val.GetCtx().Logger,
+// 			dbm.NewMemDB(),
+// 			nil,
+// 			true,
+// 			simtestutil.NewAppOptionsWithFlagHome(val.GetCtx().Config.RootDir),
+// 			DefaultNodeHome,
+// 			app.invCheckPeriod,
+// 			EmptyAppOptions{},
+// 			encConfig,
+// 			bam.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
+// 			bam.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
+// 			bam.SetChainID(val.GetCtx().Viper.GetString(flags.FlagChainID)),
+// 		)
+// 	}
+
+// 	return network.TestFixture{
+// 		AppConstructor: appCtr,
+// 		GenesisState:   NewDefaultGenesisState(app.AppCodec()),
+// 		EncodingConfig: moduletestutil.TestEncodingConfig{
+// 			InterfaceRegistry: app.InterfaceRegistry(),
+// 			Codec:             app.AppCodec(),
+// 			TxConfig:          app.TxConfig(),
+// 			Amino:             app.LegacyAmino(),
+// 		},
+// 	}
+// }
