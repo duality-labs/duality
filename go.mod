@@ -185,3 +185,5 @@ require (
 	gotest.tools v2.2.0+incompatible
 	nhooyr.io/websocket v1.8.6 // indirect
 )
+
+replace github.com/cosmos/ibc-go/v7 => github.com/Stride-Labs/ibc-go/v7 v7.1.1-0.20230622125415-f45876a168a0

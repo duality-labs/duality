@@ -30,13 +30,19 @@ func (k MockKeeper) ValueForShares(ctx sdk.Context, coin sdk.Coin, tick int64) (
 	return coin.Amount.Mul(sdk.NewInt(2)), nil
 }
 
-func (k MockKeeper) GetStakesByQueryCondition(ctx sdk.Context, distrTo *types.QueryCondition) types.Stakes {
+func (k MockKeeper) GetStakesByQueryCondition(
+	ctx sdk.Context,
+	distrTo *types.QueryCondition,
+) types.Stakes {
 	return k.stakes
 }
 
 func TestDistributor(t *testing.T) {
-	app := app.Setup(false)
-	ctx := app.BaseApp.NewContext(false, tmtypes.Header{Height: 1, ChainID: "duality-1", Time: time.Now().UTC()})
+	app := app.Setup(t, false)
+	ctx := app.BaseApp.NewContext(
+		false,
+		tmtypes.Header{Height: 1, ChainID: "duality-1", Time: time.Now().UTC()},
+	)
 
 	gauge := types.NewGauge(
 		1,
@@ -56,8 +62,10 @@ func TestDistributor(t *testing.T) {
 		sdk.Coins{},
 		0,
 	)
-	rewardedDenom := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 5, 1).String()
-	nonRewardedDenom := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 12, 1).String()
+	rewardedDenom := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 5, 1).
+		String()
+	nonRewardedDenom := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 12, 1).
+		String()
 	allStakes := types.Stakes{
 		{1, "addr1", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(50))}},
 		{2, "addr2", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}},

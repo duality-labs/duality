@@ -39,7 +39,7 @@ func TestMsgServerTestSuite(t *testing.T) {
 }
 
 func (s *MsgServerTestSuite) SetupTest() {
-	app := dualityapp.Setup(false)
+	app := dualityapp.Setup(s.T(), false)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 	ctx = ctx.WithBlockGasMeter(sdk.NewInfiniteGasMeter())
 
@@ -1549,7 +1549,9 @@ func SharesOnDeposit(
 
 	if existingAmount0.Add(existingAmount1).GT(sdk.ZeroInt()) {
 		existingValue := sdk.NewDecFromInt(existingAmount0).Add(price1To0.MulInt(existingAmount1))
-		sharesMinted = sdk.NewDecFromInt(sharesMinted).Mul(newValue.Quo(existingValue)).TruncateInt()
+		sharesMinted = sdk.NewDecFromInt(sharesMinted).
+			Mul(newValue.Quo(existingValue)).
+			TruncateInt()
 	} else {
 		sharesMinted = newValue.TruncateInt()
 	}
@@ -1585,7 +1587,9 @@ func (s *MsgServerTestSuite) calcAutoswapSharesMinted(
 	leftPrice := types.MustNewPrice(-1 * (centerTick - int64(fee)))
 	discountPrice := types.MustNewPrice(-1 * int64(fee))
 
-	balancedValue := sdk.NewDecFromInt(balanced0Int).Add(centerPrice.MulInt(balanced1Int)).TruncateInt()
+	balancedValue := sdk.NewDecFromInt(balanced0Int).
+		Add(centerPrice.MulInt(balanced1Int)).
+		TruncateInt()
 	residualValue := discountPrice.MulInt(residual0Int).
 		Add(leftPrice.Mul(sdk.NewDecFromInt(residual1Int))).
 		TruncateInt()
