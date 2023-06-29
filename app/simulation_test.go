@@ -87,7 +87,7 @@ func BenchmarkSimulation(b *testing.B) {
 	appOptions[flags.FlagHome] = app.DefaultNodeHome
 	appOptions[server.FlagInvCheckPeriod] = simcli.FlagPeriodValue
 
-	bApp := app.New(
+	bApp := app.NewApp(
 		logger,
 		db,
 		nil,
@@ -95,8 +95,8 @@ func BenchmarkSimulation(b *testing.B) {
 		map[int64]bool{},
 		app.DefaultNodeHome,
 		0,
-		app.MakeEncodingConfig(),
 		appOptions,
+		app.MakeEncodingConfig(),
 		baseapp.SetChainID(config.ChainID),
 	)
 	require.Equal(b, app.Name, bApp.Name())
@@ -163,7 +163,7 @@ func TestAppStateDeterminism(t *testing.T) {
 			config.ChainID = chainID
 
 			db := dbm.NewMemDB()
-			bApp := app.New(
+			bApp := app.NewApp(
 				logger,
 				db,
 				nil,
@@ -171,8 +171,8 @@ func TestAppStateDeterminism(t *testing.T) {
 				map[int64]bool{},
 				app.DefaultNodeHome,
 				simcli.FlagPeriodValue,
-				app.MakeEncodingConfig(),
 				appOptions,
+				app.MakeEncodingConfig(),
 				fauxMerkleModeOpt,
 				baseapp.SetChainID(chainID),
 			)
@@ -248,7 +248,7 @@ func TestAppImportExport(t *testing.T) {
 	appOptions[flags.FlagHome] = app.DefaultNodeHome
 	appOptions[server.FlagInvCheckPeriod] = simcli.FlagPeriodValue
 
-	bApp := app.New(
+	bApp := app.NewApp(
 		logger,
 		db,
 		nil,
@@ -256,8 +256,8 @@ func TestAppImportExport(t *testing.T) {
 		map[int64]bool{},
 		app.DefaultNodeHome,
 		0,
-		app.MakeEncodingConfig(),
 		appOptions,
+		app.MakeEncodingConfig(),
 		baseapp.SetChainID(config.ChainID),
 	)
 	require.Equal(t, app.Name, bApp.Name())
@@ -309,7 +309,7 @@ func TestAppImportExport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(newDir))
 	}()
 
-	newApp := app.New(
+	newApp := app.NewApp(
 		log.NewNopLogger(),
 		newDB,
 		nil,
@@ -317,8 +317,8 @@ func TestAppImportExport(t *testing.T) {
 		map[int64]bool{},
 		app.DefaultNodeHome,
 		0,
-		app.MakeEncodingConfig(),
 		appOptions,
+		app.MakeEncodingConfig(),
 		baseapp.SetChainID(config.ChainID),
 	)
 	require.Equal(t, app.Name, bApp.Name())
@@ -429,7 +429,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 	appOptions[flags.FlagHome] = app.DefaultNodeHome
 	appOptions[server.FlagInvCheckPeriod] = simcli.FlagPeriodValue
 
-	bApp := app.New(
+	bApp := app.NewApp(
 		logger,
 		db,
 		nil,
@@ -437,8 +437,8 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		map[int64]bool{},
 		app.DefaultNodeHome,
 		0,
-		app.MakeEncodingConfig(),
 		appOptions,
+		app.MakeEncodingConfig(),
 		fauxMerkleModeOpt,
 		baseapp.SetChainID(config.ChainID),
 	)
@@ -496,7 +496,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		require.NoError(t, os.RemoveAll(newDir))
 	}()
 
-	newApp := app.New(
+	newApp := app.NewApp(
 		log.NewNopLogger(),
 		newDB,
 		nil,
@@ -504,8 +504,8 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		map[int64]bool{},
 		app.DefaultNodeHome,
 		0,
-		app.MakeEncodingConfig(),
 		appOptions,
+		app.MakeEncodingConfig(),
 		fauxMerkleModeOpt,
 		baseapp.SetChainID(config.ChainID),
 	)

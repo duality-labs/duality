@@ -28,26 +28,18 @@ func TestConsumerWhitelistingKeys(t *testing.T) {
 }
 
 func SetupTestingAppConsumer() (ibctesting.TestingApp, map[string]json.RawMessage) {
-	db := cmdb.NewMemDB()
-	encCdc := app.MakeEncodingConfig()
-
-	// TODO: Maybe these are needed
-	// std.RegisterLegacyAminoCodec(encCfg.Amino)
-	// std.RegisterInterfaces(encCfg.InterfaceRegistry)
-	// mb.RegisterLegacyAminoCodec(encCfg.Amino)
-	// mb.RegisterInterfaces(encCfg.InterfaceRegistry)
-
+	encConfig := app.MakeEncodingConfig()
 	testApp := app.NewApp(
 		log.NewNopLogger(),
-		db,
+		cmdb.NewMemDB(),
 		nil,
 		true,
 		map[int64]bool{},
 		app.DefaultNodeHome,
 		5,
 		app.EmptyAppOptions{},
-		encCdc,
+		encConfig,
 	)
 
-	return testApp, app.NewDefaultGenesisState(encCdc.Marshaler)
+	return testApp, app.NewDefaultGenesisState(encConfig.Marshaler)
 }

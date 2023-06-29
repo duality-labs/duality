@@ -247,32 +247,6 @@ type App struct {
 	configurator module.Configurator
 }
 
-// New returns a reference to an initialized blockchain app
-func New(
-	logger log.Logger,
-	db dbm.DB,
-	traceStore io.Writer,
-	loadLatest bool,
-	skipUpgradeHeights map[int64]bool,
-	homePath string,
-	invCheckPeriod uint,
-	encConfig appparams.EncodingConfig,
-	appOpts servertypes.AppOptions,
-	baseAppOptions ...func(*baseapp.BaseApp),
-) *App {
-	return NewApp(
-		logger,
-		db,
-		traceStore,
-		loadLatest,
-		skipUpgradeHeights,
-		homePath,
-		invCheckPeriod,
-		appOpts,
-		encConfig,
-		baseAppOptions...)
-}
-
 func NewApp(
 	logger log.Logger,
 	db dbm.DB,

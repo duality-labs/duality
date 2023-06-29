@@ -284,7 +284,7 @@ func (a appCreator) newApp(
 
 	encConfig := app.MakeEncodingConfig()
 
-	return app.New(
+	return app.NewApp(
 		logger,
 		db,
 		traceStore,
@@ -292,8 +292,8 @@ func (a appCreator) newApp(
 		skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
-		encConfig,
 		appOpts,
+		encConfig,
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
 		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))),
@@ -325,7 +325,7 @@ func (a appCreator) appExport(
 		return servertypes.ExportedApp{}, errors.New("application home not set")
 	}
 
-	app := app.New(
+	app := app.NewApp(
 		logger,
 		db,
 		traceStore,
@@ -333,8 +333,8 @@ func (a appCreator) appExport(
 		map[int64]bool{},
 		homePath,
 		uint(1),
-		a.encodingConfig,
 		appOpts,
+		a.encodingConfig,
 	)
 
 	if height != -1 {

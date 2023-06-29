@@ -16,8 +16,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil/cli"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	testutilmod "github.com/cosmos/cosmos-sdk/types/module/testutil"
-	"github.com/duality-labs/duality/x/dex"
+	"github.com/duality-labs/duality/app"
+	appparams "github.com/duality-labs/duality/app/params"
 	dexClient "github.com/duality-labs/duality/x/dex/client/cli"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/require"
@@ -28,7 +28,7 @@ type TxTestSuite struct {
 	suite.Suite
 
 	kr        keyring.Keyring
-	encCfg    testutilmod.TestEncodingConfig
+	encCfg    appparams.EncodingConfig
 	baseCtx   client.Context
 	clientCtx client.Context
 	addrs     []sdk.AccAddress
@@ -48,19 +48,19 @@ func findTrancheKeyInTx(tx string) string {
 }
 
 func (s *TxTestSuite) SetupSuite() {
-	s.encCfg = testutilmod.MakeTestEncodingConfig(dex.AppModuleBasic{})
-	s.kr = keyring.NewInMemory(s.encCfg.Codec)
+	s.encCfg = app.MakeEncodingConfig()
+	s.kr = keyring.NewInMemory(s.encCfg.Marshaler)
 	s.baseCtx = client.Context{}.
 		WithKeyring(s.kr).
 		WithTxConfig(s.encCfg.TxConfig).
-		WithCodec(s.encCfg.Codec).
+		WithCodec(s.encCfg.Marshaler).
 		WithClient(clitestutil.MockTendermintRPC{Client: rpcclientmock.Client{}}).
 		WithAccountRetriever(client.MockAccountRetriever{}).
 		WithOutput(io.Discard).
 		WithChainID("test-chain")
 
 	ctxGen := func() client.Context {
-		bz, _ := s.encCfg.Codec.Marshal(&sdk.TxResponse{})
+		bz, _ := s.encCfg.Marshaler.Marshal(&sdk.TxResponse{})
 		c := clitestutil.NewMockTendermintRPC(abci.ResponseQuery{
 			Value: bz,
 		})
