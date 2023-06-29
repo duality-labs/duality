@@ -294,6 +294,8 @@ func NewApp(
 		// adminmodulemoduletypes.StoreKey,
 		forwardtypes.StoreKey,
 		epochsmoduletypes.StoreKey, incentivesmoduletypes.StoreKey,
+		consensusparamtypes.StoreKey,
+		crisistypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
