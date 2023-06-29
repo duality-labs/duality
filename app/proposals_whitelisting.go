@@ -2,7 +2,6 @@
 package app
 
 import (
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
@@ -39,7 +38,8 @@ type paramChangeKey struct {
 
 var WhitelistedParams = map[paramChangeKey]struct{}{
 	// bank
-	{Subspace: banktypes.ModuleName, Key: "SendEnabled"}: {},
+	// TODO: confirm this can be removed? Send enabled for bank is deprecated
+	// {Subspace: banktypes.ModuleName, Key: "SendEnabled"}: {},
 	// ibc transfer
 	{Subspace: ibctransfertypes.ModuleName, Key: "SendEnabled"}:    {},
 	{Subspace: ibctransfertypes.ModuleName, Key: "ReceiveEnabled"}: {},
