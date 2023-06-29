@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	cmdcfg "github.com/Stride-Labs/stride/v10/cmd/strided/config"
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/crypto/secp256k1"
@@ -24,15 +23,6 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
 )
-
-const Bech32Prefix = "cosmoosmos"
-
-func init() {
-	SetupConfig()
-}
-
-func SetupConfig() {
-}
 
 var DefaultConsensusParams = &tmproto.ConsensusParams{
 	Block: &tmproto.BlockParams{
@@ -74,12 +64,6 @@ func setup(withGenesis bool, invCheckPeriod uint, chainID string) (*App, Genesis
 
 // Setup initializes a new SimApp. A Nop logger is set in SimApp.
 func Setup(t *testing.T, isCheckTx bool) *App {
-	config := sdk.GetConfig()
-	valoper := sdk.PrefixValidator + sdk.PrefixOperator
-	valoperpub := sdk.PrefixValidator + sdk.PrefixOperator + sdk.PrefixPublic
-	config.SetBech32PrefixForAccount(Bech32Prefix, Bech32Prefix+sdk.PrefixPublic)
-	config.SetBech32PrefixForValidator(Bech32Prefix+valoper, Bech32Prefix+valoperpub)
-	cmdcfg.SetAddressPrefixes(config)
 	// Give bank module minter permissions for testing (ie. KeeperTestHelper.FundAcc)
 	// maccPerms[banktypes.ModuleName] = []string{authtypes.Minter}
 	app, _ := setup(false, 5, "duality")
@@ -105,12 +89,6 @@ func Setup(t *testing.T, isCheckTx bool) *App {
 }
 
 func Setup2(isCheckTx bool, chainID string) *App {
-	config := sdk.GetConfig()
-	valoper := sdk.PrefixValidator + sdk.PrefixOperator
-	valoperpub := sdk.PrefixValidator + sdk.PrefixOperator + sdk.PrefixPublic
-	config.SetBech32PrefixForAccount(Bech32Prefix, Bech32Prefix+sdk.PrefixPublic)
-	config.SetBech32PrefixForValidator(Bech32Prefix+valoper, Bech32Prefix+valoperpub)
-	cmdcfg.SetAddressPrefixes(config)
 	// Give bank module minter permissions for testing (ie. KeeperTestHelper.FundAcc)
 	// maccPerms[banktypes.ModuleName] = []string{authtypes.Minter}
 	app, _ := setup(false, 5, chainID)
