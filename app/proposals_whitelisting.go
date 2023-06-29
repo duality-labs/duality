@@ -40,6 +40,7 @@ type paramChangeKey struct {
 var WhitelistedParams = map[paramChangeKey]struct{}{
 	// bank
 	{Subspace: banktypes.ModuleName, Key: "SendEnabled"}: {},
+
 	// ibc transfer
 	{Subspace: ibctransfertypes.ModuleName, Key: "SendEnabled"}:    {},
 	{Subspace: ibctransfertypes.ModuleName, Key: "ReceiveEnabled"}: {},
