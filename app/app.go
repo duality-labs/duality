@@ -4,7 +4,6 @@ package app
 import (
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"path/filepath"
 
@@ -75,26 +74,24 @@ import (
 	ibcporttypes "github.com/cosmos/ibc-go/v7/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
-	ibctestingcore "github.com/cosmos/interchain-security/legacy_ibc_testing/core"
-	ibctesting "github.com/cosmos/interchain-security/legacy_ibc_testing/testing"
+	ibctestingcore "github.com/cosmos/interchain-security/v3/legacy_ibc_testing/core"
+	ibctesting "github.com/cosmos/interchain-security/v3/legacy_ibc_testing/testing"
 
 	dbm "github.com/cometbft/cometbft-db"
-	"github.com/ignite/cli/docs"
-	"github.com/ignite/cli/ignite/pkg/openapiconsole"
 	"github.com/spf13/cast"
 	forwardmiddleware "github.com/strangelove-ventures/packet-forward-middleware/v7/router"
 	forwardkeeper "github.com/strangelove-ventures/packet-forward-middleware/v7/router/keeper"
 	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v7/router/types"
 
-	ccvconsumer "github.com/cosmos/interchain-security/x/ccv/consumer"
-	ccvconsumerkeeper "github.com/cosmos/interchain-security/x/ccv/consumer/keeper"
-	ccvconsumertypes "github.com/cosmos/interchain-security/x/ccv/consumer/types"
+	ccvconsumer "github.com/cosmos/interchain-security/v3/x/ccv/consumer"
+	ccvconsumerkeeper "github.com/cosmos/interchain-security/v3/x/ccv/consumer/keeper"
+	ccvconsumertypes "github.com/cosmos/interchain-security/v3/x/ccv/consumer/types"
 
 	dexmodule "github.com/duality-labs/duality/x/dex"
 	dexmodulekeeper "github.com/duality-labs/duality/x/dex/keeper"
 	dexmoduletypes "github.com/duality-labs/duality/x/dex/types"
 
-	icstestintegration "github.com/cosmos/interchain-security/testutil/integration"
+	icstestintegration "github.com/cosmos/interchain-security/v3/testutil/integration"
 
 	appparams "github.com/duality-labs/duality/app/params"
 	epochsmodule "github.com/duality-labs/duality/x/epochs"
@@ -353,7 +350,7 @@ func NewApp(
 
 	// Remove the fee-pool from the group of blocked recipient addresses in bank
 	// this is required for the consumer chain to be able to send tokens to the provider chain
-	// RE: https://github.com/cosmos/interchain-security/blob/main/app/consumer/app.go#L272
+	// RE: https://github.com/cosmos/interchain-security/v3/blob/main/app/consumer/app.go#L272
 	bankBlockedAddrs := app.ModuleAccountAddrs()
 	delete(bankBlockedAddrs, authtypes.NewModuleAddress(
 		ccvconsumertypes.ConsumerToSendToProviderName).String())
@@ -425,7 +422,7 @@ func NewApp(
 	)
 
 	app.ConsumerKeeper = *app.ConsumerKeeper.SetHooks(app.SlashingKeeper.Hooks())
-	consumerModule := ccvconsumer.NewAppModule(app.ConsumerKeeper)
+	consumerModule := ccvconsumer.NewAppModule(app.ConsumerKeeper, app.GetSubspace(ccvconsumertypes.ModuleName))
 
 	// adminRouter := govtypes.NewRouter()
 	// adminRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
@@ -681,13 +678,17 @@ func NewApp(
 	app.MountTransientStores(tkeys)
 	app.MountMemoryStores(memKeys)
 
-	anteHandler, err := ante.NewAnteHandler(
-		ante.HandlerOptions{
-			AccountKeeper:   app.AccountKeeper,
-			BankKeeper:      app.BankKeeper,
-			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-			FeegrantKeeper:  app.FeeGrantKeeper,
-			SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
+	anteHandler, err := NewAnteHandler(
+		HandlerOptions{
+			HandlerOptions: ante.HandlerOptions{
+				AccountKeeper:   app.AccountKeeper,
+				BankKeeper:      app.BankKeeper,
+				FeegrantKeeper:  app.FeeGrantKeeper,
+				SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
+				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
+			},
+			IBCKeeper:      app.IBCKeeper,
+			ConsumerKeeper: app.ConsumerKeeper,
 		},
 	)
 	if err != nil {
@@ -819,8 +820,9 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, _ config.APIConfig) {
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
 	// register app's OpenAPI routes.
-	apiSvr.Router.Handle("/static/openapi.yml", http.FileServer(http.FS(docs.Docs)))
-	apiSvr.Router.HandleFunc("/", openapiconsole.Handler(Name, "/static/openapi.yml"))
+	// TODO: fix or ensure don't need
+	// apiSvr.Router.Handle("/static/openapi.yml", http.FileServer(http.FS(docs.Docs)))
+	// apiSvr.Router.HandleFunc("/", openapiconsole.Handler(Name, "/static/openapi.yml"))
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.

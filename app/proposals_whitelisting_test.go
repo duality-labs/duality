@@ -6,7 +6,7 @@ import (
 
 	dbm "github.com/cometbft/cometbft-db"
 	"github.com/cometbft/cometbft/libs/log"
-	ibctesting "github.com/cosmos/interchain-security/legacy_ibc_testing/testing"
+	ibctesting "github.com/cosmos/interchain-security/v3/legacy_ibc_testing/testing"
 	"github.com/duality-labs/duality/app"
 	"github.com/stretchr/testify/require"
 )
