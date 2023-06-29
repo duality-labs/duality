@@ -643,13 +643,12 @@ func NewApp(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		ccvconsumertypes.ModuleName,
-		// adminmodulemoduletypes.ModuleName,
 		dexmoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
 		epochsmoduletypes.ModuleName,
 		incentivesmoduletypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/initGenesis
+	// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
 	app.mm.RegisterInvariants(app.CrisisKeeper)
