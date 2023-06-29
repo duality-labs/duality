@@ -12,6 +12,7 @@ import (
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -50,10 +51,20 @@ var DefaultConsensusParams = &tmproto.ConsensusParams{
 	},
 }
 
-func setup(withGenesis bool, invCheckPeriod uint) (*App, GenesisState) {
+func setup(withGenesis bool, invCheckPeriod uint, chainID string) (*App, GenesisState) {
 	db := dbm.NewMemDB()
 	encCdc := MakeTestEncodingConfig()
-	app := NewApp(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, invCheckPeriod, encCdc, EmptyAppOptions{})
+	app := NewApp(log.NewNopLogger(),
+		db,
+		nil,
+		true,
+		map[int64]bool{},
+		DefaultNodeHome,
+		invCheckPeriod,
+		encCdc,
+		EmptyAppOptions{},
+		baseapp.SetChainID(chainID),
+	)
 	if withGenesis {
 		return app, NewDefaultGenesisState(encCdc.Marshaler)
 	}
@@ -71,9 +82,9 @@ func Setup(t *testing.T, isCheckTx bool) *App {
 	cmdcfg.SetAddressPrefixes(config)
 	// Give bank module minter permissions for testing (ie. KeeperTestHelper.FundAcc)
 	// maccPerms[banktypes.ModuleName] = []string{authtypes.Minter}
-	app, _ := setup(false, 5)
+	app, _ := setup(false, 5, "duality")
 	if !isCheckTx {
-		genesisState := GenesisStateWithValSet(app)
+		genesisState, _ := GenesisStateWithValSet(app)
 
 		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 		if err != nil {
@@ -82,6 +93,7 @@ func Setup(t *testing.T, isCheckTx bool) *App {
 
 		app.InitChain(
 			abci.RequestInitChain{
+				ChainId:         "duality",
 				Validators:      []abci.ValidatorUpdate{},
 				ConsensusParams: DefaultConsensusParams,
 				AppStateBytes:   stateBytes,
@@ -92,7 +104,7 @@ func Setup(t *testing.T, isCheckTx bool) *App {
 	return app
 }
 
-func Setup2(isCheckTx bool) *App {
+func Setup2(isCheckTx bool, chainID string) *App {
 	config := sdk.GetConfig()
 	valoper := sdk.PrefixValidator + sdk.PrefixOperator
 	valoperpub := sdk.PrefixValidator + sdk.PrefixOperator + sdk.PrefixPublic
@@ -101,22 +113,47 @@ func Setup2(isCheckTx bool) *App {
 	cmdcfg.SetAddressPrefixes(config)
 	// Give bank module minter permissions for testing (ie. KeeperTestHelper.FundAcc)
 	// maccPerms[banktypes.ModuleName] = []string{authtypes.Minter}
-	app, _ := setup(false, 5)
+	app, _ := setup(false, 5, chainID)
 	if !isCheckTx {
-		genesisState := GenesisStateWithValSet(app)
+		genesisState, valSet := GenesisStateWithValSet(app)
 
 		stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 		if err != nil {
 			panic(err)
 		}
+		valUpdate := make([]abci.ValidatorUpdate, 0, len(valSet.Validators))
+		for _, v := range valSet.Validators {
+			pubKey, err := cryptocodec.FromTmPubKeyInterface(v.PubKey)
+			if err != nil {
+				panic("cannot cooerce pk")
+			}
+			tmPubkey, _ := cryptocodec.ToTmProtoPublicKey(pubKey)
+			if err != nil {
+				panic(err)
+			}
+			valUpdate = append(valUpdate, abci.ValidatorUpdate{PubKey: tmPubkey, Power: 100000})
+		}
 
 		app.InitChain(
 			abci.RequestInitChain{
-				Validators:      []abci.ValidatorUpdate{},
+				ChainId:         chainID,
+				Validators:      valUpdate,
 				ConsensusParams: DefaultConsensusParams,
 				AppStateBytes:   stateBytes,
 			},
 		)
+
+		// ctx := app.NewContext(false, tmproto.Header{})
+		// app.ConsumerKeeper.SetSmallestNonOptOutPower(ctx, 1)
+		// app.Commit()
+
+		// app.BeginBlock(abci.RequestBeginBlock{Header: tmproto.Header{
+		// 	ChainID:            chainID,
+		// 	Height:             app.LastBlockHeight() + 1,
+		// 	AppHash:            app.LastCommitID().Hash,
+		// 	ValidatorsHash:     valSet.Hash(),
+		// 	NextValidatorsHash: valSet.Hash(),
+		// }})
 	}
 
 	return app
@@ -131,8 +168,8 @@ func SetupWithGenesisValSet(
 ) *App {
 	t.Helper()
 
-	app, genesisState := setup(true, 5)
-	genesisState = GenesisStateWithValSet(app)
+	app, genesisState := setup(true, 5, "dualitysdsd")
+	genesisState, _ = GenesisStateWithValSet(app)
 
 	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 	require.NoError(t, err)
@@ -158,7 +195,7 @@ func SetupWithGenesisValSet(
 	return app
 }
 
-func GenesisStateWithValSet(app *App) GenesisState {
+func GenesisStateWithValSet(app *App) (GenesisState, *tmtypes.ValidatorSet) {
 	privVal := mock.NewPV()
 	pubKey, _ := privVal.GetPubKey()
 	validator := tmtypes.NewValidator(pubKey, 1)
@@ -166,7 +203,6 @@ func GenesisStateWithValSet(app *App) GenesisState {
 
 	// generate genesis account
 	senderPrivKey := secp256k1.GenPrivKey()
-	senderPrivKey.PubKey().Address()
 	acc := authtypes.NewBaseAccountWithAddress(senderPrivKey.PubKey().Address().Bytes())
 	balance := banktypes.Balance{
 		Address: acc.GetAddress().String(),
@@ -207,6 +243,7 @@ func GenesisStateWithValSet(app *App) GenesisState {
 	}
 	// set validators and delegations
 	stakingGenesis := stakingtypes.NewGenesisState(stakingtypes.DefaultParams(), validators, delegations)
+
 	genesisState[stakingtypes.ModuleName] = app.AppCodec().MustMarshalJSON(stakingGenesis)
 
 	totalSupply := sdk.NewCoins()
@@ -235,7 +272,7 @@ func GenesisStateWithValSet(app *App) GenesisState {
 		[]banktypes.SendEnabled{},
 	)
 	genesisState[banktypes.ModuleName] = app.AppCodec().MustMarshalJSON(bankGenesis)
-	return genesisState
+	return genesisState, valSet
 }
 
 type EmptyAppOptions struct {

@@ -71,25 +71,25 @@ func DefaultConfig() network.Config {
 		InterfaceRegistry: encoding.InterfaceRegistry,
 		AccountRetriever:  authtypes.AccountRetriever{},
 		AppConstructor: func(val network.ValidatorI) servertypes.Application {
-			// err := modifyConsumerGenesis(val.(network.Validator))
-			// if err != nil {
-			// 	panic(err)
-			// }
-			return app.Setup2(false)
-			// return app.New(
-			// 	val.GetCtx().Logger,
-			// 	dbm.NewMemDB(),
-			// 	nil,
-			// 	true,
-			// 	map[int64]bool{},
-			// 	val.GetCtx().Config.RootDir,
-			// 	0,
-			// 	encoding,
-			// 	simtestutil.EmptyAppOptions{},
-			// 	baseapp.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
-			// 	baseapp.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
-			// 	baseapp.SetChainID(chainID),
-			// )
+			err := modifyConsumerGenesis(val.(network.Validator))
+			if err != nil {
+				panic(err)
+			}
+			return app.Setup2(false, chainID)
+			// 	return app.New(
+			// 		val.GetCtx().Logger,
+			// 		dbm.NewMemDB(),
+			// 		nil,
+			// 		true,
+			// 		map[int64]bool{},
+			// 		val.GetCtx().Config.RootDir,
+			// 		0,
+			// 		encoding,
+			// 		simtestutil.EmptyAppOptions{},
+			// 		baseapp.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
+			// 		baseapp.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
+			// 		baseapp.SetChainID(chainID),
+			// 	)
 		},
 		GenesisState:    app.ModuleBasics.DefaultGenesis(encoding.Marshaler),
 		TimeoutCommit:   2 * time.Second,

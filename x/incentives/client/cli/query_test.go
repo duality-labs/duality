@@ -15,13 +15,13 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type QueryTestSuite struct {
+type IncentiveQueryTestSuite struct {
 	apptesting.KeeperTestHelper
 	queryClient types.QueryClient
 }
 
 // StakeTokens funds an account, stakes tokens and returns a stakeID.
-func (s *QueryTestSuite) SetupStake(addr sdk.AccAddress, coins sdk.Coins, duration time.Duration) (stakeID uint64) {
+func (s *IncentiveQueryTestSuite) SetupStake(addr sdk.AccAddress, coins sdk.Coins, duration time.Duration) (stakeID uint64) {
 	msgServer := keeper.NewMsgServerImpl(&s.App.IncentivesKeeper)
 	s.FundAcc(addr, coins)
 
@@ -31,7 +31,7 @@ func (s *QueryTestSuite) SetupStake(addr sdk.AccAddress, coins sdk.Coins, durati
 	return msgResponse.ID
 }
 
-func (s *QueryTestSuite) SetupSuite() {
+func (s *IncentiveQueryTestSuite) SetupSuite() {
 	s.Setup()
 	s.queryClient = types.NewQueryClient(s.QueryHelper)
 
@@ -51,7 +51,7 @@ func (s *QueryTestSuite) SetupSuite() {
 	s.Commit()
 }
 
-func (s *QueryTestSuite) TestQueriesNeverAlterState() {
+func (s *IncentiveQueryTestSuite) TestQueriesNeverAlterState() {
 	testCases := []struct {
 		name   string
 		query  string
@@ -126,6 +126,6 @@ func (s *QueryTestSuite) TestQueriesNeverAlterState() {
 	}
 }
 
-func TestQueryTestSuite(t *testing.T) {
-	suite.Run(t, new(QueryTestSuite))
+func TestIncentivesQueryTestSuite(t *testing.T) {
+	suite.Run(t, new(IncentiveQueryTestSuite))
 }

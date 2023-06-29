@@ -165,6 +165,8 @@ var (
 		ccvconsumertypes.ConsumerRedistributeName:     nil,
 		ccvconsumertypes.ConsumerToSendToProviderName: nil,
 		incentivesmoduletypes.ModuleName:              nil,
+		// TODO: TEMP: DON'T ACTUALLY DO THIS
+		banktypes.ModuleName: {authtypes.Minter},
 
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
@@ -741,7 +743,9 @@ func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.Res
 		panic(err)
 	}
 	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
-	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
+
+	// return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
+	return abci.ResponseInitChain{Validators: req.Validators}
 }
 
 // LoadHeight loads a particular height
