@@ -16,15 +16,16 @@ func TestEpochsExportGenesis(t *testing.T) {
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
 	chainStartTime := ctx.BlockTime()
-	chainStartHeight := ctx.BlockHeight()
 
 	genesis := app.EpochsKeeper.ExportGenesis(ctx)
 	require.Len(t, genesis.Epochs, 3)
 
 	expectedEpochs := types.DefaultGenesis().Epochs
 	for i := 0; i < len(expectedEpochs); i++ {
-		expectedEpochs[i].CurrentEpochStartHeight = chainStartHeight
+		expectedEpochs[i].CurrentEpochStartHeight = 2
 		expectedEpochs[i].CurrentEpochStartTime = chainStartTime
+		expectedEpochs[i].EpochCountingStarted = true
+		expectedEpochs[i].CurrentEpoch = 1
 	}
 	require.Equal(t, expectedEpochs, genesis.Epochs)
 }
@@ -91,5 +92,5 @@ func TestEpochsInitGenesis(t *testing.T) {
 	require.Equal(t, epochInfo.CurrentEpoch, int64(0))
 	require.Equal(t, epochInfo.CurrentEpochStartHeight, ctx.BlockHeight())
 	require.Equal(t, epochInfo.CurrentEpochStartTime.UTC().String(), time.Time{}.String())
-	require.Equal(t, epochInfo.EpochCountingStarted, true)
+	require.Equal(t, epochInfo.EpochCountingStarted, false)
 }
