@@ -96,10 +96,12 @@ func setup(withGenesis bool, invCheckPeriod uint) (*App, GenesisState) {
 
 func Setup(t *testing.T, isCheckTx bool) *App {
 	t.Helper()
-
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
 	require.NoError(t, err)
+
+	// Give bank module minter permissions for testing (ie. KeeperTestHelper.FundAcc)
+	maccPerms[banktypes.ModuleName] = []string{authtypes.Minter}
 
 	// create validator set with single validator
 	validator := tmtypes.NewValidator(pubKey, 1)

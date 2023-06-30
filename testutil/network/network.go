@@ -16,6 +16,10 @@ import (
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/cosmos/cosmos-sdk/x/genutil"
+	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
+	"github.com/cosmos/cosmos-sdk/x/staking"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
 
 	"github.com/duality-labs/duality/app"
@@ -49,6 +53,9 @@ func New(t *testing.T, configs ...Config) *Network {
 // DefaultConfig will initialize config for the network with custom application,
 // genesis and single validator. All other parameters are inherited from cosmos-sdk/testutil/network.DefaultConfig
 func DefaultConfig() network.Config {
+	// app doesn't have this modules anymore, but we need them for test setup, which uses gentx and MsgCreateValidator
+	app.ModuleBasics[genutiltypes.ModuleName] = genutil.AppModuleBasic{}
+	app.ModuleBasics[stakingtypes.ModuleName] = staking.AppModuleBasic{}
 	var (
 		encoding = app.MakeEncodingConfig()
 		chainID  = "chain-" + tmrand.NewRand().Str(6)
