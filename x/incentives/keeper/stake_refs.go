@@ -42,9 +42,9 @@ func getStakeRefKeys(stake *types.Stake) ([][]byte, error) {
 		return nil, err
 	}
 
-	refKeys := [][]byte{}
-	refKeys = append(refKeys, types.KeyPrefixStakeIndex)
-	refKeys = append(refKeys, types.CombineKeys(types.KeyPrefixStakeIndexAccount, owner))
+	refKeys := make(map[string]bool)
+	refKeys[string(types.KeyPrefixStakeIndex)] = true
+	refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexAccount, owner))] = true
 
 	for _, coin := range stake.Coins {
 		depositDenom, err := dextypes.NewDepositDenomFromString(coin.Denom)
@@ -53,12 +53,24 @@ func getStakeRefKeys(stake *types.Stake) ([][]byte, error) {
 		}
 		denomBz := []byte(coin.Denom)
 		pairIDBz := []byte(depositDenom.PairID.Stringify())
-		tickBz := dextypes.TickIndexToBytes(depositDenom.Tick, depositDenom.PairID, depositDenom.PairID.Token1)
-		refKeys = append(refKeys, types.CombineKeys(types.KeyPrefixStakeIndexDenom, denomBz))
-		refKeys = append(refKeys, types.CombineKeys(types.KeyPrefixStakeIndexPairTick, pairIDBz, tickBz))
-		refKeys = append(refKeys, types.CombineKeys(types.KeyPrefixStakeIndexAccountDenom, owner, denomBz))
-		refKeys = append(refKeys, types.CombineKeys(types.KeyPrefixStakeIndexPairTimestamp, pairIDBz, types.GetTimeKey(stake.StartTime)))
+		tickBz := dextypes.TickIndexToBytes(
+			depositDenom.Tick,
+			depositDenom.PairID,
+			depositDenom.PairID.Token1,
+		)
+		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexDenom, denomBz))] = true
+		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexPairTick, pairIDBz, tickBz))] = true
+		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexAccountDenom, owner, denomBz))] = true
+		refKeys[string(types.CombineKeys(
+			types.KeyPrefixStakeIndexPairTimestamp,
+			pairIDBz,
+			types.GetTimeKey(stake.StartTime),
+		))] = true
 	}
 
-	return refKeys, nil
+	refKeyBytes := make([][]byte, 0, len(refKeys))
+	for k, _ := range refKeys {
+		refKeyBytes = append(refKeyBytes, []byte(k))
+	}
+	return refKeyBytes, nil
 }

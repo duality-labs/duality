@@ -22,7 +22,7 @@ func (suite *KeeperTestSuite) TestGenesis() {
 				ID:        0,
 				Owner:     validAddr,
 				StartTime: time.Time{},
-				Coins:     sdk.NewCoins(sdk.NewInt64Coin(suite.LPDenom, 10)),
+				Coins:     sdk.NewCoins(sdk.NewInt64Coin(suite.LPDenom0, 10)),
 			},
 		},
 		LastGaugeId: 10,
