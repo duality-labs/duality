@@ -46,7 +46,8 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 				},
 			},
 			coin: sdk.NewInt64Coin(
-				dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).String(),
+				dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).
+					String(),
 				20,
 			),
 			tick:        1000,
@@ -64,7 +65,8 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 				},
 			},
 			coin: sdk.NewInt64Coin(
-				dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).String(),
+				dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).
+					String(),
 				20,
 			),
 			tick:        0,
@@ -89,7 +91,8 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 				},
 			},
 			coin: sdk.NewInt64Coin(
-				dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).String(),
+				dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).
+					String(),
 				20,
 			),
 			tick:        1000,
@@ -114,7 +117,8 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 				},
 			},
 			coin: sdk.NewInt64Coin(
-				dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).String(),
+				dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).
+					String(),
 				20,
 			),
 			tick:        1000,
@@ -124,9 +128,7 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 	for _, tc := range tests {
 		suite.T().Run(tc.name, func(t *testing.T) {
 			suite.SetupTest()
-			for _, depositSpec := range tc.deposits {
-				suite.SetupDeposit(depositSpec)
-			}
+			_ = suite.SetupDeposit(tc.deposits)
 			value, err := suite.App.IncentivesKeeper.ValueForShares(suite.Ctx, tc.coin, tc.tick)
 			if tc.err == nil {
 				require.NoError(t, err)
@@ -153,32 +155,38 @@ func (suite *KeeperTestSuite) TestDistribute() {
 			name: "one gauge",
 			depositStakeSpecs: []depositStakeSpec{
 				{
-					depositSpec: depositSpec{
-						addr:   addrs[0],
-						token0: sdk.NewInt64Coin("TokenA", 10),
-						token1: sdk.NewInt64Coin("TokenB", 10),
-						tick:   0,
-						fee:    1,
+					depositSpecs: []depositSpec{
+						{
+							addr:   addrs[0],
+							token0: sdk.NewInt64Coin("TokenA", 10),
+							token1: sdk.NewInt64Coin("TokenB", 10),
+							tick:   0,
+							fee:    1,
+						},
 					},
 					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					depositSpec: depositSpec{
-						addr:   addrs[1],
-						token0: sdk.NewInt64Coin("TokenA", 10),
-						token1: sdk.NewInt64Coin("TokenB", 10),
-						tick:   0,
-						fee:    1,
+					depositSpecs: []depositSpec{
+						{
+							addr:   addrs[1],
+							token0: sdk.NewInt64Coin("TokenA", 10),
+							token1: sdk.NewInt64Coin("TokenB", 10),
+							tick:   0,
+							fee:    1,
+						},
 					},
 					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					depositSpec: depositSpec{
-						addr:   addrs[1],
-						token0: sdk.NewInt64Coin("TokenA", 10),
-						token1: sdk.NewInt64Coin("TokenB", 10),
-						tick:   0,
-						fee:    1,
+					depositSpecs: []depositSpec{
+						{
+							addr:   addrs[1],
+							token0: sdk.NewInt64Coin("TokenA", 10),
+							token1: sdk.NewInt64Coin("TokenB", 10),
+							tick:   0,
+							fee:    1,
+						},
 					},
 					stakeTimeOffset: -24 * time.Hour,
 				},
@@ -202,42 +210,50 @@ func (suite *KeeperTestSuite) TestDistribute() {
 			name: "two gauges",
 			depositStakeSpecs: []depositStakeSpec{
 				{
-					depositSpec: depositSpec{
-						addr:   addrs[0],
-						token0: sdk.NewInt64Coin("TokenA", 10),
-						token1: sdk.NewInt64Coin("TokenB", 10),
-						tick:   0,
-						fee:    1,
+					depositSpecs: []depositSpec{
+						{
+							addr:   addrs[0],
+							token0: sdk.NewInt64Coin("TokenA", 10),
+							token1: sdk.NewInt64Coin("TokenB", 10),
+							tick:   0,
+							fee:    1,
+						},
 					},
 					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					depositSpec: depositSpec{
-						addr:   addrs[1],
-						token0: sdk.NewInt64Coin("TokenA", 10),
-						token1: sdk.NewInt64Coin("TokenB", 10),
-						tick:   0,
-						fee:    1,
+					depositSpecs: []depositSpec{
+						{
+							addr:   addrs[1],
+							token0: sdk.NewInt64Coin("TokenA", 10),
+							token1: sdk.NewInt64Coin("TokenB", 10),
+							tick:   0,
+							fee:    1,
+						},
 					},
 					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					depositSpec: depositSpec{
-						addr:   addrs[1],
-						token0: sdk.NewInt64Coin("TokenA", 10),
-						token1: sdk.NewInt64Coin("TokenB", 10),
-						tick:   0,
-						fee:    1,
+					depositSpecs: []depositSpec{
+						{
+							addr:   addrs[1],
+							token0: sdk.NewInt64Coin("TokenA", 10),
+							token1: sdk.NewInt64Coin("TokenB", 10),
+							tick:   0,
+							fee:    1,
+						},
 					},
 					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					depositSpec: depositSpec{
-						addr:   addrs[0],
-						token0: sdk.NewInt64Coin("TokenA", 10),
-						token1: sdk.NewInt64Coin("TokenB", 10),
-						tick:   0,
-						fee:    1,
+					depositSpecs: []depositSpec{
+						{
+							addr:   addrs[0],
+							token0: sdk.NewInt64Coin("TokenA", 10),
+							token1: sdk.NewInt64Coin("TokenB", 10),
+							tick:   0,
+							fee:    1,
+						},
 					},
 					stakeTimeOffset: -12 * time.Hour,
 				},
@@ -269,42 +285,50 @@ func (suite *KeeperTestSuite) TestDistribute() {
 			name: "one stake with adjustment",
 			depositStakeSpecs: []depositStakeSpec{
 				{
-					depositSpec: depositSpec{
-						addr:   addrs[0],
-						token0: sdk.NewInt64Coin("TokenA", 10),
-						token1: sdk.NewInt64Coin("TokenB", 10),
-						tick:   999,
-						fee:    1,
+					depositSpecs: []depositSpec{
+						{
+							addr:   addrs[0],
+							token0: sdk.NewInt64Coin("TokenA", 10),
+							token1: sdk.NewInt64Coin("TokenB", 10),
+							tick:   999,
+							fee:    1,
+						},
 					},
 					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					depositSpec: depositSpec{
-						addr:   addrs[1],
-						token0: sdk.NewInt64Coin("TokenA", 10),
-						token1: sdk.NewInt64Coin("TokenB", 10),
-						tick:   999,
-						fee:    1,
+					depositSpecs: []depositSpec{
+						{
+							addr:   addrs[1],
+							token0: sdk.NewInt64Coin("TokenA", 10),
+							token1: sdk.NewInt64Coin("TokenB", 10),
+							tick:   999,
+							fee:    1,
+						},
 					},
 					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					depositSpec: depositSpec{
-						addr:   addrs[1],
-						token0: sdk.NewInt64Coin("TokenA", 10),
-						token1: sdk.NewInt64Coin("TokenB", 10),
-						tick:   999,
-						fee:    40,
+					depositSpecs: []depositSpec{
+						{
+							addr:   addrs[1],
+							token0: sdk.NewInt64Coin("TokenA", 10),
+							token1: sdk.NewInt64Coin("TokenB", 10),
+							tick:   999,
+							fee:    40,
+						},
 					},
 					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					depositSpec: depositSpec{
-						addr:   addrs[1],
-						token0: sdk.NewInt64Coin("TokenA", 10),
-						token1: sdk.NewInt64Coin("TokenB", 10),
-						tick:   999,
-						fee:    40,
+					depositSpecs: []depositSpec{
+						{
+							addr:   addrs[1],
+							token0: sdk.NewInt64Coin("TokenA", 10),
+							token1: sdk.NewInt64Coin("TokenB", 10),
+							tick:   999,
+							fee:    40,
+						},
 					},
 					stakeTimeOffset: -12 * time.Hour,
 				},
@@ -341,7 +365,14 @@ func (suite *KeeperTestSuite) TestDistribute() {
 			// check expected rewards against actual rewards received
 			for i, assertion := range tc.assertions {
 				bal := suite.App.BankKeeper.GetAllBalances(suite.Ctx, assertion.addr)
-				assert.Equal(t, assertion.balances.String(), bal.String(), "test %v, person %d", tc.name, i)
+				assert.Equal(
+					t,
+					assertion.balances.String(),
+					bal.String(),
+					"test %v, person %d",
+					tc.name,
+					i,
+				)
 			}
 		})
 	}

@@ -14,7 +14,7 @@ type userStakes struct {
 }
 
 type depositStakeSpec struct {
-	depositSpec     depositSpec
+	depositSpecs    []depositSpec
 	stakeTimeOffset time.Duration // used for simulating the time of staking
 }
 
@@ -45,28 +45,32 @@ func (suite *KeeperTestSuite) AddToGauge(coins sdk.Coins, gaugeID uint64) uint64
 	return gaugeID
 }
 
-func (suite *KeeperTestSuite) SetupDeposit(s depositSpec) sdk.Coins {
-	suite.FundAcc(s.addr, sdk.Coins{s.token0, s.token1})
-	_, _, shares, err := suite.App.DexKeeper.DepositCore(
-		sdk.WrapSDKContext(suite.Ctx),
-		s.token0.Denom,
-		s.token1.Denom,
-		s.addr,
-		s.addr,
-		[]sdk.Int{s.token0.Amount},
-		[]sdk.Int{s.token1.Amount},
-		[]int64{s.tick},
-		[]uint64{s.fee},
-		[]*dextypes.DepositOptions{{}},
-	)
-	suite.Require().NoError(err)
-	suite.Require().NotEmpty(shares)
+func (suite *KeeperTestSuite) SetupDeposit(ss []depositSpec) sdk.Coins {
+	shares := sdk.NewCoins()
+	for _, s := range ss {
+		suite.FundAcc(s.addr, sdk.Coins{s.token0, s.token1})
+		_, _, indivShares, err := suite.App.DexKeeper.DepositCore(
+			sdk.WrapSDKContext(suite.Ctx),
+			s.token0.Denom,
+			s.token1.Denom,
+			s.addr,
+			s.addr,
+			[]sdk.Int{s.token0.Amount},
+			[]sdk.Int{s.token1.Amount},
+			[]int64{s.tick},
+			[]uint64{s.fee},
+			[]*dextypes.DepositOptions{{}},
+		)
+		suite.Require().NoError(err)
+		suite.Require().NotEmpty(indivShares)
+		shares = shares.Add(indivShares...)
+	}
 	return shares
 }
 
 func (suite *KeeperTestSuite) SetupDepositAndStake(s depositStakeSpec) *types.Stake {
-	shares := suite.SetupDeposit(s.depositSpec)
-	return suite.SetupStake(s.depositSpec.addr, shares, s.stakeTimeOffset)
+	shares := suite.SetupDeposit(s.depositSpecs)
+	return suite.SetupStake(s.depositSpecs[0].addr, shares, s.stakeTimeOffset)
 }
 
 // StakeTokens stakes tokens for the specified duration
@@ -75,7 +79,12 @@ func (suite *KeeperTestSuite) SetupStake(
 	shares sdk.Coins,
 	timeOffset time.Duration,
 ) *types.Stake {
-	stake, err := suite.App.IncentivesKeeper.CreateStake(suite.Ctx, addr, shares, suite.Ctx.BlockTime().Add(timeOffset))
+	stake, err := suite.App.IncentivesKeeper.CreateStake(
+		suite.Ctx,
+		addr,
+		shares,
+		suite.Ctx.BlockTime().Add(timeOffset),
+	)
 	suite.Require().NoError(err)
 	return stake
 }

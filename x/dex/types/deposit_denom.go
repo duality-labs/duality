@@ -13,7 +13,7 @@ const LPsharesRegexpStr = "^" + DepositSharesPrefix + "-" +
 	// Token1
 	"([a-zA-Z][a-zA-Z0-9/-]{2,127})" + "-" +
 	// Tickindex
-	`t(\d+)` + "-" +
+	`t(-?\d+)` + "-" +
 	// fee
 	`f(\d+)`
 
