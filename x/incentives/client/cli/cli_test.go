@@ -247,6 +247,20 @@ func TestNewStakeCmd(t *testing.T) {
 				),
 			},
 		},
+		"tokenized share test": {
+			Cmd: fmt.Sprintf("1000DualityPoolShares-tokenA-tokenB-t123-f30 --from %s", testAddresses[0]),
+			ExpectedMsg: &types.MsgStake{
+				Owner: testAddresses[0].String(),
+				Coins: sdk.NewCoins(sdk.NewCoin("DualityPoolShares-tokenA-tokenB-t123-f30", sdk.NewInt(1000))),
+			},
+		},
+		"tokenized share negative tick index test": {
+			Cmd: fmt.Sprintf("1000DualityPoolShares-tokenA-tokenB-t-123-f30 --from %s", testAddresses[0]),
+			ExpectedMsg: &types.MsgStake{
+				Owner: testAddresses[0].String(),
+				Coins: sdk.NewCoins(sdk.NewCoin("DualityPoolShares-tokenA-tokenB-t-123-f30", sdk.NewInt(1000))),
+			},
+		},
 	}
 	dcli.RunTxTestCases(t, desc, tcs)
 }
