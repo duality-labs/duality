@@ -92,5 +92,5 @@ func TestEpochsInitGenesis(t *testing.T) {
 	require.Equal(t, epochInfo.CurrentEpoch, int64(0))
 	require.Equal(t, epochInfo.CurrentEpochStartHeight, ctx.BlockHeight())
 	require.Equal(t, epochInfo.CurrentEpochStartTime.UTC().String(), time.Time{}.String())
-	require.Equal(t, epochInfo.EpochCountingStarted, false)
+	require.Equal(t, epochInfo.EpochCountingStarted, true)
 }
