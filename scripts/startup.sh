@@ -141,12 +141,16 @@ else
             exit 1
         fi
 
-        # add persistent peers
-        genesis_ip=$(echo $rpc_address | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b")
-        # TODO: ideally this should parse listen_addr to get the port
-        persistent_peers=$( wget -q -O - $rpc_address/status \
-                            | jq -r --arg ip $genesis_ip '.result.node_info.id + "@" + $ip + ":26656"' )
-
+        # set persistent_peers variable
+        if [ ! -z $PERSISTENT_PEER ]; then
+            persistent_peers="$PERSISTENT_PEER"
+        else
+            # add persistent peers from RPC IP address
+            genesis_ip=$(echo $rpc_address | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b")
+            # TODO: ideally this should parse listen_addr to get the port
+            persistent_peers=$( wget -q -O - $rpc_address/status \
+                                | jq -r --arg ip $genesis_ip '.result.node_info.id + "@" + $ip + ":26656"' )
+        fi
     else
 
         # if RPC_ADDRESS was not provided then read it from the chain.json
