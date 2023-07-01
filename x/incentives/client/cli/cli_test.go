@@ -123,7 +123,7 @@ func TestNewCreateGaugeCmd(t *testing.T) {
 	tcs := map[string]dcli.TxCliTestCase[*types.MsgCreateGauge]{
 		"basic test": {
 			Cmd: fmt.Sprintf(
-				"TokenA<>TokenB 0 100 100TokenA,100TokenB 50 0 --from %s",
+				"TokenA TokenB 0 100 100TokenA,100TokenB 50 0 --from %s",
 				testAddresses[0],
 			),
 			ExpectedMsg: &types.MsgCreateGauge{
@@ -145,7 +145,7 @@ func TestNewCreateGaugeCmd(t *testing.T) {
 		},
 		"tests with time (RFC3339)": {
 			Cmd: fmt.Sprintf(
-				"TokenA<>TokenB [-20] 20 100TokenA,100TokenB 50 0 --start-time %s --from %s",
+				"TokenA TokenB [-20] 20 100TokenA,100TokenB 50 0 --start-time %s --from %s",
 				testTime.Format(time.RFC3339),
 				testAddresses[0],
 			),
@@ -168,7 +168,7 @@ func TestNewCreateGaugeCmd(t *testing.T) {
 		},
 		"tests with time (unix int)": {
 			Cmd: fmt.Sprintf(
-				"TokenA<>TokenB [-20] 20 100TokenA,100TokenB 50 0 --start-time %d --from %s",
+				"TokenA TokenB [-20] 20 100TokenA,100TokenB 50 0 --start-time %d --from %s",
 				testTime.Unix(),
 				testAddresses[0],
 			),
@@ -191,7 +191,7 @@ func TestNewCreateGaugeCmd(t *testing.T) {
 		},
 		"tests with perpetual": {
 			Cmd: fmt.Sprintf(
-				"TokenA<>TokenB [-20] 20 100TokenA,100TokenB 50 0 --perpetual --from %s",
+				"TokenA TokenB [-20] 20 100TokenA,100TokenB 50 0 --perpetual --from %s",
 				testAddresses[0],
 			),
 			ExpectedMsg: &types.MsgCreateGauge{
