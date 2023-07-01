@@ -20,12 +20,6 @@ mkdir -p /root/.duality/config # create directory if not exists
 
 echo "Startup mode: $STARTUP_MODE"
 
-echo "Initializing chain..."
-dualityd init --chain-id $CHAIN_ID duality
-
-# Add consumer section to the ICS chain
-dualityd add-consumer-section
-
 # replace moniker in the config
 if [ ! -z $NODE_MONIKER ]
 then
@@ -39,6 +33,12 @@ fi
 # for mainnets a custom genesis file should be curated outside of these scripts
 if [ $STARTUP_MODE == "new" ]
 then
+
+    echo "Initializing chain..."
+    dualityd init --chain-id $CHAIN_ID duality
+
+    # Add consumer section to the ICS chain
+    dualityd add-consumer-section
 
     # duplicate genesis for easier merging and recovery
     cp /root/.duality/config/genesis.json /root/.duality/config/genesis-init.json
