@@ -181,6 +181,7 @@ else
     fi
 
     # set chain settings
+    echo "using persistent peers: $persistent_peers"
     sed -i 's#persistent_peers = ""#persistent_peers = "'"$persistent_peers"'"#' /root/.duality/config/config.toml
 
     # check if this node intends to become a validator
