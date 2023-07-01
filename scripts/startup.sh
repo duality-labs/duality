@@ -127,12 +127,6 @@ else
         rpc_address=$RPC_ADDRESS
         echo "RPC ADDRESS: $rpc_address"
 
-        # assert that address is an IP address
-        if [[ ! "$rpc_address" =~ "https?://([0-9]{1,3}\.){3}[0-9]{1,3}\b" ]]; then
-            echo "Must provide ENV variable RPC_ADDRESS as an IP address"
-            exit 1
-        fi
-
         # add genesis
         if $(wget -q -O - $rpc_address/genesis | jq .result.genesis > /root/.duality/config/genesis.json); then
             echo "Loaded genesis.json"
@@ -145,6 +139,11 @@ else
         if [ ! -z $PERSISTENT_PEER ]; then
             persistent_peers="$PERSISTENT_PEER"
         else
+            # assert that address is an IP address so that it can be the persistent peer
+            if [[ ! "$rpc_address" =~ "https?://([0-9]{1,3}\.){3}[0-9]{1,3}\b" ]]; then
+                echo "Must provide ENV variable RPC_ADDRESS as an IP address"
+                exit 1
+            fi
             # add persistent peers from RPC IP address
             genesis_ip=$(echo $rpc_address | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b")
             # TODO: ideally this should parse listen_addr to get the port
