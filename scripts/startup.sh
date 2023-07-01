@@ -152,6 +152,7 @@ else
         echo "RPC ADDRESS: $rpc_address"
 
         # add genesis
+        mkdir -p /root/.duality/config # create directory if not exists (like in VSCode dev container)
         mv networks/$NETWORK/genesis.json /root/.duality/config/genesis.json
 
         # add persistent peers
