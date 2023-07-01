@@ -13,6 +13,11 @@ if [[ ! -e scripts/startup.sh ]]; then
     exit 1
 fi
 
+# ensure settings directory exists
+# eg. even after running ignite chain build in the VSCode DevContainer image this directory doesn't exist
+# we will need it to add/move config files during setup
+mkdir -p /root/.duality/config # create directory if not exists
+
 echo "Startup mode: $STARTUP_MODE"
 
 echo "Initializing chain..."
@@ -152,7 +157,6 @@ else
         echo "RPC ADDRESS: $rpc_address"
 
         # add genesis
-        mkdir -p /root/.duality/config # create directory if not exists (like in VSCode dev container)
         mv networks/$NETWORK/genesis.json /root/.duality/config/genesis.json
 
         # add persistent peers
