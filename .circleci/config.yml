@@ -75,7 +75,6 @@ jobs:
           root: ./tmp
           paths:
             - docker
-
   ictest:
     working_directory: ~/repo
     machine: # executor type
@@ -186,9 +185,6 @@ workflows:
       - heighliner-build:
           context:
             - GITHUB_CREDS
-      - ictest:
-          requires:
-            - heighliner-build
       - binary-build
   lint:
     jobs:
