@@ -8,13 +8,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
-	transfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
-	channeltypes "github.com/cosmos/ibc-go/v4/modules/core/04-channel/types"
-	porttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
-	ibcexported "github.com/cosmos/ibc-go/v4/modules/core/exported"
+	transfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
+	clienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
+	channeltypes "github.com/cosmos/ibc-go/v7/modules/core/04-channel/types"
+	porttypes "github.com/cosmos/ibc-go/v7/modules/core/05-port/types"
+	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 	"github.com/duality-labs/duality/x/ibcswap/keeper"
 	"github.com/duality-labs/duality/x/ibcswap/types"
-	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
+	forwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/types"
 )
 
 var _ porttypes.Middleware = &IBCMiddleware{}
@@ -45,7 +46,16 @@ func (im IBCMiddleware) OnChanOpenInit(
 	counterparty channeltypes.Counterparty,
 	version string,
 ) (string, error) {
-	return im.app.OnChanOpenInit(ctx, order, connectionHops, portID, channelID, chanCap, counterparty, version)
+	return im.app.OnChanOpenInit(
+		ctx,
+		order,
+		connectionHops,
+		portID,
+		channelID,
+		chanCap,
+		counterparty,
+		version,
+	)
 }
 
 // OnChanOpenTry implements the IBCModule interface.
@@ -58,7 +68,16 @@ func (im IBCMiddleware) OnChanOpenTry(
 	counterparty channeltypes.Counterparty,
 	counterpartyVersion string,
 ) (version string, err error) {
-	return im.app.OnChanOpenTry(ctx, order, connectionHops, portID, channelID, chanCap, counterparty, counterpartyVersion)
+	return im.app.OnChanOpenTry(
+		ctx,
+		order,
+		connectionHops,
+		portID,
+		channelID,
+		chanCap,
+		counterparty,
+		counterpartyVersion,
+	)
 }
 
 // OnChanOpenAck implements the IBCModule interface.
@@ -124,8 +143,16 @@ func (im IBCMiddleware) OnRecvPacket(
 
 	// Compose our context with values that will be used to pass through to the forward middleware
 	ctxWithForwardFlags := context.WithValue(ctx.Context(), forwardtypes.ProcessedKey{}, true)
-	ctxWithForwardFlags = context.WithValue(ctxWithForwardFlags, forwardtypes.NonrefundableKey{}, true)
-	ctxWithForwardFlags = context.WithValue(ctxWithForwardFlags, forwardtypes.DisableDenomCompositionKey{}, true)
+	ctxWithForwardFlags = context.WithValue(
+		ctxWithForwardFlags,
+		forwardtypes.NonrefundableKey{},
+		true,
+	)
+	ctxWithForwardFlags = context.WithValue(
+		ctxWithForwardFlags,
+		forwardtypes.DisableDenomCompositionKey{},
+		true,
+	)
 	wrappedSdkCtx := ctx.WithContext(ctxWithForwardFlags)
 
 	// If this packet has been handled by another middleware in the stack there is no need to call into the
@@ -194,17 +221,32 @@ func (im IBCMiddleware) OnAcknowledgementPacket(
 }
 
 // OnTimeoutPacket implements the IBCModule interface.
-func (im IBCMiddleware) OnTimeoutPacket(ctx sdk.Context, packet channeltypes.Packet, relayer sdk.AccAddress) error {
+func (im IBCMiddleware) OnTimeoutPacket(
+	ctx sdk.Context,
+	packet channeltypes.Packet,
+	relayer sdk.AccAddress,
+) error {
 	return im.app.OnTimeoutPacket(ctx, packet, relayer)
 }
 
-// SendPacket implements the ICS4 Wrapper interface.
 func (im IBCMiddleware) SendPacket(
 	ctx sdk.Context,
 	chanCap *capabilitytypes.Capability,
-	packet ibcexported.PacketI,
-) error {
-	return im.keeper.SendPacket(ctx, chanCap, packet)
+	sourcePort string,
+	sourceChannel string,
+	timeoutHeight clienttypes.Height,
+	timeoutTimestamp uint64,
+	data []byte,
+) (sequence uint64, err error) {
+	return im.keeper.SendPacket(
+		ctx,
+		chanCap,
+		sourceChannel,
+		sourceChannel,
+		timeoutHeight,
+		timeoutTimestamp,
+		data,
+	)
 }
 
 // WriteAcknowledgement implements the ICS4 Wrapper interface.
@@ -217,7 +259,11 @@ func (im IBCMiddleware) WriteAcknowledgement(
 	return im.keeper.WriteAcknowledgement(ctx, chanCap, packet, ack)
 }
 
-func (im IBCMiddleware) GetAppVersion(ctx sdk.Context, portID string, channelID string) (string, bool) {
+func (im IBCMiddleware) GetAppVersion(
+	ctx sdk.Context,
+	portID string,
+	channelID string,
+) (string, bool) {
 	return im.keeper.GetAppVersion(ctx, portID, channelID)
 }
 
@@ -277,7 +323,11 @@ func (im IBCMiddleware) handleNoRefund(
 
 	amount, ok := sdk.NewIntFromString(data.Amount)
 	if !ok {
-		wrappedErr := sdkerrors.Wrapf(transfertypes.ErrInvalidAmount, "unable to parse transfer amount (%s) into math.Int", data.Amount)
+		wrappedErr := sdkerrors.Wrapf(
+			transfertypes.ErrInvalidAmount,
+			"unable to parse transfer amount (%s) into math.Int",
+			data.Amount,
+		)
 		wrappedErr = sdkerrors.Wrap(swapErr, wrappedErr.Error())
 		return channeltypes.NewResultAcknowledgement([]byte(wrappedErr.Error()))
 	}
@@ -319,7 +369,9 @@ func (im IBCMiddleware) handleRefund(
 
 // getDenomForThisChain composes a new token denom by either unwinding or prefixing the specified token denom appropriately.
 // This is necessary because the token denom in the packet data is from the perspective of the counterparty chain.
-func getDenomForThisChain(port, channel, counterpartyPort, counterpartyChannel, denom string) string {
+func getDenomForThisChain(
+	port, channel, counterpartyPort, counterpartyChannel, denom string,
+) string {
 	counterpartyPrefix := transfertypes.GetDenomPrefix(counterpartyPort, counterpartyChannel)
 	if strings.HasPrefix(denom, counterpartyPrefix) {
 		// unwind denom

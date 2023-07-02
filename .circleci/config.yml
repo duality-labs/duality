@@ -98,7 +98,7 @@ jobs:
   binary-build:
     working_directory: ~/repo
     docker:
-      - image: ignitehq/cli:0.23.0
+      - image: ignitehq/cli:v0.27.1
     steps:
       - checkout
       - run:
@@ -112,7 +112,7 @@ jobs:
   codegen-check:
     working_directory: ~/repo
     docker:
-      - image: ignitehq/cli:0.23.0
+      - image: ignitehq/cli:v0.27.1
     steps:
       - checkout
       - run:
@@ -130,7 +130,7 @@ jobs:
   binary-release-build:
     working_directory: ~/repo
     docker:
-      - image: ignitehq/cli:0.23.0
+      - image: ignitehq/cli:v0.27.1
     steps:
       - checkout
       - run:

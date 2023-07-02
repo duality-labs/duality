@@ -68,7 +68,10 @@ func CmdPlaceLimitOrder() *cobra.Command {
 			if maxAmountOutArg != "" {
 				maxAmountOutInt, ok := sdk.NewIntFromString(maxAmountOutArg)
 				if !ok {
-					return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Integer overflow for max-amount-out")
+					return sdkerrors.Wrapf(
+						types.ErrIntOverflowTx,
+						"Integer overflow for max-amount-out",
+					)
 				}
 				maxAmountOutIntP = &maxAmountOutInt
 			}

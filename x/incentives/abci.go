@@ -1,8 +1,8 @@
 package incentives
 
 import (
+	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/duality-labs/duality/x/incentives/keeper"
-	abci "github.com/tendermint/tendermint/abci/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

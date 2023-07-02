@@ -86,7 +86,13 @@ func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquid
 	upperTickIndex := upperTick.TickIndex
 	centerTickIndex := upperTickIndex - utils.MustSafeUint64(upperTick.Fee)
 	lowerTickIndex := centerTickIndex - utils.MustSafeUint64(upperTick.Fee)
-	lowerTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairID, s.pairID.Token0, lowerTickIndex, upperTick.Fee)
+	lowerTick, err := s.keeper.GetOrInitPoolReserves(
+		s.ctx,
+		s.pairID,
+		s.pairID.Token0,
+		lowerTickIndex,
+		upperTick.Fee,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +109,13 @@ func (s *LiquidityIterator) createPool1To0(lowerTick types.PoolReserves) (Liquid
 	lowerTickIndex := lowerTick.TickIndex
 	centerTickIndex := lowerTickIndex + utils.MustSafeUint64(lowerTick.Fee)
 	upperTickIndex := centerTickIndex + utils.MustSafeUint64(lowerTick.Fee)
-	upperTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairID, s.pairID.Token1, upperTickIndex, lowerTick.Fee)
+	upperTick, err := s.keeper.GetOrInitPoolReserves(
+		s.ctx,
+		s.pairID,
+		s.pairID.Token1,
+		upperTickIndex,
+		lowerTick.Fee,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +213,15 @@ func (k Keeper) SwapExactAmountIn(ctx sdk.Context,
 	maxAmountOut *sdk.Int,
 	limitPrice *sdk.Dec,
 ) (totalIn, totalOut sdk.Coin, err error) {
-	swapAmountIn, swapAmountOut, orderFilled, err := k.Swap(ctx, pairID, tokenIn, tokenOut, amountIn, maxAmountOut, limitPrice)
+	swapAmountIn, swapAmountOut, orderFilled, err := k.Swap(
+		ctx,
+		pairID,
+		tokenIn,
+		tokenOut,
+		amountIn,
+		maxAmountOut,
+		limitPrice,
+	)
 	if err != nil {
 		return sdk.Coin{}, sdk.Coin{}, err
 	}
@@ -222,7 +242,15 @@ func (k Keeper) SwapWithCache(
 	limitPrice *sdk.Dec,
 ) (totalIn, totalOut sdk.Coin, orderFilled bool, err error) {
 	cacheCtx, writeCache := ctx.CacheContext()
-	totalIn, totalOut, orderFilled, err = k.Swap(cacheCtx, pairID, tokenIn, tokenOut, maxAmountIn, maxAmountOut, limitPrice)
+	totalIn, totalOut, orderFilled, err = k.Swap(
+		cacheCtx,
+		pairID,
+		tokenIn,
+		tokenOut,
+		maxAmountIn,
+		maxAmountOut,
+		limitPrice,
+	)
 
 	writeCache()
 

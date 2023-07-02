@@ -28,7 +28,10 @@ func NewQueryServer(k Keeper) QueryServer {
 	return QueryServer{Keeper: k}
 }
 
-func (q QueryServer) GetModuleStatus(goCtx context.Context, req *types.GetModuleStatusRequest) (*types.GetModuleStatusResponse, error) {
+func (q QueryServer) GetModuleStatus(
+	goCtx context.Context,
+	req *types.GetModuleStatusRequest,
+) (*types.GetModuleStatusResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	return &types.GetModuleStatusResponse{
 		RewardCoins: q.Keeper.GetModuleCoinsToBeDistributed(ctx),
@@ -37,7 +40,10 @@ func (q QueryServer) GetModuleStatus(goCtx context.Context, req *types.GetModule
 	}, nil
 }
 
-func (q QueryServer) GetGaugeByID(goCtx context.Context, req *types.GetGaugeByIDRequest) (*types.GetGaugeByIDResponse, error) {
+func (q QueryServer) GetGaugeByID(
+	goCtx context.Context,
+	req *types.GetGaugeByIDRequest,
+) (*types.GetGaugeByIDResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
@@ -49,7 +55,10 @@ func (q QueryServer) GetGaugeByID(goCtx context.Context, req *types.GetGaugeByID
 	return &types.GetGaugeByIDResponse{Gauge: gauge}, nil
 }
 
-func (q QueryServer) GetGauges(goCtx context.Context, req *types.GetGaugesRequest) (*types.GetGaugesResponse, error) {
+func (q QueryServer) GetGauges(
+	goCtx context.Context,
+	req *types.GetGaugesRequest,
+) (*types.GetGaugesResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -82,7 +91,10 @@ func (q QueryServer) GetGauges(goCtx context.Context, req *types.GetGaugesReques
 	}, nil
 }
 
-func (q QueryServer) GetStakeByID(goCtx context.Context, req *types.GetStakeByIDRequest) (*types.GetStakeByIDResponse, error) {
+func (q QueryServer) GetStakeByID(
+	goCtx context.Context,
+	req *types.GetStakeByIDRequest,
+) (*types.GetStakeByIDResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -94,7 +106,10 @@ func (q QueryServer) GetStakeByID(goCtx context.Context, req *types.GetStakeByID
 	return &types.GetStakeByIDResponse{Stake: stake}, nil
 }
 
-func (q QueryServer) GetStakes(goCtx context.Context, req *types.GetStakesRequest) (*types.GetStakesResponse, error) {
+func (q QueryServer) GetStakes(
+	goCtx context.Context,
+	req *types.GetStakesRequest,
+) (*types.GetStakesResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -103,7 +118,10 @@ func (q QueryServer) GetStakes(goCtx context.Context, req *types.GetStakesReques
 	hasOwner := len(req.Owner) > 0
 	if !hasOwner {
 		// TODO: Verify this protection is necessary
-		return nil, status.Error(codes.InvalidArgument, "for performance reasons will not return all stakes")
+		return nil, status.Error(
+			codes.InvalidArgument,
+			"for performance reasons will not return all stakes",
+		)
 	}
 
 	owner, err := sdk.AccAddressFromBech32(req.Owner)
@@ -117,7 +135,10 @@ func (q QueryServer) GetStakes(goCtx context.Context, req *types.GetStakesReques
 	}, nil
 }
 
-func (q QueryServer) GetFutureRewardEstimate(goCtx context.Context, req *types.GetFutureRewardEstimateRequest) (*types.GetFutureRewardEstimateResponse, error) {
+func (q QueryServer) GetFutureRewardEstimate(
+	goCtx context.Context,
+	req *types.GetFutureRewardEstimateRequest,
+) (*types.GetFutureRewardEstimateResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -126,8 +147,7 @@ func (q QueryServer) GetFutureRewardEstimate(goCtx context.Context, req *types.G
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	diff := req.EndEpoch - q.Keeper.GetEpochInfo(ctx).CurrentEpoch
-	if diff > 365 {
+	if req.NumEpochs > 365 {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "end epoch out of ranges")
 	}
 
@@ -149,7 +169,7 @@ func (q QueryServer) GetFutureRewardEstimate(goCtx context.Context, req *types.G
 		stakes = append(stakes, stake)
 	}
 
-	rewards, err := q.Keeper.GetRewardsEstimate(ctx, ownerAddress, stakes, req.EndEpoch)
+	rewards, err := q.Keeper.GetRewardsEstimate(ctx, ownerAddress, stakes, req.NumEpochs)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +177,10 @@ func (q QueryServer) GetFutureRewardEstimate(goCtx context.Context, req *types.G
 }
 
 // getGaugeFromIDJsonBytes returns gauges from the json bytes of gaugeIDs.
-func (q QueryServer) getGaugeFromIDJsonBytes(ctx sdk.Context, refValue []byte) (types.Gauges, error) {
+func (q QueryServer) getGaugeFromIDJsonBytes(
+	ctx sdk.Context,
+	refValue []byte,
+) (types.Gauges, error) {
 	gauges := types.Gauges{}
 	gaugeIDs := []uint64{}
 
@@ -179,7 +202,12 @@ func (q QueryServer) getGaugeFromIDJsonBytes(ctx sdk.Context, refValue []byte) (
 }
 
 // filterByPrefixAndDenom filters gauges based on a given key prefix and denom
-func (q QueryServer) filterByPrefixAndDenom(ctx sdk.Context, prefixType []byte, denom string, pagination *query.PageRequest) (*query.PageResponse, types.Gauges, error) {
+func (q QueryServer) filterByPrefixAndDenom(
+	ctx sdk.Context,
+	prefixType []byte,
+	denom string,
+	pagination *query.PageRequest,
+) (*query.PageResponse, types.Gauges, error) {
 	gauges := types.Gauges{}
 	store := ctx.KVStore(q.Keeper.storeKey)
 	valStore := prefix.NewStore(store, prefixType)
@@ -190,31 +218,37 @@ func (q QueryServer) filterByPrefixAndDenom(ctx sdk.Context, prefixType []byte, 
 	lowerTick := depositDenom.Tick - int64(depositDenom.Fee)
 	upperTick := depositDenom.Tick + int64(depositDenom.Fee)
 
-	pageRes, err := query.FilteredPaginate(valStore, pagination, func(key []byte, value []byte, accumulate bool) (bool, error) {
-		// this may return multiple gauges at once if two gauges start at the same time.
-		// for now this is treated as an edge case that is not of importance
-		newGauges, err := q.getGaugeFromIDJsonBytes(ctx, value)
-		if err != nil {
-			return false, err
-		}
-		if accumulate {
-			if denom != "" {
-				for _, gauge := range newGauges {
-					if *gauge.DistributeTo.PairID != *depositDenom.PairID {
-						return false, nil
-					}
-					lowerTickInRange := gauge.DistributeTo.StartTick <= lowerTick && lowerTick <= gauge.DistributeTo.EndTick
-					upperTickInRange := gauge.DistributeTo.StartTick <= upperTick && upperTick <= gauge.DistributeTo.EndTick
-					if !lowerTickInRange || !upperTickInRange {
-						return false, nil
-					}
-					gauges = append(gauges, gauge)
-				}
-			} else {
-				gauges = append(gauges, newGauges...)
+	pageRes, err := query.FilteredPaginate(
+		valStore,
+		pagination,
+		func(key []byte, value []byte, accumulate bool) (bool, error) {
+			// this may return multiple gauges at once if two gauges start at the same time.
+			// for now this is treated as an edge case that is not of importance
+			newGauges, err := q.getGaugeFromIDJsonBytes(ctx, value)
+			if err != nil {
+				return false, err
 			}
-		}
-		return true, nil
-	})
+			if accumulate {
+				if denom != "" {
+					for _, gauge := range newGauges {
+						if *gauge.DistributeTo.PairID != *depositDenom.PairID {
+							return false, nil
+						}
+						lowerTickInRange := gauge.DistributeTo.StartTick <= lowerTick &&
+							lowerTick <= gauge.DistributeTo.EndTick
+						upperTickInRange := gauge.DistributeTo.StartTick <= upperTick &&
+							upperTick <= gauge.DistributeTo.EndTick
+						if !lowerTickInRange || !upperTickInRange {
+							return false, nil
+						}
+						gauges = append(gauges, gauge)
+					}
+				} else {
+					gauges = append(gauges, newGauges...)
+				}
+			}
+			return true, nil
+		},
+	)
 	return pageRes, gauges, err
 }

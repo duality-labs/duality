@@ -3,8 +3,8 @@ package keeper
 import (
 	"encoding/json"
 
+	db "github.com/cometbft/cometbft-db"
 	"github.com/duality-labs/duality/x/incentives/types"
-	db "github.com/tendermint/tm-db"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

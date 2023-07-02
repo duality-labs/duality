@@ -2,10 +2,10 @@ syntax = "proto3";
 package dualitylabs.duality.dex;
 
 import "gogoproto/gogo.proto";
-import "duality/dex/params.proto";
-import "duality/dex/limit_order_tranche_user.proto";
-import "duality/dex/limit_order_tranche.proto";
-import "duality/dex/tick_liquidity.proto";
+import "dualitylabs/duality/dex/params.proto";
+import "dualitylabs/duality/dex/limit_order_tranche_user.proto";
+import "dualitylabs/duality/dex/limit_order_tranche.proto";
+import "dualitylabs/duality/dex/tick_liquidity.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/duality-labs/duality/x/dex/types";
