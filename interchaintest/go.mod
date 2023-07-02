@@ -23,7 +23,7 @@ require (
 	github.com/duality-labs/duality v0.0.0-00010101000000-000000000000
 	github.com/iancoleman/orderedmap v0.2.0
 	github.com/strangelove-ventures/interchaintest/v4 v4.0.0-20230316161044-8d8c01f96b4a
-	github.com/strangelove-ventures/packet-forward-middleware/v7 v4.0.5
+	github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7 v4.0.5
 	github.com/stretchr/testify v1.8.1
 	github.com/cometbft/cometbft v0.34.27
 	go.uber.org/zap v1.23.0
