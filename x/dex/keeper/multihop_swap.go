@@ -11,7 +11,11 @@ type MultihopStep struct {
 	TradingPair types.DirectionalTradingPair
 }
 
-func (k Keeper) HopsToRouteData(ctx sdk.Context, hops []string, exitLimitPrice sdk.Dec) ([]MultihopStep, error) {
+func (k Keeper) HopsToRouteData(
+	ctx sdk.Context,
+	hops []string,
+	exitLimitPrice sdk.Dec,
+) ([]MultihopStep, error) {
 	nPairs := len(hops) - 1
 	routeArr := make([]MultihopStep, nPairs)
 	priceUpperbound := sdk.OneDec()
@@ -147,9 +151,14 @@ func (k Keeper) RunMultihopRoute(
 			stepCache,
 		)
 		if err != nil {
-			return sdk.Coin{}, nil, sdkerrors.Wrapf(err, "Failed at pair: %s", step.TradingPair.PairID.Stringify())
+			return sdk.Coin{}, nil, sdkerrors.Wrapf(
+				err,
+				"Failed at pair: %s",
+				step.TradingPair.PairID.Stringify(),
+			)
 		}
-		currentPrice = currentOutCoin.Amount.ToDec().Quo(initialInCoin.Amount.ToDec())
+		currentPrice = sdk.NewDecFromInt(currentOutCoin.Amount).
+			Quo(sdk.NewDecFromInt(initialInCoin.Amount))
 	}
 
 	if exitLimitPrice.GT(currentPrice) {

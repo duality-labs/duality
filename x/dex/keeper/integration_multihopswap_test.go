@@ -78,7 +78,13 @@ func (s *MsgServerTestSuite) TestMultiHopSwapInsufficientLiquiditySingleRoute() 
 
 	// THEN alice multihopswap fails
 	route := [][]string{{"TokenA", "TokenB", "TokenC", "TokenD"}}
-	s.aliceMultiHopSwapFails(types.ErrInsufficientLiquidity, route, 100, sdk.MustNewDecFromStr("0.9"), false)
+	s.aliceMultiHopSwapFails(
+		types.ErrInsufficientLiquidity,
+		route,
+		100,
+		sdk.MustNewDecFromStr("0.9"),
+		false,
+	)
 }
 
 func (s *MsgServerTestSuite) TestMultiHopSwapLimitPriceNotMetSingleRoute() {
@@ -93,7 +99,13 @@ func (s *MsgServerTestSuite) TestMultiHopSwapLimitPriceNotMetSingleRoute() {
 
 	// THEN alice multihopswap fails
 	route := [][]string{{"TokenA", "TokenB", "TokenC", "TokenD"}}
-	s.aliceMultiHopSwapFails(types.ErrExitLimitPriceHit, route, 50, sdk.MustNewDecFromStr("0.9"), false)
+	s.aliceMultiHopSwapFails(
+		types.ErrExitLimitPriceHit,
+		route,
+		50,
+		sdk.MustNewDecFromStr("0.9"),
+		false,
+	)
 }
 
 func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteOneGood() {
@@ -124,17 +136,71 @@ func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteOneGood() {
 
 	s.assertAccountBalanceWithDenom(s.alice, "TokenA", 0)
 	s.assertAccountBalanceWithDenom(s.alice, "TokenX", 99)
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenA", Token1: "TokenB"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenB", Token1: "TokenE"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenE", Token1: "TokenX"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenA", Token1: "TokenB"},
+		sdk.NewInt(100),
+		sdk.NewInt(1),
+		0,
+		1,
+	)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenB", Token1: "TokenE"},
+		sdk.NewInt(100),
+		sdk.NewInt(1),
+		0,
+		1,
+	)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenE", Token1: "TokenX"},
+		sdk.NewInt(100),
+		sdk.NewInt(1),
+		0,
+		1,
+	)
 
 	// Other pools are unaffected
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenB", Token1: "TokenC"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenC", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(50), 0, 1)
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenC", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(50), 2200, 1)
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenB", Token1: "TokenD"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenD", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(50), 0, 1)
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenD", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(50), 2200, 1)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenB", Token1: "TokenC"},
+		sdk.NewInt(0),
+		sdk.NewInt(100),
+		0,
+		1,
+	)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenC", Token1: "TokenX"},
+		sdk.NewInt(0),
+		sdk.NewInt(50),
+		0,
+		1,
+	)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenC", Token1: "TokenX"},
+		sdk.NewInt(0),
+		sdk.NewInt(50),
+		2200,
+		1,
+	)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenB", Token1: "TokenD"},
+		sdk.NewInt(0),
+		sdk.NewInt(100),
+		0,
+		1,
+	)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenD", Token1: "TokenX"},
+		sdk.NewInt(0),
+		sdk.NewInt(50),
+		0,
+		1,
+	)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenD", Token1: "TokenX"},
+		sdk.NewInt(0),
+		sdk.NewInt(50),
+		2200,
+		1,
+	)
 }
 
 func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteAllFail() {
@@ -161,11 +227,23 @@ func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteAllFail() {
 	}
 
 	// Then fails with findBestRoute
-	s.aliceMultiHopSwapFails(types.ErrExitLimitPriceHit, routes, 100, sdk.MustNewDecFromStr("0.9"), true)
+	s.aliceMultiHopSwapFails(
+		types.ErrExitLimitPriceHit,
+		routes,
+		100,
+		sdk.MustNewDecFromStr("0.9"),
+		true,
+	)
 
 	// and with findFirstRoute
 
-	s.aliceMultiHopSwapFails(types.ErrInsufficientLiquidity, routes, 100, sdk.MustNewDecFromStr("0.9"), false)
+	s.aliceMultiHopSwapFails(
+		types.ErrInsufficientLiquidity,
+		routes,
+		100,
+		sdk.MustNewDecFromStr("0.9"),
+		false,
+	)
 }
 
 func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteFindBestRoute() {
@@ -194,15 +272,57 @@ func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteFindBestRoute() {
 
 	s.assertAccountBalanceWithDenom(s.alice, "TokenA", 0)
 	s.assertAccountBalanceWithDenom(s.alice, "TokenX", 134)
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenA", Token1: "TokenB"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenB", Token1: "TokenE"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenE", Token1: "TokenX"}, sdk.NewInt(100), sdk.NewInt(866), -3000, 1)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenA", Token1: "TokenB"},
+		sdk.NewInt(100),
+		sdk.NewInt(1),
+		0,
+		1,
+	)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenB", Token1: "TokenE"},
+		sdk.NewInt(100),
+		sdk.NewInt(1),
+		0,
+		1,
+	)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenE", Token1: "TokenX"},
+		sdk.NewInt(100),
+		sdk.NewInt(866),
+		-3000,
+		1,
+	)
 
 	// Other pools are unaffected
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenB", Token1: "TokenC"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenC", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(1000), -1000, 1)
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenB", Token1: "TokenD"}, sdk.NewInt(0), sdk.NewInt(100), 0, 1)
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenD", Token1: "TokenX"}, sdk.NewInt(0), sdk.NewInt(1000), -2000, 1)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenB", Token1: "TokenC"},
+		sdk.NewInt(0),
+		sdk.NewInt(100),
+		0,
+		1,
+	)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenC", Token1: "TokenX"},
+		sdk.NewInt(0),
+		sdk.NewInt(1000),
+		-1000,
+		1,
+	)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenB", Token1: "TokenD"},
+		sdk.NewInt(0),
+		sdk.NewInt(100),
+		0,
+		1,
+	)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenD", Token1: "TokenX"},
+		sdk.NewInt(0),
+		sdk.NewInt(1000),
+		-2000,
+		1,
+	)
 }
 
 func (s *MsgServerTestSuite) TestMultiHopSwapLongRouteWithCache() {
@@ -245,7 +365,13 @@ func (s *MsgServerTestSuite) TestMultiHopSwapLongRouteWithCache() {
 
 	s.assertAccountBalanceWithDenom(s.alice, "TokenA", 0)
 	s.assertAccountBalanceWithDenom(s.alice, "TokenX", 99)
-	s.assertLiquidityAtTickWithDenom(&types.PairID{Token0: "TokenM", Token1: "TokenX"}, sdk.NewInt(100), sdk.NewInt(1), 0, 1)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenM", Token1: "TokenX"},
+		sdk.NewInt(100),
+		sdk.NewInt(1),
+		0,
+		1,
+	)
 }
 
 func (s *MsgServerTestSuite) TestMultiHopSwapEventsEmitted() {

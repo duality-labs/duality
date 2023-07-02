@@ -4,12 +4,12 @@ import (
 	"math"
 	"testing"
 
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	dualityapp "github.com/duality-labs/duality/app"
 	keepertest "github.com/duality-labs/duality/testutil/keeper"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/suite"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
 
 type LiquidityTestSuite struct {
@@ -22,7 +22,7 @@ type LiquidityTestSuite struct {
 // don't need to test both LO and LP. At the level of swap testing these should be indistinguishable.
 
 func (s *LiquidityTestSuite) SetupTest() {
-	s.app = dualityapp.Setup(false)
+	s.app = dualityapp.Setup(s.T(), false)
 	ctx := s.app.BaseApp.NewContext(false, tmproto.Header{})
 	ctx = ctx.WithBlockGasMeter(sdk.NewInfiniteGasMeter())
 	s.ctx = ctx
@@ -587,32 +587,71 @@ func (s *LiquidityTestSuite) addDeposits(deposits ...*Deposit) {
 }
 
 func (s *LiquidityTestSuite) placeGTCLimitOrder(tokenIn string, amountIn int64, tickIndex int64) {
-	tranche, err := s.app.DexKeeper.GetOrInitPlaceTranche(s.ctx, defaultPairID, tokenIn, tickIndex, nil, types.LimitOrderType_GOOD_TIL_CANCELLED)
+	tranche, err := s.app.DexKeeper.GetOrInitPlaceTranche(
+		s.ctx,
+		defaultPairID,
+		tokenIn,
+		tickIndex,
+		nil,
+		types.LimitOrderType_GOOD_TIL_CANCELLED,
+	)
 	s.Assert().NoError(err)
 	tranche.PlaceMakerLimitOrder(sdk.NewInt(amountIn))
 	s.app.DexKeeper.SaveTranche(s.ctx, tranche)
 }
 
-func (s *LiquidityTestSuite) swap(tokenIn string, tokenOut string, maxAmountIn int64) (coinIn, coinOut sdk.Coin) {
-	coinIn, coinOut, _, err := s.app.DexKeeper.Swap(s.ctx, defaultPairID, tokenIn, tokenOut, sdk.NewInt(maxAmountIn), nil, nil)
+func (s *LiquidityTestSuite) swap(
+	tokenIn string,
+	tokenOut string,
+	maxAmountIn int64,
+) (coinIn, coinOut sdk.Coin) {
+	coinIn, coinOut, _, err := s.app.DexKeeper.Swap(
+		s.ctx,
+		defaultPairID,
+		tokenIn,
+		tokenOut,
+		sdk.NewInt(maxAmountIn),
+		nil,
+		nil,
+	)
 	s.Assert().NoError(err)
 	return coinIn, coinOut
 }
 
-func (s *LiquidityTestSuite) swapWithMaxOut(tokenIn string, tokenOut string, maxAmountIn int64, maxAmountOut int64) (coinIn, coinOut sdk.Coin) {
+func (s *LiquidityTestSuite) swapWithMaxOut(
+	tokenIn string,
+	tokenOut string,
+	maxAmountIn int64,
+	maxAmountOut int64,
+) (coinIn, coinOut sdk.Coin) {
 	maxAmountOutInt := sdk.NewInt(maxAmountOut)
-	coinIn, coinOut, _, err := s.app.DexKeeper.Swap(s.ctx, defaultPairID, tokenIn, tokenOut, sdk.NewInt(maxAmountIn), &maxAmountOutInt, nil)
+	coinIn, coinOut, _, err := s.app.DexKeeper.Swap(
+		s.ctx,
+		defaultPairID,
+		tokenIn,
+		tokenOut,
+		sdk.NewInt(maxAmountIn),
+		&maxAmountOutInt,
+		nil,
+	)
 	s.Assert().NoError(err)
 
 	return coinIn, coinOut
 }
 
-func (s *LiquidityTestSuite) assertSwapOutput(actualIn sdk.Coin, expectedIn int64, actualOut sdk.Coin, expectedOut int64) {
+func (s *LiquidityTestSuite) assertSwapOutput(
+	actualIn sdk.Coin,
+	expectedIn int64,
+	actualOut sdk.Coin,
+	expectedOut int64,
+) {
 	amtIn := actualIn.Amount
 	amtOut := actualOut.Amount
 
-	s.Assert().True(amtIn.Equal(sdk.NewInt(expectedIn)), "Expected amountIn %d != %s", expectedIn, amtIn)
-	s.Assert().True(amtOut.Equal(sdk.NewInt(expectedOut)), "Expected amountOut %d != %s", expectedOut, amtOut)
+	s.Assert().
+		True(amtIn.Equal(sdk.NewInt(expectedIn)), "Expected amountIn %d != %s", expectedIn, amtIn)
+	s.Assert().
+		True(amtOut.Equal(sdk.NewInt(expectedOut)), "Expected amountOut %d != %s", expectedOut, amtOut)
 }
 
 func (s *LiquidityTestSuite) assertDexBalances(expectedABalance int64, expectedBBalance int64) {
@@ -652,8 +691,10 @@ func (s *LiquidityTestSuite) assertDexBalances(expectedABalance int64, expectedB
 	actualA := allCoins.AmountOf("TokenA")
 	actualB := allCoins.AmountOf("TokenB")
 
-	s.Assert().True(actualA.Equal(expectedAInt), "TokenA: expected %s != actual %s", expectedAInt, actualA)
-	s.Assert().True(actualB.Equal(expectedBInt), "TokenB: expected %s != actual %s", expectedBInt, actualB)
+	s.Assert().
+		True(actualA.Equal(expectedAInt), "TokenA: expected %s != actual %s", expectedAInt, actualA)
+	s.Assert().
+		True(actualB.Equal(expectedBInt), "TokenB: expected %s != actual %s", expectedBInt, actualB)
 }
 
 func (s *LiquidityTestSuite) assertCurr0To1(curr0To1Expected int64) {
@@ -666,9 +707,23 @@ func (s *LiquidityTestSuite) assertCurr1To0(curr1To0Expected int64) {
 	s.Assert().Equal(curr1To0Expected, curr1to0Actual)
 }
 
-func (s *LiquidityTestSuite) assertFillAndPlaceTrancheKeys(selling string, tickIndex int64, expectedFill, expectedPlace string) {
-	placeTranche, foundPlace := s.app.DexKeeper.GetPlaceTranche(s.ctx, defaultPairID, selling, tickIndex)
-	fillTranche, foundFill := s.app.DexKeeper.GetFillTranche(s.ctx, defaultPairID, selling, tickIndex)
+func (s *LiquidityTestSuite) assertFillAndPlaceTrancheKeys(
+	selling string,
+	tickIndex int64,
+	expectedFill, expectedPlace string,
+) {
+	placeTranche, foundPlace := s.app.DexKeeper.GetPlaceTranche(
+		s.ctx,
+		defaultPairID,
+		selling,
+		tickIndex,
+	)
+	fillTranche, foundFill := s.app.DexKeeper.GetFillTranche(
+		s.ctx,
+		defaultPairID,
+		selling,
+		tickIndex,
+	)
 	placeKey, fillKey := "", ""
 	if foundPlace {
 		placeKey = placeTranche.TrancheKey

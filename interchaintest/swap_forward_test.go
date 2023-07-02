@@ -8,7 +8,7 @@ import (
 	"time"
 
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
-	transfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
+	transfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 	"github.com/duality-labs/duality/x/dex/types"
 	swaptypes "github.com/duality-labs/duality/x/ibcswap/types"
 	"github.com/iancoleman/orderedmap"
@@ -19,7 +19,7 @@ import (
 	"github.com/strangelove-ventures/interchaintest/v4/relayer/rly"
 	"github.com/strangelove-ventures/interchaintest/v4/testreporter"
 	"github.com/strangelove-ventures/interchaintest/v4/testutil"
-	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
+	forwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/types"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest"
 )

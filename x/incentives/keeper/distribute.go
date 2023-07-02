@@ -33,7 +33,7 @@ func (k Keeper) ValueForShares(ctx sdk.Context, coin sdk.Coin, tick int64) (sdk.
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
-	return amount0.ToDec().Add(price1To0Center.MulInt(amount1)).TruncateInt(), nil
+	return sdk.NewDecFromInt(amount0).Add(price1To0Center.MulInt(amount1)).TruncateInt(), nil
 }
 
 // Distribute distributes coins from an array of gauges to all eligible stakes.
@@ -101,7 +101,12 @@ func (k Keeper) GetModuleDistributedCoins(ctx sdk.Context) sdk.Coins {
 // GetRewardsEstimate returns rewards estimation at a future specific time (by epoch)
 // If stakes are nil, it returns the rewards between now and the end epoch associated with address.
 // If stakes are not nil, it returns all the rewards for the given stakes between now and end epoch.
-func (k Keeper) GetRewardsEstimate(ctx sdk.Context, addr sdk.AccAddress, filterStakes types.Stakes, endEpoch int64) (sdk.Coins, error) {
+func (k Keeper) GetRewardsEstimate(
+	ctx sdk.Context,
+	addr sdk.AccAddress,
+	filterStakes types.Stakes,
+	numEpochs int64,
+) (sdk.Coins, error) {
 	// if stakes are nil, populate with all stakes associated with the address
 	if len(filterStakes) == 0 {
 		filterStakes = k.GetStakesByAccount(ctx, addr)
@@ -133,16 +138,21 @@ func (k Keeper) GetRewardsEstimate(ctx sdk.Context, addr sdk.AccAddress, filterS
 	cacheCtx, _ := ctx.CacheContext()
 	for _, gauge := range gauges {
 		distrBeginEpoch := epochInfo.CurrentEpoch
+		endEpoch := epochInfo.CurrentEpoch + numEpochs
 		bstakeTime := ctx.BlockTime()
 		if gauge.StartTime.After(bstakeTime) {
-			distrBeginEpoch = epochInfo.CurrentEpoch + 1 + int64(gauge.StartTime.Sub(bstakeTime)/epochInfo.Duration)
+			distrBeginEpoch = epochInfo.CurrentEpoch + 1 + int64(
+				gauge.StartTime.Sub(bstakeTime)/epochInfo.Duration,
+			)
 		}
 
 		// TODO: Make more efficient by making it possible to call distribute with this
 		// gaugeStakes := k.GetStakesByQueryCondition(cacheCtx, &gauge.DistributeTo)
 		gaugeRewards := sdk.Coins{}
 		for epoch := distrBeginEpoch; epoch <= endEpoch; epoch++ {
-			epochTime := epochInfo.StartTime.Add(time.Duration(epoch-epochInfo.CurrentEpoch) * epochInfo.Duration)
+			epochTime := epochInfo.StartTime.Add(
+				time.Duration(epoch-epochInfo.CurrentEpoch) * epochInfo.Duration,
+			)
 			if !gauge.IsActiveGauge(epochTime) {
 				break
 			}

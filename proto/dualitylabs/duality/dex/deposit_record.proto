@@ -3,7 +3,7 @@ package dualitylabs.duality.dex;
 
 option go_package = "github.com/duality-labs/duality/x/dex/types";
 import "gogoproto/gogo.proto";
-import "duality/dex/pair_id.proto";
+import "dualitylabs/duality/dex/pair_id.proto";
 
 message DepositRecord {
   PairID pairID = 1;

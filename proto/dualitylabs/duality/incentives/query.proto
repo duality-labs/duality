@@ -1,15 +1,15 @@
 syntax = "proto3";
-package duality.incentives;
+package dualitylabs.duality.incentives;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "duality/incentives/gauge.proto";
-import "duality/incentives/stake.proto";
+import "dualitylabs/duality/incentives/gauge.proto";
+import "dualitylabs/duality/incentives/stake.proto";
 import "google/protobuf/timestamp.proto";
-import "duality/incentives/params.proto";
+import "dualitylabs/duality/incentives/params.proto";
 
 option go_package = "github.com/duality-labs/duality/x/incentives/types";
 
@@ -118,9 +118,9 @@ message GetFutureRewardEstimateRequest {
   string owner = 1 [ (gogoproto.moretags) = "yaml:\"owner\"" ];
   // Stake IDs included in future reward estimation
   repeated uint64 stake_ids = 2;
-  // Upper time limit of reward estimation
-  // Lower limit is current epoch
-  int64 end_epoch = 3;
+  // Determines upper time limit of reward estimation
+  // reward estimation goes up to current_epoch + num_epochs
+  int64 num_epochs = 3;
 }
 message GetFutureRewardEstimateResponse {
   // Estimated coin rewards that will be recieved at provided address
