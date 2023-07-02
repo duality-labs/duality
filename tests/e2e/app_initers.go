@@ -8,12 +8,13 @@ import (
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	ibctesting "github.com/cosmos/interchain-security/v3/legacy_ibc_testing/testing"
 	"github.com/duality-labs/duality/app"
+	appConsumer "github.com/duality-labs/duality/app"
 )
 
 // DualityAppIniter implements ibctesting.AppIniter for the duality consumer app
 func DualityAppIniter() (ibctesting.TestingApp, map[string]json.RawMessage) {
 	encoding := app.MakeEncodingConfig()
-	testApp := app.NewApp(
+	testApp := appConsumer.NewApp(
 		log.NewNopLogger(),
 		dbm.NewMemDB(),
 		nil,
@@ -25,5 +26,5 @@ func DualityAppIniter() (ibctesting.TestingApp, map[string]json.RawMessage) {
 		encoding,
 	)
 
-	return testApp, app.NewDefaultGenesisState(encoding.Marshaler)
+	return testApp, appConsumer.NewDefaultGenesisState(encoding.Marshaler)
 }

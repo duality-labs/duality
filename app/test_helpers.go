@@ -76,7 +76,6 @@ func setup(withGenesis bool, invCheckPeriod uint) (*App, GenesisState) {
 
 func Setup(t *testing.T, isCheckTx bool) *App {
 	t.Helper()
-
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
 	require.NoError(t, err)
