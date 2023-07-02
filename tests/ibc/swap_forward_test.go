@@ -9,7 +9,7 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 	swaptypes "github.com/duality-labs/duality/x/ibcswap/types"
 	"github.com/iancoleman/orderedmap"
-	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v7/router/types"
+	forwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/types"
 	"golang.org/x/exp/maps"
 )
 
