@@ -3,22 +3,27 @@ package e2e_test
 import (
 	"encoding/json"
 
-	"github.com/cosmos/cosmos-sdk/simapp"
-
-	ibctesting "github.com/cosmos/interchain-security/legacy_ibc_testing/testing"
-
-	"github.com/tendermint/spm/cosmoscmd"
-	"github.com/tendermint/tendermint/libs/log"
-	tmdb "github.com/tendermint/tm-db"
-
-	appConsumer "github.com/duality-labs/duality/app"
+	dbm "github.com/cometbft/cometbft-db"
+	"github.com/cometbft/cometbft/libs/log"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
+	ibctesting "github.com/cosmos/interchain-security/v3/legacy_ibc_testing/testing"
+	"github.com/duality-labs/duality/app"
 )
 
 // DualityAppIniter implements ibctesting.AppIniter for the duality consumer app
 func DualityAppIniter() (ibctesting.TestingApp, map[string]json.RawMessage) {
-	encoding := cosmoscmd.MakeEncodingConfig(appConsumer.ModuleBasics)
-	testApp := appConsumer.New(log.NewNopLogger(), tmdb.NewMemDB(), nil, true, map[int64]bool{},
-		simapp.DefaultNodeHome, 5, encoding, simapp.EmptyAppOptions{}).(ibctesting.TestingApp)
+	encoding := app.MakeEncodingConfig()
+	testApp := app.NewApp(
+		log.NewNopLogger(),
+		dbm.NewMemDB(),
+		nil,
+		true,
+		map[int64]bool{},
+		app.DefaultNodeHome,
+		5,
+		simtestutil.EmptyAppOptions{},
+		encoding,
+	)
 
-	return testApp, appConsumer.NewDefaultGenesisState(encoding.Marshaler)
+	return testApp, app.NewDefaultGenesisState(encoding.Marshaler)
 }

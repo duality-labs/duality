@@ -1,5 +1,5 @@
 syntax = "proto3";
-package duality.epochs.v1beta1;
+package dualitylabs.duality.epochs;
 
 import "gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";

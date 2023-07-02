@@ -7,7 +7,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/gogo/protobuf/proto"
+	"github.com/cosmos/gogoproto/proto"
 
 	"github.com/duality-labs/duality/x/incentives/types"
 )
@@ -46,7 +46,7 @@ func (k Keeper) Unstake(ctx sdk.Context, stake *types.Stake, coins sdk.Coins) (u
 	}
 
 	if len(coins) != 0 && !coins.IsEqual(stake.Coins) {
-		stake.Coins = stake.Coins.Sub(coins)
+		stake.Coins = stake.Coins.Sub(coins...)
 		err := k.setStake(ctx, stake)
 		if err != nil {
 			return 0, err
@@ -106,7 +106,10 @@ func (k Keeper) GetStakeByID(ctx sdk.Context, stakeID uint64) (*types.Stake, err
 	store := ctx.KVStore(k.storeKey)
 	lockKey := types.GetStakeStoreKey(stakeID)
 	if !store.Has(lockKey) {
-		return nil, sdkerrors.Wrap(types.ErrStakeupNotFound, fmt.Sprintf("stake with ID %d does not exist", stakeID))
+		return nil, sdkerrors.Wrap(
+			types.ErrStakeupNotFound,
+			fmt.Sprintf("stake with ID %d does not exist", stakeID),
+		)
 	}
 	bz := store.Get(lockKey)
 	err := proto.Unmarshal(bz, &stake)
@@ -114,7 +117,10 @@ func (k Keeper) GetStakeByID(ctx sdk.Context, stakeID uint64) (*types.Stake, err
 }
 
 // GetAccountStakes Returns the period locks associated to an account.
-func (k Keeper) GetStakesByQueryCondition(ctx sdk.Context, distrTo *types.QueryCondition) types.Stakes {
+func (k Keeper) GetStakesByQueryCondition(
+	ctx sdk.Context,
+	distrTo *types.QueryCondition,
+) types.Stakes {
 	pairIDString := distrTo.PairID.Stringify()
 	tickStakeIds := k.getIDsFromIterator(
 		k.iteratorStartEnd(
@@ -177,7 +183,12 @@ func (k Keeper) GetStakesByAccount(ctx sdk.Context, addr sdk.AccAddress) types.S
 	return k.getStakesFromIterator(ctx, k.iterator(ctx, types.GetKeyStakeIndexByAccount(addr)))
 }
 
-func (k Keeper) CreateStake(ctx sdk.Context, owner sdk.AccAddress, coins sdk.Coins, startTime time.Time) (*types.Stake, error) {
+func (k Keeper) CreateStake(
+	ctx sdk.Context,
+	owner sdk.AccAddress,
+	coins sdk.Coins,
+	startTime time.Time,
+) (*types.Stake, error) {
 	ID := k.GetLastStakeID(ctx) + 1
 
 	// unlock time is initially set without a value, gets set as unlock start time + duration

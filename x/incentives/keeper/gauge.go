@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
-	db "github.com/tendermint/tm-db"
+	db "github.com/cometbft/cometbft-db"
+	"github.com/cosmos/gogoproto/proto"
 
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	epochtypes "github.com/duality-labs/duality/x/epochs/types"

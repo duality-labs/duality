@@ -3,17 +3,18 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/tendermint/tendermint/libs/log"
+	"github.com/cometbft/cometbft/libs/log"
 
 	"github.com/duality-labs/duality/x/incentives/types"
 
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 // Keeper provides a way to manage incentives module storage.
 type Keeper struct {
-	storeKey    sdk.StoreKey
+	storeKey    storetypes.StoreKey
 	paramSpace  paramtypes.Subspace
 	hooks       types.IncentiveHooks
 	ak          types.AccountKeeper
@@ -25,7 +26,7 @@ type Keeper struct {
 
 // NewKeeper returns a new instance of the incentive module keeper struct.
 func NewKeeper(
-	storeKey sdk.StoreKey,
+	storeKey storetypes.StoreKey,
 	paramSpace paramtypes.Subspace,
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
