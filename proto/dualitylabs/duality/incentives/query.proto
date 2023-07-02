@@ -89,13 +89,10 @@ message GetGaugesRequest {
 
   GaugeStatus status = 1;
   string denom = 2;
-  cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 message GetGaugesResponse {
   // Upcoming and active gauges
   repeated Gauge gauges = 1;
-  // Pagination defines pagination for the response
-  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 message GetStakeByIDRequest {

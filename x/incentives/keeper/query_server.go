@@ -7,10 +7,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/types/query"
 
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"
@@ -63,9 +61,6 @@ func (q QueryServer) GetGauges(
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	var gauges []*types.Gauge
-	// Pagination defines pagination for the response
-	var pagination *query.PageResponse
 
 	var prefix []byte
 	switch req.Status {
@@ -80,14 +75,51 @@ func (q QueryServer) GetGauges(
 	default:
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid status filter value")
 	}
-	pagination, gauges, err := q.filterByPrefixAndDenom(ctx, prefix, req.Denom, req.Pagination)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+
+	var lowerTick, upperTick int64
+	var depositDenom *dextypes.DepositDenom
+	if req.Denom != "" {
+		depositDenom, err := dextypes.NewDepositDenomFromString(req.Denom)
+		if err != nil {
+			return nil, err
+		}
+		lowerTick = depositDenom.Tick - int64(depositDenom.Fee)
+		upperTick = depositDenom.Tick + int64(depositDenom.Fee)
+	}
+
+	gauges := types.Gauges{}
+	store := ctx.KVStore(q.Keeper.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, prefix)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		// this may return multiple gauges at once if two gauges start at the same time.
+		// for now this is treated as an edge case that is not of importance
+		newGauges, err := q.getGaugeFromIDJsonBytes(ctx, iterator.Value())
+		if err != nil {
+			return nil, err
+		}
+		if req.Denom != "" {
+			for _, gauge := range newGauges {
+				if *gauge.DistributeTo.PairID != *depositDenom.PairID {
+					continue
+				}
+				lowerTickInRange := gauge.DistributeTo.StartTick <= lowerTick &&
+					lowerTick <= gauge.DistributeTo.EndTick
+				upperTickInRange := gauge.DistributeTo.StartTick <= upperTick &&
+					upperTick <= gauge.DistributeTo.EndTick
+				if !lowerTickInRange || !upperTickInRange {
+					continue
+				}
+				gauges = append(gauges, gauge)
+			}
+		} else {
+			gauges = append(gauges, newGauges...)
+		}
 	}
 
 	return &types.GetGaugesResponse{
-		Gauges:     gauges,
-		Pagination: pagination,
+		Gauges: gauges,
 	}, nil
 }
 
@@ -199,56 +231,4 @@ func (q QueryServer) getGaugeFromIDJsonBytes(
 	}
 
 	return gauges, nil
-}
-
-// filterByPrefixAndDenom filters gauges based on a given key prefix and denom
-func (q QueryServer) filterByPrefixAndDenom(
-	ctx sdk.Context,
-	prefixType []byte,
-	denom string,
-	pagination *query.PageRequest,
-) (*query.PageResponse, types.Gauges, error) {
-	gauges := types.Gauges{}
-	store := ctx.KVStore(q.Keeper.storeKey)
-	valStore := prefix.NewStore(store, prefixType)
-	depositDenom, err := dextypes.NewDepositDenomFromString(denom)
-	if err != nil {
-		return nil, nil, err
-	}
-	lowerTick := depositDenom.Tick - int64(depositDenom.Fee)
-	upperTick := depositDenom.Tick + int64(depositDenom.Fee)
-
-	pageRes, err := query.FilteredPaginate(
-		valStore,
-		pagination,
-		func(key []byte, value []byte, accumulate bool) (bool, error) {
-			// this may return multiple gauges at once if two gauges start at the same time.
-			// for now this is treated as an edge case that is not of importance
-			newGauges, err := q.getGaugeFromIDJsonBytes(ctx, value)
-			if err != nil {
-				return false, err
-			}
-			if accumulate {
-				if denom != "" {
-					for _, gauge := range newGauges {
-						if *gauge.DistributeTo.PairID != *depositDenom.PairID {
-							return false, nil
-						}
-						lowerTickInRange := gauge.DistributeTo.StartTick <= lowerTick &&
-							lowerTick <= gauge.DistributeTo.EndTick
-						upperTickInRange := gauge.DistributeTo.StartTick <= upperTick &&
-							upperTick <= gauge.DistributeTo.EndTick
-						if !lowerTickInRange || !upperTickInRange {
-							return false, nil
-						}
-						gauges = append(gauges, gauge)
-					}
-				} else {
-					gauges = append(gauges, newGauges...)
-				}
-			}
-			return true, nil
-		},
-	)
-	return pageRes, gauges, err
 }

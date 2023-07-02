@@ -5,13 +5,17 @@
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
-	"runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
-
+	"runArgs": [
+		"--cap-add=SYS_PTRACE",
+		"--security-opt",
+		"seccomp=unconfined"
+	],
 	// store chain state in a volume to persist across editor sessions
 	// this also allows the OS to better manage the space taken by these constantly updating files
 	// if handled inside the Docker container, the docker container size will constantly grow
-	"mounts": [ "source=duality-state,target=/root" ],
-
+	"mounts": [
+		"source=duality-state,target=/root"
+	],
 	// Configure tool-specific properties.
 	"customizations": {
 		// Configure properties specific to VS Code.
@@ -20,9 +24,14 @@
 			"settings": {
 				"go.toolsManagement.checkForUpdates": "local",
 				"go.useLanguageServer": true,
-				"go.gopath": "/go"
+				"go.gopath": "/go",
+				"go.formatTool": "custom",
+				"editor.formatOnSave": true,
+				"editor.formatOnType": true,
+				"go.alternateTools": {
+					"customFormatter": "golines"
+				}
 			},
-
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
 				// https://marketplace.visualstudio.com/items?itemName=golang.Go
@@ -34,7 +43,6 @@
 			]
 		}
 	},
-
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
 		1317,
@@ -43,10 +51,8 @@
 		26656,
 		26657
 	],
-
 	// Use 'postCreateCommand' to run commands after the container is created:
 	"postCreateCommand": "ignite version",
-
 	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	// "remoteUser": "vscode",
 	"features": {
