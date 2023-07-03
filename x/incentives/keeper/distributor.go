@@ -34,13 +34,13 @@ func (d Distributor) Distribute(
 	rewardsNextEpoch := gauge.RewardsNextEpoch()
 
 	adjustedGaugeTotal := sdk.ZeroInt()
-	stakeSumCache := map[uint64]sdk.Int{}
 
 	gaugeStakes := d.keeper.GetStakesByQueryCondition(ctx, &gauge.DistributeTo)
 	if filterStakes == nil {
 		filterStakes = gaugeStakes
 	}
 
+	stakeSumCache := make(map[uint64]sdk.Int, len(gaugeStakes))
 	for _, stake := range gaugeStakes {
 		stakeCoins := stake.CoinsPassingQueryCondition(gauge.DistributeTo)
 		stakeTotal := sdk.ZeroInt()
@@ -63,7 +63,10 @@ func (d Distributor) Distribute(
 		distCoins := sdk.Coins{}
 		for _, epochRewards := range rewardsNextEpoch {
 			// distribution amount = gauge_size * denom_stake_amount / (total_denom_stake_amount * remain_epochs)
-			amount := epochRewards.Amount.ToDec().Mul(stakeAmt.ToDec()).Quo(adjustedGaugeTotal.ToDec()).TruncateInt()
+			amount := sdk.NewDecFromInt(epochRewards.Amount).
+				Mul(sdk.NewDecFromInt(stakeAmt)).
+				Quo(sdk.NewDecFromInt(adjustedGaugeTotal)).
+				TruncateInt()
 			reward := sdk.Coin{Denom: epochRewards.Denom, Amount: amount}
 			distCoins = distCoins.Add(reward)
 		}

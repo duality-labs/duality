@@ -16,7 +16,8 @@ type KeeperTestSuite struct {
 
 	QueryServer keeper.QueryServer
 	MsgServer   types.MsgServer
-	LPDenom     string
+	LPDenom0    string
+	LPDenom1    string
 }
 
 // SetupTest sets incentives parameters from the suite's context
@@ -24,12 +25,20 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.Setup()
 	suite.QueryServer = keeper.NewQueryServer(suite.App.IncentivesKeeper)
 	suite.MsgServer = keeper.NewMsgServerImpl(&suite.App.IncentivesKeeper)
-	suite.LPDenom = dextypes.NewDepositDenom(
+	suite.LPDenom0 = dextypes.NewDepositDenom(
 		&dextypes.PairID{
 			Token0: "TokenA",
 			Token1: "TokenB",
 		},
 		0,
+		1,
+	).String()
+	suite.LPDenom1 = dextypes.NewDepositDenom(
+		&dextypes.PairID{
+			Token0: "TokenA",
+			Token1: "TokenB",
+		},
+		1,
 		1,
 	).String()
 

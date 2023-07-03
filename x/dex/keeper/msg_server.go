@@ -19,7 +19,10 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 
 var _ types.MsgServer = msgServer{}
 
-func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types.MsgDepositResponse, error) {
+func (k msgServer) Deposit(
+	goCtx context.Context,
+	msg *types.MsgDeposit,
+) (*types.MsgDepositResponse, error) {
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
@@ -49,10 +52,16 @@ func (k msgServer) Deposit(goCtx context.Context, msg *types.MsgDeposit) (*types
 		return nil, err
 	}
 
-	return &types.MsgDepositResponse{Reserve0Deposited: Amounts0Deposit, Reserve1Deposited: Amounts1Deposit}, nil
+	return &types.MsgDepositResponse{
+		Reserve0Deposited: Amounts0Deposit,
+		Reserve1Deposited: Amounts1Deposit,
+	}, nil
 }
 
-func (k msgServer) Withdrawal(goCtx context.Context, msg *types.MsgWithdrawal) (*types.MsgWithdrawalResponse, error) {
+func (k msgServer) Withdrawal(
+	goCtx context.Context,
+	msg *types.MsgWithdrawal,
+) (*types.MsgWithdrawalResponse, error) {
 	callerAddr := sdk.MustAccAddressFromBech32(msg.Creator)
 	receiverAddr := sdk.MustAccAddressFromBech32(msg.Receiver)
 
@@ -107,6 +116,7 @@ func (k msgServer) PlaceLimitOrder(
 		tickIndex,
 		msg.OrderType,
 		msg.ExpirationTime,
+		msg.MaxAmountOut,
 		callerAddr,
 		receiverAddr,
 	)

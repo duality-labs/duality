@@ -11,7 +11,11 @@ type MultihopStep struct {
 	TradingPair types.DirectionalTradingPair
 }
 
-func (k Keeper) HopsToRouteData(ctx sdk.Context, hops []string, exitLimitPrice sdk.Dec) ([]MultihopStep, error) {
+func (k Keeper) HopsToRouteData(
+	ctx sdk.Context,
+	hops []string,
+	exitLimitPrice sdk.Dec,
+) ([]MultihopStep, error) {
 	nPairs := len(hops) - 1
 	routeArr := make([]MultihopStep, nPairs)
 	priceUpperbound := sdk.OneDec()
@@ -97,13 +101,17 @@ func (k Keeper) MultihopStep(
 		return val.CoinOut, ctxBranchCopy, val.Err
 	}
 
+	// TODO: Due to rounding on swap it is possible to leak tokens at each hop.
+	// In these cases the user will end up with trace amounts of tokens from intermediary steps.
+	// To fix this we would have to pre-calculate the route such that the amount
+	// in will be used completely at each step
 	_, coinOut, err := k.SwapExactAmountIn(
 		bctx.Ctx,
 		step.TradingPair.PairID,
 		step.TradingPair.TokenIn,
 		step.TradingPair.TokenOut,
 		inCoin.Amount,
-		sdk.ZeroInt(),
+		nil,
 		nil,
 	)
 	ctxBranch := bctx.Branch()
@@ -143,9 +151,14 @@ func (k Keeper) RunMultihopRoute(
 			stepCache,
 		)
 		if err != nil {
-			return sdk.Coin{}, nil, sdkerrors.Wrapf(err, "Failed at pair: %s", step.TradingPair.PairID.Stringify())
+			return sdk.Coin{}, nil, sdkerrors.Wrapf(
+				err,
+				"Failed at pair: %s",
+				step.TradingPair.PairID.Stringify(),
+			)
 		}
-		currentPrice = currentOutCoin.Amount.ToDec().Quo(initialInCoin.Amount.ToDec())
+		currentPrice = sdk.NewDecFromInt(currentOutCoin.Amount).
+			Quo(sdk.NewDecFromInt(initialInCoin.Amount))
 	}
 
 	if exitLimitPrice.GT(currentPrice) {

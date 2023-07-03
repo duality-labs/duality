@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	forwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/types"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/iancoleman/orderedmap"
-	forwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
 	"github.com/stretchr/testify/require"
 )
 

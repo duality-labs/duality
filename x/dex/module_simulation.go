@@ -4,7 +4,6 @@ import (
 	"math/rand"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
@@ -18,7 +17,6 @@ import (
 var (
 	_ = sample.AccAddress
 	_ = dexsimulation.FindAccount
-	_ = simappparams.StakePerAccount
 	_ = simulation.MsgEntryKind
 	_ = baseapp.Paramspace
 )
@@ -73,16 +71,13 @@ func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedP
 	return nil
 }
 
-// RandomizedParams creates randomized  param changes for the simulator
-func (am AppModule) RandomizedParams(_ *rand.Rand) []simtypes.ParamChange {
-	return []simtypes.ParamChange{}
-}
-
 // RegisterStoreDecoder registers a decoder
 func (am AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}
 
 // WeightedOperations returns the all the gov module operations with their respective weights.
-func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
+func (am AppModule) WeightedOperations(
+	simState module.SimulationState,
+) []simtypes.WeightedOperation {
 	operations := make([]simtypes.WeightedOperation, 0)
 
 	var weightMsgDeposit int
@@ -108,7 +103,11 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	))
 
 	var weightMsgPlaceLimitOrder int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgPlaceLimitOrder, &weightMsgPlaceLimitOrder, nil,
+	simState.AppParams.GetOrGenerate(
+		simState.Cdc,
+		opWeightMsgPlaceLimitOrder,
+		&weightMsgPlaceLimitOrder,
+		nil,
 		func(_ *rand.Rand) {
 			weightMsgPlaceLimitOrder = defaultWeightMsgPlaceLimitOrder
 		},
@@ -130,11 +129,19 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgWithdrawFilledLimitOrder,
-		dexsimulation.SimulateMsgWithdrawFilledLimitOrder(am.accountKeeper, am.bankKeeper, am.keeper),
+		dexsimulation.SimulateMsgWithdrawFilledLimitOrder(
+			am.accountKeeper,
+			am.bankKeeper,
+			am.keeper,
+		),
 	))
 
 	var weightMsgCancelLimitOrder int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgCancelLimitOrder, &weightMsgCancelLimitOrder, nil,
+	simState.AppParams.GetOrGenerate(
+		simState.Cdc,
+		opWeightMsgCancelLimitOrder,
+		&weightMsgCancelLimitOrder,
+		nil,
 		func(_ *rand.Rand) {
 			weightMsgCancelLimitOrder = defaultWeightMsgCancelLimitOrder
 		},
@@ -145,7 +152,11 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	))
 
 	var weightMsgMultiHopSwap int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgMultiHopSwap, &weightMsgMultiHopSwap, nil,
+	simState.AppParams.GetOrGenerate(
+		simState.Cdc,
+		opWeightMsgMultiHopSwap,
+		&weightMsgMultiHopSwap,
+		nil,
 		func(_ *rand.Rand) {
 			weightMsgMultiHopSwap = defaultWeightMsgMultiHopSwap
 		},

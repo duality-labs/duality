@@ -12,7 +12,11 @@ import (
 
 // BeginBlocker of epochs module.
 func (k Keeper) BeginBlocker(ctx sdk.Context) {
-	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyBeginBlocker)
+	defer telemetry.ModuleMeasureSince(
+		types.ModuleName,
+		time.Now(),
+		telemetry.MetricKeyBeginBlocker,
+	)
 	k.IterateEpochInfo(ctx, func(index int64, epochInfo types.EpochInfo) (stop bool) {
 		logger := k.Logger(ctx)
 
@@ -35,7 +39,13 @@ func (k Keeper) BeginBlocker(ctx sdk.Context) {
 			epochInfo.EpochCountingStarted = true
 			epochInfo.CurrentEpoch = 1
 			epochInfo.CurrentEpochStartTime = epochInfo.StartTime
-			logger.Info("Starting epoch", "Identifier", epochInfo.Identifier, "CurEpoch", epochInfo.CurrentEpoch)
+			logger.Info(
+				"Starting epoch",
+				"Identifier",
+				epochInfo.Identifier,
+				"CurEpoch",
+				epochInfo.CurrentEpoch,
+			)
 		} else {
 			ctx.EventManager().EmitEvent(
 				sdk.NewEvent(
@@ -53,8 +63,14 @@ func (k Keeper) BeginBlocker(ctx sdk.Context) {
 		ctx.EventManager().EmitEvent(
 			sdk.NewEvent(
 				types.EventTypeEpochStart,
-				sdk.NewAttribute(types.AttributeEpochNumber, fmt.Sprintf("%d", epochInfo.CurrentEpoch)),
-				sdk.NewAttribute(types.AttributeEpochStartTime, fmt.Sprintf("%d", epochInfo.CurrentEpochStartTime.Unix())),
+				sdk.NewAttribute(
+					types.AttributeEpochNumber,
+					fmt.Sprintf("%d", epochInfo.CurrentEpoch),
+				),
+				sdk.NewAttribute(
+					types.AttributeEpochStartTime,
+					fmt.Sprintf("%d", epochInfo.CurrentEpochStartTime.Unix()),
+				),
 			),
 		)
 		k.setEpochInfo(ctx, epochInfo)

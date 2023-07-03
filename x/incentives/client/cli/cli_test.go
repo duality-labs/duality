@@ -106,9 +106,9 @@ func TestGetCmdFutureRewardEstimate(t *testing.T) {
 		"basic test": {
 			Cmd: fmt.Sprintf("%s [1,2,3] 1000", testAddresses[0]),
 			ExpectedQuery: &types.GetFutureRewardEstimateRequest{
-				Owner:    testAddresses[0].String(),
-				StakeIds: []uint64{1, 2, 3},
-				EndEpoch: 1000,
+				Owner:     testAddresses[0].String(),
+				StakeIds:  []uint64{1, 2, 3},
+				NumEpochs: 1000,
 			},
 		},
 	}
@@ -122,7 +122,10 @@ func TestNewCreateGaugeCmd(t *testing.T) {
 	desc, _ := cli.NewCreateGaugeCmd()
 	tcs := map[string]dcli.TxCliTestCase[*types.MsgCreateGauge]{
 		"basic test": {
-			Cmd: fmt.Sprintf("TokenA<>TokenB 0 100 100TokenA,100TokenB 50 0 --from %s", testAddresses[0]),
+			Cmd: fmt.Sprintf(
+				"TokenA TokenB 0 100 100TokenA,100TokenB 50 0 --from %s",
+				testAddresses[0],
+			),
 			ExpectedMsg: &types.MsgCreateGauge{
 				IsPerpetual: false,
 				Owner:       testAddresses[0].String(),
@@ -141,7 +144,11 @@ func TestNewCreateGaugeCmd(t *testing.T) {
 			},
 		},
 		"tests with time (RFC3339)": {
-			Cmd: fmt.Sprintf("TokenA<>TokenB [-20] 20 100TokenA,100TokenB 50 0 --start-time %s --from %s", testTime.Format(time.RFC3339), testAddresses[0]),
+			Cmd: fmt.Sprintf(
+				"TokenA TokenB [-20] 20 100TokenA,100TokenB 50 0 --start-time %s --from %s",
+				testTime.Format(time.RFC3339),
+				testAddresses[0],
+			),
 			ExpectedMsg: &types.MsgCreateGauge{
 				IsPerpetual: false,
 				Owner:       testAddresses[0].String(),
@@ -160,7 +167,11 @@ func TestNewCreateGaugeCmd(t *testing.T) {
 			},
 		},
 		"tests with time (unix int)": {
-			Cmd: fmt.Sprintf("TokenA<>TokenB [-20] 20 100TokenA,100TokenB 50 0 --start-time %d --from %s", testTime.Unix(), testAddresses[0]),
+			Cmd: fmt.Sprintf(
+				"TokenA TokenB [-20] 20 100TokenA,100TokenB 50 0 --start-time %d --from %s",
+				testTime.Unix(),
+				testAddresses[0],
+			),
 			ExpectedMsg: &types.MsgCreateGauge{
 				IsPerpetual: false,
 				Owner:       testAddresses[0].String(),
@@ -179,7 +190,10 @@ func TestNewCreateGaugeCmd(t *testing.T) {
 			},
 		},
 		"tests with perpetual": {
-			Cmd: fmt.Sprintf("TokenA<>TokenB [-20] 20 100TokenA,100TokenB 50 0 --perpetual --from %s", testAddresses[0]),
+			Cmd: fmt.Sprintf(
+				"TokenA TokenB [-20] 20 100TokenA,100TokenB 50 0 --perpetual --from %s",
+				testAddresses[0],
+			),
 			ExpectedMsg: &types.MsgCreateGauge{
 				IsPerpetual: true,
 				Owner:       testAddresses[0].String(),
@@ -244,6 +258,43 @@ func TestNewStakeCmd(t *testing.T) {
 				Coins: sdk.NewCoins(
 					sdk.NewCoin("TokenA", sdk.NewInt(1000)),
 					sdk.NewCoin("TokenZ", sdk.NewInt(1)),
+				),
+			},
+		},
+		"tokenized share test": {
+			Cmd: fmt.Sprintf(
+				"1000DualityPoolShares-tokenA-tokenB-t123-f30 --from %s",
+				testAddresses[0],
+			),
+			ExpectedMsg: &types.MsgStake{
+				Owner: testAddresses[0].String(),
+				Coins: sdk.NewCoins(
+					sdk.NewCoin("DualityPoolShares-tokenA-tokenB-t123-f30", sdk.NewInt(1000)),
+				),
+			},
+		},
+		"tokenized share negative tick index test": {
+			Cmd: fmt.Sprintf(
+				"1000DualityPoolShares-tokenA-tokenB-t-123-f30 --from %s",
+				testAddresses[0],
+			),
+			ExpectedMsg: &types.MsgStake{
+				Owner: testAddresses[0].String(),
+				Coins: sdk.NewCoins(
+					sdk.NewCoin("DualityPoolShares-tokenA-tokenB-t-123-f30", sdk.NewInt(1000)),
+				),
+			},
+		},
+		"multiple tokenized shares": {
+			Cmd: fmt.Sprintf(
+				"1000DualityPoolShares-tokenA-tokenB-t-123-f30,1DualityPoolShares-tokenA-tokenB-t-124-f30 --from %s",
+				testAddresses[0],
+			),
+			ExpectedMsg: &types.MsgStake{
+				Owner: testAddresses[0].String(),
+				Coins: sdk.NewCoins(
+					sdk.NewCoin("DualityPoolShares-tokenA-tokenB-t-123-f30", sdk.NewInt(1000)),
+					sdk.NewCoin("DualityPoolShares-tokenA-tokenB-t-124-f30", sdk.NewInt(1)),
 				),
 			},
 		},

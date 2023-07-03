@@ -20,12 +20,14 @@ func (suite *KeeperTestSuite) TestGaugeLifecycle() {
 
 	// setup dex deposit and stake of those shares
 	suite.SetupDepositAndStake(depositStakeSpec{
-		depositSpec: depositSpec{
-			addr:   addr0,
-			token0: sdk.NewInt64Coin("TokenA", 10),
-			token1: sdk.NewInt64Coin("TokenB", 10),
-			tick:   0,
-			fee:    1,
+		depositSpecs: []depositSpec{
+			{
+				addr:   addr0,
+				token0: sdk.NewInt64Coin("TokenA", 10),
+				token1: sdk.NewInt64Coin("TokenB", 10),
+				tick:   0,
+				fee:    1,
+			},
 		},
 		stakeTimeOffset: -24 * time.Hour,
 	})
@@ -44,7 +46,11 @@ func (suite *KeeperTestSuite) TestGaugeLifecycle() {
 	// assert that the gauge is not in effect yet by triggering an epoch end before gauge start
 	suite.App.IncentivesKeeper.AfterEpochEnd(suite.Ctx, "day", 1)
 	// no distribution yet
-	require.Equal(suite.T(), "0foocoin", suite.App.BankKeeper.GetBalance(suite.Ctx, addr0, "foocoin").String())
+	require.Equal(
+		suite.T(),
+		"0foocoin",
+		suite.App.BankKeeper.GetBalance(suite.Ctx, addr0, "foocoin").String(),
+	)
 	// assert that gauge state is well-managed
 	require.Equal(suite.T(), len(suite.QueryServer.GetUpcomingGauges(suite.Ctx)), 1)
 	require.Equal(suite.T(), len(suite.QueryServer.GetActiveGauges(suite.Ctx)), 0)
@@ -55,7 +61,11 @@ func (suite *KeeperTestSuite) TestGaugeLifecycle() {
 	suite.App.IncentivesKeeper.AfterEpochEnd(suite.Ctx, "day", 2)
 
 	// assert that the gauge distributed
-	require.Equal(suite.T(), "5foocoin", suite.App.BankKeeper.GetBalance(suite.Ctx, addr0, "foocoin").String())
+	require.Equal(
+		suite.T(),
+		"5foocoin",
+		suite.App.BankKeeper.GetBalance(suite.Ctx, addr0, "foocoin").String(),
+	)
 	// assert that gauge state is well-managed
 	require.Equal(suite.T(), len(suite.QueryServer.GetUpcomingGauges(suite.Ctx)), 0)
 	require.Equal(suite.T(), len(suite.QueryServer.GetActiveGauges(suite.Ctx)), 1)
@@ -66,7 +76,11 @@ func (suite *KeeperTestSuite) TestGaugeLifecycle() {
 	suite.App.IncentivesKeeper.AfterEpochEnd(suite.Ctx, "day", 3)
 
 	// assert new distribution
-	require.Equal(suite.T(), "10foocoin", suite.App.BankKeeper.GetBalance(suite.Ctx, addr0, "foocoin").String())
+	require.Equal(
+		suite.T(),
+		"10foocoin",
+		suite.App.BankKeeper.GetBalance(suite.Ctx, addr0, "foocoin").String(),
+	)
 	// assert that gauge state is well-managed
 	require.Equal(suite.T(), len(suite.QueryServer.GetUpcomingGauges(suite.Ctx)), 0)
 	require.Equal(suite.T(), len(suite.QueryServer.GetActiveGauges(suite.Ctx)), 0)
@@ -77,7 +91,11 @@ func (suite *KeeperTestSuite) TestGaugeLifecycle() {
 	suite.App.IncentivesKeeper.AfterEpochEnd(suite.Ctx, "day", 4)
 
 	// assert no additional distribution from finished gauge
-	require.Equal(suite.T(), "10foocoin", suite.App.BankKeeper.GetBalance(suite.Ctx, addr0, "foocoin").String())
+	require.Equal(
+		suite.T(),
+		"10foocoin",
+		suite.App.BankKeeper.GetBalance(suite.Ctx, addr0, "foocoin").String(),
+	)
 	// assert that gauge state is well-managed
 	require.Equal(suite.T(), len(suite.QueryServer.GetUpcomingGauges(suite.Ctx)), 0)
 	require.Equal(suite.T(), len(suite.QueryServer.GetActiveGauges(suite.Ctx)), 0)
@@ -95,12 +113,14 @@ func (suite *KeeperTestSuite) TestGaugeLimit() {
 
 	// setup dex deposit and stake of those shares
 	suite.SetupDepositAndStake(depositStakeSpec{
-		depositSpec: depositSpec{
-			addr:   addr0,
-			token0: sdk.NewInt64Coin("TokenA", 10),
-			token1: sdk.NewInt64Coin("TokenB", 10),
-			tick:   0,
-			fee:    1,
+		depositSpecs: []depositSpec{
+			{
+				addr:   addr0,
+				token0: sdk.NewInt64Coin("TokenA", 10),
+				token1: sdk.NewInt64Coin("TokenB", 10),
+				tick:   0,
+				fee:    1,
+			},
 		},
 		stakeTimeOffset: -24 * time.Hour,
 	})
@@ -159,42 +179,50 @@ func (suite *KeeperTestSuite) TestGaugeCreateFails() {
 			name: "one stake with bad gauge",
 			depositStakeSpecs: []depositStakeSpec{
 				{
-					depositSpec: depositSpec{
-						addr:   addrs[0],
-						token0: sdk.NewInt64Coin("TokenA", 10),
-						token1: sdk.NewInt64Coin("TokenB", 10),
-						tick:   999,
-						fee:    1,
+					depositSpecs: []depositSpec{
+						{
+							addr:   addrs[0],
+							token0: sdk.NewInt64Coin("TokenA", 10),
+							token1: sdk.NewInt64Coin("TokenB", 10),
+							tick:   999,
+							fee:    1,
+						},
 					},
 					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					depositSpec: depositSpec{
-						addr:   addrs[1],
-						token0: sdk.NewInt64Coin("TokenA", 10),
-						token1: sdk.NewInt64Coin("TokenB", 10),
-						tick:   999,
-						fee:    1,
+					depositSpecs: []depositSpec{
+						{
+							addr:   addrs[1],
+							token0: sdk.NewInt64Coin("TokenA", 10),
+							token1: sdk.NewInt64Coin("TokenB", 10),
+							tick:   999,
+							fee:    1,
+						},
 					},
 					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					depositSpec: depositSpec{
-						addr:   addrs[1],
-						token0: sdk.NewInt64Coin("TokenA", 10),
-						token1: sdk.NewInt64Coin("TokenB", 10),
-						tick:   999,
-						fee:    40,
+					depositSpecs: []depositSpec{
+						{
+							addr:   addrs[1],
+							token0: sdk.NewInt64Coin("TokenA", 10),
+							token1: sdk.NewInt64Coin("TokenB", 10),
+							tick:   999,
+							fee:    40,
+						},
 					},
 					stakeTimeOffset: -24 * time.Hour,
 				},
 				{
-					depositSpec: depositSpec{
-						addr:   addrs[1],
-						token0: sdk.NewInt64Coin("TokenA", 10),
-						token1: sdk.NewInt64Coin("TokenB", 10),
-						tick:   999,
-						fee:    40,
+					depositSpecs: []depositSpec{
+						{
+							addr:   addrs[1],
+							token0: sdk.NewInt64Coin("TokenA", 10),
+							token1: sdk.NewInt64Coin("TokenB", 10),
+							tick:   999,
+							fee:    40,
+						},
 					},
 					stakeTimeOffset: -12 * time.Hour,
 				},

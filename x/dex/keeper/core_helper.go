@@ -112,7 +112,10 @@ func (k Keeper) GetOrInitLimitOrderTrancheUser(
 //                          STATE CALCULATIONS                               //
 ///////////////////////////////////////////////////////////////////////////////
 
-func (k Keeper) GetCurrPrice1To0(ctx sdk.Context, pairID *types.PairID) (price types.Price, found bool) {
+func (k Keeper) GetCurrPrice1To0(
+	ctx sdk.Context,
+	pairID *types.PairID,
+) (price types.Price, found bool) {
 	tick, found := k.GetCurrTick1To0(ctx, pairID)
 	if !found {
 		return types.Price{}, false
@@ -135,7 +138,10 @@ func (k Keeper) GetCurrTick1To0(ctx sdk.Context, pairID *types.PairID) (tickIdx 
 	return math.MinInt64, false
 }
 
-func (k Keeper) GetCurrPrice0To1(ctx sdk.Context, pairID *types.PairID) (price types.Price, found bool) {
+func (k Keeper) GetCurrPrice0To1(
+	ctx sdk.Context,
+	pairID *types.PairID,
+) (price types.Price, found bool) {
 	tick, found := k.GetCurrTick0To1(ctx, pairID)
 	if !found {
 		return types.Price{}, false
@@ -158,7 +164,7 @@ func (k Keeper) GetCurrTick0To1(ctx sdk.Context, pairID *types.PairID) (tickIdx 
 }
 
 func CalcAmountAsToken0(amount0, amount1 sdk.Int, price1To0 types.Price) sdk.Dec {
-	amount0Dec := amount0.ToDec()
+	amount0Dec := sdk.NewDecFromInt(amount0)
 
 	return amount0Dec.Add(price1To0.MulInt(amount1))
 }
@@ -179,7 +185,12 @@ func (k Keeper) MintShares(ctx sdk.Context, addr sdk.AccAddress, shareCoin sdk.C
 	return err
 }
 
-func (k Keeper) BurnShares(ctx sdk.Context, addr sdk.AccAddress, amount sdk.Int, sharesID string) error {
+func (k Keeper) BurnShares(
+	ctx sdk.Context,
+	addr sdk.AccAddress,
+	amount sdk.Int,
+	sharesID string,
+) error {
 	sharesCoins := sdk.Coins{sdk.NewCoin(sharesID, amount)}
 	// transfer tokens to module
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, addr, types.ModuleName, sharesCoins); err != nil {

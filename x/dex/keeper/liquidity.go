@@ -7,7 +7,7 @@ import (
 )
 
 type Liquidity interface {
-	Swap(maxAmountIn sdk.Int, maxAmountOut sdk.Int) (inAmount, outAmount sdk.Int)
+	Swap(maxAmountIn sdk.Int, maxAmountOut *sdk.Int) (inAmount, outAmount sdk.Int)
 	Price() *types.Price
 }
 
@@ -86,7 +86,13 @@ func (s *LiquidityIterator) createPool0To1(upperTick types.PoolReserves) (Liquid
 	upperTickIndex := upperTick.TickIndex
 	centerTickIndex := upperTickIndex - utils.MustSafeUint64(upperTick.Fee)
 	lowerTickIndex := centerTickIndex - utils.MustSafeUint64(upperTick.Fee)
-	lowerTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairID, s.pairID.Token0, lowerTickIndex, upperTick.Fee)
+	lowerTick, err := s.keeper.GetOrInitPoolReserves(
+		s.ctx,
+		s.pairID,
+		s.pairID.Token0,
+		lowerTickIndex,
+		upperTick.Fee,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +109,13 @@ func (s *LiquidityIterator) createPool1To0(lowerTick types.PoolReserves) (Liquid
 	lowerTickIndex := lowerTick.TickIndex
 	centerTickIndex := lowerTickIndex + utils.MustSafeUint64(lowerTick.Fee)
 	upperTickIndex := centerTickIndex + utils.MustSafeUint64(lowerTick.Fee)
-	upperTick, err := s.keeper.GetOrInitPoolReserves(s.ctx, s.pairID, s.pairID.Token1, upperTickIndex, lowerTick.Fee)
+	upperTick, err := s.keeper.GetOrInitPoolReserves(
+		s.ctx,
+		s.pairID,
+		s.pairID.Token1,
+		upperTickIndex,
+		lowerTick.Fee,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -138,20 +150,21 @@ func (k Keeper) Swap(ctx sdk.Context,
 	tokenIn string,
 	tokenOut string,
 	maxAmountIn sdk.Int,
-	maxAmountOut sdk.Int,
+	maxAmountOut *sdk.Int,
 	limitPrice *sdk.Dec,
-) (totalInCoin, totalOutCoin sdk.Coin, err error) {
-	useMaxOut := !maxAmountOut.IsZero()
+) (totalInCoin, totalOutCoin sdk.Coin, orderFilled bool, err error) {
+	useMaxOut := maxAmountOut != nil
 	pair := types.NewDirectionalTradingPair(pairID, tokenIn, tokenOut)
 
 	remainingIn := maxAmountIn
-	remainingOut := maxAmountOut
 	totalOut := sdk.ZeroInt()
+	// track if we have completely filled the order
+	orderFilled = false
 
 	// verify that amount left is not zero and that there are additional valid ticks to check
 	liqIter := NewLiquidityIterator(k, ctx, pair)
 	defer liqIter.Close()
-	for remainingIn.GT(sdk.ZeroInt()) {
+	for {
 		liq := liqIter.Next()
 		if liq == nil {
 			break
@@ -162,24 +175,34 @@ func (k Keeper) Swap(ctx sdk.Context,
 			break
 		}
 
-		inAmount, outAmount := liq.Swap(remainingIn, remainingOut)
+		inAmount, outAmount := liq.Swap(remainingIn, maxAmountOut)
+		k.SaveLiquidity(ctx, liq)
 
 		remainingIn = remainingIn.Sub(inAmount)
 		totalOut = totalOut.Add(outAmount)
-		if useMaxOut {
-			remainingOut = remainingOut.Sub(outAmount)
+
+		// break if remainingIn will yield less than 1 tokenOut at current price
+		// this avoids unnecessary iteration since outAmount will always be 0 going forward
+		// this also catches the normal exit case where remainingIn == 0
+		if liq.Price().MulInt(remainingIn).LT(sdk.OneDec()) {
+			orderFilled = true
+			break
 		}
 
-		k.SaveLiquidity(ctx, liq)
+		if useMaxOut {
+			newMaxOut := maxAmountOut.Sub(outAmount)
+			maxAmountOut = &newMaxOut
 
-		// if remaining out has been used up then exit
-		if useMaxOut && remainingOut.LTE(sdk.ZeroInt()) {
-			break
+			// if maxAmountOut has been used up then exit
+			if maxAmountOut.LTE(sdk.ZeroInt()) {
+				orderFilled = true
+				break
+			}
 		}
 	}
 	totalIn := maxAmountIn.Sub(remainingIn)
 
-	return sdk.NewCoin(tokenIn, totalIn), sdk.NewCoin(tokenOut, totalOut), nil
+	return sdk.NewCoin(tokenIn, totalIn), sdk.NewCoin(tokenOut, totalOut), orderFilled, nil
 }
 
 func (k Keeper) SwapExactAmountIn(ctx sdk.Context,
@@ -187,14 +210,22 @@ func (k Keeper) SwapExactAmountIn(ctx sdk.Context,
 	tokenIn string,
 	tokenOut string,
 	amountIn sdk.Int,
-	maxAmountOut sdk.Int,
+	maxAmountOut *sdk.Int,
 	limitPrice *sdk.Dec,
 ) (totalIn, totalOut sdk.Coin, err error) {
-	swapAmountIn, swapAmountOut, err := k.Swap(ctx, pairID, tokenIn, tokenOut, amountIn, maxAmountOut, limitPrice)
+	swapAmountIn, swapAmountOut, orderFilled, err := k.Swap(
+		ctx,
+		pairID,
+		tokenIn,
+		tokenOut,
+		amountIn,
+		maxAmountOut,
+		limitPrice,
+	)
 	if err != nil {
 		return sdk.Coin{}, sdk.Coin{}, err
 	}
-	if !swapAmountIn.Amount.Equal(amountIn) {
+	if !orderFilled {
 		return sdk.Coin{}, sdk.Coin{}, types.ErrInsufficientLiquidity
 	}
 
@@ -207,11 +238,19 @@ func (k Keeper) SwapWithCache(
 	tokenIn string,
 	tokenOut string,
 	maxAmountIn sdk.Int,
-	maxAmountOut sdk.Int,
+	maxAmountOut *sdk.Int,
 	limitPrice *sdk.Dec,
-) (totalIn, totalOut sdk.Coin, err error) {
+) (totalIn, totalOut sdk.Coin, orderFilled bool, err error) {
 	cacheCtx, writeCache := ctx.CacheContext()
-	totalIn, totalOut, err = k.Swap(cacheCtx, pairID, tokenIn, tokenOut, maxAmountIn, maxAmountOut, limitPrice)
+	totalIn, totalOut, orderFilled, err = k.Swap(
+		cacheCtx,
+		pairID,
+		tokenIn,
+		tokenOut,
+		maxAmountIn,
+		maxAmountOut,
+		limitPrice,
+	)
 
 	writeCache()
 
@@ -220,5 +259,5 @@ func (k Keeper) SwapWithCache(
 	// Once we update, the below code can be removed
 	ctx.EventManager().EmitEvents(cacheCtx.EventManager().Events())
 
-	return totalIn, totalOut, err
+	return totalIn, totalOut, orderFilled, err
 }

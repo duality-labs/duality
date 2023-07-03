@@ -4,34 +4,34 @@ import (
 	"testing"
 	"time"
 
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/stretchr/testify/require"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	simapp "github.com/duality-labs/duality/app"
-
+	"github.com/duality-labs/duality/app"
 	"github.com/duality-labs/duality/x/epochs/types"
 )
 
 func TestEpochsExportGenesis(t *testing.T) {
-	app := simapp.Setup(false)
+	app := app.Setup(t, false)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
 	chainStartTime := ctx.BlockTime()
-	chainStartHeight := ctx.BlockHeight()
 
 	genesis := app.EpochsKeeper.ExportGenesis(ctx)
 	require.Len(t, genesis.Epochs, 3)
 
 	expectedEpochs := types.DefaultGenesis().Epochs
 	for i := 0; i < len(expectedEpochs); i++ {
-		expectedEpochs[i].CurrentEpochStartHeight = chainStartHeight
+		expectedEpochs[i].CurrentEpochStartHeight = 2
 		expectedEpochs[i].CurrentEpochStartTime = chainStartTime
+		expectedEpochs[i].EpochCountingStarted = true
+		expectedEpochs[i].CurrentEpoch = 1
 	}
 	require.Equal(t, expectedEpochs, genesis.Epochs)
 }
 
 func TestEpochsInitGenesis(t *testing.T) {
-	app := simapp.Setup(false)
+	app := app.Setup(t, false)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
 	// On init genesis, default epochs information is set

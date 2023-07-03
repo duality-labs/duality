@@ -67,18 +67,21 @@ func (msg *MsgDeposit) ValidateBasic() error {
 	}
 
 	// Verify that the lengths of TickIndexes, Fees, AmountsA, AmountsB are all equal
-	if len(msg.Fees) != len(msg.TickIndexesAToB) ||
-		len(msg.AmountsA) != len(msg.AmountsB) ||
-		len(msg.AmountsA) != len(msg.TickIndexesAToB) {
+	numDeposits := len(msg.AmountsA)
+	if numDeposits != len(msg.Fees) ||
+		numDeposits != len(msg.TickIndexesAToB) ||
+		numDeposits != len(msg.AmountsB) {
 		return ErrUnbalancedTxArray
 	}
-
-	if len(msg.AmountsA) == 0 {
+	if numDeposits == 0 {
 		return ErrZeroDeposit
 	}
 
-	for i := 0; i < len(msg.AmountsA); i++ {
-		if msg.AmountsA[i].LTE(sdk.ZeroInt()) && msg.AmountsB[i].LTE(sdk.ZeroInt()) {
+	for i := 0; i < numDeposits; i++ {
+		if msg.AmountsA[i].LT(sdk.ZeroInt()) || msg.AmountsB[i].LT(sdk.ZeroInt()) {
+			return ErrZeroDeposit
+		}
+		if msg.AmountsA[i].Equal(sdk.ZeroInt()) && msg.AmountsB[i].Equal(sdk.ZeroInt()) {
 			return ErrZeroDeposit
 		}
 	}

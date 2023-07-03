@@ -33,7 +33,9 @@ func NewPrice(relativeTickIndex int64) (*Price, error) {
 	if IsTickOutOfRange(relativeTickIndex) {
 		// TODO: This is a bit weird that we can't return a types.ErrTickOutsideRange because of cyclical dependencies
 		// Also maybe don't need this at all since we already validate that the tick is in range upstream
-		return nil, errors.New("supplying a tick outside the range of [-352437, 352437] is not allowed")
+		return nil, errors.New(
+			"supplying a tick outside the range of [-352437, 352437] is not allowed",
+		)
 	}
 
 	return &Price{
@@ -42,7 +44,7 @@ func NewPrice(relativeTickIndex int64) (*Price, error) {
 }
 
 func (p Price) MulInt(other sdk.Int) sdk.Dec {
-	return p.Mul(other.ToDec())
+	return p.Mul(sdk.NewDecFromInt(other))
 }
 
 // We are careful not to use negative-valued exponents anywhere

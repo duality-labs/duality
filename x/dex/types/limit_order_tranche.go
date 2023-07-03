@@ -72,16 +72,20 @@ func (t LimitOrderTranche) RatioFilled() sdk.Dec {
 
 func (t LimitOrderTranche) AmountUnfilled() sdk.Dec {
 	amountFilled := t.PriceTakerToMaker().MulInt(t.TotalTokenOut)
-	return t.TotalTokenIn.ToDec().Sub(amountFilled)
+	return sdk.NewDecFromInt(t.TotalTokenIn).Sub(amountFilled)
 }
 
 func (t LimitOrderTranche) HasLiquidity() bool {
 	return t.ReservesTokenIn.GT(sdk.ZeroInt())
 }
 
-func (t *LimitOrderTranche) RemoveTokenIn(trancheUser LimitOrderTrancheUser) (amountToRemove sdk.Int) {
+func (t *LimitOrderTranche) RemoveTokenIn(
+	trancheUser LimitOrderTrancheUser,
+) (amountToRemove sdk.Int) {
 	amountUnfilled := t.AmountUnfilled()
-	maxAmountToRemove := amountUnfilled.MulInt(trancheUser.SharesOwned).QuoInt(t.TotalTokenIn).TruncateInt()
+	maxAmountToRemove := amountUnfilled.MulInt(trancheUser.SharesOwned).
+		QuoInt(t.TotalTokenIn).
+		TruncateInt()
 	amountToRemove = maxAmountToRemove.Sub(trancheUser.SharesCancelled)
 	t.ReservesTokenIn = t.ReservesTokenIn.Sub(amountToRemove)
 
@@ -100,7 +104,7 @@ func (t *LimitOrderTranche) Withdraw(trancheUser LimitOrderTrancheUser) (sdk.Int
 	return amountOutTokenIn, amountOutTokenOut
 }
 
-func (t *LimitOrderTranche) Swap(maxAmountTakerIn sdk.Int, maxAmountOut sdk.Int) (
+func (t *LimitOrderTranche) Swap(maxAmountTakerIn sdk.Int, maxAmountOut *sdk.Int) (
 	inAmount sdk.Int,
 	outAmount sdk.Int,
 ) {
@@ -109,8 +113,8 @@ func (t *LimitOrderTranche) Swap(maxAmountTakerIn sdk.Int, maxAmountOut sdk.Int)
 	totalTokenIn := &t.TotalTokenOut
 	maxOutGivenIn := t.PriceTakerToMaker().MulInt(maxAmountTakerIn).TruncateInt()
 	possibleOutAmounts := []sdk.Int{*reservesTokenOut, maxOutGivenIn}
-	if !maxAmountOut.IsZero() {
-		possibleOutAmounts = append(possibleOutAmounts, maxAmountOut)
+	if maxAmountOut != nil {
+		possibleOutAmounts = append(possibleOutAmounts, *maxAmountOut)
 	}
 	outAmount = utils.MinIntArr(possibleOutAmounts)
 

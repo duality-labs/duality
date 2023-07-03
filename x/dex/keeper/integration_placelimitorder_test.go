@@ -4,10 +4,10 @@ import (
 	"math"
 	"time"
 
+	abci "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/duality-labs/duality/x/dex/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // Core tests w/ GTC limitOrders //////////////////////////////////////////////
@@ -463,6 +463,64 @@ func (s *MsgServerTestSuite) TestPlaceLimitOrder1FoKFailsWithHighLimit() {
 	s.bobDeposits(NewDeposit(20, 0, 20, 1))
 	// WHEN alice submits FoK limitOrder for 10 at tick -1 it fails
 	s.assertAliceLimitSellFails(types.ErrFoKLimitOrderNotFilled, "TokenB", -21, 10, types.LimitOrderType_FILL_OR_KILL)
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderFoK0TotalAmountInNotUsed() {
+	s.fundAliceBalances(9998, 0)
+	s.fundBobBalances(0, 5000)
+	// GIVEN LP liq at tick 20,000 & 20,001 of 1000 TokenB
+	s.bobDeposits(
+		NewDeposit(0, 1000, 20000, 1),
+		NewDeposit(0, 1000, 20001, 1),
+	)
+	// WHEN alice submits FoK limitOrder for 9998 it succeeds
+	// even though trueAmountIn < specifiedAmountIn due to rounding
+	s.aliceLimitSells("TokenA", 21000, 9998, types.LimitOrderType_FILL_OR_KILL)
+	s.assertAliceBalances(6, 1352)
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderFoK1TotalAmountInNotUsed() {
+	s.fundAliceBalances(0, 9998)
+	s.fundBobBalances(5000, 0)
+	// GIVEN LP liq at tick -20,000 & -20,001 of 1000 tokenA
+	s.bobDeposits(
+		NewDeposit(1000, 0, -20000, 1),
+		NewDeposit(1000, 0, -20001, 1),
+	)
+	// WHEN alice submits FoK limitOrder for 9998 it succeeds
+	// even though trueAmountIn < specifiedAmountIn due to rounding
+	s.aliceLimitSells("TokenB", 21000, 9998, types.LimitOrderType_FILL_OR_KILL)
+	s.assertAliceBalances(1352, 6)
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderFoKMaxOutUsed() {
+	s.fundAliceBalances(0, 50)
+	s.fundBobBalances(50, 0)
+	// GIVEN LP 50 TokenA at tick 600
+	s.bobDeposits(
+		NewDeposit(50, 0, 600, 1),
+	)
+	// WHEN alice submits FoK limitOrder of 50 TokenB with maxOut of 20
+	s.aliceLimitSellsWithMaxOut("TokenB", 0, 50, 20)
+
+	// THEN alice swap 19 TokenB and gets back 20 TokenA
+	s.assertAliceBalances(20, 31)
+}
+
+func (s *MsgServerTestSuite) TestPlaceLimitOrderFoKMaxOutUsedMultiTick() {
+	s.fundAliceBalances(0, 50)
+	s.fundBobBalances(50, 0)
+	// GIVEN LP 30 TokenA at tick 600-602
+	s.bobDeposits(
+		NewDeposit(10, 0, 600, 1),
+		NewDeposit(10, 0, 601, 1),
+		NewDeposit(10, 0, 602, 1),
+	)
+	// WHEN alice submits FoK limitOrder of 50 TokenB with maxOut of 20
+	s.aliceLimitSellsWithMaxOut("TokenB", 0, 50, 20)
+
+	// THEN alice swap 20 TokenB and gets back 20 TokenA
+	s.assertAliceBalances(20, 30)
 }
 
 // Immediate Or Cancel LimitOrders ////////////////////////////////////////////////////////////////////
