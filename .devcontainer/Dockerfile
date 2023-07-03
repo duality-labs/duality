@@ -13,7 +13,7 @@ RUN apt-get install -y \
     curl
 
 # [Choice] Ignite CLI version (align this with go.mod "github.com/ignite-hq/cli" version)
-ARG IGNITE_CLI_VERSION="v0.23.0"
+ARG IGNITE_CLI_VERSION="v0.27.1"
 RUN curl "https://get.ignite.com/cli@$IGNITE_CLI_VERSION!" | bash
 
 # see docs for exposed ports:
