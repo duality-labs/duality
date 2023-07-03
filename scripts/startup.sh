@@ -13,13 +13,12 @@ if [[ ! -e scripts/startup.sh ]]; then
     exit 1
 fi
 
+# ensure settings directory exists
+# eg. even after running ignite chain build in the VSCode DevContainer image this directory doesn't exist
+# we will need it to add/move config files during setup
+mkdir -p /root/.duality/config # create directory if not exists
+
 echo "Startup mode: $STARTUP_MODE"
-
-echo "Initializing chain..."
-dualityd init --chain-id $CHAIN_ID duality
-
-# Add consumer section to the ICS chain
-dualityd add-consumer-section
 
 # replace moniker in the config
 if [ ! -z $NODE_MONIKER ]
@@ -34,6 +33,12 @@ fi
 # for mainnets a custom genesis file should be curated outside of these scripts
 if [ $STARTUP_MODE == "new" ]
 then
+
+    echo "Initializing chain..."
+    dualityd init --chain-id $CHAIN_ID duality
+
+    # Add consumer section to the ICS chain
+    dualityd add-consumer-section
 
     # duplicate genesis for easier merging and recovery
     cp /root/.duality/config/genesis.json /root/.duality/config/genesis-init.json
@@ -122,12 +127,6 @@ else
         rpc_address=$RPC_ADDRESS
         echo "RPC ADDRESS: $rpc_address"
 
-        # assert that address is an IP address
-        if [[ ! "$rpc_address" =~ "https?://([0-9]{1,3}\.){3}[0-9]{1,3}\b" ]]; then
-            echo "Must provide ENV variable RPC_ADDRESS as an IP address"
-            exit 1
-        fi
-
         # add genesis
         if $(wget -q -O - $rpc_address/genesis | jq .result.genesis > /root/.duality/config/genesis.json); then
             echo "Loaded genesis.json"
@@ -136,12 +135,21 @@ else
             exit 1
         fi
 
-        # add persistent peers
-        genesis_ip=$(echo $rpc_address | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b")
-        # TODO: ideally this should parse listen_addr to get the port
-        persistent_peers=$( wget -q -O - $rpc_address/status \
-                            | jq -r --arg ip $genesis_ip '.result.node_info.id + "@" + $ip + ":26656"' )
-
+        # set persistent_peers variable
+        if [ ! -z $PERSISTENT_PEER ]; then
+            persistent_peers="$PERSISTENT_PEER"
+        else
+            # assert that address is an IP address so that it can be the persistent peer
+            if [[ ! "$rpc_address" =~ "https?://([0-9]{1,3}\.){3}[0-9]{1,3}\b" ]]; then
+                echo "Must provide ENV variable RPC_ADDRESS as an IP address"
+                exit 1
+            fi
+            # add persistent peers from RPC IP address
+            genesis_ip=$(echo $rpc_address | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b")
+            # TODO: ideally this should parse listen_addr to get the port
+            persistent_peers=$( wget -q -O - $rpc_address/status \
+                                | jq -r --arg ip $genesis_ip '.result.node_info.id + "@" + $ip + ":26656"' )
+        fi
     else
 
         # if RPC_ADDRESS was not provided then read it from the chain.json
@@ -173,6 +181,7 @@ else
     fi
 
     # set chain settings
+    echo "using persistent peers: $persistent_peers"
     sed -i 's#persistent_peers = ""#persistent_peers = "'"$persistent_peers"'"#' /root/.duality/config/config.toml
 
     # check if this node intends to become a validator
