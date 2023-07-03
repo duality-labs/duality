@@ -1,0 +1,19 @@
+version: "3"
+services:
+  genesis-node:
+    build: .
+    environment:
+      - MODE=new
+    volumes:
+      - validator-volume:/home/root/.duality
+    ports:
+      - 1317
+      - 6060
+      - 9090
+      - 26656
+      - 26657
+    healthcheck:
+      test: [ "CMD", "dualityd", "status" ]
+      interval: 10s
+volumes:
+  validator-volume: {}
