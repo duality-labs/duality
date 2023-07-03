@@ -103,8 +103,9 @@ func (im IBCMiddleware) OnRecvPacket(
 
 	var msg Message
 	var err error
-	if err = json.Unmarshal([]byte(data.GetMemo()), &msg); err != nil {
-		// shrug
+	err = json.Unmarshal([]byte(data.GetMemo()), &msg)
+	if err != nil || len(msg.Payload) == 0 {
+		// Not a packet that should be handled by the GMP middleware
 		return im.app.OnRecvPacket(ctx, packet, relayer)
 	}
 
