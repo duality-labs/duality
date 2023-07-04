@@ -6,7 +6,6 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/utils/dcli"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
@@ -41,36 +40,25 @@ func TestGetCmdGetGaugeByID(t *testing.T) {
 func TestGetCmdGauges(t *testing.T) {
 	desc, _ := cli.GetCmdGauges()
 	tcs := map[string]dcli.QueryCliTestCase[*types.GetGaugesRequest]{
-		"test ACTIVE with pagination": {
-			Cmd: "ACTIVE TokenA --offset=2",
-			ExpectedQuery: &types.GetGaugesRequest{
-				Status:     types.GaugeStatus_ACTIVE,
-				Denom:      "TokenA",
-				Pagination: &query.PageRequest{Key: []uint8{}, Offset: 2, Limit: 100},
-			},
-		},
 		"test ACTIVE_UPCOMING": {
 			Cmd: "ACTIVE_UPCOMING TokenA",
 			ExpectedQuery: &types.GetGaugesRequest{
-				Status:     types.GaugeStatus_ACTIVE_UPCOMING,
-				Denom:      "TokenA",
-				Pagination: &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
+				Status: types.GaugeStatus_ACTIVE_UPCOMING,
+				Denom:  "TokenA",
 			},
 		},
 		"test UPCOMING": {
 			Cmd: "UPCOMING TokenA",
 			ExpectedQuery: &types.GetGaugesRequest{
-				Status:     types.GaugeStatus_UPCOMING,
-				Denom:      "TokenA",
-				Pagination: &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
+				Status: types.GaugeStatus_UPCOMING,
+				Denom:  "TokenA",
 			},
 		},
 		"test FINISHED": {
 			Cmd: "FINISHED TokenA",
 			ExpectedQuery: &types.GetGaugesRequest{
-				Status:     types.GaugeStatus_FINISHED,
-				Denom:      "TokenA",
-				Pagination: &query.PageRequest{Key: []uint8{}, Offset: 0, Limit: 100},
+				Status: types.GaugeStatus_FINISHED,
+				Denom:  "TokenA",
 			},
 		},
 	}
