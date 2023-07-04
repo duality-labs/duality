@@ -188,3 +188,6 @@ require (
 )
 
 replace github.com/cosmos/ibc-go/v7 => github.com/Stride-Labs/ibc-go/v7 v7.1.1-0.20230622125415-f45876a168a0
+
+// downgrade of goleveldb to avoid issues: see https://github.com/cosmos/cosmos-sdk/issues/14949
+replace github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7

@@ -95,8 +95,11 @@ RUN IS_MAINNET=${IS_MAINNET-$([[ "$NETWORK" =~ "^duality-\d+$" ]] && echo "true"
     dasel put string -f /root/.duality/config/config.toml ".rpc.cors_allowed_origins" "$([[ $IS_MAINNET ]] && echo "app.duality.xyz" || echo "*")"; \
     # if not mainnet this may be a localnet, where we need address book to not be strict
     dasel put bool   -f /root/.duality/config/config.toml ".p2p.addr_book_strict" "$([[ $IS_MAINNET ]] && echo "true" || echo "false")"; \
-    # ensure listening to the RPC port doesn't block outgoing RPC connections
+    # ensure listening to ports doesn't block outgoing connections
     dasel put string -f /root/.duality/config/config.toml ".rpc.laddr" "tcp://0.0.0.0:26657"; \
+    dasel put string -f /root/.duality/config/app.toml ".api.address" "tcp://0.0.0.0:1317"; \
+    dasel put string -f /root/.duality/config/app.toml ".grpc.address" "0.0.0.0:9090"; \
+    dasel put string -f /root/.duality/config/app.toml ".grpc-web.address" "0.0.0.0:9091"; \
     # todo: add Prometheus telemetry
     # set chain id to network name
     dasel put string -f /root/.duality/config/client.toml ".chain-id" "$CHAIN_ID";
