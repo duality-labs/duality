@@ -1,6 +1,7 @@
 package apptesting
 
 import (
+	"context"
 	"crypto/rand"
 	"fmt"
 	"time"
@@ -21,8 +22,9 @@ import (
 type KeeperTestHelper struct {
 	suite.Suite
 
-	App *app.App
-	Ctx sdk.Context
+	App   *app.App
+	Ctx   sdk.Context
+	GoCtx context.Context
 	// Used for testing queries end to end.
 	// You can wrap this in a module-specific QueryClient()
 	// and then make calls as you would a normal GRPC client.
@@ -41,6 +43,7 @@ func (s *KeeperTestHelper) Setup() {
 		false,
 		tmtypes.Header{Height: 1, ChainID: "duality-1", Time: time.Now().UTC()},
 	)
+	s.GoCtx = sdk.WrapSDKContext(s.Ctx)
 	s.QueryHelper = &baseapp.QueryServiceTestHelper{
 		GRPCQueryRouter: s.App.GRPCQueryRouter(),
 		Ctx:             s.Ctx,

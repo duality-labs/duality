@@ -16,6 +16,8 @@ RUN apt-get install -y \
 ARG IGNITE_CLI_VERSION="v0.27.1"
 RUN curl "https://get.ignite.com/cli@$IGNITE_CLI_VERSION!" | bash
 
+RUN go install github.com/segmentio/golines@latest
+
 # see docs for exposed ports:
 #   https://docs.ignite.com/kb/config.html#host
 # rpc
