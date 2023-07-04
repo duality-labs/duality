@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/pflag"
 
 	"github.com/duality-labs/duality/utils/dcli"
-	dextypes "github.com/duality-labs/duality/x/dex/types"
+	"github.com/duality-labs/duality/x/dex/keeper"
 	"github.com/duality-labs/duality/x/incentives/types"
 )
 
@@ -30,23 +30,23 @@ func GetTxCmd() *cobra.Command {
 }
 
 func CreateGaugeCmdBuilder(clientCtx client.Context, args []string, flags *pflag.FlagSet) (sdk.Msg, error) {
-	// "create-gauge [pairID] [startTick] [endTick] [coins] [numEpochs] [pricingTick]"
-	pairID, err := dextypes.StringToPairID(args[0])
+	// "create-gauge [pairTokenA] [pairTokenB] [startTick] [endTick] [coins] [numEpochs] [pricingTick]"
+	pairID, err := keeper.CreatePairIDFromUnsorted(args[0], args[1])
 	if err != nil {
 		return &types.MsgCreateGauge{}, err
 	}
 
-	startTick, err := dcli.ParseIntMaybeNegative(args[1], "startTick")
+	startTick, err := dcli.ParseIntMaybeNegative(args[2], "startTick")
 	if err != nil {
 		return &types.MsgCreateGauge{}, err
 	}
 
-	endTick, err := dcli.ParseIntMaybeNegative(args[2], "endTick")
+	endTick, err := dcli.ParseIntMaybeNegative(args[3], "endTick")
 	if err != nil {
 		return &types.MsgCreateGauge{}, err
 	}
 
-	coins, err := sdk.ParseCoinsNormalized(args[3])
+	coins, err := sdk.ParseCoinsNormalized(args[4])
 	if err != nil {
 		return &types.MsgCreateGauge{}, err
 	}
@@ -66,7 +66,7 @@ func CreateGaugeCmdBuilder(clientCtx client.Context, args []string, flags *pflag
 		return &types.MsgCreateGauge{}, errors.New("invalid start time format")
 	}
 
-	epochs, err := dcli.ParseUint(args[4], "numEpochs")
+	epochs, err := dcli.ParseUint(args[5], "numEpochs")
 	if err != nil {
 		return &types.MsgCreateGauge{}, err
 	}
@@ -80,7 +80,7 @@ func CreateGaugeCmdBuilder(clientCtx client.Context, args []string, flags *pflag
 		epochs = 1
 	}
 
-	pricingTick, err := dcli.ParseIntMaybeNegative(args[5], "pricingTick")
+	pricingTick, err := dcli.ParseIntMaybeNegative(args[6], "pricingTick")
 	if err != nil {
 		return &types.MsgCreateGauge{}, err
 	}
@@ -107,10 +107,10 @@ func CreateGaugeCmdBuilder(clientCtx client.Context, args []string, flags *pflag
 func NewCreateGaugeCmd() (*dcli.TxCliDesc, *types.MsgCreateGauge) {
 	return &dcli.TxCliDesc{
 		ParseAndBuildMsg: CreateGaugeCmdBuilder,
-		Use:              "create-gauge [pairID] [startTick] [endTick] [coins] [numEpochs] [pricingTick]",
+		Use:              "create-gauge [pairTokenA] [pairTokenB] [startTick] [endTick] [coins] [numEpochs] [pricingTick]",
 		Short:            "create a gauge to distribute rewards to users",
 		Long: `{{.Short}}{{.ExampleHeader}}
-TokenA<>TokenB [-10] 200 100TokenA,200TokenB 6 0 --start-time 2006-01-02T15:04:05Z07:00 --perpetual true`,
+TokenA TokenB [-10] 200 100TokenA,200TokenB 6 0 --start-time 2006-01-02T15:04:05Z07:00 --perpetual true`,
 		Flags: dcli.FlagDesc{OptionalFlags: []*pflag.FlagSet{FlagSetCreateGauge()}},
 	}, &types.MsgCreateGauge{}
 }

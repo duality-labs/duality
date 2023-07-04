@@ -130,17 +130,6 @@ func (im IBCMiddleware) OnRecvPacket(
 		return channeltypes.NewErrorAcknowledgement(err)
 	}
 
-	// Check if a middleware before this has already processed this packet and passed the processed key via context
-	var processed bool
-	goCtx := ctx.Context()
-	p := goCtx.Value(types.ProcessedKey{})
-
-	if p != nil {
-		if pb, ok := p.(bool); ok {
-			processed = pb
-		}
-	}
-
 	// Compose our context with values that will be used to pass through to the forward middleware
 	ctxWithForwardFlags := context.WithValue(ctx.Context(), forwardtypes.ProcessedKey{}, true)
 	ctxWithForwardFlags = context.WithValue(
@@ -155,14 +144,9 @@ func (im IBCMiddleware) OnRecvPacket(
 	)
 	wrappedSdkCtx := ctx.WithContext(ctxWithForwardFlags)
 
-	// If this packet has been handled by another middleware in the stack there is no need to call into the
-	// underlying app, otherwise the transfer module's OnRecvPacket callback could be invoked more than once.
-	var ack ibcexported.Acknowledgement
-	if !processed {
-		ack = im.app.OnRecvPacket(wrappedSdkCtx, packet, relayer)
-		if ack == nil || !ack.Success() {
-			return ack
-		}
+	ack := im.app.OnRecvPacket(wrappedSdkCtx, packet, relayer)
+	if ack == nil || !ack.Success() {
+		return ack
 	}
 
 	// Attempt to perform a swap since this packets memo included swap metadata.
