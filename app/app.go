@@ -95,14 +95,14 @@ import (
 
 	testutil "github.com/cosmos/interchain-security/v3/testutil/integration"
 
+	appparams "github.com/duality-labs/duality/app/params"
 	epochsmodule "github.com/duality-labs/duality/x/epochs"
 	epochsmodulekeeper "github.com/duality-labs/duality/x/epochs/keeper"
 	epochsmoduletypes "github.com/duality-labs/duality/x/epochs/types"
+	gmpmiddleware "github.com/duality-labs/duality/x/gmp"
 	swapmiddleware "github.com/duality-labs/duality/x/ibcswap"
 	swapkeeper "github.com/duality-labs/duality/x/ibcswap/keeper"
 	swaptypes "github.com/duality-labs/duality/x/ibcswap/types"
-
-	appparams "github.com/duality-labs/duality/app/params"
 	incentivesmodule "github.com/duality-labs/duality/x/incentives"
 	incentivesmodulekeeper "github.com/duality-labs/duality/x/incentives/keeper"
 	incentivesmoduletypes "github.com/duality-labs/duality/x/incentives/types"
@@ -508,12 +508,17 @@ func NewApp(
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create our IBC middleware stack from bottom to top.
-	// The stack from top to bottom will look like this:
+	// The stack order is this:
 	// -- channel.OnRecvPacket
+	// -- gmp.OnRecvPacket
 	// -- swap.OnRecvPacket
 	// -- forward.OnRecvPacket
 	// -- transfer.OnRecvPacket
-	// see: https://github.com/cosmos/ibc-go/blob/main/docs/middleware/ics29-fee/integration.md#configuring-an-application-stack-with-fee-middleware
+	//
+	// The confusing thing is that everything flows down to transfer,
+	// but then once it gets back up to swap, swap will call down to forward
+	// again. Then forward has to know through the context not to call down to
+	// transfer a second time. This is in my opinion a bad separation of concerns.
 	var ibcStack ibcporttypes.IBCModule
 	ibcStack = transfer.NewIBCModule(app.TransferKeeper)
 	ibcStack = forwardmiddleware.NewIBCMiddleware(
@@ -524,6 +529,7 @@ func NewApp(
 		forwardkeeper.DefaultRefundTransferPacketTimeoutTimestamp,
 	)
 	ibcStack = swapmiddleware.NewIBCMiddleware(ibcStack, app.SwapKeeper)
+	ibcStack = gmpmiddleware.NewIBCMiddleware(ibcStack)
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
