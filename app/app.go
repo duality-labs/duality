@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
 	"github.com/cosmos/cosmos-sdk/runtime"
@@ -13,7 +14,6 @@ import (
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/cosmos/cosmos-sdk/x/group"
-	proposaltypes "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -60,7 +60,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
 	feegrantmodule "github.com/cosmos/cosmos-sdk/x/feegrant/module"
-	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 	groupmodule "github.com/cosmos/cosmos-sdk/x/group/module"
 	"github.com/cosmos/cosmos-sdk/x/params"
@@ -75,12 +74,13 @@ import (
 	forwardmiddleware "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router"
 	forwardkeeper "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/keeper"
 	forwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/types"
+	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7"
+	ibchookskeeper "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/keeper"
+	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v7/types"
 	"github.com/cosmos/ibc-go/v7/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v7/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/v7/modules/core"
-	ibcclient "github.com/cosmos/ibc-go/v7/modules/core/02-client"
-	ibcclienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
 	ibcporttypes "github.com/cosmos/ibc-go/v7/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v7/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
@@ -110,6 +110,9 @@ import (
 	incentivesmodule "github.com/duality-labs/duality/x/incentives"
 	incentivesmodulekeeper "github.com/duality-labs/duality/x/incentives/keeper"
 	incentivesmoduletypes "github.com/duality-labs/duality/x/incentives/types"
+
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -150,6 +153,8 @@ var (
 		tendermint.AppModuleBasic{},
 		genutil.AppModuleBasic{},
 		groupmodule.AppModuleBasic{},
+		wasm.AppModuleBasic{},
+		ibchooks.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -165,9 +170,12 @@ var (
 		ccvconsumertypes.ConsumerRedistributeName:     nil,
 		ccvconsumertypes.ConsumerToSendToProviderName: nil,
 		incentivesmoduletypes.ModuleName:              nil,
+		wasm.ModuleName:                               {authtypes.Burner},
 
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
+
+	AppAuthority = "cosmos1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfwkgpd"
 )
 
 var (
@@ -225,6 +233,7 @@ type App struct {
 	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper    capabilitykeeper.ScopedKeeper
 	ScopedCCVConsumerKeeper capabilitykeeper.ScopedKeeper
+	ScopedWasmKeeper        capabilitykeeper.ScopedKeeper
 
 	DexKeeper     dexmodulekeeper.Keeper
 	SwapKeeper    swapkeeper.Keeper
@@ -233,6 +242,9 @@ type App struct {
 	EpochsKeeper *epochsmodulekeeper.Keeper
 
 	IncentivesKeeper *incentivesmodulekeeper.Keeper
+	WasmKeeper       wasm.Keeper
+	IBCHooksKeeper   ibchookskeeper.Keeper
+
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -253,6 +265,7 @@ func NewApp(
 	invCheckPeriod uint,
 	appOpts servertypes.AppOptions,
 	encConfig appparams.EncodingConfig,
+	wasmOpts []wasm.Option,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
 	appCodec := encConfig.Marshaler
@@ -290,6 +303,8 @@ func NewApp(
 		consensusparamtypes.StoreKey,
 		crisistypes.StoreKey,
 		group.StoreKey,
+		wasm.StoreKey,
+		ibchookstypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -332,6 +347,7 @@ func NewApp(
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibcexported.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedCCVConsumerKeeper := app.CapabilityKeeper.ScopeToModule(ccvconsumertypes.ModuleName)
+	scopedWasmKeeper := app.CapabilityKeeper.ScopeToModule(wasm.ModuleName)
 	app.CapabilityKeeper.Seal()
 	// this line is used by starport scaffolding # stargate/app/scopedKeeper
 
@@ -357,6 +373,7 @@ func NewApp(
 		keys[banktypes.StoreKey],
 		app.AccountKeeper,
 		app.BlockedModuleAccountAddrs(),
+		// TODO: Set
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
@@ -366,6 +383,7 @@ func NewApp(
 		appCodec,
 		homePath,
 		app.BaseApp,
+		// TODO: Set
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
@@ -384,6 +402,7 @@ func NewApp(
 		encConfig.Amino,
 		keys[slashingtypes.StoreKey],
 		&app.ConsumerKeeper,
+		// TODO: Set
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
@@ -410,6 +429,7 @@ func NewApp(
 		invCheckPeriod,
 		app.BankKeeper,
 		authtypes.FeeCollectorName,
+		// TODO: Set
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
@@ -434,14 +454,6 @@ func NewApp(
 
 	// ... other modules keepers
 
-	// Create Transfer Keepers
-	app.TransferKeeper = ibctransferkeeper.NewKeeper(
-		appCodec, keys[ibctransfertypes.StoreKey], app.GetSubspace(ibctransfertypes.ModuleName),
-		app.IBCKeeper.ChannelKeeper, app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
-		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
-	)
-	transferModule := transfer.NewAppModule(app.TransferKeeper)
-
 	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
 	evidenceKeeper := evidencekeeper.NewKeeper(
 		appCodec, keys[evidencetypes.StoreKey], &app.ConsumerKeeper, app.SlashingKeeper,
@@ -454,12 +466,6 @@ func NewApp(
 		app.ConsumerKeeper,
 		app.GetSubspace(ccvconsumertypes.ModuleName),
 	)
-
-	govRouter := govv1beta1.NewRouter()
-	govRouter.AddRoute(govtypes.RouterKey, govv1beta1.ProposalHandler).
-		AddRoute(proposaltypes.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
-		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IBCKeeper.ClientKeeper))
 
 	app.DexKeeper = *dexmodulekeeper.NewKeeper(
 		appCodec,
@@ -520,9 +526,83 @@ func NewApp(
 	app.EpochsKeeper.SetHooks(epochsmoduletypes.NewMultiEpochHooks(
 		app.IncentivesKeeper.Hooks(),
 	))
+
 	// NB: This must be initialized AFTER app.EpochsKeeper.SetHooks() because otherwise
 	// we dereference an out-of-date EpochsKeeper.
 	epochsModule := epochsmodule.NewAppModule(*app.EpochsKeeper)
+
+	wasmDir := filepath.Join(homePath, "wasm")
+	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
+	if err != nil {
+		panic(fmt.Sprintf("error while reading wasm config: %s", err))
+	}
+
+	// wasmOpts = append(
+	// 	wasmbinding.RegisterCustomPlugins(
+	// 		&app.InterchainTxsKeeper,
+	// 		&app.InterchainQueriesKeeper,
+	// 		app.TransferKeeper,
+	// 		&app.AdminmoduleKeeper,
+	// 		app.FeeBurnerKeeper,
+	// 		app.FeeKeeper,
+	// 		&app.BankKeeper,
+	// 		app.TokenFactoryKeeper,
+	// 		&app.CronKeeper,
+	// 	),
+	// 	wasmOpts...)
+
+	app.WasmKeeper = wasm.NewKeeper(
+		appCodec,
+		keys[wasm.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		nil,
+		nil,
+		app.IBCKeeper.ChannelKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedWasmKeeper,
+		app.TransferKeeper,
+		app.MsgServiceRouter(),
+		app.GRPCQueryRouter(),
+		wasmDir,
+		wasmConfig,
+		strings.Join(AllCapabilities(), ","),
+		AppAuthority,
+		wasmOpts...,
+	)
+
+	// 'ibc-hooks' module - depends on
+	// 1. 'auth'
+	// 2. 'bank'
+	// 3. 'distr'
+	app.IBCHooksKeeper = ibchookskeeper.NewKeeper(
+		app.keys[ibchookstypes.StoreKey],
+	)
+	ics20WasmHooks := ibchooks.NewWasmHooks(
+		&app.IBCHooksKeeper,
+		&app.WasmKeeper,
+		AccountAddressPrefix,
+	) // The contract keeper needs to be set later
+	hooksICS4Wrapper := ibchooks.NewICS4Middleware(
+		app.IBCKeeper.ChannelKeeper,
+		ics20WasmHooks,
+	)
+
+	// Create Transfer Module
+	app.TransferKeeper = ibctransferkeeper.NewKeeper(
+		appCodec,
+		keys[ibctransfertypes.StoreKey],
+		app.GetSubspace(ibctransfertypes.ModuleName),
+		hooksICS4Wrapper,
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
+		scopedTransferKeeper,
+	)
+	transferModule := transfer.NewAppModule(app.TransferKeeper)
+	app.ForwardKeeper.SetTransferKeeper(app.TransferKeeper)
 
 	// Set the initialized transfer keeper for forward middleware
 	app.ForwardKeeper.SetTransferKeeper(app.TransferKeeper)
@@ -535,28 +615,38 @@ func NewApp(
 	// -- gmp.OnRecvPacket
 	// -- swap.OnRecvPacket
 	// -- forward.OnRecvPacket
+	// -- ibchooks.OnRecvPacket
 	// -- transfer.OnRecvPacket
+	// -- ibchookswrapper.OnRecvPacket
 	//
 	// The confusing thing is that everything flows down to transfer,
 	// but then once it gets back up to swap, swap will call down to forward
 	// again. Then forward has to know through the context not to call down to
 	// transfer a second time. This is in my opinion a bad separation of concerns.
-	var ibcStack ibcporttypes.IBCModule
-	ibcStack = transfer.NewIBCModule(app.TransferKeeper)
-	ibcStack = forwardmiddleware.NewIBCMiddleware(
-		ibcStack,
+	var transferStack ibcporttypes.IBCModule
+	transferStack = transfer.NewIBCModule(app.TransferKeeper)
+	transferStack = ibchooks.NewIBCMiddleware(transferStack, &hooksICS4Wrapper)
+	transferStack = forwardmiddleware.NewIBCMiddleware(
+		transferStack,
 		app.ForwardKeeper,
 		0, // TODO explore changing default values for retries and timeouts
 		forwardkeeper.DefaultForwardTransferPacketTimeoutTimestamp,
 		forwardkeeper.DefaultRefundTransferPacketTimeoutTimestamp,
 	)
-	ibcStack = swapmiddleware.NewIBCMiddleware(ibcStack, app.SwapKeeper)
-	ibcStack = gmpmiddleware.NewIBCMiddleware(ibcStack)
+	transferStack = swapmiddleware.NewIBCMiddleware(transferStack, app.SwapKeeper)
+	transferStack = gmpmiddleware.NewIBCMiddleware(transferStack)
+
+	wasmStack := wasm.NewIBCHandler(
+		app.WasmKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		app.IBCKeeper.ChannelKeeper,
+	)
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
-	ibcRouter.AddRoute(ibctransfertypes.ModuleName, ibcStack)
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferStack)
 	ibcRouter.AddRoute(ccvconsumertypes.ModuleName, consumerModule)
+	ibcRouter.AddRoute(wasm.ModuleName, wasmStack)
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -624,6 +714,7 @@ func NewApp(
 		swapModule,
 		epochsModule,
 		incentivesModule,
+		ibchooks.NewAppModule(app.AccountKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
 
 		// always be last to make sure that it checks for all invariants and not only part of them
@@ -667,6 +758,7 @@ func NewApp(
 		swaptypes.ModuleName,
 		incentivesmoduletypes.ModuleName,
 		group.ModuleName,
+		ibchookstypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -691,6 +783,7 @@ func NewApp(
 		epochsmoduletypes.ModuleName,
 		incentivesmoduletypes.ModuleName,
 		group.ModuleName,
+		ibchookstypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 
 		// NOTE: Because of the gas sensitivity of PurgeExpiredLimit order operations
@@ -726,6 +819,7 @@ func NewApp(
 		epochsmoduletypes.ModuleName,
 		incentivesmoduletypes.ModuleName,
 		group.ModuleName,
+		ibchookstypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -765,8 +859,10 @@ func NewApp(
 				SignModeHandler: encConfig.TxConfig.SignModeHandler(),
 				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 			},
-			IBCKeeper:      app.IBCKeeper,
-			ConsumerKeeper: app.ConsumerKeeper,
+			IBCKeeper:         app.IBCKeeper,
+			ConsumerKeeper:    app.ConsumerKeeper,
+			WasmConfig:        &wasmConfig,
+			TXCounterStoreKey: keys[wasm.StoreKey],
 		},
 	)
 	if err != nil {
@@ -779,6 +875,18 @@ func NewApp(
 	app.SetAnteHandler(anteHandler)
 	app.SetEndBlocker(app.EndBlocker)
 
+	// must be before Loading version
+	// requires the snapshot store to be created and registered as a BaseAppOption
+	// see cmd/wasmd/root.go: 206 - 214 approx
+	if manager := app.SnapshotManager(); manager != nil {
+		err := manager.RegisterExtensions(
+			wasmkeeper.NewWasmSnapshotter(app.CommitMultiStore(), &app.WasmKeeper),
+		)
+		if err != nil {
+			panic(fmt.Errorf("failed to register snapshot extension: %s", err))
+		}
+	}
+
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
@@ -788,6 +896,7 @@ func NewApp(
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
 	app.ScopedCCVConsumerKeeper = scopedCCVConsumerKeeper
+	app.ScopedWasmKeeper = scopedWasmKeeper
 	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
 
 	return app

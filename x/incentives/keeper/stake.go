@@ -129,7 +129,6 @@ func (k Keeper) GetStakesByQueryCondition(
 			types.GetKeyStakeIndexByPairTick(pairIDString, distrTo.EndTick+1),
 		),
 	)
-	fmt.Println("tickStakeIds: ", tickStakeIds)
 
 	idMemo := make(map[uint64]bool)
 	for _, id := range tickStakeIds {
