@@ -59,7 +59,13 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 				}
 
 				// attempt to lookup address from Keybase if no address was provided
-				kb, err := keyring.New(sdk.KeyringServiceName(), keyringBackend, clientCtx.HomeDir, inBuf, cdc)
+				kb, err := keyring.New(
+					sdk.KeyringServiceName(),
+					keyringBackend,
+					clientCtx.HomeDir,
+					inBuf,
+					cdc,
+				)
 				if err != nil {
 					return err
 				}
@@ -100,7 +106,11 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 			baseAccount := authtypes.NewBaseAccount(addr, nil, 0, 0)
 
 			if !vestingAmt.IsZero() {
-				baseVestingAccount := authvesting.NewBaseVestingAccount(baseAccount, vestingAmt.Sort(), vestingEnd)
+				baseVestingAccount := authvesting.NewBaseVestingAccount(
+					baseAccount,
+					vestingAmt.Sort(),
+					vestingEnd,
+				)
 
 				if (balances.Coins.IsZero() && !baseVestingAccount.OriginalVesting.IsZero()) ||
 					baseVestingAccount.OriginalVesting.IsAnyGT(balances.Coins) {
@@ -109,13 +119,18 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 
 				switch {
 				case vestingStart != 0 && vestingEnd != 0:
-					genAccount = authvesting.NewContinuousVestingAccountRaw(baseVestingAccount, vestingStart)
+					genAccount = authvesting.NewContinuousVestingAccountRaw(
+						baseVestingAccount,
+						vestingStart,
+					)
 
 				case vestingEnd != 0:
 					genAccount = authvesting.NewDelayedVestingAccountRaw(baseVestingAccount)
 
 				default:
-					return errors.New("invalid vesting parameters; must supply start and end time or end time")
+					return errors.New(
+						"invalid vesting parameters; must supply start and end time or end time",
+					)
 				}
 			} else {
 				genAccount = baseAccount
@@ -181,7 +196,8 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 		},
 	}
 
-	cmd.Flags().String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|kwallet|pass|test)")
+	cmd.Flags().
+		String(flags.FlagKeyringBackend, flags.DefaultKeyringBackend, "Select keyring's backend (os|file|kwallet|pass|test)")
 	cmd.Flags().String(flags.FlagHome, defaultNodeHome, "The application home directory")
 	cmd.Flags().String(flagVestingAmt, "", "amount of coins for vesting accounts")
 	cmd.Flags().Int64(flagVestingStart, 0, "schedule start time (unix epoch) for vesting accounts")

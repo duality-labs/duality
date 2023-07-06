@@ -1,5 +1,5 @@
 //nolint:lll,deadcode
-package main
+package cmd
 
 import (
 	"encoding/json"
@@ -28,39 +28,48 @@ func AddConsumerSectionCmd(defaultNodeHome string) *cobra.Command {
 		Short:                      "ONLY FOR TESTING PURPOSES! Modifies genesis so that chain can be started locally with one node.",
 		SuggestionsMinimumDistance: 2,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return genesisMutator.AlterConsumerModuleState(cmd, func(state *GenesisData, _ map[string]json.RawMessage) error {
-				genesisState := testutil.CreateMinimalConsumerTestGenesis()
-				clientCtx := client.GetClientContextFromCmd(cmd)
-				serverCtx := server.GetServerContextFromCmd(cmd)
-				config := serverCtx.Config
-				config.SetRoot(clientCtx.HomeDir)
-				privValidator := pvm.LoadFilePV(config.PrivValidatorKeyFile(), config.PrivValidatorStateFile())
-				pk, err := privValidator.GetPubKey()
-				if err != nil {
-					return err
-				}
-				sdkPublicKey, err := cryptocodec.FromTmPubKeyInterface(pk)
-				if err != nil {
-					return err
-				}
-				tmProtoPublicKey, err := cryptocodec.ToTmProtoPublicKey(sdkPublicKey)
-				if err != nil {
-					return err
-				}
+			return genesisMutator.AlterConsumerModuleState(
+				cmd,
+				func(state *GenesisData, _ map[string]json.RawMessage) error {
+					genesisState := testutil.CreateMinimalConsumerTestGenesis()
+					clientCtx := client.GetClientContextFromCmd(cmd)
+					serverCtx := server.GetServerContextFromCmd(cmd)
+					config := serverCtx.Config
+					config.SetRoot(clientCtx.HomeDir)
+					privValidator := pvm.LoadFilePV(
+						config.PrivValidatorKeyFile(),
+						config.PrivValidatorStateFile(),
+					)
+					pk, err := privValidator.GetPubKey()
+					if err != nil {
+						return err
+					}
+					sdkPublicKey, err := cryptocodec.FromTmPubKeyInterface(pk)
+					if err != nil {
+						return err
+					}
+					tmProtoPublicKey, err := cryptocodec.ToTmProtoPublicKey(sdkPublicKey)
+					if err != nil {
+						return err
+					}
 
-				initialValset := []types1.ValidatorUpdate{{PubKey: tmProtoPublicKey, Power: 100}}
-				vals, err := tmtypes.PB2TM.ValidatorUpdates(initialValset)
-				if err != nil {
-					return sdkerrors.Wrap(err, "could not convert val updates to validator set")
-				}
+					initialValset := []types1.ValidatorUpdate{
+						{PubKey: tmProtoPublicKey, Power: 100},
+					}
+					vals, err := tmtypes.PB2TM.ValidatorUpdates(initialValset)
+					if err != nil {
+						return sdkerrors.Wrap(err, "could not convert val updates to validator set")
+					}
 
-				genesisState.InitialValSet = initialValset
-				genesisState.ProviderConsensusState.NextValidatorsHash = tmtypes.NewValidatorSet(vals).Hash()
+					genesisState.InitialValSet = initialValset
+					genesisState.ProviderConsensusState.NextValidatorsHash = tmtypes.NewValidatorSet(vals).
+						Hash()
 
-				state.ConsumerModuleState = genesisState
+					state.ConsumerModuleState = genesisState
 
-				return nil
-			})
+					return nil
+				},
+			)
 		},
 	}
 
@@ -71,7 +80,10 @@ func AddConsumerSectionCmd(defaultNodeHome string) *cobra.Command {
 }
 
 type GenesisMutator interface {
-	AlterConsumerModuleState(cmd *cobra.Command, callback func(state *GenesisData, appState map[string]json.RawMessage) error) error
+	AlterConsumerModuleState(
+		cmd *cobra.Command,
+		callback func(state *GenesisData, appState map[string]json.RawMessage) error,
+	) error
 }
 
 type DefaultGenesisIO struct {
@@ -82,7 +94,10 @@ func NewDefaultGenesisIO() *DefaultGenesisIO {
 	return &DefaultGenesisIO{DefaultGenesisReader: DefaultGenesisReader{}}
 }
 
-func (x DefaultGenesisIO) AlterConsumerModuleState(cmd *cobra.Command, callback func(state *GenesisData, appState map[string]json.RawMessage) error) error {
+func (x DefaultGenesisIO) AlterConsumerModuleState(
+	cmd *cobra.Command,
+	callback func(state *GenesisData, appState map[string]json.RawMessage) error,
+) error {
 	g, err := x.ReadGenesis(cmd)
 	if err != nil {
 		return err
@@ -139,6 +154,16 @@ type GenesisData struct {
 	ConsumerModuleState *ccvconsumertypes.GenesisState
 }
 
-func NewGenesisData(genesisFile string, genDoc *tmtypes.GenesisDoc, appState map[string]json.RawMessage, consumerModuleState *ccvconsumertypes.GenesisState) *GenesisData {
-	return &GenesisData{GenesisFile: genesisFile, GenDoc: genDoc, AppState: appState, ConsumerModuleState: consumerModuleState}
+func NewGenesisData(
+	genesisFile string,
+	genDoc *tmtypes.GenesisDoc,
+	appState map[string]json.RawMessage,
+	consumerModuleState *ccvconsumertypes.GenesisState,
+) *GenesisData {
+	return &GenesisData{
+		GenesisFile:         genesisFile,
+		GenDoc:              genDoc,
+		AppState:            appState,
+		ConsumerModuleState: consumerModuleState,
+	}
 }

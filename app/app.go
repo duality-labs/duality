@@ -10,7 +10,9 @@ import (
 	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
+	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	"github.com/cosmos/cosmos-sdk/x/group"
 	proposaltypes "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 
 	dbm "github.com/cometbft/cometbft-db"
@@ -59,6 +61,8 @@ import (
 	feegrantkeeper "github.com/cosmos/cosmos-sdk/x/feegrant/keeper"
 	feegrantmodule "github.com/cosmos/cosmos-sdk/x/feegrant/module"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
+	groupmodule "github.com/cosmos/cosmos-sdk/x/group/module"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -145,6 +149,7 @@ var (
 		incentivesmodule.AppModuleBasic{},
 		tendermint.AppModuleBasic{},
 		genutil.AppModuleBasic{},
+		groupmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -214,6 +219,7 @@ type App struct {
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	ConsumerKeeper        ccvconsumerkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
+	GroupKeeper           groupkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper         capabilitykeeper.ScopedKeeper
@@ -283,6 +289,7 @@ func NewApp(
 		incentivesmoduletypes.StoreKey,
 		consensusparamtypes.StoreKey,
 		crisistypes.StoreKey,
+		group.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -410,6 +417,19 @@ func NewApp(
 		appCodec,
 		keys[feegrant.StoreKey],
 		app.AccountKeeper,
+	)
+
+	groupConfig := group.DefaultConfig()
+	/*
+		Example of setting group params:
+		groupConfig.MaxMetadataLen = 1000
+	*/
+	app.GroupKeeper = groupkeeper.NewKeeper(
+		keys[group.StoreKey],
+		appCodec,
+		app.MsgServiceRouter(),
+		app.AccountKeeper,
+		groupConfig,
 	)
 
 	// ... other modules keepers
@@ -548,6 +568,12 @@ func NewApp(
 	// must be passed by reference here.
 
 	app.mm = module.NewManager(
+		genutil.NewAppModule(
+			app.AccountKeeper,
+			app.ConsumerKeeper,
+			app.BaseApp.DeliverTx,
+			encConfig.TxConfig,
+		),
 		auth.NewAppModule(
 			appCodec,
 			app.AccountKeeper,
@@ -604,6 +630,13 @@ func NewApp(
 			skipGenesisInvariants,
 			app.GetSubspace(crisistypes.ModuleName),
 		),
+		groupmodule.NewAppModule(
+			appCodec,
+			app.GroupKeeper,
+			app.AccountKeeper,
+			app.BankKeeper,
+			app.interfaceRegistry,
+		),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -623,6 +656,7 @@ func NewApp(
 		authz.ModuleName,
 		banktypes.ModuleName,
 		crisistypes.ModuleName,
+		genutiltypes.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		ccvconsumertypes.ModuleName,
@@ -630,6 +664,7 @@ func NewApp(
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
 		incentivesmoduletypes.ModuleName,
+		group.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -646,12 +681,14 @@ func NewApp(
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		ibcexported.ModuleName,
+		genutiltypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ccvconsumertypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
 		epochsmoduletypes.ModuleName,
 		incentivesmoduletypes.ModuleName,
+		group.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 
 		// NOTE: Because of the gas sensitivity of PurgeExpiredLimit order operations
@@ -659,11 +696,12 @@ func NewApp(
 		dexmoduletypes.ModuleName,
 	)
 
-	// NOTE: The genutils module must occur after staking so that pools are
-	// properly initialized with tokens from genesis accounts.
 	// NOTE: Capability module must occur first so that it can initialize any capabilities
 	// so that other modules that want to create or claim capabilities afterwards in InitChain
 	// can do so safely.
+	// NOTE: The genutils module must occur after consumer so that pools are
+	// properly initialized with tokens from genesis accounts.
+	// NOTE: The genutils module must also occur after auth so that it can access the params from auth.
 	app.mm.SetOrderInitGenesis(
 		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
@@ -679,11 +717,13 @@ func NewApp(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		ccvconsumertypes.ModuleName,
+		genutiltypes.ModuleName,
 		dexmoduletypes.ModuleName,
 		forwardtypes.ModuleName,
 		swaptypes.ModuleName,
 		epochsmoduletypes.ModuleName,
 		incentivesmoduletypes.ModuleName,
+		group.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
