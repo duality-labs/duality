@@ -14,7 +14,7 @@ RUN apt-get install -y \
 WORKDIR /usr/src
 
 # add Ignite for generating docs
-RUN curl "https://get.ignite.com/cli@v0.23.0!" | bash
+RUN curl "https://get.ignite.com/cli@v0.27.1!" | bash
 
 # Get Go dependencies
 COPY go.mod ./go.mod
