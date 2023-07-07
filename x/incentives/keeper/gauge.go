@@ -60,7 +60,11 @@ func (k Keeper) setGaugeRefs(ctx sdk.Context, gauge *types.Gauge) error {
 		if err := k.addRefByKey(ctx, types.CombineKeys(types.KeyPrefixGaugeIndexUpcoming, types.GetTimeKey(gauge.StartTime)), gauge.Id); err != nil {
 			return err
 		}
-		err := k.addRefByKey(ctx, types.GetKeyGaugeIndexByPair(gauge.DistributeTo.PairID.Stringify()), gauge.Id)
+		err := k.addRefByKey(
+			ctx,
+			types.GetKeyGaugeIndexByPair(gauge.DistributeTo.PairID.Stringify()),
+			gauge.Id,
+		)
 		if err != nil {
 			return err
 		}
@@ -156,7 +160,12 @@ func (k Keeper) CreateGauge(
 }
 
 // AddToGaugeRewards adds coins to gauge.
-func (k Keeper) AddToGaugeRewards(ctx sdk.Context, owner sdk.AccAddress, coins sdk.Coins, gaugeID uint64) error {
+func (k Keeper) AddToGaugeRewards(
+	ctx sdk.Context,
+	owner sdk.AccAddress,
+	coins sdk.Coins,
+	gaugeID uint64,
+) error {
 	gauge, err := k.GetGaugeByID(ctx, gaugeID)
 	if err != nil {
 		return err
@@ -212,7 +221,11 @@ func (k Keeper) GetEpochInfo(ctx sdk.Context) epochtypes.EpochInfo {
 func (k Keeper) moveUpcomingGaugeToActiveGauge(ctx sdk.Context, gauge *types.Gauge) error {
 	// validation for current time and distribution start time
 	if ctx.BlockTime().Before(gauge.StartTime) {
-		return fmt.Errorf("gauge is not able to start distribution yet: %s >= %s", ctx.BlockTime().String(), gauge.StartTime.String())
+		return fmt.Errorf(
+			"gauge is not able to start distribution yet: %s >= %s",
+			ctx.BlockTime().String(),
+			gauge.StartTime.String(),
+		)
 	}
 
 	timeKey := types.GetTimeKey(gauge.StartTime)
@@ -234,7 +247,11 @@ func (k Keeper) moveActiveGaugeToFinishedGauge(ctx sdk.Context, gauge *types.Gau
 	if err := k.addRefByKey(ctx, types.CombineKeys(types.KeyPrefixGaugeIndexFinished, timeKey), gauge.Id); err != nil {
 		return err
 	}
-	err := k.deleteRefByKey(ctx, types.GetKeyGaugeIndexByPair(gauge.DistributeTo.PairID.Stringify()), gauge.Id)
+	err := k.deleteRefByKey(
+		ctx,
+		types.GetKeyGaugeIndexByPair(gauge.DistributeTo.PairID.Stringify()),
+		gauge.Id,
+	)
 	if err != nil {
 		return err
 	}
@@ -258,5 +275,8 @@ func (k Keeper) GetFinishedGauges(ctx sdk.Context) types.Gauges {
 }
 
 func (k Keeper) GetGaugesByPair(ctx sdk.Context, pair *dextypes.PairID) []*types.Gauge {
-	return k.getGaugesFromIterator(ctx, k.iterator(ctx, types.GetKeyGaugeIndexByPair(pair.Stringify())))
+	return k.getGaugesFromIterator(
+		ctx,
+		k.iterator(ctx, types.GetKeyGaugeIndexByPair(pair.Stringify())),
+	)
 }
