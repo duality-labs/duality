@@ -1,0 +1,13 @@
+{
+    "params": {
+        "code_upload_access": {
+            "permission": "Nobody",
+            "address": "",
+            "addresses": []
+        },
+        "instantiate_default_permission": "Nobody"
+    },
+    "codes": [],
+    "contracts": [],
+    "sequences": []
+}

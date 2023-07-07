@@ -1,4 +1,6 @@
-# Setup group genesis
+# Genesis Setup
+
+## Group Genesis Config
 
 Run with:
 
@@ -17,4 +19,14 @@ To update the genesis.json with the final group_genesis.json run the following.
 ```
 group_genesis=$(dasel -f "group_genesis.json" '.')
 dasel put object -f "old_genesis.json" -s "$group_genesis" '.app_state.group' > new_genesis.json
+```
+
+## Wasm Genesis Config
+
+We're locking things down so that only the admin group defined by the process above has the permission
+to upload and instantiate wasm contracts. [Docs here](https://github.com/CosmWasm/wasmd/tree/main#genesis-configuration).
+
+```
+wasm_genesis=$(dasel -f "wasm_genesis.json" '.')
+dasel put object -f "old_genesis.json" -s "$wasm_genesis" '.app_state.wasm' > new_genesis.json
 ```
