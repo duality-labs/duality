@@ -1,0 +1,8 @@
+{
+    "@type": "/cosmos.group.v1.PercentageDecisionPolicy",
+    "percentage": "0.50",
+    "windows": {
+        "voting_period": "120h",
+        "min_execution_period": "0s"
+    }
+}
