@@ -109,10 +109,9 @@ func NewCreateGaugeCmd() (*dcli.TxCliDesc, *types.MsgCreateGauge) {
 		ParseAndBuildMsg: CreateGaugeCmdBuilder,
 		Use:              "create-gauge [pairTokenA] [pairTokenB] [startTick] [endTick] [coins] [numEpochs] [pricingTick]",
 		Short:            "create a gauge to distribute rewards to users",
-		Long: `{{.Short}}{{.ExampleHeader}}
-TokenA TokenB [-10] 200 100TokenA,200TokenB 6 0 --start-time 2006-01-02T15:04:05Z07:00 --perpetual true`,
-		Flags:   dcli.FlagDesc{OptionalFlags: []*pflag.FlagSet{FlagSetCreateGauge()}},
-		NumArgs: 7,
+		Long:             `{{.Short}}{{.ExampleHeader}} create-gauge TokenA TokenB [-10] 200 100TokenA,200TokenB 6 0 --start-time 2006-01-02T15:04:05Z07:00 --perpetual true`,
+		Flags:            dcli.FlagDesc{OptionalFlags: []*pflag.FlagSet{FlagSetCreateGauge()}},
+		NumArgs:          7,
 	}, &types.MsgCreateGauge{}
 }
 
