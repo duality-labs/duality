@@ -28,20 +28,16 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
-	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
 	// this line is used by starport scaffolding # root/moduleImport
 
-	appparams "github.com/duality-labs/duality/app/params"
-
 	"github.com/duality-labs/duality/app"
+	appparams "github.com/duality-labs/duality/app/params"
 )
 
 // NewRootCmd creates a new root command for a Cosmos SDK application
@@ -85,7 +81,6 @@ func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 		},
 	}
 
-
 	initRootCmd(rootCmd, encodingConfig)
 	overwriteFlagDefaults(rootCmd, map[string]string{
 		flags.FlagChainID:        strings.ReplaceAll(app.Name, "-", ""),
@@ -109,21 +104,21 @@ func initRootCmd(
 	// Set config
 	initSDKConfig()
 
-	gentxModule := app.ModuleBasics[genutiltypes.ModuleName].(genutil.AppModuleBasic)
+	// gentxModule := app.ModuleBasics[genutiltypes.ModuleName].(genutil.AppModuleBasic)
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
-		genutilcli.CollectGenTxsCmd(
-			banktypes.GenesisBalancesIterator{},
-			app.DefaultNodeHome,
-			gentxModule.GenTxValidator,
-		),
+		// genutilcli.CollectGenTxsCmd(
+		// 	banktypes.GenesisBalancesIterator{},
+		// 	app.DefaultNodeHome,
+		// 	gentxModule.GenTxValidator,
+		// ),
 		genutilcli.MigrateGenesisCmd(),
-		genutilcli.GenTxCmd(
-			app.ModuleBasics,
-			encodingConfig.TxConfig,
-			banktypes.GenesisBalancesIterator{},
-			app.DefaultNodeHome,
-		),
+		// genutilcli.GenTxCmd(
+		// 	app.ModuleBasics,
+		// 	encodingConfig.TxConfig,
+		// 	banktypes.GenesisBalancesIterator{},
+		// 	app.DefaultNodeHome,
+		// ),
 		genutilcli.ValidateGenesisCmd(app.ModuleBasics),
 		AddGenesisAccountCmd(app.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
@@ -151,6 +146,7 @@ func initRootCmd(
 		queryCommand(),
 		txCommand(),
 		keys.Commands(app.DefaultNodeHome),
+		AddConsumerSectionCmd(app.DefaultNodeHome),
 	)
 }
 
@@ -283,8 +279,6 @@ func (a appCreator) newApp(
 		cast.ToUint32(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent)),
 	)
 
-	encConfig := app.MakeEncodingConfig()
-
 	return app.NewApp(
 		logger,
 		db,
@@ -294,7 +288,7 @@ func (a appCreator) newApp(
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		appOpts,
-		encConfig,
+		a.encodingConfig,
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
 		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))),

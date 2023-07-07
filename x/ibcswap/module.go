@@ -102,7 +102,7 @@ func (am AppModule) InitGenesis(
 
 // ExportGenesis returns the exported genesis state as raw bytes for the swap module.
 func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.RawMessage {
-	return json.RawMessage{}
+	return nil
 }
 
 // ConsensusVersion returns the consensus state breaking version for the swap module.
