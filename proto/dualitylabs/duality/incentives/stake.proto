@@ -18,10 +18,7 @@ message Stake {
   // coins from the stake.
   string owner = 2 [ (gogoproto.moretags) = "yaml:\"owner\"" ];
 
-  // start_time is the time at which the coins in the lock were staked. This is
-  // used by distribution logic to filter on stakes that have existed for longer
-  // than the distribution period (you can only qualify for today's rewards if
-  // you staked your LP tokens yesterday).
+  // start_time is the time at which the coins in the lock were staked.
   google.protobuf.Timestamp start_time = 3 [
     (gogoproto.stdtime) = true,
     (gogoproto.nullable) = false,
@@ -34,4 +31,11 @@ message Stake {
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
+
+  // start_dist_epoch is the dist epoch (defaulting to the day) at which the
+  // coins in the lock were staked. This is used by distribution logic to filter
+  // on stakes that have existed for longer than the distribution period (you
+  // can only qualify for today's rewards if you staked your LP tokens
+  // yesterday). We use int64 instead of uint64 to make testing easier.
+  int64 start_dist_epoch = 5;
 }

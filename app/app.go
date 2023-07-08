@@ -511,7 +511,7 @@ func NewApp(
 	)
 
 	incentivesModule := incentivesmodule.NewAppModule(
-		*app.IncentivesKeeper,
+		app.IncentivesKeeper,
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.EpochsKeeper,

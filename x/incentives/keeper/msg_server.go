@@ -27,7 +27,10 @@ func NewMsgServerImpl(keeper *Keeper) types.MsgServer {
 
 // CreateGauge creates a gauge and sends coins to the gauge.
 // Emits create gauge event and returns the create gauge response.
-func (server msgServer) CreateGauge(goCtx context.Context, msg *types.MsgCreateGauge) (*types.MsgCreateGaugeResponse, error) {
+func (server msgServer) CreateGauge(
+	goCtx context.Context,
+	msg *types.MsgCreateGauge,
+) (*types.MsgCreateGaugeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
@@ -60,7 +63,10 @@ func (server msgServer) CreateGauge(goCtx context.Context, msg *types.MsgCreateG
 
 // AddToGauge adds coins to gauge.
 // Emits add to gauge event and returns the add to gauge response.
-func (server msgServer) AddToGauge(goCtx context.Context, msg *types.MsgAddToGauge) (*types.MsgAddToGaugeResponse, error) {
+func (server msgServer) AddToGauge(
+	goCtx context.Context,
+	msg *types.MsgAddToGauge,
+) (*types.MsgAddToGaugeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {
@@ -87,7 +93,10 @@ func (server msgServer) AddToGauge(goCtx context.Context, msg *types.MsgAddToGau
 // 2. Create a new stake if not.
 // A sanity check to ensure given tokens is a single token is done in ValidateBaic.
 // That is, a stake with multiple tokens cannot be created.
-func (server msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*types.MsgStakeResponse, error) {
+func (server msgServer) Stake(
+	goCtx context.Context,
+	msg *types.MsgStake,
+) (*types.MsgStakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
@@ -95,8 +104,11 @@ func (server msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*type
 		return nil, err
 	}
 
+	params := server.keeper.GetParams(ctx)
+	startDistEpoch := server.keeper.ek.GetEpochInfo(ctx, params.DistrEpochIdentifier).CurrentEpoch
+
 	// if the owner + duration combination is new, create a new stake.
-	stake, err := server.keeper.CreateStake(ctx, owner, msg.Coins, ctx.BlockTime())
+	stake, err := server.keeper.CreateStake(ctx, owner, msg.Coins, ctx.BlockTime(), startDistEpoch)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +127,10 @@ func (server msgServer) Stake(goCtx context.Context, msg *types.MsgStake) (*type
 
 // BeginUnstaking begins unstaking of the specified stake.
 // The stake would enter the unstaking queue, with the endtime of the stake set as block time + duration.
-func (server msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*types.MsgUnstakeResponse, error) {
+func (server msgServer) Unstake(
+	goCtx context.Context,
+	msg *types.MsgUnstake,
+) (*types.MsgUnstakeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	unstakes := msg.Unstakes
@@ -137,7 +152,14 @@ func (server msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*
 		}
 
 		if msg.Owner != stake.Owner {
-			return nil, sdkerrors.Wrap(types.ErrNotStakeOwner, fmt.Sprintf("msg sender (%s) and stake owner (%s) does not match", msg.Owner, stake.Owner))
+			return nil, sdkerrors.Wrap(
+				types.ErrNotStakeOwner,
+				fmt.Sprintf(
+					"msg sender (%s) and stake owner (%s) does not match",
+					msg.Owner,
+					stake.Owner,
+				),
+			)
 		}
 
 		_, err = server.keeper.Unstake(ctx, stake, unstake.Coins)

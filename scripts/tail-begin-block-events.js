@@ -24,9 +24,6 @@ ws.on('message', function incoming(data) {
     msg.forEach((e) => {
       console.log(util.inspect(e, { showHidden: false, depth: null, maxArrayLength: Infinity }));
     })
-    // console.log(util.inspect(msg, { showHidden: false, depth: null, maxArrayLength: Infinity }));
-  } catch (err) {
-    // console.log(err);
-  }
+  } catch (err) { }
 });
 

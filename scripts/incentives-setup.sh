@@ -3,7 +3,6 @@
 
 cleanup() {
     kill $dualityd_pid >/dev/null 2>&1
-    kill $tail_events_pid >/dev/null 2>&1
 }
 trap cleanup ERR
 trap 'exit_code=$?; cleanup; exit $exit_code' EXIT
@@ -53,38 +52,36 @@ dualityd keys add user2 --keyring-backend test
 user2=$(dualityd keys show -a user2 --keyring-backend test)
 dualityd add-genesis-account user2 100000000000stake,100000000000token --keyring-backend test
 
-dualityd start 1>/dev/null 2>&1 &
+dualityd start >/dev/null 2>&1 &
 dualityd_pid=$!
 sleep 10
-
-./scripts/tail-begin-block-events.js &
-tail_events_pid=$!
 
 dualityd tx dex deposit $user1 stake token 100 100 0 1 false \
     --from user1 --keyring-backend test -y --broadcast-mode sync
 sleep 10
 
-dualityd tx incentives create-gauge token stake "[-10]" "10" 10000stake 10 0 \
+dualityd tx incentives stake-tokens 200DualityPoolShares-stake-token-t0-f1 \
+    --from user1 --keyring-backend test -y --broadcast-mode sync
+sleep 10
+
+dualityd tx incentives create-gauge token stake "[-10]" "10" 10000stake 5 0 \
     --from user2 --keyring-backend test -y --broadcast-mode sync
 sleep 10
 
-dualityd q incentives list-gauges "ACTIVE_UPCOMING" ""
-sleep 10
+# dualityd q incentives list-gauges "ACTIVE_UPCOMING" ""
+# sleep 10
 
-dualityd q incentives list-gauges "ACTIVE_UPCOMING" ""
-sleep 10
+# dualityd q incentives list-gauges "ACTIVE_UPCOMING" ""
+# sleep 10
 
-dualityd q incentives list-gauges "ACTIVE_UPCOMING" ""
-sleep 10
+# dualityd q incentives list-gauges "ACTIVE_UPCOMING" ""
+# sleep 10
 
-dualityd q incentives list-gauges "ACTIVE_UPCOMING" ""
-sleep 10
+# dualityd q incentives list-gauges "ACTIVE_UPCOMING" ""
+# sleep 10
 
-dualityd q incentives list-gauges "ACTIVE_UPCOMING" ""
-sleep 10
+# dualityd q incentives list-gauges "ACTIVE_UPCOMING" ""
+# sleep 10
 
-dualityd q incentives list-gauges "ACTIVE_UPCOMING" ""
-sleep 10
-
-dualityd q incentives list-gauges "ACTIVE_UPCOMING" ""
-sleep 10
+# dualityd q incentives list-gauges "ACTIVE_UPCOMING" ""
+# sleep 10

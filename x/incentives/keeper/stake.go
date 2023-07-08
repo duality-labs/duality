@@ -129,24 +129,25 @@ func (k Keeper) GetStakesByQueryCondition(
 			types.GetKeyStakeIndexByPairTick(pairIDString, distrTo.EndTick+1),
 		),
 	)
+	fmt.Println("tickStakeIds: ", tickStakeIds)
 
 	idMemo := make(map[uint64]bool)
 	for _, id := range tickStakeIds {
 		idMemo[id] = true
 	}
 
-	// This is hard-coded but should probably be linked to
-	// the query condition or the distribution interval.
-	stakedBefore := ctx.BlockTime().Add(-24 * time.Hour)
+	params := k.GetParams(ctx)
+	curEpoch := k.ek.GetEpochInfo(ctx, params.GetDistrEpochIdentifier())
 	timeStakeIds := k.getIDsFromIterator(
 		k.iteratorStartEnd(
 			ctx,
-			types.GetKeyStakeIndexByTimestamp(
-				pairIDString, time.Time{},
+			types.CombineKeys(
+				types.KeyPrefixStakeIndexPairDistEpoch,
+				[]byte(pairIDString),
 			),
-			sdk.PrefixEndBytes(types.GetKeyStakeIndexByTimestamp(
+			sdk.PrefixEndBytes(types.GetKeyStakeIndexByDistEpoch(
 				pairIDString,
-				stakedBefore,
+				curEpoch.CurrentEpoch-2,
 			)),
 		),
 	)
@@ -188,12 +189,13 @@ func (k Keeper) CreateStake(
 	owner sdk.AccAddress,
 	coins sdk.Coins,
 	startTime time.Time,
+	startDistEpoch int64,
 ) (*types.Stake, error) {
 	ID := k.GetLastStakeID(ctx) + 1
 
 	// unlock time is initially set without a value, gets set as unlock start time + duration
 	// when unlocking starts.
-	stake := types.NewStake(ID, owner, coins, startTime)
+	stake := types.NewStake(ID, owner, coins, startTime, startDistEpoch)
 
 	owner, err := sdk.AccAddressFromBech32(stake.Owner)
 	if err != nil {

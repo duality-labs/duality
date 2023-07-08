@@ -3,12 +3,10 @@ package dualitylabs.duality.incentives;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "google/protobuf/duration.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "dualitylabs/duality/incentives/gauge.proto";
 import "dualitylabs/duality/incentives/stake.proto";
-import "google/protobuf/timestamp.proto";
 import "dualitylabs/duality/incentives/params.proto";
 
 option go_package = "github.com/duality-labs/duality/x/incentives/types";

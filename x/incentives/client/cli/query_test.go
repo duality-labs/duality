@@ -25,7 +25,7 @@ func (s *QueryTestSuite) SetupStake(
 	coins sdk.Coins,
 	duration time.Duration,
 ) (stakeID uint64) {
-	msgServer := keeper.NewMsgServerImpl(&s.App.IncentivesKeeper)
+	msgServer := keeper.NewMsgServerImpl(s.App.IncentivesKeeper)
 	s.FundAcc(addr, coins)
 
 	msgResponse, err := msgServer.Stake(

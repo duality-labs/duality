@@ -1,8 +1,6 @@
 package keeper_test
 
 import (
-	"time"
-
 	"github.com/stretchr/testify/suite"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -24,7 +22,7 @@ func (suite *KeeperTestSuite) TestStakeLifecycle() {
 				fee:    1,
 			},
 		},
-		stakeTimeOffset: -24 * time.Hour,
+		stakeDistEpochOffset: -2,
 	})
 
 	retrievedStake, err := suite.App.IncentivesKeeper.GetStakeByID(suite.Ctx, stake.ID)
@@ -61,7 +59,7 @@ func (suite *KeeperTestSuite) TestMultipleStakeLifecycle() {
 				fee:    1,
 			},
 		},
-		stakeTimeOffset: -24 * time.Hour,
+		stakeDistEpochOffset: -2,
 	})
 
 	retrievedStake, err := suite.App.IncentivesKeeper.GetStakeByID(suite.Ctx, stake.ID)
@@ -95,7 +93,7 @@ func (suite *KeeperTestSuite) TestStakeUnstakePartial() {
 				fee:    1,
 			},
 		},
-		stakeTimeOffset: -24 * time.Hour,
+		stakeDistEpochOffset: -2,
 	})
 
 	retrievedStake, err := suite.App.IncentivesKeeper.GetStakeByID(suite.Ctx, stake.ID)

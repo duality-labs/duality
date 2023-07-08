@@ -22,7 +22,7 @@ func (suite *KeeperTestSuite) TestGetFutureRewardEstimate() {
 				fee:    1,
 			},
 		},
-		stakeTimeOffset: -24 * time.Hour,
+		stakeDistEpochOffset: -2,
 	})
 	addr2 := suite.SetupAddr(1)
 	suite.SetupDepositAndStake(depositStakeSpec{
@@ -35,7 +35,7 @@ func (suite *KeeperTestSuite) TestGetFutureRewardEstimate() {
 				fee:    1,
 			},
 		},
-		stakeTimeOffset: -24 * time.Hour,
+		stakeDistEpochOffset: -2,
 	})
 	suite.SetupGauge(gaugeSpec{
 		isPerpetual: false,
@@ -79,7 +79,7 @@ func (suite *KeeperTestSuite) TestGetGauges() {
 				fee:    1,
 			},
 		},
-		stakeTimeOffset: -24 * time.Hour,
+		stakeDistEpochOffset: -2,
 	})
 	addr2 := suite.SetupAddr(1)
 	suite.SetupDepositAndStake(depositStakeSpec{
@@ -92,7 +92,7 @@ func (suite *KeeperTestSuite) TestGetGauges() {
 				fee:    1,
 			},
 		},
-		stakeTimeOffset: -24 * time.Hour,
+		stakeDistEpochOffset: -2,
 	})
 	gauge1 := suite.SetupGauge(gaugeSpec{
 		isPerpetual: false,
