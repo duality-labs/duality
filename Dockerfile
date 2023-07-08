@@ -31,7 +31,7 @@ RUN ignite generate openapi -y
 # create docs Go package
 RUN echo 'package docs \n import "embed" \n //go:embed static \n var Docs embed.FS' > docs/docs.go
 # add docs package to app (over Ignite's version)
-RUN sed -i 's#github.com/ignite/cli/docs#github.com/duality-labs/duality/docs#' app/app.go
+RUN sed -i 's,// this line is used by starport scaffolding # stargate/app/moduleImport,"github.com/duality-labs/duality/docs",' app/app.go
 
 # compile dualityd to ARM64 architecture for final image
 RUN --mount=type=cache,target=/root/.cache/go-build \
