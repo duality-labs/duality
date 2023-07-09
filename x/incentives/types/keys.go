@@ -68,8 +68,8 @@ var (
 	// KeyPrefixStakeIndexAccountDenom defines prefix for the iteration of stake IDs by account, denomination.
 	KeyPrefixStakeIndexAccountDenom = []byte{0x0e}
 
-	// KeyPrefixStakeIndexTimestamp defines prefix for the iteration of stake IDs by timestamp.
-	KeyPrefixStakeIndexPairTimestamp = []byte{0x0f}
+	// KeyPrefixStakeIndexTimestamp defines prefix for the iteration of stake IDs by day epoch integer.
+	KeyPrefixStakeIndexPairDistEpoch = []byte{0x0f}
 
 	// // KeyPrefixStakeIndexAccountTimestamp defines prefix for the iteration of stake IDs by account and timestamp.
 	// KeyPrefixStakeIndexAccountTimestamp = []byte{0x10}
@@ -150,11 +150,11 @@ func GetKeyStakeIndexByAccountDenom(account sdk.AccAddress, denom string) []byte
 	)
 }
 
-func GetKeyStakeIndexByTimestamp(pairID string, timestamp time.Time) []byte {
+func GetKeyStakeIndexByDistEpoch(pairID string, distEpoch int64) []byte {
 	return CombineKeys(
-		KeyPrefixStakeIndexPairTimestamp,
+		KeyPrefixStakeIndexPairDistEpoch,
 		[]byte(pairID),
-		GetTimeKey(timestamp),
+		GetKeyInt64(distEpoch),
 	)
 }
 
@@ -162,17 +162,17 @@ func GetKeyStakeIndexByPairTick(pairID string, tickIndex int64) []byte {
 	return CombineKeys(
 		KeyPrefixStakeIndexPairTick,
 		[]byte(pairID),
-		TickIndexToBytes(tickIndex),
+		GetKeyInt64(tickIndex),
 	)
 }
 
-func TickIndexToBytes(tickIndex int64) []byte {
+func GetKeyInt64(a int64) []byte {
 	key := make([]byte, 9)
-	if tickIndex < 0 {
-		copy(key[1:], sdk.Uint64ToBigEndian(uint64(tickIndex)))
+	if a < 0 {
+		copy(key[1:], sdk.Uint64ToBigEndian(uint64(a)))
 	} else {
 		copy(key[:1], []byte{0x01})
-		copy(key[1:], sdk.Uint64ToBigEndian(uint64(tickIndex)))
+		copy(key[1:], sdk.Uint64ToBigEndian(uint64(a)))
 	}
 	return key
 }

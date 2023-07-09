@@ -52,9 +52,9 @@ func TestStakesCoinsByQueryCondition(t *testing.T) {
 	}
 
 	stakes := Stakes{
-		NewStake(1, owner, sdk.Coins{allCoins[0]}, time.Time{}),
-		NewStake(2, owner, sdk.Coins{allCoins[1]}, time.Time{}),
-		NewStake(3, owner, sdk.Coins{allCoins[2]}, time.Time{}),
+		NewStake(1, owner, sdk.Coins{allCoins[0]}, time.Time{}, 0),
+		NewStake(2, owner, sdk.Coins{allCoins[1]}, time.Time{}, 0),
+		NewStake(3, owner, sdk.Coins{allCoins[2]}, time.Time{}, 0),
 	}
 
 	pairID := &dextypes.PairID{
@@ -144,7 +144,7 @@ func TestStakesCoinsByQueryConditionMultiple(t *testing.T) {
 	assert.Equal(t, allCoins, allCoins.Sort())
 
 	stakes := Stakes{
-		NewStake(1, owner, allCoins, time.Time{}),
+		NewStake(1, owner, allCoins, time.Time{}, 0),
 	}
 
 	pairID := &dextypes.PairID{

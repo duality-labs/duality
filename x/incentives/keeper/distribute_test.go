@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -164,7 +163,7 @@ func (suite *KeeperTestSuite) TestDistribute() {
 							fee:    1,
 						},
 					},
-					stakeTimeOffset: -24 * time.Hour,
+					stakeDistEpochOffset: -2,
 				},
 				{
 					depositSpecs: []depositSpec{
@@ -176,7 +175,7 @@ func (suite *KeeperTestSuite) TestDistribute() {
 							fee:    1,
 						},
 					},
-					stakeTimeOffset: -24 * time.Hour,
+					stakeDistEpochOffset: -2,
 				},
 				{
 					depositSpecs: []depositSpec{
@@ -188,7 +187,7 @@ func (suite *KeeperTestSuite) TestDistribute() {
 							fee:    1,
 						},
 					},
-					stakeTimeOffset: -24 * time.Hour,
+					stakeDistEpochOffset: -2,
 				},
 			},
 			gaugeSpecs: []gaugeSpec{
@@ -219,7 +218,7 @@ func (suite *KeeperTestSuite) TestDistribute() {
 							fee:    1,
 						},
 					},
-					stakeTimeOffset: -24 * time.Hour,
+					stakeDistEpochOffset: -2,
 				},
 				{
 					depositSpecs: []depositSpec{
@@ -231,7 +230,7 @@ func (suite *KeeperTestSuite) TestDistribute() {
 							fee:    1,
 						},
 					},
-					stakeTimeOffset: -24 * time.Hour,
+					stakeDistEpochOffset: -2,
 				},
 				{
 					depositSpecs: []depositSpec{
@@ -243,7 +242,7 @@ func (suite *KeeperTestSuite) TestDistribute() {
 							fee:    1,
 						},
 					},
-					stakeTimeOffset: -24 * time.Hour,
+					stakeDistEpochOffset: -2,
 				},
 				{
 					depositSpecs: []depositSpec{
@@ -255,7 +254,7 @@ func (suite *KeeperTestSuite) TestDistribute() {
 							fee:    1,
 						},
 					},
-					stakeTimeOffset: -12 * time.Hour,
+					stakeDistEpochOffset: -1,
 				},
 			},
 			gaugeSpecs: []gaugeSpec{
@@ -294,7 +293,7 @@ func (suite *KeeperTestSuite) TestDistribute() {
 							fee:    1,
 						},
 					},
-					stakeTimeOffset: -24 * time.Hour,
+					stakeDistEpochOffset: -2,
 				},
 				{
 					depositSpecs: []depositSpec{
@@ -306,7 +305,7 @@ func (suite *KeeperTestSuite) TestDistribute() {
 							fee:    1,
 						},
 					},
-					stakeTimeOffset: -24 * time.Hour,
+					stakeDistEpochOffset: -2,
 				},
 				{
 					depositSpecs: []depositSpec{
@@ -318,7 +317,7 @@ func (suite *KeeperTestSuite) TestDistribute() {
 							fee:    40,
 						},
 					},
-					stakeTimeOffset: -24 * time.Hour,
+					stakeDistEpochOffset: -2,
 				},
 				{
 					depositSpecs: []depositSpec{
@@ -330,7 +329,7 @@ func (suite *KeeperTestSuite) TestDistribute() {
 							fee:    40,
 						},
 					},
-					stakeTimeOffset: -12 * time.Hour,
+					stakeDistEpochOffset: -1,
 				},
 			},
 			gaugeSpecs: []gaugeSpec{

@@ -54,6 +54,7 @@ func (d Distributor) Distribute(
 		adjustedGaugeTotal = adjustedGaugeTotal.Add(stakeTotal)
 		stakeSumCache[stake.ID] = stakeTotal
 	}
+
 	if adjustedGaugeTotal.IsZero() {
 		return distSpec, nil
 	}

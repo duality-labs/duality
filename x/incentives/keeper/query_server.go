@@ -18,11 +18,11 @@ var _ types.QueryServer = QueryServer{}
 
 // QueryServer defines a wrapper around the incentives module keeper providing gRPC method handlers.
 type QueryServer struct {
-	Keeper
+	*Keeper
 }
 
 // NewQueryServer creates a new QueryServer struct.
-func NewQueryServer(k Keeper) QueryServer {
+func NewQueryServer(k *Keeper) QueryServer {
 	return QueryServer{Keeper: k}
 }
 

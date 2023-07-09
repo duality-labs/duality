@@ -14,8 +14,8 @@ type userStakes struct {
 }
 
 type depositStakeSpec struct {
-	depositSpecs    []depositSpec
-	stakeTimeOffset time.Duration // used for simulating the time of staking
+	depositSpecs         []depositSpec
+	stakeDistEpochOffset int // used for simulating the time of staking
 }
 
 type depositSpec struct {
@@ -70,20 +70,23 @@ func (suite *KeeperTestSuite) SetupDeposit(ss []depositSpec) sdk.Coins {
 
 func (suite *KeeperTestSuite) SetupDepositAndStake(s depositStakeSpec) *types.Stake {
 	shares := suite.SetupDeposit(s.depositSpecs)
-	return suite.SetupStake(s.depositSpecs[0].addr, shares, s.stakeTimeOffset)
+	return suite.SetupStake(s.depositSpecs[0].addr, shares, s.stakeDistEpochOffset)
 }
 
 // StakeTokens stakes tokens for the specified duration
 func (suite *KeeperTestSuite) SetupStake(
 	addr sdk.AccAddress,
 	shares sdk.Coins,
-	timeOffset time.Duration,
+	distEpochOffset int,
 ) *types.Stake {
+	params := suite.App.IncentivesKeeper.GetParams(suite.Ctx)
+	epoch := suite.App.EpochsKeeper.GetEpochInfo(suite.Ctx, params.GetDistrEpochIdentifier())
 	stake, err := suite.App.IncentivesKeeper.CreateStake(
 		suite.Ctx,
 		addr,
 		shares,
-		suite.Ctx.BlockTime().Add(timeOffset),
+		suite.Ctx.BlockTime(), // irrelevant now
+		epoch.CurrentEpoch+int64(distEpochOffset),
 	)
 	suite.Require().NoError(err)
 	return stake

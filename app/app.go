@@ -230,9 +230,9 @@ type App struct {
 	SwapKeeper    swapkeeper.Keeper
 	ForwardKeeper *forwardkeeper.Keeper
 
-	EpochsKeeper epochsmodulekeeper.Keeper
+	EpochsKeeper *epochsmodulekeeper.Keeper
 
-	IncentivesKeeper incentivesmodulekeeper.Keeper
+	IncentivesKeeper *incentivesmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -493,18 +493,9 @@ func NewApp(
 	)
 	forwardModule := forwardmiddleware.NewAppModule(app.ForwardKeeper)
 
-	app.EpochsKeeper = *epochsmodulekeeper.NewKeeper(keys[epochsmoduletypes.StoreKey])
-	epochsModule := epochsmodule.NewAppModule(app.EpochsKeeper)
-	app.EpochsKeeper.SetHooks(
-		epochsmoduletypes.NewMultiEpochHooks(
-			app.IncentivesKeeper.Hooks(),
-		),
-	)
+	app.EpochsKeeper = epochsmodulekeeper.NewKeeper(keys[epochsmoduletypes.StoreKey])
 
-	// Set the initialized transfer keeper for forward middleware
-	app.ForwardKeeper.SetTransferKeeper(app.TransferKeeper)
-
-	app.IncentivesKeeper = *incentivesmodulekeeper.NewKeeper(
+	app.IncentivesKeeper = incentivesmodulekeeper.NewKeeper(
 		keys[incentivesmoduletypes.StoreKey],
 		app.GetSubspace(incentivesmoduletypes.ModuleName),
 		app.AccountKeeper,
@@ -518,12 +509,23 @@ func NewApp(
 		// insert Incentives hooks receivers here
 		),
 	)
+
 	incentivesModule := incentivesmodule.NewAppModule(
 		app.IncentivesKeeper,
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.EpochsKeeper,
 	)
+
+	app.EpochsKeeper.SetHooks(epochsmoduletypes.NewMultiEpochHooks(
+		app.IncentivesKeeper.Hooks(),
+	))
+	// NB: This must be initialized AFTER app.EpochsKeeper.SetHooks() because otherwise
+	// we dereference an out-of-date EpochsKeeper.
+	epochsModule := epochsmodule.NewAppModule(*app.EpochsKeeper)
+
+	// Set the initialized transfer keeper for forward middleware
+	app.ForwardKeeper.SetTransferKeeper(app.TransferKeeper)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 

@@ -110,7 +110,7 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 type AppModule struct {
 	AppModuleBasic
 
-	keeper keeper.Keeper
+	keeper *keeper.Keeper
 
 	accountKeeper stakingtypes.AccountKeeper
 	bankKeeper    stakingtypes.BankKeeper
@@ -118,7 +118,7 @@ type AppModule struct {
 }
 
 // NewAppModule creates a new AppModule struct.
-func NewAppModule(keeper keeper.Keeper,
+func NewAppModule(keeper *keeper.Keeper,
 	accountKeeper stakingtypes.AccountKeeper, bankKeeper stakingtypes.BankKeeper,
 	epochKeeper types.EpochKeeper,
 ) AppModule {
@@ -141,7 +141,7 @@ func (AppModule) QuerierRoute() string { return types.QuerierRoute }
 
 // RegisterServices registers the module's services.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(&am.keeper))
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewQueryServer(am.keeper))
 }
 

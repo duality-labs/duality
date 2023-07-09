@@ -62,9 +62,9 @@ func getStakeRefKeys(stake *types.Stake) ([][]byte, error) {
 		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexPairTick, pairIDBz, tickBz))] = true
 		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexAccountDenom, owner, denomBz))] = true
 		refKeys[string(types.CombineKeys(
-			types.KeyPrefixStakeIndexPairTimestamp,
+			types.KeyPrefixStakeIndexPairDistEpoch,
 			pairIDBz,
-			types.GetTimeKey(stake.StartTime),
+			types.GetKeyInt64(stake.StartDistEpoch),
 		))] = true
 	}
 

@@ -29,7 +29,7 @@ func (suite *KeeperTestSuite) TestGaugeLifecycle() {
 				fee:    1,
 			},
 		},
-		stakeTimeOffset: -24 * time.Hour,
+		stakeDistEpochOffset: -2,
 	})
 
 	// setup gauge starting 24 hours in the future
@@ -122,7 +122,7 @@ func (suite *KeeperTestSuite) TestGaugeLimit() {
 				fee:    1,
 			},
 		},
-		stakeTimeOffset: -24 * time.Hour,
+		stakeDistEpochOffset: -2,
 	})
 
 	for i := 0; i < 20; i++ {
@@ -188,7 +188,7 @@ func (suite *KeeperTestSuite) TestGaugeCreateFails() {
 							fee:    1,
 						},
 					},
-					stakeTimeOffset: -24 * time.Hour,
+					stakeDistEpochOffset: -2,
 				},
 				{
 					depositSpecs: []depositSpec{
@@ -200,7 +200,7 @@ func (suite *KeeperTestSuite) TestGaugeCreateFails() {
 							fee:    1,
 						},
 					},
-					stakeTimeOffset: -24 * time.Hour,
+					stakeDistEpochOffset: -2,
 				},
 				{
 					depositSpecs: []depositSpec{
@@ -212,7 +212,7 @@ func (suite *KeeperTestSuite) TestGaugeCreateFails() {
 							fee:    40,
 						},
 					},
-					stakeTimeOffset: -24 * time.Hour,
+					stakeDistEpochOffset: -2,
 				},
 				{
 					depositSpecs: []depositSpec{
@@ -224,7 +224,7 @@ func (suite *KeeperTestSuite) TestGaugeCreateFails() {
 							fee:    40,
 						},
 					},
-					stakeTimeOffset: -12 * time.Hour,
+					stakeDistEpochOffset: -1,
 				},
 			},
 			gaugeSpecs: []gaugeSpec{

@@ -67,10 +67,10 @@ func TestDistributor(t *testing.T) {
 	nonRewardedDenom := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 12, 1).
 		String()
 	allStakes := types.Stakes{
-		{1, "addr1", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(50))}},
-		{2, "addr2", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}},
-		{3, "addr2", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}},
-		{4, "addr3", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(nonRewardedDenom, sdk.NewInt(50))}},
+		{1, "addr1", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(50))}, 0},
+		{2, "addr2", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}, 0},
+		{3, "addr2", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}, 0},
+		{4, "addr3", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(nonRewardedDenom, sdk.NewInt(50))}, 0},
 	}
 
 	distributor := NewDistributor(NewMockKeeper(allStakes))

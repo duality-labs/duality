@@ -24,7 +24,7 @@ type KeeperTestSuite struct {
 func (suite *KeeperTestSuite) SetupTest() {
 	suite.Setup()
 	suite.QueryServer = keeper.NewQueryServer(suite.App.IncentivesKeeper)
-	suite.MsgServer = keeper.NewMsgServerImpl(&suite.App.IncentivesKeeper)
+	suite.MsgServer = keeper.NewMsgServerImpl(suite.App.IncentivesKeeper)
 	suite.LPDenom0 = dextypes.NewDepositDenom(
 		&dextypes.PairID{
 			Token0: "TokenA",
