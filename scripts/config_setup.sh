@@ -7,6 +7,7 @@ echo "Updating config files"
 # enable API to be served on any browser page when in developent, but only production web-app in production
 dasel put bool -f ${HOME}/.duality/config/app.toml -s ".api.enable" "true"
 dasel put bool -f ${HOME}/.duality/config/app.toml -s ".api.enabled-unsafe-cors" "$([[ $IS_MAINNET = true ]] && echo "false" || echo "true")"
+dasel put string -f ${HOME}/.duality/config/app.toml -s ".api.address" "tcp://0.0.0.0:1317"
 dasel put string -f ${HOME}/.duality/config/config.toml -s ".rpc.cors_allowed_origins" "$([[ $IS_MAINNET = true ]] && echo "app.duality.xyz" || echo "*")"
 
 # if not mainnet this may be a localnet, where we need address book to not be strict
