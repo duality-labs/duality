@@ -86,11 +86,17 @@ func sendAllTokens(address string) error {
 func faucetHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
+	if r.URL.Path == "/health" {
+		resp := response{Message: "ok"}
+		json.NewEncoder(w).Encode(resp)
+		return
+	}
+
 	address := r.URL.Query().Get("address")
 
 	// Ensure that an address is passed in
 	if address == "" {
-		http.Error(w, "Key \"address\" not provided in request", http.StatusInternalServerError)
+		http.Error(w, "Key \"address\" not provided in request", http.StatusOK)
 		return
 	}
 
