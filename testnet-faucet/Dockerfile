@@ -29,7 +29,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 \
     CC=aarch64-linux-gnu-gcc \
     GOOS=linux \
-    GOARCH=arm64 \
+    GOARCH=amd64 \
     go build -o build/dualityd_arm64 ./cmd/dualityd
 
 # compile dualityd to ARM64 architecture for final faucet image
@@ -38,12 +38,12 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 \
     CC=aarch64-linux-gnu-gcc \
     GOOS=linux \
-    GOARCH=arm64 \
+    GOARCH=amd64 \
     go build -o build/faucet_arm64 ./testnet-faucet/faucet/faucet.go
 
 
 # Final image build on small stable release of ARM64 Linux
-FROM arm64v8/alpine:20220715
+FROM amd64/alpine:20220715
 
 
 
