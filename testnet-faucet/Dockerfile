@@ -31,10 +31,8 @@ COPY testnet-faucet/faucet ./faucet
 # Copy work files for dualityd (but not Dockerfile: to avoid invalidating caches while developing)
 COPY app ./app
 COPY cmd ./cmd
-COPY docs ./docs
 COPY proto ./proto
 COPY testutil ./testutil
-COPY vue ./vue
 COPY x ./x
 
 # compile faucet to ARM64 architecture for final image
