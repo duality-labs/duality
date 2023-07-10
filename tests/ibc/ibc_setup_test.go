@@ -58,7 +58,11 @@ func TestIBCTestSuite(t *testing.T) {
 func (s *IBCTestSuite) SetupTest() {
 	// Create coordinator
 	s.coordinator = icsibctesting.NewCoordinator(s.T(), 0)
-	s.providerChain, s.providerApp = icstestingutils.AddProvider[testutil.ProviderApp](s.T(), s.coordinator, icstestingutils.ProviderAppIniter)
+	s.providerChain, s.providerApp = icstestingutils.AddProvider[testutil.ProviderApp](
+		s.T(),
+		s.coordinator,
+		icstestingutils.ProviderAppIniter,
+	)
 
 	// Setup duality as a consumer chain
 	dualityBundle := s.addConsumerChain(dualityAppIniter, 1)
@@ -97,8 +101,16 @@ func (s *IBCTestSuite) SetupTest() {
 	s.assertProviderBalance(s.providerAddr, nativeDenom, genesisWalletAmount)
 }
 
-func (s *IBCTestSuite) addConsumerChain(appIniter icsibctesting.AppIniter, chainIdx int) *icstestingutils.ConsumerBundle {
-	bundle := icstestingutils.AddConsumer[testutil.ProviderApp, testutil.ConsumerApp](s.coordinator, &s.Suite, chainIdx, appIniter)
+func (s *IBCTestSuite) addConsumerChain(
+	appIniter icsibctesting.AppIniter,
+	chainIdx int,
+) *icstestingutils.ConsumerBundle {
+	bundle := icstestingutils.AddConsumer[testutil.ProviderApp, testutil.ConsumerApp](
+		s.coordinator,
+		&s.Suite,
+		chainIdx,
+		appIniter,
+	)
 	providerKeeper := s.providerApp.GetProviderKeeper()
 	consumerKeeper := bundle.GetKeeper()
 	genesisState, found := providerKeeper.GetConsumerGenesis(
@@ -108,7 +120,12 @@ func (s *IBCTestSuite) addConsumerChain(appIniter icsibctesting.AppIniter, chain
 	s.Require().True(found, "consumer genesis not found")
 	consumerKeeper.InitGenesis(bundle.GetCtx(), &genesisState)
 	bundle.Path = s.setupCCVChannel(bundle)
-	bundle.TransferPath = s.setupTransferChannel(bundle.Path, bundle.App, bundle.Chain, s.providerChain)
+	bundle.TransferPath = s.setupTransferChannel(
+		bundle.Path,
+		bundle.App,
+		bundle.Chain,
+		s.providerChain,
+	)
 
 	return bundle
 }
@@ -146,7 +163,9 @@ func (s *IBCTestSuite) setupCCVChannel(bundle *icstestingutils.ConsumerBundle) *
 	return ccvPath
 }
 
-func (s *IBCTestSuite) setupConsumerToConsumerTransferChannel(bundleA, bundleB *icstestingutils.ConsumerBundle) *icsibctesting.Path {
+func (s *IBCTestSuite) setupConsumerToConsumerTransferChannel(
+	bundleA, bundleB *icstestingutils.ConsumerBundle,
+) *icsibctesting.Path {
 	path := icsibctesting.NewPath(bundleA.Chain, bundleB.Chain)
 
 	// Set the correct client unbonding period
@@ -165,7 +184,11 @@ func (s *IBCTestSuite) setupConsumerToConsumerTransferChannel(bundleA, bundleB *
 	return path
 }
 
-func (s *IBCTestSuite) setupTransferChannel(ccvPath *icsibctesting.Path, appA testutil.ConsumerApp, chainA, chainB *icsibctesting.TestChain) *icsibctesting.Path {
+func (s *IBCTestSuite) setupTransferChannel(
+	ccvPath *icsibctesting.Path,
+	appA testutil.ConsumerApp,
+	chainA, chainB *icsibctesting.TestChain,
+) *icsibctesting.Path {
 	// transfer path will use the same connection as ibc path
 	transferPath := icsibctesting.NewPath(chainA, chainB)
 	transferPath.EndpointA.ChannelConfig.PortID = transfertypes.PortID
@@ -179,7 +202,8 @@ func (s *IBCTestSuite) setupTransferChannel(ccvPath *icsibctesting.Path, appA te
 
 	// IBC channel handshake will automatically initiate transfer channel handshake on ACK
 	// so transfer channel will be on stage INIT when CompleteSetupIBCChannel returns
-	destinationChannelID := appA.GetConsumerKeeper().GetDistributionTransmissionChannel(chainA.GetContext())
+	destinationChannelID := appA.GetConsumerKeeper().
+		GetDistributionTransmissionChannel(chainA.GetContext())
 	transferPath.EndpointA.ChannelID = destinationChannelID
 
 	// Complete TRY, ACK, CONFIRM for transfer path
@@ -211,6 +235,7 @@ func dualityAppIniter() (icsibctesting.TestingApp, map[string]json.RawMessage) {
 		5,
 		appduality.EmptyAppOptions{},
 		encoding,
+		nil,
 	)
 
 	return testApp, appduality.NewDefaultGenesisState(testApp.AppCodec())
@@ -267,24 +292,52 @@ func (s *IBCTestSuite) IBCTransferProviderToDuality(
 	transferAmount sdk.Int,
 	memo string,
 ) {
-	s.IBCTransfer(s.dualityTransferPath, s.dualityTransferPath.EndpointB, providerAddr, dualityAddr, transferDenom, transferAmount, memo)
+	s.IBCTransfer(
+		s.dualityTransferPath,
+		s.dualityTransferPath.EndpointB,
+		providerAddr,
+		dualityAddr,
+		transferDenom,
+		transferAmount,
+		memo,
+	)
 }
 
-func (s *IBCTestSuite) getBalance(bk testutil.TestBankKeeper, chain *icsibctesting.TestChain, addr sdk.AccAddress, denom string) sdk.Coin {
+func (s *IBCTestSuite) getBalance(
+	bk testutil.TestBankKeeper,
+	chain *icsibctesting.TestChain,
+	addr sdk.AccAddress,
+	denom string,
+) sdk.Coin {
 	ctx := chain.GetContext()
 	return bk.GetBalance(ctx, addr, denom)
 }
 
-func (s *IBCTestSuite) assertBalance(bk testutil.TestBankKeeper, chain *icsibctesting.TestChain, addr sdk.AccAddress, denom string, expectedAmt sdk.Int) {
+func (s *IBCTestSuite) assertBalance(
+	bk testutil.TestBankKeeper,
+	chain *icsibctesting.TestChain,
+	addr sdk.AccAddress,
+	denom string,
+	expectedAmt sdk.Int,
+) {
 	actualAmt := s.getBalance(bk, chain, addr, denom).Amount
-	s.Assert().Equal(expectedAmt, actualAmt, "Expected amount of %s: %s; Got: %s", denom, expectedAmt, actualAmt)
+	s.Assert().
+		Equal(expectedAmt, actualAmt, "Expected amount of %s: %s; Got: %s", denom, expectedAmt, actualAmt)
 }
 
-func (s *IBCTestSuite) assertDualityBalance(addr sdk.AccAddress, denom string, expectedAmt sdk.Int) {
+func (s *IBCTestSuite) assertDualityBalance(
+	addr sdk.AccAddress,
+	denom string,
+	expectedAmt sdk.Int,
+) {
 	s.assertBalance(s.dualityApp.GetTestBankKeeper(), s.dualityChain, addr, denom, expectedAmt)
 }
 
-func (s *IBCTestSuite) assertProviderBalance(addr sdk.AccAddress, denom string, expectedAmt sdk.Int) {
+func (s *IBCTestSuite) assertProviderBalance(
+	addr sdk.AccAddress,
+	denom string,
+	expectedAmt sdk.Int,
+) {
 	s.assertBalance(s.providerApp.GetTestBankKeeper(), s.providerChain, addr, denom, expectedAmt)
 }
 

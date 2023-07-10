@@ -23,6 +23,7 @@ func DualityAppIniter() (ibctesting.TestingApp, map[string]json.RawMessage) {
 		5,
 		simtestutil.EmptyAppOptions{},
 		encoding,
+		nil,
 	)
 
 	return testApp, app.NewDefaultGenesisState(encoding.Marshaler)
