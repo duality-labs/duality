@@ -26,7 +26,7 @@ COPY . .
 # compile dualityd to ARM64 architecture for final dualityd image
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/root/go/pkg/mod \
-    CGO_ENABLED=1 \
+    CGO_ENABLED=0 \
     CC=aarch64-linux-gnu-gcc \
     GOOS=linux \
     GOARCH=arm64 \
@@ -35,7 +35,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 # compile dualityd to ARM64 architecture for final faucet image
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/root/go/pkg/mod \
-    CGO_ENABLED=1 \
+    CGO_ENABLED=0 \
     CC=aarch64-linux-gnu-gcc \
     GOOS=linux \
     GOARCH=arm64 \
