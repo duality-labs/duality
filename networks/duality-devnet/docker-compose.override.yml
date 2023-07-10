@@ -8,36 +8,33 @@ services:
     environment:
       - MNEMONICS=reveal gloom baby scan escape shine flock kind marriage sad clinic affair invite dove document youth weekend brave mutual chief sunny return myself sorry;input coin depth fetch interest shaft vendor ready cave tell ten robot stem cat travel visit unknown saddle rain great describe derive inhale attract;actress general today spike hire bronze elbow cage mystery scheme attack head october lucky poverty eagle forest column lizard flag nominee frog gap audit
       - FAUCET_MNEMONIC=guilt sausage note edit route horror miss key bike fire icon raven fire rug gas dust property attend salad cabin town toy green photo
-    logging:
-        driver: awslogs
-        options:
-          awslogs-group: /ecs/duality-devnet
-          awslogs-region: us-west-2
-          awslogs-stream-prefix: genesis-node-launcher
-
-  genesis-node:
-      logging:
-        driver: awslogs
-        options:
-          awslogs-group: /ecs/duality-devnet
-          awslogs-region: us-west-2
-          awslogs-stream-prefix: genesis-node
-
-  follower-node-launcher:
-      logging:
-        driver: awslogs
-        options:
-          awslogs-group: ecs/duality-devnet
-          awslogs-region: us-west-2
-          awslogs-stream-prefix: follower-node-launcher
-
+  indexer:
+    image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/hapi-indexer:${INDEXER_TAG:-latest}
+    ports:
+      #RPC
+      - target: 8000
+        x-aws-protocol: http
+    environment:
+      - NODE_ENV=development
+      - REST_API=http://follower-node:1317
+      - RPC_API=http://follower-node:26657
+      - WEBSOCKET_URL=ws://follower-node:26657/websocket
+    depends_on:
+     follower-node:
+       condition: service_healthy
+  faucet:
+    image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/testnet-faucet:latest
+    ports:
+      - target: 9000
+        x-aws-protocol: http
+    environment:
+      - RPC_NODE=tcp://genesis-node:26657
+      - DENOMS=tokenA,tokenB,tokenC,tokenD
+      - MNEMONIC=guilt sausage note edit route horror miss key bike fire icon raven fire rug gas dust property attend salad cabin town toy green photo
+    depends_on:
   follower-node:
-      logging:
-        driver: awslogs
-        options:
-          awslogs-group: ecs/duality-devnet
-          awslogs-region: us-west-2
-          awslogs-stream-prefix: follower-node
+       condition: service_healthy
+
 
 
 
