@@ -12,7 +12,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ignite/cli/ignite/pkg/chaincmd"
-	chaincmdrunner "github.com/ignite/cli/ignite/pkg/cmdrunner"
+	chaincmdrunner "github.com/ignite/cli/ignite/pkg/chaincmd/runner"
 )
 
 // Default Config vars
