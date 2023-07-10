@@ -1,44 +1,45 @@
-# NOTE: Since we are copying over the core project deps we need to run docker build from the root directory
-# ie. docker build -f ./testnet-faucet/Dockerfile -t faucet .
-
 # [Choice] Go version (use -bullseye variants on local arm64/Apple Silicon): 1, 1.16, 1.17, 1-bullseye, 1.16-bullseye, 1.17-bullseye, 1-buster, 1.16-buster, 1.17-buster
-FROM golang:1.18-bullseye as build-env
-
-ARG PORT=9000
-ENV PORT=$PORT
+FROM golang:1.19-bullseye as build-env
 
 # install additional OS packages.
 RUN apt update && \
     apt upgrade -y
 
 RUN apt-get install -y \
-#    build-essential \
-#    ca-certificates \
+    build-essential \
+    ca-certificates \
     # must install cross compiler for arm64
     gcc-aarch64-linux-gnu
 
 WORKDIR /usr/src
 
 # Get Go dependencies
-# TODO: this is grabbing all deps from core project, we don't really need this
 COPY go.mod ./go.mod
 COPY go.sum ./go.sum
-RUN go mod download
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/root/go/pkg/mod \
+    go mod download
 
-# Copy work files for faucet (but not Dockerfile: to avoid invalidating caches while developing)
-COPY testnet-faucet/faucet ./faucet
+# Copy rest of files
+COPY . .
 
-# Copy work files for dualityd (but not Dockerfile: to avoid invalidating caches while developing)
-COPY app ./app
-COPY cmd ./cmd
-COPY proto ./proto
-COPY testutil ./testutil
-COPY x ./x
+# compile dualityd to ARM64 architecture for final dualityd image
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/root/go/pkg/mod \
+    CGO_ENABLED=1 \
+    CC=aarch64-linux-gnu-gcc \
+    GOOS=linux \
+    GOARCH=arm64 \
+    go build -o build/dualityd_arm64 ./cmd/dualityd
 
-# compile faucet to ARM64 architecture for final image
-RUN CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -o build/faucet_arm64 ./faucet/faucet.go
-
-RUN CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -o build/dualityd_arm64 ./cmd/dualityd
+# compile dualityd to ARM64 architecture for final faucet image
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/root/go/pkg/mod \
+    CGO_ENABLED=1 \
+    CC=aarch64-linux-gnu-gcc \
+    GOOS=linux \
+    GOARCH=arm64 \
+    go build -o build/faucet_arm64 ./testnet-faucet/faucet/faucet.go
 
 
 # Final image build on small stable release of ARM64 Linux
