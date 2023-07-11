@@ -20,7 +20,7 @@ var (
 	Port          = "9000"
 	AppCli        = "dualityd"
 	FaucetAccount = ""
-	AmountToSend  = 1000
+	AmountToSend  = "1000000000"
 	DenomsToSend  = []string{"token", "stake"}
 	TxTimeoutInt  = 1
 	TxTimeout     = time.Duration(TxTimeoutInt) * time.Second
@@ -49,8 +49,8 @@ func newChainCmdRunner() (cr chaincmdrunner.Runner, err error) {
 	return
 }
 
-func sendToken(cr chaincmdrunner.Runner, address string, amount int, denom string) error {
-	amountStr := fmt.Sprintf("%d%s", amount, denom)
+func sendToken(cr chaincmdrunner.Runner, address string, amount string, denom string) error {
+	amountStr := fmt.Sprintf("%s%s", amount, denom)
 	log.Printf("Sending: %s", amountStr)
 
 	tx, err := cr.BankSend(context.Background(), FaucetAccount, address, amountStr)
@@ -132,7 +132,7 @@ func main() {
 	flag.StringVar(&FaucetAccount, "faucet-account", FaucetAccount, "Account to use for faucet")
 	flag.StringVar(&Port, "port", Port, "Port to listen on")
 	flag.StringVar(&NodeAddress, "node", NodeAddress, "<host>:<port> to tendermint rpc interface for this chain")
-	flag.IntVar(&AmountToSend, "token-amount", AmountToSend, "Amount of token to send")
+	flag.StringVar(&AmountToSend, "token-amount", AmountToSend, "Amount of token to send")
 	denomsToSendStr := flag.String("denoms", strings.Join(DenomsToSend, ","), "Denoms to send")
 	flag.Parse()
 
