@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"reflect"
 
 	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
 	"github.com/cosmos/cosmos-sdk/runtime"
@@ -110,7 +111,15 @@ import (
 	incentivesmodule "github.com/duality-labs/duality/x/incentives"
 	incentivesmodulekeeper "github.com/duality-labs/duality/x/incentives/keeper"
 	incentivesmoduletypes "github.com/duality-labs/duality/x/incentives/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
+	buildermodule "github.com/skip-mev/pob/x/builder"
+	builderkeeper "github.com/skip-mev/pob/x/builder/keeper"
+	builderrewards "github.com/skip-mev/pob/x/builder/rewards_address_provider"
+	buildertypes "github.com/skip-mev/pob/x/builder/types"
+
+	pobabci "github.com/skip-mev/pob/abci"
+	pobmempool "github.com/skip-mev/pob/mempool"
 )
 
 const (
@@ -150,6 +159,7 @@ var (
 		tendermint.AppModuleBasic{},
 		genutil.AppModuleBasic{},
 		groupmodule.AppModuleBasic{},
+		buildermodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -208,6 +218,7 @@ type App struct {
 	AccountKeeper         authkeeper.AccountKeeper
 	AuthzKeeper           authzkeeper.Keeper
 	BankKeeper            bankkeeper.Keeper
+	BuildKeeper           builderkeeper.Keeper
 	CapabilityKeeper      *capabilitykeeper.Keeper
 	SlashingKeeper        slashingkeeper.Keeper
 	CrisisKeeper          *crisiskeeper.Keeper
@@ -241,6 +252,9 @@ type App struct {
 	// sm is the simulation manager
 	sm           *module.SimulationManager
 	configurator module.Configurator
+
+	// Skip POB's custom checkTx handler
+	checkTxHandler pobabci.CheckTx
 }
 
 func NewApp(
@@ -290,6 +304,7 @@ func NewApp(
 		consensusparamtypes.StoreKey,
 		crisistypes.StoreKey,
 		group.StoreKey,
+		buildertypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -336,13 +351,14 @@ func NewApp(
 	// this line is used by starport scaffolding # stargate/app/scopedKeeper
 
 	// add keepers
+	governanceModuleAddress := authtypes.NewModuleAddress(govtypes.ModuleName).String()
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
 		appCodec,
 		keys[authtypes.StoreKey],
 		authtypes.ProtoBaseAccount,
 		maccPerms,
 		sdk.Bech32PrefixAccAddr,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		governanceModuleAddress,
 	)
 
 	app.AuthzKeeper = authzkeeper.NewKeeper(
@@ -357,7 +373,7 @@ func NewApp(
 		keys[banktypes.StoreKey],
 		app.AccountKeeper,
 		app.BlockedModuleAccountAddrs(),
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		governanceModuleAddress,
 	)
 
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(
@@ -366,7 +382,7 @@ func NewApp(
 		appCodec,
 		homePath,
 		app.BaseApp,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		governanceModuleAddress,
 	)
 
 	// Create IBC Keeper
@@ -481,13 +497,14 @@ func NewApp(
 	swapModule := swapmiddleware.NewAppModule(app.SwapKeeper)
 
 	// Create packet forward middleware keeper
+	noopDistributionKeeper := &NoopDistributionKeeper{}
 	app.ForwardKeeper = forwardkeeper.NewKeeper(
 		appCodec,
 		keys[forwardtypes.StoreKey],
 		app.GetSubspace(forwardtypes.ModuleName),
 		app.TransferKeeper, // This is zero value because transfer keeper is not initialized yet
 		app.IBCKeeper.ChannelKeeper,
-		&NoopDistributionKeeper{}, // Use a no-op implementation of the Distribution Keeper to avoid NPE
+		noopDistributionKeeper, // Use a no-op implementation of the Distribution Keeper to avoid NPE
 		app.BankKeeper,
 		&app.IBCKeeper.ChannelKeeper,
 	)
@@ -526,6 +543,18 @@ func NewApp(
 
 	// Set the initialized transfer keeper for forward middleware
 	app.ForwardKeeper.SetTransferKeeper(app.TransferKeeper)
+
+	moduleAddress := app.AccountKeeper.GetModuleAddress(buildertypes.ModuleName)
+	rewardsAddressProvider := builderrewards.NewFixedAddressRewardsAddressProvider(moduleAddress)
+
+	app.BuildKeeper = builderkeeper.NewKeeperWithRewardsAddressProvider(
+		appCodec,
+		app.keys[buildertypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		rewardsAddressProvider,
+		governanceModuleAddress,
+	)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
@@ -639,6 +668,7 @@ func NewApp(
 			app.BankKeeper,
 			app.interfaceRegistry,
 		),
+		buildermodule.NewAppModule(appCodec, app.BuildKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -667,6 +697,7 @@ func NewApp(
 		swaptypes.ModuleName,
 		incentivesmoduletypes.ModuleName,
 		group.ModuleName,
+		buildertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -691,6 +722,7 @@ func NewApp(
 		epochsmoduletypes.ModuleName,
 		incentivesmoduletypes.ModuleName,
 		group.ModuleName,
+		buildertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 
 		// NOTE: Because of the gas sensitivity of PurgeExpiredLimit order operations
@@ -726,6 +758,7 @@ func NewApp(
 		epochsmoduletypes.ModuleName,
 		incentivesmoduletypes.ModuleName,
 		group.ModuleName,
+		buildertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -756,6 +789,15 @@ func NewApp(
 	app.MountTransientStores(tkeys)
 	app.MountMemoryStores(memKeys)
 
+	factory := pobmempool.NewDefaultAuctionFactory(app.txConfig.TxDecoder())
+	mempool := pobmempool.NewAuctionMempool(
+		app.txConfig.TxDecoder(),
+		app.txConfig.TxEncoder(),
+		0,
+		factory,
+	)
+	app.SetMempool(mempool)
+
 	anteHandler, err := NewAnteHandler(
 		HandlerOptions{
 			HandlerOptions: ante.HandlerOptions{
@@ -767,11 +809,35 @@ func NewApp(
 			},
 			IBCKeeper:      app.IBCKeeper,
 			ConsumerKeeper: app.ConsumerKeeper,
+
+			TxEncoder:     app.txConfig.TxEncoder(),
+			BuilderKeeper: app.BuildKeeper,
+			Mempool:       mempool,
 		},
 	)
 	if err != nil {
 		panic(fmt.Errorf("failed to create AnteHandler: %w", err))
 	}
+
+	proposalHandlers := pobabci.NewProposalHandler(
+		mempool,
+		app.Logger(),
+		anteHandler,
+		app.txConfig.TxEncoder(),
+		app.txConfig.TxDecoder(),
+	)
+	app.SetPrepareProposal(proposalHandlers.PrepareProposalHandler())
+	app.SetProcessProposal(proposalHandlers.ProcessProposalHandler())
+
+	// Set the custom CheckTx handler on BaseApp.
+	checkTxHandler := pobabci.NewCheckTxHandler(
+		app.BaseApp,
+		app.txConfig.TxDecoder(),
+		mempool,
+		anteHandler,
+		app.ChainID(),
+	)
+	app.SetCheckTx(checkTxHandler.CheckTx())
 
 	// initialize BaseApp
 	app.SetInitChainer(app.InitChainer)
@@ -807,6 +873,19 @@ func (app *App) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.R
 // EndBlocker application updates every end block
 func (app *App) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
+}
+
+// CheckTx will check the transaction with the provided checkTxHandler. We override the default
+// handler so that we can verify bid transactions before they are inserted into the mempool.
+// With the POB CheckTx, we can verify the bid transaction and all of the bundled transactions
+// before inserting the bid transaction into the mempool.
+func (app *App) CheckTx(req abci.RequestCheckTx) abci.ResponseCheckTx {
+	return app.checkTxHandler(req)
+}
+
+// SetCheckTx sets the checkTxHandler for the app.
+func (app *App) SetCheckTx(handler pobabci.CheckTx) {
+	app.checkTxHandler = handler
 }
 
 // InitChainer application update at chain initialization
@@ -967,6 +1046,7 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(forwardtypes.ModuleName).WithKeyTable(forwardtypes.ParamKeyTable())
 	paramsKeeper.Subspace(epochsmoduletypes.ModuleName)
 	paramsKeeper.Subspace(incentivesmoduletypes.ModuleName)
+	paramsKeeper.Subspace(buildertypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
@@ -1064,4 +1144,11 @@ func BlockedAddresses() map[string]bool {
 // ModuleManager returns the app ModuleManager
 func (app *App) ModuleManager() *module.Manager {
 	return app.mm
+}
+
+// ChainID gets chainID from private fields of BaseApp
+// Should be removed once SDK 0.50.x will be adopted
+func (app *App) ChainID() string {
+	field := reflect.ValueOf(app.BaseApp).Elem().FieldByName("chainID")
+	return field.String()
 }

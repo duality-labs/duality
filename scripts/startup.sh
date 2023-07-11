@@ -73,6 +73,10 @@ then
     # bob
     dualityd keys add bob --keyring-backend test
     dualityd add-genesis-account $(dualityd keys show bob -a --keyring-backend test) ${B}token,${B}stake --keyring-backend test
+    # builder module
+    dualityd keys add builder --keyring-backend test
+    dualityd add-genesis-account $(dualityd keys show builder -a --keyring-backend test) ${B}token,${B}stake --keyring-backend test
+
     # custom account
     if [[ ! -z "$MNEMONIC" ]]
     then
