@@ -50,6 +50,12 @@ service Query {
     option (google.api.http).get =
         "/dualitylabs/duality/incentives/v1beta1/future_rewards_estimate/{owner}";
   }
+
+  // GetAccountHistory returns the total accumulated rewards per denom for a given user.
+  rpc GetAccountHistory(GetAccountHistoryRequest) returns (GetAccountHistoryResponse) {
+    option (google.api.http).get =
+        "/dualitylabs/duality/incentives/v1beta1/account_history/{account}";
+  }
 }
 
 message GetModuleStatusRequest {}
@@ -120,6 +126,18 @@ message GetFutureRewardEstimateRequest {
 message GetFutureRewardEstimateResponse {
   // Estimated coin rewards that will be recieved at provided address
   // from specified locks between current time and end epoch
+  repeated cosmos.base.v1beta1.Coin coins = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
+
+message GetAccountHistoryRequest {
+  // Address that is being queried for account history
+  string account = 1 [ (gogoproto.moretags) = "yaml:\"account\"" ];
+}
+message GetAccountHistoryResponse {
+  // Gauge rewards that have been distributed to this address to date
   repeated cosmos.base.v1beta1.Coin coins = 1 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"

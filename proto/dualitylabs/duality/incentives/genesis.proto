@@ -5,6 +5,7 @@ import "gogoproto/gogo.proto";
 import "dualitylabs/duality/incentives/params.proto";
 import "dualitylabs/duality/incentives/gauge.proto";
 import "dualitylabs/duality/incentives/stake.proto";
+import "dualitylabs/duality/incentives/account_history.proto";
 
 option go_package = "github.com/duality-labs/duality/x/incentives/types";
 
@@ -21,4 +22,5 @@ message GenesisState {
 
   uint64 last_stake_id = 4;
   repeated Stake stakes = 5;
+  repeated AccountHistory accountHistories = 6;
 }

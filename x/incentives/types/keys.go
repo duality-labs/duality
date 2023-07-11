@@ -71,14 +71,8 @@ var (
 	// KeyPrefixStakeIndexTimestamp defines prefix for the iteration of stake IDs by day epoch integer.
 	KeyPrefixStakeIndexPairDistEpoch = []byte{0x0f}
 
-	// // KeyPrefixStakeIndexAccountTimestamp defines prefix for the iteration of stake IDs by account and timestamp.
-	// KeyPrefixStakeIndexAccountTimestamp = []byte{0x10}
-
-	// // KeyPrefixStakeIndexDenomTimestamp defines prefix for the iteration of stake IDs by denom and timestamp.
-	// KeyPrefixStakeIndexDenomTimestamp = []byte{0x11}
-
-	// // KeyPrefixStakeIndexAccountDenomTimestamp defines prefix for the iteration of stake IDs by account, denomination and timestamp.
-	// KeyPrefixStakeIndexAccountDenomTimestamp = []byte{0x12}
+	// KeyPrefixAccountHistory defines the prefix for storing account histories.
+	KeyPrefixAccountHistory = []byte{0x10}
 
 	// KeyndexSeparator defines separator between keys when combine, it should be one that is not used in denom expression.
 	KeyIndexSeparator = []byte{0xFF}
@@ -163,6 +157,13 @@ func GetKeyStakeIndexByPairTick(pairID string, tickIndex int64) []byte {
 		KeyPrefixStakeIndexPairTick,
 		[]byte(pairID),
 		GetKeyInt64(tickIndex),
+	)
+}
+
+func GetKeyAccountHistory(address string) []byte {
+	return CombineKeys(
+		KeyPrefixStakeIndexPairTick,
+		[]byte(address),
 	)
 }
 

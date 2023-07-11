@@ -208,6 +208,24 @@ func (q QueryServer) GetFutureRewardEstimate(
 	return &types.GetFutureRewardEstimateResponse{Coins: rewards}, nil
 }
 
+func (q QueryServer) GetAccountHistory(
+	goCtx context.Context,
+	req *types.GetAccountHistoryRequest,
+) (*types.GetAccountHistoryResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	accountHistory, found := q.Keeper.GetAccountHistory(ctx, req.Account)
+	if !found {
+		return nil, status.Error(
+			codes.NotFound,
+			"Could not locate an account history with that address",
+		)
+	}
+	return &types.GetAccountHistoryResponse{Coins: accountHistory.Coins}, nil
+}
+
 // getGaugeFromIDJsonBytes returns gauges from the json bytes of gaugeIDs.
 func (q QueryServer) getGaugeFromIDJsonBytes(
 	ctx sdk.Context,
