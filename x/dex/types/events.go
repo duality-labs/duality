@@ -66,7 +66,7 @@ func CreateWithdrawEvent(
 func CreateMultihopSwapEvent(
 	creator sdk.AccAddress,
 	receiver sdk.AccAddress,
-	tokenIn string,
+	makerDenom string,
 	tokenOut string,
 	amountIn sdk.Int,
 	amountOut sdk.Int,
@@ -77,7 +77,7 @@ func CreateMultihopSwapEvent(
 		sdk.NewAttribute(sdk.AttributeKeyAction, MultihopSwapEventKey),
 		sdk.NewAttribute(MultihopSwapEventCreator, creator.String()),
 		sdk.NewAttribute(MultihopSwapEventReceiver, receiver.String()),
-		sdk.NewAttribute(MultihopSwapEventTokenIn, tokenIn),
+		sdk.NewAttribute(MultihopSwapEventTokenIn, makerDenom),
 		sdk.NewAttribute(MultihopSwapEventTokenOut, tokenOut),
 		sdk.NewAttribute(MultihopSwapEventAmountIn, amountIn.String()),
 		sdk.NewAttribute(MultihopSwapEventAmountOut, amountOut.String()),
@@ -92,7 +92,7 @@ func CreatePlaceLimitOrderEvent(
 	receiver sdk.AccAddress,
 	token0 string,
 	token1 string,
-	tokenIn string,
+	makerDenom string,
 	tokenOut string,
 	amountIn sdk.Int,
 	limitTick int64,
@@ -107,7 +107,7 @@ func CreatePlaceLimitOrderEvent(
 		sdk.NewAttribute(PlaceLimitOrderEventReceiver, receiver.String()),
 		sdk.NewAttribute(PlaceLimitOrderEventToken0, token0),
 		sdk.NewAttribute(PlaceLimitOrderEventToken1, token1),
-		sdk.NewAttribute(PlaceLimitOrderEventTokenIn, tokenIn),
+		sdk.NewAttribute(PlaceLimitOrderEventTokenIn, makerDenom),
 		sdk.NewAttribute(PlaceLimitOrderEventTokenOut, tokenOut),
 		sdk.NewAttribute(PlaceLimitOrderEventAmountIn, amountIn.String()),
 		sdk.NewAttribute(PlaceLimitOrderEventLimitTick, strconv.FormatInt(limitTick, 10)),
@@ -123,7 +123,7 @@ func WithdrawFilledLimitOrderEvent(
 	creator sdk.AccAddress,
 	token0 string,
 	token1 string,
-	tokenIn string,
+	makerDenom string,
 	tokenOut string,
 	amountOut sdk.Int,
 	trancheKey string,
@@ -134,7 +134,7 @@ func WithdrawFilledLimitOrderEvent(
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventCreator, creator.String()),
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventToken0, token0),
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventToken1, token1),
-		sdk.NewAttribute(WithdrawFilledLimitOrderEventTokenIn, tokenIn),
+		sdk.NewAttribute(WithdrawFilledLimitOrderEventTokenIn, makerDenom),
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventTokenOut, tokenOut),
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventTrancheKey, trancheKey),
 		sdk.NewAttribute(WithdrawFilledLimitOrderEventAmountOut, amountOut.String()),
@@ -147,7 +147,7 @@ func CancelLimitOrderEvent(
 	creator sdk.AccAddress,
 	token0 string,
 	token1 string,
-	tokenIn string,
+	makerDenom string,
 	tokenOut string,
 	amountOut sdk.Int,
 	trancheKey string,
@@ -158,7 +158,7 @@ func CancelLimitOrderEvent(
 		sdk.NewAttribute(CancelLimitOrderEventCreator, creator.String()),
 		sdk.NewAttribute(CancelLimitOrderEventToken0, token0),
 		sdk.NewAttribute(CancelLimitOrderEventToken1, token1),
-		sdk.NewAttribute(CancelLimitOrderEventTokenIn, tokenIn),
+		sdk.NewAttribute(CancelLimitOrderEventTokenIn, makerDenom),
 		sdk.NewAttribute(CancelLimitOrderEventTokenOut, tokenOut),
 		sdk.NewAttribute(CancelLimitOrderEventAmountOut, amountOut.String()),
 		sdk.NewAttribute(CancelLimitOrderEventTrancheKey, trancheKey),
@@ -170,7 +170,7 @@ func CancelLimitOrderEvent(
 func TickUpdateEvent(
 	token0 string,
 	token1 string,
-	tokenIn string,
+	makerDenom string,
 	tickIndex int64,
 	reserves sdk.Int,
 	otherAttrs ...sdk.Attribute,
@@ -180,7 +180,7 @@ func TickUpdateEvent(
 		sdk.NewAttribute(sdk.AttributeKeyAction, TickUpdateEventKey),
 		sdk.NewAttribute(TickUpdateEventToken0, token0),
 		sdk.NewAttribute(TickUpdateEventToken1, token1),
-		sdk.NewAttribute(TickUpdateEventTokenIn, tokenIn),
+		sdk.NewAttribute(TickUpdateEventTokenIn, makerDenom),
 		sdk.NewAttribute(TickUpdateEventTickIndex, strconv.FormatInt(tickIndex, 10)),
 		sdk.NewAttribute(TickUpdateEventFee, strconv.FormatInt(tickIndex, 10)),
 		sdk.NewAttribute(TickUpdateEventReserves, reserves.String()),
@@ -191,24 +191,28 @@ func TickUpdateEvent(
 }
 
 func CreateTickUpdatePoolReserves(tick PoolReserves) sdk.Event {
+	tradePairID := tick.Key.TradePairID
+	pairID := tradePairID.MustPairID()
 	return TickUpdateEvent(
-		tick.PairID.Token0,
-		tick.PairID.Token1,
-		tick.TokenIn,
-		tick.TickIndex,
-		tick.Reserves,
-		sdk.NewAttribute(TickUpdateEventFee, strconv.FormatUint(tick.Fee, 10)),
+		pairID.Token0,
+		pairID.Token1,
+		tradePairID.MakerDenom,
+		tick.Key.TickIndexTakerToMaker,
+		tick.ReservesMakerDenom,
+		sdk.NewAttribute(TickUpdateEventFee, strconv.FormatUint(tick.Key.Fee, 10)),
 	)
 }
 
-func CreateTickUpdateLimitOrderTranche(tranche LimitOrderTranche) sdk.Event {
+func CreateTickUpdateLimitOrderTranche(tranche *LimitOrderTranche) sdk.Event {
+	tradePairID := tranche.Key.TradePairID
+	pairID := tradePairID.MustPairID()
 	return TickUpdateEvent(
-		tranche.PairID.Token0,
-		tranche.PairID.Token1,
-		tranche.TokenIn,
-		tranche.TickIndex,
-		tranche.ReservesTokenIn,
-		sdk.NewAttribute(TickUpdateEventTrancheKey, tranche.TrancheKey),
+		pairID.Token0,
+		pairID.Token1,
+		tradePairID.MakerDenom,
+		tranche.Key.TickIndexTakerToMaker,
+		tranche.ReservesMakerDenom,
+		sdk.NewAttribute(TickUpdateEventTrancheKey, tranche.Key.TrancheKey),
 	)
 }
 

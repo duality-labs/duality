@@ -28,9 +28,9 @@ func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 			desc: "First",
 			request: &types.QueryGetLimitOrderTrancheRequest{
 				PairID:     "TokenA<>TokenB",
-				TickIndex:  msgs[0].TickIndex,
+				TickIndex:  msgs[0].Key.TickIndexTakerToMaker,
 				TokenIn:    "TokenA",
-				TrancheKey: msgs[0].TrancheKey,
+				TrancheKey: msgs[0].Key.TrancheKey,
 			},
 			response: &types.QueryGetLimitOrderTrancheResponse{LimitOrderTranche: msgs[0]},
 		},
@@ -38,9 +38,9 @@ func TestLimitOrderTrancheQuerySingle(t *testing.T) {
 			desc: "Second",
 			request: &types.QueryGetLimitOrderTrancheRequest{
 				PairID:     "TokenA<>TokenB",
-				TickIndex:  msgs[1].TickIndex,
+				TickIndex:  msgs[1].Key.TickIndexTakerToMaker,
 				TokenIn:    "TokenA",
-				TrancheKey: msgs[1].TrancheKey,
+				TrancheKey: msgs[1].Key.TrancheKey,
 			},
 			response: &types.QueryGetLimitOrderTrancheResponse{LimitOrderTranche: msgs[1]},
 		},
@@ -100,8 +100,8 @@ func TestLimitOrderTrancheQueryPaginated(t *testing.T) {
 			require.NoError(t, err)
 			require.LessOrEqual(t, len(resp.LimitOrderTranche), step)
 			require.Subset(t,
-				nullify.Fill(msgs),
-				nullify.Fill(resp.LimitOrderTranche),
+				msgs,
+				resp.LimitOrderTranche,
 			)
 		}
 	})
@@ -113,8 +113,8 @@ func TestLimitOrderTrancheQueryPaginated(t *testing.T) {
 			require.NoError(t, err)
 			require.LessOrEqual(t, len(resp.LimitOrderTranche), step)
 			require.Subset(t,
-				nullify.Fill(msgs),
-				nullify.Fill(resp.LimitOrderTranche),
+				msgs,
+				resp.LimitOrderTranche,
 			)
 			next = resp.Pagination.NextKey
 		}
@@ -124,8 +124,8 @@ func TestLimitOrderTrancheQueryPaginated(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, len(msgs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
-			nullify.Fill(msgs),
-			nullify.Fill(resp.LimitOrderTranche),
+			msgs,
+			resp.LimitOrderTranche,
 		)
 	})
 	t.Run("InvalidRequest", func(t *testing.T) {

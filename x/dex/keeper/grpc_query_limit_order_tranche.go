@@ -21,18 +21,20 @@ func (k Keeper) LimitOrderTrancheAll(
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	var LimitOrderTranches []types.LimitOrderTranche
+	var limitOrderTranches []*types.LimitOrderTranche
 	ctx := sdk.UnwrapSDKContext(c)
 
-	pairID, err := types.StringToPairID(req.PairID)
+	pairID, err := types.NewPairIDFromCanonicalString(req.PairID)
 	if err != nil {
 		return nil, err
 	}
+	tradePairID := types.NewTradePairIDFromMaker(pairID, req.TokenIn)
+
 	store := ctx.KVStore(k.storeKey)
-	LimitOrderTrancheStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairID, req.TokenIn))
+	limitOrderTrancheStore := prefix.NewStore(store, types.TickLiquidityPrefix(tradePairID))
 
 	pageRes, err := query.FilteredPaginate(
-		LimitOrderTrancheStore,
+		limitOrderTrancheStore,
 		req.Pagination, func(key, value []byte, accum bool) (hit bool, err error) {
 			var tick types.TickLiquidity
 
@@ -43,7 +45,7 @@ func (k Keeper) LimitOrderTrancheAll(
 			// Check if this is a LimitOrderTranche and not PoolReserves
 			if tranche != nil {
 				if accum {
-					LimitOrderTranches = append(LimitOrderTranches, *tranche)
+					limitOrderTranches = append(limitOrderTranches, tranche)
 				}
 
 				return true, nil
@@ -55,7 +57,7 @@ func (k Keeper) LimitOrderTrancheAll(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryAllLimitOrderTrancheResponse{LimitOrderTranche: LimitOrderTranches, Pagination: pageRes}, nil
+	return &types.QueryAllLimitOrderTrancheResponse{LimitOrderTranche: limitOrderTranches, Pagination: pageRes}, nil
 }
 
 // Returns a specific limit order tranche either from the tickLiquidity index or from the FillLimitOrderTranche index
@@ -67,11 +69,19 @@ func (k Keeper) LimitOrderTranche(
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(c)
-	pairID, err := types.StringToPairID(req.PairID)
+	pairID, err := types.NewPairIDFromCanonicalString(req.PairID)
 	if err != nil {
 		return nil, err
 	}
-	val, _, found := k.FindLimitOrderTranche(ctx, pairID, req.TickIndex, req.TokenIn, req.TrancheKey)
+	tradePairID := types.NewTradePairIDFromMaker(pairID, req.TokenIn)
+	val, _, found := k.FindLimitOrderTranche(
+		ctx,
+		&types.LimitOrderTrancheKey{
+			TradePairID:           tradePairID,
+			TickIndexTakerToMaker: req.TickIndex,
+			TrancheKey:            req.TrancheKey,
+		},
+	)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")
 	}

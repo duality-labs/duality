@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/pflag"
 
 	"github.com/duality-labs/duality/utils/dcli"
-	"github.com/duality-labs/duality/x/dex/keeper"
+	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"
 )
 
@@ -29,9 +29,13 @@ func GetTxCmd() *cobra.Command {
 	return cmd
 }
 
-func CreateGaugeCmdBuilder(clientCtx client.Context, args []string, flags *pflag.FlagSet) (sdk.Msg, error) {
+func CreateGaugeCmdBuilder(
+	clientCtx client.Context,
+	args []string,
+	flags *pflag.FlagSet,
+) (sdk.Msg, error) {
 	// "create-gauge [pairTokenA] [pairTokenB] [startTick] [endTick] [coins] [numEpochs] [pricingTick]"
-	pairID, err := keeper.CreatePairIDFromUnsorted(args[0], args[1])
+	pairID, err := dextypes.NewPairIDFromUnsorted(args[0], args[1])
 	if err != nil {
 		return &types.MsgCreateGauge{}, err
 	}

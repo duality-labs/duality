@@ -13,67 +13,71 @@ import (
 
 func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
-		Params: types.DefaultParams(),
-		LimitOrderTrancheUserList: []types.LimitOrderTrancheUser{
+		Params: *types.DefaultParams(),
+		LimitOrderTrancheUserList: []*types.LimitOrderTrancheUser{
 			{
-				PairID:          &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-				Token:           "TokenB",
-				TickIndex:       1,
-				TrancheKey:      "0",
-				Address:         "fakeAddr",
-				SharesOwned:     sdk.NewInt(10),
-				SharesWithdrawn: sdk.NewInt(0),
-				SharesCancelled: sdk.NewInt(0),
+				TradePairID:           &types.TradePairID{TakerDenom: "TokenA", MakerDenom: "TokenB"},
+				TickIndexTakerToMaker: 1,
+				TrancheKey:            "0",
+				Address:               "fakeAddr",
+				SharesOwned:           sdk.NewInt(10),
+				SharesWithdrawn:       sdk.NewInt(0),
+				SharesCancelled:       sdk.NewInt(0),
 			},
 			{
-				PairID:          &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-				Token:           "TokenA",
-				TickIndex:       20,
-				TrancheKey:      "0",
-				Address:         "fakeAddr",
-				SharesOwned:     sdk.NewInt(10),
-				SharesWithdrawn: sdk.NewInt(0),
-				SharesCancelled: sdk.NewInt(0),
+				TradePairID:           &types.TradePairID{TakerDenom: "TokenB", MakerDenom: "TokenA"},
+				TickIndexTakerToMaker: 20,
+				TrancheKey:            "0",
+				Address:               "fakeAddr",
+				SharesOwned:           sdk.NewInt(10),
+				SharesWithdrawn:       sdk.NewInt(0),
+				SharesCancelled:       sdk.NewInt(0),
 			},
 		},
-		TickLiquidityList: []types.TickLiquidity{
+		TickLiquidityList: []*types.TickLiquidity{
 			{
 				Liquidity: &types.TickLiquidity_LimitOrderTranche{
-					LimitOrderTranche: &types.LimitOrderTranche{
-						PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-						TokenIn:          "0",
-						TickIndex:        0,
-						TrancheKey:       "0",
-						ReservesTokenIn:  sdk.NewInt(0),
-						ReservesTokenOut: sdk.NewInt(0),
-						TotalTokenIn:     sdk.NewInt(0),
-						TotalTokenOut:    sdk.NewInt(0),
-					},
+					LimitOrderTranche: types.MustNewLimitOrderTranche(
+						"TokenB",
+						"TokenA",
+						"0",
+						0,
+						sdk.ZeroInt(),
+						sdk.ZeroInt(),
+						sdk.ZeroInt(),
+						sdk.ZeroInt(),
+					),
 				},
 			},
 			{
 				Liquidity: &types.TickLiquidity_LimitOrderTranche{
-					LimitOrderTranche: &types.LimitOrderTranche{
-						PairID:     &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-						TokenIn:    "0",
-						TickIndex:  0,
-						TrancheKey: "0",
-					},
+					LimitOrderTranche: types.MustNewLimitOrderTranche(
+						"TokenB",
+						"TokenA",
+						"0",
+						0,
+						sdk.ZeroInt(),
+						sdk.ZeroInt(),
+						sdk.ZeroInt(),
+						sdk.ZeroInt(),
+					),
 				},
 			},
 		},
-		InactiveLimitOrderTrancheList: []types.LimitOrderTranche{
+		InactiveLimitOrderTrancheList: []*types.LimitOrderTranche{
 			{
-				PairID:     &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-				TokenIn:    "0",
-				TickIndex:  0,
-				TrancheKey: "0",
+				Key: &types.LimitOrderTrancheKey{
+					TradePairID:           &types.TradePairID{TakerDenom: "TokenA", MakerDenom: "TokenB"},
+					TickIndexTakerToMaker: 0,
+					TrancheKey:            "0",
+				},
 			},
 			{
-				PairID:     &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-				TokenIn:    "1",
-				TickIndex:  1,
-				TrancheKey: "1",
+				Key: &types.LimitOrderTrancheKey{
+					TradePairID:           &types.TradePairID{TakerDenom: "TokenA", MakerDenom: "TokenB"},
+					TickIndexTakerToMaker: 1,
+					TrancheKey:            "1",
+				},
 			},
 		},
 		// this line is used by starport scaffolding # genesis/test/state

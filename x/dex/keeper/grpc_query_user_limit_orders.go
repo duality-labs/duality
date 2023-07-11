@@ -21,10 +21,10 @@ func (k Keeper) UserLimitOrdersAll(
 	if err != nil {
 		return nil, err
 	}
-	profile := NewUserProfile(addr)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	limitOrders := k.GetAllLimitOrderTrancheUserForAddress(ctx, addr)
 	return &types.QueryAllUserLimitOrdersResponse{
-		LimitOrders: profile.GetAllLimitOrders(ctx, k),
+		LimitOrders: limitOrders,
 	}, nil
 }

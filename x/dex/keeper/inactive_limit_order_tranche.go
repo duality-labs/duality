@@ -7,38 +7,26 @@ import (
 )
 
 // SetInactiveLimitOrderTranche set a specific inactiveLimitOrderTranche in the store from its index
-func (k Keeper) SetInactiveLimitOrderTranche(ctx sdk.Context, inactiveLimitOrderTranche types.LimitOrderTranche) {
+func (k Keeper) SetInactiveLimitOrderTranche(ctx sdk.Context, limitOrderTranche *types.LimitOrderTranche) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.InactiveLimitOrderTrancheKeyPrefix))
-	b := k.cdc.MustMarshal(&inactiveLimitOrderTranche)
-	store.Set(types.InactiveLimitOrderTrancheKey(
-		inactiveLimitOrderTranche.PairID,
-		inactiveLimitOrderTranche.TokenIn,
-		inactiveLimitOrderTranche.TickIndex,
-		inactiveLimitOrderTranche.TrancheKey,
-	), b)
+	b := k.cdc.MustMarshal(limitOrderTranche)
+	store.Set(limitOrderTranche.Key.KeyMarshal(), b)
 }
 
 // GetInactiveLimitOrderTranche returns a inactiveLimitOrderTranche from its index
 func (k Keeper) GetInactiveLimitOrderTranche(
 	ctx sdk.Context,
-	pairID *types.PairID,
-	tokenIn string,
-	tickIndex int64,
-	trancheKey string,
-) (val types.LimitOrderTranche, found bool) {
+	limitOrderTrancheKey *types.LimitOrderTrancheKey,
+) (val *types.LimitOrderTranche, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.InactiveLimitOrderTrancheKeyPrefix))
 
-	b := store.Get(types.InactiveLimitOrderTrancheKey(
-		pairID,
-		tokenIn,
-		tickIndex,
-		trancheKey,
-	))
+	b := store.Get(limitOrderTrancheKey.KeyMarshal())
 	if b == nil {
 		return val, false
 	}
 
-	k.cdc.MustUnmarshal(b, &val)
+	val = &types.LimitOrderTranche{}
+	k.cdc.MustUnmarshal(b, val)
 
 	return val, true
 }
@@ -46,40 +34,35 @@ func (k Keeper) GetInactiveLimitOrderTranche(
 // RemoveInactiveLimitOrderTranche removes a inactiveLimitOrderTranche from the store
 func (k Keeper) RemoveInactiveLimitOrderTranche(
 	ctx sdk.Context,
-	pairID *types.PairID,
-	tokenIn string,
-	tickIndex int64,
-	trancheKey string,
+	limitOrderTrancheKey *types.LimitOrderTrancheKey,
 ) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.InactiveLimitOrderTrancheKeyPrefix))
-	store.Delete(types.InactiveLimitOrderTrancheKey(
-		pairID,
-		tokenIn,
-		tickIndex,
-		trancheKey,
-	))
+	store.Delete(limitOrderTrancheKey.KeyMarshal())
 }
 
 // GetAllInactiveLimitOrderTranche returns all inactiveLimitOrderTranche
-func (k Keeper) GetAllInactiveLimitOrderTranche(ctx sdk.Context) (list []types.LimitOrderTranche) {
+func (k Keeper) GetAllInactiveLimitOrderTranche(ctx sdk.Context) (list []*types.LimitOrderTranche) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.InactiveLimitOrderTrancheKeyPrefix))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var val types.LimitOrderTranche
-		k.cdc.MustUnmarshal(iterator.Value(), &val)
+		val := &types.LimitOrderTranche{}
+		k.cdc.MustUnmarshal(iterator.Value(), val)
 		list = append(list, val)
 	}
 
 	return
 }
 
-func (k Keeper) SaveInactiveTranche(sdkCtx sdk.Context, tranche types.LimitOrderTranche) {
+func (k Keeper) SaveInactiveTranche(sdkCtx sdk.Context, tranche *types.LimitOrderTranche) {
 	if tranche.HasTokenIn() || tranche.HasTokenOut() {
 		k.SetInactiveLimitOrderTranche(sdkCtx, tranche)
 	} else {
-		k.RemoveInactiveLimitOrderTranche(sdkCtx, tranche.PairID, tranche.TokenIn, tranche.TickIndex, tranche.TrancheKey)
+		k.RemoveInactiveLimitOrderTranche(
+			sdkCtx,
+			tranche.Key,
+		)
 	}
 }

@@ -21,10 +21,9 @@ func (k Keeper) UserDepositsAll(
 	if err != nil {
 		return nil, err
 	}
-	profile := NewUserProfile(addr)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	return &types.QueryAllUserDepositsResponse{
-		Deposits: profile.GetAllDeposits(ctx, k),
+		Deposits: k.GetAllDepositsForAddress(ctx, addr),
 	}, nil
 }

@@ -31,20 +31,20 @@ func TestInactiveLimitOrderTrancheQuerySingle(t *testing.T) {
 		{
 			desc: "First",
 			request: &types.QueryGetInactiveLimitOrderTrancheRequest{
-				PairID:     msgs[0].PairID.Stringify(),
-				TokenIn:    msgs[0].TokenIn,
-				TickIndex:  msgs[0].TickIndex,
-				TrancheKey: msgs[0].TrancheKey,
+				PairID:     msgs[0].Key.TradePairID.MustPairID().CanonicalString(),
+				TokenIn:    msgs[0].Key.TradePairID.MakerDenom,
+				TickIndex:  msgs[0].Key.TickIndexTakerToMaker,
+				TrancheKey: msgs[0].Key.TrancheKey,
 			},
 			response: &types.QueryGetInactiveLimitOrderTrancheResponse{InactiveLimitOrderTranche: msgs[0]},
 		},
 		{
 			desc: "Second",
 			request: &types.QueryGetInactiveLimitOrderTrancheRequest{
-				PairID:     msgs[1].PairID.Stringify(),
-				TokenIn:    msgs[1].TokenIn,
-				TickIndex:  msgs[1].TickIndex,
-				TrancheKey: msgs[1].TrancheKey,
+				PairID:     msgs[1].Key.TradePairID.MustPairID().CanonicalString(),
+				TokenIn:    msgs[1].Key.TradePairID.MakerDenom,
+				TickIndex:  msgs[1].Key.TickIndexTakerToMaker,
+				TrancheKey: msgs[1].Key.TrancheKey,
 			},
 			response: &types.QueryGetInactiveLimitOrderTrancheResponse{InactiveLimitOrderTranche: msgs[1]},
 		},
@@ -100,8 +100,8 @@ func TestInactiveLimitOrderTrancheQueryPaginated(t *testing.T) {
 			require.NoError(t, err)
 			require.LessOrEqual(t, len(resp.InactiveLimitOrderTranche), step)
 			require.Subset(t,
-				nullify.Fill(msgs),
-				nullify.Fill(resp.InactiveLimitOrderTranche),
+				msgs,
+				resp.InactiveLimitOrderTranche,
 			)
 		}
 	})
@@ -113,8 +113,8 @@ func TestInactiveLimitOrderTrancheQueryPaginated(t *testing.T) {
 			require.NoError(t, err)
 			require.LessOrEqual(t, len(resp.InactiveLimitOrderTranche), step)
 			require.Subset(t,
-				nullify.Fill(msgs),
-				nullify.Fill(resp.InactiveLimitOrderTranche),
+				msgs,
+				resp.InactiveLimitOrderTranche,
 			)
 			next = resp.Pagination.NextKey
 		}
@@ -124,8 +124,8 @@ func TestInactiveLimitOrderTrancheQueryPaginated(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, len(msgs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
-			nullify.Fill(msgs),
-			nullify.Fill(resp.InactiveLimitOrderTranche),
+			msgs,
+			resp.InactiveLimitOrderTranche,
 		)
 	})
 	t.Run("InvalidRequest", func(t *testing.T) {
