@@ -116,19 +116,6 @@ func TestGetAccountHistory(t *testing.T) {
 	dcli.RunQueryTestCases(t, desc, tcs)
 }
 
-func TestGetGaugeQualifyingValue(t *testing.T) {
-	desc, _ := cli.GetCmdGaugeQualifyingValue()
-	tcs := map[string]dcli.QueryCliTestCase[*types.GetGaugeQualifyingValueRequest]{
-		"basic test": {
-			Cmd: "1",
-			ExpectedQuery: &types.GetGaugeQualifyingValueRequest{
-				Id: 1,
-			},
-		},
-	}
-	dcli.RunQueryTestCases(t, desc, tcs)
-}
-
 // TXS ////////////////////////////////////////////////////////////////////////
 
 func TestNewCreateGaugeCmd(t *testing.T) {

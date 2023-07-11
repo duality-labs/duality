@@ -20,7 +20,6 @@ func GetQueryCmd() *cobra.Command {
 	dcli.AddQueryCmd(cmd, qcGetter, GetCmdStakes)
 	dcli.AddQueryCmd(cmd, qcGetter, GetCmdGetFutureRewardEstimate)
 	dcli.AddQueryCmd(cmd, qcGetter, GetCmdGetAccountHistory)
-	dcli.AddQueryCmd(cmd, qcGetter, GetCmdGaugeQualifyingValue)
 
 	return cmd
 }
@@ -102,12 +101,4 @@ func GetCmdGetAccountHistory() (*dcli.QueryDescriptor, *types.GetAccountHistoryR
 		Short: "Get rewards distribution history for an address",
 		Long:  `{{.Short}}{{.ExampleHeader}} account-history cosmos1chl62vc593p99z2tfh2pp8tl4anm0w4l8h8svx`,
 	}, &types.GetAccountHistoryRequest{}
-}
-
-func GetCmdGaugeQualifyingValue() (*dcli.QueryDescriptor, *types.GetGaugeQualifyingValueRequest) {
-	return &dcli.QueryDescriptor{
-		Use:   "gauge-qualifying-value [gaugeID]",
-		Short: "Query the qualifying value of a gauge by gauge id.",
-		Long:  `{{.Short}}{{.ExampleHeader}} gauge-qualifying-value 1`,
-	}, &types.GetGaugeQualifyingValueRequest{}
 }

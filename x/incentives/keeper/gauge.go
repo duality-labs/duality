@@ -201,33 +201,6 @@ func (k Keeper) GetGaugeByID(ctx sdk.Context, gaugeID uint64) (*types.Gauge, err
 	return &gauge, nil
 }
 
-// GetGaugeQualifyingValue returns gauge qualifying value from gauge ID.
-func (k Keeper) GetGaugeQualifyingValue(ctx sdk.Context, gaugeID uint64) (uint64, error) {
-	gauge := types.Gauge{}
-	store := ctx.KVStore(k.storeKey)
-	gaugeKey := types.GetKeyGaugeStore(gaugeID)
-	if !store.Has(gaugeKey) {
-		return 0, fmt.Errorf("gauge with ID %d does not exist", gaugeID)
-	}
-	bz := store.Get(gaugeKey)
-	if err := proto.Unmarshal(bz, &gauge); err != nil {
-		return 0, err
-	}
-	var value uint64 = 0
-	stakes := k.GetStakesByQueryCondition(ctx, &gauge.DistributeTo)
-	for _, stake := range stakes {
-		stakeCoins := stake.CoinsPassingQueryCondition(gauge.DistributeTo)
-		for _, stakeCoin := range stakeCoins {
-			adjustedPositionValue, err := k.ValueForShares(ctx, stakeCoin, gauge.PricingTick)
-			if err != nil {
-				return 0, err
-			}
-			value += value + adjustedPositionValue.Uint64()
-		}
-	}
-	return value, nil
-}
-
 // GetGauges returns upcoming, active, and finished gauges.
 func (k Keeper) GetGauges(ctx sdk.Context) types.Gauges {
 	return k.getGaugesFromIterator(ctx, k.iterator(ctx, types.KeyPrefixGaugeIndex))
