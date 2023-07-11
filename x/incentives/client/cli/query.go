@@ -19,6 +19,7 @@ func GetQueryCmd() *cobra.Command {
 	dcli.AddQueryCmd(cmd, qcGetter, GetCmdGetStakeByID)
 	dcli.AddQueryCmd(cmd, qcGetter, GetCmdStakes)
 	dcli.AddQueryCmd(cmd, qcGetter, GetCmdGetFutureRewardEstimate)
+	dcli.AddQueryCmd(cmd, qcGetter, GetCmdGetAccountHistory)
 
 	return cmd
 }
@@ -91,4 +92,13 @@ func GetCmdGetFutureRewardEstimate() (*dcli.QueryDescriptor, *types.GetFutureRew
 			"StakeIDs": dcli.ParseUintArray,
 		},
 	}, &types.GetFutureRewardEstimateRequest{}
+}
+
+// GetCmdGetFutureRewardsEstimate returns a rewards estimate for a given set of stakes.
+func GetCmdGetAccountHistory() (*dcli.QueryDescriptor, *types.GetAccountHistoryRequest) {
+	return &dcli.QueryDescriptor{
+		Use:   "account-history [account]",
+		Short: "Get rewards distribution history for an address",
+		Long:  `{{.Short}}{{.ExampleHeader}} account-history cosmos1chl62vc593p99z2tfh2pp8tl4anm0w4l8h8svx`,
+	}, &types.GetAccountHistoryRequest{}
 }

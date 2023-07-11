@@ -71,6 +71,17 @@ func (k Keeper) Distribute(ctx sdk.Context, gauges types.Gauges) (types.Distribu
 		if err != nil {
 			return nil, err
 		}
+
+		// Accumulate to account history
+		accHistory, found := k.GetAccountHistory(ctx, addr)
+		if found {
+			accHistory.Coins = accHistory.Coins.Add(rewards...)
+		} else {
+			accHistory = NewAccountHistory(addr, rewards)
+		}
+		k.SetAccountHistory(ctx, accHistory)
+
+		// Emit events
 		ctx.EventManager().EmitEvents(sdk.Events{
 			sdk.NewEvent(
 				types.TypeEvtDistribution,

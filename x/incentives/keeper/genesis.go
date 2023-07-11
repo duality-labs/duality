@@ -12,23 +12,30 @@ import (
 func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 	k.SetParams(ctx, genState.Params)
 	if err := k.InitializeAllStakes(ctx, genState.Stakes); err != nil {
-		return
+		panic(err)
 	}
 	if err := k.InitializeAllGauges(ctx, genState.Gauges); err != nil {
-		return
+		panic(err)
 	}
 	k.SetLastStakeID(ctx, genState.LastStakeId)
 	k.SetLastGaugeID(ctx, genState.LastGaugeId)
+	for _, accountHistory := range genState.AccountHistories {
+		err := k.SetAccountHistory(ctx, accountHistory)
+		if err != nil {
+			panic(err)
+		}
+	}
 }
 
 // ExportGenesis returns the x/incentives module's exported genesis.
 func (k Keeper) ExportGenesis(ctx sdk.Context) *types.GenesisState {
 	return &types.GenesisState{
-		Params:      k.GetParams(ctx),
-		Gauges:      k.GetNotFinishedGauges(ctx),
-		LastGaugeId: k.GetLastGaugeID(ctx),
-		LastStakeId: k.GetLastStakeID(ctx),
-		Stakes:      k.GetStakes(ctx),
+		Params:           k.GetParams(ctx),
+		Gauges:           k.GetNotFinishedGauges(ctx),
+		LastGaugeId:      k.GetLastGaugeID(ctx),
+		LastStakeId:      k.GetLastStakeID(ctx),
+		Stakes:           k.GetStakes(ctx),
+		AccountHistories: k.GetAllAccountHistory(ctx),
 	}
 }
 

@@ -103,6 +103,19 @@ func TestGetCmdFutureRewardEstimate(t *testing.T) {
 	dcli.RunQueryTestCases(t, desc, tcs)
 }
 
+func TestGetAccountHistory(t *testing.T) {
+	desc, _ := cli.GetCmdGetAccountHistory()
+	tcs := map[string]dcli.QueryCliTestCase[*types.GetAccountHistoryRequest]{
+		"basic test": {
+			Cmd: fmt.Sprintf("%s", testAddresses[0]),
+			ExpectedQuery: &types.GetAccountHistoryRequest{
+				Account: testAddresses[0].String(),
+			},
+		},
+	}
+	dcli.RunQueryTestCases(t, desc, tcs)
+}
+
 // TXS ////////////////////////////////////////////////////////////////////////
 
 func TestNewCreateGaugeCmd(t *testing.T) {
