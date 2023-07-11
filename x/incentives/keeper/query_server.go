@@ -53,6 +53,21 @@ func (q QueryServer) GetGaugeByID(
 	return &types.GetGaugeByIDResponse{Gauge: gauge}, nil
 }
 
+func (q QueryServer) GetGaugeQualifyingValue(
+	goCtx context.Context,
+	req *types.GetGaugeQualifyingValueRequest,
+) (*types.GetGaugeQualifyingValueResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+	value, err := q.Keeper.GetGaugeQualifyingValue(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &types.GetGaugeQualifyingValueResponse{QualifyingValue: value}, nil
+}
+
 func (q QueryServer) GetGauges(
 	goCtx context.Context,
 	req *types.GetGaugesRequest,

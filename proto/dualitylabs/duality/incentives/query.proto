@@ -56,6 +56,13 @@ service Query {
     option (google.api.http).get =
         "/dualitylabs/duality/incentives/v1beta1/account_history/{account}";
   }
+
+  // Returns the total amount of value currently qualifying for the gauge. This is useful for calculating
+  // the prospective future rewards of staking.
+  rpc GetGaugeQualifyingValue(GetGaugeQualifyingValueRequest) returns (GetGaugeQualifyingValueResponse) {
+    option (google.api.http).get =
+        "/dualitylabs/duality/incentives/v1beta1/get_gauge_qualifying_value/{id}";
+  }
 }
 
 message GetModuleStatusRequest {}
@@ -79,6 +86,15 @@ message GetGaugeByIDRequest {
 message GetGaugeByIDResponse {
   // Gauge that corresponds to provided gague ID
   Gauge gauge = 1;
+}
+
+message GetGaugeQualifyingValueRequest {
+  // Gague ID being queried
+  uint64 id = 1;
+}
+message GetGaugeQualifyingValueResponse {
+  // The amount of value at the gauge's pricing tick currently qualifying for the gauge.
+  uint64 qualifying_value = 1;
 }
 
 enum GaugeStatus {
