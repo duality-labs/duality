@@ -21,7 +21,15 @@ const (
 var _ sdk.Msg = &MsgCreateGauge{}
 
 // NewMsgCreateGauge creates a message to create a gauge with the provided parameters.
-func NewMsgCreateGauge(isPerpetual bool, owner sdk.AccAddress, distributeTo QueryCondition, coins sdk.Coins, startTime time.Time, numEpochsPaidOver uint64, pricingTick int64) *MsgCreateGauge {
+func NewMsgCreateGauge(
+	isPerpetual bool,
+	owner sdk.AccAddress,
+	distributeTo QueryCondition,
+	coins sdk.Coins,
+	startTime time.Time,
+	numEpochsPaidOver uint64,
+	pricingTick int64,
+) *MsgCreateGauge {
 	return &MsgCreateGauge{
 		IsPerpetual:       isPerpetual,
 		Owner:             owner.String(),
@@ -49,19 +57,40 @@ func (m MsgCreateGauge) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "distribution start time should be set")
 	}
 	if m.NumEpochsPaidOver == 0 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "distribution period should be at least 1 epoch")
+		return sdkerrors.Wrapf(
+			sdkerrors.ErrInvalidRequest,
+			"distribution period should be at least 1 epoch",
+		)
 	}
 	if m.IsPerpetual && m.NumEpochsPaidOver != 1 {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "distribution period should be 1 epoch for perpetual gauge")
+		return sdkerrors.Wrapf(
+			sdkerrors.ErrInvalidRequest,
+			"distribution period should be 1 epoch for perpetual gauge",
+		)
 	}
 	if dextypes.IsTickOutOfRange(m.PricingTick) {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "pricing tick is out of range, must be between %d and %d", int64(dextypes.MaxTickExp)*-1, dextypes.MaxTickExp)
+		return sdkerrors.Wrapf(
+			sdkerrors.ErrInvalidRequest,
+			"pricing tick is out of range, must be between %d and %d",
+			int64(dextypes.MaxTickExp)*-1,
+			dextypes.MaxTickExp,
+		)
 	}
 	if dextypes.IsTickOutOfRange(m.DistributeTo.StartTick) {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "start tick is out of range, must be between %d and %d", int64(dextypes.MaxTickExp)*-1, dextypes.MaxTickExp)
+		return sdkerrors.Wrapf(
+			sdkerrors.ErrInvalidRequest,
+			"start tick is out of range, must be between %d and %d",
+			int64(dextypes.MaxTickExp)*-1,
+			dextypes.MaxTickExp,
+		)
 	}
 	if dextypes.IsTickOutOfRange(m.DistributeTo.EndTick) {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "start tick is out of range, must be between %d and %d", int64(dextypes.MaxTickExp)*-1, dextypes.MaxTickExp)
+		return sdkerrors.Wrapf(
+			sdkerrors.ErrInvalidRequest,
+			"start tick is out of range, must be between %d and %d",
+			int64(dextypes.MaxTickExp)*-1,
+			dextypes.MaxTickExp,
+		)
 	}
 
 	return nil
@@ -101,7 +130,10 @@ func (m MsgAddToGauge) ValidateBasic() error {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "owner should be set")
 	}
 	if m.Rewards.Empty() {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "additional rewards should not be empty")
+		return sdkerrors.Wrapf(
+			sdkerrors.ErrInvalidRequest,
+			"additional rewards should not be empty",
+		)
 	}
 
 	return nil
