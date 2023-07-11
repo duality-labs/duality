@@ -171,6 +171,7 @@ func (q QueryServer) GetFutureRewardEstimate(
 	goCtx context.Context,
 	req *types.GetFutureRewardEstimateRequest,
 ) (*types.GetFutureRewardEstimateResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -178,7 +179,6 @@ func (q QueryServer) GetFutureRewardEstimate(
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "empty owner")
 	}
 
-	ctx := sdk.UnwrapSDKContext(goCtx)
 	if req.NumEpochs > 365 {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "end epoch out of ranges")
 	}

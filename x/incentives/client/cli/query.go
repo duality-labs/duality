@@ -84,9 +84,9 @@ func GetCmdStakes() (*dcli.QueryDescriptor, *types.GetStakesRequest) {
 // GetCmdGetFutureRewardsEstimate returns a rewards estimate for a given set of stakes.
 func GetCmdGetFutureRewardEstimate() (*dcli.QueryDescriptor, *types.GetFutureRewardEstimateRequest) {
 	return &dcli.QueryDescriptor{
-		Use:   "reward-estimate [owner] [stakeIDs] [endEpoch]",
+		Use:   "reward-estimate [owner] [stakeIDs] [numEpochs]",
 		Short: "Get rewards estimate for set of stakes",
-		Long:  `{{.Short}}{{.ExampleHeader}} reward-estimate cosmos1chl62vc593p99z2tfh2pp8tl4anm0w4l8h8svx [1,2,3] 1681450672`,
+		Long:  `{{.Short}}{{.ExampleHeader}} reward-estimate cosmos1chl62vc593p99z2tfh2pp8tl4anm0w4l8h8svx [1,2,3] 365`,
 		CustomFieldParsers: map[string]dcli.CustomFieldParserFn{
 			"StakeIDs": dcli.ParseUintArray,
 		},
