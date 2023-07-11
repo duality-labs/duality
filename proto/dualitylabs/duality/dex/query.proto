@@ -91,7 +91,7 @@ message QueryParamsRequest {}
 // QueryParamsResponse is response type for the Query/Params RPC method.
 message QueryParamsResponse {
   // params holds all the parameters of this module.
-  Params params = 1 [(gogoproto.nullable) = false];
+  Params params = 1 [(gogoproto.nullable) = true];
 }
 
 message QueryGetLimitOrderTrancheUserRequest {
@@ -100,7 +100,7 @@ message QueryGetLimitOrderTrancheUserRequest {
 }
 
 message QueryGetLimitOrderTrancheUserResponse {
-	LimitOrderTrancheUser LimitOrderTrancheUser = 1 [(gogoproto.nullable) = false];
+	LimitOrderTrancheUser LimitOrderTrancheUser = 1 [(gogoproto.nullable) = true];
 }
 
 message QueryAllLimitOrderTrancheUserRequest {
@@ -108,7 +108,7 @@ message QueryAllLimitOrderTrancheUserRequest {
 }
 
 message QueryAllLimitOrderTrancheUserResponse {
-	repeated LimitOrderTrancheUser LimitOrderTrancheUser = 1 [(gogoproto.nullable) = false];
+	repeated LimitOrderTrancheUser LimitOrderTrancheUser = 1 [(gogoproto.nullable) = true];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
@@ -121,7 +121,7 @@ message QueryGetLimitOrderTrancheRequest {
 }
 
 message QueryGetLimitOrderTrancheResponse {
-	LimitOrderTranche LimitOrderTranche = 1 [(gogoproto.nullable) = false];
+	LimitOrderTranche LimitOrderTranche = 1 [(gogoproto.nullable) = true];
 }
 
 message QueryAllLimitOrderTrancheRequest {
@@ -131,7 +131,7 @@ message QueryAllLimitOrderTrancheRequest {
 }
 
 message QueryAllLimitOrderTrancheResponse {
-	repeated LimitOrderTranche LimitOrderTranche = 1 [(gogoproto.nullable) = false];
+	repeated LimitOrderTranche LimitOrderTranche = 1 [(gogoproto.nullable) = true];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
@@ -140,7 +140,7 @@ message QueryGetUserPositionsRequest {
 }
 
 message QueryGetUserPositionsResponse {
-  UserPositions UserPositions = 1 [(gogoproto.nullable) = false];
+  UserPositions UserPositions = 1 [(gogoproto.nullable) = true];
 }
 
 message QueryAllUserDepositsRequest {
@@ -148,7 +148,7 @@ message QueryAllUserDepositsRequest {
 }
 
 message QueryAllUserDepositsResponse {
-  repeated DepositRecord Deposits = 1 [(gogoproto.nullable) = false];
+  repeated DepositRecord Deposits = 1 [(gogoproto.nullable) = true];
 }
 
 message QueryAllUserLimitOrdersRequest {
@@ -156,7 +156,7 @@ message QueryAllUserLimitOrdersRequest {
 }
 
 message QueryAllUserLimitOrdersResponse {
-  repeated LimitOrderTrancheUser limitOrders = 1 [(gogoproto.nullable) = false];
+  repeated LimitOrderTrancheUser limitOrders = 1 [(gogoproto.nullable) = true];
 }
 
 message QueryAllTickLiquidityRequest {
@@ -166,7 +166,7 @@ message QueryAllTickLiquidityRequest {
 }
 
 message QueryAllTickLiquidityResponse {
-	repeated TickLiquidity tickLiquidity = 1 [(gogoproto.nullable) = false];
+	repeated TickLiquidity tickLiquidity = 1 [(gogoproto.nullable) = true];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
@@ -179,7 +179,7 @@ message QueryGetInactiveLimitOrderTrancheRequest {
 }
 
 message QueryGetInactiveLimitOrderTrancheResponse {
-	LimitOrderTranche inactiveLimitOrderTranche = 1 [(gogoproto.nullable) = false];
+	LimitOrderTranche inactiveLimitOrderTranche = 1 [(gogoproto.nullable) = true];
 }
 
 message QueryAllInactiveLimitOrderTrancheRequest {
@@ -187,7 +187,7 @@ message QueryAllInactiveLimitOrderTrancheRequest {
 }
 
 message QueryAllInactiveLimitOrderTrancheResponse {
-	repeated LimitOrderTranche inactiveLimitOrderTranche = 1 [(gogoproto.nullable) = false];
+	repeated LimitOrderTranche inactiveLimitOrderTranche = 1 [(gogoproto.nullable) = true];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
@@ -198,7 +198,7 @@ cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 
 message QueryAllPoolReservesResponse {
-  repeated PoolReserves poolReserves = 1 [(gogoproto.nullable) = false];
+  repeated PoolReserves poolReserves = 1 [(gogoproto.nullable) = true];
 cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
@@ -211,6 +211,6 @@ message QueryGetPoolReservesRequest {
 }
 
 message QueryGetPoolReservesResponse {
-	PoolReserves poolReserves = 1 [(gogoproto.nullable) = false];
+	PoolReserves poolReserves = 1 [(gogoproto.nullable) = true];
 }
 // this line is used by starport scaffolding # 3

@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"testing"
 
+	math "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	keepertest "github.com/duality-labs/duality/testutil/keeper"
 	"github.com/duality-labs/duality/testutil/nullify"
@@ -12,21 +13,24 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createNLimitOrderTranches(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.LimitOrderTranche {
-	items := make([]types.LimitOrderTranche, n)
+func createNLimitOrderTranches(
+	keeper *keeper.Keeper,
+	ctx sdk.Context,
+	n int,
+) []*types.LimitOrderTranche {
+	items := make([]*types.LimitOrderTranche, n)
 	for i := range items {
-		tranche := &types.LimitOrderTranche{
-			PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-			TokenIn:          "TokenA",
-			TickIndex:        int64(i),
-			TrancheKey:       strconv.Itoa(i),
-			ReservesTokenIn:  sdk.NewInt(10),
-			ReservesTokenOut: sdk.NewInt(10),
-			TotalTokenIn:     sdk.NewInt(10),
-			TotalTokenOut:    sdk.NewInt(10),
-		}
-		keeper.SetLimitOrderTranche(ctx, *tranche)
-		items[i] = *tranche
+		items[i] = types.MustNewLimitOrderTranche(
+			"TokenA",
+			"TokenB",
+			strconv.Itoa(i),
+			int64(i),
+			math.ZeroInt(),
+			math.ZeroInt(),
+			math.ZeroInt(),
+			math.ZeroInt(),
+		)
+		keeper.SetLimitOrderTranche(ctx, items[i])
 	}
 
 	return items
@@ -36,13 +40,8 @@ func TestGetLimitOrderTranche(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNLimitOrderTranches(keeper, ctx, 10)
 	for _, item := range items {
-		rst, found := keeper.GetLimitOrderTranche(ctx,
-			item.PairID,
-			item.TokenIn,
-			item.TickIndex,
-			item.TrancheKey,
-		)
-		require.True(t, found)
+		rst := keeper.GetLimitOrderTranche(ctx, item.Key)
+		require.NotNil(t, rst)
 		require.Equal(t,
 			nullify.Fill(&item),
 			nullify.Fill(&rst),
@@ -54,13 +53,8 @@ func TestRemoveLimitOrderTranche(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNLimitOrderTranches(keeper, ctx, 10)
 	for _, item := range items {
-		keeper.RemoveLimitOrderTranche(ctx, item)
-		_, found := keeper.GetLimitOrderTranche(ctx,
-			item.PairID,
-			item.TokenIn,
-			item.TickIndex,
-			item.TrancheKey,
-		)
-		require.False(t, found)
+		keeper.RemoveLimitOrderTranche(ctx, item.Key)
+		rst := keeper.GetLimitOrderTranche(ctx, item.Key)
+		require.Nil(t, rst)
 	}
 }

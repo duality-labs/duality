@@ -11,18 +11,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createNPoolReserves(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.PoolReserves {
-	items := make([]types.PoolReserves, n)
+func createNPoolReserves(k *keeper.Keeper, ctx sdk.Context, n int) []*types.PoolReserves {
+	items := make([]*types.PoolReserves, n)
 	for i := range items {
-		tranche := &types.PoolReserves{
-			PairID:    &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-			TokenIn:   "TokenA",
-			TickIndex: int64(i),
-			Fee:       uint64(i),
-			Reserves:  sdk.NewInt(10),
-		}
-		keeper.SetPoolReserves(ctx, *tranche)
-		items[i] = *tranche
+		pool := keeper.MustNewPool(types.MustNewPairID("TokenA", "TokenB"), int64(i), uint64(i))
+		pool.Deposit(sdk.NewInt(10), sdk.NewInt(0), sdk.ZeroInt(), true)
+		k.SetPool(ctx, pool)
+		items[i] = pool.LowerTick0
 	}
 
 	return items
@@ -32,12 +27,7 @@ func TestGetPoolReserves(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNPoolReserves(keeper, ctx, 10)
 	for _, item := range items {
-		rst, found := keeper.GetPoolReserves(ctx,
-			item.PairID,
-			item.TokenIn,
-			item.TickIndex,
-			item.Fee,
-		)
+		rst, found := keeper.GetPoolReserves(ctx, item.Key)
 		require.True(t, found)
 		require.Equal(t,
 			nullify.Fill(&item),
@@ -50,13 +40,8 @@ func TestRemovePoolReserves(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNPoolReserves(keeper, ctx, 10)
 	for _, item := range items {
-		keeper.RemovePoolReserves(ctx, item)
-		_, found := keeper.GetPoolReserves(ctx,
-			item.PairID,
-			item.TokenIn,
-			item.TickIndex,
-			item.Fee,
-		)
+		keeper.RemovePoolReserves(ctx, item.Key)
+		_, found := keeper.GetPoolReserves(ctx, item.Key)
 		require.False(t, found)
 	}
 }

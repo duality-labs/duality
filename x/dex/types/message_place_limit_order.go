@@ -23,15 +23,15 @@ func NewMsgPlaceLimitOrder(
 	maxAmountOut *sdk.Int,
 ) *MsgPlaceLimitOrder {
 	return &MsgPlaceLimitOrder{
-		Creator:        creator,
-		Receiver:       receiver,
-		TokenIn:        tokenIn,
-		TokenOut:       tokenOut,
-		TickIndex:      tickIndex,
-		AmountIn:       amountIn,
-		OrderType:      orderType,
-		ExpirationTime: goodTil,
-		MaxAmountOut:   maxAmountOut,
+		Creator:          creator,
+		Receiver:         receiver,
+		TokenIn:          tokenIn,
+		TokenOut:         tokenOut,
+		TickIndexInToOut: tickIndex,
+		AmountIn:         amountIn,
+		OrderType:        orderType,
+		ExpirationTime:   goodTil,
+		MaxAmountOut:     maxAmountOut,
 	}
 }
 

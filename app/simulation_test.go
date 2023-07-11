@@ -97,6 +97,7 @@ func BenchmarkSimulation(b *testing.B) {
 		0,
 		appOptions,
 		app.MakeEncodingConfig(),
+		nil,
 		baseapp.SetChainID(config.ChainID),
 	)
 	require.Equal(b, app.Name, bApp.Name())
@@ -173,6 +174,7 @@ func TestAppStateDeterminism(t *testing.T) {
 				simcli.FlagPeriodValue,
 				appOptions,
 				app.MakeEncodingConfig(),
+				nil,
 				fauxMerkleModeOpt,
 				baseapp.SetChainID(chainID),
 			)
@@ -258,6 +260,7 @@ func TestAppImportExport(t *testing.T) {
 		0,
 		appOptions,
 		app.MakeEncodingConfig(),
+		nil,
 		baseapp.SetChainID(config.ChainID),
 	)
 	require.Equal(t, app.Name, bApp.Name())
@@ -319,6 +322,7 @@ func TestAppImportExport(t *testing.T) {
 		0,
 		appOptions,
 		app.MakeEncodingConfig(),
+		nil,
 		baseapp.SetChainID(config.ChainID),
 	)
 	require.Equal(t, app.Name, bApp.Name())
@@ -439,6 +443,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		0,
 		appOptions,
 		app.MakeEncodingConfig(),
+		nil,
 		fauxMerkleModeOpt,
 		baseapp.SetChainID(config.ChainID),
 	)
@@ -506,6 +511,7 @@ func TestAppSimulationAfterImport(t *testing.T) {
 		0,
 		appOptions,
 		app.MakeEncodingConfig(),
+		nil,
 		fauxMerkleModeOpt,
 		baseapp.SetChainID(config.ChainID),
 	)

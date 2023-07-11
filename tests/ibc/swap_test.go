@@ -12,7 +12,13 @@ import (
 // consumer chain connected to the Cosmos Hub.
 func (s *IBCTestSuite) TestIBCSwapMiddleware_Success() {
 	// Send an IBC transfer from provider to Duality, so we can initialize a pool with the IBC denom token + native Duality token
-	s.IBCTransferProviderToDuality(s.providerAddr, s.dualityAddr, nativeDenom, ibcTransferAmount, "")
+	s.IBCTransferProviderToDuality(
+		s.providerAddr,
+		s.dualityAddr,
+		nativeDenom,
+		ibcTransferAmount,
+		"",
+	)
 
 	// Assert that the funds are gone from the acc on provider and present in the acc on Duality
 	newProviderBalNative := genesisWalletAmount.Sub(ibcTransferAmount)
@@ -43,13 +49,13 @@ func (s *IBCTestSuite) TestIBCSwapMiddleware_Success() {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &dextypes.MsgPlaceLimitOrder{
-				Creator:   s.dualityAddr.String(),
-				Receiver:  s.dualityAddr.String(),
-				TokenIn:   s.providerToDualityDenom,
-				TokenOut:  nativeDenom,
-				AmountIn:  swapAmount,
-				TickIndex: 1,
-				OrderType: dextypes.LimitOrderType_FILL_OR_KILL,
+				Creator:          s.dualityAddr.String(),
+				Receiver:         s.dualityAddr.String(),
+				TokenIn:          s.providerToDualityDenom,
+				TokenOut:         nativeDenom,
+				AmountIn:         swapAmount,
+				TickIndexInToOut: 1,
+				OrderType:        dextypes.LimitOrderType_FILL_OR_KILL,
 				// TODO: enable soon
 				// MaxAmountOut: minOut,
 			},
@@ -60,10 +66,20 @@ func (s *IBCTestSuite) TestIBCSwapMiddleware_Success() {
 	metadataBz, err := json.Marshal(metadata)
 	s.Require().NoError(err)
 
-	s.IBCTransferProviderToDuality(s.providerAddr, s.dualityAddr, nativeDenom, ibcTransferAmount, string(metadataBz))
+	s.IBCTransferProviderToDuality(
+		s.providerAddr,
+		s.dualityAddr,
+		nativeDenom,
+		ibcTransferAmount,
+		string(metadataBz),
+	)
 
 	// Check that the funds are moved out of the acc on providerChain
-	s.assertProviderBalance(s.providerAddr, nativeDenom, newProviderBalNative.Sub(ibcTransferAmount))
+	s.assertProviderBalance(
+		s.providerAddr,
+		nativeDenom,
+		newProviderBalNative.Sub(ibcTransferAmount),
+	)
 
 	// Check that the swap funds are now present in the acc on Duality
 	s.assertDualityBalance(s.dualityAddr, nativeDenom, postDepositDualityBalNative.Add(expectedOut))
@@ -80,13 +96,13 @@ func (s *IBCTestSuite) TestIBCSwapMiddleware_FailRefund() {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &dextypes.MsgPlaceLimitOrder{
-				Creator:   s.dualityAddr.String(),
-				Receiver:  s.dualityAddr.String(),
-				TokenIn:   s.providerToDualityDenom,
-				TokenOut:  nativeDenom,
-				AmountIn:  swapAmount,
-				TickIndex: 1,
-				OrderType: dextypes.LimitOrderType_FILL_OR_KILL,
+				Creator:          s.dualityAddr.String(),
+				Receiver:         s.dualityAddr.String(),
+				TokenIn:          s.providerToDualityDenom,
+				TokenOut:         nativeDenom,
+				AmountIn:         swapAmount,
+				TickIndexInToOut: 1,
+				OrderType:        dextypes.LimitOrderType_FILL_OR_KILL,
 			},
 			NonRefundable: false,
 			Next:          nil,
@@ -97,7 +113,13 @@ func (s *IBCTestSuite) TestIBCSwapMiddleware_FailRefund() {
 	s.Require().NoError(err)
 
 	// Send (failing) IBC transfer with  swap metadata
-	s.IBCTransferProviderToDuality(s.providerAddr, s.dualityAddr, nativeDenom, ibcTransferAmount, string(metadataBz))
+	s.IBCTransferProviderToDuality(
+		s.providerAddr,
+		s.dualityAddr,
+		nativeDenom,
+		ibcTransferAmount,
+		string(metadataBz),
+	)
 
 	// Check that the funds are not present in the account on Duality
 	s.assertDualityBalance(s.dualityAddr, nativeDenom, genesisWalletAmount)
@@ -115,13 +137,13 @@ func (s *IBCTestSuite) TestIBCSwapMiddleware_FailNoRefund() {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &dextypes.MsgPlaceLimitOrder{
-				Creator:   s.dualityAddr.String(),
-				Receiver:  s.dualityAddr.String(),
-				TokenIn:   s.providerToDualityDenom,
-				TokenOut:  nativeDenom,
-				AmountIn:  swapAmount,
-				TickIndex: 1,
-				OrderType: dextypes.LimitOrderType_FILL_OR_KILL,
+				Creator:          s.dualityAddr.String(),
+				Receiver:         s.dualityAddr.String(),
+				TokenIn:          s.providerToDualityDenom,
+				TokenOut:         nativeDenom,
+				AmountIn:         swapAmount,
+				TickIndexInToOut: 1,
+				OrderType:        dextypes.LimitOrderType_FILL_OR_KILL,
 			},
 			NonRefundable: true,
 			Next:          nil,
@@ -132,7 +154,13 @@ func (s *IBCTestSuite) TestIBCSwapMiddleware_FailNoRefund() {
 	s.Require().NoError(err)
 
 	// Send (failing) IBC transfer with swap metadata
-	s.IBCTransferProviderToDuality(s.providerAddr, s.dualityAddr, nativeDenom, ibcTransferAmount, string(metadataBz))
+	s.IBCTransferProviderToDuality(
+		s.providerAddr,
+		s.dualityAddr,
+		nativeDenom,
+		ibcTransferAmount,
+		string(metadataBz),
+	)
 
 	// Check that the funds are present in the account on Duality
 	s.assertDualityBalance(s.dualityAddr, nativeDenom, genesisWalletAmount)
@@ -153,13 +181,13 @@ func (s *IBCTestSuite) TestIBCSwapMiddleware_FailWithRefundAddr() {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &dextypes.MsgPlaceLimitOrder{
-				Creator:   s.dualityAddr.String(),
-				Receiver:  s.dualityAddr.String(),
-				TokenIn:   s.providerToDualityDenom,
-				TokenOut:  nativeDenom,
-				AmountIn:  swapAmount,
-				TickIndex: 1,
-				OrderType: dextypes.LimitOrderType_FILL_OR_KILL,
+				Creator:          s.dualityAddr.String(),
+				Receiver:         s.dualityAddr.String(),
+				TokenIn:          s.providerToDualityDenom,
+				TokenOut:         nativeDenom,
+				AmountIn:         swapAmount,
+				TickIndexInToOut: 1,
+				OrderType:        dextypes.LimitOrderType_FILL_OR_KILL,
 			},
 			RefundAddress: refundAddr.String(),
 			NonRefundable: true,
@@ -171,7 +199,13 @@ func (s *IBCTestSuite) TestIBCSwapMiddleware_FailWithRefundAddr() {
 	s.Require().NoError(err)
 
 	// Send (failing) IBC transfer with swap metadata
-	s.IBCTransferProviderToDuality(s.providerAddr, s.dualityAddr, nativeDenom, ibcTransferAmount, string(metadataBz))
+	s.IBCTransferProviderToDuality(
+		s.providerAddr,
+		s.dualityAddr,
+		nativeDenom,
+		ibcTransferAmount,
+		string(metadataBz),
+	)
 
 	// Check that the funds have been moved to the refund address
 	s.assertDualityBalance(refundAddr, nativeDenom, genesisWalletAmount)

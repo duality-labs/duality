@@ -22,24 +22,26 @@ func (k Keeper) TickLiquidityAll(
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	var tickLiquiditys []types.TickLiquidity
+	var tickLiquidities []*types.TickLiquidity
 	ctx := sdk.UnwrapSDKContext(c)
 
-	pairID, err := types.StringToPairID(req.PairID)
+	pairID, err := types.NewPairIDFromCanonicalString(req.PairID)
 	if err != nil {
 		return nil, err
 	}
 
+	tradePairID := types.NewTradePairIDFromMaker(pairID, req.TokenIn)
+
 	store := ctx.KVStore(k.storeKey)
-	tickLiquidityStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairID, req.TokenIn))
+	tickLiquidityStore := prefix.NewStore(store, types.TickLiquidityPrefix(tradePairID))
 
 	pageRes, err := query.Paginate(tickLiquidityStore, req.Pagination, func(key, value []byte) error {
-		var tickLiquidity types.TickLiquidity
-		if err := k.cdc.Unmarshal(value, &tickLiquidity); err != nil {
+		tickLiquidity := &types.TickLiquidity{}
+		if err := k.cdc.Unmarshal(value, tickLiquidity); err != nil {
 			return err
 		}
 
-		tickLiquiditys = append(tickLiquiditys, tickLiquidity)
+		tickLiquidities = append(tickLiquidities, tickLiquidity)
 
 		return nil
 	})
@@ -47,5 +49,5 @@ func (k Keeper) TickLiquidityAll(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.QueryAllTickLiquidityResponse{TickLiquidity: tickLiquiditys, Pagination: pageRes}, nil
+	return &types.QueryAllTickLiquidityResponse{TickLiquidity: tickLiquidities, Pagination: pageRes}, nil
 }

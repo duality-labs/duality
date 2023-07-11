@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/binary"
+	"errors"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -31,29 +32,6 @@ const (
 	DepositSharesPrefix = "DualityPoolShares"
 )
 
-func KeyPrefix(p string) []byte {
-	key := []byte(p)
-	key = append(key, []byte("/")...)
-	return key
-}
-
-func TickIndexToBytes(tickIndex int64, pairID *PairID, tokenIn string) []byte {
-	// NOTE: We flip the sign on ticks storing token0 so that all liquidity is index left to right.
-	// This allows us to iterate through liquidity consistently regardless of 0to1 vs 1to0
-	if pairID.Token0 == tokenIn {
-		tickIndex *= -1
-	}
-	key := make([]byte, 9)
-	if tickIndex < 0 {
-		copy(key[1:], sdk.Uint64ToBigEndian(uint64(tickIndex)))
-	} else {
-		copy(key[:1], []byte{0x01})
-		copy(key[1:], sdk.Uint64ToBigEndian(uint64(tickIndex)))
-	}
-
-	return key
-}
-
 const (
 	// TickLiquidityKeyPrefix is the prefix to retrieve all TickLiquidity
 	TickLiquidityKeyPrefix = "TickLiquidity/value/"
@@ -70,6 +48,39 @@ const (
 	// LimitOrderExpirationKeyPrefix is the prefix to retrieve all LimitOrderExpiration
 	LimitOrderExpirationKeyPrefix = "LimitOrderExpiration/value/"
 )
+
+func KeyPrefix(p string) []byte {
+	key := []byte(p)
+	key = append(key, []byte("/")...)
+	return key
+}
+
+func TickIndexToBytes(tickTakerToMaker int64) []byte {
+	key := make([]byte, 9)
+	if tickTakerToMaker < 0 {
+		copy(key[1:], sdk.Uint64ToBigEndian(uint64(tickTakerToMaker)))
+	} else {
+		copy(key[:1], []byte{0x01})
+		copy(key[1:], sdk.Uint64ToBigEndian(uint64(tickTakerToMaker)))
+	}
+
+	return key
+}
+
+func BytesToTickIndex(bz []byte) (int64, error) {
+	if len(bz) != 9 {
+		return 0, errors.New("input should be 9 bytes long")
+	}
+
+	isNegative := bz[0] == 0
+	tickTakerToMaker := sdk.BigEndianToUint64(bz[1:])
+
+	if isNegative {
+		return int64(-tickTakerToMaker), nil
+	} else {
+		return int64(tickTakerToMaker), nil
+	}
+}
 
 // LimitOrderTrancheUserKey returns the store key to retrieve a LimitOrderTrancheUser from the index fields
 func LimitOrderTrancheUserKey(address, trancheKey string) []byte {
@@ -97,49 +108,26 @@ func LimitOrderTrancheUserAddressPrefix(address string) []byte {
 
 // InactiveLimitOrderTrancheKey returns the store key to retrieve a InactiveLimitOrderTranche from the index fields
 func InactiveLimitOrderTrancheKey(
-	pairID *PairID,
-	tokenIn string,
-	tickIndex int64,
+	tradePairID *TradePairID,
+	tickIndexTakerToMaker int64,
 	trancheKey string,
 ) []byte {
-	var key []byte
+	key := KeyPrefix(InactiveLimitOrderTrancheKeyPrefix)
 
-	pairIDBytes := []byte(pairID.Stringify())
+	pairIDBytes := []byte(tradePairID.MustPairID().CanonicalString())
 	key = append(key, pairIDBytes...)
 	key = append(key, []byte("/")...)
 
-	tokenInBytes := []byte(tokenIn)
-	key = append(key, tokenInBytes...)
+	makerDenomBytes := []byte(tradePairID.MakerDenom)
+	key = append(key, makerDenomBytes...)
 	key = append(key, []byte("/")...)
 
-	tickIndexBytes := TickIndexToBytes(tickIndex, pairID, tokenIn)
+	tickIndexBytes := TickIndexToBytes(tickIndexTakerToMaker)
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
 	trancheKeyBytes := []byte(trancheKey)
 	key = append(key, trancheKeyBytes...)
-	key = append(key, []byte("/")...)
-
-	return key
-}
-
-func InactiveLimitOrderTranchePrefix(
-	pairID *PairID,
-	tokenIn string,
-	tickIndex int64,
-) []byte {
-	key := KeyPrefix(InactiveLimitOrderTrancheKeyPrefix)
-
-	pairIDBytes := []byte(pairID.Stringify())
-	key = append(key, pairIDBytes...)
-	key = append(key, []byte("/")...)
-
-	tokenInBytes := []byte(tokenIn)
-	key = append(key, tokenInBytes...)
-	key = append(key, []byte("/")...)
-
-	tickIndexBytes := TickIndexToBytes(tickIndex, pairID, tokenIn)
-	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
 	return key
@@ -164,53 +152,21 @@ func TimeBytes(timestamp time.Time) []byte {
 	return []byte(str)
 }
 
-func TickLiquidityKey(
-	pairID *PairID,
-	tokenIn string,
-	tickIndex int64,
-	liquidityType string,
-	liquidityIndex interface{},
-) []byte {
-	var key []byte
-
-	pairIDBytes := []byte(pairID.Stringify())
-	key = append(key, pairIDBytes...)
-	key = append(key, []byte("/")...)
-
-	tokenInBytes := []byte(tokenIn)
-	key = append(key, tokenInBytes...)
-	key = append(key, []byte("/")...)
-
-	tickIndexBytes := TickIndexToBytes(tickIndex, pairID, tokenIn)
-	key = append(key, tickIndexBytes...)
-	key = append(key, []byte("/")...)
-
-	liquidityTypeBytes := []byte(liquidityType)
-	key = append(key, liquidityTypeBytes...)
-	key = append(key, []byte("/")...)
-
-	key = append(key, LiquidityIndexBytes(liquidityIndex)...)
-	key = append(key, []byte("/")...)
-
-	return key
-}
-
 func TickLiquidityLimitOrderPrefix(
-	pairID *PairID,
-	tokenIn string,
-	tickIndex int64,
+	tradePairID *TradePairID,
+	tickIndexTakerTomMaker int64,
 ) []byte {
 	key := KeyPrefix(TickLiquidityKeyPrefix)
 
-	pairIDBytes := []byte(pairID.Stringify())
+	pairIDBytes := []byte(tradePairID.MustPairID().CanonicalString())
 	key = append(key, pairIDBytes...)
 	key = append(key, []byte("/")...)
 
-	tokenInBytes := []byte(tokenIn)
-	key = append(key, tokenInBytes...)
+	makerDenomBytes := []byte(tradePairID.MakerDenom)
+	key = append(key, makerDenomBytes...)
 	key = append(key, []byte("/")...)
 
-	tickIndexBytes := TickIndexToBytes(tickIndex, pairID, tokenIn)
+	tickIndexBytes := TickIndexToBytes(tickIndexTakerTomMaker)
 	key = append(key, tickIndexBytes...)
 	key = append(key, []byte("/")...)
 
@@ -221,10 +177,10 @@ func TickLiquidityLimitOrderPrefix(
 	return key
 }
 
-func TickLiquidityPrefix(pairID *PairID, tokenIn string) []byte {
+func TickLiquidityPrefix(tradePairID *TradePairID) []byte {
 	var key []byte
-	key = append(KeyPrefix(TickLiquidityKeyPrefix), KeyPrefix(pairID.Stringify())...)
-	key = append(key, KeyPrefix(tokenIn)...)
+	key = append(KeyPrefix(TickLiquidityKeyPrefix), KeyPrefix(tradePairID.MustPairID().CanonicalString())...)
+	key = append(key, KeyPrefix(tradePairID.MakerDenom)...)
 
 	return key
 }

@@ -276,7 +276,7 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedCreatingArbToken0() {
 	s.aliceDeposits(NewDeposit(10, 0, 4000, 1))
 
 	// Bob arbs
-	s.bobLimitSells("TokenB", int(s.GetCurrTick0To1()), 50, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
+	s.bobLimitSells("TokenB", -1, 50, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
 	s.bobLimitSells("TokenA", 1, 10)
 	s.assertBobBalances(50, 52)
 }
@@ -301,8 +301,8 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedCreatingArbToken1() {
 	s.aliceDeposits(NewDeposit(0, 10, -4000, 0))
 
 	// Bob arbs
-	s.bobLimitSells("TokenA", int(s.GetCurrTick1To0()), 50, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
-	s.bobLimitSells("TokenB", 1, 10)
+	s.bobLimitSells("TokenA", -1, 50, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
+	s.bobLimitSells("TokenB", -1, 10)
 	s.assertBobBalances(52, 50)
 }
 

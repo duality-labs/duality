@@ -28,9 +28,9 @@ func TestPoolReservesQuerySingle(t *testing.T) {
 			desc: "First",
 			request: &types.QueryGetPoolReservesRequest{
 				PairID:    "TokenA<>TokenB",
-				TickIndex: msgs[0].TickIndex,
+				TickIndex: msgs[0].Key.TickIndexTakerToMaker,
 				TokenIn:   "TokenA",
-				Fee:       msgs[0].Fee,
+				Fee:       msgs[0].Key.Fee,
 			},
 			response: &types.QueryGetPoolReservesResponse{PoolReserves: msgs[0]},
 		},
@@ -38,9 +38,9 @@ func TestPoolReservesQuerySingle(t *testing.T) {
 			desc: "Second",
 			request: &types.QueryGetPoolReservesRequest{
 				PairID:    "TokenA<>TokenB",
-				TickIndex: msgs[1].TickIndex,
+				TickIndex: msgs[1].Key.TickIndexTakerToMaker,
 				TokenIn:   "TokenA",
-				Fee:       msgs[1].Fee,
+				Fee:       msgs[1].Key.Fee,
 			},
 			response: &types.QueryGetPoolReservesResponse{PoolReserves: msgs[1]},
 		},
@@ -100,8 +100,8 @@ func TestPoolReservesQueryPaginated(t *testing.T) {
 			require.NoError(t, err)
 			require.LessOrEqual(t, len(resp.PoolReserves), step)
 			require.Subset(t,
-				nullify.Fill(msgs),
-				nullify.Fill(resp.PoolReserves),
+				msgs,
+				resp.PoolReserves,
 			)
 		}
 	})
@@ -113,8 +113,8 @@ func TestPoolReservesQueryPaginated(t *testing.T) {
 			require.NoError(t, err)
 			require.LessOrEqual(t, len(resp.PoolReserves), step)
 			require.Subset(t,
-				nullify.Fill(msgs),
-				nullify.Fill(resp.PoolReserves),
+				msgs,
+				resp.PoolReserves,
 			)
 			next = resp.Pagination.NextKey
 		}
@@ -124,8 +124,8 @@ func TestPoolReservesQueryPaginated(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, len(msgs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
-			nullify.Fill(msgs),
-			nullify.Fill(resp.PoolReserves),
+			msgs,
+			resp.PoolReserves,
 		)
 	})
 	t.Run("InvalidRequest", func(t *testing.T) {
