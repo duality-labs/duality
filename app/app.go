@@ -175,6 +175,7 @@ var (
 		ccvconsumertypes.ConsumerRedistributeName:     nil,
 		ccvconsumertypes.ConsumerToSendToProviderName: nil,
 		incentivesmoduletypes.ModuleName:              nil,
+		buildertypes.ModuleName:                       nil,
 
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
