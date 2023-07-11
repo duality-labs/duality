@@ -505,6 +505,7 @@ func NewApp(
 		app.BankKeeper,
 		app.EpochsKeeper,
 		app.DexKeeper,
+		AppAuthority,
 	)
 
 	app.IncentivesKeeper.SetHooks(

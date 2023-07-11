@@ -3,6 +3,7 @@ module github.com/duality-labs/duality
 go 1.19
 
 require (
+	cosmossdk.io/errors v1.0.0-beta.7
 	cosmossdk.io/math v1.0.1
 	github.com/CosmWasm/wasmd v0.40.2
 	github.com/cometbft/cometbft v0.37.2
@@ -33,7 +34,6 @@ require (
 	cloud.google.com/go/iam v0.13.0 // indirect
 	cloud.google.com/go/storage v1.29.0 // indirect
 	cosmossdk.io/api v0.3.1 // indirect
-	cosmossdk.io/errors v1.0.0-beta.7 // indirect
 	cosmossdk.io/log v1.1.0 // indirect
 	cosmossdk.io/tools/rosetta v0.2.1 // indirect
 	github.com/CosmWasm/wasmvm v1.2.4 // indirect
