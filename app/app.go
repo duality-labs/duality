@@ -122,6 +122,10 @@ import (
 
 	pobabci "github.com/skip-mev/pob/abci"
 	pobmempool "github.com/skip-mev/pob/mempool"
+
+	grouptypes "github.com/cosmos/cosmos-sdk/x/group"
+	ibcclienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
+	ibcconnectiontypes "github.com/cosmos/ibc-go/v7/modules/core/03-connection/types"
 )
 
 const (
@@ -551,19 +555,81 @@ func NewApp(
 		panic(fmt.Sprintf("error while reading wasm config: %s", err))
 	}
 
-	// wasmOpts = append(
-	// 	wasmbinding.RegisterCustomPlugins(
-	// 		&app.InterchainTxsKeeper,
-	// 		&app.InterchainQueriesKeeper,
-	// 		app.TransferKeeper,
-	// 		&app.AdminmoduleKeeper,
-	// 		app.FeeBurnerKeeper,
-	// 		app.FeeKeeper,
-	// 		&app.BankKeeper,
-	// 		app.TokenFactoryKeeper,
-	// 		&app.CronKeeper,
-	// 	),
-	// 	wasmOpts...)
+	acceptList := wasmkeeper.AcceptedStargateQueries{
+		// ibc
+		"/ibc.core.client.v1.Query/ClientState":          &ibcclienttypes.QueryClientStateResponse{},
+		"/ibc.core.client.v1.Query/ConsensusState":       &ibcclienttypes.QueryConsensusStateResponse{},
+		"/ibc.core.connection.v1.Query/Connection":       &ibcconnectiontypes.QueryConnectionResponse{},
+		"/ibc.applications.transfer.v1.Query/DenomTrace": &ibctransfertypes.QueryDenomTraceResponse{},
+
+		// auth
+		"/cosmos.auth.v1beta1.Query/Account": &authtypes.QueryAccountResponse{},
+		"/cosmos.auth.v1beta1.Query/Params":  &authtypes.QueryParamsResponse{},
+
+		// bank
+		"/cosmos.bank.v1beta1.Query/Balance":       &banktypes.QueryBalanceResponse{},
+		"/cosmos.bank.v1beta1.Query/DenomMetadata": &banktypes.QueryDenomsMetadataResponse{},
+		"/cosmos.bank.v1beta1.Query/Params":        &banktypes.QueryParamsResponse{},
+		"/cosmos.bank.v1beta1.Query/SupplyOf":      &banktypes.QuerySupplyOfResponse{},
+
+		// x/dex
+		"/dualitylabs.duality.dex.Query/Params":                &dexmoduletypes.QueryParamsResponse{},
+		"/dualitylabs.duality.dex.Query/LimitOrderTrancheUser": &dexmoduletypes.QueryGetLimitOrderTrancheUserResponse{},
+		// "/dualitylabs.duality.dex.Query/LimitOrderTrancheUserAll": &dexmoduletypes.QueryAllLimitOrderTrancheUserResponse{},
+		"/dualitylabs.duality.dex.Query/LimitOrderTranche": &dexmoduletypes.QueryGetLimitOrderTrancheResponse{},
+		// "/dualitylabs.duality.dex.Query/LimitOrderTrancheAll":     &dexmoduletypes.QueryAllLimitOrderTrancheResponse{},
+		"/dualitylabs.duality.dex.Query/GetUserPositions": &dexmoduletypes.QueryGetUserPositionsResponse{},
+		// "/dualitylabs.duality.dex.Query/UserDepositsAll":              &dexmoduletypes.QueryAllUserDepositsResponse{},
+		// "/dualitylabs.duality.dex.Query/UserLimitOrdersAll":           &dexmoduletypes.QueryAllUserLimitOrdersResponse{},
+		// "/dualitylabs.duality.dex.Query/TickLiquidityAll":             &dexmoduletypes.QueryAllTickLiquidityResponse{},
+		"/dualitylabs.duality.dex.Query/InactiveLimitOrderTranche": &dexmoduletypes.QueryGetInactiveLimitOrderTrancheResponse{},
+		// "/dualitylabs.duality.dex.Query/InactiveLimitOrderTrancheAll": &dexmoduletypes.QueryAllInactiveLimitOrderTrancheResponse{},
+		// "/dualitylabs.duality.dex.Query/PoolReservesAll":              &dexmoduletypes.QueryAllPoolReservesResponse{},
+		"/dualitylabs.duality.dex.Query/PoolReserves":         &dexmoduletypes.QueryGetPoolReservesResponse{},
+		"/dualitylabs.duality.dex.Query/EstimateMultiHopSwap": &dexmoduletypes.QueryEstimateMultiHopSwapResponse{},
+
+		// x/incentives
+		"/dualitylabs.duality.incentives.Query/GetModuleStatus":         &incentivesmoduletypes.GetModuleStatusResponse{},
+		"/dualitylabs.duality.incentives.Query/GetGaugeByID":            &incentivesmoduletypes.GetGaugeByIDResponse{},
+		"/dualitylabs.duality.incentives.Query/GetGauges":               &incentivesmoduletypes.GetGaugesResponse{},
+		"/dualitylabs.duality.incentives.Query/GetStakeByID":            &incentivesmoduletypes.GetStakeByIDResponse{},
+		"/dualitylabs.duality.incentives.Query/GetStakes":               &incentivesmoduletypes.GetStakesResponse{},
+		"/dualitylabs.duality.incentives.Query/GetFutureRewardEstimate": &incentivesmoduletypes.GetFutureRewardEstimateResponse{},
+		"/dualitylabs.duality.incentives.Query/GetAccountHistory":       &incentivesmoduletypes.GetAccountHistoryResponse{},
+		"/dualitylabs.duality.incentives.Query/GetGaugeQualifyingValue": &incentivesmoduletypes.GetGaugeQualifyingValueResponse{},
+
+		// x/group queries
+		"/cosmos.group.v1.Query/GroupInfo":              &grouptypes.QueryGroupInfoResponse{},
+		"/cosmos.group.v1.Query/GroupPolicyInfo":        &grouptypes.QueryGroupPolicyInfoResponse{},
+		"/cosmos.group.v1.Query/GroupMembers":           &grouptypes.QueryGroupMembersResponse{},
+		"/cosmos.group.v1.Query/GroupsByAdmin":          &grouptypes.QueryGroupsByAdminResponse{},
+		"/cosmos.group.v1.Query/GroupPoliciesByGroup":   &grouptypes.QueryGroupPoliciesByGroupResponse{},
+		"/cosmos.group.v1.Query/GroupPoliciesByAdmin":   &grouptypes.QueryGroupPoliciesByAdminResponse{},
+		"/cosmos.group.v1.Query/Proposal":               &grouptypes.QueryProposalResponse{},
+		"/cosmos.group.v1.Query/ProposalsByGroupPolicy": &grouptypes.QueryProposalsByGroupPolicyResponse{},
+		"/cosmos.group.v1.Query/VoteByProposalVoter":    &grouptypes.QueryVoteByProposalVoterResponse{},
+		"/cosmos.group.v1.Query/VotesByProposal":        &grouptypes.QueryVotesByProposalResponse{},
+		"/cosmos.group.v1.Query/VotesByVoter":           &grouptypes.QueryVotesByVoterResponse{},
+		"/cosmos.group.v1.Query/GroupsByMember":         &grouptypes.QueryGroupsByMemberResponse{},
+		"/cosmos.group.v1.Query/TallyResult":            &grouptypes.QueryTallyResultResponse{},
+		"/cosmos.group.v1.Query/Groups":                 &grouptypes.QueryGroupsResponse{},
+
+		// x/epochs
+		"/dualitylabs.duality.epochs.Query/EpochInfos":   &epochsmoduletypes.QueryEpochsInfoResponse{},
+		"/dualitylabs.duality.epochs.Query/CurrentEpoch": &epochsmoduletypes.QueryCurrentEpochResponse{},
+	}
+
+	wasmOpts = append(
+		wasmOpts,
+		wasmkeeper.WithQueryPlugins(
+			&wasmkeeper.QueryPlugins{
+				Stargate: wasmkeeper.AcceptListStargateQuerier(
+					acceptList,
+					app.GRPCQueryRouter(),
+					appCodec,
+				),
+			},
+		))
 
 	app.WasmKeeper = wasm.NewKeeper(
 		appCodec,

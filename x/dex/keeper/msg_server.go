@@ -7,19 +7,19 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
-type msgServer struct {
+type MsgServer struct {
 	Keeper
 }
 
 // NewMsgServerImpl returns an implementation of the MsgServer interface
 // for the provided Keeper.
 func NewMsgServerImpl(keeper Keeper) types.MsgServer {
-	return &msgServer{Keeper: keeper}
+	return &MsgServer{Keeper: keeper}
 }
 
-var _ types.MsgServer = msgServer{}
+var _ types.MsgServer = MsgServer{}
 
-func (k msgServer) Deposit(
+func (k MsgServer) Deposit(
 	goCtx context.Context,
 	msg *types.MsgDeposit,
 ) (*types.MsgDepositResponse, error) {
@@ -57,7 +57,7 @@ func (k msgServer) Deposit(
 	}, nil
 }
 
-func (k msgServer) Withdrawal(
+func (k MsgServer) Withdrawal(
 	goCtx context.Context,
 	msg *types.MsgWithdrawal,
 ) (*types.MsgWithdrawalResponse, error) {
@@ -87,7 +87,7 @@ func (k msgServer) Withdrawal(
 	return &types.MsgWithdrawalResponse{}, nil
 }
 
-func (k msgServer) PlaceLimitOrder(
+func (k MsgServer) PlaceLimitOrder(
 	goCtx context.Context,
 	msg *types.MsgPlaceLimitOrder,
 ) (*types.MsgPlaceLimitOrderResponse, error) {
@@ -123,7 +123,7 @@ func (k msgServer) PlaceLimitOrder(
 	}, nil
 }
 
-func (k msgServer) WithdrawFilledLimitOrder(
+func (k MsgServer) WithdrawFilledLimitOrder(
 	goCtx context.Context,
 	msg *types.MsgWithdrawFilledLimitOrder,
 ) (*types.MsgWithdrawFilledLimitOrderResponse, error) {
@@ -141,7 +141,7 @@ func (k msgServer) WithdrawFilledLimitOrder(
 	return &types.MsgWithdrawFilledLimitOrderResponse{}, nil
 }
 
-func (k msgServer) CancelLimitOrder(
+func (k MsgServer) CancelLimitOrder(
 	goCtx context.Context,
 	msg *types.MsgCancelLimitOrder,
 ) (*types.MsgCancelLimitOrderResponse, error) {
@@ -159,7 +159,7 @@ func (k msgServer) CancelLimitOrder(
 	return &types.MsgCancelLimitOrderResponse{}, nil
 }
 
-func (k msgServer) MultiHopSwap(
+func (k MsgServer) MultiHopSwap(
 	goCtx context.Context,
 	msg *types.MsgMultiHopSwap,
 ) (*types.MsgMultiHopSwapResponse, error) {
