@@ -12,7 +12,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/cosmos/cosmos-sdk/x/group"
 
 	dbm "github.com/cometbft/cometbft-db"
@@ -175,6 +174,8 @@ var (
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 
+	// This is the address of the admin multisig group, the first group policy configured in x/group.
+	// You can rederive this by checking out the `multisig-setup` branch and looking at the README.md.
 	AppAuthority = "cosmos1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfwkgpd"
 )
 
@@ -332,7 +333,7 @@ func NewApp(
 	app.ConsensusParamsKeeper = consensusparamkeeper.NewKeeper(
 		appCodec,
 		keys[upgradetypes.StoreKey],
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		AppAuthority,
 	)
 	bApp.SetParamStore(&app.ConsensusParamsKeeper)
 
@@ -358,7 +359,7 @@ func NewApp(
 		authtypes.ProtoBaseAccount,
 		maccPerms,
 		sdk.Bech32PrefixAccAddr,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		AppAuthority,
 	)
 
 	app.AuthzKeeper = authzkeeper.NewKeeper(
@@ -373,8 +374,7 @@ func NewApp(
 		keys[banktypes.StoreKey],
 		app.AccountKeeper,
 		app.BlockedModuleAccountAddrs(),
-		// TODO: Set
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		AppAuthority,
 	)
 
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(
@@ -383,8 +383,7 @@ func NewApp(
 		appCodec,
 		homePath,
 		app.BaseApp,
-		// TODO: Set
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		AppAuthority,
 	)
 
 	// Create IBC Keeper
@@ -402,8 +401,7 @@ func NewApp(
 		encConfig.Amino,
 		keys[slashingtypes.StoreKey],
 		&app.ConsumerKeeper,
-		// TODO: Set
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		AppAuthority,
 	)
 
 	app.ConsumerKeeper = ccvconsumerkeeper.NewKeeper(
@@ -429,8 +427,7 @@ func NewApp(
 		invCheckPeriod,
 		app.BankKeeper,
 		authtypes.FeeCollectorName,
-		// TODO: Set
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+		AppAuthority,
 	)
 
 	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(
@@ -947,7 +944,7 @@ func (app *App) ModuleAccountAddrs() map[string]bool {
 // addresses.
 func (app *App) BlockedModuleAccountAddrs() map[string]bool {
 	modAccAddrs := app.ModuleAccountAddrs()
-	delete(modAccAddrs, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	delete(modAccAddrs, AppAuthority)
 	delete(
 		modAccAddrs,
 		authtypes.NewModuleAddress(ccvconsumertypes.ConsumerToSendToProviderName).String(),
@@ -1165,7 +1162,7 @@ func BlockedAddresses() map[string]bool {
 	}
 
 	// allow the following addresses to receive funds
-	delete(modAccAddrs, authtypes.NewModuleAddress(govtypes.ModuleName).String())
+	delete(modAccAddrs, AppAuthority)
 
 	return modAccAddrs
 }
