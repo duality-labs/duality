@@ -5,17 +5,23 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	forwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/types"
 	transfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
 	"github.com/duality-labs/duality/x/dex/types"
 	swaptypes "github.com/duality-labs/duality/x/ibcswap/types"
 	"github.com/iancoleman/orderedmap"
-	forwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/types"
 	"golang.org/x/exp/maps"
 )
 
 func (s *IBCTestSuite) TestSwapAndForward_Success() {
 	// Send an IBC transfer from provider chain to duality, so we can initialize a pool with the IBC denom token + native Duality token
-	s.IBCTransferProviderToDuality(s.providerAddr, s.dualityAddr, nativeDenom, ibcTransferAmount, "")
+	s.IBCTransferProviderToDuality(
+		s.providerAddr,
+		s.dualityAddr,
+		nativeDenom,
+		ibcTransferAmount,
+		"",
+	)
 
 	// Assert that the funds are gone from the acc on provider and present in the acc on Duality
 	newProviderBalNative := genesisWalletAmount.Sub(ibcTransferAmount)
@@ -67,13 +73,13 @@ func (s *IBCTestSuite) TestSwapAndForward_Success() {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   s.dualityAddr.String(),
-				Receiver:  s.dualityAddr.String(),
-				TokenIn:   s.providerToDualityDenom,
-				TokenOut:  nativeDenom,
-				AmountIn:  swapAmount,
-				TickIndex: 2,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          s.dualityAddr.String(),
+				Receiver:         s.dualityAddr.String(),
+				TokenIn:          s.providerToDualityDenom,
+				TokenOut:         nativeDenom,
+				AmountIn:         swapAmount,
+				TickIndexInToOut: 2,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 			},
 			Next: nextJSON,
 		},
@@ -83,14 +89,24 @@ func (s *IBCTestSuite) TestSwapAndForward_Success() {
 	s.Require().NoError(err)
 
 	// Send an IBC transfer from provider to duality with packet memo containing the swap metadata
-	s.IBCTransferProviderToDuality(s.providerAddr, s.dualityAddr, nativeDenom, ibcTransferAmount, string(metadataBz))
+	s.IBCTransferProviderToDuality(
+		s.providerAddr,
+		s.dualityAddr,
+		nativeDenom,
+		ibcTransferAmount,
+		string(metadataBz),
+	)
 
 	// Relay the packets
 	err = s.RelayAllPacketsAToB(s.dualityChainBPath)
 	s.Assert().NoError(err)
 
 	// Check that the funds are moved out of the acc on providerChain
-	s.assertProviderBalance(s.providerAddr, nativeDenom, newProviderBalNative.Sub(ibcTransferAmount))
+	s.assertProviderBalance(
+		s.providerAddr,
+		nativeDenom,
+		newProviderBalNative.Sub(ibcTransferAmount),
+	)
 
 	// Check that the amountIn is deduced from the duality account
 	s.assertDualityBalance(s.dualityAddr, s.providerToDualityDenom, sdk.ZeroInt())
@@ -112,7 +128,13 @@ func (s *IBCTestSuite) TestSwapAndForward_Success() {
 
 func (s *IBCTestSuite) TestSwapAndForward_MultiHopSuccess() {
 	// Send an IBC transfer from provider chain to duality, so we can initialize a pool with the IBC denom token + native Duality token
-	s.IBCTransferProviderToDuality(s.providerAddr, s.dualityAddr, nativeDenom, ibcTransferAmount, "")
+	s.IBCTransferProviderToDuality(
+		s.providerAddr,
+		s.dualityAddr,
+		nativeDenom,
+		ibcTransferAmount,
+		"",
+	)
 
 	// Assert that the funds are gone from the acc on provider and present in the acc on Duality
 	newProviderBalNative := genesisWalletAmount.Sub(ibcTransferAmount)
@@ -179,13 +201,13 @@ func (s *IBCTestSuite) TestSwapAndForward_MultiHopSuccess() {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   s.dualityAddr.String(),
-				Receiver:  s.dualityAddr.String(),
-				TokenIn:   s.providerToDualityDenom,
-				TokenOut:  nativeDenom,
-				AmountIn:  swapAmount,
-				TickIndex: 2,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          s.dualityAddr.String(),
+				Receiver:         s.dualityAddr.String(),
+				TokenIn:          s.providerToDualityDenom,
+				TokenOut:         nativeDenom,
+				AmountIn:         swapAmount,
+				TickIndexInToOut: 2,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 			},
 			Next: nextJSON,
 		},
@@ -195,7 +217,13 @@ func (s *IBCTestSuite) TestSwapAndForward_MultiHopSuccess() {
 	s.Assert().NoError(err)
 
 	// Send an IBC transfer from provider to duality with packet memo containing the swap metadata
-	s.IBCTransferProviderToDuality(s.providerAddr, s.dualityAddr, nativeDenom, ibcTransferAmount, string(metadataBz))
+	s.IBCTransferProviderToDuality(
+		s.providerAddr,
+		s.dualityAddr,
+		nativeDenom,
+		ibcTransferAmount,
+		string(metadataBz),
+	)
 
 	dualityPacket := maps.Values(s.dualityChain.SentPackets)[0]
 	err = s.dualityChainBPath.EndpointB.UpdateClient()
@@ -219,7 +247,11 @@ func (s *IBCTestSuite) TestSwapAndForward_MultiHopSuccess() {
 	transferDenomB_C := transfertypes.ParseDenomTrace(transferDenomPathB_C).IBCDenom()
 
 	// Check that the funds are moved out of the acc on chainA
-	s.assertProviderBalance(s.providerAddr, nativeDenom, newProviderBalNative.Sub(ibcTransferAmount))
+	s.assertProviderBalance(
+		s.providerAddr,
+		nativeDenom,
+		newProviderBalNative.Sub(ibcTransferAmount),
+	)
 	// Check that chain B balance is unchanged
 	s.assertChainBBalance(chainBAddr, transferDenomDuality_B, sdk.ZeroInt())
 
@@ -232,7 +264,13 @@ func (s *IBCTestSuite) TestSwapAndForward_MultiHopSuccess() {
 // This asserts that denom unwinding works as intended when going provider->duality->provider
 func (s *IBCTestSuite) TestSwapAndForward_UnwindIBCDenomSuccess() {
 	// Send an IBC transfer from provider chain to duality, so we can initialize a pool with the IBC denom token + native Duality token
-	s.IBCTransferProviderToDuality(s.providerAddr, s.dualityAddr, nativeDenom, ibcTransferAmount, "")
+	s.IBCTransferProviderToDuality(
+		s.providerAddr,
+		s.dualityAddr,
+		nativeDenom,
+		ibcTransferAmount,
+		"",
+	)
 
 	// Assert that the funds are gone from the acc on provider and present in the acc on Duality
 	newProviderBalNative := genesisWalletAmount.Sub(ibcTransferAmount)
@@ -282,13 +320,13 @@ func (s *IBCTestSuite) TestSwapAndForward_UnwindIBCDenomSuccess() {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   s.dualityAddr.String(),
-				Receiver:  s.dualityAddr.String(),
-				TokenIn:   nativeDenom,
-				TokenOut:  s.providerToDualityDenom,
-				AmountIn:  swapAmount,
-				TickIndex: 2,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          s.dualityAddr.String(),
+				Receiver:         s.dualityAddr.String(),
+				TokenIn:          nativeDenom,
+				TokenOut:         s.providerToDualityDenom,
+				AmountIn:         swapAmount,
+				TickIndexInToOut: 2,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 			},
 			Next: nextJSON,
 		},
@@ -298,7 +336,13 @@ func (s *IBCTestSuite) TestSwapAndForward_UnwindIBCDenomSuccess() {
 	s.Require().NoError(err)
 
 	// Send an IBC transfer from provider to duality with packet memo containing the swap metadata
-	s.IBCTransferProviderToDuality(s.providerAddr, s.dualityAddr, nativeDenom, ibcTransferAmount, string(metadataBz))
+	s.IBCTransferProviderToDuality(
+		s.providerAddr,
+		s.dualityAddr,
+		nativeDenom,
+		ibcTransferAmount,
+		string(metadataBz),
+	)
 
 	// Relay the packets
 	s.RelayAllPacketsAToB(s.dualityTransferPath)
@@ -309,7 +353,11 @@ func (s *IBCTestSuite) TestSwapAndForward_UnwindIBCDenomSuccess() {
 	// Check that the amountIn has been deducted from the duality chain
 	s.assertDualityBalance(s.dualityAddr, nativeDenom, postDepositDualityBalNative.Sub(swapAmount))
 	// Check that the funds are now present on the provider chainer
-	s.assertProviderBalance(s.providerAddr, nativeDenom, newProviderBalNative.Sub(ibcTransferAmount).Add(expectedAmountOut))
+	s.assertProviderBalance(
+		s.providerAddr,
+		nativeDenom,
+		newProviderBalNative.Sub(ibcTransferAmount).Add(expectedAmountOut),
+	)
 
 	s.Assert().NoError(err)
 }
@@ -318,7 +366,13 @@ func (s *IBCTestSuite) TestSwapAndForward_UnwindIBCDenomSuccess() {
 // that an incoming IBC swap succeeds but the forward fails.
 func (s *IBCTestSuite) TestSwapAndForward_ForwardFails() {
 	// Send an IBC transfer from provider chain to duality, so we can initialize a pool with the IBC denom token + native Duality token
-	s.IBCTransferProviderToDuality(s.providerAddr, s.dualityAddr, nativeDenom, ibcTransferAmount, "")
+	s.IBCTransferProviderToDuality(
+		s.providerAddr,
+		s.dualityAddr,
+		nativeDenom,
+		ibcTransferAmount,
+		"",
+	)
 
 	// Assert that the funds are gone from the acc on provider and present in the acc on Duality
 	newProviderBalNative := genesisWalletAmount.Sub(ibcTransferAmount)
@@ -370,13 +424,13 @@ func (s *IBCTestSuite) TestSwapAndForward_ForwardFails() {
 	metadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   s.dualityAddr.String(),
-				Receiver:  s.dualityAddr.String(),
-				TokenIn:   s.providerToDualityDenom,
-				TokenOut:  nativeDenom,
-				AmountIn:  swapAmount,
-				TickIndex: 2,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          s.dualityAddr.String(),
+				Receiver:         s.dualityAddr.String(),
+				TokenIn:          s.providerToDualityDenom,
+				TokenOut:         nativeDenom,
+				AmountIn:         swapAmount,
+				TickIndexInToOut: 2,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 			},
 			Next: nextJSON,
 		},
@@ -386,7 +440,13 @@ func (s *IBCTestSuite) TestSwapAndForward_ForwardFails() {
 	s.Require().NoError(err)
 
 	// Send an IBC transfer from provider to duality with packet memo containing the swap metadata
-	s.IBCTransferProviderToDuality(s.providerAddr, s.dualityAddr, nativeDenom, ibcTransferAmount, string(metadataBz))
+	s.IBCTransferProviderToDuality(
+		s.providerAddr,
+		s.dualityAddr,
+		nativeDenom,
+		ibcTransferAmount,
+		string(metadataBz),
+	)
 
 	// Relay the packets from duality => ChainB
 	err = s.RelayAllPacketsAToB(s.dualityChainBPath)
@@ -394,12 +454,20 @@ func (s *IBCTestSuite) TestSwapAndForward_ForwardFails() {
 	s.Assert().Error(err)
 
 	// Check that the funds are moved out of the acc on providerChain
-	s.assertProviderBalance(s.providerAddr, nativeDenom, newProviderBalNative.Sub(ibcTransferAmount))
+	s.assertProviderBalance(
+		s.providerAddr,
+		nativeDenom,
+		newProviderBalNative.Sub(ibcTransferAmount),
+	)
 
 	// Check that the amountIn is deduced from the duality account
 	s.assertDualityBalance(s.dualityAddr, s.providerToDualityDenom, sdk.ZeroInt())
 	// Check that the amountOut stays on the dualitychain
-	s.assertDualityBalance(s.dualityAddr, nativeDenom, postDepositDualityBalNative.Add(expectedAmountOut))
+	s.assertDualityBalance(
+		s.dualityAddr,
+		nativeDenom,
+		postDepositDualityBalNative.Add(expectedAmountOut),
+	)
 
 	// Check that nothing made it to chainB
 	transferDenomPath := transfertypes.GetPrefixedDenom(

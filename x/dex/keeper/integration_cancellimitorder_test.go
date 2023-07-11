@@ -100,7 +100,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderATwoExistDiffTicksDi
 	// Alice adds one limit orders from A to B and one from B to A and removes the one from A to B
 
 	trancheKey := s.aliceLimitSells("TokenA", 0, 10)
-	s.aliceLimitSells("TokenB", -1, 10)
+	s.aliceLimitSells("TokenB", 1, 10)
 
 	s.assertAliceBalances(40, 40)
 	s.assertDexBalances(10, 10)
@@ -121,7 +121,7 @@ func (s *MsgServerTestSuite) TestCancelHigherEntireLimitOrderBTwoExistDiffTicksS
 	// Alice adds two limit orders from B to A and removes the one at tick 0
 
 	trancheKey := s.aliceLimitSells("TokenB", 0, 10)
-	s.aliceLimitSells("TokenB", 1, 10)
+	s.aliceLimitSells("TokenB", -1, 10)
 
 	s.assertAliceBalances(50, 30)
 	s.assertDexBalances(0, 20)
@@ -142,7 +142,7 @@ func (s *MsgServerTestSuite) TestCancelLowerEntireLimitOrderBTwoExistDiffTicksSa
 	// Alice adds two limit orders from B to A and removes the one at tick 0
 
 	s.aliceLimitSells("TokenB", 0, 10)
-	trancheKey := s.aliceLimitSells("TokenB", 1, 10)
+	trancheKey := s.aliceLimitSells("TokenB", -1, 10)
 
 	s.assertAliceBalances(50, 30)
 	s.assertDexBalances(0, 20)
@@ -182,7 +182,7 @@ func (s *MsgServerTestSuite) TestCancelPartiallyFilled() {
 	// GIVEN alice limit sells 50 TokenA
 	trancheKey := s.aliceLimitSells("TokenA", 0, 50)
 	// Bob swaps 25 TokenB for TokenA
-	s.bobLimitSells("TokenB", 10, 25, types.LimitOrderType_FILL_OR_KILL)
+	s.bobLimitSells("TokenB", -10, 25, types.LimitOrderType_FILL_OR_KILL)
 
 	s.assertDexBalances(25, 25)
 	s.assertAliceBalances(0, 0)
@@ -204,7 +204,7 @@ func (s *MsgServerTestSuite) TestCancelPartiallyFilledMultiUser() {
 	trancheKey := s.aliceLimitSells("TokenA", 0, 50)
 	s.carolLimitSells("TokenA", 0, 100)
 	// Bob swaps 25 TokenB for TokenA
-	s.bobLimitSells("TokenB", 10, 25, types.LimitOrderType_FILL_OR_KILL)
+	s.bobLimitSells("TokenB", -10, 25, types.LimitOrderType_FILL_OR_KILL)
 
 	s.assertLimitLiquidityAtTick("TokenA", 0, 125)
 	s.assertDexBalances(125, 25)

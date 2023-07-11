@@ -1,10 +1,10 @@
-package keeper_test
+package types_test
 
 import (
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	. "github.com/duality-labs/duality/x/dex/keeper"
+	. "github.com/duality-labs/duality/x/dex/types"
 	"github.com/stretchr/testify/assert"
 )
 

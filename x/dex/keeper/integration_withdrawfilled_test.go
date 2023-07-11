@@ -22,7 +22,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledSimpleFull() {
 	s.assertCurr1To0(0)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.bobLimitSells("TokenB", 10, 10, types.LimitOrderType_FILL_OR_KILL)
+	s.bobLimitSells("TokenB", -10, 10, types.LimitOrderType_FILL_OR_KILL)
 
 	s.assertAliceBalances(40, 50)
 	s.assertBobBalances(60, 40)
@@ -95,7 +95,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.assertCurr1To0(0)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.bobLimitSells("TokenB", 10, 10, types.LimitOrderType_FILL_OR_KILL)
+	s.bobLimitSells("TokenB", -10, 10, types.LimitOrderType_FILL_OR_KILL)
 
 	s.assertAliceBalances(40, 50)
 	s.assertBobBalances(60, 40)
@@ -112,7 +112,7 @@ func (s *MsgServerTestSuite) TestWithdrawFilledTwiceFullSameDirection() {
 	s.assertCurr1To0(0)
 	s.assertCurr0To1(math.MaxInt64)
 
-	s.bobLimitSells("TokenB", 10, 10, types.LimitOrderType_FILL_OR_KILL)
+	s.bobLimitSells("TokenB", -10, 10, types.LimitOrderType_FILL_OR_KILL)
 
 	s.assertAliceBalances(30, 60)
 	s.assertBobBalances(70, 30)

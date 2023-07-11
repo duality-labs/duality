@@ -10,7 +10,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	keepertest "github.com/duality-labs/duality/testutil/keeper"
-	"github.com/duality-labs/duality/testutil/nullify"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
@@ -38,8 +37,8 @@ func TestTickLiquidityQueryPaginated(t *testing.T) {
 			require.NoError(t, err)
 			require.LessOrEqual(t, len(resp.TickLiquidity), step)
 			require.Subset(t,
-				nullify.Fill(msgs),
-				nullify.Fill(resp.TickLiquidity),
+				msgs,
+				resp.TickLiquidity,
 			)
 		}
 	})
@@ -51,8 +50,8 @@ func TestTickLiquidityQueryPaginated(t *testing.T) {
 			require.NoError(t, err)
 			require.LessOrEqual(t, len(resp.TickLiquidity), step)
 			require.Subset(t,
-				nullify.Fill(msgs),
-				nullify.Fill(resp.TickLiquidity),
+				msgs,
+				resp.TickLiquidity,
 			)
 			next = resp.Pagination.NextKey
 		}
@@ -62,8 +61,8 @@ func TestTickLiquidityQueryPaginated(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, len(msgs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
-			nullify.Fill(msgs),
-			nullify.Fill(resp.TickLiquidity),
+			msgs,
+			resp.TickLiquidity,
 		)
 	})
 	t.Run("InvalidRequest", func(t *testing.T) {

@@ -67,7 +67,7 @@ func (s *IBCTestSuite) TestGMPSwapAndForward_Success() {
 				TokenIn:   s.providerToDualityDenom,
 				TokenOut:  nativeDenom,
 				AmountIn:  swapAmount,
-				TickIndex: 2,
+				TickIndexInToOut: 2,
 				OrderType: types.LimitOrderType_FILL_OR_KILL,
 			},
 			Next: forwardNextJSON,

@@ -10,80 +10,81 @@ import (
 	"github.com/duality-labs/duality/x/dex/utils"
 )
 
+func NewLimitOrderTranche(
+	limitOrderTrancheKey *types.LimitOrderTrancheKey,
+	goodTil *time.Time,
+) (*types.LimitOrderTranche, error) {
+	priceTakerToMaker, err := limitOrderTrancheKey.PriceTakerToMaker()
+	if err != nil {
+		return nil, err
+	}
+	return &types.LimitOrderTranche{
+		Key:                limitOrderTrancheKey,
+		ReservesMakerDenom: sdk.ZeroInt(),
+		ReservesTakerDenom: sdk.ZeroInt(),
+		TotalMakerDenom:    sdk.ZeroInt(),
+		TotalTakerDenom:    sdk.ZeroInt(),
+		ExpirationTime:     goodTil,
+		PriceTakerToMaker:  priceTakerToMaker,
+	}, nil
+}
+
 func (k Keeper) FindLimitOrderTranche(
 	ctx sdk.Context,
-	pairID *types.PairID,
-	tickIndex int64,
-	token string,
-	trancheKey string,
-) (val types.LimitOrderTranche, fromFilled, found bool) {
+	limitOrderTrancheKey *types.LimitOrderTrancheKey,
+) (val *types.LimitOrderTranche, fromFilled, found bool) {
 	// Try to find the tranche in the active liq index
-	tick, found := k.GetLimitOrderTranche(ctx, pairID, token, tickIndex, trancheKey)
-	if found {
-		return *tick, false, true
+	tick := k.GetLimitOrderTranche(ctx, limitOrderTrancheKey)
+	if tick != nil {
+		return tick, false, true
 	}
 	// Look for filled limit orders
-	tranche, found := k.GetInactiveLimitOrderTranche(ctx, pairID, token, tickIndex, trancheKey)
+	tranche, found := k.GetInactiveLimitOrderTranche(ctx, limitOrderTrancheKey)
 	if found {
 		return tranche, true, true
 	}
 
-	return types.LimitOrderTranche{}, false, false
+	return nil, false, false
 }
 
-func (k Keeper) SaveTranche(ctx sdk.Context, tranche types.LimitOrderTranche) {
+func (k Keeper) SaveTranche(ctx sdk.Context, tranche *types.LimitOrderTranche) {
 	if tranche.HasTokenIn() {
 		k.SetLimitOrderTranche(ctx, tranche)
 	} else {
 		k.SetInactiveLimitOrderTranche(ctx, tranche)
-		k.RemoveLimitOrderTranche(ctx, tranche)
+		k.RemoveLimitOrderTranche(ctx, tranche.Key)
 	}
 
 	ctx.EventManager().EmitEvent(types.CreateTickUpdateLimitOrderTranche(tranche))
 }
 
-func (k Keeper) SetLimitOrderTranche(ctx sdk.Context, tranche types.LimitOrderTranche) {
+func (k Keeper) SetLimitOrderTranche(ctx sdk.Context, tranche *types.LimitOrderTranche) {
 	// Wrap tranche back into TickLiquidity
 	tick := types.TickLiquidity{
 		Liquidity: &types.TickLiquidity_LimitOrderTranche{
-			LimitOrderTranche: &tranche,
+			LimitOrderTranche: tranche,
 		},
 	}
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickLiquidityKeyPrefix))
 	b := k.cdc.MustMarshal(&tick)
-	store.Set(types.TickLiquidityKey(
-		tranche.PairID,
-		tranche.TokenIn,
-		tranche.TickIndex,
-		types.LiquidityTypeLimitOrder,
-		tranche.TrancheKey,
-	), b)
+	store.Set(tranche.Key.KeyMarshal(), b)
 }
 
 func (k Keeper) GetLimitOrderTranche(
 	ctx sdk.Context,
-	pairID *types.PairID,
-	tokenIn string,
-	tickIndex int64,
-	trancheKey string,
-) (tranche *types.LimitOrderTranche, found bool) {
+	limitOrderTrancheKey *types.LimitOrderTrancheKey,
+) (tranche *types.LimitOrderTranche) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickLiquidityKeyPrefix))
-	b := store.Get(types.TickLiquidityKey(
-		pairID,
-		tokenIn,
-		tickIndex,
-		types.LiquidityTypeLimitOrder,
-		trancheKey,
-	))
+	b := store.Get(limitOrderTrancheKey.KeyMarshal())
 
 	if b == nil {
-		return nil, false
+		return nil
 	}
 
 	var tick types.TickLiquidity
 	k.cdc.MustUnmarshal(b, &tick)
 
-	return tick.GetLimitOrderTranche(), true
+	return tick.GetLimitOrderTranche()
 }
 
 func (k Keeper) GetLimitOrderTrancheByKey(
@@ -103,26 +104,19 @@ func (k Keeper) GetLimitOrderTrancheByKey(
 	return tick.GetLimitOrderTranche(), true
 }
 
-func (k Keeper) RemoveLimitOrderTranche(ctx sdk.Context, tranche types.LimitOrderTranche) {
+func (k Keeper) RemoveLimitOrderTranche(ctx sdk.Context, trancheKey *types.LimitOrderTrancheKey) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.TickLiquidityKeyPrefix))
-	store.Delete(types.TickLiquidityKey(
-		tranche.PairID,
-		tranche.TokenIn,
-		tranche.TickIndex,
-		types.LiquidityTypeLimitOrder,
-		tranche.TrancheKey,
-	))
+	store.Delete(trancheKey.KeyMarshal())
 }
 
 func (k Keeper) GetPlaceTranche(
 	sdkCtx sdk.Context,
-	pairID *types.PairID,
-	tokenIn string,
-	tickIndex int64,
-) (types.LimitOrderTranche, bool) {
+	tradePairID *types.TradePairID,
+	tickIndexTakerToMaker int64,
+) *types.LimitOrderTranche {
 	prefixStore := prefix.NewStore(
 		sdkCtx.KVStore(k.storeKey),
-		types.TickLiquidityLimitOrderPrefix(pairID, tokenIn, tickIndex),
+		types.TickLiquidityLimitOrderPrefix(tradePairID, tickIndexTakerToMaker),
 	)
 	iter := prefixStore.Iterator(nil, nil)
 
@@ -132,22 +126,21 @@ func (k Keeper) GetPlaceTranche(
 		k.cdc.MustUnmarshal(iter.Value(), &tick)
 		tranche := tick.GetLimitOrderTranche()
 		if tranche.IsPlaceTranche() {
-			return *tranche, true
+			return tranche
 		}
 	}
 
-	return types.LimitOrderTranche{}, false
+	return nil
 }
 
 func (k Keeper) GetFillTranche(
 	sdkCtx sdk.Context,
-	pairID *types.PairID,
-	tokenIn string,
-	tickIndex int64,
+	tradePairID *types.TradePairID,
+	tickIndexTakerToMaker int64,
 ) (*types.LimitOrderTranche, bool) {
 	prefixStore := prefix.NewStore(
 		sdkCtx.KVStore(k.storeKey),
-		types.TickLiquidityLimitOrderPrefix(pairID, tokenIn, tickIndex),
+		types.TickLiquidityLimitOrderPrefix(tradePairID, tickIndexTakerToMaker),
 	)
 	iter := sdk.KVStorePrefixIterator(prefixStore, []byte{})
 
@@ -164,13 +157,12 @@ func (k Keeper) GetFillTranche(
 
 func (k Keeper) GetAllLimitOrderTrancheAtIndex(
 	sdkCtx sdk.Context,
-	pairID *types.PairID,
-	tokenIn string,
-	tickIndex int64,
+	tradePairID *types.TradePairID,
+	tickIndexTakerToMaker int64,
 ) (trancheList []types.LimitOrderTranche) {
 	prefixStore := prefix.NewStore(
 		sdkCtx.KVStore(k.storeKey),
-		types.TickLiquidityLimitOrderPrefix(pairID, tokenIn, tickIndex),
+		types.TickLiquidityLimitOrderPrefix(tradePairID, tickIndexTakerToMaker),
 	)
 	iter := sdk.KVStorePrefixIterator(prefixStore, []byte{})
 
@@ -207,12 +199,11 @@ func NewTrancheKey(sdkCtx sdk.Context) string {
 }
 
 func (k Keeper) GetOrInitPlaceTranche(ctx sdk.Context,
-	pairID *types.PairID,
-	tokenIn string,
-	tickIndex int64,
+	tradePairID *types.TradePairID,
+	tickIndexTakerToMaker int64,
 	goodTil *time.Time,
 	orderType types.LimitOrderType,
-) (placeTranche types.LimitOrderTranche, err error) {
+) (placeTranche *types.LimitOrderTranche, err error) {
 	// NOTE: Right now we are not indexing by goodTil date so we can't easily check if there's already a tranche
 	// with the same goodTil date so instead we create a new tranche for each goodTil order
 	// if there is a large number of limitOrders with the same goodTilTime (most likely JIT)
@@ -222,21 +213,35 @@ func (k Keeper) GetOrInitPlaceTranche(ctx sdk.Context,
 	JITGoodTilTime := types.JITGoodTilTime()
 	switch orderType {
 	case types.LimitOrderType_JUST_IN_TIME:
-		placeTranche, err = NewLimitOrderTranche(ctx, pairID, tokenIn, tickIndex, &JITGoodTilTime)
+		limitOrderTrancheKey := &types.LimitOrderTrancheKey{
+			TradePairID:           tradePairID,
+			TickIndexTakerToMaker: tickIndexTakerToMaker,
+			TrancheKey:            NewTrancheKey(ctx),
+		}
+		placeTranche, err = NewLimitOrderTranche(limitOrderTrancheKey, &JITGoodTilTime)
 	case types.LimitOrderType_GOOD_TIL_TIME:
-		placeTranche, err = NewLimitOrderTranche(ctx, pairID, tokenIn, tickIndex, goodTil)
+		limitOrderTrancheKey := &types.LimitOrderTrancheKey{
+			TradePairID:           tradePairID,
+			TickIndexTakerToMaker: tickIndexTakerToMaker,
+			TrancheKey:            NewTrancheKey(ctx),
+		}
+		placeTranche, err = NewLimitOrderTranche(limitOrderTrancheKey, goodTil)
 	default:
-		var found bool
-		placeTranche, found = k.GetPlaceTranche(ctx, pairID, tokenIn, tickIndex)
-		if !found {
-			placeTranche, err = NewLimitOrderTranche(ctx, pairID, tokenIn, tickIndex, nil)
+		placeTranche = k.GetPlaceTranche(ctx, tradePairID, tickIndexTakerToMaker)
+		if placeTranche == nil {
+			limitOrderTrancheKey := &types.LimitOrderTrancheKey{
+				TradePairID:           tradePairID,
+				TickIndexTakerToMaker: tickIndexTakerToMaker,
+				TrancheKey:            NewTrancheKey(ctx),
+			}
+			placeTranche, err = NewLimitOrderTranche(limitOrderTrancheKey, nil)
 			if err != nil {
-				return types.LimitOrderTranche{}, err
+				return nil, err
 			}
 		}
 	}
 	if err != nil {
-		return types.LimitOrderTranche{}, err
+		return nil, err
 	}
 
 	return placeTranche, nil

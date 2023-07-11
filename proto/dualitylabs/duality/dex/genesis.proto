@@ -13,9 +13,9 @@ option go_package = "github.com/duality-labs/duality/x/dex/types";
 // GenesisState defines the dex module's genesis state.
 message GenesisState {
   Params params = 1 [(gogoproto.nullable) = false];
-  repeated TickLiquidity tickLiquidityList = 2 [(gogoproto.nullable) = false];
-  repeated LimitOrderTranche inactiveLimitOrderTrancheList = 6 [(gogoproto.nullable) = false];
-  repeated LimitOrderTrancheUser limitOrderTrancheUserList = 7 [(gogoproto.nullable) = false];
+  repeated TickLiquidity tickLiquidityList = 2 [(gogoproto.nullable) = true];
+  repeated LimitOrderTranche inactiveLimitOrderTrancheList = 6 [(gogoproto.nullable) = true];
+  repeated LimitOrderTrancheUser limitOrderTrancheUserList = 7 [(gogoproto.nullable) = true];
 
 
   // this line is used by starport scaffolding # genesis/proto/state

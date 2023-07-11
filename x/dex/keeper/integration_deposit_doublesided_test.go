@@ -228,20 +228,20 @@ func (s *MsgServerTestSuite) TestDepositValueAccural() {
 	for i := 0; i < 100; i++ {
 		liquidityA, liquidityB := s.getLiquidityAtTick(0, 10)
 		if i%2 == 0 {
-			s.bobLimitSells("TokenB", 10, int(liquidityA.Int64()), types.LimitOrderType_FILL_OR_KILL)
+			s.bobLimitSells("TokenB", -10, int(liquidityA.Int64())+10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
 		} else {
-			s.bobLimitSells("TokenA", 10, int(liquidityB.Int64()), types.LimitOrderType_FILL_OR_KILL)
+			s.bobLimitSells("TokenA", 10, int(liquidityB.Int64())+10, types.LimitOrderType_IMMEDIATE_OR_CANCEL)
 		}
 	}
-	s.assertLiquidityAtTick(sdk.NewInt(199), sdk.NewInt(1), 0, 10)
-	s.assertDexBalances(199, 1)
+	s.assertLiquidityAtTick(sdk.NewInt(200), sdk.NewInt(0), 0, 10)
+	s.assertDexBalances(200, 0)
 
 	// Carol deposits 100TokenA @tick0
 	s.carolDeposits(NewDeposit(100, 1, 0, 10))
 	s.assertCarolShares(0, 10, 50)
 
 	s.aliceWithdraws(NewWithdrawal(100, 0, 10))
-	s.assertAliceBalances(199, 1)
+	s.assertAliceBalances(200, 0)
 
 	s.carolWithdraws(NewWithdrawal(50, 0, 10))
 	s.assertCarolBalances(100, 1)

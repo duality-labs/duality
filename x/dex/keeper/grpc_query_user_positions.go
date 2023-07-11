@@ -17,15 +17,20 @@ func (k Keeper) GetUserPositions(
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	address, err := sdk.AccAddressFromBech32(req.Address)
+	addr, err := sdk.AccAddressFromBech32(req.Address)
 	if err != nil {
 		return &types.QueryGetUserPositionsResponse{}, err
 	}
 
-	userProfile := NewUserProfile(address)
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	deposits := k.GetAllDepositsForAddress(ctx, addr)
+	limitOrders := k.GetAllLimitOrderTrancheUserForAddress(ctx, addr)
+
 	return &types.QueryGetUserPositionsResponse{
-		UserPositions: userProfile.GetAllPositions(ctx, k),
+		UserPositions: &types.UserPositions{
+			PoolDeposits: deposits,
+			LimitOrders:  limitOrders,
+		},
 	}, nil
 }

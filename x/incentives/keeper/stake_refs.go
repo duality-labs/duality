@@ -52,12 +52,8 @@ func getStakeRefKeys(stake *types.Stake) ([][]byte, error) {
 			panic("Only valid LP tokens should be staked")
 		}
 		denomBz := []byte(coin.Denom)
-		pairIDBz := []byte(depositDenom.PairID.Stringify())
-		tickBz := dextypes.TickIndexToBytes(
-			depositDenom.Tick,
-			depositDenom.PairID,
-			depositDenom.PairID.Token1,
-		)
+		pairIDBz := []byte(depositDenom.PairID.CanonicalString())
+		tickBz := dextypes.TickIndexToBytes(depositDenom.Tick)
 		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexDenom, denomBz))] = true
 		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexPairTick, pairIDBz, tickBz))] = true
 		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexAccountDenom, owner, denomBz))] = true
