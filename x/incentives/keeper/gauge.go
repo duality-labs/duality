@@ -62,7 +62,7 @@ func (k Keeper) setGaugeRefs(ctx sdk.Context, gauge *types.Gauge) error {
 		}
 		err := k.addRefByKey(
 			ctx,
-			types.GetKeyGaugeIndexByPair(gauge.DistributeTo.PairID.Stringify()),
+			types.GetKeyGaugeIndexByPair(gauge.DistributeTo.PairID.CanonicalString()),
 			gauge.Id,
 		)
 		if err != nil {
@@ -73,7 +73,7 @@ func (k Keeper) setGaugeRefs(ctx sdk.Context, gauge *types.Gauge) error {
 		if err != nil {
 			return err
 		}
-		err = k.addRefByKey(ctx, types.GetKeyGaugeIndexByPair(gauge.DistributeTo.PairID.Stringify()), gauge.Id)
+		err = k.addRefByKey(ctx, types.GetKeyGaugeIndexByPair(gauge.DistributeTo.PairID.CanonicalString()), gauge.Id)
 		if err != nil {
 			return err
 		}
@@ -201,6 +201,33 @@ func (k Keeper) GetGaugeByID(ctx sdk.Context, gaugeID uint64) (*types.Gauge, err
 	return &gauge, nil
 }
 
+// GetGaugeQualifyingValue returns gauge qualifying value from gauge ID.
+func (k Keeper) GetGaugeQualifyingValue(ctx sdk.Context, gaugeID uint64) (uint64, error) {
+	gauge := types.Gauge{}
+	store := ctx.KVStore(k.storeKey)
+	gaugeKey := types.GetKeyGaugeStore(gaugeID)
+	if !store.Has(gaugeKey) {
+		return 0, fmt.Errorf("gauge with ID %d does not exist", gaugeID)
+	}
+	bz := store.Get(gaugeKey)
+	if err := proto.Unmarshal(bz, &gauge); err != nil {
+		return 0, err
+	}
+	var value uint64 = 0
+	stakes := k.GetStakesByQueryCondition(ctx, &gauge.DistributeTo)
+	for _, stake := range stakes {
+		stakeCoins := stake.CoinsPassingQueryCondition(gauge.DistributeTo)
+		for _, stakeCoin := range stakeCoins {
+			adjustedPositionValue, err := k.ValueForShares(ctx, stakeCoin, gauge.PricingTick)
+			if err != nil {
+				return 0, err
+			}
+			value += value + adjustedPositionValue.Uint64()
+		}
+	}
+	return value, nil
+}
+
 // GetGauges returns upcoming, active, and finished gauges.
 func (k Keeper) GetGauges(ctx sdk.Context) types.Gauges {
 	return k.getGaugesFromIterator(ctx, k.iterator(ctx, types.KeyPrefixGaugeIndex))
@@ -249,7 +276,7 @@ func (k Keeper) moveActiveGaugeToFinishedGauge(ctx sdk.Context, gauge *types.Gau
 	}
 	err := k.deleteRefByKey(
 		ctx,
-		types.GetKeyGaugeIndexByPair(gauge.DistributeTo.PairID.Stringify()),
+		types.GetKeyGaugeIndexByPair(gauge.DistributeTo.PairID.CanonicalString()),
 		gauge.Id,
 	)
 	if err != nil {
@@ -277,6 +304,6 @@ func (k Keeper) GetFinishedGauges(ctx sdk.Context) types.Gauges {
 func (k Keeper) GetGaugesByPair(ctx sdk.Context, pair *dextypes.PairID) []*types.Gauge {
 	return k.getGaugesFromIterator(
 		ctx,
-		k.iterator(ctx, types.GetKeyGaugeIndexByPair(pair.Stringify())),
+		k.iterator(ctx, types.GetKeyGaugeIndexByPair(pair.CanonicalString())),
 	)
 }

@@ -13,12 +13,12 @@ func ParamKeyTable() paramtypes.KeyTable {
 }
 
 // NewParams creates a new Params instance
-func NewParams() Params {
-	return Params{}
+func NewParams() *Params {
+	return &Params{}
 }
 
 // DefaultParams returns a default set of parameters
-func DefaultParams() Params {
+func DefaultParams() *Params {
 	return NewParams()
 }
 

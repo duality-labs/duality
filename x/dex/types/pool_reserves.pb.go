@@ -24,19 +24,78 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+type PoolReservesKey struct {
+	TradePairID           *TradePairID `protobuf:"bytes,1,opt,name=tradePairID,proto3" json:"tradePairID,omitempty"`
+	TickIndexTakerToMaker int64        `protobuf:"varint,2,opt,name=TickIndexTakerToMaker,proto3" json:"TickIndexTakerToMaker,omitempty"`
+	Fee                   uint64       `protobuf:"varint,3,opt,name=Fee,proto3" json:"Fee,omitempty"`
+}
+
+func (m *PoolReservesKey) Reset()         { *m = PoolReservesKey{} }
+func (m *PoolReservesKey) String() string { return proto.CompactTextString(m) }
+func (*PoolReservesKey) ProtoMessage()    {}
+func (*PoolReservesKey) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e79192b22e683fdf, []int{0}
+}
+func (m *PoolReservesKey) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PoolReservesKey) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_PoolReservesKey.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *PoolReservesKey) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PoolReservesKey.Merge(m, src)
+}
+func (m *PoolReservesKey) XXX_Size() int {
+	return m.Size()
+}
+func (m *PoolReservesKey) XXX_DiscardUnknown() {
+	xxx_messageInfo_PoolReservesKey.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PoolReservesKey proto.InternalMessageInfo
+
+func (m *PoolReservesKey) GetTradePairID() *TradePairID {
+	if m != nil {
+		return m.TradePairID
+	}
+	return nil
+}
+
+func (m *PoolReservesKey) GetTickIndexTakerToMaker() int64 {
+	if m != nil {
+		return m.TickIndexTakerToMaker
+	}
+	return 0
+}
+
+func (m *PoolReservesKey) GetFee() uint64 {
+	if m != nil {
+		return m.Fee
+	}
+	return 0
+}
+
 type PoolReserves struct {
-	PairID    *PairID                                `protobuf:"bytes,1,opt,name=pairID,proto3" json:"pairID,omitempty"`
-	TokenIn   string                                 `protobuf:"bytes,2,opt,name=tokenIn,proto3" json:"tokenIn,omitempty"`
-	TickIndex int64                                  `protobuf:"varint,3,opt,name=tickIndex,proto3" json:"tickIndex,omitempty"`
-	Reserves  github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,4,opt,name=reserves,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"reserves" yaml:"reserves"`
-	Fee       uint64                                 `protobuf:"varint,5,opt,name=fee,proto3" json:"fee,omitempty"`
+	Key                       *PoolReservesKey                       `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	ReservesMakerDenom        github_com_cosmos_cosmos_sdk_types.Int `protobuf:"bytes,2,opt,name=reservesMakerDenom,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Int" json:"reservesMakerDenom" yaml:"reservesMakerDenom"`
+	PriceTakerToMaker         github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,3,opt,name=priceTakerToMaker,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"priceTakerToMaker" yaml:"priceTakerToMaker"`
+	PriceOppositeTakerToMaker github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,4,opt,name=priceOppositeTakerToMaker,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"priceOppositeTakerToMaker" yaml:"priceOppositeTakerToMaker"`
 }
 
 func (m *PoolReserves) Reset()         { *m = PoolReserves{} }
 func (m *PoolReserves) String() string { return proto.CompactTextString(m) }
 func (*PoolReserves) ProtoMessage()    {}
 func (*PoolReserves) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e79192b22e683fdf, []int{0}
+	return fileDescriptor_e79192b22e683fdf, []int{1}
 }
 func (m *PoolReserves) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -65,35 +124,15 @@ func (m *PoolReserves) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_PoolReserves proto.InternalMessageInfo
 
-func (m *PoolReserves) GetPairID() *PairID {
+func (m *PoolReserves) GetKey() *PoolReservesKey {
 	if m != nil {
-		return m.PairID
+		return m.Key
 	}
 	return nil
 }
 
-func (m *PoolReserves) GetTokenIn() string {
-	if m != nil {
-		return m.TokenIn
-	}
-	return ""
-}
-
-func (m *PoolReserves) GetTickIndex() int64 {
-	if m != nil {
-		return m.TickIndex
-	}
-	return 0
-}
-
-func (m *PoolReserves) GetFee() uint64 {
-	if m != nil {
-		return m.Fee
-	}
-	return 0
-}
-
 func init() {
+	proto.RegisterType((*PoolReservesKey)(nil), "dualitylabs.duality.dex.PoolReservesKey")
 	proto.RegisterType((*PoolReserves)(nil), "dualitylabs.duality.dex.PoolReserves")
 }
 
@@ -102,27 +141,79 @@ func init() {
 }
 
 var fileDescriptor_e79192b22e683fdf = []byte{
-	// 319 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xd2, 0x4e, 0x29, 0x4d, 0xcc,
-	0xc9, 0x2c, 0xa9, 0xcc, 0x49, 0x4c, 0x2a, 0xd6, 0x87, 0xb2, 0xf5, 0x53, 0x52, 0x2b, 0xf4, 0x0b,
-	0xf2, 0xf3, 0x73, 0xe2, 0x8b, 0x52, 0x8b, 0x53, 0x8b, 0xca, 0x52, 0x8b, 0xf5, 0x0a, 0x8a, 0xf2,
-	0x4b, 0xf2, 0x85, 0xc4, 0x91, 0x14, 0xeb, 0x41, 0xd9, 0x7a, 0x29, 0xa9, 0x15, 0x52, 0x22, 0xe9,
-	0xf9, 0xe9, 0xf9, 0x60, 0x35, 0xfa, 0x20, 0x16, 0x44, 0xb9, 0x94, 0x2a, 0x4e, 0xb3, 0x13, 0x33,
-	0x8b, 0xe2, 0x33, 0x53, 0x20, 0xca, 0x94, 0xfe, 0x30, 0x72, 0xf1, 0x04, 0xe4, 0xe7, 0xe7, 0x04,
-	0x41, 0x2d, 0x13, 0x32, 0xe7, 0x62, 0x03, 0xa9, 0xf0, 0x74, 0x91, 0x60, 0x54, 0x60, 0xd4, 0xe0,
-	0x36, 0x92, 0xd7, 0xc3, 0x61, 0xaf, 0x5e, 0x00, 0x58, 0x59, 0x10, 0x54, 0xb9, 0x90, 0x04, 0x17,
-	0x7b, 0x49, 0x7e, 0x76, 0x6a, 0x9e, 0x67, 0x9e, 0x04, 0x93, 0x02, 0xa3, 0x06, 0x67, 0x10, 0x8c,
-	0x2b, 0x24, 0xc3, 0xc5, 0x59, 0x92, 0x99, 0x9c, 0xed, 0x99, 0x97, 0x92, 0x5a, 0x21, 0xc1, 0xac,
-	0xc0, 0xa8, 0xc1, 0x1c, 0x84, 0x10, 0x10, 0xca, 0xe4, 0xe2, 0x80, 0xf9, 0x54, 0x82, 0x05, 0xa4,
-	0xd1, 0xc9, 0xf7, 0xc4, 0x3d, 0x79, 0x86, 0x5b, 0xf7, 0xe4, 0xd5, 0xd2, 0x33, 0x4b, 0x32, 0x4a,
-	0x93, 0xf4, 0x92, 0xf3, 0x73, 0xf5, 0x93, 0xf3, 0x8b, 0x73, 0xf3, 0x8b, 0xa1, 0x94, 0x6e, 0x71,
-	0x4a, 0xb6, 0x7e, 0x49, 0x65, 0x41, 0x6a, 0xb1, 0x9e, 0x67, 0x5e, 0xc9, 0xab, 0x7b, 0xf2, 0x70,
-	0x13, 0x3e, 0xdd, 0x93, 0xe7, 0xaf, 0x4c, 0xcc, 0xcd, 0xb1, 0x52, 0x82, 0x89, 0x28, 0x05, 0xc1,
-	0x25, 0x85, 0x04, 0xb8, 0x98, 0xd3, 0x52, 0x53, 0x25, 0x58, 0x15, 0x18, 0x35, 0x58, 0x82, 0x40,
-	0x4c, 0x27, 0xd7, 0x13, 0x8f, 0xe4, 0x18, 0x2f, 0x3c, 0x92, 0x63, 0x7c, 0xf0, 0x48, 0x8e, 0x71,
-	0xc2, 0x63, 0x39, 0x86, 0x0b, 0x8f, 0xe5, 0x18, 0x6e, 0x3c, 0x96, 0x63, 0x88, 0xd2, 0x46, 0xb2,
-	0x1c, 0xea, 0x6b, 0x5d, 0x94, 0xb0, 0xac, 0x00, 0x87, 0x26, 0xd8, 0x15, 0x49, 0x6c, 0xe0, 0xc0,
-	0x34, 0x06, 0x04, 0x00, 0x00, 0xff, 0xff, 0xd4, 0xe4, 0x65, 0xcf, 0xd1, 0x01, 0x00, 0x00,
+	// 431 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0x41, 0x6b, 0xd4, 0x40,
+	0x14, 0x80, 0x77, 0xcc, 0x22, 0x38, 0x15, 0xd4, 0x41, 0x71, 0xdb, 0x43, 0xb2, 0x04, 0x91, 0x85,
+	0xd2, 0x04, 0xd4, 0x53, 0x8f, 0x65, 0x2d, 0x2c, 0x22, 0x96, 0x21, 0x27, 0x2f, 0x61, 0x36, 0x79,
+	0xac, 0x43, 0x92, 0x9d, 0x30, 0x93, 0x4a, 0xf2, 0x23, 0x04, 0xfd, 0x03, 0x82, 0x3f, 0xc0, 0xff,
+	0xd1, 0x63, 0x8f, 0xe2, 0x21, 0xc8, 0xee, 0xad, 0xc7, 0xfd, 0x05, 0x92, 0x49, 0xc4, 0x6c, 0x93,
+	0x1c, 0x7a, 0x9a, 0x47, 0xde, 0xf7, 0xde, 0x7c, 0x79, 0xcc, 0xc3, 0xc7, 0xe1, 0x25, 0x8b, 0x79,
+	0x56, 0xc4, 0x6c, 0xa9, 0xdc, 0x26, 0x76, 0x43, 0xc8, 0xdd, 0x54, 0x88, 0xd8, 0x97, 0xa0, 0x40,
+	0x7e, 0x06, 0xe5, 0xa4, 0x52, 0x64, 0x82, 0x3c, 0x6f, 0xc1, 0x4e, 0x13, 0x3b, 0x21, 0xe4, 0x47,
+	0x4f, 0x57, 0x62, 0x25, 0x34, 0xe3, 0x56, 0x51, 0x8d, 0x1f, 0x0d, 0xf6, 0xce, 0x24, 0x0b, 0xc1,
+	0x4f, 0x19, 0x97, 0x3e, 0x0f, 0x6b, 0xd8, 0xfe, 0x81, 0xf0, 0xa3, 0x0b, 0x21, 0x62, 0xda, 0x5c,
+	0xf9, 0x0e, 0x0a, 0x72, 0x8e, 0x0f, 0x34, 0x7a, 0xc1, 0xb8, 0x5c, 0xcc, 0x27, 0x68, 0x8a, 0x66,
+	0x07, 0xaf, 0x5e, 0x38, 0x03, 0x16, 0x8e, 0xf7, 0x9f, 0xa5, 0xed, 0x42, 0xf2, 0x06, 0x3f, 0xf3,
+	0x78, 0x10, 0x2d, 0xd6, 0x21, 0xe4, 0x1e, 0x8b, 0x40, 0x7a, 0xe2, 0x7d, 0x75, 0x4c, 0xee, 0x4d,
+	0xd1, 0xcc, 0xa0, 0xfd, 0x49, 0xf2, 0x18, 0x1b, 0xe7, 0x00, 0x13, 0x63, 0x8a, 0x66, 0x63, 0x5a,
+	0x85, 0xf6, 0xf7, 0x31, 0x7e, 0xd8, 0x76, 0x24, 0xa7, 0xd8, 0x88, 0xa0, 0x68, 0xc4, 0x66, 0x83,
+	0x62, 0xb7, 0xfe, 0x8b, 0x56, 0x45, 0xe4, 0x1b, 0xc2, 0xe4, 0xdf, 0x7c, 0xf5, 0x85, 0x73, 0x58,
+	0x8b, 0x44, 0x2b, 0x3d, 0x38, 0x63, 0x57, 0xa5, 0x35, 0xfa, 0x5d, 0x5a, 0x2f, 0x57, 0x3c, 0xfb,
+	0x74, 0xb9, 0x74, 0x02, 0x91, 0xb8, 0x81, 0x50, 0x89, 0x50, 0xcd, 0x71, 0xa2, 0xc2, 0xc8, 0xcd,
+	0x8a, 0x14, 0x94, 0xb3, 0x58, 0x67, 0x37, 0xa5, 0xd5, 0xd3, 0x6b, 0x57, 0x5a, 0x87, 0x05, 0x4b,
+	0xe2, 0x53, 0xbb, 0x9b, 0xb3, 0x69, 0x4f, 0x01, 0xf9, 0x82, 0xf0, 0x93, 0x54, 0xf2, 0x00, 0xf6,
+	0xa6, 0x64, 0x68, 0x25, 0xff, 0x0e, 0x4a, 0x73, 0x08, 0x6e, 0x4a, 0xab, 0xdb, 0x6a, 0x57, 0x5a,
+	0x93, 0xda, 0xa8, 0x93, 0xb2, 0x69, 0x17, 0x27, 0x3f, 0x11, 0x3e, 0xd4, 0x5f, 0x3f, 0xa4, 0xa9,
+	0x50, 0x3c, 0xdb, 0xf7, 0x1a, 0x6b, 0x2f, 0x71, 0x67, 0xaf, 0xe1, 0x96, 0xbb, 0xd2, 0x9a, 0xb6,
+	0xfc, 0xfa, 0x10, 0x9b, 0x0e, 0x97, 0x9f, 0xbd, 0xbd, 0xda, 0x98, 0xe8, 0x7a, 0x63, 0xa2, 0x3f,
+	0x1b, 0x13, 0x7d, 0xdd, 0x9a, 0xa3, 0xeb, 0xad, 0x39, 0xfa, 0xb5, 0x35, 0x47, 0x1f, 0x8f, 0x5b,
+	0x76, 0xcd, 0xd3, 0x38, 0xd9, 0xdb, 0x8b, 0xbc, 0xde, 0x8c, 0x4a, 0x73, 0x79, 0x5f, 0xaf, 0xc4,
+	0xeb, 0xbf, 0x01, 0x00, 0x00, 0xff, 0xff, 0xdc, 0xf8, 0xe5, 0xe3, 0x9d, 0x03, 0x00, 0x00,
+}
+
+func (m *PoolReservesKey) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PoolReservesKey) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PoolReservesKey) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Fee != 0 {
+		i = encodeVarintPoolReserves(dAtA, i, uint64(m.Fee))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.TickIndexTakerToMaker != 0 {
+		i = encodeVarintPoolReserves(dAtA, i, uint64(m.TickIndexTakerToMaker))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.TradePairID != nil {
+		{
+			size, err := m.TradePairID.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintPoolReserves(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *PoolReserves) Marshal() (dAtA []byte, err error) {
@@ -145,36 +236,39 @@ func (m *PoolReserves) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Fee != 0 {
-		i = encodeVarintPoolReserves(dAtA, i, uint64(m.Fee))
-		i--
-		dAtA[i] = 0x28
-	}
 	{
-		size := m.Reserves.Size()
+		size := m.PriceOppositeTakerToMaker.Size()
 		i -= size
-		if _, err := m.Reserves.MarshalTo(dAtA[i:]); err != nil {
+		if _, err := m.PriceOppositeTakerToMaker.MarshalTo(dAtA[i:]); err != nil {
 			return 0, err
 		}
 		i = encodeVarintPoolReserves(dAtA, i, uint64(size))
 	}
 	i--
 	dAtA[i] = 0x22
-	if m.TickIndex != 0 {
-		i = encodeVarintPoolReserves(dAtA, i, uint64(m.TickIndex))
-		i--
-		dAtA[i] = 0x18
+	{
+		size := m.PriceTakerToMaker.Size()
+		i -= size
+		if _, err := m.PriceTakerToMaker.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintPoolReserves(dAtA, i, uint64(size))
 	}
-	if len(m.TokenIn) > 0 {
-		i -= len(m.TokenIn)
-		copy(dAtA[i:], m.TokenIn)
-		i = encodeVarintPoolReserves(dAtA, i, uint64(len(m.TokenIn)))
-		i--
-		dAtA[i] = 0x12
+	i--
+	dAtA[i] = 0x1a
+	{
+		size := m.ReservesMakerDenom.Size()
+		i -= size
+		if _, err := m.ReservesMakerDenom.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintPoolReserves(dAtA, i, uint64(size))
 	}
-	if m.PairID != nil {
+	i--
+	dAtA[i] = 0x12
+	if m.Key != nil {
 		{
-			size, err := m.PairID.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.Key.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -198,28 +292,41 @@ func encodeVarintPoolReserves(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func (m *PoolReservesKey) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.TradePairID != nil {
+		l = m.TradePairID.Size()
+		n += 1 + l + sovPoolReserves(uint64(l))
+	}
+	if m.TickIndexTakerToMaker != 0 {
+		n += 1 + sovPoolReserves(uint64(m.TickIndexTakerToMaker))
+	}
+	if m.Fee != 0 {
+		n += 1 + sovPoolReserves(uint64(m.Fee))
+	}
+	return n
+}
+
 func (m *PoolReserves) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.PairID != nil {
-		l = m.PairID.Size()
+	if m.Key != nil {
+		l = m.Key.Size()
 		n += 1 + l + sovPoolReserves(uint64(l))
 	}
-	l = len(m.TokenIn)
-	if l > 0 {
-		n += 1 + l + sovPoolReserves(uint64(l))
-	}
-	if m.TickIndex != 0 {
-		n += 1 + sovPoolReserves(uint64(m.TickIndex))
-	}
-	l = m.Reserves.Size()
+	l = m.ReservesMakerDenom.Size()
 	n += 1 + l + sovPoolReserves(uint64(l))
-	if m.Fee != 0 {
-		n += 1 + sovPoolReserves(uint64(m.Fee))
-	}
+	l = m.PriceTakerToMaker.Size()
+	n += 1 + l + sovPoolReserves(uint64(l))
+	l = m.PriceOppositeTakerToMaker.Size()
+	n += 1 + l + sovPoolReserves(uint64(l))
 	return n
 }
 
@@ -228,6 +335,130 @@ func sovPoolReserves(x uint64) (n int) {
 }
 func sozPoolReserves(x uint64) (n int) {
 	return sovPoolReserves(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *PoolReservesKey) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowPoolReserves
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PoolReservesKey: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PoolReservesKey: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TradePairID", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPoolReserves
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthPoolReserves
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthPoolReserves
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.TradePairID == nil {
+				m.TradePairID = &TradePairID{}
+			}
+			if err := m.TradePairID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TickIndexTakerToMaker", wireType)
+			}
+			m.TickIndexTakerToMaker = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPoolReserves
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.TickIndexTakerToMaker |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Fee", wireType)
+			}
+			m.Fee = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPoolReserves
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Fee |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipPoolReserves(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthPoolReserves
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *PoolReserves) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -260,7 +491,7 @@ func (m *PoolReserves) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PairID", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -287,16 +518,16 @@ func (m *PoolReserves) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.PairID == nil {
-				m.PairID = &PairID{}
+			if m.Key == nil {
+				m.Key = &PoolReservesKey{}
 			}
-			if err := m.PairID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Key.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TokenIn", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ReservesMakerDenom", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -324,66 +555,15 @@ func (m *PoolReserves) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TokenIn = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TickIndex", wireType)
-			}
-			m.TickIndex = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPoolReserves
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.TickIndex |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Reserves", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPoolReserves
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPoolReserves
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPoolReserves
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.Reserves.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.ReservesMakerDenom.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Fee", wireType)
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PriceTakerToMaker", wireType)
 			}
-			m.Fee = 0
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowPoolReserves
@@ -393,11 +573,60 @@ func (m *PoolReserves) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Fee |= uint64(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthPoolReserves
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthPoolReserves
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.PriceTakerToMaker.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PriceOppositeTakerToMaker", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPoolReserves
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthPoolReserves
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthPoolReserves
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.PriceOppositeTakerToMaker.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipPoolReserves(dAtA[iNdEx:])

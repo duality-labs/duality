@@ -48,7 +48,7 @@ func NewDepositDenomFromString(denom string) (depositDenom *DepositDenom, err er
 	}
 
 	fee, err := strconv.ParseUint(matches[3], 10, 0)
-	if err != nil {
+	if err != nil || fee < 0 {
 		return nil, ErrInvalidDepositDenom
 	}
 

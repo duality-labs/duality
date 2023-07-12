@@ -43,7 +43,7 @@ type MsgCreateGauge struct {
 	// at a single time and only distribute their tokens again once the gauge is
 	// refilled
 	IsPerpetual bool `protobuf:"varint,1,opt,name=is_perpetual,json=isPerpetual,proto3" json:"is_perpetual,omitempty"`
-	// owner is the address of gauge creator
+	// owner is the address of gauge creator, should be the module authority
 	Owner string `protobuf:"bytes,2,opt,name=owner,proto3" json:"owner,omitempty" yaml:"owner"`
 	// distribute_to show which lock the gauge should distribute to by time
 	// duration or by timestamp

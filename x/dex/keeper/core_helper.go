@@ -1,172 +1,59 @@
 package keeper
 
 import (
-	"math"
-	"time"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
 ///////////////////////////////////////////////////////////////////////////////
-//                           GETTERS & INITIALIZERS                          //
-///////////////////////////////////////////////////////////////////////////////
-
-func (k Keeper) GetOrInitPoolReserves(
-	ctx sdk.Context,
-	pairID *types.PairID,
-	tokenIn string,
-	tickIndex int64,
-	fee uint64,
-) (*types.PoolReserves, error) {
-	tickLiq, tickFound := k.GetPoolReserves(
-		ctx,
-		pairID,
-		tokenIn,
-		tickIndex,
-		fee,
-	)
-	switch {
-	case tickFound:
-		return tickLiq, nil
-	case types.IsTickOutOfRange(tickIndex):
-		return nil, types.ErrTickOutsideRange
-	default:
-		return &types.PoolReserves{
-			PairID:    pairID,
-			TokenIn:   tokenIn,
-			TickIndex: tickIndex,
-			Fee:       fee,
-			Reserves:  sdk.ZeroInt(),
-		}, nil
-	}
-}
-
-func NewLimitOrderExpiration(tranche types.LimitOrderTranche) types.LimitOrderExpiration {
-	trancheExpiry := tranche.ExpirationTime
-	if trancheExpiry == nil {
-		panic("Cannot create LimitOrderExpiration from tranche with nil ExpirationTime")
-	}
-
-	return types.LimitOrderExpiration{
-		TrancheRef:     tranche.Ref(),
-		ExpirationTime: *tranche.ExpirationTime,
-	}
-}
-
-func NewLimitOrderTranche(
-	sdkCtx sdk.Context,
-	pairID *types.PairID,
-	tokenIn string,
-	tickIndex int64,
-	goodTil *time.Time,
-) (types.LimitOrderTranche, error) {
-	// NOTE: CONTRACT: There is no active place tranche (ie. GetPlaceTrancheTick has returned false)
-	if types.IsTickOutOfRange(tickIndex) {
-		return types.LimitOrderTranche{}, types.ErrTickOutsideRange
-	}
-	trancheKey := NewTrancheKey(sdkCtx)
-
-	return types.LimitOrderTranche{
-		PairID:           pairID,
-		TokenIn:          tokenIn,
-		TickIndex:        tickIndex,
-		TrancheKey:       trancheKey,
-		ReservesTokenIn:  sdk.ZeroInt(),
-		ReservesTokenOut: sdk.ZeroInt(),
-		TotalTokenIn:     sdk.ZeroInt(),
-		TotalTokenOut:    sdk.ZeroInt(),
-		ExpirationTime:   goodTil,
-	}, nil
-}
-
-func (k Keeper) GetOrInitLimitOrderTrancheUser(
-	ctx sdk.Context,
-	pairID *types.PairID,
-	tickIndex int64,
-	tokenIn string,
-	trancheKey string,
-	orderType types.LimitOrderType,
-	receiver string,
-) types.LimitOrderTrancheUser {
-	UserShareData, UserShareDataFound := k.GetLimitOrderTrancheUser(ctx, receiver, trancheKey)
-
-	if !UserShareDataFound {
-		return types.LimitOrderTrancheUser{
-			TrancheKey:      trancheKey,
-			Address:         receiver,
-			SharesOwned:     sdk.ZeroInt(),
-			SharesWithdrawn: sdk.ZeroInt(),
-			SharesCancelled: sdk.ZeroInt(),
-			TickIndex:       tickIndex,
-			Token:           tokenIn,
-			PairID:          pairID,
-			OrderType:       orderType,
-		}
-	}
-
-	return UserShareData
-}
-
-///////////////////////////////////////////////////////////////////////////////
 //                          STATE CALCULATIONS                               //
 ///////////////////////////////////////////////////////////////////////////////
 
-func (k Keeper) GetCurrPrice1To0(
-	ctx sdk.Context,
-	pairID *types.PairID,
-) (price types.Price, found bool) {
-	tick, found := k.GetCurrTick1To0(ctx, pairID)
-	if !found {
-		return types.Price{}, false
+func (k Keeper) GetCurrPrice(ctx sdk.Context, tradePairID *types.TradePairID) (sdk.Dec, bool) {
+	liq := k.GetCurrLiq(ctx, tradePairID)
+	if liq != nil {
+		return liq.Price(), true
 	}
-
-	return *types.MustNewPrice(tick * -1), true
+	return sdk.ZeroDec(), false
 }
 
-func (k Keeper) GetCurrTick1To0(ctx sdk.Context, pairID *types.PairID) (tickIdx int64, found bool) {
-	ti := k.NewTickIterator(ctx, pairID, pairID.Token0)
+// Returns a takerToMaker tick index
+func (k Keeper) GetCurrTickIndexTakerToMaker(
+	ctx sdk.Context,
+	tradePairID *types.TradePairID,
+) (int64, bool) {
+	liq := k.GetCurrLiq(ctx, tradePairID)
+	if liq != nil {
+		return liq.TickIndex(), true
+	}
+	return 0, false
+}
 
+// Returns a takerToMaker tick index
+func (k Keeper) GetCurrTickIndexTakerToMakerNormalized(
+	ctx sdk.Context,
+	tradePairID *types.TradePairID,
+) (int64, bool) {
+	tickIndexTakerToMaker, found := k.GetCurrTickIndexTakerToMaker(ctx, tradePairID)
+	if found {
+		tickIndexTakerToMakerNormalized := tradePairID.TickIndexNormalized(tickIndexTakerToMaker)
+		return tickIndexTakerToMakerNormalized, true
+	}
+
+	return 0, false
+}
+
+func (k Keeper) GetCurrLiq(ctx sdk.Context, tradePairID *types.TradePairID) *types.TickLiquidity {
+	ti := k.NewTickIterator(ctx, tradePairID)
 	defer ti.Close()
 	for ; ti.Valid(); ti.Next() {
 		tick := ti.Value()
 		if tick.HasToken() {
-			return tick.TickIndex(), true
+			return &tick
 		}
 	}
 
-	return math.MinInt64, false
-}
-
-func (k Keeper) GetCurrPrice0To1(
-	ctx sdk.Context,
-	pairID *types.PairID,
-) (price types.Price, found bool) {
-	tick, found := k.GetCurrTick0To1(ctx, pairID)
-	if !found {
-		return types.Price{}, false
-	}
-
-	return *types.MustNewPrice(tick), true
-}
-
-func (k Keeper) GetCurrTick0To1(ctx sdk.Context, pairID *types.PairID) (tickIdx int64, found bool) {
-	ti := k.NewTickIterator(ctx, pairID, pairID.Token1)
-	defer ti.Close()
-	for ; ti.Valid(); ti.Next() {
-		tick := ti.Value()
-		if tick.HasToken() {
-			return tick.TickIndex(), true
-		}
-	}
-
-	return math.MaxInt64, false
-}
-
-func CalcAmountAsToken0(amount0, amount1 sdk.Int, price1To0 types.Price) sdk.Dec {
-	amount0Dec := sdk.NewDecFromInt(amount0)
-
-	return amount0Dec.Add(price1To0.MulInt(amount1))
+	return nil
 }
 
 ///////////////////////////////////////////////////////////////////////////////

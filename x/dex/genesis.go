@@ -14,9 +14,9 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, elem := range genState.TickLiquidityList {
 		switch elem.Liquidity.(type) {
 		case *types.TickLiquidity_PoolReserves:
-			k.SetPoolReserves(ctx, *elem.GetPoolReserves())
+			k.SetPoolReserves(ctx, elem.GetPoolReserves())
 		case *types.TickLiquidity_LimitOrderTranche:
-			k.SetLimitOrderTranche(ctx, *elem.GetLimitOrderTranche())
+			k.SetLimitOrderTranche(ctx, elem.GetLimitOrderTranche())
 		}
 	}
 	// Set all the inactiveLimitOrderTranche
@@ -29,13 +29,13 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		k.SetLimitOrderTrancheUser(ctx, elem)
 	}
 	// this line is used by starport scaffolding # genesis/module/init
-	k.SetParams(ctx, genState.Params)
+	k.SetParams(ctx, &genState.Params)
 }
 
 // ExportGenesis returns the capability module's exported genesis.
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
-	genesis.Params = k.GetParams(ctx)
+	genesis.Params = *k.GetParams(ctx)
 	genesis.LimitOrderTrancheUserList = k.GetAllLimitOrderTrancheUser(ctx)
 	genesis.TickLiquidityList = k.GetAllTickLiquidity(ctx)
 	genesis.InactiveLimitOrderTrancheList = k.GetAllInactiveLimitOrderTranche(ctx)

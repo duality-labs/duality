@@ -6,10 +6,36 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
+func (k Keeper) GetOrInitLimitOrderTrancheUser(
+	ctx sdk.Context,
+	tradePairID *types.TradePairID,
+	tickIndex int64,
+	trancheKey string,
+	orderType types.LimitOrderType,
+	receiver string,
+) *types.LimitOrderTrancheUser {
+	userShareData, found := k.GetLimitOrderTrancheUser(ctx, receiver, trancheKey)
+
+	if !found {
+		return &types.LimitOrderTrancheUser{
+			TrancheKey:            trancheKey,
+			Address:               receiver,
+			SharesOwned:           sdk.ZeroInt(),
+			SharesWithdrawn:       sdk.ZeroInt(),
+			SharesCancelled:       sdk.ZeroInt(),
+			TickIndexTakerToMaker: tickIndex,
+			TradePairID:           tradePairID,
+			OrderType:             orderType,
+		}
+	}
+
+	return userShareData
+}
+
 // SetLimitOrderTrancheUser set a specific LimitOrderTrancheUser in the store from its index
-func (k Keeper) SetLimitOrderTrancheUser(ctx sdk.Context, limitOrderTrancheUser types.LimitOrderTrancheUser) {
+func (k Keeper) SetLimitOrderTrancheUser(ctx sdk.Context, limitOrderTrancheUser *types.LimitOrderTrancheUser) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderTrancheUserKeyPrefix))
-	b := k.cdc.MustMarshal(&limitOrderTrancheUser)
+	b := k.cdc.MustMarshal(limitOrderTrancheUser)
 	store.Set(types.LimitOrderTrancheUserKey(
 		limitOrderTrancheUser.Address,
 		limitOrderTrancheUser.TrancheKey,
@@ -21,7 +47,7 @@ func (k Keeper) GetLimitOrderTrancheUser(
 	ctx sdk.Context,
 	address string,
 	trancheKey string,
-) (val types.LimitOrderTrancheUser, found bool) {
+) (val *types.LimitOrderTrancheUser, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderTrancheUserKeyPrefix))
 
 	b := store.Get(types.LimitOrderTrancheUserKey(
@@ -29,10 +55,11 @@ func (k Keeper) GetLimitOrderTrancheUser(
 		trancheKey,
 	))
 	if b == nil {
-		return val, false
+		return nil, false
 	}
 
-	k.cdc.MustUnmarshal(b, &val)
+	val = &types.LimitOrderTrancheUser{}
+	k.cdc.MustUnmarshal(b, val)
 
 	return val, true
 }
@@ -50,7 +77,7 @@ func (k Keeper) RemoveLimitOrderTrancheUserByKey(
 	))
 }
 
-func (k Keeper) RemoveLimitOrderTrancheUser(ctx sdk.Context, trancheUser types.LimitOrderTrancheUser) {
+func (k Keeper) RemoveLimitOrderTrancheUser(ctx sdk.Context, trancheUser *types.LimitOrderTrancheUser) {
 	k.RemoveLimitOrderTrancheUserByKey(
 		ctx,
 		trancheUser.TrancheKey,
@@ -58,7 +85,7 @@ func (k Keeper) RemoveLimitOrderTrancheUser(ctx sdk.Context, trancheUser types.L
 	)
 }
 
-func (k Keeper) SaveTrancheUser(ctx sdk.Context, trancheUser types.LimitOrderTrancheUser) {
+func (k Keeper) SaveTrancheUser(ctx sdk.Context, trancheUser *types.LimitOrderTrancheUser) {
 	if trancheUser.IsEmpty() {
 		k.RemoveLimitOrderTrancheUser(ctx, trancheUser)
 	} else {
@@ -67,15 +94,15 @@ func (k Keeper) SaveTrancheUser(ctx sdk.Context, trancheUser types.LimitOrderTra
 }
 
 // GetAllLimitOrderTrancheUser returns all LimitOrderTrancheUser
-func (k Keeper) GetAllLimitOrderTrancheUser(ctx sdk.Context) (list []types.LimitOrderTrancheUser) {
+func (k Keeper) GetAllLimitOrderTrancheUser(ctx sdk.Context) (list []*types.LimitOrderTrancheUser) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LimitOrderTrancheUserKeyPrefix))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var val types.LimitOrderTrancheUser
-		k.cdc.MustUnmarshal(iterator.Value(), &val)
+		val := &types.LimitOrderTrancheUser{}
+		k.cdc.MustUnmarshal(iterator.Value(), val)
 		list = append(list, val)
 	}
 
@@ -85,7 +112,7 @@ func (k Keeper) GetAllLimitOrderTrancheUser(ctx sdk.Context) (list []types.Limit
 func (k Keeper) GetAllLimitOrderTrancheUserForAddress(
 	ctx sdk.Context,
 	address sdk.AccAddress,
-) (list []types.LimitOrderTrancheUser) {
+) (list []*types.LimitOrderTrancheUser) {
 	addressPrefix := types.LimitOrderTrancheUserAddressPrefix(address.String())
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), addressPrefix)
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
@@ -93,8 +120,8 @@ func (k Keeper) GetAllLimitOrderTrancheUserForAddress(
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var val types.LimitOrderTrancheUser
-		k.cdc.MustUnmarshal(iterator.Value(), &val)
+		val := &types.LimitOrderTrancheUser{}
+		k.cdc.MustUnmarshal(iterator.Value(), val)
 		list = append(list, val)
 	}
 

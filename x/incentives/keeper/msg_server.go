@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"cosmossdk.io/errors"
 	"github.com/duality-labs/duality/x/incentives/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -31,6 +32,15 @@ func (server msgServer) CreateGauge(
 	goCtx context.Context,
 	msg *types.MsgCreateGauge,
 ) (*types.MsgCreateGaugeResponse, error) {
+	if server.keeper.authority != msg.Owner {
+		return nil, errors.Wrapf(
+			types.ErrInvalidSigner,
+			"invalid authority; expected %s, got %s",
+			server.keeper.authority,
+			msg.Owner,
+		)
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	owner, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {

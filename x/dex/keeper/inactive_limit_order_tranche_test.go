@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"testing"
 
+	math "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	keepertest "github.com/duality-labs/duality/testutil/keeper"
 	"github.com/duality-labs/duality/testutil/nullify"
@@ -12,19 +13,23 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createNInactiveLimitOrderTranche(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.LimitOrderTranche {
-	items := make([]types.LimitOrderTranche, n)
+func createNInactiveLimitOrderTranche(
+	keeper *keeper.Keeper,
+	ctx sdk.Context,
+	n int,
+) []*types.LimitOrderTranche {
+	items := make([]*types.LimitOrderTranche, n)
 	for i := range items {
-		items[i] = types.LimitOrderTranche{
-			TrancheKey:       strconv.Itoa(i),
-			PairID:           &types.PairID{Token0: "TokenA", Token1: "TokenB"},
-			TickIndex:        int64(i),
-			TokenIn:          "TokenA",
-			TotalTokenIn:     sdk.ZeroInt(),
-			TotalTokenOut:    sdk.ZeroInt(),
-			ReservesTokenOut: sdk.ZeroInt(),
-			ReservesTokenIn:  sdk.ZeroInt(),
-		}
+		items[i] = types.MustNewLimitOrderTranche(
+			"TokenA",
+			"TokenB",
+			strconv.Itoa(i),
+			int64(i),
+			math.ZeroInt(),
+			math.ZeroInt(),
+			math.ZeroInt(),
+			math.ZeroInt(),
+		)
 		keeper.SetInactiveLimitOrderTranche(ctx, items[i])
 	}
 
@@ -35,12 +40,7 @@ func TestInactiveLimitOrderTrancheGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNInactiveLimitOrderTranche(keeper, ctx, 10)
 	for _, item := range items {
-		rst, found := keeper.GetInactiveLimitOrderTranche(ctx,
-			item.PairID,
-			item.TokenIn,
-			item.TickIndex,
-			item.TrancheKey,
-		)
+		rst, found := keeper.GetInactiveLimitOrderTranche(ctx, item.Key)
 		require.True(t, found)
 		require.Equal(t,
 			nullify.Fill(&item),
@@ -53,18 +53,8 @@ func TestInactiveLimitOrderTrancheRemove(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNInactiveLimitOrderTranche(keeper, ctx, 10)
 	for _, item := range items {
-		keeper.RemoveInactiveLimitOrderTranche(ctx,
-			item.PairID,
-			item.TokenIn,
-			item.TickIndex,
-			item.TrancheKey,
-		)
-		_, found := keeper.GetInactiveLimitOrderTranche(ctx,
-			item.PairID,
-			item.TokenIn,
-			item.TickIndex,
-			item.TrancheKey,
-		)
+		keeper.RemoveInactiveLimitOrderTranche(ctx, item.Key)
+		_, found := keeper.GetInactiveLimitOrderTranche(ctx, item.Key)
 		require.False(t, found)
 	}
 }
@@ -72,8 +62,12 @@ func TestInactiveLimitOrderTrancheRemove(t *testing.T) {
 func TestInactiveLimitOrderTrancheGetAll(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNInactiveLimitOrderTranche(keeper, ctx, 10)
+	pointerItems := make([]*types.LimitOrderTranche, len(items))
+	for i := range items {
+		pointerItems[i] = items[i]
+	}
 	require.ElementsMatch(t,
-		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllInactiveLimitOrderTranche(ctx)),
+		pointerItems,
+		keeper.GetAllInactiveLimitOrderTranche(ctx),
 	)
 }

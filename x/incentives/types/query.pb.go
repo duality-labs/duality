@@ -250,6 +250,96 @@ func (m *GetGaugeByIDResponse) GetGauge() *Gauge {
 	return nil
 }
 
+type GetGaugeQualifyingValueRequest struct {
+	// Gague ID being queried
+	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (m *GetGaugeQualifyingValueRequest) Reset()         { *m = GetGaugeQualifyingValueRequest{} }
+func (m *GetGaugeQualifyingValueRequest) String() string { return proto.CompactTextString(m) }
+func (*GetGaugeQualifyingValueRequest) ProtoMessage()    {}
+func (*GetGaugeQualifyingValueRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0495b99755da9ff3, []int{4}
+}
+func (m *GetGaugeQualifyingValueRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *GetGaugeQualifyingValueRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_GetGaugeQualifyingValueRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *GetGaugeQualifyingValueRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetGaugeQualifyingValueRequest.Merge(m, src)
+}
+func (m *GetGaugeQualifyingValueRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *GetGaugeQualifyingValueRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetGaugeQualifyingValueRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetGaugeQualifyingValueRequest proto.InternalMessageInfo
+
+func (m *GetGaugeQualifyingValueRequest) GetId() uint64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+type GetGaugeQualifyingValueResponse struct {
+	// The amount of value at the gauge's pricing tick currently qualifying for the gauge.
+	QualifyingValue uint64 `protobuf:"varint,1,opt,name=qualifying_value,json=qualifyingValue,proto3" json:"qualifying_value,omitempty"`
+}
+
+func (m *GetGaugeQualifyingValueResponse) Reset()         { *m = GetGaugeQualifyingValueResponse{} }
+func (m *GetGaugeQualifyingValueResponse) String() string { return proto.CompactTextString(m) }
+func (*GetGaugeQualifyingValueResponse) ProtoMessage()    {}
+func (*GetGaugeQualifyingValueResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0495b99755da9ff3, []int{5}
+}
+func (m *GetGaugeQualifyingValueResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *GetGaugeQualifyingValueResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_GetGaugeQualifyingValueResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *GetGaugeQualifyingValueResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetGaugeQualifyingValueResponse.Merge(m, src)
+}
+func (m *GetGaugeQualifyingValueResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *GetGaugeQualifyingValueResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetGaugeQualifyingValueResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetGaugeQualifyingValueResponse proto.InternalMessageInfo
+
+func (m *GetGaugeQualifyingValueResponse) GetQualifyingValue() uint64 {
+	if m != nil {
+		return m.QualifyingValue
+	}
+	return 0
+}
+
 type GetGaugesRequest struct {
 	Status GaugeStatus `protobuf:"varint,1,opt,name=status,proto3,enum=dualitylabs.duality.incentives.GaugeStatus" json:"status,omitempty"`
 	Denom  string      `protobuf:"bytes,2,opt,name=denom,proto3" json:"denom,omitempty"`
@@ -259,7 +349,7 @@ func (m *GetGaugesRequest) Reset()         { *m = GetGaugesRequest{} }
 func (m *GetGaugesRequest) String() string { return proto.CompactTextString(m) }
 func (*GetGaugesRequest) ProtoMessage()    {}
 func (*GetGaugesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0495b99755da9ff3, []int{4}
+	return fileDescriptor_0495b99755da9ff3, []int{6}
 }
 func (m *GetGaugesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -311,7 +401,7 @@ func (m *GetGaugesResponse) Reset()         { *m = GetGaugesResponse{} }
 func (m *GetGaugesResponse) String() string { return proto.CompactTextString(m) }
 func (*GetGaugesResponse) ProtoMessage()    {}
 func (*GetGaugesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0495b99755da9ff3, []int{5}
+	return fileDescriptor_0495b99755da9ff3, []int{7}
 }
 func (m *GetGaugesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -355,7 +445,7 @@ func (m *GetStakeByIDRequest) Reset()         { *m = GetStakeByIDRequest{} }
 func (m *GetStakeByIDRequest) String() string { return proto.CompactTextString(m) }
 func (*GetStakeByIDRequest) ProtoMessage()    {}
 func (*GetStakeByIDRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0495b99755da9ff3, []int{6}
+	return fileDescriptor_0495b99755da9ff3, []int{8}
 }
 func (m *GetStakeByIDRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -399,7 +489,7 @@ func (m *GetStakeByIDResponse) Reset()         { *m = GetStakeByIDResponse{} }
 func (m *GetStakeByIDResponse) String() string { return proto.CompactTextString(m) }
 func (*GetStakeByIDResponse) ProtoMessage()    {}
 func (*GetStakeByIDResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0495b99755da9ff3, []int{7}
+	return fileDescriptor_0495b99755da9ff3, []int{9}
 }
 func (m *GetStakeByIDResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -443,7 +533,7 @@ func (m *GetStakesRequest) Reset()         { *m = GetStakesRequest{} }
 func (m *GetStakesRequest) String() string { return proto.CompactTextString(m) }
 func (*GetStakesRequest) ProtoMessage()    {}
 func (*GetStakesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0495b99755da9ff3, []int{8}
+	return fileDescriptor_0495b99755da9ff3, []int{10}
 }
 func (m *GetStakesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -487,7 +577,7 @@ func (m *GetStakesResponse) Reset()         { *m = GetStakesResponse{} }
 func (m *GetStakesResponse) String() string { return proto.CompactTextString(m) }
 func (*GetStakesResponse) ProtoMessage()    {}
 func (*GetStakesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0495b99755da9ff3, []int{9}
+	return fileDescriptor_0495b99755da9ff3, []int{11}
 }
 func (m *GetStakesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -537,7 +627,7 @@ func (m *GetFutureRewardEstimateRequest) Reset()         { *m = GetFutureRewardE
 func (m *GetFutureRewardEstimateRequest) String() string { return proto.CompactTextString(m) }
 func (*GetFutureRewardEstimateRequest) ProtoMessage()    {}
 func (*GetFutureRewardEstimateRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0495b99755da9ff3, []int{10}
+	return fileDescriptor_0495b99755da9ff3, []int{12}
 }
 func (m *GetFutureRewardEstimateRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -597,7 +687,7 @@ func (m *GetFutureRewardEstimateResponse) Reset()         { *m = GetFutureReward
 func (m *GetFutureRewardEstimateResponse) String() string { return proto.CompactTextString(m) }
 func (*GetFutureRewardEstimateResponse) ProtoMessage()    {}
 func (*GetFutureRewardEstimateResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0495b99755da9ff3, []int{11}
+	return fileDescriptor_0495b99755da9ff3, []int{13}
 }
 func (m *GetFutureRewardEstimateResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -633,12 +723,104 @@ func (m *GetFutureRewardEstimateResponse) GetCoins() github_com_cosmos_cosmos_sd
 	return nil
 }
 
+type GetAccountHistoryRequest struct {
+	// Address that is being queried for account history
+	Account string `protobuf:"bytes,1,opt,name=account,proto3" json:"account,omitempty" yaml:"account"`
+}
+
+func (m *GetAccountHistoryRequest) Reset()         { *m = GetAccountHistoryRequest{} }
+func (m *GetAccountHistoryRequest) String() string { return proto.CompactTextString(m) }
+func (*GetAccountHistoryRequest) ProtoMessage()    {}
+func (*GetAccountHistoryRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0495b99755da9ff3, []int{14}
+}
+func (m *GetAccountHistoryRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *GetAccountHistoryRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_GetAccountHistoryRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *GetAccountHistoryRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetAccountHistoryRequest.Merge(m, src)
+}
+func (m *GetAccountHistoryRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *GetAccountHistoryRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetAccountHistoryRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetAccountHistoryRequest proto.InternalMessageInfo
+
+func (m *GetAccountHistoryRequest) GetAccount() string {
+	if m != nil {
+		return m.Account
+	}
+	return ""
+}
+
+type GetAccountHistoryResponse struct {
+	// Gauge rewards that have been distributed to this address to date
+	Coins github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,1,rep,name=coins,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"coins"`
+}
+
+func (m *GetAccountHistoryResponse) Reset()         { *m = GetAccountHistoryResponse{} }
+func (m *GetAccountHistoryResponse) String() string { return proto.CompactTextString(m) }
+func (*GetAccountHistoryResponse) ProtoMessage()    {}
+func (*GetAccountHistoryResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0495b99755da9ff3, []int{15}
+}
+func (m *GetAccountHistoryResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *GetAccountHistoryResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_GetAccountHistoryResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *GetAccountHistoryResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetAccountHistoryResponse.Merge(m, src)
+}
+func (m *GetAccountHistoryResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *GetAccountHistoryResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetAccountHistoryResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetAccountHistoryResponse proto.InternalMessageInfo
+
+func (m *GetAccountHistoryResponse) GetCoins() github_com_cosmos_cosmos_sdk_types.Coins {
+	if m != nil {
+		return m.Coins
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterEnum("dualitylabs.duality.incentives.GaugeStatus", GaugeStatus_name, GaugeStatus_value)
 	proto.RegisterType((*GetModuleStatusRequest)(nil), "dualitylabs.duality.incentives.GetModuleStatusRequest")
 	proto.RegisterType((*GetModuleStatusResponse)(nil), "dualitylabs.duality.incentives.GetModuleStatusResponse")
 	proto.RegisterType((*GetGaugeByIDRequest)(nil), "dualitylabs.duality.incentives.GetGaugeByIDRequest")
 	proto.RegisterType((*GetGaugeByIDResponse)(nil), "dualitylabs.duality.incentives.GetGaugeByIDResponse")
+	proto.RegisterType((*GetGaugeQualifyingValueRequest)(nil), "dualitylabs.duality.incentives.GetGaugeQualifyingValueRequest")
+	proto.RegisterType((*GetGaugeQualifyingValueResponse)(nil), "dualitylabs.duality.incentives.GetGaugeQualifyingValueResponse")
 	proto.RegisterType((*GetGaugesRequest)(nil), "dualitylabs.duality.incentives.GetGaugesRequest")
 	proto.RegisterType((*GetGaugesResponse)(nil), "dualitylabs.duality.incentives.GetGaugesResponse")
 	proto.RegisterType((*GetStakeByIDRequest)(nil), "dualitylabs.duality.incentives.GetStakeByIDRequest")
@@ -647,6 +829,8 @@ func init() {
 	proto.RegisterType((*GetStakesResponse)(nil), "dualitylabs.duality.incentives.GetStakesResponse")
 	proto.RegisterType((*GetFutureRewardEstimateRequest)(nil), "dualitylabs.duality.incentives.GetFutureRewardEstimateRequest")
 	proto.RegisterType((*GetFutureRewardEstimateResponse)(nil), "dualitylabs.duality.incentives.GetFutureRewardEstimateResponse")
+	proto.RegisterType((*GetAccountHistoryRequest)(nil), "dualitylabs.duality.incentives.GetAccountHistoryRequest")
+	proto.RegisterType((*GetAccountHistoryResponse)(nil), "dualitylabs.duality.incentives.GetAccountHistoryResponse")
 }
 
 func init() {
@@ -654,66 +838,76 @@ func init() {
 }
 
 var fileDescriptor_0495b99755da9ff3 = []byte{
-	// 936 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0xcf, 0x6f, 0x1b, 0x45,
-	0x14, 0xf6, 0x3a, 0xb1, 0x89, 0xc7, 0x51, 0x6b, 0xa6, 0x11, 0xb8, 0x06, 0x36, 0xd1, 0x4a, 0x8d,
-	0xac, 0x54, 0xdd, 0x49, 0x1c, 0xda, 0x8a, 0x56, 0x05, 0xe1, 0x24, 0x35, 0x46, 0xf4, 0x07, 0x1b,
-	0xe0, 0xc0, 0xc5, 0x1a, 0xdb, 0xc3, 0x76, 0x55, 0xef, 0x8e, 0xeb, 0x99, 0x6d, 0xb1, 0xa2, 0x5c,
-	0x10, 0x7f, 0x00, 0x12, 0xff, 0x00, 0x47, 0xc4, 0x19, 0x71, 0x45, 0xdc, 0x7a, 0xac, 0xc4, 0x85,
-	0x53, 0x41, 0x09, 0x37, 0x6e, 0x5c, 0xb8, 0xa2, 0x7d, 0x33, 0xeb, 0xac, 0xd3, 0x52, 0x8f, 0x91,
-	0x7a, 0xf2, 0xce, 0xcc, 0xfb, 0xde, 0xfb, 0xde, 0x37, 0x33, 0x9f, 0x07, 0x6d, 0xf4, 0x63, 0x3a,
-	0x08, 0xe4, 0x78, 0x40, 0xbb, 0x82, 0xe8, 0x6f, 0x12, 0x44, 0x3d, 0x16, 0xc9, 0xe0, 0x21, 0x13,
-	0xe4, 0x41, 0xcc, 0x46, 0x63, 0x77, 0x38, 0xe2, 0x92, 0x63, 0x3b, 0x13, 0xeb, 0xea, 0x6f, 0xf7,
-	0x24, 0xb6, 0xb6, 0xe2, 0x73, 0x9f, 0x43, 0x28, 0x49, 0xbe, 0x14, 0xaa, 0xf6, 0xa6, 0xcf, 0xb9,
-	0x3f, 0x60, 0x84, 0x0e, 0x03, 0x42, 0xa3, 0x88, 0x4b, 0x2a, 0x03, 0x1e, 0x09, 0xbd, 0x6a, 0xf7,
-	0xb8, 0x08, 0xb9, 0x20, 0x5d, 0x2a, 0x18, 0x79, 0xb8, 0xd5, 0x65, 0x92, 0x6e, 0x91, 0x1e, 0x0f,
-	0x22, 0xbd, 0xbe, 0x91, 0x5d, 0x07, 0x32, 0x93, 0xa8, 0x21, 0xf5, 0x83, 0x08, 0x92, 0xa5, 0xb1,
-	0x33, 0x7a, 0xf1, 0x69, 0xec, 0x33, 0xc3, 0x58, 0x21, 0xe9, 0xfd, 0x34, 0xf6, 0xe2, 0x8c, 0xd8,
-	0x21, 0x1d, 0xd1, 0x50, 0x37, 0xe4, 0x54, 0xd1, 0x6b, 0x2d, 0x26, 0x6f, 0xf1, 0x7e, 0x3c, 0x60,
-	0xfb, 0x92, 0xca, 0x58, 0x78, 0xec, 0x41, 0xcc, 0x84, 0x74, 0x7e, 0xce, 0xa3, 0xd7, 0x9f, 0x59,
-	0x12, 0x43, 0x1e, 0x09, 0x86, 0x23, 0xb4, 0x3c, 0x62, 0x8f, 0xe8, 0xa8, 0xdf, 0x49, 0x7a, 0x17,
-	0x55, 0x6b, 0x6d, 0xa1, 0x5e, 0x6e, 0x9c, 0x77, 0x55, 0xf7, 0x6e, 0xd2, 0xbd, 0xab, 0xfb, 0x76,
-	0x77, 0x78, 0x10, 0x35, 0x37, 0x1f, 0x3f, 0x5d, 0xcd, 0xfd, 0xf0, 0xfb, 0x6a, 0xdd, 0x0f, 0xe4,
-	0xbd, 0xb8, 0xeb, 0xf6, 0x78, 0x48, 0xb4, 0x54, 0xea, 0xe7, 0x92, 0xe8, 0xdf, 0x27, 0x72, 0x3c,
-	0x64, 0x02, 0x00, 0xc2, 0x2b, 0xab, 0x02, 0x30, 0x48, 0xea, 0x41, 0x87, 0x69, 0xbd, 0xfc, 0x4b,
-	0xa8, 0xa7, 0x0a, 0xa8, 0x7a, 0xbb, 0xa8, 0xa8, 0x54, 0xaa, 0x2e, 0xac, 0x59, 0xf5, 0x72, 0x63,
-	0xdd, 0x7d, 0xf1, 0x59, 0x72, 0xef, 0x42, 0x74, 0x73, 0x31, 0x29, 0xeb, 0x69, 0xac, 0x73, 0x01,
-	0x9d, 0x6b, 0x31, 0xd9, 0x4a, 0xb6, 0xb1, 0x39, 0x6e, 0xef, 0x6a, 0x61, 0xf1, 0x19, 0x94, 0x0f,
-	0xfa, 0x55, 0x6b, 0xcd, 0xaa, 0x2f, 0x7a, 0xf9, 0xa0, 0xef, 0xec, 0xa3, 0x95, 0xe9, 0x30, 0x2d,
-	0xf2, 0x75, 0x54, 0x80, 0x23, 0x00, 0xa1, 0xe5, 0xc6, 0x85, 0x59, 0x1c, 0x20, 0x83, 0xa7, 0x30,
-	0x4e, 0x88, 0x2a, 0x69, 0xd2, 0x74, 0x47, 0xf1, 0x0e, 0x2a, 0x0a, 0xd8, 0x47, 0xc8, 0x78, 0xa6,
-	0x71, 0xd1, 0x28, 0xa3, 0xde, 0x7a, 0x0d, 0xc5, 0x2b, 0xa8, 0xd0, 0x67, 0x11, 0x0f, 0xab, 0xf9,
-	0x35, 0xab, 0x5e, 0xf2, 0xd4, 0xc0, 0xf1, 0xd0, 0xab, 0x99, 0x72, 0xba, 0x81, 0x1b, 0xa8, 0x08,
-	0x64, 0xd2, 0xf3, 0x61, 0xd8, 0x81, 0x06, 0x39, 0x9b, 0x20, 0xdf, 0x7e, 0xb2, 0x2d, 0x59, 0xf9,
-	0xce, 0xa3, 0x25, 0xd8, 0xaa, 0xce, 0x44, 0xc4, 0x57, 0x60, 0xdc, 0x4e, 0x95, 0xcc, 0x20, 0x4e,
-	0x94, 0x84, 0x10, 0x53, 0x25, 0x21, 0x83, 0xa7, 0x30, 0xce, 0x35, 0x50, 0x12, 0xa6, 0x26, 0x4a,
-	0xae, 0xa3, 0x02, 0x7f, 0x14, 0xb1, 0x11, 0x24, 0x2c, 0x35, 0x2b, 0x7f, 0x3f, 0x5d, 0x5d, 0x1e,
-	0xd3, 0x70, 0x70, 0xcd, 0x81, 0x69, 0xc7, 0x2b, 0xe8, 0x5f, 0x90, 0x25, 0xc5, 0x9e, 0xc8, 0x02,
-	0x99, 0x8d, 0x65, 0x51, 0x74, 0x34, 0xc8, 0xf9, 0xda, 0x42, 0x76, 0x8b, 0xc9, 0x9b, 0xb1, 0x8c,
-	0x47, 0xcc, 0x83, 0x4b, 0xb2, 0x27, 0x64, 0x10, 0x52, 0xc9, 0xe6, 0xa4, 0x87, 0xdf, 0x40, 0xa5,
-	0x54, 0x4a, 0x75, 0xa7, 0x16, 0xbd, 0x25, 0xad, 0xa5, 0xc0, 0x6f, 0x21, 0x14, 0xc5, 0x61, 0x87,
-	0x0d, 0x79, 0xef, 0x9e, 0xba, 0x07, 0x0b, 0x5e, 0x29, 0x8a, 0xc3, 0x3d, 0x98, 0x48, 0x68, 0xac,
-	0xfe, 0x27, 0x0d, 0xdd, 0x29, 0x45, 0x85, 0x97, 0xe6, 0x0f, 0x2a, 0xf3, 0xc6, 0x87, 0xa8, 0x9c,
-	0x39, 0xa5, 0xf8, 0x1c, 0x3a, 0xfb, 0xfe, 0xce, 0x27, 0xed, 0xcf, 0xf6, 0x3a, 0x9f, 0xde, 0xdd,
-	0xb9, 0x73, 0xab, 0x7d, 0xbb, 0x55, 0xc9, 0x61, 0x84, 0x8a, 0x6a, 0xb2, 0x62, 0xe1, 0x65, 0xb4,
-	0x34, 0x59, 0xc9, 0x27, 0xa3, 0x9b, 0xed, 0xdb, 0xed, 0xfd, 0x0f, 0xf6, 0x76, 0x2b, 0x0b, 0x8d,
-	0x7f, 0x96, 0x50, 0xe1, 0xe3, 0xc4, 0xb3, 0xf1, 0x2f, 0x16, 0x3a, 0x7b, 0xca, 0xfb, 0xf0, 0x95,
-	0x99, 0xa7, 0xf7, 0xb9, 0x3e, 0x5a, 0xbb, 0x3a, 0x37, 0x4e, 0xa9, 0xe7, 0xdc, 0xf8, 0xea, 0xd7,
-	0x3f, 0xbf, 0xcd, 0x5f, 0xc5, 0x97, 0xc9, 0x0c, 0x43, 0x4f, 0xff, 0x61, 0x42, 0xc8, 0xd2, 0xd1,
-	0x17, 0xf5, 0x27, 0x0b, 0x2d, 0x67, 0x7d, 0x05, 0x6f, 0x1b, 0x10, 0x39, 0x6d, 0x56, 0xb5, 0xb7,
-	0xe7, 0x03, 0x69, 0xea, 0xd7, 0x81, 0xfa, 0x65, 0xbc, 0x6d, 0x4a, 0x5d, 0x5d, 0x79, 0x72, 0x10,
-	0xf4, 0x0f, 0xf1, 0xf7, 0x16, 0x2a, 0x4d, 0xcc, 0x04, 0x6f, 0x9a, 0x12, 0x98, 0x08, 0xbe, 0x35,
-	0x07, 0x42, 0xf3, 0xbd, 0x02, 0x7c, 0x37, 0xb1, 0x3b, 0x1f, 0x5f, 0xfc, 0xa3, 0xd2, 0x78, 0xe2,
-	0x38, 0x46, 0x1a, 0x9f, 0x76, 0x34, 0x23, 0x8d, 0x9f, 0x31, 0x35, 0xe7, 0x1d, 0xe0, 0xbc, 0x8d,
-	0xb7, 0x88, 0xc9, 0xdb, 0x40, 0x90, 0x83, 0xf4, 0xaa, 0x1f, 0xe2, 0xef, 0x94, 0xc2, 0xca, 0x97,
-	0x8c, 0x14, 0x9e, 0xb2, 0x3f, 0x23, 0x85, 0xa7, 0x4d, 0xcf, 0x71, 0x81, 0x6d, 0x1d, 0xaf, 0x9b,
-	0xb1, 0xc5, 0x7f, 0x59, 0xf0, 0xfa, 0x78, 0x9e, 0xbd, 0xe0, 0x77, 0x0d, 0xca, 0xbf, 0xc0, 0x1e,
-	0x6b, 0xef, 0xfd, 0x6f, 0xbc, 0x6e, 0xe6, 0x0e, 0x34, 0xd3, 0xc6, 0x2d, 0xd3, 0xe3, 0xf2, 0x05,
-	0x64, 0xeb, 0xa8, 0x27, 0x8d, 0xe8, 0x30, 0x9d, 0x90, 0x1c, 0x80, 0x0f, 0x1f, 0x36, 0x3f, 0x7a,
-	0x7c, 0x64, 0x5b, 0x4f, 0x8e, 0x6c, 0xeb, 0x8f, 0x23, 0xdb, 0xfa, 0xe6, 0xd8, 0xce, 0x3d, 0x39,
-	0xb6, 0x73, 0xbf, 0x1d, 0xdb, 0xb9, 0xcf, 0x1b, 0x19, 0x43, 0xd4, 0x05, 0x2e, 0x4d, 0x55, 0xfb,
-	0x32, 0x5b, 0x0f, 0x0c, 0xb2, 0x5b, 0x84, 0xa7, 0xdd, 0xf6, 0xbf, 0x01, 0x00, 0x00, 0xff, 0xff,
-	0x5d, 0xc4, 0x78, 0x19, 0x2d, 0x0b, 0x00, 0x00,
+	// 1096 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x57, 0xcf, 0x6f, 0x1b, 0xc5,
+	0x17, 0xcf, 0x3a, 0x71, 0x9a, 0x4c, 0xa2, 0xc4, 0xdf, 0x69, 0xf4, 0xc5, 0x31, 0x60, 0x47, 0x2b,
+	0x35, 0x32, 0x29, 0xdd, 0x75, 0x1c, 0xda, 0xd2, 0x56, 0x05, 0xc5, 0x4e, 0xea, 0x18, 0xf5, 0xe7,
+	0x06, 0x7a, 0xe0, 0xb2, 0x5a, 0xdb, 0xd3, 0xcd, 0xaa, 0xde, 0x1d, 0xc7, 0x33, 0x9b, 0x62, 0x45,
+	0xe1, 0x80, 0xf8, 0x03, 0x90, 0xf8, 0x07, 0x38, 0x22, 0xce, 0x88, 0x0b, 0x07, 0xc4, 0xad, 0xc7,
+	0x4a, 0xbd, 0x70, 0x0a, 0x28, 0xe1, 0xc6, 0xad, 0x7f, 0x01, 0xda, 0x37, 0xb3, 0x8e, 0x9d, 0x3a,
+	0xf1, 0xb8, 0x52, 0x39, 0x79, 0x77, 0xdf, 0xaf, 0xcf, 0xfb, 0xbc, 0x37, 0xef, 0x8d, 0xd1, 0x4a,
+	0x23, 0x74, 0x9a, 0x1e, 0xef, 0x34, 0x9d, 0x1a, 0x33, 0xe5, 0xb3, 0xe9, 0x05, 0x75, 0x12, 0x70,
+	0x6f, 0x8f, 0x30, 0x73, 0x37, 0x24, 0xed, 0x8e, 0xd1, 0x6a, 0x53, 0x4e, 0x71, 0xb6, 0x47, 0xd7,
+	0x90, 0xcf, 0xc6, 0x89, 0x6e, 0x66, 0xc1, 0xa5, 0x2e, 0x05, 0x55, 0x33, 0x7a, 0x12, 0x56, 0x99,
+	0xf7, 0x5c, 0x4a, 0xdd, 0x26, 0x31, 0x9d, 0x96, 0x67, 0x3a, 0x41, 0x40, 0xb9, 0xc3, 0x3d, 0x1a,
+	0x30, 0x29, 0xcd, 0xd6, 0x29, 0xf3, 0x29, 0x33, 0x6b, 0x0e, 0x23, 0xe6, 0xde, 0x6a, 0x8d, 0x70,
+	0x67, 0xd5, 0xac, 0x53, 0x2f, 0x90, 0xf2, 0x95, 0x5e, 0x39, 0x80, 0xe9, 0x6a, 0xb5, 0x1c, 0xd7,
+	0x0b, 0xc0, 0x59, 0xac, 0x3b, 0x24, 0x17, 0xd7, 0x09, 0x5d, 0xa2, 0xa8, 0xcb, 0xb8, 0xf3, 0x34,
+	0xd6, 0xbd, 0x3c, 0x44, 0xb7, 0xe5, 0xb4, 0x1d, 0x5f, 0x26, 0xa4, 0xa7, 0xd1, 0xff, 0x2b, 0x84,
+	0xdf, 0xa3, 0x8d, 0xb0, 0x49, 0xb6, 0xb9, 0xc3, 0x43, 0x66, 0x91, 0xdd, 0x90, 0x30, 0xae, 0xff,
+	0x96, 0x40, 0xef, 0xbc, 0x26, 0x62, 0x2d, 0x1a, 0x30, 0x82, 0x03, 0x34, 0xdb, 0x26, 0xcf, 0x9c,
+	0x76, 0xc3, 0x8e, 0x72, 0x67, 0x69, 0x6d, 0x69, 0x3c, 0x3f, 0x53, 0x5c, 0x34, 0x44, 0xf6, 0x46,
+	0x94, 0xbd, 0x21, 0xf3, 0x36, 0xca, 0xd4, 0x0b, 0x4a, 0x85, 0xe7, 0x87, 0xb9, 0xb1, 0x9f, 0xfe,
+	0xcc, 0xe5, 0x5d, 0x8f, 0xef, 0x84, 0x35, 0xa3, 0x4e, 0x7d, 0x53, 0x52, 0x25, 0x7e, 0xae, 0xb0,
+	0xc6, 0x53, 0x93, 0x77, 0x5a, 0x84, 0x81, 0x01, 0xb3, 0x66, 0x44, 0x00, 0x78, 0x89, 0xe2, 0x41,
+	0x86, 0x71, 0xbc, 0xc4, 0x5b, 0x88, 0x27, 0x02, 0x88, 0x78, 0x1b, 0x68, 0x52, 0xb0, 0x94, 0x1e,
+	0x5f, 0xd2, 0xf2, 0x33, 0xc5, 0x65, 0xe3, 0xfc, 0x5e, 0x32, 0x1e, 0x82, 0x76, 0x69, 0x22, 0x0a,
+	0x6b, 0x49, 0x5b, 0xfd, 0x12, 0xba, 0x58, 0x21, 0xbc, 0x12, 0x95, 0xb1, 0xd4, 0xa9, 0x6e, 0x48,
+	0x62, 0xf1, 0x1c, 0x4a, 0x78, 0x8d, 0xb4, 0xb6, 0xa4, 0xe5, 0x27, 0xac, 0x84, 0xd7, 0xd0, 0xb7,
+	0xd1, 0x42, 0xbf, 0x9a, 0x24, 0xf9, 0x16, 0x4a, 0x42, 0x0b, 0x80, 0xea, 0x4c, 0xf1, 0xd2, 0x30,
+	0x0c, 0xe0, 0xc1, 0x12, 0x36, 0x7a, 0x01, 0x65, 0x63, 0xa7, 0x8f, 0x22, 0xd5, 0x27, 0x1d, 0x2f,
+	0x70, 0x1f, 0x3b, 0xcd, 0x90, 0x9c, 0x05, 0xe3, 0x2e, 0xca, 0x9d, 0x69, 0x21, 0x11, 0x7d, 0x80,
+	0x52, 0xbb, 0x5d, 0x91, 0xbd, 0x17, 0xc9, 0xa4, 0x83, 0xf9, 0xdd, 0x7e, 0x13, 0xdd, 0x47, 0xa9,
+	0xd8, 0x5b, 0xdc, 0x51, 0xb8, 0x8c, 0x26, 0x19, 0xf4, 0x11, 0x18, 0xcd, 0x15, 0x2f, 0x2b, 0x65,
+	0x24, 0x5b, 0x4f, 0x9a, 0xe2, 0x05, 0x94, 0x6c, 0x90, 0x80, 0xfa, 0xe9, 0xc4, 0x92, 0x96, 0x9f,
+	0xb6, 0xc4, 0x8b, 0x6e, 0xa1, 0xff, 0xf5, 0x84, 0x93, 0x70, 0x6f, 0xa3, 0x49, 0x20, 0x23, 0xee,
+	0x4f, 0x45, 0x06, 0xa5, 0x91, 0x5e, 0x80, 0xf2, 0x6d, 0x47, 0x6d, 0xd1, 0x5b, 0xbe, 0x45, 0x34,
+	0x05, 0xad, 0x62, 0x77, 0xd9, 0xbb, 0x00, 0xef, 0xd5, 0xb8, 0x92, 0x3d, 0x16, 0x27, 0x95, 0x04,
+	0x15, 0xd5, 0x4a, 0x82, 0x07, 0x4b, 0xd8, 0xe8, 0x37, 0x81, 0x49, 0xf8, 0xd4, 0x65, 0x72, 0x19,
+	0x25, 0xe9, 0xb3, 0x80, 0xb4, 0xc1, 0xe1, 0x74, 0x29, 0xf5, 0xea, 0x30, 0x37, 0xdb, 0x71, 0xfc,
+	0xe6, 0x4d, 0x1d, 0x3e, 0xeb, 0x56, 0x52, 0xfe, 0x02, 0x2d, 0xb1, 0xed, 0x09, 0x2d, 0xe0, 0x59,
+	0x99, 0x16, 0x01, 0x47, 0x1a, 0xe9, 0xdf, 0x6a, 0xd0, 0x5a, 0x77, 0x42, 0x1e, 0xb6, 0x89, 0x05,
+	0x87, 0x74, 0x93, 0x71, 0xcf, 0x77, 0x38, 0x19, 0x11, 0x1e, 0x7e, 0x17, 0x4d, 0xc7, 0x54, 0x8a,
+	0x33, 0x3d, 0x61, 0x4d, 0x49, 0x2e, 0x19, 0x7e, 0x1f, 0xa1, 0x20, 0xf4, 0x6d, 0xd2, 0xa2, 0xf5,
+	0x1d, 0x71, 0x0e, 0xc7, 0xad, 0xe9, 0x20, 0xf4, 0x37, 0xe1, 0x43, 0x04, 0x23, 0x77, 0x26, 0x0c,
+	0x99, 0xa9, 0x83, 0x92, 0x6f, 0x6d, 0x3e, 0x09, 0xcf, 0xfa, 0x16, 0x4a, 0x57, 0x08, 0x5f, 0xaf,
+	0xd7, 0x69, 0x18, 0xf0, 0x2d, 0x8f, 0x71, 0xda, 0xee, 0xc4, 0x34, 0x7c, 0x88, 0x2e, 0x38, 0x42,
+	0x20, 0x89, 0xc0, 0xaf, 0x0e, 0x73, 0x73, 0x82, 0x08, 0x29, 0xd0, 0xad, 0x58, 0x45, 0xff, 0x1a,
+	0x2d, 0x0e, 0xf0, 0xf4, 0x9f, 0x65, 0xb2, 0xf2, 0x19, 0x9a, 0xe9, 0x39, 0x6f, 0xf8, 0x22, 0x9a,
+	0x5f, 0x2f, 0x7f, 0x5e, 0x7d, 0xbc, 0x69, 0x7f, 0xf1, 0xb0, 0xfc, 0xe0, 0x5e, 0xf5, 0x7e, 0x25,
+	0x35, 0x86, 0x11, 0x9a, 0x14, 0x1f, 0x53, 0x1a, 0x9e, 0x45, 0x53, 0x5d, 0x49, 0x22, 0x7a, 0xbb,
+	0x53, 0xbd, 0x5f, 0xdd, 0xde, 0xda, 0xdc, 0x48, 0x8d, 0x17, 0x7f, 0x9d, 0x45, 0xc9, 0x47, 0xd1,
+	0xf6, 0xc3, 0xbf, 0x6b, 0x68, 0xfe, 0xd4, 0x16, 0xc1, 0xd7, 0x86, 0x9e, 0xc3, 0x81, 0x1b, 0x29,
+	0x73, 0x7d, 0x64, 0x3b, 0xc1, 0x9e, 0x7e, 0xfb, 0x9b, 0x97, 0x7f, 0x7f, 0x9f, 0xb8, 0x8e, 0xaf,
+	0x9a, 0x43, 0x56, 0x63, 0xbc, 0xab, 0x7d, 0xf0, 0x62, 0xcb, 0x91, 0xf3, 0x8b, 0x86, 0x66, 0x7b,
+	0x27, 0x34, 0x5e, 0x53, 0x00, 0x72, 0x7a, 0xec, 0x67, 0x3e, 0x1a, 0xcd, 0x48, 0x42, 0xbf, 0x05,
+	0xd0, 0xaf, 0xe2, 0x35, 0x55, 0xe8, 0x62, 0x78, 0x99, 0xfb, 0x5e, 0xe3, 0x00, 0xff, 0xa8, 0xa1,
+	0xe9, 0xee, 0x58, 0xc4, 0x05, 0x55, 0x00, 0x5d, 0xc2, 0x57, 0x47, 0xb0, 0x90, 0x78, 0xaf, 0x01,
+	0xde, 0x02, 0x36, 0x46, 0xc3, 0x8b, 0x7f, 0x16, 0x1c, 0x77, 0x67, 0xa7, 0x12, 0xc7, 0xa7, 0x67,
+	0xb3, 0x12, 0xc7, 0xaf, 0x8d, 0x67, 0xfd, 0x06, 0x60, 0x5e, 0xc3, 0xab, 0xa6, 0xca, 0x2d, 0x8b,
+	0x99, 0xfb, 0xf1, 0xd0, 0x3a, 0xc0, 0x3f, 0x08, 0x86, 0xc5, 0x84, 0x55, 0x62, 0xb8, 0x6f, 0x90,
+	0x2b, 0x31, 0xdc, 0x3f, 0xbe, 0x75, 0x03, 0xd0, 0xe6, 0xf1, 0xb2, 0x1a, 0x5a, 0xfc, 0x8f, 0x06,
+	0xf7, 0xb8, 0x41, 0x83, 0x12, 0x7f, 0xa2, 0x10, 0xfe, 0x9c, 0x41, 0x9f, 0xf9, 0xf4, 0x8d, 0xed,
+	0x65, 0x32, 0x0f, 0x20, 0x99, 0x2a, 0xae, 0xa8, 0xb6, 0xcb, 0x13, 0xf0, 0x66, 0x8b, 0xcb, 0x21,
+	0xb3, 0x89, 0x74, 0x68, 0xee, 0xc3, 0x46, 0x39, 0xc0, 0x2f, 0x35, 0x58, 0x79, 0xfd, 0x63, 0x14,
+	0x7f, 0xac, 0x80, 0x73, 0xe0, 0x0c, 0xcf, 0xdc, 0x78, 0x03, 0x4b, 0x99, 0x5b, 0x15, 0x72, 0x2b,
+	0xe3, 0x75, 0xd5, 0xdc, 0xe4, 0x26, 0xb0, 0x77, 0x84, 0x23, 0x73, 0x5f, 0x7e, 0x38, 0x88, 0x6b,
+	0x38, 0xe8, 0x72, 0xa6, 0x54, 0xc3, 0x73, 0xee, 0x81, 0x4a, 0x35, 0x3c, 0xef, 0x56, 0x38, 0x7a,
+	0x0d, 0x5d, 0xc2, 0x6d, 0x38, 0xf6, 0xf6, 0xe9, 0xdb, 0x24, 0x8c, 0xad, 0xd2, 0xdd, 0xe7, 0x47,
+	0x59, 0xed, 0xc5, 0x51, 0x56, 0xfb, 0xeb, 0x28, 0xab, 0x7d, 0x77, 0x9c, 0x1d, 0x7b, 0x71, 0x9c,
+	0x1d, 0xfb, 0xe3, 0x38, 0x3b, 0xf6, 0x65, 0xb1, 0x67, 0xa9, 0xc9, 0x00, 0x57, 0xfa, 0xa2, 0x7d,
+	0xd5, 0x1b, 0x0f, 0x96, 0x5c, 0x6d, 0x12, 0xfe, 0xe8, 0xac, 0xfd, 0x1b, 0x00, 0x00, 0xff, 0xff,
+	0x40, 0xf5, 0xf5, 0x11, 0x3b, 0x0e, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -742,6 +936,11 @@ type QueryClient interface {
 	// time in the future. The requestor either provides an address or a set of locks
 	// for which they want to find the associated rewards.
 	GetFutureRewardEstimate(ctx context.Context, in *GetFutureRewardEstimateRequest, opts ...grpc.CallOption) (*GetFutureRewardEstimateResponse, error)
+	// GetAccountHistory returns the total accumulated rewards per denom for a given user.
+	GetAccountHistory(ctx context.Context, in *GetAccountHistoryRequest, opts ...grpc.CallOption) (*GetAccountHistoryResponse, error)
+	// Returns the total amount of value currently qualifying for the gauge. This is useful for calculating
+	// the prospective future rewards of staking.
+	GetGaugeQualifyingValue(ctx context.Context, in *GetGaugeQualifyingValueRequest, opts ...grpc.CallOption) (*GetGaugeQualifyingValueResponse, error)
 }
 
 type queryClient struct {
@@ -806,6 +1005,24 @@ func (c *queryClient) GetFutureRewardEstimate(ctx context.Context, in *GetFuture
 	return out, nil
 }
 
+func (c *queryClient) GetAccountHistory(ctx context.Context, in *GetAccountHistoryRequest, opts ...grpc.CallOption) (*GetAccountHistoryResponse, error) {
+	out := new(GetAccountHistoryResponse)
+	err := c.cc.Invoke(ctx, "/dualitylabs.duality.incentives.Query/GetAccountHistory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) GetGaugeQualifyingValue(ctx context.Context, in *GetGaugeQualifyingValueRequest, opts ...grpc.CallOption) (*GetGaugeQualifyingValueResponse, error) {
+	out := new(GetGaugeQualifyingValueResponse)
+	err := c.cc.Invoke(ctx, "/dualitylabs.duality.incentives.Query/GetGaugeQualifyingValue", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// GetModuleStatus returns a rundown of coins in the module and their status
@@ -822,6 +1039,11 @@ type QueryServer interface {
 	// time in the future. The requestor either provides an address or a set of locks
 	// for which they want to find the associated rewards.
 	GetFutureRewardEstimate(context.Context, *GetFutureRewardEstimateRequest) (*GetFutureRewardEstimateResponse, error)
+	// GetAccountHistory returns the total accumulated rewards per denom for a given user.
+	GetAccountHistory(context.Context, *GetAccountHistoryRequest) (*GetAccountHistoryResponse, error)
+	// Returns the total amount of value currently qualifying for the gauge. This is useful for calculating
+	// the prospective future rewards of staking.
+	GetGaugeQualifyingValue(context.Context, *GetGaugeQualifyingValueRequest) (*GetGaugeQualifyingValueResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -845,6 +1067,12 @@ func (*UnimplementedQueryServer) GetStakes(ctx context.Context, req *GetStakesRe
 }
 func (*UnimplementedQueryServer) GetFutureRewardEstimate(ctx context.Context, req *GetFutureRewardEstimateRequest) (*GetFutureRewardEstimateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFutureRewardEstimate not implemented")
+}
+func (*UnimplementedQueryServer) GetAccountHistory(ctx context.Context, req *GetAccountHistoryRequest) (*GetAccountHistoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAccountHistory not implemented")
+}
+func (*UnimplementedQueryServer) GetGaugeQualifyingValue(ctx context.Context, req *GetGaugeQualifyingValueRequest) (*GetGaugeQualifyingValueResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetGaugeQualifyingValue not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -959,6 +1187,42 @@ func _Query_GetFutureRewardEstimate_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_GetAccountHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAccountHistoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).GetAccountHistory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dualitylabs.duality.incentives.Query/GetAccountHistory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).GetAccountHistory(ctx, req.(*GetAccountHistoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_GetGaugeQualifyingValue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetGaugeQualifyingValueRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).GetGaugeQualifyingValue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dualitylabs.duality.incentives.Query/GetGaugeQualifyingValue",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).GetGaugeQualifyingValue(ctx, req.(*GetGaugeQualifyingValueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "dualitylabs.duality.incentives.Query",
 	HandlerType: (*QueryServer)(nil),
@@ -986,6 +1250,14 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFutureRewardEstimate",
 			Handler:    _Query_GetFutureRewardEstimate_Handler,
+		},
+		{
+			MethodName: "GetAccountHistory",
+			Handler:    _Query_GetAccountHistory_Handler,
+		},
+		{
+			MethodName: "GetGaugeQualifyingValue",
+			Handler:    _Query_GetGaugeQualifyingValue_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1135,6 +1407,62 @@ func (m *GetGaugeByIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		}
 		i--
 		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *GetGaugeQualifyingValueRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GetGaugeQualifyingValueRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetGaugeQualifyingValueRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Id != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.Id))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *GetGaugeQualifyingValueResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GetGaugeQualifyingValueResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetGaugeQualifyingValueResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.QualifyingValue != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.QualifyingValue))
+		i--
+		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -1431,6 +1759,73 @@ func (m *GetFutureRewardEstimateResponse) MarshalToSizedBuffer(dAtA []byte) (int
 	return len(dAtA) - i, nil
 }
 
+func (m *GetAccountHistoryRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GetAccountHistoryRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetAccountHistoryRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Account) > 0 {
+		i -= len(m.Account)
+		copy(dAtA[i:], m.Account)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Account)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *GetAccountHistoryResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GetAccountHistoryResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GetAccountHistoryResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Coins) > 0 {
+		for iNdEx := len(m.Coins) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Coins[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintQuery(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	offset -= sovQuery(v)
 	base := offset
@@ -1495,6 +1890,30 @@ func (m *GetGaugeByIDResponse) Size() (n int) {
 	if m.Gauge != nil {
 		l = m.Gauge.Size()
 		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *GetGaugeQualifyingValueRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Id != 0 {
+		n += 1 + sovQuery(uint64(m.Id))
+	}
+	return n
+}
+
+func (m *GetGaugeQualifyingValueResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.QualifyingValue != 0 {
+		n += 1 + sovQuery(uint64(m.QualifyingValue))
 	}
 	return n
 }
@@ -1607,6 +2026,34 @@ func (m *GetFutureRewardEstimateRequest) Size() (n int) {
 }
 
 func (m *GetFutureRewardEstimateResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Coins) > 0 {
+		for _, e := range m.Coins {
+			l = e.Size()
+			n += 1 + l + sovQuery(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *GetAccountHistoryRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Account)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *GetAccountHistoryResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1962,6 +2409,144 @@ func (m *GetGaugeByIDResponse) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GetGaugeQualifyingValueRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GetGaugeQualifyingValueRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GetGaugeQualifyingValueRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			m.Id = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Id |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GetGaugeQualifyingValueResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GetGaugeQualifyingValueResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GetGaugeQualifyingValueResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field QualifyingValue", wireType)
+			}
+			m.QualifyingValue = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.QualifyingValue |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipQuery(dAtA[iNdEx:])
@@ -2693,6 +3278,172 @@ func (m *GetFutureRewardEstimateResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: GetFutureRewardEstimateResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Coins", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Coins = append(m.Coins, types.Coin{})
+			if err := m.Coins[len(m.Coins)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GetAccountHistoryRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GetAccountHistoryRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GetAccountHistoryRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Account", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Account = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GetAccountHistoryResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GetAccountHistoryResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GetAccountHistoryResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

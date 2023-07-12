@@ -16,13 +16,13 @@ func TestPacketMetadata_Marshal(t *testing.T) {
 	pm := PacketMetadata{
 		&SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   "test-1",
-				Receiver:  "test-1",
-				TokenIn:   "token-a",
-				TokenOut:  "token-b",
-				AmountIn:  sdk.NewInt(123),
-				TickIndex: 0,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          "test-1",
+				Receiver:         "test-1",
+				TokenIn:          "token-a",
+				TokenOut:         "token-b",
+				AmountIn:         sdk.NewInt(123),
+				TickIndexInToOut: 0,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 				// NOTE: will enable MaxAmountOut for swap soon
 				// MaxAmountOut: sdk.NewInt(456),
 			},
@@ -51,13 +51,13 @@ func TestPacketMetadata_MarshalWithNext(t *testing.T) {
 	pm := PacketMetadata{
 		&SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   "test-1",
-				Receiver:  "test-1",
-				TokenIn:   "token-a",
-				TokenOut:  "token-b",
-				TickIndex: 0,
-				AmountIn:  sdk.NewInt(123),
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          "test-1",
+				Receiver:         "test-1",
+				TokenIn:          "token-a",
+				TokenOut:         "token-b",
+				TickIndexInToOut: 0,
+				AmountIn:         sdk.NewInt(123),
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 				// MaxAmountOut: sdk.NewInt(456),
 			},
 			Next: NewJSONObject(false, nextBz, orderedmap.OrderedMap{}),
@@ -69,7 +69,7 @@ func TestPacketMetadata_MarshalWithNext(t *testing.T) {
 
 // TestPacketMetadata_Unmarshal asserts that unmarshaling works as intended.
 func TestPacketMetadata_Unmarshal(t *testing.T) {
-	metadata := "{\n  \"swap\": {\n    \"creator\": \"test-1\",\n \"tickIndex\": 0,\n \"orderType\": 1,\n   \"receiver\": \"test-1\",\n    \"tokenIn\": \"token-a\",\n    \"tokenOut\": \"token-b\",\n    \"AmountIn\": \"123\",\n    \"next\": \"\"\n  }\n}"
+	metadata := "{\n  \"swap\": {\n    \"creator\": \"test-1\",\n \"TickIndexInToOut\": 0,\n \"orderType\": 1,\n   \"receiver\": \"test-1\",\n    \"tokenIn\": \"token-a\",\n    \"tokenOut\": \"token-b\",\n    \"AmountIn\": \"123\",\n    \"next\": \"\"\n  }\n}"
 	pm := &PacketMetadata{}
 	err := json.Unmarshal([]byte(metadata), pm)
 	require.NoError(t, err)
@@ -77,7 +77,7 @@ func TestPacketMetadata_Unmarshal(t *testing.T) {
 
 // TestPacketMetadata_UnmarshalStringNext asserts that unmarshaling works as intended when next is escaped json string.
 func TestPacketMetadata_UnmarshalStringNext(t *testing.T) {
-	metadata := "{\n  \"swap\": {\n    \"creator\": \"test-1\",\n    \"receiver\": \"test-1\",\n    \"tokenIn\": \"token-a\",\n    \"tokenOut\": \"token-b\",\n    \"AmountIn\": \"123\",\n  \"tickIndex\": 0,\n \"orderType\": 1,\n  \"next\": \" {\\\"forward\\\":{\\\"receiver\\\":\\\"cosmos1f4cur2krsua2th9kkp7n0zje4stea4p9tu70u8\\\",\\\"port\\\":\\\"transfer\\\",\\\"channel\\\":\\\"channel-0\\\",\\\"timeout\\\":0,\\\"next\\\":{\\\"forward\\\":{\\\"receiver\\\":\\\"cosmos1l505zhahp24v5jsmps9vs5asah759fdce06sfp\\\",\\\"port\\\":\\\"transfer\\\",\\\"channel\\\":\\\"channel-0\\\",\\\"timeout\\\":0}}}}\"\n  }\n}"
+	metadata := "{\n  \"swap\": {\n    \"creator\": \"test-1\",\n    \"receiver\": \"test-1\",\n    \"tokenIn\": \"token-a\",\n    \"tokenOut\": \"token-b\",\n    \"AmountIn\": \"123\",\n  \"TickIndexInToOut\": 0,\n \"orderType\": 1,\n  \"next\": \" {\\\"forward\\\":{\\\"receiver\\\":\\\"cosmos1f4cur2krsua2th9kkp7n0zje4stea4p9tu70u8\\\",\\\"port\\\":\\\"transfer\\\",\\\"channel\\\":\\\"channel-0\\\",\\\"timeout\\\":0,\\\"next\\\":{\\\"forward\\\":{\\\"receiver\\\":\\\"cosmos1l505zhahp24v5jsmps9vs5asah759fdce06sfp\\\",\\\"port\\\":\\\"transfer\\\",\\\"channel\\\":\\\"channel-0\\\",\\\"timeout\\\":0}}}}\"\n  }\n}"
 	pm := &PacketMetadata{}
 	err := json.Unmarshal([]byte(metadata), pm)
 	require.NoError(t, err)
@@ -85,7 +85,7 @@ func TestPacketMetadata_UnmarshalStringNext(t *testing.T) {
 
 // TestPacketMetadata_UnmarshalJSONNext asserts that unmarshaling works as intended when next is a raw json object.
 func TestPacketMetadata_UnmarshalJSONNext(t *testing.T) {
-	metadata := "{\"swap\":{\"creator\":\"test-1\",\"receiver\":\"test-1\",\"tokenIn\":\"token-a\",\"tokenOut\":\"token-b\",\"AmountIn\":\"123\",\"tickIndex\":0, \"orderType\": 1, \"tokenIn\":\"token-in\",\"next\":{\"forward\":{\"receiver\":\"cosmos14zde8usc4ur04y3aqnufzzmv2uqdpwwttr5uwv\",\"port\":\"transfer\",\"channel\":\"channel-0\"}}}}"
+	metadata := "{\"swap\":{\"creator\":\"test-1\",\"receiver\":\"test-1\",\"tokenIn\":\"token-a\",\"tokenOut\":\"token-b\",\"AmountIn\":\"123\",\"TickIndexInToOut\":0, \"orderType\": 1, \"tokenIn\":\"token-in\",\"next\":{\"forward\":{\"receiver\":\"cosmos14zde8usc4ur04y3aqnufzzmv2uqdpwwttr5uwv\",\"port\":\"transfer\",\"channel\":\"channel-0\"}}}}"
 	pm := &PacketMetadata{}
 	err := json.Unmarshal([]byte(metadata), pm)
 	require.NoError(t, err)
@@ -95,13 +95,13 @@ func TestSwapMetadata_ValidatePass(t *testing.T) {
 	pm := PacketMetadata{
 		&SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   "cosmos14zde8usc4ur04y3aqnufzzmv2uqdpwwttr5uwv",
-				Receiver:  "cosmos14zde8usc4ur04y3aqnufzzmv2uqdpwwttr5uwv",
-				TokenIn:   "token-a",
-				TokenOut:  "token-b",
-				AmountIn:  sdk.NewInt(123),
-				TickIndex: 0,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          "cosmos14zde8usc4ur04y3aqnufzzmv2uqdpwwttr5uwv",
+				Receiver:         "cosmos14zde8usc4ur04y3aqnufzzmv2uqdpwwttr5uwv",
+				TokenIn:          "token-a",
+				TokenOut:         "token-b",
+				AmountIn:         sdk.NewInt(123),
+				TickIndexInToOut: 0,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 				// MaxAmountOut: sdk.NewInt(456),
 			},
 			Next: nil,
@@ -117,13 +117,13 @@ func TestSwapMetadata_ValidateFail(t *testing.T) {
 	pm := PacketMetadata{
 		&SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   "",
-				Receiver:  "test-1",
-				TokenIn:   "token-a",
-				TokenOut:  "token-b",
-				AmountIn:  sdk.NewInt(123),
-				TickIndex: 0,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          "",
+				Receiver:         "test-1",
+				TokenIn:          "token-a",
+				TokenOut:         "token-b",
+				AmountIn:         sdk.NewInt(123),
+				TickIndexInToOut: 0,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 				// MaxAmountOut: sdk.NewInt(456),
 			},
 			Next: nil,
@@ -136,13 +136,13 @@ func TestSwapMetadata_ValidateFail(t *testing.T) {
 	pm = PacketMetadata{
 		&SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   "creator",
-				Receiver:  "",
-				TokenIn:   "token-a",
-				TokenOut:  "token-b",
-				AmountIn:  sdk.NewInt(123),
-				TickIndex: 0,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          "creator",
+				Receiver:         "",
+				TokenIn:          "token-a",
+				TokenOut:         "token-b",
+				AmountIn:         sdk.NewInt(123),
+				TickIndexInToOut: 0,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 				// MaxAmountOut: sdk.NewInt(456),
 			},
 			Next: nil,
@@ -155,13 +155,13 @@ func TestSwapMetadata_ValidateFail(t *testing.T) {
 	pm = PacketMetadata{
 		&SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   "creator",
-				Receiver:  "test-1",
-				TokenIn:   "",
-				TokenOut:  "token-b",
-				AmountIn:  sdk.NewInt(123),
-				TickIndex: 0,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          "creator",
+				Receiver:         "test-1",
+				TokenIn:          "",
+				TokenOut:         "token-b",
+				AmountIn:         sdk.NewInt(123),
+				TickIndexInToOut: 0,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 				// MaxAmountOut: sdk.NewInt(456),
 			},
 			Next: nil,
@@ -174,13 +174,13 @@ func TestSwapMetadata_ValidateFail(t *testing.T) {
 	pm = PacketMetadata{
 		&SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   "creator",
-				Receiver:  "receiver",
-				TokenIn:   "token-a",
-				TokenOut:  "",
-				AmountIn:  sdk.NewInt(123),
-				TickIndex: 0,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          "creator",
+				Receiver:         "receiver",
+				TokenIn:          "token-a",
+				TokenOut:         "",
+				AmountIn:         sdk.NewInt(123),
+				TickIndexInToOut: 0,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 				// MaxAmountOut: sdk.NewInt(456),
 			},
 			Next: nil,
@@ -193,13 +193,13 @@ func TestSwapMetadata_ValidateFail(t *testing.T) {
 	pm = PacketMetadata{
 		&SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   "creator",
-				Receiver:  "receiver",
-				TokenIn:   "token-a",
-				TokenOut:  "token-b",
-				AmountIn:  sdk.NewInt(0),
-				TickIndex: 0,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          "creator",
+				Receiver:         "receiver",
+				TokenIn:          "token-a",
+				TokenOut:         "token-b",
+				AmountIn:         sdk.NewInt(0),
+				TickIndexInToOut: 0,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 				// MaxAmountOut: sdk.NewInt(456),
 			},
 			Next: nil,
@@ -212,13 +212,13 @@ func TestSwapMetadata_ValidateFail(t *testing.T) {
 	pm = PacketMetadata{
 		&SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   "creator",
-				Receiver:  "receiver",
-				TokenIn:   "token-a",
-				TokenOut:  "token-b",
-				AmountIn:  sdk.NewInt(-1),
-				TickIndex: 0,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				Creator:          "creator",
+				Receiver:         "receiver",
+				TokenIn:          "token-a",
+				TokenOut:         "token-b",
+				AmountIn:         sdk.NewInt(-1),
+				TickIndexInToOut: 0,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 				// MaxAmountOut: sdk.NewInt(456),
 			},
 			Next: nil,
@@ -231,13 +231,13 @@ func TestSwapMetadata_ValidateFail(t *testing.T) {
 	pm = PacketMetadata{
 		&SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   "creator",
-				Receiver:  "receiver",
-				TokenIn:   "token-a",
-				TokenOut:  "token-b",
-				AmountIn:  sdk.NewInt(123),
-				TickIndex: 0,
-				OrderType: types.LimitOrderType_GOOD_TIL_CANCELLED,
+				Creator:          "creator",
+				Receiver:         "receiver",
+				TokenIn:          "token-a",
+				TokenOut:         "token-b",
+				AmountIn:         sdk.NewInt(123),
+				TickIndexInToOut: 0,
+				OrderType:        types.LimitOrderType_GOOD_TIL_CANCELLED,
 				// MaxAmountOut: sdk.NewInt(0),
 			},
 			Next: nil,
@@ -256,7 +256,7 @@ func TestSwapMetadata_ValidateFail(t *testing.T) {
 	// 			TokenIn:  "token-a",
 	// 			TokenOut: "token-b",
 	// 			AmountIn: sdk.NewInt(123),
-	// 			TickIndex: 0,
+	// 			TickIndexInToOut: 0,
 	// 			OrderType: types.LimitOrderType_FILL_OR_KILL,
 	// 			MaxAmountOut: sdk.NewInt(-1),
 	// 		},

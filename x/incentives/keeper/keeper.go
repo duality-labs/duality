@@ -22,6 +22,7 @@ type Keeper struct {
 	ek          types.EpochKeeper
 	dk          types.DexKeeper
 	distributor Distributor
+	authority   string
 }
 
 // NewKeeper returns a new instance of the incentive module keeper struct.
@@ -32,6 +33,7 @@ func NewKeeper(
 	bk types.BankKeeper,
 	ek types.EpochKeeper,
 	dk types.DexKeeper,
+	authority string,
 ) *Keeper {
 	if !paramSpace.HasKeyTable() {
 		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
@@ -44,6 +46,7 @@ func NewKeeper(
 		bk:         bk,
 		ek:         ek,
 		dk:         dk,
+		authority:  authority,
 	}
 	keeper.distributor = NewDistributor(keeper)
 	return keeper

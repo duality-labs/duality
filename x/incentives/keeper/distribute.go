@@ -29,7 +29,7 @@ func (k Keeper) ValueForShares(ctx sdk.Context, coin sdk.Coin, tick int64) (sdk.
 		return sdk.ZeroInt(), err
 	}
 	amount0, amount1 := pool.RedeemValue(coin.Amount, totalShares)
-	price1To0Center, err := dextypes.NewPrice(-1 * tick)
+	price1To0Center, err := dextypes.CalcPrice(-1 * tick)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
@@ -71,6 +71,17 @@ func (k Keeper) Distribute(ctx sdk.Context, gauges types.Gauges) (types.Distribu
 		if err != nil {
 			return nil, err
 		}
+
+		// Accumulate to account history
+		accHistory, found := k.GetAccountHistory(ctx, addr)
+		if found {
+			accHistory.Coins = accHistory.Coins.Add(rewards...)
+		} else {
+			accHistory = NewAccountHistory(addr, rewards)
+		}
+		k.SetAccountHistory(ctx, accHistory)
+
+		// Emit events
 		ctx.EventManager().EmitEvents(sdk.Events{
 			sdk.NewEvent(
 				types.TypeEvtDistribution,

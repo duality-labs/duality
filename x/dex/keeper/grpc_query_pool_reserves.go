@@ -21,14 +21,16 @@ func (k Keeper) PoolReservesAll(
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	pairID, err := types.StringToPairID(req.PairID)
+	pairID, err := types.NewPairIDFromCanonicalString(req.PairID)
 	if err != nil {
 		return nil, err
 	}
-	store := ctx.KVStore(k.storeKey)
-	PoolReservesStore := prefix.NewStore(store, types.TickLiquidityPrefix(pairID, req.TokenIn))
+	tradePairID := types.NewTradePairIDFromMaker(pairID, req.TokenIn)
 
-	var poolReserves []types.PoolReserves
+	store := ctx.KVStore(k.storeKey)
+	PoolReservesStore := prefix.NewStore(store, types.TickLiquidityPrefix(tradePairID))
+
+	var poolReserves []*types.PoolReserves
 	pageRes, err := query.FilteredPaginate(
 		PoolReservesStore,
 		req.Pagination,
@@ -42,7 +44,7 @@ func (k Keeper) PoolReservesAll(
 			// Check if this is a LimitOrderTranche and not PoolReserves
 			if reserves != nil {
 				if accum {
-					poolReserves = append(poolReserves, *reserves)
+					poolReserves = append(poolReserves, reserves)
 				}
 
 				return true, nil
@@ -65,14 +67,21 @@ func (k Keeper) PoolReserves(
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	pairID, err := types.StringToPairID(req.PairID)
+	pairID, err := types.NewPairIDFromCanonicalString(req.PairID)
 	if err != nil {
 		return nil, err
 	}
-	val, found := k.GetPoolReserves(ctx, pairID, req.TokenIn, req.TickIndex, req.Fee)
+	tradePairID := types.NewTradePairIDFromMaker(pairID, req.TokenIn)
+
+	poolReservesID := &types.PoolReservesKey{
+		tradePairID,
+		req.TickIndex,
+		req.Fee,
+	}
+	val, found := k.GetPoolReserves(ctx, poolReservesID)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")
 	}
 
-	return &types.QueryGetPoolReservesResponse{PoolReserves: *val}, nil
+	return &types.QueryGetPoolReservesResponse{PoolReserves: val}, nil
 }

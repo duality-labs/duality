@@ -66,6 +66,7 @@ func setup(withGenesis bool, invCheckPeriod uint) (*App, GenesisState) {
 		invCheckPeriod,
 		EmptyAppOptions{},
 		encConfig,
+		nil,
 	)
 	if withGenesis {
 		return app, NewDefaultGenesisState(encConfig.Marshaler)
@@ -308,6 +309,7 @@ func NewTestNetworkFixture() network.TestFixture {
 		5,
 		EmptyAppOptions{},
 		encConfig,
+		nil,
 	)
 
 	appCtr := func(val network.ValidatorI) servertypes.Application {
@@ -321,6 +323,7 @@ func NewTestNetworkFixture() network.TestFixture {
 			5,
 			EmptyAppOptions{},
 			encConfig,
+			nil,
 			bam.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
 			bam.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
 			bam.SetChainID(val.GetCtx().Viper.GetString(flags.FlagChainID)),

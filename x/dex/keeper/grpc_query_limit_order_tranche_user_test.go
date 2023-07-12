@@ -91,8 +91,8 @@ func TestLimitOrderTrancheUserQueryPaginated(t *testing.T) {
 			require.NoError(t, err)
 			require.LessOrEqual(t, len(resp.LimitOrderTrancheUser), step)
 			require.Subset(t,
-				nullify.Fill(msgs),
-				nullify.Fill(resp.LimitOrderTrancheUser),
+				msgs,
+				resp.LimitOrderTrancheUser,
 			)
 		}
 	})
@@ -104,8 +104,8 @@ func TestLimitOrderTrancheUserQueryPaginated(t *testing.T) {
 			require.NoError(t, err)
 			require.LessOrEqual(t, len(resp.LimitOrderTrancheUser), step)
 			require.Subset(t,
-				nullify.Fill(msgs),
-				nullify.Fill(resp.LimitOrderTrancheUser),
+				msgs,
+				resp.LimitOrderTrancheUser,
 			)
 			next = resp.Pagination.NextKey
 		}
@@ -115,8 +115,8 @@ func TestLimitOrderTrancheUserQueryPaginated(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, len(msgs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
-			nullify.Fill(msgs),
-			nullify.Fill(resp.LimitOrderTrancheUser),
+			msgs,
+			resp.LimitOrderTrancheUser,
 		)
 	})
 	t.Run("InvalidRequest", func(t *testing.T) {

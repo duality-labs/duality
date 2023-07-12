@@ -19,6 +19,8 @@ func GetQueryCmd() *cobra.Command {
 	dcli.AddQueryCmd(cmd, qcGetter, GetCmdGetStakeByID)
 	dcli.AddQueryCmd(cmd, qcGetter, GetCmdStakes)
 	dcli.AddQueryCmd(cmd, qcGetter, GetCmdGetFutureRewardEstimate)
+	dcli.AddQueryCmd(cmd, qcGetter, GetCmdGetAccountHistory)
+	dcli.AddQueryCmd(cmd, qcGetter, GetCmdGaugeQualifyingValue)
 
 	return cmd
 }
@@ -84,11 +86,28 @@ func GetCmdStakes() (*dcli.QueryDescriptor, *types.GetStakesRequest) {
 // GetCmdGetFutureRewardsEstimate returns a rewards estimate for a given set of stakes.
 func GetCmdGetFutureRewardEstimate() (*dcli.QueryDescriptor, *types.GetFutureRewardEstimateRequest) {
 	return &dcli.QueryDescriptor{
-		Use:   "reward-estimate [owner] [stakeIDs] [endEpoch]",
+		Use:   "reward-estimate [owner] [stakeIDs] [numEpochs]",
 		Short: "Get rewards estimate for set of stakes",
-		Long:  `{{.Short}}{{.ExampleHeader}} reward-estimate cosmos1chl62vc593p99z2tfh2pp8tl4anm0w4l8h8svx [1,2,3] 1681450672`,
+		Long:  `{{.Short}}{{.ExampleHeader}} reward-estimate cosmos1chl62vc593p99z2tfh2pp8tl4anm0w4l8h8svx [1,2,3] 365`,
 		CustomFieldParsers: map[string]dcli.CustomFieldParserFn{
 			"StakeIDs": dcli.ParseUintArray,
 		},
 	}, &types.GetFutureRewardEstimateRequest{}
+}
+
+// GetCmdGetFutureRewardsEstimate returns a rewards estimate for a given set of stakes.
+func GetCmdGetAccountHistory() (*dcli.QueryDescriptor, *types.GetAccountHistoryRequest) {
+	return &dcli.QueryDescriptor{
+		Use:   "account-history [account]",
+		Short: "Get rewards distribution history for an address",
+		Long:  `{{.Short}}{{.ExampleHeader}} account-history cosmos1chl62vc593p99z2tfh2pp8tl4anm0w4l8h8svx`,
+	}, &types.GetAccountHistoryRequest{}
+}
+
+func GetCmdGaugeQualifyingValue() (*dcli.QueryDescriptor, *types.GetGaugeQualifyingValueRequest) {
+	return &dcli.QueryDescriptor{
+		Use:   "gauge-qualifying-value [gaugeID]",
+		Short: "Query the qualifying value of a gauge by gauge id.",
+		Long:  `{{.Short}}{{.ExampleHeader}} gauge-qualifying-value 1`,
+	}, &types.GetGaugeQualifyingValueRequest{}
 }

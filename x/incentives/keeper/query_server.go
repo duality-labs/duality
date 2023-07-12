@@ -53,6 +53,21 @@ func (q QueryServer) GetGaugeByID(
 	return &types.GetGaugeByIDResponse{Gauge: gauge}, nil
 }
 
+func (q QueryServer) GetGaugeQualifyingValue(
+	goCtx context.Context,
+	req *types.GetGaugeQualifyingValueRequest,
+) (*types.GetGaugeQualifyingValueResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+	value, err := q.Keeper.GetGaugeQualifyingValue(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &types.GetGaugeQualifyingValueResponse{QualifyingValue: value}, nil
+}
+
 func (q QueryServer) GetGauges(
 	goCtx context.Context,
 	req *types.GetGaugesRequest,
@@ -171,6 +186,7 @@ func (q QueryServer) GetFutureRewardEstimate(
 	goCtx context.Context,
 	req *types.GetFutureRewardEstimateRequest,
 ) (*types.GetFutureRewardEstimateResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -178,7 +194,6 @@ func (q QueryServer) GetFutureRewardEstimate(
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "empty owner")
 	}
 
-	ctx := sdk.UnwrapSDKContext(goCtx)
 	if req.NumEpochs > 365 {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "end epoch out of ranges")
 	}
@@ -206,6 +221,24 @@ func (q QueryServer) GetFutureRewardEstimate(
 		return nil, err
 	}
 	return &types.GetFutureRewardEstimateResponse{Coins: rewards}, nil
+}
+
+func (q QueryServer) GetAccountHistory(
+	goCtx context.Context,
+	req *types.GetAccountHistoryRequest,
+) (*types.GetAccountHistoryResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	accountHistory, found := q.Keeper.GetAccountHistory(ctx, req.Account)
+	if !found {
+		return nil, status.Error(
+			codes.NotFound,
+			"Could not locate an account history with that address",
+		)
+	}
+	return &types.GetAccountHistoryResponse{Coins: accountHistory.Coins}, nil
 }
 
 // getGaugeFromIDJsonBytes returns gauges from the json bytes of gaugeIDs.
