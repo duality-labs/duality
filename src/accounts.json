@@ -1,0 +1,16 @@
+[
+    {
+        "@type": "/cosmos.auth.v1beta1.BaseAccount",
+        "address": "cosmos1ugfvmwydvmvvjkzxjt4nduaj5p42kkednxkppv",
+        "pub_key": null,
+        "account_number": "0",
+        "sequence": "0"
+    },
+    {
+        "@type": "/cosmos.auth.v1beta1.BaseAccount",
+        "address": "cosmos1t0v4244t7nd8h4vq29vv6ufmhr5w8gcjqyxqty",
+        "pub_key": null,
+        "account_number": "1",
+        "sequence": "0"
+    }
+]

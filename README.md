@@ -1,5 +1,13 @@
 # Genesis Setup
 
+## Set Chain ID
+
+Defaults to just "duality".
+
+## CCV
+
+Set provider_reward_denoms to `uatom` and set a few other params.
+
 ## Group Genesis Config
 
 Run with:
@@ -18,7 +26,7 @@ To update the genesis.json with the final group_genesis.json run the following.
 
 ```
 group_genesis=$(dasel -f "group_genesis.json" '.')
-dasel put object -f "old_genesis.json" -s "$group_genesis" '.app_state.group' > new_genesis.json
+dasel put -f ~/.duality/config/genesis.json -t json -v "$group_genesis" '.app_state.group'
 ```
 
 ## Wasm Genesis Config
@@ -28,5 +36,5 @@ to upload and instantiate wasm contracts. [Docs here](https://github.com/CosmWas
 
 ```
 wasm_genesis=$(dasel -f "wasm_genesis.json" '.')
-dasel put object -f "old_genesis.json" -s "$wasm_genesis" '.app_state.wasm' > new_genesis.json
+dasel put -f ~/.duality/config/genesis.json -t json -v "$wasm_genesis" '.app_state.wasm'
 ```

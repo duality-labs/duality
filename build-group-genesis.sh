@@ -3,10 +3,9 @@
 nodehome=$(mktemp -d)
 
 cleanup() {
-    echo $?
-    kill $dualityd_pid >/dev/null 2>&1
     rm -rf $nodehome
 }
+
 trap cleanup ERR
 trap 'exit_code=$?; cleanup; exit $exit_code' EXIT
 
@@ -24,8 +23,8 @@ dualityd tx group create-group-with-policy \
     "$user" \
     "" \
     "" \
-    members.json \
-    policy.json \
+    ./src/members.json \
+    ./src/policy.json \
     --group-policy-as-admin \
     --from $user \
     --keyring-backend test \
