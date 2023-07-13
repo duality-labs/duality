@@ -11,6 +11,9 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
 	consumerante "github.com/cosmos/interchain-security/v3/app/consumer/ante"
 	ibcconsumerkeeper "github.com/cosmos/interchain-security/v3/x/ccv/consumer/keeper"
+
+	builderante "github.com/skip-mev/pob/x/builder/ante"
+	builderkeeper "github.com/skip-mev/pob/x/builder/keeper"
 )
 
 // HandlerOptions extend the SDK's AnteHandler options by requiring the IBC
@@ -22,6 +25,10 @@ type HandlerOptions struct {
 	ConsumerKeeper    ibcconsumerkeeper.Keeper
 	WasmConfig        *wasmtypes.WasmConfig
 	TXCounterStoreKey storetypes.StoreKey
+
+	BuilderKeeper builderkeeper.Keeper
+	TxEncoder     sdk.TxEncoder
+	Mempool       builderante.Mempool
 }
 
 func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
@@ -84,6 +91,9 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
 		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
+
+		// Skip Protocol's POB
+		builderante.NewBuilderDecorator(options.BuilderKeeper, options.TxEncoder, options.Mempool),
 	}
 
 	return sdk.ChainAnteDecorators(anteDecorators...), nil

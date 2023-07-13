@@ -86,6 +86,21 @@
       "supply": [],
       "denom_metadata": []
     },
+    "builder": {
+      "params": {
+        "escrow_account_address": "cosmos1fun809ksxh87nzf88yashp9ynjz6xkscxlchqa",
+        "front_running_protection": false,
+        "max_bundle_size": "4",
+        "min_bid_increment": {
+          "denom": "uatom",
+          "amount": "1000000"
+        },
+        "reserve_fee": {
+          "denom": "uatom",
+          "amount": "1000000"
+        }
+      }
+    },
     "capability": {
       "index": "1",
       "owners": []
