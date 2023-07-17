@@ -7,8 +7,8 @@ import (
 )
 
 type MultihopStep struct {
-	BestPrice   sdk.Dec
-	tradePairID *types.TradePairID
+	RemainingBestPrice sdk.Dec
+	tradePairID        *types.TradePairID
 }
 
 func (k Keeper) HopsToRouteData(
@@ -18,10 +18,11 @@ func (k Keeper) HopsToRouteData(
 ) ([]MultihopStep, error) {
 	nPairs := len(hops) - 1
 	routeArr := make([]MultihopStep, nPairs)
-	priceUpperbound := sdk.OneDec()
+	priceAcc := sdk.OneDec()
 	for i := range routeArr {
-		tokenIn := hops[i]
-		tokenOut := hops[i+1]
+		index := len(routeArr) - 1 - i
+		tokenIn := hops[index]
+		tokenOut := hops[index+1]
 		tradePairID, err := types.NewTradePairID(tokenIn, tokenOut)
 		if err != nil {
 			return routeArr, err
@@ -30,32 +31,20 @@ func (k Keeper) HopsToRouteData(
 		if !found {
 			return routeArr, types.ErrInsufficientLiquidity
 		}
-		priceUpperbound = price.Mul(priceUpperbound)
-		routeArr[i] = MultihopStep{
-			tradePairID: tradePairID,
-			BestPrice:   price,
+		priceAcc = priceAcc.Mul(price)
+		routeArr[index] = MultihopStep{
+			tradePairID:        tradePairID,
+			RemainingBestPrice: priceAcc,
 		}
-	}
-
-	if exitLimitPrice.GT(priceUpperbound) {
-		return routeArr, types.ErrExitLimitPriceHit
 	}
 
 	return routeArr, nil
 }
 
-func CalcMultihopPriceUpperbound(currentPrice sdk.Dec, remainingSteps []MultihopStep) sdk.Dec {
-	price := currentPrice
-	for _, step := range remainingSteps {
-		price = step.BestPrice.Mul(price)
-	}
-
-	return price
-}
-
 type StepResult struct {
-	Ctx     types.BranchableCache
+	Ctx     *types.BranchableCache
 	CoinOut sdk.Coin
+	CoinIn  sdk.Coin
 	Err     error
 }
 
@@ -74,19 +63,15 @@ func newCacheKey(tokenIn, tokenOut string, inAmount sdk.Int) multihopCacheKey {
 }
 
 func (k Keeper) MultihopStep(
-	bctx types.BranchableCache,
+	bctx *types.BranchableCache,
 	step MultihopStep,
 	inCoin sdk.Coin,
 	exitLimitPrice sdk.Dec,
 	currentPrice sdk.Dec,
 	remainingSteps []MultihopStep,
 	stepCache map[multihopCacheKey]StepResult,
-) (sdk.Coin, types.BranchableCache, error) {
-	priceUpperbound := CalcMultihopPriceUpperbound(currentPrice, remainingSteps)
-	if exitLimitPrice.GT(priceUpperbound) {
-		// If we can't hit the best possible price we can greedily abort
-		return sdk.Coin{}, bctx, types.ErrExitLimitPriceHit
-	}
+) (sdk.Coin, *types.BranchableCache, error) {
+
 	cacheKey := newCacheKey(step.tradePairID.TakerDenom, step.tradePairID.MakerDenom, inCoin.Amount)
 	val, ok := stepCache[cacheKey]
 	if ok {
@@ -98,13 +83,7 @@ func (k Keeper) MultihopStep(
 	// In these cases the user will end up with trace amounts of tokens from intermediary steps.
 	// To fix this we would have to pre-calculate the route such that the amount
 	// in will be used completely at each step
-	_, coinOut, err := k.SwapExactAmountIn(
-		bctx.Ctx,
-		step.tradePairID,
-		inCoin.Amount,
-		nil,
-		nil,
-	)
+	coinOut, err := k.SwapExactAmountIn(bctx.Ctx, step.tradePairID, inCoin.Amount)
 	ctxBranch := bctx.Branch()
 	stepCache[cacheKey] = StepResult{Ctx: bctx, CoinOut: coinOut, Err: err}
 	if err != nil {
@@ -132,6 +111,12 @@ func (k Keeper) RunMultihopRoute(
 	bCacheCtx := types.NewBranchableCache(ctx)
 
 	for i, step := range routeData {
+		// If we can't hit the best possible price we can greedily abort
+		priceUpperbound := currentPrice.Mul(step.RemainingBestPrice)
+		if exitLimitPrice.GT(priceUpperbound) {
+			return sdk.Coin{}, bCacheCtx.WriteCache, types.ErrExitLimitPriceHit
+		}
+
 		currentOutCoin, bCacheCtx, err = k.MultihopStep(
 			bCacheCtx,
 			step,
@@ -141,6 +126,7 @@ func (k Keeper) RunMultihopRoute(
 			routeData[i:],
 			stepCache,
 		)
+		inCoin = currentOutCoin
 		if err != nil {
 			return sdk.Coin{}, nil, sdkerrors.Wrapf(
 				err,
@@ -148,6 +134,7 @@ func (k Keeper) RunMultihopRoute(
 				step.tradePairID.MustPairID().CanonicalString(),
 			)
 		}
+
 		currentPrice = sdk.NewDecFromInt(currentOutCoin.Amount).
 			Quo(sdk.NewDecFromInt(initialInCoin.Amount))
 	}
@@ -156,28 +143,26 @@ func (k Keeper) RunMultihopRoute(
 		return sdk.Coin{}, nil, types.ErrExitLimitPriceHit
 	}
 
-	return currentOutCoin, bCacheCtx.Write, nil
+	return currentOutCoin, bCacheCtx.WriteCache, nil
 }
 
 func (k Keeper) SwapExactAmountIn(ctx sdk.Context,
 	tradePairID *types.TradePairID,
 	amountIn sdk.Int,
-	maxAmountOut *sdk.Int,
-	limitPrice *sdk.Dec,
-) (totalIn, totalOut sdk.Coin, err error) {
-	swapAmountTakerDenom, swapAmountMakerDenom, orderFilled, err := k.Swap(
+) (totalOut sdk.Coin, err error) {
+	_, swapAmountMakerDenom, orderFilled, err := k.Swap(
 		ctx,
 		tradePairID,
 		amountIn,
-		maxAmountOut,
-		limitPrice,
+		nil,
+		nil,
 	)
 	if err != nil {
-		return sdk.Coin{}, sdk.Coin{}, err
+		return sdk.Coin{}, err
 	}
 	if !orderFilled {
-		return sdk.Coin{}, sdk.Coin{}, types.ErrInsufficientLiquidity
+		return sdk.Coin{}, types.ErrInsufficientLiquidity
 	}
 
-	return swapAmountTakerDenom, swapAmountMakerDenom, err
+	return swapAmountMakerDenom, err
 }

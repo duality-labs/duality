@@ -287,7 +287,7 @@ func (k Keeper) MultiHopSwapCore(
 		bestRoute.route,
 	))
 
-	return coinOut, nil
+	return bestRoute.coinOut, nil
 }
 
 // Handles MsgPlaceLimitOrder, initializing (tick, pair) data structures if needed, calculating and
