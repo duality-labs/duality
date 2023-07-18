@@ -11,18 +11,21 @@ import "dualitylabs/duality/dex/user_positions.proto";
 import "dualitylabs/duality/dex/deposit_record.proto";
 import "dualitylabs/duality/dex/tick_liquidity.proto";
 import "dualitylabs/duality/dex/pool_reserves.proto";
+import "dualitylabs/duality/dex/tx.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/duality-labs/duality/x/dex/types";
 
 // Query defines the gRPC querier service.
 service Query {
-  // Parameters queries the parameters of the module.
-  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/dualitylabs/duality/dex/params";
-  }
+	// Parameters queries the parameters of the module.
+	rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+		option (google.api.http).get = "/dualitylabs/duality/dex/params";
+	}
 
-  // Queries a LimitOrderTrancheUser by index.
+	// Queries a LimitOrderTrancheUser by index.
 	rpc LimitOrderTrancheUser(QueryGetLimitOrderTrancheUserRequest) returns (QueryGetLimitOrderTrancheUserResponse) {
 		option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche_user/{address}/{trancheKey}";
 	}
@@ -32,27 +35,27 @@ service Query {
 		option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche_user";
 	}
 
-  // Queries a LimitOrderTranche by index.
- rpc LimitOrderTranche(QueryGetLimitOrderTrancheRequest) returns (QueryGetLimitOrderTrancheResponse) {
-  	option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche/{pairID}/{tokenIn}/{tickIndex}/{trancheKey}";
-  }
+	// Queries a LimitOrderTranche by index.
+	rpc LimitOrderTranche(QueryGetLimitOrderTrancheRequest) returns (QueryGetLimitOrderTrancheResponse) {
+		option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche/{pairID}/{tokenIn}/{tickIndex}/{trancheKey}";
+	}
 
-  // Queries a list of LimitOrderTranche items for a given pairID / TokenIn combination.
-  rpc LimitOrderTrancheAll(QueryAllLimitOrderTrancheRequest) returns (QueryAllLimitOrderTrancheResponse) {
-  	option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche/{pairID}/{tokenIn}";
-  }
+	// Queries a list of LimitOrderTranche items for a given pairID / TokenIn combination.
+	rpc LimitOrderTrancheAll(QueryAllLimitOrderTrancheRequest) returns (QueryAllLimitOrderTrancheResponse) {
+		option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche/{pairID}/{tokenIn}";
+	}
 
-  // Queries a list of GetUserPositions items.
+	// Queries a list of GetUserPositions items.
 	rpc GetUserPositions(QueryGetUserPositionsRequest) returns (QueryGetUserPositionsResponse) {
 		option (google.api.http).get = "/dualitylabs/duality/dex/user/positions/{address}";
 	}
 
-// Queries a list of UserDeposits items.
+	// Queries a list of UserDeposits items.
 	rpc UserDepositsAll(QueryAllUserDepositsRequest) returns (QueryAllUserDepositsResponse) {
 		option (google.api.http).get = "/dualitylabs/duality/dex/user/deposits/{address}";
 	}
 
-// Queries a list of UserLimitOrders items.
+	// Queries a list of UserLimitOrders items.
 	rpc UserLimitOrdersAll(QueryAllUserLimitOrdersRequest) returns (QueryAllUserLimitOrdersResponse) {
 		option (google.api.http).get = "/dualitylabs/duality/dex/user/limit_orders/{address}";
 	}
@@ -62,7 +65,7 @@ service Query {
 		option (google.api.http).get = "/dualitylabs/duality/dex/tick_liquidity/{pairID}/{tokenIn}";
 	}
 
-// Queries a InactiveLimitOrderTranche by index.
+	// Queries a InactiveLimitOrderTranche by index.
 	rpc InactiveLimitOrderTranche(QueryGetInactiveLimitOrderTrancheRequest) returns (QueryGetInactiveLimitOrderTrancheResponse) {
 		option (google.api.http).get = "/dualitylabs/duality/dex/filled_limit_order_tranche/{pairID}/{tokenIn}/{tickIndex}/{trancheKey}";
 	}
@@ -72,14 +75,19 @@ service Query {
 		option (google.api.http).get = "/dualitylabs/duality/dex/filled_limit_order_tranche";
 	}
 
-// Queries a list of PoolReserves items.
+	// Queries a list of PoolReserves items.
 	rpc PoolReservesAll(QueryAllPoolReservesRequest) returns (QueryAllPoolReservesResponse) {
 		option (google.api.http).get = "/dualitylabs/duality/dex/pool_reserves/{pairID}/{tokenIn}";
 	}
 
-  // Queries a PoolReserve by index
-  rpc PoolReserves(QueryGetPoolReservesRequest) returns (QueryGetPoolReservesResponse) {
+	// Queries a PoolReserve by index
+	rpc PoolReserves(QueryGetPoolReservesRequest) returns (QueryGetPoolReservesResponse) {
 		option (google.api.http).get = "/dualitylabs/duality/dex/pool_reserves/{pairID}/{tokenIn}/{tickIndex}/{fee}";
+	}
+
+	// Queries the simulated result of a multihop swap 
+	rpc EstimateMultiHopSwap(QueryEstimateMultiHopSwapRequest) returns (QueryEstimateMultiHopSwapResponse) {
+		option (google.api.http).get = "/dualitylabs/duality/dex/estimate_multi_hop_swap";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -213,4 +221,32 @@ message QueryGetPoolReservesRequest {
 message QueryGetPoolReservesResponse {
 	PoolReserves poolReserves = 1 [(gogoproto.nullable) = true];
 }
+
+message QueryEstimateMultiHopSwapRequest {
+  repeated MultiHopRoute routes = 1;
+  string amountIn = 2 [
+                       (gogoproto.moretags)   = "yaml:\"amountIn\"",
+                       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+                       (gogoproto.nullable)   = false,
+                       (gogoproto.jsontag) = "amountIn"
+                       ];
+  string exitLimitPrice = 3 [
+                             (gogoproto.moretags)   = "yaml:\"exitLimitPrice\"",
+                             (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+                             (gogoproto.nullable)   = false,
+                             (gogoproto.jsontag) = "exitLimitPrice"
+                             ];
+  // If pickBestRoute == true then all routes are run and the route with the best price is chosen
+  // otherwise, the first succesful route is used.
+  bool pickBestRoute = 4;
+}
+
+message QueryEstimateMultiHopSwapResponse {
+  cosmos.base.v1beta1.Coin coinOut = 1 [
+                                        (gogoproto.nullable) = false,
+                                        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
+                                        (gogoproto.jsontag) = "coinOut"
+                                        ];
+}
+
 // this line is used by starport scaffolding # 3

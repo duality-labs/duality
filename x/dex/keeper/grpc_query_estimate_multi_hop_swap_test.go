@@ -6,43 +6,7 @@ import (
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
-type PoolSetup struct {
-	TokenA    string
-	TokenB    string
-	AmountA   int
-	AmountB   int
-	TickIndex int
-	Fee       int
-}
-
-func NewPoolSetup(tokenA, tokenB string, amountA, amountB, tickIndex, fee int) PoolSetup {
-	return PoolSetup{
-		TokenA:    tokenA,
-		TokenB:    tokenB,
-		AmountA:   amountA,
-		AmountB:   amountB,
-		TickIndex: tickIndex,
-		Fee:       fee,
-	}
-}
-
-func (s *MsgServerTestSuite) SetupMultiplePools(poolSetups ...PoolSetup) {
-	for _, p := range poolSetups {
-		coins := sdk.NewCoins(
-			sdk.NewCoin(p.TokenA, sdk.NewInt(int64(p.AmountA))),
-			sdk.NewCoin(p.TokenB, sdk.NewInt(int64(p.AmountB))),
-		)
-		s.fundAccountBalancesWithDenom(s.bob, coins)
-		pairID := types.PairID{Token0: p.TokenA, Token1: p.TokenB}
-		s.deposits(
-			s.bob,
-			[]*Deposit{NewDeposit(p.AmountA, p.AmountB, p.TickIndex, p.Fee)},
-			pairID,
-		)
-	}
-}
-
-func (s *MsgServerTestSuite) TestMultiHopSwapSingleRoute() {
+func (s *MsgServerTestSuite) TestEstimateMultiHopSwapSingleRoute() {
 	s.fundAliceBalances(100, 0)
 
 	// GIVEN liquidity in pools A<>B, B<>C, C<>D,
@@ -54,19 +18,20 @@ func (s *MsgServerTestSuite) TestMultiHopSwapSingleRoute() {
 
 	// WHEN alice multihopswaps A<>B => B<>C => C<>D,
 	route := [][]string{{"TokenA", "TokenB", "TokenC", "TokenD"}}
-	s.aliceMultiHopSwaps(route, 100, sdk.MustNewDecFromStr("0.9"), false)
+	coinOut := s.estimateMultiHopSwap(route, 100, sdk.MustNewDecFromStr("0.9"), false)
 
-	// THEN alice gets out 99 TokenD
-	s.assertAccountBalanceWithDenom(s.alice, "TokenA", 0)
-	s.assertAccountBalanceWithDenom(s.alice, "TokenD", 97)
+	// THEN alice would get out 99 TokenD
+	s.Assert().Equal(sdk.NewInt(97), coinOut.Amount)
+	s.assertAccountBalanceWithDenom(s.alice, "TokenA", 100)
+	s.assertAccountBalanceWithDenom(s.alice, "TokenD", 0)
 
-	s.assertDexBalanceWithDenom("TokenA", 100)
+	s.assertDexBalanceWithDenom("TokenA", 0)
 	s.assertDexBalanceWithDenom("TokenB", 100)
 	s.assertDexBalanceWithDenom("TokenC", 100)
-	s.assertDexBalanceWithDenom("TokenD", 3)
+	s.assertDexBalanceWithDenom("TokenD", 100)
 }
 
-func (s *MsgServerTestSuite) TestMultiHopSwapInsufficientLiquiditySingleRoute() {
+func (s *MsgServerTestSuite) TestEstimateMultiHopSwapInsufficientLiquiditySingleRoute() {
 	s.fundAliceBalances(100, 0)
 
 	// GIVEN liquidity in pools A<>B, B<>C, C<>D with insufficient liquidity in C<>D
@@ -76,9 +41,9 @@ func (s *MsgServerTestSuite) TestMultiHopSwapInsufficientLiquiditySingleRoute() 
 		NewPoolSetup("TokenC", "TokenD", 0, 50, 0, 1),
 	)
 
-	// THEN alice multihopswap fails
+	// THEN estimate multihopswap fails
 	route := [][]string{{"TokenA", "TokenB", "TokenC", "TokenD"}}
-	s.aliceMultiHopSwapFails(
+	s.estimateMultiHopSwapFails(
 		types.ErrInsufficientLiquidity,
 		route,
 		100,
@@ -87,7 +52,7 @@ func (s *MsgServerTestSuite) TestMultiHopSwapInsufficientLiquiditySingleRoute() 
 	)
 }
 
-func (s *MsgServerTestSuite) TestMultiHopSwapLimitPriceNotMetSingleRoute() {
+func (s *MsgServerTestSuite) TestEstimateMultiHopSwapLimitPriceNotMetSingleRoute() {
 	s.fundAliceBalances(100, 0)
 
 	// GIVEN liquidity in pools A<>B, B<>C, C<>D with insufficient liquidity in C<>D
@@ -97,9 +62,9 @@ func (s *MsgServerTestSuite) TestMultiHopSwapLimitPriceNotMetSingleRoute() {
 		NewPoolSetup("TokenC", "TokenD", 0, 100, 1200, 1),
 	)
 
-	// THEN alice multihopswap fails
+	// THEN estimate multihopswap fails
 	route := [][]string{{"TokenA", "TokenB", "TokenC", "TokenD"}}
-	s.aliceMultiHopSwapFails(
+	s.estimateMultiHopSwapFails(
 		types.ErrExitLimitPriceHit,
 		route,
 		50,
@@ -108,7 +73,7 @@ func (s *MsgServerTestSuite) TestMultiHopSwapLimitPriceNotMetSingleRoute() {
 	)
 }
 
-func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteOneGood() {
+func (s *MsgServerTestSuite) TestEstimateMultiHopSwapMultiRouteOneGood() {
 	s.fundAliceBalances(100, 0)
 
 	// GIVEN viable liquidity in pools A<>B, B<>E, E<>X
@@ -124,35 +89,47 @@ func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteOneGood() {
 		NewPoolSetup("TokenE", "TokenX", 0, 100, 0, 1),
 	)
 
-	// WHEN alice multihopswaps with three routes the first two routes fail and the third works
+	// WHEN estimate multihopswaps with three routes the first two routes fail and the third works
 	routes := [][]string{
 		{"TokenA", "TokenB", "TokenC", "TokenX"},
 		{"TokenA", "TokenB", "TokenD", "TokenX"},
 		{"TokenA", "TokenB", "TokenE", "TokenX"},
 	}
-	s.aliceMultiHopSwaps(routes, 100, sdk.MustNewDecFromStr("0.9"), false)
 
-	// THEN swap succeeds through route A<>B, B<>E, E<>X
-	s.assertAccountBalanceWithDenom(s.alice, "TokenA", 0)
-	s.assertAccountBalanceWithDenom(s.alice, "TokenX", 97)
 	s.assertLiquidityAtTickWithDenom(
 		&types.PairID{Token0: "TokenA", Token1: "TokenB"},
+		sdk.NewInt(0),
 		sdk.NewInt(100),
-		sdk.NewInt(1),
+		0,
+		1,
+	)
+
+	coinOut := s.estimateMultiHopSwap(routes, 100, sdk.MustNewDecFromStr("0.9"), false)
+	_ = coinOut
+
+	// THEN swap estimation succeeds through route A<>B, B<>E, E<>X
+
+	s.Assert().Equal(sdk.NewInt(97), coinOut.Amount)
+	s.assertAccountBalanceWithDenom(s.alice, "TokenA", 100)
+	s.assertAccountBalanceWithDenom(s.alice, "TokenX", 0)
+	s.assertLiquidityAtTickWithDenom(
+		&types.PairID{Token0: "TokenA", Token1: "TokenB"},
+		sdk.NewInt(0),
+		sdk.NewInt(100),
 		0,
 		1,
 	)
 	s.assertLiquidityAtTickWithDenom(
 		&types.PairID{Token0: "TokenB", Token1: "TokenE"},
-		sdk.NewInt(99),
-		sdk.NewInt(2),
+		sdk.NewInt(0),
+		sdk.NewInt(100),
 		0,
 		1,
 	)
 	s.assertLiquidityAtTickWithDenom(
 		&types.PairID{Token0: "TokenE", Token1: "TokenX"},
-		sdk.NewInt(98),
-		sdk.NewInt(3),
+		sdk.NewInt(0),
+		sdk.NewInt(100),
 		0,
 		1,
 	)
@@ -202,7 +179,7 @@ func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteOneGood() {
 	)
 }
 
-func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteAllFail() {
+func (s *MsgServerTestSuite) TestEstimateMultiHopSwapMultiRouteAllFail() {
 	s.fundAliceBalances(100, 0)
 
 	// GIVEN liquidity in sufficient liquidity but inadequate prices
@@ -226,7 +203,7 @@ func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteAllFail() {
 	}
 
 	// Then fails with findBestRoute
-	s.aliceMultiHopSwapFails(
+	s.estimateMultiHopSwapFails(
 		types.ErrExitLimitPriceHit,
 		routes,
 		100,
@@ -236,7 +213,7 @@ func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteAllFail() {
 
 	// and with findFirstRoute
 
-	s.aliceMultiHopSwapFails(
+	s.estimateMultiHopSwapFails(
 		types.ErrExitLimitPriceHit,
 		routes,
 		100,
@@ -245,7 +222,7 @@ func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteAllFail() {
 	)
 }
 
-func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteFindBestRoute() {
+func (s *MsgServerTestSuite) TestEstimateMultiHopSwapMultiRouteFindBestRoute() {
 	s.fundAliceBalances(100, 0)
 
 	// GIVEN viable liquidity in pools but with a best route through E<>X
@@ -265,30 +242,29 @@ func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteFindBestRoute() {
 		{"TokenA", "TokenB", "TokenD", "TokenX"},
 		{"TokenA", "TokenB", "TokenE", "TokenX"},
 	}
-	s.aliceMultiHopSwaps(routes, 100, sdk.MustNewDecFromStr("0.9"), true)
+	coinOut := s.estimateMultiHopSwap(routes, 100, sdk.MustNewDecFromStr("0.9"), true)
 
 	// THEN swap succeeds through route A<>B, B<>E, E<>X
 
-	s.assertAccountBalanceWithDenom(s.alice, "TokenA", 0)
-	s.assertAccountBalanceWithDenom(s.alice, "TokenX", 132)
+	s.Assert().Equal(sdk.NewCoin("TokenX", sdk.NewInt(132)), coinOut)
 	s.assertLiquidityAtTickWithDenom(
 		&types.PairID{Token0: "TokenA", Token1: "TokenB"},
+		sdk.NewInt(0),
 		sdk.NewInt(100),
-		sdk.NewInt(1),
 		0,
 		1,
 	)
 	s.assertLiquidityAtTickWithDenom(
 		&types.PairID{Token0: "TokenB", Token1: "TokenE"},
-		sdk.NewInt(99),
-		sdk.NewInt(2),
+		sdk.NewInt(0),
+		sdk.NewInt(100),
 		0,
 		1,
 	)
 	s.assertLiquidityAtTickWithDenom(
 		&types.PairID{Token0: "TokenE", Token1: "TokenX"},
-		sdk.NewInt(98),
-		sdk.NewInt(868),
+		sdk.NewInt(0),
+		sdk.NewInt(1000),
 		-3000,
 		1,
 	)
@@ -324,7 +300,7 @@ func (s *MsgServerTestSuite) TestMultiHopSwapMultiRouteFindBestRoute() {
 	)
 }
 
-func (s *MsgServerTestSuite) TestMultiHopSwapLongRouteWithCache() {
+func (s *MsgServerTestSuite) TestEstimateMultiHopSwapLongRouteWithCache() {
 	s.fundAliceBalances(100, 0)
 
 	// GIVEN viable route from A->B->C...->L but last leg to X only possible through K->M->X
@@ -358,21 +334,21 @@ func (s *MsgServerTestSuite) TestMultiHopSwapLongRouteWithCache() {
 			"TokenG", "TokenH", "TokenI", "TokenJ", "TokenK", "TokenM", "TokenX",
 		},
 	}
-	s.aliceMultiHopSwaps(routes, 100, sdk.MustNewDecFromStr("0.8"), true)
+	coinOut := s.estimateMultiHopSwap(routes, 100, sdk.MustNewDecFromStr("0.8"), true)
 
 	// THEN swap succeeds with second route
-	s.assertAccountBalanceWithDenom(s.alice, "TokenA", 0)
-	s.assertAccountBalanceWithDenom(s.alice, "TokenX", 88)
+	s.Assert().Equal(coinOut, sdk.NewCoin("TokenX", sdk.NewInt(88)))
+	s.assertAccountBalanceWithDenom(s.alice, "TokenA", 100)
 	s.assertLiquidityAtTickWithDenom(
 		&types.PairID{Token0: "TokenM", Token1: "TokenX"},
-		sdk.NewInt(89),
-		sdk.NewInt(12),
+		sdk.NewInt(0),
+		sdk.NewInt(100),
 		0,
 		1,
 	)
 }
 
-func (s *MsgServerTestSuite) TestMultiHopSwapEventsEmitted() {
+func (s *MsgServerTestSuite) TestEstimateMultiHopSwapEventsEmitted() {
 	s.fundAliceBalances(100, 0)
 
 	s.SetupMultiplePools(
@@ -381,8 +357,8 @@ func (s *MsgServerTestSuite) TestMultiHopSwapEventsEmitted() {
 	)
 
 	route := [][]string{{"TokenA", "TokenB", "TokenC"}}
-	s.aliceMultiHopSwaps(route, 100, sdk.MustNewDecFromStr("0.9"), false)
+	_ = s.estimateMultiHopSwap(route, 100, sdk.MustNewDecFromStr("0.9"), false)
 
 	// 8 tickUpdateEvents are emitted 4x for pool setup 4x for two swaps
-	keepertest.AssertNEventsEmitted(s.T(), s.ctx, types.TickUpdateEventKey, 8)
+	keepertest.AssertEventNotEmitted(s.T(), s.ctx, types.TickUpdateEventKey, "Expected no events")
 }

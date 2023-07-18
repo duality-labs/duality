@@ -897,6 +897,48 @@ func (s *MsgServerTestSuite) multiHopSwaps(
 	s.Assert().Nil(err)
 }
 
+func (s *MsgServerTestSuite) estimateMultiHopSwap(
+	routes [][]string,
+	amountIn int,
+	exitLimitPrice sdk.Dec,
+	pickBest bool,
+) (coinOut sdk.Coin) {
+	multiHopRoutes := make([]*types.MultiHopRoute, len(routes))
+	for i, hops := range routes {
+		multiHopRoutes[i] = &types.MultiHopRoute{Hops: hops}
+	}
+	msg := &types.QueryEstimateMultiHopSwapRequest{
+		Routes:         multiHopRoutes,
+		AmountIn:       sdk.NewInt(int64(amountIn)),
+		ExitLimitPrice: exitLimitPrice,
+		PickBestRoute:  pickBest,
+	}
+	res, err := s.queryClient.EstimateMultiHopSwap(s.goCtx, msg)
+	s.Require().Nil(err)
+	return res.CoinOut
+}
+
+func (s *MsgServerTestSuite) estimateMultiHopSwapFails(
+	expectedErr error,
+	routes [][]string,
+	amountIn int,
+	exitLimitPrice sdk.Dec,
+	pickBest bool,
+) {
+	multiHopRoutes := make([]*types.MultiHopRoute, len(routes))
+	for i, hops := range routes {
+		multiHopRoutes[i] = &types.MultiHopRoute{Hops: hops}
+	}
+	msg := &types.QueryEstimateMultiHopSwapRequest{
+		Routes:         multiHopRoutes,
+		AmountIn:       sdk.NewInt(int64(amountIn)),
+		ExitLimitPrice: exitLimitPrice,
+		PickBestRoute:  pickBest,
+	}
+	_, err := s.queryClient.EstimateMultiHopSwap(s.goCtx, msg)
+	s.Assert().ErrorIs(err, expectedErr)
+}
+
 func (s *MsgServerTestSuite) aliceMultiHopSwapFails(
 	err error,
 	routes [][]string,

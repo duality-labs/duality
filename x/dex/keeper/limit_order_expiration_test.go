@@ -153,7 +153,7 @@ func TestPurgeExpiredLimitOrdersAtBlockGasLimit(t *testing.T) {
 	ctx = ctx.WithBlockTime(now)
 	gasLimit := 1000000
 	ctx = ctx.WithBlockGasMeter(sdk.NewGasMeter(uint64(gasLimit)))
-	timeRequiredToPurgeOneNonJIT := 40000
+	timeRequiredToPurgeOneNonJIT := 35000
 	gasUsed := gasLimit - types.GoodTilPurgeGasBuffer - timeRequiredToPurgeOneNonJIT
 
 	yesterday := now.AddDate(0, 0, -1)
