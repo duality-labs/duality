@@ -125,7 +125,7 @@ import (
 )
 
 const (
-	AccountAddressPrefix = "cosmos"
+	AccountAddressPrefix = "dual"
 	Name                 = "duality"
 )
 
