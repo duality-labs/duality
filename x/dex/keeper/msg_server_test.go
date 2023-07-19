@@ -897,7 +897,7 @@ func (s *MsgServerTestSuite) multiHopSwaps(
 	s.Assert().Nil(err)
 }
 
-func (s *MsgServerTestSuite) estimateMultiHopSwap(
+func (s *MsgServerTestSuite) aliceEstimatesMultiHopSwap(
 	routes [][]string,
 	amountIn int,
 	exitLimitPrice sdk.Dec,
@@ -908,6 +908,8 @@ func (s *MsgServerTestSuite) estimateMultiHopSwap(
 		multiHopRoutes[i] = &types.MultiHopRoute{Hops: hops}
 	}
 	msg := &types.QueryEstimateMultiHopSwapRequest{
+		Creator:        s.alice.String(),
+		Receiver:       s.alice.String(),
 		Routes:         multiHopRoutes,
 		AmountIn:       sdk.NewInt(int64(amountIn)),
 		ExitLimitPrice: exitLimitPrice,
@@ -918,7 +920,7 @@ func (s *MsgServerTestSuite) estimateMultiHopSwap(
 	return res.CoinOut
 }
 
-func (s *MsgServerTestSuite) estimateMultiHopSwapFails(
+func (s *MsgServerTestSuite) aliceEstimatesMultiHopSwapFails(
 	expectedErr error,
 	routes [][]string,
 	amountIn int,
@@ -930,6 +932,8 @@ func (s *MsgServerTestSuite) estimateMultiHopSwapFails(
 		multiHopRoutes[i] = &types.MultiHopRoute{Hops: hops}
 	}
 	msg := &types.QueryEstimateMultiHopSwapRequest{
+		Creator:        s.alice.String(),
+		Receiver:       s.alice.String(),
 		Routes:         multiHopRoutes,
 		AmountIn:       sdk.NewInt(int64(amountIn)),
 		ExitLimitPrice: exitLimitPrice,

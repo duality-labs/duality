@@ -303,12 +303,13 @@ func (k Keeper) PlaceLimitOrderCore(
 	maxAmountOut *sdk.Int,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
-) (trancheKeyP *string, coinIn sdk.Coin, coinOutSwap sdk.Coin, err error) {
+) (trancheKey string, totalInCoin sdk.Coin, swapInCoin sdk.Coin, swapOutCoin sdk.Coin, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	pairID, err := types.NewPairIDFromUnsorted(tokenIn, tokenOut)
+	var pairID *types.PairID
+	pairID, err = types.NewPairIDFromUnsorted(tokenIn, tokenOut)
 	if err != nil {
-		return nil, coinIn, coinOutSwap, err
+		return
 	}
 
 	amountLeft, totalIn := amountIn, sdk.ZeroInt()
@@ -317,14 +318,15 @@ func (k Keeper) PlaceLimitOrderCore(
 	if !orderType.IsJIT() {
 		// This is ok because tokenOut is provided to the constructor of PairID above
 		takerTradePairID := pairID.MustTradePairIDFromMaker(tokenOut)
-		limitPrice, err := types.CalcPrice(tickIndexInToOut)
+		var limitPrice sdk.Dec
+		limitPrice, err = types.CalcPrice(tickIndexInToOut)
+		err = err
 		if err != nil {
-			return nil, coinIn, coinOutSwap, err
+			return
 		}
 
-		var coinInSwap sdk.Coin
 		var orderFilled bool
-		coinInSwap, coinOutSwap, orderFilled, err = k.SwapWithCache(
+		swapInCoin, swapOutCoin, orderFilled, err = k.SwapWithCache(
 			ctx,
 			takerTradePairID,
 			amountIn,
@@ -332,25 +334,26 @@ func (k Keeper) PlaceLimitOrderCore(
 			&limitPrice,
 		)
 		if err != nil {
-			return nil, coinIn, coinOutSwap, err
+			return
 		}
 
 		if orderType.IsFoK() && !orderFilled {
-			return nil, coinIn, coinOutSwap, types.ErrFoKLimitOrderNotFilled
+			err = types.ErrFoKLimitOrderNotFilled
+			return
 		}
 
-		totalIn = coinInSwap.Amount
-		amountLeft = amountLeft.Sub(coinInSwap.Amount)
+		totalIn = swapInCoin.Amount
+		amountLeft = amountLeft.Sub(swapInCoin.Amount)
 
-		if coinOutSwap.IsPositive() {
+		if swapOutCoin.IsPositive() {
 			err = k.bankKeeper.SendCoinsFromModuleToAccount(
 				ctx,
 				types.ModuleName,
 				receiverAddr,
-				sdk.Coins{coinOutSwap},
+				sdk.Coins{swapOutCoin},
 			)
 			if err != nil {
-				return nil, coinIn, coinOutSwap, err
+				return
 			}
 		}
 	}
@@ -358,7 +361,8 @@ func (k Keeper) PlaceLimitOrderCore(
 	// This is ok because pairID was constructed from tokenIn above.
 	makerTradePairID := pairID.MustTradePairIDFromMaker(tokenIn)
 	makerTickIndexTakerToMaker := tickIndexInToOut * -1
-	placeTranche, err := k.GetOrInitPlaceTranche(
+	var placeTranche *types.LimitOrderTranche
+	placeTranche, err = k.GetOrInitPlaceTranche(
 		ctx,
 		makerTradePairID,
 		makerTickIndexTakerToMaker,
@@ -366,10 +370,10 @@ func (k Keeper) PlaceLimitOrderCore(
 		orderType,
 	)
 	if err != nil {
-		return nil, coinIn, coinOutSwap, err
+		return
 	}
 
-	trancheKey := placeTranche.Key.TrancheKey
+	trancheKey = placeTranche.Key.TrancheKey
 	trancheUser := k.GetOrInitLimitOrderTrancheUser(
 		ctx,
 		makerTradePairID,
@@ -401,16 +405,16 @@ func (k Keeper) PlaceLimitOrderCore(
 	k.SaveTrancheUser(ctx, trancheUser)
 
 	if totalIn.IsPositive() {
-		coinIn = sdk.NewCoin(tokenIn, totalIn)
+		totalInCoin = sdk.NewCoin(tokenIn, totalIn)
 
 		err = k.bankKeeper.SendCoinsFromAccountToModule(
 			ctx,
 			callerAddr,
 			types.ModuleName,
-			sdk.Coins{coinIn},
+			sdk.Coins{totalInCoin},
 		)
 		if err != nil {
-			return nil, coinIn, coinOutSwap, err
+			return
 		}
 	}
 
@@ -428,7 +432,7 @@ func (k Keeper) PlaceLimitOrderCore(
 		trancheKey,
 	))
 
-	return &trancheKey, coinIn, coinOutSwap, nil
+	return
 }
 
 // Handles MsgCancelLimitOrder, removing a specified number of shares from a limit order
