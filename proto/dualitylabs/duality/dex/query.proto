@@ -14,6 +14,7 @@ import "dualitylabs/duality/dex/pool_reserves.proto";
 import "dualitylabs/duality/dex/tx.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "google/protobuf/timestamp.proto";
+import "dualitylabs/duality/dex/pool.proto";
 
 // this line is used by starport scaffolding # 1
 
@@ -94,6 +95,11 @@ service Query {
 	// Queries the simulated result of a multihop swap 
 	rpc EstimatePlaceLimitOrder(QueryEstimatePlaceLimitOrderRequest) returns (QueryEstimatePlaceLimitOrderResponse) {
 		option (google.api.http).get = "/dualitylabs/duality/dex/estimate_place_limit_order";
+	}
+
+	// Queries the pool for a pair, tick and fee 
+	rpc Pool(QueryPoolRequest) returns (QueryPoolResponse) {
+		option (google.api.http).get = "/dualitylabs/duality/dex/pool/{pairID}/{tickIndex}/{fee}";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -311,6 +317,16 @@ message QueryEstimatePlaceLimitOrderResponse {
 										(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
 												(gogoproto.jsontag) = "swapOutCoin"
 										];
+}
+
+message QueryPoolRequest {
+  string pairID = 1;
+  int64 tickIndex = 2;
+  uint64 fee = 3;
+}
+
+message QueryPoolResponse {
+	Pool pool = 1 [(gogoproto.nullable) = true];
 }
 
 // this line is used by starport scaffolding # 3
