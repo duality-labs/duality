@@ -210,8 +210,8 @@ const (
 	DepositEventPrice              = "TickIndex"
 	DepositEventFee                = "Fee"
 	DepositEventReceiver           = "Receiver"
-	DepositEventReserves0Deposited = "Reserves0Deposited"
-	DepositEventReserves1Deposited = "Reserves1Deposited"
+	DepositEventReserves0Deposited = "ReservesZeroDeposited"
+	DepositEventReserves1Deposited = "ReservesOneDeposited"
 	DepositEventSharesMinted       = "SharesMinted"
 )
 
@@ -224,8 +224,8 @@ const (
 	WithdrawEventPrice              = "TickIndex"
 	WithdrawEventFee                = "Fee"
 	WithdrawEventReceiver           = "Receiver"
-	WithdrawEventReserves0Withdrawn = "Reserves0Withdrawn"
-	WithdrawEventReserves1Withdrawn = "Reserves1Withdrawn"
+	WithdrawEventReserves0Withdrawn = "ReservesZeroWithdrawn"
+	WithdrawEventReserves1Withdrawn = "ReservesOneWithdrawn"
 	WithdrawEventSharesRemoved      = "SharesRemoved"
 )
 
