@@ -12,6 +12,18 @@ func (k Keeper) EstimateMultiHopSwap(
 	goCtx context.Context,
 	req *types.QueryEstimateMultiHopSwapRequest,
 ) (*types.QueryEstimateMultiHopSwapResponse, error) {
+	msg := types.MsgMultiHopSwap{
+		Creator:        req.Creator,
+		Receiver:       req.Receiver,
+		Routes:         req.Routes,
+		AmountIn:       req.AmountIn,
+		ExitLimitPrice: req.ExitLimitPrice,
+		PickBestRoute:  req.PickBestRoute,
+	}
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	cacheCtx, _ := ctx.CacheContext()
 	cacheGoCtx := sdk.WrapSDKContext(cacheCtx)
