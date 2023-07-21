@@ -13,6 +13,21 @@ func (k Keeper) EstimatePlaceLimitOrder(
 	goCtx context.Context,
 	req *types.QueryEstimatePlaceLimitOrderRequest,
 ) (*types.QueryEstimatePlaceLimitOrderResponse, error) {
+	msg := types.MsgPlaceLimitOrder{
+		Creator:          req.Creator,
+		Receiver:         req.Receiver,
+		TokenIn:          req.TokenIn,
+		TokenOut:         req.TokenOut,
+		TickIndexInToOut: req.TickIndexInToOut,
+		AmountIn:         req.AmountIn,
+		OrderType:        req.OrderType,
+		ExpirationTime:   req.ExpirationTime,
+		MaxAmountOut:     req.MaxAmountOut,
+	}
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	cacheCtx, _ := ctx.CacheContext()
 	cacheGoCtx := sdk.WrapSDKContext(cacheCtx)
