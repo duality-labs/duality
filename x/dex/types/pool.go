@@ -5,9 +5,30 @@ import (
 	"github.com/duality-labs/duality/x/dex/utils"
 )
 
-type Pool struct {
-	LowerTick0 *PoolReserves
-	UpperTick1 *PoolReserves
+func NewPool(
+	pairID *PairID,
+	centerTickIndexNormalized int64,
+	fee uint64,
+) (*Pool, error) {
+	feeInt64 := utils.MustSafeUint64(fee)
+
+	id0To1 := &PoolReservesKey{
+		TradePairID:           NewTradePairIDFromMaker(pairID, pairID.Token1),
+		TickIndexTakerToMaker: centerTickIndexNormalized + feeInt64,
+		Fee:                   fee,
+	}
+
+	upperTick, err := NewPoolReserves(id0To1)
+	if err != nil {
+		return nil, err
+	}
+
+	lowerTick := NewPoolReservesFromCounterpart(upperTick)
+
+	return &Pool{
+		LowerTick0: lowerTick,
+		UpperTick1: upperTick,
+	}, nil
 }
 
 func (p *Pool) CenterTickIndex() int64 {

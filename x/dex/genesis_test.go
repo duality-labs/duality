@@ -16,7 +16,10 @@ func TestGenesis(t *testing.T) {
 		Params: *types.DefaultParams(),
 		LimitOrderTrancheUserList: []*types.LimitOrderTrancheUser{
 			{
-				TradePairID:           &types.TradePairID{TakerDenom: "TokenA", MakerDenom: "TokenB"},
+				TradePairID: &types.TradePairID{
+					TakerDenom: "TokenA",
+					MakerDenom: "TokenB",
+				},
 				TickIndexTakerToMaker: 1,
 				TrancheKey:            "0",
 				Address:               "fakeAddr",
@@ -25,7 +28,10 @@ func TestGenesis(t *testing.T) {
 				SharesCancelled:       sdk.NewInt(0),
 			},
 			{
-				TradePairID:           &types.TradePairID{TakerDenom: "TokenB", MakerDenom: "TokenA"},
+				TradePairID: &types.TradePairID{
+					TakerDenom: "TokenB",
+					MakerDenom: "TokenA",
+				},
 				TickIndexTakerToMaker: 20,
 				TrancheKey:            "0",
 				Address:               "fakeAddr",
@@ -67,14 +73,20 @@ func TestGenesis(t *testing.T) {
 		InactiveLimitOrderTrancheList: []*types.LimitOrderTranche{
 			{
 				Key: &types.LimitOrderTrancheKey{
-					TradePairID:           &types.TradePairID{TakerDenom: "TokenA", MakerDenom: "TokenB"},
+					TradePairID: &types.TradePairID{
+						TakerDenom: "TokenA",
+						MakerDenom: "TokenB",
+					},
 					TickIndexTakerToMaker: 0,
 					TrancheKey:            "0",
 				},
 			},
 			{
 				Key: &types.LimitOrderTrancheKey{
-					TradePairID:           &types.TradePairID{TakerDenom: "TokenA", MakerDenom: "TokenB"},
+					TradePairID: &types.TradePairID{
+						TakerDenom: "TokenA",
+						MakerDenom: "TokenB",
+					},
 					TickIndexTakerToMaker: 1,
 					TrancheKey:            "1",
 				},
@@ -93,6 +105,10 @@ func TestGenesis(t *testing.T) {
 
 	require.ElementsMatch(t, genesisState.LimitOrderTrancheUserList, got.LimitOrderTrancheUserList)
 	require.ElementsMatch(t, genesisState.TickLiquidityList, got.TickLiquidityList)
-	require.ElementsMatch(t, genesisState.InactiveLimitOrderTrancheList, got.InactiveLimitOrderTrancheList)
+	require.ElementsMatch(
+		t,
+		genesisState.InactiveLimitOrderTrancheList,
+		got.InactiveLimitOrderTrancheList,
+	)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

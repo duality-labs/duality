@@ -17,8 +17,11 @@ import (
 func GetQueryCmd(_ string) *cobra.Command {
 	// Group dex queries under a subcommand
 	cmd := &cobra.Command{
-		Use:                        types.ModuleName,
-		Short:                      fmt.Sprintf("Querying commands for the %s module", types.ModuleName),
+		Use: types.ModuleName,
+		Short: fmt.Sprintf(
+			"Querying commands for the %s module",
+			types.ModuleName,
+		),
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
@@ -37,6 +40,7 @@ func GetQueryCmd(_ string) *cobra.Command {
 	cmd.AddCommand(CmdShowInactiveLimitOrderTranche())
 	cmd.AddCommand(CmdListPoolReserves())
 	cmd.AddCommand(CmdShowPoolReserves())
+	cmd.AddCommand(CmdShowPool())
 
 	// this line is used by starport scaffolding # 1
 
