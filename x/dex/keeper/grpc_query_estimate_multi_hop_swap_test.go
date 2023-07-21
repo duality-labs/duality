@@ -18,7 +18,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapSingleRoute() {
 
 	// WHEN alice multihopswaps A<>B => B<>C => C<>D,
 	route := [][]string{{"TokenA", "TokenB", "TokenC", "TokenD"}}
-	coinOut := s.estimateMultiHopSwap(route, 100, sdk.MustNewDecFromStr("0.9"), false)
+	coinOut := s.aliceEstimatesMultiHopSwap(route, 100, sdk.MustNewDecFromStr("0.9"), false)
 
 	// THEN alice would get out 99 TokenD
 	s.Assert().Equal(sdk.NewInt(97), coinOut.Amount)
@@ -43,7 +43,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapInsufficientLiquiditySingle
 
 	// THEN estimate multihopswap fails
 	route := [][]string{{"TokenA", "TokenB", "TokenC", "TokenD"}}
-	s.estimateMultiHopSwapFails(
+	s.aliceEstimatesMultiHopSwapFails(
 		types.ErrInsufficientLiquidity,
 		route,
 		100,
@@ -64,7 +64,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapLimitPriceNotMetSingleRoute
 
 	// THEN estimate multihopswap fails
 	route := [][]string{{"TokenA", "TokenB", "TokenC", "TokenD"}}
-	s.estimateMultiHopSwapFails(
+	s.aliceEstimatesMultiHopSwapFails(
 		types.ErrExitLimitPriceHit,
 		route,
 		50,
@@ -104,7 +104,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapMultiRouteOneGood() {
 		1,
 	)
 
-	coinOut := s.estimateMultiHopSwap(routes, 100, sdk.MustNewDecFromStr("0.9"), false)
+	coinOut := s.aliceEstimatesMultiHopSwap(routes, 100, sdk.MustNewDecFromStr("0.9"), false)
 	_ = coinOut
 
 	// THEN swap estimation succeeds through route A<>B, B<>E, E<>X
@@ -203,7 +203,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapMultiRouteAllFail() {
 	}
 
 	// Then fails with findBestRoute
-	s.estimateMultiHopSwapFails(
+	s.aliceEstimatesMultiHopSwapFails(
 		types.ErrExitLimitPriceHit,
 		routes,
 		100,
@@ -213,7 +213,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapMultiRouteAllFail() {
 
 	// and with findFirstRoute
 
-	s.estimateMultiHopSwapFails(
+	s.aliceEstimatesMultiHopSwapFails(
 		types.ErrExitLimitPriceHit,
 		routes,
 		100,
@@ -242,7 +242,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapMultiRouteFindBestRoute() {
 		{"TokenA", "TokenB", "TokenD", "TokenX"},
 		{"TokenA", "TokenB", "TokenE", "TokenX"},
 	}
-	coinOut := s.estimateMultiHopSwap(routes, 100, sdk.MustNewDecFromStr("0.9"), true)
+	coinOut := s.aliceEstimatesMultiHopSwap(routes, 100, sdk.MustNewDecFromStr("0.9"), true)
 
 	// THEN swap succeeds through route A<>B, B<>E, E<>X
 
@@ -334,7 +334,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapLongRouteWithCache() {
 			"TokenG", "TokenH", "TokenI", "TokenJ", "TokenK", "TokenM", "TokenX",
 		},
 	}
-	coinOut := s.estimateMultiHopSwap(routes, 100, sdk.MustNewDecFromStr("0.8"), true)
+	coinOut := s.aliceEstimatesMultiHopSwap(routes, 100, sdk.MustNewDecFromStr("0.8"), true)
 
 	// THEN swap succeeds with second route
 	s.Assert().Equal(coinOut, sdk.NewCoin("TokenX", sdk.NewInt(88)))
@@ -357,7 +357,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapEventsEmitted() {
 	)
 
 	route := [][]string{{"TokenA", "TokenB", "TokenC"}}
-	_ = s.estimateMultiHopSwap(route, 100, sdk.MustNewDecFromStr("0.9"), false)
+	_ = s.aliceEstimatesMultiHopSwap(route, 100, sdk.MustNewDecFromStr("0.9"), false)
 
 	// 8 tickUpdateEvents are emitted 4x for pool setup 4x for two swaps
 	keepertest.AssertEventNotEmitted(s.T(), s.ctx, types.TickUpdateEventKey, "Expected no events")

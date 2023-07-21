@@ -585,8 +585,9 @@ func NewApp(
 		"/dualitylabs.duality.dex.Query/InactiveLimitOrderTranche": &dexmoduletypes.QueryGetInactiveLimitOrderTrancheResponse{},
 		// "/dualitylabs.duality.dex.Query/InactiveLimitOrderTrancheAll": &dexmoduletypes.QueryAllInactiveLimitOrderTrancheResponse{},
 		// "/dualitylabs.duality.dex.Query/PoolReservesAll":              &dexmoduletypes.QueryAllPoolReservesResponse{},
-		"/dualitylabs.duality.dex.Query/PoolReserves":         &dexmoduletypes.QueryGetPoolReservesResponse{},
-		"/dualitylabs.duality.dex.Query/EstimateMultiHopSwap": &dexmoduletypes.QueryEstimateMultiHopSwapResponse{},
+		"/dualitylabs.duality.dex.Query/PoolReserves":            &dexmoduletypes.QueryGetPoolReservesResponse{},
+		"/dualitylabs.duality.dex.Query/EstimateMultiHopSwap":    &dexmoduletypes.QueryEstimateMultiHopSwapResponse{},
+		"/dualitylabs.duality.dex.Query/EstimatePlaceLimitOrder": &dexmoduletypes.QueryEstimatePlaceLimitOrderResponse{},
 
 		// x/incentives
 		"/dualitylabs.duality.incentives.Query/GetModuleStatus":         &incentivesmoduletypes.GetModuleStatusResponse{},
