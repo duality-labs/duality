@@ -191,7 +191,7 @@ var (
 
 	// This is the address of the admin multisig group, the first group policy configured in x/group.
 	// You can rederive this by checking out the `multisig-setup` branch and looking at the README.md.
-	AppAuthority = "cosmos1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfwkgpd"
+	AppAuthority = "dual1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfwkgpd"
 )
 
 var (
