@@ -63,7 +63,7 @@ var chainCfg = ibc.ChainConfig{
 		UidGid:     heighlinerUserString,
 	}},
 	Bin:                 "dualityd",
-	Bech32Prefix:        "dual",
+	Bech32Prefix:        "cosmos",
 	Denom:               "stake",
 	CoinType:            cosmosCoinType,
 	GasPrices:           "0.0stake",
@@ -84,11 +84,7 @@ func TestDualityConsumerChainStart(t *testing.T) {
 	// Create chain factory with Duality and Cosmos Hub
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
 		{Name: "duality", ChainConfig: chainCfg},
-		{
-			Name:        "gaia",
-			Version:     "v9.0.0-rc1",
-			ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"},
-		}},
+		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}}},
 	)
 
 	// Get chains from the chain factory
@@ -102,11 +98,7 @@ func TestDualityConsumerChainStart(t *testing.T) {
 	r := interchaintest.NewBuiltinRelayerFactory(
 		ibc.CosmosRly,
 		zaptest.NewLogger(t),
-		relayer.CustomDockerImage(
-			"ghcr.io/cosmos/relayer",
-			"andrew-paths_update",
-			rly.RlyDefaultUidGid,
-		),
+		relayer.CustomDockerImage("ghcr.io/cosmos/relayer", "andrew-paths_update", rly.RlyDefaultUidGid),
 	).Build(t, client, network)
 
 	ic := interchaintest.NewInterchain().
@@ -138,11 +130,7 @@ func TestDualityConsumerChainStart(t *testing.T) {
 	require.NoError(t, err)
 
 	// Assert that the genesis wallet contains the specified balance from initialization
-	bal, err := duality.GetBalance(
-		ctx,
-		users[0].Bech32Address(duality.Config().Bech32Prefix),
-		duality.Config().Denom,
-	)
+	bal, err := duality.GetBalance(ctx, users[0].Bech32Address(duality.Config().Bech32Prefix), duality.Config().Denom)
 	require.NoError(t, err)
 	require.Equal(t, genesisWalletAmount, bal)
 }

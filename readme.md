@@ -1,3 +1,5 @@
+[![duality-labs](https://circleci.com/gh/duality-labs/duality.svg?style=svg&circle-token=077571c2f18af3b4642d79ac6539db11122b4fbf)](<https://app.circleci.com/pipelines/github/duality-labs/duality>)
+
 Duality is a decentralized exchange optimized for capital efficiency and composability while protecting users from harmful price manipulation. With Duality, liquidity providers and protocols have intuitive, fine grain control over parameters and distribution of liquidity.
 
 Build Steps:
