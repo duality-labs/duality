@@ -129,7 +129,7 @@ import (
 )
 
 const (
-	AccountAddressPrefix = "dual"
+	AccountAddressPrefix = "cosmos"
 	Name                 = "duality"
 )
 
@@ -138,7 +138,6 @@ const (
 var (
 	// DefaultNodeHome default home directories for the application daemon
 	DefaultNodeHome string
-	AppAuthority    string
 
 	// ModuleBasics defines the module BasicManager is in charge of setting up basic,
 	// non-dependant module elements, such as codec registration
@@ -189,6 +188,10 @@ var (
 
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
+
+	// This is the address of the admin multisig group, the first group policy configured in x/group.
+	// You can rederive this by checking out the `multisig-setup` branch and looking at the README.md.
+	AppAuthority = "cosmos1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfwkgpd"
 )
 
 var (
@@ -198,27 +201,7 @@ var (
 	_ testutil.ConsumerApp    = (*App)(nil)
 )
 
-func initSDKConfig() {
-	// Set prefixes
-	accountPubKeyPrefix := AccountAddressPrefix + "pub"
-	validatorAddressPrefix := AccountAddressPrefix + "valoper"
-	validatorPubKeyPrefix := AccountAddressPrefix + "valoperpub"
-	consNodeAddressPrefix := AccountAddressPrefix + "valcons"
-	consNodePubKeyPrefix := AccountAddressPrefix + "valconspub"
-
-	// Set and seal config
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(AccountAddressPrefix, accountPubKeyPrefix)
-	config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
-	config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
-	config.Seal()
-}
-
 func init() {
-	initSDKConfig()
-	// This is the address of the admin multisig group, the first group policy configured in x/group.
-	// You can rederive this by checking out the `multisig-setup` branch and looking at the README.md.
-	AppAuthority = "dual1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsyf0vr6"
 	userHomeDir, err := os.UserHomeDir()
 	if err != nil {
 		panic(err)
