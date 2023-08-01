@@ -17,8 +17,18 @@ type BankKeeper interface {
 	HasSupply(ctx sdk.Context, denom string) bool
 	GetSupply(ctx sdk.Context, denom string) sdk.Coin
 
-	SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error
-	SendCoinsFromAccountToModule(ctx sdk.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error
+	SendCoinsFromModuleToAccount(
+		ctx sdk.Context,
+		senderModule string,
+		recipientAddr sdk.AccAddress,
+		amt sdk.Coins,
+	) error
+	SendCoinsFromAccountToModule(
+		ctx sdk.Context,
+		senderAddr sdk.AccAddress,
+		recipientModule string,
+		amt sdk.Coins,
+	) error
 }
 
 // EpochKeeper defines the expected interface needed to retrieve epoch info.
@@ -33,5 +43,11 @@ type AccountKeeper interface {
 }
 
 type DexKeeper interface {
-	GetOrInitPool(ctx sdk.Context, pairID *types.PairID, centerTickIndex int64, fee uint64) (*dextypes.Pool, error)
+	GetOrInitPool(
+		ctx sdk.Context,
+		pairID *types.PairID,
+		centerTickIndex int64,
+		fee uint64,
+	) (*dextypes.Pool, error)
+	GetPoolMetadataByID(ctx sdk.Context, poolMetadataID uint64) (*types.PoolMetadata, error)
 }

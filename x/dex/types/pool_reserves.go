@@ -13,6 +13,7 @@ func NewPoolReservesFromCounterpart(
 ) *PoolReserves {
 	thisID := counterpart.Key.Counterpart()
 	return &PoolReserves{
+		PoolId:                    counterpart.PoolId,
 		Key:                       thisID,
 		ReservesMakerDenom:        sdk.ZeroInt(),
 		PriceTakerToMaker:         counterpart.PriceOppositeTakerToMaker,
@@ -34,6 +35,7 @@ func NewPoolReserves(
 	}
 
 	return &PoolReserves{
+		// PoolId is set on pool save
 		Key:                       poolReservesID,
 		ReservesMakerDenom:        sdk.ZeroInt(),
 		PriceTakerToMaker:         priceTakerToMaker,
@@ -42,9 +44,11 @@ func NewPoolReserves(
 }
 
 func MustNewPoolReserves(
+	poolID uint64,
 	poolReservesID *PoolReservesKey,
 ) *PoolReserves {
 	poolReserves, err := NewPoolReserves(poolReservesID)
+	poolReserves.PoolId = poolID
 	if err != nil {
 		panic(err)
 	}

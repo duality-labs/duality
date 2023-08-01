@@ -172,7 +172,7 @@ func (server msgServer) Unstake(
 			)
 		}
 
-		_, err = server.keeper.Unstake(ctx, stake, unstake.Coins)
+		err = server.keeper.Unstake(ctx, stake, unstake.Coins)
 		if err != nil {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
 		}

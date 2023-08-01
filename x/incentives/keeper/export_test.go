@@ -3,6 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"
 )
 
@@ -31,8 +32,8 @@ func (k Keeper) MoveActiveGaugeToFinishedGauge(ctx sdk.Context, gauge *types.Gau
 	return k.moveActiveGaugeToFinishedGauge(ctx, gauge)
 }
 
-func GetStakeRefKeys(stake *types.Stake) ([][]byte, error) {
-	return getStakeRefKeys(stake)
+func GetStakeRefKeys(stake *types.Stake, poolMetadatas []*dextypes.PoolMetadata) ([][]byte, error) {
+	return getStakeRefKeys(stake, poolMetadatas)
 }
 
 func RemoveValue(ids []uint64, id uint64) ([]uint64, int) {

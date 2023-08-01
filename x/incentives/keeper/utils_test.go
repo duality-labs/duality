@@ -67,50 +67,60 @@ func TestRemoveValue(t *testing.T) {
 
 func TestStakeRefKeys(t *testing.T) {
 	addr1 := sdk.AccAddress([]byte("addr1---------------"))
-	denom1 := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).
-		String()
-	denom2 := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenC"}, 0, 1).
-		String()
+	pool1 := dextypes.NewPoolMetadata(1, &dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1)
+	pool2 := dextypes.NewPoolMetadata(2, &dextypes.PairID{Token0: "TokenA", Token1: "TokenC"}, 0, 1)
 	// empty address and 1 coin
 	stake1 := types.NewStake(
 		1,
 		sdk.AccAddress{},
-		sdk.Coins{sdk.NewInt64Coin(denom1, 10)},
+		sdk.Coins{sdk.NewInt64Coin(pool1.Denom(), 10)},
 		time.Now(),
 		10,
 	)
-	_, err := GetStakeRefKeys(stake1)
+	_, err := GetStakeRefKeys(stake1, []*dextypes.PoolMetadata{pool1})
 	require.Error(t, err)
 
 	// empty address and 2 coins
 	stake2 := types.NewStake(
 		1,
 		sdk.AccAddress{},
-		sdk.Coins{sdk.NewInt64Coin(denom1, 10), sdk.NewInt64Coin(denom2, 1)},
+		sdk.Coins{sdk.NewInt64Coin(pool1.Denom(), 10), sdk.NewInt64Coin(pool2.Denom(), 1)},
 		time.Now(),
 		10,
 	)
-	_, err = GetStakeRefKeys(stake2)
+	_, err = GetStakeRefKeys(stake2, []*dextypes.PoolMetadata{pool2})
 	require.Error(t, err)
 
 	// not empty address and 1 coin
-	stake3 := types.NewStake(1, addr1, sdk.Coins{sdk.NewInt64Coin(denom1, 10)}, time.Now(), 10)
-	keys3, err := GetStakeRefKeys(stake3)
+	stake3 := types.NewStake(
+		1,
+		addr1,
+		sdk.Coins{sdk.NewInt64Coin(pool1.Denom(), 10)},
+		time.Now(),
+		10,
+	)
+	keys3, err := GetStakeRefKeys(stake3, []*dextypes.PoolMetadata{pool1})
 	require.Len(t, keys3, 6)
 
 	// not empty address and empty coin
-	stake4 := types.NewStake(1, addr1, sdk.Coins{sdk.NewInt64Coin(denom1, 10)}, time.Now(), 10)
-	keys4, err := GetStakeRefKeys(stake4)
+	stake4 := types.NewStake(
+		1,
+		addr1,
+		sdk.Coins{sdk.NewInt64Coin(pool1.Denom(), 10)},
+		time.Now(),
+		10,
+	)
+	keys4, err := GetStakeRefKeys(stake4, []*dextypes.PoolMetadata{pool1})
 	require.Len(t, keys4, 6)
 
 	// not empty address and 2 coins
 	stake5 := types.NewStake(
 		1,
 		addr1,
-		sdk.Coins{sdk.NewInt64Coin(denom1, 10), sdk.NewInt64Coin(denom2, 1)},
+		sdk.Coins{sdk.NewInt64Coin(pool1.Denom(), 10), sdk.NewInt64Coin(pool2.Denom(), 1)},
 		time.Now(),
 		10,
 	)
-	keys5, err := GetStakeRefKeys(stake5)
+	keys5, err := GetStakeRefKeys(stake5, []*dextypes.PoolMetadata{pool1, pool2})
 	require.Len(t, keys5, 10)
 }

@@ -14,16 +14,20 @@ var _ DistributorKeeper = Keeper{}
 
 func (k Keeper) ValueForShares(ctx sdk.Context, coin sdk.Coin, tick int64) (sdk.Int, error) {
 	totalShares := k.bk.GetSupply(ctx, coin.Denom).Amount
-	depositDenom, err := dextypes.NewDepositDenomFromString(coin.Denom)
+	poolID, err := dextypes.ParsePoolIDFromDepositDenom(coin.Denom)
+	if err != nil {
+		return sdk.ZeroInt(), err
+	}
+	poolMetadata, err := k.dk.GetPoolMetadataByID(ctx, poolID)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
 
 	pool, err := k.dk.GetOrInitPool(
 		ctx,
-		depositDenom.PairID,
-		depositDenom.Tick,
-		depositDenom.Fee,
+		poolMetadata.PairId,
+		poolMetadata.NormalizedCenterTickIndex,
+		poolMetadata.Fee,
 	)
 	if err != nil {
 		return sdk.ZeroInt(), err
@@ -127,11 +131,15 @@ func (k Keeper) GetRewardsEstimate(
 	pairSet := map[dextypes.PairID]bool{}
 	for _, l := range filterStakes {
 		for _, c := range l.Coins {
-			depositDenom, err := dextypes.NewDepositDenomFromString(c.Denom)
+			poolID, err := dextypes.ParsePoolIDFromDepositDenom(c.Denom)
 			if err != nil {
-				panic("all stakes should be valid deposit denoms")
+				return nil, err
 			}
-			pairSet[*depositDenom.PairID] = true
+			poolMetadata, err := k.dk.GetPoolMetadataByID(ctx, poolID)
+			if err != nil {
+				return nil, err
+			}
+			pairSet[*poolMetadata.PairId] = true
 		}
 	}
 

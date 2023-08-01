@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"
 )
 
@@ -52,7 +53,20 @@ func (k Keeper) InitializeAllStakes(ctx sdk.Context, stakes types.Stakes) error 
 			return err
 		}
 
-		err = k.addStakeRefs(ctx, stake)
+		poolMetadatas := make([]*dextypes.PoolMetadata, len(stake.Coins))
+		for i, coin := range stake.Coins {
+			poolID, err := dextypes.ParsePoolIDFromDepositDenom(coin.Denom)
+			if err != nil {
+				return err
+			}
+			poolMetadata, err := k.dk.GetPoolMetadataByID(ctx, poolID)
+			if err != nil {
+				return err
+			}
+			poolMetadatas[i] = poolMetadata
+		}
+
+		err = k.addStakeRefs(ctx, stake, poolMetadatas)
 		if err != nil {
 			return err
 		}

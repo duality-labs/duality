@@ -76,9 +76,9 @@ func (k Keeper) BurnShares(
 	ctx sdk.Context,
 	addr sdk.AccAddress,
 	amount sdk.Int,
-	sharesID string,
+	sharesDenom string,
 ) error {
-	sharesCoins := sdk.Coins{sdk.NewCoin(sharesID, amount)}
+	sharesCoins := sdk.Coins{sdk.NewCoin(sharesDenom, amount)}
 	// transfer tokens to module
 	if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, addr, types.ModuleName, sharesCoins); err != nil {
 		return err

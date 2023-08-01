@@ -13,19 +13,20 @@ message PoolReservesKey {
 
 message PoolReserves {
   PoolReservesKey key = 1;
-  string reservesMakerDenom = 2 [
+  uint64 pool_id = 2;
+  string reservesMakerDenom = 3 [
                  (gogoproto.moretags)   = "yaml:\"reservesMakerDenom\"",
                  (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
                  (gogoproto.jsontag) = "reservesMakerDenom",
                  (gogoproto.nullable)   = false
                  ];
-  string priceTakerToMaker = 3 [
+  string priceTakerToMaker = 4 [
                 (gogoproto.moretags)   = "yaml:\"priceTakerToMaker\"",
                 (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
                 (gogoproto.nullable)   = false,
                 (gogoproto.jsontag) = "priceTakerToMaker"
                 ];
-  string priceOppositeTakerToMaker = 4 [
+  string priceOppositeTakerToMaker = 5 [
                 (gogoproto.moretags)   = "yaml:\"priceOppositeTakerToMaker\"",
                 (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
                 (gogoproto.nullable)   = false,

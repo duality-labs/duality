@@ -2,12 +2,14 @@ syntax = "proto3";
 package dualitylabs.duality.dex;
 
 option go_package = "github.com/duality-labs/duality/x/dex/types";
+
 import "gogoproto/gogo.proto";
 import "dualitylabs/duality/dex/pool_reserves.proto";
-import "dualitylabs/duality/dex/pool_metadata.proto";
+import "dualitylabs/duality/dex/pair_id.proto";
 
-message Pool {
-    PoolMetadata metadata = 1;
-    PoolReserves lower_tick0 = 2;
-    PoolReserves upper_tick1 = 3;
+message PoolMetadata {
+    uint64 id = 1;
+    PairID pair_id = 2;
+    int64 normalized_center_tick_index = 3;
+    uint64 fee = 4;
 }

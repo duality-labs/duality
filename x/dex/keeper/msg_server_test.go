@@ -1064,9 +1064,17 @@ func (s *MsgServerTestSuite) getPoolShares(
 	tick int64,
 	fee uint64,
 ) (shares sdk.Int) {
-	sharesID := types.NewDepositDenom(&types.PairID{Token0: token0, Token1: token1}, tick, fee).
-		String()
-	return s.app.BankKeeper.GetSupply(s.ctx, sharesID).Amount
+	// sharesID := types.NewPoolMetadata(&types.PairID{Token0: token0, Token1: token1}, tick, fee).String()
+	pool, err := s.app.DexKeeper.GetOrInitPool(
+		s.ctx,
+		&types.PairID{Token0: token0, Token1: token1},
+		tick,
+		fee,
+	)
+	if err != nil {
+		panic(err)
+	}
+	return s.app.BankKeeper.GetSupply(s.ctx, pool.GetDepositDenom()).Amount
 }
 
 func (s *MsgServerTestSuite) assertPoolShares(
@@ -1086,9 +1094,16 @@ func (s *MsgServerTestSuite) getAccountShares(
 	tick int64,
 	fee uint64,
 ) (shares sdk.Int) {
-	sharesID := types.NewDepositDenom(&types.PairID{Token0: token0, Token1: token1}, tick, fee).
-		String()
-	return s.app.BankKeeper.GetBalance(s.ctx, account, sharesID).Amount
+	pool, err := s.app.DexKeeper.GetOrInitPool(
+		s.ctx,
+		&types.PairID{Token0: token0, Token1: token1},
+		tick,
+		fee,
+	)
+	if err != nil {
+		panic(err)
+	}
+	return s.app.BankKeeper.GetBalance(s.ctx, account, pool.GetDepositDenom()).Amount
 }
 
 func (s *MsgServerTestSuite) assertAccountShares(

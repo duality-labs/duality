@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"fmt"
 	"testing"
 	time "time"
 
@@ -17,12 +18,14 @@ import (
 var _ DistributorKeeper = MockKeeper{}
 
 type MockKeeper struct {
-	stakes types.Stakes
+	stakes        types.Stakes
+	poolMetadatas []*dextypes.PoolMetadata
 }
 
-func NewMockKeeper(stakes types.Stakes) MockKeeper {
+func NewMockKeeper(stakes types.Stakes, poolMetadatas []*dextypes.PoolMetadata) MockKeeper {
 	return MockKeeper{
-		stakes: stakes,
+		stakes:        stakes,
+		poolMetadatas: poolMetadatas,
 	}
 }
 
@@ -35,6 +38,35 @@ func (k MockKeeper) GetStakesByQueryCondition(
 	distrTo *types.QueryCondition,
 ) types.Stakes {
 	return k.stakes
+}
+
+func (k MockKeeper) StakeCoinsPassingQueryCondition(
+	ctx sdk.Context,
+	stake *types.Stake,
+	distrTo types.QueryCondition,
+) sdk.Coins {
+	coins := stake.Coins
+	result := sdk.NewCoins()
+	for _, c := range coins {
+		poolID, err := dextypes.ParsePoolIDFromDepositDenom(c.Denom)
+		if err != nil {
+			continue
+		}
+		var poolMetadata *dextypes.PoolMetadata
+		for _, pm := range k.poolMetadatas {
+			if pm.Id == poolID {
+				poolMetadata = pm
+			}
+		}
+		if poolMetadata == nil {
+			panic(fmt.Errorf("No pool metadata found corresponding to pool id %s", poolID))
+		}
+
+		if distrTo.Test(poolMetadata) {
+			result = result.Add(c)
+		}
+	}
+	return result
 }
 
 func TestDistributor(t *testing.T) {
@@ -62,18 +94,54 @@ func TestDistributor(t *testing.T) {
 		sdk.Coins{},
 		0,
 	)
-	rewardedDenom := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 5, 1).
-		String()
-	nonRewardedDenom := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 12, 1).
-		String()
+	rewardedPoolMetadata := dextypes.NewPoolMetadata(
+		1,
+		&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"},
+		5,
+		1,
+	)
+	nonRewardedPoolMetadata := dextypes.NewPoolMetadata(
+		2,
+		&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"},
+		12,
+		1,
+	)
+	allPoolMetadata := []*dextypes.PoolMetadata{
+		rewardedPoolMetadata,
+		nonRewardedPoolMetadata,
+	}
 	allStakes := types.Stakes{
-		{1, "addr1", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(50))}, 0},
-		{2, "addr2", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}, 0},
-		{3, "addr2", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}, 0},
-		{4, "addr3", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(nonRewardedDenom, sdk.NewInt(50))}, 0},
+		{
+			1,
+			"addr1",
+			ctx.BlockTime(),
+			sdk.Coins{sdk.NewCoin(rewardedPoolMetadata.Denom(), sdk.NewInt(50))},
+			0,
+		},
+		{
+			2,
+			"addr2",
+			ctx.BlockTime(),
+			sdk.Coins{sdk.NewCoin(rewardedPoolMetadata.Denom(), sdk.NewInt(25))},
+			0,
+		},
+		{
+			3,
+			"addr2",
+			ctx.BlockTime(),
+			sdk.Coins{sdk.NewCoin(rewardedPoolMetadata.Denom(), sdk.NewInt(25))},
+			0,
+		},
+		{
+			4,
+			"addr3",
+			ctx.BlockTime(),
+			sdk.Coins{sdk.NewCoin(nonRewardedPoolMetadata.Denom(), sdk.NewInt(50))},
+			0,
+		},
 	}
 
-	distributor := NewDistributor(NewMockKeeper(allStakes))
+	distributor := NewDistributor(NewMockKeeper(allStakes, allPoolMetadata))
 
 	testCases := []struct {
 		name         string

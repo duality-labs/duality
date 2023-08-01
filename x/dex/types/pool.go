@@ -1,6 +1,7 @@
 package types
 
 import (
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/utils"
 )
@@ -26,6 +27,11 @@ func NewPool(
 	lowerTick := NewPoolReservesFromCounterpart(upperTick)
 
 	return &Pool{
+		Metadata: &PoolMetadata{
+			PairId:                    pairID,
+			NormalizedCenterTickIndex: centerTickIndexNormalized,
+			Fee:                       fee,
+		},
 		LowerTick0: lowerTick,
 		UpperTick1: upperTick,
 	}, nil
@@ -108,7 +114,7 @@ func (p *Pool) Deposit(
 	)
 
 	if inAmount0.Equal(sdk.ZeroInt()) && inAmount1.Equal(sdk.ZeroInt()) {
-		return sdk.ZeroInt(), sdk.ZeroInt(), sdk.Coin{Denom: p.GetDepositDenom()}
+		return sdk.ZeroInt(), sdk.ZeroInt(), sdk.NewCoin(p.GetDepositDenom(), math.NewInt(0))
 	}
 
 	outShares = p.CalcSharesMinted(inAmount0, inAmount1, existingShares)
@@ -136,11 +142,7 @@ func (p *Pool) Deposit(
 }
 
 func (p *Pool) GetDepositDenom() string {
-	return NewDepositDenom(
-		p.UpperTick1.Key.TradePairID.MustPairID(),
-		p.CenterTickIndex(),
-		p.Fee(),
-	).String()
+	return p.Metadata.Denom()
 }
 
 func (p *Pool) Price(tradePairID *TradePairID) sdk.Dec {

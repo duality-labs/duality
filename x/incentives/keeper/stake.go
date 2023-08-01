@@ -9,6 +9,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/gogoproto/proto"
 
+	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"
 )
 
@@ -30,32 +31,52 @@ func (k Keeper) SetLastStakeID(ctx sdk.Context, id uint64) {
 	store.Set(types.KeyLastStakeID, sdk.Uint64ToBigEndian(id))
 }
 
-func (k Keeper) Unstake(ctx sdk.Context, stake *types.Stake, coins sdk.Coins) (uint64, error) {
+func (k Keeper) Unstake(ctx sdk.Context, stake *types.Stake, coins sdk.Coins) error {
 	if coins.Empty() {
 		coins = stake.Coins
 	}
 
 	if !coins.IsAllLTE(stake.Coins) {
-		return 0, fmt.Errorf("requested amount to unstake exceeds locked tokens")
+		return fmt.Errorf("requested amount to unstake exceeds locked tokens")
+	}
+
+	poolMetadataMap := make(map[string]*dextypes.PoolMetadata, len(stake.Coins))
+	poolMetadatas := make([]*dextypes.PoolMetadata, len(stake.Coins))
+	for i, coin := range stake.Coins {
+		poolID, err := dextypes.ParsePoolIDFromDepositDenom(coin.Denom)
+		if err != nil {
+			return err
+		}
+		poolMetadata, err := k.dk.GetPoolMetadataByID(ctx, poolID)
+		if err != nil {
+			return err
+		}
+		poolMetadataMap[coin.Denom] = poolMetadata
+		poolMetadatas[i] = poolMetadata
 	}
 
 	// remove existing stake refs from not unlocking queue
-	err := k.deleteStakeRefs(ctx, stake)
+	err := k.deleteStakeRefs(ctx, stake, poolMetadatas)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	if len(coins) != 0 && !coins.IsEqual(stake.Coins) {
 		stake.Coins = stake.Coins.Sub(coins...)
 		err := k.setStake(ctx, stake)
 		if err != nil {
-			return 0, err
+			return err
+		}
+
+		poolMetadatas = make([]*dextypes.PoolMetadata, len(stake.Coins))
+		for i, coin := range stake.Coins {
+			poolMetadatas[i] = poolMetadataMap[coin.Denom]
 		}
 
 		// re-add remaining stake refs
-		err = k.addStakeRefs(ctx, stake)
+		err = k.addStakeRefs(ctx, stake, poolMetadatas)
 		if err != nil {
-			return 0, err
+			return err
 		}
 	} else {
 		k.deleteStake(ctx, stake.ID)
@@ -63,7 +84,7 @@ func (k Keeper) Unstake(ctx sdk.Context, stake *types.Stake, coins sdk.Coins) (u
 
 	err = k.bk.SendCoinsFromModuleToAccount(ctx, types.ModuleName, stake.OwnerAddress(), coins)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	if k.hooks != nil {
@@ -80,7 +101,7 @@ func (k Keeper) Unstake(ctx sdk.Context, stake *types.Stake, coins sdk.Coins) (u
 		),
 	})
 
-	return stake.ID, err
+	return err
 }
 
 // setStake is a utility to store stake object into the store.
@@ -206,6 +227,18 @@ func (k Keeper) CreateStake(
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
 	}
 
+	poolMetadatas := make([]*dextypes.PoolMetadata, len(coins))
+	for i := range coins {
+		poolID, err := dextypes.ParsePoolIDFromDepositDenom(coins[i].Denom)
+		if err != nil {
+			return nil, err
+		}
+		poolMetadatas[i], err = k.dk.GetPoolMetadataByID(ctx, poolID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if err := k.bk.SendCoinsFromAccountToModule(ctx, owner, types.ModuleName, stake.Coins); err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
 	}
@@ -220,10 +253,31 @@ func (k Keeper) CreateStake(
 	k.SetLastStakeID(ctx, stake.ID)
 
 	// add stake refs into not unlocking queue
-	err = k.addStakeRefs(ctx, stake)
+	err = k.addStakeRefs(ctx, stake, poolMetadatas)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, err.Error())
 	}
 
 	return stake, nil
+}
+
+func (k Keeper) StakeCoinsPassingQueryCondition(
+	ctx sdk.Context,
+	stake *types.Stake,
+	distrTo types.QueryCondition,
+) sdk.Coins {
+	coins := stake.Coins
+	result := sdk.NewCoins()
+	for _, c := range coins {
+		poolID, err := dextypes.ParsePoolIDFromDepositDenom(c.Denom)
+		if err != nil {
+			continue
+		}
+		poolMetadata, err := k.dk.GetPoolMetadataByID(ctx, poolID)
+
+		if distrTo.Test(poolMetadata) {
+			result = result.Add(c)
+		}
+	}
+	return result
 }

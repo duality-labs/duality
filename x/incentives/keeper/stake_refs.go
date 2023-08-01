@@ -8,8 +8,12 @@ import (
 
 // addStakeRefs adds appropriate reference keys preceded by a prefix.
 // A prefix indicates whether the stake is unstaking or not.
-func (k Keeper) addStakeRefs(ctx sdk.Context, stake *types.Stake) error {
-	refKeys, err := getStakeRefKeys(stake)
+func (k Keeper) addStakeRefs(
+	ctx sdk.Context,
+	stake *types.Stake,
+	poolMetadatas []*dextypes.PoolMetadata,
+) error {
+	refKeys, err := getStakeRefKeys(stake, poolMetadatas)
 	if err != nil {
 		return err
 	}
@@ -22,8 +26,12 @@ func (k Keeper) addStakeRefs(ctx sdk.Context, stake *types.Stake) error {
 }
 
 // deleteStakeRefs deletes all the stake references of the stake with the given stake prefix.
-func (k Keeper) deleteStakeRefs(ctx sdk.Context, stake *types.Stake) error {
-	refKeys, err := getStakeRefKeys(stake)
+func (k Keeper) deleteStakeRefs(
+	ctx sdk.Context,
+	stake *types.Stake,
+	poolMetadatas []*dextypes.PoolMetadata,
+) error {
+	refKeys, err := getStakeRefKeys(stake, poolMetadatas)
 	if err != nil {
 		return err
 	}
@@ -36,7 +44,7 @@ func (k Keeper) deleteStakeRefs(ctx sdk.Context, stake *types.Stake) error {
 	return nil
 }
 
-func getStakeRefKeys(stake *types.Stake) ([][]byte, error) {
+func getStakeRefKeys(stake *types.Stake, poolMetadatas []*dextypes.PoolMetadata) ([][]byte, error) {
 	owner, err := sdk.AccAddressFromBech32(stake.Owner)
 	if err != nil {
 		return nil, err
@@ -46,14 +54,14 @@ func getStakeRefKeys(stake *types.Stake) ([][]byte, error) {
 	refKeys[string(types.KeyPrefixStakeIndex)] = true
 	refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexAccount, owner))] = true
 
-	for _, coin := range stake.Coins {
-		depositDenom, err := dextypes.NewDepositDenomFromString(coin.Denom)
+	for i, coin := range stake.Coins {
+		poolMetadata := poolMetadatas[i]
 		if err != nil {
 			panic("Only valid LP tokens should be staked")
 		}
 		denomBz := []byte(coin.Denom)
-		pairIDBz := []byte(depositDenom.PairID.CanonicalString())
-		tickBz := dextypes.TickIndexToBytes(depositDenom.Tick)
+		pairIDBz := []byte(poolMetadata.PairId.CanonicalString())
+		tickBz := dextypes.TickIndexToBytes(poolMetadata.NormalizedCenterTickIndex)
 		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexDenom, denomBz))] = true
 		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexPairTick, pairIDBz, tickBz))] = true
 		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexAccountDenom, owner, denomBz))] = true

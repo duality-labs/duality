@@ -29,7 +29,7 @@ const (
 )
 
 const (
-	DepositSharesPrefix = "DualityPoolShares"
+	DepositSharesPrefix = "pool/"
 )
 
 const (
@@ -47,6 +47,9 @@ const (
 
 	// LimitOrderExpirationKeyPrefix is the prefix to retrieve all LimitOrderExpiration
 	LimitOrderExpirationKeyPrefix = "LimitOrderExpiration/value/"
+
+	LastPoolIDKey = "LastPoolID/value/"
+	PoolKeyPrefix = "Pool/value/"
 )
 
 func KeyPrefix(p string) []byte {
@@ -179,7 +182,9 @@ func TickLiquidityLimitOrderPrefix(
 
 func TickLiquidityPrefix(tradePairID *TradePairID) []byte {
 	var key []byte
-	key = append(KeyPrefix(TickLiquidityKeyPrefix), KeyPrefix(tradePairID.MustPairID().CanonicalString())...)
+	key = append(
+		KeyPrefix(TickLiquidityKeyPrefix),
+		KeyPrefix(tradePairID.MustPairID().CanonicalString())...)
 	key = append(key, KeyPrefix(tradePairID.MakerDenom)...)
 
 	return key
@@ -316,3 +321,16 @@ const (
 	GoodTilPurgeGasBuffer = 50_000
 	ExpiringLimitOrderGas = 10_000
 )
+
+// InactiveLimitOrderTrancheKey returns the store key to retrieve a InactiveLimitOrderTranche from the index fields
+func PoolMetadataKey(
+	poolID uint64,
+) []byte {
+	key := KeyPrefix(PoolKeyPrefix)
+
+	poolIDBz := sdk.Uint64ToBigEndian(poolID)
+	key = append(key, poolIDBz...)
+	key = append(key, []byte("/")...)
+
+	return key
+}

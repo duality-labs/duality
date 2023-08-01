@@ -17,7 +17,15 @@ func (k Keeper) GetOrInitPool(
 		return pool, nil
 	}
 
-	return types.NewPool(pairID, centerTickIndexNormalized, fee)
+	pool, err := types.NewPool(pairID, centerTickIndexNormalized, fee)
+	if err != nil {
+		return nil, err
+	}
+
+	// This is important because it sets the pool's id (pool.Metadata.Id)
+	k.SetPool(ctx, pool)
+
+	return pool, err
 }
 
 func (k Keeper) GetPool(
@@ -46,12 +54,28 @@ func (k Keeper) GetPool(
 	}
 
 	return &types.Pool{
+		Metadata: &types.PoolMetadata{
+			Id:     upperTick.PoolId,
+			PairId: upperTick.Key.TradePairID.MustPairID(),
+			NormalizedCenterTickIndex: upperTick.Key.TickIndexTakerToMaker - int64(
+				upperTick.Key.Fee,
+			),
+			Fee: upperTick.Key.Fee,
+		},
 		LowerTick0: lowerTick,
 		UpperTick1: upperTick,
 	}, true
 }
 
 func (k Keeper) SetPool(ctx sdk.Context, pool *types.Pool) {
+	poolID := &pool.Metadata.Id
+	if *poolID == 0 {
+		*poolID = k.getNextPoolIdAndIncrement(ctx)
+		pool.LowerTick0.PoolId = *poolID
+		pool.UpperTick1.PoolId = *poolID
+		k.SetPoolMetadata(ctx, pool.Metadata)
+	}
+
 	if pool.LowerTick0.HasToken() {
 		k.SetPoolReserves(ctx, pool.LowerTick0)
 	} else {
@@ -70,7 +94,12 @@ func (k Keeper) SetPool(ctx sdk.Context, pool *types.Pool) {
 }
 
 // Useful for testing
-func MustNewPool(pairID *types.PairID, normalizedCenterTickIndex int64, fee uint64) *types.Pool {
+func MustNewPool(
+	poolID uint64,
+	pairID *types.PairID,
+	normalizedCenterTickIndex int64,
+	fee uint64,
+) *types.Pool {
 	feeInt64 := utils.MustSafeUint64(fee)
 
 	id0To1 := &types.PoolReservesKey{
@@ -87,6 +116,12 @@ func MustNewPool(pairID *types.PairID, normalizedCenterTickIndex int64, fee uint
 	lowerTick := types.NewPoolReservesFromCounterpart(upperTick)
 
 	return &types.Pool{
+		Metadata: &types.PoolMetadata{
+			Id:                        poolID,
+			PairId:                    pairID,
+			NormalizedCenterTickIndex: normalizedCenterTickIndex,
+			Fee:                       fee,
+		},
 		LowerTick0: lowerTick,
 		UpperTick1: upperTick,
 	}
