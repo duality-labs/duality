@@ -127,8 +127,20 @@ func (suite *KeeperTestSuite) TestStakeUnstakePartial() {
 }
 
 func (suite *KeeperTestSuite) TestStakesCoinsByQueryCondition(t *testing.T) {
-	owner, err := sdk.AccAddressFromBech32("cosmos1xv9tklw7d82sezh9haa573wufgy59vmwe6xxe5")
-	require.NoError(t, err)
+	addr0 := suite.SetupAddr(0)
+
+	stake := suite.SetupDepositAndStake(depositStakeSpec{
+		depositSpecs: []depositSpec{
+			{
+				addr:   addr0,
+				token0: sdk.NewInt64Coin("TokenA", 10),
+				token1: sdk.NewInt64Coin("TokenB", 10),
+				tick:   0,
+				fee:    1,
+			},
+		},
+		stakeDistEpochOffset: -2,
+	})
 
 	allCoins := sdk.Coins{
 		sdk.NewInt64Coin(
