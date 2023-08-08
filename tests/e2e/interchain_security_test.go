@@ -5,9 +5,8 @@ import (
 
 	appprovider "github.com/cosmos/interchain-security/v3/app/provider"
 	"github.com/cosmos/interchain-security/v3/tests/integration"
-	"github.com/duality-labs/duality/app"
 
-	icsappiniters "github.com/cosmos/interchain-security/v3/testutil/ibc_testing"
+	"github.com/duality-labs/duality/app"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -22,7 +21,7 @@ func TestCCVTestSuite(t *testing.T) {
 	// Pass in concrete app types that implement the interfaces defined in /testutil/e2e/interfaces.go
 	ccvSuite := integration.NewCCVTestSuite[*appprovider.App, *app.App](
 		// Pass in ibctesting.AppIniters for provider and consumer.
-		icsappiniters.ProviderAppIniter, DualityAppIniter, []string{})
+		ProviderAppIniter, DualityAppIniter, []string{})
 
 	// Run tests
 	suite.Run(t, ccvSuite)
