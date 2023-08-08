@@ -49,12 +49,15 @@ func (n *TrieNode) PrintStats() {
 	pruned := n.PruneSmallTrieNodes(1)
 	cur := pruned
 
-	fmt.Printf(
-		"%d | ",
-		pruned.Index(
-			[]byte{115, 47, 107, 58, 115, 108, 97, 115, 104, 105, 110, 103, 47, 110},
-		).Count,
+	interest := pruned.Index(
+		[]byte{115, 47, 107, 58, 115, 108, 97, 115, 104, 105, 110, 103, 47, 110},
 	)
+	if interest != nil {
+		fmt.Printf(
+			"%d | ",
+			interest.Count,
+		)
+	}
 	for len(cur.List) > 0 {
 		cur = cur.List[0]
 		fmt.Printf("%d ", cur.Value)
