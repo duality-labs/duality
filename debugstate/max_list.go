@@ -1,22 +1,22 @@
 package main
 
 type MaxList struct {
-	Array []*Node
+	Array []*TrieNode
 	Size  int
 }
 
 func NewMaxList(keep int) MaxList {
 	return MaxList{
-		Array: []*Node{},
+		Array: []*TrieNode{},
 		Size:  keep,
 	}
 }
 
-func (n *MaxList) Insert(item *Node) {
+func (n *MaxList) Insert(item *TrieNode) {
 	i := len(n.Array) - 1
 	for ; 0 <= i; i-- {
 		e := n.Array[i]
-		if e.Value > item.Value {
+		if e.Count > item.Count {
 			break
 		}
 	}
@@ -26,7 +26,7 @@ func (n *MaxList) Insert(item *Node) {
 		if nextLen > n.Size {
 			nextLen = n.Size
 		}
-		next := make([]*Node, 0, nextLen)
+		next := make([]*TrieNode, 0, nextLen)
 		next = append(next, n.Array[0:loc]...)
 		next = append(next, item)
 		if len(n.Array) == n.Size {

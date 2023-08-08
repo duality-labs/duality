@@ -25,7 +25,7 @@ func main() {
 	defer iterator.Close()
 
 	// Initialize key count
-	root := NewNode(0)
+	root := NewTrieNode(0)
 	keyCount := 0
 
 	// Iterate over the keys in the database

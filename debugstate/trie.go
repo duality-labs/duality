@@ -2,36 +2,36 @@ package main
 
 import "fmt"
 
-type Node struct {
-	Children map[byte]*Node
+type TrieNode struct {
+	Children map[byte]*TrieNode
 	Value    byte
 	Count    int
 }
 
-func NewNode(value byte) *Node {
-	return &Node{
-		Children: make(map[byte]*Node),
+func NewTrieNode(value byte) *TrieNode {
+	return &TrieNode{
+		Children: make(map[byte]*TrieNode),
 		Value:    value,
 		Count:    0,
 	}
 }
 
-func (n *Node) Insert(key []byte, weight int) {
-	curNode := n
-	curNode.Count += weight
+func (n *TrieNode) Insert(key []byte, weight int) {
+	curTrieNode := n
+	curTrieNode.Count += weight
 	for _, c := range key {
-		if sub, ok := curNode.Children[c]; ok {
-			curNode = sub
+		if sub, ok := curTrieNode.Children[c]; ok {
+			curTrieNode = sub
 		} else {
-			nextNode := NewNode(c)
-			curNode.Children[c] = nextNode
-			curNode = nextNode
+			nextTrieNode := NewTrieNode(c)
+			curTrieNode.Children[c] = nextTrieNode
+			curTrieNode = nextTrieNode
 		}
-		curNode.Count += weight
+		curTrieNode.Count += weight
 	}
 }
 
-func (n *Node) MaxLen() int {
+func (n *TrieNode) MaxLen() int {
 	max := 0
 	if len(n.Children) == 0 {
 		return 0
@@ -45,31 +45,35 @@ func (n *Node) MaxLen() int {
 	return max + 1
 }
 
-func (n *Node) PrintStats() {
-	pruned := n.PruneSmallNodes(1)
+func (n *TrieNode) PrintStats() {
+	pruned := n.PruneSmallTrieNodes(1)
 	cur := pruned
-	for _, v := range cur.Children {
-		for _, vv := range v.Children {
-			fmt.Printf("%d | ", vv.Count)
-		}
-	}
-	for len(cur.Children) > 0 {
-		for _, v := range cur.Children {
-			fmt.Printf("%d ", v.Value)
-			cur = v
-		}
+	fmt.Printf("%d | ", cur.Count)
+	for len(cur.List) > 0 {
+		cur = cur.List[0]
+		fmt.Printf("%d ", cur.Value)
 	}
 	fmt.Printf("\n")
 }
 
-func (n *Node) PruneSmallNodes(keep int) *Node {
+type MaxListNode struct {
+	List  []*MaxListNode
+	Value byte
+	Count int
+}
+
+func (n *TrieNode) PruneSmallTrieNodes(keep int) *MaxListNode {
 	heap := NewMaxList(keep)
 	for _, n := range n.Children {
 		heap.Insert(n)
 	}
-	top := NewNode(n.Value)
-	for _, e := range heap.Array {
-		top.Children[e.Value] = e.PruneSmallNodes(keep)
+	top := &MaxListNode{
+		Value: n.Value,
+		Count: n.Count,
+		List:  make([]*MaxListNode, len(heap.Array)),
+	}
+	for i, e := range heap.Array {
+		top.List[i] = e.PruneSmallTrieNodes(keep)
 	}
 	return top
 }
