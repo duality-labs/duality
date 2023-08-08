@@ -7,7 +7,7 @@ type MaxList struct {
 
 func NewMaxList(keep int) MaxList {
 	return MaxList{
-		Array: make([]*Node, 0, keep),
+		Array: []*Node{},
 		Size:  keep,
 	}
 }
