@@ -48,7 +48,13 @@ func (n *TrieNode) MaxLen() int {
 func (n *TrieNode) PrintStats() {
 	pruned := n.PruneSmallTrieNodes(1)
 	cur := pruned
-	fmt.Printf("%d | ", cur.List[0].Count)
+
+	fmt.Printf(
+		"%d | ",
+		pruned.Index(
+			[]byte{115, 47, 107, 58, 115, 108, 97, 115, 104, 105, 110, 103, 47, 110},
+		).Count,
+	)
 	for len(cur.List) > 0 {
 		cur = cur.List[0]
 		fmt.Printf("%d ", cur.Value)
@@ -60,6 +66,24 @@ type MaxListNode struct {
 	List  []*MaxListNode
 	Value byte
 	Count int
+}
+
+func (n *MaxListNode) Index(key []byte) *MaxListNode {
+	cur := n
+	for _, c := range key {
+		found := false
+		for _, h := range cur.List {
+			if h.Value == c {
+				cur = h
+				found = true
+				break
+			}
+		}
+		if !found {
+			return nil
+		}
+	}
+	return cur
 }
 
 func (n *TrieNode) PruneSmallTrieNodes(keep int) *MaxListNode {
