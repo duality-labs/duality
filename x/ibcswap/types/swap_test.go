@@ -6,10 +6,14 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	forwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v7/router/types"
+	appparams "github.com/duality-labs/duality/app/params"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/iancoleman/orderedmap"
 	"github.com/stretchr/testify/require"
 )
+
+// Load appparams so that we correctly init acc prefixes
+var _ appparams.EncodingConfig
 
 // TestPacketMetadata_Marshal asserts that the marshaling of the swap metadata works as intended.
 func TestPacketMetadata_Marshal(t *testing.T) {
@@ -95,8 +99,8 @@ func TestSwapMetadata_ValidatePass(t *testing.T) {
 	pm := PacketMetadata{
 		&SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:          "cosmos14zde8usc4ur04y3aqnufzzmv2uqdpwwttr5uwv",
-				Receiver:         "cosmos14zde8usc4ur04y3aqnufzzmv2uqdpwwttr5uwv",
+				Creator:          "dual1lyaz7emmzreenas4fpz49a49958kye7wxuvsdr",
+				Receiver:         "dual1lyaz7emmzreenas4fpz49a49958kye7wxuvsdr",
 				TokenIn:          "token-a",
 				TokenOut:         "token-b",
 				AmountIn:         sdk.NewInt(123),
