@@ -50,7 +50,7 @@ func (n *TrieNode) PrintStats() {
 	cur := pruned
 
 	interest := pruned.Index(
-		[]byte{115, 47, 107, 58, 115, 108, 97, 115, 104, 105, 110, 103, 47, 110},
+		[]byte{115, 47, 107, 58, 115, 108, 97, 115, 104, 105, 110, 103},
 	)
 	if interest != nil {
 		fmt.Printf(
