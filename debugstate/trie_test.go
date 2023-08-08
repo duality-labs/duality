@@ -15,7 +15,7 @@ func TestNodeCreation(t *testing.T) {
 
 func TestNodeInsertion(t *testing.T) {
 	n := NewNode('A')
-	n.Insert([]byte("BCD"))
+	n.Insert([]byte("BCD"), 1)
 	if n.Count != 1 {
 		t.Errorf("Root node count after insertion - got: %d; want: 1", n.Count)
 	}

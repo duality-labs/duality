@@ -48,6 +48,9 @@ func (n *Node) MaxLen() int {
 func (n *Node) PrintStats() {
 	pruned := n.PruneSmallNodes(1)
 	cur := pruned
+	for _, v := range cur.Children {
+		fmt.Printf("%d | ", v.Count)
+	}
 	for len(cur.Children) > 0 {
 		for _, v := range cur.Children {
 			fmt.Printf("%d ", v.Value)
