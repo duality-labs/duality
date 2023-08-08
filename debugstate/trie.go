@@ -5,7 +5,7 @@ import "fmt"
 type Node struct {
 	Children map[byte]*Node
 	Value    byte
-	Count    uint64
+	Count    int
 }
 
 func NewNode(value byte) *Node {
@@ -16,9 +16,9 @@ func NewNode(value byte) *Node {
 	}
 }
 
-func (n *Node) Insert(key []byte) {
+func (n *Node) Insert(key []byte, weight int) {
 	curNode := n
-	curNode.Count += 1
+	curNode.Count += weight
 	for _, c := range key {
 		if sub, ok := curNode.Children[c]; ok {
 			curNode = sub
@@ -27,7 +27,7 @@ func (n *Node) Insert(key []byte) {
 			curNode.Children[c] = nextNode
 			curNode = nextNode
 		}
-		curNode.Count += 1
+		curNode.Count += weight
 	}
 }
 

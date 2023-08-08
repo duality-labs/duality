@@ -30,7 +30,7 @@ func main() {
 
 	// Iterate over the keys in the database
 	for ; iterator.Valid(); iterator.Next() {
-		root.Insert(iterator.Key())
+		root.Insert(iterator.Key(), len(iterator.Value()))
 		keyCount += 1
 		if keyCount%1000000 == 0 {
 			root.PrintStats()

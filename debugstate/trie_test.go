@@ -28,8 +28,8 @@ func TestNodeInsertion(t *testing.T) {
 
 func TestNodePruneSmallNodes(t *testing.T) {
 	n := NewNode('A')
-	n.Insert([]byte("BCE"))
-	n.Insert([]byte("BCD"))
+	n.Insert([]byte("BCE"), 1)
+	n.Insert([]byte("BCD"), 1)
 	n.PrintStats()
 }
 
