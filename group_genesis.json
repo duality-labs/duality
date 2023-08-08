@@ -3,8 +3,8 @@
     {
       "group_id": "1",
       "member": {
-        "added_at": "2023-07-07T17:37:52.589204Z",
-        "address": "cosmos18xtrk6ntzslm3anjfy9gz8f9gy29m0rkmkraj6",
+        "added_at": "2023-08-08T18:52:44.630823Z",
+        "address": "dual1rxz0k9laylk7qz2s3rkme4xf2x48zkhsswgqnz",
         "metadata": "",
         "weight": "1"
       }
@@ -12,9 +12,9 @@
   ],
   "group_policies": [
     {
-      "address": "cosmos1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfwkgpd",
-      "admin": "cosmos1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfwkgpd",
-      "created_at": "2023-07-07T17:37:52.589204Z",
+      "address": "dual1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsyf0vr6",
+      "admin": "dual1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsyf0vr6",
+      "created_at": "2023-08-08T18:52:44.630823Z",
       "decision_policy": {
         "@type": "/cosmos.group.v1.PercentageDecisionPolicy",
         "percentage": "0.50",
@@ -32,8 +32,8 @@
   "group_seq": "1",
   "groups": [
     {
-      "admin": "cosmos1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfwkgpd",
-      "created_at": "2023-07-07T17:37:52.589204Z",
+      "admin": "dual1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsyf0vr6",
+      "created_at": "2023-08-08T18:52:44.630823Z",
       "id": "1",
       "metadata": "",
       "total_weight": "1",
