@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	cometbftdb "github.com/cometbft/cometbft-db"
 )
 
@@ -30,8 +32,10 @@ func main() {
 	for ; iterator.Valid(); iterator.Next() {
 		root.Insert(iterator.Key())
 		keyCount += 1
-		if keyCount%10000 == 0 {
+		if keyCount%1000000 == 0 {
 			root.PrintStats()
 		}
 	}
+	root.PrintStats()
+	fmt.Println(root.Count)
 }
