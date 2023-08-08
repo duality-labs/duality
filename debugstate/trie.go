@@ -48,7 +48,7 @@ func (n *TrieNode) MaxLen() int {
 func (n *TrieNode) PrintStats() {
 	pruned := n.PruneSmallTrieNodes(1)
 	cur := pruned
-	fmt.Printf("%d | ", cur.Count)
+	fmt.Printf("%d | ", cur.List[0].Count)
 	for len(cur.List) > 0 {
 		cur = cur.List[0]
 		fmt.Printf("%d ", cur.Value)
