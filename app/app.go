@@ -126,6 +126,11 @@ import (
 	grouptypes "github.com/cosmos/cosmos-sdk/x/group"
 	ibcclienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
 	ibcconnectiontypes "github.com/cosmos/ibc-go/v7/modules/core/03-connection/types"
+
+	"github.com/CosmosContracts/juno/v16/x/tokenfactory"
+	tokenfactorybindings "github.com/CosmosContracts/juno/v16/x/tokenfactory/bindings"
+	tokenfactorykeeper "github.com/CosmosContracts/juno/v16/x/tokenfactory/keeper"
+	tokenfactorytypes "github.com/CosmosContracts/juno/v16/x/tokenfactory/types"
 )
 
 const (
@@ -167,6 +172,7 @@ var (
 		buildermodule.AppModuleBasic{},
 		wasm.AppModuleBasic{},
 		ibchooks.AppModuleBasic{},
+		tokenfactory.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -184,6 +190,7 @@ var (
 		incentivesmoduletypes.ModuleName:              nil,
 		buildertypes.ModuleName:                       nil,
 		wasm.ModuleName:                               {authtypes.Burner},
+		tokenfactorytypes.ModuleName:                  {authtypes.Minter, authtypes.Burner},
 
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
@@ -230,7 +237,7 @@ type App struct {
 	// keepers
 	AccountKeeper         authkeeper.AccountKeeper
 	AuthzKeeper           authzkeeper.Keeper
-	BankKeeper            bankkeeper.Keeper
+	BankKeeper            bankkeeper.BaseKeeper
 	BuildKeeper           builderkeeper.Keeper
 	CapabilityKeeper      *capabilitykeeper.Keeper
 	SlashingKeeper        slashingkeeper.Keeper
@@ -257,9 +264,10 @@ type App struct {
 
 	EpochsKeeper *epochsmodulekeeper.Keeper
 
-	IncentivesKeeper *incentivesmodulekeeper.Keeper
-	WasmKeeper       wasm.Keeper
-	IBCHooksKeeper   ibchookskeeper.Keeper
+	IncentivesKeeper   *incentivesmodulekeeper.Keeper
+	WasmKeeper         wasm.Keeper
+	IBCHooksKeeper     ibchookskeeper.Keeper
+	TokenFactoryKeeper tokenfactorykeeper.Keeper
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
@@ -617,6 +625,11 @@ func NewApp(
 		// x/epochs
 		"/dualitylabs.duality.epochs.Query/EpochInfos":   &epochsmoduletypes.QueryEpochsInfoResponse{},
 		"/dualitylabs.duality.epochs.Query/CurrentEpoch": &epochsmoduletypes.QueryCurrentEpochResponse{},
+
+		// token factory
+		"/osmosis.tokenfactory.v1beta1.Query/Params":                 &tokenfactorytypes.QueryParamsResponse{},
+		"/osmosis.tokenfactory.v1beta1.Query/DenomAuthorityMetadata": &tokenfactorytypes.QueryDenomAuthorityMetadataResponse{},
+		"/osmosis.tokenfactory.v1beta1.Query/DenomsFromCreator":      &tokenfactorytypes.QueryDenomsFromCreatorResponse{},
 	}
 
 	wasmOpts = append(
@@ -629,7 +642,11 @@ func NewApp(
 					appCodec,
 				),
 			},
-		))
+		),
+	)
+	// Move custom query of token factory to stargate, still use custom msg which is tfOpts[1]
+	tfOpts := tokenfactorybindings.RegisterCustomPlugins(&app.BankKeeper, &app.TokenFactoryKeeper)
+	wasmOpts = append(wasmOpts, tfOpts...)
 
 	app.WasmKeeper = wasm.NewKeeper(
 		appCodec,
@@ -696,6 +713,17 @@ func NewApp(
 		app.AccountKeeper,
 		app.BankKeeper,
 		rewardsAddressProvider,
+		AppAuthority,
+	)
+
+	// Create the TokenFactory Keeper
+	app.TokenFactoryKeeper = tokenfactorykeeper.NewKeeper(
+		appCodec,
+		app.keys[tokenfactorytypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+		nil,
+		TokenFactoryCapbilities(),
 		AppAuthority,
 	)
 
@@ -798,6 +826,12 @@ func NewApp(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
+		tokenfactory.NewAppModule(
+			app.TokenFactoryKeeper,
+			app.AccountKeeper,
+			app.BankKeeper,
+			app.GetSubspace(tokenfactorytypes.ModuleName),
+		),
 
 		transferModule,
 		consumerModule,
@@ -853,6 +887,7 @@ func NewApp(
 		group.ModuleName,
 		buildertypes.ModuleName,
 		ibchookstypes.ModuleName,
+		tokenfactorytypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -879,6 +914,8 @@ func NewApp(
 		group.ModuleName,
 		buildertypes.ModuleName,
 		ibchookstypes.ModuleName,
+		tokenfactorytypes.ModuleName,
+
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 
 		// NOTE: Because of the gas sensitivity of PurgeExpiredLimit order operations
@@ -916,6 +953,8 @@ func NewApp(
 		group.ModuleName,
 		buildertypes.ModuleName,
 		ibchookstypes.ModuleName,
+		tokenfactorytypes.ModuleName,
+
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -1218,6 +1257,7 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(epochsmoduletypes.ModuleName)
 	paramsKeeper.Subspace(incentivesmoduletypes.ModuleName)
 	paramsKeeper.Subspace(buildertypes.ModuleName)
+	paramsKeeper.Subspace(tokenfactorytypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
