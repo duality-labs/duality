@@ -1,11 +1,11 @@
 syntax = "proto3";
-package dualitylabs.duality.incentives;
+package duality.incentives;
 
 import "gogoproto/gogo.proto";
-import "dualitylabs/duality/incentives/params.proto";
-import "dualitylabs/duality/incentives/gauge.proto";
-import "dualitylabs/duality/incentives/stake.proto";
-import "dualitylabs/duality/incentives/account_history.proto";
+import "duality/incentives/params.proto";
+import "duality/incentives/gauge.proto";
+import "duality/incentives/stake.proto";
+import "duality/incentives/account_history.proto";
 
 option go_package = "github.com/duality-labs/duality/x/incentives/types";
 

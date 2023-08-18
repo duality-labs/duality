@@ -1,9 +1,9 @@
 syntax = "proto3";
-package dualitylabs.duality.dex;
+package duality.dex;
 
 option go_package = "github.com/duality-labs/duality/x/dex/types";
 import "gogoproto/gogo.proto";
-import "dualitylabs/duality/dex/pool_reserves.proto";
+import "duality/dex/pool_reserves.proto";
 
 message Pool {
     PoolReserves lower_tick0 = 1;

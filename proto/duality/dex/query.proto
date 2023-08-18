@@ -1,20 +1,20 @@
 syntax = "proto3";
-package dualitylabs.duality.dex;
+package duality.dex;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "dualitylabs/duality/dex/params.proto";
-import "dualitylabs/duality/dex/limit_order_tranche_user.proto";
-import "dualitylabs/duality/dex/limit_order_tranche.proto";
-import "dualitylabs/duality/dex/user_positions.proto";
-import "dualitylabs/duality/dex/deposit_record.proto";
-import "dualitylabs/duality/dex/tick_liquidity.proto";
-import "dualitylabs/duality/dex/pool_reserves.proto";
-import "dualitylabs/duality/dex/tx.proto";
+import "duality/dex/params.proto";
+import "duality/dex/limit_order_tranche_user.proto";
+import "duality/dex/limit_order_tranche.proto";
+import "duality/dex/user_positions.proto";
+import "duality/dex/deposit_record.proto";
+import "duality/dex/tick_liquidity.proto";
+import "duality/dex/pool_reserves.proto";
+import "duality/dex/tx.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "google/protobuf/timestamp.proto";
-import "dualitylabs/duality/dex/pool.proto";
+import "duality/dex/pool.proto";
 
 // this line is used by starport scaffolding # 1
 
@@ -24,82 +24,82 @@ option go_package = "github.com/duality-labs/duality/x/dex/types";
 service Query {
 	// Parameters queries the parameters of the module.
 	rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/params";
+		option (google.api.http).get = "/duality/dex/params";
 	}
 
 	// Queries a LimitOrderTrancheUser by index.
 	rpc LimitOrderTrancheUser(QueryGetLimitOrderTrancheUserRequest) returns (QueryGetLimitOrderTrancheUserResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche_user/{address}/{trancheKey}";
+		option (google.api.http).get = "/duality/dex/limit_order_tranche_user/{address}/{trancheKey}";
 	}
 
 	// Queries a list of LimitOrderTrancheMap items.
 	rpc LimitOrderTrancheUserAll(QueryAllLimitOrderTrancheUserRequest) returns (QueryAllLimitOrderTrancheUserResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche_user";
+		option (google.api.http).get = "/duality/dex/limit_order_tranche_user";
 	}
 
 	// Queries a LimitOrderTranche by index.
 	rpc LimitOrderTranche(QueryGetLimitOrderTrancheRequest) returns (QueryGetLimitOrderTrancheResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche/{pairID}/{tokenIn}/{tickIndex}/{trancheKey}";
+		option (google.api.http).get = "/duality/dex/limit_order_tranche/{pairID}/{tokenIn}/{tickIndex}/{trancheKey}";
 	}
 
 	// Queries a list of LimitOrderTranche items for a given pairID / TokenIn combination.
 	rpc LimitOrderTrancheAll(QueryAllLimitOrderTrancheRequest) returns (QueryAllLimitOrderTrancheResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/limit_order_tranche/{pairID}/{tokenIn}";
+		option (google.api.http).get = "/duality/dex/limit_order_tranche/{pairID}/{tokenIn}";
 	}
 
 	// Queries a list of GetUserPositions items.
 	rpc GetUserPositions(QueryGetUserPositionsRequest) returns (QueryGetUserPositionsResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/user/positions/{address}";
+		option (google.api.http).get = "/duality/dex/user/positions/{address}";
 	}
 
 	// Queries a list of UserDeposits items.
 	rpc UserDepositsAll(QueryAllUserDepositsRequest) returns (QueryAllUserDepositsResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/user/deposits/{address}";
+		option (google.api.http).get = "/duality/dex/user/deposits/{address}";
 	}
 
 	// Queries a list of UserLimitOrders items.
 	rpc UserLimitOrdersAll(QueryAllUserLimitOrdersRequest) returns (QueryAllUserLimitOrdersResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/user/limit_orders/{address}";
+		option (google.api.http).get = "/duality/dex/user/limit_orders/{address}";
 	}
 
 	// Queries a list of TickLiquidity items.
 	rpc TickLiquidityAll(QueryAllTickLiquidityRequest) returns (QueryAllTickLiquidityResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/tick_liquidity/{pairID}/{tokenIn}";
+		option (google.api.http).get = "/duality/dex/tick_liquidity/{pairID}/{tokenIn}";
 	}
 
 	// Queries a InactiveLimitOrderTranche by index.
 	rpc InactiveLimitOrderTranche(QueryGetInactiveLimitOrderTrancheRequest) returns (QueryGetInactiveLimitOrderTrancheResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/filled_limit_order_tranche/{pairID}/{tokenIn}/{tickIndex}/{trancheKey}";
+		option (google.api.http).get = "/duality/dex/filled_limit_order_tranche/{pairID}/{tokenIn}/{tickIndex}/{trancheKey}";
 	}
 
 	// Queries a list of InactiveLimitOrderTranche items.
 	rpc InactiveLimitOrderTrancheAll(QueryAllInactiveLimitOrderTrancheRequest) returns (QueryAllInactiveLimitOrderTrancheResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/filled_limit_order_tranche";
+		option (google.api.http).get = "/duality/dex/filled_limit_order_tranche";
 	}
 
 	// Queries a list of PoolReserves items.
 	rpc PoolReservesAll(QueryAllPoolReservesRequest) returns (QueryAllPoolReservesResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/pool_reserves/{pairID}/{tokenIn}";
+		option (google.api.http).get = "/duality/dex/pool_reserves/{pairID}/{tokenIn}";
 	}
 
 	// Queries a PoolReserve by index
 	rpc PoolReserves(QueryGetPoolReservesRequest) returns (QueryGetPoolReservesResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/pool_reserves/{pairID}/{tokenIn}/{tickIndex}/{fee}";
+		option (google.api.http).get = "/duality/dex/pool_reserves/{pairID}/{tokenIn}/{tickIndex}/{fee}";
 	}
 
 	// Queries the simulated result of a multihop swap 
 	rpc EstimateMultiHopSwap(QueryEstimateMultiHopSwapRequest) returns (QueryEstimateMultiHopSwapResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/estimate_multi_hop_swap";
+		option (google.api.http).get = "/duality/dex/estimate_multi_hop_swap";
 	}
 
 	// Queries the simulated result of a multihop swap 
 	rpc EstimatePlaceLimitOrder(QueryEstimatePlaceLimitOrderRequest) returns (QueryEstimatePlaceLimitOrderResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/estimate_place_limit_order";
+		option (google.api.http).get = "/duality/dex/estimate_place_limit_order";
 	}
 
 	// Queries the pool for a pair, tick and fee 
 	rpc Pool(QueryPoolRequest) returns (QueryPoolResponse) {
-		option (google.api.http).get = "/dualitylabs/duality/dex/pool/{pairID}/{tickIndex}/{fee}";
+		option (google.api.http).get = "/duality/dex/pool/{pairID}/{tickIndex}/{fee}";
 	}
 
 // this line is used by starport scaffolding # 2
