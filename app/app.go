@@ -129,8 +129,7 @@ import (
 )
 
 const (
-	AccountAddressPrefix = "cosmos"
-	Name                 = "duality"
+	Name = "duality"
 )
 
 // this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
@@ -191,7 +190,7 @@ var (
 
 	// This is the address of the admin multisig group, the first group policy configured in x/group.
 	// You can rederive this by checking out the `multisig-setup` branch and looking at the README.md.
-	AppAuthority = "cosmos1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfwkgpd"
+	AppAuthority = "dual1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsyf0vr6"
 )
 
 var (
@@ -378,7 +377,7 @@ func NewApp(
 		keys[authtypes.StoreKey],
 		authtypes.ProtoBaseAccount,
 		maccPerms,
-		sdk.Bech32PrefixAccAddr,
+		appparams.Bech32PrefixAccAddr,
 		AppAuthority,
 	)
 
@@ -663,7 +662,7 @@ func NewApp(
 	ics20WasmHooks := ibchooks.NewWasmHooks(
 		&app.IBCHooksKeeper,
 		&app.WasmKeeper,
-		AccountAddressPrefix,
+		appparams.Bech32PrefixAccAddr,
 	) // The contract keeper needs to be set later
 	hooksICS4Wrapper := ibchooks.NewICS4Middleware(
 		app.IBCKeeper.ChannelKeeper,

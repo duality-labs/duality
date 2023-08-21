@@ -12,7 +12,7 @@ import (
 )
 
 func TestStakesCoinsByQueryCondition(t *testing.T) {
-	owner, err := sdk.AccAddressFromBech32("cosmos1xv9tklw7d82sezh9haa573wufgy59vmwe6xxe5")
+	owner, err := sdk.AccAddressFromBech32("dual1lyaz7emmzreenas4fpz49a49958kye7wxuvsdr")
 	require.NoError(t, err)
 
 	allCoins := sdk.Coins{
@@ -98,7 +98,7 @@ func TestStakesCoinsByQueryCondition(t *testing.T) {
 }
 
 func TestStakesCoinsByQueryConditionMultiple(t *testing.T) {
-	owner, err := sdk.AccAddressFromBech32("cosmos1xv9tklw7d82sezh9haa573wufgy59vmwe6xxe5")
+	owner, err := sdk.AccAddressFromBech32("dual1lyaz7emmzreenas4fpz49a49958kye7wxuvsdr")
 	require.NoError(t, err)
 
 	allCoins := sdk.Coins{}

@@ -63,7 +63,7 @@ var chainCfg = ibc.ChainConfig{
 		UidGid:     heighlinerUserString,
 	}},
 	Bin:                 "dualityd",
-	Bech32Prefix:        "cosmos",
+	Bech32Prefix:        "dual",
 	Denom:               "stake",
 	CoinType:            cosmosCoinType,
 	GasPrices:           "0.0stake",
@@ -84,7 +84,8 @@ func TestDualityConsumerChainStart(t *testing.T) {
 	// Create chain factory with Duality and Cosmos Hub
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
 		{Name: "duality", ChainConfig: chainCfg},
-		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}}},
+		{Name: "gaia", Version: "v9.0.0-rc1", ChainConfig: ibc.ChainConfig{ChainID: "chain-a", GasPrices: "0.0uatom"}},
+	},
 	)
 
 	// Get chains from the chain factory
