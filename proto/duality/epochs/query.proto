@@ -1,10 +1,10 @@
 syntax = "proto3";
-package dualitylabs.duality.epochs;
+package duality.epochs;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "dualitylabs/duality/epochs/genesis.proto";
+import "duality/epochs/genesis.proto";
 
 option go_package = "github.com/duality-labs/duality/x/epochs/types";
 

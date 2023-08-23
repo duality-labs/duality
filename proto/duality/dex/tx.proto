@@ -1,5 +1,5 @@
 syntax = "proto3";
-package dualitylabs.duality.dex;
+package duality.dex;
 
 // this line is used by starport scaffolding # proto/tx/import
 
