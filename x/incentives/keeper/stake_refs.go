@@ -9,7 +9,7 @@ import (
 // addStakeRefs adds appropriate reference keys preceded by a prefix.
 // A prefix indicates whether the stake is unstaking or not.
 func (k Keeper) addStakeRefs(ctx sdk.Context, stake *types.Stake) error {
-	refKeys, err := getStakeRefKeys(stake)
+	refKeys, err := k.getStakeRefKeys(ctx, stake)
 	if err != nil {
 		return err
 	}
@@ -23,7 +23,7 @@ func (k Keeper) addStakeRefs(ctx sdk.Context, stake *types.Stake) error {
 
 // deleteStakeRefs deletes all the stake references of the stake with the given stake prefix.
 func (k Keeper) deleteStakeRefs(ctx sdk.Context, stake *types.Stake) error {
-	refKeys, err := getStakeRefKeys(stake)
+	refKeys, err := k.getStakeRefKeys(ctx, stake)
 	if err != nil {
 		return err
 	}
@@ -36,7 +36,7 @@ func (k Keeper) deleteStakeRefs(ctx sdk.Context, stake *types.Stake) error {
 	return nil
 }
 
-func getStakeRefKeys(stake *types.Stake) ([][]byte, error) {
+func (k Keeper) getStakeRefKeys(ctx sdk.Context, stake *types.Stake) ([][]byte, error) {
 	owner, err := sdk.AccAddressFromBech32(stake.Owner)
 	if err != nil {
 		return nil, err
@@ -47,13 +47,13 @@ func getStakeRefKeys(stake *types.Stake) ([][]byte, error) {
 	refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexAccount, owner))] = true
 
 	for _, coin := range stake.Coins {
-		depositDenom, err := dextypes.NewDepositDenomFromString(coin.Denom)
+		poolParams, err := k.dk.GetPoolParamsByID(ctx, coin.Denom)
 		if err != nil {
 			panic("Only valid LP tokens should be staked")
 		}
 		denomBz := []byte(coin.Denom)
-		pairIDBz := []byte(depositDenom.PairID.CanonicalString())
-		tickBz := dextypes.TickIndexToBytes(depositDenom.Tick)
+		pairIDBz := []byte(poolParams.PairID.CanonicalString())
+		tickBz := dextypes.TickIndexToBytes(poolParams.Tick)
 		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexDenom, denomBz))] = true
 		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexPairTick, pairIDBz, tickBz))] = true
 		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexAccountDenom, owner, denomBz))] = true

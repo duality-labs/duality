@@ -37,6 +37,10 @@ func (k MockKeeper) GetStakesByQueryCondition(
 	return k.stakes
 }
 
+func (k MockKeeper) StakeCoinsPassingQueryCondition(ctx sdk.Context, stake *types.Stake, distrTo types.QueryCondition) sdk.Coins {
+	panic("StakeCoinsPassingQueryCondition has not been implemented for the MockKeeper")
+}
+
 func TestDistributor(t *testing.T) {
 	app := app.Setup(t, false)
 	ctx := app.BaseApp.NewContext(
@@ -62,10 +66,10 @@ func TestDistributor(t *testing.T) {
 		sdk.Coins{},
 		0,
 	)
-	rewardedDenom := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 5, 1).
-		String()
-	nonRewardedDenom := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 12, 1).
-		String()
+	rewardPool, _ := app.DexKeeper.GetOrInitPool(ctx, &dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 5, 1)
+	rewardedDenom := rewardPool.GetPoolDenom()
+	nonRewardPool, _ := app.DexKeeper.GetOrInitPool(ctx, &dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 12, 1)
+	nonRewardedDenom := nonRewardPool.GetPoolDenom()
 	allStakes := types.Stakes{
 		{1, "addr1", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(50))}, 0},
 		{2, "addr2", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(rewardedDenom, sdk.NewInt(25))}, 0},

@@ -14,16 +14,16 @@ var _ DistributorKeeper = Keeper{}
 
 func (k Keeper) ValueForShares(ctx sdk.Context, coin sdk.Coin, tick int64) (sdk.Int, error) {
 	totalShares := k.bk.GetSupply(ctx, coin.Denom).Amount
-	depositDenom, err := dextypes.NewDepositDenomFromString(coin.Denom)
+	poolParams, err := k.dk.GetPoolParamsByID(ctx, coin.Denom)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
 
 	pool, err := k.dk.GetOrInitPool(
 		ctx,
-		depositDenom.PairID,
-		depositDenom.Tick,
-		depositDenom.Fee,
+		poolParams.PairID,
+		poolParams.Tick,
+		poolParams.Fee,
 	)
 	if err != nil {
 		return sdk.ZeroInt(), err
@@ -127,11 +127,11 @@ func (k Keeper) GetRewardsEstimate(
 	pairSet := map[dextypes.PairID]bool{}
 	for _, l := range filterStakes {
 		for _, c := range l.Coins {
-			depositDenom, err := dextypes.NewDepositDenomFromString(c.Denom)
+			poolParams, err := k.dk.GetPoolParamsByID(ctx, c.Denom)
 			if err != nil {
 				panic("all stakes should be valid deposit denoms")
 			}
-			pairSet[*depositDenom.PairID] = true
+			pairSet[*poolParams.PairID] = true
 		}
 	}
 

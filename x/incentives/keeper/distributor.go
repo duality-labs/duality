@@ -8,6 +8,7 @@ import (
 type DistributorKeeper interface {
 	ValueForShares(ctx sdk.Context, coin sdk.Coin, tick int64) (sdk.Int, error)
 	GetStakesByQueryCondition(ctx sdk.Context, distrTo *types.QueryCondition) types.Stakes
+	StakeCoinsPassingQueryCondition(ctx sdk.Context, stake *types.Stake, distrTo types.QueryCondition) sdk.Coins
 }
 
 type Distributor struct {
@@ -42,7 +43,7 @@ func (d Distributor) Distribute(
 
 	stakeSumCache := make(map[uint64]sdk.Int, len(gaugeStakes))
 	for _, stake := range gaugeStakes {
-		stakeCoins := stake.CoinsPassingQueryCondition(gauge.DistributeTo)
+		stakeCoins := d.keeper.StakeCoinsPassingQueryCondition(ctx, stake, gauge.DistributeTo)
 		stakeTotal := sdk.ZeroInt()
 		for _, stakeCoin := range stakeCoins {
 			adjustedPositionValue, err := d.keeper.ValueForShares(ctx, stakeCoin, gauge.PricingTick)

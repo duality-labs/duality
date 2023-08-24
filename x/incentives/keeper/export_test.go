@@ -31,8 +31,8 @@ func (k Keeper) MoveActiveGaugeToFinishedGauge(ctx sdk.Context, gauge *types.Gau
 	return k.moveActiveGaugeToFinishedGauge(ctx, gauge)
 }
 
-func GetStakeRefKeys(stake *types.Stake) ([][]byte, error) {
-	return getStakeRefKeys(stake)
+func (k Keeper) GetStakeRefKeys(ctx sdk.Context, stake *types.Stake) ([][]byte, error) {
+	return k.getStakeRefKeys(ctx, stake)
 }
 
 func RemoveValue(ids []uint64, id uint64) ([]uint64, int) {

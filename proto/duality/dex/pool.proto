@@ -6,6 +6,7 @@ import "gogoproto/gogo.proto";
 import "duality/dex/pool_reserves.proto";
 
 message Pool {
-    PoolReserves lower_tick0 = 1;
-    PoolReserves upper_tick1 = 2;
+    string ID = 1;
+    PoolReserves lower_tick0 = 2;
+    PoolReserves upper_tick1 = 3;
 }
