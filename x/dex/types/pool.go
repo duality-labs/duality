@@ -33,6 +33,19 @@ func NewPool(
 	}, nil
 }
 
+func MustNewPool(
+	pairID *PairID,
+	centerTickIndexNormalized int64,
+	fee uint64,
+	id string,
+) *Pool {
+	pool, err := NewPool(pairID, centerTickIndexNormalized, fee, id)
+	if err != nil {
+		panic("Error while creating new pool: " + err.Error())
+	}
+	return pool
+}
+
 func (p *Pool) CenterTickIndex() int64 {
 	feeInt64 := utils.MustSafeUint64(p.Fee())
 	return p.UpperTick1.Key.TickIndexTakerToMaker - feeInt64

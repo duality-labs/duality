@@ -89,7 +89,8 @@ func (k Keeper) GetPool(
 	} else if lowerTickFound && !upperTickFound {
 		upperTick = types.NewPoolReservesFromCounterpart(lowerTick)
 	} else if !lowerTickFound && !upperTickFound {
-		return nil, false
+		// Pool has already been initialized before so we can safely assume that pool creation doesn't throw an error
+		return types.MustNewPool(pairID, centerTickIndexNormalized, fee, poolID), true
 	}
 
 	return &types.Pool{
