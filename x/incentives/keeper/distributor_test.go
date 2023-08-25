@@ -18,27 +18,29 @@ var _ DistributorKeeper = MockKeeper{}
 
 type MockKeeper struct {
 	stakes types.Stakes
+	keeper DistributorKeeper
 }
 
-func NewMockKeeper(stakes types.Stakes) MockKeeper {
+func NewMockKeeper(keeper DistributorKeeper, stakes types.Stakes) MockKeeper {
 	return MockKeeper{
 		stakes: stakes,
+		keeper: keeper,
 	}
 }
 
-func (k MockKeeper) ValueForShares(ctx sdk.Context, coin sdk.Coin, tick int64) (sdk.Int, error) {
+func (k MockKeeper) ValueForShares(_ sdk.Context, coin sdk.Coin, tick int64) (sdk.Int, error) {
 	return coin.Amount.Mul(sdk.NewInt(2)), nil
 }
 
 func (k MockKeeper) GetStakesByQueryCondition(
-	ctx sdk.Context,
+	_ sdk.Context,
 	distrTo *types.QueryCondition,
 ) types.Stakes {
 	return k.stakes
 }
 
 func (k MockKeeper) StakeCoinsPassingQueryCondition(ctx sdk.Context, stake *types.Stake, distrTo types.QueryCondition) sdk.Coins {
-	panic("StakeCoinsPassingQueryCondition has not been implemented for the MockKeeper")
+	return k.keeper.StakeCoinsPassingQueryCondition(ctx, stake, distrTo)
 }
 
 func TestDistributor(t *testing.T) {
@@ -77,7 +79,7 @@ func TestDistributor(t *testing.T) {
 		{4, "addr3", ctx.BlockTime(), sdk.Coins{sdk.NewCoin(nonRewardedDenom, sdk.NewInt(50))}, 0},
 	}
 
-	distributor := NewDistributor(NewMockKeeper(allStakes))
+	distributor := NewDistributor(NewMockKeeper(app.IncentivesKeeper, allStakes))
 
 	testCases := []struct {
 		name         string

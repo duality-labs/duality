@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"encoding/binary"
-	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -140,7 +139,6 @@ func (k Keeper) GetPoolParamsByID(
 	if !found {
 		return types.PoolParams{}, types.ErrInvalidDepositDenom
 	}
-	fmt.Printf("REf: %v (%v)\n", ref, string(ref))
 
 	poolParams, err := types.ParsePoolRefToParams(ref)
 	if err != nil {

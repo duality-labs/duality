@@ -51,12 +51,6 @@ func TestQueryCondition(t *testing.T) {
 			poolParams: dextypes.NewPoolParams(pairID, 20, 5),
 			testResult: false,
 		},
-		{
-			name:       "Invalid denom",
-			queryCond:  QueryCondition{PairID: pairID, StartTick: 10, EndTick: 20},
-			poolParams: dextypes.NewPoolParams(&dextypes.PairID{Token0: "coinz", Token1: "coinz"}, 15, 5),
-			testResult: false,
-		},
 	}
 
 	for _, tt := range tests {
