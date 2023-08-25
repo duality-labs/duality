@@ -188,26 +188,3 @@ func (k Keeper) SetPool(ctx sdk.Context, pool *types.Pool) {
 	ctx.EventManager().EmitEvent(types.CreateTickUpdatePoolReserves(*pool.LowerTick0))
 	ctx.EventManager().EmitEvent(types.CreateTickUpdatePoolReserves(*pool.UpperTick1))
 }
-
-// Useful for testing
-func MustNewPool(pairID *types.PairID, normalizedCenterTickIndex int64, fee uint64) *types.Pool {
-	feeInt64 := utils.MustSafeUint64(fee)
-
-	id0To1 := &types.PoolReservesKey{
-		TradePairID:           types.NewTradePairIDFromMaker(pairID, pairID.Token1),
-		TickIndexTakerToMaker: normalizedCenterTickIndex + feeInt64,
-		Fee:                   fee,
-	}
-
-	upperTick, err := types.NewPoolReserves(id0To1)
-	if err != nil {
-		panic(err)
-	}
-
-	lowerTick := types.NewPoolReservesFromCounterpart(upperTick)
-
-	return &types.Pool{
-		LowerTick0: lowerTick,
-		UpperTick1: upperTick,
-	}
-}

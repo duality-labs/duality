@@ -14,7 +14,10 @@ import (
 func createNPoolReserves(k *keeper.Keeper, ctx sdk.Context, n int) []*types.PoolReserves {
 	items := make([]*types.PoolReserves, n)
 	for i := range items {
-		pool := keeper.MustNewPool(types.MustNewPairID("TokenA", "TokenB"), int64(i), uint64(i))
+		pool, err := k.InitPool(ctx, types.MustNewPairID("TokenA", "TokenB"), int64(i), uint64(i))
+		if err != nil {
+			panic("failed to create pool")
+		}
 		pool.Deposit(sdk.NewInt(10), sdk.NewInt(0), sdk.ZeroInt(), true)
 		k.SetPool(ctx, pool)
 		items[i] = pool.LowerTick0
@@ -34,7 +37,10 @@ func createNPools(k *keeper.Keeper, ctx sdk.Context, n int) []struct {
 		Fee       uint64
 	}, n)
 	for i := range items {
-		pool := keeper.MustNewPool(types.MustNewPairID("TokenA", "TokenB"), int64(i), uint64(i))
+		pool, err := k.InitPool(ctx, types.MustNewPairID("TokenA", "TokenB"), int64(i), uint64(i))
+		if err != nil {
+			panic("failed to create pool")
+		}
 		pool.Deposit(sdk.NewInt(10), sdk.NewInt(0), sdk.ZeroInt(), true)
 		k.SetPool(ctx, pool)
 		items[i] = struct {
