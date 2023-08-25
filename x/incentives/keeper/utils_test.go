@@ -64,9 +64,9 @@ func TestRemoveValue(t *testing.T) {
 // JCP TODO: fix me
 // func TestStakeRefKeys(t *testing.T) {
 // 	addr1 := sdk.AccAddress([]byte("addr1---------------"))
-// 	denom1 := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).
+// 	denom1 := dextypes.NewPoolDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).
 // 		String()
-// 	denom2 := dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenC"}, 0, 1).
+// 	denom2 := dextypes.NewPoolDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenC"}, 0, 1).
 // 		String()
 // 	// empty address and 1 coin
 // 	stake1 := types.NewStake(

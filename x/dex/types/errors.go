@@ -65,10 +65,10 @@ var (
 		1117,
 		"Supplying a tick outside the range of [-352437, 352437] is not allowed",
 	)
-	ErrInvalidDepositDenom = sdkerrors.Register(
+	ErrInvalidPoolDenom = sdkerrors.Register(
 		ModuleName,
 		1118,
-		"Denom is not an instance of Duality DepositDenom",
+		"Denom is not an instance of Duality PoolDenom",
 	)
 	ErrInvalidPairIDStr = sdkerrors.Register(
 		ModuleName,

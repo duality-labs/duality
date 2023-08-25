@@ -15,7 +15,7 @@ type PoolParams struct {
 func ParsePoolRefToParams(poolRef []byte) (PoolParams, error) {
 	parts := bytes.Split(poolRef, []byte("/"))
 	if len(parts) != 4 {
-		return PoolParams{}, ErrInvalidDepositDenom
+		return PoolParams{}, ErrInvalidPoolDenom
 	}
 
 	pairID, err := NewPairIDFromCanonicalString(string(parts[0]))

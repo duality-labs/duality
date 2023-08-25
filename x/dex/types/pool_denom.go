@@ -15,7 +15,7 @@ func NewPoolDenom(poolIdx uint64) string {
 
 func ValidatePoolDenom(denom string) error {
 	if !PoolDenomRegexp.MatchString(denom) {
-		return ErrInvalidDepositDenom
+		return ErrInvalidPoolDenom
 	}
 
 	return nil

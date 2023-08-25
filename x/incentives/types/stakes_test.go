@@ -18,7 +18,7 @@ package types_test
 
 // 	allCoins := sdk.Coins{
 // 		sdk.NewInt64Coin(
-// 			dextypes.NewDepositDenom(
+// 			dextypes.NewPoolDenom(
 // 				&dextypes.PairID{
 // 					Token0: "coin1",
 // 					Token1: "coin2",
@@ -29,7 +29,7 @@ package types_test
 // 			100,
 // 		),
 // 		sdk.NewInt64Coin(
-// 			dextypes.NewDepositDenom(
+// 			dextypes.NewPoolDenom(
 // 				&dextypes.PairID{
 // 					Token0: "coin1",
 // 					Token1: "coin2",
@@ -40,7 +40,7 @@ package types_test
 // 			200,
 // 		),
 // 		sdk.NewInt64Coin(
-// 			dextypes.NewDepositDenom(
+// 			dextypes.NewPoolDenom(
 // 				&dextypes.PairID{
 // 					Token0: "coin1",
 // 					Token1: "coin2",
@@ -105,7 +105,7 @@ package types_test
 // 	allCoins := sdk.Coins{}
 
 // 	coins1 := sdk.NewInt64Coin(
-// 		dextypes.NewDepositDenom(
+// 		dextypes.NewPoolDenom(
 // 			&dextypes.PairID{
 // 				Token0: "coin1",
 // 				Token1: "coin2",
@@ -118,7 +118,7 @@ package types_test
 // 	allCoins = allCoins.Add(coins1)
 
 // 	coins2 := sdk.NewInt64Coin(
-// 		dextypes.NewDepositDenom(
+// 		dextypes.NewPoolDenom(
 // 			&dextypes.PairID{
 // 				Token0: "coin1",
 // 				Token1: "coin2",
@@ -131,7 +131,7 @@ package types_test
 // 	allCoins = allCoins.Add(coins2)
 
 // 	coins3 := sdk.NewInt64Coin(
-// 		dextypes.NewDepositDenom(
+// 		dextypes.NewPoolDenom(
 // 			&dextypes.PairID{
 // 				Token0: "coin1",
 // 				Token1: "coin2",
