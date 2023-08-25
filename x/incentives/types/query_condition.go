@@ -5,7 +5,7 @@ import (
 )
 
 func (qc QueryCondition) Test(poolParams dextypes.PoolParams) bool {
-	if *poolParams.PairID != *qc.PairID {
+	if !poolParams.PairID.Equal(qc.PairID) {
 		return false
 	}
 
