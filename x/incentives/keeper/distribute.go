@@ -14,7 +14,7 @@ var _ DistributorKeeper = Keeper{}
 
 func (k Keeper) ValueForShares(ctx sdk.Context, coin sdk.Coin, tick int64) (sdk.Int, error) {
 	totalShares := k.bk.GetSupply(ctx, coin.Denom).Amount
-	poolParams, err := k.dk.GetPoolParamsByID(ctx, coin.Denom)
+	poolParams, err := k.dk.GetPoolParamsByDenom(ctx, coin.Denom)
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
@@ -127,7 +127,7 @@ func (k Keeper) GetRewardsEstimate(
 	pairSet := map[dextypes.PairID]bool{}
 	for _, l := range filterStakes {
 		for _, c := range l.Coins {
-			poolParams, err := k.dk.GetPoolParamsByID(ctx, c.Denom)
+			poolParams, err := k.dk.GetPoolParamsByDenom(ctx, c.Denom)
 			if err != nil {
 				panic("all stakes should be valid deposit denoms")
 			}

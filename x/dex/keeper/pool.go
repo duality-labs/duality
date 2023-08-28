@@ -37,11 +37,13 @@ func (k Keeper) InitPoolKeys(ctx sdk.Context,
 	pairID *types.PairID,
 	centerTickIndexNormalized int64,
 	fee uint64,
-) string {
+) uint64 {
 	poolKeyBz := types.PoolKey(*pairID, centerTickIndexNormalized, fee)
 
 	poolID := k.GetNextPoolID(ctx)
-	poolIDBz := []byte(poolID)
+	poolIDBz := sdk.Uint64ToBigEndian(poolID)
+
+	k.SetPoolCount(ctx, poolID+1)
 
 	store := ctx.KVStore(k.storeKey)
 
@@ -55,11 +57,8 @@ func (k Keeper) InitPoolKeys(ctx sdk.Context,
 }
 
 // GetNextPoolId get ID for the next pool to be created
-func (k Keeper) GetNextPoolID(ctx sdk.Context) string {
-	poolCount := k.GetPoolCount(ctx)
-	// JCP TODO: this should happen in init keys once we switch poolID to uint64
-	k.SetPoolCount(ctx, poolCount+1)
-	return types.NewPoolDenom(poolCount)
+func (k Keeper) GetNextPoolID(ctx sdk.Context) uint64 {
+	return k.GetPoolCount(ctx)
 }
 
 func (k Keeper) GetPool(
@@ -120,41 +119,54 @@ func (k Keeper) GetPoolIDByParams(
 	pairID *types.PairID,
 	centerTickIndexNormalized int64,
 	fee uint64,
-) (id string, found bool) {
+) (id uint64, found bool) {
 	poolRefKey := types.PoolKey(*pairID, centerTickIndexNormalized, fee)
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PoolIDKeyPrefix))
 	b := store.Get(poolRefKey)
 	if b == nil {
-		return "", false
+		return 0, false
 	}
 
-	return string(b), true
+	poolID := sdk.BigEndianToUint64(b)
+	return poolID, true
+}
+
+func (k Keeper) GetPoolParamsByDenom(
+	ctx sdk.Context,
+	denom string,
+) (pp types.PoolParams, err error) {
+	poolID, err := types.ParsePoolIDFromDenom(denom)
+	if err != nil {
+		return pp, err
+	}
+	pp, found := k.GetPoolParamsByID(ctx, poolID)
+	if !found {
+		return pp, types.ErrInvalidPoolDenom
+	}
+	return pp, nil
 }
 
 func (k Keeper) GetPoolParamsByID(
 	ctx sdk.Context,
-	id string,
-) (types.PoolParams, error) {
-	// JCP TODO: should this be found vs error?
+	id uint64,
+) (pp types.PoolParams, found bool) {
 	ref, found := k.GetPoolRefByID(ctx, id)
 	if !found {
-		return types.PoolParams{}, types.ErrInvalidDepositDenom
+		return pp, false
 	}
 
-	poolParams, err := types.ParsePoolRefToParams(ref)
-	if err != nil {
-		panic("Cannot parse pool ref")
-	}
+	poolParams := types.MustParsePoolRefToParams(ref)
 
-	return poolParams, nil
+	return poolParams, true
 }
 
 func (k Keeper) GetPoolRefByID(
 	ctx sdk.Context,
-	id string,
+	poolID uint64,
 ) (ref []byte, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PoolRefKeyPrefix))
-	b := store.Get([]byte(id))
+	poolIDBz := sdk.Uint64ToBigEndian(poolID)
+	b := store.Get(poolIDBz)
 	if b == nil {
 		return []byte{}, false
 	}

@@ -94,7 +94,7 @@ func (q QueryServer) GetGauges(
 	var lowerTick, upperTick int64
 	var poolParams *dextypes.PoolParams
 	if req.Denom != "" {
-		poolParams, err := q.dk.GetPoolParamsByID(ctx, req.Denom)
+		poolParams, err := q.dk.GetPoolParamsByDenom(ctx, req.Denom)
 		if err != nil {
 			return nil, err
 		}

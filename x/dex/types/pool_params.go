@@ -33,6 +33,14 @@ func ParsePoolRefToParams(poolRef []byte) (PoolParams, error) {
 	return PoolParams{PairID: pairID, Tick: tick, Fee: fee}, nil
 }
 
+func MustParsePoolRefToParams(poolRef []byte) PoolParams {
+	poolParams, err := ParsePoolRefToParams(poolRef)
+	if err != nil {
+		panic("Invalid pool ref")
+	}
+	return poolParams
+}
+
 func NewPoolParams(pairID *PairID, tick int64, fee uint64) PoolParams {
 	return PoolParams{PairID: pairID, Tick: tick, Fee: fee}
 }

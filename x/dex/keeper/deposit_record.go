@@ -15,7 +15,7 @@ func (k Keeper) GetAllDepositsForAddress(ctx sdk.Context, addr sdk.AccAddress) [
 				return false
 			}
 
-			poolParams, err := k.GetPoolParamsByID(ctx, sharesMaybe.Denom)
+			poolParams, err := k.GetPoolParamsByDenom(ctx, sharesMaybe.Denom)
 			if err != nil {
 				panic("Can't get info for PoolDenom")
 			}

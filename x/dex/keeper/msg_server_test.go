@@ -1068,7 +1068,8 @@ func (s *MsgServerTestSuite) getPoolShares(
 	if !found {
 		return sdk.ZeroInt()
 	}
-	return s.app.BankKeeper.GetSupply(s.ctx, poolID).Amount
+	poolDenom := types.NewPoolDenom(poolID)
+	return s.app.BankKeeper.GetSupply(s.ctx, poolDenom).Amount
 }
 
 func (s *MsgServerTestSuite) assertPoolShares(
@@ -1092,7 +1093,9 @@ func (s *MsgServerTestSuite) getAccountShares(
 	if !found {
 		return sdk.ZeroInt()
 	}
-	return s.app.BankKeeper.GetBalance(s.ctx, account, id).Amount
+
+	poolDenom := types.NewPoolDenom(id)
+	return s.app.BankKeeper.GetBalance(s.ctx, account, poolDenom).Amount
 }
 
 func (s *MsgServerTestSuite) assertAccountShares(

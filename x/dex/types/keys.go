@@ -28,9 +28,6 @@ const (
 	Separator = "/"
 )
 
-const (
-	PoolNamePrefix = "duality/pool/"
-)
 
 const (
 	// TickLiquidityKeyPrefix is the prefix to retrieve all TickLiquidity

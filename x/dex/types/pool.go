@@ -9,7 +9,7 @@ func NewPool(
 	pairID *PairID,
 	centerTickIndexNormalized int64,
 	fee uint64,
-	id string,
+	id uint64,
 ) (*Pool, error) {
 	feeInt64 := utils.MustSafeUint64(fee)
 
@@ -37,7 +37,7 @@ func MustNewPool(
 	pairID *PairID,
 	centerTickIndexNormalized int64,
 	fee uint64,
-	id string,
+	id uint64,
 ) *Pool {
 	pool, err := NewPool(pairID, centerTickIndexNormalized, fee, id)
 	if err != nil {
@@ -151,7 +151,7 @@ func (p *Pool) Deposit(
 }
 
 func (p *Pool) GetPoolDenom() string {
-	return p.ID
+	return NewPoolDenom(p.ID)
 }
 
 func (p *Pool) Price(tradePairID *TradePairID) sdk.Dec {

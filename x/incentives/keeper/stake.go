@@ -236,7 +236,7 @@ func (k Keeper) StakeCoinsPassingQueryCondition(
 	coins := stake.Coins
 	result := sdk.NewCoins()
 	for _, c := range coins {
-		poolParams, err := k.dk.GetPoolParamsByID(ctx, c.Denom)
+		poolParams, err := k.dk.GetPoolParamsByDenom(ctx, c.Denom)
 		if err != nil {
 			continue
 		}
