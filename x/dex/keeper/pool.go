@@ -99,6 +99,15 @@ func (k Keeper) GetPool(
 	}, true
 }
 
+func (k Keeper) GetPoolByID(ctx sdk.Context, poolID uint64) (pool *types.Pool, found bool) {
+	poolParams, found := k.GetPoolParamsByID(ctx, poolID)
+	if !found {
+		return pool, false
+	}
+
+	return k.GetPool(ctx, poolParams.PairID, poolParams.Tick, poolParams.Fee)
+}
+
 // GetPoolCount get the total number of pool
 func (k Keeper) GetPoolCount(ctx sdk.Context) uint64 {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte{})

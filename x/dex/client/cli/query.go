@@ -41,6 +41,7 @@ func GetQueryCmd(_ string) *cobra.Command {
 	cmd.AddCommand(CmdListPoolReserves())
 	cmd.AddCommand(CmdShowPoolReserves())
 	cmd.AddCommand(CmdShowPool())
+	cmd.AddCommand(CmdShowPoolByID())
 
 	// this line is used by starport scaffolding # 1
 

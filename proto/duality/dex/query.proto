@@ -97,9 +97,14 @@ service Query {
 		option (google.api.http).get = "/duality/dex/estimate_place_limit_order";
 	}
 
-	// Queries the pool for a pair, tick and fee 
+	// Queries a pool by pair, tick and fee
 	rpc Pool(QueryPoolRequest) returns (QueryPoolResponse) {
 		option (google.api.http).get = "/duality/dex/pool/{pairID}/{tickIndex}/{fee}";
+	}
+
+  // Queries a pool by ID
+	rpc PoolByID(QueryPoolByIDRequest) returns (QueryPoolResponse) {
+		option (google.api.http).get = "/duality/dex/pool/{poolID}";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -323,6 +328,11 @@ message QueryPoolRequest {
   string pairID = 1;
   int64 tickIndex = 2;
   uint64 fee = 3;
+
+}
+
+message QueryPoolByIDRequest {
+  uint64 poolID = 1;
 }
 
 message QueryPoolResponse {

@@ -31,3 +31,21 @@ func (k Keeper) Pool(
 
 	return &types.QueryPoolResponse{Pool: pool}, nil
 }
+
+func (k Keeper) PoolByID(
+	goCtx context.Context,
+	req *types.QueryPoolByIDRequest,
+) (*types.QueryPoolResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	pool, found := k.GetPoolByID(ctx, req.PoolID)
+	if !found {
+		return nil, status.Error(codes.NotFound, "not found")
+	}
+
+	return &types.QueryPoolResponse{Pool: pool}, nil
+}
