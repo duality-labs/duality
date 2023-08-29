@@ -19,7 +19,7 @@ func (k Keeper) GetAllDepositsForAddress(ctx sdk.Context, addr sdk.AccAddress) [
 			if err != nil {
 				panic("Can't get info for PoolDenom")
 			}
-			fee := utils.MustSafeUint64(poolParams.Fee)
+			fee := utils.MustSafeUint64ToInt64(poolParams.Fee)
 			depositRecord := &types.DepositRecord{
 				PairID:          poolParams.PairID,
 				SharesOwned:     sharesMaybe.Amount,

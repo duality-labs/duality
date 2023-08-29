@@ -84,12 +84,12 @@ func Uint64ToSortableString(i uint64) string {
 	return fmt.Sprintf("%s%s", lenChar, intStr)
 }
 
-func SafeUint64(in uint64) (out int64, overflow bool) {
+func SafeUint64ToInt64(in uint64) (out int64, overflow bool) {
 	return int64(in), in > math.MaxInt64
 }
 
-func MustSafeUint64(in uint64) (out int64) {
-	safeInt64, overflow := SafeUint64(in)
+func MustSafeUint64ToInt64(in uint64) (out int64) {
+	safeInt64, overflow := SafeUint64ToInt64(in)
 	if overflow {
 		panic("Overflow while casting uint64 to int64")
 	}

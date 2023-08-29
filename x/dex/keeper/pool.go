@@ -67,7 +67,7 @@ func (k Keeper) GetPool(
 	centerTickIndexNormalized int64,
 	fee uint64,
 ) (*types.Pool, bool) {
-	feeInt64 := utils.MustSafeUint64(fee)
+	feeInt64 := utils.MustSafeUint64ToInt64(fee)
 
 	id0To1 := &types.PoolReservesKey{
 		TradePairID:           types.NewTradePairIDFromMaker(pairID, pairID.Token1),

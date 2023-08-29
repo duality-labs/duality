@@ -11,7 +11,7 @@ func NewPool(
 	fee uint64,
 	id uint64,
 ) (*Pool, error) {
-	feeInt64 := utils.MustSafeUint64(fee)
+	feeInt64 := utils.MustSafeUint64ToInt64(fee)
 
 	id0To1 := &PoolReservesKey{
 		TradePairID:           NewTradePairIDFromMaker(pairID, pairID.Token1),
@@ -47,7 +47,7 @@ func MustNewPool(
 }
 
 func (p *Pool) CenterTickIndex() int64 {
-	feeInt64 := utils.MustSafeUint64(p.Fee())
+	feeInt64 := utils.MustSafeUint64ToInt64(p.Fee())
 	return p.UpperTick1.Key.TickIndexTakerToMaker - feeInt64
 }
 
