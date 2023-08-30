@@ -24,31 +24,31 @@ func TestQueryCondition(t *testing.T) {
 		{
 			name:       "Matching denom and tick range",
 			queryCond:  QueryCondition{PairID: pairID, StartTick: 10, EndTick: 20},
-			poolParams: dextypes.NewPoolParams(pairID, 15, 5),
+			poolParams: dextypes.NewPoolParams(pairID, 15, 5, 0),
 			testResult: true,
 		},
 		{
 			name:       "Non-matching denom",
 			queryCond:  QueryCondition{PairID: pairID, StartTick: 10, EndTick: 20},
-			poolParams: dextypes.NewPoolParams(&dextypes.PairID{Token0: "coin1", Token1: "coin3"}, 15, 5),
+			poolParams: dextypes.NewPoolParams(&dextypes.PairID{Token0: "coin1", Token1: "coin3"}, 15, 5, 0),
 			testResult: false,
 		},
 		{
 			name:       "Non-matching tick range",
 			queryCond:  QueryCondition{PairID: pairID, StartTick: 30, EndTick: 40},
-			poolParams: dextypes.NewPoolParams(pairID, 15, 6),
+			poolParams: dextypes.NewPoolParams(pairID, 15, 6, 0),
 			testResult: false,
 		},
 		{
 			name:       "Non-matching tick fee range lower",
 			queryCond:  QueryCondition{PairID: pairID, StartTick: 30, EndTick: 40},
-			poolParams: dextypes.NewPoolParams(pairID, 10, 5),
+			poolParams: dextypes.NewPoolParams(pairID, 10, 5, 0),
 			testResult: false,
 		},
 		{
 			name:       "Non-matching tick fee range upper",
 			queryCond:  QueryCondition{PairID: pairID, StartTick: 30, EndTick: 40},
-			poolParams: dextypes.NewPoolParams(pairID, 20, 5),
+			poolParams: dextypes.NewPoolParams(pairID, 20, 5, 0),
 			testResult: false,
 		},
 	}

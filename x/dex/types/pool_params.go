@@ -10,9 +10,10 @@ type PoolParams struct {
 	PairID *PairID
 	Tick   int64
 	Fee    uint64
+	PoolID uint64
 }
 
-func ParsePoolRefToParams(poolRef []byte) (PoolParams, error) {
+func ParsePoolRefToParams(poolID uint64, poolRef []byte) (PoolParams, error) {
 	parts := bytes.Split(poolRef, []byte("/"))
 	if len(parts) != 4 {
 		return PoolParams{}, ErrInvalidPoolDenom
@@ -30,17 +31,17 @@ func ParsePoolRefToParams(poolRef []byte) (PoolParams, error) {
 
 	fee := sdk.BigEndianToUint64(parts[2])
 
-	return PoolParams{PairID: pairID, Tick: tick, Fee: fee}, nil
+	return PoolParams{PairID: pairID, Tick: tick, Fee: fee, PoolID: poolID}, nil
 }
 
-func MustParsePoolRefToParams(poolRef []byte) PoolParams {
-	poolParams, err := ParsePoolRefToParams(poolRef)
+func MustParsePoolRefToParams(poolID uint64, poolRef []byte) PoolParams {
+	poolParams, err := ParsePoolRefToParams(poolID, poolRef)
 	if err != nil {
 		panic("Invalid pool ref")
 	}
 	return poolParams
 }
 
-func NewPoolParams(pairID *PairID, tick int64, fee uint64) PoolParams {
-	return PoolParams{PairID: pairID, Tick: tick, Fee: fee}
+func NewPoolParams(pairID *PairID, tick int64, fee uint64, poolID uint64) PoolParams {
+	return PoolParams{PairID: pairID, Tick: tick, Fee: fee, PoolID: poolID}
 }
