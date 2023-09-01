@@ -113,6 +113,7 @@ import (
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 	buildermodule "github.com/skip-mev/pob/x/builder"
@@ -823,6 +824,7 @@ func NewApp(
 			app.interfaceRegistry,
 		),
 		buildermodule.NewAppModule(appCodec, app.BuildKeeper),
+		wasm.NewAppModule(appCodec, &app.WasmKeeper, nil, app.AccountKeeper, app.BankKeeper, app.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -853,6 +855,7 @@ func NewApp(
 		group.ModuleName,
 		buildertypes.ModuleName,
 		ibchookstypes.ModuleName,
+		wasm.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -879,6 +882,7 @@ func NewApp(
 		group.ModuleName,
 		buildertypes.ModuleName,
 		ibchookstypes.ModuleName,
+		wasm.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 
 		// NOTE: Because of the gas sensitivity of PurgeExpiredLimit order operations
@@ -916,6 +920,7 @@ func NewApp(
 		group.ModuleName,
 		buildertypes.ModuleName,
 		ibchookstypes.ModuleName,
+		wasm.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
