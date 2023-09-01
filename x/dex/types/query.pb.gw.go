@@ -2219,9 +2219,9 @@ var (
 
 	pattern_Query_PoolByID_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"duality", "dex", "pool", "poolID"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_PoolMetadata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"duality-labs", "duality", "dex", "pool_metadata", "id"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_PoolMetadata_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"duality", "dex", "pool_metadata", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_PoolMetadataAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"duality-labs", "duality", "dex", "pool_metadata"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_PoolMetadataAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"duality", "dex", "pool_metadata"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

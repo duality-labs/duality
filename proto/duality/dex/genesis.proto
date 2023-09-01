@@ -17,11 +17,10 @@ option go_package = "github.com/duality-labs/duality/x/dex/types";
 message GenesisState {
            Params                params                        = 1 [(gogoproto.nullable) = false];
   repeated TickLiquidity         tickLiquidityList             = 2 [(gogoproto.nullable) = true ];
-  repeated LimitOrderTranche     inactiveLimitOrderTrancheList = 6 [(gogoproto.nullable) = true ];
-  repeated LimitOrderTrancheUser limitOrderTrancheUserList     = 7 [(gogoproto.nullable) = true ];
-
+  repeated LimitOrderTranche     inactiveLimitOrderTrancheList = 3 [(gogoproto.nullable) = true ];
+  repeated LimitOrderTrancheUser limitOrderTrancheUserList     = 4 [(gogoproto.nullable) = true ];
+  repeated PoolMetadata poolMetadataList  = 5 [(gogoproto.nullable) = false];
+           uint64       poolCount = 6;
   // this line is used by starport scaffolding # genesis/proto/state
-  repeated PoolMetadata poolMetadataList  = 8 [(gogoproto.nullable) = false];
-           uint64       poolCount = 9;
 }
 

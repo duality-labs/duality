@@ -31,7 +31,7 @@ func (k Keeper) InitPool(
 ) (pool *types.Pool, err error) {
 	poolMetadata := types.PoolMetadata{PairID: pairID, Tick: centerTickIndexNormalized, Fee: fee}
 
-	// Get current pool poolID
+	// Get current poolID
 	poolID := k.GetPoolCount(ctx)
 	poolMetadata.ID = poolID
 
@@ -103,21 +103,6 @@ func (k Keeper) GetPoolByID(ctx sdk.Context, poolID uint64) (pool *types.Pool, f
 	return k.GetPool(ctx, poolMetadata.PairID, poolMetadata.Tick, poolMetadata.Fee)
 }
 
-// GetPoolCount get the total number of pool
-func (k Keeper) GetPoolCount(ctx sdk.Context) uint64 {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte{})
-	byteKey := types.KeyPrefix(types.PoolCountKeyPrefix)
-	bz := store.Get(byteKey)
-
-	// Count doesn't exist: no element
-	if bz == nil {
-		return 0
-	}
-
-	// Parse bytes
-	return binary.BigEndian.Uint64(bz)
-}
-
 func (k Keeper) GetPoolIDByParams(
 	ctx sdk.Context,
 	pairID *types.PairID,
@@ -133,15 +118,6 @@ func (k Keeper) GetPoolIDByParams(
 
 	poolID := sdk.BigEndianToUint64(b)
 	return poolID, true
-}
-
-// SetPoolCount set the total number of pool
-func (k Keeper) SetPoolCount(ctx sdk.Context, count uint64) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte{})
-	byteKey := types.KeyPrefix(types.PoolCountKeyPrefix)
-	bz := make([]byte, 8)
-	binary.BigEndian.PutUint64(bz, count)
-	store.Set(byteKey, bz)
 }
 
 func (k Keeper) SetPool(ctx sdk.Context, pool *types.Pool) {
@@ -160,4 +136,28 @@ func (k Keeper) SetPool(ctx sdk.Context, pool *types.Pool) {
 	// This should be solved upstream by better tracking of dirty ticks
 	ctx.EventManager().EmitEvent(types.CreateTickUpdatePoolReserves(*pool.LowerTick0))
 	ctx.EventManager().EmitEvent(types.CreateTickUpdatePoolReserves(*pool.UpperTick1))
+}
+
+// GetPoolCount get the total number of pools
+func (k Keeper) GetPoolCount(ctx sdk.Context) uint64 {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte{})
+	byteKey := types.KeyPrefix(types.PoolCountKeyPrefix)
+	bz := store.Get(byteKey)
+
+	// Count doesn't exist: no element
+	if bz == nil {
+		return 0
+	}
+
+	// Parse bytes
+	return binary.BigEndian.Uint64(bz)
+}
+
+// SetPoolCount set the total number of pools
+func (k Keeper) SetPoolCount(ctx sdk.Context, count uint64) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte{})
+	byteKey := types.KeyPrefix(types.PoolCountKeyPrefix)
+	bz := make([]byte, 8)
+	binary.BigEndian.PutUint64(bz, count)
+	store.Set(byteKey, bz)
 }

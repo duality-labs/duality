@@ -24,7 +24,6 @@ option go_package = "github.com/duality-labs/duality/x/dex/types";
 
 // Query defines the gRPC querier service.
 service Query {
-  
   // Parameters queries the parameters of the module.
   rpc Params (QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/duality/dex/params";
@@ -127,17 +126,20 @@ service Query {
   
   }
 
-  // this line is used by starport scaffolding # 2
-  
-  // Queries a list of PoolMetadata items.
+  // Queries a PoolMetadata by ID
   rpc PoolMetadata    (QueryGetPoolMetadataRequest) returns (QueryGetPoolMetadataResponse) {
-    option (google.api.http).get = "/duality-labs/duality/dex/pool_metadata/{id}";
+    option (google.api.http).get = "/duality/dex/pool_metadata/{id}";
   
   }
+
+  // Queries a list of PoolMetadata items.
   rpc PoolMetadataAll (QueryAllPoolMetadataRequest) returns (QueryAllPoolMetadataResponse) {
-    option (google.api.http).get = "/duality-labs/duality/dex/pool_metadata";
+    option (google.api.http).get = "/duality/dex/pool_metadata";
   
   }
+
+// this line is used by starport scaffolding # 2
+
 }
 // QueryParamsRequest is request type for the Query/Params RPC method.
 message QueryParamsRequest {}
@@ -326,7 +328,6 @@ message QueryPoolResponse {
 }
 
 
-// this line is used by starport scaffolding # 3
 message QueryGetPoolMetadataRequest {
   uint64 id = 1;
 }
@@ -343,4 +344,6 @@ message QueryAllPoolMetadataResponse {
   repeated PoolMetadata                           PoolMetadata = 1 [(gogoproto.nullable) = false];
            cosmos.base.query.v1beta1.PageResponse pagination   = 2;
 }
+
+// this line is used by starport scaffolding # 3
 
