@@ -28,32 +28,27 @@ func (k Keeper) InitPool(
 	pairID *types.PairID,
 	centerTickIndexNormalized int64,
 	fee uint64,
-) (*types.Pool, error) {
-	poolID := k.InitPoolKeys(ctx, pairID, centerTickIndexNormalized, fee)
-	return types.NewPool(pairID, centerTickIndexNormalized, fee, poolID)
-}
+) (pool *types.Pool, err error) {
+	poolMetadata := types.PoolMetadata{PairID: pairID, Tick: centerTickIndexNormalized, Fee: fee}
 
-func (k Keeper) InitPoolKeys(ctx sdk.Context,
-	pairID *types.PairID,
-	centerTickIndexNormalized int64,
-	fee uint64,
-) uint64 {
-	poolKeyBz := types.PoolKey(*pairID, centerTickIndexNormalized, fee)
+	// Get current pool poolID
+	poolID := k.GetPoolCount(ctx)
+	poolMetadata.ID = poolID
 
-	poolID := k.GetNextPoolID(ctx)
+	// Store poolMetadata
+	k.SetPoolMetadata(ctx, poolMetadata)
+
+	// Create a reference so poolID can be looked up by poolMetadata
 	poolIDBz := sdk.Uint64ToBigEndian(poolID)
+	poolIDKey := types.PoolIDKey(pairID, centerTickIndexNormalized, fee)
 
+	poolIDStore := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PoolIDKeyPrefix))
+	poolIDStore.Set(poolIDKey, poolIDBz)
+
+	// Update poolCount
 	k.SetPoolCount(ctx, poolID+1)
 
-	store := ctx.KVStore(k.storeKey)
-
-	poolIDStore := prefix.NewStore(store, types.KeyPrefix(types.PoolIDKeyPrefix))
-	poolIDStore.Set(poolKeyBz, poolIDBz)
-
-	poolRefStore := prefix.NewStore(store, types.KeyPrefix(types.PoolRefKeyPrefix))
-	poolRefStore.Set(poolIDBz, poolKeyBz)
-
-	return poolID
+	return types.NewPool(pairID, centerTickIndexNormalized, fee, poolID)
 }
 
 // GetNextPoolId get ID for the next pool to be created
@@ -100,12 +95,12 @@ func (k Keeper) GetPool(
 }
 
 func (k Keeper) GetPoolByID(ctx sdk.Context, poolID uint64) (pool *types.Pool, found bool) {
-	poolParams, found := k.GetPoolParamsByID(ctx, poolID)
+	poolMetadata, found := k.GetPoolMetadata(ctx, poolID)
 	if !found {
 		return pool, false
 	}
 
-	return k.GetPool(ctx, poolParams.PairID, poolParams.Tick, poolParams.Fee)
+	return k.GetPool(ctx, poolMetadata.PairID, poolMetadata.Tick, poolMetadata.Fee)
 }
 
 // GetPoolCount get the total number of pool
@@ -129,58 +124,15 @@ func (k Keeper) GetPoolIDByParams(
 	centerTickIndexNormalized int64,
 	fee uint64,
 ) (id uint64, found bool) {
-	poolRefKey := types.PoolKey(*pairID, centerTickIndexNormalized, fee)
+	poolIDKey := types.PoolIDKey(pairID, centerTickIndexNormalized, fee)
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PoolIDKeyPrefix))
-	b := store.Get(poolRefKey)
+	b := store.Get(poolIDKey)
 	if b == nil {
 		return 0, false
 	}
 
 	poolID := sdk.BigEndianToUint64(b)
 	return poolID, true
-}
-
-func (k Keeper) GetPoolParamsByDenom(
-	ctx sdk.Context,
-	denom string,
-) (pp types.PoolParams, err error) {
-	poolID, err := types.ParsePoolIDFromDenom(denom)
-	if err != nil {
-		return pp, err
-	}
-	pp, found := k.GetPoolParamsByID(ctx, poolID)
-	if !found {
-		return pp, types.ErrInvalidPoolDenom
-	}
-	return pp, nil
-}
-
-func (k Keeper) GetPoolParamsByID(
-	ctx sdk.Context,
-	id uint64,
-) (pp types.PoolParams, found bool) {
-	ref, found := k.GetPoolRefByID(ctx, id)
-	if !found {
-		return pp, false
-	}
-
-	poolParams := types.MustParsePoolRefToParams(ref)
-
-	return poolParams, true
-}
-
-func (k Keeper) GetPoolRefByID(
-	ctx sdk.Context,
-	poolID uint64,
-) (ref []byte, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PoolRefKeyPrefix))
-	poolIDBz := sdk.Uint64ToBigEndian(poolID)
-	b := store.Get(poolIDBz)
-	if b == nil {
-		return []byte{}, false
-	}
-
-	return b, true
 }
 
 // SetPoolCount set the total number of pool

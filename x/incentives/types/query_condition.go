@@ -4,13 +4,13 @@ import (
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 )
 
-func (qc QueryCondition) Test(poolParams dextypes.PoolParams) bool {
-	if !poolParams.PairID.Equal(qc.PairID) {
+func (qc QueryCondition) Test(poolMetadata dextypes.PoolMetadata) bool {
+	if !poolMetadata.PairID.Equal(qc.PairID) {
 		return false
 	}
 
-	lowerTick := poolParams.Tick - int64(poolParams.Fee)
-	upperTick := poolParams.Tick + int64(poolParams.Fee)
+	lowerTick := poolMetadata.Tick - int64(poolMetadata.Fee)
+	upperTick := poolMetadata.Tick + int64(poolMetadata.Fee)
 	lowerTickQualifies := qc.StartTick <= lowerTick && lowerTick <= qc.EndTick
 	upperTickQualifies := qc.StartTick <= upperTick && upperTick <= qc.EndTick
 

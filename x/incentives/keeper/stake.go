@@ -236,12 +236,12 @@ func (k Keeper) StakeCoinsPassingQueryCondition(
 	coins := stake.Coins
 	result := sdk.NewCoins()
 	for _, c := range coins {
-		poolParams, err := k.dk.GetPoolParamsByDenom(ctx, c.Denom)
+		poolMetadata, err := k.dk.GetPoolMetadataByDenom(ctx, c.Denom)
 		if err != nil {
 			continue
 		}
 
-		if distrTo.Test(poolParams) {
+		if distrTo.Test(poolMetadata) {
 			result = result.Add(c)
 		}
 	}

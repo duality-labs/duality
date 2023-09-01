@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 package duality.dex;
 
 import "gogoproto/gogo.proto";
@@ -6,17 +7,21 @@ import "duality/dex/params.proto";
 import "duality/dex/limit_order_tranche_user.proto";
 import "duality/dex/limit_order_tranche.proto";
 import "duality/dex/tick_liquidity.proto";
+import "duality/dex/pool_metadata.proto";
+
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/duality-labs/duality/x/dex/types";
 
 // GenesisState defines the dex module's genesis state.
 message GenesisState {
-  Params params = 1 [(gogoproto.nullable) = false];
-  repeated TickLiquidity tickLiquidityList = 2 [(gogoproto.nullable) = true];
-  repeated LimitOrderTranche inactiveLimitOrderTrancheList = 6 [(gogoproto.nullable) = true];
-  repeated LimitOrderTrancheUser limitOrderTrancheUserList = 7 [(gogoproto.nullable) = true];
-
+           Params                params                        = 1 [(gogoproto.nullable) = false];
+  repeated TickLiquidity         tickLiquidityList             = 2 [(gogoproto.nullable) = true ];
+  repeated LimitOrderTranche     inactiveLimitOrderTrancheList = 6 [(gogoproto.nullable) = true ];
+  repeated LimitOrderTrancheUser limitOrderTrancheUserList     = 7 [(gogoproto.nullable) = true ];
 
   // this line is used by starport scaffolding # genesis/proto/state
+  repeated PoolMetadata poolMetadataList  = 8 [(gogoproto.nullable) = false];
+           uint64       poolCount = 9;
 }
+

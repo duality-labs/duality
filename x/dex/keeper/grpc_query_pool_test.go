@@ -27,19 +27,19 @@ func TestPoolQuerySingle(t *testing.T) {
 			desc: "First",
 			request: &types.QueryPoolRequest{
 				PairID:    "TokenA<>TokenB",
-				TickIndex: msgs[0].TickIndex,
-				Fee:       msgs[0].Fee,
+				TickIndex: msgs[0].CenterTickIndex(),
+				Fee:       msgs[0].Fee(),
 			},
-			response: &types.QueryPoolResponse{Pool: msgs[0].Pool},
+			response: &types.QueryPoolResponse{Pool: msgs[0]},
 		},
 		{
 			desc: "Second",
 			request: &types.QueryPoolRequest{
 				PairID:    "TokenA<>TokenB",
-				TickIndex: msgs[1].TickIndex,
-				Fee:       msgs[1].Fee,
+				TickIndex: msgs[1].CenterTickIndex(),
+				Fee:       msgs[1].Fee(),
 			},
-			response: &types.QueryPoolResponse{Pool: msgs[1].Pool},
+			response: &types.QueryPoolResponse{Pool: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
@@ -85,14 +85,14 @@ func TestPoolQueryByID(t *testing.T) {
 			request: &types.QueryPoolByIDRequest{
 				PoolID: 0,
 			},
-			response: &types.QueryPoolResponse{Pool: msgs[0].Pool},
+			response: &types.QueryPoolResponse{Pool: msgs[0]},
 		},
 		{
 			desc: "Second",
 			request: &types.QueryPoolByIDRequest{
 				PoolID: 1,
 			},
-			response: &types.QueryPoolResponse{Pool: msgs[1].Pool},
+			response: &types.QueryPoolResponse{Pool: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",

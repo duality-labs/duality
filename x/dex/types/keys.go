@@ -28,7 +28,6 @@ const (
 	Separator = "/"
 )
 
-
 const (
 	// TickLiquidityKeyPrefix is the prefix to retrieve all TickLiquidity
 	TickLiquidityKeyPrefix = "TickLiquidity/value/"
@@ -48,8 +47,8 @@ const (
 	// PoolIDKeyPrefix is the prefix to retrieve all PoolIds or retrieve a specific pool by pair+tick+fee
 	PoolIDKeyPrefix = "Pool/id/"
 
-	// PoolRefKeyPrefix is the prefix to retrieve all pool refs (pair+tick+fee)
-	PoolRefKeyPrefix = "Pool/ref/"
+	// PoolMetadataKeyPrefix is the prefix to retrieve all PoolMetadata
+	PoolMetadataKeyPrefix = "PoolMetadata/value/"
 
 	// PoolCountKeyPrefix is the prefix to retrieve the Pool count
 	PoolCountKeyPrefix = "Pool/count/"
@@ -207,8 +206,8 @@ func LimitOrderExpirationKey(
 	return key
 }
 
-func PoolKey(
-	pairID PairID,
+func PoolIDKey(
+	pairID *PairID,
 	tickIndex int64,
 	fee uint64,
 ) []byte {

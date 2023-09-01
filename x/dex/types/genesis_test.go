@@ -73,6 +73,15 @@ func TestGenesisState_Validate(t *testing.T) {
 						},
 					},
 				},
+				PoolMetadataList: []types.PoolMetadata{
+					{
+						ID: 0,
+					},
+					{
+						ID: 1,
+					},
+				},
+				PoolCount: 2,
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -144,6 +153,32 @@ func TestGenesisState_Validate(t *testing.T) {
 						},
 					},
 				},
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated poolMetadata",
+			genState: &types.GenesisState{
+				PoolMetadataList: []types.PoolMetadata{
+					{
+						ID: 0,
+					},
+					{
+						ID: 0,
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "invalid poolCount",
+			genState: &types.GenesisState{
+				PoolMetadataList: []types.PoolMetadata{
+					{
+						ID: 1,
+					},
+				},
+				PoolCount: 0,
 			},
 			valid: false,
 		},

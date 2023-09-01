@@ -26,37 +26,6 @@ func createNPoolReserves(k *keeper.Keeper, ctx sdk.Context, n int) []*types.Pool
 	return items
 }
 
-func createNPools(k *keeper.Keeper, ctx sdk.Context, n int) []struct {
-	Pool      *types.Pool
-	TickIndex int64
-	Fee       uint64
-} {
-	items := make([]struct {
-		Pool      *types.Pool
-		TickIndex int64
-		Fee       uint64
-	}, n)
-	for i := range items {
-		pool, err := k.InitPool(ctx, types.MustNewPairID("TokenA", "TokenB"), int64(i), uint64(i))
-		if err != nil {
-			panic("failed to create pool")
-		}
-		pool.Deposit(sdk.NewInt(10), sdk.NewInt(0), sdk.ZeroInt(), true)
-		k.SetPool(ctx, pool)
-		items[i] = struct {
-			Pool      *types.Pool
-			TickIndex int64
-			Fee       uint64
-		}{
-			Pool:      pool,
-			TickIndex: int64(i),
-			Fee:       uint64(i),
-		}
-	}
-
-	return items
-}
-
 func TestGetPoolReserves(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNPoolReserves(keeper, ctx, 10)

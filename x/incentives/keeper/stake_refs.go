@@ -47,13 +47,13 @@ func (k Keeper) getStakeRefKeys(ctx sdk.Context, stake *types.Stake) ([][]byte, 
 	refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexAccount, owner))] = true
 
 	for _, coin := range stake.Coins {
-		poolParams, err := k.dk.GetPoolParamsByDenom(ctx, coin.Denom)
+		poolMetadata, err := k.dk.GetPoolMetadataByDenom(ctx, coin.Denom)
 		if err != nil {
 			panic("Only valid LP tokens should be staked")
 		}
 		denomBz := []byte(coin.Denom)
-		pairIDBz := []byte(poolParams.PairID.CanonicalString())
-		tickBz := dextypes.TickIndexToBytes(poolParams.Tick)
+		pairIDBz := []byte(poolMetadata.PairID.CanonicalString())
+		tickBz := dextypes.TickIndexToBytes(poolMetadata.Tick)
 		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexDenom, denomBz))] = true
 		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexPairTick, pairIDBz, tickBz))] = true
 		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexAccountDenom, owner, denomBz))] = true

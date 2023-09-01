@@ -15,18 +15,18 @@ func (k Keeper) GetAllDepositsForAddress(ctx sdk.Context, addr sdk.AccAddress) [
 				return false
 			}
 
-			poolParams, err := k.GetPoolParamsByDenom(ctx, sharesMaybe.Denom)
+			poolMetadata, err := k.GetPoolMetadataByDenom(ctx, sharesMaybe.Denom)
 			if err != nil {
 				panic("Can't get info for PoolDenom")
 			}
-			fee := utils.MustSafeUint64ToInt64(poolParams.Fee)
+			fee := utils.MustSafeUint64ToInt64(poolMetadata.Fee)
 			depositRecord := &types.DepositRecord{
-				PairID:          poolParams.PairID,
+				PairID:          poolMetadata.PairID,
 				SharesOwned:     sharesMaybe.Amount,
-				CenterTickIndex: poolParams.Tick,
-				LowerTickIndex:  poolParams.Tick - fee,
-				UpperTickIndex:  poolParams.Tick + fee,
-				Fee:             poolParams.Fee,
+				CenterTickIndex: poolMetadata.Tick,
+				LowerTickIndex:  poolMetadata.Tick - fee,
+				UpperTickIndex:  poolMetadata.Tick + fee,
+				Fee:             poolMetadata.Fee,
 			}
 			depositArr = append(depositArr, depositRecord)
 
