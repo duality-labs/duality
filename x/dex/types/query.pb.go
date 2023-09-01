@@ -2162,8 +2162,9 @@ type QueryClient interface {
 	Pool(ctx context.Context, in *QueryPoolRequest, opts ...grpc.CallOption) (*QueryPoolResponse, error)
 	// Queries a pool by ID
 	PoolByID(ctx context.Context, in *QueryPoolByIDRequest, opts ...grpc.CallOption) (*QueryPoolResponse, error)
-	// Queries a list of PoolMetadata items.
+	// Queries a PoolMetadata by ID
 	PoolMetadata(ctx context.Context, in *QueryGetPoolMetadataRequest, opts ...grpc.CallOption) (*QueryGetPoolMetadataResponse, error)
+	// Queries a list of PoolMetadata items.
 	PoolMetadataAll(ctx context.Context, in *QueryAllPoolMetadataRequest, opts ...grpc.CallOption) (*QueryAllPoolMetadataResponse, error)
 }
 
@@ -2382,8 +2383,9 @@ type QueryServer interface {
 	Pool(context.Context, *QueryPoolRequest) (*QueryPoolResponse, error)
 	// Queries a pool by ID
 	PoolByID(context.Context, *QueryPoolByIDRequest) (*QueryPoolResponse, error)
-	// Queries a list of PoolMetadata items.
+	// Queries a PoolMetadata by ID
 	PoolMetadata(context.Context, *QueryGetPoolMetadataRequest) (*QueryGetPoolMetadataResponse, error)
+	// Queries a list of PoolMetadata items.
 	PoolMetadataAll(context.Context, *QueryAllPoolMetadataRequest) (*QueryAllPoolMetadataResponse, error)
 }
 
