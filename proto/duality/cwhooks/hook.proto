@@ -1,0 +1,14 @@
+syntax = "proto3";
+package duality.cwhooks;
+
+option go_package = "github.com/duality-labs/duality/x/cwhooks/types";
+
+message Hook {
+  uint64 id = 1;
+  string contractID = 2; 
+  string args = 3; 
+  bool persistent = 4; 
+  string triggerKey = 5; 
+  string triggerValue = 6; 
+  string creator = 7;
+}

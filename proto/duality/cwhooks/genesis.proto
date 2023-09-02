@@ -1,12 +1,17 @@
 syntax = "proto3";
+
 package duality.cwhooks;
 
 import "gogoproto/gogo.proto";
 import "duality/cwhooks/params.proto";
+import "duality/cwhooks/hook.proto";
 
 option go_package = "github.com/duality-labs/duality/x/cwhooks/types";
 
 // GenesisState defines the cwhooks module's genesis state.
 message GenesisState {
-  Params params = 1 [(gogoproto.nullable) = false];
+           Params params    = 1 [(gogoproto.nullable) = false];
+  repeated Hook   hookList  = 2 [(gogoproto.nullable) = false];
+           uint64 hookCount = 3;
 }
+

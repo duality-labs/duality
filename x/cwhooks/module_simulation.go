@@ -23,7 +23,19 @@ var (
 )
 
 const (
-// this line is used by starport scaffolding # simapp/module/const
+	opWeightMsgCreateHook = "op_weight_msg_hook"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgCreateHook int = 100
+
+	opWeightMsgUpdateHook = "op_weight_msg_hook"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgUpdateHook int = 100
+
+	opWeightMsgDeleteHook = "op_weight_msg_hook"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgDeleteHook int = 100
+
+	// this line is used by starport scaffolding # simapp/module/const
 )
 
 // GenerateGenesisState creates a randomized GenState of the module.
@@ -34,6 +46,17 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 	}
 	cwhooksGenesis := types.GenesisState{
 		Params: types.DefaultParams(),
+		HookList: []types.Hook{
+			{
+				Id:      0,
+				Creator: sample.AccAddress(),
+			},
+			{
+				Id:      1,
+				Creator: sample.AccAddress(),
+			},
+		},
+		HookCount: 2,
 		// this line is used by starport scaffolding # simapp/module/genesisState
 	}
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(&cwhooksGenesis)
@@ -51,6 +74,39 @@ func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedP
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
 	operations := make([]simtypes.WeightedOperation, 0)
 
+	var weightMsgCreateHook int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgCreateHook, &weightMsgCreateHook, nil,
+		func(_ *rand.Rand) {
+			weightMsgCreateHook = defaultWeightMsgCreateHook
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgCreateHook,
+		cwhookssimulation.SimulateMsgCreateHook(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgUpdateHook int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateHook, &weightMsgUpdateHook, nil,
+		func(_ *rand.Rand) {
+			weightMsgUpdateHook = defaultWeightMsgUpdateHook
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgUpdateHook,
+		cwhookssimulation.SimulateMsgUpdateHook(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgDeleteHook int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgDeleteHook, &weightMsgDeleteHook, nil,
+		func(_ *rand.Rand) {
+			weightMsgDeleteHook = defaultWeightMsgDeleteHook
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgDeleteHook,
+		cwhookssimulation.SimulateMsgDeleteHook(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
 	// this line is used by starport scaffolding # simapp/module/operation
 
 	return operations
@@ -59,6 +115,30 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 // ProposalMsgs returns msgs used for governance proposals for simulations.
 func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
 	return []simtypes.WeightedProposalMsg{
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgCreateHook,
+			defaultWeightMsgCreateHook,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				cwhookssimulation.SimulateMsgCreateHook(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgUpdateHook,
+			defaultWeightMsgUpdateHook,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				cwhookssimulation.SimulateMsgUpdateHook(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgDeleteHook,
+			defaultWeightMsgDeleteHook,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				cwhookssimulation.SimulateMsgDeleteHook(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
 		// this line is used by starport scaffolding # simapp/module/OpMsg
 	}
 }
