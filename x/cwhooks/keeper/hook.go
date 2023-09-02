@@ -43,9 +43,9 @@ func (k Keeper) AppendHook(
 	// Set the ID of the appended value
 	hook.Id = count
 
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.HookKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.HookKeyPrefix))
 	appendedValue := k.cdc.MustMarshal(&hook)
-	store.Set(GetHookIDBytes(hook.Id), appendedValue)
+	store.Set(types.HookKey(hook.TriggerKey, hook.TriggerValue, hook.Id), appendedValue)
 
 	// Update hook count
 	k.SetHookCount(ctx, count+1)
@@ -55,15 +55,15 @@ func (k Keeper) AppendHook(
 
 // SetHook set a specific hook in the store
 func (k Keeper) SetHook(ctx sdk.Context, hook types.Hook) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.HookKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.HookKeyPrefix))
 	b := k.cdc.MustMarshal(&hook)
-	store.Set(GetHookIDBytes(hook.Id), b)
+	store.Set(types.HookKey(hook.TriggerKey, hook.TriggerValue, hook.Id), b)
 }
 
 // GetHook returns a hook from its id
-func (k Keeper) GetHook(ctx sdk.Context, id uint64) (val types.Hook, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.HookKey))
-	b := store.Get(GetHookIDBytes(id))
+func (k Keeper) GetHook(ctx sdk.Context, triggerKey string, triggerValue string, ID uint64) (val types.Hook, found bool) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.HookKeyPrefix))
+	b := store.Get(types.HookKey(triggerKey, triggerValue, ID))
 	if b == nil {
 		return val, false
 	}
@@ -72,14 +72,14 @@ func (k Keeper) GetHook(ctx sdk.Context, id uint64) (val types.Hook, found bool)
 }
 
 // RemoveHook removes a hook from the store
-func (k Keeper) RemoveHook(ctx sdk.Context, id uint64) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.HookKey))
-	store.Delete(GetHookIDBytes(id))
+func (k Keeper) RemoveHook(ctx sdk.Context, triggerKey string, triggerValue string, ID uint64) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.HookKeyPrefix))
+	store.Delete(types.HookKey(triggerKey, triggerValue, ID))
 }
 
 // GetAllHook returns all hook
 func (k Keeper) GetAllHook(ctx sdk.Context) (list []types.Hook) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.HookKey))
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.HookKeyPrefix))
 	iterator := sdk.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
@@ -91,16 +91,4 @@ func (k Keeper) GetAllHook(ctx sdk.Context) (list []types.Hook) {
 	}
 
 	return
-}
-
-// GetHookIDBytes returns the byte representation of the ID
-func GetHookIDBytes(id uint64) []byte {
-	bz := make([]byte, 8)
-	binary.BigEndian.PutUint64(bz, id)
-	return bz
-}
-
-// GetHookIDFromBytes returns ID in uint64 format from a byte array
-func GetHookIDFromBytes(bz []byte) uint64 {
-	return binary.BigEndian.Uint64(bz)
 }
