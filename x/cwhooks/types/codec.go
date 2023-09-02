@@ -9,7 +9,6 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateHook{}, "cwhooks/CreateHook", nil)
-	cdc.RegisterConcrete(&MsgUpdateHook{}, "cwhooks/UpdateHook", nil)
 	cdc.RegisterConcrete(&MsgDeleteHook{}, "cwhooks/DeleteHook", nil)
 	// this line is used by starport scaffolding # 2
 }
@@ -17,7 +16,6 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateHook{},
-		&MsgUpdateHook{},
 		&MsgDeleteHook{},
 	)
 	// this line is used by starport scaffolding # 3

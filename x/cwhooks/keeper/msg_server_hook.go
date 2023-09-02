@@ -12,7 +12,7 @@ import (
 func (k msgServer) CreateHook(goCtx context.Context, msg *types.MsgCreateHook) (*types.MsgCreateHookResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	var hook = types.Hook{
+	hook := types.Hook{
 		Creator:      msg.Creator,
 		ContractID:   msg.ContractID,
 		Args:         msg.Args,
@@ -29,35 +29,6 @@ func (k msgServer) CreateHook(goCtx context.Context, msg *types.MsgCreateHook) (
 	return &types.MsgCreateHookResponse{
 		Id: id,
 	}, nil
-}
-
-func (k msgServer) UpdateHook(goCtx context.Context, msg *types.MsgUpdateHook) (*types.MsgUpdateHookResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	var hook = types.Hook{
-		Creator:      msg.Creator,
-		Id:           msg.Id,
-		ContractID:   msg.ContractID,
-		Args:         msg.Args,
-		Persistent:   msg.Persistent,
-		TriggerKey:   msg.TriggerKey,
-		TriggerValue: msg.TriggerValue,
-	}
-
-	// Checks that the element exists
-	val, found := k.GetHook(ctx, msg.Id)
-	if !found {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, fmt.Sprintf("key %d doesn't exist", msg.Id))
-	}
-
-	// Checks if the msg creator is the same as the current owner
-	if msg.Creator != val.Creator {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
-	}
-
-	k.SetHook(ctx, hook)
-
-	return &types.MsgUpdateHookResponse{}, nil
 }
 
 func (k msgServer) DeleteHook(goCtx context.Context, msg *types.MsgDeleteHook) (*types.MsgDeleteHookResponse, error) {

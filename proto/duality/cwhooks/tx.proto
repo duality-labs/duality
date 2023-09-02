@@ -9,7 +9,6 @@ option go_package = "github.com/duality-labs/duality/x/cwhooks/types";
 // Msg defines the Msg service.
 service Msg {
   rpc CreateHook (MsgCreateHook) returns (MsgCreateHookResponse);
-  rpc UpdateHook (MsgUpdateHook) returns (MsgUpdateHookResponse);
   rpc DeleteHook (MsgDeleteHook) returns (MsgDeleteHookResponse);
 }
 message MsgCreateHook {
@@ -25,17 +24,6 @@ message MsgCreateHookResponse {
   uint64 id = 1;
 }
 
-message MsgUpdateHook {
-  string creator      = 1;
-  uint64 id           = 2;
-  string contractID   = 3;
-  string args         = 4;
-  bool   persistent   = 5;
-  string triggerKey   = 6;
-  string triggerValue = 7;
-}
-
-message MsgUpdateHookResponse {}
 
 message MsgDeleteHook {
   string creator = 1;

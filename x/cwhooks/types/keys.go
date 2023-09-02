@@ -23,8 +23,8 @@ func KeyPrefix(p string) []byte {
 }
 
 const (
-	HookKey      = "Hook/value/"
-	HookCountKey = "Hook/count/"
+	HookKeyPrefix = "Hook/value/"
+	HookCountKey  = "Hook/count/"
 )
 
 func HookKey(triggerKey, triggerValue string, id uint64) []byte {

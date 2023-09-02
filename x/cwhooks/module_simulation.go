@@ -27,10 +27,6 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgCreateHook int = 100
 
-	opWeightMsgUpdateHook = "op_weight_msg_hook"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgUpdateHook int = 100
-
 	opWeightMsgDeleteHook = "op_weight_msg_hook"
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgDeleteHook int = 100
@@ -85,17 +81,6 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		cwhookssimulation.SimulateMsgCreateHook(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-	var weightMsgUpdateHook int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateHook, &weightMsgUpdateHook, nil,
-		func(_ *rand.Rand) {
-			weightMsgUpdateHook = defaultWeightMsgUpdateHook
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgUpdateHook,
-		cwhookssimulation.SimulateMsgUpdateHook(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
 	var weightMsgDeleteHook int
 	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgDeleteHook, &weightMsgDeleteHook, nil,
 		func(_ *rand.Rand) {
@@ -120,14 +105,6 @@ func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.Wei
 			defaultWeightMsgCreateHook,
 			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
 				cwhookssimulation.SimulateMsgCreateHook(am.accountKeeper, am.bankKeeper, am.keeper)
-				return nil
-			},
-		),
-		simulation.NewWeightedProposalMsg(
-			opWeightMsgUpdateHook,
-			defaultWeightMsgUpdateHook,
-			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
-				cwhookssimulation.SimulateMsgUpdateHook(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
 		),

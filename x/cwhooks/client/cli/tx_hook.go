@@ -44,48 +44,6 @@ func CmdCreateHook() *cobra.Command {
 	return cmd
 }
 
-func CmdUpdateHook() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "update-hook [id] [contract-id] [args] [persistent] [trigger-key] [trigger-value]",
-		Short: "Update a hook",
-		Args:  cobra.ExactArgs(6),
-		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			id, err := strconv.ParseUint(args[0], 10, 64)
-			if err != nil {
-				return err
-			}
-
-			argContractID := args[1]
-
-			argArgs := args[2]
-
-			argPersistent, err := cast.ToBoolE(args[3])
-			if err != nil {
-				return err
-			}
-
-			argTriggerKey := args[4]
-
-			argTriggerValue := args[5]
-
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			msg := types.NewMsgUpdateHook(clientCtx.GetFromAddress().String(), id, argContractID, argArgs, argPersistent, argTriggerKey, argTriggerValue)
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
-		},
-	}
-
-	flags.AddTxFlagsToCmd(cmd)
-
-	return cmd
-}
-
 func CmdDeleteHook() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-hook [id]",

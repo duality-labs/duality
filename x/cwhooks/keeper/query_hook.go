@@ -21,7 +21,7 @@ func (k Keeper) HookAll(goCtx context.Context, req *types.QueryAllHookRequest) (
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	store := ctx.KVStore(k.storeKey)
-	hookStore := prefix.NewStore(store, types.KeyPrefix(types.HookKey))
+	hookStore := prefix.NewStore(store, types.KeyPrefix(types.HookKeyPrefix))
 
 	pageRes, err := query.Paginate(hookStore, req.Pagination, func(key []byte, value []byte) error {
 		var hook types.Hook
@@ -32,7 +32,6 @@ func (k Keeper) HookAll(goCtx context.Context, req *types.QueryAllHookRequest) (
 		hooks = append(hooks, hook)
 		return nil
 	})
-
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

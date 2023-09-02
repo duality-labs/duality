@@ -7,7 +7,6 @@ import (
 
 const (
 	TypeMsgCreateHook = "create_hook"
-	TypeMsgUpdateHook = "update_hook"
 	TypeMsgDeleteHook = "delete_hook"
 )
 
@@ -53,49 +52,6 @@ func (msg *MsgCreateHook) ValidateBasic() error {
 	return nil
 }
 
-var _ sdk.Msg = &MsgUpdateHook{}
-
-func NewMsgUpdateHook(creator string, id uint64, contractID string, args string, persistent bool, triggerKey string, triggerValue string) *MsgUpdateHook {
-	return &MsgUpdateHook{
-		Id:           id,
-		Creator:      creator,
-		ContractID:   contractID,
-		Args:         args,
-		Persistent:   persistent,
-		TriggerKey:   triggerKey,
-		TriggerValue: triggerValue,
-	}
-}
-
-func (msg *MsgUpdateHook) Route() string {
-	return RouterKey
-}
-
-func (msg *MsgUpdateHook) Type() string {
-	return TypeMsgUpdateHook
-}
-
-func (msg *MsgUpdateHook) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{creator}
-}
-
-func (msg *MsgUpdateHook) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
-}
-
-func (msg *MsgUpdateHook) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
-	return nil
-}
-
 var _ sdk.Msg = &MsgDeleteHook{}
 
 func NewMsgDeleteHook(creator string, id uint64) *MsgDeleteHook {
@@ -104,6 +60,7 @@ func NewMsgDeleteHook(creator string, id uint64) *MsgDeleteHook {
 		Creator: creator,
 	}
 }
+
 func (msg *MsgDeleteHook) Route() string {
 	return RouterKey
 }

@@ -11,9 +11,7 @@ import (
 	"github.com/duality-labs/duality/x/cwhooks/types"
 )
 
-var (
-	DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
-)
+var DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
 
 const (
 	flagPacketTimeoutTimestamp = "packet-timeout-timestamp"
@@ -31,7 +29,6 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdCreateHook())
-	cmd.AddCommand(CmdUpdateHook())
 	cmd.AddCommand(CmdDeleteHook())
 	// this line is used by starport scaffolding # 1
 
