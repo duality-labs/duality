@@ -58,8 +58,8 @@ func (suite *KeeperTestSuite) TestGetFutureRewardEstimate() {
 	estimate, err := suite.QueryServer.GetFutureRewardEstimate(
 		suite.GoCtx,
 		&types.GetFutureRewardEstimateRequest{
-			Owner:    addr1.String(),
-			StakeIds: nil,
+			Owner:     addr1.String(),
+			StakeIds:  nil,
 			NumEpochs: 365,
 		},
 	)
@@ -114,8 +114,8 @@ func (suite *KeeperTestSuite) TestGetGauges() {
 	})
 
 	response, err := suite.QueryServer.GetGauges(suite.GoCtx, &types.GetGaugesRequest{
-		Status:     types.GaugeStatus_ACTIVE_UPCOMING,
-		Denom:      "",
+		Status: types.GaugeStatus_ACTIVE_UPCOMING,
+		Denom:  "",
 	})
 
 	suite.Require().NoError(err)
