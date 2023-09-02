@@ -62,13 +62,13 @@ func (s *IBCTestSuite) TestGMPSwapAndForward_Success() {
 	swapMetadata := swaptypes.PacketMetadata{
 		Swap: &swaptypes.SwapMetadata{
 			MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-				Creator:   s.dualityAddr.String(),
-				Receiver:  s.dualityAddr.String(),
-				TokenIn:   s.providerToDualityDenom,
-				TokenOut:  nativeDenom,
-				AmountIn:  swapAmount,
+				Creator:          s.dualityAddr.String(),
+				Receiver:         s.dualityAddr.String(),
+				TokenIn:          s.providerToDualityDenom,
+				TokenOut:         nativeDenom,
+				AmountIn:         swapAmount,
 				TickIndexInToOut: 2,
-				OrderType: types.LimitOrderType_FILL_OR_KILL,
+				OrderType:        types.LimitOrderType_FILL_OR_KILL,
 			},
 			Next: forwardNextJSON,
 		},

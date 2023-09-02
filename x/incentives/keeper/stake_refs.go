@@ -65,7 +65,7 @@ func getStakeRefKeys(stake *types.Stake) ([][]byte, error) {
 	}
 
 	refKeyBytes := make([][]byte, 0, len(refKeys))
-	for k, _ := range refKeys {
+	for k := range refKeys {
 		refKeyBytes = append(refKeyBytes, []byte(k))
 	}
 	return refKeyBytes, nil
