@@ -1,0 +1,7 @@
+syntax = "proto3";
+package duality.cwhooks;
+
+option go_package = "github.com/duality-labs/duality/x/cwhooks/types";
+
+// Msg defines the Msg service.
+service Msg {}
