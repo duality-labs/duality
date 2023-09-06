@@ -16,17 +16,18 @@ type (
 	Keeper struct {
 		cdc        codec.BinaryCodec
 		storeKey   storetypes.StoreKey
-		memKey     storetypes.StoreKey
+		tKey       storetypes.StoreKey
 		paramstore paramtypes.Subspace
+		wasmKeeper types.WasmKeeper
 	}
 )
 
 func NewKeeper(
 	cdc codec.BinaryCodec,
 	storeKey,
-	memKey storetypes.StoreKey,
+	tKey storetypes.StoreKey,
 	ps paramtypes.Subspace,
-
+	wasmKeeper types.WasmKeeper,
 ) *Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -36,8 +37,9 @@ func NewKeeper(
 	return &Keeper{
 		cdc:        cdc,
 		storeKey:   storeKey,
-		memKey:     memKey,
+		tKey:       tKey,
 		paramstore: ps,
+		wasmKeeper: wasmKeeper,
 	}
 }
 

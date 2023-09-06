@@ -118,6 +118,7 @@ import (
 	cwhooksmodule "github.com/duality-labs/duality/x/cwhooks"
 	cwhooksmodulekeeper "github.com/duality-labs/duality/x/cwhooks/keeper"
 	cwhooksmoduletypes "github.com/duality-labs/duality/x/cwhooks/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 	buildermodule "github.com/skip-mev/pob/x/builder"
 	builderkeeper "github.com/skip-mev/pob/x/builder/keeper"
@@ -334,7 +335,10 @@ func NewApp(
 		cwhooksmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
-	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
+	tkeys := sdk.NewTransientStoreKeys(
+		paramstypes.TStoreKey,
+		cwhooksmoduletypes.TransientStoreKey,
+	)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
 	app := &App{
@@ -705,12 +709,13 @@ func NewApp(
 		rewardsAddressProvider,
 		AppAuthority,
 	)
-
+	wasmPermissionedKeeper := wasmkeeper.NewDefaultPermissionKeeper(app.WasmKeeper)
 	app.CwhooksKeeper = *cwhooksmodulekeeper.NewKeeper(
 		appCodec,
 		keys[cwhooksmoduletypes.StoreKey],
-		keys[cwhooksmoduletypes.MemStoreKey],
+		tkeys[cwhooksmoduletypes.TransientStoreKey],
 		app.GetSubspace(cwhooksmoduletypes.ModuleName),
+		wasmPermissionedKeeper,
 	)
 	cwhooksModule := cwhooksmodule.NewAppModule(appCodec, app.CwhooksKeeper, app.AccountKeeper, app.BankKeeper)
 

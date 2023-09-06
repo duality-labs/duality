@@ -60,7 +60,7 @@ func DefaultConfig() network.Config {
 		InterfaceRegistry: encoding.InterfaceRegistry,
 		AccountRetriever:  authtypes.AccountRetriever{},
 		AppConstructor: func(val network.ValidatorI) servertypes.Application {
-			return app.New(
+			return app.NewApp(
 				val.GetCtx().Logger,
 				tmdb.NewMemDB(),
 				nil,
@@ -68,8 +68,9 @@ func DefaultConfig() network.Config {
 				map[int64]bool{},
 				val.GetCtx().Config.RootDir,
 				0,
-				encoding,
 				simtestutil.EmptyAppOptions{},
+				encoding,
+				nil,
 				baseapp.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
 				baseapp.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
 				baseapp.SetChainID(chainID),

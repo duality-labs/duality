@@ -9,7 +9,7 @@ import (
 )
 
 func TestGetParams(t *testing.T) {
-	k, ctx := testkeeper.CwhooksKeeper(t)
+	k, ctx := testkeeper.CWHooksKeeper(t)
 	params := types.DefaultParams()
 
 	k.SetParams(ctx, params)

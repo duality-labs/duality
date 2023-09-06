@@ -26,7 +26,7 @@ func TestGenesis(t *testing.T) {
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
-	k, ctx := keepertest.CwhooksKeeper(t)
+	k, ctx := keepertest.CWHooksKeeper(t)
 	cwhooks.InitGenesis(ctx, *k, genesisState)
 	got := cwhooks.ExportGenesis(ctx, *k)
 	require.NotNil(t, got)

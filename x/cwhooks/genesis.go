@@ -10,7 +10,7 @@ import (
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	// Set all the hook
 	for _, elem := range genState.HookList {
-		k.SetHook(ctx, elem)
+		k.AppendHook(ctx, elem)
 	}
 
 	// Set hook count

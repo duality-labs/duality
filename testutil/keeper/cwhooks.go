@@ -17,7 +17,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func CwhooksKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
+func CWHooksKeeper(t testing.TB, wasmKeeperArg ...types.WasmKeeper) (*keeper.Keeper, sdk.Context) {
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
 
@@ -36,11 +36,24 @@ func CwhooksKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 		memStoreKey,
 		"CwhooksParams",
 	)
+
+	var wasmKeeper types.WasmKeeper
+
+	switch len(wasmKeeperArg) {
+	case 0:
+		break
+	case 1:
+		wasmKeeper = wasmKeeperArg[0]
+	default: // len(wasmKeeperArg) > 1
+		panic("Can only supply 1 wasmKeeper")
+	}
+
 	k := keeper.NewKeeper(
 		cdc,
 		storeKey,
 		memStoreKey,
 		paramsSubspace,
+		wasmKeeper,
 	)
 
 	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())

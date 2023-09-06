@@ -16,7 +16,7 @@ import (
 )
 
 func TestHookQuerySingle(t *testing.T) {
-	keeper, ctx := keepertest.CwhooksKeeper(t)
+	keeper, ctx := keepertest.CWHooksKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
 	msgs := createNHook(keeper, ctx, 2)
 	tests := []struct {
@@ -62,7 +62,7 @@ func TestHookQuerySingle(t *testing.T) {
 }
 
 func TestHookQueryPaginated(t *testing.T) {
-	keeper, ctx := keepertest.CwhooksKeeper(t)
+	keeper, ctx := keepertest.CWHooksKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
 	msgs := createNHook(keeper, ctx, 5)
 

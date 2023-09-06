@@ -45,7 +45,7 @@ func (k Keeper) Hook(goCtx context.Context, req *types.QueryGetHookRequest) (*ty
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	hook, found := k.GetHook(ctx, req.Id)
+	hook, found := k.GetHookByID(ctx, req.Id)
 	if !found {
 		return nil, sdkerrors.ErrKeyNotFound
 	}
