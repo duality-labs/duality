@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package duality.cwhooks;
+
+import "duality/cwhooks/hook.proto";
+
+option go_package = "github.com/duality-labs/duality/x/cwhooks/types";
+
+// Msg defines the Msg service.
+service Msg {
+  rpc CreateHook (MsgCreateHook) returns (MsgCreateHookResponse);
+  rpc DeleteHook (MsgDeleteHook) returns (MsgDeleteHookResponse);
+}
+message MsgCreateHook {
+  string creator      = 1;
+  string contractID   = 2;
+  string args         = 3;
+  bool   persistent   = 4;
+  string triggerKey   = 5;
+  string triggerValue = 6;
+}
+
+message MsgCreateHookResponse {
+  uint64 id = 1;
+}
+
+
+message MsgDeleteHook {
+  string creator = 1;
+  uint64 id      = 2;
+}
+
+message MsgDeleteHookResponse {}
+

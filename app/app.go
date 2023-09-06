@@ -115,6 +115,10 @@ import (
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
+	cwhooksmodule "github.com/duality-labs/duality/x/cwhooks"
+	cwhooksmodulekeeper "github.com/duality-labs/duality/x/cwhooks/keeper"
+	cwhooksmoduletypes "github.com/duality-labs/duality/x/cwhooks/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 	buildermodule "github.com/skip-mev/pob/x/builder"
 	builderkeeper "github.com/skip-mev/pob/x/builder/keeper"
@@ -168,6 +172,7 @@ var (
 		buildermodule.AppModuleBasic{},
 		wasm.AppModuleBasic{},
 		ibchooks.AppModuleBasic{},
+		cwhooksmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -262,6 +267,7 @@ type App struct {
 	WasmKeeper       wasm.Keeper
 	IBCHooksKeeper   ibchookskeeper.Keeper
 
+	CwhooksKeeper cwhooksmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -326,9 +332,13 @@ func NewApp(
 		buildertypes.StoreKey,
 		wasm.StoreKey,
 		ibchookstypes.StoreKey,
+		cwhooksmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
-	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
+	tkeys := sdk.NewTransientStoreKeys(
+		paramstypes.TStoreKey,
+		cwhooksmoduletypes.TransientStoreKey,
+	)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
 	app := &App{
@@ -699,6 +709,15 @@ func NewApp(
 		rewardsAddressProvider,
 		AppAuthority,
 	)
+	wasmPermissionedKeeper := wasmkeeper.NewDefaultPermissionKeeper(app.WasmKeeper)
+	app.CwhooksKeeper = *cwhooksmodulekeeper.NewKeeper(
+		appCodec,
+		keys[cwhooksmoduletypes.StoreKey],
+		tkeys[cwhooksmoduletypes.TransientStoreKey],
+		app.GetSubspace(cwhooksmoduletypes.ModuleName),
+		wasmPermissionedKeeper,
+	)
+	cwhooksModule := cwhooksmodule.NewAppModule(appCodec, app.CwhooksKeeper, app.AccountKeeper, app.BankKeeper)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
@@ -808,6 +827,7 @@ func NewApp(
 		epochsModule,
 		incentivesModule,
 		ibchooks.NewAppModule(app.AccountKeeper),
+		cwhooksModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 
 		// always be last to make sure that it checks for all invariants and not only part of them
@@ -856,6 +876,7 @@ func NewApp(
 		buildertypes.ModuleName,
 		ibchookstypes.ModuleName,
 		wasm.ModuleName,
+		cwhooksmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -883,6 +904,7 @@ func NewApp(
 		buildertypes.ModuleName,
 		ibchookstypes.ModuleName,
 		wasm.ModuleName,
+		cwhooksmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 
 		// NOTE: Because of the gas sensitivity of PurgeExpiredLimit order operations
@@ -921,6 +943,7 @@ func NewApp(
 		buildertypes.ModuleName,
 		ibchookstypes.ModuleName,
 		wasm.ModuleName,
+		cwhooksmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -1223,6 +1246,7 @@ func initParamsKeeper(
 	paramsKeeper.Subspace(epochsmoduletypes.ModuleName)
 	paramsKeeper.Subspace(incentivesmoduletypes.ModuleName)
 	paramsKeeper.Subspace(buildertypes.ModuleName)
+	paramsKeeper.Subspace(cwhooksmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
