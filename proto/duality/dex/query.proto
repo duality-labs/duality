@@ -41,6 +41,11 @@ service Query {
     option (google.api.http).get = "/duality/dex/limit_order_tranche_user";
   
   }
+
+  // Queries a list of LimitOrderTrancheUser items for a given address.
+	rpc LimitOrderTrancheUserAllByAddress(QueryAllUserLimitOrdersRequest) returns (QueryAllUserLimitOrdersResponse) {
+		option (google.api.http).get = "/duality/dex/user/limit_orders/{address}";
+	}
   
   // Queries a LimitOrderTranche by index.
   rpc LimitOrderTranche (QueryGetLimitOrderTrancheRequest) returns (QueryGetLimitOrderTrancheResponse) {
@@ -209,10 +214,12 @@ message QueryAllUserDepositsResponse {
 
 message QueryAllUserLimitOrdersRequest {
   string address = 1;
+	cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 message QueryAllUserLimitOrdersResponse {
   repeated LimitOrderTrancheUser limitOrders = 1 [(gogoproto.nullable) = true];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 message QueryAllTickLiquidityRequest {

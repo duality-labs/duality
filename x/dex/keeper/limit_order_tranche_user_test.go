@@ -31,6 +31,25 @@ func createNLimitOrderTrancheUser(keeper *keeper.Keeper, ctx sdk.Context, n int)
 	return items
 }
 
+func createNLimitOrderTrancheUserWithAddress(keeper *keeper.Keeper, ctx sdk.Context, address string, n int) []*types.LimitOrderTrancheUser {
+	items := make([]*types.LimitOrderTrancheUser, n)
+	for i := range items {
+		val := &types.LimitOrderTrancheUser{
+			TrancheKey:            strconv.Itoa(i),
+			Address:               address,
+			TradePairID:           &types.TradePairID{MakerDenom: "TokenA", TakerDenom: "TokenB"},
+			TickIndexTakerToMaker: 0,
+			SharesOwned:           sdk.ZeroInt(),
+			SharesWithdrawn:       sdk.ZeroInt(),
+			SharesCancelled:       sdk.ZeroInt(),
+		}
+		items[i] = val
+		keeper.SetLimitOrderTrancheUser(ctx, items[i])
+	}
+
+	return items
+}
+
 func TestLimitOrderTrancheUserGet(t *testing.T) {
 	keeper, ctx := keepertest.DexKeeper(t)
 	items := createNLimitOrderTrancheUser(keeper, ctx, 10)
