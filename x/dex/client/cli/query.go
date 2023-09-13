@@ -32,7 +32,6 @@ func GetQueryCmd(_ string) *cobra.Command {
 	cmd.AddCommand(CmdShowLimitOrderTrancheUser())
 	cmd.AddCommand(CmdListLimitOrderTranche())
 	cmd.AddCommand(CmdShowLimitOrderTranche())
-	cmd.AddCommand(CmdShowUserPositions())
 	cmd.AddCommand(CmdListUserDeposits())
 	cmd.AddCommand(CmdListUserLimitOrders())
 	cmd.AddCommand(CmdListTickLiquidity())
