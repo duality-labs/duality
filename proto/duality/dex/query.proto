@@ -206,10 +206,12 @@ message QueryGetUserPositionsResponse {
 
 message QueryAllUserDepositsRequest {
   string address = 1;
+	cosmos.base.query.v1beta1.PageRequest pagination = 2;
 }
 
 message QueryAllUserDepositsResponse {
   repeated DepositRecord Deposits = 1 [(gogoproto.nullable) = true];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 message QueryAllUserLimitOrdersRequest {
