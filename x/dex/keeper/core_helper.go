@@ -2,7 +2,9 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/duality-labs/duality/x/dex/types"
+	"golang.org/x/exp/slices"
 )
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -51,6 +53,19 @@ func (k Keeper) GetCurrLiq(ctx sdk.Context, tradePairID *types.TradePairID) *typ
 		if tick.HasToken() {
 			return &tick
 		}
+	}
+
+	return nil
+}
+
+func (k Keeper) GetValidFees(ctx sdk.Context) []uint64 {
+	return k.GetParams(ctx).FeeTiers
+}
+
+func (k Keeper) ValidateFee(ctx sdk.Context, fee uint64) error {
+	validFees := k.GetValidFees(ctx)
+	if !slices.Contains(validFees, fee) {
+		return sdkerrors.Wrapf(types.ErrInvalidFee, "%s", validFees)
 	}
 
 	return nil

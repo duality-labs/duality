@@ -16,3 +16,11 @@ func TestGetParams(t *testing.T) {
 
 	require.EqualValues(t, params, k.GetParams(ctx))
 }
+
+func TestValidateParams(t *testing.T) {
+	goodFees := []uint64{1, 2, 3, 4, 5, 200}
+	require.NoError(t, types.Params{FeeTiers: goodFees}.Validate())
+
+	badFees := []uint64{1, 2, 3, 3}
+	require.Error(t, types.Params{FeeTiers: badFees}.Validate())
+}

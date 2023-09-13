@@ -13,7 +13,7 @@ import (
 
 func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
-		Params: *types.DefaultParams(),
+		Params: types.DefaultParams(),
 		LimitOrderTrancheUserList: []*types.LimitOrderTrancheUser{
 			{
 				TradePairID: &types.TradePairID{

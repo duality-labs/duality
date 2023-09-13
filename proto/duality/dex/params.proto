@@ -8,5 +8,5 @@ option go_package = "github.com/duality-labs/duality/x/dex/types";
 // Params defines the parameters for the module.
 message Params {
   option (gogoproto.goproto_stringer) = false;
-  
+  repeated uint64 fee_tiers = 1; 
 }
