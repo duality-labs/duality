@@ -69,8 +69,3 @@ func GetPoolMetadataIDBytes(id uint64) []byte {
 	binary.BigEndian.PutUint64(bz, id)
 	return bz
 }
-
-// GetPoolMetadataIDFromBytes returns ID in uint64 format from a byte array
-func GetPoolMetadataIDFromBytes(bz []byte) uint64 {
-	return binary.BigEndian.Uint64(bz)
-}
