@@ -33,19 +33,26 @@ func (k Keeper) UserDepositsAll(
 		addr,
 		req.Pagination,
 		func(poolCoinMaybe sdk.Coin, accumulate bool) bool {
-			depositDenom, err := types.NewDepositDenomFromString(poolCoinMaybe.Denom)
+			err := types.ValidatePoolDenom(poolCoinMaybe.Denom)
 			if err != nil {
 				return false
 			}
 
+			poolMetadata, err := k.GetPoolMetadataByDenom(ctx, poolCoinMaybe.Denom)
+			if err != nil {
+				panic("Can't get info for PoolDenom")
+			}
+
+			fee := dexutils.MustSafeUint64ToInt64(poolMetadata.Fee)
+
 			if accumulate {
 				depositRecord := &types.DepositRecord{
-					PairID:          depositDenom.PairID,
+					PairID:          poolMetadata.PairID,
 					SharesOwned:     poolCoinMaybe.Amount,
-					CenterTickIndex: depositDenom.Tick,
-					LowerTickIndex:  depositDenom.Tick - dexutils.MustSafeUint64(depositDenom.Fee),
-					UpperTickIndex:  depositDenom.Tick + dexutils.MustSafeUint64(depositDenom.Fee),
-					Fee:             depositDenom.Fee,
+					CenterTickIndex: poolMetadata.Tick,
+					LowerTickIndex:  poolMetadata.Tick - fee,
+					UpperTickIndex:  poolMetadata.Tick + fee,
+					Fee:             poolMetadata.Fee,
 				}
 
 				depositArr = append(depositArr, depositRecord)

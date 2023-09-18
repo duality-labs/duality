@@ -9,26 +9,20 @@ import (
 	dualityapp "github.com/duality-labs/duality/app"
 	keepertest "github.com/duality-labs/duality/x/dex/keeper/internal/testutils"
 	"github.com/duality-labs/duality/x/dex/types"
-	"github.com/duality-labs/duality/x/dex/utils"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func poolTokenToDepositRecord(coin sdk.Coin) *types.DepositRecord {
-	depositDenom, err := types.NewDepositDenomFromString(coin.Denom)
+func simulateDeposit(ctx sdk.Context, app *dualityapp.App, addr sdk.AccAddress, deposit *types.DepositRecord) {
+	// NOTE: For simplicyt sake, we are not actually doing a deposit, we are just initializing
+	// the pool and adding the poolDenom to the users account
+	pool, err := app.DexKeeper.InitPool(ctx, deposit.PairID, deposit.CenterTickIndex, deposit.Fee)
 	if err != nil {
-		panic("failed to parse deposit denom")
+		panic("Cannot init pool")
 	}
-
-	return &types.DepositRecord{
-		PairID:          depositDenom.PairID,
-		SharesOwned:     coin.Amount,
-		CenterTickIndex: depositDenom.Tick,
-		LowerTickIndex:  depositDenom.Tick - utils.MustSafeUint64(depositDenom.Fee),
-		UpperTickIndex:  depositDenom.Tick + utils.MustSafeUint64(depositDenom.Fee),
-		Fee:             depositDenom.Fee,
-	}
+	coin := sdk.NewCoin(pool.GetPoolDenom(), deposit.SharesOwned)
+	keepertest.FundAccount(app.BankKeeper, ctx, addr, sdk.Coins{coin})
 }
 
 func TestUserDepositsAllQueryPaginated(t *testing.T) {
@@ -37,22 +31,57 @@ func TestUserDepositsAllQueryPaginated(t *testing.T) {
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 	wctx := sdk.WrapSDKContext(ctx)
 	addr := sdk.AccAddress([]byte("test_addr"))
-
-	depositDenoms := sdk.Coins{
-		sdk.NewInt64Coin(types.NewDepositDenom(defaultPairID, 2, 1).String(), 10),
-		sdk.NewInt64Coin(types.NewDepositDenom(defaultPairID, 3, 1).String(), 10),
-		sdk.NewInt64Coin(types.NewDepositDenom(defaultPairID, 4, 1).String(), 10),
-		sdk.NewInt64Coin(types.NewDepositDenom(defaultPairID, 5, 1).String(), 10),
-		sdk.NewInt64Coin(types.NewDepositDenom(defaultPairID, 6, 1).String(), 10),
+	msgs := []*types.DepositRecord{
+		{
+			PairID:          defaultPairID,
+			SharesOwned:     sdk.NewInt(10),
+			CenterTickIndex: 2,
+			LowerTickIndex:  1,
+			UpperTickIndex:  3,
+			Fee:             1,
+		},
+		{
+			PairID:          defaultPairID,
+			SharesOwned:     sdk.NewInt(10),
+			CenterTickIndex: 3,
+			LowerTickIndex:  2,
+			UpperTickIndex:  4,
+			Fee:             1,
+		},
+		{
+			PairID:          defaultPairID,
+			SharesOwned:     sdk.NewInt(10),
+			CenterTickIndex: 4,
+			LowerTickIndex:  3,
+			UpperTickIndex:  5,
+			Fee:             1,
+		},
+		{
+			PairID:          defaultPairID,
+			SharesOwned:     sdk.NewInt(10),
+			CenterTickIndex: 5,
+			LowerTickIndex:  4,
+			UpperTickIndex:  6,
+			Fee:             1,
+		},
+		{
+			PairID:          defaultPairID,
+			SharesOwned:     sdk.NewInt(10),
+			CenterTickIndex: 6,
+			LowerTickIndex:  5,
+			UpperTickIndex:  7,
+			Fee:             1,
+		},
 	}
-	var msgs []*types.DepositRecord
 
-	for _, d := range depositDenoms {
-		msgs = append(msgs, poolTokenToDepositRecord(d))
+	for _, d := range msgs {
+		simulateDeposit(ctx, app, addr, d)
 	}
+
+	// Add random noise to make sure only pool denoms are picked up
 	randomCoins := sdk.Coins{sdk.NewInt64Coin("TokenA", 10), sdk.NewInt64Coin("TokenZ", 10)}
-	allCoins := randomCoins.Add(depositDenoms...)
-	keepertest.FundAccount(app.BankKeeper, ctx, addr, allCoins)
+	keepertest.FundAccount(app.BankKeeper, ctx, addr, randomCoins)
+
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllUserDepositsRequest {
 		return &types.QueryAllUserDepositsRequest{
 			Address: addr.String(),
