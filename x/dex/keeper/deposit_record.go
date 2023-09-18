@@ -10,18 +10,23 @@ func (k Keeper) GetAllDepositsForAddress(ctx sdk.Context, addr sdk.AccAddress) [
 	var depositArr []*types.DepositRecord
 	k.bankKeeper.IterateAccountBalances(ctx, addr,
 		func(sharesMaybe sdk.Coin) bool {
-			depositDenom, err := types.NewDepositDenomFromString(sharesMaybe.Denom)
+			err := types.ValidatePoolDenom(sharesMaybe.Denom)
 			if err != nil {
 				return false
 			}
 
+			poolMetadata, err := k.GetPoolMetadataByDenom(ctx, sharesMaybe.Denom)
+			if err != nil {
+				panic("Can't get info for PoolDenom")
+			}
+			fee := utils.MustSafeUint64ToInt64(poolMetadata.Fee)
 			depositRecord := &types.DepositRecord{
-				PairID:          depositDenom.PairID,
+				PairID:          poolMetadata.PairID,
 				SharesOwned:     sharesMaybe.Amount,
-				CenterTickIndex: depositDenom.Tick,
-				LowerTickIndex:  depositDenom.Tick - utils.MustSafeUint64(depositDenom.Fee),
-				UpperTickIndex:  depositDenom.Tick + utils.MustSafeUint64(depositDenom.Fee),
-				Fee:             depositDenom.Fee,
+				CenterTickIndex: poolMetadata.Tick,
+				LowerTickIndex:  poolMetadata.Tick - fee,
+				UpperTickIndex:  poolMetadata.Tick + fee,
+				Fee:             poolMetadata.Fee,
 			}
 			depositArr = append(depositArr, depositRecord)
 

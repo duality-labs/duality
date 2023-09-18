@@ -56,7 +56,7 @@ func (k Keeper) DepositCore(
 			return nil, nil, nil, err
 		}
 
-		existingShares := k.bankKeeper.GetSupply(ctx, pool.GetDepositDenom()).Amount
+		existingShares := k.bankKeeper.GetSupply(ctx, pool.GetPoolDenom()).Amount
 
 		inAmount0, inAmount1, outShares := pool.Deposit(amount0, amount1, existingShares, autoswap)
 
@@ -136,17 +136,16 @@ func (k Keeper) WithdrawCore(
 			return err
 		}
 
-		sharesID := types.NewDepositDenom(&types.PairID{Token0: pairID.Token0, Token1: pairID.Token1}, tickIndex, fee).
-			String()
-		totalShares := k.bankKeeper.GetSupply(ctx, sharesID).Amount
+		poolDenom := pool.GetPoolDenom()
 
+		totalShares := k.bankKeeper.GetSupply(ctx, poolDenom).Amount
 		if totalShares.LT(sharesToRemove) {
 			return sdkerrors.Wrapf(
 				types.ErrInsufficientShares,
 				"%s does not have %s shares of type %s",
 				callerAddr,
 				sharesToRemove,
-				sharesID,
+				poolDenom,
 			)
 		}
 
@@ -154,7 +153,7 @@ func (k Keeper) WithdrawCore(
 		k.SetPool(ctx, pool)
 
 		if sharesToRemove.IsPositive() {
-			if err := k.BurnShares(ctx, callerAddr, sharesToRemove, sharesID); err != nil {
+			if err := k.BurnShares(ctx, callerAddr, sharesToRemove, poolDenom); err != nil {
 				return err
 			}
 		}

@@ -92,14 +92,14 @@ func (q QueryServer) GetGauges(
 	}
 
 	var lowerTick, upperTick int64
-	var depositDenom *dextypes.DepositDenom
+	var poolMetadata *dextypes.PoolMetadata
 	if req.Denom != "" {
-		depositDenom, err := dextypes.NewDepositDenomFromString(req.Denom)
+		poolMetadata, err := q.dk.GetPoolMetadataByDenom(ctx, req.Denom)
 		if err != nil {
 			return nil, err
 		}
-		lowerTick = depositDenom.Tick - int64(depositDenom.Fee)
-		upperTick = depositDenom.Tick + int64(depositDenom.Fee)
+		lowerTick = poolMetadata.Tick - int64(poolMetadata.Fee)
+		upperTick = poolMetadata.Tick + int64(poolMetadata.Fee)
 	}
 
 	gauges := types.Gauges{}
@@ -116,7 +116,7 @@ func (q QueryServer) GetGauges(
 		}
 		if req.Denom != "" {
 			for _, gauge := range newGauges {
-				if *gauge.DistributeTo.PairID != *depositDenom.PairID {
+				if *gauge.DistributeTo.PairID != *poolMetadata.PairID {
 					continue
 				}
 				lowerTickInRange := gauge.DistributeTo.StartTick <= lowerTick &&

@@ -25,22 +25,24 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.Setup()
 	suite.QueryServer = keeper.NewQueryServer(suite.App.IncentivesKeeper)
 	suite.MsgServer = keeper.NewMsgServerImpl(suite.App.IncentivesKeeper)
-	suite.LPDenom0 = dextypes.NewDepositDenom(
+	pool0, _ := suite.App.DexKeeper.GetOrInitPool(suite.Ctx,
 		&dextypes.PairID{
 			Token0: "TokenA",
 			Token1: "TokenB",
 		},
 		0,
 		1,
-	).String()
-	suite.LPDenom1 = dextypes.NewDepositDenom(
+	)
+	suite.LPDenom0 = pool0.GetPoolDenom()
+	pool1, _ := suite.App.DexKeeper.GetOrInitPool(suite.Ctx,
 		&dextypes.PairID{
 			Token0: "TokenA",
 			Token1: "TokenB",
 		},
 		1,
 		1,
-	).String()
+	)
+	suite.LPDenom1 = pool1.GetPoolDenom()
 
 	suite.SetEpochStartTime()
 }

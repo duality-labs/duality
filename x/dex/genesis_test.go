@@ -92,6 +92,15 @@ func TestGenesis(t *testing.T) {
 				},
 			},
 		},
+		PoolMetadataList: []types.PoolMetadata{
+			{
+				ID: 0,
+			},
+			{
+				ID: 1,
+			},
+		},
+		PoolCount: 2,
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
@@ -110,5 +119,7 @@ func TestGenesis(t *testing.T) {
 		genesisState.InactiveLimitOrderTrancheList,
 		got.InactiveLimitOrderTrancheList,
 	)
+	require.ElementsMatch(t, genesisState.PoolMetadataList, got.PoolMetadataList)
+	require.Equal(t, genesisState.PoolCount, got.PoolCount)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

@@ -44,70 +44,10 @@ func (p Stake) SingleCoin() (sdk.Coin, error) {
 
 func (p Stake) ValidateBasic() error {
 	for _, coin := range p.Coins {
-		_, err := dextypes.NewDepositDenomFromString(coin.Denom)
+		err := dextypes.ValidatePoolDenom(coin.Denom)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
-}
-
-func (p Stake) CoinsPassingQueryCondition(distrTo QueryCondition) sdk.Coins {
-	coins := p.Coins
-	switch len(p.Coins) {
-	case 0:
-		return nil
-
-	case 1:
-		coin := coins[0]
-		if !distrTo.Test(coin.Denom) {
-			return nil
-		}
-		return sdk.Coins{coin}
-
-	default:
-		// Binary search the amount of coins remaining
-		result := sdk.NewCoins()
-		denomPrefix := dextypes.DepositDenomPairIDPrefix(
-			distrTo.PairID.Token0,
-			distrTo.PairID.Token1,
-		)
-		low := 0
-		high := len(coins)
-		for low < high {
-			mid := low + ((high - low) / 2)
-			coin := coins[mid]
-			switch {
-			case distrTo.Test(coin.Denom):
-				result = result.Add(coin)
-
-				midLeft := mid - 1
-				for 0 <= midLeft {
-					coin = coins[midLeft]
-					if !distrTo.Test(coin.Denom) {
-						break
-					}
-					result = result.Add(coin)
-					midLeft--
-				}
-
-				midRight := mid + 1
-				for midRight < len(coins) {
-					coin = coins[midRight]
-					if !distrTo.Test(coin.Denom) {
-						break
-					}
-					result = result.Add(coin)
-					midRight++
-				}
-
-				return result
-			case denomPrefix < coin.Denom:
-				high = mid
-			default:
-				low = mid
-			}
-		}
-		return nil
-	}
 }

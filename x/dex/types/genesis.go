@@ -13,6 +13,7 @@ func DefaultGenesis() *GenesisState {
 		LimitOrderTrancheUserList:     []*LimitOrderTrancheUser{},
 		TickLiquidityList:             []*TickLiquidity{},
 		InactiveLimitOrderTrancheList: []*LimitOrderTranche{},
+		PoolMetadataList:              []PoolMetadata{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: *DefaultParams(),
 	}
@@ -57,6 +58,18 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("duplicated index for inactiveLimitOrderTranche")
 		}
 		inactiveLimitOrderTrancheKeyMap[index] = struct{}{}
+	}
+	// Check for duplicated ID in poolMetadata
+	poolMetadataIDMap := make(map[uint64]bool)
+	poolMetadataCount := gs.GetPoolCount()
+	for _, elem := range gs.PoolMetadataList {
+		if _, ok := poolMetadataIDMap[elem.ID]; ok {
+			return fmt.Errorf("duplicated id for poolMetadata")
+		}
+		if elem.ID >= poolMetadataCount {
+			return fmt.Errorf("poolMetadata id should be lower or equal than the last id")
+		}
+		poolMetadataIDMap[elem.ID] = true
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 

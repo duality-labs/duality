@@ -91,16 +91,6 @@ func (suite *KeeperTestSuite) SetupStake(
 	return stake
 }
 
-func GetQualifyingDenom(qc types.QueryCondition) *dextypes.DepositDenom {
-	tick := qc.StartTick + (qc.EndTick-qc.StartTick)/2
-	fee := (qc.EndTick - qc.StartTick) / 3
-	return dextypes.NewDepositDenom(
-		qc.PairID,
-		tick,
-		uint64(fee),
-	)
-}
-
 // setupNewGauge creates a gauge with the specified duration.
 func (suite *KeeperTestSuite) SetupGauge(s gaugeSpec) *types.Gauge {
 	addr := sdk.AccAddress([]byte("Gauge_Creation_Addr_"))

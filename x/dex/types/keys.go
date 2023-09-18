@@ -29,10 +29,6 @@ const (
 )
 
 const (
-	DepositSharesPrefix = "DualityPoolShares"
-)
-
-const (
 	// TickLiquidityKeyPrefix is the prefix to retrieve all TickLiquidity
 	TickLiquidityKeyPrefix = "TickLiquidity/value/"
 
@@ -47,6 +43,15 @@ const (
 
 	// LimitOrderExpirationKeyPrefix is the prefix to retrieve all LimitOrderExpiration
 	LimitOrderExpirationKeyPrefix = "LimitOrderExpiration/value/"
+
+	// PoolIDKeyPrefix is the prefix to retrieve all PoolIds or retrieve a specific pool by pair+tick+fee
+	PoolIDKeyPrefix = "Pool/id/"
+
+	// PoolMetadataKeyPrefix is the prefix to retrieve all PoolMetadata
+	PoolMetadataKeyPrefix = "PoolMetadata/value/"
+
+	// PoolCountKeyPrefix is the prefix to retrieve the Pool count
+	PoolCountKeyPrefix = "Pool/count/"
 )
 
 func KeyPrefix(p string) []byte {
@@ -196,6 +201,25 @@ func LimitOrderExpirationKey(
 	key = append(key, []byte("/")...)
 
 	key = append(key, trancheRef...)
+	key = append(key, []byte("/")...)
+
+	return key
+}
+
+func PoolIDKey(
+	pairID *PairID,
+	tickIndex int64,
+	fee uint64,
+) []byte {
+	key := []byte(pairID.CanonicalString())
+	key = append(key, []byte("/")...)
+
+	tickIndexBytes := TickIndexToBytes(tickIndex)
+	key = append(key, tickIndexBytes...)
+	key = append(key, []byte("/")...)
+
+	feeBytes := sdk.Uint64ToBigEndian(fee)
+	key = append(key, feeBytes...)
 	key = append(key, []byte("/")...)
 
 	return key

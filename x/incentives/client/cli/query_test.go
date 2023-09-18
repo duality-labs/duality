@@ -41,14 +41,8 @@ func (s *QueryTestSuite) SetupSuite() {
 	s.Setup()
 	s.queryClient = types.NewQueryClient(s.QueryHelper)
 
-	denom := dextypes.NewDepositDenom(
-		&dextypes.PairID{
-			Token0: "TokenA",
-			Token1: "TokenB",
-		},
-		0,
-		1,
-	).String()
+	pool, _ := s.App.DexKeeper.InitPool(s.Ctx, dextypes.MustNewPairID("tokenA", "tokenB"), 0, 1)
+	denom := pool.GetPoolDenom()
 
 	// set up stake with id = 1
 	addr := apptesting.SetupAddr(0)

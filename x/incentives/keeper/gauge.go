@@ -216,7 +216,7 @@ func (k Keeper) GetGaugeQualifyingValue(ctx sdk.Context, gaugeID uint64) (uint64
 	var value uint64 = 0
 	stakes := k.GetStakesByQueryCondition(ctx, &gauge.DistributeTo)
 	for _, stake := range stakes {
-		stakeCoins := stake.CoinsPassingQueryCondition(gauge.DistributeTo)
+		stakeCoins := k.StakeCoinsPassingQueryCondition(ctx, stake, gauge.DistributeTo)
 		for _, stakeCoin := range stakeCoins {
 			adjustedPositionValue, err := k.ValueForShares(ctx, stakeCoin, gauge.PricingTick)
 			if err != nil {

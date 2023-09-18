@@ -89,3 +89,7 @@ func (p *PairID) MustTradePairIDFromTaker(taker string) *TradePairID {
 		panic(fmt.Errorf("pair.TradePairIDFromMaker(maker string) called where maker does not equal either pair.Token0 or pair.Token1"))
 	}
 }
+
+func (p *PairID) Equal(otherPairID *PairID) bool {
+	return *p == *otherPairID
+}

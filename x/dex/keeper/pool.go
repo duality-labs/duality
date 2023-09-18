@@ -1,6 +1,9 @@
 package keeper
 
 import (
+	"encoding/binary"
+
+	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/dex/utils"
@@ -17,7 +20,40 @@ func (k Keeper) GetOrInitPool(
 		return pool, nil
 	}
 
-	return types.NewPool(pairID, centerTickIndexNormalized, fee)
+	return k.InitPool(ctx, pairID, centerTickIndexNormalized, fee)
+}
+
+func (k Keeper) InitPool(
+	ctx sdk.Context,
+	pairID *types.PairID,
+	centerTickIndexNormalized int64,
+	fee uint64,
+) (pool *types.Pool, err error) {
+	poolMetadata := types.PoolMetadata{PairID: pairID, Tick: centerTickIndexNormalized, Fee: fee}
+
+	// Get current poolID
+	poolID := k.GetPoolCount(ctx)
+	poolMetadata.ID = poolID
+
+	// Store poolMetadata
+	k.SetPoolMetadata(ctx, poolMetadata)
+
+	// Create a reference so poolID can be looked up by poolMetadata
+	poolIDBz := sdk.Uint64ToBigEndian(poolID)
+	poolIDKey := types.PoolIDKey(pairID, centerTickIndexNormalized, fee)
+
+	poolIDStore := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PoolIDKeyPrefix))
+	poolIDStore.Set(poolIDKey, poolIDBz)
+
+	// Update poolCount
+	k.SetPoolCount(ctx, poolID+1)
+
+	return types.NewPool(pairID, centerTickIndexNormalized, fee, poolID)
+}
+
+// GetNextPoolId get ID for the next pool to be created
+func (k Keeper) GetNextPoolID(ctx sdk.Context) uint64 {
+	return k.GetPoolCount(ctx)
 }
 
 func (k Keeper) GetPool(
@@ -26,12 +62,17 @@ func (k Keeper) GetPool(
 	centerTickIndexNormalized int64,
 	fee uint64,
 ) (*types.Pool, bool) {
-	feeInt64 := utils.MustSafeUint64(fee)
+	feeInt64 := utils.MustSafeUint64ToInt64(fee)
 
 	id0To1 := &types.PoolReservesKey{
 		TradePairID:           types.NewTradePairIDFromMaker(pairID, pairID.Token1),
 		TickIndexTakerToMaker: centerTickIndexNormalized + feeInt64,
 		Fee:                   fee,
+	}
+
+	poolID, found := k.GetPoolIDByParams(ctx, pairID, centerTickIndexNormalized, fee)
+	if !found {
+		return nil, false
 	}
 
 	upperTick, upperTickFound := k.GetPoolReserves(ctx, id0To1)
@@ -42,13 +83,41 @@ func (k Keeper) GetPool(
 	} else if lowerTickFound && !upperTickFound {
 		upperTick = types.NewPoolReservesFromCounterpart(lowerTick)
 	} else if !lowerTickFound && !upperTickFound {
-		return nil, false
+		// Pool has already been initialized before so we can safely assume that pool creation doesn't throw an error
+		return types.MustNewPool(pairID, centerTickIndexNormalized, fee, poolID), true
 	}
 
 	return &types.Pool{
+		ID:         poolID,
 		LowerTick0: lowerTick,
 		UpperTick1: upperTick,
 	}, true
+}
+
+func (k Keeper) GetPoolByID(ctx sdk.Context, poolID uint64) (pool *types.Pool, found bool) {
+	poolMetadata, found := k.GetPoolMetadata(ctx, poolID)
+	if !found {
+		return pool, false
+	}
+
+	return k.GetPool(ctx, poolMetadata.PairID, poolMetadata.Tick, poolMetadata.Fee)
+}
+
+func (k Keeper) GetPoolIDByParams(
+	ctx sdk.Context,
+	pairID *types.PairID,
+	centerTickIndexNormalized int64,
+	fee uint64,
+) (id uint64, found bool) {
+	poolIDKey := types.PoolIDKey(pairID, centerTickIndexNormalized, fee)
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PoolIDKeyPrefix))
+	b := store.Get(poolIDKey)
+	if b == nil {
+		return 0, false
+	}
+
+	poolID := sdk.BigEndianToUint64(b)
+	return poolID, true
 }
 
 func (k Keeper) SetPool(ctx sdk.Context, pool *types.Pool) {
@@ -69,25 +138,26 @@ func (k Keeper) SetPool(ctx sdk.Context, pool *types.Pool) {
 	ctx.EventManager().EmitEvent(types.CreateTickUpdatePoolReserves(*pool.UpperTick1))
 }
 
-// Useful for testing
-func MustNewPool(pairID *types.PairID, normalizedCenterTickIndex int64, fee uint64) *types.Pool {
-	feeInt64 := utils.MustSafeUint64(fee)
+// GetPoolCount get the total number of pools
+func (k Keeper) GetPoolCount(ctx sdk.Context) uint64 {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte{})
+	byteKey := types.KeyPrefix(types.PoolCountKeyPrefix)
+	bz := store.Get(byteKey)
 
-	id0To1 := &types.PoolReservesKey{
-		TradePairID:           types.NewTradePairIDFromMaker(pairID, pairID.Token1),
-		TickIndexTakerToMaker: normalizedCenterTickIndex + feeInt64,
-		Fee:                   fee,
+	// Count doesn't exist: no element
+	if bz == nil {
+		return 0
 	}
 
-	upperTick, err := types.NewPoolReserves(id0To1)
-	if err != nil {
-		panic(err)
-	}
+	// Parse bytes
+	return binary.BigEndian.Uint64(bz)
+}
 
-	lowerTick := types.NewPoolReservesFromCounterpart(upperTick)
-
-	return &types.Pool{
-		LowerTick0: lowerTick,
-		UpperTick1: upperTick,
-	}
+// SetPoolCount set the total number of pools
+func (k Keeper) SetPoolCount(ctx sdk.Context, count uint64) {
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), []byte{})
+	byteKey := types.KeyPrefix(types.PoolCountKeyPrefix)
+	bz := make([]byte, 8)
+	binary.BigEndian.PutUint64(bz, count)
+	store.Set(byteKey, bz)
 }

@@ -9,8 +9,9 @@ func NewPool(
 	pairID *PairID,
 	centerTickIndexNormalized int64,
 	fee uint64,
+	id uint64,
 ) (*Pool, error) {
-	feeInt64 := utils.MustSafeUint64(fee)
+	feeInt64 := utils.MustSafeUint64ToInt64(fee)
 
 	id0To1 := &PoolReservesKey{
 		TradePairID:           NewTradePairIDFromMaker(pairID, pairID.Token1),
@@ -28,11 +29,25 @@ func NewPool(
 	return &Pool{
 		LowerTick0: lowerTick,
 		UpperTick1: upperTick,
+		ID:         id,
 	}, nil
 }
 
+func MustNewPool(
+	pairID *PairID,
+	centerTickIndexNormalized int64,
+	fee uint64,
+	id uint64,
+) *Pool {
+	pool, err := NewPool(pairID, centerTickIndexNormalized, fee, id)
+	if err != nil {
+		panic("Error while creating new pool: " + err.Error())
+	}
+	return pool
+}
+
 func (p *Pool) CenterTickIndex() int64 {
-	feeInt64 := utils.MustSafeUint64(p.Fee())
+	feeInt64 := utils.MustSafeUint64ToInt64(p.Fee())
 	return p.UpperTick1.Key.TickIndexTakerToMaker - feeInt64
 }
 
@@ -108,7 +123,7 @@ func (p *Pool) Deposit(
 	)
 
 	if inAmount0.Equal(sdk.ZeroInt()) && inAmount1.Equal(sdk.ZeroInt()) {
-		return sdk.ZeroInt(), sdk.ZeroInt(), sdk.Coin{Denom: p.GetDepositDenom()}
+		return sdk.ZeroInt(), sdk.ZeroInt(), sdk.Coin{Denom: p.GetPoolDenom()}
 	}
 
 	outShares = p.CalcSharesMinted(inAmount0, inAmount1, existingShares)
@@ -135,12 +150,8 @@ func (p *Pool) Deposit(
 	return inAmount0, inAmount1, outShares
 }
 
-func (p *Pool) GetDepositDenom() string {
-	return NewDepositDenom(
-		p.UpperTick1.Key.TradePairID.MustPairID(),
-		p.CenterTickIndex(),
-		p.Fee(),
-	).String()
+func (p *Pool) GetPoolDenom() string {
+	return NewPoolDenom(p.ID)
 }
 
 func (p *Pool) Price(tradePairID *TradePairID) sdk.Dec {
@@ -179,7 +190,7 @@ func (p *Pool) CalcSharesMinted(
 		sharesMintedAmount = valueMintedToken0.TruncateInt()
 	}
 
-	return sdk.Coin{Denom: p.GetDepositDenom(), Amount: sharesMintedAmount}
+	return sdk.Coin{Denom: p.GetPoolDenom(), Amount: sharesMintedAmount}
 }
 
 func (p *Pool) CalcResidualSharesMinted(
@@ -194,10 +205,10 @@ func (p *Pool) CalcResidualSharesMinted(
 		fee,
 	)
 	if err != nil {
-		return sdk.Coin{Denom: p.GetDepositDenom()}, err
+		return sdk.Coin{Denom: p.GetPoolDenom()}, err
 	}
 
-	return sdk.Coin{Denom: p.GetDepositDenom(), Amount: valueMintedToken0.TruncateInt()}, nil
+	return sdk.Coin{Denom: p.GetPoolDenom(), Amount: valueMintedToken0.TruncateInt()}, nil
 }
 
 func (p *Pool) RedeemValue(sharesToRemove, totalShares sdk.Int) (outAmount0, outAmount1 sdk.Int) {

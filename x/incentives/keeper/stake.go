@@ -227,3 +227,23 @@ func (k Keeper) CreateStake(
 
 	return stake, nil
 }
+
+func (k Keeper) StakeCoinsPassingQueryCondition(
+	ctx sdk.Context,
+	stake *types.Stake,
+	distrTo types.QueryCondition,
+) sdk.Coins {
+	coins := stake.Coins
+	result := sdk.NewCoins()
+	for _, c := range coins {
+		poolMetadata, err := k.dk.GetPoolMetadataByDenom(ctx, c.Denom)
+		if err != nil {
+			continue
+		}
+
+		if distrTo.Test(poolMetadata) {
+			result = result.Add(c)
+		}
+	}
+	return result
+}

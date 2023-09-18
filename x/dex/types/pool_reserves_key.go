@@ -65,7 +65,7 @@ func (p PoolReservesKey) KeyUnmarshal(bz []byte) error {
 }
 
 func (p PoolReservesKey) Counterpart() *PoolReservesKey {
-	feeInt64 := utils.MustSafeUint64(p.Fee)
+	feeInt64 := utils.MustSafeUint64ToInt64(p.Fee)
 	return &PoolReservesKey{
 		TradePairID:           p.TradePairID.Reversed(),
 		TickIndexTakerToMaker: p.TickIndexTakerToMaker*-1 + 2*feeInt64,

@@ -34,4 +34,5 @@ type AccountKeeper interface {
 
 type DexKeeper interface {
 	GetOrInitPool(ctx sdk.Context, pairID *types.PairID, centerTickIndex int64, fee uint64) (*dextypes.Pool, error)
+	GetPoolMetadataByDenom(ctx sdk.Context, id string) (types.PoolMetadata, error)
 }

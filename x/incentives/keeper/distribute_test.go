@@ -44,11 +44,7 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 					fee:    1,
 				},
 			},
-			coin: sdk.NewInt64Coin(
-				dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).
-					String(),
-				20,
-			),
+			coin:        sdk.NewInt64Coin(dextypes.NewPoolDenom(0), 20),
 			tick:        1000,
 			expectation: sdk.NewInt(21),
 		},
@@ -63,11 +59,7 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 					fee:    1,
 				},
 			},
-			coin: sdk.NewInt64Coin(
-				dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).
-					String(),
-				20,
-			),
+			coin:        sdk.NewInt64Coin(dextypes.NewPoolDenom(0), 20),
 			tick:        0,
 			expectation: sdk.NewInt(20),
 		},
@@ -89,11 +81,7 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 					fee:    2,
 				},
 			},
-			coin: sdk.NewInt64Coin(
-				dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).
-					String(),
-				20,
-			),
+			coin:        sdk.NewInt64Coin(dextypes.NewPoolDenom(0), 20),
 			tick:        1000,
 			expectation: sdk.NewInt(21),
 		},
@@ -115,11 +103,7 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 					fee:    1,
 				},
 			},
-			coin: sdk.NewInt64Coin(
-				dextypes.NewDepositDenom(&dextypes.PairID{Token0: "TokenA", Token1: "TokenB"}, 0, 1).
-					String(),
-				20,
-			),
+			coin:        sdk.NewInt64Coin(dextypes.NewPoolDenom(0), 20),
 			tick:        1000,
 			expectation: sdk.NewInt(21),
 		},

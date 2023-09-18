@@ -28,6 +28,13 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, elem := range genState.LimitOrderTrancheUserList {
 		k.SetLimitOrderTrancheUser(ctx, elem)
 	}
+	// Set all the poolMetadata
+	for _, elem := range genState.PoolMetadataList {
+		k.SetPoolMetadata(ctx, elem)
+	}
+
+	// Set poolMetadata count
+	k.SetPoolCount(ctx, genState.PoolCount)
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, &genState.Params)
 }
@@ -39,6 +46,8 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.LimitOrderTrancheUserList = k.GetAllLimitOrderTrancheUser(ctx)
 	genesis.TickLiquidityList = k.GetAllTickLiquidity(ctx)
 	genesis.InactiveLimitOrderTrancheList = k.GetAllInactiveLimitOrderTranche(ctx)
+	genesis.PoolMetadataList = k.GetAllPoolMetadata(ctx)
+	genesis.PoolCount = k.GetPoolCount(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis
