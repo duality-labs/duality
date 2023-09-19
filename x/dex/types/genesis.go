@@ -15,7 +15,7 @@ func DefaultGenesis() *GenesisState {
 		InactiveLimitOrderTrancheList: []*LimitOrderTranche{},
 		PoolMetadataList:              []PoolMetadata{},
 		// this line is used by starport scaffolding # genesis/types/default
-		Params: *DefaultParams(),
+		Params: DefaultParams(),
 	}
 }
 

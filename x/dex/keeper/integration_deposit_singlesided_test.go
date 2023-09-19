@@ -424,3 +424,15 @@ func (s *MsgServerTestSuite) TestDepositSingleLowTickUnderflowFails() {
 		NewDeposit(0, 50, -352436, 0),
 	)
 }
+
+func (s *MsgServerTestSuite) TestDepositSingleInvalidFeeFails() {
+	s.fundAliceBalances(0, 50)
+
+	// GIVEN
+	// Deposit at fee 43 (invalid)
+	// THEN FAILURE
+	s.assertAliceDepositFails(
+		types.ErrInvalidFee,
+		NewDeposit(0, 50, 10, 43),
+	)
+}

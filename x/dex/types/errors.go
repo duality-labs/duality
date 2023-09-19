@@ -198,6 +198,6 @@ var (
 	ErrInvalidFee = sdkerrors.Register(
 		ModuleName,
 		1148,
-		"Fee plus/minus center tick cannot exceed tick range [-352437, 352437]",
+		"Fee must must a legal fee amount:",
 	)
 )
