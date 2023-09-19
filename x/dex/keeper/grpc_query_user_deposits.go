@@ -4,7 +4,9 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/duality-labs/duality/utils"
 	"github.com/duality-labs/duality/x/dex/types"
+	dexutils "github.com/duality-labs/duality/x/dex/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -23,7 +25,47 @@ func (k Keeper) UserDepositsAll(
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	var depositArr []*types.DepositRecord
+
+	pageRes, err := utils.FilteredPaginateAccountBalances(
+		ctx,
+		k.bankKeeper,
+		addr,
+		req.Pagination,
+		func(poolCoinMaybe sdk.Coin, accumulate bool) bool {
+			err := types.ValidatePoolDenom(poolCoinMaybe.Denom)
+			if err != nil {
+				return false
+			}
+
+			poolMetadata, err := k.GetPoolMetadataByDenom(ctx, poolCoinMaybe.Denom)
+			if err != nil {
+				panic("Can't get info for PoolDenom")
+			}
+
+			fee := dexutils.MustSafeUint64ToInt64(poolMetadata.Fee)
+
+			if accumulate {
+				depositRecord := &types.DepositRecord{
+					PairID:          poolMetadata.PairID,
+					SharesOwned:     poolCoinMaybe.Amount,
+					CenterTickIndex: poolMetadata.Tick,
+					LowerTickIndex:  poolMetadata.Tick - fee,
+					UpperTickIndex:  poolMetadata.Tick + fee,
+					Fee:             poolMetadata.Fee,
+				}
+
+				depositArr = append(depositArr, depositRecord)
+			}
+
+			return true
+		})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	return &types.QueryAllUserDepositsResponse{
-		Deposits: k.GetAllDepositsForAddress(ctx, addr),
+		Deposits:   depositArr,
+		Pagination: pageRes,
 	}, nil
 }
