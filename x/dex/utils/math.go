@@ -6,11 +6,12 @@ import (
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	math_utils "github.com/duality-labs/duality/utils/math"
 )
 
 // Return the base value for price, 1.0001
-func BasePrice() sdk.Dec {
-	return sdk.MustNewDecFromStr("1.0001")
+func BasePrice() math_utils.PrecDec {
+	return math_utils.MustNewPrecDecFromStr("1.0001")
 }
 
 func Abs(x int64) uint64 {

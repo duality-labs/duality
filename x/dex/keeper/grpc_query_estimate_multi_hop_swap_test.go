@@ -3,6 +3,7 @@ package keeper_test
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	keepertest "github.com/duality-labs/duality/testutil/keeper"
+	math_utils "github.com/duality-labs/duality/utils/math"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
@@ -18,7 +19,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapSingleRoute() {
 
 	// WHEN alice multihopswaps A<>B => B<>C => C<>D,
 	route := [][]string{{"TokenA", "TokenB", "TokenC", "TokenD"}}
-	coinOut := s.aliceEstimatesMultiHopSwap(route, 100, sdk.MustNewDecFromStr("0.9"), false)
+	coinOut := s.aliceEstimatesMultiHopSwap(route, 100, math_utils.MustNewPrecDecFromStr("0.9"), false)
 
 	// THEN alice would get out 99 TokenD
 	s.Assert().Equal(sdk.NewInt(97), coinOut.Amount)
@@ -47,7 +48,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapInsufficientLiquiditySingle
 		types.ErrInsufficientLiquidity,
 		route,
 		100,
-		sdk.MustNewDecFromStr("0.9"),
+		math_utils.MustNewPrecDecFromStr("0.9"),
 		false,
 	)
 }
@@ -68,7 +69,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapLimitPriceNotMetSingleRoute
 		types.ErrExitLimitPriceHit,
 		route,
 		50,
-		sdk.MustNewDecFromStr("0.9"),
+		math_utils.MustNewPrecDecFromStr("0.9"),
 		false,
 	)
 }
@@ -104,7 +105,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapMultiRouteOneGood() {
 		1,
 	)
 
-	coinOut := s.aliceEstimatesMultiHopSwap(routes, 100, sdk.MustNewDecFromStr("0.9"), false)
+	coinOut := s.aliceEstimatesMultiHopSwap(routes, 100, math_utils.MustNewPrecDecFromStr("0.9"), false)
 	_ = coinOut
 
 	// THEN swap estimation succeeds through route A<>B, B<>E, E<>X
@@ -207,7 +208,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapMultiRouteAllFail() {
 		types.ErrExitLimitPriceHit,
 		routes,
 		100,
-		sdk.MustNewDecFromStr("0.9"),
+		math_utils.MustNewPrecDecFromStr("0.9"),
 		true,
 	)
 
@@ -217,7 +218,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapMultiRouteAllFail() {
 		types.ErrExitLimitPriceHit,
 		routes,
 		100,
-		sdk.MustNewDecFromStr("0.9"),
+		math_utils.MustNewPrecDecFromStr("0.9"),
 		false,
 	)
 }
@@ -242,7 +243,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapMultiRouteFindBestRoute() {
 		{"TokenA", "TokenB", "TokenD", "TokenX"},
 		{"TokenA", "TokenB", "TokenE", "TokenX"},
 	}
-	coinOut := s.aliceEstimatesMultiHopSwap(routes, 100, sdk.MustNewDecFromStr("0.9"), true)
+	coinOut := s.aliceEstimatesMultiHopSwap(routes, 100, math_utils.MustNewPrecDecFromStr("0.9"), true)
 
 	// THEN swap succeeds through route A<>B, B<>E, E<>X
 
@@ -334,7 +335,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapLongRouteWithCache() {
 			"TokenG", "TokenH", "TokenI", "TokenJ", "TokenK", "TokenM", "TokenX",
 		},
 	}
-	coinOut := s.aliceEstimatesMultiHopSwap(routes, 100, sdk.MustNewDecFromStr("0.8"), true)
+	coinOut := s.aliceEstimatesMultiHopSwap(routes, 100, math_utils.MustNewPrecDecFromStr("0.8"), true)
 
 	// THEN swap succeeds with second route
 	s.Assert().Equal(coinOut, sdk.NewCoin("TokenX", sdk.NewInt(88)))
@@ -357,7 +358,7 @@ func (s *MsgServerTestSuite) TestEstimateMultiHopSwapEventsEmitted() {
 	)
 
 	route := [][]string{{"TokenA", "TokenB", "TokenC"}}
-	_ = s.aliceEstimatesMultiHopSwap(route, 100, sdk.MustNewDecFromStr("0.9"), false)
+	_ = s.aliceEstimatesMultiHopSwap(route, 100, math_utils.MustNewPrecDecFromStr("0.9"), false)
 
 	// 8 tickUpdateEvents are emitted 4x for pool setup 4x for two swaps
 	keepertest.AssertEventNotEmitted(s.T(), s.ctx, types.TickUpdateEventKey, "Expected no events")

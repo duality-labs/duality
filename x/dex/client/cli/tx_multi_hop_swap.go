@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	math_utils "github.com/duality-labs/duality/utils/math"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/spf13/cobra"
 )
@@ -37,7 +38,7 @@ func CmdMultiHopSwap() *cobra.Command {
 				return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Invalid value for amount-in")
 			}
 
-			exitLimitPriceDec, err := sdk.NewDecFromStr(argExitLimitPrice)
+			exitLimitPriceDec, err := math_utils.NewPrecDecFromStr(argExitLimitPrice)
 			if err != nil {
 				return sdkerrors.Wrapf(types.ErrIntOverflowTx, "Invalid value for exit-limit-price")
 			}

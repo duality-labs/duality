@@ -13,6 +13,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	dualityapp "github.com/duality-labs/duality/app"
+	math_utils "github.com/duality-labs/duality/utils/math"
 	. "github.com/duality-labs/duality/x/dex/keeper"
 	. "github.com/duality-labs/duality/x/dex/keeper/internal/testutils"
 	"github.com/duality-labs/duality/x/dex/types"
@@ -845,7 +846,7 @@ func (s *MsgServerTestSuite) cancelsLimitSellFails(
 func (s *MsgServerTestSuite) aliceMultiHopSwaps(
 	routes [][]string,
 	amountIn int,
-	exitLimitPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
 	pickBest bool,
 ) {
 	s.multiHopSwaps(s.alice, routes, amountIn, exitLimitPrice, pickBest)
@@ -854,7 +855,7 @@ func (s *MsgServerTestSuite) aliceMultiHopSwaps(
 func (s *MsgServerTestSuite) bobMultiHopSwaps(
 	routes [][]string,
 	amountIn int,
-	exitLimitPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
 	pickBest bool,
 ) {
 	s.multiHopSwaps(s.bob, routes, amountIn, exitLimitPrice, pickBest)
@@ -863,7 +864,7 @@ func (s *MsgServerTestSuite) bobMultiHopSwaps(
 func (s *MsgServerTestSuite) carolMultiHopSwaps(
 	routes [][]string,
 	amountIn int,
-	exitLimitPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
 	pickBest bool,
 ) {
 	s.multiHopSwaps(s.carol, routes, amountIn, exitLimitPrice, pickBest)
@@ -872,7 +873,7 @@ func (s *MsgServerTestSuite) carolMultiHopSwaps(
 func (s *MsgServerTestSuite) danMultiHopSwaps(
 	routes [][]string,
 	amountIn int,
-	exitLimitPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
 	pickBest bool,
 ) {
 	s.multiHopSwaps(s.dan, routes, amountIn, exitLimitPrice, pickBest)
@@ -882,7 +883,7 @@ func (s *MsgServerTestSuite) multiHopSwaps(
 	account sdk.AccAddress,
 	routes [][]string,
 	amountIn int,
-	exitLimitPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
 	pickBest bool,
 ) {
 	msg := types.NewMsgMultiHopSwap(
@@ -900,7 +901,7 @@ func (s *MsgServerTestSuite) multiHopSwaps(
 func (s *MsgServerTestSuite) aliceEstimatesMultiHopSwap(
 	routes [][]string,
 	amountIn int,
-	exitLimitPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
 	pickBest bool,
 ) (coinOut sdk.Coin) {
 	multiHopRoutes := make([]*types.MultiHopRoute, len(routes))
@@ -924,7 +925,7 @@ func (s *MsgServerTestSuite) aliceEstimatesMultiHopSwapFails(
 	expectedErr error,
 	routes [][]string,
 	amountIn int,
-	exitLimitPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
 	pickBest bool,
 ) {
 	multiHopRoutes := make([]*types.MultiHopRoute, len(routes))
@@ -947,7 +948,7 @@ func (s *MsgServerTestSuite) aliceMultiHopSwapFails(
 	err error,
 	routes [][]string,
 	amountIn int,
-	exitLimitPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
 	pickBest bool,
 ) {
 	s.multiHopSwapFails(s.alice, err, routes, amountIn, exitLimitPrice, pickBest)
@@ -957,7 +958,7 @@ func (s *MsgServerTestSuite) bobMultiHopSwapFails(
 	err error,
 	routes [][]string,
 	amountIn int,
-	exitLimitPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
 	pickBest bool,
 ) {
 	s.multiHopSwapFails(s.bob, err, routes, amountIn, exitLimitPrice, pickBest)
@@ -967,7 +968,7 @@ func (s *MsgServerTestSuite) carolMultiHopSwapFails(
 	err error,
 	routes [][]string,
 	amountIn int,
-	exitLimitPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
 	pickBest bool,
 ) {
 	s.multiHopSwapFails(s.carol, err, routes, amountIn, exitLimitPrice, pickBest)
@@ -977,7 +978,7 @@ func (s *MsgServerTestSuite) danMultiHopSwapFails(
 	err error,
 	routes [][]string,
 	amountIn int,
-	exitLimitPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
 	pickBest bool,
 ) {
 	s.multiHopSwapFails(s.dan, err, routes, amountIn, exitLimitPrice, pickBest)
@@ -988,7 +989,7 @@ func (s *MsgServerTestSuite) multiHopSwapFails(
 	expectedErr error,
 	routes [][]string,
 	amountIn int,
-	exitLimitPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
 	pickBest bool,
 ) {
 	msg := types.NewMsgMultiHopSwap(
@@ -1249,7 +1250,7 @@ func (s *MsgServerTestSuite) assertLimitFilledAtTickAtIndex(
 		selling,
 		tickIndex,
 	)
-	userRatio := sdk.NewDecFromInt(userShares).QuoInt(totalShares)
+	userRatio := math_utils.NewPrecDecFromInt(userShares).QuoInt(totalShares)
 	filled := s.getLimitFilledLiquidityAtTickAtIndex(selling, tickIndex, trancheKey)
 	amt := sdk.NewInt(int64(amount))
 	userFilled := userRatio.MulInt(filled).RoundInt()
@@ -1297,7 +1298,7 @@ func (s *MsgServerTestSuite) assertAccountLimitLiquidityAtTick(
 ) {
 	userShares := s.getLimitUserSharesAtTick(account, selling, tickIndexNormalized)
 	totalShares := s.getLimitTotalSharesAtTick(selling, tickIndexNormalized)
-	userRatio := sdk.NewDecFromInt(userShares).QuoInt(totalShares)
+	userRatio := math_utils.NewPrecDecFromInt(userShares).QuoInt(totalShares)
 	userLiquidity := userRatio.MulInt64(int64(amount)).TruncateInt()
 
 	s.assertLimitLiquidityAtTick(selling, tickIndexNormalized, userLiquidity.Int64())
@@ -1481,11 +1482,11 @@ func (s *MsgServerTestSuite) calcAutoswapSharesMinted(
 	leftPrice := types.MustCalcPrice(-1 * (centerTick - int64(fee)))
 	discountPrice := types.MustCalcPrice(-1 * int64(fee))
 
-	balancedValue := sdk.NewDecFromInt(balanced0Int).
+	balancedValue := math_utils.NewPrecDecFromInt(balanced0Int).
 		Add(centerPrice.MulInt(balanced1Int)).
 		TruncateInt()
 	residualValue := discountPrice.MulInt(residual0Int).
-		Add(leftPrice.Mul(sdk.NewDecFromInt(residual1Int))).
+		Add(leftPrice.Mul(math_utils.NewPrecDecFromInt(residual1Int))).
 		TruncateInt()
 	valueMint := balancedValue.Add(residualValue)
 
@@ -1496,7 +1497,7 @@ func (s *MsgServerTestSuite) calcSharesMinted(centerTick, amount0Int, amount1Int
 	amount0, amount1 := sdk.NewInt(amount0Int), sdk.NewInt(amount1Int)
 	centerPrice := types.MustCalcPrice(-1 * centerTick)
 
-	return sdk.NewDecFromInt(amount0).Add(centerPrice.Mul(sdk.NewDecFromInt(amount1))).TruncateInt()
+	return math_utils.NewPrecDecFromInt(amount0).Add(centerPrice.Mul(math_utils.NewPrecDecFromInt(amount1))).TruncateInt()
 }
 
 func (s *MsgServerTestSuite) calcExpectedBalancesAfterWithdrawOnePool(

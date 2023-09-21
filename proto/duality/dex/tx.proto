@@ -166,7 +166,7 @@ message MsgMultiHopSwap {
                        ];
   string exitLimitPrice = 5 [
                              (gogoproto.moretags)   = "yaml:\"exitLimitPrice\"",
-                             (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+                             (gogoproto.customtype) = "github.com/duality-labs/duality/utils/math.PrecDec",
                              (gogoproto.nullable)   = false,
                              (gogoproto.jsontag) = "exitLimitPrice"
                              ];

@@ -3,6 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	math_utils "github.com/duality-labs/duality/utils/math"
 )
 
 const TypeMsgMultiHopSwap = "multi_hop_swap"
@@ -14,7 +15,7 @@ func NewMsgMultiHopSwap(
 	receiever string,
 	routesArr [][]string,
 	amountIn sdk.Int,
-	exitLimitPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
 	pickBestRoute bool,
 ) *MsgMultiHopSwap {
 	routes := make([]*MultiHopRoute, len(routesArr))

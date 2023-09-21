@@ -2,6 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	math_utils "github.com/duality-labs/duality/utils/math"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
@@ -10,9 +11,8 @@ func (k Keeper) Swap(
 	tradePairID *types.TradePairID,
 	maxAmountTakerDenom sdk.Int,
 	maxAmountMakerDenom *sdk.Int,
-	limitPrice *sdk.Dec,
+	limitPrice *math_utils.PrecDec,
 ) (totalTakerCoin, totalMakerCoin sdk.Coin, orderFilled bool, err error) {
-
 	useMaxOut := maxAmountMakerDenom != nil
 	var remainingMakerDenom *sdk.Int
 	if useMaxOut {
@@ -47,7 +47,7 @@ func (k Keeper) Swap(
 		// break if remainingTakerDenom will yield less than 1 tokenOut at current price
 		// this avoids unnecessary iteration since outAmount will always be 0 going forward
 		// this also catches the normal exit case where remainingTakerDenom == 0
-		if liq.Price().MulInt(remainingTakerDenom).LT(sdk.OneDec()) {
+		if liq.Price().MulInt(remainingTakerDenom).LT(math_utils.OnePrecDec()) {
 			orderFilled = true
 			break
 		}
@@ -79,7 +79,7 @@ func (k Keeper) SwapWithCache(
 	tradePairID *types.TradePairID,
 	maxAmountIn sdk.Int,
 	maxAmountOut *sdk.Int,
-	limitPrice *sdk.Dec,
+	limitPrice *math_utils.PrecDec,
 ) (totalIn, totalOut sdk.Coin, orderFilled bool, err error) {
 	cacheCtx, writeCache := ctx.CacheContext()
 	totalIn, totalOut, orderFilled, err = k.Swap(

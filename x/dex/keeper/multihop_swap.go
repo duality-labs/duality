@@ -3,22 +3,23 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	math_utils "github.com/duality-labs/duality/utils/math"
 	"github.com/duality-labs/duality/x/dex/types"
 )
 
 type MultihopStep struct {
-	RemainingBestPrice sdk.Dec
+	RemainingBestPrice math_utils.PrecDec
 	tradePairID        *types.TradePairID
 }
 
 func (k Keeper) HopsToRouteData(
 	ctx sdk.Context,
 	hops []string,
-	exitLimitPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
 ) ([]MultihopStep, error) {
 	nPairs := len(hops) - 1
 	routeArr := make([]MultihopStep, nPairs)
-	priceAcc := sdk.OneDec()
+	priceAcc := math_utils.OnePrecDec()
 	for i := range routeArr {
 		index := len(routeArr) - 1 - i
 		tokenIn := hops[index]
@@ -65,8 +66,8 @@ func (k Keeper) MultihopStep(
 	bctx *types.BranchableCache,
 	step MultihopStep,
 	inCoin sdk.Coin,
-	exitLimitPrice sdk.Dec,
-	currentPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
+	currentPrice math_utils.PrecDec,
 	remainingSteps []MultihopStep,
 	stepCache map[multihopCacheKey]StepResult,
 ) (sdk.Coin, *types.BranchableCache, error) {
@@ -95,14 +96,14 @@ func (k Keeper) RunMultihopRoute(
 	ctx sdk.Context,
 	route types.MultiHopRoute,
 	initialInCoin sdk.Coin,
-	exitLimitPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
 	stepCache map[multihopCacheKey]StepResult,
 ) (sdk.Coin, func(), error) {
 	routeData, err := k.HopsToRouteData(ctx, route.Hops, exitLimitPrice)
 	if err != nil {
 		return sdk.Coin{}, nil, err
 	}
-	currentPrice := sdk.OneDec()
+	currentPrice := math_utils.OnePrecDec()
 
 	var currentOutCoin sdk.Coin
 	inCoin := initialInCoin
@@ -133,8 +134,8 @@ func (k Keeper) RunMultihopRoute(
 			)
 		}
 
-		currentPrice = sdk.NewDecFromInt(currentOutCoin.Amount).
-			Quo(sdk.NewDecFromInt(initialInCoin.Amount))
+		currentPrice = math_utils.NewPrecDecFromInt(currentOutCoin.Amount).
+			Quo(math_utils.NewPrecDecFromInt(initialInCoin.Amount))
 	}
 
 	if exitLimitPrice.GT(currentPrice) {
