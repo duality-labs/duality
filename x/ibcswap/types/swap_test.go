@@ -27,8 +27,6 @@ func TestPacketMetadata_Marshal(t *testing.T) {
 				AmountIn:         sdk.NewInt(123),
 				TickIndexInToOut: 0,
 				OrderType:        types.LimitOrderType_FILL_OR_KILL,
-				// NOTE: will enable MaxAmountOut for swap soon
-				// MaxAmountOut: sdk.NewInt(456),
 			},
 			Next: nil,
 		},
@@ -106,7 +104,6 @@ func TestSwapMetadata_ValidatePass(t *testing.T) {
 				AmountIn:         sdk.NewInt(123),
 				TickIndexInToOut: 0,
 				OrderType:        types.LimitOrderType_FILL_OR_KILL,
-				// MaxAmountOut: sdk.NewInt(456),
 			},
 			Next: nil,
 		},
@@ -128,7 +125,6 @@ func TestSwapMetadata_ValidateFail(t *testing.T) {
 				AmountIn:         sdk.NewInt(123),
 				TickIndexInToOut: 0,
 				OrderType:        types.LimitOrderType_FILL_OR_KILL,
-				// MaxAmountOut: sdk.NewInt(456),
 			},
 			Next: nil,
 		},
@@ -147,7 +143,6 @@ func TestSwapMetadata_ValidateFail(t *testing.T) {
 				AmountIn:         sdk.NewInt(123),
 				TickIndexInToOut: 0,
 				OrderType:        types.LimitOrderType_FILL_OR_KILL,
-				// MaxAmountOut: sdk.NewInt(456),
 			},
 			Next: nil,
 		},
@@ -166,7 +161,6 @@ func TestSwapMetadata_ValidateFail(t *testing.T) {
 				AmountIn:         sdk.NewInt(123),
 				TickIndexInToOut: 0,
 				OrderType:        types.LimitOrderType_FILL_OR_KILL,
-				// MaxAmountOut: sdk.NewInt(456),
 			},
 			Next: nil,
 		},
@@ -185,7 +179,6 @@ func TestSwapMetadata_ValidateFail(t *testing.T) {
 				AmountIn:         sdk.NewInt(123),
 				TickIndexInToOut: 0,
 				OrderType:        types.LimitOrderType_FILL_OR_KILL,
-				// MaxAmountOut: sdk.NewInt(456),
 			},
 			Next: nil,
 		},
@@ -204,7 +197,6 @@ func TestSwapMetadata_ValidateFail(t *testing.T) {
 				AmountIn:         sdk.NewInt(0),
 				TickIndexInToOut: 0,
 				OrderType:        types.LimitOrderType_FILL_OR_KILL,
-				// MaxAmountOut: sdk.NewInt(456),
 			},
 			Next: nil,
 		},
@@ -223,7 +215,6 @@ func TestSwapMetadata_ValidateFail(t *testing.T) {
 				AmountIn:         sdk.NewInt(-1),
 				TickIndexInToOut: 0,
 				OrderType:        types.LimitOrderType_FILL_OR_KILL,
-				// MaxAmountOut: sdk.NewInt(456),
 			},
 			Next: nil,
 		},
@@ -242,7 +233,6 @@ func TestSwapMetadata_ValidateFail(t *testing.T) {
 				AmountIn:         sdk.NewInt(123),
 				TickIndexInToOut: 0,
 				OrderType:        types.LimitOrderType_GOOD_TIL_CANCELLED,
-				// MaxAmountOut: sdk.NewInt(0),
 			},
 			Next: nil,
 		},
@@ -250,24 +240,4 @@ func TestSwapMetadata_ValidateFail(t *testing.T) {
 	_, err = json.Marshal(pm)
 	require.NoError(t, err)
 	require.Error(t, pm.Swap.Validate())
-
-	// TODO: enable this test for max amountOut
-	// pm = PacketMetadata{
-	// 	&SwapMetadata{
-	// 		MsgPlaceLimitOrder: &types.MsgPlaceLimitOrder{
-	// 			Creator:  "creator",
-	// 			Receiver: "receiver",
-	// 			TokenIn:  "token-a",
-	// 			TokenOut: "token-b",
-	// 			AmountIn: sdk.NewInt(123),
-	// 			TickIndexInToOut: 0,
-	// 			OrderType: types.LimitOrderType_FILL_OR_KILL,
-	// 			MaxAmountOut: sdk.NewInt(-1),
-	// 		},
-	// 		Next: nil,
-	// 	},
-	// }
-	// _, err = json.Marshal(pm)
-	// require.NoError(t, err)
-	// require.Error(t, pm.Swap.Validate())
 }

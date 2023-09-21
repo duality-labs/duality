@@ -136,7 +136,6 @@ func (p *Pool) Deposit(
 		// but added error handling to all of the new functions for autoswap.
 		// Open to changing it however.
 		residualShares, _ := p.CalcResidualSharesMinted(residualAmount0, residualAmount1)
-		// TODO: Fix
 
 		outShares = outShares.Add(residualShares)
 

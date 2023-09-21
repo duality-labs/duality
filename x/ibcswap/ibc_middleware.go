@@ -271,8 +271,6 @@ func (im IBCMiddleware) handleFailedSwap(
 		"AmountIn", metadata.AmountIn,
 		"TickIndexInToOut", metadata.TickIndexInToOut,
 		"OrderType", metadata.OrderType,
-		// TODO: enable soon
-		// "maxAmountOut", metadata.MaxAmountOut,
 		"refundable", metadata.NonRefundable,
 		"refund address", metadata.RefundAddress,
 	)

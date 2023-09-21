@@ -74,7 +74,6 @@ func TestMsgCreatePool(t *testing.T) {
 			}),
 			expectPass: false,
 		},
-		// TODO
 		{
 			name: "invalid distribution start time",
 			msg: createMsg(func(msg MsgCreateGauge) MsgCreateGauge {
