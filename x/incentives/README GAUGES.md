@@ -245,7 +245,7 @@ done at `AfterEpochEnd` hook
 Create a gauge to distribute rewards to users
 
 ```sh
-osmosisd tx incentives create-gauge [stakeup_denom] [reward] [flags]
+osmosisd tx incentives create-gauge [stake_denom] [reward] [flags]
 ```
 
 ::: details Example 1

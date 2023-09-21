@@ -130,7 +130,7 @@ func NewAddToGaugeCmd() (*dcli.TxCliDesc, *types.MsgAddToGauge) {
 func NewStakeCmd() (*dcli.TxCliDesc, *types.MsgStake) {
 	return &dcli.TxCliDesc{
 		Use:   "stake-tokens [coins]",
-		Short: "stake tokens into stakeup pool from user account",
+		Short: "stake tokens into stake pool from user account",
 	}, &types.MsgStake{}
 }
 
