@@ -30,7 +30,7 @@ func UnmarshalRefArray(bz []byte) []uint64 {
 	return ids
 }
 
-// getStakesFromIterator returns an array of single stake units by period defined by the x/stakeup module.
+// getStakesFromIterator returns an array of single stake units by period defined by the x/stake module.
 func (k Keeper) getStakesFromIterator(ctx sdk.Context, iterator db.Iterator) types.Stakes {
 	stakes := types.Stakes{}
 	defer iterator.Close()

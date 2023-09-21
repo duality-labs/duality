@@ -75,8 +75,8 @@ func (h MultiIncentiveHooks) OnTokenUnstaked(ctx sdk.Context, address sdk.AccAdd
 	}
 }
 
-// func (h MultiIncentiveHooks) OnStakeupExtend(ctx sdk.Context, stakeID uint64, prevDuration, newDuration time.Duration) {
+// func (h MultiIncentiveHooks) OnStakeExtend(ctx sdk.Context, stakeID uint64, prevDuration, newDuration time.Duration) {
 // 	for i := range h {
-// 		h[i].OnStakeupExtend(ctx, stakeID, prevDuration, newDuration)
+// 		h[i].OnStakeExtend(ctx, stakeID, prevDuration, newDuration)
 // 	}
 // }

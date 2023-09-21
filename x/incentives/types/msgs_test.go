@@ -267,7 +267,7 @@ func TestMsgUnstake(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid stakeup ID",
+			name: "invalid stake ID",
 			msg: MsgUnstake{
 				Owner: addr1,
 				Unstakes: []*MsgUnstake_UnstakeDescriptor{

@@ -107,7 +107,7 @@ func (k Keeper) GetStakeByID(ctx sdk.Context, stakeID uint64) (*types.Stake, err
 	lockKey := types.GetStakeStoreKey(stakeID)
 	if !store.Has(lockKey) {
 		return nil, sdkerrors.Wrap(
-			types.ErrStakeupNotFound,
+			types.ErrStakeNotFound,
 			fmt.Sprintf("stake with ID %d does not exist", stakeID),
 		)
 	}

@@ -32,7 +32,7 @@ func (suite *KeeperTestSuite) TestValueForShares() {
 		err         error
 	}{
 		// gauge 1 gives 3k coins. three stakes, all eligible. 1k coins per stake.
-		// 1k should go to oneStakeupUser and 2k to twoStakeupUser.
+		// 1k should go to oneStakeUser and 2k to twoStakeUser.
 		{
 			name: "one deposit",
 			deposits: []depositSpec{

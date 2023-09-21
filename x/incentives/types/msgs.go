@@ -209,7 +209,7 @@ func (m MsgUnstake) ValidateBasic() error {
 
 	for _, unstake := range m.Unstakes {
 		if unstake.ID == 0 {
-			return fmt.Errorf("invalid stakeup ID, got %v", unstake.ID)
+			return fmt.Errorf("invalid stake ID, got %v", unstake.ID)
 		}
 
 		if !unstake.Coins.Empty() && !unstake.Coins.IsAllPositive() {

@@ -17,8 +17,8 @@ var (
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateGauge{}, "duality/incentives/create-gauge", nil)
 	cdc.RegisterConcrete(&MsgAddToGauge{}, "duality/incentives/add-to-gauge", nil)
-	cdc.RegisterConcrete(&MsgStake{}, "duality/stakeup/stake-tokens", nil)
-	cdc.RegisterConcrete(&MsgUnstake{}, "duality/stakeup/begin-unstake-period-stake", nil)
+	cdc.RegisterConcrete(&MsgStake{}, "duality/stake/stake-tokens", nil)
+	cdc.RegisterConcrete(&MsgUnstake{}, "duality/stake/begin-unstake-period-stake", nil)
 }
 
 // RegisterInterfaces registers interfaces and implementations of the incentives module.
