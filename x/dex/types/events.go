@@ -154,7 +154,7 @@ func CancelLimitOrderEvent(
 ) sdk.Event {
 	attrs := []sdk.Attribute{
 		sdk.NewAttribute(sdk.AttributeKeyModule, "dex"),
-		sdk.NewAttribute(sdk.AttributeKeyAction, WithdrawFilledLimitOrderEventKey),
+		sdk.NewAttribute(sdk.AttributeKeyAction, CancelLimitOrderEventKey),
 		sdk.NewAttribute(CancelLimitOrderEventCreator, creator.String()),
 		sdk.NewAttribute(CancelLimitOrderEventToken0, token0),
 		sdk.NewAttribute(CancelLimitOrderEventToken1, token1),
