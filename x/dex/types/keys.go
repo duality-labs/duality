@@ -227,7 +227,7 @@ func PoolIDKey(
 
 // Deposit Event Attributes
 const (
-	DepositEventKey                = "Deposit"
+	DepositEventKey                = "DepositLP"
 	DepositEventCreator            = "Creator"
 	DepositEventToken0             = "TokenZero"
 	DepositEventToken1             = "TokenOne"
@@ -241,7 +241,7 @@ const (
 
 // Withdraw Event Attributes
 const (
-	WithdrawEventKey                = "Withdraw"
+	WithdrawEventKey                = "WithdrawLP"
 	WithdrawEventCreator            = "Creator"
 	WithdrawEventToken0             = "TokenZero"
 	WithdrawEventToken1             = "TokenOne"
@@ -283,7 +283,7 @@ const (
 
 // Withdraw LimitOrder Event Attributes
 const (
-	WithdrawFilledLimitOrderEventKey        = "Withdraw"
+	WithdrawFilledLimitOrderEventKey        = "WithdrawLimitOrder"
 	WithdrawFilledLimitOrderEventCreator    = "Creator"
 	WithdrawFilledLimitOrderEventToken0     = "TokenZero"
 	WithdrawFilledLimitOrderEventToken1     = "TokenOne"
@@ -295,7 +295,7 @@ const (
 
 // Cancel LimitOrder Event Attributes
 const (
-	CancelLimitOrderEventKey        = "Withdraw"
+	CancelLimitOrderEventKey        = "CancelLimitOrder"
 	CancelLimitOrderEventCreator    = "Creator"
 	CancelLimitOrderEventToken0     = "TokenZero"
 	CancelLimitOrderEventToken1     = "TokenOne"
