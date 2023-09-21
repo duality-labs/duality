@@ -9,10 +9,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-type userStakes struct {
-	stakeAmounts []sdk.Coins
-}
-
 type depositStakeSpec struct {
 	depositSpecs         []depositSpec
 	stakeDistEpochOffset int // used for simulating the time of staking

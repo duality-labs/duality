@@ -11,7 +11,6 @@ import (
 )
 
 func SimulateMsgPlaceLimitOrder(
-	_ types.AccountKeeper,
 	_ types.BankKeeper,
 	_ keeper.Keeper,
 ) simtypes.Operation {

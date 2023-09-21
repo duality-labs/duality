@@ -56,8 +56,6 @@ func (s *IBCTestSuite) TestIBCSwapMiddleware_Success() {
 				AmountIn:         swapAmount,
 				TickIndexInToOut: 1,
 				OrderType:        dextypes.LimitOrderType_FILL_OR_KILL,
-				// TODO: enable soon
-				// MaxAmountOut: minOut,
 			},
 			Next: nil,
 		},

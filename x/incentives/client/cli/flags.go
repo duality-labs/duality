@@ -20,9 +20,3 @@ func FlagSetCreateGauge() *flag.FlagSet {
 
 	return fs
 }
-
-func FlagSetUnSetupStake() *flag.FlagSet {
-	fs := flag.NewFlagSet("", flag.ContinueOnError)
-	fs.String(FlagAmount, "", "The amount to be unstaked. e.g. 1osmo")
-	return fs
-}

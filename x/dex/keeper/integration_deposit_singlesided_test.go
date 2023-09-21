@@ -206,7 +206,6 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedOutOfSpreadMaxNotAdjusted() {
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityA() {
-	// TODO: this fails because PairInit doesn't account for single sided liquidity
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -232,7 +231,6 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityA() {
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedExistingLiquidityB() {
-	// TODO: this fails because PairInit doesn't account for single sided liquidity
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN
@@ -307,7 +305,6 @@ func (s *MsgServerTestSuite) TestDepositSingleSidedCreatingArbToken1() {
 }
 
 func (s *MsgServerTestSuite) TestDepositSingleSidedMultiA() {
-	// TODO: this fails because PairInit doesn't account for single sided liquidity
 	s.fundAliceBalances(50, 50)
 
 	// GIVEN

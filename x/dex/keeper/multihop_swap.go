@@ -44,7 +44,6 @@ func (k Keeper) HopsToRouteData(
 type StepResult struct {
 	Ctx     *types.BranchableCache
 	CoinOut sdk.Coin
-	CoinIn  sdk.Coin
 	Err     error
 }
 
@@ -71,7 +70,6 @@ func (k Keeper) MultihopStep(
 	remainingSteps []MultihopStep,
 	stepCache map[multihopCacheKey]StepResult,
 ) (sdk.Coin, *types.BranchableCache, error) {
-
 	cacheKey := newCacheKey(step.tradePairID.TakerDenom, step.tradePairID.MakerDenom, inCoin.Amount)
 	val, ok := stepCache[cacheKey]
 	if ok {

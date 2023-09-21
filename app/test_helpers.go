@@ -12,7 +12,6 @@ import (
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-	tmprototypes "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -28,7 +27,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	consumertypes "github.com/cosmos/interchain-security/v3/x/ccv/consumer/types"
@@ -36,23 +34,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 )
-
-var DefaultConsensusParams = &tmprototypes.ConsensusParams{
-	Block: &tmprototypes.BlockParams{
-		MaxBytes: 200000,
-		MaxGas:   2000000,
-	},
-	Evidence: &tmproto.EvidenceParams{
-		MaxAgeNumBlocks: 302400,
-		MaxAgeDuration:  504 * time.Hour, // 3 weeks is the max duration
-		MaxBytes:        10000,
-	},
-	Validator: &tmproto.ValidatorParams{
-		PubKeyTypes: []string{
-			tmtypes.ABCIPubKeyTypeEd25519,
-		},
-	},
-}
 
 func setup(withGenesis bool, invCheckPeriod uint) (*App, GenesisState) {
 	encConfig := MakeEncodingConfig()
@@ -273,19 +254,6 @@ type EmptyAppOptions struct {
 // Get implements AppOptions
 func (ao EmptyAppOptions) Get(_ string) interface{} {
 	return nil
-}
-
-func FundAccount(
-	bankKeeper bankkeeper.Keeper,
-	ctx sdk.Context,
-	addr sdk.AccAddress,
-	amounts sdk.Coins,
-) error {
-	if err := bankKeeper.MintCoins(ctx, banktypes.ModuleName, amounts); err != nil {
-		return err
-	}
-
-	return bankKeeper.SendCoinsFromModuleToAccount(ctx, banktypes.ModuleName, addr, amounts)
 }
 
 var _ network.TestFixtureFactory = NewTestNetworkFixture

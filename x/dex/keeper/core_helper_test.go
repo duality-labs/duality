@@ -82,10 +82,6 @@ func (s *CoreHelpersTestSuite) setLPAtFee1Pool(tickIndex int64, amountA int, amo
 	s.app.DexKeeper.SetPool(s.ctx, pool)
 }
 
-// GetOrInitUserShareData /////////////////////////////////////////////////////
-
-// TODO: WRITE ME
-
 // FindNextTick ////////////////////////////////////////////////////
 
 func (s *CoreHelpersTestSuite) TestFindNextTick1To0NoLiq() {

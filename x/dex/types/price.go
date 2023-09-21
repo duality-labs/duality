@@ -31,22 +31,6 @@ func MustCalcPrice(relativeTickIndex int64) sdk.Dec {
 	return price
 }
 
-func CalcPrice0To1(tickIndex int64) (sdk.Dec, error) {
-	return CalcPrice(tickIndex)
-}
-
-func MustCalcPrice0To1(tickIndex int64) sdk.Dec {
-	return MustCalcPrice(tickIndex)
-}
-
-func CalcPrice1To0(tickIndex int64) (sdk.Dec, error) {
-	return CalcPrice(-1 * tickIndex)
-}
-
-func MustCalcPrice1To0(tickIndex int64) sdk.Dec {
-	return MustCalcPrice(-1 * tickIndex)
-}
-
 func IsTickOutOfRange(tickIndex int64) bool {
 	absTickIndex := utils.Abs(tickIndex)
 	return absTickIndex > MaxTickExp

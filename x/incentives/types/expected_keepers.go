@@ -12,9 +12,6 @@ import (
 // BankKeeper defines the expected interface needed to retrieve account balances.
 type BankKeeper interface {
 	GetAllBalances(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
-	GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom string) sdk.Coin
-
-	HasSupply(ctx sdk.Context, denom string) bool
 	GetSupply(ctx sdk.Context, denom string) sdk.Coin
 
 	SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error
@@ -27,7 +24,6 @@ type EpochKeeper interface {
 }
 
 type AccountKeeper interface {
-	GetAllAccounts(ctx sdk.Context) []authtypes.AccountI
 	GetModuleAccount(ctx sdk.Context, moduleName string) authtypes.ModuleAccountI
 	GetModuleAddress(moduleName string) sdk.AccAddress
 }

@@ -31,11 +31,6 @@ type KeeperTestHelper struct {
 	QueryHelper *baseapp.QueryServiceTestHelper
 }
 
-var (
-	SecondaryDenom  = "uion"
-	SecondaryAmount = sdk.NewInt(100000000)
-)
-
 // Setup sets up basic environment for suite (App, Ctx, and test accounts)
 func (s *KeeperTestHelper) Setup() {
 	s.App = app.Setup(s.T(), false)

@@ -492,7 +492,7 @@ func NewApp(
 
 		app.BankKeeper,
 	)
-	dexModule := dexmodule.NewAppModule(appCodec, app.DexKeeper, app.AccountKeeper, app.BankKeeper)
+	dexModule := dexmodule.NewAppModule(appCodec, app.DexKeeper, app.BankKeeper)
 
 	// Create swap middleware keeper
 	app.SwapKeeper = swapkeeper.NewKeeper(
