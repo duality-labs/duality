@@ -1062,12 +1062,14 @@ func (app *App) CheckTx(req abci.RequestCheckTx) abci.ResponseCheckTx {
 func (app *App) SetCheckTx(handler pobabci.CheckTx) {
 	app.checkTxHandler = handler
 }
+
 func (app *App) EnsureBlockGasMeter(ctx sdk.Context) {
 	// TrancheKey generation and LimitOrderExpirationPurge both rely on a BlockGas meter.
 	// check that it works at startup
 	cp := app.GetConsensusParams(ctx)
 	if cp == nil || cp.Block == nil || cp.Block.MaxGas <= 0 {
 		panic("BlockGas meter must be initialized. Genesis must provide value for Block.MaxGas")
+	}
 }
 
 
