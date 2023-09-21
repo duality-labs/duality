@@ -10,12 +10,10 @@ import (
 )
 
 const (
-	TypeMsgCreateGauge       = "create_gauge"
-	TypeMsgAddToGauge        = "add_to_gauge"
-	TypeMsgStakeTokens       = "stake_tokens"
-	TypeMsgBeginUnstakingAll = "begin_unstaking_all"
-	TypeMsgBeginUnstaking    = "begin_unstaking"
-	TypeMsgExtendStakeup     = "edit_stakeup"
+	TypeMsgCreateGauge    = "create_gauge"
+	TypeMsgAddToGauge     = "add_to_gauge"
+	TypeMsgStakeTokens    = "stake_tokens"
+	TypeMsgBeginUnstaking = "begin_unstaking"
 )
 
 var _ sdk.Msg = &MsgCreateGauge{}

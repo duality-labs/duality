@@ -30,10 +30,6 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgWithdrawal int = 100
 
-	opWeightMsgSwap = "op_weight_msg_swap"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgSwap int = 100
-
 	opWeightMsgPlaceLimitOrder = "op_weight_msg_place_limit_order"
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgPlaceLimitOrder int = 100
@@ -88,7 +84,7 @@ func (am AppModule) WeightedOperations(
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgDeposit,
-		dexsimulation.SimulateMsgDeposit(am.accountKeeper, am.bankKeeper, am.keeper),
+		dexsimulation.SimulateMsgDeposit(am.bankKeeper, am.keeper),
 	))
 
 	var weightMsgWithdrawal int
@@ -99,7 +95,7 @@ func (am AppModule) WeightedOperations(
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgWithdrawal,
-		dexsimulation.SimulateMsgWithdrawal(am.accountKeeper, am.bankKeeper, am.keeper),
+		dexsimulation.SimulateMsgWithdrawal(am.bankKeeper, am.keeper),
 	))
 
 	var weightMsgPlaceLimitOrder int
@@ -114,7 +110,7 @@ func (am AppModule) WeightedOperations(
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgPlaceLimitOrder,
-		dexsimulation.SimulateMsgPlaceLimitOrder(am.accountKeeper, am.bankKeeper, am.keeper),
+		dexsimulation.SimulateMsgPlaceLimitOrder(am.bankKeeper, am.keeper),
 	))
 
 	var weightMsgWithdrawFilledLimitOrder int
@@ -130,7 +126,6 @@ func (am AppModule) WeightedOperations(
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgWithdrawFilledLimitOrder,
 		dexsimulation.SimulateMsgWithdrawFilledLimitOrder(
-			am.accountKeeper,
 			am.bankKeeper,
 			am.keeper,
 		),
@@ -148,7 +143,7 @@ func (am AppModule) WeightedOperations(
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgCancelLimitOrder,
-		dexsimulation.SimulateMsgCancelLimitOrder(am.accountKeeper, am.bankKeeper, am.keeper),
+		dexsimulation.SimulateMsgCancelLimitOrder(am.bankKeeper, am.keeper),
 	))
 
 	var weightMsgMultiHopSwap int
@@ -163,7 +158,7 @@ func (am AppModule) WeightedOperations(
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgMultiHopSwap,
-		dexsimulation.SimulateMsgMultiHopSwap(am.accountKeeper, am.bankKeeper, am.keeper),
+		dexsimulation.SimulateMsgMultiHopSwap(am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation

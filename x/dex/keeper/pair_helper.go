@@ -20,22 +20,6 @@ func GetInOutTokens(tokenIn, tokenA, tokenB string) (_, tokenOut string) {
 	return tokenB, tokenA
 }
 
-func NormalizeTickIndex(takerDenom, token0 string, tickIndexTakerToMaker int64) int64 {
-	if takerDenom != token0 {
-		return tickIndexTakerToMaker * -1
-	}
-
-	return tickIndexTakerToMaker
-}
-
-func DenormalizeTickIndex(takerDenom, token0 string, tickIndexNormalized int64) int64 {
-	if takerDenom != token0 {
-		return tickIndexNormalized * -1
-	}
-
-	return tickIndexNormalized
-}
-
 func NormalizeAllTickIndexes(takerDenom, token0 string, tickIndexes []int64) []int64 {
 	if takerDenom != token0 {
 		result := make([]int64, len(tickIndexes))

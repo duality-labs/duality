@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/binary"
 	"errors"
 	"time"
 
@@ -24,8 +23,6 @@ const (
 
 	// MemStoreKey defines the in-memory store key
 	MemStoreKey = "mem_dex"
-
-	Separator = "/"
 )
 
 const (
@@ -34,9 +31,6 @@ const (
 
 	// LimitOrderTrancheUserKeyPrefix is the prefix to retrieve all LimitOrderTrancheUser
 	LimitOrderTrancheUserKeyPrefix = "LimitOrderTrancheUser/value"
-
-	// LimitOrderTrancheKeyPrefix is the prefix to retrieve all LimitOrderTranche
-	LimitOrderTrancheKeyPrefix = "LimitOrderTranche/value"
 
 	// InactiveLimitOrderTrancheKeyPrefix is the prefix to retrieve all InactiveLimitOrderTranche
 	InactiveLimitOrderTrancheKeyPrefix = "InactiveLimitOrderTranche/value/"
@@ -109,46 +103,6 @@ func LimitOrderTrancheUserAddressPrefix(address string) []byte {
 	key = append(key, []byte("/")...)
 
 	return key
-}
-
-// InactiveLimitOrderTrancheKey returns the store key to retrieve a InactiveLimitOrderTranche from the index fields
-func InactiveLimitOrderTrancheKey(
-	tradePairID *TradePairID,
-	tickIndexTakerToMaker int64,
-	trancheKey string,
-) []byte {
-	key := KeyPrefix(InactiveLimitOrderTrancheKeyPrefix)
-
-	pairIDBytes := []byte(tradePairID.MustPairID().CanonicalString())
-	key = append(key, pairIDBytes...)
-	key = append(key, []byte("/")...)
-
-	makerDenomBytes := []byte(tradePairID.MakerDenom)
-	key = append(key, makerDenomBytes...)
-	key = append(key, []byte("/")...)
-
-	tickIndexBytes := TickIndexToBytes(tickIndexTakerToMaker)
-	key = append(key, tickIndexBytes...)
-	key = append(key, []byte("/")...)
-
-	trancheKeyBytes := []byte(trancheKey)
-	key = append(key, trancheKeyBytes...)
-	key = append(key, []byte("/")...)
-
-	return key
-}
-
-func LiquidityIndexBytes(liquidityIndex interface{}) []byte {
-	switch index := liquidityIndex.(type) {
-	case uint64:
-		liquidityIndexBytes := make([]byte, 8)
-		binary.BigEndian.PutUint64(liquidityIndexBytes, index)
-		return liquidityIndexBytes
-	case string:
-		return []byte(index)
-	default:
-		panic("LiquidityIndex is not a valid type")
-	}
 }
 
 func TimeBytes(timestamp time.Time) []byte {

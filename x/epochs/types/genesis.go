@@ -5,9 +5,6 @@ import (
 	"time"
 )
 
-// DefaultIndex is the default capability global index.
-const DefaultIndex uint64 = 1
-
 func NewGenesisState(epochs []EpochInfo) *GenesisState {
 	return &GenesisState{Epochs: epochs}
 }

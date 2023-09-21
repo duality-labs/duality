@@ -79,13 +79,6 @@ func AddConsumerSectionCmd(defaultNodeHome string) *cobra.Command {
 	return txCmd
 }
 
-type GenesisMutator interface {
-	AlterConsumerModuleState(
-		cmd *cobra.Command,
-		callback func(state *GenesisData, appState map[string]json.RawMessage) error,
-	) error
-}
-
 type DefaultGenesisIO struct {
 	DefaultGenesisReader
 }

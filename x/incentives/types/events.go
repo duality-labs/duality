@@ -6,10 +6,9 @@ const (
 	TypeEvtAddToGauge   = "add_to_gauge"
 	TypeEvtDistribution = "distribution"
 
-	AttributeGaugeID     = "gauge_id"
-	AttributeStakedDenom = "denom"
-	AttributeReceiver    = "receiver"
-	AttributeAmount      = "amount"
+	AttributeGaugeID  = "gauge_id"
+	AttributeReceiver = "receiver"
+	AttributeAmount   = "amount"
 
 	TypeEvtStake   = "stake"
 	TypeEvtUnstake = "unstake"

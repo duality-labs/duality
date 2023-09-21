@@ -20,16 +20,6 @@ var (
 		1104,
 		"Insufficient shares:",
 	) // "%s does not have %s shares of type %s", address, shares, sharesID
-	ErrValidTickNotFound = sdkerrors.Register(
-		ModuleName,
-		1106,
-		"Valid tick not found:",
-	) // "%d", tickIndex
-	ErrValidPairNotFound = sdkerrors.Register(
-		ModuleName,
-		1107,
-		"Valid pair not found.",
-	)
 	ErrUnbalancedTxArray = sdkerrors.Register(
 		ModuleName,
 		1110,
@@ -49,16 +39,6 @@ var (
 		ModuleName,
 		1114,
 		"Not enough liquidity to complete trade",
-	)
-	ErrDepositBehindPairLiquidity = sdkerrors.Register(
-		ModuleName,
-		1115,
-		"Depositing behind the opposite token pair's liquidity is currently not allowed",
-	)
-	ErrPlaceLimitOrderBehindPairLiquidity = sdkerrors.Register(
-		ModuleName,
-		1116,
-		"Placing a limit order behind the opposite token pair's liquidity is currently not allowed",
 	)
 	ErrTickOutsideRange = sdkerrors.Register(
 		ModuleName,
@@ -95,11 +75,6 @@ var (
 		1125,
 		"MaxAmountIn in must be > 0 for swap.",
 	)
-	ErrInvalidTokenIn = sdkerrors.Register(
-		ModuleName,
-		1127,
-		"TokenIn not in specified pair.",
-	)
 	ErrActiveLimitOrderNotFound = sdkerrors.Register(
 		ModuleName,
 		1128,
@@ -114,11 +89,6 @@ var (
 		ModuleName,
 		1130,
 		"Limit order amount must be > 0.",
-	)
-	ErrNegativeLimitPrice = sdkerrors.Register(
-		ModuleName,
-		1132,
-		"LimitPrice must be > 0.",
 	)
 	ErrDepositShareUnderflow = sdkerrors.Register(
 		ModuleName,
@@ -184,16 +154,6 @@ var (
 		ModuleName,
 		1145,
 		"MaxAmountOut can only be set for taker only limit orders.",
-	)
-	ErrNegativeMaxAmountOut = sdkerrors.Register(
-		ModuleName,
-		1146,
-		"MaxAmountOut is supplied it must be  > 0",
-	)
-	ErrCorruptPoolLiquidity = sdkerrors.Register(
-		ModuleName,
-		1147,
-		"Each pool should have stored liquidity records for both sides",
 	)
 	ErrInvalidFee = sdkerrors.Register(
 		ModuleName,

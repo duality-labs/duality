@@ -1,20 +1,12 @@
 package utils
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/cometbft/cometbft/crypto/ed25519"
-	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
-
-func DefaultFeeString(cfg network.Config) string {
-	feeCoins := sdk.NewCoins(sdk.NewCoin(cfg.BondDenom, sdk.NewInt(10)))
-	return fmt.Sprintf("--%s=%s", flags.FlagFees, feeCoins.String())
-}
 
 const (
 	base   = 10

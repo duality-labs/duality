@@ -21,38 +21,6 @@ func Abs(x int64) uint64 {
 	return uint64(x)
 }
 
-func MaxInt64(a, b int64) int64 {
-	if a < b {
-		return b
-	}
-
-	return a
-}
-
-func MinInt64(a, b int64) int64 {
-	if a < b {
-		return a
-	}
-
-	return b
-}
-
-func MinDec(a, b sdk.Dec) sdk.Dec {
-	if a.LT(b) {
-		return a
-	}
-
-	return b
-}
-
-func MaxDec(a, b sdk.Dec) sdk.Dec {
-	if a.GT(b) {
-		return a
-	}
-
-	return b
-}
-
 func MinIntArr(vals []sdk.Int) sdk.Int {
 	min := vals[0]
 	for _, val := range vals {

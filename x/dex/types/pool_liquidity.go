@@ -23,10 +23,3 @@ func (pl *PoolLiquidity) Swap(
 func (pl *PoolLiquidity) Price() sdk.Dec {
 	return pl.Pool.Price(pl.TradePairID)
 }
-
-func NewPoolLiquidity(tradePairID *TradePairID, pool *Pool) Liquidity {
-	return &PoolLiquidity{
-		TradePairID: tradePairID,
-		Pool:        pool,
-	}
-}

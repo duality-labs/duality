@@ -108,10 +108,6 @@ func GetTimeKey(timestamp time.Time) []byte {
 	return bz
 }
 
-func CombineStakes(pl1 Stakes, pl2 Stakes) Stakes {
-	return append(pl1, pl2...)
-}
-
 // gaugeStoreKey returns the combined byte array (store key) of the provided gauge ID's key prefix and the ID itself.
 func GetKeyGaugeStore(id uint64) []byte {
 	return CombineKeys(KeyPrefixGauge, sdk.Uint64ToBigEndian(id))
