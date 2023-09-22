@@ -179,17 +179,10 @@ func (k Keeper) GetAllLimitOrderTrancheAtIndex(
 	return trancheList
 }
 
-func NewTrancheKey(sdkCtx sdk.Context) string {
-	blockHeight := sdkCtx.BlockHeight()
-	txGas := sdkCtx.GasMeter().GasConsumed()
-
-	var blockGas uint64 = 0
-
-	// TEMP: REMOVE ME
-	if sdkCtx.BlockGasMeter() != nil {
-		blockGas = sdkCtx.BlockGasMeter().GasConsumed()
-	}
-
+func NewTrancheKey(ctx sdk.Context) string {
+	blockHeight := ctx.BlockHeight()
+	txGas := ctx.GasMeter().GasConsumed()
+	blockGas := utils.MustGetBlockGasUsed(ctx)
 	totalGas := blockGas + txGas
 
 	blockStr := utils.Uint64ToSortableString(uint64(blockHeight))
