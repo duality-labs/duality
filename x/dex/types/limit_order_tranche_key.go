@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	math_utils "github.com/duality-labs/duality/utils/math"
 )
 
 var _ TickLiquidityKey = (*LimitOrderTrancheKey)(nil)
@@ -62,11 +62,11 @@ func (p LimitOrderTrancheKey) KeyUnmarshal(bz []byte) error {
 	return nil
 }
 
-func (p LimitOrderTrancheKey) PriceTakerToMaker() (priceTakerToMaker sdk.Dec, err error) {
+func (p LimitOrderTrancheKey) PriceTakerToMaker() (priceTakerToMaker math_utils.PrecDec, err error) {
 	return CalcPrice(p.TickIndexTakerToMaker)
 }
 
-func (p LimitOrderTrancheKey) MustPriceTakerToMaker() (priceTakerToMaker sdk.Dec) {
+func (p LimitOrderTrancheKey) MustPriceTakerToMaker() (priceTakerToMaker math_utils.PrecDec) {
 	price, err := p.PriceTakerToMaker()
 	if err != nil {
 		panic(err)

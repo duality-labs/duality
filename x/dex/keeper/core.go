@@ -6,6 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	math_utils "github.com/duality-labs/duality/utils/math"
 	"github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/dex/utils"
 )
@@ -213,7 +214,7 @@ func (k Keeper) MultiHopSwapCore(
 	goCtx context.Context,
 	amountIn sdk.Int,
 	routes []*types.MultiHopRoute,
-	exitLimitPrice sdk.Dec,
+	exitLimitPrice math_utils.PrecDec,
 	pickBestRoute bool,
 	callerAddr sdk.AccAddress,
 	receiverAddr sdk.AccAddress,
@@ -321,7 +322,7 @@ func (k Keeper) PlaceLimitOrderCore(
 	if !orderType.IsJIT() {
 		// This is ok because tokenOut is provided to the constructor of PairID above
 		takerTradePairID := pairID.MustTradePairIDFromMaker(tokenOut)
-		var limitPrice sdk.Dec
+		var limitPrice math_utils.PrecDec
 		limitPrice, err = types.CalcPrice(tickIndexInToOut)
 		err = err
 		if err != nil {
@@ -535,7 +536,7 @@ func (k Keeper) WithdrawFilledLimitOrderCore(
 		},
 	)
 
-	amountOutTokenOut := sdk.ZeroDec()
+	amountOutTokenOut := math_utils.ZeroPrecDec()
 	remainingTokenIn := sdk.ZeroInt()
 	// It's possible that a TrancheUser exists but tranche does not if LO was filled entirely through a swap
 	if found {

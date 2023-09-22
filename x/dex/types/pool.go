@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	math_utils "github.com/duality-labs/duality/utils/math"
 	"github.com/duality-labs/duality/x/dex/utils"
 )
 
@@ -93,7 +94,7 @@ func (p *Pool) Swap(
 	// b.) The most the user could get out given maxAmountIn0 (maxOutGivenIn1)
 	// c.) The maximum amount the user wants out (maxAmountOut1)
 	amountMakerOut = utils.MinIntArr(possibleAmountsMakerOut)
-	amountTakerIn = sdk.NewDecFromInt(amountMakerOut).
+	amountTakerIn = math_utils.NewPrecDecFromInt(amountMakerOut).
 		Quo(makerReserves.PriceTakerToMaker).
 		Ceil().
 		TruncateInt()
@@ -153,7 +154,7 @@ func (p *Pool) GetPoolDenom() string {
 	return NewPoolDenom(p.ID)
 }
 
-func (p *Pool) Price(tradePairID *TradePairID) sdk.Dec {
+func (p *Pool) Price(tradePairID *TradePairID) math_utils.PrecDec {
 	if tradePairID.IsTakerDenomToken0() {
 		return p.UpperTick1.PriceTakerToMaker
 	}
@@ -161,7 +162,7 @@ func (p *Pool) Price(tradePairID *TradePairID) sdk.Dec {
 	return p.LowerTick0.PriceTakerToMaker
 }
 
-func (p *Pool) MustCalcPrice1To0Center() sdk.Dec {
+func (p *Pool) MustCalcPrice1To0Center() math_utils.PrecDec {
 	// NOTE: We can safely call the error-less version of CalcPrice here because the pool object
 	// has already been initialized with an upper and lower tick which satisfy a check for IsTickOutOfRange
 	return MustCalcPrice(-1 * p.CenterTickIndex())
@@ -181,7 +182,7 @@ func (p *Pool) CalcSharesMinted(
 		price1To0Center,
 	)
 	var sharesMintedAmount sdk.Int
-	if valueExistingToken0.GT(sdk.ZeroDec()) {
+	if valueExistingToken0.GT(math_utils.ZeroPrecDec()) {
 		sharesMintedAmount = valueMintedToken0.MulInt(existingShares).
 			Quo(valueExistingToken0).
 			TruncateInt()
@@ -267,13 +268,13 @@ func CalcGreatestMatchingRatio(
 
 func CalcResidualValue(
 	amount0, amount1 sdk.Int,
-	priceLowerTakerToMaker sdk.Dec,
+	priceLowerTakerToMaker math_utils.PrecDec,
 	fee int64,
-) (sdk.Dec, error) {
+) (math_utils.PrecDec, error) {
 	// ResidualValue = Amount0 * (Price1to0Center / Price1to0Upper) + Amount1 * Price1to0Lower
 	amount0Discount, err := CalcPrice(-fee)
 	if err != nil {
-		return sdk.ZeroDec(), err
+		return math_utils.ZeroPrecDec(), err
 	}
 
 	return amount0Discount.MulInt(amount0).Add(priceLowerTakerToMaker.MulInt(amount1)), nil
@@ -283,8 +284,8 @@ func CalcFee(upperTickIndex, lowerTickIndex int64) int64 {
 	return (upperTickIndex - lowerTickIndex) / 2
 }
 
-func CalcAmountAsToken0(amount0, amount1 sdk.Int, price1To0 sdk.Dec) sdk.Dec {
-	amount0Dec := sdk.NewDecFromInt(amount0)
+func CalcAmountAsToken0(amount0, amount1 sdk.Int, price1To0 math_utils.PrecDec) math_utils.PrecDec {
+	amount0Dec := math_utils.NewPrecDecFromInt(amount0)
 
 	return amount0Dec.Add(price1To0.MulInt(amount1))
 }

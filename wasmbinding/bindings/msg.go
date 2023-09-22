@@ -3,6 +3,7 @@ package bindings
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	math_utils "github.com/duality-labs/duality/utils/math"
 )
 
 // DualityMsg is used like a sum type to hold one of custom Duality messages.
@@ -17,7 +18,7 @@ type MultiHopSwap struct {
 	Receiver       string           `json:"receiver"`
 	Routes         []*MultiHopRoute `json:"routes"`
 	AmountIn       sdk.Int          `json:"amount_in"`
-	ExitLimitPrice sdk.Dec          `json:"exit_limit_price"`
+	ExitLimitPrice math_utils.PrecDec `json:"exit_limit_price"`
 	// If pickBestRoute == true then all routes are run and the route with the best price is chosen
 	// otherwise, the first succesful route is used.
 	PickBestRoute bool `json:"pick_best_route"`

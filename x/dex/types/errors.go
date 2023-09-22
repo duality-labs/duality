@@ -43,7 +43,7 @@ var (
 	ErrTickOutsideRange = sdkerrors.Register(
 		ModuleName,
 		1117,
-		"Supplying a tick outside the range of [-352437, 352437] is not allowed",
+		"Supplying a tick > 559,680 is not allowed",
 	)
 	ErrInvalidPoolDenom = sdkerrors.Register(
 		ModuleName,

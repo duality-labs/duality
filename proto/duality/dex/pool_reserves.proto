@@ -21,13 +21,13 @@ message PoolReserves {
                  ];
   string priceTakerToMaker = 3 [
                 (gogoproto.moretags)   = "yaml:\"priceTakerToMaker\"",
-                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+                (gogoproto.customtype) = "github.com/duality-labs/duality/utils/math.PrecDec",
                 (gogoproto.nullable)   = false,
                 (gogoproto.jsontag) = "priceTakerToMaker"
                 ];
   string priceOppositeTakerToMaker = 4 [
                 (gogoproto.moretags)   = "yaml:\"priceOppositeTakerToMaker\"",
-                (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+                (gogoproto.customtype) = "github.com/duality-labs/duality/utils/math.PrecDec",
                 (gogoproto.nullable)   = false,
                 (gogoproto.jsontag) = "priceOppositeTakerToMaker"
                 ];

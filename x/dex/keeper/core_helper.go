@@ -3,6 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	math_utils "github.com/duality-labs/duality/utils/math"
 	"github.com/duality-labs/duality/x/dex/types"
 	"golang.org/x/exp/slices"
 )
@@ -11,12 +12,12 @@ import (
 //                          STATE CALCULATIONS                               //
 ///////////////////////////////////////////////////////////////////////////////
 
-func (k Keeper) GetCurrPrice(ctx sdk.Context, tradePairID *types.TradePairID) (sdk.Dec, bool) {
+func (k Keeper) GetCurrPrice(ctx sdk.Context, tradePairID *types.TradePairID) (math_utils.PrecDec, bool) {
 	liq := k.GetCurrLiq(ctx, tradePairID)
 	if liq != nil {
 		return liq.Price(), true
 	}
-	return sdk.ZeroDec(), false
+	return math_utils.ZeroPrecDec(), false
 }
 
 // Returns a takerToMaker tick index
