@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	math_utils "github.com/duality-labs/duality/utils/math"
 )
 
 type PoolLiquidity struct {
@@ -20,6 +21,6 @@ func (pl *PoolLiquidity) Swap(
 	)
 }
 
-func (pl *PoolLiquidity) Price() sdk.Dec {
+func (pl *PoolLiquidity) Price() math_utils.PrecDec {
 	return pl.Pool.Price(pl.TradePairID)
 }

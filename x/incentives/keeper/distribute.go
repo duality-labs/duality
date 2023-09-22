@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	math_utils "github.com/duality-labs/duality/utils/math"
 	dextypes "github.com/duality-labs/duality/x/dex/types"
 	"github.com/duality-labs/duality/x/incentives/types"
 
@@ -33,7 +34,7 @@ func (k Keeper) ValueForShares(ctx sdk.Context, coin sdk.Coin, tick int64) (sdk.
 	if err != nil {
 		return sdk.ZeroInt(), err
 	}
-	return sdk.NewDecFromInt(amount0).Add(price1To0Center.MulInt(amount1)).TruncateInt(), nil
+	return math_utils.NewPrecDecFromInt(amount0).Add(price1To0Center.MulInt(amount1)).TruncateInt(), nil
 }
 
 // Distribute distributes coins from an array of gauges to all eligible stakes.

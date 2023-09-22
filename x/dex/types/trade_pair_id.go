@@ -1,8 +1,8 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	math_utils "github.com/duality-labs/duality/utils/math"
 )
 
 func NewTradePairID(takerDenom, makerDenom string) (*TradePairID, error) {
@@ -90,11 +90,11 @@ func (p TradePairID) TickIndexNormalized(tickIndexTakerToMaker int64) int64 {
 	return p.TickIndexTakerToMaker(tickIndexTakerToMaker)
 }
 
-func (p TradePairID) PriceTakerToMaker(tickIndexNormalized int64) (priceTakerToMaker sdk.Dec, err error) {
+func (p TradePairID) PriceTakerToMaker(tickIndexNormalized int64) (priceTakerToMaker math_utils.PrecDec, err error) {
 	return CalcPrice(p.TickIndexTakerToMaker(tickIndexNormalized))
 }
 
-func (p TradePairID) MustPriceTakerToMaker(tickIndexNormalized int64) (priceTakerToMaker sdk.Dec) {
+func (p TradePairID) MustPriceTakerToMaker(tickIndexNormalized int64) (priceTakerToMaker math_utils.PrecDec) {
 	price, err := p.PriceTakerToMaker(tickIndexNormalized)
 	if err != nil {
 		panic(err)

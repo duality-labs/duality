@@ -1,11 +1,13 @@
 package types
 
-import sdk "github.com/cosmos/cosmos-sdk/types"
+import (
+	math_utils "github.com/duality-labs/duality/utils/math"
+)
 
 // NOTE: These methods should be avoided if possible.
 // Generally default to dealing with LimitOrderTranche or PoolReserves explicitly
 
-func (t TickLiquidity) Price() sdk.Dec {
+func (t TickLiquidity) Price() math_utils.PrecDec {
 	switch liquidity := t.Liquidity.(type) {
 	case *TickLiquidity_LimitOrderTranche:
 		return liquidity.LimitOrderTranche.PriceTakerToMaker

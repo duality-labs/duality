@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	math_utils "github.com/duality-labs/duality/utils/math"
 	"github.com/duality-labs/duality/x/dex/utils"
 )
 
@@ -73,11 +74,11 @@ func (p PoolReservesKey) Counterpart() *PoolReservesKey {
 	}
 }
 
-func (p PoolReservesKey) PriceTakerToMaker() (priceTakerToMaker sdk.Dec, err error) {
+func (p PoolReservesKey) PriceTakerToMaker() (priceTakerToMaker math_utils.PrecDec, err error) {
 	return CalcPrice(p.TickIndexTakerToMaker)
 }
 
-func (p PoolReservesKey) MustPriceTakerToMaker() (priceTakerToMaker sdk.Dec) {
+func (p PoolReservesKey) MustPriceTakerToMaker() (priceTakerToMaker math_utils.PrecDec) {
 	price, err := p.PriceTakerToMaker()
 	if err != nil {
 		panic(err)

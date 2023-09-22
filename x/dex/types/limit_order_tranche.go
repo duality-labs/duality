@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	math_utils "github.com/duality-labs/duality/utils/math"
 	"github.com/duality-labs/duality/x/dex/utils"
 )
 
@@ -88,19 +89,19 @@ func (t LimitOrderTranche) HasTokenOut() bool {
 	return t.ReservesTakerDenom.GT(sdk.ZeroInt())
 }
 
-func (t LimitOrderTranche) Price() sdk.Dec {
+func (t LimitOrderTranche) Price() math_utils.PrecDec {
 	return t.PriceTakerToMaker
 }
 
-func (t LimitOrderTranche) RatioFilled() sdk.Dec {
+func (t LimitOrderTranche) RatioFilled() math_utils.PrecDec {
 	amountFilled := t.PriceTakerToMaker.MulInt(t.TotalTakerDenom)
 	ratioFilled := amountFilled.QuoInt(t.TotalMakerDenom)
 	return ratioFilled
 }
 
-func (t LimitOrderTranche) AmountUnfilled() sdk.Dec {
+func (t LimitOrderTranche) AmountUnfilled() math_utils.PrecDec {
 	amountFilled := t.PriceTakerToMaker.MulInt(t.TotalTakerDenom)
-	return sdk.NewDecFromInt(t.TotalMakerDenom).Sub(amountFilled)
+	return math_utils.NewPrecDecFromInt(t.TotalMakerDenom).Sub(amountFilled)
 }
 
 func (t LimitOrderTranche) HasLiquidity() bool {
@@ -120,13 +121,13 @@ func (t *LimitOrderTranche) RemoveTokenIn(
 	return amountToRemove
 }
 
-func (t *LimitOrderTranche) Withdraw(trancheUser *LimitOrderTrancheUser) (sdk.Int, sdk.Dec) {
-	reservesTokenOutDec := sdk.NewDecFromInt(t.ReservesTakerDenom)
+func (t *LimitOrderTranche) Withdraw(trancheUser *LimitOrderTrancheUser) (sdk.Int, math_utils.PrecDec) {
+	reservesTokenOutDec := math_utils.NewPrecDecFromInt(t.ReservesTakerDenom)
 
 	ratioFilled := t.RatioFilled()
 	maxAllowedToWithdraw := ratioFilled.MulInt(trancheUser.SharesOwned).TruncateInt()
 	amountOutTokenIn := maxAllowedToWithdraw.Sub(trancheUser.SharesWithdrawn)
-	amountOutTokenOut := sdk.NewDecFromInt(amountOutTokenIn).Quo(t.PriceTakerToMaker)
+	amountOutTokenOut := math_utils.NewPrecDecFromInt(amountOutTokenIn).Quo(t.PriceTakerToMaker)
 	t.ReservesTakerDenom = reservesTokenOutDec.Sub(amountOutTokenOut).TruncateInt()
 
 	return amountOutTokenIn, amountOutTokenOut
@@ -146,7 +147,7 @@ func (t *LimitOrderTranche) Swap(maxAmountTakerIn sdk.Int, maxAmountMakerOut *sd
 	}
 	outAmount = utils.MinIntArr(possibleOutAmounts)
 
-	inAmount = sdk.NewDecFromInt(outAmount).Quo(t.PriceTakerToMaker).Ceil().TruncateInt()
+	inAmount = math_utils.NewPrecDecFromInt(outAmount).Quo(t.PriceTakerToMaker).Ceil().TruncateInt()
 
 	*fillTokenIn = fillTokenIn.Add(inAmount)
 	*totalTokenIn = totalTokenIn.Add(inAmount)

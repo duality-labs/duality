@@ -251,7 +251,7 @@ message QueryEstimateMultiHopSwapRequest {
            string        receiver       = 2;
   repeated MultiHopRoute routes         = 3;
            string        amountIn       = 4 [(gogoproto.moretags) = "yaml:\"amountIn\""      , (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int", (gogoproto.nullable) = false, (gogoproto.jsontag) = "amountIn"      ];
-           string        exitLimitPrice = 5 [(gogoproto.moretags) = "yaml:\"exitLimitPrice\"", (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false, (gogoproto.jsontag) = "exitLimitPrice"];
+  string        exitLimitPrice = 5 [(gogoproto.moretags) = "yaml:\"exitLimitPrice\"", (gogoproto.customtype) = "github.com/duality-labs/duality/utils/math.PrecDec", (gogoproto.nullable) = false, (gogoproto.jsontag) = "exitLimitPrice"];
   
   // If pickBestRoute == true then all routes are run and the route with the best price is chosen
   // otherwise, the first succesful route is used.
