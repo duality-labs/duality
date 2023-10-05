@@ -27,14 +27,14 @@ COPY . .
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/root/go/pkg/mod \
     CGO_ENABLED=1 \
-    CC=aarch64-linux-gnu-gcc \
+    # CC=aarch64-linux-gnu-gcc \
     GOOS=linux \
-    GOARCH=arm64 \
+    GOARCH=amd64 \
     go build -o build/dualityd_arm64 ./cmd/dualityd
 
 
 # Final image build on small stable release of ARM64 Linux
-FROM arm64v8/alpine:3.14 as base-env
+FROM amd64/alpine:3.14 as base-env
 
 # Install ca-certificates
 RUN apk add --update \
@@ -76,10 +76,10 @@ EXPOSE 1317
 FROM base-env as edit-config-files
 
 # install TOML editing tool dasel for complicated TOML edits
-RUN wget https://github.com/TomWright/dasel/releases/download/v1.27.3/dasel_linux_arm64.gz; \
-    gzip -d dasel_linux_arm64.gz; \
-    chmod 755 dasel_linux_arm64; \
-    mv ./dasel_linux_arm64 /usr/local/bin/dasel;
+RUN wget https://github.com/TomWright/dasel/releases/download/v1.27.3/dasel_linux_amd64.gz; \
+    gzip -d dasel_linux_amd64.gz; \
+    chmod 755 dasel_linux_amd64; \
+    mv ./dasel_linux_amd64 /usr/local/bin/dasel;
 
 #  create default config files
 RUN dualityd init --chain-id "$CHAIN_ID" duality
