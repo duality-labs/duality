@@ -27,6 +27,14 @@ else
     dualityd add-genesis-account faucet "${B}token,${B}stake,${B}tokenA,${B}tokenB,${B}tokenC,${B}tokenD,${B}tokenE,${B}tokenF,${B}tokenG,${B}tokenH,${B}tokenI,${B}tokenJ,${B}tokenK,${B}tokenL,${B}tokenM,${B}tokenN,${B}tokenO,${B}tokenP,${B}tokenQ,${B}tokenR,${B}tokenS,${B}tokenT,${B}tokenU,${B}tokenV,${B}tokenW,${B}tokenX,${B}tokenY,${B}tokenZ" --keyring-backend test
 fi
 
+# Add trader account
+if [ -z "$TRADER_MNEMONIC" ]; then
+    echo "No TRADER_MNEMONIC"
+else
+    echo $TRADER_MNEMONIC | dualityd keys add faucet --recover --keyring-backend test
+    dualityd add-genesis-account faucet "${B}token,${B}stake,${B}tokenA,${B}tokenB,${B}tokenC,${B}tokenD" --keyring-backend test
+fi
+
 
 
 echo "Starting new chain..."

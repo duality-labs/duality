@@ -1,13 +1,13 @@
 version: "3"
-# x-aws-vpc: "vpc-013e79af9077c1e0e"
-# x-aws-cluster: "devnet-cluster"
-# x-aws-loadbalancer: "duality-devnet-lb"
+x-aws-vpc: "vpc-013e79af9077c1e0e"
+x-aws-cluster: "devnet-cluster"
+x-aws-loadbalancer: "duality-devnet-lb"
 services:
-
-  genesis-node-launcher:
+  genesis-node:
     environment:
       - MNEMONICS=reveal gloom baby scan escape shine flock kind marriage sad clinic affair invite dove document youth weekend brave mutual chief sunny return myself sorry;input coin depth fetch interest shaft vendor ready cave tell ten robot stem cat travel visit unknown saddle rain great describe derive inhale attract;actress general today spike hire bronze elbow cage mystery scheme attack head october lucky poverty eagle forest column lizard flag nominee frog gap audit
       - FAUCET_MNEMONIC=guilt sausage note edit route horror miss key bike fire icon raven fire rug gas dust property attend salad cabin town toy green photo
+      - TRADER_MNEMONIC=wire tenant auction firm eyebrow trigger regret october drop title roof theory plastic deal collect food afford belt govern grass scatter tree risk unlock
   indexer:
     image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/hapi-indexer:${INDEXER_TAG:-latest}
     ports:
@@ -22,18 +22,48 @@ services:
     depends_on:
      follower-node:
        condition: service_healthy
+
   faucet:
+    restart: always
+    container_name: faucet-all
     image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/testnet-faucet:latest
-    ports:
-      - target: 9000
-        x-aws-protocol: http
+    volumes:
+      - faucet:/tmp/.storage
     environment:
-      - RPC_NODE=tcp://genesis-node:26657
-      - DENOMS=tokenA,tokenB,tokenC,tokenD
+      - TRANSPORT=discord
       - MNEMONIC=guilt sausage note edit route horror miss key bike fire icon raven fire rug gas dust property attend salad cabin town toy green photo
+      - CHAIN_ID=duality-devnet
+      - CHAIN_PREFIX=cosmos
+      - REST_URL=http://follower-node:1317
+      - DENOM=tokenA,tokenB,tokenC,tokenD
+      # - STORAGE=
+      - GAS_LIMIT=100000000
+      - FEE=0
+      - DROP_AMOUNT=10000000
+      - TIMEOUT=2
+      - DISCORD_CHANNEL_NAME=duality-faucet
+      - DISCORD_APP_ID=1041241686120071171
+      - DISCORD_TOKEN=MTA0MTI0MTY4NjEyMDA3MTE3MQ.G5Hv-L.PsaumTNYoACcoTqldZa-1EbvBJO8Gl8OgnmD3M
     depends_on:
-  follower-node:
+     follower-node:
        condition: service_healthy
+  dualitypricebotsimulator:
+    container_name: dualitypricebot
+    image: 137158674376.dkr.ecr.us-west-2.amazonaws.com/trading-bot:latest
+    environment:
+      - DEBUG=0
+      - MNEMONIC=wire tenant auction firm eyebrow trigger regret october drop title roof theory plastic deal collect food afford belt govern grass scatter tree risk unlock
+      - RPC_ADDRESS=http://follower-node:26657
+      - API_ADDRESS=http://follower-node:1317
+      - TRADE_DURATION_SECONDS=${TRADE_DURATION_SECONDS:-}
+      - TRADE_FREQUENCY_SECONDS=${TRADE_FREQUENCY_SECONDS:-60}
+    depends_on:
+     follower-node:
+       condition: service_healthy
+
+volumes:
+  faucet:
+    external: false
 
 
 
