@@ -120,7 +120,7 @@ func (server msgServer) Unstake(goCtx context.Context, msg *types.MsgUnstake) (*
 
 	unstakes := msg.Unstakes
 	if len(msg.Unstakes) == 0 {
-		stakes := server.keeper.GetStakesByAccount(ctx, sdk.AccAddress(msg.Owner))
+		stakes := server.keeper.GetStakesByAccount(ctx, sdk.MustAccAddressFromBech32(msg.Owner))
 		unstakes = make([]*types.MsgUnstake_UnstakeDescriptor, len(stakes))
 		for i, stake := range stakes {
 			unstakes[i] = &types.MsgUnstake_UnstakeDescriptor{
