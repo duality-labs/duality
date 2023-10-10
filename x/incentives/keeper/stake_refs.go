@@ -41,10 +41,10 @@ func (k Keeper) getStakeRefKeys(ctx sdk.Context, stake *types.Stake) ([][]byte, 
 	if err != nil {
 		return nil, err
 	}
-
-	refKeys := make(map[string]bool)
-	refKeys[string(types.KeyPrefixStakeIndex)] = true
-	refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexAccount, owner))] = true
+	nKeys := 2 + 4*len(stake.Coins)
+	refKeys := make([]string, 0, nKeys)
+	refKeys = append(refKeys, string(types.KeyPrefixStakeIndex))
+	refKeys = append(refKeys, string(types.CombineKeys(types.KeyPrefixStakeIndexAccount, owner)))
 
 	for _, coin := range stake.Coins {
 		poolMetadata, err := k.dk.GetPoolMetadataByDenom(ctx, coin.Denom)
@@ -52,21 +52,30 @@ func (k Keeper) getStakeRefKeys(ctx sdk.Context, stake *types.Stake) ([][]byte, 
 			panic("Only valid LP tokens should be staked")
 		}
 		denomBz := []byte(coin.Denom)
-		pairIDBz := []byte(poolMetadata.PairID.CanonicalString())
-		tickBz := dextypes.TickIndexToBytes(poolMetadata.Tick)
-		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexDenom, denomBz))] = true
-		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexPairTick, pairIDBz, tickBz))] = true
-		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexAccountDenom, owner, denomBz))] = true
-		refKeys[string(types.CombineKeys(
-			types.KeyPrefixStakeIndexPairDistEpoch,
+		pairIDBz := []byte(depositDenom.PairID.Stringify())
+		tickBz := dextypes.TickIndexToBytes(
+			depositDenom.Tick,
+			depositDenom.PairID,
+			depositDenom.PairID.Token1,
+		)
+		refKeys = append(refKeys, string(types.CombineKeys(types.KeyPrefixStakeIndexDenom, denomBz)))
+		refKeys = append(refKeys, string(types.CombineKeys(types.KeyPrefixStakeIndexPairTick, pairIDBz, tickBz)))
+		refKeys = append(refKeys, string(types.CombineKeys(types.KeyPrefixStakeIndexAccountDenom, owner, denomBz)))
+		refKeys = append(refKeys, string(types.CombineKeys(
+			types.KeyPrefixStakeIndexPairTimestamp,
 			pairIDBz,
-			types.GetKeyInt64(stake.StartDistEpoch),
-		))] = true
+			types.GetTimeKey(stake.StartTime),
+		)))
 	}
 
-	refKeyBytes := make([][]byte, 0, len(refKeys))
-	for k := range refKeys {
-		refKeyBytes = append(refKeyBytes, []byte(k))
+	// Since we might end up with duplicate refkeys we need to de-dupe the list
+	uniqueRefKeyBytes := make([][]byte, 0, len(refKeys))
+	seen := make(map[string]bool)
+	for _, k := range refKeys {
+		if !seen[k] {
+			seen[k] = true
+			uniqueRefKeyBytes = append(uniqueRefKeyBytes, []byte(k))
+		}
 	}
-	return refKeyBytes, nil
+	return uniqueRefKeyBytes, nil
 }
