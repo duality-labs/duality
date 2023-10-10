@@ -41,10 +41,10 @@ func getStakeRefKeys(stake *types.Stake) ([][]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	refKeys := make(map[string]bool)
-	refKeys[string(types.KeyPrefixStakeIndex)] = true
-	refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexAccount, owner))] = true
+	nKeys := 2 + 4*len(stake.Coins)
+	refKeys := make([]string, 0, nKeys)
+	refKeys = append(refKeys, string(types.KeyPrefixStakeIndex))
+	refKeys = append(refKeys, string(types.CombineKeys(types.KeyPrefixStakeIndexAccount, owner)))
 
 	for _, coin := range stake.Coins {
 		depositDenom, err := dextypes.NewDepositDenomFromString(coin.Denom)
@@ -58,19 +58,24 @@ func getStakeRefKeys(stake *types.Stake) ([][]byte, error) {
 			depositDenom.PairID,
 			depositDenom.PairID.Token1,
 		)
-		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexDenom, denomBz))] = true
-		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexPairTick, pairIDBz, tickBz))] = true
-		refKeys[string(types.CombineKeys(types.KeyPrefixStakeIndexAccountDenom, owner, denomBz))] = true
-		refKeys[string(types.CombineKeys(
+		refKeys = append(refKeys, string(types.CombineKeys(types.KeyPrefixStakeIndexDenom, denomBz)))
+		refKeys = append(refKeys, string(types.CombineKeys(types.KeyPrefixStakeIndexPairTick, pairIDBz, tickBz)))
+		refKeys = append(refKeys, string(types.CombineKeys(types.KeyPrefixStakeIndexAccountDenom, owner, denomBz)))
+		refKeys = append(refKeys, string(types.CombineKeys(
 			types.KeyPrefixStakeIndexPairTimestamp,
 			pairIDBz,
 			types.GetTimeKey(stake.StartTime),
-		))] = true
+		)))
 	}
 
-	refKeyBytes := make([][]byte, 0, len(refKeys))
-	for k, _ := range refKeys {
-		refKeyBytes = append(refKeyBytes, []byte(k))
+	// Since we might end up with duplicate refkeys we need to de-dupe the list
+	uniqueRefKeyBytes := make([][]byte, 0, len(refKeys))
+	seen := make(map[string]bool)
+	for _, k := range refKeys {
+		if !seen[k] {
+			seen[k] = true
+			uniqueRefKeyBytes = append(uniqueRefKeyBytes, []byte(k))
+		}
 	}
-	return refKeyBytes, nil
+	return uniqueRefKeyBytes, nil
 }
