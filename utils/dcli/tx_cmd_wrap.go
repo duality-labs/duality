@@ -24,7 +24,8 @@ type TxCliDesc struct {
 	Long    string
 	Example string
 
-	NumArgs int
+	NumArgs    int
+	CustomArgs cobra.PositionalArgs
 	// Contract: len(args) = NumArgs
 	ParseAndBuildMsg  func(clientCtx client.Context, args []string, flags *pflag.FlagSet) (sdk.Msg, error)
 	TxSignerFieldName string
@@ -60,16 +61,22 @@ func BuildTxCli[M sdk.Msg](desc *TxCliDesc) *cobra.Command {
 			return ParseFieldsFromFlagsAndArgs[M](flagAdvice, flags, args)
 		}
 	}
-	return desc.BuildCommandCustomFn()
+	c := desc.BuildCommandCustomFn()
+
+	return c
 }
 
 // Creates a new cobra command given the description.
 // Its up to then caller to add CLI flags, aside from `flags.AddTxFlagsToCmd(cmd)`
 func (desc TxCliDesc) BuildCommandCustomFn() *cobra.Command {
+	argsFn := cobra.ExactArgs(desc.NumArgs)
+	if desc.CustomArgs != nil {
+		argsFn = desc.CustomArgs
+	}
 	cmd := &cobra.Command{
 		Use:   desc.Use,
 		Short: desc.Short,
-		Args:  cobra.ExactArgs(desc.NumArgs),
+		Args:  argsFn,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
