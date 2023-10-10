@@ -169,5 +169,6 @@ func NewUnstakeCmd() (*dcli.TxCliDesc, *types.MsgUnstake) {
 		Short:            "Unstake tokens",
 		ParseAndBuildMsg: UnstakeCmdBuilder,
 		Long:             `{{.Short}}{{.ExampleHeader}} unstake-tokens 1:100TokenA 2:10TokenZ,20TokenB`,
+		CustomArgs:       cobra.ArbitraryArgs,
 	}, &types.MsgUnstake{}
 }
