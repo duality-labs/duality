@@ -31,8 +31,8 @@ fi
 if [ -z "$TRADER_MNEMONIC" ]; then
     echo "No TRADER_MNEMONIC"
 else
-    echo $TRADER_MNEMONIC | dualityd keys add faucet --recover --keyring-backend test
-    dualityd add-genesis-account faucet "${B}token,${B}stake,${B}tokenA,${B}tokenB,${B}tokenC,${B}tokenD" --keyring-backend test
+    echo $TRADER_MNEMONIC | dualityd keys add trader --recover --keyring-backend test
+    dualityd add-genesis-account trader "${B}token,${B}stake,${B}tokenA,${B}tokenB,${B}tokenC,${B}tokenD" --keyring-backend test
 fi
 
 
