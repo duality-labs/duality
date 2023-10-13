@@ -1,12 +1,11 @@
 {
-  "genesis_time": "2023-06-02T05:42:05.516116Z",
+  "genesis_time": "2023-10-13T21:11:28.583722Z",
   "chain_id": "duality",
   "initial_height": "1",
   "consensus_params": {
     "block": {
       "max_bytes": "22020096",
-      "max_gas": "10000000",
-      "time_iota_ms": "1000"
+      "max_gas": "400000000"
     },
     "evidence": {
       "max_age_num_blocks": "100000",
@@ -18,13 +17,13 @@
         "ed25519"
       ]
     },
-    "version": {}
+    "version": {
+      "app": "0"
+    }
   },
   "app_hash": "",
   "app_state": {
-    "adminmodule": {
-      "admins": []
-    },
+    "07-tendermint": null,
     "auth": {
       "params": {
         "max_memo_characters": "256",
@@ -45,7 +44,8 @@
       },
       "balances": [],
       "supply": [],
-      "denom_metadata": []
+      "denom_metadata": [],
+      "send_enabled": []
     },
     "capability": {
       "index": "1",
@@ -107,7 +107,8 @@
               "hash": "SHA256"
             },
             "max_depth": 0,
-            "min_depth": 0
+            "min_depth": 0,
+            "prehash_key_before_comparison": false
           },
           {
             "leaf_spec": {
@@ -129,28 +130,29 @@
               "hash": "SHA256"
             },
             "max_depth": 0,
-            "min_depth": 0
+            "min_depth": 0,
+            "prehash_key_before_comparison": false
           }
         ],
         "upgrade_path": [
           "upgrade",
           "upgradedIBCState"
         ],
-        "allow_update_after_expiry": true,
-        "allow_update_after_misbehaviour": true
+        "allow_update_after_expiry": false,
+        "allow_update_after_misbehaviour": false
       },
       "provider_consensus_state": {
-        "timestamp": "2023-06-02T05:42:11.203117Z",
+        "timestamp": "2023-10-13T21:11:33.446092Z",
         "root": {
           "hash": "ZHVtbXk="
         },
-        "next_validators_hash": "5A625E7EA955BF397E6D410507B47C0F35E0A82362F2A1D6FEC593D806AF4541"
+        "next_validators_hash": "9CDE8C70CF911FFA7353E03B0FC89497F1BE3D32237A842EF23127CFF062CAA7"
       },
       "maturing_packets": [],
       "initial_val_set": [
         {
           "pub_key": {
-            "ed25519": "6E84Afu4/Vj4nmC1MQmrQJf0CkAdVzonU0AwSmJaFqM="
+            "ed25519": "p8z2N7MAAVF9j34uZ1vP4x0xJdjgAAI6kpr5BKsDzos="
           },
           "power": "100"
         }
@@ -162,7 +164,8 @@
       },
       "last_transmission_block_height": {
         "height": "0"
-      }
+      },
+      "preCCV": false
     },
     "crisis": {
       "constant_fee": {
@@ -213,6 +216,9 @@
     "feegrant": {
       "allowances": []
     },
+    "genutil": {
+      "gen_txs": []
+    },
     "ibc": {
       "client_genesis": {
         "clients": [],
@@ -221,7 +227,8 @@
         "params": {
           "allowed_clients": [
             "06-solomachine",
-            "07-tendermint"
+            "07-tendermint",
+            "09-localhost"
           ]
         },
         "create_localhost": false,
@@ -256,9 +263,6 @@
       "last_stake_id": "0",
       "stakes": []
     },
-    "mev": {
-      "params": {}
-    },
     "packetfowardmiddleware": {
       "params": {
         "fee_percentage": "0.000000000000000000"
@@ -284,7 +288,8 @@
       "params": {
         "send_enabled": true,
         "receive_enabled": true
-      }
+      },
+      "total_escrowed": []
     },
     "upgrade": {},
     "vesting": {}

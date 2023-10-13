@@ -7,7 +7,7 @@ ARG BASE_IMAGE_TAG=latest
 
 FROM ghcr.io/strangelove-ventures/infra-toolkit:v0.0.7 AS infra-toolkit
 
-FROM ghcr.io/duality-labs/duality:${BASE_IMAGE_TAG}
+FROM duality:local
 
 # NOTE: Make heighliner owner of all copied files so
 # they can be deleted after startup if desired
